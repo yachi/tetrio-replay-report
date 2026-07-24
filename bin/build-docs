@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""Regenerate docs/ (the GitHub Pages site) from the sessions.
+
+    bin/build-docs
+
+Copies each session's self-contained report into docs/ under a clean name and
+regenerates docs/index.html from facts.json + the proof maps — so the landing
+page can never drift from the data it describes. Re-run after adding a session.
+"""
+import json
+import shutil
+from html import escape
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+DOCS = REPO / "docs"
+SESSIONS = REPO / "sessions"
+
+# (session dir, artefact subdir, output name, label, blurb)
+ARTEFACTS = [
+    ("2026-07-22", "report", "2026-07-22.html", "完整戰報",
+     "十場 series、79 局，每個數字都有 Dafny lemma。"),
+    ("2026-07-24", "report", "2026-07-24.html", "完整戰報",
+     "七場 series、50 局，復仇戰full report。"),
+    ("2026-07-24", None, "2026-07-24-live.html", "即場戰報",
+     "同一晚嘅精簡版即場報告，另有 20 條獨立驗證嘅 claim。"),
+]
+LOOSE_REPORTS = {("2026-07-24", None): "report-2026-07-24.html"}
+
+
+def load(path):
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def proof_map_rows(path):
+    data = load(path)
+    return data if isinstance(data, list) else [dict(v, id=k) for k, v in data.items()]
+
+
+def summarize(session, artefact):
+    """Derive the headline numbers straight from the session's own data."""
+    base = SESSIONS / session / (artefact or "proof")
+    facts_file = next(
+        (p for p in sorted(base.glob("facts*.json")) if not p.name.startswith("facts2")), None
+    )
+    if facts_file is None:
+        return None
+    facts = load(facts_file)
+    players = facts["players"]
+    wins = {p: 0 for p in players}
+    round_wins = {p: 0 for p in players}
+    rounds = 0
+    for match in facts["matches"]:
+        wins[match["winner"]] += 1
+        rounds += len(match["rounds"])
+        for rnd in match["rounds"]:
+            round_wins[rnd["winner"]] += 1
+    claims = 0
+    for pm in list(base.glob("*proof-map*.json")):
+        claims += len(proof_map_rows(pm))
+    champ = max(wins, key=lambda p: wins[p])
+    # Scores are rendered in PLAYER order (players[0] : players[1]) so they read
+    # correctly next to the names. Never champion-first — that silently reverses
+    # the meaning whenever players[0] is not the winner.
+    left, right = players[0], players[1]
+    return {
+        "players": players,
+        "champion": champ,
+        "score": f"{wins[left]}:{wins[right]}",
+        "rounds_score": f"{round_wins[left]}:{round_wins[right]}",
+        "matches": len(facts["matches"]),
+        "rounds": rounds,
+        "claims": claims,
+    }
+
+
+CSS = """
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f5f6fa; --card:#fff; --ink:#12141c; --muted:#6b7080; --line:rgba(18,20,28,.12);
+  --p1:#0e8f9e; --p2:#7c3aed; --accent:#0e8f9e;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0a0c12; --card:#141824; --ink:#eef1f8; --muted:#8f96ab; --line:rgba(255,255,255,.10);
+        --p1:#22d3ee; --p2:#a78bfa; --accent:#22d3ee}
+}
+:root[data-theme="dark"]{--bg:#0a0c12;--card:#141824;--ink:#eef1f8;--muted:#8f96ab;
+  --line:rgba(255,255,255,.10);--p1:#22d3ee;--p2:#a78bfa;--accent:#22d3ee}
+:root[data-theme="light"]{--bg:#f5f6fa;--card:#fff;--ink:#12141c;--muted:#6b7080;
+  --line:rgba(18,20,28,.12);--p1:#0e8f9e;--p2:#7c3aed;--accent:#0e8f9e}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang HK","Hiragino Sans CNS","Noto Sans HK","Microsoft JhengHei",
+    -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:clamp(2rem,6vw,4.5rem) clamp(1.1rem,4vw,2rem) 5rem}
+.kicker{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(1.9rem,5.5vw,3rem);line-height:1.2;margin:.5rem 0 1rem;letter-spacing:-.02em}
+.lede{color:var(--muted);max-width:62ch;margin:0 0 2.5rem}
+h2{font-size:1.05rem;letter-spacing:.02em;margin:3rem 0 1rem;
+  padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:1.35rem 1.4rem;text-decoration:none;color:inherit;display:block;
+  transition:transform .15s ease,border-color .15s ease}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card .date{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;color:var(--muted)}
+.card .title{font-weight:650;font-size:1.12rem;margin:.35rem 0 .1rem}
+.vs{display:flex;align-items:baseline;gap:.5rem;margin:.75rem 0 .5rem;flex-wrap:wrap}
+.vs b{font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.p1{color:var(--p1)} .p2{color:var(--p2)}
+.meta{font-size:.83rem;color:var(--muted);margin-top:.6rem}
+.pill{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:.7rem;padding:.16rem .5rem;border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
+  color:var(--accent);margin-top:.7rem}
+.blurb{font-size:.9rem;color:var(--muted);margin:.5rem 0 0}
+footer{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--line);
+  font-size:.85rem;color:var(--muted)}
+a{color:var(--accent)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
+"""
+
+
+def render_index(cards, totals):
+    parts = [
+        '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
+        "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        '<meta name="description" content="TETR.IO 1v1 對戰分析報告，每一句數據都由 Dafny 形式驗證。">',
+        f"<style>{CSS}</style></head><body><div class='wrap'>",
+        "<p class='kicker'>TETR.IO · 1v1 SERIES REPORTS</p>",
+        "<h1>每個數字都有證明嘅戰報</h1>",
+        "<p class='lede'>每份戰報嘅數據由兩個獨立寫嘅 parser 抽出並互相對數，"
+        "每一句可以數得出嘅說話都寫成一條 claim，再由 Dafny 逐條形式驗證；"
+        "mutation test 保證啲 lemma 唔係擺設。CI 每次 push 都會重跑晒所有 gate。</p>",
+        f"<p class='lede'><strong>{totals['sessions']}</strong> 個 session · "
+        f"<strong>{totals['matches']}</strong> 場 match · "
+        f"<strong>{totals['rounds']}</strong> 局 · "
+        f"<strong>{totals['claims']}</strong> 條已驗證 claim</p>",
+        "<h2>戰報</h2><div class='grid'>",
+    ]
+    for c in cards:
+        s = c["summary"]
+        parts.append(
+            f"<a class='card' href='{escape(c['href'])}'>"
+            f"<div class='date'>{escape(c['date'])}</div>"
+            f"<div class='title'>{escape(c['label'])}</div>"
+            f"<div class='vs'><span class='p1'>{escape(s['players'][0])}</span>"
+            f"<b>{escape(s['score'])}</b>"
+            f"<span class='p2'>{escape(s['players'][1])}</span></div>"
+            f"<div class='meta'>局數 {escape(s['rounds_score'])} · "
+            f"{s['matches']} 場 · {s['rounds']} 局 · 冠軍 {escape(s['champion'])}</div>"
+            f"<p class='blurb'>{escape(c['blurb'])}</p>"
+            f"<span class='pill'>✓ {s['claims']} 條 claim 已證明</span></a>"
+        )
+    parts.append("</div>")
+    parts.append("<h2>工具</h2><div class='grid'>")
+    parts.append(
+        "<a class='card' href='analyzer.html'>"
+        "<div class='date'>TOOL</div><div class='title'>Replay 分析器</div>"
+        "<p class='blurb'>掉一個 <code>.ttrm</code> 入去就即刻出即場戰報，"
+        "全部喺你部機行，冇嘢上傳。</p></a>"
+    )
+    parts.append(
+        "<a class='card' href='https://github.com/yachi/tetrio-replay-report'>"
+        "<div class='date'>SOURCE</div><div class='title'>GitHub repo</div>"
+        "<p class='blurb'>抽取器、claim ledger、Dafny 證明、mutation test、"
+        "同埋 CI 全部喺度，可以自己重跑。</p></a>"
+    )
+    parts.append("</div>")
+    parts.append(
+        "<footer><p>Dafny 證明嘅係「claim ⇔ 抽出嚟嘅數據」。"
+        "數據本身啱唔啱，靠兩個獨立 parser 完全一致嚟兜底 —— 呢兩件事係分開嘅，唔好溝埋。</p>"
+        "<p>Replays &amp; reports 由 yachi 同 pinglamb 對戰產生，兩位都同意公開。</p></footer>"
+    )
+    parts.append("</div></body></html>")
+    return "".join(parts)
+
+
+def main():
+    DOCS.mkdir(exist_ok=True)
+    cards = []
+    totals = {"sessions": 0, "matches": 0, "rounds": 0, "claims": 0}
+    seen_sessions = set()
+
+    for session, artefact, out_name, label, blurb in ARTEFACTS:
+        if artefact:
+            src = SESSIONS / session / artefact / "report.html"
+        else:
+            src = SESSIONS / session / LOOSE_REPORTS[(session, artefact)]
+        if not src.exists():
+            print(f"  skip {src.relative_to(REPO)} (missing)")
+            continue
+        summary = summarize(session, artefact)
+        if summary is None:
+            print(f"  skip {session}/{artefact} (no facts)")
+            continue
+        shutil.copyfile(src, DOCS / out_name)
+        cards.append(
+            {"href": out_name, "date": session, "label": label,
+             "blurb": blurb, "summary": summary}
+        )
+        totals["claims"] += summary["claims"]
+        if session not in seen_sessions:
+            seen_sessions.add(session)
+            totals["sessions"] += 1
+            totals["matches"] += summary["matches"]
+            totals["rounds"] += summary["rounds"]
+        print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
+
+    analyzer = REPO / "tools" / "analyzer.html"
+    if analyzer.exists():
+        shutil.copyfile(analyzer, DOCS / "analyzer.html")
+        print("  copied tools/analyzer.html -> docs/analyzer.html")
+
+    (DOCS / ".nojekyll").write_text("", encoding="utf-8")
+    (DOCS / "index.html").write_text(render_index(cards, totals), encoding="utf-8")
+    print(
+        f"wrote docs/index.html — {totals['sessions']} sessions, "
+        f"{totals['matches']} matches, {totals['rounds']} rounds, "
+        f"{totals['claims']} verified claims"
+    )
+
+
+if __name__ == "__main__":
+    main()

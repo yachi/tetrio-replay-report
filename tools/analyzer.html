@@ -1,0 +1,1624 @@
+<meta charset="utf-8" />
+<title>TETR.IO Replay 分析器 — 即場戰報</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ============================= TOKENS ============================= */
+  :root {
+    --bg: #f5f6fa;
+    --bg-raised: #ffffff;
+    --bg-sunken: #eceef5;
+    --ink: #12141c;
+    --ink-secondary: #4b4f5e;
+    --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10);
+    --border-strong: rgba(18, 20, 28, 0.18);
+
+    /* player-1 = teal, player-2 = violet (assigned by player order, not name) */
+    --p1: #0e8f9e;
+    --p1-tint: rgba(14, 143, 158, 0.10);
+    --p1-tint-strong: rgba(14, 143, 158, 0.20);
+    --p2: #7c3aed;
+    --p2-tint: rgba(124, 58, 237, 0.10);
+    --p2-tint-strong: rgba(124, 58, 237, 0.20);
+
+    --good: #0ca30c;
+    --good-tint: rgba(12, 163, 12, 0.12);
+    --bad: #d03b3b;
+    --bad-tint: rgba(208, 59, 59, 0.12);
+    --pending: #c98500;
+    --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b;
+    --spotlight-tint: rgba(184, 134, 11, 0.12);
+    --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+
+    /* extra categorical hues for clears breakdown / >2 players */
+    --c-blue: #2a78d6;
+    --c-aqua: #1baf7a;
+    --c-yellow: #eda100;
+    --c-green: #008300;
+    --c-violet: #4a3aa7;
+    --c-red: #e34948;
+    --c-magenta: #e87ba4;
+    --c-orange: #eb6834;
+
+    --grid-line: #e1e0d9;
+    --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+
+    --font-cjk: "PingFang HK", "Noto Sans HK", "Microsoft JhengHei", "Heiti TC",
+      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+      "Liberation Mono", monospace;
+
+    --content-w: 920px;
+    --wide-w: 1200px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0d13; --bg-raised: #141924; --bg-sunken: #10141d;
+      --ink: #edeff7; --ink-secondary: #b7bcce; --muted: #6e7488;
+      --border: rgba(255, 255, 255, 0.09); --border-strong: rgba(255, 255, 255, 0.17);
+      --p1: #1caa9e; --p1-tint: rgba(28, 170, 158, 0.16); --p1-tint-strong: rgba(28, 170, 158, 0.28);
+      --p2: #9678e8; --p2-tint: rgba(150, 120, 232, 0.18); --p2-tint-strong: rgba(150, 120, 232, 0.30);
+      --good: #23c923; --good-tint: rgba(35, 201, 35, 0.16);
+      --bad: #e66767; --bad-tint: rgba(230, 103, 103, 0.16);
+      --pending: #fab219; --pending-tint: rgba(250, 178, 25, 0.16);
+      --spotlight: #e8b94a; --spotlight-tint: rgba(232, 185, 74, 0.16); --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+      --c-blue: #3987e5; --c-aqua: #199e70; --c-yellow: #c98500; --c-green: #008300;
+      --c-violet: #9085e9; --c-red: #e66767; --c-magenta: #d55181; --c-orange: #d95926;
+      --grid-line: #262b38;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0d13; --bg-raised: #141924; --bg-sunken: #10141d;
+    --ink: #edeff7; --ink-secondary: #b7bcce; --muted: #6e7488;
+    --border: rgba(255, 255, 255, 0.09); --border-strong: rgba(255, 255, 255, 0.17);
+    --p1: #1caa9e; --p1-tint: rgba(28, 170, 158, 0.16); --p1-tint-strong: rgba(28, 170, 158, 0.28);
+    --p2: #9678e8; --p2-tint: rgba(150, 120, 232, 0.18); --p2-tint-strong: rgba(150, 120, 232, 0.30);
+    --good: #23c923; --good-tint: rgba(35, 201, 35, 0.16);
+    --bad: #e66767; --bad-tint: rgba(230, 103, 103, 0.16);
+    --pending: #fab219; --pending-tint: rgba(250, 178, 25, 0.16);
+    --spotlight: #e8b94a; --spotlight-tint: rgba(232, 185, 74, 0.16); --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+    --c-blue: #3987e5; --c-aqua: #199e70; --c-yellow: #c98500; --c-green: #008300;
+    --c-violet: #9085e9; --c-red: #e66767; --c-magenta: #d55181; --c-orange: #d95926;
+    --grid-line: #262b38;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f6fa; --bg-raised: #ffffff; --bg-sunken: #eceef5;
+    --ink: #12141c; --ink-secondary: #4b4f5e; --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10); --border-strong: rgba(18, 20, 28, 0.18);
+    --p1: #0e8f9e; --p1-tint: rgba(14, 143, 158, 0.10); --p1-tint-strong: rgba(14, 143, 158, 0.20);
+    --p2: #7c3aed; --p2-tint: rgba(124, 58, 237, 0.10); --p2-tint-strong: rgba(124, 58, 237, 0.20);
+    --good: #0ca30c; --good-tint: rgba(12, 163, 12, 0.12);
+    --bad: #d03b3b; --bad-tint: rgba(208, 59, 59, 0.12);
+    --pending: #c98500; --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b; --spotlight-tint: rgba(184, 134, 11, 0.12); --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+    --c-blue: #2a78d6; --c-aqua: #1baf7a; --c-yellow: #eda100; --c-green: #008300;
+    --c-violet: #4a3aa7; --c-red: #e34948; --c-magenta: #e87ba4; --c-orange: #eb6834;
+    --grid-line: #e1e0d9;
+    --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+  }
+
+  /* ============================= RESET / BASE ============================= */
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-cjk);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4 { text-wrap: balance; margin: 0; font-family: var(--font-cjk); }
+  p { margin: 0 0 1em; }
+  p:last-child { margin-bottom: 0; }
+  a { color: inherit; }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  ::selection { background: var(--p2-tint-strong); }
+  :focus-visible { outline: 2px solid var(--p1); outline-offset: 2px; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  }
+
+  /* ============================= LAYOUT SHELL ============================= */
+  .wrap { max-width: var(--content-w); margin: 0 auto; padding: 0 24px; }
+  .wrap-wide { max-width: var(--wide-w); margin: 0 auto; padding: 0 24px; }
+  section { padding: 56px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: ""; width: 22px; height: 2px;
+    background: linear-gradient(90deg, var(--p1), var(--p2));
+    display: inline-block; border-radius: 2px;
+  }
+  .section-title { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -0.01em; }
+  .section-lede { color: var(--ink-secondary); font-size: 1.02rem; max-width: 64ch; margin-top: 12px; }
+
+  /* ============================= TOP BAR ============================= */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px clamp(16px, 4vw, 40px);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: saturate(1.2) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.01em; }
+  .brand .logo { width: 20px; height: 20px; border-radius: 5px; background: linear-gradient(135deg, var(--p1), var(--p2)); box-shadow: var(--shadow); }
+  .brand small { font-family: var(--font-mono); font-weight: 500; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; }
+  .topbar .spacer { flex: 1; }
+  .tbtn {
+    font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+    background: var(--bg-raised); color: var(--ink); cursor: pointer; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 7px; transition: filter .15s, background .15s;
+  }
+  .tbtn:hover { filter: brightness(1.05); }
+  .tbtn[disabled] { opacity: .4; cursor: not-allowed; }
+  .tbtn.primary { background: linear-gradient(135deg, var(--p1), var(--p2)); color: #fff; border-color: transparent; }
+  @media (max-width: 520px) {
+    .topbar { flex-wrap: wrap; padding: 10px 16px; gap: 8px; }
+    .topbar .spacer { display: none; }
+    .brand { flex: 1 1 auto; }
+    .brand small { display: none; }
+    .tbtn { padding: 7px 11px; font-size: 0.72rem; }
+  }
+
+  /* ============================= DROP ZONE / EMPTY ============================= */
+  .stage { min-height: calc(100vh - 54px); display: flex; flex-direction: column; }
+  .drop {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 40px 24px;
+    background:
+      radial-gradient(ellipse 900px 420px at 18% -6%, var(--p1-tint), transparent 60%),
+      radial-gradient(ellipse 900px 420px at 84% 4%, var(--p2-tint), transparent 60%);
+  }
+  .drop-card {
+    max-width: 640px; width: 100%; text-align: center;
+    border: 2px dashed var(--border-strong); border-radius: 24px;
+    padding: clamp(32px, 6vw, 64px) clamp(20px, 5vw, 48px);
+    background: color-mix(in srgb, var(--bg-raised) 55%, transparent);
+    transition: border-color .18s, background .18s, transform .18s;
+  }
+  body.dragging .drop-card { border-color: var(--p1); background: var(--p1-tint); transform: scale(1.01); }
+  .drop-tetro { display: flex; gap: 6px; justify-content: center; margin-bottom: 26px; }
+  .drop-tetro i { width: 20px; height: 20px; border-radius: 4px; display: inline-block; box-shadow: var(--shadow); animation: bob 2.4s ease-in-out infinite; }
+  .drop-tetro i:nth-child(1){ background: var(--c-blue); animation-delay: 0s;}
+  .drop-tetro i:nth-child(2){ background: var(--c-violet); animation-delay: .12s;}
+  .drop-tetro i:nth-child(3){ background: var(--c-aqua); animation-delay: .24s;}
+  .drop-tetro i:nth-child(4){ background: var(--c-yellow); animation-delay: .36s;}
+  .drop-tetro i:nth-child(5){ background: var(--c-red); animation-delay: .48s;}
+  @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-7px);} }
+  .drop-h { font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 800; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .drop-sub { color: var(--ink-secondary); font-size: 1.02rem; margin: 0 auto 26px; max-width: 46ch; }
+  .drop-actions { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .file-label {
+    display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+    font-weight: 700; padding: 12px 22px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--p1), var(--p2)); color: #fff;
+    box-shadow: var(--shadow); transition: filter .15s, transform .1s;
+  }
+  .file-label:hover { filter: brightness(1.06); }
+  .file-label:active { transform: translateY(1px); }
+  .file-label input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .drop-hint { font-family: var(--font-mono); font-size: 0.76rem; color: var(--muted); letter-spacing: 0.03em; }
+
+  /* error chips */
+  .errbar { max-width: var(--content-w); margin: 0 auto; padding: 0 24px; }
+  .err-chips { display: flex; flex-wrap: wrap; gap: 10px; padding: 18px 0 0; }
+  .err-chip {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.86rem;
+    padding: 8px 13px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--bad) 40%, var(--border-strong));
+    background: var(--bad-tint); color: var(--bad); max-width: 100%;
+  }
+  .err-chip .fn { font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all; }
+
+  /* ============================= HERO / SCOREBOARD ============================= */
+  .hero { padding: 44px 0 8px; }
+  .hero-meta { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 18px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .hero-title { font-size: clamp(1.7rem, 4vw, 2.7rem); font-weight: 800; letter-spacing: -0.015em; line-height: 1.25; max-width: 24ch; }
+  .hero-title .h1c { color: var(--p1); }
+  .hero-title .h2c { color: var(--p2); }
+
+  .scoreboard {
+    margin-top: 34px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px;
+    background: var(--bg-raised); border: 1px solid var(--border); border-radius: 20px;
+    padding: 26px clamp(16px, 4vw, 40px); box-shadow: var(--shadow);
+  }
+  .sb-player { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .sb-player.p-right { align-items: flex-end; text-align: right; }
+  .sb-name { font-size: clamp(1.05rem, 2.4vw, 1.5rem); font-weight: 800; overflow-wrap: anywhere; }
+  .sb-player.p-left .sb-name { color: var(--p1); }
+  .sb-player.p-right .sb-name { color: var(--p2); }
+  .sb-tag { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); letter-spacing: 0.05em; }
+  .sb-mid { text-align: center; }
+  .sb-score { font-family: var(--font-mono); font-weight: 800; font-size: clamp(2.2rem, 8vw, 4rem); letter-spacing: -0.02em; line-height: 1; }
+  .sb-score .win1 { color: var(--p1); }
+  .sb-score .win2 { color: var(--p2); }
+  .sb-score .dash { color: var(--muted); margin: 0 .12em; }
+  .sb-sub { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); margin-top: 8px; letter-spacing: 0.04em; }
+
+  /* stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-top: 26px; }
+  .stat-card { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); }
+  .stat-card .k { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+  .stat-card .v { font-family: var(--font-mono); font-weight: 800; font-size: 1.7rem; letter-spacing: -0.01em; }
+  .stat-card .d { font-size: 0.82rem; color: var(--ink-secondary); margin-top: 6px; }
+  .stat-card.accent-1 { border-top: 3px solid var(--p1); }
+  .stat-card.accent-2 { border-top: 3px solid var(--p2); }
+  .stat-card.accent-g { border-top: 3px solid var(--spotlight); }
+
+  /* ============================= MATCH CARDS ============================= */
+  .match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); gap: 16px; margin-top: 8px; }
+  .match-card { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
+  .mc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .mc-idx { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); letter-spacing: 0.06em; }
+  .mc-win { font-weight: 800; font-size: 0.92rem; }
+  .mc-win.w1 { color: var(--p1); } .mc-win.w2 { color: var(--p2); }
+  .mc-score { font-family: var(--font-mono); font-weight: 800; font-size: 1.9rem; letter-spacing: -0.01em; }
+  .mc-score .s1 { color: var(--p1); } .mc-score .s2 { color: var(--p2); } .mc-score .dash { color: var(--muted); }
+  .pips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pip { width: 15px; height: 15px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .pip.p1 { background: var(--p1); } .pip.p2 { background: var(--p2); }
+  .mc-note { font-size: 0.85rem; color: var(--ink-secondary); border-top: 1px dashed var(--border); padding-top: 10px; }
+  .mc-note b { color: var(--ink); }
+
+  /* ============================= CHARTS ============================= */
+  .chart-panel { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px; padding: 20px 20px 16px; box-shadow: var(--shadow); margin-top: 18px; }
+  .chart-panel h3 { font-size: 1.02rem; font-weight: 800; margin-bottom: 4px; }
+  .chart-panel .cap { font-size: 0.85rem; color: var(--ink-secondary); margin-bottom: 12px; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 0.82rem; color: var(--ink-secondary); }
+  .legend-row .lg { display: inline-flex; align-items: center; gap: 7px; }
+  .legend-row .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .scroll-x { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  svg { display: block; max-width: 100%; }
+  svg text { font-family: var(--font-mono); fill: var(--muted); }
+  .axis-line { stroke: var(--grid-line); stroke-width: 1; }
+  .grid-line { stroke: var(--grid-line); stroke-width: 1; stroke-dasharray: 2 3; }
+  .bar { transition: opacity .12s; }
+  .bar:hover { opacity: .82; }
+  .val-lbl { fill: var(--ink-secondary); font-weight: 700; }
+
+  .charts-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+  /* tale of the tape */
+  .tot { display: flex; flex-direction: column; gap: 2px; }
+  .tot-row { display: grid; grid-template-columns: 1fr 128px 1fr; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .tot-row:last-child { border-bottom: 0; }
+  .tot-val { font-family: var(--font-mono); font-weight: 800; font-size: 0.98rem; }
+  .tot-val.l { text-align: right; } .tot-val.r { text-align: left; }
+  .tot-val.win1 { color: var(--p1); } .tot-val.win2 { color: var(--p2); }
+  .tot-lbl { text-align: center; font-size: 0.76rem; color: var(--muted); font-family: var(--font-mono); letter-spacing: 0.03em; }
+  .tot-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-top: 5px; align-items: center; }
+  .tot-bar { height: 7px; border-radius: 4px; background: var(--bg-sunken); overflow: hidden; position: relative; }
+  .tot-bar .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .tot-bar.l { transform: scaleX(-1); }
+  .tot-bar.l .fill { background: var(--p1); left: 0; }
+  .tot-bar.r .fill { background: var(--p2); left: 0; }
+
+  /* ============================= SUPERLATIVES ============================= */
+  .super-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .super-card { background: var(--bg-raised); border: 1px solid var(--border); border-left: 3px solid var(--spotlight); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
+  .super-card .st { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--spotlight); margin-bottom: 8px; }
+  .super-card .sv { font-size: 0.98rem; line-height: 1.6; }
+  .super-card .sv b { font-weight: 800; }
+
+  /* ============================= RECOMMENDATIONS ============================= */
+  .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+  .rec-col { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+  .rec-col.for-1 { border-top: 3px solid var(--p1); }
+  .rec-col.for-2 { border-top: 3px solid var(--p2); }
+  .rec-col h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+  .rec-col.for-1 h3 { color: var(--p1); } .rec-col.for-2 h3 { color: var(--p2); }
+  .rec-col .rc-sub { font-size: 0.84rem; color: var(--muted); font-family: var(--font-mono); margin-bottom: 16px; }
+  .rec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  .rec-item { display: flex; gap: 12px; }
+  .rec-num { flex: none; width: 26px; height: 26px; border-radius: 8px; background: var(--bg-sunken); color: var(--ink-secondary); font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; }
+  .rec-item .txt { font-size: 0.94rem; line-height: 1.65; }
+  .rec-item .txt b { font-weight: 800; }
+  .rec-tag { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 2px; }
+  .rec-neutral { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: 14px; padding: 18px; color: var(--ink-secondary); font-size: 0.94rem; }
+
+  /* ============================= BADGES ============================= */
+  .badge {
+    display: inline-flex; align-items: baseline; gap: 0.28em;
+    font-family: var(--font-mono); font-size: 0.66em; font-weight: 700; letter-spacing: 0.02em;
+    padding: 0.12em 0.5em; margin: 0 0.12em; border-radius: 999px;
+    border: 1px solid var(--border-strong); background: var(--bg-sunken); color: var(--ink-secondary);
+    text-decoration: none; vertical-align: 0.5em; line-height: 1; white-space: nowrap; cursor: pointer;
+  }
+  .badge[data-status="pass"] { border-color: color-mix(in srgb, var(--good) 55%, var(--border-strong)); background: var(--good-tint); color: var(--good); }
+  .badge[data-status="fail"] { border-color: color-mix(in srgb, var(--bad) 60%, var(--border-strong)); background: var(--bad-tint); color: var(--bad); }
+  .badge:hover { filter: brightness(1.08); }
+  .badge .ic { font-size: 0.95em; }
+
+  /* ============================= APPENDIX TABLE ============================= */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); background: var(--bg-raised); margin-top: 18px; }
+  table.appendix { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 0.86rem; }
+  table.appendix th, table.appendix td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.appendix thead th { position: sticky; top: 0; background: var(--bg-sunken); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); z-index: 1; }
+  table.appendix tbody tr:last-child td { border-bottom: 0; }
+  table.appendix .id-cell { font-family: var(--font-mono); font-weight: 700; color: var(--ink-secondary); white-space: nowrap; }
+  table.appendix .cat-cell { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+  table.appendix .src-cell { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); max-width: 340px; }
+  table.appendix .src-cell code { white-space: pre-wrap; word-break: break-word; }
+  .status-pill { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-weight: 700; font-size: 0.74rem; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .status-pill[data-status="pass"] { background: var(--good-tint); color: var(--good); }
+  .status-pill[data-status="fail"] { background: var(--bad-tint); color: var(--bad); }
+
+  .method-note { background: var(--bg-sunken); border: 1px solid var(--border); border-left: 3px solid var(--pending); border-radius: 14px; padding: 18px 20px; font-size: 0.9rem; color: var(--ink-secondary); margin-top: 22px; }
+  .method-note b { color: var(--ink); }
+  .status-line { font-family: var(--font-mono); font-size: 0.9rem; margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: var(--bg-sunken); border: 1px solid var(--border); }
+  .status-line[data-all="pass"] { border-color: color-mix(in srgb, var(--good) 45%, var(--border)); }
+  .status-line[data-all="fail"] { border-color: color-mix(in srgb, var(--bad) 55%, var(--border)); color: var(--bad); }
+
+  /* aggregate leaderboard (>2 players) */
+  table.leaderboard { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.9rem; }
+  table.leaderboard th, table.leaderboard td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align: right; font-variant-numeric: tabular-nums; }
+  table.leaderboard th:first-child, table.leaderboard td:first-child { text-align: left; }
+  table.leaderboard thead th { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--bg-sunken); }
+  table.leaderboard .pname { font-weight: 800; }
+
+  /* shared SVG tooltip */
+  #tooltip {
+    position: fixed; z-index: 200; pointer-events: none; opacity: 0; transition: opacity .1s;
+    background: var(--ink); color: var(--bg); font-family: var(--font-mono); font-size: 0.76rem;
+    padding: 7px 10px; border-radius: 8px; box-shadow: var(--shadow); max-width: 260px; line-height: 1.5;
+  }
+
+  .report-footer { padding: 40px 0 64px; color: var(--muted); font-family: var(--font-mono); font-size: 0.78rem; text-align: center; }
+
+  #report { display: none; }
+  body.has-data #stage { display: none; }
+  body.has-data #report { display: block; }
+</style>
+
+<div class="topbar">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>Replay 分析器 <small>TETR.IO · .ttrm</small></div>
+  <div class="spacer"></div>
+  <button class="tbtn" id="reset-btn" hidden type="button">↻ 換一批</button>
+  <button class="tbtn" id="export-btn" disabled type="button">⬇ 匯出 facts.json</button>
+  <button class="tbtn" id="theme-btn" type="button" aria-label="切換主題">◐ 主題</button>
+</div>
+
+<div id="stage" class="stage">
+  <div class="drop" id="dropzone">
+    <div class="drop-card">
+      <div class="drop-tetro" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="drop-h">掉幾個 replay 入嚟，即刻出戰報</div>
+      <p class="drop-sub">拖 TETR.IO 嘅 <b>.ttrm</b> 多人對戰檔案入呢版任何位置，或者禁掣揀檔。一次掉幾多個都得,即場幫你砌埋成份廣東話數據報告。全程喺你部機度計,唔會傳去任何伺服器。</p>
+      <div class="drop-actions">
+        <label class="file-label">
+          <span aria-hidden="true">📂</span> 揀 .ttrm 檔案
+          <input id="file-input" type="file" accept=".ttrm,application/json" multiple />
+        </label>
+        <span class="drop-hint">或者直接拖檔入嚟 · 支援 1 個或以上</span>
+      </div>
+    </div>
+  </div>
+  <div class="errbar"><div class="err-chips" id="stage-errs"></div></div>
+</div>
+
+<main id="report" aria-live="polite"></main>
+
+<div id="tooltip" role="status"></div>
+
+<script>
+"use strict";
+(function () {
+  /* ============================================================
+   *  PART 1 — PARSING & FACTS  (deep-equal to SCHEMA.md format)
+   * ============================================================ */
+  var CLEAR_KEYS = [
+    ["singles","singles"],["doubles","doubles"],["triples","triples"],["quads","quads"],
+    ["tspin_singles","tspinsingles"],["tspin_doubles","tspindoubles"],["tspin_triples","tspintriples"],
+    ["mini_tspin_singles","minitspinsingles"],["mini_tspin_doubles","minitspindoubles"],["allclear","allclear"]
+  ];
+
+  function x1000(v) { var n = Number(v); return Number.isFinite(n) ? Math.floor(n * 1000 + 0.5) : 0; }
+  function intVal(v) { var n = Number(v); return Number.isFinite(n) ? Math.trunc(n) : 0; }
+
+  function extractGarbageEvents(events) {
+    var out = [];
+    if (!Array.isArray(events)) return out;
+    for (var i = 0; i < events.length; i++) {
+      var e = events[i];
+      if (!e || e.type !== "ige") continue;
+      var data = e.data;
+      if (!data || data.type !== "interaction_confirm") continue;
+      var inner = data.data;
+      if (!inner || inner.type !== "garbage") continue;
+      out.push({ frame: intVal(data.frame), amt: intVal(inner.amt) });
+    }
+    return out;
+  }
+
+  function extractLeaderboardEntry(entry) {
+    var s = (entry && entry.stats) || {};
+    return {
+      wins: intVal(entry && entry.wins),
+      apm_x1000: x1000(s.apm), pps_x1000: x1000(s.pps), vs_x1000: x1000(s.vsscore),
+      garbagesent: intVal(s.garbagesent), garbagereceived: intVal(s.garbagereceived), kills: intVal(s.kills)
+    };
+  }
+
+  function extractRoundPlayer(p) {
+    var s = (p && p.stats) || {};
+    var rs = (p && p.replay && p.replay.results && p.replay.results.stats) || {};
+    var cr = rs.clears || {};
+    var gr = rs.garbage || {};
+    var fr = rs.finesse || {};
+    var clears = {};
+    for (var i = 0; i < CLEAR_KEYS.length; i++) clears[CLEAR_KEYS[i][0]] = intVal(cr[CLEAR_KEYS[i][1]]);
+    return {
+      lifetime: intVal(p && p.lifetime),
+      alive: (p && p.alive) === true,
+      apm_x1000: x1000(s.apm), pps_x1000: x1000(s.pps), vs_x1000: x1000(s.vsscore),
+      garbagesent: intVal(s.garbagesent), garbagereceived: intVal(s.garbagereceived), kills: intVal(s.kills),
+      lines: intVal(rs.lines), pieces: intVal(rs.piecesplaced), inputs: intVal(rs.inputs), holds: intVal(rs.holds),
+      topcombo: intVal(rs.topcombo), topbtb: intVal(rs.topbtb), tspins: intVal(rs.tspins),
+      clears: clears,
+      garbage_attack: intVal(gr.attack), garbage_cleared: intVal(gr.cleared), maxspike: intVal(gr.maxspike),
+      finesse_faults: intVal(fr.faults), finesse_perfect: intVal(fr.perfectpieces),
+      garbage_events: extractGarbageEvents(p && p.replay && p.replay.events)
+    };
+  }
+
+  // Parse one replay into an intermediate match record. Throws on structural garbage.
+  function parseOne(name, text) {
+    var raw;
+    try { raw = JSON.parse(text); }
+    catch (e) { throw new Error("唔係有效 JSON,讀唔到(可能唔係 .ttrm 檔)"); }
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("唔係 replay 物件");
+    var rp = raw.replay;
+    if (!rp || !Array.isArray(rp.leaderboard)) throw new Error("搵唔到 replay.leaderboard");
+    if (!Array.isArray(rp.rounds)) throw new Error("搵唔到 replay.rounds");
+
+    var seen = [];        // usernames in first-appearance order (leaderboard then rounds)
+    var leaderboard = {}; // username -> entry
+    var score = {};
+    for (var i = 0; i < rp.leaderboard.length; i++) {
+      var e = rp.leaderboard[i];
+      var u = e && e.username;
+      if (typeof u !== "string") continue;
+      if (seen.indexOf(u) < 0) seen.push(u);
+      leaderboard[u] = extractLeaderboardEntry(e);
+      score[u] = leaderboard[u].wins;
+    }
+
+    var rounds = rp.rounds.map(function (roundPlayers, ri) {
+      if (!Array.isArray(roundPlayers)) throw new Error("round " + ri + " 唔係陣列");
+      var players = {};
+      var winner = "";
+      var aliveCount = 0;
+      for (var j = 0; j < roundPlayers.length; j++) {
+        var pl = roundPlayers[j];
+        var pu = pl && pl.username;
+        if (typeof pu !== "string") throw new Error("round " + ri + " 有 player 冇 username");
+        if (seen.indexOf(pu) < 0) seen.push(pu);
+        players[pu] = extractRoundPlayer(pl);
+        if (players[pu].alive) { winner = pu; aliveCount++; }
+      }
+      if (aliveCount !== 1 && !winner) {
+        // fall back to the last-standing / lowest-death; keep deterministic
+        winner = Object.keys(players)[0] || "";
+      }
+      return { index: ri, winner: winner, players: players };
+    });
+
+    if (typeof raw.ts !== "string") throw new Error("搵唔到 top-level ts");
+
+    return { file: name, ts: raw.ts, _seen: seen, _score: score, leaderboard: leaderboard, rounds: rounds };
+  }
+
+  function derivePlayerOrder(records) {
+    var order = [];
+    for (var i = 0; i < records.length; i++) {
+      var s = records[i]._seen;
+      for (var j = 0; j < s.length; j++) if (order.indexOf(s[j]) < 0) order.push(s[j]);
+    }
+    return order;
+  }
+
+  function matchWinner(rec, playerOrder) {
+    var best = "", bestWins = -Infinity, bestRank = Infinity;
+    for (var u in rec._score) {
+      if (!rec._score.hasOwnProperty(u)) continue;
+      var w = rec._score[u];
+      var rank = playerOrder.indexOf(u); if (rank < 0) rank = 999;
+      if (w > bestWins || (w === bestWins && rank < bestRank)) { bestWins = w; best = u; bestRank = rank; }
+    }
+    return best;
+  }
+
+  // Build the canonical facts object (SCHEMA.md shape). items: [{name,text}].
+  // Returns { facts, errors:[{file,error}] }.
+  function buildFacts(items) {
+    var records = [], errors = [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var name = it && typeof it === "object" ? (it.name || it.file || ("match-" + (i + 1) + ".ttrm")) : ("match-" + (i + 1) + ".ttrm");
+      var text = it && typeof it === "object" ? (it.text != null ? it.text : it.content) : it;
+      try {
+        records.push(parseOne(name, String(text)));
+      } catch (err) {
+        errors.push({ file: name, error: (err && err.message) ? err.message : String(err) });
+      }
+    }
+    // sort by ts ascending (ties -> filename)
+    records.sort(function (a, b) {
+      if (a.ts < b.ts) return -1; if (a.ts > b.ts) return 1;
+      return a.file < b.file ? -1 : a.file > b.file ? 1 : 0;
+    });
+    var playerOrder = derivePlayerOrder(records);
+
+    var matches = records.map(function (rec, idx) {
+      var winner = matchWinner(rec, playerOrder);
+      var score = {};
+      for (var k = 0; k < playerOrder.length; k++) {
+        var u = playerOrder[k];
+        if (rec._score.hasOwnProperty(u)) score[u] = rec._score[u];
+      }
+      // preserve any usernames not in global order (defensive)
+      for (var u2 in rec._score) if (rec._score.hasOwnProperty(u2) && !score.hasOwnProperty(u2)) score[u2] = rec._score[u2];
+      return {
+        index: idx + 1, file: rec.file, ts: rec.ts, winner: winner,
+        score: score, leaderboard: rec.leaderboard, rounds: rec.rounds
+      };
+    });
+
+    return { facts: { players: playerOrder, matches: matches }, errors: errors };
+  }
+
+  /* ============================================================
+   *  PART 2 — DERIVED METRICS  (pure functions over facts)
+   * ============================================================ */
+  function sum(arr) { var t = 0; for (var i = 0; i < arr.length; i++) t += arr[i]; return t; }
+  function roundDuration(r) { var m = 0; for (var u in r.players) if (r.players.hasOwnProperty(u)) m = Math.max(m, r.players[u].lifetime); return m; }
+  function queuedIncoming(pl) { var t = 0; for (var i = 0; i < pl.garbage_events.length; i++) t += pl.garbage_events[i].amt; return t; }
+  function tspinClears(c) { return c.tspin_singles + c.tspin_doubles + c.tspin_triples + c.mini_tspin_singles + c.mini_tspin_doubles; }
+  function allRounds(facts) { var out = []; facts.matches.forEach(function (m) { m.rounds.forEach(function (r) { out.push({ m: m, r: r }); }); }); return out; }
+
+  var SPIKE_THRESHOLD = 12;
+
+  function derive(facts) {
+    var players = facts.players;
+    var d = { players: players, perPlayer: {}, twoPlayer: players.length === 2 };
+    // per-player accumulators
+    players.forEach(function (p) {
+      d.perPlayer[p] = {
+        matchWins: 0, roundWins: 0, rounds: 0,
+        pieces: 0, lines: 0, inputs: 0, holds: 0,
+        finesse_faults: 0, finesse_perfect: 0,
+        garbage_cleared: 0, garbage_attack: 0, garbagesent: 0, garbagereceived: 0,
+        queuedIncoming: 0, lifetimeMs: 0,
+        quads: 0, tspinClears: 0, allclear: 0, tspinsRaw: 0,
+        maxSpikeCeiling: 0, spikeRounds: 0,
+        topbtb: 0, topcombo: 0,
+        clears: { singles: 0, doubles: 0, triples: 0, quads: 0, tspin_singles: 0, tspin_doubles: 0, tspin_triples: 0, mini_tspin_singles: 0, mini_tspin_doubles: 0, allclear: 0 }
+      };
+    });
+    facts.matches.forEach(function (m) {
+      if (d.perPlayer[m.winner]) d.perPlayer[m.winner].matchWins++;
+      m.rounds.forEach(function (r) {
+        for (var p in r.players) {
+          if (!r.players.hasOwnProperty(p) || !d.perPlayer[p]) continue;
+          var pl = r.players[p], a = d.perPlayer[p];
+          a.rounds++;
+          a.pieces += pl.pieces; a.lines += pl.lines; a.inputs += pl.inputs; a.holds += pl.holds;
+          a.finesse_faults += pl.finesse_faults; a.finesse_perfect += pl.finesse_perfect;
+          a.garbage_cleared += pl.garbage_cleared; a.garbage_attack += pl.garbage_attack;
+          a.garbagesent += pl.garbagesent; a.garbagereceived += pl.garbagereceived;
+          a.queuedIncoming += queuedIncoming(pl); a.lifetimeMs += pl.lifetime;
+          a.quads += pl.clears.quads; a.tspinClears += tspinClears(pl.clears); a.allclear += pl.clears.allclear;
+          a.tspinsRaw += pl.tspins;
+          a.topbtb = Math.max(a.topbtb, pl.topbtb); a.topcombo = Math.max(a.topcombo, pl.topcombo);
+          a.maxSpikeCeiling = Math.max(a.maxSpikeCeiling, pl.maxspike);
+          if (pl.maxspike >= SPIKE_THRESHOLD) a.spikeRounds++;
+          for (var ck in a.clears) if (a.clears.hasOwnProperty(ck)) a.clears[ck] += pl.clears[ck];
+        }
+        if (d.perPlayer[r.winner]) d.perPlayer[r.winner].roundWins++;
+      });
+    });
+    // rates
+    players.forEach(function (p) {
+      var a = d.perPlayer[p];
+      a.seconds = a.lifetimeMs / 1000;
+      a.ppsAgg = a.seconds > 0 ? a.pieces / a.seconds : 0;                 // pieces per second (aggregate)
+      a.faultRate = a.pieces > 0 ? a.finesse_faults / a.pieces : 0;         // faults per piece
+      a.perfectRate = a.pieces > 0 ? a.finesse_perfect / a.pieces : 0;
+      a.attackPerPiece = a.pieces > 0 ? a.garbage_attack / a.pieces : 0;
+      a.tspinShare = (a.tspinClears + a.quads) > 0 ? a.tspinClears / (a.tspinClears + a.quads) : 0;
+    });
+    d.totalRounds = facts.matches.reduce(function (t, m) { return t + m.rounds.length; }, 0);
+    d.totalMatches = facts.matches.length;
+
+    // superlatives
+    var rs = allRounds(facts);
+    d.longest = null; d.shortest = null; d.maxSpike = { val: -1, hits: [] }; d.bestComeback = null; d.higherVsAlways = true; d.higherVsCount = 0;
+    rs.forEach(function (x) {
+      var dur = roundDuration(x.r);
+      if (!d.longest || dur > d.longest.dur) d.longest = { m: x.m, r: x.r, dur: dur };
+      if (!d.shortest || dur < d.shortest.dur) d.shortest = { m: x.m, r: x.r, dur: dur };
+      for (var p in x.r.players) {
+        if (!x.r.players.hasOwnProperty(p)) continue;
+        var sp = x.r.players[p].maxspike;
+        if (sp > d.maxSpike.val) { d.maxSpike.val = sp; d.maxSpike.hits = [{ m: x.m, r: x.r, p: p }]; }
+        else if (sp === d.maxSpike.val) d.maxSpike.hits.push({ m: x.m, r: x.r, p: p });
+      }
+      // higher-vs-wins check (2-player)
+      if (d.twoPlayer) {
+        var w = x.r.winner, l = players[0] === w ? players[1] : players[0];
+        if (x.r.players[w] && x.r.players[l]) {
+          if (x.r.players[w].vs_x1000 > x.r.players[l].vs_x1000) d.higherVsCount++;
+          else d.higherVsAlways = false;
+          // comeback = winner queued MORE incoming than loser
+          var deficit = queuedIncoming(x.r.players[w]) - queuedIncoming(x.r.players[l]);
+          if (deficit > 0 && (!d.bestComeback || deficit > d.bestComeback.deficit)) {
+            d.bestComeback = { m: x.m, r: x.r, winner: w, loser: l, deficit: deficit,
+              winQ: queuedIncoming(x.r.players[w]), loseQ: queuedIncoming(x.r.players[l]) };
+          }
+        }
+      }
+    });
+
+    // deciders: matches decided by exactly 1 round of margin (2-player)
+    if (d.twoPlayer) {
+      d.deciders = [];
+      facts.matches.forEach(function (m) {
+        var a = m.score[players[0]] || 0, b = m.score[players[1]] || 0;
+        if (Math.abs(a - b) === 1) {
+          var lastWinner = m.rounds.length ? m.rounds[m.rounds.length - 1].winner : "";
+          d.deciders.push({ m: m, winner: m.winner, lastWinner: lastWinner });
+        }
+      });
+      d.deciderWins = {}; players.forEach(function (p) { d.deciderWins[p] = 0; });
+      d.deciders.forEach(function (x) { if (d.deciderWins[x.winner] != null) d.deciderWins[x.winner]++; });
+    }
+    return d;
+  }
+
+  /* ============================================================
+   *  PART 3 — CLAIM ENGINE  (live predicates over facts)
+   * ============================================================ */
+  function ClaimBag(facts) {
+    this.facts = facts; this.list = []; this._n = 0;
+  }
+  // register a claim; canto text embeds numbers, predicate re-derives from facts. returns id.
+  ClaimBag.prototype.add = function (category, canto, gloss, predicate) {
+    var id = "C" + String(++this._n).padStart(3, "0");
+    this.list.push({ id: id, category: category, canto: canto, english_gloss: gloss, predicate: predicate, status: null });
+    return id;
+  };
+  ClaimBag.prototype.evaluate = function () {
+    var facts = this.facts, self = this;
+    this.list.forEach(function (c) {
+      var ok = false;
+      try { ok = c.predicate(facts) === true; }
+      catch (e) { ok = false; c._err = String(e); }
+      c.status = ok ? "pass" : "fail";
+      if (!ok) console.error("[claim FAIL] " + c.id + " — " + c.english_gloss + (c._err ? " (" + c._err + ")" : "") + " :: 「" + c.canto + "」");
+    });
+    return this;
+  };
+
+  /* ============================================================
+   *  PART 4 — RENDERING HELPERS
+   * ============================================================ */
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+  function fmtInt(n) { return Number(n).toLocaleString("en-US"); }
+  function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
+  function f2(x) { return (Math.round(x * 100) / 100).toFixed(2); }
+  function pct(x) { return Math.round(x * 100); }
+  function secs(ms) { return f1(ms / 1000); }
+
+  // badge placeholder — expanded after claims evaluated
+  function badge(id) { return '<a class="badge" data-claim="' + id + '" href="#claim-' + id + '"></a>'; }
+
+  var CLAIM_MAP = {};
+  function renderBadges(root) {
+    (root || document).querySelectorAll(".badge[data-claim]").forEach(function (a) {
+      var id = a.getAttribute("data-claim");
+      var c = CLAIM_MAP[id];
+      var st = c ? c.status : "fail";
+      a.setAttribute("data-status", st);
+      a.setAttribute("title", (c ? c.english_gloss : "unknown claim") + " · " + (st === "pass" ? "即場驗證通過" : "驗證失敗"));
+      a.innerHTML = '<span class="ic">' + (st === "pass" ? "✓" : "✗") + "</span>即場驗證";
+    });
+  }
+
+  // ---- shared tooltip ----
+  var tip = null;
+  function showTip(html, x, y) {
+    if (!tip) tip = document.getElementById("tooltip");
+    tip.innerHTML = html; tip.style.opacity = "1";
+    var pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = x + pad, top = y + pad;
+    if (left + w > window.innerWidth - 8) left = x - w - pad;
+    if (top + h > window.innerHeight - 8) top = y - h - pad;
+    tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+  }
+  function hideTip() { if (tip) tip.style.opacity = "0"; }
+  function bindTip(node, html) {
+    node.addEventListener("mousemove", function (e) { showTip(html, e.clientX, e.clientY); });
+    node.addEventListener("mouseleave", hideTip);
+  }
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) { var e = document.createElementNS(SVGNS, tag); if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  // Grouped bar chart: one metric across matches, 2 series (players).
+  // groups: [{label, values:[{name,color,value,disp}]}]
+  function groupedBars(opts) {
+    var groups = opts.groups, maxV = 0;
+    groups.forEach(function (g) { g.values.forEach(function (v) { if (v.value > maxV) maxV = v.value; }); });
+    if (maxV <= 0) maxV = 1;
+    var W = Math.max(opts.minWidth || 0, groups.length * 62 + 46);
+    var H = 210, padL = 40, padR = 12, padT = 14, padB = 30;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var gw = plotW / groups.length;
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img" });
+    // gridlines + y ticks
+    var ticks = 4;
+    for (var t = 0; t <= ticks; t++) {
+      var yv = maxV * t / ticks, y = padT + plotH - (yv / maxV) * plotH;
+      svg.appendChild(svgEl("line", { class: "grid-line", x1: padL, y1: y, x2: W - padR, y2: y }));
+      var tl = svgEl("text", { x: padL - 6, y: y + 3, "text-anchor": "end", "font-size": "9" });
+      tl.textContent = opts.tickFmt ? opts.tickFmt(yv) : String(Math.round(yv));
+      svg.appendChild(tl);
+    }
+    groups.forEach(function (g, gi) {
+      var series = g.values, n = series.length;
+      var bw = Math.min(20, (gw - 12) / n);
+      var groupInner = bw * n + (n - 1) * 4;
+      var startX = padL + gi * gw + (gw - groupInner) / 2;
+      series.forEach(function (v, si) {
+        var bh = (v.value / maxV) * plotH;
+        var x = startX + si * (bw + 4);
+        var y = padT + plotH - bh;
+        var rect = svgEl("rect", { class: "bar", x: x, y: y, width: bw, height: Math.max(0, bh), rx: 3, fill: v.color });
+        bindTip(rect, "<b>" + esc(g.label) + "</b><br>" + esc(v.name) + " · " + esc(v.disp));
+        svg.appendChild(rect);
+      });
+      var xl = svgEl("text", { x: padL + gi * gw + gw / 2, y: H - padB + 16, "text-anchor": "middle", "font-size": "9.5" });
+      xl.textContent = g.label;
+      svg.appendChild(xl);
+    });
+    svg.appendChild(svgEl("line", { class: "axis-line", x1: padL, y1: padT + plotH, x2: W - padR, y2: padT + plotH }));
+    return svg;
+  }
+
+  function chartPanel(title, cap, seriesLegend, node) {
+    var panel = el("div", "chart-panel");
+    panel.appendChild(el("h3", null, esc(title)));
+    if (cap) panel.appendChild(el("div", "cap", cap));
+    if (seriesLegend && seriesLegend.length) {
+      var lg = el("div", "legend-row");
+      seriesLegend.forEach(function (s) {
+        lg.innerHTML += '<span class="lg"><span class="sw" style="background:' + s.color + '"></span>' + esc(s.name) + "</span>";
+      });
+      panel.appendChild(lg);
+    }
+    var sx = el("div", "scroll-x");
+    sx.appendChild(node);
+    panel.appendChild(sx);
+    return panel;
+  }
+
+  // stacked horizontal bar of clears for one player
+  function clearsStack(playerName, clears, color, maxTotal, segs) {
+    var total = 0; segs.forEach(function (s) { total += clears[s.key]; });
+    var row = el("div");
+    row.style.marginBottom = "14px";
+    var head = el("div");
+    head.style.cssText = "display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px;font-family:var(--font-mono)";
+    head.innerHTML = '<span style="font-weight:800;color:' + color + '">' + esc(playerName) + '</span><span style="color:var(--muted)">清咗 ' + fmtInt(clears.singles + clears.doubles + clears.triples + clears.quads + 0) + ' 行 · 呢啲類別合共 ' + fmtInt(total) + '</span>';
+    row.appendChild(head);
+    var track = el("div");
+    track.style.cssText = "display:flex;gap:2px;height:26px;border-radius:6px;overflow:hidden;background:var(--bg-sunken);width:" + (maxTotal > 0 ? (total / maxTotal * 100) : 0) + "%;min-width:2px";
+    segs.forEach(function (s) {
+      var v = clears[s.key]; if (v <= 0) return;
+      var seg = el("div");
+      seg.style.cssText = "background:" + s.color + ";width:" + (total > 0 ? (v / total * 100) : 0) + "%";
+      bindTip(seg, "<b>" + esc(playerName) + "</b><br>" + esc(s.name) + " · " + fmtInt(v));
+      track.appendChild(seg);
+    });
+    row.appendChild(track);
+    return row;
+  }
+
+  /* ============================================================
+   *  PART 5 — BUILD REPORT SECTIONS
+   * ============================================================ */
+  var lastFacts = null, lastDerived = null, lastClaims = null, lastErrors = [];
+
+  function playerColorVar(i) { return i === 0 ? "var(--p1)" : i === 1 ? "var(--p2)" : ["var(--c-blue)","var(--c-aqua)","var(--c-yellow)","var(--c-green)","var(--c-violet)","var(--c-red)","var(--c-magenta)","var(--c-orange)"][(i) % 8]; }
+
+  function renderReport(facts, errors) {
+    lastErrors = errors || [];
+    var d = derive(facts);
+    var bag = new ClaimBag(facts);
+    lastFacts = facts; lastDerived = d;
+
+    var root = document.getElementById("report");
+    root.innerHTML = "";
+
+    if (facts.players.length === 2) buildTwoPlayer(root, facts, d, bag);
+    else buildAggregate(root, facts, d, bag);
+
+    // methodology + appendix always
+    buildAppendix(root, facts, bag);
+
+    // finalize claims
+    bag.evaluate();
+    lastClaims = bag.list;
+    CLAIM_MAP = {}; bag.list.forEach(function (c) { CLAIM_MAP[c.id] = c; });
+    renderBadges(root);
+    fillAppendixTable(bag.list);
+
+    document.body.classList.add("has-data");
+    document.getElementById("export-btn").disabled = false;
+    document.getElementById("reset-btn").hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- 2-player layout ----------
+  function buildTwoPlayer(root, facts, d, bag) {
+    var P = facts.players, A = P[0], B = P[1];
+    var pa = d.perPlayer[A], pb = d.perPlayer[B];
+
+    // ----- HERO / 總覽 -----
+    var hero = el("section", "hero");
+    var w = el("div", "wrap");
+    var seriesWinner = pa.matchWins === pb.matchWins ? null : (pa.matchWins > pb.matchWins ? A : B);
+    var swClass = seriesWinner === A ? "h1c" : "h2c";
+
+    var cWins = bag.add("score",
+      esc(A) + " " + d.totalMatches + " 場入面贏咗 " + pa.matchWins + " 場," + esc(B) + " 執 " + pb.matchWins + " 場",
+      A + " won " + pa.matchWins + " matches, " + B + " " + pb.matchWins,
+      function (f) {
+        var aw = f.matches.filter(function (m) { return m.winner === A; }).length;
+        var bw = f.matches.filter(function (m) { return m.winner === B; }).length;
+        return aw === pa.matchWins && bw === pb.matchWins;
+      });
+
+    var cRounds = bag.add("score",
+      "成個 series 打足 " + d.totalRounds + " 局," + esc(A) + " 贏 " + pa.roundWins + " 局," + esc(B) + " 贏 " + pb.roundWins + " 局",
+      d.totalRounds + " rounds; " + A + " " + pa.roundWins + ", " + B + " " + pb.roundWins,
+      function (f) {
+        var tot = 0, aw = 0, bw = 0;
+        f.matches.forEach(function (m) { tot += m.rounds.length; m.rounds.forEach(function (r) { if (r.winner === A) aw++; else if (r.winner === B) bw++; }); });
+        return tot === d.totalRounds && aw === pa.roundWins && bw === pb.roundWins;
+      });
+
+    w.innerHTML =
+      '<div class="hero-meta"><span>' + d.totalMatches + ' 場對局 · ' + d.totalRounds + ' 局</span><span>' +
+      esc(facts.matches[0].ts.slice(0, 10)) + '</span><span>即場喺你部機分析</span></div>' +
+      '<h1 class="hero-title">' + (seriesWinner ? '<span class="' + swClass + '">' + esc(seriesWinner) + '</span> 攞低呢個 series' : '兩個打成平手') +
+      '<span style="color:var(--muted);font-weight:700"> · ' + esc(A) + ' 對 ' + esc(B) + '</span></h1>';
+
+    // scoreboard
+    var sb = el("div", "scoreboard");
+    sb.innerHTML =
+      '<div class="sb-player p-left"><span class="sb-name">' + esc(A) + '</span><span class="sb-tag">PLAYER 1</span></div>' +
+      '<div class="sb-mid"><div class="sb-score"><span class="win1">' + pa.matchWins + '</span><span class="dash">–</span><span class="win2">' + pb.matchWins + '</span></div>' +
+      '<div class="sb-sub">場數 ' + badge(cWins) + '</div></div>' +
+      '<div class="sb-player p-right"><span class="sb-name">' + esc(B) + '</span><span class="sb-tag">PLAYER 2</span></div>';
+    w.appendChild(sb);
+
+    // narrative lede
+    var lede = el("p", "section-lede");
+    lede.style.marginTop = "22px";
+    lede.innerHTML = '大比數係 ' + pa.matchWins + '–' + pb.matchWins + ' ' + badge(cWins) +
+      ',但係逐局計其實好貼:成個 series 打足 ' + d.totalRounds + ' 局,' + esc(A) + ' ' + pa.roundWins + ' 局、' + esc(B) + ' ' + pb.roundWins + ' 局 ' + badge(cRounds) + '。下面每個數字都即場用 JS 驗返,禁個 ✓ 即場驗證 章睇得到。';
+    w.appendChild(lede);
+
+    // stat cards
+    var sg = el("div", "stat-grid");
+    var cPieces = bag.add("style", esc(A) + " 全 series 落咗 " + fmtInt(pa.pieces) + " 粒方塊," + esc(B) + " 落 " + fmtInt(pb.pieces),
+      A + " placed " + pa.pieces + " pieces vs " + B + " " + pb.pieces,
+      function (f) { var t = { }; t[A] = 0; t[B] = 0; f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) if (t[p] != null) t[p] += r.players[p].pieces; }); }); return t[A] === pa.pieces && t[B] === pb.pieces; });
+    var fasterPace = pa.ppsAgg >= pb.ppsAgg ? A : B;
+    var cPace = bag.add("pace", esc(A) + " 平均 " + f2(pa.ppsAgg) + " PPS," + esc(B) + " " + f2(pb.ppsAgg) + " PPS",
+      A + " agg pps " + f2(pa.ppsAgg) + " vs " + f2(pb.ppsAgg),
+      function () { return f2(pa.ppsAgg) === f2(pa.pieces / (pa.lifetimeMs / 1000)) && f2(pb.ppsAgg) === f2(pb.pieces / (pb.lifetimeMs / 1000)); });
+    var cAC = bag.add("style", "兩個夾埋出咗 " + (pa.allclear + pb.allclear) + " 次 Perfect Clear(" + esc(A) + " " + pa.allclear + "、" + esc(B) + " " + pb.allclear + ")",
+      "total all-clears " + (pa.allclear + pb.allclear),
+      function (f) { var t = 0; f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) t += r.players[p].clears.allclear; }); }); return t === (pa.allclear + pb.allclear); });
+
+    sg.appendChild(cardEl("accent-1", esc(A) + " 局數", pa.roundWins + " / " + d.totalRounds, "贏咗嘅局 " + badge(cRounds)));
+    sg.appendChild(cardEl("accent-2", esc(B) + " 局數", pb.roundWins + " / " + d.totalRounds, "贏咗嘅局 " + badge(cRounds)));
+    sg.appendChild(cardEl("accent-g", "最快一局", secs(d.shortest.dur) + "s", "全場最短嗰局 " + badge(supShort(bag, d, A, B))));
+    sg.appendChild(cardEl("accent-g", "最長一局", secs(d.longest.dur) + "s", "打足成分幾鐘 " + badge(supLong(bag, d, A, B))));
+    sg.appendChild(cardEl("accent-1", "方塊總數 · " + esc(A), fmtInt(pa.pieces), "落磚量 " + badge(cPieces)));
+    sg.appendChild(cardEl("accent-2", "方塊總數 · " + esc(B), fmtInt(pb.pieces), "落磚量 " + badge(cPieces)));
+    w.appendChild(sg);
+    hero.appendChild(w);
+    root.appendChild(hero);
+
+    // ----- 逐場戰報 (match cards) -----
+    var sMatch = el("section");
+    var wm = el("div", "wrap-wide");
+    wm.innerHTML = '<div class="eyebrow">MATCH BY MATCH</div><h2 class="section-title">逐場戰報</h2>' +
+      '<p class="section-lede">每場最終比數、每局邊個贏嘅色 pip trail,加埋嗰場一個抵睇嘅數據點。</p>';
+    var mg = el("div", "match-grid");
+    facts.matches.forEach(function (m) { mg.appendChild(matchCard(m, facts, d, bag)); });
+    wm.appendChild(mg);
+    sMatch.appendChild(wm);
+    root.appendChild(sMatch);
+
+    // ----- 數據對決 (charts) -----
+    var sData = el("section");
+    var wd = el("div", "wrap-wide");
+    wd.innerHTML = '<div class="eyebrow">HEAD TO HEAD</div><h2 class="section-title">數據對決</h2>' +
+      '<p class="section-lede">全部圖表都係即場用 parsed 數據畫嘅 inline SVG,將個 mouse 移上去睇實數。</p>';
+    var legend2 = [{ name: A, color: cssVal("--p1") }, { name: B, color: cssVal("--p2") }];
+
+    var col = el("div", "charts-2col");
+    // APM / PPS / VS by match (leaderboard match-level)
+    col.appendChild(chartPanel("每場 APM", "各場 leaderboard 平均 APM。", legend2, groupedBars({
+      groups: facts.matches.map(function (m) {
+        return { label: "M" + m.index, values: [
+          { name: A, color: cssVal("--p1"), value: (m.leaderboard[A] || {}).apm_x1000 / 1000 || 0, disp: f1((m.leaderboard[A] || {}).apm_x1000 / 1000 || 0) + " APM" },
+          { name: B, color: cssVal("--p2"), value: (m.leaderboard[B] || {}).apm_x1000 / 1000 || 0, disp: f1((m.leaderboard[B] || {}).apm_x1000 / 1000 || 0) + " APM" }
+        ] };
+      }), tickFmt: function (v) { return String(Math.round(v)); }
+    })));
+    col.appendChild(chartPanel("每場 PPS", "各場 leaderboard 平均 PPS(落磚速度)。", legend2, groupedBars({
+      groups: facts.matches.map(function (m) {
+        return { label: "M" + m.index, values: [
+          { name: A, color: cssVal("--p1"), value: (m.leaderboard[A] || {}).pps_x1000 / 1000 || 0, disp: f2((m.leaderboard[A] || {}).pps_x1000 / 1000 || 0) + " PPS" },
+          { name: B, color: cssVal("--p2"), value: (m.leaderboard[B] || {}).pps_x1000 / 1000 || 0, disp: f2((m.leaderboard[B] || {}).pps_x1000 / 1000 || 0) + " PPS" }
+        ] };
+      }), tickFmt: function (v) { return f1(v); }
+    })));
+    col.appendChild(chartPanel("每場 VS score", "各場 leaderboard 平均 VS(綜合輸出效率)。", legend2, groupedBars({
+      groups: facts.matches.map(function (m) {
+        return { label: "M" + m.index, values: [
+          { name: A, color: cssVal("--p1"), value: (m.leaderboard[A] || {}).vs_x1000 / 1000 || 0, disp: f1((m.leaderboard[A] || {}).vs_x1000 / 1000 || 0) + " VS" },
+          { name: B, color: cssVal("--p2"), value: (m.leaderboard[B] || {}).vs_x1000 / 1000 || 0, disp: f1((m.leaderboard[B] || {}).vs_x1000 / 1000 || 0) + " VS" }
+        ] };
+      }), tickFmt: function (v) { return String(Math.round(v)); }
+    })));
+    // clears-type breakdown
+    var clearsPanel = el("div", "chart-panel");
+    clearsPanel.appendChild(el("h3", null, "清行類型分佈"));
+    clearsPanel.appendChild(el("div", "cap", "兩個玩家全 series 各類清行嘅合計。橫 bar 長度代表數量。"));
+    var segs = [
+      { key: "singles", name: "Single", color: cssVal("--c-blue") },
+      { key: "doubles", name: "Double", color: cssVal("--c-aqua") },
+      { key: "triples", name: "Triple", color: cssVal("--c-yellow") },
+      { key: "quads", name: "Quad", color: cssVal("--c-green") },
+      { key: "tspin_doubles", name: "T-spin Double", color: cssVal("--c-violet") },
+      { key: "tspin_triples", name: "T-spin Triple", color: cssVal("--c-red") },
+      { key: "tspin_singles", name: "T-spin Single", color: cssVal("--c-magenta") },
+      { key: "allclear", name: "All Clear", color: cssVal("--c-orange") }
+    ];
+    var lg2 = el("div", "legend-row");
+    segs.forEach(function (s) { lg2.innerHTML += '<span class="lg"><span class="sw" style="background:' + s.color + '"></span>' + esc(s.name) + "</span>"; });
+    clearsPanel.appendChild(lg2);
+    var maxTot = 0; [pa, pb].forEach(function (p) { var t = 0; segs.forEach(function (s) { t += p.clears[s.key]; }); maxTot = Math.max(maxTot, t); });
+    clearsPanel.appendChild(clearsStack(A, pa.clears, cssVal("--p1"), maxTot, segs));
+    clearsPanel.appendChild(clearsStack(B, pb.clears, cssVal("--p2"), maxTot, segs));
+    col.appendChild(clearsPanel);
+    wd.appendChild(col);
+
+    // tale of the tape
+    var totPanel = el("div", "chart-panel");
+    totPanel.appendChild(el("h3", null, "Tale of the Tape"));
+    totPanel.appendChild(el("div", "cap", esc(A) + "(左·teal)對 " + esc(B) + "(右·violet) 逐項比併。"));
+    totPanel.appendChild(taleOfTape(A, B, pa, pb, bag, facts));
+    wd.appendChild(totPanel);
+
+    sData.appendChild(wd);
+    root.appendChild(sData);
+
+    // ----- 關鍵時刻 (superlatives) -----
+    var sKey = el("section");
+    var wk = el("div", "wrap-wide");
+    wk.innerHTML = '<div class="eyebrow">DEFINING MOMENTS</div><h2 class="section-title">關鍵時刻</h2>' +
+      '<p class="section-lede">全場計出嚟嘅極值 — 最長、最短、最大 spike、最勁翻盤。</p>';
+    wk.appendChild(superlatives(facts, d, bag, A, B));
+    sKey.appendChild(wk);
+    root.appendChild(sKey);
+
+    // ----- 建議 (recommendations) -----
+    var sRec = el("section");
+    var wr = el("div", "wrap-wide");
+    wr.innerHTML = '<div class="eyebrow">COACHING</div><h2 class="section-title">建議</h2>' +
+      '<p class="section-lede">規則引擎逐條 threshold 計,夠條件先出。每條建議都貼住即場驗證嘅數字。</p>';
+    wr.appendChild(recommendations(facts, d, bag, A, B));
+    sRec.appendChild(wr);
+    root.appendChild(sRec);
+  }
+
+  function cssVal(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888"; }
+  function cardEl(accent, k, v, d) { var c = el("div", "stat-card " + accent); c.innerHTML = '<div class="k">' + k + '</div><div class="v">' + v + '</div><div class="d">' + d + '</div>'; return c; }
+
+  // superlative claim helpers (return ids)
+  function supShort(bag, d, A, B) {
+    var s = d.shortest, dur = s.dur, mi = s.m.index, ri = s.r.index;
+    return bag.add("duration", "全場最快嗰局係第 " + mi + " 場第 " + (ri + 1) + " 局,約 " + secs(dur) + " 秒收工",
+      "shortest round is m" + mi + "r" + (ri + 1) + " ~" + secs(dur) + "s",
+      function (f) {
+        var mn = Infinity, best = null;
+        f.matches.forEach(function (m) { m.rounds.forEach(function (r) { var dd = 0; for (var p in r.players) dd = Math.max(dd, r.players[p].lifetime); if (dd < mn) { mn = dd; best = { mi: m.index, ri: r.index, dd: dd }; } }); });
+        return best && best.mi === mi && best.ri === ri && best.dd === dur;
+      });
+  }
+  function supLong(bag, d, A, B) {
+    var s = d.longest, dur = s.dur, mi = s.m.index, ri = s.r.index;
+    return bag.add("duration", "全場最長嗰局係第 " + mi + " 場第 " + (ri + 1) + " 局,打足約 " + secs(dur) + " 秒",
+      "longest round is m" + mi + "r" + (ri + 1) + " ~" + secs(dur) + "s",
+      function (f) {
+        var mx = -1, best = null;
+        f.matches.forEach(function (m) { m.rounds.forEach(function (r) { var dd = 0; for (var p in r.players) dd = Math.max(dd, r.players[p].lifetime); if (dd > mx) { mx = dd; best = { mi: m.index, ri: r.index, dd: dd }; } }); });
+        return best && best.mi === mi && best.ri === ri && best.dd === dur;
+      });
+  }
+
+  function matchCard(m, facts, d, bag) {
+    var P = facts.players, A = P[0], B = P[1];
+    var a = m.score[A] || 0, b = m.score[B] || 0;
+    var wClass = m.winner === A ? "w1" : "w2";
+    var card = el("div", "match-card");
+    var pips = m.rounds.map(function (r) { return '<span class="pip ' + (r.winner === A ? "p1" : "p2") + '" title="局 ' + (r.index + 1) + ':' + esc(r.winner) + '"></span>'; }).join("");
+
+    // notable stat for this match = its longest round + who won it, verified
+    var ml = null; m.rounds.forEach(function (r) { var dd = 0; for (var p in r.players) dd = Math.max(dd, r.players[p].lifetime); if (!ml || dd > ml.dd) ml = { r: r, dd: dd }; });
+    var noteClaim = bag.add("duration",
+      "第 " + m.index + " 場最長一局約 " + secs(ml.dd) + " 秒,由 " + esc(ml.r.winner) + " 攞低",
+      "m" + m.index + " longest round ~" + secs(ml.dd) + "s won by " + ml.r.winner,
+      (function (mi, ri, dd, win) {
+        return function (f) {
+          var mm = f.matches[mi - 1]; var mx = -1, best = null;
+          mm.rounds.forEach(function (r) { var x = 0; for (var p in r.players) x = Math.max(x, r.players[p].lifetime); if (x > mx) { mx = x; best = r; } });
+          return best && best.index === ri && mx === dd && best.winner === win;
+        };
+      })(m.index, ml.r.index, ml.dd, ml.r.winner));
+
+    card.innerHTML =
+      '<div class="mc-head"><span class="mc-idx">第 ' + m.index + ' 場</span>' +
+      '<span class="mc-win ' + wClass + '">' + esc(m.winner) + ' 贏</span></div>' +
+      '<div class="mc-score"><span class="s1">' + a + '</span><span class="dash">–</span><span class="s2">' + b + '</span></div>' +
+      '<div class="pips">' + pips + '</div>' +
+      '<div class="mc-note">最長一局約 <b>' + secs(ml.dd) + 's</b>,' + esc(ml.r.winner) + ' 生還 ' + badge(noteClaim) + '</div>';
+    return card;
+  }
+
+  function taleOfTape(A, B, pa, pb, bag, facts) {
+    var rows = [
+      { lbl: "場數", av: pa.matchWins, bv: pb.matchWins, ad: String(pa.matchWins), bd: String(pb.matchWins) },
+      { lbl: "局數", av: pa.roundWins, bv: pb.roundWins, ad: String(pa.roundWins), bd: String(pb.roundWins) },
+      { lbl: "方塊", av: pa.pieces, bv: pb.pieces, ad: fmtInt(pa.pieces), bd: fmtInt(pb.pieces) },
+      { lbl: "平均 PPS", av: pa.ppsAgg, bv: pb.ppsAgg, ad: f2(pa.ppsAgg), bd: f2(pb.ppsAgg) },
+      { lbl: "Quad 清行", av: pa.clears.quads, bv: pb.clears.quads, ad: fmtInt(pa.clears.quads), bd: fmtInt(pb.clears.quads) },
+      { lbl: "T-spin 清行", av: pa.tspinClears, bv: pb.tspinClears, ad: fmtInt(pa.tspinClears), bd: fmtInt(pb.tspinClears) },
+      { lbl: "All Clear", av: pa.allclear, bv: pb.allclear, ad: String(pa.allclear), bd: String(pb.allclear) },
+      { lbl: "Finesse 失誤", av: pa.finesse_faults, bv: pb.finesse_faults, ad: fmtInt(pa.finesse_faults), bd: fmtInt(pb.finesse_faults), lowerBetter: true },
+      { lbl: "清垃圾行", av: pa.garbage_cleared, bv: pb.garbage_cleared, ad: fmtInt(pa.garbage_cleared), bd: fmtInt(pb.garbage_cleared) },
+      { lbl: "最高 B2B", av: pa.topbtb, bv: pb.topbtb, ad: String(pa.topbtb), bd: String(pb.topbtb) },
+      { lbl: "最高 Combo", av: pa.topcombo, bv: pb.topcombo, ad: String(pa.topcombo), bd: String(pb.topcombo) }
+    ];
+    var box = el("div", "tot");
+    rows.forEach(function (row) {
+      var mx = Math.max(row.av, row.bv, 1);
+      var aWins = row.lowerBetter ? row.av < row.bv : row.av > row.bv;
+      var bWins = row.lowerBetter ? row.bv < row.av : row.bv > row.av;
+      var r = el("div", "tot-row");
+      r.innerHTML =
+        '<div class="tot-val l ' + (aWins ? "win1" : "") + '">' + row.ad + '</div>' +
+        '<div class="tot-lbl">' + esc(row.lbl) + '</div>' +
+        '<div class="tot-val r ' + (bWins ? "win2" : "") + '">' + row.bd + '</div>' +
+        '<div class="tot-bars" style="grid-column:1 / -1">' +
+          '<div class="tot-bar l"><span class="fill" style="width:' + (row.av / mx * 100) + '%"></span></div>' +
+          '<div class="tot-bar r"><span class="fill" style="width:' + (row.bv / mx * 100) + '%"></span></div>' +
+        '</div>';
+      box.appendChild(r);
+    });
+    return box;
+  }
+
+  function superlatives(facts, d, bag, A, B) {
+    var grid = el("div", "super-grid");
+
+    // longest
+    var L = d.longest;
+    var idLong = supLong(bag, d, A, B);
+    grid.appendChild(superCard("最長一局", "第 " + L.m.index + " 場第 " + (L.r.index + 1) + " 局打足 <b>" + secs(L.dur) + " 秒</b>,由 " + esc(L.r.winner) + " 死頂到最後 " + badge(idLong)));
+
+    // shortest
+    var S = d.shortest;
+    var idShort = supShort(bag, d, A, B);
+    grid.appendChild(superCard("最快一局", "第 " + S.m.index + " 場第 " + (S.r.index + 1) + " 局,<b>" + secs(S.dur) + " 秒</b>就收工," + esc(S.r.winner) + " 秒殺 " + badge(idShort)));
+
+    // biggest spike + tie disclosure
+    var sp = d.maxSpike;
+    var hitTxt = sp.hits.map(function (h) { return "第" + h.m.index + "場第" + (h.r.index + 1) + "局 " + esc(h.p); }).join("、");
+    var idSpike = bag.add("spike",
+      "全場最大單發 spike 係 " + sp.val + ",一共出現 " + sp.hits.length + " 次(" + hitTxt + ")",
+      "biggest single spike is " + sp.val + ", hit " + sp.hits.length + " time(s)",
+      function (f) {
+        var mx = -1, cnt = 0;
+        f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) { var v = r.players[p].maxspike; if (v > mx) { mx = v; cnt = 1; } else if (v === mx) cnt++; } }); });
+        return mx === sp.val && cnt === sp.hits.length;
+      });
+    var tieNote = sp.hits.length > 1 ? "呢個數兩邊都掂過,唔係一個人專利 — " : "";
+    grid.appendChild(superCard("最大 Spike", tieNote + "最勁一嘢 spike 打咗 <b>" + sp.val + "</b>,全場出現 " + sp.hits.length + " 次 " + badge(idSpike)));
+
+    // biggest comeback
+    if (d.bestComeback) {
+      var cb = d.bestComeback;
+      var idCB = bag.add("comeback",
+        "最勁翻盤局:第 " + cb.m.index + " 場第 " + (cb.r.index + 1) + " 局," + esc(cb.winner) + " 俾人射埋嚟 " + cb.winQ + " 行(對手得 " + cb.loseQ + " 行)都照贏",
+        "biggest comeback m" + cb.m.index + "r" + (cb.r.index + 1) + ": winner queued " + cb.winQ + " vs " + cb.loseQ,
+        (function (mi, ri, winner, winQ, loseQ) {
+          return function (f) {
+            var best = null;
+            f.matches.forEach(function (m) { m.rounds.forEach(function (r) {
+              var w = r.winner, l = f.players[0] === w ? f.players[1] : f.players[0];
+              if (!r.players[w] || !r.players[l]) return;
+              var q = function (pl) { var t = 0; pl.garbage_events.forEach(function (g) { t += g.amt; }); return t; };
+              var def = q(r.players[w]) - q(r.players[l]);
+              if (def > 0 && (!best || def > best.def)) best = { mi: m.index, ri: r.index, def: def, wq: q(r.players[w]), lq: q(r.players[l]) };
+            }); });
+            return best && best.mi === mi && best.ri === ri && best.wq === winQ && best.lq === loseQ;
+          };
+        })(cb.m.index, cb.r.index, cb.winner, cb.winQ, cb.loseQ));
+      grid.appendChild(superCard("最勁翻盤", "第 " + cb.m.index + " 場第 " + (cb.r.index + 1) + " 局," + esc(cb.winner) + " 頂住 <b>" + cb.winQ + "</b> 行射埋嚟嘅攻擊(對手 " + cb.loseQ + " 行)都反贏 " + badge(idCB)));
+    }
+
+    // higher-vs-wins
+    var idVs = bag.add("clutch",
+      d.higherVsAlways ? "全 " + d.totalRounds + " 局,每一局贏嗰個嘅 VS score 都高過輸嗰個,一局例外都冇" : (d.higherVsCount + "/" + d.totalRounds + " 局係 VS 高嗰個贏"),
+      d.higherVsAlways ? "in every one of " + d.totalRounds + " rounds the winner had higher VS" : d.higherVsCount + " of " + d.totalRounds + " rounds won by higher VS",
+      function (f) {
+        var cnt = 0, tot = 0;
+        f.matches.forEach(function (m) { m.rounds.forEach(function (r) {
+          tot++; var w = r.winner, l = f.players[0] === w ? f.players[1] : f.players[0];
+          if (r.players[w] && r.players[l] && r.players[w].vs_x1000 > r.players[l].vs_x1000) cnt++;
+        }); });
+        return cnt === d.higherVsCount && tot === d.totalRounds && (d.higherVsAlways ? cnt === tot : true);
+      });
+    grid.appendChild(superCard("VS 就係命", d.higherVsAlways ?
+      "全 " + d.totalRounds + " 局,<b>每一局</b>都係 VS score 高嗰個贏,冇一局例外 " + badge(idVs) :
+      d.higherVsCount + " / " + d.totalRounds + " 局係 VS 高嗰個贏 " + badge(idVs)));
+
+    return grid;
+  }
+  function superCard(title, html) { var c = el("div", "super-card"); c.innerHTML = '<div class="st">' + esc(title) + '</div><div class="sv">' + html + '</div>'; return c; }
+
+  /* ---------- recommendation rule engine ---------- */
+  function recommendations(facts, d, bag, A, B) {
+    var pa = d.perPlayer[A], pb = d.perPlayer[B];
+    var recs = {}; recs[A] = []; recs[B] = [];
+    var fired = 0;
+
+    function gapRatio(x, y) { var lo = Math.min(x, y); return lo > 0 ? Math.abs(x - y) / lo : (x === y ? 0 : Infinity); }
+
+    // RULE 1 — finesse fault-rate gap > 30% -> worse player drills finesse
+    (function () {
+      if (gapRatio(pa.faultRate, pb.faultRate) > 0.30) {
+        var worse = pa.faultRate > pb.faultRate ? A : B, better = worse === A ? B : A;
+        var wp = d.perPlayer[worse], bp = d.perPlayer[better];
+        var id = bag.add("finesse",
+          esc(worse) + " 嘅 finesse 失誤率(每粒 " + f2(wp.faultRate * 100) + "%)高過 " + esc(better) + "(" + f2(bp.faultRate * 100) + "%)成 " + pct(gapRatio(pa.faultRate, pb.faultRate)) + "%",
+          worse + " finesse fault rate " + f2(wp.faultRate * 100) + "% vs " + f2(bp.faultRate * 100) + "%",
+          (function (worseP, betterP, wr, br) {
+            return function (f) {
+              var t = {}; t[worseP] = { fa: 0, pc: 0 }; t[betterP] = { fa: 0, pc: 0 };
+              f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) if (t[p]) { t[p].fa += r.players[p].finesse_faults; t[p].pc += r.players[p].pieces; } }); });
+              var wR = t[worseP].fa / t[worseP].pc, bR = t[betterP].fa / t[betterP].pc;
+              return f2(wR * 100) === wr && f2(bR * 100) === br && wR > bR;
+            };
+          })(worse, better, f2(wp.faultRate * 100), f2(bp.faultRate * 100)));
+        recs[worse].push({ tag: "FINESSE DRILL", html: "<b>操 finesse。</b>你每粒方塊嘅 finesse 失誤率 " + f2(wp.faultRate * 100) + "%,比 " + esc(better) + " 嘅 " + f2(bp.faultRate * 100) + "% 高成 " + pct(gapRatio(pa.faultRate, pb.faultRate)) + "% " + badge(id) + "。日日行 finesse trainer,將多餘 input 減走,PPS 自然追返上。" });
+        fired++;
+      }
+    })();
+
+    // RULE 2 — PPS gap > 5% -> slower player speeds up
+    (function () {
+      if (gapRatio(pa.ppsAgg, pb.ppsAgg) > 0.05) {
+        var slower = pa.ppsAgg < pb.ppsAgg ? A : B, faster = slower === A ? B : A;
+        var sp = d.perPlayer[slower], fp = d.perPlayer[faster];
+        var id = bag.add("pace",
+          esc(slower) + " 平均 " + f2(sp.ppsAgg) + " PPS,慢過 " + esc(faster) + " 嘅 " + f2(fp.ppsAgg) + " PPS 約 " + pct(gapRatio(pa.ppsAgg, pb.ppsAgg)) + "%",
+          slower + " agg pps " + f2(sp.ppsAgg) + " < " + faster + " " + f2(fp.ppsAgg),
+          (function (slowP, fastP, sd, fd) {
+            return function (f) {
+              var t = {}; t[slowP] = { pc: 0, ms: 0 }; t[fastP] = { pc: 0, ms: 0 };
+              f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) if (t[p]) { t[p].pc += r.players[p].pieces; t[p].ms += r.players[p].lifetime; } }); });
+              var sR = t[slowP].pc / (t[slowP].ms / 1000), fR = t[fastP].pc / (t[fastP].ms / 1000);
+              return f2(sR) === sd && f2(fR) === fd && sR < fR;
+            };
+          })(slower, faster, f2(sp.ppsAgg), f2(fp.ppsAgg)));
+        recs[slower].push({ tag: "SPEED UP", html: "<b>提速,收窄 PPS 差距。</b>你平均 " + f2(sp.ppsAgg) + " PPS,落後 " + esc(faster) + " 嘅 " + f2(fp.ppsAgg) + " 約 " + pct(gapRatio(pa.ppsAgg, pb.ppsAgg)) + "% " + badge(id) + "。主力練 stacking speed 同 hold 運用,將你嘅效率乘埋速度。" });
+        fired++;
+      }
+    })();
+
+    // RULE 3 — T-spin:Quad mix imbalance -> tspin-light player gets opener advice
+    (function () {
+      if (Math.abs(pa.tspinShare - pb.tspinShare) > 0.15) {
+        var light = pa.tspinShare < pb.tspinShare ? A : B, heavy = light === A ? B : A;
+        var lp = d.perPlayer[light], hp = d.perPlayer[heavy];
+        var id = bag.add("style",
+          esc(light) + " 嘅 T-spin 佔 T-spin+Quad 只係 " + pct(lp.tspinShare) + "%(Quad " + fmtInt(lp.clears.quads) + "、T-spin " + fmtInt(lp.tspinClears) + "),偏 Quad;" + esc(heavy) + " 有 " + pct(hp.tspinShare) + "%",
+          light + " tspin share " + pct(lp.tspinShare) + "% vs " + heavy + " " + pct(hp.tspinShare) + "%",
+          (function (lightP, heavyP, ls, hs) {
+            return function (f) {
+              var t = {}; t[lightP] = { ts: 0, q: 0 }; t[heavyP] = { ts: 0, q: 0 };
+              f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) if (t[p]) { var c = r.players[p].clears; t[p].ts += c.tspin_singles + c.tspin_doubles + c.tspin_triples + c.mini_tspin_singles + c.mini_tspin_doubles; t[p].q += c.quads; } }); });
+              var lR = t[lightP].ts / (t[lightP].ts + t[lightP].q), hR = t[heavyP].ts / (t[heavyP].ts + t[heavyP].q);
+              return Math.round(lR * 100) === ls && Math.round(hR * 100) === hs && lR < hR;
+            };
+          })(light, heavy, pct(lp.tspinShare), pct(hp.tspinShare)));
+        recs[light].push({ tag: "OPENER MIX", html: "<b>練 T-spin,唔好淨堆 Quad。</b>你嘅清行 T-spin 只佔 " + pct(lp.tspinShare) + "%,好偏 Quad(Quad " + fmtInt(lp.clears.quads) + " 對 T-spin " + fmtInt(lp.tspinClears) + "),而 " + esc(heavy) + " 有 " + pct(hp.tspinShare) + "% " + badge(id) + "。Quad 要四行位先開得到,慢又易俾人斷;練 DT cannon / STSD 呢類 T-spin 開局,又快又有 B2B。" });
+        fired++;
+      }
+    })();
+
+    // RULE 4 — spike ceiling equal but frequency lower -> spike more often
+    (function () {
+      if (pa.maxSpikeCeiling === pb.maxSpikeCeiling && Math.abs(pa.spikeRounds - pb.spikeRounds) >= 3) {
+        var lo = pa.spikeRounds < pb.spikeRounds ? A : B, hi = lo === A ? B : A;
+        var lp = d.perPlayer[lo], hp = d.perPlayer[hi];
+        var id = bag.add("spike",
+          "兩個嘅單發 spike 天花板一樣高(都係 " + pa.maxSpikeCeiling + "),但 " + esc(lo) + " 只有 " + lp.spikeRounds + " 局劈到 " + SPIKE_THRESHOLD + "+," + esc(hi) + " 有 " + hp.spikeRounds + " 局",
+          "same spike ceiling " + pa.maxSpikeCeiling + " but " + lo + " has " + lp.spikeRounds + " big-spike rounds vs " + hi + " " + hp.spikeRounds,
+          (function (loP, hiP, ceil, loN, hiN) {
+            return function (f) {
+              var t = {}; t[loP] = { c: 0, n: 0 }; t[hiP] = { c: 0, n: 0 };
+              f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) if (t[p]) { t[p].c = Math.max(t[p].c, r.players[p].maxspike); if (r.players[p].maxspike >= SPIKE_THRESHOLD) t[p].n++; } }); });
+              return t[loP].c === ceil && t[hiP].c === ceil && t[loP].n === loN && t[hiP].n === hiN && loN < hiN;
+            };
+          })(lo, hi, pa.maxSpikeCeiling, lp.spikeRounds, hp.spikeRounds));
+        recs[lo].push({ tag: "SPIKE FREQUENCY", html: "<b>大 spike 要出得密啲。</b>你單發 spike 嘅天花板同 " + esc(hi) + " 一樣係 " + pa.maxSpikeCeiling + ",即係唔係爆唔到;但你得 " + lp.spikeRounds + " 局劈到 " + SPIKE_THRESHOLD + "+,對面有 " + hp.spikeRounds + " 局 " + badge(id) + "。試下連 B2B 儲彈再一次過放,唔好逐 Quad 散射。" });
+        fired++;
+      }
+    })();
+
+    // RULE 5 — decider record: player under 50% in deciders (>=2) shores up clutch
+    (function () {
+      if (d.deciders && d.deciders.length >= 2) {
+        var loser = d.deciderWins[A] < d.deciderWins[B] ? A : (d.deciderWins[B] < d.deciderWins[A] ? B : null);
+        if (loser) {
+          var winnerP = loser === A ? B : A;
+          var id = bag.add("clutch",
+            "打到爭一局定生死嘅場有 " + d.deciders.length + " 場," + esc(winnerP) + " 執 " + d.deciderWins[winnerP] + " 場," + esc(loser) + " 得 " + d.deciderWins[loser] + " 場",
+            d.deciders.length + " one-round deciders: " + winnerP + " " + d.deciderWins[winnerP] + ", " + loser + " " + d.deciderWins[loser],
+            (function (loP, wiP, loN, wiN) {
+              return function (f) {
+                var decs = [], wins = {}; wins[f.players[0]] = 0; wins[f.players[1]] = 0;
+                f.matches.forEach(function (m) { var a = m.score[f.players[0]] || 0, b = m.score[f.players[1]] || 0; if (Math.abs(a - b) === 1) { decs.push(m); if (wins[m.winner] != null) wins[m.winner]++; } });
+                return wins[loP] === loN && wins[wiP] === wiN && loN < wiN;
+              };
+            })(loser, winnerP, d.deciderWins[loser], d.deciderWins[winnerP]));
+          recs[loser].push({ tag: "DECIDER FOCUS", html: "<b>守住決勝局。</b>爭一局定生死嘅場你 " + d.deciderWins[loser] + " 比 " + d.deciderWins[winnerP] + " 輸俾 " + esc(winnerP) + " " + badge(id) + "。決勝局打保守啲、清垃圾優先,唔好貪快食 spike 俾人反殺。" });
+          fired++;
+        }
+      }
+    })();
+
+    // render
+    var wrap = el("div");
+    if (fired < 3) {
+      var neutral = el("div", "rec-neutral");
+      neutral.innerHTML = "兩個玩家嘅數據差距唔算大 — 規則引擎只有 " + fired + " 條夠 threshold 出建議。呢個 series 打得幾均勻,冇明顯短板,繼續維持節奏就得。";
+      wrap.appendChild(neutral);
+    }
+    var grid = el("div", "rec-grid");
+    [[A, "for-1"], [B, "for-2"]].forEach(function (pc) {
+      var name = pc[0], cls = pc[1], items = recs[name];
+      var col = el("div", "rec-col " + cls);
+      var sub = items.length ? items.length + " 條建議" : "冇明顯短板";
+      col.innerHTML = '<h3>俾 ' + esc(name) + ' 嘅建議</h3><div class="rc-sub">' + sub + '</div>';
+      if (items.length) {
+        var ul = el("ul", "rec-list");
+        items.forEach(function (it, i) {
+          var li = el("li", "rec-item");
+          li.innerHTML = '<span class="rec-num">' + (i + 1) + '</span><span class="txt"><span class="rec-tag">' + it.tag + '</span>' + it.html + '</span>';
+          ul.appendChild(li);
+        });
+        col.appendChild(ul);
+      } else {
+        col.appendChild(el("p", null, "呢個玩家喺呢批 replay 冇觸發到任何弱點規則。"));
+      }
+      grid.appendChild(col);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  /* ---------- aggregate layout (>2 players) ---------- */
+  function buildAggregate(root, facts, d, bag) {
+    var hero = el("section", "hero");
+    var w = el("div", "wrap-wide");
+    w.innerHTML = '<div class="hero-meta"><span>' + d.totalMatches + ' 場 · ' + d.totalRounds + ' 局 · ' + facts.players.length + ' 個玩家</span></div>' +
+      '<h1 class="hero-title">' + facts.players.length + ' 人混戰總表</h1>' +
+      '<p class="section-lede">多過兩個玩家,唔畫一對一圖表,改為出一個綜合排行榜同逐場卡片。</p>';
+    // leaderboard table
+    var tblWrap = el("div", "table-wrap");
+    var rows = facts.players.map(function (p) { return { p: p, w: d.perPlayer[p].matchWins, rw: d.perPlayer[p].roundWins, pc: d.perPlayer[p].pieces, ac: d.perPlayer[p].allclear }; });
+    rows.sort(function (a, b) { return b.w - a.w || b.rw - a.rw; });
+    var idAgg = bag.add("score", "合共 " + d.totalMatches + " 場、" + d.totalRounds + " 局,涉及 " + facts.players.length + " 個玩家",
+      d.totalMatches + " matches, " + d.totalRounds + " rounds, " + facts.players.length + " players",
+      function (f) { var tot = 0; f.matches.forEach(function (m) { tot += m.rounds.length; }); return tot === d.totalRounds && f.matches.length === d.totalMatches && f.players.length === facts.players.length; });
+    var html = '<table class="leaderboard"><thead><tr><th>玩家</th><th>場數</th><th>局數</th><th>方塊</th><th>All Clear</th></tr></thead><tbody>';
+    rows.forEach(function (r, i) {
+      html += '<tr><td class="pname" style="color:' + playerColorVar(i) + '">' + esc(r.p) + '</td><td>' + r.w + '</td><td>' + r.rw + '</td><td>' + fmtInt(r.pc) + '</td><td>' + r.ac + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    tblWrap.innerHTML = html;
+    w.appendChild(el("p", "section-lede", "全表數據即場驗證 " + badge(idAgg)));
+    w.appendChild(tblWrap);
+
+    // per-match cards
+    var mg = el("div", "match-grid"); mg.style.marginTop = "24px";
+    facts.matches.forEach(function (m) {
+      var card = el("div", "match-card");
+      var scoreParts = facts.players.filter(function (p) { return (m.score[p] || 0) > 0 || m.leaderboard[p]; }).map(function (p) { return esc(p) + " " + (m.score[p] || 0); }).join(" · ");
+      var pips = m.rounds.map(function (r) { var i = facts.players.indexOf(r.winner); return '<span class="pip" style="background:' + playerColorVar(i) + '" title="' + esc(r.winner) + '"></span>'; }).join("");
+      card.innerHTML = '<div class="mc-head"><span class="mc-idx">第 ' + m.index + ' 場</span><span class="mc-win">' + esc(m.winner) + ' 贏</span></div>' +
+        '<div style="font-family:var(--font-mono);font-size:.9rem">' + scoreParts + '</div><div class="pips">' + pips + '</div>';
+      mg.appendChild(card);
+    });
+    w.appendChild(mg);
+    hero.appendChild(w);
+    root.appendChild(hero);
+  }
+
+  /* ---------- appendix + methodology ---------- */
+  function buildAppendix(root, facts, bag) {
+    var s = el("section");
+    var w = el("div", "wrap-wide");
+    w.innerHTML = '<div class="eyebrow">VERIFICATION</div><h2 class="section-title">即場驗證 · Claims Ledger</h2>' +
+      '<p class="section-lede">上面每個可數嘅講法都對應一條 predicate,render 之前即場拎 parsed 數據再計一次。全部 ✓ 先叫過關。</p>' +
+      '<div class="status-line" id="status-line"></div>' +
+      '<div class="method-note"><b>方法論(要老實講):</b>呢版係<b>即場 JS 驗證</b>(runtime predicate re-evaluation),<b>唔係 Dafny 形式證明</b>。每條 claim 顯示嘅數字同佢個 predicate 由同一份 computed value 出,所以理論上唔會相反 — 若果邊條變 ✗,即係代碼有 bug(已經同步 console.error)。想要形式印章,禁上面「匯出 facts.json」再行離線嘅 Dafny pipeline(codegen_dafny.py)就得。</div>' +
+      '<div class="table-wrap"><table class="appendix"><thead><tr><th>ID</th><th>類別</th><th>廣東話講法</th><th>English gloss</th><th>Predicate（source）</th><th>結果</th></tr></thead><tbody id="appendix-tbody"></tbody></table></div>';
+    s.appendChild(w);
+    root.appendChild(s);
+
+    // footer
+    var f = el("div", "report-footer");
+    f.innerHTML = "全程喺 browser 度計 · 零外部請求 · " + facts.matches.length + " 個 replay · 生成時間 " + new Date().toISOString().slice(0, 19).replace("T", " ");
+    root.appendChild(f);
+  }
+
+  function fillAppendixTable(claims) {
+    var tbody = document.getElementById("appendix-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    var pass = 0;
+    claims.forEach(function (c) {
+      if (c.status === "pass") pass++;
+      var src = c.predicate.toString();
+      if (src.length > 320) src = src.slice(0, 317) + "…";
+      var tr = el("tr");
+      tr.id = "claim-" + c.id;
+      tr.innerHTML =
+        '<td class="id-cell">' + c.id + '</td>' +
+        '<td class="cat-cell">' + esc(c.category) + '</td>' +
+        '<td>' + c.canto + '</td>' +
+        '<td class="cat-cell">' + esc(c.english_gloss || "") + '</td>' +
+        '<td class="src-cell"><code>' + esc(src) + '</code></td>' +
+        '<td><span class="status-pill" data-status="' + c.status + '">' + (c.status === "pass" ? "✓ 通過" : "✗ 失敗") + '</span></td>';
+      tbody.appendChild(tr);
+    });
+    var sl = document.getElementById("status-line");
+    if (sl) {
+      var all = pass === claims.length && claims.length > 0;
+      sl.setAttribute("data-all", all ? "pass" : "fail");
+      sl.innerHTML = all
+        ? "✓ 全部 " + claims.length + " 條 claim 即場驗證通過。"
+        : (pass + " / " + claims.length + " 條通過 — 有 ✗,睇 console.error 追 bug。");
+    }
+  }
+
+  /* ============================================================
+   *  PART 6 — FILE INTAKE + WIRING
+   * ============================================================ */
+  function readFiles(fileList) {
+    var files = Array.prototype.slice.call(fileList);
+    if (!files.length) return;
+    var items = [], errs = [], pending = files.length;
+    files.forEach(function (file) {
+      var name = file.name || "unnamed.ttrm";
+      var isTtrm = /\.ttrm$/i.test(name) || /\.json$/i.test(name);
+      var reader = new FileReader();
+      reader.onload = function () { items.push({ name: name, text: String(reader.result), _ttrm: isTtrm }); done(); };
+      reader.onerror = function () { errs.push({ file: name, error: "讀唔到個檔" }); done(); };
+      reader.readAsText(file);
+    });
+    function done() {
+      if (--pending > 0) return;
+      // build facts from all items (parse errors captured inside buildFacts)
+      var out = buildFacts(items);
+      var allErrs = errs.concat(out.errors);
+      if (!out.facts.matches.length) {
+        showStageErrors(allErrs.length ? allErrs : [{ file: "(冇檔)", error: "冇一個 replay 讀得掂" }]);
+        return;
+      }
+      renderReport(out.facts, allErrs);
+      if (allErrs.length) appendReportErrors(allErrs);
+    }
+  }
+
+  function showStageErrors(errs) {
+    var box = document.getElementById("stage-errs");
+    box.innerHTML = "";
+    errs.forEach(function (e) { box.appendChild(errChip(e)); });
+  }
+  function appendReportErrors(errs) {
+    var report = document.getElementById("report");
+    var s = el("section");
+    var w = el("div", "wrap-wide");
+    w.innerHTML = '<div class="eyebrow">SKIPPED FILES</div><h2 class="section-title">跳咗嘅檔案</h2><p class="section-lede">呢啲檔讀唔掂或者唔係正常 replay,冇計入上面嘅報告。</p>';
+    var chips = el("div", "err-chips");
+    errs.forEach(function (e) { chips.appendChild(errChip(e)); });
+    w.appendChild(chips); s.appendChild(w);
+    report.insertBefore(s, report.querySelector("section:last-of-type") || null);
+    // simpler: append at end before footer — insert before appendix section is fine
+  }
+  function errChip(e) {
+    var c = el("div", "err-chip");
+    c.innerHTML = '<span aria-hidden="true">⚠</span><span class="fn">' + esc(e.file) + '</span><span>' + esc(e.error) + '</span>';
+    return c;
+  }
+
+  // export facts.json in SCHEMA order
+  function orderedFacts(facts) {
+    return {
+      players: facts.players,
+      matches: facts.matches.map(function (m) {
+        var lb = {}; Object.keys(m.leaderboard).forEach(function (u) {
+          var e = m.leaderboard[u];
+          lb[u] = { wins: e.wins, apm_x1000: e.apm_x1000, pps_x1000: e.pps_x1000, vs_x1000: e.vs_x1000, garbagesent: e.garbagesent, garbagereceived: e.garbagereceived, kills: e.kills };
+        });
+        return {
+          index: m.index, file: m.file, ts: m.ts, winner: m.winner, score: m.score,
+          leaderboard: lb,
+          rounds: m.rounds.map(function (r) {
+            var players = {};
+            Object.keys(r.players).forEach(function (u) {
+              var p = r.players[u];
+              players[u] = {
+                lifetime: p.lifetime, alive: p.alive, apm_x1000: p.apm_x1000, pps_x1000: p.pps_x1000, vs_x1000: p.vs_x1000,
+                garbagesent: p.garbagesent, garbagereceived: p.garbagereceived, kills: p.kills,
+                lines: p.lines, pieces: p.pieces, inputs: p.inputs, holds: p.holds,
+                topcombo: p.topcombo, topbtb: p.topbtb, tspins: p.tspins,
+                clears: p.clears,
+                garbage_attack: p.garbage_attack, garbage_cleared: p.garbage_cleared, maxspike: p.maxspike,
+                finesse_faults: p.finesse_faults, finesse_perfect: p.finesse_perfect,
+                garbage_events: p.garbage_events
+              };
+            });
+            return { index: r.index, winner: r.winner, players: players };
+          })
+        };
+      })
+    };
+  }
+  function exportFacts() {
+    if (!lastFacts) return;
+    var blob = new Blob([JSON.stringify(orderedFacts(lastFacts), null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "facts.json"; document.body.appendChild(a); a.click();
+    document.body.removeChild(a); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function resetSession() {
+    document.body.classList.remove("has-data");
+    document.getElementById("report").innerHTML = "";
+    document.getElementById("stage-errs").innerHTML = "";
+    document.getElementById("file-input").value = "";
+    document.getElementById("export-btn").disabled = true;
+    document.getElementById("reset-btn").hidden = true;
+    lastFacts = lastDerived = lastClaims = null; lastErrors = []; CLAIM_MAP = {};
+    window.scrollTo(0, 0);
+  }
+
+  // theme toggle
+  function toggleTheme() {
+    var cur = document.documentElement.getAttribute("data-theme");
+    var next;
+    if (cur === "dark") next = "light"; else if (cur === "light") next = "dark";
+    else next = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+  }
+
+  function wire() {
+    var fi = document.getElementById("file-input");
+    fi.addEventListener("change", function () { readFiles(fi.files); });
+    document.getElementById("export-btn").addEventListener("click", exportFacts);
+    document.getElementById("reset-btn").addEventListener("click", resetSession);
+    document.getElementById("theme-btn").addEventListener("click", toggleTheme);
+
+    var dragDepth = 0;
+    window.addEventListener("dragenter", function (e) { e.preventDefault(); dragDepth++; document.body.classList.add("dragging"); });
+    window.addEventListener("dragover", function (e) { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; });
+    window.addEventListener("dragleave", function (e) { e.preventDefault(); if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove("dragging"); } });
+    window.addEventListener("drop", function (e) {
+      e.preventDefault(); dragDepth = 0; document.body.classList.remove("dragging");
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) readFiles(e.dataTransfer.files);
+    });
+  }
+
+  /* ============================================================
+   *  PART 7 — TESTABILITY HOOKS
+   * ============================================================ */
+  // window.__analyze(items) — items: array of JSON strings OR {name,text} objects.
+  // Runs the full pipeline programmatically and returns the computed facts object.
+  window.__analyze = function (items) {
+    if (!Array.isArray(items)) throw new Error("__analyze expects an array");
+    var out = buildFacts(items);
+    // build + evaluate claims so __claims() works even without rendering
+    var d = derive(out.facts);
+    var bag = new ClaimBag(out.facts);
+    if (out.facts.players.length === 2) {
+      // reproduce the same claim set the report builds (headless)
+      buildClaimsHeadless(out.facts, d, bag);
+    } else {
+      // minimal aggregate claim
+      bag.add("score", "aggregate", "aggregate", function (f) { return f.matches.length === out.facts.matches.length; });
+    }
+    bag.evaluate();
+    lastFacts = out.facts; lastDerived = d; lastClaims = bag.list;
+    CLAIM_MAP = {}; bag.list.forEach(function (c) { CLAIM_MAP[c.id] = c; });
+    return orderedFacts(out.facts);
+  };
+  // window.__claims() — fired claims with pass/fail (from the last render or __analyze).
+  window.__claims = function () {
+    if (!lastClaims) return [];
+    return lastClaims.map(function (c) {
+      var ok; try { ok = c.predicate(lastFacts) === true; } catch (e) { ok = false; }
+      return { id: c.id, category: c.category, canto: c.canto, english_gloss: c.english_gloss, source: c.predicate.toString(), pass: ok };
+    });
+  };
+  window.__facts = function () { return lastFacts ? orderedFacts(lastFacts) : null; };
+
+  // Headless claim builder — mirrors the countable claims used in the DOM report,
+  // so __claims() is meaningful without touching the DOM. (The DOM path registers
+  // the same predicates via the render functions; this covers the __analyze path.)
+  function buildClaimsHeadless(facts, d, bag) {
+    var A = facts.players[0], B = facts.players[1], pa = d.perPlayer[A], pb = d.perPlayer[B];
+    bag.add("score", A + " won " + pa.matchWins, A + " matches " + pa.matchWins, function (f) {
+      return f.matches.filter(function (m) { return m.winner === A; }).length === pa.matchWins && f.matches.filter(function (m) { return m.winner === B; }).length === pb.matchWins;
+    });
+    bag.add("score", "rounds", "rounds", function (f) {
+      var tot = 0, aw = 0, bw = 0; f.matches.forEach(function (m) { tot += m.rounds.length; m.rounds.forEach(function (r) { if (r.winner === A) aw++; else if (r.winner === B) bw++; }); });
+      return tot === d.totalRounds && aw === pa.roundWins && bw === pb.roundWins;
+    });
+    supLong(bag, d, A, B); supShort(bag, d, A, B);
+    // spike
+    bag.add("spike", "maxspike", "maxspike", function (f) {
+      var mx = -1; f.matches.forEach(function (m) { m.rounds.forEach(function (r) { for (var p in r.players) mx = Math.max(mx, r.players[p].maxspike); }); });
+      return mx === d.maxSpike.val;
+    });
+    // higher vs
+    bag.add("clutch", "higher-vs", "higher-vs", function (f) {
+      var cnt = 0, tot = 0; f.matches.forEach(function (m) { m.rounds.forEach(function (r) { tot++; var w = r.winner, l = f.players[0] === w ? f.players[1] : f.players[0]; if (r.players[w] && r.players[l] && r.players[w].vs_x1000 > r.players[l].vs_x1000) cnt++; }); });
+      return cnt === d.higherVsCount && tot === d.totalRounds;
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
+  else wire();
+})();
+</script>

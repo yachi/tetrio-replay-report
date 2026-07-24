@@ -1,0 +1,170 @@
+[
+  {
+    "id": "R001",
+    "canto": "呢個 session pinglamb 贏咗四場，yachi 贏咗三場",
+    "english_gloss": "pinglamb won 4 matches, yachi won 3",
+    "category": "score",
+    "python_check": "sum(1 for m in facts['matches'] if m['winner']=='pinglamb')==4 and sum(1 for m in facts['matches'] if m['winner']=='yachi')==3"
+  },
+  {
+    "id": "R002",
+    "canto": "五十局入面 pinglamb 攞咗 29 局，yachi 得 21 局",
+    "english_gloss": "of 50 rounds pinglamb won 29, yachi 21",
+    "category": "score",
+    "python_check": "sum(len(m['rounds']) for m in facts['matches'])==50 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')==29 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')==21"
+  },
+  {
+    "id": "R003",
+    "canto": "yachi 平均每局 PPS 約 1.40，快過 pinglamb 嘅約 1.33",
+    "english_gloss": "yachi mean per-round PPS approx 1.40 vs pinglamb approx 1.33",
+    "category": "pace",
+    "python_check": "70000 <= sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) < 70500 and 66500 <= sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) < 67000"
+  },
+  {
+    "id": "R004",
+    "canto": "pinglamb 每粒方塊打出嘅攻擊多過 yachi",
+    "english_gloss": "pinglamb deals more attack per piece placed than yachi",
+    "category": "attack",
+    "python_check": "sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])"
+  },
+  {
+    "id": "R005",
+    "canto": "成個 session yachi 落多過 pinglamb 三百粒方塊（4748 對 4439）",
+    "english_gloss": "yachi placed more total pieces than pinglamb (4748 vs 4439)",
+    "category": "pace",
+    "python_check": "sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])==4748 and sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])==4439"
+  },
+  {
+    "id": "R006",
+    "canto": "yachi 嘅手法比較乾淨，每粒方塊嘅 finesse fault 少過 pinglamb",
+    "english_gloss": "yachi has fewer finesse faults per piece than pinglamb",
+    "category": "finesse",
+    "python_check": "sum(r['players']['yachi']['finesse_faults'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']) < sum(r['players']['pinglamb']['finesse_faults'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])"
+  },
+  {
+    "id": "R007",
+    "canto": "yachi 開多咗 quad（248 對 191），pinglamb 就開多咗 T-spin double（232 對 189）",
+    "english_gloss": "yachi cleared more quads (248 vs 191); pinglamb more T-spin doubles (232 vs 189)",
+    "category": "style",
+    "python_check": "sum(r['players']['yachi']['clears']['quads'] for m in facts['matches'] for r in m['rounds'])==248 and sum(r['players']['pinglamb']['clears']['quads'] for m in facts['matches'] for r in m['rounds'])==191 and sum(r['players']['yachi']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds'])==189 and sum(r['players']['pinglamb']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds'])==232"
+  },
+  {
+    "id": "R008",
+    "canto": "計埋 T-spin double 同 triple，pinglamb 消嘅 T-spin 行數多過 yachi（284 對 221）",
+    "english_gloss": "counting T-spin doubles+triples pinglamb cleared more T-spin lines than yachi (284 vs 221)",
+    "category": "style",
+    "python_check": "sum(r['players']['pinglamb']['clears']['tspin_doubles']+r['players']['pinglamb']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])==284 and sum(r['players']['yachi']['clears']['tspin_doubles']+r['players']['yachi']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])==221"
+  },
+  {
+    "id": "R009",
+    "canto": "pinglamb 全場 KO 咗對手 29 次，yachi 得 21 次",
+    "english_gloss": "pinglamb has 29 round-level kills vs yachi 21",
+    "category": "attack",
+    "python_check": "sum(r['players']['pinglamb']['kills'] for m in facts['matches'] for r in m['rounds'])==29 and sum(r['players']['yachi']['kills'] for m in facts['matches'] for r in m['rounds'])==21"
+  },
+  {
+    "id": "R010",
+    "canto": "40 秒內收工嘅快局，pinglamb 贏 11 局，yachi 得 5 局",
+    "english_gloss": "in rounds ending under 40s pinglamb won 11, yachi 5",
+    "category": "clutch",
+    "python_check": "sum(1 for m in facts['matches'] for r in m['rounds'] if max(r['players']['yachi']['lifetime'],r['players']['pinglamb']['lifetime'])<40000 and r['winner']=='pinglamb')==11 and sum(1 for m in facts['matches'] for r in m['rounds'] if max(r['players']['yachi']['lifetime'],r['players']['pinglamb']['lifetime'])<40000 and r['winner']=='yachi')==5"
+  },
+  {
+    "id": "R011",
+    "canto": "輸咗一局之後，yachi 25 次入面得 8 次即刻贏返；pinglamb 18 次入面贏返 9 次",
+    "english_gloss": "after losing a round yachi won the next only 8 of 25 times; pinglamb 9 of 18",
+    "category": "comeback",
+    "python_check": "sum(1 for m in facts['matches'] for i in range(len(m['rounds'])-1) if m['rounds'][i]['winner']=='pinglamb' and m['rounds'][i+1]['winner']=='yachi')==8 and sum(1 for m in facts['matches'] for i in range(len(m['rounds'])-1) if m['rounds'][i]['winner']=='pinglamb')==25 and sum(1 for m in facts['matches'] for i in range(len(m['rounds'])-1) if m['rounds'][i]['winner']=='yachi' and m['rounds'][i+1]['winner']=='pinglamb')==9 and sum(1 for m in facts['matches'] for i in range(len(m['rounds'])-1) if m['rounds'][i]['winner']=='yachi')==18"
+  },
+  {
+    "id": "R012",
+    "canto": "yachi 一開火（單局 APM 到 65 以上）就贏，九局入面贏咗八局；pinglamb 到 65 以上 14 局全贏",
+    "english_gloss": "yachi won 8 of 9 rounds where his APM reached 65+; pinglamb won all 14 such rounds",
+    "category": "clutch",
+    "python_check": "sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000']>=65000)==9 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000']>=65000 and r['winner']=='yachi')==8 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000']>=65000)==14 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000']>=65000 and r['winner']=='pinglamb')==14"
+  },
+  {
+    "id": "R013",
+    "canto": "pinglamb 單次最大 spike 去到 17，yachi 最勁得 15",
+    "english_gloss": "pinglamb biggest single spike is 17 vs yachi 15",
+    "category": "spike",
+    "python_check": "max(r['players']['pinglamb']['maxspike'] for m in facts['matches'] for r in m['rounds'])==17 and max(r['players']['yachi']['maxspike'] for m in facts['matches'] for r in m['rounds'])==15"
+  },
+  {
+    "id": "R014",
+    "canto": "打出 12 或以上大 spike 嘅局數，pinglamb 有 13 局，yachi 得 9 局",
+    "english_gloss": "pinglamb had 13 rounds with a max spike of 12+, yachi 9",
+    "category": "spike",
+    "python_check": "sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike']>=12)==13 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike']>=12)==9"
+  },
+  {
+    "id": "R015",
+    "canto": "兩場 5-0 (m1、m4) 都係 pinglamb 掃走，yachi 呢兩場一局都冇贏過",
+    "english_gloss": "both 5-0 sweeps (m1, m4) went to pinglamb; yachi won zero rounds across them",
+    "category": "clutch",
+    "python_check": "facts['matches'][0]['score']=={'yachi':0,'pinglamb':5} and facts['matches'][3]['score']=={'yachi':0,'pinglamb':5} and sum(1 for m in facts['matches'] if m['index'] in (1,4) for r in m['rounds'] if r['winner']=='yachi')==0"
+  },
+  {
+    "id": "R016",
+    "canto": "兩場被掃嘅波，pinglamb 全場 APM 都拋離 yachi 一大截（m1 高過 12、m4 高過 14）",
+    "english_gloss": "in both swept matches pinglamb match APM far exceeded yachi (m1 by 12+, m4 by 14+)",
+    "category": "clutch",
+    "python_check": "facts['matches'][0]['leaderboard']['pinglamb']['apm_x1000']-facts['matches'][0]['leaderboard']['yachi']['apm_x1000']>=12000 and facts['matches'][3]['leaderboard']['pinglamb']['apm_x1000']-facts['matches'][3]['leaderboard']['yachi']['apm_x1000']>=14000"
+  },
+  {
+    "id": "R017",
+    "canto": "決勝嗰場 m7，yachi 5-4 險勝",
+    "english_gloss": "in the decider m7 yachi won 5-4",
+    "category": "clutch",
+    "python_check": "facts['matches'][6]['winner']=='yachi' and facts['matches'][6]['score']=={'yachi':5,'pinglamb':4}"
+  },
+  {
+    "id": "R018",
+    "canto": "m7 入面 yachi 單局 APM 上到 70 以上嗰三局，佢全部贏晒",
+    "english_gloss": "in m7 yachi won all 3 rounds where his APM reached 70+",
+    "category": "clutch",
+    "python_check": "len([r for r in facts['matches'][6]['rounds'] if r['players']['yachi']['apm_x1000']>=70000])==3 and all(r['winner']=='yachi' for r in facts['matches'][6]['rounds'] if r['players']['yachi']['apm_x1000']>=70000)"
+  },
+  {
+    "id": "R019",
+    "canto": "yachi 每局 APM 波動細過 pinglamb，穩定啲",
+    "english_gloss": "yachi round-to-round APM dispersion is smaller than pinglamb's (more consistent)",
+    "category": "style",
+    "python_check": "(lambda xs: 50*sum(x*x for x in xs)-sum(xs)**2)([r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']]) < (lambda xs: 50*sum(x*x for x in xs)-sum(xs)**2)([r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']])"
+  },
+  {
+    "id": "R020",
+    "canto": "但講 PPS 節奏，就係 pinglamb 波動細過 yachi，出手速度更穩",
+    "english_gloss": "for PPS pace pinglamb's round-to-round dispersion is smaller than yachi's",
+    "category": "style",
+    "python_check": "(lambda xs: 50*sum(x*x for x in xs)-sum(xs)**2)([r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']]) < (lambda xs: 50*sum(x*x for x in xs)-sum(xs)**2)([r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']])"
+  },
+  {
+    "id": "R021",
+    "canto": "全場 all-clear，yachi 開咗 6 個，多過 pinglamb 嘅 4 個",
+    "english_gloss": "yachi made 6 all-clears vs pinglamb 4",
+    "category": "style",
+    "python_check": "sum(r['players']['yachi']['clears']['allclear'] for m in facts['matches'] for r in m['rounds'])==6 and sum(r['players']['pinglamb']['clears']['allclear'] for m in facts['matches'] for r in m['rounds'])==4"
+  },
+  {
+    "id": "R022",
+    "canto": "防守方面兩個叮到嚟嘅攻擊都消得差唔多（yachi cancel 咗 333 行、pinglamb 329 行）",
+    "english_gloss": "both cancelled a similar amount of queued garbage (yachi 333 lines, pinglamb 329)",
+    "category": "attack",
+    "python_check": "sum(e['amt'] for m in facts['matches'] for r in m['rounds'] for e in r['players']['yachi']['garbage_events']) - sum(r['players']['yachi']['garbagereceived'] for m in facts['matches'] for r in m['rounds'])==333 and sum(e['amt'] for m in facts['matches'] for r in m['rounds'] for e in r['players']['pinglamb']['garbage_events']) - sum(r['players']['pinglamb']['garbagereceived'] for m in facts['matches'] for r in m['rounds'])==329"
+  },
+  {
+    "id": "R023",
+    "canto": "pinglamb T-spin triple 開咗 52 個，係 yachi（32 個）嘅超過一倍半",
+    "english_gloss": "pinglamb cleared 52 T-spin triples vs yachi 32",
+    "category": "style",
+    "python_check": "sum(r['players']['pinglamb']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])==52 and sum(r['players']['yachi']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])==32"
+  },
+  {
+    "id": "R024",
+    "canto": "yachi 用 hold 用得密啲，全場 hold 咗 1792 次，多過 pinglamb 嘅 1703 次",
+    "english_gloss": "yachi used hold more often (1792 vs pinglamb 1703)",
+    "category": "finesse",
+    "python_check": "sum(r['players']['yachi']['holds'] for m in facts['matches'] for r in m['rounds'])==1792 and sum(r['players']['pinglamb']['holds'] for m in facts['matches'] for r in m['rounds'])==1703"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "C001",
+    "lemma": "C001_pinglamb_won_4_matches_yachi_3",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C002",
+    "lemma": "C002_50_rounds_pinglamb_29_yachi_21",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C003",
+    "lemma": "C003_pinglamb_placed_4439_pieces_vs_yachi_4748",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C004",
+    "lemma": "C004_pinglamb_agg_pps_1_32_vs_1_41",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C005",
+    "lemma": "C005_total_all_clears_10",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C006",
+    "lemma": "C006_shortest_round_is_m5r2_21_0s",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C007",
+    "lemma": "C007_longest_round_is_m3r3_240_1s",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C008",
+    "lemma": "C008_m1_longest_round_116_2s_won_by_pinglamb",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C009",
+    "lemma": "C009_m2_longest_round_180_0s_won_by_yachi",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C010",
+    "lemma": "C010_m3_longest_round_240_1s_won_by_yachi",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C011",
+    "lemma": "C011_m4_longest_round_83_9s_won_by_pinglamb",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C012",
+    "lemma": "C012_m5_longest_round_140_0s_won_by_yachi",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C013",
+    "lemma": "C013_m6_longest_round_95_1s_won_by_pinglamb",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C014",
+    "lemma": "C014_m7_longest_round_101_8s_won_by_pinglamb",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C015",
+    "lemma": "C015_longest_round_is_m3r3_240_1s",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C016",
+    "lemma": "C016_shortest_round_is_m5r2_21_0s",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C017",
+    "lemma": "C017_biggest_single_spike_is_17_hit_1_time_s",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C018",
+    "lemma": "C018_biggest_comeback_m7r3_winner_queued_67_vs_47",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C019",
+    "lemma": "C019_in_every_one_of_50_rounds_the_winner_had_higher_vs",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  },
+  {
+    "id": "C020",
+    "lemma": "C020_pinglamb_agg_pps_1_32_yachi_1_41",
+    "file": "dafny/Claims24.dfy",
+    "status": "verified"
+  }
+]

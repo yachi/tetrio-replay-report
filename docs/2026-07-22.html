@@ -1,0 +1,1639 @@
+<meta charset="utf-8" />
+<title>yachi vs pinglamb — 十場戰報</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ============================= TOKENS ============================= */
+  :root {
+    --bg: #f5f6fa;
+    --bg-raised: #ffffff;
+    --bg-sunken: #eceef5;
+    --ink: #12141c;
+    --ink-secondary: #4b4f5e;
+    --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10);
+    --border-strong: rgba(18, 20, 28, 0.18);
+
+    --yachi: #0e8f9e;
+    --yachi-tint: rgba(14, 143, 158, 0.10);
+    --yachi-tint-strong: rgba(14, 143, 158, 0.20);
+    --pinglamb: #7c3aed;
+    --pinglamb-tint: rgba(124, 58, 237, 0.10);
+    --pinglamb-tint-strong: rgba(124, 58, 237, 0.20);
+
+    --good: #0ca30c;
+    --good-tint: rgba(12, 163, 12, 0.12);
+    --pending: #c98500;
+    --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b;
+    --spotlight-tint: rgba(184, 134, 11, 0.12);
+    --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+
+    --grid-line: #e1e0d9;
+    --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+
+    --font-cjk: "PingFang HK", "Noto Sans HK", "Microsoft JhengHei", "Heiti TC",
+      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+      "Liberation Mono", monospace;
+
+    --content-w: 900px;
+    --wide-w: 1180px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0d13;
+      --bg-raised: #141924;
+      --bg-sunken: #10141d;
+      --ink: #edeff7;
+      --ink-secondary: #b7bcce;
+      --muted: #6e7488;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.17);
+
+      --yachi: #1caa9e;
+      --yachi-tint: rgba(28, 170, 158, 0.16);
+      --yachi-tint-strong: rgba(28, 170, 158, 0.28);
+      --pinglamb: #9678e8;
+      --pinglamb-tint: rgba(150, 120, 232, 0.18);
+      --pinglamb-tint-strong: rgba(150, 120, 232, 0.30);
+
+      --good: #23c923;
+      --good-tint: rgba(35, 201, 35, 0.16);
+      --pending: #fab219;
+      --pending-tint: rgba(250, 178, 25, 0.16);
+      --spotlight: #e8b94a;
+      --spotlight-tint: rgba(232, 185, 74, 0.16);
+      --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+
+      --grid-line: #262b38;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0d13; --bg-raised: #141924; --bg-sunken: #10141d;
+    --ink: #edeff7; --ink-secondary: #b7bcce; --muted: #6e7488;
+    --border: rgba(255, 255, 255, 0.09); --border-strong: rgba(255, 255, 255, 0.17);
+    --yachi: #1caa9e; --yachi-tint: rgba(28, 170, 158, 0.16); --yachi-tint-strong: rgba(28, 170, 158, 0.28);
+    --pinglamb: #9678e8; --pinglamb-tint: rgba(150, 120, 232, 0.18); --pinglamb-tint-strong: rgba(150, 120, 232, 0.30);
+    --good: #23c923; --good-tint: rgba(35, 201, 35, 0.16);
+    --pending: #fab219; --pending-tint: rgba(250, 178, 25, 0.16);
+    --spotlight: #e8b94a; --spotlight-tint: rgba(232, 185, 74, 0.16); --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+    --grid-line: #262b38; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f6fa; --bg-raised: #ffffff; --bg-sunken: #eceef5;
+    --ink: #12141c; --ink-secondary: #4b4f5e; --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10); --border-strong: rgba(18, 20, 28, 0.18);
+    --yachi: #0e8f9e; --yachi-tint: rgba(14, 143, 158, 0.10); --yachi-tint-strong: rgba(14, 143, 158, 0.20);
+    --pinglamb: #7c3aed; --pinglamb-tint: rgba(124, 58, 237, 0.10); --pinglamb-tint-strong: rgba(124, 58, 237, 0.20);
+    --good: #0ca30c; --good-tint: rgba(12, 163, 12, 0.12);
+    --pending: #c98500; --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b; --spotlight-tint: rgba(184, 134, 11, 0.12); --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+    --grid-line: #e1e0d9; --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+  }
+
+  /* ============================= RESET / BASE ============================= */
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-cjk);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4 { text-wrap: balance; margin: 0; font-family: var(--font-cjk); }
+  p { margin: 0 0 1em; }
+  p:last-child { margin-bottom: 0; }
+  a { color: inherit; }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  ::selection { background: var(--pinglamb-tint-strong); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  }
+
+  /* ============================= LAYOUT SHELL ============================= */
+  .wrap { max-width: var(--content-w); margin: 0 auto; padding: 0 24px; }
+  .wrap-wide { max-width: var(--wide-w); margin: 0 auto; padding: 0 24px; }
+
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px; height: 2px;
+    background: linear-gradient(90deg, var(--yachi), var(--pinglamb));
+    display: inline-block;
+    border-radius: 2px;
+  }
+  .section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.01em; }
+  .section-lede { color: var(--ink-secondary); font-size: 1.05rem; max-width: 62ch; margin-top: 14px; }
+
+  /* ============================= HERO ============================= */
+  .hero {
+    position: relative;
+    padding: 96px 0 72px;
+    background:
+      radial-gradient(ellipse 900px 420px at 18% -10%, var(--yachi-tint), transparent 60%),
+      radial-gradient(ellipse 900px 420px at 84% 0%, var(--pinglamb-tint), transparent 60%);
+    overflow: hidden;
+  }
+  .hero-blocks {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+  }
+  .hero-meta {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+  }
+  .hero-title {
+    font-size: clamp(1.9rem, 4.4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.28;
+    max-width: 22ch;
+  }
+  .hero-title .hl-y { color: var(--yachi); }
+  .hero-title .hl-p { color: var(--pinglamb); }
+
+  .scoreboard {
+    margin-top: 44px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 30px clamp(16px, 4vw, 44px);
+    box-shadow: var(--shadow);
+  }
+  .sb-player { display: flex; flex-direction: column; gap: 6px; }
+  .sb-player.p-right { align-items: flex-end; text-align: right; }
+  .sb-name { font-size: clamp(1.1rem, 2.4vw, 1.5rem); font-weight: 800; }
+  .sb-player.p-left .sb-name { color: var(--yachi); }
+  .sb-player.p-right .sb-name { color: var(--pinglamb); }
+  .sb-tag { font-family: var(--font-mono); font-size: 0.76rem; color: var(--muted); letter-spacing: 0.06em; }
+  .sb-mid { text-align: center; }
+  .sb-score {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 8vw, 4.4rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .sb-score .sep { color: var(--muted); font-weight: 500; padding: 0 0.06em; }
+  .sb-score .y { color: var(--yachi); }
+  .sb-score .p { color: var(--pinglamb); }
+  .sb-sub { margin-top: 6px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+
+  .hero-lede { margin-top: 30px; max-width: 68ch; color: var(--ink-secondary); font-size: 1.06rem; }
+  .hero-lede strong { color: var(--ink); font-weight: 700; }
+
+  /* ============================= BADGE (claim chip) ============================= */
+  .badge {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.28em;
+    font-family: var(--font-mono);
+    font-size: 0.68em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.12em 0.5em;
+    margin: 0 0.1em;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-sunken);
+    color: var(--ink-secondary);
+    text-decoration: none;
+    vertical-align: 0.5em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .badge[data-status="verified"] { border-color: color-mix(in srgb, var(--good) 55%, var(--border-strong)); background: var(--good-tint); color: var(--good); }
+  .badge[data-status="pending"] { border-color: color-mix(in srgb, var(--pending) 45%, var(--border-strong)); background: var(--pending-tint); color: var(--pending); }
+  .badge:hover { filter: brightness(1.08); }
+  .badge .ic { font-size: 0.95em; }
+
+  /* ============================= MATCH TIMELINE ============================= */
+  .timeline { display: flex; flex-direction: column; gap: 20px; margin-top: 48px; }
+  .match-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px clamp(18px, 3.4vw, 34px);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .match-card.in-view { opacity: 1; transform: translateY(0); }
+  .match-card::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: var(--accent);
+  }
+  .match-card[data-winner="yachi"] { --accent: var(--yachi); }
+  .match-card[data-winner="pinglamb"] { --accent: var(--pinglamb); }
+  .match-card.hero-match {
+    background: linear-gradient(155deg, var(--spotlight-tint), var(--bg-raised) 42%);
+    border-color: color-mix(in srgb, var(--spotlight) 40%, var(--border));
+  }
+  .match-card.hero-match::before { background: var(--spotlight); width: 6px; }
+
+  .mc-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .mc-idx { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; letter-spacing: 0.06em; }
+  .mc-title { font-size: 1.24rem; font-weight: 800; margin-top: 4px; }
+  .mc-score {
+    font-family: var(--font-mono); font-weight: 800; font-size: 1.5rem;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .mc-score .y { color: var(--yachi); }
+  .mc-score .p { color: var(--pinglamb); }
+  .mc-score .sep { color: var(--muted); font-weight: 500; }
+
+  .pip-trail { display: flex; gap: 5px; margin: 16px 0 18px; flex-wrap: wrap; }
+  .pip {
+    width: 15px; height: 15px; border-radius: 4px;
+    display: inline-block;
+  }
+  .pip[data-w="yachi"] { background: var(--yachi); }
+  .pip[data-w="pinglamb"] { background: var(--pinglamb); }
+  .pip[title] { cursor: default; }
+
+  .mc-body { color: var(--ink-secondary); font-size: 0.98rem; }
+  .mc-body strong { color: var(--ink); font-weight: 700; }
+
+  .match-card.hero-match .mc-title { font-size: 1.5rem; }
+  .hero-flag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+    color: var(--spotlight); background: var(--spotlight-tint-strong);
+    border: 1px solid color-mix(in srgb, var(--spotlight) 50%, transparent);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 10px;
+  }
+
+  /* ============================= CHARTS ============================= */
+  .legend-row {
+    display: flex; gap: 22px; align-items: center; margin: 30px 0 26px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-secondary);
+  }
+  .legend-row .sw { display: inline-flex; align-items: center; gap: 7px; }
+  .legend-row .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .legend-row .dot.y { background: var(--yachi); }
+  .legend-row .dot.p { background: var(--pinglamb); }
+
+  .chart-panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: clamp(16px, 3vw, 30px);
+    margin-top: 28px;
+  }
+  .chart-panel h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+  .chart-panel .cap { color: var(--muted); font-size: 0.86rem; margin-bottom: 18px; }
+  .chart-panel .footnote { color: var(--muted); font-size: 0.78rem; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .scroll-x { overflow-x: auto; }
+
+  .sm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+  }
+  .sm-cell {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 12px 6px;
+    background: var(--bg-sunken);
+  }
+  .sm-cell-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .sm-cell-title { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: var(--ink); }
+  .sm-cell-score { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+  .sm-cell svg { display: block; width: 100%; height: auto; }
+
+  svg text { font-family: var(--font-mono); fill: var(--muted); }
+  .axis-line { stroke: var(--grid-line); stroke-width: 1; }
+  .grid-line { stroke: var(--grid-line); stroke-width: 1; stroke-dasharray: 2 3; }
+
+  /* ============================= STAT GRID (关键时刻) ============================= */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 34px; }
+  .stat-card {
+    background: var(--bg-raised); border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px 22px 20px;
+  }
+  .stat-card .k { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+  .stat-card .v { font-family: var(--font-mono); font-weight: 800; font-size: 1.85rem; margin: 8px 0 10px; letter-spacing: -0.01em; }
+  .stat-card .d { font-size: 0.92rem; color: var(--ink-secondary); }
+  .stat-card.accent-y { border-top: 3px solid var(--yachi); }
+  .stat-card.accent-p { border-top: 3px solid var(--pinglamb); }
+  .stat-card.accent-g { border-top: 3px solid var(--spotlight); }
+
+  .trivia-list { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+  .trivia-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-raised);
+  }
+  .trivia-item .num { font-family: var(--font-mono); font-weight: 800; color: var(--muted); font-size: 0.9rem; padding-top: 2px; }
+  .trivia-item .txt { color: var(--ink-secondary); }
+  .trivia-item .txt strong { color: var(--ink); }
+
+  blockquote.closer {
+    margin: 48px 0 0; padding: 26px 30px; border-radius: 16px;
+    background: linear-gradient(120deg, var(--yachi-tint), var(--pinglamb-tint));
+    border: 1px solid var(--border);
+    font-size: 1.06rem; color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ============================= RECOMMENDATIONS ============================= */
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 40px; }
+  @media (max-width: 760px) { .rec-grid { grid-template-columns: 1fr; } }
+  .rec-col {
+    background: var(--bg-raised); border: 1px solid var(--border); border-radius: 18px;
+    padding: 26px clamp(18px, 3vw, 30px); border-top: 4px solid var(--accent);
+  }
+  .rec-col.for-yachi { --accent: var(--yachi); }
+  .rec-col.for-pinglamb { --accent: var(--pinglamb); }
+  .rec-col h3 { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+  .rec-col .profile { margin-top: 10px; color: var(--ink-secondary); font-size: 0.96rem; }
+  .rec-col .profile strong { color: var(--ink); }
+  .rec-list { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+  .rec-list li {
+    padding-top: 14px; border-top: 1px dashed var(--border);
+    color: var(--ink-secondary); font-size: 0.95rem;
+  }
+  .rec-list li:first-child { border-top: none; padding-top: 0; }
+  .rec-list li strong { color: var(--ink); }
+  .rec-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 7px; background: var(--accent);
+    color: #fff; font-family: var(--font-mono); font-weight: 800; font-size: 0.78rem;
+    margin-right: 8px; vertical-align: -4px;
+  }
+  .versus-note {
+    margin-top: 26px; padding: 18px 20px; border-radius: 14px; background: var(--bg-sunken);
+    color: var(--ink-secondary); font-size: 0.95rem; grid-column: 1 / -1;
+  }
+
+  /* ============================= APPENDIX ============================= */
+  .method-note {
+    margin-top: 34px; padding: 22px 26px; border-radius: 16px;
+    background: var(--bg-raised); border: 1px solid var(--border);
+    color: var(--ink-secondary); font-size: 0.98rem;
+  }
+  .method-note .chain { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+  .chain-step { display: flex; gap: 12px; align-items: flex-start; }
+  .chain-step .n {
+    flex: none; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--bg-sunken); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 0.78rem; font-weight: 800; color: var(--ink-secondary);
+  }
+  #status-line {
+    font-family: var(--font-mono); font-size: 0.86rem; margin-top: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px; background: var(--pending-tint); color: var(--pending);
+    border: 1px solid color-mix(in srgb, var(--pending) 40%, transparent);
+  }
+  #status-line[data-all-verified="true"] { background: var(--good-tint); color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, transparent); }
+
+  table.appendix-table {
+    width: 100%; border-collapse: collapse; margin-top: 26px; min-width: 880px;
+    font-size: 0.92rem;
+  }
+  table.appendix-table th, table.appendix-table td {
+    text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.appendix-table thead th {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border-strong); position: sticky; top: 0; background: var(--bg-raised);
+  }
+  table.appendix-table td.id-cell { font-family: var(--font-mono); font-weight: 700; white-space: nowrap; }
+  table.appendix-table td.canto-cell { max-width: 46ch; }
+  table.appendix-table td.gloss-cell { max-width: 34ch; color: var(--ink-secondary); font-size: 0.88rem; }
+  table.appendix-table td.lemma-cell { font-family: var(--font-mono); font-size: 0.84rem; color: var(--ink-secondary); white-space: nowrap; }
+  table.appendix-table tr[id] { scroll-margin-top: 20px; }
+  table.appendix-table tr:target { background: var(--pinglamb-tint); }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+    font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+  }
+  .status-pill[data-status="verified"] { background: var(--good-tint); color: var(--good); }
+  .status-pill[data-status="pending"] { background: var(--pending-tint); color: var(--pending); }
+
+  footer.report-footer {
+    padding: 40px 0 60px; text-align: center; color: var(--muted); font-size: 0.86rem;
+    font-family: var(--font-mono);
+  }
+</style>
+
+<!-- ============================= HERO ============================= -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-meta">TETR.IO · 1v1 SERIES REPORT · 2026-07-22</div>
+    <h1 class="hero-title">
+      <span class="hl-y">yachi</span> 對 <span class="hl-p">pinglamb</span> ——
+      十場拉鋸，79局先分出真章
+    </h1>
+
+    <div class="scoreboard">
+      <div class="sb-player p-left">
+        <div class="sb-name">yachi</div>
+        <div class="sb-tag">拉鋸流 · TEMPO</div>
+      </div>
+      <div class="sb-mid">
+        <div class="sb-score"><span class="y">6</span><span class="sep">:</span><span class="p">4</span></div>
+        <div class="sb-sub">場數 · MATCHES <span class="badge" data-claim="C001"></span></div>
+      </div>
+      <div class="sb-player p-right">
+        <div class="sb-name">pinglamb</div>
+        <div class="sb-tag">閃電流 · SPIKE</div>
+      </div>
+    </div>
+
+    <p class="hero-lede">
+      呢個 series 表面睇 yachi 六比四贏咗<span class="badge" data-claim="C001"></span>，但係唔好俾個大比數呃到——成個對局打足 <strong>79 局</strong>，yachi 43、pinglamb 36，局數其實貼到痴埋一齊<span class="badge" data-claim="C002"></span>。十場入面有<strong>三場硬打到 5-4</strong> 先分到勝負：第2、第3場 pinglamb 執，第10場 yachi 執<span class="badge" data-claim="C003"></span>。pinglamb 係手起刀落嘅刺客，單局可以爆到你懷疑人生；但 yachi 贏喺個心口硬——落後翻盤、長局死頂、關鍵場一鋪過帶走。六比四睇落舒服，其實局局貼身。
+    </p>
+  </div>
+</section>
+
+<!-- ============================= 十場戰況 ============================= -->
+<section id="matches">
+  <div class="wrap">
+    <div class="eyebrow">戰況直擊 · 十場逐一睇</div>
+    <h2 class="section-title">十場戰況</h2>
+    <p class="section-lede">每場嘅最終比數、贏波序列（下面一排色格代表逐局邊個贏）同埋嗰場最關鍵嘅一鋪，第10場決勝戲留到最後。</p>
+
+    <div class="timeline" id="timeline"></div>
+  </div>
+</section>
+
+<!-- ============================= 數據對決 ============================= -->
+<section id="stats">
+  <div class="wrap-wide">
+    <div class="eyebrow">數據對決 · 逐格拆解</div>
+    <h2 class="section-title">數據對決</h2>
+    <p class="section-lede">兩個人打法南轅北轍：yachi 靠速度同乾淨手法碾壓，pinglamb 靠效率、B2B 鏈同 T-spin spike 搏殺<span class="badge" data-claim="R011"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。</p>
+
+    <div class="legend-row">
+      <span class="sw"><span class="dot y"></span>yachi</span>
+      <span class="sw"><span class="dot p"></span>pinglamb</span>
+    </div>
+
+    <div class="chart-panel">
+      <h3>逐場 VS 走勢（79局全紀錄）</h3>
+      <p class="cap">每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。全場 79 局，贏嗰個 vs 都高過輸嗰個，冇一局例外<span class="badge" data-claim="C015"></span>——馬拉松局（m2 第3局）同閃電局（m7 第2局）已經圈起。</p>
+      <div class="sm-grid" id="vs-small-multiples"></div>
+    </div>
+
+    <div class="chart-panel">
+      <h3>清行類型分布</h3>
+      <p class="cap">yachi 靠 Quad 遠遠拋離 pinglamb 嘅 293 個<span class="badge" data-claim="R008"></span>；pinglamb 就係 T-spin 專家，T-spin double 339 個、triple 82 個，兩樣都壓過 yachi<span class="badge" data-claim="R009"></span><span class="badge" data-claim="R010"></span>。</p>
+      <div class="scroll-x"><div id="clears-bar-chart"></div></div>
+      <p class="footnote">呢個圖表淨係計有消行嘅 T-spin，所以會少過整體 T-spin 總數<span class="badge" data-claim="R011"></span>——整體總數連冇消行嘅 T-spin 都計埋。</p>
+    </div>
+
+    <div class="chart-panel">
+      <h3>身手大比拼</h3>
+      <p class="cap">每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。</p>
+      <div class="scroll-x"><div id="tape-chart"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= 關鍵時刻 ============================= -->
+<section id="moments">
+  <div class="wrap">
+    <div class="eyebrow">高光時刻 · 全場之最</div>
+    <h2 class="section-title">關鍵時刻</h2>
+
+    <div class="stat-grid">
+      <div class="stat-card accent-y">
+        <div class="k">最長馬拉松</div>
+        <div class="v mono">228.3s</div>
+        <div class="d">第2場第3局，三分四十八秒嘅落樓大戰，yachi 一路食多過對手嘅垃圾（127 vs 109 行）都死頂唔冧，仲一鋪清咗全場最多嘅 204 行<span class="badge" data-claim="C006"></span><span class="badge" data-claim="C007"></span><span class="badge" data-claim="C023"></span>。</div>
+      </div>
+      <div class="stat-card accent-p">
+        <div class="k">全場最勁閃電殺</div>
+        <div class="v mono">262.6 vs</div>
+        <div class="d">第7場第2局，pinglamb APM 爆到約114.2、PPS 約1.84，約16秒一鋪過收工，vs 262.6 係全場單局最高<span class="badge" data-claim="C009"></span><span class="badge" data-claim="C010"></span>。</div>
+      </div>
+      <div class="stat-card accent-g">
+        <div class="k">單發最大 spike</div>
+        <div class="v mono">16（兩邊都掂過3次）</div>
+        <div class="d">全場最大單發 spike 係 16，兩邊都掂過，一共出現三次；yachi 喺第4場第3局劈嗰一嘢仲順手贏埋局<span class="badge" data-claim="C013"></span>。</div>
+      </div>
+      <div class="stat-card">
+        <div class="k">全場鐵律</div>
+        <div class="v mono">79 / 79</div>
+        <div class="d">全場79局，每一局贏嗰個 vs score 都高過輸嗰個——vs 就係命，冇一局例外<span class="badge" data-claim="C015"></span>。</div>
+      </div>
+    </div>
+
+    <div class="trivia-list">
+      <div class="trivia-item">
+        <div class="num">01</div>
+        <div class="txt">有 <strong>8 局</strong>係贏家真係食多過對手嘅垃圾行都照樣翻盤，當中 <strong>yachi 佔6局、pinglamb 佔2局</strong>，證明 yachi 落樓真係頂得住<span class="badge" data-claim="C016"></span><span class="badge" data-claim="C027"></span>。</div>
+      </div>
+      <div class="trivia-item">
+        <div class="num">02</div>
+        <div class="txt">兩個人夾埋成個 series 出咗 <strong>19次 Perfect Clear</strong>（yachi 12、pinglamb 7）<span class="badge" data-claim="C020"></span><span class="badge" data-claim="R012"></span>。</div>
+      </div>
+      <div class="trivia-item">
+        <div class="num">03</div>
+        <div class="txt">跨場計 yachi 最多可以連贏五局，係全場最長嘅連勝（pinglamb 最多得三局），不過單場之內佢最多都係連贏四局<span class="badge" data-claim="C021"></span>。第2場第8局 pinglamb 靠21個 T-spin 拎低咗嗰局約200.5秒嘅馬拉松<span class="badge" data-claim="C018"></span>；第9場第6局佢又串起全場最長嘅 10連 B2B<span class="badge" data-claim="C019"></span>。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= 建議 ============================= -->
+<section id="coaching">
+  <div class="wrap-wide">
+    <div class="eyebrow">教練分析 · 下一步點練</div>
+    <h2 class="section-title">俾兩位嘅建議</h2>
+    <p class="section-lede">呢個 series 打足十場、79局，yachi 六場、pinglamb 四場<span class="badge" data-claim="R001"></span>；分開局計 yachi 43局、pinglamb 36局<span class="badge" data-claim="R002"></span>。十場全部都係先贏五局定生死<span class="badge" data-claim="R003"></span>，打得幾貼身，尤其係三場拖到 5-4 嘅決勝場<span class="badge" data-claim="R020"></span>。</p>
+
+    <div class="rec-grid">
+      <div class="rec-col for-yachi">
+        <h3>yachi ——「快手乾淨型」</h3>
+        <p class="profile">全程手快嗰個：落咗 <strong>7546 粒</strong>，多過 pinglamb<span class="badge" data-claim="R004"></span>，平均 PPS 約 <strong>1.43</strong> 對 1.34<span class="badge" data-claim="R005"></span>。打法係堆靚個底再開 Quad，四行清咗 373 個遠遠拋離 pinglamb 嘅 293 個<span class="badge" data-claim="R008"></span>，連 all-clear 都出多啲（12 vs 7）<span class="badge" data-claim="R012"></span>。手指底子好乾淨：finesse 失誤率明顯低過 pinglamb<span class="badge" data-claim="R015"></span>，perfect finesse 比率仲要高過對手<span class="badge" data-claim="R016"></span>，hold 又用得勤<span class="badge" data-claim="R017"></span>。節奏亦都最穩，PPS 波動係兩個之中最細<span class="badge" data-claim="R026"></span>。防守面清垃圾清得多啲（1368 vs 1324 行）<span class="badge" data-claim="R018"></span>，加埋 cancel 咗成一成半射埋嚟嘅攻擊<span class="badge" data-claim="R019"></span>。</p>
+
+        <ol class="rec-list">
+          <li><span class="rec-num">1</span><strong>練 T-spin，唔好淨係堆 Quad。</strong> yachi Quad 打得勁<span class="badge" data-claim="R008"></span>，但係 T-spin double/triple 全面輸俾 pinglamb<span class="badge" data-claim="R009"></span><span class="badge" data-claim="R010"></span><span class="badge" data-claim="R011"></span>，整體 T-spin 少成 76 個<span class="badge" data-claim="R011"></span>。Quad 要成四行位先開到，慢又易俾人 spike 斷；T-spin 用位少、傷害高、開 B2B 快。建議練 DT cannon 同 STSD 呢類 T-spin 開局，將「快」嘅優勢轉化成「又快又准」。</li>
+          <li><span class="rec-num">2</span><strong>搏返 B2B 鏈同 spike 上限。</strong> yachi 單局最高 B2B 得 8、combo 得 6，兩樣都低過 pinglamb 嘅 10 同 7<span class="badge" data-claim="R013"></span><span class="badge" data-claim="R014"></span>，大 spike 出得疏過對手（得 16 局劈到 12+，pinglamb 有 22 局）<span class="badge" data-claim="R025"></span>。其實佢單發 spike 嘅天花板同 pinglamb 一樣高，兩邊都試過劈出 16<span class="badge" data-claim="R024"></span>，即係唔係爆唔到，而係爆得唔夠密。既然手速有優勢，應該試下連續 B2B 儲彈再一次過放大 spike，而唔係逐 Quad 咁散射，咁先食到 pinglamb 攻擊輸出穩定但缺乏爆發嘅弱點<span class="badge" data-claim="R027"></span>。</li>
+          <li><span class="rec-num">3</span><strong>守住輸波之後嘅心態，把握決勝局。</strong> yachi 反彈率已經高過 pinglamb（18/32 vs 19/37）<span class="badge" data-claim="R023"></span>，而 m10 決勝局佢就係全程壓住 PPS 同 APM 撑到最後贏<span class="badge" data-claim="R021"></span>。但係 m2、m3 兩場 5-4 都俾 pinglamb 反殺<span class="badge" data-claim="R020"></span><span class="badge" data-claim="R022"></span>，輸喺對面嘅大 spike。決勝局應該打保守啲、清垃圾優先（佢本身清 garbage 清得好<span class="badge" data-claim="R018"></span>），唔好貪快食 spike。</li>
+        </ol>
+      </div>
+
+      <div class="rec-col for-pinglamb">
+        <h3>pinglamb ——「慢工實淨型」</h3>
+        <p class="profile">慢啲（PPS ~1.34）<span class="badge" data-claim="R005"></span>，但係用少啲方塊榨到多啲傷害——每粒方塊嘅攻擊高過 yachi<span class="badge" data-claim="R007"></span>。係 T-spin 專家：T-spin double 339 個<span class="badge" data-claim="R009"></span>、triple 82 個<span class="badge" data-claim="R010"></span>、整體 T-spin 482 個<span class="badge" data-claim="R011"></span>，三樣都壓過 yachi。上限位亦都高：單局最高 B2B 去到 10<span class="badge" data-claim="R013"></span>、combo 去到 7<span class="badge" data-claim="R014"></span>，大 spike 出得密——22 局劈到 12 或以上，yachi 得 16 局<span class="badge" data-claim="R025"></span>。雖然兩個 APM 打成平手<span class="badge" data-claim="R006"></span>，但係 pinglamb 嘅攻擊輸出反而更穩定<span class="badge" data-claim="R027"></span>。</p>
+
+        <ol class="rec-list">
+          <li><span class="rec-num">1</span><strong>練 finesse drill，手指效率係最大漏洞。</strong> pinglamb 嘅 finesse 失誤率高過 yachi 接近五成<span class="badge" data-claim="R015"></span>，perfect 比率又輸<span class="badge" data-claim="R016"></span>。呢個直接拖慢佢個 PPS（~1.34 vs 1.43）<span class="badge" data-claim="R005"></span>。建議日日做 finesse drill（例如 finesse trainer、四大 SRS 擺位），將多餘 input 減走——同樣嘅攻擊力，手法乾淨咗 PPS 自然追返上，唔使再靠慢工。</li>
+          <li><span class="rec-num">2</span><strong>提速，收窄 PPS 差距。</strong> pinglamb 每粒方塊嘅傷害其實高過 yachi<span class="badge" data-claim="R007"></span>，即係話佢個「準」已經夠，而家爭嘅係「快」——落少咗 575 粒方塊<span class="badge" data-claim="R004"></span>、PPS 慢近 0.1<span class="badge" data-claim="R005"></span>。配合上面嘅 finesse 練習，主力提升下 stacking speed 同 hold 運用，將 damage-per-piece 嘅優勢乘埋速度，先食到 yachi tempo 嗰忽。</li>
+          <li><span class="rec-num">3</span><strong>穩定 spike 輸出，唔好淨靠一兩局爆種。</strong> pinglamb 大 spike 出得密<span class="badge" data-claim="R025"></span>、B2B combo 上限高<span class="badge" data-claim="R013"></span><span class="badge" data-claim="R014"></span>，但係丟咗 m10 決勝局係俾 yachi 全程壓住冇得反擊<span class="badge" data-claim="R021"></span>。建議練「持續施壓」而唔係「等大 spike」：既然 T-spin 底子好<span class="badge" data-claim="R011"></span>，應該打連環 T-spin 保持攻擊，唔好為儲一個大 spike 而俾 yachi 用速度斷你節奏。守面同樣要加強——清垃圾清得少過 yachi<span class="badge" data-claim="R018"></span>，容易喺 tempo 對拼度先崩。</li>
+        </ol>
+      </div>
+
+      <div class="versus-note">
+        呢個係典型嘅「快 vs 準」對局：yachi 用 tempo 同乾淨度壓場，pinglamb 用 T-spin 同大 spike 反殺——m3 決勝局就係最好例子，pinglamb 用少過 yachi 嘅方塊（40 vs 53）但劈出更大 spike（13 vs 5）反殺<span class="badge" data-claim="R022"></span>。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= 證明附錄 ============================= -->
+<section id="appendix">
+  <div class="wrap-wide">
+    <div class="eyebrow">證明附錄 · 信任鏈</div>
+    <h2 class="section-title">證明附錄</h2>
+
+    <div class="method-note">
+      <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
+      <div class="chain">
+        <div class="chain-step"><div class="n">1</div><div>數據由兩個獨立嘅 parser（extract.py 同 extract2.ts）各自由 10 個 replay 檔案（.ttrm）入面抽 facts，兩份輸出逐個欄位比對完全一致先算過關。</div></div>
+        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 54 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
+        <div class="chain-step"><div class="n">3</div><div>仲會做 mutation test：刻意將條引理嘅 guard/前提拆走，睇下會唔會有 test 應聲斷——如果冧唔到，即係話條 guard 得個樣冇實際用，要補返。</div></div>
+      </div>
+      <p id="method-status-text">載入緊…</p>
+      <div id="status-line" class="mono">載入緊…</div>
+    </div>
+
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr>
+            <th>編號</th>
+            <th>廣東話講法</th>
+            <th>English gloss</th>
+            <th>Dafny 引理</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody id="appendix-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="report-footer">
+  yachi vs pinglamb · 2026-07-22 · report.html generated from facts.json + claims ledgers · build_appendix.py keeps this in sync
+</footer>
+
+<!-- ============================= DATA ISLANDS ============================= -->
+<script type="application/json" id="chart-data">
+{"per_match":[{"index":1,"score":{"yachi":5,"pinglamb":2},"winner":"yachi","yachi":{"apm":52.878,"pps":1.423,"vs":118.519},"pinglamb":{"apm":55.04,"pps":1.364,"vs":108.085}},{"index":2,"score":{"yachi":4,"pinglamb":5},"winner":"pinglamb","yachi":{"apm":48.716,"pps":1.406,"vs":109.21},"pinglamb":{"apm":48.554,"pps":1.328,"vs":110.1}},{"index":3,"score":{"yachi":4,"pinglamb":5},"winner":"pinglamb","yachi":{"apm":53.592,"pps":1.495,"vs":111.546},"pinglamb":{"apm":52.921,"pps":1.351,"vs":112.62}},{"index":4,"score":{"yachi":5,"pinglamb":3},"winner":"yachi","yachi":{"apm":51.387,"pps":1.475,"vs":111.894},"pinglamb":{"apm":50.47,"pps":1.308,"vs":107.768}},{"index":5,"score":{"yachi":5,"pinglamb":3},"winner":"yachi","yachi":{"apm":52.359,"pps":1.44,"vs":115.322},"pinglamb":{"apm":53.994,"pps":1.341,"vs":116.678}},{"index":6,"score":{"yachi":5,"pinglamb":1},"winner":"yachi","yachi":{"apm":56.139,"pps":1.455,"vs":120.802},"pinglamb":{"apm":49.867,"pps":1.306,"vs":107.364}},{"index":7,"score":{"yachi":3,"pinglamb":5},"winner":"pinglamb","yachi":{"apm":52.926,"pps":1.432,"vs":113.863},"pinglamb":{"apm":58.574,"pps":1.421,"vs":122.358}},{"index":8,"score":{"yachi":5,"pinglamb":3},"winner":"yachi","yachi":{"apm":49.073,"pps":1.429,"vs":101.229},"pinglamb":{"apm":44.418,"pps":1.314,"vs":93.503}},{"index":9,"score":{"yachi":2,"pinglamb":5},"winner":"pinglamb","yachi":{"apm":47.871,"pps":1.424,"vs":106.315},"pinglamb":{"apm":53.884,"pps":1.297,"vs":117.59}},{"index":10,"score":{"yachi":5,"pinglamb":4},"winner":"yachi","yachi":{"apm":53.541,"pps":1.436,"vs":116.28},"pinglamb":{"apm":51.742,"pps":1.345,"vs":116.093}}],"grouped_clears":{"yachi":{"singles":729,"doubles":359,"triples":105,"quads":373,"tspin_singles":53,"tspin_doubles":292,"tspin_triples":53,"tspin_total":398,"mini_tspin_total":5,"allclear":12},"pinglamb":{"singles":755,"doubles":302,"triples":93,"quads":293,"tspin_singles":40,"tspin_doubles":339,"tspin_triples":82,"tspin_total":461,"mini_tspin_total":15,"allclear":7}},"totals":{"yachi":{"pieces":7546,"garbage_attack":4501,"garbage_cleared":1368,"garbagereceived":3127,"finesse_faults":1103,"finesse_perfect":6815,"holds":2888,"topbtb_max":8,"topcombo_max":6,"queued_garbage":3667,"tspins_raw_total":406,"finesse_fault_rate":0.146170156374238,"finesse_perfect_rate":0.9031274847601378,"attack_per_piece":0.5964749536178108,"hold_rate":0.3827193214948317,"cancel_rate":0.14725934005999455},"pinglamb":{"pieces":6971,"garbage_attack":4473,"garbage_cleared":1324,"garbagereceived":3047,"finesse_faults":1496,"finesse_perfect":6059,"holds":2561,"topbtb_max":10,"topcombo_max":7,"queued_garbage":3538,"tspins_raw_total":482,"finesse_fault_rate":0.2146033567637355,"finesse_perfect_rate":0.869172285181466,"attack_per_piece":0.6416582986659016,"hold_rate":0.3673791421603787,"cancel_rate":0.13877897117015262}},"round_series":[{"g":0,"match":1,"round_in_match":0,"winner":"pinglamb","yachi":{"vs":48.934,"apm":24.843,"pps":1.242,"lifetime_s":26.665},"pinglamb":{"vs":114.358,"apm":68.615,"pps":1.334,"lifetime_s":26.666}},{"g":1,"match":1,"round_in_match":1,"winner":"yachi","yachi":{"vs":90.371,"apm":40.819,"pps":1.371,"lifetime_s":98.669},"pinglamb":{"vs":75.216,"apm":36.592,"pps":1.342,"lifetime_s":98.666}},{"g":2,"match":1,"round_in_match":2,"winner":"pinglamb","yachi":{"vs":8.996,"apm":5.397,"pps":1.214,"lifetime_s":22.319},"pinglamb":{"vs":95.527,"apm":54.587,"pps":1.41,"lifetime_s":22.322}},{"g":3,"match":1,"round_in_match":3,"winner":"yachi","yachi":{"vs":156.827,"apm":73.006,"pps":1.514,"lifetime_s":37.187},"pinglamb":{"vs":124.605,"apm":63.386,"pps":1.381,"lifetime_s":37.186}},{"g":4,"match":1,"round_in_match":4,"winner":"yachi","yachi":{"vs":180.38,"apm":75.678,"pps":1.465,"lifetime_s":73.987},"pinglamb":{"vs":156.003,"apm":77.323,"pps":1.465,"lifetime_s":73.985}},{"g":5,"match":1,"round_in_match":5,"winner":"yachi","yachi":{"vs":109.911,"apm":47.346,"pps":1.381,"lifetime_s":35.609},"pinglamb":{"vs":70.755,"apm":35.66,"pps":1.132,"lifetime_s":35.606}},{"g":6,"match":1,"round_in_match":6,"winner":"yachi","yachi":{"vs":138.72,"apm":63.957,"pps":1.562,"lifetime_s":68.578},"pinglamb":{"vs":115.723,"apm":58.008,"pps":1.392,"lifetime_s":68.576}},{"g":7,"match":2,"round_in_match":0,"winner":"yachi","yachi":{"vs":28.907,"apm":16.651,"pps":0.752,"lifetime_s":86.584},"pinglamb":{"vs":6.952,"apm":2.781,"pps":0.417,"lifetime_s":86.582}},{"g":8,"match":2,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":116.675,"apm":58.629,"pps":1.502,"lifetime_s":68.656},"pinglamb":{"vs":134.831,"apm":53.639,"pps":1.348,"lifetime_s":68.659}},{"g":9,"match":2,"round_in_match":2,"winner":"yachi","yachi":{"vs":118.43,"apm":48.688,"pps":1.421,"lifetime_s":228.31},"pinglamb":{"vs":110.518,"apm":47.628,"pps":1.417,"lifetime_s":228.305}},{"g":10,"match":2,"round_in_match":3,"winner":"yachi","yachi":{"vs":73.917,"apm":42.821,"pps":1.529,"lifetime_s":39.349},"pinglamb":{"vs":23.038,"apm":13.823,"pps":1.229,"lifetime_s":39.347}},{"g":11,"match":2,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":88.868,"apm":43.0,"pps":1.405,"lifetime_s":34.969},"pinglamb":{"vs":121.798,"apm":55.679,"pps":1.276,"lifetime_s":34.971}},{"g":12,"match":2,"round_in_match":5,"winner":"pinglamb","yachi":{"vs":85.791,"apm":36.997,"pps":1.434,"lifetime_s":74.687},"pinglamb":{"vs":109.115,"apm":58.195,"pps":1.468,"lifetime_s":74.69}},{"g":13,"match":2,"round_in_match":6,"winner":"yachi","yachi":{"vs":133.378,"apm":73.964,"pps":1.536,"lifetime_s":49.735},"pinglamb":{"vs":103.1,"apm":47.305,"pps":1.314,"lifetime_s":49.734}},{"g":14,"match":2,"round_in_match":7,"winner":"pinglamb","yachi":{"vs":132.225,"apm":55.684,"pps":1.502,"lifetime_s":200.518},"pinglamb":{"vs":144.332,"apm":62.327,"pps":1.468,"lifetime_s":200.524}},{"g":15,"match":2,"round_in_match":8,"winner":"pinglamb","yachi":{"vs":127.61,"apm":54.623,"pps":1.517,"lifetime_s":128.592},"pinglamb":{"vs":138.809,"apm":60.359,"pps":1.521,"lifetime_s":128.596}},{"g":16,"match":3,"round_in_match":0,"winner":"yachi","yachi":{"vs":120.705,"apm":57.776,"pps":1.56,"lifetime_s":74.002},"pinglamb":{"vs":97.671,"apm":39.882,"pps":1.343,"lifetime_s":74.0}},{"g":17,"match":3,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":87.252,"apm":50.606,"pps":1.483,"lifetime_s":34.473},"pinglamb":{"vs":138.303,"apm":61.795,"pps":1.383,"lifetime_s":34.475}},{"g":18,"match":3,"round_in_match":2,"winner":"yachi","yachi":{"vs":108.329,"apm":53.731,"pps":1.488,"lifetime_s":69.342},"pinglamb":{"vs":83.997,"apm":43.447,"pps":1.361,"lifetime_s":69.34}},{"g":19,"match":3,"round_in_match":3,"winner":"pinglamb","yachi":{"vs":91.561,"apm":41.618,"pps":1.498,"lifetime_s":72.242},"pinglamb":{"vs":112.918,"apm":46.004,"pps":1.352,"lifetime_s":72.246}},{"g":20,"match":3,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":82.813,"apm":33.125,"pps":1.341,"lifetime_s":50.804},"pinglamb":{"vs":120.832,"apm":62.991,"pps":1.347,"lifetime_s":50.806}},{"g":21,"match":3,"round_in_match":5,"winner":"yachi","yachi":{"vs":203.902,"apm":90.623,"pps":1.699,"lifetime_s":26.747},"pinglamb":{"vs":120.907,"apm":72.544,"pps":1.474,"lifetime_s":26.746}},{"g":22,"match":3,"round_in_match":6,"winner":"yachi","yachi":{"vs":126.711,"apm":60.54,"pps":1.408,"lifetime_s":85.44},"pinglamb":{"vs":110.393,"apm":50.734,"pps":1.292,"lifetime_s":85.437}},{"g":23,"match":3,"round_in_match":7,"winner":"pinglamb","yachi":{"vs":95.01,"apm":53.551,"pps":1.44,"lifetime_s":34.825},"pinglamb":{"vs":130.498,"apm":62.639,"pps":1.392,"lifetime_s":34.827}},{"g":24,"match":3,"round_in_match":8,"winner":"pinglamb","yachi":{"vs":115.385,"apm":57.363,"pps":1.747,"lifetime_s":30.419},"pinglamb":{"vs":150.083,"apm":74.041,"pps":1.334,"lifetime_s":30.421}},{"g":25,"match":4,"round_in_match":0,"winner":"yachi","yachi":{"vs":136.454,"apm":65.975,"pps":1.59,"lifetime_s":75.615},"pinglamb":{"vs":108.874,"apm":46.205,"pps":1.142,"lifetime_s":75.612}},{"g":26,"match":4,"round_in_match":1,"winner":"yachi","yachi":{"vs":125.227,"apm":65.336,"pps":1.416,"lifetime_s":36.891},"pinglamb":{"vs":76.503,"apm":32.787,"pps":1.366,"lifetime_s":36.889}},{"g":27,"match":4,"round_in_match":2,"winner":"yachi","yachi":{"vs":125.84,"apm":55.176,"pps":1.468,"lifetime_s":62.218},"pinglamb":{"vs":101.722,"apm":43.595,"pps":1.195,"lifetime_s":62.216}},{"g":28,"match":4,"round_in_match":3,"winner":"pinglamb","yachi":{"vs":107.961,"apm":43.999,"pps":1.456,"lifetime_s":98.276},"pinglamb":{"vs":121.449,"apm":53.274,"pps":1.286,"lifetime_s":98.279}},{"g":29,"match":4,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":19.262,"apm":11.557,"pps":1.3,"lifetime_s":20.851},"pinglamb":{"vs":122.05,"apm":67.372,"pps":1.611,"lifetime_s":20.852}},{"g":30,"match":4,"round_in_match":5,"winner":"pinglamb","yachi":{"vs":39.344,"apm":17.705,"pps":1.451,"lifetime_s":40.755},"pinglamb":{"vs":109.362,"apm":64.126,"pps":1.392,"lifetime_s":40.757}},{"g":31,"match":4,"round_in_match":6,"winner":"yachi","yachi":{"vs":136.729,"apm":67.56,"pps":1.408,"lifetime_s":50.055},"pinglamb":{"vs":100.435,"apm":51.825,"pps":1.346,"lifetime_s":50.053}},{"g":32,"match":4,"round_in_match":7,"winner":"yachi","yachi":{"vs":124.274,"apm":55.469,"pps":1.531,"lifetime_s":66.138},"pinglamb":{"vs":109.339,"apm":52.847,"pps":1.427,"lifetime_s":66.136}},{"g":33,"match":5,"round_in_match":0,"winner":"yachi","yachi":{"vs":89.955,"apm":40.48,"pps":0.855,"lifetime_s":22.356},"pinglamb":{"vs":72.508,"apm":43.505,"pps":1.36,"lifetime_s":22.355}},{"g":34,"match":5,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":97.542,"apm":52.102,"pps":1.427,"lifetime_s":84.161},"pinglamb":{"vs":114.65,"apm":52.309,"pps":1.158,"lifetime_s":84.164}},{"g":35,"match":5,"round_in_match":2,"winner":"pinglamb","yachi":{"vs":100.913,"apm":40.654,"pps":1.47,"lifetime_s":69.461},"pinglamb":{"vs":134.815,"apm":56.535,"pps":1.305,"lifetime_s":69.463}},{"g":36,"match":5,"round_in_match":3,"winner":"yachi","yachi":{"vs":137.689,"apm":64.147,"pps":1.587,"lifetime_s":61.977},"pinglamb":{"vs":116.694,"apm":54.457,"pps":1.41,"lifetime_s":61.975}},{"g":37,"match":5,"round_in_match":4,"winner":"yachi","yachi":{"vs":134.328,"apm":70.522,"pps":1.371,"lifetime_s":36.013},"pinglamb":{"vs":92.351,"apm":43.657,"pps":1.315,"lifetime_s":36.01}},{"g":38,"match":5,"round_in_match":5,"winner":"pinglamb","yachi":{"vs":104.26,"apm":42.073,"pps":1.485,"lifetime_s":108.457},"pinglamb":{"vs":122.241,"apm":55.564,"pps":1.426,"lifetime_s":108.461}},{"g":39,"match":5,"round_in_match":6,"winner":"yachi","yachi":{"vs":137.829,"apm":64.024,"pps":1.512,"lifetime_s":45.295},"pinglamb":{"vs":115.513,"apm":57.312,"pps":1.311,"lifetime_s":45.293}},{"g":40,"match":5,"round_in_match":7,"winner":"yachi","yachi":{"vs":135.661,"apm":57.699,"pps":1.391,"lifetime_s":58.456},"pinglamb":{"vs":120.344,"apm":57.765,"pps":1.444,"lifetime_s":58.454}},{"g":41,"match":6,"round_in_match":0,"winner":"yachi","yachi":{"vs":132.609,"apm":60.007,"pps":1.504,"lifetime_s":135.091},"pinglamb":{"vs":120.92,"apm":55.638,"pps":1.269,"lifetime_s":135.088}},{"g":42,"match":6,"round_in_match":1,"winner":"yachi","yachi":{"vs":156.109,"apm":93.665,"pps":1.561,"lifetime_s":15.054},"pinglamb":{"vs":40.632,"apm":24.379,"pps":1.354,"lifetime_s":15.052}},{"g":43,"match":6,"round_in_match":2,"winner":"yachi","yachi":{"vs":126.133,"apm":60.022,"pps":1.392,"lifetime_s":46.19},"pinglamb":{"vs":93.716,"apm":47.076,"pps":1.308,"lifetime_s":46.186}},{"g":44,"match":6,"round_in_match":3,"winner":"pinglamb","yachi":{"vs":88.477,"apm":37.037,"pps":1.193,"lifetime_s":48.691},"pinglamb":{"vs":134.762,"apm":65.93,"pps":1.306,"lifetime_s":48.692}},{"g":45,"match":6,"round_in_match":4,"winner":"yachi","yachi":{"vs":125.09,"apm":54.349,"pps":1.477,"lifetime_s":92.975},"pinglamb":{"vs":111.131,"apm":48.552,"pps":1.413,"lifetime_s":92.972}},{"g":46,"match":6,"round_in_match":5,"winner":"yachi","yachi":{"vs":100.869,"apm":53.46,"pps":1.547,"lifetime_s":59.761},"pinglamb":{"vs":75.651,"apm":34.295,"pps":1.21,"lifetime_s":59.76}},{"g":47,"match":7,"round_in_match":0,"winner":"pinglamb","yachi":{"vs":57.325,"apm":32.484,"pps":1.21,"lifetime_s":31.472},"pinglamb":{"vs":90.371,"apm":46.477,"pps":1.194,"lifetime_s":31.474}},{"g":48,"match":7,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":89.552,"apm":49.893,"pps":1.407,"lifetime_s":15.725},"pinglamb":{"vs":262.582,"apm":114.223,"pps":1.838,"lifetime_s":15.73}},{"g":49,"match":7,"round_in_match":2,"winner":"yachi","yachi":{"vs":200.152,"apm":106.444,"pps":1.547,"lifetime_s":22.243},"pinglamb":{"vs":122.914,"apm":65.554,"pps":1.684,"lifetime_s":22.242}},{"g":50,"match":7,"round_in_match":3,"winner":"pinglamb","yachi":{"vs":115.856,"apm":56.146,"pps":1.359,"lifetime_s":44.959},"pinglamb":{"vs":141.626,"apm":63.395,"pps":1.416,"lifetime_s":44.961}},{"g":51,"match":7,"round_in_match":4,"winner":"yachi","yachi":{"vs":159.504,"apm":71.777,"pps":1.529,"lifetime_s":75.376},"pinglamb":{"vs":139.814,"apm":63.116,"pps":1.491,"lifetime_s":75.373}},{"g":52,"match":7,"round_in_match":5,"winner":"yachi","yachi":{"vs":101.766,"apm":45.167,"pps":1.478,"lifetime_s":72.069},"pinglamb":{"vs":86.351,"apm":42.618,"pps":1.337,"lifetime_s":72.067}},{"g":53,"match":7,"round_in_match":6,"winner":"pinglamb","yachi":{"vs":83.045,"apm":40.484,"pps":1.479,"lifetime_s":38.604},"pinglamb":{"vs":107.236,"apm":58.065,"pps":1.334,"lifetime_s":38.605}},{"g":54,"match":7,"round_in_match":7,"winner":"pinglamb","yachi":{"vs":99.214,"apm":40.653,"pps":1.379,"lifetime_s":82.743},"pinglamb":{"vs":120.389,"apm":58.37,"pps":1.411,"lifetime_s":82.749}},{"g":55,"match":8,"round_in_match":0,"winner":"pinglamb","yachi":{"vs":81.525,"apm":40.154,"pps":1.375,"lifetime_s":82.28},"pinglamb":{"vs":98.801,"apm":45.375,"pps":1.366,"lifetime_s":82.284}},{"g":56,"match":8,"round_in_match":1,"winner":"yachi","yachi":{"vs":97.626,"apm":46.092,"pps":1.52,"lifetime_s":62.653},"pinglamb":{"vs":76.964,"apm":32.71,"pps":1.203,"lifetime_s":62.651}},{"g":57,"match":8,"round_in_match":2,"winner":"pinglamb","yachi":{"vs":75.815,"apm":35.439,"pps":1.305,"lifetime_s":113.527},"pinglamb":{"vs":86.547,"apm":40.801,"pps":1.254,"lifetime_s":113.529}},{"g":58,"match":8,"round_in_match":3,"winner":"yachi","yachi":{"vs":155.312,"apm":68.586,"pps":1.59,"lifetime_s":80.791},"pinglamb":{"vs":132.919,"apm":58.882,"pps":1.429,"lifetime_s":80.788}},{"g":59,"match":8,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":61.399,"apm":34.792,"pps":1.273,"lifetime_s":88.04},"pinglamb":{"vs":80.927,"apm":43.085,"pps":1.368,"lifetime_s":88.043}},{"g":60,"match":8,"round_in_match":5,"winner":"yachi","yachi":{"vs":149.786,"apm":77.033,"pps":1.755,"lifetime_s":47.026},"pinglamb":{"vs":106.952,"apm":57.754,"pps":1.39,"lifetime_s":47.024}},{"g":61,"match":8,"round_in_match":6,"winner":"yachi","yachi":{"vs":117.246,"apm":59.181,"pps":1.396,"lifetime_s":53.825},"pinglamb":{"vs":85.928,"apm":40.349,"pps":1.27,"lifetime_s":53.823}},{"g":62,"match":8,"round_in_match":7,"winner":"yachi","yachi":{"vs":118.227,"apm":55.93,"pps":1.432,"lifetime_s":44.21},"pinglamb":{"vs":72.838,"apm":35.508,"pps":1.184,"lifetime_s":44.209}},{"g":63,"match":9,"round_in_match":0,"winner":"yachi","yachi":{"vs":113.084,"apm":49.583,"pps":1.24,"lifetime_s":46.239},"pinglamb":{"vs":63.112,"apm":37.867,"pps":1.306,"lifetime_s":46.237}},{"g":64,"match":9,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":84.128,"apm":38.362,"pps":1.481,"lifetime_s":59.507},"pinglamb":{"vs":116.488,"apm":59.764,"pps":1.418,"lifetime_s":59.509}},{"g":65,"match":9,"round_in_match":2,"winner":"pinglamb","yachi":{"vs":112.735,"apm":53.236,"pps":1.524,"lifetime_s":95.895},"pinglamb":{"vs":130.913,"apm":56.554,"pps":1.278,"lifetime_s":95.9}},{"g":66,"match":9,"round_in_match":3,"winner":"yachi","yachi":{"vs":83.269,"apm":40.247,"pps":1.48,"lifetime_s":43.508},"pinglamb":{"vs":57.826,"apm":29.144,"pps":1.133,"lifetime_s":43.506}},{"g":67,"match":9,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":122.823,"apm":50.486,"pps":1.473,"lifetime_s":147.463},"pinglamb":{"vs":133.348,"apm":56.741,"pps":1.259,"lifetime_s":147.468}},{"g":68,"match":9,"round_in_match":5,"winner":"pinglamb","yachi":{"vs":80.586,"apm":39.56,"pps":1.154,"lifetime_s":54.689},"pinglamb":{"vs":121.696,"apm":66.38,"pps":1.235,"lifetime_s":54.691}},{"g":69,"match":9,"round_in_match":6,"winner":"pinglamb","yachi":{"vs":111.754,"apm":53.461,"pps":1.435,"lifetime_s":66.306},"pinglamb":{"vs":137.914,"apm":55.469,"pps":1.455,"lifetime_s":66.308}},{"g":70,"match":10,"round_in_match":0,"winner":"yachi","yachi":{"vs":87.705,"apm":42.531,"pps":1.43,"lifetime_s":83.396},"pinglamb":{"vs":72.202,"apm":36.101,"pps":1.239,"lifetime_s":83.392}},{"g":71,"match":10,"round_in_match":1,"winner":"pinglamb","yachi":{"vs":102.863,"apm":44.833,"pps":1.32,"lifetime_s":103.144},"pinglamb":{"vs":127.515,"apm":52.563,"pps":1.411,"lifetime_s":103.148}},{"g":72,"match":10,"round_in_match":2,"winner":"yachi","yachi":{"vs":130.927,"apm":60.614,"pps":1.544,"lifetime_s":124.05},"pinglamb":{"vs":114.732,"apm":44.6,"pps":1.252,"lifetime_s":124.046}},{"g":73,"match":10,"round_in_match":3,"winner":"pinglamb","yachi":{"vs":117.331,"apm":63.497,"pps":1.541,"lifetime_s":43.558},"pinglamb":{"vs":152.66,"apm":77.718,"pps":1.457,"lifetime_s":43.559}},{"g":74,"match":10,"round_in_match":4,"winner":"pinglamb","yachi":{"vs":118.345,"apm":47.568,"pps":1.39,"lifetime_s":87.127},"pinglamb":{"vs":131.437,"apm":60.876,"pps":1.372,"lifetime_s":87.129}},{"g":75,"match":10,"round_in_match":5,"winner":"pinglamb","yachi":{"vs":88.124,"apm":43.81,"pps":1.46,"lifetime_s":39.808},"pinglamb":{"vs":144.365,"apm":60.785,"pps":1.57,"lifetime_s":39.809}},{"g":76,"match":10,"round_in_match":6,"winner":"yachi","yachi":{"vs":126.01,"apm":51.285,"pps":1.383,"lifetime_s":113.64},"pinglamb":{"vs":116.453,"apm":53.992,"pps":1.412,"lifetime_s":113.637}},{"g":77,"match":10,"round_in_match":7,"winner":"yachi","yachi":{"vs":132.79,"apm":68.142,"pps":1.363,"lifetime_s":57.424},"pinglamb":{"vs":106.768,"apm":50.408,"pps":1.138,"lifetime_s":57.419}},{"g":78,"match":10,"round_in_match":8,"winner":"yachi","yachi":{"vs":135.858,"apm":74.105,"pps":1.63,"lifetime_s":40.732},"pinglamb":{"vs":93.982,"apm":43.034,"pps":1.385,"lifetime_s":40.731}}],"match_boundaries":[{"index":1,"start_g":0,"n_rounds":7},{"index":2,"start_g":7,"n_rounds":9},{"index":3,"start_g":16,"n_rounds":9},{"index":4,"start_g":25,"n_rounds":8},{"index":5,"start_g":33,"n_rounds":8},{"index":6,"start_g":41,"n_rounds":6},{"index":7,"start_g":47,"n_rounds":8},{"index":8,"start_g":55,"n_rounds":8},{"index":9,"start_g":63,"n_rounds":7},{"index":10,"start_g":70,"n_rounds":9}]}
+</script>
+
+<!-- CLAIMS_DATA_START -->
+<script type="application/json" id="claims-data">
+{
+  "generated_at": "2026-07-22T19:54:46+00:00",
+  "proof_map_available": true,
+  "total_claims": 54,
+  "verified_count": 54,
+  "claims": [
+    {
+      "id": "C001",
+      "source": "narrative",
+      "canto": "yachi 十場打咗六場，pinglamb 執四場",
+      "english_gloss": "yachi won 6 matches, pinglamb won 4 (of 10)",
+      "category": "score",
+      "lemma": "C001_yachi_won_6_matches_pinglamb_won_4_of_10",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C002",
+      "source": "narrative",
+      "canto": "成個 series 打足 79 局，yachi 贏 43 局、pinglamb 贏 36 局，局數其實好貼",
+      "english_gloss": "79 rounds total; yachi won 43 rounds, pinglamb 36",
+      "category": "score",
+      "lemma": "C002_79_rounds_total_yachi_won_43_rounds_pinglamb_36",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C003",
+      "source": "narrative",
+      "canto": "有三場打到 5-4 先分勝負：第2、第3場 pinglamb 執，第10場 yachi 執",
+      "english_gloss": "three matches went to a 5-4 decider: m2 & m3 to pinglamb, m10 to yachi",
+      "category": "clutch",
+      "lemma": "C003_three_matches_went_to_a_5_4_decider_m2_m3_to_pinglamb_m10_to",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C004",
+      "source": "narrative",
+      "canto": "決勝第10場 yachi 一度 2-4 落後、俾人拎住 match point，跟住連贏最後三局翻盤 5-4 封 series",
+      "english_gloss": "in m10 yachi was down 2-4 (facing match point) then won the last 3 rounds to take it 5-4",
+      "category": "comeback",
+      "lemma": "C004_in_m10_yachi_was_down_2_4_facing_match_point_then_won_the_la",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C005",
+      "source": "narrative",
+      "canto": "第10場最尾一局 yachi 打到 vs 約135.9、pinglamb 得約94.0，APM 約74 對約43，一面倒收工",
+      "english_gloss": "m10 final round: yachi vs≈135.9 vs pinglamb≈94.0, apm 74 vs 43",
+      "category": "clutch",
+      "lemma": "C005_m10_final_round_yachi_vs_135_9_vs_pinglamb_94_0_apm_74_vs_43",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C006",
+      "source": "narrative",
+      "canto": "成個 session 最長嗰局係第2場第3局，打足約228秒（三分四十八秒，差唔多四分鐘），最後 yachi 生還",
+      "english_gloss": "longest round of the session is m2r2 (~228s, ~3.8min), won by yachi",
+      "category": "duration",
+      "lemma": "C006_longest_round_of_the_session_is_m2r2_228s_3_8min_won_by_yach",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C007",
+      "source": "narrative",
+      "canto": "呢局係場落樓大戰：yachi 一路食多過對手嘅垃圾（真係食咗127行、pinglamb 得109行）都照贏，仲清咗204行",
+      "english_gloss": "in that marathon yachi won despite receiving more real garbage (127) than pinglamb (109), and cleared 204 lines",
+      "category": "comeback",
+      "lemma": "C007_in_that_marathon_yachi_won_despite_receiving_more_real_garba",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C008",
+      "source": "narrative",
+      "canto": "最快嗰局係第6場第2局，約15秒就收咗工，yachi APM 爆到約93.7、pinglamb 得約24.4",
+      "english_gloss": "shortest round is m6r1 (~15s); yachi apm≈93.7 vs pinglamb≈24.4",
+      "category": "duration",
+      "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_4",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C009",
+      "source": "narrative",
+      "canto": "全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.84、vs 約262.6，約16秒閃電殺",
+      "english_gloss": "highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.84, vs≈262.6, a ~16s blitz",
+      "category": "spike",
+      "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_84_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C010",
+      "source": "narrative",
+      "canto": "嗰局 pinglamb 嘅 vs 約262.6，係成個 session 單局最高嘅 vs score",
+      "english_gloss": "pinglamb's vs≈262.6 in m7r1 is the highest single-round vs of the session",
+      "category": "spike",
+      "lemma": "C010_pinglamb_s_vs_262_6_in_m7r1_is_the_highest_single_round_vs_o",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C011",
+      "source": "narrative",
+      "canto": "第2場嘅決勝局 pinglamb 頂住約128.6秒嘅拉鋸，清咗121行、APM 約60.4 執咗場波",
+      "english_gloss": "m2 decider: pinglamb won a ~128.6s round, 121 lines, apm≈60.4",
+      "category": "clutch",
+      "lemma": "C011_m2_decider_pinglamb_won_a_128_6s_round_121_lines_apm_60_4",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C012",
+      "source": "narrative",
+      "canto": "第3場決勝局 pinglamb 用約30.4秒、APM 約74.0、vs 約150.1 快刀斬亂麻",
+      "english_gloss": "m3 decider: pinglamb won in ~30.4s with apm≈74.0, vs≈150.1",
+      "category": "clutch",
+      "lemma": "C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_1",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C013",
+      "source": "narrative",
+      "canto": "全場最大單發 spike 係16，呢個數兩邊都掂過（全場出現咗三次），yachi 喺第4場第3局劈嗰一嘢16仲順手贏埋嗰局",
+      "english_gloss": "biggest single spike of the session is 16 (reached 3 times, by both players); yachi's came in m4r2 and he won that round",
+      "category": "spike",
+      "lemma": "C013_biggest_single_spike_of_the_session_is_16_reached_3_times_by",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C014",
+      "source": "narrative",
+      "canto": "打得最一面倒嗰場係第6場，yachi 5-1 冚咗 pinglamb",
+      "english_gloss": "most one-sided match is m6, yachi 5-1",
+      "category": "score",
+      "lemma": "C014_most_one_sided_match_is_m6_yachi_5_1",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C015",
+      "source": "narrative",
+      "canto": "全場79局，每一局贏嗰個 vs score 都高過輸嗰個——vs 就係命，冇一局例外",
+      "english_gloss": "in all 79 rounds the winner had a higher vs than the loser (0 exceptions)",
+      "category": "style",
+      "lemma": "C015_in_all_79_rounds_the_winner_had_a_higher_vs_than_the_loser_0",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C016",
+      "source": "narrative",
+      "canto": "有8局係贏家真係食多過對手嘅垃圾行都照樣翻盤",
+      "english_gloss": "8 rounds were won by the player who received more real garbage than the loser",
+      "category": "comeback",
+      "lemma": "C016_8_rounds_were_won_by_the_player_who_received_more_real_garba",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C017",
+      "source": "narrative",
+      "canto": "打得最乾淨嗰局係第1場第3局：pinglamb 全局淨係食咗1行垃圾（全場贏家最少），仲把 yachi 嘅 APM 壓到約5.4、vs 約9.0",
+      "english_gloss": "cleanest kill is m1r2: pinglamb conceded only 1 line (session-min for a winner), holding yachi to apm≈5.4, vs≈9.0",
+      "category": "clutch",
+      "lemma": "C017_cleanest_kill_is_m1r2_pinglamb_conceded_only_1_line_session_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C018",
+      "source": "narrative",
+      "canto": "單局最多 T-spin 係第2場第8局 pinglamb 嘅21個，佢就係靠啲 T-spin 攞低咗嗰局約200.5秒嘅馬拉松",
+      "english_gloss": "most tspins in a round is 21 by pinglamb in m2r7, winning a ~200.5s marathon",
+      "category": "style",
+      "lemma": "C018_most_tspins_in_a_round_is_21_by_pinglamb_in_m2r7_winning_a_2",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C019",
+      "source": "narrative",
+      "canto": "最長 back-to-back 鏈係第9場第6局 pinglamb 嘅10連 B2B",
+      "english_gloss": "longest back-to-back streak is 10 by pinglamb in m9r5",
+      "category": "style",
+      "lemma": "C019_longest_back_to_back_streak_is_10_by_pinglamb_in_m9r5",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C020",
+      "source": "narrative",
+      "canto": "成個 series 兩人夾埋出咗19次 Perfect Clear（All Clear）",
+      "english_gloss": "19 all-clears (perfect clears) were made across the whole series",
+      "category": "style",
+      "lemma": "C020_19_all_clears_perfect_clears_were_made_across_the_whole_seri",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C021",
+      "source": "narrative",
+      "canto": "跨場計 yachi 最多可以連贏五局（全場最長，pinglamb 最多得三局），不過單場之內佢最多連贏四局（第1場中段）。兩條五連勝：第5場尾駁第6場頭嗰條五局全部係贏波局；另一條第1場尾駁到第2場頭，但要留意第2場嗰個開局其實係 yachi 之後輸咗場（4-5）嘅頭一局",
+      "english_gloss": "yachi's longest cross-match round-win streak is 5 (session max; pinglamb's is 3); within a single match his max is 4. Of the two 5-streaks, m5r6-m6r2 are all wins in won territory, while m1r3-m2r0 bridges into m2 which yachi lost 4-5",
+      "category": "clutch",
+      "lemma": "C021_yachi_s_longest_cross_match_round_win_streak_is_5_session_ma",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C022",
+      "source": "narrative",
+      "canto": "第1場 yachi 一度 1-2 落後，之後連贏最後四局反超 5-2 收爐",
+      "english_gloss": "in m1 yachi trailed 1-2 then won the last 4 rounds to close 5-2",
+      "category": "comeback",
+      "lemma": "C022_in_m1_yachi_trailed_1_2_then_won_the_last_4_rounds_to_close_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C023",
+      "source": "narrative",
+      "canto": "第2場第3局嗰場落樓大戰，yachi 一局清咗204行，係全場單局最多",
+      "english_gloss": "yachi cleared 204 lines in m2r2, the most lines in any single round of the session",
+      "category": "duration",
+      "lemma": "C023_yachi_cleared_204_lines_in_m2r2_the_most_lines_in_any_single",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C024",
+      "source": "narrative",
+      "canto": "第3場入面 yachi 喺第6局 vs 爆到約203.9，係佢嗰場單局最高嘅 vs",
+      "english_gloss": "in m3, yachi's vs≈203.9 in round 6 (idx5) is the highest single-round vs of that match",
+      "category": "spike",
+      "lemma": "C024_in_m3_yachi_s_vs_203_9_in_round_6_idx5_is_the_highest_single",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C025",
+      "source": "narrative",
+      "canto": "第4場 yachi 先贏頭三局、pinglamb 追返三局打成 3-3，最後 yachi 贏埋尾兩局 5-3 收",
+      "english_gloss": "in m4 yachi won the first 3, pinglamb answered with 3 to tie 3-3, then yachi took the last 2 to close 5-3",
+      "category": "score",
+      "lemma": "C025_in_m4_yachi_won_the_first_3_pinglamb_answered_with_3_to_tie_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C026",
+      "source": "narrative",
+      "canto": "十場嘅最終比數順序係 5-2、4-5、4-5、5-3、5-3、5-1、3-5、5-3、2-5、5-4（yachi 對 pinglamb）",
+      "english_gloss": "the 10 match final scores in order (yachi-pinglamb): 5-2, 4-5, 4-5, 5-3, 5-3, 5-1, 3-5, 5-3, 2-5, 5-4",
+      "category": "score",
+      "lemma": "C026_the_10_match_final_scores_in_order_yachi_pinglamb_5_2_4_5_4_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "C027",
+      "source": "narrative",
+      "canto": "嗰8局翻盤局（贏家食多過對手垃圾都照贏），yachi 佔咗其中6局、pinglamb 佔2局",
+      "english_gloss": "of the 8 comeback rounds (winner received more garbage yet won), yachi took 6 and pinglamb 2",
+      "category": "comeback",
+      "lemma": "C027_of_the_8_comeback_rounds_winner_received_more_garbage_yet_wo",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R001",
+      "source": "coaching",
+      "canto": "yachi 十場入面贏咗六場,pinglamb 贏四場",
+      "english_gloss": "yachi won 6 of 10 matches, pinglamb 4",
+      "category": "score",
+      "lemma": "R001_yachi_won_6_of_10_matches_pinglamb_4",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R002",
+      "source": "coaching",
+      "canto": "分開一局局計,yachi 贏咗 43 局,pinglamb 贏 36 局",
+      "english_gloss": "round wins: yachi 43, pinglamb 36",
+      "category": "score",
+      "lemma": "R002_round_wins_yachi_43_pinglamb_36",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R003",
+      "source": "coaching",
+      "canto": "成個 series 打足 79 局,十場都係先贏五局嗰個贏",
+      "english_gloss": "79 rounds total across 10 matches, every match won by first to 5 round-wins",
+      "category": "duration",
+      "lemma": "R003_79_rounds_total_across_10_matches_every_match_won_by_first_t",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R004",
+      "source": "coaching",
+      "canto": "yachi 手快啲,全 series 落咗 7546 粒,多過 pinglamb 嘅 6971 粒",
+      "english_gloss": "yachi placed more pieces overall (7546 vs 6971)",
+      "category": "pace",
+      "lemma": "R004_yachi_placed_more_pieces_overall_7546_vs_6971",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R005",
+      "source": "coaching",
+      "canto": "yachi 平均 PPS 約 1.43,快過 pinglamb 約 1.34",
+      "english_gloss": "yachi mean PPS ~1.43 > pinglamb ~1.34",
+      "category": "pace",
+      "lemma": "R005_yachi_mean_pps_1_43_pinglamb_1_34",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R006",
+      "source": "coaching",
+      "canto": "逐局 APM 打成平手,pinglamb 每局平均 APM 淨係叻 yachi 少少",
+      "english_gloss": "per-round APM essentially tied, pinglamb marginally higher per-round average",
+      "category": "attack",
+      "lemma": "R006_per_round_apm_essentially_tied_pinglamb_marginally_higher_pe",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R007",
+      "source": "coaching",
+      "canto": "論每粒方塊嘅傷害,pinglamb 高過 yachi,佢慢啲但係打得實淨",
+      "english_gloss": "pinglamb has higher attack-per-piece than yachi (more damage per piece)",
+      "category": "attack",
+      "lemma": "R007_pinglamb_has_higher_attack_per_piece_than_yachi_more_damage_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R008",
+      "source": "coaching",
+      "canto": "yachi 打 Quad(四行)多好多,373 個 vs pinglamb 293 個",
+      "english_gloss": "yachi cleared more quads (373 vs 293)",
+      "category": "style",
+      "lemma": "R008_yachi_cleared_more_quads_373_vs_293",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R009",
+      "source": "coaching",
+      "canto": "pinglamb 玩 T-spin double 玩得勁,339 個 vs yachi 292 個",
+      "english_gloss": "pinglamb hit more T-spin doubles (339 vs 292)",
+      "category": "style",
+      "lemma": "R009_pinglamb_hit_more_t_spin_doubles_339_vs_292",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R010",
+      "source": "coaching",
+      "canto": "連 T-spin triple pinglamb 都多啲,82 個 vs yachi 53 個",
+      "english_gloss": "pinglamb hit more T-spin triples (82 vs 53)",
+      "category": "style",
+      "lemma": "R010_pinglamb_hit_more_t_spin_triples_82_vs_53",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R011",
+      "source": "coaching",
+      "canto": "整體 T-spin 數量 pinglamb 482 個,多過 yachi 406 個",
+      "english_gloss": "pinglamb has more total T-spins (482 vs 406)",
+      "category": "style",
+      "lemma": "R011_pinglamb_has_more_total_t_spins_482_vs_406",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R012",
+      "source": "coaching",
+      "canto": "yachi 出 all-clear(執清)多過 pinglamb,12 次 vs 7 次",
+      "english_gloss": "yachi hit more all-clears (12 vs 7)",
+      "category": "style",
+      "lemma": "R012_yachi_hit_more_all_clears_12_vs_7",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R013",
+      "source": "coaching",
+      "canto": "單局最高 B2B pinglamb 去到 10,yachi 最高得 8",
+      "english_gloss": "pinglamb's best single-round B2B is 10 vs yachi's 8",
+      "category": "style",
+      "lemma": "R013_pinglamb_s_best_single_round_b2b_is_10_vs_yachi_s_8",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R014",
+      "source": "coaching",
+      "canto": "單局最高 combo pinglamb 去到 7,yachi 最高 6",
+      "english_gloss": "pinglamb's best single-round combo is 7 vs yachi's 6",
+      "category": "style",
+      "lemma": "R014_pinglamb_s_best_single_round_combo_is_7_vs_yachi_s_6",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R015",
+      "source": "coaching",
+      "canto": "pinglamb 嘅 finesse 失誤率高過 yachi 接近五成,手指效率係佢嘅弱項",
+      "english_gloss": "pinglamb's finesse-fault rate is ~46-48% higher than yachi's",
+      "category": "finesse",
+      "lemma": "R015_pinglamb_s_finesse_fault_rate_is_46_48_higher_than_yachi_s",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R016",
+      "source": "coaching",
+      "canto": "yachi 每粒方塊嘅 perfect finesse 比率高過 pinglamb,手法乾淨啲",
+      "english_gloss": "yachi has higher perfect-piece-per-piece ratio than pinglamb",
+      "category": "finesse",
+      "lemma": "R016_yachi_has_higher_perfect_piece_per_piece_ratio_than_pinglamb",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R017",
+      "source": "coaching",
+      "canto": "yachi 用 hold 用得多啲,每粒方塊 hold 比率高過 pinglamb",
+      "english_gloss": "yachi holds slightly more per piece than pinglamb",
+      "category": "finesse",
+      "lemma": "R017_yachi_holds_slightly_more_per_piece_than_pinglamb",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R018",
+      "source": "coaching",
+      "canto": "防守方面 yachi 清咗 1368 行垃圾,多過 pinglamb 嘅 1324 行",
+      "english_gloss": "yachi cleared more garbage lines total (1368 vs 1324)",
+      "category": "attack",
+      "lemma": "R018_yachi_cleared_more_garbage_lines_total_1368_vs_1324",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R019",
+      "source": "coaching",
+      "canto": "yachi 俾人射埋嚟嘅攻擊約 3667,但真係食咗嘅垃圾得 3127,即係佢 cancel 咗成一成半",
+      "english_gloss": "yachi's queued incoming attack (~3667) exceeds materialized garbage received (3127), ~15% cancelled",
+      "category": "attack",
+      "lemma": "R019_yachi_s_queued_incoming_attack_3667_exceeds_materialized_gar",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R020",
+      "source": "coaching",
+      "canto": "三場打到 5-4 嘅決勝場入面,pinglamb 攞咗 m2 同 m3,yachi 攞返 m10",
+      "english_gloss": "of the three 5-4 deciders, pinglamb won m2 and m3, yachi won m10",
+      "category": "clutch",
+      "lemma": "R020_of_the_three_5_4_deciders_pinglamb_won_m2_and_m3_yachi_won_m",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R021",
+      "source": "coaching",
+      "canto": "m10 嘅決勝局,yachi 撑到最後 alive,PPS(1630)同 APM(74105)兩樣都爆過 pinglamb",
+      "english_gloss": "in m10's decider yachi survived alive with higher PPS (1630) and APM (74105) than pinglamb",
+      "category": "clutch",
+      "lemma": "R021_in_m10_s_decider_yachi_survived_alive_with_higher_pps_1630_a",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R022",
+      "source": "coaching",
+      "canto": "m3 嘅決勝局,pinglamb 用少過 yachi 嘅方塊(40 vs 53)但係劈出更大 spike(13 vs 5)反殺",
+      "english_gloss": "in m3's decider pinglamb won with fewer pieces (40 vs 53) but a bigger spike (13 vs 5)",
+      "category": "spike",
+      "lemma": "R022_in_m3_s_decider_pinglamb_won_with_fewer_pieces_40_vs_53_but_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R023",
+      "source": "coaching",
+      "canto": "輸咗上一局之後,yachi 反彈贏返嗰局嘅比率高過 pinglamb(18/32 vs 19/37)",
+      "english_gloss": "yachi's bounce-back rate after losing the previous round is higher than pinglamb's (18/32 vs 19/37)",
+      "category": "comeback",
+      "lemma": "R023_yachi_s_bounce_back_rate_after_losing_the_previous_round_is_",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R024",
+      "source": "coaching",
+      "canto": "兩個嘅單 spike 天花板一樣,都試過劈出 16 嘅 spike",
+      "english_gloss": "both players peaked at a single spike of 16",
+      "category": "spike",
+      "lemma": "R024_both_players_peaked_at_a_single_spike_of_16",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R025",
+      "source": "coaching",
+      "canto": "但係大 spike 出得密啲嘅係 pinglamb,有 22 局 spike 到 12 或以上,yachi 得 16 局",
+      "english_gloss": "pinglamb had more rounds with maxspike >= 12 (22 vs 16)",
+      "category": "spike",
+      "lemma": "R025_pinglamb_had_more_rounds_with_maxspike_12_22_vs_16",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R026",
+      "source": "coaching",
+      "canto": "論落 piece 嘅穩定性,yachi 嘅 PPS 波動細過 pinglamb,節奏穩陣啲",
+      "english_gloss": "yachi's per-round PPS is less variable than pinglamb's (steadier pace)",
+      "category": "pace",
+      "lemma": "R026_yachi_s_per_round_pps_is_less_variable_than_pinglamb_s_stead",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "R027",
+      "source": "coaching",
+      "canto": "但係論攻擊輸出嘅穩定性,反而係 pinglamb 嘅 APM 波動細過 yachi",
+      "english_gloss": "pinglamb's per-round APM is less variable than yachi's (steadier attack output)",
+      "category": "attack",
+      "lemma": "R027_pinglamb_s_per_round_apm_is_less_variable_than_yachi_s_stead",
+      "status": "verified",
+      "status_label": "已驗證"
+    }
+  ]
+}
+</script>
+<!-- CLAIMS_DATA_END -->
+
+<!-- Match card copy — keyed by match index, sourced from narrative-beats.md -->
+<script type="application/json" id="match-copy">
+{
+  "1": {
+    "title": "yachi 落後都翻到轉頭",
+    "flag": null,
+    "body": "開波 pinglamb 先拔頭籌，仲喺第3局打咗全場最乾淨嘅一鋪：佢全局淨係食咗1行垃圾（全場所有贏家入面最少），直頭把 yachi 嘅 APM 壓到得約5.4、vs 約9.0，係一面倒嘅屠殺 <b>C017</b>。嗰陣 yachi 一度 1-2 落後。但係 yachi 冇散，反手連贏最後四局反超，5-2 收爐 <b>C022</b>。呢個就係 yachi 全 series 嘅縮影——俾人搏晒都好，佢有本事一口氣扳返轉頭。"
+  },
+  "2": {
+    "title": "馬拉松地獄，pinglamb 頂到最後",
+    "flag": null,
+    "body": "呢場係體力戰。第3局就係成個 session 最長嗰局，兩個人喺格入面耗足約228秒、三分四十八秒差唔多四分鐘 <b>C006</b>。嗰局係場落樓大戰：yachi 一路食多過對手嘅垃圾（真係食咗127行、pinglamb 得109行）都死頂唔冧，仲一局清咗204行——全場單局最多嘅清行數 <b>C007</b><b>C023</b>。yachi 攞低咗呢場消耗戰。但係 pinglamb 冇軟。第8局佢玩 T-spin 玩到出神入化，一局砌咗21個 T-spin，係全場單局最多，靠住呢啲 T-spin 拎低咗嗰局約200.5秒嘅馬拉松 <b>C018</b>。去到決勝局，pinglamb 又頂多一鋪約128.6秒嘅拉鋸，清咗121行、APM 約60.4，硬食咗場波 5-4 <b>C011</b>。呢場係全 series 最攞命嘅耐力對決。"
+  },
+  "3": {
+    "title": "pinglamb 快刀斬亂麻封波",
+    "flag": null,
+    "body": "又係打到 5-4。同第2場相反，pinglamb 呢場靠嘅係快。決勝局佢只用約30.4秒，APM 約74.0、vs 約150.1，一鋪過斬亂麻封咗場 <b>C012</b>。yachi 打得唔差（呢場入面第6局佢 vs 爆到約203.9，係嗰場單局最高 <b>C024</b>），但係關鍵局俾 pinglamb 個節奏帶住走。連輸兩場 5-4，yachi 喺場數上 1-2 落後 <b>C026</b>，俾 pinglamb 帶住走。"
+  },
+  "4": {
+    "title": "yachi 劈出全場最大一嘢 spike",
+    "flag": null,
+    "body": "yachi 喺呢場搵返狀態。第3局佢劈咗全場最大嘅單發 spike——一嘢16；呢個數其實全場出現過三次、兩邊都掂過，不過 yachi 呢一嘢16係贏埋嗰局 <b>C013</b>。有趣嘅係呢場一度打成 3-3（yachi 先贏三局、pinglamb 追返三局），但係 yachi 最後兩局企得穩，5-3 攞返一場 <b>C025</b>。"
+  },
+  "5": {
+    "title": "連勝機器開動",
+    "flag": null,
+    "body": "yachi 呢場尾段開始發力。佢喺呢場尾兩局同下一場駁埋，跨場砌出咗全 series 最長嘅連勝鏈（第5場尾駁到第6場頭連贏五局，五局全部係贏波局；單場之內最多連贏四局）<b>C021</b>。5-3 再入一城 <b>C026</b>，勢頭完全喺 yachi 嗰邊。"
+  },
+  "6": {
+    "title": "一面倒嘅屠殺",
+    "flag": null,
+    "body": "呢場係全 series 打得最一面倒嘅一場，yachi 5-1 冚咗 pinglamb <b>C014</b>。當中第2局係全場最快嘅一鋪——約15秒就收工，yachi APM 爆到約93.7、pinglamb 得約24.4，直頭係秒殺 <b>C008</b>。連住之前跨場嗰條五連勝，yachi 呢個時候氣勢如虹。"
+  },
+  "7": {
+    "title": "pinglamb 打出全場最勁一局",
+    "flag": null,
+    "body": "pinglamb 冇就咁俾人拋離。呢場佢打出咗全 series 火力最爆嘅一局：第2局 pinglamb APM 爆到約114.2、PPS 約1.84、vs 約262.6——vs 係全場單局最高，約16秒閃電殺一鋪過 <b>C009</b><b>C010</b>。呢場 pinglamb 3-5 冇失手 <b>C026</b>，止住咗 yachi 嘅勢。"
+  },
+  "8": {
+    "title": "yachi 再入一城",
+    "flag": null,
+    "body": "yachi 5-3 再拎一場 <b>C026</b>，將 series 場數優勢拉開。"
+  },
+  "9": {
+    "title": "pinglamb 靠 B2B 鏈頂返",
+    "flag": null,
+    "body": "pinglamb 呢場打得好硬淨，5-2 <b>C026</b>。第6局佢串起咗全場最長嘅 back-to-back 鏈——10連 B2B，係成個 series 冇人夾得到嘅數 <b>C019</b>。打到呢度場數上 series 未完，去到最後一場先分勝負。"
+  },
+  "10": {
+    "title": "決勝場，落後 2-4 大翻盤封 series",
+    "flag": "決勝戰 · MATCH POINT SURVIVED",
+    "body": "呢場就係全 series 最爆嘅高潮。yachi 一度 2-4 落後，pinglamb 拎住 match point——差一局就攞埋成個 series。但係 yachi 喺懸崖邊連贏最後三局，硬生生翻盤 5-4 封波 <b>C004</b>。最尾一局 yachi vs 打到約135.9、pinglamb 得約94.0，APM 約74 對約43，一面倒收咗尾 <b>C005</b>。落後住、俾人拎住 match point 都照樣連下三城——呢個就係 yachi 成個 series 嘅精神。"
+  }
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var CD = JSON.parse(document.getElementById("chart-data").textContent);
+  var MATCH_COPY = JSON.parse(document.getElementById("match-copy").textContent);
+  var CLAIMS = null; // populated after claims-data parse below
+  var CLAIM_MAP = {};
+
+  function parseClaimsData() {
+    var raw = JSON.parse(document.getElementById("claims-data").textContent);
+    CLAIMS = raw;
+    CLAIM_MAP = {};
+    (raw.claims || []).forEach(function (c) { CLAIM_MAP[c.id] = c; });
+  }
+
+  var YACHI = "#0e8f9e-token"; // resolved via CSS var at paint time, kept here only as key name
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // ---------- badge rendering ----------
+  function statusIcon(status) { return status === "verified" ? "✓" : "⏳"; }
+
+  function renderInlineBadge(el) {
+    var id = el.getAttribute("data-claim");
+    var c = CLAIM_MAP[id];
+    var status = c ? c.status : "pending";
+    el.setAttribute("data-status", status);
+    el.setAttribute("href", "#claim-" + id);
+    el.innerHTML = '<span class="ic">' + statusIcon(status) + "</span>" + id;
+    if (c) el.setAttribute("title", c.english_gloss || "");
+  }
+
+  function renderAllBadges(root) {
+    (root || document).querySelectorAll(".badge[data-claim]").forEach(function (el) {
+      if (el.tagName.toLowerCase() !== "a") {
+        var a = document.createElement("a");
+        for (var i = 0; i < el.attributes.length; i++) {
+          a.setAttribute(el.attributes[i].name, el.attributes[i].value);
+        }
+        a.className = el.className;
+        el.replaceWith(a);
+        el = a;
+      }
+      renderInlineBadge(el);
+    });
+  }
+
+  // expand <b>C007</b> shorthand inside injected match-copy html into real badge anchors
+  function expandShorthandBadges(html) {
+    return html.replace(/<b>([CR]\d{3})<\/b>/g, function (_, id) {
+      return '<span class="badge" data-claim="' + id + '"></span>';
+    });
+  }
+
+  // ---------- appendix table ----------
+  function renderAppendix() {
+    var tbody = document.getElementById("appendix-tbody");
+    tbody.innerHTML = "";
+    (CLAIMS.claims || []).forEach(function (c) {
+      var tr = document.createElement("tr");
+      tr.id = "claim-" + c.id;
+      tr.innerHTML =
+        '<td class="id-cell">' + c.id + "</td>" +
+        '<td class="canto-cell">' + c.canto + "</td>" +
+        '<td class="gloss-cell">' + (c.english_gloss || "") + "</td>" +
+        '<td class="lemma-cell">' + (c.lemma || "—") + "</td>" +
+        '<td><span class="status-pill" data-status="' + c.status + '">' +
+          statusIcon(c.status) + " " + c.status_label + "</span></td>";
+      tbody.appendChild(tr);
+    });
+
+    var statusLine = document.getElementById("status-line");
+    var total = CLAIMS.total_claims || (CLAIMS.claims || []).length;
+    var verified = CLAIMS.verified_count || 0;
+    var allVerified = total > 0 && verified === total;
+    statusLine.setAttribute("data-all-verified", String(allVerified));
+
+    var statusText = document.getElementById("method-status-text");
+    if (!CLAIMS.proof_map_available) {
+      statusLine.textContent = "claims-proof-map.json 未搵到 · " + total + " 條 claim 全部「驗證中」⏳";
+      statusText.innerHTML = "呢一版報告出爐嗰陣，claims-proof-map.json 仲未落地，所以下面啲狀態暫時全部顯示「驗證中」⏳；Dafny 引理一驗證完，淨係要行一次 <code>python3 build_appendix.py</code>，呢份報告就會自動翻新做 ✓，唔使再改呢份 HTML。";
+    } else if (allVerified) {
+      statusLine.textContent = "proof-map 已載入 · 已驗證 " + verified + " / " + total;
+      statusText.innerHTML = "呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 " + total + " 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 build_appendix.py</code> 就會自動同步，唔使再改呢份 HTML。";
+    } else {
+      statusLine.textContent = "proof-map 已載入 · 已驗證 " + verified + " / " + total;
+      statusText.innerHTML = "呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，但 " + total + " 條 claim 入面暫時得 " + verified + " 條驗證完，其餘仲喺度証緊，所以下面部分狀態仲顯示「驗證中」⏳；Dafny 引理跑晒之後，淨係要再行一次 <code>python3 build_appendix.py</code>，呢份報告就會自動翻新，唔使再改呢份 HTML。";
+    }
+  }
+
+  // ---------- match timeline ----------
+  function buildPipTrail(matchIndex) {
+    var rounds = CD.round_series.filter(function (r) { return r.match === matchIndex; });
+    var wrap = document.createElement("div");
+    wrap.className = "pip-trail";
+    rounds.forEach(function (r) {
+      var pip = document.createElement("span");
+      pip.className = "pip";
+      pip.setAttribute("data-w", r.winner);
+      pip.title = "第" + (r.round_in_match + 1) + "局 · " + r.winner + " 贏";
+      wrap.appendChild(pip);
+    });
+    return wrap;
+  }
+
+  function renderTimeline() {
+    var timeline = document.getElementById("timeline");
+    CD.per_match.forEach(function (m) {
+      var copy = MATCH_COPY[String(m.index)];
+      var card = document.createElement("article");
+      card.className = "match-card reveal" + (m.index === 10 ? " hero-match" : "");
+      card.setAttribute("data-winner", m.winner);
+
+      var head = document.createElement("div");
+      head.className = "mc-head";
+
+      var titleWrap = document.createElement("div");
+      var idx = document.createElement("div");
+      idx.className = "mc-idx";
+      idx.textContent = "第 " + m.index + " 場 · MATCH " + m.index;
+      titleWrap.appendChild(idx);
+
+      if (copy.flag) {
+        var flag = document.createElement("div");
+        flag.className = "hero-flag";
+        flag.textContent = "🏆 " + copy.flag;
+        titleWrap.appendChild(flag);
+      }
+
+      var title = document.createElement("div");
+      title.className = "mc-title";
+      title.textContent = copy.title;
+      titleWrap.appendChild(title);
+      head.appendChild(titleWrap);
+
+      var score = document.createElement("div");
+      score.className = "mc-score";
+      score.innerHTML =
+        '<span class="y">' + m.score.yachi + "</span>" +
+        '<span class="sep">:</span>' +
+        '<span class="p">' + m.score.pinglamb + "</span> " +
+        '<span class="badge" data-claim="C026"></span>';
+      head.appendChild(score);
+
+      card.appendChild(head);
+      card.appendChild(buildPipTrail(m.index));
+
+      var body = document.createElement("div");
+      body.className = "mc-body";
+      body.innerHTML = "<p>" + expandShorthandBadges(copy.body) + "</p>";
+      card.appendChild(body);
+
+      timeline.appendChild(card);
+    });
+
+    renderAllBadges(timeline);
+
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("in-view"); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll(".match-card").forEach(function (el) { io.observe(el); });
+    } else {
+      document.querySelectorAll(".match-card").forEach(function (el) { el.classList.add("in-view"); });
+    }
+  }
+
+  // ---------- SVG helpers ----------
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  // ---------- chart: per-match VS small multiples ----------
+  function renderVsSmallMultiples() {
+    var grid = document.getElementById("vs-small-multiples");
+    var W = 260, H = 130, PAD_L = 30, PAD_R = 10, PAD_T = 10, PAD_B = 20;
+    var plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+
+    CD.per_match.forEach(function (m) {
+      var rounds = CD.round_series.filter(function (r) { return r.match === m.index; });
+      var maxVs = 0;
+      rounds.forEach(function (r) {
+        maxVs = Math.max(maxVs, r.yachi.vs, r.pinglamb.vs);
+      });
+      maxVs = Math.ceil(maxVs / 20) * 20;
+
+      var cell = document.createElement("div");
+      cell.className = "sm-cell";
+
+      var head = document.createElement("div");
+      head.className = "sm-cell-head";
+      var t = document.createElement("div"); t.className = "sm-cell-title"; t.textContent = "m" + m.index;
+      var s = document.createElement("div"); s.className = "sm-cell-score";
+      s.textContent = m.score.yachi + ":" + m.score.pinglamb;
+      head.appendChild(t); head.appendChild(s);
+      cell.appendChild(head);
+
+      var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "m" + m.index + " vs score per round" });
+
+      function xAt(i) { return PAD_L + (rounds.length === 1 ? 0 : (i / (rounds.length - 1)) * plotW); }
+      function yAt(v) { return PAD_T + plotH - (v / maxVs) * plotH; }
+
+      // gridline baseline
+      svg.appendChild(svgEl("line", { class: "axis-line", x1: PAD_L, x2: W - PAD_R, y1: PAD_T + plotH, y2: PAD_T + plotH }));
+      // y tick label (max)
+      var maxLabel = svgEl("text", { x: 2, y: PAD_T + 4, "font-size": 8 });
+      maxLabel.textContent = Math.round(maxVs);
+      svg.appendChild(maxLabel);
+      var zeroLabel = svgEl("text", { x: 2, y: PAD_T + plotH + 3, "font-size": 8 });
+      zeroLabel.textContent = "0";
+      svg.appendChild(zeroLabel);
+
+      ["yachi", "pinglamb"].forEach(function (p) {
+        var pts = rounds.map(function (r, i) { return xAt(i) + "," + yAt(r[p].vs); }).join(" ");
+        svg.appendChild(svgEl("polyline", {
+          points: pts, fill: "none",
+          stroke: "var(--" + p + ")", "stroke-width": 2,
+          "stroke-linecap": "round", "stroke-linejoin": "round"
+        }));
+        rounds.forEach(function (r, i) {
+          var isLast = i === rounds.length - 1;
+          var isDecisive = isLast || r.g === 9 || r.g === 48; // last round of match, or marathon/blitz globally
+          var c = svgEl("circle", {
+            cx: xAt(i), cy: yAt(r[p].vs), r: isDecisive ? 3.4 : 2.2,
+            fill: "var(--" + p + ")",
+            stroke: "var(--bg-raised)", "stroke-width": isDecisive ? 1.5 : 0
+          });
+          var title = svgEl("title", {});
+          title.textContent = p + " · 第" + (i + 1) + "局 · vs " + r[p].vs.toFixed(1);
+          c.appendChild(title);
+          svg.appendChild(c);
+        });
+      });
+
+      cell.appendChild(svg);
+      grid.appendChild(cell);
+    });
+  }
+
+  // ---------- chart: clears grouped bar ----------
+  function renderClearsBar() {
+    var cats = [
+      { key: "singles", label: "Single" },
+      { key: "doubles", label: "Double" },
+      { key: "triples", label: "Triple" },
+      { key: "quads", label: "Quad" },
+      { key: "tspin_singles", label: "TSS" },
+      { key: "tspin_doubles", label: "TSD" },
+      { key: "tspin_triples", label: "TST" }
+    ];
+    var gc = CD.grouped_clears;
+    var maxVal = 0;
+    cats.forEach(function (c) { maxVal = Math.max(maxVal, gc.yachi[c.key], gc.pinglamb[c.key]); });
+    maxVal = Math.ceil(maxVal / 100) * 100;
+
+    var groupW = 96, barW = 30, gap = 4, PAD_L = 40, PAD_T = 26, PAD_B = 30;
+    var plotH = 230;
+    var W = PAD_L + cats.length * groupW + 20, H = PAD_T + plotH + PAD_B;
+
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, style: "width:100%;min-width:" + W + "px;height:auto;" });
+
+    // gridlines
+    var steps = 4;
+    for (var s = 0; s <= steps; s++) {
+      var val = (maxVal / steps) * s;
+      var y = PAD_T + plotH - (val / maxVal) * plotH;
+      svg.appendChild(svgEl("line", { class: "grid-line", x1: PAD_L, x2: W - 10, y1: y, y2: y }));
+      var lbl = svgEl("text", { x: PAD_L - 8, y: y + 3, "font-size": 9, "text-anchor": "end" });
+      lbl.textContent = Math.round(val);
+      svg.appendChild(lbl);
+    }
+    svg.appendChild(svgEl("line", { class: "axis-line", x1: PAD_L, x2: W - 10, y1: PAD_T + plotH, y2: PAD_T + plotH }));
+
+    cats.forEach(function (c, i) {
+      var gx = PAD_L + i * groupW + groupW / 2;
+      ["yachi", "pinglamb"].forEach(function (p, pi) {
+        var v = gc[p][c.key];
+        var barH = (v / maxVal) * plotH;
+        var bx = gx - barW - gap / 2 + pi * (barW + gap);
+        var by = PAD_T + plotH - barH;
+        svg.appendChild(svgEl("rect", {
+          x: bx, y: by, width: barW, height: Math.max(barH, 1),
+          rx: 4, ry: 4, fill: "var(--" + p + ")"
+        }));
+        var valLabel = svgEl("text", { x: bx + barW / 2, y: by - 5, "font-size": 9.5, "text-anchor": "middle", fill: "var(--ink-secondary)" });
+        valLabel.setAttribute("font-family", "var(--font-mono)");
+        valLabel.textContent = v;
+        svg.appendChild(valLabel);
+        var t = svgEl("title", {});
+        t.textContent = p + " · " + c.label + " · " + v;
+        var hit = svgEl("rect", { x: bx, y: PAD_T, width: barW, height: plotH, fill: "transparent" });
+        hit.appendChild(t);
+        svg.appendChild(hit);
+      });
+      var catLabel = svgEl("text", { x: gx, y: PAD_T + plotH + 18, "font-size": 10.5, "text-anchor": "middle", "font-weight": "700", fill: "var(--ink)" });
+      catLabel.textContent = c.label;
+      svg.appendChild(catLabel);
+    });
+
+    document.getElementById("clears-bar-chart").appendChild(svg);
+  }
+
+  // ---------- chart: tale of the tape (dumbbell rows, independent scales) ----------
+  function renderTapeChart() {
+    var t = CD.totals;
+    var rows = [
+      { label: "落子總數（粒）", y: t.yachi.pieces, p: t.pinglamb.pieces, fmt: function (v) { return Math.round(v); } },
+      { label: "每粒攻擊", y: t.yachi.attack_per_piece, p: t.pinglamb.attack_per_piece, fmt: function (v) { return v.toFixed(3); } },
+      { label: "總攻擊行數", y: t.yachi.garbage_attack, p: t.pinglamb.garbage_attack, fmt: function (v) { return Math.round(v); } },
+      { label: "清垃圾行數", y: t.yachi.garbage_cleared, p: t.pinglamb.garbage_cleared, fmt: function (v) { return Math.round(v); } },
+      { label: "finesse 失誤率", y: t.yachi.finesse_fault_rate, p: t.pinglamb.finesse_fault_rate, fmt: function (v) { return (v * 100).toFixed(1) + "%"; }, lowerBetter: true },
+      { label: "hold 使用率", y: t.yachi.hold_rate, p: t.pinglamb.hold_rate, fmt: function (v) { return (v * 100).toFixed(1) + "%"; } }
+    ];
+
+    var W = 640, rowH = 60, PAD_L = 150, PAD_R = 70, PAD_T = 14;
+    var plotW = W - PAD_L - PAD_R;
+    var H = PAD_T * 2 + rows.length * rowH;
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, style: "width:100%;min-width:520px;height:auto;" });
+
+    rows.forEach(function (r, i) {
+      var cy = PAD_T + i * rowH + rowH / 2;
+      var lo = Math.min(r.y, r.p), hi = Math.max(r.y, r.p);
+      var span = hi - lo || 1;
+      var padFrac = 0.28;
+      var loX = lo - span * padFrac, hiX = hi + span * padFrac;
+      function xAt(v) { return PAD_L + ((v - loX) / (hiX - loX)) * plotW; }
+
+      var rowLabel = svgEl("text", { x: 0, y: cy + 4, "font-size": 11.5, fill: "var(--ink)", "font-weight": "600" });
+      rowLabel.textContent = r.label;
+      svg.appendChild(rowLabel);
+
+      svg.appendChild(svgEl("line", {
+        x1: xAt(lo), x2: xAt(hi), y1: cy, y2: cy,
+        stroke: "var(--border-strong)", "stroke-width": 2, "stroke-linecap": "round"
+      }));
+
+      ["yachi", "pinglamb"].forEach(function (p) {
+        var v = r[p === "yachi" ? "y" : "p"];
+        var c = svgEl("circle", { cx: xAt(v), cy: cy, r: 6, fill: "var(--" + p + ")", stroke: "var(--bg-raised)", "stroke-width": 2 });
+        var ti = svgEl("title", {}); ti.textContent = p + " · " + r.fmt(v); c.appendChild(ti);
+        svg.appendChild(c);
+      });
+
+      var better = r.lowerBetter ? (r.y < r.p ? "yachi" : "pinglamb") : (r.y > r.p ? "yachi" : "pinglamb");
+      var yLabel = svgEl("text", { x: xAt(r.y), y: cy - 14, "font-size": 10, "text-anchor": "middle", fill: "var(--yachi)", "font-weight": better === "yachi" ? "800" : "500" });
+      yLabel.setAttribute("font-family", "var(--font-mono)");
+      yLabel.textContent = r.fmt(r.y);
+      svg.appendChild(yLabel);
+      var pLabel = svgEl("text", { x: xAt(r.p), y: cy + 20, "font-size": 10, "text-anchor": "middle", fill: "var(--pinglamb)", "font-weight": better === "pinglamb" ? "800" : "500" });
+      pLabel.setAttribute("font-family", "var(--font-mono)");
+      pLabel.textContent = r.fmt(r.p);
+      svg.appendChild(pLabel);
+    });
+
+    document.getElementById("tape-chart").appendChild(svg);
+  }
+
+  // ---------- boot ----------
+  document.addEventListener("DOMContentLoaded", function () {
+    parseClaimsData();
+    renderTimeline();
+    renderVsSmallMultiples();
+    renderClearsBar();
+    renderTapeChart();
+    renderAppendix();
+    renderAllBadges(document); // catch remaining static badges (hero, stats, coaching, moments)
+  });
+})();
+</script>

@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# Re-run every verification gate for one session artefact.
+#
+#   bin/verify-session sessions/2026-07-24/report
+#   MUTATION=1 bin/verify-session sessions/2026-07-22/report
+#
+# Gates, in order (any failure aborts with a non-zero exit):
+#   1. extractor agreement — the two independent extractors' committed outputs are
+#      identical, and re-running the Python extractor reproduces its output exactly
+#   2. claim predicates    — every python_check in every ledger evaluates True
+#   3. dafny verify        — every claim lemma verifies, 0 errors
+#   4. codegen consistency — committed .dfy is byte-identical to codegen output
+#   5. mutation test       — flipping a literal MUST break verification (opt-in:
+#                            MUTATION=1; it re-runs the verifier once per mutation)
+#
+# Works with either file-naming convention in use (facts.json / facts-24.json).
+set -euo pipefail
+
+DIR="${1:?usage: bin/verify-session <session-artefact-dir>}"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$DIR"
+NAME="$(cd .. && basename "$PWD")/$(basename "$PWD")"
+fail() { echo "FAIL [$NAME] $*" >&2; exit 1; }
+ok()   { echo "  ok  $*"; }
+shopt -s nullglob
+
+echo "== verifying $NAME =="
+
+# --- locate this artefact's files ------------------------------------------
+FACTS=""
+for f in facts.json facts-*.json; do
+  [ -f "$f" ] || continue
+  case "$f" in facts2*) continue ;; esac
+  FACTS="$f"; break
+done
+FACTS2=""; for f in facts2.json facts2-*.json; do [ -f "$f" ] && { FACTS2="$f"; break; }; done
+EXTRACT=""; for f in extract.py extract-*.py; do [ -f "$f" ] && { EXTRACT="$f"; break; }; done
+[ -n "$FACTS" ]   || fail "no facts file found"
+[ -n "$FACTS2" ]  || fail "no second-extractor facts file found"
+[ -n "$EXTRACT" ] || fail "no Python extractor found"
+
+CHECKER="./check_claims.py"
+[ -f "$CHECKER" ] || CHECKER="$REPO/tools/check_claims.py"
+[ -f "$CHECKER" ] || fail "no check_claims.py available"
+
+# --- 1. extractor agreement ------------------------------------------------
+command -v jq >/dev/null || fail "jq not installed"
+diff <(jq -S . "$FACTS") <(jq -S . "$FACTS2") >/dev/null \
+  || fail "$FACTS and $FACTS2 disagree (independent extractors diverged)"
+ok "dual-extractor outputs identical ($FACTS == $FACTS2)"
+
+# Regenerate in place and compare hashes: a faithful extractor leaves the file
+# unchanged, so there is nothing to clean up. If it differs the gate fails and the
+# working tree shows exactly how (git checkout restores).
+BEFORE="$(shasum -a 256 "$FACTS" | cut -d' ' -f1)"
+python3 "$EXTRACT" >/dev/null
+AFTER="$(shasum -a 256 "$FACTS" | cut -d' ' -f1)"
+[ "$BEFORE" = "$AFTER" ] || fail "re-running $EXTRACT did not reproduce the committed $FACTS"
+ok "$EXTRACT reproduces committed $FACTS"
+
+# --- 2. claim predicates ---------------------------------------------------
+FOUND=0
+for L in claims*.json; do
+  case "$L" in *proof-map*) continue ;; esac
+  OUT="$(python3 "$CHECKER" "$L" "$FACTS" | tail -1)"
+  case "$OUT" in
+    *", 0 fail"*) ok "$L — $OUT"; FOUND=$((FOUND+1)) ;;
+    *) fail "$L — $OUT" ;;
+  esac
+done
+[ "$FOUND" -gt 0 ] || fail "no claim ledgers found"
+
+# --- 3. dafny verify -------------------------------------------------------
+command -v dafny >/dev/null || fail "dafny not installed"
+VOUT="$(dafny verify dafny/*.dfy --cores 4 2>&1 | tail -1)"
+case "$VOUT" in
+  *"0 errors"*) ok "dafny — $VOUT" ;;
+  *) fail "dafny — $VOUT" ;;
+esac
+
+# --- 4. proof map honesty --------------------------------------------------
+for M in claims-proof-map.json proof-map*.json; do
+  [ -f "$M" ] || continue
+  BAD="$(python3 -c "
+import json,sys
+m=json.load(open('$M'))
+rows=m if isinstance(m,list) else [dict(v,id=k) for k,v in m.items()]
+print(sum(1 for r in rows if r.get('status')!='verified'), len(rows))
+")"
+  set -- $BAD
+  [ "$1" = "0" ] || fail "$M has $1 non-verified entries but the verifier reported 0 errors"
+  ok "$M — $2/$2 verified"
+done
+
+# --- 5. codegen consistency ------------------------------------------------
+if [ -f gen_consistency.sh ]; then
+  COUT="$(bash gen_consistency.sh 2>&1 | tail -1)"
+  case "$COUT" in
+    CONSISTENCY:*) ok "$COUT" ;;
+    *) fail "codegen consistency — $COUT" ;;
+  esac
+fi
+
+# --- 6. mutation test (opt-in) ---------------------------------------------
+if [ "${MUTATION:-0}" = "1" ] && [ -f mutation_test.sh ]; then
+  MOUT="$(bash mutation_test.sh 2>&1 | tail -1)"
+  case "$MOUT" in
+    *"MUTATION TEST:"*)
+      RATIO="$(echo "$MOUT" | sed -E 's/.*MUTATION TEST: *([0-9]+\/[0-9]+).*/\1/')"
+      [ "${RATIO%%/*}" = "${RATIO##*/}" ] || fail "mutation — $MOUT (a survivor means a vacuous lemma)"
+      ok "$MOUT" ;;
+    *) fail "mutation — $MOUT" ;;
+  esac
+else
+  echo "  --  mutation test skipped (set MUTATION=1 to run)"
+fi
+
+echo "PASS [$NAME]"

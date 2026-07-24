@@ -1,0 +1,142 @@
+[
+  {
+    "id": "C001",
+    "canto": "pinglamb 7 場入面贏咗 4 場,yachi 執 3 場",
+    "english_gloss": "pinglamb won 4 matches, yachi 3",
+    "category": "score",
+    "python_check": "sum(1 for m in facts['matches'] if m['winner']=='pinglamb')==4 and sum(1 for m in facts['matches'] if m['winner']=='yachi')==3"
+  },
+  {
+    "id": "C002",
+    "canto": "成個 series 打足 50 局,pinglamb 贏 29 局,yachi 贏 21 局",
+    "english_gloss": "50 rounds; pinglamb 29, yachi 21",
+    "category": "score",
+    "python_check": "sum(len(m['rounds']) for m in facts['matches'])==50 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')==29 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')==21"
+  },
+  {
+    "id": "C003",
+    "canto": "pinglamb 全 series 落咗 4,439 粒方塊,yachi 落 4,748",
+    "english_gloss": "pinglamb placed 4439 pieces vs yachi 4748",
+    "category": "style",
+    "python_check": "sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])==4439 and sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])==4748"
+  },
+  {
+    "id": "C004",
+    "canto": "pinglamb 平均 1.32 PPS,yachi 1.41 PPS",
+    "english_gloss": "pinglamb agg pps 1.32 vs 1.41",
+    "category": "pace",
+    "python_check": "(lambda P,M,Y,N: (2*P*100000+M)//(2*M)==132 and (2*Y*100000+N)//(2*N)==141)(sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['pinglamb']['lifetime'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['yachi']['lifetime'] for m in facts['matches'] for r in m['rounds']))"
+  },
+  {
+    "id": "C005",
+    "canto": "兩個夾埋出咗 10 次 Perfect Clear(pinglamb 4、yachi 6)",
+    "english_gloss": "total all-clears 10",
+    "category": "style",
+    "python_check": "sum(d['clears']['allclear'] for m in facts['matches'] for r in m['rounds'] for d in r['players'].values())==10 and sum(r['players']['pinglamb']['clears']['allclear'] for m in facts['matches'] for r in m['rounds'])==4 and sum(r['players']['yachi']['clears']['allclear'] for m in facts['matches'] for r in m['rounds'])==6"
+  },
+  {
+    "id": "C006",
+    "canto": "全場最快嗰局係第 5 場第 2 局,約 21.0 秒收工",
+    "english_gloss": "shortest round is m5r2 ~21.0s",
+    "category": "duration",
+    "python_check": "min(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==21023 and facts['matches'][4]['index']==5 and max(d['lifetime'] for d in facts['matches'][4]['rounds'][1]['players'].values())==21023 and 20950<=21023<21050"
+  },
+  {
+    "id": "C007",
+    "canto": "全場最長嗰局係第 3 場第 3 局,打足約 240.1 秒",
+    "english_gloss": "longest round is m3r3 ~240.1s",
+    "category": "duration",
+    "python_check": "max(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==240131 and facts['matches'][2]['index']==3 and max(d['lifetime'] for d in facts['matches'][2]['rounds'][2]['players'].values())==240131 and 240050<=240131<240150"
+  },
+  {
+    "id": "C008",
+    "canto": "第 1 場最長一局約 116.2 秒,由 pinglamb 攞低",
+    "english_gloss": "m1 longest round ~116.2s won by pinglamb",
+    "category": "duration",
+    "python_check": "facts['matches'][0]['index']==1 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][0]['rounds'])==116222 and max(d['lifetime'] for d in facts['matches'][0]['rounds'][4]['players'].values())==116222 and facts['matches'][0]['rounds'][4]['winner']=='pinglamb' and 116150<=116222<116250"
+  },
+  {
+    "id": "C009",
+    "canto": "第 2 場最長一局約 180.0 秒,由 yachi 攞低",
+    "english_gloss": "m2 longest round ~180.0s won by yachi",
+    "category": "duration",
+    "python_check": "facts['matches'][1]['index']==2 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][1]['rounds'])==179950 and max(d['lifetime'] for d in facts['matches'][1]['rounds'][2]['players'].values())==179950 and facts['matches'][1]['rounds'][2]['winner']=='yachi' and 179950<=179950<180050"
+  },
+  {
+    "id": "C010",
+    "canto": "第 3 場最長一局約 240.1 秒,由 yachi 攞低",
+    "english_gloss": "m3 longest round ~240.1s won by yachi",
+    "category": "duration",
+    "python_check": "facts['matches'][2]['index']==3 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][2]['rounds'])==240131 and max(d['lifetime'] for d in facts['matches'][2]['rounds'][2]['players'].values())==240131 and facts['matches'][2]['rounds'][2]['winner']=='yachi' and 240050<=240131<240150"
+  },
+  {
+    "id": "C011",
+    "canto": "第 4 場最長一局約 83.9 秒,由 pinglamb 攞低",
+    "english_gloss": "m4 longest round ~83.9s won by pinglamb",
+    "category": "duration",
+    "python_check": "facts['matches'][3]['index']==4 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][3]['rounds'])==83945 and max(d['lifetime'] for d in facts['matches'][3]['rounds'][4]['players'].values())==83945 and facts['matches'][3]['rounds'][4]['winner']=='pinglamb' and 83850<=83945<83950"
+  },
+  {
+    "id": "C012",
+    "canto": "第 5 場最長一局約 140.0 秒,由 yachi 攞低",
+    "english_gloss": "m5 longest round ~140.0s won by yachi",
+    "category": "duration",
+    "python_check": "facts['matches'][4]['index']==5 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][4]['rounds'])==140000 and max(d['lifetime'] for d in facts['matches'][4]['rounds'][0]['players'].values())==140000 and facts['matches'][4]['rounds'][0]['winner']=='yachi' and 139950<=140000<140050"
+  },
+  {
+    "id": "C013",
+    "canto": "第 6 場最長一局約 95.1 秒,由 pinglamb 攞低",
+    "english_gloss": "m6 longest round ~95.1s won by pinglamb",
+    "category": "duration",
+    "python_check": "facts['matches'][5]['index']==6 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][5]['rounds'])==95111 and max(d['lifetime'] for d in facts['matches'][5]['rounds'][4]['players'].values())==95111 and facts['matches'][5]['rounds'][4]['winner']=='pinglamb' and 95050<=95111<95150"
+  },
+  {
+    "id": "C014",
+    "canto": "第 7 場最長一局約 101.8 秒,由 pinglamb 攞低",
+    "english_gloss": "m7 longest round ~101.8s won by pinglamb",
+    "category": "duration",
+    "python_check": "facts['matches'][6]['index']==7 and max(max(d['lifetime'] for d in r['players'].values()) for r in facts['matches'][6]['rounds'])==101797 and max(d['lifetime'] for d in facts['matches'][6]['rounds'][2]['players'].values())==101797 and facts['matches'][6]['rounds'][2]['winner']=='pinglamb' and 101750<=101797<101850"
+  },
+  {
+    "id": "C015",
+    "canto": "全場最長嗰局係第 3 場第 3 局,打足約 240.1 秒",
+    "english_gloss": "longest round is m3r3 ~240.1s",
+    "category": "duration",
+    "python_check": "max(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==240131 and facts['matches'][2]['index']==3 and max(d['lifetime'] for d in facts['matches'][2]['rounds'][2]['players'].values())==240131 and 240050<=240131<240150"
+  },
+  {
+    "id": "C016",
+    "canto": "全場最快嗰局係第 5 場第 2 局,約 21.0 秒收工",
+    "english_gloss": "shortest round is m5r2 ~21.0s",
+    "category": "duration",
+    "python_check": "min(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==21023 and facts['matches'][4]['index']==5 and max(d['lifetime'] for d in facts['matches'][4]['rounds'][1]['players'].values())==21023 and 20950<=21023<21050"
+  },
+  {
+    "id": "C017",
+    "canto": "全場最大單發 spike 係 17,一共出現 1 次(第5場第8局 pinglamb)",
+    "english_gloss": "biggest single spike is 17, hit 1 time(s)",
+    "category": "spike",
+    "python_check": "max(d['maxspike'] for m in facts['matches'] for r in m['rounds'] for d in r['players'].values())==17 and sum(1 for m in facts['matches'] for r in m['rounds'] for d in r['players'].values() if d['maxspike']==17)==1 and facts['matches'][4]['index']==5 and facts['matches'][4]['rounds'][7]['players']['pinglamb']['maxspike']==17"
+  },
+  {
+    "id": "C018",
+    "canto": "最勁翻盤局:第 7 場第 3 局,pinglamb 俾人射埋嚟 67 行(對手得 47 行)都照贏",
+    "english_gloss": "biggest comeback m7r3: winner queued 67 vs 47",
+    "category": "comeback",
+    "python_check": "(lambda Q: facts['matches'][6]['index']==7 and facts['matches'][6]['rounds'][2]['winner']=='pinglamb' and Q(facts['matches'][6]['rounds'][2],'pinglamb')==67 and Q(facts['matches'][6]['rounds'][2],'yachi')==47 and max(Q(r,r['winner'])-Q(r,'yachi' if r['winner']=='pinglamb' else 'pinglamb') for m in facts['matches'] for r in m['rounds'])==20)(lambda r,pl: sum(e['amt'] for e in r['players'][pl]['garbage_events']))"
+  },
+  {
+    "id": "C019",
+    "canto": "全 50 局,每一局贏嗰個嘅 VS score 都高過輸嗰個,一局例外都冇",
+    "english_gloss": "in every one of 50 rounds the winner had higher VS",
+    "category": "clutch",
+    "python_check": "all(r['players'][r['winner']]['vs_x1000'] > [d for p,d in r['players'].items() if p!=r['winner']][0]['vs_x1000'] for m in facts['matches'] for r in m['rounds'])"
+  },
+  {
+    "id": "C020",
+    "canto": "pinglamb 平均 1.32 PPS,慢過 yachi 嘅 1.41 PPS 約 7%",
+    "english_gloss": "pinglamb agg pps 1.32 < yachi 1.41",
+    "category": "pace",
+    "python_check": "(lambda P,M,Y,N: P*N < Y*M and (2*P*100000+M)//(2*M)==132 and (2*Y*100000+N)//(2*N)==141)(sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['pinglamb']['lifetime'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']), sum(r['players']['yachi']['lifetime'] for m in facts['matches'] for r in m['rounds']))"
+  }
+]

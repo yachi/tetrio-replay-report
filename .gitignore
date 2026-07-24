@@ -1,0 +1,17 @@
+# QA / tooling artefacts — never part of the repo
+.playwright-cli/
+.playwright/
+**/shots/
+__pycache__/
+*.pyc
+
+# archives of the raw replay drops
+*.zip
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# local Dafny scratch
+*.dfy.tmp
+*.bak

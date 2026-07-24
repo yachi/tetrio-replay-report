@@ -1,0 +1,93 @@
+name: verify
+
+# The repo's whole claim is that the numbers in the reports are machine-checked.
+# This workflow re-establishes that on every push: it does not trust a single
+# committed artefact, it re-runs the extractors, the claim predicates, the Dafny
+# verifier, the codegen consistency check and (nightly) the mutation test.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 6 * * 1'   # weekly, with mutation testing enabled
+  workflow_dispatch:
+    inputs:
+      mutation:
+        description: 'Run the mutation test (slow)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  DAFNY_VERSION: 4.11.0
+  # sha256 of dafny-4.11.0-x64-ubuntu-22.04.zip, from the signed release listing
+  DAFNY_SHA256: a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179
+
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        artefact:
+          - sessions/2026-07-22/report
+          - sessions/2026-07-24/report
+          - sessions/2026-07-24/proof
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        run: |
+          set -euo pipefail
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-ubuntu-22.04.zip"
+          curl -fsSL "$URL" -o dafny.zip
+          echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
+          unzip -q dafny.zip -d "$HOME/dafny-dist"
+          echo "$HOME/dafny-dist/dafny" >> "$GITHUB_PATH"
+
+      - name: Show tool versions
+        run: |
+          dafny --version
+          python3 --version
+          jq --version
+
+      - name: Verify ${{ matrix.artefact }}
+        env:
+          MUTATION: ${{ (github.event_name == 'schedule' || inputs.mutation) && '1' || '0' }}
+        run: bin/verify-session "${{ matrix.artefact }}"
+
+  # The second extractor is a genuinely independent implementation; re-running it
+  # is what makes the "two parsers agree" claim mean something.
+  cross-extractor:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
+        with:
+          bun-version: '1.2.4'
+
+      - name: Re-run the TypeScript extractor and compare against committed output
+        run: |
+          set -euo pipefail
+          status=0
+          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof; do
+            ts=$(ls "$d"/extract2*.ts | head -1)
+            f2=$(ls "$d"/facts2*.json | head -1)
+            before=$(sha256sum "$f2" | cut -d' ' -f1)
+            ( cd "$d" && bun "$(basename "$ts")" >/dev/null )
+            after=$(sha256sum "$f2" | cut -d' ' -f1)
+            if [ "$before" = "$after" ]; then
+              echo "  ok  $d — $(basename "$ts") reproduces $(basename "$f2")"
+            else
+              echo "FAIL  $d — $(basename "$ts") no longer reproduces $(basename "$f2")" >&2
+              status=1
+            fi
+          done
+          exit $status

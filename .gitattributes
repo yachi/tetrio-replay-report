@@ -1,0 +1,16 @@
+# .ttrm replays are single-line JSON blobs (one 65k+ char line).
+# Diffing them is meaningless and they are not "our" source code.
+*.ttrm linguist-vendored
+*.ttrm -diff
+
+# Generated Dafny carries the dataset as literals; don't let it skew language stats.
+sessions/*/report/dafny/*.dfy linguist-generated
+sessions/*/proof/dafny/*.dfy linguist-generated
+
+# facts.json is machine-generated data, not hand-authored config.
+sessions/**/facts*.json linguist-generated
+sessions/**/facts*.json -diff
+
+# Reports are generated single-file HTML.
+sessions/**/report*.html linguist-generated
+docs/*.html linguist-generated
