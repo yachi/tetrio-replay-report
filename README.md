@@ -1,5 +1,7 @@
 # tetrio-replay-report
 
+[![verify](https://github.com/yachi/tetrio-replay-report/actions/workflows/verify.yml/badge.svg)](https://github.com/yachi/tetrio-replay-report/actions/workflows/verify.yml)
+
 Turn a batch of TETR.IO `.ttrm` replays into a Cantonese match report where **every
 number is machine-checked** — extracted twice by independent parsers, written as a
 formal claim, and proved with [Dafny](https://dafny.org).
