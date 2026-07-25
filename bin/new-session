@@ -86,7 +86,9 @@ next, the parts that need judgment:
   1. write $WORK/narrative-beats.md and $WORK/recommendations.md against the
      generated ledger (each countable statement citing its claim id), and
      $WORK/prose/hero.json — the headline, both taglines and the lede
-     (the date, names and series score come from facts.json)
+     (the date, names and series score come from facts.json) — and
+     $WORK/prose/matches.json — one card per match plus hero_match
+     (the scores, winners and pip trails come from facts.json)
   2. add hand-written claims for whatever is genuinely unique to this session,
      then re-run steps 3-4 to fold them into the proofs
   3. build the report, then refresh the site:

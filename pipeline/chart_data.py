@@ -129,7 +129,11 @@ def match_boundaries(facts):
 
 
 def build(facts):
-    return {"per_match": per_match(facts),
+    # `players` is emitted so the page's renderers can key by position instead of
+    # by name; the inline script used to say `m.score.yachi` outright, which is
+    # what stopped a report from being reused for any other pair of players.
+    return {"players": list(facts["players"]),
+            "per_match": per_match(facts),
             "grouped_clears": grouped_clears(facts),
             "totals": totals(facts),
             "round_series": round_series(facts),

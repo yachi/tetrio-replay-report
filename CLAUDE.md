@@ -105,19 +105,29 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
 
 ## Known remaining work
 
-1. Three pre-existing `innerHTML` sites in `report.html` concatenate variables into markup
-   (appendix row builder, match-card score, badge-prose expander). No live risk — all values
-   come from this pipeline — but they violate the skill's XSS rule. Needs one focused change
-   with the 110 badge count and 52 appendix rows re-verified after.
+1. Two `innerHTML` sites left in `report.html` concatenate into markup: the appendix row
+   builder, and the badge-prose expander. The expander is legitimate — card and lede prose is
+   authored HTML — so the real target is the appendix builder, which the P5 appendix section
+   will replace anyway. (The match-card score was the third; it now builds nodes.) Re-verify
+   the 110 badge count and 52 appendix rows after touching either.
 2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
-   `--check`): the `chart-data` island and the hero/scoreboard. Still hand-built: the match
-   cards, the coaching section and the appendix. Add each as a new entry in `SECTIONS`; the
-   marker region and the drift gate come for free.
+   `--check`): the hero/scoreboard, the `chart-data` island, and the `match-copy` island.
+   Still hand-built: the coaching section and the appendix. Add each as a new entry in
+   `SECTIONS`; the marker region and the drift gate come for free.
 
-   The hero split is the pattern the rest of P5 follows: numbers from `facts.json`, words from
-   `<report_dir>/prose/hero.json`. Prose is inserted as raw HTML because it legitimately
-   contains `<span class="hl-y">` and badge spans — derived values are escaped, prose is
-   trusted, and `load_prose` runs the same simplified-glyph check as the claim generator.
+   The split every section follows: numbers from `facts.json`, words from
+   `<report_dir>/prose/*.json`. Prose is inserted as raw HTML because it legitimately contains
+   `<span class="hl-y">` and badge spans — derived values are escaped, prose is trusted, and
+   each loader runs the same simplified-glyph check as the claim generator.
+
+   Editorial constants belong in prose, not in the script: `hero_match` (which card gets the
+   spotlight) and `score_claim` (the badge on every card's score) were `m.index === 7` and a
+   literal `data-claim="C026"` inside each report's inline JS, which is a large part of why the
+   script could not be shared between sessions.
+
+   **The inline script is still player-hardcoded** — ~110 occurrences of `yachi`/`pinglamb` in
+   colours, keys and labels. The card renderer and the small multiples now read `CD.players`
+   by position; the rest is the report-skeleton step's job, not something to chip at.
 3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
    It is a cross-check, not a published report — every fact in it is covered by that session's
    full report. Keep it gated by CI; do not resurrect it onto the site.

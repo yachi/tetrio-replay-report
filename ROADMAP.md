@@ -202,10 +202,30 @@ Validation:
 * both heroes re-rendered in a browser: one `.hero`, correct eyebrow (including 07-24's
   第二回合 kicker), score in player order (6:4 / 3:4), taglines, and every badge resolving
 
+**Shipped (2026-07-25): the match cards.** `pipeline/matches.py` generates the `match-copy`
+island from `<report_dir>/prose/matches.json`; the card's numbers (score, winner, the
+per-round pip trail) already came from the chart island.
+
+The interesting part was what had to stop being code. Two editorial constants were baked into
+each report's inline script — `m.index === 7` (which card gets the spotlight) and a literal
+`data-claim="C026"` on every card's score — and they differed per session, which is a large
+part of why the script could not be shared. Both are now `hero_match` and `score_claim` in the
+prose file. The score itself is built from DOM nodes instead of an `innerHTML` string, and
+reads `CD.players` by position rather than `m.score.yachi`, so that renderer no longer knows
+who is playing. `chart_data` emits `players` for it.
+
+Validation: both islands round-trip (the committed copy regenerates exactly); six adversarial
+probes all caught (a match with no card, an unknown card index, an empty body, `hero_match`
+out of range, a simplified glyph, and drift in the committed island); both reports re-rendered
+— 10/7 cards, exactly one spotlight card at the right index, scores in player order with
+07-22's C026 badge and none on 07-24, pip trails summing to 79/50 rounds, 110 badges, no
+console errors.
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
-1. match cards — the `match-copy` island, which is prose keyed by match index; the same
-   facts/prose split, with per-match scores and win sequences derived
-2. appendix — folds in the three `innerHTML` sites, since the generator can build those rows
-   with `textContent` instead of string concatenation
+1. appendix — folds in the remaining `innerHTML` row builder, since the generator can build
+   those rows with `textContent` instead of string concatenation
+2. the coaching section
 3. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
-   expecting one to be copied from a previous session
+   expecting one to be copied from a previous session. This is also where the inline script
+   stops being player-hardcoded: ~110 occurrences of `yachi`/`pinglamb` remain in colours,
+   keys and labels, and they should be resolved once, by the template, not chipped at.
