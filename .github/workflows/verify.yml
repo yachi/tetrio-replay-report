@@ -95,6 +95,12 @@ jobs:
           }
           echo "  ok  generated ledger reproduces byte-for-byte"
 
+      # The charts read a JSON island. It used to be hand-written, so a chart could
+      # disagree with facts.json and nothing would catch it — this makes that a
+      # build failure instead.
+      - name: Regenerate the report's derived sections and compare with the committed report
+        run: python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --check
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail

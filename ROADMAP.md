@@ -161,8 +161,34 @@ falsify are reported separately rather than counted as covered.
 * `+1` mutations could not kill values that are only constrained beyond a threshold; the
   operator escalates before calling a mutant a survivor (14/14 killed)
 
-## P5 — next
+## P5 — in progress
 
 Report templating: `build_report.py` generating the scoreboard, match cards, charts and
 appendix from `facts.json` + the ledger, leaving prose sections as the only hand-written
 part. That closes the loop from replays to published report.
+
+**Shipped (2026-07-25): the `chart-data` island.** Every chart in the report — the per-match
+scoreboard strip, the VS small multiples, the clear-type bars, the tape chart, the match
+timeline — reads one JSON island that until now was written by hand. Nothing tied it to
+`facts.json`, so a chart could disagree with the proved data and no gate would notice; in a
+repo whose whole claim is "these numbers are checked", that was the largest remaining hole.
+
+`pipeline/chart_data.py` derives it, `pipeline/build_report.py` injects it into a marker
+region, and `--check` fails CI if the committed report differs from what `facts.json`
+generates.
+
+Validation, in the same style as P4:
+* the generator reproduces both committed islands exactly on the first run — every count,
+  every float — with a single addition: session 2026-07-22's island was missing `kills`
+  (43/36), which 2026-07-24's already carried
+* the drift gate was mutation-tested (perturb one committed value → `--check` exits 1;
+  restore → 0), so it is not decorative
+* both reports were re-rendered in a browser: 10/7 match cards, 10/7 small multiples, both
+  charts, 110 badges, 54/52 appendix rows, 158/100 round rows, no console errors
+
+**Next in P5**, each a new entry in `build_report.SECTIONS`:
+1. hero + scoreboard (needs a per-session prose file for the title/tagline/lede, which is the
+   design decision the rest of P5 rests on)
+2. match cards — the `match-copy` island, which is prose keyed by match index
+3. appendix — folds in the three `innerHTML` sites, since the generator can build those rows
+   with `textContent` instead of string concatenation

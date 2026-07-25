@@ -26,14 +26,18 @@ Corollaries that are gates, not preferences:
 bin/new-session sessions/<date> <replay-dir>   # extract → claims → Dafny → verify → proof map
 bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 adds mutation test)
 bin/build-docs                                 # regenerate docs/ (the Pages site) from sessions
+python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
+python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 逐局全數據 section
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
 python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exhaustive mutation
 ```
 
-`build_round_table.py` replaces only the region between its HTML comment markers, so it is
-idempotent and safe to re-run over a hand-edited report.
+Every generator replaces only the region between its HTML comment markers, so all of them are
+idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that
+mechanism (`markers()` / `replace()`); `build_round_table.py` predates it and carries its own
+equivalent marker pair.
 
 ## Workflow
 
@@ -105,8 +109,10 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
    (appendix row builder, match-card score, badge-prose expander). No live risk — all values
    come from this pipeline — but they violate the skill's XSS rule. Needs one focused change
    with the 110 badge count and 52 appendix rows re-verified after.
-2. ROADMAP P5: templating the rest of the report (hero, match cards, charts, appendix) so only
-   the Cantonese prose is hand-written.
+2. ROADMAP P5, in progress. The `chart-data` island is generated (`pipeline/build_report.py`,
+   CI-gated with `--check`). Still hand-written: the hero/scoreboard markup, the match-card and
+   coaching prose, and the appendix builder. Add each as a new entry in `SECTIONS`; the marker
+   region and the drift gate come for free.
 3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
    It is a cross-check, not a published report — every fact in it is covered by that session's
    full report. Keep it gated by CI; do not resurrect it onto the site.

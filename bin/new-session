@@ -88,6 +88,7 @@ next, the parts that need judgment:
   2. add hand-written claims for whatever is genuinely unique to this session,
      then re-run steps 3-4 to fold them into the proofs
   3. build the report, then refresh the site:
+       python3 -m pipeline.build_report $WORK    # derived sections (the chart-data island)
        python3 $WORK/build_appendix.py
        python3 bin/build-docs
 EOF
