@@ -144,6 +144,53 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-legend code { font-family: var(--font-mono); font-size: .95em; color: var(--ink-secondary); }
 .rt-hint { font-family: var(--font-mono); font-size: .66rem; color: var(--muted);
   margin: .3rem 0 0; }
+/* header strip: row count is the first thing a data reader looks for */
+.rt-meta { font-family: var(--font-mono); font-size: .72rem; color: var(--muted);
+  margin: 0 0 .5rem; }
+.rt-meta b { color: var(--ink); }
+/* summary panel — recomputed from the VISIBLE rows on every filter change */
+.rt-summary { display: grid; gap: .5rem; margin: 0 0 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr)); }
+.rt-stat { border: 1px solid var(--border); border-radius: 8px; padding: .5rem .65rem;
+  background: var(--bg-raised); }
+.rt-stat dt { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted); margin: 0; }
+.rt-stat dd { margin: .15rem 0 0; font-weight: 700; font-size: 1rem;
+  font-variant-numeric: tabular-nums; }
+.rt-stat dd small { font-weight: 500; font-size: .68rem; color: var(--muted); }
+/* detail drawer */
+.rt-tbl tbody tr { cursor: pointer; }
+.rt-drawer { position: fixed; inset: auto 0 0 0; max-height: 76vh; overflow-y: auto;
+  background: var(--bg-raised); border-top: 2px solid var(--rt-accent);
+  box-shadow: 0 -8px 32px rgba(0,0,0,.18); padding: 1rem 1.2rem 1.6rem;
+  z-index: 50; display: none; }
+.rt-drawer.is-open { display: block; }
+.rt-drawer-head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+  margin-bottom: .7rem; }
+.rt-drawer-head h4 { margin: 0; font-size: 1rem; }
+.rt-close { margin-left: auto; border: 1px solid var(--border); background: none;
+  border-radius: 999px; padding: .2rem .7rem; cursor: pointer; font-size: .74rem;
+  color: var(--muted); font-family: var(--font-mono); }
+.rt-close:hover { color: var(--ink); border-color: var(--border-strong); }
+.rt-fields { display: grid; gap: .3rem .9rem; margin: 0 0 .9rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+.rt-fields div { display: flex; justify-content: space-between; gap: .5rem;
+  font-size: .76rem; border-bottom: 1px dotted var(--border); padding: .15rem 0; }
+.rt-fields dt, .rt-fields .k { color: var(--muted); font-family: var(--font-mono);
+  font-size: .68rem; }
+.rt-fields .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+.rt-timeline { margin-top: .4rem; }
+.rt-timeline h5 { margin: 0 0 .35rem; font-size: .78rem; }
+.rt-spark { display: block; width: 100%; height: 56px; }
+.rt-status { font-family: var(--font-mono); font-size: .68rem; color: var(--muted);
+  min-height: 1.1em; }
+/* print: keep the bars and tints meaningful on paper */
+@media print {
+  .rt-controls, .rt-hint, .rt-drawer { display: none !important; }
+  .rt-scroll { overflow: visible; border: none; }
+  table.rt-tbl { font-size: .6rem; }
+  .rt-tbl td, .rt-tbl th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
 /* per-piece efficiency findings */
 .rt-find { display: grid; gap: .6rem; margin: 0 0 2rem;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
@@ -162,6 +209,290 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-card p { margin: .35rem 0 0; font-size: .82rem; line-height: 1.65; }
 .rt-card .rt-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 </style>
+"""
+
+EXPLORE_JS = r"""
+<script>
+/* Live count, summary, detail drawer, CSV/summary export, URL-hash state.
+   DOM is built with createElement/textContent only — never innerHTML from a value. */
+(function () {
+  var sect = document.getElementById("rounds");
+  if (!sect) return;
+  var island = document.getElementById("rt-rounds");
+  var DATA = island ? JSON.parse(island.textContent) : [];
+  var byKey = {};
+  DATA.forEach(function (d) { byKey[d.m + "-" + d.r + "-" + d.who] = d; });
+
+  var countEl = document.getElementById("rt-count");
+  var sumEl = document.getElementById("rt-summary");
+  var statusEl = document.getElementById("rt-status");
+
+  function visibleRows() {
+    return Array.prototype.slice.call(sect.querySelectorAll(".rt-tbl tbody tr"))
+      .filter(function (tr) { return tr.offsetParent !== null; });
+  }
+
+  function num(tr, name) {
+    var idx = HEAD_INDEX[name];
+    if (idx === undefined) return NaN;
+    return parseFloat(tr.cells[idx].dataset.v);
+  }
+
+  /* Column name -> cell index. Read from ONE header row: every table shares the
+     same column order, and querying across all of them let the LAST table's
+     indices win, putting every lookup past the end of a row. */
+  var HEAD_INDEX = {};
+  (function () {
+    var firstHead = sect.querySelector(".rt-tbl thead tr");
+    if (!firstHead) return;
+    Array.prototype.forEach.call(firstHead.cells, function (th, i) {
+      HEAD_INDEX[th.textContent.replace(/[\u2195]/g, "").trim()] = i;
+    });
+  })();
+
+  function stat(dl, label, value, sub) {
+    var wrap = document.createElement("div");
+    wrap.className = "rt-stat";
+    var dt = document.createElement("dt");
+    dt.textContent = label;
+    var dd = document.createElement("dd");
+    dd.textContent = value;
+    if (sub) {
+      var small = document.createElement("small");
+      small.textContent = " " + sub;
+      dd.appendChild(small);
+    }
+    wrap.appendChild(dt); wrap.appendChild(dd);
+    dl.appendChild(wrap);
+  }
+
+  function mean(rows, name) {
+    var vals = rows.map(function (r) { return num(r, name); })
+                   .filter(function (v) { return !isNaN(v); });
+    if (!vals.length) return null;
+    return vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+  }
+
+  function refresh() {
+    var rows = visibleRows();
+    var total = sect.querySelectorAll(".rt-tbl tbody tr").length;
+    if (countEl) {
+      countEl.textContent = " 　現正顯示 " + rows.length + " / " + total + " 行。";
+    }
+    if (!sumEl) return;
+    while (sumEl.firstChild) sumEl.removeChild(sumEl.firstChild);
+    var wins = rows.filter(function (r) { return !r.classList.contains("rt-loser"); }).length;
+    stat(sumEl, "行數", rows.length, "/ " + total);
+    stat(sumEl, "贏 / 輸", wins + " / " + (rows.length - wins));
+    var m;
+    if ((m = mean(rows, "APM")) !== null) stat(sumEl, "平均 APM", m.toFixed(1));
+    if ((m = mean(rows, "PPS")) !== null) stat(sumEl, "平均 PPS", m.toFixed(2));
+    if ((m = mean(rows, "VS")) !== null) stat(sumEl, "平均 VS", m.toFixed(1));
+    if ((m = mean(rows, "APP")) !== null) stat(sumEl, "平均 APP", m.toFixed(2));
+    if ((m = mean(rows, "方塊")) !== null) stat(sumEl, "平均方塊", Math.round(m));
+    writeHash();
+  }
+
+  /* ---------------- filters, clear-all, bars, columns ---------------- */
+  function setFilter(name) {
+    sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+    if (name) sect.classList.add(name);
+    Array.prototype.forEach.call(sect.querySelectorAll(".rt-chip[data-filter]"), function (c) {
+      c.setAttribute("aria-pressed", (c.dataset.filter || "") === (name || "") ? "true" : "false");
+    });
+    refresh();
+  }
+  Array.prototype.forEach.call(sect.querySelectorAll(".rt-chip[data-filter]"), function (chip) {
+    chip.addEventListener("click", function () { setFilter(chip.dataset.filter); });
+  });
+  var clearBtn = document.getElementById("rt-clear");
+  if (clearBtn) clearBtn.addEventListener("click", function () { setFilter(""); });
+
+  /* ---------------- detail drawer ---------------- */
+  var drawer = document.getElementById("rt-drawer");
+  var dTitle = document.getElementById("rt-drawer-title");
+  var dSub = document.getElementById("rt-drawer-sub");
+  var dFields = document.getElementById("rt-drawer-fields");
+  var dClears = document.getElementById("rt-drawer-clears");
+  var dTime = document.getElementById("rt-drawer-timeline");
+  var FIELD_LABELS = __FIELD_LABELS__;
+  var CLEAR_LABELS = __CLEAR_LABELS__;
+
+  function kv(host, key, val) {
+    var row = document.createElement("div");
+    var k = document.createElement("span"); k.className = "k"; k.textContent = key;
+    var v = document.createElement("span"); v.className = "v"; v.textContent = val;
+    row.appendChild(k); row.appendChild(v); host.appendChild(row);
+  }
+
+  function clock(ms) {
+    var t = Math.floor(ms / 1000);
+    return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
+  }
+
+  function sparkline(events, dur) {
+    var W = 640, H = 56, pad = 4;
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("class", "rt-spark");
+    svg.setAttribute("role", "img");
+    var maxAmt = events.reduce(function (a, e) { return Math.max(a, e[1]); }, 1);
+    var lastFrame = events.reduce(function (a, e) { return Math.max(a, e[0]); }, 1);
+    var axis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    axis.setAttribute("x1", 0); axis.setAttribute("x2", W);
+    axis.setAttribute("y1", H - pad); axis.setAttribute("y2", H - pad);
+    axis.setAttribute("stroke", "currentColor");
+    axis.setAttribute("stroke-opacity", ".25");
+    svg.appendChild(axis);
+    events.forEach(function (e) {
+      var x = pad + (e[0] / lastFrame) * (W - pad * 2);
+      var h = (e[1] / maxAmt) * (H - pad * 3);
+      var bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bar.setAttribute("x", x.toFixed(1)); bar.setAttribute("width", 3);
+      bar.setAttribute("y", (H - pad - h).toFixed(1)); bar.setAttribute("height", h.toFixed(1));
+      bar.setAttribute("fill", "currentColor"); bar.setAttribute("fill-opacity", ".55");
+      var t = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      t.textContent = e[1] + " 行 @ frame " + e[0];
+      bar.appendChild(t);
+      svg.appendChild(bar);
+    });
+    return svg;
+  }
+
+  function openDrawer(tr) {
+    var table = tr.closest("table");
+    var mLabel = table.dataset.match;
+    var rd = tr.cells[HEAD_INDEX["局"]].textContent.replace("R", "");
+    var who = tr.dataset.who;
+    var d = byKey[mLabel + "-" + rd + "-" + who];
+    if (!d) return;
+    dTitle.textContent = "M" + d.m + " R" + d.r + " · " + d.who + (d.won ? " ✓ 贏" : " 輸");
+    dSub.textContent = "局長 " + clock(d.dur) + " · 結果 " + (d.end || "—");
+    [dFields, dClears, dTime].forEach(function (host) {
+      while (host.firstChild) host.removeChild(host.firstChild);
+    });
+    FIELD_LABELS.forEach(function (pair) {
+      var key = pair[0], label = pair[1], scale = pair[2];
+      if (!(key in d.f)) return;
+      var v = d.f[key];
+      kv(dFields, label, scale === 1000 ? (v / 1000).toFixed(2) : String(v));
+    });
+    CLEAR_LABELS.forEach(function (pair) {
+      if (!(pair[0] in d.c)) return;
+      kv(dClears, pair[1], String(d.c[pair[0]]));
+    });
+    var h5 = document.createElement("h5");
+    var queued = d.ge.reduce(function (a, e) { return a + e[1]; }, 0);
+    h5.textContent = "俾人射埋嚟嘅攻擊：" + d.ge.length + " 次，合共 " + queued +
+      " 行（未計 cancel）";
+    dTime.appendChild(h5);
+    if (d.ge.length) {
+      dTime.appendChild(sparkline(d.ge, d.dur));
+      var note = document.createElement("p");
+      note.className = "rt-hint";
+      note.textContent = "橫軸係時間（frame），每條係一次攻擊，高度係行數。";
+      dTime.appendChild(note);
+    }
+    drawer.classList.add("is-open");
+  }
+
+  Array.prototype.forEach.call(sect.querySelectorAll(".rt-tbl"), function (table) {
+    table.addEventListener("click", function (ev) {
+      if (ev.target.closest("thead")) return;
+      var tr = ev.target.closest("tbody tr");
+      if (tr) openDrawer(tr);
+    });
+  });
+  document.getElementById("rt-drawer-close").addEventListener("click", function () {
+    drawer.classList.remove("is-open");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") drawer.classList.remove("is-open");
+  });
+
+  /* ---------------- export ---------------- */
+  function copyText(text, msg) {
+    function done() { statusEl.textContent = msg; setTimeout(function () {
+      statusEl.textContent = ""; }, 2600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {
+        statusEl.textContent = "複製唔到，請手動選取";
+      });
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (err) { statusEl.textContent = "複製唔到"; }
+      ta.remove();
+    }
+  }
+
+  function visibleCsv() {
+    var heads = Array.prototype.slice.call(sect.querySelectorAll(".rt-tbl thead th"))
+      .map(function (th) { return th.textContent.replace(/[\u2195]/g, "").trim(); });
+    var lines = [["場"].concat(heads).join(",")];
+    Array.prototype.forEach.call(sect.querySelectorAll(".rt-tbl"), function (table) {
+      var mLabel = table.dataset.match;
+      Array.prototype.forEach.call(table.tBodies[0].rows, function (tr) {
+        if (tr.offsetParent === null) return;
+        var cells = Array.prototype.map.call(tr.cells, function (td) {
+          var v = td.dataset.v !== undefined ? td.dataset.v : td.textContent;
+          v = String(v).replace(/\s+/g, " ").trim();
+          return /[",]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        });
+        lines.push(["M" + mLabel].concat(cells).join(","));
+      });
+    });
+    return lines.join("\n");
+  }
+
+  document.getElementById("rt-csv").addEventListener("click", function () {
+    var csv = visibleCsv();
+    copyText(csv, "已複製 " + (csv.split("\n").length - 1) + " 行 CSV");
+  });
+  document.getElementById("rt-sum").addEventListener("click", function () {
+    var rows = visibleRows();
+    var wins = rows.filter(function (r) { return !r.classList.contains("rt-loser"); }).length;
+    var parts = ["顯示 " + rows.length + " 行（贏 " + wins + " / 輸 " + (rows.length - wins) + "）"];
+    [["APM", 1], ["PPS", 2], ["VS", 1], ["APP", 2]].forEach(function (p) {
+      var m = mean(rows, p[0]);
+      if (m !== null) parts.push("平均 " + p[0] + " " + m.toFixed(p[1]));
+    });
+    copyText(parts.join("，"), "已複製摘要");
+  });
+
+  /* ---------------- URL hash state ---------------- */
+  function writeHash() {
+    var bits = [];
+    ["f-win", "f-yachi", "f-pinglamb"].forEach(function (c) {
+      if (sect.classList.contains(c)) bits.push(c);
+    });
+    if (sect.classList.contains("rt-show-all")) bits.push("all");
+    if (sect.classList.contains("rt-nobars")) bits.push("nobars");
+    var h = bits.length ? "#rounds=" + bits.join(",") : "";
+    if (h && location.hash !== h) history.replaceState(null, "", h);
+  }
+  (function readHash() {
+    var m = /#rounds=([a-z,-]+)/.exec(location.hash);
+    if (!m) { refresh(); return; }
+    var bits = m[1].split(",");
+    bits.forEach(function (b) {
+      if (b === "all") {
+        sect.classList.add("rt-show-all");
+        var box = document.getElementById("rt-toggle-all");
+        if (box) box.checked = true;
+      } else if (b === "nobars") {
+        sect.classList.add("rt-nobars");
+        var bb = document.querySelector(".rt-chip[data-bars]");
+        if (bb) bb.setAttribute("aria-pressed", "false");
+      } else if (b.indexOf("f-") === 0) {
+        setFilter(b);
+      }
+    });
+    refresh();
+  })();
+})();
+</script>
 """
 
 SORT_JS = """
@@ -417,6 +748,54 @@ def findings(report_dir):
     return out
 
 
+DETAIL_FIELDS = [
+    ("apm_x1000", "APM", 1000), ("pps_x1000", "PPS", 1000), ("vs_x1000", "VS", 1000),
+    ("pieces", "方塊", 1), ("lines", "清行", 1), ("inputs", "按鍵", 1),
+    ("holds", "hold", 1), ("kills", "KO", 1),
+    ("garbage_attack", "攻擊", 1), ("garbagesent", "送出", 1),
+    ("garbagereceived", "食垃圾", 1), ("garbage_cleared", "清垃圾", 1),
+    ("maxspike", "最大 spike", 1), ("maxspike_nomult", "spike(無倍率)", 1),
+    ("garbage_sent_raw", "送出(原始)", 1), ("garbage_sent_nomult", "送出(無倍率)", 1),
+    ("topbtb", "B2B", 1), ("topcombo", "combo", 1), ("tspins", "T-spin", 1),
+    ("finesse_perfect", "完美擺放", 1), ("finesse_faults", "finesse 失誤", 1),
+    ("finesse_combo", "finesse 連續", 1),
+    ("score", "分數", 1), ("combo_power", "combo power", 1),
+    ("btb_power", "B2B power", 1), ("finaltime_ms", "引擎時長(ms)", 1),
+]
+CLEAR_FIELDS = [
+    ("singles", "single"), ("doubles", "double"), ("triples", "triple"),
+    ("quads", "quad"), ("pentas", "penta"),
+    ("tspin_singles", "TSS"), ("tspin_doubles", "TSD"), ("tspin_triples", "TST"),
+    ("tspin_quads", "TSQ"), ("mini_tspin_singles", "mini TSS"),
+    ("mini_tspin_doubles", "mini TSD"), ("mini_tspin_triples", "mini TST"),
+    ("real_tspins", "真 T-spin"), ("mini_tspins", "mini T-spin"),
+    ("allclear", "Perfect Clear"),
+]
+
+
+def detail_payload(facts):
+    """Per-round records for the drawer, including the frame-stamped attack timeline.
+
+    The table can only show a total for queued attack; the drawer is where the
+    timeline actually lives, which is the point of keeping the events in facts.json.
+    """
+    out = []
+    for mi, m in enumerate(facts["matches"]):
+        for ri, r in enumerate(m["rounds"]):
+            dur = max(d["lifetime"] for d in r["players"].values())
+            for pl, p in r["players"].items():
+                out.append({
+                    "m": mi + 1, "r": ri + 1, "who": pl,
+                    "won": r["winner"] == pl, "dur": dur,
+                    "end": p.get("gameoverreason", ""),
+                    "f": {k: p[k] for k, _lab, _s in DETAIL_FIELDS if k in p},
+                    "c": {k: p["clears"][k] for k, _lab in CLEAR_FIELDS
+                          if k in p["clears"]},
+                    "ge": [[g["frame"], g["amt"]] for g in p["garbage_events"]],
+                })
+    return out
+
+
 def build(facts, report_dir=None):
     p1, p2 = facts["players"]
     ranges = bar_ranges(facts)
@@ -457,7 +836,14 @@ def build(facts, report_dir=None):
             out.append(f'        <div class="rt-cid">{c["id"]} · {tick}</div>')
             out.append('      </div>')
         out.append('    </div>')
+    nrounds = sum(len(m["rounds"]) for m in facts["matches"])
+    nrows = nrounds * 2
+    last_ts = facts["matches"][-1]["ts"][:10] if facts["matches"][-1].get("ts") else ""
     out += [
+        f'    <p class="rt-meta">全部 <b>{nrounds}</b> 局（<b>{nrows}</b> 行，一局兩行）'
+        f'都焗死喺呢個檔案裏面 —— 篩選只係改你睇到嘅範圍，唔會改檔案內容。'
+        f'{"資料截至 " + last_ts + "。" if last_ts else ""}'
+        f'<span id="rt-count"></span></p>',
         '    <div class="rt-controls">',
         '      <button class="rt-chip" data-filter="" aria-pressed="true">全部局</button>',
         '      <button class="rt-chip" data-filter="f-win" aria-pressed="false">只睇贏嘅一方</button>',
@@ -467,7 +853,12 @@ def build(facts, report_dir=None):
         '      <label class="rt-toggle" style="margin:0">'
         '<input type="checkbox" id="rt-toggle-all">'
         f'全部 {len(COLUMNS) + 3} 欄</label>',
+        '      <button class="rt-chip" id="rt-clear">清空篩選</button>',
+        '      <button class="rt-chip" id="rt-csv">複製 CSV</button>',
+        '      <button class="rt-chip" id="rt-sum">複製摘要</button>',
+        '      <span class="rt-status" id="rt-status"></span>',
         '    </div>',
+        '    <dl class="rt-summary" id="rt-summary"></dl>',
         f'    <p class="rt-hint" style="margin:-.6rem 0 1rem">APM／VS／APP／攻 嘅長條'
         '按全 session 同一把尺畫，所以跨場都可以直接比。</p>',
     ]
@@ -487,7 +878,7 @@ def build(facts, report_dir=None):
                    f'{r1(lb[p2]["vs_x1000"])} &nbsp;(APM/PPS/VS)</span>')
         out.append('      </div>')
         out.append('      <div class="rt-scroll">')
-        out.append('        <table class="rt-tbl">')
+        out.append(f'        <table class="rt-tbl" data-match="{mi + 1}">')
         out.append('          <thead><tr>')
         ARROW = '<span class="rt-arrow">↕</span>'
         out.append(f'            <th class="c-rd" title="round number">局{ARROW}</th>'
@@ -533,6 +924,15 @@ def build(facts, report_dir=None):
                         cls.append("rt-opt")
                     if val in ("0", "–"):
                         cls.append("rt-zero")
+                    # data-v carries the raw value so sorting and the summary means are
+                    # numeric, not textual ("10" must not sort before "9"). It MUST be
+                    # computed before any markup is wrapped around the value, or the
+                    # sort key becomes the markup itself.
+                    raw = val.replace(",", "").replace("%", "")
+                    try:
+                        key_v = str(float(raw))
+                    except ValueError:
+                        key_v = val
                     style = ""
                     if label in BAR_COLS and label in ranges:
                         lo, hi = ranges[label]
@@ -544,13 +944,6 @@ def build(facts, report_dir=None):
                             val = f"<span>{val}</span>"
                     attr = f' class="{" ".join(cls)}"' if cls else ""
                     attr += style
-                    # data-v carries the raw value so sorting is numeric, not textual
-                    # ("10" must not sort before "9", "1,234" must beat "999")
-                    raw = val.replace(",", "").replace("%", "")
-                    try:
-                        key_v = str(float(raw))
-                    except ValueError:
-                        key_v = val
                     out.append(f'              <td{attr} data-v="{key_v}">{val}</td>')
                 out.append('            </tr>')
         out.append('          </tbody>')
@@ -558,7 +951,31 @@ def build(facts, report_dir=None):
         out.append('      </div>')
         out.append('      <p class="rt-hint">← 左右拉睇齊全部欄 · 點欄名可以排序 →</p>')
         out.append('    </div>')
-    out += ['  </div>', SORT_JS, '</section>', END]
+    out += [
+        '    <aside class="rt-drawer" id="rt-drawer" aria-live="polite">',
+        '      <div class="rt-drawer-head">',
+        '        <h4 id="rt-drawer-title"></h4>',
+        '        <span class="rt-hint" id="rt-drawer-sub"></span>',
+        '        <button class="rt-close" id="rt-drawer-close">關閉 ✕</button>',
+        '      </div>',
+        '      <div class="rt-fields" id="rt-drawer-fields"></div>',
+        '      <div class="rt-fields" id="rt-drawer-clears"></div>',
+        '      <div class="rt-timeline" id="rt-drawer-timeline"></div>',
+        '    </aside>',
+        '  </div>',
+        '<script type="application/json" id="rt-rounds">'
+        + json.dumps(detail_payload(facts), ensure_ascii=False, separators=(",", ":"))
+        + '</script>',
+        SORT_JS,
+        (EXPLORE_JS
+         .replace("__FIELD_LABELS__",
+                  json.dumps([[k, lab, sc] for k, lab, sc in DETAIL_FIELDS],
+                             ensure_ascii=False))
+         .replace("__CLEAR_LABELS__",
+                  json.dumps([[k, lab] for k, lab in CLEAR_FIELDS],
+                             ensure_ascii=False))),
+        '</section>', END,
+    ]
     return "\n".join(out) + "\n"
 
 
