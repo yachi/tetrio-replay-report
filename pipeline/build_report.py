@@ -9,41 +9,49 @@ so it is idempotent and safe to re-run over a report someone has edited around.
 
 Sections handled so far:
 
+  hero         the eyebrow, headline, scoreboard and lede. Numbers (date, names,
+               series score) come from facts.json; the Cantonese comes from
+               `<report_dir>/prose/hero.json`.
   chart-data   the JSON island every chart reads — per-match scoreboard, the VS
                small multiples, clear-type bars, the tape chart, match boundaries.
 
 `--check` regenerates in memory and exits non-zero if the committed report differs,
-which is what CI runs: the charts and facts.json cannot drift apart unnoticed.
+which is what CI runs: the report and facts.json cannot drift apart unnoticed.
 """
 import argparse
 import json
 import os
 import sys
 
-from pipeline import chart_data, region
-
-CHART_START, CHART_END = region.markers("chart-data", "pipeline/build_report.py")
-# The island must precede the claims island, which is where the page's inline
-# script starts reading data from.
-CHART_ANCHOR = "<!-- CLAIMS_DATA_START -->"
+from pipeline import chart_data, hero, region
 
 
-def chart_section(facts):
-    blob = json.dumps(chart_data.build(facts), ensure_ascii=False,
+def chart_section(ctx):
+    blob = json.dumps(chart_data.build(ctx["facts"]), ensure_ascii=False,
                       separators=(",", ":"))
     return ('<script type="application/json" id="chart-data">\n'
             f"{blob}\n"
             "</script>")
 
 
-SECTIONS = [("chart-data", CHART_START, CHART_END, CHART_ANCHOR, chart_section)]
+def hero_section(ctx):
+    return hero.build(ctx["facts"], hero.load_prose(ctx["report_dir"]),
+                      ctx["report_dir"])
 
 
-def render(html, facts):
+# (name, anchor to insert before when the region is absent, builder)
+# The chart island must precede the claims island, which is where the page's
+# inline script starts reading data from; the hero opens the document body.
+SECTIONS = [("hero", '<section id="matches">', hero_section),
+            ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section)]
+
+
+def render(html, ctx):
     """Apply every generated section to `html`. Returns (html, [(name, how)])."""
     applied = []
-    for name, start, end, anchor, build in SECTIONS:
-        html, how = region.replace(html, start, end, build(facts), anchor)
+    for name, anchor, build in SECTIONS:
+        start, end = region.markers(name, "pipeline/build_report.py")
+        html, how = region.replace(html, start, end, build(ctx), anchor)
         applied.append((name, how))
     return html, applied
 
@@ -58,11 +66,12 @@ def main(argv=None):
 
     with open(os.path.join(args.report_dir, "facts.json"), encoding="utf-8") as fh:
         facts = json.load(fh)
+    ctx = {"facts": facts, "report_dir": args.report_dir}
     report_path = os.path.join(args.report_dir, "report.html")
     with open(report_path, encoding="utf-8") as fh:
         before = fh.read()
 
-    after, applied = render(before, facts)
+    after, applied = render(before, ctx)
 
     if args.check:
         if after != before:
@@ -80,7 +89,7 @@ def main(argv=None):
         print(f"{how}: {name} -> {report_path}")
     # Re-running must be a no-op; proving it here costs nothing and is the whole
     # reason the sections are marker-scoped.
-    again, _ = render(after, facts)
+    again, _ = render(after, ctx)
     if again != after:
         print("BUG: build_report is not idempotent", file=sys.stderr)
         return 1

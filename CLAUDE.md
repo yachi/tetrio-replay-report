@@ -109,10 +109,15 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
    (appendix row builder, match-card score, badge-prose expander). No live risk — all values
    come from this pipeline — but they violate the skill's XSS rule. Needs one focused change
    with the 110 badge count and 52 appendix rows re-verified after.
-2. ROADMAP P5, in progress. The `chart-data` island is generated (`pipeline/build_report.py`,
-   CI-gated with `--check`). Still hand-written: the hero/scoreboard markup, the match-card and
-   coaching prose, and the appendix builder. Add each as a new entry in `SECTIONS`; the marker
-   region and the drift gate come for free.
+2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
+   `--check`): the `chart-data` island and the hero/scoreboard. Still hand-built: the match
+   cards, the coaching section and the appendix. Add each as a new entry in `SECTIONS`; the
+   marker region and the drift gate come for free.
+
+   The hero split is the pattern the rest of P5 follows: numbers from `facts.json`, words from
+   `<report_dir>/prose/hero.json`. Prose is inserted as raw HTML because it legitimately
+   contains `<span class="hl-y">` and badge spans — derived values are escaped, prose is
+   trusted, and `load_prose` runs the same simplified-glyph check as the claim generator.
 3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
    It is a cross-check, not a published report — every fact in it is covered by that session's
    full report. Keep it gated by CI; do not resurrect it onto the site.

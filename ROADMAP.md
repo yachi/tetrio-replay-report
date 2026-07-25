@@ -186,9 +186,26 @@ Validation, in the same style as P4:
 * both reports were re-rendered in a browser: 10/7 match cards, 10/7 small multiples, both
   charts, 110 badges, 54/52 appendix rows, 158/100 round rows, no console errors
 
+**Shipped (2026-07-25): the hero and scoreboard**, and with it the prose split the rest of P5
+follows. `pipeline/hero.py` derives the date, both player names and the series score from
+`facts.json`; the headline, taglines, lede and the optional eyebrow kicker come from
+`<report_dir>/prose/hero.json`. Derived values are HTML-escaped; prose is inserted raw because
+it legitimately carries `<span class="hl-y">`, `<strong>` and badge spans.
+
+Validation:
+* both committed heroes were *extracted* into prose files and regenerated **byte-for-byte** —
+  the migration only wrote a prose file where the round-trip was exact, so no prose was
+  silently rewritten. The reports' only diff is the two marker lines.
+* five adversarial probes, all caught: hero drift vs the committed report, a simplified glyph
+  in prose, an empty prose field, a missing prose file, and a session whose replay timestamps
+  disagree with the directory it was dropped into
+* both heroes re-rendered in a browser: one `.hero`, correct eyebrow (including 07-24's
+  第二回合 kicker), score in player order (6:4 / 3:4), taglines, and every badge resolving
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
-1. hero + scoreboard (needs a per-session prose file for the title/tagline/lede, which is the
-   design decision the rest of P5 rests on)
-2. match cards — the `match-copy` island, which is prose keyed by match index
-3. appendix — folds in the three `innerHTML` sites, since the generator can build those rows
+1. match cards — the `match-copy` island, which is prose keyed by match index; the same
+   facts/prose split, with per-match scores and win sequences derived
+2. appendix — folds in the three `innerHTML` sites, since the generator can build those rows
    with `textContent` instead of string concatenation
+3. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
+   expecting one to be copied from a previous session
