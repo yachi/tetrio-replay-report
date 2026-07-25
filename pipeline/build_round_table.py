@@ -42,9 +42,10 @@ CSS = """
   background: var(--bg-raised); -webkit-overflow-scrolling: touch; }
 table.rt-tbl { border-collapse: separate; border-spacing: 0; width: max-content;
   min-width: 100%; font-variant-numeric: tabular-nums; font-size: .74rem; }
-table.rt-tbl th, table.rt-tbl td { padding: .3rem .5rem; text-align: right;
+table.rt-tbl th, table.rt-tbl td { padding: .42rem .6rem; text-align: right;
   white-space: nowrap; border-bottom: 1px solid var(--border); }
-table.rt-tbl thead th { position: sticky; top: 0; z-index: 3;
+table.rt-tbl thead th { position: sticky; top: 0; z-index: 3; cursor: pointer;
+  user-select: none;
   background: var(--bg-sunken); font-family: var(--font-mono); font-size: .66rem;
   font-weight: 700; letter-spacing: .04em; color: var(--ink-secondary);
   text-transform: uppercase; border-bottom: 1px solid var(--border-strong); }
@@ -75,6 +76,26 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   background-color: var(--bg-raised);
   background-image: linear-gradient(var(--pinglamb-tint-strong), var(--pinglamb-tint-strong)); }
 .rt-tbl tr.rt-loser td { color: var(--ink-secondary); }
+/* Hover layer. A 28-column lookup table is unreadable without one: the eye loses
+   the row between the pinned name and the column it is reading. */
+.rt-tbl tbody tr:hover td { background-image:
+  linear-gradient(var(--bg-sunken), var(--bg-sunken)); }
+.rt-tbl tbody tr:hover .c-rd, .rt-tbl tbody tr:hover .c-time,
+.rt-tbl tbody tr:hover .c-who { background-image:
+  linear-gradient(var(--bg-sunken), var(--bg-sunken)); }
+/* Identity is a coloured dot plus ink-coloured text, not coloured text: a name
+   painted in the series colour is colour-as-information and reads worse. */
+.rt-dot { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%;
+  margin-right: .35rem; vertical-align: baseline; }
+.rt-dot.is-y { background: var(--yachi); }
+.rt-dot.is-p { background: var(--pinglamb); }
+.rt-tbl .c-who { color: var(--ink); }
+/* sort affordance */
+.rt-tbl thead th .rt-arrow { opacity: .25; margin-left: .25rem; font-size: .85em; }
+.rt-tbl thead th[aria-sort="ascending"] .rt-arrow,
+.rt-tbl thead th[aria-sort="descending"] .rt-arrow { opacity: 1; color: var(--accent); }
+.rt-tbl thead th:hover { color: var(--ink); }
+.rt-oddgroup td { border-bottom-color: var(--border); }
 .rt-tbl td.rt-key { font-weight: 700; color: var(--ink); }
 .rt-tbl td.c-end { text-align: left; font-family: var(--font-mono); font-size: .68rem;
   color: var(--muted); }
@@ -102,6 +123,44 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-card p { margin: .35rem 0 0; font-size: .82rem; line-height: 1.65; }
 .rt-card .rt-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 </style>
+"""
+
+SORT_JS = """
+<script>
+/* Click a column header to sort that match's rounds by it; click again to reverse;
+   a third click restores the original round order. Self-contained, no libraries. */
+(function () {
+  document.querySelectorAll("table.rt-tbl").forEach(function (table) {
+    var body = table.tBodies[0];
+    var heads = Array.prototype.slice.call(table.querySelectorAll("thead th"));
+    heads.forEach(function (th, idx) {
+      th.addEventListener("click", function () {
+        var state = th.getAttribute("aria-sort");
+        var next = state === "descending" ? "ascending"
+                 : state === "ascending" ? "none" : "descending";
+        heads.forEach(function (h) { h.removeAttribute("aria-sort"); });
+        var rows = Array.prototype.slice.call(body.rows);
+        if (next === "none") {
+          rows.sort(function (a, b) {
+            return (+a.dataset.order) - (+b.dataset.order);
+          });
+        } else {
+          th.setAttribute("aria-sort", next);
+          var dir = next === "ascending" ? 1 : -1;
+          rows.sort(function (a, b) {
+            var x = a.cells[idx].dataset.v, y = b.cells[idx].dataset.v;
+            var nx = parseFloat(x), ny = parseFloat(y);
+            var cmp = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : String(x).localeCompare(String(y));
+            /* stable: fall back to the original order so equal values keep round order */
+            return cmp !== 0 ? cmp * dir : (+a.dataset.order) - (+b.dataset.order);
+          });
+        }
+        rows.forEach(function (r) { body.appendChild(r); });
+      });
+    });
+  });
+})();
+</script>
 """
 
 # (header label, title/explanation) — order defines the columns after the pinned three
@@ -301,11 +360,13 @@ def build(facts, report_dir=None):
         out.append('      <div class="rt-scroll">')
         out.append('        <table class="rt-tbl">')
         out.append('          <thead><tr>')
-        out.append('            <th class="c-rd">局</th>'
-                   '<th class="c-time">時間</th><th class="c-who">玩家</th>')
+        ARROW = '<span class="rt-arrow">↕</span>'
+        out.append(f'            <th class="c-rd" title="round number">局{ARROW}</th>'
+                   f'<th class="c-time" title="round length">時間{ARROW}</th>'
+                   f'<th class="c-who" title="player">玩家{ARROW}</th>')
         for label, title in COLUMNS:
             cls = ' class="c-end"' if label == "結果" else ""
-            out.append(f'            <th{cls} title="{title}">{label}</th>')
+            out.append(f'            <th{cls} title="{title}">{label}{ARROW}</th>')
         out.append('          </tr></thead>')
         out.append('          <tbody>')
         for ri, r in enumerate(m["rounds"]):
@@ -320,13 +381,15 @@ def build(facts, report_dir=None):
                     classes.append("rt-loser")
                 if n == 1:
                     classes.append("rt-round-end")
-                out.append(f'            <tr class="{" ".join(classes)}">')
-                if n == 0:
-                    out.append(f'              <td class="c-rd" rowspan="2">R{ri + 1}</td>')
-                    out.append(f'              <td class="c-time" rowspan="2">{fmt_clock(dur)}</td>')
-                colour = "rt-y" if pl == p1 else "rt-p"
+                out.append(f'            <tr class="{" ".join(classes)}" data-order="{ri * 2 + n}">')
+                # Every row repeats 局 and 時間 instead of using rowspan: rowspan would
+                # pin the pairs together and make the table unsortable.
+                out.append(f'              <td class="c-rd" data-v="{ri}">R{ri + 1}</td>')
+                out.append(f'              <td class="c-time" data-v="{dur}">{fmt_clock(dur)}</td>')
+                dot = "is-y" if pl == p1 else "is-p"
                 mark = ' <span class="rt-win-mark">✓</span>' if won else ""
-                out.append(f'              <td class="c-who"><span class="{colour}">{pl}</span>{mark}</td>')
+                out.append(f'              <td class="c-who" data-v="{pl}">'
+                           f'<span class="rt-dot {dot}"></span>{pl}{mark}</td>')
                 for (val, key), (label, _t) in zip(cells(p, won), COLUMNS):
                     cls = []
                     if label == "結果":
@@ -336,14 +399,21 @@ def build(facts, report_dir=None):
                     if val in ("0", "–"):
                         cls.append("rt-zero")
                     attr = f' class="{" ".join(cls)}"' if cls else ""
-                    out.append(f'              <td{attr}>{val}</td>')
+                    # data-v carries the raw value so sorting is numeric, not textual
+                    # ("10" must not sort before "9", "1,234" must beat "999")
+                    raw = val.replace(",", "").replace("%", "")
+                    try:
+                        key_v = str(float(raw))
+                    except ValueError:
+                        key_v = val
+                    out.append(f'              <td{attr} data-v="{key_v}">{val}</td>')
                 out.append('            </tr>')
         out.append('          </tbody>')
         out.append('        </table>')
         out.append('      </div>')
-        out.append('      <p class="rt-hint">← 表可以左右拉睇齊全部欄 →</p>')
+        out.append('      <p class="rt-hint">← 左右拉睇齊全部欄 · 點欄名可以排序 →</p>')
         out.append('    </div>')
-    out += ['  </div>', '</section>', END]
+    out += ['  </div>', SORT_JS, '</section>', END]
     return "\n".join(out) + "\n"
 
 
