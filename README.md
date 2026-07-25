@@ -80,43 +80,73 @@ CI runs exactly this on every push, so the badge above is not decorative.
 ## Repository layout
 
 ```
+pipeline/
+  extract.py, extract2.ts      independent extractors -> facts.json / facts2.json
+  claims/spec.py               predicate algebra -> Python and Dafny renderers
+  claims/generators.py         32 claim families
+  claims/build_claims.py       facts.json -> claims-generated.json
+  claims/equiv.py              exhaustive-mutation coverage measurement
+  codegen.py                   facts + claims -> Facts.dfy + Claims.dfy
+  build_proof_map.py           verifier output -> proof map (never optimistic)
+  mutation_test.sh             anti-vacuity gate, with an escalating operator
 sessions/<date>/
-  *.ttrm                    raw replays, untouched
+  *.ttrm                       raw replays, untouched
   report/
-    extract.py, extract2.ts independent extractors  → facts.json / facts2.json
-    claims-narrative.json   戰況 claims  (C0xx)
-    claims-coaching.json    建議 claims  (R0xx)
-    check_claims.py         predicate gate
-    codegen_dafny.py        claims + facts → Dafny (zero hand-typed data)
-    dafny/*.dfy             generated: flat scalar consts + one lemma per claim
-    mutation_test.sh        anti-vacuity gate
-    gen_consistency.sh      codegen byte-identity gate
-    build_proof_map.py      verifier output → claims-proof-map.json
-    build_appendix.py       claims + proof map → report appendix
-    report.html             the deliverable, self-contained
-    narrative-beats.md      Cantonese prose source
-    recommendations.md      coaching prose source
-    review-phase2.md        adversarial review of the claim ledgers
-    audit-phase5.md         adversarial audit of the finished report
-tools/analyzer.html         drop in a .ttrm, get an instant report (runs locally)
-bin/verify-session          re-run every gate for one artefact
-bin/build-docs              regenerate the GitHub Pages site from the sessions
-docs/                       the published site
+    facts.json / facts2.json   the two extractors' output, which must match
+    claims-generated.json      generated ledger (canto + predicate + spec)
+    claims-narrative.json      hand-written 戰況 claims  (C0xx)
+    claims-coaching.json       hand-written 建議 claims  (R0xx)
+    dafny/*.dfy                one lemma per claim
+    claims-proof-map.json      what the verifier actually proved
+    report.html                the deliverable, self-contained
+    narrative-beats.md         Cantonese prose source
+    recommendations.md         coaching prose source
+    review-phase2.md           adversarial review of the ledgers
+    audit-phase5.md            adversarial audit of the finished report
+tools/analyzer.html            drop in a .ttrm, get an instant report (runs locally)
+bin/new-session                replays in, verified ledger and proofs out
+bin/verify-session             re-run every gate for one artefact
+bin/build-docs                 regenerate the Pages site from the sessions
+docs/                          the published site
 ```
 
-## Adding a session today
+## Adding a session
 
-1. Drop the `.ttrm` batch into `sessions/<date>/`.
-2. Copy `report/` from the most recent session and point the extractors at the new files.
-3. Write the claim ledgers, generate Dafny, and run `bin/verify-session` until green.
-4. Write the prose, build the report, and run `bin/build-docs`.
+```bash
+bin/new-session sessions/2026-08-01 ~/Downloads/replay-batch
+```
 
-Steps 2–3 are still more manual than they should be — see
-**[ROADMAP.md](ROADMAP.md)**, whose whole point is collapsing them into one command by
-turning the recurring claim families into generators. About 85% of the claims across the
-two existing sessions are the same handful of shapes (series and per-match scores, sweeps,
-session superlatives, streaks, comeback-under-pressure, per-player aggregates, variance),
-so they can be generated instead of hand-written.
+That extracts the batch twice and compares, generates the claim ledger, generates the
+Dafny, verifies it, and records the proof map — failing at the first gate that does not
+hold. Then write the Cantonese prose against the generated ledger, add hand-written
+claims for whatever is genuinely unique about the session, and run `bin/build-docs`.
+
+### How the claims are generated
+
+A **claim family** locates its own instances in whatever session it is handed — argmax
+for superlatives, a scan for streaks, cross-multiplied ratios for per-piece rates — and
+builds a **spec**, not a predicate string. `pipeline/claims/spec.py` renders that spec to
+a Python predicate *and* to a Dafny `ensures` clause, so the statement that is checked
+and the statement that is proved cannot drift apart. 32 families currently cover the
+recurring shapes: series and per-match scores, sweeps and shutouts, deciders, streaks
+(disclosing any match boundary they cross), session superlatives, per-player ceilings,
+comebacks under queued and materialised pressure, cancellation, per-piece rates, clear
+mix, integer variance, and situational records.
+
+Coverage is measured rather than asserted. Comparing predicates as strings tells you
+nothing, since every predicate is true of the real data, so
+`pipeline/claims/equiv.py` applies **every single-value mutation** of the dataset
+(4,440 sites for the 7-match session; 7,019 for the 10-match one) and only counts a
+hand-written claim as covered when a generated claim cannot be true unless it is:
+
+| Session | Hand-written claims covered |
+|---|---|
+| 2026-07-22 | 45 of 53 testable — **85%** |
+| 2026-07-24 | 48 of 49 testable — **98%** |
+
+Claims that no single mutation can falsify are reported separately rather than counted.
+The remainder stay hand-written, which is the point: generation handles the recurring
+shapes so attention goes to whatever was actually interesting about that night.
 
 ## Data notes
 
