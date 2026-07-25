@@ -23,7 +23,7 @@ Wording rules encoded here on purpose, because each one was a review finding onc
 * traditional characters only (build_claims.py asserts this)
 """
 
-from .spec import (add, all_rounds, c_str, le, between, c_and, c_dur, c_field, c_winner,
+from .spec import (add, all_rounds, c_str, le, lt, sum_round_where, between, c_and, c_dur, c_field, c_winner,
                   count_matches_margin, sum_lb,
                   c_winner_gt_loser, conj, count_matches_won, count_rounds,
                   count_rounds_won, eq, gt, lb, lit, match_winner, mul, rnd,
@@ -1021,3 +1021,144 @@ def spike_multiplier_effect(facts):
                          eq(sum_round(pl, "garbage_sent_nomult"), lit(raw))),
         })
     return out
+
+
+# --------------------------------------------------------------------------- #
+# per-piece rates split by outcome — does the rate actually predict winning?
+# --------------------------------------------------------------------------- #
+# APP (attack per piece), KPP (keypresses per piece) and DS (garbage cleared per
+# piece) are the rates a coach cares about, but a session total only says who was
+# higher overall. The useful question is whether a player's OWN rate moves between
+# the rounds they won and the rounds they lost. All comparisons are cross-multiplied
+# so they stay exact integer arithmetic.
+
+_RATES = [
+    ("garbage_attack", "APP", "每粒方塊打出嘅攻擊", "attack per piece"),
+    ("inputs", "KPP", "每粒方塊要按幾多下", "keypresses per piece"),
+    ("garbage_cleared", "DS", "每粒方塊清走幾多垃圾", "garbage cleared per piece"),
+]
+
+
+def _rate_x1000(facts, pl, f, won):
+    """The player's rate over the rounds they won (or lost), x1000."""
+    num = den = 0
+    for _, _, r in _rounds(facts):
+        if (r["winner"] == pl) != won:
+            continue
+        num += r["players"][pl][f]
+        den += r["players"][pl]["pieces"]
+    return ((num * 1000) // den if den else 0), num, den
+
+
+@family
+def rate_by_outcome(facts):
+    """For each player and each rate: is it higher in the rounds they won?"""
+    out = []
+    for f, short, phrase, gloss in _RATES:
+        for pl in _players(facts):
+            other = [p for p in _players(facts) if p != pl][0]
+            rw, nw, dw = _rate_x1000(facts, pl, f, True)
+            rl, nl, dl = _rate_x1000(facts, pl, f, False)
+            if not dw or not dl or rw == rl:
+                continue
+            gap = abs(rw - rl)
+            # The threshold has to be RELATIVE. KPP sits around 3.6 and DS around
+            # 0.19, so one absolute cutoff either dismisses real DS differences as
+            # noise or promotes KPP rounding into a finding.
+            base = min(rw, rl) or 1
+            gap_pct = (gap * 100) // base
+            # numerator/denominator sums restricted to won and lost rounds
+            n_won = sum_round_where(pl, f, c_winner(pl))
+            p_won = sum_round_where(pl, "pieces", c_winner(pl))
+            n_lost = sum_round_where(pl, f, c_winner(other))
+            p_lost = sum_round_where(pl, "pieces", c_winner(other))
+
+            if gap_pct < 5:
+                # A gap this small is not a lever — say so instead of dressing it up
+                # as a finding. Proved as a bound on the cross-multiplied difference.
+                bound = gap + 10
+                bigger = (mul(n_lost, p_won) if rl > rw else mul(n_won, p_lost))
+                smaller = (mul(n_won, p_lost) if rl > rw else mul(n_lost, p_won))
+                out.append({
+                    "family": f"rate_flat_{f}", "category": "finesse",
+                    "canto": f"{pl} 嘅 {short}（{phrase}）贏局同輸局幾乎一樣，"
+                             f"差距唔夠 {bound / 1000:.2f}（即係唔到 {gap_pct + 1}%），"
+                             f"所以 {short} 唔係佢輸贏嘅關鍵",
+                    "english_gloss": (f"{pl}'s {gloss} barely differs between rounds won "
+                                      f"and lost (under {bound / 1000:.2f}, "
+                                      f"~{gap_pct}%) — not the lever"),
+                    "spec": lt(mul(sub(bigger, smaller), lit(1000)),
+                               mul(lit(bound), mul(p_won, p_lost))),
+                })
+            else:
+                higher_when_winning = rw > rl
+                verb = "高" if higher_when_winning else "低"
+                read = ("即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊"
+                        if higher_when_winning and f == "garbage_attack" else
+                        "贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到"
+                        if higher_when_winning and f == "garbage_cleared" else
+                        "輸嘅局清得更多，即係一路捱打、淨係顧住清垃圾"
+                        if not higher_when_winning and f == "garbage_cleared" else
+                        "輸嘅時候手法反而更亂" if not higher_when_winning and f == "inputs" else
+                        "值得留意")
+                out.append({
+                    "family": f"rate_split_{f}", "category":
+                        ("attack" if f == "garbage_attack" else
+                         "finesse" if f == "inputs" else "style"),
+                    "canto": f"{pl} 贏嘅局嘅 {short}（{phrase}）約 {rw / 1000:.2f}，"
+                             f"輸嘅局約 {rl / 1000:.2f}，"
+                             f"贏局{verb}咗大約 {gap_pct}% —— {read}",
+                    "english_gloss": (f"{pl}'s {gloss}: {rw / 1000:.3f} in rounds won vs "
+                                      f"{rl / 1000:.3f} in rounds lost"),
+                    "spec": (gt(mul(n_won, p_lost), mul(n_lost, p_won))
+                             if higher_when_winning
+                             else gt(mul(n_lost, p_won), mul(n_won, p_lost))),
+                })
+    return out
+
+
+@family
+def app_decides_rounds(facts):
+    """Both players' APP rises in the rounds they win — the cross-player read."""
+    hits = []
+    for pl in _players(facts):
+        rw, _, dw = _rate_x1000(facts, pl, "garbage_attack", True)
+        rl, _, dl = _rate_x1000(facts, pl, "garbage_attack", False)
+        if dw and dl and rw > rl:
+            hits.append(pl)
+    if len(hits) != len(_players(facts)):
+        return []
+    parts = []
+    for pl in hits:
+        other = [p for p in _players(facts) if p != pl][0]
+        parts.append(gt(mul(sum_round_where(pl, "garbage_attack", c_winner(pl)),
+                            sum_round_where(pl, "pieces", c_winner(other))),
+                        mul(sum_round_where(pl, "garbage_attack", c_winner(other)),
+                            sum_round_where(pl, "pieces", c_winner(pl)))))
+    return [{
+        "family": "app_decides_rounds", "category": "attack",
+        "canto": "兩個人都一樣：贏嘅局嘅 APP 高過輸嘅局。"
+                 "呢個 session 決定一局嘅唔係手速，而係每粒方塊嘅傷害",
+        "english_gloss": ("both players' attack per piece is higher in the rounds they "
+                          "won than in the rounds they lost"),
+        "spec": conj(*parts),
+    }]
+
+
+@family
+def ds_session_comparison(facts):
+    """Session-level downstack rate — who spends more of each piece on defence."""
+    a, b = _players(facts)
+    ca, cb = _tot(facts, a, "garbage_cleared"), _tot(facts, b, "garbage_cleared")
+    pa, pb = _tot(facts, a, "pieces"), _tot(facts, b, "pieces")
+    if ca * pb == cb * pa:
+        return []
+    hi, lo = (a, b) if ca * pb > cb * pa else (b, a)
+    return [{
+        "family": "ds_session", "category": "style",
+        "canto": f"全 session 計每粒方塊清走幾多垃圾（DS）：{hi} 高過 {lo}，"
+                 f"即係 {hi} 花多啲方塊落喺守同清垃圾上面",
+        "english_gloss": f"session downstack per piece: {hi} higher than {lo}",
+        "spec": gt(mul(sum_round(hi, "garbage_cleared"), sum_round(lo, "pieces")),
+                   mul(sum_round(lo, "garbage_cleared"), sum_round(hi, "pieces"))),
+    }]

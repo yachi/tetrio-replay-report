@@ -5828,5 +5828,577 @@
   },
   "id": "G068",
   "python_check": "(sum(r['players']['pinglamb']['garbage_sent_raw'] for m in facts['matches'] for r in m['rounds']) == 2355) and (sum(r['players']['pinglamb']['garbage_sent_nomult'] for m in facts['matches'] for r in m['rounds']) == 2344)"
+ },
+ {
+  "family": "rate_split_garbage_attack",
+  "category": "attack",
+  "canto": "yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.66，輸嘅局約 0.56，贏局高咗大約 17% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
+  "english_gloss": "yachi's attack per piece: 0.659 in rounds won vs 0.561 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   }
+  },
+  "id": "G069",
+  "python_check": "((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))"
+ },
+ {
+  "family": "rate_split_garbage_attack",
+  "category": "attack",
+  "canto": "pinglamb 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.73，輸嘅局約 0.60，贏局高咗大約 21% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
+  "english_gloss": "pinglamb's attack per piece: 0.730 in rounds won vs 0.602 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   }
+  },
+  "id": "G070",
+  "python_check": "((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))"
+ },
+ {
+  "family": "rate_flat_inputs",
+  "category": "finesse",
+  "canto": "yachi 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.05（即係唔到 2%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "yachi's keypresses per piece barely differs between rounds won and lost (under 0.05, ~1%) — not the lever",
+  "spec": {
+   "p": "lt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sub",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     }
+    },
+    "b": {
+     "e": "lit",
+     "v": 1000
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "lit",
+     "v": 48
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round_where",
+      "pl": "yachi",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "yachi"
+      }
+     },
+     "b": {
+      "e": "sum_round_where",
+      "pl": "yachi",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "pinglamb"
+      }
+     }
+    }
+   }
+  },
+  "id": "G071",
+  "python_check": "((((sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) - (sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) * 1000) < (48 * (sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))))"
+ },
+ {
+  "family": "rate_flat_inputs",
+  "category": "finesse",
+  "canto": "pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.02（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "pinglamb's keypresses per piece barely differs between rounds won and lost (under 0.02, ~0%) — not the lever",
+  "spec": {
+   "p": "lt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sub",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     }
+    },
+    "b": {
+     "e": "lit",
+     "v": 1000
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "lit",
+     "v": 23
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "pinglamb"
+      }
+     },
+     "b": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "yachi"
+      }
+     }
+    }
+   }
+  },
+  "id": "G072",
+  "python_check": "((((sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) - (sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) * 1000) < (23 * (sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))))"
+ },
+ {
+  "family": "rate_split_garbage_cleared",
+  "category": "style",
+  "canto": "yachi 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.16，贏局高咗大約 33% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到",
+  "english_gloss": "yachi's garbage cleared per piece: 0.210 in rounds won vs 0.157 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   }
+  },
+  "id": "G073",
+  "python_check": "((sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))"
+ },
+ {
+  "family": "rate_flat_garbage_cleared",
+  "category": "finesse",
+  "canto": "pinglamb 嘅 DS（每粒方塊清走幾多垃圾）贏局同輸局幾乎一樣，差距唔夠 0.02（即係唔到 4%），所以 DS 唔係佢輸贏嘅關鍵",
+  "english_gloss": "pinglamb's garbage cleared per piece barely differs between rounds won and lost (under 0.02, ~3%) — not the lever",
+  "spec": {
+   "p": "lt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sub",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_cleared",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_cleared",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     }
+    },
+    "b": {
+     "e": "lit",
+     "v": 1000
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "lit",
+     "v": 17
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "pinglamb"
+      }
+     },
+     "b": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "yachi"
+      }
+     }
+    }
+   }
+  },
+  "id": "G074",
+  "python_check": "((((sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) - (sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) * 1000) < (17 * (sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))))"
+ },
+ {
+  "family": "app_decides_rounds",
+  "category": "attack",
+  "canto": "兩個人都一樣：贏嘅局嘅 APP 高過輸嘅局。呢個 session 決定一局嘅唔係手速，而係每粒方塊嘅傷害",
+  "english_gloss": "both players' attack per piece is higher in the rounds they won than in the rounds they lost",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     }
+    }
+   ]
+  },
+  "id": "G075",
+  "python_check": "((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))"
+ },
+ {
+  "family": "ds_session",
+  "category": "style",
+  "canto": "全 session 計每粒方塊清走幾多垃圾（DS）：pinglamb 高過 yachi，即係 pinglamb 花多啲方塊落喺守同清垃圾上面",
+  "english_gloss": "session downstack per piece: pinglamb higher than yachi",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "garbage_cleared"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "garbage_cleared"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G076",
+  "python_check": "((sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
  }
 ]

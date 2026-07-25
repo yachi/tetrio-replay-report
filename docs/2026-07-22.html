@@ -671,6 +671,23 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-legend code { font-family: var(--font-mono); font-size: .95em; color: var(--ink-secondary); }
 .rt-hint { font-family: var(--font-mono); font-size: .66rem; color: var(--muted);
   margin: .3rem 0 0; }
+/* per-piece efficiency findings */
+.rt-find { display: grid; gap: .6rem; margin: 0 0 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.rt-card { border: 1px solid var(--border); border-left-width: 3px; border-radius: 8px;
+  padding: .7rem .85rem; background: var(--bg-raised); }
+.rt-card.is-lever { border-left-color: var(--good); }
+.rt-card.is-flat { border-left-color: var(--muted); }
+.rt-card.is-compare { border-left-color: var(--accent); }
+.rt-card.is-compare .rt-verdict { color: var(--accent); }
+.rt-card .rt-metric { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); display: flex; gap: .4rem; align-items: center; }
+.rt-card .rt-verdict { font-family: var(--font-mono); font-size: .62rem; padding: .05rem .35rem;
+  border-radius: 999px; border: 1px solid currentColor; }
+.rt-card.is-lever .rt-verdict { color: var(--good); }
+.rt-card.is-flat .rt-verdict { color: var(--muted); }
+.rt-card p { margin: .35rem 0 0; font-size: .82rem; line-height: 1.65; }
+.rt-card .rt-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 </style>
 
 <section id="rounds">
@@ -684,6 +701,74 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <code>射埋</code>（對手射過嚟、未 cancel 嘅攻擊）對 <code>食</code>（真正變成垃圾行）、
       同埋 <code>結果</code>（點收嘅）。
     </p>
+    <h3 style="font-size:1.05rem;margin:.2rem 0 .3rem">每粒方塊嘅效率：邊個數真係決定輸贏</h3>
+    <p class="rt-legend" style="margin-bottom:.9rem">
+      呢幾個判斷係由 pipeline 自動生成、再逐條用 Dafny 證過嘅（claim id 喺下面）。
+      <b>決定輸贏</b>／<b>唔係關鍵</b> 係拿同一個玩家「贏嘅局」對「輸嘅局」比出嚟嘅；
+      <b>兩人對比</b> 淨係比兩個人嘅高低，講唔到邊個數影響勝負。
+    </p>
+    <div class="rt-find">
+      <div class="rt-card is-lever">
+        <div class="rt-metric">APP<span class="rt-verdict">決定輸贏</span></div>
+        <p>yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.66，輸嘅局約 0.53，贏局高咗大約 24% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊</p>
+        <div class="rt-cid">G070 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-lever">
+        <div class="rt-metric">APP<span class="rt-verdict">決定輸贏</span></div>
+        <p>pinglamb 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.69，輸嘅局約 0.59，贏局高咗大約 17% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊</p>
+        <div class="rt-cid">G071 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-lever">
+        <div class="rt-metric">APP<span class="rt-verdict">決定輸贏</span></div>
+        <p>兩個人都一樣：贏嘅局嘅 APP 高過輸嘅局。呢個 session 決定一局嘅唔係手速，而係每粒方塊嘅傷害</p>
+        <div class="rt-cid">G076 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-lever">
+        <div class="rt-metric">DS<span class="rt-verdict">決定輸贏</span></div>
+        <p>yachi 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.19，輸嘅局約 0.17，贏局高咗大約 11% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到</p>
+        <div class="rt-cid">G074 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-lever">
+        <div class="rt-metric">DS<span class="rt-verdict">決定輸贏</span></div>
+        <p>pinglamb 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.17，贏局高咗大約 25% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到</p>
+        <div class="rt-cid">G075 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-flat">
+        <div class="rt-metric">KPP<span class="rt-verdict">唔係關鍵</span></div>
+        <p>yachi 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.01（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵</p>
+        <div class="rt-cid">G072 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-flat">
+        <div class="rt-metric">KPP<span class="rt-verdict">唔係關鍵</span></div>
+        <p>pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.06（即係唔到 2%），所以 KPP 唔係佢輸贏嘅關鍵</p>
+        <div class="rt-cid">G073 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-compare">
+        <div class="rt-metric">APP<span class="rt-verdict">兩人對比</span></div>
+        <p>每粒方塊打出嘅攻擊：pinglamb 多過 yachi</p>
+        <div class="rt-cid">G043 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-compare">
+        <div class="rt-metric">DS<span class="rt-verdict">兩人對比</span></div>
+        <p>全 session 計每粒方塊清走幾多垃圾（DS）：pinglamb 高過 yachi，即係 pinglamb 花多啲方塊落喺守同清垃圾上面</p>
+        <div class="rt-cid">G077 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-compare">
+        <div class="rt-metric">KPP<span class="rt-verdict">兩人對比</span></div>
+        <p>每粒方塊要按幾多下（KPP）：yachi 少過 pinglamb，即係 yachi 嘅手法比較省力</p>
+        <div class="rt-cid">G065 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-compare">
+        <div class="rt-metric">FINESSE<span class="rt-verdict">兩人對比</span></div>
+        <p>每粒方塊嘅 finesse 失誤：pinglamb 多過 yachi</p>
+        <div class="rt-cid">G044 · ✓ Dafny 已證</div>
+      </div>
+      <div class="rt-card is-compare">
+        <div class="rt-metric">FINESSE<span class="rt-verdict">兩人對比</span></div>
+        <p>perfect piece 嘅比率：yachi 多過 pinglamb</p>
+        <div class="rt-cid">G045 · ✓ Dafny 已證</div>
+      </div>
+    </div>
     <div class="rt-match">
       <div class="rt-head">
         <span class="rt-no">M1</span>

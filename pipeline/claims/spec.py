@@ -12,6 +12,7 @@ Expressions
     score             a match score component   m['score'][pl]    / m{mi}_score{Pl}
     total_rounds      rounds in the session
     sum_round         a per-round stat summed over the whole session
+    sum_round_where   the same, restricted to rounds satisfying a Cond
     sum_sq_round      the same, squared (for the integer variance identity)
     sum_ge            queued incoming attack (garbage events), session- or round-scoped
     count_matches_won / count_rounds_won
@@ -111,6 +112,7 @@ def lb(mi, pl, f):                return {"e": "lb", "mi": mi, "pl": pl, "f": f}
 def score(mi, pl):                return {"e": "score", "mi": mi, "pl": pl}
 def total_rounds():               return {"e": "total_rounds"}
 def sum_round(pl, f):             return {"e": "sum_round", "pl": pl, "f": f}
+def sum_round_where(pl, f, cond): return {"e": "sum_round_where", "pl": pl, "f": f, "cond": cond}
 def sum_sq_round(pl, f):          return {"e": "sum_sq_round", "pl": pl, "f": f}
 def sum_ge(pl, mi=None, ri=None): return {"e": "sum_ge", "pl": pl, "mi": mi, "ri": ri}
 def count_matches_won(pl):        return {"e": "count_matches_won", "pl": pl}
@@ -189,6 +191,9 @@ def py_expr(e):
         return "sum(len(m['rounds']) for m in facts['matches'])"
     if k == "sum_round":
         return f"sum({py_field_access(e['pl'], e['f'])} {_PY_ROUNDS})"
+    if k == "sum_round_where":
+        return (f"sum({py_field_access(e['pl'], e['f'])} {_PY_ROUNDS} "
+                f"if {py_cond(e['cond'])})")
     if k == "sum_sq_round":
         acc = py_field_access(e["pl"], e["f"])
         return f"sum({acc}*{acc} {_PY_ROUNDS})"
@@ -310,6 +315,11 @@ def dfy_expr(facts, e):
         return bal("+", [f"m{mi}_nrounds" for mi in range(len(facts["matches"]))])
     if k == "sum_round":
         return bal("+", _dfy_round_terms(facts, e["pl"], e["f"]))
+    if k == "sum_round_where":
+        terms = [f"(if {dfy_cond(facts, mi, ri, e['cond'])} then "
+                 f"{dafny_field(mi, ri, e['pl'], e['f'])} else 0)"
+                 for mi, ri in rounds_of(facts)]
+        return bal("+", terms)
     if k == "sum_sq_round":
         return bal("+", _dfy_round_terms(facts, e["pl"], e["f"], square=True))
     if k == "sum_ge":

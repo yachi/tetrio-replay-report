@@ -84,6 +84,23 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-legend code { font-family: var(--font-mono); font-size: .95em; color: var(--ink-secondary); }
 .rt-hint { font-family: var(--font-mono); font-size: .66rem; color: var(--muted);
   margin: .3rem 0 0; }
+/* per-piece efficiency findings */
+.rt-find { display: grid; gap: .6rem; margin: 0 0 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.rt-card { border: 1px solid var(--border); border-left-width: 3px; border-radius: 8px;
+  padding: .7rem .85rem; background: var(--bg-raised); }
+.rt-card.is-lever { border-left-color: var(--good); }
+.rt-card.is-flat { border-left-color: var(--muted); }
+.rt-card.is-compare { border-left-color: var(--accent); }
+.rt-card.is-compare .rt-verdict { color: var(--accent); }
+.rt-card .rt-metric { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted); display: flex; gap: .4rem; align-items: center; }
+.rt-card .rt-verdict { font-family: var(--font-mono); font-size: .62rem; padding: .05rem .35rem;
+  border-radius: 999px; border: 1px solid currentColor; }
+.rt-card.is-lever .rt-verdict { color: var(--good); }
+.rt-card.is-flat .rt-verdict { color: var(--muted); }
+.rt-card p { margin: .35rem 0 0; font-size: .82rem; line-height: 1.65; }
+.rt-card .rt-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 </style>
 """
 
@@ -179,7 +196,55 @@ def cells(p, won):
     ]
 
 
-def build(facts):
+def findings(report_dir):
+    """The APP / KPP / DS verdicts from the generated ledger, with proof status.
+
+    These are read from claims-generated.json rather than re-derived here, so the card
+    text and the proved lemma are the same statement.
+    """
+    import glob
+    led = os.path.join(report_dir, "claims-generated.json")
+    if not os.path.exists(led):
+        return []
+    with open(led, encoding="utf-8") as fh:
+        claims = json.load(fh)
+    status = {}
+    for pm in glob.glob(os.path.join(report_dir, "claims-generated-proof-map.json")):
+        with open(pm, encoding="utf-8") as fh:
+            for row in json.load(fh):
+                status[row["id"]] = row["status"]
+    keep = ("rate_split_", "rate_flat_", "app_decides_rounds", "ds_session",
+            "keys_per_piece", "per_piece_")
+    out = []
+    for c in claims:
+        fam = c.get("family", "")
+        if not fam.startswith(keep):
+            continue
+        metric = ("APP" if "garbage_attack" in fam or fam == "app_decides_rounds"
+                  else "KPP" if "inputs" in fam or fam == "keys_per_piece"
+                  else "DS" if "garbage_cleared" in fam or fam == "ds_session"
+                  else "FINESSE")
+        # Three kinds, because they answer different questions:
+        #   lever      the player's own rate differs between rounds won and lost
+        #   flat       it barely differs, so it is not what decides their rounds
+        #   compare    one player against the other — says nothing about winning,
+        #              and must not be dressed up as if it did
+        if fam.startswith("rate_flat_"):
+            kind = "flat"
+        elif fam.startswith("rate_split_") or fam == "app_decides_rounds":
+            kind = "lever"
+        else:
+            kind = "compare"
+        out.append({"id": c["id"], "metric": metric, "kind": kind,
+                    "canto": c["canto"],
+                    "verified": status.get(c["id"]) == "verified"})
+    order = {"APP": 0, "DS": 1, "KPP": 2, "FINESSE": 3}
+    rank = {"lever": 0, "flat": 1, "compare": 2}
+    out.sort(key=lambda d: (rank[d["kind"]], order.get(d["metric"], 9), d["id"]))
+    return out
+
+
+def build(facts, report_dir=None):
     p1, p2 = facts["players"]
     out = [START, CSS,
            '<section id="rounds">', '  <div class="wrap-wide">',
@@ -193,6 +258,31 @@ def build(facts):
            '      同埋 <code>結果</code>（點收嘅）。',
            '    </p>',
            ]
+    cards = findings(report_dir) if report_dir else []
+    if cards:
+        out += [
+            '    <h3 style="font-size:1.05rem;margin:.2rem 0 .3rem">'
+            '每粒方塊嘅效率：邊個數真係決定輸贏</h3>',
+            '    <p class="rt-legend" style="margin-bottom:.9rem">',
+            '      呢幾個判斷係由 pipeline 自動生成、再逐條用 Dafny 證過嘅（claim id 喺下面）。',
+            '      <b>決定輸贏</b>／<b>唔係關鍵</b> 係拿同一個玩家「贏嘅局」對「輸嘅局」比出嚟嘅；',
+            '      <b>兩人對比</b> 淨係比兩個人嘅高低，講唔到邊個數影響勝負。',
+            '    </p>',
+            '    <div class="rt-find">',
+        ]
+        VERDICT = {"lever": ("is-lever", "決定輸贏"),
+                   "flat": ("is-flat", "唔係關鍵"),
+                   "compare": ("is-compare", "兩人對比")}
+        for c in cards:
+            cls, verdict = VERDICT[c["kind"]]
+            tick = "✓ Dafny 已證" if c["verified"] else "⏳ 待證"
+            out.append(f'      <div class="rt-card {cls}">')
+            out.append(f'        <div class="rt-metric">{c["metric"]}'
+                       f'<span class="rt-verdict">{verdict}</span></div>')
+            out.append(f'        <p>{c["canto"]}</p>')
+            out.append(f'        <div class="rt-cid">{c["id"]} · {tick}</div>')
+            out.append('      </div>')
+        out.append('    </div>')
     for mi, m in enumerate(facts["matches"]):
         lb, win = m["leaderboard"], m["winner"]
         out.append('    <div class="rt-match">')
@@ -283,7 +373,7 @@ def main(argv=None):
     with open(os.path.join(args.report_dir, "facts.json"), encoding="utf-8") as fh:
         facts = json.load(fh)
     report_path = os.path.join(args.report_dir, "report.html")
-    section = build(facts)
+    section = build(facts, args.report_dir)
     how = inject(report_path, section)
     nrounds = sum(len(m["rounds"]) for m in facts["matches"])
     print(f"{how}: {nrounds} rounds x {len(COLUMNS) + 3} columns over "
