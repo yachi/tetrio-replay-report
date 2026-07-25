@@ -124,3 +124,45 @@ P1+P2 are mechanical. P4 is the real engineering.
 - **Generator coverage**: if a future session's drama doesn't fit a family, the pipeline still produces a valid report — bespoke claims are additive, never required.
 - **Dafny in CI**: pin the Dafny version (4.11.0 locally); verify time is ~3-5s per session, so CI stays fast.
 - **`.ttrm` churn**: single-line JSON; marked `-diff` so PRs stay readable.
+
+---
+
+## P4 — DONE (2026-07-25)
+
+Claim generators shipped. A session's ledger and its Dafny proofs are now generated from
+`facts.json` by `bin/new-session`; only the Cantonese prose still needs a person.
+
+**Design.** A family never writes a predicate string. It builds a *spec* (a nested dict
+in `pipeline/claims/spec.py`) which is rendered to a Python predicate and to a Dafny
+`ensures` clause by two backends, so the checked statement and the proved statement
+cannot drift apart. 32 families live in `pipeline/claims/generators.py`.
+
+**Measured coverage** (`pipeline/claims/equiv.py`). Comparing generated to hand-written
+predicates by string is useless — every predicate is True on the real data. Instead every
+single-value mutation of the dataset is applied (exhaustive: 4,440 sites for the 7-match
+session, 7,019 for the 10-match one) and a hand claim counts as covered only when a
+generated claim's truth is impossible without it, and both are falsifiable somewhere.
+
+| Session | Coverage | Identical behaviour |
+|---|---|---|
+| 2026-07-22 (10 matches, 54 hand claims) | 45/53 testable = **85%** | 24 |
+| 2026-07-24 (7 matches, 52 hand claims) | 48/49 testable = **98%** | 28 |
+
+Combined 93/102 = **91%**, clearing the ≥85% acceptance gate. Claims no mutation can
+falsify are reported separately rather than counted as covered.
+
+**Bugs this phase's own gates caught**
+* the "only one decider" claim restated that match's score without proving it was the
+  *only* one — fixed by adding a match-margin counter to the algebra
+* `total_rounds` rendered to Dafny as a literal, making "50 rounds" the tautology
+  `50 == 50` — real in Python, vacuous in Dafny; now the sum of the `nrounds` consts
+* `Facts.dfy` emitted the whole dataset, leaving dead consts no lemma reads, so mutation
+  survivors were meaningless — now only load-bearing data is emitted
+* `+1` mutations could not kill values that are only constrained beyond a threshold; the
+  operator escalates before calling a mutant a survivor (14/14 killed)
+
+## P5 — next
+
+Report templating: `build_report.py` generating the scoreboard, match cards, charts and
+appendix from `facts.json` + the ledger, leaving prose sections as the only hand-written
+part. That closes the loop from replays to published report.

@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Turn a batch of .ttrm replays into a verified session.
+#
+#   bin/new-session sessions/2026-08-01 ~/Downloads/replay-batch
+#   MUTATION=1 bin/new-session sessions/2026-08-01 ~/Downloads/replay-batch
+#
+# Runs the whole chain, stopping at the first failed gate:
+#
+#   1. copy the replays in
+#   2. both independent extractors -> facts.json / facts2.json, which must agree
+#   3. generate the claim ledger; every predicate must evaluate True
+#   4. generate Dafny from the same specs; `dafny verify` must report 0 errors
+#   5. (MUTATION=1) flipping a datum must break verification
+#
+# What it does NOT do is write the Cantonese prose or the report — that is the part
+# that needs judgment. It leaves you a verified ledger to write against, and prints
+# what to run next.
+set -euo pipefail
+
+DEST="${1:?usage: bin/new-session <sessions/DATE> <replay-dir>}"
+SRC="${2:?usage: bin/new-session <sessions/DATE> <replay-dir>}"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO"
+
+step() { printf '\n== %s\n' "$*"; }
+die()  { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
+
+command -v jq >/dev/null    || die "jq not installed"
+command -v dafny >/dev/null || die "dafny not installed"
+
+shopt -s nullglob
+REPLAYS=("$SRC"/*.ttrm)
+[ "${#REPLAYS[@]}" -gt 0 ] || die "no .ttrm files in $SRC"
+
+WORK="$DEST/report"
+step "1/5 collecting ${#REPLAYS[@]} replays into $DEST"
+mkdir -p "$WORK"
+for f in "${REPLAYS[@]}"; do
+  cp -n "$f" "$DEST/$(basename "$f")"
+done
+# the extractors read ../*.ttrm relative to the report dir
+cp pipeline/extract.py pipeline/extract2.ts pipeline/check_claims.py "$WORK/" 2>/dev/null || true
+ls "$DEST"/*.ttrm >/dev/null || die "no replays landed in $DEST"
+
+step "2/5 extracting twice and comparing"
+( cd "$WORK" && python3 extract.py >/dev/null )
+if command -v bun >/dev/null; then
+  ( cd "$WORK" && bun extract2.ts >/dev/null )
+  diff <(jq -S . "$WORK/facts.json") <(jq -S . "$WORK/facts2.json") >/dev/null \
+    || die "the two extractors disagree — resolve before trusting anything downstream"
+  echo "  ok  independent extractors agree"
+else
+  echo "  !!  bun not installed: only the Python extractor ran, so the"
+  echo "      two-parser agreement gate did NOT run for this session"
+fi
+
+step "3/5 generating the claim ledger"
+python3 -m pipeline.claims.build_claims "$WORK/facts.json" \
+  --out "$WORK/claims-generated.json" || die "claim generation refused to emit"
+
+step "4/5 generating and verifying Dafny"
+python3 -m pipeline.codegen "$WORK/facts.json" \
+  --claims "$WORK/claims-generated.json" --outdir "$WORK/dafny"
+VOUT="$(cd "$WORK" && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4 2>&1 | tail -1)"
+case "$VOUT" in
+  *"0 errors"*) echo "  ok  $VOUT" ;;
+  *) die "dafny — $VOUT" ;;
+esac
+python3 -m pipeline.build_proof_map "$WORK/claims-generated.json" \
+  --dafny-dir "$WORK/dafny" --out "$WORK/claims-proof-map.json"
+
+if [ "${MUTATION:-0}" = "1" ]; then
+  step "5/5 mutation testing the generated proofs"
+  bash pipeline/mutation_test.sh "$WORK/dafny" 12 || die "a mutant survived — some lemma is vacuous"
+else
+  step "5/5 mutation test skipped (set MUTATION=1 to run it)"
+fi
+
+CLAIMS=$(jq length "$WORK/claims-generated.json")
+ROUNDS=$(jq '[.matches[].rounds | length] | add' "$WORK/facts.json")
+cat <<EOF
+
+verified: $CLAIMS generated claims over $ROUNDS rounds in $WORK
+
+next, the parts that need judgment:
+  1. write $WORK/narrative-beats.md and $WORK/recommendations.md against the
+     generated ledger (each countable statement citing its claim id)
+  2. add hand-written claims for whatever is genuinely unique to this session,
+     then re-run steps 3-4 to fold them into the proofs
+  3. build the report, then refresh the site:
+       python3 $WORK/build_appendix.py
+       python3 bin/build-docs
+EOF
