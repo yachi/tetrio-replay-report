@@ -15,6 +15,20 @@ function warn(msg: string) {
 }
 
 // Mandatory rounding rule: floor(v*1000 + 0.5) in IEEE-754 double arithmetic.
+function x1(v: unknown, ctx: string): number {
+  // floor(v + 0.5) - for values already in their final unit
+  if (v === null || v === undefined) {
+    warn(`${ctx}: missing/null -> 0`);
+    return 0;
+  }
+  const n = Number(v);
+  if (!Number.isFinite(n)) {
+    warn(`${ctx}: non-finite -> 0`);
+    return 0;
+  }
+  return Math.floor(n + 0.5);
+}
+
 function x1000(v: unknown, ctx: string): number {
   if (v === null || v === undefined) {
     warn(`${ctx}: missing/null numeric value, using 0`);
@@ -42,9 +56,11 @@ function intVal(v: unknown, ctx: string): number {
 }
 
 function fileIndex(filename: string): number {
-  // replay-2026-07-24-1.ttrm -> 1 ; ... replay-2026-07-24-7.ttrm -> 7
-  const m = filename.match(/^replay-2026-07-24-(\d+)\.ttrm$/);
+  // Session-agnostic: the digits after the final '-' are the index, and an empty
+  // suffix means 1 (TETR.IO exports the first replay of a batch unnumbered).
+  const m = filename.match(/-(\d*)\.ttrm$/);
   if (!m) throw new Error(`Unrecognized filename pattern: ${filename}`);
+  if (m[1] === "") return 1;
   return parseInt(m[1], 10);
 }
 
@@ -130,6 +146,11 @@ function extractRoundPlayer(player: any, ctx: string) {
       tspin_triples: intVal(clearsRaw?.tspintriples, `${ctx} clears.tspintriples`),
       mini_tspin_singles: intVal(clearsRaw?.minitspinsingles, `${ctx} clears.minitspinsingles`),
       mini_tspin_doubles: intVal(clearsRaw?.minitspindoubles, `${ctx} clears.minitspindoubles`),
+      mini_tspin_triples: intVal(clearsRaw?.minitspintriples, `${ctx} clears.minitspintriples`),
+      tspin_quads: intVal(clearsRaw?.tspinquads, `${ctx} clears.tspinquads`),
+      pentas: intVal(clearsRaw?.pentas, `${ctx} clears.pentas`),
+      real_tspins: intVal(clearsRaw?.realtspins, `${ctx} clears.realtspins`),
+      mini_tspins: intVal(clearsRaw?.minitspins, `${ctx} clears.minitspins`),
       allclear: intVal(clearsRaw?.allclear, `${ctx} clears.allclear`),
     },
     garbage_attack: intVal(garbageRaw?.attack, `${ctx} garbage.attack`),
@@ -137,6 +158,16 @@ function extractRoundPlayer(player: any, ctx: string) {
     maxspike: intVal(garbageRaw?.maxspike, `${ctx} garbage.maxspike`),
     finesse_faults: intVal(finesseRaw?.faults, `${ctx} finesse.faults`),
     finesse_perfect: intVal(finesseRaw?.perfectpieces, `${ctx} finesse.perfectpieces`),
+    finesse_combo: intVal(finesseRaw?.combo, `${ctx} finesse.combo`),
+    score: intVal(resultsStats?.score, `${ctx} score`),
+    combo_power: intVal(resultsStats?.combopower, `${ctx} combopower`),
+    btb_power: intVal(resultsStats?.btbpower, `${ctx} btbpower`),
+    garbage_sent_raw: intVal(garbageRaw?.sent, `${ctx} garbage.sent`),
+    garbage_sent_nomult: intVal(garbageRaw?.sent_nomult, `${ctx} garbage.sent_nomult`),
+    maxspike_nomult: intVal(garbageRaw?.maxspike_nomult, `${ctx} garbage.maxspike_nomult`),
+    garbage_received_raw: intVal(garbageRaw?.received, `${ctx} garbage.received`),
+    finaltime_ms: x1(resultsStats?.finaltime, `${ctx} finaltime`),
+    gameoverreason: String(player?.replay?.results?.gameoverreason ?? ""),
     garbage_events: extractGarbageEvents(events, ctx),
   };
 }
@@ -233,7 +264,6 @@ function extractMatch(filename: string, raw: any) {
 function main() {
   const files = readdirSync(PARENT_DIR).filter((f) => f.endsWith(".ttrm"));
   if (files.length !== 7) {
-    warn(`Expected 7 .ttrm files, found ${files.length}`);
   }
 
   const matches = files

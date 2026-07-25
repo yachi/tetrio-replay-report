@@ -35,6 +35,7 @@ Conds (a boolean about one round)
     field_cmp         a player's stat compared to a literal
     dur_cmp           round duration (max of both lifetimes) compared to a literal
     winner_gt_loser   the round's winner had a higher value of a field than the loser
+    str_field         a player's string field equals a value (e.g. how they died)
 
 Dafny rendering is fully ground: every sum is expanded over the actual rounds and
 emitted as a BALANCED expression tree. Deep left-nested chains overflow Boogie's
@@ -142,6 +143,7 @@ def c_field(pl, f, op, v):        return {"c": "field_cmp", "pl": pl, "f": f, "o
 def c_dur(op, v):                 return {"c": "dur_cmp", "op": op, "v": int(v)}
 def c_winner_gt_loser(f):         return {"c": "winner_gt_loser", "f": f}
 def c_and(*xs):                   return {"c": "and", "xs": list(xs)}
+def c_str(pl, f, v):              return {"c": "str_field", "pl": pl, "f": f, "v": v}
 
 
 # --------------------------------------------------------------------------- #
@@ -164,6 +166,8 @@ def py_cond(cond):
         parts = "".join(f"[{k!r}]" for k in field_path(cond["f"]))
         return (f"r['players'][r['winner']]{parts} > "
                 f"min(r['players'][p]{parts} for p in r['players'] if p!=r['winner'])")
+    if k == "str_field":
+        return f"{py_field_access(cond['pl'], cond['f'])} == {cond['v']!r}"
     if k == "and":
         return " and ".join(f"({py_cond(x)})" for x in cond["xs"])
     raise ValueError(f"unknown cond {k}")
@@ -276,6 +280,8 @@ def dfy_cond(facts, mi, ri, cond):
         # winner-relative read: select by the winner const so a mutated winner
         # genuinely re-selects the datum
         return (f'(if m{mi}_r{ri}_winner == "yachi" then {y} > {p} else {p} > {y})')
+    if k == "str_field":
+        return (f'({dafny_field(mi, ri, cond["pl"], cond["f"])} == "{cond["v"]}")')
     if k == "and":
         return "(" + " && ".join(dfy_cond(facts, mi, ri, x) for x in cond["xs"]) + ")"
     raise ValueError(f"unknown cond {k}")

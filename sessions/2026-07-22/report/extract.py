@@ -17,6 +17,13 @@ def warn(msg):
     WARNINGS.append(msg)
 
 
+def x1(v):
+    """floor(v + 0.5) - for values that are already in their final unit."""
+    if v is None:
+        return 0
+    return math.floor(v + 0.5)
+
+
 def x1000(v):
     """floor(v*1000 + 0.5) in IEEE-754 double arithmetic."""
     if v is None:
@@ -25,13 +32,16 @@ def x1000(v):
 
 
 def file_index(fname):
-    # replay-2026-07-22-.ttrm -> 1 (no numeric suffix)
-    # replay-2026-07-22-2.ttrm -> 2 ... -10.ttrm -> 10
-    m = re.match(r"replay-2026-07-22-(\d*)\.ttrm$", fname)
+    """Match index from the filename's trailing number.
+
+    Session-agnostic: the suffix after the final '-' is the index, and an empty
+    suffix means 1 (TETR.IO names the first export of a batch without a number,
+    e.g. replay-2026-07-22-.ttrm alongside replay-2026-07-22-2.ttrm).
+    """
+    m = re.match(r".*?-(\d*)\.ttrm$", fname)
     if not m:
         raise ValueError(f"Unexpected filename: {fname}")
-    suffix = m.group(1)
-    return 1 if suffix == "" else int(suffix)
+    return int(m.group(1)) if m.group(1) else 1
 
 
 def get(d, key, default, ctx):
@@ -74,6 +84,11 @@ def extract_clears(clears, ctx):
         "tspin_triples": get(clears, "tspintriples", 0, ctx),
         "mini_tspin_singles": get(clears, "minitspinsingles", 0, ctx),
         "mini_tspin_doubles": get(clears, "minitspindoubles", 0, ctx),
+        "mini_tspin_triples": get(clears, "minitspintriples", 0, ctx),
+        "tspin_quads": get(clears, "tspinquads", 0, ctx),
+        "pentas": get(clears, "pentas", 0, ctx),
+        "real_tspins": get(clears, "realtspins", 0, ctx),
+        "mini_tspins": get(clears, "minitspins", 0, ctx),
         "allclear": get(clears, "allclear", 0, ctx),
     }
 
@@ -159,6 +174,16 @@ def extract_round_player(player, ctx):
         "maxspike": get(garbage, "maxspike", 0, ctx + ".results.stats.garbage"),
         "finesse_faults": get(finesse, "faults", 0, ctx + ".results.stats.finesse"),
         "finesse_perfect": get(finesse, "perfectpieces", 0, ctx + ".results.stats.finesse"),
+        "finesse_combo": get(finesse, "combo", 0, ctx + ".results.stats.finesse"),
+        "score": get(rstats, "score", 0, ctx + ".results.stats"),
+        "combo_power": get(rstats, "combopower", 0, ctx + ".results.stats"),
+        "btb_power": get(rstats, "btbpower", 0, ctx + ".results.stats"),
+        "garbage_sent_raw": get(garbage, "sent", 0, ctx + ".results.stats.garbage"),
+        "garbage_sent_nomult": get(garbage, "sent_nomult", 0, ctx + ".results.stats.garbage"),
+        "maxspike_nomult": get(garbage, "maxspike_nomult", 0, ctx + ".results.stats.garbage"),
+        "garbage_received_raw": get(garbage, "received", 0, ctx + ".results.stats.garbage"),
+        "finaltime_ms": x1(get(rstats, "finaltime", 0, ctx + ".results.stats")),
+        "gameoverreason": str(get(results, "gameoverreason", "", ctx + ".results")),
         "garbage_events": extract_garbage_events(events, ctx + ".replay.events"),
     }
 
@@ -229,10 +254,9 @@ def extract_match(fname):
 
 
 def main():
-    files = [f for f in os.listdir(PARENT_DIR)
-             if re.match(r"replay-2026-07-22-\d*\.ttrm$", f)]
-    if len(files) != 10:
-        warn(f"Expected 10 .ttrm files, found {len(files)}: {sorted(files)}")
+    files = [f for f in os.listdir(PARENT_DIR) if f.endswith(".ttrm")]
+    if not files:
+        raise SystemExit(f"no .ttrm files found in {PARENT_DIR}")
 
     matches = [extract_match(f) for f in files]
     matches.sort(key=lambda m: m["index"])

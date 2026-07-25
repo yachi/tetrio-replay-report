@@ -29,13 +29,20 @@ ROUND_FIELDS = [
     "apm_x1000", "pps_x1000", "vs_x1000", "lifetime", "maxspike", "topcombo",
     "topbtb", "tspins", "pieces", "lines", "inputs", "holds", "kills",
     "garbage_attack", "garbage_cleared", "garbagesent", "garbagereceived",
-    "finesse_faults", "finesse_perfect",
+    "finesse_faults", "finesse_perfect", "finesse_combo",
+    "score", "combo_power", "btb_power", "finaltime_ms",
+    "garbage_sent_raw", "garbage_sent_nomult", "garbage_received_raw", "maxspike_nomult",
     "clears.singles", "clears.doubles", "clears.triples", "clears.quads",
+    "clears.pentas", "clears.real_tspins", "clears.mini_tspins",
     "clears.tspin_singles", "clears.tspin_doubles", "clears.tspin_triples",
-    "clears.mini_tspin_singles", "clears.mini_tspin_doubles", "clears.allclear",
+    "clears.tspin_quads",
+    "clears.mini_tspin_singles", "clears.mini_tspin_doubles", "clears.mini_tspin_triples",
+    "clears.allclear",
 ]
 LB_FIELDS = ["apm_x1000", "pps_x1000", "vs_x1000", "garbagesent",
              "garbagereceived", "kills"]
+# Per-round fields that are strings rather than integers.
+STR_ROUND_FIELDS = ["gameoverreason"]
 
 
 def _cap(pl):
@@ -94,6 +101,12 @@ def emit_facts(facts, keep=None):
                     name = f"m{mi}_r{ri}_{pl}_{dafny_suffix(f)}"
                     if wanted(name):
                         lines.append(f"const {name}: int := {v}")
+                for f in STR_ROUND_FIELDS:
+                    if f not in p:
+                        continue
+                    name = f"m{mi}_r{ri}_{pl}_{dafny_suffix(f)}"
+                    if wanted(name):
+                        lines.append(f'const {name}: string := "{p[f]}"')
                 for gi, g in enumerate(p.get("garbage_events", [])):
                     name = f"m{mi}_r{ri}_{pl}_ge{gi}"
                     if wanted(name):

@@ -23,7 +23,7 @@ Wording rules encoded here on purpose, because each one was a review finding onc
 * traditional characters only (build_claims.py asserts this)
 """
 
-from .spec import (add, all_rounds, le, between, c_and, c_dur, c_field, c_winner,
+from .spec import (add, all_rounds, c_str, le, between, c_and, c_dur, c_field, c_winner,
                   count_matches_margin, sum_lb,
                   c_winner_gt_loser, conj, count_matches_won, count_rounds,
                   count_rounds_won, eq, gt, lb, lit, match_winner, mul, rnd,
@@ -931,3 +931,93 @@ def most_intense_round(facts):
                               rnd(m2, r2, facts["players"][1], "vs_x1000")), lit(tot))
                        for m2, r2, _ in _rounds(facts)]),
     }]
+
+
+# --------------------------------------------------------------------------- #
+# stats the in-game end screen does not surface
+# --------------------------------------------------------------------------- #
+
+@family
+def keys_per_piece(facts):
+    """KPP — how many keypresses each piece costs. Lower is cleaner movement."""
+    a, b = _players(facts)
+    ia, ib = _tot(facts, a, "inputs"), _tot(facts, b, "inputs")
+    pa, pb = _tot(facts, a, "pieces"), _tot(facts, b, "pieces")
+    if ia * pb == ib * pa:
+        return []
+    lo, hi = (a, b) if ia * pb < ib * pa else (b, a)
+    return [{
+        "family": "keys_per_piece", "category": "finesse",
+        "canto": f"每粒方塊要按幾多下（KPP）：{lo} 少過 {hi}，即係 {lo} 嘅手法比較省力",
+        "english_gloss": f"keys per piece: {lo} lower than {hi}",
+        "spec": gt(mul(sum_round(hi, "inputs"), sum_round(lo, "pieces")),
+                   mul(sum_round(lo, "inputs"), sum_round(hi, "pieces"))),
+    }]
+
+
+@family
+def death_reasons(facts):
+    """How rounds actually ended, from the loser's game-over reason."""
+    from collections import Counter
+    tally = Counter()
+    for _, _, r in _rounds(facts):
+        for pl, p in r["players"].items():
+            if pl != r["winner"]:
+                tally[p.get("gameoverreason", "")] += 1
+    tally.pop("", None)
+    if not tally:
+        return []
+    label = {"garbagesmash": "俾垃圾頂爆", "topout": "自己頂到頂",
+             "forfeit": "投降", "winner": "對手死"}
+    total = sum(tally.values())
+    parts = "、".join(f"{tally[k]} 局{label.get(k, k)}" for k, _ in tally.most_common())
+    return [{
+        "family": "death_reasons", "category": "style",
+        "canto": f"{total} 局係點收嘅：{parts}",
+        "english_gloss": ("how rounds ended: " +
+                          ", ".join(f"{k} {v}" for k, v in tally.most_common())),
+        # counted per reason across both players; the winner's reason is always
+        # "winner", so these counts are exactly the losing sides
+        "spec": conj(*[
+            eq(add(count_rounds(c_str(_players(facts)[0], "gameoverreason", reason)),
+                   count_rounds(c_str(_players(facts)[1], "gameoverreason", reason))),
+               lit(n))
+            for reason, n in tally.most_common()]),
+    }]
+
+
+@family
+def score_totals(facts):
+    """In-game score — a rough proxy for total constructive output."""
+    vals = {p: _tot(facts, p, "score") for p in _players(facts)}
+    hi, lo = sorted(vals, key=lambda p: -vals[p])
+    if vals[hi] == vals[lo]:
+        return []
+    return [{
+        "family": "score_totals", "category": "style",
+        "canto": f"全 session 累計分數：{hi} {vals[hi]:,} 分，{lo} {vals[lo]:,} 分",
+        "english_gloss": f"total in-game score: {hi} {vals[hi]}, {lo} {vals[lo]}",
+        "spec": conj(eq(sum_round(hi, "score"), lit(vals[hi])),
+                     eq(sum_round(lo, "score"), lit(vals[lo]))),
+    }]
+
+
+@family
+def spike_multiplier_effect(facts):
+    """How much of each player's damage came from multipliers rather than raw sends."""
+    out = []
+    for pl in _players(facts):
+        raw = _tot(facts, pl, "garbage_sent_nomult")
+        sent = _tot(facts, pl, "garbage_sent_raw")
+        if sent <= raw:
+            continue
+        out.append({
+            "family": "multiplier_bonus", "category": "attack",
+            "canto": f"{pl} 送出 {sent} 行垃圾，當中 {sent - raw} 行係倍率加成嚟嘅"
+                     f"（唔計倍率淨係 {raw} 行）",
+            "english_gloss": (f"{pl} sent {sent} lines, {sent - raw} of them from "
+                              f"multipliers ({raw} before multipliers)"),
+            "spec": conj(eq(sum_round(pl, "garbage_sent_raw"), lit(sent)),
+                         eq(sum_round(pl, "garbage_sent_nomult"), lit(raw))),
+        })
+    return out
