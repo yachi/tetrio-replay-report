@@ -27,6 +27,10 @@ END = "<!-- END generated round-table -->"
 CSS = """
 <style>
 /* ---------- per-round data table (generated) ---------- */
+/* The host report defines --accent only on .match-card[data-winner], so it resolves
+   to an empty string here and any color-mix() using it silently paints nothing.
+   This section carries its own token instead. */
+#rounds { --rt-accent: var(--yachi); }
 .rt-match { margin: 0 0 2.2rem; }
 .rt-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem .9rem;
   margin-bottom: .5rem; }
@@ -93,7 +97,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 /* sort affordance */
 .rt-tbl thead th .rt-arrow { opacity: .25; margin-left: .25rem; font-size: .85em; }
 .rt-tbl thead th[aria-sort="ascending"] .rt-arrow,
-.rt-tbl thead th[aria-sort="descending"] .rt-arrow { opacity: 1; color: var(--accent); }
+.rt-tbl thead th[aria-sort="descending"] .rt-arrow { opacity: 1; color: var(--rt-accent); }
 .rt-tbl thead th:hover { color: var(--ink); }
 .rt-oddgroup td { border-bottom-color: var(--border); }
 /* low-signal columns: present, hidden by default (see OPTIONAL_COLS) */
@@ -104,7 +108,33 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   border: 1px solid var(--border); border-radius: 999px; padding: .25rem .7rem;
   background: var(--bg-raised); margin: 0 0 1rem; }
 .rt-toggle:hover { color: var(--ink); border-color: var(--border-strong); }
-.rt-toggle input { accent-color: var(--accent); margin: 0; }
+.rt-toggle input { accent-color: var(--rt-accent); margin: 0; }
+/* Magnitude bar. Drawn as a pseudo-element rather than a background layer, because
+   the row tint and the hover layer already occupy background-color/background-image. */
+.rt-tbl td.rt-bar { position: relative; }
+.rt-tbl td.rt-bar::before { content: ""; position: absolute; left: 0; top: 3px; bottom: 3px;
+  width: calc(var(--b, 0) * 100%); border-radius: 0 2px 2px 0; pointer-events: none;
+  background: color-mix(in srgb, var(--muted) 30%, transparent); }
+/* Bar length is magnitude, bar hue is identity — two channels, two meanings, the way
+   the game's own end screen does it. */
+.rt-tbl tr[data-who="yachi"] td.rt-bar::before {
+  background: color-mix(in srgb, var(--yachi) 30%, transparent); }
+.rt-tbl tr[data-who="pinglamb"] td.rt-bar::before {
+  background: color-mix(in srgb, var(--pinglamb) 30%, transparent); }
+.rt-tbl td.rt-bar > span { position: relative; }
+#rounds.rt-nobars .rt-tbl td.rt-bar::before { display: none; }
+/* row filters */
+#rounds.f-win .rt-tbl tbody tr.rt-loser { display: none; }
+#rounds.f-yachi .rt-tbl tbody tr:not([data-who="yachi"]) { display: none; }
+#rounds.f-pinglamb .rt-tbl tbody tr:not([data-who="pinglamb"]) { display: none; }
+.rt-controls { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
+  margin: 0 0 1rem; }
+.rt-chip { font-family: var(--font-mono); font-size: .72rem; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 999px; padding: .26rem .7rem;
+  background: var(--bg-raised); color: var(--muted); }
+.rt-chip:hover { color: var(--ink); border-color: var(--border-strong); }
+.rt-chip[aria-pressed="true"] { color: var(--rt-accent); border-color: var(--rt-accent);
+  background: color-mix(in srgb, var(--rt-accent) 12%, transparent); }
 .rt-tbl td.rt-key { font-weight: 700; color: var(--ink); }
 .rt-tbl td.c-end { text-align: left; font-family: var(--font-mono); font-size: .68rem;
   color: var(--muted); }
@@ -121,8 +151,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   padding: .7rem .85rem; background: var(--bg-raised); }
 .rt-card.is-lever { border-left-color: var(--good); }
 .rt-card.is-flat { border-left-color: var(--muted); }
-.rt-card.is-compare { border-left-color: var(--accent); }
-.rt-card.is-compare .rt-verdict { color: var(--accent); }
+.rt-card.is-compare { border-left-color: var(--rt-accent); }
+.rt-card.is-compare .rt-verdict { color: var(--rt-accent); }
 .rt-card .rt-metric { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em;
   text-transform: uppercase; color: var(--muted); display: flex; gap: .4rem; align-items: center; }
 .rt-card .rt-verdict { font-family: var(--font-mono); font-size: .62rem; padding: .05rem .35rem;
@@ -139,6 +169,25 @@ SORT_JS = """
 /* Click a column header to sort that match's rounds by it; click again to reverse;
    a third click restores the original round order. Self-contained, no libraries. */
 (function () {
+  var sect = document.getElementById("rounds");
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".rt-chip[data-filter]"));
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      chips.forEach(function (c) {
+        c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+      });
+      sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+      if (chip.dataset.filter) sect.classList.add(chip.dataset.filter);
+    });
+  });
+  var barBtn = document.querySelector(".rt-chip[data-bars]");
+  if (barBtn) {
+    barBtn.addEventListener("click", function () {
+      var on = barBtn.getAttribute("aria-pressed") === "true";
+      barBtn.setAttribute("aria-pressed", on ? "false" : "true");
+      sect.classList.toggle("rt-nobars", on);
+    });
+  }
   var box = document.getElementById("rt-toggle-all");
   if (box) {
     box.addEventListener("change", function () {
@@ -194,6 +243,13 @@ SORT_JS = """
 # the table from 1430px to 1121px, inside the 1130px container, so the default view
 # needs no horizontal scrolling at all.
 OPTIONAL_COLS = {"PC", "COMBO", "TST", "TSD", "KPP", "FIN%"}
+
+# In-cell magnitude bars, only on the columns that measured as strongly tied to the
+# round result (paired AUC >= 85%, counting inverted). Barring all 22 would be noise;
+# these four are where a glance is worth as much as reading the number.
+# The scale is session-wide, not per match, so a bar length means the same thing in
+# every table. One hue, light to dark by magnitude — sequential data, sequential ramp.
+BAR_COLS = {"APM", "VS", "APP", "攻"}
 
 # (header label, title/explanation) — order defines the columns after the pinned three
 COLUMNS = [
@@ -251,6 +307,32 @@ def pct(num, den):
 
 END_LABEL = {"winner": "生還", "garbagesmash": "俾垃圾頂爆",
              "topout": "自己頂爆", "forfeit": "投降"}
+
+
+def bar_ranges(facts):
+    """Session-wide min/max for the barred columns, so bars are comparable."""
+    acc = {k: [] for k in BAR_COLS}
+    for m in facts["matches"]:
+        for r in m["rounds"]:
+            for p in r["players"].values():
+                acc["APM"].append(p["apm_x1000"])
+                acc["VS"].append(p["vs_x1000"])
+                acc["攻"].append(p["garbage_attack"])
+                acc["APP"].append((p["garbage_attack"] * 1000) // p["pieces"]
+                                  if p["pieces"] else 0)
+    return {k: (min(v), max(v)) for k, v in acc.items() if v}
+
+
+def bar_value(p, label):
+    if label == "APM":
+        return p["apm_x1000"]
+    if label == "VS":
+        return p["vs_x1000"]
+    if label == "攻":
+        return p["garbage_attack"]
+    if label == "APP":
+        return (p["garbage_attack"] * 1000) // p["pieces"] if p["pieces"] else 0
+    return None
 
 
 def cells(p, won):
@@ -337,6 +419,7 @@ def findings(report_dir):
 
 def build(facts, report_dir=None):
     p1, p2 = facts["players"]
+    ranges = bar_ranges(facts)
     out = [START, CSS,
            '<section id="rounds">', '  <div class="wrap-wide">',
            '    <div class="eyebrow">逐局數據 · ROUND BY ROUND</div>',
@@ -374,10 +457,20 @@ def build(facts, report_dir=None):
             out.append(f'        <div class="rt-cid">{c["id"]} · {tick}</div>')
             out.append('      </div>')
         out.append('    </div>')
-    out.append('    <label class="rt-toggle">'
-               '<input type="checkbox" id="rt-toggle-all">'
-               f'顯示全部 {len(COLUMNS) + 3} 欄（加埋 {"、".join(sorted(OPTIONAL_COLS))}'
-               '，呢幾欄同輸贏關係唔大）</label>')
+    out += [
+        '    <div class="rt-controls">',
+        '      <button class="rt-chip" data-filter="" aria-pressed="true">全部局</button>',
+        '      <button class="rt-chip" data-filter="f-win" aria-pressed="false">只睇贏嘅一方</button>',
+        f'      <button class="rt-chip" data-filter="f-yachi" aria-pressed="false">只睇 {p1}</button>',
+        f'      <button class="rt-chip" data-filter="f-pinglamb" aria-pressed="false">只睇 {p2}</button>',
+        '      <button class="rt-chip" data-bars aria-pressed="true">長條圖</button>',
+        '      <label class="rt-toggle" style="margin:0">'
+        '<input type="checkbox" id="rt-toggle-all">'
+        f'全部 {len(COLUMNS) + 3} 欄</label>',
+        '    </div>',
+        f'    <p class="rt-hint" style="margin:-.6rem 0 1rem">APM／VS／APP／攻 嘅長條'
+        '按全 session 同一把尺畫，所以跨場都可以直接比。</p>',
+    ]
     for mi, m in enumerate(facts["matches"]):
         lb, win = m["leaderboard"], m["winner"]
         out.append('    <div class="rt-match">')
@@ -420,7 +513,8 @@ def build(facts, report_dir=None):
                     classes.append("rt-loser")
                 if n == 1:
                     classes.append("rt-round-end")
-                out.append(f'            <tr class="{" ".join(classes)}" data-order="{ri * 2 + n}">')
+                out.append(f'            <tr class="{" ".join(classes)}" '
+                           f'data-order="{ri * 2 + n}" data-who="{pl}">')
                 # Every row repeats 局 and 時間 instead of using rowspan: rowspan would
                 # pin the pairs together and make the table unsortable.
                 out.append(f'              <td class="c-rd" data-v="{ri}">R{ri + 1}</td>')
@@ -439,7 +533,17 @@ def build(facts, report_dir=None):
                         cls.append("rt-opt")
                     if val in ("0", "–"):
                         cls.append("rt-zero")
+                    style = ""
+                    if label in BAR_COLS and label in ranges:
+                        lo, hi = ranges[label]
+                        bv = bar_value(p, label)
+                        if bv is not None and hi > lo:
+                            frac = (bv - lo) / (hi - lo)
+                            cls.append("rt-bar")
+                            style = f' style="--b:{frac:.3f}"'
+                            val = f"<span>{val}</span>"
                     attr = f' class="{" ".join(cls)}"' if cls else ""
+                    attr += style
                     # data-v carries the raw value so sorting is numeric, not textual
                     # ("10" must not sort before "9", "1,234" must beat "999")
                     raw = val.replace(",", "").replace("%", "")
