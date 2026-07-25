@@ -1,0 +1,112 @@
+# tetrio-replay-report — operating context
+
+Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
+
+Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
+factual sentence is badge-linked to a Dafny-verified lemma. Two sessions so far
+(2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3), 129 rounds, 106 hand-written +
+153 generated claims.
+
+## The one invariant
+
+**Dafny proves "claim ⇔ extracted data", not the extraction.** That the dataset matches
+the `.ttrm` files rests on two independently written extractors agreeing byte-for-byte.
+Never let a report, README, or commit message blur those two things — every audit round
+in this project's history caught someone doing exactly that.
+
+Corollaries that are gates, not preferences:
+- a proof-map status may only come from real `dafny verify` output, never stamped by codegen
+- a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant
+- every countable statement in a report needs a claim id whose predicate covers *that*
+  number — not a weaker one nearby
+
+## Commands
+
+```bash
+bin/new-session sessions/<date> <replay-dir>   # extract → claims → Dafny → verify → proof map
+bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 adds mutation test)
+bin/build-docs                                 # regenerate docs/ (the Pages site) from sessions
+python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 逐局全數據 section
+python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
+python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
+python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exhaustive mutation
+```
+
+`build_round_table.py` replaces only the region between its HTML comment markers, so it is
+idempotent and safe to re-run over a hand-edited report.
+
+## Workflow
+
+- **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
+  Stage, commit with a Conventional Commit message, then tell the user to push.
+- CI (6 jobs) re-runs every gate on push, including regenerating each ledger and checking it
+  is byte-identical to what is committed. Weekly runs add mutation testing.
+- Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
+  asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
+
+## Data semantics that cost real debugging
+
+- `lifetime` is **milliseconds**, not frames (verify via `pieces / pps`; 60 fps is ~15× off).
+- `ige` `interaction_confirm` events are **queued incoming attack**, before cancellation —
+  consistently ~10–20% above `garbagereceived`, which is what materialised. The reports say
+  射埋 vs 食 and must never conflate them.
+- The raw `tspins` counter includes spins that cleared nothing, so it exceeds the sum of the
+  T-spin clear types. Always say which measure is meant.
+- Kills equal round wins by construction in first-to-death 1v1 — never presented as a second
+  independent signal.
+- Player order in `users` / `leaderboard` is **not stable across files**; key by username.
+
+## What the data actually says (measured, not asserted)
+
+Paired AUC over 129 rounds — how often the round's winner held the higher value:
+
+- **Strong**: VS 100% · APM 94.6 · 攻 93.8 · APP 91.5 · 送 88.0 · 射埋 12.0 (88 inverted) ·
+  食 14.3 · 分 85.3
+- **No signal**: COMBO 45.0 · PC 50.8 (89% zeros) · TST 55.8 · TSD 60.9 · KPP 39.9
+- Near-constant (CV 0.05): KPP, FIN% — their flatness is the finding, not a column of numbers
+
+Coaching conclusions, cross-validated over both sessions: **APP is the lever** (17–24% higher
+in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-sessions;
+**KPP is flat** (0–2%) — reported as a negative result. When adding a column or a claim, run
+`pipeline/claims/equiv.py` or the AUC probe rather than assuming a stat is informative.
+
+## Front-end traps in report.html (each one shipped a silent bug)
+
+- `--accent` is defined **only** on `.match-card[data-winner=…]`. It resolves to an empty
+  string everywhere else, which silently invalidates any `color-mix()` using it — that
+  painted invisible bars and an unstyled card border. The round-table section carries its
+  own `--rt-accent`.
+- **Sticky cells must be fully opaque.** The player tints are translucent; a translucent
+  sticky cell lets the scrolling columns show through, printing stat values on top of the
+  pinned player name. Paint the tint as `background-image` over an opaque `background-color`.
+- **`data-v` must be computed before any markup is wrapped around a cell value**, or the sort
+  key becomes the markup — this broke sorting and the summary means on the four barred columns.
+- Build the column-name→index map from **one** header row. Querying across all tables lets the
+  last table's indices win, putting every lookup past the end of a row.
+- Scores render in **player order** (`players[0] : players[1]`), never champion-first — that
+  reversed the meaning on the site index once.
+- The `.ttrm` files are single-line JSON; `.gitattributes` marks them `-diff linguist-vendored`.
+
+## Relevant skills
+
+- `dataviz` (bundled) — its palette validator is authoritative: run
+  `node scripts/validate_palette.js "<hex,hex>" --mode light|dark`. The yachi/pinglamb pair
+  passes all six checks in both modes, so colour is not the thing to change.
+- `html-skills:html-data-explorer` (installed from `f-labs-io/agent-html-skills`) — the round
+  table follows its structure: row count, live summary, detail drawer, export, URL hash, plus
+  its mandatory secret-scan-before-embedding rule.
+- `web-artifacts-builder` is a **bad fit** here: it pulls React + Tailwind + shadcn (~150KB)
+  for interactivity already delivered by ~20KB of vanilla JS, and the reports are deliberately
+  single-file with zero external requests.
+
+## Known remaining work
+
+1. Three pre-existing `innerHTML` sites in `report.html` concatenate variables into markup
+   (appendix row builder, match-card score, badge-prose expander). No live risk — all values
+   come from this pipeline — but they violate the skill's XSS rule. Needs one focused change
+   with the 110 badge count and 52 appendix rows re-verified after.
+2. ROADMAP P5: templating the rest of the report (hero, match cards, charts, appendix) so only
+   the Cantonese prose is hand-written.
+3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
+   It is a cross-check, not a published report — every fact in it is covered by that session's
+   full report. Keep it gated by CI; do not resurrect it onto the site.
