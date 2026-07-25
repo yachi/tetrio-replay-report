@@ -96,6 +96,15 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-tbl thead th[aria-sort="descending"] .rt-arrow { opacity: 1; color: var(--accent); }
 .rt-tbl thead th:hover { color: var(--ink); }
 .rt-oddgroup td { border-bottom-color: var(--border); }
+/* low-signal columns: present, hidden by default (see OPTIONAL_COLS) */
+.rt-tbl .rt-opt { display: none; }
+#rounds.rt-show-all .rt-tbl .rt-opt { display: table-cell; }
+.rt-toggle { display: inline-flex; align-items: center; gap: .4rem; cursor: pointer;
+  font-size: .74rem; font-family: var(--font-mono); color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .7rem;
+  background: var(--bg-raised); margin: 0 0 1rem; }
+.rt-toggle:hover { color: var(--ink); border-color: var(--border-strong); }
+.rt-toggle input { accent-color: var(--accent); margin: 0; }
 .rt-tbl td.rt-key { font-weight: 700; color: var(--ink); }
 .rt-tbl td.c-end { text-align: left; font-family: var(--font-mono); font-size: .68rem;
   color: var(--muted); }
@@ -130,6 +139,12 @@ SORT_JS = """
 /* Click a column header to sort that match's rounds by it; click again to reverse;
    a third click restores the original round order. Self-contained, no libraries. */
 (function () {
+  var box = document.getElementById("rt-toggle-all");
+  if (box) {
+    box.addEventListener("change", function () {
+      document.getElementById("rounds").classList.toggle("rt-show-all", box.checked);
+    });
+  }
   document.querySelectorAll("table.rt-tbl").forEach(function (table) {
     var body = table.tBodies[0];
     var heads = Array.prototype.slice.call(table.querySelectorAll("thead th"));
@@ -162,6 +177,23 @@ SORT_JS = """
 })();
 </script>
 """
+
+# Columns whose measured value does not justify a permanent slot. Over 129 rounds
+# (both sessions), each was scored on how often the round's winner held the higher
+# value — the paired AUC, where 50% means the column says nothing about who won —
+# plus its spread and its share of zeros:
+#
+#   PC     AUC 50.8%, 89.1% zeros   — says nothing, and is empty nine times in ten
+#   COMBO  AUC 45.0%                — no signal
+#   TST    AUC 55.8%, 23.6% zeros   — little signal, often empty
+#   TSD    AUC 60.9%                — weak
+#   KPP    AUC 39.9%, CV 0.05       — near-constant; the finding is its flatness,
+#   FIN%   AUC 64.0%, CV 0.05         which the verdict cards already state
+#
+# They stay available behind a toggle rather than being deleted: hiding them takes
+# the table from 1430px to 1121px, inside the 1130px container, so the default view
+# needs no horizontal scrolling at all.
+OPTIONAL_COLS = {"PC", "COMBO", "TST", "TSD", "KPP", "FIN%"}
 
 # (header label, title/explanation) — order defines the columns after the pinned three
 COLUMNS = [
@@ -342,6 +374,10 @@ def build(facts, report_dir=None):
             out.append(f'        <div class="rt-cid">{c["id"]} · {tick}</div>')
             out.append('      </div>')
         out.append('    </div>')
+    out.append('    <label class="rt-toggle">'
+               '<input type="checkbox" id="rt-toggle-all">'
+               f'顯示全部 {len(COLUMNS) + 3} 欄（加埋 {"、".join(sorted(OPTIONAL_COLS))}'
+               '，呢幾欄同輸贏關係唔大）</label>')
     for mi, m in enumerate(facts["matches"]):
         lb, win = m["leaderboard"], m["winner"]
         out.append('    <div class="rt-match">')
@@ -365,7 +401,10 @@ def build(facts, report_dir=None):
                    f'<th class="c-time" title="round length">時間{ARROW}</th>'
                    f'<th class="c-who" title="player">玩家{ARROW}</th>')
         for label, title in COLUMNS:
-            cls = ' class="c-end"' if label == "結果" else ""
+            klass = ["c-end"] if label == "結果" else []
+            if label in OPTIONAL_COLS:
+                klass.append("rt-opt")
+            cls = f' class="{" ".join(klass)}"' if klass else ""
             out.append(f'            <th{cls} title="{title}">{label}{ARROW}</th>')
         out.append('          </tr></thead>')
         out.append('          <tbody>')
@@ -396,6 +435,8 @@ def build(facts, report_dir=None):
                         cls.append("c-end")
                     elif key:
                         cls.append("rt-key")
+                    if label in OPTIONAL_COLS:
+                        cls.append("rt-opt")
                     if val in ("0", "–"):
                         cls.append("rt-zero")
                     attr = f' class="{" ".join(cls)}"' if cls else ""
