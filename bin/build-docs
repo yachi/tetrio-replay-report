@@ -17,15 +17,19 @@ DOCS = REPO / "docs"
 SESSIONS = REPO / "sessions"
 
 # (session dir, artefact subdir, output name, label, blurb)
+#
+# One published report per session. sessions/2026-07-24/ also contains a lighter
+# "即場戰報" with its own independent 20-claim proof layer (sessions/2026-07-24/proof),
+# but every fact in it is already covered by that session's full report — publishing
+# both just put two cards for the same night on the page. It stays in the repo as a
+# cross-check artefact and is still verified by CI; it is simply not a separate report.
 ARTEFACTS = [
     ("2026-07-22", "report", "2026-07-22.html", "完整戰報",
      "十場 series、79 局，每個數字都有 Dafny lemma。"),
     ("2026-07-24", "report", "2026-07-24.html", "完整戰報",
-     "七場 series、50 局，復仇戰full report。"),
-    ("2026-07-24", None, "2026-07-24-live.html", "即場戰報",
-     "同一晚嘅精簡版即場報告，另有 20 條獨立驗證嘅 claim。"),
+     "七場 series、50 局，pinglamb 復仇戰。"),
 ]
-LOOSE_REPORTS = {("2026-07-24", None): "report-2026-07-24.html"}
+LOOSE_REPORTS = {}
 
 
 def load(path):
@@ -173,6 +177,8 @@ def render_index(cards, totals):
     parts.append(
         "<footer><p>Dafny 證明嘅係「claim ⇔ 抽出嚟嘅數據」。"
         "數據本身啱唔啱，靠兩個獨立 parser 完全一致嚟兜底 —— 呢兩件事係分開嘅，唔好溝埋。</p>"
+        "<p>上面數嘅係已出版戰報嘅 claim。repo 裏面仲有一個 20 條 claim 嘅"
+        "即場戰報做交叉驗證，一樣過 CI，但內容已經全部包含喺當晚嘅完整戰報，所以唔另外出版。</p>"
         "<p>Replays &amp; reports 由 yachi 同 pinglamb 對戰產生，兩位都同意公開。</p></footer>"
     )
     parts.append("</div></body></html>")
