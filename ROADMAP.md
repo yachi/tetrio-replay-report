@@ -221,6 +221,35 @@ out of range, a simplified glyph, and drift in the committed island); both repor
 07-22's C026 badge and none on 07-24, pip trails summing to 79/50 rounds, 110 badges, no
 console errors.
 
+**Shipped (2026-07-26): 全場之最 — the session records.** The generators already found every
+session superlative; they were only readable as rows in the 52-row appendix, which is the wrong
+form for a headline number. Nine stat tiles per session now carry them (single-round max VS,
+APM, lines, spike, B2B, T-spin, combo, plus the longest and shortest round), ordered by how
+much each measure actually says about who won the round — the paired AUC, so COMBO's tile comes
+last rather than first.
+
+Design references: Leetify's "NEW PERSONAL BEST" callouts (a superlative deserves a card, not a
+table row) and Lichess's habit of stating the finding as a sentence under the figure. The form
+follows the bundled `dataviz` procedure: a KPI row of stat tiles, no hover layer, proportional
+figures (`tabular-nums` is for columns), identity as a coloured dot beside ink-coloured text,
+and no new colours.
+
+The load-bearing decision: **each tile's figure is read out of the claim's own spec** — the
+operands of the equality Dafny proved — via `claim_cards.round_operand()`, never re-derived
+from `facts.json`. Swap the literal in a spec and the tile changes with it; give a claim a spec
+of another shape and it gets no tile at all rather than an invented figure. `match_apm_max` is
+listed in the table on purpose so its exclusion prints in a footnote instead of vanishing. The
+claim's full sentence sits under every figure, which is what keeps disclosures like
+「呢個數字全場出現過 3 次」 attached to the number.
+
+Also folded out: `pipeline/fmt.py` (the floored formatters) and `pipeline/claim_cards.py` (one
+ledger + proof-map loader), both of which `build_round_table.py` now uses instead of its own
+copies — its output verified byte-identical after the change.
+
+This surfaced a **pre-existing inconsistency**: the hand ledgers round their 約 figures while
+the generated ledger floors them (C009 約262.6 vs G017 約262.5). See CLAUDE.md — fixing it means
+editing hand-written Cantonese, so it is left as a decision, not a silent rewrite.
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
 1. appendix — folds in the remaining `innerHTML` row builder, since the generator can build
    those rows with `textContent` instead of string concatenation

@@ -21,6 +21,9 @@ import json
 import os
 import re
 
+from pipeline import claim_cards
+from pipeline.fmt import fmt_clock, r1, r2
+
 START = "<!-- BEGIN generated round-table (pipeline/build_round_table.py) -->"
 END = "<!-- END generated round-table -->"
 
@@ -612,19 +615,6 @@ COLUMNS = [
 ]
 
 
-def fmt_clock(ms):
-    total = ms // 1000
-    return f"{total // 60}:{total % 60:02d}"
-
-
-def r1(x):
-    return f"{x // 100 / 10:.1f}"
-
-
-def r2(x):
-    return f"{x // 10 / 100:.2f}"
-
-
 def ratio(num, den, dp=2):
     if not den:
         return "–"
@@ -706,24 +696,11 @@ def findings(report_dir):
     These are read from claims-generated.json rather than re-derived here, so the card
     text and the proved lemma are the same statement.
     """
-    import glob
-    led = os.path.join(report_dir, "claims-generated.json")
-    if not os.path.exists(led):
-        return []
-    with open(led, encoding="utf-8") as fh:
-        claims = json.load(fh)
-    status = {}
-    for pm in glob.glob(os.path.join(report_dir, "claims-generated-proof-map.json")):
-        with open(pm, encoding="utf-8") as fh:
-            for row in json.load(fh):
-                status[row["id"]] = row["status"]
     keep = ("rate_split_", "rate_flat_", "app_decides_rounds", "ds_session",
             "keys_per_piece", "per_piece_")
     out = []
-    for c in claims:
-        fam = c.get("family", "")
-        if not fam.startswith(keep):
-            continue
+    for c in claim_cards.by_family(claim_cards.load(report_dir), keep):
+        fam = c["family"]
         metric = ("APP" if "garbage_attack" in fam or fam == "app_decides_rounds"
                   else "KPP" if "inputs" in fam or fam == "keys_per_piece"
                   else "DS" if "garbage_cleared" in fam or fam == "ds_session"
@@ -740,8 +717,7 @@ def findings(report_dir):
         else:
             kind = "compare"
         out.append({"id": c["id"], "metric": metric, "kind": kind,
-                    "canto": c["canto"],
-                    "verified": status.get(c["id"]) == "verified"})
+                    "canto": c["canto"], "verified": c["verified"]})
     order = {"APP": 0, "DS": 1, "KPP": 2, "FINESSE": 3}
     rank = {"lever": 0, "flat": 1, "compare": 2}
     out.sort(key=lambda d: (rank[d["kind"]], order.get(d["metric"], 9), d["id"]))

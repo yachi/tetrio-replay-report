@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import chart_data, hero, matches, region
+from pipeline import chart_data, hero, matches, records, region
 
 
 def chart_section(ctx):
@@ -44,10 +44,16 @@ def match_copy_section(ctx):
                          matches.load_prose(ctx["report_dir"], ctx["facts"]))
 
 
+def records_section(ctx):
+    return records.build(ctx["facts"], ctx["report_dir"])
+
+
 # (name, anchor to insert before when the region is absent, builder)
 # Both islands must precede the claims island, which is where the page's inline
-# script starts reading data from; the hero opens the document body.
+# script starts reading data from; the hero opens the document body; the records
+# sit between the key moments and the coaching recommendations.
 SECTIONS = [("hero", '<section id="matches">', hero_section),
+            ("records", '<section id="coaching">', records_section),
             ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section),
             ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section)]
 

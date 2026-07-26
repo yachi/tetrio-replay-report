@@ -91,6 +91,24 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
   reversed the meaning on the site index once.
 - The `.ttrm` files are single-line JSON; `.gitattributes` marks them `-diff linguist-vendored`.
 
+## Known inconsistency: the hand ledgers round, the generated ledger floors
+
+The same underlying integer prints two ways in one report. `claims-narrative.json` **rounds**
+its 約 figures; `pipeline/claims/generators.py` **floors** them:
+
+| Session | Value | Hand claim | Generated claim |
+|---|---|---|---|
+| 2026-07-22 | VS 262582 | C009 / C010 約262.6 | G017 約262.5 |
+| 2026-07-24 | APM 95498 | C007 約 95.5 | G014 約95.4 |
+| 2026-07-24 | VS 178457 | C008 約 178.5 | G015 約178.4 |
+
+Both ledgers pass `check_claims` because each predicate compares the integer — the divergence
+is only in the Cantonese. The floor convention is the decided one (session-2 minor m5), so the
+hand ledgers and the prose quoting them are what is out of convention. 全場之最 prints the
+floored figure, which puts the two renderings on the same page. Fixing it means editing
+hand-written Cantonese in `claims-narrative.json` and `prose/matches.json` — a person's call,
+not a generator's.
+
 ## Relevant skills
 
 - `dataviz` (bundled) — its palette validator is authoritative: run
@@ -111,9 +129,16 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
    will replace anyway. (The match-card score was the third; it now builds nodes.) Re-verify
    the 110 badge count and 52 appendix rows after touching either.
 2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
-   `--check`): the hero/scoreboard, the `chart-data` island, and the `match-copy` island.
-   Still hand-built: the coaching section and the appendix. Add each as a new entry in
-   `SECTIONS`; the marker region and the drift gate come for free.
+   `--check`): the hero/scoreboard, 全場之最, the `chart-data` island, and the `match-copy`
+   island. Still hand-built: the coaching section and the appendix. Add each as a new entry
+   in `SECTIONS`; the marker region and the drift gate come for free.
+
+   A section that cites claims uses `pipeline/claim_cards.py` — one loader for ledger + proof
+   map, so every section agrees on what "verified" means. `round_operand()` reads a figure out
+   of the claim's own spec (the operands of the proved equality) rather than re-deriving it
+   from `facts.json`; a spec of another shape returns None so the section skips the claim
+   instead of inventing a number. Number formatting lives in `pipeline/fmt.py` and **floors**,
+   because 約 has to mean "at least this much" everywhere.
 
    The split every section follows: numbers from `facts.json`, words from
    `<report_dir>/prose/*.json`. Prose is inserted as raw HTML because it legitimately contains
