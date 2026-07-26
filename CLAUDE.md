@@ -68,8 +68,20 @@ byte-identity gated, so it doubles as a portable artefact: any SMT-LIB solver ca
 claims without this pipeline.
 
 The `.smt2` covers the **generated** ledger only — the hand ledgers have no spec, so they stay
-Dafny-only. Second-solver coverage (cvc5 alongside z3) is one `brew install cvc5` away;
-`check_smt` runs every solver it finds on PATH and says so when one is missing.
+Dafny-only.
+
+**Encoding, and why it is what it is.** Strings are integer codes with a legend in the header
+(`1 = yachi`), not the `String` sort — the sort restricted the file to the two solvers with a
+string theory, which defeats emitting a standard format. The logic is `QF_NIA`, not `QF_LIA`:
+the integer variance identity squares a datum, and `QF_LIA` rejects `(* v v)` outright. Both
+facts were found by a solver refusing the file, not by reading a spec.
+
+**Second solver: still open.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
+`yices-smt2`) and names the missing ones, so a single-solver run is visible rather than
+implied. There is **no `cvc5` in Homebrew core** and the PyPI package is Python bindings with
+no CLI, so the CLI means the pinned release binary
+(`cvc5-macOS-arm64-static.zip`, tag `cvc5-1.3.4`). yices2 is one `brew install yices2` but its
+nonlinear support is limited, so it may refuse the variance claims.
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that

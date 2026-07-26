@@ -29,8 +29,12 @@ import shutil
 import subprocess
 import sys
 
-SOLVERS = ("z3", "cvc5")
-DEFINE = re.compile(r"^\(define-fun (\w+) \(\) Int (-?\d+)\)$", re.M)
+# Every SMT-LIB 2 front end worth trying, in order of preference. yices2's
+# binary is `yices-smt2`, not `yices2`.
+SOLVERS = ("z3", "cvc5", "yices-smt2")
+DEFINE = re.compile(r"^\(define-fun (\w+) \(\) Int (-?\d+)\)", re.M)
+# Claim ids as the ledgers assign them: C001, R014, G077.
+CLAIM_ID = re.compile(r"[A-Z]\d{3,}")
 
 
 def solvers_available(only=None):
@@ -40,19 +44,29 @@ def solvers_available(only=None):
 
 
 def run(solver, text):
-    """[(claim id, answer)] in file order."""
+    """([(claim id, answer)], [solver errors]) — line-based, on purpose.
+
+    An earlier token-based version treated the words inside `(error "logic does not
+    support nonlinear arithmetic")` as claim ids and answers, so a file the solver
+    had REFUSED read as a file full of kills. Errors are now collected and are a
+    failure in their own right.
+    """
     proc = subprocess.run([solver, "-in"], input=text, capture_output=True, text=True)
-    out = proc.stdout.split()
-    pairs, pending = [], None
-    for tok in out:
-        if tok in ("sat", "unsat", "unknown"):
-            pairs.append((pending, tok))
+    pairs, errors, pending = [], [], None
+    for line in (proc.stdout + "\n" + proc.stderr).splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("(error") or line.startswith("error"):
+            errors.append(line[:120])
+        elif line in ("sat", "unsat", "unknown"):
+            pairs.append((pending, line))
             pending = None
-        else:
-            pending = tok.strip('"')
-    if not pairs and proc.returncode != 0:
+        elif CLAIM_ID.fullmatch(line.strip('"')):
+            pending = line.strip('"')
+    if not pairs and proc.returncode != 0 and not errors:
         raise SystemExit(f"{solver} failed: {proc.stderr.strip()[:200]}")
-    return pairs
+    return pairs, errors
 
 
 def check(path, only=None):
@@ -66,7 +80,14 @@ def check(path, only=None):
     missing = [s for s in SOLVERS if s not in found]
     bad = 0
     for solver in found:
-        pairs = run(solver, text)
+        pairs, errors = run(solver, text)
+        for err in errors[:5]:
+            print(f"FAIL {solver}: {err}", file=sys.stderr)
+        if errors:
+            print(f"FAIL {solver} reported {len(errors)} error(s) — the file was not "
+                  f"fully answered", file=sys.stderr)
+            bad += len(errors)
+            continue
         wrong = [(cid, ans) for cid, ans in pairs if ans != "unsat"]
         for cid, ans in wrong:
             print(f"FAIL {os.path.basename(path)} {cid}: {ans} (expected unsat)",
@@ -123,7 +144,9 @@ def mutate(path, count, only=None, seed=7):
         for step in (1, 1000, max(abs(v) * 2, 10 ** 6)):
             probe = text.replace(f"(define-fun {name} () Int {val})",
                                  f"(define-fun {name} () Int {v + step})", 1)
-            pairs = run(solver, probe)
+            pairs, errors = run(solver, probe)
+            if errors:
+                raise SystemExit(f"{solver} errored on a mutant: {errors[0]}")
             hits = [cid for cid, ans in pairs if ans == "sat"]
             if hits:
                 killed_by = (step, hits[:3], len(hits))

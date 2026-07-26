@@ -44,9 +44,10 @@ This distinction matters, so it is stated plainly rather than buried:
   For the same reason, no constant may sit in `Facts.dfy` unread by any lemma: a datum
   nothing depends on is a mutation that can never be killed.
 - **The generated claims are also checkable without this pipeline.** The same specs render to
-  SMT-LIB 2.6 as `claims.smt2` — facts as definitions, each claim asserted negated. Run
-  `z3 claims.smt2` (or any SMT-LIB solver) and every answer must be `unsat`. Two independent
-  solvers agreeing is the same argument as two independent extractors agreeing.
+  SMT-LIB 2.6 as `claims.smt2` — facts as definitions, each claim asserted negated, quantifier-
+  free integer arithmetic with player names as integer codes so no string theory is needed. Run
+  `z3 claims.smt2` (or any QF_NIA-capable SMT-LIB solver) and every answer must be `unsat`. Two
+  independent solvers agreeing is the same argument as two independent extractors agreeing.
 
 ## The verification chain
 
@@ -106,8 +107,8 @@ sessions/<date>/
     claims-narrative.json      hand-written 戰況 claims  (C0xx)
     claims-coaching.json       hand-written 建議 claims  (R0xx)
     dafny/*.dfy                one lemma per claim
-    claims.smt2                the generated claims in SMT-LIB 2.6 — run it
-                               yourself: `z3 claims.smt2`, all answers `unsat`
+    claims.smt2                the generated claims in SMT-LIB 2.6 (QF_NIA) — run
+                               it yourself: `z3 claims.smt2`, all answers `unsat`
     claims-proof-map.json      what the verifier actually proved
     report.html                the deliverable, self-contained
     narrative-beats.md         Cantonese prose source

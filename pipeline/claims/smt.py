@@ -9,14 +9,20 @@ evaluates, what Dafny proves, and what an SMT solver refutes cannot drift apart.
 Const names are **identical to the Dafny backend's** (`m3_r2_yachi_apm`), so a
 reader can put `Facts.dfy` and `facts.smt2` side by side and check them off.
 
-Two differences from the Dafny renderer, both because SMT-LIB has no Boogie under
-it:
+Three differences from the Dafny renderer:
 
 * sums are emitted **n-ary** — `(+ t1 t2 … t79)`. `spec.bal` exists to keep the
   Dafny AST shallow enough for Boogie's recursive visitor; an s-expression needs no
   such trick, so the balancing is dropped rather than imitated.
 * a claim is discharged by asserting its **negation** and requiring `unsat`, which
   is the SMT idiom for "this holds", and mirrors what Boogie does internally.
+* **strings are encoded as integer codes.** Dafny compares player names as strings;
+  here `m0_winner` is `1` or `2` with the mapping written into the file's header.
+  Only equality is ever used on these, so nothing is lost — and it keeps the file
+  inside quantifier-free linear integer arithmetic, which every SMT-LIB solver
+  implements. Using the `String` sort restricted the artefact to the few solvers
+  with a string theory (z3, cvc5), which defeats the point of emitting a standard
+  format so that an *independent* solver can check it.
 
 Integer division: Dafny's `/` on `int` and SMT-LIB's `div` are both Euclidean, and
 every value here is non-negative, so the two agree with floor. The algebra emits no
@@ -24,6 +30,39 @@ division today; if a family ever needs one, that equivalence is the thing to re-
 before trusting the two backends to agree.
 """
 from .spec import c_winner, dafny_field, dafny_suffix, rounds_of
+
+# Every string value in the corpus, mapped to an integer code. Populated by
+# `code_table()` from facts.json before rendering, so the codes are derived from
+# the data rather than hard-coded, and the emitter can print the legend.
+CODES = {}
+
+
+def code_table(facts):
+    """{string value: code} for every string a claim can compare against.
+
+    Player names first (1, 2, in `players` order) so the common case reads
+    predictably, then any other string field's values in sorted order.
+    """
+    codes = {pl: i + 1 for i, pl in enumerate(facts["players"])}
+    others = set()
+    for m in facts["matches"]:
+        for r in m["rounds"]:
+            for p in r["players"].values():
+                for k, v in p.items():
+                    if isinstance(v, str):
+                        others.add(v)
+    for v in sorted(others - set(codes)):
+        codes[v] = len(codes) + 1
+    CODES.clear()
+    CODES.update(codes)
+    return codes
+
+
+def code(value):
+    """The integer code for a string value, or a loud failure."""
+    if value not in CODES:
+        raise KeyError(f"no code for {value!r} — call code_table(facts) first")
+    return CODES[value]
 
 # --------------------------------------------------------------------------- #
 # helpers
@@ -56,7 +95,7 @@ def _ite(cond, a, b):
 def smt_cond(facts, mi, ri, cond):
     k = cond["c"]
     if k == "winner":
-        return f'(= m{mi}_r{ri}_winner "{cond["pl"]}")'
+        return f'(= m{mi}_r{ri}_winner {code(cond["pl"])})'
     if k == "field_cmp":
         return (f"({cond['op']} {dafny_field(mi, ri, cond['pl'], cond['f'])} "
                 f"{cond['v']})")
@@ -69,9 +108,11 @@ def smt_cond(facts, mi, ri, cond):
         y, p = dafny_field(mi, ri, "yachi", f), dafny_field(mi, ri, "pinglamb", f)
         # Selected by the winner const, exactly as the Dafny renderer does, so a
         # mutated winner genuinely re-selects which datum is compared.
-        return _ite(f'(= m{mi}_r{ri}_winner "yachi")', f"(> {y} {p})", f"(> {p} {y})")
+        return _ite(f'(= m{mi}_r{ri}_winner {code("yachi")})',
+                    f"(> {y} {p})", f"(> {p} {y})")
     if k == "str_field":
-        return f'(= {dafny_field(mi, ri, cond["pl"], cond["f"])} "{cond["v"]}")'
+        return (f'(= {dafny_field(mi, ri, cond["pl"], cond["f"])} '
+                f'{code(cond["v"])})')
     if k == "and":
         return nary("and", [smt_cond(facts, mi, ri, x) for x in cond["xs"]], "true")
     raise ValueError(f"unknown cond {k}")
@@ -126,7 +167,7 @@ def smt_expr(facts, e):
     if k == "sum_ge":
         return nary("+", _ge_terms(facts, e["pl"], e["mi"], e["ri"]))
     if k == "count_matches_won":
-        return nary("+", [_ite(f'(= m{mi}_winner "{e["pl"]}")', "1", "0")
+        return nary("+", [_ite(f'(= m{mi}_winner {code(e["pl"])})', "1", "0")
                           for mi in range(len(facts["matches"]))])
     if k == "count_rounds_won":
         return _count(facts, c_winner(e["pl"]))
@@ -158,11 +199,11 @@ def smt_pred(facts, p):
         x = smt_expr(facts, p["x"])
         return f"(and (<= {p['lo']} {x}) (< {x} {p['hi']}))"
     if k == "match_winner":
-        return f'(= m{p["mi"]}_winner "{p["pl"]}")'
+        return f'(= m{p["mi"]}_winner {code(p["pl"])})'
     if k == "round_winner":
-        return f'(= m{p["mi"]}_r{p["ri"]}_winner "{p["pl"]}")'
+        return f'(= m{p["mi"]}_r{p["ri"]}_winner {code(p["pl"])})'
     if k == "round_seq":
-        return nary("and", [f'(= m{mi}_r{ri}_winner "{w}")'
+        return nary("and", [f'(= m{mi}_r{ri}_winner {code(w)})'
                             for (mi, ri), w in zip(p["pairs"], p["winners"])], "true")
     if k == "all_rounds":
         return f"(= {_count(facts, p['cond'])} {len(rounds_of(facts))})"

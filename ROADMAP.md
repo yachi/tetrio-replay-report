@@ -308,10 +308,27 @@ Validation: 77/77 and 76/76 `unsat`; the committed file regenerates byte-for-byt
 perturbations falsified at least one claim. Dafny stays exactly as it was — this is a
 cross-check, not a replacement, and the report's badges still cite Dafny lemmas.
 
-**Not done yet:** the second solver. The whole argument for a standard format is that an
-independently implemented solver can check the same file, and `check_smt` already runs every
-solver on PATH — but cvc5 is not installed here, so both sessions are currently single-solver.
-One `brew install cvc5` closes that.
+**Two encoding facts, both found by a solver refusing the file rather than by reasoning:**
+
+* strings are **integer codes** with a legend in the header, not the `String` sort. The sort
+  worked with z3 and cvc5 and locked everyone else out, which defeats the point of emitting a
+  standard format so an independent solver can read it.
+* the logic is **`QF_NIA`**, not `QF_LIA`. The integer variance identity squares a datum, and
+  `QF_LIA` rejects `(* v v)` outright.
+
+The second attempt at that first point also exposed a hole in the gate itself: with the wrong
+logic declared, z3 answered nothing and printed `(error "logic does not support nonlinear
+arithmetic")` per claim — and the token-based output parser read the words inside those errors
+as claim ids and answers, so a **refused file reported 15 kills per mutation**. The parser is
+line-based now, solver errors are a failure in their own right, and that is mutation-tested by
+re-declaring the wrong logic.
+
+**Not done yet: the second solver.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
+`yices-smt2`) and names the missing ones, so single-solver runs are visible rather than implied.
+Getting cvc5 here is more work than expected: no Homebrew formula, and the PyPI package ships
+Python bindings with no CLI, so it means the pinned release binary
+(`cvc5-macOS-arm64-static.zip` from tag `cvc5-1.3.4`). yices2 installs from Homebrew but its
+nonlinear support is limited, so it may refuse the variance claims.
 
 ### Dead constants, found by the same probe
 
