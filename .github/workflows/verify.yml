@@ -113,6 +113,12 @@ jobs:
       - name: Check every 約-figure in hand-written text is floored
         run: python3 -m pipeline.check_prose_figures "sessions/${{ matrix.session }}/report"
 
+      # A generated section's <style> is injected into the body, so at equal
+      # specificity it beats the report's own stylesheet. 全場之最 defining
+      # .rec-grid silently collapsed 建議's two columns; nothing failed.
+      - name: Check no generated CSS reaches outside its region
+        run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail

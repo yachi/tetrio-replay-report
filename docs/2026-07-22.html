@@ -581,32 +581,32 @@
 /* The host report defines --accent only on .match-card[data-winner], where it is
    set from the winner; anywhere else it resolves to an empty string and silently
    invalidates any color-mix() using it. This section carries its own token. */
-#records { --rec-accent: var(--yachi); }
-.rec-grid { display: grid; gap: .8rem; margin: 1.4rem 0 0;
+#records { --sr-accent: var(--yachi); }
+#records .sr-grid { display: grid; gap: .8rem; margin: 1.4rem 0 0;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 232px), 1fr)); }
-.rec-tile { border: 1px solid var(--border); border-radius: 10px; padding: .85rem .95rem 1rem;
+#records .sr-tile { border: 1px solid var(--border); border-radius: 10px; padding: .85rem .95rem 1rem;
   background: var(--bg-raised); display: flex; flex-direction: column; gap: .3rem; }
-.rec-label { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em;
+#records .sr-label { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em;
   text-transform: uppercase; color: var(--muted); }
 /* Proportional figures, not tabular: these are standalone display numbers, and
    equal-width digits make a value like 121 read loose at this size. */
-.rec-value { font-size: 1.7rem; font-weight: 700; line-height: 1.1; color: var(--ink);
+#records .sr-value { font-size: 1.7rem; font-weight: 700; line-height: 1.1; color: var(--ink);
   font-variant-numeric: proportional-nums; }
-.rec-value small { font-size: .62em; font-weight: 600; color: var(--muted); margin-left: .18em; }
+#records .sr-value small { font-size: .62em; font-weight: 600; color: var(--muted); margin-left: .18em; }
 /* Identity is a coloured dot plus ink-coloured text. A figure painted in the
    player's hue would be colour-as-information and reads worse. */
-.rec-who { font-size: .78rem; color: var(--ink-secondary); display: flex;
+#records .sr-who { font-size: .78rem; color: var(--ink-secondary); display: flex;
   align-items: center; gap: .4rem; }
-.rec-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
-.rec-dot.is-y { background: var(--yachi); }
-.rec-dot.is-p { background: var(--pinglamb); }
-.rec-note { margin: .35rem 0 0; font-size: .78rem; line-height: 1.7;
+#records .sr-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+#records .sr-dot.is-y { background: var(--yachi); }
+#records .sr-dot.is-p { background: var(--pinglamb); }
+#records .sr-note { margin: .35rem 0 0; font-size: .78rem; line-height: 1.7;
   color: var(--ink-secondary); }
-.rec-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
+#records .sr-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
   margin-top: auto; padding-top: .5rem; }
-.rec-foot { font-size: .8rem; color: var(--muted); margin: 1.1rem 0 0; }
+#records .sr-foot { font-size: .8rem; color: var(--muted); margin: 1.1rem 0 0; }
 @media print {
-  .rec-tile { break-inside: avoid; }
+  #records .sr-tile { break-inside: avoid; }
 }
 </style>
 
@@ -615,72 +615,72 @@
     <div class="eyebrow">紀錄 · SESSION RECORDS</div>
     <h2 class="section-title">全場之最</h2>
     <p class="section-lede">每格都係 pipeline 由 facts.json 自己搵出嚟、再逐條用 Dafny 證過嘅紀錄（claim id 喺格仔下面）。格仔嘅數字就係嗰條 claim 證嘅同一個數，唔係另外再算一次；下面嗰句連埋原本嘅注解一齊擺，所以「呢個數全場出現過幾次」呢類話唔會跌咗。</p>
-    <div class="rec-grid">
-      <div class="rec-tile">
-        <div class="rec-label">單局最高 VS</div>
-        <div class="rec-value">約262.5</div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m7 第2局</div>
-        <p class="rec-note">全場最高單局 VS係 pinglamb 喺 m7 第 2 局打出嘅 約262.5，嗰局 pinglamb 生還</p>
-        <div class="rec-cid">G017 · ✓ Dafny 已證</div>
+    <div class="sr-grid">
+      <div class="sr-tile">
+        <div class="sr-label">單局最高 VS</div>
+        <div class="sr-value">約262.5</div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m7 第2局</div>
+        <p class="sr-note">全場最高單局 VS係 pinglamb 喺 m7 第 2 局打出嘅 約262.5，嗰局 pinglamb 生還</p>
+        <div class="sr-cid">G017 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">單局最高 APM</div>
-        <div class="rec-value">約114.2</div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m7 第2局</div>
-        <p class="rec-note">全場最高單局 APM係 pinglamb 喺 m7 第 2 局打出嘅 約114.2，嗰局 pinglamb 生還</p>
-        <div class="rec-cid">G016 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">單局最高 APM</div>
+        <div class="sr-value">約114.2</div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m7 第2局</div>
+        <p class="sr-note">全場最高單局 APM係 pinglamb 喺 m7 第 2 局打出嘅 約114.2，嗰局 pinglamb 生還</p>
+        <div class="sr-cid">G016 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">單局最多清行</div>
-        <div class="rec-value">204<small>行</small></div>
-        <div class="rec-who"><span class="rec-dot is-y"></span>yachi · m2 第3局</div>
-        <p class="rec-note">全場最高單局清行數係 yachi 喺 m2 第 3 局打出嘅 204，嗰局 yachi 生還</p>
-        <div class="rec-cid">G022 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">單局最多清行</div>
+        <div class="sr-value">204<small>行</small></div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m2 第3局</div>
+        <p class="sr-note">全場最高單局清行數係 yachi 喺 m2 第 3 局打出嘅 204，嗰局 yachi 生還</p>
+        <div class="sr-cid">G022 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">最長嘅一局</div>
-        <div class="rec-value">228<small>秒（3:48）</small></div>
-        <div class="rec-who"><span class="rec-dot is-y"></span>yachi · m2 第3局</div>
-        <p class="rec-note">全場最長嗰局係 m2 第 3 局，打咗約 228 秒（3 分 48 秒），最後 yachi 生還</p>
-        <div class="rec-cid">G023 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">最長嘅一局</div>
+        <div class="sr-value">228<small>秒（3:48）</small></div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m2 第3局</div>
+        <p class="sr-note">全場最長嗰局係 m2 第 3 局，打咗約 228 秒（3 分 48 秒），最後 yachi 生還</p>
+        <div class="sr-cid">G023 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">最短嘅一局</div>
-        <div class="rec-value">15<small>秒</small></div>
-        <div class="rec-who"><span class="rec-dot is-y"></span>yachi · m6 第2局</div>
-        <p class="rec-note">全場最短嗰局係 m6 第 2 局，打咗約 15 秒，最後 yachi 生還</p>
-        <div class="rec-cid">G024 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">最短嘅一局</div>
+        <div class="sr-value">15<small>秒</small></div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m6 第2局</div>
+        <p class="sr-note">全場最短嗰局係 m6 第 2 局，打咗約 15 秒，最後 yachi 生還</p>
+        <div class="sr-cid">G024 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">最大單一 spike</div>
-        <div class="rec-value">16<small>行</small></div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m1 第5局</div>
-        <p class="rec-note">全場最高單一次 spike係 pinglamb 喺 m1 第 5 局打出嘅 16，嗰局 yachi 生還（呢個數字全場出現過 3 次）</p>
-        <div class="rec-cid">G018 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">最大單一 spike</div>
+        <div class="sr-value">16<small>行</small></div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m1 第5局</div>
+        <p class="sr-note">全場最高單一次 spike係 pinglamb 喺 m1 第 5 局打出嘅 16，嗰局 yachi 生還（呢個數字全場出現過 3 次）</p>
+        <div class="sr-cid">G018 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">最長 B2B 鏈</div>
-        <div class="rec-value">10<small>段</small></div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m9 第6局</div>
-        <p class="rec-note">全場最高B2B 鏈係 pinglamb 喺 m9 第 6 局打出嘅 10，嗰局 pinglamb 生還</p>
-        <div class="rec-cid">G020 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">最長 B2B 鏈</div>
+        <div class="sr-value">10<small>段</small></div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m9 第6局</div>
+        <p class="sr-note">全場最高B2B 鏈係 pinglamb 喺 m9 第 6 局打出嘅 10，嗰局 pinglamb 生還</p>
+        <div class="sr-cid">G020 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">單局最多 T-spin</div>
-        <div class="rec-value">21<small>個</small></div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m2 第8局</div>
-        <p class="rec-note">全場最高單局 T-spin 數係 pinglamb 喺 m2 第 8 局打出嘅 21（計埋冇消行嘅 T-spin），嗰局 pinglamb 生還</p>
-        <div class="rec-cid">G021 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">單局最多 T-spin</div>
+        <div class="sr-value">21<small>個</small></div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m2 第8局</div>
+        <p class="sr-note">全場最高單局 T-spin 數係 pinglamb 喺 m2 第 8 局打出嘅 21（計埋冇消行嘅 T-spin），嗰局 pinglamb 生還</p>
+        <div class="sr-cid">G021 · ✓ Dafny 已證</div>
       </div>
-      <div class="rec-tile">
-        <div class="rec-label">最長 COMBO</div>
-        <div class="rec-value">7<small>下</small></div>
-        <div class="rec-who"><span class="rec-dot is-p"></span>pinglamb · m1 第7局</div>
-        <p class="rec-note">全場最高combo係 pinglamb 喺 m1 第 7 局打出嘅 7，嗰局 yachi 生還（呢個數字全場出現過 2 次）</p>
-        <div class="rec-cid">G019 · ✓ Dafny 已證</div>
+      <div class="sr-tile">
+        <div class="sr-label">最長 COMBO</div>
+        <div class="sr-value">7<small>下</small></div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m1 第7局</div>
+        <p class="sr-note">全場最高combo係 pinglamb 喺 m1 第 7 局打出嘅 7，嗰局 yachi 生還（呢個數字全場出現過 2 次）</p>
+        <div class="sr-cid">G019 · ✓ Dafny 已證</div>
       </div>
     </div>
-    <p class="rec-foot">另外有 1 條紀錄類 claim（G025）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
+    <p class="sr-foot">另外有 1 條紀錄類 claim（G025）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
 <!-- END generated records -->

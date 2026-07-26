@@ -35,6 +35,7 @@ python3 -m pipeline.build_report sessions/<date>/report         # regenerate the
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
 python3 -m pipeline.check_proof_links sessions/<date>/report      # CI gate: every badge's lemma exists
+python3 -m pipeline.check_generated_css sessions/<date>/report    # CI gate: generated CSS stays in its region
 python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 逐局全數據 section
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
@@ -83,6 +84,14 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
+- **A generated section's `<style>` is injected into the body, so at equal specificity it beats
+  the report's own stylesheet.** 全場之最 defined `.rec-grid` for its tile grid; 建議 had used
+  `.rec-grid` for its two-column layout since long before, and the coaching columns silently
+  collapsed into narrow auto-fit ones — the new section itself looked perfect, which is why
+  eyeballing the section you just added does not cover this. Name generated classes with a
+  section-specific prefix (`sr-`, `rt-`) and scope the rules under the section id.
+  `pipeline/check_generated_css.py` is the gate: it fails any selector that could match an
+  element outside its own region.
 - `--accent` is defined **only** on `.match-card[data-winner=…]`. It resolves to an empty
   string everywhere else, which silently invalidates any `color-mix()` using it — that
   painted invisible bars and an unstyled card border. The round-table section carries its

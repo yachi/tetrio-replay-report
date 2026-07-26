@@ -51,32 +51,32 @@ CSS = """
 /* The host report defines --accent only on .match-card[data-winner], where it is
    set from the winner; anywhere else it resolves to an empty string and silently
    invalidates any color-mix() using it. This section carries its own token. */
-#records { --rec-accent: var(--yachi); }
-.rec-grid { display: grid; gap: .8rem; margin: 1.4rem 0 0;
+#records { --sr-accent: var(--yachi); }
+#records .sr-grid { display: grid; gap: .8rem; margin: 1.4rem 0 0;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 232px), 1fr)); }
-.rec-tile { border: 1px solid var(--border); border-radius: 10px; padding: .85rem .95rem 1rem;
+#records .sr-tile { border: 1px solid var(--border); border-radius: 10px; padding: .85rem .95rem 1rem;
   background: var(--bg-raised); display: flex; flex-direction: column; gap: .3rem; }
-.rec-label { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em;
+#records .sr-label { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em;
   text-transform: uppercase; color: var(--muted); }
 /* Proportional figures, not tabular: these are standalone display numbers, and
    equal-width digits make a value like 121 read loose at this size. */
-.rec-value { font-size: 1.7rem; font-weight: 700; line-height: 1.1; color: var(--ink);
+#records .sr-value { font-size: 1.7rem; font-weight: 700; line-height: 1.1; color: var(--ink);
   font-variant-numeric: proportional-nums; }
-.rec-value small { font-size: .62em; font-weight: 600; color: var(--muted); margin-left: .18em; }
+#records .sr-value small { font-size: .62em; font-weight: 600; color: var(--muted); margin-left: .18em; }
 /* Identity is a coloured dot plus ink-coloured text. A figure painted in the
    player's hue would be colour-as-information and reads worse. */
-.rec-who { font-size: .78rem; color: var(--ink-secondary); display: flex;
+#records .sr-who { font-size: .78rem; color: var(--ink-secondary); display: flex;
   align-items: center; gap: .4rem; }
-.rec-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
-.rec-dot.is-y { background: var(--yachi); }
-.rec-dot.is-p { background: var(--pinglamb); }
-.rec-note { margin: .35rem 0 0; font-size: .78rem; line-height: 1.7;
+#records .sr-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+#records .sr-dot.is-y { background: var(--yachi); }
+#records .sr-dot.is-p { background: var(--pinglamb); }
+#records .sr-note { margin: .35rem 0 0; font-size: .78rem; line-height: 1.7;
   color: var(--ink-secondary); }
-.rec-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
+#records .sr-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted);
   margin-top: auto; padding-top: .5rem; }
-.rec-foot { font-size: .8rem; color: var(--muted); margin: 1.1rem 0 0; }
+#records .sr-foot { font-size: .8rem; color: var(--muted); margin: 1.1rem 0 0; }
 @media print {
-  .rec-tile { break-inside: avoid; }
+  #records .sr-tile { break-inside: avoid; }
 }
 </style>
 """
@@ -128,24 +128,24 @@ def build(facts, report_dir):
            '再逐條用 Dafny 證過嘅紀錄（claim id 喺格仔下面）。格仔嘅數字就係嗰條 claim '
            '證嘅同一個數，唔係另外再算一次；下面嗰句連埋原本嘅注解一齊擺，'
            '所以「呢個數全場出現過幾次」呢類話唔會跌咗。</p>',
-           '    <div class="rec-grid">']
+           '    <div class="sr-grid">']
     for t in tiles:
         dot = "is-y" if t["player"] == p1 else "is-p"
         tick = "✓ Dafny 已證" if t["verified"] else "⏳ 待證"
         suffix = (f'<small>{html.escape(t["suffix"])}</small>' if t["suffix"] else "")
         out += [
-            '      <div class="rec-tile">',
-            f'        <div class="rec-label">{html.escape(t["label"])}</div>',
-            f'        <div class="rec-value">{html.escape(t["value"])}{suffix}</div>',
-            f'        <div class="rec-who"><span class="rec-dot {dot}"></span>'
+            '      <div class="sr-tile">',
+            f'        <div class="sr-label">{html.escape(t["label"])}</div>',
+            f'        <div class="sr-value">{html.escape(t["value"])}{suffix}</div>',
+            f'        <div class="sr-who"><span class="sr-dot {dot}"></span>'
             f'{html.escape(t["player"])} · m{t["match"]} 第{t["round"]}局</div>',
-            f'        <p class="rec-note">{html.escape(t["canto"])}</p>',
-            f'        <div class="rec-cid">{html.escape(t["id"])} · {tick}</div>',
+            f'        <p class="sr-note">{html.escape(t["canto"])}</p>',
+            f'        <div class="sr-cid">{html.escape(t["id"])} · {tick}</div>',
             '      </div>',
         ]
     out.append('    </div>')
     if skipped:
-        out.append('    <p class="rec-foot">另外有 '
+        out.append('    <p class="sr-foot">另外有 '
                    f'{len(skipped)} 條紀錄類 claim（{", ".join(html.escape(i) for i in skipped)}）'
                    '嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>')
     out += ['  </div>', '</section>']
