@@ -323,18 +323,31 @@ as claim ids and answers, so a **refused file reported 15 kills per mutation**. 
 line-based now, solver errors are a failure in their own right, and that is mutation-tested by
 re-declaring the wrong logic.
 
-**Not done yet: the second solver.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
-`yices-smt2`) and names the missing ones, so single-solver runs are visible rather than implied.
+### The second solver, done (2026-07-26)
 
-The install is documented, just not where `brew search` looks: cvc5 ships its own Homebrew tap
-and cvc5 is a **cask**, not a formula — `brew install --cask cvc5/cvc5/cvc5`. That cask is also
-the authority for pinning in CI, since it carries the release sha256 and GitHub's asset digest
-for the Linux build agrees with it. The PyPI package is Python bindings with no CLI.
+**z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on all 153 generated claims.** That is the
+argument the SMT backend existed to make: the same file, two independently implemented solvers,
+same verdict — the dual-extractor design applied to the proof side.
 
-One CI wrinkle worth recording: recent z3 releases ship only `x64-glibc-2.39` builds, which
-cannot run on the `ubuntu-22.04` runner the Dafny step pins (glibc 2.35). So the natural
-arrangement is cvc5 in CI and z3 locally — two independently implemented solvers over the same
-committed artefact, which is the point, even though they run in different places.
+Finding cvc5 took a wrong turn worth recording: `brew install cvc5` fails and
+`brew search --formula cvc5` finds nothing, because cvc5 is packaged as a **cask in the
+project's own tap** (`brew install --cask cvc5/cvc5/cvc5`). The PyPI package is Python bindings
+with no CLI. The cask is also what makes CI pinning trustworthy — it carries the release
+sha256, GitHub's asset digest reports the same hash, and the downloaded bytes matched both
+before the binary was run.
+
+Then two invocation facts, both found by the solver refusing to work rather than by reading
+docs: `check_smt` had hardcoded z3's `-in`, which cvc5 rejects outright, and cvc5 will not
+honour the file's `push`/`pop` without `--incremental` (it errors with
+`cannot push when not solving incrementally`). `SOLVERS` maps each name to its flags now, and
+the file is passed as a path, which every front end accepts.
+
+Cost of the whole gate with both solvers, byte-identity and 8 mutations: **0.33 s**.
+
+z3 is deliberately not in CI: recent z3 releases ship only `x64-glibc-2.39` builds, which cannot
+run on the `ubuntu-22.04` runner the Dafny step pins (glibc 2.35), and the ≤ 4.14.1 builds that
+target 2.35 have no GitHub-reported digest to pin against. So z3 runs locally and cvc5 in CI,
+over the same committed artefact.
 
 ### Dead constants, found by the same probe
 

@@ -25,6 +25,10 @@ env:
   DAFNY_VERSION: 4.11.0
   # sha256 of dafny-4.11.0-x64-ubuntu-22.04.zip, from the signed release listing
   DAFNY_SHA256: a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179
+  CVC5_VERSION: 1.3.4
+  # sha256 of cvc5-Linux-x86_64-static.zip. Two independent authorities agree on
+  # this: cvc5's own Homebrew cask (cvc5/homebrew-cvc5) and GitHub's asset digest.
+  CVC5_SHA256: dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6
 
 jobs:
   verify:
@@ -145,23 +149,22 @@ jobs:
         if: github.event_name == 'schedule' || inputs.mutation
         run: bash pipeline/mutation_test.sh "$RUNNER_TEMP/dfy" 12
 
-      # Use the Z3 inside the Dafny release, which the sha256 above already pins —
-      # rather than apt's, which would be an unpinned download. If the layout ever
-      # changes this fails loudly instead of quietly falling back to an unpinned
-      # solver.
-      - name: Put Dafny's bundled Z3 on PATH
+      # cvc5 is the SECOND solver: independently implemented from Z3, checking the
+      # same committed .smt2. Pinned by sha256 — the same hash cvc5's own Homebrew
+      # cask carries and GitHub's asset digest reports, which agree with each other.
+      # (Recent z3 releases only ship glibc-2.39 builds, which will not run on this
+      # runner, so z3 is the local solver and cvc5 the CI one.)
+      - name: Install cvc5 ${{ env.CVC5_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
-          Z3="$(find "$HOME/dafny-dist" -type f -name 'z3*' -perm -u+x | head -1)"
-          if [ -z "$Z3" ]; then
-            echo "no z3 inside the pinned Dafny distribution; add a sha256-pinned" >&2
-            echo "z3 release step rather than an unpinned package install" >&2
-            find "$HOME/dafny-dist" -maxdepth 3 -type d | head -20 >&2
-            exit 1
-          fi
-          mkdir -p "$HOME/bin" && ln -sf "$Z3" "$HOME/bin/z3"
+          URL="https://github.com/cvc5/cvc5/releases/download/cvc5-${CVC5_VERSION}/cvc5-Linux-x86_64-static.zip"
+          curl -fsSL "$URL" -o cvc5.zip
+          echo "${CVC5_SHA256}  cvc5.zip" | sha256sum -c -
+          unzip -q cvc5.zip -d "$HOME/cvc5-dist"
+          mkdir -p "$HOME/bin"
+          cp "$HOME/cvc5-dist/cvc5-Linux-x86_64-static/bin/cvc5" "$HOME/bin/cvc5"
           echo "$HOME/bin" >> "$GITHUB_PATH"
-          "$HOME/bin/z3" --version
+          "$HOME/bin/cvc5" --version | head -1
 
       # The same claims, rendered to SMT-LIB from the same specs and checked by a
       # solver directly. Runs in well under a second, so the anti-vacuity mutation

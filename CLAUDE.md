@@ -76,27 +76,29 @@ string theory, which defeats emitting a standard format. The logic is `QF_NIA`, 
 the integer variance identity squares a datum, and `QF_LIA` rejects `(* v v)` outright. Both
 facts were found by a solver refusing the file, not by reading a spec.
 
-**Second solver: still open.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
-`yices-smt2`) and names the missing ones, so a single-solver run is visible rather than implied.
+**Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on all 153
+generated claims (77 + 76). `check_smt` runs every solver on PATH and names the ones it did not
+find, so a single-solver run is stated rather than implied. Each solver needs different argv —
+z3 reads stdin only with `-in`, cvc5 needs `--incremental` before it honours the file's
+`push`/`pop` — so `SOLVERS` maps a name to its flags and the file is passed as a path.
 
-Installing cvc5 — the documented way is the project's **own Homebrew tap, as a cask**, which is
+Installing cvc5: the documented way is the project's **own Homebrew tap, as a cask**, which is
 why `brew install cvc5` and `brew search --formula cvc5` both come up empty:
 
 ```fish
 brew install --cask cvc5/cvc5/cvc5
 ```
 
-The cask (v1.3.4) fetches `cvc5-macOS-arm64-static.zip` and pins
-`sha256 3840aa53f6ee6fc357415dcfe291d7f5ffec6cfb1ccca6fef64120a0d2be4cb6`; GitHub's asset
-digest for the Linux build agrees with the cask's, so **CI can pin from the same authority**
-(`cvc5-Linux-x86_64-static.zip`,
-`sha256 dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6`). The PyPI `cvc5`
-package is Python bindings only — no CLI. yices2 installs from core (`brew install yices2`) but
-its nonlinear support is limited, so it may refuse the variance claims.
+The PyPI `cvc5` package is Python bindings only — no CLI. yices2 installs from core
+(`brew install yices2`) but its nonlinear support is limited, so it may refuse the variance
+claims.
 
-Note for CI: recent z3 releases only ship `x64-glibc-2.39` builds, which will not run on the
-`ubuntu-22.04` runner this workflow pins for Dafny (glibc 2.35). z3 ≤ 4.14.1 has 2.35 builds but
-GitHub reports no digest for those assets, so pinning one means hashing it by hand.
+CI pins cvc5 by sha256 (`CVC5_SHA256` in the workflow), and that hash has **two independent
+authorities that agree**: cvc5's own Homebrew cask and GitHub's asset digest — verified against
+the downloaded bytes before use. z3 is *not* in CI because recent z3 releases only ship
+`x64-glibc-2.39` builds, which cannot run on the `ubuntu-22.04` runner the Dafny step pins
+(glibc 2.35); z3 ≤ 4.14.1 has 2.35 builds but GitHub reports no digest for those assets. So the
+split is z3 locally, cvc5 in CI, both over the same committed artefact.
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that

@@ -28,10 +28,16 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
-# Every SMT-LIB 2 front end worth trying, in order of preference. yices2's
-# binary is `yices-smt2`, not `yices2`.
-SOLVERS = ("z3", "cvc5", "yices-smt2")
+# Every SMT-LIB 2 front end worth trying, in order of preference, with the argv
+# each one needs. They genuinely differ: z3 reads stdin only with `-in`, cvc5 needs
+# `--incremental` before it will honour the push/pop this file uses, and yices2's
+# binary is called `yices-smt2`. The file is passed as a path, which all of them
+# accept, rather than piped.
+SOLVERS = {"z3": [],
+           "cvc5": ["--incremental"],
+           "yices-smt2": ["--incremental"]}
 DEFINE = re.compile(r"^\(define-fun (\w+) \(\) Int (-?\d+)\)", re.M)
 # Claim ids as the ledgers assign them: C001, R014, G077.
 CLAIM_ID = re.compile(r"[A-Z]\d{3,}")
@@ -43,6 +49,10 @@ def solvers_available(only=None):
     return [s for s in SOLVERS if shutil.which(s)]
 
 
+def argv_for(solver, path):
+    return [solver, *SOLVERS.get(solver, []), path]
+
+
 def run(solver, text):
     """([(claim id, answer)], [solver errors]) — line-based, on purpose.
 
@@ -51,7 +61,14 @@ def run(solver, text):
     had REFUSED read as a file full of kills. Errors are now collected and are a
     failure in their own right.
     """
-    proc = subprocess.run([solver, "-in"], input=text, capture_output=True, text=True)
+    with tempfile.NamedTemporaryFile("w", suffix=".smt2", encoding="utf-8",
+                                     delete=False) as fh:
+        fh.write(text)
+        tmp = fh.name
+    try:
+        proc = subprocess.run(argv_for(solver, tmp), capture_output=True, text=True)
+    finally:
+        os.unlink(tmp)
     pairs, errors, pending = [], [], None
     for line in (proc.stdout + "\n" + proc.stderr).splitlines():
         line = line.strip()
