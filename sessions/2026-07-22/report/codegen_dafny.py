@@ -741,17 +741,39 @@ def lemma_index():
             + [{"id": m["id"], "lemma": m["lemma"], "file": "dafny/Claims_coaching.dfy"} for m in cmap])
 
 
+
+CONST_LINE = re.compile(r"^const (\w+)\s*:")
+
+
+def keep_referenced(facts_src, claims_srcs):
+    """Drop consts no lemma reads.
+
+    A const nothing reads is data the proofs do not depend on, so a mutation of it
+    can never be killed — it makes the anti-vacuity gate report survivors that mean
+    nothing. pipeline/codegen.py filters the generated ledger the same way.
+    """
+    body = " ".join(claims_srcs)
+    out = []
+    for line in facts_src.split("\n"):
+        m = CONST_LINE.match(line)
+        if m and not re.search(rf"\b{m.group(1)}\b", body):
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     stale = os.path.join(OUT, "Lib.dfy")  # remove artifact of the old nested design
     if os.path.exists(stale):
         os.remove(stale)
-    with open(os.path.join(OUT, "Facts.dfy"), "w") as f:
-        f.write(emit_facts())
     nsrc, _ = emit_claims(os.path.join(HERE, "claims-narrative.json"), NARRATIVE_BUILDERS, "Claims_narrative.dfy")
+    csrc, _ = emit_claims(os.path.join(HERE, "claims-coaching.json"), COACHING_BUILDERS, "Claims_coaching.dfy")
+    # Facts.dfy is written last, carrying only the consts the lemmas actually read.
+    with open(os.path.join(OUT, "Facts.dfy"), "w") as f:
+        f.write(keep_referenced(emit_facts(), [nsrc, csrc]))
     with open(os.path.join(OUT, "Claims_narrative.dfy"), "w") as f:
         f.write(nsrc)
-    csrc, _ = emit_claims(os.path.join(HERE, "claims-coaching.json"), COACHING_BUILDERS, "Claims_coaching.dfy")
     with open(os.path.join(OUT, "Claims_coaching.dfy"), "w") as f:
         f.write(csrc)
     print("generated 54 lemmas -> dafny/*.dfy (proof map is written separately by build_proof_map.py from real verifier results)")

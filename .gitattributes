@@ -14,3 +14,6 @@ sessions/**/facts*.json -diff
 # Reports are generated single-file HTML.
 sessions/**/report*.html linguist-generated
 docs/*.html linguist-generated
+
+# Generated SMT-LIB carries the dataset as definitions; same treatment as the Dafny.
+sessions/*/report/claims.smt2 linguist-generated

@@ -66,6 +66,11 @@ jobs:
       - name: Check every proof link names a lemma that exists
         run: python3 -m pipeline.check_proof_links "${{ matrix.artefact }}"
 
+      # A const no lemma reads cannot be killed by a mutation, so it inflates the
+      # dataset the proofs appear to pin down. 157 dead ones shipped for weeks.
+      - name: Check no Dafny constant is dead
+        run: python3 -m pipeline.check_dead_consts "${{ matrix.artefact }}"
+
   # The generator pipeline: regenerate each session's ledger from facts.json, check it
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
   # what keeps "a new session is one command" true rather than aspirational.
@@ -139,6 +144,32 @@ jobs:
       - name: Mutation-test the generated proofs
         if: github.event_name == 'schedule' || inputs.mutation
         run: bash pipeline/mutation_test.sh "$RUNNER_TEMP/dfy" 12
+
+      # Use the Z3 inside the Dafny release, which the sha256 above already pins —
+      # rather than apt's, which would be an unpinned download. If the layout ever
+      # changes this fails loudly instead of quietly falling back to an unpinned
+      # solver.
+      - name: Put Dafny's bundled Z3 on PATH
+        run: |
+          set -euo pipefail
+          Z3="$(find "$HOME/dafny-dist" -type f -name 'z3*' -perm -u+x | head -1)"
+          if [ -z "$Z3" ]; then
+            echo "no z3 inside the pinned Dafny distribution; add a sha256-pinned" >&2
+            echo "z3 release step rather than an unpinned package install" >&2
+            find "$HOME/dafny-dist" -maxdepth 3 -type d | head -20 >&2
+            exit 1
+          fi
+          mkdir -p "$HOME/bin" && ln -sf "$Z3" "$HOME/bin/z3"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+          "$HOME/bin/z3" --version
+
+      # The same claims, rendered to SMT-LIB from the same specs and checked by a
+      # solver directly. Runs in well under a second, so the anti-vacuity mutation
+      # test runs on every push here rather than weekly like the Dafny one.
+      - name: Check the SMT-LIB artefact (regenerates, then solves and mutates)
+        run: |
+          python3 -m pipeline.check_smt "sessions/${{ matrix.session }}/report" \
+            --regen --mutate 12
 
   # The second extractor is a genuinely independent implementation; re-running it
   # is what makes the "two parsers agree" claim mean something.

@@ -5,7 +5,6 @@
 // players). Per-match leaderboard: apm/pps/kills. Match winner/score/index/
 // nrounds + per-round winner. All other facts.json fields are omitted.
 
-const nmatches: int := 7
 const m0_index: int := 1
 const m0_winner: string := "pinglamb"
 const m0_scoreYachi: int := 0
@@ -340,7 +339,6 @@ const m0_r4_pinglamb_ge18: int := 1
 const m0_r4_pinglamb_ge19: int := 1
 const m0_r4_pinglamb_ge20: int := 4
 const m0_r4_pinglamb_ge21: int := 4
-const m1_index: int := 2
 const m1_winner: string := "yachi"
 const m1_scoreYachi: int := 5
 const m1_scorePinglamb: int := 2
@@ -852,7 +850,6 @@ const m1_r6_pinglamb_ge7: int := 4
 const m1_r6_pinglamb_ge8: int := 5
 const m1_r6_pinglamb_ge9: int := 6
 const m1_r6_pinglamb_ge10: int := 6
-const m2_index: int := 3
 const m2_winner: string := "pinglamb"
 const m2_scoreYachi: int := 3
 const m2_scorePinglamb: int := 5
@@ -1764,7 +1761,6 @@ const m3_r4_pinglamb_ge11: int := 2
 const m3_r4_pinglamb_ge12: int := 1
 const m3_r4_pinglamb_ge13: int := 4
 const m3_r4_pinglamb_ge14: int := 5
-const m4_index: int := 5
 const m4_winner: string := "pinglamb"
 const m4_scoreYachi: int := 3
 const m4_scorePinglamb: int := 5
@@ -2262,7 +2258,6 @@ const m4_r7_pinglamb_ge2: int := 6
 const m4_r7_pinglamb_ge3: int := 5
 const m4_r7_pinglamb_ge4: int := 1
 const m4_r7_pinglamb_ge5: int := 4
-const m5_index: int := 6
 const m5_winner: string := "yachi"
 const m5_scoreYachi: int := 5
 const m5_scorePinglamb: int := 3
@@ -2803,7 +2798,6 @@ const m5_r7_pinglamb_ge12: int := 5
 const m5_r7_pinglamb_ge13: int := 5
 const m5_r7_pinglamb_ge14: int := 1
 const m5_r7_pinglamb_ge15: int := 7
-const m6_index: int := 7
 const m6_winner: string := "yachi"
 const m6_scoreYachi: int := 5
 const m6_scorePinglamb: int := 4

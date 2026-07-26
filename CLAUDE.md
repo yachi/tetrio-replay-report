@@ -40,7 +40,36 @@ python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
 python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exhaustive mutation
+python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt2
+python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
+python3 -m pipeline.check_dead_consts sessions/<date>/report
 ```
+
+## Three backends, one spec
+
+`pipeline/claims/spec.py` renders each claim to a **Python** predicate, a **Dafny**
+`ensures`, and **SMT-LIB 2.6** (`pipeline/claims/smt.py`). One spec, three targets, so what
+Python evaluates, what Dafny proves and what a solver refutes cannot drift apart — the
+dual-extractor argument applied to the proof side.
+
+Why SMT-LIB exists alongside Dafny: **every generated lemma has an empty body** and uses no
+quantifiers, functions or loops, so the obligation is ground integer arithmetic that Dafny
+hands to Boogie which hands it to Z3. Going straight to SMT-LIB skips two layers and is about
+two orders of magnitude faster — measured, over the same claims:
+
+| | Dafny (`--cores 4`) | `claims.smt2` + z3 |
+|---|---|---|
+| 2026-07-22 · 77 generated claims | ~4.6 s (54 hand claims) | **40 ms** |
+| 2026-07-24 · 76 generated claims | ~3 s (52 hand claims) | **10 ms** |
+
+That speed is what makes the anti-vacuity mutation test affordable on every push
+(`--mutate 12` finishes in under a second) rather than weekly. `claims.smt2` is committed and
+byte-identity gated, so it doubles as a portable artefact: any SMT-LIB solver can re-check the
+claims without this pipeline.
+
+The `.smt2` covers the **generated** ledger only — the hand ledgers have no spec, so they stay
+Dafny-only. Second-solver coverage (cvc5 alongside z3) is one `brew install cvc5` away;
+`check_smt` runs every solver it finds on PATH and says so when one is missing.
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that

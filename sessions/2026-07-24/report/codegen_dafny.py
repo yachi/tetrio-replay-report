@@ -485,12 +485,35 @@ def lemma_index():
             + [{"id": m["id"], "lemma": m["lemma"], "file": "dafny/Claims_coaching.dfy"} for m in cm])
 
 
+
+CONST_LINE = re.compile(r"^const (\w+)\s*:")
+
+
+def keep_referenced(facts_src, claims_srcs):
+    """Drop consts no lemma reads.
+
+    A const nothing reads is data the proofs do not depend on, so a mutation of it
+    can never be killed — it makes the anti-vacuity gate report survivors that mean
+    nothing. pipeline/codegen.py filters the generated ledger the same way.
+    """
+    body = " ".join(claims_srcs)
+    out = []
+    for line in facts_src.split("\n"):
+        m = CONST_LINE.match(line)
+        if m and not re.search(rf"\b{m.group(1)}\b", body):
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
-    open(os.path.join(OUT, "Facts.dfy"), "w").write(emit_facts())
     nsrc, _ = emit_claims(os.path.join(HERE, "claims-narrative.json"), NARR, "Claims_narrative.dfy")
-    open(os.path.join(OUT, "Claims_narrative.dfy"), "w").write(nsrc)
     csrc, _ = emit_claims(os.path.join(HERE, "claims-coaching.json"), COACH, "Claims_coaching.dfy")
+    # Facts.dfy is written last, carrying only the consts the lemmas actually read.
+    open(os.path.join(OUT, "Facts.dfy"), "w").write(
+        keep_referenced(emit_facts(), [nsrc, csrc]))
+    open(os.path.join(OUT, "Claims_narrative.dfy"), "w").write(nsrc)
     open(os.path.join(OUT, "Claims_coaching.dfy"), "w").write(csrc)
     print("generated 52 lemmas -> dafny/*.dfy (proof map written by build_proof_map.py from real verifier)")
 

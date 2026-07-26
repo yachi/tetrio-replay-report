@@ -41,6 +41,12 @@ This distinction matters, so it is stated plainly rather than buried:
 - **Mutation testing keeps the lemmas honest.** A lemma that verifies but pins nothing is
   worthless, so `mutation_test.sh` flips one data literal or predicate constant at a time
   and requires verification to *break* every time. A surviving mutant is a build failure.
+  For the same reason, no constant may sit in `Facts.dfy` unread by any lemma: a datum
+  nothing depends on is a mutation that can never be killed.
+- **The generated claims are also checkable without this pipeline.** The same specs render to
+  SMT-LIB 2.6 as `claims.smt2` — facts as definitions, each claim asserted negated. Run
+  `z3 claims.smt2` (or any SMT-LIB solver) and every answer must be `unsat`. Two independent
+  solvers agreeing is the same argument as two independent extractors agreeing.
 
 ## The verification chain
 
@@ -83,10 +89,13 @@ CI runs exactly this on every push, so the badge above is not decorative.
 pipeline/
   extract.py, extract2.ts      independent extractors -> facts.json / facts2.json
   claims/spec.py               predicate algebra -> Python and Dafny renderers
+  claims/smt.py                the same algebra -> SMT-LIB 2.6
   claims/generators.py         32 claim families
   claims/build_claims.py       facts.json -> claims-generated.json
   claims/equiv.py              exhaustive-mutation coverage measurement
   codegen.py                   facts + claims -> Facts.dfy + Claims.dfy
+  codegen_smt.py               facts + claims -> claims.smt2
+  check_smt.py                 solve, regenerate and mutate the .smt2
   build_proof_map.py           verifier output -> proof map (never optimistic)
   mutation_test.sh             anti-vacuity gate, with an escalating operator
 sessions/<date>/
@@ -97,6 +106,8 @@ sessions/<date>/
     claims-narrative.json      hand-written 戰況 claims  (C0xx)
     claims-coaching.json       hand-written 建議 claims  (R0xx)
     dafny/*.dfy                one lemma per claim
+    claims.smt2                the generated claims in SMT-LIB 2.6 — run it
+                               yourself: `z3 claims.smt2`, all answers `unsat`
     claims-proof-map.json      what the verifier actually proved
     report.html                the deliverable, self-contained
     narrative-beats.md         Cantonese prose source

@@ -284,6 +284,46 @@ missing lemma (mutation-tested). It runs per artefact in CI, plus once against t
 Worth remembering as a pattern: a *derived identifier* (lemma name ← gloss text) turns a
 cosmetic edit into a structural one. Nothing in the pipeline had declared that dependency.
 
+## SMT-LIB as a third backend (2026-07-26)
+
+**The finding that motivated it, measured not assumed:** all 106 hand lemmas and all 153
+generated ones have **empty bodies**, and use no quantifiers, no functions and no loops. Dafny
+was translating a ground arithmetic statement into Boogie, which generated a verification
+condition, which Z3 evaluated. None of Dafny's proving machinery was in use — only its syntax,
+and the Boogie layer that caused the balanced-tree workaround in `spec.bal`.
+
+So `pipeline/claims/smt.py` renders the same specs to SMT-LIB 2.6, `pipeline/codegen_smt.py`
+emits one self-contained `claims.smt2` per session (facts as `define-fun`, one
+`(assert (not claim))/(check-sat)` per claim, every answer must be `unsat`), and
+`pipeline/check_smt.py` gates it. Constant names match `Facts.dfy` exactly so the two backends
+can be read side by side; sums are emitted n-ary because an s-expression has no AST-depth limit
+to work around.
+
+Measured over the same claims: **40 ms and 10 ms** versus Dafny's ~4.6 s and ~3 s. That is what
+makes the anti-vacuity mutation test cheap enough to run on **every push** (`--mutate 12`, under
+a second) instead of weekly — the mutation escalates (+1, +1000, far) because banded predicates
+like `135000 <= v < 136000` survive +1 by design.
+
+Validation: 77/77 and 76/76 `unsat`; the committed file regenerates byte-for-byte; 12/12
+perturbations falsified at least one claim. Dafny stays exactly as it was — this is a
+cross-check, not a replacement, and the report's badges still cite Dafny lemmas.
+
+**Not done yet:** the second solver. The whole argument for a standard format is that an
+independently implemented solver can check the same file, and `check_smt` already runs every
+solver on PATH — but cvc5 is not installed here, so both sessions are currently single-solver.
+One `brew install cvc5` closes that.
+
+### Dead constants, found by the same probe
+
+Mutating `m9_r8_yachi_vs` killed nothing, which turned out to be correct (a banded predicate),
+but checking why exposed a real defect: the per-session `codegen_dafny.py` scripts emitted the
+whole dataset, so **157 constants in 2026-07-22, 6 in 2026-07-24 and 15 in `proof/` were read
+by no lemma**. A const nothing reads cannot be killed by a mutation, so it inflates how much of
+the data the proofs appear to pin down. `pipeline/codegen.py` had filtered the generated ledger
+this way from the start; the three legacy scripts now do too, and
+`pipeline/check_dead_consts.py` keeps it that way. All three artefacts re-verify: 56, 52 and 22
+lemmas, 0 errors.
+
 ## The appendix (2026-07-26)
 
 `pipeline/appendix.py` now owns 證明附錄 — the trust-chain note, the status line, and one table

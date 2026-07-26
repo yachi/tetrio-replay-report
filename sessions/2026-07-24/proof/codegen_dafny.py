@@ -304,11 +304,33 @@ def lemma_index():
     return m
 
 
+
+CONST_LINE = re.compile(r"^const (\w+)\s*:")
+
+
+def keep_referenced(facts_src, claims_srcs):
+    """Drop consts no lemma reads.
+
+    A const nothing reads is data the proofs do not depend on, so a mutation of it
+    can never be killed — it makes the anti-vacuity gate report survivors that mean
+    nothing. pipeline/codegen.py filters the generated ledger the same way.
+    """
+    body = " ".join(claims_srcs)
+    out = []
+    for line in facts_src.split("\n"):
+        m = CONST_LINE.match(line)
+        if m and not re.search(rf"\b{m.group(1)}\b", body):
+            continue
+        out.append(line)
+    return "\n".join(out)
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
-    with open(os.path.join(OUT, "Facts24.dfy"), "w") as f:
-        f.write(emit_facts())
     src, _ = emit_claims()
+    # Facts24.dfy is written last, carrying only the consts the lemmas actually read.
+    with open(os.path.join(OUT, "Facts24.dfy"), "w") as f:
+        f.write(keep_referenced(emit_facts(), [src]))
     with open(os.path.join(OUT, "Claims24.dfy"), "w") as f:
         f.write(src)
     print("generated 20 lemmas -> dafny/Facts24.dfy, dafny/Claims24.dfy "
