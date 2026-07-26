@@ -325,10 +325,16 @@ re-declaring the wrong logic.
 
 **Not done yet: the second solver.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
 `yices-smt2`) and names the missing ones, so single-solver runs are visible rather than implied.
-Getting cvc5 here is more work than expected: no Homebrew formula, and the PyPI package ships
-Python bindings with no CLI, so it means the pinned release binary
-(`cvc5-macOS-arm64-static.zip` from tag `cvc5-1.3.4`). yices2 installs from Homebrew but its
-nonlinear support is limited, so it may refuse the variance claims.
+
+The install is documented, just not where `brew search` looks: cvc5 ships its own Homebrew tap
+and cvc5 is a **cask**, not a formula — `brew install --cask cvc5/cvc5/cvc5`. That cask is also
+the authority for pinning in CI, since it carries the release sha256 and GitHub's asset digest
+for the Linux build agrees with it. The PyPI package is Python bindings with no CLI.
+
+One CI wrinkle worth recording: recent z3 releases ship only `x64-glibc-2.39` builds, which
+cannot run on the `ubuntu-22.04` runner the Dafny step pins (glibc 2.35). So the natural
+arrangement is cvc5 in CI and z3 locally — two independently implemented solvers over the same
+committed artefact, which is the point, even though they run in different places.
 
 ### Dead constants, found by the same probe
 

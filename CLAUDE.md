@@ -77,11 +77,26 @@ the integer variance identity squares a datum, and `QF_LIA` rejects `(* v v)` ou
 facts were found by a solver refusing the file, not by reading a spec.
 
 **Second solver: still open.** `check_smt` runs every solver on PATH (`z3`, `cvc5`,
-`yices-smt2`) and names the missing ones, so a single-solver run is visible rather than
-implied. There is **no `cvc5` in Homebrew core** and the PyPI package is Python bindings with
-no CLI, so the CLI means the pinned release binary
-(`cvc5-macOS-arm64-static.zip`, tag `cvc5-1.3.4`). yices2 is one `brew install yices2` but its
-nonlinear support is limited, so it may refuse the variance claims.
+`yices-smt2`) and names the missing ones, so a single-solver run is visible rather than implied.
+
+Installing cvc5 — the documented way is the project's **own Homebrew tap, as a cask**, which is
+why `brew install cvc5` and `brew search --formula cvc5` both come up empty:
+
+```fish
+brew install --cask cvc5/cvc5/cvc5
+```
+
+The cask (v1.3.4) fetches `cvc5-macOS-arm64-static.zip` and pins
+`sha256 3840aa53f6ee6fc357415dcfe291d7f5ffec6cfb1ccca6fef64120a0d2be4cb6`; GitHub's asset
+digest for the Linux build agrees with the cask's, so **CI can pin from the same authority**
+(`cvc5-Linux-x86_64-static.zip`,
+`sha256 dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6`). The PyPI `cvc5`
+package is Python bindings only — no CLI. yices2 installs from core (`brew install yices2`) but
+its nonlinear support is limited, so it may refuse the variance claims.
+
+Note for CI: recent z3 releases only ship `x64-glibc-2.39` builds, which will not run on the
+`ubuntu-22.04` runner this workflow pins for Dafny (glibc 2.35). z3 ≤ 4.14.1 has 2.35 builds but
+GitHub reports no digest for those assets, so pinning one means hashing it by hand.
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that
