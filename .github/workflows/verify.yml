@@ -60,6 +60,12 @@ jobs:
           MUTATION: ${{ (github.event_name == 'schedule' || inputs.mutation) && '1' || '0' }}
         run: bin/verify-session "${{ matrix.artefact }}"
 
+      # A badge links a claim to its lemma through the proof map, and codegen
+      # derives lemma names from each claim's gloss — so editing a gloss can
+      # strand the link while the verifier still reports 0 errors.
+      - name: Check every proof link names a lemma that exists
+        run: python3 -m pipeline.check_proof_links "${{ matrix.artefact }}"
+
   # The generator pipeline: regenerate each session's ledger from facts.json, check it
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
   # what keeps "a new session is one command" true rather than aspirational.
@@ -116,6 +122,13 @@ jobs:
           out=$(dafny verify "$RUNNER_TEMP/dfy/Facts.dfy" "$RUNNER_TEMP/dfy/Claims.dfy" --cores 4 2>&1 | tail -1)
           echo "$out"
           case "$out" in *"0 errors"*) ;; *) exit 1 ;; esac
+
+      # The generated ledger's lemmas are not committed, so its proof map can only
+      # be checked against the directory they were just generated into.
+      - name: Check the generated proof map's links resolve
+        run: |
+          python3 -m pipeline.check_proof_links "sessions/${{ matrix.session }}/report" \
+            --map claims-generated-proof-map.json --dafny-dir "$RUNNER_TEMP/dfy"
 
       - name: Mutation-test the generated proofs
         if: github.event_name == 'schedule' || inputs.mutation

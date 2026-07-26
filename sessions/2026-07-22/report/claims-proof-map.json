@@ -25,7 +25,7 @@
   },
   {
     "id": "C005",
-    "lemma": "C005_m10_final_round_yachi_vs_135_9_vs_pinglamb_94_0_apm_74_vs_43",
+    "lemma": "C005_m10_final_round_yachi_vs_135_8_vs_pinglamb_93_9_apm_74_vs_43",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
@@ -43,31 +43,31 @@
   },
   {
     "id": "C008",
-    "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_4",
+    "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_3",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
   {
     "id": "C009",
-    "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_84_",
+    "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_83_",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
   {
     "id": "C010",
-    "lemma": "C010_pinglamb_s_vs_262_6_in_m7r1_is_the_highest_single_round_vs_o",
+    "lemma": "C010_pinglamb_s_vs_262_5_in_m7r1_is_the_highest_single_round_vs_o",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
   {
     "id": "C011",
-    "lemma": "C011_m2_decider_pinglamb_won_a_128_6s_round_121_lines_apm_60_4",
+    "lemma": "C011_m2_decider_pinglamb_won_a_128_5s_round_121_lines_apm_60_3",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
   {
     "id": "C012",
-    "lemma": "C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_1",
+    "lemma": "C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_0",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },

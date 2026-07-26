@@ -271,6 +271,19 @@ every 約 / `~` / `≈` figure in every hand-written surface against `facts.json
 datum floors to it but one rounds to it. Wired into CI per session. `check_claims` could never
 have caught this — every predicate compares the integer, not the printed text.
 
+### The second-order bug it caused
+
+`codegen` builds each lemma's *name* from the claim's `english_gloss`, so correcting 14 glosses
+renamed 14 lemmas and stranded 8 proof-map entries — badges pointing at lemmas that no longer
+existed. Every existing gate stayed green: the verifier still reported 0 errors, and the
+status check still counted 54/54 verified, because it only reads statuses. The maps were rebuilt
+from real verifier output, and `pipeline/check_proof_links.py` now fails when any entry names a
+missing lemma (mutation-tested). It runs per artefact in CI, plus once against the generated
+`Claims.dfy` in the temp directory CI builds it in, since those lemmas are not committed.
+
+Worth remembering as a pattern: a *derived identifier* (lemma name ← gloss text) turns a
+cosmetic edit into a structural one. Nothing in the pipeline had declared that dependency.
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
 1. appendix — folds in the remaining `innerHTML` row builder, since the generator can build
    those rows with `textContent` instead of string concatenation

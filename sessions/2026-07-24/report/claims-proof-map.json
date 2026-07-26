@@ -37,13 +37,13 @@
   },
   {
     "id": "C007",
-    "lemma": "C007_m5_round_2_index_1_pinglamb_s_95_5_apm_is_the_session_s_high",
+    "lemma": "C007_m5_round_2_index_1_pinglamb_s_95_4_apm_is_the_session_s_high",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
   {
     "id": "C008",
-    "lemma": "C008_same_round_pinglamb_s_178_5_vs_is_the_session_s_highest_sing",
+    "lemma": "C008_same_round_pinglamb_s_178_4_vs_is_the_session_s_highest_sing",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },

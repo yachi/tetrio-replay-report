@@ -16,6 +16,11 @@ in this project's history caught someone doing exactly that.
 
 Corollaries that are gates, not preferences:
 - a proof-map status may only come from real `dafny verify` output, never stamped by codegen
+- a proof-map entry must name a lemma that still exists. `codegen` builds lemma *names* from
+  each claim's `english_gloss`, so editing a gloss renames the lemma and strands the badge's
+  link while the verifier still reports 0 errors and the status gate still counts 54/54.
+  `pipeline/check_proof_links.py` is the gate; rebuild a stranded map with the session's
+  `build_proof_map.py` (the committed hand layout) or `pipeline.build_proof_map` (generated)
 - a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant
 - every countable statement in a report needs a claim id whose predicate covers *that*
   number — not a weaker one nearby
@@ -29,6 +34,7 @@ bin/build-docs                                 # regenerate docs/ (the Pages sit
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
+python3 -m pipeline.check_proof_links sessions/<date>/report      # CI gate: every badge's lemma exists
 python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 逐局全數據 section
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
