@@ -101,6 +101,12 @@ jobs:
       - name: Regenerate the report's derived sections and compare with the committed report
         run: python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --check
 
+      # 約 has to mean the floored value everywhere. The generators floor by
+      # construction; hand-written Cantonese and glosses are where a rounded
+      # figure gets in, and 約262.6 vs 約262.5 for one integer shipped for weeks.
+      - name: Check every 約-figure in hand-written text is floored
+        run: python3 -m pipeline.check_prose_figures "sessions/${{ matrix.session }}/report"
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail

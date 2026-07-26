@@ -43,15 +43,15 @@
   },
   {
     "id": "C007",
-    "canto": "m5 第二局，pinglamb 打出全場最勁嘅單局 APM，約 95.5",
-    "english_gloss": "m5 round 2 (index 1): pinglamb's ~95.5 APM is the session's highest single-round APM",
+    "canto": "m5 第二局，pinglamb 打出全場最勁嘅單局 APM，約 95.4",
+    "english_gloss": "m5 round 2 (index 1): pinglamb's ~95.4 APM is the session's highest single-round APM",
     "category": "spike",
     "python_check": "facts['matches'][4]['rounds'][1]['players']['pinglamb']['apm_x1000']==95498 and 95498==max(x['apm_x1000'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values()) and 95000<=95498<96000"
   },
   {
     "id": "C008",
-    "canto": "同一局 pinglamb 個 VS 都係全場最高，約 178.5",
-    "english_gloss": "same round: pinglamb's ~178.5 VS is the session's highest single-round VS",
+    "canto": "同一局 pinglamb 個 VS 都係全場最高，約 178.4",
+    "english_gloss": "same round: pinglamb's ~178.4 VS is the session's highest single-round VS",
     "category": "spike",
     "python_check": "facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000']==178457 and 178457==max(x['vs_x1000'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values()) and 178000<=178457<179000"
   },

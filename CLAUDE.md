@@ -28,6 +28,7 @@ bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 ad
 bin/build-docs                                 # regenerate docs/ (the Pages site) from sessions
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
+python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
 python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 逐局全數據 section
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
@@ -91,23 +92,26 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
   reversed the meaning on the site index once.
 - The `.ttrm` files are single-line JSON; `.gitattributes` marks them `-diff linguist-vendored`.
 
-## Known inconsistency: the hand ledgers round, the generated ledger floors
+## 約 means the floored value — everywhere, and it is gated
 
-The same underlying integer prints two ways in one report. `claims-narrative.json` **rounds**
-its 約 figures; `pipeline/claims/generators.py` **floors** them:
+`pipeline/fmt.py` floors; every generator uses it. Hand-written text is where a *rounded*
+figure gets in, and it did: for weeks 約262.6 (C009/C010) and 約262.5 (G017) were the same
+`vs_x1000 == 262582`, in one report. 45 figures across both sessions were rewritten on
+2026-07-26 — Cantonese, `english_gloss` (which ships inside the claims island, so it is just
+as published), and the prose typed straight into `report.html`.
 
-| Session | Value | Hand claim | Generated claim |
-|---|---|---|---|
-| 2026-07-22 | VS 262582 | C009 / C010 約262.6 | G017 約262.5 |
-| 2026-07-24 | APM 95498 | C007 約 95.5 | G014 約95.4 |
-| 2026-07-24 | VS 178457 | C008 約 178.5 | G015 約178.4 |
+`pipeline/check_prose_figures.py` is now the gate: it resolves every 約 / `~` / `≈` figure
+against `facts.json` and fails when no datum *floors* to it but one *rounds* to it. Run it on
+any session whose prose changed:
 
-Both ledgers pass `check_claims` because each predicate compares the integer — the divergence
-is only in the Cantonese. The floor convention is the decided one (session-2 minor m5), so the
-hand ledgers and the prose quoting them are what is out of convention. 全場之最 prints the
-floored figure, which puts the two renderings on the same page. Fixing it means editing
-hand-written Cantonese in `claims-narrative.json` and `prose/matches.json` — a person's call,
-not a generator's.
+```bash
+python3 -m pipeline.check_prose_figures sessions/<date>/report
+```
+
+Notes for future prose: a figure the checker cannot resolve is reported, not failed — sums and
+differences legitimately print values no single datum produces. Figures in minutes are skipped
+(a different divisor). `check_claims` will never catch this class, because every predicate
+compares the integer, not the printed text.
 
 ## Relevant skills
 

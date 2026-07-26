@@ -246,9 +246,30 @@ Also folded out: `pipeline/fmt.py` (the floored formatters) and `pipeline/claim_
 ledger + proof-map loader), both of which `build_round_table.py` now uses instead of its own
 copies — its output verified byte-identical after the change.
 
-This surfaced a **pre-existing inconsistency**: the hand ledgers round their 約 figures while
-the generated ledger floors them (C009 約262.6 vs G017 約262.5). See CLAUDE.md — fixing it means
-editing hand-written Cantonese, so it is left as a decision, not a silent rewrite.
+This surfaced a **pre-existing inconsistency**, since fixed (below): the hand ledgers rounded
+their 約 figures while the generated ledger floors them (C009 約262.6 vs G017 約262.5, one
+integer).
+
+## The 約 convention, enforced (2026-07-26)
+
+45 rounded figures were rewritten to their floored values across both sessions — 25 + 6 in the
+Cantonese and prose, 12 + 2 in `english_gloss`, which ships inside the claims island and is
+therefore just as published. Every replacement was computed from `facts.json` and applied only
+where the data gave exactly one floored candidate, so nothing but the last digit changed.
+
+Three passes were needed, and each found what the previous one had missed — worth recording,
+because the misses were all *scope* misses rather than logic errors:
+
+1. one-decimal 約-figures in the ledgers and prose files
+2. figures in seconds (「約128.6秒」 is the same artifact), and prose typed straight into
+   `report.html` rather than into a prose file
+3. two-decimal figures (`約1.84` — the pattern for one decimal never matched it) and the
+   `~` / `≈` markers used in `english_gloss`
+
+`pipeline/check_prose_figures.py` now closes the class instead of the instances: it resolves
+every 約 / `~` / `≈` figure in every hand-written surface against `facts.json` and fails when no
+datum floors to it but one rounds to it. Wired into CI per session. `check_claims` could never
+have caught this — every predicate compares the integer, not the printed text.
 
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
 1. appendix — folds in the remaining `innerHTML` row builder, since the generator can build

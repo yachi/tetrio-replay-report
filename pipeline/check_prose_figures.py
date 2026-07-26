@@ -1,0 +1,158 @@
+"""Gate: every 約-figure in hand-written text must be a FLOORED datum.
+
+    python3 -m pipeline.check_prose_figures sessions/2026-07-24/report
+
+約 means "about this much, at least" — the reports settled on flooring so the word
+means one thing everywhere. A figure that was *rounded* instead reads as a
+different number from the one the proofs cover: 約262.6 and 約262.5 are the same
+`vs_x1000 == 262582`, and both used to appear in one report.
+
+The generators floor by construction (`pipeline/fmt.py`), so this checks the
+surfaces a person writes: the hand ledgers, the prose files, and whatever prose
+sits directly in report.html. Generated regions are skipped because they are
+already covered, and the claims-data island is skipped because it is built from
+the ledgers this checks — reporting it too would just double-count.
+
+A figure counts as:
+  ok           some datum floors to it at that precision
+  ROUNDED      no datum floors to it, but one rounds to it — a real defect
+  unresolved   no datum produces it either way; printed for a human to judge,
+               because it is usually a sum or a difference this cannot resolve
+"""
+import argparse
+import json
+import os
+import re
+import sys
+
+GENERATED = re.compile(r"<!-- BEGIN generated .*?<!-- END generated [a-z-]+ -->", re.S)
+CLAIMS_ISLAND = re.compile(r"<!-- CLAIMS_DATA_START -->.*?<!-- CLAIMS_DATA_END -->", re.S)
+TAG = re.compile(r"<[^>]+>")
+
+# Every way the text marks an approximation: 約 in the Cantonese, ~ and ≈ in the
+# english_gloss (which ships inside the claims island, so it is just as visible).
+APPROX = r"(?:約|~|≈)"
+# (regex, precision) — 2dp before 1dp, so 「約1.84」 is not read as 「約1.8」.
+# `min` is excluded: a figure in minutes is floored against a different divisor,
+# and the only one in the corpus is already correct.
+PATTERNS = [(re.compile(APPROX + r"\s?\d+\.\d\d(?!\d)(?!\s?min)"), 2),
+            (re.compile(APPROX + r"\s?\d+\.\d(?!\d)(?!\s?min)"), 1),
+            (re.compile(APPROX + r"\s?\d+(?!\.)\s?(?:秒|s\b)"), 0)]
+FIGURE = re.compile(r"\d+(?:\.\d+)?")
+
+
+def pools(facts):
+    """The integers a figure can legitimately come from."""
+    x1000, lifetimes = set(), set()
+    for m in facts["matches"]:
+        for lb in m["leaderboard"].values():
+            x1000.update(lb[k] for k in ("apm_x1000", "pps_x1000", "vs_x1000"))
+        for r in m["rounds"]:
+            for p in r["players"].values():
+                x1000.update(p[k] for k in ("apm_x1000", "pps_x1000", "vs_x1000"))
+                lifetimes.add(p["lifetime"])
+    return x1000, lifetimes
+
+
+def renderings(value, precision, x1000, lifetimes):
+    """(floored, rounded) sets of printable figures at this precision.
+
+    A one-decimal figure can be an x1000 stat (約262.5) or a duration in seconds
+    (約128.5秒); both are the same arithmetic on a milliseconds/×1000 integer, so
+    the pools are merged for that precision.
+    """
+    if precision == 0:
+        pool, div = lifetimes, 1000
+        return ({v // div for v in pool}, {round(v / div) for v in pool})
+    pool = (x1000 | lifetimes) if precision == 1 else x1000
+    step = 10 ** (3 - precision)
+    scale = 10 ** precision
+    return ({v // step / scale for v in pool},
+            {round(v / 1000, precision) for v in pool})
+
+
+def surfaces(report_dir):
+    """(label, identifier, text) for every hand-written surface."""
+    out = []
+    for rel in ("claims-narrative.json", "claims-coaching.json"):
+        path = os.path.join(report_dir, rel)
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as fh:
+                claims = json.load(fh)
+            # The gloss is checked as well as the Cantonese: it travels in the
+            # claims island, so a rounded figure there is just as published.
+            out += [(rel, c["id"], c["canto"]) for c in claims]
+            out += [(rel, f'{c["id"]}.gloss', c.get("english_gloss") or "")
+                    for c in claims]
+    hero = os.path.join(report_dir, "prose", "hero.json")
+    if os.path.exists(hero):
+        with open(hero, encoding="utf-8") as fh:
+            d = json.load(fh)
+        out += [("prose/hero.json", k, d[k]) for k in ("title", "lede") if d.get(k)]
+    mats = os.path.join(report_dir, "prose", "matches.json")
+    if os.path.exists(mats):
+        with open(mats, encoding="utf-8") as fh:
+            d = json.load(fh)
+        for k, v in (d.get("cards") or {}).items():
+            out += [("prose/matches.json", f"card{k}.title", v.get("title") or ""),
+                    ("prose/matches.json", f"card{k}.body", v.get("body") or "")]
+    report = os.path.join(report_dir, "report.html")
+    if os.path.exists(report):
+        with open(report, encoding="utf-8") as fh:
+            html = fh.read()
+        hand = TAG.sub(" ", CLAIMS_ISLAND.sub(" ", GENERATED.sub(" ", html)))
+        out.append(("report.html", "hand-written prose", hand))
+    return out
+
+
+def scan(report_dir):
+    with open(os.path.join(report_dir, "facts.json"), encoding="utf-8") as fh:
+        facts = json.load(fh)
+    x1000, lifetimes = pools(facts)
+    cache = {p: renderings(None, p, x1000, lifetimes) for p in (0, 1, 2)}
+
+    rounded, unresolved, ok = [], [], 0
+    for label, ident, text in surfaces(report_dir):
+        seen = set()
+        for pat, precision in PATTERNS:
+            for m in pat.finditer(text):
+                span = (m.start(), m.end())
+                if any(s <= span[0] < e for s, e in seen):
+                    continue
+                seen.add(span)
+                figure = FIGURE.search(m.group(0)).group(0)
+                value = float(figure) if precision else int(figure)
+                floors, rounds = cache[precision]
+                if value in floors:
+                    ok += 1
+                elif value in rounds:
+                    rounded.append((label, ident, m.group(0).strip(), precision))
+                else:
+                    unresolved.append((label, ident, m.group(0).strip()))
+    return ok, rounded, unresolved
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("report_dir")
+    args = ap.parse_args(argv)
+
+    ok, rounded, unresolved = scan(args.report_dir)
+    for label, ident, printed in unresolved:
+        print(f"  --  unresolved {label} {ident}: {printed} "
+              f"(no datum prints this either way — check by hand)")
+    for label, ident, printed, precision in rounded:
+        print(f"FAIL {label} {ident}: {printed} is rounded, not floored "
+              f"({precision} dp)", file=sys.stderr)
+    if rounded:
+        print(f"\n{len(rounded)} rounded figure(s): 約 must mean the floored value "
+              f"everywhere, as pipeline/fmt.py emits it", file=sys.stderr)
+        return 1
+    print(f"  ok  {ok} 約-figures in hand-written text are all floored"
+          + (f"; {len(unresolved)} unresolved" if unresolved else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
