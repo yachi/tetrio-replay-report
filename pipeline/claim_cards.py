@@ -11,10 +11,14 @@ import json
 import os
 
 
-def load(report_dir, ledger="claims-generated.json"):
+def load(report_dir, ledger="claims-generated.json", proof_map=None):
     """Claims from one ledger, each with its proof status resolved.
 
-    Returns a list of dicts: id, family, category, canto, spec, verified.
+    `proof_map` defaults to the ledger's own `<stem>-proof-map.json`; the two hand
+    ledgers share one map, so a caller reading those passes it explicitly.
+
+    Returns dicts: id, family, category, canto, english_gloss, spec, lemma,
+    status (raw, as the map recorded it) and verified (status == "verified").
     """
     path = os.path.join(report_dir, ledger)
     if not os.path.exists(path):
@@ -22,19 +26,35 @@ def load(report_dir, ledger="claims-generated.json"):
     with open(path, encoding="utf-8") as fh:
         claims = json.load(fh)
 
-    status = {}
-    stem = ledger[:-len(".json")] if ledger.endswith(".json") else ledger
-    for pm in glob.glob(os.path.join(report_dir, f"{stem}-proof-map.json")):
+    entries = {}
+    if proof_map:
+        maps = [os.path.join(report_dir, proof_map)]
+    else:
+        stem = ledger[:-len(".json")] if ledger.endswith(".json") else ledger
+        maps = glob.glob(os.path.join(report_dir, f"{stem}-proof-map.json"))
+    for pm in maps:
+        if not os.path.exists(pm):
+            continue
         with open(pm, encoding="utf-8") as fh:
             rows = json.load(fh)
         rows = rows if isinstance(rows, list) else [dict(v, id=k) for k, v in rows.items()]
         for row in rows:
-            status[row["id"]] = row.get("status")
+            entries[row["id"]] = row
 
-    return [{"id": c["id"], "family": c.get("family", ""),
-             "category": c.get("category", ""), "canto": c["canto"],
-             "spec": c.get("spec"), "verified": status.get(c["id"]) == "verified"}
-            for c in claims]
+    out = []
+    for c in claims:
+        entry = entries.get(c["id"]) or {}
+        status = entry.get("status")
+        if status is None and entry.get("verified") is True:
+            status = "verified"
+        out.append({"id": c["id"], "family": c.get("family", ""),
+                    "category": c.get("category", ""), "canto": c["canto"],
+                    "english_gloss": c.get("english_gloss", ""),
+                    "spec": c.get("spec"),
+                    "lemma": entry.get("lemma") or entry.get("lemma_name")
+                             or entry.get("name") or "",
+                    "status": status, "verified": status == "verified"})
+    return out
 
 
 def by_family(claims, prefixes):

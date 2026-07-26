@@ -6533,6 +6533,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 </section>
 <!-- END generated round-table -->
 
+<!-- BEGIN generated appendix (pipeline/build_report.py) -->
 <section id="appendix">
   <div class="wrap-wide">
     <div class="eyebrow">證明附錄 · 信任鏈</div>
@@ -6545,8 +6546,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 54 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
         <div class="chain-step"><div class="n">3</div><div>仲會做 mutation test：刻意將條引理嘅 guard/前提拆走，睇下會唔會有 test 應聲斷——如果冧唔到，即係話條 guard 得個樣冇實際用，要補返。</div></div>
       </div>
-      <p id="method-status-text">載入緊…</p>
-      <div id="status-line" class="mono">載入緊…</div>
+      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 54 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
+      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 54 / 54</div>
     </div>
 
     <div class="scroll-x">
@@ -6560,11 +6561,391 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th>狀態</th>
           </tr>
         </thead>
-        <tbody id="appendix-tbody"></tbody>
+        <tbody id="appendix-tbody">
+          <tr id="claim-C001">
+            <td class="id-cell">C001</td>
+            <td class="canto-cell">yachi 十場打咗六場，pinglamb 執四場</td>
+            <td class="gloss-cell">yachi won 6 matches, pinglamb won 4 (of 10)</td>
+            <td class="lemma-cell">C001_yachi_won_6_matches_pinglamb_won_4_of_10</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C002">
+            <td class="id-cell">C002</td>
+            <td class="canto-cell">成個 series 打足 79 局，yachi 贏 43 局、pinglamb 贏 36 局，局數其實好貼</td>
+            <td class="gloss-cell">79 rounds total; yachi won 43 rounds, pinglamb 36</td>
+            <td class="lemma-cell">C002_79_rounds_total_yachi_won_43_rounds_pinglamb_36</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C003">
+            <td class="id-cell">C003</td>
+            <td class="canto-cell">有三場打到 5-4 先分勝負：第2、第3場 pinglamb 執，第10場 yachi 執</td>
+            <td class="gloss-cell">three matches went to a 5-4 decider: m2 &amp; m3 to pinglamb, m10 to yachi</td>
+            <td class="lemma-cell">C003_three_matches_went_to_a_5_4_decider_m2_m3_to_pinglamb_m10_to</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C004">
+            <td class="id-cell">C004</td>
+            <td class="canto-cell">決勝第10場 yachi 一度 2-4 落後、俾人拎住 match point，跟住連贏最後三局翻盤 5-4 封 series</td>
+            <td class="gloss-cell">in m10 yachi was down 2-4 (facing match point) then won the last 3 rounds to take it 5-4</td>
+            <td class="lemma-cell">C004_in_m10_yachi_was_down_2_4_facing_match_point_then_won_the_la</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C005">
+            <td class="id-cell">C005</td>
+            <td class="canto-cell">第10場最尾一局 yachi 打到 vs 約135.8、pinglamb 得約93.9，APM 約74 對約43，一面倒收工</td>
+            <td class="gloss-cell">m10 final round: yachi vs≈135.8 vs pinglamb≈93.9, apm 74 vs 43</td>
+            <td class="lemma-cell">C005_m10_final_round_yachi_vs_135_8_vs_pinglamb_93_9_apm_74_vs_43</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C006">
+            <td class="id-cell">C006</td>
+            <td class="canto-cell">成個 session 最長嗰局係第2場第3局，打足約228秒（三分四十八秒，差唔多四分鐘），最後 yachi 生還</td>
+            <td class="gloss-cell">longest round of the session is m2r2 (~228s, ~3.8min), won by yachi</td>
+            <td class="lemma-cell">C006_longest_round_of_the_session_is_m2r2_228s_3_8min_won_by_yach</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C007">
+            <td class="id-cell">C007</td>
+            <td class="canto-cell">呢局係場落樓大戰：yachi 一路食多過對手嘅垃圾（真係食咗127行、pinglamb 得109行）都照贏，仲清咗204行</td>
+            <td class="gloss-cell">in that marathon yachi won despite receiving more real garbage (127) than pinglamb (109), and cleared 204 lines</td>
+            <td class="lemma-cell">C007_in_that_marathon_yachi_won_despite_receiving_more_real_garba</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C008">
+            <td class="id-cell">C008</td>
+            <td class="canto-cell">最快嗰局係第6場第2局，約15秒就收咗工，yachi APM 爆到約93.7、pinglamb 得約24.3</td>
+            <td class="gloss-cell">shortest round is m6r1 (~15s); yachi apm≈93.7 vs pinglamb≈24.3</td>
+            <td class="lemma-cell">C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_3</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C009">
+            <td class="id-cell">C009</td>
+            <td class="canto-cell">全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺</td>
+            <td class="gloss-cell">highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.83, vs≈262.5, a ~15s blitz</td>
+            <td class="lemma-cell">C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_83_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C010">
+            <td class="id-cell">C010</td>
+            <td class="canto-cell">嗰局 pinglamb 嘅 vs 約262.5，係成個 session 單局最高嘅 vs score</td>
+            <td class="gloss-cell">pinglamb&#x27;s vs≈262.5 in m7r1 is the highest single-round vs of the session</td>
+            <td class="lemma-cell">C010_pinglamb_s_vs_262_5_in_m7r1_is_the_highest_single_round_vs_o</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C011">
+            <td class="id-cell">C011</td>
+            <td class="canto-cell">第2場嘅決勝局 pinglamb 頂住約128.5秒嘅拉鋸，清咗121行、APM 約60.3 執咗場波</td>
+            <td class="gloss-cell">m2 decider: pinglamb won a ~128.5s round, 121 lines, apm≈60.3</td>
+            <td class="lemma-cell">C011_m2_decider_pinglamb_won_a_128_5s_round_121_lines_apm_60_3</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C012">
+            <td class="id-cell">C012</td>
+            <td class="canto-cell">第3場決勝局 pinglamb 用約30.4秒、APM 約74.0、vs 約150.0 快刀斬亂麻</td>
+            <td class="gloss-cell">m3 decider: pinglamb won in ~30.4s with apm≈74.0, vs≈150.0</td>
+            <td class="lemma-cell">C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_0</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C013">
+            <td class="id-cell">C013</td>
+            <td class="canto-cell">全場最大單發 spike 係16，呢個數兩邊都掂過（全場出現咗三次），yachi 喺第4場第3局劈嗰一嘢16仲順手贏埋嗰局</td>
+            <td class="gloss-cell">biggest single spike of the session is 16 (reached 3 times, by both players); yachi&#x27;s came in m4r2 and he won that round</td>
+            <td class="lemma-cell">C013_biggest_single_spike_of_the_session_is_16_reached_3_times_by</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C014">
+            <td class="id-cell">C014</td>
+            <td class="canto-cell">打得最一面倒嗰場係第6場，yachi 5-1 冚咗 pinglamb</td>
+            <td class="gloss-cell">most one-sided match is m6, yachi 5-1</td>
+            <td class="lemma-cell">C014_most_one_sided_match_is_m6_yachi_5_1</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C015">
+            <td class="id-cell">C015</td>
+            <td class="canto-cell">全場79局，每一局贏嗰個 vs score 都高過輸嗰個——vs 就係命，冇一局例外</td>
+            <td class="gloss-cell">in all 79 rounds the winner had a higher vs than the loser (0 exceptions)</td>
+            <td class="lemma-cell">C015_in_all_79_rounds_the_winner_had_a_higher_vs_than_the_loser_0</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C016">
+            <td class="id-cell">C016</td>
+            <td class="canto-cell">有8局係贏家真係食多過對手嘅垃圾行都照樣翻盤</td>
+            <td class="gloss-cell">8 rounds were won by the player who received more real garbage than the loser</td>
+            <td class="lemma-cell">C016_8_rounds_were_won_by_the_player_who_received_more_real_garba</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C017">
+            <td class="id-cell">C017</td>
+            <td class="canto-cell">打得最乾淨嗰局係第1場第3局：pinglamb 全局淨係食咗1行垃圾（全場贏家最少），仲把 yachi 嘅 APM 壓到約5.3、vs 約8.9</td>
+            <td class="gloss-cell">cleanest kill is m1r2: pinglamb conceded only 1 line (session-min for a winner), holding yachi to apm≈5.3, vs≈8.9</td>
+            <td class="lemma-cell">C017_cleanest_kill_is_m1r2_pinglamb_conceded_only_1_line_session_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C018">
+            <td class="id-cell">C018</td>
+            <td class="canto-cell">單局最多 T-spin 係第2場第8局 pinglamb 嘅21個，佢就係靠啲 T-spin 攞低咗嗰局約200.5秒嘅馬拉松</td>
+            <td class="gloss-cell">most tspins in a round is 21 by pinglamb in m2r7, winning a ~200.5s marathon</td>
+            <td class="lemma-cell">C018_most_tspins_in_a_round_is_21_by_pinglamb_in_m2r7_winning_a_2</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C019">
+            <td class="id-cell">C019</td>
+            <td class="canto-cell">最長 back-to-back 鏈係第9場第6局 pinglamb 嘅10連 B2B</td>
+            <td class="gloss-cell">longest back-to-back streak is 10 by pinglamb in m9r5</td>
+            <td class="lemma-cell">C019_longest_back_to_back_streak_is_10_by_pinglamb_in_m9r5</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C020">
+            <td class="id-cell">C020</td>
+            <td class="canto-cell">成個 series 兩人夾埋出咗19次 Perfect Clear（All Clear）</td>
+            <td class="gloss-cell">19 all-clears (perfect clears) were made across the whole series</td>
+            <td class="lemma-cell">C020_19_all_clears_perfect_clears_were_made_across_the_whole_seri</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C021">
+            <td class="id-cell">C021</td>
+            <td class="canto-cell">跨場計 yachi 最多可以連贏五局（全場最長，pinglamb 最多得三局），不過單場之內佢最多連贏四局（第1場中段）。兩條五連勝：第5場尾駁第6場頭嗰條五局全部係贏波局；另一條第1場尾駁到第2場頭，但要留意第2場嗰個開局其實係 yachi 之後輸咗場（4-5）嘅頭一局</td>
+            <td class="gloss-cell">yachi&#x27;s longest cross-match round-win streak is 5 (session max; pinglamb&#x27;s is 3); within a single match his max is 4. Of the two 5-streaks, m5r6-m6r2 are all wins in won territory, while m1r3-m2r0 bridges into m2 which yachi lost 4-5</td>
+            <td class="lemma-cell">C021_yachi_s_longest_cross_match_round_win_streak_is_5_session_ma</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C022">
+            <td class="id-cell">C022</td>
+            <td class="canto-cell">第1場 yachi 一度 1-2 落後，之後連贏最後四局反超 5-2 收爐</td>
+            <td class="gloss-cell">in m1 yachi trailed 1-2 then won the last 4 rounds to close 5-2</td>
+            <td class="lemma-cell">C022_in_m1_yachi_trailed_1_2_then_won_the_last_4_rounds_to_close_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C023">
+            <td class="id-cell">C023</td>
+            <td class="canto-cell">第2場第3局嗰場落樓大戰，yachi 一局清咗204行，係全場單局最多</td>
+            <td class="gloss-cell">yachi cleared 204 lines in m2r2, the most lines in any single round of the session</td>
+            <td class="lemma-cell">C023_yachi_cleared_204_lines_in_m2r2_the_most_lines_in_any_single</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C024">
+            <td class="id-cell">C024</td>
+            <td class="canto-cell">第3場入面 yachi 喺第6局 vs 爆到約203.9，係佢嗰場單局最高嘅 vs</td>
+            <td class="gloss-cell">in m3, yachi&#x27;s vs≈203.9 in round 6 (idx5) is the highest single-round vs of that match</td>
+            <td class="lemma-cell">C024_in_m3_yachi_s_vs_203_9_in_round_6_idx5_is_the_highest_single</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C025">
+            <td class="id-cell">C025</td>
+            <td class="canto-cell">第4場 yachi 先贏頭三局、pinglamb 追返三局打成 3-3，最後 yachi 贏埋尾兩局 5-3 收</td>
+            <td class="gloss-cell">in m4 yachi won the first 3, pinglamb answered with 3 to tie 3-3, then yachi took the last 2 to close 5-3</td>
+            <td class="lemma-cell">C025_in_m4_yachi_won_the_first_3_pinglamb_answered_with_3_to_tie_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C026">
+            <td class="id-cell">C026</td>
+            <td class="canto-cell">十場嘅最終比數順序係 5-2、4-5、4-5、5-3、5-3、5-1、3-5、5-3、2-5、5-4（yachi 對 pinglamb）</td>
+            <td class="gloss-cell">the 10 match final scores in order (yachi-pinglamb): 5-2, 4-5, 4-5, 5-3, 5-3, 5-1, 3-5, 5-3, 2-5, 5-4</td>
+            <td class="lemma-cell">C026_the_10_match_final_scores_in_order_yachi_pinglamb_5_2_4_5_4_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-C027">
+            <td class="id-cell">C027</td>
+            <td class="canto-cell">嗰8局翻盤局（贏家食多過對手垃圾都照贏），yachi 佔咗其中6局、pinglamb 佔2局</td>
+            <td class="gloss-cell">of the 8 comeback rounds (winner received more garbage yet won), yachi took 6 and pinglamb 2</td>
+            <td class="lemma-cell">C027_of_the_8_comeback_rounds_winner_received_more_garbage_yet_wo</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R001">
+            <td class="id-cell">R001</td>
+            <td class="canto-cell">yachi 十場入面贏咗六場,pinglamb 贏四場</td>
+            <td class="gloss-cell">yachi won 6 of 10 matches, pinglamb 4</td>
+            <td class="lemma-cell">R001_yachi_won_6_of_10_matches_pinglamb_4</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R002">
+            <td class="id-cell">R002</td>
+            <td class="canto-cell">分開一局局計,yachi 贏咗 43 局,pinglamb 贏 36 局</td>
+            <td class="gloss-cell">round wins: yachi 43, pinglamb 36</td>
+            <td class="lemma-cell">R002_round_wins_yachi_43_pinglamb_36</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R003">
+            <td class="id-cell">R003</td>
+            <td class="canto-cell">成個 series 打足 79 局,十場都係先贏五局嗰個贏</td>
+            <td class="gloss-cell">79 rounds total across 10 matches, every match won by first to 5 round-wins</td>
+            <td class="lemma-cell">R003_79_rounds_total_across_10_matches_every_match_won_by_first_t</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R004">
+            <td class="id-cell">R004</td>
+            <td class="canto-cell">yachi 手快啲,全 series 落咗 7546 粒,多過 pinglamb 嘅 6971 粒</td>
+            <td class="gloss-cell">yachi placed more pieces overall (7546 vs 6971)</td>
+            <td class="lemma-cell">R004_yachi_placed_more_pieces_overall_7546_vs_6971</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R005">
+            <td class="id-cell">R005</td>
+            <td class="canto-cell">yachi 平均 PPS 約 1.43,快過 pinglamb 約 1.34</td>
+            <td class="gloss-cell">yachi mean PPS ~1.43 &gt; pinglamb ~1.34</td>
+            <td class="lemma-cell">R005_yachi_mean_pps_1_43_pinglamb_1_34</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R006">
+            <td class="id-cell">R006</td>
+            <td class="canto-cell">逐局 APM 打成平手,pinglamb 每局平均 APM 淨係叻 yachi 少少</td>
+            <td class="gloss-cell">per-round APM essentially tied, pinglamb marginally higher per-round average</td>
+            <td class="lemma-cell">R006_per_round_apm_essentially_tied_pinglamb_marginally_higher_pe</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R007">
+            <td class="id-cell">R007</td>
+            <td class="canto-cell">論每粒方塊嘅傷害,pinglamb 高過 yachi,佢慢啲但係打得實淨</td>
+            <td class="gloss-cell">pinglamb has higher attack-per-piece than yachi (more damage per piece)</td>
+            <td class="lemma-cell">R007_pinglamb_has_higher_attack_per_piece_than_yachi_more_damage_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R008">
+            <td class="id-cell">R008</td>
+            <td class="canto-cell">yachi 打 Quad(四行)多好多,373 個 vs pinglamb 293 個</td>
+            <td class="gloss-cell">yachi cleared more quads (373 vs 293)</td>
+            <td class="lemma-cell">R008_yachi_cleared_more_quads_373_vs_293</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R009">
+            <td class="id-cell">R009</td>
+            <td class="canto-cell">pinglamb 玩 T-spin double 玩得勁,339 個 vs yachi 292 個</td>
+            <td class="gloss-cell">pinglamb hit more T-spin doubles (339 vs 292)</td>
+            <td class="lemma-cell">R009_pinglamb_hit_more_t_spin_doubles_339_vs_292</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R010">
+            <td class="id-cell">R010</td>
+            <td class="canto-cell">連 T-spin triple pinglamb 都多啲,82 個 vs yachi 53 個</td>
+            <td class="gloss-cell">pinglamb hit more T-spin triples (82 vs 53)</td>
+            <td class="lemma-cell">R010_pinglamb_hit_more_t_spin_triples_82_vs_53</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R011">
+            <td class="id-cell">R011</td>
+            <td class="canto-cell">整體 T-spin 數量 pinglamb 482 個,多過 yachi 406 個</td>
+            <td class="gloss-cell">pinglamb has more total T-spins (482 vs 406)</td>
+            <td class="lemma-cell">R011_pinglamb_has_more_total_t_spins_482_vs_406</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R012">
+            <td class="id-cell">R012</td>
+            <td class="canto-cell">yachi 出 all-clear(執清)多過 pinglamb,12 次 vs 7 次</td>
+            <td class="gloss-cell">yachi hit more all-clears (12 vs 7)</td>
+            <td class="lemma-cell">R012_yachi_hit_more_all_clears_12_vs_7</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R013">
+            <td class="id-cell">R013</td>
+            <td class="canto-cell">單局最高 B2B pinglamb 去到 10,yachi 最高得 8</td>
+            <td class="gloss-cell">pinglamb&#x27;s best single-round B2B is 10 vs yachi&#x27;s 8</td>
+            <td class="lemma-cell">R013_pinglamb_s_best_single_round_b2b_is_10_vs_yachi_s_8</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R014">
+            <td class="id-cell">R014</td>
+            <td class="canto-cell">單局最高 combo pinglamb 去到 7,yachi 最高 6</td>
+            <td class="gloss-cell">pinglamb&#x27;s best single-round combo is 7 vs yachi&#x27;s 6</td>
+            <td class="lemma-cell">R014_pinglamb_s_best_single_round_combo_is_7_vs_yachi_s_6</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R015">
+            <td class="id-cell">R015</td>
+            <td class="canto-cell">pinglamb 嘅 finesse 失誤率高過 yachi 接近五成,手指效率係佢嘅弱項</td>
+            <td class="gloss-cell">pinglamb&#x27;s finesse-fault rate is ~46-48% higher than yachi&#x27;s</td>
+            <td class="lemma-cell">R015_pinglamb_s_finesse_fault_rate_is_46_48_higher_than_yachi_s</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R016">
+            <td class="id-cell">R016</td>
+            <td class="canto-cell">yachi 每粒方塊嘅 perfect finesse 比率高過 pinglamb,手法乾淨啲</td>
+            <td class="gloss-cell">yachi has higher perfect-piece-per-piece ratio than pinglamb</td>
+            <td class="lemma-cell">R016_yachi_has_higher_perfect_piece_per_piece_ratio_than_pinglamb</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R017">
+            <td class="id-cell">R017</td>
+            <td class="canto-cell">yachi 用 hold 用得多啲,每粒方塊 hold 比率高過 pinglamb</td>
+            <td class="gloss-cell">yachi holds slightly more per piece than pinglamb</td>
+            <td class="lemma-cell">R017_yachi_holds_slightly_more_per_piece_than_pinglamb</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R018">
+            <td class="id-cell">R018</td>
+            <td class="canto-cell">防守方面 yachi 清咗 1368 行垃圾,多過 pinglamb 嘅 1324 行</td>
+            <td class="gloss-cell">yachi cleared more garbage lines total (1368 vs 1324)</td>
+            <td class="lemma-cell">R018_yachi_cleared_more_garbage_lines_total_1368_vs_1324</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R019">
+            <td class="id-cell">R019</td>
+            <td class="canto-cell">yachi 俾人射埋嚟嘅攻擊約 3667,但真係食咗嘅垃圾得 3127,即係佢 cancel 咗成一成半</td>
+            <td class="gloss-cell">yachi&#x27;s queued incoming attack (~3667) exceeds materialized garbage received (3127), ~15% cancelled</td>
+            <td class="lemma-cell">R019_yachi_s_queued_incoming_attack_3667_exceeds_materialized_gar</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R020">
+            <td class="id-cell">R020</td>
+            <td class="canto-cell">三場打到 5-4 嘅決勝場入面,pinglamb 攞咗 m2 同 m3,yachi 攞返 m10</td>
+            <td class="gloss-cell">of the three 5-4 deciders, pinglamb won m2 and m3, yachi won m10</td>
+            <td class="lemma-cell">R020_of_the_three_5_4_deciders_pinglamb_won_m2_and_m3_yachi_won_m</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R021">
+            <td class="id-cell">R021</td>
+            <td class="canto-cell">m10 嘅決勝局,yachi 撑到最後 alive,PPS(1630)同 APM(74105)兩樣都爆過 pinglamb</td>
+            <td class="gloss-cell">in m10&#x27;s decider yachi survived alive with higher PPS (1630) and APM (74105) than pinglamb</td>
+            <td class="lemma-cell">R021_in_m10_s_decider_yachi_survived_alive_with_higher_pps_1630_a</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R022">
+            <td class="id-cell">R022</td>
+            <td class="canto-cell">m3 嘅決勝局,pinglamb 用少過 yachi 嘅方塊(40 vs 53)但係劈出更大 spike(13 vs 5)反殺</td>
+            <td class="gloss-cell">in m3&#x27;s decider pinglamb won with fewer pieces (40 vs 53) but a bigger spike (13 vs 5)</td>
+            <td class="lemma-cell">R022_in_m3_s_decider_pinglamb_won_with_fewer_pieces_40_vs_53_but_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R023">
+            <td class="id-cell">R023</td>
+            <td class="canto-cell">輸咗上一局之後,yachi 反彈贏返嗰局嘅比率高過 pinglamb(18/32 vs 19/37)</td>
+            <td class="gloss-cell">yachi&#x27;s bounce-back rate after losing the previous round is higher than pinglamb&#x27;s (18/32 vs 19/37)</td>
+            <td class="lemma-cell">R023_yachi_s_bounce_back_rate_after_losing_the_previous_round_is_</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R024">
+            <td class="id-cell">R024</td>
+            <td class="canto-cell">兩個嘅單 spike 天花板一樣,都試過劈出 16 嘅 spike</td>
+            <td class="gloss-cell">both players peaked at a single spike of 16</td>
+            <td class="lemma-cell">R024_both_players_peaked_at_a_single_spike_of_16</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R025">
+            <td class="id-cell">R025</td>
+            <td class="canto-cell">但係大 spike 出得密啲嘅係 pinglamb,有 22 局 spike 到 12 或以上,yachi 得 16 局</td>
+            <td class="gloss-cell">pinglamb had more rounds with maxspike &gt;= 12 (22 vs 16)</td>
+            <td class="lemma-cell">R025_pinglamb_had_more_rounds_with_maxspike_12_22_vs_16</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R026">
+            <td class="id-cell">R026</td>
+            <td class="canto-cell">論落 piece 嘅穩定性,yachi 嘅 PPS 波動細過 pinglamb,節奏穩陣啲</td>
+            <td class="gloss-cell">yachi&#x27;s per-round PPS is less variable than pinglamb&#x27;s (steadier pace)</td>
+            <td class="lemma-cell">R026_yachi_s_per_round_pps_is_less_variable_than_pinglamb_s_stead</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-R027">
+            <td class="id-cell">R027</td>
+            <td class="canto-cell">但係論攻擊輸出嘅穩定性,反而係 pinglamb 嘅 APM 波動細過 yachi</td>
+            <td class="gloss-cell">pinglamb&#x27;s per-round APM is less variable than yachi&#x27;s (steadier attack output)</td>
+            <td class="lemma-cell">R027_pinglamb_s_per_round_apm_is_less_variable_than_yachi_s_stead</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
 </section>
+<!-- END generated appendix -->
 
 <footer class="report-footer">
   yachi vs pinglamb · 2026-07-22 · report.html generated from facts.json + claims ledgers · build_appendix.py keeps this in sync
@@ -6580,7 +6961,6 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 <!-- CLAIMS_DATA_START -->
 <script type="application/json" id="claims-data">
 {
-  "generated_at": "2026-07-26T12:49:23+00:00",
   "proof_map_available": true,
   "total_claims": 54,
   "verified_count": 54,
@@ -6631,7 +7011,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "第10場最尾一局 yachi 打到 vs 約135.8、pinglamb 得約93.9，APM 約74 對約43，一面倒收工",
       "english_gloss": "m10 final round: yachi vs≈135.8 vs pinglamb≈93.9, apm 74 vs 43",
       "category": "clutch",
-      "lemma": "C005_m10_final_round_yachi_vs_135_9_vs_pinglamb_94_0_apm_74_vs_43",
+      "lemma": "C005_m10_final_round_yachi_vs_135_8_vs_pinglamb_93_9_apm_74_vs_43",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6661,7 +7041,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "最快嗰局係第6場第2局，約15秒就收咗工，yachi APM 爆到約93.7、pinglamb 得約24.3",
       "english_gloss": "shortest round is m6r1 (~15s); yachi apm≈93.7 vs pinglamb≈24.3",
       "category": "duration",
-      "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_4",
+      "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_3",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6671,7 +7051,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺",
       "english_gloss": "highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.83, vs≈262.5, a ~15s blitz",
       "category": "spike",
-      "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_84_",
+      "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_83_",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6681,7 +7061,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "嗰局 pinglamb 嘅 vs 約262.5，係成個 session 單局最高嘅 vs score",
       "english_gloss": "pinglamb's vs≈262.5 in m7r1 is the highest single-round vs of the session",
       "category": "spike",
-      "lemma": "C010_pinglamb_s_vs_262_6_in_m7r1_is_the_highest_single_round_vs_o",
+      "lemma": "C010_pinglamb_s_vs_262_5_in_m7r1_is_the_highest_single_round_vs_o",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6691,7 +7071,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "第2場嘅決勝局 pinglamb 頂住約128.5秒嘅拉鋸，清咗121行、APM 約60.3 執咗場波",
       "english_gloss": "m2 decider: pinglamb won a ~128.5s round, 121 lines, apm≈60.3",
       "category": "clutch",
-      "lemma": "C011_m2_decider_pinglamb_won_a_128_6s_round_121_lines_apm_60_4",
+      "lemma": "C011_m2_decider_pinglamb_won_a_128_5s_round_121_lines_apm_60_3",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6701,7 +7081,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "canto": "第3場決勝局 pinglamb 用約30.4秒、APM 約74.0、vs 約150.0 快刀斬亂麻",
       "english_gloss": "m3 decider: pinglamb won in ~30.4s with apm≈74.0, vs≈150.0",
       "category": "clutch",
-      "lemma": "C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_1",
+      "lemma": "C012_m3_decider_pinglamb_won_in_30_4s_with_apm_74_0_vs_150_0",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -7256,50 +7636,6 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     });
   }
 
-  // ---------- appendix table ----------
-  function renderAppendix() {
-    var tbody = document.getElementById("appendix-tbody");
-    tbody.innerHTML = "";
-    (CLAIMS.claims || []).forEach(function (c) {
-      var tr = document.createElement("tr");
-      tr.id = "claim-" + c.id;
-      tr.innerHTML =
-        '<td class="id-cell">' + c.id + "</td>" +
-        '<td class="canto-cell">' + c.canto + "</td>" +
-        '<td class="gloss-cell">' + (c.english_gloss || "") + "</td>" +
-        '<td class="lemma-cell">' + (c.lemma || "—") + "</td>" +
-        '<td><span class="status-pill" data-status="' + c.status + '">' +
-          statusIcon(c.status) + " " + c.status_label + "</span></td>";
-      tbody.appendChild(tr);
-    });
-
-    var statusLine = document.getElementById("status-line");
-    var total = CLAIMS.total_claims || (CLAIMS.claims || []).length;
-    var verified = CLAIMS.verified_count || 0;
-    var allVerified = total > 0 && verified === total;
-    statusLine.setAttribute("data-all-verified", String(allVerified));
-
-    var statusText = document.getElementById("method-status-text");
-    if (!CLAIMS.proof_map_available) {
-      statusLine.textContent = "claims-proof-map.json 未搵到 · " + total + " 條 claim 全部「驗證中」⏳";
-      while (statusText.firstChild) statusText.removeChild(statusText.firstChild);
-      statusText.appendChild(document.createRange().createContextualFragment("呢一版報告出爐嗰陣，claims-proof-map.json 仲未落地，所以下面啲狀態暫時全部顯示「驗證中」⏳；Dafny 引理一驗證完，淨係要行一次 <code>python3 build_appendix.py</code>，呢份報告就會自動翻新做 ✓，唔使再改呢份 HTML。"));
-    } else if (allVerified) {
-      statusLine.textContent = "proof-map 已載入 · 已驗證 " + verified + " / " + total;
-      while (statusText.firstChild) statusText.removeChild(statusText.firstChild);
-      statusText.appendChild(document.createRange().createContextualFragment("呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 "));
-      statusText.appendChild(document.createTextNode(String(total)));
-      statusText.appendChild(document.createRange().createContextualFragment(" 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 build_appendix.py</code> 就會自動同步，唔使再改呢份 HTML。"));
-    } else {
-      statusLine.textContent = "proof-map 已載入 · 已驗證 " + verified + " / " + total;
-      while (statusText.firstChild) statusText.removeChild(statusText.firstChild);
-      statusText.appendChild(document.createRange().createContextualFragment("呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，但 "));
-      statusText.appendChild(document.createTextNode(String(total)));
-      statusText.appendChild(document.createRange().createContextualFragment(" 條 claim 入面暫時得 "));
-      statusText.appendChild(document.createTextNode(String(verified)));
-      statusText.appendChild(document.createRange().createContextualFragment(" 條驗證完，其餘仲喺度証緊，所以下面部分狀態仲顯示「驗證中」⏳；Dafny 引理跑晒之後，淨係要再行一次 <code>python3 build_appendix.py</code>，呢份報告就會自動翻新，唔使再改呢份 HTML。"));
-    }
-  }
 
   // ---------- match timeline ----------
   function buildPipTrail(matchIndex) {
@@ -7593,7 +7929,6 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     renderVsSmallMultiples();
     renderClearsBar();
     renderTapeChart();
-    renderAppendix();
     renderAllBadges(document); // catch remaining static badges (hero, stats, coaching, moments)
   });
 })();

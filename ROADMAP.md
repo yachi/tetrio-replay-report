@@ -284,11 +284,33 @@ missing lemma (mutation-tested). It runs per artefact in CI, plus once against t
 Worth remembering as a pattern: a *derived identifier* (lemma name ← gloss text) turns a
 cosmetic edit into a structural one. Nothing in the pipeline had declared that dependency.
 
+## The appendix (2026-07-26)
+
+`pipeline/appendix.py` now owns 證明附錄 — the trust-chain note, the status line, and one table
+row per claim — plus the `claims-data` island the badges resolve through. The rows are **static
+HTML** rather than assembled in the browser, which deletes the last concatenating row builder
+(44 lines of JS per report), makes the appendix exist without JavaScript, and lets it print.
+The two per-session `build_appendix.py` scripts are deleted: the pipeline supersedes them.
+
+Three things stopped being hand-maintained:
+
+* the island's `generated_at` timestamp, which nothing displayed and which made the artefact
+  differ on every run — the opposite of what every other gate here checks
+* 「7 個 replay 檔案」 and 「52 條」 in the trust-chain prose, typed by hand per session and now
+  derived from `facts.json` and the ledgers
+* the three status-line wordings, which all shipped in the JS so the browser could pick one;
+  only the applicable branch is emitted now
+
+Verified by snapshotting the JS-rendered appendix in a browser *before* the change and comparing
+after: 54 and 52 rows, **every cell identical**, same status line, same `data-all-verified`, 110
+badges. Probes: a hand-edited row fails `--check`; a claim downgraded in the proof map renders
+驗證中（failed） with `data-all-verified="false"` and no tick; markup injected into a claim's
+Cantonese comes out escaped.
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
-1. appendix — folds in the remaining `innerHTML` row builder, since the generator can build
-   those rows with `textContent` instead of string concatenation
-2. the coaching section
-3. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
+1. the coaching section, 關鍵時刻, and the section ledes in 數據對決 — the last hand-built prose
+   still living in `report.html` rather than in a prose file
+2. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
    expecting one to be copied from a previous session. This is also where the inline script
    stops being player-hardcoded: ~110 occurrences of `yachi`/`pinglamb` remain in colours,
    keys and labels, and they should be resolved once, by the template, not chipped at.

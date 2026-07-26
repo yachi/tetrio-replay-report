@@ -133,15 +133,20 @@ compares the integer, not the printed text.
 
 ## Known remaining work
 
-1. Two `innerHTML` sites left in `report.html` concatenate into markup: the appendix row
-   builder, and the badge-prose expander. The expander is legitimate — card and lede prose is
-   authored HTML — so the real target is the appendix builder, which the P5 appendix section
-   will replace anyway. (The match-card score was the third; it now builds nodes.) Re-verify
-   the 110 badge count and 52 appendix rows after touching either.
+1. One `innerHTML` assignment left in `report.html`, and it is the legitimate one: the
+   match-card body expands authored prose carrying badge shorthand (`<b>C001</b>`). The other
+   two are gone — the match-card score builds nodes, and the appendix row builder was deleted
+   with the section it served. Re-verify the 110 badge count and 54/52 appendix rows after
+   touching anything near them.
 2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
-   `--check`): the hero/scoreboard, 全場之最, the `chart-data` island, and the `match-copy`
-   island. Still hand-built: the coaching section and the appendix. Add each as a new entry
-   in `SECTIONS`; the marker region and the drift gate come for free.
+   `--check`): the hero/scoreboard, 全場之最, the appendix, and the `chart-data`, `match-copy`
+   and `claims-data` islands. Still hand-built: the coaching section, 關鍵時刻, and the
+   section ledes in 數據對決. Add each as a new entry in `SECTIONS`; the marker region and the
+   drift gate come for free.
+
+   A `SECTIONS` entry may keep pre-existing markers instead of the standard pair — the
+   `claims-data` island does, because things locate it by those comments (`check_prose_figures`
+   skips it by them).
 
    A section that cites claims uses `pipeline/claim_cards.py` — one loader for ledger + proof
    map, so every section agrees on what "verified" means. `round_operand()` reads a figure out

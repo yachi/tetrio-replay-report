@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import chart_data, hero, matches, records, region
+from pipeline import appendix, chart_data, hero, matches, records, region
 
 
 def chart_section(ctx):
@@ -48,21 +48,37 @@ def records_section(ctx):
     return records.build(ctx["facts"], ctx["report_dir"])
 
 
-# (name, anchor to insert before when the region is absent, builder)
-# Both islands must precede the claims island, which is where the page's inline
-# script starts reading data from; the hero opens the document body; the records
-# sit between the key moments and the coaching recommendations.
-SECTIONS = [("hero", '<section id="matches">', hero_section),
-            ("records", '<section id="coaching">', records_section),
-            ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section),
-            ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section)]
+def appendix_section(ctx):
+    return appendix.section(ctx["facts"], ctx["report_dir"])
+
+
+def claims_island(ctx):
+    return appendix.island(ctx["report_dir"])
+
+
+# (name, anchor to insert before when the region is absent, builder, markers)
+# `markers` is None unless a region predates this module and owns a different
+# comment pair — the claims island does, and anything that finds it by name
+# (check_prose_figures skips it) keeps working because it kept them.
+#
+# Order is document order for a report being built from nothing: hero, records
+# before the coaching section, appendix before the footer, then the islands.
+SECTIONS = [
+    ("hero", '<section id="matches">', hero_section, None),
+    ("records", '<section id="coaching">', records_section, None),
+    ("appendix", '<footer class="report-footer">', appendix_section, None),
+    ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
+    ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),
+    ("claims-data", '<footer class="report-footer">', claims_island,
+     (appendix.ISLAND_START, appendix.ISLAND_END)),
+]
 
 
 def render(html, ctx):
     """Apply every generated section to `html`. Returns (html, [(name, how)])."""
     applied = []
-    for name, anchor, build in SECTIONS:
-        start, end = region.markers(name, "pipeline/build_report.py")
+    for name, anchor, build, markers in SECTIONS:
+        start, end = markers or region.markers(name, "pipeline/build_report.py")
         html, how = region.replace(html, start, end, build(ctx), anchor)
         applied.append((name, how))
     return html, applied
