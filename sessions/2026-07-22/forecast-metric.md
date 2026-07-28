@@ -15,7 +15,10 @@ then classifies by what happened between roof-build and execution.
 
 - `forecast_garbage` — garbage rose in that window
 - `forecast_lineclear` — a line clear occurred in that window
-- `reactive` — neither; the slot was already usable
+- `reactive` — the slot was already usable
+
+The `forecast_*` buckets additionally require the strict gate below: no line-clearing T-spin was
+available anywhere on the board when the roof was placed.
 
 `separation = k − j` in pieces. Reported as a rate, never a binary claim.
 
@@ -95,8 +98,12 @@ every audit round in this project has caught. A numeric section without badges b
 
 ## Validation performed on the instrument
 
-- 10 unit tests on hand-built cases; **6/6 mutants killed** (one initially survived — every test
-  had a single roof owner, so `Math.max`→`Math.min` was invisible; a two-owner case fixed it)
+- 14 unit tests on hand-built cases. Mutation testing on the classifier: **6/6 killed** (one
+  initially survived — every test had a single roof owner, so `Math.max`→`Math.min` was invisible;
+  a two-owner case fixed it). On the strict availability probe: **2/4 killed** — "probe ignores the
+  line-clear requirement" and "probe accepts non-rotation landings" both **survive**, because the
+  BEFORE/AFTER fixtures cannot distinguish them. Closing those needs a board where a T-spin is
+  available but clears nothing, and one where a T lands spin-shaped without rotating. **Not done.**
 - On real data, all 167 counted T-spins: BFS-reachable from spawn **167/167**, satisfy the
   3-corner rule **167/167**, physically supported **167/167**
 - Negative control: random T placements on the same boards are reachable only **3.6%**, so the
