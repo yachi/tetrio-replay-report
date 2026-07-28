@@ -1594,7 +1594,7 @@
   "family": "match_apm_max",
   "category": "pace",
   "canto": "以整場 match 計，最高 APM 係 pinglamb 喺 m7 嘅約 58.5",
-  "english_gloss": "highest match-level APM is 58.6 by pinglamb in m7",
+  "english_gloss": "highest match-level APM is 58.5 by pinglamb in m7",
   "spec": {
    "p": "and",
    "xs": [
@@ -2445,7 +2445,7 @@
   "family": "avg_pps_x1000",
   "category": "pace",
   "canto": "每局平均 PPS：yachi 約 1.43，高過 pinglamb 嘅約 1.34",
-  "english_gloss": "per-round mean PPS: yachi 1.434 > pinglamb 1.342",
+  "english_gloss": "per-round mean PPS: yachi 1.433 > pinglamb 1.342",
   "spec": {
    "p": "and",
    "xs": [
@@ -2495,7 +2495,7 @@
   "family": "avg_apm_x1000",
   "category": "pace",
   "canto": "每局平均 APM：pinglamb 約 52.2，高過 yachi 嘅約 52.0",
-  "english_gloss": "per-round mean APM: pinglamb 52.244 > yachi 52.097",
+  "english_gloss": "per-round mean APM: pinglamb 52.243 > yachi 52.096",
   "spec": {
    "p": "and",
    "xs": [
@@ -4756,7 +4756,7 @@
   "family": "decider_final_round",
   "category": "clutch",
   "canto": "m2 嘅生死局：pinglamb 打出 VS 約 138.8、APM 約 60.3，yachi 得 VS 約 127.6、APM 約 54.6",
-  "english_gloss": "m2 deciding round: pinglamb VS 138.8 / APM 60.4 vs yachi VS 127.6 / APM 54.6",
+  "english_gloss": "m2 deciding round: pinglamb VS 138.8 / APM 60.3 vs yachi VS 127.6 / APM 54.6",
   "spec": {
    "p": "and",
    "xs": [
@@ -4823,7 +4823,7 @@
   "family": "decider_final_round",
   "category": "clutch",
   "canto": "m3 嘅生死局：pinglamb 打出 VS 約 150.0、APM 約 74.0，yachi 得 VS 約 115.3、APM 約 57.3",
-  "english_gloss": "m3 deciding round: pinglamb VS 150.1 / APM 74.0 vs yachi VS 115.4 / APM 57.4",
+  "english_gloss": "m3 deciding round: pinglamb VS 150.0 / APM 74.0 vs yachi VS 115.3 / APM 57.3",
   "spec": {
    "p": "and",
    "xs": [
@@ -4890,7 +4890,7 @@
   "family": "decider_final_round",
   "category": "clutch",
   "canto": "m10 嘅生死局：yachi 打出 VS 約 135.8、APM 約 74.1，pinglamb 得 VS 約 93.9、APM 約 43.0",
-  "english_gloss": "m10 deciding round: yachi VS 135.9 / APM 74.1 vs pinglamb VS 94.0 / APM 43.0",
+  "english_gloss": "m10 deciding round: yachi VS 135.8 / APM 74.1 vs pinglamb VS 93.9 / APM 43.0",
   "spec": {
    "p": "and",
    "xs": [
@@ -7112,7 +7112,7 @@
  {
   "family": "rate_split_garbage_attack",
   "category": "attack",
-  "canto": "yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.66，輸嘅局約 0.53，贏局高咗大約 24% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
+  "canto": "yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.65，輸嘅局約 0.52，贏局高咗大約 24% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
   "english_gloss": "yachi's attack per piece: 0.656 in rounds won vs 0.525 in rounds lost",
   "spec": {
    "p": "gt",
@@ -7218,8 +7218,8 @@
  {
   "family": "rate_flat_inputs",
   "category": "finesse",
-  "canto": "yachi 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.01（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵",
-  "english_gloss": "yachi's keypresses per piece barely differs between rounds won and lost (under 0.01, ~0%) — not the lever",
+  "canto": "yachi 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.02（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "yachi's keypresses per piece barely differs between rounds won and lost (under 0.02, ~0%) — not the lever",
   "spec": {
    "p": "lt",
    "a": {
@@ -7309,8 +7309,8 @@
  {
   "family": "rate_flat_inputs",
   "category": "finesse",
-  "canto": "pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.06（即係唔到 2%），所以 KPP 唔係佢輸贏嘅關鍵",
-  "english_gloss": "pinglamb's keypresses per piece barely differs between rounds won and lost (under 0.06, ~1%) — not the lever",
+  "canto": "pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.07（即係唔到 2%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "pinglamb's keypresses per piece barely differs between rounds won and lost (under 0.07, ~1%) — not the lever",
   "spec": {
    "p": "lt",
    "a": {
@@ -7453,7 +7453,7 @@
  {
   "family": "rate_split_garbage_cleared",
   "category": "style",
-  "canto": "pinglamb 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.17，贏局高咗大約 25% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到",
+  "canto": "pinglamb 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.16，贏局高咗大約 25% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到",
   "english_gloss": "pinglamb's garbage cleared per piece: 0.212 in rounds won vs 0.169 in rounds lost",
   "spec": {
    "p": "gt",

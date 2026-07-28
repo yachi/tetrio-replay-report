@@ -28,6 +28,8 @@ ARTEFACTS = [
      "十場 series、79 局，每個數字都有 Dafny lemma。"),
     ("2026-07-24", "report", "2026-07-24.html", "完整戰報",
      "七場 series、50 局，pinglamb 復仇戰。"),
+    ("2026-07-28", "report", "2026-07-28.html", "完整戰報",
+     "八場 series、64 局，yachi 贏晒頭兩場之後俾人連斬六場。"),
 ]
 LOOSE_REPORTS = {}
 

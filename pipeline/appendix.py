@@ -31,17 +31,51 @@ from pipeline import claim_cards
 ISLAND_START = "<!-- CLAIMS_DATA_START -->"
 ISLAND_END = "<!-- CLAIMS_DATA_END -->"
 
-LEDGERS = [("claims-narrative.json", "narrative"),
-           ("claims-coaching.json", "coaching")]
+PROOF_MAP = "claims-proof-map.json"
+# Ledger filename -> the short tag the appendix labels its rows with.
+TAGS = {"claims-narrative.json": "narrative",
+        "claims-coaching.json": "coaching",
+        "claims-generated.json": "generated"}
+
+
+def _ledgers(report_dir):
+    """The ledgers this session's committed proofs cover, in canonical order.
+
+    The rule is "whose lemma is committed in this session's dafny/", which
+    `claims-proof-map.json` already records — so no session needs to be named here.
+    For 07-22 and 07-24 that is the two hand ledgers (their generated lemmas are
+    built and verified in CI, never committed); for 07-28, whose hand claims carry
+    specs and compile into the same Claims.dfy, it is both ledgers.
+
+    Getting this wrong is not cosmetic. The island built from these rows is what a
+    badge resolves against, and an unresolved badge renders as "⏳ G014" linking to
+    an anchor that does not exist — indistinguishable from a claim still being
+    proved. 38 cited claims looked pending that way.
+    """
+    names = sorted(n for n in os.listdir(report_dir)
+                   if n.startswith("claims") and n.endswith(".json")
+                   and "proof-map" not in n)
+    order = ["claims-generated.json", "claims-narrative.json", "claims-coaching.json"]
+    names.sort(key=lambda n: (order.index(n) if n in order else len(order), n))
+    return [(n, TAGS.get(n, "hand")) for n in names]
 
 
 def _rows(report_dir):
-    """Every hand claim, in ledger order, with its lemma and status resolved."""
+    """Every claim the committed proofs cover, in ledger order, status resolved."""
     out = []
-    for ledger, tag in LEDGERS:
+    covered = set()
+    path = os.path.join(report_dir, PROOF_MAP)
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        rows = data if isinstance(data, list) else [dict(v, id=k) for k, v in data.items()]
+        covered = {r["id"] for r in rows}
+    for ledger, tag in _ledgers(report_dir):
         if not os.path.exists(os.path.join(report_dir, ledger)):
             continue
-        for c in claim_cards.load(report_dir, ledger, proof_map="claims-proof-map.json"):
+        for c in claim_cards.load(report_dir, ledger, proof_map=PROOF_MAP):
+            if c["id"] not in covered:
+                continue
             verified = c["verified"]
             raw = c["status"]
             # An unknown status still shows 驗證中 — never a tick the verifier did

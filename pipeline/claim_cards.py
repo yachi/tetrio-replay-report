@@ -30,8 +30,14 @@ def load(report_dir, ledger="claims-generated.json", proof_map=None):
     if proof_map:
         maps = [os.path.join(report_dir, proof_map)]
     else:
+        # The ledger's own map if it has one, otherwise the session-wide map. A
+        # session whose ledgers all compile into one Claims.dfy has only the latter,
+        # and without this fallback every one of its generated claims resolved to no
+        # entry and rendered 待證 — a verified claim displayed as still being proved.
         stem = ledger[:-len(".json")] if ledger.endswith(".json") else ledger
         maps = glob.glob(os.path.join(report_dir, f"{stem}-proof-map.json"))
+        if not maps:
+            maps = glob.glob(os.path.join(report_dir, "claims-proof-map.json"))
     for pm in maps:
         if not os.path.exists(pm):
             continue

@@ -51,6 +51,25 @@ def pools(facts):
             for p in r["players"].values():
                 x1000.update(p[k] for k in ("apm_x1000", "pps_x1000", "vs_x1000"))
                 lifetimes.add(p["lifetime"])
+    # The derived quantities the generators also print with 約: per-round means, and
+    # the per-piece rates split by whether the round was won. Without them a correctly
+    # floored derived figure matches no datum, collides with some *unrelated* datum's
+    # rounded rendering, and is reported as a defect — 約0.73 (an APP rate) was read
+    # as the rounding of a 0.728 PPS. The gate has to know every integer a generator
+    # can legitimately format, or it cries wolf at exactly the figures it added.
+    rounds = [r for m in facts["matches"] for r in m["rounds"]]
+    for pl in facts["players"]:
+        for k in ("apm_x1000", "pps_x1000", "vs_x1000"):
+            vals = [r["players"][pl][k] for r in rounds]
+            if vals:
+                x1000.add(sum(vals) // len(vals))
+        for f in ("garbage_attack", "inputs", "garbage_cleared"):
+            for won in (True, False):
+                sel = [r for r in rounds if (r["winner"] == pl) == won]
+                num = sum(r["players"][pl][f] for r in sel)
+                den = sum(r["players"][pl]["pieces"] for r in sel)
+                if den:
+                    x1000.add((num * 1000) // den)
     return x1000, lifetimes
 
 
@@ -72,18 +91,25 @@ def renderings(value, precision, x1000, lifetimes):
 
 
 def surfaces(report_dir):
-    """(label, identifier, text) for every hand-written surface."""
+    """(label, identifier, text) for every published surface."""
     out = []
-    for rel in ("claims-narrative.json", "claims-coaching.json"):
-        path = os.path.join(report_dir, rel)
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as fh:
-                claims = json.load(fh)
-            # The gloss is checked as well as the Cantonese: it travels in the
-            # claims island, so a rounded figure there is just as published.
-            out += [(rel, c["id"], c["canto"]) for c in claims]
-            out += [(rel, f'{c["id"]}.gloss', c.get("english_gloss") or "")
-                    for c in claims]
+    # Every ledger, the generated one included. This used to list only the hand
+    # ledgers, on the grounds that the generators floor by construction. They did
+    # not: several families formatted the Cantonese with the flooring helper and the
+    # english_gloss with a bare `:.1f`, so one claim published 約167.9 and
+    # "VS 168.0" for the same datum, and the flat-rate family printed a bound
+    # *tighter* than its own lemma proved. Trusting the generator is what let that
+    # ship for three sessions, so the gate now measures it instead.
+    for rel in sorted(n for n in os.listdir(report_dir)
+                      if n.startswith("claims") and n.endswith(".json")
+                      and "proof-map" not in n):
+        with open(os.path.join(report_dir, rel), encoding="utf-8") as fh:
+            claims = json.load(fh)
+        # The gloss is checked as well as the Cantonese: it travels in the
+        # claims island, so a rounded figure there is just as published.
+        out += [(rel, c["id"], c["canto"]) for c in claims]
+        out += [(rel, f'{c["id"]}.gloss', c.get("english_gloss") or "")
+                for c in claims]
     hero = os.path.join(report_dir, "prose", "hero.json")
     if os.path.exists(hero):
         with open(hero, encoding="utf-8") as fh:

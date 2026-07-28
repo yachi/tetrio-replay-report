@@ -40,6 +40,7 @@ jobs:
           - sessions/2026-07-22/report
           - sessions/2026-07-24/report
           - sessions/2026-07-24/proof
+          - sessions/2026-07-28/report
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -83,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        session: ['2026-07-22', '2026-07-24']
+        session: ['2026-07-22', '2026-07-24', '2026-07-28']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -110,6 +111,27 @@ jobs:
           }
           echo "  ok  generated ledger reproduces byte-for-byte"
 
+      # A session whose hand claims carry specs builds them from hand_claims.py the
+      # same way, so the committed ledger cannot drift from the module either. The
+      # older sessions have no such module and are skipped by the guard, not silently.
+      - name: Regenerate the hand ledger and compare with the committed one
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          if [ ! -f "$W/hand_claims.py" ]; then
+            echo "  --  $W has no hand_claims.py (its hand claims predate the spec algebra)"
+            exit 0
+          fi
+          before=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
+          python3 -m pipeline.claims.build_hand "$W/hand_claims.py" \
+            --facts "$W/facts.json" --out "$W/claims-narrative.json"
+          after=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
+          [ "$before" = "$after" ] || {
+            echo "FAIL: regenerating the hand ledger changed it — commit the new one" >&2
+            exit 1
+          }
+          echo "  ok  hand ledger reproduces byte-for-byte"
+
       # The charts read a JSON island. It used to be hand-written, so a chart could
       # disagree with facts.json and nothing would catch it — this makes that a
       # build failure instead.
@@ -132,8 +154,10 @@ jobs:
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
+          LEDGERS=$(python3 -c "import sys;from pipeline.codegen import partition_spec_ledgers,session_ledgers;print(' '.join(partition_spec_ledgers(session_ledgers(sys.argv[1]))[0]))" "$W")
+          echo "ledgers: $LEDGERS"
           python3 -m pipeline.codegen "$W/facts.json" \
-            --claims "$W/claims-generated.json" --outdir "$RUNNER_TEMP/dfy"
+            --claims $LEDGERS --outdir "$RUNNER_TEMP/dfy"
           out=$(dafny verify "$RUNNER_TEMP/dfy/Facts.dfy" "$RUNNER_TEMP/dfy/Claims.dfy" --cores 4 2>&1 | tail -1)
           echo "$out"
           case "$out" in *"0 errors"*) ;; *) exit 1 ;; esac
@@ -142,7 +166,13 @@ jobs:
       # be checked against the directory they were just generated into.
       - name: Check the generated proof map's links resolve
         run: |
-          python3 -m pipeline.check_proof_links "sessions/${{ matrix.session }}/report" \
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          if [ ! -f "$W/claims-generated-proof-map.json" ]; then
+            echo "  --  $W has one map covering every ledger; the verify job checks it"
+            exit 0
+          fi
+          python3 -m pipeline.check_proof_links "$W" \
             --map claims-generated-proof-map.json --dafny-dir "$RUNNER_TEMP/dfy"
 
       - name: Mutation-test the generated proofs
@@ -194,7 +224,7 @@ jobs:
         run: |
           set -euo pipefail
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof; do
+          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report; do
             ts=$(ls "$d"/extract2*.ts | head -1)
             f2=$(ls "$d"/facts2*.json | head -1)
             before=$(sha256sum "$f2" | cut -d' ' -f1)

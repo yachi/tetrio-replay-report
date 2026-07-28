@@ -169,7 +169,7 @@
  },
  {
   "id": "G025",
-  "lemma": "G025_highest_match_level_apm_is_58_6_by_pinglamb_in_m7",
+  "lemma": "G025_highest_match_level_apm_is_58_5_by_pinglamb_in_m7",
   "file": "Claims.dfy",
   "family": "match_apm_max",
   "status": "verified"
@@ -281,14 +281,14 @@
  },
  {
   "id": "G041",
-  "lemma": "G041_per_round_mean_pps_yachi_1_434_pinglamb_1_342",
+  "lemma": "G041_per_round_mean_pps_yachi_1_433_pinglamb_1_342",
   "file": "Claims.dfy",
   "family": "avg_pps_x1000",
   "status": "verified"
  },
  {
   "id": "G042",
-  "lemma": "G042_per_round_mean_apm_pinglamb_52_244_yachi_52_097",
+  "lemma": "G042_per_round_mean_apm_pinglamb_52_243_yachi_52_096",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
@@ -421,21 +421,21 @@
  },
  {
   "id": "G061",
-  "lemma": "G061_m2_deciding_round_pinglamb_vs_138_8_apm_60_4_vs_yachi_vs_127_6_apm_54",
+  "lemma": "G061_m2_deciding_round_pinglamb_vs_138_8_apm_60_3_vs_yachi_vs_127_6_apm_54",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"
  },
  {
   "id": "G062",
-  "lemma": "G062_m3_deciding_round_pinglamb_vs_150_1_apm_74_0_vs_yachi_vs_115_4_apm_57",
+  "lemma": "G062_m3_deciding_round_pinglamb_vs_150_0_apm_74_0_vs_yachi_vs_115_3_apm_57",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"
  },
  {
   "id": "G063",
-  "lemma": "G063_m10_deciding_round_yachi_vs_135_9_apm_74_1_vs_pinglamb_vs_94_0_apm_43",
+  "lemma": "G063_m10_deciding_round_yachi_vs_135_8_apm_74_1_vs_pinglamb_vs_93_9_apm_43",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"

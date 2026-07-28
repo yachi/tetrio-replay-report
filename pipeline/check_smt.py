@@ -142,10 +142,14 @@ def check(path, only=None):
 def regen(report_dir):
     """The committed file must be exactly what codegen emits now."""
     from . import codegen_smt
+    from .codegen import load_ledgers, partition_spec_ledgers, session_ledgers
     with open(os.path.join(report_dir, "facts.json"), encoding="utf-8") as fh:
         facts = json.load(fh)
-    with open(os.path.join(report_dir, "claims-generated.json"), encoding="utf-8") as fh:
-        claims = json.load(fh)
+    usable, skipped = partition_spec_ledgers(session_ledgers(report_dir))
+    for p in skipped:
+        print(f"  --  {os.path.basename(p)} has no specs, so it is not in claims.smt2 "
+              f"(Dafny-only)")
+    claims = load_ledgers(usable)
     text, _ = codegen_smt.emit(facts, claims)
     path = os.path.join(report_dir, "claims.smt2")
     with open(path, encoding="utf-8") as fh:

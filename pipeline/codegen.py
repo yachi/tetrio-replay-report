@@ -1,8 +1,13 @@
-"""Emit Dafny from a session's facts.json plus a claim ledger.
+"""Emit Dafny from a session's facts.json plus one or more claim ledgers.
 
     python3 -m pipeline.codegen sessions/2026-07-24/report/facts.json \
         --claims sessions/2026-07-24/report/claims-generated.json \
         --outdir sessions/2026-07-24/report/dafny-generated
+
+`--claims` takes several ledgers, which is how a session's hand-written claims join
+its generated ones in a single Facts.dfy / Claims.dfy. It is also why hand claims
+now carry a `spec` rather than a bare `python_check`: a spec renders to all three
+backends, so a hand claim needs no bespoke per-session Dafny emitter.
 
 Produces Facts.dfy (flat named scalar consts, every literal from facts.json) and
 Claims.dfy (one empty-bodied lemma per claim, whose ensures clause is the same spec the
@@ -47,6 +52,62 @@ STR_ROUND_FIELDS = ["gameoverreason"]
 
 def _cap(pl):
     return pl[:1].upper() + pl[1:]
+
+
+def session_ledgers(report_dir):
+    """A session's claim ledgers in the one canonical order.
+
+    Generated first, then the hand ledgers alphabetically. Both the emitters and the
+    byte-identity gates call this, so "regenerate and compare" cannot fail merely
+    because a caller listed the same ledgers in a different order.
+    """
+    names = sorted(n for n in os.listdir(report_dir)
+                   if n.startswith("claims") and n.endswith(".json")
+                   and "proof-map" not in n)
+    gen = [n for n in names if n == "claims-generated.json"]
+    return [os.path.join(report_dir, n) for n in gen + [n for n in names if n not in gen]]
+
+
+def partition_spec_ledgers(paths):
+    """Split ledgers into the spec-carrying ones and the rest.
+
+    The 07-22 and 07-24 hand ledgers predate the spec algebra: they carry only a
+    `python_check`, are proved by their own committed codegen_dafny.py, and cannot be
+    rendered to SMT-LIB. Callers that can only consume specs use this and **name what
+    they left out** — a silent skip here would understate the artefact's coverage,
+    which is the one thing this repo will not do.
+    """
+    with_spec, without = [], []
+    for p in paths:
+        with open(p, encoding="utf-8") as fh:
+            batch = json.load(fh)
+        (with_spec if batch and all("spec" in c for c in batch) else without).append(p)
+    return with_spec, without
+
+
+def load_ledgers(paths):
+    """Concatenate ledgers, refusing anything that would silently lose a claim.
+
+    Ids must be unique across ledgers because the proof map, the badges and the
+    lemma names are all keyed by id — two ledgers both starting at C001 would have
+    one claim's badge quietly resolve to the other's lemma.
+    """
+    claims, seen = [], {}
+    for p in paths:
+        with open(p, encoding="utf-8") as fh:
+            batch = json.load(fh)
+        for c in batch:
+            if "spec" in c:
+                cid = c.get("id")
+                if cid in seen:
+                    raise SystemExit(f"claim id {cid} appears in both {seen[cid]} and {p}")
+                seen[cid] = p
+            claims.append(c)
+    missing = [c.get("id") for c in claims if "spec" not in c]
+    if missing:
+        raise SystemExit("every claim needs its spec, these have none: "
+                         + ", ".join(str(m) for m in missing))
+    return claims
 
 
 def referenced_consts(facts, claims):
@@ -144,16 +205,14 @@ def emit_claims(facts, claims):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("facts")
-    ap.add_argument("--claims", required=True)
+    ap.add_argument("--claims", required=True, nargs="+",
+                    help="one or more ledgers; concatenated in the order given")
     ap.add_argument("--outdir", required=True)
     args = ap.parse_args(argv)
 
     with open(args.facts, encoding="utf-8") as fh:
         facts = json.load(fh)
-    with open(args.claims, encoding="utf-8") as fh:
-        claims = json.load(fh)
-    if not all("spec" in c for c in claims):
-        raise SystemExit("every claim needs its spec (regenerate with build_claims.py)")
+    claims = load_ledgers(args.claims)
 
     os.makedirs(args.outdir, exist_ok=True)
     facts_dfy = os.path.join(args.outdir, "Facts.dfy")

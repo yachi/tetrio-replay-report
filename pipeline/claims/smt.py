@@ -29,7 +29,7 @@ every value here is non-negative, so the two agree with floor. The algebra emits
 division today; if a family ever needs one, that equivalence is the thing to re-check
 before trusting the two backends to agree.
 """
-from .spec import c_winner, dafny_field, dafny_suffix, rounds_of
+from .spec import c_winner, dafny_field, dafny_suffix, rounds_in, rounds_of
 
 # Every string value in the corpus, mapped to an integer code. Populated by
 # `code_table()` from facts.json before rendering, so the codes are derived from
@@ -162,6 +162,9 @@ def smt_expr(facts, e):
         return nary("+", [_ite(smt_cond(facts, mi, ri, e["cond"]),
                                dafny_field(mi, ri, e["pl"], e["f"]), "0")
                           for mi, ri in rounds_of(facts)])
+    if k == "sum_round_range":
+        return nary("+", [dafny_field(mi, ri, e["pl"], e["f"])
+                          for mi, ri in rounds_in(facts, e["lo"], e["hi"])])
     if k == "sum_sq_round":
         return nary("+", _round_terms(facts, e["pl"], e["f"], square=True))
     if k == "sum_ge":
@@ -173,6 +176,9 @@ def smt_expr(facts, e):
         return _count(facts, c_winner(e["pl"]))
     if k == "count_rounds":
         return _count(facts, e["cond"])
+    if k == "count_rounds_range":
+        return nary("+", [_ite(smt_cond(facts, mi, ri, e["cond"]), "1", "0")
+                          for mi, ri in rounds_in(facts, e["lo"], e["hi"])])
     if k == "sum_lb":
         return nary("+", [f"m{mi}_lb_{e['pl']}_{dafny_suffix(e['f'])}"
                           for mi in range(len(facts["matches"]))])

@@ -3,9 +3,9 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Two sessions so far
-(2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3), 129 rounds, 106 hand-written +
-153 generated claims.
+factual sentence is badge-linked to a Dafny-verified lemma. Three sessions so far
+(2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2),
+193 rounds, 118 hand-written + 224 generated claims.
 
 ## The one invariant
 
@@ -67,8 +67,22 @@ That speed is what makes the anti-vacuity mutation test affordable on every push
 byte-identity gated, so it doubles as a portable artefact: any SMT-LIB solver can re-check the
 claims without this pipeline.
 
-The `.smt2` covers the **generated** ledger only — the hand ledgers have no spec, so they stay
-Dafny-only.
+The `.smt2` covers every **spec-carrying** ledger. For 07-22 and 07-24 that is the generated
+one only — their hand ledgers predate the spec algebra, carry a bare `python_check`, and are
+proved by a session-local ~500-line `codegen_dafny.py`. From 2026-07-28 on, hand claims are
+written as **specs** in `sessions/<date>/report/hand_claims.py` and built with
+`pipeline.claims.build_hand`, so they render to all three backends and need no per-session
+emitter: `--claims` on `codegen`, `codegen_smt` and `build_proof_map` takes several ledgers,
+`pipeline.codegen.session_ledgers` defines their canonical order, and `check_smt` **names**
+any ledger it had to leave out rather than silently narrowing what the artefact covers.
+
+Two windowed operators exist for claims about how a session *changed*:
+`sum_round_range` / `count_rounds_range` restrict to a contiguous window of matches. The
+window is part of the claim's identity (like `sum_ge`'s explicit mi/ri), so it is rendered by
+emitting only the in-window terms — never `if <window> then x else 0`, whose folded-away
+`if false` would leave a const referenced in the text but unread by the proof, i.e. a mutation
+that can never be killed. Windows of different sizes must be compared as cross-multiplied
+rates, never as raw sums.
 
 **Encoding, and why it is what it is.** Strings are integer codes with a legend in the header
 (`1 = yachi`), not the `String` sort — the sort restricted the file to the two solvers with a
@@ -148,10 +162,26 @@ Paired AUC over 129 rounds — how often the round's winner held the higher valu
 - **No signal**: COMBO 45.0 · PC 50.8 (89% zeros) · TST 55.8 · TSD 60.9 · KPP 39.9
 - Near-constant (CV 0.05): KPP, FIN% — their flatness is the finding, not a column of numbers
 
-Coaching conclusions, cross-validated over both sessions: **APP is the lever** (17–24% higher
-in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-sessions;
+2026-07-28 (64 rounds) reproduces all of it independently: VS 100% · APP 96.9 · APM 95.3 ·
+攻 93.8 · DS 75.0 · 食 12.5 · 射埋 14.1 — and **KPP 42.2**, below chance for a third time.
+
+Coaching conclusions, cross-validated over three sessions: **APP is the lever** (17–24% higher
+in rounds won, both players, every session); **DS matters** in 5 of 6 player-sessions;
 **KPP is flat** (0–2%) — reported as a negative result. When adding a column or a claim, run
 `pipeline/claims/equiv.py` or the AUC probe rather than assuming a stat is informative.
+
+**`equiv.py` reports 100% for 07-28 and the number is an artefact** — read it before quoting
+it. It tries every *single*-value mutation, and a windowed claim shares its rounds with a
+session total, so nothing it can try falsifies one without the other. Two changes break the
+tie: moving 120 pieces from a match-3 round to a match-1 round keeps `total_pieces`,
+`total_garbage_attack` and C008 true while flipping C005 false. Extending it to
+value-preserving two-site moves is the obvious next step and is not done.
+
+07-28's own finding is about *change over a night*, which no earlier session asked: yachi won
+the first two matches and lost six straight, but his rate did not collapse — in matches 1-2 the
+two players' APP were level (0.62305 vs 0.62216, yachi ahead by 0.0009) and from match 3 they
+separated, pinglamb +4.99% and yachi −4.92%. Both totals are nearly equal (attack 3264 vs 3249)
+because yachi threw 378 more pieces to get there. That is what `sum_round_range` exists for.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
@@ -176,6 +206,16 @@ in rounds won, both players, both sessions); **DS matters** in 3 of 4 player-ses
   last table's indices win, putting every lookup past the end of a row.
 - Scores render in **player order** (`players[0] : players[1]`), never champion-first — that
   reversed the meaning on the site index once.
+- **An unresolved badge is indistinguishable from a pending one.** It renders `⏳ G014` linked
+  to an anchor that does not exist, which reads as "still being proved". Two ways that
+  happened on 07-28, the first session whose prose cites generated claims: the claims island
+  listed only the hand ledgers, and `expandShorthandBadges` matched `[CR]\d{3}` so `<b>G004</b>`
+  in match-card copy stayed literal text. `appendix._rows` now includes every ledger the
+  session's committed `claims-proof-map.json` covers — a rule that leaves 07-22 at 54 rows and
+  07-24 at 52 while giving 07-28 all 83 — and `claim_cards.load` falls back to that map when a
+  ledger has no `<stem>-proof-map.json` of its own, which is what made the round table's
+  verdict cards show 待證 for claims the verifier had proved. Counting `.badge[data-status]`
+  in the DOM does **not** catch either one; both were found by reading a screenshot.
 - The `.ttrm` files are single-line JSON; `.gitattributes` marks them `-diff linguist-vendored`.
 
 ## 約 means the floored value — everywhere, and it is gated
@@ -198,6 +238,18 @@ Notes for future prose: a figure the checker cannot resolve is reported, not fai
 differences legitimately print values no single datum produces. Figures in minutes are skipped
 (a different divisor). `check_claims` will never catch this class, because every predicate
 compares the integer, not the printed text.
+
+**The gate used to skip the generated ledger, on the grounds that the generators floor by
+construction. They did not.** Several families formatted the Cantonese with `_one_dp`/`_two_dp`
+and the `english_gloss` with a bare `:.1f`, so one claim published 約167.9 and "VS 168.0" for
+the same datum across all three sessions; the flat-rate family printed "差距唔夠 0.01 / under
+0.01" for a bound its lemma only proved at 0.013 — a sentence strictly stronger than its proof.
+Fixed 2026-07-28: every printed figure goes through a helper, and `_bound_dp` **ceils** because
+an upper bound is the one figure that must round the other way. `check_prose_figures` now scans
+every ledger, and its datum pool includes the derived quantities a generator can legitimately
+print (per-round means, and the won/lost per-piece rates) — without them a correctly floored
+rate resolves against no datum, collides with some unrelated datum's rounded rendering, and the
+gate cries wolf at exactly the figures it just added.
 
 ## Relevant skills
 

@@ -940,7 +940,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="rt-find">
       <div class="rt-card is-lever">
         <div class="rt-metric">APP<span class="rt-verdict">決定輸贏</span></div>
-        <p>yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.66，輸嘅局約 0.56，贏局高咗大約 17% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊</p>
+        <p>yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.65，輸嘅局約 0.56，贏局高咗大約 17% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊</p>
         <div class="rt-cid">G069 · ✓ Dafny 已證</div>
       </div>
       <div class="rt-card is-lever">
@@ -955,7 +955,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       </div>
       <div class="rt-card is-lever">
         <div class="rt-metric">DS<span class="rt-verdict">決定輸贏</span></div>
-        <p>yachi 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.16，贏局高咗大約 33% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到</p>
+        <p>yachi 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.21，輸嘅局約 0.15，贏局高咗大約 33% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到</p>
         <div class="rt-cid">G073 · ✓ Dafny 已證</div>
       </div>
       <div class="rt-card is-flat">
@@ -970,7 +970,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       </div>
       <div class="rt-card is-flat">
         <div class="rt-metric">KPP<span class="rt-verdict">唔係關鍵</span></div>
-        <p>pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.02（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵</p>
+        <p>pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.03（即係唔到 1%），所以 KPP 唔係佢輸贏嘅關鍵</p>
         <div class="rt-cid">G072 · ✓ Dafny 已證</div>
       </div>
       <div class="rt-card is-compare">
@@ -5723,7 +5723,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
   // expand <b>C007</b> shorthand inside injected match-copy html into real badge anchors
   function expandShorthandBadges(html) {
-    return html.replace(/<b>([CR]\d{3})<\/b>/g, function (_, id) {
+    return html.replace(/<b>([CGR]\d{3})<\/b>/g, function (_, id) {
       return '<span class="badge" data-claim="' + id + '"></span>';
     });
   }

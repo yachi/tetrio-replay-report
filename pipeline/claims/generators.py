@@ -92,6 +92,23 @@ def _two_dp(x_x1000):
     return f"{x_x1000 // 10 / 100:.2f}"
 
 
+def _three_dp(x_x1000):
+    """x1000 integer -> '0.666'. Exact, so flooring and rounding coincide."""
+    return f"{x_x1000 / 1000:.3f}"
+
+
+def _bound_dp(x_x1000):
+    """An UPPER bound as 2dp, rounded **up**: 13 -> '0.02', not '0.01'.
+
+    The flooring convention exists so 約 means "at least this much". A bound runs the
+    other way — "the gap is under X" is only true if the printed X is at least the
+    proved one, so this is the one place that must ceil. Flooring here printed
+    "under 0.01" for a bound the lemma proved at 0.013: a claim strictly stronger
+    than its own proof.
+    """
+    return f"{-(-x_x1000 // 10) / 100:.2f}"
+
+
 def _ordinal(mi):
     return f"m{mi + 1}"
 
@@ -344,7 +361,7 @@ def match_level_apm_max(facts):
     return [{
         "family": "match_apm_max", "category": "pace",
         "canto": f"以整場 match 計，最高 APM 係 {pl} 喺 {_ordinal(mi)} 嘅約 {_one_dp(v)}",
-        "english_gloss": f"highest match-level APM is {v / 1000:.1f} by {pl} in m{mi + 1}",
+        "english_gloss": f"highest match-level APM is {_one_dp(v)} by {pl} in m{mi + 1}",
         "spec": conj(
             between(lb(mi, pl, "apm_x1000"), v // 100 * 100, v // 100 * 100 + 100),
             *[gt(lit(v + 1), lb(m2, p2, "apm_x1000"))
@@ -513,8 +530,8 @@ def average_rates(facts):
             "family": f"avg_{f}", "category": "pace",
             "canto": f"每局平均 {label}：{hi} 約 {fmt(sums[hi] // n)}，"
                      f"高過 {lo} 嘅約 {fmt(sums[lo] // n)}",
-            "english_gloss": (f"per-round mean {label}: {hi} {sums[hi] / n / 1000:.3f} > "
-                              f"{lo} {sums[lo] / n / 1000:.3f}"),
+            "english_gloss": (f"per-round mean {label}: {hi} {_three_dp(sums[hi] // n)} > "
+                              f"{lo} {_three_dp(sums[lo] // n)}"),
             "spec": conj(eq(sum_round(hi, f), lit(sums[hi])),
                          eq(sum_round(lo, f), lit(sums[lo])),
                          gt(sum_round(hi, f), sum_round(lo, f))),
@@ -897,9 +914,9 @@ def decider_final_rounds(facts):
             "canto": f"{_ordinal(mi)} 嘅生死局：{win} 打出 VS 約 {_one_dp(vw)}、"
                      f"APM 約 {_one_dp(aw)}，{lose} 得 VS 約 {_one_dp(vl)}、"
                      f"APM 約 {_one_dp(al)}",
-            "english_gloss": (f"m{mi + 1} deciding round: {win} VS {vw / 1000:.1f} / APM "
-                              f"{aw / 1000:.1f} vs {lose} VS {vl / 1000:.1f} / APM "
-                              f"{al / 1000:.1f}"),
+            "english_gloss": (f"m{mi + 1} deciding round: {win} VS {_one_dp(vw)} / APM "
+                              f"{_one_dp(aw)} vs {lose} VS {_one_dp(vl)} / APM "
+                              f"{_one_dp(al)}"),
             "spec": conj(round_winner(mi, ri, win),
                          between(rnd(mi, ri, win, "vs_x1000"), vw // 100 * 100, vw // 100 * 100 + 100),
                          between(rnd(mi, ri, win, "apm_x1000"), aw // 100 * 100, aw // 100 * 100 + 100),
@@ -922,7 +939,7 @@ def most_intense_round(facts):
         "canto": f"最癲嘅一局係 {_ordinal(mi)} 第 {ri + 1} 局，兩邊 VS 加埋約 "
                  f"{_one_dp(tot)}（{win} 約 {_one_dp(r['players'][win]['vs_x1000'])} 對 "
                  f"{lose} 約 {_one_dp(r['players'][lose]['vs_x1000'])}）",
-        "english_gloss": (f"highest combined VS is m{mi + 1}r{ri + 1} at {tot / 1000:.1f}, "
+        "english_gloss": (f"highest combined VS is m{mi + 1}r{ri + 1} at {_one_dp(tot)}, "
                           f"won by {win}"),
         "spec": conj(round_winner(mi, ri, win),
                      eq(add(rnd(mi, ri, win, "vs_x1000"), rnd(mi, ri, lose, "vs_x1000")),
@@ -1082,10 +1099,10 @@ def rate_by_outcome(facts):
                 out.append({
                     "family": f"rate_flat_{f}", "category": "finesse",
                     "canto": f"{pl} 嘅 {short}（{phrase}）贏局同輸局幾乎一樣，"
-                             f"差距唔夠 {bound / 1000:.2f}（即係唔到 {gap_pct + 1}%），"
+                             f"差距唔夠 {_bound_dp(bound)}（即係唔到 {gap_pct + 1}%），"
                              f"所以 {short} 唔係佢輸贏嘅關鍵",
                     "english_gloss": (f"{pl}'s {gloss} barely differs between rounds won "
-                                      f"and lost (under {bound / 1000:.2f}, "
+                                      f"and lost (under {_bound_dp(bound)}, "
                                       f"~{gap_pct}%) — not the lever"),
                     "spec": lt(mul(sub(bigger, smaller), lit(1000)),
                                mul(lit(bound), mul(p_won, p_lost))),
@@ -1105,11 +1122,11 @@ def rate_by_outcome(facts):
                     "family": f"rate_split_{f}", "category":
                         ("attack" if f == "garbage_attack" else
                          "finesse" if f == "inputs" else "style"),
-                    "canto": f"{pl} 贏嘅局嘅 {short}（{phrase}）約 {rw / 1000:.2f}，"
-                             f"輸嘅局約 {rl / 1000:.2f}，"
+                    "canto": f"{pl} 贏嘅局嘅 {short}（{phrase}）約 {_two_dp(rw)}，"
+                             f"輸嘅局約 {_two_dp(rl)}，"
                              f"贏局{verb}咗大約 {gap_pct}% —— {read}",
-                    "english_gloss": (f"{pl}'s {gloss}: {rw / 1000:.3f} in rounds won vs "
-                                      f"{rl / 1000:.3f} in rounds lost"),
+                    "english_gloss": (f"{pl}'s {gloss}: {_three_dp(rw)} in rounds won vs "
+                                      f"{_three_dp(rl)} in rounds lost"),
                     "spec": (gt(mul(n_won, p_lost), mul(n_lost, p_won))
                              if higher_when_winning
                              else gt(mul(n_lost, p_won), mul(n_won, p_lost))),

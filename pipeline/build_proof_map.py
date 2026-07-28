@@ -1,6 +1,9 @@
 """Record which claims the verifier actually proved.
 
-    python3 -m pipeline.build_proof_map <claims.json> --dafny-dir <dir> --out <map.json>
+    python3 -m pipeline.build_proof_map <claims.json>... --dafny-dir <dir> --out <map.json>
+
+Takes as many ledgers as codegen was given, in the same order, so one map covers every
+lemma in the emitted Claims.dfy.
 
 Runs `dafny verify` itself, parses the output, and marks a claim "verified" only if its
 lemma is present and no error was attributed to it. Codegen must never stamp this field:
@@ -44,13 +47,16 @@ def failing_lemmas(verifier_output, lemmas):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("claims")
+    ap.add_argument("claims", nargs="+",
+                    help="one or more ledgers, in the order codegen was given them")
     ap.add_argument("--dafny-dir", required=True)
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
 
-    with open(args.claims, encoding="utf-8") as fh:
-        claims = json.load(fh)
+    claims = []
+    for path in args.claims:
+        with open(path, encoding="utf-8") as fh:
+            claims.extend(json.load(fh))
 
     claims_dfy = f"{args.dafny_dir}/Claims.dfy"
     lemmas = lemma_lines(claims_dfy)

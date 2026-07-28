@@ -12,6 +12,7 @@ formal claim, and proved with [Dafny](https://dafny.org).
 |---|---|---|---|
 | [2026-07-22](sessions/2026-07-22) | yachi 6 : 4 pinglamb | 79 over 10 matches | 54 |
 | [2026-07-24](sessions/2026-07-24) | yachi 3 : 4 pinglamb | 50 over 7 matches | 52 |
+| [2026-07-28](sessions/2026-07-28) | yachi 2 : 6 pinglamb | 64 over 8 matches | 83 |
 
 That session also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
 independent 20-claim proof layer in [`sessions/2026-07-24/proof`](sessions/2026-07-24/proof).
@@ -155,6 +156,19 @@ hand-written claim as covered when a generated claim cannot be true unless it is
 |---|---|
 | 2026-07-22 | 45 of 53 testable — **85%** |
 | 2026-07-24 | 48 of 49 testable — **98%** |
+| 2026-07-28 | 10 of 10 testable — **100%**, and the number is an artefact (below) |
+
+**Where this metric breaks down.** 2026-07-28's hand claims are *windowed* — they compare
+matches 1-2 against matches 3-8 — and every window sum draws on the same rounds as a session
+total, so no single-value change can falsify one without falsifying the other. The tool
+duly reports 100%. But a total is preserved by *moving* value between two rounds, and that
+takes two changes: shifting 120 pieces from a match-3 round to a match-1 round leaves the
+`total_pieces`, `total_garbage_attack` and efficiency-gap claims all true while flipping
+"yachi's attack per piece fell after match 2" to false. So the generated totals do not in
+fact imply the windowed claims; the sampling depth just cannot see it. The docstring already
+warns that two simultaneous changes are out of scope — this is the first session where that
+caveat decides the headline number, which is why it is printed next to it rather than in a
+footnote.
 
 Claims that no single mutation can falsify are reported separately rather than counted.
 The remainder stay hand-written, which is the point: generation handles the recurring

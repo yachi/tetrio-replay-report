@@ -13,10 +13,12 @@ Expressions
     total_rounds      rounds in the session
     sum_round         a per-round stat summed over the whole session
     sum_round_where   the same, restricted to rounds satisfying a Cond
+    sum_round_range   the same, restricted to a contiguous window of matches
     sum_sq_round      the same, squared (for the integer variance identity)
     sum_ge            queued incoming attack (garbage events), session- or round-scoped
     count_matches_won / count_rounds_won
     count_rounds      rounds satisfying a Cond
+    count_rounds_range  the same, restricted to a contiguous window of matches
     count_matches_margin  matches whose score margin is exactly k
     sum_lb            a match-level stat summed over the session
     add / sub / mul
@@ -94,6 +96,18 @@ def rounds_of(facts):
     return [(mi, ri) for mi, m in enumerate(facts["matches"]) for ri in range(len(m["rounds"]))]
 
 
+def rounds_in(facts, lo, hi):
+    """The rounds of matches [lo, hi) by position, not by the file's index field.
+
+    A window is part of a claim's identity ("the first two matches"), the way sum_ge's
+    mi/ri already are — it is not a datum. So it is rendered by emitting only the terms
+    inside it, never as `if <window> then x else 0`: a folded-away `if false` leaves the
+    const referenced in the text but unread by the proof, which is precisely the dead
+    const that mutation testing can never kill.
+    """
+    return [(mi, ri) for mi, ri in rounds_of(facts) if lo <= mi < hi]
+
+
 def dafny_field(mi, ri, pl, f):
     return f"m{mi}_r{ri}_{pl}_{dafny_suffix(f)}"
 
@@ -113,11 +127,15 @@ def score(mi, pl):                return {"e": "score", "mi": mi, "pl": pl}
 def total_rounds():               return {"e": "total_rounds"}
 def sum_round(pl, f):             return {"e": "sum_round", "pl": pl, "f": f}
 def sum_round_where(pl, f, cond): return {"e": "sum_round_where", "pl": pl, "f": f, "cond": cond}
+def sum_round_range(pl, f, lo, hi):
+    return {"e": "sum_round_range", "pl": pl, "f": f, "lo": int(lo), "hi": int(hi)}
 def sum_sq_round(pl, f):          return {"e": "sum_sq_round", "pl": pl, "f": f}
 def sum_ge(pl, mi=None, ri=None): return {"e": "sum_ge", "pl": pl, "mi": mi, "ri": ri}
 def count_matches_won(pl):        return {"e": "count_matches_won", "pl": pl}
 def count_rounds_won(pl):         return {"e": "count_rounds_won", "pl": pl}
 def count_rounds(cond):           return {"e": "count_rounds", "cond": cond}
+def count_rounds_range(cond, lo, hi):
+    return {"e": "count_rounds_range", "cond": cond, "lo": int(lo), "hi": int(hi)}
 def count_matches_margin(m):      return {"e": "count_matches_margin", "margin": int(m)}
 def sum_lb(pl, f):                return {"e": "sum_lb", "pl": pl, "f": f}
 def add(a, b):                    return {"e": "add", "a": a, "b": b}
@@ -194,6 +212,9 @@ def py_expr(e):
     if k == "sum_round_where":
         return (f"sum({py_field_access(e['pl'], e['f'])} {_PY_ROUNDS} "
                 f"if {py_cond(e['cond'])})")
+    if k == "sum_round_range":
+        return (f"sum({py_field_access(e['pl'], e['f'])} "
+                f"for m in facts['matches'][{e['lo']}:{e['hi']}] for r in m['rounds'])")
     if k == "sum_sq_round":
         acc = py_field_access(e["pl"], e["f"])
         return f"sum({acc}*{acc} {_PY_ROUNDS})"
@@ -209,6 +230,9 @@ def py_expr(e):
         return f"sum(1 {_PY_ROUNDS} if r['winner']=={e['pl']!r})"
     if k == "count_rounds":
         return f"sum(1 {_PY_ROUNDS} if {py_cond(e['cond'])})"
+    if k == "count_rounds_range":
+        return (f"sum(1 for m in facts['matches'][{e['lo']}:{e['hi']}] for r in m['rounds'] "
+                f"if {py_cond(e['cond'])})")
     if k == "count_matches_margin":
         return ("sum(1 for m in facts['matches'] if "
                 f"max(m['score'].values())-min(m['score'].values())=={e['margin']})")
@@ -320,6 +344,9 @@ def dfy_expr(facts, e):
                  f"{dafny_field(mi, ri, e['pl'], e['f'])} else 0)"
                  for mi, ri in rounds_of(facts)]
         return bal("+", terms)
+    if k == "sum_round_range":
+        return bal("+", [dafny_field(mi, ri, e["pl"], e["f"])
+                         for mi, ri in rounds_in(facts, e["lo"], e["hi"])])
     if k == "sum_sq_round":
         return bal("+", _dfy_round_terms(facts, e["pl"], e["f"], square=True))
     if k == "sum_ge":
@@ -331,6 +358,9 @@ def dfy_expr(facts, e):
         return _dfy_count(facts, c_winner(e["pl"]))
     if k == "count_rounds":
         return _dfy_count(facts, e["cond"])
+    if k == "count_rounds_range":
+        return bal("+", [f"(if {dfy_cond(facts, mi, ri, e['cond'])} then 1 else 0)"
+                         for mi, ri in rounds_in(facts, e["lo"], e["hi"])])
     if k == "sum_lb":
         return bal("+", [f"m{mi}_lb_{e['pl']}_{dafny_suffix(e['f'])}"
                          for mi in range(len(facts["matches"]))])
