@@ -323,6 +323,33 @@ as claim ids and answers, so a **refused file reported 15 kills per mutation**. 
 line-based now, solver errors are a failure in their own right, and that is mutation-tested by
 re-declaring the wrong logic.
 
+### What CI caught that local runs did not (2026-07-28)
+
+The first push with cvc5 went red, and the failure was real rather than environmental: CI
+sampled 12 constants where local runs had sampled 6, and hit
+`m5_r2_yachi_gameoverreason` — a constant **no perturbation could kill**. Chasing it found
+three separate defects in the mutation operator, each hidden behind the last:
+
+1. **Categorical codes need a category, not an offset.** That constant is `5 = winner`, and
+   G065 counts death reasons (42 `garbagesmash`, 8 `topout`). Adding 1, 1000 or 10⁶ moves it to
+   a value that is still neither, so both counts hold. `5 → 3` falsifies it immediately.
+2. **Coded-ness must come from the name, not the value.** The first fix asked "is this value in
+   the code range 1–5?", which reclassified a `topcombo` of **4** as a category and mutated it
+   to 1/2/3/5 — none of which crosses the `> 6` its claim tests. Six genuine measurements were
+   reported as survivors. The emitter already marks coded constants with a trailing `; label`,
+   so that is what is read now.
+3. **Escalation has to go both ways.** `m4_r3_pinglamb_inputs` feeds "yachi's keys-per-piece is
+   lower than pinglamb's" — *raising* pinglamb's keypresses keeps that true at any magnitude.
+   Only lowering it (to 0) falsifies anything. The operator was increase-only.
+
+The sample is now **stratified by kind of datum** rather than uniform, since all three bugs
+lived in a kind, and CI mutates 96 constants covering all 32 kinds instead of 12 uniform draws.
+Both sessions: 96/96 killed, and a 250-constant sweep also came back 500/500 clean.
+
+The lesson worth keeping: a mutation gate reporting "all killed" says as much about the operator
+as about the data, and an operator that only knows one kind of perturbation will certify
+whatever it cannot express.
+
 ### The second solver, done (2026-07-26)
 
 **z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on all 153 generated claims.** That is the

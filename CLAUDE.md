@@ -76,6 +76,19 @@ string theory, which defeats emitting a standard format. The logic is `QF_NIA`, 
 the integer variance identity squares a datum, and `QF_LIA` rejects `(* v v)` outright. Both
 facts were found by a solver refusing the file, not by reading a spec.
 
+**Mutating the SMT artefact needs an operator per kind of datum.** `check_smt --mutate`
+perturbs a *stratified* sample (every kind of datum, not a uniform draw) because both bugs this
+gate has had were confined to a kind:
+
+| Kind | Operator | Why the obvious one fails |
+|---|---|---|
+| categorical code (`_winner`, `_gameoverreason`) | try the **other codes** | claims count members of a category; `5 → 6` changes no count, `5 → 3` does |
+| measurement | escalate **both ways** (+1, −1, +1000, −1000, far up, 0) | many claims are one-sided — "yachi's KPP is lower than pinglamb's" survives *any* increase to pinglamb |
+
+Coded-ness is read from the constant's **name** (the emitter marks them with a trailing
+`; label`), never from its value — detecting by value quietly reclassified a `topcombo` of 4 as
+"the code for topout" and reported six real measurements as survivors.
+
 **Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on all 153
 generated claims (77 + 76). `check_smt` runs every solver on PATH and names the ones it did not
 find, so a single-solver run is stated rather than implied. Each solver needs different argv —

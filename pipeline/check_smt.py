@@ -14,11 +14,23 @@ stronger statement than one toolchain checking its own output, in the same way t
 extractors agreeing beats one extractor being careful.
 
 `--mutate` perturbs constants in the committed file and requires each perturbation
-to turn some claim `sat`. Without it, a file of vacuous claims would pass. The
-perturbation escalates (+1, then past the nearest band edge, then far away) because
-many predicates pin a *displayed* value and so hold across a range on purpose —
-`135000 <= v < 136000` survives +1 by design, and calling that a survivor would be
-a false alarm.
+to turn some claim `sat`. Without it, a file of vacuous claims would pass.
+
+The operator depends on what the constant *is*:
+
+* **measurements** escalate in BOTH directions — +1, -1, +1000, -1000, far up, then
+  0 — because many predicates pin a displayed value to a band on purpose
+  (`135000 <= v < 136000` survives +1 by design), and many others are one-sided.
+  `m4_r3_pinglamb_inputs` feeds "yachi's keys-per-piece is lower than pinglamb's":
+  raising pinglamb's keypresses keeps that true no matter how far, and only
+  lowering it falsifies anything. An increase-only operator called it a survivor.
+* **categorical codes** (the string legend: a winner, a game-over reason) are
+  perturbed to *another code*, never by an offset. Claims over these count members
+  of a category, so moving `5` (winner) to `6` changes no count — the round was not
+  being counted either way. Moving it to `3` (garbagesmash) is the mutation that
+  means something. CI caught exactly this: `m5_r2_yachi_gameoverreason` survived
+  every numeric offset while G065 ("42 rounds ended by garbagesmash, 8 by topout")
+  went on holding, because none of 6, 1005 or 10⁶ is a death reason either.
 """
 import argparse
 import json
@@ -39,6 +51,16 @@ SOLVERS = {"z3": [],
            "cvc5": ["--incremental"],
            "yices-smt2": ["--incremental"]}
 DEFINE = re.compile(r"^\(define-fun (\w+) \(\) Int (-?\d+)\)", re.M)
+# The legend codegen_smt writes above the definitions: `; 3 = garbagesmash`.
+LEGEND = re.compile(r"^; (\d+) = (\S+)$", re.M)
+# A coded constant is marked by the trailing label the emitter writes:
+#   (define-fun m5_r2_yachi_gameoverreason () Int 5)  ; winner
+# Detecting them by NAME is the point: an earlier version detected them by whether
+# the VALUE fell in the code range, which quietly reclassified small measurements —
+# a topcombo of 4 was "the code for topout" and got mutated to 1/2/3/5, none of
+# which crosses the `> 6` threshold its claim tests. Six real measurements looked
+# like survivors because of it.
+CODED = re.compile(r"^\(define-fun (\w+) \(\) Int (-?\d+)\)\s+; \S+", re.M)
 # Claim ids as the ledgers assign them: C001, R014, G077.
 CLAIM_ID = re.compile(r"[A-Z]\d{3,}")
 
@@ -136,10 +158,61 @@ def regen(report_dir):
     return 0
 
 
+def perturbations(value, coded, codes):
+    """The values worth trying for this constant, in order.
+
+    A categorical code gets the other codes; a measurement gets escalating offsets.
+    `coded` says which it is — read from the constant's name, never its value.
+    """
+    if coded:
+        return [c for c in sorted(codes) if c != value]
+    tries = [value + 1, value - 1, value + 1000, value - 1000,
+             value + 10 ** 6, 0]
+    seen, out = {value}, []
+    for t in tries:
+        if t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
+
+def field_of(name):
+    """The kind of datum a constant name denotes: `topcombo`, `winner`, `ge`, ...
+
+    Both mutation bugs this gate has had were confined to a KIND — coded strings,
+    then one-sided measurements — so the sample is stratified by kind rather than
+    drawn uniformly, where a whole kind can go untouched.
+    """
+    stem = re.sub(r"^m\d+_(r\d+_)?", "", name)
+    stem = re.sub(r"^(yachi|pinglamb)_", "", stem)
+    stem = re.sub(r"^lb_(yachi|pinglamb)_", "lb_", stem)
+    stem = re.sub(r"^score(Yachi|Pinglamb)$", "score", stem)
+    return re.sub(r"ge\d+$", "ge", stem)
+
+
+def stratified(consts, count, rng):
+    """`count` constants, spread across kinds: round-robin over shuffled groups."""
+    groups = {}
+    for name, val in consts:
+        groups.setdefault(field_of(name), []).append((name, val))
+    for g in groups.values():
+        rng.shuffle(g)
+    picks, order = [], sorted(groups)
+    while len(picks) < count and any(groups[k] for k in order):
+        for k in order:
+            if groups[k]:
+                picks.append(groups[k].pop())
+                if len(picks) == count:
+                    break
+    return picks
+
+
 def mutate(path, count, only=None, seed=7):
     """Perturb constants; each must falsify at least one claim."""
     with open(path, encoding="utf-8") as fh:
         text = fh.read()
+    codes = {int(n) for n, _v in LEGEND.findall(text)}
+    coded_names = {n for n, _v in CODED.findall(text)}
     consts = DEFINE.findall(text)
     if not consts:
         print("FAIL no integer constants to mutate", file=sys.stderr)
@@ -150,27 +223,26 @@ def mutate(path, count, only=None, seed=7):
         return 1
     solver = found[0]
     rng = random.Random(seed)
-    picks = rng.sample(consts, min(count, len(consts)))
+    picks = stratified(consts, min(count, len(consts)), rng)
     survivors = []
     for name, val in picks:
         v = int(val)
         killed_by = None
-        # Escalate: many predicates pin a displayed value to a band on purpose, so
-        # +1 legitimately keeps them true. Only a datum that survives every step is
-        # a real survivor.
-        for step in (1, 1000, max(abs(v) * 2, 10 ** 6)):
+        coded = name in coded_names
+        for new in perturbations(v, coded, codes):
             probe = text.replace(f"(define-fun {name} () Int {val})",
-                                 f"(define-fun {name} () Int {v + step})", 1)
+                                 f"(define-fun {name} () Int {new})", 1)
             pairs, errors = run(solver, probe)
             if errors:
                 raise SystemExit(f"{solver} errored on a mutant: {errors[0]}")
             hits = [cid for cid, ans in pairs if ans == "sat"]
             if hits:
-                killed_by = (step, hits[:3], len(hits))
+                killed_by = (new, hits[:3], len(hits))
                 break
         if killed_by:
-            step, ids, n = killed_by
-            print(f"  ok  {name} +{step} falsifies {n} claim(s) {ids}")
+            new, ids, n = killed_by
+            how = f"->{new}" if coded else f"+{new - v}"
+            print(f"  ok  {name} {how} falsifies {n} claim(s) {ids}")
         else:
             survivors.append(name)
             print(f"FAIL {name} survives every perturbation — no claim depends on it",
@@ -179,7 +251,9 @@ def mutate(path, count, only=None, seed=7):
         print(f"\n{len(survivors)} constant(s) no claim depends on: a mutation that "
               "cannot be killed means the data is decorative", file=sys.stderr)
         return 1
-    print(f"  ok  mutation: {len(picks)}/{len(picks)} perturbations falsified a claim")
+    kinds = len({field_of(n) for n, _v in picks})
+    print(f"  ok  mutation: {len(picks)}/{len(picks)} perturbations falsified a claim "
+          f"across {kinds} kinds of datum")
     return 0
 
 

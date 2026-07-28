@@ -169,10 +169,13 @@ jobs:
       # The same claims, rendered to SMT-LIB from the same specs and checked by a
       # solver directly. Runs in well under a second, so the anti-vacuity mutation
       # test runs on every push here rather than weekly like the Dafny one.
+      # 96, not a token dozen: the sample is stratified so this covers all 32 kinds
+      # of datum, and a 12-constant sample is what let two operator bugs through.
+      # Costs ~5s.
       - name: Check the SMT-LIB artefact (regenerates, then solves and mutates)
         run: |
           python3 -m pipeline.check_smt "sessions/${{ matrix.session }}/report" \
-            --regen --mutate 12
+            --regen --mutate 96
 
   # The second extractor is a genuinely independent implementation; re-running it
   # is what makes the "two parsers agree" claim mean something.
