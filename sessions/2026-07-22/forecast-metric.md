@@ -1,7 +1,9 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **measured, validated as an instrument, deliberately excluded from the badge-linked
-report.** Read the exclusion argument before deciding to promote it.
+Status: **negative result.** The metric is validated as an instrument, but under a mechanically
+correct definition it carries no signal — AUC 61.4%, indistinguishable from TSD's 60.9%, which
+this project already files under "No signal". Excluded from the report on two independent
+grounds: it is simulator-derived, and it does not measure anything.
 
 ## What it measures
 
@@ -21,29 +23,48 @@ Geometric note that cost a wrong model: **garbage can never be the roof.** It ri
 bottom, so its role is to *lift* an already-built overhang into a spinnable position, not to
 construct one. A "roof is garbage" test fires 0/167 and is dead logic.
 
-## Result (2026-07-22, verified prefixes only)
+## The definition matters more than the measurement
 
-| | tucked T-spins | forecast (garbage) | forecast (clear) | reactive | rate |
-|---|---|---|---|---|---|
-| yachi | 89 | 15 | 23 | 51 | **42.7%** |
-| pinglamb | 78 | 15 | 12 | 51 | **34.6%** |
+Two rules were implemented. The difference between them is the whole finding.
 
-Rate rises monotonically with setup separation — 38.9% (sep≥1) → 45.5% (≥2) → 51.6% (≥3) →
-63.0% (≥5) — the direction intent predicts, and not something the implementation was fitted to.
+**Loose** — "a line clear or garbage occurred between roof-build and execution". Wrong, because a
+clear five rows below the slot splices nothing.
+
+**Strict** — "was a line-clearing T-spin *already available* when the roof was placed?" If none was,
+the slot did not exist and something later created it. Verified against an engine-checked fixture
+pair (`splice-demo`): identical overhang and cavity separated by one full row offers **no** T-spin;
+remove that row and a clean TSD appears.
+
+A third rule was tried and discarded: "is the cell beneath the roof empty at placement". It returns
+reactive for all 167 cases, because a piece placed as an overhang has an empty cell beneath it *by
+definition*. Recorded so nobody re-derives it.
+
+| | tucked T-spins | forecast (loose) | forecast (strict) |
+|---|---|---|---|
+| yachi | 89 | 38 → **42.7%** | 11 → **12.4%** |
+| pinglamb | 78 | 27 → **34.6%** | 10 → **12.8%** |
+
+The loose rule showed yachi forecasting ~8 points more than pinglamb. Under the strict rule the
+two are **identical within noise**. That gap was an artefact of the rule, not a property of the
+players.
 
 ## Paired AUC (the repo's own bar for earning a column)
 
-| metric | AUC | n pairs |
-|---|---|---|
-| forecast rate | **72.7%** | 22 (6 ties) |
-| forecast per piece | 67.3% | 26 (5 ties) |
-| forecast count | 53.2% | 79 (36 ties) |
-| tucked T-spins | 46.2% | 79 (25 ties) |
+| metric | AUC (strict) | AUC (loose) | n pairs |
+|---|---|---|---|
+| forecast rate | **61.4%** | 72.7% | 22 (11 ties strict) |
+| forecast per piece | 57.7% | 67.3% | 26 (14 ties) |
+| forecast count | 52.5% | 53.2% | 79 (61 ties) |
+| tucked T-spins | 46.2% | 46.2% | 79 (25 ties) |
 
-`forecast rate` is 13W–3L–6T, one-sided binomial **p = 0.011**, Wilson 95% CI **57.0–93.4%**.
-So it clears the "no signal" band that already contains TSD (60.9) and TST (55.8), but its
-interval is wide and it does not approach the strong band (APM 94.6, VS 100). Suggestive, not
-established.
+Under the loose rule `forecast rate` looked promising — 13W–3L–6T, binomial p = 0.011. **That
+signal does not survive the correct definition.** At 61.4% it sits on top of TSD's 60.9%, inside
+the no-signal band, with half its pairs now ties.
+
+The most likely reading: the loose rule was largely detecting "a line clear happened recently",
+which tracks attacking well, not forecasting. `tucked T-spins` at 46.2% independently reproduces
+this project's existing TSD/TST no-signal finding, which is a useful check that the pipeline is
+not manufacturing structure.
 
 ## Why it is not in the report
 
