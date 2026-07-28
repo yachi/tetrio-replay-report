@@ -243,7 +243,7 @@ compares the integer, not the printed text.
 construction. They did not.** Several families formatted the Cantonese with `_one_dp`/`_two_dp`
 and the `english_gloss` with a bare `:.1f`, so one claim published 約167.9 and "VS 168.0" for
 the same datum across all three sessions; the flat-rate family printed "差距唔夠 0.01 / under
-0.01" for a bound its lemma only proved at 0.013 — a sentence strictly stronger than its proof.
+0.01" for a bound its lemma only proved at 0.015 — a sentence strictly stronger than its proof.
 Fixed 2026-07-28: every printed figure goes through a helper, and `_bound_dp` **ceils** because
 an upper bound is the one figure that must round the other way. `check_prose_figures` now scans
 every ledger, and its datum pool includes the derived quantities a generator can legitimately

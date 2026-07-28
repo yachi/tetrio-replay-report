@@ -103,7 +103,7 @@ def _bound_dp(x_x1000):
     The flooring convention exists so 約 means "at least this much". A bound runs the
     other way — "the gap is under X" is only true if the printed X is at least the
     proved one, so this is the one place that must ceil. Flooring here printed
-    "under 0.01" for a bound the lemma proved at 0.013: a claim strictly stronger
+    "under 0.01" for a bound the lemma proved at 0.015: a claim strictly stronger
     than its own proof.
     """
     return f"{-(-x_x1000 // 10) / 100:.2f}"
