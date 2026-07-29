@@ -417,3 +417,48 @@ Cantonese comes out escaped.
    expecting one to be copied from a previous session. This is also where the inline script
    stops being player-hardcoded: ~110 occurrences of `yachi`/`pinglamb` remain in colours,
    keys and labels, and they should be resolved once, by the template, not chipped at.
+
+
+---
+
+## Board reconstruction — open (2026-07-29)
+
+Everything above derives from `results.stats`. A whole class of question cannot: where the stack
+was, how deep the well ran, what the board looked like when the kill landed. Those need the board,
+and the board needs a simulator that replays the input stream.
+
+**What exists.** A frame-stepped TETR.IO simulator (session scratchpad, not in this repo) on top of
+the SRS geometry from `yachi/td-opener-trainer`. Solved and verified: the piece queue (MINSTD
+`16807`/`2147483647` over the `ZLOSIJT` bag, 158/158 rounds well-formed), the 60 fps frame clock
+(`frames == finaltime_ms * 0.06`, 158/158), incoming garbage content (`amt`/`x`/`size` are in the
+`ige` payload — no RNG derivation), and the outgoing attack timeline (recoverable from the
+*opponent's* ige stream, 156/158 against `garbage.sent`).
+
+**What blocks it.** Attack timing is **100% correct before the first garbage and ~6% after**. The
+insertion rule is wrong, not its parameters — 40 combinations of `garbagespeed`/`garbagecap`/insert
+mode/cancel mode were swept and the best still survives only 7/158 rounds. So the board is provable
+only on a *prefix* of each round, using the opponent's ige stream as a per-attack oracle:
+**2001/14517 placements, 13.8%**, and systematically the early part of every round.
+
+**What it produced so far.** One metric, T-Spin Forecast, written up in
+`sessions/2026-07-22/forecast-metric.md`. It came back a **negative result** — AUC 61.4%, on top of
+TSD's 60.9%, inside the no-signal band. Worth reading before extending this work, because the
+loose version of the same metric scored 72.7% and would have looked like a finding.
+
+### TODO, in order
+
+1. **AUC-triage candidate board metrics on the existing 13.8%.** Before spending days on simulator
+   fidelity, ask whether *any* board-derived measure carries signal: stack height when garbage
+   lands, covered holes created per piece, well depth, downstack rate under pressure, height
+   differential at the kill. The probe already exists. If they all sit at 50–60% like forecast did,
+   stop here — that is the whole answer and it costs an hour.
+2. **Close the two surviving mutants** on the T-spin availability probe ("accepts non-rotation
+   landings", "`bestTspinLines` drops the spin test"). Either construct a board that distinguishes
+   them or demonstrate equivalence. Currently recorded as open, not as equivalent.
+3. **Fix the post-garbage divergence** — only if (1) says the sim is worth finishing. The per-attack
+   oracle localises failures to individual pieces now, so this iterates far faster than it did.
+4. **A second independent simulator**, agreeing byte-for-byte on emitted per-round values. The
+   dual-extractor rule applied to derived data; nothing from a simulator can carry a badge without
+   it.
+
+Items 3 and 4 are gated on 1. Item 2 is independent and small.
