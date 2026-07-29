@@ -445,7 +445,57 @@ only on a *prefix* of each round, using the opponent's ige stream as a per-attac
 TSD's 60.9%, inside the no-signal band. Worth reading before extending this work, because the
 loose version of the same metric scored 72.7% and would have looked like a finding.
 
-### TODO, in order
+### 1 — DONE (2026-07-29): the triage says no
+
+Eight board-derived measures, paired AUC over the 26 rounds with a decided winner and a verified
+prefix on both sides:
+
+| measure | AUC | W-L-T | two-sided p | 95% CI |
+|---|---|---|---|---|
+| height when garbage lands | 28.6% (inv) | 4-10-0 | 0.180 | 45–88% |
+| holes at end of prefix | 32.7% (inv) | 7-16-3 | 0.093 | 49–84% |
+| max stack height | 36.5% (inv) | 8-15-3 | 0.210 | 45–81% |
+| bumpiness | 38.5% (inv) | 10-16-0 | 0.327 | 43–78% |
+| well depth | 38.5% (inv) | 10-16-0 | 0.327 | 43–78% |
+| holes per piece | 42.3% (inv) | 10-14-2 | 0.541 | 39–76% |
+| clear rate | 46.2% | — | — | — |
+| average height | 50.0% | — | — | — |
+
+**Nothing reaches significance**, and every confidence interval includes chance. All six
+non-trivial measures point the same way — lower, cleaner board wins — which reads less like six
+findings than like six proxies for *played well*, a thing `APP` already measures at 91.5% AUC
+straight out of `results.stats`. Against a baseline of VS 100% / APM 94.6% / APP 91.5%, a
+board metric would have to be far stronger than any of these to earn a column.
+
+**Caveat, stated so nobody over-reads this:** n=26 is underpowered, and the verified prefix is
+systematically the *early* part of every round — precisely excluding the deep stacks and heavy
+downstacking where these measures should matter most. This is "not justified on current evidence",
+not "proven worthless". If the simulator ever gets fixed for another reason, re-run the triage on
+full coverage before concluding again.
+
+### 2 — DONE (2026-07-29): mutation coverage closed, 5/5
+
+The two survivors needed adversarial boards, and both took a search rather than an argument:
+
+* **accepts non-rotation landings** — a vertical T slides down a 2-wide channel and comes to rest
+  with three corners filled. It satisfies the corner rule but the last action was a downward move,
+  so it is a placement, not a spin. Dropping the `rot` guard scores it 2 lines.
+* **`bestTspinLines` drops the spin test** — a 3-deep 1-wide well; the T rotates in and completes a
+  row with only two corners filled. Dropping the corner test scores it 1.
+
+The first search for the second board returned boards whose rows were **already full**, which
+cannot persist in a real game — an invalid state that would have certified a mutant as equivalent.
+Excluding pre-existing full rows found a valid one immediately. Worth remembering: a mutation
+search over synthesised boards needs the game's own invariants applied to the search space, or it
+answers with states the game can never reach.
+
+### 3 and 4 — not justified on current evidence
+
+Both were gated on (1), and (1) came back negative. Fixing the post-garbage divergence and writing
+a second independent simulator are each multi-day, and nothing measured so far says the resulting
+metrics would earn a place in a report. Left documented rather than done.
+
+### Original TODO, for reference
 
 1. **AUC-triage candidate board metrics on the existing 13.8%.** Before spending days on simulator
    fidelity, ask whether *any* board-derived measure carries signal: stack height when garbage
