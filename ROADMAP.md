@@ -534,6 +534,41 @@ about those numbers are provable like any other.
 This corrects the earlier claim that timing is "100% correct pre-garbage": that was measured over
 the prefix before the first garbage *arrival*, a shorter window than before the first *insertion*.
 
+### 3b — the method was wrong, and fixing it localised the bug to single pieces (2026-07-29)
+
+Six hypotheses had been refuted one at a time, each costing a full 158-round sweep. That is the
+wrong shape for this problem. The field this belongs to is **deterministic-lockstep desync
+debugging**, and its standard method is *per-tick state checksums on both sides, compare every
+frame, then per-subsystem hashes to narrow which subsystem broke* — a search over **time**, not
+over hypotheses. The companion technique is **ddmin** (Zeller & Hildebrandt, IEEE TSE 2002), which
+minimises a failing input until removing any single element makes the failure vanish.
+
+Sources: Zeller & Hildebrandt, *Simplifying and Isolating Failure-Inducing Input*;
+`bugnet.io/blog/how-to-debug-desync-in-deterministic-lockstep-games`;
+`gafferongames.com/post/deterministic_lockstep`.
+
+Applying the search-over-time half properly — bisecting each round on the opponent's ige stream and
+keeping only divergences that occur before any garbage is inserted — narrows the bug from "somewhere
+in the round" to **a single piece**:
+
+| replay | round | player | piece | sim said | real |
+|---|---|---|---|---|---|
+| `…-3.ttrm` | 1 | yachi | **14** (O) | 2 lines, no spin → 11 | 1 |
+| `…-2.ttrm` | 6 | yachi | **19** (T) | 2 lines, no spin → 11 | 1 |
+| `…22-.ttrm` | 0 | pinglamb | **20** (T) | 2 lines, full spin → 6 | 7 |
+| `…-9.ttrm` | 0 | pinglamb | **33** (I) | 3 lines, no spin → 1 | 2 |
+
+Nine such single-piece cases exist. An attack of **11** for a two-line non-spin clear can only be
+`double(1) + allclear(10)`, so at those pieces the simulated board is empty when the real one is
+not. Aggregate check: the sim reports **7** perfect clears where the real games had **19** — it is
+losing real all-clears, another board-divergence signature rather than a scoring one.
+
+**What remains is the oracle half.** TETR.IO's own client is the reference implementation (a
+`.ttrm` dropped into the PC or web client plays back); no third-party board renderer exists. With
+the window already down to one piece, the capture needed is a handful of board states from one
+round — a bounded task, not the screen-scraping pipeline it was estimated as earlier. It needs a
+logged-in TETR.IO session, which the agent cannot and must not do.
+
 ### 4 — not started
 
 Gated on (3). Nothing from a simulator can carry a badge without a second independent
