@@ -489,11 +489,42 @@ Excluding pre-existing full rows found a valid one immediately. Worth rememberin
 search over synthesised boards needs the game's own invariants applied to the search space, or it
 answers with states the game can never reach.
 
-### 3 and 4 — not justified on current evidence
+### 3 — advanced, not finished (2026-07-29)
 
-Both were gated on (1), and (1) came back negative. Fixing the post-garbage divergence and writing
-a second independent simulator are each multi-day, and nothing measured so far says the resulting
-metrics would earn a place in a report. Left documented rather than done.
+Worked on despite (1), at the user's direction. Two hypotheses tested and refuted: rising the
+*remaining* garbage after a clearing placement (`insertAfterClear`), and using the ige wrapper's
+frame rather than the outer event frame for arrival. Neither moved the matched-attack prefix.
+
+**The attack table is not the problem — it is now confirmed correct.** Aggregating every attack
+against the opponent's ige stream, keeping only samples where nothing was cancelled:
+
+| signature | observed | formula |
+|---|---|---|
+| `full-3 b2b0` | 6 (n=50) | TST 6 |
+| `full-2 b2b0/1/2/3` | 4 / 5 / 5 / 6 | base 4, then +1, +1, +2 |
+| `none-4 b2b0/1/2/3` | 4 / 5 / 5 / 6 | quad 4, same escalation |
+| `none-2 c0/c1/c2` | 1 / 1 / 1 | combo multiplier ×1.25, ×1.5, floored |
+| `full-2 b2b1 c1` | 6 (n=2) | (4+1)×1.25 = 6.25 → 6 |
+
+**The residual is a board error, and specifically a line-count one.** The minority readings are
+`full-1 b2b0 → 6` (the sim cleared 1 line where the real game cleared 3) and `none-2 b2b-1 → 4`
+(the sim called a T-spin double a plain double). A missed line also breaks the B2B chain, so a
+single early board error cascades into every later attack — which is why one mistake destroys a
+whole round rather than one claim.
+
+**Where the error starts, measured:** of the 42 rounds that diverge, **16 diverge before any
+garbage has been inserted at all**, 25 after, 1 with no garbage in the round. So this is not one
+bug in the garbage model — there is a garbage-independent placement bug too, and it is the more
+tractable of the two because no garbage timing is involved. That is the next thing to chase.
+
+This corrects the earlier claim that timing is "100% correct pre-garbage": that was measured over
+the prefix before the first garbage *arrival*, a shorter window than before the first *insertion*.
+
+### 4 — not started
+
+Gated on (3). Nothing from a simulator can carry a badge without a second independent
+implementation agreeing byte-for-byte, and there is no point writing one against a simulator that
+still fails its own gate.
 
 ### Original TODO, for reference
 
