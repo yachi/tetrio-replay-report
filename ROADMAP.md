@@ -569,6 +569,44 @@ the window already down to one piece, the capture needed is a handful of board s
 round — a bounded task, not the screen-scraping pipeline it was estimated as earlier. It needs a
 logged-in TETR.IO session, which the agent cannot and must not do.
 
+### 3c — differential test run, and it found a mechanic that was never modelled (2026-07-29)
+
+The oracle half was executed: `replay-2026-07-22-3.ttrm` round 1 loaded in the TETR.IO client,
+paused, scrubbed to a chosen frame. The transport exposes a **frame counter** under the scrubber
+(`0:27.583 FRAME 1655`), which independently re-confirms the 60 fps clock and makes frame-accurate
+comparison possible.
+
+At **frame 421**, yachi's real board against the simulator's board at its last preceding lock
+(frame 387):
+
+```
+sim @387            real @421
+36 XXX..XXXXX       XXX..XXXXX     <- identical
+37 XXX..XXXXX       XXX..XXXXX     <- identical
+38 XXX...XXXX       XXXXXXXXXX     <- full, magenta T at cols 3,4,5
+39 XXXX.XXXXX       XXXXXXXXXX     <- full, magenta at col 4
+```
+
+The overlapping stack matches **cell for cell**. The two bottom rows are full in the real client
+because a T-spin Double had just completed them and they were still on screen — caught mid
+**line-clear animation**. The simulator performs the same TSD at frame 429 and reaches the same
+`XXX..XXXXX / XXX..XXXXX`.
+
+**So placement geometry is not the bug.** Queue, hold, DAS/ARR, rotation and hard drop all produce
+the right stack. What differs is *when a completed row vacates*: the simulator clears instantly on
+lock, while TETR.IO holds completed rows for a **line-clear delay** — about 34 frames in this
+instance. Nothing in the simulator models that, and it was not on the suspect list, which is why
+six hypothesis sweeps walked straight past it.
+
+It also explains the phantom perfect clear: at frame 449 the simulator drops an O into the two
+remaining gaps, empties the board and scores `double + allclear = 11`, where the real game sent 1.
+With a clear delay, a piece can land before the rows vacate, leaving residue that makes a perfect
+clear impossible.
+
+**Next:** capture frames 429–470 the same way and confirm what the real board holds when the
+simulator empties it, then model the line-clear delay (and check whether `results.stats` or the
+options block pins its length rather than fitting it).
+
 ### 4 — not started
 
 Gated on (3). Nothing from a simulator can carry a badge without a second independent
