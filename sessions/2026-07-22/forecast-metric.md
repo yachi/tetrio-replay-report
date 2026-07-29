@@ -114,5 +114,45 @@ every audit round in this project has caught. A numeric section without badges b
 
 Not done: property-based testing over random boards, coverage measurement on the new lines.
 
+## External golden data: the wiki's own boards
+
+`wiki-tspin-forecast-boards.json` holds all **29 board diagrams** parsed from
+harddrop.com/wiki/T-Spin_Forecast, with hierarchical section paths. Provenance is the point — the
+boards *and* the expectations come from the wiki, never from this engine.
+
+Parsing notes, each of which cost a wrong reading:
+- the page has **no `<br>` between rows**; tiles wrap visually. Row structure was confirmed by
+  measuring each image's pixel y-position, which gives exactly 10 columns per row.
+- `PTet.png` is the **T** piece (drawn purple). There is no `TTet.png`.
+- **`-Tet.png` is a dashed *empty* cell, not a T outline.** It marks a region of interest — the
+  well, or the future garbage hole. On the TSD board the dashed cells form an **L** shape, and five
+  boards carry a single dashed cell, so reading them as a T placement is wrong.
+
+What the engine finds, checked against what each section *claims*:
+
+| wiki section | best T-spin the engine finds |
+|---|---|
+| Forecasting T-Spin Singles | **none** |
+| Forecasting T-Spin Doubles | **none** |
+| Forecasting T-Spin Triples | **none** |
+| Forecasting T-Spin Doubles > Garbage | **2 lines** (double) |
+| Forecasting T-Spin Triples > Garbage | **3 lines** (triple) |
+
+The non-garbage rows are the striking ones: **every "Forecasting X" setup is a position where no
+T-spin is available yet.** That is the premise of forecasting, stated by the wiki's own figures and
+independently confirmed by the engine — and it is exactly the predicate the strict classifier tests.
+The Garbage sections then land on precisely the spin each section is named for.
+
+One adjacent pair makes the garbage mechanic concrete: identical Z overhang, one extra bottom row
+of garbage whose hole sits under the slot, and the same T-spin goes from **1 line to 2**. Garbage
+does not build the overhang; it lifts the structure so the existing slot is worth more.
+
+These fixtures raised mutation coverage of the availability probe from 2/4 to 3/4 — the surviving
+"probe ignores the line-clear requirement" mutant is killed by the no-T-spin-yet assertions. Two
+mutants still survive ("accepts non-rotation landings", "bestTspinLines drops the spin test"); I
+could not construct a board that distinguishes them, since reaching a 3-corner position without
+rotating appears to require a kick by construction. They may be equivalent mutants — **unproven,
+recorded as open.**
+
 Implementation lives outside this repo (session scratchpad): `sim.ts`, `forecast.ts`,
 `run-forecast.ts`, `forecast.test.ts`, `validate.ts`, `auc.ts`.
