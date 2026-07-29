@@ -517,6 +517,20 @@ garbage has been inserted at all**, 25 after, 1 with no garbage in the round. So
 bug in the garbage model — there is a garbage-independent placement bug too, and it is the more
 tractable of the two because no garbage timing is involved. That is the next thing to chase.
 
+**IRS/IHS implemented and refuted (2026-07-29).** The handling block carries `irs: "tap"` and
+`ihs: "tap"`, and 3 of 35 pieces in a sample round are hard-dropped with a rotate or hold key still
+held — so initial-rotation looked like a strong candidate for the garbage-free bug. Implementing it
+made things sharply *worse* (matched attacks 197 → 76, survivors 7 → 2). The reading is that
+**"tap" mode fires only on a fresh press, not on a key held across a spawn**, so the baseline was
+already correct. Kept behind a default-off flag; the refutation is the result worth keeping,
+because it removes handling from the suspect list.
+
+**A note on formal methods, since it comes up:** Dafny and the SMT backend prove *claim ⇔ extracted
+data*. Whether the simulator matches TETR.IO is an empirical question about an external system, and
+no proof assistant can settle it — only the replay oracle can. Formal proof becomes applicable
+once the sim passes its gate and its outputs enter `facts.json` as data, at which point claims
+about those numbers are provable like any other.
+
 This corrects the earlier claim that timing is "100% correct pre-garbage": that was measured over
 the prefix before the first garbage *arrival*, a shorter window than before the first *insertion*.
 
