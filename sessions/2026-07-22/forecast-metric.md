@@ -100,10 +100,13 @@ every audit round in this project has caught. A numeric section without badges b
 
 - 14 unit tests on hand-built cases. Mutation testing on the classifier: **6/6 killed** (one
   initially survived — every test had a single roof owner, so `Math.max`→`Math.min` was invisible;
-  a two-owner case fixed it). On the strict availability probe: **2/4 killed** — "probe ignores the
-  line-clear requirement" and "probe accepts non-rotation landings" both **survive**, because the
-  BEFORE/AFTER fixtures cannot distinguish them. Closing those needs a board where a T-spin is
-  available but clears nothing, and one where a T lands spin-shaped without rotating. **Not done.**
+  a two-owner case fixed it).
+- **Mutation, re-measured 2026-07-30: 11/11 killed** across the whole instrument (`mutate-forecast.ts`).
+  The harness is itself validated by control mutants — three semantics-preserving edits **survive**
+  and a poison mutant (spawn column 3→9) **dies**, so a green sweep is discrimination, not a
+  syntax error killing everything.
+  Attribution was measured, not assumed: strip the two rotation/spin fixtures and **6 mutants
+  survive**; restore them and it is 11/11. See the correction at the end of the wiki section.
 - On real data, all 167 counted T-spins: BFS-reachable from spawn **167/167**, satisfy the
   3-corner rule **167/167**, physically supported **167/167**
 - Negative control: random T placements on the same boards are reachable only **3.6%**, so the
@@ -112,7 +115,17 @@ every audit round in this project has caught. A numeric section without badges b
   of (clear type, spin, B2B, combo), and every counted spin sits in a prefix where amounts matched
   ground truth; the other 29 were fully cancelled, leaving no witness
 
-Not done: property-based testing over random boards, coverage measurement on the new lines.
+- **Property-based testing over random boards, done 2026-07-30** (`property-forecast.test.ts`):
+  932 boards from three domain-shaped generators (stack profiles, garbage rows, sparse noise),
+  seeded with the same MINSTD as the piece RNG so any failure is reproducible. Boards containing a
+  full row are discarded as unreachable states. Properties held: availability ≡ `bestTspinLines > 0`,
+  a T-spin clears at most 3 lines, neither probe mutates its input, results are deterministic, and
+  an empty board offers nothing. An anti-vacuity gate asserts the sample is not inert — **84/932**
+  boards actually offer a line-clearing T-spin, so the suite is exercising the predicate.
+- **Coverage, done 2026-07-30**: `bun test --coverage` reports **100% of functions and lines** on
+  `forecast.ts`.
+
+Still not done: nothing on the instrument. The remaining gaps are all in the simulator underneath it.
 
 ## External golden data: the wiki's own boards
 
@@ -148,11 +161,43 @@ of garbage whose hole sits under the slot, and the same T-spin goes from **1 lin
 does not build the overhang; it lifts the structure so the existing slot is worth more.
 
 These fixtures raised mutation coverage of the availability probe from 2/4 to 3/4 — the surviving
-"probe ignores the line-clear requirement" mutant is killed by the no-T-spin-yet assertions. Two
-mutants still survive ("accepts non-rotation landings", "bestTspinLines drops the spin test"); I
-could not construct a board that distinguishes them, since reaching a 3-corner position without
-rotating appears to require a kick by construction. They may be equivalent mutants — **unproven,
-recorded as open.**
+"probe ignores the line-clear requirement" mutant is killed by the no-T-spin-yet assertions.
 
-Implementation lives outside this repo (session scratchpad): `sim.ts`, `forecast.ts`,
-`run-forecast.ts`, `forecast.test.ts`, `validate.ts`, `auc.ts`.
+**Correction (2026-07-30). The two mutants recorded here as possibly-equivalent are killable, and
+were already dead when this paragraph was written.** The claim was that reaching a 3-corner position
+without rotating "appears to require a kick by construction". That is false: a *vertical* T slides
+down a one-wide channel and comes to rest with three corners filled, having never rotated — its last
+action is a downward move, so it is a placement, not a spin. Two fixtures encoding exactly that
+(`37:[3,4] 38:[3,4] 39:[4]`, and a T rotated into a well that clears a line with only two corners)
+are in `wiki-fixtures.test.ts`, whose mtime is **29 Jul 13:03 — seven minutes after this file's
+12:56**. The tests were written and the paragraph was never revisited.
+
+The lesson is not about T-spin geometry. **"I could not construct X" was recorded as a property of
+X rather than of the search** — the earlier attempt (`find-mut2.ts`) swept only rows 37-39 with ≤4
+empty columns drawn from columns 2-7, a space that happens to exclude the one-wide vertical channel.
+An exhausted search bounded that narrowly is evidence about the bound, not about the claim.
+
+## One duplicate deleted (2026-07-30)
+
+`tspinAvailable` was a second, independently written BFS beside `bestTspinLines`. The property
+suite found them agreeing on all 932 boards, and the duplication was actively dangerous: the two
+copies carried **different BFS caps**, 20000 and 40000. Neither was ever live — the queue only
+grows when a fresh `rotation:col:row` key enters `seen`, so it is bounded by `4 * 10 * H = 1600`
+states by construction (measured max over 2000 boards: **688**, `bfs-cap.ts`). Equivalence is
+structural, not sampled, so `tspinAvailable` is now one line: `bestTspinLines(board) > 0`.
+
+`forecast.ts` 156 → 145 lines, still 11/11 mutation-killed, and the published figures reproduce
+**exactly** — yachi 89/11/12.4%, pinglamb 78/10/12.8%, AUC 61.4 / 57.7 / 52.5 / 46.2. The negative
+result is unchanged; it now rests on half as much code.
+
+## Where the implementation actually lives — this is a hazard
+
+Session scratchpad, **not this repo**: `sim.ts`, `forecast.ts`, `run-forecast.ts`,
+`forecast.test.ts`, `wiki-fixtures.test.ts`, `property-forecast.test.ts`, `mutate-forecast.ts`,
+`bfs-cap.ts`, `validate.ts`, `auc.ts`, plus ~45 probe scripts.
+
+That path is under `/private/tmp`, which macOS purges. Every number in this document — the AUC
+table, the 167 T-spins, the mutation score — is currently **reproducible only from files one reboot
+away from deletion**, and the session that produced them has ended. Either commit the implementation
+or accept that this file becomes an unverifiable assertion. It is the same failure this project
+guards against everywhere else: a claim whose evidence cannot be re-run is a claim on trust.
