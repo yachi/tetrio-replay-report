@@ -1,9 +1,15 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **negative result.** The metric is validated as an instrument, but under a mechanically
-correct definition it carries no signal — AUC 61.4%, indistinguishable from TSD's 60.9%, which
-this project already files under "No signal". Excluded from the report on two independent
-grounds: it is simulator-derived, and it does not measure anything.
+Status: **inconclusive, and excluded.** The metric is validated as an instrument. Its AUC of 61.4%
+rests on **11 decided pairs** (8W–3L, plus 11 ties), a 95% CI of **[39%, 94%]**, and 31% power
+against a true 70% effect — so it can distinguish neither "no signal" from "strong signal" nor
+itself from TSD's 60.9%. Excluded from the report on two independent grounds: it is
+simulator-derived, and it is not measurable at this sample size.
+
+**This corrects an earlier "negative result" framing** (see *Power*, below). A null finding and an
+underpowered one licence different conclusions: the first says the metric does not work, the second
+says this design could not have told you either way. Only `tucked T-spins`, on 54 decided pairs
+with 90% power, is a genuine negative result here.
 
 ## What it measures
 
@@ -60,9 +66,55 @@ players.
 | forecast count | 52.5% | 53.2% | 79 (61 ties) |
 | tucked T-spins | 46.2% | 46.2% | 79 (25 ties) |
 
-Under the loose rule `forecast rate` looked promising — 13W–3L–6T, binomial p = 0.011. **That
-signal does not survive the correct definition.** At 61.4% it sits on top of TSD's 60.9%, inside
-the no-signal band, with half its pairs now ties.
+Under the loose rule `forecast rate` looked promising — 13W–3L–6T, binomial p = 0.011. At 61.4%
+the strict rule sits on top of TSD's 60.9%, inside the no-signal band, with half its pairs now ties.
+
+## Power — what these AUCs can and cannot support
+
+Run `bun run sim/auc-power.ts`. Its statistics are self-checked against the defining equations
+(an early version silently printed an upper bound of 0%, and a Clopper–Pearson value recalled from
+memory was wrong by 0.001 — both caught by that check, neither by reading the output).
+
+| metric | AUC | W–L–T | decided | exact p | 95% CI on win-rate | power vs true 70% |
+|---|---|---|---|---|---|---|
+| forecast rate | 61.4% | 8–3–11 | **11** | 0.227 | **[39%, 94%]** | **31%** |
+| forecast per piece | 57.7% | 8–4–14 | 12 | 0.388 | [35%, 90%] | 25% |
+| forecast count | 52.5% | 11–7–61 | 18 | 0.481 | [36%, 83%] | 53% |
+| tucked T-spins | 46.2% | 24–30–25 | **54** | 0.497 | [31%, 59%] | **90%** |
+
+`forecast rate` would need **9 of 11** — an 82% win-rate — to reach p < 0.05. A design that can
+only see an effect that large has not measured a null; it has not measured. `tucked T-spins` is the
+opposite case and the contrast is the point: 54 decided pairs, a CI that excludes anything
+interesting, 90% power. That one genuinely reproduces the project's TSD/TST no-signal finding.
+
+### "The signal does not survive the correct definition" was the wrong reading
+
+That sentence attributed the loose→strict drop to the definition being corrected. Decomposed:
+
+| | AUC | win-rate among decided | ties |
+|---|---|---|---|
+| loose | 72.7% | 81.3% | 6 of 22 |
+| strict | 61.4% | 72.7% | **11 of 22** |
+
+AUC scores a tie as half a win, so a coarser rule is dragged toward 50% **regardless of its effect
+size**. Carry loose's effect size onto strict's tie structure and AUC is 65.6% — so of the
+11.4-point drop, **7.1 points (63%) is the tie mechanism** and only 4.3 points is the effect
+estimate moving. The win-rate CIs, [54%, 96%] loose and [39%, 94%] strict, overlap across nearly
+their whole range. *At this n, "the effect went away" and "the rule resolves less" are not
+separable.* The strict rule is still the right rule — that argument was always geometric, not
+statistical — but the AUC drop is not the evidence for it.
+
+This is the same error as the original loose/strict finding, one level up: a property of the
+instrument read as a property of the world. The first time it was the rule inventing a gap between
+players; this time it is the tie-handling inventing a collapse.
+
+### A trap worth recording
+
+A cluster bootstrap over the 10 matches returns a 95% CI of **[52.8%, 70.4%]** for `forecast rate`
+— which excludes 50% and reads as a real signal, contradicting the exact test's p = 0.227. Do not
+believe it: 10 clusters is far below what a cluster bootstrap needs to attain nominal coverage, and
+it is estimating the tie-inclusive AUC rather than the conditional win-rate. The conservative exact
+test governs. Reporting only the bootstrap would have flipped this document's conclusion.
 
 The most likely reading: the loose rule was largely detecting "a line clear happened recently",
 which tracks attacking well, not forecasting. `tucked T-spins` at 46.2% independently reproduces
@@ -93,8 +145,21 @@ every audit round in this project has caught. A numeric section without badges b
 2. A **second independent sim implementation**, agreeing byte-for-byte on the emitted
    per-round forecast counts — the dual-extractor rule applied to derived data.
 3. Forecast counts land in `facts.json` as data; claims then written as specs like any other.
-4. Re-run the AUC probe on the full (unbiased) sample before it earns a column — the current
-   n=22 could move a long way.
+4. **Enough decided pairs to have power.** This is now the binding constraint, and it is
+   quantified — `auc-power.ts` computes the sample size for 80% power at the observed 50% tie rate:
+
+   | if the true effect is | decided pairs needed | total pairs | vs current |
+   |---|---|---|---|
+   | 60% win-rate | 158 | 316 | 14× |
+   | 65% | 69 | 138 | 6× |
+   | 70% | 37 | 74 | 3× |
+   | 80% | 18 | 36 | 2× |
+
+   The 07-22 set yields 22 usable pairs from 158 rounds, because coverage is a verified *prefix*.
+   **More sessions alone will not fix this**: at a 50% tie rate, half of every future pair is
+   discarded too. The lever is either a finer-grained metric (the rate is a ratio of small integers,
+   which is where the ties come from) or a simulator that verifies deeper into each round — i.e.
+   item 1 is not just a correctness prerequisite, it is the power prerequisite.
 
 ## Validation performed on the instrument
 

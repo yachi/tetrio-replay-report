@@ -19,10 +19,13 @@ bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
 bun run mutate-forecast.ts forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
 bun run run-forecast.ts
 bun run auc.ts
+bun run auc-power.ts     # read this before quoting any AUC
 bun run bfs-cap.ts
 ```
 
 Runners locate the `.ttrm` files at `../` (the session directory) and honour `REPLAY_DIR`.
+`LOOSE=1` switches the classifier to the discarded loose rule, for comparison only.
+Pairing is simulated once and cached to `pairs-cache.json` (gitignored; delete to force a re-run).
 
 Expected output, all four verified from this directory on 2026-07-30:
 
@@ -74,4 +77,17 @@ match-level rate. `validate.ts` is what establishes which prefixes are trustwort
 | `*.test.ts` | unit, external-golden, and property suites |
 | `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |
 | `bfs-cap.ts` | proves the BFS cap is unreachable (bound 1600, measured max 688) |
+| `pairs.ts` | winner-vs-loser pairing, shared by both AUC consumers |
 | `run-forecast.ts`, `auc.ts`, `validate.ts` | the runners that produce the published figures |
+| `auc-power.ts` | CIs, exact tests, power, and required sample size for those figures |
+
+## Do not quote an AUC from here without `auc-power.ts`
+
+`forecast rate`'s 61.4% rests on **11 decided pairs** — 95% CI [39%, 94%], 31% power against a
+true 70% effect. It would need a 9-of-11 sweep to reach p < 0.05. Only `tucked T-spins`
+(54 decided pairs, 90% power) supports a genuine negative result.
+
+`auc-power.ts` self-checks its statistics against the defining equations before printing anything.
+That check has already caught two real bugs: a Clopper–Pearson upper bound printing 0% because the
+bisection assumed an increasing function, and a "textbook" constant recalled from memory that was
+wrong in the fourth decimal. Neither was visible in the output.
