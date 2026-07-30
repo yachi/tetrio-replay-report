@@ -1,15 +1,15 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **inconclusive, and excluded.** The metric is validated as an instrument. Its AUC of 61.4%
-rests on **11 decided pairs** (8W–3L, plus 11 ties), a 95% CI of **[39%, 94%]**, and 31% power
+Status: **inconclusive, and excluded.** The metric is validated as an instrument. Its AUC of 63.6%
+rests on **12 decided pairs** (9W–3L, plus 10 ties), a 95% CI of **[43%, 95%]**, and 25% power
 against a true 70% effect — so it can distinguish neither "no signal" from "strong signal" nor
 itself from TSD's 60.9%. Excluded from the report on two independent grounds: it is
 simulator-derived, and it is not measurable at this sample size.
 
 **This corrects an earlier "negative result" framing** (see *Power*, below). A null finding and an
 underpowered one licence different conclusions: the first says the metric does not work, the second
-says this design could not have told you either way. Only `tucked T-spins`, on 54 decided pairs
-with 90% power, is a genuine negative result here.
+says this design could not have told you either way. Only `tucked T-spins`, on 55 decided pairs
+with 88% power, is a genuine negative result here.
 
 ## What it measures
 
@@ -50,7 +50,7 @@ definition*. Recorded so nobody re-derives it.
 
 | | tucked T-spins | forecast (loose) | forecast (strict) |
 |---|---|---|---|
-| yachi | 89 | 38 → **42.7%** | 11 → **12.4%** |
+| yachi | 92 | 39 → **42.4%** | 12 → **13.0%** |
 | pinglamb | 78 | 27 → **34.6%** | 10 → **12.8%** |
 
 The loose rule showed yachi forecasting ~8 points more than pinglamb. Under the strict rule the
@@ -61,13 +61,13 @@ players.
 
 | metric | AUC (strict) | AUC (loose) | n pairs |
 |---|---|---|---|
-| forecast rate | **61.4%** | 72.7% | 22 (11 ties strict) |
-| forecast per piece | 57.7% | 67.3% | 26 (14 ties) |
-| forecast count | 52.5% | 53.2% | 79 (61 ties) |
-| tucked T-spins | 46.2% | 46.2% | 79 (25 ties) |
+| forecast rate | **63.6%** | 75.0% | 22 (10 ties strict) |
+| forecast per piece | 61.1% | 70.4% | 27 (13 ties) |
+| forecast count | 53.2% | 53.8% | 79 (60 ties) |
+| tucked T-spins | 46.8% | 46.8% | 79 (24 ties) |
 
-Under the loose rule `forecast rate` looked promising — 13W–3L–6T, binomial p = 0.011. At 61.4%
-the strict rule sits on top of TSD's 60.9%, inside the no-signal band, with half its pairs now ties.
+Under the loose rule `forecast rate` looked promising — 14W–3L–5T, exact p = 0.013. At 63.6%
+the strict rule sits near TSD's 60.9%, inside the no-signal band, with half its pairs now ties.
 
 ## Power — what these AUCs can and cannot support
 
@@ -77,15 +77,15 @@ memory was wrong by 0.001 — both caught by that check, neither by reading the 
 
 | metric | AUC | W–L–T | decided | exact p | 95% CI on win-rate | power vs true 70% |
 |---|---|---|---|---|---|---|
-| forecast rate | 61.4% | 8–3–11 | **11** | 0.227 | **[39%, 94%]** | **31%** |
-| forecast per piece | 57.7% | 8–4–14 | 12 | 0.388 | [35%, 90%] | 25% |
-| forecast count | 52.5% | 11–7–61 | 18 | 0.481 | [36%, 83%] | 53% |
-| tucked T-spins | 46.2% | 24–30–25 | **54** | 0.497 | [31%, 59%] | **90%** |
+| forecast rate | 63.6% | 9–3–10 | **12** | 0.146 | **[43%, 95%]** | **25%** |
+| forecast per piece | 61.1% | 10–4–13 | 14 | 0.180 | [42%, 92%] | 36% |
+| forecast count | 53.2% | 12–7–60 | 19 | 0.359 | [38%, 84%] | 47% |
+| tucked T-spins | 46.8% | 25–30–24 | **55** | 0.590 | [32%, 59%] | **88%** |
 
-`forecast rate` would need **9 of 11** — an 82% win-rate — to reach p < 0.05. A design that can
+`forecast rate` would need **10 of 12** — an 83% win-rate — to reach p < 0.05. A design that can
 only see an effect that large has not measured a null; it has not measured. `tucked T-spins` is the
-opposite case and the contrast is the point: 54 decided pairs, a CI that excludes anything
-interesting, 90% power. That one genuinely reproduces the project's TSD/TST no-signal finding.
+opposite case and the contrast is the point: 55 decided pairs, a CI that excludes anything
+interesting, 88% power. That one genuinely reproduces the project's TSD/TST no-signal finding.
 
 ### "The signal does not survive the correct definition" was the wrong reading
 
@@ -93,13 +93,13 @@ That sentence attributed the loose→strict drop to the definition being correct
 
 | | AUC | win-rate among decided | ties |
 |---|---|---|---|
-| loose | 72.7% | 81.3% | 6 of 22 |
-| strict | 61.4% | 72.7% | **11 of 22** |
+| loose | 75.0% | 82.4% | 5 of 22 |
+| strict | 63.6% | 75.0% | **10 of 22** |
 
 AUC scores a tie as half a win, so a coarser rule is dragged toward 50% **regardless of its effect
-size**. Carry loose's effect size onto strict's tie structure and AUC is 65.6% — so of the
-11.4-point drop, **7.1 points (63%) is the tie mechanism** and only 4.3 points is the effect
-estimate moving. The win-rate CIs, [54%, 96%] loose and [39%, 94%] strict, overlap across nearly
+size**. Carry loose's effect size onto strict's tie structure and AUC is 67.6% — so of the
+11.4-point drop, **7.4 points (65%) is the tie mechanism** and only 4.0 points is the effect
+estimate moving. The win-rate CIs, [57%, 96%] loose and [43%, 95%] strict, overlap across nearly
 their whole range. *At this n, "the effect went away" and "the rule resolves less" are not
 separable.* The strict rule is still the right rule — that argument was always geometric, not
 statistical — but the AUC drop is not the evidence for it.
@@ -110,14 +110,14 @@ players; this time it is the tie-handling inventing a collapse.
 
 ### A trap worth recording
 
-A cluster bootstrap over the 10 matches returns a 95% CI of **[52.8%, 70.4%]** for `forecast rate`
-— which excludes 50% and reads as a real signal, contradicting the exact test's p = 0.227. Do not
+A cluster bootstrap over the 10 matches returns a 95% CI of **[55.0%, 73.8%]** for `forecast rate`
+— which excludes 50% and reads as a real signal, contradicting the exact test's p = 0.146. Do not
 believe it: 10 clusters is far below what a cluster bootstrap needs to attain nominal coverage, and
 it is estimating the tie-inclusive AUC rather than the conditional win-rate. The conservative exact
 test governs. Reporting only the bootstrap would have flipped this document's conclusion.
 
 The most likely reading: the loose rule was largely detecting "a line clear happened recently",
-which tracks attacking well, not forecasting. `tucked T-spins` at 46.2% independently reproduces
+which tracks attacking well, not forecasting. `tucked T-spins` at 46.8% independently reproduces
 this project's existing TSD/TST no-signal finding, which is a useful check that the pipeline is
 not manufacturing structure.
 
@@ -129,7 +129,7 @@ independent extractors agree byte-for-byte.* These numbers come from **a simulat
 1. There is **no second independent implementation** — the dual-extractor argument does not hold.
 2. The simulator **fails its own gate**: 1/158 rounds match all fields. Only *prefixes* are
    verified, using the opponent's ige stream as a per-attack oracle.
-3. **Coverage is 13.8%** of placements (2001/14517) across 88/158 rounds, and it is
+3. **Coverage is 14.1%** of placements (2052/14517) across 89/158 rounds, and it is
    systematically the *early* part of every round — opener/early-midgame, when garbage pressure
    is lightest. Not a match-level rate.
 
@@ -242,6 +242,64 @@ X rather than of the search** — the earlier attempt (`find-mut2.ts`) swept onl
 empty columns drawn from columns 2-7, a space that happens to exclude the one-wide vertical channel.
 An exhausted search bounded that narrowly is evidence about the bound, not about the claim.
 
+## The all-clear is its own event — and that gives perfect clears an oracle (2026-07-30)
+
+Chasing the open "sim finds 7 perfect clears, the games had 19" question produced a measured answer
+to a different question, and then dissolved the original one.
+
+**TETR.IO does not fold the all-clear bonus into the line-clear attack.** It emits a *second* `ige`
+event, of amount exactly **10**, at the same frame, after the base attack. Four rounds show it
+plainly — the sim sends one combined number, ground truth sends two:
+
+```
+sim sent 11@326    truth  1@326  10@326
+sim sent 12@755    truth  2@755  10@755
+sim sent 11@646    truth  1@646  10@646
+sim sent 12@633    truth  2@633  10@633
+```
+
+The bonus *value* (10) was already right; the packaging was wrong. This is why the verified prefix
+was **zero in every round containing a perfect clear**: the matcher compared the sim's 11 against
+truth's 1, failed, and truncated at the first PC.
+
+**`amt === 10` is therefore an exact oracle for the perfect clear — 158/158 player-rounds, 19
+predicted vs 19 recorded** (`sim/pc-oracle.ts`). It is safe because no ordinary attack in this
+dataset reaches 9 or 10; the histogram tops out at 8, and 10 occurs exactly 19 times. A first
+version of the test also required the 10 to share a frame with a sibling attack and scored 155/158
+— the three misses are PCs whose base attack was *fully cancelled*, so no sibling exists.
+Co-location is a property of the common case, not the rule.
+
+This matters beyond perfect clears: every attack a player sent is now locatable in time to the
+event, including ones a whole-round statistic cannot place.
+
+Fixing the emission (`acEmit: 'separate'`, now the default) moves coverage 13.8% → **14.1%**,
+contributing rounds 88 → 89, and shifts the published figures — which is why the numbers earlier in
+this document changed.
+
+### The 7-vs-19 gap was a symptom, not a question
+
+With the oracle in hand, the original framing does not survive contact with the data:
+
+| | |
+|---|---|
+| sim tops out | **151 / 158 rounds** |
+| sim clears **zero** lines while the real player cleared some | 39 / 158 |
+| median sim/real line ratio | **0.13** |
+| sim invents a PC that never happened | **0 / 158** |
+
+The simulator reproduces about an eighth of a round's line clears and dies in 96% of rounds. It
+finds 7 of 19 perfect clears for the same reason it finds 13% of line clears: it is not surviving
+the round. Nine of the twelve misses occur in rounds the sim *did* simulate past piece 19, and in
+several of those it had cleared **no lines at all in 25–29 pieces** — so it is not a perfect-clear
+bug, and hunting one would have been fixing a symptom.
+
+The one genuinely diagnostic row is the last: **the sim never invents a perfect clear.** The
+all-clear predicate does not over-fire. The board it is asked about is simply wrong.
+
+**Reframed open question**, replacing "why 7 and not 19": *why does the simulator top out in 151 of
+158 rounds, and clear nothing at all in 39 of them, when its placement engine is frame-accurate?*
+That is one question, and the perfect-clear count is one of several ways to observe it.
+
 ## One duplicate deleted (2026-07-30)
 
 `tspinAvailable` was a second, independently written BFS beside `bestTspinLines`. The property
@@ -252,7 +310,8 @@ states by construction (measured max over 2000 boards: **688**, `bfs-cap.ts`). E
 structural, not sampled, so `tspinAvailable` is now one line: `bestTspinLines(board) > 0`.
 
 `forecast.ts` 156 → 145 lines, still 11/11 mutation-killed, and the published figures reproduce
-**exactly** — yachi 89/11/12.4%, pinglamb 78/10/12.8%, AUC 61.4 / 57.7 / 52.5 / 46.2. The negative
+**exactly** — yachi 89/11/12.4%, pinglamb 78/10/12.8%, AUC 61.4 / 57.7 / 52.5 / 46.2 (the figures
+as they stood that day; they moved when the all-clear emission was fixed, below). The negative
 result is unchanged; it now rests on half as much code.
 
 ## Where the implementation lives

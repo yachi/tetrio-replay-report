@@ -1,12 +1,12 @@
 /**
  * Is the forecast metric's "negative result" statistically licensed, or merely underpowered?
  *
- * forecast-metric.md concludes "no signal" from AUC 61.4% on 22 pairs, 11 of them ties. That is
- * ELEVEN decided comparisons. This asks the question the AUC number cannot answer on its own:
+ * forecast-metric.md concluded "no signal" from an AUC resting on ~12 decided pairs. That is
+ * a dozen decided comparisons. This asks the question the AUC number cannot answer on its own:
  *
  *   1. What is the confidence interval on that AUC?
  *   2. What effect size could this design have detected at all? (minimum detectable effect)
- *   3. Is 61.4% distinguishable from TSD's 60.9%, the benchmark it is being filed alongside?
+ *   3. Is it distinguishable from TSD's 60.9%, the benchmark it is being filed alongside?
  *
  * "No signal" and "no power to see a signal" are different claims. Only one of them is about
  * the metric.
@@ -109,7 +109,7 @@ for (const m of METRICS) {
   console.log(`${String(dec).padStart(5)}     ${md ? String(md.k).padStart(6) : '  none'}           ${md ? (100 * md.rate).toFixed(0) + '%' : '  -'}              ${(100 * power(dec, 0.70)).toFixed(0)}%              ${(100 * power(dec, 0.80)).toFixed(0)}%   [${m}]`);
 }
 
-console.log('\n--- is 61.4% distinguishable from TSD 60.9% (the "no signal" benchmark)? ---\n');
+console.log('\n--- is forecast rate distinguishable from TSD 60.9% (the "no signal" benchmark)? ---\n');
 const fr = pairsFor(rows, 'forecast rate');
 const a = auc(fr);
 const dec = a.wins + a.losses;
@@ -159,7 +159,7 @@ console.log('\n--- how many decided pairs would this actually need? ---\n');
     console.log(`   ${(100 * p).toFixed(0)}%          ${n === null ? '  >4000' : String(n).padStart(6)}                       ${tot === null ? '   -' : String(tot).padStart(6)}                  ${tot === null ? '-' : (tot / S.n).toFixed(0) + 'x'}`);
   }
   console.log(`\nThe 2026-07-22 set yields ${S.n} usable pairs from 158 rounds, because coverage is a verified`);
-  console.log(`PREFIX (13.8% of placements). More sessions alone will not fix this at the observed tie rate —`);
+  console.log(`PREFIX (14.1% of placements). More sessions alone will not fix this at the observed tie rate —`);
   console.log(`reducing ties means a finer-grained metric, or a simulator that verifies deeper into rounds.`);
 }
 

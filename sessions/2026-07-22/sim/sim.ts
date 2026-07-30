@@ -68,7 +68,7 @@ export interface SimResult {
   boards: Board[];            // board AFTER each placement
   records: ClearRecord[];
   events: { frame: number; kind: 'lock' | 'garbage'; }[];
-  locks: { frame: number; piece: PieceType; cells: {col:number;row:number}[]; cleared: number; spin: 'none'|'mini'|'full' }[];
+  locks: { frame: number; piece: PieceType; cells: {col:number;row:number}[]; cleared: number; spin: 'none'|'mini'|'full'; allclear: boolean }[];
   garbageEvents: { frame: number; amt: number; lockIndex: number }[];
   provSnaps: (number|null)[][][];   // provenance grid after each lock
   topout: boolean;
@@ -101,7 +101,7 @@ export function detectTSpin(board: Board, p: ActivePiece, lastWasRotation: boole
 export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
-  opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acMode?: 'flat'|'b2bonly'|'none'|'replace' },
+  opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace' },
 ): SimResult {
   const queue = makeQueue(seed, 4000);
   let qi = 0;
@@ -185,7 +185,7 @@ export function simulate(
     lines += cleared; clearedTotal += garbageRows; placed++;
 
     // scoring
-    let atk = 0;
+    let atk = 0, sawAllclear = false;
     const isDifficult = cleared >= 4 || (spin !== 'none' && cleared > 0);
     if (cleared > 0) {
       combo++; topcombo = Math.max(topcombo, combo);
@@ -209,29 +209,40 @@ export function simulate(
       } else b2b = -1;
       // observed: combo is a MULTIPLIER, not additive. (4+1)*1.25 = 6.25 -> 6
       if (combo > 0) atk = Math.floor(atk * (1 + 0.25 * combo));
+      // All-clear bonus. MEASURED (pc-oracle.ts, 158/158 rounds): TETR.IO does NOT fold this into
+      // the line-clear attack — it emits a SECOND ige event of amount exactly 10 at the same
+      // frame, after the base attack. Folding them into one value (1+10=11) is why the verified
+      // prefix collapsed to zero in every round containing a perfect clear: the matcher compared
+      // the sim's 11 against the truth's 1 and truncated at the first PC.
+      let bonus = 0;
       if (board.every(r => r.every(c => c === null))) {
-        clears.allclear++;
+        clears.allclear++; sawAllclear = true;
         const m = opts.acMode ?? 'flat';
-        if (m === 'flat') atk += table.allclear;
-        else if (m === 'b2bonly') { if (b2b > 0) atk += table.allclear; }
-        else if (m === 'replace') atk = table.allclear;
+        if (m === 'flat') bonus = table.allclear;
+        else if (m === 'b2bonly') { if (b2b > 0) bonus = table.allclear; }
+        else if (m === 'replace') { atk = 0; bonus = table.allclear; }
         // 'none' adds nothing
       }
-      attackTotal += atk;
+      if ((opts.acEmit ?? 'separate') === 'combined') { atk += bonus; bonus = 0; }
 
       // cancel pending garbage first, then send the remainder
-      let remaining = atk;
-      for (let pi = 0; pi < pending.length && remaining > 0; ) {
-        const p0 = pending[pi]!;
-        // with passthrough disabled, only garbage still IN TRANSIT can be cancelled
-        if (opts.cancelMode === 'inTransit' && p0.ready <= frame) { pi++; continue; }
-        const take = Math.min(remaining, p0.amt);
-        p0.amt -= take; remaining -= take;
-        if (p0.amt === 0) pending.splice(pi, 1); else pi++;
-      }
-      sentTotal += remaining;
-      records.push({ frame, piece: piece.type, lines: cleared, spin, attack: atk, sent: remaining,
-        cancelled: atk - remaining, b2b, combo, cells, garbageCleared: garbageRows });
+      const emit = (amount: number) => {
+        attackTotal += amount;
+        let remaining = amount;
+        for (let pi = 0; pi < pending.length && remaining > 0; ) {
+          const p0 = pending[pi]!;
+          // with passthrough disabled, only garbage still IN TRANSIT can be cancelled
+          if (opts.cancelMode === 'inTransit' && p0.ready <= frame) { pi++; continue; }
+          const take = Math.min(remaining, p0.amt);
+          p0.amt -= take; remaining -= take;
+          if (p0.amt === 0) pending.splice(pi, 1); else pi++;
+        }
+        sentTotal += remaining;
+        records.push({ frame, piece: piece.type, lines: cleared, spin, attack: amount, sent: remaining,
+          cancelled: amount - remaining, b2b, combo, cells, garbageCleared: garbageRows });
+      };
+      emit(atk);
+      if (bonus > 0) emit(bonus);
       if (opts.insertAfterClear) {
         let budget = opts.garbagecap;
         while (budget > 0 && pending.length > 0 && pending[0]!.ready <= frame) {
@@ -254,7 +265,7 @@ export function simulate(
         if (p0.amt === 0) pending.shift();
       }
     }
-    locks.push({ frame, piece: piece.type, cells, cleared, spin });
+    locks.push({ frame, piece: piece.type, cells, cleared, spin, allclear: sawAllclear });
     provSnaps.push(prov.map(r => [...r]));
     boards.push(board);
     evLog.push({ frame, kind: 'lock' });
