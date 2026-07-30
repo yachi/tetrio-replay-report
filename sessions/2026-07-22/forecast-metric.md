@@ -190,14 +190,18 @@ structural, not sampled, so `tspinAvailable` is now one line: `bestTspinLines(bo
 **exactly** — yachi 89/11/12.4%, pinglamb 78/10/12.8%, AUC 61.4 / 57.7 / 52.5 / 46.2. The negative
 result is unchanged; it now rests on half as much code.
 
-## Where the implementation actually lives — this is a hazard
+## Where the implementation lives
 
-Session scratchpad, **not this repo**: `sim.ts`, `forecast.ts`, `run-forecast.ts`,
-`forecast.test.ts`, `wiki-fixtures.test.ts`, `property-forecast.test.ts`, `mutate-forecast.ts`,
-`bfs-cap.ts`, `validate.ts`, `auc.ts`, plus ~45 probe scripts.
+[`sim/`](sim/), committed 2026-07-30 — see its README for how to re-run every figure above.
 
-That path is under `/private/tmp`, which macOS purges. Every number in this document — the AUC
-table, the 167 T-spins, the mutation score — is currently **reproducible only from files one reboot
-away from deletion**, and the session that produced them has ended. Either commit the implementation
-or accept that this file becomes an unverifiable assertion. It is the same failure this project
-guards against everywhere else: a claim whose evidence cannot be re-run is a claim on trust.
+Until then it lived only in a `/private/tmp` session scratchpad belonging to a session that had
+ended, i.e. every number here was reproducible only from files one reboot from deletion. That is
+the same failure this project guards against everywhere else: a claim whose evidence cannot be
+re-run is a claim on trust. The ~45 exploratory probe scripts were deliberately left behind; only
+the reproducible core is committed.
+
+One thing the move surfaced: the engine under the simulator is a **patched** copy of
+td-opener-trainer `fa596ee` — `BOARD_VISIBLE_HEIGHT` 20 → 40, which `srs.ts` bakes into its floor
+check. The patch was uncommitted in the scratchpad clone, so a re-clone would have locked pieces at
+row 20 and produced wrong boards **without erroring**. It is vendored into `sim/vendor/core/` with
+that noted in the files themselves.

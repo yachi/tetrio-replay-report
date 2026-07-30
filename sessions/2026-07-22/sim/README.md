@@ -1,0 +1,77 @@
+# `sim/` — the T-Spin Forecast instrument
+
+The code behind [`../forecast-metric.md`](../forecast-metric.md). Committed 2026-07-30 because
+every number in that document was, until then, reproducible only from a `/private/tmp` scratchpad
+belonging to a session that had ended.
+
+**This is not part of the report pipeline.** Nothing here feeds `facts.json`, no claim cites it,
+and CI does not run it. It is deliberately excluded — see *Why it is not in the report* in the
+findings doc. It lives here so the negative result stays checkable, not so it can be promoted.
+
+## Running it
+
+Requires `bun`. No install step; there are no dependencies.
+
+```fish
+cd sessions/2026-07-22/sim
+
+bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
+bun run mutate-forecast.ts forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
+bun run run-forecast.ts
+bun run auc.ts
+bun run bfs-cap.ts
+```
+
+Runners locate the `.ttrm` files at `../` (the session directory) and honour `REPLAY_DIR`.
+
+Expected output, all four verified from this directory on 2026-07-30:
+
+| command | result |
+|---|---|
+| the three test files | 29 pass, 0 fail, 466 assertions |
+| `mutate-forecast.ts` | 11/11 killed |
+| `run-forecast.ts` | yachi 89 tucked / 11 forecast / 12.4% · pinglamb 78 / 10 / 12.8% |
+| `auc.ts` | 61.4 · 57.7 · 52.5 · 46.2 |
+
+## What is verified, and how
+
+- **Mutation — 11/11.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
+  The harness validates itself with control mutants: three semantics-preserving edits must
+  **survive** and a poison mutant (spawn column 3→9) must **die**. A sweep where everything dies
+  is a syntax error, not a passing gate.
+- **Attribution is measured.** `strip-tests.ts` removes named tests so a kill can be traced to
+  them. Strip the two rotation/spin fixtures and 6 mutants survive; restore them and it is 11/11.
+- **Property tests over 932 seeded random boards** (`property-forecast.test.ts`), with an
+  anti-vacuity gate: 84 of them must actually offer a line-clearing T-spin, or the suite proves
+  nothing. Seeds are MINSTD, so any failure reproduces.
+- **External golden data.** `wiki-fixtures.test.ts` reads
+  `../wiki-tspin-forecast-boards.json` — 29 board diagrams parsed from harddrop.com. The boards
+  *and* the expectations come from the wiki, never from this engine. There is one copy of that
+  file and this test reads it; do not add a second.
+- **Coverage** — 100% of lines and functions in `forecast.ts`.
+
+## Two hazards worth knowing before you trust output
+
+**`vendor/core/` is a patched copy, not a clean one.** It comes from
+`github.com/yachi/td-opener-trainer` at `fa596ee`, with `BOARD_VISIBLE_HEIGHT` changed from 20 to
+40 (20 visible + 20 buffer). `srs.ts` bakes that constant into `isValidPosition`'s floor check, so
+a fresh clone of the trainer **silently** locks pieces at row 20 and yields wrong boards with no
+error. The patch was uncommitted in the original scratchpad clone. Vendoring is what makes this
+directory reproduce; re-cloning upstream would not.
+
+**Coverage is 13.8% of placements, and it is biased.** The simulator matches the real game on
+2001/14517 placements across 88/158 rounds, and those are systematically the *early* part of each
+round, when garbage pressure is lightest. Every figure here is a verified-prefix figure, not a
+match-level rate. `validate.ts` is what establishes which prefixes are trustworthy.
+
+## Files
+
+| | |
+|---|---|
+| `sim.ts` | the replay simulator — RNG, board, attack table, garbage |
+| `forecast.ts` | the metric: `bestTspinLines`, `tspinAvailable`, `forecastMetric` |
+| `forecast-boards.ts` | re-export shim so fixtures import one surface |
+| `*.test.ts` | unit, external-golden, and property suites |
+| `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |
+| `bfs-cap.ts` | proves the BFS cap is unreachable (bound 1600, measured max 688) |
+| `run-forecast.ts`, `auc.ts`, `validate.ts` | the runners that produce the published figures |
