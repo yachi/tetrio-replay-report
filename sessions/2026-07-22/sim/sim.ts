@@ -102,7 +102,7 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean },
 ): SimResult {
   const queue = makeQueue(seed, 4000);
   let qi = 0;
@@ -311,11 +311,19 @@ export function simulate(
         p0.amt -= take; budget -= take; if (p0.amt === 0) pending.shift();
       }
     }
+    // DAS/ARR advanced by dt frames. TETR.IO records inputs to 0.1-frame precision and runs
+    // its handling on that clock; at arr=2 a one-frame rounding error is a whole cell of
+    // movement, which is why this is separable from gravity and lock delay.
+    const dasArr = (dt: number) => {
+      if (dir === 0) return;
+      if (dasTimer > 0) { dasTimer -= dt; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } }
+      else if ((arrTimer -= dt) <= 0) {
+        shift(dir); arrTimer = handling.arr || 1;
+        if (!handling.arr) for (let i = 0; i < BOARD_WIDTH; i++) shift(dir);
+      }
+    };
     const continuous = () => {
-    if (dir !== 0) {
-      if (dasTimer > 0) { dasTimer--; if (dasTimer === 0) { arrTimer = 0; } }
-      else { if (--arrTimer <= 0) { shift(dir); arrTimer = handling.arr || 1; if (!handling.arr) for (let i = 0; i < BOARD_WIDTH; i++) shift(dir); } }
-    }
+    if (!opts.subframe) dasArr(1);
     const sdRate = opts.sdfMode === 'mult' ? opts.gravity * handling.sdf : handling.sdf;
     gravAcc += opts.gravity + (softHeld ? sdRate : 0);
     while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) break; piece = n; lastWasRotation = false; gravAcc -= 1; }
@@ -324,12 +332,10 @@ export function simulate(
     if (grounded()) { if (++groundFrames >= opts.locktime) lockPiece(f); }
     else groundFrames = 0;
     };
-    const applyEvents = () => {
-    while (ei < evs.length && evs[ei]!.frame === f && !topout) {
-      const e = evs[ei++]!;
+    const applyEvent = (e: InEvent) => {
       if (e.type === 'keydown') {
         if (e.key) held.add(e.key);
-        if (f < areUntil) continue;          // entry delay: no piece to control yet
+        if (f < areUntil) return;            // entry delay: no piece to control yet
         switch (e.key) {
           case 'moveLeft': dir = -1; shift(-1); dasTimer = handling.das; break;
           case 'moveRight': dir = 1; shift(1); dasTimer = handling.das; break;
@@ -355,9 +361,26 @@ export function simulate(
         if (e.key === 'moveRight' && dir === 1) dir = 0;
         if (e.key === 'softDrop') softHeld = false;
       }
-    }
     };
-    if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
+    const applyEvents = () => {
+      while (ei < evs.length && evs[ei]!.frame === f && !topout) applyEvent(evs[ei++]!);
+    };
+
+    if (opts.subframe) {
+      // Interleave events and DAS/ARR on a 0.1-frame clock, then run gravity and lock
+      // delay once at frame granularity (they are frame-quantised in the client).
+      const N = 10;
+      for (let s = 1; s <= N && !topout; s++) {
+        const t = f + s / N;
+        while (ei < evs.length && !topout) {
+          const e = evs[ei]!;
+          if (e.frame + (e.sub ?? 0) >= t || e.frame > f) break;
+          ei++; applyEvent(e);
+        }
+        dasArr(1 / N);
+      }
+      if (!topout) continuous();
+    } else if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
   }
   return { lines, placed, holds, clears, topbtb, topcombo,
     garbage: { sent: sentTotal, received: recvTotal, cleared: clearedTotal, attack: attackTotal },
