@@ -101,13 +101,15 @@ export function detectTSpin(board: Board, p: ActivePiece, lastWasRotation: boole
 export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
-  opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace' },
+  opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
+          blockout?: 'strict'|'clutch'|'shiftup' },
 ): SimResult {
   const queue = makeQueue(seed, 4000);
   let qi = 0;
   let board: Board = emptyBoard();
   let hold: PieceType | null = null, holdUsed = false;
   let lines = 0, placed = 0, holds = 0, topout = false;
+  let lastClearWasLines = false;     // did the previous placement clear? gates 'clutch'
   let b2b = -1, combo = -1, topbtb = 0, topcombo = 0;
   let sentTotal = 0, recvTotal = 0, clearedTotal = 0, attackTotal = 0;
   const clears: Record<string, number> = {
@@ -141,7 +143,21 @@ export function simulate(
       const n = tryRotate(board, piece, held.has('rotateCW') ? 1 : -1);
       if (n) { usedKick = n.col !== piece.col || n.row !== piece.row; piece = n; lastWasRotation = true; }
     }
-    if (!isValidPosition(board, piece)) topout = true;
+    if (!isValidPosition(board, piece)) {
+      // A blocked spawn is not necessarily death. halp1/triangle's #considerBlockout
+      // walks the piece UP through the buffer until it fits, gated on the previous
+      // placement having cleared lines ("clutch"). 'shiftup' drops that gate.
+      const mode = opts.blockout ?? 'strict';
+      const mayClutch = mode === 'shiftup' || (mode === 'clutch' && lastClearWasLines);
+      let rescued = false;
+      if (mayClutch) {
+        for (let row = SPAWN_ROW - 1; row >= 0; row--) {
+          const cand = { ...piece, row };
+          if (isValidPosition(board, cand)) { piece = cand; rescued = true; break; }
+        }
+      }
+      if (!rescued) topout = true;
+    }
   };
   const shift = (d: number) => { const n = tryMove(board, piece, d, 0); if (n) { piece = n; lastWasRotation = false; groundFrames = 0; } };
   const grounded = () => tryMove(board, piece, 0, 1) === null;
@@ -265,6 +281,7 @@ export function simulate(
         if (p0.amt === 0) pending.shift();
       }
     }
+    lastClearWasLines = cleared > 0;
     locks.push({ frame, piece: piece.type, cells, cleared, spin, allclear: sawAllclear });
     provSnaps.push(prov.map(r => [...r]));
     boards.push(board);
