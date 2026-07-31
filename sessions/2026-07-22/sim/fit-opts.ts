@@ -9,6 +9,7 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
+import { matchesIgeY } from './ige-y-oracle.ts';
 const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
 
 type Case = { ev:any[]; gin:any[]; truth:any[]; handling:any; seed:number; frames:number; placed:number };
@@ -25,7 +26,7 @@ for (const f of readdirSync(DIR).filter(x=>x.endsWith('.ttrm')).sort()) {
           .map((e:any)=>({frame:e.frame, amt:e.data.data.amt, x:e.data.data.x, size:e.data.data.size})),
         truth: other.rp.events.filter((e:any)=>e.type==='ige'&&e.data.type==='interaction'
           && e.data.data?.type==='garbage' && e.data.data.gameid===me.gameid)
-          .map((e:any)=>({frame:e.data.data.frame??e.frame, amt:e.data.data.amt}))
+          .map((e:any)=>({frame:e.data.data.frame??e.frame, amt:e.data.data.amt, y:e.data.data.y}))
           .sort((a:any,b:any)=>a.frame-b.frame),
         handling: me.rp.options.handling, seed: me.rp.options.seed,
         frames: me.rp.frames, placed: me.rp.results.stats.piecesplaced });
@@ -36,9 +37,14 @@ const score = (o:any) => {
   for (const c of cases) {
     const r = simulate(c.ev, c.gin, c.handling, c.seed, c.frames, DEFAULT_TABLE, o);
     const mine = r.records.filter(x=>x.sent>0);
+    // STRICT gate: frame, amount AND board row (ige y) must all agree. The loose gate
+    // rewards a wrong board that happens to send the same number at the same time.
     let vf=-1;
     for (let i=0;i<Math.min(mine.length,c.truth.length);i++) {
-      if (Math.abs(mine[i]!.frame-c.truth[i]!.frame)<=25 && mine[i]!.sent===c.truth[i]!.amt) vf=mine[i]!.frame; else break;
+      const a=mine[i]!, b=c.truth[i]!;
+      if (Math.abs(a.frame-b.frame)>25 || a.sent!==b.amt) break;
+      if (a.lines>0 && !matchesIgeY(a.clearedRows, a.lines, b.y)) break;
+      vf=a.frame;
     }
     let vIdx=-1; for (let i=0;i<r.locks.length;i++) if (r.locks[i]!.frame<=vf) vIdx=i;
     ver += vIdx+1; real += c.placed;

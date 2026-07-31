@@ -59,6 +59,7 @@ export interface ClearRecord {
   attack: number; sent: number; cancelled: number; b2b: number; combo: number;
   cells: { col: number; row: number }[];      // where the piece locked
   garbageCleared: number;
+  clearedRows: number[];   // pre-clear row indices that were full (bottom-most last)
 }
 export interface SimResult {
   lines: number; placed: number; holds: number;
@@ -191,9 +192,13 @@ export function simulate(
 
     // find + clear full rows
     let cleared = 0, garbageRows = 0;
+    // Scanning bottom-up and splicing keeps `row` in ORIGINAL coordinates: splice(row,1)
+    // only shifts rows BELOW row, which this loop has already visited.
+    const clearedRows: number[] = [];
     for (let row = H - 1; row >= 0; row--) {
       if (b[row]!.every(c => c !== null)) {
         if (b[row]!.some(c => c === GARBAGE)) garbageRows++;
+        clearedRows.push(row);
         b.splice(row, 1); prov.splice(row, 1); cleared++;
       }
     }
@@ -260,7 +265,7 @@ export function simulate(
         }
         sentTotal += remaining;
         records.push({ frame, piece: piece.type, lines: cleared, spin, attack: amount, sent: remaining,
-          cancelled: amount - remaining, b2b, combo, cells, garbageCleared: garbageRows });
+          cancelled: amount - remaining, b2b, combo, cells, garbageCleared: garbageRows, clearedRows });
       };
       emit(atk);
       if (bonus > 0) emit(bonus);
