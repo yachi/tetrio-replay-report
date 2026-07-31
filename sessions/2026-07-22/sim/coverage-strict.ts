@@ -11,6 +11,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
 const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+
+/** frame of the interaction_confirm matching a queued interaction (same cid+iid) */
+const CONFIRM = (rp:any, cid:number, iid:number): number|undefined => {
+  const c = rp.events.find((e:any)=>e.type==='ige' && e.data.type==='interaction_confirm'
+    && e.data.data?.type==='garbage' && e.data.data.cid===cid && e.data.data.iid===iid);
+  return c ? c.frame : undefined;
+};
+
 const base = {garbagespeed:30, garbagecap:8, locktime:60, gravity:0.0167, sdfMode:'abs' as const,
               insertMode:'onPlace' as const, cancelMode:'all' as const, acEmit:'separate' as const,
               blockout:'shiftup' as const, kickset:'SRS+' as const};
@@ -26,7 +34,8 @@ for (const f of readdirSync(DIR).filter(x=>x.endsWith('.ttrm')).sort()) {
         ev: me.rp.events.filter((e:any)=>e.type==='keydown'||e.type==='keyup')
           .map((e:any)=>({frame:e.frame, sub:e.data.subframe??0, type:e.type, key:e.data.key})),
         gin: me.rp.events.filter((e:any)=>e.type==='ige'&&e.data.type==='interaction'&&e.data.data?.type==='garbage')
-          .map((e:any)=>({frame:e.frame, amt:e.data.data.amt, x:e.data.data.x, size:e.data.data.size})),
+          .map((e:any)=>({frame:e.frame, amt:e.data.data.amt, x:e.data.data.x, size:e.data.data.size,
+            confirmFrame: CONFIRM(me.rp ?? rp, e.data.data.cid, e.data.data.iid)})),
         truth: other.rp.events.filter((e:any)=>e.type==='ige'&&e.data.type==='interaction'
           && e.data.data?.type==='garbage' && e.data.data.gameid===me.gameid)
           .map((e:any)=>({frame:e.data.data.frame??e.frame, amt:e.data.data.amt, y:e.data.data.y}))
@@ -66,3 +75,13 @@ run('subframe', {subframe:true});
 run('subframe locktime30', {subframe:true, locktime:30});
 run('subframe SRS', {subframe:true, kickset:'SRS'});
 run('subframe strictBlock', {subframe:true, blockout:'strict'});
+// The garbage-total test (triage-garbage-totals.ts, fixed cohort) says cancellation
+// should not touch garbage that has already landed — only what is still in transit.
+run('+cancel inTransit', {subframe:true, cancelMode:'inTransit'});
+run('+insert immediate', {subframe:true, insertMode:'immediate'});
+run('+inTransit +immediate', {subframe:true, cancelMode:'inTransit', insertMode:'immediate'});
+// triangle rewrites a queued entry's frame on interaction_confirm, so the confirm event is
+// the real arrival time; the interaction is only the provisional announcement.
+run('readyFrom=confirm', {subframe:true, readyFrom:'confirm'});
+run('confirm speed0', {subframe:true, readyFrom:'confirm', garbagespeed:0});
+run('confirm speed30', {subframe:true, readyFrom:'confirm', garbagespeed:30});

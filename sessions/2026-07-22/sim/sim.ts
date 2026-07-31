@@ -52,7 +52,12 @@ export const DEFAULT_TABLE: AttackTable = {
 
 export interface Handling { das: number; arr: number; sdf: number; dcd: number }
 export interface InEvent { frame: number; sub: number; type: string; key?: string }
-export interface InGarbage { frame: number; amt: number; x: number; size: number }
+export interface InGarbage {
+  frame: number; amt: number; x: number; size: number;
+  /** frame of the matching interaction_confirm, if any (halp1/triangle's GarbageQueue.confirm
+   *  rewrites the queued entry's frame on confirmation, so this is the real arrival time) */
+  confirmFrame?: number;
+}
 
 export interface ClearRecord {
   frame: number; piece: PieceType; lines: number; spin: 'none' | 'mini' | 'full';
@@ -103,7 +108,7 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm' },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -310,7 +315,10 @@ export function simulate(
   for (let f = 0; f <= endFrame && !topout; f++) {
     while (gi < gq.length && gq[gi]!.frame <= f) {
       const g = gq[gi++]!;
-      pending.push({ ready: g.frame + opts.garbagespeed, amt: g.amt, x: g.x, size: g.size });
+      // triangle's GarbageQueue.confirm(cid, gameid, frame) overwrites the queued entry's
+      // frame when the server confirms it, so 'confirm' uses that instead of arrival.
+      const arriveAt = (opts.readyFrom === 'confirm' && g.confirmFrame != null) ? g.confirmFrame : g.frame;
+      pending.push({ ready: arriveAt + opts.garbagespeed, amt: g.amt, x: g.x, size: g.size });
     }
     if (opts.insertMode === 'immediate') {
       let budget = opts.garbagecap;
