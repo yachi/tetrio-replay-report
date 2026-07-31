@@ -15,9 +15,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
 const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
-const opts = {garbagespeed:30, garbagecap:8, locktime:30, gravity:0.02, sdfMode:'abs' as const,
+const opts = {garbagespeed:30, garbagecap:8, locktime:60, gravity:0.0167, sdfMode:'abs' as const,
               insertMode:'onPlace' as const, cancelMode:'all' as const, acEmit:'separate' as const,
-              subframe: process.env.SUBFRAME !== '0'};
+              subframe: process.env.SUBFRAME !== '0', blockout:'shiftup' as const, kickset:'SRS+' as const};
 
 type R = { file:string; user:string; firstBadIdx:number; badFrame:number; simAmt:number; truthAmt:number;
            reason:string; insertFrame:number; locksBetween:number; nAttacks:number; nTruth:number };
@@ -48,7 +48,12 @@ for (const f of readdirSync(DIR).filter(x=>x.endsWith('.ttrm')).sort()) {
           // Confounder: if the sim is already dead, EVERY later truth attack is "missing".
           // That is death, not a divergence — label it so it cannot masquerade as one.
           const lastLock = r.locks.length ? r.locks[r.locks.length-1]!.frame : -1;
-          bad=i; reason = (r.topout && b!.frame > lastLock) ? 'sim already dead' : 'sim missing attack';
+          // Second confounder: "no attack" can mean "cleared nothing" OR "cleared but the
+          // whole attack was cancelled by pending garbage". Those are different bugs —
+          // a board defect vs a cancellation-model defect — so separate them here.
+          const nearby = r.records.some(x => Math.abs(x.frame - b!.frame) <= 25 && x.lines > 0);
+          bad=i; reason = (r.topout && b!.frame > lastLock) ? 'sim already dead'
+                        : nearby ? 'sim cleared but cancelled to 0' : 'sim cleared nothing';
           badFrame=b!.frame; truthAmt=b!.amt; break;
         }
         if (!b) { bad=i; reason='sim spurious attack'; badFrame=a.frame; simAmt=a.sent; break; }

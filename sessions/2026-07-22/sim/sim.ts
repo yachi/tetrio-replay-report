@@ -9,7 +9,7 @@
 import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
-import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop } from './vendor/core/srs.ts';
+import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop, setKickset } from './vendor/core/srs.ts';
 
 export const H = 40;                  // total rows (20 buffer + 20 visible)
 export const SPAWN_ROW = 18;
@@ -102,8 +102,9 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean },
 ): SimResult {
+  setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
   let qi = 0;
   let board: Board = emptyBoard();
@@ -225,6 +226,10 @@ export function simulate(
       } else b2b = -1;
       // observed: combo is a MULTIPLIER, not additive. (4+1)*1.25 = 6.25 -> 6
       if (combo > 0) atk = Math.floor(atk * (1 + 0.25 * combo));
+      // Special bonus: a flat +1 when a spin or a quad CLEARS GARBAGE. In halp1/triangle this
+      // is `gSpecialBonus`, added AFTER the garbage multiplier
+      // (`garbage.garbage * multiplier + gSpecialBonus`), so it is not scaled by combo or b2b.
+      if (opts.specialBonus && garbageRows > 0 && (spin !== 'none' || cleared >= 4)) atk += 1;
       // All-clear bonus. MEASURED (pc-oracle.ts, 158/158 rounds): TETR.IO does NOT fold this into
       // the line-clear attack — it emits a SECOND ige event of amount exactly 10 at the same
       // frame, after the base attack. Folding them into one value (1+10=11) is why the verified
@@ -357,6 +362,9 @@ export function simulate(
         }
       } else if (e.type === 'keyup') {
         if (e.key) held.delete(e.key);
+        // Releasing one direction while the other is still held would need to RESUME that
+        // other direction rather than stop. Not modelled deliberately: measured 0 such
+        // releases in 18,424 across all 158 player-rounds, so the branch would be untestable.
         if (e.key === 'moveLeft' && dir === -1) dir = 0;
         if (e.key === 'moveRight' && dir === 1) dir = 0;
         if (e.key === 'softDrop') softHeld = false;

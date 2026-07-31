@@ -57,6 +57,28 @@ const I_KICKS: KickTable = {
   '0->3': [[0, 0], [-1, 0], [+2, 0], [-1, -2], [+2, +1]],
 };
 
+/**
+ * LOCAL ADDITION (not from td-opener-trainer): TETR.IO ships "SRS+", which differs from
+ * vanilla SRS ONLY for the I piece and ONLY in the ORDER of the kick candidates. Order is
+ * load-bearing — the first legal candidate wins, so a reordering lands the piece somewhere
+ * else whenever more than one candidate is legal. Transcribed from halp1/triangle
+ * src/engine/utils/kicks/data.ts ("SRS+".i_kicks); same [dx, dy] row-down convention.
+ * 1->2, 2->3 and 3->0 are identical in both tables and are repeated here verbatim.
+ */
+const I_KICKS_PLUS: KickTable = {
+  '0->1': [[0, 0], [+1, 0], [-2, 0], [-2, +1], [+1, -2]],
+  '1->0': [[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]],
+  '1->2': [[0, 0], [-1, 0], [+2, 0], [-1, -2], [+2, +1]],
+  '2->1': [[0, 0], [-2, 0], [+1, 0], [-2, -1], [+1, +2]],
+  '2->3': [[0, 0], [+2, 0], [-1, 0], [+2, -1], [-1, +2]],
+  '3->2': [[0, 0], [+1, 0], [-2, 0], [+1, -2], [-2, +1]],
+  '3->0': [[0, 0], [+1, 0], [-2, 0], [+1, +2], [-2, -1]],
+  '0->3': [[0, 0], [-1, 0], [+2, 0], [+2, +1], [-1, -2]],
+};
+
+let kicksetName: 'SRS' | 'SRS+' = 'SRS';
+export function setKickset(k: 'SRS' | 'SRS+') { kicksetName = k; }
+
 const O_KICKS: KickTable = {
   '0->1': [[0, 0]],
   '1->0': [[0, 0]],
@@ -69,7 +91,7 @@ const O_KICKS: KickTable = {
 };
 
 function getKickTable(type: PieceType): KickTable {
-  if (type === 'I') return I_KICKS;
+  if (type === 'I') return kicksetName === 'SRS+' ? I_KICKS_PLUS : I_KICKS;
   if (type === 'O') return O_KICKS;
   return JLSZT_KICKS;
 }
