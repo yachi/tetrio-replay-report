@@ -10,6 +10,7 @@ import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop, setKickset } from './vendor/core/srs.ts';
+import { GarbageQueue } from './garbage-queue.ts';
 
 export const H = 40;                  // total rows (20 buffer + 20 visible)
 export const SPAWN_ROW = 18;
@@ -57,6 +58,9 @@ export interface InGarbage {
   /** frame of the matching interaction_confirm, if any (halp1/triangle's GarbageQueue.confirm
    *  rewrites the queued entry's frame on confirmation, so this is the real arrival time) */
   confirmFrame?: number;
+  /** iid of the interaction (triangle stores this as the queue entry's cid) */
+  cid?: number;
+  gameid?: number;
 }
 
 export interface ClearRecord {
@@ -108,7 +112,7 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference' },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -133,6 +137,25 @@ export function simulate(
 
   // pending garbage queue: entries become insertable at frame + garbagespeed
   const pending: { ready: number; amt: number; x: number; size: number }[] = [];
+  // Faithful port of the reference queue (confirm-gated insertion, cancellable while
+  // unconfirmed, frame-sorted). Selected with opts.queue='reference'.
+  const useRefQ = opts.queue === 'reference';
+  const refQ = new GarbageQueue(opts.garbagespeed);
+  const qEvents: { frame: number; kind: 'receive'|'confirm'; g: InGarbage }[] = [];
+  if (useRefQ) {
+    for (const g of garbageIn) {
+      qEvents.push({ frame: g.frame, kind: 'receive', g });
+      if (g.confirmFrame != null) qEvents.push({ frame: g.confirmFrame, kind: 'confirm', g });
+    }
+    qEvents.sort((a, b) => a.frame - b.frame);
+  }
+  let qi2 = 0;
+  const drainRefQ = (frame: number, hard: boolean) => {
+    for (const t of refQ.tank(frame, opts.garbagecap, hard)) {
+      insertGarbage(t.amount, t.x, t.size);
+      garbageEvents.push({ frame, amt: t.amount, lockIndex: locks.length });
+    }
+  };
   const gq = [...garbageIn].sort((a, b) => a.frame - b.frame);
   let gi = 0;
 
@@ -260,6 +283,11 @@ export function simulate(
       const emit = (amount: number) => {
         attackTotal += amount;
         let remaining = amount;
+        if (useRefQ) {
+          // cancel() ignores frame on purpose: unconfirmed garbage is un-insertable but
+          // still cancellable, which is the asymmetry the scalar knobs could not express
+          remaining = refQ.cancel(amount);
+        } else
         for (let pi = 0; pi < pending.length && remaining > 0; ) {
           const p0 = pending[pi]!;
           // with passthrough disabled, only garbage still IN TRANSIT can be cancelled
@@ -285,6 +313,8 @@ export function simulate(
       }
     } else {
       combo = -1;
+      if (useRefQ) { drainRefQ(frame, true); }
+      else {
       // no clear → pending garbage rises, up to the cap
       let budget = opts.garbagecap;
       while (budget > 0 && pending.length > 0 && pending[0]!.ready <= frame) {
@@ -294,6 +324,7 @@ export function simulate(
       garbageEvents.push({ frame, amt: take, lockIndex: locks.length });
         p0.amt -= take; budget -= take;
         if (p0.amt === 0) pending.shift();
+      }
       }
     }
     lastClearWasLines = cleared > 0;
@@ -313,6 +344,15 @@ export function simulate(
   const evs = [...events].sort((a, b) => a.frame - b.frame || a.sub - b.sub);
   let ei = 0;
   for (let f = 0; f <= endFrame && !topout; f++) {
+    if (useRefQ) {
+      while (qi2 < qEvents.length && qEvents[qi2]!.frame <= f) {
+        const q = qEvents[qi2++]!;
+        if (q.kind === 'receive')
+          refQ.receive({ amount: q.g.amt, size: q.g.size, x: q.g.x,
+                         cid: q.g.cid ?? 0, gameid: q.g.gameid ?? 0 });
+        else refQ.confirm(q.g.cid ?? 0, q.g.gameid ?? 0, q.frame);
+      }
+    }
     while (gi < gq.length && gq[gi]!.frame <= f) {
       const g = gq[gi++]!;
       // triangle's GarbageQueue.confirm(cid, gameid, frame) overwrites the queued entry's

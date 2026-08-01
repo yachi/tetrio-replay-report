@@ -46,7 +46,12 @@ export function loadCases(dir = process.env.REPLAY_DIR ?? `${import.meta.dir}/..
           ev: me.rp.events.filter((e: any) => e.type === 'keydown' || e.type === 'keyup')
             .map((e: any) => ({ frame: e.frame, sub: e.data.subframe ?? 0, type: e.type, key: e.data.key })),
           gin: me.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction' && e.data.data?.type === 'garbage')
-            .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size })),
+            .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size,
+              cid: e.data.data.iid, gameid: e.data.data.gameid,
+              // the reference queue times insertion from the CONFIRM event, not the arrival
+              confirmFrame: me.rp.events.find((k: any) => k.type === 'ige'
+                && k.data.type === 'interaction_confirm' && k.data.data?.type === 'garbage'
+                && k.data.data.iid === e.data.data.iid && k.data.data.gameid === e.data.data.gameid)?.frame })),
           truth: other.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction'
             && e.data.data?.type === 'garbage' && e.data.data.gameid === me.gameid)
             .map((e: any) => ({ frame: e.data.data.frame ?? e.frame, amt: e.data.data.amt, y: e.data.data.y }))
@@ -68,14 +73,31 @@ export function runCase(c: Case, extra: any = {}): SimResult {
  * Index of the last lock on a board that provably matches the real game (-1 if none).
  * With strictRows, an attack must also agree with the ige row oracle.
  */
-export function verifiedIndex(r: SimResult, truth: Case['truth'], strictRows = true): number {
+export type Gate =
+  | 'frame+amount'        // original: attack timing and value
+  | 'frame+amount+row'    // + the ige row oracle
+  | 'frame+row';          // BOARD-only: drop the attack value
+
+/**
+ * Index of the last lock on a board that provably matches the real game (-1 if none).
+ *
+ * Gate choice matters and is not cosmetic. The forecast metric needs the BOARD to be right;
+ * the attack VALUE is a downstream function of the board AND the attack table, so truncating
+ * the prefix at a table error throws away board that is actually correct. 'frame+row' keeps
+ * the two board constraints (when the clear happened, and where on the board) and drops the
+ * one that mixes in a separate model. It is not weaker in the board sense — it swaps a
+ * board+table constraint for a purely positional one.
+ */
+export function verifiedIndex(r: SimResult, truth: Case['truth'], gate: Gate | boolean = 'frame+amount+row'): number {
+  const g: Gate = gate === true ? 'frame+amount+row' : gate === false ? 'frame+amount' : gate;
   const mine = r.records.filter(x => x.sent > 0);
   let vf = -1;
   for (let i = 0; i < Math.min(mine.length, truth.length); i++) {
     const a = mine[i]!, b = truth[i]!;
-    if (Math.abs(a.frame - b.frame) > 25 || a.sent !== b.amt) break;
+    if (Math.abs(a.frame - b.frame) > 25) break;
+    if (g !== 'frame+row' && a.sent !== b.amt) break;
     // the all-clear bonus is its own event and carries no clear of its own, so no row to check
-    if (strictRows && a.lines > 0 && !matchesIgeY(a.clearedRows, a.lines, b.y)) break;
+    if (g !== 'frame+amount' && a.lines > 0 && !matchesIgeY(a.clearedRows, a.lines, b.y)) break;
     vf = a.frame;
   }
   let vIdx = -1;
