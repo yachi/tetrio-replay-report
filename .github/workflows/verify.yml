@@ -41,6 +41,7 @@ jobs:
           - sessions/2026-07-24/report
           - sessions/2026-07-24/proof
           - sessions/2026-07-28/report
+          - sessions/2026-08-01/report
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -84,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        session: ['2026-07-22', '2026-07-24', '2026-07-28']
+        session: ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -233,7 +234,7 @@ jobs:
         run: |
           set -euo pipefail
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report; do
+          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report; do
             ts=$(ls "$d"/extract2*.ts | head -1)
             f2=$(ls "$d"/facts2*.json | head -1)
             before=$(sha256sum "$f2" | cut -d' ' -f1)

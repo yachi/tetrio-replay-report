@@ -3,9 +3,9 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Three sessions so far
-(2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2),
-193 rounds, 118 hand-written + 224 generated claims.
+factual sentence is badge-linked to a Dafny-verified lemma. Four sessions so far
+(2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
+2026-08-01: yachi 4:3), 246 rounds, 132 hand-written + 296 generated claims.
 
 ## The one invariant
 
@@ -152,6 +152,12 @@ equivalent marker pair.
 - Kills equal round wins by construction in first-to-death 1v1 — never presented as a second
   independent signal.
 - Player order in `users` / `leaderboard` is **not stable across files**; key by username.
+- A match's `index` is its **position in the session**, not the export number in the
+  filename — the filename stays in `file`. The two agreed by accident until 2026-08-01,
+  whose exports are numbered 2-8: claims have always said `m{position}` while the report
+  card printed `第 {index} 場`, so a badge proving something about m1 would have sat on a
+  card labelled 第 2 場. Both extractors renumber after sorting; every earlier session's
+  `facts.json` is byte-identical under the change, which is what makes it safe.
 
 ## What the data actually says (measured, not asserted)
 
@@ -165,10 +171,15 @@ Paired AUC over 129 rounds — how often the round's winner held the higher valu
 2026-07-28 (64 rounds) reproduces all of it independently: VS 100% · APP 96.9 · APM 95.3 ·
 攻 93.8 · DS 75.0 · 食 12.5 · 射埋 14.1 — and **KPP 42.2**, below chance for a third time.
 
-Coaching conclusions, cross-validated over three sessions: **APP is the lever** (17–24% higher
-in rounds won, both players, every session); **DS matters** in 5 of 6 player-sessions;
-**KPP is flat** (0–2%) — reported as a negative result. When adding a column or a claim, run
-`pipeline/claims/equiv.py` or the AUC probe rather than assuming a stat is informative.
+2026-08-01 (53 rounds) is the fourth independent reproduction: VS 100% · 攻 90.6 · APM 90.6 ·
+APP 83.0 · 食/射埋 15.1 — **DS 84.0, the highest of any session** (66.5 · 60.0 · 75.0 · 84.0
+across the four) — and **KPP 53.8**, i.e. chance, for a fourth time.
+
+Coaching conclusions, cross-validated over four sessions: **APP is the lever** (16–25% higher
+in rounds won, both players, 8 of 8 player-sessions); **DS matters** in 7 of 8 player-sessions
+(only 07-24 pinglamb is negative); **KPP is flat** (0–2%) — reported as a negative result. When
+adding a column or a claim, run `pipeline/claims/equiv.py` or the AUC probe rather than
+assuming a stat is informative.
 
 **`equiv.py` reports 100% for 07-28 and the number is an artefact** — read it before quoting
 it. It tries every *single*-value mutation, and a windowed claim shares its rounds with a
@@ -182,6 +193,17 @@ the first two matches and lost six straight, but his rate did not collapse — i
 two players' APP were level (0.62305 vs 0.62216, yachi ahead by 0.0009) and from match 3 they
 separated, pinglamb +4.99% and yachi −4.92%. Both totals are nearly equal (attack 3264 vs 3249)
 because yachi threw 378 more pieces to get there. That is what `sum_round_range` exists for.
+
+08-01 asks the next question down: **APP decides a round, and it does not decide a night.**
+pinglamb's APP was higher in all seven matches and in both regimes — his won rounds beat
+yachi's won rounds, his lost rounds beat yachi's lost rounds — yet he lost the series 3:4. The
+totals land on top of each other (attack 3394 vs 3426, in-game score 1087345 vs 1087921, 0.05%
+apart) because yachi bought the 7% efficiency gap back with 326 extra pieces at a higher PPS
+in all seven matches. Two routes, one destination; the night was then decided by *which* rounds
+fell where — the seven matches alternate winners perfectly, so it came down to the last one.
+Same window operator, per-match windows this time: `sum_round_range(pl, f, mi, mi+1)` is how
+"in all seven matches" gets proved match by match instead of asserted from a session sum.
+The visible cost of the volume route is in the death tally: 6 of the 8 topouts are yachi's.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

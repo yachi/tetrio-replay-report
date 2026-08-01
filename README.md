@@ -13,8 +13,9 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-07-22](sessions/2026-07-22) | yachi 6 : 4 pinglamb | 79 over 10 matches | 54 |
 | [2026-07-24](sessions/2026-07-24) | yachi 3 : 4 pinglamb | 50 over 7 matches | 52 |
 | [2026-07-28](sessions/2026-07-28) | yachi 2 : 6 pinglamb | 64 over 8 matches | 83 |
+| [2026-08-01](sessions/2026-08-01) | yachi 4 : 3 pinglamb | 53 over 7 matches | 86 |
 
-That session also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
+2026-07-24 also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
 independent 20-claim proof layer in [`sessions/2026-07-24/proof`](sessions/2026-07-24/proof).
 Every fact in it is already covered by the session's full report, so it is kept as a
 cross-check artefact — still verified by CI — rather than published as a second report.
