@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import appendix, chart_data, hero, matches, records, region
+from pipeline import appendix, chart_data, forecast_section, hero, matches, records, region
 
 
 def chart_section(ctx):
@@ -52,6 +52,14 @@ def appendix_section(ctx):
     return appendix.section(ctx["facts"], ctx["report_dir"])
 
 
+def forecast_sec(ctx):
+    # Sourced from sim/forecast-facts.json, NOT facts.json — see the module docstring.
+    # Quarantined from the claims pipeline on purpose: one simulator, no second
+    # independent implementation, so the dual-extractor trust argument does not cover it.
+    root = ctx.get("repo_root") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return forecast_section.section(forecast_section.load(root))
+
+
 def claims_island(ctx):
     return appendix.island(ctx["report_dir"])
 
@@ -67,6 +75,9 @@ SECTIONS = [
     ("hero", '<section id="matches">', hero_section, None),
     ("records", '<section id="coaching">', records_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),
+    # after the proof appendix, so a reader meets the trust chain before the thing
+    # that is explicitly outside it
+    ("forecast", '<footer class="report-footer">', forecast_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),
     ("claims-data", '<footer class="report-footer">', claims_island,
