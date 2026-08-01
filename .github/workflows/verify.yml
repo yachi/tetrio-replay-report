@@ -164,6 +164,15 @@ jobs:
       - name: Check no generated CSS reaches outside its region
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
 
+      # An unresolved badge is indistinguishable from a pending one: it renders
+      # ⏳ G014 pointing at an anchor that does not exist. Both ways that has
+      # happened are checked — a cited id the island does not carry, and
+      # shorthand the page's own expander regex fails to match (07-28 shipped
+      # `[CR]\d{3}`, so every <b>G0xx</b> in match copy stayed literal text and
+      # only a screenshot caught it).
+      - name: Check every badge citation resolves
+        run: python3 -m pipeline.check_badge_links "sessions/${{ matrix.session }}/report"
+
       # The forecast section is simulator-derived and sits OUTSIDE the proof
       # chain, so no lemma covers its numbers. This re-derives them from
       # sim/forecast-facts.json, and fails if the section ever stops declaring

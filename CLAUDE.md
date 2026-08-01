@@ -54,6 +54,7 @@ python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt
 python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
+python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 ```
 
@@ -275,7 +276,11 @@ Two holes opened the moment the qualifier was written, and both are now gated:
   last table's indices win, putting every lookup past the end of a row.
 - Scores render in **player order** (`players[0] : players[1]`), never champion-first — that
   reversed the meaning on the site index once.
-- **An unresolved badge is indistinguishable from a pending one.** It renders `⏳ G014` linked
+- **An unresolved badge is indistinguishable from a pending one.** `check_badge_links.py`
+  is now the gate, and it reads `expandShorthandBadges`' regex out of the report rather
+  than assuming one, because the failure was that regex being narrower than the prose.
+  Both mutants are killed: a typo'd `data-claim`, and the expander narrowed back to
+  `[CR]\d{3}`. It renders `⏳ G014` linked
   to an anchor that does not exist, which reads as "still being proved". Two ways that
   happened on 07-28, the first session whose prose cites generated claims: the claims island
   listed only the hand ledgers, and `expandShorthandBadges` matched `[CR]\d{3}` so `<b>G004</b>`
