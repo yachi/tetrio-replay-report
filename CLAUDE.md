@@ -5,7 +5,7 @@ Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://y
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
 factual sentence is badge-linked to a Dafny-verified lemma. Four sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
-2026-08-01: yachi 4:3), 246 rounds, 132 hand-written + 296 generated claims.
+2026-08-01: yachi 4:3), 246 rounds, 132 hand-written + 304 generated claims.
 
 ## The one invariant
 
@@ -24,6 +24,16 @@ Corollaries that are gates, not preferences:
 - a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant
 - every countable statement in a report needs a claim id whose predicate covers *that*
   number — not a weaker one nearby
+- a **rate** record (APM, VS) is only over rounds of `generators.QUALIFYING_MS` or more;
+  **count** records (lines, spike, combo, B2B, T-spin) are over every round. See
+  「速率紀錄要有局長下限」 below — the rule is measured, not a preference
+
+## Relevant skills / tools
+
+R 4.6.1 with `jsonlite` is installed; `analysis/rate_records.R` is the worked example of
+using it against `sessions/*/report/facts.json`. Reach for it before changing a metric's
+definition — the qualifier below came out of it and the argument for the threshold is a
+regression, not an opinion.
 
 ## Commands
 
@@ -43,6 +53,8 @@ python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exh
 python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt2
 python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
+python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
+Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 ```
 
 ## Three backends, one spec
@@ -204,6 +216,41 @@ fell where — the seven matches alternate winners perfectly, so it came down to
 Same window operator, per-match windows this time: `sum_round_range(pl, f, mi, mi+1)` is how
 "in all seven matches" gets proved match by match instead of asserted from a session sum.
 The visible cost of the volume route is in the death tally: 6 of the 8 topouts are yachi's.
+
+## 速率紀錄要有局長下限 — and the two holes cutting one opens
+
+For three sessions the APM/VS records were the plain argmax and were **all** short-round
+artifacts. A rate has the round's length in its denominator, so over a short round it is a
+sample mean over a small n. Measured in `analysis/rate_records.R` over all 492 player-rounds:
+regressing log SD on log t gives **−0.616 for VS and −0.697 for APM**, both with −0.5 inside
+the 95% CI and slope 0 rejected (p 0.001 / 0.0003), while the **mean stays flat** (108 → 118
+across the bins). Short rounds are not better play, only noisier. All 12 unqualified records
+(3 metrics × 4 sessions) came from the shortest quartile — p = 6e-08 — and 07-22's headline
+約262.6 was a 15.6 s round, 45% above that session's qualified peak.
+
+`QUALIFYING_MS = 60_000` is where definition and data agree: APM and VS are per-*minute*, and
+each session's record names the same round for every cut-off from 50 s to 70 s, so nothing
+rests on the number. Counts are deliberately unqualified — fitting more lines into a short
+round is harder, not easier.
+
+Two holes opened the moment the qualifier was written, and both are now gated:
+
+1. **The record's `count_rounds(... > v) == 0` conjuncts stopped ranging over short rounds**,
+   so their APM/VS constants lost their upper bound — the only remaining constraint,
+   "the winner had the higher VS", survives every increase. `mutation_test.sh` caught it
+   with a 14-of-4557 random sample, i.e. by luck. `unqualified_rate_peaks` fixes it by
+   keeping the unqualified maximum as its own claim (worded as the burst it is), and
+   `pipeline/check_rate_coverage.py` is the deterministic gate: every short round, both
+   players, both fields, must be falsifiable by *raising*. Checking "some perturbation is
+   caught" is too weak (the winner-gt-loser claim catches every decrease) and checking both
+   directions is too strong (a round loser's VS has never been pinned from below, and
+   inventing a claim to fix that would be writing for the checker, not the reader).
+2. **`==` had never appeared in a Cond**, so nobody had noticed `smt.py` passed the operator
+   through verbatim — SMT-LIB spells equality `=`, and both solvers answered
+   `unknown constant ==` rather than a verdict. Only `check_smt` caught it; Python and Dafny
+   accept `==` happily. `smt.py` now maps operators explicitly and dies on an unknown one,
+   and `spec.py`'s `c_field`/`c_dur` reject an unsupported operator at construction, so the
+   failure is a build error rather than a solver error.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

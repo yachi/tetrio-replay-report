@@ -21,6 +21,7 @@ hue. No new colours are introduced: the validated yachi/pinglamb pair is reused.
 import html
 
 from pipeline import claim_cards, fmt
+from pipeline.claims import generators
 
 # (family, label, unit, how to format the proved integer)
 #
@@ -144,6 +145,17 @@ def build(facts, report_dir):
             '      </div>',
         ]
     out.append('    </div>')
+    # Why two kinds of record live in one grid. Without this the reader sees a
+    # 打足 60 秒 qualifier on some tiles and not others and has to guess whether
+    # it is a rule or an oversight.
+    out.append(f'    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計'
+               f'打足 {generators.QUALIFYING_MS // 1000} 秒嘅局。速率係「攻擊 ÷ 時間」，'
+               '局數愈短分母愈細，個數就愈飄——四個 session 夾埋 492 個 player-round 度'
+               '量過：VS 嘅標準差由 58.2（約 21 秒嗰批）跌到 15.2（約 144 秒嗰批），'
+               '但平均數企喺原地，即係短局唔係打得好啲，係量得唔準啲。'
+               '未設限之前，四個 session 全部 12 項速率紀錄都落喺最短嗰四分一嘅局度。'
+               '<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>'
+               '——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>')
     if skipped:
         out.append('    <p class="sr-foot">另外有 '
                    f'{len(skipped)} 條紀錄類 claim（{", ".join(html.escape(i) for i in skipped)}）'

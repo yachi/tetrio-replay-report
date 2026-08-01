@@ -540,13 +540,13 @@
     <div class="stat-grid">
       <div class="stat-card accent-y">
         <div class="k">13秒完場，一條垃圾都冇食</div>
-        <div class="v mono">104.2 apm</div>
-        <div class="d">第1場第4局，yachi 個 APM 飆到約 104.2，係全場單局最高<span class="badge" data-claim="G014"></span>；呢一局亦都係成晚最短嘅一局，約 13 秒就收工<span class="badge" data-claim="G022"></span>，而且佢由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局<span class="badge" data-claim="G057"></span>。三項全場之最，同一局。</div>
+        <div class="v mono">13s</div>
+        <div class="d">第1場第4局，約 13 秒就收工，係成晚最短嘅一局<span class="badge" data-claim="G022"></span>，而且 yachi 由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局<span class="badge" data-claim="G057"></span>。佢嗰局個 APM 睇落爆錶，但 APM 係<strong>速率</strong>，分母得 13 秒，數字自然大——所以唔計入 APM 紀錄，詳情見下面嘅註。</div>
       </div>
       <div class="stat-card accent-p">
-        <div class="k">全場最激嘅一鋪</div>
-        <div class="v mono">209.9 vs</div>
-        <div class="d">第7場第7局，pinglamb 個 VS 去到約 209.9，係全場單局最高<span class="badge" data-claim="G015"></span>；兩邊夾埋約 349.7 嘅 VS 亦都係成晚最高嘅一局<span class="badge" data-claim="G060"></span>——兩個人喺同一局度同時開盡火。</div>
+        <div class="k">最激嘅一鋪（打足一分鐘計）</div>
+        <div class="v mono">157.2 vs</div>
+        <div class="d">第8場第8局：打足一分鐘以上嘅 23 局入面，yachi 呢一局個 VS 約 157.2 同 APM 約 78.6 都係最高<span class="badge" data-claim="G015"></span><span class="badge" data-claim="G014"></span>，兩邊夾埋約 286.9 亦都係最高<span class="badge" data-claim="G060"></span>——而且係決勝局，兩個人喺同一局度同時開盡火。</div>
       </div>
       <div class="stat-card accent-g">
         <div class="k">全場最長馬拉松</div>
@@ -621,16 +621,16 @@
     <div class="sr-grid">
       <div class="sr-tile">
         <div class="sr-label">單局最高 VS</div>
-        <div class="sr-value">約209.9</div>
-        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m7 第7局</div>
-        <p class="sr-note">全場最高單局 VS係 pinglamb 喺 m7 第 7 局打出嘅 約209.9，嗰局 pinglamb 生還</p>
+        <div class="sr-value">約157.2</div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m8 第8局</div>
+        <p class="sr-note">打足 60 秒以上嘅 23 局入面，最高單局 VS係 yachi 喺 m8 第 8 局打出嘅 約157.2，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G015 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
         <div class="sr-label">單局最高 APM</div>
-        <div class="sr-value">約104.2</div>
-        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m1 第4局</div>
-        <p class="sr-note">全場最高單局 APM係 yachi 喺 m1 第 4 局打出嘅 約104.2，嗰局 yachi 生還</p>
+        <div class="sr-value">約78.6</div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m8 第8局</div>
+        <p class="sr-note">打足 60 秒以上嘅 23 局入面，最高單局 APM係 yachi 喺 m8 第 8 局打出嘅 約78.6，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G014 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
@@ -683,6 +683,7 @@
         <div class="sr-cid">G017 · ✓ Dafny 已證</div>
       </div>
     </div>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——四個 session 夾埋 492 個 player-round 度量過：VS 嘅標準差由 58.2（約 21 秒嗰批）跌到 15.2（約 144 秒嗰批），但平均數企喺原地，即係短局唔係打得好啲，係量得唔準啲。未設限之前，四個 session 全部 12 項速率紀錄都落喺最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G023）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -5570,11 +5571,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
       <div class="chain">
         <div class="chain-step"><div class="n">1</div><div>數據由兩個獨立嘅 parser（extract.py 同 extract2.ts）各自由 8 個 replay 檔案（.ttrm）入面抽 facts，兩份輸出逐個欄位比對完全一致先算過關。</div></div>
-        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 83 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
+        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 85 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
         <div class="chain-step"><div class="n">3</div><div>仲會做 mutation test：刻意將條引理嘅 guard/前提拆走，睇下會唔會有 test 應聲斷——如果冧唔到，即係話條 guard 得個樣冇實際用，要補返。</div></div>
       </div>
-      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 83 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
-      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 83 / 83</div>
+      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 85 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
+      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 85 / 85</div>
     </div>
 
     <div class="scroll-x">
@@ -5682,16 +5683,16 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
           <tr id="claim-G014">
             <td class="id-cell">G014</td>
-            <td class="canto-cell">全場最高單局 APM係 yachi 喺 m1 第 4 局打出嘅 約104.2，嗰局 yachi 生還</td>
-            <td class="gloss-cell">session-max apm_x1000 is 104282 by yachi at m1r4</td>
-            <td class="lemma-cell">G014_session_max_apm_x1000_is_104282_by_yachi_at_m1r4</td>
+            <td class="canto-cell">打足 60 秒以上嘅 23 局入面，最高單局 APM係 yachi 喺 m8 第 8 局打出嘅 約78.6，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</td>
+            <td class="gloss-cell">session-max apm_x1000 among the 23 rounds lasting 60s or more is 78639 by yachi at m8r8</td>
+            <td class="lemma-cell">G014_session_max_apm_x1000_among_the_23_rounds_lasting_60s_or_more_is_78639</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G015">
             <td class="id-cell">G015</td>
-            <td class="canto-cell">全場最高單局 VS係 pinglamb 喺 m7 第 7 局打出嘅 約209.9，嗰局 pinglamb 生還</td>
-            <td class="gloss-cell">session-max vs_x1000 is 209951 by pinglamb at m7r7</td>
-            <td class="lemma-cell">G015_session_max_vs_x1000_is_209951_by_pinglamb_at_m7r7</td>
+            <td class="canto-cell">打足 60 秒以上嘅 23 局入面，最高單局 VS係 yachi 喺 m8 第 8 局打出嘅 約157.2，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</td>
+            <td class="gloss-cell">session-max vs_x1000 among the 23 rounds lasting 60s or more is 157278 by yachi at m8r8</td>
+            <td class="lemma-cell">G015_session_max_vs_x1000_among_the_23_rounds_lasting_60s_or_more_is_157278</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G016">
@@ -6004,9 +6005,9 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
           <tr id="claim-G060">
             <td class="id-cell">G060</td>
-            <td class="canto-cell">最癲嘅一局係 m7 第 7 局，兩邊 VS 加埋約 349.7（pinglamb 約 209.9 對 yachi 約 139.7）</td>
-            <td class="gloss-cell">highest combined VS is m7r7 at 349.7, won by pinglamb</td>
-            <td class="lemma-cell">G060_highest_combined_vs_is_m7r7_at_349_7_won_by_pinglamb</td>
+            <td class="canto-cell">打足 60 秒以上嘅局入面最癲嘅一局係 m8 第 8 局，兩邊 VS 加埋約 286.9（yachi 約 157.2 對 pinglamb 約 129.6）</td>
+            <td class="gloss-cell">highest combined VS among rounds of 60s or more is m8r8 at 286.9, won by yachi</td>
+            <td class="lemma-cell">G060_highest_combined_vs_among_rounds_of_60s_or_more_is_m8r8_at_286_9_won_b</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G061">
@@ -6084,6 +6085,20 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <td class="canto-cell">全 session 計每粒方塊清走幾多垃圾（DS）：pinglamb 高過 yachi，即係 pinglamb 花多啲方塊落喺守同清垃圾上面</td>
             <td class="gloss-cell">session downstack per piece: pinglamb higher than yachi</td>
             <td class="lemma-cell">G071_session_downstack_per_piece_pinglamb_higher_than_yachi</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G072">
+            <td class="id-cell">G072</td>
+            <td class="canto-cell">唔設任何局長下限嘅話，全場最高單局 APM係 yachi 喺 m1 第 4 局打出嘅 約104.2，但嗰局只打咗 13 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局</td>
+            <td class="gloss-cell">unqualified session peak apm_x1000 is 104282 by yachi at m1r4, a 13s round — not the record</td>
+            <td class="lemma-cell">G072_unqualified_session_peak_apm_x1000_is_104282_by_yachi_at_m1r4_a_13s_ro</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G073">
+            <td class="id-cell">G073</td>
+            <td class="canto-cell">唔設任何局長下限嘅話，全場最高單局 VS係 pinglamb 喺 m7 第 7 局打出嘅 約209.9，但嗰局只打咗 30 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局</td>
+            <td class="gloss-cell">unqualified session peak vs_x1000 is 209951 by pinglamb at m7r7, a 30s round — not the record</td>
+            <td class="lemma-cell">G073_unqualified_session_peak_vs_x1000_is_209951_by_pinglamb_at_m7r7_a_30s</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-C001">
@@ -6192,8 +6207,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 <script type="application/json" id="claims-data">
 {
   "proof_map_available": true,
-  "total_claims": 83,
-  "verified_count": 83,
+  "total_claims": 85,
+  "verified_count": 85,
   "claims": [
     {
       "id": "G001",
@@ -6328,20 +6343,20 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "G014",
       "source": "generated",
-      "canto": "全場最高單局 APM係 yachi 喺 m1 第 4 局打出嘅 約104.2，嗰局 yachi 生還",
-      "english_gloss": "session-max apm_x1000 is 104282 by yachi at m1r4",
+      "canto": "打足 60 秒以上嘅 23 局入面，最高單局 APM係 yachi 喺 m8 第 8 局打出嘅 約78.6，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
+      "english_gloss": "session-max apm_x1000 among the 23 rounds lasting 60s or more is 78639 by yachi at m8r8",
       "category": "pace",
-      "lemma": "G014_session_max_apm_x1000_is_104282_by_yachi_at_m1r4",
+      "lemma": "G014_session_max_apm_x1000_among_the_23_rounds_lasting_60s_or_more_is_78639",
       "status": "verified",
       "status_label": "已驗證"
     },
     {
       "id": "G015",
       "source": "generated",
-      "canto": "全場最高單局 VS係 pinglamb 喺 m7 第 7 局打出嘅 約209.9，嗰局 pinglamb 生還",
-      "english_gloss": "session-max vs_x1000 is 209951 by pinglamb at m7r7",
+      "canto": "打足 60 秒以上嘅 23 局入面，最高單局 VS係 yachi 喺 m8 第 8 局打出嘅 約157.2，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
+      "english_gloss": "session-max vs_x1000 among the 23 rounds lasting 60s or more is 157278 by yachi at m8r8",
       "category": "pace",
-      "lemma": "G015_session_max_vs_x1000_is_209951_by_pinglamb_at_m7r7",
+      "lemma": "G015_session_max_vs_x1000_among_the_23_rounds_lasting_60s_or_more_is_157278",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6788,10 +6803,10 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "G060",
       "source": "generated",
-      "canto": "最癲嘅一局係 m7 第 7 局，兩邊 VS 加埋約 349.7（pinglamb 約 209.9 對 yachi 約 139.7）",
-      "english_gloss": "highest combined VS is m7r7 at 349.7, won by pinglamb",
+      "canto": "打足 60 秒以上嘅局入面最癲嘅一局係 m8 第 8 局，兩邊 VS 加埋約 286.9（yachi 約 157.2 對 pinglamb 約 129.6）",
+      "english_gloss": "highest combined VS among rounds of 60s or more is m8r8 at 286.9, won by yachi",
       "category": "pace",
-      "lemma": "G060_highest_combined_vs_is_m7r7_at_349_7_won_by_pinglamb",
+      "lemma": "G060_highest_combined_vs_among_rounds_of_60s_or_more_is_m8r8_at_286_9_won_b",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -6902,6 +6917,26 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "english_gloss": "session downstack per piece: pinglamb higher than yachi",
       "category": "style",
       "lemma": "G071_session_downstack_per_piece_pinglamb_higher_than_yachi",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G072",
+      "source": "generated",
+      "canto": "唔設任何局長下限嘅話，全場最高單局 APM係 yachi 喺 m1 第 4 局打出嘅 約104.2，但嗰局只打咗 13 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局",
+      "english_gloss": "unqualified session peak apm_x1000 is 104282 by yachi at m1r4, a 13s round — not the record",
+      "category": "pace",
+      "lemma": "G072_unqualified_session_peak_apm_x1000_is_104282_by_yachi_at_m1r4_a_13s_ro",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G073",
+      "source": "generated",
+      "canto": "唔設任何局長下限嘅話，全場最高單局 VS係 pinglamb 喺 m7 第 7 局打出嘅 約209.9，但嗰局只打咗 30 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局",
+      "english_gloss": "unqualified session peak vs_x1000 is 209951 by pinglamb at m7r7, a 30s round — not the record",
+      "category": "pace",
+      "lemma": "G073_unqualified_session_peak_vs_x1000_is_209951_by_pinglamb_at_m7r7_a_30s",
       "status": "verified",
       "status_label": "已驗證"
     },
@@ -7039,7 +7074,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     "1": {
       "title": "俾人開兩局，照樣連追五局",
       "flag": null,
-      "body": "開場其實唔順——pinglamb 先食咗頭兩局。之後 yachi 就一啖氣連追五局收火，5:2 埋數 <b>C010</b> <b>G004</b>。中間第四局係成晚最誇張嘅一鋪：yachi 個 APM 飆到約 104.2，係全場最高 <b>G014</b>，成局約 13 秒就完 <b>G022</b>，而且佢由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局 <b>G057</b>。"
+      "body": "開場其實唔順——pinglamb 先食咗頭兩局。之後 yachi 就一啖氣連追五局收火，5:2 埋數 <b>C010</b> <b>G004</b>。中間第四局係成晚最誇張嘅一鋪：成局約 13 秒就完，全場最短 <b>G022</b>，而且佢由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局 <b>G057</b>。嗰局個 APM 睇落爆錶，不過 13 秒嘅分母撐唔起一個速率紀錄。"
     },
     "2": {
       "title": "再落一城，2:0 領先",
@@ -7069,7 +7104,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     "7": {
       "title": "4:1 領先，最後四局全部俾人收晒",
       "flag": "🏆",
-      "body": "全晚最肉痛嘅一場。yachi 開頭三局連贏，一度 4:1 拋離——跟住最後四局一局都冇再贏過，5:4 輸咗 <b>C012</b> <b>G010</b>。決勝嗰一局 pinglamb VS 約 107.3、APM 約 49.7，兩樣都壓住 yachi <b>G058</b>。呢場第七局仲係成晚最激嘅一鋪：pinglamb 個 VS 去到約 209.9，係全場單局最高 <b>G015</b>，兩邊夾埋約 349.7 嘅 VS 亦都係全場之最 <b>G060</b>。"
+      "body": "全晚最肉痛嘅一場。yachi 開頭三局連贏，一度 4:1 拋離——跟住最後四局一局都冇再贏過，5:4 輸咗 <b>C012</b> <b>G010</b>。決勝嗰一局 pinglamb VS 約 107.3、APM 約 49.7，兩樣都壓住 yachi <b>G058</b>。呢場第七局係全晚火力最集中嘅一鋪，不過係一局短打——打足一分鐘以上嘅速率紀錄喺第八場第八局 <b>G015</b> <b>G060</b>。"
     },
     "8": {
       "title": "再打足九局，一樣係 5:4",

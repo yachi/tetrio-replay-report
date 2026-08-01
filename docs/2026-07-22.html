@@ -542,8 +542,8 @@
       </div>
       <div class="stat-card accent-p">
         <div class="k">全場最勁閃電殺</div>
-        <div class="v mono">262.6 vs</div>
-        <div class="d">第7場第2局，pinglamb APM 爆到約114.2、PPS 約1.83，約15秒一鋪過收工，vs 262.6 係全場單局最高<span class="badge" data-claim="C009"></span><span class="badge" data-claim="C010"></span>。</div>
+        <div class="v mono">15s</div>
+        <div class="d">第7場第2局，pinglamb 約15秒一鋪過收工<span class="badge" data-claim="C009"></span>。嗰局個 APM 同 vs 睇落爆錶（約114.2、約262.5），但呢兩樣係<strong>速率</strong>，分母得15秒，數字自然大——所以唔計入 APM／VS 紀錄<span class="badge" data-claim="C010"></span>，打足一分鐘嘅紀錄喺下面嘅全場之最。</div>
       </div>
       <div class="stat-card accent-g">
         <div class="k">單發最大 spike</div>
@@ -618,16 +618,16 @@
     <div class="sr-grid">
       <div class="sr-tile">
         <div class="sr-label">單局最高 VS</div>
-        <div class="sr-value">約262.5</div>
-        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m7 第2局</div>
-        <p class="sr-note">全場最高單局 VS係 pinglamb 喺 m7 第 2 局打出嘅 約262.5，嗰局 pinglamb 生還</p>
+        <div class="sr-value">約180.3</div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m1 第5局</div>
+        <p class="sr-note">打足 60 秒以上嘅 39 局入面，最高單局 VS係 yachi 喺 m1 第 5 局打出嘅 約180.3，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G017 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
         <div class="sr-label">單局最高 APM</div>
-        <div class="sr-value">約114.2</div>
-        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m7 第2局</div>
-        <p class="sr-note">全場最高單局 APM係 pinglamb 喺 m7 第 2 局打出嘅 約114.2，嗰局 pinglamb 生還</p>
+        <div class="sr-value">約77.3</div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m1 第5局</div>
+        <p class="sr-note">打足 60 秒以上嘅 39 局入面，最高單局 APM係 pinglamb 喺 m1 第 5 局打出嘅 約77.3，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G016 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
@@ -680,6 +680,7 @@
         <div class="sr-cid">G019 · ✓ Dafny 已證</div>
       </div>
     </div>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——四個 session 夾埋 492 個 player-round 度量過：VS 嘅標準差由 58.2（約 21 秒嗰批）跌到 15.2（約 144 秒嗰批），但平均數企喺原地，即係短局唔係打得好啲，係量得唔準啲。未設限之前，四個 session 全部 12 項速率紀錄都落喺最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G025）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -6620,14 +6621,14 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
           <tr id="claim-C009">
             <td class="id-cell">C009</td>
-            <td class="canto-cell">全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺</td>
+            <td class="canto-cell">全場火力最集中嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺（呢啲係速率，15 秒嘅分母做唔到速率紀錄）</td>
             <td class="gloss-cell">highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.83, vs≈262.5, a ~15s blitz</td>
             <td class="lemma-cell">C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_83_</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-C010">
             <td class="id-cell">C010</td>
-            <td class="canto-cell">嗰局 pinglamb 嘅 vs 約262.5，係成個 session 單局最高嘅 vs score</td>
+            <td class="canto-cell">嗰局 pinglamb 嘅 vs 約262.5，係成個 session 冇設限之下單局最高嘅 vs score；不過只計打足一分鐘嘅局，紀錄就唔係佢</td>
             <td class="gloss-cell">pinglamb&#x27;s vs≈262.5 in m7r1 is the highest single-round vs of the session</td>
             <td class="lemma-cell">C010_pinglamb_s_vs_262_5_in_m7r1_is_the_highest_single_round_vs_o</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
@@ -7088,7 +7089,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "C009",
       "source": "narrative",
-      "canto": "全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺",
+      "canto": "全場火力最集中嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺（呢啲係速率，15 秒嘅分母做唔到速率紀錄）",
       "english_gloss": "highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.83, vs≈262.5, a ~15s blitz",
       "category": "spike",
       "lemma": "C009_highest_intensity_round_is_m7r1_pinglamb_apm_114_2_pps_1_83_",
@@ -7098,7 +7099,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "C010",
       "source": "narrative",
-      "canto": "嗰局 pinglamb 嘅 vs 約262.5，係成個 session 單局最高嘅 vs score",
+      "canto": "嗰局 pinglamb 嘅 vs 約262.5，係成個 session 冇設限之下單局最高嘅 vs score；不過只計打足一分鐘嘅局，紀錄就唔係佢",
       "english_gloss": "pinglamb's vs≈262.5 in m7r1 is the highest single-round vs of the session",
       "category": "spike",
       "lemma": "C010_pinglamb_s_vs_262_5_in_m7r1_is_the_highest_single_round_vs_o",

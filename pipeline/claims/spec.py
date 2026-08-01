@@ -158,9 +158,25 @@ def conj(*xs):                    return {"p": "and", "xs": [x for x in xs if x 
 
 
 # cond constructors
+#
+# A Cond's operator is written the Python/Dafny way, and every backend needs a
+# spelling for it. Rejecting an unknown one HERE rather than at render time is the
+# difference between a family that refuses to build and a claims.smt2 that a solver
+# answers `unknown constant ==` on: the first `==` in a spec shipped as the latter,
+# because Python and Dafny both accept it verbatim and only the SMT gate noticed.
+_COND_OPS = ("==", "<", "<=", ">", ">=", "!=")
+
+
+def _check_op(op):
+    if op not in _COND_OPS:
+        raise ValueError(f"unsupported cond operator {op!r} "
+                         f"(supported: {', '.join(_COND_OPS)})")
+    return op
+
+
 def c_winner(pl):                 return {"c": "winner", "pl": pl}
-def c_field(pl, f, op, v):        return {"c": "field_cmp", "pl": pl, "f": f, "op": op, "v": int(v)}
-def c_dur(op, v):                 return {"c": "dur_cmp", "op": op, "v": int(v)}
+def c_field(pl, f, op, v):        return {"c": "field_cmp", "pl": pl, "f": f, "op": _check_op(op), "v": int(v)}
+def c_dur(op, v):                 return {"c": "dur_cmp", "op": _check_op(op), "v": int(v)}
 def c_winner_gt_loser(f):         return {"c": "winner_gt_loser", "f": f}
 def c_and(*xs):                   return {"c": "and", "xs": list(xs)}
 def c_str(pl, f, v):              return {"c": "str_field", "pl": pl, "f": f, "v": v}

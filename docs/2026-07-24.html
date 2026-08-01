@@ -545,8 +545,8 @@
       </div>
       <div class="stat-card accent-p">
         <div class="k">21秒閃電屠殺</div>
-        <div class="v mono">178.5 vs</div>
-        <div class="d">第5場第2局，pinglamb APM 爆到約95.4、VS 飆到約178.4，全部係全場最高，而呢一局淨係約21秒就完咗，係成晚最短嘅一局<span class="badge" data-claim="C007"></span><span class="badge" data-claim="C008"></span><span class="badge" data-claim="C009"></span>。</div>
+        <div class="v mono">21s</div>
+        <div class="d">第5場第2局淨係約21秒就完咗，係成晚最短嘅一局<span class="badge" data-claim="C009"></span>。pinglamb 嗰局個 APM 同 VS 睇落爆錶（約95.4、約178.4），但呢兩樣係<strong>速率</strong>，分母得21秒，數字自然大——所以唔計入 APM／VS 紀錄<span class="badge" data-claim="C007"></span><span class="badge" data-claim="C008"></span>，打足一分鐘嘅紀錄喺下面嘅全場之最。</div>
       </div>
       <div class="stat-card accent-g">
         <div class="k">單發最大 spike</div>
@@ -621,16 +621,16 @@
     <div class="sr-grid">
       <div class="sr-tile">
         <div class="sr-label">單局最高 VS</div>
-        <div class="sr-value">約178.4</div>
-        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m5 第2局</div>
-        <p class="sr-note">全場最高單局 VS係 pinglamb 喺 m5 第 2 局打出嘅 約178.4，嗰局 pinglamb 生還</p>
+        <div class="sr-value">約159.7</div>
+        <div class="sr-who"><span class="sr-dot is-y"></span>yachi · m6 第8局</div>
+        <p class="sr-note">打足 60 秒以上嘅 24 局入面，最高單局 VS係 yachi 喺 m6 第 8 局打出嘅 約159.7，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G015 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
         <div class="sr-label">單局最高 APM</div>
-        <div class="sr-value">約95.4</div>
-        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m5 第2局</div>
-        <p class="sr-note">全場最高單局 APM係 pinglamb 喺 m5 第 2 局打出嘅 約95.4，嗰局 pinglamb 生還</p>
+        <div class="sr-value">約70.6</div>
+        <div class="sr-who"><span class="sr-dot is-p"></span>pinglamb · m4 第4局</div>
+        <p class="sr-note">打足 60 秒以上嘅 24 局入面，最高單局 APM係 pinglamb 喺 m4 第 4 局打出嘅 約70.6，嗰局 pinglamb 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）</p>
         <div class="sr-cid">G014 · ✓ Dafny 已證</div>
       </div>
       <div class="sr-tile">
@@ -683,6 +683,7 @@
         <div class="sr-cid">G017 · ✓ Dafny 已證</div>
       </div>
     </div>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——四個 session 夾埋 492 個 player-round 度量過：VS 嘅標準差由 58.2（約 21 秒嗰批）跌到 15.2（約 144 秒嗰批），但平均數企喺原地，即係短局唔係打得好啲，係量得唔準啲。未設限之前，四個 session 全部 12 項速率紀錄都落喺最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G023）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -4748,14 +4749,14 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
           <tr id="claim-C007">
             <td class="id-cell">C007</td>
-            <td class="canto-cell">m5 第二局，pinglamb 打出全場最勁嘅單局 APM，約 95.4</td>
+            <td class="canto-cell">m5 第二局，pinglamb 打出成晚冇設限之下最勁嘅單局 APM，約 95.4——不過嗰局係一局短打，速率紀錄唔計短局</td>
             <td class="gloss-cell">m5 round 2 (index 1): pinglamb&#x27;s ~95.4 APM is the session&#x27;s highest single-round APM</td>
             <td class="lemma-cell">C007_m5_round_2_index_1_pinglamb_s_95_4_apm_is_the_session_s_high</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-C008">
             <td class="id-cell">C008</td>
-            <td class="canto-cell">同一局 pinglamb 個 VS 都係全場最高，約 178.4</td>
+            <td class="canto-cell">同一局 pinglamb 個 VS 約 178.4，同樣係冇設限之下全場最高，同樣因為局太短唔計入紀錄</td>
             <td class="gloss-cell">same round: pinglamb&#x27;s ~178.4 VS is the session&#x27;s highest single-round VS</td>
             <td class="lemma-cell">C008_same_round_pinglamb_s_178_4_vs_is_the_session_s_highest_sing</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
@@ -5156,7 +5157,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "C007",
       "source": "narrative",
-      "canto": "m5 第二局，pinglamb 打出全場最勁嘅單局 APM，約 95.4",
+      "canto": "m5 第二局，pinglamb 打出成晚冇設限之下最勁嘅單局 APM，約 95.4——不過嗰局係一局短打，速率紀錄唔計短局",
       "english_gloss": "m5 round 2 (index 1): pinglamb's ~95.4 APM is the session's highest single-round APM",
       "category": "spike",
       "lemma": "C007_m5_round_2_index_1_pinglamb_s_95_4_apm_is_the_session_s_high",
@@ -5166,7 +5167,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "C008",
       "source": "narrative",
-      "canto": "同一局 pinglamb 個 VS 都係全場最高，約 178.4",
+      "canto": "同一局 pinglamb 個 VS 約 178.4，同樣係冇設限之下全場最高，同樣因為局太短唔計入紀錄",
       "english_gloss": "same round: pinglamb's ~178.4 VS is the session's highest single-round VS",
       "category": "spike",
       "lemma": "C008_same_round_pinglamb_s_178_4_vs_is_the_session_s_highest_sing",
@@ -5647,7 +5648,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     "5": {
       "title": "一場閃電屠殺",
       "flag": null,
-      "body": "第五場 pinglamb 一路壓住 5:3 攞落 <b>C027</b>。呢場有兩個嚇死人嘅數字：第二局佢打出約 95.4 嘅單局 APM，係全場最高 <b>C007</b>，同一局 VS 都飆到約 178.4，一樣係全場之最 <b>C008</b>——而呢一局淨係約 21 秒就完咗，係成晚最短嘅一局 <b>C009</b>，即係話 pinglamb 21 秒之內就轟到 yachi 崩盤。到第八局佢再補多一下 17 嘅單次 spike，係全場最大嘅一 spike <b>C010</b>。攞到呢場，pinglamb 已經鎖死咗個系列。"
+      "body": "第五場 pinglamb 一路壓住 5:3 攞落 <b>C027</b>。呢場第二局淨係約 21 秒就完咗，係成晚最短嘅一局 <b>C009</b>——pinglamb 21 秒之內就轟到 yachi 崩盤。佢嗰局個 APM（約 95.4）同 VS（約 178.4）睇落嚇死人 <b>C007</b> <b>C008</b>，但速率紀錄只計打足一分鐘嘅局，21 秒嘅分母唔算數。到第八局佢再補多一下 17 嘅單次 spike，係全場最大嘅一 spike <b>C010</b>。攞到呢場，pinglamb 已經鎖死咗個系列。"
     },
     "6": {
       "title": "yachi 唔認命",

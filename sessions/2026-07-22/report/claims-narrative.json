@@ -57,14 +57,14 @@
   },
   {
     "id": "C009",
-    "canto": "全場火力最勁嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺",
+    "canto": "全場火力最集中嗰局係第7場第2局：pinglamb APM 爆到約114.2、PPS 約1.83、vs 約262.5，約15秒閃電殺（呢啲係速率，15 秒嘅分母做唔到速率紀錄）",
     "english_gloss": "highest-intensity round is m7r1: pinglamb apm≈114.2, pps≈1.83, vs≈262.5, a ~15s blitz",
     "category": "spike",
     "python_check": "max(d['apm_x1000'] for m in facts['matches'] for r in m['rounds'] for d in r['players'].values())==114223 and facts['matches'][6]['rounds'][1]['players']['pinglamb']['apm_x1000']==114223 and 1838==facts['matches'][6]['rounds'][1]['players']['pinglamb']['pps_x1000'] and facts['matches'][6]['rounds'][1]['winner']=='pinglamb' and 15000<=max(d['lifetime'] for d in facts['matches'][6]['rounds'][1]['players'].values())<16000"
   },
   {
     "id": "C010",
-    "canto": "嗰局 pinglamb 嘅 vs 約262.5，係成個 session 單局最高嘅 vs score",
+    "canto": "嗰局 pinglamb 嘅 vs 約262.5，係成個 session 冇設限之下單局最高嘅 vs score；不過只計打足一分鐘嘅局，紀錄就唔係佢",
     "english_gloss": "pinglamb's vs≈262.5 in m7r1 is the highest single-round vs of the session",
     "category": "spike",
     "python_check": "max(d['vs_x1000'] for m in facts['matches'] for r in m['rounds'] for d in r['players'].values())==262582 and facts['matches'][6]['rounds'][1]['players']['pinglamb']['vs_x1000']==262582 and 262000<=262582<263000"

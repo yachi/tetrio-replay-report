@@ -281,23 +281,57 @@ def longest_streak(facts):
 # superlatives
 # --------------------------------------------------------------------------- #
 
+# A RATE record needs a qualifying round, the way a batting title needs a minimum
+# number of plate appearances. APM and VS are ratios with the round's length in
+# the denominator, so over a short round they behave like a sample mean over a
+# small n: measured across all 492 player-rounds of the four sessions, the SD of
+# VS falls from 58.2 (21 s bin) to 15.2 (144 s bin) while the MEAN stays flat
+# (108 -> 118). Fitting log SD on log t gives -0.616 for VS and -0.697 for APM,
+# both with -0.5 inside the 95% CI and slope 0 rejected (p 0.001 / 0.0003) —
+# the signature of sampling noise, not of better play. The consequence shipped:
+# all 12 unqualified rate records (3 metrics x 4 sessions) came from the shortest
+# quartile of rounds, which under chance is p = 6e-08, and 07-22's headline
+# "約262.6" was a 15.6-second round 45% above that session's qualified peak.
+#
+# 60_000 ms is where the definition and the data agree: APM and VS are per-MINUTE
+# rates, so the window should be at least a minute — and each session's record
+# names the identical round for every cut-off from 50 s to 70 s, so nothing here
+# rests on the exact number. The full analysis is `analysis/rate_records.R`.
+#
+# COUNT records are deliberately NOT qualified: the artifact runs the other way
+# for them. Fitting more lines or a longer B2B chain into a short round is
+# harder, not easier, so a short-round count record is a real one.
+QUALIFYING_MS = 60_000
+
 _SUPERLATIVES = [
-    # field, x1000?, category, noun, formatter
-    ("apm_x1000", True, "pace", "單局 APM", _one_dp),
-    ("vs_x1000", True, "pace", "單局 VS", _one_dp),
-    ("maxspike", False, "spike", "單一次 spike", str),
-    ("topcombo", False, "style", "combo", str),
-    ("topbtb", False, "style", "B2B 鏈", str),
-    ("tspins", False, "style", "單局 T-spin 數", str),
-    ("lines", False, "style", "單局清行數", str),
+    # field, x1000?, category, noun, formatter, qualify?
+    ("apm_x1000", True, "pace", "單局 APM", _one_dp, True),
+    ("vs_x1000", True, "pace", "單局 VS", _one_dp, True),
+    ("maxspike", False, "spike", "單一次 spike", str, False),
+    ("topcombo", False, "style", "combo", str, False),
+    ("topbtb", False, "style", "B2B 鏈", str, False),
+    ("tspins", False, "style", "單局 T-spin 數", str, False),
+    ("lines", False, "style", "單局清行數", str, False),
 ]
 
 
 @family
 def round_superlatives(facts):
     out = []
-    for f, scaled, cat, noun, fmt in _SUPERLATIVES:
+    n_qual = sum(1 for _, _, r in _rounds(facts) if _dur(r) >= QUALIFYING_MS)
+    qual_secs = QUALIFYING_MS // 1000
+    for f, scaled, cat, noun, fmt, qualify in _SUPERLATIVES:
         ranked = _rank_desc(facts, lambda p, f=f: p[f])
+        if qualify:
+            # The record is over qualifying rounds only, so the ranking, the tie
+            # count and the "nobody exceeds it" conjuncts must all be restricted
+            # to the same set — a superlative proved over one population and
+            # stated over another is exactly the kind of gap this pipeline exists
+            # to close.
+            ok = {(mi, ri) for mi, ri, r in _rounds(facts) if _dur(r) >= QUALIFYING_MS}
+            ranked = [t for t in ranked if (t[0], t[1]) in ok]
+        if not ranked:
+            continue
         mi, ri, pl, v = ranked[0]
         if v <= 0:
             continue
@@ -307,19 +341,42 @@ def round_superlatives(facts):
         extra = "（計埋冇消行嘅 T-spin）" if f == "tspins" else ""
         winner = facts["matches"][mi]["rounds"][ri]["winner"]
         approx = "約" if scaled else ""
+        # The qualified sentence names its own population, and the count of
+        # qualifying rounds is proved alongside it, so a reader can see how much
+        # of the session the record was taken over instead of trusting the word.
+        if qualify:
+            scope = (f"打足 {qual_secs} 秒以上嘅 {n_qual} 局入面，最高{noun}係")
+            gloss_scope = (f"session-max {f} among the {n_qual} rounds lasting "
+                           f"{qual_secs}s or more")
+            note = ("（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）"
+                    if not tie_note else tie_note)
+        else:
+            scope = f"全場最高{noun}係"
+            gloss_scope = f"session-max {f}"
+            note = tie_note
+        exceed = [c_field(p, f, ">", v) for p in _players(facts)]
+        if qualify:
+            long_enough = c_dur(">=", QUALIFYING_MS)
+            both = c_and(long_enough, *exceed)
+            each = [c_and(long_enough, e) for e in exceed]
+        else:
+            both = c_and(*exceed)
+            each = exceed
         out.append({
             "family": f"round_max_{f}", "category": cat,
-            "canto": f"全場最高{noun}係 {pl} 喺 {_ordinal(mi)} 第 {ri + 1} 局打出嘅 "
-                     f"{approx}{shown}{extra}，嗰局 {winner} 生還{tie_note}",
-            "english_gloss": f"session-max {f} is {v} by {pl} at m{mi + 1}r{ri + 1}",
+            "canto": f"{scope} {pl} 喺 {_ordinal(mi)} 第 {ri + 1} 局打出嘅 "
+                     f"{approx}{shown}{extra}，嗰局 {winner} 生還{note}",
+            "english_gloss": f"{gloss_scope} is {v} by {pl} at m{mi + 1}r{ri + 1}",
             "spec": conj(
                 eq(rnd(mi, ri, pl, f), lit(v)),
-                # the superlative itself: nobody in any round exceeds it
-                eq(count_rounds(c_and(*[c_field(p, f, ">", v) for p in _players(facts)])),
-                   lit(0)),
-                eq(count_rounds(c_field(_players(facts)[0], f, ">", v)), lit(0)),
-                eq(count_rounds(c_field(_players(facts)[1], f, ">", v)), lit(0)),
+                # the superlative itself: nobody in any (qualifying) round exceeds it
+                eq(count_rounds(both), lit(0)),
+                eq(count_rounds(each[0]), lit(0)),
+                eq(count_rounds(each[1]), lit(0)),
                 round_winner(mi, ri, winner),
+                # how many rounds the record was taken over — without this the
+                # qualifier is a word in the sentence that no lemma covers
+                eq(count_rounds(c_dur(">=", QUALIFYING_MS)), lit(n_qual)) if qualify else None,
             ),
         })
     return out
@@ -928,25 +985,35 @@ def decider_final_rounds(facts):
 
 @family
 def most_intense_round(facts):
-    """Highest combined VS — the round where both players were swinging hardest."""
+    """Highest combined VS — the round where both players were swinging hardest.
+
+    Qualified at QUALIFYING_MS for the same reason as the single-player VS record:
+    a sum of two rates carries both denominators, so a short round inflates it
+    twice over. The comparison conjuncts range over the qualifying rounds only.
+    """
+    qual = [(mi, ri, r) for mi, ri, r in _rounds(facts) if _dur(r) >= QUALIFYING_MS]
+    if not qual:
+        return []
     best = max(((mi, ri, r, sum(r["players"][p]["vs_x1000"] for p in r["players"]))
-                for mi, ri, r in _rounds(facts)), key=lambda t: t[3])
+                for mi, ri, r in qual), key=lambda t: t[3])
     mi, ri, r, tot = best
     win = r["winner"]
     lose = [p for p in r["players"] if p != win][0]
+    qual_secs = QUALIFYING_MS // 1000
     return [{
         "family": "most_intense_round", "category": "pace",
-        "canto": f"最癲嘅一局係 {_ordinal(mi)} 第 {ri + 1} 局，兩邊 VS 加埋約 "
+        "canto": f"打足 {qual_secs} 秒以上嘅局入面最癲嘅一局係 {_ordinal(mi)} 第 {ri + 1} 局，"
+                 f"兩邊 VS 加埋約 "
                  f"{_one_dp(tot)}（{win} 約 {_one_dp(r['players'][win]['vs_x1000'])} 對 "
                  f"{lose} 約 {_one_dp(r['players'][lose]['vs_x1000'])}）",
-        "english_gloss": (f"highest combined VS is m{mi + 1}r{ri + 1} at {_one_dp(tot)}, "
-                          f"won by {win}"),
+        "english_gloss": (f"highest combined VS among rounds of {qual_secs}s or more is "
+                          f"m{mi + 1}r{ri + 1} at {_one_dp(tot)}, won by {win}"),
         "spec": conj(round_winner(mi, ri, win),
                      eq(add(rnd(mi, ri, win, "vs_x1000"), rnd(mi, ri, lose, "vs_x1000")),
                         lit(tot)),
                      *[le(add(rnd(m2, r2, facts["players"][0], "vs_x1000"),
                               rnd(m2, r2, facts["players"][1], "vs_x1000")), lit(tot))
-                       for m2, r2, _ in _rounds(facts)]),
+                       for m2, r2, _ in qual]),
     }]
 
 
@@ -1179,3 +1246,60 @@ def ds_session_comparison(facts):
         "spec": gt(mul(sum_round(hi, "garbage_cleared"), sum_round(lo, "pieces")),
                    mul(sum_round(lo, "garbage_cleared"), sum_round(hi, "pieces"))),
     }]
+
+
+@family
+def unqualified_rate_peaks(facts):
+    """The unqualified maximum of each rate — kept, but stated as a burst.
+
+    `round_superlatives` qualifies APM and VS at QUALIFYING_MS, which is right for
+    a record and wrong for coverage: it restricts the "nobody exceeds it" conjuncts
+    to qualifying rounds, so a short round's rate constant is left with no upper
+    bound. Its only other constraint is "the round's winner had the higher VS",
+    which every INCREASE preserves. `mutation_test.sh` found exactly that hole the
+    first time this ran — `m6_r1_yachi_vs` survived +1 and x10.
+
+    So the unqualified peak stays in the ledger as its own claim, bounding every
+    round again, and says what it actually is. It is emitted only when the peak
+    round is NOT a qualifying one; otherwise it would duplicate the record claim's
+    predicate, which `validate` rejects.
+
+    Defined last on purpose: FAMILIES runs in definition order and ids are assigned
+    over the flattened output, so appending here leaves every existing claim id —
+    and therefore every badge already published in four reports — untouched.
+    """
+    out = []
+    qual_secs = QUALIFYING_MS // 1000
+    for f, scaled, cat, noun, fmt, qualify in _SUPERLATIVES:
+        if not qualify:
+            continue
+        ranked = _rank_desc(facts, lambda p, f=f: p[f])
+        mi, ri, pl, v = ranked[0]
+        if v <= 0:
+            continue
+        if _dur(facts["matches"][mi]["rounds"][ri]) >= QUALIFYING_MS:
+            continue          # the peak IS the record; one claim already covers it
+        winner = facts["matches"][mi]["rounds"][ri]["winner"]
+        dur_s = _dur(facts["matches"][mi]["rounds"][ri]) // 1000
+        approx = "約" if scaled else ""
+        out.append({
+            "family": f"round_peak_{f}", "category": cat,
+            "canto": f"唔設任何局長下限嘅話，全場最高{noun}係 {pl} 喺 {_ordinal(mi)} 第 "
+                     f"{ri + 1} 局打出嘅 {approx}{fmt(v)}，但嗰局只打咗 {dur_s} 秒——"
+                     f"速率嘅分母就係局長，所以呢個數唔算紀錄，"
+                     f"紀錄只計打足 {qual_secs} 秒嘅局",
+            "english_gloss": (f"unqualified session peak {f} is {v} by {pl} at "
+                              f"m{mi + 1}r{ri + 1}, a {dur_s}s round — not the record"),
+            "spec": conj(
+                eq(rnd(mi, ri, pl, f), lit(v)),
+                # over EVERY round this time: this is what re-bounds the short ones
+                eq(count_rounds(c_field(_players(facts)[0], f, ">", v)), lit(0)),
+                eq(count_rounds(c_field(_players(facts)[1], f, ">", v)), lit(0)),
+                round_winner(mi, ri, winner),
+                # and that the round really is a short one, so the sentence's
+                # reason for demoting it is proved rather than asserted
+                eq(count_rounds(c_and(c_dur("<", QUALIFYING_MS),
+                                      c_field(pl, f, "==", v))), lit(1)),
+            ),
+        })
+    return out

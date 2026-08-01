@@ -106,14 +106,14 @@
  },
  {
   "id": "G016",
-  "lemma": "G016_session_max_apm_x1000_is_114223_by_pinglamb_at_m7r2",
+  "lemma": "G016_session_max_apm_x1000_among_the_39_rounds_lasting_60s_or_more_is_77323",
   "file": "Claims.dfy",
   "family": "round_max_apm_x1000",
   "status": "verified"
  },
  {
   "id": "G017",
-  "lemma": "G017_session_max_vs_x1000_is_262582_by_pinglamb_at_m7r2",
+  "lemma": "G017_session_max_vs_x1000_among_the_39_rounds_lasting_60s_or_more_is_180380",
   "file": "Claims.dfy",
   "family": "round_max_vs_x1000",
   "status": "verified"
@@ -442,7 +442,7 @@
  },
  {
   "id": "G064",
-  "lemma": "G064_highest_combined_vs_is_m7r2_at_352_1_won_by_pinglamb",
+  "lemma": "G064_highest_combined_vs_among_rounds_of_60s_or_more_is_m1r5_at_336_3_won_b",
   "file": "Claims.dfy",
   "family": "most_intense_round",
   "status": "verified"
@@ -536,6 +536,20 @@
   "lemma": "G077_session_downstack_per_piece_pinglamb_higher_than_yachi",
   "file": "Claims.dfy",
   "family": "ds_session",
+  "status": "verified"
+ },
+ {
+  "id": "G078",
+  "lemma": "G078_unqualified_session_peak_apm_x1000_is_114223_by_pinglamb_at_m7r2_a_15s",
+  "file": "Claims.dfy",
+  "family": "round_peak_apm_x1000",
+  "status": "verified"
+ },
+ {
+  "id": "G079",
+  "lemma": "G079_unqualified_session_peak_vs_x1000_is_262582_by_pinglamb_at_m7r2_a_15s",
+  "file": "Claims.dfy",
+  "family": "round_peak_vs_x1000",
   "status": "verified"
  }
 ]

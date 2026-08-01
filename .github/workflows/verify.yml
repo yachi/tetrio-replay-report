@@ -77,6 +77,19 @@ jobs:
       - name: Check no Dafny constant is dead
         run: python3 -m pipeline.check_dead_consts "${{ matrix.artefact }}"
 
+      # The APM/VS records exclude short rounds (generators.QUALIFYING_MS), which
+      # frees those rounds' rate constants from the record's upper bound. The
+      # random mutation sample caught that hole once, by luck; this walks the whole
+      # class deterministically. Skipped for the 07-24 proof/ artefact, which has
+      # no rate-record family.
+      - name: Check short rounds' rate constants are still pinned
+        run: |
+          if [ -f "${{ matrix.artefact }}/claims-generated.json" ]; then
+            python3 -m pipeline.check_rate_coverage "${{ matrix.artefact }}"
+          else
+            echo "  --  ${{ matrix.artefact }} has no generated ledger"
+          fi
+
   # The generator pipeline: regenerate each session's ledger from facts.json, check it
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
   # what keeps "a new session is one command" true rather than aspirational.

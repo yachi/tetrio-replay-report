@@ -87,6 +87,24 @@ def _ite(cond, a, b):
     return f"(ite {cond} {a} {b})"
 
 
+# A Cond's comparison operator is written the way Python and Dafny spell it, and
+# those two agree on every operator — which is why passing it through to SMT-LIB
+# went unnoticed until the first `==` appeared in a spec: SMT-LIB spells equality
+# `=`, and z3/cvc5 answered `unknown constant ==` rather than a verdict. An op the
+# emitter does not know is a hard error, never a pass-through: the whole point of
+# the third backend is that a solver independently re-checks the same claim, and a
+# file it cannot parse checks nothing.
+_OPS = {"==": "=", "=": "=", "<": "<", "<=": "<=", ">": ">", ">=": ">=", "!=": "distinct"}
+
+
+def _op(op):
+    try:
+        return _OPS[op]
+    except KeyError:
+        raise SystemExit(f"smt: no SMT-LIB spelling for comparison operator {op!r} "
+                         f"(known: {', '.join(sorted(_OPS))})") from None
+
+
 # --------------------------------------------------------------------------- #
 # Cond / expression / predicate
 # --------------------------------------------------------------------------- #
@@ -97,12 +115,12 @@ def smt_cond(facts, mi, ri, cond):
     if k == "winner":
         return f'(= m{mi}_r{ri}_winner {code(cond["pl"])})'
     if k == "field_cmp":
-        return (f"({cond['op']} {dafny_field(mi, ri, cond['pl'], cond['f'])} "
+        return (f"({_op(cond['op'])} {dafny_field(mi, ri, cond['pl'], cond['f'])} "
                 f"{cond['v']})")
     if k == "dur_cmp":
         a = dafny_field(mi, ri, "yachi", "lifetime")
         b = dafny_field(mi, ri, "pinglamb", "lifetime")
-        return f"({cond['op']} {_ite(f'(>= {a} {b})', a, b)} {cond['v']})"
+        return f"({_op(cond['op'])} {_ite(f'(>= {a} {b})', a, b)} {cond['v']})"
     if k == "winner_gt_loser":
         f = cond["f"]
         y, p = dafny_field(mi, ri, "yachi", f), dafny_field(mi, ri, "pinglamb", f)
