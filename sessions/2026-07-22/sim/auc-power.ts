@@ -159,7 +159,7 @@ console.log('\n--- how many decided pairs would this actually need? ---\n');
     console.log(`   ${(100 * p).toFixed(0)}%          ${n === null ? '  >4000' : String(n).padStart(6)}                       ${tot === null ? '   -' : String(tot).padStart(6)}                  ${tot === null ? '-' : (tot / S.n).toFixed(0) + 'x'}`);
   }
   console.log(`\nThe 2026-07-22 set yields ${S.n} usable pairs from 158 rounds, because coverage is a verified`);
-  console.log(`PREFIX (14.1% of placements). More sessions alone will not fix this at the observed tie rate —`);
+  console.log(`PREFIX. More sessions alone will not fix this at the observed tie rate —`);
   console.log(`reducing ties means a finer-grained metric, or a simulator that verifies deeper into rounds.`);
 }
 

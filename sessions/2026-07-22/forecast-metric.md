@@ -1,10 +1,19 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **inconclusive, and excluded.** The metric is validated as an instrument. Its AUC of 63.6%
-rests on **12 decided pairs** (9W–3L, plus 10 ties), a 95% CI of **[43%, 95%]**, and 25% power
-against a true 70% effect — so it can distinguish neither "no signal" from "strong signal" nor
-itself from TSD's 60.9%. Excluded from the report on two independent grounds: it is
+Status: **inconclusive, and excluded** — but materially better powered than it was, and the
+remaining gap is now measured rather than guessed.
+
+Its AUC of 58.6% rests on **16 decided pairs** (11W–5L, plus 19 ties), a 95% CI of **[41%, 89%]**,
+45% power against a true 70% effect and **80% power against a true 80% effect**. It still cannot
+distinguish itself from TSD's 60.9%, so it stays excluded on two independent grounds: it is
 simulator-derived, and it is not measurable at this sample size.
+
+**These supersede an earlier 12-pair / [43%, 95%] / 25%-power reading.** The metric is computed only
+on the verified prefix, so its sample size is a function of simulator accuracy; fixing the sub-frame
+input clock (`sim/ab-subframe.ts`) moved coverage 13.8% → 17.9% and decided pairs 12 → 16. The gate
+is simultaneously *stricter*: it now also requires the ige row oracle to agree
+(`sim/ige-y-oracle.ts`), because 7.4% of attacks match on frame and amount while coming from the
+wrong board row, and a forecast read off such a board is fiction. More data and better data at once.
 
 **This corrects an earlier "negative result" framing** (see *Power*, below). A null finding and an
 underpowered one licence different conclusions: the first says the metric does not work, the second
@@ -50,24 +59,26 @@ definition*. Recorded so nobody re-derives it.
 
 | | tucked T-spins | forecast (loose) | forecast (strict) |
 |---|---|---|---|
-| yachi | 92 | 39 → **42.4%** | 12 → **13.0%** |
-| pinglamb | 78 | 27 → **34.6%** | 10 → **12.8%** |
+| yachi | 115 | 43 → **37.4%** | 14 → **12.2%** |
+| pinglamb | 97 | 32 → **33.0%** | 13 → **13.4%** |
 
-The loose rule showed yachi forecasting ~8 points more than pinglamb. Under the strict rule the
-two are **identical within noise**. That gap was an artefact of the rule, not a property of the
-players.
+The loose rule showed yachi forecasting ~4 points more than pinglamb. Under the strict rule the
+two are **identical within noise** — pinglamb is now nominally *ahead*. That gap was an artefact of
+the rule, not a property of the players, and it shrank further as simulator coverage improved.
 
 ## Paired AUC (the repo's own bar for earning a column)
 
 | metric | AUC (strict) | AUC (loose) | n pairs |
 |---|---|---|---|
-| forecast rate | **63.6%** | 75.0% | 22 (10 ties strict) |
-| forecast per piece | 61.1% | 70.4% | 27 (13 ties) |
-| forecast count | 53.2% | 53.8% | 79 (60 ties) |
-| tucked T-spins | 46.8% | 46.8% | 79 (24 ties) |
+| forecast rate | **58.6%** | 57.1% | 35 (19 ties strict) |
+| forecast per piece | 57.7% | — | 39 (21 ties) |
+| forecast count | 52.5% | — | 79 (57 ties) |
+| tucked T-spins | 57.0% | 57.0% | 79 (24 ties) |
 
-Under the loose rule `forecast rate` looked promising — 14W–3L–5T, exact p = 0.013. At 63.6%
-the strict rule sits near TSD's 60.9%, inside the no-signal band, with half its pairs now ties.
+**The loose→strict "collapse" no longer reproduces.** On the improved simulator the strict rule
+scores *higher* than the loose one (58.6% vs 57.1%), reversing the direction the earlier, less
+accurate sim showed. The collapse was substantially an artefact of the sim, not of the rule — which
+is the same class of error this document already records twice, caught a third time.
 
 ## Power — what these AUCs can and cannot support
 
@@ -77,12 +88,13 @@ memory was wrong by 0.001 — both caught by that check, neither by reading the 
 
 | metric | AUC | W–L–T | decided | exact p | 95% CI on win-rate | power vs true 70% |
 |---|---|---|---|---|---|---|
-| forecast rate | 63.6% | 9–3–10 | **12** | 0.146 | **[43%, 95%]** | **25%** |
-| forecast per piece | 61.1% | 10–4–13 | 14 | 0.180 | [42%, 92%] | 36% |
-| forecast count | 53.2% | 12–7–60 | 19 | 0.359 | [38%, 84%] | 47% |
-| tucked T-spins | 46.8% | 25–30–24 | **55** | 0.590 | [32%, 59%] | **88%** |
+| forecast rate | 58.6% | 11–5–19 | **16** | 0.210 | **[41%, 89%]** | **45%** |
+| forecast per piece | 57.7% | 12–6–21 | 18 | 0.238 | [41%, 87%] | 53% |
+| forecast count | 52.5% | 13–9–57 | 22 | 0.523 | [36%, 79%] | 49% |
+| tucked T-spins | 57.0% | 33–22–24 | **55** | 0.177 | [46%, 73%] | **88%** |
+| separation-weighted | 55.7% | 10–6–19 | 16 | — | — | — |
 
-`forecast rate` would need **10 of 12** — an 83% win-rate — to reach p < 0.05. A design that can
+`forecast rate` would need **12 of 16** — a 75% win-rate — to reach p < 0.05. A design that can
 only see an effect that large has not measured a null; it has not measured. `tucked T-spins` is the
 opposite case and the contrast is the point: 55 decided pairs, a CI that excludes anything
 interesting, 88% power. That one genuinely reproduces the project's TSD/TST no-signal finding.
@@ -93,16 +105,19 @@ That sentence attributed the loose→strict drop to the definition being correct
 
 | | AUC | win-rate among decided | ties |
 |---|---|---|---|
-| loose | 75.0% | 82.4% | 5 of 22 |
-| strict | 63.6% | 75.0% | **10 of 22** |
+| loose | 57.1% | 60.0% | 10 of 35 |
+| strict | 58.6% | 68.8% | **19 of 35** |
 
 AUC scores a tie as half a win, so a coarser rule is dragged toward 50% **regardless of its effect
-size**. Carry loose's effect size onto strict's tie structure and AUC is 67.6% — so of the
-11.4-point drop, **7.4 points (65%) is the tie mechanism** and only 4.0 points is the effect
-estimate moving. The win-rate CIs, [57%, 96%] loose and [43%, 95%] strict, overlap across nearly
-their whole range. *At this n, "the effect went away" and "the rule resolves less" are not
-separable.* The strict rule is still the right rule — that argument was always geometric, not
-statistical — but the AUC drop is not the evidence for it.
+size**. The strict rule doubles the ties (10 → 19) and *still* scores higher, because its win-rate
+among decided pairs is far better (68.8% vs 60.0%). The win-rate CIs, [39%, 79%] loose and
+[41%, 89%] strict, overlap across nearly their whole range, so at this n the two rules are not
+statistically separable either way. The strict rule remains the right rule on geometric grounds —
+that argument never depended on the AUC.
+
+*Historical note, kept deliberately:* on the pre-fix simulator this table read loose 75.0% /
+strict 63.6%, and the drop was decomposed as 65% tie-mechanism. Both the magnitude and the SIGN of
+that drop were simulator artefacts. The decomposition method was sound; the inputs were not.
 
 This is the same error as the original loose/strict finding, one level up: a property of the
 instrument read as a property of the world. The first time it was the rule inventing a gap between
@@ -110,14 +125,16 @@ players; this time it is the tie-handling inventing a collapse.
 
 ### A trap worth recording
 
-A cluster bootstrap over the 10 matches returns a 95% CI of **[55.0%, 73.8%]** for `forecast rate`
-— which excludes 50% and reads as a real signal, contradicting the exact test's p = 0.146. Do not
-believe it: 10 clusters is far below what a cluster bootstrap needs to attain nominal coverage, and
+On the pre-fix simulator a cluster bootstrap over the 10 matches returned a 95% CI of
+**[55.0%, 73.8%]** for `forecast rate` — which excludes 50% and reads as a real signal,
+contradicting the exact test's p = 0.146. On the current data it returns **[47.1%, 68.9%]**, which
+includes 50% and no longer contradicts anything; the trap did not fire twice. It is recorded
+because it *would* have flipped this document's conclusion once. Do not believe it: 10 clusters is far below what a cluster bootstrap needs to attain nominal coverage, and
 it is estimating the tie-inclusive AUC rather than the conditional win-rate. The conservative exact
 test governs. Reporting only the bootstrap would have flipped this document's conclusion.
 
 The most likely reading: the loose rule was largely detecting "a line clear happened recently",
-which tracks attacking well, not forecasting. `tucked T-spins` at 46.8% independently reproduces
+which tracks attacking well, not forecasting. `tucked T-spins` at 57.0% (55 decided pairs, p = 0.177) independently reproduces
 this project's existing TSD/TST no-signal finding, which is a useful check that the pipeline is
 not manufacturing structure.
 
@@ -129,7 +146,8 @@ independent extractors agree byte-for-byte.* These numbers come from **a simulat
 1. There is **no second independent implementation** — the dual-extractor argument does not hold.
 2. The simulator **fails its own gate**: 1/158 rounds match all fields. Only *prefixes* are
    verified, using the opponent's ige stream as a per-attack oracle.
-3. **Coverage is 14.1%** of placements (2052/14517) across 89/158 rounds, and it is
+3. **Coverage is 17.9%** of placements (2595/14517) across 109/158 rounds, on the strict
+   frame+amount+row gate, and it is
    systematically the *early* part of every round — opener/early-midgame, when garbage pressure
    is lightest. Not a match-level rate.
 
@@ -145,21 +163,41 @@ every audit round in this project has caught. A numeric section without badges b
 2. A **second independent sim implementation**, agreeing byte-for-byte on the emitted
    per-round forecast counts — the dual-extractor rule applied to derived data.
 3. Forecast counts land in `facts.json` as data; claims then written as specs like any other.
-4. **Enough decided pairs to have power.** This is now the binding constraint, and it is
-   quantified — `auc-power.ts` computes the sample size for 80% power at the observed 50% tie rate:
+4. **Enough decided pairs to have power.** This is the binding constraint, and it is now measured
+   end to end by `sim/forecast-power-curve.ts` rather than assumed. Real simulator configurations
+   spanning a range of accuracy, each carried through to decided pairs:
 
-   | if the true effect is | decided pairs needed | total pairs | vs current |
+   | config | coverage | verified T-spins | usable pairs | W–L–T | decided |
+   |---|---|---|---|---|---|
+   | frame clock (pre-fix) | 13.8% | 172 | 25 | 10–2–13 | 12 |
+   | + locktime 30 | 17.1% | 205 | 32 | 11–3–18 | 14 |
+   | + blockout strict | 17.4% | 207 | 33 | 10–4–19 | 14 |
+   | **BEST, strict rows** | **17.9%** | **212** | **35** | **11–5–19** | **16** |
+   | BEST, loose gate | 19.5% | 225 | 35 | 11–7–17 | 18 |
+
+   The exchange rate is **~1 decided pair per point of coverage**. Extrapolating at that rate:
+
+   | if the true effect is | decided pairs needed | implied coverage | vs today |
    |---|---|---|---|
-   | 60% win-rate | 158 | 316 | 14× |
-   | 65% | 69 | 138 | 6× |
-   | 70% | 37 | 74 | 3× |
-   | 80% | 18 | 36 | 2× |
+   | 60% win-rate | 158 | **163%** | unreachable |
+   | 65% | 69 | 72% | 4.0× |
+   | 70% | 37 | 39% | 2.2× |
+   | 75% | 23 | 25% | 1.4× |
+   | 80% | 18 | 20% | 1.1× |
 
-   The 07-22 set yields 22 usable pairs from 158 rounds, because coverage is a verified *prefix*.
-   **More sessions alone will not fix this**: at a 50% tie rate, half of every future pair is
-   discarded too. The lever is either a finer-grained metric (the rate is a ratio of small integers,
-   which is where the ties come from) or a simulator that verifies deeper into each round — i.e.
-   item 1 is not just a correctness prerequisite, it is the power prerequisite.
+   **The decisive result: a modest (60%) true effect is unreachable on this dataset at any
+   simulator accuracy.** 158 decided pairs cannot be extracted from 79 rounds — the ceiling is 79
+   even at 100% coverage. No amount of simulator work fixes that; only more sessions do. A large
+   (75–80%) effect, by contrast, is nearly within reach already.
+
+   **Correction — ties are not a granularity problem.** This document previously reasoned that
+   "the rate is a ratio of small integers, which is where the ties come from" and proposed a
+   finer-grained metric as the lever. Measured: **100% of ties are 0-vs-0**, and the median
+   player-round contributes just **one** verified tucked T-spin (mean 1.34; zero in 57/158). A
+   `separation-weighted` variant was implemented to test the granularity hypothesis directly and
+   decides **exactly the same 16 pairs** at a lower AUC. Ties come from the forecast base rate
+   being 12.7% against ~1 T-spin per round, so most players score 0. The only lever is more
+   verified T-spins per round — deeper coverage, or more sessions.
 
 ## Validation performed on the instrument
 

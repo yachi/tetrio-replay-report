@@ -5,72 +5,70 @@
  * implementation. Simulating 158 rounds twice over takes ~2 minutes, so results are cached to
  * pairs-cache.json keyed by the rule; delete that file to force a re-run.
  */
-import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
-import { simulate, DEFAULT_TABLE } from './sim.ts';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { forecastMetric } from './forecast.ts';
+import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
-export const METRICS = ['forecast rate', 'forecast per piece', 'forecast count', 'tucked T-spins'] as const;
+export const METRICS = ['forecast rate', 'forecast per piece', 'forecast count', 'tucked T-spins',
+                        'separation-weighted'] as const;
 export type Metric = (typeof METRICS)[number];
 const KEY: Record<Metric, string> = {
   'forecast rate': 'rate', 'forecast per piece': 'perPiece',
-  'forecast count': 'fc', 'tucked T-spins': 'n',
+  'forecast count': 'fc', 'tucked T-spins': 'n', 'separation-weighted': 'sepw',
 };
 
 export interface Row {
   file: string; round: number; W: string; L: string;
-  vals: Record<string, { alive: boolean; n: number; fc: number; rate: number | null; perPiece: number | null; verified: number }>;
+  vals: Record<string, { alive: boolean; n: number; fc: number; rate: number | null;
+                         perPiece: number | null; sepw: number | null; verified: number }>;
 }
 
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
-const opts = { garbagespeed: 30, garbagecap: 8, locktime: 30, gravity: 0.02, sdfMode: 'abs' as const,
-               insertMode: 'onPlace' as const, cancelMode: 'all' as const };
-
-export function collectRows(strict = true): Row[] {
+/** `strict` is the forecast RULE (strict vs loose T-spin classification).
+ *  `strictRows` is the verified-prefix GATE (whether the ige row oracle must agree). */
+export function collectRows(strict = true, strictRows = true): Row[] {
+  // Bump CACHE_V whenever the row shape or the sim settings change. A stale cache silently
+// yields rows missing the new field, which read as undefined and score as TIES — the
+// separation-weighted metric first appeared as 0 decided / 79 ties for exactly that reason.
+const CACHE_V = 3;
+  const cacheKey = `v${CACHE_V}|${strict}|rows=${strictRows}`;
   const cache = `${import.meta.dir}/pairs-cache.json`;
   if (existsSync(cache)) {
     const c = JSON.parse(readFileSync(cache, 'utf8'));
-    if (c[String(strict)]) return c[String(strict)] as Row[];
+    if (c[cacheKey]) return c[cacheKey] as Row[];
   }
   const rows: Row[] = [];
-  for (const file of readdirSync(DIR).filter(f => f.endsWith('.ttrm')).sort()) {
-    const d = JSON.parse(readFileSync(`${DIR}/${file}`, 'utf8'));
-    d.replay.rounds.forEach((rnd: any, ri: number) => {
-      if (rnd.length !== 2) return;
-      const P = rnd.map((p: any) => ({ p, rp: p.replay, gameid: p.replay.options.gameid }));
-      const vals: Row['vals'] = {};
-      for (const [me, other] of [[P[0], P[1]], [P[1], P[0]]] as any[]) {
-        const ev = me.rp.events.filter((e: any) => e.type === 'keydown' || e.type === 'keyup')
-          .map((e: any) => ({ frame: e.frame, sub: e.data.subframe ?? 0, type: e.type, key: e.data.key }));
-        const gin = me.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction' && e.data.data?.type === 'garbage')
-          .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size }));
-        const truth = other.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction'
-          && e.data.data?.type === 'garbage' && e.data.data.gameid === me.gameid)
-          .map((e: any) => ({ frame: e.data.data.frame ?? e.frame, amt: e.data.data.amt }))
-          .sort((a: any, b: any) => a.frame - b.frame);
-        const r = simulate(ev, gin, me.rp.options.handling, me.rp.options.seed, me.rp.frames, DEFAULT_TABLE, opts);
-        const mine = r.records.filter(x => x.sent > 0);
-        let vf = -1;
-        for (let i = 0; i < Math.min(mine.length, truth.length); i++) {
-          if (Math.abs(mine[i]!.frame - truth[i]!.frame) <= 25 && mine[i]!.sent === truth[i]!.amt) vf = mine[i]!.frame; else break;
-        }
-        let vIdx = -1;
-        for (let i = 0; i < r.locks.length; i++) if (r.locks[i]!.frame <= vf) vIdx = i;
-        const recs = vIdx < 0 ? [] : forecastMetric(r, strict).records.filter(x => x.lockIndex <= vIdx);
-        const fc = recs.filter(x => x.kind !== 'reactive').length;
-        vals[me.p.username] = { alive: me.p.alive, n: recs.length, fc,
-          rate: recs.length ? fc / recs.length : null,
-          perPiece: vIdx >= 0 ? fc / (vIdx + 1) : null, verified: vIdx + 1 };
-      }
-      const names = Object.keys(vals);
-      if (names.length !== 2) return;
-      const [a, b] = names as [string, string];
-      const W = vals[a]!.alive ? a : b, L = vals[a]!.alive ? b : a;
-      if (vals[W]!.alive === vals[L]!.alive) return;
-      rows.push({ file, round: ri, W, L, vals });
-    });
+  const byRound = new Map<string, { file: string; round: number; vals: Row['vals'] }>();
+  for (const c of loadCases()) {
+    const r = runCase(c);
+    const vIdx = verifiedIndex(r, c.truth, strictRows);
+    const recs = vIdx < 0 ? [] : forecastMetric(r, strict).records.filter(x => x.lockIndex <= vIdx);
+    const fcRecs = recs.filter(x => x.kind !== 'reactive');
+    const fc = fcRecs.length;
+    // Separation-weighted score. `forecast rate` is fc/n over a handful of T-spins, so it
+    // lands on the same few rationals for both players and TIES 54% of pairs — ties are
+    // scored as half a win, which drags AUC toward 50% regardless of effect size.
+    // Weighting each forecast by how many pieces ahead the roof was set is both finer
+    // grained (far fewer exact ties) and closer to the construct: a roof placed 8 pieces
+    // before the T is stronger evidence of intent than one placed 1 piece before.
+    const sepw = recs.length
+      ? fcRecs.reduce((a, x) => a + Math.max(x.separation, 0), 0) / recs.length
+      : null;
+    const k = `${c.file}#${c.round}`;
+    if (!byRound.has(k)) byRound.set(k, { file: c.file, round: c.round, vals: {} });
+    byRound.get(k)!.vals[c.user] = { alive: c.alive, n: recs.length, fc,
+      rate: recs.length ? fc / recs.length : null,
+      perPiece: vIdx >= 0 ? fc / (vIdx + 1) : null, sepw, verified: vIdx + 1 };
+  }
+  for (const { file, round, vals } of byRound.values()) {
+    const names = Object.keys(vals);
+    if (names.length !== 2) continue;
+    const [a, b] = names as [string, string];
+    const W = vals[a]!.alive ? a : b, L = vals[a]!.alive ? b : a;
+    if (vals[W]!.alive === vals[L]!.alive) continue;
+    rows.push({ file, round, W, L, vals });
   }
   const prev = existsSync(cache) ? JSON.parse(readFileSync(cache, 'utf8')) : {};
-  writeFileSync(cache, JSON.stringify({ ...prev, [String(strict)]: rows }));
+  writeFileSync(cache, JSON.stringify({ ...prev, [cacheKey]: rows }));
   return rows;
 }
 
@@ -80,7 +78,9 @@ export function pairsFor(rows: Row[], m: Metric): { win: number; lose: number; f
   const out: { win: number; lose: number; file: string }[] = [];
   for (const r of rows) {
     const w = (r.vals[r.W] as any)[k], l = (r.vals[r.L] as any)[k];
-    if (w === null || l === null) continue;
+    // == null catches undefined too: a missing field must never be scored as a tie
+    if (w == null || l == null) continue;
+    if (!Number.isFinite(w) || !Number.isFinite(l)) throw new Error(`non-finite ${m}: ${w} ${l}`);
     out.push({ win: w, lose: l, file: r.file });
   }
   return out;
