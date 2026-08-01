@@ -1,6 +1,35 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **a properly powered NULL, and excluded.** The metric is validated as an instrument, and
+Status: **a properly powered NULL at every unit of analysis, and excluded.** Three units were
+tested — round, event, player — and none shows an effect. More usefully, the ROUND is now known to
+be the wrong unit in principle.
+
+**The per-round metric barely correlates with itself.** Split-half reliability (odd vs even rounds,
+within player) is **0.29** for pinglamb and **0.064** for yachi. By Spearman–Brown, reaching a
+reliability of 0.70 would require aggregating **6** rounds for pinglamb and **34** for yachi. A
+quantity that cannot correlate with itself cannot correlate with winning, so at ~1.34 T-spins per
+player-round a per-round column is impossible **regardless of simulator coverage** — a stronger
+statement than "not significant", and the reason every round-level result here was doomed.
+
+**Selection bias was checked and ruled out.** The verified prefix ends where the simulator diverges,
+which plausibly tracks garbage pressure and therefore losing; if so, conditioning on verification
+would bias the AUC rather than merely widen it. It does not: winner's verified fraction vs loser's
+is 34–36 (exact sign test p = 0.905), correlation with winning 0.026. The verified-prefix analyses
+are unbiased, just underpowered.
+
+**Event level (the only well-powered design): no effect, and the negative control fires.** Forecast
+T-spins send 4.56 attack vs 4.04 for reactive, difference +0.52 with a cluster-bootstrap 95% CI of
+[−0.34, 1.28] — includes zero. But the pre-declared negative control — attack sent in the window
+*before the roof was built*, which forecasting cannot influence — shows a **significant** difference
+(−0.57, CI [−0.98, −0.07]). The two groups differ before the mechanism could act, so even a
+significant primary result could not have been attributed to forecasting. The control did its job.
+
+**Player level: no difference.** pinglamb 13/97 = 13.4%, yachi 14/115 = 12.2%; exact two-sided
+binomial against the exposure split, p = 0.848.
+
+Original status follows.
+
+Status (paired AUC, primary estimand): **a properly powered NULL, and excluded.** The metric is validated as an instrument, and
 on a design that uses all the data it shows **no association with anything** — not winning, not
 attack, not survival, not lines.
 
