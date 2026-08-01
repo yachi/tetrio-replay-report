@@ -32,11 +32,13 @@ def x1000(v):
 
 
 def file_index(fname):
-    """Match index from the filename's trailing number.
+    """The export number in the filename — what the batch is ordered by.
 
-    Session-agnostic: the suffix after the final '-' is the index, and an empty
+    Session-agnostic: the suffix after the final '-' is the number, and an empty
     suffix means 1 (TETR.IO names the first export of a batch without a number,
-    e.g. replay-2026-07-22-.ttrm alongside replay-2026-07-22-2.ttrm).
+    e.g. replay-2026-07-22-.ttrm alongside replay-2026-07-22-2.ttrm). It is not
+    the match's index in the session: see main(), which renumbers by position
+    once the batch is in order.
     """
     m = re.match(r".*?-(\d*)\.ttrm$", fname)
     if not m:
@@ -260,6 +262,14 @@ def main():
 
     matches = [extract_match(f) for f in files]
     matches.sort(key=lambda m: m["index"])
+    # The export number orders the batch and then stops being interesting: `index`
+    # is the match's POSITION in the session, which is what every claim means by
+    # "m3" and what the report prints as 第 3 場. They agreed by accident while
+    # every batch started at 1; 2026-08-01's exports run 2-8, and a card labelled
+    # 第 2 場 carrying a badge whose lemma says m1 is exactly the silent
+    # inconsistency this repo exists to prevent. The filename stays in `file`.
+    for pos, m in enumerate(matches, 1):
+        m["index"] = pos
 
     facts = {
         "players": PLAYERS,

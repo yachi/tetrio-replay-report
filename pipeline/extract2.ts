@@ -56,8 +56,10 @@ function intVal(v: unknown, ctx: string): number {
 }
 
 function fileIndex(filename: string): number {
-  // Session-agnostic: the digits after the final '-' are the index, and an empty
-  // suffix means 1 (TETR.IO exports the first replay of a batch unnumbered).
+  // The export number in the filename — what the batch is ordered by, not the
+  // match's index in the session (main() renumbers by position). Session-agnostic:
+  // the digits after the final '-', and an empty suffix means 1 (TETR.IO exports
+  // the first replay of a batch unnumbered).
   const m = filename.match(/-(\d*)\.ttrm$/);
   if (!m) throw new Error(`Unrecognized filename pattern: ${filename}`);
   if (m[1] === "") return 1;
@@ -272,6 +274,15 @@ function main() {
       return extractMatch(f, raw);
     })
     .sort((a, b) => a.index - b.index);
+
+  // The export number orders the batch and then stops being interesting: `index`
+  // is the match's POSITION in the session, which is what every claim means by
+  // "m3" and what the report prints as 第 3 場. They agreed by accident while
+  // every batch started at 1; 2026-08-01's exports run 2-8. The filename stays
+  // in `file`.
+  matches.forEach((m, i) => {
+    m.index = i + 1;
+  });
 
   const output = {
     players: [...PLAYERS],
