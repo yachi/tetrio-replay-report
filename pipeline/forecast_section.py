@@ -26,11 +26,24 @@ import html
 import json
 import os
 
-FACTS = os.path.join("sessions", "2026-07-22", "sim", "forecast-facts.json")
+# Session-scoped, NOT global. The first version hardcoded the 2026-07-22 path and was
+# registered for every session, so `build_report --check` on 2026-07-24 and 2026-07-28
+# reported DRIFT — it was trying to graft one session's simulator output into another
+# session's report. A session that has no forecast-facts.json simply has no such section.
+FACTS_REL = os.path.join("sim", "forecast-facts.json")
 
 
-def load(repo_root):
-    with open(os.path.join(repo_root, FACTS), encoding="utf-8") as fh:
+def facts_path(report_dir):
+    """`<session>/sim/forecast-facts.json` for the session owning `report_dir`."""
+    return os.path.join(os.path.dirname(os.path.abspath(report_dir)), FACTS_REL)
+
+
+def load(report_dir):
+    """The session's forecast facts, or None when it has none."""
+    path = facts_path(report_dir)
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
         return json.load(fh)
 
 
@@ -40,6 +53,8 @@ def _pct(x1000):
 
 
 def section(data):
+    if data is None:
+        return None
     players = sorted(data["players"], key=lambda p: -p["forecast_rate_x1000"])
     rows = []
     for p in players:

@@ -28,13 +28,23 @@ def main(argv=None):
         print("usage: check_forecast_section <report dir>", file=sys.stderr)
         return 2
     report_dir = argv[0]
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data = forecast_section.load(root)
+    data = forecast_section.load(report_dir)
     with open(os.path.join(report_dir, "report.html"), encoding="utf-8") as fh:
         doc = fh.read()
 
     start, end = region.markers("forecast", "pipeline/build_report.py")
     i, j = doc.find(start), doc.find(end)
+
+    if data is None:
+        # A session with no simulator output must have no forecast section. Asserted rather
+        # than skipped: a stray region here would be one session's numbers in another's report.
+        if i >= 0 or j >= 0:
+            print(f"FAIL {report_dir} has a forecast region but no "
+                  f"{forecast_section.FACTS_REL}", file=sys.stderr)
+            return 1
+        print(f"ok  {report_dir} has no forecast data and no forecast section")
+        return 0
+
     if i < 0 or j < 0:
         print("FAIL forecast region missing from report.html", file=sys.stderr)
         return 1
@@ -61,7 +71,7 @@ def main(argv=None):
         print(f"FAIL {b}", file=sys.stderr)
     if bad:
         return 1
-    print(f"ok  forecast section matches {forecast_section.FACTS} "
+    print(f"ok  forecast section matches {forecast_section.FACTS_REL} "
           f"({len(data['players'])} players) and stays outside the claims chain")
     return 0
 

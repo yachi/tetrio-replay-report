@@ -53,11 +53,12 @@ def appendix_section(ctx):
 
 
 def forecast_sec(ctx):
-    # Sourced from sim/forecast-facts.json, NOT facts.json — see the module docstring.
-    # Quarantined from the claims pipeline on purpose: one simulator, no second
+    # Sourced from the SESSION's sim/forecast-facts.json, not facts.json — see the module
+    # docstring. Quarantined from the claims pipeline on purpose: one simulator, no second
     # independent implementation, so the dual-extractor trust argument does not cover it.
-    root = ctx.get("repo_root") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return forecast_section.section(forecast_section.load(root))
+    # Returns None for a session with no such file, and render() then skips the region
+    # entirely rather than writing an empty one.
+    return forecast_section.section(forecast_section.load(ctx["report_dir"]))
 
 
 def claims_island(ctx):
@@ -89,8 +90,11 @@ def render(html, ctx):
     """Apply every generated section to `html`. Returns (html, [(name, how)])."""
     applied = []
     for name, anchor, build, markers in SECTIONS:
+        body = build(ctx)
+        if body is None:           # section does not apply to this session
+            continue
         start, end = markers or region.markers(name, "pipeline/build_report.py")
-        html, how = region.replace(html, start, end, build(ctx), anchor)
+        html, how = region.replace(html, start, end, body, anchor)
         applied.append((name, how))
     return html, applied
 
