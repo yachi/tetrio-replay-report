@@ -1,0 +1,66 @@
+{
+  "schema": "forecast-facts/1",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the simulator fails its own full gate; only verified prefixes are used",
+    "per-round split-half reliability is 0.29 (pinglamb) / 0.064 (yachi), so a per-round column is not possible at this event rate",
+    "no effect at any unit: round AUC p=0.210, event-level CI includes zero with a firing negative control, player-level p=0.848"
+  ],
+  "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "simulator_options": {
+    "garbagespeed": 30,
+    "garbagecap": 8,
+    "locktime": 60,
+    "gravity": 0.02,
+    "sdfMode": "abs",
+    "insertMode": "onPlace",
+    "cancelMode": "all",
+    "acEmit": "separate",
+    "subframe": true,
+    "blockout": "shiftup",
+    "kickset": "SRS+"
+  },
+  "simulator_configs_for_range": [
+    "best",
+    "vanilla_srs",
+    "strict_blockout",
+    "locktime30",
+    "gravity05",
+    "reference_queue",
+    "frame_clock"
+  ],
+  "players": [
+    {
+      "user": "pinglamb",
+      "verified_tspins": 97,
+      "forecast_garbage": 7,
+      "forecast_lineclear": 6,
+      "forecast_total": 13,
+      "reactive": 84,
+      "forecast_rate_x1000": 134,
+      "sampling_ci95_lo_x1000": 73,
+      "sampling_ci95_hi_x1000": 218,
+      "simulator_range_lo_x1000": 117,
+      "simulator_range_hi_x1000": 148,
+      "verified_placements": 1004,
+      "total_placements": 6971
+    },
+    {
+      "user": "yachi",
+      "verified_tspins": 115,
+      "forecast_garbage": 7,
+      "forecast_lineclear": 7,
+      "forecast_total": 14,
+      "reactive": 101,
+      "forecast_rate_x1000": 122,
+      "sampling_ci95_lo_x1000": 68,
+      "sampling_ci95_hi_x1000": 196,
+      "simulator_range_lo_x1000": 115,
+      "simulator_range_hi_x1000": 132,
+      "verified_placements": 1591,
+      "total_placements": 7546
+    }
+  ]
+}
