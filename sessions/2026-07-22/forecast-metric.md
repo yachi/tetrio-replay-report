@@ -1,7 +1,31 @@
 # T-Spin Forecast metric — findings, and why it is *not* in the report
 
-Status: **inconclusive, and excluded** — but materially better powered than it was, and the
-remaining gap is now measured rather than guessed.
+Status: **a properly powered NULL, and excluded.** The metric is validated as an instrument, and
+on a design that uses all the data it shows **no association with anything** — not winning, not
+attack, not survival, not lines.
+
+The paired-AUC primary estimand remains underpowered (16 decided pairs, p = 0.210). But that design
+throws away almost everything: it collapses each round to one bit, then discards 19 of 35 pairs as
+ties. A secondary continuous-outcome design over **110 player-rounds** with within-round permutation
+inference gives:
+
+| outcome | Pearson r | permutation p |
+|---|---|---|
+| won the round | **-0.000** | **0.995** |
+| garbage sent | -0.193 | 0.640 |
+| attack per minute | 0.109 | 0.300 |
+| pieces placed | -0.224 | 0.310 |
+| lines cleared | -0.207 | 0.871 |
+
+**And that null has a stated power.** Injecting a known winner advantage into the real data and
+re-running the same test: +5pp detected 24% of the time, **+10pp 67%, +15pp 94%**, +20pp 98% — so
+~80% power at about **+12 percentage points**. The false-positive rate at an injected effect of zero
+is 6%, which validates the test rather than assuming it. The observed between-player gap is 3-4
+points (yachi 11.9%, pinglamb 15.2%), comfortably inside the null.
+
+So this is no longer "we could not tell". It is: **there is no winner/loser forecast effect larger
+than about 12 percentage points, and nothing at all is visible.** It stays out of the report because
+it is simulator-derived and because a null does not earn a column — not because it is unmeasured.
 
 Its AUC of 58.6% rests on **16 decided pairs** (11W–5L, plus 19 ties), a 95% CI of **[41%, 89%]**,
 45% power against a true 70% effect and **80% power against a true 80% effect**. It still cannot
