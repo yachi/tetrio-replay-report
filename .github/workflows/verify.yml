@@ -150,6 +150,15 @@ jobs:
       - name: Check no generated CSS reaches outside its region
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
 
+      # The forecast section is simulator-derived and sits OUTSIDE the proof
+      # chain, so no lemma covers its numbers. This re-derives them from
+      # sim/forecast-facts.json, and fails if the section ever stops declaring
+      # itself unproved or acquires a claim badge. It also fails if a session
+      # with no simulator output somehow grew the section — that bug shipped
+      # once, grafting one session's numbers into another session's report.
+      - name: Check the simulator-derived forecast section
+        run: python3 -m pipeline.check_forecast_section "sessions/${{ matrix.session }}/report"
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail
@@ -238,3 +247,17 @@ jobs:
             fi
           done
           exit $status
+
+  # docs/ is the published GitHub Pages site, copied from the sessions by
+  # bin/build-docs — and nothing reran it automatically. Every other gate here
+  # verifies sessions/, so a report could pass all of them while the page people
+  # actually load stayed stale. That happened: a whole section (T-Spin Forecast)
+  # was live in sessions/ and absent from docs/ until someone noticed by hand.
+  docs:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check docs/ was republished from the sessions
+        run: python3 bin/build-docs --check

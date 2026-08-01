@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 """Regenerate docs/ (the GitHub Pages site) from the sessions.
 
-    bin/build-docs
+    bin/build-docs            regenerate
+    bin/build-docs --check    verify docs/ matches the sessions, write nothing
 
 Copies each session's self-contained report into docs/ under a clean name and
 regenerates docs/index.html from facts.json + the proof maps — so the landing
 page can never drift from the data it describes. Re-run after adding a session.
+
+`--check` exists because that promise had a hole: CI verified sessions/ in depth
+but never checked that docs/ had been regenerated from it, and nothing reruns this
+script automatically. A whole section (T-Spin Forecast) once lived in
+sessions/2026-07-22/report/report.html and was absent from the published
+docs/2026-07-22.html, so the page readers actually load was a different document
+from the one every gate had passed. --check is the same shape as
+`pipeline.build_report --check`: exit 1 and name the drifting files.
 """
+import argparse
+import filecmp
 import json
 import shutil
+import sys
 from html import escape
 from pathlib import Path
 
@@ -187,7 +199,14 @@ def render_index(cards, totals):
     return "".join(parts)
 
 
-def main():
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--check", action="store_true",
+                    help="verify docs/ matches the sessions; write nothing")
+    args = ap.parse_args(argv)
+    check = args.check
+    drift = []
+
     DOCS.mkdir(exist_ok=True)
     cards = []
     totals = {"sessions": 0, "matches": 0, "rounds": 0, "claims": 0}
@@ -205,7 +224,12 @@ def main():
         if summary is None:
             print(f"  skip {session}/{artefact} (no facts)")
             continue
-        shutil.copyfile(src, DOCS / out_name)
+        if check:
+            dst = DOCS / out_name
+            if not dst.exists() or not filecmp.cmp(src, dst, shallow=False):
+                drift.append(f"docs/{out_name} differs from {src.relative_to(REPO)}")
+        else:
+            shutil.copyfile(src, DOCS / out_name)
         cards.append(
             {"href": out_name, "date": session, "label": label,
              "blurb": blurb, "summary": summary}
@@ -216,21 +240,45 @@ def main():
             totals["sessions"] += 1
             totals["matches"] += summary["matches"]
             totals["rounds"] += summary["rounds"]
-        print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
+        if not check:
+            print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
 
     analyzer = REPO / "tools" / "analyzer.html"
     if analyzer.exists():
-        shutil.copyfile(analyzer, DOCS / "analyzer.html")
-        print("  copied tools/analyzer.html -> docs/analyzer.html")
+        dst = DOCS / "analyzer.html"
+        if check:
+            if not dst.exists() or not filecmp.cmp(analyzer, dst, shallow=False):
+                drift.append("docs/analyzer.html differs from tools/analyzer.html")
+        else:
+            shutil.copyfile(analyzer, dst)
+            print("  copied tools/analyzer.html -> docs/analyzer.html")
+
+    index = render_index(cards, totals)
+    if check:
+        cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
+        if cur != index:
+            drift.append("docs/index.html differs from what the sessions generate")
+        if drift:
+            for d in drift:
+                print(f"DRIFT: {d}", file=sys.stderr)
+            print("run `bin/build-docs` to republish", file=sys.stderr)
+            return 1
+        print(
+            f"ok  docs/ matches the sessions — {totals['sessions']} sessions, "
+            f"{totals['matches']} matches, {totals['rounds']} rounds, "
+            f"{totals['claims']} verified claims"
+        )
+        return 0
 
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
-    (DOCS / "index.html").write_text(render_index(cards, totals), encoding="utf-8")
+    (DOCS / "index.html").write_text(index, encoding="utf-8")
     print(
         f"wrote docs/index.html — {totals['sessions']} sessions, "
         f"{totals['matches']} matches, {totals['rounds']} rounds, "
         f"{totals['claims']} verified claims"
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
