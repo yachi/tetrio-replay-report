@@ -418,9 +418,17 @@ anonymous "report.html hand-written prose". Doing it exposed that `check_prose_f
 enumerated prose files by NAME, so the move silently removed 4 figures per session from the
 scan; it now walks `prose/*.json` generically.
 
-**Next in P5**, each a new entry in `build_report.SECTIONS`:
-1. the coaching section and the section ledes in 數據對決 — the last hand-built prose
-   still living in `report.html` rather than in a prose file
+**數據對決 and 建議 done (2026-08-02)** — `pipeline/stats_section.py` and
+`pipeline/coaching.py`, built in parallel by two agents and wired in serially, because both
+touch `build_report.SECTIONS` and all four reports. Verified by an independent harness rather
+than by the agents' own reports: all 8 section renders are content-identical to the committed
+markup, the element-id sets match (the chart mount points are read by the inline JS, so
+losing one silently blanks a chart), and each whole report reproduces its own content. The
+`約`-figure coverage landed back on 102/49/43/48 — the number to watch, since moving prose out
+of report.html is what silently narrowed that gate when 關鍵時刻 moved.
+
+**Next in P5**, the last item:
+1. ~~the coaching section and the section ledes in 數據對決~~ — done
 2. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
    expecting one to be copied from a previous session. This is also where the inline script
    stops being player-hardcoded: ~110 occurrences of `yachi`/`pinglamb` remain in colours,

@@ -344,10 +344,12 @@ gate cries wolf at exactly the figures it just added.
    two are gone — the match-card score builds nodes, and the appendix row builder was deleted
    with the section it served. Re-verify the 110 badge count and 54/52 appendix rows after
    touching anything near them.
-2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
-   `--check`): the hero/scoreboard, 全場之最, 關鍵時刻, the appendix, and the `chart-data`,
-   `match-copy` and `claims-data` islands. Still hand-built: the coaching section and the
-   section ledes in 數據對決.
+2. ROADMAP P5. **The report body is fully generated** (`pipeline/build_report.py`,
+   CI-gated with `--check`): hero/scoreboard, 數據對決, 關鍵時刻, 全場之最, 建議, the
+   appendix, and the `chart-data`, `match-copy` and `claims-data` islands, plus the round
+   table from its own generator. `report.html` carries the shell and marker pairs, nothing
+   else. What remains of P5 is the skeleton, so `bin/new-session` emits a report instead of
+   expecting one copied from the previous session.
 
    **Moving prose into a file can narrow a checker.** `check_prose_figures` enumerated
    `hero.json` and `matches.json` by name, so lifting 關鍵時刻 into `prose/moments.json`
