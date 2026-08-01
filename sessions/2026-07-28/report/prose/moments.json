@@ -1,0 +1,35 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "13秒完場，一條垃圾都冇食",
+      "value": "13s",
+      "body": "第1場第4局，約 13 秒就收工，係成晚最短嘅一局<span class=\"badge\" data-claim=\"G022\"></span>，而且 yachi 由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局<span class=\"badge\" data-claim=\"G057\"></span>。佢嗰局個 APM 睇落爆錶，但 APM 係<strong>速率</strong>，分母得 13 秒，數字自然大——所以唔計入 APM 紀錄，詳情見下面嘅註。"
+    },
+    {
+      "accent": "p",
+      "label": "最激嘅一鋪（打足一分鐘計）",
+      "value": "157.2 vs",
+      "body": "第8場第8局：打足一分鐘以上嘅 23 局入面，yachi 呢一局個 VS 約 157.2 同 APM 約 78.6 都係最高<span class=\"badge\" data-claim=\"G015\"></span><span class=\"badge\" data-claim=\"G014\"></span>，兩邊夾埋約 286.9 亦都係最高<span class=\"badge\" data-claim=\"G060\"></span>——而且係決勝局，兩個人喺同一局度同時開盡火。"
+    },
+    {
+      "accent": "g",
+      "label": "全場最長馬拉松",
+      "value": "167.5s",
+      "body": "第6場第5局頂足約 167.5 秒，係全場最長嘅一局<span class=\"badge\" data-claim=\"G021\"></span>。yachi 喺呢一局清咗 138 行，係全場單局最多<span class=\"badge\" data-claim=\"G020\"></span>，最後亦都係佢贏——長局佢守得住。"
+    },
+    {
+      "accent": null,
+      "label": "4:1 領先，最後四局全失",
+      "value": "m7",
+      "body": "第七場 yachi 一度 4:1 拋離，跟住最後四局一局都冇再贏過，5:4 輸咗<span class=\"badge\" data-claim=\"C012\"></span>。八場入面有兩場要打到最後一局先分勝負，兩場都係 pinglamb 埋單<span class=\"badge\" data-claim=\"G012\"></span>。"
+    }
+  ],
+  "trivia": [
+    "全晚最能夠解釋個比數嘅一條數：<strong>俾人埋咗都仲贏得返嘅局，pinglamb 有 8 局，yachi 一局都冇</strong><span class=\"badge\" data-claim=\"G056\"></span>。埋得深嗰陣邊個掘得返出嚟，就係呢晚嘅分別。",
+    "1v1 一局一命，殺人數同贏波局數係同一組數：<strong>pinglamb 35、yachi 29</strong><span class=\"badge\" data-claim=\"G038\"></span>。同上兩晚一樣，yachi 疊得快過對面<span class=\"badge\" data-claim=\"G039\"></span>、手法乾淨過對面<span class=\"badge\" data-claim=\"G043\"></span>，但係贏唔到個系列。",
+    "成晚最長嘅一條連勝係 pinglamb 嘅 <strong>七局</strong>，由第五場尾一路駁到第六場開頭<span class=\"badge\" data-claim=\"G013\"></span>——跨場都冇甩手，個系列就係喺呢度鎖死。"
+  ]
+}

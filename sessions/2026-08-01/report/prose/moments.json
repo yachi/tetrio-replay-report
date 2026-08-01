@@ -1,0 +1,35 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "12秒完場，一條垃圾都冇食",
+      "value": "12s",
+      "body": "第2場第5局，成局約 12 秒就收工，係全晚最短嘅一局<span class=\"badge\" data-claim=\"G021\"></span>，而且 yachi 由頭到尾一條垃圾都冇食過，係全晚贏得最乾淨嘅一局<span class=\"badge\" data-claim=\"G057\"></span>。佢嗰局個 APM 同 VS 睇落爆錶，但嗰兩樣係<strong>速率</strong>，分母得 12 秒，數字自然大——所以唔計入 APM／VS 紀錄，詳情見下面嘅註。"
+    },
+    {
+      "accent": "p",
+      "label": "最硬淨嘅一次頂返",
+      "value": "54 行",
+      "body": "第2場第3局，pinglamb 俾人射埋嚟 54 行，多過 yachi 嗰邊嘅 33 行，照樣頂住贏返<span class=\"badge\" data-claim=\"G024\"></span>。食多過對手垃圾都照贏嘅局全晚有 7 局，佢一個人佔 5 局<span class=\"badge\" data-claim=\"G056\"></span>。"
+    },
+    {
+      "accent": "g",
+      "label": "全場最長馬拉松",
+      "value": "205s",
+      "body": "第6場第2局頂足約 205 秒，係全場最長嘅一局<span class=\"badge\" data-claim=\"G020\"></span>。yachi 喺呢一局清咗 181 行，係全場單局最多<span class=\"badge\" data-claim=\"G019\"></span>，但最後仲係輸咗——清得多唔等於打得重。"
+    },
+    {
+      "accent": null,
+      "label": "3:3 之後，一場定生死",
+      "value": "m7",
+      "body": "七場梅花間竹輪住贏<span class=\"badge\" data-claim=\"C001\"></span>，所以打到第七場就係 3:3、一場定生死。yachi 開波連贏三局，5:2 攞埋成晚<span class=\"badge\" data-claim=\"C012\"></span>。決勝場第三局仲一次過收晒三項紀錄：打足一分鐘以上嘅局入面，最高單局 APM 約 75.1<span class=\"badge\" data-claim=\"G013\"></span>、最高單局 VS 約 172.4<span class=\"badge\" data-claim=\"G014\"></span>，兩邊夾埋約 323.4 亦都係最高<span class=\"badge\" data-claim=\"G059\"></span>。"
+    }
+  ],
+  "trivia": [
+    "全晚最抵諗嘅一條數：<strong>yachi 多疊咗 326 粒方塊，打出嘅攻擊反而少過 pinglamb 32 條</strong><span class=\"badge\" data-claim=\"C003\"></span>。連遊戲分數都只係爭 576 分，唔夠千分之一<span class=\"badge\" data-claim=\"C005\"></span>——兩條完全唔同嘅路，埋單去到同一個位。",
+    "快嘅代價：全晚 8 局係自己頂到頂收場，<strong>6 局係 yachi、2 局係 pinglamb</strong><span class=\"badge\" data-claim=\"C007\"></span>。落多啲方塊、追速度，換返嚟就係自爆多咗三倍。",
+    "成晚最長嘅一條連勝係 yachi 嘅 <strong>四局</strong>，由第三場尾駁到第四場開頭<span class=\"badge\" data-claim=\"G012\"></span>——第三場最後三局，正正就係佢 2:3 落後之後反手嗰三局<span class=\"badge\" data-claim=\"C009\"></span>。"
+  ]
+}

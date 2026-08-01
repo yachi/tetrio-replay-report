@@ -1,0 +1,35 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "最長馬拉松",
+      "value": "228.3s",
+      "body": "第2場第3局，三分四十八秒嘅落樓大戰，yachi 一路食多過對手嘅垃圾（127 vs 109 行）都死頂唔冧，仲一鋪清咗全場最多嘅 204 行<span class=\"badge\" data-claim=\"C006\"></span><span class=\"badge\" data-claim=\"C007\"></span><span class=\"badge\" data-claim=\"C023\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "全場最勁閃電殺",
+      "value": "15s",
+      "body": "第7場第2局，pinglamb 約15秒一鋪過收工<span class=\"badge\" data-claim=\"C009\"></span>。嗰局個 APM 同 vs 睇落爆錶（約114.2、約262.5），但呢兩樣係<strong>速率</strong>，分母得15秒，數字自然大——所以唔計入 APM／VS 紀錄<span class=\"badge\" data-claim=\"C010\"></span>，打足一分鐘嘅紀錄喺下面嘅全場之最。"
+    },
+    {
+      "accent": "g",
+      "label": "單發最大 spike",
+      "value": "16（兩邊都掂過3次）",
+      "body": "全場最大單發 spike 係 16，兩邊都掂過，一共出現三次；yachi 喺第4場第3局劈嗰一嘢仲順手贏埋局<span class=\"badge\" data-claim=\"C013\"></span>。"
+    },
+    {
+      "accent": null,
+      "label": "全場鐵律",
+      "value": "79 / 79",
+      "body": "全場79局，每一局贏嗰個 vs score 都高過輸嗰個——vs 就係命，冇一局例外<span class=\"badge\" data-claim=\"C015\"></span>。"
+    }
+  ],
+  "trivia": [
+    "有 <strong>8 局</strong>係贏家真係食多過對手嘅垃圾行都照樣翻盤，當中 <strong>yachi 佔6局、pinglamb 佔2局</strong>，證明 yachi 落樓真係頂得住<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"C027\"></span>。",
+    "兩個人夾埋成個 series 出咗 <strong>19次 Perfect Clear</strong>（yachi 12、pinglamb 7）<span class=\"badge\" data-claim=\"C020\"></span><span class=\"badge\" data-claim=\"R012\"></span>。",
+    "跨場計 yachi 最多可以連贏五局，係全場最長嘅連勝（pinglamb 最多得三局），不過單場之內佢最多都係連贏四局<span class=\"badge\" data-claim=\"C021\"></span>。第2場第8局 pinglamb 靠21個 T-spin 拎低咗嗰局約200.5秒嘅馬拉松<span class=\"badge\" data-claim=\"C018\"></span>；第9場第6局佢又串起全場最長嘅 10連 B2B<span class=\"badge\" data-claim=\"C019\"></span>。"
+  ]
+}

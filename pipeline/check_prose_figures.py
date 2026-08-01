@@ -20,10 +20,29 @@ A figure counts as:
                because it is usually a sum or a difference this cannot resolve
 """
 import argparse
+import glob
 import json
 import os
 import re
 import sys
+
+def _strings(node, path=""):
+    """Every string leaf in a decoded JSON document, with a dotted path label.
+
+    Deliberately structure-agnostic: a prose file's shape is the section author's
+    business, and a checker that knows the shape is a checker that stops looking
+    when the shape changes.
+    """
+    if isinstance(node, str):
+        if node.strip():
+            yield path or "(root)", node
+    elif isinstance(node, dict):
+        for k, v in node.items():
+            yield from _strings(v, f"{path}.{k}" if path else str(k))
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _strings(v, f"{path}[{i}]")
+
 
 GENERATED = re.compile(r"<!-- BEGIN generated .*?<!-- END generated [a-z-]+ -->", re.S)
 CLAIMS_ISLAND = re.compile(r"<!-- CLAIMS_DATA_START -->.*?<!-- CLAIMS_DATA_END -->", re.S)
@@ -110,18 +129,18 @@ def surfaces(report_dir):
         out += [(rel, c["id"], c["canto"]) for c in claims]
         out += [(rel, f'{c["id"]}.gloss', c.get("english_gloss") or "")
                 for c in claims]
-    hero = os.path.join(report_dir, "prose", "hero.json")
-    if os.path.exists(hero):
-        with open(hero, encoding="utf-8") as fh:
-            d = json.load(fh)
-        out += [("prose/hero.json", k, d[k]) for k in ("title", "lede") if d.get(k)]
-    mats = os.path.join(report_dir, "prose", "matches.json")
-    if os.path.exists(mats):
-        with open(mats, encoding="utf-8") as fh:
-            d = json.load(fh)
-        for k, v in (d.get("cards") or {}).items():
-            out += [("prose/matches.json", f"card{k}.title", v.get("title") or ""),
-                    ("prose/matches.json", f"card{k}.body", v.get("body") or "")]
+    # Every prose file, and every string in it — NOT a list of known filenames and
+    # known fields. That is how this check silently narrowed once: moving 關鍵時刻
+    # out of report.html and into prose/moments.json took its figures out of the
+    # scan, because the region it left behind is generated (and so skipped below)
+    # while the new file was not on the list. The count went DOWN and nothing said
+    # so. Walking prose/*.json means the next prose file is covered on the day it
+    # is written, and fields nobody thought to enumerate — hero's tags, a card's
+    # title — are covered too.
+    for path in sorted(glob.glob(os.path.join(report_dir, "prose", "*.json"))):
+        rel = f"prose/{os.path.basename(path)}"
+        with open(path, encoding="utf-8") as fh:
+            out += [(rel, label, text) for label, text in _strings(json.load(fh))]
     report = os.path.join(report_dir, "report.html")
     if os.path.exists(report):
         with open(report, encoding="utf-8") as fh:

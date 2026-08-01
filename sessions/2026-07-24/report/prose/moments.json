@@ -1,0 +1,35 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "全場最長馬拉松",
+      "value": "240.1s",
+      "body": "第3場第3局，全場最長嘅一局，yachi 俾人射埋嚟 177 嘅攻擊（比 pinglamb 面對嘅 158 仲多）都照贏，仲順手疊出全場最長嘅 8 combo<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"C013\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "21秒閃電屠殺",
+      "value": "21s",
+      "body": "第5場第2局淨係約21秒就完咗，係成晚最短嘅一局<span class=\"badge\" data-claim=\"C009\"></span>。pinglamb 嗰局個 APM 同 VS 睇落爆錶（約95.4、約178.4），但呢兩樣係<strong>速率</strong>，分母得21秒，數字自然大——所以唔計入 APM／VS 紀錄<span class=\"badge\" data-claim=\"C007\"></span><span class=\"badge\" data-claim=\"C008\"></span>，打足一分鐘嘅紀錄喺下面嘅全場之最。"
+    },
+    {
+      "accent": "g",
+      "label": "單發最大 spike",
+      "value": "17（pinglamb）",
+      "body": "第5場第8局 pinglamb 一下打出 17 嘅單次 spike，係全場最大嘅一 spike，遠高過 yachi 嘅單場最勁 15<span class=\"badge\" data-claim=\"C010\"></span><span class=\"badge\" data-claim=\"R013\"></span>。"
+    },
+    {
+      "accent": null,
+      "label": "全場唯一長戰",
+      "value": "9局",
+      "body": "第7場係全場唯一一場要打夠九局先分到勝負嘅 match，最後 yachi 5:4 收火<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"C014\"></span>。"
+    }
+  ],
+  "trivia": [
+    "1v1 一局一命，殺人數同贏波局數係同一組數：<strong>pinglamb 29、yachi 21</strong><span class=\"badge\" data-claim=\"C021\"></span>。",
+    "最大反差：七場 match 入面 <strong>yachi 場場疊得快過 pinglamb</strong>（match PPS 全部高過對面）<span class=\"badge\" data-claim=\"C022\"></span>，但係就係贏唔到個系列——快，唔等於贏。",
+    "第6場第5局 pinglamb 疊到全場最長嘅 <strong>8 條 back-to-back</strong><span class=\"badge\" data-claim=\"C019\"></span>；決勝場 m7 局勢仲反覆到 yachi 先贏頭兩局，俾 pinglamb 連追三局反超，先再追返<span class=\"badge\" data-claim=\"C016\"></span>。"
+  ]
+}

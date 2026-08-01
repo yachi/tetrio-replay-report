@@ -410,8 +410,16 @@ badges. Probes: a hand-edited row fails `--check`; a claim downgraded in the pro
 驗證中（failed） with `data-all-verified="false"` and no tick; markup injected into a claim's
 Cantonese comes out escaped.
 
+**關鍵時刻 done (2026-08-02)** — `pipeline/moments.py` + `prose/moments.json`, extracted from
+the committed HTML rather than retyped and verified to render identical content in all four
+reports. The trivia numbers stopped being hand-typed (they are positional now), and the
+figures gained per-field attribution: `prose/moments.json cards[3].body` instead of an
+anonymous "report.html hand-written prose". Doing it exposed that `check_prose_figures`
+enumerated prose files by NAME, so the move silently removed 4 figures per session from the
+scan; it now walks `prose/*.json` generically.
+
 **Next in P5**, each a new entry in `build_report.SECTIONS`:
-1. the coaching section, 關鍵時刻, and the section ledes in 數據對決 — the last hand-built prose
+1. the coaching section and the section ledes in 數據對決 — the last hand-built prose
    still living in `report.html` rather than in a prose file
 2. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
    expecting one to be copied from a previous session. This is also where the inline script

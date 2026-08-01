@@ -345,9 +345,17 @@ gate cries wolf at exactly the figures it just added.
    with the section it served. Re-verify the 110 badge count and 54/52 appendix rows after
    touching anything near them.
 2. ROADMAP P5, in progress. Generated so far (`pipeline/build_report.py`, CI-gated with
-   `--check`): the hero/scoreboard, 全場之最, the appendix, and the `chart-data`, `match-copy`
-   and `claims-data` islands. Still hand-built: the coaching section, 關鍵時刻, and the
-   section ledes in 數據對決. Add each as a new entry in `SECTIONS`; the marker region and the
+   `--check`): the hero/scoreboard, 全場之最, 關鍵時刻, the appendix, and the `chart-data`,
+   `match-copy` and `claims-data` islands. Still hand-built: the coaching section and the
+   section ledes in 數據對決.
+
+   **Moving prose into a file can narrow a checker.** `check_prose_figures` enumerated
+   `hero.json` and `matches.json` by name, so lifting 關鍵時刻 into `prose/moments.json`
+   took its figures out of the scan — the region left behind is generated and therefore
+   skipped, and the new file was on nobody's list. The count went 102 → 98 and nothing
+   said so. It now walks `prose/*.json` and every string leaf in them, which also picked
+   up fields nobody had enumerated. When adding a prose file, check the figure count goes
+   UP. Add each as a new entry in `SECTIONS`; the marker region and the
    drift gate come for free.
 
    A `SECTIONS` entry may keep pre-existing markers instead of the standard pair — the
