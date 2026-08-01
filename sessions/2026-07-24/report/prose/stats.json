@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人打法完全唔同：yachi 係「快手 quad 流」，靠速度同乾淨手法追落後；pinglamb 就係「power T-spin 效率流」，用少啲方塊榨到多啲傷害<span class=\"badge\" data-claim=\"R004\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（50局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。馬拉松局（m3 第三局）同閃電屠殺局（m5 第二局）已經圈起。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "yachi 開多咗 quad（248 對 191）<span class=\"badge\" data-claim=\"R007\"></span>；pinglamb 就開多咗 T-spin double（232 對 189）<span class=\"badge\" data-claim=\"R007\"></span>，T-spin triple 仲拋離 yachi 超過一倍半（52 對 32）<span class=\"badge\" data-claim=\"R023\"></span>。"
+      ],
+      "footnote": "呢個圖表嘅 TSD 同 TST 兩條 bar 加埋，先啱「計埋 T-spin double 同 triple」嗰條數（pinglamb 284、yachi 221）<span class=\"badge\" data-claim=\"R008\"></span>——TSS（T-spin single）冇計落嗰個總數度。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

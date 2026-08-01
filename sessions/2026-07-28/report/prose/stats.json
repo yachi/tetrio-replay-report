@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人嘅分工同前兩晚一樣清楚：yachi 係「快手 quad 流」，PPS 快過對面<span class=\"badge\" data-claim=\"G039\"></span>、手法乾淨過對面<span class=\"badge\" data-claim=\"G043\"></span>；pinglamb 就係「效率流」，每粒方塊打得重過 yachi<span class=\"badge\" data-claim=\"G041\"></span>。最能夠概括成晚嘅一條數係咁嘅：yachi 全晚多疊咗 378 粒方塊，打出嚟嘅攻擊反而仲少過 pinglamb 15 條<span class=\"badge\" data-claim=\"C008\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（64局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。VS 呢一項喺今晚 64 局入面，每一局都係贏嗰個高過輸嗰個——冇一局例外<span class=\"badge\" data-claim=\"G024\"></span>。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "兩個人揀嘅開行方式差好遠：yachi 開多咗 quad（272 對 207）<span class=\"badge\" data-claim=\"G034\"></span>；pinglamb 就開多咗 T-spin double（237 對 219）<span class=\"badge\" data-claim=\"G035\"></span>，T-spin triple 仲拋離 yachi 超過一半（68 對 43）<span class=\"badge\" data-claim=\"G036\"></span>。同樣清一行，T-spin 用少啲方塊就換到同等傷害——呢個就係佢每粒方塊打得重過 yachi 嘅來源<span class=\"badge\" data-claim=\"G041\"></span>。"
+      ],
+      "footnote": "呢個圖表嘅 TSD 同 TST 兩條 bar 加埋，先啱「計埋 T-spin double 同 triple」嗰條數（pinglamb 305、yachi 262）<span class=\"badge\" data-claim=\"G054\"></span>——TSS（T-spin single）冇計落嗰個總數度。另外要留意，facts.json 入面嗰個 <code>tspins</code> 原始計數（pinglamb 368、yachi 312）<span class=\"badge\" data-claim=\"G033\"></span>係連冇清到行嘅轉都計埋，所以一定大過上面兩條 bar 加埋，兩者唔可以溝亂。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

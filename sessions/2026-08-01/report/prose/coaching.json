@@ -1,0 +1,36 @@
+{
+  "eyebrow": "教練分析 · 下一步點練",
+  "title": "俾兩位嘅建議",
+  "lede": "個比數係 4:3，局數係 28:25<span class=\"badge\" data-claim=\"G002\"></span>，總攻擊爭 32 條、遊戲分數爭 576 分<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"C005\"></span>——呢晚兩個人嘅距離，細到用邊個「打得好啲」呢句去講都唔啱。真正嘅分別係<strong>路線</strong>：一個靠快，一個靠重。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 quad 流",
+      "profile": [
+        "你嘅強項一如以往，而且係實數：七場 match，場場場均 PPS 高過 pinglamb<span class=\"badge\" data-claim=\"G050\"></span>，每局平均 PPS 約 1.44 對佢約 1.35<span class=\"badge\" data-claim=\"G038\"></span>。每粒方塊按嘅掣少過對面<span class=\"badge\" data-claim=\"G060\"></span>，finesse 失誤率又低過對面<span class=\"badge\" data-claim=\"G041\"></span>、perfect piece 比率高過對面<span class=\"badge\" data-claim=\"G042\"></span>，即係手法真係乾淨。hold 用得比對面密（2194 對 1960）<span class=\"badge\" data-claim=\"G031\"></span>，quad 亦都開多過對面（263 對 245）<span class=\"badge\" data-claim=\"G033\"></span>。",
+        "<strong>問題同前三晚一模一樣：呢啲嘢冇換到傷害。</strong> 成晚計埋，你多疊咗 326 粒方塊，打出嚟嘅攻擊反而少過 pinglamb 32 條<span class=\"badge\" data-claim=\"C003\"></span>；拉開嚟計，佢每粒方塊嘅攻擊高過你超過 7%<span class=\"badge\" data-claim=\"C004\"></span>，而且七場冇一場例外<span class=\"badge\" data-claim=\"C002\"></span>。",
+        "今次同上次唔同嘅係，<strong>呢個唔再係走勢問題，係恆定嘅風格差異</strong>：佢贏嗰啲局嘅 APP 高過你贏嗰啲局，佢輸嗰啲局又高過你輸嗰啲局<span class=\"badge\" data-claim=\"C006\"></span>。即係無論打得好定唔好，效率呢一格都係你輸蝕。代價亦都睇得到——全晚 8 局自己頂到頂，6 局係你、佢得 2 局<span class=\"badge\" data-claim=\"C007\"></span>。",
+        "好消息係個開關好清楚：單局 APM 一上到 65 以上，你 8 局贏晒 8 局<span class=\"badge\" data-claim=\"G046\"></span>；而且你自己贏嘅局同輸嘅局比較，APP 約 0.65 對約 0.56，高咗大約 16%<span class=\"badge\" data-claim=\"G065\"></span>——分別喺開唔開到火，唔係喺打唔打得快。"
+      ],
+      "recs": [
+        "<strong>唔好再加速——加重。</strong> 你已經場場快過對面<span class=\"badge\" data-claim=\"G050\"></span>、按掣少過對面<span class=\"badge\" data-claim=\"G060\"></span>、finesse 靚過對面<span class=\"badge\" data-claim=\"G042\"></span>，而呢三樣都冇幫你贏多局。真正分勝負嗰樣係 APP：你自己贏嗰啲局約 0.65、輸嗰啲局約 0.56<span class=\"badge\" data-claim=\"G065\"></span>，兩個人都一樣<span class=\"badge\" data-claim=\"G071\"></span>。具體做法：唔好見到位就即刻清行，等多一兩粒砌到 TSD 先出手。",
+        "<strong>T-spin triple 係最大嗰條裂縫。</strong> TSD 兩邊差唔多（240 對 238）<span class=\"badge\" data-claim=\"G034\"></span>，但 TST 就 34 對 54，輸咗成 20 個<span class=\"badge\" data-claim=\"G035\"></span>，加埋計 274 對 292<span class=\"badge\" data-claim=\"G054\"></span>。你 quad 開多過佢<span class=\"badge\" data-claim=\"G033\"></span>，但同樣清行數，TST 用嘅方塊少好多——呢個就係嗰 7% 效率差距最抵補嘅一格。",
+        "<strong>守嗰邊今次做得唔錯，繼續。</strong> 全 session 每粒方塊清走嘅垃圾（DS）你係高過 pinglamb 嘅<span class=\"badge\" data-claim=\"G072\"></span>，清走嘅垃圾總數亦都多（1124 對 1038）<span class=\"badge\" data-claim=\"G029\"></span>，贏局 DS 約 0.21、輸局約 0.18<span class=\"badge\" data-claim=\"G069\"></span>。呢樣同上一個 session 掉轉咗，係實質進步，唔好因為追效率而丟返低。",
+        "<strong>唔使再練手法。</strong> 講明呢樣係想你唔好浪費時間：每粒方塊按幾多下（KPP）呢一項，你贏嘅局同輸嘅局差距唔夠 0.03，即係唔到 1%<span class=\"badge\" data-claim=\"G067\"></span>，pinglamb 都係一樣<span class=\"badge\" data-claim=\"G068\"></span>。呢個係<strong>連續第四個 session</strong> 同一個結論——手法乾淨唔會再幫你贏多一局，慳返啲時間練上面三樣。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "power T-spin 效率流",
+      "profile": [
+        "慢啲但重啲：PPS 逐場都低過 yachi<span class=\"badge\" data-claim=\"G050\"></span>，但每粒方塊打出嘅攻擊七場都高過對面<span class=\"badge\" data-claim=\"C002\"></span>，全 session 高出超過 7%<span class=\"badge\" data-claim=\"C004\"></span>。靠嘅係 T-spin triple——54 對 34<span class=\"badge\" data-claim=\"G035\"></span>，加埋 TSD 計 292 對 274<span class=\"badge\" data-claim=\"G054\"></span>，仲有 All Clear 8 對 4<span class=\"badge\" data-claim=\"G036\"></span>。大 spike 又勁又密：12 行以上嘅局有 22 局，yachi 得 17 局<span class=\"badge\" data-claim=\"G053\"></span>。單局 combo 同 B2B 嘅上限都係你高（9 對 7、9 對 6）<span class=\"badge\" data-claim=\"G052\"></span><span class=\"badge\" data-claim=\"G051\"></span>。輸出嘅波動仲細過 yachi，APM 同 PPS 兩樣都係<span class=\"badge\" data-claim=\"G043\"></span><span class=\"badge\" data-claim=\"G044\"></span>，即係你場場都交到貨。",
+        "守嗰邊仲勁：你贏嘅局 DS 約 0.23、輸嘅局約 0.16，贏局高足四成半<span class=\"badge\" data-claim=\"G070\"></span>——比 yachi 嗰邊嘅差距大好多<span class=\"badge\" data-claim=\"G069\"></span>。食多過對手垃圾都照贏嘅局全晚 7 局，你佔 5 局<span class=\"badge\" data-claim=\"G056\"></span>。",
+        "咁點解會輸？講白啲，<strong>你冇輸幾多</strong>——28 比 25，三局之差<span class=\"badge\" data-claim=\"G002\"></span>，總攻擊仲多過對面 32 條<span class=\"badge\" data-claim=\"C003\"></span>。要搵一格你真係落後嘅，得速度：七場場均 PPS 場場低過 yachi<span class=\"badge\" data-claim=\"G050\"></span>，而佢就係用呢一格買返成晚。"
+      ],
+      "recs": [
+        "<strong>效率係你嘅主武器，唔好去溝 quad。</strong> 你贏面完全建立喺每粒方塊打得重之上<span class=\"badge\" data-claim=\"C002\"></span><span class=\"badge\" data-claim=\"C004\"></span>，而個來源就係 TST<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G054\"></span>。yachi 多開 18 個 quad 都追唔到效率<span class=\"badge\" data-claim=\"G033\"></span>，你千祈唔好調轉去追 quad。",
+        "<strong>要補嘅係速度，唔係輸出。</strong> 效率呢一格你已經七場七贏<span class=\"badge\" data-claim=\"C002\"></span>，再推上去嘅邊際回報好細；速度就係你唯一一格輸足七場嘅嘢<span class=\"badge\" data-claim=\"G050\"></span>。yachi 呢一晚就係示範咗速度可以買返幾多——多 326 粒方塊，補返成個效率差距<span class=\"badge\" data-claim=\"C003\"></span>。你 APM 一夠 65 就 8 局贏 7 局<span class=\"badge\" data-claim=\"G047\"></span>，即係去到嗰個檔一樣贏，問題係去唔去到。練法：唔好等到砌好 T-spin 先開火，開局同過渡位嘅手速先係樽頸。",
+        "<strong>繼續食住 downstack 呢個優勢。</strong> 你贏局同輸局嘅 DS 差距四成半<span class=\"badge\" data-claim=\"G070\"></span>，係全晚所有指標入面最大嘅一個 split——「掘得返」對你嘅勝率影響比對面重好多<span class=\"badge\" data-claim=\"G069\"></span>。反打局 5 比 2 唔係彩數<span class=\"badge\" data-claim=\"G056\"></span>，係可以繼續加碼嘅本錢。"
+      ]
+    }
+  },
+  "versus_note": "四個 session 落嚟，同一個結論企得更穩：<strong>贏一局嘅係每粒方塊嘅攻擊，唔係每分鐘落幾多粒</strong><span class=\"badge\" data-claim=\"G071\"></span>——53 局裏面每一局，贏嗰個嘅 VS 都高過輸嗰個<span class=\"badge\" data-claim=\"G023\"></span>。但今晚多咗一句要記住：<strong>兩條路可以去到同一個位</strong>。yachi 用 326 粒額外方塊，換返 pinglamb 用效率賺到嘅嘢，兩邊總攻擊爭 32 條、總分爭 576 分<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"C005\"></span>。所以「APP 高過對面」唔等於「贏成晚」——APP 決定嘅係一局，一晚係由邊啲局落喺邊個手上決定，而呢晚就係梅花間竹咁分，最後嗰場企咗喺 yachi 嗰邊<span class=\"badge\" data-claim=\"C001\"></span><span class=\"badge\" data-claim=\"C012\"></span>。同樣要記住嘅係一個負面結論：KPP 連續第四次證實同輸贏冇關係<span class=\"badge\" data-claim=\"G067\"></span><span class=\"badge\" data-claim=\"G068\"></span>。呢個唔係一個「未搵到」嘅指標，係一個「已經確認冇用」嘅指標。"
+}

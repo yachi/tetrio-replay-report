@@ -1,0 +1,36 @@
+{
+  "eyebrow": "教練分析 · 下一步點練",
+  "title": "俾兩位嘅建議",
+  "lede": "個比數係 6:2，但局數係 35:29<span class=\"badge\" data-claim=\"G002\"></span>——兩個人嘅距離冇個比數睇落咁遠。落面拆開嚟講嘅嘢，全部圍住同一個結論：呢晚唔係邊個打得快，係邊個每粒方塊榨得多<span class=\"badge\" data-claim=\"G070\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 quad 流",
+      "profile": [
+        "你嘅強項一如以往，而且係實數：每局平均 PPS 約 1.456，快過 pinglamb 嘅約 1.381<span class=\"badge\" data-claim=\"G039\"></span>；每粒方塊按嘅掣少過對面<span class=\"badge\" data-claim=\"G061\"></span>，finesse 打得靚嘅比例又高過對面<span class=\"badge\" data-claim=\"G043\"></span>，即係手法真係乾淨。hold 用得比對面密（2150 對 1835）<span class=\"badge\" data-claim=\"G032\"></span>，quad 亦都開多過對面（272 對 207）<span class=\"badge\" data-claim=\"G034\"></span>。",
+        "<strong>問題係呢啲嘢冇換到傷害。</strong> 成晚計埋，你多疊咗 378 粒方塊，打出嚟嘅攻擊反而少過 pinglamb 15 條<span class=\"badge\" data-claim=\"C008\"></span>——即係每粒方塊嘅攻擊（APP）輸蝕<span class=\"badge\" data-claim=\"G041\"></span>。更加要留意嘅係走勢：頭兩場你哋兩個嘅 APP 本來叮噹馬頭，你仲高過一線<span class=\"badge\" data-claim=\"C002\"></span>；由第三場開始，佢嗰條升上去<span class=\"badge\" data-claim=\"C004\"></span>，你嗰條跌落嚟<span class=\"badge\" data-claim=\"C005\"></span>。輸六場唔係一開波就注定，係打落去嗰陣先甩開。",
+        "另一個更硬淨嘅位：<strong>俾人埋咗之後掘唔返出嚟</strong>。全晚有 8 局係食多過對手垃圾都仲贏得返，8 局全部係 pinglamb 嘅，你一局都冇<span class=\"badge\" data-claim=\"G056\"></span>；每粒方塊清走嘅垃圾（DS）你亦都低過佢<span class=\"badge\" data-claim=\"G071\"></span>。",
+        "好消息係個開關好清楚：單局 APM 一上到 65 以上，你 12 局贏 10 局<span class=\"badge\" data-claim=\"G047\"></span>；而且你自己贏嘅局同輸嘅局比較，APP 係 0.666 對 0.540<span class=\"badge\" data-claim=\"G064\"></span>——分別喺開唔開到火，唔係喺打唔打得快。"
+      ],
+      "recs": [
+        "<strong>唔好再加速——加重。</strong> 你已經快過對面、乾淨過對面、按掣仲少過對面<span class=\"badge\" data-claim=\"G039\"></span><span class=\"badge\" data-claim=\"G061\"></span><span class=\"badge\" data-claim=\"G043\"></span>，而呢三樣都冇幫你贏多局。真正分勝負嗰樣係 APP：你自己贏嗰啲局係 0.666、輸嗰啲局係 0.540<span class=\"badge\" data-claim=\"G064\"></span>，兩個人都一樣<span class=\"badge\" data-claim=\"G070\"></span>。具體做法：唔好見到位就即刻清行，等多一兩粒砌到 TSD 先出手。",
+        "<strong>由純 quad 流補多啲 T-spin 落 opener。</strong> pinglamb 就係靠 T-spin 拉開效率——TSD 237 對你 219<span class=\"badge\" data-claim=\"G035\"></span>、TST 68 對你 43<span class=\"badge\" data-claim=\"G036\"></span>，加埋 305 對 262<span class=\"badge\" data-claim=\"G054\"></span>。你 quad 開得多過佢<span class=\"badge\" data-claim=\"G034\"></span>，但同樣清一行，T-spin 用少啲方塊就換到同等傷害。你手法夠乾淨、hold 又用得密<span class=\"badge\" data-claim=\"G032\"></span>，完全有條件加 TSD/TST 落 build。",
+        "<strong>練 downstack，練到「埋咗都掘得返」。</strong> 呢個係全晚最明顯嘅一條裂縫：反打局 8 比 0<span class=\"badge\" data-claim=\"G056\"></span>，DS 全場低過對面<span class=\"badge\" data-claim=\"G071\"></span>。而你自己嘅數字都話你知呢樣有用——你贏嘅局 DS 係 0.182、輸嘅局係 0.159<span class=\"badge\" data-claim=\"G068\"></span>。練法：專登開 cheese race，逼自己喺高垃圾底下搵 T-spin，唔好一味死頂等對手甩手。",
+        "<strong>唔使再練手法。</strong> 講明呢樣係想你唔好浪費時間：每粒方塊按幾多下（KPP）呢一項，你贏嘅局同輸嘅局幾乎完全一樣<span class=\"badge\" data-claim=\"G066\"></span>，pinglamb 都係一樣<span class=\"badge\" data-claim=\"G067\"></span>。呢個係第三個 session 都係同一個結論——手法乾淨唔會再幫你贏多一局，慳返啲時間練上面三樣。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "power T-spin 效率流",
+      "profile": [
+        "PPS 慢啲（約 1.381 對 1.456）<span class=\"badge\" data-claim=\"G039\"></span>，但每局平均 APM 反而高過 yachi（約 55.5 對 53.2）<span class=\"badge\" data-claim=\"G040\"></span>，因為每粒方塊打得重<span class=\"badge\" data-claim=\"G041\"></span>。靠嘅係 T-spin：TSD 237、TST 68，兩樣都拋離對手<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G036\"></span><span class=\"badge\" data-claim=\"G054\"></span>。大 spike 又勁又密——12 以上嘅局有 27 局，yachi 得 14 局<span class=\"badge\" data-claim=\"G053\"></span>。輸出嘅波動仲細過 yachi，APM 同 PPS 兩樣都係<span class=\"badge\" data-claim=\"G044\"></span><span class=\"badge\" data-claim=\"G045\"></span>，即係你場場都交到貨。",
+        "你今晚真正贏喺邊？<strong>喺你自己進步咗。</strong> 你後六場嘅 APP 高過你自己頭兩場<span class=\"badge\" data-claim=\"C004\"></span>，同一時間 yachi 嗰條係跌<span class=\"badge\" data-claim=\"C005\"></span>。頭兩場你哋 APP 本來平手<span class=\"badge\" data-claim=\"C002\"></span>，之後六場就變成你長期高過佢<span class=\"badge\" data-claim=\"C003\"></span>——個系列就係喺呢度轉。",
+        "另一半功勞喺守：全晚 8 局係食多過對手垃圾都照贏得返，8 局全部係你嘅<span class=\"badge\" data-claim=\"G056\"></span>。而且你頭兩場已經係每粒方塊清得多過 yachi<span class=\"badge\" data-claim=\"C006\"></span>，後六場繼續保持<span class=\"badge\" data-claim=\"C007\"></span>——呢樣唔係後尾先練返嚟，係你一路都有嘅底子。"
+      ],
+      "recs": [
+        "<strong>T-spin 效率係你嘅主武器，唔好去溝 quad。</strong> 你贏面完全建立喺每粒方塊打得重之上<span class=\"badge\" data-claim=\"G041\"></span>，而個來源就係 TSD 同 TST<span class=\"badge\" data-claim=\"G054\"></span>。yachi 開多過你 65 個 quad 都追唔到效率<span class=\"badge\" data-claim=\"G034\"></span>，你千祈唔好調轉去追 quad。",
+        "<strong>繼續食住 downstack 呢個優勢。</strong> 你贏嘅局 DS 係 0.230、輸嘅局係 0.166<span class=\"badge\" data-claim=\"G069\"></span>——差距比 yachi 嗰邊大好多<span class=\"badge\" data-claim=\"G068\"></span>，即係「掘得返」對你嘅勝率影響仲要重。反打局 8 比 0 唔係彩數<span class=\"badge\" data-claim=\"G056\"></span>，係可以繼續加碼嘅本錢。",
+        "<strong>唯一要補嘅係節奏。</strong> 你嘅弱點就係慢——成晚被 yachi 多落咗 378 粒方塊<span class=\"badge\" data-claim=\"C008\"></span>，每粒方塊按嘅掣又多過佢<span class=\"badge\" data-claim=\"G061\"></span>，finesse 亦都冇佢咁靚<span class=\"badge\" data-claim=\"G042\"></span>。你 APM 一夠 65 就 12 局贏 11 局<span class=\"badge\" data-claim=\"G048\"></span>，所以問題唔係去到嗰個檔會唔會贏，係去唔去到。練 PPS 一致性，令啲「靜低嘅局」少啲。"
+      ]
+    }
+  },
+  "versus_note": "三個 session 落嚟，同一個結論已經企穩：<strong>贏波嘅係每粒方塊嘅攻擊，唔係每分鐘落幾多粒</strong><span class=\"badge\" data-claim=\"G070\"></span>。yachi 快、乾淨、按掣少，三樣都拋離對手，三樣都冇換到局數；pinglamb 慢啲，但每粒方塊打得重、埋咗又掘得返，就係咁攞走六場。yachi 想追返，唔係練得更順，而係<strong>每粒方塊榨多啲</strong>同<strong>學識喺垃圾底下開路</strong>。"
+}

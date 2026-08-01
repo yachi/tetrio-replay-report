@@ -1,0 +1,34 @@
+{
+  "eyebrow": "教練分析 · 下一步點練",
+  "title": "俾兩位嘅建議",
+  "lede": "呢個 session pinglamb 四場贏三場<span class=\"badge\" data-claim=\"R001\"></span>，五十局入面攞咗 29 局，yachi 得 21 局<span class=\"badge\" data-claim=\"R002\"></span>。分數睇落好貼，但一拆開嚟睇，兩個人風格差好遠，而個差距其實有得追。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 quad 流",
+      "profile": [
+        "平均每局 PPS 約 1.40，快過 pinglamb 嘅約 1.33<span class=\"badge\" data-claim=\"R003\"></span>，成個 session 落多咗三百幾粒方塊<span class=\"badge\" data-claim=\"R005\"></span>。手法都乾淨過對手，每粒方塊嘅 finesse fault 少過 pinglamb<span class=\"badge\" data-claim=\"R006\"></span>，仲用多咗 hold（1792 對 1703）<span class=\"badge\" data-claim=\"R024\"></span>，all-clear 都開多啲（6 對 4）<span class=\"badge\" data-claim=\"R021\"></span>。開行方面佢係 quad 主打，248 個 quad 拋離 pinglamb 嘅 191 個<span class=\"badge\" data-claim=\"R007\"></span>。APM 嘅波動仲細過 pinglamb，即係佢輸出好平穩<span class=\"badge\" data-claim=\"R019\"></span>。",
+        "<strong>問題係</strong>：呢啲乾淨同快，冇轉化成殺傷力。每粒方塊打出嘅攻擊反而低過 pinglamb<span class=\"badge\" data-claim=\"R004\"></span>，全場 KO 少咗（21 對 29）<span class=\"badge\" data-claim=\"R009\"></span>，大 spike（12+）得 9 局、單次最勁得 15<span class=\"badge\" data-claim=\"R013\"></span><span class=\"badge\" data-claim=\"R014\"></span>。最致命係兩個位——快局崩盤：40 秒內收工嘅快局，yachi 5 勝 11 敗（對 pinglamb 反轉）<span class=\"badge\" data-claim=\"R010\"></span>，兩場 5-0 被掃（m1、m4）一局都冇贏過<span class=\"badge\" data-claim=\"R015\"></span>，嗰兩場 pinglamb 全場 APM 拋離佢十幾<span class=\"badge\" data-claim=\"R016\"></span>；輸波之後追唔返：輸咗一局之後，25 次得 8 次即刻贏返，命中率得三成幾，遠低過 pinglamb 嘅 9/18<span class=\"badge\" data-claim=\"R011\"></span>。",
+        "好消息係佢有一個好清楚嘅「必勝開關」：單局 APM 一上到 65 以上，九局贏八局<span class=\"badge\" data-claim=\"R012\"></span>；決勝場 m7 更加係 APM 到 70 以上嗰三局全部贏晒<span class=\"badge\" data-claim=\"R018\"></span><span class=\"badge\" data-claim=\"R017\"></span>。佢唔係打唔出火力，係太少開火。"
+      ],
+      "recs": [
+        "<strong>開波頭三十秒要主動搶攻，唔好淨係求穩。</strong> 你嘅快局勝率係全場最痛嘅弱點——40 秒內嘅局 5 勝 11 敗<span class=\"badge\" data-claim=\"R010\"></span>，兩場被掃都係輸喺開局節奏<span class=\"badge\" data-claim=\"R015\"></span><span class=\"badge\" data-claim=\"R016\"></span>。但你 APM 一夠 65 就贏八成<span class=\"badge\" data-claim=\"R012\"></span>，證明係「唔開火」而唔係「開唔到火」。練習：開局用你嘅快手優勢（PPS 1.40<span class=\"badge\" data-claim=\"R003\"></span>）主動叠雙 well／T-spin，逼對手先食你嘅垃圾，唔好等對手起手。",
+        "<strong>由純 quad 流補多啲 T-spin double 進你嘅 opener。</strong> 你每粒方塊嘅攻擊輸蝕 pinglamb<span class=\"badge\" data-claim=\"R004\"></span>，佢就係靠 T-spin 拉開效率（TSD 232 對你 189、TST 52 對你 32）<span class=\"badge\" data-claim=\"R007\"></span><span class=\"badge\" data-claim=\"R023\"></span>。你手法夠乾淨、hold 又用得密<span class=\"badge\" data-claim=\"R006\"></span><span class=\"badge\" data-claim=\"R024\"></span>，完全有條件加多啲 TSD/TST 進 build，令每粒方塊打得更重。",
+        "<strong>練「輸一局即刻穩返」嘅 reset 心態。</strong> 你最大嘅隱形失分係連敗——輸一局之後追返率得三成幾<span class=\"badge\" data-claim=\"R011\"></span>，兩場 0-5 就係咁雪球滾出嚟<span class=\"badge\" data-claim=\"R015\"></span>。每輸一局，落場前深呼吸、明確重設 downstack 目標，斬斷連鎖崩盤。你 APM 波動本身好穩<span class=\"badge\" data-claim=\"R019\"></span>，證明底子夠穩，差嘅係心理 reset。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "power T-spin 效率流",
+      "profile": [
+        "PPS 慢啲（約 1.33<span class=\"badge\" data-claim=\"R003\"></span>），但每粒方塊打出嘅攻擊重過 yachi<span class=\"badge\" data-claim=\"R004\"></span>，靠嘅係 T-spin：TSD 232、TST 52，都大幅拋離對手<span class=\"badge\" data-claim=\"R007\"></span><span class=\"badge\" data-claim=\"R008\"></span><span class=\"badge\" data-claim=\"R023\"></span>。KO 多（29 對 21）<span class=\"badge\" data-claim=\"R009\"></span>，大 spike 又勁又密——12+ 有 13 局、單次最大去到 17<span class=\"badge\" data-claim=\"R013\"></span><span class=\"badge\" data-claim=\"R014\"></span>。佢嘅 PPS 節奏波動細過 yachi，出手速度好穩<span class=\"badge\" data-claim=\"R020\"></span>。",
+        "佢贏波嘅命脈係<strong>快局同開局壓制</strong>：40 秒內快局 11 勝 5 敗<span class=\"badge\" data-claim=\"R010\"></span>，兩場 5-0 掃走 yachi，全靠開場 APM 直接拋離對手<span class=\"badge\" data-claim=\"R015\"></span><span class=\"badge\" data-claim=\"R016\"></span>。單局 APM 一上到 65 以上，14 局全贏，零漏波<span class=\"badge\" data-claim=\"R012\"></span>，執行力驚人。",
+        "佢嘅相對弱點：PPS 偏慢、被 yachi 落多咗方塊<span class=\"badge\" data-claim=\"R005\"></span>；APM 波動大過 yachi<span class=\"badge\" data-claim=\"R019\"></span>，即係佢有啲局會突然靜低（打長局同拖後嘅局容易被追）；防守上兩人 cancel 量其實差唔多（329 對 333）<span class=\"badge\" data-claim=\"R022\"></span>，所以佢個優勢純粹係「攻」而唔係「守」。"
+      ],
+      "recs": [
+        "<strong>保住快局壓制，繼續搶開局。</strong> 你贏波嘅根就係快局同 APM 開局爆發<span class=\"badge\" data-claim=\"R010\"></span><span class=\"badge\" data-claim=\"R016\"></span>，65+ APM 局 14 戰全勝<span class=\"badge\" data-claim=\"R012\"></span>。呢個唔好變——反而要有意識喺每場頭兩局全力搶節奏，因為 yachi 一旦連敗就會塌<span class=\"badge\" data-claim=\"R011\"></span>，你越早搶到 momentum 越易滾雪球（m1、m4 就係咁掃<span class=\"badge\" data-claim=\"R015\"></span>）。",
+        "<strong>補快 PPS，減少「靜局」。</strong> 你嘅弱點係節奏慢過 yachi、被佢落多三百粒<span class=\"badge\" data-claim=\"R005\"></span>，而且 APM 波動偏大<span class=\"badge\" data-claim=\"R019\"></span>。當 T-spin setup 唔就手嗰陣，唔好死等——練 PPS 一致性（你 PPS 波動其實已經幾穩<span class=\"badge\" data-claim=\"R020\"></span>，將呢個穩定度推上 APM），令啲「靜低嘅局」少啲被 yachi 靠快手追返。",
+        "<strong>鞏固 T-spin 效率做主武器，唔好去溝 quad。</strong> 你嘅贏面完全建立喺 T-spin 效率同大 spike 之上<span class=\"badge\" data-claim=\"R004\"></span><span class=\"badge\" data-claim=\"R008\"></span><span class=\"badge\" data-claim=\"R013\"></span><span class=\"badge\" data-claim=\"R014\"></span>。yachi 試 quad 流反而輸效率<span class=\"badge\" data-claim=\"R007\"></span>，你千祈唔好調轉去追 quad。集中練 TSD/TST 連段同 spike timing，將你「每粒方塊更重」嘅優勢再拉大。"
+      ]
+    }
+  },
+  "versus_note": "yachi 快、乾淨、穩，但唔夠狠又易崩；pinglamb 慢啲但每一擊都重，開局壓制同 T-spin 效率就係佢今場攞多一場嘅本錢。yachi 想追返，關鍵唔係練得更順，而係<strong>夠膽開火</strong>同<strong>輸一局即刻企返</strong>。"
+}

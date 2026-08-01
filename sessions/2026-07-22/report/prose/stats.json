@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人打法南轅北轍：yachi 靠速度同乾淨手法碾壓，pinglamb 靠效率、B2B 鏈同 T-spin spike 搏殺<span class=\"badge\" data-claim=\"R011\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（79局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。全場 79 局，贏嗰個 vs 都高過輸嗰個，冇一局例外<span class=\"badge\" data-claim=\"C015\"></span>——馬拉松局（m2 第3局）同閃電局（m7 第2局）已經圈起。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "yachi 靠 Quad 遠遠拋離 pinglamb 嘅 293 個<span class=\"badge\" data-claim=\"R008\"></span>；pinglamb 就係 T-spin 專家，T-spin double 339 個、triple 82 個，兩樣都壓過 yachi<span class=\"badge\" data-claim=\"R009\"></span><span class=\"badge\" data-claim=\"R010\"></span>。"
+      ],
+      "footnote": "呢個圖表淨係計有消行嘅 T-spin，所以會少過整體 T-spin 總數<span class=\"badge\" data-claim=\"R011\"></span>——整體總數連冇消行嘅 T-spin 都計埋。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

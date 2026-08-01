@@ -23,8 +23,8 @@ import json
 import os
 import sys
 
-from pipeline import (appendix, chart_data, forecast_section, hero, matches, moments,
-                      records, region)
+from pipeline import (appendix, chart_data, coaching, forecast_section, hero, matches,
+                      moments, records, region, stats_section)
 
 
 def chart_section(ctx):
@@ -45,8 +45,20 @@ def match_copy_section(ctx):
                          matches.load_prose(ctx["report_dir"], ctx["facts"]))
 
 
+def stats_sec(ctx):
+    return stats_section.build(ctx["facts"],
+                               stats_section.load_prose(ctx["report_dir"]))
+
+
 def moments_section(ctx):
     return moments.build(ctx["facts"], moments.load_prose(ctx["report_dir"]))
+
+
+def coaching_section(ctx):
+    # Takes facts like matches.py's loader does — it validates that the prose has a
+    # column for each player rather than trusting the file to name them right.
+    return coaching.build(ctx["facts"],
+                          coaching.load_prose(ctx["report_dir"], ctx["facts"]))
 
 
 def records_section(ctx):
@@ -79,8 +91,10 @@ def claims_island(ctx):
 # before the coaching section, appendix before the footer, then the islands.
 SECTIONS = [
     ("hero", '<section id="matches">', hero_section, None),
+    ("stats", '<section id="moments">', stats_sec, None),
     ("moments", '<section id="records">', moments_section, None),
     ("records", '<section id="coaching">', records_section, None),
+    ("coaching", '<section id="rounds">', coaching_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),
     # after the proof appendix, so a reader meets the trust chain before the thing
     # that is explicitly outside it
