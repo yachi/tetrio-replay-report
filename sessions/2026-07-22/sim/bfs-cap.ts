@@ -16,8 +16,31 @@
  * over 2000 boards. Everything it prints is sampled evidence, and the caps stay as live belts.
  */
 import { emptyBoard, H } from './sim.ts';
-import { tryMove, tryRotate, hardDrop } from './vendor/core/srs.ts';
+import { tryMove, tryRotate, hardDrop, isValidPosition } from './vendor/core/srs.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
+
+/**
+ * The reason `h < 40000` must survive: the key space is NOT bounded the way the old comment
+ * claimed. These are executable witnesses against the engine, so the next person to read
+ * "measured max 688, far under the cap" and conclude the cap is dead code hits a failing script
+ * instead of a plausible-looking argument. A printed number could not have stopped that — the
+ * old derivation sat beside the same 688 for weeks.
+ */
+function assertKeySpaceIsNotBounded() {
+  const b = emptyBoard();
+  const at = (rotation: 0 | 1 | 2 | 3, col: number, row: number): ActivePiece =>
+    ({ type: 'T', rotation, col, row });
+  const fail = (what: string) => { console.error(`SELF-CHECK FAILED ${what}`); process.exit(1); };
+  // Rows: srs.ts skips the board lookup for row < 0 instead of rejecting it, so arbitrarily
+  // negative rows are legal positions. This is the whole reason 4 x 10 x 40 was never a theorem.
+  if (!isValidPosition(b, at(0, 3, -5))) fail('a negative row is rejected — the row factor would now be bounded, so this file (and forecast.ts) needs rewriting, not the cap deleting');
+  // Columns: 10 values but -1..8, and asymmetrically — only R reaches -1, only L reaches 8.
+  if (!isValidPosition(b, at(1, -1, 18))) fail('rotation R no longer reaches col -1');
+  if (!isValidPosition(b, at(3, 8, 18))) fail('rotation L no longer reaches col 8');
+  if (isValidPosition(b, at(0, -1, 18)) || isValidPosition(b, at(0, 8, 18)))
+    fail('rotation 0 now reaches -1 or 8 — the per-rotation column spans have changed');
+}
+assertKeySpaceIsNotBounded();
 
 interface Explored { states: number; rowLo: number; rowHi: number; colLo: number; colHi: number }
 
