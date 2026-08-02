@@ -78,13 +78,30 @@ jobs:
       # is what ubuntu-22.04 has; every release after it is glibc-2.39 only, the
       # constraint the SMT job's comment records.
       #
-      # Weaker pin than the cvc5 one below, and deliberately flagged as such:
-      # GitHub's asset `digest` field is null for this release, so unlike cvc5
-      # there is no second independent authority to agree with. The sha256 was
-      # computed from a downloaded copy whose byte length matches the length the
-      # API reports (51650111). That is trust-on-first-use — it defends against
-      # the asset changing from here on, not against it having been wrong when
-      # first fetched. Replace with a two-authority pin when one exists.
+      # WEAKER PIN THAN THE cvc5 ONE BELOW, deliberately, and here is the search
+      # that settled it (2026-08-02) so nobody has to repeat it:
+      #
+      #   - GitHub asset `digest`: null for EVERY z3 release that ships a
+      #     glibc-2.35 build (checked 4.13.4, 4.14.1). Every release that DOES
+      #     publish a digest (4.15.3, 4.15.8, 4.16.0) ships glibc-2.39 only.
+      #     The two properties are disjoint across the whole release history.
+      #   - `gh attestation verify`: HTTP 404, no SLSA provenance for this asset.
+      #   - The release carries no checksum, signature or SBOM asset — its only
+      #     non-archive files are Microsoft.Z3 nupkgs, a different artifact.
+      #   - nixpkgs builds z3 from source (`fetchFromGitHub` on a rev), as does
+      #     its F* z3 pin, so neither is an authority for this binary zip.
+      #
+      # So the sha256 below is trust-on-first-use: computed from a download whose
+      # byte length matches the API's (51650111). It defends against the asset
+      # changing from here on, not against it having been wrong when first
+      # fetched.
+      #
+      # The one way to reach a two-authority pin is ubuntu-24.04 + z3 4.16.0,
+      # whose digest GitHub publishes. NOT taken: that would move the OS under
+      # the Dafny proof run to strengthen a helper tool's provenance, and the
+      # verification result is the thing this repo exists to protect. Revisit if
+      # the job moves to 24.04 for its own reasons, or if Z3Prover starts
+      # publishing digests for the builds this runner can execute.
       - name: Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
