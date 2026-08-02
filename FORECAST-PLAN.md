@@ -284,6 +284,42 @@ pieces, so the observable window IS the first three bags — precisely where mem
 This is the same bias `sim/README.md` already records as "systematically the *early* part of each
 round", now with a specific consequence.
 
+**The counterfactual is VALIDATED against the wiki's own boards.** Parsing the article's wikitext
+(`action=raw`) rather than the rendered page shows the Garbage subsections are **before/after PAIRS**:
+the second board of each pair is the first with **one full row containing exactly one hole appended at
+the bottom** — a literal garbage line, its hole column being the thing anticipated. Stripping that row
+reproduces the "before" board's value exactly in all five pairs:
+
+| wiki pair | before | after | after − garbage |
+|---|---|---|---|
+| Doubles > Garbage 1 | 1 | 2 | **1** |
+| Doubles > Garbage 2 | 1 | 2 | **1** |
+| Doubles > Garbage 3 | 0 | 2 | **0** |
+| Doubles > Garbage 4 | 0 | 2 | **0** |
+| Triples > Garbage | 0 | 3 | **0** |
+
+In every wiki example the garbage is **load-bearing** (+1 to +3 lines). So the test is not an artefact
+of my implementation — it recovers the article's own semantics on the article's own data.
+
+**Applied to the corpus, the result is total: 0 of 212 verified tucked T-spins on 2026-07-22 have
+garbage that is load-bearing for the available T-spin.** Not merely 0 of the 14 labelled
+`forecast_garbage` — zero in the whole session. The `forecast_garbage` bucket has no causal support
+anywhere in the data.
+
+**A SECOND, OPPOSITE defect: the availability test is binary, so forecast UPGRADES are lost.** Two of
+the five wiki pairs go `best 1 → 2` — a T-spin single was *already* available and the garbage upgrades
+it to a double, which the article presents as forecasting a Double. The metric's strict rule is
+`slotOpenedLater = !tspinAvailable(boardJ)`, so any board already offering *any* spin is forced to
+`reactive`. **34 of the 185 reactive events are exactly this shape** (a spin available at the roof that
+grew by execution). So the metric over-counts openers *and* under-counts upgrades. (0 of those 34 are
+garbage-caused either, so fixing this alone would not add genuine forecasts on this session.)
+
+Notes for whoever implements the fix: cells in these diagrams are `pfrow` codes rendering
+`<code>Tet.png`; MediaWiki capitalises the first filename letter, so **`g` and `G` are the same image**,
+and `-` and space are BOTH empty (`-` is a hole drawn inside a stack — see `Template:Pfstart`'s own
+example, `J|J|J|Z|-|S|L|L|i|`). Grey is generic filled stack, NOT necessarily garbage; the only
+reliable garbage signature in the diagrams is the appended full-row-with-one-hole.
+
 **Remedies, none applied yet — this changes published figures in four sessions and is the user's
 call:**
 1. **Require causation, not co-occurrence.** Recompute `tspinAvailable` on a counterfactual board
