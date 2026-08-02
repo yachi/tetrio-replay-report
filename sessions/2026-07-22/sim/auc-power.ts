@@ -47,9 +47,17 @@ function clopperPearson(k: number, n: number, alpha = 0.05): [number, number] {
   return [lower, upper];
 }
 
-/** Smallest k of n that reaches one-sided significance, and the win-rate it implies. */
+/**
+ * Smallest k of n that reaches TWO-sided significance, and the win-rate it implies.
+ *
+ * Two-sided because the `exact p` column printed beside it is two-sided (`2 * min(tail, tail)`),
+ * and a required-n read off a one-sided rule quoted next to a two-sided p understates what the
+ * test being reported actually needs — by about 25% here (a true 60% effect wants 199 decided
+ * pairs, not 158). The direction was never argued for; the metric has no prior reason to be
+ * one-tailed, and every p-value in this file assumes it is not.
+ */
 function minDetectable(n: number, alpha = 0.05) {
-  for (let k = Math.ceil(n / 2); k <= n; k++) if (binomTail(k, n, 0.5) <= alpha) return { k, rate: k / n };
+  for (let k = Math.ceil(n / 2); k <= n; k++) if (2 * binomTail(k, n, 0.5) <= alpha) return { k, rate: k / n };
   return null;
 }
 
@@ -57,7 +65,10 @@ function minDetectable(n: number, alpha = 0.05) {
 function power(n: number, p: number, alpha = 0.05) {
   const md = minDetectable(n, alpha);
   if (!md) return 0;
-  return binomTail(md.k, n, p);
+  // A two-sided test rejects in BOTH tails, and by the null's symmetry the other region is
+  // X <= n-k. It contributes ~1e-9 at the effects asked about here, but dropping it would make
+  // this the one-sided power of a two-sided rule — the exact mismatch fixed just above.
+  return binomTail(md.k, n, p) + (1 - binomTail(n - md.k + 1, n, p));
 }
 
 // ---- self-check: these are textbook Clopper-Pearson / binomial values, not this code's output.
@@ -79,7 +90,25 @@ const near = (a: number, b: number, tol: number, what: string) => {
   }
   near(binomTail(8, 11, 0.5), 232 / 2048, 1e-12, 'P(X>=8|n=11,p=.5)');   // C(11,8..11)=232
   near(binomPmf(5, 10, 0.5), 252 / 1024, 1e-12, 'binom pmf(5,10,.5)');
-  console.log('stats self-check passed (CP intervals and binomial tails match textbook values)\n');
+  // minDetectable is two-sided, and a sidedness bug does not announce itself in the output: both
+  // rules return a plausible k, and for many n they return the SAME one. n=20 is the textbook
+  // sign-test critical value (15, i.e. reject on x>=15 or x<=5) and is one of those; n=11 is a
+  // case that discriminates, one-sided taking 9 (P(X>=9)=0.0327) where two-sided needs 10
+  // (2*0.0327 = 0.065 > 0.05). Both are needed — the anchor alone would not have caught this.
+  near(minDetectable(20)!.k, 15, 0, 'two-sided critical k at n=20');
+  near(minDetectable(11)!.k, 10, 0, 'two-sided critical k at n=11');
+  // and, over every n the tables below can ask for, k against its DEFINING property rather than
+  // against a table: smallest k with 2*P(X>=k) <= alpha. Both halves are needed — significance
+  // alone is satisfied by k=n, minimality alone by any k that never reaches significance.
+  for (let n = 5; n <= 4000; n++) {
+    const md = minDetectable(n);
+    if (!md) continue;
+    if (2 * binomTail(md.k, n, 0.5) > 0.05)
+      { console.error(`SELF-CHECK FAILED minDetectable(${n}): k=${md.k} is not significant`); process.exit(1); }
+    if (md.k > Math.ceil(n / 2) && 2 * binomTail(md.k - 1, n, 0.5) <= 0.05)
+      { console.error(`SELF-CHECK FAILED minDetectable(${n}): k=${md.k} is not minimal`); process.exit(1); }
+  }
+  console.log('stats self-check passed (CP intervals, binomial tails and the two-sided critical k)\n');
 }
 
 const STRICT = process.env.LOOSE !== '1';
@@ -100,8 +129,8 @@ for (const m of METRICS) {
   console.log(`${m.padEnd(20)} ${a.auc.toFixed(1).padStart(5)}%  ${String(a.wins).padStart(2)}  ${String(a.losses).padStart(2)}  ${String(a.ties).padStart(3)}   ${String(dec).padStart(5)}    ${dec ? Math.min(1, p).toFixed(3) : '  -  '}     [${(100 * lo).toFixed(0)}%, ${(100 * hi).toFixed(0)}%]`);
 }
 
-console.log('\n--- what could this design have detected? ---\n');
-console.log('decided   min k for p<0.05   implied win-rate   power vs a TRUE 70%   vs TRUE 80%');
+console.log('\n--- what could this design have detected? (two-sided, alpha 0.05) ---\n');
+console.log('decided   min k (2-sided)    implied win-rate   power vs a TRUE 70%   vs TRUE 80%');
 console.log('-'.repeat(84));
 for (const m of METRICS) {
   const { dec } = summary[m]!;
@@ -142,7 +171,7 @@ console.log('\n--- decomposing the loose -> strict "collapse" ---\n');
   console.log(`definition is coarser and resolves less". At this n the data cannot tell those apart.`);
 }
 
-console.log('\n--- how many decided pairs would this actually need? ---\n');
+console.log('\n--- how many decided pairs would this actually need? (two-sided, 80% power) ---\n');
 {
   const need = (p: number, target: number) => {
     for (let n = 5; n <= 4000; n++) if (power(n, p) >= target) return n;

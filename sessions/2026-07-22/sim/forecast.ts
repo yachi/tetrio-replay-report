@@ -58,9 +58,21 @@ export function bestTspinLines(board: Board): number {
  *
  * This was a second, independently written BFS until 2026-07-30. The two agreed on every one of
  * 932 random boards, and the duplication was not merely redundant — the copies carried different
- * BFS caps (20000 vs 40000), a divergence waiting to happen. Neither cap was ever live: `q` only
- * grows when a fresh `rotation:col:row` key enters `seen`, so it is bounded by 4*10*H = 1600
- * states (measured max: 688). Equivalence is therefore structural, not sampled — see bfs-cap.ts.
+ * BFS caps (20000 vs 40000), a divergence waiting to happen. Merging them removed the divergence;
+ * what it does NOT rest on is the caps being provably dead. `q` only grows when a fresh
+ * `rotation:col:row` key enters `seen`, so the key space bounds it — but only two of those three
+ * coordinates are bounded by the engine. Columns are: `isValidPosition` rejects any cell outside
+ * 0..9, and the T's anchor is offset from its cells asymmetrically per rotation, so the anchor
+ * runs -1..7 in R (its leftmost cell sits at offset 1), 0..8 in L (its rightmost cell does), and
+ * 0..7 in 0/2 — a union of -1..8, still 10 values but not the 0..9 previously assumed, and the
+ * 4x10 product is loose because no single rotation admits all ten. Rows are NOT bounded:
+ * `vendor/core/srs.ts:129` is `if (row < 0) continue`, so every negative row is a legal position
+ * and nothing in the collision test stops a piece climbing. CONDITIONAL on rows staying in
+ * [-2, 39] the bound is 4*10*42 = 1680; that side condition needs kick-table reasoning (a piece
+ * rises only on a kick, a kick only fires when the [0,0] candidate is blocked, and the JLSZT table
+ * lifts at most 2), which is a sketch nobody has turned into a proof. So 1680 is an assumption,
+ * the measured max of 688 (bfs-cap.ts, 2000 boards) is the evidence, and `h < 40000` is a LIVE
+ * belt rather than dead code.
  */
 export function tspinAvailable(board: Board): boolean {
   return bestTspinLines(board) > 0;

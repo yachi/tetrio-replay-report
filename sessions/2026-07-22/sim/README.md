@@ -76,7 +76,7 @@ match-level rate. `validate.ts` is what establishes which prefixes are trustwort
 | `forecast-boards.ts` | re-export shim so fixtures import one surface |
 | `*.test.ts` | unit, external-golden, and property suites |
 | `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |
-| `bfs-cap.ts` | proves the BFS cap is unreachable (bound 1600, measured max 688) |
+| `bfs-cap.ts` | measures how far the BFS runs from its cap (max 688 over 2000 boards) |
 | `pairs.ts` | winner-vs-loser pairing, shared by both AUC consumers |
 | `run-forecast.ts`, `auc.ts`, `validate.ts` | the runners that produce the published figures |
 | `auc-power.ts` | CIs, exact tests, power, and required sample size for those figures |

@@ -57,7 +57,7 @@ than about 12 percentage points, and nothing at all is visible.** It stays out o
 it is simulator-derived and because a null does not earn a column — not because it is unmeasured.
 
 Its AUC of 58.6% rests on **16 decided pairs** (11W–5L, plus 19 ties), a 95% CI of **[41%, 89%]**,
-45% power against a true 70% effect and **80% power against a true 80% effect**. It still cannot
+25% power against a true 70% effect and **60% power against a true 80% effect**. It still cannot
 distinguish itself from TSD's 60.9%, so it stays excluded on two independent grounds: it is
 simulator-derived, and it is not measurable at this sample size.
 
@@ -71,7 +71,7 @@ wrong board row, and a forecast read off such a board is fiction. More data and 
 **This corrects an earlier "negative result" framing** (see *Power*, below). A null finding and an
 underpowered one licence different conclusions: the first says the metric does not work, the second
 says this design could not have told you either way. Only `tucked T-spins`, on 55 decided pairs
-with 88% power, is a genuine negative result here.
+with 81% power, is a genuine negative result here.
 
 ## What it measures
 
@@ -141,16 +141,22 @@ memory was wrong by 0.001 — both caught by that check, neither by reading the 
 
 | metric | AUC | W–L–T | decided | exact p | 95% CI on win-rate | power vs true 70% |
 |---|---|---|---|---|---|---|
-| forecast rate | 58.6% | 11–5–19 | **16** | 0.210 | **[41%, 89%]** | **45%** |
-| forecast per piece | 57.7% | 12–6–21 | 18 | 0.238 | [41%, 87%] | 53% |
-| forecast count | 52.5% | 13–9–57 | 22 | 0.523 | [36%, 79%] | 49% |
-| tucked T-spins | 57.0% | 33–22–24 | **55** | 0.177 | [46%, 73%] | **88%** |
-| separation-weighted | 55.7% | 10–6–19 | 16 | — | — | — |
+| forecast rate | 58.6% | 11–5–19 | **16** | 0.210 | **[41%, 89%]** | **25%** |
+| forecast per piece | 57.7% | 12–6–21 | 18 | 0.238 | [41%, 87%] | 33% |
+| forecast count | 52.5% | 13–9–57 | 22 | 0.523 | [36%, 79%] | 31% |
+| tucked T-spins | 57.0% | 33–22–24 | **55** | 0.177 | [46%, 73%] | **81%** |
+| separation-weighted | 55.7% | 10–6–19 | 16 | 0.454 | [35%, 85%] | 25% |
 
-`forecast rate` would need **12 of 16** — a 75% win-rate — to reach p < 0.05. A design that can
-only see an effect that large has not measured a null; it has not measured. `tucked T-spins` is the
-opposite case and the contrast is the point: 55 decided pairs, a CI that excludes anything
-interesting, 88% power. That one genuinely reproduces the project's TSD/TST no-signal finding.
+**The power column is two-sided as of 2026-08-02; it used to read 45 / 53 / 49 / 88 / —, which
+was one-sided** (see the correction under *how many decided pairs would this need*, below). The
+`exact p` beside it always was two-sided, so the two columns had been describing different tests.
+Every conclusion here moves in the same direction: this design had *less* power than claimed.
+
+`forecast rate` would need **13 of 16** — an 81% win-rate — to reach two-sided p < 0.05. A design
+that can only see an effect that large has not measured a null; it has not measured. `tucked
+T-spins` is the opposite case and the contrast is the point: 55 decided pairs, a CI that excludes
+anything interesting, 81% power. That one genuinely reproduces the project's TSD/TST no-signal
+finding — and it is the one row the correction does not weaken past its own bar.
 
 ### "The signal does not survive the correct definition" was the wrong reading
 
@@ -232,16 +238,27 @@ every audit round in this project has caught. A numeric section without badges b
 
    | if the true effect is | decided pairs needed | implied coverage | vs today |
    |---|---|---|---|
-   | 60% win-rate | 158 | **163%** | unreachable |
-   | 65% | 69 | 72% | 4.0× |
-   | 70% | 37 | 39% | 2.2× |
-   | 75% | 23 | 25% | 1.4× |
-   | 80% | 18 | 20% | 1.1× |
+   | 60% win-rate | 199 | **205%** | 11.5× — unreachable |
+   | 65% | 90 | 94% | 5.2× — **unreachable** |
+   | 70% | 49 | 52% | 2.9× |
+   | 75% | 30 | 32% | 1.8× |
+   | 80% | 20 | 22% | 1.2× |
 
-   **The decisive result: a modest (60%) true effect is unreachable on this dataset at any
-   simulator accuracy.** 158 decided pairs cannot be extracted from 79 rounds — the ceiling is 79
-   even at 100% coverage. No amount of simulator work fixes that; only more sessions do. A large
-   (75–80%) effect, by contrast, is nearly within reach already.
+   **Correction (2026-08-02): this table used to read 158 / 69 / 37 / 23 / 18, which is the
+   ONE-sided column** — under a heading that already said "two-sided". `auc-power.ts`'s
+   `minDetectable` tested `P(X≥k) ≤ α` while every p-value quoted beside it — including the 0.210
+   this whole document turns on — is the two-sided `2·min(tail, tail)`. A required-n from a
+   one-sided rule printed next to a two-sided p understates what the reported test needs, by
+   ~25%. The figures above are the two-sided ones,
+   and they were verified independently in R 4.6.1 *before* the TypeScript was touched, so the
+   code agreeing afterwards is a check rather than a restatement. The old numbers are kept here
+   rather than overwritten because they are what the earlier readings of this document rest on.
+
+   **The decisive result, and it got stronger: neither a modest (60%) nor a middling (65%) true
+   effect is reachable on this dataset at any simulator accuracy.** The ceiling is 79 decided
+   pairs — one per round, at 100% coverage — and two-sided 65% now wants 90, where one-sided
+   wanted 69 and sat just under the ceiling. No amount of simulator work fixes that; only more
+   sessions do. A large (75–80%) effect is still nearly within reach.
 
    **Correction — ties are not a granularity problem.** This document previously reasoned that
    "the rate is a ratio of small integers, which is where the ties come from" and proposed a
@@ -395,10 +412,23 @@ That is one question, and the perfect-clear count is one of several ways to obse
 
 `tspinAvailable` was a second, independently written BFS beside `bestTspinLines`. The property
 suite found them agreeing on all 932 boards, and the duplication was actively dangerous: the two
-copies carried **different BFS caps**, 20000 and 40000. Neither was ever live — the queue only
-grows when a fresh `rotation:col:row` key enters `seen`, so it is bounded by `4 * 10 * H = 1600`
-states by construction (measured max over 2000 boards: **688**, `bfs-cap.ts`). Equivalence is
-structural, not sampled, so `tspinAvailable` is now one line: `bestTspinLines(board) > 0`.
+copies carried **different BFS caps**, 20000 and 40000. Merging them removed that divergence, so
+`tspinAvailable` is now one line: `bestTspinLines(board) > 0`.
+
+**Correction (2026-08-02): the caps were called dead on a bound that does not hold.** The queue
+only grows when a fresh `rotation:col:row` key enters `seen`, which was written up as
+`4 * 10 * H = 1600` states *by construction*. Two of the three factors do not survive reading the
+engine. `vendor/core/srs.ts:129` is `if (row < 0) continue`, so a negative row is a legal
+position and nothing in the collision test bounds rows at all — the `40` was an assumption about
+reachability wearing the clothes of a derivation. The anchor column spans **−1..8**, not 0..9,
+because the T's anchor is offset asymmetrically per rotation: R runs −1..7 (its leftmost cell sits
+at offset 1), L runs 0..8 (its rightmost cell does), 0 and 2 run 0..7. Still 10 values, and now
+measured — `bfs-cap.ts` reaches exactly −1..8. An honest statement is **≤ 4 × 10 × 42 = 1680 conditional on
+rows staying in [−2, 39]**, and discharging that side condition needs kick-table reasoning — a
+piece rises only on a kick, a kick only fires when the [0,0] candidate is blocked, the JLSZT table
+lifts at most 2 — which nobody has written down. The measured max of **688** over 2000 boards is
+real and unchanged; what it is is *evidence*, so `h < 40000` is a **live belt**, not dead code.
+Equivalence of the two BFSs was never resting on the cap anyway: it rests on there being one loop.
 
 `forecast.ts` 156 → 145 lines, still 11/11 mutation-killed, and the published figures reproduce
 **exactly** — yachi 89/11/12.4%, pinglamb 78/10/12.8%, AUC 61.4 / 57.7 / 52.5 / 46.2 (the figures

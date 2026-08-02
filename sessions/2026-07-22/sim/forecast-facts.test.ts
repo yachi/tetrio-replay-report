@@ -37,6 +37,19 @@ test('counts are internally consistent and integers', () => {
   }
 });
 
+test('the rate is the floored quotient of the counts it is printed beside', () => {
+  const d = JSON.parse(readFileSync(PATH, 'utf8'));
+  for (const p of d.players) {
+    // Every other gate here checks the rate's SHAPE — integral, inside its interval, ordered.
+    // None of them reads the counts, so a rate that had drifted from them passed the lot.
+    // Cross-multiplied so the check is exact integer arithmetic, and so it pins the floor
+    // rather than merely a tolerance: r <= 1000*fc/n < r+1 has exactly one solution.
+    const r = p.forecast_rate_x1000, n = p.verified_tspins, fc = p.forecast_total;
+    expect(r * n).toBeLessThanOrEqual(1000 * fc);
+    expect(1000 * fc).toBeLessThan((r + 1) * n);
+  }
+});
+
 test('simulator uncertainty is smaller than sampling uncertainty', () => {
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
   for (const p of d.players) {

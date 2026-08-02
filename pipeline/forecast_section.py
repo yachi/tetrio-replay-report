@@ -48,7 +48,14 @@ def load(report_dir):
 
 
 def _pct(x1000):
-    """x1000 integer -> one-decimal percent string. Exact, never rounded up."""
+    """x1000 integer -> one-decimal percent string: 121 -> "12.1%".
+
+    This step drops nothing — an x1000 integer has exactly one decimal at percent scale.
+    The 約-convention is upheld one level up instead, in `emit-forecast-facts.ts`: point
+    estimates and lower bounds floor, upper bounds ceil (`_bound_dp`'s rule). Saying
+    "never rounded up" here was a claim about the *input* that the emitter did not honour
+    — it used `Math.round`, and this function faithfully printed 12.2% for 12.1739%.
+    """
     return f"{x1000 / 10:.1f}%"
 
 

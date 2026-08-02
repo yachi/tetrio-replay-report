@@ -478,6 +478,14 @@ only on a *prefix* of each round, using the opponent's ige stream as a per-attac
 TSD's 60.9%, inside the no-signal band. Worth reading before extending this work, because the
 loose version of the same metric scored 72.7% and would have looked like a finding.
 
+**Superseded 2026-08-02 — see [`FORECAST-PLAN.md`](FORECAST-PLAN.md).** The instrument was pointed
+at the other three sessions (it had always honoured `REPLAY_DIR`; nobody had tried). On the three
+sessions it was *not* tuned on the round-level signal is **exactly 50.0%** — 17W-17L-43T, p = 1.000
+— against 68.8% on 2026-07-22, at 78% power versus a true 70% effect. The descriptive level
+survives and is homogeneous across all four sessions (χ² p = 0.978): **14.5% [11.9%, 17.5%]** over
+654 verified T-spins. That document also records four defects the work found in committed code,
+and the plan for P0–P4.
+
 ### 1 — DONE (2026-07-29): the triage says no
 
 Eight board-derived measures, paired AUC over the 26 rounds with a decided winner and a verified

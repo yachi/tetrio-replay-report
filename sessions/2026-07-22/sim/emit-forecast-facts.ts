@@ -105,11 +105,17 @@ const players = Object.entries(base).map(([user, v]) => {
     forecast_lineclear: v.fl,
     forecast_total: fc,
     reactive: v.reactive,
-    forecast_rate_x1000: Math.round(1000 * fc / v.tspins),
-    sampling_ci95_lo_x1000: Math.round(1000 * lo),
-    sampling_ci95_hi_x1000: Math.round(1000 * hi),
-    simulator_range_lo_x1000: Math.round(1000 * Math.min(...s)),
-    simulator_range_hi_x1000: Math.round(1000 * Math.max(...s)),
+    // Gated floor convention (`pipeline/fmt.py`): every printed figure in this repo floors, so
+    // 約 means "at least this much" and the rendered percent can be read as a lower bound.
+    // Rounding broke that here — 14/115 = 121.739 emitted as 122 and the report printed 12.2%.
+    // UPPER bounds are the one exception and must CEIL, exactly as `_bound_dp` does: flooring a
+    // bound prints an interval tighter than the one that was computed, i.e. a figure stronger
+    // than its own evidence. So each interval below can only ever widen, never tighten.
+    forecast_rate_x1000: Math.floor(1000 * fc / v.tspins),
+    sampling_ci95_lo_x1000: Math.floor(1000 * lo),
+    sampling_ci95_hi_x1000: Math.ceil(1000 * hi),
+    simulator_range_lo_x1000: Math.floor(1000 * Math.min(...s)),
+    simulator_range_hi_x1000: Math.ceil(1000 * Math.max(...s)),
     verified_placements: v.verified,
     total_placements: v.placed,
   };
