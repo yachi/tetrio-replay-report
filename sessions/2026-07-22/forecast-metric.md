@@ -24,7 +24,7 @@ T-spins send 4.56 attack vs 4.04 for reactive, difference +0.52 with a cluster-b
 (−0.57, CI [−0.98, −0.07]). The two groups differ before the mechanism could act, so even a
 significant primary result could not have been attributed to forecasting. The control did its job.
 
-**Player level: no difference.** pinglamb 13/97 = 13.4%, yachi 14/115 = 12.2%; exact two-sided
+**Player level: no difference.** pinglamb 13/97 = 13.4%, yachi 14/115 = 12.1%; exact two-sided
 binomial against the exposure split, p = 0.848.
 
 Original status follows.
@@ -112,7 +112,7 @@ definition*. Recorded so nobody re-derives it.
 
 | | tucked T-spins | forecast (loose) | forecast (strict) |
 |---|---|---|---|
-| yachi | 115 | 43 → **37.4%** | 14 → **12.2%** |
+| yachi | 115 | 43 → **37.4%** | 14 → **12.1%** |
 | pinglamb | 97 | 32 → **33.0%** | 13 → **13.4%** |
 
 The loose rule showed yachi forecasting ~4 points more than pinglamb. Under the strict rule the
