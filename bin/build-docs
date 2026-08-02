@@ -28,6 +28,9 @@ REPO = Path(__file__).resolve().parent.parent
 DOCS = REPO / "docs"
 SESSIONS = REPO / "sessions"
 
+sys.path.insert(0, str(REPO))
+from pipeline import forecast_pooled  # noqa: E402  (needs REPO on the path first)
+
 # (session dir, artefact subdir, output name, label, blurb)
 #
 # One published report per session. sessions/2026-07-24/ also contains a lighter
@@ -143,7 +146,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals):
+def render_index(cards, totals, pooled_html=None):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -176,6 +179,10 @@ def render_index(cards, totals):
             f"<span class='pill'>✓ {s['claims']} 條 claim 已證明</span></a>"
         )
     parts.append("</div>")
+    # Simulator-derived, and placed AFTER the proved reports so nothing above it is coloured by
+    # it. Renders nothing at all when no session has a forecast artefact — see forecast_pooled.
+    if pooled_html:
+        parts.append(pooled_html)
     parts.append("<h2>工具</h2><div class='grid'>")
     parts.append(
         "<a class='card' href='analyzer.html'>"
@@ -255,7 +262,20 @@ def main(argv=None):
             shutil.copyfile(analyzer, dst)
             print("  copied tools/analyzer.html -> docs/analyzer.html")
 
-    index = render_index(cards, totals)
+    # Computed from the four committed artefacts at render time rather than read from a pooled
+    # artefact of its own: --check regenerates this, so the figure cannot go stale against its
+    # inputs, and there is no extra file to forget to rebuild.
+    pooled_html = forecast_pooled.section(forecast_pooled.pool(forecast_pooled.load_all(str(REPO))))
+
+    # The pooled figure has no Dafny lemma behind it, so its controls ARE its gate. Run them on
+    # every build and every check; a bad control here is a published wrong number.
+    problems = forecast_pooled.selftest(str(REPO))
+    if problems:
+        for p in problems:
+            print(f"FAIL pooled forecast: {p}", file=sys.stderr)
+        return 1
+
+    index = render_index(cards, totals, pooled_html)
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:
