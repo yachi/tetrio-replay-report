@@ -63,9 +63,9 @@ simulator-derived, and it is not measurable at this sample size.
 
 **These supersede an earlier 12-pair / [43%, 95%] / 25%-power reading.** The metric is computed only
 on the verified prefix, so its sample size is a function of simulator accuracy; fixing the sub-frame
-input clock (`sim/ab-subframe.ts`) moved coverage 13.8% → 17.9% and decided pairs 12 → 16. The gate
+input clock (`pipeline/sim/ab-subframe.ts`) moved coverage 13.8% → 17.9% and decided pairs 12 → 16. The gate
 is simultaneously *stricter*: it now also requires the ige row oracle to agree
-(`sim/ige-y-oracle.ts`), because 7.4% of attacks match on frame and amount while coming from the
+(`pipeline/sim/ige-y-oracle.ts`), because 7.4% of attacks match on frame and amount while coming from the
 wrong board row, and a forecast read off such a board is fiction. More data and better data at once.
 
 **This corrects an earlier "negative result" framing** (see *Power*, below). A null finding and an
@@ -135,7 +135,7 @@ is the same class of error this document already records twice, caught a third t
 
 ## Power — what these AUCs can and cannot support
 
-Run `bun run sim/auc-power.ts`. Its statistics are self-checked against the defining equations
+Run `REPLAY_DIR=sessions/2026-07-22 bun run pipeline/sim/auc-power.ts`. Its statistics are self-checked against the defining equations
 (an early version silently printed an upper bound of 0%, and a Clopper–Pearson value recalled from
 memory was wrong by 0.001 — both caught by that check, neither by reading the output).
 
@@ -223,7 +223,7 @@ every audit round in this project has caught. A numeric section without badges b
    per-round forecast counts — the dual-extractor rule applied to derived data.
 3. Forecast counts land in `facts.json` as data; claims then written as specs like any other.
 4. **Enough decided pairs to have power.** This is the binding constraint, and it is now measured
-   end to end by `sim/forecast-power-curve.ts` rather than assumed. Real simulator configurations
+   end to end by `pipeline/sim/forecast-power-curve.ts` rather than assumed. Real simulator configurations
    spanning a range of accuracy, each carried through to decided pairs:
 
    | config | coverage | verified T-spins | usable pairs | W–L–T | decided |
@@ -371,7 +371,7 @@ was **zero in every round containing a perfect clear**: the matcher compared the
 truth's 1, failed, and truncated at the first PC.
 
 **`amt === 10` is therefore an exact oracle for the perfect clear — 158/158 player-rounds, 19
-predicted vs 19 recorded** (`sim/pc-oracle.ts`). It is safe because no ordinary attack in this
+predicted vs 19 recorded** (`pipeline/sim/pc-oracle.ts`). It is safe because no ordinary attack in this
 dataset reaches 9 or 10; the histogram tops out at 8, and 10 occurs exactly 19 times. A first
 version of the test also required the 10 to share a frame with a sibling attack and scored 155/158
 — the three misses are PCs whose base attack was *fully cancelled*, so no sibling exists.
@@ -437,7 +437,7 @@ result is unchanged; it now rests on half as much code.
 
 ## Where the implementation lives
 
-[`sim/`](sim/), committed 2026-07-30 — see its README for how to re-run every figure above.
+[`pipeline/sim/`](../../pipeline/sim/), committed 2026-07-30 — see its README for how to re-run every figure above.
 
 Until then it lived only in a `/private/tmp` session scratchpad belonging to a session that had
 ended, i.e. every number here was reproducible only from files one reboot from deletion. That is
@@ -448,5 +448,5 @@ the reproducible core is committed.
 One thing the move surfaced: the engine under the simulator is a **patched** copy of
 td-opener-trainer `fa596ee` — `BOARD_VISIBLE_HEIGHT` 20 → 40, which `srs.ts` bakes into its floor
 check. The patch was uncommitted in the scratchpad clone, so a re-clone would have locked pieces at
-row 20 and produced wrong boards **without erroring**. It is vendored into `sim/vendor/core/` with
+row 20 and produced wrong boards **without erroring**. It is vendored into `pipeline/sim/vendor/core/` with
 that noted in the files themselves.

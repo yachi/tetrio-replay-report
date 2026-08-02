@@ -1,6 +1,6 @@
 # `sim/` — the T-Spin Forecast instrument
 
-The code behind [`../forecast-metric.md`](../forecast-metric.md). Committed 2026-07-30 because
+The code behind [`sessions/2026-07-22/forecast-metric.md`](../../sessions/2026-07-22/forecast-metric.md). Committed 2026-07-30 because
 every number in that document was, until then, reproducible only from a `/private/tmp` scratchpad
 belonging to a session that had ended.
 
@@ -46,14 +46,30 @@ Pairing is simulated once and cached to `pairs-cache.json` (gitignored; delete t
 The cache key includes the replay directory, so pointing `REPLAY_DIR` at another session cannot
 poison this one's entry.
 
-Expected output, all four verified from this directory on 2026-07-30:
+Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08-02**:
 
 | command | result |
 |---|---|
 | the three test files | 29 pass, 0 fail, 466 assertions |
 | `mutate-forecast.ts` | 11/11 killed |
-| `run-forecast.ts` | yachi 89 tucked / 11 forecast / 12.4% · pinglamb 78 / 10 / 12.8% |
-| `auc.ts` | 61.4 · 57.7 · 52.5 · 46.2 |
+| `run-forecast.ts` | pinglamb 97 tucked / 13 forecast / 13.4% · yachi 115 / 14 / 12.2% |
+| `auc.ts` | 58.6 · 57.7 · 52.5 · 57.0 · 55.7 |
+
+The bottom two rows moved since they were written on 2026-07-30, and the table said nothing
+about it because nothing re-runs it. What changed:
+
+* `run-forecast.ts` read `yachi 89 / 11 / 12.4% · pinglamb 78 / 10 / 12.8%`. The counts grew
+  because the verified prefix did; the rates moved because the emitted rate now FLOORS rather
+  than rounds. Note the two columns had also been printed in the opposite order to the runner's
+  own output, which prints pinglamb first.
+* `auc.ts` read `61.4 · 57.7 · 52.5 · 46.2` — four values for what is now **five** metrics, so
+  the row could not be lined up against the output even in principle once `separation-weighted`
+  was added. `forecast rate` is 58.6%, not 61.4%.
+
+These are a regression reference, not golden data: they record what this repo's own runners
+produce, so re-measuring them is correct. The wiki fixtures are the opposite — an external
+oracle that must never be regenerated from this engine. Re-measure this table whenever the gate,
+the rounding, or the metric set changes, and date it.
 
 ## What is verified, and how
 
@@ -67,7 +83,7 @@ Expected output, all four verified from this directory on 2026-07-30:
   anti-vacuity gate: 84 of them must actually offer a line-clearing T-spin, or the suite proves
   nothing. Seeds are MINSTD, so any failure reproduces.
 - **External golden data.** `wiki-fixtures.test.ts` reads
-  `../wiki-tspin-forecast-boards.json` — 29 board diagrams parsed from harddrop.com. The boards
+  `wiki-tspin-forecast-boards.json` — 29 board diagrams parsed from harddrop.com. The boards
   *and* the expectations come from the wiki, never from this engine. There is one copy of that
   file and this test reads it; do not add a second.
 - **Coverage** — 100% of lines and functions in `forecast.ts`.

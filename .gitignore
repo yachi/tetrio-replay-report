@@ -15,6 +15,10 @@ Thumbs.db
 # local Dafny scratch
 *.dfy.tmp
 *.bak
+# mutate-forecast.ts backs up the file it patches as <name>.mutbak and restores it afterwards.
+# A crash or interrupt mid-sweep leaves that backup behind, and `*.bak` does not match it — so
+# an unrestored copy of forecast.ts was one `git add` away from being committed as source.
+*.mutbak
 
 # derived simulation cache — regenerate with pipeline/sim/pairs.ts.
 # The pattern must follow the CODE, not the sessions: the cache is written beside pairs.ts, so
