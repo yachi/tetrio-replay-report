@@ -37,18 +37,30 @@ and its perturbation operator — rather than growing a second copy that drifts.
    was mis-extracted and no lemma was ever emitted, and a verifier handed zero lemmas
    prints "0 verified, 0 errors" and exits 0. A verdict is only meaningful once the
    unmutated claim has been seen to hold.
-2. *free* — the constants the claim reads become free integers over the realisable
-   domain (measurements non-negative — no constant in any committed artefact is
-   negative; coded constants restricted to the legend), and the negation is asserted.
-   `sat` means some fact base falsifies the claim. **`unsat` means none does: the
-   claim is a tautology, and proving it says nothing about the data.**
+2. *free* — the constants the claim reads become free integers and the negation is
+   asserted, so `sat` exhibits a fact base that falsifies the claim and `unsat` proves
+   none exists. Run at **two domains**, because they are two different findings:
+
+   * over *every integer* — `unsat` here is an outright tautology (`vacuous`);
+   * over the *realisable* domain — measurements non-negative (no constant in any
+     committed artefact is negative), coded constants restricted to the legend.
+     `unsat` here and `sat` above means only impossible data falsifies it
+     (`unrealisable`): true of every session that could ever be played, which is
+     decorative for a claim that is supposed to be about *this* one.
 3. *probe* — the stratified single-constant operator from `check_smt`, run for a
    concrete witness: which real constant, moved to which real value, flips this claim.
-   A claim that pass 2 calls falsifiable but no single-constant perturbation reaches
-   is reported (`weak`), because the operator the repo's other gates use cannot see it.
 
-Pass 2 subsumes pass 3 logically — if no fact base falsifies a claim then no
-perturbation does — so the two disagreeing is a harness bug, and is raised as one.
+Pass 2 subsumes pass 3, so the two disagreeing is a harness bug and is raised as one
+— but only at the matching domain. `check_smt`'s operator escalates a measurement to
+`v - 1000`, which for a value under 1000 is a negative APM, so it can "kill" a claim
+that no realisable fact base falsifies. That gap is why `unrealisable` is its own
+verdict rather than an argument about the operator: it is precisely the class the
+existing mutation sweep reports as covered.
+
+A claim pass 2 calls falsifiable that pass 3's sample does not reach is noted
+(`weak`) and is a statement about the **sample**, not the claim: 07-28's G057 is
+falsifiable by 7 of the 192 constants it reads, so a 64-constant sample misses it and
+`--probe 0` (sweep them all) finds it. `weak` never fails the gate.
 
 **Self-validation is not optional.** A uniform verdict (all dead or all alive) is the
 signature of a broken harness, never a finding, so three control claims ride through
@@ -101,7 +113,7 @@ class Claim:
         self.id = cid
         self.gloss = gloss
         self.asserts = asserts        # raw lines, verbatim from the artefact
-        self.refs = refs              # constants it reads, in file order
+        self.refs = refs              # constants it reads, first mention first
         self.control = control        # None, "vacuous" or "live" — the expected verdict
 
 
@@ -138,7 +150,7 @@ def parse(text):
         cid, asserts, j = None, [], i + 1
         while j < len(lines) and lines[j].strip() != "(pop 1)":
             s = lines[j].strip()
-            if s.startswith("(echo "):
+            if s.startswith("(echo ") and '"' in s:
                 cid = s.split('"')[1]
             elif s.startswith("(assert "):
                 asserts.append(lines[j])
@@ -153,6 +165,10 @@ def parse(text):
                 if n in consts]
         claims.append(Claim(cid, gloss.get(cid, ""), asserts, refs))
         i = j + 1
+    if coded and not codes:
+        raise SystemExit(f"{len(coded)} constant(s) are marked as categorical but the "
+                         f"file has no `; N = value` legend — their domain would be "
+                         f"empty, which makes every claim over them look vacuous")
     return Artefact(consts, coded, codes, claims)
 
 
@@ -264,7 +280,8 @@ def build_probes(art, claim, count, seed=7):
     """
     import random
     picks = stratified([(n, art.consts[n]) for n in claim.refs],
-                       min(count, len(claim.refs)), random.Random(seed))
+                       len(claim.refs) if count == 0 else min(count, len(claim.refs)),
+                       random.Random(seed))
     lines, probes = ["(set-logic QF_NIA)"], {}
     for name, val in picks:
         for new in perturbations(int(val), name in art.coded, art.codes):
@@ -451,7 +468,11 @@ def classify(cid, loose, tight, w):
         return "unrealisable"
     if w.real:
         return "live"
-    return "weak" if "sat" in (loose, tight) else "undecided"
+    # `weak` is only available when the REALISABLE pass answered: with `tight`
+    # unknown and no in-domain witness, nothing has established that a real fact
+    # base falsifies this claim, and `loose` being sat does not — an all-integer
+    # counterexample can be a negative APM.
+    return "weak" if tight == "sat" else "undecided"
 
 
 def main(argv=None):
@@ -459,9 +480,10 @@ def main(argv=None):
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("report_dir")
     ap.add_argument("--solver", help="use only this solver")
-    ap.add_argument("--probe", type=int, default=8, metavar="N",
+    ap.add_argument("--probe", type=int, default=12, metavar="N",
                     help="constants to perturb per claim when hunting a witness "
-                         "(default 8)")
+                         "(default 12, as check_smt --mutate; 0 sweeps every "
+                         "constant the claim reads — ~20x slower)")
     ap.add_argument("--limit-ms", type=int, default=3000, metavar="MS",
                     help="per-query solver time limit (default 3000)")
     ap.add_argument("--list", action="store_true",
@@ -555,8 +577,11 @@ def main(argv=None):
               f"constants and no perturbation falsified it, so this run cannot say "
               f"whether it is vacuous — {c.gloss}", file=sys.stderr)
     for c in by["weak"]:
-        print(f"  !!  {c.id} is falsifiable, but no single-constant perturbation "
-              f"reaches it ({args.probe} constants tried) — {c.gloss}")
+        w = witness[c.id]
+        print(f"  !!  {c.id} is falsifiable, but none of the {w.tried} perturbations "
+              f"of the {min(args.probe or len(c.refs), len(c.refs))} constants sampled "
+              f"from the {len(c.refs)} it reads reaches it — a statement about the "
+              f"sample, not the claim; --probe 0 sweeps them all — {c.gloss}")
 
     bad = by["vacuous"] + by["unrealisable"] + by["undecided"]
     if bad:
@@ -573,7 +598,8 @@ def main(argv=None):
     print(f"  {'ok ' if not bad else '!! '} {len(by['live'])} of {len(real)} claims "
           f"falsified by a concrete in-domain perturbation, {len(by['weak'])} only by a "
           f"compound one, {len(bad)} not pinned at all ({took:.1f}s, "
-          f"{', '.join(found)}, {args.probe} constants probed per claim)")
+          f"{', '.join(found)}, "
+          f"{'every' if not args.probe else args.probe} constant(s) probed per claim)")
     for s in absent:
         print(f"  --  {s} not used, so this run is {len(found)}-solver")
     return 1 if bad else 0
