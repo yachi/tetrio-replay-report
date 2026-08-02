@@ -29,6 +29,11 @@ env:
   # sha256 of cvc5-Linux-x86_64-static.zip. Two independent authorities agree on
   # this: cvc5's own Homebrew cask (cvc5/homebrew-cvc5) and GitHub's asset digest.
   CVC5_SHA256: dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6
+  # Newest z3 still shipping a glibc-2.35 build (ubuntu-22.04's). See the install
+  # step for why the lemma-vacuity gate needs z3 specifically, and why this pin is
+  # weaker than the cvc5 one above.
+  Z3_VERSION: 4.14.1
+  Z3_SHA256: 76f797c849ae1487ce08840321d3334720434e0eb1a23e1bd755c3818ffb7265
 
 jobs:
   verify:
@@ -55,9 +60,46 @@ jobs:
           unzip -q dafny.zip -d "$HOME/dafny-dist"
           echo "$HOME/dafny-dist/dafny" >> "$GITHUB_PATH"
 
+      # verify-session step 7 (lemma vacuity) needs an SMT solver, and it FAILS
+      # rather than skips when there is none — a gate that quietly does nothing
+      # when its dependency is absent reports success for work it never did.
+      # That is the right behaviour, and it is why this job went red: the step
+      # was moved from MUTATION-gated to always-on once it got fast enough, and
+      # this job installed only Dafny.
+      #
+      # It must be z3, not the cvc5 the SMT job below installs. Measured on this
+      # checker's queries: z3 settles 2026-07-24's 78 claims in 2.6 s, while cvc5
+      # produced no result at all in 120 s and did not finish 2026-07-22 in ten
+      # minutes. Installing cvc5 here would have turned a red job into a hanging
+      # one. The free-variable queries this gate asks are simply not cvc5's
+      # ground, and the two solvers are not interchangeable for it.
+      #
+      # 4.14.1 is the NEWEST z3 release still shipping a glibc-2.35 build, which
+      # is what ubuntu-22.04 has; every release after it is glibc-2.39 only, the
+      # constraint the SMT job's comment records.
+      #
+      # Weaker pin than the cvc5 one below, and deliberately flagged as such:
+      # GitHub's asset `digest` field is null for this release, so unlike cvc5
+      # there is no second independent authority to agree with. The sha256 was
+      # computed from a downloaded copy whose byte length matches the length the
+      # API reports (51650111). That is trust-on-first-use — it defends against
+      # the asset changing from here on, not against it having been wrong when
+      # first fetched. Replace with a two-authority pin when one exists.
+      - name: Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)
+        run: |
+          set -euo pipefail
+          URL="https://github.com/Z3Prover/z3/releases/download/z3-${Z3_VERSION}/z3-${Z3_VERSION}-x64-glibc-2.35.zip"
+          curl -fsSL "$URL" -o z3.zip
+          echo "${Z3_SHA256}  z3.zip" | sha256sum -c -
+          unzip -q z3.zip -d "$HOME/z3-dist"
+          mkdir -p "$HOME/bin"
+          cp "$HOME/z3-dist/z3-${Z3_VERSION}-x64-glibc-2.35/bin/z3" "$HOME/bin/z3"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
       - name: Show tool versions
         run: |
           dafny --version
+          z3 --version
           python3 --version
           jq --version
 
