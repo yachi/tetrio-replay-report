@@ -1,11 +1,11 @@
 {
-  "schema": "forecast-facts/2",
+  "schema": "forecast-facts/3",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
-    "per-round split-half reliability is 0.004 (pinglamb) / -0.215 (yachi), so a per-round column is not possible at this event rate",
-    "no effect at any unit: round AUC p=1.000, event-level CI includes zero, player-level p=0.523"
+    "per-round split-half reliability is 0.136 (pinglamb) / -0.121 (yachi), so a per-round column is not possible at this event rate",
+    "no effect at any unit: round AUC p=1.000"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -35,30 +35,32 @@
     {
       "user": "pinglamb",
       "verified_tspins": 61,
-      "forecast_garbage": 9,
-      "forecast_lineclear": 2,
-      "forecast_total": 11,
-      "reactive": 50,
-      "forecast_rate_x1000": 180,
-      "sampling_ci95_lo_x1000": 93,
-      "sampling_ci95_hi_x1000": 300,
-      "simulator_range_lo_x1000": 169,
-      "simulator_range_hi_x1000": 191,
+      "forecast_garbage": 0,
+      "forecast_lineclear_unverified": 10,
+      "self_built": 29,
+      "forecast_total": 0,
+      "reactive": 22,
+      "forecast_rate_x1000": 0,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 59,
+      "simulator_range_lo_x1000": 0,
+      "simulator_range_hi_x1000": 0,
       "verified_placements": 655,
       "total_placements": 5201
     },
     {
       "user": "yachi",
       "verified_tspins": 82,
-      "forecast_garbage": 5,
-      "forecast_lineclear": 6,
-      "forecast_total": 11,
-      "reactive": 71,
-      "forecast_rate_x1000": 134,
-      "sampling_ci95_lo_x1000": 68,
-      "sampling_ci95_hi_x1000": 228,
-      "simulator_range_lo_x1000": 134,
-      "simulator_range_hi_x1000": 158,
+      "forecast_garbage": 0,
+      "forecast_lineclear_unverified": 13,
+      "self_built": 38,
+      "forecast_total": 0,
+      "reactive": 31,
+      "forecast_rate_x1000": 0,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 44,
+      "simulator_range_lo_x1000": 0,
+      "simulator_range_hi_x1000": 0,
       "verified_placements": 979,
       "total_placements": 5527
     }
@@ -80,70 +82,28 @@
       "exact_p_x1000": 1000
     },
     "event": {
-      "forecast_n": 22,
-      "reactive_n": 121,
-      "attack": {
-        "forecast_mean_x1000": 4590,
-        "reactive_mean_x1000": 4256,
-        "diff_x1000": 334,
-        "ci95_lo_x1000": -516,
-        "ci95_hi_x1000": 1163,
-        "excludes_zero": false
-      },
-      "lines": {
-        "forecast_mean_x1000": 2181,
-        "reactive_mean_x1000": 2413,
-        "diff_x1000": -232,
-        "ci95_lo_x1000": -439,
-        "ci95_hi_x1000": 55,
-        "excludes_zero": false
-      },
+      "forecast_n": 0,
+      "reactive_n": 143,
+      "attack": null,
+      "lines": null,
       "balance": {
-        "stack_height": {
-          "forecast_mean_x1000": 7818,
-          "reactive_mean_x1000": 5826,
-          "diff_x1000": 1991,
-          "ci95_lo_x1000": -343,
-          "ci95_hi_x1000": 4506,
-          "excludes_zero": false
-        },
-        "garbage_pressure": {
-          "forecast_mean_x1000": 1681,
-          "reactive_mean_x1000": 1776,
-          "diff_x1000": -96,
-          "ci95_lo_x1000": -1524,
-          "ci95_hi_x1000": 1496,
-          "excludes_zero": false
-        }
+        "stack_height": null,
+        "garbage_pressure": null
       },
-      "negative_control": {
-        "forecast_mean_x1000": 545,
-        "reactive_mean_x1000": 140,
-        "diff_x1000": 404,
-        "ci95_lo_x1000": -258,
-        "ci95_hi_x1000": 1627,
-        "excludes_zero": false,
-        "fires": false
-      }
+      "negative_control": null
     },
-    "player": {
-      "user": "yachi",
-      "k": 11,
-      "n": 22,
-      "expected_x1000": 12615,
-      "exact_p_x1000": 523
-    },
+    "player": null,
     "reliability": {
       "split_half_r_x1000": {
-        "pinglamb": 4,
-        "yachi": -215
+        "pinglamb": 136,
+        "yachi": -121
       },
       "scorable_rounds": {
         "pinglamb": 33,
         "yachi": 38
       },
       "rounds_for_r70": {
-        "pinglamb": 545,
+        "pinglamb": 15,
         "yachi": null
       }
     }

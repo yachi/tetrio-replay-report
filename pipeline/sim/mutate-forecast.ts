@@ -49,12 +49,32 @@ const MUTANTS: Mutant[] = [
   { name: 'metric/roof-oldest-builder', note: 'roof attributed to the earliest placer, not the latest',
     find: `const j = placers.length ? Math.max(...placers) : -1;`, nth: 1,
     repl: `const j = placers.length ? Math.min(...placers) : -1;` },
-  { name: 'metric/strict-gate-inverted', note: 'strict gate answers the opposite question',
-    find: `if (boardJ) { determinable = true; slotOpenedLater = !tspinAvailable(boardJ); }`, nth: 1,
-    repl: `if (boardJ) { determinable = true; slotOpenedLater = tspinAvailable(boardJ); }` },
-  { name: 'metric/strict-disabled', note: 'silently falls back to the loose rule',
-    find: `const opened = strict && determinable ? slotOpenedLater : (clearBetween || garbageBetween);`, nth: 1,
-    repl: `const opened = (clearBetween || garbageBetween);` },
+  { name: 'metric/improve-inverted', note: 'the improvement test answers the opposite question',
+    find: `      ? availAtSpin > availAtRoof`, nth: 1,
+    repl: `      ? availAtSpin < availAtRoof` },
+  { name: 'metric/improve-nonstrict', note: 'any change counts as an improvement',
+    find: `      ? availAtSpin > availAtRoof`, nth: 1,
+    repl: `      ? availAtSpin >= availAtRoof` },
+  { name: 'metric/strict-disabled', note: 'silently falls back to the loose co-occurrence rule',
+    find: `    const improved = (strict && determinable)`, nth: 1,
+    repl: `    const improved = (false && determinable)` },
+
+  // --- the causal test. These are the mutants that matter most: the whole 2026-08-02 correction
+  //     is that co-occurrence was standing in for causation, so a harness that cannot kill a
+  //     reversion to co-occurrence would not have caught the original defect either.
+  { name: 'metric/garbage-co-occurrence', note: 'reverts to "garbage arrived", the original bug',
+    find: `    const garbageLoadBearing = !!(boardK && garbageBetween
+      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);`, nth: 1,
+    repl: `    const garbageLoadBearing = !!garbageBetween;` },
+  { name: 'metric/garbage-causal-inverted', note: 'load-bearing test inverted',
+    find: `      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);`, nth: 1,
+    repl: `      && bestTspinLines(withoutGarbage(boardK)) >= availAtSpin);` },
+  { name: 'metric/withoutGarbage-noop', note: 'the counterfactual board is the same board',
+    find: `  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));`, nth: 1,
+    repl: `  const kept = board.filter(() => true);` },
+  { name: 'metric/self-built-counted', note: 'openers rejoin the forecast bucket',
+    find: `export const isVerifiedForecast = (r: ForecastRecord) => r.kind === 'forecast_garbage';`, nth: 1,
+    repl: `export const isVerifiedForecast = (r: ForecastRecord) => r.kind !== 'reactive';` },
 ];
 
 function replaceNth(src: string, find: string, nth: number, repl: string): string {
@@ -69,6 +89,30 @@ function replaceNth(src: string, find: string, nth: number, repl: string): strin
 const TESTS = process.argv.slice(2).length ? process.argv.slice(2) : ['forecast.test.ts', 'wiki-fixtures.test.ts'];
 const original = readFileSync(SRC, 'utf8');
 copyFileSync(SRC, BAK);
+
+/**
+ * Restore on ANY exit, not just the happy path.
+ *
+ * This harness mutates `forecast.ts` IN PLACE and restored it only after the sweep finished. A
+ * crash on 2026-08-02 therefore left `Math.min(...placers)` sitting in the committed source where
+ * `Math.max` belongs — a live mutation, invisible to `git status` only because nothing looked.
+ * It was caught by a unit test, but every command run in between was executing mutated code.
+ *
+ * Two things make that recoverable now: the restore is unconditional, and the backup is only
+ * taken when the file is known-good. Note the second-order trap that made the first diagnosis
+ * hard — re-running the harness copies the ALREADY-MUTATED source into the backup, so
+ * `diff forecast.ts forecast.ts.mutbak` comes back identical and looks like proof of health.
+ * Compare against git, not against the backup.
+ */
+let restored = false;
+const restore = () => {
+  if (restored) return;
+  restored = true;
+  writeFileSync(SRC, original);
+};
+process.on('exit', restore);
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(sig, () => { restore(); process.exit(130); });
+process.on('uncaughtException', e => { restore(); console.error(e); process.exit(1); });
 
 // baseline must be green, or every mutant "dies" for the wrong reason
 try {

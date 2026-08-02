@@ -86,19 +86,23 @@ const CONFIGS: [string, any][] = [
 ];
 
 const tally = (extra: any) => {
-  const per: Record<string, { tspins: number; fg: number; fl: number; reactive: number; verified: number; placed: number }> = {};
+  const per: Record<string, { tspins: number; fg: number; fl: number; sb: number; reactive: number; verified: number; placed: number }> = {};
   for (const c of loadCases()) {
     const r = runCase(c, extra);
     const v = verifiedIndex(r, c.truth);
-    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, reactive: 0, verified: 0, placed: 0 };
+    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, verified: 0, placed: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
     if (v < 0) continue;
     for (const rec of forecastMetric(r, true).records) {
       if (rec.lockIndex > v) continue;
       p.tspins++;
+      // Four buckets, and the `else` must not swallow one: `self_built` was added precisely
+      // because openers were landing in the forecast count, so folding it into `reactive`
+      // would hide the correction it exists to make.
       if (rec.kind === 'forecast_garbage') p.fg++;
       else if (rec.kind === 'forecast_lineclear') p.fl++;
+      else if (rec.kind === 'self_built') p.sb++;
       else p.reactive++;
     }
   }
@@ -109,18 +113,23 @@ const base = tally({});
 const spread: Record<string, number[]> = {};
 for (const [, extra] of CONFIGS) {
   const t = tally(extra);
-  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? (v.fg + v.fl) / v.tspins : 0);
+  // sensitivity of the VERIFIED rate only — the unverified bucket is not the headline
+  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? v.fg / v.tspins : 0);
 }
 
 const players = Object.entries(base).map(([user, v]) => {
-  const fc = v.fg + v.fl;
+  const fc = v.fg;   // VERIFIED forecasts only: garbage counterfactually shown to be load-bearing
   const [lo, hi] = clopperPearson(fc, v.tspins);
   const s = spread[user]!;
   return {
     user,
     verified_tspins: v.tspins,
     forecast_garbage: v.fg,
-    forecast_lineclear: v.fl,
+    // Causality untestable for line clears — un-clearing a row needs a re-simulation, not a
+    // board edit. Reported, never added into forecast_total.
+    forecast_lineclear_unverified: v.fl,
+    // improved, but neither mechanism explains it: the player built the slot. Openers land here.
+    self_built: v.sb,
     forecast_total: fc,
     reactive: v.reactive,
     // Gated floor convention (`pipeline/fmt.py`): every printed figure in this repo floors, so
@@ -241,7 +250,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/2',
+  schema: 'forecast-facts/3',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

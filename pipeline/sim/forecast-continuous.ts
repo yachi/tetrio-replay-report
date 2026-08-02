@@ -18,7 +18,7 @@
  * while destroying only the association being tested, which is the exchangeability the null
  * actually requires.
  */
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast} from './forecast.ts';
 import { loadCases, runCase, verifiedIndex, replayDir} from './verified-prefix.ts';
 import { readFileSync, readdirSync } from 'node:fs';
 
@@ -44,7 +44,7 @@ for (const c of loadCases()) {
   const st = stats.get(`${c.file}#${c.round}#${c.user}`)!;
   const mins = (st.finaltime ?? c.frames / 60 * 1000) / 60000;
   obs.push({ round: `${c.file}#${c.round}`, user: c.user, won: c.alive ? 1 : 0,
-             rate: recs.filter(x => x.kind !== 'reactive').length / recs.length,
+             rate: recs.filter(isVerifiedForecast).length / recs.length,
              n: recs.length, sent: st.garbage?.sent ?? 0, pieces: st.piecesplaced,
              lines: st.lines, apm: mins > 0 ? (st.garbage?.sent ?? 0) / mins : 0 });
 }

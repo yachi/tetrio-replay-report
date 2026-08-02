@@ -172,11 +172,21 @@ def homogeneity(artefacts):
 
 
 def _chi2_stat(cnts):
-    """Chi-square for a 2xK table of (successes, trials) against the pooled rate."""
+    """Chi-square for a 2xK table of (successes, trials) against the pooled rate.
+
+    `0.0` — perfect agreement — for the degenerate margins, NOT None. When every session has the
+    same count of 0 (or of n), the rates are IDENTICAL, so the sessions could not agree more; the
+    chi-square is undefined only because its denominator vanishes. Returning None there made
+    `homogeneity()` answer "not testable", which the caller correctly refuses to pool on — and so
+    a corpus of 0-of-654, one of the cleanest results this metric has produced, rendered as
+    "cannot say". Undefined-because-degenerate is not the same as unknown.
+    """
     tot_k = sum(k for k, _ in cnts)
     tot_n = sum(n for _, n in cnts)
-    if tot_n == 0 or tot_k == 0 or tot_k == tot_n:
+    if tot_n == 0:
         return None
+    if tot_k == 0 or tot_k == tot_n:
+        return 0.0
     p = tot_k / tot_n
     stat = 0.0
     for k, n in cnts:
@@ -274,7 +284,8 @@ def section(pooled):
         f"<div class='meta'>{pooled['forecast_total']} / {pooled['verified_tspins']} "
         f"可核 T-spin · {n_sessions} 個 session 合併</div>",
         "<p class='blurb'>喺可核（早局）嘅 tucked T-spin 入面，"
-        "打之前個窿位仲未存在嘅大約佔咁多。"
+        "個窿位<strong>真係由垃圾整出嚟</strong>嘅佔咁多——"
+        "每一個都用反事實驗過：抽走所有垃圾行之後個窿位就冇咗，先計數。"
         "呢個數<strong>唔係</strong>由兩個獨立 parser 抽出嚟、亦<strong>冇</strong>經 Dafny 證明——"
         "佢由一個 replay 模擬器重跑操作記錄推導出嚟，所以冇 claim 編號、冇 ✓ 標記。</p>",
         "<p class='blurb'>合併之前有驗過各 session 一唔一致（"
@@ -286,6 +297,12 @@ def section(pooled):
                      f"[{_pct(p['lo_x1000'])}, {_pct(p['hi_x1000'])}]"
                      for p in pooled["players"])
         + "</div>",
+        ("<p class='blurb'><strong>四晚加埋一個都冇。</strong>"
+         "唔係樣本細到睇唔到——係逐個驗完之後，冇一個窿位係垃圾造成。"
+         "之前呢個數係 14.5%，因為當時只要「垃圾喺窗口入面到過」就當數，"
+         "而喺平均相隔 11 隻棋嘅窗口入面幾乎實會有垃圾到；"
+         "嗰個數量到嘅係<em>開局定式</em>，唔係預測。</p>"
+         if pooled["forecast_total"] == 0 else ""),
         "<span class='pill'>未經證明 · 探索性資料</span>",
         "</div></div>",
     ]

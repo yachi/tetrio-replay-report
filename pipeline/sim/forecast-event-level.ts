@@ -35,7 +35,7 @@
  * arm is empty has no difference to report, and `mean([])` is NaN while a fabricated 0 would
  * read downstream as "measured, and the two arms are equal".
  */
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast} from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 export type Ev = { user:string; round:string; kind:string; forecast:boolean;
@@ -68,7 +68,7 @@ export function collectEvents(): Ev[] {
             .reduce((a,x)=>a+x.sent, 0)
         : 0;
       evs.push({ user:c.user, round:`${c.file}#${c.round}`, kind:rec.kind,
-                 forecast: rec.kind !== 'reactive', attack: sent?.sent ?? 0,
+                 forecast: isVerifiedForecast(rec), attack: sent?.sent ?? 0,
                  lines: lock.cleared, stackHeight: board.length - top,
                  garbagePressure: gp, priorAttack: prior });
     }

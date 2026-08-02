@@ -7,7 +7,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast} from './forecast.ts';
 import { loadCases, runCase, verifiedIndex, replayDir} from './verified-prefix.ts';
 
 export const METRICS = ['forecast rate', 'forecast per piece', 'forecast count', 'tucked T-spins',
@@ -51,7 +51,7 @@ export function collectRows(strict = true, strictRows = true): Row[] {
     const r = runCase(c);
     const vIdx = verifiedIndex(r, c.truth, strictRows);
     const recs = vIdx < 0 ? [] : forecastMetric(r, strict).records.filter(x => x.lockIndex <= vIdx);
-    const fcRecs = recs.filter(x => x.kind !== 'reactive');
+    const fcRecs = recs.filter(isVerifiedForecast);
     const fc = fcRecs.length;
     // Separation-weighted score. `forecast rate` is fc/n over a handful of T-spins, so it
     // lands on the same few rationals for both players and TIES 54% of pairs — ties are

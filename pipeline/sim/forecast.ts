@@ -5,15 +5,29 @@
  * T-spins in advance. A player stacks so that T-Spins would emerge from line clears or upcoming
  * garbage."
  *
+ * The MECHANISM clause is load-bearing and was missing until 2026-08-02. A slot that appears
+ * because the player finished building it is not a forecast, however long before the spin the
+ * overhang was placed. The C-Spin (TKI積み) opener is exactly that case — "L and J are used to
+ * build the overhang" in the first bag — and it was being counted as forecasting.
+ *
  * Operational form — intent is unobservable, so we measure its signature:
  *   For each executed T-spin at lock k, find the lock j that built the slot's ROOF (the overhang
- *   the T tucks under), via the provenance grid. Then classify by what happened in (j, k]:
- *     forecast_garbage   — the roof is garbage, or garbage rose between j and k
- *                          (the slot did not exist as usable when the overhang was placed)
- *     forecast_lineclear — a line clear occurred between j and k, dropping the stack into the slot
- *     reactive           — neither; the slot was already there and usable
- *   `separation` = k - j in pieces. A larger separation is stronger evidence of intent;
- *   separation == 1 means the overhang was placed by the immediately preceding piece.
+ *   the T tucks under), via the provenance grid. Then:
+ *     1. did the best available T-spin IMPROVE between j and k? (not merely "was one absent at j",
+ *        which discards the wiki's own 1 -> 2 upgrade examples)
+ *     2. if so, is the mechanism established?
+ *          forecast_garbage   — removing every garbage row strictly reduces what is available at
+ *                               k, so the garbage is LOAD-BEARING. Counterfactually verified, and
+ *                               validated against the wiki's five garbage pairs, where stripping
+ *                               the appended line reproduces the article's own "before" value.
+ *          forecast_lineclear — a clear occurred in (j, k] and the garbage is not load-bearing.
+ *                               CO-OCCURRENCE ONLY: un-clearing a row needs a re-simulation, not a
+ *                               board edit, so this bucket is reported separately and is NOT in
+ *                               `forecastRate`. It carries the confound the garbage branch shed.
+ *          self_built         — improved, but neither mechanism explains it. Openers land here.
+ *     3. otherwise `reactive` — the spin on offer did not get better.
+ *   `separation` = k - j in pieces. Note it is NOT evidence of intent on its own: the corpus's
+ *   longest separations are openers.
  *
  * Reported as a RATE, never a binary claim: some fraction of any forecast bucket is luck.
  */
@@ -78,30 +92,61 @@ export function tspinAvailable(board: Board): boolean {
   return bestTspinLines(board) > 0;
 }
 
-export type ForecastKind = 'forecast_garbage' | 'forecast_lineclear' | 'reactive';
+/**
+ * `forecast_garbage`   improved, and the garbage is LOAD-BEARING — removing it strictly reduces the
+ *                      available spin. Causally verified.
+ * `forecast_lineclear` improved, a line cleared in the window, and garbage is not load-bearing.
+ *                      **Causality is NOT established** — see `forecastMetric`.
+ * `self_built`         improved, but the player built the slot themselves. Openers land here.
+ * `reactive`           the available spin did not improve between roof and execution.
+ */
+export type ForecastKind = 'forecast_garbage' | 'forecast_lineclear' | 'self_built' | 'reactive';
 export interface ForecastRecord {
   lockIndex: number; frame: number; lines: number; spin: 'mini' | 'full';
   kind: ForecastKind; separation: number; roofFrom: number | null; roofIsGarbage: boolean;
   slotOpenedLater?: boolean; determinable?: boolean;
+  /** best T-spin available when the roof was placed, and just before it was executed */
+  availAtRoof?: number; availAtSpin?: number;
+  /** removing every garbage row strictly reduces what is available at execution */
+  garbageLoadBearing?: boolean;
 }
 
 /**
- * Strict test — the defining property, verified in splice-demo.ts:
- * was the cell directly BENEATH the roof already empty when the roof was placed?
- *   empty  -> the slot was already open; the overhang was laid onto an existing cavity (reactive)
- *   filled -> the roof sat on solid ground and the cavity opened later, either because a clear
- *             spliced the rows together or because garbage lifted a hole under it (forecast)
- * This replaces "any line clear happened in the window", which counted clears far below the slot
- * that splice nothing.
+ * Forecasts whose mechanism is ESTABLISHED. This is the honest numerator.
+ *
+ * Callers previously wrote `kind !== 'reactive'` inline in six places. That is why adding a fourth
+ * kind is dangerous and why it is now a function: a new kind silently joined the forecast bucket
+ * under the old idiom, which is exactly how openers got counted in the first place.
+ */
+export const isVerifiedForecast = (r: ForecastRecord) => r.kind === 'forecast_garbage';
+
+/** Adds the line-clear bucket, whose causality this simulator cannot test. Report it separately. */
+export const isForecastOrUnverified = (r: ForecastRecord) =>
+  r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear';
+
+/** Every row containing a garbage cell removed, stack shifted down — the counterfactual board. */
+export function withoutGarbage(board: Board): Board {
+  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));
+  const pad = Array.from({ length: board.length - kept.length }, () => Array(10).fill(null));
+  return [...pad, ...kept] as Board;
+}
+
+/**
+ * `strict` (the default) applies the causal rule described above. `strict = false` restores the
+ * original co-occurrence behaviour verbatim — any garbage or clear in the window counts — so
+ * LOOSE=1 still reproduces the pre-correction figures for comparison.
  */
 export function forecastMetric(r: SimResult, strict = true): {
   records: ForecastRecord[];
   totals: Record<ForecastKind, number>;
   tspins: number;
+  /** verified only: garbage counterfactually shown to be load-bearing */
   forecastRate: number;
+  /** verified + the untestable line-clear bucket. Never print this as "the" rate. */
+  unverifiedRate: number;
 } {
   const records: ForecastRecord[] = [];
-  const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, reactive: 0 };
+  const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0 };
 
   for (let k = 0; k < r.locks.length; k++) {
     const lk = r.locks[k]!;
@@ -131,27 +176,61 @@ export function forecastMetric(r: SimResult, strict = true): {
     let clearBetween = false;
     for (let i = Math.max(j, 0) + 1; i < k; i++) if (r.locks[i]!.cleared > 0) { clearBetween = true; break; }
 
-    // strict gate: was a line-clearing T-spin already available when the roof was placed?
-    // (the first attempt tested "is the cell under the roof empty" — that is true by definition
-    //  of an overhang, so it returned reactive for all 167 cases and was discarded)
-    let slotOpenedLater = true, determinable = false;
+    // Did the available spin IMPROVE between the roof going down and the T going in?
+    //
+    // This replaces a binary `!tspinAvailable(boardJ)`. That test forced any board already
+    // offering ANY spin to `reactive`, which discards the wiki's own Doubles>Garbage examples:
+    // two of its five garbage pairs go best 1 -> 2, an already-available single that garbage
+    // UPGRADES to a double, presented by the article as forecasting a Double. 34 of this
+    // corpus's reactive events have that shape.
     const boardJ = j >= 0 ? r.boards[j] : null;
-    if (boardJ) { determinable = true; slotOpenedLater = !tspinAvailable(boardJ); }
+    const boardK = k > 0 ? r.boards[k - 1] : null;
+    const determinable = !!(boardJ && boardK);
+    const availAtRoof = boardJ ? bestTspinLines(boardJ) : 0;
+    const availAtSpin = boardK ? bestTspinLines(boardK) : 0;
+    // `strict` selects the causal rule; loose keeps the original co-occurrence behaviour so
+    // LOOSE=1 still reproduces the pre-correction numbers for comparison (auc.ts, run-forecast.ts).
+    const improved = (strict && determinable)
+      ? availAtSpin > availAtRoof
+      : (clearBetween || garbageBetween);
 
-    const opened = strict && determinable ? slotOpenedLater : (clearBetween || garbageBetween);
+    // Is the garbage LOAD-BEARING? Strip every garbage row and re-ask. If the spin is unchanged,
+    // the garbage cannot have created it, however much of it arrived in the window.
+    //
+    // `garbageBetween` alone is CO-OCCURRENCE, not causation, and at a median separation of ~11
+    // pieces some garbage arriving is near-certain — so every memorised opener (the C-Spin builds
+    // its overhang from L and J in the first bag) was being labelled forecast_garbage by default.
+    // This counterfactual is validated against the wiki's own boards: stripping the appended
+    // garbage line reproduces the article's "before" value in all five of its garbage pairs.
+    const garbageLoadBearing = !!(boardK && garbageBetween
+      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);
 
-    const kind: ForecastKind =
-      !opened ? 'reactive'
-      : garbageBetween ? 'forecast_garbage'
+    // Loose mode: the original rule verbatim, co-occurrence and all.
+    const kind: ForecastKind = !(strict && determinable)
+      ? (!improved ? 'reactive' : garbageBetween ? 'forecast_garbage'
+         : clearBetween ? 'forecast_lineclear' : 'reactive')
+      : !improved ? 'reactive'
+      : garbageLoadBearing ? 'forecast_garbage'
+      // No equivalent counterfactual exists for a line clear — un-clearing a row cannot be done
+      // by editing the board, only by re-simulating a round whose inputs were conditioned on the
+      // clear happening. So this bucket asserts CO-OCCURRENCE ONLY and is reported separately;
+      // it carries the same opener confound the garbage branch just had removed.
       : clearBetween ? 'forecast_lineclear'
-      : 'reactive';
+      // Improved, but neither mechanism accounts for it: the player built the slot. Openers.
+      : 'self_built';
 
     totals[kind]++;
     records.push({ lockIndex: k, frame: lk.frame, lines: lk.cleared, spin: lk.spin,
       kind, separation: j >= 0 ? k - j : -1, roofFrom: j >= 0 ? j : null, roofIsGarbage,
-      slotOpenedLater, determinable });
+      slotOpenedLater: improved, determinable, availAtRoof, availAtSpin, garbageLoadBearing });
   }
   const tspins = records.length;
-  const fc = totals.forecast_garbage + totals.forecast_lineclear;
-  return { records, totals, tspins, forecastRate: tspins ? fc / tspins : 0 };
+  // `forecastRate` is the VERIFIED rate — garbage whose removal changes the answer. The
+  // line-clear bucket is deliberately excluded from the headline because its mechanism is
+  // asserted rather than tested; it is returned separately so a caller must opt in to it.
+  const verified = totals.forecast_garbage;
+  const unverified = totals.forecast_lineclear;
+  return { records, totals, tspins,
+           forecastRate: tspins ? verified / tspins : 0,
+           unverifiedRate: tspins ? (verified + unverified) / tspins : 0 };
 }

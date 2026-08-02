@@ -199,7 +199,12 @@ def _spread_clause(data):
         if sim > 0:
             widths.append((samp, sim, samp / sim))
     if not widths:
-        return ""
+        # Every simulator config agrees exactly — which happens when the verified count is 0 and
+        # stays 0 however the simulator is perturbed. That is a RESULT, not a missing figure, and
+        # rendering an empty paragraph would hide the most robust thing in the section.
+        return ("七個模擬器設定全部計出同一個數，飄幅係零。"
+                "即係話下面個數<strong>唔係模擬器調校出嚟嘅結果</strong>——"
+                "點樣改模擬器都係同一個答案。")
     sim_lo, sim_hi = min(w[1] for w in widths), max(w[1] for w in widths)
     sa_lo, sa_hi = min(w[0] for w in widths), max(w[0] for w in widths)
     ratio_lo, ratio_hi = min(w[2] for w in widths), max(w[2] for w in widths)
@@ -243,6 +248,44 @@ def _overlap_clause(data):
             "所以依然<strong>冇聲稱邊個 forecast 多啲</strong>，只可以當成值得再查嘅線索。")
 
 
+def _mechanism_clause(data):
+    """Why the verified count is what it is, and where the other T-spins went.
+
+    Added 2026-08-02 with the causal correction. Without it a reader sees 0.0% beside a table of
+    real T-spins and has no way to tell a measurement from a bug.
+    """
+    ps = data["players"]
+    tot = sum(p["verified_tspins"] for p in ps)
+    fg = sum(p.get("forecast_garbage", 0) for p in ps)
+    lc = sum(p.get("forecast_lineclear_unverified", 0) for p in ps)
+    sb = sum(p.get("self_built", 0) for p in ps)
+    re_ = sum(p.get("reactive", 0) for p in ps)
+    if not tot:
+        return ""
+    parts = [
+        "<strong>「Forecast」要求個窿位係<em>由外力</em>整出嚟嘅</strong>——"
+        "即係垃圾升起或者消行，唔係自己砌出嚟。"
+        "所以每一個可核 T-spin 都用反事實驗一次：<strong>抽走所有垃圾行再問多次</strong>，"
+        "個窿位仲喺度嘅話，就唔係垃圾造成。"
+        "呢個做法用維基自己嘅五組 garbage 對照圖驗證過——抽走嗰行垃圾之後，"
+        "計出嚟啱啱好等於維基自己嗰張「之前」圖。",
+        f"喺呢個 session 全部 {tot} 個可核 T-spin 入面："
+        f"<strong>{fg} 個</strong>係垃圾真係造成個窿位（呢個先係下面表入面嘅數）；"
+        f"{lc} 個喺窗口入面有消行，但<strong>消行冇得用反事實驗</strong>"
+        "（要重跑成局，唔係改吓個板就得），所以另計、唔當數；"
+        f"{sb} 個係<strong>玩家自己砌出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
+        "個天花板早過個窿位係定式本身嘅砌法，唔係預測；"
+        f"其餘 {re_} 個個窿位本身冇變好。",
+    ]
+    if fg == 0:
+        parts.append(
+            "<strong>換句話講：呢個 session 冇一個可核 T-spin 嘅窿位係垃圾造成嘅。</strong>"
+            "之前呢節報過嘅 forecast 數，係「垃圾喺窗口入面到過」就算數——"
+            "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有垃圾到，"
+            "所以嗰個數量到嘅係<em>開局定式</em>，唔係預測。")
+    return "".join(parts)
+
+
 def section(data):
     if data is None:
         return None
@@ -274,6 +317,7 @@ def section(data):
         '搭個天花板嗰陣打唔到 T-spin，之後靠垃圾行升起或者消行先至浮出嚟。'
         '對照組叫 reactive，即係位早就喺度。</p>',
         '      <p>' + _headline(data) + _units_clause(data) + _reliability_clause(data) + '</p>',
+        '      <p>' + _mechanism_clause(data) + '</p>',
         '      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），'
         '唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。'
         + _coverage_clause(data) + '</p>',
@@ -284,7 +328,7 @@ def section(data):
         '        <thead>',
         '          <tr>',
         '            <th>玩家</th>',
-        '            <th>Forecast / 可核 T-spin</th>',
+        '            <th>垃圾造成嘅 Forecast / 可核 T-spin</th>',
         '            <th>比率</th>',
         '            <th>抽樣 95% CI</th>',
         '            <th>模擬器敏感度範圍</th>',

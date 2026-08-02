@@ -15,7 +15,7 @@
  * the forecast base rate and tie structure hold. That is a modelling assumption, not a
  * measurement — it is stated here so the number is not mistaken for one.
  */
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast} from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 type Point = { label:string; coverage:number; tspins:number; decided:number; wins:number;
@@ -33,7 +33,7 @@ const evaluate = (label: string, extra: any, strictRows: boolean): Point => {
     const k = `${c.file}#${c.round}`;
     if (!byRound.has(k)) byRound.set(k, []);
     byRound.get(k)!.push({ alive: c.alive, n: recs.length,
-                           fc: recs.filter(x => x.kind !== 'reactive').length });
+                           fc: recs.filter(isVerifiedForecast).length });
   }
   let wins=0, losses=0, ties=0, usable=0, decidable=0;
   for (const v of byRound.values()) {
