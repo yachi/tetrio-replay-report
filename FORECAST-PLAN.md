@@ -320,6 +320,23 @@ and `-` and space are BOTH empty (`-` is a hole drawn inside a stack — see `Te
 example, `J|J|J|Z|-|S|L|L|i|`). Grey is generic filled stack, NOT necessarily garbage; the only
 reliable garbage signature in the diagrams is the appended full-row-with-one-hole.
 
+**RESOLVED 2026-08-02 (`b9e4e5d`): remedy 1 applied, and the verified rate is 0 of 654.**
+`forecast_garbage` now requires the garbage to be load-bearing. Published rate 14.5% -> 0.0%
+[0.0%, 0.6%]. The 654 split: 0 verified / 86 line-clear (untestable) / 303 self_built (openers) /
+265 reactive. The binary availability test was replaced by an improvement test, which also admits
+the wiki's 1 -> 2 upgrades. 16/16 mutants killed, including a straight reversion to co-occurrence.
+
+**STILL OPEN: the 86 line-clear events are unaudited.** They assert co-occurrence only and carry
+the same opener confound. Excluded from `forecastRate` and reported separately, so the published
+figure is unaffected — but the bucket is un-verified, not zero-verified. No board edit can
+un-clear a line (the rows are gone and the player's later inputs were conditioned on the clear),
+so closing it needs re-simulation with the clear suppressed, or a cheaper proxy: a provenance test
+on the cells bounding the slot, or restricting to clears whose rows lie between the roof and the
+slot where a splice is geometrically possible at all. Prediction, recorded in advance: 0 survivors,
+because the same opener mechanism explains them.
+
+*Original remedy list, for the record:*
+
 **Remedies, none applied yet — this changes published figures in four sessions and is the user's
 call:**
 1. **Require causation, not co-occurrence.** Recompute `tspinAvailable` on a counterfactual board
