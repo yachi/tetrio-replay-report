@@ -77,3 +77,55 @@ realData('the scalar improvement gate has one known blind spot, and it is one ev
   // depended on the mechanism, not whether the best-available scalar rose.
   expect(R!.loadBearingButNotImproved).toBe(1);
 });
+
+/* --- the second opinion -------------------------------------------------------------------
+ * `gap-closure.ts` implements the definition as a player states it — an overhang placed above a
+ * hole, the lines between them clearing — and shares no code or reasoning with the step
+ * localisation in `forecast.ts`. Two instruments agreeing on one event out of 654 is worth far
+ * more than either one alone, so the agreement is asserted rather than admired.
+ */
+import { gapClosure } from './gap-closure.ts';
+
+const gapRun = () => {
+  const hits: string[] = [];
+  let closed = 0, spinOnly = 0, untraceable = 0;
+  for (const c of loadCases(SESSION)) {
+    const r = runCase(c, {});
+    const v = verifiedIndex(r, c.truth);
+    if (v < 0) continue;
+    for (const rec of forecastMetric(r, true).records) {
+      if (rec.lockIndex > v) continue;
+      const g = gapClosure(r, rec);
+      if (!g) { untraceable++; continue; }
+      if (g.plainRows + g.spinRows === 0) continue;
+      closed++;
+      if (g.forecast) hits.push(`${c.user} ${c.file} r${c.round} lock ${rec.lockIndex}`);
+      else spinOnly++;
+    }
+  }
+  return { hits, closed, spinOnly, untraceable };
+};
+const G = R === null ? null : gapRun();
+
+realData('a T-spin clear does not count as the lines between clearing', () => {
+  // Without this exclusion the test fires on the C-Spin: a T-spin triple takes out three rows under
+  // an overhang from the second bag, and the opener scores itself as foresight. Session-local
+  // counts; corpus-wide it is 180 of 181 excluded on exactly this rule.
+  expect(G!.closed).toBeGreaterThan(0);
+  expect(G!.spinOnly).toBe(G!.closed - G!.hits.length);
+  expect(G!.hits.length).toBeGreaterThan(0);
+});
+
+realData('the two independent instruments name the SAME single event', () => {
+  expect(G!.hits).toEqual(['pinglamb replay-2026-07-28-6.ttrm r5 lock 32']);
+  // and it is the one the committed metric publishes, reached by localising the mechanism instead
+  expect(R!.forecasts).toEqual([
+    'pinglamb replay-2026-07-28-6.ttrm r5 lock 32 forecast_lineclear roof 19 0->2',
+  ]);
+});
+
+realData('the garbage-floor blind spot is measured, not merely mentioned', () => {
+  // The T landing on garbage leaves no placing lock to trace, so this instrument is silent there.
+  // Pinned because it is the one case the wiki documents most thoroughly and this cannot see.
+  expect(G!.untraceable).toBe(2);
+});
