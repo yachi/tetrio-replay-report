@@ -6207,6 +6207,46 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 </section>
 <!-- END generated appendix -->
 
+<!-- BEGIN generated forecast (pipeline/build_report.py) -->
+<section id="forecast">
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">T-Spin Forecast（未經證明）</h2>
+
+    <div class="method-note">
+      <p><strong>呢一節同上面所有數唔同級數，請當佢係探索性資料，唔好當結論。</strong>上面每個數都係兩個獨立 parser 抽出嚟、再由 Dafny 引理逐條證明；呢節嘅數係由<strong>一個 replay 模擬器</strong>重跑操作記錄推導出嚟，得一份實作，冇第二個獨立實作對得上，所以套唔到同一個信任鏈——亦都因為咁，呢節<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>
+      <p>「Forecast」係指打 T-spin 之前，個窿位<em>當時仲未存在</em>：搭個天花板嗰陣打唔到 T-spin，之後靠垃圾行升起或者消行先至浮出嚟。對照組叫 reactive，即係位早就喺度。</p>
+      <p><strong>統計結論係：搵唔到效果。</strong>三個分析單位都試過——每局（AUC 50.0%，p = 1.000）、每次 T-spin（forecast 比 reactive 多送 0.060 attack，95% CI [−0.890, 0.895]，含 0）、每個玩家（p = 0.837）。而且每局嘅數<strong>連自己都對唔上自己</strong>：split-half reliability 得 −0.054（pinglamb）同 −0.329（yachi），即係每局一個數喺呢個事件密度下根本唔可能穩定，幾好嘅模擬器都救唔到。所以下面只列<strong>每個玩家嘅總計</strong>。</p>
+      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。全 128 個 player-round 入面，只有 15.3% 嘅落子對得上，所以樣本先咁細。</p>
+    </div>
+
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr>
+            <th>玩家</th>
+            <th>Forecast / 可核 T-spin</th>
+            <th>比率</th>
+            <th>抽樣 95% CI</th>
+            <th>模擬器敏感度範圍</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>pinglamb</td><td class="mono">13 / 78</td><td class="mono">16.6%</td><td class="mono">[9.1%, 26.9%]</td><td class="mono">[12.3%, 17.6%]</td></tr>
+          <tr><td>yachi</td><td class="mono">10 / 68</td><td class="mono">14.7%</td><td class="mono">[7.2%, 25.4%]</td><td class="mono">[14.7%, 16.4%]</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="method-note">
+      <p>兩欄唔確定性係分開報，因為佢哋講緊兩件事。<strong>抽樣</strong>係樣本細（Clopper–Pearson 精確區間）；<strong>模擬器敏感度</strong>係攞七個<em>用唔同方式出錯</em>嘅模擬器設定（kick table、blockout、lock delay、gravity、垃圾佇列、input clock）各自重算一次，睇個數飄幾多。</p>
+      <p>兩者一比就答咗一條好重要嘅問題：<strong>模擬器嘅飄幅（1.7%–5.3%）遠細過抽樣嘅飄幅（17.8%–18.2%）</strong>，爭大約 3–11 倍。即係話喺<em>呢七個設定掃到嘅範圍之內</em>，改模擬器對收窄呢個數幫助有限，要收窄佢就要更多場數。要留意呢個掃描只係換咗同一個模擬器嘅七個設定，<strong>量度唔到七個設定一齊錯嘅嗰種偏差</strong>，所以佢並唔等於證明咗模擬器本身準。</p>
+      <p>兩個玩家嘅區間幾乎完全重疊，所以呢度<strong>冇聲稱邊個 forecast 多啲</strong>。</p>
+    </div>
+  </div>
+</section>
+<!-- END generated forecast -->
+
 <footer class="report-footer">
   yachi vs pinglamb · 第三回合 · 2026-07-28 · report.html generated from facts.json + claims ledgers · pipeline/build_report.py keeps this in sync
 </footer>
