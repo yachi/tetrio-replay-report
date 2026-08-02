@@ -128,6 +128,33 @@ def match_boundaries(facts):
     return out
 
 
+def extreme_rounds(facts):
+    """The session's longest and shortest round, as indices into `round_series`.
+
+    The small multiples mark these rounds. They used to be a literal in the inline
+    script — `r.g === 14 || r.g === 26` — computed once for 2026-07-24 and then
+    copied forward into 07-28 and 08-01 along with the rest of the report. In those
+    two sessions the marks landed on two unremarkable rounds (a 53s and a 75s; an
+    85s and a 25s) while the actual extremes went unmarked: 07-28's 168-second
+    marathon and 08-01's 206-second one.
+
+    Nothing could have caught that, because a hardcoded index is never *wrong* in a
+    way a checker can see — it is just about a different session. Deriving it here
+    puts it inside `build_report --check`, so it cannot be stale again.
+    """
+    rows = round_series(facts)
+    if not rows:
+        return {}
+    dur = {}
+    g = 0
+    for m in facts["matches"]:
+        for r in m["rounds"]:
+            dur[g] = max(d["lifetime"] for d in r["players"].values())
+            g += 1
+    return {"longest_g": max(dur, key=lambda k: dur[k]),
+            "shortest_g": min(dur, key=lambda k: dur[k])}
+
+
 def build(facts):
     # `players` is emitted so the page's renderers can key by position instead of
     # by name; the inline script used to say `m.score.yachi` outright, which is
@@ -137,4 +164,5 @@ def build(facts):
             "grouped_clears": grouped_clears(facts),
             "totals": totals(facts),
             "round_series": round_series(facts),
+            "extreme_rounds": extreme_rounds(facts),
             "match_boundaries": match_boundaries(facts)}
