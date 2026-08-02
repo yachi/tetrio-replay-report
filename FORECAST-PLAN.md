@@ -238,6 +238,64 @@ simulator-derived lemmas would inflate the public verified-claim total; `bin/ver
 runs `check_claims` over every `claims*.json` against `facts.json`, which forecast fields are not
 in; and `:82` globs `proof-map*.json` the same way.
 
+## 5b. OPEN DEFECT — the forecast bucket is substantially the C-Spin opener (2026-08-02)
+
+Raised by the user against the three real examples published in the boards explainer; all three
+are C-Spin setups. Verified against the wiki and then measured. **This invalidates the published
+14.5% as a measure of forecasting**, and is the most serious defect found in this metric so far.
+
+**What the wiki actually requires.** T-Spin Forecast is "a playing style that predicts and sets up
+T-spins in advance. A player stacks so that T-Spins would emerge **from line clears or upcoming
+garbage**" — the sub-headings are "In anticipation of an empty garbage column". The emergence
+mechanism is part of the definition.
+
+**What a C-Spin is.** "The C-Spin (TKI積み) is a kind of Triple Double Attack... the 'C' shape that
+is formed by the J and L... it results in a T-Spin Triple which is usually followed by a T-Spin
+Double within three bags. **As an opener**, it is most often built with an ZST core whereas **L and
+J are used to build the overhang**." It is a memorised first-bag opener whose overhang is placed,
+by construction, before the slot exists — and the slot then emerges from **the player's own
+subsequent stacking**, not from garbage or a line clear.
+
+**Why the metric cannot tell them apart.** `forecast.ts` classifies on CO-OCCURRENCE, never
+causation: `garbageBetween` is only `r.garbageEvents.some(g => g.lockIndex > j && g.lockIndex <= k)`.
+At the measured median separation of ~11 pieces, *some* garbage arriving is close to certain, so any
+opener whose overhang predates its slot is labelled `forecast_garbage` by default.
+
+**Measured on 2026-07-22 (212 verified tucked T-spins):**
+
+| cut | forecast rate |
+|---|---|
+| all verified T-spins | 27/212 = **12.7%** |
+| roof placed after piece 8 | 13/153 = 8.5% |
+| **roof placed after piece 10** | **4/105 = 3.8%** |
+| roof placed after piece 12 | 3/63 = 4.8% |
+
+**85% of forecast roofs are placed within the first 10 pieces**, against 45% for reactive. Removing
+the opener collapses the rate from 12.7% to 3.8% — i.e. roughly **five sixths of the forecast bucket
+is opener execution**. The line counts corroborate it: the bucket is 16 doubles and 10 triples, which
+is exactly the C-Spin's "Triple Double Attack".
+
+**And the garbage label is never directly evidenced: `roofIsGarbage` is true for 0 of 212 T-spins,
+including 0 of the 14 `forecast_garbage` events.** Not one slot in the corpus has a roof actually
+made of garbage.
+
+**Compounding it, the instrument can only see the opener.** The verified prefix has median length 25
+pieces, so the observable window IS the first three bags — precisely where memorised openers live.
+This is the same bias `sim/README.md` already records as "systematically the *early* part of each
+round", now with a specific consequence.
+
+**Remedies, none applied yet — this changes published figures in four sessions and is the user's
+call:**
+1. **Require causation, not co-occurrence.** Recompute `tspinAvailable` on a counterfactual board
+   with the garbage rows removed; label `forecast_garbage` only if the slot exists WITH the garbage
+   and not without it. Same idea for a line clear. This is the correct fix and kills the confound at
+   its root.
+2. **Report the opener-excluded rate as the headline**, with the full rate as a secondary figure.
+3. **Withdraw the level figure** and publish only the null, until (1) exists.
+
+Until one is done, the 14.5% pooled figure and the per-session rates should be read as "tucked
+T-spins whose overhang predated the slot", NOT as forecasting.
+
 ## 6. What is unresolved, and must be said wherever the figure is printed
 
 **Whether 14.5% is a floor or a ceiling on a whole-round rate is unknown.** Within-prefix quartiles
