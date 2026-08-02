@@ -55,6 +55,7 @@ python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
+python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 ```
 
@@ -345,9 +346,12 @@ gate cries wolf at exactly the figures it just added.
    with the section it served. Re-verify the 110 badge count and 54/52 appendix rows after
    touching anything near them.
 2. ROADMAP P5. **The report body is fully generated** (`pipeline/build_report.py`,
-   CI-gated with `--check`): hero/scoreboard, 數據對決, 關鍵時刻, 全場之最, 建議, the
+   CI-gated with `--check`): hero/scoreboard, 戰況, 數據對決, 關鍵時刻, 全場之最, 建議, the
    appendix, and the `chart-data`, `match-copy` and `claims-data` islands, plus the round
-   table from its own generator. `report.html` carries the shell and marker pairs, nothing
+   table from its own generator. That sentence was first written while 戰況 was still
+   hand-written — it had been checked by counting `SECTIONS` entries rather than by
+   scanning the document. `pipeline/check_report_shell.py` now scans the document, so the
+   claim is enforced instead of asserted. `report.html` carries the shell and marker pairs, nothing
    else. What remains of P5 is the skeleton, so `bin/new-session` emits a report instead of
    expecting one copied from the previous session.
 

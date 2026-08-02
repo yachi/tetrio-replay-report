@@ -21,6 +21,7 @@ The card bodies use the report's badge shorthand (`<b>C001</b>`), expanded by
 inserted as such. Every match must have a card: a session where match 6 silently
 has no copy would render an empty card, and nothing else would notice.
 """
+import html
 import json
 import os
 
@@ -65,6 +66,42 @@ def load_prose(report_dir, facts):
         raise SystemExit(f"{path}: simplified glyph(s) {bad} — this report is "
                          "traditional characters only")
     return prose
+
+
+SECTION_FIELDS = ("eyebrow", "title", "lede")
+
+
+def section(facts, prose):
+    """The 戰況 section itself — the frame the timeline renders into.
+
+    The cards come from the island below and are assembled in the browser; what
+    lives here is the wrapper plus the two pieces of authored prose around it, the
+    lede and the closing blockquote.
+
+    This was the last hand-written `<section>` in the report body, which is worth
+    stating plainly: "the body is fully generated" got written down while it was
+    true of every OTHER section, because the claim was checked by reading the
+    SECTIONS list rather than by scanning the document for sections outside a
+    marker region. The scan is now `pipeline/check_report_shell.py`.
+
+    `closer` is optional — it is an editorial flourish and not every session has
+    one. The heading and lede are not, because a section missing its heading is a
+    broken page rather than a plainer one.
+    """
+    missing = [f for f in SECTION_FIELDS if not (prose.get(f) or "").strip()]
+    if missing:
+        raise SystemExit(f"prose/matches.json: missing or empty {', '.join(missing)} "
+                         f"— 戰況's heading and lede are required")
+    out = ['<section id="matches">', '  <div class="wrap">',
+           f'    <div class="eyebrow">{html.escape(prose["eyebrow"])}</div>',
+           f'    <h2 class="section-title">{html.escape(prose["title"])}</h2>',
+           f'    <p class="section-lede">{prose["lede"]}</p>',
+           '',
+           '    <div class="timeline" id="timeline"></div>']
+    if (prose.get("closer") or "").strip():
+        out += ['', f'    <blockquote class="closer">{prose["closer"]}</blockquote>']
+    out += ['  </div>', '</section>']
+    return "\n".join(out)
 
 
 def build(facts, prose):

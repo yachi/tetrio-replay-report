@@ -1,4 +1,8 @@
 {
+  "eyebrow": "戰況直擊 · 七場逐一睇",
+  "title": "七場戰況",
+  "lede": "每場嘅最終比數、贏波序列（下面一排色格代表逐局邊個贏）同埋嗰場最關鍵嘅一鋪。今晚睇條色格特別過癮——七場梅花間竹輪住贏<span class=\"badge\" data-claim=\"C001\"></span>，但冇一場係順風順水贏返嚟。",
+  "closer": "yachi 贏嗰四場入面，有三場都係先落後、再連贏最後三局收火：第一場 2:3 追返<span class=\"badge\" data-claim=\"C008\"></span>，第三場同一套劇本再嚟一次<span class=\"badge\" data-claim=\"C009\"></span>，第五場 2:2 之後連贏三局<span class=\"badge\" data-claim=\"C014\"></span>。輸嗰邊都貼：第二場追平 3:3 先俾人收<span class=\"badge\" data-claim=\"C013\"></span>，第四場由 2:4 追成 4:4 最後輸決勝局<span class=\"badge\" data-claim=\"C010\"></span>——七場入面唯一打到最後一局嗰場<span class=\"badge\" data-claim=\"G011\"></span>。真正一面倒嘅得第六場<span class=\"badge\" data-claim=\"C011\"></span>。",
   "hero_match": 7,
   "score_claim": null,
   "cards": {

@@ -173,6 +173,14 @@ jobs:
       - name: Check every badge citation resolves
         run: python3 -m pipeline.check_badge_links "sessions/${{ matrix.session }}/report"
 
+      # The report body is generated from prose files into marker regions; the
+      # shell is all that is left in the HTML. This scans the DOCUMENT for
+      # sections rather than reading build_report.SECTIONS — the claim "the body
+      # is fully generated" was once written down while <section id="matches">
+      # sat there hand-written, because it was checked the other way.
+      - name: Check no hand-written section survives in the body
+        run: python3 -m pipeline.check_report_shell "sessions/${{ matrix.session }}/report"
+
       # The forecast section is simulator-derived and sits OUTSIDE the proof
       # chain, so no lemma covers its numbers. This re-derives them from
       # sim/forecast-facts.json, and fails if the section ever stops declaring

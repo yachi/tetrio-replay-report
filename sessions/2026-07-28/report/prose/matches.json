@@ -1,4 +1,8 @@
 {
+  "eyebrow": "戰況直擊 · 八場逐一睇",
+  "title": "八場戰況",
+  "lede": "每場嘅最終比數、贏波序列（下面一排色格代表逐局邊個贏）同埋嗰場最關鍵嘅一鋪。留意個色格條——成晚最好睇嘅嘢唔喺比數度，係喺每場入面幾時轉勢。",
+  "closer": "睇條色格就知，呢晚冇一場係一面倒：第一場 pinglamb 開兩局跟住俾人連追五局<span class=\"badge\" data-claim=\"C010\"></span>，第三場 yachi 3:1 領先都守唔住<span class=\"badge\" data-claim=\"C011\"></span>，第七場更加係 4:1 拋離最後四局全失<span class=\"badge\" data-claim=\"C012\"></span>。八場入面有兩場要打到最後一局先分勝負<span class=\"badge\" data-claim=\"G012\"></span>，兩場都係 pinglamb 埋單。個系列係 6:2，但每一場都爭過。",
   "hero_match": 7,
   "score_claim": null,
   "cards": {

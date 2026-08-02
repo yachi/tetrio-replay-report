@@ -45,6 +45,11 @@ def match_copy_section(ctx):
                          matches.load_prose(ctx["report_dir"], ctx["facts"]))
 
 
+def matches_section(ctx):
+    return matches.section(ctx["facts"],
+                           matches.load_prose(ctx["report_dir"], ctx["facts"]))
+
+
 def stats_sec(ctx):
     return stats_section.build(ctx["facts"],
                                stats_section.load_prose(ctx["report_dir"]))
@@ -90,9 +95,10 @@ def claims_island(ctx):
 # Order is document order for a report being built from nothing: hero, records
 # before the coaching section, appendix before the footer, then the islands.
 SECTIONS = [
-    ("hero", '<section id="matches">', hero_section, None),
-    ("stats", '<section id="moments">', stats_sec, None),
-    ("moments", '<section id="records">', moments_section, None),
+    ("hero", '<!-- BEGIN generated matches', hero_section, None),
+    ("matches", '<!-- BEGIN generated stats', matches_section, None),
+    ("stats", '<!-- BEGIN generated moments', stats_sec, None),
+    ("moments", '<!-- BEGIN generated records', moments_section, None),
     ("records", '<section id="coaching">', records_section, None),
     ("coaching", '<section id="rounds">', coaching_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),
