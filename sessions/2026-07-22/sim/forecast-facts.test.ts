@@ -8,7 +8,11 @@
 import { test, expect } from 'bun:test';
 import { readFileSync, existsSync } from 'node:fs';
 
-const PATH = `${import.meta.dir}/forecast-facts.json`;
+// FORECAST_FACTS points the whole file at another session's artifact, so one guard covers
+// every emitted artifact rather than only the session it happens to live beside. The emitter
+// is shared (`--out` + REPLAY_DIR); its guards have to be too, or three of the four artifacts
+// ship unchecked.
+const PATH = process.env.FORECAST_FACTS ?? `${import.meta.dir}/forecast-facts.json`;
 
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);
@@ -105,10 +109,14 @@ test('the derived reasons quote this session, not a remembered one', () => {
   const rel = d.statistics.reliability;
   if (rel) {
     // Every reliability the reason string names must be one this session actually measured.
-    for (const m of joined.matchAll(/([0-9]\.[0-9]{3}) \(([^)]+)\)/g)) {
+    // The minus sign is not optional in this pattern: a correlation may be negative, and a
+    // regex that skipped it read "-0.132" as 0.132 and compared it to -0.133. That miss is
+    // how the two-roundings bug reached a committed artifact.
+    for (const m of joined.matchAll(/(-?[0-9]\.[0-9]{3}) \(([^)]+)\)/g)) {
       const [, val, user] = m;
       expect(rel.split_half_r_x1000[user!]).not.toBe(undefined);
-      expect(Math.abs(rel.split_half_r_x1000[user!]! / 1000 - Number(val))).toBeLessThan(0.001);
+      // exact, not approximate: both sides must come from the SAME rounding of r11
+      expect(rel.split_half_r_x1000[user!]! / 1000).toBe(Number(val));
     }
   }
   // and every p it names must match the emitted one to the digit it prints

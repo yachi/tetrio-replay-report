@@ -106,20 +106,34 @@ def _selftest(report_dir):
     with open(os.path.join(report_dir, "report.html"), encoding="utf-8") as fh:
         doc = fh.read()
 
+    start, end = region.markers("forecast", "pipeline/build_report.py")
+    i, j = doc.find(start), doc.find(end)
+    if i < 0 or j < 0:
+        print("FAIL selftest: no forecast region to corrupt", file=sys.stderr)
+        return 1
+    head, body, tail = doc[:i + len(start)], doc[i + len(start):j], doc[j:]
+
     cases = []           # (name, data, doc, must_fail)
     cases.append(("control: the committed pair agrees", data, doc, False))
 
-    # Plant a FOREIGN figure — the same shape the renderer emits, a different value. Each of
-    # these is a real number from this corpus, so none of them looks out of place by eye.
-    for name, old, new in [
-        ("planted AUC (58.5% -> 58.6%)", "58.5%", "58.6%"),
-        ("planted round p (0.211 -> 0.210)", "0.211", "0.210"),
-        ("planted player p (0.849 -> 0.848)", "0.849", "0.848"),
-        ("planted reliability (0.291 -> 0.29)", "0.291（", "0.29（"),
-        ("planted coverage (17.8% -> 17.9%)", "17.8%", "17.9%"),
-    ]:
-        if old in doc:
-            cases.append((name, data, doc.replace(old, new, 1), True))
+    # Plant a foreign value over EVERY figure the section renders, one at a time. Derived from
+    # the region rather than written as constants for two reasons: it is session-agnostic, and
+    # it makes the control a completeness statement — every number in the section is shown to
+    # be load-bearing, rather than the handful someone remembered to list.
+    #
+    # The corruption must be applied INSIDE the region. Replacing across the whole document
+    # hits an earlier, legitimate occurrence first, and the gate then rightly ignores it — that
+    # false alarm fired twice while writing this.
+    seen = set()
+    for m in re.finditer(r"\d+\.\d+", body):
+        tok = m.group(0)
+        if tok in seen:
+            continue
+        seen.add(tok)
+        # bump the last digit, so the planted value stays the same shape and the same width
+        alt = tok[:-1] + str((int(tok[-1]) + 1) % 10)
+        cases.append((f"planted figure {tok} -> {alt}", data,
+                      head + body[:m.start()] + alt + body[m.end():] + tail, True))
 
     # A figure changed in the JSON without rebuilding the report is the same drift seen from
     # the other side, and the containment-only gate could not see this one either.
@@ -132,11 +146,11 @@ def _selftest(report_dir):
     # forecast region: the document's first `section-title` belongs to an earlier, legitimately
     # badged section, and a control that corrupts the wrong part of the file proves nothing.
     anchor = "T-Spin Forecast（未經證明）"
-    if anchor in doc:
+    if anchor in body:
         cases.append(("a claim badge appears on simulator output", data,
-                      doc.replace(anchor, anchor + '<span class="claim-badge">✓</span>', 1), True))
+                      head + body.replace(anchor, anchor + '<span class="claim-badge">✓</span>', 1) + tail, True))
         cases.append(("the section stops declaring itself unproved", data,
-                      doc.replace(anchor, "T-Spin Forecast", 1), True))
+                      head + body.replace(anchor, "T-Spin Forecast", 1) + tail, True))
     eligible = json.loads(json.dumps(data))
     eligible["report_eligible"] = True
     cases.append(("the artifact declares itself report-eligible", eligible, doc, True))

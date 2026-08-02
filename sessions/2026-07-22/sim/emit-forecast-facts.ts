@@ -217,9 +217,14 @@ function notEligibleBecause(): string[] {
     'simulator-derived: no second independent implementation (dual-extractor rule unmet)',
     'the simulator fails its own full gate; only verified prefixes are used',
   ];
-  const weak = vc.splitHalf.filter(s => s.r11 !== null && s.r11 < 0.7);
+  // Read the ALREADY-SCALED value, never r11 itself. Formatting the raw float here rounded
+  // where `pt` floors, so 2026-07-24's pinglamb reliability appeared as -0.132 in this string
+  // and -0.133 in the statistics block — one artifact stating one quantity two ways. Rounding
+  // a figure twice, by two rules, is the defect this whole schema exists to remove.
+  const rs = reliability?.split_half_r_x1000 ?? {};
+  const weak = Object.entries(rs).filter(([, v]) => v !== null && v < 700) as [string, number][];
   if (weak.length)
-    why.push(`per-round split-half reliability is ${weak.map(s => `${s.r11!.toFixed(3)} (${s.user})`).join(' / ')}` +
+    why.push(`per-round split-half reliability is ${weak.map(([u, v]) => `${(v / 1000).toFixed(3)} (${u})`).join(' / ')}` +
              `, so a per-round column is not possible at this event rate`);
   const noEffect: string[] = [];
   if (roundStat?.exact_p_x1000 != null)
