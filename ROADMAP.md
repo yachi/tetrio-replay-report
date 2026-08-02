@@ -682,6 +682,43 @@ place → clear → insert garbage, so whichever edit the availability crosses I
 **1 of 654**. What remains open is not the mechanism test but the gate that decides which events
 reach it.
 
+### 0 — RESOLVED: the user's own definition agrees with the published number
+
+Stated by the user on 2026-08-02: *"putting an overhang over a few lines far of a hole, when the lines
+between them clear, like 1,2,3,4,5+ **cleared by not tspin**, it becomes a tspin hole."* Implemented in
+full it is a **necessity** test — track the overhang cell and the cell the T lands on, and count the
+event when rows are removed from between them — plus the clause that the removing clear must not itself
+be a T-spin.
+
+Measured over all four sessions:
+
+| step | events |
+|---|---|
+| gap between overhang and landing cell closes | 181 |
+| ... rows removed **only by T-spin clears** | 180 |
+| ... mixed | 0 |
+| ... rows removed **only by plain clears** | **1** |
+
+The 180 are the C-Spin: a T-spin triple removes three rows under an overhang laid in bag 2 (174 of 181
+roofs are pieces 7-13), the overhang descends three, the T-spin double goes in. The clear that opens the
+slot is itself a T-spin, so the "not tspin" clause excludes them — correctly, since that is the opener,
+not a read of the board. The single survivor is `pinglamb replay-2026-07-28-6 r5 lock 32`, closed by a
+plain double then a plain single, overhang at piece 19.
+
+**That is the same event the committed metric publishes.** Four routes reach it independently: step
+localisation with the straddle test (the shipped rule), the gap-closure necessity test, the not-a-tspin
+clause, and a hand-check of the raw boards. No figure changes.
+
+Two things this settled that were previously recorded here as open puzzles:
+
+* **Prophecy and Forecasting are not independent axes.** Implemented as separate predicates over 649
+  events, both off-diagonal cells are EMPTY (181 both, 0 either-only). Nothing except a line clear can
+  lower an overhang — filling under it does not move it and garbage pushes it up — so placing a roof
+  above its final position forces a clear to be what completes it. four.lol's two sections describe one
+  event from its two ends.
+* **The bimodal gap distribution was not an artefact.** Gap-at-placement being 2 or 5 and never 3 or 4
+  is a T-spin triple removing exactly three rows, every time.
+
 ### 1 — the improvement gate is a scalar, and one event proves it leaks
 
 `improved` asks whether `bestTspinLines` rose between the roof board and the execution board. That
@@ -722,3 +759,13 @@ The "Original TODO" item 2 above — the two surviving mutants on the availabili
 (`best/no-rotation`, `best/no-spin-test`) — is **done**. Both are killed in the current sweep,
 which stands at **24/24**. The probe they guard is now `bestTspin`, a single BFS returning both the
 line count and the slot's rows; the second copy that once carried a different cap is gone.
+
+### 3 — garbage-floor events cannot be measured at all
+
+When the cell the T lands on is GARBAGE it has no placing lock, so nothing can be traced and the gap test
+does not run. That is **5 events**, and two of them are live candidates: `pinglamb 07-24-3 r7 lock 29`
+(best 0 -> 2 over 12 pieces; stripping the garbage drops it to 1) and `yachi 07-28-1 r5 lock 36` (the
+scalar blind spot of item 1, now located — it is a garbage-floor event). This is the wiki's own
+"in anticipation of an empty garbage column" case going unexamined, and it is the largest remaining hole
+in the instrument. Tracking a garbage cell needs an identity other than a placing lock — the arrival
+event that inserted its row would do.
