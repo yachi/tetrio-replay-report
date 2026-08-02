@@ -120,16 +120,12 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   background: color-mix(in srgb, var(--muted) 30%, transparent); }
 /* Bar length is magnitude, bar hue is identity — two channels, two meanings, the way
    the game's own end screen does it. */
-.rt-tbl tr[data-who="yachi"] td.rt-bar::before {
-  background: color-mix(in srgb, var(--yachi) 30%, transparent); }
-.rt-tbl tr[data-who="pinglamb"] td.rt-bar::before {
-  background: color-mix(in srgb, var(--pinglamb) 30%, transparent); }
+/* the two identity rules are per-session; see player_css() */
 .rt-tbl td.rt-bar > span { position: relative; }
 #rounds.rt-nobars .rt-tbl td.rt-bar::before { display: none; }
 /* row filters */
 #rounds.f-win .rt-tbl tbody tr.rt-loser { display: none; }
-#rounds.f-yachi .rt-tbl tbody tr:not([data-who="yachi"]) { display: none; }
-#rounds.f-pinglamb .rt-tbl tbody tr:not([data-who="pinglamb"]) { display: none; }
+/* the two per-player filters are per-session; see player_css() */
 .rt-controls { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
   margin: 0 0 1rem; }
 .rt-chip { font-family: var(--font-mono); font-size: .72rem; cursor: pointer;
@@ -298,7 +294,7 @@ EXPLORE_JS = r"""
 
   /* ---------------- filters, clear-all, bars, columns ---------------- */
   function setFilter(name) {
-    sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+    sect.classList.remove("f-win", "f-p1", "f-p2");
     if (name) sect.classList.add(name);
     Array.prototype.forEach.call(sect.querySelectorAll(".rt-chip[data-filter]"), function (c) {
       c.setAttribute("aria-pressed", (c.dataset.filter || "") === (name || "") ? "true" : "false");
@@ -467,7 +463,7 @@ EXPLORE_JS = r"""
   /* ---------------- URL hash state ---------------- */
   function writeHash() {
     var bits = [];
-    ["f-win", "f-yachi", "f-pinglamb"].forEach(function (c) {
+    ["f-win", "f-p1", "f-p2"].forEach(function (c) {
       if (sect.classList.contains(c)) bits.push(c);
     });
     if (sect.classList.contains("rt-show-all")) bits.push("all");
@@ -476,7 +472,10 @@ EXPLORE_JS = r"""
     if (h && location.hash !== h) history.replaceState(null, "", h);
   }
   (function readHash() {
-    var m = /#rounds=([a-z,-]+)/.exec(location.hash);
+    // [a-z0-9,-]: the per-player filters are f-p1 / f-p2 now, and a class list
+    // that excluded digits silently dropped them on reload — the URL said
+    // #rounds=f-p1 and the page came back unfiltered.
+    var m = /#rounds=([a-z0-9,-]+)/.exec(location.hash);
     if (!m) { refresh(); return; }
     var bits = m[1].split(",");
     bits.forEach(function (b) {
@@ -510,7 +509,7 @@ SORT_JS = """
       chips.forEach(function (c) {
         c.setAttribute("aria-pressed", c === chip ? "true" : "false");
       });
-      sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+      sect.classList.remove("f-win", "f-p1", "f-p2");
       if (chip.dataset.filter) sect.classList.add(chip.dataset.filter);
     });
   });
@@ -772,10 +771,45 @@ def detail_payload(facts):
     return out
 
 
+def _css_str(name):
+    """A player name as a CSS string literal — quotes and backslashes escaped.
+
+    An attribute selector carries the name verbatim, so a name containing a quote
+    would end the selector early and silently drop the rule. Nothing in four
+    sessions has such a name; that is exactly why it would not be noticed.
+    """
+    return '"' + name.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def player_css(p1, p2):
+    """The rules that name the players — derived, because they used to be literals.
+
+    `tr[data-who="yachi"]` matched nothing for any other pair, so the magnitude
+    bars fell back to the grey `--muted` fill and the per-player filter chips hid
+    every row. Neither fails: the table renders, just without identity colour.
+    That is the same silent shape as the copied `r.g === 14` markers, and it was
+    the last name-binding left in the pipeline.
+
+    The colour tokens stay `--yachi` / `--pinglamb`: the report shell defines those
+    as aliases of the positional `--p1` / `--p2`, so they resolve for any pair.
+    Pointing at the slots directly would break the four committed reports, whose
+    `:root` predates the aliases — the `--accent` trap, which resolves to an empty
+    string and silently invalidates the whole `color-mix()`.
+    """
+    out = []
+    for slot, (pl, token) in enumerate(((p1, "--yachi"), (p2, "--pinglamb")), start=1):
+        sel = _css_str(pl)
+        out.append(f'.rt-tbl tr[data-who={sel}] td.rt-bar::before {{\n'
+                   f'  background: color-mix(in srgb, var({token}) 30%, transparent); }}')
+        out.append(f'#rounds.f-p{slot} .rt-tbl tbody tr:not([data-who={sel}]) '
+                   f'{{ display: none; }}')
+    return "<style>\n" + "\n".join(out) + "\n</style>"
+
+
 def build(facts, report_dir=None):
     p1, p2 = facts["players"]
     ranges = bar_ranges(facts)
-    out = [START, CSS,
+    out = [START, CSS, player_css(p1, p2),
            '<section id="rounds">', '  <div class="wrap-wide">',
            '    <div class="eyebrow">逐局數據 · ROUND BY ROUND</div>',
            '    <h2 class="section-title">逐局全數據</h2>',
@@ -823,8 +857,8 @@ def build(facts, report_dir=None):
         '    <div class="rt-controls">',
         '      <button class="rt-chip" data-filter="" aria-pressed="true">全部局</button>',
         '      <button class="rt-chip" data-filter="f-win" aria-pressed="false">只睇贏嘅一方</button>',
-        f'      <button class="rt-chip" data-filter="f-yachi" aria-pressed="false">只睇 {p1}</button>',
-        f'      <button class="rt-chip" data-filter="f-pinglamb" aria-pressed="false">只睇 {p2}</button>',
+        f'      <button class="rt-chip" data-filter="f-p1" aria-pressed="false">只睇 {p1}</button>',
+        f'      <button class="rt-chip" data-filter="f-p2" aria-pressed="false">只睇 {p2}</button>',
         '      <button class="rt-chip" data-bars aria-pressed="true">長條圖</button>',
         '      <label class="rt-toggle" style="margin:0">'
         '<input type="checkbox" id="rt-toggle-all">'

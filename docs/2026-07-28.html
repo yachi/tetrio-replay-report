@@ -838,16 +838,12 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   background: color-mix(in srgb, var(--muted) 30%, transparent); }
 /* Bar length is magnitude, bar hue is identity — two channels, two meanings, the way
    the game's own end screen does it. */
-.rt-tbl tr[data-who="yachi"] td.rt-bar::before {
-  background: color-mix(in srgb, var(--yachi) 30%, transparent); }
-.rt-tbl tr[data-who="pinglamb"] td.rt-bar::before {
-  background: color-mix(in srgb, var(--pinglamb) 30%, transparent); }
+/* the two identity rules are per-session; see player_css() */
 .rt-tbl td.rt-bar > span { position: relative; }
 #rounds.rt-nobars .rt-tbl td.rt-bar::before { display: none; }
 /* row filters */
 #rounds.f-win .rt-tbl tbody tr.rt-loser { display: none; }
-#rounds.f-yachi .rt-tbl tbody tr:not([data-who="yachi"]) { display: none; }
-#rounds.f-pinglamb .rt-tbl tbody tr:not([data-who="pinglamb"]) { display: none; }
+/* the two per-player filters are per-session; see player_css() */
 .rt-controls { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
   margin: 0 0 1rem; }
 .rt-chip { font-family: var(--font-mono); font-size: .72rem; cursor: pointer;
@@ -931,6 +927,14 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 .rt-card .rt-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
 </style>
 
+<style>
+.rt-tbl tr[data-who="yachi"] td.rt-bar::before {
+  background: color-mix(in srgb, var(--yachi) 30%, transparent); }
+#rounds.f-p1 .rt-tbl tbody tr:not([data-who="yachi"]) { display: none; }
+.rt-tbl tr[data-who="pinglamb"] td.rt-bar::before {
+  background: color-mix(in srgb, var(--pinglamb) 30%, transparent); }
+#rounds.f-p2 .rt-tbl tbody tr:not([data-who="pinglamb"]) { display: none; }
+</style>
 <section id="rounds">
   <div class="wrap-wide">
     <div class="eyebrow">逐局數據 · ROUND BY ROUND</div>
@@ -1014,8 +1018,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="rt-controls">
       <button class="rt-chip" data-filter="" aria-pressed="true">全部局</button>
       <button class="rt-chip" data-filter="f-win" aria-pressed="false">只睇贏嘅一方</button>
-      <button class="rt-chip" data-filter="f-yachi" aria-pressed="false">只睇 yachi</button>
-      <button class="rt-chip" data-filter="f-pinglamb" aria-pressed="false">只睇 pinglamb</button>
+      <button class="rt-chip" data-filter="f-p1" aria-pressed="false">只睇 yachi</button>
+      <button class="rt-chip" data-filter="f-p2" aria-pressed="false">只睇 pinglamb</button>
       <button class="rt-chip" data-bars aria-pressed="true">長條圖</button>
       <label class="rt-toggle" style="margin:0"><input type="checkbox" id="rt-toggle-all">全部 28 欄</label>
       <button class="rt-chip" id="rt-clear">清空篩選</button>
@@ -5233,7 +5237,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       chips.forEach(function (c) {
         c.setAttribute("aria-pressed", c === chip ? "true" : "false");
       });
-      sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+      sect.classList.remove("f-win", "f-p1", "f-p2");
       if (chip.dataset.filter) sect.classList.add(chip.dataset.filter);
     });
   });
@@ -5367,7 +5371,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
   /* ---------------- filters, clear-all, bars, columns ---------------- */
   function setFilter(name) {
-    sect.classList.remove("f-win", "f-yachi", "f-pinglamb");
+    sect.classList.remove("f-win", "f-p1", "f-p2");
     if (name) sect.classList.add(name);
     Array.prototype.forEach.call(sect.querySelectorAll(".rt-chip[data-filter]"), function (c) {
       c.setAttribute("aria-pressed", (c.dataset.filter || "") === (name || "") ? "true" : "false");
@@ -5536,7 +5540,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   /* ---------------- URL hash state ---------------- */
   function writeHash() {
     var bits = [];
-    ["f-win", "f-yachi", "f-pinglamb"].forEach(function (c) {
+    ["f-win", "f-p1", "f-p2"].forEach(function (c) {
       if (sect.classList.contains(c)) bits.push(c);
     });
     if (sect.classList.contains("rt-show-all")) bits.push("all");
@@ -5545,7 +5549,10 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     if (h && location.hash !== h) history.replaceState(null, "", h);
   }
   (function readHash() {
-    var m = /#rounds=([a-z,-]+)/.exec(location.hash);
+    // [a-z0-9,-]: the per-player filters are f-p1 / f-p2 now, and a class list
+    // that excluded digits silently dropped them on reload — the URL said
+    // #rounds=f-p1 and the page came back unfiltered.
+    var m = /#rounds=([a-z0-9,-]+)/.exec(location.hash);
     if (!m) { refresh(); return; }
     var bits = m[1].split(",");
     bits.forEach(function (b) {

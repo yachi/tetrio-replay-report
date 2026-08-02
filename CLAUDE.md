@@ -361,7 +361,16 @@ gate cries wolf at exactly the figures it just added.
 
    What a person still writes by hand: the five `prose/*.json` files, `narrative-beats.md`
    / `recommendations.md`, `hand_claims.py`, and the `<title>` — the only string in the
-   document no generator owns. `report.html` carries the shell and marker pairs, nothing
+   document no generator owns.
+
+   **Nothing in the pipeline is bound to the players' names any more.** The last one was
+   `build_round_table.py`, whose `tr[data-who="yachi"]` bar-tint and filter rules matched
+   nothing for any other pair — the bars fell back to grey `--muted` and no gate noticed,
+   because the table still rendered. Those four rules are derived per session now
+   (`player_css`), and the filter classes are positional `f-p1` / `f-p2`. The colour
+   tokens stay `--yachi` / `--pinglamb`: the shell defines them as aliases of `--p1` /
+   `--p2`, and pointing at the slots directly would break the four committed reports whose
+   `:root` predates the aliases — the `--accent` trap again. `report.html` carries the shell and marker pairs, nothing
    else. What remains of P5 is the skeleton, so `bin/new-session` emits a report instead of
    expecting one copied from the previous session.
 
