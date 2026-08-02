@@ -59,6 +59,166 @@ def _pct(x1000):
     return f"{x1000 / 10:.1f}%"
 
 
+def _num(x1000):
+    """x1000 integer -> exact 3-decimal string: 517 -> "0.517", -337 -> "−0.337".
+
+    Three decimals because that is exactly what an x1000 integer carries; rendering at two
+    would re-round a value whose direction was already decided in `emit-forecast-facts.ts`,
+    and this module must not make a second rounding decision. Uses U+2212 MINUS, matching the
+    typography the rest of the report uses for negative figures.
+    """
+    return f"{x1000 / 1000:.3f}".replace("-", "−")
+
+
+def _stat(data, *path):
+    """`data["statistics"][a][b]...`, or None as soon as any level is null or missing.
+
+    Every caller must handle None by printing an ABSENCE. A session where a quantity could
+    not be computed has no figure for it, and substituting 0 would publish "measured, and the
+    effect is exactly nothing" — a finding this data cannot support.
+    """
+    cur = data.get("statistics") or {}
+    for key in path:
+        if not isinstance(cur, dict):
+            return None
+        cur = cur.get(key)
+        if cur is None:
+            return None
+    return cur
+
+
+def _units_clause(data):
+    """The 「三個分析單位都試過」 sentence, built from whichever units are computable.
+
+    Every figure in here was a literal until 2026-08-02. This module renders for EVERY
+    session, so those literals described 2026-07-22 and would have been published as another
+    session's numbers the moment a second session emitted a forecast artifact.
+    """
+    parts = []
+    rnd = _stat(data, "round")
+    if rnd and rnd.get("auc_x1000") is not None and rnd.get("exact_p_x1000") is not None:
+        parts.append(f"每局（AUC {_pct(rnd['auc_x1000'])}，p = {_num(rnd['exact_p_x1000'])}）")
+
+    atk = _stat(data, "event", "attack")
+    if atk and atk.get("diff_x1000") is not None:
+        lo, hi = atk.get("ci95_lo_x1000"), atk.get("ci95_hi_x1000")
+        ci = (f"，95% CI [{_num(lo)}, {_num(hi)}]"
+              + ("，含 0" if not atk.get("excludes_zero") else "，唔含 0")) if lo is not None else ""
+        nc = _stat(data, "event", "negative_control")
+        # The negative control is only worth a sentence when it FIRED — a difference that also
+        # shows up where the mechanism cannot act is evidence the two arms are incomparable.
+        nc_txt = ("，而且事前定好嘅 negative control 有反應，證明兩組本身就唔可比"
+                  if nc and nc.get("fires") else "")
+        parts.append(f"每次 T-spin（forecast 比 reactive 多送 {_num(atk['diff_x1000'])} attack{ci}{nc_txt}）")
+
+    ply = _stat(data, "player")
+    if ply and ply.get("exact_p_x1000") is not None:
+        parts.append(f"每個玩家（p = {_num(ply['exact_p_x1000'])}）")
+
+    if not parts:
+        return "呢一節冇一個分析單位夠數計得出結果。"
+    if len(parts) == 1:
+        return "淨係得一個分析單位計得出——" + parts[0] + "。"
+    return f"{'三個' if len(parts) == 3 else f'{len(parts)} 個'}分析單位都試過——" + "、".join(parts) + "。"
+
+
+# A p at or below this is called significant; x1000, so 50 is p = 0.05.
+ALPHA_X1000 = 50
+
+
+def _effects(data):
+    """The units, if any, that show an effect on THIS session's data.
+
+    The section's headline used to assert 「搵唔到效果」 unconditionally. That is a conclusion,
+    and a module rendered for every session must not carry one session's conclusion as a
+    constant any more than it may carry its figures — a later session that did show something
+    would have had the null printed over it.
+    """
+    found = []
+    rnd = _stat(data, "round")
+    if rnd and rnd.get("exact_p_x1000") is not None and rnd["exact_p_x1000"] <= ALPHA_X1000:
+        found.append("每局")
+    atk = _stat(data, "event", "attack")
+    nc = _stat(data, "event", "negative_control")
+    # A firing negative control means the same difference appears where the mechanism cannot
+    # act, so an interval excluding zero is evidence the arms differ, not that forecasting
+    # works. That is not an effect and must not be counted as one.
+    if atk and atk.get("excludes_zero") and not (nc and nc.get("fires")):
+        found.append("每次 T-spin")
+    ply = _stat(data, "player")
+    if ply and ply.get("exact_p_x1000") is not None and ply["exact_p_x1000"] <= ALPHA_X1000:
+        found.append("每個玩家")
+    return found
+
+
+def _headline(data):
+    found = _effects(data)
+    if not found:
+        return "<strong>統計結論係：搵唔到效果。</strong>"
+    listed = "同".join(found)
+    # 「每次 T-spin」ends in a Latin character, and this repo sets a space at a Latin/CJK
+    # boundary everywhere else it renders one.
+    sep = " " if listed[-1].isascii() else ""
+    return ("<strong>統計結論係：" + listed + sep + ("呢個" if len(found) == 1 else "呢啲")
+            + "單位見到差異。</strong>"
+            "但呢節嘅數依然係一個模擬器出嘅，冇第二個獨立實作對得上，"
+            "所以<strong>唔可以當成證實咗嘅結論</strong>，只可以當成值得再查嘅線索。")
+
+
+def _reliability_clause(data):
+    """The split-half sentence — the reason the unit is the player and not the round."""
+    rel = _stat(data, "reliability")
+    if not rel:
+        return ""
+    rs = rel.get("split_half_r_x1000") or {}
+    named = [(u, v) for u, v in rs.items() if v is not None]
+    if not named:
+        return ""
+    listed = "同 ".join(f"{_num(v)}（{html.escape(u)}）" for u, v in named)
+    return ("而且每局嘅數<strong>連自己都對唔上自己</strong>："
+            f"split-half reliability 得 {listed}，"
+            "即係每局一個數喺呢個事件密度下根本唔可能穩定，"
+            "幾好嘅模擬器都救唔到。所以下面只列<strong>每個玩家嘅總計</strong>。")
+
+
+def _coverage_clause(data):
+    """Why the sample is small: how much of the session the simulator could reproduce."""
+    ses = data.get("session") or {}
+    rounds, cov = ses.get("player_rounds"), ses.get("coverage_x1000")
+    if rounds is None or cov is None:
+        return "呢節嘅樣本細，因為只有對得返上真實對局嘅落子先計得入。"
+    return (f"全 {rounds} 個 player-round 入面，只有 {_pct(cov)} 嘅落子對得上，所以樣本先咁細。")
+
+
+def _spread_clause(data):
+    """Sampling spread vs simulator spread, and what that comparison does NOT establish."""
+    widths = []
+    for p in data["players"]:
+        samp = p["sampling_ci95_hi_x1000"] - p["sampling_ci95_lo_x1000"]
+        sim = p["simulator_range_hi_x1000"] - p["simulator_range_lo_x1000"]
+        if sim > 0:
+            widths.append((samp, sim, samp / sim))
+    if not widths:
+        return ""
+    sim_lo, sim_hi = min(w[1] for w in widths), max(w[1] for w in widths)
+    sa_lo, sa_hi = min(w[0] for w in widths), max(w[0] for w in widths)
+    ratio_lo, ratio_hi = min(w[2] for w in widths), max(w[2] for w in widths)
+    span = (lambda a, b: _pct(a) if a == b else f"{_pct(a)}–{_pct(b)}")
+    return (
+        "兩者一比就答咗一條好重要嘅問題："
+        f"<strong>模擬器嘅飄幅（{span(sim_lo, sim_hi)}）遠細過抽樣嘅飄幅（{span(sa_lo, sa_hi)}）</strong>，"
+        f"爭大約 {ratio_lo:.0f}–{ratio_hi:.0f} 倍。"
+        "即係話喺<em>呢七個設定掃到嘅範圍之內</em>，改模擬器對收窄呢個數幫助有限，要收窄佢就要更多場數。"
+        # The sweep varies seven FITTED options of one simulator. It bounds parameter
+        # sensitivity and nothing else: a shared modelling error — something every one of the
+        # seven configs gets wrong the same way — moves all of them together and never appears
+        # in this range. Saying flatly that the bottleneck "is not simulator accuracy" claimed
+        # more than the sweep measures, so it is stated as the scope-limited fact it is.
+        "要留意呢個掃描只係換咗同一個模擬器嘅七個設定，"
+        "<strong>量度唔到七個設定一齊錯嘅嗰種偏差</strong>，所以佢並唔等於證明咗模擬器本身準。"
+    )
+
+
 def section(data):
     if data is None:
         return None
@@ -89,18 +249,10 @@ def section(data):
         '      <p>「Forecast」係指打 T-spin 之前，個窿位<em>當時仲未存在</em>：'
         '搭個天花板嗰陣打唔到 T-spin，之後靠垃圾行升起或者消行先至浮出嚟。'
         '對照組叫 reactive，即係位早就喺度。</p>',
-        '      <p><strong>統計結論係：搵唔到效果。</strong>'
-        '三個分析單位都試過——每局（AUC 58.6%，p = 0.210）、'
-        '每次 T-spin（forecast 比 reactive 多送 0.52 attack，95% CI [−0.34, 1.28]，含 0，'
-        '而且事前定好嘅 negative control 有反應，證明兩組本身就唔可比）、'
-        '每個玩家（p = 0.848）。'
-        '而且每局嘅數<strong>連自己都對唔上自己</strong>：'
-        'split-half reliability 得 0.29（pinglamb）同 0.064（yachi），'
-        '即係每局一個數喺呢個事件密度下根本唔可能穩定，'
-        '幾好嘅模擬器都救唔到。所以下面只列<strong>每個玩家嘅總計</strong>。</p>',
+        '      <p>' + _headline(data) + _units_clause(data) + _reliability_clause(data) + '</p>',
         '      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），'
         '唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。'
-        '全 158 個 player-round 入面，只有 17.9% 嘅落子對得上，所以樣本先咁細。</p>',
+        + _coverage_clause(data) + '</p>',
         '    </div>',
         '',
         '    <div class="scroll-x">',
@@ -126,10 +278,7 @@ def section(data):
         '<strong>模擬器敏感度</strong>係攞七個<em>用唔同方式出錯</em>嘅模擬器設定'
         '（kick table、blockout、lock delay、gravity、垃圾佇列、input clock）各自重算一次，'
         '睇個數飄幾多。</p>',
-        '      <p>兩者一比就答咗一條好重要嘅問題：'
-        '<strong>模擬器嘅飄幅（約 1.5–3 個百分點）遠細過抽樣嘅飄幅（約 13–14 個百分點）。</strong>'
-        '即係話呢個數嘅樽頸<strong>唔係</strong>模擬器準唔準，而係局數唔夠——爭大約五倍。'
-        '再花力氣改模擬器，對呢個數幫助好有限；要收窄佢就要更多場數。</p>',
+        '      <p>' + _spread_clause(data) + '</p>',
         '      <p>兩個玩家嘅區間幾乎完全重疊，所以呢度<strong>冇聲稱邊個 forecast 多啲</strong>。</p>',
         '    </div>',
         '  </div>',

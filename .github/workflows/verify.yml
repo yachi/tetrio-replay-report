@@ -182,13 +182,27 @@ jobs:
         run: python3 -m pipeline.check_report_shell "sessions/${{ matrix.session }}/report"
 
       # The forecast section is simulator-derived and sits OUTSIDE the proof
-      # chain, so no lemma covers its numbers. This re-derives them from
-      # sim/forecast-facts.json, and fails if the section ever stops declaring
-      # itself unproved or acquires a claim badge. It also fails if a session
-      # with no simulator output somehow grew the section — that bug shipped
-      # once, grafting one session's numbers into another session's report.
+      # chain, so no lemma covers its numbers. This RE-RENDERS the region from
+      # sim/forecast-facts.json and requires the committed HTML to match it
+      # exactly, and fails if the section ever stops declaring itself unproved
+      # or acquires a claim badge. It also fails if a session with no simulator
+      # output somehow grew the section — that bug shipped once, grafting one
+      # session's numbers into another session's report.
+      #
+      # --selftest plants a foreign figure into the committed pair and requires
+      # the gate to reject it. The gate's previous form checked only that each
+      # JSON figure APPEARED in the HTML, which passes just as happily when the
+      # section also contains a figure that came from nowhere — and every
+      # statistic in the method note was exactly that. A gate whose failure has
+      # never been demonstrated is not evidence of anything.
       - name: Check the simulator-derived forecast section
-        run: python3 -m pipeline.check_forecast_section "sessions/${{ matrix.session }}/report"
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_forecast_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/forecast-facts.json" ]; then
+            python3 -m pipeline.check_forecast_section "$W" --selftest
+          fi
 
       - name: Generate and verify the Dafny proofs
         run: |
