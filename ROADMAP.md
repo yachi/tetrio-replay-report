@@ -427,8 +427,25 @@ losing one silently blanks a chart), and each whole report reproduces its own co
 `約`-figure coverage landed back on 102/49/43/48 — the number to watch, since moving prose out
 of report.html is what silently narrowed that gate when 關鍵時刻 moved.
 
-**Next in P5**, the last item:
-1. ~~the coaching section and the section ledes in 數據對決~~ — done
+**P5 — DONE (2026-08-02).** `pipeline/skeleton.py` emits the shell, the marker regions
+in document order, and TODO prose; `bin/new-session` calls it as step 6 and never touches a
+report.html that exists. Verified end to end from raw replays: 6617 lines, every region
+filled, `build_report --check` clean, `check_report_shell` clean, and re-running leaves a
+written report byte-unchanged.
+
+The copy-forward workflow it replaces had been propagating stale constants. The VS small
+multiples' emphasised rounds were literals computed once for 07-24 and carried into three
+later reports, where they marked unremarkable rounds and missed the real extremes (07-28's
+168s marathon, 08-01's 206s). Now derived in `chart_data.extreme_rounds()`, so they are
+covered by `build_report --check`. Two more of the same shape were fixed on the way: BSD
+`cp -n` exits 1 when it skips, so `set -e` aborted `bin/new-session` at step 1 on any
+re-run; and the player colours are now positional `--p1`/`--p2` with `--yachi`/`--pinglamb`
+kept as aliases, because `records.py` and `build_round_table.py` emit `var(--yachi)`
+literally into the regions they own.
+
+Residue, deliberately not done: the four committed reports still declare the palette under
+the old names (the aliases make both spellings work), and the `<title>` is the one authored
+string outside any region.
 2. a report skeleton, so `bin/new-session` emits a report with TODO prose rather than
    expecting one to be copied from a previous session. This is also where the inline script
    stops being player-hardcoded: ~110 occurrences of `yachi`/`pinglamb` remain in colours,

@@ -11,10 +11,15 @@
 #   3. generate the claim ledger; every predicate must evaluate True
 #   4. generate Dafny from the same specs; `dafny verify` must report 0 errors
 #   5. (MUTATION=1) flipping a datum must break verification
+#   6. emit a report skeleton — but only if the session has no report.html yet
 #
-# What it does NOT do is write the Cantonese prose or the report — that is the part
-# that needs judgment. It leaves you a verified ledger to write against, and prints
-# what to run next.
+# What it does NOT do is write the Cantonese prose — that is the part that needs
+# judgment. It leaves you a verified ledger, a report shell with every generated
+# region already in place, and TODO prose files to write into.
+#
+# Step 6 never touches a report that exists. A committed report.html is the output
+# of this pipeline plus a person's writing, and re-running the command on a session
+# that already has one must not cost that writing.
 set -euo pipefail
 
 DEST="${1:?usage: bin/new-session <sessions/DATE> <replay-dir>}"
@@ -33,16 +38,22 @@ REPLAYS=("$SRC"/*.ttrm)
 [ "${#REPLAYS[@]}" -gt 0 ] || die "no .ttrm files in $SRC"
 
 WORK="$DEST/report"
-step "1/5 collecting ${#REPLAYS[@]} replays into $DEST"
+step "1/6 collecting ${#REPLAYS[@]} replays into $DEST"
 mkdir -p "$WORK"
 for f in "${REPLAYS[@]}"; do
-  cp -n "$f" "$DEST/$(basename "$f")"
+  dst="$DEST/$(basename "$f")"
+  # Test for the file rather than trusting `cp -n`: BSD/macOS cp exits 1 when -n
+  # makes it skip, and `set -e` turned that into an abort at step 1 — so the
+  # command could never be re-run over a session whose replays were already in
+  # place, which is exactly the run that must reach step 6 and leave report.html
+  # alone.
+  [ -e "$dst" ] || cp "$f" "$dst"
 done
 # the extractors read ../*.ttrm relative to the report dir
 cp pipeline/extract.py pipeline/extract2.ts pipeline/check_claims.py "$WORK/" 2>/dev/null || true
 ls "$DEST"/*.ttrm >/dev/null || die "no replays landed in $DEST"
 
-step "2/5 extracting twice and comparing"
+step "2/6 extracting twice and comparing"
 ( cd "$WORK" && python3 extract.py >/dev/null )
 if command -v bun >/dev/null; then
   ( cd "$WORK" && bun extract2.ts >/dev/null )
@@ -54,11 +65,11 @@ else
   echo "      two-parser agreement gate did NOT run for this session"
 fi
 
-step "3/5 generating the claim ledger"
+step "3/6 generating the claim ledger"
 python3 -m pipeline.claims.build_claims "$WORK/facts.json" \
   --out "$WORK/claims-generated.json" || die "claim generation refused to emit"
 
-step "4/5 generating and verifying Dafny"
+step "4/6 generating and verifying Dafny"
 python3 -m pipeline.codegen "$WORK/facts.json" \
   --claims "$WORK/claims-generated.json" --outdir "$WORK/dafny"
 VOUT="$(cd "$WORK" && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4 2>&1 | tail -1)"
@@ -70,10 +81,24 @@ python3 -m pipeline.build_proof_map "$WORK/claims-generated.json" \
   --dafny-dir "$WORK/dafny" --out "$WORK/claims-proof-map.json"
 
 if [ "${MUTATION:-0}" = "1" ]; then
-  step "5/5 mutation testing the generated proofs"
+  step "5/6 mutation testing the generated proofs"
   bash pipeline/mutation_test.sh "$WORK/dafny" 12 || die "a mutant survived — some lemma is vacuous"
 else
-  step "5/5 mutation test skipped (set MUTATION=1 to run it)"
+  step "5/6 mutation test skipped (set MUTATION=1 to run it)"
+fi
+
+step "6/6 report skeleton"
+# Only when there is none. A report that exists carries a person's Cantonese, and
+# the skeleton would replace every generated region with an empty one.
+if [ -f "$WORK/report.html" ]; then
+  echo "  ok  $WORK/report.html exists — left untouched"
+else
+  python3 -m pipeline.skeleton "$WORK" || die "could not emit the report skeleton"
+  python3 -m pipeline.build_report "$WORK" >/dev/null \
+    || die "the skeleton's regions did not fill — see the error above"
+  python3 -m pipeline.build_round_table "$WORK" >/dev/null \
+    || die "the round table did not fill"
+  echo "  ok  $WORK/report.html built from the skeleton with TODO prose"
 fi
 
 CLAIMS=$(jq length "$WORK/claims-generated.json")
@@ -82,17 +107,26 @@ cat <<EOF
 
 verified: $CLAIMS generated claims over $ROUNDS rounds in $WORK
 
-next, the parts that need judgment:
+next, the parts that need judgment. Every one of them is a file that now exists
+and says TODO — the report renders before a word is written, so the writing can be
+checked in a browser as it goes:
   1. write $WORK/narrative-beats.md and $WORK/recommendations.md against the
-     generated ledger (each countable statement citing its claim id), and
-     $WORK/prose/hero.json — the headline, both taglines and the lede
-     (the date, names and series score come from facts.json) — and
-     $WORK/prose/matches.json — one card per match plus hero_match
-     (the scores, winners and pip trails come from facts.json)
+     generated ledger (each countable statement citing its claim id), then fill in
+     the TODO prose files (the date, names, scores and every figure come from
+     facts.json — prose is words only):
+       $WORK/prose/hero.json      headline, both taglines, lede
+       $WORK/prose/matches.json   戰況's heading/lede/closer + one card per match
+       $WORK/prose/moments.json   關鍵時刻's cards and trivia
+       $WORK/prose/stats.json     數據對決's lede, panel headings and captions
+       $WORK/prose/coaching.json  both columns' taglines, profiles, recommendations
+     and the one thing no generator owns, edited in report.html itself:
+       the <title> — everything else in the body is generated
   2. add hand-written claims for whatever is genuinely unique to this session,
      then re-run steps 3-4 to fold them into the proofs
-  3. build the report, then refresh the site:
-       python3 -m pipeline.build_report $WORK    # hero, records, appendix, islands
+  3. rebuild the report after every prose edit, then refresh the site:
+       python3 -m pipeline.build_report $WORK
+       python3 -m pipeline.build_round_table $WORK
        python3 -m pipeline.check_prose_figures $WORK
+       python3 -m pipeline.check_badge_links $WORK
        python3 bin/build-docs
 EOF

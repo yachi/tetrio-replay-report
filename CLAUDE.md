@@ -351,7 +351,17 @@ gate cries wolf at exactly the figures it just added.
    table from its own generator. That sentence was first written while 戰況 was still
    hand-written — it had been checked by counting `SECTIONS` entries rather than by
    scanning the document. `pipeline/check_report_shell.py` now scans the document, so the
-   claim is enforced instead of asserted. `report.html` carries the shell and marker pairs, nothing
+   claim is enforced instead of asserted.
+
+   **P5 is done.** `bin/new-session` emits the report too (`pipeline/skeleton.py`): raw
+   replays in, a complete rendering report out, with every generated region filled and
+   TODO prose files to write into. A session no longer starts by copying the previous
+   one's report.html — which is what had been silently propagating stale constants
+   between sessions. Step 6 never touches an existing report.html.
+
+   What a person still writes by hand: the five `prose/*.json` files, `narrative-beats.md`
+   / `recommendations.md`, `hand_claims.py`, and the `<title>` — the only string in the
+   document no generator owns. `report.html` carries the shell and marker pairs, nothing
    else. What remains of P5 is the skeleton, so `bin/new-session` emits a report instead of
    expecting one copied from the previous session.
 
