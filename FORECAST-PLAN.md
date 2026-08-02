@@ -140,6 +140,55 @@ Each session's landing must also be **atomic** — its `forecast-facts.json`, it
 `report.html` and its rebuilt `docs/` copy in one commit — because `check_forecast_section` flips
 behaviour the moment the JSON exists, from "must have no forecast region" to "must match exactly".
 
+### P1, step by step
+
+Six figures are hardcoded in the shared module, and they come from three places:
+
+| figure | source | reusable as-is? |
+|---|---|---|
+| round AUC 58.6%, p = 0.210 | `pairs.ts` + `auc-power.ts` | yes — already exports `collectRows`/`pairsFor`/`auc` |
+| event-level +0.52 attack, CI [−0.34, 1.28], negative control | `forecast-event-level.ts` | no — top-level printer |
+| player-level p = 0.848 | `forecast-event-level.ts` | no — top-level printer |
+| split-half 0.29 / 0.064 | `validity-checks.ts` | no — top-level printer |
+| 158 player-rounds, 17.9% coverage | — | yes — already derivable from the schema |
+
+**Step 0 — the cache key (DONE).** `pairs.ts` keyed its cache `v3|{strict}|rows={strictRows}` with
+no replay directory, in a single file beside the code rather than beside the session. One run with
+`REPLAY_DIR` pointed elsewhere would have written that session's rows under this one's key, and the
+next 07-22 run would have read them back as its own. Latent until the metric went cross-session,
+which P1 does. The directory is now in the key and `CACHE_V` went 3 → 4 so no pre-existing entry can
+match by accident. Verified: 79 rows for 07-22, 64 for 07-28, no collision.
+
+**Step 1 — make the computations reusable.** Convert `validity-checks.ts` and
+`forecast-event-level.ts` from top-level printers into exported functions plus a thin
+`import.meta.main` printer, the shape `pairs.ts` already has. Acceptance: each script's stdout is
+**byte-identical** before and after. The alternative — a second copy of the statistics inside the
+emitter — is the duplication this repo has twice watched drift.
+
+**Step 2 — extend the schema** to `forecast-facts/2` with a `statistics` block: round AUC, W–L–T,
+decided pairs and exact p; the event-level difference, its cluster CI, and the negative control's
+own difference and CI; player-level p; split-half r per player; coverage and round count. **Every
+field nullable, and null must be rendered as an absence**, never as 0 — a later session may have too
+few events, and a fabricated zero would be published as fact. This is `claim_cards.round_operand()`'s
+rule: a value of the wrong shape yields nothing rather than an invented number.
+
+**Step 3 — render the prose from that block**, so no figure in the module is a literal and each null
+has a sentence-level fallback. Fold in the correction that the section's 「樽頸唔係模擬器準唔準，而係
+局數唔夠」 claim is **unproven**: the seven-config sweep bounds fitted-parameter sensitivity only, and
+model-form error was never probed.
+
+**Step 4 — strengthen the gate, and this is the load-bearing step.**
+`check_forecast_section.py` today checks the per-player table, the 未經證明 string and badge absence,
+and ignores the method note — which is exactly why the leak passes. Extend it to resolve *every*
+figure in the section against the JSON. **Acceptance test: plant 2026-07-22's AUC into 2026-07-24's
+rendered section and require the gate to fail.** If it does not, the gate is decorative and P1 is
+still blocked, whatever the prose says.
+
+**Step 5 — parameterize the emitter's output path** and emit per session, one atomic commit each.
+
+Steps 0→4 are serial; step 4 can be written against 07-22 while 2 and 3 are in progress, but its
+acceptance test needs a real second session.
+
 **P2 — promote `sessions/2026-07-22/sim/` to `pipeline/sim/`. Deferred to its own change set.** Note
 CI is *not* the coupling: no CI job executes any `sim/*.ts`. The real breakages are `loadCases`'
 default `${import.meta.dir}/..` (`verified-prefix.ts:36`) no longer resolving to a session, the

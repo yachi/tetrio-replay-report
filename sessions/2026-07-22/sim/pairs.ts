@@ -6,6 +6,7 @@
  * pairs-cache.json keyed by the rule; delete that file to force a re-run.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { forecastMetric } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
@@ -27,10 +28,18 @@ export interface Row {
  *  `strictRows` is the verified-prefix GATE (whether the ige row oracle must agree). */
 export function collectRows(strict = true, strictRows = true): Row[] {
   // Bump CACHE_V whenever the row shape or the sim settings change. A stale cache silently
-// yields rows missing the new field, which read as undefined and score as TIES — the
-// separation-weighted metric first appeared as 0 decided / 79 ties for exactly that reason.
-const CACHE_V = 3;
-  const cacheKey = `v${CACHE_V}|${strict}|rows=${strictRows}`;
+  // yields rows missing the new field, which read as undefined and score as TIES — the
+  // separation-weighted metric first appeared as 0 decided / 79 ties for exactly that reason.
+  const CACHE_V = 4;
+  // The REPLAY DIRECTORY is part of the key. It was not, and the cache is a single file
+  // beside the code rather than beside the session, so one run with REPLAY_DIR pointed at
+  // another session would have written that session's rows under this one's key — and the
+  // next 2026-07-22 run would have read them back as its own, silently. Nothing consumed
+  // this from more than one session until the metric was extended to all four, so the bug
+  // was latent rather than harmless. Keyed, and CACHE_V bumped so every existing entry
+  // (written without a directory) is discarded rather than matched by accident.
+  const dir = process.env.REPLAY_DIR ?? `${import.meta.dir}/..`;
+  const cacheKey = `v${CACHE_V}|${strict}|rows=${strictRows}|dir=${resolve(dir)}`;
   const cache = `${import.meta.dir}/pairs-cache.json`;
   if (existsSync(cache)) {
     const c = JSON.parse(readFileSync(cache, 'utf8'));
