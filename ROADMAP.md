@@ -671,3 +671,54 @@ still fails its own gate.
    it.
 
 Items 3 and 4 are gated on 1. Item 2 is independent and small.
+
+---
+
+## T-Spin Forecast — the mechanism is settled, the gate in front of it is not (2026-08-02)
+
+The metric now establishes a mechanism for every event it counts (`1a5ce30`): the window is walked
+to find the step where the executed spin became available, and that step is decomposed into
+place → clear → insert garbage, so whichever edit the availability crosses IS the cause. Rate is
+**1 of 654**. What remains open is not the mechanism test but the gate that decides which events
+reach it.
+
+### 1 — the improvement gate is a scalar, and one event proves it leaks
+
+`improved` asks whether `bestTspinLines` rose between the roof board and the execution board. That
+collapses the whole board to one number, so a mechanism that **replaces** one two-line spin with a
+different two-line spin moves nothing and the event is filed `reactive` — never reaching the
+mechanism test at all.
+
+This is measured, not hypothetical: **1 event of 654** (`2026-07-28`, yachi, `replay-2026-07-28-1`
+r5, lock 36) has garbage that IS load-bearing at execution — strip it and the best spin drops 2 → 1
+— while `availAtRoof == availAtSpin == 2`. It is found by the execution-time counterfactual
+disagreeing with the gate, and pinned by a test in `forecast-corpus.test.ts` so the number cannot
+drift silently.
+
+**The fix is a different question, not a patch.** Ask whether the **executed** spin depended on the
+mechanism — the T's placement at lock `k` is known, so test that specific slot's dependence rather
+than the board's best-available scalar. That subsumes the current gate (a spin that only exists
+because of garbage also fails without it) and removes `improved` entirely, so it is a deletion, not
+another branch. It would also retire the `withoutGarbage` counterfactual's last job.
+
+**Sizing before building it:** 265 events are currently `reactive`. Re-run the execution-time
+counterfactual over all of them first and count how many have a load-bearing mechanism. If the
+answer stays 1, the leak is a footnote and the rewrite is not worth it; if it is 20, the published
+rate is wrong again in the same direction as before. That measurement is an hour and decides the
+rest.
+
+### 2 — one mutant is unlisted rather than killed
+
+`metric/localise-skip-placement` is proven equivalent for every step in the corpus (with no clear at
+the causing step, `B` IS `Bpre`, so the next branch runs the identical test — and all 388 placement
+attributions land on such steps). It could only differ where a step both places and clears AND the
+board offers a second independent slot straddling the cleared row. Closing it properly means
+constructing that two-slot board; until then the equivalence is conditional and documented in
+`mutate-forecast.ts` rather than asserted.
+
+### Closed since the last roadmap entry
+
+The "Original TODO" item 2 above — the two surviving mutants on the availability probe
+(`best/no-rotation`, `best/no-spin-test`) — is **done**. Both are killed in the current sweep,
+which stands at **24/24**. The probe they guard is now `bestTspin`, a single BFS returning both the
+line count and the slot's rows; the second copy that once carried a different cap is gone.
