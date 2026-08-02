@@ -167,6 +167,18 @@ test('simulator uncertainty is smaller than sampling uncertainty', () => {
   }
 });
 
+test('the sensitivity sweep is the set the prose describes', () => {
+  const d = load();
+  // The section names the mechanisms these configs vary (kick table, blockout, lock delay,
+  // gravity, garbage queue, input clock). It renders the COUNT from this list, but the names
+  // are prose and cannot be derived, so changing the sweep must fail here and force the
+  // sentence to be rewritten rather than silently describing configs that no longer exist.
+  expect(d.simulator_configs_for_range).toEqual([
+    'best', 'vanilla_srs', 'strict_blockout', 'locktime30', 'gravity05',
+    'reference_queue', 'frame_clock',
+  ]);
+});
+
 test('the two players\' intervals overlap — no difference is claimed', () => {
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
   const [a, b] = d.players;

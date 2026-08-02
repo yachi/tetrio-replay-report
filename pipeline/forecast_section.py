@@ -219,6 +219,30 @@ def _spread_clause(data):
     )
 
 
+def _overlap_clause(data):
+    """Whether the players' sampling intervals overlap — checked, not assumed.
+
+    This sentence used to assert 「兩個玩家嘅區間幾乎完全重疊」 unconditionally. It is true of
+    all four sessions today, which is exactly why it survived review: an assertion that happens
+    to hold is indistinguishable from a derivation until the day it does not. It also assumed
+    there are two players.
+    """
+    ps = sorted(data["players"], key=lambda p: -p["forecast_rate_x1000"])
+    n = len(ps)
+    if n < 2:
+        return "得一個玩家有可核數據，所以呢度冇任何玩家之間嘅比較。"
+    apart = [(a, b) for i, a in enumerate(ps) for b in ps[i + 1:]
+             if min(a["sampling_ci95_hi_x1000"], b["sampling_ci95_hi_x1000"])
+             <= max(a["sampling_ci95_lo_x1000"], b["sampling_ci95_lo_x1000"])]
+    if not apart:
+        return f"{n} 個玩家嘅抽樣區間互相重疊，所以呢度<strong>冇聲稱邊個 forecast 多啲</strong>。"
+    pairs = "、".join(f"{html.escape(a['user'])} 同 {html.escape(b['user'])}" for a, b in apart)
+    # Still no claim: the section is outside the trust chain whatever the intervals do. Only
+    # the REASON changes, and stating an overlap that is not there would be a false one.
+    return (f"{pairs} 嘅抽樣區間冇重疊。不過呢節嘅數係模擬器出嘅、唔屬於信任鏈，"
+            "所以依然<strong>冇聲稱邊個 forecast 多啲</strong>，只可以當成值得再查嘅線索。")
+
+
 def section(data):
     if data is None:
         return None
@@ -275,11 +299,12 @@ def section(data):
         '    <div class="method-note">',
         '      <p>兩欄唔確定性係分開報，因為佢哋講緊兩件事。'
         '<strong>抽樣</strong>係樣本細（Clopper–Pearson 精確區間）；'
-        '<strong>模擬器敏感度</strong>係攞七個<em>用唔同方式出錯</em>嘅模擬器設定'
+        f'<strong>模擬器敏感度</strong>係攞 {len(data["simulator_configs_for_range"])} 個'
+        '<em>用唔同方式出錯</em>嘅模擬器設定'
         '（kick table、blockout、lock delay、gravity、垃圾佇列、input clock）各自重算一次，'
         '睇個數飄幾多。</p>',
         '      <p>' + _spread_clause(data) + '</p>',
-        '      <p>兩個玩家嘅區間幾乎完全重疊，所以呢度<strong>冇聲稱邊個 forecast 多啲</strong>。</p>',
+        '      <p>' + _overlap_clause(data) + '</p>',
         '    </div>',
         '  </div>',
         '</section>',
