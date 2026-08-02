@@ -99,3 +99,37 @@ export const auc = (P: { win: number; lose: number }[]) => {
   const wins = P.filter(p => p.win > p.lose).length, ties = P.filter(p => p.win === p.lose).length;
   return { wins, ties, losses: P.length - wins - ties, n: P.length, auc: 100 * (wins + 0.5 * ties) / P.length };
 };
+
+// Lanczos log-gamma, so the binomial tail below is exact enough at any n this corpus reaches.
+const lgamma = (z: number): number => {
+  const g = [676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059,
+             12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+  z -= 1; let x = 0.99999999999980993;
+  for (let i = 0; i < g.length; i++) x += g[i]! / (z + i + 1);
+  const t = z + g.length - 0.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+};
+const logC = (n: number, k: number) => lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+/** P(X >= k) for X ~ Binom(n, p). */
+export const binomTail = (k: number, n: number, p: number) => {
+  const pmf = (i: number) => p === 0 ? (i === 0 ? 1 : 0) : p === 1 ? (i === n ? 1 : 0)
+    : Math.exp(logC(n, i) + i * Math.log(p) + (n - i) * Math.log(1 - p));
+  let s = 0; for (let i = k; i <= n; i++) s += pmf(i); return s;
+};
+
+/**
+ * Exact TWO-sided sign-test p on the decided pairs — the round-level p the report quotes.
+ *
+ * Lives here rather than in auc-power.ts because the emitter needs the same number, and a
+ * second implementation of a published p-value is how two figures that must agree stop
+ * agreeing. Same reason `pairsFor` is here: one pairing, every consumer.
+ *
+ * `null`, not NaN, when nothing was decided. A p-value over an empty sample does not exist,
+ * and NaN has reached a printed figure in this repo before.
+ */
+export const exactSignP = (wins: number, losses: number): number | null => {
+  const dec = wins + losses;
+  if (dec === 0) return null;
+  return Math.min(1, 2 * Math.min(binomTail(wins, dec, 0.5), binomTail(losses, dec, 0.5)));
+};

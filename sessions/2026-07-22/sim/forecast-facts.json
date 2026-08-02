@@ -1,11 +1,11 @@
 {
-  "schema": "forecast-facts/1",
+  "schema": "forecast-facts/2",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
-    "per-round split-half reliability is 0.29 (pinglamb) / 0.064 (yachi), so a per-round column is not possible at this event rate",
-    "no effect at any unit: round AUC p=0.210, event-level CI includes zero with a firing negative control, player-level p=0.848"
+    "per-round split-half reliability is 0.291 (pinglamb) / 0.064 (yachi), so a per-round column is not possible at this event rate",
+    "no effect at any unit: round AUC p=0.211, event-level CI includes zero with a firing negative control, player-level p=0.849"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -62,5 +62,90 @@
       "verified_placements": 1591,
       "total_placements": 7546
     }
-  ]
+  ],
+  "session": {
+    "player_rounds": 158,
+    "verified_placements": 2595,
+    "total_placements": 14517,
+    "coverage_x1000": 178
+  },
+  "statistics": {
+    "round": {
+      "metric": "forecast rate",
+      "auc_x1000": 585,
+      "wins": 11,
+      "losses": 5,
+      "ties": 19,
+      "decided": 16,
+      "exact_p_x1000": 211
+    },
+    "event": {
+      "forecast_n": 27,
+      "reactive_n": 185,
+      "attack": {
+        "forecast_mean_x1000": 4555,
+        "reactive_mean_x1000": 4037,
+        "diff_x1000": 517,
+        "ci95_lo_x1000": -337,
+        "ci95_hi_x1000": 1279,
+        "excludes_zero": false
+      },
+      "lines": {
+        "forecast_mean_x1000": 2333,
+        "reactive_mean_x1000": 2378,
+        "diff_x1000": -46,
+        "ci95_lo_x1000": -264,
+        "ci95_hi_x1000": 170,
+        "excludes_zero": false
+      },
+      "balance": {
+        "stack_height": {
+          "forecast_mean_x1000": 8074,
+          "reactive_mean_x1000": 6572,
+          "diff_x1000": 1501,
+          "ci95_lo_x1000": -378,
+          "ci95_hi_x1000": 3545,
+          "excludes_zero": false
+        },
+        "garbage_pressure": {
+          "forecast_mean_x1000": 2148,
+          "reactive_mean_x1000": 1864,
+          "diff_x1000": 283,
+          "ci95_lo_x1000": -1027,
+          "ci95_hi_x1000": 1566,
+          "excludes_zero": false
+        }
+      },
+      "negative_control": {
+        "forecast_mean_x1000": 148,
+        "reactive_mean_x1000": 713,
+        "diff_x1000": -566,
+        "ci95_lo_x1000": -981,
+        "ci95_hi_x1000": -68,
+        "excludes_zero": true,
+        "fires": true
+      }
+    },
+    "player": {
+      "user": "pinglamb",
+      "k": 13,
+      "n": 27,
+      "expected_x1000": 12353,
+      "exact_p_x1000": 849
+    },
+    "reliability": {
+      "split_half_r_x1000": {
+        "pinglamb": 291,
+        "yachi": 64
+      },
+      "scorable_rounds": {
+        "pinglamb": 44,
+        "yachi": 57
+      },
+      "rounds_for_r70": {
+        "pinglamb": 6,
+        "yachi": 34
+      }
+    }
+  }
 }

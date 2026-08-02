@@ -13,11 +13,109 @@ const PATH = `${import.meta.dir}/forecast-facts.json`;
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
-  expect(d.schema).toBe('forecast-facts/1');
+  expect(d.schema).toBe('forecast-facts/2');
   // simulator-derived data must never be promoted to a report claim without the
   // dual-extractor rule being satisfied; this flag is the guard
   expect(d.report_eligible).toBe(false);
   expect(d.not_eligible_because.length).toBeGreaterThanOrEqual(3);
+});
+
+const load = () => JSON.parse(readFileSync(PATH, 'utf8'));
+
+test('the session block accounts for the coverage the report quotes', () => {
+  const s = load().session;
+  for (const k of ['player_rounds', 'verified_placements', 'total_placements'])
+    expect(Number.isInteger(s[k])).toBe(true);
+  expect(s.verified_placements).toBeLessThanOrEqual(s.total_placements);
+  // coverage floors, like every other printed figure
+  expect(s.coverage_x1000 * s.total_placements).toBeLessThanOrEqual(1000 * s.verified_placements);
+  expect(1000 * s.verified_placements).toBeLessThan((s.coverage_x1000 + 1) * s.total_placements);
+});
+
+test('every statistics block is present or explicitly null — never absent', () => {
+  const st = load().statistics;
+  // A missing key reads as `undefined` in the renderer and would render as an empty string
+  // rather than as an absence. The contract is that the key always exists.
+  for (const k of ['round', 'event', 'player', 'reliability']) expect(k in st).toBe(true);
+});
+
+test('intervals contain their point estimate, and bounds widened rather than tightened', () => {
+  const st = load().statistics;
+  const cs = [st.event?.attack, st.event?.lines, st.event?.balance?.stack_height,
+              st.event?.balance?.garbage_pressure, st.event?.negative_control].filter(Boolean);
+  expect(cs.length).toBeGreaterThan(0);
+  for (const c of cs) {
+    // Negative differences are legal here — this is a signed contrast, not a rate. A consumer
+    // that assumes non-negative would silently mis-order the bounds.
+    expect(c.ci95_lo_x1000).toBeLessThanOrEqual(c.diff_x1000);
+    expect(c.ci95_hi_x1000).toBeGreaterThanOrEqual(c.diff_x1000);
+    // `excludes_zero` must be computed from the interval, not asserted alongside it
+    expect(c.excludes_zero).toBe(c.ci95_lo_x1000 > 0 || c.ci95_hi_x1000 < 0);
+  }
+});
+
+test('the negative control fires exactly when its own interval excludes zero', () => {
+  const nc = load().statistics.event?.negative_control;
+  if (!nc) return;
+  // This is the guard that keeps the confound honest: `fires` true means the difference also
+  // appears in a window the mechanism cannot reach, so the primary is measuring context.
+  expect(nc.fires).toBe(nc.excludes_zero);
+});
+
+test('p-values CEIL, because a p rounded down overstates significance', () => {
+  const st = load().statistics;
+  // Reconstructed from the counts the same p was computed over: the ceiled x1000 value must be
+  // the smallest integer at or above 1000p, so p > (v-1)/1000. Checked against the DEFINING
+  // inequality rather than a remembered constant.
+  const r = st.round;
+  if (r?.exact_p_x1000 != null) {
+    expect(Number.isInteger(r.exact_p_x1000)).toBe(true);
+    expect(r.exact_p_x1000).toBeGreaterThan(0);      // a p of exactly 0 would floor-print as 0.000
+    expect(r.exact_p_x1000).toBeLessThanOrEqual(1000);
+    expect(r.decided).toBe(r.wins + r.losses);
+  }
+  if (st.player?.exact_p_x1000 != null) {
+    expect(Number.isInteger(st.player.exact_p_x1000)).toBe(true);
+    expect(st.player.k).toBeLessThanOrEqual(st.player.n);
+  }
+});
+
+test('reliability reports unreachable as null, not as a large number of rounds', () => {
+  const rel = load().statistics.reliability;
+  if (!rel) return;
+  for (const [u, r] of Object.entries(rel.split_half_r_x1000) as [string, number | null][]) {
+    const need = rel.rounds_for_r70[u];
+    // r <= 0 means NO amount of aggregation reaches 0.70. That is a different statement from
+    // "it takes many rounds" and must not be rendered as a round count.
+    if (r === null || r <= 0) { expect(need).toBe(null); continue; }
+    expect(Number.isInteger(need)).toBe(true);
+    // Type alone is not a guard: `999` passed `isInteger` and said nothing about whether the
+    // count came from Spearman-Brown at all. Reconstruct it. The emitted r is FLOORED to
+    // x1000, so the true r lies in [r, r+1)/1000; need(r) = ceil((T/(1-T)) * (1-r)/r) is
+    // decreasing in r, so the true count is bracketed by evaluating at both ends.
+    const T = 0.7, sb = (x: number) => Math.ceil((T / (1 - T)) * (1 - x) / x);
+    expect(need).toBeGreaterThanOrEqual(sb((r + 1) / 1000));
+    expect(need).toBeLessThanOrEqual(sb(r / 1000));
+  }
+});
+
+test('the derived reasons quote this session, not a remembered one', () => {
+  const d = load();
+  const joined = d.not_eligible_because.join(' ');
+  const rel = d.statistics.reliability;
+  if (rel) {
+    // Every reliability the reason string names must be one this session actually measured.
+    for (const m of joined.matchAll(/([0-9]\.[0-9]{3}) \(([^)]+)\)/g)) {
+      const [, val, user] = m;
+      expect(rel.split_half_r_x1000[user!]).not.toBe(undefined);
+      expect(Math.abs(rel.split_half_r_x1000[user!]! / 1000 - Number(val))).toBeLessThan(0.001);
+    }
+  }
+  // and every p it names must match the emitted one to the digit it prints
+  const ps = [...joined.matchAll(/p=([0-9]\.[0-9]{3})/g)].map(m => Number(m[1]));
+  const emitted = [d.statistics.round?.exact_p_x1000, d.statistics.player?.exact_p_x1000]
+    .filter(v => v != null).map(v => v / 1000);
+  for (const p of ps) expect(emitted).toContain(p);
 });
 
 test('counts are internally consistent and integers', () => {

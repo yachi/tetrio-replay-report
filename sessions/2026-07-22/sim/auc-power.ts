@@ -11,7 +11,7 @@
  * "No signal" and "no power to see a signal" are different claims. Only one of them is about
  * the metric.
  */
-import { collectRows, pairsFor, auc, METRICS, type Metric } from './pairs.ts';
+import { collectRows, pairsFor, auc, exactSignP, METRICS, type Metric } from './pairs.ts';
 
 // ---- exact binomial helpers (small n, so no normal approximation anywhere) ----
 const lgamma = (z: number): number => {   // Lanczos
@@ -123,7 +123,8 @@ for (const m of METRICS) {
   const P = pairsFor(rows, m as Metric);
   const a = auc(P);
   const dec = a.wins + a.losses;
-  const p = dec ? 2 * Math.min(binomTail(a.wins, dec, 0.5), binomTail(a.losses, dec, 0.5)) : NaN;
+  // shared with emit-forecast-facts.ts via pairs.ts — this p is published, so there is one of it
+  const p = exactSignP(a.wins, a.losses) ?? NaN;
   const [lo, hi] = clopperPearson(a.wins, dec);
   summary[m] = { dec, wins: a.wins };
   console.log(`${m.padEnd(20)} ${a.auc.toFixed(1).padStart(5)}%  ${String(a.wins).padStart(2)}  ${String(a.losses).padStart(2)}  ${String(a.ties).padStart(3)}   ${String(dec).padStart(5)}    ${dec ? Math.min(1, p).toFixed(3) : '  -  '}     [${(100 * lo).toFixed(0)}%, ${(100 * hi).toFixed(0)}%]`);
