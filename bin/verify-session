@@ -115,4 +115,26 @@ else
   echo "  --  mutation test skipped (set MUTATION=1 to run)"
 fi
 
+# --- 7. lemma vacuity (opt-in) ---------------------------------------------
+# Step 6 asks whether each CONSTANT is load-bearing; this asks whether each CLAIM
+# is. They are not the same question, and neither implies the other: a claim that
+# pins nothing still has its constants killed via the other claims that read them,
+# so the mutation sweep reports no survivors while the claim proves nothing about
+# the data. Opt-in beside the mutation test, but for a narrower reason than "it is
+# slow": measured, three of the four sessions finish in 2-3 s (07-24 2.1, 07-28 2.8,
+# 08-01 2.6) while 2026-07-22 takes 483 s — a 200x spread over artefacts of the same
+# size. So the cost is not O(claims); it is a property of one file's claim shapes,
+# and MUTATION here bounds a worst case rather than describing the check. If 07-22
+# is ever made fast, this belongs on the per-push path.
+if [ "${MUTATION:-0}" = "1" ] && [ -f claims.smt2 ]; then
+  # Report the VERDICT line, not the last line — the gate signs off with a note about
+  # which solvers it did not find, so `tail -1` printed "yices-smt2 not used" as the
+  # result and buried the number this step exists to show.
+  VOUT="$(cd "$REPO" && python3 -m pipeline.check_lemma_vacuity "$DIR" 2>&1)" \
+    && ok "$(echo "$VOUT" | grep -m1 "claims falsified" | sed 's/^ *ok *//;s/^ *!! *//;s/^ *//')" \
+    || fail "lemma vacuity — $(echo "$VOUT" | grep -m1 FAIL || echo "$VOUT" | tail -1)"
+else
+  echo "  --  lemma vacuity skipped (set MUTATION=1 to run)"
+fi
+
 echo "PASS [$NAME]"
