@@ -14,8 +14,9 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
+import { replayDir } from './verified-prefix.ts';
 
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+const DIR = replayDir();
 const opts = { garbagespeed: 30, garbagecap: 8, locktime: 30, gravity: 0.02, sdfMode: 'abs' as const,
                insertMode: 'onPlace' as const, cancelMode: 'all' as const };
 

@@ -16,11 +16,11 @@
  * model and the control score the same, this oracle cannot see column errors and the test is
  * vacuous — the same self-validation the mutation harness uses.
  */
-import { loadCases, runCase } from './verified-prefix.ts';
+import { loadCases, runCase, replayDir} from './verified-prefix.ts';
 
 // attach the two ground-truth garbage stats to each case
 import { readFileSync, readdirSync } from 'node:fs';
-const DIR = process.env.REPLAY_DIR ?? `${import.meta.dir}/..`;
+const DIR = replayDir();
 const truth = new Map<string, { cleared: number; recv: number; lines: number }>();
 for (const f of readdirSync(DIR).filter(x => x.endsWith('.ttrm')).sort()) {
   const d = JSON.parse(readFileSync(`${DIR}/${f}`, 'utf8'));

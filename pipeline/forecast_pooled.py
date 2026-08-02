@@ -104,7 +104,7 @@ def _binom_cdf(k, n, p):
 def clopper_pearson(k, n, alpha=0.05):
     """Exact binomial interval, by bisection on the tails.
 
-    Mirrors `sessions/2026-07-22/sim/emit-forecast-facts.ts`. A second implementation of a
+    Mirrors `pipeline/sim/emit-forecast-facts.ts`. A second implementation of a
     statistic is a liability in this repo, so `selftest()` requires this one to reproduce EVERY
     per-player interval already committed in the four artefacts — if the two ever disagree, that
     is a failure, not a rounding difference. Computing here rather than emitting a pooled artefact

@@ -11,7 +11,8 @@ import { simulate, DEFAULT_TABLE, H, SPAWN_ROW } from './sim.ts';
 import { forecastMetric } from './forecast.ts';
 import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop } from './vendor/core/srs.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
-const DIR=(process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+import { replayDir } from './verified-prefix.ts';
+const DIR=replayDir();
 const opts={garbagespeed:30,garbagecap:8,locktime:30,gravity:0.02,sdfMode:'abs' as const,
             insertMode:'onPlace' as const,cancelMode:'all' as const};
 

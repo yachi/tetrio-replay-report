@@ -1,7 +1,8 @@
 /** How many rounds does the sim get catastrophically wrong (near-zero lines vs a real player)? */
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
-const DIR=(process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+import { replayDir } from './verified-prefix.ts';
+const DIR=replayDir();
 const opts={garbagespeed:30,garbagecap:8,locktime:30,gravity:0.02,sdfMode:'abs' as const,
             insertMode:'onPlace' as const,cancelMode:'all' as const};
 let zero=0, tot=0, topout=0; const ratios:number[]=[]; const zeroRounds:string[]=[];

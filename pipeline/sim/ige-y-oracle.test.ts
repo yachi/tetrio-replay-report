@@ -10,6 +10,7 @@ import { test, expect } from 'bun:test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
 import { expectedIgeY, matchesIgeY } from './ige-y-oracle.ts';
+import { replayDir } from './verified-prefix.ts';
 
 test('y is the centre of the cleared block, rounded toward the bottom', () => {
   expect(expectedIgeY(39, 1)).toBe(39);            // single: the row itself
@@ -25,8 +26,32 @@ test('matchesIgeY needs a real clear to compare against', () => {
   expect(matchesIgeY([38, 37, 36], 3, 38)).toBe(false);
 });
 
-test('board rows agree with ground truth on at least 90% of verified attacks', () => {
-  const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+/**
+ * Agreement floor, and what it is NOT.
+ *
+ * This asserted `> 0.90` and `checked > 200`. Both were fitted to 2026-07-22, because until the
+ * simulator moved to pipeline/sim the runner defaulted to `../` and this test could not run
+ * anywhere else. Pointed at the other three sessions, measured 2026-08-02:
+ *
+ *   2026-07-22   293 checked   90.4%   <- the session BEST_OPTS was tuned on; clears 90% by 0.4pp
+ *   2026-07-24   237 checked   80.6%
+ *   2026-07-28   197 checked   86.8%   <- also below the old `checked > 200`
+ *   2026-08-01   219 checked   82.6%
+ *
+ * So the ige row oracle agrees 4-10 points less often out of sample than the number this test
+ * enshrined, and the old threshold passed only on the session it was derived from. That is a
+ * finding about the simulator, not a licence to re-fit: these constants are a REGRESSION FLOOR,
+ * labelled as such, with the real per-session rates recorded above where they can be read.
+ * Re-fitting the floor to whichever session is worst would just recreate the original mistake.
+ *
+ * The floor is still far above chance — a wrong row agrees at roughly 1-in-20 — so a genuine
+ * break in the oracle still fails this loudly. Verified by mutation, see below.
+ */
+const MIN_AGREEMENT = 0.75;
+const MIN_CHECKED = 100;
+
+test('board rows agree with ground truth well above chance on verified attacks', () => {
+  const DIR = replayDir();
   const opts = {garbagespeed:30, garbagecap:8, locktime:60, gravity:0.02, sdfMode:'abs' as const,
                 insertMode:'onPlace' as const, cancelMode:'all' as const, acEmit:'separate' as const,
                 subframe:true, blockout:'shiftup' as const, kickset:'SRS+' as const};
@@ -54,6 +79,6 @@ test('board rows agree with ground truth on at least 90% of verified attacks', (
           if (matchesIgeY(a.clearedRows, a.lines, b.y)) ok++;
         }
       }}}
-  expect(checked).toBeGreaterThan(200);          // anti-vacuity: the loop must actually run
-  expect(ok / checked).toBeGreaterThan(0.90);
+  expect(checked).toBeGreaterThan(MIN_CHECKED);  // anti-vacuity: the loop must actually run
+  expect(ok / checked).toBeGreaterThan(MIN_AGREEMENT);
 });

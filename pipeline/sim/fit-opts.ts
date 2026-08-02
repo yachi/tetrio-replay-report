@@ -10,7 +10,8 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+import { replayDir } from './verified-prefix.ts';
+const DIR = replayDir();
 
 type Case = { ev:any[]; gin:any[]; truth:any[]; handling:any; seed:number; frames:number; placed:number };
 const cases: Case[] = [];

@@ -6,13 +6,24 @@
  * and are asserted here rather than left to review.
  */
 import { test, expect } from 'bun:test';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 
-// FORECAST_FACTS points the whole file at another session's artifact, so one guard covers
-// every emitted artifact rather than only the session it happens to live beside. The emitter
-// is shared (`--out` + REPLAY_DIR); its guards have to be too, or three of the four artifacts
+// FORECAST_FACTS points the whole file at one session's artifact, so one guard covers every
+// emitted artifact rather than only the session it happens to live beside. The emitter is
+// shared (`--out` + REPLAY_DIR); its guards have to be too, or three of the four artifacts
 // ship unchecked.
-const PATH = process.env.FORECAST_FACTS ?? `${import.meta.dir}/forecast-facts.json`;
+//
+// The default was `${import.meta.dir}/forecast-facts.json`, which resolved only because this
+// test lived inside 2026-07-22. From pipeline/sim there is no artifact beside the code, so it
+// DISCOVERS them — naming a session here would quietly re-privilege one inside what is now
+// shared code, which is the whole thing this move exists to end.
+const SESSIONS = `${import.meta.dir}/../../sessions`;
+const DISCOVERED = readdirSync(SESSIONS)
+  .map(s => `${SESSIONS}/${s}/sim/forecast-facts.json`)
+  .filter(existsSync)
+  .sort();
+const PATH = process.env.FORECAST_FACTS ?? DISCOVERED[0];
+if (!PATH) throw new Error('no sessions/*/sim/forecast-facts.json found, and FORECAST_FACTS is unset');
 
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);

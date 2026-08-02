@@ -16,8 +16,9 @@
  * 9 or 10, and 10 occurs exactly 19 times.
  */
 import { readFileSync, readdirSync } from 'node:fs';
+import { replayDir } from './verified-prefix.ts';
 
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+const DIR = replayDir();
 
 let exact = 0, total = 0, sumReal = 0, sumFound = 0, soloBonus = 0;
 const bad: string[] = [];

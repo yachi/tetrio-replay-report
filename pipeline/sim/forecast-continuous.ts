@@ -19,10 +19,10 @@
  * actually requires.
  */
 import { forecastMetric } from './forecast.ts';
-import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { loadCases, runCase, verifiedIndex, replayDir} from './verified-prefix.ts';
 import { readFileSync, readdirSync } from 'node:fs';
 
-const DIR = process.env.REPLAY_DIR ?? `${import.meta.dir}/..`;
+const DIR = replayDir();
 const stats = new Map<string, any>();
 for (const f of readdirSync(DIR).filter(x => x.endsWith('.ttrm')).sort()) {
   const d = JSON.parse(readFileSync(`${DIR}/${f}`, 'utf8'));

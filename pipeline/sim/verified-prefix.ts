@@ -17,9 +17,39 @@
  * of this loop and had already drifted (pairs.ts and run-forecast.ts still ran the pre-fix
  * settings). One implementation, one set of numbers.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { simulate, DEFAULT_TABLE, type SimResult } from './sim.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
+
+/**
+ * Where the .ttrm replays live. ONE definition, and it refuses to guess.
+ *
+ * This was `process.env.REPLAY_DIR ?? ${import.meta.dir}/..` written out in 26 separate files.
+ * That default worked only because the code sat inside a session directory, so `..` happened to
+ * be 2026-07-22 — which is exactly why the instrument could not be shared, and how three
+ * sessions' artifacts came to be produced by a script living inside a fourth's.
+ *
+ * Moving to pipeline/sim makes `..` the pipeline directory, which holds no replays. That is the
+ * dangerous kind of wrong: readdirSync on it SUCCEEDS and the .ttrm filter returns an EMPTY
+ * list, so all 26 callers would quietly compute over zero rounds and emit an artifact full of
+ * zeroes instead of failing. So there is no positional default any more, and an empty match is
+ * an error rather than an answer.
+ */
+export function replayDir(dir = process.env.REPLAY_DIR): string {
+  if (!dir)
+    throw new Error(
+      'REPLAY_DIR is not set. The simulator lives in pipeline/sim and is session-agnostic, so it '
+      + 'cannot infer which replays you mean.\n'
+      + '  REPLAY_DIR=sessions/2026-07-22 bun pipeline/sim/<script>.ts');
+  const abs = resolve(dir);
+  if (!existsSync(abs)) throw new Error(`REPLAY_DIR does not exist: ${abs}`);
+  const n = readdirSync(abs).filter(f => f.endsWith('.ttrm')).length;
+  // Zero replays is the silent failure this function exists to prevent: downstream it is
+  // indistinguishable from "this session genuinely had no rounds".
+  if (n === 0) throw new Error(`no .ttrm replays in REPLAY_DIR: ${abs}`);
+  return abs;
+}
 
 export const BEST_OPTS = {
   garbagespeed: 30, garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
@@ -33,7 +63,7 @@ export interface Case {
   handling: any; seed: number; frames: number; placed: number;
 }
 
-export function loadCases(dir = process.env.REPLAY_DIR ?? `${import.meta.dir}/..`): Case[] {
+export function loadCases(dir = replayDir()): Case[] {
   const out: Case[] = [];
   for (const file of readdirSync(dir).filter(f => f.endsWith('.ttrm')).sort()) {
     const d = JSON.parse(readFileSync(`${dir}/${file}`, 'utf8'));

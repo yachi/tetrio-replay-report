@@ -16,5 +16,10 @@ Thumbs.db
 *.dfy.tmp
 *.bak
 
-# derived simulation cache — regenerate with sim/pairs.ts
+# derived simulation cache — regenerate with pipeline/sim/pairs.ts.
+# The pattern must follow the CODE, not the sessions: the cache is written beside pairs.ts, so
+# when the simulator moved to pipeline/sim a sessions-only pattern silently stopped matching and
+# a 200 KB derived cache would have been committed as if it were source. The old pattern stays
+# so an existing checkout's leftover cache is still ignored.
+pipeline/sim/pairs-cache.json
 sessions/*/sim/pairs-cache.json

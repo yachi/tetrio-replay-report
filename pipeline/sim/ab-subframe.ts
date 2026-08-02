@@ -1,25 +1,24 @@
 /**
- * A/B: does inserting queued garbage on LINE-CLEARING placements too (after the
- * all-clear check) beat inserting only on no-clear placements?
+ * A/B: does running DAS/ARR on TETR.IO's 0.1-frame input clock fix the column errors?
  *
- * Motivated by halp1/triangle's engine core, where the PC predicate is read
- * immediately after clearLines and BEFORE insertGarbage — i.e. insertion is not
- * gated on "cleared no lines", it is gated on ordering. `insertAfterClear` was a
- * dead opt in sim.ts (declared, never set by any caller); this exercises it.
- *
- * Metrics: verified-prefix coverage (the real gate), plus top-out rate and the
- * sim/real line ratio, which is where the sim actually fails.
+ * Every recorded keydown/keyup carries a `subframe` (0.0-0.9). sim.ts used it only to
+ * SORT events and ran handling on whole frames. With arr=2 (these replays' handling),
+ * a one-frame rounding error in the DAS charge is one whole cell of horizontal movement
+ * — which would put pieces in the wrong column from the opening, before any garbage.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+import { replayDir } from './verified-prefix.ts';
+const DIR = replayDir();
 const base = {garbagespeed:30, garbagecap:8, locktime:30, gravity:0.02, sdfMode:'abs' as const,
               insertMode:'onPlace' as const, cancelMode:'all' as const, acEmit:'separate' as const};
 
-for (const iac of [false, true]) {
-  let ver=0, real=0, tot=0, fullyVerified=0, topouts=0, zeroLine=0;
-  let simLines=0, realLines=0, simPC=0, realPC=0;
-  const ratios: number[] = [];
+for (const [label, extra] of [
+  ['frame-clock', {}],
+  ['subframe',    {subframe:true}],
+  ['subframe+shiftup', {subframe:true, blockout:'shiftup' as const}],
+] as const) {
+  let ver=0, real=0, tot=0, full=0, topouts=0, zero=0, simLines=0, realLines=0, simPC=0, realPC=0, placed=0;
   for (const f of readdirSync(DIR).filter(x=>x.endsWith('.ttrm')).sort()) {
     const d = JSON.parse(readFileSync(`${DIR}/${f}`,'utf8'));
     for (const rnd of d.replay.rounds) { if (rnd.length!==2) continue;
@@ -34,7 +33,7 @@ for (const iac of [false, true]) {
           .map((e:any)=>({frame:e.data.data.frame??e.frame, amt:e.data.data.amt}))
           .sort((a:any,b:any)=>a.frame-b.frame);
         const r = simulate(ev, gin, me.rp.options.handling, me.rp.options.seed, me.rp.frames,
-                           DEFAULT_TABLE, {...base, insertAfterClear: iac});
+                           DEFAULT_TABLE, {...base, ...extra});
         const mine = r.records.filter(x=>x.sent>0);
         let vf=-1;
         for (let i=0;i<Math.min(mine.length,truth.length);i++) {
@@ -42,15 +41,12 @@ for (const iac of [false, true]) {
         }
         let vIdx=-1; for (let i=0;i<r.locks.length;i++) if (r.locks[i]!.frame<=vf) vIdx=i;
         const st = me.rp.results.stats;
-        ver += vIdx+1; real += st.piecesplaced; tot++;
-        if (vIdx+1 >= st.piecesplaced) fullyVerified++;
+        ver += vIdx+1; real += st.piecesplaced; tot++; placed += r.placed;
+        if (vIdx+1 >= st.piecesplaced) full++;
         if (r.topout) topouts++;
-        if (r.lines === 0) zeroLine++;
+        if (r.lines === 0) zero++;
         simLines += r.lines; realLines += st.lines;
-        if (st.lines > 0) ratios.push(r.lines/st.lines);
         simPC += r.clears.allclear; realPC += st.clears.allclear ?? 0;
       }}}
-  ratios.sort((a,b)=>a-b);
-  const med = ratios[Math.floor(ratios.length/2)] ?? 0;
-  console.log(`insertAfterClear=${String(iac).padEnd(5)} coverage ${ver}/${real} = ${(100*ver/real).toFixed(1)}%  full ${fullyVerified}/${tot}  topout ${topouts}/${tot}  zero-line ${zeroLine}/${tot}  lines ${simLines}/${realLines}  medRatio ${med.toFixed(3)}  PC ${simPC}/${realPC}`);
+  console.log(`${label.padEnd(18)} coverage ${(100*ver/real).toFixed(1)}%  full ${full}/${tot}  topout ${topouts}/${tot}  zero-line ${zero}/${tot}  pieces ${placed}/${real}  lines ${simLines}/${realLines}  PC ${simPC}/${realPC}`);
 }

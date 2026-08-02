@@ -13,7 +13,7 @@ import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { emptyBoard, H, tspinAvailable, bestTspinLines } from './forecast-boards.ts';
 
-const RAW = JSON.parse(readFileSync(`${import.meta.dir}/../wiki-tspin-forecast-boards.json`, 'utf8')) as
+const RAW = JSON.parse(readFileSync(`${import.meta.dir}/wiki-tspin-forecast-boards.json`, 'utf8')) as
   { sec: string; rows: string[] }[];
 const toBoard = (rows: string[]) => {
   const b = emptyBoard().map(r => [...r]) as any[][];

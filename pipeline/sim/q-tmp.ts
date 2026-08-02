@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { makeQueue } from './sim.ts';
-const d = JSON.parse(readFileSync(`${import.meta.dir}/../replay-2026-07-22-2.ttrm`,'utf8'));
+import { replayDir } from './verified-prefix.ts';
+const d = JSON.parse(readFileSync(`${replayDir()}/replay-2026-07-22-2.ttrm`,'utf8'));
 const rnd = d.replay.rounds[4];
 for (const p of rnd) {
   const seed = p.replay.options.seed;

@@ -12,8 +12,12 @@ findings doc. It lives here so the negative result stays checkable, not so it ca
 
 Requires `bun`. No install step; there are no dependencies.
 
+This code is **session-agnostic**: it lives in `pipeline/` and is pointed at a session, rather
+than living inside one. Every runner therefore needs `REPLAY_DIR`.
+
 ```fish
-cd sessions/2026-07-22/sim
+cd pipeline/sim
+set -x REPLAY_DIR (git rev-parse --show-toplevel)/sessions/2026-07-22
 
 bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
 bun run mutate-forecast.ts forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
@@ -23,9 +27,24 @@ bun run auc-power.ts     # read this before quoting any AUC
 bun run bfs-cap.ts
 ```
 
-Runners locate the `.ttrm` files at `../` (the session directory) and honour `REPLAY_DIR`.
+Emitting a session's forecast artifact — `--out` is required, because this code no longer
+belongs to a session and must not guess which one you mean:
+
+```fish
+REPLAY_DIR=sessions/2026-07-24 bun pipeline/sim/emit-forecast-facts.ts \
+    --out sessions/2026-07-24/sim/forecast-facts.json
+```
+
+`REPLAY_DIR` is resolved by `replayDir()` in `verified-prefix.ts`, which **fails** when it is
+unset, missing, or contains no `.ttrm`. It used to default to `../`, which only worked because
+this directory sat inside a session; from `pipeline/sim` that default would have found zero
+replays and every runner would have computed over zero rounds and reported zeroes rather than
+erroring.
+
 `LOOSE=1` switches the classifier to the discarded loose rule, for comparison only.
 Pairing is simulated once and cached to `pairs-cache.json` (gitignored; delete to force a re-run).
+The cache key includes the replay directory, so pointing `REPLAY_DIR` at another session cannot
+poison this one's entry.
 
 Expected output, all four verified from this directory on 2026-07-30:
 

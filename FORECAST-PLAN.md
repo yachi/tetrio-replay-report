@@ -194,7 +194,16 @@ still blocked, whatever the prose says.
 Steps 0→4 are serial; step 4 can be written against 07-22 while 2 and 3 are in progress, but its
 acceptance test needs a real second session.
 
-**P2 — promote `sessions/2026-07-22/sim/` to `pipeline/sim/`. Deferred to its own change set.** Note
+**P2 — promote `sessions/2026-07-22/sim/` to `pipeline/sim/`. DONE 2026-08-02.** All three
+predicted breakages were real and are fixed: `loadCases`' default, the emitter's output path, and
+the `.gitignore` pattern. The default was not in one place but **26**, each file carrying its own
+copy of ``process.env.REPLAY_DIR ?? `${import.meta.dir}/..` ``; they are now one `replayDir()` that
+refuses to guess, because from `pipeline/` that default finds zero replays and `readdirSync`
+SUCCEEDS on it — every runner would have computed over zero rounds and emitted zeroes instead of
+failing. Proof the move changed no behaviour: the emitter reproduces all four committed artifacts
+byte-for-byte, and the suite is 45 pass / 0 fail before and after. Original note follows.
+
+**P2 (original diagnosis).** Note
 CI is *not* the coupling: no CI job executes any `sim/*.ts`. The real breakages are `loadCases`'
 default `${import.meta.dir}/..` (`verified-prefix.ts:36`) no longer resolving to a session, the
 emitter's output path, and `.gitignore:20`'s `sessions/*/sim/pairs-cache.json` pattern silently
@@ -244,6 +253,36 @@ seven-config range bounds *fitted-parameter* sensitivity; model-form error was n
 模擬器準唔準」. It states the ratio it measured and then says outright that the sweep cannot see an
 error all seven configs share. The bun guard's name still overstates what it checks; the claim
 itself remains unprobed.
+
+### What P2 turned up: a test constant fitted to the tuning session
+
+Making the simulator session-agnostic let its own test suite run somewhere other than
+2026-07-22 for the first time, and `ige-y-oracle.test.ts` immediately failed on the other three.
+It asserted the ige row oracle agrees with ground truth on `> 90%` of verified attacks, over
+`> 200` checked attacks. Measured 2026-08-02:
+
+| session | checked | agreement |
+|---|---|---|
+| 2026-07-22 (tuning) | 293 | **90.4%** |
+| 2026-07-24 | 237 | 80.6% |
+| 2026-07-28 | 197 | 86.8% |
+| 2026-08-01 | 219 | 82.6% |
+
+2026-07-22 is the session `BEST_OPTS` was fitted on, and it clears its own threshold by 0.4
+points. Out of sample the oracle is 4-10 points worse, and 2026-07-28 also falls under the
+`checked > 200` floor. Neither constant was ever a specification; both were read off the only
+session the test could reach, which is the same defect as the round-level AUC that did not
+replicate — and the same one as a gate exercised only against the input it already passes.
+
+The constants are now a labelled regression floor (0.75 agreement, 100 checked) with the real
+per-session rates recorded beside them, rather than a re-fit to whichever session is worst.
+Mutation-tested so the looser floor is not decorative: an oracle off by one row scores 0-1%
+agreement on every session, so genuine breakage still fails by a wide margin.
+
+**This is a real limit on the verified prefix and should be treated as one.** The prefix gate
+`frame+amount+row` accepts a placement only if the row oracle agrees, so a ~10-point out-of-sample
+drop in that oracle is a drop in the evidence the forecast metric rests on. It is not yet known
+whether the disagreements are oracle error or simulator error.
 
 ### What P1 taught, beyond its own scope
 

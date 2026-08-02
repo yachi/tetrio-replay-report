@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { forecastMetric } from './forecast.ts';
-import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { loadCases, runCase, verifiedIndex, replayDir} from './verified-prefix.ts';
 
 export const METRICS = ['forecast rate', 'forecast per piece', 'forecast count', 'tucked T-spins',
                         'separation-weighted'] as const;
@@ -38,7 +38,7 @@ export function collectRows(strict = true, strictRows = true): Row[] {
   // this from more than one session until the metric was extended to all four, so the bug
   // was latent rather than harmless. Keyed, and CACHE_V bumped so every existing entry
   // (written without a directory) is discarded rather than matched by accident.
-  const dir = process.env.REPLAY_DIR ?? `${import.meta.dir}/..`;
+  const dir = replayDir();
   const cacheKey = `v${CACHE_V}|${strict}|rows=${strictRows}|dir=${resolve(dir)}`;
   const cache = `${import.meta.dir}/pairs-cache.json`;
   if (existsSync(cache)) {

@@ -253,12 +253,19 @@ const out = {
   statistics: { round: roundStat, event: eventStat, player: playerStat, reliability },
 };
 
-// `--out <path>` so one emitter serves every session; the replay directory comes from
-// REPLAY_DIR, which loadCases() already honours.
+// `--out <path>` is REQUIRED, and the replay directory comes from REPLAY_DIR via replayDir().
+// The default used to be `${import.meta.dir}/forecast-facts.json`, which was only ever right
+// because the emitter lived inside 2026-07-22. From pipeline/sim that default would write the
+// artifact next to the CODE, where no session would read it and where the .gitignore pattern
+// does not reach — so a run with the wrong arguments would look like it succeeded. There is no
+// session this emitter belongs to any more, so it must be told.
 const argv = process.argv.slice(2);
 const oi = argv.indexOf('--out');
-if (oi !== -1 && !argv[oi + 1]) throw new Error('--out needs a path');
-const path = oi === -1 ? `${import.meta.dir}/forecast-facts.json` : argv[oi + 1]!;
+if (oi === -1 || !argv[oi + 1])
+  throw new Error('--out <path> is required, e.g.\n'
+    + '  REPLAY_DIR=sessions/2026-07-22 bun pipeline/sim/emit-forecast-facts.ts \\\n'
+    + '    --out sessions/2026-07-22/sim/forecast-facts.json');
+const path = argv[oi + 1]!;
 writeFileSync(path, JSON.stringify(out, null, 2) + '\n');
 console.log(`wrote ${path}\n`);
 for (const p of players)

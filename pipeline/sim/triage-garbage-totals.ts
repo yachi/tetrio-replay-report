@@ -13,7 +13,8 @@
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { simulate, DEFAULT_TABLE } from './sim.ts';
-const DIR = (process.env.REPLAY_DIR ?? `${import.meta.dir}/..`);
+import { replayDir } from './verified-prefix.ts';
+const DIR = replayDir();
 
 /** frame of the interaction_confirm matching a queued interaction (same cid+iid) */
 const CONFIRM = (rp:any, cid:number, iid:number): number|undefined => {
