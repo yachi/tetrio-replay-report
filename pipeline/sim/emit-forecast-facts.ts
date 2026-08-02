@@ -86,11 +86,11 @@ const CONFIGS: [string, any][] = [
 ];
 
 const tally = (extra: any) => {
-  const per: Record<string, { tspins: number; fg: number; fl: number; sb: number; reactive: number; verified: number; placed: number }> = {};
+  const per: Record<string, { tspins: number; fg: number; fl: number; sb: number; reactive: number; unattributed: number; verified: number; placed: number }> = {};
   for (const c of loadCases()) {
     const r = runCase(c, extra);
     const v = verifiedIndex(r, c.truth);
-    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, verified: 0, placed: 0 };
+    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
     if (v < 0) continue;
@@ -104,6 +104,7 @@ const tally = (extra: any) => {
       else if (rec.kind === 'forecast_lineclear') p.fl++;
       else if (rec.kind === 'self_built') p.sb++;
       else p.reactive++;
+      if (rec.mechanism === 'unattributed') p.unattributed++;
     }
   }
   return per;
@@ -113,23 +114,33 @@ const base = tally({});
 const spread: Record<string, number[]> = {};
 for (const [, extra] of CONFIGS) {
   const t = tally(extra);
-  // sensitivity of the VERIFIED rate only — the unverified bucket is not the headline
-  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? v.fg / v.tspins : 0);
+  // The sweep must vary the SAME quantity the table prints, or the two disagree silently: this
+  // read `v.fg` for one commit after `fc` became `fg + fl`, which rendered a 1.2% rate beside a
+  // simulator range of [0.0%, 0.0%] and a sentence claiming all seven configs agreed.
+  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? (v.fg + v.fl) / v.tspins : 0);
 }
 
 const players = Object.entries(base).map(([user, v]) => {
-  const fc = v.fg;   // VERIFIED forecasts only: garbage counterfactually shown to be load-bearing
+  // Both kinds are mechanism-established: each is localised to the single step that raised the
+  // availability, and to which of that step's three edits did it. The old split — one branch
+  // counterfactually tested, the other asserting co-occurrence — is gone, so there is no longer
+  // a second, weaker rate to keep out of the total.
+  const fc = v.fg + v.fl;
   const [lo, hi] = clopperPearson(fc, v.tspins);
   const s = spread[user]!;
   return {
     user,
     verified_tspins: v.tspins,
     forecast_garbage: v.fg,
-    // Causality untestable for line clears — un-clearing a row needs a re-simulation, not a
-    // board edit. Reported, never added into forecast_total.
-    forecast_lineclear_unverified: v.fl,
-    // improved, but neither mechanism explains it: the player built the slot. Openers land here.
+    // The clear FORMED the slot: a cleared row lay strictly inside it, so removing that row is
+    // what brought roof and cavity together. Auditing the 86 events the old co-occurrence rule
+    // produced left exactly 1 — the other 85 were the player's own placement.
+    forecast_lineclear: v.fl,
+    // improved, but the player's own placement did it. Openers land here.
     self_built: v.sb,
+    // improvements the step model could not explain. Emitted so that a metric which has stopped
+    // understanding its own corpus says so, rather than absorbing the gap into self_built.
+    unattributed: v.unattributed,
     forecast_total: fc,
     reactive: v.reactive,
     // Gated floor convention (`pipeline/fmt.py`): every printed figure in this repo floors, so
@@ -250,7 +261,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/3',
+  schema: 'forecast-facts/4',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

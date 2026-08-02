@@ -274,7 +274,14 @@ every audit round in this project has caught. A numeric section without badges b
 - 14 unit tests on hand-built cases. Mutation testing on the classifier: **6/6 killed** (one
   initially survived — every test had a single roof owner, so `Math.max`→`Math.min` was invisible;
   a two-owner case fixed it).
-- **Mutation, re-measured 2026-07-30: 11/11 killed** across the whole instrument (`mutate-forecast.ts`).
+- **Mutation, re-measured 2026-08-02: 24/24 killed** across the whole instrument
+  (`mutate-forecast.ts`); it read 11/11 on 2026-07-30, before the causal correction and the
+  mechanism localisation added the mutants that matter most — a straight reversion to
+  co-occurrence, on either mechanism. Two further mutants are dropped as PROVEN equivalent
+  rather than left as permanent survivors; both proofs rest on the reconstruction assertion
+  inside `localiseMechanism`. The default test set now includes `forecast-corpus.test.ts`,
+  because two mutants survived the fixture-only suite while changing how 654 real events
+  classify.
   The harness is itself validated by control mutants — three semantics-preserving edits **survive**
   and a poison mutant (spawn column 3→9) **dies**, so a green sweep is discrimination, not a
   syntax error killing everything.

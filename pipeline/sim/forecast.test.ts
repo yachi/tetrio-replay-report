@@ -34,9 +34,11 @@ function mk(opts: {
   tLock: number; tCells: { col: number; row: number }[]; roofOwner: number | null;
   clearsAt?: number[]; garbageAt?: number[]; spin?: 'full' | 'mini' | 'none'; tCleared?: number;
   boardAtRoof?: any[][]; boardAtSpin?: any[][];
+  /** which lock changes the board, and the cells it placed */
+  changeAt?: number; stepCells?: { col: number; row: number }[];
 }): SimResult {
   const { tLock, tCells, roofOwner, clearsAt = [], garbageAt = [], spin = 'full', tCleared = 2,
-          boardAtRoof, boardAtSpin } = opts;
+          boardAtRoof, boardAtSpin, changeAt, stepCells } = opts;
   const locks: SimResult['locks'] = [];
   const provSnaps: (number | null)[][][] = [];
   for (let i = 0; i <= tLock; i++) {
@@ -52,9 +54,19 @@ function mk(opts: {
   return {
     lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
     garbage: { sent: 0, received: 0, cleared: 0, attack: 0 },
+    // Every board in the window must exist and must be reachable from its predecessor by the
+    // step that separates them, because localiseMechanism walks the window and asserts its own
+    // reconstruction. The old version left holes (`undefined`) either side of two named indices,
+    // which was invisible while the rule only ever read those two.
     boards: (() => { const bs: any[] = Array.from({ length: tLock + 1 }, () => undefined);
-      if (boardAtRoof && roofOwner !== null) bs[roofOwner] = boardAtRoof;
-      if (boardAtSpin) bs[tLock - 1] = boardAtSpin;
+      if (boardAtRoof && roofOwner !== null) {
+        const change = changeAt ?? garbageAt[0] ?? clearsAt[0] ?? tLock - 1;
+        for (let i = 0; i <= tLock; i++) bs[i] = i < change ? boardAtRoof : (boardAtSpin ?? boardAtRoof);
+        // The piece type has to match what the fixture boards are filled with ('I'), because the
+        // reconstruction compares cell CONTENT, not just occupancy — it caught this fixture
+        // claiming an L placed cells that the board records as an I.
+        if (stepCells) { locks[change]!.cells = stepCells; locks[change]!.piece = 'I'; }
+      }
       return bs; })(),
     records: [], events: [], locks,
     garbageEvents: garbageAt.map(i => ({ frame: i * 100, amt: 4, lockIndex: i })),
@@ -88,11 +100,15 @@ const ROOF_NO_SPIN = boardFrom([
 const SPIN_VIA_GARBAGE = boardFrom([
   "..........", ".......#..", ".......##.", "........##", "#######.##", "######..##", "GGGGGGG.GG",
 ]);
-/* Same improvement, but the extra row is the PLAYER'S OWN stack rather than garbage. Removing
- * garbage changes nothing, so this is the opener shape: self_built, not a forecast. */
-const SPIN_SELF_BUILT = boardFrom([
-  "..........", ".......#..", ".......##.", "........##", "#######.##", "######..##", "#######.##",
-]);
+/* The opener shape: the same 0 -> 2 improvement, produced by the player's OWN placement. An L
+ * lands on the col-2 stack and overhangs col 3, roofing a notch that was already there — which is
+ * how a C-Spin builds its overhang, and what the old co-occurrence rule scored as a forecast
+ * merely because garbage happened to arrive during the window. Stated as a placement rather than
+ * as an appended row, because a board that changes with no piece to account for it is not a state
+ * the game can reach — and `localiseMechanism` now says so instead of classifying it. */
+const SB_ROOF = boardFrom(["..........", "..........", "###...####", "####.#####"]);
+const SB_CELLS = [{ col: 2, row: 35 }, { col: 2, row: 36 }, { col: 2, row: 37 }, { col: 3, row: 37 }];
+const SB_SPIN = boardFrom(["..#.......", "..#.......", "..##......", "###...####", "####.#####"]);
 
 test('forecast_garbage: the garbage is LOAD-BEARING — remove it and the spin is gone', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
@@ -103,12 +119,15 @@ test('forecast_garbage: the garbage is LOAD-BEARING — remove it and the spin i
   expect(r.records[0]!.availAtSpin).toBe(3);
 });
 
-test('self_built: garbage arrived but the slot does not depend on it', () => {
-  // This is the C-Spin/opener case that was being counted as forecast_garbage: garbage lands in
-  // the window, so the old `garbageBetween` co-occurrence test fired, but the player built the
-  // slot. Removing the garbage leaves the spin untouched.
+test('self_built: garbage arrived but the PLACEMENT is what raised the spin', () => {
+  // The C-Spin/opener case that was being counted as forecast_garbage: garbage lands in the
+  // window, so the old `garbageBetween` co-occurrence test fired, but the availability crossed
+  // on the player's own piece.
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
-    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_SELF_BUILT }));
+    boardAtRoof: SB_ROOF, boardAtSpin: SB_SPIN, changeAt: 2, stepCells: SB_CELLS }));
+  expect(r.records[0]!.availAtRoof).toBe(0);
+  expect(r.records[0]!.availAtSpin).toBe(2);
+  expect(r.records[0]!.mechanism).toBe('placement');
   expect(r.records[0]!.kind).toBe('self_built');
   expect(r.records[0]!.garbageLoadBearing).toBe(false);
 });
@@ -117,6 +136,99 @@ test('self_built: garbage arrived but the slot does not depend on it', () => {
  * garbage line upgrades to a DOUBLE. Measured 1 -> 2, and back to 1 with the garbage removed. */
 const UPGRADE_ROOF = boardFrom(["..........", "..........", "..##......", "...#######"]);
 const UPGRADE_SPIN = boardFrom(["..........", "..##......", "...#######", "G.GGGGGGGG"]);
+
+/* A clear that DISPLACES the slot instead of forming it. The J both roofs the notch and completes
+ * a row well above it, so the availability crosses on this step and a line does clear — but the
+ * cleared row lies outside the slot's own rows, so removing it only moved the slot down bodily.
+ * Without the straddle rule this is indistinguishable from the real mechanism, and it is the
+ * shape 85 of the corpus's 86 line-clear-labelled events turned out to have. */
+const DISP_ROOF = boardFrom(["##.#######", "..........", "..........", "###...####", "####.#####"]);
+const DISP_CELLS = [{ col: 2, row: 35 }, { col: 2, row: 36 }, { col: 2, row: 37 }, { col: 3, row: 37 }];
+const DISP_SPIN = boardFrom(["..........", "..#.......", "..##......", "###...####", "####.#####"]);
+
+test('a clear that DISPLACES the slot is the placement, not a forecast', () => {
+  const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2],
+    boardAtRoof: DISP_ROOF, boardAtSpin: DISP_SPIN, changeAt: 2, stepCells: DISP_CELLS }));
+  expect(r.records[0]!.availAtRoof).toBe(0);
+  expect(r.records[0]!.availAtSpin).toBe(2);
+  // a line DID clear in the window, and the old rule would have scored this a forecast on
+  // exactly that fact. The row it removed was nowhere near the slot.
+  expect(r.records[0]!.mechanism).toBe('placement');
+  expect(r.records[0]!.kind).toBe('self_built');
+});
+
+/* Neither mechanism: the slot is already built and merely UNREACHABLE, sealed under a row that is
+ * full but for one column. The I completes that row from four rows up, the clear opens the path,
+ * and the T walks in. The clear did not form the slot and the piece never went near it, so the
+ * answer is `unattributed` — recorded rather than guessed. This never occurs in the corpus, which
+ * is why it is here: an untested branch is where a silent default would live. */
+const ACC_ROOF = boardFrom(["#########.", "..........", "..##......", "###...####", "####.#####"]);
+const ACC_CELLS = [35, 34, 33, 32].map(row => ({ col: 9, row }));
+// the I's other three cells survive the clear and ride down with the rest of the stack
+const ACC_SPIN = boardFrom([".........#", ".........#", ".........#", "..........",
+                            "..##......", "###...####", "####.#####"]);
+
+test('a clear that only opens ACCESS is attributed to neither, and says so', () => {
+  const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2],
+    boardAtRoof: ACC_ROOF, boardAtSpin: ACC_SPIN, changeAt: 2, stepCells: ACC_CELLS }));
+  expect(r.records[0]!.availAtSpin).toBe(2);
+  expect(r.records[0]!.mechanism).toBe('unattributed');
+  // it must NOT be counted as a forecast on the strength of a mechanism nobody established
+  expect(r.records[0]!.kind).toBe('self_built');
+  expect(r.forecastRate).toBe(0);
+  expect(r.unattributed).toBe(1);
+});
+
+/* Availability OVERSHOOTS and settles back: 0 -> 2 -> 3 -> 2. The step that produced what the
+ * player actually executed is the one where the final level was first reached AND held (step 1),
+ * not the last step where the number went up (step 2, which reached a 3 that was gone by
+ * execution). The distinction is invisible on a monotone window, which is every window in the
+ * fixtures above and all 654 events in the corpus — so without this it is untested rule.
+ *
+ * These three boards are a synthetic TRAJECTORY, not game states: the cell sets that separate
+ * them were searched for by availability, and are not tetromino shapes. That is legitimate here
+ * because what is under test is the walk over `boards`, which reads only the arithmetic; it would
+ * not be legitimate for anything that reasons about how a piece got there. */
+const OS0 = boardFrom(["######...#", "######...#", "#######.##"]);
+const OS1 = boardFrom(["........#.", "........##", "######..##", "######...#", "#######.##"]);
+const OS2 = boardFrom([".......#..", ".......##.", "........##", "#######.##", "######..##", "#######.##"]);
+const OS1_CELLS = [{ col: 8, row: 35 }, { col: 8, row: 36 }, { col: 9, row: 36 }, { col: 8, row: 37 }];
+const OS2_CELLS = [{ col: 7, row: 34 }, { col: 7, row: 35 }, { col: 6, row: 37 }, { col: 8, row: 38 }];
+
+test('the causing step is where the level was reached and HELD, not the last rise', () => {
+  const tLock = 4;
+  const locks: any[] = [], provSnaps: any[] = [];
+  for (let i = 0; i <= tLock; i++) {
+    locks.push({ frame: i * 100, piece: i === tLock ? 'T' : 'I',
+      cells: i === tLock ? T_CELLS : i === 1 ? OS1_CELLS : i === 2 ? OS2_CELLS : [],
+      cleared: i === tLock ? 2 : 0, spin: i === tLock ? 'full' : 'none' });
+    const g = Array.from({ length: H }, () => new Array<number | null>(10).fill(null));
+    if (i === tLock - 1) for (const c of T_CELLS) g[c.row - 1]![c.col] = 0;
+    provSnaps.push(g);
+  }
+  const r = forecastMetric({ locks, provSnaps, garbageEvents: [], records: [], events: [],
+    boards: [OS0, OS1, OS2, OS1, OS1], topout: false, lines: 0, placed: 0, holds: 0, clears: {},
+    topbtb: 0, topcombo: 0, garbage: { sent: 0, received: 0, cleared: 0, attack: 0 } } as any);
+  expect(r.records[0]!.availAtRoof).toBe(0);
+  expect(r.records[0]!.availAtSpin).toBe(2);
+  // step 2 is where availability peaked; step 1 is where the executed level was established
+  expect(r.records[0]!.mechanismStep).toBe(1);
+});
+
+test('a board that changed without a placement to explain it is an ERROR, not a verdict', () => {
+  // The whole step model rests on boards[t] being boards[t-1] plus this lock's cells, minus the
+  // rows that filled, plus any garbage. If that is ever false the decomposition is meaningless
+  // and every mechanism it reports is fiction — so it must fail loudly rather than classify.
+  // Both fixtures in this file broke this rule at first, in ways that looked entirely plausible.
+  // the board gains cells that no lock placed
+  expect(() => forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0,
+    boardAtRoof: SB_ROOF, boardAtSpin: SB_SPIN, changeAt: 2 /* no stepCells: nothing placed */ })))
+    .toThrow(/diverges/);
+  // and the lock claims a clear the board cannot account for
+  expect(() => forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2],
+    boardAtRoof: SB_ROOF, boardAtSpin: SB_SPIN, changeAt: 2, stepCells: SB_CELLS })))
+    .toThrow(/cleared 1 rows/);
+});
 
 test('an already-available spin that GROWS still counts — forecasting an upgrade', () => {
   // Two of the wiki's five garbage pairs go best 1 -> 2, which the article presents as
@@ -156,30 +268,29 @@ test('garbage strictly BEFORE the roof was built does not count as forecast', ()
   expect(r.records[0]!.kind).toBe('reactive');
 });
 
-test('isVerifiedForecast admits ONLY the causally-verified bucket', () => {
+test('isVerifiedForecast admits both mechanism-established kinds and neither other', () => {
   // The mutation `kind !== 'reactive'` — the idiom this predicate replaced — survived the whole
   // suite until this test existed. That idiom IS the original defect: it readmits self_built
-  // (openers) and the untestable line-clear bucket into the forecast numerator. A harness that
-  // cannot kill a reversion to it would not have caught the bug it was written for.
+  // (openers) into the forecast numerator. A harness that cannot kill a reversion to it would
+  // not have caught the bug it was written for. The line-clear bucket joined the numerator on
+  // 2026-08-02, when localisation gave it the same evidence the garbage branch already had —
+  // which is a change in what can be PROVEN, not a relaxation of the bar.
   const mkRec = (kind: string) => ({ kind } as any);
   expect(isVerifiedForecast(mkRec('forecast_garbage'))).toBe(true);
-  expect(isVerifiedForecast(mkRec('forecast_lineclear'))).toBe(false);
+  expect(isVerifiedForecast(mkRec('forecast_lineclear'))).toBe(true);
   expect(isVerifiedForecast(mkRec('self_built'))).toBe(false);
   expect(isVerifiedForecast(mkRec('reactive'))).toBe(false);
-  // and the wider predicate takes the line-clear bucket but never the opener
-  expect(isForecastOrUnverified(mkRec('forecast_lineclear'))).toBe(true);
-  expect(isForecastOrUnverified(mkRec('self_built'))).toBe(false);
 });
 
-test('forecastRate counts VERIFIED forecasts only; the line-clear bucket is separate', () => {
+test('forecastRate counts mechanism-established forecasts and nothing else', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
     boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_VIA_GARBAGE }));
   expect(r.forecastRate).toBe(1);
-  // an opener whose garbage does nothing must NOT move the headline rate
+  // an opener the player built themselves must NOT move the headline rate
   const sb = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
-    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_SELF_BUILT }));
+    boardAtRoof: SB_ROOF, boardAtSpin: SB_SPIN, changeAt: 2, stepCells: SB_CELLS }));
   expect(sb.forecastRate).toBe(0);
-  expect(sb.unverifiedRate).toBe(0);
+  expect(sb.unattributed).toBe(0);
   const r2 = forecastMetric(mk({ tLock: 3, tCells: T_CELLS, roofOwner: 2 }));
   expect(r2.forecastRate).toBe(0);
 });
@@ -220,12 +331,17 @@ function mkBoards(boardAtJ: any, boardAtSpin?: any) {
   const tLock = 4, j = 1, roofCol = T_CELLS[1]!.col;
   const locks: any[] = [], provSnaps: any[] = [], boards: any[] = [];
   for (let i = 0; i <= tLock; i++) {
-    locks.push({ frame: i * 100, piece: i === tLock ? 'T' : 'L', cells: i === tLock ? T_CELLS : [],
-      cleared: i === 2 ? 1 : (i === tLock ? 2 : 0), spin: i === tLock ? 'full' : 'none' });
+    // The clearing piece is lock 3, and it is a REAL piece: the four cells that complete row 37.
+    // It used to be lock 2 with no cells at all, against boards that jumped from the roof state
+    // to `emptyBoard()` and back — a sequence no game produces, which stopped mattering the
+    // moment the rule began walking the window instead of reading its two endpoints.
+    locks.push({ frame: i * 100, piece: i === tLock ? 'T' : 'I',
+      cells: i === tLock ? T_CELLS : i === 3 ? CLEAR_CELLS : [],
+      cleared: i === 3 ? 1 : (i === tLock ? 2 : 0), spin: i === tLock ? 'full' : 'none' });
     const g = Array.from({ length: H }, () => new Array<number | null>(10).fill(null));
     if (i === tLock - 1) g[T_CELLS[1]!.row - 1]![roofCol] = j;
     provSnaps.push(g);
-    boards.push(i === j ? boardAtJ : (i === tLock - 1 ? (boardAtSpin ?? AFTER) : emptyBoard()));
+    boards.push(i < 3 ? boardAtJ : (boardAtSpin ?? AFTER));
   }
   return { locks, provSnaps, boards, garbageEvents: [], records: [], events: [], topout: false,
     lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
@@ -237,19 +353,30 @@ const mk3 = (rows: Record<number, number[]>) => {
     for (let c = 0; c < 10; c++) if (!empt.includes(c)) b[+r]![c] = 'I';
   return b;
 };
-// verified in splice-demo.ts: BEFORE offers no T-spin, AFTER offers a clean TSD
-const BEFORE = mk3({ 36: [4, 5], 37: [], 38: [3, 4, 5], 39: [4] });
+// verified in splice-demo.ts: BEFORE offers no T-spin, AFTER offers a clean TSD.
+// BEFORE holds a FULL row 37, so it is the board mid-lock — after the piece, before the rows go.
+// PRE_CLEAR is the state the game is actually in beforehand, and CLEAR_CELLS is what closes it.
+const BEFORE    = mk3({ 36: [4, 5], 37: [],           38: [3, 4, 5], 39: [4] });
+const PRE_CLEAR = mk3({ 36: [4, 5], 37: [6, 7, 8, 9], 38: [3, 4, 5], 39: [4] });
+const CLEAR_CELLS = [6, 7, 8, 9].map(col => ({ col, row: 37 }));
 const AFTER  = mk3({ 37: [4, 5], 38: [3, 4, 5], 39: [4] });
 
 test('fixture sanity: the engine agrees BEFORE has no T-spin and AFTER does', () => {
   expect(tspinAvailable(BEFORE as any)).toBe(false);
   expect(tspinAvailable(AFTER as any)).toBe(true);
+  // and the state before the clearing piece offers none either — the notch is roofed over, so
+  // the improvement cannot be credited to anything already present
+  expect(tspinAvailable(PRE_CLEAR as any)).toBe(false);
 });
 
-test('STRICT: no T-spin was available when the roof was placed -> forecast', () => {
-  const r = forecastMetric(mkBoards(BEFORE));
+test('STRICT: the clear FORMED the slot — a cleared row lay strictly inside it', () => {
+  // This is the surviving mechanism, and the only one of the corpus's 86 line-clear-labelled
+  // events that turned out to be real: the roof and the cavity were separated by one full row,
+  // and removing it brought them together. The T is not reachable before the clear at all.
+  const r = forecastMetric(mkBoards(PRE_CLEAR));
   expect(r.records[0]!.determinable).toBe(true);
   expect(r.records[0]!.slotOpenedLater).toBe(true);
+  expect(r.records[0]!.mechanism).toBe('line-clear');
   expect(r.records[0]!.kind).toBe('forecast_lineclear');
 });
 

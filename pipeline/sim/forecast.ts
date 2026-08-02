@@ -15,17 +15,21 @@
  *   the T tucks under), via the provenance grid. Then:
  *     1. did the best available T-spin IMPROVE between j and k? (not merely "was one absent at j",
  *        which discards the wiki's own 1 -> 2 upgrade examples)
- *     2. if so, is the mechanism established?
- *          forecast_garbage   — removing every garbage row strictly reduces what is available at
- *                               k, so the garbage is LOAD-BEARING. Counterfactually verified, and
- *                               validated against the wiki's five garbage pairs, where stripping
- *                               the appended line reproduces the article's own "before" value.
- *          forecast_lineclear — a clear occurred in (j, k] and the garbage is not load-bearing.
- *                               CO-OCCURRENCE ONLY: un-clearing a row needs a re-simulation, not a
- *                               board edit, so this bucket is reported separately and is NOT in
- *                               `forecastRate`. It carries the confound the garbage branch shed.
- *          self_built         — improved, but neither mechanism explains it. Openers land here.
+ *     2. if so, WHICH STEP raised it, and which edit within that step? See `localiseMechanism`.
+ *        The window is not treated as one opaque interval — it is walked, and the single step
+ *        that produced the executed spin is decomposed into place -> clear -> insert garbage.
+ *          forecast_garbage   — the availability crossed on the garbage insertion.
+ *          forecast_lineclear — it crossed on the row removal, and a cleared row lay strictly
+ *                               inside the slot, so the clear FORMED it rather than moving it.
+ *          self_built         — it crossed on the player's own placement. Openers land here.
  *     3. otherwise `reactive` — the spin on offer did not get better.
+ *
+ * Both forecast kinds now rest on the same evidence. Until 2026-08-02 the garbage branch was
+ * counterfactually tested while the line-clear branch merely asserted co-occurrence, because
+ * un-clearing a row looked impossible — the rows are gone and the player's later inputs were
+ * conditioned on the clear. Localising the step dissolves that: at the step itself the pre-clear
+ * board is just the previous board plus four cells, so no re-simulation is needed. Auditing the
+ * 86 events that assertion had produced found 85 were the player's own placement and 1 was real.
  *   `separation` = k - j in pieces. Note it is NOT evidence of intent on its own: the corpus's
  *   longest separations are openers.
  *
@@ -41,8 +45,8 @@ import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.t
  * Mirrors splice-demo.ts, which verified the BEFORE board offers none and the AFTER board
  * (identical overhang + cavity, one full row removed between them) offers a clean TSD.
  */
-export function bestTspinLines(board: Board): number {
-  let best = 0;
+export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
+  let best = 0, bestRows: number[] = [];
   const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
   const seen = new Set(['0:3:18']);
   const q: { p: ActivePiece; rot: boolean; kick: boolean }[] = [{ p: spawn, rot: false, kick: false }];
@@ -51,9 +55,16 @@ export function bestTspinLines(board: Board): number {
     const d = hardDrop(board, cur);
     if (d.row === cur.row && rot && detectTSpin(board, d, true, kick) !== 'none') {
       const after = board.map(r => [...r]) as (string | null)[][];
-      for (const c of getPieceCells(d)) if (c.row >= 0 && c.row < H) after[c.row]![c.col] = 'T';
+      const cells = getPieceCells(d);
+      for (const c of cells) if (c.row >= 0 && c.row < H) after[c.row]![c.col] = 'T';
       const lines = after.filter(r => r.every(x => x !== null)).length;
-      if (lines > best) best = lines;
+      if (lines > best) {
+        best = lines;
+        // The slot is the T's own cells plus the roof directly above them — the rows a line
+        // clear would have to fall between in order to have FORMED it rather than moved it.
+        const rows = cells.map(c => c.row);
+        bestRows = [...rows, Math.min(...rows) - 1];
+      }
     }
     const nexts: [ActivePiece | null, boolean][] = [
       [tryMove(board, cur, -1, 0), false], [tryMove(board, cur, 1, 0), false],
@@ -64,7 +75,12 @@ export function bestTspinLines(board: Board): number {
       q.push({ p: n, rot: isRot, kick: isRot && (n.col !== cur.col || n.row !== cur.row) });
     }
   }
-  return best;
+  return best > 0 ? { lines: best, rows: bestRows } : null;
+}
+
+/** How many lines the best available T-spin clears; 0 if none is reachable. */
+export function bestTspinLines(board: Board): number {
+  return bestTspin(board)?.lines ?? 0;
 }
 
 /**
@@ -95,8 +111,8 @@ export function tspinAvailable(board: Board): boolean {
 /**
  * `forecast_garbage`   improved, and the garbage is LOAD-BEARING — removing it strictly reduces the
  *                      available spin. Causally verified.
- * `forecast_lineclear` improved, a line cleared in the window, and garbage is not load-bearing.
- *                      **Causality is NOT established** — see `forecastMetric`.
+ * `forecast_lineclear` improved, and the clear FORMED the slot: a cleared row lay strictly inside
+ *                      it, so removing that row is what brought roof and cavity together.
  * `self_built`         improved, but the player built the slot themselves. Openers land here.
  * `reactive`           the available spin did not improve between roof and execution.
  */
@@ -109,6 +125,8 @@ export interface ForecastRecord {
   availAtRoof?: number; availAtSpin?: number;
   /** removing every garbage row strictly reduces what is available at execution */
   garbageLoadBearing?: boolean;
+  /** which of the causing step's three edits raised the availability, and which step that was */
+  mechanism?: Mechanism; mechanismStep?: number;
 }
 
 /**
@@ -118,10 +136,7 @@ export interface ForecastRecord {
  * kind is dangerous and why it is now a function: a new kind silently joined the forecast bucket
  * under the old idiom, which is exactly how openers got counted in the first place.
  */
-export const isVerifiedForecast = (r: ForecastRecord) => r.kind === 'forecast_garbage';
-
-/** Adds the line-clear bucket, whose causality this simulator cannot test. Report it separately. */
-export const isForecastOrUnverified = (r: ForecastRecord) =>
+export const isVerifiedForecast = (r: ForecastRecord) =>
   r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear';
 
 /** Every row containing a garbage cell removed, stack shifted down — the counterfactual board. */
@@ -129,6 +144,93 @@ export function withoutGarbage(board: Board): Board {
   const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));
   const pad = Array.from({ length: board.length - kept.length }, () => Array(10).fill(null));
   return [...pad, ...kept] as Board;
+}
+
+/**
+ * Which mechanism raised the available spin — read off the game, not inferred from a window.
+ *
+ * The counterfactual above answers "is the garbage load-bearing AT EXECUTION", which is a sound
+ * question but the wrong moment, and it has no analogue for a line clear at all. Both limits come
+ * from treating the whole roof-to-spin window as one opaque interval and asking what co-occurred
+ * inside it. They dissolve once the window is walked: `boards[t]` exists after every lock, so the
+ * step at which the executed spin became available is observable, and within that one step the
+ * simulator does place -> clear -> insert garbage before snapshotting (sim.ts). So the step
+ * decomposes into a chain of three edits, each exactly reconstructible:
+ *
+ *     A    = boards[t-1]                    before the piece
+ *     Bpre = A + the locked cells           placed, nothing removed
+ *     B    = Bpre minus its full rows       placed and cleared
+ *     C    = boards[t]                      and garbage inserted
+ *
+ * Whichever link the availability crosses IS the mechanism. Nothing is hypothesised: when no
+ * garbage arrives, B must equal C cell-for-cell, and `forecastMetric` asserts exactly that.
+ *
+ * `t` is the step at which the final availability is reached AND HELD to execution, not merely
+ * the last step it rose: availability spikes and falls back as the stack changes, and the step
+ * that created a slot the player then destroyed is not the step that produced what they executed.
+ *
+ * The one inconclusive link is Bpre, which still holds the full rows and so blocks the T's path
+ * down from spawn. That artifact can only LOWER avail(Bpre), so reaching the target there proves
+ * the placement alone sufficed, while failing to reach it proves nothing — and is settled
+ * geometrically instead: a clear forms a slot only if a cleared row lies strictly INSIDE it. A
+ * cleared row outside the slot's own rows displaces the slot rigidly and cannot have formed it.
+ * Where neither the clear nor the piece touches the slot, the answer is `unattributed` rather
+ * than a default: an `else` that quietly returns 'placement' is how the opener confound survived
+ * the first time.
+ */
+export type Mechanism = 'garbage' | 'line-clear' | 'placement' | 'unattributed';
+
+export function localiseMechanism(
+  r: SimResult, j: number, k: number, target: number, avail: (t: number) => number,
+): { step: number; mechanism: Mechanism } {
+  let t = k - 1;
+  while (t > j && avail(t - 1) >= target) t--;
+  // `improved` guarantees avail(j) < target, so the walk always halts above the roof.
+  if (t <= j) return { step: t, mechanism: 'unattributed' };
+
+  const A = r.boards[t - 1]!, lk = r.locks[t]!;
+  const Bpre = A.map(row => [...row]) as Board;
+  for (const c of lk.cells) if (c.row >= 0 && c.row < H) Bpre[c.row]![c.col] = lk.piece as never;
+  const clearedRows = Bpre.map((row, i) => row.every(x => x !== null) ? i : -1).filter(i => i >= 0);
+  const B = Bpre.map(row => [...row]) as Board;
+  for (const row of [...clearedRows].reverse()) B.splice(row, 1);
+  for (let i = 0; i < clearedRows.length; i++) B.unshift(Array(10).fill(null) as never);
+
+  // The reconstruction is asserted, never assumed. If these ever fire, the step model is wrong
+  // and every mechanism verdict computed from it is fiction — which is exactly the failure that
+  // would otherwise present as a plausible reclassification rather than as an error.
+  const C = r.boards[t]!;
+  const gcells = (b: Board) => b.reduce((n, row) => n + row.filter(c => (c as unknown as string) === 'G').length, 0);
+  const garbageArrived = gcells(C) > gcells(B);
+  if (clearedRows.length !== lk.cleared)
+    throw new Error(`step ${t}: lock cleared ${lk.cleared} rows but the reconstruction found ${clearedRows.length}`);
+  if (!garbageArrived && !B.every((row, i) => row.every((c, x) => c === C[i]![x])))
+    throw new Error(`step ${t}: reconstruction diverges from boards[${t}] with no garbage inserted`);
+
+  if (bestTspinLines(Bpre) >= target) return { step: t, mechanism: 'placement' };
+
+  if (bestTspinLines(B) >= target) {
+    const slot = bestTspin(B);
+    if (!slot) return { step: t, mechanism: 'unattributed' };
+    // Map the slot's rows back into Bpre's frame: a Bpre row p lands at p + #{cleared rows below}.
+    const back = (rB: number) => {
+      for (let p = 0; p < H; p++) if (p + clearedRows.filter(cr => cr > p).length === rB) return p;
+      return rB;
+    };
+    const ps = slot.rows.map(back);
+    if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))
+      return { step: t, mechanism: 'line-clear' };
+    // The clear only displaced the slot, so the piece must have formed it — but only if the
+    // piece actually went near it. Otherwise neither did, and that is a finding.
+    const touches = lk.cells.some(c => {
+      const rB = c.row + clearedRows.filter(cr => cr > c.row).length;
+      return slot.rows.includes(rB) || slot.rows.includes(rB - 1) || slot.rows.includes(rB + 1);
+    });
+    return { step: t, mechanism: touches ? 'placement' : 'unattributed' };
+  }
+
+  if (avail(t) >= target && garbageArrived) return { step: t, mechanism: 'garbage' };
+  return { step: t, mechanism: 'unattributed' };
 }
 
 /**
@@ -140,13 +242,22 @@ export function forecastMetric(r: SimResult, strict = true): {
   records: ForecastRecord[];
   totals: Record<ForecastKind, number>;
   tspins: number;
-  /** verified only: garbage counterfactually shown to be load-bearing */
+  /** improvements the step model could not explain — must be 0, and is published so it can't hide */
+  unattributed: number;
+  /** both mechanism-established kinds: garbage and line-clear, localised to the causing step */
   forecastRate: number;
-  /** verified + the untestable line-clear bucket. Never print this as "the" rate. */
-  unverifiedRate: number;
 } {
   const records: ForecastRecord[] = [];
   const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0 };
+  // Localising a mechanism walks back through the window re-evaluating boards the endpoints
+  // already visited, and consecutive events share most of their windows. Memoised per call:
+  // the boards are immutable, so this is arithmetic-identical to recomputing.
+  const availCache = new Map<number, number>();
+  const avail = (t: number) => {
+    let v = availCache.get(t);
+    if (v === undefined) { v = bestTspinLines(r.boards[t]!); availCache.set(t, v); }
+    return v;
+  };
 
   for (let k = 0; k < r.locks.length; k++) {
     const lk = r.locks[k]!;
@@ -186,51 +297,54 @@ export function forecastMetric(r: SimResult, strict = true): {
     const boardJ = j >= 0 ? r.boards[j] : null;
     const boardK = k > 0 ? r.boards[k - 1] : null;
     const determinable = !!(boardJ && boardK);
-    const availAtRoof = boardJ ? bestTspinLines(boardJ) : 0;
-    const availAtSpin = boardK ? bestTspinLines(boardK) : 0;
+    const availAtRoof = boardJ ? avail(j) : 0;
+    const availAtSpin = boardK ? avail(k - 1) : 0;
     // `strict` selects the causal rule; loose keeps the original co-occurrence behaviour so
     // LOOSE=1 still reproduces the pre-correction numbers for comparison (auc.ts, run-forecast.ts).
     const improved = (strict && determinable)
       ? availAtSpin > availAtRoof
       : (clearBetween || garbageBetween);
 
-    // Is the garbage LOAD-BEARING? Strip every garbage row and re-ask. If the spin is unchanged,
-    // the garbage cannot have created it, however much of it arrived in the window.
-    //
-    // `garbageBetween` alone is CO-OCCURRENCE, not causation, and at a median separation of ~11
-    // pieces some garbage arriving is near-certain — so every memorised opener (the C-Spin builds
-    // its overhang from L and J in the first bag) was being labelled forecast_garbage by default.
-    // This counterfactual is validated against the wiki's own boards: stripping the appended
-    // garbage line reproduces the article's "before" value in all five of its garbage pairs.
+    // Strip every garbage row and re-ask: if the spin is unchanged, the garbage at EXECUTION
+    // cannot be holding it up. This no longer classifies anything — `localiseMechanism` does —
+    // but it is kept, and recorded, as an independent second opinion on the garbage branch. It is
+    // the one instrument here validated directly against the wiki's own boards (stripping the
+    // appended garbage line reproduces the article's "before" value in all five of its garbage
+    // pairs), so it is worth keeping as an oracle even though it answers at the wrong moment:
+    // garbage that made a slot and was then cleared away leaves it nothing to remove. One source
+    // of truth classifies; this one observes, and a test asserts the two agree on the corpus.
     const garbageLoadBearing = !!(boardK && garbageBetween
       && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);
+
+    // Which of the three edits in the causing step did it? Direct observation replaces both the
+    // execution-time counterfactual AND the co-occurrence assertion, so the two forecast kinds
+    // now rest on the same evidence instead of one being tested and the other asserted.
+    const loc = (strict && determinable && improved)
+      ? localiseMechanism(r, j, k, availAtSpin, avail) : null;
 
     // Loose mode: the original rule verbatim, co-occurrence and all.
     const kind: ForecastKind = !(strict && determinable)
       ? (!improved ? 'reactive' : garbageBetween ? 'forecast_garbage'
          : clearBetween ? 'forecast_lineclear' : 'reactive')
       : !improved ? 'reactive'
-      : garbageLoadBearing ? 'forecast_garbage'
-      // No equivalent counterfactual exists for a line clear — un-clearing a row cannot be done
-      // by editing the board, only by re-simulating a round whose inputs were conditioned on the
-      // clear happening. So this bucket asserts CO-OCCURRENCE ONLY and is reported separately;
-      // it carries the same opener confound the garbage branch just had removed.
-      : clearBetween ? 'forecast_lineclear'
-      // Improved, but neither mechanism accounts for it: the player built the slot. Openers.
+      : loc!.mechanism === 'garbage' ? 'forecast_garbage'
+      : loc!.mechanism === 'line-clear' ? 'forecast_lineclear'
+      // `placement` is the player building their own slot — openers land here. So does
+      // `unattributed`, which must stay COUNTED rather than folded away: it means the step model
+      // failed to explain an improvement, and a metric that cannot say so will never be corrected.
       : 'self_built';
 
     totals[kind]++;
     records.push({ lockIndex: k, frame: lk.frame, lines: lk.cleared, spin: lk.spin,
       kind, separation: j >= 0 ? k - j : -1, roofFrom: j >= 0 ? j : null, roofIsGarbage,
-      slotOpenedLater: improved, determinable, availAtRoof, availAtSpin, garbageLoadBearing });
+      slotOpenedLater: improved, determinable, availAtRoof, availAtSpin, garbageLoadBearing,
+      mechanism: loc?.mechanism, mechanismStep: loc?.step });
   }
   const tspins = records.length;
-  // `forecastRate` is the VERIFIED rate — garbage whose removal changes the answer. The
-  // line-clear bucket is deliberately excluded from the headline because its mechanism is
-  // asserted rather than tested; it is returned separately so a caller must opt in to it.
-  const verified = totals.forecast_garbage;
-  const unverified = totals.forecast_lineclear;
-  return { records, totals, tspins,
-           forecastRate: tspins ? verified / tspins : 0,
-           unverifiedRate: tspins ? (verified + unverified) / tspins : 0 };
+  // Both forecast kinds are now mechanism-established, so both count. The distinction that used
+  // to matter — tested vs asserted — is gone, and with it the reason to publish two rates.
+  const verified = totals.forecast_garbage + totals.forecast_lineclear;
+  const unattributed = records.filter(x => x.mechanism === 'unattributed').length;
+  return { records, totals, tspins, unattributed,
+           forecastRate: tspins ? verified / tspins : 0 };
 }

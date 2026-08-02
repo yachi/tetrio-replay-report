@@ -90,12 +90,20 @@ export interface ClusterStat {
   d: number | null;
 }
 
+/** Smallest arm a cluster contrast may be computed from; below it the answer is null. */
+export const MIN_ARM = 5;
+
 /** cluster-robust two-sample comparison; clusters are player-rounds (events within a round
- *  share a board and are not independent). Returns null when either arm is empty — there is
- *  no difference between a group and nothing. */
+ *  share a board and are not independent). Returns null when either arm is too small — there is
+ *  no difference between a group and nothing, and none worth quoting between a group and one. */
 export function clusterTest(evs: Ev[], sel:(e:Ev)=>number, label:string): ClusterStat | null {
   const F = evs.filter(e=>e.forecast), R = evs.filter(e=>!e.forecast);
-  if (!F.length || !R.length) return null;
+  // An emptiness check alone let an arm of ONE through. When the line-clear audit left 2026-07-28
+  // with a single forecast event, this reported "forecast sends 0.751 more attack, 95% CI
+  // [0.470, 1.116], excludes zero" — a contrast between 145 events and one, whose forecast arm has
+  // no within-arm variance and whose every bootstrap resample draws that same event. Null is the
+  // honest answer, and null renders here as an absence rather than as a zero.
+  if (F.length < MIN_ARM || R.length < MIN_ARM) return null;
   const d = mean(F.map(sel)) - mean(R.map(sel));
   const clusters = [...new Set(evs.map(e=>e.round))];
   // cluster bootstrap over player-rounds, deterministic seed for reproducibility

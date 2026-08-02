@@ -42,8 +42,10 @@ const MUTANTS: Mutant[] = [
 
   // --- the line-clear requirement now lives only in bestTspinLines ---
   { name: 'best/no-lineclear-req', note: 'a T-spin that clears nothing counts',
-    find: `      if (lines > best) best = lines;`, nth: 1,
-    repl: `      best = Math.max(best, Math.max(lines, 1));` },
+    find: `      if (lines > best) {
+        best = lines;`, nth: 1,
+    repl: `      if (lines >= best) {
+        best = Math.max(lines, 1);` },
 
   // --- forecastMetric classifier ---
   { name: 'metric/roof-oldest-builder', note: 'roof attributed to the earliest placer, not the latest',
@@ -59,9 +61,52 @@ const MUTANTS: Mutant[] = [
     find: `    const improved = (strict && determinable)`, nth: 1,
     repl: `    const improved = (false && determinable)` },
 
-  // --- the causal test. These are the mutants that matter most: the whole 2026-08-02 correction
-  //     is that co-occurrence was standing in for causation, so a harness that cannot kill a
-  //     reversion to co-occurrence would not have caught the original defect either.
+  // --- the mechanism localisation: which STEP raised the availability, and which of that step's
+  //     three edits did it. These are the mutants that matter most: the whole 2026-08-02
+  //     correction is that co-occurrence was standing in for causation, so a harness that cannot
+  //     kill a reversion to co-occurrence would not have caught the original defect either.
+  { name: 'metric/lineclear-co-occurrence', note: 'THE original defect: a clear in the window counts',
+    find: `      : loc!.mechanism === 'line-clear' ? 'forecast_lineclear'`, nth: 1,
+    repl: `      : clearBetween ? 'forecast_lineclear'` },
+  { name: 'metric/garbage-step-co-occurrence', note: 'garbage anywhere in the window counts',
+    find: `      : loc!.mechanism === 'garbage' ? 'forecast_garbage'`, nth: 1,
+    repl: `      : garbageBetween ? 'forecast_garbage'` },
+  { name: 'metric/localise-no-straddle', note: 'any clear at the step FORMED the slot',
+    find: `    if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))`, nth: 1,
+    repl: `    if (clearedRows.length > 0)` },
+  { name: 'metric/localise-straddle-inverted', note: 'the slot-spanning test answers the opposite',
+    find: `    if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))`, nth: 1,
+    repl: `    if (!clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))` },
+  // `metric/localise-skip-placement` (dropping the `avail(Bpre) >= target` early return) is
+  // equivalent for every step in the corpus, and the proof is again the reconstruction assertion:
+  // when the causing step clears nothing, B IS Bpre, so the next branch runs the identical test.
+  // All 388 placement attributions across the four sessions land on steps that cleared nothing.
+  // It could only ever differ at a step that BOTH places and clears, where the board offers a
+  // second independent slot straddling the cleared row while the piece's own slot already meets
+  // the target — a shape neither the fixtures nor 654 real events contain. Left unlisted rather
+  // than as a permanent survivor, because a survivor list that always has entries stops being read.
+  { name: 'metric/localise-unattributed-guessed', note: 'an unexplained improvement defaults to the piece',
+    find: `    return { step: t, mechanism: touches ? 'placement' : 'unattributed' };`, nth: 1,
+    repl: `    return { step: t, mechanism: 'placement' };` },
+  // `metric/localise-garbage-unguarded` (dropping `&& garbageArrived`) is EQUIVALENT, and the
+  // proof is the reconstruction assertion above it: with no garbage inserted B is asserted equal
+  // to C, so avail(C) = avail(B), and control only reaches that line once avail(B) < target. The
+  // guard therefore cannot change an outcome. It stays in the source as documentation of the
+  // branch's precondition; it is not listed here, because a mutant nothing can kill is noise
+  // that trains the reader to expect survivors.
+  { name: 'metric/localise-first-step', note: 'blames the step after the roof rather than the causing one',
+    find: `  while (t > j && avail(t - 1) >= target) t--;`, nth: 1,
+    repl: `  while (t > j + 1) t--;` },
+  { name: 'metric/localise-any-rise', note: 'stops at the last rise, not the level that HELD to execution',
+    find: `  while (t > j && avail(t - 1) >= target) t--;`, nth: 1,
+    repl: `  while (t > j && avail(t - 1) >= avail(t)) t--;` },
+  { name: 'metric/reconstruction-unchecked', note: 'the step model may silently disagree with the game',
+    find: `  if (!garbageArrived && !B.every((row, i) => row.every((c, x) => c === C[i]![x])))`, nth: 1,
+    repl: `  if (false)` },
+
+  // --- the execution-time counterfactual. It no longer classifies anything, but it is still
+  //     RECORDED as an independent second opinion on the garbage branch, and the tests assert
+  //     it — so these mutants stay live and guard the oracle rather than the classifier.
   { name: 'metric/garbage-co-occurrence', note: 'reverts to "garbage arrived", the original bug',
     find: `    const garbageLoadBearing = !!(boardK && garbageBetween
       && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);`, nth: 1,
@@ -73,7 +118,8 @@ const MUTANTS: Mutant[] = [
     find: `  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));`, nth: 1,
     repl: `  const kept = board.filter(() => true);` },
   { name: 'metric/self-built-counted', note: 'openers rejoin the forecast bucket',
-    find: `export const isVerifiedForecast = (r: ForecastRecord) => r.kind === 'forecast_garbage';`, nth: 1,
+    find: `export const isVerifiedForecast = (r: ForecastRecord) =>
+  r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear';`, nth: 1,
     repl: `export const isVerifiedForecast = (r: ForecastRecord) => r.kind !== 'reactive';` },
 ];
 
@@ -86,7 +132,12 @@ function replaceNth(src: string, find: string, nth: number, repl: string): strin
   return src.slice(0, idx) + repl + src.slice(idx + find.length);
 }
 
-const TESTS = process.argv.slice(2).length ? process.argv.slice(2) : ['forecast.test.ts', 'wiki-fixtures.test.ts'];
+// forecast-corpus.test.ts is in the default set deliberately. Hand-built fixtures cannot reach
+// the shapes 654 real events do, and two mutants survived the fixture-only suite while changing
+// the corpus classification — which is the failure mode that matters, since the corpus is what
+// the report quotes.
+const TESTS = process.argv.slice(2).length ? process.argv.slice(2)
+  : ['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts'];
 const original = readFileSync(SRC, 'utf8');
 copyFileSync(SRC, BAK);
 

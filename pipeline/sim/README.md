@@ -19,8 +19,8 @@ than living inside one. Every runner therefore needs `REPLAY_DIR`.
 cd pipeline/sim
 set -x REPLAY_DIR (git rev-parse --show-toplevel)/sessions/2026-07-22
 
-bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
-bun run mutate-forecast.ts forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts
+bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts forecast-corpus.test.ts
+bun run mutate-forecast.ts   # defaults to the fixture files PLUS forecast-corpus.test.ts
 bun run run-forecast.ts
 bun run auc.ts
 bun run auc-power.ts     # read this before quoting any AUC
@@ -50,8 +50,8 @@ Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08
 
 | command | result |
 |---|---|
-| the three test files | 29 pass, 0 fail, 466 assertions |
-| `mutate-forecast.ts` | 11/11 killed |
+| the four test files | 39 pass, 0 fail, 502 assertions |
+| `mutate-forecast.ts` | 24/24 killed |
 | `run-forecast.ts` | pinglamb 97 tucked / 13 forecast / 13.4% · yachi 115 / 14 / 12.2% |
 | `auc.ts` | 58.6 · 57.7 · 52.5 · 57.0 · 55.7 |
 
@@ -73,7 +73,7 @@ the rounding, or the metric set changes, and date it.
 
 ## What is verified, and how
 
-- **Mutation — 11/11.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
+- **Mutation — 24/24.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
   The harness validates itself with control mutants: three semantics-preserving edits must
   **survive** and a poison mutant (spawn column 3→9) must **die**. A sweep where everything dies
   is a syntax error, not a passing gate.
@@ -107,7 +107,8 @@ match-level rate. `validate.ts` is what establishes which prefixes are trustwort
 | | |
 |---|---|
 | `sim.ts` | the replay simulator — RNG, board, attack table, garbage |
-| `forecast.ts` | the metric: `bestTspinLines`, `tspinAvailable`, `forecastMetric` |
+| `forecast.ts` | the metric: `bestTspin`, `localiseMechanism`, `forecastMetric` |
+| `audit-mechanism.ts` | reports which mechanism raised each improved event, across the sweep |
 | `forecast-boards.ts` | re-export shim so fixtures import one surface |
 | `*.test.ts` | unit, external-golden, and property suites |
 | `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |

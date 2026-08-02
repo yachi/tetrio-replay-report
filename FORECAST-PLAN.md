@@ -326,14 +326,49 @@ reliable garbage signature in the diagrams is the appended full-row-with-one-hol
 265 reactive. The binary availability test was replaced by an improvement test, which also admits
 the wiki's 1 -> 2 upgrades. 16/16 mutants killed, including a straight reversion to co-occurrence.
 
-**STILL OPEN: the 86 line-clear events are unaudited.** They assert co-occurrence only and carry
-the same opener confound. Excluded from `forecastRate` and reported separately, so the published
-figure is unaffected — but the bucket is un-verified, not zero-verified. No board edit can
-un-clear a line (the rows are gone and the player's later inputs were conditioned on the clear),
-so closing it needs re-simulation with the clear suppressed, or a cheaper proxy: a provenance test
-on the cells bounding the slot, or restricting to clears whose rows lie between the roof and the
-slot where a splice is geometrically possible at all. Prediction, recorded in advance: 0 survivors,
-because the same opener mechanism explains them.
+**CLOSED 2026-08-02: the 86 line-clear events audited — 85 were the player's own piece, 1 is real.**
+
+The prediction recorded in advance was 0 survivors. The answer is 1, so the prediction was wrong
+in the direction that matters: a rate of exactly zero was not the safe assumption it looked like.
+
+Closing it did not need the re-simulation this item assumed, because the premise was wrong. "No
+board edit can un-clear a line" holds only while the window is treated as one opaque interval.
+`boards[t]` exists after every lock, so the step at which the executed spin became available can be
+found by walking the window — and *at that step* the pre-clear board is just the previous board
+plus the four locked cells. Un-clearing is impossible retroactively and trivial in place. Within
+one step the simulator does place → clear → insert garbage before snapshotting, so the step
+decomposes into three exactly-reconstructible edits, and whichever one the availability crosses IS
+the mechanism. No counterfactual is needed, and the reconstruction is asserted rather than assumed:
+with no garbage inserted, the rebuilt board must equal the real one cell-for-cell.
+
+The one survivor, hand-checked against the boards: `pinglamb`, `replay-2026-07-28-6.ttrm` round 5.
+An L at lock 19 leaves an overhang; a full row sits between that overhang and the notch for twelve
+pieces; a vertical I at lock 31 completes and clears that row in column 1, far from the slot; the
+overhang settles onto the notch (availability 0 → 2) and the T goes in at lock 32. It survives 6 of
+the 7 simulator configs — under `frame_clock` the round fails verification outright rather than
+being reclassified — and it sits at lock 32 with the verified prefix ending at exactly lock 32,
+i.e. the last provable placement of its round.
+
+Corpus after the audit: **0 garbage / 1 line-clear / 388 self_built / 265 reactive**. Published
+rate 1/654: pinglamb 1/78 = 1.2% [0.0%, 7.0%] in 2026-07-28, zero everywhere else. Both forecast
+kinds now rest on the same evidence, so the "verified vs unverified" split and its second rate are
+gone. 24/24 mutants killed; two were dropped as proven equivalent, each proof resting on the
+reconstruction assertion. A corpus-level regression test pins the buckets, because no hand-built
+fixture reaches the shapes 654 real events do — two mutants survived the fixture-only suite while
+changing the corpus classification.
+
+**Newly surfaced, quantified rather than fixed:** the `improved` gate compares a single number
+either side of the window, so garbage that REPLACES one two-line spin with another leaves it
+unmoved even though the executed spin depended on that garbage. One event of 654, found by the
+execution-time counterfactual disagreeing with the gate, and pinned by a test. Closing it means
+asking whether the EXECUTED spin depended on the mechanism rather than whether the best-available
+scalar rose — a different metric, not a patch to this one.
+
+**Caught by looking at the rendered page, not by any gate:** the sensitivity sweep kept measuring
+the garbage bucket after the printed rate became garbage + line-clear, so the section rendered
+1.2% beside a simulator range of [0.0%, 0.0%] and a sentence asserting all seven configs agreed;
+and the table header still read 「垃圾造成嘅」, which labelled a clear-formed event as
+garbage-caused. Both are now gated — the range must bracket the rate it is printed beside.
 
 *Original remedy list, for the record:*
 

@@ -252,12 +252,14 @@ def _mechanism_clause(data):
     """Why the verified count is what it is, and where the other T-spins went.
 
     Added 2026-08-02 with the causal correction. Without it a reader sees 0.0% beside a table of
-    real T-spins and has no way to tell a measurement from a bug.
+    real T-spins and has no way to tell a measurement from a bug. Rewritten later the same day
+    when localising the mechanism to a single step replaced the counterfactual, and the line-clear
+    bucket stopped being untestable — 85 of its 86 events turned out to be the player's own piece.
     """
     ps = data["players"]
     tot = sum(p["verified_tspins"] for p in ps)
     fg = sum(p.get("forecast_garbage", 0) for p in ps)
-    lc = sum(p.get("forecast_lineclear_unverified", 0) for p in ps)
+    lc = sum(p.get("forecast_lineclear", 0) for p in ps)
     sb = sum(p.get("self_built", 0) for p in ps)
     re_ = sum(p.get("reactive", 0) for p in ps)
     if not tot:
@@ -265,24 +267,33 @@ def _mechanism_clause(data):
     parts = [
         "<strong>「Forecast」要求個窿位係<em>由外力</em>整出嚟嘅</strong>——"
         "即係垃圾升起或者消行，唔係自己砌出嚟。"
-        "所以每一個可核 T-spin 都用反事實驗一次：<strong>抽走所有垃圾行再問多次</strong>，"
-        "個窿位仲喺度嘅話，就唔係垃圾造成。"
-        "呢個做法用維基自己嘅五組 garbage 對照圖驗證過——抽走嗰行垃圾之後，"
-        "計出嚟啱啱好等於維基自己嗰張「之前」圖。",
+        "所以唔係問「嗰段時間有冇垃圾、有冇消行」，而係<strong>逐格倒帶</strong>："
+        "每落一隻棋都有一張板，搵返個 T-spin 係<em>邊一步</em>先至出現；"
+        "而喺嗰一步入面，模擬器係先落棋、再消行、最後升垃圾，"
+        "所以嗰三個動作可以逐個拆開，睇個窿位到底邊個動作整出嚟。"
+        "咁樣就唔使靠反事實：三張中間板都係由上一張板砌返出嚟，"
+        "而且當嗰步冇垃圾升起嘅時候，砌返出嚟嗰張<strong>一定要同實際嗰張逐格一樣</strong>——"
+        "呢點係查咗先算數，唔係當佢啱。",
         f"喺呢個 session 全部 {tot} 個可核 T-spin 入面："
-        f"<strong>{fg} 個</strong>係垃圾真係造成個窿位（呢個先係下面表入面嘅數）；"
-        f"{lc} 個喺窗口入面有消行，但<strong>消行冇得用反事實驗</strong>"
-        "（要重跑成局，唔係改吓個板就得），所以另計、唔當數；"
-        f"{sb} 個係<strong>玩家自己砌出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
+        f"<strong>{fg} 個</strong>係垃圾造成個窿位；"
+        f"<strong>{lc} 個</strong>係消行造成——消嗰行啱啱夾喺天花板同窿位中間，"
+        "消走咗兩者先貼埋一齊（下面表入面嘅數，就係呢兩種加埋）；"
+        f"{sb} 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
         "個天花板早過個窿位係定式本身嘅砌法，唔係預測；"
         f"其餘 {re_} 個個窿位本身冇變好。",
     ]
-    if fg == 0:
+    if fg + lc == 0:
         parts.append(
-            "<strong>換句話講：呢個 session 冇一個可核 T-spin 嘅窿位係垃圾造成嘅。</strong>"
-            "之前呢節報過嘅 forecast 數，係「垃圾喺窗口入面到過」就算數——"
-            "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有垃圾到，"
+            "<strong>換句話講：呢個 session 冇一個可核 T-spin 嘅窿位係外力造成嘅。</strong>"
+            "之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——"
+            "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有，"
             "所以嗰個數量到嘅係<em>開局定式</em>，唔係預測。")
+    else:
+        parts.append(
+            "要留意：呢個數細到<strong>一兩件事就當唔到係習慣</strong>，"
+            "抽樣區間亦都已經包含咗零，"
+            "所以呢度<strong>唔係話邊個識 forecast</strong>，"
+            "只係話喺可核範圍入面，符合定義嘅情況搵到幾多次。")
     return "".join(parts)
 
 
@@ -313,9 +324,10 @@ def section(data):
         '呢節嘅數係由<strong>一個 replay 模擬器</strong>重跑操作記錄推導出嚟，'
         '得一份實作，冇第二個獨立實作對得上，所以套唔到同一個信任鏈——'
         '亦都因為咁，呢節<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>',
-        '      <p>「Forecast」係指打 T-spin 之前，個窿位<em>當時仲未存在</em>：'
-        '搭個天花板嗰陣打唔到 T-spin，之後靠垃圾行升起或者消行先至浮出嚟。'
-        '對照組叫 reactive，即係位早就喺度。</p>',
+        '      <p>「Forecast」係指打 T-spin 之前，個窿位<em>仲未成形</em>：'
+        '搭個天花板嗰陣打得到嘅 T-spin 冇咁好，之後靠垃圾行升起或者消行先至變好。'
+        '（唔係淨係「本來完全冇」——維基自己嘅例子入面，有啲係本來得一行、'
+        '垃圾升完變兩行，嗰啲一樣算。）對照組叫 reactive，即係個位本身冇變好過。</p>',
         '      <p>' + _headline(data) + _units_clause(data) + _reliability_clause(data) + '</p>',
         '      <p>' + _mechanism_clause(data) + '</p>',
         '      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），'
@@ -328,7 +340,11 @@ def section(data):
         '        <thead>',
         '          <tr>',
         '            <th>玩家</th>',
-        '            <th>垃圾造成嘅 Forecast / 可核 T-spin</th>',
+        # The header names what the numerator IS, and has to be re-read whenever the numerator
+        # changes: it said 「垃圾造成嘅」 for one commit after the line-clear mechanism joined the
+        # count, which made pinglamb's single clear-formed event read as garbage-caused. A column
+        # heading is a factual claim about the column.
+        '            <th>外力造成嘅 Forecast / 可核 T-spin</th>',
         '            <th>比率</th>',
         '            <th>抽樣 95% CI</th>',
         '            <th>模擬器敏感度範圍</th>',

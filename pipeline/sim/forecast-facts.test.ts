@@ -28,7 +28,7 @@ if (!PATH) throw new Error('no sessions/*/sim/forecast-facts.json found, and FOR
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
-  expect(d.schema).toBe('forecast-facts/3');
+  expect(d.schema).toBe('forecast-facts/4');
   // simulator-derived data must never be promoted to a report claim without the
   // dual-extractor rule being satisfied; this flag is the guard
   expect(d.report_eligible).toBe(false);
@@ -62,8 +62,11 @@ test('intervals contain their point estimate, and bounds widened rather than tig
   // legitimately null — there is nothing to compare reactive events against. Assert that
   // explicitly rather than letting an empty list pass as if the checks had run: an empty
   // sample silently satisfying a for-loop is how a gate proves nothing while reporting ok.
+  // An arm too small to have a mean worth comparing yields null contrasts, exactly as an empty
+  // arm does. The threshold lives in `forecast-event-level.ts`; asserting on the emitted
+  // `forecast_n` here keeps the artifact honest without importing the simulator into a guard.
   const forecastN = st.event?.forecast_n ?? 0;
-  if (forecastN === 0) { expect(cs.length).toBe(0); return; }
+  if (forecastN < 5) { expect(cs.length).toBe(0); return; }
   expect(cs.length).toBeGreaterThan(0);
   for (const c of cs) {
     // Negative differences are legal here — this is a signed contrast, not a rate. A consumer
@@ -147,12 +150,16 @@ test('counts are internally consistent and integers', () => {
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
   expect(d.players.length).toBe(2);
   for (const p of d.players) {
-    // forecast_total is VERIFIED forecasts only. The line-clear bucket has untestable
-    // causality and the self_built bucket is the opener case, so neither may be folded in —
-    // doing so is precisely the over-count this schema exists to correct.
-    expect(p.forecast_total).toBe(p.forecast_garbage);
+    // forecast_total is the two MECHANISM-ESTABLISHED kinds, each localised to the step and the
+    // edit within it that raised the availability. self_built must still never be folded in —
+    // that is the opener case, and folding it back is precisely the over-count this schema
+    // exists to correct.
+    expect(p.forecast_total).toBe(p.forecast_garbage + p.forecast_lineclear);
     expect(p.verified_tspins).toBe(
-      p.forecast_garbage + p.forecast_lineclear_unverified + p.self_built + p.reactive);
+      p.forecast_garbage + p.forecast_lineclear + p.self_built + p.reactive);
+    // An improvement the step model cannot explain is a defect in the model, not a category.
+    // If this ever exceeds 0, the buckets below it stop meaning what they say.
+    expect(p.unattributed).toBe(0);
     expect(p.verified_placements).toBeLessThanOrEqual(p.total_placements);
     for (const k of ['forecast_rate_x1000','sampling_ci95_lo_x1000','sampling_ci95_hi_x1000'])
       expect(Number.isInteger(p[k])).toBe(true);
@@ -178,6 +185,18 @@ test('the rate is the floored quotient of the counts it is printed beside', () =
     const r = p.forecast_rate_x1000, n = p.verified_tspins, fc = p.forecast_total;
     expect(r * n).toBeLessThanOrEqual(1000 * fc);
     expect(1000 * fc).toBeLessThan((r + 1) * n);
+  }
+});
+
+test('the simulator range brackets the rate it is printed beside', () => {
+  const d = JSON.parse(readFileSync(PATH, 'utf8'));
+  for (const p of d.players) {
+    // `best` is one of the seven swept configs and is the config the rate itself comes from, so
+    // the range must contain it. It briefly did not: the sweep kept measuring the garbage bucket
+    // after the printed rate became garbage + line-clear, and the section rendered a non-zero
+    // rate beside a zero-width range without any gate objecting.
+    expect(p.simulator_range_lo_x1000).toBeLessThanOrEqual(p.forecast_rate_x1000);
+    expect(p.simulator_range_hi_x1000).toBeGreaterThanOrEqual(p.forecast_rate_x1000);
   }
 });
 

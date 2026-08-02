@@ -1,11 +1,11 @@
 {
-  "schema": "forecast-facts/3",
+  "schema": "forecast-facts/4",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
     "per-round split-half reliability is -0.101 (pinglamb) / 0.014 (yachi), so a per-round column is not possible at this event rate",
-    "no effect at any unit: round AUC p=1.000"
+    "no effect at any unit: round AUC p=1.000, player-level p=1.000"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -36,15 +36,16 @@
       "user": "pinglamb",
       "verified_tspins": 78,
       "forecast_garbage": 0,
-      "forecast_lineclear_unverified": 13,
-      "self_built": 35,
-      "forecast_total": 0,
+      "forecast_lineclear": 1,
+      "self_built": 47,
+      "unattributed": 0,
+      "forecast_total": 1,
       "reactive": 30,
-      "forecast_rate_x1000": 0,
+      "forecast_rate_x1000": 12,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 47,
+      "sampling_ci95_hi_x1000": 70,
       "simulator_range_lo_x1000": 0,
-      "simulator_range_hi_x1000": 0,
+      "simulator_range_hi_x1000": 14,
       "verified_placements": 798,
       "total_placements": 5047
     },
@@ -52,8 +53,9 @@
       "user": "yachi",
       "verified_tspins": 68,
       "forecast_garbage": 0,
-      "forecast_lineclear_unverified": 9,
-      "self_built": 33,
+      "forecast_lineclear": 0,
+      "self_built": 42,
+      "unattributed": 0,
       "forecast_total": 0,
       "reactive": 26,
       "forecast_rate_x1000": 0,
@@ -82,8 +84,8 @@
       "exact_p_x1000": 1000
     },
     "event": {
-      "forecast_n": 0,
-      "reactive_n": 146,
+      "forecast_n": 1,
+      "reactive_n": 145,
       "attack": null,
       "lines": null,
       "balance": {
@@ -92,7 +94,13 @@
       },
       "negative_control": null
     },
-    "player": null,
+    "player": {
+      "user": "pinglamb",
+      "k": 1,
+      "n": 1,
+      "expected_x1000": 534,
+      "exact_p_x1000": 1000
+    },
     "reliability": {
       "split_half_r_x1000": {
         "pinglamb": -101,
