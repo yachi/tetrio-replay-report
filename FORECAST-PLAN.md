@@ -124,7 +124,12 @@ existing dual extractors' 610.
 defect 1 into three more sessions. The rate change cascades: emitter → `sim/forecast-facts.json` →
 the rendered section → `report/report.html` → `docs/2026-07-22.html`.
 
-**P1 — emit `forecast-facts.json` for the other three sessions. BLOCKED, and the blocker is not the
+**P1 — emit `forecast-facts.json` for the other three sessions. DONE 2026-08-02**
+(`7cf7a88`, `0007cf0`, `e5f7a97`, `7b463b8`, `36eb81f`, `917ad7f`, `6cf827d`, `2cf2f27`).
+All four sessions carry the section, rendered entirely from their own data. What this diagnosis
+got right and what it missed is recorded in §6 below.
+
+*The diagnosis, as written before the work:* **BLOCKED, and the blocker is not the
 output path.** `pipeline/forecast_section.py` is a *shared* module, and lines 86–96 hardcode
 2026-07-22's statistics into its Cantonese prose: 「AUC 58.6%，p = 0.210」, the event-level
 「0.52 attack，95% CI [−0.34, 1.28]」, 「p = 0.848」, the split-half 「0.29（pinglamb）同
@@ -235,6 +240,40 @@ coverage beside it.
 **"Sampling-limited, not simulator-limited" is unproven, not established.** The ±1.1–1.2 pp
 seven-config range bounds *fitted-parameter* sensitivity; model-form error was never probed.
 `forecast-facts.test.ts` asserts the claim as if it were established, which overstates it.
+*Partly addressed 2026-08-02 (`e5f7a97`):* the rendered prose no longer says the bottleneck 「唔係
+模擬器準唔準」. It states the ratio it measured and then says outright that the sweep cannot see an
+error all seven configs share. The bun guard's name still overstates what it checks; the claim
+itself remains unprobed.
+
+### What P1 taught, beyond its own scope
+
+**A containment gate cannot catch an invented figure, and this one didn't for four sessions.**
+`check_forecast_section` verified that every JSON figure *appeared* in the HTML. That passes just as
+happily when the section *also* contains figures that came from nowhere — which is what the entire
+method note was. Re-rendering and comparing byte-for-byte is complete where containment is sampled,
+and it is the argument `verify-session` already makes twice (extractor reproduces facts, codegen
+reproduces `.dfy`). Prefer *reproduce and compare* over *look for the expected substring*.
+
+**Hardcoded prose hides two things, and the conclusions are the more dangerous half.** The six
+figures were the visible defect. Underneath them sat 「統計結論係：搵唔到效果」, 「negative control
+有反應」, 「兩個玩家嘅區間幾乎完全重疊」 and 「攞七個設定」 — *conclusions* asserted without
+consulting the data, in a module rendered for every session. Two survived the first pass because they
+are true of all four sessions today. **An assertion that happens to hold is indistinguishable from a
+derivation until the day it does not**, so it cannot be found by reading the output; only by asking
+of each sentence "which field decides this?".
+
+**Both defects the cross-session extension surfaced were in checks, not in the code under test.**
+One rounding rule in the emitter's prose and one in its data disagreed only where a correlation went
+negative (07-24), and the guard's regex dropped the minus sign. The gate's self-test planted figures
+into the whole document, so on any session but 07-22 the plant landed outside the region. Both are
+the same lesson: **a check exercised only against the one input it already passes on has never been
+shown to fail.** The fix in both cases was to derive the check's inputs from the artefact rather than
+write them as constants.
+
+**The corpus answered the round-level question on its own.** All three sessions held out from the
+exploratory work read AUC exactly 50.0% with p = 1.000, against 58.6% on the session the metric was
+developed on; split-half reliability is negative on three of the four players outside 07-22. The
+per-round column does not replicate, and now says so in each session's own numbers.
 
 The one known-missing mechanic cannot currently settle it. `lineclearAre` is plumbed
 (`sim.ts:114`, `:335`) but is in no config; adding it moves the rate 14.5% → 10.3% and halves
@@ -249,8 +288,10 @@ the client, not closer — it is ROADMAP 3c work, not a sensitivity config.
 ## 7. Provenance of the numbers in this document
 
 The per-session counts for 2026-07-24, 2026-07-28 and 2026-08-01 were computed in-session on
-2026-08-02 by pointing the committed instrument at those replay directories. **Only 2026-07-22 has a
-committed `forecast-facts.json` until P1 runs**; every other figure here is reproducible from the
-committed instrument but is not yet a committed artefact. Statistics were computed in R 4.6.1 using
+2026-08-02 by pointing the committed instrument at those replay directories. **All four sessions now
+have a committed `forecast-facts.json`** (P1, 2026-08-02); the figures quoted in this document
+predate those artefacts and were produced by the same instrument, so where the two differ the
+committed artefact is authoritative — notably the p-values, which the schema CEILs (0.210 -> 0.211,
+0.848 -> 0.849) so that a rounded p never overstates significance. Statistics were computed in R 4.6.1 using
 its own exact tests (`binom.test`, `fisher.test`, `prop.test`) rather than hand-rolled tails,
 because this project has twice been bitten by a recalled statistical constant.
