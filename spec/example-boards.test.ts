@@ -149,6 +149,17 @@ test('every tetromino can leave an overhang — the roof is a cell, not a piece'
   expect([...seen].sort()).toEqual(['I', 'J', 'L', 'O', 'S', 'T', 'Z']);
 });
 
+test('the worked examples do not all take their overhang from the same piece', () => {
+  // Every board once used a J, which reads as though the shape were part of the definition. This
+  // is here so a future edit cannot quietly collapse them back to one piece.
+  const roofs = (EXAMPLES as any[]).map(ex => {
+    const p = ex.panels.find((q: any) => q.roof);
+    return p.rows[p.roof[0]][p.roof[1]];
+  });
+  expect({ roofs, distinct: new Set(roofs).size }).toEqual({ roofs, distinct: 6 });
+  expect([...new Set(roofs)].sort()).toEqual(['I', 'J', 'L', 'O', 'S', 'Z']);
+});
+
 test('the Event separations in the Dafny lemmas are the ones the boards draw', () => {
   for (const ex of EXAMPLES as any[]) {
     const first = ex.panels.find((p: any) => p.roof && p.floor);

@@ -14,9 +14,11 @@
 //
 // The definition is blind to which tetromino left the overhang, and could not be otherwise: roofAt
 // is an int, and a filled cell is Stack(placedBy: int) — the index of the LOCK that placed it, never
-// the shape. The boards below lean on the J because its bar-plus-foot is the tidiest way to draw a
-// roof two rows above a hole; example G uses an S instead, and example-boards.test.ts shows all
-// seven pieces leaving one.
+// the shape. The drawn boards take their overhang from six different pieces — J, L, S, O, Z and a
+// flat I — and example-boards.test.ts adds the seventh. Only the T is left out, because a T in the
+// roof reads as a spin. A search over that roof cell found that J, S and I are the only pieces that
+// can leave it without the stack standing one row taller; L, Z, O and T all need the extra row, and
+// the boards that use them are drawn that way.
 //
 // Row numbering matches Forecast.dfy: row 0 is the TOP, larger index is lower on the screen. The
 // boards drawn alongside this file use a 22-row field, so the bottom row is 21:
