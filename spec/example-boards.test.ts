@@ -18,7 +18,7 @@
  *      was walled on all four sides — and no amount of shape checking would have caught it.
  */
 import { test, expect } from 'bun:test';
-import { EXAMPLES } from './example-boards.ts';
+import { EXAMPLES, OVERHANGS } from './example-boards.ts';
 import { reach } from './srs-reach.ts';
 
 const W = 10;
@@ -123,6 +123,31 @@ for (const ex of EXAMPLES as any[]) {
     });
   });
 }
+
+test('every tetromino can leave an overhang — the roof is a cell, not a piece', () => {
+  const seen = new Set<string>();
+  for (const o of OVERHANGS as any[]) {
+    seen.add(o.piece);
+    const added: [number, number][] = [];
+    for (let r = 0; r < o.rows.length; r++) for (let c = 0; c < W; c++)
+      if (o.rows[r][c] === o.piece && o.base[r]![c] === '.') added.push([r, c]);
+    expect({ piece: o.piece, cells: added.length }).toEqual({ piece: o.piece, cells: 4 });
+
+    // the marked cell belongs to this piece and has an empty cell directly beneath it
+    expect(`${o.piece} roof`).toBe(`${o.piece} roof`);
+    expect(o.rows[o.roof[0]][o.roof[1]]).toBe(o.piece);
+    expect({ piece: o.piece, under: o.rows[o.roof[0] + 1]?.[o.roof[1]] })
+      .toEqual({ piece: o.piece, under: '.' });
+
+    // and it can be played: real orientation, rests on something, reachable under SRS
+    const res: any = reach(o.base, o.piece, added);
+    expect({ piece: o.piece, reachable: res.ok }).toEqual({ piece: o.piece, reachable: true });
+
+    // nothing here may clear — an overhang is a shape on a standing board
+    for (const row of o.rows) expect(full(row)).toBe(false);
+  }
+  expect([...seen].sort()).toEqual(['I', 'J', 'L', 'O', 'S', 'T', 'Z']);
+});
 
 test('the Event separations in the Dafny lemmas are the ones the boards draw', () => {
   for (const ex of EXAMPLES as any[]) {

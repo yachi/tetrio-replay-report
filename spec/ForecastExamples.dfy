@@ -12,6 +12,12 @@
 // tetromino orientation, resting on something, and reachable under SRS with its kick tables. That
 // last check is not decorative — it rejected the first board drawn for example D outright.
 //
+// The definition is blind to which tetromino left the overhang, and could not be otherwise: roofAt
+// is an int, and a filled cell is Stack(placedBy: int) — the index of the LOCK that placed it, never
+// the shape. The boards below lean on the J because its bar-plus-foot is the tidiest way to draw a
+// roof two rows above a hole; example G uses an S instead, and example-boards.test.ts shows all
+// seven pieces leaving one.
+//
 // Row numbering matches Forecast.dfy: row 0 is the TOP, larger index is lower on the screen. The
 // boards drawn alongside this file use a 22-row field, so the bottom row is 21:
 //

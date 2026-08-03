@@ -176,13 +176,51 @@ export const EXAMPLES = [
     history: 'Step(clearedRows := [], wasSpin := false, garbageRows := 0)',
     clauses: [true, true, false, false],
     panels: [
-      { cap: 'The J places the overhang directly onto a finished slot — roof, bar row, nose and floor on four consecutive rows.',
-        rows: ['..JJ......', 'XXJ...XXXX', 'XXXX.XXXXX', '.XXXXXXXXX'],
+      { cap: 'The slot is finished apart from its roof: bar row, nose and floor already sit on three consecutive rows.',
+        rows: ['..........', 'X.....XXXX', 'XXXX.XXXXX', '.XXXXXXXXX'],
+        hole: [2, 4], floor: [3, 4] },
+      { cap: 'An S drops its right end straight onto the slot. Nothing in the definition asks which piece this was — the overhang is a cell.',
+        add: 'S',
+        rows: ['..SS......', 'XSS...XXXX', 'XXXX.XXXXX', '.XXXXXXXXX'],
         roof: [0, 3], hole: [2, 4], floor: [3, 4] },
       { cap: 'T-Spin Double. Nothing was ever removed from between the pair, because nothing was ever between them.',
         add: 'T',
-        rows: ['..JJ......', 'XXJTTTXXXX', 'XXXXTXXXXX', '.XXXXXXXXX'],
+        rows: ['..SS......', 'XSSTTTXXXX', 'XXXXTXXXXX', '.XXXXXXXXX'],
         clears: [1, 2] },
     ],
   },
+];
+
+/**
+ * The overhang is a CELL with an empty cell under it, not a piece. Forecast.dfy could not depend on
+ * which tetromino left it even if it wanted to: `roofAt` is an int, and a filled cell is
+ * `Stack(placedBy: int)` — the index of the LOCK that placed it, never the shape.
+ *
+ * The drawn examples lean on the J because its vertical bar plus foot is the tidiest way to leave a
+ * roof two rows above a hole. That is a drafting convenience and nothing more, so here are all seven
+ * pieces leaving an overhang on the same little ledge. Each is checked by the same gates as the
+ * examples: a real orientation, resting on something, and reachable.
+ */
+export const OVERHANGS = [
+  { piece: 'J', roof: [0, 4], how: 'foot right off a vertical bar',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['...JJ.....', '...J......', 'XXXJ......', 'XXXXXXXXX.'] },
+  { piece: 'L', roof: [0, 3], how: 'foot left off a vertical bar',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['...LL.....', '....L.....', 'XXX.L.....', 'XXXXXXXXX.'] },
+  { piece: 'S', roof: [0, 3], how: 'upper half overhanging its own lower half',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['..SS......', '.SS.......', 'XXX.......', 'XXXXXXXXX.'] },
+  { piece: 'Z', roof: [1, 3], how: 'upper half the other way, off the low side',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['..........', '...ZZ.....', 'XXX.ZZ....', 'XXXXXXXXX.'] },
+  { piece: 'T', roof: [1, 3], how: 'flat across the step, two cells hanging',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['...T......', '..TTT.....', 'XXX.......', 'XXXXXXXXX.'] },
+  { piece: 'I', roof: [1, 3], how: 'flat across the step, three cells hanging',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['..........', '..IIII....', 'XXX.......', 'XXXXXXXXX.'] },
+  { piece: 'O', roof: [1, 3], how: 'half on the step, half off it',
+    base: ['..........', '..........', 'XXX.......', 'XXXXXXXXX.'],
+    rows: ['..OO......', '..OO......', 'XXX.......', 'XXXXXXXXX.'] },
 ];
