@@ -6,8 +6,11 @@
 //
 // The seven are chosen so that each of the four clauses is the SOLE reason for a rejection at least
 // once, and so that the two readings of "triple line(s)" are separated by a real board. Examples
-// A, C, D and F share one history shape and differ from each other in a single Event field — see
-// OnlyClause2SeparatesAFromC / OnlyClause4SeparatesAFromD at the bottom.
+// A, C, D and F are the same situation differing in a single field each — one Event flag or one
+// Step flag — so every rejection is provably caused by its clause. See the minimality lemmas at
+// the bottom. The BOARDS drawn alongside are checked separately: every placement is a real
+// tetromino orientation, resting on something, and reachable under SRS with its kick tables. That
+// last check is not decorative — it rejected the first board drawn for example D outright.
 //
 // Row numbering matches Forecast.dfy: row 0 is the TOP, larger index is lower on the screen. The
 // boards drawn alongside this file use a 22-row field, so the bottom row is 21:
@@ -85,9 +88,38 @@ module ForecastExamples {
     assert CountBetween([17, 18, 19], 15, 21) == 3;
   }
 
-  // D. Clause 4. The C-Spin. Again byte-for-byte example A, except that the three rows are taken by
-  //    a T-Spin Triple. The overhang is lowered onto its slot by the player's own spin, so nothing
-  //    was forecast: the setup and the thing that resolved it are the same memorised opener.
+  // Example D's board needs one more placement than the others: a filler that seals the column the
+  // first T came down through. It clears nothing and takes no garbage, and this says that such a
+  // placement is invisible to every clause — it moves no tracked cell and contributes to no count.
+  // That is why D's history below has two steps and its drawing has an extra piece: the model is
+  // not omitting something that could matter.
+  lemma InertPlacementsAreInvisible(h: History, from: int, upto: int, a: Tracked, b: Tracked, spins: bool)
+    requires 0 <= from <= upto <= |h|
+    requires forall i :: from <= i < upto ==> h[i].clearedRows == [] && h[i].garbageRows == 0
+    ensures RemovedBetween(h, from, upto, a, b, spins) == 0
+    ensures Track(h, from, upto, a) == a
+    decreases upto - from
+  {
+    if from == upto {
+    } else {
+      assert TrackStep(h[from], a) == a;
+      NoClearsMeansNoRemoval(h, from, upto, a, b, spins);
+      InertPlacementsAreInvisible(h, from + 1, upto, a, b, spins);
+    }
+  }
+
+  // D. Clause 4. The C-Spin: the three rows are taken by a T-Spin Triple, so the overhang is
+  //    lowered onto its slot by the player's own spin. Nothing was forecast — the setup and the
+  //    thing that resolved it are the same memorised opener.
+  //
+  //    Unlike C and F this is NOT example A with one field changed, for a geometric reason worth
+  //    recording. The board that carries the SECOND spin has its bar row complete apart from the
+  //    three-wide pocket, and such a row roofs everything beneath it: a search over every T
+  //    placement under it found no reachable spin at all. So the drawn board leaves one further
+  //    column of that row open for the first T to descend through, and a filler piece closes it
+  //    before the second T arrives. That filler clears nothing and takes no garbage, so by
+  //    InertPlacementsAreInvisible it is not a step this model can see, and the history below is
+  //    still example A's with one flag flipped.
   lemma ExampleD_TheCSpinLowersItsOwnRoof() returns (h: History, e: Event)
     ensures WellFormed(h, e)
     ensures GapClosed(h, e) && HolePreExisted(e) && Tucked(e)
@@ -165,16 +197,17 @@ module ForecastExamples {
     assert hA == hC && eC == eA.(holeOpenAtJ := false);
   }
 
-  lemma OnlyClause4SeparatesAFromD()
-    ensures exists hA: History, eA: Event, hD: History, eD: Event ::
-      (WellFormed(hA, eA) && WellFormed(hD, eD)
-          && |hA| == 2 && eA == eD && hD == [hA[0].(wasSpin := true), hA[1]]
-          && IsForecastTriple(hA, eA) && !IsForecastAnyClear(hD, eD))
+  // D's drawn board needs one extra placement, so its own history is a step longer than A's. The
+  // clause-4 claim does not depend on that: flipping wasSpin on A's history alone, with A's event
+  // unchanged, already flips the verdict. Returned rather than asserted existentially, so the
+  // witness is the lemma's own output instead of something the verifier has to go looking for.
+  lemma OnlyClause4SeparatesAFromD() returns (hA: History, eA: Event, hD: History, eD: Event)
+    ensures WellFormed(hA, eA) && WellFormed(hD, eD)
+    ensures |hA| == 2 && eA == eD && hD == [hA[0].(wasSpin := true), hA[1]]
+    ensures IsForecastTriple(hA, eA) && !IsForecastAnyClear(hD, eD)
   {
-    var hA, eA := ExampleA_PlainTripleClosesTheGap();
-    var hD, eD := ExampleD_TheCSpinLowersItsOwnRoof();
-    assert eA == eD;
-    assert hD == [hA[0].(wasSpin := true), hA[1]];
+    hA, eA := ExampleA_PlainTripleClosesTheGap();
+    hD, eD := ExampleD_TheCSpinLowersItsOwnRoof();
   }
 
   lemma OnlyClause1SeparatesAFromF()
