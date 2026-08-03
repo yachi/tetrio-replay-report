@@ -23,6 +23,14 @@
  *                               inside the slot, so the clear FORMED it rather than moving it.
  *          self_built         — it crossed on the player's own placement. Openers land here.
  *     3. otherwise `reactive` — the spin on offer did not get better.
+ *     4. and, independently of all that, WAS THERE A HOLE to close onto when the roof went up?
+ *        See `floorOrigin`. Steps 1-3 say which edit brought roof and cavity together and say
+ *        nothing about whether the cavity was there first, so until 2026-08-03 a roof dropped on
+ *        solid stack that opened up underneath scored exactly like a roof laid over a hole on
+ *        purpose. The player's own statement of the metric makes the hole a premise: "putting an
+ *        overhang over a few lines far of A HOLE". Adding it took the corpus from 1 of 654 to
+ *        0 of 654 — the single event that reached this clause has its nose resting on a garbage
+ *        cell that had not arrived when the overhang was placed.
  *
  * Both forecast kinds now rest on the same evidence. Until 2026-08-02 the garbage branch was
  * counterfactually tested while the line-clear branch merely asserted co-occurrence, because
@@ -127,17 +135,72 @@ export interface ForecastRecord {
   garbageLoadBearing?: boolean;
   /** which of the causing step's three edits raised the availability, and which step that was */
   mechanism?: Mechanism; mechanismStep?: number;
+  /** clause 2: where the cell the T's nose came to rest on came from */
+  floorOrigin?: FloorOrigin; floorFrom?: number | null;
 }
 
 /**
- * Forecasts whose mechanism is ESTABLISHED. This is the honest numerator.
+ * Where the cell under the T's nose came from — clause 2, "the hole was already open when the
+ * overhang landed".
+ *
+ * The kinds above answer WHAT closed the gap. They do not ask whether there was a hole to close
+ * onto, and without that a roof laid on solid stack which later opens up underneath scores exactly
+ * like a roof laid deliberately over a cavity. The player's own statement of the metric is "putting
+ * an overhang over a few lines far of A HOLE"; the hole is a premise, not a consequence.
+ *
+ * No cell tracking is needed to decide it. `provSnaps[t]` records, for every filled cell, the index
+ * of the lock that placed it, so the floor's origin is read directly at k-1 and compared with j:
+ *
+ *   'pre-existed'   placed by a lock at or before j — the roof went up over something already there
+ *   'arrived-later' placed after j, so at j there was nothing for the nose to rest on
+ *   'field-floor'   the nose reaches the bottom of the playfield, which predates all play
+ *   'undetermined'  the floor is a garbage cell, garbage both predates and postdates j, and which
+ *                   row is which cannot be settled without tracking. Never counted either way.
+ *
+ * A garbage floor is NOT automatically undetermined: if the board held no garbage at all when the
+ * roof landed, a garbage floor cannot predate it, and that is decidable from the two snapshots.
+ * That single test is what settles the one event this corpus used to publish.
+ */
+export type FloorOrigin = 'pre-existed' | 'arrived-later' | 'field-floor' | 'undetermined';
+
+export function floorOrigin(r: SimResult, k: number, j: number | null): FloorOrigin {
+  const lk = r.locks[k]!;
+  const noseRow = Math.max(...lk.cells.map(c => c.row));
+  if (noseRow + 1 >= H) return 'field-floor';
+  const prev = r.provSnaps[k - 1];
+  if (!prev) return 'undetermined';
+  // a T that finishes flat has two lowest cells; consider whatever any of them rests on
+  const provs = lk.cells.filter(c => c.row === noseRow)
+    .map(c => prev[noseRow + 1]?.[c.col])
+    .filter((p): p is number => p !== null && p !== undefined);
+  if (provs.length === 0) return 'field-floor';
+  if (j === null) return 'undetermined';
+  if (provs.some(p => p === -1)) {
+    const garbageRows = (t: number) =>
+      r.boards[t]!.filter(row => row.some(c => (c as unknown as string) === 'G')).length;
+    if (garbageRows(j) === 0) return 'arrived-later';
+    return r.garbageEvents.some(g => g.lockIndex > j && g.lockIndex <= k) ? 'undetermined' : 'pre-existed';
+  }
+  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';
+}
+
+/** Clause 2 as a verdict: true, false, or `null` for the cases nothing can decide. */
+export const holePreExisted = (o: FloorOrigin): boolean | null =>
+  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';
+
+/**
+ * Forecasts whose mechanism is ESTABLISHED and which had a hole to forecast onto. This is the
+ * honest numerator.
  *
  * Callers previously wrote `kind !== 'reactive'` inline in six places. That is why adding a fourth
  * kind is dangerous and why it is now a function: a new kind silently joined the forecast bucket
- * under the old idiom, which is exactly how openers got counted in the first place.
+ * under the old idiom, which is exactly how openers got counted in the first place. Clause 2 is
+ * added HERE rather than as a fifth kind for the same reason — the kinds answer which edit closed
+ * the gap, and every consumer already routes its numerator through this one predicate.
  */
 export const isVerifiedForecast = (r: ForecastRecord) =>
-  r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear';
+  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')
+  && holePreExisted(r.floorOrigin ?? 'undetermined') === true;
 
 /** Every row containing a garbage cell removed, stack shifted down — the counterfactual board. */
 export function withoutGarbage(board: Board): Board {
@@ -244,8 +307,12 @@ export function forecastMetric(r: SimResult, strict = true): {
   tspins: number;
   /** improvements the step model could not explain — must be 0, and is published so it can't hide */
   unattributed: number;
-  /** both mechanism-established kinds: garbage and line-clear, localised to the causing step */
+  /** clause 2 across every event: how the cell under the nose got there */
+  floorOrigins: Record<FloorOrigin, number>;
+  /** mechanism established AND a hole to close onto; the denominator is every executed tucked spin */
   forecastRate: number;
+  /** mechanism established but clause 2 undecidable — reported, never counted either way */
+  undecidedClause2: number;
 } {
   const records: ForecastRecord[] = [];
   const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0 };
@@ -322,6 +389,13 @@ export function forecastMetric(r: SimResult, strict = true): {
     const loc = (strict && determinable && improved)
       ? localiseMechanism(r, j, k, availAtSpin, avail) : null;
 
+    // Clause 2, evaluated for every event rather than only the ones that reach the gate, so the
+    // report can say how often it is decidable at all instead of only how often it passes.
+    const origin = floorOrigin(r, k, j >= 0 ? j : null);
+    const noseRow = Math.max(...lk.cells.map(c => c.row));
+    const floorFrom = noseRow + 1 < H ? (r.provSnaps[k - 1]?.[noseRow + 1]?.[
+      lk.cells.filter(c => c.row === noseRow)[0]!.col] ?? null) : null;
+
     // Loose mode: the original rule verbatim, co-occurrence and all.
     const kind: ForecastKind = !(strict && determinable)
       ? (!improved ? 'reactive' : garbageBetween ? 'forecast_garbage'
@@ -338,13 +412,19 @@ export function forecastMetric(r: SimResult, strict = true): {
     records.push({ lockIndex: k, frame: lk.frame, lines: lk.cleared, spin: lk.spin,
       kind, separation: j >= 0 ? k - j : -1, roofFrom: j >= 0 ? j : null, roofIsGarbage,
       slotOpenedLater: improved, determinable, availAtRoof, availAtSpin, garbageLoadBearing,
-      mechanism: loc?.mechanism, mechanismStep: loc?.step });
+      mechanism: loc?.mechanism, mechanismStep: loc?.step, floorOrigin: origin, floorFrom });
   }
   const tspins = records.length;
-  // Both forecast kinds are now mechanism-established, so both count. The distinction that used
-  // to matter — tested vs asserted — is gone, and with it the reason to publish two rates.
-  const verified = totals.forecast_garbage + totals.forecast_lineclear;
+  const verified = records.filter(isVerifiedForecast).length;
   const unattributed = records.filter(x => x.mechanism === 'unattributed').length;
-  return { records, totals, tspins, unattributed,
+  const floorOrigins: Record<FloorOrigin, number> =
+    { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 };
+  for (const x of records) floorOrigins[x.floorOrigin ?? 'undetermined']++;
+  // an event whose mechanism holds but whose clause 2 cannot be decided is neither counted nor
+  // discarded quietly: it is its own number, so a rate of zero cannot hide an undecidable case
+  const undecidedClause2 = records.filter(x =>
+    (x.kind === 'forecast_garbage' || x.kind === 'forecast_lineclear')
+    && holePreExisted(x.floorOrigin ?? 'undetermined') === null).length;
+  return { records, totals, tspins, unattributed, floorOrigins, undecidedClause2,
            forecastRate: tspins ? verified / tspins : 0 };
 }

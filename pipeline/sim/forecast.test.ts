@@ -3,7 +3,7 @@
  * Run: bun test forecast.test.ts
  */
 import { test, expect } from 'bun:test';
-import { forecastMetric, isVerifiedForecast, isForecastOrUnverified } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, floorOrigin, isForecastOrUnverified } from './forecast.ts';
 import { H } from './sim.ts';
 import type { SimResult } from './sim.ts';
 
@@ -268,18 +268,28 @@ test('garbage strictly BEFORE the roof was built does not count as forecast', ()
   expect(r.records[0]!.kind).toBe('reactive');
 });
 
-test('isVerifiedForecast admits both mechanism-established kinds and neither other', () => {
+test('isVerifiedForecast wants a mechanism AND a hole that was already there', () => {
   // The mutation `kind !== 'reactive'` — the idiom this predicate replaced — survived the whole
   // suite until this test existed. That idiom IS the original defect: it readmits self_built
   // (openers) into the forecast numerator. A harness that cannot kill a reversion to it would
   // not have caught the bug it was written for. The line-clear bucket joined the numerator on
   // 2026-08-02, when localisation gave it the same evidence the garbage branch already had —
-  // which is a change in what can be PROVEN, not a relaxation of the bar.
-  const mkRec = (kind: string) => ({ kind } as any);
+  // which is a change in what can be PROVEN, not a relaxation of the bar. Clause 2 joined on
+  // 2026-08-03: the kinds say WHICH edit closed the gap and nothing about whether there was a
+  // hole to close onto, so a roof dropped on solid stack that opens up underneath used to score
+  // identically to a roof laid over a cavity on purpose.
+  const mkRec = (kind: string, floorOrigin = 'pre-existed') => ({ kind, floorOrigin } as any);
   expect(isVerifiedForecast(mkRec('forecast_garbage'))).toBe(true);
   expect(isVerifiedForecast(mkRec('forecast_lineclear'))).toBe(true);
   expect(isVerifiedForecast(mkRec('self_built'))).toBe(false);
   expect(isVerifiedForecast(mkRec('reactive'))).toBe(false);
+  // the playfield floor predates every placement, so a nose resting on it had its hole all along
+  expect(isVerifiedForecast(mkRec('forecast_lineclear', 'field-floor'))).toBe(true);
+  // and the two that must not count, including the one that is merely unknown
+  expect(isVerifiedForecast(mkRec('forecast_lineclear', 'arrived-later'))).toBe(false);
+  expect(isVerifiedForecast(mkRec('forecast_garbage', 'undetermined'))).toBe(false);
+  // a record with no verdict at all is not a pass by omission
+  expect(isVerifiedForecast({ kind: 'forecast_garbage' } as any)).toBe(false);
 });
 
 test('forecastRate counts mechanism-established forecasts and nothing else', () => {
@@ -388,4 +398,64 @@ test('STRICT: a T-spin was already available -> reactive, despite a clear in bet
 
 test('STRICT can be disabled, restoring the loose rule', () => {
   expect(forecastMetric(mkBoards(AFTER), false).records[0]!.kind).toBe('forecast_lineclear');
+});
+
+/**
+ * `floorOrigin` directly, on hand-made provenance.
+ *
+ * Two of its comparisons cannot be reached by any board in the corpus, so the mutation harness had
+ * nothing to kill them with: a piece that lays BOTH the roof and the floor under the nose, and a
+ * flat T whose two lowest cells rest on cells from two different locks. Neither shape occurs in 654
+ * real events, which is a fact about this corpus and not a reason to leave the comparisons untested
+ * — a later session could contain either.
+ */
+const fakeFor = (opts: {
+  noseRow: number; noseCols: number[]; provs: (number | null)[];
+  garbageRowsAtRoof?: number; garbageEvents?: number[];
+}) => {
+  const j = 5, k = 9;
+  const row = Array(10).fill(null) as (number | null)[];
+  opts.noseCols.forEach((c, i) => { row[c] = opts.provs[i] ?? null; });
+  const prov = Array.from({ length: H }, () => Array(10).fill(null)) as (number | null)[][];
+  prov[opts.noseRow + 1] = row;
+  const gRow = Array(10).fill('G');
+  const boards = Array.from({ length: k }, () =>
+    Array.from({ length: H }, () => Array(10).fill(null)));
+  for (let i = 0; i < (opts.garbageRowsAtRoof ?? 0); i++) boards[j]![H - 1 - i] = [...gRow];
+  const provSnaps: any[] = Array.from({ length: k }, () => prov);
+  return { r: {
+    locks: Array.from({ length: k + 1 }, (_, i) => i === k
+      ? { cells: opts.noseCols.map(c => ({ col: c, row: opts.noseRow })) } : { cells: [] }),
+    provSnaps, boards,
+    garbageEvents: (opts.garbageEvents ?? []).map(lockIndex => ({ lockIndex, amt: 1, frame: 0 })),
+  } as any, j, k };
+};
+
+test('a piece that lays the roof AND the floor under the nose still counts as pre-existing', () => {
+  // At the instant that piece locks, both cells exist and so does the cavity between them, so the
+  // comparison is `<= j` and not `< j`. Nothing in the corpus has this shape.
+  const { r, j, k } = fakeFor({ noseRow: 10, noseCols: [4], provs: [5] });
+  expect(floorOrigin(r, k, j)).toBe('pre-existed');
+  const later = fakeFor({ noseRow: 10, noseCols: [4], provs: [6] });
+  expect(floorOrigin(later.r, later.k, later.j)).toBe('arrived-later');
+});
+
+test('when a flat T rests on two locks, the LATER one decides', () => {
+  // Taking the older of the two would call a floor pre-existing whenever any part of what the T
+  // stands on happens to be old, which is the weaker question.
+  const { r, j, k } = fakeFor({ noseRow: 10, noseCols: [3, 5], provs: [2, 8] });
+  expect(floorOrigin(r, k, j)).toBe('arrived-later');
+  const bothOld = fakeFor({ noseRow: 10, noseCols: [3, 5], provs: [2, 4] });
+  expect(floorOrigin(bothOld.r, bothOld.k, bothOld.j)).toBe('pre-existed');
+});
+
+test('a garbage floor is undetermined only when garbage straddles the roof', () => {
+  const noGarbageThen = fakeFor({ noseRow: 10, noseCols: [4], provs: [-1], garbageRowsAtRoof: 0 });
+  expect(floorOrigin(noGarbageThen.r, noGarbageThen.k, noGarbageThen.j)).toBe('arrived-later');
+  const straddles = fakeFor({ noseRow: 10, noseCols: [4], provs: [-1],
+    garbageRowsAtRoof: 2, garbageEvents: [7] });
+  expect(floorOrigin(straddles.r, straddles.k, straddles.j)).toBe('undetermined');
+  const allBefore = fakeFor({ noseRow: 10, noseCols: [4], provs: [-1],
+    garbageRowsAtRoof: 2, garbageEvents: [3] });
+  expect(floorOrigin(allBefore.r, allBefore.k, allBefore.j)).toBe('pre-existed');
 });

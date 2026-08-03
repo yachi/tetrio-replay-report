@@ -38,7 +38,8 @@
  * "measured, and the effect is exactly nothing", which is a finding this data cannot support.
  */
 import { writeFileSync } from 'node:fs';
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, holePreExisted } from './forecast.ts';
+import type { FloorOrigin } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex, BEST_OPTS } from './verified-prefix.ts';
 import { collectRows, pairsFor, auc, exactSignP } from './pairs.ts';
 import { eventLevel } from './forecast-event-level.ts';
@@ -85,12 +86,18 @@ const CONFIGS: [string, any][] = [
   ['reference_queue', { queue: 'reference' }], ['frame_clock', { subframe: false }],
 ];
 
+type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: number;
+             unattributed: number; verified: number; placed: number;
+             floors: Record<FloorOrigin, number>; forecasts: number; undecided: number };
+
 const tally = (extra: any) => {
-  const per: Record<string, { tspins: number; fg: number; fl: number; sb: number; reactive: number; unattributed: number; verified: number; placed: number }> = {};
+  const per: Record<string, Per> = {};
   for (const c of loadCases()) {
     const r = runCase(c, extra);
     const v = verifiedIndex(r, c.truth);
-    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0 };
+    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
+      floors: { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 },
+      forecasts: 0, undecided: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
     if (v < 0) continue;
@@ -105,6 +112,12 @@ const tally = (extra: any) => {
       else if (rec.kind === 'self_built') p.sb++;
       else p.reactive++;
       if (rec.mechanism === 'unattributed') p.unattributed++;
+      // Clause 2 is tallied for every event, not only the ones that reach the gate, so the report
+      // can say how often the question is answerable rather than only how often the answer is yes.
+      p.floors[rec.floorOrigin ?? 'undetermined']++;
+      if (isVerifiedForecast(rec)) p.forecasts++;
+      else if ((rec.kind === 'forecast_garbage' || rec.kind === 'forecast_lineclear')
+               && holePreExisted(rec.floorOrigin ?? 'undetermined') === null) p.undecided++;
     }
   }
   return per;
@@ -115,17 +128,18 @@ const spread: Record<string, number[]> = {};
 for (const [, extra] of CONFIGS) {
   const t = tally(extra);
   // The sweep must vary the SAME quantity the table prints, or the two disagree silently: this
-  // read `v.fg` for one commit after `fc` became `fg + fl`, which rendered a 1.2% rate beside a
-  // simulator range of [0.0%, 0.0%] and a sentence claiming all seven configs agreed.
-  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? (v.fg + v.fl) / v.tspins : 0);
+  // read `v.fg` for one commit after the rate became `fg + fl`, which rendered a 1.2% rate beside
+  // a simulator range of [0.0%, 0.0%] and a sentence claiming all seven configs agreed. It is
+  // `v.forecasts` now — the count that passes clause 2 as well — for exactly the same reason.
+  for (const [u, v] of Object.entries(t)) (spread[u] ??= []).push(v.tspins ? v.forecasts / v.tspins : 0);
 }
 
 const players = Object.entries(base).map(([user, v]) => {
-  // Both kinds are mechanism-established: each is localised to the single step that raised the
-  // availability, and to which of that step's three edits did it. The old split — one branch
-  // counterfactually tested, the other asserting co-occurrence — is gone, so there is no longer
-  // a second, weaker rate to keep out of the total.
-  const fc = v.fg + v.fl;
+  // Mechanism established AND a hole to close onto. `fg + fl` answers only the first: it says
+  // which edit brought roof and cavity together, not whether the cavity was there when the roof
+  // went up. A roof dropped on solid stack that opens up underneath scored the same until
+  // clause 2 was added, and the single event this corpus used to publish is exactly that shape.
+  const fc = v.forecasts;
   const [lo, hi] = clopperPearson(fc, v.tspins);
   const s = spread[user]!;
   return {
@@ -141,7 +155,17 @@ const players = Object.entries(base).map(([user, v]) => {
     // improvements the step model could not explain. Emitted so that a metric which has stopped
     // understanding its own corpus says so, rather than absorbing the gap into self_built.
     unattributed: v.unattributed,
+    // mechanism-established before clause 2 is applied, so the effect of clause 2 is visible
+    // rather than folded into a single smaller number
+    mechanism_established: v.fg + v.fl,
     forecast_total: fc,
+    // mechanism established but clause 2 undecidable: the floor is garbage and the board held
+    // garbage both before and after the roof. Never counted either way, always reported.
+    clause2_undecided: v.undecided,
+    floor_pre_existed: v.floors['pre-existed'],
+    floor_arrived_later: v.floors['arrived-later'],
+    floor_is_playfield: v.floors['field-floor'],
+    floor_undetermined: v.floors.undetermined,
     reactive: v.reactive,
     // Gated floor convention (`pipeline/fmt.py`): every printed figure in this repo floors, so
     // 約 means "at least this much" and the rendered percent can be read as a lower bound.
@@ -261,7 +285,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/4',
+  schema: 'forecast-facts/5',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

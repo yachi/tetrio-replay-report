@@ -262,6 +262,13 @@ def _mechanism_clause(data):
     lc = sum(p.get("forecast_lineclear", 0) for p in ps)
     sb = sum(p.get("self_built", 0) for p in ps)
     re_ = sum(p.get("reactive", 0) for p in ps)
+    mech = sum(p.get("mechanism_established", 0) for p in ps)
+    fc = sum(p.get("forecast_total", 0) for p in ps)
+    pre = sum(p.get("floor_pre_existed", 0) for p in ps)
+    fld = sum(p.get("floor_is_playfield", 0) for p in ps)
+    late = sum(p.get("floor_arrived_later", 0) for p in ps)
+    und = sum(p.get("floor_undetermined", 0) for p in ps)
+    undec = sum(p.get("clause2_undecided", 0) for p in ps)
     if not tot:
         return ""
     parts = [
@@ -277,14 +284,38 @@ def _mechanism_clause(data):
         f"喺呢個 session 全部 {tot} 個可核 T-spin 入面："
         f"<strong>{fg} 個</strong>係垃圾造成個窿位；"
         f"<strong>{lc} 個</strong>係消行造成——消嗰行啱啱夾喺天花板同窿位中間，"
-        "消走咗兩者先貼埋一齊（下面表入面嘅數，就係呢兩種加埋）；"
+        "消走咗兩者先貼埋一齊；"
         f"{sb} 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
         "個天花板早過個窿位係定式本身嘅砌法，唔係預測；"
         f"其餘 {re_} 個個窿位本身冇變好。",
+        # Clause 2. Added 2026-08-03: the mechanism clause says WHAT closed the gap, and says
+        # nothing about whether there was a hole to close onto. Without it a roof dropped on solid
+        # stack that opens up underneath scores exactly like a roof laid over a cavity on purpose.
+        "<strong>仲有一個前提：搭天花板嗰陣，個窿位要已經喺度。</strong>"
+        "如果落天花板嗰時下面係實心，之後先至開窿，"
+        "咁就唔係「預先搭喺個窿上面」，只係執返個之後先出現嘅位。"
+        "呢一項唔使追格——provenance 格網記住每一格係邊一手落嘅，"
+        f"睇 T 個鼻尖最後踩住嗰格係邊一手放低就得。全部 {tot} 個入面："
+        f"<strong>{pre} 個</strong>個底早過天花板；{fld} 個係踩到場底（場底早過所有嘢）；"
+        f"<strong>{late} 個</strong>個底係天花板之後先至出現；"
+        f"{und} 個查唔到（個底係垃圾，而垃圾喺天花板前後都升過，唔追格就分唔到邊行係邊行）。"
+        "下面表入面嘅數，係<strong>四項條件全部符合</strong>先計。",
     ]
-    if fg + lc == 0:
+    if mech > fc:
+        rest = ("但佢哋個底" if fc == 0 and mech > 1
+                else "但佢個底" if fc == 0
+                else f"但當中 {mech - fc} 個嘅底")
         parts.append(
-            "<strong>換句話講：呢個 session 冇一個可核 T-spin 嘅窿位係外力造成嘅。</strong>"
+            f"<strong>今次呢一項改咗個數。</strong>有 {mech} 個嘅機制係成立嘅"
+            f"（消行或者垃圾真係整咗個窿位出嚟），{rest}"
+            "係天花板之後先至嚟嘅，所以計唔到數。")
+    if undec:
+        parts.append(
+            f"另外有 {undec} 個機制成立、但呢一項<strong>查唔到答案</strong>——"
+            "唔會當佢啱，亦都唔會當佢錯，淨係報出嚟。")
+    if fc == 0:
+        parts.append(
+            "<strong>換句話講：呢個 session 冇一個可核 T-spin 符合曬四項條件。</strong>"
             "之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——"
             "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有，"
             "所以嗰個數量到嘅係<em>開局定式</em>，唔係預測。")
@@ -344,7 +375,7 @@ def section(data):
         # changes: it said 「垃圾造成嘅」 for one commit after the line-clear mechanism joined the
         # count, which made pinglamb's single clear-formed event read as garbage-caused. A column
         # heading is a factual claim about the column.
-        '            <th>外力造成嘅 Forecast / 可核 T-spin</th>',
+        '            <th>四項條件全部符合嘅 Forecast / 可核 T-spin</th>',
         '            <th>比率</th>',
         '            <th>抽樣 95% CI</th>',
         '            <th>模擬器敏感度範圍</th>',

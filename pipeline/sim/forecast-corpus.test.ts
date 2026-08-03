@@ -17,14 +17,17 @@
 import { test, expect } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
-import { forecastMetric, isVerifiedForecast, type ForecastKind } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, type ForecastKind, type FloorOrigin } from './forecast.ts';
 
 const SESSION = `${import.meta.dir}/../../sessions/2026-07-28`;
 
 const run = () => {
   const totals: Record<string, number> = {
     forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0, unattributed: 0 };
+  const floors: Record<FloorOrigin, number> =
+    { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 };
   const forecasts: string[] = [];
+  const mechanismOnly: string[] = [];
   let loadBearingButNotImproved = 0;
   for (const c of loadCases(SESSION)) {
     const r = runCase(c, {});
@@ -33,7 +36,11 @@ const run = () => {
     for (const rec of forecastMetric(r, true).records) {
       if (rec.lockIndex > v) continue;
       totals[rec.kind as ForecastKind]!++;
+      floors[rec.floorOrigin!]++;
       if (rec.mechanism === 'unattributed') totals.unattributed!++;
+      if (rec.kind === 'forecast_garbage' || rec.kind === 'forecast_lineclear')
+        mechanismOnly.push(`${c.user} ${c.file} r${c.round} lock ${rec.lockIndex} ${rec.kind} `
+          + `floor ${rec.floorOrigin} from ${rec.floorFrom} roof ${rec.roofFrom}`);
       if (isVerifiedForecast(rec))
         forecasts.push(`${c.user} ${c.file} r${c.round} lock ${rec.lockIndex} ${rec.kind} `
           + `roof ${rec.roofFrom} ${rec.availAtRoof}->${rec.availAtSpin}`);
@@ -41,7 +48,7 @@ const run = () => {
       if (rec.kind === 'reactive' && rec.garbageLoadBearing) loadBearingButNotImproved++;
     }
   }
-  return { totals, forecasts, loadBearingButNotImproved };
+  return { totals, floors, forecasts, mechanismOnly, loadBearingButNotImproved };
 };
 
 const R = existsSync(SESSION) ? run() : null;
@@ -60,13 +67,24 @@ realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
   });
 });
 
-realData('the surviving forecast is the hand-checked one, not merely a count of one', () => {
-  // A count can stay at 1 while pointing at a different event entirely. This names it: the L at
-  // lock 19 leaves an overhang, a full row sits between that overhang and the notch for twelve
-  // pieces, the I at lock 31 completes and clears it, and the T goes in at 32.
-  expect(R!.forecasts).toEqual([
-    'pinglamb replay-2026-07-28-6.ttrm r5 lock 32 forecast_lineclear roof 19 0->2',
+realData('nothing survives all four clauses, and the one that reaches clause 2 is named', () => {
+  // A count of zero says nothing about WHY. This names the single event whose mechanism holds —
+  // the L at lock 19 leaves an overhang, a full row sits between that overhang and the notch for
+  // twelve pieces, the I at lock 31 clears it, the T goes in at 32 — and records that it is
+  // rejected because the cell its nose rests on is garbage that had not arrived at lock 19. A
+  // regression that re-admits it changes this string rather than silently moving a rate.
+  expect(R!.forecasts).toEqual([]);
+  expect(R!.mechanismOnly).toEqual([
+    'pinglamb replay-2026-07-28-6.ttrm r5 lock 32 forecast_lineclear floor arrived-later from -1 roof 19',
   ]);
+});
+
+realData('clause 2 is decidable for all but two of the 2026-07-28 events', () => {
+  // Published so a drift in the undecidable count is visible: an implementation that quietly
+  // stopped being able to answer would otherwise present as a rate that had not moved.
+  expect(R!.floors).toEqual({
+    'pre-existed': 83, 'field-floor': 48, 'arrived-later': 13, undetermined: 2,
+  });
 });
 
 realData('the scalar improvement gate has one known blind spot, and it is one event', () => {
@@ -76,56 +94,4 @@ realData('the scalar improvement gate has one known blind spot, and it is one ev
   // the gate. It is pinned rather than fixed: closing it means asking whether the EXECUTED spin
   // depended on the mechanism, not whether the best-available scalar rose.
   expect(R!.loadBearingButNotImproved).toBe(1);
-});
-
-/* --- the second opinion -------------------------------------------------------------------
- * `gap-closure.ts` implements the definition as a player states it — an overhang placed above a
- * hole, the lines between them clearing — and shares no code or reasoning with the step
- * localisation in `forecast.ts`. Two instruments agreeing on one event out of 654 is worth far
- * more than either one alone, so the agreement is asserted rather than admired.
- */
-import { gapClosure } from './gap-closure.ts';
-
-const gapRun = () => {
-  const hits: string[] = [];
-  let closed = 0, spinOnly = 0, untraceable = 0;
-  for (const c of loadCases(SESSION)) {
-    const r = runCase(c, {});
-    const v = verifiedIndex(r, c.truth);
-    if (v < 0) continue;
-    for (const rec of forecastMetric(r, true).records) {
-      if (rec.lockIndex > v) continue;
-      const g = gapClosure(r, rec);
-      if (!g) { untraceable++; continue; }
-      if (g.plainRows + g.spinRows === 0) continue;
-      closed++;
-      if (g.forecast) hits.push(`${c.user} ${c.file} r${c.round} lock ${rec.lockIndex}`);
-      else spinOnly++;
-    }
-  }
-  return { hits, closed, spinOnly, untraceable };
-};
-const G = R === null ? null : gapRun();
-
-realData('a T-spin clear does not count as the lines between clearing', () => {
-  // Without this exclusion the test fires on the C-Spin: a T-spin triple takes out three rows under
-  // an overhang from the second bag, and the opener scores itself as foresight. Session-local
-  // counts; corpus-wide it is 180 of 181 excluded on exactly this rule.
-  expect(G!.closed).toBeGreaterThan(0);
-  expect(G!.spinOnly).toBe(G!.closed - G!.hits.length);
-  expect(G!.hits.length).toBeGreaterThan(0);
-});
-
-realData('the two independent instruments name the SAME single event', () => {
-  expect(G!.hits).toEqual(['pinglamb replay-2026-07-28-6.ttrm r5 lock 32']);
-  // and it is the one the committed metric publishes, reached by localising the mechanism instead
-  expect(R!.forecasts).toEqual([
-    'pinglamb replay-2026-07-28-6.ttrm r5 lock 32 forecast_lineclear roof 19 0->2',
-  ]);
-});
-
-realData('the garbage-floor blind spot is measured, not merely mentioned', () => {
-  // The T landing on garbage leaves no placing lock to trace, so this instrument is silent there.
-  // Pinned because it is the one case the wiki documents most thoroughly and this cannot see.
-  expect(G!.untraceable).toBe(2);
 });

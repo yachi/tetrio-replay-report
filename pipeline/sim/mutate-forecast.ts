@@ -104,6 +104,29 @@ const MUTANTS: Mutant[] = [
     find: `  if (!garbageArrived && !B.every((row, i) => row.every((c, x) => c === C[i]![x])))`, nth: 1,
     repl: `  if (false)` },
 
+  // --- clause 2: was there a hole to close onto when the roof went up? -----------------------
+  { name: 'metric/clause2-dropped', note: 'THE pre-2026-08-03 defect: mechanism alone counts',
+    find: `  && holePreExisted(r.floorOrigin ?? 'undetermined') === true;`, nth: 1,
+    repl: `  && true;` },
+  { name: 'metric/clause2-inverted', note: 'a floor that arrived later counts and one that was there does not',
+    find: `  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';`, nth: 1,
+    repl: `  o === 'undetermined' ? null : !(o === 'pre-existed' || o === 'field-floor');` },
+  { name: 'metric/clause2-undecided-passes', note: 'an undecidable floor is counted as a pass',
+    find: `  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';`, nth: 1,
+    repl: `  o === 'undetermined' ? true : o === 'pre-existed' || o === 'field-floor';` },
+  { name: 'metric/clause2-roof-column', note: 'reads the floor under the ROOF, not under the nose',
+    find: `  const provs = lk.cells.filter(c => c.row === noseRow)`, nth: 1,
+    repl: `  const provs = lk.cells.filter(c => c.row === Math.min(...lk.cells.map(x => x.row)))` },
+  { name: 'metric/clause2-roof-excluded', note: 'a floor placed BY the roof piece stops counting',
+    find: `  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';`, nth: 1,
+    repl: `  return Math.max(...provs) < j ? 'pre-existed' : 'arrived-later';` },
+  { name: 'metric/clause2-oldest-floor', note: 'takes the oldest thing under the nose, not the newest',
+    find: `  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';`, nth: 1,
+    repl: `  return Math.min(...provs) <= j ? 'pre-existed' : 'arrived-later';` },
+  { name: 'metric/clause2-garbage-always-old', note: 'any garbage floor is assumed to predate the roof',
+    find: `    if (garbageRows(j) === 0) return 'arrived-later';`, nth: 1,
+    repl: `    if (garbageRows(j) === 0) return 'pre-existed';` },
+
   // --- the execution-time counterfactual. It no longer classifies anything, but it is still
   //     RECORDED as an independent second opinion on the garbage branch, and the tests assert
   //     it — so these mutants stay live and guard the oracle rather than the classifier.
@@ -118,9 +141,8 @@ const MUTANTS: Mutant[] = [
     find: `  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));`, nth: 1,
     repl: `  const kept = board.filter(() => true);` },
   { name: 'metric/self-built-counted', note: 'openers rejoin the forecast bucket',
-    find: `export const isVerifiedForecast = (r: ForecastRecord) =>
-  r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear';`, nth: 1,
-    repl: `export const isVerifiedForecast = (r: ForecastRecord) => r.kind !== 'reactive';` },
+    find: `  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')`, nth: 1,
+    repl: `  (r.kind !== 'reactive')` },
 ];
 
 function replaceNth(src: string, find: string, nth: number, repl: string): string {
