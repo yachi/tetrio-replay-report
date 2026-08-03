@@ -30,3 +30,4 @@ run "CountBetween uses <= not <"          's|else (if a < cleared\[0\] && cleare
 run "CountBelow counts above instead"     's|else (if cleared\[0\] > r then 1 else 0)|else (if cleared[0] < r then 1 else 0)|'
 run "IsForecastTriple is really any-clear" 's|  { IsForecast(h, e, 3) }|  { IsForecast(h, e, 1) }|'
 run "the T-spin flag is ignored"          's|&& s.wasSpin == spins|&& true|'
+run "CountBetween counts everything below a" 's|else (if a < cleared\[0\] && cleared\[0\] < b then 1 else 0)|else (if a < cleared[0] then 1 else 0)|'

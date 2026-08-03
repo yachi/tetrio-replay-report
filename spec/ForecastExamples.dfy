@@ -134,21 +134,35 @@ module ForecastExamples {
     CSpinIsNotAForecast(h, e, 1);
   }
 
-  // E. Clause 3, the opponent's version. Four rows of garbage rise under a genuine overhang-over-
-  //    hole. Both cells are lifted by four, so their separation is untouched and no slot appears.
-  //    Garbage can never close a gap; only a clear from BETWEEN the pair can.
-  lemma ExampleE_FourRowsOfGarbageMoveNothing() returns (h: History, e: Event)
+  // E. Clause 3, the version that actually occurs. A board where nothing happens fails clause 3
+  //    trivially — that is example G, and it is not worth two examples. This is the one that is:
+  //    a line DOES clear and garbage DOES arrive, both from outside the interval between the
+  //    overhang and the hole. The clear drops the pair by one together, the garbage lifts it by
+  //    four together, and the distance between them is exactly what it was. No slot.
+  //
+  //    This is the shape that made the co-occurrence rule wrong. Over a window of the corpus's
+  //    median length, SOME clear or SOME garbage arriving is close to certain, so "something
+  //    happened during the window" is nearly a tautology; only "a row went from BETWEEN them"
+  //    carries information. That is what the straddle test measures, and it is the shape 85 of
+  //    the 86 audited line-clear events turned out to have.
+  lemma ExampleE_AClearAndGarbageBothFromOutside() returns (h: History, e: Event)
     ensures WellFormed(h, e)
-    ensures h[0].garbageRows == 4
+    ensures h[0].clearedRows == [21] && h[0].garbageRows == 4   // both confounds present at once
     ensures HolePreExisted(e) && Tucked(e)
     ensures BothSurvive(h, e)
+    ensures CountBetween(h[0].clearedRows, e.roofAt, e.floorAt) == 0
     ensures FloorFinal(h, e).row - RoofFinal(h, e).row == e.floorAt - e.roofAt
+    ensures ClosedByPlain(h, e) == 0
     ensures !GapClosed(h, e) && !IsForecastShape(h, e)
+    ensures h == [ Step([21], false, 4), Step([], false, 0) ] && e == Event(0, 2, 16, 20, true, true)
   {
-    h := [ Step([], false, 4), Step([], false, 0) ];
-    e := Event(0, 2, 17, 21, true, true);
-    assert Advance(h[0], 17) == 13 && Advance(h[0], 21) == 17;
-    GarbageNeverClosesAGap(h[0], 17, 21);
+    h := [ Step([21], false, 4), Step([], false, 0) ];
+    e := Event(0, 2, 16, 20, true, true);
+    assert CountBetween([21], 16, 20) == 0;
+    // both absolute positions, not only their difference: a mutation dropping the `- garbageRows`
+    // term in Advance moves the pair together too, so the difference alone would not see it
+    assert Advance(h[0], 16) == 13 && Advance(h[0], 20) == 17;
+    GarbageNeverClosesAGap(h[0], 16, 20);
   }
 
   // F. Clause 1. The setup is example A in full — overhang over a pre-existing hole, gap closed by
