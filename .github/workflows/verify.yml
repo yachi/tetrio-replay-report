@@ -365,3 +365,33 @@ jobs:
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
+
+  # The simulator's own test suite ran nowhere. `cross-extractor` above is the only job that
+  # touches Bun and it only re-runs the extractors, so every assertion about the T-Spin Forecast
+  # metric — the corpus census, the wiki fixtures, the clause-2 verdicts — was verified on
+  # someone's laptop and nowhere else. The suite takes under four seconds.
+  #
+  # The import gate is the other half of the same hole. `forecast.test.ts` imported a name that no
+  # file exported, for weeks, green the whole time: Bun does not validate named exports, there is
+  # no tsc step, and the tests were not run here. See pipeline/check_ts_imports.py.
+  typescript:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
+        with:
+          bun-version: '1.2.4'
+
+      - name: Check every named import resolves to an export (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_ts_imports --selftest
+          python3 -m pipeline.check_ts_imports
+
+      # REPLAY_DIR has no default on purpose — the simulator is session-agnostic and refuses to
+      # guess which replays you mean. One test reads it; the rest name their sessions themselves.
+      - name: Run the simulator test suite
+        run: REPLAY_DIR=sessions/2026-07-22 bun test

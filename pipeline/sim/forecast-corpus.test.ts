@@ -92,17 +92,17 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   });
 });
 
-realData('the scalar gate and the garbage counterfactual disagree on exactly one event', () => {
-  // `improved` compares a single number either side of the window, so garbage that REPLACES one
-  // two-line spin with another leaves it unmoved. One event trips that comparison — but it is NOT
-  // a spin that depended on garbage. `withoutGarbage` strips EVERY garbage row, and on this event
-  // (yachi replay-2026-07-28-1 r5 lock 36) the row it removes to make the spin vanish is the one
-  // the T tucks into, which arrived at lock 11 — 22 locks BEFORE the roof at 33. The only garbage
-  // that arrived inside the window is a single row at the very bottom of the field, twelve rows
-  // below the slot; deleting just that row leaves the spin intact at two lines.
+realData('the scalar gate and the garbage counterfactual now agree on every event', () => {
+  // This pinned 1 for as long as the counterfactual deleted every garbage row. The event was
+  // `yachi replay-2026-07-28-1 r5 lock 36`, and the row whose removal made the spin vanish is the
+  // one the T tucks into, which arrived at lock 11 — 22 locks BEFORE the roof at 33. Deleting the
+  // slot's own floor deletes the piece, and the collapse read as proof the garbage was holding it
+  // up. The only garbage inside that window is a single row at the very bottom of the field,
+  // twelve rows below the slot; deleting just that row leaves the spin intact at two lines.
   //
-  // So this pins a disagreement between two instruments, not a load-bearing mechanism. Restricting
-  // the deletion set to post-roof arrivals would take it to 0. Measured over all four sessions:
-  // 121 events have post-roof garbage and the executed spin survives its removal in all 121.
-  expect(R!.loadBearingButNotImproved).toBe(1);
+  // With the deletion set restricted to post-roof arrivals, no event in the corpus disagrees:
+  // 121 events have such an arrival and the executed spin survives its removal in all 121. `0` is
+  // therefore a much weaker assertion than the `1` it replaces — it now says only that the two
+  // instruments never diverge, so the census above and the mutants are what hold the rule in place.
+  expect(R!.loadBearingButNotImproved).toBe(0);
 });

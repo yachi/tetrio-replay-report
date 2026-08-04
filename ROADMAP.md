@@ -752,11 +752,18 @@ that is not a T in 47 of 50 cases, so a naive version reports "load-bearing" for
 steps. Retiring `improved` in its favour would delete the corpus's only positive, which is a
 `forecast_lineclear`.
 
-**What remains open is small and named:** restrict `withoutGarbage`'s deletion set to post-roof
-arrivals. That is a two-line change which would take `loadBearingButNotImproved` from 1 to 0 and
-retire the last disagreement between the two instruments. `withoutGarbage` was validated on the
-wiki's five garbage pairs, and in every one of those the appended line **is** the slot, so destroying
-it is the right answer there; the corpus contains the other shape and the oracle inverts on it.
+**The deletion set is now restricted, and the last disagreement is gone.** `withoutGarbage` is
+replaced by `withoutRows(board, garbageArrivedAfter(r, j, k))`. Arrival is derived rather than
+tracked, by replaying each step's row edits over one boolean per row; the marks reproduce the real
+garbage mask of `boards[t]` at all **110,927 lock-steps** of the four sessions across all seven
+swept configs, ordered oldest-on-top everywhere — including `reference_queue`, the one config that
+inserts garbage before the piece rather than after it. `loadBearingButNotImproved` is 0, the four
+`forecast-facts.json` regenerate byte-identical (the counterfactual observes, it does not classify),
+and five new mutants guard the set, `deletion-set-unrestricted` among them.
+
+Note what the corpus test now asserts: `0` is a far weaker statement than the `1` it replaces. It
+says only that the two instruments never diverge. The census and the mutants are what hold the rule
+in place now, which is the usual cost of fixing the event a test was pinning.
 
 **Also settled:** the sizing sweep costs **2.1 seconds** for all four sessions, not the hour this item
 budgeted. `audit-mechanism.ts` already walks them cross-session and needs no `REPLAY_DIR`.
@@ -774,7 +781,7 @@ constructing that two-slot board; until then the equivalence is conditional and 
 
 The "Original TODO" item 2 above — the two surviving mutants on the availability probe
 (`best/no-rotation`, `best/no-spin-test`) — is **done**. Both are killed in the current sweep,
-which stands at **32/32**. The probe they guard is now `bestTspin`, a single BFS returning both the
+which stands at **36/36**. The probe they guard is now `bestTspin`, a single BFS returning both the
 line count and the slot's rows; the second copy that once carried a different cap is gone.
 
 ### 3 — CLOSED: the garbage-floor events were the same five events as item 1, and they are decidable
@@ -817,3 +824,22 @@ that has nothing to do with the spin while the shoulders carry the piece. Judgin
 be the wrong question for those boards, since there is no cavity under the overhang at all. This is a
 definition question about what "the hole" refers to, not a measurement gap, and no sweep can decide
 it. If the answer is that they should not count, it is a larger correction than anything above.
+
+### 5 — CLOSED: the simulator's tests ran nowhere, and a dead import proved it
+
+`forecast.test.ts` imported `isForecastOrUnverified`, which no file in the repo exports. It had been
+there for weeks and the suite was green throughout, because three things are true at once: Bun does
+not validate named exports, a name that is imported but never called is never evaluated, and there
+is no `tsc` step. The third is the one that mattered — `bun test` was not in CI at all. Only
+`cross-extractor` runs Bun, and only to re-run the extractors, so every assertion about this metric
+(the corpus census, the wiki fixtures, the clause-2 verdicts, the mutation-guarded gates) was
+verified on a laptop and nowhere else.
+
+Both halves are fixed by a `typescript` job: `pipeline/check_ts_imports.py`, then the suite, which
+takes under four seconds. The gate has a `--selftest` like `check_forecast_section` does, and it was
+run against the actual historical defect — restoring the import makes it fail with the right
+message. It reports rather than skips any import form it cannot parse, because a checker that
+silently ignores what it does not recognise reports "all clear" for the files it never read.
+
+It is deliberately not a typechecker. A real `tsc` pass would subsume it and is worth doing; it
+needs a `tsconfig.json` and a pinned `typescript`, which is a dependency decision, not a gate.

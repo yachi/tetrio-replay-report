@@ -131,16 +131,16 @@ export interface ForecastRecord {
   slotOpenedLater?: boolean; determinable?: boolean;
   /** best T-spin available when the roof was placed, and just before it was executed */
   availAtRoof?: number; availAtSpin?: number;
-  /** removing every garbage row strictly reduces what is available at execution */
+  /** removing the garbage that arrived AFTER the roof strictly reduces what is available */
   garbageLoadBearing?: boolean;
   /** which of the causing step's three edits raised the availability, and which step that was */
   mechanism?: Mechanism; mechanismStep?: number;
-  /** clause 2: where the cell the T's nose came to rest on came from */
+  /** clause 2: where the cells holding the T up came from */
   floorOrigin?: FloorOrigin; floorFrom?: number | null;
 }
 
 /**
- * Where the cell under the T's nose came from — clause 2, "the hole was already open when the
+ * Where the cells holding the T up came from — clause 2, "the hole was already open when the
  * overhang landed".
  *
  * The kinds above answer WHAT closed the gap. They do not ask whether there was a hole to close
@@ -227,11 +227,64 @@ export const isVerifiedForecast = (r: ForecastRecord) =>
   (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')
   && holePreExisted(r.floorOrigin ?? 'undetermined') === true;
 
-/** Every row containing a garbage cell removed, stack shifted down — the counterfactual board. */
-export function withoutGarbage(board: Board): Board {
-  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));
+/** `board` with those rows deleted and the stack shifted down — the counterfactual board. */
+export function withoutRows(board: Board, rows: Set<number>): Board {
+  const kept = board.filter((_, i) => !rows.has(i));
   const pad = Array.from({ length: board.length - kept.length }, () => Array(10).fill(null));
   return [...pad, ...kept] as Board;
+}
+
+/**
+ * The rows of `boards[k-1]` holding garbage that ARRIVED after the roof went up at lock `j`.
+ *
+ * This is the deletion set for the counterfactual below, and getting it wrong is not a matter of
+ * strictness. The claim under test is that garbage *arriving during the window* is what holds the
+ * executed spin up. Deleting every garbage row instead — which is what this used to do — deletes
+ * the slot's own floor whenever the T tucks into a well that garbage built long before the roof,
+ * and a piece with no floor cannot exist in the counterfactual world at all. The spin vanishes, and
+ * "the spin vanished" is exactly the signature the test reads as causation. An over-broad deletion
+ * set does not fail loudly; it fails toward the positive.
+ *
+ * On this corpus that mattered on exactly one event, `yachi 07-28-1 r5 lock 36`, which stripping
+ * everything called load-bearing: the row the T tucks into arrived at lock 11 under a roof at lock
+ * 33, and the only garbage inside the window is one row at the very bottom of the field, twelve
+ * rows below the slot. It also explains why the wiki fixtures never caught it — in all five of the
+ * article's garbage pairs the appended line IS the slot, so destroying it is the right answer
+ * there, and the oracle inverts only on the shape the article does not contain.
+ *
+ * Arrival is derived, not tracked, by replaying each step's row edits over one boolean per row: a
+ * placement moves no rows; a clear splices out the full rows of `Bpre` and pads the top; an insert
+ * shifts rows off the top and pushes the new ones in at the bottom, where they are marked. Seeding
+ * at `j` with everything false is what makes the answer relative to the roof, and it needs no
+ * special case for `j = -1` (a roof with no placer): the walk starts at lock 0 and every garbage
+ * row then on the board counts as having arrived after it.
+ *
+ * Measured against the boards themselves: the marks reproduce the real garbage mask of `boards[t]`
+ * at all 110,927 lock-steps of the four sessions across all seven swept configs, and the marked
+ * rows come out ordered oldest-on-top everywhere — including `reference_queue`, the one config that
+ * can insert garbage before the piece rather than after it.
+ */
+export function garbageArrivedAfter(r: SimResult, j: number, k: number): Set<number> {
+  let post = new Array<boolean>(H).fill(false);
+  for (let t = j + 1; t <= k - 1; t++) {
+    const lk = r.locks[t]!;
+    const Bpre = r.boards[t - 1]!.map(row => [...row]) as Board;
+    for (const c of lk.cells) if (c.row >= 0 && c.row < H) Bpre[c.row]![c.col] = lk.piece as never;
+    for (let row = H - 1; row >= 0; row--) {
+      if (Bpre[row]!.every(x => x !== null)) { Bpre.splice(row, 1); post.splice(row, 1); }
+    }
+    while (post.length < H) post.unshift(false);
+    for (const g of r.garbageEvents) {
+      if (g.lockIndex === t) post = post.slice(g.amt).concat(new Array<boolean>(g.amt).fill(true));
+    }
+  }
+  // A row carrying no garbage is not garbage that arrived, whatever the events claim. On the real
+  // corpus the mark and the mask agree at every one of those 110,927 steps, so this narrows nothing
+  // there; it is what stops a hand-built SimResult whose garbage events do not match its boards
+  // from deleting rows that hold the player's own stack.
+  const boardK = r.boards[k - 1]!;
+  return new Set(post.flatMap((p, i) =>
+    p && boardK[i]!.some(c => (c as unknown as string) === 'G') ? [i] : []));
 }
 
 /**
@@ -397,16 +450,19 @@ export function forecastMetric(r: SimResult, strict = true): {
       ? availAtSpin > availAtRoof
       : (clearBetween || garbageBetween);
 
-    // Strip every garbage row and re-ask: if the spin is unchanged, the garbage at EXECUTION
-    // cannot be holding it up. This no longer classifies anything — `localiseMechanism` does —
-    // but it is kept, and recorded, as an independent second opinion on the garbage branch. It is
-    // the one instrument here validated directly against the wiki's own boards (stripping the
-    // appended garbage line reproduces the article's "before" value in all five of its garbage
-    // pairs), so it is worth keeping as an oracle even though it answers at the wrong moment:
-    // garbage that made a slot and was then cleared away leaves it nothing to remove. One source
-    // of truth classifies; this one observes, and a test asserts the two agree on the corpus.
-    const garbageLoadBearing = !!(boardK && garbageBetween
-      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);
+    // Strip the garbage that arrived after the roof and re-ask: if the spin is unchanged, that
+    // garbage cannot be holding it up at EXECUTION. This no longer classifies anything —
+    // `localiseMechanism` does — but it is kept, and recorded, as an independent second opinion on
+    // the garbage branch. It is the one instrument here validated directly against the wiki's own
+    // boards (stripping the appended garbage line reproduces the article's "before" value in all
+    // five of its garbage pairs), so it is worth keeping as an oracle even though it answers at the
+    // wrong moment: garbage that made a slot and was then cleared away leaves it nothing to remove.
+    // One source of truth classifies; this one observes, and a test asserts the two agree on the
+    // corpus. No `garbageBetween` guard: a non-empty deletion set already implies one, since every
+    // marked row was pushed in by an event inside the window.
+    const arrivedSince = boardK ? garbageArrivedAfter(r, j, k) : new Set<number>();
+    const garbageLoadBearing = !!(boardK && arrivedSince.size
+      && bestTspinLines(withoutRows(boardK, arrivedSince)) < availAtSpin);
 
     // Which of the three edits in the causing step did it? Direct observation replaces both the
     // execution-time counterfactual AND the co-occurrence assertion, so the two forecast kinds

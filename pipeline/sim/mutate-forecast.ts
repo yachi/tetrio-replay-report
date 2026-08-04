@@ -147,15 +147,30 @@ const MUTANTS: Mutant[] = [
   //     RECORDED as an independent second opinion on the garbage branch, and the tests assert
   //     it — so these mutants stay live and guard the oracle rather than the classifier.
   { name: 'metric/garbage-co-occurrence', note: 'reverts to "garbage arrived", the original bug',
-    find: `    const garbageLoadBearing = !!(boardK && garbageBetween
-      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);`, nth: 1,
+    find: `    const garbageLoadBearing = !!(boardK && arrivedSince.size
+      && bestTspinLines(withoutRows(boardK, arrivedSince)) < availAtSpin);`, nth: 1,
     repl: `    const garbageLoadBearing = !!garbageBetween;` },
   { name: 'metric/garbage-causal-inverted', note: 'load-bearing test inverted',
-    find: `      && bestTspinLines(withoutGarbage(boardK)) < availAtSpin);`, nth: 1,
-    repl: `      && bestTspinLines(withoutGarbage(boardK)) >= availAtSpin);` },
-  { name: 'metric/withoutGarbage-noop', note: 'the counterfactual board is the same board',
-    find: `  const kept = board.filter(row => !row.some(c => (c as unknown as string) === 'G'));`, nth: 1,
+    find: `      && bestTspinLines(withoutRows(boardK, arrivedSince)) < availAtSpin);`, nth: 1,
+    repl: `      && bestTspinLines(withoutRows(boardK, arrivedSince)) >= availAtSpin);` },
+  { name: 'metric/withoutRows-noop', note: 'the counterfactual board is the same board',
+    find: `  const kept = board.filter((_, i) => !rows.has(i));`, nth: 1,
     repl: `  const kept = board.filter(() => true);` },
+  // The deletion set. `deletion-set-unrestricted` is the defect this replaced: strip every garbage
+  // row rather than the ones that arrived after the roof, and the slot's own floor goes with them.
+  { name: 'metric/deletion-set-unrestricted', note: 'deletes all garbage, not the post-roof arrivals',
+    find: `    const arrivedSince = boardK ? garbageArrivedAfter(r, j, k) : new Set<number>();`, nth: 1,
+    repl: `    const arrivedSince = new Set<number>((boardK ?? []).flatMap((row, i) =>
+      row.some(c => (c as unknown as string) === 'G') ? [i] : []));` },
+  { name: 'metric/deletion-set-ignores-clears', note: 'the window walk does not carry marks past a clear',
+    find: `      if (Bpre[row]!.every(x => x !== null)) { Bpre.splice(row, 1); post.splice(row, 1); }`, nth: 1,
+    repl: `      if (false) { Bpre.splice(row, 1); post.splice(row, 1); }` },
+  { name: 'metric/deletion-set-no-shift', note: 'inserted rows do not push the stack off the top',
+    find: `      if (g.lockIndex === t) post = post.slice(g.amt).concat(new Array<boolean>(g.amt).fill(true));`, nth: 1,
+    repl: `      if (g.lockIndex === t) post = post.concat(new Array<boolean>(g.amt).fill(true)).slice(0, H);` },
+  { name: 'metric/deletion-set-trusts-events', note: 'marks rows the events claim without checking the board',
+    find: `    p && boardK[i]!.some(c => (c as unknown as string) === 'G') ? [i] : []));`, nth: 1,
+    repl: `    p ? [i] : []));` },
   { name: 'metric/self-built-counted', note: 'openers rejoin the forecast bucket',
     find: `  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')`, nth: 1,
     repl: `  (r.kind !== 'reactive')` },

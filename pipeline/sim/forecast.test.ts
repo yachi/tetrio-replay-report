@@ -3,7 +3,7 @@
  * Run: bun test forecast.test.ts
  */
 import { test, expect } from 'bun:test';
-import { forecastMetric, isVerifiedForecast, floorOrigin, isForecastOrUnverified } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, floorOrigin, garbageArrivedAfter } from './forecast.ts';
 import { H } from './sim.ts';
 import type { SimResult } from './sim.ts';
 
@@ -496,4 +496,55 @@ test('a garbage floor is undetermined only when garbage straddles the roof', () 
   const allBefore = fakeFor({ noseRow: 10, noseCols: [4], provs: [-1],
     garbageRowsAtRoof: 2, garbageEvents: [3] });
   expect(floorOrigin(allBefore.r, allBefore.k, allBefore.j)).toBe('pre-existed');
+});
+
+/* ---- the counterfactual's deletion set -------------------------------------------------------
+ * A garbage row with a hole at `hole`, and a board carrying `holes.length` of them stacked at the
+ * bottom — oldest on top, which is the order insertion produces. */
+const gRow = (hole: number) => Array.from({ length: W }, (_, c) => c === hole ? null : 'G');
+const withGarbage = (holes: number[], extra: { col: number; row: number }[] = []) => {
+  const b = Array.from({ length: H }, () => new Array<any>(W).fill(null));
+  holes.forEach((hole, i) => { b[H - holes.length + i] = gRow(hole); });
+  for (const c of extra) b[c.row]![c.col] = 'I';
+  return b;
+};
+
+test('the deletion set is the garbage that arrived AFTER the roof, not every garbage row', () => {
+  // One row at lock 1, two more at lock 3, roof at lock 2. Insertion pushes the stack up, so at
+  // lock 3 the pre-roof row sits at 37 and the two arrivals are the BOTTOM-most rows.
+  //
+  // This is the whole item: stripping all three is what made `yachi 07-28-1 r5 lock 36` read as a
+  // spin that depended on garbage, when the row it tucks into arrived 22 locks before its roof.
+  const r = { locks: Array.from({ length: 6 }, () => ({ cells: [], piece: 'I' })),
+    boards: [withGarbage([]), withGarbage([5]), withGarbage([5]),
+             withGarbage([5, 5, 0]), withGarbage([5, 5, 0])],
+    garbageEvents: [{ lockIndex: 1, amt: 1, frame: 0 }, { lockIndex: 3, amt: 2, frame: 0 }] } as any;
+  expect(garbageArrivedAfter(r, 2, 5)).toEqual(new Set([38, 39]));
+  // measured from lock 0 the same board gives all three — the answer is relative to the roof
+  expect(garbageArrivedAfter(r, 0, 5)).toEqual(new Set([37, 38, 39]));
+  // and a roof laid after the last arrival leaves nothing to delete
+  expect(garbageArrivedAfter(r, 3, 5)).toEqual(new Set());
+});
+
+test('a clear inside the window carries the marks down with the rows', () => {
+  // Same board, then the player fills the hole in the bottom row at lock 4 and clears it. Rows
+  // above drop by one, so the surviving arrival is now row 39 and row 38 is the PRE-roof row that
+  // used to be at 37. A walk that skipped the clear would still be marking 38 and 39 and would
+  // delete the pre-roof row — the same over-deletion, one step further along.
+  const r = { locks: [...Array.from({ length: 4 }, () => ({ cells: [], piece: 'I' })),
+      { cells: [{ col: 0, row: H - 1 }], piece: 'I' }, { cells: [], piece: 'I' }],
+    boards: [withGarbage([]), withGarbage([5]), withGarbage([5]),
+             withGarbage([5, 5, 0]), withGarbage([5, 5])],
+    garbageEvents: [{ lockIndex: 1, amt: 1, frame: 0 }, { lockIndex: 3, amt: 2, frame: 0 }] } as any;
+  expect(garbageArrivedAfter(r, 2, 5)).toEqual(new Set([39]));
+});
+
+test('a garbage event whose rows are not on the board deletes nothing', () => {
+  // `mk` below writes garbage EVENTS into fixtures whose boards carry no garbage at all, and the
+  // self_built case depends on it. Marking rows the events claim without checking the board would
+  // delete four rows of the player's own stack and report the placement as load-bearing garbage.
+  const r = { locks: Array.from({ length: 6 }, () => ({ cells: [], piece: 'I' })),
+    boards: Array.from({ length: 5 }, () => withGarbage([], [{ col: 0, row: H - 1 }])),
+    garbageEvents: [{ lockIndex: 3, amt: 4, frame: 0 }] } as any;
+  expect(garbageArrivedAfter(r, 2, 5)).toEqual(new Set());
 });
