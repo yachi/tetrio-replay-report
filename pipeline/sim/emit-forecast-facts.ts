@@ -96,7 +96,7 @@ const tally = (extra: any) => {
     const r = runCase(c, extra);
     const v = verifiedIndex(r, c.truth);
     per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
-      floors: { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 },
+      floors: { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 },
       forecasts: 0, undecided: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
@@ -164,7 +164,6 @@ const players = Object.entries(base).map(([user, v]) => {
     clause2_undecided: v.undecided,
     floor_pre_existed: v.floors['pre-existed'],
     floor_arrived_later: v.floors['arrived-later'],
-    floor_is_playfield: v.floors['field-floor'],
     floor_undetermined: v.floors.undetermined,
     reactive: v.reactive,
     // Gated floor convention (`pipeline/fmt.py`): every printed figure in this repo floors, so
@@ -285,7 +284,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/5',
+  schema: 'forecast-facts/6',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

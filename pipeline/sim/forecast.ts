@@ -149,44 +149,69 @@ export interface ForecastRecord {
  * an overhang over a few lines far of A HOLE"; the hole is a premise, not a consequence.
  *
  * No cell tracking is needed to decide it. `provSnaps[t]` records, for every filled cell, the index
- * of the lock that placed it, so the floor's origin is read directly at k-1 and compared with j:
+ * of the lock that placed it, so each support's origin is read directly at k-1 and compared with j:
  *
- *   'pre-existed'   placed by a lock at or before j — the roof went up over something already there
- *   'arrived-later' placed after j, so at j there was nothing for the nose to rest on
- *   'field-floor'   the nose reaches the bottom of the playfield, which predates all play
- *   'undetermined'  the floor is a garbage cell, garbage both predates and postdates j, and which
+ *   'pre-existed'   every cell holding the piece up was there at j — the roof went up over
+ *                   something already present
+ *   'arrived-later' at least one of them was placed after j, so at j there was nothing there to
+ *                   rest on. One such support is enough: the hole as executed did not pre-exist.
+ *   'undetermined'  a support is a garbage cell, garbage both predates and postdates j, and which
  *                   row is which cannot be settled without tracking. Never counted either way.
  *
- * A garbage floor is NOT automatically undetermined: if the board held no garbage at all when the
- * roof landed, a garbage floor cannot predate it, and that is decidable from the two snapshots.
- * That single test is what settles the one event this corpus used to publish.
+ * A garbage support is NOT automatically undetermined: if the board held no garbage at all when the
+ * roof landed, garbage cannot predate it, and that is decidable from the two snapshots. That single
+ * test is what settles the one event this corpus used to publish.
+ *
+ * EVERY support is judged, not the deepest row alone. A T that tucks under an overhang usually rests
+ * on its two shoulders while its nose hangs into a well, so reading the cell under the nose reads an
+ * empty cell and learns nothing. Measured over the four committed sessions: the deepest-row cells
+ * were a PROPER SUBSET of the genuine supports in all 654 events — 294 missed one support, 204 two,
+ * 156 three — and the missed cells carried strictly newer provenance in 258 of the 398 events where
+ * both sets were non-empty. There was also a `'field-floor'` verdict, returned both when the nose
+ * reached row 39 and when nothing at all sat beneath it; it is gone, because the case it named —
+ * a piece held up by the playfield bottom ALONE — occurs 0 times in 654 events across all seven
+ * simulator configs. The floor still predates all play, so it simply never raises the maximum.
  */
-export type FloorOrigin = 'pre-existed' | 'arrived-later' | 'field-floor' | 'undetermined';
+export type FloorOrigin = 'pre-existed' | 'arrived-later' | 'undetermined';
 
 export function floorOrigin(r: SimResult, k: number, j: number | null): FloorOrigin {
   const lk = r.locks[k]!;
-  const noseRow = Math.max(...lk.cells.map(c => c.row));
-  if (noseRow + 1 >= H) return 'field-floor';
   const prev = r.provSnaps[k - 1];
   if (!prev) return 'undetermined';
-  // a T that finishes flat has two lowest cells; consider whatever any of them rests on
-  const provs = lk.cells.filter(c => c.row === noseRow)
-    .map(c => prev[noseRow + 1]?.[c.col])
-    .filter((p): p is number => p !== null && p !== undefined);
-  if (provs.length === 0) return 'field-floor';
-  if (j === null) return 'undetermined';
-  if (provs.some(p => p === -1)) {
-    const garbageRows = (t: number) =>
-      r.boards[t]!.filter(row => row.some(c => (c as unknown as string) === 'G')).length;
-    if (garbageRows(j) === 0) return 'arrived-later';
-    return r.garbageEvents.some(g => g.lockIndex > j && g.lockIndex <= k) ? 'undetermined' : 'pre-existed';
+
+  const provs: number[] = [];
+  let onFloor = false;
+  for (const c of lk.cells) {
+    const below = c.row + 1;
+    if (below >= H) { onFloor = true; continue; }   // the playfield bottom predates everything
+    // No guard is needed for a cell of the T sitting below another: `prev` is the snapshot BEFORE
+    // this lock, so every cell the piece is about to occupy is still empty and the null test below
+    // already skips it. One was written here and the mutation harness could not kill it — measured,
+    // it fires 953 times across the corpus and finds a non-null cell in 0 of them.
+    const p = prev[below]?.[c.col];
+    if (p === null || p === undefined) continue;    // empty: this cell of the piece rests on nothing
+    provs.push(p);
   }
-  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';
+  // held up by the playfield floor and nothing else — measured 0 times, kept so it cannot go wrong
+  if (provs.length === 0) return onFloor ? 'pre-existed' : 'undetermined';
+  if (j === null) return 'undetermined';
+
+  const garbageRows = (t: number) =>
+    r.boards[t]!.filter(row => row.some(c => (c as unknown as string) === 'G')).length;
+  let after = false, unknown = false;
+  for (const p of provs) {
+    if (p >= 0) { if (p > j) after = true; continue; }
+    // a garbage support: decidable at the ends, undecidable when garbage straddles the window
+    if (garbageRows(j) === 0) after = true;
+    else if (r.garbageEvents.some(g => g.lockIndex > j && g.lockIndex <= k)) unknown = true;
+  }
+  // a support that demonstrably postdates the roof settles it, whatever the others do
+  return after ? 'arrived-later' : unknown ? 'undetermined' : 'pre-existed';
 }
 
 /** Clause 2 as a verdict: true, false, or `null` for the cases nothing can decide. */
 export const holePreExisted = (o: FloorOrigin): boolean | null =>
-  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';
+  o === 'undetermined' ? null : o === 'pre-existed';
 
 /**
  * Forecasts whose mechanism is ESTABLISHED and which had a hole to forecast onto. This is the
@@ -392,9 +417,14 @@ export function forecastMetric(r: SimResult, strict = true): {
     // Clause 2, evaluated for every event rather than only the ones that reach the gate, so the
     // report can say how often it is decidable at all instead of only how often it passes.
     const origin = floorOrigin(r, k, j >= 0 ? j : null);
-    const noseRow = Math.max(...lk.cells.map(c => c.row));
-    const floorFrom = noseRow + 1 < H ? (r.provSnaps[k - 1]?.[noseRow + 1]?.[
-      lk.cells.filter(c => c.row === noseRow)[0]!.col] ?? null) : null;
+    // The support that decided it: the newest thing holding the piece up, or -1 if any of them is
+    // garbage, since garbage has no lock index to be newest by. This read the nose row alone until
+    // clause 2 stopped doing so — a diagnostic naming a cell the verdict never consulted is worse
+    // than no diagnostic, because it reads like corroboration.
+    const supports = lk.cells.map(c => c.row + 1 < H ? r.provSnaps[k - 1]?.[c.row + 1]?.[c.col] : null)
+      .filter((p): p is number => p !== null && p !== undefined);
+    const floorFrom = supports.length === 0 ? null
+      : supports.includes(-1) ? -1 : Math.max(...supports);
 
     // Loose mode: the original rule verbatim, co-occurrence and all.
     const kind: ForecastKind = !(strict && determinable)
@@ -418,7 +448,7 @@ export function forecastMetric(r: SimResult, strict = true): {
   const verified = records.filter(isVerifiedForecast).length;
   const unattributed = records.filter(x => x.mechanism === 'unattributed').length;
   const floorOrigins: Record<FloorOrigin, number> =
-    { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 };
+    { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 };
   for (const x of records) floorOrigins[x.floorOrigin ?? 'undetermined']++;
   // an event whose mechanism holds but whose clause 2 cannot be decided is neither counted nor
   // discarded quietly: it is its own number, so a rate of zero cannot hide an undecidable case

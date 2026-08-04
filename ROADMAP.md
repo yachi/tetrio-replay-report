@@ -719,30 +719,47 @@ Two things this settled that were previously recorded here as open puzzles:
 * **The bimodal gap distribution was not an artefact.** Gap-at-placement being 2 or 5 and never 3 or 4
   is a T-spin triple removing exactly three rows, every time.
 
-### 1 — the improvement gate is a scalar, and one event proves it leaks
+### 1 — CLOSED: the leak was not a leak, and the defect was in the counterfactual's deletion set
 
-`improved` asks whether `bestTspinLines` rose between the roof board and the execution board. That
-collapses the whole board to one number, so a mechanism that **replaces** one two-line spin with a
-different two-line spin moves nothing and the event is filed `reactive` — never reaching the
-mechanism test at all.
+This item used to read: *"`improved` collapses the board to one number, so a mechanism that replaces
+one two-line spin with a different two-line spin moves nothing… 1 event of 654 has garbage that IS
+load-bearing at execution."* The sizing run it asked for was done on 2026-08-04. **Every part of that
+claim is false except the arithmetic.**
 
-This is measured, not hypothetical: **1 event of 654** (`2026-07-28`, yachi, `replay-2026-07-28-1`
-r5, lock 36) has garbage that IS load-bearing at execution — strip it and the best spin drops 2 → 1
-— while `availAtRoof == availAtSpin == 2`. It is found by the execution-time counterfactual
-disagreeing with the gate, and pinned by a test in `forecast-corpus.test.ts` so the number cannot
-drift silently.
+**The event is not load-bearing.** `yachi replay-2026-07-28-1 r5 lock 36`: the T tucks into a garbage
+row that arrived at **lock 11**, and the roof is at lock 33. The only garbage that arrived inside the
+window `(33, 36]` is a single row at lock 34, sitting at the very bottom of the field twelve rows
+below the slot. Delete just that row and the executed spin is untouched — still two lines. The 2 → 1
+drop comes from `withoutGarbage` stripping **all thirteen** garbage rows, including the one that is
+the slot's own floor and predates the roof by 22 locks. The scalar falls because the board was
+mangled, not because any post-roof garbage held the spin up.
 
-**The fix is a different question, not a patch.** Ask whether the **executed** spin depended on the
-mechanism — the T's placement at lock `k` is known, so test that specific slot's dependence rather
-than the board's best-available scalar. That subsumes the current gate (a spin that only exists
-because of garbage also fails without it) and removes `improved` entirely, so it is a deletion, not
-another branch. It would also retire the `withoutGarbage` counterfactual's last job.
+**Zero events of 654 depend on post-roof garbage.** Restricting the deletion set to rows whose derived
+arrival lock is in `(j, k]`: 121 events have such a row (`|D|` from 1 to 14), and the executed spin
+survives its removal in **all 121** — 0 gone, 0 degraded, 0 undecidable. The remap was mutation-tested
+(drop the row-shift term → 0 reachable / 121 gone), the arrival tagging was validated against the
+board at 17,076 lock-steps with 0 disagreements, and a BFS matching the executed cell set reproduces
+the actual placement, line count and spin grade on 654/654 events.
 
-**Sizing before building it:** 265 events are currently `reactive`. Re-run the execution-time
-counterfactual over all of them first and count how many have a load-bearing mechanism. If the
-answer stays 1, the leak is a footnote and the rewrite is not worth it; if it is 20, the published
-rate is wrong again in the same direction as before. That measurement is an hour and decides the
-rest.
+**The proposed replacement does not subsume `improved`; it contradicts it in the wrong direction.**
+`improved` asks about the board's best slot, the executed-spin test asks about the one slot the player
+used, and those differ whenever the mechanism opens a *better* slot than the one executed. At least
+**81** currently-accepted events get re-decided INDEPENDENT by the garbage arm alone. Direction B —
+`improved = false` and the executed spin DEPENDS — is **empty**. And the line-clear arm has no
+execution-time form at all: re-inserting a cleared row yields a board carrying a full row, a state
+`lockPiece` cannot leave behind. Back-mapping the executed cells across a cleared row leaves a shape
+that is not a T in 47 of 50 cases, so a naive version reports "load-bearing" for 100% of clearing
+steps. Retiring `improved` in its favour would delete the corpus's only positive, which is a
+`forecast_lineclear`.
+
+**What remains open is small and named:** restrict `withoutGarbage`'s deletion set to post-roof
+arrivals. That is a two-line change which would take `loadBearingButNotImproved` from 1 to 0 and
+retire the last disagreement between the two instruments. `withoutGarbage` was validated on the
+wiki's five garbage pairs, and in every one of those the appended line **is** the slot, so destroying
+it is the right answer there; the corpus contains the other shape and the oracle inverts on it.
+
+**Also settled:** the sizing sweep costs **2.1 seconds** for all four sessions, not the hour this item
+budgeted. `audit-mechanism.ts` already walks them cross-session and needs no `REPLAY_DIR`.
 
 ### 2 — one mutant is unlisted rather than killed
 
@@ -757,15 +774,46 @@ constructing that two-slot board; until then the equivalence is conditional and 
 
 The "Original TODO" item 2 above — the two surviving mutants on the availability probe
 (`best/no-rotation`, `best/no-spin-test`) — is **done**. Both are killed in the current sweep,
-which stands at **24/24**. The probe they guard is now `bestTspin`, a single BFS returning both the
+which stands at **32/32**. The probe they guard is now `bestTspin`, a single BFS returning both the
 line count and the slot's rows; the second copy that once carried a different cap is gone.
 
-### 3 — garbage-floor events cannot be measured at all
+### 3 — CLOSED: the garbage-floor events were the same five events as item 1, and they are decidable
 
-When the cell the T lands on is GARBAGE it has no placing lock, so nothing can be traced and the gap test
-does not run. That is **5 events**, and two of them are live candidates: `pinglamb 07-24-3 r7 lock 29`
-(best 0 -> 2 over 12 pieces; stripping the garbage drops it to 1) and `yachi 07-28-1 r5 lock 36` (the
-scalar blind spot of item 1, now located — it is a garbage-floor event). This is the wiki's own
-"in anticipation of an empty garbage column" case going unexamined, and it is the largest remaining hole
-in the instrument. Tracking a garbage cell needs an identity other than a placing lock — the arrival
-event that inserted its row would do.
+This item used to read: *"When the cell the T lands on is GARBAGE it has no placing lock… That is 5
+events."* Both halves are now settled, and the two items turned out to describe one population.
+
+The five are `pinglamb 07-24-2 r6 lock 45`, `pinglamb 07-24-3 r7 lock 29`, `yachi 07-24-5 r7 lock 20`,
+`yachi 07-28-1 r5 lock 36`, `yachi 07-28-8 r6 lock 21` — every one a TSD tucking into a garbage well
+whose lower row is garbage. Item 1's "leak" is the fourth of them. They looked undecidable only under
+the strip-all deletion set; under the restricted one **D never touches the slot in any of the five**,
+because in every case the in-slot garbage arrived 8 to 22 locks *before* that event's own roof. All
+five are decidable and none depends on post-roof garbage.
+
+The tracing problem is also gone, and not by tracking cells. Clause 2 now reads **every cell holding
+the piece up**, not the deepest row alone, so a garbage cell under the nose is no longer the only
+evidence available — the shoulders usually rest on player stack whose provenance is exact. Where a
+genuine support *is* garbage, the existing two-ended test decides it (no garbage at the roof ⇒ it
+arrived later; no garbage event in the window ⇒ it predates), and only a straddling window is reported
+`undetermined`. Corpus-wide that is **10 of 654**, reported and never counted either way.
+
+What prompted the rewrite was measuring the branch this item leaned on. `floorOrigin` used to return
+`'field-floor'` — documented as "the nose reaches the bottom of the playfield, which predates all
+play" — in two structurally different situations, and the second one had inspected nothing at all.
+Measured over 654 events: 161 nose-on-row-39 and **95 nose-over-empty**, all counted clause 2 TRUE.
+Judging the real supports flips **36** of them (35 true→false, 1 true→null). The label is deleted: a
+piece supported by the playfield bottom **alone** occurs 0 times in 654 events across all seven
+configs, so the case it named does not exist. More generally the inspected cells were a *proper
+subset* of the genuine supports in **all 654** events — 294 missed one, 204 two, 156 three — and the
+missed cells carried strictly newer provenance in 258 of the 398 events where both sets were
+non-empty. The old rule was reaching the right verdict from an input that did not entail it.
+
+The published rate is unchanged at **0 of 654**, under all seven simulator configs.
+
+### 4 — is a dangling nose over an unrelated well "an overhang over a hole"?
+
+Raised by the clause-2 rewrite and **not** settled by it. In 74 events the T's nose hangs into a well
+that has nothing to do with the spin while the shoulders carry the piece. Judging the supports gives
+`pre-existed`, which correctly answers *"did the cells holding it up predate the roof"* — but that may
+be the wrong question for those boards, since there is no cavity under the overhang at all. This is a
+definition question about what "the hole" refers to, not a measurement gap, and no sweep can decide
+it. If the answer is that they should not count, it is a larger correction than anything above.

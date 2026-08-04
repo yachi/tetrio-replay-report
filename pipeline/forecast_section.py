@@ -265,7 +265,6 @@ def _mechanism_clause(data):
     mech = sum(p.get("mechanism_established", 0) for p in ps)
     fc = sum(p.get("forecast_total", 0) for p in ps)
     pre = sum(p.get("floor_pre_existed", 0) for p in ps)
-    fld = sum(p.get("floor_is_playfield", 0) for p in ps)
     late = sum(p.get("floor_arrived_later", 0) for p in ps)
     und = sum(p.get("floor_undetermined", 0) for p in ps)
     undec = sum(p.get("clause2_undecided", 0) for p in ps)
@@ -295,8 +294,11 @@ def _mechanism_clause(data):
         "如果落天花板嗰時下面係實心，之後先至開窿，"
         "咁就唔係「預先搭喺個窿上面」，只係執返個之後先出現嘅位。"
         "呢一項唔使追格——provenance 格網記住每一格係邊一手落嘅，"
-        f"睇 T 個鼻尖最後踩住嗰格係邊一手放低就得。全部 {tot} 個入面："
-        f"<strong>{pre} 個</strong>個底早過天花板；{fld} 個係踩到場底（場底早過所有嘢）；"
+        "睇住 T <strong>四格全部</strong>各自踩住嗰格係邊一手放低就得——"
+        "唔淨止睇最低嗰行：T 塞入去嘅時候多數係兩邊膊頭承住、個鼻尖吊喺個窿度，"
+        "淨睇鼻尖下面嗰格會睇到一格空氣，乜都問唔到。"
+        f"全部 {tot} 個入面："
+        f"<strong>{pre} 個</strong>承住佢嘅格全部早過天花板；"
         f"<strong>{late} 個</strong>個底係天花板之後先至出現；"
         f"{und} 個查唔到（個底係垃圾，而垃圾喺天花板前後都升過，唔追格就分唔到邊行係邊行）。"
         "下面表入面嘅數，係<strong>四項條件全部符合</strong>先計。",

@@ -109,23 +109,39 @@ const MUTANTS: Mutant[] = [
     find: `  && holePreExisted(r.floorOrigin ?? 'undetermined') === true;`, nth: 1,
     repl: `  && true;` },
   { name: 'metric/clause2-inverted', note: 'a floor that arrived later counts and one that was there does not',
-    find: `  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';`, nth: 1,
-    repl: `  o === 'undetermined' ? null : !(o === 'pre-existed' || o === 'field-floor');` },
+    find: `  o === 'undetermined' ? null : o === 'pre-existed';`, nth: 1,
+    repl: `  o === 'undetermined' ? null : o !== 'pre-existed';` },
   { name: 'metric/clause2-undecided-passes', note: 'an undecidable floor is counted as a pass',
-    find: `  o === 'undetermined' ? null : o === 'pre-existed' || o === 'field-floor';`, nth: 1,
-    repl: `  o === 'undetermined' ? true : o === 'pre-existed' || o === 'field-floor';` },
-  { name: 'metric/clause2-roof-column', note: 'reads the floor under the ROOF, not under the nose',
-    find: `  const provs = lk.cells.filter(c => c.row === noseRow)`, nth: 1,
-    repl: `  const provs = lk.cells.filter(c => c.row === Math.min(...lk.cells.map(x => x.row)))` },
+    find: `  o === 'undetermined' ? null : o === 'pre-existed';`, nth: 1,
+    repl: `  o === 'undetermined' ? true : o === 'pre-existed';` },
   { name: 'metric/clause2-roof-excluded', note: 'a floor placed BY the roof piece stops counting',
-    find: `  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';`, nth: 1,
-    repl: `  return Math.max(...provs) < j ? 'pre-existed' : 'arrived-later';` },
-  { name: 'metric/clause2-oldest-floor', note: 'takes the oldest thing under the nose, not the newest',
-    find: `  return Math.max(...provs) <= j ? 'pre-existed' : 'arrived-later';`, nth: 1,
-    repl: `  return Math.min(...provs) <= j ? 'pre-existed' : 'arrived-later';` },
+    find: `    if (p >= 0) { if (p > j) after = true; continue; }`, nth: 1,
+    repl: `    if (p >= 0) { if (p >= j) after = true; continue; }` },
   { name: 'metric/clause2-garbage-always-old', note: 'any garbage floor is assumed to predate the roof',
-    find: `    if (garbageRows(j) === 0) return 'arrived-later';`, nth: 1,
-    repl: `    if (garbageRows(j) === 0) return 'pre-existed';` },
+    find: `    if (garbageRows(j) === 0) after = true;`, nth: 1,
+    repl: `    if (garbageRows(j) === 0) after = false;` },
+
+  // Clause 2 reads EVERY cell holding the piece up, not the deepest row alone. These guard that:
+  // the nose-only reading was a proper subset of the genuine supports in all 654 events, and the
+  // `'field-floor'` verdict it needed to cover its blind spot named a case — a piece held up by
+  // the playfield bottom ALONE — that occurs zero times in 654 events across seven configs.
+  { name: 'metric/clause2-nose-row-only', note: 'reverts to reading only the cells under the deepest row',
+    find: `  for (const c of lk.cells) {
+    const below = c.row + 1;`, nth: 1,
+    repl: `  const noseRow = Math.max(...lk.cells.map(c => c.row));
+  for (const c of lk.cells.filter(c => c.row === noseRow)) {
+    const below = c.row + 1;` },
+  { name: 'metric/clause2-unsupported-passes', note: 'a piece resting on nothing is called pre-existing',
+    find: `  if (provs.length === 0) return onFloor ? 'pre-existed' : 'undetermined';`, nth: 1,
+    repl: `  if (provs.length === 0) return 'pre-existed';` },
+  // There was a `metric/clause2-self-support` mutant here, guarding an `own.has(...)` skip for a
+  // cell of the T sitting below another. It survived, and the reason is that the guard could not
+  // do anything: `prev` is the snapshot BEFORE the lock, so those cells are still empty and the
+  // null test already skips them. Measured 953 firings, 0 non-null. The guard was deleted rather
+  // than given a test — a mutant nothing can kill is a line nothing needs.
+  { name: 'metric/clause2-after-loses-to-unknown', note: 'a support that postdates the roof is reported undecidable',
+    find: `  return after ? 'arrived-later' : unknown ? 'undetermined' : 'pre-existed';`, nth: 1,
+    repl: `  return unknown ? 'undetermined' : after ? 'arrived-later' : 'pre-existed';` },
 
   // --- the execution-time counterfactual. It no longer classifies anything, but it is still
   //     RECORDED as an independent second opinion on the garbage branch, and the tests assert

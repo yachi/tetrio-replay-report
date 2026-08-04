@@ -25,7 +25,7 @@ const run = () => {
   const totals: Record<string, number> = {
     forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0, unattributed: 0 };
   const floors: Record<FloorOrigin, number> =
-    { 'pre-existed': 0, 'arrived-later': 0, 'field-floor': 0, undetermined: 0 };
+    { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 };
   const forecasts: string[] = [];
   const mechanismOnly: string[] = [];
   let loadBearingButNotImproved = 0;
@@ -79,19 +79,30 @@ realData('nothing survives all four clauses, and the one that reaches clause 2 i
   ]);
 });
 
-realData('clause 2 is decidable for all but two of the 2026-07-28 events', () => {
+realData('clause 2 is decidable for all but three of the 2026-07-28 events', () => {
   // Published so a drift in the undecidable count is visible: an implementation that quietly
   // stopped being able to answer would otherwise present as a rate that had not moved.
+  //
+  // These moved when clause 2 started judging EVERY cell holding the piece up rather than the
+  // deepest row alone. The old split read 83 / 48 field-floor / 13 / 2, and the 48 were the
+  // giveaway: `field-floor` claimed the playfield bottom was the support, but across all 654
+  // events and all seven configs the number of pieces held up by the floor ALONE is zero.
   expect(R!.floors).toEqual({
-    'pre-existed': 83, 'field-floor': 48, 'arrived-later': 13, undetermined: 2,
+    'pre-existed': 126, 'arrived-later': 17, undetermined: 3,
   });
 });
 
-realData('the scalar improvement gate has one known blind spot, and it is one event', () => {
+realData('the scalar gate and the garbage counterfactual disagree on exactly one event', () => {
   // `improved` compares a single number either side of the window, so garbage that REPLACES one
-  // two-line spin with another leaves it unmoved even though the executed spin depended on the
-  // garbage. Here that is one event, found by the execution-time counterfactual disagreeing with
-  // the gate. It is pinned rather than fixed: closing it means asking whether the EXECUTED spin
-  // depended on the mechanism, not whether the best-available scalar rose.
+  // two-line spin with another leaves it unmoved. One event trips that comparison — but it is NOT
+  // a spin that depended on garbage. `withoutGarbage` strips EVERY garbage row, and on this event
+  // (yachi replay-2026-07-28-1 r5 lock 36) the row it removes to make the spin vanish is the one
+  // the T tucks into, which arrived at lock 11 — 22 locks BEFORE the roof at 33. The only garbage
+  // that arrived inside the window is a single row at the very bottom of the field, twelve rows
+  // below the slot; deleting just that row leaves the spin intact at two lines.
+  //
+  // So this pins a disagreement between two instruments, not a load-bearing mechanism. Restricting
+  // the deletion set to post-roof arrivals would take it to 0. Measured over all four sessions:
+  // 121 events have post-roof garbage and the executed spin survives its removal in all 121.
   expect(R!.loadBearingButNotImproved).toBe(1);
 });

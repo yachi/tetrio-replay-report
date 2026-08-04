@@ -48,6 +48,13 @@ function mk(opts: {
     // snapshot BEFORE the T lock (index tLock-1) carries the roof
     const filled: Record<string, number> = {};
     if (roofOwner !== null) for (const c of tCells) filled[`${c.col},${c.row - 1}`] = roofOwner;
+    // ...and a floor, because a piece resting on nothing at all is not a state the game can reach.
+    // This fixture used to leave the cells under the T empty and passed anyway: clause 2 read the
+    // one cell under the nose, found it empty, and returned 'field-floor' — "the playfield bottom
+    // predates all play" — for a T floating in mid-air at row 31. Lock 0 owns the floor so it can
+    // never postdate the roof, which is what these tests are about.
+    const noseRow = Math.max(...tCells.map(c => c.row));
+    for (const c of tCells) if (c.row === noseRow) filled[`${c.col},${noseRow + 1}`] ??= 0;
     provSnaps.push(grid(i === tLock - 1 ? filled : {}));
   }
   locks[tLock]!.cleared = tCleared;
@@ -283,8 +290,11 @@ test('isVerifiedForecast wants a mechanism AND a hole that was already there', (
   expect(isVerifiedForecast(mkRec('forecast_lineclear'))).toBe(true);
   expect(isVerifiedForecast(mkRec('self_built'))).toBe(false);
   expect(isVerifiedForecast(mkRec('reactive'))).toBe(false);
-  // the playfield floor predates every placement, so a nose resting on it had its hole all along
-  expect(isVerifiedForecast(mkRec('forecast_lineclear', 'field-floor'))).toBe(true);
+  // A 'field-floor' verdict used to sit here, counted true because the playfield bottom predates
+  // every placement. It is gone: the same label was returned for a nose on row 39 AND for a nose
+  // with nothing at all beneath it, and a piece held up by the floor ALONE occurs zero times in
+  // 654 events across seven configs. The floor is still older than everything — it just never
+  // raises the maximum provenance, so it needs no verdict of its own.
   // and the two that must not count, including the one that is merely unknown
   expect(isVerifiedForecast(mkRec('forecast_lineclear', 'arrived-later'))).toBe(false);
   expect(isVerifiedForecast(mkRec('forecast_garbage', 'undetermined'))).toBe(false);
@@ -447,6 +457,34 @@ test('when a flat T rests on two locks, the LATER one decides', () => {
   expect(floorOrigin(r, k, j)).toBe('arrived-later');
   const bothOld = fakeFor({ noseRow: 10, noseCols: [3, 5], provs: [2, 4] });
   expect(floorOrigin(bothOld.r, bothOld.k, bothOld.j)).toBe('pre-existed');
+});
+
+test('a piece resting on nothing is undetermined, not pre-existing', () => {
+  // `provs` empty means every cell under the piece is empty. The old rule returned 'field-floor'
+  // here — "the playfield bottom predates all play" — for a piece nowhere near the bottom, and
+  // counted it as clause 2 TRUE. It is the branch that made 95 corpus events pass on an inspection
+  // that read nothing. Only genuine floor contact may answer, and then only when it is the whole
+  // support; anything else is a question the snapshots cannot settle.
+  const nothing = fakeFor({ noseRow: 10, noseCols: [4], provs: [null] });
+  expect(floorOrigin(nothing.r, nothing.k, nothing.j)).toBe('undetermined');
+  const onTheFloor = fakeFor({ noseRow: H - 1, noseCols: [4], provs: [null] });
+  expect(floorOrigin(onTheFloor.r, onTheFloor.k, onTheFloor.j)).toBe('pre-existed');
+});
+
+test('a support that postdates the roof settles it, even beside an undecidable one', () => {
+  // A flat T can rest on one player cell and one garbage cell. If the player cell was placed after
+  // the roof, the hole did not pre-exist the overhang and no amount of uncertainty about the
+  // garbage changes that — so 'arrived-later' must win over 'undetermined'. Two corpus events have
+  // this shape (07-22-3 r1 lock 21, and the published 07-28-6 r5 lock 32), but in both the garbage
+  // is DECIDABLE, so neither exercises the precedence. This does.
+  const both = fakeFor({ noseRow: 10, noseCols: [3, 5], provs: [8, -1],
+    garbageRowsAtRoof: 2, garbageEvents: [7] });
+  expect(floorOrigin(both.r, both.k, both.j)).toBe('arrived-later');
+  // and with the player cell placed BEFORE the roof, the undecidable garbage does decide
+  const onlyGarbageUnknown = fakeFor({ noseRow: 10, noseCols: [3, 5], provs: [2, -1],
+    garbageRowsAtRoof: 2, garbageEvents: [7] });
+  expect(floorOrigin(onlyGarbageUnknown.r, onlyGarbageUnknown.k, onlyGarbageUnknown.j))
+    .toBe('undetermined');
 });
 
 test('a garbage floor is undetermined only when garbage straddles the roof', () => {
