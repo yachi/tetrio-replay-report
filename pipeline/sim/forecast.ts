@@ -29,8 +29,10 @@
  *        solid stack that opened up underneath scored exactly like a roof laid over a hole on
  *        purpose. The player's own statement of the metric makes the hole a premise: "putting an
  *        overhang over a few lines far of A HOLE". Adding it took the corpus from 1 of 654 to
- *        0 of 654 — the single event that reached this clause has its nose resting on a garbage
- *        cell that had not arrived when the overhang was placed.
+ *        0 of 654 — on the single event that reached this clause, one of the cells holding the T
+ *        up is garbage that had not arrived when the overhang was placed. Note "one of the cells
+ *        holding it up", not "the cell under the nose": whether anything sits under the T's lowest
+ *        cell is irrelevant, and reading that cell was the defect this clause was rewritten to fix.
  *
  * Both forecast kinds now rest on the same evidence. Until 2026-08-02 the garbage branch was
  * counterfactually tested while the line-clear branch merely asserted co-occurrence, because
@@ -385,7 +387,7 @@ export function forecastMetric(r: SimResult, strict = true): {
   tspins: number;
   /** improvements the step model could not explain — must be 0, and is published so it can't hide */
   unattributed: number;
-  /** clause 2 across every event: how the cell under the nose got there */
+  /** clause 2 across every event: where the cells holding the T up came from */
   floorOrigins: Record<FloorOrigin, number>;
   /** mechanism established AND a hole to close onto; the denominator is every executed tucked spin */
   forecastRate: number;
