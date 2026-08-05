@@ -3,7 +3,8 @@
  * Run: bun test forecast.test.ts
  */
 import { test, expect } from 'bun:test';
-import { forecastMetric, isVerifiedForecast, floorOrigin, garbageArrivedAfter } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, floorOrigin, garbageArrivedAfter,
+         localiseMechanism, bestTspinLines } from './forecast.ts';
 import { H } from './sim.ts';
 import type { SimResult } from './sim.ts';
 
@@ -547,4 +548,57 @@ test('a garbage event whose rows are not on the board deletes nothing', () => {
     boards: Array.from({ length: 5 }, () => withGarbage([], [{ col: 0, row: H - 1 }])),
     garbageEvents: [{ lockIndex: 3, amt: 4, frame: 0 }] } as any;
   expect(garbageArrivedAfter(r, 2, 5)).toEqual(new Set());
+});
+
+/* ── the early return in localiseMechanism, and why it is not decoration ─────────────────────────
+ *
+ * `if (bestTspinLines(Bpre) >= target) return 'placement'` says: if the placement ALONE already
+ * reached the target, before any row was removed, then the placement sufficed. Dropping it was
+ * equivalent for all 654 corpus events and every fixture, because with no clear at the causing
+ * step B IS Bpre and the next branch runs the identical test. It was carried in the mutant list as
+ * a comment for that reason. This is the board that separates them.
+ *
+ * Three things had to hold at once, and the first two fight each other:
+ *   · the step both places and clears
+ *   · Bpre already reaches the target
+ *   · the post-clear best slot STRADDLES the cleared row, so without the early return the whole
+ *     step is attributed to the line clear
+ *
+ * The fight: a slot's rows go full, so nothing can descend past them — any ordinary second slot
+ * placed above the low well seals it in both Bpre and B, and the low slot is never reachable. The
+ * way out is that `bestTspin` counts every full row in the board it produces, including the one
+ * about to be cleared. So the high spin need clear nothing of its own: a nook confined to the
+ * right, worth exactly 1 in Bpre and 0 in B, which blocks no column.
+ */
+test('a placement that already reached the target is not credited to the clear beside it', () => {
+  const row = (cells: string) => [...cells].map(c => c === '.' ? null : 'I');
+  const bd = (rows: Record<number, string>) => {
+    const b = Array.from({ length: H }, () => new Array<any>(W).fill(null));
+    for (const [r, l] of Object.entries(rows)) b[Number(r)] = row(l);
+    return b;
+  };
+  const A = bd({
+    30: ".......##.", 31: "......#..#", 32: "......#..#", 33: "......####",  // the non-clearing nook
+    36: "..##......",                                                        // low slot: overhang
+    37: "######....",                                                        // the row the I completes
+    38: "...#######", 39: "#.########",                                      // low slot: the T's rows
+  });
+  const cells = [6, 7, 8, 9].map(col => ({ col, row: 37 }));
+  const B = bd({
+    31: ".......##.", 32: "......#..#", 33: "......#..#", 34: "......####",
+    37: "..##......", 38: "...#######", 39: "#.########",
+  });
+  const r = { boards: { 4: A, 5: B }, garbageEvents: [],
+    locks: { 5: { cells, piece: 'I', cleared: 1 } } } as unknown as SimResult;
+  const avail = (t: number) => bestTspinLines((r.boards as any)[t] ?? A);
+
+  // the setup itself, so a fixture that quietly stopped exercising the branch is visible
+  expect(bestTspinLines(A as any)).toBe(0);          // below target, so the walk stays on this step
+  expect(bestTspinLines(B as any)).toBe(2);          // and the post-clear slot is worth more
+
+  // target 1: Bpre reaches it, so the placement is credited — this is the assertion the mutant fails
+  expect(localiseMechanism(r, 4, 6, 1, avail)).toEqual({ step: 5, mechanism: 'placement' });
+  // target 2: Bpre does NOT reach it, the early return is skipped, and the same board is a
+  // line-clear. The two branches genuinely disagree here, which is what "not equivalent" means.
+  expect(localiseMechanism(r, 4, 6, 2, avail)).toEqual({ step: 5, mechanism: 'line-clear' });
 });

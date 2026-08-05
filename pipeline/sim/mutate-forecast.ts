@@ -77,14 +77,14 @@ const MUTANTS: Mutant[] = [
   { name: 'metric/localise-straddle-inverted', note: 'the slot-spanning test answers the opposite',
     find: `    if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))`, nth: 1,
     repl: `    if (!clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))` },
-  // `metric/localise-skip-placement` (dropping the `avail(Bpre) >= target` early return) is
-  // equivalent for every step in the corpus, and the proof is again the reconstruction assertion:
-  // when the causing step clears nothing, B IS Bpre, so the next branch runs the identical test.
-  // All 388 placement attributions across the four sessions land on steps that cleared nothing.
-  // It could only ever differ at a step that BOTH places and clears, where the board offers a
-  // second independent slot straddling the cleared row while the piece's own slot already meets
-  // the target — a shape neither the fixtures nor 654 real events contain. Left unlisted rather
-  // than as a permanent survivor, because a survivor list that always has entries stops being read.
+  // Was unlisted for months as "equivalent for every step in the corpus": with no clear at the
+  // causing step B IS Bpre, so the next branch runs the identical test, and all 388 placement
+  // attributions land on steps that cleared nothing. The shape that separates them — a step that
+  // both places and clears, where Bpre already meets the target AND the post-clear best slot
+  // straddles the cleared row — is now built by hand in forecast.test.ts, so the mutant is live.
+  { name: 'metric/localise-skip-placement', note: 'a placement that already sufficed is credited to the clear',
+    find: `  if (bestTspinLines(Bpre) >= target) return { step: t, mechanism: 'placement' };`, nth: 1,
+    repl: `  if (false) return { step: t, mechanism: 'placement' };` },
   { name: 'metric/localise-unattributed-guessed', note: 'an unexplained improvement defaults to the piece',
     find: `    return { step: t, mechanism: touches ? 'placement' : 'unattributed' };`, nth: 1,
     repl: `    return { step: t, mechanism: 'placement' };` },

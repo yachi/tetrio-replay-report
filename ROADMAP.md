@@ -768,14 +768,25 @@ in place now, which is the usual cost of fixing the event a test was pinning.
 **Also settled:** the sizing sweep costs **2.1 seconds** for all four sessions, not the hour this item
 budgeted. `audit-mechanism.ts` already walks them cross-session and needs no `REPLAY_DIR`.
 
-### 2 — one mutant is unlisted rather than killed
+### 2 — CLOSED: the two-slot board exists, and the mutant is live (2026-08-05)
 
-`metric/localise-skip-placement` is proven equivalent for every step in the corpus (with no clear at
-the causing step, `B` IS `Bpre`, so the next branch runs the identical test — and all 388 placement
-attributions land on such steps). It could only differ where a step both places and clears AND the
-board offers a second independent slot straddling the cleared row. Closing it properly means
-constructing that two-slot board; until then the equivalence is conditional and documented in
-`mutate-forecast.ts` rather than asserted.
+`metric/localise-skip-placement` sat unlisted as "equivalent for every step in the corpus": with no
+clear at the causing step `B` IS `Bpre`, so the next branch runs the identical test, and all 388
+placement attributions land on steps that cleared nothing. The separating shape has now been built
+by hand and the mutant is in the sweep.
+
+What made it awkward is worth recording, because the obvious construction cannot work. The board
+needs a second slot that reaches the target in `Bpre` while the post-clear best slot straddles the
+cleared row — but **a slot's rows go full, so nothing can descend past them**. Any ordinary second
+slot placed above the low well seals it in both `Bpre` and `B`, and the low slot is never reachable.
+Three attempts died there.
+
+The way through is that `bestTspin` counts every full row in the board it produces, including the
+one about to be cleared. So the high spin need clear nothing of its own: a nook confined to the
+right-hand columns, worth exactly 1 in `Bpre` and 0 in `B`, blocking no column. With `target = 1`
+the early return fires and the answer is `placement`; drop the early return and the same board is
+`line-clear`. The fixture asserts both, so it also demonstrates the two branches genuinely disagree
+rather than merely that one of them runs.
 
 ### Closed since the last roadmap entry
 
