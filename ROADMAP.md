@@ -816,6 +816,51 @@ non-empty. The old rule was reaching the right verdict from an input that did no
 
 The published rate is unchanged at **0 of 654**, under all seven simulator configs.
 
+### 6 — CLOSED: the scalar does conflate slots, and it changes nothing (2026-08-05)
+
+Opened by the player disputing the published sentence — *"forecast is quite common"* — and closed by
+the same player reading the boards. Both directions were wrong before the evidence arrived, mine
+worse than theirs.
+
+**The mechanism is real.** `localiseMechanism` and `improved` both track `avail(t)`, the board's
+BEST T-spin, so neither can see a new slot born beside an existing one of equal line count. Item 1
+said exactly this and was closed on 2026-08-04 by testing the GARBAGE arm alone — the line-clear arm
+has no counterfactual, so the scalar was never checked there.
+
+**The consequence is nil, and the first three measurements of it were wrong.** A slot-tracking test —
+carry the executed T's cells back through every row edit and ask in each frame whether the slot is
+spinnable — settles it, but only once it SELF-CHECKS: it must report spinnable at the frame the T
+was really executed in. Two versions did not, and each produced a confident number. Requiring every
+row the T occupies to fill (a T-Spin Single spans two rows and fills one) gave 323 events where the
+spin demonstrably happened but the slot "did not exist"; requiring the roof above a TOP-ROW cell (a
+vertical T's roof usually sits over the other column) gave 298. A looser straddle test gave 183.
+With the self-check passing 654/654:
+
+| what first made the executed slot spinnable | n |
+|---|---|
+| already spinnable when the overhang landed — the roof was the last piece | 585 |
+| the player's own later placement | 64 |
+| garbage | 4 |
+| a line clear | 1 |
+
+Four of the five fail clause 2. The survivor, `pinglamb 07-28-6 r6 lock 19`, is a vertical-T
+three-row clear in a well walled by the player's own pieces, with the garbage five rows below it;
+the arrival only shifted the stack. **So the published 0 of 654 holds under the player's own
+criterion** — a clear or garbage before the hole becomes spinnable — and a slot-tracking rewrite
+would land on 0 as well. It is therefore not worth doing.
+
+**What the detour found.** The 183 the loose test flagged are the C-Spin: **179** have a vertical T
+clearing three rows as the piece that closes the gap, 175 laid the overhang in bag 1-2, and 173
+executed in bag 3 — matching harddrop.com/wiki/C-Spin, *"a T-Spin Triple which is usually followed
+by a T-Spin Double within three bags"*. Nothing in the code knows that. They are excluded because
+the slot was already spinnable when the overhang landed, which is what an opener is, and clause 2 is
+no help — it returns `pre-existed` for 146 of them. `forecast-corpus.test.ts` now pins the outcome
+as an oracle (46 such events in 2026-07-28, 0 counted), demonstrated to fail when openers are
+admitted. Deliberately NOT a rule in `forecast.ts`: a "vertical T, three rows, first bags"
+blacklist needs one entry per named opener and encodes folklore where a property will do.
+
+The wiki is reachable at `harddrop.com/wiki/<page>?action=raw`; the rendered HTML is 403.
+
 ### 4 — is a dangling nose over an unrelated well "an overhang over a hole"?
 
 Raised by the clause-2 rewrite and **not** settled by it. In 74 events the T's nose hangs into a well

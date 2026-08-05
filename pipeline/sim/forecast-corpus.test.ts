@@ -92,6 +92,49 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   });
 });
 
+/**
+ * An OUTCOME oracle for the C-Spin, deliberately not a rule the metric follows.
+ *
+ * The C-Spin (TKI積み) is the confound this metric exists to exclude — harddrop.com/wiki/C-Spin
+ * says it "results in a T-Spin Triple which is usually followed by a T-Spin Double within three
+ * bags", and that follow-up TSD is scripted, not forecast. Across the four sessions 179 events sit
+ * behind such a triple: 175 laid the overhang in bag 1-2 and 173 executed in bag 3.
+ *
+ * Why a test and not a check in `forecast.ts`: a "vertical T, 3 rows, first bags" rule in the
+ * metric would be a named-technique blacklist needing one entry per opener, and it would encode
+ * folklore in place of the property that actually decides these — that the slot was already
+ * spinnable when the overhang landed, which is what an opener IS. The metric stays ignorant of the
+ * C-Spin and gets them right anyway; this asserts it keeps doing so, the same way the wiki fixtures
+ * assert against an authority the engine cannot see.
+ *
+ * The population is pinned as well as the verdict. A refactor that stopped FINDING C-Spins would
+ * otherwise leave this passing vacuously on an empty set.
+ */
+realData('no T-spin following a C-Spin triple is ever counted as a forecast', () => {
+  const isCSpinTriple = (lk: { piece: string; cleared: number; cells: { col: number; row: number }[] }) => {
+    if (lk.piece !== 'T' || lk.cleared !== 3) return false;
+    const cols = lk.cells.map(c => c.col), rows = lk.cells.map(c => c.row);
+    // vertical T: two columns wide, three rows tall — the shape the wiki diagrams show
+    return Math.max(...cols) - Math.min(...cols) === 1 && Math.max(...rows) - Math.min(...rows) === 2;
+  };
+  let behindACSpin = 0, counted = 0;
+  for (const c of loadCases(SESSION)) {
+    const r = runCase(c, {});
+    const v = verifiedIndex(r, c.truth);
+    if (v < 0) continue;
+    for (const rec of forecastMetric(r, true).records) {
+      if (rec.lockIndex > v || rec.roofFrom === null) continue;
+      let hit = false;
+      for (let t = rec.roofFrom + 1; t < rec.lockIndex; t++) if (isCSpinTriple(r.locks[t]!)) hit = true;
+      if (!hit) continue;
+      behindACSpin++;
+      if (isVerifiedForecast(rec)) counted++;
+    }
+  }
+  expect(behindACSpin).toBe(46);
+  expect(counted).toBe(0);
+});
+
 realData('the scalar gate and the garbage counterfactual now agree on every event', () => {
   // This pinned 1 for as long as the counterfactual deleted every garbage row. The event was
   // `yachi replay-2026-07-28-1 r5 lock 36`, and the row whose removal made the spin vanish is the
