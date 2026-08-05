@@ -61,6 +61,14 @@ export interface Case {
   file: string; round: number; user: string; alive: boolean;
   ev: any[]; gin: any[]; truth: { frame: number; amt: number; y: number }[];
   handling: any; seed: number; frames: number; placed: number;
+  /**
+   * The round's own clear counts, straight from `results.stats.clears` — the GAME's tally, not
+   * this simulator's, and covering the whole round rather than the verified prefix. Carried here
+   * so a consumer can publish a figure that does not depend on the simulator at all, and can say
+   * so. `extract.py` and `extract2.ts` read the same field into facts.json independently, where
+   * the cross-extractor gate compares them, so the number is already twice-derived.
+   */
+  clears: Record<string, number>;
 }
 
 export function loadCases(dir = replayDir()): Case[] {
@@ -88,6 +96,7 @@ export function loadCases(dir = replayDir()): Case[] {
             .sort((a: any, b: any) => a.frame - b.frame),
           handling: me.rp.options.handling, seed: me.rp.options.seed,
           frames: me.rp.frames, placed: me.rp.results.stats.piecesplaced,
+          clears: me.rp.results.stats.clears ?? {},
         });
       }
     });

@@ -28,7 +28,7 @@ if (!PATH) throw new Error('no sessions/*/sim/forecast-facts.json found, and FOR
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
-  expect(d.schema).toBe('forecast-facts/6');
+  expect(d.schema).toBe('forecast-facts/7');
   // simulator-derived data must never be promoted to a report claim without the
   // dual-extractor rule being satisfied; this flag is the guard
   expect(d.report_eligible).toBe(false);

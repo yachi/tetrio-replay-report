@@ -327,7 +327,42 @@ def _mechanism_clause(data):
             "抽樣區間亦都已經包含咗零，"
             "所以呢度<strong>唔係話邊個識 forecast</strong>，"
             "只係話喺可核範圍入面，符合定義嘅情況搵到幾多次。")
+    # The "openers explain self_built" line above was asserted for weeks with no number beside it.
+    # This is that number, and it is the only figure in this section that owes nothing to the
+    # simulator — so it says so rather than inheriting the section's disclaimer by silence.
+    parts.append(_cspin_clause(data))
     return "".join(parts)
+
+
+def _cspin_clause(data):
+    """The C-Spin's signature clear, counted by the GAME rather than by the simulator.
+
+    A T-Spin Triple can only be made by a vertical T in a one-wide covered well, which is the shape
+    the C-Spin (TKI積み) builds — so this counts the shape, not the opener, and the wording must not
+    promote one to the other. What is NOT here is the wiki's full pattern (a Triple followed by a
+    Double within three bags): that needs ordering, which only the simulator gives, and the verified
+    prefix is both small and a PREFIX, so a Triple near its end has nowhere for its 21-placement
+    window to fit. Measured while writing this: 21 to 45 Triples per player per session have no
+    room, leaving 1 to 7 observable. A rate over those would be a rate about prefix length.
+    """
+    ps = data["players"]
+    if not any("tspin_triples_game_stats" in p for p in ps):
+        return ""
+    bits = "、".join(
+        f"{html.escape(p['user'])} <strong>{p['tspin_triples_game_stats']}</strong> 個"
+        for p in sorted(ps, key=lambda p: -p.get("tspin_triples_game_stats", 0)))
+    rounds = max(p.get("rounds_played", 0) for p in ps)
+    return (
+        "<strong>順帶一提 C-Spin。</strong>"
+        "T-Spin Triple 一定要一隻直放嘅 T 塞入一條有蓋嘅單格井——即係 C-Spin（TKI積み）砌嘅嗰個形。"
+        f"呢個 session {rounds} 個回合入面，T-Spin Triple 嘅數目係："
+        f"{bits}。"
+        "呢個數<strong>唔係模擬器計嘅</strong>，係遊戲自己 <code>results.stats</code> 入面嘅記錄，"
+        "覆蓋每一個回合而唔止可核嗰段，亦都係兩個獨立 parser 各自抽出嚟對過數嗰一條。"
+        "留意佢數嘅係<em>個形</em>唔係<em>開局</em>——TST 唔一定係 C-Spin 開局打出嚟。"
+        "至於 wiki 講嘅完整 C-Spin 定式（打完 Triple 之後三個 bag 之內接返個 Double），"
+        "要知道次序先計得到，而次序淨係模擬器有；"
+        "可核嗰段太短，多數 Triple 根本冇位裝落個 21 手嘅窗口，所以呢度<strong>唔報</strong>。")
 
 
 def section(data):

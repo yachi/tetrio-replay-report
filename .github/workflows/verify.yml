@@ -352,6 +352,34 @@ jobs:
           done
           exit $status
 
+      # The step above only proves extractor B is deterministic. The repo's actual claim is that
+      # TWO INDEPENDENT extractors agree — and nothing here checked that. `bin/new-session` diffs
+      # A against B once, when a session is created, and never again; a later edit to either
+      # extractor could drift them apart and every gate would stay green. The reports say in prose
+      # that their figures are twice-derived, so this is the step that makes that sentence true
+      # rather than historical.
+      - name: Compare extractor A against extractor B
+        run: |
+          set -euo pipefail
+          status=0
+          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report; do
+            # Globbed, not `ls`-ed: under `set -o pipefail` an `ls` with one non-matching operand
+            # fails the whole assignment and the step exits before printing anything.
+            f1=""; for f in "$d"/facts.json "$d"/facts-*.json; do [ -f "$f" ] && { f1="$f"; break; }; done
+            f2=""; for f in "$d"/facts2.json "$d"/facts2-*.json; do [ -f "$f" ] && { f2="$f"; break; }; done
+            if [ -z "$f1" ] || [ -z "$f2" ]; then
+              echo "FAIL  $d — missing a facts pair (A='$f1' B='$f2')" >&2; status=1; continue
+            fi
+            if diff <(jq -S . "$f1") <(jq -S . "$f2") >/dev/null; then
+              echo "  ok  $d — $(basename "$f1") and $(basename "$f2") agree"
+            else
+              echo "FAIL  $d — the two extractors disagree:" >&2
+              diff <(jq -S . "$f1") <(jq -S . "$f2") | head -40 >&2
+              status=1
+            fi
+          done
+          exit $status
+
   # docs/ is the published GitHub Pages site, copied from the sessions by
   # bin/build-docs — and nothing reran it automatically. Every other gate here
   # verifies sessions/, so a report could pass all of them while the page people

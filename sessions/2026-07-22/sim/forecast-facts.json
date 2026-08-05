@@ -1,5 +1,5 @@
 {
-  "schema": "forecast-facts/6",
+  "schema": "forecast-facts/7",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
@@ -34,6 +34,9 @@
   "players": [
     {
       "user": "pinglamb",
+      "tspin_triples_game_stats": 82,
+      "tspin_doubles_game_stats": 339,
+      "rounds_played": 79,
       "verified_tspins": 97,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
@@ -56,6 +59,9 @@
     },
     {
       "user": "yachi",
+      "tspin_triples_game_stats": 53,
+      "tspin_doubles_game_stats": 292,
+      "rounds_played": 79,
       "verified_tspins": 115,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,

@@ -88,7 +88,9 @@ const CONFIGS: [string, any][] = [
 
 type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: number;
              unattributed: number; verified: number; placed: number;
-             floors: Record<FloorOrigin, number>; forecasts: number; undecided: number };
+             floors: Record<FloorOrigin, number>; forecasts: number; undecided: number;
+             /** the GAME's own clear tallies, whole rounds — see Case.clears */
+             tst: number; tsd: number; rounds: number };
 
 const tally = (extra: any) => {
   const per: Record<string, Per> = {};
@@ -97,9 +99,12 @@ const tally = (extra: any) => {
     const v = verifiedIndex(r, c.truth);
     per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
       floors: { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 },
-      forecasts: 0, undecided: 0 };
+      forecasts: 0, undecided: 0, tst: 0, tsd: 0, rounds: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
+    // Counted BEFORE the `v < 0` guard on purpose: these come from the game's own stats and cover
+    // the whole round, so a round the simulator could not verify still contributes its real tally.
+    p.tst += c.clears.tspintriples ?? 0; p.tsd += c.clears.tspindoubles ?? 0; p.rounds++;
     if (v < 0) continue;
     for (const rec of forecastMetric(r, true).records) {
       if (rec.lockIndex > v) continue;
@@ -144,6 +149,22 @@ const players = Object.entries(base).map(([user, v]) => {
   const s = spread[user]!;
   return {
     user,
+    // The C-Spin's signature clear, and the only figure in this section that owes NOTHING to the
+    // simulator: it is the game's own `results.stats.clears` tally over every round, the same
+    // field both extractors read into facts.json. A T-Spin Triple needs a vertical T in a 1-wide
+    // covered well, which is what the C-Spin (TKI積み) builds — so this counts the shape, not the
+    // opener. It is emitted because the metric's `self_built` bucket is explained by openers and
+    // that explanation was, until now, asserted with no number beside it.
+    //
+    // Deliberately NOT emitted: the wiki's full C-Spin pattern, a Triple followed by a Double
+    // within three bags. That needs ORDERING, which only the simulator gives, and it is not
+    // measurable here — the verified prefix is 15% of placements AND it is a prefix, so a Triple
+    // near its end has nowhere for its 21-placement follow-up window to fit. Measured: 21 to 45
+    // Triples per player per session have no room, leaving 1 to 7 observable. A rate computed on
+    // those would be a rate about prefix length.
+    tspin_triples_game_stats: v.tst,
+    tspin_doubles_game_stats: v.tsd,
+    rounds_played: v.rounds,
     verified_tspins: v.tspins,
     forecast_garbage: v.fg,
     // The clear FORMED the slot: a cleared row lay strictly inside it, so removing that row is
@@ -284,7 +305,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/6',
+  schema: 'forecast-facts/7',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',
