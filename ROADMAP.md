@@ -861,14 +861,30 @@ blacklist needs one entry per named opener and encodes folklore where a property
 
 The wiki is reachable at `harddrop.com/wiki/<page>?action=raw`; the rendered HTML is 403.
 
-### 4 — is a dangling nose over an unrelated well "an overhang over a hole"?
+### 4 — CLOSED: a dangling nose is still an overhang over a hole, at any depth (2026-08-05)
 
-Raised by the clause-2 rewrite and **not** settled by it. In 74 events the T's nose hangs into a well
-that has nothing to do with the spin while the shoulders carry the piece. Judging the supports gives
-`pre-existed`, which correctly answers *"did the cells holding it up predate the roof"* — but that may
-be the wrong question for those boards, since there is no cavity under the overhang at all. This is a
-definition question about what "the hole" refers to, not a measurement gap, and no sweep can decide
-it. If the answer is that they should not count, it is a larger correction than anything above.
+This item asked whether a T whose nose hangs into a well, with the shoulders carrying the piece,
+is really "an overhang over a hole" — the worry being that there might be no cavity under the
+overhang at all. **Ruled by the player, and the answer is that depth is not a criterion:** the hole
+under a T-spin may be arbitrarily deep, and the nose failing to reach its floor only means the
+shoulders got there first. The well the nose points into IS the hole. Nothing changes.
+
+Re-derived while putting the decision to them, and the population was misstated here: it is **95**
+events with a dangling nose, of which clause 2 already rejects 21. The **74** was the surviving
+subset, not the population. Depth of the well beneath the nose, among those 74:
+
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 |
+|---|---|---|---|---|---|---|---|
+| 36 | 8 | 13 | 4 | 3 | 7 | 1 | 2 |
+
+Half sit at depth 1, which is simply what an ordinary T-Spin Double looks like — the cell under the
+nose stays empty, and that is exactly why it clears two rows rather than three. Had a cutoff been
+adopted anywhere it would only have moved the clause-2 census (568 `pre-existed`, down to 494 at
+most); the published rate is 0 of 654 either way. Also confirmed while measuring: **0** events have
+a piece resting on nothing at all, which is the case `'field-floor'` used to name.
+
+No code change. The item is closed because the question was answered, not because it was worked
+around, and clause 2 was right as written.
 
 ### 5 — CLOSED: the simulator's tests ran nowhere, and a dead import proved it
 
