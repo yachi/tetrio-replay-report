@@ -915,3 +915,52 @@ silently ignores what it does not recognise reports "all clear" for the files it
 
 It is deliberately not a typechecker. A real `tsc` pass would subsume it and is worth doing; it
 needs a `tsconfig.json` and a pinned `typescript`, which is a dependency decision, not a gate.
+
+---
+
+## Original TODO 1 — DONE (2026-08-06): four of five candidates are dead, one is not
+
+`pipeline/sim/board-metrics.ts`, all four sessions, 120 rounds with a decided winner and a verified
+prefix on both sides. Everything is computed over the verified prefix only, so none of it depends on
+the part of the simulation known to diverge. Paired winner-vs-loser AUC through the same
+`decideWinner` the forecast AUC uses, with Holm across the five candidates.
+
+| metric | pairs | decided | AUC | p | p (Holm) |
+|---|---|---|---|---|---|
+| height at garbage | 54 | 50 | 53.7% | 0.672 | 1.000 |
+| holes per piece | 120 | 104 | 54.2% | 0.378 | 1.000 |
+| well depth | 120 | 114 | 55.0% | 0.303 | 1.000 |
+| **downstack rate under pressure** | 54 | 51 | **67.6%** | **0.011** | 0.077 |
+| height at end | 120 | 109 | 45.4% | 0.338 | 1.000 |
+
+Four land in the 45–55% band this project already files under "no signal", which is the answer the
+item was asking for: **items 3 and 4 (post-garbage divergence, a second simulator) are not justified
+by any of them.**
+
+The exception is downstack rate under pressure — rows cleared per piece while garbage is on the
+board. Two pre-declared controls were computed in the same run, before the result was read:
+
+- **clear rate with NO garbage on the board: 45.4%** (p=0.343). The winner does not simply clear
+  more; the effect is specific to pressure, which is what a confound would not respect.
+- **verified prefix length: 59.6%** (raw p=0.033). Exposure is imbalanced — winners' prefixes are
+  longer — and that is a caveat, not a refutation, since the metric is a rate per pressure-lock.
+
+Per session the sign is the same in all four (71.9 · 71.9 · 58.3 · 65.0), none individually
+significant at 9–15 decided pairs each.
+
+**What it does NOT license.** Holm-adjusted p = 0.077 is not significant, and all four sessions have
+now been used, so nothing is held out. This is exploratory. Confirming it needs a NEW session, run
+against a pre-registered direction and threshold — the same exploratory/confirmatory split the
+forecast metric used, with git as the audit trail. Until then it is a candidate, not a finding, and
+it does not earn a column.
+
+### Fallout: a stale cache was feeding the published artifacts
+
+`pairs-cache.json` was keyed on the rule flags and the replay directory but not on the code that
+decides the rows. Clause 2 changed `isVerifiedForecast` on 2026-08-05 without bumping `CACHE_V`, so
+every consumer kept reading pre-clause-2 rows: the committed `forecast-facts.json` carried
+`round AUC p=0.211` on 16 decided pairs while the live classifier scored 0 forecasts for everyone
+and therefore tied every pair. Fixed by keying the cache on a sha256 of `forecast.ts`, `sim.ts` and
+`verified-prefix.ts`, so a rule change invalidates it without anyone remembering to. All four
+artifacts re-emitted. `emit-forecast-facts.ts` now also says "round AUC undecidable — 0 decided
+pairs" instead of silently dropping the line when the test has nothing to decide.
