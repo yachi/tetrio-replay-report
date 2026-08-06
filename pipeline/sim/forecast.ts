@@ -137,6 +137,17 @@ export interface ForecastRecord {
   garbageLoadBearing?: boolean;
   /** which of the causing step's three edits raised the availability, and which step that was */
   mechanism?: Mechanism; mechanismStep?: number;
+  /**
+   * clause 4: was the clear that closed the gap ITSELF a T-spin?
+   *
+   * `spec/Forecast.dfy` states the definition as "...cleared by NOT tspin" and proves that a window
+   * closed only by spin clears is not a forecast (`CSpinIsNotAForecast`). This file did not test it
+   * until 2026-08-06: `localiseMechanism` reads the step's rows and never looked at its `spin`, so a
+   * C-Spin's own Triple lowering its own overhang would have been counted. It changes nothing on this
+   * corpus — the single line-clear event's closing piece is a vertical I — which is exactly why it
+   * needed a probe rather than an eyeball.
+   */
+  closingClearWasSpin?: boolean;
   /** clause 2: where the cells holding the T up came from */
   floorOrigin?: FloorOrigin; floorFrom?: number | null;
 }
@@ -227,7 +238,9 @@ export const holePreExisted = (o: FloorOrigin): boolean | null =>
  */
 export const isVerifiedForecast = (r: ForecastRecord) =>
   (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')
-  && holePreExisted(r.floorOrigin ?? 'undetermined') === true;
+  && holePreExisted(r.floorOrigin ?? 'undetermined') === true
+  // clause 4 — the gap must have been closed by a clear that was not itself a T-spin
+  && r.closingClearWasSpin !== true;
 
 /** `board` with those rows deleted and the stack shifted down — the counterfactual board. */
 export function withoutRows(board: Board, rows: Set<number>): Board {
@@ -496,8 +509,14 @@ export function forecastMetric(r: SimResult, strict = true): {
       // failed to explain an improvement, and a metric that cannot say so will never be corrected.
       : 'self_built';
 
+    // Clause 4 is recorded on every line-clear event rather than folded into `kind`, for the reason
+    // clause 2 is: `kind` says which edit closed the gap, which is a fact about the game, and every
+    // consumer already routes its numerator through `isVerifiedForecast`.
+    const closingClearWasSpin = loc?.mechanism === 'line-clear'
+      ? r.locks[loc.step]!.spin !== 'none' : undefined;
+
     totals[kind]++;
-    records.push({ lockIndex: k, frame: lk.frame, lines: lk.cleared, spin: lk.spin,
+    records.push({ lockIndex: k, frame: lk.frame, lines: lk.cleared, spin: lk.spin, closingClearWasSpin,
       kind, separation: j >= 0 ? k - j : -1, roofFrom: j >= 0 ? j : null, roofIsGarbage,
       slotOpenedLater: improved, determinable, availAtRoof, availAtSpin, garbageLoadBearing,
       mechanism: loc?.mechanism, mechanismStep: loc?.step, floorOrigin: origin, floorFrom });

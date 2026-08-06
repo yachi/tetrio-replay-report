@@ -412,6 +412,87 @@ test('STRICT can be disabled, restoring the loose rule', () => {
 });
 
 /**
+ * The clear that FORMS the slot can be of any size, and need not be a T-spin or the player's own
+ * kind of clear — a Double, Triple or Tetris splices the roof onto the cavity exactly as a Single
+ * does. `localiseMechanism` already handles it (`clearedRows` is however many rows were full, and
+ * the inside-the-slot test maps every one of them back), but until now every fixture here cleared
+ * exactly ONE row and so did the corpus's only line-clear event, so nothing said what a multi-row
+ * clear does. Measured on the four sessions: 82% of the clears in the verified prefix remove two or
+ * more rows, and 191 of the 654 roof->spin windows contain one, so this is not a hypothetical shape.
+ *
+ * Same post-clear board as the tests above — the one verified to offer a clean TSD — with `n` full
+ * rows re-inserted between roof and cavity, each missing exactly the cells of the piece that lands
+ * at the causing step. So the step is a real place -> clear -> snapshot, and `localiseMechanism`'s
+ * own reconstruction assertion has to agree with the boards it is handed.
+ */
+const MULTI_ROW: Record<number, { rows: Record<number, number[]>; piece: string; cells: { col: number; row: number }[] }> = {
+  1: { rows: { 37: [6, 7, 8, 9] }, piece: 'I', cells: [6, 7, 8, 9].map(col => ({ col, row: 37 })) },
+  2: { rows: { 36: [8, 9], 37: [8, 9] }, piece: 'O',
+       cells: [{ col: 8, row: 36 }, { col: 9, row: 36 }, { col: 8, row: 37 }, { col: 9, row: 37 }] },
+  3: { rows: { 35: [8, 9], 36: [9], 37: [9] }, piece: 'L',
+       cells: [{ col: 8, row: 35 }, { col: 9, row: 35 }, { col: 9, row: 36 }, { col: 9, row: 37 }] },
+  4: { rows: { 34: [9], 35: [9], 36: [9], 37: [9] }, piece: 'I',
+       cells: [34, 35, 36, 37].map(row => ({ col: 9, row })) },
+};
+const SPLICE_T = [{ col: 3, row: 38 }, { col: 4, row: 38 }, { col: 5, row: 38 }, { col: 4, row: 39 }];
+const SPLICE_AFTER = mk3({ 37: [4, 5], 38: [3, 4, 5], 39: [4] });
+
+function spliceOf(n: number) {
+  const { rows, piece, cells } = MULTI_ROW[n]!;
+  const pre = mk3({ [37 - n]: [4, 5], ...rows, 38: [3, 4, 5], 39: [4] });
+  const j = 1, t = 4, k = 5;
+  const locks: any[] = [], provSnaps: any[] = [], boards: any[] = [];
+  for (let i = 0; i <= k; i++) {
+    locks.push({ frame: i * 100, piece: i === k ? 'T' : i === t ? piece : 'I',
+      cells: i === k ? SPLICE_T : i === t ? cells : [],
+      cleared: i === k ? 2 : i === t ? n : 0, spin: i === k ? 'full' : 'none' });
+    const g = Array.from({ length: H }, () => new Array<number | null>(10).fill(null));
+    if (i === k - 1) { g[37]![3] = j; g[39]![3] = 0; g[39]![5] = 0; }
+    provSnaps.push(g);
+    boards.push(i < t ? pre : SPLICE_AFTER);
+  }
+  return { locks, provSnaps, boards, garbageEvents: [], records: [], events: [], topout: false,
+    lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
+    garbage: { sent: 0, received: 0, cleared: 0, attack: 0 } } as any;
+}
+
+/**
+ * Clause 4 of `spec/Forecast.dfy`: the clear that closes the gap must not itself be a T-spin —
+ * "1,2,3,4,5+ cleared by NOT tspin". The C-Spin is the confound: its own T-Spin Triple is what
+ * lowers its own overhang, and counting that would make the opener a forecast by construction.
+ *
+ * This was UNENFORCED here until 2026-08-06 while the spec proved it (`CSpinIsNotAForecast`), and no
+ * test could see it because the corpus's only line-clear event is closed by a vertical I. The
+ * fixture below is the same board as above with one field changed.
+ */
+for (const n of [1, 2, 3, 4]) for (const spin of ['full', 'mini'] as const) {
+  test(`STRICT: a ${n}-row clear that is ITSELF a ${spin} T-spin does not count (clause 4)`, () => {
+    const f = spliceOf(n);
+    // a mini is still a T-spin: "cleared by NOT tspin" does not have a size exemption, and reading
+    // only `=== 'full'` here survives every other test in this file
+    f.locks[4].spin = spin;
+    const rec = forecastMetric(f, true).records[0]!;
+    expect(rec.mechanism).toBe('line-clear');       // the gap still closed on the clear ...
+    expect(rec.closingClearWasSpin).toBe(true);
+    expect(isVerifiedForecast(rec)).toBe(false);    // ... and it is still not a forecast
+  });
+}
+
+for (const n of [1, 2, 3, 4]) {
+  test(`STRICT: a ${n}-row clear that splices roof onto cavity is a forecast`, () => {
+    const f = spliceOf(n);
+    expect(f.locks[4].spin).toBe('none');
+    // the fixture itself, not just the verdict: no spin before, a Double after
+    expect(bestTspinLines(f.boards[0])).toBe(0);
+    expect(bestTspinLines(f.boards[4])).toBe(2);
+    const rec = forecastMetric(f, true).records[0]!;
+    expect(rec.mechanism).toBe('line-clear');
+    expect(rec.kind).toBe('forecast_lineclear');
+    expect(isVerifiedForecast(rec)).toBe(true);
+  });
+}
+
+/**
  * `floorOrigin` directly, on hand-made provenance.
  *
  * Two of its comparisons cannot be reached by any board in the corpus, so the mutation harness had
