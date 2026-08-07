@@ -964,3 +964,72 @@ and therefore tied every pair. Fixed by keying the cache on a sha256 of `forecas
 `verified-prefix.ts`, so a rule change invalidates it without anyone remembering to. All four
 artifacts re-emitted. `emit-forecast-facts.ts` now also says "round AUC undecidable — 0 decided
 pairs" instead of silently dropping the line when the test has nothing to decide.
+
+---
+
+## Open — 2026-08-07
+
+### 1 — Pre-register `downstack rate under pressure` BEFORE the next session is recorded
+
+The triage above left exactly one candidate alive: rows cleared per piece while garbage is on the
+board. Pooled AUC **67.6%** on 51 decided pairs, exact p=0.011, Holm 0.077, same sign in all four
+sessions (71.9 / 71.9 / 58.3 / 65.0), and its pre-declared control — the same rate with *no* garbage
+on the board — sits at 45.4%, so it is not "clears more" in disguise.
+
+It cannot be strengthened with the data already in this repo. All four sessions were used to find it,
+so nothing is held out, and re-reading them is exactly how a 0.077 turns into a 0.03 that means
+nothing. The only thing that can move it is a session that does not exist yet — and only if the
+prediction predates that session. So it is written down now, in full:
+
+- **Estimand** — paired AUC, winner vs loser, of `downstack rate` exactly as `board-metrics.ts`
+  computes it today: rows cleared per piece over locks whose PRE-lock board carries at least one
+  garbage row, over the verified prefix only. No re-definition afterwards.
+- **Unit** — the player-round, paired by `decideWinner` (the player still alive at the end).
+- **Direction** — ONE-SIDED, winner higher. A significant result the other way is a failure, not a
+  discovery.
+- **Test** — exact sign test over decided pairs, with the decided count always printed beside it.
+- **Threshold** — p < 0.05 one-sided **on the new data alone**. Pooling the new session with these
+  four is not a confirmation and must not be reported as one.
+- **Controls that must also hold** — the calm-clear-rate control stays inside 45–55%, and the
+  verified-prefix-length imbalance is reported alongside (59.6%, raw p=0.033 on the exploratory set:
+  exposure is not balanced, and that is a caveat carried forward, not a fixed bug).
+- **What kills it** — a new session at or below 50%, or the calm control moving with it.
+
+**How much data this actually needs, computed rather than hoped:** the exact sign test needs
+≥12 of 15 wins to clear 0.05 one-sided, which at the observed 68% has **24% power**. One session
+(9–15 decided pairs) cannot decide this and running it as though it could is how a null gets called
+a finding.
+
+| decided pairs | wins needed | power at true 68% | at true 60% |
+|---|---|---|---|
+| 12 | 10 | 21% | 8% |
+| 15 | 12 | 24% | 9% |
+| 30 | 20 | 65% | 29% |
+| 50 | 32 | 78% | 34% |
+
+So: bank sessions until **~50 decided pairs exist outside the exploratory four** (roughly four more
+sessions at the current rate), test once, and report whatever comes out. Anything short of that is
+parked, not pending. Nothing here goes in a report until the above is satisfied.
+
+### 2 — The C-Spin negative is bounded by CATALOGUE COVERAGE, not by the matcher
+
+`pipeline/openers/` establishes: 0 of 300 clean first bags come within four cells of a catalogued
+C-Spin. The catalogue behind that sentence is **3 distinct C-Spin openers across 8 drawn pages**, out
+of 360 openers and 783 pages. So the claim the repo can make is "**not these C-Spins**". "No C-Spin
+anywhere" is not available at any distance threshold, and no amount of tuning gets it.
+
+Better matching code cannot fix this. The matcher already round-trips every C-Spin page it holds,
+finds their mirrors, rejects a junk board, and is alignment-checked against a one-row shift. What is
+missing is **data**:
+
+- harddrop's own C-Spin page draws setups the community catalogue does not carry —
+  `pipeline/sim/wiki-cspin-boards.json` already holds 38 placements parsed from it, in a different
+  format, so a converter would widen coverage today;
+- the wiki calls C-Spin a **family** ("there are many C-Spin openers", ZST core, vertical and
+  horizontal T), which means an enumeration BY CONSTRUCTION — J and L building an overhang over a
+  1-wide covered well — would bound the family instead of sampling it;
+- `knewjade/solution-finder` enumerates setups satisfying a pattern, and is the right tool for that
+  enumeration if it is worth doing.
+
+Until one of those exists, every C-Spin statement in this repo carries the coverage caveat, and
+`pipeline/openers/README.md` says so in the same words.
