@@ -137,10 +137,40 @@ def _selftest(report_dir):
 
     # A figure changed in the JSON without rebuilding the report is the same drift seen from
     # the other side, and the containment-only gate could not see this one either.
-    stale = json.loads(json.dumps(data))
-    if (stale.get("statistics") or {}).get("round"):
-        stale["statistics"]["round"]["auc_x1000"] = 700
-        cases.append(("data moved but the report was not rebuilt", stale, doc, True))
+    #
+    # WHICH field is moved has to be decided by re-rendering, not written down. This was
+    # hardcoded to statistics.round.auc_x1000 and stopped meaning anything on 2026-08-06, when
+    # the round AUC became undecidable (a forecast rate of 0 for every player ties every pair)
+    # and dropped out of the prose. The mutation was still planted, the render was unchanged,
+    # and the case failed as "accepted" — the selftest correctly reporting a hole in itself
+    # rather than passing on a corruption that no longer corrupted anything.
+    rendered = forecast_section.section(data)
+    moved = None
+    for path in (("statistics", "round", "auc_x1000"),
+                 ("players", 0, "verified_tspins"),
+                 ("players", 0, "reactive"),
+                 ("players", 0, "self_built"),
+                 ("players", 0, "forecast_rate_x1000")):
+        stale = json.loads(json.dumps(data))
+        node = stale
+        try:
+            for k in path[:-1]:
+                node = node[k]
+            if not isinstance(node[path[-1]], int):
+                continue
+            node[path[-1]] += 7
+        except (KeyError, IndexError, TypeError):
+            continue
+        if forecast_section.section(stale) != rendered:
+            moved = (".".join(str(k) for k in path), stale)
+            break
+    if moved is None:
+        # Not a skip: if no field of the JSON changes what the section renders, this gate is
+        # comparing the report against nothing and the whole file is decorative.
+        print("FAIL selftest: no JSON field moves the render — the gate cannot see its data",
+              file=sys.stderr)
+        return 1
+    cases.append((f"data moved but the report was not rebuilt ({moved[0]})", moved[1], doc, True))
 
     # And the invariants the section exists to hold. The badge must be planted INSIDE the
     # forecast region: the document's first `section-title` belongs to an earlier, legitimately
