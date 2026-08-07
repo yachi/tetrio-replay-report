@@ -106,8 +106,19 @@ const MUTANTS: Mutant[] = [
 
   // --- clause 2: was there a hole to close onto when the roof went up? -----------------------
   { name: 'metric/clause2-dropped', note: 'THE pre-2026-08-03 defect: mechanism alone counts',
-    find: `  && holePreExisted(r.floorOrigin ?? 'undetermined') === true;`, nth: 1,
+    find: `  && holePreExisted(r.floorOrigin ?? 'undetermined') === true`, nth: 1,
+    repl: `  && true` },
+
+  // --- clause 4: was the closing clear itself a T-spin? --------------------------------------
+  { name: 'metric/clause4-dropped', note: 'THE pre-2026-08-06 defect: a spin closing its own gap counts',
+    find: `  && r.closingClearWasSpin !== true;`, nth: 1,
     repl: `  && true;` },
+  { name: 'metric/clause4-inverted', note: 'only spin-closed gaps count',
+    find: `  && r.closingClearWasSpin !== true;`, nth: 1,
+    repl: `  && r.closingClearWasSpin === true;` },
+  { name: 'metric/clause4-mini-allowed', note: 'a mini T-spin closing the gap is treated as an ordinary clear',
+    find: `      ? r.locks[loc.step]!.spin !== 'none' : undefined;`, nth: 1,
+    repl: `      ? r.locks[loc.step]!.spin === 'full' : undefined;` },
   { name: 'metric/clause2-inverted', note: 'a floor that arrived later counts and one that was there does not',
     find: `  o === 'undetermined' ? null : o === 'pre-existed';`, nth: 1,
     repl: `  o === 'undetermined' ? null : o !== 'pre-existed';` },

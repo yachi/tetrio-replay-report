@@ -6,6 +6,7 @@
  * pairs-cache.json keyed by the rule; delete that file to force a re-run.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { forecastMetric, isVerifiedForecast} from './forecast.ts';
 import { loadCases, runCase, verifiedIndex, replayDir} from './verified-prefix.ts';
@@ -30,7 +31,17 @@ export function collectRows(strict = true, strictRows = true): Row[] {
   // Bump CACHE_V whenever the row shape or the sim settings change. A stale cache silently
   // yields rows missing the new field, which read as undefined and score as TIES — the
   // separation-weighted metric first appeared as 0 decided / 79 ties for exactly that reason.
-  const CACHE_V = 4;
+  const CACHE_V = 5;
+  // ...and a fingerprint of the code that DECIDES the rows, because bumping a number by hand is a
+  // rule nobody follows across sessions. Clause 2 changed what `isVerifiedForecast` returns on
+  // 2026-08-05 without a bump, so every consumer kept reading pre-clause-2 rows out of this file:
+  // the committed forecast-facts.json carried an AUC of 58.5% on 16 decided pairs while the live
+  // classifier scored 0 forecasts for every player and therefore tied every pair. The figure was
+  // wrong in the artifact and right in the code, which is the worst way round.
+  const fingerprint = createHash('sha256')
+    .update(['forecast.ts', 'sim.ts', 'verified-prefix.ts']
+      .map(f => readFileSync(`${import.meta.dir}/${f}`, 'utf8')).join('\0'))
+    .digest('hex').slice(0, 12);
   // The REPLAY DIRECTORY is part of the key. It was not, and the cache is a single file
   // beside the code rather than beside the session, so one run with REPLAY_DIR pointed at
   // another session would have written that session's rows under this one's key — and the
@@ -39,7 +50,7 @@ export function collectRows(strict = true, strictRows = true): Row[] {
   // was latent rather than harmless. Keyed, and CACHE_V bumped so every existing entry
   // (written without a directory) is discarded rather than matched by accident.
   const dir = replayDir();
-  const cacheKey = `v${CACHE_V}|${strict}|rows=${strictRows}|dir=${resolve(dir)}`;
+  const cacheKey = `v${CACHE_V}|code=${fingerprint}|${strict}|rows=${strictRows}|dir=${resolve(dir)}`;
   const cache = `${import.meta.dir}/pairs-cache.json`;
   if (existsSync(cache)) {
     const c = JSON.parse(readFileSync(cache, 'utf8'));
@@ -69,16 +80,27 @@ export function collectRows(strict = true, strictRows = true): Row[] {
       perPiece: vIdx >= 0 ? fc / (vIdx + 1) : null, sepw, verified: vIdx + 1 };
   }
   for (const { file, round, vals } of byRound.values()) {
-    const names = Object.keys(vals);
-    if (names.length !== 2) continue;
-    const [a, b] = names as [string, string];
-    const W = vals[a]!.alive ? a : b, L = vals[a]!.alive ? b : a;
-    if (vals[W]!.alive === vals[L]!.alive) continue;
-    rows.push({ file, round, W, L, vals });
+    const wl = decideWinner(vals);
+    if (wl) rows.push({ file, round, W: wl.W, L: wl.L, vals });
   }
   const prev = existsSync(cache) ? JSON.parse(readFileSync(cache, 'utf8')) : {};
   writeFileSync(cache, JSON.stringify({ ...prev, [cacheKey]: rows }));
   return rows;
+}
+
+/**
+ * Which of the two players won the round: the one still alive at the end.
+ *
+ * Exported because board-metrics.ts pairs a different set of per-player values over the same rounds,
+ * and "winner vs loser" must have ONE implementation — two copies of this drifting apart would move
+ * every AUC in the repo without any of them changing.
+ */
+export function decideWinner<T extends { alive: boolean }>(vals: Record<string, T>): { W: string; L: string } | null {
+  const names = Object.keys(vals);
+  if (names.length !== 2) return null;
+  const [a, b] = names as [string, string];
+  const W = vals[a]!.alive ? a : b, L = vals[a]!.alive ? b : a;
+  return vals[W]!.alive === vals[L]!.alive ? null : { W, L };
 }
 
 /** Winner-vs-loser pairs for one metric, with the round they came from (for clustered resampling). */

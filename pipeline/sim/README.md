@@ -21,6 +21,7 @@ set -x REPLAY_DIR (git rev-parse --show-toplevel)/sessions/2026-07-22
 
 bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts forecast-corpus.test.ts
 bun run mutate-forecast.ts   # defaults to the fixture files PLUS forecast-corpus.test.ts
+bun run board-metrics.ts ../../sessions/2026-07-22   # ROADMAP triage of board-derived metrics
 bun run run-forecast.ts
 bun run auc.ts
 bun run auc-power.ts     # read this before quoting any AUC
@@ -53,7 +54,7 @@ Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08
 | the four test files | 39 pass, 0 fail, 502 assertions |
 | `mutate-forecast.ts` | 24/24 killed |
 | `run-forecast.ts` | pinglamb 97 tucked / 13 forecast / 13.4% · yachi 115 / 14 / 12.2% |
-| `auc.ts` | 58.6 · 57.7 · 52.5 · 57.0 · 55.7 |
+| `auc.ts` | 50.0 · 50.0 · 50.0 · 57.0 · 50.0 — every forecast metric ties now that the rate is 0 |
 
 The bottom two rows moved since they were written on 2026-07-30, and the table said nothing
 about it because nothing re-runs it. What changed:

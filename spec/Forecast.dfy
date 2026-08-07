@@ -388,4 +388,176 @@ module Forecast {
       NoClearsMeansNoRemoval(h, from + 1, upto, TrackStep(h[from], a), TrackStep(h[from], b), spins);
     }
   }
+
+  // ---------------------------------------------------------------------------------------------
+  // HOW MANY ROWS THE CLEAR TAKES IS NOT PART OF THE DEFINITION.
+  //
+  //   "like 1,2,3,4,5+ cleared by NOT tspin, it becomes a tspin hole"
+  //
+  // Clause 4 counts ROWS taken from strictly between the overhang and the hole. It does not ask how
+  // many clears took them, which piece did it, or whether the clear was a Single or a Tetris. That
+  // is a claim about the definition, so it is proved here for every n at once rather than on four
+  // hand-built boards — four boards would leave "and 5+" open, and the reader would have to trust
+  // that the pattern continues.
+  //
+  // It also pins the other half: rows taken from OUTSIDE the pair move both cells together and
+  // close nothing, whatever the size of the clear. That is the `straddle` test the measurement runs.
+  // ---------------------------------------------------------------------------------------------
+
+  function RangeSeq(lo: int, n: nat): seq<int>
+    decreases n
+  { if n == 0 then [] else [lo] + RangeSeq(lo + 1, n - 1) }
+
+  lemma RangeSeqLen(lo: int, n: nat)
+    ensures |RangeSeq(lo, n)| == n
+    decreases n
+  { if n == 0 { } else { RangeSeqLen(lo + 1, n - 1); } }
+
+  lemma RangeSeqExcludes(lo: int, n: nat, r: int)
+    requires r < lo || lo + n <= r
+    ensures r !in RangeSeq(lo, n)
+    decreases n
+  { if n == 0 { } else { RangeSeqExcludes(lo + 1, n - 1, r); } }
+
+  // every row of the range lies strictly between a and b
+  lemma RangeSeqBetween(lo: int, n: nat, a: int, b: int)
+    requires a < lo && lo + n <= b
+    ensures CountBetween(RangeSeq(lo, n), a, b) == n
+    decreases n
+  { if n == 0 { } else { RangeSeqBetween(lo + 1, n - 1, a, b); } }
+
+  // ... so a cell above the whole range falls by exactly n ...
+  lemma RangeSeqBelow(lo: int, n: nat, r: int)
+    requires r < lo
+    ensures CountBelow(RangeSeq(lo, n), r) == n
+    decreases n
+  { if n == 0 { } else { RangeSeqBelow(lo + 1, n - 1, r); } }
+
+  // ... and a cell below it does not move at all.
+  lemma RangeSeqNoneBelow(lo: int, n: nat, r: int)
+    requires lo + n <= r
+    ensures CountBelow(RangeSeq(lo, n), r) == 0
+    decreases n
+  { if n == 0 { } else { RangeSeqNoneBelow(lo + 1, n - 1, r); } }
+
+  /** ONE non-spin clear of ANY size n >= 1 taken from between the pair is a forecast. */
+  lemma AnySizeOfClearIsAForecast(n: nat) returns (h: History, e: Event)
+    requires n >= 1
+    ensures WellFormed(h, e)
+    ensures |h| == 2 && !h[0].wasSpin && |h[0].clearedRows| == n   // ONE clear, n rows
+    ensures ClosedByPlain(h, e) == n
+    ensures IsForecastAnyClear(h, e)
+    ensures n >= 3 ==> IsForecastTriple(h, e)                      // a Triple or a Tetris also qualifies
+  {
+    var cleared := RangeSeq(26, n);
+    RangeSeqLen(26, n);
+    RangeSeqExcludes(26, n, 25);
+    RangeSeqExcludes(26, n, 26 + n);
+    RangeSeqBelow(26, n, 25);
+    RangeSeqNoneBelow(26, n, 26 + n);
+    RangeSeqBetween(26, n, 25, 26 + n);
+    h := [ Step(cleared, false, 0), Step([], false, 0) ];
+    e := Event(0, 2, 25, 26 + n, true, true);
+    assert Advance(h[0], 25) == 25 + n;
+    assert Advance(h[0], 26 + n) == 26 + n;
+    assert RoofFinal(h, e) == At(25 + n) && FloorFinal(h, e) == At(26 + n);
+    assert ClosedByPlain(h, e) == n;
+  }
+
+  /**
+   * Rows accumulate across the window: what a window removes is what its parts remove.
+   *
+   * This is the general form of "1,2,3,4,5+" — it says clause 4's count is additive over steps, so
+   * no arrangement of clears is special. It is also what makes the concrete witnesses below cheap:
+   * a THREE-step ground window makes this encoding blow up (>30 s, measured), while every two-step
+   * window verifies in well under a second, so longer histories are reasoned about by splitting
+   * rather than by unrolling.
+   */
+  lemma RemovedBetweenSplit(h: History, from: int, mid: int, upto: int, a: Tracked, b: Tracked, spins: bool)
+    requires 0 <= from <= mid <= upto <= |h|
+    ensures RemovedBetween(h, from, upto, a, b, spins)
+         == RemovedBetween(h, from, mid, a, b, spins)
+          + RemovedBetween(h, mid, upto, Track(h, from, mid, a), Track(h, from, mid, b), spins)
+    decreases mid - from
+  {
+    if from == mid { }
+    else { RemovedBetweenSplit(h, from + 1, mid, upto, TrackStep(h[from], a), TrackStep(h[from], b), spins); }
+  }
+
+  lemma TrackSplit(h: History, from: int, mid: int, upto: int, t: Tracked)
+    requires 0 <= from <= mid <= upto <= |h|
+    ensures Track(h, from, upto, t) == Track(h, mid, upto, Track(h, from, mid, t))
+    decreases mid - from
+  { if from == mid { } else { TrackSplit(h, from + 1, mid, upto, TrackStep(h[from], t)); } }
+
+  /** A Double and then a Single reach the Triple reading: clause 4 counts ROWS, not clears. */
+  lemma RowsAccumulateAcrossClears() returns (h: History, e: Event)
+    ensures WellFormed(h, e)
+    ensures |h| == 3 && |h[0].clearedRows| == 2 && |h[1].clearedRows| == 1   // a Double, then a Single
+    ensures ClosedByPlain(h, e) == 3
+    ensures IsForecastTriple(h, e)
+  {
+    h := [ Step([26, 27], false, 0), Step([28], false, 0), Step([], false, 0) ];
+    e := Event(0, 3, 25, 30, true, true);
+  }
+
+  /**
+   * A spin and a plain clear in the same window: only the plain rows count toward clause 4.
+   *
+   * The two counts are established one at a time through `RemovedBetweenSplit`. Asking for both in
+   * one lemma re-derives the whole window twice and times out — the same encoding cost recorded on
+   * the split lemma above.
+   */
+  const SPIN_THEN_PLAIN: History := [ Step([26], true, 0), Step([27], false, 0), Step([], false, 0) ]
+  const SPIN_THEN_PLAIN_EVENT: Event := Event(0, 3, 25, 29, true, true)
+
+  lemma SpinRowsDoNotCountTowardClause4()
+    ensures WellFormed(SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT)
+    ensures ClosedByPlain(SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT) == 1   // only the ordinary clear
+  {
+    var h, e := SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT;
+    RemovedBetweenSplit(h, 0, 1, 2, At(25), At(29), false);
+    assert RemovedBetween(h, 0, 1, At(25), At(29), false) == 0;   // step 0 was a spin
+    assert Track(h, 0, 1, At(25)) == At(26) && Track(h, 0, 1, At(29)) == At(29);
+    assert RemovedBetween(h, 1, 2, At(26), At(29), false) == 1;
+  }
+
+  lemma SpinRowsAreCountedSeparately()
+    ensures WellFormed(SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT)
+    ensures ClosedBySpins(SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT) == 1  // and the spin's row is seen
+  {
+    var h, e := SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT;
+    RemovedBetweenSplit(h, 0, 1, 2, At(25), At(29), true);
+    assert RemovedBetween(h, 0, 1, At(25), At(29), true) == 1;
+    assert Track(h, 0, 1, At(25)) == At(26) && Track(h, 0, 1, At(29)) == At(29);
+    assert RemovedBetween(h, 1, 2, At(26), At(29), true) == 0;
+  }
+
+  // No lemma here states the mixed window's forecast VERDICT: evaluating IsForecast over a two-step
+  // window re-derives both counts plus the tracked pair and does not finish inside the time limit.
+  // The verdict follows from two lemmas that do verify — AnySizeOfClearIsAForecast(1) says one
+  // ordinary row suffices, and CSpinIsNotAForecast says spin rows alone never do.
+
+  /** A Tetris that lands entirely BELOW the hole moves the pair down together and closes nothing. */
+  lemma ClearsOutsideThePairCloseNothing(n: nat) returns (h: History, e: Event)
+    requires n >= 1
+    ensures WellFormed(h, e)
+    ensures |h[0].clearedRows| == n && !h[0].wasSpin
+    ensures ClosedByPlain(h, e) == 0
+    ensures !GapClosed(h, e)
+    ensures !IsForecastAnyClear(h, e)
+  {
+    var cleared := RangeSeq(30, n);      // strictly below the floor at row 29
+    RangeSeqLen(30, n);
+    RangeSeqExcludes(30, n, 25);
+    RangeSeqExcludes(30, n, 29);
+    RangeSeqBelow(30, n, 25);
+    RangeSeqBelow(30, n, 29);
+    RangeSeqBetween(30, n, 29, 30 + n);
+    h := [ Step(cleared, false, 0), Step([], false, 0) ];
+    e := Event(0, 2, 25, 29, true, true);
+    assert CountBetween(cleared, 25, 29) == 0 by { CountBelowSplit(cleared, 25, 29); }
+    assert Advance(h[0], 25) == 25 + n && Advance(h[0], 29) == 29 + n;
+    assert ClosedByPlain(h, e) == 0;
+  }
 }

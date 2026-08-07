@@ -5,7 +5,7 @@
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
     "per-round split-half reliability is 0.136 (pinglamb) / -0.121 (yachi), so a per-round column is not possible at this event rate",
-    "no effect at any unit: round AUC p=1.000"
+    "no effect at any unit: round AUC undecidable — 0 decided pairs of 24, the rate ties everywhere"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -93,11 +93,11 @@
     "round": {
       "metric": "forecast rate",
       "auc_x1000": 500,
-      "wins": 4,
-      "losses": 4,
-      "ties": 16,
-      "decided": 8,
-      "exact_p_x1000": 1000
+      "wins": 0,
+      "losses": 0,
+      "ties": 24,
+      "decided": 0,
+      "exact_p_x1000": null
     },
     "event": {
       "forecast_n": 0,

@@ -293,6 +293,11 @@ function notEligibleBecause(): string[] {
   const noEffect: string[] = [];
   if (roundStat?.exact_p_x1000 != null)
     noEffect.push(`round AUC p=${(roundStat.exact_p_x1000 / 1000).toFixed(3)}`);
+  // A null p is not "no reason to give": with a forecast rate of 0 for every player, every pair
+  // ties and the test has nothing to decide. Saying so beats dropping the line, which is how the
+  // artifact came to carry a stale p from before clause 2 without anything looking wrong.
+  else if (roundStat && roundStat.decided === 0)
+    noEffect.push(`round AUC undecidable — 0 decided pairs of ${roundStat.ties}, the rate ties everywhere`);
   if (eventStat?.attack)
     noEffect.push(eventStat.attack.excludes_zero
       ? `event-level CI excludes zero`
