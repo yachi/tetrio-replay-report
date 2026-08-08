@@ -12,19 +12,21 @@ const STRICT_ROWS = process.env.LOOSEROWS !== '1';
  * The prefix, and therefore this metric's whole sample size, is a function of simulator
  * accuracy. See verified-prefix.ts for the shared gate and the settings.
  */
-import { forecastMetric, type ForecastKind } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, type ForecastKind } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
-const byUser:Record<string,{tot:Record<ForecastKind,number>;tspins:number;verifiedPieces:number;
-  totalPieces:number;seps:number[]}> = {};
+const byUser:Record<string,{tot:Record<ForecastKind,number>;verified:number;tspins:number;
+  verifiedPieces:number;totalPieces:number;seps:number[]}> = {};
 let roundsUsed=0, verifiedLocks=0, totalLocks=0;
 const ALL:any[]=[];
 for (const c of loadCases()) {
   const r = runCase(c);
   const vIdx = verifiedIndex(r, c.truth, STRICT_ROWS);
   const u = c.user;
-  byUser[u] ??= {tot:{forecast_garbage:0,forecast_lineclear:0,reactive:0},tspins:0,
-                verifiedPieces:0,totalPieces:0,seps:[]};
+  // `self_built` was missing from this initialiser, so `tot[rec.kind]++` produced NaN for 388 of
+  // the 654 records and the printed breakdown silently failed to sum to the header count.
+  byUser[u] ??= {tot:{forecast_garbage:0,forecast_lineclear:0,self_built:0,reactive:0},verified:0,
+                tspins:0,verifiedPieces:0,totalPieces:0,seps:[]};
   byUser[u]!.verifiedPieces += vIdx+1; byUser[u]!.totalPieces += c.placed;
   verifiedLocks += vIdx+1; totalLocks += c.placed;
   if (vIdx < 0) continue;
@@ -32,6 +34,7 @@ for (const c of loadCases()) {
   const fm = forecastMetric(r, STRICT);
   for (const rec of fm.records) { if (rec.lockIndex > vIdx) continue;
     byUser[u]!.tot[rec.kind]++; byUser[u]!.tspins++; byUser[u]!.seps.push(rec.separation);
+    if (isVerifiedForecast(rec)) byUser[u]!.verified++;
     ALL.push({u,...rec}); }
 }
 console.log(`=== T-Spin Forecast — verified-prefix only ===`);
@@ -39,12 +42,15 @@ console.log(`rule: ${STRICT?'strict':'loose'}   gate: ${STRICT_ROWS?'frame+amoun
 console.log(`rounds contributing: ${roundsUsed}/158`);
 console.log(`board coverage: ${verifiedLocks}/${totalLocks} placements (${(100*verifiedLocks/totalLocks).toFixed(1)}%) provably match the real game\n`);
 for(const [u,v] of Object.entries(byUser)){
-  const fc=v.tot.forecast_garbage+v.tot.forecast_lineclear;
+  // the NUMERATOR is isVerifiedForecast, never a kind test — the kinds say which edit closed the
+  // gap and do not carry clauses 2 and 4. See forecast.ts:isVerifiedForecast.
+  const fc=v.verified;
   const med=v.seps.length?[...v.seps].sort((a,b)=>a-b)[Math.floor(v.seps.length/2)]:0;
   console.log(`${u}`);
   console.log(`  tucked T-spins on verified board : ${v.tspins}`);
   console.log(`    forecast (garbage)   : ${v.tot.forecast_garbage}`);
   console.log(`    forecast (line clear): ${v.tot.forecast_lineclear}`);
+  console.log(`    self_built           : ${v.tot.self_built}`);
   console.log(`    reactive             : ${v.tot.reactive}`);
   console.log(`  forecast rate: ${v.tspins?(100*fc/v.tspins).toFixed(1):'n/a'}%   median setup separation: ${med} pieces`);
 }
@@ -52,7 +58,9 @@ for(const [u,v] of Object.entries(byUser)){
 console.log('\n=== robustness cuts ===');
 for(const minSep of [1,2,3,5]){
   const sub=ALL.filter(r=>r.separation>=minSep);
-  const fc=sub.filter(r=>r.kind!=='reactive').length;
+  // was `r.kind!=='reactive'`, the idiom isVerifiedForecast exists to abolish: it counted every
+  // self_built opener as a forecast and printed 58.0% under a headline rate of 0.0%.
+  const fc=sub.filter(isVerifiedForecast).length;
   console.log(`  separation >= ${minSep}: n=${String(sub.length).padStart(3)}  forecast=${String(fc).padStart(3)} (${sub.length?(100*fc/sub.length).toFixed(1):'-'}%)`);
 }
 const rg=ALL.filter(r=>r.roofIsGarbage);

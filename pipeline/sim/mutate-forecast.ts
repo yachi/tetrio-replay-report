@@ -101,8 +101,18 @@ const MUTANTS: Mutant[] = [
     find: `  while (t > j && avail(t - 1) >= target) t--;`, nth: 1,
     repl: `  while (t > j && avail(t - 1) >= avail(t)) t--;` },
   { name: 'metric/reconstruction-unchecked', note: 'the step model may silently disagree with the game',
-    find: `  if (!garbageArrived && !B.every((row, i) => row.every((c, x) => c === C[i]![x])))`, nth: 1,
-    repl: `  if (false)` },
+    find: `    if (!B.every((row, i) => row.every((c, x) => c === C[i]![x])))`, nth: 1,
+    repl: `    if (false)` },
+  // The garbage arm of the same assertion. It did not exist as a mutant because it did not exist as
+  // a check: the reconstruction was guarded by `!garbageArrived`, so the one branch that can violate
+  // the step model was the one branch never tested. Under insertMode:'immediate' that returned 13
+  // verified forecasts across four sessions in silence.
+  { name: 'metric/reconstruction-unchecked-under-garbage', note: 'garbage steps skip the step model',
+    find: `    if (shift < 0)`, nth: 1,
+    repl: `    if (false)` },
+  { name: 'metric/lift-shift-unbounded', note: 'a shift matching vacuously at the bottom of the field',
+    find: `      if (!C.slice(H - s).every(row => row.some(c => (c as unknown as string) === 'G'))) continue;`, nth: 1,
+    repl: `      if (false) continue;` },
 
   // --- clause 2: was there a hole to close onto when the roof went up? -----------------------
   { name: 'metric/clause2-dropped', note: 'THE pre-2026-08-03 defect: mechanism alone counts',

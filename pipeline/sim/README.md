@@ -47,14 +47,23 @@ Pairing is simulated once and cached to `pairs-cache.json` (gitignored; delete t
 The cache key includes the replay directory, so pointing `REPLAY_DIR` at another session cannot
 poison this one's entry.
 
-Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08-02**:
+Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08-08**:
 
 | command | result |
 |---|---|
-| the four test files | 39 pass, 0 fail, 502 assertions |
-| `mutate-forecast.ts` | 24/24 killed |
-| `run-forecast.ts` | pinglamb 97 tucked / 13 forecast / 13.4% · yachi 115 / 14 / 12.2% |
+| the four test files | 68 pass, 0 fail, 1008 assertions |
+| `mutate-forecast.ts` | 42/42 killed |
+| `run-forecast.ts` | pinglamb 97 tucked / 0 forecast / 0.0% · yachi 115 / 0 / 0.0% |
 | `auc.ts` | 50.0 · 50.0 · 50.0 · 57.0 · 50.0 — every forecast metric ties now that the rate is 0 |
+
+The `run-forecast.ts` row read `pinglamb 97 tucked / 13 forecast / 13.4%` until 2026-08-08, while
+the row directly beneath it said "every forecast metric ties now that the rate is 0" — the same
+table asserting both 13.4% and 0 at once. Two separate bugs in that runner produced the 13.4%: its
+per-user totals omitted a `self_built` key, so `tot[rec.kind]++` was `NaN` for 388 of 654 records and
+the printed breakdown did not sum to its own header; and both the rate and the robustness cuts
+counted `kind !== 'reactive'`, the idiom `isVerifiedForecast` exists to abolish, which scores every
+opener as a forecast. Both now route through `isVerifiedForecast`. **Nothing re-runs this table, so
+it goes stale silently — re-measure it whenever you touch the metric.**
 
 The bottom two rows moved since they were written on 2026-07-30, and the table said nothing
 about it because nothing re-runs it. What changed:

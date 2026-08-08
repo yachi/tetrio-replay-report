@@ -249,6 +249,39 @@ test('an already-available spin that GROWS still counts — forecasting an upgra
   expect(r.records[0]!.kind).toBe('forecast_garbage');
 });
 
+/* The step model itself, asserted. `localiseMechanism` reconstructs Bpre = boards[t-1] + cells and
+ * then compares against boards[t]; that comparison used to be skipped whenever garbage arrived
+ * (`!garbageArrived &&`), i.e. on exactly the steps that can violate the model. Under
+ * insertMode:'immediate' garbage goes in BEFORE the piece, and the metric returned 13 verified
+ * forecasts across the four committed sessions with nothing thrown. This board is that shape in
+ * miniature: a garbage row appears WITHOUT the stack being lifted, so boards[t] is not boards[t-1]
+ * placed, cleared and then raised. */
+const GARBAGE_WITHOUT_LIFT = boardFrom([
+  "..........", "#......#..", ".......##.", "........##", "#######.##", "######..##", "GGGGGGG.GG",
+]);   // SPIN_VIA_GARBAGE with one stray cell at col 0, far from the col-6..9 slot: the spin is still
+      // on offer, so the window IS localised, but no lift of ROOF_NO_SPIN produces this board.
+
+test('a garbage step that does not LIFT the stack is rejected, not classified', () => {
+  expect(() => forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
+    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: GARBAGE_WITHOUT_LIFT })))
+    .toThrow(/not .* placed, cleared and then lifted/);
+});
+
+/* Kills `metric/lift-shift-unbounded`. Every arriving garbage row is 9/10 full, so a two-row insert
+ * whose upper row carries no garbage is not a state the game can reach. Without the "the bottom `s`
+ * rows must all be garbage" requirement the shift search accepts it at s = 2. */
+const LIFT_BY_TWO_ONE_GARBAGE_ROW = boardFrom([
+  ".......#..", ".......##.", "........##", "#######.##", "######..##", "#######.##", "GGGGGGG.GG",
+]);   // ROOF_NO_SPIN raised by two, with only the lower inserted row carrying garbage. The upper one
+      // is chosen so the board still offers a spin (0 -> 3), because a window that does not improve
+      // is never localised and would exercise nothing.
+
+test('a lift whose inserted rows are not all garbage is rejected', () => {
+  expect(() => forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
+    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: LIFT_BY_TWO_ONE_GARBAGE_ROW })))
+    .toThrow(/not .* placed, cleared and then lifted/);
+});
+
 test('garbage takes precedence over a clear when it is load-bearing', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2], garbageAt: [3],
     boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_VIA_GARBAGE }));

@@ -360,8 +360,39 @@ export function localiseMechanism(
   const garbageArrived = gcells(C) > gcells(B);
   if (clearedRows.length !== lk.cleared)
     throw new Error(`step ${t}: lock cleared ${lk.cleared} rows but the reconstruction found ${clearedRows.length}`);
-  if (!garbageArrived && !B.every((row, i) => row.every((c, x) => c === C[i]![x])))
-    throw new Error(`step ${t}: reconstruction diverges from boards[${t}] with no garbage inserted`);
+  if (!garbageArrived) {
+    if (!B.every((row, i) => row.every((c, x) => c === C[i]![x])))
+      throw new Error(`step ${t}: reconstruction diverges from boards[${t}] with no garbage inserted`);
+  } else {
+    // ...and when garbage DID arrive, which is exactly when this used to check nothing at all.
+    //
+    // `!garbageArrived` guarded the only test of the step model, so the model was verified precisely
+    // on the steps that cannot violate it and never on the steps that can. Measured 2026-08-08: under
+    // `insertMode: 'immediate'` — a legal option, not one of the seven swept — garbage goes in BEFORE
+    // the piece, `Bpre` merges pre-garbage rows with post-garbage coordinates, and the metric returned
+    // 13 verified forecasts across the four sessions with nothing thrown. A guard conditioned on the
+    // very thing that breaks it is not a guard.
+    //
+    // Insertion is at the bottom and lifts the stack, so C must be B raised by some shift with that
+    // many fresh garbage rows underneath. The shift is DERIVED from the boards, never read from
+    // `garbageEvents[].amt`: this file already documents (see `garbageArrivedAfter`) that a
+    // hand-built SimResult's events need not agree with its boards, and the unit fixtures do exactly
+    // that — their boards move by one row while every event says four. Deriving it keeps the check
+    // about the step model, which is what is actually in doubt.
+    const sameRow = (x: readonly unknown[], y: readonly unknown[]) => x.every((c, i) => c === y[i]);
+    let shift = -1;
+    for (let s = 1; s < H && shift < 0; s++) {
+      // the bottom `s` rows of C are the arrivals, so they must all carry garbage; everything above
+      // is B lifted by `s`. Requiring both keeps a large shift from matching vacuously.
+      if (!C.slice(H - s).every(row => row.some(c => (c as unknown as string) === 'G'))) continue;
+      let ok = true;
+      for (let i = 0; i + s < H && ok; i++) if (!sameRow(B[i + s]!, C[i]!)) ok = false;
+      if (ok) shift = s;
+    }
+    if (shift < 0)
+      throw new Error(`step ${t}: boards[${t}] is not boards[${t - 1}] placed, cleared and then lifted `
+        + `by a garbage insert — the step is not place -> clear -> insert`);
+  }
 
   if (bestTspinLines(Bpre) >= target) return { step: t, mechanism: 'placement' };
 
