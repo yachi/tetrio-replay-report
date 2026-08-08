@@ -1033,3 +1033,134 @@ missing is **data**:
 
 Until one of those exists, every C-Spin statement in this repo carries the coverage caveat, and
 `pipeline/openers/README.md` says so in the same words.
+
+## T-Spin Forecast — covering the definition's state space (2026-08-08)
+
+A four-agent sweep enumerated the metric's dimensions and cross-tabbed every cell against corpus
+instances, fixtures and lemmas. Two commits landed from it (`7b4eb51`, `58378a5`). What follows is
+the part that did **not** land: the inventory is the deliverable here, so "cover all possibilities"
+is a finite task rather than an aspiration. Roughly a third of it is done.
+
+Every item is marked **measured** (I ran it) or **unverified** (reported by an agent, not reproduced).
+That distinction is load-bearing — of the four agent reports, each contained at least one claim that
+did not survive checking: a wrong symptom, a wrong file path, a crash misread as a false positive, a
+re-derivation of an already-closed finding, and a "surviving" mutant that dies.
+
+### 1 — The two-piece roof: a rule the corpus can NEVER exercise. Highest value.
+
+**measured.** `Math.max(...placers)` (`pipeline/sim/forecast.ts`) is the whole "the roof's most recent
+builder is the piece that set up the slot" rule. Censused over all 654 tucked T-spins: **every roof is
+exactly one cell, 654 of 654.** So `placers` is a singleton in every real event and the corpus cannot
+distinguish `max` from `min` — not now, and not at any corpus size. One fixture exists
+(`forecast.test.ts`, provs {1,5}) and it is the only thing killing `metric/roof-oldest-builder`.
+
+Near-forced rather than surprising: a flat T needs a three-wide pocket and covering a second cell
+seals its only entry. That makes it permanent, which is exactly why it needs a fixture rather than
+more data. Build a second two-placer board where `j` differs between `max` and `min`, and assert the
+window, `separation` and clause 2's comparison base all move with it.
+
+### 2 — A mini spin has never been the EXECUTED spin
+
+**measured.** `forecast.ts` admits any `spin !== 'none'`, and `bestTspin` counts minis as available.
+Across the four sessions the verified prefix holds **exactly one mini lock**; it cleared lines and is
+excluded only by the no-roof filter, never by the spin filter. So: 0 of 654 records, 0 fixtures. The
+`mk` helper defaults `spin: 'full'` and the clause-4 loop varies the CLOSING clear's spin, not the
+executed one. Any mini/full asymmetry is invisible today.
+
+### 3 — `bestTspinLines` counts pre-existing full rows, and only `Bpre` has any
+
+**measured, and deliberately left unfixed.** `bestTspin` sets `lines` to the TOTAL full-row count of
+the post-placement board, not the rows the T completes. Harmless on every post-lock snapshot; `Bpre`
+is the one board that holds full rows. Probed on a real TSD: 0 extra full rows -> 2, one -> **3**,
+two -> **3**, three or more -> **0** (the rows block the T's descent). Both effects are real and they
+fight; the comment above `localiseMechanism` documents only the lowering one and concludes it "can
+only LOWER avail(Bpre)".
+
+Exposure today is **1 of 389** events whose causing step clears anything, and it is the single
+line-clear event, where even the inflated reading stayed under target. So nothing moves — by a margin
+of one event. The failure direction is toward `self_built`, i.e. toward the published 0%, which is
+the direction that deserves the least benefit of the doubt.
+
+### 4 — `forecast_garbage` has no corpus instance and no spec backing
+
+**measured.** 0 of 654 events, 0 with `mechanism = 'garbage'`, 0 with `garbageLoadBearing = true`,
+and `roofIsGarbage` false for all 654. The arm rests on three hand fixtures over wiki boards.
+
+`58378a5` establishes why the spec cannot help: `GarbageAmountCannotChangeAnyGap` proves two steps
+clearing the same rows and differing only in `garbageRows` are indistinguishable to every gap-based
+predicate, so **the model cannot adjudicate this branch in either direction** — it fires on garbage
+CONTENT and `Step` has no hole column. `GarbageAloneCannotMakeAForecast` is not a refutation of it.
+Adjudicating it needs `Step` to carry the hole column per inserted row, which is a model change.
+
+Related and open: `garbageLoadBearing` is vacuous. Garbage arrives in-window in **121 of 654** events
+and the flag is true in 0, so the corpus test asserting classifier/oracle agreement asserts `0 === 0`.
+It needs the anti-vacuity treatment `property-forecast.test.ts` already applies elsewhere.
+
+### 5 — Clause 2 `'undetermined'` has never reached a forecast kind
+
+**measured.** `undecidedClause2` and the emitted `clause2_undecided` are 0 in all four artifacts. The
+verdict is unit-tested but the reporting path that exists to stop a zero rate hiding an undecidable
+case has never carried a non-zero value.
+
+### 6 — Clause 3 is still witness-only
+
+**measured.** Clauses 2 and 4 each have a universal `...IsNotAForecast` lemma; `58378a5` added clause
+1's (`NotASpinIsNeverAForecast`). Clause 3 has none — nothing states `!GapClosed ==> !IsForecast`, and
+`GapClosesOnlyByClearsBetween` / `GarbageNeverClosesAGap` are both single-step. Three proposals, in
+dependency order:
+
+- `GapEqualsRowsRemovedBetween` — lift the header's identity to a window of any length. Induct via
+  `TrackSplit` / `RemovedBetweenSplit` with `h` symbolic, so the three-step ground blow-up does not
+  apply. Needs `CountBetweenIsDistinctCount` (landed) as a prerequisite.
+- `Clause3FollowsFromClause4` — turns the prose claim that `GapClosed` is redundant beside clause 4 at
+  `minLines >= 1` into a theorem. One-line corollary of the above.
+- `NothingRemovedIsNotEvenForecastShaped` — clause 3's first universal; strictly generalises
+  `GapClauseIsLoadBearingAtZero` and the `minLines == 0` case `GarbageAloneCannotMakeAForecast` excludes.
+
+### 7 — Modelling `improved` in Dafny is BLOCKED, not pending
+
+**measured, from the codebase's own words.** It needs `BestTspinLines` as a max over reachable
+placements; a finite max needs a bounded position set; `forecast.ts` states outright that the ROW
+coordinate is not bounded by the engine (`vendor/core/srs.ts` is `if (row < 0) continue`), that the
+`4*10*42 = 1680` bound is an ASSUMPTION resting on kick-table reasoning "nobody has turned into a
+proof", and that `h < 40000` is "a LIVE belt rather than dead code". Discharging that boundedness
+lemma is the prerequisite; until then the spec's clause 3 and the implementation's are different
+predicates and the repo should keep saying so.
+
+### 8 — Two sources of truth for "was a spin"
+
+**measured.** In every witness in both spec files `e.spinAtK == true` while `h[e.k - 1]` has
+`wasSpin == false`, and nothing relates them. More broadly `WellFormed` never relates `spinAtK`,
+`holeOpenAtJ`, `roofAt` or `floorAt` to `h` at all — clauses 1 and 2 have **zero history-side
+content**, so the spec can prove the predicate reads those flags and never that a flag is right. The
+corpus result turns on clause 2, which is one of the two.
+
+### 9 — The spec mutation suite is 15 killed + 1 unresolved, not 16/16
+
+**measured.** `58378a5` made `mutate-forecast-spec.sh` read the verifier's output instead of its exit
+code, because Dafny exits 4 on a TIMEOUT and the harness scored that as a kill. It immediately
+reclassified "gap test inverted (>= not <)", which times out at the default and resolves to KILLED at
+`DAFNY_TIME_LIMIT=300`. Either speed that obligation up or run the suite at the higher limit in CI; a
+standing TIMEOUT is an unread survivor.
+
+### 10 — Unverified, carried from the sweep so they are not lost
+
+Neither was reproduced. Do not act on them without checking first.
+
+- **Negative-row slots.** `bestRows` appends `min(rows) - 1`, so a slot topping at row 0 yields roof
+  row -1; `back(-1)` then finds no match and returns -1, and the straddle test would admit every
+  cleared row below the slot's bottom — over-attribution to `'line-clear'`. Claimed 0 of 7,579 boards
+  observed, constructible.
+- **Three unreachable guards** that survive mutation: `avail(t) >= target` at the garbage branch (the
+  walk's exit condition may already establish it), `if (!slot)` after a positive `bestTspinLines`, and
+  the `t <= j` early return. If genuinely unreachable they want deletion or a comment, not a mutant.
+
+### 11 — Decision, not a task: does `insertMode` join the swept configs?
+
+**measured.** `insertMode: 'immediate'` is legal, is used by `coverage-strict.ts` and
+`triage-garbage-totals.ts`, and is not among the seven swept. Before `7b4eb51` it returned **13
+verified forecasts** across the four sessions (2.83%) against 0.00% for `best`, every one
+`mechanism: 'garbage'` with `garbageLoadBearing: false`. It now throws 20 times instead, and all seven
+swept configs are unaffected. So the metric no longer reports a number it cannot justify — but the
+published 0% is still a claim about seven configs, and whether that set is the right one is an
+editorial call about what the figure asserts, not a bug.
