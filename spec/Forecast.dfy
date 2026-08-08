@@ -52,6 +52,81 @@ module Forecast {
 
   type History = seq<Step>
 
+  // ---------------------------------------------------------------------------------------------
+  // WELL-FORMEDNESS. Added 2026-08-08 after a probe showed the model admits histories the game
+  // cannot produce, and that one of them satisfies the STRICTEST reading of the definition:
+  //
+  //   Step([5, 5, 5], false, 0)  -- one row, listed three times
+  //
+  // `CountBelow` and `CountBetween` walk the sequence and count occurrences, so a duplicated row is
+  // counted once per copy. That made `ClosedByPlain == 3` from a single line clear, and
+  // `IsForecastTriple` -- "a non-spin TRIPLE" -- provable from it. Negative `garbageRows` was
+  // admitted too, sinking the field instead of lifting it.
+  //
+  // No published figure was ever affected: `pipeline/sim/forecast.ts` derives its cleared rows from
+  // the board itself (`Bpre.map((row, i) => row.every(...))`), which cannot repeat an index. The gap
+  // was between the spec and the thing it specifies -- which is the one gap this file exists to close.
+  // ---------------------------------------------------------------------------------------------
+
+  predicate NoDup(s: seq<int>) {
+    forall i, j :: 0 <= i < j < |s| ==> s[i] != s[j]
+  }
+
+  predicate WellFormedStep(s: Step) {
+    && NoDup(s.clearedRows)      // a row can only be removed once
+    && s.garbageRows >= 0        // garbage rises; it never sinks the field
+  }
+
+  predicate WellFormedHistory(h: History) {
+    forall i :: 0 <= i < |h| ==> WellFormedStep(h[i])
+  }
+
+  // The rows actually taken from between the pair, as a SET. Cardinality is what forces distinctness.
+  function RowsBetween(cleared: seq<int>, a: int, b: int): set<int>
+  {
+    set i | 0 <= i < |cleared| && a < cleared[i] < b :: cleared[i]
+  }
+
+  /**
+   * THE theorem clause 4 needs: "n rows were removed from between them" means n DIFFERENT rows.
+   *
+   * Without `NoDup` this is false, and not academically: `Step([5, 5, 5], false, 0)` makes
+   * `ClosedByPlain == 3` and `IsForecastTriple` provable from a single line clear. Deleting the
+   * hypothesis makes this proof fail, so the requirement is load-bearing rather than decorative.
+   */
+  lemma CountBetweenIsDistinctCount(cleared: seq<int>, a: int, b: int)
+    requires NoDup(cleared)
+    ensures CountBetween(cleared, a, b) == |RowsBetween(cleared, a, b)|
+    decreases |cleared|
+  {
+    if |cleared| == 0 {
+      assert RowsBetween(cleared, a, b) == {};
+    } else {
+      var x := cleared[0];
+      var rest := cleared[1..];
+      assert NoDup(rest);
+      CountBetweenIsDistinctCount(rest, a, b);
+      assert x !in rest;
+      if a < x < b {
+        assert RowsBetween(cleared, a, b) == {x} + RowsBetween(rest, a, b);
+        assert x !in RowsBetween(rest, a, b);
+      } else {
+        assert RowsBetween(cleared, a, b) == RowsBetween(rest, a, b);
+      }
+    }
+  }
+
+  /** The defect, pinned. Both shapes the model used to admit are now rejected by name. */
+  lemma ImpossibleStepsAreRejected()
+    ensures !WellFormedStep(Step([5, 5, 5], false, 0))    // one row, counted three times
+    ensures !WellFormedStep(Step([], false, -1))          // garbage that sinks the field
+    ensures WellFormedStep(Step([5, 6, 7], false, 4))     // and a real one still passes
+  {
+    var dup := [5, 5, 5];
+    assert dup[0] == dup[1];          // the witness indices; a negated forall needs them named
+    assert !NoDup(dup);
+  }
+
   // Rows removed from strictly below `r` — the ones that make `r` fall.
   function CountBelow(cleared: seq<int>, r: int): int
     decreases |cleared|
@@ -122,6 +197,44 @@ module Forecast {
     GapClosesOnlyByClearsBetween(s, a, b);
   }
 
+  /**
+   * Garbage is a RIGID TRANSLATION of everything that survives: it moves every cell by the same
+   * amount, so it preserves every pairwise relationship, not merely the one gap that
+   * `GarbageNeverClosesAGap` names.
+   */
+  lemma GarbageIsARigidTranslation(s: Step, a: int, b: int)
+    requires WellFormedStep(s)
+    requires s.clearedRows == []
+    ensures Survives(s, a) && Survives(s, b)
+    ensures Advance(s, a) == a - s.garbageRows
+    ensures Advance(s, b) - Advance(s, a) == b - a
+  { }
+
+  /**
+   * ...and the sharper consequence: HOW MUCH garbage arrives cannot change any gap. Two steps that
+   * clear the same rows and differ only in garbage are indistinguishable to every gap-based
+   * predicate in this file.
+   *
+   * This is the precise boundary of the model, and it is why the spec cannot adjudicate the
+   * implementation's `forecast_garbage` branch (`pipeline/sim/forecast.ts:388`) either way. That
+   * branch fires on garbage CONTENT -- the hole in an arriving row becoming the floor of a new slot
+   * -- whereas `Step` carries only `garbageRows: int` and no hole column, so arriving garbage is
+   * pure translation here. `GarbageAloneCannotMakeAForecast` is therefore not a refutation of that
+   * branch; the two are about different mechanisms, and nothing had said so.
+   *
+   * Measured 2026-08-08: under `insertMode:'immediate'` the implementation emits 13 verified
+   * forecasts across the four sessions, every one of them `mechanism = 'garbage'` and every one with
+   * `garbageLoadBearing = false`. Representing that at all needs a hole column, which this model
+   * deliberately does not have.
+   */
+  lemma GarbageAmountCannotChangeAnyGap(s1: Step, s2: Step, a: int, b: int)
+    requires WellFormedStep(s1) && WellFormedStep(s2)
+    requires s1.clearedRows == s2.clearedRows
+    requires Survives(s1, a) && Survives(s1, b)
+    ensures Survives(s2, a) && Survives(s2, b)
+    ensures Advance(s2, b) - Advance(s2, a) == Advance(s1, b) - Advance(s1, a)
+  { }
+
   // ---------------------------------------------------------------------------------------------
   // Tracking a cell across a stretch of history.
   // ---------------------------------------------------------------------------------------------
@@ -173,8 +286,13 @@ module Forecast {
   datatype Event = Event(
     j: int,             // the step whose piece placed the overhang
     k: int,             // the step whose piece is the T-spin
-    roofAt: int,        // overhang's row, measured just after step j
-    floorAt: int,       // row of the cell the nose will rest on, measured just after step j
+    // Measured at step j's LOCK, i.e. BEFORE step j's own clears — not "just after step j", which is
+    // what this said until 2026-08-08. `RoofFinal` is `Track(h, j, k-1, ·)` and `Track` applies h[j],
+    // so a row measured after step j would have step j applied to it twice. `ForecastIsSatisfiable`
+    // agrees with the code and not with the old comment: it sets roofAt = 25 where step 0 clears row
+    // 26, and asserts `Advance(h[0], 25) == 26`.
+    roofAt: int,        // overhang's row, at step j's lock
+    floorAt: int,       // row of the cell the nose will rest on, at step j's lock
     holeOpenAtJ: bool,  // was the cell directly above that floor already empty at step j?
     spinAtK: bool       // did the piece at step k finish as a T-spin?
   )
@@ -237,6 +355,32 @@ module Forecast {
     requires WellFormed(h, e)
   { IsForecast(h, e, 3) }
 
+  /**
+   * An overhang placed by the IMMEDIATELY PRECEDING piece can never be a forecast, whatever else
+   * happened. With k == j + 1 the tracking window `Track(h, j, k-1, ...)` is empty, so neither cell
+   * has moved and the gap is unchanged.
+   *
+   * This is the spec's counterpart of a behaviour `pipeline/sim/forecast.ts` gets structurally:
+   * `localiseMechanism` walks `t` down from `k-1` while `t > j`, so at separation 1 there is no step
+   * to attribute and the event falls through to `unattributed`. Stated here as a theorem for ALL
+   * histories rather than left as an emergent property of a loop bound.
+   */
+  lemma SeparationOneIsNeverAForecast(h: History, e: Event, minLines: int)
+    requires WellFormed(h, e)
+    requires e.k == e.j + 1
+    requires minLines >= 0
+    ensures !IsForecast(h, e, minLines)
+  { }
+
+  /** ...and its hypotheses are satisfiable, so the lemma above is not vacuously true. */
+  lemma SeparationOneIsReachable() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures e.k == e.j + 1 && Tucked(e) && HolePreExisted(e)
+  {
+    h := [ Step([], false, 0) ];
+    e := Event(0, 1, 25, 29, true, true);
+  }
+
   lemma TripleIsStricter(h: History, e: Event)
     requires WellFormed(h, e)
     ensures IsForecastTriple(h, e) ==> IsForecastAnyClear(h, e)
@@ -257,6 +401,21 @@ module Forecast {
     ensures !IsForecast(h, e, minLines)
   { }
 
+  /**
+   * Clause 1's missing universal. Every other clause has a "...IsNotAForecast" lemma quantified over
+   * all histories; clause 1 was backed only by the single board in `NotASpinIsRejected`.
+   *
+   * Note what this does and does not say. `WellFormed` never relates `spinAtK` to `h`, so the spec
+   * can prove the predicate READS the flag, never that the flag is right. Clauses 1 and 2 have no
+   * history-side content at all -- they are extractor input. Worth stating plainly, because the
+   * corpus's whole result turns on clause 2.
+   */
+  lemma NotASpinIsNeverAForecast(h: History, e: Event, minLines: int)
+    requires WellFormed(h, e)
+    requires !e.spinAtK
+    ensures !IsForecast(h, e, minLines)
+  { }
+
   // A roof laid on solid stack that opens up later is downstacking, not forecasting.
   lemma NoPreExistingHoleIsNotAForecast(h: History, e: Event, minLines: int)
     requires WellFormed(h, e)
@@ -264,7 +423,10 @@ module Forecast {
     ensures !IsForecast(h, e, minLines)
   { }
 
-  // And the reason clause 3 can never be satisfied by the opponent: garbage lifts the pair together.
+  // Garbage lifts the pair together, so the opponent cannot close a gap. NOTE the proof route: the
+  // body discharges CLAUSE 4 (`ClosedByPlain == 0`, via NoClearsMeansNoRemoval with spins=false),
+  // not clause 3. Both clauses do fail on a clear-free window, so the lemma is true either way —
+  // but this comment said "clause 3" for the reason and that is not what is proved here.
   lemma GarbageAloneCannotMakeAForecast(h: History, e: Event, minLines: int)
     requires WellFormed(h, e)
     requires minLines >= 1
@@ -285,6 +447,7 @@ module Forecast {
   // The shape the player confirmed: an overhang two rows above the floor of an already-open hole,
   // one ordinary line clear takes the row between them, and the T tucks in.
   lemma ForecastIsSatisfiable() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures IsForecastAnyClear(h, e)
     // the exact count is part of the contract, so callers can reason about HOW MUCH was removed
@@ -300,6 +463,7 @@ module Forecast {
   // The same board, but the clear that lowers the overhang is itself a T-spin — the C-Spin. The
   // gap closes exactly as before and the definition still says no.
   lemma CSpinWitnessIsRejected() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures GapClosed(h, e)          // the gap really does close ...
     ensures !IsForecastAnyClear(h, e) // ... and it is still not a forecast
@@ -314,6 +478,7 @@ module Forecast {
   // And the case the player used to reject the currently-published event: everything else holds,
   // but the hole was not open when the overhang was placed.
   lemma NoHoleWitnessIsRejected() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures GapClosed(h, e)
     ensures ClosedByPlain(h, e) >= 1
@@ -327,6 +492,7 @@ module Forecast {
   // A T that lands without finishing as a spin is not a forecast however perfect the setup was.
   // Without this the `Tucked` clause is decorative: nothing else in the file ever sets spinAtK false.
   lemma NotASpinIsRejected() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures GapClosed(h, e) && ClosedByPlain(h, e) >= 1 && HolePreExisted(e)
     ensures !IsForecastAnyClear(h, e)
@@ -340,6 +506,7 @@ module Forecast {
   // actually HAS garbage, because every other lemma here sets garbageRows to 0 — which left the
   // `- s.garbageRows` term in `Advance` unpinned and a mutation deleting it undetected.
   lemma GarbageWitnessLeavesTheGapAlone() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures h[0].garbageRows == 4
     ensures !GapClosed(h, e)              // four rows of garbage, gap unmoved
@@ -359,6 +526,7 @@ module Forecast {
   { IsForecast(h, e, 0) }
 
   lemma GapClauseIsLoadBearingAtZero() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures Tucked(e) && HolePreExisted(e) && ClosedByPlain(h, e) == 0
     ensures !GapClosed(h, e)
@@ -370,6 +538,7 @@ module Forecast {
 
   // The two readings of "triple line(s)" are genuinely different, so the choice cannot be silent.
   lemma TheTwoReadingsDiffer() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures IsForecastAnyClear(h, e) && !IsForecastTriple(h, e)
   {
@@ -433,6 +602,33 @@ module Forecast {
     decreases n
   { if n == 0 { } else { RangeSeqBelow(lo + 1, n - 1, r); } }
 
+  // A range of consecutive rows repeats nothing — the obligation `WellFormedStep` needs, and the
+  // only one of the RangeSeq helpers that was missing. Without it the two PARAMETRIC witnesses were
+  // the only two of the ten that could not prove their own history physically possible.
+  lemma RangeSeqNoDup(lo: int, n: nat)
+    ensures NoDup(RangeSeq(lo, n))
+    decreases n
+  {
+    if n == 0 {
+    } else {
+      RangeSeqNoDup(lo + 1, n - 1);
+      RangeSeqExcludes(lo + 1, n - 1, lo);
+      RangeSeqLen(lo + 1, n - 1);
+      var rest := RangeSeq(lo + 1, n - 1);
+      assert RangeSeq(lo, n) == [lo] + rest;
+      forall i, j | 0 <= i < j < |RangeSeq(lo, n)|
+        ensures RangeSeq(lo, n)[i] != RangeSeq(lo, n)[j]
+      {
+        if i == 0 {
+          assert RangeSeq(lo, n)[j] == rest[j - 1];
+          assert rest[j - 1] in rest;
+        } else {
+          assert RangeSeq(lo, n)[i] == rest[i - 1] && RangeSeq(lo, n)[j] == rest[j - 1];
+        }
+      }
+    }
+  }
+
   // ... and a cell below it does not move at all.
   lemma RangeSeqNoneBelow(lo: int, n: nat, r: int)
     requires lo + n <= r
@@ -442,6 +638,7 @@ module Forecast {
 
   /** ONE non-spin clear of ANY size n >= 1 taken from between the pair is a forecast. */
   lemma AnySizeOfClearIsAForecast(n: nat) returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     requires n >= 1
     ensures WellFormed(h, e)
     ensures |h| == 2 && !h[0].wasSpin && |h[0].clearedRows| == n   // ONE clear, n rows
@@ -450,6 +647,7 @@ module Forecast {
     ensures n >= 3 ==> IsForecastTriple(h, e)                      // a Triple or a Tetris also qualifies
   {
     var cleared := RangeSeq(26, n);
+    RangeSeqNoDup(26, n);
     RangeSeqLen(26, n);
     RangeSeqExcludes(26, n, 25);
     RangeSeqExcludes(26, n, 26 + n);
@@ -492,6 +690,7 @@ module Forecast {
 
   /** A Double and then a Single reach the Triple reading: clause 4 counts ROWS, not clears. */
   lemma RowsAccumulateAcrossClears() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     ensures WellFormed(h, e)
     ensures |h| == 3 && |h[0].clearedRows| == 2 && |h[1].clearedRows| == 1   // a Double, then a Single
     ensures ClosedByPlain(h, e) == 3
@@ -540,6 +739,7 @@ module Forecast {
 
   /** A Tetris that lands entirely BELOW the hole moves the pair down together and closes nothing. */
   lemma ClearsOutsideThePairCloseNothing(n: nat) returns (h: History, e: Event)
+    ensures WellFormedHistory(h)   // ADDED: the witness must be a history the game can produce
     requires n >= 1
     ensures WellFormed(h, e)
     ensures |h[0].clearedRows| == n && !h[0].wasSpin
@@ -548,6 +748,7 @@ module Forecast {
     ensures !IsForecastAnyClear(h, e)
   {
     var cleared := RangeSeq(30, n);      // strictly below the floor at row 29
+    RangeSeqNoDup(30, n);
     RangeSeqLen(30, n);
     RangeSeqExcludes(30, n, 25);
     RangeSeqExcludes(30, n, 29);

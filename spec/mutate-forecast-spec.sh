@@ -11,13 +11,34 @@ mkdir -p "$DIR"
 cp "$EX" "$DIR/ForecastExamples.dfy"
 # `dafny verify` checks only the file it is given — an `include` is trusted, not re-verified. So both
 # files are run, and the mutant dies if EITHER objects.
+# A mutant is KILLED only by a verification ERROR. Dafny exits non-zero on a TIMEOUT too, so judging
+# on the exit code alone scores "this made the verifier slow" as "this was caught" — and timeouts are
+# routine in this file, which itself records that a three-step ground window does not finish in 30 s.
+# So the output is read, not just the status, and a timeout is reported as its own outcome.
+# A TIMEOUT is an UNRESOLVED mutant, not a killed one. Escalate it by raising the limit before
+# concluding anything: "gap test inverted (>= not <)" times out at the 30 s default and resolves to
+# KILLED (six failing postconditions) at 300 s. Verified 2026-08-08.
+LIMIT=${DAFNY_TIME_LIMIT:-60}
+
+verdict() {  # file -> prints: error | timeout | clean
+  local out; out=$(dafny verify --verification-time-limit "$LIMIT" "$1" 2>&1)
+  if   grep -q "Error:.*timed out" <<<"$out"; then echo timeout
+  elif grep -qE "^.*Error:" <<<"$out";        then echo error
+  elif grep -q ", 0 errors" <<<"$out";        then echo clean
+  else echo error; fi
+}
+
 run() {  # name, sed-expr
   sed "$2" "$SRC" > "$DIR/Forecast.dfy"
   # a sed that matched nothing verifies exactly like the original and reads as a survivor
   if cmp -s "$SRC" "$DIR/Forecast.dfy"; then echo "  NO-OP   $1  <- the pattern matched nothing"; return; fi
-  if dafny verify "$DIR/Forecast.dfy" >/dev/null 2>&1 \
-  && dafny verify "$DIR/ForecastExamples.dfy" >/dev/null 2>&1
-  then echo "SURVIVED  $1"; else echo "  killed  $1"; fi
+  local a b
+  a=$(verdict "$DIR/Forecast.dfy"); b=$(verdict "$DIR/ForecastExamples.dfy")
+  case "$a $b" in
+    *error*)              echo "  killed  $1" ;;
+    *timeout*)            echo " TIMEOUT  $1  <- UNRESOLVED, not a kill; retry with DAFNY_TIME_LIMIT=300" ;;
+    *)                    echo "SURVIVED  $1" ;;
+  esac
 }
 run "drop the pre-existing-hole clause"   's|    && HolePreExisted(e)                  // 2\..*|    \&\& true|'
 run "drop the non-spin-clear clause"      's|    && ClosedByPlain(h, e) >= minLines.*|    \&\& true|'

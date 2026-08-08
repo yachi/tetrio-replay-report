@@ -57,6 +57,9 @@ python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
+dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
+bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
+python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true
 ```
 
 ## Three backends, one spec
