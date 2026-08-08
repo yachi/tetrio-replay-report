@@ -27,3 +27,6 @@ Thumbs.db
 # so an existing checkout's leftover cache is still ignored.
 pipeline/sim/pairs-cache.json
 sessions/*/sim/pairs-cache.json
+
+# nix build symlink (the oracle derivation; the store path is the artifact, not this)
+/result

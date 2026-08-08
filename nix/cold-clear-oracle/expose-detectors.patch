@@ -1,0 +1,78 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 0fe484b..5780c20 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,17 +1,12 @@
+ [workspace]
+ 
++# TRIMMED for the differential oracle: the graphical client, optimiser, battle harness and
++# c-api are not built here, and dropping them removes five git dependencies from the lockfile
++# (game-util-rs at two revs, gilrs, gilrs-core, webutil) that this binary never touches.
+ members = [
+     "bot",
+     "libtetris",
+-    "battle",
+-    "cc-client",
+-    "opening-book",
+-    "c-api",
+-    "compare",
+-    "optimizer",
+-    "opening-book/book-builder",
+-    "opening-book/pc-gen",
+-    "tbp"
++    "opening-book"
+ ]
+ 
+ [profile.release]
+diff --git a/bot/src/evaluation/mod.rs b/bot/src/evaluation/mod.rs
+index e159820..c7da0bc 100644
+--- a/bot/src/evaluation/mod.rs
++++ b/bot/src/evaluation/mod.rs
+@@ -2,7 +2,7 @@ use libtetris::{Board, LockResult, Piece};
+ 
+ use crate::dag::MoveCandidate;
+ 
+-mod standard;
++pub mod standard;
+ pub use self::standard::Standard;
+ pub mod changed;
+ 
+diff --git a/bot/src/evaluation/standard.rs b/bot/src/evaluation/standard.rs
+index 17f3504..935fd24 100644
+--- a/bot/src/evaluation/standard.rs
++++ b/bot/src/evaluation/standard.rs
+@@ -454,7 +454,7 @@ macro_rules! detect_shape {
+         success ($x:expr, $y:expr, $piece:ident, $facing:ident)
+         $([$($rowspec:tt)*])*
+     ) => {
+-        fn $name(board: &Board) -> Option<FallingPiece> {
++        pub fn $name(board: &Board) -> Option<FallingPiece> {
+             for (x, s) in board.column_heights().windows(
+                 detect_shape!(@len [$($heights)*])
+             ).enumerate() {
+@@ -567,7 +567,7 @@ detect_shape! {
+     [_ # ? ?]
+ }
+ 
+-fn cave_tslot(board: &Board, mut starting_point: FallingPiece) -> Option<FallingPiece> {
++pub fn cave_tslot(board: &Board, mut starting_point: FallingPiece) -> Option<FallingPiece> {
+     starting_point.sonic_drop(board);
+     let x = starting_point.x;
+     let y = starting_point.y;
+@@ -646,12 +646,12 @@ fn cave_tslot(board: &Board, mut starting_point: FallingPiece) -> Option<Falling
+     }
+ }
+ 
+-struct Cutout {
+-    lines: usize,
+-    result: Option<Board>,
++pub struct Cutout {
++    pub lines: usize,
++    pub result: Option<Board>,
+ }
+ 
+-fn cutout_tslot(mut board: Board, mut piece: FallingPiece) -> Cutout {
++pub fn cutout_tslot(mut board: Board, mut piece: FallingPiece) -> Cutout {
+     piece.tspin = TspinStatus::Full;
+     let result = board.lock_piece(piece);
+ 
