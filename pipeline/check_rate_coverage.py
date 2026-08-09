@@ -21,11 +21,11 @@ in the ledger, bounding every round again, and states it as the burst it is inst
 of as a record.
 """
 import argparse
-import copy
 import json
 import os
 import sys
 
+from pipeline import perturb
 from pipeline.claims.generators import QUALIFYING_MS
 
 # UPWARD only, and the direction is the whole point.
@@ -93,6 +93,7 @@ def main(argv=None):
              if max(d["lifetime"] for d in r["players"].values()) < QUALIFYING_MS]
 
     checked, holes = 0, []
+    pristine = perturb.fingerprint(facts)
     for mi, ri in short:
         for pl in facts["players"]:
             for f in RATE_FIELDS:
@@ -101,6 +102,12 @@ def main(argv=None):
                 if not _pinned_from_above(claims, facts, mi, ri, pl, f, base):
                     holes.append(f"m{mi + 1}r{ri + 1} {pl} {f} = {base} "
                                  f"— raising it falsifies no claim")
+    # A missed restore would leave later rounds checked against a raised constant, which
+    # makes the gate MORE likely to pass — the direction that hides a hole rather than
+    # inventing one. Asserted, not assumed.
+    assert perturb.unchanged(facts, pristine), \
+        "the perturbation sweep did not restore facts — later rounds were judged " \
+        "against a corrupted baseline"
 
     if holes:
         print(f"FAIL {args.report_dir}: {len(holes)} short-round rate constant(s) are "
@@ -115,17 +122,20 @@ def main(argv=None):
     return 0
 
 
-def _mutated(facts, mi, ri, pl, f, value):
-    m = copy.deepcopy(facts)
-    m["matches"][mi]["rounds"][ri]["players"][pl][f] = value
-    return m
-
-
 def _pinned_from_above(claims, facts, mi, ri, pl, f, base):
-    """True if SOME increase of this constant falsifies SOME claim."""
+    """True if SOME increase of this constant falsifies SOME claim.
+
+    Raising the value used to mean `copy.deepcopy(facts)` — a 300-480 KB rebuild to write
+    one integer, and 68 % of this gate's runtime. `perturb.perturbed` writes it in place
+    and puts it back; `main` fingerprints the tree either side of the whole sweep, because
+    a restore that silently misses a site would leave later rounds judged against a
+    corrupted baseline. See `pipeline/perturb.py`.
+    """
+    p = facts["matches"][mi]["rounds"][ri]["players"][pl]
     for d in UP:
-        if _false_claims(claims, _mutated(facts, mi, ri, pl, f, base + d)):
-            return True
+        with perturb.perturbed([(p, f, base + d)]):
+            if _false_claims(claims, facts):
+                return True
     return False
 
 

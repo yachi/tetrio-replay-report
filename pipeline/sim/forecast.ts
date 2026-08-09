@@ -64,10 +64,58 @@ import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.t
  * every `avail(t)` board have their full rows removed. Every full row `bestTspin` ever sees was thus
  * completed by that step's own placement, which is exactly what `bestTspinLines(Bpre)` credits.
  */
+/**
+ * BFS visited set as a direct-address table (CLRS §11.1) rather than a `Set` of built strings.
+ *
+ * A state is three small integers, and the old key was `` `${rot}:${col}:${row}` `` — a string
+ * built, hashed and compared for every edge the search relaxes. Encoding the same triple as one
+ * array index removes the allocation and the hash entirely.
+ *
+ * The window is deliberately WIDER than anything measured, and the fallback is why that is safe
+ * rather than sloppy. `bfs-cap.ts` establishes that rows are NOT bounded by the engine —
+ * `vendor/core/srs.ts` skips the board lookup for `row < 0` instead of rejecting it, so a piece
+ * can in principle climb, and the only ceiling anyone has is the measured [-2, 39] over 2 000
+ * boards plus an unwritten kick-table argument. So this table must not *assume* a range: a state
+ * outside the window falls back to a `Set`, keyed identically to before. The table is a fast path
+ * for the states that occur, not a claim about which states can occur, and `bfs-cap.ts`'s standing
+ * warning stays true.
+ *
+ * Cleared by generation stamp rather than by `.fill(0)`: each call bumps `visitGen` and a slot
+ * counts as visited only when it holds the current stamp, so the 2 304-entry table is allocated
+ * once for the process instead of once per board.
+ */
+const V_ROT = 4, V_COL_MIN = -2, V_COL_N = 12, V_ROW_MIN = -4, V_ROW_N = 48;
+const visitStamp = new Uint32Array(V_ROT * V_COL_N * V_ROW_N);
+let visitGen = 0;
+
+function visitIndex(rotation: number, col: number, row: number): number {
+  const c = col - V_COL_MIN, r = row - V_ROW_MIN;
+  if (c < 0 || c >= V_COL_N || r < 0 || r >= V_ROW_N) return -1;
+  return (rotation * V_COL_N + c) * V_ROW_N + r;
+}
+
 export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
   let best = 0, bestRows: number[] = [];
   const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
-  const seen = new Set(['0:3:18']);
+  // Uint32 wraps after 4.29e9 boards; restarting from 1 over a zeroed table keeps the
+  // "holds the current stamp" test honest instead of resurrecting stale marks.
+  if (++visitGen === 0xffffffff) { visitStamp.fill(0); visitGen = 1; }
+  const gen = visitGen;
+  const outside = new Set<string>();
+  /** True if this state had already been queued; marks it visited either way. */
+  const seenOrMark = (rotation: number, col: number, row: number): boolean => {
+    const i = visitIndex(rotation, col, row);
+    if (i < 0) {                       // outside the measured window — exact, just slower
+      const k = `${rotation}:${col}:${row}`;
+      if (outside.has(k)) return true;
+      outside.add(k);
+      return false;
+    }
+    if (visitStamp[i] === gen) return true;
+    visitStamp[i] = gen;
+    return false;
+  };
+  seenOrMark(0, 3, 18);
   const q: { p: ActivePiece; rot: boolean; kick: boolean }[] = [{ p: spawn, rot: false, kick: false }];
   for (let h = 0; h < q.length && h < 40000; h++) {
     const { p: cur, rot, kick } = q[h]!;
@@ -96,7 +144,7 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
       [tryMove(board, cur, 0, 1), false], [tryRotate(board, cur, 1), true], [tryRotate(board, cur, -1), true]];
     for (const [n, isRot] of nexts) {
       if (!n) continue;
-      const k = `${n.rotation}:${n.col}:${n.row}`; if (seen.has(k)) continue; seen.add(k);
+      if (seenOrMark(n.rotation, n.col, n.row)) continue;
       q.push({ p: n, rot: isRot, kick: isRot && (n.col !== cur.col || n.row !== cur.row) });
     }
   }

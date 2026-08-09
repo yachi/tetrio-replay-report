@@ -134,8 +134,16 @@ jobs:
 
       # A const no lemma reads cannot be killed by a mutation, so it inflates the
       # dataset the proofs appear to pin down. 157 dead ones shipped for weeks.
-      - name: Check no Dafny constant is dead
-        run: python3 -m pipeline.check_dead_consts "${{ matrix.artefact }}"
+      #
+      # --selftest first: this gate decides membership by tokenising the lemma text once
+      # rather than running a regex per const, and a tokeniser that is too generous prints
+      # exactly what a clean run prints. The planted cases include the prefix/suffix
+      # substrings that a naive containment test would wave through.
+      - name: Check no Dafny constant is dead (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_dead_consts --selftest
+          python3 -m pipeline.check_dead_consts "${{ matrix.artefact }}"
 
       # The APM/VS records exclude short rounds (generators.QUALIFYING_MS), which
       # frees those rounds' rate constants from the record's upper bound. The
@@ -149,6 +157,15 @@ jobs:
           else
             echo "  --  ${{ matrix.artefact }} has no generated ledger"
           fi
+
+      # check_rate_coverage and claims/equiv.py perturb facts IN PLACE and undo, instead of
+      # deep-copying the tree per mutant. deepcopy could not corrupt the original; make/unmake
+      # can, and would do it silently — a sweep that misses one restore judges everything
+      # after it against a raised constant, which makes the gate MORE likely to pass. Both
+      # callers fingerprint the tree either side of their sweep; this plants a broken restore
+      # and requires that fingerprint to catch it.
+      - name: Check the in-place perturbation always restores (and that the guard can fail)
+        run: bash pipeline/test_perturb.sh "${{ matrix.artefact }}"
 
   # The generator pipeline: regenerate each session's ledger from facts.json, check it
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
