@@ -60,6 +60,9 @@ Rscript analysis/rate_records.R                                 # the evidence f
 dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
 bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
 python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true
+python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts) agree with the
+                                           #   proven witnesses (ForecastExamples.dfy); --write regens
+                                           #   spec/forecast-examples.json, --selftest proves teeth
 ```
 
 ## Three backends, one spec
