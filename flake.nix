@@ -27,10 +27,21 @@
         }))
         {
           # The OCI image for services.containerization.images.cc-oracle. Built from the
-          # aarch64-linux package, so it needs `linux-builder.aarch64.enable = true` and two
-          # rebuilds — the first starts the builder, the second builds and loads this.
+          # aarch64-linux package, so ON A MAC it needs `linux-builder.aarch64.enable = true` and
+          # two rebuilds — the first starts the builder, the second builds and loads this. That is
+          # the local path; CI uses the aarch64-linux output below, which needs no builder at all.
           aarch64-darwin.cc-oracle-image =
             nix2container.packages.aarch64-darwin.nix2container.buildImage {
+              name = "cc-oracle";
+              tag = "latest";
+              config.Cmd = [ "${self.packages.aarch64-linux.cc-oracle}/bin/cc-oracle" ];
+            };
+          # The same image built ENTIRELY NATIVELY on an aarch64-linux host — i.e. a GitHub
+          # `ubuntu-24.04-arm` runner. No cross-compile (so no zstd-sys/libiconv snag), no
+          # linux-builder, no root: `cc-oracle` compiles native and nix2container assembles the
+          # image in one `nix build .#cc-oracle-image`. This is the output CI builds.
+          aarch64-linux.cc-oracle-image =
+            nix2container.packages.aarch64-linux.nix2container.buildImage {
               name = "cc-oracle";
               tag = "latest";
               config.Cmd = [ "${self.packages.aarch64-linux.cc-oracle}/bin/cc-oracle" ];
