@@ -3,9 +3,10 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Four sessions so far
+factual sentence is badge-linked to a Dafny-verified lemma. Five sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
-2026-08-01: yachi 4:3), 246 rounds, 132 hand-written + 304 generated claims.
+2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0), 296 rounds, 144 hand-written +
+380 generated claims.
 
 ## The one invariant
 
@@ -201,11 +202,35 @@ Paired AUC over 129 rounds — how often the round's winner held the higher valu
 APP 83.0 · 食/射埋 15.1 — **DS 84.0, the highest of any session** (66.5 · 60.0 · 75.0 · 84.0
 across the four) — and **KPP 53.8**, i.e. chance, for a fourth time.
 
-Coaching conclusions, cross-validated over four sessions: **APP is the lever** (16–25% higher
-in rounds won, both players, 8 of 8 player-sessions); **DS matters** in 7 of 8 player-sessions
-(only 07-24 pinglamb is negative); **KPP is flat** (0–2%) — reported as a negative result. When
+2026-08-09 (50 rounds) is the fifth: VS 100% · 攻 94.0 · APM 94.0 · APP 88.0 · 分 86.0 ·
+食 20.0 · 射埋 23.0 · DS 66.0 — and **KPP 58.0**, i.e. chance from the other side, for a fifth
+time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4 · 62.0 · 81.2 ·
+83.0 · 64.0 and is a different series); the 129-round headline block above is 07-22 and 07-24
+pooled, not one session.
+
+Coaching conclusions, cross-validated over five sessions: **APP is the lever** (16–52% higher
+in rounds won, both players, 10 of 10 player-sessions); **DS matters** in 9 of 10 player-sessions
+(only 07-24 pinglamb is negative); **KPP is flat** (0–3%) — reported as a negative result. When
 adding a column or a claim, run `pipeline/claims/equiv.py` or the AUC probe rather than
 assuming a stat is informative.
+
+**08-09 splits APP the other way, and that is the finding of the fifth session.** Every earlier
+session had one player ahead in *both* regimes by a similar margin — a style difference. Pool
+attack over pieces after splitting the 50 rounds by who won them and the two regimes come
+apart: won .6738 vs .6862 (+1.8%), lost .5124 vs .6425 (+25.4%) [C002]. yachi's won-round rate
+is above pinglamb's *lost*-round rate [C003]. The rank test says this is not a variance
+artefact — over losing rounds P(yachi > pinglamb) = 0.138, permutation p = 1e-5; over winning
+rounds 0.464, p = 0.34 — and it survives dropping the three near-zero rounds. The per-session
+won-gap runs +5.8 · +10.8 · +5.9 · +7.9 · **+1.8**, the lost-gap +12.8 · +7.3 · +6.0 · +6.1 ·
+**+25.4**. Two consequences worth knowing before writing another report:
+
+- **The volume route is not a law.** 08-01's headline was that 326 extra pieces bought back a
+  7% efficiency gap to within 32 lines. 08-09 ran the same route into 382 extra pieces and
+  **271 fewer** lines of attack, 8%+ of pinglamb's total [C004] — because buying it back
+  requires the per-piece value not to collapse, and here it collapsed on one side only.
+- **Advice taken can leave the score wider.** 08-01 flagged that 6 of 8 topouts were yachi's.
+  08-09 has 4 topouts, all pinglamb's, yachi none [C006] — and the match score went 4:3 to 0:6.
+  A metric moving the right way is not the same as the metric that decides.
 
 **`equiv.py` reports 100% for 07-28 and the number is an artefact** — read it before quoting
 it. It tries every *single*-value mutation, and a windowed claim shares its rounds with a
@@ -235,12 +260,17 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
-sample mean over a small n. Measured in `analysis/rate_records.R` over all 492 player-rounds:
-regressing log SD on log t gives **−0.616 for VS and −0.697 for APM**, both with −0.5 inside
-the 95% CI and slope 0 rejected (p 0.001 / 0.0003), while the **mean stays flat** (108 → 118
-across the bins). Short rounds are not better play, only noisier. All 12 unqualified records
-(3 metrics × 4 sessions) came from the shortest quartile — p = 6e-08 — and 07-22's headline
+sample mean over a small n. Measured in `analysis/rate_records.R` over all 592 player-rounds:
+regressing log SD on log t gives **−0.648 for VS and −0.726 for APM**, both with −0.5 inside
+the 95% CI and slope 0 rejected (p 0.0006 / 0.0002), while the **mean stays flat** (100 → 119
+across the bins). Short rounds are not better play, only noisier. All 15 unqualified records
+(3 metrics × 5 sessions) came from the shortest quartile — p = 9e-10 — and 07-22's headline
 約262.6 was a 15.6 s round, 45% above that session's qualified peak.
+
+The script's session list is hardcoded, so **adding a session means editing it and re-running**
+— otherwise the evidence for `QUALIFYING_MS` silently stops covering the newest data. Adding
+08-09 also broke it: the records test carried a literal `12` for "3 metrics × 4 sessions", and
+`binom.test(15, 12, ...)` aborts. It derives `n_records` from `sessions` now.
 
 `QUALIFYING_MS = 60_000` is where definition and data agree: APM and VS are per-*minute*, and
 each session's record names the same round for every cut-off from 50 s to 70 s, so nothing

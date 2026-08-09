@@ -12,7 +12,7 @@
 suppressPackageStartupMessages(library(jsonlite))
 
 repo <- "/Users/yachi/github/tetrio-replay-report"
-sessions <- c("2026-07-22", "2026-07-24", "2026-07-28", "2026-08-01")
+sessions <- c("2026-07-22", "2026-07-24", "2026-07-28", "2026-08-01", "2026-08-09")
 
 rows <- do.call(rbind, lapply(sessions, function(s) {
   f <- fromJSON(file.path(repo, "sessions", s, "report", "facts.json"),
@@ -77,11 +77,16 @@ for (metric in c("vs", "apm", "pps")) {
 }
 
 ## ---------------------------------------------------------------------------
-cat("\n"); rule("2. WHERE THE 12 RECORDS ACTUALLY COME FROM")
+cat("\n"); rule("2. WHERE THE UNQUALIFIED RECORDS ACTUALLY COME FROM")
 q1 <- quantile(rows$t, .25)
 cat(sprintf("   shortest quartile of rounds = under %.1fs\n\n", q1))
+# 3 metrics x one record per session. DERIVED, not the literal 12 this line carried
+# while there were four sessions: adding the fifth made it 15 and binom.test(15, 12, ...)
+# aborted the script. A hardcoded n here is a silent understatement at best.
+metrics <- c("vs", "apm", "pps")
+n_records <- length(metrics) * length(sessions)
 hits <- 0
-for (metric in c("vs", "apm", "pps")) {
+for (metric in metrics) {
   qs <- sapply(sessions, function(s) {
     d <- rows[rows$session == s, ]
     b <- d[which.max(d[[metric]]), ]
@@ -91,11 +96,11 @@ for (metric in c("vs", "apm", "pps")) {
   cat(sprintf("   %-4s record's quartile per session: %s\n", toupper(metric),
               paste(qs, collapse = " ")))
 }
-cat(sprintf("\n   %d of 12 records sit in the shortest quartile.\n", hits))
-cat(sprintf("   Under H0 that is Binom(12, 0.25): p = %.3g\n",
-            binom.test(hits, 12, 0.25, alternative = "greater")$p.value))
+cat(sprintf("\n   %d of %d records sit in the shortest quartile.\n", hits, n_records))
+cat(sprintf("   Under H0 that is Binom(%d, 0.25): p = %.3g\n", n_records,
+            binom.test(hits, n_records, 0.25, alternative = "greater")$p.value))
 
-for (metric in c("vs", "apm", "pps")) {
+for (metric in metrics) {
   top <- rows[[metric]] >= quantile(rows[[metric]], .90)
   k <- sum(rows$t[top] <= q1)
   bt <- binom.test(k, sum(top), 0.25, alternative = "greater")
