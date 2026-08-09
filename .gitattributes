@@ -22,3 +22,5 @@ sessions/*/report/claims.smt2 linguist-generated
 spec/fixtures/jp-forecast/*.jpg binary linguist-vendored
 # The boards extracted from those images by pipeline/sim/extract_jp_forecast.py — machine data.
 pipeline/sim/jp-forecast-boards.json linguist-generated -diff
+# four.lol forecast boards, decoded from the committed fumen codes — machine data.
+pipeline/sim/four-forecast-boards.json linguist-generated -diff

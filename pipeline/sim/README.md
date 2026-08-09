@@ -105,6 +105,28 @@ the rounding, or the metric set changes, and date it.
   `python3 -m pipeline.sim.extract_jp_forecast` re-extracts byte-identically from the images
   (needs Pillow). These are step-by-step setup frames with no per-board label, so — unlike the
   harddrop set — the section-premise spin checks do not apply and are deliberately not asserted.
+- **A third, four.lol corpus.** `four-forecast.test.ts` reads `four-forecast-boards.json` — 26
+  frames decoded from the nine forecast-section **fumen** codes in `four-forecast-fumens.json`
+  (four.lol's board diagrams are fumen-backed, credited to kazu). Capturing at the fumen layer
+  sidesteps four.lol's build-hashed styled-component DOM entirely: the fumens are stable authored
+  content, decoded by the `py_fumen` library (`extract_four_forecast.py`) — a trusted third-party
+  decoder, so any fumen tool reproduces the same boards. Same conventions and caveats as the JP set.
+
+### Forecast example sources swept (2026-08-09)
+
+The question "is that every forecast example on the internet?" has been asked and answered, so it
+is recorded here rather than re-litigated. The three corpora above (harddrop 29, harddrop/C-Spin 38,
+Tetrisちゃんねる 38, four.lol 26) are the distinct machine-capturable example sets found. What was
+checked and NOT captured, with the reason:
+
+- **tetris.wiki/T-Spin_Forecast** — the modern Hard Drop relaunch. Its 23 `<playfield>` diagrams
+  were parsed from `?action=raw` and compared cell-by-cell (wildcarding the don't-care columns):
+  all 23 are contained in harddrop's 29. A strict subset — nothing new.
+- **tetris.fandom.com/wiki/T-Spin_Forecast** — a Hard Drop mirror, and egress-blocked (403). Its
+  content duplicates the harddrop page.
+- **namu.wiki (KO), tetris.huijiwiki.com / zhihu (ZH), winternebs TETRIS-FAQ, Galactoid, YouTube** —
+  prose, general-T-spin, or video; no distinct forecast example-board collection. TETRIS-FAQ embeds
+  four.lol/fumen rather than carrying its own boards.
 - **Coverage** — 100% of lines and functions in `forecast.ts`.
 
 ## Two hazards worth knowing before you trust output

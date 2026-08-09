@@ -66,6 +66,9 @@ python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts
 python3 -m pipeline.sim.extract_jp_forecast # re-extract the 38 Tetrisちゃんねる forecast diagrams from
                                            #   their JPEGs (needs Pillow); --write regens the JSON.
                                            #   CI gate is bun test pipeline/sim/jp-forecast.test.ts
+python3 -m pipeline.sim.extract_four_forecast # re-decode four.lol's 26 forecast frames from the
+                                           #   committed fumen codes (needs py_fumen); CI gate is
+                                           #   bun test pipeline/sim/four-forecast.test.ts
 ```
 
 ## Three backends, one spec
