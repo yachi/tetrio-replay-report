@@ -54,6 +54,15 @@ import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.t
  * Was any line-clearing T-spin ALREADY available on this board?
  * Mirrors splice-demo.ts, which verified the BEFORE board offers none and the AFTER board
  * (identical overhang + cavity, one full row removed between them) offers a clean TSD.
+ *
+ * CONTRACT (ROADMAP item 3, closed 2026-08-09): `lines` is how many rows this T-spin would CLEAR
+ * if it locked here — every full row of the RESULTING board, because the game clears every full row
+ * on lock — NOT only the rows the T's own cells complete. So a full row already on the board before
+ * the T is counted. That is game-faithful, not a bug, and it never misattributes: the only board a
+ * caller ever hands this that already holds a full row is `localiseMechanism`'s `Bpre` (the pre-clear
+ * board, `A + this step's placement`); `A = boards[t-1]` is post-clear so holds none, and `B` and
+ * every `avail(t)` board have their full rows removed. Every full row `bestTspin` ever sees was thus
+ * completed by that step's own placement, which is exactly what `bestTspinLines(Bpre)` credits.
  */
 export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
   let best = 0, bestRows: number[] = [];

@@ -1069,17 +1069,23 @@ executed one. Any mini/full asymmetry is invisible today.
 
 ### 3 — `bestTspinLines` counts pre-existing full rows, and only `Bpre` has any
 
-**measured, and deliberately left unfixed.** `bestTspin` sets `lines` to the TOTAL full-row count of
-the post-placement board, not the rows the T completes. Harmless on every post-lock snapshot; `Bpre`
-is the one board that holds full rows. Probed on a real TSD: 0 extra full rows -> 2, one -> **3**,
-two -> **3**, three or more -> **0** (the rows block the T's descent). Both effects are real and they
-fight; the comment above `localiseMechanism` documents only the lowering one and concludes it "can
-only LOWER avail(Bpre)".
+**CLOSED 2026-08-09 — the count is correct, not a latent bug.** `bestTspin` sets `lines` to the
+TOTAL full-row count of the post-placement board, not the rows the T completes. That is the
+game-faithful contract: the game clears every full row on lock, so "the lines this T-spin would
+clear if it locked here" IS the total full-row count, and reading only the rows the T's own cells
+complete would be the wrong number. It never misattributes because `bestTspin` only ever sees a full
+row on `Bpre`, and every such row was completed by that step's own placement: `A = boards[t-1]` is
+post-clear (never full), `B` and every `avail(t)` board have their full rows removed, and
+`Bpre = A + this step's placement` — so the full rows are the placement's. The comment above
+`localiseMechanism` ("can only LOWER avail(Bpre)") describes the descent-blocking effect; the
+inflating effect it fights with only ever applies to placement-completed rows, so it credits
+`placement` exactly rather than by mistake.
 
-Exposure today is **1 of 389** events whose causing step clears anything, and it is the single
-line-clear event, where even the inflated reading stayed under target. So nothing moves — by a margin
-of one event. The failure direction is toward `self_built`, i.e. toward the published 0%, which is
-the direction that deserves the least benefit of the doubt.
+Probed on a real TSD to see the two effects: 0 extra full rows -> 2, one -> **3**, two -> **3**,
+three or more -> **0** (the rows block the T's descent). Those extra full rows are a constructed
+input, not a corpus one — exposure is **1 of 389** events whose causing step clears anything (the
+single line-clear event), and even its inflated reading stayed under target, so nothing moves.
+`bestTspin`'s doc now states the contract so the "total full-row count" is not re-read as a bug.
 
 ### 4 — `forecast_garbage` has no corpus instance and no spec backing
 
@@ -1213,12 +1219,18 @@ several did not survive that check and are called out below.
 
 ### Re-classified (fable-model review; not yet actioned)
 
-- **3 — `bestTspinLines` counts pre-existing full rows.** Measured under a patched classifier over
-  654 events × 6 configs: **zero classification changes, zero rate changes**. So the fix is free and
-  leaving it in buys nothing — recommend fixing (subtract the board's pre-existing full-row count in
-  `bestTspin`), which is algebraically identity on every board but `Bpre`. Not done this round.
-  Correction to the item: the failure direction is not solely toward `self_built`; the 3+-row
-  deflation runs the other way. Low threat to the 0% (the rate is badge-unlinked).
+- **3 — `bestTspinLines` counts pre-existing full rows — CLOSED, the count is correct** (fable
+  reversed its own "recommend fixing" on second look; the main thread had already reverted the code
+  change). Measured under a patched classifier over 654 events × 6 configs: **zero classification
+  changes, zero rate changes**. The reversal: counting every full row of the resulting board IS the
+  contract — `bestTspin.lines` is "the lines this T-spin would clear if it locked here", and the game
+  clears every full row on lock, not "the rows the T's own cells complete". `bestTspin` only ever
+  sees a full row on `Bpre`: `A = boards[t-1]` is post-clear so never full, and `B` and every
+  `avail(t)` board have their full rows removed, so every full row in `Bpre = A + this step's
+  placement` was completed by THAT placement — crediting `placement` is exact, not an artifact.
+  Subtracting the pre-existing count would be identity on every corpus board and would BREAK the
+  contract on the constructed boards where it is not, so nothing is subtracted. Verified against
+  `localiseMechanism` source before closing; `bestTspin`'s doc now carries the contract line.
 - **7 — modelling `improved` was NOT blocked.** The premise "a finite max needs a bounded position
   set" is false: `BestTspinLines` is a max over LINE COUNTS, bounded by 3, regardless of the
   position set's size. Cheap path (hours): add `availAtJ`/`availAtK: nat` to `Event` (exactly like
