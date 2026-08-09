@@ -329,6 +329,51 @@ print (per-round means, and the won/lost per-piece rates) — without them a cor
 rate resolves against no datum, collides with some unrelated datum's rounded rendering, and the
 gate cries wolf at exactly the figures it just added.
 
+## Perturbation is in place now, and that trade needs a guard
+
+Two gates ask *"if I change this one datum, which claims flip?"* — `claims/equiv.py` 4 440
+times per session (7 019 on 07-22) and `check_rate_coverage.py` up to 164 times. Both used
+to answer it with `copy.deepcopy(facts)`, rebuilding a 300-480 KB object graph to write one
+integer: 76.5 million deepcopy calls per `equiv` run, 88 % of its wall clock.
+
+`pipeline/perturb.py` replaces that with **make/unmake** — write in place, evaluate, write
+the old value back. Same mutants, O(1) instead of O(|facts|). `equiv` went 51.8 s → 13.9 s
+on 07-22, output byte-identical.
+
+**What it costs is the one thing deepcopy gave for free: the original cannot be corrupted.**
+A sweep that restores 4 439 of 4 440 sites leaves every later mutant on a wrong baseline,
+prints a plausible coverage figure and exits 0 — and for `check_rate_coverage` the drift is
+in the direction that makes the gate *pass*, hiding a hole rather than inventing one. So
+both callers fingerprint the tree either side of the sweep and assert it came back, and
+`pipeline/test_perturb.sh` plants a disabled restore to prove that assertion fires. Do not
+delete the fingerprint because it "obviously can't happen" — it is the only thing standing
+where deepcopy's structure used to.
+
+Preconditions, neither enforced at runtime: the code inside the `with` must not mutate
+`facts` (both callers `eval` a pure comparison), and a write must name a container and key
+that already exist.
+
+`equiv.py`'s truth vectors are **bitmaps**, not lists — `defined` and `value`, one bit per
+mutant, so three-valued logic survives (`defined ^ value` is "decided and False"). The
+pair-coverage search is O(|hand| × |gen|²), which was 167 M interpreter steps in one
+generator expression; as `&` over ~110 machine words it is free. `implies`, `==` and the
+conjunction all changed representation — anything new that consumes a truth vector must go
+through `Vec`, which is why the old list-shaped `truth_vector()` was deleted rather than
+left for reuse.
+
+**`check_dead_consts` tokenises once instead of searching per const** (9.1 s → 0.04 s, 206×).
+It was `re.search(rf"\b{n}\b", body)` for each of ~4 700 names over ~600 KB. Aho-Corasick
+(CACM 18(6), 1975) is the general answer, but every pattern here is `\b<word>\b` over `\w+`,
+and `\b` *is* a token boundary — so a `set` of `re.findall(r"\w+", body)` gives the identical
+answer in one pass. The hazard is that a tokeniser which is too generous prints exactly what
+a clean run prints, so `--selftest` plants prefix and suffix substrings (`abc` against
+`abcd`) that a naive containment check would wave through. It runs before the gate in CI.
+
+**A profiler share is not a wall-clock share.** `cProfile` said deepcopy was 68 % of
+`check_rate_coverage`; removing it gained 1.4×, because per-call instrumentation inflates
+millions of tiny recursive `deepcopy` calls far more than it inflates one `eval`. Profile to
+find *where* the time goes, then time the change to find out *how much*.
+
 ## Relevant skills
 
 - `dataviz` (bundled) — its palette validator is authoritative: run

@@ -19,9 +19,10 @@ two values), and claims that no single mutation can falsify are reported separat
 rather than counted as covered.
 """
 import argparse
-import copy
 import json
 import random
+
+from pipeline import perturb
 
 SCALARS = [
     "apm_x1000", "pps_x1000", "vs_x1000", "lifetime", "maxspike", "topcombo",
@@ -60,42 +61,57 @@ def mutation_sites(facts):
     return sites
 
 
-def apply_mutation(facts, site, rng):
-    """Mutate one value in a deep copy and return it."""
-    f2 = copy.deepcopy(facts)
+def mutation_writes(facts, site, rng):
+    """The `(container, key, value)` writes that realise one mutation.
+
+    Was `apply_mutation`, which deep-copied `facts` and wrote into the copy — an O(|facts|)
+    rebuild per O(1) edit, and 88 % of this tool's runtime. `pipeline.perturb.perturbed`
+    applies these in place and undoes them, which is the same mutant for a few hundred
+    nanoseconds instead of twelve milliseconds. See that module for what the trade costs
+    and which assertion buys it back.
+
+    The `rng` draws happen HERE, in site order, exactly as often as the deepcopy version
+    drew them — one `_bump` (or one `choice`) per site, none for the winner flips. That is
+    not incidental tidiness: the corpus is seeded, so any change to the number or order of
+    draws silently produces a different set of mutants and a different coverage figure,
+    which would read as a result rather than as a bug.
+    """
     other = {facts["players"][0]: facts["players"][1],
              facts["players"][1]: facts["players"][0]}
     kind = site[0]
     if kind == "match_winner":
         _, mi = site
-        m = f2["matches"][mi]
-        m["winner"] = other[m["winner"]]
-    elif kind == "score":
+        m = facts["matches"][mi]
+        return [(m, "winner", other[m["winner"]])]
+    if kind == "score":
         _, mi, pl = site
-        f2["matches"][mi]["score"][pl] += rng.choice([-1, 1])
-    elif kind == "lb":
+        s = facts["matches"][mi]["score"]
+        return [(s, pl, s[pl] + rng.choice([-1, 1]))]
+    if kind == "lb":
         _, mi, pl, f = site
-        f2["matches"][mi]["leaderboard"][pl][f] = _bump(
-            f2["matches"][mi]["leaderboard"][pl][f], rng)
-    elif kind == "round_winner":
+        lb = facts["matches"][mi]["leaderboard"][pl]
+        return [(lb, f, _bump(lb[f], rng))]
+    if kind == "round_winner":
         _, mi, ri = site
-        r = f2["matches"][mi]["rounds"][ri]
-        r["winner"] = other[r["winner"]]
-        for pl in f2["players"]:
-            r["players"][pl]["alive"] = (pl == r["winner"])
-    elif kind == "field":
+        r = facts["matches"][mi]["rounds"][ri]
+        new = other[r["winner"]]
+        # `alive` is derived from the winner, so flipping one without the other would
+        # build a mutant no extractor could ever produce.
+        return ([(r, "winner", new)]
+                + [(r["players"][pl], "alive", pl == new) for pl in facts["players"]])
+    if kind == "field":
         _, mi, ri, pl, f = site
-        p = f2["matches"][mi]["rounds"][ri]["players"][pl]
-        p[f] = _bump(p[f], rng)
-    elif kind == "clear":
+        p = facts["matches"][mi]["rounds"][ri]["players"][pl]
+        return [(p, f, _bump(p[f], rng))]
+    if kind == "clear":
         _, mi, ri, pl, f = site
-        c = f2["matches"][mi]["rounds"][ri]["players"][pl]["clears"]
-        c[f] = _bump(c[f], rng)
-    elif kind == "ge":
+        c = facts["matches"][mi]["rounds"][ri]["players"][pl]["clears"]
+        return [(c, f, _bump(c[f], rng))]
+    if kind == "ge":
         _, mi, ri, pl, gi = site
-        g = f2["matches"][mi]["rounds"][ri]["players"][pl]["garbage_events"]
-        g[gi]["amt"] = _bump(g[gi]["amt"], rng)
-    return f2
+        g = facts["matches"][mi]["rounds"][ri]["players"][pl]["garbage_events"][gi]
+        return [(g, "amt", _bump(g["amt"], rng))]
+    raise AssertionError(f"unknown mutation site kind {kind!r}")
 
 
 def _bump(v, rng):
@@ -117,26 +133,67 @@ def _bump(v, rng):
     return max(0, v + rng.choice([-1, 1]) * max(1, abs(v) // 20))
 
 
-def truth_vector(compiled, corpus):
-    out = []
-    for facts in corpus:
-        try:
-            out.append(bool(eval(compiled, {"__builtins__": __builtins__}, {"facts": facts})))
-        except Exception:                    # noqa: BLE001 - a mutation broke an index
-            out.append(None)
-    return tuple(out)
+class Vec:
+    """A three-valued truth vector as two bitmaps, one bit per mutant.
+
+    `defined` bit i is set when claim evaluation produced a verdict on sample i;
+    `value` bit i is set when that verdict was True. `value` is always a subset of
+    `defined`, so an undefined sample reads as 0 in both and "defined and False" is
+    exactly `defined ^ value`.
+
+    Why not a list of True/False/None: the pair-coverage search below tries every PAIR
+    of generated claims against each uncovered hand claim — O(|hand| x |gen|^2) vector
+    operations, and on 2026-07-22 that is 167 million interpreter steps inside one
+    generator expression, the single hottest line in the tool. Python's ints are
+    arbitrary-precision bitmaps, so the same conjunction over 7 020 samples becomes a
+    couple of `&`s over ~110 machine words. This is the word-parallel trick behind
+    Shift-Or approximate matching (Baeza-Yates & Gonnet, CACM 35(10), 1992) and bitset
+    dataflow analysis; nothing about the answers changes, only how many operations
+    compute them.
+    """
+    __slots__ = ("defined", "value")
+
+    def __init__(self, defined, value):
+        self.defined, self.value = defined, value
+
+    @classmethod
+    def of(cls, verdicts):
+        """Pack a list of True/False/None, sample 0 in bit 0.
+
+        Built from a binary string rather than by `|= 1 << i` in a loop: shifting into a
+        growing int is O(n) per bit and so O(n^2) overall, which for 7 020 samples costs
+        more than it saves.
+        """
+        d = "".join("1" if v is not None else "0" for v in reversed(verdicts))
+        b = "".join("1" if v else "0" for v in reversed(verdicts))
+        return cls(int(d, 2), int(b, 2))
+
+    def falsified(self):
+        """Was this claim False on at least one sample? (`any(x is False for x in v)`)"""
+        return (self.defined ^ self.value) != 0
+
+    def __and__(self, other):
+        """Pointwise conjunction, undefined wherever either side is."""
+        d = self.defined & other.defined
+        return Vec(d, self.value & other.value & d)
+
+    def __eq__(self, other):
+        return self.defined == other.defined and self.value == other.value
 
 
 def implies(g, h):
-    """g -> h on every sample where both evaluated."""
-    seen = False
-    for a, b in zip(g, h):
-        if a is None or b is None:
-            continue
-        seen = True
-        if a and not b:
-            return False
-    return seen
+    """g -> h on every sample where both evaluated.
+
+    A violation is a sample where g is True and h is False. `h.defined ^ h.value` is
+    exactly h's False bits, and `g.value` is inside `g.defined`, so their intersection is
+    already restricted to samples both sides decided — no separate mask is needed.
+
+    `seen` in the list version required at least one commonly-decided sample, so a pair
+    that never overlaps is not an implication. `g.defined & h.defined` is that condition.
+    """
+    if not (g.defined & h.defined):
+        return False
+    return (g.value & (h.defined ^ h.value)) == 0
 
 
 def main(argv=None):
@@ -179,8 +236,8 @@ def main(argv=None):
     gen_codes = [(c, compile(c["python_check"], "<gen>", "eval")) for c in gen]
     hand_codes = [(h, compile(h["python_check"], "<hand>", "eval")) for h in hand]
 
-    # Stream the mutants: build one, evaluate every claim on it, discard. Holding
-    # thousands of deep copies at once would cost gigabytes for nothing.
+    # Mutate `facts` in place, evaluate every claim, undo. Nothing is copied and nothing
+    # is held: the mutant exists only for the duration of the `with` block.
     gvecs = [[] for _ in gen_codes]
     hvecs = [[] for _ in hand_codes]
 
@@ -198,41 +255,47 @@ def main(argv=None):
                 hvecs[i].append(None)
 
     evaluate(facts)
+    pristine = perturb.fingerprint(facts)
     for n, site in enumerate(sites, 1):
-        evaluate(apply_mutation(facts, site, rng))
+        with perturb.perturbed(mutation_writes(facts, site, rng)):
+            evaluate(facts)
         if n % 500 == 0:
             print(f"  ... {n}/{len(sites)} mutants evaluated")
+    # The one thing deepcopy gave for free. A restore that misses a single site leaves
+    # every later mutant on a wrong baseline and still prints a plausible coverage
+    # figure, so this is checked rather than assumed.
+    assert perturb.unchanged(facts, pristine), \
+        "the mutation sweep did not restore facts — coverage below would be measured " \
+        "against a corrupted baseline"
 
     gtriples = []
     for (c, _), v in zip(gen_codes, gvecs):
-        vt = tuple(v)
-        gtriples.append((c, vt, any(x is False for x in vt)))
+        vt = Vec.of(v)
+        gtriples.append((c, vt, vt.falsified()))
 
     trivial = [c["id"] for c, _, nt in gtriples if not nt]
     if trivial:
         print(f"WARNING: generated claims never falsified by any mutation: {trivial}")
 
+    # A claim no mutation falsifies can imply nothing useful, and both loops below skipped
+    # it. Filtering once keeps the quadratic pair search off them entirely.
+    live = [(c, v) for c, v, nt in gtriples if nt]
+
     covered, uncovered, untested = [], [], []
     for (h, _), v in zip(hand_codes, hvecs):
-        hv = tuple(v)
-        if not any(x is False for x in hv):
+        hv = Vec.of(v)
+        if not hv.falsified():
             untested.append(h)
             continue
-        exact = next((c for c, gv, nt in gtriples if nt and gv == hv), None)
-        impl = exact or next((c for c, gv, nt in gtriples if nt and implies(gv, hv)), None)
+        exact = next((c for c, gv in live if gv == hv), None)
+        impl = exact or next((c for c, gv in live if implies(gv, hv)), None)
         if impl is None:
             # A hand claim often bundles two facts ("more quads, fewer T-spins").
             # The ledger still carries it if a PAIR of generated claims does, so try
             # conjunctions of two before declaring it uncovered.
-            for i, (c1, v1, nt1) in enumerate(gtriples):
-                if not nt1:
-                    continue
-                for c2, v2, nt2 in gtriples[i + 1:]:
-                    if not nt2:
-                        continue
-                    both = tuple(None if (a is None or b is None) else (a and b)
-                                 for a, b in zip(v1, v2))
-                    if implies(both, hv):
+            for i, (c1, v1) in enumerate(live):
+                for c2, v2 in live[i + 1:]:
+                    if implies(v1 & v2, hv):
                         impl = {"id": f"{c1['id']}+{c2['id']}",
                                 "family": f"{c1['family']} + {c2['family']}"}
                         break
