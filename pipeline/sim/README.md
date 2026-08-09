@@ -157,6 +157,19 @@ error, not a timing artifact, so no alignment/DTW/HMM/PC-re-anchor can extend co
 the garbage-insertion model (system identification of the line-clear delay, which isn't even in the
 replay options and must be estimated), not the prefix gate.
 
+### Is the 0 a coverage artifact? Independent test, ignoring garbage (answer: no)
+
+`coverage-forecast-probe.ts` attacks the question from the other side: extend coverage by algorithms
+INDEPENDENT of the attack-timing gate, ignore garbage (the mechanism that caps coverage), and count
+line-clear forecasts. Three levers: the repo's BOARD-ONLY `frame+row` gate (drops the attack-table
+constraint a table error can wrongly truncate; +~140 placements); the **pre-garbage deterministic
+oracle** (before the first received garbage the board is a pure function of inputs+seed, verifiable
+with no garbage model — +2,192 placements, up to +47% in a session); and the absolute ceiling (the
+whole round, 100% coverage). Every one finds **0 verified line-clear forecasts**, and at the ceiling
+there is exactly **1 forecast_lineclear-labelled event across all four sessions, clause-rejected**.
+So the 0 is not hidden by the verified prefix — line-clear forecasts are absent by nature (this
+corpus is openers and self-builds). The count moves only with a genuine change in play.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
