@@ -15,6 +15,17 @@
  * tuck, nothing "opened later". This is not a miss — it is the concrete instance of the spec's
  * machine-checked theorem `SeparationOneIsNeverAForecast` (spec/Forecast.dfy: k == j+1 ⇒ !IsForecast).
  * So the example CORROBORATES the ~0 count instead of raising it.
+ *
+ * Audit of the whole corpora (2026-08-09), so this is measured rather than asserted: of the 64
+ * external frames, exactly THREE draw a newly-placed T that clears a line — JP 008 (this 004..009
+ * run), JP 031 and JP 037. 004..009 is the ONLY one that lifts as a faithful multi-step sequence and
+ * it is reactive/sep-1. JP 031 is an untucked self-build (named below → no forecast record). JP 037's
+ * tuck is real but its roofing O is drawn in the SAME frame as two other pieces, so it cannot be
+ * lifted as single-piece steps without inventing frames (forbidden hand-data); its roof sits in the
+ * immediately-prior frame regardless, i.e. sep-1. four.lol is the same: every executed spin is either
+ * a single-frame tuck (sep-1, covered by the sweep) or a multi-piece illustration jump. So no
+ * additional named lift can surface a separation ≥2 forecast — the corpora do not draw one beyond
+ * 004..009. Hand-authoring more cases broadens the negative controls; it does not raise the count.
  */
 import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
@@ -91,6 +102,55 @@ test('the detector classifies the JP forecast example as reactive at separation 
   // so there is no step between roof and tuck. This is exactly SeparationOneIsNeverAForecast.
   expect(t!.separation).toBe(1);
   expect(t!.kind).toBe('reactive');
+  expect(out.records.filter(isVerifiedForecast).length).toBe(0);
+});
+
+// --- Second named exemplar: the UNTUCKED self-build (JP foreacast_029..031) -------------------
+// The sweep below states the two honest outcomes an executed corpus spin can have; foreacast_004..009
+// above is the sep-1 one. This is the other: the T fills an OPEN right-side well (col 9, empty all the
+// way above the stack) — no cell roofs any T cell — so it is a self-built vertical spin, not a tuck
+// under an overhang. The detector records NOTHING for it (forecast.ts drops an untucked spin at the
+// tuck gate), which is the correct verdict: a forecast needs a roof over a pre-existing hole, and this
+// board has neither. Single-piece steps (S = 4 cells, then T = 4 cells), so the lift is faithful.
+const G029 = ['..........', '..........', '#########.', '#######.##', '#######.##', '#######.##', '#######.##', '###.######'];
+const G030 = ['.SS.......', 'SS........', '#########.', '#######.##', '#######.##', '#######.##', '#######.##', '###.######'];
+const G031 = ['.SS......T', 'SS......TT', '#########T', '#######.##', '#######.##', '#######.##', '#######.##', '###.######'];
+
+function liftSelfBuild() {
+  const board: Cell[][] = place(G029);
+  const prov: (number | null)[][] = board.map(r => r.map(c => (filled(c) ? 0 : null)));
+  const boards: Cell[][][] = [board.map(r => [...r])];
+  const provSnaps: (number | null)[][][] = [prov.map(r => [...r])];
+  const locks: any[] = [{ frame: 0, piece: 'I', cells: [], cleared: 0, spin: 'none', allclear: false }];
+  const step = (prev: string[], cur: string[], piece: PieceType, idx: number, spin: 'none' | 'full') => {
+    const p = place(prev), q = place(cur), off = H - cur.length;
+    const cells: { col: number; row: number }[] = [];
+    cur.forEach((l, i) => [...l].forEach((ch, c) => {
+      const r = off + i;
+      if (ch !== '.' && !filled(p[r]![c]) && filled(q[r]![c])) cells.push({ col: c, row: r });
+    }));
+    for (const cell of cells) { board[cell.row]![cell.col] = piece; prov[cell.row]![cell.col] = idx; }
+    const full: number[] = [];
+    for (let r = 0; r < H; r++) if (board[r]!.every(filled)) full.push(r);
+    for (const r of full) {
+      board.splice(r, 1); board.unshift(new Array(W).fill(null));
+      prov.splice(r, 1); prov.unshift(new Array(W).fill(null));
+    }
+    locks.push({ frame: idx * 100, piece, cells, cleared: full.length, spin, allclear: false });
+    boards.push(board.map(r => [...r])); provSnaps.push(prov.map(r => [...r]));
+  };
+  step(G029, G030, 'S', 1, 'none');   // an unrelated S opener, far from the well
+  step(G030, G031, 'T', 2, 'full');   // T drops the open right well and clears — but nothing roofs it
+  return { lines: 0, placed: 0, holds: 0, clears: {}, garbage: { sent: 0, received: 0, cleared: 0, attack: 0 },
+    topbtb: 0, topcombo: 0, boards, records: [], events: [], locks, garbageEvents: [], provSnaps, topout: false } as any;
+}
+
+test('a second corpus exemplar — the untucked self-build (JP 029..031) — records no forecast at all', () => {
+  const r = liftSelfBuild();
+  expect(() => forecastMetric(r, true)).not.toThrow();          // the lift is faithful (single-piece steps)
+  const out = forecastMetric(r, true);
+  // nothing roofs the T, so it is not even a tuck: zero forecast records, the correct verdict.
+  expect(out.records.length).toBe(0);
   expect(out.records.filter(isVerifiedForecast).length).toBe(0);
 });
 
