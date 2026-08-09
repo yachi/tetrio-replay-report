@@ -466,8 +466,22 @@ export function forecastMetric(r: SimResult, strict = true): {
   forecastRate: number;
   /** mechanism established but clause 2 undecidable — reported, never counted either way */
   undecidedClause2: number;
+  /**
+   * Admitted T-spins (`spin !== 'none'`) that never became a tucked, line-clearing record — the
+   * denominator's EXCLUDED scope, by lock index so a consumer can restrict to its verified prefix.
+   * `records` are the tucked line-clearing spins (the published `verified_tspins`); this is where
+   * the rest went. `records.length + noSnapshot + untucked` is every line-clearing T-spin, so the
+   * published 654 is that set MINUS the untucked and the snapshot-less — which is why the report may
+   * not call 654 "all verifiable T-spins". `zeroClear` is a spin that cleared nothing (not part of
+   * the line-clearing denominator at all).
+   */
+  drops: { zeroClear: number[]; noSnapshot: number[]; untucked: number[] };
 } {
   const records: ForecastRecord[] = [];
+  // Why an admitted T-spin does not reach the tucked, line-clearing record set. Counted, not
+  // silently `continue`d, so the denominator's scope is measured — the asymmetry that let the
+  // numerator bug live for weeks was that the numerator had a gate and this denominator had none.
+  const drops = { zeroClear: [] as number[], noSnapshot: [] as number[], untucked: [] as number[] };
   const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0 };
   // Localising a mechanism walks back through the window re-evaluating boards the endpoints
   // already visited, and consecutive events share most of their windows. Memoised per call:
@@ -481,11 +495,12 @@ export function forecastMetric(r: SimResult, strict = true): {
 
   for (let k = 0; k < r.locks.length; k++) {
     const lk = r.locks[k]!;
-    if (lk.spin === 'none' || lk.cleared === 0) continue;
+    if (lk.spin === 'none') continue;                        // not a T-spin at all
+    if (lk.cleared === 0) { drops.zeroClear.push(k); continue; }   // a spin that cleared nothing
 
     // The board state the T landed into is the snapshot BEFORE this lock (k-1).
     const prev = k > 0 ? r.provSnaps[k - 1] : null;
-    if (!prev) continue;
+    if (!prev) { drops.noSnapshot.push(k); continue; }
 
     // Roof = filled cells directly above the T's own cells.
     const roofProv: (number | null)[] = [];
@@ -495,7 +510,7 @@ export function forecastMetric(r: SimResult, strict = true): {
       const p = prev[above]?.[c.col];
       if (p !== null && p !== undefined) roofProv.push(p);
     }
-    if (roofProv.length === 0) continue;   // no overhang → not a tucked spin
+    if (roofProv.length === 0) { drops.untucked.push(k); continue; }   // no overhang → not tucked
 
     const roofIsGarbage = roofProv.some(p => p === -1);
     const placers = roofProv.filter((p): p is number => p !== null && p >= 0);
@@ -592,6 +607,6 @@ export function forecastMetric(r: SimResult, strict = true): {
   const undecidedClause2 = records.filter(x =>
     (x.kind === 'forecast_garbage' || x.kind === 'forecast_lineclear')
     && holePreExisted(x.floorOrigin ?? 'undetermined') === null).length;
-  return { records, totals, tspins, unattributed, floorOrigins, undecidedClause2,
+  return { records, totals, tspins, unattributed, floorOrigins, undecidedClause2, drops,
            forecastRate: tspins ? verified / tspins : 0 };
 }

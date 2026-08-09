@@ -90,7 +90,10 @@ type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: numbe
              unattributed: number; verified: number; placed: number;
              floors: Record<FloorOrigin, number>; forecasts: number; undecided: number;
              /** the GAME's own clear tallies, whole rounds — see Case.clears */
-             tst: number; tsd: number; rounds: number };
+             tst: number; tsd: number; rounds: number;
+             /** admitted T-spins in the verified prefix that never reached `tspins` — the
+              *  denominator's excluded scope, so 654 is not published as "all verifiable T-spins" */
+             dropUntucked: number; dropNoSnapshot: number; dropZeroClear: number };
 
 const tally = (extra: any) => {
   const per: Record<string, Per> = {};
@@ -99,14 +102,22 @@ const tally = (extra: any) => {
     const v = verifiedIndex(r, c.truth);
     per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
       floors: { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 },
-      forecasts: 0, undecided: 0, tst: 0, tsd: 0, rounds: 0 };
+      forecasts: 0, undecided: 0, tst: 0, tsd: 0, rounds: 0,
+      dropUntucked: 0, dropNoSnapshot: 0, dropZeroClear: 0 };
     const p = per[c.user]!;
     p.verified += v + 1; p.placed += c.placed;
     // Counted BEFORE the `v < 0` guard on purpose: these come from the game's own stats and cover
     // the whole round, so a round the simulator could not verify still contributes its real tally.
     p.tst += c.clears.tspintriples ?? 0; p.tsd += c.clears.tspindoubles ?? 0; p.rounds++;
     if (v < 0) continue;
-    for (const rec of forecastMetric(r, true).records) {
+    const metric = forecastMetric(r, true);
+    // The admitted T-spins that never became a record, restricted to the same verified prefix the
+    // records are — so `dropUntucked + dropNoSnapshot + tspins` is every line-clearing T-spin in
+    // the prefix, and 654 is provably its tucked subset rather than "all verifiable T-spins".
+    for (const k of metric.drops.untucked) if (k <= v) p.dropUntucked++;
+    for (const k of metric.drops.noSnapshot) if (k <= v) p.dropNoSnapshot++;
+    for (const k of metric.drops.zeroClear) if (k <= v) p.dropZeroClear++;
+    for (const rec of metric.records) {
       if (rec.lockIndex > v) continue;
       p.tspins++;
       // Four buckets, and the `else` must not swallow one: `self_built` was added precisely
@@ -165,7 +176,19 @@ const players = Object.entries(base).map(([user, v]) => {
     tspin_triples_game_stats: v.tst,
     tspin_doubles_game_stats: v.tsd,
     rounds_played: v.rounds,
+    // `verified_tspins` is the denominator of the forecast rate — the TUCKED, LINE-CLEARING T-spins
+    // in the verified prefix, NOT every T-spin there. The report must not call it "all verifiable
+    // T-spins" (it did, and the repo's own tests prove it false: a mini lock and untucked spins are
+    // excluded). The three exclusions below make that scope measured, not asserted — the numerator
+    // had a gate for weeks while this denominator had none, the asymmetry that hid the numerator bug.
+    // `verified_tspins + tspins_excluded_untucked + tspins_excluded_no_snapshot` is every
+    // line-clearing T-spin; `tspins_excluded_zero_clear` cleared nothing, so it is a T-spin the game
+    // saw but not part of any line-clearing denominator.
     verified_tspins: v.tspins,
+    admitted_lineclearing_tspins: v.tspins + v.dropUntucked + v.dropNoSnapshot,
+    tspins_excluded_untucked: v.dropUntucked,
+    tspins_excluded_no_snapshot: v.dropNoSnapshot,
+    tspins_excluded_zero_clear: v.dropZeroClear,
     forecast_garbage: v.fg,
     // The clear FORMED the slot: a cleared row lay strictly inside it, so removing that row is
     // what brought roof and cavity together. Auditing the 86 events the old co-occurrence rule
@@ -318,7 +341,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/7',
+  schema: 'forecast-facts/8',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

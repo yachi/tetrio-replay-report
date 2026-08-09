@@ -28,7 +28,7 @@ if (!PATH) throw new Error('no sessions/*/sim/forecast-facts.json found, and FOR
 test('the artifact exists and declares itself ineligible for the report', () => {
   expect(existsSync(PATH)).toBe(true);
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
-  expect(d.schema).toBe('forecast-facts/7');
+  expect(d.schema).toBe('forecast-facts/8');
   // simulator-derived data must never be promoted to a report claim without the
   // dual-extractor rule being satisfied; this flag is the guard
   expect(d.report_eligible).toBe(false);
@@ -169,13 +169,32 @@ test('counts are internally consistent and integers', () => {
   const d = JSON.parse(readFileSync(PATH, 'utf8'));
   expect(d.players.length).toBe(2);
   for (const p of d.players) {
-    // forecast_total is the two MECHANISM-ESTABLISHED kinds, each localised to the step and the
-    // edit within it that raised the availability. self_built must still never be folded in —
-    // that is the opener case, and folding it back is precisely the over-count this schema
-    // exists to correct.
-    expect(p.forecast_total).toBe(p.forecast_garbage + p.forecast_lineclear);
+    // `mechanism_established` is the two MECHANISM-ESTABLISHED kinds; self_built must never be
+    // folded in — that is the opener case, and folding it back is precisely the over-count this
+    // schema exists to correct. `forecast_total` then applies clause 2 (the hole pre-existed) ON
+    // TOP, so it is a subset: forecast_total <= mechanism_established, equal only when clause 2
+    // rejects nothing. The old assertion `forecast_total === fg + fl` asserted the stronger thing
+    // and is FALSE on 2026-07-28 (pinglamb's one line-clear event has a floor that arrived later,
+    // so clause 2 rejects it: mechanism_established 1, forecast_total 0). It never fired because
+    // this file checks 2026-07-22 by default, where clause 2 rejects nothing. Corrected + widened
+    // to every session (FORECAST_FACTS) here.
+    expect(p.mechanism_established).toBe(p.forecast_garbage + p.forecast_lineclear);
+    expect(p.forecast_total).toBeLessThanOrEqual(p.mechanism_established);
     expect(p.verified_tspins).toBe(
       p.forecast_garbage + p.forecast_lineclear + p.self_built + p.reactive);
+    // The DENOMINATOR's scope, gated (schema 8). `verified_tspins` is the TUCKED, line-clearing
+    // T-spins; `admitted_lineclearing_tspins` is EVERY line-clearing verifiable T-spin, so the
+    // difference is exactly the untucked and the snapshot-less. Without this the report could go
+    // back to calling `verified_tspins` "all verifiable T-spins" — the numerator had a gate for
+    // weeks while this leg had none, which is how the numerator bug hid. Also pins the drop counts
+    // as non-negative integers so a mislabelled or double-counted drop is a test failure.
+    for (const k of ['admitted_lineclearing_tspins', 'tspins_excluded_untucked',
+                     'tspins_excluded_no_snapshot', 'tspins_excluded_zero_clear']) {
+      expect(Number.isInteger(p[k])).toBe(true);
+      expect(p[k]).toBeGreaterThanOrEqual(0);
+    }
+    expect(p.admitted_lineclearing_tspins).toBe(
+      p.verified_tspins + p.tspins_excluded_untucked + p.tspins_excluded_no_snapshot);
     // An improvement the step model cannot explain is a defect in the model, not a category.
     // If this ever exceeds 0, the buckets below it stop meaning what they say.
     expect(p.unattributed).toBe(0);

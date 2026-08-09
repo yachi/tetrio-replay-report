@@ -270,6 +270,12 @@ def _mechanism_clause(data):
     """
     ps = data["players"]
     tot = sum(p["verified_tspins"] for p in ps)
+    # The denominator's SCOPE, measured (schema 8), so `tot` is not published as "all verifiable
+    # T-spins": it is the TUCKED, line-clearing subset. `admitted` is every line-clearing verifiable
+    # T-spin; `excl` are the line-clearing ones dropped for having no overhang (or no provenance
+    # snapshot to read one from), i.e. not tucked.
+    admitted = sum(p.get("admitted_lineclearing_tspins", p["verified_tspins"]) for p in ps)
+    excl = sum(p.get("tspins_excluded_untucked", 0) + p.get("tspins_excluded_no_snapshot", 0) for p in ps)
     fg = sum(p.get("forecast_garbage", 0) for p in ps)
     lc = sum(p.get("forecast_lineclear", 0) for p in ps)
     sb = sum(p.get("self_built", 0) for p in ps)
@@ -292,8 +298,13 @@ def _mechanism_clause(data):
         "咁樣就唔使靠反事實：三張中間板都係由上一張板砌返出嚟，"
         "而且當嗰步冇垃圾升起嘅時候，砌返出嚟嗰張<strong>一定要同實際嗰張逐格一樣</strong>——"
         "呢點係查咗先算數，唔係當佢啱。",
-        f"喺呢個 session 全部 {tot} 個可核 T-spin 入面："
-        f"<strong>{fg} 個</strong>係垃圾造成個窿位；"
+        (f"呢個 session {admitted} 個消到行嘅可核 T-spin 入面，"
+         f"<strong>{tot} 個</strong>係 tucked（T 上面有蓋），先至問得到「個蓋係咪預先搭喺窿位上面」；"
+         f"另外 {excl} 個冇蓋，唔算 tucked，唔喺 forecast 範圍。呢 {tot} 個入面："
+         if excl else
+         f"呢個 session <strong>{tot} 個</strong> tucked（T 上面有蓋）、消到行嘅可核 T-spin 入面"
+         "（消行 T-spin 全部有蓋）：")
+        + f"<strong>{fg} 個</strong>係垃圾造成個窿位；"
         f"<strong>{lc} 個</strong>係消行造成——消嗰行啱啱夾喺天花板同窿位中間，"
         "消走咗兩者先貼埋一齊；"
         f"{sb} 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
@@ -329,7 +340,7 @@ def _mechanism_clause(data):
             "唔會當佢啱，亦都唔會當佢錯，淨係報出嚟。")
     if fc == 0:
         parts.append(
-            "<strong>換句話講：呢個 session 冇一個可核 T-spin 符合曬四項條件。</strong>"
+            "<strong>換句話講：呢個 session 冇一個 tucked 消行 T-spin 符合曬四項條件。</strong>"
             "之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——"
             "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有，"
             "所以嗰個數量到嘅係<em>開局定式</em>，唔係預測。")
@@ -338,7 +349,7 @@ def _mechanism_clause(data):
             "要留意：呢個數細到<strong>一兩件事就當唔到係習慣</strong>，"
             "抽樣區間亦都已經包含咗零，"
             "所以呢度<strong>唔係話邊個識 forecast</strong>，"
-            "只係話喺可核範圍入面，符合定義嘅情況搵到幾多次。")
+            "只係話喺 tucked 消行嘅可核 T-spin 入面，符合定義嘅情況搵到幾多次。")
     # The "openers explain self_built" line above was asserted for weeks with no number beside it.
     # This is that number, and it is the only figure in this section that owes nothing to the
     # simulator — so it says so rather than inheriting the section's disclaimer by silence.
@@ -412,6 +423,8 @@ def section(data):
         '      <p>' + _mechanism_clause(data) + '</p>',
         '      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），'
         '唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。'
+        '表入面個分母淨係計<em>tucked</em>（T 上面有蓋）、消到行嗰啲——冇蓋就無「預先搭喺個窿上面」可言，'
+        '消唔到行就唔係一個 forecast——所以佢係可核 T-spin 嘅一個<strong>子集</strong>，唔係全部。'
         + _coverage_clause(data) + '</p>',
         '    </div>',
         '',
@@ -424,7 +437,7 @@ def section(data):
         # changes: it said 「垃圾造成嘅」 for one commit after the line-clear mechanism joined the
         # count, which made pinglamb's single clear-formed event read as garbage-caused. A column
         # heading is a factual claim about the column.
-        '            <th>四項條件全部符合嘅 Forecast / 可核 T-spin</th>',
+        '            <th>四項條件全部符合嘅 Forecast / tucked 消行可核 T-spin</th>',
         '            <th>比率</th>',
         '            <th>抽樣 95% CI</th>',
         '            <th>模擬器敏感度範圍</th>',

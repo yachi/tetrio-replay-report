@@ -1,5 +1,5 @@
 {
-  "schema": "forecast-facts/7",
+  "schema": "forecast-facts/8",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
@@ -38,6 +38,10 @@
       "tspin_doubles_game_stats": 339,
       "rounds_played": 79,
       "verified_tspins": 97,
+      "admitted_lineclearing_tspins": 98,
+      "tspins_excluded_untucked": 1,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 1,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
       "self_built": 57,
@@ -63,6 +67,10 @@
       "tspin_doubles_game_stats": 292,
       "rounds_played": 79,
       "verified_tspins": 115,
+      "admitted_lineclearing_tspins": 115,
+      "tspins_excluded_untucked": 0,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 1,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
       "self_built": 66,
