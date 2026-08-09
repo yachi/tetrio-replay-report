@@ -132,7 +132,20 @@ definition just re-imports the co-occurrence bug). Two probes, both committed:
   `separation === 1`**: the cell roofing the T was placed by the same lock that cleared the row, so no
   step lies between roof and tuck. That is the concrete instance of the machine-checked theorem
   `spec/Forecast.dfy:SeparationOneIsNeverAForecast` (`k == j+1 ⇒ !IsForecast`), witnessed in
-  `spec/ForecastExamples.dfy:ExternalForecastExampleReducesToSeparationOne`.
+  `spec/ForecastExamples.dfy:ExternalForecastExampleReducesToSeparationOne`. A second named exemplar,
+  JP `foreacast_029..031`, gives the *other* honest outcome the sweep lumps together — an **untucked
+  self-build** (the T fills an open right-side well, nothing roofing it), which the detector records
+  as **no forecast at all**.
+
+**All 64 external frames were then audited for a liftable multi-step forecast (2026-08-09), so "that
+is all of them" is measured, not asserted.** Exactly three draw a newly-placed line-clearing T (JP
+008/031/037); `004..009` is the only one that lifts as a faithful single-piece-per-step sequence, and
+it is reactive/sep-1. JP 031 is the untucked self-build above; JP 037's tuck is real but its roofing O
+is drawn in the *same* frame as two other pieces, so it can't be lifted as named steps without
+inventing frames — and its roof is in the immediately-prior frame regardless (sep-1). four.lol is the
+same: every executed spin is a single-frame tuck (sep-1, covered by the sweep) or a multi-piece
+illustration jump. **No additional named lift can surface a separation ≥2 forecast — the corpora do
+not draw one beyond `004..009`.**
 
 So the examples **corroborate** the 0-of-654 count rather than raise it: the detector reaches every
 spin they draw and is provably right to reject the one forecast they draw cleanly. Detecting more
@@ -188,6 +201,18 @@ four base shapes (A, B genuine; F, G near-misses), each drawn with a random hori
 random overhang piece, lifted and run through the real detector. **100/100 classified correctly** —
 every genuine forecast detected (both handedness, via the mirror axis), every near-miss rejected.
 The corpus 0 is a true negative at scale, not a blind spot.
+
+`generated-forecast-montecarlo.test.ts` asks the complementary question — does a forecast arise by
+**chance**? A hole-avoiding heuristic bot (minimise aggregate height, holes and bumpiness, with
+jitter) plays 100 games of up to 150 pieces through the real SRS engine (spawn → move/rotate →
+hardDrop → lock → clear), and every line-clearing T is *generously* marked a spin to give the
+forecast path maximum opportunity. Deterministic (seed 7): ~3,600 line clears and ~460 line-clearing
+T-spins are produced, `forecastMetric` runs on all of them **without throwing**, and finds **0
+forecast records / 0 verified forecasts**. That is the mechanism, not luck — a forecast requires an
+overhang deliberately laid over a *pre-existing* hole and opened by an *earlier external* clear, the
+exact opposite of the clean stacking a hole-minimiser does. Forecasts are a deliberate act; they do
+not occur by chance. This reproduces the corpus 0 from first principles and shows the detector does
+not false-positive on ordinary play.
 
 ### Forecast example sources swept (2026-08-09)
 
