@@ -860,6 +860,15 @@ the arrival only shifted the stack. **So the published 0 of 654 holds under the 
 criterion** — a clear or garbage before the hole becomes spinnable — and a slot-tracking rewrite
 would land on 0 as well. It is therefore not worth doing.
 
+**Re-probed 2026-08-09 from the executed-slot angle, and now GATED.** Recomputing `improved`
+slot-locally — `bestTspin`'s BFS constrained to the columns the T actually occupied — over every
+reactive event in all four sessions: **0 of 265** rose slot-locally (probe validated: 0 probe-misses,
+and it reports a rise on 385/388 self_built and 1/1 forecast_lineclear, so it discriminates). 122 of
+the 265 had garbage/clear co-occurrence in-window and none formed the executed slot. So a slot-local
+gate reclassifies nothing; the 0% is real, not a saturation artifact. `forecast-saturation.test.ts`
+pins it with a non-vacuity self-check (mutation-killed) — if a future session ever makes a reactive
+event's own slot rise, that test fails and forces the slot-local rewrite decision on the data.
+
 **What the detour found.** The 183 the loose test flagged are the C-Spin: **179** have a vertical T
 clearing three rows as the piece that closes the gap, 175 laid the overhang in bag 1-2, and 173
 executed in bag 3 — matching harddrop.com/wiki/C-Spin, *"a T-Spin Triple which is usually followed
