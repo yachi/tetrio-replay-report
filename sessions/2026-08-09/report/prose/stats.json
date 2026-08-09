@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人嘅分工同前四晚一樣：場均 PPS，yachi 六場場場高過對面<span class=\"badge\" data-claim=\"G049\"></span>；每粒方塊打出嘅攻擊（APP），pinglamb 全 session 高過對面<span class=\"badge\" data-claim=\"G039\"></span>。一個靠快，一個靠重。但今晚埋單同上一晚唔同——yachi 多疊咗 382 粒方塊，打出嘅攻擊反而少 271 條，即係 pinglamb 總攻擊嘅 8% 以上<span class=\"badge\" data-claim=\"C004\"></span>。上一晚同一條數係少 32 條、唔夠 1%，即係話「靠量補返效率」呢條路今晚買唔返。真正嘅原因喺下面：兩個人贏嗰啲局爭唔夠 2%，輸嗰啲局爭超過 25%<span class=\"badge\" data-claim=\"C002\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（50局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。VS 呢一項喺今晚 50 局入面，每一局都係贏嗰個高過輸嗰個——冇一局例外<span class=\"badge\" data-claim=\"G022\"></span>。連續第五個 session 都係咁。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "今晚兩個人嘅開行方式分得好開：quad 係 yachi 開多啲（258 對 209）<span class=\"badge\" data-claim=\"G032\"></span>，但 T-spin 兩格都係 pinglamb 贏——T-spin double 236 對 179<span class=\"badge\" data-claim=\"G033\"></span>、T-spin triple 56 對 33<span class=\"badge\" data-claim=\"G034\"></span>。同樣清行，T-spin 用嘅方塊少好多，呢兩格就係佢每粒方塊打得重過 yachi 嘅主要來源<span class=\"badge\" data-claim=\"G039\"></span>。All Clear 亦都係佢多（7 對 3）<span class=\"badge\" data-claim=\"G035\"></span>。"
+      ],
+      "footnote": "呢個圖表嘅 TSD 同 TST 兩條 bar 加埋，先啱「計埋 T-spin double 同 triple」嗰條數（pinglamb 292、yachi 212）<span class=\"badge\" data-claim=\"G054\"></span>——TSS（T-spin single）冇計落嗰個總數度。另外要留意，facts.json 入面嗰個 <code>tspins</code> 原始計數（pinglamb 343、yachi 261）<span class=\"badge\" data-claim=\"G031\"></span>係連冇清到行嘅轉都計埋，所以一定大過上面兩條 bar 加埋，兩者唔可以溝亂。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。今晚有一格值得留意：手法呢一格喺兩個人之間掉咗轉——finesse 失誤 yachi 880 對 pinglamb 680<span class=\"badge\" data-claim=\"G029\"></span>，每粒方塊嘅 perfect 比率<span class=\"badge\" data-claim=\"G041\"></span>同 KPP<span class=\"badge\" data-claim=\"G062\"></span>亦都係 pinglamb 較好，同上一晚啱啱相反。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

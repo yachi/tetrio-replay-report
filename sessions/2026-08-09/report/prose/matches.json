@@ -1,0 +1,40 @@
+{
+  "eyebrow": "戰況直擊 · 六場逐一睇",
+  "title": "六場戰況",
+  "lede": "每場嘅最終比數、贏波序列（下面一排色格代表逐局邊個贏）同埋嗰場最關鍵嘅一鋪。今晚睇條色格特別肉緊——六場都係 pinglamb 攞<span class=\"badge\" data-claim=\"G001\"></span>，但六場之中五場 yachi 都領先過，一場都收唔到。",
+  "closer": "六場 match 嘅最後一局，全部落喺 pinglamb 嗰邊<span class=\"badge\" data-claim=\"C001\"></span>——包括三場 5 比 4 嘅決勝局<span class=\"badge\" data-claim=\"G010\"></span>。yachi 領先過嘅位置全部係實數：第一場 2 比 0<span class=\"badge\" data-claim=\"C007\"></span>、第三場 2 比 0 之後仲追返 4 比 4<span class=\"badge\" data-claim=\"C009\"></span>、第五場 4 比 3<span class=\"badge\" data-claim=\"C011\"></span>、第六場 4 比 2<span class=\"badge\" data-claim=\"C012\"></span>。真正由頭輸到尾嘅得第二場<span class=\"badge\" data-claim=\"C008\"></span>。",
+  "hero_match": 6,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "開波連贏兩局，跟住俾人連追三局",
+      "flag": null,
+      "body": "yachi 開波連贏兩局，之後 pinglamb 連追三局反超，最後 3 比 5 <b>C007</b> <b>G004</b>。呢場第四局係全晚最誇張嘅一鋪：pinglamb 劈出全場最大嘅單次 spike，19 行 <b>G014</b>，個 VS 衝到約 217.7——但嗰局得約 31 秒，速率紀錄只計打足一分鐘嘅局，所以呢個數字唔算數 <b>G076</b>。呢場 pinglamb 個 match APM 約 58.4，係六場之中最高 <b>G021</b>。"
+    },
+    "2": {
+      "title": "全晚唯一一場由頭輸到尾",
+      "flag": null,
+      "body": "yachi 由頭到尾冇領先過一次，2 比 5 交波 <b>C008</b> <b>G005</b>，係六場之中最一面倒嗰場。第一局 pinglamb 一條垃圾都冇食過就收工，係全晚贏得最乾淨嘅一局 <b>G057</b>。第五局就啱啱相反——打足約 198 秒，係全晚最大嘅一次頂返：贏嗰個俾人射埋嚟 113 行，輸嗰個得 90 行 <b>G023</b>。"
+    },
+    "3": {
+      "title": "2 比 0 開頭，4 比 4 追平，決勝局俾人收",
+      "flag": null,
+      "body": "yachi 又係 2 比 0 開頭，跟住俾人連贏四局，再追返兩局拉成 4 比 4，第九局俾人收咗 <b>C009</b> <b>G006</b>。生死嗰局 pinglamb VS 約 99.7、APM 約 54.7，yachi 得 VS 約 78.6、APM 約 34.8，兩樣都輸蝕一大截 <b>G058</b>。同場第六局 pinglamb 打出全晚最高嘅合資格單局 VS，約 140.7 <b>G013</b>。"
+    },
+    "4": {
+      "title": "贏一局，即刻俾人收返一局",
+      "flag": null,
+      "body": "yachi 贏嘅三局係第一、第四、第七局，每次贏完都俾人即刻收返，3 比 5 <b>C010</b> <b>G007</b>。第二局係全場最長嗰局，打足約 223 秒 <b>G019</b>：yachi 喺嗰局清咗 193 行，全場單局最多 <b>G018</b>，最後仲係輸咗——同一局 pinglamb 疊到 10 段 B2B <b>G016</b>、插足 21 個 T-spin <b>G017</b>，兩樣都係全場之最。第六局 pinglamb 再交出全晚最高嘅合資格單局 APM，約 64.4 <b>G012</b>。"
+    },
+    "5": {
+      "title": "4 比 3 領先，尾二尾三局連輸",
+      "flag": null,
+      "body": "yachi 一度 4 比 3 領先，最後兩局連輸，4 比 5 <b>C011</b> <b>G008</b>。第七局係全晚兩邊夾埋 VS 最高嘅一局，約 265.8，而且係 yachi 贏返嚟嘅 <b>G061</b>；佢喺嗰局劈出 17 行 spike，係佢全晚最大 <b>G050</b>。生死局就冇咁貼：pinglamb VS 約 103.3、APM 約 62.0，yachi 得 VS 約 43.7、APM 約 26.2 <b>G059</b>。"
+    },
+    "6": {
+      "title": "4 比 2 領先，最後三局連輸",
+      "flag": "🏆",
+      "body": "最肉痛嗰場：yachi 一度 4 比 2 領先，最後三局連輸，4 比 5 收工，成晚 6 比 0 <b>C012</b> <b>G009</b> <b>G001</b>。第四局係全場最短嘅一局，約 11.9 秒 <b>G020</b>——yachi 一鋪過劈死對面，個 APM 去到約 117.6，係全 session 未經局長篩選嘅最高值，但唔夠 12 秒嘅分母撐唔起紀錄 <b>G075</b>。決勝局 pinglamb VS 約 139.0、APM 約 63.8，yachi VS 約 102.5、APM 約 47.1 <b>G060</b>。"
+    }
+  }
+}

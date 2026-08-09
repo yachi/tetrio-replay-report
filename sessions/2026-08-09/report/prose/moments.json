@@ -1,0 +1,36 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "11.9 秒收工，一鋪過",
+      "value": "11.9s",
+      "body": "第6場第4局，成局約 11.9 秒就完，係全晚最短嘅一局<span class=\"badge\" data-claim=\"G020\"></span>。yachi 一鋪過劈死對面，個 APM 去到約 117.6——全 session 未經局長篩選嘅最高值<span class=\"badge\" data-claim=\"G075\"></span>。但嗰兩樣係<strong>速率</strong>，分母唔夠 12 秒，數字自然大，所以唔計入 APM／VS 紀錄，詳情見下面嘅註。"
+    },
+    {
+      "accent": "p",
+      "label": "全場最大嘅單次 spike",
+      "value": "19 行",
+      "body": "第1場第4局，pinglamb 一次過劈出 19 行，係全場最大嘅單次 spike<span class=\"badge\" data-claim=\"G014\"></span>，個 VS 同時衝到約 217.7<span class=\"badge\" data-claim=\"G076\"></span>。呢類大 spike 唔係偶然——12 行以上嘅局佢有 13 局，yachi 得 9 局<span class=\"badge\" data-claim=\"G053\"></span>。"
+    },
+    {
+      "accent": "g",
+      "label": "全場最長馬拉松",
+      "value": "223s",
+      "body": "第4場第2局頂足約 223 秒，係全場最長嘅一局<span class=\"badge\" data-claim=\"G019\"></span>。yachi 喺呢一局清咗 193 行，係全場單局最多<span class=\"badge\" data-claim=\"G018\"></span>，但最後仲係輸咗——同一局 pinglamb 疊到 10 段 B2B<span class=\"badge\" data-claim=\"G016\"></span>、插足 21 個 T-spin<span class=\"badge\" data-claim=\"G017\"></span>。清得多唔等於打得重。"
+    },
+    {
+      "accent": null,
+      "label": "六場嘅最後一局",
+      "value": "6／6",
+      "body": "六場 match 嘅最後一局，全部 pinglamb 攞<span class=\"badge\" data-claim=\"C001\"></span>，其中三場係打到 5 比 4 嘅決勝局<span class=\"badge\" data-claim=\"G010\"></span>。三場決勝局嘅數字都一面倒：第三場 VS 約 99.7 對約 78.6<span class=\"badge\" data-claim=\"G058\"></span>、第五場約 103.3 對約 43.7<span class=\"badge\" data-claim=\"G059\"></span>、第六場約 139.0 對約 102.5<span class=\"badge\" data-claim=\"G060\"></span>。個 6 比 0 就係喺呢六局砌出嚟。"
+    }
+  ],
+  "trivia": [
+    "全晚最抵諗嘅一條數：<strong>贏嗰啲局兩個人幾乎打成平手（爭唔夠 2%），輸嗰啲局爭超過 25%</strong><span class=\"badge\" data-claim=\"C002\"></span>。仲要講到盡：yachi 贏嗰啲局每粒方塊嘅攻擊，高過 pinglamb 輸嗰啲局超過 4%<span class=\"badge\" data-claim=\"C003\"></span>——天花板貼到實，地板差咁遠。",
+    "多落方塊呢條路，今次冇買得返：<strong>yachi 多疊咗 382 粒方塊，打出嘅攻擊反而少 271 條</strong><span class=\"badge\" data-claim=\"C004\"></span>，即係 pinglamb 總攻擊嘅 8% 以上。同一條數上一晚係少 32 條、唔夠 1%。",
+    "死法掉轉咗：全晚 50 局有 4 局係自己頂到天花板收場<span class=\"badge\" data-claim=\"G063\"></span>，而 <strong>4 局全部係 pinglamb，yachi 一次都冇</strong><span class=\"badge\" data-claim=\"C006\"></span>。上一晚 8 局自爆入面 6 局係 yachi——呢格清咗，個比數反而係四晚以嚟最闊。",
+    "個效率差距成晚一路收窄：頭兩場 pinglamb 每粒方塊嘅攻擊高過 yachi 超過三成半，尾兩場收窄到唔夠 8%<span class=\"badge\" data-claim=\"C005\"></span>——但六場 match 一場都冇轉手<span class=\"badge\" data-claim=\"G001\"></span>。"
+  ]
+}
