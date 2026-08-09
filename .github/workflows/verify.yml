@@ -522,3 +522,15 @@ jobs:
             echo "-- $s"
             REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
           done
+
+      # cross-tslot-count checks ours against cold-clear's SINGLE best detector. This checks the
+      # stronger thing multi-slot could threaten: the scalar the forecast metric consumes is never
+      # below what cold-clear's MULTI-slot cutout chain finds on the same board (`CC_ORACLE_SLOTS=1`
+      # makes the oracle emit the chain). It fails if multi-slot ever sees a bigger current-board
+      # spin than the scalar — the case that would force re-opening the "don't wire multi-slot into
+      # the metric" decision. Measured clean: 0 of 7,544 boards; multi-slot changes the path of
+      # exclusion, not the value.
+      - name: Multi-slot cutout never exceeds the scalar the metric consumes
+        env:
+          CC_ORACLE_SLOTS: '1'
+        run: bun pipeline/sim/cross-tslot-multi.ts ./result/bin/cc-oracle
