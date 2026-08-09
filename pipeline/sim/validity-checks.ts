@@ -32,7 +32,7 @@
  * a constant or empty input, and a 0 reads downstream as "measured, and there is no
  * relationship" — a fabricated finding rather than a missing one.
  */
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 export type Row = { file:string; round:number; user:string; won:number;
@@ -47,7 +47,7 @@ export function collectRows(): Row[] {
     const recs = v === 0 ? [] : forecastMetric(r, true).records.filter(x => x.lockIndex < v);
     rows.push({ file:c.file, round:c.round, user:c.user, won: c.alive ? 1 : 0,
                 frac: v / c.placed, verified: v, placed: c.placed,
-                n: recs.length, fc: recs.filter(x=>x.kind!=='reactive').length });
+                n: recs.length, fc: recs.filter(isVerifiedForecast).length });
   }
   return rows;
 }

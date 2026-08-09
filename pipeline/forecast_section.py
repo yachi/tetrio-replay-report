@@ -173,6 +173,18 @@ def _reliability_clause(data):
     rs = rel.get("split_half_r_x1000") or {}
     named = [(u, v) for u, v in rs.items() if v is not None]
     if not named:
+        # Every r is null. Under isVerifiedForecast the per-round rate is identically 0, so the
+        # odd/even series is constant and the correlation is undefined — a strictly stronger
+        # statement than "low". Returning "" here is how the section came to rest on a
+        # reliability from the SUPERSEDED numerator; render the degenerate case instead of
+        # dropping it. (If the rate is ever non-zero and r is still null for another reason,
+        # say nothing rather than assert the zero-rate story.)
+        players = data.get("players") or []
+        if players and all(p.get("forecast_rate_x1000") == 0 for p in players):
+            return ("而且每局嘅數<strong>根本冇得同自己比</strong>："
+                    "每局嘅 forecast rate 全部係 0，冇任何變化，"
+                    "所以 split-half reliability 係<strong>冇定義</strong>（唔係低）——"
+                    "冇變化就冇嘢可以穩定唔穩定。所以下面只列<strong>每個玩家嘅總計</strong>。")
         return ""
     listed = "同 ".join(f"{_num(v)}（{html.escape(u)}）" for u, v in named)
     return ("而且每局嘅數<strong>連自己都對唔上自己</strong>："

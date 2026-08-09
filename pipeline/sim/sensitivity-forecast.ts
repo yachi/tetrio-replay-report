@@ -23,7 +23,7 @@
  * Test 2 is the stronger one: a metric whose player ranking flips under perturbation cannot
  * be reported no matter how many pairs it yields.
  */
-import { forecastMetric } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 type Row = { key:string; user:string; alive:boolean; file:string; round:number;
@@ -38,8 +38,8 @@ const collect = (extra: any): Row[] => {
     const pre = vIdx < 0 ? [] : all.filter(x => x.lockIndex <= vIdx);
     out.push({ key:`${c.file}#${c.round}#${c.user}`, user:c.user, alive:c.alive,
                file:c.file, round:c.round,
-               nPre: pre.length, fcPre: pre.filter(x=>x.kind!=='reactive').length,
-               nFull: all.length, fcFull: all.filter(x=>x.kind!=='reactive').length });
+               nPre: pre.length, fcPre: pre.filter(isVerifiedForecast).length,
+               nFull: all.length, fcFull: all.filter(isVerifiedForecast).length });
   }
   return out;
 };

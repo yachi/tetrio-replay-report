@@ -33,6 +33,25 @@ test('the artifact exists and declares itself ineligible for the report', () => 
   // dual-extractor rule being satisfied; this flag is the guard
   expect(d.report_eligible).toBe(false);
   expect(d.not_eligible_because.length).toBeGreaterThanOrEqual(3);
+  // Counting reasons without reading them is the shape of check that let a stale reliability
+  // figure survive: a session whose rate is identically 0 must SAY the per-round rate has no
+  // variance, not silently drop the line when the numerator stops firing.
+  if (d.statistics.reliability && d.players.every((p: any) => p.forecast_rate_x1000 === 0))
+    expect(d.not_eligible_because.join(' ')).toContain('identically 0');
+});
+
+test('reliability is computed on the same numerator as the published rate', () => {
+  const d = load();
+  const rel = d.statistics.reliability;
+  if (!rel) return;
+  // A rate of 0 for every player means the per-round rate is CONSTANT, so a correlation over it
+  // is undefined and `pearson` returns null. A number here would mean the reliability block was
+  // computed from a different predicate than the one behind forecast_rate_x1000 — which is exactly
+  // how the superseded kind!=='reactive' numerator kept publishing a figure the metric had dropped.
+  if (d.players.every((p: any) => p.forecast_rate_x1000 === 0)) {
+    for (const v of Object.values(rel.split_half_r_x1000)) expect(v).toBeNull();
+    for (const v of Object.values(rel.rounds_for_r70)) expect(v).toBeNull();
+  }
 });
 
 const load = () => JSON.parse(readFileSync(PATH, 'utf8'));

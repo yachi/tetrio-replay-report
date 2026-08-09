@@ -290,6 +290,14 @@ function notEligibleBecause(): string[] {
   if (weak.length)
     why.push(`per-round split-half reliability is ${weak.map(([u, v]) => `${(v / 1000).toFixed(3)} (${u})`).join(' / ')}` +
              `, so a per-round column is not possible at this event rate`);
+  // A reliability of `null` for every player is not "no reason to give": once the numerator is
+  // isVerifiedForecast the per-round rate is identically 0, the odd/even series is constant, and
+  // `pearson` returns null by design. Dropping the line here is how the artifact came to carry a
+  // reliability from the SUPERSEDED numerator — a figure that no longer exists under the metric —
+  // without anything looking wrong. This is the same fix the round-AUC branch below already made.
+  else if (reliability && players.length && players.every(p => p.forecast_rate_x1000 === 0))
+    why.push('per-round split-half reliability is undefined, not low: the per-round rate is '
+           + 'identically 0 in every scorable round, so it has no variance to correlate with itself');
   const noEffect: string[] = [];
   if (roundStat?.exact_p_x1000 != null)
     noEffect.push(`round AUC p=${(roundStat.exact_p_x1000 / 1000).toFixed(3)}`);

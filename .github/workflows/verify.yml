@@ -419,6 +419,12 @@ jobs:
           python3 -m pipeline.check_ts_imports --selftest
           python3 -m pipeline.check_ts_imports
 
+      - name: Check every forecast count routes through isVerifiedForecast (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_forecast_numerator --selftest
+          python3 -m pipeline.check_forecast_numerator
+
       # REPLAY_DIR has no default on purpose — the simulator is session-agnostic and refuses to
       # guess which replays you mean. One test reads it; the rest name their sessions themselves.
       - name: Run the simulator test suite

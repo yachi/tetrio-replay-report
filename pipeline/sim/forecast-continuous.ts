@@ -37,8 +37,10 @@ const obs: Obs[] = [];
 for (const c of loadCases()) {
   const r = runCase(c);
   const vIdx = verifiedIndex(r, c.truth);
-  // full-round records: justified by sensitivity-forecast.ts, which found no significant
-  // bias between the verified-prefix value and the full-round value (r=0.783, t=1.28)
+  // full-round records: under isVerifiedForecast the verified-prefix and full-round forecast
+  // counts are BOTH identically 0 across all 101 player-rounds, so the choice of window cannot
+  // change the rate — they agree degenerately, not via a correlation. (The r=0.783 / t=1.28 this
+  // once cited came from the superseded kind!=='reactive' numerator and no longer exists.)
   const recs = forecastMetric(r, true).records;
   if (!recs.length) continue;
   const st = stats.get(`${c.file}#${c.round}#${c.user}`)!;

@@ -4,7 +4,7 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
-    "per-round split-half reliability is -0.101 (pinglamb) / 0.014 (yachi), so a per-round column is not possible at this event rate",
+    "per-round split-half reliability is undefined, not low: the per-round rate is identically 0 in every scorable round, so it has no variance to correlate with itself",
     "no effect at any unit: round AUC undecidable — 0 decided pairs of 28, the rate ties everywhere"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
@@ -113,8 +113,8 @@
     "player": null,
     "reliability": {
       "split_half_r_x1000": {
-        "pinglamb": -101,
-        "yachi": 14
+        "pinglamb": null,
+        "yachi": null
       },
       "scorable_rounds": {
         "pinglamb": 40,
@@ -122,7 +122,7 @@
       },
       "rounds_for_r70": {
         "pinglamb": null,
-        "yachi": 160
+        "yachi": null
       }
     }
   }
