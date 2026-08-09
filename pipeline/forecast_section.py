@@ -204,6 +204,10 @@ def _coverage_clause(data):
 
 def _spread_clause(data):
     """Sampling spread vs simulator spread, and what that comparison does NOT establish."""
+    # The sweep's size, READ from the artifact — never the literal 「七」. `simulator_configs_for_range`
+    # is emitted from `CONFIGS`, and item 11 proposes adding four more; a hardcoded 七 here would then
+    # contradict the count `_coverage_clause` computes from the same list.
+    n_cfg = len(data["simulator_configs_for_range"])
     widths = []
     for p in data["players"]:
         samp = p["sampling_ci95_hi_x1000"] - p["sampling_ci95_lo_x1000"]
@@ -214,7 +218,7 @@ def _spread_clause(data):
         # Every simulator config agrees exactly — which happens when the verified count is 0 and
         # stays 0 however the simulator is perturbed. That is a RESULT, not a missing figure, and
         # rendering an empty paragraph would hide the most robust thing in the section.
-        return ("七個模擬器設定全部計出同一個數，飄幅係零。"
+        return (f"{n_cfg} 個模擬器設定全部計出同一個數，飄幅係零。"
                 "即係話下面個數<strong>唔係模擬器調校出嚟嘅結果</strong>——"
                 "點樣改模擬器都係同一個答案。")
     sim_lo, sim_hi = min(w[1] for w in widths), max(w[1] for w in widths)
@@ -225,14 +229,14 @@ def _spread_clause(data):
         "兩者一比就答咗一條好重要嘅問題："
         f"<strong>模擬器嘅飄幅（{span(sim_lo, sim_hi)}）遠細過抽樣嘅飄幅（{span(sa_lo, sa_hi)}）</strong>，"
         f"爭大約 {ratio_lo:.0f}–{ratio_hi:.0f} 倍。"
-        "即係話喺<em>呢七個設定掃到嘅範圍之內</em>，改模擬器對收窄呢個數幫助有限，要收窄佢就要更多場數。"
+        f"即係話喺<em>呢 {n_cfg} 個設定掃到嘅範圍之內</em>，改模擬器對收窄呢個數幫助有限，要收窄佢就要更多場數。"
         # The sweep varies seven FITTED options of one simulator. It bounds parameter
         # sensitivity and nothing else: a shared modelling error — something every one of the
         # seven configs gets wrong the same way — moves all of them together and never appears
         # in this range. Saying flatly that the bottleneck "is not simulator accuracy" claimed
         # more than the sweep measures, so it is stated as the scope-limited fact it is.
-        "要留意呢個掃描只係換咗同一個模擬器嘅七個設定，"
-        "<strong>量度唔到七個設定一齊錯嘅嗰種偏差</strong>，所以佢並唔等於證明咗模擬器本身準。"
+        f"要留意呢個掃描只係換咗同一個模擬器嘅 {n_cfg} 個設定，"
+        f"<strong>量度唔到呢 {n_cfg} 個設定一齊錯嘅嗰種偏差</strong>，所以佢並唔等於證明咗模擬器本身準。"
     )
 
 
@@ -340,10 +344,16 @@ def _mechanism_clause(data):
             "唔會當佢啱，亦都唔會當佢錯，淨係報出嚟。")
     if fc == 0:
         parts.append(
+            # The old justification here was 「喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有」 — a
+            # hardcoded 11 that matches no measured quantity (the real mean roof-to-spin separation
+            # over these events is ~4.4, and garbage/clear co-occurs in only 35–44%, not "almost
+            # always"). It was a corpus-shaped figure asserted in per-session prose. Regrounded in
+            # the finding that DOES hold: co-occurrence is not causation, and reverse-tracing the
+            # step shows most were the player's own opener placement (the large self_built count).
             "<strong>換句話講：呢個 session 冇一個 tucked 消行 T-spin 符合曬四項條件。</strong>"
             "之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——"
-            "喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有，"
-            "所以嗰個數量到嘅係<em>開局定式</em>，唔係預測。")
+            "但「出現過」唔等於「整咗個窿位出嚟」：真正要核嘅係嗰下消行或者垃圾有冇造成個窿位，"
+            "倒帶逐格一睇，嗰啲數量到嘅多數係<em>開局定式</em>（自己落嘅棋砌個窿），唔係預測。")
     else:
         parts.append(
             "要留意：呢個數細到<strong>一兩件事就當唔到係習慣</strong>，"
