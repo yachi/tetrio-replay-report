@@ -139,6 +139,19 @@ spin they draw and is provably right to reject the one forecast they draw cleanl
 would require extending the **verified prefix** (only 13.8% of placements, systematically early-round)
 — a simulator-fidelity project (the line-clear-delay attack model), not something the examples reach.
 
+### Can sequence alignment extend the verified prefix? (measured: no)
+
+`prefix-alignment-probe.ts` tests the obvious academic lever: `verifiedIndex` cuts the prefix at the
+first POSITIONAL mismatch of the outgoing-vs-received attack streams, so a single divergence truncates
+the rest — exactly what global sequence alignment (Needleman–Wunsch) / DTW exist to survive. The
+honest guardrail: a placement is verified only if its board matches, witnessed by the attack's
+amount+row, and the streams are 1:1 — so alignment may relax only the timing, never amount+row.
+Measured over all four sessions, that maximal honest relaxation recovers **+2 attacks total and 0
+extra forecasts**; the LCS-with-gaps ceiling (+81) is illusory because every gap is a non-1:1 match,
+i.e. a genuine board divergence. The greedy break is a real board error, not a timing artifact, so no
+alignment/DTW/HMM can extend coverage — the wall is the garbage-insertion model (system identification
+of the line-clear delay), not the prefix gate.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
