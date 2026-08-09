@@ -17,8 +17,12 @@ Input is **40 rows of 10 characters per board**, `.` empty and anything else fil
 (row 0 is the top of the field, matching this repo). One JSON line out per board:
 
 ```
-{"any":true,"hits":["tst_twist_right"]}
+{"any":true,"hits":["tst_twist_right"],"lines":2}
 ```
+
+`lines` is `cutout_tslot`'s line count — the max over the detected slots, i.e. the quantity
+`bestTspinLines` computes on our side and the one the forecast metric consumes. `pipeline/sim/
+cross-tslot-count.ts` differentials the two over the whole corpus; CI's `oracle-image` job runs it.
 
 ## Three things that were not obvious, all of which cost a build
 
@@ -99,13 +103,17 @@ It checks **T-slot availability** — one input to the forecast rules, the quant
 themselves: cold-clear has no notion of roof provenance, of clause 2's pre-existing hole, of gap
 closure or of clause 4, and this project's own survey found no prior art for the metric anywhere.
 
-The two things worth doing with it, per `ROADMAP.md`:
+**`cutout_tslot` — done (2026-08-09).** It gives the LINE COUNT of a slot, and `cc-tslot.ts` omits
+it, so the cross-check used to be presence-only while the metric consumes `bestTspinLines`. The
+oracle now emits `lines` and `cross-tslot-count.ts` differentials it against our count over every
+verified-prefix board: **1,831 slots where both fire, all counts agree; 0 line-clearing slots
+missed.** So the quantity the metric actually uses is now checked against the Rust original, not just
+against our own second BFS. (The 588 boards where we score a line clear and cold-clear's *named*
+opener detectors do not are general T-spins — e.g. a plain single into a well — outside cold-clear's
+sky/tst/fin/cave vocabulary; each is a genuine hard-drop-reachable spin, not an over-count.)
 
-- **`cutout_tslot`** gives the LINE COUNT of a slot. `cc-tslot.ts` omits it, so today's cross-check is
-  presence-only while the metric consumes `bestTspinLines`. Exposing it upgrades the check to the
-  quantity that is actually used.
+Still open, per `ROADMAP.md`:
+
 - **multi-slot cutout** — cold-clear counts several slots by cutting each out and re-detecting, which
   the roadmap notes is "precisely the fix for the scalar problem". Having the reference implementation
   to differential-test against de-risks building ours.
-
-Re-running presence detection alone has low expected yield: it already agrees on 7,544 boards.

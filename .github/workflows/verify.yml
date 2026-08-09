@@ -500,8 +500,25 @@ jobs:
           nix build .#cc-oracle -L          # the aarch64-linux binary the image wraps
           empty=$(python3 -c "print(chr(10).join(['.'*10]*40))" | ./result/bin/cc-oracle)
           echo "empty board -> $empty"
-          [ "$empty" = '{"any":false,"hits":[]}' ] || { echo "negative control failed" >&2; exit 1; }
+          [ "$empty" = '{"any":false,"hits":[],"lines":0}' ] || { echo "negative control failed" >&2; exit 1; }
           tst=$(./result/bin/cc-oracle < nix/cold-clear-oracle/smoke-tst.txt)
           echo "corpus T-slot -> $tst"
-          case "$tst" in *'"tst_twist_left"'*) ;; *) echo "positive control failed" >&2; exit 1 ;; esac
+          case "$tst" in *'"tst_twist_left"'*'"lines":3'*) ;; *) echo "positive control failed" >&2; exit 1 ;; esac
           echo "oracle smoke test passed"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
+        with:
+          bun-version: '1.2.4'
+
+      # The count `bestTspinLines` produces IS what the forecast metric consumes, and it had no
+      # outside check — only our own second BFS. This runs it against the Rust cutout_tslot over
+      # every verified-prefix board of all four sessions: a miscount or a missed line-clearing slot
+      # fails the job. (Measured clean: 1,831 slots, all counts agree, 0 missed.)
+      - name: Every T-spin line count matches the Rust original across the corpus
+        run: |
+          set -euo pipefail
+          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01; do
+            echo "-- $s"
+            REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
+          done

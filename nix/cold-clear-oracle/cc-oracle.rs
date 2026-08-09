@@ -24,15 +24,28 @@ fn main() {
         if row == 40 {
             let mut b = Board::new();
             b.set_field(field);
-            let hits: Vec<&str> = [
-                ("sky_tslot_right", sky_tslot_right(&b).is_some()),
-                ("sky_tslot_left",  sky_tslot_left(&b).is_some()),
-                ("tst_twist_right", tst_twist_right(&b).is_some()),
-                ("tst_twist_left",  tst_twist_left(&b).is_some()),
-                ("fin_right",       fin_right(&b).is_some()),
-                ("fin_left",        fin_left(&b).is_some()),
-            ].iter().filter(|(_, h)| *h).map(|(n, _)| *n).collect();
-            writeln!(out, "{{\"any\":{},\"hits\":{:?}}}", !hits.is_empty(), hits).unwrap();
+            // Each detector returns the FallingPiece for a slot; cutout_tslot turns that piece into
+            // the LINE COUNT the slot clears. `lines` is the max over detected slots — the quantity
+            // `bestTspinLines` computes on our side, and the one the metric actually consumes. Until
+            // now this bridge reported presence only; the count had no external check at all.
+            let dets: [(&str, Option<_>); 6] = [
+                ("sky_tslot_right", sky_tslot_right(&b)),
+                ("sky_tslot_left",  sky_tslot_left(&b)),
+                ("tst_twist_right", tst_twist_right(&b)),
+                ("tst_twist_left",  tst_twist_left(&b)),
+                ("fin_right",       fin_right(&b)),
+                ("fin_left",        fin_left(&b)),
+            ];
+            let mut hits: Vec<&str> = Vec::new();
+            let mut lines = 0usize;
+            for (name, opt) in dets {
+                if let Some(piece) = opt {
+                    hits.push(name);
+                    let c = cutout_tslot(b.clone(), piece);
+                    if c.lines > lines { lines = c.lines; }
+                }
+            }
+            writeln!(out, "{{\"any\":{},\"hits\":{:?},\"lines\":{}}}", !hits.is_empty(), hits, lines).unwrap();
             out.flush().unwrap();
             field = [[false; 10]; 40]; row = 0;
         }
