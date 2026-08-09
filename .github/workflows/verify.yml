@@ -471,6 +471,16 @@ jobs:
       - name: Check no lemma is vacuously true
         run: python3 spec/check_spec_vacuity.py
 
+      # The seven worked examples are described twice — as the machine-checked witnesses above and
+      # as the drawn boards in example-boards.ts. The Dafny verifier never reads the TS, and the TS
+      # test only compared the roof/floor separation, so the two could disagree on the verdict of a
+      # board and stay green. This parses both and fails on any mismatch (event, setup step, verdict
+      # derived from the ensures, failing clause), then checks the committed JSON is byte-identical.
+      - name: The drawn boards agree with the proven examples
+        run: |
+          python3 -m pipeline.forecast_examples --selftest
+          python3 -m pipeline.forecast_examples
+
       # Slow (each mutant is a full re-verification), so it runs on the schedule and on demand,
       # matching how the `verify` job gates its own mutation testing.
       - name: Mutation-test the spec

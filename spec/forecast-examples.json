@@ -1,0 +1,280 @@
+{
+  "_note": "The seven worked T-Spin Forecast examples, parsed from the machine-checked Dafny witnesses in spec/ForecastExamples.dfy and cross-checked against the drawn boards in spec/example-boards.ts. Regenerate with `python3 -m pipeline.forecast_examples --write`.",
+  "sources": [
+    "spec/ForecastExamples.dfy",
+    "spec/example-boards.ts"
+  ],
+  "clauseOrder": [
+    "tucked",
+    "holePreExisted",
+    "gapClosed",
+    "nonSpinClear"
+  ],
+  "examples": [
+    {
+      "id": "A",
+      "lemma": "ExampleA_PlainTripleClosesTheGap",
+      "title": "An ordinary triple takes the rows between the overhang and the hole",
+      "verdict": "accept",
+      "failsClause": null,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": true,
+        "gapClosed": true,
+        "nonSpinClear": true
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 15,
+        "floorAt": 21,
+        "holeOpenAtJ": true,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            17,
+            18,
+            19
+          ],
+          "wasSpin": false,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "lemma": "ExampleB_ASingleIsEnoughOnlyUnderTheLooseReading",
+      "title": "One row, taken by a Single — the reading has to decide",
+      "verdict": "accept-loose",
+      "failsClause": null,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": true,
+        "gapClosed": true,
+        "nonSpinClear": "partial"
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 17,
+        "floorAt": 21,
+        "holeOpenAtJ": true,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            19
+          ],
+          "wasSpin": false,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "lemma": "ExampleC_TheFloorArrivedAfterTheRoof",
+      "title": "The floor under the nose had not arrived when the overhang was placed",
+      "verdict": "reject",
+      "failsClause": 2,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": false,
+        "gapClosed": true,
+        "nonSpinClear": true
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 15,
+        "floorAt": 21,
+        "holeOpenAtJ": false,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            17,
+            18,
+            19
+          ],
+          "wasSpin": false,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "lemma": "ExampleD_TheCSpinLowersItsOwnRoof",
+      "title": "The C-Spin: the clear that lowers the overhang is itself a T-spin",
+      "verdict": "reject",
+      "failsClause": 4,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": true,
+        "gapClosed": true,
+        "nonSpinClear": false
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 15,
+        "floorAt": 21,
+        "holeOpenAtJ": true,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            17,
+            18,
+            19
+          ],
+          "wasSpin": true,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "lemma": "ExampleE_AClearAndGarbageBothFromOutside",
+      "title": "A line does clear, and garbage does arrive — from outside the pair, so nothing moves",
+      "verdict": "reject",
+      "failsClause": 3,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": true,
+        "gapClosed": false,
+        "nonSpinClear": false
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 16,
+        "floorAt": 20,
+        "holeOpenAtJ": true,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            21
+          ],
+          "wasSpin": false,
+          "garbageRows": 4
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "lemma": "ExampleF_ThePerfectSetupThatWasNeverSpun",
+      "title": "The setup was perfect and the T was never spun into it",
+      "verdict": "reject",
+      "failsClause": 1,
+      "clauses": {
+        "tucked": false,
+        "holePreExisted": true,
+        "gapClosed": true,
+        "nonSpinClear": true
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 15,
+        "floorAt": 21,
+        "holeOpenAtJ": true,
+        "spinAtK": false,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [
+            17,
+            18,
+            19
+          ],
+          "wasSpin": false,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": false,
+          "garbageRows": 0
+        }
+      ]
+    },
+    {
+      "id": "G",
+      "lemma": "ExampleG_TheSlotWasCompleteWhenTheRoofLanded",
+      "title": "The slot was already complete when the overhang landed",
+      "verdict": "reject",
+      "failsClause": 3,
+      "clauses": {
+        "tucked": true,
+        "holePreExisted": true,
+        "gapClosed": false,
+        "nonSpinClear": false
+      },
+      "event": {
+        "j": 0,
+        "k": 2,
+        "roofAt": 18,
+        "floorAt": 21,
+        "holeOpenAtJ": true,
+        "spinAtK": true,
+        "availAtJ": 0,
+        "availAtK": 0
+      },
+      "history": [
+        {
+          "clearedRows": [],
+          "wasSpin": false,
+          "garbageRows": 0
+        },
+        {
+          "clearedRows": [],
+          "wasSpin": true,
+          "garbageRows": 0
+        }
+      ]
+    }
+  ]
+}
