@@ -148,9 +148,14 @@ honest guardrail: a placement is verified only if its board matches, witnessed b
 amount+row, and the streams are 1:1 — so alignment may relax only the timing, never amount+row.
 Measured over all four sessions, that maximal honest relaxation recovers **+2 attacks total and 0
 extra forecasts**; the LCS-with-gaps ceiling (+81) is illusory because every gap is a non-1:1 match,
-i.e. a genuine board divergence. The greedy break is a real board error, not a timing artifact, so no
-alignment/DTW/HMM can extend coverage — the wall is the garbage-insertion model (system identification
-of the line-clear delay), not the prefix gate.
+i.e. a genuine board divergence. The one avenue timing-relaxation can't reach — **perfect-clear
+re-anchoring** (restart a verified interval at a mutual all-clear, where both boards are provably
+empty, an exact mid-round oracle) — is measured too: across all four sessions it yields **1 valid
+re-anchored interval and unlocks 0 forecasts** (bounded because the sim reproduces only ~7 of the
+~19 real PCs). So both honest alignment avenues are exhausted. The greedy break is a real board
+error, not a timing artifact, so no alignment/DTW/HMM/PC-re-anchor can extend coverage — the wall is
+the garbage-insertion model (system identification of the line-clear delay, which isn't even in the
+replay options and must be estimated), not the prefix gate.
 
 ### Forecast example sources swept (2026-08-09)
 

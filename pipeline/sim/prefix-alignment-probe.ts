@@ -24,9 +24,14 @@
  * first garbage), not a timing artifact an alignment could fix. Extending coverage is a
  * simulator-fidelity problem (system identification of the insertion timing), not an alignment one.
  *
+ * The one avenue timing-relaxation cannot reach — PERFECT-CLEAR re-anchoring (restart a verified
+ * interval at a mutual all-clear, where both boards are provably empty) — is measured below too:
+ * across all four sessions it yields ONE valid re-anchored interval and unlocks 0 forecasts. So both
+ * honest alignment avenues are exhausted; the coverage wall is the simulator's board, full stop.
+ *
  *   REPLAY_DIR=sessions/2026-07-22 bun pipeline/sim/prefix-alignment-probe.ts
  */
-import { loadCases, runCase } from './verified-prefix.ts';
+import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
 import { forecastMetric, isVerifiedForecast } from './forecast.ts';
 
@@ -120,3 +125,61 @@ console.log(`verified PLACEMENTS: current ${placesCur} -> relaxed ${placesRelax}
 console.log(`VERIFIED FORECASTS:  current ${fcCur} -> relaxed ${fcRelax}  (+${fcRelax - fcCur})`);
 console.log(`\nfirst-break reason distribution:`);
 for (const [k, v] of Object.entries(reasons).sort((a, b) => b[1] - a[1])) console.log(`  ${String(v).padStart(4)}  ${k}`);
+
+// -------------------------------------------------------------------------------------------------
+// The one alignment avenue the timing relaxation cannot reach: PERFECT-CLEAR RE-ANCHORING. At a
+// mutual all-clear both boards are provably empty — an exact board oracle mid-round — so a verified
+// interval may honestly RESTART there even after an earlier divergence, and forecasts whose window
+// lies entirely inside such an island become countable. This is the only place "board matches" is
+// total information rather than checkpoint sampling. Bounded by how rarely the sim reproduces a real
+// PC (7 corpus-wide vs 19 real, ROADMAP): so it is either a small gain or the impossibility proof.
+// -------------------------------------------------------------------------------------------------
+function verifyFrom(mine: Atk[], truth: Truth[], mi: number, ti: number): number {
+  let vf = -1, drift = 0, first = true;
+  for (let a = mi, b = ti; a < mine.length && b < truth.length; a++, b++) {
+    const x = mine[a]!, y = truth[b]!;
+    if (x.amt !== y.amt) break;
+    if (x.lines > 0 && !matchesIgeY(x.clearedRows, x.lines, y.y)) break;
+    const d = x.frame - y.frame;
+    if (!first && d < drift - 25) break;
+    drift = d; first = false; vf = x.frame;
+  }
+  return vf;
+}
+
+let simPC = 0, mutualPC = 0, reanchors = 0, newForecasts = 0;
+for (const c of loadCases()) {
+  const r: any = runCase(c);
+  const out = forecastMetric(r, true);
+  const mine: Atk[] = r.records.filter((x: any) => x.sent > 0)
+    .map((x: any) => ({ frame: x.frame, amt: x.sent, lines: x.lines, clearedRows: x.clearedRows }));
+  const vIdx = verifiedIndex(r, c.truth, 'frame+amount+row');
+  const vf = vIdx >= 0 ? r.locks[vIdx]!.frame : -1;
+  const truthPC = c.truth.map((t, i) => ({ ...t, i })).filter(t => t.amt === 10);
+  const intervals: [number, number][] = [[0, vIdx]];
+  for (let k = 0; k < r.locks.length; k++) {
+    const lk = r.locks[k]!;
+    if (!lk.allclear) continue;
+    simPC++;
+    const pc = truthPC.find(t => Math.abs(t.frame - lk.frame) <= 60);
+    if (!pc) continue;
+    mutualPC++;
+    if (lk.frame <= vf) continue;                                   // already inside the prefix
+    const board = r.boards[k];
+    if (!(board && board.every((row: any) => row.every((c: any) => c === null)))) continue;  // exact PC oracle
+    const mi = mine.findIndex(x => x.frame > lk.frame);
+    if (mi < 0) continue;
+    const islandVf = verifyFrom(mine, c.truth, mi, pc.i + 1);
+    let end = k; for (let j = 0; j < r.locks.length; j++) if (r.locks[j]!.frame <= islandVf) end = j;
+    if (end > k) { reanchors++; intervals.push([k, end]); }
+  }
+  const inAny = (l: number) => intervals.some(([s, e]) => l >= s && l <= e);
+  for (const rec of out.records) {
+    if (!isVerifiedForecast(rec)) continue;
+    const already = rec.lockIndex <= vIdx && (rec.roofFrom == null || rec.roofFrom <= vIdx);
+    if (!already && inAny(rec.lockIndex) && (rec.roofFrom == null || inAny(rec.roofFrom))) newForecasts++;
+  }
+}
+console.log(`\nPC re-anchor census: sim all-clears ${simPC}, mutual-with-real ${mutualPC}, `
+  + `new re-anchored intervals ${reanchors}`);
+console.log(`forecasts unlocked by PC re-anchoring: ${newForecasts}`);
