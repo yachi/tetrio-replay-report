@@ -72,6 +72,12 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
         best = lines;
         // The slot is the T's own cells plus the roof directly above them — the rows a line
         // clear would have to fall between in order to have FORMED it rather than moved it.
+        // The appended roof is always `topCell - 1`, so a slot topping at row 0 yields roof
+        // row -1. That is correct, not a degeneracy: the straddle test at `back()` reads it as
+        // `cr > min(rows)` and no cleared row is ever negative, so `cr > -1` is the identical
+        // predicate; clamping the roof to 0 would flip `cr = 0` from admitted to rejected and
+        // INTRODUCE an inconsistency. Constructible only as a `Board` argument, never as a game
+        // state (row 0 needs a 40-row stack that a topout ends first); 0 of 7,544 corpus boards.
         const rows = cells.map(c => c.row);
         bestRows = [...rows, Math.min(...rows) - 1];
       }
@@ -270,9 +276,10 @@ export function withoutRows(board: Board, rows: Set<number>): Board {
  * Arrival is derived, not tracked, by replaying each step's row edits over one boolean per row: a
  * placement moves no rows; a clear splices out the full rows of `Bpre` and pads the top; an insert
  * shifts rows off the top and pushes the new ones in at the bottom, where they are marked. Seeding
- * at `j` with everything false is what makes the answer relative to the roof, and it needs no
- * special case for `j = -1` (a roof with no placer): the walk starts at lock 0 and every garbage
- * row then on the board counts as having arrived after it.
+ * at `j` with everything false is what makes the answer relative to the roof. For `j = -1` (a roof
+ * with no placer) the walk starts at lock 0, whose pre-board is the empty field — the one place the
+ * body substitutes an empty board rather than reading `boards[t - 1]`, so every garbage row then on
+ * the board counts as having arrived after the roof.
  *
  * Measured against the boards themselves: the marks reproduce the real garbage mask of `boards[t]`
  * at all 110,927 lock-steps of the four sessions across all seven swept configs, and the marked
@@ -281,9 +288,15 @@ export function withoutRows(board: Board, rows: Set<number>): Board {
  */
 export function garbageArrivedAfter(r: SimResult, j: number, k: number): Set<number> {
   let post = new Array<boolean>(H).fill(false);
+  // The walk starts at lock 0 when the roof has no placer (`j = -1`), and the board BEFORE lock 0
+  // is empty — there is no `boards[-1]` to read. Falling through to `boards[t - 1]!` there threw,
+  // which contradicted the promise three lines up; an empty pre-board is what makes that promise
+  // true. Width is taken from a real board so this carries no hard-coded 10.
+  const width = (r.boards[k - 1] ?? Object.values(r.boards)[0] ?? [[]])[0]!.length;
+  const emptyBoard = () => Array.from({ length: H }, () => new Array(width).fill(null)) as Board;
   for (let t = j + 1; t <= k - 1; t++) {
     const lk = r.locks[t]!;
-    const Bpre = r.boards[t - 1]!.map(row => [...row]) as Board;
+    const Bpre = (r.boards[t - 1] ?? emptyBoard()).map(row => [...row]) as Board;
     for (const c of lk.cells) if (c.row >= 0 && c.row < H) Bpre[c.row]![c.col] = lk.piece as never;
     for (let row = H - 1; row >= 0; row--) {
       if (Bpre[row]!.every(x => x !== null)) { Bpre.splice(row, 1); post.splice(row, 1); }
@@ -398,6 +411,13 @@ export function localiseMechanism(
 
   if (bestTspinLines(B) >= target) {
     const slot = bestTspin(B);
+    // Unreachable, and not merely in practice: reaching this block needs
+    // `bestTspinLines(Bpre) < target`, and `bestTspinLines` is never negative, so `target >= 1`;
+    // the block's own condition then gives `bestTspinLines(B) >= 1`, and `bestTspin` returns null
+    // exactly when `bestTspinLines` is 0. No argument tuple gets here with a null slot, so no
+    // mutant is listed for it — it is here for the type, not the value. Measured 2026-08-09 for
+    // the avoidance of doubt: reached 1 time in 389 corpus calls and 18 over the fixture suite,
+    // null in 0 of them.
     if (!slot) return { step: t, mechanism: 'unattributed' };
     // Map the slot's rows back into Bpre's frame: a Bpre row p lands at p + #{cleared rows below}.
     const back = (rB: number) => {

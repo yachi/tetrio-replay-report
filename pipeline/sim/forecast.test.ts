@@ -7,6 +7,8 @@ import { forecastMetric, isVerifiedForecast, floorOrigin, garbageArrivedAfter,
          localiseMechanism, bestTspinLines } from './forecast.ts';
 import { H } from './sim.ts';
 import type { SimResult } from './sim.ts';
+import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
+import type { ActivePiece } from './vendor/core/srs.ts';
 
 const W = 10;
 const grid = (filled: Record<string, number>): (number | null)[][] => {
@@ -375,6 +377,93 @@ test('roof spanning two pieces attributes to the LATEST builder, not the earlies
   expect(r.records[0]!.kind).toBe('reactive');
 });
 
+/* ── a SECOND two-placer roof, and this one moves the answer ─────────────────────────────────
+ *
+ * `Math.max(...placers)` is the whole "the roof's most recent builder is the piece that set up
+ * the slot" rule, and no corpus can test it: censused over all 654 tucked T-spins, every roof is
+ * exactly ONE cell, so `placers` is a singleton in every real event and `max` and `min` agree by
+ * construction. Not an artefact of sample size either — a flat T needs a three-wide pocket and
+ * covering a second cell seals its only entry — so more data will never separate them.
+ *
+ * The fixture above is the only other two-placer board here, and it decides the mutant on the
+ * LOOSE branch: it passes `boards: []`, so `determinable` is false and the verdict turns on
+ * whether a clear happened to fall inside the window. This one runs the strict rule production
+ * runs, and every value `j` feeds moves with it:
+ *
+ *                       j = max = 4                    j = min = 1
+ *   localisation        never runs (no improvement)    step 2, mechanism 'garbage'
+ *     availAtRoof       3, i.e. availAtSpin            0
+ *   separation          7 - 4 = 3                      7 - 1 = 6
+ *   clause 2's base     supports compared with 4       ... compared with 1
+ *   deletion set        {} — nothing arrived after 4   {39}, so the garbage reads load-bearing
+ *   the ANSWER          reactive, rate 0               forecast_garbage, VERIFIED, rate 1
+ *
+ * The shape is a roof built AROUND the arrival: lock 1 lays one of its two cells, the garbage
+ * that makes the spin lands at lock 2, and lock 4 lays the cell that completes it. Reading the
+ * roof as its oldest builder therefore back-dates the window across an arrival the overhang did
+ * not yet exist to be waiting for, and publishes a verified forecast for it.
+ */
+function twoPlacerRoof(supportProv: number): SimResult {
+  const k = 7, gLock = 2;
+  const locks: any[] = [], provSnaps: any[] = [], boards: any[] = [];
+  for (let i = 0; i <= k; i++) {
+    locks.push({ frame: i * 100, piece: i === k ? 'T' : 'L', cells: i === k ? T_CELLS : [],
+      cleared: i === k ? 2 : 0, spin: i === k ? 'full' : 'none' });
+    const g = Array.from({ length: H }, () => new Array<number | null>(W).fill(null));
+    if (i === k - 1) {
+      g[T_CELLS[1]!.row - 1]![T_CELLS[1]!.col] = 1;   // the earlier of the roof's two cells
+      g[T_CELLS[3]!.row - 1]![T_CELLS[3]!.col] = 4;   // the cell that COMPLETES the roof
+      // the T's floor. Its provenance is the only thing clause 2 compares against j, so varying
+      // it is how the same boards exercise the comparison base as well as the window.
+      for (const c of T_CELLS) if (c.row === 31) g[c.row + 1]![c.col] = supportProv;
+    }
+    provSnaps.push(g);
+    boards.push(i < gLock ? ROOF_NO_SPIN : SPIN_VIA_GARBAGE);
+  }
+  return { locks, provSnaps, boards, records: [], events: [], topout: false,
+    garbageEvents: [{ frame: gLock * 100, amt: 4, lockIndex: gLock }],
+    lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
+    garbage: { sent: 0, received: 0, cleared: 0, attack: 0 } } as unknown as SimResult;
+}
+
+test('a two-placer roof: the LATEST builder sets the window, and the ANSWER moves with it', () => {
+  const f = twoPlacerRoof(0);
+  // the fixture's own premises, so a board that quietly stopped exercising this is visible
+  expect((f.provSnaps[6]![30] as (number | null)[]).filter(p => p !== null)).toEqual([1, 4]);
+  expect(bestTspinLines(f.boards[1]!)).toBe(0);        // before the garbage
+  expect(bestTspinLines(f.boards[6]!)).toBe(3);        // after it
+
+  const r = forecastMetric(f);
+  const rec = r.records[0]!;
+  expect(rec.roofFrom).toBe(4);
+  expect(rec.separation).toBe(3);                      // `min` says 6
+  expect(rec.availAtRoof).toBe(3);                     // `min` says 0 ...
+  expect(rec.availAtSpin).toBe(3);                     // ... against the same 3
+  // the garbage landed BEFORE the roof was finished, so nothing improved after the roof and
+  // there is no window to localise inside
+  expect(rec.kind).toBe('reactive');
+  expect(rec.mechanism).toBeUndefined();
+  expect(rec.mechanismStep).toBeUndefined();
+  // the deletion set is measured from j too: nothing arrived after lock 4
+  expect(rec.garbageLoadBearing).toBe(false);
+  // and the OUTCOME, not an intermediate: under `min` this same board is a VERIFIED
+  // forecast_garbage localised to step 2, and the published rate goes 0 -> 1
+  expect(isVerifiedForecast(rec)).toBe(false);
+  expect(r.forecastRate).toBe(0);
+  expect(r.totals).toEqual({ forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 1 });
+});
+
+test('a two-placer roof also moves what clause 2 compares its supports against', () => {
+  // A floor placed at lock 3: older than the roof's latest builder (4), newer than its earliest
+  // (1). Nothing about the floor changed — only which lock it is being asked to predate.
+  const rec = forecastMetric(twoPlacerRoof(3)).records[0]!;
+  expect(rec.floorFrom).toBe(3);
+  expect(rec.floorOrigin).toBe('pre-existed');   // `min` compares with 1 and says 'arrived-later'
+  // and with a floor older than BOTH builders the verdict is stable, which is what makes the
+  // line above a statement about the comparison base rather than about this particular floor
+  expect(forecastMetric(twoPlacerRoof(0)).records[0]!.floorOrigin).toBe('pre-existed');
+});
+
 /** Real boards, from the shapes splice-demo.ts verified against the engine. */
 import { emptyBoard, tspinAvailable } from './forecast-boards.ts';
 
@@ -715,4 +804,262 @@ test('a placement that already reached the target is not credited to the clear b
   // target 2: Bpre does NOT reach it, the early return is skipped, and the same board is a
   // line-clear. The two branches genuinely disagree here, which is what "not equivalent" means.
   expect(localiseMechanism(r, 4, 6, 2, avail)).toEqual({ step: 5, mechanism: 'line-clear' });
+});
+
+/* ── the EXECUTED spin has never been a mini ─────────────────────────────────────────────────
+ *
+ * `forecastMetric` admits any `spin !== 'none'` and `bestTspin` counts minis as available, but
+ * across the four sessions the verified prefix holds exactly ONE mini lock and it is excluded by
+ * the no-roof filter, never by the spin filter — 0 of 654 records. `mk` defaults to 'full', and
+ * the clause-4 loop above varies the CLOSING clear's spin, not the executed one, so nothing here
+ * had ever run the metric on a mini either.
+ *
+ * Measured rather than assumed: there is no mini/full asymmetry to find. `lk.spin` is read in
+ * exactly two places — the `=== 'none'` admission test and the record's own `spin` field — and
+ * neither distinguishes a mini from a full spin. That is the right answer as well as the current
+ * one: the wiki's definition is about a slot the player set up in advance, and how many corners
+ * the T ended up touching is a fact about the execution, not about the forecast. Clause 4 already
+ * refuses a size exemption in the other direction ("cleared by NOT tspin" covers a mini closing
+ * clear), so exempting the executed spin would leave the two ends of the same window disagreeing
+ * about what a T-spin is.
+ *
+ * These tests PIN that. A future change that gives minis their own arm — dropping them from the
+ * numerator, say, or from the denominator — fails here instead of silently moving the rate.
+ */
+const MINI_CASES: [string, () => SimResult][] = [
+  ['reactive', () => mk({ tLock: 3, tCells: T_CELLS, roofOwner: 2 })],
+  ['forecast_garbage', () => mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
+    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_VIA_GARBAGE })],
+  ['self_built', () => mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
+    boardAtRoof: SB_ROOF, boardAtSpin: SB_SPIN, changeAt: 2, stepCells: SB_CELLS })],
+  ['forecast_lineclear', () => mkBoards(PRE_CLEAR)],
+];
+
+for (const [name, build] of MINI_CASES) {
+  test(`an executed MINI is classified exactly as the full spin is (${name})`, () => {
+    const full = build(), mini = build();
+    const k = mini.locks.length - 1;
+    expect(full.locks[k]!.spin).toBe('full');
+    (mini.locks[k] as { spin: string }).spin = 'mini';
+    const a = forecastMetric(full), b = forecastMetric(mini);
+    // a mini is a T-spin, so it is not filtered out of the denominator
+    expect(b.records).toHaveLength(1);
+    expect(b.tspins).toBe(a.tspins);
+    expect(b.records[0]!.spin).toBe('mini');
+    // and every other field of the record, and every total, is identical
+    expect({ ...b.records[0]!, spin: 'full' as const }).toEqual(a.records[0]!);
+    expect(b.totals).toEqual(a.totals);
+    expect(b.forecastRate).toBe(a.forecastRate);
+    expect(isVerifiedForecast(b.records[0]!)).toBe(isVerifiedForecast(a.records[0]!));
+  });
+}
+
+test('an executed MINI reaches the NUMERATOR — the rate is not a full-spin-only rate', () => {
+  // The loop above pins full and mini against each other; this pins the level, so a change that
+  // excluded minis from BOTH ends (leaving the two runs equal at 0/0) would still fail.
+  const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, garbageAt: [2],
+    boardAtRoof: ROOF_NO_SPIN, boardAtSpin: SPIN_VIA_GARBAGE, spin: 'mini' }));
+  expect(r.tspins).toBe(1);
+  expect(r.records[0]!.spin).toBe('mini');
+  expect(r.records[0]!.kind).toBe('forecast_garbage');
+  expect(isVerifiedForecast(r.records[0]!)).toBe(true);
+  expect(r.forecastRate).toBe(1);
+});
+
+/* ── clause 2 'undetermined', end to end ─────────────────────────────────────────────────────
+ *
+ * `undecidedClause2`, and the `clause2_undecided` it is emitted as, are 0 in all four session
+ * artifacts. The verdict itself is unit-tested (`floorOrigin` above), but the REPORTING path —
+ * the number that exists so a rate of zero cannot hide an undecidable case — had never carried a
+ * non-zero value, so nothing said whether an undecidable event even reaches a forecast kind
+ * rather than being dropped by an earlier clause.
+ *
+ * It does, and by the STRICT rule rather than the loose fallback. The shape:
+ *   · at the roof (lock 1) the board already holds garbage — its bottom row is one hole wide,
+ *     which is what a garbage row looks like — so `garbageRows(j) > 0` and garbage on the board
+ *     at execution cannot be assumed to have arrived after the overhang;
+ *   · one more row arrives at lock 2, so garbage STRADDLES the window and which row is which is
+ *     not settleable from the two snapshots;
+ *   · the cells holding the T up are garbage, so that undecidable question is exactly the one
+ *     clause 2 has to answer;
+ *   · and the slot is formed at lock 3 by a clear, so the MECHANISM is established independently
+ *     — this is a forecast_lineclear whose clause 2 is unknown, not an event that failed earlier.
+ * Counted as a forecast: no. Counted against: also no. It is its own number, which is the point.
+ *
+ * The boards are a splice of the shape used above with garbage underneath, and every value here
+ * was read off the engine, not off the diagram: 0 at the roof, 0 after the arrival (the garbage
+ * lands under the stack and offers nothing on its own), 2 after the clear, and the causing step's
+ * reconstruction reproduces `boards[3]` cell for cell.
+ *
+ * It is NOT `spliceOf`'s board, for a reason worth recording. In that family the row that clears
+ * is missing exactly the cells the roof row above it fills, so the four cells the clearing piece
+ * has to occupy are a COVERED hole: measured over all seven tetrominoes, no hard-drop landing on
+ * that board produces them, in any rotation, with slides allowed. It does not matter there —
+ * those tests are about the reconstruction arithmetic — but this fixture is a claim about a
+ * situation a game can be in, so its clearing row is open from the top instead (the roof row is
+ * short on the right, and the I falls straight down cols 6-9), and `reachableAsLanding` below
+ * asserts it against the engine rather than by inspection.
+ */
+/** `mk3` with the named rows written as GARBAGE — same occupancy, so the engine sees exactly the
+ *  same board, but `floorOrigin`'s garbage tests can now see them. */
+const mk3g = (rows: Record<number, number[]>, garbage: number[]) => {
+  const b = mk3(rows);
+  for (const r of garbage) for (let c = 0; c < W; c++) if (b[r]![c] !== null) b[r]![c] = 'G';
+  return b;
+};
+/** cols 4-9 open, so the clearing row below is reachable from directly above */
+const UND_OPEN = [4, 5, 6, 7, 8, 9];
+const UND_ROOF   = mk3g({ 36: UND_OPEN, 37: [6, 7, 8, 9], 38: [3, 4, 5], 39: [4] }, [39]);
+const UND_MORE_G = mk3g({ 35: UND_OPEN, 36: [6, 7, 8, 9], 37: [3, 4, 5], 38: [4], 39: [0] }, [38, 39]);
+const UND_SPIN   = mk3g({ 36: UND_OPEN, 37: [3, 4, 5], 38: [4], 39: [0] }, [38, 39]);
+const UND_CLEAR_CELLS = [6, 7, 8, 9].map(col => ({ col, row: 36 }));
+
+/**
+ * Can `cells` be the landing of SOME piece hard-dropped on `board`? Enumerated the way
+ * `bestTspin` enumerates T placements: every reachable `rotation:col:row`, slides and rotations
+ * included, keeping the ones the piece cannot fall further from. A hand-drawn placement that no
+ * piece can reach is the failure this repo has shipped before, and it is not visible by reading
+ * the board.
+ */
+function reachableAsLanding(board: any[][], cells: { col: number; row: number }[]): string[] {
+  const key = (cs: { col: number; row: number }[]) =>
+    cs.map(c => `${c.col},${c.row}`).sort().join(' ');
+  const want = key(cells);
+  const hits: string[] = [];
+  for (const type of ['I', 'O', 'L', 'J', 'S', 'Z', 'T'] as const) {
+    const seen = new Set(['0:3:18']);
+    const q: ActivePiece[] = [{ type, rotation: 0, col: 3, row: 18 }];
+    for (let h = 0; h < q.length && h < 60000; h++) {
+      const cur = q[h]!;
+      const d = hardDrop(board as any, cur);
+      if (d.row === cur.row && key(getPieceCells(d)) === want) { hits.push(type); break; }
+      for (const n of [tryMove(board as any, cur, -1, 0), tryMove(board as any, cur, 1, 0),
+                       tryMove(board as any, cur, 0, 1), tryRotate(board as any, cur, 1),
+                       tryRotate(board as any, cur, -1)]) {
+        if (!n) continue;
+        const kk = `${n.rotation}:${n.col}:${n.row}`;
+        if (seen.has(kk)) continue; seen.add(kk); q.push(n);
+      }
+    }
+  }
+  return hits;
+}
+
+function undecidedFixture(): SimResult {
+  const k = 5, j = 1, gLock = 2, cLock = 3;
+  const locks: any[] = [], provSnaps: any[] = [], boards: any[] = [];
+  for (let i = 0; i <= k; i++) {
+    locks.push({ frame: i * 100, piece: i === k ? 'T' : 'I',
+      cells: i === k ? T_CELLS : i === cLock ? UND_CLEAR_CELLS : [],
+      cleared: i === k ? 2 : i === cLock ? 1 : 0, spin: i === k ? 'full' : 'none' });
+    const g = Array.from({ length: H }, () => new Array<number | null>(W).fill(null));
+    if (i === k - 1) {
+      g[T_CELLS[1]!.row - 1]![T_CELLS[1]!.col] = j;                             // a player-built roof
+      for (const c of T_CELLS) if (c.row === 31) g[c.row + 1]![c.col] = -1;     // ... on a garbage floor
+    }
+    provSnaps.push(g);
+    boards.push(i <= j ? UND_ROOF : i < cLock ? UND_MORE_G : UND_SPIN);
+  }
+  return { locks, provSnaps, boards, records: [], events: [], topout: false,
+    garbageEvents: [{ frame: gLock * 100, amt: 1, lockIndex: gLock }],
+    lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
+    garbage: { sent: 0, received: 0, cleared: 0, attack: 0 } } as unknown as SimResult;
+}
+
+test('clause 2 undetermined REACHES a forecast kind, and is reported instead of counted', () => {
+  const f = undecidedFixture();
+  // the trajectory, from the engine — the arrival alone offers nothing, the clear is what forms
+  // the slot, so the mechanism verdict cannot be an artefact of the garbage that muddies clause 2
+  expect(bestTspinLines(f.boards[1]!)).toBe(0);
+  expect(bestTspinLines(f.boards[2]!)).toBe(0);
+  expect(bestTspinLines(f.boards[4]!)).toBe(2);
+  // and the causing step is a placement the game can actually make
+  expect(reachableAsLanding(UND_MORE_G, UND_CLEAR_CELLS)).toEqual(['I']);
+  // and the straddle itself: garbage really did arrive inside the window, and the roof really
+  // did go up while garbage was already on the board
+  expect(garbageArrivedAfter(f, 1, 5)).toEqual(new Set([39]));
+  expect(floorOrigin(f, 5, 1)).toBe('undetermined');
+  expect(floorOrigin(f, 5, 4)).toBe('pre-existed');   // a roof laid AFTER the arrival is decidable
+
+  const r = forecastMetric(f);
+  const rec = r.records[0]!;
+  expect(rec.determinable).toBe(true);              // the strict rule, not the loose fallback
+  expect(rec.mechanism).toBe('line-clear');
+  expect(rec.kind).toBe('forecast_lineclear');      // the mechanism IS established ...
+  expect(rec.closingClearWasSpin).toBe(false);      // ... and clause 4 does not block it either
+  expect(rec.floorOrigin).toBe('undetermined');     // ... and clause 2 still cannot answer
+  expect(rec.floorFrom).toBe(-1);
+  expect(isVerifiedForecast(rec)).toBe(false);
+  expect(r.forecastRate).toBe(0);
+  // the number that stops a zero rate hiding an undecidable case, non-zero for the first time
+  expect(r.undecidedClause2).toBe(1);
+  expect(r.floorOrigins).toEqual({ 'pre-existed': 0, 'arrived-later': 0, undetermined: 1 });
+});
+
+/* ── localiseMechanism's two out-of-contract guards ──────────────────────────────────────────
+ *
+ * `forecastMetric` only ever calls this with `target === avail(k-1)` and only when `improved`,
+ * and under those two preconditions both guards below are unreachable: the walk decrements only
+ * while `avail(t-1) >= target`, which makes `avail(t) >= target` an invariant, and `improved`
+ * rules out `j === k-1`. Measured 2026-08-09 over all four sessions: 0 of 389 calls take either
+ * branch, while 85 of them halt at exactly `t === j + 1` — the walk reaches the boundary
+ * constantly and never crosses it.
+ *
+ * But `localiseMechanism` is exported and the tests in this file call it directly with a
+ * hand-chosen `j` and `target`. At those arguments the guards are live, and without them the
+ * function invents a mechanism instead of declining to name one. So they are contract tests.
+ */
+
+test('a roof at the immediately preceding lock is unattributed, not attributed to that lock', () => {
+  const row = (cells: string) => [...cells].map(c => c === '.' ? null : 'I');
+  const bd = (rows: Record<number, string>) => {
+    const b = Array.from({ length: H }, () => new Array<any>(W).fill(null));
+    for (const [r, l] of Object.entries(rows)) b[Number(r)] = row(l);
+    return b;
+  };
+  const A = bd({
+    30: ".......##.", 31: "......#..#", 32: "......#..#", 33: "......####",
+    36: "..##......", 37: "######....", 38: "...#######", 39: "#.########",
+  });
+  const B = bd({
+    31: ".......##.", 32: "......#..#", 33: "......#..#", 34: "......####",
+    37: "..##......", 38: "...#######", 39: "#.########",
+  });
+  const cells = [6, 7, 8, 9].map(col => ({ col, row: 37 }));
+  const r = { boards: { 4: A, 5: B }, garbageEvents: [],
+    locks: { 5: { cells, piece: 'I', cleared: 1 } } } as unknown as SimResult;
+  const avail = (t: number) => bestTspinLines((r.boards as any)[t] ?? A);
+
+  // j = 5 = k - 1: there is no window between roof and spin, so no step can have raised anything.
+  expect(localiseMechanism(r, 5, 6, 1, avail)).toEqual({ step: 5, mechanism: 'unattributed' });
+  // the same boards one lock earlier, where the window does contain a step, for contrast
+  expect(localiseMechanism(r, 4, 6, 1, avail)).toEqual({ step: 5, mechanism: 'placement' });
+});
+
+test('a target the causing step never reaches is unattributed, not credited to the garbage', () => {
+  const empty = () => Array.from({ length: H }, () => new Array<any>(W).fill(null));
+  const A = empty();
+  const C = empty();
+  C[H - 1] = Array.from({ length: W }, (_, i) => (i === 3 ? null : 'G'));   // one row pushed in
+  const r = { boards: { 4: A, 5: C }, garbageEvents: [{ lockIndex: 5, amt: 1, frame: 0 }],
+    locks: { 5: { cells: [], piece: 'I', cleared: 0 } } } as unknown as SimResult;
+  const avail = (t: number) => bestTspinLines((r.boards as any)[t] ?? A);
+
+  // the step model holds — garbage really did arrive — but nothing on this board offers a T-spin
+  expect(avail(4)).toBe(0);
+  expect(avail(5)).toBe(0);
+  // ... so a target above that must not be blamed on the insertion just because one happened
+  expect(localiseMechanism(r, 4, 6, 99, avail)).toEqual({ step: 5, mechanism: 'unattributed' });
+});
+
+test('garbageArrivedAfter starts at an empty pre-board when the roof has no placer (j = -1)', () => {
+  const empty = () => Array.from({ length: H }, () => new Array<any>(W).fill(null));
+  const b0 = empty();
+  b0[H - 1] = Array.from({ length: W }, (_, i) => (i === 3 ? null : 'G'));   // one garbage row at lock 0
+  const r = { boards: { 0: b0 }, garbageEvents: [{ lockIndex: 0, amt: 1, frame: 0 }],
+    locks: { 0: { cells: [], piece: 'I', cleared: 0 } } } as unknown as SimResult;
+  // j = -1: the walk starts at lock 0, whose pre-board is the empty field. Reading boards[-1]
+  // used to throw here; the row that arrived at lock 0 counts as after the (absent) roof.
+  expect(() => garbageArrivedAfter(r, -1, 1)).not.toThrow();
+  expect([...garbageArrivedAfter(r, -1, 1)]).toEqual([H - 1]);
 });

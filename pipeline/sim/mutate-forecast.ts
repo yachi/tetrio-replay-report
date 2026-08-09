@@ -195,6 +195,41 @@ const MUTANTS: Mutant[] = [
   { name: 'metric/self-built-counted', note: 'openers rejoin the forecast bucket',
     find: `  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')`, nth: 1,
     repl: `  (r.kind !== 'reactive')` },
+
+  // localiseMechanism's two out-of-contract guards. Unreachable from `forecastMetric` but the
+  // function is exported and forecast.test.ts calls it directly with a hand-chosen j and target;
+  // at those arguments both are live, and without them the function invents a mechanism instead
+  // of declining to name one. See the two contract tests in forecast.test.ts.
+  { name: 'localise/roof-at-previous-lock', note: 'a roof at k-1 leaves no window, yet a step gets blamed',
+    find: `  if (t <= j) return { step: t, mechanism: 'unattributed' };`, nth: 1,
+    repl: `  if (false) return { step: t, mechanism: 'unattributed' };` },
+  { name: 'localise/garbage-target-unchecked', note: 'garbage is credited for a target the step never reached',
+    find: `  if (avail(t) >= target && garbageArrived) return { step: t, mechanism: 'garbage' };`, nth: 1,
+    repl: `  if (garbageArrived) return { step: t, mechanism: 'garbage' };` },
+  { name: 'localise/garbage-unguarded', note: 'both conjuncts dropped; the tail unattributed return goes dead',
+    find: `  if (avail(t) >= target && garbageArrived) return { step: t, mechanism: 'garbage' };`, nth: 1,
+    repl: `  if (true) return { step: t, mechanism: 'garbage' };` },
+
+  // An executed MINI must be classified exactly as the executed full spin is — nothing reads
+  // lk.spin except the admission test and the record's own field. Pinned by the mini tests.
+  { name: 'metric/executed-mini-excluded', note: 'a mini executed spin is dropped before it can be a forecast',
+    find: `    if (lk.spin === 'none' || lk.cleared === 0) continue;`, nth: 1,
+    repl: `    if (lk.spin !== 'full' || lk.cleared === 0) continue;` },
+  { name: 'metric/executed-mini-not-verified', note: 'a mini is refused a verified-forecast kind that a full spin would get',
+    find: `  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')`, nth: 1,
+    repl: `  r.spin !== 'mini' && (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')` },
+
+  // The undecidable-clause-2 count exists so a zero rate cannot hide an undecidable case;
+  // silencing it is the failure it guards against. Pinned by the clause-2-undetermined test.
+  { name: 'metric/clause2-undecided-unreported', note: 'the undecidable-clause-2 count is forced to zero',
+    find: `    && holePreExisted(x.floorOrigin ?? 'undetermined') === null).length;`, nth: 1,
+    repl: `    && false).length;` },
+
+  // A roof with no placer (j = -1) has no boards[-1]; the pre-board is empty. Reverting to the
+  // bare index dereference throws on a garbage roof. Pinned by the j = -1 test.
+  { name: 'metric/garbage-arrived-no-empty-preboard', note: 'the j = -1 pre-board reads boards[-1] instead of an empty field',
+    find: `    const Bpre = (r.boards[t - 1] ?? emptyBoard()).map(row => [...row]) as Board;`, nth: 1,
+    repl: `    const Bpre = r.boards[t - 1]!.map(row => [...row]) as Board;` },
 ];
 
 function replaceNth(src: string, find: string, nth: number, repl: string): string {
