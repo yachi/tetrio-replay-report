@@ -30,3 +30,6 @@ sessions/*/sim/pairs-cache.json
 
 # nix build symlink (the oracle derivation; the store path is the artifact, not this)
 /result
+
+# git worktrees for isolated feature work (superpowers:using-git-worktrees)
+.worktrees/
