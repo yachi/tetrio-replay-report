@@ -112,6 +112,33 @@ the rounding, or the metric set changes, and date it.
   content, decoded by the `py_fumen` library (`extract_four_forecast.py`) — a trusted third-party
   decoder, so any fumen tool reproduces the same boards. Same conventions and caveats as the JP set.
 
+### Do the external examples let us detect MORE forecasts? (2026-08-09) — no, and it is proven
+
+The three corpora were then turned on the detector itself, to hunt for a false negative — a real
+forecast the metric misses, which is the only honest way the count could rise (loosening the
+definition just re-imports the co-occurrence bug). Two probes, both committed:
+
+- **Reachability** (`reachability-external.test.ts`, driver `reachability-external.ts`). The numerator
+  rests on `bestTspin` finding every executable spin; if it under-reads `avail(t)`, a real
+  improvement is scored `reactive`. Every JP / four.lol frame that draws a newly-placed,
+  line-clearing T witnesses a reachable spin — strip the T and the engine must re-find it. Result:
+  **0 misses** across all witnesses. The engine's reachability is complete on the corpora (the three
+  C-Spin diagrams `wiki-fixtures` marks `UNREACHABLE` need a 180 the players never press, and none is
+  an executed spin here).
+- **Clause logic** (`lift-external.test.ts`). The cleanest genuine forecast the corpora draw —
+  Tetrisちゃんねる's `foreacast_004..009` (Z overhang → an L that clears the opening row → a T tuck) —
+  is lifted into a `SimResult` and run through the real `forecastMetric` (`localiseMechanism`'s step
+  assertions throw on a bad lift, so the verdict can't be faked). It classifies **`reactive` at
+  `separation === 1`**: the cell roofing the T was placed by the same lock that cleared the row, so no
+  step lies between roof and tuck. That is the concrete instance of the machine-checked theorem
+  `spec/Forecast.dfy:SeparationOneIsNeverAForecast` (`k == j+1 ⇒ !IsForecast`), witnessed in
+  `spec/ForecastExamples.dfy:ExternalForecastExampleReducesToSeparationOne`.
+
+So the examples **corroborate** the 0-of-654 count rather than raise it: the detector reaches every
+spin they draw and is provably right to reject the one forecast they draw cleanly. Detecting more
+would require extending the **verified prefix** (only 13.8% of placements, systematically early-round)
+— a simulator-fidelity project (the line-clear-delay attack model), not something the examples reach.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
