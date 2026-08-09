@@ -6,9 +6,13 @@
 //
 // The seven are chosen so that each of the four clauses is the SOLE reason for a rejection at least
 // once, and so that the two readings of "triple line(s)" are separated by a real board. Examples
-// A, C, D and F are the same situation differing in a single field each — one Event flag or one
-// Step flag — so every rejection is provably caused by its clause. See the minimality lemmas at
-// the bottom. The BOARDS drawn alongside are checked separately: every placement is a real
+// A, C and D are the same situation differing in a single field each — one Event flag or one Step
+// flag — so every rejection is provably caused by its clause. F is the same situation differing in
+// one FACT, which since 2026-08-09 the model records in two places: `WellFormed` ties `spinAtK` to
+// `h[e.k - 1].wasSpin`, so "the T did not spin" has to be written on both. See the minimality
+// lemmas at the bottom, and `OnlyClause1SeparatesAFromF` in particular — it asserted the two
+// histories were byte-identical, and that was true only while the flag was ungrounded.
+// The BOARDS drawn alongside are checked separately: every placement is a real
 // tetromino orientation, resting on something, and reachable under SRS with its kick tables. That
 // last check is not decorative — it rejected the first board drawn for example D outright.
 //
@@ -49,12 +53,12 @@ module ForecastExamples {
     ensures WellFormed(h, e)
     ensures IsForecastTriple(h, e) && IsForecastAnyClear(h, e) && IsForecastShape(h, e)
     ensures ClosedByPlain(h, e) == 3 && ClosedBySpins(h, e) == 0
-    ensures h == [ Step([17, 18, 19], false, 0), Step([], false, 0) ] && e == Event(0, 2, 15, 21, true, true)
+    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, true, true)
     ensures e.floorAt - e.roofAt == 6                        // before
     ensures BothSurvive(h, e)
     ensures FloorFinal(h, e).row - RoofFinal(h, e).row == 3  // after: the T-Spin Double geometry
   {
-    h := [ Step([17, 18, 19], false, 0), Step([], false, 0) ];
+    h := [ Step([17, 18, 19], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 15, 21, true, true);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
     assert Advance(h[0], 15) == 18 && Advance(h[0], 21) == 21;
@@ -68,9 +72,9 @@ module ForecastExamples {
     ensures IsForecastAnyClear(h, e)     // "one or more clears, none of them a T-spin"
     ensures !IsForecastTriple(h, e)      // "a clear of three lines"
     ensures ClosedByPlain(h, e) == 1
-    ensures h == [ Step([19], false, 0), Step([], false, 0) ] && e == Event(0, 2, 17, 21, true, true)
+    ensures h == [ Step([19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 17, 21, true, true)
   {
-    h := [ Step([19], false, 0), Step([], false, 0) ];
+    h := [ Step([19], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 17, 21, true, true);
     assert CountBetween([19], 17, 21) == 1;
     assert Advance(h[0], 17) == 18 && Advance(h[0], 21) == 21;
@@ -89,9 +93,9 @@ module ForecastExamples {
     ensures GapClosed(h, e) && ClosedByPlain(h, e) == 3   // clauses 1, 3 and 4 all hold
     ensures !HolePreExisted(e)
     ensures !IsForecastAnyClear(h, e) && !IsForecastShape(h, e)
-    ensures h == [ Step([17, 18, 19], false, 0), Step([], false, 0) ] && e == Event(0, 2, 15, 21, false, true)
+    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, false, true)
   {
-    h := [ Step([17, 18, 19], false, 0), Step([], false, 0) ];
+    h := [ Step([17, 18, 19], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 15, 21, false, true);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
   }
@@ -133,10 +137,10 @@ module ForecastExamples {
     ensures GapClosed(h, e) && HolePreExisted(e) && Tucked(e)
     ensures ClosedBySpins(h, e) == 3 && ClosedByPlain(h, e) == 0
     ensures !IsForecastAnyClear(h, e)
-    ensures h == [ Step([17, 18, 19], true, 0), Step([], false, 0) ]
+    ensures h == [ Step([17, 18, 19], true, 0), Step([], true, 0) ]
          && e == Event(0, 2, 15, 21, true, true)
   {
-    h := [ Step([17, 18, 19], true, 0), Step([], false, 0) ];
+    h := [ Step([17, 18, 19], true, 0), Step([], true, 0) ];
     e := Event(0, 2, 15, 21, true, true);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
     CSpinIsNotAForecast(h, e, 1);
@@ -162,9 +166,9 @@ module ForecastExamples {
     ensures FloorFinal(h, e).row - RoofFinal(h, e).row == e.floorAt - e.roofAt
     ensures ClosedByPlain(h, e) == 0
     ensures !GapClosed(h, e) && !IsForecastShape(h, e)
-    ensures h == [ Step([21], false, 4), Step([], false, 0) ] && e == Event(0, 2, 16, 20, true, true)
+    ensures h == [ Step([21], false, 4), Step([], true, 0) ] && e == Event(0, 2, 16, 20, true, true)
   {
-    h := [ Step([21], false, 4), Step([], false, 0) ];
+    h := [ Step([21], false, 4), Step([], true, 0) ];
     e := Event(0, 2, 16, 20, true, true);
     assert CountBetween([21], 16, 20) == 0;
     // both absolute positions, not only their difference: a mutation dropping the `- garbageRows`
@@ -198,7 +202,7 @@ module ForecastExamples {
     ensures ClosedByPlain(h, e) == 0 && !GapClosed(h, e)
     ensures !IsForecastShape(h, e)
   {
-    h := [ Step([], false, 0), Step([], false, 0) ];
+    h := [ Step([], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 18, 21, true, true);
   }
 
@@ -232,15 +236,29 @@ module ForecastExamples {
     hD, eD := ExampleD_TheCSpinLowersItsOwnRoof();
   }
 
+  // F stopped being a single-FIELD edit on 2026-08-09.
+  //
+  // This lemma used to assert `hA == hF && eF == eA.(spinAtK := false)`: same history exactly, one
+  // event flag flipped. It verified — and it verified only because `spinAtK` floated free of `h`.
+  // Now that `WellFormed` requires `e.spinAtK == h[e.k - 1].wasSpin`, "the T did not spin" is a
+  // single FACT that the model records in two places, so flipping it is necessarily a two-site
+  // edit and the old assertion is false. Nothing about clause 1's minimality changed; what changed
+  // is that the model no longer lets the flag and the lock disagree.
+  //
+  // Stated as the paired edit rather than repaired by weakening: the honest reading of this lemma
+  // is that `spinAtK` is now DERIVABLE from `h`, and a derivable field is one the datatype should
+  // not carry. Deleting it is the follow-up this points at; it is a change to `Event`'s shape and
+  // to every witness, so it is not folded in here.
   lemma OnlyClause1SeparatesAFromF()
     ensures exists hA: History, eA: Event, hF: History, eF: Event ::
       (WellFormed(hA, eA) && WellFormed(hF, eF)
-          && hA == hF && eF == eA.(spinAtK := false)
+          && |hA| == 2 && hF == [hA[0], hA[1].(wasSpin := false)]
+          && eF == eA.(spinAtK := false)
           && IsForecastTriple(hA, eA) && !IsForecastShape(hF, eF))
   {
     var hA, eA := ExampleA_PlainTripleClosesTheGap();
     var hF, eF := ExampleF_ThePerfectSetupThatWasNeverSpun();
-    assert hA == hF && eF == eA.(spinAtK := false);
+    assert hF == [hA[0], hA[1].(wasSpin := false)] && eF == eA.(spinAtK := false);
   }
 
   // And the pair that is NOT a single-field edit: B differs from A in the history, not the event,

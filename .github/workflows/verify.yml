@@ -423,3 +423,50 @@ jobs:
       # guess which replays you mean. One test reads it; the rest name their sessions themselves.
       - name: Run the simulator test suite
         run: REPLAY_DIR=sessions/2026-07-22 bun test
+
+  # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
+  # claims (Facts.dfy / Claims.dfy) — that job installs Dafny and never touches spec/Forecast.dfy.
+  # Until now nothing did: 109 proof obligations, a mutation suite and a vacuity gate all lived
+  # outside CI and were green on one laptop. Everything below was already runnable; the omission
+  # was that no job ran it.
+  spec:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
+        run: |
+          set -euo pipefail
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-ubuntu-22.04.zip"
+          curl -fsSL "$URL" -o dafny.zip
+          echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
+          unzip -q dafny.zip -d "$HOME/dafny-dist"
+          echo "$HOME/dafny-dist/dafny" >> "$GITHUB_PATH"
+
+      # Read the OUTPUT, not the exit code. Dafny exits 4 on a TIMEOUT, and this repo has already
+      # shipped one harness that scored a timeout as a pass by trusting `$?` — see the note in
+      # spec/mutate-forecast-spec.sh. `0 errors` is the only thing that means verified.
+      - name: Verify the spec
+        run: |
+          set -euo pipefail
+          for f in spec/Forecast.dfy spec/ForecastExamples.dfy; do
+            out=$(dafny verify "$f" 2>&1) || true
+            echo "$out" | tail -1
+            case "$out" in
+              *", 0 errors"*) ;;
+              *) echo "FAIL: $f did not verify" >&2; exit 1 ;;
+            esac
+          done
+
+      # A lemma whose hypotheses are contradictory is green and says nothing. The gate carries a
+      # poison and a healthy control and exits 2 if either misbehaves — a uniform verdict is the
+      # signature of a broken harness, which this repo has also shipped once.
+      - name: Check no lemma is vacuously true
+        run: python3 spec/check_spec_vacuity.py
+
+      # Slow (each mutant is a full re-verification), so it runs on the schedule and on demand,
+      # matching how the `verify` job gates its own mutation testing.
+      - name: Mutation-test the spec
+        if: github.event_name == 'schedule' || inputs.mutation
+        run: bash spec/mutate-forecast-spec.sh

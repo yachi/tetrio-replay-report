@@ -15,16 +15,38 @@ cp "$EX" "$DIR/ForecastExamples.dfy"
 # on the exit code alone scores "this made the verifier slow" as "this was caught" — and timeouts are
 # routine in this file, which itself records that a three-step ground window does not finish in 30 s.
 # So the output is read, not just the status, and a timeout is reported as its own outcome.
-# A TIMEOUT is an UNRESOLVED mutant, not a killed one. Escalate it by raising the limit before
-# concluding anything: "gap test inverted (>= not <)" times out at the 30 s default and resolves to
-# KILLED (six failing postconditions) at 300 s. Verified 2026-08-08.
+# A TIMEOUT is an UNRESOLVED mutant, not a killed one.
+#
+# ERRORS DOMINATE TIMEOUTS, and getting that precedence backwards was the same bug one layer up.
+# 2026-08-08 this read `timed out` FIRST, so a file that reported nine failing obligations AND one
+# slow one was scored `timeout` and the nine kills were thrown away. That is what made "gap test
+# inverted (>= not <)" look unresolved: measured per-obligation on 2026-08-09 against the spec as it
+# stood BEFORE this commit, that mutant failed SeparationOneIsNeverAForecast, ForecastIsSatisfiable,
+# CSpinWitnessIsRejected, NoHoleWitnessIsRejected, NotASpinIsRejected,
+# GarbageWitnessLeavesTheGapAlone, AnySizeOfClearIsAForecast, RowsAccumulateAcrossClears and
+# ClearsOutsideThePairCloseNothing, and only GapClauseIsLoadBearingAtZero ran long — nine kills
+# behind one slow obligation. A proved error is a kill; some OTHER obligation
+# being slow does not unprove it. `timeout` is now reported only when nothing errored, which is the
+# case where it really does mean "unread".
+#
+# The slow obligation was then fixed at the source rather than by raising the limit: pinning both
+# tracked positions in GapClauseIsLoadBearingAtZero takes it from >26 s to 1.3 s under that mutant.
+# Raising the limit was the alternative and was rejected — nothing runs this suite in CI (there is
+# no spec job in .github/workflows/verify.yml at all), so "run CI at 300 s" would have been a
+# setting on a job that does not exist, and a 300 s budget hides the next slow obligation instead
+# of surfacing it.
 LIMIT=${DAFNY_TIME_LIMIT:-60}
 
+# NOTE the shape of the error test. A timeout is ALSO reported on an `Error:` line —
+#   Error: Verification of 'Forecast.X' timed out after 20 seconds.
+# — so "does the output contain Error:" cannot be the first question, and simply swapping the two
+# branches would score every timeout as a kill. Real errors are the `Error:` lines that are NOT
+# timeouts; that is the set that has to be non-empty before a mutant is called killed.
 verdict() {  # file -> prints: error | timeout | clean
   local out; out=$(dafny verify --verification-time-limit "$LIMIT" "$1" 2>&1)
-  if   grep -q "Error:.*timed out" <<<"$out"; then echo timeout
-  elif grep -qE "^.*Error:" <<<"$out";        then echo error
-  elif grep -q ", 0 errors" <<<"$out";        then echo clean
+  if   grep "Error:" <<<"$out" | grep -qv "timed out"; then echo error
+  elif grep -q "Error:.*timed out" <<<"$out";          then echo timeout
+  elif grep -q ", 0 errors" <<<"$out";                 then echo clean
   else echo error; fi
 }
 
@@ -63,3 +85,24 @@ run "clause 4 caps a clear at two rows"   's|        then CountBetween(s.cleared
 # the worked examples top out at a Triple, so nothing there could tell "any n" from "n <= 3".
 run "clause 4 caps a clear at three rows" 's|        then CountBetween(s.clearedRows, a.row, b.row) else 0|        then (var c := CountBetween(s.clearedRows, a.row, b.row); if c > 3 then 3 else c) else 0|'
 run "rows below the pair count too"       's|  { RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), false) }|  { RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt + 100), false) }|'
+
+# --- the two guards added 2026-08-09 ------------------------------------------------------------
+# A guard no mutant can kill is decorative, so each of them gets one.
+
+# Clause 1's flag against the history. Killed by AForecastIsASpinInTheHistory, which is exactly the
+# statement that was unprovable while `spinAtK` floated free of `h`.
+run "WellFormed stops tying the spin flag to the history" \
+  's|    && e.spinAtK == h\[e.k - 1\].wasSpin.*|    \&\& true|'
+
+# The window's right endpoint. Measured against the committed spec (2026-08-09): this mutant errors
+# on two UNIVERSALS -- SeparationOneIsNeverAForecast and GarbageAloneCannotMakeAForecast, both of
+# whose hypotheses are stated in terms of the window bound -- and times out four witnesses, so the
+# old timeout-first verdict scored it UNRESOLVED. No witness distinguished the two windows: every
+# one of them padded with an inert final step, which Track passes through unchanged. The ones that
+# resolved all passed, and the four that timed out settled nothing either way.
+# TheSpinsOwnClearDoesNotCloseTheGap now kills it on the definition's own numbers in 1.3 s.
+run "the window runs past the spin's own lock" \
+  's|Track(h, e.j, e.k - 1, At(e.roofAt))|Track(h, e.j, e.k, At(e.roofAt))|
+   s|Track(h, e.j, e.k - 1, At(e.floorAt))|Track(h, e.j, e.k, At(e.floorAt))|
+   s|RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), true)|RemovedBetween(h, e.j, e.k, At(e.roofAt), At(e.floorAt), true)|
+   s|RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), false)|RemovedBetween(h, e.j, e.k, At(e.roofAt), At(e.floorAt), false)|'

@@ -271,6 +271,147 @@ module Forecast {
   }
 
   // ---------------------------------------------------------------------------------------------
+  // THE GAP IDENTITY, LIFTED FROM ONE STEP TO A WINDOW OF ANY LENGTH.
+  //
+  // `GapClosesOnlyByClearsBetween` is the one-step statement. Clause 3 is about a WINDOW, so until
+  // 2026-08-09 nothing connected the two: the clause was backed by worked boards only, while
+  // clauses 1, 2 and 4 each had a universal. Everything below exists to close that.
+  //
+  // The induction runs from the FRONT of the window rather than through `TrackSplit` /
+  // `RemovedBetweenSplit`. Those split lemmas are what the ground three-step witnesses need, because
+  // there the blow-up is in evaluating a concrete history; here `h` is symbolic and the recursion in
+  // `Track` and `RemovedBetween` already lines up step for step, so peeling one step off the front
+  // discharges it in about a second.
+  //
+  // WELL-FORMEDNESS IS LOAD-BEARING HERE, and this is the first place it does real work rather than
+  // rejecting a nonsense witness. The induction needs the tracked pair to stay ORDERED, and it does
+  // so only because a step cannot remove more rows from between two cells than there are rows
+  // between them — which is false without `NoDup`, since `Step([5, 5, 5], ...)` removes "three
+  // rows" from a one-row gap and swaps the pair over.
+  // ---------------------------------------------------------------------------------------------
+
+  // Defined by recursion rather than as `set i | a < i < b :: i`: the comprehension has no term to
+  // trigger on, so Dafny warns that it will be brittle, and its cardinality then needs the same
+  // induction anyway.
+  function IntsBetween(a: int, b: int): set<int>
+    decreases b - a
+  { if b <= a + 1 then {} else IntsBetween(a, b - 1) + {b - 1} }
+
+  lemma IntsBetweenMembership(a: int, b: int, x: int)
+    ensures x in IntsBetween(a, b) <==> a < x < b
+    decreases b - a
+  { if b <= a + 1 { } else { IntsBetweenMembership(a, b - 1, x); } }
+
+  lemma IntsBetweenCard(a: int, b: int)
+    requires a < b
+    ensures |IntsBetween(a, b)| == b - a - 1
+    decreases b - a
+  {
+    if b == a + 1 { }
+    else {
+      IntsBetweenCard(a, b - 1);
+      IntsBetweenMembership(a, b - 1, b - 1);   // b-1 is new, so the cardinality goes up by one
+    }
+  }
+
+  // Dafny 4.11 does NOT know this — `requires s <= t ensures |s| <= |t|` with an empty body fails.
+  // Checked before relying on it, because the whole bound below rests on it.
+  lemma SubsetCard(s: set<int>, t: set<int>)
+    requires s <= t
+    ensures |s| <= |t|
+    decreases |t|
+  {
+    if s == t { }
+    else {
+      var x :| x in t && x !in s;
+      assert s <= t - {x};
+      SubsetCard(s, t - {x});
+    }
+  }
+
+  lemma CountBetweenNonNeg(cleared: seq<int>, a: int, b: int)
+    ensures CountBetween(cleared, a, b) >= 0
+    decreases |cleared|
+  { if |cleared| == 0 { } else { CountBetweenNonNeg(cleared[1..], a, b); } }
+
+  /**
+   * A step cannot close a gap past zero: at most `b - a - 1` rows lie strictly between two cells, so
+   * at most that many can be taken. Pigeonhole, and it needs `NoDup` — `CountBetween` counts
+   * OCCURRENCES, so without distinctness a single row listed n times reads as n rows removed.
+   */
+  lemma CountBetweenIsLessThanTheGap(cleared: seq<int>, a: int, b: int)
+    requires NoDup(cleared)
+    requires a < b
+    ensures 0 <= CountBetween(cleared, a, b) < b - a
+  {
+    CountBetweenNonNeg(cleared, a, b);
+    CountBetweenIsDistinctCount(cleared, a, b);
+    IntsBetweenCard(a, b);
+    forall x | x in RowsBetween(cleared, a, b)
+      ensures x in IntsBetween(a, b)
+    { IntsBetweenMembership(a, b, x); }
+    SubsetCard(RowsBetween(cleared, a, b), IntsBetween(a, b));
+  }
+
+  // `Gone` is absorbing, so a pair that is `At?` at the end of the window was `At?` throughout it.
+  lemma TrackGoneStaysGone(h: History, from: int, upto: int)
+    requires 0 <= from <= upto <= |h|
+    ensures Track(h, from, upto, Gone) == Gone
+    decreases upto - from
+  { if from == upto { } else { TrackGoneStaysGone(h, from + 1, upto); } }
+
+  lemma RemovedBetweenNonNeg(h: History, from: int, upto: int, a: Tracked, b: Tracked, spins: bool)
+    requires 0 <= from <= upto <= |h|
+    ensures RemovedBetween(h, from, upto, a, b, spins) >= 0
+    decreases upto - from
+  {
+    if from == upto { }
+    else {
+      if a.At? && b.At? { CountBetweenNonNeg(h[from].clearedRows, a.row, b.row); }
+      RemovedBetweenNonNeg(h, from + 1, upto, TrackStep(h[from], a), TrackStep(h[from], b), spins);
+    }
+  }
+
+  /**
+   * THE WINDOW IDENTITY. Over a window of ANY length, the pair's separation shrinks by exactly the
+   * number of rows taken from between them — spin rows and plain rows together, and nothing else.
+   *
+   * Everything clause 3 says follows from this: `GapClosed` is not an independent property of a
+   * history, it is a restatement of "the two counts sum to at least one".
+   */
+  lemma GapEqualsRowsRemovedBetween(h: History, from: int, upto: int, a: int, b: int)
+    requires WellFormedHistory(h)
+    requires 0 <= from <= upto <= |h|
+    requires a < b
+    requires Track(h, from, upto, At(a)).At?
+    requires Track(h, from, upto, At(b)).At?
+    ensures Track(h, from, upto, At(a)).row < Track(h, from, upto, At(b)).row
+    ensures Track(h, from, upto, At(b)).row - Track(h, from, upto, At(a)).row
+         == (b - a) - (RemovedBetween(h, from, upto, At(a), At(b), false)
+                     + RemovedBetween(h, from, upto, At(a), At(b), true))
+    decreases upto - from
+  {
+    if from == upto { }
+    else {
+      var s := h[from];
+      // Neither cell can go in this step: the walk would then be Gone at the end of the window.
+      if !Survives(s, a) {
+        assert TrackStep(s, At(a)) == Gone;
+        TrackGoneStaysGone(h, from + 1, upto);
+        assert false;
+      }
+      if !Survives(s, b) {
+        assert TrackStep(s, At(b)) == Gone;
+        TrackGoneStaysGone(h, from + 1, upto);
+        assert false;
+      }
+      GapClosesOnlyByClearsBetween(s, a, b);
+      CountBetweenIsLessThanTheGap(s.clearedRows, a, b);   // ... so the pair stays ordered
+      GapEqualsRowsRemovedBetween(h, from + 1, upto, Advance(s, a), Advance(s, b));
+    }
+  }
+
+  // ---------------------------------------------------------------------------------------------
   // THE DEFINITION.
   //
   // At step k a T lands tucked under an overhang. `roofAt` is the overhang cell's row when its own
@@ -297,9 +438,35 @@ module Forecast {
     spinAtK: bool       // did the piece at step k finish as a T-spin?
   )
 
+  // ---------------------------------------------------------------------------------------------
+  // WHICH STEP IS THE T-SPIN, and why `e.k <= |h|` is the answer.
+  //
+  // `Track(h, e.j, e.k - 1, ·)` needs only `e.k - 1 <= |h|`. `WellFormed` demands `e.k <= |h|`,
+  // one tighter than anything in the file used — and that slack is the convention, written down
+  // here for the first time: **the T-spin is the lock at index `e.k - 1`**, so it has to exist.
+  // The window then applies `h[e.j] .. h[e.k - 2]`, i.e. step j's own clears (the overhang lands,
+  // THEN j's rows come out) up to the last step before the spin. That is exactly the set of steps
+  // `localiseMechanism` walks in `pipeline/sim/forecast.ts`, offset by the pre-clear measurement
+  // of `roofAt`.
+  //
+  // Until 2026-08-09 `WellFormed` said nothing about `spinAtK` at all, and every witness in both
+  // spec files set `e.spinAtK == true` while `h[e.k - 1].wasSpin == false` — the T-spin's own lock,
+  // flagged as not a spin. Nothing caught it because the final step is read by nothing: `Track` and
+  // `RemovedBetween` both stop before it. So the file carried two sources of truth for "was a spin"
+  // and used only one of them.
+  //
+  // What this does NOT fix: `holeOpenAtJ`, `roofAt` and `floorAt` stay pure extractor input. They
+  // are statements about BOARD CONTENT — which cell is empty, which row a cell sits in — and `Step`
+  // carries `clearedRows`, `wasSpin` and `garbageRows` and no board at all. There is nothing in `h`
+  // to relate them to. Clause 2, on which the corpus result turns, therefore still has zero
+  // history-side content, and grounding it is a model change (the same one `forecast_garbage`
+  // needs), not a stronger invariant.
+  // ---------------------------------------------------------------------------------------------
+
   predicate WellFormed(h: History, e: Event) {
     && 0 <= e.j < e.k <= |h|
     && e.roofAt < e.floorAt          // the overhang is above the hole's floor
+    && e.spinAtK == h[e.k - 1].wasSpin   // clause 1's flag is the history's flag, not a second one
   }
 
   predicate Tucked(e: Event) { e.spinAtK }
@@ -364,6 +531,13 @@ module Forecast {
    * `localiseMechanism` walks `t` down from `k-1` while `t > j`, so at separation 1 there is no step
    * to attribute and the event falls through to `unattributed`. Stated here as a theorem for ALL
    * histories rather than left as an emergent property of a loop bound.
+   *
+   * READ THE FIRST SENTENCE AGAINST THE CONVENTION, which was only written down on 2026-08-09 (see
+   * `WellFormed`). The T-spin is the lock at index `e.k - 1`, so `e.k == e.j + 1` puts the spin at
+   * index `e.j` — the piece that placed the overhang and the piece that spun are the SAME lock, a
+   * separation of zero, not "the immediately preceding piece". The lemma is true as stated and the
+   * name is kept because renaming it strands references; what is corrected here is the prose, which
+   * described the other reading of `k` and had nothing to check it against.
    */
   lemma SeparationOneIsNeverAForecast(h: History, e: Event, minLines: int)
     requires WellFormed(h, e)
@@ -377,7 +551,7 @@ module Forecast {
     ensures WellFormedHistory(h) && WellFormed(h, e)
     ensures e.k == e.j + 1 && Tucked(e) && HolePreExisted(e)
   {
-    h := [ Step([], false, 0) ];
+    h := [ Step([], true, 0) ];
     e := Event(0, 1, 25, 29, true, true);
   }
 
@@ -405,15 +579,30 @@ module Forecast {
    * Clause 1's missing universal. Every other clause has a "...IsNotAForecast" lemma quantified over
    * all histories; clause 1 was backed only by the single board in `NotASpinIsRejected`.
    *
-   * Note what this does and does not say. `WellFormed` never relates `spinAtK` to `h`, so the spec
-   * can prove the predicate READS the flag, never that the flag is right. Clauses 1 and 2 have no
-   * history-side content at all -- they are extractor input. Worth stating plainly, because the
-   * corpus's whole result turns on clause 2.
+   * The note that used to sit here said `WellFormed` never relates `spinAtK` to `h`, so the spec
+   * could prove the predicate READS the flag and never that the flag is right. That is fixed for
+   * clause 1 as of 2026-08-09 (see `WellFormed`) and `AForecastIsASpinInTheHistory` below is the
+   * statement that was unprovable before. It remains true of clause 2, which is the one the corpus
+   * result turns on.
    */
   lemma NotASpinIsNeverAForecast(h: History, e: Event, minLines: int)
     requires WellFormed(h, e)
     requires !e.spinAtK
     ensures !IsForecast(h, e, minLines)
+    ensures !h[e.k - 1].wasSpin      // ... and the history agrees, which is the new part
+  { }
+
+  /**
+   * Clause 1, finally said about the HISTORY rather than about a flag: a forecast's step `k - 1`
+   * really is a spin. Not provable before the well-formedness relation, at any `minLines`, on any
+   * history — `spinAtK` was a free field and `h[e.k - 1].wasSpin` was read by nothing.
+   *
+   * `ForecastIsSatisfiable` supplies a witness, so this is not vacuous.
+   */
+  lemma AForecastIsASpinInTheHistory(h: History, e: Event, minLines: int)
+    requires WellFormed(h, e)
+    requires IsForecast(h, e, minLines)
+    ensures h[e.k - 1].wasSpin
   { }
 
   // A roof laid on solid stack that opens up later is downstacking, not forecasting.
@@ -437,6 +626,108 @@ module Forecast {
   }
 
   // ---------------------------------------------------------------------------------------------
+  // CLAUSE 3'S UNIVERSALS. Added 2026-08-09; until then clause 3 was the only clause backed by
+  // witnesses alone, and the two lemmas that named it (`GapClosesOnlyByClearsBetween`,
+  // `GarbageNeverClosesAGap`) were both about a SINGLE step.
+  // ---------------------------------------------------------------------------------------------
+
+  /**
+   * What clause 3 actually asserts, with the window collapsed away: the gap closes exactly when the
+   * pair survives and at least one row was taken from between them. `GapClosed` quantifies over a
+   * whole history; the right-hand side is two counts and a survival test.
+   *
+   * Note the `+ ClosedBySpins` — the C-Spin closes its own gap, so clause 3 is satisfied there and
+   * the rejection has to come from clause 4. That is the whole reason the two clauses are separate.
+   */
+  lemma GapClosedIsExactlyRowsRemoved(h: History, e: Event)
+    requires WellFormedHistory(h)
+    requires WellFormed(h, e)
+    ensures GapClosed(h, e)
+        <==> (BothSurvive(h, e) && ClosedByPlain(h, e) + ClosedBySpins(h, e) >= 1)
+  {
+    if BothSurvive(h, e) {
+      GapEqualsRowsRemovedBetween(h, e.j, e.k - 1, e.roofAt, e.floorAt);
+    }
+  }
+
+  /**
+   * The prose claim that clause 3 is redundant beside clause 4 at `minLines >= 1`, as a theorem.
+   *
+   * It is redundant only GIVEN `BothSurvive`, and that is not a technicality: rows can be taken from
+   * between the pair early in the window and the overhang cleared away later, which leaves clause 4
+   * satisfied and clause 3 false. So what clause 3 contributes at `minLines >= 1` is precisely
+   * "and both cells are still there" — not nothing, but not what the comment on `IsForecastShape`
+   * said it was either.
+   */
+  lemma Clause3FollowsFromClause4(h: History, e: Event, minLines: int)
+    requires WellFormedHistory(h)
+    requires WellFormed(h, e)
+    requires minLines >= 1
+    requires BothSurvive(h, e)
+    requires ClosedByPlain(h, e) >= minLines
+    ensures GapClosed(h, e)
+  {
+    RemovedBetweenNonNeg(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), true);
+    GapClosedIsExactlyRowsRemoved(h, e);
+  }
+
+  lemma Clause3IsRedundantAtOneOrMore(h: History, e: Event, minLines: int)
+    requires WellFormedHistory(h)
+    requires WellFormed(h, e)
+    requires minLines >= 1
+    requires BothSurvive(h, e)
+    ensures IsForecast(h, e, minLines)
+        <==> (Tucked(e) && HolePreExisted(e) && ClosedByPlain(h, e) >= minLines)
+  {
+    if Tucked(e) && HolePreExisted(e) && ClosedByPlain(h, e) >= minLines {
+      Clause3FollowsFromClause4(h, e, minLines);
+    }
+  }
+
+  // The structural half, stated for symmetry with clauses 1, 2 and 4: each of those has a
+  // "...IsNeverAForecast" quantified over all histories, and clause 3 had none.
+  lemma NoGapClosedIsNeverAForecast(h: History, e: Event, minLines: int)
+    requires WellFormed(h, e)
+    requires !GapClosed(h, e)
+    ensures !IsForecast(h, e, minLines)
+  { }
+
+  /**
+   * Clause 3's substantive universal, and the one that covers the case the other rejection lemmas
+   * leave open: `minLines == 0`, where clause 4 admits everything.
+   *
+   * Strictly generalises `GapClauseIsLoadBearingAtZero`, which is one board on which nothing was
+   * cleared at all. This is every history in which nothing was taken from between the pair — the
+   * clears can be arbitrarily large and arbitrarily many, as long as they fall outside the pair —
+   * and `GarbageAloneCannotMakeAForecast` does not reach it, both because that lemma requires
+   * `minLines >= 1` and because it requires the window to be clear-FREE.
+   */
+  lemma NothingRemovedIsNotEvenForecastShaped(h: History, e: Event)
+    requires WellFormedHistory(h)
+    requires WellFormed(h, e)
+    requires ClosedByPlain(h, e) == 0 && ClosedBySpins(h, e) == 0
+    ensures !GapClosed(h, e)
+    ensures !IsForecastShape(h, e)
+    ensures forall m: int :: !IsForecast(h, e, m)
+  {
+    GapClosedIsExactlyRowsRemoved(h, e);
+  }
+
+  /**
+   * ...and its hypotheses are satisfiable, so the lemma above is not vacuously true. Same discipline
+   * as `SeparationOneIsReachable`: `check_spec_vacuity.py` is one-directional and reports "not
+   * shown" rather than "healthy", so a universal rejection lemma still needs a board reaching it.
+   */
+  lemma NothingRemovedIsReachable() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures Tucked(e) && HolePreExisted(e)
+    ensures ClosedByPlain(h, e) == 0 && ClosedBySpins(h, e) == 0
+  {
+    h := [ Step([], false, 0), Step([], true, 0) ];
+    e := Event(0, 2, 25, 27, true, true);
+  }
+
+  // ---------------------------------------------------------------------------------------------
   // ANTI-VACUITY. Every lemma above is of the form "this is NOT a forecast", and all of them hold
   // trivially if `IsForecast` is unsatisfiable. A green verifier proves nothing until a witness
   // exists, so here are three: one the definition accepts, and two it rejects for the two distinct
@@ -453,7 +744,7 @@ module Forecast {
     // the exact count is part of the contract, so callers can reason about HOW MUCH was removed
     ensures ClosedByPlain(h, e) == 1
   {
-    h := [ Step([26], false, 0), Step([], false, 0) ];
+    h := [ Step([26], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 27, true, true);
     assert CountBetween([26], 25, 27) == 1;
     assert Advance(h[0], 25) == 26 && Advance(h[0], 27) == 27;
@@ -468,7 +759,7 @@ module Forecast {
     ensures GapClosed(h, e)          // the gap really does close ...
     ensures !IsForecastAnyClear(h, e) // ... and it is still not a forecast
   {
-    h := [ Step([26], true, 0), Step([], false, 0) ];
+    h := [ Step([26], true, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 27, true, true);
     assert CountBetween([26], 25, 27) == 1;
     assert ClosedByPlain(h, e) == 0;
@@ -484,7 +775,7 @@ module Forecast {
     ensures ClosedByPlain(h, e) >= 1
     ensures !IsForecastAnyClear(h, e)
   {
-    h := [ Step([26], false, 0), Step([], false, 0) ];
+    h := [ Step([26], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 27, false, true);
     assert CountBetween([26], 25, 27) == 1;
   }
@@ -502,6 +793,37 @@ module Forecast {
     assert CountBetween([26], 25, 27) == 1;
   }
 
+  /**
+   * THE WINDOW'S RIGHT ENDPOINT, made testable.
+   *
+   * `WellFormed` fixes the T-spin at index `e.k - 1`, so the window `Track(h, e.j, e.k - 1, ·)`
+   * stops just before it and the spin's OWN line clear must not count toward closing the gap — the
+   * gap has to be closed already for the T to fit. No witness tested that. Every other witness in
+   * this file pads with an inert final step (`Step([], _, 0)`), which `Track` passes through
+   * unchanged, so widening the window to `e.k` leaves all of their numbers alone. Measured on the
+   * committed spec, that mutation is caught only by two UNIVERSALS whose hypotheses mention the
+   * window bound (`SeparationOneIsNeverAForecast`, `GarbageAloneCannotMakeAForecast`) — and four
+   * witnesses time out on it, settling nothing. So the endpoint was very nearly free to be off by
+   * one, and it was justified only in a comment.
+   *
+   * Here the spin's own lock takes row 27, which lies between the tracked pair. `ClosedBySpins == 0`
+   * and `RoofFinal == At(26)` are both false if the window runs one step longer.
+   */
+  lemma TheSpinsOwnClearDoesNotCloseTheGap() returns (h: History, e: Event)
+    ensures WellFormedHistory(h)
+    ensures WellFormed(h, e)
+    ensures |h| == 2 && h[e.k - 1] == Step([27], true, 0)   // the T-spin's lock clears a row itself
+    ensures RoofFinal(h, e) == At(26) && FloorFinal(h, e) == At(29)
+    ensures ClosedBySpins(h, e) == 0                        // ... and that row is not counted
+    ensures ClosedByPlain(h, e) == 1
+    ensures IsForecastAnyClear(h, e)
+  {
+    h := [ Step([26], false, 0), Step([27], true, 0) ];
+    e := Event(0, 2, 25, 29, true, true);
+    assert CountBetween([26], 25, 29) == 1;
+    assert Advance(h[0], 25) == 26 && Advance(h[0], 29) == 29;
+  }
+
   // Garbage lifts the pair together and changes nothing between them. Stated on a witness that
   // actually HAS garbage, because every other lemma here sets garbageRows to 0 — which left the
   // `- s.garbageRows` term in `Advance` unpinned and a mutation deleting it undetected.
@@ -512,15 +834,20 @@ module Forecast {
     ensures !GapClosed(h, e)              // four rows of garbage, gap unmoved
     ensures !IsForecastAnyClear(h, e)
   {
-    h := [ Step([], false, 4), Step([], false, 0) ];
+    h := [ Step([], false, 4), Step([], true, 0) ];
     e := Event(0, 2, 25, 27, true, true);
     assert Advance(h[0], 25) == 21 && Advance(h[0], 27) == 23;
     GarbageNeverClosesAGap(h[0], 25, 27);
   }
 
   // `GapClosed` looks redundant beside clause 4 — removing a row from between the pair does close
-  // the gap — and at minLines >= 1 it is. It is load-bearing at minLines == 0, the "forecast-shaped
-  // regardless of how much was removed" reading, and is kept so that reading stays honest.
+  // the gap — and at minLines >= 1 it ALMOST is. This comment said "it is", flatly, until
+  // `Clause3FollowsFromClause4` turned the claim into a theorem and the proof produced the missing
+  // hypothesis: the redundancy holds only GIVEN `BothSurvive`. Rows can come out from between the
+  // pair early in the window and the overhang be cleared away later, which satisfies clause 4 and
+  // falsifies clause 3. So what clause 3 adds at minLines >= 1 is exactly "and both cells are still
+  // there". It is load-bearing outright at minLines == 0, the "forecast-shaped regardless of how
+  // much was removed" reading, and is kept so that reading stays honest.
   predicate IsForecastShape(h: History, e: Event)
     requires WellFormed(h, e)
   { IsForecast(h, e, 0) }
@@ -532,8 +859,12 @@ module Forecast {
     ensures !GapClosed(h, e)
     ensures !IsForecastShape(h, e)        // false ONLY because the gap never closed
   {
-    h := [ Step([], false, 0), Step([], false, 0) ];
+    h := [ Step([], false, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 27, true, true);
+    // Both tracked positions, pinned. Not decorative: without them the mutant that inverts the
+    // gap test sends this obligation past 26 s and the whole mutant reads as UNRESOLVED (see
+    // spec/mutate-forecast-spec.sh). With them it fails in 1.3 s, which is what a kill looks like.
+    assert RoofFinal(h, e) == At(25) && FloorFinal(h, e) == At(27);
   }
 
   // The two readings of "triple line(s)" are genuinely different, so the choice cannot be silent.
@@ -654,7 +985,7 @@ module Forecast {
     RangeSeqBelow(26, n, 25);
     RangeSeqNoneBelow(26, n, 26 + n);
     RangeSeqBetween(26, n, 25, 26 + n);
-    h := [ Step(cleared, false, 0), Step([], false, 0) ];
+    h := [ Step(cleared, false, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 26 + n, true, true);
     assert Advance(h[0], 25) == 25 + n;
     assert Advance(h[0], 26 + n) == 26 + n;
@@ -696,7 +1027,7 @@ module Forecast {
     ensures ClosedByPlain(h, e) == 3
     ensures IsForecastTriple(h, e)
   {
-    h := [ Step([26, 27], false, 0), Step([28], false, 0), Step([], false, 0) ];
+    h := [ Step([26, 27], false, 0), Step([28], false, 0), Step([], true, 0) ];
     e := Event(0, 3, 25, 30, true, true);
   }
 
@@ -707,7 +1038,7 @@ module Forecast {
    * one lemma re-derives the whole window twice and times out — the same encoding cost recorded on
    * the split lemma above.
    */
-  const SPIN_THEN_PLAIN: History := [ Step([26], true, 0), Step([27], false, 0), Step([], false, 0) ]
+  const SPIN_THEN_PLAIN: History := [ Step([26], true, 0), Step([27], false, 0), Step([], true, 0) ]
   const SPIN_THEN_PLAIN_EVENT: Event := Event(0, 3, 25, 29, true, true)
 
   lemma SpinRowsDoNotCountTowardClause4()
@@ -755,7 +1086,7 @@ module Forecast {
     RangeSeqBelow(30, n, 25);
     RangeSeqBelow(30, n, 29);
     RangeSeqBetween(30, n, 29, 30 + n);
-    h := [ Step(cleared, false, 0), Step([], false, 0) ];
+    h := [ Step(cleared, false, 0), Step([], true, 0) ];
     e := Event(0, 2, 25, 29, true, true);
     assert CountBetween(cleared, 25, 29) == 0 by { CountBelowSplit(cleared, 25, 29); }
     assert Advance(h[0], 25) == 25 + n && Advance(h[0], 29) == 29 + n;
