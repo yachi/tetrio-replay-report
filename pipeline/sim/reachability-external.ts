@@ -17,7 +17,8 @@
 import { bestTspin } from './forecast.ts';
 import { emptyBoard, H } from './sim.ts';
 import { readFileSync } from 'node:fs';
-import type { Board, PieceType } from './vendor/core/srs.ts';
+import type { Board } from './vendor/core/srs.ts';
+import type { PieceType } from './vendor/core/types.ts';
 
 const W = 10;
 type Frame = { id: string; rows: string[] };
