@@ -1164,3 +1164,90 @@ verified forecasts** across the four sessions (2.83%) against 0.00% for `best`, 
 swept configs are unaffected. So the metric no longer reports a number it cannot justify — but the
 published 0% is still a claim about seven configs, and whether that set is the right one is an
 editorial call about what the figure asserts, not a bug.
+
+## T-Spin Forecast — inventory resolved (2026-08-09)
+
+A parallel expert sweep (four implementation agents + a fable-model reviewer + a read-only
+verifier) worked the inventory above. Three commits landed: `33b233b` (sim fixtures + mutants +
+the j=-1 fix), `6866f7a` (spec + the spec's first CI job), `5cc6573` (a numerator bug the
+inventory could not see). Every agent claim was reproduced on the main thread before landing;
+several did not survive that check and are called out below.
+
+### Closed
+
+- **1 — two-piece roof.** Second multi-placer fixture whose *answer* moves with max-vs-min, not
+  just an intermediate. With both it and the provs-{1,5} fixture skipped, the max→min mutant
+  survives the whole corpus — the "no corpus can distinguish them" claim, now measured, not argued.
+- **2 — mini executed spin.** No asymmetry exists (nothing reads `lk.spin` but the admission test
+  and the record's field); the identity is pinned so a future asymmetry fails, and it is the right
+  answer — clause 4 already refuses a size exemption at the other end of the window.
+- **4b — `garbageLoadBearing` vacuity.** Reachable: 288 constructed cases, 144 load-bearing via a
+  landing shift, 144 not. The corpus's 0 is now asserted against a population where the flag is
+  true, not `0 === 0`. Reproduced the 121/654-and-0 census independently.
+- **5 — clause 2 `'undetermined'`.** Constructed end to end by the strict rule; `undecidedClause2`
+  carries 1 for the first time.
+- **6 — clause 3 universals.** `GapEqualsRowsRemovedBetween` (any-length window),
+  `Clause3FollowsFromClause4`, `NothingRemovedIsNotEvenForecastShaped`. One correction to the
+  inventory: clause 3 is **not** unconditionally redundant beside clause 4 at `minLines >= 1` —
+  only given `BothSurvive`; the old `IsForecastShape` comment claimed the stronger thing and was
+  provably imprecise.
+- **8 — grounding `spinAtK`.** `WellFormed` now requires `spinAtK == h[k-1].wasSpin`. This exposed
+  that `OnlyClause1SeparatesAFromF` was green only because the flag floated free of the history; 17
+  witnesses carried the same defect. Fixed all without weakening the invariant.
+- **9 — spec mutation suite.** Root cause was the harness testing timeout before error (a mutant
+  with nine proved errors behind one slow obligation scored as a whole-file timeout). Fixed, and
+  the obligation sped up. 18/18 killed, was 15 + 1 unread timeout.
+- **The numerator blind spot (new, not on the list).** Four published reports carried a split-half
+  reliability from the superseded `kind !== 'reactive'` numerator; under the live metric the figure
+  does not exist. Fixed, re-emitted, and closed with a source scanner + an artifact test, both of
+  which fail on the pre-fix artifact. This is the class the inventory structurally could not see:
+  every item asked "is each cell of the definition exercised?", none asked "does every published
+  figure come from this definition?". See `5cc6573`.
+- **Item 10 — refuted, not fixed.** Claim A (negative roof rows) is a **non-bug**: the negative
+  bound is the correct generalisation and clamping it would regress the straddle test — a comment
+  records why, no code change. Two of the three "unreachable guards" are reachable via the exported
+  `localiseMechanism` and got mutants + contract fixtures rather than deletion; the third is
+  provably unreachable and got a comment. The census is **7,544 boards, not 7,579** (7,544 matches
+  project memory; the inventory's figure was the outlier). The `j = -1` crash the sweep surfaced is
+  fixed (it read `boards[-1]`, contradicting its own doc comment; 0 corpus exposure).
+
+### Re-classified (fable-model review; not yet actioned)
+
+- **3 — `bestTspinLines` counts pre-existing full rows.** Measured under a patched classifier over
+  654 events × 6 configs: **zero classification changes, zero rate changes**. So the fix is free and
+  leaving it in buys nothing — recommend fixing (subtract the board's pre-existing full-row count in
+  `bestTspin`), which is algebraically identity on every board but `Bpre`. Not done this round.
+  Correction to the item: the failure direction is not solely toward `self_built`; the 3+-row
+  deflation runs the other way. Low threat to the 0% (the rate is badge-unlinked).
+- **7 — modelling `improved` was NOT blocked.** The premise "a finite max needs a bounded position
+  set" is false: `BestTspinLines` is a max over LINE COUNTS, bounded by 3, regardless of the
+  position set's size. Cheap path (hours): add `availAtJ`/`availAtK: nat` to `Event` (exactly like
+  the two flags already there, `<= 3`), prove `Improved` and `GapClosed` are *different* predicates
+  with two witnesses + an anti-vacuity witness. No boundedness lemma. This matters: `improved`
+  performs 653 of 654 corpus exclusions and is the single largest unmodelled thing.
+- **11 — `insertMode`, keep seven not eight.** Four *other* legal garbage-timing configs
+  (`cancelMode:inTransit`, `readyFrom:confirm`, `garbagespeed:0`, `insertAfterClear`) all measure 0
+  without throwing, which strengthens the 0%. But the published `simulator_range [0,0]` is over seven
+  configs, six of which vary piece kinematics and only one touches garbage — the axis the metric is
+  actually about. Recommend: add the four that run (free, all 0), and emit the `insertMode`
+  exclusion as data (`simulator_configs_excluded`) rather than dropping a throwing config silently.
+
+### Consolidated
+
+- **4 (main) + 8 (clause 2) are one model change.** Grounding `holeOpenAtJ`/`roofAt`/`floorAt` and
+  adjudicating `forecast_garbage` both need a board-carrying `Step` (column information, which
+  `Step` has none of today). Grounding clause 2 strictly subsumes `forecast_garbage`: clause 2 needs
+  to know which cells each *placement* filled (`roofIsGarbage` is false for all 654), of which
+  garbage hole columns are a subset. Driver is clause 2. Cheaper than it sounds — `Cell`, `Board`,
+  `Filled`, `Width` are already declared in `Forecast.dfy` and referenced by nothing (dead today).
+
+### New, carried so they are not lost
+
+- **`roofIsGarbage` has no fixture at all** — 0 of 654, same vacuity class as 4b was, and it was not
+  on the original item-4 list.
+- **`determinable` degrades silently at `j = -1`.** Even with the crash fixed, a garbage roof has
+  `determinable === false`, so the strict clause-2 rule falls back to loose co-occurrence there.
+- **Layer 1 of the numerator gate is deferred.** A branded `VerifiedCount` type would make a
+  hand-rolled numerator a *compile* error rather than a scanner finding — the right fix — but this
+  tree has no typechecker (no tsconfig, no tsc step; `check_ts_imports.py` is the homemade stand-in).
+  Its true cost is "adopt a typecheck step for the whole TS tree", a separate decision.
