@@ -170,6 +170,19 @@ there is exactly **1 forecast_lineclear-labelled event across all four sessions,
 So the 0 is not hidden by the verified prefix — line-clear forecasts are absent by nature (this
 corpus is openers and self-builds). The count moves only with a genuine change in play.
 
+### Positive control: the detector DOES fire on a generated forecast
+
+Every test above is a negative control (real play, correctly not counted), which leaves open the
+worry that the 0 is a broken always-rejecting detector. `generated-forecast.test.ts` closes it: it
+GENERATES the spec's canonical forecast — Example A, J overhang over a pre-existing hole, a vertical
+I clearing the three rows between (non-spin), a T tuck for a Double — lifts it into a SimResult, runs
+the real `forecastMetric`, and it **verifies (forecast_lineclear, separation 2)**. Example B (a
+single) verifies too; F (T never spun) and G (slot pre-complete, separation 1) are rejected — and all
+four match the verdict the Dafny spec proves. So the corpus 0 is a true negative: the detector fires
+on a real forecast, it just never sees one in these replays. This is the one place the repo's three
+representations — ledger data, Dafny proof, and the simulator detector — are shown to agree on live
+boards.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
