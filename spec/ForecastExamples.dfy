@@ -273,4 +273,36 @@ module ForecastExamples {
     var hA, eA := ExampleA_PlainTripleClosesTheGap();
     var hB, eB := ExampleB_ASingleIsEnoughOnlyUnderTheLooseReading();
   }
+
+  // ===============================================================================================
+  // EXTERNAL EVIDENCE. The captured example corpora (harddrop, Tetrisちゃんねる, four.lol) were run
+  // through the SIMULATOR detector to hunt for a false negative — a real forecast the metric misses,
+  // which would raise the 0-of-654 count. Two probes, both committed as bun tests:
+  //
+  //   · pipeline/sim/reachability-external.test.ts — the availability engine reaches every executed
+  //     spin the corpora draw, so the count is not suppressed by an unreachable slot.
+  //   · pipeline/sim/lift-external.test.ts — the cleanest forecast the corpora draw
+  //     (Tetrisちゃんねる foreacast_004..009: a Z overhang, an L that CLEARS the opening row, then a T
+  //     tuck) is lifted into a SimResult and run through `forecastMetric`. It classifies `reactive`
+  //     at `separation === 1`: the cell roofing the T was placed by the same lock that cleared the
+  //     row, so no step lies between the roof and the spin.
+  //
+  // This lemma is the formal counterpart of that reactive verdict. A `separation === 1` detector event
+  // is a `k == j + 1` model event, and at k == j + 1 the tracking window is empty — nothing can have
+  // moved between the pair — so the situation is not even forecast-shaped, whatever the boards look
+  // like. It reuses the proven `SeparationOneIsNeverAForecast`; the point here is that a real external
+  // example LANDS on that theorem, i.e. the detector is provably right to reject it and the corpus is
+  // corroborated, not under-counting. (Not an Example[A-G]_ witness — the seven worked boards are the
+  // definition's own cases; this is the one imported from outside.)
+  lemma ExternalForecastExampleReducesToSeparationOne() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures e.k == e.j + 1 && Tucked(e) && HolePreExisted(e)   // the lift: tucked T, pre-existing floor
+    ensures !IsForecastShape(h, e)                             // ...and still not a forecast, at any minLines
+  {
+    // j = 2 (the L roofs the T), k = 3 (the T), availAtRoof = availAtSpin = 2, spinAtK = true —
+    // the abstract shape of the detector record the lift produces.
+    h := [ Step([], false, 0), Step([], false, 0), Step([], true, 0) ];
+    e := Event(2, 3, 25, 29, true, true, 2, 2);
+    SeparationOneIsNeverAForecast(h, e, 0);
+  }
 }

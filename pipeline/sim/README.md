@@ -112,6 +112,77 @@ the rounding, or the metric set changes, and date it.
   content, decoded by the `py_fumen` library (`extract_four_forecast.py`) — a trusted third-party
   decoder, so any fumen tool reproduces the same boards. Same conventions and caveats as the JP set.
 
+### Do the external examples let us detect MORE forecasts? (2026-08-09) — no, and it is proven
+
+The three corpora were then turned on the detector itself, to hunt for a false negative — a real
+forecast the metric misses, which is the only honest way the count could rise (loosening the
+definition just re-imports the co-occurrence bug). Two probes, both committed:
+
+- **Reachability** (`reachability-external.test.ts`, driver `reachability-external.ts`). The numerator
+  rests on `bestTspin` finding every executable spin; if it under-reads `avail(t)`, a real
+  improvement is scored `reactive`. Every JP / four.lol frame that draws a newly-placed,
+  line-clearing T witnesses a reachable spin — strip the T and the engine must re-find it. Result:
+  **0 misses** across all witnesses. The engine's reachability is complete on the corpora (the three
+  C-Spin diagrams `wiki-fixtures` marks `UNREACHABLE` need a 180 the players never press, and none is
+  an executed spin here).
+- **Clause logic** (`lift-external.test.ts`). The cleanest genuine forecast the corpora draw —
+  Tetrisちゃんねる's `foreacast_004..009` (Z overhang → an L that clears the opening row → a T tuck) —
+  is lifted into a `SimResult` and run through the real `forecastMetric` (`localiseMechanism`'s step
+  assertions throw on a bad lift, so the verdict can't be faked). It classifies **`reactive` at
+  `separation === 1`**: the cell roofing the T was placed by the same lock that cleared the row, so no
+  step lies between roof and tuck. That is the concrete instance of the machine-checked theorem
+  `spec/Forecast.dfy:SeparationOneIsNeverAForecast` (`k == j+1 ⇒ !IsForecast`), witnessed in
+  `spec/ForecastExamples.dfy:ExternalForecastExampleReducesToSeparationOne`.
+
+So the examples **corroborate** the 0-of-654 count rather than raise it: the detector reaches every
+spin they draw and is provably right to reject the one forecast they draw cleanly. Detecting more
+would require extending the **verified prefix** (only 13.8% of placements, systematically early-round)
+— a simulator-fidelity project (the line-clear-delay attack model), not something the examples reach.
+
+### Can sequence alignment extend the verified prefix? (measured: no)
+
+`prefix-alignment-probe.ts` tests the obvious academic lever: `verifiedIndex` cuts the prefix at the
+first POSITIONAL mismatch of the outgoing-vs-received attack streams, so a single divergence truncates
+the rest — exactly what global sequence alignment (Needleman–Wunsch) / DTW exist to survive. The
+honest guardrail: a placement is verified only if its board matches, witnessed by the attack's
+amount+row, and the streams are 1:1 — so alignment may relax only the timing, never amount+row.
+Measured over all four sessions, that maximal honest relaxation recovers **+2 attacks total and 0
+extra forecasts**; the LCS-with-gaps ceiling (+81) is illusory because every gap is a non-1:1 match,
+i.e. a genuine board divergence. The one avenue timing-relaxation can't reach — **perfect-clear
+re-anchoring** (restart a verified interval at a mutual all-clear, where both boards are provably
+empty, an exact mid-round oracle) — is measured too: across all four sessions it yields **1 valid
+re-anchored interval and unlocks 0 forecasts** (bounded because the sim reproduces only ~7 of the
+~19 real PCs). So both honest alignment avenues are exhausted. The greedy break is a real board
+error, not a timing artifact, so no alignment/DTW/HMM/PC-re-anchor can extend coverage — the wall is
+the garbage-insertion model (system identification of the line-clear delay, which isn't even in the
+replay options and must be estimated), not the prefix gate.
+
+### Is the 0 a coverage artifact? Independent test, ignoring garbage (answer: no)
+
+`coverage-forecast-probe.ts` attacks the question from the other side: extend coverage by algorithms
+INDEPENDENT of the attack-timing gate, ignore garbage (the mechanism that caps coverage), and count
+line-clear forecasts. Three levers: the repo's BOARD-ONLY `frame+row` gate (drops the attack-table
+constraint a table error can wrongly truncate; +~140 placements); the **pre-garbage deterministic
+oracle** (before the first received garbage the board is a pure function of inputs+seed, verifiable
+with no garbage model — +2,192 placements, up to +47% in a session); and the absolute ceiling (the
+whole round, 100% coverage). Every one finds **0 verified line-clear forecasts**, and at the ceiling
+there is exactly **1 forecast_lineclear-labelled event across all four sessions, clause-rejected**.
+So the 0 is not hidden by the verified prefix — line-clear forecasts are absent by nature (this
+corpus is openers and self-builds). The count moves only with a genuine change in play.
+
+### Positive control: the detector DOES fire on a generated forecast
+
+Every test above is a negative control (real play, correctly not counted), which leaves open the
+worry that the 0 is a broken always-rejecting detector. `generated-forecast.test.ts` closes it: it
+GENERATES the spec's canonical forecast — Example A, J overhang over a pre-existing hole, a vertical
+I clearing the three rows between (non-spin), a T tuck for a Double — lifts it into a SimResult, runs
+the real `forecastMetric`, and it **verifies (forecast_lineclear, separation 2)**. Example B (a
+single) verifies too; F (T never spun) and G (slot pre-complete, separation 1) are rejected — and all
+four match the verdict the Dafny spec proves. So the corpus 0 is a true negative: the detector fires
+on a real forecast, it just never sees one in these replays. This is the one place the repo's three
+representations — ledger data, Dafny proof, and the simulator detector — are shown to agree on live
+boards.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
