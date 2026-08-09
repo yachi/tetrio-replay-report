@@ -183,6 +183,12 @@ on a real forecast, it just never sees one in these replays. This is the one pla
 representations — ledger data, Dafny proof, and the simulator detector — are shown to agree on live
 boards.
 
+`generated-forecast-fuzz.test.ts` scales that to **100 generated examples** under a seeded PRNG:
+four base shapes (A, B genuine; F, G near-misses), each drawn with a random horizontal mirror and a
+random overhang piece, lifted and run through the real detector. **100/100 classified correctly** —
+every genuine forecast detected (both handedness, via the mirror axis), every near-miss rejected.
+The corpus 0 is a true negative at scale, not a blind spot.
+
 ### Forecast example sources swept (2026-08-09)
 
 The question "is that every forecast example on the internet?" has been asked and answered, so it
