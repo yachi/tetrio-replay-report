@@ -93,5 +93,42 @@ export function rowsFromBoard(board: (string | null)[][]): string[] | null {
 }
 
 /** The catalogue's C-Spin entries. Named openers only — the wiki's C-Spin is a FAMILY, and the
- *  catalogue holds a handful of its members, which is what bounds any negative result here. */
+ *  catalogue holds a handful of its members, which is what bounds any negative result here.
+ *
+ *  READ THE NAMES THIS SELECTS BEFORE QUOTING A NEGATIVE FROM IT. All three are substring hits and
+ *  not one of them is the C-Spin as harddrop draws it: `Fake C-Spin {JP: 偽TKI}` is by its own name
+ *  a *fake*, `Secspin` is a different opener whose name merely ends in the letters, and the third is
+ *  a compound page listing `SDPC-Spin` among eight names. So "0 rounds near a catalogued C-Spin"
+ *  computed over THIS set alone would be a statement about a set that arguably contains no C-Spin —
+ *  which is why `NAME_SETS` below carries wider readings and the emitter reports all of them. */
 export const isCSpin = (name: string) => /c-?spin/i.test(name);
+
+/** TKI, the family the C-Spin is commonly identified with (`TKI-3 {Alt: TKI, JP: 開幕TSD}` and
+ *  three relatives, 18 pages). Kept separate from `isCSpin` rather than merged into it because
+ *  whether C-Spin *is* TKI is a taxonomy question this repo has no authority to settle. Reporting
+ *  both sets side by side settles the only thing that matters instead: whether the answer moves. */
+export const isTKI = (name: string) => /TKI/i.test(name);
+
+/** DT Cannon proper — the canonical 開幕DT砲 and the variants that name themselves after it.
+ *  The `(^|[^A-Za-z])` guard is load-bearing: a bare /DT ?Cannon/ also matches `SDT Cannon`,
+ *  `SDDT Cannon`, `SZDT Cannon` and `NEWDT Cannon` by substring, which would quietly widen the
+ *  "canonical" set to five openers it does not contain. Those live in `isDTFamily` instead. */
+export const isDTCannon = (name: string) => /(^|[^A-Za-z])DT ?Cannon/i.test(name);
+
+/** The widest defensible DT reading: any opener whose name carries "DT" at all (48 openers,
+ *  115 pages) — DDT, SDDT, SZDT, 91DT, Perfect DT and the rest. This is deliberately over-broad.
+ *  A negative that survives the over-broad set is not a negative about set membership. */
+export const isDTFamily = (name: string) => /DT/i.test(name);
+
+/** The named page sets the opener metrics are reported over, narrowest first within each subject.
+ *
+ *  Every set is emitted WITH ITS MEMBER NAMES (see emit-opener-facts.ts) so a reader can audit what
+ *  a number ranges over instead of trusting a regex they cannot see. The pairing is the point: a
+ *  distance reported over one set alone cannot be told apart from an artefact of choosing that set.
+ */
+export const NAME_SETS: { key: string; label: string; test: (name: string) => boolean }[] = [
+  { key: 'cspin', label: 'C-Spin (by name)', test: isCSpin },
+  { key: 'cspin_or_tki', label: 'C-Spin or TKI', test: n => isCSpin(n) || isTKI(n) },
+  { key: 'dt_cannon', label: 'DT Cannon', test: isDTCannon },
+  { key: 'dt_family', label: 'DT family (widest)', test: isDTFamily },
+];

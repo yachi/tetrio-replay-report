@@ -1069,6 +1069,8 @@ LAYOUT = [
 SELF_INSERTING = {
     "forecast": "conditional — only a session with sim/forecast-facts.json gets one; "
                 "build_report inserts it before the footer anchor",
+    "openers": "conditional — only a session with sim/opener-facts.json gets one; "
+               "build_report inserts it before the footer anchor, after forecast",
 }
 
 

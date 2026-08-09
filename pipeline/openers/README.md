@@ -11,7 +11,8 @@ recorded in the file and asserted in the test.
 
 ```fish
 bun run pipeline/openers/run-openers.ts sessions/2026-07-22 sessions/2026-07-24 \
-                                        sessions/2026-07-28 sessions/2026-08-01
+                                        sessions/2026-07-28 sessions/2026-08-01 \
+                                        sessions/2026-08-09
 REPLAY_DIR=sessions/2026-07-22 bun test pipeline/openers/openers.test.ts
 bun add tetris-fumen; bun run pipeline/openers/fetch-catalogue.ts   # only to re-vendor
 ```
@@ -27,22 +28,59 @@ Comparison is by **occupancy, not colour**: many catalogue pages are drawn all-g
 piece"), which is why opener_db's own front-end greys fumens before comparing. A colour test against
 a grey page can only fail.
 
-## What it found (2026-08-06, all four sessions)
+## What it found (2026-08-10, all five sessions)
 
 | | |
 |---|---|
-| rounds with a verified clean 7-piece first bag | **300** of 492 |
-| within 4 cells of any catalogued **C-Spin** | **0** — nearest band is 5–8 cells (220 rounds) |
-| rounds holding a `self_built` Triple | 219, and none of them within 4 cells of a C-Spin either |
+| rounds with a verified clean 7-piece first bag | **358** of 592 |
+| within 4 cells of any catalogued **C-Spin** | **0** — nearest is 6 cells |
+| within 4 cells of any catalogued **DT Cannon** | **0** — nearest is 6 cells |
+| rounds holding a `self_built` Triple | 264, and none of them near a C-Spin either |
 | exact first-bag matches | **5**, all of them PCO |
 
 So the players' Triples are **not** catalogued C-Spin openers, which retires the "self_built is
 C-Spin execution" reading. What survives is weaker and still measured: early roofs, triple-heavy,
 canonical TST slot geometry.
 
-**What bounds that negative:** the catalogue holds **3 distinct C-Spin openers, 8 drawn pages**. This
-is "not these C-Spins", not "no C-Spin anywhere". Widening it means a better catalogue, not a better
-matcher.
+## Which pages count as "a C-Spin" is the whole argument — so all four sets are reported
+
+A distance to "the C-Spin set" cannot be told apart from an artefact of picking that set, and this
+set is genuinely doubtful. `isCSpin` is a substring match, and **not one of the three names it
+selects is the C-Spin as harddrop draws it**:
+
+- `Fake C-Spin {JP: 偽TKI}` — by its own name a *fake*;
+- `Secspin {JP: None}` — a different opener whose name merely ends in those letters;
+- a compound page listing `SDPC-Spin` among eight names.
+
+`openers.test.ts` asserts exactly that, so if a future catalogue carries the real thing the test
+fails and this paragraph has to be rewritten rather than quietly outlived.
+
+The answer therefore has to be shown to survive the set choice, and `match.ts` defines four sets for
+that (`NAME_SETS`), reported side by side by `emit-opener-facts.ts`:
+
+| set | openers | pages | nearest, over 358 bags | within 4 cells |
+|---|---|---|---|---|
+| C-Spin (by name) | 3 | 8 | 6 cells | 0 |
+| C-Spin **or TKI** | 6 | 24 | 6 cells | 0 |
+| DT Cannon | 6 | 12 | 6 cells | 0 |
+| DT family (widest — any name carrying "DT") | 48 | 115 | 4 cells | 1 |
+
+The middle row is the one that matters. C-Spin is commonly identified with TKI, `TKI-3 {Alt: TKI}`
+is catalogued with 12 pages that `isCSpin` does not select, and **widening to it does not move the
+answer** — so the null does not depend on settling whether C-Spin *is* TKI, which is a taxonomy
+question this repo has no authority to settle. Same for DT: the narrow reading and the widest
+reading agree that nothing lands inside the threshold, with one board in 2026-07-22 sitting 4 cells
+from a DT-family page that the narrow set does not contain.
+
+For scale, against **any** catalogued opener: 5 of the 358 bags are exact (all PCO), 1 more is
+within 2 cells, **244 sit in the 3–4 band** and 104 in the 5–8 band. So boards do get close to the
+catalogue in general — the instrument is not simply reporting "far from everything" — and the
+C-Spin and DT rows are far in a way the `any` row is not. `Ichinoseki Variable` is the nearest page
+for 236 of the 358, which is a fact about these players' stacking, not about either opener here.
+
+**What still bounds the negative:** coverage, not the matcher. This is "not these catalogued pages",
+never "no C-Spin anywhere", and no distance threshold buys the stronger sentence. Widening it means
+a better catalogue — or an enumeration by construction — not better matching code. See ROADMAP.
 
 ## Controls
 
@@ -51,3 +89,18 @@ runs four before the result is allowed to mean anything: every C-Spin page fed b
 itself; each is found again mirrored; a board no opener draws is named as nothing; and a page
 shifted by one row is strictly further away than the page itself, which is what rules out a constant
 misalignment masquerading as "everyone plays a 3-cell variant".
+
+Three more guard the name sets themselves, because a regex that selects the wrong pages turns every
+number above into a sentence about nothing: what `isCSpin` selects is asserted by name; `isDTCannon`
+is required to carry `DT Cannon {JP: 開幕DT砲}` and to reject the four substring hits (`SDT`, `SDDT`,
+`SZDT`, `NEWDT` Cannon) that a bare `/DT ?Cannon/` would swallow; and TKI is required to be present
+under its own name, since otherwise the wide reading would be the narrow one reported twice.
+
+## The report metric
+
+`pipeline/sim/emit-opener-facts.ts` turns this into `sessions/<date>/sim/opener-facts.json`, which
+`pipeline/opener_section.py` renders into each report — quarantined exactly like the forecast
+section, with no claim ids and no ✓ badges, because it is simulator-derived. The first-bag
+comparison above is one of its three metrics; the other two are the **ordering** of the two T-spins
+(DT Cannon is a Double then a Triple, the C-Spin a Triple then a Double) and the **slot geometry**
+against harddrop's own diagrams. See that emitter's docstring for what each one's control is.

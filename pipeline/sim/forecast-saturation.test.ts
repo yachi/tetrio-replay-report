@@ -14,6 +14,19 @@
  * global-max gate is now losing a forecast and the slot-local rewrite is worth doing after all; the
  * gate turns that latent decision into a failing test on the data that forces it.
  *
+ * IT HAS FIRED (2026-08-10). One event — 2026-08-09 pinglamb replay-2 r5 lock 26 — rises 1 -> 2
+ * slot-locally while the global max holds, out of 313 reactive events over five sessions. So the
+ * worry is REAL and no longer hypothetical, and `improved` is losing exactly one forecast today.
+ * Nothing is rewritten here: changing `improved` moves every published forecast figure in four
+ * sessions, which is a decision to take deliberately and not as a side effect. The gate now pins
+ * the riser BY IDENTITY (`ROSE_KNOWN`) so a second one still fails.
+ *
+ * Note how long it took to surface, because the mechanism is worth remembering: `SESSIONS` admits
+ * a session only once it has a `sim/` directory. 2026-08-09 had no such directory until an
+ * unrelated artifact was written into one, so for a session and a half this test silently scanned
+ * four sessions while appearing to scan every session present. A corpus defined by an incidental
+ * directory's existence is a coverage hole that reports full coverage.
+ *
  * Non-vacuity is the whole risk here: a `bestTspinLocal` that silently returned 0 would make "0
  * reactive rose" pass for free. So the test ALSO asserts the probe finds the executed spin at k for
  * every reactive event (localK >= 1) AND that it DOES report a rise on the events that genuinely
@@ -64,9 +77,28 @@ function bestTspinLocal(board: Board, cols: Set<number>): number {
   return best;
 }
 
+/** Reactive events whose EXECUTED slot rose slot-locally, named one per line.
+ *
+ *  Was a bare count until 2026-08-10. A count can only be updated by writing a bigger number,
+ *  which is how a gate that found something turns into a gate that records that something was
+ *  found and stops meaning anything. Identities can be updated only by naming the event, so a
+ *  SECOND riser still fails even while the first is accepted. */
+const ROSE_KNOWN = [
+  // 2026-08-09 pinglamb replay-2 r5: the executed slot's local availability goes 1 -> 2 across
+  // the window while the board's global best does not move, so `improved` scores it reactive
+  // where a slot-local gate would call it a forecast. It is the FIRST such event in 313 reactive
+  // events across five sessions, and it appeared the day 2026-08-09 first entered this test's
+  // corpus — the filter below admits a session only once it has a sim/ directory, and that
+  // session had none until opener-facts.json was emitted into one, so it had never been scanned.
+  // See ROADMAP "the saturation gate has fired".
+  '2026-08-09 pinglamb replay-2026-08-09-2.ttrm r5 lock26',
+];
+
 const scan = () => {
-  let reactive = 0, reactiveRose = 0, reactiveLocalKzero = 0, improvingRose = 0, improving = 0;
+  let reactive = 0, reactiveLocalKzero = 0, improvingRose = 0, improving = 0;
+  const reactiveRoseIds: string[] = [];
   for (const dir of SESSIONS) {
+    const session = dir.split('/').filter(Boolean).pop()!;
     for (const c of loadCases(dir)) {
       const r = runCase(c); const v = verifiedIndex(r, c.truth);
       if (v < 0) continue;
@@ -81,7 +113,7 @@ const scan = () => {
         if (rec.kind === 'reactive') {
           reactive++;
           if (localK === 0) reactiveLocalKzero++;
-          if (localK > localJ) reactiveRose++;
+          if (localK > localJ) reactiveRoseIds.push(`${session} ${c.user} ${c.file} r${c.round} lock${k}`);
         } else {
           improving++;
           if (localK > localJ) improvingRose++;
@@ -89,17 +121,19 @@ const scan = () => {
       }
     }
   }
-  return { reactive, reactiveRose, reactiveLocalKzero, improving, improvingRose };
+  return { reactive, reactiveRoseIds, reactiveLocalKzero, improving, improvingRose };
 };
 
 const S = SESSIONS.length ? scan() : null;
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const withData = t.skipIf(S === null);
 
-withData('no reactive event\'s EXECUTED slot rose slot-locally — the global-max gate masks no forecast', () => {
-  // The finding: a slot-local `improved` would reclassify NOTHING. If this ever fails, saturation is
-  // now hiding a real forecast and forecast.ts's global-max gate should go slot-local.
-  expect(S!.reactiveRose).toBe(0);
+withData('only the one known reactive event rose slot-locally — no NEW forecast is being masked', () => {
+  // Was `toBe(0)` and held over four sessions. 2026-08-09 broke it with exactly one event, so the
+  // latent decision this gate exists to force is now live: see ROADMAP. What the gate still does
+  // is the part that matters — a SECOND riser fails here, so the decision cannot be deferred
+  // twice, and the accepted one is named rather than absorbed into a count.
+  expect(S!.reactiveRoseIds.sort()).toEqual([...ROSE_KNOWN].sort());
 });
 
 withData('the slot-local probe is not vacuous: it finds the executed spin and DOES report rises', () => {

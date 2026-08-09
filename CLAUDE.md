@@ -57,6 +57,10 @@ python3 -m pipeline.check_dead_consts sessions/<date>/report
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
+python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the C-Spin / DT 砲 section
+python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
+REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
+  --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
 bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
@@ -295,6 +299,37 @@ Two holes opened the moment the qualifier was written, and both are now gated:
    accept `==` happily. `smt.py` now maps operators explicitly and dies on an unknown one,
    and `spec.py`'s `c_field`/`c_dur` reject an unsupported operator at construction, so the
    failure is a build error rather than a solver error.
+
+## C-Spin 同 DT 砲 — the second quarantined section, and its three controls
+
+`sim/opener-facts.json` → `pipeline/opener_section.py`, gated by `check_opener_section.py`. Same
+quarantine as the forecast section and for the same reason: one simulator, no second independent
+implementation, so **no claim ids and no ✓ badges**, and nothing merges into `facts.json`.
+
+The two openers are the same pair of T-spins in the two orders — **DT 砲 is a Double then a Triple,
+the C-Spin a Triple then a Double** — which is why one section covers both. Order is a property
+`facts.json` does not have (it counts `tspin_doubles` and `tspin_triples`, not which came first), so
+it is exactly the kind of question the quarantined tier exists for.
+
+Each metric ships with the control that says what it is NOT, and each control is enforced, not
+merely documented:
+
+- **ordering** — control is *exposure*: scored only on rounds holding both spins, and re-run over
+  the whole simulated round so the short verified prefix cannot manufacture the result. Five
+  sessions: 221 of 221 run the C-Spin order, 0 the DT order; unwindowed, 277 of 277.
+- **first bag vs the catalogue** — control is *set choice*. `isCSpin` is a substring match whose
+  three hits are `Fake C-Spin`, `Secspin` and an `SDPC-Spin` compound — arguably no real C-Spin at
+  all — so every number is reported over a narrow and a widest reading of both openers
+  (`NAME_SETS`). The reportable finding is that the answer does not move. A null here is always
+  "not these catalogued pages", never "not this opener".
+- **slot geometry vs harddrop's 38 diagrams** — control is the *cross-tab by lines*, and it is the
+  reason this may be printed at all: ~9 in 10 Triples match the window against ~1 in 10 Doubles, so
+  it detects a Triple-shaped slot, not an opener. `check_opener_section.py` fails if the Doubles
+  sentence is deleted while the share stays, because that edit turns a shape test into "89% of
+  these were C-Spins".
+
+`emit-opener-facts.ts` exports `build()` so `openers.test.ts` can assert the committed artefact
+reproduces byte-for-byte — the same rule facts.json, the ledgers and the .dfy are held to.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

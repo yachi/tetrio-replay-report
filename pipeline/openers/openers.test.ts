@@ -14,13 +14,18 @@
  * Run: REPLAY_DIR=sessions/2026-07-22 bun test pipeline/openers/openers.test.ts
  */
 import { test, expect } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, distance,
-         cellsOf, isCSpin, ROWS } from './match.ts';
+         cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS } from './match.ts';
 import { analyse } from './run-openers.ts';
+import { build, serialise } from '../sim/emit-opener-facts.ts';
 
 const cat = loadCatalogue();
 const prepared = prepare(cat.pages);
 const cspin = prepared.filter(p => isCSpin(p.name));
+
+const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09'];
+const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 
 test('the vendored catalogue is the pinned upstream commit, decoded whole', () => {
   expect(cat.provenance.commit).toBe('b4a66878a47466b557165dec9171701bfeafab93');
@@ -79,14 +84,51 @@ test('a grid is always ROWS tall and cell counts survive the trim', () => {
   expect(cellsOf(['#.........', '##........'])).toBe(3);
 });
 
+/* ── the name sets, and what they actually select ──────────────────────────────────────────────
+ * The negatives this file pins are statements about SETS OF PAGES. A regex that quietly selects
+ * the wrong pages turns "no round played a C-Spin" into a sentence about nothing, so what each
+ * predicate picks is asserted by name rather than by count alone. */
+test('isCSpin selects three doubtful names, and that is the coverage caveat in code', () => {
+  const names = [...new Set(cat.pages.filter(p => isCSpin(p.name)).map(p => p.name))];
+  expect(names).toHaveLength(3);
+  // Not one of them is the C-Spin as harddrop draws it. If a future catalogue adds the real
+  // thing this test fails, which is the point: the caveat in openers/README.md and in the
+  // report section would then be wrong and must be rewritten.
+  expect(names.some(n => /^Fake C-Spin/.test(n))).toBe(true);
+  expect(names.some(n => /^Secspin/.test(n))).toBe(true);
+  expect(names.some(n => /SDPC-Spin/.test(n))).toBe(true);
+});
+
+test('the DT sets separate the cannon proper from the substring hits', () => {
+  const dtc = [...new Set(cat.pages.filter(p => isDTCannon(p.name)).map(p => p.name))];
+  expect(dtc.some(n => /^DT Cannon \{/.test(n))).toBe(true);       // 開幕DT砲 itself
+  // The word-boundary guard is load-bearing: a bare /DT ?Cannon/ swallows these four by
+  // substring and silently widens the "canonical" set to openers it does not contain.
+  for (const bogus of ['SDT Cannon', 'SDDT Cannon', 'SZDT Cannon', 'NEWDT Cannon'])
+    expect(dtc.some(n => n.startsWith(bogus))).toBe(false);
+  // ... while the widest reading does carry them, which is what makes it the widest reading
+  const fam = [...new Set(cat.pages.filter(p => isDTFamily(p.name)).map(p => p.name))];
+  for (const wide of ['SDDT Cannon', 'SZDT Cannon Opener', 'NEWDT Cannon'])
+    expect(fam.some(n => n.startsWith(wide))).toBe(true);
+  expect(fam.length).toBeGreaterThan(dtc.length);
+  expect(NAME_SETS.map(s => s.key)).toEqual(['cspin', 'cspin_or_tki', 'dt_cannon', 'dt_family']);
+});
+
+test('TKI is in the catalogue under its own name, so widening C-Spin to it is a real widening', () => {
+  // The whole reason `cspin_or_tki` exists: C-Spin is commonly identified with TKI, and TKI-3 is
+  // catalogued with 12 pages that `isCSpin` does not select. If this were empty, reporting the
+  // wide reading would be reporting the narrow one twice.
+  const tki = [...new Set(cat.pages.filter(p => isTKI(p.name)).map(p => p.name))];
+  expect(tki.some(n => /^TKI-3/.test(n))).toBe(true);
+  expect(prepared.filter(p => isTKI(p.name) && !isCSpin(p.name)).length).toBeGreaterThan(0);
+});
+
 /* ── the corpus result, pinned ────────────────────────────────────────────────────────────────
  * Slow (it simulates every round), so it runs only when the sessions are present. */
 test('no round comes within four cells of a catalogued C-Spin', () => {
-  const dirs = ['sessions/2026-07-22', 'sessions/2026-07-24', 'sessions/2026-07-28', 'sessions/2026-08-01']
-    .map(d => `${import.meta.dir}/../../${d}`);
-  const res = analyse(dirs);
+  const res = analyse(SESSIONS.map(sessionDir));
   const clean = res.filter(r => r.clean);
-  expect(clean.length).toBe(300);
+  expect(clean.length).toBe(358);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
   // ... and the instrument is not simply blind: it finds five exact matches, all the same opener
   const exact = clean.filter(r => r.exact!.asDrawn.length || r.exact!.asMirror.length);
@@ -94,5 +136,50 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   for (const r of exact)
     expect([...r.exact!.asDrawn, ...r.exact!.asMirror].some(n => /Perfect Clear Opener/.test(n))).toBe(true);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
-  expect(clean.filter(r => r.sbTriple).length).toBe(219);
+  expect(clean.filter(r => r.sbTriple).length).toBe(264);
 }, 300_000);
+
+/* ── the artifact the report reads ─────────────────────────────────────────────────────────────
+ * Every other artifact in this repo has to reproduce itself — the extractor must reproduce
+ * facts.json, codegen the .dfy, build_claims the ledger. A simulator artifact nothing can
+ * re-derive is a file nobody can check, so opener-facts.json is held to the same rule. */
+test('rebuilding every session reproduces its committed opener-facts.json byte for byte', () => {
+  for (const s of SESSIONS) {
+    const path = `${sessionDir(s)}/sim/opener-facts.json`;
+    process.env.REPLAY_DIR = sessionDir(s);
+    expect(serialise(build(sessionDir(s)))).toBe(readFileSync(path, 'utf8'));
+  }
+}, 300_000);
+
+test('the ordering metric separates the two openers, in every session, both players', () => {
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    for (const p of data.ordering.players) {
+      // Exposure first: a zero over rounds that never held both spins would say nothing at all.
+      expect(p.rounds_with_both).toBeGreaterThan(0);
+      // DT Cannon is a Double then a Triple; the C-Spin is a Triple then a Double. Every round
+      // holding both runs the C-Spin order and none runs the DT order — the finding this
+      // section exists to carry, pinned so a change to the simulator has to face it.
+      expect(p.dt_order).toBe(0);
+      expect(p.cspin_order).toBe(p.rounds_with_both);
+    }
+    // ... and it is not the verified-prefix window doing it: dropping the window adds exposure
+    // and leaves the split alone.
+    for (const p of data.ordering_full_round.players) {
+      expect(p.dt_order).toBe(0);
+      expect(p.cspin_order).toBe(p.rounds_with_both);
+    }
+  }
+});
+
+test('the slot-geometry test is a Triple-shape detector, which is why it is never a C-Spin count', () => {
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const by = Object.fromEntries(data.slot_geometry.rows.map((r: any) => [r.lines, r]));
+    // The control, asserted rather than described: Triples overwhelmingly match the wiki window
+    // and Doubles overwhelmingly do not. If these ever converge, the window has stopped
+    // discriminating and the section's control paragraph is no longer true.
+    expect(by[3].share_x1000).toBeGreaterThan(800);
+    expect(by[2].share_x1000).toBeLessThan(250);
+  }
+});

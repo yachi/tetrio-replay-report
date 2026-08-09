@@ -1022,7 +1022,25 @@ parked, not pending. Nothing here goes in a report until the above is satisfied.
 
 ### 2 — The C-Spin negative is bounded by CATALOGUE COVERAGE, not by the matcher
 
-`pipeline/openers/` establishes: 0 of 300 clean first bags come within four cells of a catalogued
+**Updated 2026-08-10: the corpus is five sessions now (358 clean bags), the same null holds, and it
+has been shown to survive the set choice — which is what the rest of this item asked for.** See
+`pipeline/openers/README.md` for the table. Two things changed:
+
+- **The C-Spin set is worse than "3 openers" suggested.** Not one of the three names `isCSpin`
+  selects is the C-Spin as harddrop draws it: `Fake C-Spin {JP: 偽TKI}` is by its own name a fake,
+  `Secspin` merely ends in those letters, and the third is a compound page listing `SDPC-Spin`
+  among eight names. The set arguably contains **zero** genuine C-Spins, so a null computed over it
+  alone was a statement about very little. `openers.test.ts` now asserts the three names, so this
+  paragraph fails a test rather than quietly outliving the catalogue.
+- **Widening it does not move the answer**, which is the finding that makes the null reportable.
+  C-Spin is commonly identified with TKI; `TKI-3 {Alt: TKI}` is catalogued with 12 pages `isCSpin`
+  does not select; adding them (6 openers, 24 pages) leaves the nearest bag at **6 cells** and the
+  within-4 count at **0**. So the null no longer depends on settling whether C-Spin *is* TKI. Same
+  shape for DT Cannon: narrow (6 openers) and widest (48 openers, any name carrying "DT") agree.
+
+What remains true and unfixed is the sentence below.
+
+`pipeline/openers/` establishes: 0 of 358 clean first bags come within four cells of a catalogued
 C-Spin. The catalogue behind that sentence is **3 distinct C-Spin openers across 8 drawn pages**, out
 of 360 openers and 783 pages. So the claim the repo can make is "**not these C-Spins**". "No C-Spin
 anywhere" is not available at any distance threshold, and no amount of tuning gets it.
@@ -1042,6 +1060,37 @@ missing is **data**:
 
 Until one of those exists, every C-Spin statement in this repo carries the coverage caveat, and
 `pipeline/openers/README.md` says so in the same words.
+
+**What the first bag could never answer, and now is answered elsewhere.** Board comparison asks
+"did they build this shape", which coverage bounds. The two openers are also distinguishable by
+something coverage cannot touch — the ORDER of their two T-spins. DT Cannon (開幕DT砲, "Double
+Triple Cannon") is a Double then a Triple; the C-Spin is a Triple then a Double. Over five sessions,
+of the 221 verified rounds holding both spins, **221 run the C-Spin order and 0 run the DT order**,
+and dropping the verified-prefix window widens it to 277/277 with the split unchanged. That is a
+clean separation with no catalogue in it at all, and it is the spine of the new report section
+(`pipeline/opener_section.py`, fed by `pipeline/sim/emit-opener-facts.ts`, quarantined outside the
+claims chain like the forecast section).
+
+### 2b — The saturation gate has fired, and the decision it defers is now live
+
+**`forecast-saturation.test.ts` held `reactiveRose === 0` over four sessions. On 2026-08-10 it went
+to one:** `2026-08-09 pinglamb replay-2 r5 lock 26` rises 1 → 2 slot-locally while the board's
+global best does not move, out of 313 reactive events across five sessions. So `improved`'s
+global-max gate is losing exactly one forecast today, and the slot-local rewrite the test was
+written to force is no longer hypothetical.
+
+**Not done here, deliberately.** Changing `improved` moves every published forecast figure in four
+sessions; that is a decision to take on its own terms, not as a side effect of adding an unrelated
+metric. The test now pins the riser BY IDENTITY rather than by count, so a second one still fails —
+a count can only be updated by writing a bigger number, which is how a gate that found something
+becomes a gate that records that something was found.
+
+**How it stayed hidden is the more useful half.** That test's `SESSIONS` admits a session only once
+it has a `sim/` directory. 2026-08-09 had none until `opener-facts.json` was written into one, so
+the test scanned four sessions while appearing to scan every session present — a corpus defined by
+an incidental directory's existence, reporting full coverage. Worth a sweep for the same shape
+elsewhere; `pipeline/sim/cross-tslot.test.ts` carries a hardcoded four-session list and has
+likewise never seen 2026-08-09.
 
 ## T-Spin Forecast — covering the definition's state space (2026-08-08)
 

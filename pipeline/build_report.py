@@ -24,7 +24,7 @@ import os
 import sys
 
 from pipeline import (appendix, chart_data, coaching, forecast_section, hero, matches,
-                      moments, records, region, stats_section)
+                      moments, opener_section, records, region, stats_section)
 
 
 def chart_section(ctx):
@@ -83,6 +83,12 @@ def forecast_sec(ctx):
     return forecast_section.section(forecast_section.load(ctx["report_dir"]))
 
 
+def opener_sec(ctx):
+    # Same quarantine as forecast_sec, same source discipline: the SESSION's
+    # sim/opener-facts.json, never facts.json. Returns None for a session with no such file.
+    return opener_section.section(opener_section.load(ctx["report_dir"]))
+
+
 def claims_island(ctx):
     return appendix.island(ctx["report_dir"])
 
@@ -105,6 +111,9 @@ SECTIONS = [
     # after the proof appendix, so a reader meets the trust chain before the thing
     # that is explicitly outside it
     ("forecast", '<footer class="report-footer">', forecast_sec, None),
+    # after the forecast section, so the two quarantined sections sit together below the
+    # trust chain rather than one of them being stranded among the proved ones
+    ("openers", '<footer class="report-footer">', opener_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),
     ("claims-data", '<footer class="report-footer">', claims_island,

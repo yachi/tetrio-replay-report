@@ -6248,6 +6248,77 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 </section>
 <!-- END generated forecast -->
 
+<!-- BEGIN generated openers (pipeline/build_report.py) -->
+<section id="openers">
+  <style>
+    #openers h3 { margin: 2.2rem 0 .1rem; font-size: 1.05rem; }
+    #openers h3:first-of-type { margin-top: 1.4rem; }
+  </style>
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">C-Spin 同 DT 砲（未經證明）</h2>
+
+    <div class="method-note">
+      <p><strong>同上面 T-Spin Forecast 一樣，呢節唔屬於信任鏈，請當佢係探索性資料。</strong>上面每個數都係兩個獨立 parser 抽出嚟、再由 Dafny 引理逐條證明；呢節嘅數由<strong>一個 replay 模擬器</strong>重跑操作記錄推導出嚟，得一份實作，所以<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>
+      <p>兩個定式，講嘅係同一對 T-spin 嘅兩個<strong>次序</strong>：<strong>DT 砲</strong>（開幕DT砲，Double Triple Cannon）係<em>先 Double 後 Triple</em>；<strong>C-Spin</strong> 係<em>先 Triple 後 Double</em>。次序係 <code>facts.json</code> 冇嘅嘢——佢淨係數到 <code>tspin_doubles</code> 同 <code>tspin_triples</code> 各有幾多個，數唔到邊個行先——所以呢條問題本來就只有模擬器答得到，亦都因為咁佢擺喺呢一節而唔係上面。</p>
+    </div>
+
+    <h3>一 · 次序</h3>
+    <div class="method-note"><p>可核嗰段入面，有 <strong>45</strong> 個回合（全部 77 個入面）同時有 T-spin Double 同 T-spin Triple，即係話呢啲回合本身有足夠材料行任何一個次序。而 <strong>45 個全部都係先 Triple 後 Double</strong>，即係 C-Spin 嗰個次序；行 DT 砲次序嘅係 <strong>0</strong> 個。呢個唔係「差唔多」，係完全冇重疊。攤開成個模擬回合（唔限可核嗰段）再計一次，就有 55 個回合兩種都有——睇長咗自然多咗回合入圍——但係<strong>分家嘅方式一模一樣</strong>：C-Spin 次序 55 個、DT 砲次序<strong>依然係 0</strong> 個。即係話呢個零唔係可核嗰段太短睇漏咗後面，睇多啲反而更加乾淨。</p></div>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr><th>玩家</th><th>可核回合</th><th>兩種 T-spin 都有</th><th>C-Spin 次序（先 Triple）</th><th>DT 砲次序（先 Double）</th><th>第一個 Triple 喺第幾手（min／中位／max）</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>pinglamb</td><td class="mono">40</td><td class="mono">24</td><td class="mono">24</td><td class="mono">0</td><td class="mono">12／13／15</td></tr>
+          <tr><td>yachi</td><td class="mono">37</td><td class="mono">21</td><td class="mono">21</td><td class="mono">0</td><td class="mono">12／13／17</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>
+    <div class="method-note">
+      <p>七手落完、冇消行、冇食垃圾嘅板一定有 28 格。攞佢同定式庫入面每一版同格數嘅圖比：783 版圖、360 個定式，出處係 <code>https://github.com/swng/opener_db</code>，釘死喺 commit <code>b4a66878</code>。呢個 session 有 <strong>72</strong> 個乾淨開局 bag（全部 128 個回合入面）。冇一個開局 bag 同任何一版定式一模一樣。</p>
+      <p>「最近」係<strong>逐格數唔同</strong>（Hamming），淨係同格數一樣嘅定式頁比，正著同反轉都比。揀邊啲頁做「C-Spin」同「DT 砲」本身就係一個判斷，所以呢度<strong>窄同闊兩種讀法都報</strong>：C-Spin 照名揀得 3 個定式（8 頁），加埋 TKI 就 6 個（24 頁）；DT 砲照名揀 6 個（12 頁），闊到「個名有 DT」就 48 個（115 頁）。C-Spin 窄定闊都係同一個答案；DT 窄定闊都係同一個答案——C-Spin 最近 6 格／6 格，DT 最近 6 格／6 格，4 格以內嘅回合數係 0／0 同 0／0。</p>
+    </div>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr><th>定式集</th><th>pinglamb 最近</th><th>pinglamb ≤4 格</th><th>yachi 最近</th><th>yachi ≤4 格</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>全部 360 個定式</td><td class="mono">4 格</td><td class="mono">32</td><td class="mono">4 格</td><td class="mono">21</td></tr>
+          <tr><td>C-Spin（照名揀）</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
+          <tr><td>C-Spin 或者 TKI</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
+          <tr><td>DT 砲</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
+          <tr><td>DT 家族（最闊）</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p><strong>呢個零係俾定式庫嘅覆蓋率封住嘅，唔係俾比對程式封住。</strong>照個名揀出嚟嘅所謂「C-Spin」頁得 3 個定式，而且個個都可疑：Fake C-Spin、Secspin、Single Double PC——第一個自己個名就叫「假」（偽TKI），第二個係名尾啱啱好有嗰幾個字母，第三個係一版夾埋八個名嘅合併頁。所以呢一格數講得出嘅係「唔係<em>呢啲</em>頁」，<strong>永遠唔係「冇打過 C-Spin」</strong>。要講到後者，要嘅係更闊嘅定式庫（或者由 J、L 搭蓋冚單格井去<em>窮舉</em>成個家族），唔係更好嘅比對程式——比對程式已經逐頁餵返自己、認得返鏡像、亂砌嘅板認唔出、差一行嘅板一定更遠。</p></div>
+
+    <h3>三 · 槽位幾何對唔對得上 wiki 畫嘅 C-Spin</h3>
+    <div class="method-note">
+      <p>攞 harddrop.com/wiki/C-Spin 自己嗰 38 個擺法做尺：每個擺法抽出隻 T 塞入去嗰陣、佢周圍嗰笪位嘅「有格／冇格」形狀（隻 T 自己嗰四格當冇），再攞真實對局落子前一刻同一笪位比。形一樣就係同一個槽位，唔理佢喺板邊個位。</p>
+    </div>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr><th>消行數</th><th>可核 T-spin</th><th>撞到 wiki 槽位</th><th>比率</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">3 行</td><td class="mono">71</td><td class="mono">61</td><td class="mono">85.9%</td></tr>
+          <tr><td class="mono">2 行</td><td class="mono">65</td><td class="mono">11</td><td class="mono">16.9%</td></tr>
+          <tr><td class="mono">1 行</td><td class="mono">10</td><td class="mono">0</td><td class="mono">0.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p><strong>睇個對照，唔好淨係睇 85.9%。</strong>消三行嘅 T-spin 有 85.9% 撞到 wiki 個槽位，但消兩行嘅只有 16.9%。兩個數擺埋一齊講嘅係：呢個測試分得出「三行定兩行」，分唔出「係咪 C-Spin 開局」——T-Spin Triple 本來就要一隻直放嘅 T 塞入一條有蓋單格井，個形就係咁，同用邊個開局打出嚟冇關係。所以呢 146 個可核 T-spin 入面撞到槽位嗰啲，<strong>唔可以當成 C-Spin 嘅次數</strong>，只可以當成「個窿位嘅形同 wiki 畫嘅一樣」。</p></div>
+  </div>
+</section>
+<!-- END generated openers -->
+
 <footer class="report-footer">
   yachi vs pinglamb · 第三回合 · 2026-07-28 · report.html generated from facts.json + claims ledgers · pipeline/build_report.py keeps this in sync
 </footer>

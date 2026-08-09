@@ -281,6 +281,22 @@ jobs:
             python3 -m pipeline.check_forecast_section "$W" --selftest
           fi
 
+      # The C-Spin / DT-Cannon section, same quarantine and the same re-render
+      # gate. It carries one extra invariant of its own: the slot-geometry share
+      # (~9 in 10 Triples match the wiki window, ~1 in 10 Doubles) may not be
+      # published without the Doubles comparison beside it. Keeping the share and
+      # dropping the control turns a shape test into "89% of these were C-Spins",
+      # which is the misreading the cross-tab exists to prevent — so the control
+      # sentence is checked for, and --selftest deletes it to prove the check bites.
+      - name: Check the simulator-derived C-Spin / DT Cannon section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_opener_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/opener-facts.json" ]; then
+            python3 -m pipeline.check_opener_section "$W" --selftest
+          fi
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail

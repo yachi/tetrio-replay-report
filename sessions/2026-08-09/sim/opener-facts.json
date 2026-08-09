@@ -1,0 +1,379 @@
+{
+  "schema": "opener-facts/1",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
+    "the slot-geometry match is a SHAPE test, not an opener test: 86.4% of Triples match the wiki window against 12.1% of Doubles, over 130 verified T-spins",
+    "the ordering metric is scored on 32 of 67 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+  ],
+  "session": "2026-08-09",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "simulator_options": {
+    "garbagespeed": 30,
+    "garbagecap": 8,
+    "locktime": 60,
+    "gravity": 0.02,
+    "sdfMode": "abs",
+    "insertMode": "onPlace",
+    "cancelMode": "all",
+    "acEmit": "separate",
+    "subframe": true,
+    "blockout": "shiftup",
+    "kickset": "SRS+"
+  },
+  "window_pieces": 21,
+  "near_cells": 4,
+  "definitions": {
+    "dt_order": "a T-spin Double before a T-spin Triple — DT Cannon (開幕DT砲) by definition",
+    "cspin_order": "a T-spin Triple before a T-spin Double — the C-Spin follow-up by definition"
+  },
+  "catalogue": {
+    "source": "https://github.com/swng/opener_db",
+    "commit": "b4a66878a47466b557165dec9171701bfeafab93",
+    "data_json_sha256": "d1fbade1f6df174766b5a354c6ab6d5be992e9c30cbaad3bc6ee1ba4a359a8bf",
+    "pages": 783,
+    "openers": 360,
+    "sets": {
+      "cspin": {
+        "label": "C-Spin (by name)",
+        "openers": 3,
+        "pages": 8,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}"
+        ]
+      },
+      "cspin_or_tki": {
+        "label": "C-Spin or TKI",
+        "openers": 6,
+        "pages": 24,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Amino TSD {JP: 開幕TSD亜種} / Kazu TKI {JP: None}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}"
+        ]
+      },
+      "dt_cannon": {
+        "label": "DT Cannon",
+        "openers": 6,
+        "pages": 12,
+        "names": [
+          "Center DT Cannon {JP: 確定DT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Super Speed DT Cannon {JP: 超DT}"
+        ]
+      },
+      "dt_family": {
+        "label": "DT family (widest)",
+        "openers": 48,
+        "pages": 115,
+        "names": [
+          "Soil MDDT {JP: None}",
+          "Bakkure SDT {JP: バックレSDT}",
+          "Chair SDT {JP: チェアSDT}",
+          "Dolphin {JP: None} / Misfire-Beta / Buhin SDT {JP: 舞浜SDT}",
+          "Juice ST {JP: ジュースST} / Deuru’s SDT {JP: でうる式SDT}",
+          "Pure SDT {JP: ピュアSDT}",
+          "SDDT Cannon {JP: SDDT砲}",
+          "SDT Cannon {JP: SDT砲}",
+          "SDT’s {JP: None}",
+          "SDTT {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Snail SDT {JP: スネイルSDT}",
+          "Flavor {JP: 風味} / Swift DTD {JP: スウィフトDTD}",
+          "Great DDT {JP: グレートDDT}",
+          "Pseudo 91 DT {JP: 杭DTもどき}",
+          "Variable DDT {JP: バリアブルDDT}",
+          "91DT {JP: 杭DT}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "Fast DT {JP: ファーストDT}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}",
+          "Flamingo DT {JP: フラミンゴDT}",
+          "airDT {JP: none}",
+          "AntiRotationDT {JP: none}",
+          "Center DT Cannon {JP: 確定DT砲}",
+          "Crescent DT {JP: クレセントDT}",
+          "Cycle DT {JP: サイクルDT}",
+          "DDT Cannon {JP: DDT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Gill DT {JP: ジルDT}",
+          "Hijiki DT {JP: ひじきDT}",
+          "HOLE DTD {JP: none}",
+          "Illuminate DT {JP: イルミネイトDT}",
+          "Muko DT {JP: 婿DT}",
+          "NEWDT Cannon {JP: NEWDT砲}",
+          "Parallel DT {JP: パラレルDT}",
+          "Pyramid DT {JP: ピラミッドDT}",
+          "Risu DT {JP: りすDT}",
+          "Sharp Jasda Logistics DT {JP: シャープジャスダロジスティクスDT}",
+          "Speerde Stacking {JP: スピアード積み} / Oxygen DT PC {JP: 酸素DTパフェ} / Beacon 6-3 {JP: None}",
+          "Starlight DT {JP: スターライトDT}",
+          "Super Speed DT Cannon {JP: 超DT}",
+          "SZDT 2 {JP: SZDT改}",
+          "SZDT Cannon Opener {JP: 開幕SZDT砲}",
+          "Toro DTD {JP: トロDTD}",
+          "Unbalance DT {JP: アンバランスDT}"
+        ]
+      }
+    }
+  },
+  "wiki_cspin": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38
+  },
+  "first_bag": {
+    "rounds": 100,
+    "clean": 58,
+    "players": [
+      {
+        "user": "pinglamb",
+        "clean_first_bags": 31,
+        "exact_matches": [],
+        "nearest": {
+          "any": {
+            "min_cells": 4,
+            "within_threshold": 28,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 28,
+              "5-8": 3,
+              "9-14": 0,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 28,
+              "9-14": 3,
+              "15+": 0
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 28,
+              "9-14": 3,
+              "15+": 0
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 8,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 1,
+              "9-14": 30,
+              "15+": 0
+            }
+          },
+          "dt_family": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 31,
+              "9-14": 0,
+              "15+": 0
+            }
+          }
+        }
+      },
+      {
+        "user": "yachi",
+        "clean_first_bags": 27,
+        "exact_matches": [],
+        "nearest": {
+          "any": {
+            "min_cells": 4,
+            "within_threshold": 11,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 11,
+              "5-8": 16,
+              "9-14": 0,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 11,
+              "9-14": 16,
+              "15+": 0
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 12,
+              "9-14": 15,
+              "15+": 0
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 8,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 7,
+              "9-14": 20,
+              "15+": 0
+            }
+          },
+          "dt_family": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 26,
+              "9-14": 1,
+              "15+": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ordering": {
+    "scope": "verified prefix",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 32,
+        "rounds_with_tspin_double": 16,
+        "rounds_with_tspin_triple": 32,
+        "rounds_with_both": 16,
+        "dt_order": 0,
+        "cspin_order": 16,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 16,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 14
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 35,
+        "rounds_with_tspin_double": 26,
+        "rounds_with_tspin_triple": 23,
+        "rounds_with_both": 16,
+        "dt_order": 0,
+        "cspin_order": 16,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 15,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 16
+        }
+      }
+    ]
+  },
+  "ordering_full_round": {
+    "scope": "whole simulated round, verification NOT required",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 32,
+        "rounds_with_tspin_double": 28,
+        "rounds_with_tspin_triple": 32,
+        "rounds_with_both": 28,
+        "dt_order": 0,
+        "cspin_order": 28,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 28,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 14
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 35,
+        "rounds_with_tspin_double": 32,
+        "rounds_with_tspin_triple": 23,
+        "rounds_with_both": 21,
+        "dt_order": 0,
+        "cspin_order": 21,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 20,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 16
+        }
+      }
+    ]
+  },
+  "slot_geometry": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38,
+    "rows": [
+      {
+        "lines": 1,
+        "n": 5,
+        "drawn": 0,
+        "mirrored": 0,
+        "matched": 0,
+        "share_x1000": 0
+      },
+      {
+        "lines": 2,
+        "n": 66,
+        "drawn": 5,
+        "mirrored": 3,
+        "matched": 8,
+        "share_x1000": 121
+      },
+      {
+        "lines": 3,
+        "n": 59,
+        "drawn": 14,
+        "mirrored": 37,
+        "matched": 51,
+        "share_x1000": 864
+      }
+    ]
+  }
+}
