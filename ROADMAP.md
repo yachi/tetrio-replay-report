@@ -1255,8 +1255,12 @@ several did not survive that check and are called out below.
 
 ### New, carried so they are not lost
 
-- **`roofIsGarbage` has no fixture at all** — 0 of 654, same vacuity class as 4b was, and it was not
-  on the original item-4 list.
+- **`roofIsGarbage` anti-vacuity — CLOSED 2026-08-09.** Was 0 of 654 with no fixture, same vacuity
+  class as 4b. Unlike `garbageLoadBearing` it gates no classification — it is the diagnostic
+  `run-forecast.ts` prints as "roof literally IS garbage (strongest signal)" — so the fix is one
+  discriminating pair rather than a population: `roofOwner: -1` (garbage overhang) → true,
+  `roofOwner: 2` (built) → false, both non-empty, mutation-checked (hardcoding the flag false fails
+  the test). `forecast.test.ts`.
 - **`determinable` degrades silently at `j = -1`.** Even with the crash fixed, a garbage roof has
   `determinable === false`, so the strict clause-2 rule falls back to loose co-occurrence there.
 - **Layer 1 of the numerator gate is deferred.** A branded `VerifiedCount` type would make a

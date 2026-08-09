@@ -93,6 +93,22 @@ test('reactive: roof built by the immediately preceding piece, nothing in betwee
   expect(r.records[0]!.separation).toBe(1);
 });
 
+test('roofIsGarbage discriminates a garbage overhang from a built one (anti-vacuity)', () => {
+  // `roofIsGarbage` is 0 of 654 across all four sessions and gates no classification — it is the
+  // diagnostic `run-forecast.ts` prints as "roof literally IS garbage (strongest signal)". With no
+  // fixture it was 0-of-0: every "0 garbage roofs" reading would hold identically if the flag were
+  // hardcoded false, never computed, or read the wrong provenance value. `roofOwner: -1` marks the
+  // cells directly above the T as garbage provenance; a real placer index marks them player-built.
+  // Both arms must be non-empty, exactly like the `garbageLoadBearing` families — a single instance
+  // states the flag CAN be true; the pair states it DISCRIMINATES, which is what the diagnostic claims.
+  const garbageRoof = forecastMetric(mk({ tLock: 3, tCells: T_CELLS, roofOwner: -1 })).records;
+  const builtRoof = forecastMetric(mk({ tLock: 3, tCells: T_CELLS, roofOwner: 2 })).records;
+  expect(garbageRoof).toHaveLength(1);
+  expect(builtRoof).toHaveLength(1);
+  expect(garbageRoof[0]!.roofIsGarbage).toBe(true);
+  expect(builtRoof[0]!.roofIsGarbage).toBe(false);
+});
+
 test('forecast_lineclear: a line clear falls between roof-build and execution', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2] }));
   expect(r.records[0]!.kind).toBe('forecast_lineclear');
