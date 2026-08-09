@@ -63,6 +63,9 @@ python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously t
 python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts) agree with the
                                            #   proven witnesses (ForecastExamples.dfy); --write regens
                                            #   spec/forecast-examples.json, --selftest proves teeth
+python3 -m pipeline.sim.extract_jp_forecast # re-extract the 38 Tetrisちゃんねる forecast diagrams from
+                                           #   their JPEGs (needs Pillow); --write regens the JSON.
+                                           #   CI gate is bun test pipeline/sim/jp-forecast.test.ts
 ```
 
 ## Three backends, one spec

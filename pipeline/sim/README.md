@@ -96,6 +96,15 @@ the rounding, or the metric set changes, and date it.
   `wiki-tspin-forecast-boards.json` — 29 board diagrams parsed from harddrop.com. The boards
   *and* the expectations come from the wiki, never from this engine. There is one copy of that
   file and this test reads it; do not add a second.
+- **A second, Japanese corpus.** `jp-forecast.test.ts` reads `jp-forecast-boards.json` — the 38
+  T-Spin Forecast (予報の技法) diagrams from Tetrisちゃんねる. Harddrop encodes its boards as HTML
+  cell-tables, so they parse from text; this page ships JPEGs, so the grids are read by a
+  deterministic pixel sampler (`extract_jp_forecast.py`) over the images committed under
+  `spec/fixtures/jp-forecast/` — never by eye, so it is not single-source hand data. The bun test
+  is the CI gate (integrity, image binding, palette coverage, three human-read golden anchors);
+  `python3 -m pipeline.sim.extract_jp_forecast` re-extracts byte-identically from the images
+  (needs Pillow). These are step-by-step setup frames with no per-board label, so — unlike the
+  harddrop set — the section-premise spin checks do not apply and are deliberately not asserted.
 - **Coverage** — 100% of lines and functions in `forecast.ts`.
 
 ## Two hazards worth knowing before you trust output
