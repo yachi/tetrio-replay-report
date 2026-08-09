@@ -53,13 +53,13 @@ module ForecastExamples {
     ensures WellFormed(h, e)
     ensures IsForecastTriple(h, e) && IsForecastAnyClear(h, e) && IsForecastShape(h, e)
     ensures ClosedByPlain(h, e) == 3 && ClosedBySpins(h, e) == 0
-    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, true, true)
+    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, true, true, 0, 0)
     ensures e.floorAt - e.roofAt == 6                        // before
     ensures BothSurvive(h, e)
     ensures FloorFinal(h, e).row - RoofFinal(h, e).row == 3  // after: the T-Spin Double geometry
   {
     h := [ Step([17, 18, 19], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 15, 21, true, true);
+    e := Event(0, 2, 15, 21, true, true, 0, 0);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
     assert Advance(h[0], 15) == 18 && Advance(h[0], 21) == 21;
   }
@@ -72,10 +72,10 @@ module ForecastExamples {
     ensures IsForecastAnyClear(h, e)     // "one or more clears, none of them a T-spin"
     ensures !IsForecastTriple(h, e)      // "a clear of three lines"
     ensures ClosedByPlain(h, e) == 1
-    ensures h == [ Step([19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 17, 21, true, true)
+    ensures h == [ Step([19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 17, 21, true, true, 0, 0)
   {
     h := [ Step([19], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 17, 21, true, true);
+    e := Event(0, 2, 17, 21, true, true, 0, 0);
     assert CountBetween([19], 17, 21) == 1;
     assert Advance(h[0], 17) == 18 && Advance(h[0], 21) == 21;
   }
@@ -93,10 +93,10 @@ module ForecastExamples {
     ensures GapClosed(h, e) && ClosedByPlain(h, e) == 3   // clauses 1, 3 and 4 all hold
     ensures !HolePreExisted(e)
     ensures !IsForecastAnyClear(h, e) && !IsForecastShape(h, e)
-    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, false, true)
+    ensures h == [ Step([17, 18, 19], false, 0), Step([], true, 0) ] && e == Event(0, 2, 15, 21, false, true, 0, 0)
   {
     h := [ Step([17, 18, 19], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 15, 21, false, true);
+    e := Event(0, 2, 15, 21, false, true, 0, 0);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
   }
 
@@ -138,10 +138,10 @@ module ForecastExamples {
     ensures ClosedBySpins(h, e) == 3 && ClosedByPlain(h, e) == 0
     ensures !IsForecastAnyClear(h, e)
     ensures h == [ Step([17, 18, 19], true, 0), Step([], true, 0) ]
-         && e == Event(0, 2, 15, 21, true, true)
+         && e == Event(0, 2, 15, 21, true, true, 0, 0)
   {
     h := [ Step([17, 18, 19], true, 0), Step([], true, 0) ];
-    e := Event(0, 2, 15, 21, true, true);
+    e := Event(0, 2, 15, 21, true, true, 0, 0);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
     CSpinIsNotAForecast(h, e, 1);
   }
@@ -166,10 +166,10 @@ module ForecastExamples {
     ensures FloorFinal(h, e).row - RoofFinal(h, e).row == e.floorAt - e.roofAt
     ensures ClosedByPlain(h, e) == 0
     ensures !GapClosed(h, e) && !IsForecastShape(h, e)
-    ensures h == [ Step([21], false, 4), Step([], true, 0) ] && e == Event(0, 2, 16, 20, true, true)
+    ensures h == [ Step([21], false, 4), Step([], true, 0) ] && e == Event(0, 2, 16, 20, true, true, 0, 0)
   {
     h := [ Step([21], false, 4), Step([], true, 0) ];
-    e := Event(0, 2, 16, 20, true, true);
+    e := Event(0, 2, 16, 20, true, true, 0, 0);
     assert CountBetween([21], 16, 20) == 0;
     // both absolute positions, not only their difference: a mutation dropping the `- garbageRows`
     // term in Advance moves the pair together too, so the difference alone would not see it
@@ -184,10 +184,10 @@ module ForecastExamples {
     ensures WellFormed(h, e)
     ensures HolePreExisted(e) && GapClosed(h, e) && ClosedByPlain(h, e) == 3
     ensures !Tucked(e) && !IsForecastShape(h, e)
-    ensures h == [ Step([17, 18, 19], false, 0), Step([], false, 0) ] && e == Event(0, 2, 15, 21, true, false)
+    ensures h == [ Step([17, 18, 19], false, 0), Step([], false, 0) ] && e == Event(0, 2, 15, 21, true, false, 0, 0)
   {
     h := [ Step([17, 18, 19], false, 0), Step([], false, 0) ];
-    e := Event(0, 2, 15, 21, true, false);
+    e := Event(0, 2, 15, 21, true, false, 0, 0);
     assert CountBetween([17, 18, 19], 15, 21) == 3;
   }
 
@@ -203,7 +203,7 @@ module ForecastExamples {
     ensures !IsForecastShape(h, e)
   {
     h := [ Step([], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 18, 21, true, true);
+    e := Event(0, 2, 18, 21, true, true, 0, 0);
   }
 
   // ===============================================================================================

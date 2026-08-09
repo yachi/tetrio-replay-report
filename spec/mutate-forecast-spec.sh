@@ -106,3 +106,10 @@ run "the window runs past the spin's own lock" \
    s|Track(h, e.j, e.k - 1, At(e.floorAt))|Track(h, e.j, e.k, At(e.floorAt))|
    s|RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), true)|RemovedBetween(h, e.j, e.k, At(e.roofAt), At(e.floorAt), true)|
    s|RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), false)|RemovedBetween(h, e.j, e.k, At(e.roofAt), At(e.floorAt), false)|'
+
+# --- the `improved` guard added 2026-08-09 (ROADMAP item 7) --------------------------------------
+# `Improved` compares availAtK against availAtJ strictly. Weakening `>` to `>=` reclassifies an event
+# whose availability held steady as improved. Killed by GapCanCloseWithoutImproving, whose witness has
+# availAtJ == availAtK == 2 and asserts !Improved — false the moment the comparison admits equality.
+run "Improved admits equality (> -> >=)" \
+  's|{ e.availAtK > e.availAtJ }|{ e.availAtK >= e.availAtJ }|'

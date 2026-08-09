@@ -435,7 +435,11 @@ module Forecast {
     roofAt: int,        // overhang's row, at step j's lock
     floorAt: int,       // row of the cell the nose will rest on, at step j's lock
     holeOpenAtJ: bool,  // was the cell directly above that floor already empty at step j?
-    spinAtK: bool       // did the piece at step k finish as a T-spin?
+    spinAtK: bool,      // did the piece at step k finish as a T-spin?
+    // The two fields `improved` compares (pipeline/sim/forecast.ts:511-516). See the MODELLING
+    // `improved` section for why they are `nat`, why `<= 3`, and why they stay pure extractor input.
+    availAtJ: nat,      // bestTspinLines(board at step j's lock)   -- availAtRoof
+    availAtK: nat       // bestTspinLines(board at step k-1's lock) -- availAtSpin
   )
 
   // ---------------------------------------------------------------------------------------------
@@ -467,6 +471,7 @@ module Forecast {
     && 0 <= e.j < e.k <= |h|
     && e.roofAt < e.floorAt          // the overhang is above the hole's floor
     && e.spinAtK == h[e.k - 1].wasSpin   // clause 1's flag is the history's flag, not a second one
+    && e.availAtJ <= 3 && e.availAtK <= 3 // a T occupies at most three rows, so bestTspinLines is in 0..3
   }
 
   predicate Tucked(e: Event) { e.spinAtK }
@@ -552,7 +557,7 @@ module Forecast {
     ensures e.k == e.j + 1 && Tucked(e) && HolePreExisted(e)
   {
     h := [ Step([], true, 0) ];
-    e := Event(0, 1, 25, 29, true, true);
+    e := Event(0, 1, 25, 29, true, true, 0, 0);
   }
 
   lemma TripleIsStricter(h: History, e: Event)
@@ -724,8 +729,100 @@ module Forecast {
     ensures ClosedByPlain(h, e) == 0 && ClosedBySpins(h, e) == 0
   {
     h := [ Step([], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, true, true);
+    e := Event(0, 2, 25, 27, true, true, 0, 0);
   }
+
+  // ---------------------------------------------------------------------------------------------
+  // MODELLING `improved` (ROADMAP item 7, 2026-08-09).
+  //
+  // `improved` is the implementation's dominant filter — it performs 653 of the 654 corpus
+  // exclusions — and was the single largest thing this spec did not model. It sat on the inventory
+  // as BLOCKED on the premise "a finite max needs a bounded position set". That premise is FALSE:
+  // `improved` (pipeline/sim/forecast.ts:515) is
+  //
+  //     availAtSpin > availAtRoof
+  //
+  // where availAtRoof = bestTspinLines(board at step j) and availAtSpin = bestTspinLines(board at
+  // step k-1). `bestTspinLines` is a max over LINE COUNTS, and a T-piece occupies at most three
+  // rows, so BOTH sides are in 0..3 whatever the board — the bound is on the max's VALUE, not on
+  // the position set the BFS searches. Boundedness of the position set is needed to COMPUTE the max
+  // in a terminating search; it is NOT needed to STATE it, and Dafny is being asked to state it.
+  //
+  // WHAT THIS PROVES, AND WHAT IT DELIBERATELY DOES NOT.
+  //
+  // `Improved` and `GapClosed` are DIFFERENT predicates, and `ImprovedIsNotGapClosed` proves it in
+  // both directions on game-producible inputs. That is the whole claim. It is NOT a proof that
+  // `availAtJ`/`availAtK` are computed correctly, nor that `Improved` and clause 3 measure the same
+  // thing — they do not, which is exactly why the implementation needs `improved` on TOP of the
+  // gap machinery, and why modelling it was worth doing.
+  //
+  // WHY THE FIELDS STAY ABSTRACT (not grounded in `h` the way `spinAtK` now is). `spinAtK` could be
+  // tied to the history because `h[e.k - 1].wasSpin` already carries "was the k-th lock a spin".
+  // `availAtJ`/`availAtK` are `bestTspinLines(board)` — statements about which CELLS are filled —
+  // and `Step` carries `clearedRows`, `wasSpin`, `garbageRows` and no board at all (the same note
+  // sits on `holeOpenAtJ`/`roofAt`/`floorAt` at the `WellFormed` convention above). There is
+  // nothing in `h` to derive them from, so grounding them is the board-carrying-`Step` model change
+  // that ROADMAP items 4+8 are consolidated around, NOT a stronger invariant. They are therefore
+  // the third and fourth pure-extractor fields on `Event`, and the deliverable is scoped to match:
+  // a difference theorem, which cannot be mistaken for validation of the search.
+  // ---------------------------------------------------------------------------------------------
+
+  // The available T-spin lines rose between the overhang landing and the T going in. `bestTspinLines`
+  // is bounded by 3, which `WellFormed` records; the predicate itself only compares the two.
+  predicate Improved(e: Event) { e.availAtK > e.availAtJ }
+
+  // THE DIFFERENCE THEOREM, in two halves. `Improved` and `GapClosed` disagree in BOTH directions,
+  // so neither is a restatement of the other — on well-formed, game-producible inputs, not merely as
+  // symbols. Split across two `returns` lemmas rather than one: evaluating GapClosed (which unfolds
+  // Track over the window) for one witness while also carrying the other re-derives enough to time
+  // out, the same encoding cost `SpinRowsDoNotCountTowardClause4` records. Each half pins its tracked
+  // positions, which is what takes the obligation from a timeout to about a second.
+  //
+  // These witnesses ARE the anti-vacuity evidence `check_spec_vacuity.py` asks for: a `returns` lemma
+  // states its own reachability, following `SeparationOneIsReachable`, instead of leaving the
+  // verifier to search for one.
+
+  /**
+   * `Improved && !GapClosed`. The available spin ROSE (availAtK 2 > availAtJ 0) while the tracked
+   * roof/floor gap did NOT close. This is the real shape behind `improved`'s independence: a slot can
+   * open ELSEWHERE on the board (garbage, or a clear outside the pair) and lift `bestTspinLines`
+   * without removing anything from between THIS overhang and THIS hole. The history is inert here, so
+   * the gap is untouched.
+   */
+  lemma ImprovedNeedNotCloseTheGap() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures Improved(e) && !GapClosed(h, e)
+  {
+    h := [ Step([], false, 0), Step([], true, 0) ];
+    e := Event(0, 2, 25, 27, true, true, 0, 2);
+    assert RoofFinal(h, e) == At(25) && FloorFinal(h, e) == At(27);   // separation unchanged at 2
+  }
+
+  /**
+   * `!Improved && GapClosed`. The tracked gap DID close — one plain row (26) taken from between the
+   * pair — while the available spin did NOT rise (availAtK == availAtJ). Clause 3 fires; `Improved`
+   * does not. The equality of the two avail fields is what kills the `> -> >=` mutant: under `>=`,
+   * `2 >= 2` would make this event `Improved`, contradicting the ensures.
+   */
+  lemma GapCanCloseWithoutImproving() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures !Improved(e) && GapClosed(h, e)
+  {
+    h := [ Step([26], false, 0), Step([], true, 0) ];
+    e := Event(0, 2, 25, 27, true, true, 2, 2);
+    assert CountBetween([26], 25, 27) == 1;
+    assert RoofFinal(h, e) == At(26) && FloorFinal(h, e) == At(27);   // separation falls 2 -> 1
+  }
+
+  /**
+   * `Improved` reads ONLY the two `Event` fields — it never consults `h`. Stated as a theorem so an
+   * edit that quietly makes `Improved` depend on the history (which would silently change what the
+   * predicate means, and what the difference theorem above compares against) fails here. No
+   * hypotheses, so `check_spec_vacuity.py` does not probe it; it is a definitional identity.
+   */
+  lemma ImprovedIsPurelyAnEventProperty(h: History, e: Event)
+    ensures Improved(e) <==> e.availAtK > e.availAtJ
+  { }
 
   // ---------------------------------------------------------------------------------------------
   // ANTI-VACUITY. Every lemma above is of the form "this is NOT a forecast", and all of them hold
@@ -745,7 +842,7 @@ module Forecast {
     ensures ClosedByPlain(h, e) == 1
   {
     h := [ Step([26], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, true, true);
+    e := Event(0, 2, 25, 27, true, true, 0, 0);
     assert CountBetween([26], 25, 27) == 1;
     assert Advance(h[0], 25) == 26 && Advance(h[0], 27) == 27;
     assert ClosedByPlain(h, e) == 1;
@@ -760,7 +857,7 @@ module Forecast {
     ensures !IsForecastAnyClear(h, e) // ... and it is still not a forecast
   {
     h := [ Step([26], true, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, true, true);
+    e := Event(0, 2, 25, 27, true, true, 0, 0);
     assert CountBetween([26], 25, 27) == 1;
     assert ClosedByPlain(h, e) == 0;
     assert ClosedBySpins(h, e) == 1;
@@ -776,7 +873,7 @@ module Forecast {
     ensures !IsForecastAnyClear(h, e)
   {
     h := [ Step([26], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, false, true);
+    e := Event(0, 2, 25, 27, false, true, 0, 0);
     assert CountBetween([26], 25, 27) == 1;
   }
 
@@ -789,7 +886,7 @@ module Forecast {
     ensures !IsForecastAnyClear(h, e)
   {
     h := [ Step([26], false, 0), Step([], false, 0) ];
-    e := Event(0, 2, 25, 27, true, false);
+    e := Event(0, 2, 25, 27, true, false, 0, 0);
     assert CountBetween([26], 25, 27) == 1;
   }
 
@@ -819,7 +916,7 @@ module Forecast {
     ensures IsForecastAnyClear(h, e)
   {
     h := [ Step([26], false, 0), Step([27], true, 0) ];
-    e := Event(0, 2, 25, 29, true, true);
+    e := Event(0, 2, 25, 29, true, true, 0, 0);
     assert CountBetween([26], 25, 29) == 1;
     assert Advance(h[0], 25) == 26 && Advance(h[0], 29) == 29;
   }
@@ -835,7 +932,7 @@ module Forecast {
     ensures !IsForecastAnyClear(h, e)
   {
     h := [ Step([], false, 4), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, true, true);
+    e := Event(0, 2, 25, 27, true, true, 0, 0);
     assert Advance(h[0], 25) == 21 && Advance(h[0], 27) == 23;
     GarbageNeverClosesAGap(h[0], 25, 27);
   }
@@ -860,7 +957,7 @@ module Forecast {
     ensures !IsForecastShape(h, e)        // false ONLY because the gap never closed
   {
     h := [ Step([], false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 27, true, true);
+    e := Event(0, 2, 25, 27, true, true, 0, 0);
     // Both tracked positions, pinned. Not decorative: without them the mutant that inverts the
     // gap test sends this obligation past 26 s and the whole mutant reads as UNRESOLVED (see
     // spec/mutate-forecast-spec.sh). With them it fails in 1.3 s, which is what a kill looks like.
@@ -986,7 +1083,7 @@ module Forecast {
     RangeSeqNoneBelow(26, n, 26 + n);
     RangeSeqBetween(26, n, 25, 26 + n);
     h := [ Step(cleared, false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 26 + n, true, true);
+    e := Event(0, 2, 25, 26 + n, true, true, 0, 0);
     assert Advance(h[0], 25) == 25 + n;
     assert Advance(h[0], 26 + n) == 26 + n;
     assert RoofFinal(h, e) == At(25 + n) && FloorFinal(h, e) == At(26 + n);
@@ -1028,7 +1125,7 @@ module Forecast {
     ensures IsForecastTriple(h, e)
   {
     h := [ Step([26, 27], false, 0), Step([28], false, 0), Step([], true, 0) ];
-    e := Event(0, 3, 25, 30, true, true);
+    e := Event(0, 3, 25, 30, true, true, 0, 0);
   }
 
   /**
@@ -1039,7 +1136,7 @@ module Forecast {
    * the split lemma above.
    */
   const SPIN_THEN_PLAIN: History := [ Step([26], true, 0), Step([27], false, 0), Step([], true, 0) ]
-  const SPIN_THEN_PLAIN_EVENT: Event := Event(0, 3, 25, 29, true, true)
+  const SPIN_THEN_PLAIN_EVENT: Event := Event(0, 3, 25, 29, true, true, 0, 0)
 
   lemma SpinRowsDoNotCountTowardClause4()
     ensures WellFormed(SPIN_THEN_PLAIN, SPIN_THEN_PLAIN_EVENT)
@@ -1087,7 +1184,7 @@ module Forecast {
     RangeSeqBelow(30, n, 29);
     RangeSeqBetween(30, n, 29, 30 + n);
     h := [ Step(cleared, false, 0), Step([], true, 0) ];
-    e := Event(0, 2, 25, 29, true, true);
+    e := Event(0, 2, 25, 29, true, true, 0, 0);
     assert CountBetween(cleared, 25, 29) == 0 by { CountBelowSplit(cleared, 25, 29); }
     assert Advance(h[0], 25) == 25 + n && Advance(h[0], 29) == 29 + n;
     assert ClosedByPlain(h, e) == 0;
