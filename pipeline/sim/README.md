@@ -88,7 +88,7 @@ the rounding, or the metric set changes, and date it.
   **This file used to claim the harness validated itself with control mutants — "three
   semantics-preserving edits must survive and a poison mutant (spawn column 3→9) must die". No
   such mutants exist, and none ever did.** At `0dde1d8`, the commit that wrote that sentence, the
-  harness held 13 entries and contained neither the word `spawn` nor any notion of a control; at
+  harness held 11 entries and contained neither the word `spawn` nor any notion of a control; at
   `2911eb8` it held 49, still with no `spawn` and no expected-verdict field. `git log --all -S`
   finds no such entry in any commit. The sentence described a regime nobody built, and its
   companion — "a sweep where everything dies is a syntax error, not a passing gate" — condemned
