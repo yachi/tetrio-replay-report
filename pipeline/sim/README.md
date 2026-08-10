@@ -84,9 +84,25 @@ the rounding, or the metric set changes, and date it.
 ## What is verified, and how
 
 - **Mutation — 50/50.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
-  The harness validates itself with control mutants: three semantics-preserving edits must
-  **survive** and a poison mutant (spawn column 3→9) must **die**. A sweep where everything dies
-  is a syntax error, not a passing gate.
+
+  **This file used to claim the harness validated itself with control mutants — "three
+  semantics-preserving edits must survive and a poison mutant (spawn column 3→9) must die". No
+  such mutants exist, and none ever did.** At `0dde1d8`, the commit that wrote that sentence, the
+  harness held 13 entries and contained neither the word `spawn` nor any notion of a control; at
+  `2911eb8` it held 49, still with no `spawn` and no expected-verdict field. `git log --all -S`
+  finds no such entry in any commit. The sentence described a regime nobody built, and its
+  companion — "a sweep where everything dies is a syntax error, not a passing gate" — condemned
+  every honest run this harness has ever produced, since with no controls **50/50 killed is the
+  correct result**. It was false on the day it was written and survived because it reads exactly
+  like the kind of thing this project does do.
+
+  The machinery now exists even though the controls do not: each entry carries an optional
+  `expect`, defaulting to `killed`, and the run fails when any observed verdict differs from its
+  expected one — so a killed control fails as loudly as a surviving mutant. That is what makes a
+  control *possible*, and it forces an equivalence claim to be declared rather than tolerated,
+  which is this file's own doctrine: a surviving mutant is either a missing test or a
+  proven-equivalent mutant, and "probably equivalent" is not a status this project accepts.
+  Adding the controls is open work.
 
   Two failure modes it could not report until 2026-08-10, both of which had already bitten it.
   A find string that no longer matches used to throw and **abort the sweep mid-list**, after
