@@ -1325,3 +1325,52 @@ several did not survive that check and are called out below.
   hand-rolled numerator a *compile* error rather than a scanner finding — the right fix — but this
   tree has no typechecker (no tsconfig, no tsc step; `check_ts_imports.py` is the homemade stand-in).
   Its true cost is "adopt a typecheck step for the whole TS tree", a separate decision.
+
+## BFS arrival key — landed, and what it left behind (2026-08-10)
+
+`bestTspin` deduped on `(rotation, col, row)` while its admission test also read the arrival mode,
+so a shift or soft-drop reaching a position first discarded the kicked rotation arrival behind it.
+Found by porting cold-clear-2's movegen as a second opinion, which keys on `Placement` (spin
+included) and does not lose it. Fixed in `0b0aaf6`; proved in `spec/BfsKey.dfy` (`dfd2834`);
+191 of 8 995 verified-prefix boards gained exactly one line, 0 lost, published classifications
+unchanged on all five sessions, every committed `forecast-facts.json` byte-identical. Open items
+below are what the work turned up and did not close.
+
+- **`bfs-cap.ts` measures a REPLICA of the search, not the search.** It imports `sim.ts` and
+  `vendor/core/srs.ts` and never imports `forecast.ts`; it walks its own copy of the BFS. So it
+  printed the same 688 for the shipped and the fixed engine, and **that agreement is worth nothing
+  as evidence** — it cannot disagree with an engine it never calls. The real queue is 848 under the
+  landed key. Point it at `bestTspin`, or the next reader trusts a number the engine no longer
+  produces. This is the same class as「a gate exercised only against the input it already passes」.
+- **The control mutants `pipeline/sim/README.md` claimed do not exist and never did** — corrected in
+  `8d44543`, but corrected by *deleting the claim*, not by building them. The machinery now exists:
+  each entry in `mutate-forecast.ts` carries an optional `expect` defaulting to `killed`, and a
+  mismatch in either direction fails the run, so a killed control fails as loudly as a surviving
+  mutant. What is missing is the controls themselves — a semantics-preserving edit that must
+  survive, and a poison mutant that must die. Until they exist the harness still cannot detect its
+  own breakage, which is precisely what the deleted sentence pretended it could.
+- **`mutate-forecast.ts` restores its startup snapshot unconditionally.** It snapshots `forecast.ts`,
+  plants, tests, restores — with no check that the file moved underneath it, so a concurrent write is
+  silently overwritten. Strictly worse than the abort fixed in `d17a454`, because it destroys work
+  rather than mis-reporting. Recorded as a KNOWN HAZARD in the file header; the guard (compare
+  against the snapshot before restoring, refuse rather than clobber) is not written. Two related
+  traps, both hit on 2026-08-10 and both now documented: a planted mutant in a tracked file is
+  exactly `+1/-1` on `git diff --stat`, and a test run against a planted tree reports plausible
+  failures that are not regressions.
+- **`arrival-key.test.ts` is not in the mutation baseline.** `mutate-forecast.ts`'s default set is
+  `['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts']`, so the fixture that
+  proves this whole fix contributes no kills to the main sweep. Nothing measurable changes today —
+  all 50 already die — but there is no mutant in that harness for the arrival key at all, so a
+  future revert would be caught only by the separate `mutate-arrival-key.ts`. Either add the file to
+  the default set, or add a `key/revert-to-position` entry, or state why neither is wanted.
+- **`sessions/2026-08-09/sim/forecast-facts.json` does not exist**, so the newest session is
+  uncovered by the forecast-section gate — `verify.yml:280` guards it with `if [ -f ... ]` and simply
+  skips. Pre-existing, unrelated to this work, and it means the blast radius of any forecast change
+  is silently four sessions rather than five.
+- **The `cc-movegen.ts` standing gate is not built.** `cc-tslot.ts` cross-checks slot *presence* by
+  shape-matching and structurally could not have caught this defect, which is about *reachability*.
+  A cold-clear-2 port did catch it. Port from **CC2** (MIT/Apache — CC1 is MPL-2.0, see `fba5ddc`),
+  run with `fast_mode` pruning disabled or it under-reports, carry an anti-vacuity liveness
+  assertion, and state that it shares this engine's **no-180-rotation** blind spot so it can never
+  detect the `wiki-fixtures.test.ts` `UNREACHABLE = {31,35,37}` class. No claim ids, no badges, same
+  quarantine as `cc-tslot.ts`.
