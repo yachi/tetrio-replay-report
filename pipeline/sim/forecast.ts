@@ -85,7 +85,8 @@ import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.t
  * once for the process instead of once per board.
  */
 const V_ROT = 4, V_COL_MIN = -2, V_COL_N = 12, V_ROW_MIN = -4, V_ROW_N = 48;
-const visitStamp = new Uint32Array(V_ROT * V_COL_N * V_ROW_N);
+const visitStamp = new Uint32Array(V_ROT * V_COL_N * V_ROW_N);   // expansion dedup
+const rotStamp   = new Uint32Array(V_ROT * V_COL_N * V_ROW_N);   // evaluation dedup: rotation arrivals only
 let visitGen = 0;
 
 function visitIndex(rotation: number, col: number, row: number): number {
@@ -116,9 +117,35 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
     return false;
   };
   seenOrMark(0, 3, 18);
-  const q: { p: ActivePiece; rot: boolean; kick: boolean }[] = [{ p: spawn, rot: false, kick: false }];
+  const outsideRot = new Set<string>();
+  /**
+   * True if a ROTATION arrival at this position was already evaluated; marks it either way.
+   *
+   * The key deliberately omits the kick bit, and that omission is licensed by exactly one
+   * reading: inside `detectTSpin`, `usedKick` is consumed at a single line (`sim.ts:108`) where
+   * it chooses `'full'` vs `'mini'` — and both are `!== 'none'`, which is the whole of this
+   * search's admission test. So a kicked and an unkicked rotation arrival at the same position
+   * are indistinguishable TO `bestTspin`, and one evaluation entry per position suffices.
+   *
+   * ⚠️ This is NOT a claim that the kick bit is redundant. `usedKick` stays load-bearing for
+   * `simulate()` at `sim.ts:216`, which records the actual spin type for scoring, where 'full'
+   * and 'mini' are worth different attack. The collapse is valid for `bestTspin` only; do not
+   * carry it into any caller that distinguishes the two.
+   */
+  const rotSeenOrMark = (rotation: number, col: number, row: number): boolean => {
+    const i = visitIndex(rotation, col, row);
+    if (i < 0) {
+      const k = `${rotation}:${col}:${row}`;
+      if (outsideRot.has(k)) return true;
+      outsideRot.add(k); return false;
+    }
+    if (rotStamp[i] === gen) return true;
+    rotStamp[i] = gen; return false;
+  };
+  const q: { p: ActivePiece; rot: boolean; kick: boolean; expand: boolean }[] =
+    [{ p: spawn, rot: false, kick: false, expand: true }];
   for (let h = 0; h < q.length && h < 40000; h++) {
-    const { p: cur, rot, kick } = q[h]!;
+    const { p: cur, rot, kick, expand } = q[h]!;
     const d = hardDrop(board, cur);
     if (d.row === cur.row && rot && detectTSpin(board, d, true, kick) !== 'none') {
       const after = board.map(r => [...r]) as (string | null)[][];
@@ -139,13 +166,23 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
         bestRows = [...rows, Math.min(...rows) - 1];
       }
     }
+    if (!expand) continue;
     const nexts: [ActivePiece | null, boolean][] = [
       [tryMove(board, cur, -1, 0), false], [tryMove(board, cur, 1, 0), false],
       [tryMove(board, cur, 0, 1), false], [tryRotate(board, cur, 1), true], [tryRotate(board, cur, -1), true]];
     for (const [n, isRot] of nexts) {
       if (!n) continue;
-      if (seenOrMark(n.rotation, n.col, n.row)) continue;
-      q.push({ p: n, rot: isRot, kick: isRot && (n.col !== cur.col || n.row !== cur.row) });
+      const isKick = isRot && (n.col !== cur.col || n.row !== cur.row);
+      // A non-rotation arrival can NEVER satisfy the spin test (`rot` gates it), so it needs no
+      // pair entry — it is only ever worth enqueuing to expand a position not yet expanded.
+      // Rotation arrivals get the full (position, arrival) evaluation key.
+      if (!isRot) {
+        if (seenOrMark(n.rotation, n.col, n.row)) continue;
+        q.push({ p: n, rot: false, kick: false, expand: true });
+        continue;
+      }
+      if (rotSeenOrMark(n.rotation, n.col, n.row)) continue;
+      q.push({ p: n, rot: true, kick: isKick, expand: !seenOrMark(n.rotation, n.col, n.row) });
     }
   }
   return best > 0 ? { lines: best, rows: bestRows } : null;
@@ -162,20 +199,41 @@ export function bestTspinLines(board: Board): number {
  * This was a second, independently written BFS until 2026-07-30. The two agreed on every one of
  * 932 random boards, and the duplication was not merely redundant — the copies carried different
  * BFS caps (20000 vs 40000), a divergence waiting to happen. Merging them removed the divergence;
- * what it does NOT rest on is the caps being provably dead. `q` only grows when a fresh
- * `rotation:col:row` key enters `seen`, so the key space bounds it — but only two of those three
- * coordinates are bounded by the engine. Columns are: `isValidPosition` rejects any cell outside
- * 0..9, and the T's anchor is offset from its cells asymmetrically per rotation, so the anchor
- * runs -1..7 in R (its leftmost cell sits at offset 1), 0..8 in L (its rightmost cell does), and
- * 0..7 in 0/2 — a union of -1..8, still 10 values but not the 0..9 previously assumed, and the
- * 4x10 product is loose because no single rotation admits all ten. Rows are NOT bounded:
- * `vendor/core/srs.ts:129` is `if (row < 0) continue`, so every negative row is a legal position
- * and nothing in the collision test stops a piece climbing. CONDITIONAL on rows staying in
- * [-2, 39] the bound is 4*10*42 = 1680; that side condition needs kick-table reasoning (a piece
- * rises only on a kick, a kick only fires when the [0,0] candidate is blocked, and the JLSZT table
- * lifts at most 2), which is a sketch nobody has turned into a proof. So 1680 is an assumption,
- * the measured max of 688 (bfs-cap.ts, 2000 boards) is the evidence, and `h < 40000` is a LIVE
- * belt rather than dead code.
+ * what it does NOT rest on is the caps being provably dead. Since 2026-08-10 the search carries
+ * TWO dedup keys, so what bounds `q` has to be said twice over:
+ *
+ * A **position** is `rotation:col:row`, and that is what `seenOrMark`/`visitStamp` key — it is the
+ * expansion key, and it is exactly the old one, because a state's successors are a function of the
+ * position alone (`tryMove`/`tryRotate` never read how the state was entered). A **queue entry** is
+ * a (position, arrival) pair, and `rotSeenOrMark`/`rotStamp` key the second of those: one extra
+ * entry per position, admitting a rotation arrival that a shift or a soft-drop would otherwise have
+ * marked away. So the queue is bounded by |positions| x |arrivals|, and |arrivals| here is 2.
+ *
+ * Only two of the three position coordinates are bounded by the engine. Columns are:
+ * `isValidPosition` rejects any cell outside 0..9, and the T's anchor is offset from its cells
+ * asymmetrically per rotation, so the anchor runs -1..7 in R (its leftmost cell sits at offset 1),
+ * 0..8 in L (its rightmost cell does), and 0..7 in 0/2 — a union of -1..8, still 10 values but not
+ * the 0..9 previously assumed, and the 4x10 product is loose because no single rotation admits all
+ * ten. Rows are NOT bounded: `vendor/core/srs.ts:129` is `if (row < 0) continue`, so every negative
+ * row is a legal position and nothing in the collision test stops a piece climbing.
+ *
+ * Four numbers live nearby and mean four different things; keep them apart:
+ *
+ * - **1680** = 4*10*42 is the position bound CONDITIONAL on rows staying in [-2, 39]. That side
+ *   condition needs kick-table reasoning (a piece rises only on a kick, a kick only fires when the
+ *   [0,0] candidate is blocked, and the JLSZT table lifts at most 2), which is a sketch nobody has
+ *   turned into a proof. 1680 is therefore an ASSUMPTION, undischarged.
+ * - **2304** = 4*12*48 is the size of `visitStamp` (and now of `rotStamp`). It is a direct-address
+ *   FAST PATH, not a bound: `visitIndex` returns -1 outside the window and the search falls back to
+ *   an exact `Set`, so a position beyond 2304 is slower, never dropped.
+ * - **688** is the measured maximum number of distinct POSITIONS over 2 000 boards (`bfs-cap.ts`).
+ *   It is key-independent — successors depend on position alone, so splitting the key cannot change
+ *   it — and it is not a queue length in either variant.
+ * - **848** is the measured maximum PAIR QUEUE under this collapsed 2-valued arrival key. That is
+ *   1.23 entries per position, not the 2 the product allows.
+ *
+ * So `h < 40000` is a LIVE belt rather than dead code — it guards against the unbounded-row case
+ * that no proof excludes — and against the measured 848 it leaves 40000/848 ~= 47x of headroom.
  */
 export function tspinAvailable(board: Board): boolean {
   return bestTspinLines(board) > 0;
