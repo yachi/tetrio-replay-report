@@ -63,6 +63,8 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
   --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
+dafny verify spec/BfsKey.dfy               # why bestTspin's visited key carries the arrival mode
+bash spec/mutate-bfskey.sh                 # its mutants — a lemma none can kill is decorative
 bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
 python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true
 python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts) agree with the

@@ -490,7 +490,7 @@ jobs:
       - name: Verify the spec
         run: |
           set -euo pipefail
-          for f in spec/Forecast.dfy spec/ForecastExamples.dfy; do
+          for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy; do
             out=$(dafny verify "$f" 2>&1) || true
             echo "$out" | tail -1
             case "$out" in
