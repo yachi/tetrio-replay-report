@@ -127,3 +127,53 @@ test('the simulator detector agrees with the Dafny-proven verdicts', () => {
   expect({ A: verdict(A), B: verdict(B), F: verdict(F), G: verdict(G) })
     .toEqual({ A: true, B: true, F: false, G: false });
 });
+
+// --- Dig-forecast: the forecast opens a hole in the GARBAGE field --------------------------------
+// SYNTHETIC reconstruction, not a capture. Inspired by a narikura_Tetris Short (掘りREN defence) where
+// the same three-beat shape as Example B plays out over received garbage rather than player stack:
+// S overhang (roof) → an I that clears one garbage row (external, non-spin, single) → a T that tucks
+// under the S into the slot the cleared row opened. Every A/B/F/G example above puts the opened hole in
+// the PLAYER stack; this is the one case where it sits in garbage (provenance -1), which is where dig
+// play naturally produces forecasts and low-garbage opener corpora do not. `liftDig` marks the initial
+// 'G' cells as garbage-owned (-1) instead of synthetic-lock-0, so floorOrigin is read against a real
+// pre-existing garbage hole. It is here, with the other GENERATED controls, and deliberately NOT in
+// lift-external.test.ts, which is reserved for faithfully machine-extracted external captures.
+function liftDig(init: string[], steps: Step[]) {
+  const board = place(init);
+  // garbage cells (glyph 'G') are owned by the garbage stream (-1); other filled cells by lock 0.
+  const prov: (number | null)[][] = board.map(r => r.map(c => (filled(c) ? (c === 'G' ? -1 : 0) : null)));
+  const boards = [board.map(r => [...r])];
+  const provSnaps = [prov.map(r => [...r])];
+  const locks: any[] = [{ frame: 0, piece: 'I', cells: [], cleared: 0, spin: 'none', allclear: false }];
+  steps.forEach((s, si) => {
+    const idx = si + 1, q = place(s.panel), cells: { col: number; row: number }[] = [];
+    for (let r = 0; r < H; r++) for (let c = 0; c < W; c++)
+      if (filled(q[r]![c]) && !filled(board[r]![c])) cells.push({ col: c, row: r });
+    for (const cell of cells) { board[cell.row]![cell.col] = s.piece; prov[cell.row]![cell.col] = idx; }
+    const full: number[] = [];
+    for (let r = 0; r < H; r++) if (board[r]!.every(filled)) full.push(r);
+    for (const r of full) {
+      board.splice(r, 1); board.unshift(new Array(W).fill(null));
+      prov.splice(r, 1); prov.unshift(new Array(W).fill(null));
+    }
+    locks.push({ frame: idx * 100, piece: s.piece, cells, cleared: full.length, spin: s.spin, allclear: false });
+    boards.push(board.map(r => [...r])); provSnaps.push(prov.map(r => [...r]));
+  });
+  return { lines: 0, placed: 0, holds: 0, clears: {}, garbage: { sent: 0, received: 0, cleared: 0, attack: 0 },
+    topbtb: 0, topcombo: 0, boards, records: [], events: [], locks, garbageEvents: [], provSnaps, topout: false } as any;
+}
+
+const DIG = liftDig(
+  ['..........', 'XXX...XX..', 'GGGGGGGG..', 'GGGG.GGGGG', '.GGGGGGGGG'],
+  [{ panel: ['...S......', '.SSS......', 'XXX...XX..', 'GGGGGGGG..', 'GGGG.GGGGG', '.GGGGGGGGG'], piece: 'S', spin: 'none' },
+   { panel: ['...S......', '.SSS......', 'XXX...XXII', 'GGGGGGGGII', 'GGGG.GGGGG', '.GGGGGGGGG'], piece: 'I', spin: 'none' },
+   { panel: ['...S......', '.SSS......', 'XXXTTTXXII', 'GGGGTGGGGG', '.GGGGGGGGG'], piece: 'T', spin: 'full' }]);
+
+test('a forecast that opens a hole in GARBAGE is detected (the dig-forecast mechanism)', () => {
+  const out = forecastMetric(DIG, true);
+  const t = out.records.find((r: any) => r.spin === 'full')!;
+  expect(t.kind).toBe('forecast_lineclear');
+  expect(t.separation).toBe(2);                 // S roof (lock 1), I clear (lock 2), T tuck (lock 3)
+  expect(t.floorOrigin).toBe('pre-existed');    // the opened hole is a real, pre-existing garbage hole
+  expect(out.records.filter(isVerifiedForecast).length).toBe(1);
+});
