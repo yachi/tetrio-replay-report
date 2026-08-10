@@ -1,3 +1,16 @@
+// SPDX-FileCopyrightText: Cold Clear contributors
+// SPDX-License-Identifier: MPL-2.0
+//
+// This file is a TypeScript port of MinusKelvin/cold-clear
+// `bot/src/evaluation/standard.rs` (the `detect_shape!` macro and its six invocations).
+// Cold Clear is licensed under the Mozilla Public License 2.0; as a Modification under
+// MPL-2.0 §1.10(b), this file remains under that licence while the rest of this
+// repository stays MIT, as MPL-2.0 §3.3 permits for a Larger Work.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at
+// http://mozilla.org/MPL/2.0/.
+
 /**
  * cold-clear's T-slot detectors, ported from MinusKelvin/cold-clear
  * `bot/src/evaluation/standard.rs` (the `detect_shape!` macro and its six invocations).

@@ -196,6 +196,10 @@ Some field semantics are non-obvious and cost real debugging to establish:
 Replays are from matches between **yachi** and **pinglamb**, published with the agreement
 of both players.
 
-Code and tooling: [MIT](LICENSE). The replay files and report text describe real matches
-between real people — please do not repurpose them to characterise either player outside
-this context.
+Code and tooling: [MIT](LICENSE), with one exception — `pipeline/sim/cc-tslot.ts` is a port
+of [MinusKelvin/cold-clear](https://github.com/MinusKelvin/cold-clear)'s T-slot detectors and
+stays under that project's [MPL-2.0](LICENSES/MPL-2.0.txt), as its own header records. MPL is
+file-level copyleft (§3.3), so that one file is MPL and everything else is MIT.
+
+The replay files and report text describe real matches between real people — please do not
+repurpose them to characterise either player outside this context.
