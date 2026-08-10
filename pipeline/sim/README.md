@@ -19,7 +19,7 @@ than living inside one. Every runner therefore needs `REPLAY_DIR`.
 cd pipeline/sim
 set -x REPLAY_DIR (git rev-parse --show-toplevel)/sessions/2026-07-22
 
-bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts forecast-corpus.test.ts
+bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts forecast-corpus.test.ts arrival-key.test.ts
 bun run mutate-forecast.ts   # defaults to the fixture files PLUS forecast-corpus.test.ts
 bun run board-metrics.ts ../../sessions/2026-07-22   # ROADMAP triage of board-derived metrics
 bun run run-forecast.ts
@@ -47,12 +47,12 @@ Pairing is simulated once and cached to `pairs-cache.json` (gitignored; delete t
 The cache key includes the replay directory, so pointing `REPLAY_DIR` at another session cannot
 poison this one's entry.
 
-Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08-08**:
+Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08-10**:
 
 | command | result |
 |---|---|
-| the four test files | 68 pass, 0 fail, 1008 assertions |
-| `mutate-forecast.ts` | 42/42 killed |
+| the `bun test` line above | 103 pass, 0 fail, 8200 assertions, **8 files** |
+| `mutate-forecast.ts` | 50/50 killed |
 | `run-forecast.ts` | pinglamb 97 tucked / 0 forecast / 0.0% · yachi 115 / 0 / 0.0% |
 | `auc.ts` | 50.0 · 50.0 · 50.0 · 57.0 · 50.0 — every forecast metric ties now that the rate is 0 |
 
@@ -83,10 +83,30 @@ the rounding, or the metric set changes, and date it.
 
 ## What is verified, and how
 
-- **Mutation — 24/24.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
+- **Mutation — 50/50.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
   The harness validates itself with control mutants: three semantics-preserving edits must
   **survive** and a poison mutant (spawn column 3→9) must **die**. A sweep where everything dies
   is a syntax error, not a passing gate.
+
+  Two failure modes it could not report until 2026-08-10, both of which had already bitten it.
+  A find string that no longer matches used to throw and **abort the sweep mid-list**, after
+  printing a wall of `killed` lines and no summary — which reads exactly like success. It had been
+  doing that at mutant 46 of 49 for some time, so mutants 46-49 had never run at all and the
+  count quoted here was stale in both numbers. A stale entry is now reported as `STALE`, the sweep
+  continues, and the run exits non-zero naming every one — because **a mutant that cannot be
+  applied is not a mutant that was killed, and the old output could not tell you which happened.**
+  The run also now fails when any mutant's observed verdict differs from its **expected** verdict,
+  which is stricter than "a survivor fails" and is what keeps the controls honest: a killed
+  control is as much a failure as a surviving mutant.
+
+  **Do not run this against the worktree while anyone is editing `forecast.ts`.** It snapshots the
+  file at startup and restores that snapshot unconditionally at the end, with no check that the
+  file moved underneath it — so a concurrent write is silently overwritten. For the same reason a
+  planted mutant sitting in the tree is indistinguishable from ordinary work by every summary
+  statistic: a one-line mutation is exactly `+1/-1` on `git diff --stat`, and a test run against a
+  planted tree reports plausible failures that are not regressions. Both traps were hit on
+  2026-08-10. Verify restoration with `cmp` against a pre-sweep copy, never with "the tests pass
+  again".
 - **Attribution is measured.** `strip-tests.ts` removes named tests so a kill can be traced to
   them. Strip the two rotation/spin fixtures and 6 mutants survive; restore them and it is 11/11.
 - **Property tests over 932 seeded random boards** (`property-forecast.test.ts`), with an
@@ -255,10 +275,24 @@ match-level rate. `validate.ts` is what establishes which prefixes are trustwort
 | `forecast-boards.ts` | re-export shim so fixtures import one surface |
 | `*.test.ts` | unit, external-golden, and property suites |
 | `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |
-| `bfs-cap.ts` | measures how far the BFS runs from its cap (max 688 over 2000 boards) |
+| `bfs-cap.ts` | how far the BFS runs from its cap — but against a REPLICA of the search, see below |
 | `pairs.ts` | winner-vs-loser pairing, shared by both AUC consumers |
 | `run-forecast.ts`, `auc.ts`, `validate.ts` | the runners that produce the published figures |
 | `auc-power.ts` | CIs, exact tests, power, and required sample size for those figures |
+
+## `bfs-cap.ts` measures a replica, and its number is a state count
+
+**It does not import `forecast.ts`.** Its imports are `sim.ts` and `vendor/core/srs.ts`; it walks
+its own copy of the search. So whatever it prints is structurally blind to any change in the real
+BFS — it cannot disagree with an engine it never calls, and an agreement it reports across two
+variants of that engine is therefore worth nothing as evidence. Point it at the real `bestTspin`
+before quoting it again.
+
+The figure it used to be quoted for, `max 688 over 2000 boards`, is also easy to read as the wrong
+quantity: it is the **largest number of states any sampled board reached**, which is what the
+20000 / 40000 caps are counted in. It is not a bound on queue length, and it is sampled evidence
+rather than a proof — the file's own header says so, and says the caps stay live belts because of
+it.
 
 ## Do not quote an AUC from here without `auc-power.ts`
 
