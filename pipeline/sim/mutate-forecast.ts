@@ -16,7 +16,33 @@ const BAK = './forecast.ts.mutbak';
 const GUARD = `if (d.row === cur.row && rot && detectTSpin(board, d, true, kick) !== 'none') {`;
 //                occurrence 1 = bestTspinLines, occurrence 2 = tspinAvailable
 
-interface Mutant { name: string; note: string; find: string; nth: number; repl: string }
+/**
+ * What the sweep asserts about a mutant, not what it observes. `killed` is the default and is
+ * what every entry below expects; `survived` declares a CONTROL — a semantics-preserving edit
+ * that the suite must NOT be able to detect, so a control that starts dying is as much a failure
+ * as a real mutant that starts surviving.
+ *
+ * The gate compares observed against expected. That is the only formulation that can hold both
+ * kinds at once: a blanket "any survivor fails" cannot express a control, and a blanket "count
+ * the kills" cannot express that a control dying means the harness has stopped controlling for
+ * anything. It also gives STALE somewhere to sit — "never ran" matches no expectation at all.
+ *
+ * NOTE FOR ANYONE ADDING A CONTROL. `pipeline/sim/README.md` currently states that this harness
+ * "validates itself with control mutants: three semantics-preserving edits must survive and a
+ * poison mutant (spawn column 3→9) must die". No such entry has ever existed in this file — not
+ * at 0dde1d8, the commit that wrote that sentence (11 entries, no control field, no spawn
+ * mutant), and not now. Every entry below is a real defect injection and all of them die. The
+ * README sentence describes a regime that was never built here, which is why its companion
+ * claim "a sweep where everything dies is a syntax error" would condemn every honest run this
+ * harness has ever produced. The mechanism is now here if someone wants to build it for real.
+ */
+type Verdict = 'killed' | 'survived';
+
+interface Mutant {
+  name: string; note: string; find: string; nth: number; repl: string;
+  /** defaults to `'killed'`; set `'survived'` to declare a control */
+  expect?: Verdict;
+}
 
 const MUTANTS: Mutant[] = [
   // --- bestTspinLines ---
@@ -212,9 +238,31 @@ const MUTANTS: Mutant[] = [
 
   // An executed MINI must be classified exactly as the executed full spin is — nothing reads
   // lk.spin except the admission test and the record's own field. Pinned by the mini tests.
+  //
+  // RE-TARGETED. This searched for `if (lk.spin === 'none' || lk.cleared === 0) continue;`, one
+  // line that no longer exists: the admission test was split so a zero-clearing spin could be
+  // COUNTED into `drops.zeroClear` instead of silently `continue`d. The mini half of that test is
+  // now its own line, and that is the line this mutant has always been about — the find string
+  // moved, the mutant did not. Read the old entry to see why: it mutated `=== 'none'` to
+  // `!== 'full'` and carried `|| lk.cleared === 0` IDENTICALLY on both sides, so the zero-clear
+  // half was never part of the mutation, only part of the line.
+  //
+  // The find string deliberately stops at the semicolon and does not include the trailing
+  // `// not a T-spin at all` comment, even though matching the full line would be more literal.
+  // A find string that spans a comment is strandable by an editorial pass over that comment —
+  // which is the exact failure this entry is being repaired FROM, just with a different trigger.
+  // Ending at the code keeps the mutant robust and leaves the comment and its column padding
+  // untouched for free, rather than obliging the replacement to reproduce them.
   { name: 'metric/executed-mini-excluded', note: 'a mini executed spin is dropped before it can be a forecast',
-    find: `    if (lk.spin === 'none' || lk.cleared === 0) continue;`, nth: 1,
-    repl: `    if (lk.spin !== 'full' || lk.cleared === 0) continue;` },
+    find: `    if (lk.spin === 'none') continue;`, nth: 1,
+    repl: `    if (lk.spin !== 'full') continue;` },
+  // The other half of that split, which the combined line's mutant never reached: its replacement
+  // kept `|| lk.cleared === 0`, so the line-clear requirement on the ADMISSION side has never been
+  // mutated. Dropping it admits spins that cleared nothing into the tucked record set and empties
+  // the `zeroClear` drop bucket the split exists to publish.
+  { name: 'metric/zero-clear-admitted', note: 'a spin that cleared nothing is admitted to the record set',
+    find: `    if (lk.cleared === 0) { drops.zeroClear.push(k); continue; }`, nth: 1,
+    repl: `    if (false) { drops.zeroClear.push(k); continue; }` },
   { name: 'metric/executed-mini-not-verified', note: 'a mini is refused a verified-forecast kind that a full spin would get',
     find: `  (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')`, nth: 1,
     repl: `  r.spin !== 'mini' && (r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')` },
@@ -263,6 +311,16 @@ copyFileSync(SRC, BAK);
  * hard — re-running the harness copies the ALREADY-MUTATED source into the backup, so
  * `diff forecast.ts forecast.ts.mutbak` comes back identical and looks like proof of health.
  * Compare against git, not against the backup.
+ *
+ * KNOWN HAZARD, NOT FIXED — unconditional is not the same as safe. `original` is read ONCE at
+ * startup and every restore path writes that snapshot back with no check that the file moved
+ * underneath it. So a concurrent editor loses their work: anything written to `forecast.ts`
+ * after the sweep starts is silently reverted when it ends, and `git status` reads the same
+ * either way because the file is modified in both worlds. This is strictly worse than the abort
+ * this file was just repaired for — that one lost a summary, this one loses source. The fix is a
+ * guard that compares the file against the snapshot before restoring and REFUSES rather than
+ * clobbers. Deliberately out of scope for this branch; do not run this harness against a
+ * worktree anyone else is editing until it exists.
  */
 let restored = false;
 const restore = () => {
@@ -283,20 +341,62 @@ try {
 }
 console.log(`baseline green over ${TESTS.join(', ')}\n`);
 
-const survivors: Mutant[] = [];
+/**
+ * A find string that no longer occurs is a mutant that never RAN, and the sweep used to be unable
+ * to say so. `replaceNth` threw out of the loop; the exit handler restored the file; the run ended
+ * after 45 `killed` lines with no summary at all — which reads like a clean finish, not like four
+ * mutants going unmeasured. `metric/executed-mini-excluded` sat stale that way for weeks, and took
+ * the three entries after it down with it, their kill status simply unknown.
+ *
+ * So a miss is recorded, the sweep CONTINUES through the rest, and the run fails at the end with
+ * every stale entry named: a mutant that cannot be applied is not a mutant that was killed, and
+ * the kill count must be reported over the mutants that actually ran.
+ */
+const mismatched: { m: Mutant; observed: Verdict; expected: Verdict }[] = [];
+const stale: { m: Mutant; why: string }[] = [];
+let killedCount = 0, controlsHeld = 0;
 for (const m of MUTANTS) {
-  writeFileSync(SRC, replaceNth(original, m.find, m.nth, m.repl));
+  let mutated: string;
+  try {
+    mutated = replaceNth(original, m.find, m.nth, m.repl);
+  } catch (e) {
+    stale.push({ m, why: (e as Error).message });
+    console.log(`   STALE    ${m.name.padEnd(26)} ${m.note}`);
+    continue;
+  }
+  writeFileSync(SRC, mutated);
   let killed = false;
   try { execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe' }); }
   catch { killed = true; }
-  console.log(`${killed ? '  killed  ' : 'SURVIVED  '} ${m.name.padEnd(26)} ${m.note}`);
-  if (!killed) survivors.push(m);
+
+  const observed: Verdict = killed ? 'killed' : 'survived';
+  const expected = m.expect ?? 'killed';
+  if (observed === expected) {
+    if (observed === 'killed') killedCount++; else controlsHeld++;
+    console.log(`  ${observed.padEnd(9)} ${m.name.padEnd(26)} ${m.note}${expected === 'survived' ? '   [control held]' : ''}`);
+  } else {
+    mismatched.push({ m, observed, expected });
+    console.log(`! ${observed.toUpperCase().padEnd(9)} ${m.name.padEnd(26)} ${m.note}   ← expected to be ${expected}`);
+  }
 }
 writeFileSync(SRC, original);
 unlinkSync(BAK);
 
-console.log(`\n${MUTANTS.length - survivors.length}/${MUTANTS.length} killed`);
-if (survivors.length) {
-  console.log('\nsurvivors — each needs a killing test or an equivalence proof:');
-  for (const s of survivors) console.log(`  - ${s.name}: ${s.note}`);
+const ran = MUTANTS.length - stale.length;
+console.log(`\n${killedCount}/${ran} killed, ${controlsHeld} control(s) held, ${mismatched.length} mismatched${
+  stale.length ? `, ${stale.length} of ${MUTANTS.length} never ran` : ''}`);
+if (mismatched.length) {
+  console.log('\nVERDICT MISMATCH — the observed outcome is not the asserted one:');
+  for (const x of mismatched) {
+    console.log(x.observed === 'survived'
+      ? `  - ${x.m.name} SURVIVED but must die: it needs a killing test or an equivalence proof. ${x.m.note}`
+      : `  - ${x.m.name} was KILLED but is declared a control: it is no longer semantics-preserving, so it controls for nothing. ${x.m.note}`);
+  }
 }
+if (stale.length) {
+  console.log('\nSTALE — the find string no longer occurs in forecast.ts, so these were never applied.');
+  console.log('Re-target each onto the line that now carries the behaviour its name describes; do not');
+  console.log('delete it, because an unapplied mutant is a hole, not a passing check:');
+  for (const s of stale) console.log(`  - ${s.m.name}: ${s.why}`);
+}
+if (mismatched.length || stale.length) process.exit(1);
