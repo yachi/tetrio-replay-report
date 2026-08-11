@@ -1,0 +1,9 @@
+{
+  "name": "triangle-oracle",
+  "private": true,
+  "type": "module",
+  "description": "Isolated validation tool: headless TETR.IO board oracle (Triangle.js) for the drift work. Its deps do NOT touch the main project.",
+  "dependencies": {
+    "@haelp/teto": "4.2.7"
+  }
+}
