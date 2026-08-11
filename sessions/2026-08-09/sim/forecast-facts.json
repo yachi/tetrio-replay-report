@@ -20,7 +20,8 @@
     "acEmit": "separate",
     "subframe": true,
     "blockout": "shiftup",
-    "kickset": "SRS+"
+    "kickset": "SRS+",
+    "attackModel": "exact"
   },
   "simulator_configs_for_range": [
     "best",
@@ -41,7 +42,7 @@
       "admitted_lineclearing_tspins": 73,
       "tspins_excluded_untucked": 1,
       "tspins_excluded_no_snapshot": 0,
-      "tspins_excluded_zero_clear": 0,
+      "tspins_excluded_zero_clear": 1,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
       "self_built": 47,
@@ -58,7 +59,7 @@
       "sampling_ci95_hi_x1000": 50,
       "simulator_range_lo_x1000": 0,
       "simulator_range_hi_x1000": 0,
-      "verified_placements": 889,
+      "verified_placements": 923,
       "total_placements": 5132
     },
     {
@@ -66,36 +67,36 @@
       "tspin_triples_game_stats": 56,
       "tspin_doubles_game_stats": 236,
       "rounds_played": 50,
-      "verified_tspins": 98,
-      "admitted_lineclearing_tspins": 98,
+      "verified_tspins": 102,
+      "admitted_lineclearing_tspins": 102,
       "tspins_excluded_untucked": 0,
       "tspins_excluded_no_snapshot": 0,
       "tspins_excluded_zero_clear": 0,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
-      "self_built": 57,
+      "self_built": 59,
       "unattributed": 0,
       "mechanism_established": 0,
       "forecast_total": 0,
       "clause2_undecided": 0,
-      "floor_pre_existed": 85,
+      "floor_pre_existed": 89,
       "floor_arrived_later": 11,
       "floor_undetermined": 2,
-      "reactive": 41,
+      "reactive": 43,
       "forecast_rate_x1000": 0,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 37,
+      "sampling_ci95_hi_x1000": 36,
       "simulator_range_lo_x1000": 0,
       "simulator_range_hi_x1000": 0,
-      "verified_placements": 1011,
+      "verified_placements": 1060,
       "total_placements": 4750
     }
   ],
   "session": {
     "player_rounds": 100,
-    "verified_placements": 1900,
+    "verified_placements": 1983,
     "total_placements": 9882,
-    "coverage_x1000": 192
+    "coverage_x1000": 200
   },
   "statistics": {
     "round": {
@@ -109,7 +110,7 @@
     },
     "event": {
       "forecast_n": 0,
-      "reactive_n": 170,
+      "reactive_n": 174,
       "attack": null,
       "lines": null,
       "balance": {

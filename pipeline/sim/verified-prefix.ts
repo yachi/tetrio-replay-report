@@ -55,6 +55,12 @@ export const BEST_OPTS = {
   garbagespeed: 30, garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
   insertMode: 'onPlace' as const, cancelMode: 'all' as const, acEmit: 'separate' as const,
   subframe: true, blockout: 'shiftup' as const, kickset: 'SRS+' as const,
+  // TETR.IO's documented attack formula (logarithmic b2b level + log1p zero-base combo), not the
+  // historical fit — the biggest single drift lever found (see attack-model.test.ts). Ground-truth,
+  // so it is the default now rather than opt-in; the byte-stability that kept it 'legacy' is the same
+  // conservatism the hoisted-DAS fix overrode. Attack amount is board-independent, so it moves only
+  // the verified-prefix length (and thus the quarantined forecast/opener counts), never facts.json.
+  attackModel: 'exact' as const,
 };
 
 export interface Case {

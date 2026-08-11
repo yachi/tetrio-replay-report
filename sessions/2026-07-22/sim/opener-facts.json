@@ -4,8 +4,8 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 94.1% of Triples match the wiki window against 11.3% of Doubles, over 302 verified T-spins",
-    "the ordering metric is scored on 87 of 139 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+    "the slot-geometry match is a SHAPE test, not an opener test: 94.1% of Triples match the wiki window against 11.4% of Doubles, over 310 verified T-spins",
+    "the ordering metric is scored on 87 of 140 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
   ],
   "session": "2026-07-22",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -20,7 +20,8 @@
     "acEmit": "separate",
     "subframe": true,
     "blockout": "shiftup",
-    "kickset": "SRS+"
+    "kickset": "SRS+",
+    "attackModel": "exact"
   },
   "window_pieces": 21,
   "near_cells": 4,
@@ -298,7 +299,7 @@
       },
       {
         "user": "yachi",
-        "rounds_scored": 74,
+        "rounds_scored": 75,
         "rounds_with_tspin_double": 56,
         "rounds_with_tspin_triple": 49,
         "rounds_with_both": 40,
@@ -335,7 +336,7 @@
       },
       {
         "user": "yachi",
-        "rounds_scored": 74,
+        "rounds_scored": 75,
         "rounds_with_tspin_double": 60,
         "rounds_with_tspin_triple": 49,
         "rounds_with_both": 44,
@@ -357,19 +358,19 @@
     "rows": [
       {
         "lines": 1,
-        "n": 16,
+        "n": 17,
         "drawn": 0,
         "mirrored": 1,
         "matched": 1,
-        "share_x1000": 62
+        "share_x1000": 58
       },
       {
         "lines": 2,
-        "n": 167,
+        "n": 174,
         "drawn": 5,
-        "mirrored": 14,
-        "matched": 19,
-        "share_x1000": 113
+        "mirrored": 15,
+        "matched": 20,
+        "share_x1000": 114
       },
       {
         "lines": 3,

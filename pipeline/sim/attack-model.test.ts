@@ -9,7 +9,11 @@
  * (34.24→36.21, 27.54→28.73, 31.16→32.81 % over three sessions) — this is the biggest single drift
  * lever found, and it is ground-truth-driven (the documented formula), not another fit.
  *
- * Default stays 'legacy' so committed artifacts are byte-identical; this pins the exact function.
+ * It is now the DEFAULT in BEST_OPTS (2026-08-11, +4.2% verified locks corpus-wide). It was opt-in
+ * only to keep the quarantined sim artifacts byte-identical; that conservatism was overridden the
+ * same way the `hoisted`-DAS fix was — regenerate forecast/opener facts and re-bless the audit pins,
+ * since attack amount is board-independent and never touches facts.json. This still pins the exact
+ * function itself.
  */
 import { test, expect, describe } from 'bun:test';
 import { b2bLevel } from './sim.ts';
