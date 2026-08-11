@@ -6,68 +6,68 @@
     "@haelp/teto (Triangle.js)"
   ],
   "verified_prefix_locks": {
-    "total": 11778,
-    "dual": 11222
+    "total": 12278,
+    "dual": 11653
   },
   "sessions": {
     "2026-07-22": {
-      "prefix_locks": 3461,
-      "prefix_dual": 3341,
+      "prefix_locks": 3620,
+      "prefix_dual": 3482,
       "forecast": {
-        "total": 301,
-        "dual": 286,
+        "total": 309,
+        "dual": 294,
         "by_kind": {
           "reactive": {
-            "total": 133,
-            "dual": 122
+            "total": 138,
+            "dual": 127
           },
           "self_built": {
-            "total": 168,
-            "dual": 164
+            "total": 171,
+            "dual": 167
           }
         }
       },
-      "opener_rounds": 139,
-      "opener_dual": 131
+      "opener_rounds": 140,
+      "opener_dual": 132
     },
     "2026-07-24": {
-      "prefix_locks": 1999,
-      "prefix_dual": 1883,
+      "prefix_locks": 2087,
+      "prefix_dual": 1964,
       "forecast": {
-        "total": 178,
-        "dual": 162,
+        "total": 180,
+        "dual": 164,
         "by_kind": {
           "reactive": {
-            "total": 76,
-            "dual": 70
+            "total": 77,
+            "dual": 71
           },
           "self_built": {
-            "total": 102,
-            "dual": 92
+            "total": 103,
+            "dual": 93
           }
         }
       },
-      "opener_rounds": 83,
-      "opener_dual": 76
+      "opener_rounds": 85,
+      "opener_dual": 77
     },
     "2026-07-28": {
-      "prefix_locks": 2387,
-      "prefix_dual": 2241,
+      "prefix_locks": 2480,
+      "prefix_dual": 2322,
       "forecast": {
-        "total": 220,
-        "dual": 207,
+        "total": 225,
+        "dual": 212,
         "by_kind": {
           "forecast_lineclear": {
             "total": 1,
             "dual": 1
           },
           "reactive": {
-            "total": 83,
-            "dual": 76
+            "total": 86,
+            "dual": 79
           },
           "self_built": {
-            "total": 136,
-            "dual": 130
+            "total": 138,
+            "dual": 132
           }
         }
       },
@@ -75,44 +75,44 @@
       "opener_dual": 100
     },
     "2026-08-01": {
-      "prefix_locks": 2031,
-      "prefix_dual": 1947,
+      "prefix_locks": 2108,
+      "prefix_dual": 2015,
       "forecast": {
-        "total": 181,
-        "dual": 173,
+        "total": 185,
+        "dual": 176,
         "by_kind": {
           "reactive": {
-            "total": 70,
-            "dual": 66
+            "total": 72,
+            "dual": 67
           },
           "self_built": {
-            "total": 111,
-            "dual": 107
+            "total": 113,
+            "dual": 109
           }
         }
       },
-      "opener_rounds": 90,
-      "opener_dual": 88
+      "opener_rounds": 92,
+      "opener_dual": 90
     },
     "2026-08-09": {
-      "prefix_locks": 1900,
-      "prefix_dual": 1810,
+      "prefix_locks": 1983,
+      "prefix_dual": 1870,
       "forecast": {
-        "total": 170,
-        "dual": 158,
+        "total": 174,
+        "dual": 160,
         "by_kind": {
           "reactive": {
-            "total": 66,
-            "dual": 61
+            "total": 68,
+            "dual": 63
           },
           "self_built": {
-            "total": 104,
+            "total": 106,
             "dual": 97
           }
         }
       },
-      "opener_rounds": 88,
-      "opener_dual": 83
+      "opener_rounds": 89,
+      "opener_dual": 84
     }
   }
 }
