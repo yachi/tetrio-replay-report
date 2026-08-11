@@ -9,7 +9,7 @@
 import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
-import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop, setKickset } from './vendor/core/srs.ts';
+import { getPieceCells, isValidPosition, tryMove, tryRotate, hardDrop, setKickset, JLSZT_KICKS } from './vendor/core/srs.ts';
 import { GarbageQueue } from './garbage-queue.ts';
 
 export const H = 40;                  // total rows (20 buffer + 20 visible)
@@ -89,8 +89,25 @@ export function emptyBoard(): Board {
   return Array.from({ length: H }, emptyRow) as Board;
 }
 
-/** 3-corner T-spin detection. Returns 'full' | 'mini' | 'none'. */
-export function detectTSpin(board: Board, p: ActivePiece, lastWasRotation: boolean, usedKick: boolean): 'none' | 'mini' | 'full' {
+/** The T kick-candidate index a rotation used, from its displacement (−1 if none). T only. */
+export function tKickIndex(from: number, to: number, dx: number, dy: number): number {
+  const seq = JLSZT_KICKS[`${from}->${to}` as keyof typeof JLSZT_KICKS] as readonly [number, number][] | undefined;
+  if (!seq) return -1;
+  for (let i = 0; i < seq.length; i++) if (seq[i]![0] === dx && seq[i]![1] === dy) return i;
+  return -1;
+}
+
+/**
+ * 3-corner T-spin detection. Returns 'full' | 'mini' | 'none'.
+ *
+ * The mini→full upgrade for a spin that is not front-filled has two rules the caller selects with
+ * `rule`. 'anykick' (the historical default): ANY wall-kick upgrades. 'lastkick': only the last
+ * kick candidate (index 4, the TST-style kick) upgrades — this is the ORIGINAL cold-clear /
+ * guideline rule (see cc-tspin.ts). Which one TETR.IO actually uses is decided by the replay ige
+ * attack values, not by cold-clear; `kickIndex` is the candidate the reaching rotation used.
+ */
+export function detectTSpin(board: Board, p: ActivePiece, lastWasRotation: boolean, usedKick: boolean,
+                            kickIndex = -1, rule: 'anykick' | 'lastkick' = 'anykick'): 'none' | 'mini' | 'full' {
   if (p.type !== 'T' || !lastWasRotation) return 'none';
   // T centre in trainer coords: bounding-box offset (1,1)
   const cx = p.col + 1, cy = p.row + 1;
@@ -105,14 +122,15 @@ export function detectTSpin(board: Board, p: ActivePiece, lastWasRotation: boole
   const front = frontByRot[p.rotation]!;
   const frontFilled = front.filter(i => filled[i]).length;
   if (frontFilled === 2) return 'full';
-  return usedKick ? 'full' : 'mini';   // kicked-into-slot upgrades a mini to full
+  const upgrade = rule === 'lastkick' ? kickIndex === 4 : usedKick;
+  return upgrade ? 'full' : 'mini';   // kicked-into-slot upgrades a mini to full
 }
 
 export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick' },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -160,18 +178,20 @@ export function simulate(
   let gi = 0;
 
   let piece: ActivePiece = { type: queue[qi++]!, rotation: 0, col: 3, row: SPAWN_ROW };
-  let lastWasRotation = false, usedKick = false;
+  let lastWasRotation = false, usedKick = false, lastKickIndex = -1;
   let dir = 0, dasTimer = 0, arrTimer = 0, softHeld = false, gravAcc = 0, groundFrames = 0;
   const held = new Set<string>();
   let areUntil = -1;                 // frames before which no piece exists (entry delay)
 
   const spawn = (t: PieceType) => {
     piece = { type: t, rotation: 0, col: 3, row: SPAWN_ROW };
-    holdUsed = false; lastWasRotation = false; usedKick = false; groundFrames = 0; gravAcc = 0;
+    holdUsed = false; lastWasRotation = false; usedKick = false; lastKickIndex = -1; groundFrames = 0; gravAcc = 0;
     // IRS: a rotation key still held at spawn applies immediately
     if (opts.irs && (held.has('rotateCW') || held.has('rotateCCW'))) {
       const n = tryRotate(board, piece, held.has('rotateCW') ? 1 : -1);
-      if (n) { usedKick = n.col !== piece.col || n.row !== piece.row; piece = n; lastWasRotation = true; }
+      if (n) { usedKick = n.col !== piece.col || n.row !== piece.row;
+        lastKickIndex = piece.type === 'T' ? tKickIndex(piece.rotation, n.rotation, n.col - piece.col, n.row - piece.row) : -1;
+        piece = n; lastWasRotation = true; }
     }
     if (!isValidPosition(board, piece)) {
       // A blocked spawn is not necessarily death. halp1/triangle's #considerBlockout
@@ -213,7 +233,7 @@ export function simulate(
 
   function lockPiece(frame: number) {
     const cells = getPieceCells(piece);
-    const spin = detectTSpin(board, piece, lastWasRotation, usedKick);
+    const spin = detectTSpin(board, piece, lastWasRotation, usedKick, lastKickIndex, opts.tspinRule ?? 'anykick');
     const b = board.map(r => [...r]) as (PieceType | null)[][];
     const myIndex = locks.length;
     for (const { col, row } of cells) if (row >= 0 && row < H) { b[row]![col] = piece.type; prov[row]![col] = myIndex; }
@@ -399,9 +419,11 @@ export function simulate(
           case 'moveRight': dir = 1; shift(1); dasTimer = handling.das; break;
           case 'softDrop': softHeld = true; break;
           case 'rotateCW': case 'rotateCCW': {
-            const before = { c: piece.col, r: piece.row };
+            const before = { c: piece.col, r: piece.row, rot: piece.rotation };
             const n = tryRotate(board, piece, e.key === 'rotateCW' ? 1 : -1);
-            if (n) { usedKick = n.col !== before.c || n.row !== before.r; piece = n; lastWasRotation = true; groundFrames = 0; }
+            if (n) { usedKick = n.col !== before.c || n.row !== before.r;
+              lastKickIndex = piece.type === 'T' ? tKickIndex(before.rot, n.rotation, n.col - before.c, n.row - before.r) : -1;
+              piece = n; lastWasRotation = true; groundFrames = 0; }
             break;
           }
           case 'hold': {
