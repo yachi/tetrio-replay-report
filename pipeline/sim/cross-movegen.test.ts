@@ -47,6 +47,7 @@ import { emptyBoard, H } from './sim.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells, isValidPosition, setKickset } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
+import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 const W = 10;
 const PIECES: PieceType[] = ['I', 'T', 'O', 'S', 'Z', 'L', 'J'];
@@ -161,3 +162,46 @@ describe.skipIf(!HAVE_ORACLE)('reachable placements vs real cold-clear find_move
     expect(oursOnlyTotal).toBeGreaterThan(0);
   }, 120_000);
 });
+
+// The random-board legs above exercise the tables broadly but prove nothing about the boards the
+// forecast metric actually runs on. This leg is item 3's corpus requirement (engine-verification-plan
+// § Item 3): every verified-prefix board of every session, the piece bestTspin actually walks. Session
+// list is explicit, not globbed (memory: sim-test-corpus-silently-under-covers) — a new session's
+// directory existing is not enough to be included; it must be named here.
+const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09']
+  .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
+
+describe.skipIf(!HAVE_ORACLE || SIM_SESSIONS.length === 0)(
+  'reachable placements vs real cold-clear over the verified-prefix corpus (real game boards, T piece)',
+  () => {
+    test('every verified-prefix board of all five sessions: cc ⊆ ours (0 false negatives)', () => {
+      const perSession: Record<string, number> = {};
+      const cases: { board: Board; type: PieceType }[] = [];
+      for (const session of SIM_SESSIONS) {
+        const name = session.split('/').pop()!;
+        process.env.REPLAY_DIR = session;
+        let n = 0;
+        for (const c of loadCases(session)) {
+          const r = runCase(c, {});
+          const v = verifiedIndex(r, c.truth);
+          for (let step = 0; step <= v; step++) { cases.push({ board: r.boards[step]!, type: 'T' }); n++; }
+        }
+        perSession[name] = n;
+        // A session contributing zero boards has silently fallen out of the corpus, not just this one.
+        expect(n, `${name} contributed 0 verified-prefix boards`).toBeGreaterThan(0);
+      }
+      const { ccTotal, oursOnlyTotal, ccOnlyTotal, ccOnlyCases, examples } = compareAll(cases);
+      const summary = Object.entries(perSession).map(([k, v]) => `${k}: ${v}`).join(', ');
+      // THE GATE, over real game boards this time: our BFS reaches every T-placement cold-clear reaches.
+      expect(ccOnlyTotal,
+        `${ccOnlyCases} case(s) where cold-clear reaches a T-placement our BFS misses ` +
+        `(corpus: ${summary}):\n${examples.join('\n---\n')}`).toBe(0);
+      // Anti-vacuity, derived from the session list rather than one hardcoded grand total (risk R8 —
+      // cross-tslot.test.ts:99's literal 7544 predates session five and would have silently stayed
+      // right had a session's contribution shrunk instead of grown).
+      expect(cases.length, summary).toBeGreaterThan(SIM_SESSIONS.length * 200);
+      expect(ccTotal).toBeGreaterThan(cases.length);
+      expect(oursOnlyTotal).toBeGreaterThan(0);       // real boards have overhangs/tucks too
+    }, 300_000);
+  },
+);

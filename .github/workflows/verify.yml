@@ -578,3 +578,14 @@ jobs:
         env:
           CC_ORACLE_SLOTS: '1'
         run: bun pipeline/sim/cross-tslot-multi.ts ./result/bin/cc-oracle
+
+      # cross-tslot-count/-multi check the SLOT the metric consumes, not the SEARCH that reaches it —
+      # the arrival-key defect (spec/BfsKey.dfy) was invisible to both. cross-movegen.test.ts is that
+      # standing gate: our BFS reachable-placement set is a superset of the real find_moves for every
+      # piece, over random boards AND every verified-prefix board of all five sessions. Without
+      # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
+      # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
+      - name: Reachable-placement set (cross-movegen) and kick tables (cross-srs-tables) vs cold-clear
+        env:
+          CC_ORACLE: ./result/bin/cc-oracle
+        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts
