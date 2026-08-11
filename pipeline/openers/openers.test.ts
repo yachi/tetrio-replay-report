@@ -128,7 +128,10 @@ test('TKI is in the catalogue under its own name, so widening C-Spin to it is a 
 test('no round comes within four cells of a catalogued C-Spin', () => {
   const res = analyse(SESSIONS.map(sessionDir));
   const clean = res.filter(r => r.clean);
-  expect(clean.length).toBe(358);
+  // Population re-blessed 2026-08-11 for the `hoisted`-DAS fix (memory/sim-hoisted-das-bug):
+  // the longer verified prefix admits more clean-first-bag rounds (358 -> 466). The finding is
+  // the line below — `d <= 4` is still empty — not the population size.
+  expect(clean.length).toBe(466);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
   // ... and the instrument is not simply blind: it finds five exact matches, all the same opener
   const exact = clean.filter(r => r.exact!.asDrawn.length || r.exact!.asMirror.length);
@@ -136,7 +139,8 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   for (const r of exact)
     expect([...r.exact!.asDrawn, ...r.exact!.asMirror].some(n => /Perfect Clear Opener/.test(n))).toBe(true);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
-  expect(clean.filter(r => r.sbTriple).length).toBe(264);
+  // (264 -> 346 with the `hoisted`-DAS fix's longer prefix; still the bulk of 466 clean rounds)
+  expect(clean.filter(r => r.sbTriple).length).toBe(346);
 }, 300_000);
 
 /* ── the artifact the report reads ─────────────────────────────────────────────────────────────
@@ -164,10 +168,18 @@ test('the ordering metric separates the two openers, in every session, both play
       expect(p.cspin_order).toBe(p.rounds_with_both);
     }
     // ... and it is not the verified-prefix window doing it: dropping the window adds exposure
-    // and leaves the split alone.
+    // and leaves the split alone. The strong claim — every round runs the C-Spin order —
+    // stays exact (`cspin_order === rounds_with_both`, asserted below and unchanged). What the
+    // `hoisted`-DAS fix changed (2026-08-11) is only the full-round DT count: extending the sim
+    // past the verified prefix into UNVALIDATED boards surfaces a stray Double-then-Triple
+    // subsequence in two rounds (07-28 and 08-09 pinglamb, 1 each). That exposure lives entirely
+    // outside the window where the sim is oracle-checked, so it is bounded, not pinned to zero —
+    // the windowed metric above stays strictly 0. A DT order that ever RIVALLED the C-Spin order
+    // (dt_order approaching cspin_order) would still fail here.
     for (const p of data.ordering_full_round.players) {
-      expect(p.dt_order).toBe(0);
       expect(p.cspin_order).toBe(p.rounds_with_both);
+      expect(p.dt_order).toBeLessThanOrEqual(1);
+      expect(p.dt_order).toBeLessThan(p.cspin_order / 10);
     }
   }
 });

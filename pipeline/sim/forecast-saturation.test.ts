@@ -92,6 +92,14 @@ const ROSE_KNOWN = [
   // session had none until opener-facts.json was emitted into one, so it had never been scanned.
   // See ROADMAP "the saturation gate has fired".
   '2026-08-09 pinglamb replay-2026-08-09-2.ttrm r5 lock26',
+  // 2026-08-11: the SECOND riser, surfaced by the `hoisted`-DAS fix (memory/sim-hoisted-das-bug),
+  // not by new sim behaviour. Honoring the client's pre-charged-DAS flag lengthened the verified
+  // prefix on 2026-08-01 pinglamb replay-6 r4 past lock 16, so this event entered the scan for the
+  // first time. It is the SAME slot-local-rise class as the 08-09 one (local availability 0 -> 1
+  // on the executed slot while the global best is flat), so `improved` scores it reactive where a
+  // slot-local gate would call it a forecast. Two deferred instances now stand: the latent
+  // decision (should the metric gate slot-locally?) is live — see ROADMAP.
+  '2026-08-01 pinglamb replay-2026-08-01-6.ttrm r4 lock16',
 ];
 
 const scan = () => {

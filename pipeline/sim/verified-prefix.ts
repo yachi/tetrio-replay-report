@@ -82,7 +82,7 @@ export function loadCases(dir = replayDir()): Case[] {
         out.push({
           file, round, user: me.p.username, alive: me.p.alive,
           ev: me.rp.events.filter((e: any) => e.type === 'keydown' || e.type === 'keyup')
-            .map((e: any) => ({ frame: e.frame, sub: e.data.subframe ?? 0, type: e.type, key: e.data.key })),
+            .map((e: any) => ({ frame: e.frame, sub: e.data.subframe ?? 0, type: e.type, key: e.data.key, hoisted: e.data.hoisted })),
           gin: me.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction' && e.data.data?.type === 'garbage')
             .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size,
               cid: e.data.data.iid, gameid: e.data.data.gameid,

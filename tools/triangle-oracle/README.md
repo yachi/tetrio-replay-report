@@ -52,3 +52,20 @@ before the final 20% of the round. It is a **disagreement map, not a certified s
 
 To make this a certified drift oracle rather than a disagreement map: pin `garbagespeed`/cap and validate a
 sample of the early-divergence cases against fresh live captures.
+
+## What it has already found
+
+The disagreement map is not just a number — following it to a root cause found a real sim bug.
+
+```bash
+bun scan-lock0.mjs     # how often the OPENING piece diverges sim-vs-oracle (was 25%)
+bun scan-hoisted.mjs   # correlate those divergences with the replay's `hoisted` DAS flag
+bun diag.mjs <file> <round> <user> [n]   # dump sim vs oracle boards at the first n divergent locks
+```
+
+`scan-lock0` showed 148/592 openers (25%) diverged; `scan-hoisted` showed 146 of them carried a
+`hoisted: true` opening move-key. `.ttrm` keydowns set that flag when the client recorded the direction
+as ALREADY held when the piece spawned — DAS is pre-charged, so the piece slams to the wall. The sim
+dropped the flag and treated it as a fresh tap, stopping one cell short. Honoring it cut opening
+divergences 148 -> 3 and lifted corpus bit-exact 39.5% -> 49.6%. The ground truth was the client's own
+recorded flag; no live capture was needed. (See `pipeline/sim/hoisted-das.test.ts`.)

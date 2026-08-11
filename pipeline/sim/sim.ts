@@ -52,7 +52,7 @@ export const DEFAULT_TABLE: AttackTable = {
 };
 
 export interface Handling { das: number; arr: number; sdf: number; dcd: number }
-export interface InEvent { frame: number; sub: number; type: string; key?: string }
+export interface InEvent { frame: number; sub: number; type: string; key?: string; hoisted?: boolean }
 export interface InGarbage {
   frame: number; amt: number; x: number; size: number;
   /** frame of the matching interaction_confirm, if any (halp1/triangle's GarbageQueue.confirm
@@ -438,8 +438,12 @@ export function simulate(
         if (e.key) held.add(e.key);
         if (f < areUntil) return;            // entry delay: no piece to control yet
         switch (e.key) {
-          case 'moveLeft': dir = -1; shift(-1); dasTimer = handling.das; break;
-          case 'moveRight': dir = 1; shift(1); dasTimer = handling.das; break;
+          // `hoisted` = the client recorded this direction as already held when the piece
+          // spawned, so DAS is pre-charged (only `dcd` frames remain, not a full `das`). The
+          // client writes the flag; dropping it makes every held-into-the-wall opener stop one
+          // tap short. Match the fresh-tap completion path: when no charge remains, arm ARR now.
+          case 'moveLeft': dir = -1; shift(-1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
+          case 'moveRight': dir = 1; shift(1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
           case 'softDrop': softHeld = true; break;
           case 'rotateCW': case 'rotateCCW': {
             const before = { c: piece.col, r: piece.row, rot: piece.rotation };

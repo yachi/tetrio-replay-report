@@ -56,12 +56,17 @@ const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(R === null);
 
 realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
+  // Re-blessed 2026-08-11 for the sim `hoisted`-DAS fix (see memory/sim-hoisted-das-bug):
+  // honoring the client's pre-charged-DAS flag lengthened the verified prefix ~31%, so more
+  // locks fall inside the scanned window and each bucket grew. The classification is unchanged
+  // — the reactive:self_built ratio held (56:89 = 0.629 -> 83:136 = 0.610) and the single
+  // surviving forecast (forecast_lineclear:1) is the same event — only the window got longer.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
-    // the survivor: the ONLY event in 654 across four sessions whose mechanism holds up
+    // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
     forecast_lineclear: 1,
-    self_built: 89,
-    reactive: 56,
+    self_built: 136,
+    reactive: 83,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
@@ -87,8 +92,11 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // deepest row alone. The old split read 83 / 48 field-floor / 13 / 2, and the 48 were the
   // giveaway: `field-floor` claimed the playfield bottom was the support, but across all 654
   // events and all seven configs the number of pieces held up by the floor ALONE is zero.
+  // Re-blessed 2026-08-11 for the `hoisted`-DAS fix (longer verified prefix -> more events in
+  // window). The undetermined count grew 3 -> 5 in proportion, not as a share: 5/220 (2.3%) vs
+  // the old 3/145 (2.1%), so clause 2 stays just as decidable on the larger corpus.
   expect(R!.floors).toEqual({
-    'pre-existed': 126, 'arrived-later': 17, undetermined: 3,
+    'pre-existed': 189, 'arrived-later': 26, undetermined: 5,
   });
 });
 
@@ -131,7 +139,10 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
       if (isVerifiedForecast(rec)) counted++;
     }
   }
-  expect(behindACSpin).toBe(46);
+  // Population re-blessed 2026-08-11 for the `hoisted`-DAS fix (longer verified prefix -> more
+  // C-Spin-trailing T-spins in window: 46 -> 66). The verdict `counted == 0` is unchanged: none
+  // of them is a forecast, which is the assertion that matters.
+  expect(behindACSpin).toBe(66);
   expect(counted).toBe(0);
 });
 
