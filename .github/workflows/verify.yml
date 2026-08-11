@@ -585,7 +585,7 @@ jobs:
       # piece, over random boards AND every verified-prefix board of all five sessions. Without
       # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
-      - name: Reachable-placement set (cross-movegen) and kick tables (cross-srs-tables) vs cold-clear
+      - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin) vs cold-clear
         env:
           CC_ORACLE: ./result/bin/cc-oracle
-        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts
+        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts

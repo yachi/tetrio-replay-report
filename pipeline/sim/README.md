@@ -215,11 +215,20 @@ gates now cover the SRS geometry the forecast BFS is built on, both against the 
 **Why both.** Measured: the movegen subset gate survives a corrupted single kick candidate (even
 disabling kicks entirely) — our BFS routes around it, so `cc ⊆ ours` still holds. So movegen pins
 *reachability* but not *kick values*; the table check pins the values (it fails a transposed
-`[+1,0]→[+2,0]`). Neither alone is sufficient. Out of cold-clear's scope by design and left to
-replays/spec: SRS+ I-kicks, the attack/combo/b2b/PC table, the MINSTD 7-bag, garbage, handling, and
-180° (neither engine has it). `detectTSpin`'s mini-vs-full is CC-comparable but deliberately NOT
-gated against CC — CC upgrades only on the last kick, we on any kick, and TETR.IO not CC is ground
-truth there; its line *count* is already pinned by `cc-oracle cutout_tslot` vs `bestTspinLines`.
+`[+1,0]→[+2,0]`). Neither alone is sufficient.
+
+- **T-spin classification — `cross-tspin.test.ts`** (`cc-tspin.ts`). Our `detectTSpin` vs cold-clear's
+  `rotate()` rule over T placements reached by rotation (seeded overhang boards + every verified-prefix
+  board). The NONE-vs-SPIN boundary is **gated exact** (0 disagreements — our four-corner 3-corner gate
+  and cold-clear's are the same function; our front corners == cold-clear's `mini_tspin_corners` for
+  all 4 orientations). Mini-vs-full is **ledgered, not gated**: ours upgrades on ANY kick, cold-clear
+  only on the last kick (i==4), so every disagreement is exactly `ours=full ∧ cc=mini ∧ i∈{1,2,3}`
+  (5949/10549 spins, pinned; reverse `ours=mini ∧ cc=full` is 0, as it must be). TETR.IO replays, not
+  cold-clear, adjudicate which mini/full rule is right (R5); the line *count* is already pinned by
+  `cc-oracle cutout_tslot` vs `bestTspinLines`. Teeth: widening the 3-corner gate breaks none-vs-spin.
+
+Out of cold-clear's scope by design and left to replays/spec: SRS+ I-kicks, the attack/combo/b2b/PC
+table, the MINSTD 7-bag, garbage, handling, and 180° (neither engine has it).
 
 ### Can sequence alignment extend the verified prefix? (measured: no)
 
