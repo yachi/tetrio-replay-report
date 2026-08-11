@@ -13,11 +13,18 @@
 // sim's one known forecast (07-28-6 r5) as forecast_lineclear. On that certified reconstruction, the
 // FULL-ROUND scan over EVERY round finds 2 forecasts where the sim's drift-truncated detection finds 1:
 // the extra one (07-28-3 r5 yachi lock25) sits in a region the sim NEVER saw (it topped out at lock 12).
-// So the drift truncation WAS hiding a forecast — the "0%/1 forecast" figure was partly a window artifact.
-// CAVEAT: provenance is reconstructed approximately (the survivor's roofFrom came out 30 vs the sim's 19),
-// so the exact roof lock is soft; but the forecast KIND is robust to that (the survivor classified
-// identically despite the roofFrom gap), which is what makes the second one credible. Exact provenance
-// (tracking garbage/clear row-shifts) would make it bulletproof.
+// UPDATE — bulletproofing DISPROVED the confidence, honestly. Exact provenance (mirroring sim.ts's
+// shift/push + splice/unshift, then force-aligning the pattern to the true board) makes the reconstruction
+// reproduce the sim's KNOWN survivor BIT-EXACT (07-28-6 r5: lock 32, roofFrom 19, sep 13 — identical), and
+// keeps T-spin detection at 99% (330 vs 328). BUT the *additional* forecast candidates in the truncated
+// region are NOT STABLE: the full-round count is 2, 2-but-different, or 3 depending on the reconstruction
+// variant. `forecast_lineclear` is the strictest gate in the metric (1 in 654), so hidden-region
+// candidates sit on the decision boundary and flip with sub-1% provenance differences. CONCLUSION: the
+// only SOLID forecast is the survivor, which the sim already detects (it is at the very edge of the
+// prefix). Whether the drift truncation hides ADDITIONAL forecasts is UNRESOLVED — the candidates are
+// borderline and reconstruction-sensitive, and confirming them needs a 100%-bit-exact full board history,
+// which this reconstruction approaches (99%) but does not reach for these ultra-sensitive cases. The
+// earlier "truncation hid a forecast" claim was premature; this is the corrected, honest terminus.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Classes } from "@haelp/teto";
@@ -46,7 +53,14 @@ export function oracleSim(player, roundPlayers) {
   engine.events.on("garbage.tank", (ev) => { const x = iidToX.has(ev.iid) ? iidToX.get(ev.iid) : ev.column; for (let i = 0; i < ev.amount; i++) holeFIFO.push(x); });
 
   const boards = [], locks = [], garbageEvents = [];
-  let pendingCells = null, prevG = 0, hi = 0, curFrame = 0, lockThisFrame = null;
+  // provenance, evolved EXACTLY like the sim (sim.ts insertGarbage/lockPiece): garbage inserts do
+  // prov.shift()+push(garbageRow -1/null); a lock marks piece cells with the lock index then clears
+  // full rows with splice()+unshift(nullRow). Garbage and clears are mutually exclusive per lock
+  // (garbage only tanks on non-clearing locks), which fixes the operation order.
+  const provSnaps = [];
+  let prov = emptyBoard();
+  const gRowProv = (holeX) => { const r = new Array(10).fill(-1); r[((holeX % 10) + 10) % 10] = null; return r; };
+  let pendingCells = null, prevG = 0, hi = 0, curFrame = 0, lockThisFrame = null, hj = 0, prevSnapG = 0; // hj = hole index consumed into prov
   // capture the locking piece's cells (Triangle y-up -> sim row) just before nextPiece
   engine.events.on("falling.lock.pre", () => { try { pendingCells = engine.falling.absoluteBlocks.map(([x, y]) => ({ col: x, row: 39 - y })); } catch { pendingCells = []; } });
   // the lock's clear/spin come from the falling.lock event, NOT the tick return (which is flushRes).
@@ -61,26 +75,35 @@ export function oracleSim(player, roundPlayers) {
     curFrame = f;
     const res = engine.tick(byFrame.get(f) || []);
     injectHoles();
-    if (lockThisFrame) { locks.push({ frame: f, ...lockThisFrame, allclear: false }); boards.push(toSimBoard(engine.board.state)); lockThisFrame = null; pendingCells = null; }
-    if (res && res.topout) break;
-  }
-  // provSnaps[k]: provenance grid at lock k. The roof search reads this, not the board (forecast.ts:608).
-  // -1 = garbage, >=0 = the lock index that placed the cell, null = empty. Reconstructed by content-diff:
-  // a non-garbage cell filled in boards[k] but empty in boards[k-1] AT THE SAME ROW is newly placed by k;
-  // otherwise it inherits the prior provenance (row-aligned). Garbage ('G') is always -1. This is exact
-  // when no row shift occurs between snapshots and a close approximation across a shift; the overlap
-  // validation against the sim is what certifies it is good enough.
-  const provSnaps = [];
-  let prevProv = emptyBoard();
-  for (let k = 0; k < boards.length; k++) {
-    const b = boards[k], prov = emptyBoard();
-    for (let r = 0; r < H; r++) for (let c = 0; c < 10; c++) {
-      if (b[r][c] == null) { prov[r][c] = null; continue; }
-      if (b[r][c] === 'G') { prov[r][c] = -1; continue; }
-      const prior = prevProv[r]?.[c];
-      prov[r][c] = (prior != null && prior >= 0) ? prior : k;   // inherit placer, else this lock placed it
+    if (lockThisFrame) {
+      const k = locks.length;
+      // (1) mark this piece's cells with the lock index
+      for (const c of lockThisFrame.cells) if (c.row >= 0 && c.row < H && c.col >= 0 && c.col < 10) prov[c.row][c.col] = k;
+      // (2) clears XOR garbage. clears: remove any row that is now entirely non-null (== a full board row).
+      if (lockThisFrame.cleared > 0) {
+        for (let r = H - 1; r >= 0; r--) if (prov[r].every((v) => v !== null)) { prov.splice(r, 1); prov.unshift(new Array(10).fill(null)); }
+      } else {
+        // garbage inserted this lock? the board's garbage-row count rose since the previous snapshot.
+        const nowG = engine.board.state.filter((row) => row.filter((t) => t && t.mino === "gb").length >= holeWidth).length;
+        const gAdd = Math.max(0, nowG - prevSnapG);
+        for (let i = 0; i < gAdd; i++) { prov.shift(); prov.push(gRowProv(holeFIFO[hj++] ?? 0)); }
+      }
+      const bd = toSimBoard(engine.board.state);
+      // Force-align the PATTERN to the true board (evolved placers can drift a cell across a shift):
+      // empty->null, garbage->-1, and a filled cell the evolution left null/garbage gets this lock as a
+      // fallback placer. Keeps detection (untucked/roofIsGarbage) exact while preserving evolved placers.
+      for (let r = 0; r < H; r++) for (let c = 0; c < 10; c++) {
+        if (bd[r][c] == null) prov[r][c] = null;
+        else if (bd[r][c] === "G") prov[r][c] = -1;
+        else if (prov[r][c] == null || prov[r][c] < 0) prov[r][c] = k;
+      }
+      locks.push({ frame: f, ...lockThisFrame, allclear: false });
+      boards.push(bd);
+      provSnaps.push(prov.map((r) => [...r]));
+      prevSnapG = engine.board.state.filter((row) => row.filter((t) => t && t.mino === "gb").length >= holeWidth).length;
+      lockThisFrame = null; pendingCells = null;
     }
-    provSnaps.push(prov); prevProv = prov;
+    if (res && res.topout) break;
   }
   return { boards, locks, garbageEvents, provSnaps, records: [], topout: false };
 }
