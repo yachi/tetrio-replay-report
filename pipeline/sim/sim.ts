@@ -89,6 +89,24 @@ export function emptyBoard(): Board {
   return Array.from({ length: H }, emptyRow) as Board;
 }
 
+/**
+ * TETR.IO's back-to-back bonus as a function of the b2b chain count — the LOGARITHMIC "level" from
+ * the reference attack calculator (skysomorphic/tetrio-attack-calculator `b2bCountToLevel`), not the
+ * sim's historical `>=3 ? 2 : 1` cap. Ground truth: 1 for 1-2, 2 for 3-7, 3 for 8-23, 4 for 24-66,
+ * 5 for 67-184, 6 for 185-503, 7 for 504-1369, 8 above.
+ */
+export function b2bLevel(count: number): number {
+  if (count <= 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 7) return 2;
+  if (count <= 23) return 3;
+  if (count <= 66) return 4;
+  if (count <= 184) return 5;
+  if (count <= 503) return 6;
+  if (count <= 1369) return 7;
+  return 8;
+}
+
 /** The T kick-candidate index a rotation used, from its displacement (−1 if none). T only. */
 export function tKickIndex(from: number, to: number, dx: number, dy: number): number {
   const seq = JLSZT_KICKS[`${from}->${to}` as keyof typeof JLSZT_KICKS] as readonly [number, number][] | undefined;
@@ -130,7 +148,7 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick'; attackModel?: 'legacy'|'exact' },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -272,13 +290,18 @@ export function simulate(
         if (cleared === 1) clears.singles++; else if (cleared === 2) clears.doubles++;
         else if (cleared === 3) clears.triples++; else if (cleared === 4) clears.quads++; else clears.pentas++;
       }
+      const exact = opts.attackModel === 'exact';
       if (isDifficult) {
         b2b++; topbtb = Math.max(topbtb, b2b);
-        // observed: b2b1 -> +1, b2b2 -> +1, b2b3 -> +2 (B2B chaining escalation)
-        if (b2b > 0) atk += b2b >= 3 ? 2 : 1;
+        // 'legacy' (observed, fitted): b2b1->+1, b2b2->+1, b2b3+->+2. 'exact': TETR.IO's logarithmic
+        // b2bCountToLevel — identical for b2b 1-7, higher for b2b>=8 (which the fitted rule capped).
+        if (b2b > 0) atk += exact ? b2bLevel(b2b) : (b2b >= 3 ? 2 : 1);
       } else b2b = -1;
-      // observed: combo is a MULTIPLIER, not additive. (4+1)*1.25 = 6.25 -> 6
-      if (combo > 0) atk = Math.floor(atk * (1 + 0.25 * combo));
+      // combo is a MULTIPLIER: base*(1+0.25*combo). TETR.IO EXCEPTION (attack calculator): when the
+      // base+b2b attack is 0 (a comboing single), the value is floor(log1p(combo*1.25)) instead of 0,
+      // so a long single-combo still sends. The fitted 'legacy' path multiplied 0 and sent nothing.
+      if (combo > 0) atk = (exact && atk === 0) ? Math.floor(Math.log1p(combo * 1.25))
+                                                : Math.floor(atk * (1 + 0.25 * combo));
       // Special bonus: a flat +1 when a spin or a quad CLEARS GARBAGE. In halp1/triangle this
       // is `gSpecialBonus`, added AFTER the garbage multiplier
       // (`garbage.garbage * multiplier + gSpecialBonus`), so it is not scaled by combo or b2b.
