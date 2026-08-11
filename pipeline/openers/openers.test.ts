@@ -129,9 +129,10 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   const res = analyse(SESSIONS.map(sessionDir));
   const clean = res.filter(r => r.clean);
   // Population re-blessed 2026-08-11: the longer verified prefix admits more clean-first-bag rounds
-  // (358 -> 466 for the `hoisted`-DAS fix, then -> 470 when `attackModel:'exact'` became the drift
-  // default). The finding is the line below — `d <= 4` is still empty — not the population size.
-  expect(clean.length).toBe(470);
+  // (358 -> 466 for the `hoisted`-DAS fix, -> 470 when `attackModel:'exact'` became the drift default,
+  // -> 471 with confirm-timed garbage). The finding is the line below — `d <= 4` is still empty — not
+  // the population size.
+  expect(clean.length).toBe(471);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
   // ... and the instrument is not simply blind: it finds five exact matches, all the same opener
   const exact = clean.filter(r => r.exact!.asDrawn.length || r.exact!.asMirror.length);
@@ -139,8 +140,9 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   for (const r of exact)
     expect([...r.exact!.asDrawn, ...r.exact!.asMirror].some(n => /Perfect Clear Opener/.test(n))).toBe(true);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
-  // (264 -> 346 with the `hoisted`-DAS fix's longer prefix; still the bulk of 466 clean rounds)
-  expect(clean.filter(r => r.sbTriple).length).toBe(346);
+  // (264 -> 346 with the `hoisted`-DAS fix's longer prefix, -> 349 with confirm-timed garbage; still
+  // the bulk of 471 clean rounds)
+  expect(clean.filter(r => r.sbTriple).length).toBe(349);
 }, 300_000);
 
 /* ── the artifact the report reads ─────────────────────────────────────────────────────────────
