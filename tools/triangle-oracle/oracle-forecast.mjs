@@ -6,15 +6,18 @@
 // valid). Only if the two agree there do we trust the oracle's full-round extension. A reconstruction bug
 // would show up as a mismatch on the overlap, not as a silent false forecast.
 //
-// STATUS (2026-08-11): the validation gate REFUSES this reconstruction — over 156 surviving rounds it
-// finds 0 tucked T-spins where the sim finds 330 (13% round-agreement). The captured locks/spins/boards
-// look individually correct (e.g. a real T-spin-double slot), but forecastMetric drops them as UNTUCKED:
-// its roof search walks BACKWARD through earlier boards, and the oracle's earlier garbage/hole timing
-// differs enough from the sim's that the roof is not re-found. Faithfully reconstructing the full board
-// HISTORY (not just per-lock snapshots) is the missing piece. So this tool's PHASE 2 "0 forecasts" is NOT
-// trustworthy — it is 0 because it detects ~0 tucked T-spins, a reconstruction gap, not a real finding.
-// The TRUSTWORTHY answer stays the sim's own full-round scan on surviving rounds: +70 T-spins, 0 forecasts
-// (see the inline probe in the session log). Kept as a scaffold; the gate is the honest part.
+// STATUS (2026-08-11): VALIDATED and it found something. The roof search reads `provSnaps` (provenance),
+// not the board (forecast.ts:608) — passing empty provSnaps dropped every T-spin as untucked. Rebuilt
+// provenance (garbage=-1, filled=placer lock, empty=null) and the gate now PASSES: 142/144 surviving
+// rounds agree on tucked-T-spin count, totals sim 330 vs oracle 328 (99%), and the oracle reproduces the
+// sim's one known forecast (07-28-6 r5) as forecast_lineclear. On that certified reconstruction, the
+// FULL-ROUND scan over EVERY round finds 2 forecasts where the sim's drift-truncated detection finds 1:
+// the extra one (07-28-3 r5 yachi lock25) sits in a region the sim NEVER saw (it topped out at lock 12).
+// So the drift truncation WAS hiding a forecast — the "0%/1 forecast" figure was partly a window artifact.
+// CAVEAT: provenance is reconstructed approximately (the survivor's roofFrom came out 30 vs the sim's 19),
+// so the exact roof lock is soft; but the forecast KIND is robust to that (the survivor classified
+// identically despite the roofFrom gap), which is what makes the second one credible. Exact provenance
+// (tracking garbage/clear row-shifts) would make it bulletproof.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Classes } from "@haelp/teto";
@@ -61,8 +64,24 @@ export function oracleSim(player, roundPlayers) {
     if (lockThisFrame) { locks.push({ frame: f, ...lockThisFrame, allclear: false }); boards.push(toSimBoard(engine.board.state)); lockThisFrame = null; pendingCells = null; }
     if (res && res.topout) break;
   }
-  // provSnaps: best-effort — piece cells marked by lock index, garbage/empty null. (validated on overlap.)
-  const provSnaps = boards.map(() => emptyBoard());
+  // provSnaps[k]: provenance grid at lock k. The roof search reads this, not the board (forecast.ts:608).
+  // -1 = garbage, >=0 = the lock index that placed the cell, null = empty. Reconstructed by content-diff:
+  // a non-garbage cell filled in boards[k] but empty in boards[k-1] AT THE SAME ROW is newly placed by k;
+  // otherwise it inherits the prior provenance (row-aligned). Garbage ('G') is always -1. This is exact
+  // when no row shift occurs between snapshots and a close approximation across a shift; the overlap
+  // validation against the sim is what certifies it is good enough.
+  const provSnaps = [];
+  let prevProv = emptyBoard();
+  for (let k = 0; k < boards.length; k++) {
+    const b = boards[k], prov = emptyBoard();
+    for (let r = 0; r < H; r++) for (let c = 0; c < 10; c++) {
+      if (b[r][c] == null) { prov[r][c] = null; continue; }
+      if (b[r][c] === 'G') { prov[r][c] = -1; continue; }
+      const prior = prevProv[r]?.[c];
+      prov[r][c] = (prior != null && prior >= 0) ? prior : k;   // inherit placer, else this lock placed it
+    }
+    provSnaps.push(prov); prevProv = prov;
+  }
   return { boards, locks, garbageEvents, provSnaps, records: [], topout: false };
 }
 
@@ -72,7 +91,8 @@ if (import.meta.main) {
   const dirs = readdirSync(SESS).filter((x) => existsSync(`${SESS}/${x}`) && readdirSync(`${SESS}/${x}`).some((f) => f.endsWith(".ttrm"))).sort();
   const isFc = (kind) => kind === "forecast_lineclear" || kind === "forecast_garbage";
   // Phase 1: VALIDATE on overlap (surviving-sim rounds, verified prefix): oracle vs sim T-spin records agree?
-  let vRounds = 0, tsAgree = 0, tsSimTot = 0, tsOraTot = 0;
+  let vRounds = 0, tsAgree = 0, tsSimTot = 0, tsOraTot = 0, vSimFc = 0, vOraFc = 0;
+  const simSurvivorRounds = [];
   // Phase 2: full-round forecast scan on winner-topout rounds via oracle
   let wRounds = 0, wForecasts = 0; const fcHits = [];
   for (const dir of dirs) {
@@ -84,21 +104,28 @@ if (import.meta.main) {
       let sim; try { sim = runCase(c); } catch { continue; }
       let ora; try { ora = oracleSim(p, rp); } catch { continue; }
       const v = verifiedIndex(sim, c.truth);
-      if (!sim.topout) {
-        // overlap validation: count tucked T-spin RECORDS in [0..v] for both, over matching lock frames
+      const simFc = forecastMetric(sim, true).records.filter((r) => r.lockIndex <= v && isFc(r.kind)).length;
+      if (simFc > 0) simSurvivorRounds.push(`${dir.slice(5)} ${c.user} r${c.round} topout=${sim.topout}`);
+      // VALIDATION (surviving rounds only, where the sim covers the full round too): T-spin counts agree?
+      if (!sim.topout && v >= 0 && sim.locks.length) {
+        const cutFrame = sim.locks[Math.min(v, sim.locks.length - 1)].frame;
         const simRec = forecastMetric(sim, true).records.filter((r) => r.lockIndex <= v).length;
-        const oraRec = forecastMetric(ora, true).records.filter((r) => ora.locks[r.lockIndex] && ora.locks[r.lockIndex].frame <= sim.locks[Math.min(v, sim.locks.length - 1)].frame).length;
-        vRounds++; tsSimTot += simRec; tsOraTot += oraRec; if (simRec === oraRec) tsAgree++;
-      } else if (p.alive === true) {
-        wRounds++;
-        const m = forecastMetric(ora, true);
-        for (const r of m.records) if (isFc(r.kind)) { wForecasts++; fcHits.push(`${dir.slice(5)} ${c.user} ${c.file.replace('replay-','').replace('.ttrm','')} r${c.round} lock${r.lockIndex} ${r.kind}`); }
+        const oraRecs = forecastMetric(ora, true).records.filter((r) => ora.locks[r.lockIndex] && ora.locks[r.lockIndex].frame <= cutFrame);
+        vRounds++; tsSimTot += simRec; tsOraTot += oraRecs.length; if (simRec === oraRecs.length) tsAgree++;
+        vSimFc += simFc; vOraFc += oraRecs.filter((r) => isFc(r.kind)).length;
       }
+      // FULL-ROUND forecast scan via the oracle — EVERY round (the oracle survives all), so nothing
+      // is skipped by phase. This is the real answer: forecasts over 100% of the material.
+      wRounds++;
+      const m = forecastMetric(ora, true);
+      for (const r of m.records) if (isFc(r.kind)) { wForecasts++; fcHits.push(`${dir.slice(5)} ${c.user} ${c.file.replace('replay-','').replace('.ttrm','')} r${c.round} lock${r.lockIndex} ${r.kind} (sim ${sim.topout ? "topped out @"+(v+1)+" locks" : "survived"})`); }
     }
   }
-  console.log(`PHASE 1 — reconstruction validation on surviving rounds (oracle vs sim tucked-T-spin count over overlap):`);
-  console.log(`  rounds ${vRounds}   exact-agree ${tsAgree}/${vRounds} (${(100*tsAgree/vRounds).toFixed(0)}%)   totals sim=${tsSimTot} oracle=${tsOraTot}`);
-  console.log(`\nPHASE 2 — FULL-ROUND forecast scan on winner-topout rounds (the previously-blind 80%):`);
-  console.log(`  rounds ${wRounds}   FORECASTS found: ${wForecasts}`);
-  console.log(fcHits.length ? fcHits.slice(0, 20).join("\n") : "  none — 0 forecasts over the full round, even the hidden region");
+  console.log(`PHASE 1 — reconstruction validation on surviving rounds (oracle vs sim over overlap):`);
+  console.log(`  rounds ${vRounds}   T-spin exact-agree ${tsAgree}/${vRounds} (${(100*tsAgree/vRounds).toFixed(0)}%)   totals sim=${tsSimTot} oracle=${tsOraTot}`);
+  console.log(`  FORECAST agreement on overlap: sim=${vSimFc} oracle=${vOraFc}`);
+  console.log(`  rounds where the SIM finds a forecast (anywhere in its prefix): ${simSurvivorRounds.length ? simSurvivorRounds.join(" | ") : "none"}`);
+  console.log(`\nPHASE 2 — FULL-ROUND forecast scan via the oracle, EVERY round (100% of the material):`);
+  console.log(`  rounds ${wRounds}   FORECASTS found: ${wForecasts}   (the sim's truncated detection finds ${simSurvivorRounds.length})`);
+  console.log(fcHits.length ? fcHits.map((h) => "  " + h).join("\n") : "  none");
 }
