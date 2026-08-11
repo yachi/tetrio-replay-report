@@ -6,9 +6,77 @@
 //! field[0] is the BOTTOM row. The flip happens here, once, and it is the single easiest thing
 //! in this bridge to get wrong — feeding it top-down silently reports NO detections on every
 //! board, which reads as agreement rather than as a bug.
+//!
+//! MOVEGEN mode (CC_ORACLE_MOVES=1) is the second question this bridge can answer with the
+//! ORIGINAL Rust: not "is there a slot" but "what placements can the mover REACH". It is the
+//! external authority for our forecast BFS (`forecast.ts` `bestTspin`), whose reachable-set was
+//! only ever checked against a second copy of itself until now. Protocol per record: ONE line
+//! holding a single piece letter (I T O S Z L J), then the 40 board rows. Output per record:
+//! `{"placements":[[[c,r],[c,r],[c,r],[c,r]], ...]}` — every resting placement `find_moves`
+//! returns, each as its four occupied cells in THIS repo's top-down coords (`r = 39 - cc_y`),
+//! cells sorted (row, then col) within a placement and placements sorted lexicographically, so
+//! the line is canonical and byte-stable. `MovementMode::ZeroGComplete` is used deliberately:
+//! `ZeroG`'s fast_mode prunes stack movement and would UNDER-report versus our complete
+//! soft-drop BFS, manufacturing false "we reach more" findings. The default (detector) output is
+//! untouched, so the committed CI smoke test and `cross-tslot-count.ts` keep passing verbatim.
 use cold_clear::evaluation::standard::*;
-use libtetris::Board;
+use libtetris::{find_moves, Board, FallingPiece, MovementMode, Piece, SpawnRule};
 use std::io::{self, BufRead, Write};
+
+/// Map a board input letter to cold-clear's `Piece`. Returns `None` for anything else so a
+/// malformed piece line fails loudly rather than defaulting to some piece and reporting a
+/// plausible-but-wrong placement set.
+fn piece_of(ch: char) -> Option<Piece> {
+    match ch {
+        'I' => Some(Piece::I),
+        'O' => Some(Piece::O),
+        'T' => Some(Piece::T),
+        'L' => Some(Piece::L),
+        'J' => Some(Piece::J),
+        'S' => Some(Piece::S),
+        'Z' => Some(Piece::Z),
+        _ => None,
+    }
+}
+
+/// The four occupied cells of a resting `FallingPiece`, in this repo's top-down coords, sorted
+/// (row, col). `cells()` are absolute and y-up; `r = 39 - cc_y` is the one flip, matching
+/// `set_field` above.
+fn placement_cells(p: &FallingPiece) -> [[i32; 2]; 4] {
+    let mut cells: [[i32; 2]; 4] = [[0, 0]; 4];
+    for (i, &(x, y)) in p.cells().iter().enumerate() {
+        cells[i] = [x, 39 - y];
+    }
+    cells.sort_by(|a, b| a[1].cmp(&b[1]).then(a[0].cmp(&b[0])));
+    cells
+}
+
+/// MOVEGEN mode: `find_moves` (ZeroGComplete) for `piece` on `b`, emitted as a canonical line.
+fn emit_moves_line(out: &mut impl Write, b: &Board, piece: Piece) {
+    // A blocked spawn (roof already full) yields no placements — an honest empty list, not an
+    // error, so the differential can treat it as "our BFS must also reach nothing here".
+    let placements = match SpawnRule::Row19Or20.spawn(piece, b) {
+        Some(spawned) => {
+            let mut ps: Vec<[[i32; 2]; 4]> = find_moves(b, spawned, MovementMode::ZeroGComplete)
+                .iter()
+                .map(|pl| placement_cells(&pl.location))
+                .collect();
+            ps.sort();
+            ps.dedup();
+            ps
+        }
+        None => Vec::new(),
+    };
+    let body: Vec<String> = placements
+        .iter()
+        .map(|cells| {
+            let parts: Vec<String> = cells.iter().map(|c| format!("[{},{}]", c[0], c[1])).collect();
+            format!("[{}]", parts.join(","))
+        })
+        .collect();
+    writeln!(out, "{{\"placements\":[{}]}}", body.join(",")).unwrap();
+    out.flush().unwrap();
+}
 
 fn main() {
     // MULTI-SLOT is opt-in via CC_ORACLE_SLOTS so the default output stays byte-identical: the
@@ -16,6 +84,42 @@ fn main() {
     // `{"any":false,"hits":[],"lines":0}`, and `cross-tslot-count.ts` reads only `.lines`. With the
     // env set the line gains a trailing `"slots":[...]` field and nothing else moves.
     let emit_slots = std::env::var_os("CC_ORACLE_SLOTS").is_some();
+
+    // MOVEGEN mode is a wholly separate read path (it consumes a leading piece letter), so it
+    // branches here and never touches the detector loop below.
+    if std::env::var_os("CC_ORACLE_MOVES").is_some() {
+        let stdin = io::stdin();
+        let out = io::stdout();
+        let mut out = out.lock();
+        let mut piece: Option<Piece> = None;
+        let mut field = [[false; 10]; 40];
+        let mut row = 0usize;
+        for line in stdin.lock().lines() {
+            let line = line.unwrap();
+            if line.trim().is_empty() {
+                continue;
+            }
+            if piece.is_none() {
+                let ch = line.trim().chars().next().unwrap();
+                piece = Some(piece_of(ch).unwrap_or_else(|| panic!("bad piece letter: {:?}", ch)));
+                continue;
+            }
+            for (c, ch) in line.chars().take(10).enumerate() {
+                field[39 - row][c] = ch != '.';
+            }
+            row += 1;
+            if row == 40 {
+                let mut b = Board::new();
+                b.set_field(field);
+                emit_moves_line(&mut out, &b, piece.unwrap());
+                piece = None;
+                field = [[false; 10]; 40];
+                row = 0;
+            }
+        }
+        return;
+    }
+
     let stdin = io::stdin();
     let mut field = [[false; 10]; 40];
     let mut row = 0usize;

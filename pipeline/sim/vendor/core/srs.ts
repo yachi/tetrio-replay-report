@@ -35,7 +35,7 @@ type KickKey =
   | '3->0' | '0->3';
 type KickTable = Record<KickKey, readonly [number, number][]>;
 
-const JLSZT_KICKS: KickTable = {
+export const JLSZT_KICKS: KickTable = {
   '0->1': [[0, 0], [-1, 0], [-1, -1], [0, +2], [-1, +2]],
   '1->0': [[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]],
   '1->2': [[0, 0], [+1, 0], [+1, +1], [0, -2], [+1, -2]],
@@ -46,7 +46,7 @@ const JLSZT_KICKS: KickTable = {
   '0->3': [[0, 0], [+1, 0], [+1, -1], [0, +2], [+1, +2]],
 };
 
-const I_KICKS: KickTable = {
+export const I_KICKS: KickTable = {
   '0->1': [[0, 0], [-2, 0], [+1, 0], [-2, +1], [+1, -2]],
   '1->0': [[0, 0], [+2, 0], [-1, 0], [+2, -1], [-1, +2]],
   '1->2': [[0, 0], [-1, 0], [+2, 0], [-1, -2], [+2, +1]],
@@ -65,7 +65,7 @@ const I_KICKS: KickTable = {
  * src/engine/utils/kicks/data.ts ("SRS+".i_kicks); same [dx, dy] row-down convention.
  * 1->2, 2->3 and 3->0 are identical in both tables and are repeated here verbatim.
  */
-const I_KICKS_PLUS: KickTable = {
+export const I_KICKS_PLUS: KickTable = {
   '0->1': [[0, 0], [+1, 0], [-2, 0], [-2, +1], [+1, -2]],
   '1->0': [[0, 0], [-1, 0], [+2, 0], [-1, +2], [+2, -1]],
   '1->2': [[0, 0], [-1, 0], [+2, 0], [-1, -2], [+2, +1]],
@@ -79,7 +79,7 @@ const I_KICKS_PLUS: KickTable = {
 let kicksetName: 'SRS' | 'SRS+' = 'SRS';
 export function setKickset(k: 'SRS' | 'SRS+') { kicksetName = k; }
 
-const O_KICKS: KickTable = {
+export const O_KICKS: KickTable = {
   '0->1': [[0, 0]],
   '1->0': [[0, 0]],
   '1->2': [[0, 0]],

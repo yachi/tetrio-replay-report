@@ -188,6 +188,39 @@ spin they draw and is provably right to reject the one forecast they draw cleanl
 would require extending the **verified prefix** (only 13.8% of placements, systematically early-round)
 — a simulator-fidelity project (the line-clear-delay attack model), not something the examples reach.
 
+### The engine's geometry vs the ORIGINAL cold-clear (2026-08-10)
+
+`cross-tslot*` already differential the T-slot *detectors* against the real Rust `cc-oracle`. Two
+gates now cover the SRS geometry the forecast BFS is built on, both against the same binary
+(`nix build .#cc-oracle`), both with proven teeth:
+
+- **Reachability — `cross-movegen.test.ts`** (oracle mode `CC_ORACLE_MOVES=1`, `cc-oracle.rs`).
+  Our BFS's reachable resting-placement set vs `libtetris::find_moves(ZeroGComplete)`, all 7 pieces,
+  2,000 seeded overhang boards + the empty board. The invariant is **`cc ⊆ ours`, not equality**:
+  cold-clear's mover only shifts horizontally at rest heights (drop→shift→drop, no per-cell soft
+  drop), so it under-reaches mid-height tucks our complete-0G BFS finds — the same asymmetry
+  `cross-tslot.ts` records for the named shapes, and the faithful model of what a player reaches. The
+  informative direction is `cc \ ours` = a placement cold-clear reaches that we miss = a reachability
+  false-negative (the arrival-key class, `spec/BfsKey.dfy`). Measured **0** over 380k placements; the
+  expected superset `ours \ cc` is 14,767 and asserted non-vacuous. This is the first check that
+  exercises the six non-T pieces' kicks *behaviorally*.
+
+- **Kick values — `cross-srs-tables.test.ts`** (`cc-srs.ts`). Our kick tables vs cold-clear's
+  `rotation_points` (kick = `init[i] − target[i]`, y negated). **JLSTZ exact** on all 8 transitions;
+  **I identical up to one per-transition constant** (bounding-box vs rotation-centre origin for the
+  4-wide I — it cancels in the resting cells, which movegen confirms); **O identity** (cold-clear
+  centre-rotates the O; we hold it fixed; same cells). `I_KICKS_PLUS` (SRS+) is excluded — cold-clear
+  is guideline SRS, so it is not an oracle for TETR.IO's order-only I-kick change.
+
+**Why both.** Measured: the movegen subset gate survives a corrupted single kick candidate (even
+disabling kicks entirely) — our BFS routes around it, so `cc ⊆ ours` still holds. So movegen pins
+*reachability* but not *kick values*; the table check pins the values (it fails a transposed
+`[+1,0]→[+2,0]`). Neither alone is sufficient. Out of cold-clear's scope by design and left to
+replays/spec: SRS+ I-kicks, the attack/combo/b2b/PC table, the MINSTD 7-bag, garbage, handling, and
+180° (neither engine has it). `detectTSpin`'s mini-vs-full is CC-comparable but deliberately NOT
+gated against CC — CC upgrades only on the last kick, we on any kick, and TETR.IO not CC is ground
+truth there; its line *count* is already pinned by `cc-oracle cutout_tslot` vs `bestTspinLines`.
+
 ### Can sequence alignment extend the verified prefix? (measured: no)
 
 `prefix-alignment-probe.ts` tests the obvious academic lever: `verifiedIndex` cuts the prefix at the
