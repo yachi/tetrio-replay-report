@@ -82,6 +82,11 @@ export function replayRound(player, roundPlayers, { untilFrame = null } = {}) {
 
   const total = untilFrame ?? player.replay.frames ?? 2000;
   const grids = new Map();
-  for (let f = 0; f <= total; f++) { engine.tick(byFrame.get(f) || []); injectHoles(); grids.set(f, enc()); }
-  return { grids, gridAt: (f) => grids.get(f), frames: total, garbageLoads: loads, alive: player.alive };
+  let topout = false, topoutFrame = null;
+  for (let f = 0; f <= total; f++) {
+    const res = engine.tick(byFrame.get(f) || []);
+    if (!topout && res && res.topout) { topout = true; topoutFrame = f; }
+    injectHoles(); grids.set(f, enc());
+  }
+  return { grids, gridAt: (f) => grids.get(f), frames: total, garbageLoads: loads, alive: player.alive, topout, topoutFrame };
 }
