@@ -90,3 +90,22 @@ evidence the quarantined sections are missing. Building that check exposed the o
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
 was flagged non-dual purely because the oracle mis-paired a garbage hole; with the fix it is 1/1
 dual-backed. The sim matched ground truth throughout — the bug was the oracle's.
+
+## The dual-backed manifest — checkable two-engine confirmation
+
+`cross-extract.mjs` emits `dual-backed.json`, a committed, byte-stable record of how much of each
+quarantined section two independent engines agree on:
+
+```bash
+bun cross-extract.mjs                             # print the coverage table
+bun cross-extract.mjs --out ./dual-backed.json    # (re)write the manifest
+bun cross-extract.mjs --check                     # reproducibility gate: fail if the committed file is stale
+```
+
+It is a **tools** artifact, deliberately: computing it needs @haelp/teto (161 pkgs), so the main CI does
+not rebuild it and its `--check` gate lives here, not in `pipeline/`. Counts are stored as integers so the
+JSON is byte-stable; percentages are derived at read time. The manifest is engine AGREEMENT, **not** a
+Dafny proof — it carries no claim id and no ✓ badge, and never merges into `facts.json`. It is the data
+layer for a possible `✓ two-engine` marker in the forecast/opener sections; wiring that into the published
+report is a separate decision, because the report is pipeline-built (no oracle) and every report artifact
+is held to CI-reproducibility, which a manifest needing the oracle cannot meet.

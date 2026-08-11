@@ -1,0 +1,118 @@
+{
+  "schema": "dual-backed/1",
+  "what": "Two-engine (dual-EXTRACTOR) confirmation of the quarantined sim-derived sections. An event is dual-backed when the project sim and Triangle.js (@haelp/teto) produce bit-exact boards through its lock over the verified prefix. This is engine AGREEMENT, NOT a Dafny proof — it does not carry a claim id or a ✓ badge, and it never merges into facts.json.",
+  "engines": [
+    "pipeline/sim",
+    "@haelp/teto (Triangle.js)"
+  ],
+  "verified_prefix_locks": {
+    "total": 11778,
+    "dual": 11222
+  },
+  "sessions": {
+    "2026-07-22": {
+      "prefix_locks": 3461,
+      "prefix_dual": 3341,
+      "forecast": {
+        "total": 301,
+        "dual": 286,
+        "by_kind": {
+          "reactive": {
+            "total": 133,
+            "dual": 122
+          },
+          "self_built": {
+            "total": 168,
+            "dual": 164
+          }
+        }
+      },
+      "opener_rounds": 139,
+      "opener_dual": 131
+    },
+    "2026-07-24": {
+      "prefix_locks": 1999,
+      "prefix_dual": 1883,
+      "forecast": {
+        "total": 178,
+        "dual": 162,
+        "by_kind": {
+          "reactive": {
+            "total": 76,
+            "dual": 70
+          },
+          "self_built": {
+            "total": 102,
+            "dual": 92
+          }
+        }
+      },
+      "opener_rounds": 83,
+      "opener_dual": 76
+    },
+    "2026-07-28": {
+      "prefix_locks": 2387,
+      "prefix_dual": 2241,
+      "forecast": {
+        "total": 220,
+        "dual": 207,
+        "by_kind": {
+          "forecast_lineclear": {
+            "total": 1,
+            "dual": 1
+          },
+          "reactive": {
+            "total": 83,
+            "dual": 76
+          },
+          "self_built": {
+            "total": 136,
+            "dual": 130
+          }
+        }
+      },
+      "opener_rounds": 111,
+      "opener_dual": 100
+    },
+    "2026-08-01": {
+      "prefix_locks": 2031,
+      "prefix_dual": 1947,
+      "forecast": {
+        "total": 181,
+        "dual": 173,
+        "by_kind": {
+          "reactive": {
+            "total": 70,
+            "dual": 66
+          },
+          "self_built": {
+            "total": 111,
+            "dual": 107
+          }
+        }
+      },
+      "opener_rounds": 90,
+      "opener_dual": 88
+    },
+    "2026-08-09": {
+      "prefix_locks": 1900,
+      "prefix_dual": 1810,
+      "forecast": {
+        "total": 170,
+        "dual": 158,
+        "by_kind": {
+          "reactive": {
+            "total": 66,
+            "dual": 61
+          },
+          "self_built": {
+            "total": 104,
+            "dual": 97
+          }
+        }
+      },
+      "opener_rounds": 88,
+      "opener_dual": 83
+    }
+  }
+}
