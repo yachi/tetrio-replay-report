@@ -10,7 +10,8 @@
   "session": "2026-07-24",
   "gate": "frame+amount+row (ige row oracle must agree)",
   "simulator_options": {
-    "garbagespeed": 30,
+    "readyFrom": "confirm",
+    "garbagespeed": 20,
     "garbagecap": 8,
     "locktime": 60,
     "gravity": 0.02,

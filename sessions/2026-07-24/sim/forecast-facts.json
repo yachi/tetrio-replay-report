@@ -10,7 +10,8 @@
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
   "simulator_options": {
-    "garbagespeed": 30,
+    "readyFrom": "confirm",
+    "garbagespeed": 20,
     "garbagecap": 8,
     "locktime": 60,
     "gravity": 0.02,

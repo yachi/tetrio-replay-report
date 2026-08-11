@@ -4,13 +4,14 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 92.0% of Triples match the wiki window against 15.3% of Doubles, over 226 verified T-spins",
+    "the slot-geometry match is a SHAPE test, not an opener test: 92.0% of Triples match the wiki window against 15.0% of Doubles, over 228 verified T-spins",
     "the ordering metric is scored on 71 of 111 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
   ],
   "session": "2026-07-28",
   "gate": "frame+amount+row (ige row oracle must agree)",
   "simulator_options": {
-    "garbagespeed": 30,
+    "readyFrom": "confirm",
+    "garbagespeed": 20,
     "garbagecap": 8,
     "locktime": 60,
     "gravity": 0.02,
@@ -135,20 +136,20 @@
   },
   "first_bag": {
     "rounds": 128,
-    "clean": 104,
+    "clean": 103,
     "players": [
       {
         "user": "pinglamb",
-        "clean_first_bags": 57,
+        "clean_first_bags": 56,
         "exact_matches": [],
         "nearest": {
           "any": {
             "min_cells": 4,
-            "within_threshold": 47,
+            "within_threshold": 46,
             "bands": {
               "0": 0,
               "1-2": 0,
-              "3-4": 47,
+              "3-4": 46,
               "5-8": 9,
               "9-14": 1,
               "15+": 0
@@ -161,7 +162,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 48,
+              "5-8": 47,
               "9-14": 9,
               "15+": 0
             }
@@ -173,7 +174,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 50,
+              "5-8": 49,
               "9-14": 7,
               "15+": 0
             }
@@ -186,7 +187,7 @@
               "1-2": 0,
               "3-4": 0,
               "5-8": 3,
-              "9-14": 54,
+              "9-14": 53,
               "15+": 0
             }
           },
@@ -197,7 +198,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 56,
+              "5-8": 55,
               "9-14": 1,
               "15+": 0
             }
@@ -361,11 +362,11 @@
       },
       {
         "lines": 2,
-        "n": 111,
+        "n": 113,
         "drawn": 9,
         "mirrored": 8,
         "matched": 17,
-        "share_x1000": 153
+        "share_x1000": 150
       },
       {
         "lines": 3,

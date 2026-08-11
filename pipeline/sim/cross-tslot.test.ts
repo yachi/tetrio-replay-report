@@ -96,9 +96,10 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // pin that both methods are actually firing, and roughly how often.
   expect(both).toBeGreaterThan(1500);
   expect(ccOnly).toBeGreaterThan(50);
-  // 7544 -> 9878 -> 10295 on 2026-08-11: the `hoisted`-DAS fix lengthened the verified prefix ~31%,
-  // then `attackModel:'exact'` (the drift default) added ~4% more (lock, step) pairs. The
+  // 7544 -> 9878 -> 10295 -> 10397 on 2026-08-11: the `hoisted`-DAS fix lengthened the verified
+  // prefix ~31%, then `attackModel:'exact'` (the drift default) added ~4%, then confirm-timed garbage
+  // (readyFrom:'confirm' + documented garbagespeed 20) added ~1.2% more (lock, step) pairs. The
   // differential above (unexplained == []) is what this test guards; this total is the
   // anti-vacuity denominator and simply tracks the longer prefix.
-  expect(both + oursOnly + ccOnly + neither).toBe(10295);
+  expect(both + oursOnly + ccOnly + neither).toBe(10397);
 });

@@ -5,12 +5,13 @@
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
     "per-round split-half reliability is undefined, not low: the per-round rate is identically 0 in every scorable round, so it has no variance to correlate with itself",
-    "no effect at any unit: round AUC undecidable — 0 decided pairs of 54, the rate ties everywhere"
+    "no effect at any unit: round AUC undecidable — 0 decided pairs of 55, the rate ties everywhere"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
   "simulator_options": {
-    "garbagespeed": 30,
+    "readyFrom": "confirm",
+    "garbagespeed": 20,
     "garbagecap": 8,
     "locktime": 60,
     "gravity": 0.02,
@@ -38,28 +39,28 @@
       "tspin_triples_game_stats": 82,
       "tspin_doubles_game_stats": 339,
       "rounds_played": 79,
-      "verified_tspins": 161,
-      "admitted_lineclearing_tspins": 162,
+      "verified_tspins": 166,
+      "admitted_lineclearing_tspins": 167,
       "tspins_excluded_untucked": 1,
       "tspins_excluded_no_snapshot": 0,
       "tspins_excluded_zero_clear": 1,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
-      "self_built": 92,
+      "self_built": 96,
       "unattributed": 0,
       "mechanism_established": 0,
       "forecast_total": 0,
       "clause2_undecided": 0,
-      "floor_pre_existed": 133,
-      "floor_arrived_later": 27,
+      "floor_pre_existed": 137,
+      "floor_arrived_later": 28,
       "floor_undetermined": 1,
-      "reactive": 69,
+      "reactive": 70,
       "forecast_rate_x1000": 0,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 23,
+      "sampling_ci95_hi_x1000": 22,
       "simulator_range_lo_x1000": 0,
       "simulator_range_hi_x1000": 0,
-      "verified_placements": 1612,
+      "verified_placements": 1648,
       "total_placements": 6971
     },
     {
@@ -88,15 +89,15 @@
       "sampling_ci95_hi_x1000": 25,
       "simulator_range_lo_x1000": 0,
       "simulator_range_hi_x1000": 0,
-      "verified_placements": 2008,
+      "verified_placements": 2018,
       "total_placements": 7546
     }
   ],
   "session": {
     "player_rounds": 158,
-    "verified_placements": 3620,
+    "verified_placements": 3666,
     "total_placements": 14517,
-    "coverage_x1000": 249
+    "coverage_x1000": 252
   },
   "statistics": {
     "round": {
@@ -104,13 +105,13 @@
       "auc_x1000": 500,
       "wins": 0,
       "losses": 0,
-      "ties": 54,
+      "ties": 55,
       "decided": 0,
       "exact_p_x1000": null
     },
     "event": {
       "forecast_n": 0,
-      "reactive_n": 309,
+      "reactive_n": 314,
       "attack": null,
       "lines": null,
       "balance": {
@@ -126,7 +127,7 @@
         "yachi": null
       },
       "scorable_rounds": {
-        "pinglamb": 64,
+        "pinglamb": 65,
         "yachi": 67
       },
       "rounds_for_r70": {

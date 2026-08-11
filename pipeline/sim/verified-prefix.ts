@@ -52,7 +52,20 @@ export function replayDir(dir = process.env.REPLAY_DIR): string {
 }
 
 export const BEST_OPTS = {
-  garbagespeed: 30, garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
+  // Garbage insertion is timed from the RECORDED interaction_confirm frame (readyFrom:'confirm')
+  // plus TETR.IO's DOCUMENTED garbagespeed=20 — both ground truth, not fits. The .ttrm records
+  // both the receive (interaction) and confirm (interaction_confirm) frame of every garbage batch;
+  // the receive→confirm telegraph is mean 8.6 / median 9 frames (per-batch, recorded). Timing from
+  // receive+30 (the old fit) approximated confirm+20 with a constant offset — receive+28.6 on
+  // average — which is why the receive-timed sweep peaked near 28-30 and looked like an
+  // "undocumented active system". It was not: it was the recorded telegraph the sim ignored.
+  // confirm+20 achieves the peak verified prefix in ALL five sessions (two tie at 18) and beats the
+  // fitted receive+30 by +143 verified locks (+1.16%) corpus-wide. Same class of fix as exact-attack
+  // and hoisted-DAS: replace a fitted parameter with recorded ground truth. Garbage TIMING moves the
+  // board, so this regenerates the quarantined forecast/opener facts — never facts.json (Python-
+  // extracted, sim-independent). See tools/triangle-oracle/probe-confirm-timing.mjs for the sweep.
+  readyFrom: 'confirm' as const, garbagespeed: 20,
+  garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
   insertMode: 'onPlace' as const, cancelMode: 'all' as const, acEmit: 'separate' as const,
   subframe: true, blockout: 'shiftup' as const, kickset: 'SRS+' as const,
   // TETR.IO's documented attack formula (logarithmic b2b level + log1p zero-base combo), not the
