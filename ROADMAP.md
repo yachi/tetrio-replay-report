@@ -1085,6 +1085,13 @@ metric. The test now pins the riser BY IDENTITY rather than by count, so a secon
 a count can only be updated by writing a bigger number, which is how a gate that found something
 becomes a gate that records that something was found.
 
+**Update (2026-08-11): the second riser has now landed** — `2026-08-01 pinglamb replay-6 r4
+lock16` (localJ 0 → 1), surfaced not by new behaviour but by the hoisted-DAS fix's longer verified
+prefix bringing lock16 into scope (see "Simulator drift" below). Both risers are now named in
+`ROSE_KNOWN`. The by-identity design worked as intended — it forced this to be a conscious
+addition rather than a silent count bump — but two deferred instances now stand, so the slot-local
+decision is that much more live.
+
 **How it stayed hidden is the more useful half.** That test's `SESSIONS` admits a session only once
 it has a `sim/` directory. 2026-08-09 had none until `opener-facts.json` was written into one, so
 the test scanned four sessions while appearing to scan every session present — a corpus defined by
@@ -1363,10 +1370,11 @@ below are what the work turned up and did not close.
   all 50 already die — but there is no mutant in that harness for the arrival key at all, so a
   future revert would be caught only by the separate `mutate-arrival-key.ts`. Either add the file to
   the default set, or add a `key/revert-to-position` entry, or state why neither is wanted.
-- **`sessions/2026-08-09/sim/forecast-facts.json` does not exist**, so the newest session is
-  uncovered by the forecast-section gate — `verify.yml:280` guards it with `if [ -f ... ]` and simply
-  skips. Pre-existing, unrelated to this work, and it means the blast radius of any forecast change
-  is silently four sessions rather than five.
+- **`sessions/2026-08-09/sim/forecast-facts.json` — CLOSED 2026-08-11 (`c9f3065`).** Was
+  untracked, so the newest session was uncovered by the forecast-section gate (`verify.yml:280`
+  guards with `if [ -f ... ]` and skipped it) and the blast radius of any forecast change was
+  silently four sessions, not five. Committed alongside the hoisted-DAS regeneration, so all five
+  sessions are now covered. Worth confirming `verify.yml` no longer skips it.
 - **The `cc-movegen.ts` standing gate is not built.** `cc-tslot.ts` cross-checks slot *presence* by
   shape-matching and structurally could not have caught this defect, which is about *reachability*.
   A cold-clear-2 port did catch it. Port from **CC2** (MIT/Apache — CC1 is MPL-2.0, see `fba5ddc`),
@@ -1374,3 +1382,45 @@ below are what the work turned up and did not close.
   assertion, and state that it shares this engine's **no-180-rotation** blind spot so it can never
   detect the `wiki-fixtures.test.ts` `UNREACHABLE = {31,35,37}` class. No claim ids, no badges, same
   quarantine as `cc-tslot.ts`.
+
+## Simulator drift — the hoisted-DAS fix, and what it leaves open (2026-08-11)
+
+The Triangle.js oracle (`tools/triangle-oracle/`) was built as a headless, batchable board
+oracle to map where `pipeline/sim` diverges from a faithful engine. Following its disagreement
+map to a root cause found a real sim bug and closed the entire opening-divergence class.
+
+**DONE (2026-08-11), `c9f3065`.** `.ttrm` keydowns carry `hoisted: true` when the client
+recorded that direction as ALREADY held when the piece spawned — DAS is pre-charged, so the
+piece slams to the wall rather than moving a single tap. The sim dropped the flag
+(`verified-prefix.ts` never plumbed it, `InEvent` had no field) and treated every keydown as a
+fresh tap. `scan-lock0.mjs` found 148/592 openers (25%) diverged sim-vs-oracle; `scan-hoisted.mjs`
+found 146 of them carried a hoisted opening move-key. The ground truth was the client's OWN
+recorded flag, stronger than a pixel capture — no live capture needed. Fix:
+`dasTimer = e.hoisted ? handling.dcd : handling.das`, arming ARR when no charge remains.
+Result: opening divergences **148 → 3**, corpus bit-exact **39.5% → 49.6%**, verified prefix
+**+31%** (cross-tslot step total 7544 → 9878). `facts.json` is python-extracted, so claims,
+Dafny and SMT were untouched (08-09 `verify-session`: 88/88 verified); the ripple was confined to
+the quarantined opener/forecast tiers and their audit count-pins, re-blessed with comments. Guarded
+by `pipeline/sim/hoisted-das.test.ts`.
+
+**TODO — three open items the fix left, in the order they were surfaced:**
+
+1. **Resolve slot-local gating (the decision two gates now force).** The hoisted fix's longer
+   prefix admitted a SECOND slot-local riser — `2026-08-01 pinglamb replay-6 r4 lock16`
+   (localJ 0 → 1) — alongside the 08-09 one that section 2b already flagged. Both are now named
+   in `forecast-saturation.test.ts`'s `ROSE_KNOWN`, and the full-round ordering control picked up
+   one stray Double-then-Triple subsequence in two sessions (past the verified prefix, so
+   `openers.test.ts` bounds it rather than pinning zero). All three point at the same latent
+   decision — should the forecast/ordering metrics gate slot-locally instead of using the global
+   `improved`? — which moves every published forecast figure and must be taken on its own terms
+   (see 2b and "T-Spin Forecast" item 7). Not resolved unilaterally.
+
+2. **Chase the 3 residual lock-0 divergences.** After the fix, 3/592 openers still diverge
+   sim-vs-oracle (2 "plain", i.e. non-hoisted, + 1). A separate, rarer cause — likely a
+   movement/spawn edge case. `diag.mjs <file> <round> <user>` dumps the boards to localise it.
+
+3. **Certify mid-round garbage timing (`garbagespeed`/cap).** The opening class is closed but the
+   corpus is still only 49.6% bit-exact — the bulk of the remainder is garbage-insertion TIMING,
+   where the oracle's `TL_DEFAULTS` are best-effort (holes and gravity are pinned; speed/cap are
+   not; see the README caveat). Pin them against a live-capture sample of the early mid-round
+   divergences to turn the disagreement map into a certified drift oracle for that class too.
