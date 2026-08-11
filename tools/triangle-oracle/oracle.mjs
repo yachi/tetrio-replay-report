@@ -30,14 +30,26 @@ export function replayRound(player, roundPlayers, { untilFrame = null } = {}) {
   const players = roundPlayers.map((p) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const byFrame = new Map();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame).push(e); }
-  // recorded per-line hole columns, oldest-first, from the ige garbage `interaction` events
+  // recorded garbage batches from the ige `interaction` events, keyed by batch id (`iid`). Pairing
+  // holes by iid — not by a blind oldest-first FIFO over every recorded line — is the ONLY reliable
+  // scheme: most recorded garbage is CANCELLED before it inserts (the loads sum to far more lines
+  // than a 20-high board holds), and a positional FIFO desyncs permanently at the first cancel,
+  // handing every later insertion an earlier, cancelled batch's hole column.
   const loads = player.replay.events
     .filter((e) => e.type === "ige" && e.data?.data?.type === "garbage" && e.data.type === "interaction")
-    .map((e) => ({ amt: e.data.data.amt, x: e.data.data.x }));
-  const holeFIFO = [];
-  for (const l of loads) for (let i = 0; i < l.amt; i++) holeFIFO.push(l.x);
+    .map((e) => ({ amt: e.data.data.amt, x: e.data.data.x, iid: e.data.data.iid }));
+  const iidToX = new Map(loads.map((l) => [l.iid, l.x]));
 
   const engine = Game.createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
+  // Holes of garbage that ACTUALLY inserts, in insertion order — Triangle emits `garbage.tank` per
+  // inserted batch (cancelled batches never tank), carrying the batch `iid` we map back to the
+  // recorded hole `x`. Accumulated during each tick, consumed by injectHoles after it. Falls back to
+  // Triangle's own re-rolled column only for an iid the recording somehow lacks.
+  const holeFIFO = [];
+  engine.events.on("garbage.tank", (ev) => {
+    const x = iidToX.has(ev.iid) ? iidToX.get(ev.iid) : ev.column;
+    for (let i = 0; i < ev.amount; i++) holeFIFO.push(x);
+  });
   const holeWidth = 10 - (o.garbageholesize ?? 1);
   const gbTile = () => ({ mino: "gb", connections: 0 });
   const gRowIdx = () => {

@@ -29,8 +29,13 @@ match these specific replays:
 1. **Gravity** — the version-19 `.ttrm` `options` omits `g`; force a sane value (hard-drops make the exact
    value irrelevant, but a missing one desyncs).
 2. **Garbage hole column** — Triangle re-rolls holes from its own seeded RNG and ignores the ige-recorded
-   column. The replay records the true hole as `x` on each garbage `interaction` event, so we inject it
-   onto the board once per insertion (garbage inserts only on non-clearing locks).
+   column. The replay records the true hole as `x` on each garbage `interaction` event, keyed by batch
+   `iid`. We pair holes to Triangle's OWN `garbage.tank` events (which fire per batch that actually
+   inserts, carrying the `iid`) and look the recorded `x` up by `iid`. A blind oldest-first FIFO over
+   every recorded line does NOT work: most recorded garbage is CANCELLED before it inserts — the loads
+   sum to far more lines than a 20-high board holds — so a positional FIFO desyncs at the first cancel
+   and hands every later insertion an earlier, cancelled batch's hole. Keying by `iid` off the tank
+   events excludes cancelled batches structurally.
 
 With these, the oracle is **bit-exact vs the sim through the deterministic + main garbage phase**
 (28/28 locks to frame 1371 on 2026-07-22 r0 yachi) and, where checked against a live capture, **more
@@ -42,13 +47,15 @@ garbage).
 `driftmap.mjs` prints per-session `%exact` (bit-exact locks, sim vs oracle) and lists cases that diverge
 before the final 20% of the round. It is a **disagreement map, not a certified sim-bug list**:
 
-- Corpus-wide `%exact` ≈ 39.5%, close to the sim's own ~34% verified-prefix vs the real ige — consistent
-  with the oracle tracking reality about as well as the real oracle, headlessly.
+- Corpus-wide `%exact` ≈ 63.3% (was 39.5% before the `hoisted`-DAS and iid hole-pairing fixes), and
+  95.3% over the verified prefix alone — the whole-round figure is dragged down by the topout flood past
+  the prefix.
 - Options are identical across files, so early divergences are **not** a per-game ruleset mismatch; they
   are genuine sim-vs-oracle *model* differences (movement/handling edge cases). Which engine is right at
   any given divergence needs a **live spot-check** for that round.
-- Holes and gravity are pinned, so board *occupancy* is sound; `garbagespeed`/`garbagecap` are still
-  best-effort, so garbage *timing* attribution is soft.
+- Holes (column AND cancellation-correct pairing) and gravity are pinned, so board *occupancy* is sound;
+  `garbagespeed`/`garbagecap` are still best-effort, so garbage *timing* — how many lines stand by a given
+  frame — is the dominant residual and the last thing needing live calibration.
 
 To make this a certified drift oracle rather than a disagreement map: pin `garbagespeed`/cap and validate a
 sample of the early-divergence cases against fresh live captures.
@@ -69,3 +76,17 @@ as ALREADY held when the piece spawned — DAS is pre-charged, so the piece slam
 dropped the flag and treated it as a fresh tap, stopping one cell short. Honoring it cut opening
 divergences 148 -> 3 and lifted corpus bit-exact 39.5% -> 49.6%. The ground truth was the client's own
 recorded flag; no live capture was needed. (See `pipeline/sim/hoisted-das.test.ts`.)
+
+```bash
+bun scan-firstdiv.mjs   # classify the NEXT divergence class after openings (it's garbage-timing)
+bun cross-extract.mjs   # how much of each quarantined section two engines agree on (dual-backed)
+```
+
+`scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
+placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
+over the verified prefix, sim and Triangle agree bit-exact on **95.3%** of locks, backing **93.9%** of
+forecast events and **93.5%** of opener rounds with an independent engine — the dual-implementation
+evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
+bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
+was flagged non-dual purely because the oracle mis-paired a garbage hole; with the fix it is 1/1
+dual-backed. The sim matched ground truth throughout — the bug was the oracle's.
