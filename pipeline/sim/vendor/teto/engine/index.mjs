@@ -1,0 +1,1457 @@
+import { EventEmitter, Hook } from "../utils/events/index.mjs";
+import { Board, BoardConnections } from "./board/index.mjs";
+import { constants } from "./constants/index.mjs";
+import { GarbageQueue, LegacyGarbageQueue } from "./garbage/index.mjs";
+import { IGEHandler } from "./multiplayer/index.mjs";
+import { Queue } from "./queue/index.mjs";
+import { Mino } from "./queue/types.mjs";
+import { IncreaseTracker, deepCopy } from "./utils/index.mjs";
+import { garbageCalcV2 } from "./utils/damageCalc/index.mjs";
+import { legal, performKick } from "./utils/kicks/index.mjs";
+import { cornerTable, kicks, spinbonusRules } from "./utils/kicks/data.mjs";
+import { Tetromino, tetrominoes } from "./utils/tetromino/index.mjs";
+import chalk from "./chalk-shim.mjs";
+export class Engine {
+    queue;
+    // internal queue matching tetrio length for handling resets correctly
+    #queue;
+    held;
+    holdLocked;
+    falling;
+    #kickTable;
+    #undoHook;
+    board;
+    lastSpin;
+    lastWasClear;
+    stats;
+    gameOptions;
+    garbageQueue;
+    frame;
+    subframe;
+    initializer;
+    handling;
+    input;
+    pc;
+    b2b;
+    dynamic;
+    glock;
+    multiplayer;
+    igeHandler;
+    misc;
+    state;
+    stock;
+    practice;
+    time;
+    spike;
+    events = new EventEmitter();
+    /** @internal */ resCache;
+    constructor(options){
+        this.initializer = deepCopy(options, [
+            {
+                type: Date,
+                copy: (d)=>new Date(d)
+            }
+        ]);
+        this.init();
+    }
+    init() {
+        const options = deepCopy(this.initializer, [
+            {
+                type: Date,
+                copy: (d)=>new Date(d)
+            }
+        ]);
+        this.queue = new Queue(options.queue);
+        this.#queue = new Queue(options.queue);
+        this.#queue.minLength = 14; // Note: becomes 6 if 'zenith' bag is used
+        this.queue.onRepopulate(this.#onQueueRepopulate.bind(this));
+        this.#kickTable = options.kickTable;
+        this.board = new Board(options.board);
+        this.garbageQueue = new ((options.misc.date ?? new Date()) > new Date("2025-05-06T15:00:00-04:00") ? GarbageQueue : LegacyGarbageQueue)(options.garbage);
+        this.igeHandler = new IGEHandler(options.multiplayer?.opponents || []);
+        if (options.multiplayer) this.multiplayer = {
+            options: options.multiplayer,
+            targets: [],
+            passthrough: {
+                network: [
+                    "consistent",
+                    "zero"
+                ].includes(options.multiplayer.passthrough),
+                replay: options.multiplayer.passthrough !== "full",
+                travel: [
+                    "zero",
+                    "limited"
+                ].includes(options.multiplayer.passthrough)
+            }
+        };
+        this.held = null;
+        this.holdLocked = false;
+        this.lastSpin = null;
+        this.lastWasClear = false;
+        this.stats = {
+            combo: -1,
+            b2b: -1,
+            pieces: 0,
+            lines: 0,
+            garbage: {
+                sent: 0,
+                attack: 0,
+                receive: 0,
+                cleared: 0
+            }
+        };
+        this.pc = options.pc;
+        this.b2b = {
+            chaining: options.b2b.chaining,
+            charging: options.b2b.charging
+        };
+        this.dynamic = {
+            gravity: new IncreaseTracker(options.gravity.value, options.gravity.increase, options.gravity.marginTime),
+            garbageMultiplier: new IncreaseTracker(options.garbage.multiplier.value, options.garbage.multiplier.increase, options.garbage.multiplier.marginTime),
+            garbageCap: new IncreaseTracker(options.garbage.cap.value, options.garbage.cap.increase, options.garbage.cap.marginTime)
+        };
+        this.glock = 0;
+        this.stock = options.options.stock;
+        this.misc = options.misc;
+        this.practice = {
+            redo: [],
+            undo: [],
+            retry: false,
+            retryIter: 0,
+            lastPiece: null
+        };
+        this.time = {
+            frameOffset: 0
+        };
+        this.gameOptions = options.options;
+        this.handling = options.handling;
+        this.input = {
+            lShift: {
+                held: false,
+                arr: 0,
+                das: 0,
+                dir: -1
+            },
+            rShift: {
+                held: false,
+                arr: 0,
+                das: 0,
+                dir: 1
+            },
+            lastShift: -1,
+            firstInputTime: -1,
+            time: {
+                start: 0,
+                zero: true,
+                locked: false,
+                prev: 0
+            },
+            lastPieceTime: 0,
+            keys: {
+                softDrop: false,
+                hold: false,
+                rotateCW: false,
+                rotateCCW: false,
+                rotate180: false
+            }
+        };
+        this.frame = 0;
+        this.subframe = 0;
+        this.state = 0;
+        this.spike = {
+            count: 0,
+            timer: 0
+        };
+        this.#flushRes();
+        if (this.#undoHook) this.#undoHook.destroy();
+        this.#undoHook = new Hook(this.events);
+        if (this.misc.allowed.undo) {
+            this.#undoHook.on("falling.lock.pre", this.undoPieceLockHandler.bind(this));
+            this.#undoHook.on("falling.new", this.undoPieceSpawnHandler.bind(this));
+        }
+        this.nextPiece();
+        this.bindAll();
+    }
+    #flushRes() {
+        let res = null;
+        if (this.resCache) {
+            res = {
+                pieces: this.resCache.pieces,
+                garbage: {
+                    sent: [
+                        ...this.resCache.garbage.sent
+                    ],
+                    received: [
+                        ...this.resCache.garbage.received
+                    ]
+                },
+                keys: [
+                    ...this.resCache.keys
+                ],
+                lastLock: this.resCache.lastLock
+            };
+        }
+        this.resCache = {
+            pieces: 0,
+            garbage: {
+                sent: [],
+                received: []
+            },
+            keys: [],
+            lastLock: res?.lastLock ?? 0
+        };
+        return res;
+    }
+    reset() {
+        this.init();
+    }
+    bindAll() {
+        this.moveRight = this.moveRight.bind(this);
+        this.moveLeft = this.moveLeft.bind(this);
+        this.dasRight = this.dasRight.bind(this);
+        this.dasLeft = this.dasLeft.bind(this);
+        this.softDrop = this.softDrop.bind(this);
+        this.hardDrop = this.hardDrop.bind(this);
+        this.hold = this.hold.bind(this);
+        this.rotateCW = this.rotateCW.bind(this);
+        this.rotateCCW = this.rotateCCW.bind(this);
+        this.rotate180 = this.rotate180.bind(this);
+        this.undo = this.undo.bind(this);
+        this.redo = this.redo.bind(this);
+        this.retry = this.retry.bind(this);
+        this.snapshot = this.snapshot.bind(this);
+        this.fromSnapshot = this.fromSnapshot.bind(this);
+        this.nextPiece = this.nextPiece.bind(this);
+    }
+    #onQueueRepopulate(pieces) {
+        this.events.emit("queue.add", pieces);
+    }
+    snapshot({ isUndoRedo = false } = {}) {
+        return {
+            __meta: {
+                isUndoRedo
+            },
+            board: deepCopy(this.board.state),
+            falling: this.falling.snapshot(),
+            frame: this.frame,
+            garbage: this.garbageQueue.snapshot(),
+            hold: this.held,
+            holdLocked: this.holdLocked,
+            lastSpin: deepCopy(this.lastSpin),
+            lastWasClear: this.lastWasClear,
+            queue: this.queue.snapshot(),
+            _queue: this.#queue.snapshot(),
+            input: deepCopy(this.input),
+            subframe: this.subframe,
+            targets: this.multiplayer?.targets,
+            stats: deepCopy(this.stats),
+            glock: this.glock,
+            stock: this.stock,
+            ige: this.igeHandler.snapshot(),
+            state: this.state,
+            spike: deepCopy(this.spike),
+            time: deepCopy(this.time),
+            resCache: deepCopy(this.resCache),
+            practice: isUndoRedo ? {
+                lastPiece: null,
+                redo: [],
+                undo: [],
+                retry: this.practice.retry,
+                retryIter: this.practice.retryIter
+            } : deepCopy(this.practice)
+        };
+    }
+    fromSnapshot(snapshot) {
+        // const options = deepCopy(this.initializer, [
+        //   { type: Date, copy: (d) => new Date(d) }
+        // ]);
+        const options = this.initializer;
+        this.board.state = deepCopy(snapshot.board);
+        this.falling = new Tetromino({
+            boardHeight: this.board.height,
+            boardWidth: this.board.width,
+            initialRotation: this.kickTable.spawn_rotation[snapshot.falling.symbol.toLowerCase()] ?? 0,
+            symbol: snapshot.falling.symbol,
+            from: snapshot.falling
+        });
+        for (const key of Object.keys(snapshot.falling)){
+            // @ts-expect-error
+            this.falling[key] = deepCopy(snapshot.falling[key]);
+        }
+        if (!snapshot.__meta.isUndoRedo) {
+            this.frame = snapshot.frame;
+            this.subframe = snapshot.subframe;
+        }
+        this.garbageQueue.fromSnapshot(snapshot.garbage);
+        this.held = snapshot.hold;
+        this.holdLocked = snapshot.holdLocked;
+        this.lastSpin = deepCopy(snapshot.lastSpin);
+        this.lastWasClear = snapshot.lastWasClear;
+        this.queue.fromSnapshot(snapshot.queue);
+        this.#queue.fromSnapshot(snapshot._queue);
+        this.dynamic = {
+            gravity: new IncreaseTracker(options.gravity.value, options.gravity.increase, options.gravity.marginTime),
+            garbageMultiplier: new IncreaseTracker(options.garbage.multiplier.value, options.garbage.multiplier.increase, options.garbage.multiplier.marginTime),
+            garbageCap: new IncreaseTracker(options.garbage.cap.value, options.garbage.cap.increase, options.garbage.cap.marginTime)
+        };
+        for(let i = 0; i < this.frame; i++){
+            this.dynamic.gravity.tick();
+            this.dynamic.garbageMultiplier.tick();
+            this.dynamic.garbageCap.tick();
+        }
+        if (!snapshot.__meta.isUndoRedo) {
+            this.input = deepCopy(snapshot.input);
+        } else {
+            this.input.firstInputTime = snapshot.input.firstInputTime;
+            this.input.time = deepCopy(snapshot.input.time);
+            this.input.lastPieceTime = snapshot.input.lastPieceTime;
+            this.input.keys = {
+                ...deepCopy(snapshot.input.keys),
+                softDrop: this.input.keys.softDrop
+            };
+        }
+        if (this.multiplayer && snapshot.targets && !snapshot.__meta.isUndoRedo) this.multiplayer.targets = [
+            ...snapshot.targets
+        ];
+        this.stats = deepCopy(snapshot.stats);
+        this.glock = snapshot.glock;
+        this.stock = snapshot.stock;
+        this.state = snapshot.state;
+        this.spike = deepCopy(snapshot.spike);
+        this.time = deepCopy(snapshot.time);
+        this.igeHandler.fromSnapshot(snapshot.ige);
+        this.resCache = deepCopy(snapshot.resCache);
+        this.practice = {
+            retry: snapshot.practice.retry,
+            retryIter: snapshot.practice.retryIter,
+            lastPiece: !snapshot.__meta.isUndoRedo ? deepCopy(snapshot.practice.lastPiece) : this.practice.lastPiece,
+            redo: !snapshot.__meta.isUndoRedo ? deepCopy(snapshot.practice.redo) : this.practice.redo,
+            undo: !snapshot.__meta.isUndoRedo ? deepCopy(snapshot.practice.undo) : this.practice.undo
+        };
+    }
+    get kickTable() {
+        return kicks[this.#kickTable];
+    }
+    get kickTableName() {
+        return this.#kickTable;
+    }
+    set kickTable(value) {
+        this.#kickTable = value;
+    }
+    get dynamicStats() {
+        const frame = this.frame - this.time.frameOffset;
+        return {
+            apm: this.stats.garbage.attack / (frame / 60 / 60) || 0,
+            pps: this.stats.pieces / (frame / 60) || 0,
+            vs: (this.stats.garbage.attack + this.stats.garbage.cleared) / (frame / 60) * 100 || 0,
+            surgePower: this.b2b.charging ? Math.floor(this.stats.b2b - this.b2b.charging.at + this.b2b.charging.base + 1) : 0
+        };
+    }
+    #getEffectiveGravity() {
+        return this.glock <= 0 ? this.dynamic.gravity.get() : this.glock <= 180 ? (1 - this.glock / 180) ** 2 * this.dynamic.gravity.get() : 0;
+    }
+    #hasHitWall() {
+        return !!(this.state & constants.flags.STATE_WALL);
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #hasRotated() {
+        return !!(this.state & (constants.flags.ROTATION_LEFT | constants.flags.ROTATION_RIGHT));
+    }
+    // @ts-expect-error
+    // eslint-disable-next-line no-unused-private-class-members
+    #hasRotated180() {
+        return !!(this.state & constants.flags.ROTATION_180);
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isSpin() {
+        return !!(this.state & constants.flags.ROTATION_SPIN);
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isSpinMini() {
+        return !(~this.state & (constants.flags.ROTATION_SPIN | constants.flags.ROTATION_MINI));
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isSpinAll() {
+        return !!(this.state & constants.flags.ROTATION_SPIN_ALL);
+    }
+    #isSleep() {
+        return !!(this.state & constants.flags.STATE_SLEEP);
+    }
+    #setSleep(sleep) {
+        if (sleep) this.state |= constants.flags.STATE_SLEEP;
+        else this.state &= ~constants.flags.STATE_SLEEP;
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isFloored() {
+        return !!(this.state & constants.flags.STATE_FLOOR);
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isVisible() {
+        return !(this.state & constants.flags.STATE_NODRAW);
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #isSoftDropped() {
+        return !!(this.state & constants.flags.ACTION_SOFTDROP);
+    }
+    #isForcedToLock() {
+        return !!(this.state & constants.flags.ACTION_FORCELOCK);
+    }
+    #is20G() {
+        const is20G = this.dynamic.gravity.get() > this.board.height;
+        const mode20G = this.misc.movement.may20G;
+        if (this.input.keys.softDrop) {
+            const preferSoftDrop = this.handling.may20g || is20G && mode20G;
+            return (this.handling.sdf === 41 || this.dynamic.gravity.get() * this.handling.sdf > this.board.height) && preferSoftDrop;
+        }
+        return is20G && mode20G;
+    }
+    #shouldLock() {
+        return !this.misc.movement.infinite && this.falling.lockResets >= this.misc.movement.lockResets;
+    }
+    #shouldFallFaster() {
+        return this.misc.movement.infinite ? false : this.falling.rotResets > this.misc.movement.lockResets + 15;
+    }
+    #clearFlags(e) {
+        this.state &= ~e;
+    }
+    #__internal_lock(subframe = 1 - this.subframe) {
+        this.falling.locking += subframe;
+        return this.falling.locking > this.misc.movement.lockTime || !!this.#isForcedToLock() || this.#shouldLock();
+    }
+    #__internal_fall(value) {
+        let y1 = Math.round(1e6 * (this.falling.location[1] - value)) / 1e6, y2 = this.falling.location[1] - 1;
+        if (y1 % 1 === 0) y1 -= 1e-6;
+        if (y2 % 1 === 0) y2 += 2e-6;
+        if (!legal(this.falling.absoluteAt({
+            y: y1
+        }), this.board.state) || !legal(this.falling.absoluteAt({
+            y: y2
+        }), this.board.state)) return false;
+        const { highestY } = this.falling;
+        if (highestY > y1) this.falling.highestY = Math.floor(y1);
+        this.falling.location[1] = y1;
+        if (this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        this.state &= ~constants.flags.STATE_FLOOR;
+        if (y1 < highestY || this.misc.movement.infinite) {
+            this.falling.lockResets = 0;
+            this.falling.rotResets = 0;
+        }
+        return true;
+    }
+    // @ts-expect-error unused
+    // eslint-disable-next-line no-unused-private-class-members
+    #__internal_lockout() {
+    // TODO: implement
+    // if (this.options.nolockout) return;
+    // if (!e || false === this.options.clutch)
+    //   return this.self.stm.LoseStockOrGameOver(
+    //     this.options.topoutisclear ? "topout_clear" : "topout",
+    //   );
+    }
+    #__internal_dcd() {
+        if (!this.#hasHitWall() || !this.handling.dcd) return;
+        this.input.lShift.das = Math.min(this.input.lShift.das, this.handling.das - this.handling.dcd);
+        this.input.lShift.arr = this.handling.arr;
+        this.input.rShift.das = Math.min(this.input.rShift.das, this.handling.das - this.handling.dcd);
+        this.input.rShift.arr = this.handling.arr;
+    }
+    #fall(subframe = 1 - this.subframe) {
+        if (this.falling.safeLock > 0) this.falling.safeLock--;
+        // TODO: if pause, return: if ((this.piece.safelock > 0 && this.piece.safelock--, this.S.pause)) return;
+        if (this.#isSleep()) return;
+        let fall = this.#getEffectiveGravity() * subframe;
+        if (this.glock > 0) this.glock -= subframe;
+        if (this.glock < 0) this.glock = 0;
+        if (this.input.keys.softDrop) {
+            if (this.handling.sdf === 41) fall = 400 * subframe;
+            else {
+                fall *= this.handling.sdf;
+                fall = Math.max(fall, 0.05 * this.handling.sdf);
+            }
+        }
+        if (this.#shouldLock() && !legal(this.falling.absoluteAt({
+            y: this.falling.location[1] - 1
+        }), this.board.state)) {
+            fall = 20;
+            this.state |= constants.flags.ACTION_FORCELOCK;
+        }
+        if (this.#shouldFallFaster()) {
+            fall += 0.5 * subframe * (this.falling.rotResets - (this.misc.movement.lockResets + 15));
+        }
+        for(let dropFactor = fall; dropFactor > 0; dropFactor -= Math.min(1, dropFactor)){
+            const y = this.falling.location[1];
+            if (!this.#__internal_fall(Math.min(1, dropFactor))) {
+                if (this.#__internal_lock(subframe)) {
+                    if (this.handling.safelock) this.falling.safeLock = 7;
+                    this.#lock(false);
+                }
+                return;
+            }
+            if (Math.floor(y) !== Math.floor(this.falling.location[1])) {
+                this.state &= ~constants.flags.ROTATION_ALL;
+            }
+        }
+    }
+    #clampRotation(amount) {
+        return ((this.falling.rotation + amount) % 4 + 4) % 4;
+    }
+    #__internal_rotate(newX, newY, newRotation, rotationDirection, kick, _isIRS = false) {
+        // Handle rotation flags based on direction
+        if (rotationDirection >= 2) {
+            // 180 degree rotation
+            rotationDirection = newRotation > this.falling.rotation ? 1 : -1;
+            this.state |= constants.flags.ROTATION_180;
+        }
+        // Update this.falling properties
+        this.falling.x = newX;
+        this.falling.y = newY;
+        this.falling.rotation = newRotation;
+        // Set rotation direction flags
+        this.state |= rotationDirection === 1 ? constants.flags.ROTATION_RIGHT : constants.flags.ROTATION_LEFT;
+        this.state &= ~(constants.flags.ROTATION_SPIN | constants.flags.ROTATION_MINI | constants.flags.ROTATION_SPIN_ALL);
+        // Update lock and rotation resets with caps
+        if (this.falling.lockResets < 31) this.falling.lockResets++;
+        if (this.falling.rotResets < 63) this.falling.rotResets++;
+        // Check for T-Spin
+        const spin = this.#detectSpin(this.#isTSpinKick(kick));
+        this.lastSpin = spin;
+        if (spin) {
+            this.state |= constants.flags.ROTATION_SPIN;
+            if (spin === "mini") {
+                this.state |= constants.flags.ROTATION_MINI;
+            }
+        }
+        this.falling.totalRotations++;
+        // Handle post-rotation actions
+        this.#__internal_dcd();
+        // Reset locking if not going to lock
+        if (!this.#shouldLock()) {
+            this.falling.locking = 0;
+        }
+        return true;
+    }
+    #kick(to) {
+        const kick = performKick(this.kickTableName, this.falling.symbol, this.falling.location, [
+            this.falling.aox,
+            this.falling.aoy
+        ], !this.misc.movement.infinite && this.falling.totalRotations > this.misc.movement.lockResets + 15, this.falling.states[to], this.falling.rotation, to, this.board.state);
+        if (typeof kick === "object") return kick;
+        else return kick === false ? false : {
+            kick: [
+                0,
+                0
+            ],
+            newLocation: [
+                this.falling.location[0],
+                this.falling.location[1]
+            ],
+            id: "00",
+            index: 0
+        };
+    }
+    #rotate(amount, isIRS = false) {
+        if (this.#isSleep()) {
+            if (this.handling.irs === "tap") this.falling.irs = ((this.falling.irs + amount) % 4 + 4) % 4;
+            return false;
+        }
+        const to = this.#clampRotation(amount);
+        this.state |= constants.flags.ACTION_MOVE;
+        this.state |= constants.flags.ACTION_ROTATE;
+        const kick = this.#kick(to);
+        return kick ? this.#__internal_rotate(kick.newLocation[0], kick.newLocation[1], to, amount, kick, isIRS) : false;
+    }
+    nextPiece(ignoreBlockout = false, isHold = false) {
+        const newTetromino = this.queue.shift();
+        this.#queue.shift();
+        this.initiatePiece(newTetromino, ignoreBlockout, isHold);
+    }
+    // TODO: finish
+    // @ts-expect-error wip
+    // eslint-disable-next-line no-unused-private-class-members
+    #loseStockOrGameOver(_reason) {
+        if (this.stock <= 0) {
+        // TODO: game over or something idk
+        } else {
+            this.#setSleep(true);
+        // TODO: lose stock event
+        }
+    }
+    initiatePiece(piece, ignoreBlockout = false, isHold = false) {
+        if (this.handling.irs === "hold" && this.falling) {
+            let rotationState = 0;
+            // Calculate rotation based on input
+            if (this.input.keys.rotateCCW) rotationState -= 1;
+            if (this.input.keys.rotateCW) rotationState += 1;
+            if (this.input.keys.rotate180) rotationState += 2;
+            // Ensure rotation state is in 0-3 range
+            this.falling.irs = (rotationState % 4 + 4) % 4;
+        }
+        if (this.handling.ihs === "hold" && this.input.keys.hold && !isHold) {
+            this.state |= constants.flags.ACTION_IHS;
+        }
+        this.#__internal_dcd();
+        this.state &= ~(constants.flags.ROTATION_ALL | constants.flags.STATE_ALL | constants.flags.ACTION_FORCELOCK | constants.flags.ACTION_SOFTDROP | constants.flags.ACTION_MOVE | constants.flags.ACTION_ROTATE);
+        this.input.firstInputTime = -1;
+        if (!isHold) this.holdLocked = false;
+        this.falling = new Tetromino({
+            boardHeight: this.board.height,
+            boardWidth: this.board.width,
+            initialRotation: this.kickTable.spawn_rotation[piece.toLowerCase()] ?? 0,
+            symbol: piece,
+            from: this.falling
+        });
+        if (!ignoreBlockout && this.#considerBlockout(isHold)) {
+            // Lose Stock or Game Over
+            this.state ^= constants.flags.ACTION_IHS;
+            this.falling.irs = 0;
+        } else {
+            if (this.state & constants.flags.ACTION_IHS) {
+                this.state ^= constants.flags.ACTION_IHS;
+                this.hold(true, ignoreBlockout);
+            } else {
+                if (this.falling.irs !== 0) {
+                    this.#rotate(this.falling.irs, true);
+                    this.falling.irs = 0;
+                }
+                if (this.#considerBlockout(!ignoreBlockout || isHold)) {
+                // lose stock or game over
+                } else {
+                    if (this.#is20G()) {
+                        this.#slamToFloor();
+                    }
+                }
+            }
+        }
+        this.events.emit("falling.new", {
+            piece: this.falling.symbol,
+            isHold
+        });
+    }
+    #considerBlockout(isSilent = false) {
+        if (legal(this.falling.absoluteBlocks, this.board.state)) {
+            // TODO: clutch count
+            // if (!isSilent) {
+            //   this.S.clutchCount = 0;
+            // }
+            return false;
+        }
+        let clutched = false;
+        if (this.lastWasClear && this.gameOptions.clutch !== false) {
+            const originalY = this.falling.location[1];
+            const originalHy = this.falling.highestY;
+            while(this.falling.y < this.board.fullHeight){
+                this.falling.location[1]++;
+                this.falling.highestY++;
+                if (legal(this.falling.absoluteBlocks, this.board.state)) {
+                    clutched = true;
+                    break;
+                }
+            }
+            if (!clutched) {
+                this.falling.location[1] = originalY;
+                this.falling.highestY = originalHy;
+            }
+        }
+        if (!clutched) return true;
+        if (!isSilent) {
+        // TODO: update clutch count +1
+        }
+        return false;
+    }
+    hold(_ihs = false, ignoreBlockout = false) {
+        if (this.#isSleep()) {
+            if (this.handling.ihs === "tap") this.state |= constants.flags.ACTION_IHS;
+            return false;
+        }
+        if (this.holdLocked || !this.misc.allowed.hold) return false;
+        this.holdLocked = !this.misc.infiniteHold;
+        if (this.held) {
+            const save = this.held;
+            this.held = this.falling.symbol;
+            this.initiatePiece(save, ignoreBlockout, true);
+        } else {
+            this.held = this.falling.symbol;
+            this.nextPiece(ignoreBlockout, true);
+        }
+        this.holdLocked = !this.misc.infiniteHold;
+        return true;
+    }
+    #slamToFloor() {
+        while(this.#__internal_fall(1)){
+        /* empty */ }
+    }
+    get toppedOut() {
+        try {
+            for (const block of this.falling.blocks){
+                if (this.board.state[-block[1] + this.falling.y][block[0] + this.falling.location[0]] !== null) return true;
+            }
+            return false;
+        } catch  {
+            return true;
+        }
+    }
+    #isTSpinKick(kick) {
+        if (typeof kick === "object") {
+            return((kick.id === "23" || kick.id === "03") && kick.kick[0] === 1 && kick.kick[1] === -2 || // fin ccw and tst cw
+            (kick.id === "21" || kick.id === "01") && kick.kick[0] === -1 && kick.kick[1] === -2);
+        }
+        return false;
+    }
+    rotateCW() {
+        return this.#processRotate(1);
+    }
+    rotateCCW() {
+        return this.#processRotate(-1);
+    }
+    rotate180() {
+        return this.#processRotate(2);
+    }
+    moveRight() {
+        const res = this.falling.moveRight(this.board.state);
+        if (res && this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        return res;
+    }
+    moveLeft() {
+        const res = this.falling.moveLeft(this.board.state);
+        if (res && this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        return res;
+    }
+    dasRight() {
+        const res = this.falling.dasRight(this.board.state);
+        if (res && this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        return res;
+    }
+    dasLeft() {
+        const res = this.falling.dasLeft(this.board.state);
+        if (res && this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        return res;
+    }
+    softDrop() {
+        const res = this.falling.softDrop(this.board.state);
+        if (res && this.gameOptions.spinBonuses !== "stupid") this.lastSpin = null;
+        return res;
+    }
+    undoPieceSpawnHandler({ isHold }) {
+        if (isHold) return;
+        this.practice.lastPiece = this.snapshot({
+            isUndoRedo: true
+        });
+    }
+    undoPieceLockHandler() {
+        this.practice.undo.push(this.practice.lastPiece);
+        if (this.practice.undo.length > 100) this.practice.undo.shift();
+        this.practice.redo.length = 0;
+    }
+    undo() {
+        if (!this.misc.allowed.undo || this.practice.undo.length === 0) return false;
+        this.practice.redo.push(this.practice.lastPiece);
+        this.practice.lastPiece = this.practice.undo.pop();
+        this.fromSnapshot(this.practice.lastPiece);
+        // TODO: something about garbagequeue filter active
+        // (t.impendingdamage = t.impendingdamage.filter((e) => e.active))
+        this.practice.retry = false;
+        this.practice.retryIter = 0;
+    }
+    redo() {
+        if (!this.misc.allowed.undo || this.practice.redo.length === 0) return false;
+        this.practice.undo.push(this.practice.lastPiece);
+        this.practice.lastPiece = this.practice.redo.pop();
+        this.fromSnapshot(this.practice.lastPiece);
+        // TODO: something about garbagequeue filter active
+        // (t.impendingdamage = t.impendingdamage.filter((e) => e.active))
+        this.practice.retry = false;
+        this.practice.retryIter = 0;
+    }
+    retry() {
+        if (this.misc.allowed.undo) this.undoPieceLockHandler();
+        this.practice.retry = false;
+        this.practice.retryIter = 0;
+        this.held = null;
+        this.holdLocked = false;
+        this.#queue.clear();
+        this.#queue.repopulateOnce();
+        this.queue.fromSnapshot(this.#queue.snapshot());
+        this.board.reset();
+        this.garbageQueue.reset();
+        this.stats = {
+            combo: -1,
+            b2b: -1,
+            pieces: 0,
+            lines: 0,
+            garbage: {
+                sent: 0,
+                attack: 0,
+                receive: 0,
+                cleared: 0
+            }
+        };
+        this.time.frameOffset = this.frame;
+        this.nextPiece();
+    }
+    #maxSpin(...spins) {
+        let best = spins[0];
+        let bestScore = best === "normal" ? 2 : best === "mini" ? 1 : 0;
+        for(let i = 1; i < spins.length; i++){
+            const spin = spins[i];
+            const score = spin === "normal" ? 2 : spin === "mini" ? 1 : 0;
+            if (score >= bestScore) {
+                best = spin;
+                bestScore = score;
+            }
+        }
+        return best;
+    }
+    #detectSpin(finOrTst) {
+        if (this.gameOptions.spinBonuses === "none") return "none";
+        const tSpin = [
+            "all",
+            "all-mini",
+            "all-mini+",
+            "all+",
+            "T-spins",
+            "T-spins+"
+        ].includes(this.gameOptions.spinBonuses) && this.falling.symbol === "t" ? this.#detectSpinFromCorners(finOrTst) : false;
+        const allSpin = this.falling.isAllSpinPosition(this.board.state);
+        switch(this.gameOptions.spinBonuses){
+            case "stupid":
+                return this.falling.isStupidSpinPosition(this.board.state) ? "normal" : "none";
+            case "T-spins":
+                return tSpin || "none";
+            case "T-spins+":
+                return this.#maxSpin(tSpin || "none", allSpin ? this.falling.symbol === "t" ? "mini" : "none" : "none");
+            case "all":
+                return tSpin || (allSpin ? "normal" : "none");
+            case "all-mini":
+                return tSpin || (allSpin ? "mini" : "none");
+            case "all+":
+                return this.#maxSpin(tSpin || "none", allSpin ? this.falling.symbol === "t" ? "mini" : "normal" : "none");
+            case "all-mini+":
+                return this.#maxSpin(tSpin || "none", allSpin ? "mini" : "none");
+            case "mini-only":
+                return tSpin === "normal" ? "mini" : this.#maxSpin(tSpin || "none", allSpin ? "mini" : "none");
+            case "handheld":
+                return this.#detectSpinFromCorners(finOrTst);
+        }
+    }
+    #spinbonuses(piece) {
+        const p = tetrominoes[piece];
+        const rules = spinbonusRules[this.gameOptions.spinBonuses];
+        // @ts-expect-error
+        return p?.spinbonus_override ? p.spinbonus_override?.mini : !!rules?.types_mini?.includes(piece);
+    }
+    #detectSpinFromCorners(finOrTst) {
+        const blocks = this.falling.blocks;
+        const absolute = new Array(blocks.length);
+        for(let i = 0; i < blocks.length; i++){
+            const block = blocks[i];
+            absolute[i] = [
+                block[0] + this.falling.location[0],
+                -block[1] + this.falling.y - 1
+            ];
+        }
+        if (legal(absolute, this.board.state)) return "none";
+        let corners = 0;
+        let frontCorners = 0;
+        for(let i = 0; i < 4; i++){
+            const table = cornerTable[this.falling.symbol]?.[this.falling.rotation];
+            if (!table) break;
+            if (this.board.occupied(this.falling.x + table[i][0] + 1, this.falling.y - table[i][1] - 1)) {
+                corners++;
+                if (this.falling.rotation === table[i][2] || this.falling.rotation === table[i][3]) {
+                    frontCorners++;
+                }
+            }
+        }
+        if (corners < 3) return "none";
+        let spin = "normal";
+        if (this.#spinbonuses(this.falling.symbol) && frontCorners !== 2) spin = "mini";
+        if (finOrTst) spin = "normal";
+        return spin;
+    }
+    /** */ hardDrop() {
+        while(this.#__internal_fall(1));
+        return this.#lock(true);
+    }
+    #lock(hard) {
+        this.holdLocked = false;
+        // TODO: ARE (line clear, garbage)
+        const blocks = this.falling.blocks;
+        const placed = new Array(blocks.length);
+        const placedPos = new Array(blocks.length);
+        const connectInput = new Array(blocks.length);
+        for(let i = 0; i < blocks.length; i++){
+            const block = blocks[i];
+            const x = this.falling.location[0] + block[0];
+            const y = this.falling.y - block[1];
+            placed[i] = [
+                this.falling.symbol,
+                x,
+                y
+            ];
+            placedPos[i] = [
+                x,
+                y
+            ];
+            connectInput[i] = [
+                x,
+                -y
+            ];
+        }
+        const connected = this.connect(connectInput);
+        const boardAddParams = new Array(connected.length);
+        for(let i = 0; i < connected.length; i++){
+            const c = connected[i];
+            boardAddParams[i] = [
+                {
+                    mino: this.falling.symbol,
+                    connections: c[2]
+                },
+                c[0],
+                -c[1]
+            ];
+        }
+        this.board.add(...boardAddParams);
+        const { lines, garbageCleared } = this.board.clearBombsAndLines(placedPos);
+        const pc = this.board.perfectClear;
+        this.stats.garbage.cleared += garbageCleared;
+        let brokeB2B = this.stats.b2b;
+        if (lines > 0) {
+            this.stats.combo++;
+            if ((this.lastSpin && this.lastSpin !== "none" || lines >= 4) && !(pc && this.pc && this.pc.b2b)) {
+                this.stats.b2b++;
+                brokeB2B = false;
+            }
+            if (pc && this.pc && this.pc.b2b) {
+                this.stats.b2b += this.pc.b2b;
+                brokeB2B = false;
+            }
+            if (brokeB2B !== false) {
+                this.stats.b2b = -1;
+            }
+        } else {
+            this.stats.combo = -1;
+            brokeB2B = false;
+        }
+        const gSpecialBonus = this.garbageQueue.options.specialBonus && garbageCleared > 0 && (this.lastSpin && this.lastSpin !== "none" || lines >= 4) ? 1 : 0;
+        const garbage = garbageCalcV2({
+            b2b: Math.max(this.stats.b2b, 0),
+            combo: Math.max(this.stats.combo, 0),
+            enemies: 0,
+            lines,
+            piece: this.falling.symbol,
+            spin: this.lastSpin ? this.lastSpin : "none"
+        }, {
+            ...this.gameOptions,
+            b2b: {
+                chaining: this.b2b.chaining,
+                charging: !!this.b2b.charging
+            }
+        });
+        const gEvents = garbage.garbage > 0 || gSpecialBonus > 0 ? [
+            this.garbageQueue.round(garbage.garbage * this.dynamic.garbageMultiplier.get() + gSpecialBonus)
+        ] : [];
+        let surged = 0;
+        if (brokeB2B !== false) {
+            const btb = brokeB2B;
+            if (this.b2b.charging !== false && btb + 1 > this.b2b.charging.at) {
+                surged = Math.floor((btb - this.b2b.charging.at + this.b2b.charging.base + 1) * this.dynamic.garbageMultiplier.get());
+                const garbages = [
+                    Math.round(surged / 3),
+                    Math.round(surged / 3),
+                    surged - 2 * Math.round(surged / 3)
+                ];
+                gEvents.splice(0, 0, ...garbages);
+                brokeB2B = false;
+            }
+        }
+        if (pc && this.pc) {
+            gEvents.push(this.garbageQueue.round(this.pc.garbage * this.dynamic.garbageMultiplier.get()));
+        }
+        const filteredGarbage = [];
+        for(let i = 0; i < gEvents.length; i++){
+            const g = gEvents[i];
+            if (g > 0) filteredGarbage.push(g);
+        }
+        const res = {
+            mino: this.falling.symbol,
+            garbageCleared,
+            lines,
+            spin: this.lastSpin ? this.lastSpin : "none",
+            garbage: filteredGarbage,
+            rawGarbage: [
+                ...filteredGarbage
+            ],
+            surge: surged,
+            stats: this.stats,
+            garbageAdded: false,
+            topout: false,
+            keysPresses: this.resCache.keys.splice(0),
+            pieceTime: Math.round((this.frame + this.subframe - this.resCache.lastLock) * 10) / 10
+        };
+        for (const gb of res.garbage)this.stats.garbage.attack += gb;
+        if (lines > 0) {
+            const cancelEvents = [];
+            this.lastWasClear = true;
+            while(res.garbage.length > 0){
+                if (res.garbage[0] === 0) {
+                    res.garbage.shift();
+                    continue;
+                }
+                const [r, cancelled] = this.garbageQueue.cancel(res.garbage[0], this.stats.pieces, {
+                    openerPhase: (this.misc.date ?? new Date()) < new Date(2025, 1, 16)
+                });
+                for(let i = 0; i < cancelled.length; i++){
+                    const c = cancelled[i];
+                    cancelEvents.push({
+                        iid: c.cid,
+                        amount: c.amount,
+                        size: c.size
+                    });
+                }
+                if (r === 0) res.garbage.shift();
+                else {
+                    res.garbage[0] = r;
+                    break;
+                }
+            }
+            for(let i = 0; i < cancelEvents.length; i++){
+                this.events.emit("garbage.cancel", cancelEvents[i]);
+            }
+        } else {
+            this.lastWasClear = false;
+            const garbages = this.garbageQueue.tank(this.frame, this.dynamic.garbageCap.get(), hard);
+            res.garbageAdded = garbages;
+            if (res.garbageAdded) {
+                const tankEvent = [];
+                for(let idx = 0; idx < garbages.length; idx++){
+                    const garbage = garbages[idx];
+                    this.board.insertGarbage({
+                        ...garbage,
+                        bombs: this.garbageQueue.options.bombs,
+                        isBeginning: idx === 0 || garbages[idx - 1].id !== garbage.id,
+                        isEnd: idx === garbages.length - 1 || garbages[idx + 1].id !== garbage.id
+                    });
+                    if (tankEvent.length === 0 || tankEvent[tankEvent.length - 1].iid !== garbage.id) {
+                        tankEvent.push({
+                            iid: garbage.id,
+                            column: garbage.column,
+                            amount: garbage.amount,
+                            size: garbage.size
+                        });
+                    } else {
+                        tankEvent[tankEvent.length - 1].amount += garbage.amount;
+                    }
+                }
+                for(let i = 0; i < tankEvent.length; i++){
+                    this.events.emit("garbage.tank", tankEvent[i]);
+                }
+            }
+        }
+        this.events.emit("falling.lock.pre", undefined);
+        this.nextPiece();
+        this.lastSpin = null;
+        try {
+            if (!legal(this.falling.absoluteBlocks, this.board.state)) res.topout = true;
+        } catch  {
+            res.topout = true;
+        }
+        if (res.garbage.length > 0) {
+            if (this.multiplayer) {
+                for(let i = 0; i < this.multiplayer.targets.length; i++){
+                    const target = this.multiplayer.targets[i];
+                    for(let j = 0; j < res.garbage.length; j++){
+                        this.igeHandler.send({
+                            amount: res.garbage[j],
+                            playerID: target
+                        });
+                    }
+                }
+            }
+        }
+        let sent = 0;
+        for(let i = 0; i < res.garbage.length; i++){
+            sent += res.garbage[i];
+        }
+        this.stats.garbage.sent += sent;
+        if (sent > 0) {
+            this.spike.count += sent;
+            this.spike.timer = 60;
+        }
+        this.resCache.pieces++;
+        this.resCache.garbage.sent.push(...res.garbage);
+        this.resCache.garbage.received.push(...res.garbageAdded || []);
+        this.resCache.lastLock = this.frame + this.subframe;
+        this.stats.pieces++;
+        this.stats.lines += lines;
+        this.events.emit("falling.lock", deepCopy(res));
+        return res;
+    }
+    press(key) {
+        if (key in this) return this[key]();
+        else throw new Error("invalid key: " + key);
+    }
+    #keydown({ data: event }) {
+        this.#processSubframe(event.subframe);
+        this.resCache.keys.push(event.key);
+        // TODO: inversion? probably just a qp thing
+        // if (this.misc.inverted)
+        //   switch (e.key) {
+        //     case "moveLeft":
+        //       e.key = "moveRight";
+        //       break;
+        //     case "moveRight":
+        //       e.key = "moveLeft";
+        //   }
+        switch(event.key){
+            case "moveLeft":
+                this.falling.keys++;
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                this.#activateShift("lShift", !!event.hoisted);
+                this.#__internal_shift();
+                return;
+            case "moveRight":
+                this.falling.keys++;
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                this.#activateShift("rShift", !!event.hoisted);
+                this.#__internal_shift();
+                return;
+            case "softDrop":
+                this.input.keys.softDrop = true;
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                return;
+            // todo: handle exit key somehow?
+            // case "exit":
+            // 	return;
+            case "retry":
+                this.practice.retry = true;
+                this.practice.retryIter = 0;
+                return;
+            case "undo":
+                this.undo();
+                return;
+            case "redo":
+                this.redo();
+                return;
+            case "rotateCCW":
+                this.input.keys.rotateCCW = true;
+                break;
+            case "rotateCW":
+                this.input.keys.rotateCW = true;
+                break;
+            case "rotate180":
+                this.input.keys.rotate180 = true;
+                break;
+            case "hold":
+                this.input.keys.hold = true;
+                break;
+        }
+        // todo: all in if (!this.pause)
+        switch(event.key){
+            case "rotateCCW":
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                this.#processRotate(-1);
+                break;
+            case "rotateCW":
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                this.#processRotate(1);
+                break;
+            case "rotate180":
+                if (!this.misc.allowed.spin180) return;
+                if (this.input.firstInputTime == -1) this.input.firstInputTime = this.frame + this.subframe;
+                this.#processRotate(2);
+                break;
+            case "hardDrop":
+                if (this.misc.allowed.hardDrop === false || this.falling.safeLock !== 0) return;
+                this.hardDrop();
+                return;
+            case "hold":
+                this.hold();
+                return;
+        }
+    }
+    #keyup({ data: event }) {
+        this.#processSubframe(event.subframe);
+        // TODO: inversion?
+        // if (this.misc.inverted)
+        //   switch (e.key) {
+        //     case "moveLeft":
+        //       e.key = "moveRight";
+        //       break;
+        //     case "moveRight":
+        //       e.key = "moveLeft";
+        //   }
+        switch(event.key){
+            case "moveLeft":
+                this.input.lShift.held = false;
+                this.input.lShift.das = 0;
+                this.input.lastShift = this.input.rShift.held ? this.input.rShift.dir : this.input.lastShift;
+                if (this.handling.cancel) {
+                    this.input.rShift.arr = this.handling.arr;
+                    this.input.rShift.das = 0;
+                }
+                break;
+            case "moveRight":
+                this.input.rShift.held = false;
+                this.input.rShift.das = 0;
+                this.input.lastShift = this.input.lShift.held ? this.input.lShift.dir : this.input.lastShift;
+                if (this.handling.cancel) {
+                    this.input.lShift.arr = this.handling.arr;
+                    this.input.lShift.das = 0;
+                }
+                break;
+            case "softDrop":
+                this.state |= constants.flags.ACTION_SOFTDROP;
+                this.input.keys.softDrop = false;
+                break;
+            // todo: handle exit key somehow?
+            // case "exit":
+            // 	return;
+            case "retry":
+                this.practice.retry = false;
+                this.practice.retryIter = 0;
+                return;
+            case "rotateCCW":
+                this.input.keys.rotateCCW = false;
+                break;
+            case "rotateCW":
+                this.input.keys.rotateCW = false;
+                break;
+            case "rotate180":
+                this.input.keys.rotate180 = false;
+                break;
+            case "hold":
+                this.input.keys.hold = false;
+                break;
+        }
+    }
+    #activateShift(shift, hoisted) {
+        this.input[shift].held = true;
+        this.input[shift].das = hoisted ? this.handling.das - this.handling.dcd : 0;
+        this.input[shift].arr = this.handling.arr;
+        this.input.lastShift = this.input[shift].dir;
+    }
+    #processRotate(rotation) {
+        this.falling.keys += rotation >= 2 ? 2 : 1;
+        return this.#rotate(rotation);
+    }
+    #processSubframe(subframe) {
+        if (subframe <= this.subframe) return;
+        const delta = subframe - this.subframe;
+        this.#processAllShift(delta);
+        this.#fall(delta);
+        this.subframe = subframe;
+    }
+    #processInterrupts() {
+        if (this.misc.allowed.retry && this.practice.retry) {
+            if (this.misc.stride) return this.retry();
+            const tick = this.practice.retryIter++;
+            if (tick > 15) {
+                this.retry();
+            }
+        }
+    }
+    #__internal_shift() {
+        if (!this.#isSleep()) {
+            // TODO: missing: && !this.pause
+            this.state |= constants.flags.ACTION_MOVE;
+            if (legal(this.falling.absoluteAt({
+                x: this.falling.location[0] + this.input.lastShift
+            }), this.board.state)) {
+                this.falling.location[0] += this.input.lastShift;
+                if (this.falling.lockResets < 31) this.falling.lockResets++;
+                this.#clearFlags(constants.flags.ROTATION_ALL | constants.flags.STATE_WALL);
+                // fallingdirty = true;
+                if (this.#is20G()) this.#slamToFloor();
+                if (!this.#shouldLock()) this.falling.locking = 0;
+                return true;
+            } else {
+                this.state |= constants.flags.STATE_WALL;
+                return false;
+            }
+        }
+    }
+    #processShift(shift, delta) {
+        if (!this.input[shift].held || this.input.lastShift !== this.input[shift].dir) return;
+        const arrDelta = Math.max(0, delta - Math.max(0, this.handling.das - this.input[shift].das));
+        this.input[shift].das = Math.min(this.input[shift].das + delta, this.handling.das);
+        if (this.input[shift].das < this.handling.das) return;
+        if (this.#isSleep()) return; // TODO: missing: && !this.pause
+        this.input[shift].arr += arrDelta;
+        if (this.input[shift].arr < this.handling.arr) return;
+        const arrMultiplier = this.handling.arr === 0 ? this.board.width : Math.floor(this.input[shift].arr / this.handling.arr);
+        this.input[shift].arr -= this.handling.arr * arrMultiplier;
+        for(let i = 0; i < arrMultiplier; i++)this.#__internal_shift();
+    }
+    #processAllShift(subFrameDiff = 1 - this.subframe) {
+        this.#processShift("lShift", subFrameDiff);
+        this.#processShift("rShift", subFrameDiff);
+    }
+    #tickSpike() {
+        if (this.spike.timer > 0) {
+            this.spike.timer--;
+            if (this.spike.timer === 0) this.spike.count = 0;
+        }
+    }
+    #run(frames) {
+        for(let i = 0; i < frames.length; i++){
+            const frame = frames[i];
+            switch(frame.type){
+                case "keydown":
+                    this.#keydown(frame);
+                    break;
+                case "keyup":
+                    this.#keyup(frame);
+                    break;
+                case "ige":
+                    if (frame.data.type === "interaction") {
+                        if (frame.data.data.type === "garbage") {
+                            const original = frame.data.data.amt;
+                            const amount = this.multiplayer?.passthrough?.network ? this.igeHandler.receive({
+                                playerID: frame.data.data.gameid,
+                                ackiid: frame.data.data.ackiid,
+                                amount: frame.data.data.amt,
+                                iid: frame.data.data.iid
+                            }) : frame.data.data.amt;
+                            this.receiveGarbage({
+                                frame: Number.MAX_SAFE_INTEGER - this.garbageQueue.options.garbage.speed,
+                                amount,
+                                size: frame.data.data.size,
+                                cid: frame.data.data.iid,
+                                gameid: frame.data.data.gameid,
+                                confirmed: false
+                            });
+                            this.stats.garbage.receive += amount;
+                            this.events.emit("garbage.receive", {
+                                iid: frame.data.data.iid,
+                                amount,
+                                originalAmount: original
+                            });
+                        }
+                    } else if (frame.data.type === "interaction_confirm") {
+                        if (frame.data.data.type === "garbage") {
+                            this.garbageQueue.confirm(frame.data.data.iid, frame.data.data.gameid, frame.frame);
+                            this.events.emit("garbage.confirm", {
+                                iid: frame.data.data.iid,
+                                gameid: frame.data.data.gameid,
+                                frame: frame.frame
+                            });
+                        }
+                    } else if (frame.data.type === "target" && this.multiplayer) {
+                        this.multiplayer.targets = frame.data.data.targets;
+                    }
+                    break;
+            }
+        }
+    }
+    tick(frames) {
+        this.subframe = 0;
+        if (frames.length > 0) this.#run(frames);
+        this.frame++;
+        this.#processAllShift();
+        this.#fall();
+        this.#processInterrupts();
+        // TODO: execute waiting frames
+        // TODO: process garbage are
+        this.#tickSpike();
+        this.dynamic.gravity.tick();
+        this.dynamic.garbageMultiplier.tick();
+        this.dynamic.garbageCap.tick();
+        return this.#flushRes();
+    }
+    receiveGarbage(...garbage) {
+        this.garbageQueue.receive(...garbage);
+    }
+    getPreview(piece) {
+        return tetrominoes[piece.toLowerCase()].preview;
+    }
+    connect(blocks) {
+        const exists = (x, y)=>{
+            for(let i = 0; i < blocks.length; i++){
+                const block = blocks[i];
+                if (block[0] === x && block[1] === y) return true;
+            }
+            return false;
+        };
+        const out = new Array(blocks.length);
+        for(let i = 0; i < blocks.length; i++){
+            const x = blocks[i][0];
+            const y = blocks[i][1];
+            let state = 0;
+            if (!exists(x, y - 1)) state |= BoardConnections.TOP;
+            if (!exists(x + 1, y)) state |= BoardConnections.RIGHT;
+            if (!exists(x, y + 1)) state |= BoardConnections.BOTTOM;
+            if (!exists(x - 1, y)) state |= BoardConnections.LEFT;
+            if (state === (BoardConnections.TOP | BoardConnections.LEFT) && !exists(x + 1, y + 1) || state === (BoardConnections.TOP | BoardConnections.RIGHT) && !exists(x - 1, y + 1) || state === (BoardConnections.BOTTOM | BoardConnections.LEFT) && !exists(x + 1, y - 1) || state === (BoardConnections.BOTTOM | BoardConnections.RIGHT) && !exists(x - 1, y - 1) || state === BoardConnections.BOTTOM && !exists(x + 1, y - 1) && !exists(x - 1, y - 1) || state === BoardConnections.LEFT && !exists(x + 1, y - 1) && !exists(x + 1, y + 1) || state === BoardConnections.TOP && !exists(x - 1, y + 1) && !exists(x + 1, y + 1) || state === BoardConnections.RIGHT && !exists(x - 1, y - 1) && !exists(x - 1, y + 1)) {
+                state |= BoardConnections.CORNER;
+            }
+            out[i] = [
+                x,
+                y,
+                state
+            ];
+        }
+        return out;
+    }
+    getConnectedPreview(piece) {
+        const data = tetrominoes[piece.toLowerCase()].preview;
+        return {
+            ...data,
+            data: this.connect(data.data)
+        };
+    }
+    /** @deprecated Engine.onQueuePieces is deprecated and no longer functional. Switch to Engine.events.on("queue.add", (pieces) => {}) instead. */ onQueuePieces(_listener) {
+        console.log(`${chalk.redBright("[Triangle.js]")} Engine.onQueuePieces is deprecated and no longer functional. Switch to Engine.events.on("queue.add", (pieces) => {}) instead.`);
+    }
+    get currentSpike() {
+        return this.spike.count;
+    }
+    static colorMap = {
+        [Mino.I]: chalk.bgCyan,
+        [Mino.J]: chalk.bgBlue,
+        [Mino.L]: chalk.bgYellow,
+        [Mino.O]: chalk.bgWhite,
+        [Mino.S]: chalk.bgGreenBright,
+        [Mino.T]: chalk.bgMagentaBright,
+        [Mino.Z]: chalk.bgRedBright,
+        [Mino.GARBAGE]: chalk.bgBlackBright,
+        [Mino.BOMB]: chalk.bgHex("#FFA500")
+    };
+    get text() {
+        const boardTop = this.board.state.findIndex((row)=>row.every((block)=>block === null));
+        const height = Math.max(this.garbageQueue.size, boardTop, 0);
+        const output = [];
+        for(let i = 0; i < height; i++){
+            let str = i % 2 === 0 ? "|" : " ";
+            if (i < this.garbageQueue.size) str += " " + chalk.bgRed(" ") + " ";
+            else str += "   ";
+            if (i > boardTop) {
+                output.push(str + "  ".repeat(this.board.width) + " " + (i % 2 === 0 ? "|" : " "));
+                continue;
+            }
+            for(let j = 0; j < this.board.width; j++){
+                const block = this.board.state[i][j];
+                str += block ? Engine.colorMap[block.mino]("  ") : "  ";
+            }
+            output.push(str + " " + (i % 2 === 0 ? "|" : " "));
+        }
+        return output.reverse().join("\n");
+    }
+    /** Return an engine with the same config. Does not preserve state. */ clone() {
+        return new Engine(this.initializer);
+    }
+}
+export * from "./queue/index.mjs";
+export * from "./garbage/index.mjs";
+export * from "./utils/index.mjs";
+export * from "./board/index.mjs";
+export * from "./types.mjs";
+export * from "./multiplayer/index.mjs";
+
+//# sourceMappingURL=index.js.map
