@@ -68,36 +68,36 @@
       "tspin_triples_game_stats": 56,
       "tspin_doubles_game_stats": 236,
       "rounds_played": 50,
-      "verified_tspins": 109,
-      "admitted_lineclearing_tspins": 109,
+      "verified_tspins": 111,
+      "admitted_lineclearing_tspins": 111,
       "tspins_excluded_untucked": 0,
       "tspins_excluded_no_snapshot": 0,
       "tspins_excluded_zero_clear": 0,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
-      "self_built": 63,
+      "self_built": 64,
       "unattributed": 0,
       "mechanism_established": 0,
       "forecast_total": 0,
       "clause2_undecided": 0,
-      "floor_pre_existed": 94,
+      "floor_pre_existed": 96,
       "floor_arrived_later": 12,
       "floor_undetermined": 3,
-      "reactive": 46,
+      "reactive": 47,
       "forecast_rate_x1000": 0,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 34,
+      "sampling_ci95_hi_x1000": 33,
       "simulator_range_lo_x1000": 0,
       "simulator_range_hi_x1000": 0,
-      "verified_placements": 1136,
+      "verified_placements": 1161,
       "total_placements": 4750
     }
   ],
   "session": {
     "player_rounds": 100,
-    "verified_placements": 2097,
+    "verified_placements": 2122,
     "total_placements": 9882,
-    "coverage_x1000": 212
+    "coverage_x1000": 214
   },
   "statistics": {
     "round": {
@@ -111,7 +111,7 @@
     },
     "event": {
       "forecast_n": 0,
-      "reactive_n": 183,
+      "reactive_n": 185,
       "attack": null,
       "lines": null,
       "balance": {
@@ -128,7 +128,7 @@
       },
       "scorable_rounds": {
         "yachi": 39,
-        "pinglamb": 46
+        "pinglamb": 47
       },
       "rounds_for_r70": {
         "yachi": null,

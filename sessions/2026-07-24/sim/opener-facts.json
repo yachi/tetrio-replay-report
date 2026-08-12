@@ -4,8 +4,8 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 89.7% of Triples match the wiki window against 9.1% of Doubles, over 200 verified T-spins",
-    "the ordering metric is scored on 52 of 91 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+    "the slot-geometry match is a SHAPE test, not an opener test: 90.1% of Triples match the wiki window against 9.8% of Doubles, over 206 verified T-spins",
+    "the ordering metric is scored on 54 of 95 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
   ],
   "session": "2026-07-24",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -136,11 +136,11 @@
   },
   "first_bag": {
     "rounds": 100,
-    "clean": 82,
+    "clean": 86,
     "players": [
       {
         "user": "pinglamb",
-        "clean_first_bags": 47,
+        "clean_first_bags": 48,
         "exact_matches": [],
         "nearest": {
           "any": {
@@ -150,7 +150,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 38,
-              "5-8": 7,
+              "5-8": 8,
               "9-14": 2,
               "15+": 0
             }
@@ -163,7 +163,7 @@
               "1-2": 0,
               "3-4": 0,
               "5-8": 39,
-              "9-14": 7,
+              "9-14": 8,
               "15+": 1
             }
           },
@@ -175,7 +175,7 @@
               "1-2": 0,
               "3-4": 0,
               "5-8": 43,
-              "9-14": 3,
+              "9-14": 4,
               "15+": 1
             }
           },
@@ -187,7 +187,7 @@
               "1-2": 0,
               "3-4": 0,
               "5-8": 2,
-              "9-14": 43,
+              "9-14": 44,
               "15+": 2
             }
           },
@@ -198,7 +198,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 45,
+              "5-8": 46,
               "9-14": 1,
               "15+": 1
             }
@@ -207,7 +207,7 @@
       },
       {
         "user": "yachi",
-        "clean_first_bags": 35,
+        "clean_first_bags": 38,
         "exact_matches": [
           {
             "name": "Perfect Clear Opener {Abbr: PCO, JP: パフェクリテンプレ or 開幕パフェ積み}",
@@ -217,12 +217,12 @@
         "nearest": {
           "any": {
             "min_cells": 0,
-            "within_threshold": 25,
+            "within_threshold": 26,
             "bands": {
               "0": 2,
               "1-2": 0,
-              "3-4": 23,
-              "5-8": 10,
+              "3-4": 24,
+              "5-8": 12,
               "9-14": 0,
               "15+": 0
             }
@@ -234,8 +234,8 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 28,
-              "9-14": 7,
+              "5-8": 29,
+              "9-14": 9,
               "15+": 0
             }
           },
@@ -246,8 +246,8 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 29,
-              "9-14": 6,
+              "5-8": 30,
+              "9-14": 8,
               "15+": 0
             }
           },
@@ -259,7 +259,7 @@
               "1-2": 0,
               "3-4": 0,
               "5-8": 3,
-              "9-14": 32,
+              "9-14": 35,
               "15+": 0
             }
           },
@@ -270,7 +270,7 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 35,
+              "5-8": 38,
               "9-14": 0,
               "15+": 0
             }
@@ -284,14 +284,14 @@
     "players": [
       {
         "user": "pinglamb",
-        "rounds_scored": 49,
-        "rounds_with_tspin_double": 32,
-        "rounds_with_tspin_triple": 41,
-        "rounds_with_both": 29,
+        "rounds_scored": 50,
+        "rounds_with_tspin_double": 33,
+        "rounds_with_tspin_triple": 42,
+        "rounds_with_both": 30,
         "dt_order": 0,
-        "cspin_order": 29,
+        "cspin_order": 30,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 29,
+        "cspin_order_within_window": 30,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -300,14 +300,14 @@
       },
       {
         "user": "yachi",
-        "rounds_scored": 42,
-        "rounds_with_tspin_double": 32,
-        "rounds_with_tspin_triple": 29,
-        "rounds_with_both": 23,
+        "rounds_scored": 45,
+        "rounds_with_tspin_double": 34,
+        "rounds_with_tspin_triple": 31,
+        "rounds_with_both": 24,
         "dt_order": 0,
-        "cspin_order": 23,
+        "cspin_order": 24,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 23,
+        "cspin_order_within_window": 24,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -321,14 +321,14 @@
     "players": [
       {
         "user": "pinglamb",
-        "rounds_scored": 49,
-        "rounds_with_tspin_double": 43,
-        "rounds_with_tspin_triple": 41,
-        "rounds_with_both": 40,
+        "rounds_scored": 50,
+        "rounds_with_tspin_double": 44,
+        "rounds_with_tspin_triple": 42,
+        "rounds_with_both": 41,
         "dt_order": 0,
-        "cspin_order": 40,
+        "cspin_order": 41,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 40,
+        "cspin_order_within_window": 41,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -337,14 +337,14 @@
       },
       {
         "user": "yachi",
-        "rounds_scored": 42,
-        "rounds_with_tspin_double": 34,
-        "rounds_with_tspin_triple": 29,
-        "rounds_with_both": 25,
+        "rounds_scored": 45,
+        "rounds_with_tspin_double": 37,
+        "rounds_with_tspin_triple": 31,
+        "rounds_with_both": 27,
         "dt_order": 0,
-        "cspin_order": 25,
+        "cspin_order": 27,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 25,
+        "cspin_order_within_window": 27,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -367,19 +367,19 @@
       },
       {
         "lines": 2,
-        "n": 109,
+        "n": 112,
         "drawn": 5,
-        "mirrored": 5,
-        "matched": 10,
-        "share_x1000": 91
+        "mirrored": 6,
+        "matched": 11,
+        "share_x1000": 98
       },
       {
         "lines": 3,
-        "n": 78,
+        "n": 81,
         "drawn": 24,
-        "mirrored": 46,
-        "matched": 70,
-        "share_x1000": 897
+        "mirrored": 49,
+        "matched": 73,
+        "share_x1000": 901
       }
     ]
   }

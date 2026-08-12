@@ -449,20 +449,29 @@ export function simulate(
       for (let i = 0; i < mult; i++) shift(s.dir);
     };
     const dasArr = (dt: number) => { processShift(lShift, dt); processShift(rShift, dt); };
+    // triangle's #fall(delta), ported (engine/index.mjs): fall = gravity*delta, and soft drop replaces
+    // it with a floored gravity*delta*sdf (sdf===41 is the instant 400*delta). The floor `0.05*sdf` is
+    // NOT scaled by delta — it is per-CALL — so soft drop is applied once per subframe step, exactly as
+    // triangle applies #fall once per #processSubframe. The earlier "additive slam is optimal" verdict
+    // was an ILLUSION from grafting this formula onto a FRAME-ONCE gravity; the full Triangle oracle
+    // (same g=0.02) reproduces the real ige 4.4x better than the old sim, so the fix is the per-subframe
+    // interleave below, not the additive rate. Fractional fall is carried in gravAcc across subframes.
+    const gravityStep = (delta: number) => {
+      let fall = opts.gravity * delta;
+      if (softHeld) fall = handling.sdf === 41 ? 400 * delta : Math.max(opts.gravity * delta * handling.sdf, 0.05 * handling.sdf);
+      gravAcc += fall;
+      while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) { gravAcc = 0; break; } piece = n; lastWasRotation = false; gravAcc -= 1; }
+    };
+    // Lock delay stays frame-quantised (the client's lock clock ticks per frame): a grounded piece
+    // locks after locktime frames of rest.
+    const lockCheck = () => {
+      if (grounded()) { if (++groundFrames >= opts.locktime) lockPiece(f); }
+      else groundFrames = 0;
+    };
     const continuous = () => {
-    if (!opts.subframe) dasArr(1);
-    // Soft drop is the additive "slam", NOT triangle's floored gravity*sdf. Measured: triangle's model
-    // is WORSE at every gravity (best g=0.1 -> 12614 vs this 13173; probe-gravity-sweep.mjs), because
-    // all 592 replays use sdf=20 and their real pieces reach bottom fast — the version-19 .ttrm omits
-    // `g`, so both this sim and triangle would otherwise assume 0.02 (too low), and no single gravity
-    // fixes it (natural fall and soft drop pull opposite ways; TL gravity also rises over the round).
-    const sdRate = opts.sdfMode === 'mult' ? opts.gravity * handling.sdf : handling.sdf;
-    gravAcc += opts.gravity + (softHeld ? sdRate : 0);
-    while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) break; piece = n; lastWasRotation = false; gravAcc -= 1; }
-    if (gravAcc >= 1) gravAcc = 0;
-
-    if (grounded()) { if (++groundFrames >= opts.locktime) lockPiece(f); }
-    else groundFrames = 0;
+      if (!opts.subframe) dasArr(1);
+      gravityStep(1);
+      lockCheck();
     };
     const applyEvent = (e: InEvent) => {
       if (e.type === 'keydown') {
@@ -517,21 +526,23 @@ export function simulate(
     };
 
     if (opts.subframe) {
-      // Match triangle's #processSubframe: before handling each event, advance DAS/ARR to the event's
-      // EXACT subframe (not the next 0.1 grid step), firing any shift that completes in between, THEN
-      // apply the event. This is why a `keyup:moveLeft@0.5` in the client moves one more cell before
-      // release — the pending charge completes at 0.5. The old fixed 0.1 grid dropped those shifts and
-      // introduced float-grid errors. Gravity + lock stay frame-quantised (continuous), as before.
+      // Match triangle's #processSubframe(subframe): advance BOTH DAS/ARR and gravity(#fall) to the
+      // event's EXACT subframe (firing any shift/fall that completes in between), THEN handle the event.
+      // Interleaving fall per subframe — not once per frame — is what lets soft drop match the client
+      // (its per-call floor makes it event-density dependent) and is why the oracle reproduces the real
+      // ige far better. Lock delay stays frame-quantised (lockCheck once, at frame end).
       let cur = 0;                            // subframe position within this frame, in [0,1]
+      const stepTo = (to: number) => { const d = to - cur; if (d > 0) { dasArr(d); gravityStep(d); cur = to; } };
       while (ei < evs.length && !topout) {
         const e = evs[ei]!;
         if (e.frame > f) break;
         const es = Math.min(1, Math.max(cur, e.sub ?? 0));
-        if (es > cur) { dasArr(es - cur); cur = es; }
+        stepTo(es);
+        if (topout) break;
         ei++; applyEvent(e);
       }
-      if (!topout && cur < 1) dasArr(1 - cur);
-      if (!topout) continuous();
+      if (!topout) stepTo(1);
+      if (!topout) lockCheck();
     } else if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
     if (opts.trace && !topout && f >= areUntil) opts.trace(f, getPieceCells(piece), piece.rotation, piece.type);
   }
