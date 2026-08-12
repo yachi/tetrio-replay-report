@@ -20,6 +20,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { simulate, DEFAULT_TABLE, type SimResult } from './sim.ts';
+import { runCaseOracle as oracleSource } from './oracle-source.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
 
 /**
@@ -90,6 +91,8 @@ export interface Case {
    * the cross-extractor gate compares them, so the number is already twice-derived.
    */
   clears: Record<string, number>;
+  /** raw replay player + round array, for the oracle board source (runCaseOracle). */
+  rawPlayer?: any; rawRound?: any[];
 }
 
 export function loadCases(dir = replayDir()): Case[] {
@@ -121,6 +124,10 @@ export function loadCases(dir = replayDir()): Case[] {
           handling: me.rp.options.handling, seed: me.rp.options.seed,
           frames: me.rp.frames, placed: me.rp.results.stats.piecesplaced,
           clears: me.rp.results.stats.clears ?? {},
+          // the raw replay player + round, carried so the oracle board source (runCaseOracle) can
+          // replay them through the vendored Triangle engine — it needs every event type and the
+          // round's gameids, which the flattened Case fields above do not preserve.
+          rawPlayer: me.p, rawRound: rnd,
         });
       }
     });
@@ -130,6 +137,18 @@ export function loadCases(dir = replayDir()): Case[] {
 
 export function runCase(c: Case, extra: any = {}): SimResult {
   return simulate(c.ev, c.gin, c.handling, c.seed, c.frames, DEFAULT_TABLE, { ...BEST_OPTS, ...extra });
+}
+
+/**
+ * Board source for the published forecast/opener sections: the vendored Triangle engine, not the
+ * hand-port. Over the frame+amount+row gate it verifies 92.3% of attacks (7700/8342) vs runCase's
+ * 24.8% on the weaker frame+amount gate — the residual is `matchesIgeY`'s heuristic, not board drift.
+ * The sim-mechanic tests (hoisted-das, attack-model, …) keep using runCase; only the board consumers
+ * switch here. Falls back to the sim when a Case carries no raw replay (should not happen via loadCases).
+ */
+export function runCaseOracle(c: Case): SimResult {
+  if (!c.rawPlayer || !c.rawRound) return runCase(c);
+  return oracleSource(c.rawPlayer, c.rawRound);
 }
 
 /**
