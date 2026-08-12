@@ -4,8 +4,8 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 95.3% of Triples match the wiki window against 8.4% of Doubles, over 207 verified T-spins",
-    "the ordering metric is scored on 62 of 100 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+    "the slot-geometry match is a SHAPE test, not an opener test: 95.3% of Triples match the wiki window against 8.6% of Doubles, over 241 verified T-spins",
+    "the ordering metric is scored on 69 of 100 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
   ],
   "session": "2026-08-01",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -285,13 +285,13 @@
       {
         "user": "pinglamb",
         "rounds_scored": 52,
-        "rounds_with_tspin_double": 36,
+        "rounds_with_tspin_double": 40,
         "rounds_with_tspin_triple": 49,
-        "rounds_with_both": 34,
+        "rounds_with_both": 38,
         "dt_order": 0,
-        "cspin_order": 34,
+        "cspin_order": 38,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 34,
+        "cspin_order_within_window": 38,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -301,13 +301,13 @@
       {
         "user": "yachi",
         "rounds_scored": 48,
-        "rounds_with_tspin_double": 40,
+        "rounds_with_tspin_double": 43,
         "rounds_with_tspin_triple": 33,
-        "rounds_with_both": 28,
+        "rounds_with_both": 31,
         "dt_order": 0,
-        "cspin_order": 28,
+        "cspin_order": 31,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 28,
+        "cspin_order_within_window": 31,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -359,19 +359,19 @@
     "rows": [
       {
         "lines": 1,
-        "n": 14,
+        "n": 16,
         "drawn": 1,
         "mirrored": 1,
         "matched": 2,
-        "share_x1000": 142
+        "share_x1000": 125
       },
       {
         "lines": 2,
-        "n": 107,
-        "drawn": 2,
-        "mirrored": 7,
-        "matched": 9,
-        "share_x1000": 84
+        "n": 139,
+        "drawn": 4,
+        "mirrored": 8,
+        "matched": 12,
+        "share_x1000": 86
       },
       {
         "lines": 3,

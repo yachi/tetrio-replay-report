@@ -105,6 +105,9 @@ export function loadCases(dir = replayDir()): Case[] {
           gin: me.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction' && e.data.data?.type === 'garbage')
             .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size,
               cid: e.data.data.iid, gameid: e.data.data.gameid,
+              // last of MY outgoing sends the opponent had processed when it sent this batch — the
+              // network-cancel protocol (igeHandler) nets the incoming against my un-acked outgoing.
+              ackiid: e.data.data.ackiid,
               // the reference queue times insertion from the CONFIRM event, not the arrival
               confirmFrame: me.rp.events.find((k: any) => k.type === 'ige'
                 && k.data.type === 'interaction_confirm' && k.data.data?.type === 'garbage'

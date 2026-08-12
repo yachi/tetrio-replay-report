@@ -60,14 +60,14 @@ realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
   // more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%),
   // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), then triangle's exact DAS/ARR port
   // (~1.8%), exact-subframe (~4%), then per-subframe #fall gravity (~3.5%). The classification is unchanged — the
-  // reactive:self_built ratio held (56:89 = 0.629 -> 103:155 = 0.665) and the single surviving forecast
+  // reactive:self_built ratio held (56:89 = 0.629 -> 123:170 = 0.724) and the single surviving forecast
   // (forecast_lineclear:1) is the same event — only the window got longer.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
     // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
     forecast_lineclear: 1,
-    self_built: 155,
-    reactive: 103,
+    self_built: 170,
+    reactive: 123,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
@@ -98,7 +98,7 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // ticked 5 -> 7 as the longer prefix admitted two more garbage-straddled events, its share still tiny
   // (7/259 = 2.7%): clause 2 stays essentially as decidable.
   expect(R!.floors).toEqual({
-    'pre-existed': 222, 'arrived-later': 30, undetermined: 7,
+    'pre-existed': 250, 'arrived-later': 35, undetermined: 9,
   });
 });
 
@@ -144,7 +144,7 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
   // Population re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` + DAS/ARR-port
   // fixes (longer verified prefix -> more C-Spin-trailing T-spins in window: 46 -> 66 -> 67 -> 69).
   // The verdict `counted == 0` is unchanged: none of them is a forecast, the assertion that matters.
-  expect(behindACSpin).toBe(73);
+  expect(behindACSpin).toBe(83);
   expect(counted).toBe(0);
 });
 

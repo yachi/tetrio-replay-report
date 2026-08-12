@@ -61,6 +61,8 @@ export interface InGarbage {
   /** iid of the interaction (triangle stores this as the queue entry's cid) */
   cid?: number;
   gameid?: number;
+  /** the opponent's ack of MY outgoing sends when it sent this batch (network-cancel protocol) */
+  ackiid?: number;
 }
 
 export interface ClearRecord {
@@ -174,6 +176,26 @@ export function simulate(
   const garbageEvents: SimResult['garbageEvents'] = [];
   const evLog: { frame: number; kind: 'lock' | 'garbage' }[] = [];
 
+  // Network garbage-cancel protocol (triangle's IGEHandler, engine/multiplayer/ige.mjs). Incoming
+  // garbage is netted against MY still-unacknowledged outgoing sends BEFORE it enters my queue — a
+  // separate layer from the local queue cancel below (that one is my attack vs my received garbage).
+  // The batch's `ackiid` says how many of my sends the opponent had processed; my outgoing with
+  // iid <= ackiid are dropped, and the incoming cancels 1-for-1 against the rest. Missing this made
+  // the sim receive garbage the real game had already mutually cancelled (root of 163 drift rounds).
+  const igeOut: { iid: number; amount: number }[] = [];
+  let igeSendIid = 0;
+  const igeReceive = (amount: number, ackiid: number | undefined): number => {
+    if (ackiid == null) return amount;      // pre-network replays: no protocol, take the raw amount
+    let running = amount, w = 0;
+    for (const item of igeOut) {
+      if (item.iid <= ackiid) continue;     // already acknowledged by the opponent — drop it
+      const amt = Math.min(item.amount, running);
+      item.amount -= amt; running -= amt;
+      if (item.amount > 0) igeOut[w++] = item;
+    }
+    igeOut.length = w;
+    return running;
+  };
   // pending garbage queue: entries become insertable at frame + garbagespeed
   const pending: { ready: number; amt: number; x: number; size: number }[] = [];
   // Faithful port of the reference queue (confirm-gated insertion, cancellable while
@@ -361,6 +383,8 @@ export function simulate(
           if (p0.amt === 0) pending.splice(pi, 1); else pi++;
         }
         sentTotal += remaining;
+        // register the outgoing send so a later incoming batch can be netted against it (igeHandler.send)
+        if (remaining > 0) igeOut.push({ iid: ++igeSendIid, amount: remaining });
         records.push({ frame, piece: piece.type, lines: cleared, spin, attack: amount, sent: remaining,
           cancelled: amount - remaining, b2b, combo, cells, garbageCleared: garbageRows, clearedRows });
       };
@@ -419,10 +443,13 @@ export function simulate(
     }
     while (gi < gq.length && gq[gi]!.frame <= f) {
       const g = gq[gi++]!;
+      // net the incoming against my un-acked outgoing sends BEFORE it enters the queue (igeHandler)
+      const net = igeReceive(g.amt, g.ackiid);
+      if (net <= 0) continue;
       // triangle's GarbageQueue.confirm(cid, gameid, frame) overwrites the queued entry's
       // frame when the server confirms it, so 'confirm' uses that instead of arrival.
       const arriveAt = (opts.readyFrom === 'confirm' && g.confirmFrame != null) ? g.confirmFrame : g.frame;
-      pending.push({ ready: arriveAt + opts.garbagespeed, amt: g.amt, x: g.x, size: g.size });
+      pending.push({ ready: arriveAt + opts.garbagespeed, amt: net, x: g.x, size: g.size });
     }
     if (opts.insertMode === 'immediate') {
       let budget = opts.garbagecap;

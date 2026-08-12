@@ -100,6 +100,14 @@ const ROSE_KNOWN = [
   // slot-local gate would call it a forecast. Two deferred instances now stand: the latent
   // decision (should the metric gate slot-locally?) is live — see ROADMAP.
   '2026-08-01 pinglamb replay-2026-08-01-6.ttrm r4 lock16',
+  // 2026-08-12: the THIRD riser, surfaced by the network garbage-cancel port (igeHandler/ackiid,
+  // memory/simulator-drift-reduction) — the sim stopped inserting garbage the real game had mutually
+  // cancelled, which corrected the boards on 2026-08-01 yachi replay-7 r5 and extended its verified
+  // prefix past lock 23. This event's support is a PLACER at lock 18, AFTER the roof at lock 17
+  // (floorOrigin=arrived-later, garbageLoadBearing=false), so clause 2 rejects it INDEPENDENTLY of the
+  // slot-local rise — the player self-built the slot after the roof, the textbook non-forecast. Same
+  // deferred class as the two above; it is not a masked forecast.
+  '2026-08-01 yachi replay-2026-08-01-7.ttrm r5 lock23',
 ];
 
 const scan = () => {

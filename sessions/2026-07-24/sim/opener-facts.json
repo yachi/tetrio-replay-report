@@ -4,8 +4,8 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 90.1% of Triples match the wiki window against 9.8% of Doubles, over 206 verified T-spins",
-    "the ordering metric is scored on 54 of 95 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+    "the slot-geometry match is a SHAPE test, not an opener test: 87.9% of Triples match the wiki window against 9.6% of Doubles, over 256 verified T-spins",
+    "the ordering metric is scored on 67 of 95 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
   ],
   "session": "2026-07-24",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -285,13 +285,13 @@
       {
         "user": "pinglamb",
         "rounds_scored": 50,
-        "rounds_with_tspin_double": 33,
+        "rounds_with_tspin_double": 42,
         "rounds_with_tspin_triple": 42,
-        "rounds_with_both": 30,
+        "rounds_with_both": 39,
         "dt_order": 0,
-        "cspin_order": 30,
+        "cspin_order": 39,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 30,
+        "cspin_order_within_window": 39,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -301,13 +301,13 @@
       {
         "user": "yachi",
         "rounds_scored": 45,
-        "rounds_with_tspin_double": 34,
+        "rounds_with_tspin_double": 38,
         "rounds_with_tspin_triple": 31,
-        "rounds_with_both": 24,
+        "rounds_with_both": 28,
         "dt_order": 0,
-        "cspin_order": 24,
+        "cspin_order": 28,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 24,
+        "cspin_order_within_window": 28,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -338,13 +338,13 @@
       {
         "user": "yachi",
         "rounds_scored": 45,
-        "rounds_with_tspin_double": 37,
+        "rounds_with_tspin_double": 38,
         "rounds_with_tspin_triple": 31,
-        "rounds_with_both": 27,
+        "rounds_with_both": 28,
         "dt_order": 0,
-        "cspin_order": 27,
+        "cspin_order": 28,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 27,
+        "cspin_order_within_window": 28,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
@@ -359,7 +359,7 @@
     "rows": [
       {
         "lines": 1,
-        "n": 13,
+        "n": 17,
         "drawn": 0,
         "mirrored": 0,
         "matched": 0,
@@ -367,19 +367,19 @@
       },
       {
         "lines": 2,
-        "n": 112,
+        "n": 156,
         "drawn": 5,
-        "mirrored": 6,
-        "matched": 11,
-        "share_x1000": 98
+        "mirrored": 10,
+        "matched": 15,
+        "share_x1000": 96
       },
       {
         "lines": 3,
-        "n": 81,
+        "n": 83,
         "drawn": 24,
         "mirrored": 49,
         "matched": 73,
-        "share_x1000": 901
+        "share_x1000": 879
       }
     ]
   }
