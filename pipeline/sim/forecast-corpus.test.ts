@@ -56,18 +56,18 @@ const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(R === null);
 
 realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
-  // Re-blessed 2026-08-11 for THREE ground-truth drift fixes that lengthened the verified prefix,
-  // so more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%),
-  // `attackModel:'exact'` (~4%), then confirm-timed garbage (readyFrom:'confirm' + garbagespeed 20,
-  // ~1.2%). The classification is unchanged — the reactive:self_built ratio held (56:89 = 0.629 ->
-  // 86:140 = 0.614) and the single surviving forecast (forecast_lineclear:1) is the same event —
+  // Re-blessed 2026-08-11 for FOUR ground-truth drift fixes that lengthened the verified prefix, so
+  // more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%),
+  // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), then triangle's exact DAS/ARR port
+  // (~1.8%). The classification is unchanged — the reactive:self_built ratio held (56:89 = 0.629 ->
+  // 92:144 = 0.639) and the single surviving forecast (forecast_lineclear:1) is the same event —
   // only the window got longer.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
     // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
     forecast_lineclear: 1,
-    self_built: 140,
-    reactive: 86,
+    self_built: 144,
+    reactive: 92,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
@@ -93,12 +93,12 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // deepest row alone. The old split read 83 / 48 field-floor / 13 / 2, and the 48 were the
   // giveaway: `field-floor` claimed the playfield bottom was the support, but across all 654
   // events and all seven configs the number of pieces held up by the floor ALONE is zero.
-  // Re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` + confirm-timed-garbage drift
-  // fixes (longer verified prefix -> more events in window). The undetermined count stayed 5 while the
-  // decidable counts grew, i.e. its share FELL (5/227 = 2.2% vs the old 3/145 = 2.1%): clause 2 stays
-  // just as decidable.
+  // Re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` + confirm-timed-garbage +
+  // DAS/ARR-port drift fixes (longer verified prefix -> more events in window). The undetermined count
+  // stayed 5 while the decidable counts grew, i.e. its share FELL (5/237 = 2.1%): clause 2 stays just
+  // as decidable.
   expect(R!.floors).toEqual({
-    'pre-existed': 195, 'arrived-later': 27, undetermined: 5,
+    'pre-existed': 204, 'arrived-later': 28, undetermined: 5,
   });
 });
 
@@ -141,10 +141,10 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
       if (isVerifiedForecast(rec)) counted++;
     }
   }
-  // Population re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` fixes (longer
-  // verified prefix -> more C-Spin-trailing T-spins in window: 46 -> 66 -> 67). The verdict
-  // `counted == 0` is unchanged: none of them is a forecast, which is the assertion that matters.
-  expect(behindACSpin).toBe(67);
+  // Population re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` + DAS/ARR-port
+  // fixes (longer verified prefix -> more C-Spin-trailing T-spins in window: 46 -> 66 -> 67 -> 69).
+  // The verdict `counted == 0` is unchanged: none of them is a forecast, the assertion that matters.
+  expect(behindACSpin).toBe(69);
   expect(counted).toBe(0);
 });
 

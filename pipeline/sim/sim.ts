@@ -148,7 +148,10 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick'; attackModel?: 'legacy'|'exact' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick'; attackModel?: 'legacy'|'exact';
+          /** opt-in per-frame trace of the falling piece (col/row/rotation), for the Triangle
+           *  frame-differential harness. Behaviour-preserving: called at end of each frame only. */
+          trace?: (frame: number, cells: { col: number; row: number }[], rotation: number, type: string) => void },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -197,7 +200,17 @@ export function simulate(
 
   let piece: ActivePiece = { type: queue[qi++]!, rotation: 0, col: 3, row: SPAWN_ROW };
   let lastWasRotation = false, usedKick = false, lastKickIndex = -1;
-  let dir = 0, dasTimer = 0, arrTimer = 0, softHeld = false, gravAcc = 0, groundFrames = 0;
+  // DAS/ARR ported verbatim from @haelp/teto's Engine (#activateShift / #processShift /
+  // #__internal_shift, engine/index.mjs). The `das` counter charges UP from 0 (fresh tap) or
+  // `das - dcd` (hoisted) to `handling.das`; `arr` starts at `handling.arr` and carries a
+  // FRACTIONAL remainder across subframes, firing floor(arr/handling.arr) shifts each step. The old
+  // count-down `dasTimer/arrTimer` matched only the simple case; it lost the leftover at the DAS→ARR
+  // transition and could not fire multiple shifts per subframe, which is why every garbage-free lock
+  // divergence vs the oracle carried a COLUMN error (lock-diff-agg.mjs: 37 rounds, 0 pure-row).
+  const lShift = { held: false, das: 0, arr: 0, dir: -1 };
+  const rShift = { held: false, das: 0, arr: 0, dir: 1 };
+  let lastShift = 0;                  // -1 | 0 | +1 — the active direction (triangle's input.lastShift)
+  let softHeld = false, gravAcc = 0, groundFrames = 0;
   const held = new Set<string>();
   let areUntil = -1;                 // frames before which no piece exists (entry delay)
 
@@ -228,6 +241,14 @@ export function simulate(
     }
   };
   const shift = (d: number) => { const n = tryMove(board, piece, d, 0); if (n) { piece = n; lastWasRotation = false; groundFrames = 0; } };
+  // triangle's #activateShift: charge DAS (0 fresh, or `das - dcd` when the direction was already
+  // held at spawn) and arm ARR at handling.arr, then this direction becomes lastShift.
+  const activateShift = (s: { held: boolean; das: number; arr: number; dir: number }, hoisted?: boolean) => {
+    s.held = true;
+    s.das = hoisted ? handling.das - handling.dcd : 0;
+    s.arr = handling.arr;
+    lastShift = s.dir;
+  };
   const grounded = () => tryMove(board, piece, 0, 1) === null;
 
   function insertGarbage(amt: number, x: number, size: number) {
@@ -412,17 +433,22 @@ export function simulate(
         p0.amt -= take; budget -= take; if (p0.amt === 0) pending.shift();
       }
     }
-    // DAS/ARR advanced by dt frames. TETR.IO records inputs to 0.1-frame precision and runs
-    // its handling on that clock; at arr=2 a one-frame rounding error is a whole cell of
-    // movement, which is why this is separable from gravity and lock delay.
-    const dasArr = (dt: number) => {
-      if (dir === 0) return;
-      if (dasTimer > 0) { dasTimer -= dt; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } }
-      else if ((arrTimer -= dt) <= 0) {
-        shift(dir); arrTimer = handling.arr || 1;
-        if (!handling.arr) for (let i = 0; i < BOARD_WIDTH; i++) shift(dir);
-      }
+    // DAS/ARR advanced by dt frames, ported from triangle's #processShift. TETR.IO records inputs to
+    // 0.1-frame precision and runs its handling on that clock; at arr=2 a one-frame rounding error is
+    // a whole cell of movement, which is why this is separable from gravity and lock delay.
+    const processShift = (s: typeof lShift, dt: number) => {
+      if (!s.held || lastShift !== s.dir) return;
+      // the part of dt left AFTER finishing the DAS charge spills into ARR this same subframe
+      const arrDelta = Math.max(0, dt - Math.max(0, handling.das - s.das));
+      s.das = Math.min(s.das + dt, handling.das);
+      if (s.das < handling.das) return;
+      s.arr += arrDelta;
+      if (s.arr < handling.arr) return;
+      const mult = handling.arr === 0 ? BOARD_WIDTH : Math.floor(s.arr / handling.arr);
+      s.arr -= handling.arr * mult;
+      for (let i = 0; i < mult; i++) shift(s.dir);
     };
+    const dasArr = (dt: number) => { processShift(lShift, dt); processShift(rShift, dt); };
     const continuous = () => {
     if (!opts.subframe) dasArr(1);
     const sdRate = opts.sdfMode === 'mult' ? opts.gravity * handling.sdf : handling.sdf;
@@ -438,12 +464,12 @@ export function simulate(
         if (e.key) held.add(e.key);
         if (f < areUntil) return;            // entry delay: no piece to control yet
         switch (e.key) {
-          // `hoisted` = the client recorded this direction as already held when the piece
-          // spawned, so DAS is pre-charged (only `dcd` frames remain, not a full `das`). The
-          // client writes the flag; dropping it makes every held-into-the-wall opener stop one
-          // tap short. Match the fresh-tap completion path: when no charge remains, arm ARR now.
-          case 'moveLeft': dir = -1; shift(-1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
-          case 'moveRight': dir = 1; shift(1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
+          // triangle's #keydown for a move: #activateShift then an immediate #__internal_shift (the
+          // tap). `hoisted` = the client recorded this direction as already held when the piece
+          // spawned, so DAS is pre-charged to `das - dcd` (only `dcd` frames of charge remain). arr
+          // starts at `handling.arr`, so the first auto-repeat fires the instant DAS completes.
+          case 'moveLeft': activateShift(lShift, e.hoisted); shift(-1); break;
+          case 'moveRight': activateShift(rShift, e.hoisted); shift(1); break;
           case 'softDrop': softHeld = true; break;
           case 'rotateCW': case 'rotateCCW': {
             const before = { c: piece.col, r: piece.row, rot: piece.rotation };
@@ -464,11 +490,20 @@ export function simulate(
         }
       } else if (e.type === 'keyup') {
         if (e.key) held.delete(e.key);
-        // Releasing one direction while the other is still held would need to RESUME that
-        // other direction rather than stop. Not modelled deliberately: measured 0 such
-        // releases in 18,424 across all 158 player-rounds, so the branch would be untestable.
-        if (e.key === 'moveLeft' && dir === -1) dir = 0;
-        if (e.key === 'moveRight' && dir === 1) dir = 0;
+        // triangle's #keyup: release the shift, and if the OTHER direction is still held, resume it
+        // from scratch (das=0, arr re-armed) and hand it lastShift. The old model dropped to dir=0
+        // and never resumed the other direction (measured 0 such releases at the time, but the port
+        // matches the engine so the branch is faithful rather than merely rare).
+        if (e.key === 'moveLeft') {
+          lShift.held = false; lShift.das = 0;
+          if (rShift.held) { lastShift = rShift.dir; rShift.arr = handling.arr; rShift.das = 0; }
+          else if (lastShift === -1) lastShift = 0;
+        }
+        if (e.key === 'moveRight') {
+          rShift.held = false; rShift.das = 0;
+          if (lShift.held) { lastShift = lShift.dir; lShift.arr = handling.arr; lShift.das = 0; }
+          else if (lastShift === 1) lastShift = 0;
+        }
         if (e.key === 'softDrop') softHeld = false;
       }
     };
@@ -491,6 +526,7 @@ export function simulate(
       }
       if (!topout) continuous();
     } else if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
+    if (opts.trace && !topout && f >= areUntil) opts.trace(f, getPieceCells(piece), piece.rotation, piece.type);
   }
   return { lines, placed, holds, clears, topbtb, topcombo,
     garbage: { sent: sentTotal, received: recvTotal, cleared: clearedTotal, attack: attackTotal },
