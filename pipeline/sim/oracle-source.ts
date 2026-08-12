@@ -45,15 +45,17 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
   const byFrame = new Map<number, any[]>();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame)!.push(e); }
 
-  // NOTE ON GARBAGE HOLES. oracle.mjs relocates each garbage row's hole from the engine's seeded-RNG
-  // column to the ige-recorded column, matched by a positional FIFO. That FIFO desyncs the moment any
-  // garbage is cancelled (oracle.mjs's own comment says so), and relocating a hole changes WHICH lines
-  // the engine completes on later locks — which corrupts board HEIGHT and, with it, the verified-prefix
-  // (coverage measured: 24.8% with relocation vs 88.6% without, on the frame+amount+row gate). Board
-  // height and piece placement are what drift measures and what the forecast needs first, so the oracle
-  // source keeps the engine's own seeded holes. The cost is that garbage-hole COLUMNS are the engine's
-  // RNG columns, not the recorded ones — a bounded caveat for garbage-adjacent T-slots, in the already-
-  // quarantined forecast section, of the same class as its documented soft garbage-timing attribution.
+  // NOTE ON GARBAGE HOLES — the oracle keeps the engine's own seeded-RNG hole columns, which mismatch the
+  // ige-recorded columns 97/103 of the time. BOTH ways of imposing the recorded column are verified dead:
+  //  - ENGINE relocation moves a hole in the live board, changing which lines the engine later completes
+  //    → board height corrupts, coverage 88.6% -> 23% (FIFO and correct per-iid both).
+  //  - ENCODE-time relocation (move the hole only in the emitted board) breaks clear-CONSISTENCY: pieces
+  //    DO fill garbage holes to clear garbage lines inside the verified prefix (the "they don't" premise
+  //    was an illusion, disproved by forecast.ts:490 `cleared 1 rows but reconstruction found 0` at
+  //    07-28 step 135), so a row the engine cleared by filling its RNG hole reads as not-full once the
+  //    hole is moved. The engine's RNG-hole board is internally valid and reproduces the real attack
+  //    stream (88.6%); its hole COLUMNS are a bounded caveat for garbage-adjacent T-slots in the
+  //    quarantined forecast section, of the same class as its documented soft garbage-timing attribution.
 
   // sim-frame board (40 rows y-down) from the engine's y-up state
   const encBoard = (): Board => {
@@ -61,8 +63,7 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
     const b: (PieceType | null)[][] = [];
     for (let r = 0; r < H; r++) {
       const row = new Array<PieceType | null>(BOARD_WIDTH).fill(null);
-      const yUp = (H - 1) - r;
-      const src = st[yUp];
+      const src = st[(H - 1) - r];
       for (let c = 0; c < BOARD_WIDTH; c++) {
         const t = src?.[c];
         row[c] = t == null ? null : t.mino === 'gb' ? GARBAGE : (String(t.mino).toUpperCase() as PieceType);
