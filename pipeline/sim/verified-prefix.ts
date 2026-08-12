@@ -65,7 +65,9 @@ export const BEST_OPTS = {
   // board, so this regenerates the quarantined forecast/opener facts — never facts.json (Python-
   // extracted, sim-independent). See tools/triangle-oracle/probe-confirm-timing.mjs for the sweep.
   readyFrom: 'confirm' as const, garbagespeed: 20,
-  garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
+  // locktime 30 = triangle's documented lockTime default (was a fitted 60 = 2x too long, from before
+  // the movement/garbage ports); sweep confirms 30 beats 60 (+40 locks) with the current model.
+  garbagecap: 8, locktime: 30, gravity: 0.02, sdfMode: 'abs' as const,
   insertMode: 'onPlace' as const, cancelMode: 'all' as const, acEmit: 'separate' as const,
   subframe: true, blockout: 'shiftup' as const, kickset: 'SRS+' as const,
   // TETR.IO's documented attack formula (logarithmic b2b level + log1p zero-base combo), not the

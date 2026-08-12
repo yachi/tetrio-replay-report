@@ -96,9 +96,9 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // pin that both methods are actually firing, and roughly how often.
   expect(both).toBeGreaterThan(1500);
   expect(ccOnly).toBeGreaterThan(50);
-  // 7544 -> 9878 -> 10295 -> 10397 -> 10587 -> 11076 -> 11540 -> 13328 on 2026-08-11/12: `hoisted`-DAS (~31%),
+  // 7544 -> 9878 -> 10295 -> 10397 -> 10587 -> 11076 -> 11540 -> 13328 -> 13319 on 2026-08-11/12: `hoisted`-DAS (~31%),
   // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), triangle's DAS/ARR port (~1.8%), then
-  // exact-subframe processing (~4%), then per-subframe #fall (~3.5%), then the network garbage-cancel port (igeHandler/ackiid, ~15%). The differential above (unexplained == []) is
+  // exact-subframe processing (~4%), then per-subframe #fall (~3.5%), then the network garbage-cancel port (~15%), then locktime 60->30 (triangle default). The differential above (unexplained == []) is
   // what this test guards; this total is the anti-vacuity denominator and tracks the longer prefix.
-  expect(both + oursOnly + ccOnly + neither).toBe(13328);
+  expect(both + oursOnly + ccOnly + neither).toBe(13319);
 });

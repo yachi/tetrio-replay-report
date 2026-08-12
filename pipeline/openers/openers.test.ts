@@ -130,8 +130,8 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   const clean = res.filter(r => r.clean);
   // Population re-blessed 2026-08-11: the longer verified prefix admits more clean-first-bag rounds
   // (358 -> 466 for the `hoisted`-DAS fix, -> 470 when `attackModel:'exact'` became the drift default,
-  // -> 471 with confirm-timed garbage, -> 477 with triangle's DAS/ARR port, -> 490 exact-subframe, -> 507 per-subframe #fall). The finding is the line below — `d <= 4` is still empty — not the population.
-  expect(clean.length).toBe(507);
+  // -> 471 with confirm-timed garbage, -> 477 with triangle's DAS/ARR port, -> 490 exact-subframe, -> 507 #fall, -> 505 locktime30). The finding is the line below — `d <= 4` is still empty — not the population.
+  expect(clean.length).toBe(505);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
   // ... and the instrument is not simply blind: it finds five exact matches, all the same opener
   const exact = clean.filter(r => r.exact!.asDrawn.length || r.exact!.asMirror.length);
@@ -140,8 +140,8 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
     expect([...r.exact!.asDrawn, ...r.exact!.asMirror].some(n => /Perfect Clear Opener/.test(n))).toBe(true);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
   // (264 -> 346 with the `hoisted`-DAS fix's longer prefix, -> 349 with confirm-timed garbage, -> 355
-  // with the DAS/ARR port, -> 366 exact-subframe, -> 375 #fall, -> 376 network-cancel; still the bulk of clean)
-  expect(clean.filter(r => r.sbTriple).length).toBe(376);
+  // with the DAS/ARR port, -> 366 exact-subframe, -> 375 #fall, -> 376 network-cancel, -> 374 locktime30; still the bulk of clean)
+  expect(clean.filter(r => r.sbTriple).length).toBe(374);
 }, 300_000);
 
 /* ── the artifact the report reads ─────────────────────────────────────────────────────────────

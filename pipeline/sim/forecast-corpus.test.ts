@@ -60,14 +60,14 @@ realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
   // more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%),
   // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), then triangle's exact DAS/ARR port
   // (~1.8%), exact-subframe (~4%), then per-subframe #fall gravity (~3.5%). The classification is unchanged — the
-  // reactive:self_built ratio held (56:89 = 0.629 -> 123:170 = 0.724) and the single surviving forecast
+  // reactive:self_built ratio held (56:89 = 0.629 -> 121:169 = 0.716) and the single surviving forecast
   // (forecast_lineclear:1) is the same event — only the window got longer.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
     // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
     forecast_lineclear: 1,
-    self_built: 170,
-    reactive: 123,
+    self_built: 169,
+    reactive: 121,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
@@ -98,7 +98,7 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // ticked 5 -> 7 as the longer prefix admitted two more garbage-straddled events, its share still tiny
   // (7/259 = 2.7%): clause 2 stays essentially as decidable.
   expect(R!.floors).toEqual({
-    'pre-existed': 250, 'arrived-later': 35, undetermined: 9,
+    'pre-existed': 248, 'arrived-later': 34, undetermined: 9,
   });
 });
 
