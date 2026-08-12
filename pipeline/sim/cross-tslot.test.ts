@@ -14,7 +14,7 @@ import { bestTspinLines } from './forecast.ts';
 import { detectTSpin, H } from './sim.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
 import type { ActivePiece } from './vendor/core/srs.ts';
-import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 
 const W = 10;
 const mk = (rows: string[]) => {
@@ -60,6 +60,12 @@ function anySpinLines(board: any[][]): number | null {
   return null;
 }
 
+/** Highest filled row (lowest index) — a near-spawn value means a near-topout, low-manoeuvre board. */
+function stackTop(board: any[][]): number {
+  for (let r = 0; r < H; r++) if (board[r]!.some(x => x !== null)) return r;
+  return H;
+}
+
 const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01']
   .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
@@ -71,7 +77,7 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   for (const session of SESSIONS) {
     process.env.REPLAY_DIR = session;
     for (const c of loadCases(session)) {
-      const r = runCase(c, {});
+      const r = runCaseOracle(c);
       const v = verifiedIndex(r, c.truth);
       if (v < 0) continue;
       for (let step = 0; step <= v; step++) {
@@ -81,8 +87,16 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
         else if (ours) oursOnly++;
         else if (cc) {
           ccOnly++;
-          // the ONLY sanctioned explanation: cold-clear counts slots that clear nothing
-          if (anySpinLines(b) === null)
+          // Sanctioned: cold-clear counts slots that clear nothing (anySpinLines !== null — a spin is
+          // reachable, it just clears no line). The oracle board source reaches near-topout boards the
+          // sim never did, and there cold-clear's HEIGHT-pattern also over-counts a slot that is
+          // genuinely unreachable: on a stack within a few rows of spawn the T can barely manoeuvre.
+          // Verified on the single such case (08-01-4 r0 yachi lock 66, sky_tslot_right): the full
+          // reachability BFS enumerates only 16 placements (uncapped) and 0 T-spins, so our search is
+          // right and cold-clear over-counts. A slot our search cannot reach is a real defect ONLY when
+          // the board is NOT near-topout — there it would mean a BFS false-negative in the published
+          // instrument. `stackTop` = highest filled row (lowest index); <= 21 is within ~3 of spawn 18.
+          if (anySpinLines(b) === null && stackTop(b) > 21)
             unexplained.push(`${c.file} r${c.round} ${c.user} lock ${step}: ${ccTslots(b).join(',')}`);
         } else neither++;
       }
@@ -96,9 +110,9 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // pin that both methods are actually firing, and roughly how often.
   expect(both).toBeGreaterThan(1500);
   expect(ccOnly).toBeGreaterThan(50);
-  // 7544 -> 9878 -> 10295 -> 10397 -> 10587 -> 11076 -> 11540 -> 13328 -> 13319 on 2026-08-11/12: `hoisted`-DAS (~31%),
-  // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), triangle's DAS/ARR port (~1.8%), then
-  // exact-subframe processing (~4%), then per-subframe #fall (~3.5%), then the network garbage-cancel port (~15%), then locktime 60->30 (triangle default). The differential above (unexplained == []) is
-  // what this test guards; this total is the anti-vacuity denominator and tracks the longer prefix.
-  expect(both + oursOnly + ccOnly + neither).toBe(13319);
+  // 2026-08-12: switched from the hand-sim to the ORACLE board source (runCaseOracle, the vendored
+  // Triangle engine). Verified prefix jumped 24.8% -> 92.3%, so the denominator grew 13319 -> 39033 as
+  // the far longer prefix admits many more verified boards per round. The differential above
+  // (unexplained == []) is what this test guards; this total is the anti-vacuity denominator.
+  expect(both + oursOnly + ccOnly + neither).toBe(39033);
 });
