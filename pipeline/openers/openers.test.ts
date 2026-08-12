@@ -128,20 +128,20 @@ test('TKI is in the catalogue under its own name, so widening C-Spin to it is a 
 test('no round comes within four cells of a catalogued C-Spin', () => {
   const res = analyse(SESSIONS.map(sessionDir));
   const clean = res.filter(r => r.clean);
-  // Population re-blessed 2026-08-11: the longer verified prefix admits more clean-first-bag rounds
-  // (358 -> 466 for the `hoisted`-DAS fix, -> 470 when `attackModel:'exact'` became the drift default,
-  // -> 471 with confirm-timed garbage, -> 477 with triangle's DAS/ARR port, -> 490 exact-subframe, -> 507 #fall, -> 505 locktime30). The finding is the line below — `d <= 4` is still empty — not the population.
-  expect(clean.length).toBe(505);
+  // Population re-blessed 2026-08-12 for the ORACLE board source (runCaseOracle): the far longer verified
+  // prefix (24.8% -> 92.3%) admits more clean-first-bag rounds, 505 -> 522. The finding is the line below —
+  // `d <= 4` is still empty — not the population.
+  expect(clean.length).toBe(522);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
-  // ... and the instrument is not simply blind: it finds five exact matches, all the same opener
+  // ... and the instrument is not simply blind: it finds exact matches, all the same opener. (5 -> 4 on
+  // the oracle: one round the sim's short prefix had mislabelled clean now resolves differently.)
   const exact = clean.filter(r => r.exact!.asDrawn.length || r.exact!.asMirror.length);
-  expect(exact).toHaveLength(5);
+  expect(exact).toHaveLength(4);
   for (const r of exact)
     expect([...r.exact!.asDrawn, ...r.exact!.asMirror].some(n => /Perfect Clear Opener/.test(n))).toBe(true);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
-  // (264 -> 346 with the `hoisted`-DAS fix's longer prefix, -> 349 with confirm-timed garbage, -> 355
-  // with the DAS/ARR port, -> 366 exact-subframe, -> 375 #fall, -> 376 network-cancel, -> 374 locktime30; still the bulk of clean)
-  expect(clean.filter(r => r.sbTriple).length).toBe(374);
+  // (oracle: 374 -> 380; still the bulk of clean)
+  expect(clean.filter(r => r.sbTriple).length).toBe(380);
 }, 300_000);
 
 /* ── the artifact the report reads ─────────────────────────────────────────────────────────────

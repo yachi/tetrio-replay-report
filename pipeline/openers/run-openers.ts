@@ -8,7 +8,7 @@
  *   REPLAY_DIR is set per session by the loop below; pass session dirs as arguments.
  *   bun run pipeline/openers/run-openers.ts sessions/2026-07-22 [...]
  */
-import { loadCases, runCase, verifiedIndex } from '../sim/verified-prefix.ts';
+import { loadCases, runCaseOracle, verifiedIndex } from '../sim/verified-prefix.ts';
 import { forecastMetric } from '../sim/forecast.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, isCSpin } from './match.ts';
 
@@ -29,7 +29,7 @@ export function analyse(sessions: string[]): RoundResult[] {
   for (const session of sessions) {
     process.env.REPLAY_DIR = session;
     for (const c of loadCases(session)) {
-      const r = runCase(c, {});
+      const r = runCaseOracle(c);
       const v = verifiedIndex(r, c.truth);
       const base = { session: session.split('/').pop()!, user: c.user, file: c.file, round: c.round };
       if (v < 6) { out.push({ ...base, clean: false }); continue; }

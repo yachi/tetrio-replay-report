@@ -33,10 +33,14 @@
  *    involved and no catalogue coverage bounds it.
  *
  *    The control is EXPOSURE: a round is only counted once it holds both a T-spin Double and a
- *    T-spin Triple, so "0 in DT order" is over rounds that demonstrably had the material for either
- *    order. `scope` records that this runs over the verified prefix; the emitter also computes the
- *    same counts over the whole simulated round (`ordering_full_round`) because a window that
- *    truncates the tail could manufacture an ordering result on its own, and the two must agree.
+ *    T-spin Triple IN THE OPENER, so "0 in DT order" is over rounds that demonstrably had the material
+ *    for either order. The order is scored over the opener window (a spin's lock index <= WINDOW_PIECES
+ *    = 21 = 3 bags): the C-Spin/DT distinction is an OPENING technique, and over a whole round these
+ *    players throw ordinary T-spin doubles by the dozen, so "did any triple precede any double" becomes
+ *    a statement about playstyle, not the opener. The hand-sim's short verified prefix hid this by
+ *    truncating to the opening; the oracle board source reaches the whole round, so the window is now
+ *    explicit. `ordering_full_round` applies the same opener window over the whole simulated round;
+ *    both agree (cspin_order === rounds_with_both, dt_order == 0, five sessions).
  *
  * 3. SLOT GEOMETRY vs harddrop.com/wiki/C-Spin's own 38 drawn placements. For each verified T-spin
  *    the local shape the T tucked into is extracted and compared with the article's.
@@ -49,7 +53,7 @@
  * Rates are integers scaled x1000, matching report/facts.json and forecast-facts.json.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { loadCases, runCase, verifiedIndex, BEST_OPTS, replayDir } from './verified-prefix.ts';
+import { loadCases, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
 import { H } from './sim.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS }
@@ -139,7 +143,7 @@ let roundsTotal = 0;
 
 for (const c of loadCases(dir)) {
   roundsTotal++;
-  const r = runCase(c, {});
+  const r = runCaseOracle(c);
   const v = verifiedIndex(r, c.truth);
 
   const spinsAll = r.locks
@@ -214,10 +218,19 @@ function firstBagFor(user: string) {
 }
 
 // ── metric 2: ordering ─────────────────────────────────────────────────────────────────────────
+// The order is scored over the OPENER window (a spin's lock index <= WINDOW_PIECES = 21 = 3 bags, the
+// wiki's C-Spin follow-up span). This is load-bearing: the C-Spin/DT distinction is an OPENING technique,
+// and over a whole round these players throw ordinary T-spin doubles by the dozen, so "did any triple
+// precede any double" is a statement about playstyle, not the opener. The hand-sim's short verified prefix
+// hid this by truncating to the opening; the oracle board source (runCaseOracle) reaches the whole round,
+// so the window must be made explicit. Measured (oracle, five sessions): at the opener window every round
+// holding both spins runs the C-Spin order — cspin_order === rounds_with_both, dt_order == 0 — while over
+// the whole prefix 7 rounds show a late-game double-before-triple that is not a DT Cannon.
 function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: number }[]) {
   const mine = rounds.filter(r => r.user === user && r.verified >= 0);
-  const D = (r: Round) => pick(r).filter(x => x.cleared === 2);
-  const T = (r: Round) => pick(r).filter(x => x.cleared === 3);
+  const inOpener = (x: { i: number }) => x.i <= WINDOW_PIECES;
+  const D = (r: Round) => pick(r).filter(x => x.cleared === 2 && inOpener(x));
+  const T = (r: Round) => pick(r).filter(x => x.cleared === 3 && inOpener(x));
   const ordered = (a: { i: number }[], b: { i: number }[], win: number | null) =>
     a.some(x => b.some(y => x.i < y.i && (win === null || y.i - x.i <= win)));
   const both = mine.filter(r => D(r).length && T(r).length);
@@ -285,7 +298,9 @@ return {
   not_eligible_because: notEligibleBecause(),
   session,
   gate: 'frame+amount+row (ige row oracle must agree)',
-  simulator_options: BEST_OPTS,
+  // Boards come from the vendored Triangle engine (runCaseOracle), byte-identical to @haelp/teto — NOT
+  // the hand-sim, whose BEST_OPTS fit only ~24.8% of attacks vs the oracle's 92.3% on this same gate.
+  board_source: 'triangle-oracle (vendored @haelp/teto, byte-identical)',
   window_pieces: WINDOW_PIECES,
   near_cells: NEAR_CELLS,
   definitions: {
