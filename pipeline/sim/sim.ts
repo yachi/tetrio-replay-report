@@ -451,6 +451,11 @@ export function simulate(
     const dasArr = (dt: number) => { processShift(lShift, dt); processShift(rShift, dt); };
     const continuous = () => {
     if (!opts.subframe) dasArr(1);
+    // Soft drop is the additive "slam", NOT triangle's floored gravity*sdf. Measured: triangle's model
+    // is WORSE at every gravity (best g=0.1 -> 12614 vs this 13173; probe-gravity-sweep.mjs), because
+    // all 592 replays use sdf=20 and their real pieces reach bottom fast — the version-19 .ttrm omits
+    // `g`, so both this sim and triangle would otherwise assume 0.02 (too low), and no single gravity
+    // fixes it (natural fall and soft drop pull opposite ways; TL gravity also rises over the round).
     const sdRate = opts.sdfMode === 'mult' ? opts.gravity * handling.sdf : handling.sdf;
     gravAcc += opts.gravity + (softHeld ? sdRate : 0);
     while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) break; piece = n; lastWasRotation = false; gravAcc -= 1; }
