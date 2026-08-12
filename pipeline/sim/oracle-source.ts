@@ -79,22 +79,33 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
   const garbageEvents: SimResult['garbageEvents'] = [];
   const provSnaps: (number | null)[][][] = [];
   const evLog: SimResult['events'] = [];
-  let prov: (number | null)[][] = Array.from({ length: H }, () => new Array<number | null>(BOARD_WIDTH).fill(null));
+  // Provenance by CELL IDENTITY, not by mirroring the engine's row-splices (which desynced ~5%). The
+  // engine's board cells are stable objects that survive its own splice/insert/clear operations, so a
+  // WeakMap tag placed once at a cell's locking lock stays attached wherever the engine later moves it.
+  // provSnaps is then read straight off the live board: null=empty, -1=garbage (`mino==='gb'`), else the
+  // tag = the lock index that placed the cell. Exact by construction.
+  const cellLock = new WeakMap<object, number>();
+  const provFromBoard = (): (number | null)[][] => {
+    const st = eng.board.state;
+    const g: (number | null)[][] = [];
+    for (let r = 0; r < H; r++) {
+      const row = new Array<number | null>(BOARD_WIDTH).fill(null);
+      const src = st[(H - 1) - r];
+      for (let c = 0; c < BOARD_WIDTH; c++) {
+        const t = src?.[c];
+        row[c] = t == null ? null : t.mino === 'gb' ? -1 : (cellLock.get(t) ?? -1);
+      }
+      g.push(row);
+    }
+    return g;
+  };
   const clears: Record<string, number> = {};
   let sentTotal = 0, recvTotal = 0, clearedTotal = 0, attackTotal = 0, holds = 0, linesTotal = 0;
   let topbtb = 0, topcombo = 0, topout = false;
 
-  // garbage.tank → sim garbageEvents + prov garbage rows (shift top, push garbage row of -1s w/ recorded hole)
   eng.events.on('garbage.tank', (ev: any) => {
     garbageEvents.push({ frame: eng.frame, amt: ev.amount, lockIndex: locks.length });
     recvTotal += ev.amount;
-    // prov: shift the grid up and push a garbage row (all -1). The row's empty hole is read from the
-    // BOARD (null), never from prov — forecast only consults prov for cells the board says are filled —
-    // so the hole column need not be carved here, which keeps prov consistent with the engine's board.
-    for (let i = 0; i < ev.amount; i++) {
-      prov.shift();
-      prov.push(new Array<number | null>(BOARD_WIDTH).fill(-1 as number | null));
-    }
   });
 
   // pre-tick board snapshot (occupancy), for cleared-row reconstruction
@@ -128,15 +139,16 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
       for (let yUp = 0; yUp < H; yUp++) if (g[yUp]!.every(Boolean)) clearedRows.push((H - 1) - yUp);
     }
 
-    // prov: place piece cells at myIndex, then splice cleared rows (bottom-up) + unshift nulls
-    for (const { col, row } of cells) if (row >= 0 && row < H) prov[row]![col] = myIndex;
-    const garbageRows = res.garbageCleared ?? 0;
-    if (lines > 0) {
-      // clearedRows is bottom-most-first (largest sim-row index first); splicing in that order leaves the
-      // still-to-splice smaller indices unshifted, matching the sim's bottom-up clear loop.
-      for (const r of clearedRows) prov.splice(r, 1);
-      while (prov.length < H) prov.unshift(new Array<number | null>(BOARD_WIDTH).fill(null));
+    // Tag this lock's surviving cells by identity: any non-garbage cell on the board not yet tagged was
+    // just placed by this piece (cells cleared in the same lock are already gone and need no tag). The
+    // engine has already run add -> clear -> garbage-insert by the time falling.lock fires, so the board
+    // is final and the shift is the engine's, not ours.
+    const st = eng.board.state;
+    for (let y = 0; y < st.length; y++) for (let x = 0; x < BOARD_WIDTH; x++) {
+      const t = st[y]?.[x];
+      if (t != null && t.mino !== 'gb' && !cellLock.has(t)) cellLock.set(t, myIndex);
     }
+    const garbageRows = res.garbageCleared ?? 0;
 
     linesTotal += lines;
     if (lines > 0) clears[String(lines)] = (clears[String(lines)] ?? 0) + 1;
@@ -159,7 +171,7 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
       preTick = snapOccupancy();
       const r = eng.tick(byFrame.get(f) || []);
       // snapshot boards + prov once per lock that happened this tick
-      while (boards.length < locks.length) { boards.push(encBoard()); provSnaps.push(prov.map((row) => [...row])); }
+      while (boards.length < locks.length) { boards.push(encBoard()); provSnaps.push(provFromBoard()); }
       if (r && r.topout) { topout = true; break; }
     }
   } catch { topout = true; }
