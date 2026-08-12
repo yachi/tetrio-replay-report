@@ -61,6 +61,8 @@ export interface InGarbage {
   /** iid of the interaction (triangle stores this as the queue entry's cid) */
   cid?: number;
   gameid?: number;
+  /** the opponent's ack of MY outgoing sends when it sent this batch (network-cancel protocol) */
+  ackiid?: number;
 }
 
 export interface ClearRecord {
@@ -148,7 +150,10 @@ export function simulate(
   events: InEvent[], garbageIn: InGarbage[], handling: Handling, seed: number,
   endFrame: number, table: AttackTable,
   opts: { garbagespeed: number; garbagecap: number; locktime: number; gravity: number; sdfMode?: 'abs'|'mult'; eventsFirst?: boolean; insertMode?: 'onPlace'|'immediate'; cancelMode?: 'all'|'inTransit'; insertAfterClear?: boolean; arriveFrame?: 'outer'|'ige'; irs?: boolean; ihs?: boolean; are?: number; lineclearAre?: number; acEmit?: 'separate'|'combined'; acMode?: 'flat'|'b2bonly'|'none'|'replace';
-          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick'; attackModel?: 'legacy'|'exact' },
+          blockout?: 'strict'|'clutch'|'shiftup'; subframe?: boolean; kickset?: 'SRS'|'SRS+'; specialBonus?: boolean; readyFrom?: 'interaction'|'confirm'; queue?: 'flat'|'reference'; tspinRule?: 'anykick'|'lastkick'; attackModel?: 'legacy'|'exact';
+          /** opt-in per-frame trace of the falling piece (col/row/rotation), for the Triangle
+           *  frame-differential harness. Behaviour-preserving: called at end of each frame only. */
+          trace?: (frame: number, cells: { col: number; row: number }[], rotation: number, type: string) => void },
 ): SimResult {
   setKickset(opts.kickset ?? 'SRS');
   const queue = makeQueue(seed, 4000);
@@ -171,6 +176,26 @@ export function simulate(
   const garbageEvents: SimResult['garbageEvents'] = [];
   const evLog: { frame: number; kind: 'lock' | 'garbage' }[] = [];
 
+  // Network garbage-cancel protocol (triangle's IGEHandler, engine/multiplayer/ige.mjs). Incoming
+  // garbage is netted against MY still-unacknowledged outgoing sends BEFORE it enters my queue — a
+  // separate layer from the local queue cancel below (that one is my attack vs my received garbage).
+  // The batch's `ackiid` says how many of my sends the opponent had processed; my outgoing with
+  // iid <= ackiid are dropped, and the incoming cancels 1-for-1 against the rest. Missing this made
+  // the sim receive garbage the real game had already mutually cancelled (root of 163 drift rounds).
+  const igeOut: { iid: number; amount: number }[] = [];
+  let igeSendIid = 0;
+  const igeReceive = (amount: number, ackiid: number | undefined): number => {
+    if (ackiid == null) return amount;      // pre-network replays: no protocol, take the raw amount
+    let running = amount, w = 0;
+    for (const item of igeOut) {
+      if (item.iid <= ackiid) continue;     // already acknowledged by the opponent — drop it
+      const amt = Math.min(item.amount, running);
+      item.amount -= amt; running -= amt;
+      if (item.amount > 0) igeOut[w++] = item;
+    }
+    igeOut.length = w;
+    return running;
+  };
   // pending garbage queue: entries become insertable at frame + garbagespeed
   const pending: { ready: number; amt: number; x: number; size: number }[] = [];
   // Faithful port of the reference queue (confirm-gated insertion, cancellable while
@@ -197,7 +222,17 @@ export function simulate(
 
   let piece: ActivePiece = { type: queue[qi++]!, rotation: 0, col: 3, row: SPAWN_ROW };
   let lastWasRotation = false, usedKick = false, lastKickIndex = -1;
-  let dir = 0, dasTimer = 0, arrTimer = 0, softHeld = false, gravAcc = 0, groundFrames = 0;
+  // DAS/ARR ported verbatim from @haelp/teto's Engine (#activateShift / #processShift /
+  // #__internal_shift, engine/index.mjs). The `das` counter charges UP from 0 (fresh tap) or
+  // `das - dcd` (hoisted) to `handling.das`; `arr` starts at `handling.arr` and carries a
+  // FRACTIONAL remainder across subframes, firing floor(arr/handling.arr) shifts each step. The old
+  // count-down `dasTimer/arrTimer` matched only the simple case; it lost the leftover at the DAS→ARR
+  // transition and could not fire multiple shifts per subframe, which is why every garbage-free lock
+  // divergence vs the oracle carried a COLUMN error (lock-diff-agg.mjs: 37 rounds, 0 pure-row).
+  const lShift = { held: false, das: 0, arr: 0, dir: -1 };
+  const rShift = { held: false, das: 0, arr: 0, dir: 1 };
+  let lastShift = 0;                  // -1 | 0 | +1 — the active direction (triangle's input.lastShift)
+  let softHeld = false, gravAcc = 0, groundFrames = 0;
   const held = new Set<string>();
   let areUntil = -1;                 // frames before which no piece exists (entry delay)
 
@@ -228,6 +263,14 @@ export function simulate(
     }
   };
   const shift = (d: number) => { const n = tryMove(board, piece, d, 0); if (n) { piece = n; lastWasRotation = false; groundFrames = 0; } };
+  // triangle's #activateShift: charge DAS (0 fresh, or `das - dcd` when the direction was already
+  // held at spawn) and arm ARR at handling.arr, then this direction becomes lastShift.
+  const activateShift = (s: { held: boolean; das: number; arr: number; dir: number }, hoisted?: boolean) => {
+    s.held = true;
+    s.das = hoisted ? handling.das - handling.dcd : 0;
+    s.arr = handling.arr;
+    lastShift = s.dir;
+  };
   const grounded = () => tryMove(board, piece, 0, 1) === null;
 
   function insertGarbage(amt: number, x: number, size: number) {
@@ -340,6 +383,8 @@ export function simulate(
           if (p0.amt === 0) pending.splice(pi, 1); else pi++;
         }
         sentTotal += remaining;
+        // register the outgoing send so a later incoming batch can be netted against it (igeHandler.send)
+        if (remaining > 0) igeOut.push({ iid: ++igeSendIid, amount: remaining });
         records.push({ frame, piece: piece.type, lines: cleared, spin, attack: amount, sent: remaining,
           cancelled: amount - remaining, b2b, combo, cells, garbageCleared: garbageRows, clearedRows });
       };
@@ -398,10 +443,13 @@ export function simulate(
     }
     while (gi < gq.length && gq[gi]!.frame <= f) {
       const g = gq[gi++]!;
+      // net the incoming against my un-acked outgoing sends BEFORE it enters the queue (igeHandler)
+      const net = igeReceive(g.amt, g.ackiid);
+      if (net <= 0) continue;
       // triangle's GarbageQueue.confirm(cid, gameid, frame) overwrites the queued entry's
       // frame when the server confirms it, so 'confirm' uses that instead of arrival.
       const arriveAt = (opts.readyFrom === 'confirm' && g.confirmFrame != null) ? g.confirmFrame : g.frame;
-      pending.push({ ready: arriveAt + opts.garbagespeed, amt: g.amt, x: g.x, size: g.size });
+      pending.push({ ready: arriveAt + opts.garbagespeed, amt: net, x: g.x, size: g.size });
     }
     if (opts.insertMode === 'immediate') {
       let budget = opts.garbagecap;
@@ -412,38 +460,57 @@ export function simulate(
         p0.amt -= take; budget -= take; if (p0.amt === 0) pending.shift();
       }
     }
-    // DAS/ARR advanced by dt frames. TETR.IO records inputs to 0.1-frame precision and runs
-    // its handling on that clock; at arr=2 a one-frame rounding error is a whole cell of
-    // movement, which is why this is separable from gravity and lock delay.
-    const dasArr = (dt: number) => {
-      if (dir === 0) return;
-      if (dasTimer > 0) { dasTimer -= dt; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } }
-      else if ((arrTimer -= dt) <= 0) {
-        shift(dir); arrTimer = handling.arr || 1;
-        if (!handling.arr) for (let i = 0; i < BOARD_WIDTH; i++) shift(dir);
-      }
+    // DAS/ARR advanced by dt frames, ported from triangle's #processShift. TETR.IO records inputs to
+    // 0.1-frame precision and runs its handling on that clock; at arr=2 a one-frame rounding error is
+    // a whole cell of movement, which is why this is separable from gravity and lock delay.
+    const processShift = (s: typeof lShift, dt: number) => {
+      if (!s.held || lastShift !== s.dir) return;
+      // the part of dt left AFTER finishing the DAS charge spills into ARR this same subframe
+      const arrDelta = Math.max(0, dt - Math.max(0, handling.das - s.das));
+      s.das = Math.min(s.das + dt, handling.das);
+      if (s.das < handling.das) return;
+      s.arr += arrDelta;
+      if (s.arr < handling.arr) return;
+      const mult = handling.arr === 0 ? BOARD_WIDTH : Math.floor(s.arr / handling.arr);
+      s.arr -= handling.arr * mult;
+      for (let i = 0; i < mult; i++) shift(s.dir);
+    };
+    const dasArr = (dt: number) => { processShift(lShift, dt); processShift(rShift, dt); };
+    // triangle's #fall(delta), ported (engine/index.mjs): fall = gravity*delta, and soft drop replaces
+    // it with a floored gravity*delta*sdf (sdf===41 is the instant 400*delta). The floor `0.05*sdf` is
+    // NOT scaled by delta — it is per-CALL — so soft drop is applied once per subframe step, exactly as
+    // triangle applies #fall once per #processSubframe. The earlier "additive slam is optimal" verdict
+    // was an ILLUSION from grafting this formula onto a FRAME-ONCE gravity; the full Triangle oracle
+    // (same g=0.02) reproduces the real ige 4.4x better than the old sim, so the fix is the per-subframe
+    // interleave below, not the additive rate. Fractional fall is carried in gravAcc across subframes.
+    const gravityStep = (delta: number) => {
+      let fall = opts.gravity * delta;
+      if (softHeld) fall = handling.sdf === 41 ? 400 * delta : Math.max(opts.gravity * delta * handling.sdf, 0.05 * handling.sdf);
+      gravAcc += fall;
+      while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) { gravAcc = 0; break; } piece = n; lastWasRotation = false; gravAcc -= 1; }
+    };
+    // Lock delay stays frame-quantised (the client's lock clock ticks per frame): a grounded piece
+    // locks after locktime frames of rest.
+    const lockCheck = () => {
+      if (grounded()) { if (++groundFrames >= opts.locktime) lockPiece(f); }
+      else groundFrames = 0;
     };
     const continuous = () => {
-    if (!opts.subframe) dasArr(1);
-    const sdRate = opts.sdfMode === 'mult' ? opts.gravity * handling.sdf : handling.sdf;
-    gravAcc += opts.gravity + (softHeld ? sdRate : 0);
-    while (gravAcc >= 1) { const n = tryMove(board, piece, 0, 1); if (!n) break; piece = n; lastWasRotation = false; gravAcc -= 1; }
-    if (gravAcc >= 1) gravAcc = 0;
-
-    if (grounded()) { if (++groundFrames >= opts.locktime) lockPiece(f); }
-    else groundFrames = 0;
+      if (!opts.subframe) dasArr(1);
+      gravityStep(1);
+      lockCheck();
     };
     const applyEvent = (e: InEvent) => {
       if (e.type === 'keydown') {
         if (e.key) held.add(e.key);
         if (f < areUntil) return;            // entry delay: no piece to control yet
         switch (e.key) {
-          // `hoisted` = the client recorded this direction as already held when the piece
-          // spawned, so DAS is pre-charged (only `dcd` frames remain, not a full `das`). The
-          // client writes the flag; dropping it makes every held-into-the-wall opener stop one
-          // tap short. Match the fresh-tap completion path: when no charge remains, arm ARR now.
-          case 'moveLeft': dir = -1; shift(-1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
-          case 'moveRight': dir = 1; shift(1); dasTimer = e.hoisted ? handling.dcd : handling.das; if (dasTimer <= 0) { dasTimer = 0; arrTimer = 0; } break;
+          // triangle's #keydown for a move: #activateShift then an immediate #__internal_shift (the
+          // tap). `hoisted` = the client recorded this direction as already held when the piece
+          // spawned, so DAS is pre-charged to `das - dcd` (only `dcd` frames of charge remain). arr
+          // starts at `handling.arr`, so the first auto-repeat fires the instant DAS completes.
+          case 'moveLeft': activateShift(lShift, e.hoisted); shift(-1); break;
+          case 'moveRight': activateShift(rShift, e.hoisted); shift(1); break;
           case 'softDrop': softHeld = true; break;
           case 'rotateCW': case 'rotateCCW': {
             const before = { c: piece.col, r: piece.row, rot: piece.rotation };
@@ -464,11 +531,20 @@ export function simulate(
         }
       } else if (e.type === 'keyup') {
         if (e.key) held.delete(e.key);
-        // Releasing one direction while the other is still held would need to RESUME that
-        // other direction rather than stop. Not modelled deliberately: measured 0 such
-        // releases in 18,424 across all 158 player-rounds, so the branch would be untestable.
-        if (e.key === 'moveLeft' && dir === -1) dir = 0;
-        if (e.key === 'moveRight' && dir === 1) dir = 0;
+        // triangle's #keyup: release the shift, and if the OTHER direction is still held, resume it
+        // from scratch (das=0, arr re-armed) and hand it lastShift. The old model dropped to dir=0
+        // and never resumed the other direction (measured 0 such releases at the time, but the port
+        // matches the engine so the branch is faithful rather than merely rare).
+        if (e.key === 'moveLeft') {
+          lShift.held = false; lShift.das = 0;
+          if (rShift.held) { lastShift = rShift.dir; rShift.arr = handling.arr; rShift.das = 0; }
+          else if (lastShift === -1) lastShift = 0;
+        }
+        if (e.key === 'moveRight') {
+          rShift.held = false; rShift.das = 0;
+          if (lShift.held) { lastShift = lShift.dir; lShift.arr = handling.arr; lShift.das = 0; }
+          else if (lastShift === 1) lastShift = 0;
+        }
         if (e.key === 'softDrop') softHeld = false;
       }
     };
@@ -477,20 +553,25 @@ export function simulate(
     };
 
     if (opts.subframe) {
-      // Interleave events and DAS/ARR on a 0.1-frame clock, then run gravity and lock
-      // delay once at frame granularity (they are frame-quantised in the client).
-      const N = 10;
-      for (let s = 1; s <= N && !topout; s++) {
-        const t = f + s / N;
-        while (ei < evs.length && !topout) {
-          const e = evs[ei]!;
-          if (e.frame + (e.sub ?? 0) >= t || e.frame > f) break;
-          ei++; applyEvent(e);
-        }
-        dasArr(1 / N);
+      // Match triangle's #processSubframe(subframe): advance BOTH DAS/ARR and gravity(#fall) to the
+      // event's EXACT subframe (firing any shift/fall that completes in between), THEN handle the event.
+      // Interleaving fall per subframe — not once per frame — is what lets soft drop match the client
+      // (its per-call floor makes it event-density dependent) and is why the oracle reproduces the real
+      // ige far better. Lock delay stays frame-quantised (lockCheck once, at frame end).
+      let cur = 0;                            // subframe position within this frame, in [0,1]
+      const stepTo = (to: number) => { const d = to - cur; if (d > 0) { dasArr(d); gravityStep(d); cur = to; } };
+      while (ei < evs.length && !topout) {
+        const e = evs[ei]!;
+        if (e.frame > f) break;
+        const es = Math.min(1, Math.max(cur, e.sub ?? 0));
+        stepTo(es);
+        if (topout) break;
+        ei++; applyEvent(e);
       }
-      if (!topout) continuous();
+      if (!topout) stepTo(1);
+      if (!topout) lockCheck();
     } else if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
+    if (opts.trace && !topout && f >= areUntil) opts.trace(f, getPieceCells(piece), piece.rotation, piece.type);
   }
   return { lines, placed, holds, clears, topbtb, topcombo,
     garbage: { sent: sentTotal, received: recvTotal, cleared: clearedTotal, attack: attackTotal },

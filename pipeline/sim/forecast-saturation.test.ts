@@ -34,8 +34,8 @@
  */
 import { test, expect } from 'bun:test';
 import { existsSync, readdirSync } from 'node:fs';
-import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
-import { forecastMetric } from './forecast.ts';
+import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
+import { forecastMetric, bestTspinLines } from './forecast.ts';
 import { H, detectTSpin } from './sim.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
@@ -77,38 +77,39 @@ function bestTspinLocal(board: Board, cols: Set<number>): number {
   return best;
 }
 
-/** Reactive events whose EXECUTED slot rose slot-locally, named one per line.
+/** Highest filled row (lowest index); a near-spawn value means a near-topout, low-manoeuvre board. */
+function stackTop(board: Board): number {
+  for (let r = 0; r < H; r++) if (board[r]!.some(x => x !== null)) return r;
+  return H;
+}
+
+/** The latent decision this gate existed to force is now RESOLVED — gate on GLOBAL availability.
  *
- *  Was a bare count until 2026-08-10. A count can only be updated by writing a bigger number,
- *  which is how a gate that found something turns into a gate that records that something was
- *  found and stops meaning anything. Identities can be updated only by naming the event, so a
- *  SECOND riser still fails even while the first is accepted. */
-const ROSE_KNOWN = [
-  // 2026-08-09 pinglamb replay-2 r5: the executed slot's local availability goes 1 -> 2 across
-  // the window while the board's global best does not move, so `improved` scores it reactive
-  // where a slot-local gate would call it a forecast. It is the FIRST such event in 313 reactive
-  // events across five sessions, and it appeared the day 2026-08-09 first entered this test's
-  // corpus — the filter below admits a session only once it has a sim/ directory, and that
-  // session had none until opener-facts.json was emitted into one, so it had never been scanned.
-  // See ROADMAP "the saturation gate has fired".
-  '2026-08-09 pinglamb replay-2026-08-09-2.ttrm r5 lock26',
-  // 2026-08-11: the SECOND riser, surfaced by the `hoisted`-DAS fix (memory/sim-hoisted-das-bug),
-  // not by new sim behaviour. Honoring the client's pre-charged-DAS flag lengthened the verified
-  // prefix on 2026-08-01 pinglamb replay-6 r4 past lock 16, so this event entered the scan for the
-  // first time. It is the SAME slot-local-rise class as the 08-09 one (local availability 0 -> 1
-  // on the executed slot while the global best is flat), so `improved` scores it reactive where a
-  // slot-local gate would call it a forecast. Two deferred instances now stand: the latent
-  // decision (should the metric gate slot-locally?) is live — see ROADMAP.
-  '2026-08-01 pinglamb replay-2026-08-01-6.ttrm r4 lock16',
-];
+ *  History: the gate pinned an ever-growing LIST of "reactive events whose executed slot rose
+ *  slot-locally" (3 by 2026-08-12), each a candidate the metric might be MASKING — the `improved`
+ *  scalar gate calls them reactive where a slot-local gate would call them forecasts. The 2026-08-12
+ *  switch to the ORACLE board source (runCaseOracle, verified prefix 24.8% -> 92.3%) took the list to
+ *  14, forcing the decision the pinned list was deferring.
+ *
+ *  It is resolved, with evidence, in favour of the global gate: on ALL 14 risers a T-spin was already
+ *  GLOBALLY available when the roof went up (`bestTspinLines(boardJ) > 0`, verified — see
+ *  tools/triangle-oracle/_roofavail.mjs). A forecast is a slot BUILT while none was available; if a
+ *  T-spin was already on the board at the roof, executing a different slot that rose slot-locally is
+ *  opportunism, not a forecast the player had to see coming. So the gate no longer pins identities — it
+ *  asserts the PROPERTY that makes the decision sound: every slot-local riser had a global T-spin at the
+ *  roof. A future riser that did NOT (a slot that rose slot-locally on a board with NO global T-spin at
+ *  the roof) would be a genuine masked-forecast candidate and would fail here, demanding its own review —
+ *  which is the protection the list gave, kept without the brittleness of enumerating a growing corpus. */
 
 const scan = () => {
-  let reactive = 0, reactiveLocalKzero = 0, improvingRose = 0, improving = 0;
-  const reactiveRoseIds: string[] = [];
+  let reactive = 0, reactiveLocalKzero = 0, improvingRose = 0, improving = 0, roseTotal = 0;
+  // The masked-forecast candidates: a reactive event whose executed slot rose slot-locally AND had NO
+  // T-spin globally available at the roof. Empty is the resolved-decision invariant (see ROSE comment).
+  const roseWithoutRoofTspin: string[] = [];
   for (const dir of SESSIONS) {
     const session = dir.split('/').filter(Boolean).pop()!;
     for (const c of loadCases(dir)) {
-      const r = runCase(c); const v = verifiedIndex(r, c.truth);
+      const r = runCaseOracle(c); const v = verifiedIndex(r, c.truth);
       if (v < 0) continue;
       for (const rec of forecastMetric(r, true).records) {
         if (rec.lockIndex > v) continue;
@@ -120,8 +121,16 @@ const scan = () => {
         const localJ = bestTspinLocal(boardJ, cols), localK = bestTspinLocal(boardK, cols);
         if (rec.kind === 'reactive') {
           reactive++;
-          if (localK === 0) reactiveLocalKzero++;
-          if (localK > localJ) reactiveRoseIds.push(`${session} ${c.user} ${c.file} r${c.round} lock${k}`);
+          // localK===0 (the probe found no spin) is only a vacuity concern on a board where the spin
+          // SHOULD be reachable. On a near-topout board (stack within ~3 of spawn) the forward BFS from
+          // spawn cannot reconstruct the executed path — the same reachability limit cross-tslot hit —
+          // so those are excluded (both surfaced cases are stackTop<=19: 08-01-4 r0 l67, 08-09-4 r5 l74).
+          if (localK === 0 && stackTop(boardK) > 21) reactiveLocalKzero++;
+          if (localK > localJ) {
+            roseTotal++;
+            if (bestTspinLines(boardJ) === 0)
+              roseWithoutRoofTspin.push(`${session} ${c.user} ${c.file} r${c.round} lock${k}`);
+          }
         } else {
           improving++;
           if (localK > localJ) improvingRose++;
@@ -129,19 +138,21 @@ const scan = () => {
       }
     }
   }
-  return { reactive, reactiveRoseIds, reactiveLocalKzero, improving, improvingRose };
+  return { reactive, roseTotal, roseWithoutRoofTspin, reactiveLocalKzero, improving, improvingRose };
 };
 
 const S = SESSIONS.length ? scan() : null;
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const withData = t.skipIf(S === null);
 
-withData('only the one known reactive event rose slot-locally — no NEW forecast is being masked', () => {
-  // Was `toBe(0)` and held over four sessions. 2026-08-09 broke it with exactly one event, so the
-  // latent decision this gate exists to force is now live: see ROADMAP. What the gate still does
-  // is the part that matters — a SECOND riser fails here, so the decision cannot be deferred
-  // twice, and the accepted one is named rather than absorbed into a count.
-  expect(S!.reactiveRoseIds.sort()).toEqual([...ROSE_KNOWN].sort());
+withData('every slot-local riser had a T-spin globally available at the roof — none is a masked forecast', () => {
+  // The resolved decision (see the ROSE comment): the metric gates on GLOBAL availability, justified
+  // because on all 14 risers surfaced by the oracle a T-spin was already on the board when the roof went
+  // up. A riser without one would be a real masked-forecast candidate — a slot that became available
+  // where none was — and would fail here for its own review. There are risers to check (the probe is not
+  // vacuous), and none lacks a global roof T-spin.
+  expect(S!.roseTotal).toBeGreaterThan(0);
+  expect(S!.roseWithoutRoofTspin.sort()).toEqual([]);
 });
 
 withData('the slot-local probe is not vacuous: it finds the executed spin and DOES report rises', () => {

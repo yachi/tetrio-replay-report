@@ -20,6 +20,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { simulate, DEFAULT_TABLE, type SimResult } from './sim.ts';
+import { runCaseOracle as oracleSource } from './oracle-source.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
 
 /**
@@ -52,7 +53,22 @@ export function replayDir(dir = process.env.REPLAY_DIR): string {
 }
 
 export const BEST_OPTS = {
-  garbagespeed: 30, garbagecap: 8, locktime: 60, gravity: 0.02, sdfMode: 'abs' as const,
+  // Garbage insertion is timed from the RECORDED interaction_confirm frame (readyFrom:'confirm')
+  // plus TETR.IO's DOCUMENTED garbagespeed=20 — both ground truth, not fits. The .ttrm records
+  // both the receive (interaction) and confirm (interaction_confirm) frame of every garbage batch;
+  // the receive→confirm telegraph is mean 8.6 / median 9 frames (per-batch, recorded). Timing from
+  // receive+30 (the old fit) approximated confirm+20 with a constant offset — receive+28.6 on
+  // average — which is why the receive-timed sweep peaked near 28-30 and looked like an
+  // "undocumented active system". It was not: it was the recorded telegraph the sim ignored.
+  // confirm+20 achieves the peak verified prefix in ALL five sessions (two tie at 18) and beats the
+  // fitted receive+30 by +143 verified locks (+1.16%) corpus-wide. Same class of fix as exact-attack
+  // and hoisted-DAS: replace a fitted parameter with recorded ground truth. Garbage TIMING moves the
+  // board, so this regenerates the quarantined forecast/opener facts — never facts.json (Python-
+  // extracted, sim-independent). See tools/triangle-oracle/probe-confirm-timing.mjs for the sweep.
+  readyFrom: 'confirm' as const, garbagespeed: 20,
+  // locktime 30 = triangle's documented lockTime default (was a fitted 60 = 2x too long, from before
+  // the movement/garbage ports); sweep confirms 30 beats 60 (+40 locks) with the current model.
+  garbagecap: 8, locktime: 30, gravity: 0.02, sdfMode: 'abs' as const,
   insertMode: 'onPlace' as const, cancelMode: 'all' as const, acEmit: 'separate' as const,
   subframe: true, blockout: 'shiftup' as const, kickset: 'SRS+' as const,
   // TETR.IO's documented attack formula (logarithmic b2b level + log1p zero-base combo), not the
@@ -75,6 +91,8 @@ export interface Case {
    * the cross-extractor gate compares them, so the number is already twice-derived.
    */
   clears: Record<string, number>;
+  /** raw replay player + round array, for the oracle board source (runCaseOracle). */
+  rawPlayer?: any; rawRound?: any[];
 }
 
 export function loadCases(dir = replayDir()): Case[] {
@@ -92,6 +110,9 @@ export function loadCases(dir = replayDir()): Case[] {
           gin: me.rp.events.filter((e: any) => e.type === 'ige' && e.data.type === 'interaction' && e.data.data?.type === 'garbage')
             .map((e: any) => ({ frame: e.frame, amt: e.data.data.amt, x: e.data.data.x, size: e.data.data.size,
               cid: e.data.data.iid, gameid: e.data.data.gameid,
+              // last of MY outgoing sends the opponent had processed when it sent this batch — the
+              // network-cancel protocol (igeHandler) nets the incoming against my un-acked outgoing.
+              ackiid: e.data.data.ackiid,
               // the reference queue times insertion from the CONFIRM event, not the arrival
               confirmFrame: me.rp.events.find((k: any) => k.type === 'ige'
                 && k.data.type === 'interaction_confirm' && k.data.data?.type === 'garbage'
@@ -103,6 +124,10 @@ export function loadCases(dir = replayDir()): Case[] {
           handling: me.rp.options.handling, seed: me.rp.options.seed,
           frames: me.rp.frames, placed: me.rp.results.stats.piecesplaced,
           clears: me.rp.results.stats.clears ?? {},
+          // the raw replay player + round, carried so the oracle board source (runCaseOracle) can
+          // replay them through the vendored Triangle engine — it needs every event type and the
+          // round's gameids, which the flattened Case fields above do not preserve.
+          rawPlayer: me.p, rawRound: rnd,
         });
       }
     });
@@ -112,6 +137,18 @@ export function loadCases(dir = replayDir()): Case[] {
 
 export function runCase(c: Case, extra: any = {}): SimResult {
   return simulate(c.ev, c.gin, c.handling, c.seed, c.frames, DEFAULT_TABLE, { ...BEST_OPTS, ...extra });
+}
+
+/**
+ * Board source for the published forecast/opener sections: the vendored Triangle engine, not the
+ * hand-port. Over the frame+amount+row gate it verifies 92.3% of attacks (7700/8342) vs runCase's
+ * 24.8% on the weaker frame+amount gate — the residual is `matchesIgeY`'s heuristic, not board drift.
+ * The sim-mechanic tests (hoisted-das, attack-model, …) keep using runCase; only the board consumers
+ * switch here. Falls back to the sim when a Case carries no raw replay (should not happen via loadCases).
+ */
+export function runCaseOracle(c: Case): SimResult {
+  if (!c.rawPlayer || !c.rawRound) return runCase(c);
+  return oracleSource(c.rawPlayer, c.rawRound);
 }
 
 /**

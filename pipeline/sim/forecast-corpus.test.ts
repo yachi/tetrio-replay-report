@@ -16,7 +16,7 @@
  */
 import { test, expect } from 'bun:test';
 import { existsSync } from 'node:fs';
-import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import { forecastMetric, isVerifiedForecast, type ForecastKind, type FloorOrigin } from './forecast.ts';
 
 const SESSION = `${import.meta.dir}/../../sessions/2026-07-28`;
@@ -30,7 +30,7 @@ const run = () => {
   const mechanismOnly: string[] = [];
   let loadBearingButNotImproved = 0;
   for (const c of loadCases(SESSION)) {
-    const r = runCase(c, {});
+    const r = runCaseOracle(c);
     const v = verifiedIndex(r, c.truth);
     if (v < 0) continue;
     for (const rec of forecastMetric(r, true).records) {
@@ -56,30 +56,36 @@ const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(R === null);
 
 realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
-  // Re-blessed 2026-08-11 for two ground-truth drift fixes that lengthened the verified prefix,
-  // so more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%) then
-  // `attackModel:'exact'` (~4%). The classification is unchanged — the reactive:self_built ratio
-  // held (56:89 = 0.629 -> 86:138 = 0.623) and the single surviving forecast (forecast_lineclear:1)
-  // is the same event — only the window got longer.
+  // Re-blessed 2026-08-12 for the ORACLE board source (runCaseOracle, verified prefix 24.8% -> 92.3%).
+  // Every bucket grew (reactive 121 -> 306, self_built 169 -> 295); forecast_lineclear 1 -> 2 because the
+  // longer prefix reaches a SECOND mechanism event, `yachi 07-28-4 r2 lock 29`, which SURVIVES all four
+  // clauses (next test) — the hand-sim never reached it. CAVEAT: counts read the engine's seeded-RNG
+  // garbage holes, not the recorded columns (imposing them is verified impossible — oracle-source.ts), so
+  // garbage-adjacent classifications carry a bounded caveat; the one VERIFIED forecast is hole-insensitive.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
-    // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
-    forecast_lineclear: 1,
-    self_built: 138,
-    reactive: 86,
+    forecast_lineclear: 2,
+    self_built: 295,
+    reactive: 306,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
 });
 
-realData('nothing survives all four clauses, and the one that reaches clause 2 is named', () => {
-  // A count of zero says nothing about WHY. This names the single event whose mechanism holds —
-  // the L at lock 19 leaves an overhang, a full row sits between that overhang and the notch for
-  // twelve pieces, the I at lock 31 clears it, the T goes in at 32 — and records that it is
-  // rejected because the cell its nose rests on is garbage that had not arrived at lock 19. A
-  // regression that re-admits it changes this string rather than silently moving a rate.
-  expect(R!.forecasts).toEqual([]);
+realData('one event survives all four clauses on the oracle — a real forecast the hand-sim was blind to', () => {
+  // The hand-sim (24.8% coverage) never reached the boards where this forecast happens, so it reported
+  // ZERO. The oracle reaches lock 29 of 07-28-4 r2: yachi builds a T-spin-Double slot whose second line
+  // was NOT clearable when the setup piece landed (availAtRoof 0) and becomes clearable by lock 29 via
+  // his own line clear (availAtSpin 2, floor pre-existed) — the forecast signature. Hand-verified
+  // 2026-08-12: a real T-spin double (spin=full, cleared=2) whose attack was fully cancelled by incoming
+  // garbage (amt6@f1211 + amt8@f1241, so no ige reached the opponent), its slot in the stack ABOVE the
+  // garbage (hole-insensitive). The SECOND mechanism event (07-28-6 lock 32) is still rejected at clause 2
+  // — its nose rests on garbage that had not arrived at the roof. Changing either verdict changes a string.
+  expect(R!.forecasts).toEqual([
+    'yachi replay-2026-07-28-4.ttrm r2 lock 29 forecast_lineclear roof 23 0->2',
+  ]);
   expect(R!.mechanismOnly).toEqual([
+    'yachi replay-2026-07-28-4.ttrm r2 lock 29 forecast_lineclear floor pre-existed from 22 roof 23',
     'pinglamb replay-2026-07-28-6.ttrm r5 lock 32 forecast_lineclear floor arrived-later from -1 roof 19',
   ]);
 });
@@ -92,11 +98,14 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // deepest row alone. The old split read 83 / 48 field-floor / 13 / 2, and the 48 were the
   // giveaway: `field-floor` claimed the playfield bottom was the support, but across all 654
   // events and all seven configs the number of pieces held up by the floor ALONE is zero.
-  // Re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` drift fixes (longer verified
-  // prefix -> more events in window). The undetermined count stayed 5 while the decidable counts grew,
-  // i.e. its share FELL (5/224 = 2.2% vs the old 3/145 = 2.1%): clause 2 stays just as decidable.
+  // Re-blessed 2026-08-12 for the ORACLE board source. undetermined rises 9 -> 46 (share 3.0% -> 7.6%):
+  // PARTLY the far longer prefix reaching more garbage-heavy late boards, PARTLY the engine's RNG
+  // garbage-hole columns making some garbage-straddled events genuinely undecidable (the recorded hole
+  // cannot be imposed without corrupting the board — oracle-source.ts). "undetermined" honestly means
+  // "clause 2 cannot decide", so a higher count under a wrong-hole board source is honest uncertainty,
+  // not a silent rate move. pre-existed/arrived-later are 504/53.
   expect(R!.floors).toEqual({
-    'pre-existed': 193, 'arrived-later': 27, undetermined: 5,
+    'pre-existed': 504, 'arrived-later': 53, undetermined: 46,
   });
 });
 
@@ -127,7 +136,7 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
   };
   let behindACSpin = 0, counted = 0;
   for (const c of loadCases(SESSION)) {
-    const r = runCase(c, {});
+    const r = runCaseOracle(c);
     const v = verifiedIndex(r, c.truth);
     if (v < 0) continue;
     for (const rec of forecastMetric(r, true).records) {
@@ -139,10 +148,11 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
       if (isVerifiedForecast(rec)) counted++;
     }
   }
-  // Population re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` fixes (longer
-  // verified prefix -> more C-Spin-trailing T-spins in window: 46 -> 66 -> 67). The verdict
-  // `counted == 0` is unchanged: none of them is a forecast, which is the assertion that matters.
-  expect(behindACSpin).toBe(67);
+  // Population re-blessed 2026-08-12 for the ORACLE board source (longer prefix -> more C-Spin-trailing
+  // T-spins in window: 83 -> 89). The verdict `counted == 0` is unchanged and is the assertion that
+  // matters: none of the T-spins following a C-Spin triple is counted as a forecast. The one verified
+  // forecast (07-28-4) does NOT trail a C-Spin triple, so it does not appear in this population.
+  expect(behindACSpin).toBe(89);
   expect(counted).toBe(0);
 });
 
