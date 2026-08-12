@@ -14,7 +14,7 @@ for(const dir of dirs){ let cases; try{cases=loadCases(`${SESS}/${dir}`);}catch{
     if(!parsed[c.file]) parsed[c.file]=JSON.parse(readFileSync(`${SESS}/${dir}/${c.file}`,"utf8"));
     const rp=parsed[c.file].replay.rounds[c.round]; const player=rp.find(p=>p.username===c.user); if(!player)continue;
     let sim; try{sim=runCase(c);}catch{continue;} if(!sim.locks.length)continue;
-    const nCheck=Math.min(sim.locks.length,30);
+    const nCheck=Math.min(sim.locks.length,80);
     let tri; try{tri=replayRound(player,rp,{untilFrame:sim.locks[nCheck-1].frame+2});}catch{continue;}
     let found=null;
     for(let i=0;i<nCheck;i++){
@@ -30,7 +30,7 @@ for(const dir of dirs){ let cases; try{cases=loadCases(`${SESS}/${dir}`);}catch{
   }
 }
 firstDivLock.sort((a,b)=>a-b);
-console.log(`rounds where sim matches Triangle for all ${30} checked locks: ${matchAll}/592`);
+console.log(`rounds where sim matches Triangle for all 80 checked locks: ${matchAll}/592`);
 console.log(`rounds that diverge: ${firstDivLock.length}, first-divergence lock median ${firstDivLock[Math.floor(firstDivLock.length/2)]}, min ${firstDivLock[0]}`);
 console.log(`  divergence involves a GARBAGE-row-count mismatch: ${gCause}   pure placement (same garbage): ${placeCause}`);
 const hist={}; for(const i of firstDivLock) { const b=i<6?"0-5":i<12?"6-11":i<20?"12-19":"20+"; hist[b]=(hist[b]||0)+1; }

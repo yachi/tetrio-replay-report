@@ -28,7 +28,7 @@ const eng = Game.createEngine({...TL,...o,g:o.g??0.02}, o.gameid, players);
 const byFrame = new Map();
 for(const e of player.replay.events){ if(!byFrame.has(e.frame))byFrame.set(e.frame,[]); byFrame.get(e.frame).push(e); }
 const triFrames = new Map();
-const total = Math.min(player.replay.frames ?? 2000, 200);
+const total = Math.min(player.replay.frames ?? 2000, 800);
 for(let f=0; f<=total; f++){ const r=eng.tick(byFrame.get(f)||[]);
   let cells=null; try{ cells = eng.falling.absoluteBlocks.map(([x,y])=>`${x},${39-y}`).sort(); }catch{}
   triFrames.set(f, cells); if(r&&r.topout)break; }
