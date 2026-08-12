@@ -8,7 +8,7 @@ report is protected by Dafny lemmas over facts.json, this section is deliberatel
 chain, so without its own guard its numbers could drift from their source with nothing to catch
 it. The argument for re-rendering rather than sampling is spelled out there and is not repeated.
 
-Six things are checked:
+Seven things are checked:
   1. the committed region is EXACTLY what rendering this session's JSON produces;
   2. every per-player ordering figure appears in the rendered HTML;
   3. the section still declares itself unproved and carries no claim badge — promoting simulator
@@ -26,6 +26,11 @@ Six things are checked:
      nothing, only an exact match does), the alias warning (two openers sharing a first-bag
      field are the same rounds twice), and the PCO ceiling (PCO is defined by an outcome, and
      the only trustworthy source for that outcome is facts.json, never this simulator).
+  7. the PERFECT CLEAR TIMING keeps the two sentences that license it: the per-round agreement
+     between the simulator's Perfect Clear count and the replay's own, and harddrop's ten-piece
+     deadline. Those piece numbers are the only simulator figures in this section that a verified
+     source could have contradicted; printing them without saying it did not is the same overclaim
+     as a badge, and without the deadline "landed on piece 20" has nothing to be late for.
 
 Every one of these controls has a mutant in `--selftest` that deletes its sentence and expects
 a rejection. A control with no mutant proving it fires is a comment, not a gate.
@@ -65,6 +70,17 @@ ALIAS_MARKER = "唔可以加埋一齊"
 # PCO is defined by an OUTCOME, and the outcome has a trustworthy source that is not this
 # simulator. The sentence naming that source is the ceiling on the whole row.
 PCO_MARKER = "clears.allclear"
+
+# The timing figures ("this session's perfect clears landed on pieces 15 and 20") are the only
+# numbers in this section that a VERIFIED source could have contradicted, and the only reason they
+# may be printed is that it did not: the simulator's per-round count was compared with the replay's
+# own counter for every round. Two sentences carry that, and each is a separate way of publishing
+# the timing dishonestly if it goes:
+#   - the agreement figure — without it the timing is an unchecked simulator number wearing the
+#     same typeface as the checked ones;
+#   - harddrop's own ten-piece deadline — without it "landed on piece 20" has nothing to be late
+#     FOR, and the row reads as a PCO count rather than as the refutation of one.
+TIMING_MARKERS = ("個回合啱", "harddrop 畫 PCO 嘅死線")
 
 
 def problems(data, doc):
@@ -151,6 +167,23 @@ def problems(data, doc):
                    "outcome, and the row may not be published without the verified source that "
                    "bounds it")
 
+    # 7. Perfect Clear TIMING is the one simulator figure here with a verified counterpart, so it
+    #    is published only together with the comparison against it. Checked when the artifact says
+    #    the comparison passed AND the session has a perfect clear to place — a session with none
+    #    renders no timing sentence and must not be asked for one.
+    timing = data.get("perfect_clear_timing")
+    spc = data.get("session_perfect_clears")
+    # The same condition `_pco_note` renders the timing sentence under, written once here rather
+    # than approximated: a gate that demands a control the section had no reason to print fails
+    # the honest report and teaches everyone to delete the gate.
+    if timing and timing["check"]["agrees"] and spc and sum(spc["per_player"].values()):
+        for marker in TIMING_MARKERS:
+            if marker not in body:
+                bad.append(f"the Perfect Clear timing control is gone ({marker!r} missing) — "
+                           "the piece numbers come from the simulator and may only be published "
+                           "beside the per-round count check that licenses them and beside "
+                           "harddrop's own deadline that gives them a meaning")
+
     return bad
 
 
@@ -234,7 +267,8 @@ def _selftest(report_dir):
     # keeping its table must be a failure and not a cosmetic edit. Listed together because they
     # are the same rule applied four times, and because a control with no mutant proving it fires
     # is a comment, not a gate.
-    for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER, PCO_MARKER):
+    for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER,
+                   PCO_MARKER, *TIMING_MARKERS):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

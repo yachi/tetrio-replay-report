@@ -322,22 +322,105 @@ test('a round claimed by two openers is only ever the documented alias', () => {
   }
 });
 
-test('PCO is bounded by the verified extractors, never by the simulator', () => {
-  // The vendored engine's perfectClear flag disagrees with both extractors (10 rounds vs 0 on
-  // 08-09), so the artifact must take its perfect-clear count from facts.json. Asserted so a
-  // future edit cannot quietly reintroduce the simulator's number.
+/**
+ * Perfect Clears per session, from the `.ttrm` by way of facts.json. Written out because the
+ * previous version of this test recomputed the total from facts.json inside the test and compared
+ * it with the artifact — and BOTH walked the same wrong path (`players[u].allclear`, one level
+ * above the counter, which lives under `clears`). Every session agreed on 0 and every session
+ * actually held perfect clears; all five reports published "not one all night".
+ *
+ * A test that re-derives a value the same way the code does can only catch a typo. These are the
+ * numbers themselves, so a reader can check one against `jq` and a future path change has to move
+ * them rather than agree with itself.
+ */
+const PERFECT_CLEARS: Record<string, Record<string, number>> = {
+  '2026-07-22': { yachi: 12, pinglamb: 7 },
+  '2026-07-24': { yachi: 6, pinglamb: 4 },
+  '2026-07-28': { yachi: 6, pinglamb: 8 },
+  '2026-08-01': { yachi: 4, pinglamb: 8 },
+  '2026-08-09': { yachi: 3, pinglamb: 7 },
+};
+
+test('the Perfect Clear count comes from the verified extractors, and is not zero', () => {
   for (const s of SESSIONS) {
     const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
     expect(data.session_perfect_clears.source).toContain('facts.json');
-    const facts = JSON.parse(readFileSync(`${sessionDir(s)}/report/facts.json`, 'utf8'));
-    const per: Record<string, number> = {};
-    for (const m of facts.matches) for (const rd of m.rounds)
-      for (const [u, st] of Object.entries<any>(rd.players))
-        per[u] = (per[u] ?? 0) + (st.allclear ?? 0);
-    expect(data.session_perfect_clears.per_player).toEqual(per);
+    const per = data.session_perfect_clears.per_player;
+    const expected = PERFECT_CLEARS[s];
+    if (expected) expect(per).toEqual(expected);
+    // The load-bearing assertion, independent of the table above: these sessions all HAVE perfect
+    // clears, so a reader that returns zero for every player is a broken reader, not a quiet night.
+    expect(Object.values<number>(per).reduce((a, b) => a + b, 0)).toBeGreaterThan(0);
     // and a session with no perfect clear cannot contain a completed PCO
     const pco = data.named_openers.openers.find((o: any) => o.key === 'pco');
     for (const p of pco.players)
       if (!per[p.user]) expect(p.matched_and_delivered ?? 0).toBe(0);
+  }
+});
+
+test('Perfect Clear timing is published only where the simulator matched the replay', () => {
+  // The count is the control on the timing: the simulator's per-round Perfect Clear count is
+  // compared with `results.stats.clears.allclear` for every player-round, and the piece numbers
+  // are emitted as null unless every round agreed. Over the five committed sessions the check is
+  // clean, which is the finding — the same flag an earlier revision of this file called wrong.
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const t = data.perfect_clear_timing;
+    expect(t.check.checked).toBe(t.check.player_rounds);      // no round left unchecked
+    expect(t.check.rounds_agreeing).toBe(t.check.checked);
+    expect(t.check.perfect_clears_sim).toBe(t.check.perfect_clears_replay);
+    expect(t.check.agrees).toBe(true);
+
+    // The two sources must land on the same per-player total, one counted off lock indices and
+    // one off facts.json.
+    const per = data.session_perfect_clears.per_player;
+    for (const p of t.players) {
+      expect(p.perfect_clears).toBe(per[p.user]);
+      const placed = Object.values<number>(p.by_piece).reduce((a, b) => a + b, 0);
+      expect(placed).toBe(p.perfect_clears);
+      // Every Perfect Clear inside harddrop's ten-piece PCO deadline is counted as such, and a
+      // PCO can only be DELIVERED in a round that had one.
+      expect(p.within_pco_window)
+        .toBe(Object.entries<number>(p.by_piece)
+          .filter(([k]) => Number(k) <= t.pco_window_locks).reduce((a, [, v]) => a + v, 0));
+    }
+    const pco = data.named_openers.openers.find((o: any) => o.key === 'pco');
+    const delivered = pco.players.reduce((a: number, p: any) => a + (p.matched_and_delivered ?? 0), 0);
+    expect(delivered).toBeLessThanOrEqual(
+      t.players.reduce((a: number, p: any) => a + p.within_pco_window, 0));
+  }
+});
+
+/** Perfect Clears that met harddrop's ten-piece PCO deadline, per session. Pinned PER SESSION
+ *  rather than pooled: a sixth session must not be able to change a pooled headline by arriving,
+ *  and a per-session table makes a drift name the session it came from. */
+const IN_PCO_WINDOW: Record<string, number> = {
+  '2026-07-22': 1, '2026-07-24': 1, '2026-07-28': 0, '2026-08-01': 1, '2026-08-09': 0,
+};
+
+test('these sessions run mid-game Perfect Clears, not the Perfect Clear Opener', () => {
+  // The finding the timing metric exists for, and the reason the PCO row reads the way it does:
+  // almost every Perfect Clear here lands on piece 20 — two bags of stacking — not inside the
+  // opener. Pinned so a change of board source has to restate it rather than absorb it.
+  let total = 0, inWindow = 0, atTwenty = 0;
+  for (const s of SESSIONS) {
+    const t = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'))
+      .perfect_clear_timing;
+    let sessionWindow = 0;
+    for (const p of t.players) {
+      total += p.perfect_clears;
+      inWindow += p.within_pco_window;
+      sessionWindow += p.within_pco_window;
+      atTwenty += p.by_piece['20'] ?? 0;
+    }
+    if (IN_PCO_WINDOW[s] !== undefined) expect([s, sessionWindow]).toEqual([s, IN_PCO_WINDOW[s]!]);
+  }
+  // The pooled shape, stated against the same corpus the table above covers.
+  const pinned = SESSIONS.filter(s => PERFECT_CLEARS[s]);
+  if (pinned.length === SESSIONS.length) {
+    expect(total).toBe(Object.values(PERFECT_CLEARS)
+      .reduce((a, r) => a + Object.values(r).reduce((x, y) => x + y, 0), 0));
+    expect(inWindow).toBe(Object.values(IN_PCO_WINDOW).reduce((a, b) => a + b, 0));
+    expect(atTwenty).toBeGreaterThan(total / 2);   // the cluster IS the finding
   }
 });

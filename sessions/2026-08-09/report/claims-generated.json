@@ -5796,5 +5796,309 @@
   },
   "id": "G076",
   "python_check": "(facts['matches'][0]['rounds'][3]['players']['pinglamb']['vs_x1000'] == 217716) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['vs_x1000'] > 217716) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['vs_x1000'] > 217716) == 0) and (facts['matches'][0]['rounds'][3]['winner']=='pinglamb') and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) < 60000) and (r['players']['pinglamb']['vs_x1000'] == 217716)) == 1)"
+ },
+ {
+  "family": "pc_rounds",
+  "category": "style",
+  "canto": "yachi 有 3 局做到 Perfect Clear，入面贏咗 2 局；佢成晚打 50 局贏 20 局",
+  "english_gloss": "yachi had a perfect clear in 3 rounds and won 2 of them; 20 round wins out of 50 overall",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "clears.allclear",
+       "op": ">",
+       "v": 0
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 20
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "total_rounds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 50
+     }
+    }
+   ]
+  },
+  "id": "G077",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['clears']['allclear'] > 0) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['clears']['allclear'] > 0) and (r['winner']=='yachi')) == 2) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') == 20) and (sum(len(m['rounds']) for m in facts['matches']) == 50)"
+ },
+ {
+  "family": "pc_solo_lost",
+  "category": "style",
+  "canto": "有 3 局係全場淨係 yachi 做到 Perfect Clear，入面佢仲要輸咗 1 局",
+  "english_gloss": "3 rounds where only yachi got a perfect clear; yachi lost 1 of them",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    }
+   ]
+  },
+  "id": "G078",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['clears']['allclear'] > 0) and (r['players']['pinglamb']['clears']['allclear'] == 0)) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['clears']['allclear'] > 0) and (r['players']['pinglamb']['clears']['allclear'] == 0) and (r['winner']=='pinglamb')) == 1)"
+ },
+ {
+  "family": "pc_rounds",
+  "category": "style",
+  "canto": "pinglamb 有 7 局做到 Perfect Clear，入面贏咗 3 局；佢成晚打 50 局贏 30 局",
+  "english_gloss": "pinglamb had a perfect clear in 7 rounds and won 3 of them; 30 round wins out of 50 overall",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "clears.allclear",
+       "op": ">",
+       "v": 0
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 7
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 30
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "total_rounds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 50
+     }
+    }
+   ]
+  },
+  "id": "G079",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['clears']['allclear'] > 0) == 7) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['winner']=='pinglamb')) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') == 30) and (sum(len(m['rounds']) for m in facts['matches']) == 50)"
+ },
+ {
+  "family": "pc_solo_lost",
+  "category": "style",
+  "canto": "有 7 局係全場淨係 pinglamb 做到 Perfect Clear，入面佢仲要輸咗 4 局",
+  "english_gloss": "7 rounds where only pinglamb got a perfect clear; pinglamb lost 4 of them",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 7
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    }
+   ]
+  },
+  "id": "G080",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['players']['yachi']['clears']['allclear'] == 0)) == 7) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['players']['yachi']['clears']['allclear'] == 0) and (r['winner']=='yachi')) == 4)"
  }
 ]

@@ -532,6 +532,34 @@
   "status": "verified"
  },
  {
+  "id": "G077",
+  "lemma": "G077_yachi_had_a_perfect_clear_in_3_rounds_and_won_2_of_them_20_round_wins",
+  "file": "Claims.dfy",
+  "family": "pc_rounds",
+  "status": "verified"
+ },
+ {
+  "id": "G078",
+  "lemma": "G078_3_rounds_where_only_yachi_got_a_perfect_clear_yachi_lost_1_of_them",
+  "file": "Claims.dfy",
+  "family": "pc_solo_lost",
+  "status": "verified"
+ },
+ {
+  "id": "G079",
+  "lemma": "G079_pinglamb_had_a_perfect_clear_in_7_rounds_and_won_3_of_them_30_round_wi",
+  "file": "Claims.dfy",
+  "family": "pc_rounds",
+  "status": "verified"
+ },
+ {
+  "id": "G080",
+  "lemma": "G080_7_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_4_of_th",
+  "file": "Claims.dfy",
+  "family": "pc_solo_lost",
+  "status": "verified"
+ },
+ {
   "id": "C001",
   "lemma": "C001_pinglamb_won_the_final_round_of_all_six_matches_three_of_them_5_4_deci",
   "file": "Claims.dfy",

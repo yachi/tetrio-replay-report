@@ -895,7 +895,7 @@
         "wiki_says": "the standard way to get a Perfect Clear in the first 4 lines (10 dropped pieces); 84.6% if the I piece is kept on hold, 61.2% if it is dropped",
         "in_triple_double_category": false,
         "occupancy_aliases": [],
-        "delivers": null,
+        "delivers": "a perfect clear within 10 locks",
         "drawn_at_locks": [
           6,
           7
@@ -927,7 +927,7 @@
               "pages": 295
             },
             "matched_rounds": 0,
-            "matched_and_delivered": null
+            "matched_and_delivered": 0
           },
           {
             "user": "yachi",
@@ -950,7 +950,7 @@
               "pages": 295
             },
             "matched_rounds": 2,
-            "matched_and_delivered": null
+            "matched_and_delivered": 1
           }
         ]
       }
@@ -958,10 +958,47 @@
   },
   "session_perfect_clears": {
     "source": "report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)",
-    "means": "an upper bound on completed Perfect Clear Openers: no perfect clears in the session means no PCO was completed, whatever the opening field looked like",
+    "means": "an upper bound on completed Perfect Clear Openers: a session cannot hold more completed PCOs than it holds perfect clears, whatever the opening fields looked like — and a session with none cannot hold one at all. Which of them arrived early enough to BE a PCO is `perfect_clear_timing`, and that answer comes from the simulator",
     "per_player": {
-      "pinglamb": 0,
-      "yachi": 0
+      "pinglamb": 8,
+      "yachi": 4
     }
+  },
+  "perfect_clear_timing": {
+    "source": "the oracle board source (runCaseOracle), checked per round against the replay's own results.stats.clears.allclear — the field extract.py and extract2.ts read into facts.json",
+    "pco_window_locks": 10,
+    "check": {
+      "player_rounds": 106,
+      "checked": 106,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 106,
+      "agrees": true,
+      "perfect_clears_sim": 12,
+      "perfect_clears_replay": 12
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "perfect_clears": 8,
+        "rounds_with_one": 8,
+        "by_piece": {
+          "20": 7,
+          "120": 1
+        },
+        "median_piece": 20,
+        "within_pco_window": 0
+      },
+      {
+        "user": "yachi",
+        "perfect_clears": 4,
+        "rounds_with_one": 4,
+        "by_piece": {
+          "10": 1,
+          "20": 3
+        },
+        "median_piece": 20,
+        "within_pco_window": 1
+      }
+    ]
   }
 }

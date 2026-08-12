@@ -377,9 +377,19 @@ def _named_table(data):
 
 
 def _pco_note(data):
-    """PCO is the one opener defined by an EVENT, and the event has a trustworthy source that is
-    not this simulator. Saying so is the control: a session with no perfect clears cannot contain
-    a completed PCO, whatever the opening field looked like."""
+    """PCO is the one opener defined by an EVENT rather than a picture, so it splits into two
+    questions with two different sources — and the note's job is to keep them apart.
+
+    HOW MANY perfect clears is `facts.json`, twice-extracted and Dafny-proved (the report's own 全消
+    section). WHEN each one landed is this simulator, and the only thing that licenses printing it
+    is that its per-round COUNT was checked against the replay's own counter, every round. That
+    check is printed here rather than asserted, because a timing figure whose count nobody compared
+    is a number with nothing behind it.
+
+    The note renders whatever it has: a session whose artifact predates `perfect_clear_timing` still
+    gets the count and the ceiling, and one whose check failed gets the count and a sentence saying
+    the timing is not established — never a quiet omission.
+    """
     spc = data.get("session_perfect_clears")
     if not spc:
         return ""
@@ -387,7 +397,9 @@ def _pco_note(data):
     total = sum(per.values())
     pco = next((o for o in data["named_openers"]["openers"] if o["key"] == "pco"), None)
     matched = sum(p["exact"] for p in pco["players"]) if pco else 0
+    delivered = sum(p["matched_and_delivered"] or 0 for p in pco["players"]) if pco else 0
     counts = "、".join(f"{html.escape(u)} <strong>{n}</strong> 次" for u, n in per.items())
+
     if total == 0:
         verdict = ("即係話<strong>今晚一個 Perfect Clear 都冇出過</strong>——"
                    f"所以就算開局個形撞啱 {matched} 次，"
@@ -395,12 +407,41 @@ def _pco_note(data):
     else:
         verdict = (f"開局個形撞啱 {matched} 次，而成晚 Perfect Clear 有 {total} 次——"
                    "呢兩個數係上限同下限嘅關係，唔可以當成同一件事。")
+
+    timing = data.get("perfect_clear_timing")
+    when = ""
+    if timing and total:
+        chk = timing["check"]
+        win = timing["pco_window_locks"]
+        if not chk["agrees"]:
+            when = ("至於<strong>幾時</strong>出到——呢個 session 模擬器數到嘅次數同 "
+                    f"<code>.ttrm</code> 本身嗰個數<strong>對唔上</strong>"
+                    f"（{chk['rounds_agreeing']}／{chk['checked']} 個回合啱），"
+                    "所以呢度<strong>唔會登住個時間</strong>。")
+        else:
+            inwin = sum(p["within_pco_window"] or 0 for p in timing["players"])
+            spread = "、".join(
+                f"{html.escape(p['user'])} 落喺第 "
+                + "、".join(f"{k}" for k in sorted((p["by_piece"] or {}), key=int)) + " 手"
+                for p in timing["players"] if p["by_piece"])
+            when = (
+                "「有冇」同「幾時」係兩個問題，兩個來源。<strong>幾時</strong>要靠模擬器答，"
+                "而佢喺呢度講得出聲，係因為佢<strong>逐個回合</strong>嘅全消次數同 "
+                f"<code>.ttrm</code> 本身嗰個數對過：{chk['rounds_agreeing']}／{chk['checked']} "
+                f"個回合啱，全場 {chk['perfect_clears_sim']} 對 {chk['perfect_clears_replay']} 次。"
+                f"對到之後見到嘅係：{spread}。harddrop 畫 PCO 嘅死線係<strong>頭 {win} 手</strong>，"
+                f"而呢 {total} 次入面得 <strong>{inwin}</strong> 次趕得切——"
+                + ("即係話呢啲全消<strong>基本上係中盤打出嚟</strong>，唔係開局定式嘅成果。"
+                   if not inwin else
+                   f"其中形又撞啱、時間又趕得切嘅有 <strong>{delivered}</strong> 次，"
+                   "淨係嗰啲先算真係行完個 PCO。"))
+
     return (
         "<strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，"
         "唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。"
         "而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>："
         "兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 "
-        f"<code>facts.json</code>。今個 session 讀到嘅係：{counts}。{verdict}"
+        f"<code>facts.json</code>。今個 session 讀到嘅係：{counts}。{verdict}{when}"
     )
 
 

@@ -226,8 +226,17 @@ jobs:
       # The charts read a JSON island. It used to be hand-written, so a chart could
       # disagree with facts.json and nothing would catch it — this makes that a
       # build failure instead.
+      # --selftest first, because --check on its own cannot see either of the two ways a
+      # generated section goes quietly stale: a builder that stops producing its section
+      # leaves the committed region untouched (so the document is unchanged and --check
+      # reports agreement), and a claim-reading section that no longer understands a
+      # claim's spec drops a row from a table that still looks complete. Each guard gets
+      # a planted defect here and must reject it.
       - name: Regenerate the report's derived sections and compare with the committed report
-        run: python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --check
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --selftest
+          python3 -m pipeline.build_report "sessions/${{ matrix.session }}/report" --check
 
       # 約 has to mean the floored value everywhere. The generators floor by
       # construction; hand-written Cantonese and glosses are where a rounded

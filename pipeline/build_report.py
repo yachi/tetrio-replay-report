@@ -23,8 +23,9 @@ import json
 import os
 import sys
 
-from pipeline import (appendix, chart_data, coaching, forecast_section, hero, matches,
-                      moments, opener_section, records, region, stats_section)
+from pipeline import (appendix, chart_data, claim_cards, coaching, forecast_section, hero,
+                      matches, moments, opener_section, pc_section, records, region,
+                      stats_section)
 
 
 def chart_section(ctx):
@@ -70,6 +71,13 @@ def records_section(ctx):
     return records.build(ctx["facts"], ctx["report_dir"])
 
 
+def pc_sec(ctx):
+    # Built from the session's own claims, like records_section — so the figures are the
+    # proved ones. Returns None for a session with no Perfect Clear (no claims, no
+    # section) rather than a table of zeroes, which would read as a measured result.
+    return pc_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def appendix_section(ctx):
     return appendix.section(ctx["facts"], ctx["report_dir"])
 
@@ -106,6 +114,17 @@ SECTIONS = [
     ("stats", '<!-- BEGIN generated moments', stats_sec, None),
     ("moments", '<!-- BEGIN generated records', moments_section, None),
     ("records", '<section id="coaching">', records_section, None),
+    # after the records grid: 全消 is a record-shaped number whose point is the
+    # column NEXT to it, so it reads as a correction to the tile above rather than
+    # a fresh headline.
+    #
+    # Anchored on the coaching region's BEGIN MARKER, not on `<section id="coaching">`.
+    # That section tag lives INSIDE the coaching region, so inserting before it puts the
+    # new block inside a region a later pass rewrites — build_report then reports
+    # "inserted: perfect-clear" and the finished file contains nothing, because coaching
+    # replaced the span the block had just been placed in. Anchor on a marker, which is
+    # by definition outside every other region.
+    ("perfect-clear", '<!-- BEGIN generated coaching', pc_sec, None),
     ("coaching", '<section id="rounds">', coaching_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),
     # after the proof appendix, so a reader meets the trust chain before the thing
@@ -126,12 +145,89 @@ def render(html, ctx):
     applied = []
     for name, anchor, build, markers in SECTIONS:
         body = build(ctx)
-        if body is None:           # section does not apply to this session
-            continue
         start, end = markers or region.markers(name, "pipeline/build_report.py")
+        if body is None:
+            # The section does not apply to this session — so it must not be SITTING there. Skipping
+            # silently is how a region goes stale and survives `--check`: the builder produces
+            # nothing, `render` leaves the committed markup alone, the document is unchanged and the
+            # drift gate reports agreement. That reads as "still true" and is really "no longer
+            # generated". The forecast and opener sections have their own gates that assert this;
+            # doing it here covers every section, including the ones that do not.
+            if start in html:
+                raise SystemExit(
+                    f"{name}: this session generates no such section, but report.html still "
+                    f"contains its region. Delete the {start!r}…{end!r} block — leaving it would "
+                    "publish numbers nothing regenerates.")
+            continue
         html, how = region.replace(html, start, end, body, anchor)
         applied.append((name, how))
     return html, applied
+
+
+def _selftest(report_dir):
+    """The two failures that pass `--check` unless something refuses them.
+
+    Both are silent by nature — one leaves a region nothing regenerates, the other drops a row from
+    a table that still looks complete — so each guard gets a planted defect proving it fires. A
+    guard no mutation can kill is decorative, which is the rule the .dfy lemmas are held to and
+    there is no reason a generator should be held to less.
+    """
+    with open(os.path.join(report_dir, "facts.json"), encoding="utf-8") as fh:
+        facts = json.load(fh)
+    ctx = {"facts": facts, "report_dir": report_dir}
+    with open(os.path.join(report_dir, "report.html"), encoding="utf-8") as fh:
+        doc = fh.read()
+
+    cases, ok = [], True
+
+    # 1. a builder that stops producing its section while the region is still committed
+    saved = SECTIONS[:]
+    try:
+        for i, (name, anchor, _build, markers) in enumerate(saved):
+            start, _ = markers or region.markers(name, "pipeline/build_report.py")
+            if start not in doc:
+                continue
+            SECTIONS[i] = (name, anchor, lambda _ctx: None, markers)
+            try:
+                render(doc, ctx)
+                cases.append((f"{name} stops generating but its region stays", False))
+            except SystemExit:
+                cases.append((f"{name} stops generating but its region stays", True))
+            finally:
+                SECTIONS[i] = saved[i]
+    finally:
+        SECTIONS[:] = saved
+
+    # 2. a perfect-clear claim whose spec no longer has the shape the section reads
+    claims = claim_cards.load(report_dir)
+    if any(c["family"] == "pc_rounds" for c in claims):
+        real = claim_cards.load
+
+        def blinded(rd, *a, **k):
+            out = real(rd, *a, **k)
+            for c in out:
+                if c["family"] == "pc_rounds":
+                    c["spec"] = {"p": "and", "xs": []}      # readable JSON, unreadable shape
+                    break
+            return out
+
+        claim_cards.load = blinded
+        try:
+            pc_section.build(facts, report_dir)
+            cases.append(("a pc_rounds claim's spec changes shape", False))
+        except SystemExit:
+            cases.append(("a pc_rounds claim's spec changes shape", True))
+        finally:
+            claim_cards.load = real
+    else:
+        print("  --  no pc_rounds claim in this session; its guard is not exercised here")
+
+    for name, caught in cases:
+        ok &= caught
+        print(f"  {'ok ' if caught else 'BAD'} {name}: {'rejected' if caught else 'ACCEPTED'}")
+    print(f"{'ok ' if ok else 'FAIL'} selftest {len(cases)} planted defects, "
+          f"{'all caught' if ok else 'SOME MISSED'}")
+    return 0 if ok else 1
 
 
 def main(argv=None):
@@ -140,7 +236,12 @@ def main(argv=None):
     ap.add_argument("report_dir", help="a session's report/ directory")
     ap.add_argument("--check", action="store_true",
                     help="do not write; exit 1 if the committed report differs")
+    ap.add_argument("--selftest", action="store_true",
+                    help="plant the defects the guards exist for and require each to be caught")
     args = ap.parse_args(argv)
+
+    if args.selftest:
+        return _selftest(args.report_dir)
 
     with open(os.path.join(args.report_dir, "facts.json"), encoding="utf-8") as fh:
         facts = json.load(fh)

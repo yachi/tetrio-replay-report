@@ -21,6 +21,12 @@ Wording rules encoded here on purpose, because each one was a review finding onc
 * the raw `tspins` counter includes spins that cleared nothing, so T-spin totals say
   which measure they mean
 * traditional characters only (build_claims.py asserts this)
+
+A NEW FAMILY GOES AT THE END OF THIS FILE. `build_claims.generate` walks FAMILIES in
+decoration order and numbers the claims G001, G002, … as it goes, so inserting a family
+in the middle renumbers every claim after it. Reports cite those ids in prose badges, and
+a shifted id still RESOLVES — it just resolves to a different claim than the sentence is
+about, which no gate can see. Appending keeps every existing id where it was.
 """
 
 from .spec import (add, all_rounds, c_str, le, lt, sum_round_where, between, c_and, c_dur, c_field, c_winner,
@@ -1300,6 +1306,81 @@ def unqualified_rate_peaks(facts):
                 # reason for demoting it is proved rather than asserted
                 eq(count_rounds(c_and(c_dur("<", QUALIFYING_MS),
                                       c_field(pl, f, "==", v))), lit(1)),
+            ),
+        })
+    return out
+
+
+@family
+def perfect_clears(facts):
+    """全消 — not how many, but whether the round that held one was won.
+
+    `clear_mix` already counts All Clears per player, and a count on its own reads as an
+    achievement list. The question a report has to answer is what the achievement bought,
+    and this session pair answers it with a shape the totals cannot show: a Perfect Clear
+    is a large one-off attack, and the round it lands in is won about as often as any
+    other. Two claims per player say that with counts a solver can refute:
+
+      * rounds holding at least one of the player's Perfect Clears, and how many of those
+        the player won — printed beside the session's own round record, because "won 7 of
+        12" means nothing without "won 43 of 79" next to it. The comparison is left to the
+        reader as four integers rather than folded into a rate: the denominators here are
+        3-12 rounds, and a percentage over 3 rounds invites a conclusion the sample cannot
+        carry.
+      * rounds where the player was the ONLY one to get a Perfect Clear and still lost.
+        This is the sharp form, because it removes the obvious confound — a round both
+        players cleared out is not evidence either way — and it is a count of individually
+        checkable rounds rather than a rate.
+
+    Skipped entirely for a session with no Perfect Clear: `count_rounds(...) == 0` would be
+    a claim no mutation of any allclear counter can falsify (raising one to 1 makes the
+    predicate false, but so does every other claim about that round), and a family whose
+    lemma is decorative is worse than a family that stays quiet.
+    """
+    pls = _players(facts)
+    rows = _rounds(facts)
+    if not any(r["players"][p]["clears"]["allclear"] for _, _, r in rows for p in pls):
+        return []
+    out = []
+    total = len(rows)
+    for pl in pls:
+        other = [p for p in pls if p != pl][0]
+        mine = [r for _, _, r in rows if r["players"][pl]["clears"]["allclear"] > 0]
+        won = sum(1 for r in mine if r["winner"] == pl)
+        wins = _round_wins(facts)[pl]
+        if not mine:
+            continue
+        out.append({
+            "family": "pc_rounds", "category": "style",
+            "canto": f"{pl} 有 {len(mine)} 局做到 Perfect Clear，入面贏咗 {won} 局；"
+                     f"佢成晚打 {total} 局贏 {wins} 局",
+            "english_gloss": (f"{pl} had a perfect clear in {len(mine)} rounds and won {won} "
+                              f"of them; {wins} round wins out of {total} overall"),
+            "spec": conj(
+                eq(count_rounds(c_field(pl, "clears.allclear", ">", 0)), lit(len(mine))),
+                eq(count_rounds(c_and(c_field(pl, "clears.allclear", ">", 0),
+                                      c_winner(pl))), lit(won)),
+                eq(count_rounds_won(pl), lit(wins)),
+                eq(total_rounds(), lit(total)),
+            ),
+        })
+        solo = [r for r in mine if r["players"][other]["clears"]["allclear"] == 0]
+        lost = sum(1 for r in solo if r["winner"] == other)
+        if not solo:
+            continue
+        out.append({
+            "family": "pc_solo_lost", "category": "style",
+            "canto": f"有 {len(solo)} 局係全場淨係 {pl} 做到 Perfect Clear，"
+                     f"入面佢仲要輸咗 {lost} 局",
+            "english_gloss": (f"{len(solo)} rounds where only {pl} got a perfect clear; "
+                              f"{pl} lost {lost} of them"),
+            "spec": conj(
+                eq(count_rounds(c_and(c_field(pl, "clears.allclear", ">", 0),
+                                      c_field(other, "clears.allclear", "==", 0))),
+                   lit(len(solo))),
+                eq(count_rounds(c_and(c_field(pl, "clears.allclear", ">", 0),
+                                      c_field(other, "clears.allclear", "==", 0),
+                                      c_winner(other))), lit(lost)),
             ),
         })
     return out

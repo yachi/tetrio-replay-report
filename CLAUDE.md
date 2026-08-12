@@ -372,12 +372,53 @@ The repertoires split, reproduced independently in all five sessions (pinned in 
 Stacking** (11-25 vs 2-11) **and is the only one who plays TKI-3 at all** (5-8; pinglamb 0, every
 session). PCO appears only for yachi, only on 07-24 and 08-01.
 
-**PCO's payoff is bounded by facts.json, never by the simulator.** PCO is defined by an outcome,
-and the vendored engine's `eng.board.perfectClear` reports a perfect clear in 10 of 08-09's 100
-rounds — always at lock 19, almost always past the verified prefix — while both extractors read
-`clears.allclear` out of the `.ttrm` and agree the session had **zero**. facts.json wins; the flag
-is used nowhere. A session with no perfect clear cannot contain a completed PCO however many boards
-match its field.
+**PCO's payoff is bounded by facts.json, and its timing is the one simulator figure with a verified
+counterpart.** PCO is defined by an outcome, so the row splits in two. HOW MANY perfect clears is
+`clears.allclear`, twice-extracted — see 全消 below. WHEN each landed only the simulator can say, and
+what licenses printing it is that `perfect_clear_timing` compares the simulator's per-round count
+with the replay's own counter for **every** player-round and emits the piece numbers as `null` unless
+all of them agree. They do: **592/592 rounds, 65/65 perfect clears**, five sessions. `check_opener_
+section` fails if the piece numbers are published without that agreement figure or without
+harddrop's ten-piece deadline beside them.
+
+The finding is that **3 of the 65 arrived inside that deadline** and 53 landed on piece 20 — these
+are mid-game perfect clears, not the opener. 08-01 holds the corpus's only completed PCO: yachi
+matched the field twice and delivered once.
+
+**An earlier revision of this section said the opposite** — that `eng.board.perfectClear` invented
+clears the sessions did not have — and it was wrong for a reason worth keeping: the facts.json
+lookup it rested on read `players[u].allclear`, one level above the counter, and `?? 0` turned every
+undefined into a plausible zero. All five reports published 「一個 Perfect Clear 都冇出過」 while the
+`.ttrm` files held 65. Nothing caught it: the value was in range, the artefact re-emitted
+byte-identically, and the test recomputed the total down the same wrong path, so it agreed with
+itself. Two rules came out of it — **a required field that goes missing must throw, never default**
+(`sessionPerfectClears` declares `clears.allclear` non-optional and dies on a non-number), and **a
+test that re-derives a value the way the code does can only catch a typo** (`openers.test.ts` now
+pins the five sessions' counts as literals and asserts the total is not zero).
+
+## 全消 — the Perfect Clear section, and the two questions it keeps apart
+
+`pipeline/pc_section.py`, region `perfect-clear`, **inside** the trust chain: every figure is read
+out of the proved claims' own specs (`pc_rounds`, `pc_solo_lost`, `clears_allclear`), never
+re-derived from facts.json, so the table cannot print a number no lemma covers. `clears.allclear` is
+read out of the `.ttrm` independently by both extractors, which is why this one is badged while the
+opener tables are not.
+
+The point is not the count. Across five sessions, **60 rounds had exactly one player with a perfect
+clear and that player lost 28 of them** — the AUC block above says the same thing (PC 50.8, 89%
+zeros). So the section prints "rounds won" beside "rounds with one" and refuses to print a rate: the
+denominators are 3-12 rounds per player, and a percentage over three rounds reads far more confident
+than the data is. Two more controls it may not lose: 全消次數 ≠ 有全消嘅局 (a round can hold two), and
+"whether" is facts.json while "when" is the simulator's, in the quarantined section below.
+
+New claim families go at the **end** of `generators.py`. `build_claims` numbers claims in FAMILIES
+order, prose cites those ids, and a shifted id still resolves — to the wrong claim. Nothing checks
+that.
+
+A `SECTIONS` entry's anchor must be a **marker comment**, not a `<section id=…>` tag. `<section
+id="coaching">` lives inside the coaching region, so anchoring there inserts the new block into a
+span a later pass rewrites: `build_report` prints `inserted: <name>` and the finished file contains
+nothing at all.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

@@ -171,7 +171,13 @@ interface Bag { user: string; grid: string[] }
  *  `round` indexes `rounds`, so a shape match can be cross-tabbed against what that round did. */
 interface CleanBoard { user: string; round: number; locks: number; grid: string[] }
 interface Round { user: string; verified: number; spinsVerified: { i: number; cleared: number }[];
-                  spinsAll: { i: number; cleared: number }[] }
+                  spinsAll: { i: number; cleared: number }[];
+                  /** 0-based lock indices at which the simulated board came out empty. */
+                  pcLocks: number[];
+                  /** the same round's Perfect Clear count from `results.stats.clears`, i.e. the
+                   *  replay's own tally. null when the replay did not carry the counter, which is
+                   *  an UNKNOWN and must not be compared against the simulator as if it were 0. */
+                  pcReal: number | null }
 
 /**
  * The whole artifact for one session directory, as a value.
@@ -198,8 +204,11 @@ for (const c of loadCases(dir)) {
     .map((lk, i) => ({ i, cleared: lk.cleared, spin: lk.spin }))
     .filter(x => x.spin !== 'none' && x.cleared > 0)     // detectTSpin returns 'none' unless the piece is a T
     .map(({ i, cleared }) => ({ i, cleared }));
+  const acReal = c.clears.allclear;
   rounds.push({ user: c.user, verified: v, spinsAll,
-                spinsVerified: spinsAll.filter(x => x.i <= v) });
+                spinsVerified: spinsAll.filter(x => x.i <= v),
+                pcLocks: r.locks.flatMap((lk, i) => (lk as { allclear?: boolean }).allclear ? [i] : []),
+                pcReal: typeof acReal === 'number' ? acReal : null });
 
   // slot geometry, over the verified prefix only
   for (const s of spinsAll) {
@@ -320,12 +329,20 @@ function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: num
 // evidence of absence out of a sampling gap — which is precisely the bug OPENER_LOCKS just fixed.
 /** The opener's payoff, scored over VERIFIED spins inside the opener window.
  *
- *  Verified, not merely simulated, and that is not caution for its own sake — this file already had
- *  one metric built on an unverified simulator flag and it was wrong. `eng.board.perfectClear` from
- *  the vendored engine reports a perfect clear in 10 of 08-09's 100 rounds, always at lock 19 and
- *  almost always past the verified prefix, while BOTH independent extractors read `clears.allclear`
- *  straight out of the .ttrm and agree the session had ZERO. facts.json wins; the flag is not used
- *  anywhere in this artifact, and PCO's payoff is bounded by `session_perfect_clears` below instead.
+ *  Verified, not merely simulated: a T-spin the simulator believes in has no second source, so the
+ *  window where the sim is checked against the replay's own garbage record is the only place its
+ *  spins may be counted from.
+ *
+ *  The Perfect Clear flag is the exception, and it earns it by measurement rather than by argument
+ *  — see `perfectClearTiming`, which checks the simulator's per-round count against the replay's own
+ *  `results.stats.clears.allclear` for every player-round in the session and publishes the result.
+ *  Over the five committed sessions that check is 592/592 rounds and 65/65 Perfect Clears.
+ *
+ *  (An earlier revision of this comment said the opposite — that the flag reported clears the
+ *  session did not have. That reading came from a facts.json lookup one level too shallow, which
+ *  returned zero for every session; the sessions hold 65 Perfect Clears between them and the flag
+ *  found exactly those. The lesson kept from it is in `sessionPerfectClears`: a bound must fail
+ *  loudly rather than quietly report the zero it never read.)
  *
  *  Triple-before-Double is the signature of the whole `Triple Double openers` category — see
  *  `ordering_class` for why it can never name which member was played. */
@@ -337,6 +354,16 @@ const openedTripleFirst = (r: Round) => {
 /** TKI-3's payoff is the opening T-spin Double it is named for (開幕TSD), not a Triple Double. */
 const openedDouble = (r: Round) =>
   r.spinsVerified.some(x => x.i <= WINDOW_PIECES && x.cleared === 2);
+
+/** harddrop defines the Perfect Clear Opener by an outcome and gives the deadline in pieces: "a
+ *  Perfect Clear in the first 4 lines of a game (10 dropped pieces)". Ten locks is that sentence
+ *  read literally, and it is a much tighter window than WINDOW_PIECES — an opener that has to
+ *  finish inside one and a half bags is not the same kind of claim as one with three bags. */
+const PCO_LOCKS = 10;
+/** PCO's payoff: the board came out empty inside harddrop's own ten-piece deadline. Scored off the
+ *  simulator's lock indices, whose per-round COUNT is checked against the replay in
+ *  `perfectClearTiming` — the position within the round is the only part with no second source. */
+const openedPerfectClear = (r: Round) => r.pcLocks.some(i => i < PCO_LOCKS);
 
 function namedOpenerFor(op: ReturnType<typeof loadWikiOpeners>['openers'][number]) {
   const pool = openerPages(op, prepared);
@@ -375,7 +402,8 @@ function namedOpenerFor(op: ReturnType<typeof loadWikiOpeners>['openers'][number
     const rs = [...new Set(matched)].map(i => rounds[i]!);
     const did = inTD ? rs.filter(openedTripleFirst).length
               : op.key === 'tki_3' ? rs.filter(openedDouble).length
-              : null;   // PCO's payoff is a perfect clear; see session_perfect_clears
+              : op.key === 'pco' ? rs.filter(openedPerfectClear).length
+              : null;
     return {
       user, boards_scored: mine.length,
       exact, min_cells: min,
@@ -407,6 +435,7 @@ function namedOpenerFor(op: ReturnType<typeof loadWikiOpeners>['openers'][number
     occupancy_aliases: aliases,
     delivers: inTD ? `a T-spin Triple before a T-spin Double within ${WINDOW_PIECES} pieces`
             : op.key === 'tki_3' ? `a T-spin Double within ${WINDOW_PIECES} pieces`
+            : op.key === 'pco' ? `a perfect clear within ${PCO_LOCKS} locks`
             : null,
     drawn_at_locks: pool.locks,
     pages: pool.source,
@@ -429,9 +458,20 @@ function namedOpenerFor(op: ReturnType<typeof loadWikiOpeners>['openers'][number
  *
  * Returns null when facts.json is absent (bin/new-session emits the replays before the report), so
  * a missing bound reads as "not known here" and never as "zero".
+ *
+ * ABSENT AND ZERO ARE DIFFERENT, and the first version of this function did not distinguish them.
+ * It read `rd.players[u].allclear` — one level too shallow, the counter lives under `clears` — and
+ * `?? 0` turned every lookup of an undefined field into a legitimate-looking zero. All five sessions
+ * published "not one Perfect Clear all night" while the .ttrm files hold 62 of them. Nothing caught
+ * it: the value was in range, the artefact regenerated byte-identically, and the test recomputed the
+ * total down the SAME wrong path, so it agreed with itself.
+ *
+ * So the shape below declares `clears.allclear` REQUIRED, which makes the shallow read a type error,
+ * and the loop throws on a non-number instead of defaulting. A required field that goes missing has
+ * to be loud; the quiet reading of it is indistinguishable from data.
  */
 function sessionPerfectClears(dir: string) {
-  let facts: { matches: { rounds: { players: Record<string, { allclear?: number }> }[] }[] };
+  let facts: { matches: { rounds: { players: Record<string, { clears: { allclear: number } }> }[] }[] };
   try {
     facts = JSON.parse(readFileSync(`${dir}/report/facts.json`, 'utf8'));
   } catch {
@@ -440,13 +480,79 @@ function sessionPerfectClears(dir: string) {
   const per: Record<string, number> = {};
   for (const m of facts.matches)
     for (const rd of m.rounds)
-      for (const [user, st] of Object.entries(rd.players))
-        per[user] = (per[user] ?? 0) + (st.allclear ?? 0);
+      for (const [user, st] of Object.entries(rd.players)) {
+        const v = st.clears?.allclear;
+        if (typeof v !== 'number')
+          throw new Error(`facts.json: players.${user}.clears.allclear is not a number — `
+                        + `the bound must fail loudly rather than report a zero it did not read`);
+        per[user] = (per[user] ?? 0) + v;
+      }
   return {
     source: 'report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)',
-    means: 'an upper bound on completed Perfect Clear Openers: no perfect clears in the session '
-         + 'means no PCO was completed, whatever the opening field looked like',
+    means: 'an upper bound on completed Perfect Clear Openers: a session cannot hold more completed '
+         + 'PCOs than it holds perfect clears, whatever the opening fields looked like — and a '
+         + 'session with none cannot hold one at all. Which of them arrived early enough to BE a '
+         + 'PCO is `perfect_clear_timing`, and that answer comes from the simulator',
     per_player: Object.fromEntries(users.map(u => [u, per[u] ?? 0])),
+  };
+}
+
+/**
+ * ── metric 6: WHEN the Perfect Clear arrived ───────────────────────────────────────────────────
+ *
+ * The report's own 全消 section already counts Perfect Clears, twice-extracted and Dafny-proved. It
+ * cannot say *when* one landed, because facts.json stores counts and nothing about ordering. That
+ * is the question PCO is defined by — harddrop's deadline is ten dropped pieces — so it is worth
+ * asking, and only the simulator can answer it.
+ *
+ * THE CONTROL IS THE COUNT ITSELF, and it is the strongest one in this file. A simulator flag has
+ * no second implementation to be checked against, but this particular flag has something almost as
+ * good: the same quantity, per round, in the replay's own `results.stats.clears.allclear` — the
+ * field both extractors read into facts.json. So every player-round is compared, the totals are
+ * published beside the timing, and `by_lock` is emitted as null when a single round disagrees.
+ * Timing that no count agrees with is a number with nothing behind it.
+ *
+ * A round whose replay carries no allclear counter is UNKNOWN, not zero: it is counted in
+ * `unknown_rounds` and excluded from `rounds_agreeing`, so a corpus that stopped carrying the field
+ * reads as unchecked rather than as perfect agreement.
+ *
+ * Positions are published as PIECE NUMBERS (1-based), which is how harddrop's ten-piece deadline is
+ * written; `pcLocks` is 0-based internally.
+ */
+function perfectClearTiming() {
+  let agree = 0, unknown = 0, sim = 0, real = 0;
+  for (const r of rounds) {
+    sim += r.pcLocks.length;
+    if (r.pcReal === null) { unknown++; continue; }
+    real += r.pcReal;
+    if (r.pcReal === r.pcLocks.length) agree++;
+  }
+  const checked = rounds.length - unknown;
+  const ok = checked > 0 && agree === checked;
+  const players = users.map(user => {
+    const mine = rounds.filter(r => r.user === user);
+    const at = mine.flatMap(r => r.pcLocks.map(i => i + 1)).sort((a, b) => a - b);
+    const hist: Record<string, number> = {};
+    for (const p of at) hist[String(p)] = (hist[String(p)] ?? 0) + 1;
+    return {
+      user,
+      perfect_clears: mine.reduce((s, r) => s + (r.pcReal ?? 0), 0),
+      rounds_with_one: mine.filter(r => (r.pcReal ?? 0) > 0).length,
+      // null rather than {} when the check failed: an empty histogram would render as
+      // "measured, and nothing was there", which is the opposite of "not established".
+      by_piece: ok ? hist : null,
+      median_piece: ok ? median(at) : null,
+      within_pco_window: ok ? at.filter(p => p <= PCO_LOCKS).length : null,
+    };
+  });
+  return {
+    source: 'the oracle board source (runCaseOracle), checked per round against the replay\'s own '
+          + 'results.stats.clears.allclear — the field extract.py and extract2.ts read into facts.json',
+    pco_window_locks: PCO_LOCKS,
+    check: { player_rounds: rounds.length, checked, unknown_rounds: unknown,
+             rounds_agreeing: agree, agrees: ok,
+             perfect_clears_sim: sim, perfect_clears_replay: real },
+    players,
   };
 }
 
@@ -608,6 +714,10 @@ return {
 
   /** The ceiling on the PCO row, from the verified extractors rather than from this simulator. */
   session_perfect_clears: sessionPerfectClears(dir),
+
+  /** WHERE in the round each Perfect Clear landed, with the per-round count check that licenses
+   *  publishing it at all. See `perfectClearTiming`. */
+  perfect_clear_timing: perfectClearTiming(),
 };
 }
 

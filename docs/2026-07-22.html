@@ -692,6 +692,77 @@
 </section>
 <!-- END generated records -->
 
+<!-- BEGIN generated perfect-clear (pipeline/build_report.py) -->
+<style>
+/* ---------- 全消 (generated) ---------- */
+/* Scoped under #perfect-clear, and every class carries the pc- prefix: a generated
+   section's <style> is injected into the body, so at equal specificity it beats the
+   report's own stylesheet and an unprefixed name silently restyles the host. */
+#perfect-clear .pc-scroll { overflow-x: auto; margin: 1.4rem 0 0; }
+#perfect-clear .pc-table { width: 100%; border-collapse: collapse; font-size: .86rem;
+  min-width: 34rem; }
+#perfect-clear .pc-table th, #perfect-clear .pc-table td { padding: .55rem .7rem;
+  border-bottom: 1px solid var(--border); text-align: right; }
+#perfect-clear .pc-table th:first-child, #perfect-clear .pc-table td:first-child {
+  text-align: left; }
+#perfect-clear .pc-table thead th { font-family: var(--font-mono); font-size: .64rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+/* Columns of figures align vertically, so these ARE tabular — the opposite of the
+   standalone display numbers in 全場之最. */
+#perfect-clear .pc-table td.pc-num { font-variant-numeric: tabular-nums; }
+#perfect-clear .pc-who { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+#perfect-clear .pc-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+/* Positional class, legacy token: the four earliest reports' :root predates the
+   positional --p1/--p2 slots and only defines --yachi/--pinglamb, and an undefined
+   custom property resolves to nothing rather than failing. Same rule build_round_table
+   follows for its bar tints. */
+#perfect-clear .pc-dot.is-p1 { background: var(--yachi); }
+#perfect-clear .pc-dot.is-p2 { background: var(--pinglamb); }
+#perfect-clear .pc-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
+#perfect-clear .pc-find { margin: 1.2rem 0 0; font-size: .92rem; line-height: 1.9; }
+#perfect-clear .pc-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8;
+  color: var(--muted); }
+@media print {
+  #perfect-clear .pc-scroll { overflow-x: visible; }
+}
+</style>
+
+<section id="perfect-clear">
+  <div class="wrap">
+    <div class="eyebrow">全消 · PERFECT CLEAR</div>
+    <h2 class="section-title">全消清晒成塊板，然之後呢？</h2>
+    <p class="section-lede">Perfect Clear（全消）係成塊板清到一格都冇，一次過送一大抽出去。呢節唔係擺個「邊個做得多」出嚟就算數——每行都跟住寫埋<strong>嗰啲局最後贏咗幾多</strong>。所有數都係由 claim 本身證嗰條等式度攞返嚟（id 喺最後一欄），唔係喺呢度另外再數一次。</p>
+    <div class="pc-scroll">
+      <table class="pc-table">
+        <thead><tr><th>玩家</th><th>全消次數</th><th>有全消嘅局</th><th>嗰啲局贏咗</th><th>成晚贏／打</th><th>淨係佢有全消但輸咗</th><th>Claim</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="pc-who"><span class="pc-dot is-p1"></span>yachi</span></td>
+            <td class="pc-num">12</td>
+            <td class="pc-num">12</td>
+            <td class="pc-num">7</td>
+            <td class="pc-num">43 ／ 79</td>
+            <td class="pc-num">4</td>
+            <td class="pc-cid">G080 · G081 ✓</td>
+          </tr>
+          <tr>
+            <td><span class="pc-who"><span class="pc-dot is-p2"></span>pinglamb</span></td>
+            <td class="pc-num">7</td>
+            <td class="pc-num">6</td>
+            <td class="pc-num">2</td>
+            <td class="pc-num">36 ／ 79</td>
+            <td class="pc-num">4</td>
+            <td class="pc-cid">G082 · G083 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pc-find">成晚 <strong>16</strong> 局係<strong>全場淨係得一個人</strong>做到全消——入面有 <strong>8</strong> 局，做到嗰個仲要輸咗。清到成塊板係一次過大攻擊，但擺喺一局嘅結果度睇，<strong>佢唔係一個決定局數嘅訊號</strong>。
+    <p class="pc-note">讀呢個表要記住三樣嘢。一，<strong>樣本細</strong>：成晚得 79 局，每個人有全消嘅局數得單位數到十幾局，所以呢度全部寫「幾多局」，<strong>唔寫百分比</strong>——三局嘅百分比睇落好肯定，其實乜都話唔到。二，<strong>「全消次數」同「有全消嘅局」唔同</strong>：一局入面可以出多過一次全消，所以左邊嗰欄大得過右邊嗰欄係正常，唔可以當成同一個數。三，呢節講嘅係<strong>有冇</strong>出全消，<strong>唔係幾時</strong>出——「打到第幾手先全消」嗰個問題靠模擬器答，同呢節唔同來源，喺下面模擬器嗰節（同埋佢自己講明係未經第二個實作核對嘅）。呢節嘅數全部出自 <code>facts.json</code> 嘅 <code>clears.allclear</code>，由兩個獨立 parser 各自由 <code>.ttrm</code> 讀一次。</p>
+  </div>
+</section>
+<!-- END generated perfect-clear -->
+
 <!-- BEGIN generated coaching (pipeline/build_report.py) -->
 <section id="coaching">
   <div class="wrap-wide">
@@ -7090,11 +7161,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><td>Mountainous Stacking 2 <span class="mono">＝</span> Mountainous Stacking</td><td class="mono">6 手</td><td>wiki 2（定式庫冇收）</td><td class="mono">11（0）</td><td class="mono">10／11</td><td class="mono">25（0）</td><td class="mono">20／25</td></tr>
           <tr><td>Mountainous Stacking 3</td><td class="mono">6 手</td><td>wiki 2（定式庫冇收）</td><td class="mono">0（11）</td><td class="mono">0／0</td><td class="mono">0（25）</td><td class="mono">0／0</td></tr>
           <tr><td>TKI 3 Opening</td><td class="mono">6 手</td><td>wiki 4（定式庫有 12 版，冇一版用得）</td><td class="mono">0（11）</td><td class="mono">0／0</td><td class="mono">8（25）</td><td class="mono">8／8</td></tr>
-          <tr><td>Perfect Clear Opener</td><td class="mono">6 手、7 手</td><td>wiki 4 + 定式庫 4</td><td class="mono">0（11）</td><td class="mono">—</td><td class="mono">0（25）</td><td class="mono">—</td></tr>
+          <tr><td>Perfect Clear Opener</td><td class="mono">6 手、7 手</td><td>wiki 4 + 定式庫 4</td><td class="mono">0（11）</td><td class="mono">0／0</td><td class="mono">0（25）</td><td class="mono">0／0</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="method-note"><p><strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>：兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 <code>facts.json</code>。今個 session 讀到嘅係：pinglamb <strong>0</strong> 次、yachi <strong>0</strong> 次。即係話<strong>今晚一個 Perfect Clear 都冇出過</strong>——所以就算開局個形撞啱 0 次，都<strong>冇一次真係做成個 PCO</strong>。形似唔等於打得成。</p></div>
+    <div class="method-note"><p><strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>：兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 <code>facts.json</code>。今個 session 讀到嘅係：pinglamb <strong>7</strong> 次、yachi <strong>12</strong> 次。開局個形撞啱 0 次，而成晚 Perfect Clear 有 19 次——呢兩個數係上限同下限嘅關係，唔可以當成同一件事。「有冇」同「幾時」係兩個問題，兩個來源。<strong>幾時</strong>要靠模擬器答，而佢喺呢度講得出聲，係因為佢<strong>逐個回合</strong>嘅全消次數同 <code>.ttrm</code> 本身嗰個數對過：158／158 個回合啱，全場 19 對 19 次。對到之後見到嘅係：pinglamb 落喺第 20、35 手、yachi 落喺第 10、15、20 手。harddrop 畫 PCO 嘅死線係<strong>頭 10 手</strong>，而呢 19 次入面得 <strong>1</strong> 次趕得切——其中形又撞啱、時間又趕得切嘅有 <strong>0</strong> 次，淨係嗰啲先算真係行完個 PCO。</p></div>
   </div>
 </section>
 <!-- END generated openers -->

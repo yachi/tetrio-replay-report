@@ -722,6 +722,77 @@
 
 <!-- ============================= 建議 ============================= -->
 
+<!-- BEGIN generated perfect-clear (pipeline/build_report.py) -->
+<style>
+/* ---------- 全消 (generated) ---------- */
+/* Scoped under #perfect-clear, and every class carries the pc- prefix: a generated
+   section's <style> is injected into the body, so at equal specificity it beats the
+   report's own stylesheet and an unprefixed name silently restyles the host. */
+#perfect-clear .pc-scroll { overflow-x: auto; margin: 1.4rem 0 0; }
+#perfect-clear .pc-table { width: 100%; border-collapse: collapse; font-size: .86rem;
+  min-width: 34rem; }
+#perfect-clear .pc-table th, #perfect-clear .pc-table td { padding: .55rem .7rem;
+  border-bottom: 1px solid var(--border); text-align: right; }
+#perfect-clear .pc-table th:first-child, #perfect-clear .pc-table td:first-child {
+  text-align: left; }
+#perfect-clear .pc-table thead th { font-family: var(--font-mono); font-size: .64rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+/* Columns of figures align vertically, so these ARE tabular — the opposite of the
+   standalone display numbers in 全場之最. */
+#perfect-clear .pc-table td.pc-num { font-variant-numeric: tabular-nums; }
+#perfect-clear .pc-who { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+#perfect-clear .pc-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+/* Positional class, legacy token: the four earliest reports' :root predates the
+   positional --p1/--p2 slots and only defines --yachi/--pinglamb, and an undefined
+   custom property resolves to nothing rather than failing. Same rule build_round_table
+   follows for its bar tints. */
+#perfect-clear .pc-dot.is-p1 { background: var(--yachi); }
+#perfect-clear .pc-dot.is-p2 { background: var(--pinglamb); }
+#perfect-clear .pc-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
+#perfect-clear .pc-find { margin: 1.2rem 0 0; font-size: .92rem; line-height: 1.9; }
+#perfect-clear .pc-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8;
+  color: var(--muted); }
+@media print {
+  #perfect-clear .pc-scroll { overflow-x: visible; }
+}
+</style>
+
+<section id="perfect-clear">
+  <div class="wrap">
+    <div class="eyebrow">全消 · PERFECT CLEAR</div>
+    <h2 class="section-title">全消清晒成塊板，然之後呢？</h2>
+    <p class="section-lede">Perfect Clear（全消）係成塊板清到一格都冇，一次過送一大抽出去。呢節唔係擺個「邊個做得多」出嚟就算數——每行都跟住寫埋<strong>嗰啲局最後贏咗幾多</strong>。所有數都係由 claim 本身證嗰條等式度攞返嚟（id 喺最後一欄），唔係喺呢度另外再數一次。</p>
+    <div class="pc-scroll">
+      <table class="pc-table">
+        <thead><tr><th>玩家</th><th>全消次數</th><th>有全消嘅局</th><th>嗰啲局贏咗</th><th>成晚贏／打</th><th>淨係佢有全消但輸咗</th><th>Claim</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="pc-who"><span class="pc-dot is-p1"></span>yachi</span></td>
+            <td class="pc-num">3</td>
+            <td class="pc-num">3</td>
+            <td class="pc-num">2</td>
+            <td class="pc-num">20 ／ 50</td>
+            <td class="pc-num">1</td>
+            <td class="pc-cid">G077 · G078 ✓</td>
+          </tr>
+          <tr>
+            <td><span class="pc-who"><span class="pc-dot is-p2"></span>pinglamb</span></td>
+            <td class="pc-num">7</td>
+            <td class="pc-num">7</td>
+            <td class="pc-num">3</td>
+            <td class="pc-num">30 ／ 50</td>
+            <td class="pc-num">4</td>
+            <td class="pc-cid">G079 · G080 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pc-find">成晚 <strong>10</strong> 局係<strong>全場淨係得一個人</strong>做到全消——入面有 <strong>5</strong> 局，做到嗰個仲要輸咗。清到成塊板係一次過大攻擊，但擺喺一局嘅結果度睇，<strong>佢唔係一個決定局數嘅訊號</strong>。
+    <p class="pc-note">讀呢個表要記住三樣嘢。一，<strong>樣本細</strong>：成晚得 50 局，每個人有全消嘅局數得單位數到十幾局，所以呢度全部寫「幾多局」，<strong>唔寫百分比</strong>——三局嘅百分比睇落好肯定，其實乜都話唔到。二，<strong>「全消次數」同「有全消嘅局」唔同</strong>：一局入面可以出多過一次全消，所以左邊嗰欄大得過右邊嗰欄係正常，唔可以當成同一個數。三，呢節講嘅係<strong>有冇</strong>出全消，<strong>唔係幾時</strong>出——「打到第幾手先全消」嗰個問題靠模擬器答，同呢節唔同來源，喺下面模擬器嗰節（同埋佢自己講明係未經第二個實作核對嘅）。呢節嘅數全部出自 <code>facts.json</code> 嘅 <code>clears.allclear</code>，由兩個獨立 parser 各自由 <code>.ttrm</code> 讀一次。</p>
+  </div>
+</section>
+<!-- END generated perfect-clear -->
+
 <!-- BEGIN generated coaching (pipeline/build_report.py) -->
 <section id="coaching">
   <div class="wrap-wide">
@@ -4692,11 +4763,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
       <div class="chain">
         <div class="chain-step"><div class="n">1</div><div>數據由兩個獨立嘅 parser（extract.py 同 extract2.ts）各自由 6 個 replay 檔案（.ttrm）入面抽 facts，兩份輸出逐個欄位比對完全一致先算過關。</div></div>
-        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 88 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
+        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 92 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
         <div class="chain-step"><div class="n">3</div><div>仲會做 mutation test：刻意將條引理嘅 guard/前提拆走，睇下會唔會有 test 應聲斷——如果冧唔到，即係話條 guard 得個樣冇實際用，要補返。</div></div>
       </div>
-      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 88 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
-      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 88 / 88</div>
+      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 92 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
+      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 92 / 92</div>
     </div>
 
     <div class="scroll-x">
@@ -5243,6 +5314,34 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <td class="lemma-cell">G076_unqualified_session_peak_vs_x1000_is_217716_by_pinglamb_at_m1r4_a_31s</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
+          <tr id="claim-G077">
+            <td class="id-cell">G077</td>
+            <td class="canto-cell">yachi 有 3 局做到 Perfect Clear，入面贏咗 2 局；佢成晚打 50 局贏 20 局</td>
+            <td class="gloss-cell">yachi had a perfect clear in 3 rounds and won 2 of them; 20 round wins out of 50 overall</td>
+            <td class="lemma-cell">G077_yachi_had_a_perfect_clear_in_3_rounds_and_won_2_of_them_20_round_wins</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G078">
+            <td class="id-cell">G078</td>
+            <td class="canto-cell">有 3 局係全場淨係 yachi 做到 Perfect Clear，入面佢仲要輸咗 1 局</td>
+            <td class="gloss-cell">3 rounds where only yachi got a perfect clear; yachi lost 1 of them</td>
+            <td class="lemma-cell">G078_3_rounds_where_only_yachi_got_a_perfect_clear_yachi_lost_1_of_them</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G079">
+            <td class="id-cell">G079</td>
+            <td class="canto-cell">pinglamb 有 7 局做到 Perfect Clear，入面贏咗 3 局；佢成晚打 50 局贏 30 局</td>
+            <td class="gloss-cell">pinglamb had a perfect clear in 7 rounds and won 3 of them; 30 round wins out of 50 overall</td>
+            <td class="lemma-cell">G079_pinglamb_had_a_perfect_clear_in_7_rounds_and_won_3_of_them_30_round_wi</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G080">
+            <td class="id-cell">G080</td>
+            <td class="canto-cell">有 7 局係全場淨係 pinglamb 做到 Perfect Clear，入面佢仲要輸咗 4 局</td>
+            <td class="gloss-cell">7 rounds where only pinglamb got a perfect clear; pinglamb lost 4 of them</td>
+            <td class="lemma-cell">G080_7_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_4_of_th</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
           <tr id="claim-C001">
             <td class="id-cell">C001</td>
             <td class="canto-cell">六場 match 嘅最後一局，全部 pinglamb 攞——包括三場打到 5 比 4 嘅決勝局</td>
@@ -5420,11 +5519,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><td>Mountainous Stacking 2 <span class="mono">＝</span> Mountainous Stacking</td><td class="mono">6 手</td><td>wiki 2（定式庫冇收）</td><td class="mono">2（0）</td><td class="mono">2／2</td><td class="mono">17（0）</td><td class="mono">12／17</td></tr>
           <tr><td>Mountainous Stacking 3</td><td class="mono">6 手</td><td>wiki 2（定式庫冇收）</td><td class="mono">0（2）</td><td class="mono">0／0</td><td class="mono">0（17）</td><td class="mono">0／0</td></tr>
           <tr><td>TKI 3 Opening</td><td class="mono">6 手</td><td>wiki 4（定式庫有 12 版，冇一版用得）</td><td class="mono">0（2）</td><td class="mono">0／0</td><td class="mono">7（17）</td><td class="mono">7／7</td></tr>
-          <tr><td>Perfect Clear Opener</td><td class="mono">6 手、7 手</td><td>wiki 4 + 定式庫 4</td><td class="mono">0（2）</td><td class="mono">—</td><td class="mono">0（17）</td><td class="mono">—</td></tr>
+          <tr><td>Perfect Clear Opener</td><td class="mono">6 手、7 手</td><td>wiki 4 + 定式庫 4</td><td class="mono">0（2）</td><td class="mono">0／0</td><td class="mono">0（17）</td><td class="mono">0／0</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="method-note"><p><strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>：兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 <code>facts.json</code>。今個 session 讀到嘅係：pinglamb <strong>0</strong> 次、yachi <strong>0</strong> 次。即係話<strong>今晚一個 Perfect Clear 都冇出過</strong>——所以就算開局個形撞啱 0 次，都<strong>冇一次真係做成個 PCO</strong>。形似唔等於打得成。</p></div>
+    <div class="method-note"><p><strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>：兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 <code>facts.json</code>。今個 session 讀到嘅係：pinglamb <strong>7</strong> 次、yachi <strong>3</strong> 次。開局個形撞啱 0 次，而成晚 Perfect Clear 有 10 次——呢兩個數係上限同下限嘅關係，唔可以當成同一件事。「有冇」同「幾時」係兩個問題，兩個來源。<strong>幾時</strong>要靠模擬器答，而佢喺呢度講得出聲，係因為佢<strong>逐個回合</strong>嘅全消次數同 <code>.ttrm</code> 本身嗰個數對過：100／100 個回合啱，全場 10 對 10 次。對到之後見到嘅係：pinglamb 落喺第 20 手、yachi 落喺第 15、20 手。harddrop 畫 PCO 嘅死線係<strong>頭 10 手</strong>，而呢 10 次入面得 <strong>0</strong> 次趕得切——即係話呢啲全消<strong>基本上係中盤打出嚟</strong>，唔係開局定式嘅成果。</p></div>
   </div>
 </section>
 <!-- END generated openers -->
@@ -5486,8 +5585,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 <script type="application/json" id="claims-data">
 {
   "proof_map_available": true,
-  "total_claims": 88,
-  "verified_count": 88,
+  "total_claims": 92,
+  "verified_count": 92,
   "claims": [
     {
       "id": "G001",
@@ -6246,6 +6345,46 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "english_gloss": "unqualified session peak vs_x1000 is 217716 by pinglamb at m1r4, a 31s round — not the record",
       "category": "pace",
       "lemma": "G076_unqualified_session_peak_vs_x1000_is_217716_by_pinglamb_at_m1r4_a_31s",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G077",
+      "source": "generated",
+      "canto": "yachi 有 3 局做到 Perfect Clear，入面贏咗 2 局；佢成晚打 50 局贏 20 局",
+      "english_gloss": "yachi had a perfect clear in 3 rounds and won 2 of them; 20 round wins out of 50 overall",
+      "category": "style",
+      "lemma": "G077_yachi_had_a_perfect_clear_in_3_rounds_and_won_2_of_them_20_round_wins",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G078",
+      "source": "generated",
+      "canto": "有 3 局係全場淨係 yachi 做到 Perfect Clear，入面佢仲要輸咗 1 局",
+      "english_gloss": "3 rounds where only yachi got a perfect clear; yachi lost 1 of them",
+      "category": "style",
+      "lemma": "G078_3_rounds_where_only_yachi_got_a_perfect_clear_yachi_lost_1_of_them",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G079",
+      "source": "generated",
+      "canto": "pinglamb 有 7 局做到 Perfect Clear，入面贏咗 3 局；佢成晚打 50 局贏 30 局",
+      "english_gloss": "pinglamb had a perfect clear in 7 rounds and won 3 of them; 30 round wins out of 50 overall",
+      "category": "style",
+      "lemma": "G079_pinglamb_had_a_perfect_clear_in_7_rounds_and_won_3_of_them_30_round_wi",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G080",
+      "source": "generated",
+      "canto": "有 7 局係全場淨係 pinglamb 做到 Perfect Clear，入面佢仲要輸咗 4 局",
+      "english_gloss": "7 rounds where only pinglamb got a perfect clear; pinglamb lost 4 of them",
+      "category": "style",
+      "lemma": "G080_7_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_4_of_th",
       "status": "verified",
       "status_label": "已驗證"
     },
