@@ -1,5 +1,6 @@
 /**
- * Emit the C-Spin and DT Cannon metrics as DATA, one artifact per session.
+ * Emit the opener metrics as DATA, one artifact per session — C-Spin and DT Cannon by the order
+ * of their two T-spins, and six NAMED openers by the shape of the opening board.
  *
  *   REPLAY_DIR=sessions/2026-08-09 bun pipeline/sim/emit-opener-facts.ts \
  *     --out sessions/2026-08-09/sim/opener-facts.json
@@ -10,7 +11,7 @@
  * these numbers. The file therefore carries `report_eligible: false`, the section it feeds mints no
  * claim ids and no ✓ badges, and none of it may be merged into report/facts.json.
  *
- * THREE METRICS, each paired with the control that says what it is NOT.
+ * FIVE METRICS, each paired with the control that says what it is NOT.
  *
  * 1. FIRST BAG vs the community catalogue. After seven locks with no clear and no garbage a board
  *    holds exactly 28 cells; `openers/match.ts` compares it with every catalogue page at that cell
@@ -50,14 +51,38 @@
  *    which is what "this is a T-spin Triple slot" looks like, not what "this is the C-Spin opener"
  *    looks like. The number is emitted so the section can SHOW that, not so it can claim the spins.
  *
+ * 4. NAMED OPENERS — Honey Cup, Stray Cannon, Mountainous Stacking 1/2/3, TKI-3 and the Perfect
+ *    Clear Opener, each against its own drawings (`openers/wiki-openers.json` plus every clean
+ *    catalogue page of the same opener). This is the metric that answers "which opener", where
+ *    (2) can only answer "which class".
+ *
+ *    Two controls, because this metric has two ways of lying.
+ *
+ *    The BASELINE says which column may be read. Scored against the openers a player is NOT
+ *    playing, the `<= NEAR_CELLS` band is reached about as often as against the opener in
+ *    question — these boards sit 3-4 cells from almost any opener page — so that column
+ *    discriminates nothing and only an EXACT match separates. Both are emitted side by side so
+ *    the section can show it rather than assert it.
+ *
+ *    The OPPORTUNITY COUNT is the denominator. An opener is only scored on boards sampled at the
+ *    lock count it is DRAWN at, and `occupancy_aliases` / `round_overlap` name the openers whose
+ *    columns are the same rounds twice (Mountainous Stacking 1 and 2 are one shape built from
+ *    different pieces, which a filled/empty grid cannot tell apart).
+ *
+ * 5. ORDERING CLASS — the control on (2), transcribed from harddrop's own category listing.
+ *    "A Triple before a Double" is the signature of 38 catalogued openers, C-Spin and Honey Cup
+ *    among them, so (2) names a CLASS and never a member. This was found by measuring (4): a
+ *    session running Honey Cup every round produces exactly the 221-of-221 that had been read as
+ *    a C-Spin result.
+ *
  * Rates are integers scaled x1000, matching report/facts.json and forecast-facts.json.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { loadCases, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
 import { H } from './sim.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
-import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS }
-  from '../openers/match.ts';
+import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS,
+         loadWikiOpeners, openerPages, hasFullRow } from '../openers/match.ts';
 
 /** Three bags. The wiki's C-Spin follow-up is "a Double within about three bags of the Triple", and
  *  a window has to be a number: 21 pieces is that phrase read literally. It is emitted rather than
@@ -69,9 +94,28 @@ const WINDOW_PIECES = 21;
  *  5-8 band that every real board in this corpus lands in. */
 const NEAR_CELLS = 4;
 
+/** Lock counts at which the opening board is sampled and offered to the matcher.
+ *
+ *  This used to be 7 alone, and 7 alone was a COVERAGE BUG rather than a choice. A player who keeps
+ *  a piece in hold through bag 1 has locked SIX pieces when the bag is done, and that is how
+ *  harddrop draws four of the six openers named here — Stray Cannon ("keep either S or Z in hold"),
+ *  Mountainous Stacking 1/2/3, TKI-3. A 24-cell field can never equal a 28-cell board, so those
+ *  openers were not scoring zero: they were never being compared. The same blind spot hid 75 of the
+ *  catalogue's 299 clean pages, including the PCO setup that keeps the I piece on hold.
+ *
+ *  6 and 7 are the two lock counts a first bag can end on (hold used, or not). */
+const OPENER_LOCKS = [6, 7] as const;
+
 const cat = loadCatalogue();
 const prepared = prepare(cat.pages);
 const catNames: string[] = [...new Set(cat.pages.map(p => p.name))];
+
+/** harddrop's own drawings and its own category listing (pipeline/openers/wiki-openers.json). */
+const wiki = loadWikiOpeners();
+const tdc = wiki.triple_double_category;
+/** How many catalogue pages could never match a real opening board because a full row would have
+ *  cleared. Emitted, not just asserted, because it is the size of the metric's blind spot. */
+const catClean = prepared.filter(p => !hasFullRow(p.page.rows)).length;
 
 const WIKI_CSPIN = JSON.parse(readFileSync(`${import.meta.dir}/wiki-cspin-boards.json`, 'utf8')) as
   { rows: string[]; piece: { row: number; col: number }[]; lines: number }[];
@@ -123,6 +167,9 @@ const sets = NAME_SETS.map(s => {
 
 // ── walk the session ───────────────────────────────────────────────────────────────────────────
 interface Bag { user: string; grid: string[] }
+/** an opening board sampled after `locks` locks, with no clear and no garbage before it.
+ *  `round` indexes `rounds`, so a shape match can be cross-tabbed against what that round did. */
+interface CleanBoard { user: string; round: number; locks: number; grid: string[] }
 interface Round { user: string; verified: number; spinsVerified: { i: number; cleared: number }[];
                   spinsAll: { i: number; cleared: number }[] }
 
@@ -137,6 +184,7 @@ interface Round { user: string; verified: number; spinsVerified: { i: number; cl
  */
 export function build(dir: string) {
 const bags: Bag[] = [];
+const cleanBoards: CleanBoard[] = [];
 const rounds: Round[] = [];
 const spinWindows: { user: string; lines: number; drawn: boolean; mirrored: boolean }[] = [];
 let roundsTotal = 0;
@@ -168,15 +216,24 @@ for (const c of loadCases(dir)) {
                        mirrored: wikiMasks.some(w => eq(w.mirror)) });
   }
 
-  // first bag: seven locks, no clear, no garbage, all inside the verified prefix
-  if (v < 6) continue;
-  let clean = true;
-  for (let i = 0; i <= 6; i++) if (r.locks[i]!.cleared > 0) clean = false;
-  for (const g of r.garbageEvents) if (g.lockIndex <= 6) clean = false;
-  if (!clean) continue;
-  const rows = rowsFromBoard(r.boards[6]! as (string | null)[][]);
-  if (!rows) continue;
-  bags.push({ user: c.user, grid: occGrid(rows) });
+  // The opening board after n locks, for each n an opener can end its first bag on: no line clear
+  // and no garbage before that point, and the whole prefix inside the verified window.
+  for (const n of OPENER_LOCKS) {
+    if (v < n - 1) continue;
+    let clean = true;
+    for (let i = 0; i < n; i++) if (r.locks[i]!.cleared > 0) clean = false;
+    for (const g of r.garbageEvents) if (g.lockIndex < n) clean = false;
+    if (!clean) continue;
+    const board = r.boards[n - 1];
+    if (!board) continue;
+    const rows = rowsFromBoard(board as (string | null)[][]);
+    if (!rows) continue;
+    cleanBoards.push({ user: c.user, round: rounds.length - 1, locks: n, grid: occGrid(rows) });
+    // `bags` is the seven-lock series the original first-bag metric is defined over. Kept as its
+    // own list rather than filtered out of `cleanBoards` at each use, so that metric's numbers are
+    // provably untouched by the widening: five sessions re-emit byte-identical first_bag blocks.
+    if (n === 7) bags.push({ user: c.user, grid: occGrid(rows) });
+  }
 }
 
 const users = [...new Set(rounds.map(r => r.user))].sort();
@@ -251,6 +308,148 @@ function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: num
   };
 }
 
+// ── metric 4: the named openers ────────────────────────────────────────────────────────────────
+// One row per opener the report talks about, scored the same way for all of them: the player's
+// clean opening boards against that opener's own drawings.
+//
+// THE CONTROL IS THE OPPORTUNITY COUNT, and it is `boards_scored`. A rate needs a denominator and
+// the denominator here is not "rounds" — it is "rounds whose opening board was sampled at a lock
+// count this opener is even drawn at". Stray Cannon is drawn at six locks, so a round that never
+// produced a clean six-lock board cannot show a Stray Cannon and must not be counted against it.
+// Printing `0 of 522 rounds` where the truth is `0 of 431 comparable boards` would be inventing
+// evidence of absence out of a sampling gap — which is precisely the bug OPENER_LOCKS just fixed.
+/** The opener's payoff, scored over VERIFIED spins inside the opener window.
+ *
+ *  Verified, not merely simulated, and that is not caution for its own sake — this file already had
+ *  one metric built on an unverified simulator flag and it was wrong. `eng.board.perfectClear` from
+ *  the vendored engine reports a perfect clear in 10 of 08-09's 100 rounds, always at lock 19 and
+ *  almost always past the verified prefix, while BOTH independent extractors read `clears.allclear`
+ *  straight out of the .ttrm and agree the session had ZERO. facts.json wins; the flag is not used
+ *  anywhere in this artifact, and PCO's payoff is bounded by `session_perfect_clears` below instead.
+ *
+ *  Triple-before-Double is the signature of the whole `Triple Double openers` category — see
+ *  `ordering_class` for why it can never name which member was played. */
+const openedTripleFirst = (r: Round) => {
+  const s = r.spinsVerified.filter(x => x.i <= WINDOW_PIECES);
+  const t = s.filter(x => x.cleared === 3), d = s.filter(x => x.cleared === 2);
+  return t.some(x => d.some(y => x.i < y.i));
+};
+/** TKI-3's payoff is the opening T-spin Double it is named for (開幕TSD), not a Triple Double. */
+const openedDouble = (r: Round) =>
+  r.spinsVerified.some(x => x.i <= WINDOW_PIECES && x.cleared === 2);
+
+function namedOpenerFor(op: ReturnType<typeof loadWikiOpeners>['openers'][number]) {
+  const pool = openerPages(op, prepared);
+  const locks = new Set(pool.locks);
+  const inTD = tdc.members.includes(op.page);
+
+  // THE BASELINE, and the reason `within_threshold` may not be read as a hit rate. Every clean
+  // catalogue page at the same lock counts, minus this opener's own fields: what a board scores
+  // against openers it is NOT playing. Measured, these boards sit 3-4 cells from almost any opener
+  // page, so the <=4 band is ~90% for everything and discriminates nothing; only an EXACT match
+  // separates the openers. Emitting the baseline is what lets a reader see that, instead of
+  // reading 89% as "89% Honey Cup".
+  const own = new Set(pool.pages.flatMap(p => [p.grid.join('/'), p.mirror.join('/')]));
+  const control = prepared.filter(p =>
+    locks.has(p.cells / 4) && !hasFullRow(p.page.rows)
+    && !own.has(p.grid.join('/')) && !own.has(p.mirror.join('/')));
+
+  const players = users.map(user => {
+    const mine = cleanBoards.filter(b => b.user === user && locks.has(b.locks));
+    const bandsOut = emptyBands();
+    let min: number | null = null, within = 0, exact = 0, baseExact = 0, baseWithin = 0;
+    const matched: number[] = [];
+    for (const b of mine) {
+      const d = nearest(b.grid, pool.pages).d;
+      if (Number.isFinite(d)) {
+        bandsOut[band(d)]!++;
+        if (min === null || d < min) min = d;
+        if (d <= NEAR_CELLS) within++;
+        if (d === 0) { exact++; matched.push(b.round); }
+      }
+      const c = nearest(b.grid, control).d;
+      if (Number.isFinite(c)) { if (c === 0) baseExact++; if (c <= NEAR_CELLS) baseWithin++; }
+    }
+    // The outcome check: of the boards that ARE this opener's field, how many went on to do what
+    // the opener is for? A shape with no outcome behind it is a coincidence of stacking.
+    const rs = [...new Set(matched)].map(i => rounds[i]!);
+    const did = inTD ? rs.filter(openedTripleFirst).length
+              : op.key === 'tki_3' ? rs.filter(openedDouble).length
+              : null;   // PCO's payoff is a perfect clear; see session_perfect_clears
+    return {
+      user, boards_scored: mine.length,
+      exact, min_cells: min,
+      within_threshold: within, share_x1000: rate(within, mine.length),
+      bands: bandsOut,
+      baseline: { exact: baseExact, within_threshold: baseWithin, pages: control.length },
+      matched_rounds: rs.length,
+      matched_and_delivered: did,
+      _rounds: [...new Set(matched)],
+    };
+  });
+  // Which OTHER named openers this one cannot be told apart from. Occupancy is the key that
+  // decides (see match.ts), and Mountainous Stacking 1 and 2 are drawn from different pieces into
+  // the SAME first-bag shape — they differ in which piece is held, which a filled/empty grid
+  // cannot see. Their rows are therefore identical in every session, and a reader summing the
+  // table would count one opening twice. Derived by comparing the fields, never typed in, so a
+  // redrawn wiki page changes the alias list instead of leaving a stale note behind.
+  const keys = new Set(pool.pages.flatMap(p => [p.grid.join('/'), p.mirror.join('/')]));
+  const aliases = wiki.openers
+    .filter(o => o.key !== op.key)
+    .filter(o => openerPages(o, prepared).pages
+      .some(p => keys.has(p.grid.join('/')) || keys.has(p.mirror.join('/'))))
+    .map(o => o.wiki);
+
+  return {
+    key: op.key, wiki: op.wiki, jp: op.jp, page: op.page, url: op.url, wiki_says: op.wiki_says,
+    in_triple_double_category: inTD,
+    /** named openers with an identical first-bag field — their columns are not independent */
+    occupancy_aliases: aliases,
+    delivers: inTD ? `a T-spin Triple before a T-spin Double within ${WINDOW_PIECES} pieces`
+            : op.key === 'tki_3' ? `a T-spin Double within ${WINDOW_PIECES} pieces`
+            : null,
+    drawn_at_locks: pool.locks,
+    pages: pool.source,
+    players,
+  };
+}
+
+/**
+ * The bound on the PCO row, taken from the VERIFIED source rather than from the simulator.
+ *
+ * PCO is the one opener here defined by an event instead of a picture — harddrop calls it "a
+ * Perfect Clear in the first 4 lines of a game (10 dropped pieces)" — so its shape metric begs to
+ * be checked against whether the perfect clear actually arrived. The simulator cannot answer that:
+ * see `openedTripleFirst` for the measurement that says so.
+ *
+ * `clears.allclear` in the .ttrm can answer it, and both independent extractors already read it
+ * into facts.json. So the count is taken from there and reported as a CEILING: a session with zero
+ * perfect clears cannot contain a completed PCO however many boards match its field, and that
+ * sentence is worth more than any similarity score.
+ *
+ * Returns null when facts.json is absent (bin/new-session emits the replays before the report), so
+ * a missing bound reads as "not known here" and never as "zero".
+ */
+function sessionPerfectClears(dir: string) {
+  let facts: { matches: { rounds: { players: Record<string, { allclear?: number }> }[] }[] };
+  try {
+    facts = JSON.parse(readFileSync(`${dir}/report/facts.json`, 'utf8'));
+  } catch {
+    return null;
+  }
+  const per: Record<string, number> = {};
+  for (const m of facts.matches)
+    for (const rd of m.rounds)
+      for (const [user, st] of Object.entries(rd.players))
+        per[user] = (per[user] ?? 0) + (st.allclear ?? 0);
+  return {
+    source: 'report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)',
+    means: 'an upper bound on completed Perfect Clear Openers: no perfect clears in the session '
+         + 'means no PCO was completed, whatever the opening field looked like',
+    per_player: Object.fromEntries(users.map(u => [u, per[u] ?? 0])),
+  };
+}
+
 // ── metric 3: slot geometry, cross-tabbed by lines (the control) ───────────────────────────────
 function slotRows() {
   const out = [];
@@ -269,6 +468,45 @@ function slotRows() {
 const session = dir.split('/').filter(Boolean).pop()!;
 const ordering = users.map(u => orderingFor(u, r => r.spinsVerified));
 const orderingFull = users.map(u => orderingFor(u, r => r.spinsAll));
+const namedRaw = wiki.openers.map(namedOpenerFor);
+
+/**
+ * How many ROUNDS each pair of named openers both claim — the control that says the columns are
+ * not independent and must not be summed.
+ *
+ * Two ways a round lands in two columns, and only the first is a drawing coincidence:
+ *   - identical fields (`occupancy_aliases`): Mountainous Stacking 1 and 2 are the same bag-1
+ *     shape built from different pieces, so every round matching one matches the other;
+ *   - different LOCK COUNTS: an opener drawn at six locks and one drawn at seven are compared
+ *     against two different snapshots of the same round, so a round can genuinely be on its way to
+ *     one shape at six locks and be the other at seven.
+ * Neither is an error. Publishing a table whose rows sum past the round count without saying so
+ * would be.
+ */
+const overlap = (() => {
+  const keys = namedRaw.map(o => o.key);
+  const setOf = (o: typeof namedRaw[number]) =>
+    new Set(o.players.flatMap(p => p._rounds));
+  const out: Record<string, Record<string, number>> = {};
+  for (let i = 0; i < namedRaw.length; i++) {
+    const a = setOf(namedRaw[i]!);
+    if (!a.size) continue;
+    const row: Record<string, number> = {};
+    for (let j = 0; j < namedRaw.length; j++) {
+      if (i === j) continue;
+      const shared = [...setOf(namedRaw[j]!)].filter(r => a.has(r)).length;
+      if (shared) row[keys[j]!] = shared;
+    }
+    if (Object.keys(row).length) out[keys[i]!] = row;
+  }
+  return out;
+})();
+
+/** `_rounds` is working state for the overlap matrix, not a published field. */
+const named = namedRaw.map(o => ({
+  ...o,
+  players: o.players.map(({ _rounds, ...p }) => p),
+}));
 
 /** Every reason this artifact is not report-eligible, DERIVED rather than typed, so it cannot
  *  describe a state the data has left. */
@@ -289,6 +527,13 @@ function notEligibleBecause() {
   const covered = ordering.reduce((a, p) => a + p.rounds_with_both, 0);
   why.push(`the ordering metric is scored on ${covered} of ${scored} rounds — those holding both a `
     + 'T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order');
+  why.push(`the ordering metric names a CLASS, not an opener: harddrop files ${tdc.members.length} `
+    + `openers under "${tdc.name}" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking `
+    + 'among them — and every one of them opens Triple-before-Double');
+  why.push(`the named-opener match is bounded by how each opener is DRAWN: ${catClean} of `
+    + `${cat.pages.length} catalogue pages are free of a full row and so could ever equal a `
+    + 'no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is '
+    + 'why harddrop\'s own diagrams are carried alongside');
   return why;
 }
 
@@ -325,6 +570,44 @@ return {
   ordering: { scope: 'verified prefix', players: ordering },
   ordering_full_round: { scope: 'whole simulated round, verification NOT required', players: orderingFull },
   slot_geometry: { source: 'harddrop.com/wiki/C-Spin', placements: WIKI_CSPIN.length, rows: slotRows() },
+
+  /** The control on the ordering metric, and the reason it may not be printed as a C-Spin count.
+   *
+   *  `cspin_order` counts "a T-spin Triple before a T-spin Double in the opener". harddrop keeps a
+   *  category for exactly that shape — `Triple Double openers`, 38 of them — and C-Spin is one
+   *  member of it, alongside Honey Cup, Stray Cannon and Mountainous Stacking. So the number
+   *  identifies the CLASS and cannot distinguish its members; a session that ran Honey Cup every
+   *  round would produce precisely the same 221-of-221.
+   *
+   *  This is transcribed from harddrop's category page rather than assembled here, because a class
+   *  this repo drew for itself would be a class chosen to fit the result. */
+  ordering_class: {
+    source: tdc.url, name: tdc.name, says: tdc.says, openers: tdc.members.length,
+    members: tdc.members,
+    means: 'a Triple-before-Double opening is the signature of this whole category, not of any one '
+         + 'opener in it — the ordering metric cannot name which member was played',
+  },
+
+  /** Per-opener coverage and match, one row per opener the report names. */
+  named_openers: {
+    source: wiki.source,
+    why_a_second_source: wiki.why,
+    provenance: wiki.provenance,
+    catalogue_pages: cat.pages.length,
+    catalogue_pages_clean: catClean,
+    sampled_at_locks: [...OPENER_LOCKS],
+    /** rounds claimed by two openers at once — see the comment on `overlap` */
+    round_overlap: overlap,
+    boards: {
+      total: cleanBoards.length,
+      by_locks: Object.fromEntries(OPENER_LOCKS.map(n =>
+        [n, cleanBoards.filter(b => b.locks === n).length])),
+    },
+    openers: named,
+  },
+
+  /** The ceiling on the PCO row, from the verified extractors rather than from this simulator. */
+  session_perfect_clears: sessionPerfectClears(dir),
 };
 }
 
@@ -366,6 +649,24 @@ if (import.meta.main) {
   for (const r of out.slot_geometry.rows)
     console.log(`  ${r.lines}-line  n=${String(r.n).padStart(4)}  matched=${String(r.matched).padStart(4)}  `
       + `${r.share_x1000 === null ? 'n/a' : (r.share_x1000 / 10).toFixed(1) + '%'}`);
+  console.log(`\nnamed openers (${out.named_openers.boards.total} clean opening boards, `
+    + `by locks ${JSON.stringify(out.named_openers.boards.by_locks)}):`);
+  for (const o of out.named_openers.openers) {
+    const src = o.pages;
+    console.log(`  ${o.key.padEnd(14)} drawn at ${JSON.stringify(o.drawn_at_locks)} `
+      + `(wiki ${src.wiki_fields}, catalogue ${src.catalogue_clean}/${src.catalogue_named} clean)`);
+    for (const p of o.players)
+      console.log(`      ${p.user.padEnd(10)} n=${String(p.boards_scored).padStart(3)}  `
+        + `exact=${String(p.exact).padStart(3)} (baseline ${p.baseline.exact})  min=${p.min_cells}  `
+        + `<=${out.near_cells}:${p.within_threshold} (baseline ${p.baseline.within_threshold})  `
+        + `delivered=${p.matched_and_delivered}/${p.matched_rounds}`);
+  }
+  console.log('\nPCO ceiling (verified source): '
+    + (out.session_perfect_clears
+       ? JSON.stringify(out.session_perfect_clears.per_player) + ' perfect clears in the session'
+       : 'facts.json not present — not known here'));
+  console.log(`\nordering control: ${out.ordering_class.openers} openers share the `
+    + `Triple-before-Double signature (${out.ordering_class.name})`);
   console.log('\nnot report-eligible because:');
   for (const w of out.not_eligible_because) console.log(`  - ${w}`);
 }

@@ -5,7 +5,9 @@
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
     "the slot-geometry match is a SHAPE test, not an opener test: 88.0% of Triples match the wiki window against 11.3% of Doubles, over 544 verified T-spins",
-    "the ordering metric is scored on 60 of 98 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order"
+    "the ordering metric is scored on 60 of 98 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
+    "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
+    "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside"
   ],
   "session": "2026-07-24",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -368,5 +370,598 @@
         "share_x1000": 880
       }
     ]
+  },
+  "ordering_class": {
+    "source": "https://harddrop.com/wiki/Category:Triple_Double_openers",
+    "name": "Triple Double openers",
+    "says": "openers that begin with a Triple Double Attack, or any variant thereof",
+    "openers": 38,
+    "members": [
+      "1-11th Compromise Cannon",
+      "1-5th End Cannon",
+      "Aitch Stacking",
+      "Azyara Spin",
+      "Bakery TD",
+      "C-Spin",
+      "Desert stacking",
+      "Donut Stacking",
+      "Dot Cannon",
+      "Gamushiro Stacking",
+      "Gravity TD",
+      "Hardtack Stacking",
+      "Honey Cup",
+      "Lime Stacking",
+      "Loyal TD",
+      "Magic TD",
+      "Manhole Stacking",
+      "Mountainous Stacking",
+      "OJI Honey Cup",
+      "Olive Stacking",
+      "Operability TD",
+      "PC-Spin",
+      "PC-Spin (Okey Version)",
+      "Pancake Stacking",
+      "Plate TD",
+      "Pseudo-PC",
+      "Rabbit Stacking",
+      "Ruby Stacking",
+      "SkTD",
+      "Solitary Moon Stacking",
+      "Stray Cannon",
+      "Tandoori Chicken Stacking",
+      "Triple Triple PC",
+      "Tsar Cannon",
+      "Waiting Moon Stacking",
+      "Yamaha Stacking",
+      "Yuchan Cannon",
+      "：-0 Stacking"
+    ],
+    "means": "a Triple-before-Double opening is the signature of this whole category, not of any one opener in it — the ordering metric cannot name which member was played"
+  },
+  "named_openers": {
+    "source": "harddrop.com/wiki",
+    "why_a_second_source": "opener_db draws 484 of its 783 pages on a filled base, and a page with a full row can never equal a no-clear opening field; four of these six openers have no clean catalogue page at all",
+    "provenance": [
+      {
+        "page": "Honey_Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "oldid": 41477,
+        "sha256": "a12439a6f2747c3687b006c0aba9b2c334019d3e7b8ad375f377f388494d95b3",
+        "bytes": 599322
+      },
+      {
+        "page": "Mountainous_Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "oldid": 43651,
+        "sha256": "f26c3cb05e02fbb58a49744df6e2dabb77135caeab2175a456a2bc3af4e055cc",
+        "bytes": 1941960
+      },
+      {
+        "page": "Perfect_Clear_Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "oldid": 43630,
+        "sha256": "e3be1c1272fcbbba196b45dc39b8583d5869318a37a1a3904b9f82de11d5ab13",
+        "bytes": 2209943
+      },
+      {
+        "page": "Stray_Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "oldid": 41406,
+        "sha256": "5952028d6a1373593dfcc7d3d808e10283ec58dd59b21ddee36986edf628cdb3",
+        "bytes": 660851
+      },
+      {
+        "page": "TKI_3_Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "oldid": 41439,
+        "sha256": "024520e28e69f4d56de2f01f15881baa136a499ae8ddc2aa9112aeb466c5938c",
+        "bytes": 2350135
+      }
+    ],
+    "catalogue_pages": 783,
+    "catalogue_pages_clean": 299,
+    "sampled_at_locks": [
+      6,
+      7
+    ],
+    "round_overlap": {
+      "mountainous_1": {
+        "mountainous_2": 14
+      },
+      "mountainous_2": {
+        "mountainous_1": 14
+      }
+    },
+    "boards": {
+      "total": 187,
+      "by_locks": {
+        "6": 98,
+        "7": 89
+      }
+    },
+    "openers": [
+      {
+        "key": "honey_cup",
+        "wiki": "Honey Cup",
+        "jp": "はちみつ砲",
+        "page": "Honey Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "wiki_says": "a TST to TSD opener; the Perfect Clear rate is 90%",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          7
+        ],
+        "pages": {
+          "wiki_fields": 1,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 48,
+            "exact": 17,
+            "min_cells": 0,
+            "within_threshold": 38,
+            "share_x1000": 791,
+            "bands": {
+              "0": 17,
+              "1-2": 21,
+              "3-4": 0,
+              "5-8": 3,
+              "9-14": 6,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 38,
+              "pages": 224
+            },
+            "matched_rounds": 17,
+            "matched_and_delivered": 12
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 41,
+            "exact": 6,
+            "min_cells": 0,
+            "within_threshold": 25,
+            "share_x1000": 609,
+            "bands": {
+              "0": 6,
+              "1-2": 19,
+              "3-4": 0,
+              "5-8": 4,
+              "9-14": 12,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 2,
+              "within_threshold": 27,
+              "pages": 224
+            },
+            "matched_rounds": 6,
+            "matched_and_delivered": 4
+          }
+        ]
+      },
+      {
+        "key": "stray_cannon",
+        "wiki": "Stray Cannon",
+        "jp": "迷走砲",
+        "page": "Stray Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "wiki_says": "a TD opener; 75% build rate on bag 1 (90% with mirror) if S/Z is held",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 50,
+            "exact": 14,
+            "min_cells": 0,
+            "within_threshold": 19,
+            "share_x1000": 380,
+            "bands": {
+              "0": 14,
+              "1-2": 5,
+              "3-4": 0,
+              "5-8": 27,
+              "9-14": 3,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 3,
+              "within_threshold": 19,
+              "pages": 75
+            },
+            "matched_rounds": 14,
+            "matched_and_delivered": 9
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 48,
+            "exact": 20,
+            "min_cells": 0,
+            "within_threshold": 20,
+            "share_x1000": 416,
+            "bands": {
+              "0": 20,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 20,
+              "9-14": 7,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 12,
+              "within_threshold": 20,
+              "pages": 75
+            },
+            "matched_rounds": 20,
+            "matched_and_delivered": 15
+          }
+        ]
+      },
+      {
+        "key": "mountainous_1",
+        "wiki": "Mountainous Stacking",
+        "jp": "山岳積み",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "a Triple Double opener; T-Spin Triple in the second bag, Perfect Clear chance in the third; 53.33% setup rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking 2"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 2,
+          "catalogue_clean": 2
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 50,
+            "exact": 3,
+            "min_cells": 0,
+            "within_threshold": 17,
+            "share_x1000": 340,
+            "bands": {
+              "0": 3,
+              "1-2": 14,
+              "3-4": 0,
+              "5-8": 27,
+              "9-14": 5,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 19,
+              "pages": 73
+            },
+            "matched_rounds": 3,
+            "matched_and_delivered": 3
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 48,
+            "exact": 11,
+            "min_cells": 0,
+            "within_threshold": 18,
+            "share_x1000": 375,
+            "bands": {
+              "0": 11,
+              "1-2": 6,
+              "3-4": 1,
+              "5-8": 23,
+              "9-14": 6,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 19,
+              "pages": 73
+            },
+            "matched_rounds": 11,
+            "matched_and_delivered": 10
+          }
+        ]
+      },
+      {
+        "key": "mountainous_2",
+        "wiki": "Mountainous Stacking 2",
+        "jp": "山岳積み2",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking; the L piece (J mirrored) is held until the second bag; 100% stack rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 50,
+            "exact": 3,
+            "min_cells": 0,
+            "within_threshold": 17,
+            "share_x1000": 340,
+            "bands": {
+              "0": 3,
+              "1-2": 14,
+              "3-4": 0,
+              "5-8": 27,
+              "9-14": 5,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 19,
+              "pages": 73
+            },
+            "matched_rounds": 3,
+            "matched_and_delivered": 3
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 48,
+            "exact": 11,
+            "min_cells": 0,
+            "within_threshold": 18,
+            "share_x1000": 375,
+            "bands": {
+              "0": 11,
+              "1-2": 6,
+              "3-4": 1,
+              "5-8": 23,
+              "9-14": 6,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 19,
+              "pages": 73
+            },
+            "matched_rounds": 11,
+            "matched_and_delivered": 10
+          }
+        ]
+      },
+      {
+        "key": "mountainous_3",
+        "wiki": "Mountainous Stacking 3",
+        "jp": "山岳積み3",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking 2; the O piece is held; for a J/L start",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 50,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 20,
+            "share_x1000": 400,
+            "bands": {
+              "0": 0,
+              "1-2": 3,
+              "3-4": 17,
+              "5-8": 22,
+              "9-14": 7,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 3,
+              "within_threshold": 19,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 48,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 17,
+            "share_x1000": 354,
+            "bands": {
+              "0": 0,
+              "1-2": 11,
+              "3-4": 6,
+              "5-8": 24,
+              "9-14": 2,
+              "15+": 5
+            },
+            "baseline": {
+              "exact": 12,
+              "within_threshold": 20,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          }
+        ]
+      },
+      {
+        "key": "tki_3",
+        "wiki": "TKI 3 Opening",
+        "jp": "開幕TSD",
+        "page": "TKI 3 Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "wiki_says": "three T-Spin Doubles and a T-Spin Triple to finish; the I piece comes before Z",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 12,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 50,
+            "exact": 0,
+            "min_cells": 8,
+            "within_threshold": 0,
+            "share_x1000": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 1,
+              "9-14": 46,
+              "15+": 3
+            },
+            "baseline": {
+              "exact": 3,
+              "within_threshold": 19,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 48,
+            "exact": 5,
+            "min_cells": 0,
+            "within_threshold": 5,
+            "share_x1000": 104,
+            "bands": {
+              "0": 5,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 2,
+              "9-14": 39,
+              "15+": 2
+            },
+            "baseline": {
+              "exact": 12,
+              "within_threshold": 20,
+              "pages": 75
+            },
+            "matched_rounds": 5,
+            "matched_and_delivered": 5
+          }
+        ]
+      },
+      {
+        "key": "pco",
+        "wiki": "Perfect Clear Opener",
+        "jp": "パフェクリテンプレ",
+        "page": "Perfect Clear Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "wiki_says": "the standard way to get a Perfect Clear in the first 4 lines (10 dropped pieces); 84.6% if the I piece is kept on hold, 61.2% if it is dropped",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": null,
+        "drawn_at_locks": [
+          6,
+          7
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 4,
+          "catalogue_clean": 4
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 98,
+            "exact": 0,
+            "min_cells": 4,
+            "within_threshold": 2,
+            "share_x1000": 20,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 2,
+              "5-8": 0,
+              "9-14": 87,
+              "15+": 9
+            },
+            "baseline": {
+              "exact": 3,
+              "within_threshold": 57,
+              "pages": 295
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": null
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 89,
+            "exact": 3,
+            "min_cells": 0,
+            "within_threshold": 3,
+            "share_x1000": 33,
+            "bands": {
+              "0": 3,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 1,
+              "9-14": 77,
+              "15+": 8
+            },
+            "baseline": {
+              "exact": 11,
+              "within_threshold": 47,
+              "pages": 295
+            },
+            "matched_rounds": 2,
+            "matched_and_delivered": null
+          }
+        ]
+      }
+    ]
+  },
+  "session_perfect_clears": {
+    "source": "report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)",
+    "means": "an upper bound on completed Perfect Clear Openers: no perfect clears in the session means no PCO was completed, whatever the opening field looked like",
+    "per_player": {
+      "pinglamb": 0,
+      "yachi": 0
+    }
   }
 }

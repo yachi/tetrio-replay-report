@@ -1,0 +1,386 @@
+{
+  "schema": "wiki-openers/1",
+  "source": "harddrop.com/wiki",
+  "why": "opener_db draws 484 of its 783 pages on a filled base, and a page with a full row can never equal a no-clear opening field; four of these six openers have no clean catalogue page at all",
+  "cell_legend": {
+    ".": "empty",
+    "#": "occupied (occupancy view)",
+    "IJLOSTZ": "that piece as drawn",
+    "G": "grey — any piece"
+  },
+  "triple_double_category": {
+    "name": "Triple Double openers",
+    "url": "https://harddrop.com/wiki/Category:Triple_Double_openers",
+    "says": "openers that begin with a Triple Double Attack, or any variant thereof",
+    "declares": 38,
+    "members": [
+      "1-11th Compromise Cannon",
+      "1-5th End Cannon",
+      "Aitch Stacking",
+      "Azyara Spin",
+      "Bakery TD",
+      "C-Spin",
+      "Desert stacking",
+      "Donut Stacking",
+      "Dot Cannon",
+      "Gamushiro Stacking",
+      "Gravity TD",
+      "Hardtack Stacking",
+      "Honey Cup",
+      "Lime Stacking",
+      "Loyal TD",
+      "Magic TD",
+      "Manhole Stacking",
+      "Mountainous Stacking",
+      "OJI Honey Cup",
+      "Olive Stacking",
+      "Operability TD",
+      "PC-Spin",
+      "PC-Spin (Okey Version)",
+      "Pancake Stacking",
+      "Plate TD",
+      "Pseudo-PC",
+      "Rabbit Stacking",
+      "Ruby Stacking",
+      "SkTD",
+      "Solitary Moon Stacking",
+      "Stray Cannon",
+      "Tandoori Chicken Stacking",
+      "Triple Triple PC",
+      "Tsar Cannon",
+      "Waiting Moon Stacking",
+      "Yamaha Stacking",
+      "Yuchan Cannon",
+      "：-0 Stacking"
+    ]
+  },
+  "provenance": [
+    {
+      "page": "Honey_Cup",
+      "url": "https://harddrop.com/wiki/Honey_Cup",
+      "oldid": 41477,
+      "sha256": "a12439a6f2747c3687b006c0aba9b2c334019d3e7b8ad375f377f388494d95b3",
+      "bytes": 599322
+    },
+    {
+      "page": "Mountainous_Stacking",
+      "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+      "oldid": 43651,
+      "sha256": "f26c3cb05e02fbb58a49744df6e2dabb77135caeab2175a456a2bc3af4e055cc",
+      "bytes": 1941960
+    },
+    {
+      "page": "Perfect_Clear_Opener",
+      "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+      "oldid": 43630,
+      "sha256": "e3be1c1272fcbbba196b45dc39b8583d5869318a37a1a3904b9f82de11d5ab13",
+      "bytes": 2209943
+    },
+    {
+      "page": "Stray_Cannon",
+      "url": "https://harddrop.com/wiki/Stray_Cannon",
+      "oldid": 41406,
+      "sha256": "5952028d6a1373593dfcc7d3d808e10283ec58dd59b21ddee36986edf628cdb3",
+      "bytes": 660851
+    },
+    {
+      "page": "TKI_3_Opening",
+      "url": "https://harddrop.com/wiki/TKI_3_Opening",
+      "oldid": 41439,
+      "sha256": "024520e28e69f4d56de2f01f15881baa136a499ae8ddc2aa9112aeb466c5938c",
+      "bytes": 2350135
+    }
+  ],
+  "openers": [
+    {
+      "key": "honey_cup",
+      "wiki": "Honey Cup",
+      "jp": "はちみつ砲",
+      "catalogue": null,
+      "page": "Honey Cup",
+      "url": "https://harddrop.com/wiki/Honey_Cup",
+      "wiki_says": "a TST to TSD opener; the Perfect Clear rate is 90%",
+      "headings": [
+        "Honey Cup"
+      ],
+      "fields": [
+        {
+          "heading": "Honey Cup",
+          "locks": 7,
+          "cells": 28,
+          "rows": [
+            ".........J",
+            ".SS......J",
+            "SSL....TJJ",
+            "LLL.ZZTTOO",
+            "IIII.ZZTOO"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "stray_cannon",
+      "wiki": "Stray Cannon",
+      "jp": "迷走砲",
+      "catalogue": null,
+      "page": "Stray Cannon",
+      "url": "https://harddrop.com/wiki/Stray_Cannon",
+      "wiki_says": "a TD opener; 75% build rate on bag 1 (90% with mirror) if S/Z is held",
+      "headings": [
+        "Bag 1"
+      ],
+      "fields": [
+        {
+          "heading": "Bag 1",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "I.........",
+            "ILS.T..J..",
+            "ILSSTT.JOO",
+            "ILLST.JJOO"
+          ]
+        },
+        {
+          "heading": "Bag 1",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            ".........I",
+            "..L..T.ZJI",
+            "OOL.TTZZJI",
+            "OOLL.TZJJI"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mountainous_1",
+      "wiki": "Mountainous Stacking",
+      "jp": "山岳積み",
+      "catalogue": "Mountainous Stacking",
+      "page": "Mountainous Stacking",
+      "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+      "wiki_says": "a Triple Double opener; T-Spin Triple in the second bag, Perfect Clear chance in the third; 53.33% setup rate counting the mirror",
+      "headings": [
+        "First Bag"
+      ],
+      "fields": [
+        {
+          "heading": "First Bag",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "LS........",
+            "LSS....T..",
+            "LLS.ZZTTOO",
+            "IIII.ZZTOO"
+          ]
+        },
+        {
+          "heading": "First Bag",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "........ZJ",
+            "..T....ZZJ",
+            "OOTTSS.ZJJ",
+            "OOTSS.IIII"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mountainous_2",
+      "wiki": "Mountainous Stacking 2",
+      "jp": "山岳積み2",
+      "catalogue": null,
+      "page": "Mountainous Stacking",
+      "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+      "wiki_says": "successor to Mountainous Stacking; the L piece (J mirrored) is held until the second bag; 100% stack rate counting the mirror",
+      "headings": [
+        "Mountainous Stacking 2"
+      ],
+      "fields": [
+        {
+          "heading": "Mountainous Stacking 2",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "IS........",
+            "ISS....T..",
+            "IJS.ZZTTOO",
+            "IJJJ.ZZTOO"
+          ]
+        },
+        {
+          "heading": "Mountainous Stacking 2",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "........ZI",
+            "..T....ZZI",
+            "OOTTSS.ZLI",
+            "OOTSS.LLLI"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mountainous_3",
+      "wiki": "Mountainous Stacking 3",
+      "jp": "山岳積み3",
+      "catalogue": null,
+      "page": "Mountainous Stacking",
+      "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+      "wiki_says": "successor to Mountainous Stacking 2; the O piece is held; for a J/L start",
+      "headings": [
+        "Mountainous Stacking 3"
+      ],
+      "fields": [
+        {
+          "heading": "Mountainous Stacking 3",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "IS........",
+            "ISS....TL.",
+            "IJS.ZZTTL.",
+            "IJJJ.ZZTLL"
+          ]
+        },
+        {
+          "heading": "Mountainous Stacking 3",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "........ZI",
+            ".JT....ZZI",
+            ".JTTSS.ZLI",
+            "JJTSS.LLLI"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "tki_3",
+      "wiki": "TKI 3 Opening",
+      "jp": "開幕TSD",
+      "catalogue": "TKI-3",
+      "page": "TKI 3 Opening",
+      "url": "https://harddrop.com/wiki/TKI_3_Opening",
+      "wiki_says": "three T-Spin Doubles and a T-Spin Triple to finish; the I piece comes before Z",
+      "headings": [
+        "Castle Top variation",
+        "Fonzie variation",
+        "Flat Top variation",
+        "Early J setup"
+      ],
+      "fields": [
+        {
+          "heading": "Castle Top variation",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            ".........J",
+            ".........J",
+            "L..ZZ.S.JJ",
+            "L...ZZSSOO",
+            "LL.IIIISOO"
+          ]
+        },
+        {
+          "heading": "Fonzie variation",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            ".......J..",
+            "L..ZZ.SJJJ",
+            "L...ZZSSOO",
+            "LL.IIIISOO"
+          ]
+        },
+        {
+          "heading": "Flat Top variation",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "...JJJ....",
+            "L..ZZJS...",
+            "L...ZZSSOO",
+            "LL.IIIISOO"
+          ]
+        },
+        {
+          "heading": "Early J setup",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "...S......",
+            "L..SSOOZZ.",
+            "L...SOOJZZ",
+            "LL.IIIIJJJ"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "pco",
+      "wiki": "Perfect Clear Opener",
+      "jp": "パフェクリテンプレ",
+      "catalogue": "Perfect Clear Opener",
+      "page": "Perfect Clear Opener",
+      "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+      "wiki_says": "the standard way to get a Perfect Clear in the first 4 lines (10 dropped pieces); 84.6% if the I piece is kept on hold, 61.2% if it is dropped",
+      "headings": [
+        "First PC Success Rates"
+      ],
+      "fields": [
+        {
+          "heading": "First PC Success Rates",
+          "locks": 7,
+          "cells": 28,
+          "rows": [
+            "GGGG....GG",
+            "GGGG...GGG",
+            "GGGG..GGGG",
+            "GGGG...GGG"
+          ]
+        },
+        {
+          "heading": "First PC Success Rates",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "GGG.....GG",
+            "GGG....GGG",
+            "GGG...GGGG",
+            "GGG....GGG"
+          ]
+        },
+        {
+          "heading": "First PC Success Rates",
+          "locks": 7,
+          "cells": 28,
+          "rows": [
+            "GG....GGGG",
+            "GGG...GGGG",
+            "GGGG..GGGG",
+            "GGG...GGGG"
+          ]
+        },
+        {
+          "heading": "First PC Success Rates",
+          "locks": 6,
+          "cells": 24,
+          "rows": [
+            "GG.....GGG",
+            "GGG....GGG",
+            "GGGG...GGG",
+            "GGG....GGG"
+          ]
+        }
+      ]
+    }
+  ]
+}

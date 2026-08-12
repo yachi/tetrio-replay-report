@@ -15,8 +15,8 @@ why the ordering table is the section's spine. Order is a property only the simu
 `facts.json` counts `tspin_doubles` and `tspin_triples` but not which came first — so this is
 exactly the kind of question the quarantined tier exists to answer.
 
-THREE TABLES, THREE CONTROLS. Each table is paired with the thing that says what it is NOT,
-because each of these metrics has a way of looking like a finding when it is an artefact:
+FOUR TABLES, EACH WITH ITS CONTROL. Each table is paired with the thing that says what it is
+NOT, because each of these metrics has a way of looking like a finding when it is an artefact:
 
   ordering      control = exposure. Scored only on rounds holding BOTH spins, so a zero is over
                 rounds that had the material for either order — and re-run over the whole
@@ -30,6 +30,17 @@ because each of these metrics has a way of looking like a finding when it is an 
                 what an opener looks like. The section must state that in the same breath as
                 the number; rendering the share alone would publish a C-Spin count this data
                 cannot support.
+  named openers control = the baseline column. Six openers the report names, each against its
+                own drawings. `<=N 格` is reached about as often by the openers a player is NOT
+                playing, so it discriminates nothing and only an exact match does — the table
+                prints both, and the paragraph saying which one to read is load-bearing.
+                Openers drawn into the SAME first-bag shape (Mountainous Stacking 1 and 2) keep
+                their own rows and carry a warning that they are the same rounds twice.
+
+The ordering table gained a control of its own when this section grew its fourth: harddrop
+files 38 openers under `Triple Double openers`, C-Spin and Honey Cup among them, so
+「先 Triple 後 Double」 names a CLASS and never a member. `_class_note` says so directly under
+the table that could otherwise be read as a C-Spin count.
 
 `_no_simplified` runs over the finished markup. The prose here is authored in this module
 rather than in `prose/*.json`, so it is not covered by any of the loaders' glyph checks, and
@@ -250,6 +261,192 @@ def _slot_note(data):
     )
 
 
+def _class_note(data):
+    """THE control on the ordering table, and the reason its zero may not be read as a C-Spin count.
+
+    `cspin_order` counts "a T-spin Triple before a T-spin Double in the opener". harddrop keeps a
+    category for exactly that shape, and C-Spin is one member of it — so the number identifies the
+    CLASS and cannot name which member was played. Every figure is read out of the artifact, so
+    widening the category upstream moves this paragraph with it.
+    """
+    cls = data.get("ordering_class")
+    if not cls:
+        return ""      # an artifact predating the control: no box, rather than an empty one
+    members = cls["members"]
+    named = [n for n in ("C-Spin", "Honey Cup", "Stray Cannon", "Mountainous Stacking")
+             if n in members]
+    return (
+        "<strong>上面個數講嘅係一個「類」，唔係一個定式。</strong>"
+        f"harddrop 自己有個分類叫 <code>{html.escape(cls['name'])}</code>，"
+        f"入面有 <strong>{cls['openers']}</strong> 個定式，"
+        f"全部都係<em>先 Triple 後 Double</em> 開局——"
+        f"{'、'.join(html.escape(n) for n in named)} 都喺入面。"
+        "所以「先 Triple 後 Double」呢個次序<strong>分得出呢一類同 DT 砲</strong>，"
+        "但係<strong>分唔出呢一類入面邊個定式</strong>："
+        "如果成晚打嘅係 Honey Cup，上面個表一模一樣會咁樣寫。"
+        "下面第四個表就係用開局個板嘅形去分呢一類入面邊個。"
+    )
+
+
+def _named_note(data):
+    """The named-opener table's own controls: the baseline, the lock counts, and the aliases."""
+    no = data.get("named_openers")
+    if not no:
+        return ""
+    boards = no["boards"]
+    by = boards["by_locks"]
+    locks = "、".join(f"{k} 手 {v} 個" for k, v in sorted(by.items()))
+
+    # The baseline is the whole reason `exact` may be printed and `≤N 格` may not be read as a hit
+    # rate. Summed over players so the paragraph states the comparison it is making.
+    tot_exact = sum(p["exact"] for o in no["openers"] for p in o["players"])
+    tot_within = sum(p["within_threshold"] for o in no["openers"] for p in o["players"])
+    base_within = sum(p["baseline"]["within_threshold"] for o in no["openers"]
+                      for p in o["players"])
+    aliases = [o for o in no["openers"] if o["occupancy_aliases"]]
+    alias_line = ""
+    if aliases:
+        pairs = "、".join(
+            f"{html.escape(o['wiki'])} 同 {html.escape('、'.join(o['occupancy_aliases']))}"
+            for o in aliases[:1])
+        alias_line = (
+            f"另外要留意：{pairs} 開局個形<strong>一模一樣</strong>——"
+            "佢哋分別喺邊隻棋擺入 hold，而「有格／冇格」嘅圖睇唔到呢樣嘢，"
+            "所以嗰兩行嘅數<strong>係同一批回合</strong>，唔可以加埋一齊。")
+
+    return (
+        f"開局落到第 6 手同第 7 手都會影相：留一隻棋喺 hold 嘅定式，成個 bag 行完得 <strong>6</strong> "
+        f"手落咗地（24 格），冇留嘅就 <strong>7</strong> 手（28 格）。"
+        f"呢個 session 影到 {boards['total']} 個乾淨開局板（{locks}）。"
+        f"每個定式淨係同<em>佢自己畫嗰個手數</em>嘅板比——"
+        f"用 28 格嘅板去撞一版 24 格嘅圖，點都撞唔到，"
+        f"嗰個唔係「冇打過」，係<strong>由頭到尾冇比過</strong>。"
+        f"<strong>睇「一模一樣」嗰欄，唔好睇「≤{data['near_cells']} 格」。</strong>"
+        f"括號入面係<em>對照</em>：同一批板去撞<em>其他</em>定式嘅結果"
+        f"（對照嗰堆圖多好多，所以要比嘅係<em>有冇分別</em>，唔係比大細）。"
+        f"逐格數唔同 ≤{data['near_cells']} 格嘅有 {tot_within} 次，對照有 {base_within} 次——"
+        f"即係話呢個門檻<strong>撞邊個定式都撞得到</strong>，分唔到嘢；"
+        f"一模一樣嘅有 {tot_exact} 次，而對照喺好多行都係 <strong>0</strong>，"
+        f"所以「一模一樣」先至係分得到嘢嗰欄。"
+        f"「兌現」係指嗰啲形撞啱嘅回合，後來喺可核嗰段真係打出咗個定式應許嘅嘢。"
+        + alias_line
+    )
+
+
+def _named_table(data):
+    """One row per named opener; per player, the exact-match count with its baseline, and the
+    delivered count. `—` where an opener has no outcome this pipeline can verify (PCO's payoff is
+    a perfect clear, and only `facts.json` may be trusted for that — see `_pco_note`)."""
+    no = data["named_openers"]
+    ps = _players(data)
+    head = ["<th>定式</th>", "<th>畫喺第幾手</th>", "<th>圖出處</th>"]
+    for p in ps:
+        u = html.escape(p["user"])
+        head.append(f"<th>{u} 一模一樣（對照）</th>")
+        head.append(f"<th>{u} 兌現</th>")
+    rows = []
+    for o in no["openers"]:
+        per = {p["user"]: p for p in o["players"]}
+        drawn = "、".join(f"{n} 手" for n in o["drawn_at_locks"]) or "—"
+        src = o["pages"]
+        # says WHICH source could have produced a hit, so a null is attributable
+        if src["catalogue_clean"]:
+            where = f"wiki {src['wiki_fields']} + 定式庫 {src['catalogue_clean']}"
+        elif src["catalogue_named"]:
+            where = f"wiki {src['wiki_fields']}（定式庫有 {src['catalogue_named']} 版，冇一版用得）"
+        else:
+            where = f"wiki {src['wiki_fields']}（定式庫冇收）"
+        label = html.escape(o["wiki"])
+        if o["occupancy_aliases"]:
+            label += ' <span class="mono">＝</span> ' + html.escape(
+                "、".join(o["occupancy_aliases"]))
+        cells = [f"<td>{label}</td>",
+                 f'<td class="mono">{drawn}</td>',
+                 f"<td>{where}</td>"]
+        for p in ps:
+            q = per.get(p["user"])
+            if q is None:
+                cells.append('<td class="mono">—</td><td class="mono">—</td>')
+                continue
+            got = q["matched_and_delivered"]
+            deliver = "—" if got is None else f"{got}／{q['matched_rounds']}"
+            cells.append(f'<td class="mono">{q["exact"]}（{q["baseline"]["exact"]}）</td>'
+                         f'<td class="mono">{deliver}</td>')
+        rows.append("          <tr>" + "".join(cells) + "</tr>")
+    return head, rows
+
+
+def _pco_note(data):
+    """PCO is the one opener defined by an EVENT, and the event has a trustworthy source that is
+    not this simulator. Saying so is the control: a session with no perfect clears cannot contain
+    a completed PCO, whatever the opening field looked like."""
+    spc = data.get("session_perfect_clears")
+    if not spc:
+        return ""
+    per = spc["per_player"]
+    total = sum(per.values())
+    pco = next((o for o in data["named_openers"]["openers"] if o["key"] == "pco"), None)
+    matched = sum(p["exact"] for p in pco["players"]) if pco else 0
+    counts = "、".join(f"{html.escape(u)} <strong>{n}</strong> 次" for u, n in per.items())
+    if total == 0:
+        verdict = ("即係話<strong>今晚一個 Perfect Clear 都冇出過</strong>——"
+                   f"所以就算開局個形撞啱 {matched} 次，"
+                   "都<strong>冇一次真係做成個 PCO</strong>。形似唔等於打得成。")
+    else:
+        verdict = (f"開局個形撞啱 {matched} 次，而成晚 Perfect Clear 有 {total} 次——"
+                   "呢兩個數係上限同下限嘅關係，唔可以當成同一件事。")
+    return (
+        "<strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，"
+        "唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。"
+        "而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>："
+        "兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 "
+        f"<code>facts.json</code>。今個 session 讀到嘅係：{counts}。{verdict}"
+    )
+
+
+def _note_block(text):
+    """A method-note paragraph, or nothing when the note has nothing to say.
+
+    A note that renders as an empty box reads as "we looked and found nothing"; a note that is
+    absent reads as "this session's artifact predates the check", which is the truth for an
+    opener-facts.json written before these controls existed.
+    """
+    return [] if not text else ['    <div class="method-note"><p>' + text + '</p></div>']
+
+
+def _named_block(data):
+    """The fourth table, or nothing at all when the artifact predates it.
+
+    Returned as a list so an older `opener-facts.json` renders the three original tables and no
+    empty heading — the same rule the section already follows for a session with no simulator
+    output. A heading with no table under it reads as "we measured this and found nothing".
+    """
+    if not data.get("named_openers"):
+        return []
+    no = data["named_openers"]
+    prov = no.get("provenance") or []
+    pages = "、".join(html.escape(p["page"]) for p in prov)
+    pco = _pco_note(data)
+    return [
+        '',
+        '    <h3>四 · 六個具名定式，逐個對開局個板</h3>',
+        '    <div class="method-note">',
+        f'      <p>上面三個表講嘅係 C-Spin 同 DT 砲。呢個表問嘅係另一條問題：'
+        f'<strong>開局個板究竟同邊個定式一模一樣</strong>。'
+        f'比對用嘅圖有兩個出處——社群定式庫（{no["catalogue_pages"]} 版），'
+        f'同埋 harddrop wiki 自己畫嗰啲（{pages}）。'
+        f'兩個都要，因為定式庫入面得 {no["catalogue_pages_clean"]} 版'
+        f'（{no["catalogue_pages"]} 版入面）冇整行滿嘅——'
+        f'一行滿咗嘅圖係「教學圖」，真實開局<em>消過行就唔會係開局</em>，'
+        f'所以嗰啲圖同真板<strong>永遠撞唔到</strong>。TKI-3 就係咁：'
+        f'定式庫收咗佢 12 版，冇一版用得。</p>',
+        '      <p>' + _named_note(data) + '</p>',
+        '    </div>',
+        *_table(*_named_table(data)),
+        *_note_block(pco),
+    ]
+
+
 def _ordering_table(data):
     ps = _players(data)
     head = ["<th>玩家</th>", "<th>可核回合</th>", "<th>兩種 T-spin 都有</th>",
@@ -378,6 +575,7 @@ def section(data):
         '    <h3>一 · 次序</h3>',
         '    <div class="method-note"><p>' + _ordering_note(data) + '</p></div>',
         *_table(*_ordering_table(data)),
+        *_note_block(_class_note(data)),
         '',
         '    <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>',
         '    <div class="method-note">',
@@ -402,6 +600,7 @@ def section(data):
         '    </div>',
         *_table(*_slot_table(data)),
         '    <div class="method-note"><p>' + _slot_note(data) + '</p></div>',
+        *_named_block(data),
         '  </div>',
         '</section>',
     ]

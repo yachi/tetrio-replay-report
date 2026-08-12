@@ -8,7 +8,7 @@ report is protected by Dafny lemmas over facts.json, this section is deliberatel
 chain, so without its own guard its numbers could drift from their source with nothing to catch
 it. The argument for re-rendering rather than sampling is spelled out there and is not repeated.
 
-Four things are checked:
+Six things are checked:
   1. the committed region is EXACTLY what rendering this session's JSON produces;
   2. every per-player ordering figure appears in the rendered HTML;
   3. the section still declares itself unproved and carries no claim badge — promoting simulator
@@ -19,6 +19,16 @@ Four things are checked:
      detector; the control paragraph saying so is load-bearing, and a future edit that keeps the
      share while dropping the control would publish "89% of these were C-Spins" — a claim the
      data cannot support and the exact misreading the cross-tab was built to prevent.
+  5. the ORDERING table keeps its class control. `cspin_order` counts a Triple before a Double,
+     and harddrop files 38 openers under that signature, so the count names a class. Drop the
+     paragraph and the table beside it becomes the C-Spin count checks 4 exists to prevent.
+  6. the NAMED-OPENER table keeps its three: the baseline column (the `<=N` band discriminates
+     nothing, only an exact match does), the alias warning (two openers sharing a first-bag
+     field are the same rounds twice), and the PCO ceiling (PCO is defined by an outcome, and
+     the only trustworthy source for that outcome is facts.json, never this simulator).
+
+Every one of these controls has a mutant in `--selftest` that deletes its sentence and expects
+a rejection. A control with no mutant proving it fires is a comment, not a gate.
 """
 import difflib
 import json
@@ -34,6 +44,27 @@ BADGE = re.compile(r"data-claim|claim-badge|已驗證")
 # what makes the Triples share readable as a shape test. Matched on the sentence's own words
 # rather than on a number, so it survives the numbers changing between sessions.
 CONTROL_MARKERS = ("但消兩行嘅只有", "唔可以當成")
+
+# The control the ORDERING table may not be published without, and the most load-bearing of the
+# four. `cspin_order` counts a Triple before a Double, and harddrop files 38 openers under
+# `Triple Double openers` — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them —
+# so the number names a CLASS. Delete this paragraph and the table beside it reads as a C-Spin
+# count, which is exactly the claim this section spent three tables refusing to make.
+CLASS_MARKERS = ("分唔出呢一類入面邊個定式",)
+
+# The control the NAMED-OPENER table may not be published without. Its `≤N 格` column is ~90% for
+# every opener AND for the control set, so it discriminates nothing; only an exact match does.
+# Losing the sentence that says so turns a similarity score into a repertoire claim.
+NAMED_MARKERS = ("睇「一模一樣」嗰欄",)
+
+# Two named openers with an identical first-bag field are the same rounds counted twice. The rows
+# stay (the reader asked for MS1, MS2 and MS3 by name); the sentence forbidding their addition is
+# what keeps the table honest.
+ALIAS_MARKER = "唔可以加埋一齊"
+
+# PCO is defined by an OUTCOME, and the outcome has a trustworthy source that is not this
+# simulator. The sentence naming that source is the ceiling on the whole row.
+PCO_MARKER = "clears.allclear"
 
 
 def problems(data, doc):
@@ -91,6 +122,34 @@ def problems(data, doc):
             if marker not in body:
                 bad.append(f"the slot-geometry control is gone ({marker!r} missing) — the share "
                            "may not be published without the Doubles comparison beside it")
+
+    # 5. the ordering table may not be published without the class control
+    if data.get("ordering_class") and any(p["rounds_with_both"]
+                                          for p in data["ordering"]["players"]):
+        for marker in CLASS_MARKERS:
+            if marker not in body:
+                bad.append(
+                    f"the ordering class control is gone ({marker!r} missing) — "
+                    f"{data['ordering_class']['openers']} catalogued openers share the "
+                    "Triple-before-Double signature, so the count may not stand alone as a "
+                    "C-Spin figure")
+
+    # 6. the named-opener table's own controls
+    no = data.get("named_openers")
+    if no and any(p["boards_scored"] for o in no["openers"] for p in o["players"]):
+        for marker in NAMED_MARKERS:
+            if marker not in body:
+                bad.append(f"the named-opener baseline control is gone ({marker!r} missing) — "
+                           "the exact-match column may not be published without the control "
+                           "column that says the ≤N band discriminates nothing")
+        if any(o["occupancy_aliases"] for o in no["openers"]) and ALIAS_MARKER not in body:
+            bad.append(f"the occupancy-alias warning is gone ({ALIAS_MARKER!r} missing) — two "
+                       "openers share a first-bag field, so their rows are the same rounds and a "
+                       "reader must be told not to add them")
+    if data.get("session_perfect_clears") and PCO_MARKER not in body:
+        bad.append(f"the PCO ceiling is gone ({PCO_MARKER!r} missing) — PCO is defined by an "
+                   "outcome, and the row may not be published without the verified source that "
+                   "bounds it")
 
     return bad
 
@@ -171,9 +230,13 @@ def _selftest(report_dir):
 
     # The control paragraph is the reason the slot-geometry share may be printed at all, so
     # deleting it while keeping the table must be a failure and not a cosmetic edit.
-    for marker in CONTROL_MARKERS:
+    # Every control paragraph is the reason its table may be printed at all, so deleting one while
+    # keeping its table must be a failure and not a cosmetic edit. Listed together because they
+    # are the same rule applied four times, and because a control with no mutant proving it fires
+    # is a comment, not a gate.
+    for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER, PCO_MARKER):
         if marker in body:
-            cases.append((f"the slot-geometry control sentence is deleted ({marker})", data,
+            cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))
 
     eligible = json.loads(json.dumps(data))

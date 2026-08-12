@@ -59,6 +59,10 @@ python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
 python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the C-Spin / DT 砲 section
 python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
+python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
+python3 -m pipeline.openers.extract_wiki_openers --selftest # its mutants
+python3 -m pipeline.openers.extract_wiki_openers \
+  --html-dir <dir> --write                                 # re-transcribe (needs the pages fetched)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
   --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
@@ -319,6 +323,12 @@ merely documented:
 - **ordering** — control is *exposure*: scored only on rounds holding both spins, and re-run over
   the whole simulated round so the short verified prefix cannot manufacture the result. Five
   sessions: 221 of 221 run the C-Spin order, 0 the DT order; unwindowed, 277 of 277.
+  **It names a CLASS, not the C-Spin, and that was found by measuring the named openers.**
+  harddrop files **38** openers under `Category:Triple Double openers` — C-Spin, Honey Cup, Stray
+  Cannon and Mountainous Stacking among them — and every one opens Triple-before-Double. A session
+  playing Honey Cup every round produces the identical 221-of-221. The category is transcribed into
+  `wiki-openers.json` (a class this repo drew itself would be a class chosen to fit the result) and
+  `check_opener_section.py` fails if the table is published without the paragraph saying so.
 - **first bag vs the catalogue** — control is *set choice*. `isCSpin` is a substring match whose
   three hits are `Fake C-Spin`, `Secspin` and an `SDPC-Spin` compound — arguably no real C-Spin at
   all — so every number is reported over a narrow and a widest reading of both openers
@@ -332,6 +342,42 @@ merely documented:
 
 `emit-opener-facts.ts` exports `build()` so `openers.test.ts` can assert the committed artefact
 reproduces byte-for-byte — the same rule facts.json, the ledgers and the .dfy are held to.
+
+## 六個具名定式 — the fourth table, and the coverage bug it exposed
+
+Honey Cup, Stray Cannon, Mountainous Stacking 1/2/3, TKI-3, PCO. Same quarantine; the metric is
+"is the opening board this opener's field, cell for cell".
+
+**Sampling at seven locks only was a coverage bug, not a choice.** A player who holds a piece
+through bag 1 has locked **six** pieces when the bag ends, and that is how harddrop draws four of
+the six (Stray Cannon says "keep either S or Z in hold"). A 24-cell field can never equal a 28-cell
+board, so those openers were never *compared*, not scoring zero. `OPENER_LOCKS = [6, 7]` fixes it
+and also reaches the 75 clean 24-cell catalogue pages that were invisible — including the PCO setup
+that keeps I on hold. Pre-existing blocks re-emit byte-identical on all five sessions.
+
+**`opener_db` alone cannot answer this**, which is why `wiki-openers.json` exists: 484 of its 783
+pages are drawn on a filled base, and a page with a full row is a state that would have cleared.
+TKI-3 has 12 catalogue pages and **none** are clean. Where both sources draw an opener (MS1, PCO)
+they agree cell-for-cell — `cross_check()` gates that, and the mutant proving it flips a cell on an
+opener both draw.
+
+**Read the exact column, never `≤4 格`.** The baseline — the same boards against openers the player
+is *not* playing — reaches the ≤4 band about as often, because these boards sit 3-4 cells from
+almost any opener page. Only exact separates. `occupancy_aliases` and `round_overlap` name the
+columns that are the same rounds twice: MS1 and MS2 are one bag-1 shape built from different
+pieces, so their rows are identical in every session and must never be added.
+
+The repertoires split, reproduced independently in all five sessions (pinned in `openers.test.ts`):
+**pinglamb opens Honey Cup** (17-25 exact per session vs yachi's 6-11), **yachi opens Mountainous
+Stacking** (11-25 vs 2-11) **and is the only one who plays TKI-3 at all** (5-8; pinglamb 0, every
+session). PCO appears only for yachi, only on 07-24 and 08-01.
+
+**PCO's payoff is bounded by facts.json, never by the simulator.** PCO is defined by an outcome,
+and the vendored engine's `eng.board.perfectClear` reports a perfect clear in 10 of 08-09's 100
+rounds — always at lock 19, almost always past the verified prefix — while both extractors read
+`clears.allclear` out of the `.ttrm` and agree the session had **zero**. facts.json wins; the flag
+is used nowhere. A session with no perfect clear cannot contain a completed PCO however many boards
+match its field.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

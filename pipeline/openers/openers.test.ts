@@ -16,7 +16,8 @@
 import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, distance,
-         cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS } from './match.ts';
+         cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS,
+         loadWikiOpeners, openerPages, hasFullRow } from './match.ts';
 import { analyse } from './run-openers.ts';
 import { build, serialise } from '../sim/emit-opener-facts.ts';
 
@@ -193,5 +194,150 @@ test('the slot-geometry test is a Triple-shape detector, which is why it is neve
     // discriminating and the section's control paragraph is no longer true.
     expect(by[3].share_x1000).toBeGreaterThan(800);
     expect(by[2].share_x1000).toBeLessThan(250);
+  }
+});
+
+// ── the named openers ──────────────────────────────────────────────────────────────────────────
+// Controls for the second source and for the table it feeds. Same shape of argument as above: the
+// named-opener table's headline is that two players have DIFFERENT opening repertoires, and a
+// difference is only worth stating once the instrument is shown to (a) agree with the catalogue
+// wherever both draw an opener, (b) find nothing on boards that are not that opener, and (c) rest
+// on a column that discriminates — which `≤N 格` provably does not.
+
+const wiki = loadWikiOpeners();
+
+test('the wiki transcription is internally consistent and pinned to a revision', () => {
+  expect(wiki.schema).toBe('wiki-openers/1');
+  expect(wiki.openers.length).toBe(7);              // 6 named openers, Mountainous split 1/2/3
+  for (const p of wiki.provenance) expect(p.oldid).toBeGreaterThan(0);
+  for (const op of wiki.openers) {
+    expect(op.fields.length).toBeGreaterThan(0);
+    for (const f of op.fields) {
+      for (const r of f.rows) expect(r.length).toBe(10);
+      expect(cellsOf(f.rows)).toBe(f.cells);
+      expect(f.cells).toBe(f.locks * 4);
+      // a full row would have CLEARED, so a field carrying one is not a board state and could
+      // never equal a real opening — the defect that makes 484 catalogue pages unusable
+      expect(hasFullRow(f.rows)).toBe(false);
+    }
+  }
+});
+
+test('control — the two sources agree wherever both draw the same opener', () => {
+  // The dual-source argument applied to the opener fields. opener_db and harddrop are maintained
+  // by different people from different diagrams, so agreement is evidence; this is the same check
+  // extract_wiki_openers.cross_check runs, re-implemented here against the TS matcher so a bug in
+  // one language's occupancy handling cannot pass both.
+  let checked = 0;
+  for (const op of wiki.openers) {
+    if (!op.catalogue) continue;
+    const clean = prepared.filter(p =>
+      p.name.toLowerCase().includes(op.catalogue!.toLowerCase()) && !hasFullRow(p.page.rows));
+    if (!clean.length) continue;                    // TKI-3: 12 pages, none of them clean
+    for (const f of op.fields) {
+      expect(nearest(occGrid(f.rows), clean).d).toBe(0);
+      checked++;
+    }
+  }
+  expect(checked).toBeGreaterThan(0);               // a vacuous pass here would prove nothing
+});
+
+test('control — TKI-3 is in the catalogue and is still unmeasurable from it', () => {
+  // The justification for carrying a second source at all, asserted so it cannot quietly stop
+  // being true: the catalogue KNOWS this opener and draws it only on a filled base.
+  const named = prepared.filter(p => p.name.toLowerCase().includes('tki-3'));
+  expect(named.length).toBe(12);
+  expect(named.filter(p => !hasFullRow(p.page.rows)).length).toBe(0);
+});
+
+test('control — a board no named opener draws is matched by none of them', () => {
+  const junk = occGrid(['#.#.#.#.#.', '.#.#.#.#.#', '#.#.#.#.#.', '.#.#.#.#.#']);
+  for (const op of wiki.openers)
+    expect(nearest(junk, openerPages(op, prepared).pages).d).not.toBe(0);
+});
+
+test('the ≤N band discriminates nothing, and the exact column does', () => {
+  // THE control the section's fourth table may not be published without. If this ever fails, the
+  // table has become readable as a hit rate and the paragraph saying otherwise is wrong.
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const rows = data.named_openers.openers.flatMap((o: any) =>
+      o.players.map((p: any) => ({ key: o.key, ...p })));
+    // the near band is reached about as often by the openers a player is NOT playing
+    const within = rows.reduce((a: number, r: any) => a + r.within_threshold, 0);
+    const baseWithin = rows.reduce((a: number, r: any) => a + r.baseline.within_threshold, 0);
+    expect(baseWithin).toBeGreaterThan(within * 0.8);
+    // while an exact match separates: Honey Cup outscores everything else in the catalogue on the
+    // same boards, in every session and for both players. Stated as a COMPARISON and not as
+    // `baseline.exact === 0`, which is what this assertion said first and is false — on 07-24 and
+    // 08-01 two of yachi's boards do exactly match some other catalogued opener. The claim the
+    // section makes is that exact discriminates, not that nothing else ever matches.
+    for (const r of rows.filter((r: any) => r.key === 'honey_cup')) {
+      expect(r.exact).toBeGreaterThan(0);
+      expect(r.exact).toBeGreaterThan(r.baseline.exact);
+    }
+  }
+});
+
+test('the repertoire split reproduces in every session', () => {
+  // The finding itself, pinned. pinglamb opens Honey Cup far more than yachi; yachi opens
+  // Mountainous Stacking far more than pinglamb and is the only one who plays TKI-3 at all.
+  // Five independent sessions, so this is a regression rather than an observation.
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const of = (key: string, user: string) => data.named_openers.openers
+      .find((o: any) => o.key === key).players.find((p: any) => p.user === user);
+    expect(of('honey_cup', 'pinglamb').exact).toBeGreaterThan(of('honey_cup', 'yachi').exact);
+    expect(of('mountainous_1', 'yachi').exact)
+      .toBeGreaterThan(of('mountainous_1', 'pinglamb').exact);
+    expect(of('tki_3', 'yachi').exact).toBeGreaterThan(0);
+    expect(of('tki_3', 'pinglamb').exact).toBe(0);
+  }
+});
+
+test('the ordering metric names a class, and the class is harddrop\'s own', () => {
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const cls = data.ordering_class;
+    expect(cls.openers).toBe(38);
+    // the control is only a control if it covers the openers it is quoted against
+    for (const n of ['C-Spin', 'Honey Cup', 'Stray Cannon', 'Mountainous Stacking'])
+      expect(cls.members).toContain(n);
+  }
+});
+
+test('a round claimed by two openers is only ever the documented alias', () => {
+  // The columns must be independent apart from openers drawn into the SAME first-bag shape.
+  // Mountainous Stacking 1 and 2 are that case; anything else appearing here would mean the
+  // 6-lock and 7-lock samples had started double-counting rounds.
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    const aliases = new Map<string, string[]>(
+      data.named_openers.openers.map((o: any) => [o.key, o.occupancy_aliases]));
+    for (const [key, row] of Object.entries<any>(data.named_openers.round_overlap)) {
+      const wikiNames = data.named_openers.openers
+        .filter((o: any) => Object.keys(row).includes(o.key)).map((o: any) => o.wiki);
+      for (const n of wikiNames) expect(aliases.get(key)).toContain(n);
+    }
+  }
+});
+
+test('PCO is bounded by the verified extractors, never by the simulator', () => {
+  // The vendored engine's perfectClear flag disagrees with both extractors (10 rounds vs 0 on
+  // 08-09), so the artifact must take its perfect-clear count from facts.json. Asserted so a
+  // future edit cannot quietly reintroduce the simulator's number.
+  for (const s of SESSIONS) {
+    const data = JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+    expect(data.session_perfect_clears.source).toContain('facts.json');
+    const facts = JSON.parse(readFileSync(`${sessionDir(s)}/report/facts.json`, 'utf8'));
+    const per: Record<string, number> = {};
+    for (const m of facts.matches) for (const rd of m.rounds)
+      for (const [u, st] of Object.entries<any>(rd.players))
+        per[u] = (per[u] ?? 0) + (st.allclear ?? 0);
+    expect(data.session_perfect_clears.per_player).toEqual(per);
+    // and a session with no perfect clear cannot contain a completed PCO
+    const pco = data.named_openers.openers.find((o: any) => o.key === 'pco');
+    for (const p of pco.players)
+      if (!per[p.user]) expect(p.matched_and_delivered ?? 0).toBe(0);
   }
 });

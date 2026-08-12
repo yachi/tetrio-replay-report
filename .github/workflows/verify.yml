@@ -281,6 +281,23 @@ jobs:
             python3 -m pipeline.check_forecast_section "$W" --selftest
           fi
 
+      # harddrop's own opener drawings, which the named-opener table compares
+      # against. Session-independent (it checks one committed file against the
+      # catalogue), so the session matrix re-runs it identically five times —
+      # kept here rather than split into a job of its own because it is offline
+      # and finishes in well under a second.
+      # Offline: it re-verifies the committed transcription's internal
+      # consistency and — where opener_db draws the same opener — that the two
+      # independently maintained sources agree cell for cell. --selftest plants
+      # the four defects it claims to catch, including a flipped cell on an
+      # opener BOTH sources draw, which is the mutant that proves the
+      # dual-source check rather than the shape checks.
+      - name: Check the harddrop wiki opener transcription
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.openers.extract_wiki_openers
+          python3 -m pipeline.openers.extract_wiki_openers --selftest
+
       # The C-Spin / DT-Cannon section, same quarantine and the same re-render
       # gate. It carries one extra invariant of its own: the slot-geometry share
       # (~9 in 10 Triples match the wiki window, ~1 in 10 Doubles) may not be

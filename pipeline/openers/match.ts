@@ -132,3 +132,61 @@ export const NAME_SETS: { key: string; label: string; test: (name: string) => bo
   { key: 'dt_cannon', label: 'DT Cannon', test: isDTCannon },
   { key: 'dt_family', label: 'DT family (widest)', test: isDTFamily },
 ];
+
+// ── the named openers, and the second source they need ─────────────────────────────────────────
+
+/** A row that is completely filled would have CLEARED, so a page carrying one is a teaching
+ *  diagram (the slot shown in a stack), never a reachable no-clear opening field. 484 of the
+ *  catalogue's 783 pages are drawn that way. Every consumer that compares a page against a real
+ *  board must filter with this or it is comparing against states the game cannot be in. */
+export const hasFullRow = (rows: string[]) => rows.some(r => [...r].every(c => c !== '.'));
+
+export interface WikiField { heading: string; locks: number; cells: number; rows: string[] }
+export interface WikiOpener {
+  key: string; wiki: string; jp: string; url: string; wiki_says: string;
+  /** how opener_db names this opener, or null when it does not carry it. DECLARED, because the
+   *  wiki's `TKI 3 Opening` and the catalogue's `TKI-3 {Alt: TKI, ...}` share no substring. */
+  catalogue: string | null;
+  /** the harddrop PAGE this opener is documented on — what the category listing names. MS1/2/3
+   *  share one page, so category membership is a property of the page, never of the title. */
+  page: string;
+  headings: string[]; fields: WikiField[];
+}
+export interface WikiOpeners {
+  schema: string; source: string; why: string;
+  triple_double_category: { name: string; url: string; says: string; declares: number; members: string[] };
+  provenance: { page: string; url: string; oldid: number | null; sha256: string; bytes: number }[];
+  openers: WikiOpener[];
+}
+
+/** harddrop.com's own drawings of the named openers (see extract_wiki_openers.py for why a second
+ *  source is needed at all: four of the six have NO clean catalogue page). */
+export function loadWikiOpeners(dir = import.meta.dir): WikiOpeners {
+  return JSON.parse(readFileSync(`${dir}/wiki-openers.json`, 'utf8')) as WikiOpeners;
+}
+
+/** The comparison pool for one named opener: harddrop's fields PLUS every clean catalogue page
+ *  whose (compound) name contains the opener's wiki name.
+ *
+ *  Pooling the two sources rather than picking one is deliberate. They agree wherever both draw an
+ *  opener (`cross_check` in the extractor gates that), so the union adds coverage without adding
+ *  disagreement — and `pages_by_source` is reported alongside every number so a reader can see
+ *  which source could have produced a hit. */
+export function openerPages(op: WikiOpener, catalogue: Prepared[]) {
+  const fromWiki: Prepared[] = op.fields.map((f, i) => {
+    const page: Page = { name: op.wiki, tag: f.heading, fumen: '', page: i, rows: f.rows };
+    return { name: op.wiki, cells: cellsOf(f.rows), page,
+             grid: occGrid(f.rows), mirror: occGrid(mirrorRows(f.rows)) };
+  });
+  const needle = op.catalogue?.toLowerCase();
+  const named = needle ? catalogue.filter(p => p.name.toLowerCase().includes(needle)) : [];
+  const fromCat = named.filter(p => !hasFullRow(p.page.rows));
+  return {
+    pages: [...fromWiki, ...fromCat],
+    // reported next to every number this pool produces: `named` minus `clean` is how many times
+    // the catalogue draws this opener on a base it could never be matched from
+    source: { wiki_fields: fromWiki.length,
+              catalogue_named: named.length, catalogue_clean: fromCat.length },
+    locks: [...new Set([...fromWiki, ...fromCat].map(p => p.cells / 4))].sort((a, b) => a - b),
+  };
+}
