@@ -204,11 +204,13 @@ test('counts are internally consistent and integers', () => {
     // the point estimate must lie inside its own interval
     expect(p.sampling_ci95_lo_x1000).toBeLessThanOrEqual(p.forecast_rate_x1000);
     expect(p.sampling_ci95_hi_x1000).toBeGreaterThanOrEqual(p.forecast_rate_x1000);
-    // A 0% lower bound was once a real bisection bug — but with k = 0 forecasts it is the
-    // CORRECT Clopper-Pearson answer, so the guard is conditioned on the count rather than
-    // asserted flat. Asserting lo > 0 unconditionally would forbid the true value.
-    if (p.forecast_total > 0) expect(p.sampling_ci95_lo_x1000).toBeGreaterThan(0);
-    else expect(p.sampling_ci95_lo_x1000).toBe(0);
+    // A 0% lower bound was once a real bisection bug. With k = 0 forecasts it is the CORRECT
+    // Clopper-Pearson answer (asserted exactly). With k > 0 the EXACT lower bound is positive, but
+    // floored to x1000 it can STILL be 0 for a single forecast in a large sample — yachi 07-28 has 1
+    // forecast in hundreds of T-spins (rate 0.3%), whose CP lower bound (~0.008%) floors to 0. So the
+    // floored guard is only asserted for k = 0; for k > 0 the real invariant kept is that the interval
+    // brackets the rate (asserted just above), which a bisection bug returning a spurious 0 would break.
+    if (p.forecast_total === 0) expect(p.sampling_ci95_lo_x1000).toBe(0);
     expect(p.sampling_ci95_hi_x1000).toBeLessThan(1000);
   }
 });
@@ -251,14 +253,10 @@ test('simulator uncertainty is smaller than sampling uncertainty', () => {
 
 test('the sensitivity sweep is the set the prose describes', () => {
   const d = load();
-  // The section names the mechanisms these configs vary (kick table, blockout, lock delay,
-  // gravity, garbage queue, input clock). It renders the COUNT from this list, but the names
-  // are prose and cannot be derived, so changing the sweep must fail here and force the
-  // sentence to be rewritten rather than silently describing configs that no longer exist.
-  expect(d.simulator_configs_for_range).toEqual([
-    'best', 'vanilla_srs', 'strict_blockout', 'locktime30', 'gravity05',
-    'reference_queue', 'frame_clock',
-  ]);
+  // 2026-08-12: the board source is the vendored Triangle engine (reference for the real game), which
+  // has no sim OPTIONS to sweep, so the multi-config robustness range collapses to a single authoritative
+  // config. Changing the sweep still must fail here and force the sentence to be rewritten.
+  expect(d.simulator_configs_for_range).toEqual(['triangle-oracle']);
 });
 
 test('the two players\' intervals overlap — no difference is claimed', () => {

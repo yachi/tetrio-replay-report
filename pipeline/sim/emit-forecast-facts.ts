@@ -40,7 +40,7 @@
 import { writeFileSync } from 'node:fs';
 import { forecastMetric, isVerifiedForecast, holePreExisted } from './forecast.ts';
 import type { FloorOrigin } from './forecast.ts';
-import { loadCases, runCase, verifiedIndex, BEST_OPTS } from './verified-prefix.ts';
+import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import { collectRows, pairsFor, auc, exactSignP } from './pairs.ts';
 import { eventLevel } from './forecast-event-level.ts';
 import { validityChecks } from './validity-checks.ts';
@@ -80,11 +80,12 @@ function clopperPearson(k: number, n: number, alpha = 0.05): [number, number] {
   console.log(`Clopper-Pearson self-check passed (P(X<=k)=${atUpper.toFixed(6)}, P(X>=k)=${atLower.toFixed(6)})`);
 }
 
-const CONFIGS: [string, any][] = [
-  ['best', {}], ['vanilla_srs', { kickset: 'SRS' }], ['strict_blockout', { blockout: 'strict' }],
-  ['locktime30', { locktime: 30 }], ['gravity05', { gravity: 0.05 }],
-  ['reference_queue', { queue: 'reference' }], ['frame_clock', { subframe: false }],
-];
+// Board source is the vendored Triangle engine (runCaseOracle), byte-identical to @haelp/teto and the
+// reference for the real game. The multi-config robustness sweep that used to live here hedged the
+// hand-sim's OPTION uncertainty (kickset/blockout/gravity/queue/clock); the reference engine has no such
+// options, so the sweep collapses to a single authoritative config and the printed "simulator range" is
+// a point. This is a stronger stance than seven agreeing guesses — see oracle-source.ts.
+const CONFIGS: [string, any][] = [['triangle-oracle', {}]];
 
 type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: number;
              unattributed: number; verified: number; placed: number;
@@ -98,7 +99,7 @@ type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: numbe
 const tally = (extra: any) => {
   const per: Record<string, Per> = {};
   for (const c of loadCases()) {
-    const r = runCase(c, extra);
+    const r = runCaseOracle(c); void extra;
     const v = verifiedIndex(r, c.truth);
     per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
       floors: { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 },
@@ -346,7 +347,7 @@ const out = {
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',
   gate: 'frame+amount+row (ige row oracle must agree)',
-  simulator_options: BEST_OPTS,
+  board_source: 'triangle-oracle (vendored @haelp/teto, byte-identical)',
   simulator_configs_for_range: CONFIGS.map(c => c[0]),
   players,
   session,
