@@ -512,18 +512,20 @@ export function simulate(
     };
 
     if (opts.subframe) {
-      // Interleave events and DAS/ARR on a 0.1-frame clock, then run gravity and lock
-      // delay once at frame granularity (they are frame-quantised in the client).
-      const N = 10;
-      for (let s = 1; s <= N && !topout; s++) {
-        const t = f + s / N;
-        while (ei < evs.length && !topout) {
-          const e = evs[ei]!;
-          if (e.frame + (e.sub ?? 0) >= t || e.frame > f) break;
-          ei++; applyEvent(e);
-        }
-        dasArr(1 / N);
+      // Match triangle's #processSubframe: before handling each event, advance DAS/ARR to the event's
+      // EXACT subframe (not the next 0.1 grid step), firing any shift that completes in between, THEN
+      // apply the event. This is why a `keyup:moveLeft@0.5` in the client moves one more cell before
+      // release — the pending charge completes at 0.5. The old fixed 0.1 grid dropped those shifts and
+      // introduced float-grid errors. Gravity + lock stay frame-quantised (continuous), as before.
+      let cur = 0;                            // subframe position within this frame, in [0,1]
+      while (ei < evs.length && !topout) {
+        const e = evs[ei]!;
+        if (e.frame > f) break;
+        const es = Math.min(1, Math.max(cur, e.sub ?? 0));
+        if (es > cur) { dasArr(es - cur); cur = es; }
+        ei++; applyEvent(e);
       }
+      if (!topout && cur < 1) dasArr(1 - cur);
       if (!topout) continuous();
     } else if (opts.eventsFirst) { applyEvents(); continuous(); } else { continuous(); applyEvents(); }
     if (opts.trace && !topout && f >= areUntil) opts.trace(f, getPieceCells(piece), piece.rotation, piece.type);

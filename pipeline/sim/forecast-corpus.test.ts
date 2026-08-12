@@ -59,15 +59,15 @@ realData('the 2026-07-28 buckets are exactly what the audit settled on', () => {
   // Re-blessed 2026-08-11 for FOUR ground-truth drift fixes that lengthened the verified prefix, so
   // more locks fall inside the scanned window and each bucket grew: `hoisted`-DAS (~31%),
   // `attackModel:'exact'` (~4%), confirm-timed garbage (~1.2%), then triangle's exact DAS/ARR port
-  // (~1.8%). The classification is unchanged — the reactive:self_built ratio held (56:89 = 0.629 ->
-  // 92:144 = 0.639) and the single surviving forecast (forecast_lineclear:1) is the same event —
-  // only the window got longer.
+  // (~1.8%), then exact-subframe event processing (~4%). The classification is unchanged — the
+  // reactive:self_built ratio held (56:89 = 0.629 -> 94:151 = 0.623) and the single surviving forecast
+  // (forecast_lineclear:1) is the same event — only the window got longer.
   expect(R!.totals).toEqual({
     forecast_garbage: 0,
     // the survivor: the ONLY event whose mechanism holds up (unchanged by the prefix extension)
     forecast_lineclear: 1,
-    self_built: 144,
-    reactive: 92,
+    self_built: 151,
+    reactive: 94,
     // an improvement the step model cannot explain would invalidate the buckets above it
     unattributed: 0,
   });
@@ -98,7 +98,7 @@ realData('clause 2 is decidable for all but three of the 2026-07-28 events', () 
   // stayed 5 while the decidable counts grew, i.e. its share FELL (5/237 = 2.1%): clause 2 stays just
   // as decidable.
   expect(R!.floors).toEqual({
-    'pre-existed': 204, 'arrived-later': 28, undetermined: 5,
+    'pre-existed': 211, 'arrived-later': 30, undetermined: 5,
   });
 });
 
@@ -144,7 +144,7 @@ realData('no T-spin following a C-Spin triple is ever counted as a forecast', ()
   // Population re-blessed 2026-08-11 for the `hoisted`-DAS + `attackModel:'exact'` + DAS/ARR-port
   // fixes (longer verified prefix -> more C-Spin-trailing T-spins in window: 46 -> 66 -> 67 -> 69).
   // The verdict `counted == 0` is unchanged: none of them is a forecast, the assertion that matters.
-  expect(behindACSpin).toBe(69);
+  expect(behindACSpin).toBe(72);
   expect(counted).toBe(0);
 });
 

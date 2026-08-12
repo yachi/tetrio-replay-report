@@ -6973,8 +6973,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <p><strong>呢一節同上面所有數唔同級數，請當佢係探索性資料，唔好當結論。</strong>上面每個數都係兩個獨立 parser 抽出嚟、再由 Dafny 引理逐條證明；呢節嘅數係由<strong>一個 replay 模擬器</strong>重跑操作記錄推導出嚟，得一份實作，冇第二個獨立實作對得上，所以套唔到同一個信任鏈——亦都因為咁，呢節<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>
       <p>「Forecast」係指打 T-spin 之前，個窿位<em>仲未成形</em>：搭個天花板嗰陣打得到嘅 T-spin 冇咁好，之後靠垃圾行升起或者消行先至變好。（唔係淨係「本來完全冇」——維基自己嘅例子入面，有啲係本來得一行、垃圾升完變兩行，嗰啲一樣算。）對照組叫 reactive，即係個位本身冇變好過。</p>
       <p><strong>統計結論係：搵唔到效果。</strong>呢一節冇一個分析單位夠數計得出結果。而且每局嘅數<strong>根本冇得同自己比</strong>：每局嘅 forecast rate 全部係 0，冇任何變化，所以 split-half reliability 係<strong>冇定義</strong>（唔係低）——冇變化就冇嘢可以穩定唔穩定。所以下面只列<strong>每個玩家嘅總計</strong>。</p>
-      <p><strong>「Forecast」要求個窿位係<em>由外力</em>整出嚟嘅</strong>——即係垃圾升起或者消行，唔係自己砌出嚟。所以唔係問「嗰段時間有冇垃圾、有冇消行」，而係<strong>逐格倒帶</strong>：每落一隻棋都有一張板，搵返個 T-spin 係<em>邊一步</em>先至出現；而喺嗰一步入面，模擬器係先落棋、再消行、最後升垃圾，所以嗰三個動作可以逐個拆開，睇個窿位到底邊個動作整出嚟。咁樣就唔使靠反事實：三張中間板都係由上一張板砌返出嚟，而且當嗰步冇垃圾升起嘅時候，砌返出嚟嗰張<strong>一定要同實際嗰張逐格一樣</strong>——呢點係查咗先算數，唔係當佢啱。呢個 session 317 個消到行嘅可核 T-spin 入面，<strong>316 個</strong>係 tucked（T 上面有蓋），先至問得到「個蓋係咪預先搭喺窿位上面」；另外 1 個冇蓋，唔算 tucked，唔喺 forecast 範圍。呢 316 個入面：<strong>0 個</strong>係垃圾造成個窿位；<strong>0 個</strong>係消行造成——消嗰行啱啱夾喺天花板同窿位中間，消走咗兩者先貼埋一齊；177 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，個天花板早過個窿位係定式本身嘅砌法，唔係預測；其餘 139 個個窿位本身冇變好。<strong>仲有一個前提：搭天花板嗰陣，個窿位要已經喺度。</strong>如果落天花板嗰時下面係實心，之後先至開窿，咁就唔係「預先搭喺個窿上面」，只係執返個之後先出現嘅位。呢一項唔使追格——provenance 格網記住每一格係邊一手落嘅，睇住 T <strong>四格全部</strong>各自踩住嗰格係邊一手放低就得——唔淨止睇最低嗰行：T 塞入去嘅時候多數係兩邊膊頭承住、個鼻尖吊喺個窿度，淨睇鼻尖下面嗰格會睇到一格空氣，乜都問唔到。全部 316 個入面：<strong>272 個</strong>承住佢嘅格全部早過天花板；<strong>41 個</strong>個底係天花板之後先至出現；3 個查唔到（個底係垃圾，而垃圾喺天花板前後都升過，唔追格就分唔到邊行係邊行）。下面表入面嘅數，係<strong>四項條件全部符合</strong>先計。<strong>換句話講：呢個 session 冇一個 tucked 消行 T-spin 符合曬四項條件。</strong>之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——但「出現過」唔等於「整咗個窿位出嚟」：真正要核嘅係嗰下消行或者垃圾有冇造成個窿位，倒帶逐格一睇，嗰啲數量到嘅多數係<em>開局定式</em>（自己落嘅棋砌個窿），唔係預測。<strong>順帶一提 C-Spin。</strong>T-Spin Triple 一定要一隻直放嘅 T 塞入一條有蓋嘅單格井——即係 C-Spin（TKI積み）砌嘅嗰個形。呢個 session 79 個回合入面，T-Spin Triple 嘅數目係：pinglamb <strong>82</strong> 個、yachi <strong>53</strong> 個。呢個數<strong>唔係模擬器計嘅</strong>，係遊戲自己 <code>results.stats</code> 入面嘅記錄，覆蓋每一個回合而唔止可核嗰段，亦都係兩個獨立 parser 各自抽出嚟對過數嗰一條。留意佢數嘅係<em>個形</em>唔係<em>開局</em>——TST 唔一定係 C-Spin 開局打出嚟。至於 wiki 講嘅完整 C-Spin 定式（打完 Triple 之後三個 bag 之內接返個 Double），要知道次序先計得到，而次序淨係模擬器有；可核嗰段太短，多數 Triple 根本冇位裝落個 21 手嘅窗口，所以呢度<strong>唔報</strong>。</p>
-      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。表入面個分母淨係計<em>tucked</em>（T 上面有蓋）、消到行嗰啲——冇蓋就無「預先搭喺個窿上面」可言，消唔到行就唔係一個 forecast——所以佢係可核 T-spin 嘅一個<strong>子集</strong>，唔係全部。全 158 個 player-round 入面，只有 25.3% 嘅落子對得上，所以樣本先咁細。</p>
+      <p><strong>「Forecast」要求個窿位係<em>由外力</em>整出嚟嘅</strong>——即係垃圾升起或者消行，唔係自己砌出嚟。所以唔係問「嗰段時間有冇垃圾、有冇消行」，而係<strong>逐格倒帶</strong>：每落一隻棋都有一張板，搵返個 T-spin 係<em>邊一步</em>先至出現；而喺嗰一步入面，模擬器係先落棋、再消行、最後升垃圾，所以嗰三個動作可以逐個拆開，睇個窿位到底邊個動作整出嚟。咁樣就唔使靠反事實：三張中間板都係由上一張板砌返出嚟，而且當嗰步冇垃圾升起嘅時候，砌返出嚟嗰張<strong>一定要同實際嗰張逐格一樣</strong>——呢點係查咗先算數，唔係當佢啱。呢個 session 323 個消到行嘅可核 T-spin 入面，<strong>322 個</strong>係 tucked（T 上面有蓋），先至問得到「個蓋係咪預先搭喺窿位上面」；另外 1 個冇蓋，唔算 tucked，唔喺 forecast 範圍。呢 322 個入面：<strong>0 個</strong>係垃圾造成個窿位；<strong>0 個</strong>係消行造成——消嗰行啱啱夾喺天花板同窿位中間，消走咗兩者先貼埋一齊；181 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，個天花板早過個窿位係定式本身嘅砌法，唔係預測；其餘 141 個個窿位本身冇變好。<strong>仲有一個前提：搭天花板嗰陣，個窿位要已經喺度。</strong>如果落天花板嗰時下面係實心，之後先至開窿，咁就唔係「預先搭喺個窿上面」，只係執返個之後先出現嘅位。呢一項唔使追格——provenance 格網記住每一格係邊一手落嘅，睇住 T <strong>四格全部</strong>各自踩住嗰格係邊一手放低就得——唔淨止睇最低嗰行：T 塞入去嘅時候多數係兩邊膊頭承住、個鼻尖吊喺個窿度，淨睇鼻尖下面嗰格會睇到一格空氣，乜都問唔到。全部 322 個入面：<strong>277 個</strong>承住佢嘅格全部早過天花板；<strong>42 個</strong>個底係天花板之後先至出現；3 個查唔到（個底係垃圾，而垃圾喺天花板前後都升過，唔追格就分唔到邊行係邊行）。下面表入面嘅數，係<strong>四項條件全部符合</strong>先計。<strong>換句話講：呢個 session 冇一個 tucked 消行 T-spin 符合曬四項條件。</strong>之前呢節報過嘅 forecast 數，係「垃圾或者消行喺窗口入面出現過」就算數——但「出現過」唔等於「整咗個窿位出嚟」：真正要核嘅係嗰下消行或者垃圾有冇造成個窿位，倒帶逐格一睇，嗰啲數量到嘅多數係<em>開局定式</em>（自己落嘅棋砌個窿），唔係預測。<strong>順帶一提 C-Spin。</strong>T-Spin Triple 一定要一隻直放嘅 T 塞入一條有蓋嘅單格井——即係 C-Spin（TKI積み）砌嘅嗰個形。呢個 session 79 個回合入面，T-Spin Triple 嘅數目係：pinglamb <strong>82</strong> 個、yachi <strong>53</strong> 個。呢個數<strong>唔係模擬器計嘅</strong>，係遊戲自己 <code>results.stats</code> 入面嘅記錄，覆蓋每一個回合而唔止可核嗰段，亦都係兩個獨立 parser 各自抽出嚟對過數嗰一條。留意佢數嘅係<em>個形</em>唔係<em>開局</em>——TST 唔一定係 C-Spin 開局打出嚟。至於 wiki 講嘅完整 C-Spin 定式（打完 Triple 之後三個 bag 之內接返個 Double），要知道次序先計得到，而次序淨係模擬器有；可核嗰段太短，多數 Triple 根本冇位裝落個 21 手嘅窗口，所以呢度<strong>唔報</strong>。</p>
+      <p>「可核 T-spin」係指嗰段棋盤可以同真實對局對得返上（用對手嘅 ige 事件流逐次攻擊校對），唔係話條數經過 Dafny 證明——呢節冇任何嘢經過證明。表入面個分母淨係計<em>tucked</em>（T 上面有蓋）、消到行嗰啲——冇蓋就無「預先搭喺個窿上面」可言，消唔到行就唔係一個 forecast——所以佢係可核 T-spin 嘅一個<strong>子集</strong>，唔係全部。全 158 個 player-round 入面，只有 25.8% 嘅落子對得上，所以樣本先咁細。</p>
     </div>
 
     <div class="scroll-x">
@@ -6989,8 +6989,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">0 / 168</td><td class="mono">0.0%</td><td class="mono">[0.0%, 2.2%]</td><td class="mono">[0.0%, 0.0%]</td></tr>
-          <tr><td>yachi</td><td class="mono">0 / 148</td><td class="mono">0.0%</td><td class="mono">[0.0%, 2.5%]</td><td class="mono">[0.0%, 0.0%]</td></tr>
+          <tr><td>pinglamb</td><td class="mono">0 / 171</td><td class="mono">0.0%</td><td class="mono">[0.0%, 2.2%]</td><td class="mono">[0.0%, 0.0%]</td></tr>
+          <tr><td>yachi</td><td class="mono">0 / 151</td><td class="mono">0.0%</td><td class="mono">[0.0%, 2.5%]</td><td class="mono">[0.0%, 0.0%]</td></tr>
         </tbody>
       </table>
     </div>
@@ -7020,22 +7020,22 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     </div>
 
     <h3>一 · 次序</h3>
-    <div class="method-note"><p>可核嗰段入面，有 <strong>90</strong> 個回合（全部 142 個入面）同時有 T-spin Double 同 T-spin Triple，即係話呢啲回合本身有足夠材料行任何一個次序。而 <strong>90 個全部都係先 Triple 後 Double</strong>，即係 C-Spin 嗰個次序；行 DT 砲次序嘅係 <strong>0</strong> 個。呢個唔係「差唔多」，係完全冇重疊。攤開成個模擬回合（唔限可核嗰段）再計一次，就有 103 個回合兩種都有——睇長咗自然多咗回合入圍——但係<strong>分家嘅方式一模一樣</strong>：C-Spin 次序 103 個、DT 砲次序<strong>依然係 0</strong> 個。即係話呢個零唔係可核嗰段太短睇漏咗後面，睇多啲反而更加乾淨。</p></div>
+    <div class="method-note"><p>可核嗰段入面，有 <strong>91</strong> 個回合（全部 144 個入面）同時有 T-spin Double 同 T-spin Triple，即係話呢啲回合本身有足夠材料行任何一個次序。而 <strong>91 個全部都係先 Triple 後 Double</strong>，即係 C-Spin 嗰個次序；行 DT 砲次序嘅係 <strong>0</strong> 個。呢個唔係「差唔多」，係完全冇重疊。攤開成個模擬回合（唔限可核嗰段）計多次：104 個回合兩種都有，C-Spin 次序 104 個、DT 砲次序 1 個。同可核嗰段唔一樣，所以睇幾長本身有影響，兩組數要一齊睇。</p></div>
     <div class="scroll-x">
       <table class="appendix-table">
         <thead>
           <tr><th>玩家</th><th>可核回合</th><th>兩種 T-spin 都有</th><th>C-Spin 次序（先 Triple）</th><th>DT 砲次序（先 Double）</th><th>第一個 Triple 喺第幾手（min／中位／max）</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">67</td><td class="mono">50</td><td class="mono">50</td><td class="mono">0</td><td class="mono">12／13／15</td></tr>
-          <tr><td>yachi</td><td class="mono">75</td><td class="mono">40</td><td class="mono">40</td><td class="mono">0</td><td class="mono">11／13／26</td></tr>
+          <tr><td>pinglamb</td><td class="mono">68</td><td class="mono">51</td><td class="mono">51</td><td class="mono">0</td><td class="mono">12／13／15</td></tr>
+          <tr><td>yachi</td><td class="mono">76</td><td class="mono">40</td><td class="mono">40</td><td class="mono">0</td><td class="mono">11／13／26</td></tr>
         </tbody>
       </table>
     </div>
 
     <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>
     <div class="method-note">
-      <p>七手落完、冇消行、冇食垃圾嘅板一定有 28 格。攞佢同定式庫入面每一版同格數嘅圖比：783 版圖、360 個定式，出處係 <code>https://github.com/swng/opener_db</code>，釘死喺 commit <code>b4a66878</code>。呢個 session 有 <strong>131</strong> 個乾淨開局 bag（全部 158 個回合入面）。一模一樣嘅開局 bag 有：Perfect Clear Opener <strong>1</strong> 個回合。</p>
+      <p>七手落完、冇消行、冇食垃圾嘅板一定有 28 格。攞佢同定式庫入面每一版同格數嘅圖比：783 版圖、360 個定式，出處係 <code>https://github.com/swng/opener_db</code>，釘死喺 commit <code>b4a66878</code>。呢個 session 有 <strong>133</strong> 個乾淨開局 bag（全部 158 個回合入面）。一模一樣嘅開局 bag 有：Perfect Clear Opener <strong>1</strong> 個回合。</p>
       <p>「最近」係<strong>逐格數唔同</strong>（Hamming），淨係同格數一樣嘅定式頁比，正著同反轉都比。揀邊啲頁做「C-Spin」同「DT 砲」本身就係一個判斷，所以呢度<strong>窄同闊兩種讀法都報</strong>：C-Spin 照名揀得 3 個定式（8 頁），加埋 TKI 就 6 個（24 頁）；DT 砲照名揀 6 個（12 頁），闊到「個名有 DT」就 48 個（115 頁）。C-Spin 窄定闊都係同一個答案；DT 闊咗之後個答案有郁，所以要連住佢係邊個集出嚟先講得通——C-Spin 最近 6 格／6 格，DT 最近 6 格／4 格，4 格以內嘅回合數係 0／0 同 0／1。</p>
     </div>
     <div class="scroll-x">
@@ -7044,7 +7044,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><th>定式集</th><th>pinglamb 最近</th><th>pinglamb ≤4 格</th><th>yachi 最近</th><th>yachi ≤4 格</th></tr>
         </thead>
         <tbody>
-          <tr><td>全部 360 個定式</td><td class="mono">2 格</td><td class="mono">55</td><td class="mono">0 格</td><td class="mono">32</td></tr>
+          <tr><td>全部 360 個定式</td><td class="mono">2 格</td><td class="mono">56</td><td class="mono">0 格</td><td class="mono">32</td></tr>
           <tr><td>C-Spin（照名揀）</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
           <tr><td>C-Spin 或者 TKI</td><td class="mono">6 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
           <tr><td>DT 砲</td><td class="mono">8 格</td><td class="mono">0</td><td class="mono">6 格</td><td class="mono">0</td></tr>
@@ -7064,13 +7064,13 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><th>消行數</th><th>可核 T-spin</th><th>撞到 wiki 槽位</th><th>比率</th></tr>
         </thead>
         <tbody>
-          <tr><td class="mono">3 行</td><td class="mono">122</td><td class="mono">114</td><td class="mono">93.4%</td></tr>
-          <tr><td class="mono">2 行</td><td class="mono">178</td><td class="mono">21</td><td class="mono">11.7%</td></tr>
-          <tr><td class="mono">1 行</td><td class="mono">17</td><td class="mono">1</td><td class="mono">5.8%</td></tr>
+          <tr><td class="mono">3 行</td><td class="mono">124</td><td class="mono">116</td><td class="mono">93.5%</td></tr>
+          <tr><td class="mono">2 行</td><td class="mono">181</td><td class="mono">21</td><td class="mono">11.6%</td></tr>
+          <tr><td class="mono">1 行</td><td class="mono">18</td><td class="mono">1</td><td class="mono">5.5%</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="method-note"><p><strong>睇個對照，唔好淨係睇 93.4%。</strong>消三行嘅 T-spin 有 93.4% 撞到 wiki 個槽位，但消兩行嘅只有 11.7%。兩個數擺埋一齊講嘅係：呢個測試分得出「三行定兩行」，分唔出「係咪 C-Spin 開局」——T-Spin Triple 本來就要一隻直放嘅 T 塞入一條有蓋單格井，個形就係咁，同用邊個開局打出嚟冇關係。所以呢 317 個可核 T-spin 入面撞到槽位嗰啲，<strong>唔可以當成 C-Spin 嘅次數</strong>，只可以當成「個窿位嘅形同 wiki 畫嘅一樣」。</p></div>
+    <div class="method-note"><p><strong>睇個對照，唔好淨係睇 93.5%。</strong>消三行嘅 T-spin 有 93.5% 撞到 wiki 個槽位，但消兩行嘅只有 11.6%。兩個數擺埋一齊講嘅係：呢個測試分得出「三行定兩行」，分唔出「係咪 C-Spin 開局」——T-Spin Triple 本來就要一隻直放嘅 T 塞入一條有蓋單格井，個形就係咁，同用邊個開局打出嚟冇關係。所以呢 323 個可核 T-spin 入面撞到槽位嗰啲，<strong>唔可以當成 C-Spin 嘅次數</strong>，只可以當成「個窿位嘅形同 wiki 畫嘅一樣」。</p></div>
   </div>
 </section>
 <!-- END generated openers -->

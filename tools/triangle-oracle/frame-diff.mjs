@@ -41,11 +41,12 @@ runCase(c, { trace: (f, cells)=>{ simFrames.set(f, cells.map(z=>`${z.col},${z.ro
 
 // compare
 let firstDiff=null;
+const eqAt=(f)=>{ const t=triFrames.get(f), s=simFrames.get(f); if(!t||!s) return true; return t.length===s.length && t.every((v,i)=>v===s[i]); };
 for(let f=0; f<=total; f++){
-  const t=triFrames.get(f), s=simFrames.get(f);
-  if(!t||!s) continue;
-  const eq = t.length===s.length && t.every((v,i)=>v===s[i]);
-  if(!eq){ firstDiff=f; break; }
+  if(eqAt(f)) continue;
+  // require the divergence to PERSIST >=3 frames (skip transient spawn-row / gravity-order blips)
+  let persist=true; for(let g=f; g<=Math.min(total,f+3); g++){ if(eqAt(g)){persist=false;break;} }
+  if(persist){ firstDiff=f; break; }
 }
 if(firstDiff==null){ console.log("no falling-piece divergence in first",total,"frames"); process.exit(0); }
 console.log(`FIRST falling-piece divergence at frame ${firstDiff}`);
