@@ -5294,6 +5294,42 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       </table>
     </div>
     <div class="method-note"><p><strong>Perfect Clear Opener 同其他五個唔同：佢係用「結果」定義嘅</strong>，唔係用個形——harddrop 自己寫嘅係「頭 4 行（10 手）之內清空個板」。而「有冇 Perfect Clear」呢樣嘢<strong>唔使靠模擬器</strong>：兩個獨立 parser 都係直接由 <code>.ttrm</code> 讀 <code>clears.allclear</code> 入 <code>facts.json</code>。今個 session 讀到嘅係：pinglamb <strong>4</strong> 次、yachi <strong>6</strong> 次。開局個形撞啱 3 次，而成晚 Perfect Clear 有 10 次——呢兩個數係上限同下限嘅關係，唔可以當成同一件事。「有冇」同「幾時」係兩個問題，兩個來源。<strong>幾時</strong>要靠模擬器答，而佢喺呢度講得出聲，係因為佢<strong>逐個回合</strong>嘅全消次數同 <code>.ttrm</code> 本身嗰個數對過：100／100 個回合啱，全場 10 對 10 次。對到之後見到嘅係：pinglamb 落喺第 20、21、34 手、yachi 落喺第 10、20 手。harddrop 畫 PCO 嘅死線係<strong>頭 10 手</strong>，而呢 10 次入面得 <strong>1</strong> 次趕得切——其中形又撞啱、時間又趕得切嘅有 <strong>0</strong> 次，淨係嗰啲先算真係行完個 PCO。</p></div>
+
+    <h3>五 · 捐窿（Donation）</h3>
+    <div class="method-note">
+      <p><strong>捐窿</strong>係 harddrop 收嘅一招：落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、嗰條欄最低嗰格填咗嘅嘢下面仲有最少 4 格空、最深嗰 4 行兩邊都有牆嘅 T-spin 消行。重砌返嘅板同引擎自己記低嘅消行逐個對過：<strong>544／544</strong> 個對得上，對唔上嗰 0 個<strong>直接唔計</strong>。</p>
+      <p>淨係睇「條井喺消嘅行度有冇填」係冇意義嘅——因為一行要滿，嗰格本來就一定要填，咁樣數會數到絕大部分嘅 T-spin。分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>
+    </div>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr><th>玩家</th><th>可核 T-spin 消行</th><th>捐窿</th><th>佔可核 T-spin</th><th>自己砌嘅井</th><th>垃圾行留低嘅井</th><th>塞嗰手冇消行（Natural）</th><th>塞嗰手消咗行（斷 B2B）</th><th>塞嗰手查唔到</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>pinglamb</td><td class="mono">309</td><td class="mono">9</td><td class="mono">2.9%</td><td class="mono">0</td><td class="mono">9</td><td class="mono">5</td><td class="mono">1</td><td class="mono">3</td></tr>
+          <tr><td>yachi</td><td class="mono">235</td><td class="mono">6</td><td class="mono">2.5%</td><td class="mono">0</td><td class="mono">6</td><td class="mono">5</td><td class="mono">0</td><td class="mono">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 15 次捐窿，條井<strong>全部都係垃圾行留低嘅窿</strong>，冇一次係自己砌返嚟嘅 Tetris 井。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
+
+    <h3>六 · STMB Cave（浮空 T-spin Double）</h3>
+    <div class="method-note">
+      <p><strong>STMB Cave</strong> 係一個<em>浮空</em>嘅 T-spin Double：隻 T 唔係坐喺實地上面，而係架喺一個最少 <strong>3</strong> 格闊嘅窿之上。個窿仲要係<em>側埋一邊</em>——佢同隻 T 得兩欄重疊，所以個測試係「有冇重疊」，唔係「包唔包得住」。呢度數嘅係可核嗰段入面，消兩行嗰啲 T-spin 落地嗰一刻，緊貼消嗰兩行下面嗰行有幾闊嘅空位。</p>
+      <p><strong>呢個形唔淨止 STMB Cave 一個。</strong>harddrop 篇文自己就話「STMB Cave is just Sky Prop but with 3 columns wide hole」，又話有個變化「has the same shape and steps as Shachiku Train」。所以呢個數認得出嘅係「浮空 TSD 喺一個 ≥3 格闊嘅窿上面」呢一類，<strong>唔係邊一個定式</strong>。</p>
+    </div>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead>
+          <tr><th>玩家</th><th>可核 T-spin Double</th><th>底下有 ≥3 格闊嘅窿</th><th>佔可核 TSD</th><th>其中深 ≥2 行</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>pinglamb</td><td class="mono">228</td><td class="mono">2</td><td class="mono">0.8%</td><td class="mono">0</td></tr>
+          <tr><td>yachi</td><td class="mono">168</td><td class="mono">4</td><td class="mono">2.3%</td><td class="mono">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p><strong>睇埋深度同消三行嗰欄，唔好淨係睇個數。</strong>呢場消兩行嗰邊有 6 次 ≥3 格闊嘅窿，其中 5 次<strong>淨係深一行</strong>——即係塊面凹咗一格，唔係一個窿；深兩行或者以上嘅得 <strong>1</strong> 次。深度分佈：深 1 行 5 次、深 3 行 1 次。而同一個形喺<strong>消三行</strong>嘅 T-spin 底下出現咗 10 次（84 個入面，11.9%），<strong>密過</strong>消兩行嗰邊（6／396，1.5%）——嗰啲係 TST 本身嘅殘形，冇人會叫佢做 STMB Cave。一個喺「唔關佢事」嗰種 T-spin 底下出得仲密嘅形，係個形狀測試，唔係個技術測試。</p></div>
   </div>
 </section>
 <!-- END generated openers -->

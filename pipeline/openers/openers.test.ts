@@ -19,7 +19,8 @@ import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, dis
          cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS,
          loadWikiOpeners, openerPages, hasFullRow } from './match.ts';
 import { analyse } from './run-openers.ts';
-import { build, serialise } from '../sim/emit-opener-facts.ts';
+import { build, serialise, donationCols, caveAt, cavity,
+         DONATION_CAVITY, DONATION_WALLED_ROWS, CAVE_MIN_WIDTH } from '../sim/emit-opener-facts.ts';
 
 const cat = loadCatalogue();
 const prepared = prepare(cat.pages);
@@ -422,5 +423,379 @@ test('these sessions run mid-game Perfect Clears, not the Perfect Clear Opener',
       .reduce((a, r) => a + Object.values(r).reduce((x, y) => x + y, 0), 0));
     expect(inWindow).toBe(Object.values(IN_PCO_WINDOW).reduce((a, b) => a + b, 0));
     expect(atTwenty).toBeGreaterThan(total / 2);   // the cluster IS the finding
+  }
+});
+
+/* ── DONATION and STMB CAVE ────────────────────────────────────────────────────────────────────
+ * The two per-T-spin board-state metrics. Both are QUARANTINED (one simulator, no second
+ * implementation) and both report numbers that are small or zero, which is the hardest kind of
+ * number to publish: a detector that has never been shown to FIRE cannot make a null mean
+ * anything. So this block is in three parts, in increasing strength:
+ *
+ *   1. the corpus result, as LITERALS — same rule as PERFECT_CLEARS above. A test that
+ *      re-derives a value the way the code does can only catch a typo.
+ *   2. INSTRUMENT CONTROLS — harddrop's own drawings for both techniques, fed straight through
+ *      the two predicates. Every positive must fire, both negatives must not.
+ *   3. DISCRIMINATING POWER — that the naive reading of each technique is NOT what is counted,
+ *      asserted by behaviour on purpose-built boards rather than by editing the source.
+ */
+
+/** Corpus result per session, written out. `clears` is the licensing denominator
+ *  (`donation.check.tspin_clears`), not a count of anything donated. */
+const DONATION: Record<string, { donations: number; natural: number; b2b: number; clears: number }> = {
+  '2026-07-22': { donations: 21, natural: 13, b2b: 2, clears: 795 },
+  '2026-07-24': { donations: 15, natural: 10, b2b: 1, clears: 544 },
+  '2026-07-28': { donations: 13, natural: 13, b2b: 0, clears: 626 },
+  '2026-08-01': { donations: 20, natural: 13, b2b: 2, clears: 612 },
+  '2026-08-09': { donations: 13, natural:  8, b2b: 0, clears: 565 },
+};
+
+/** `width_ge_3` is the RAW shape count and is NOT a cave count — `min_depth_ge_2` is the column
+ *  to read, and `triple_control` is the same shape under the spin the technique is not about. */
+const CAVE: Record<string, { width_ge_3: number; min_depth_ge_2: number; triple_control: number }> = {
+  '2026-07-22': { width_ge_3: 4, min_depth_ge_2: 0, triple_control:  8 },
+  '2026-07-24': { width_ge_3: 6, min_depth_ge_2: 1, triple_control: 10 },
+  '2026-07-28': { width_ge_3: 5, min_depth_ge_2: 0, triple_control:  8 },
+  '2026-08-01': { width_ge_3: 8, min_depth_ge_2: 0, triple_control:  4 },
+  '2026-08-09': { width_ge_3: 7, min_depth_ge_2: 0, triple_control:  8 },
+};
+
+const facts = (s: string) =>
+  JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
+const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+test('the donation counts are pinned per session, and the licensing check is clean', () => {
+  for (const s of SESSIONS) {
+    const d = facts(s).donation;
+    const want = DONATION[s]!;
+    expect([s, sum(d.players.map((p: any) => p.donations))]).toEqual([s, want.donations]);
+    expect([s, sum(d.players.map((p: any) => p.natural))]).toEqual([s, want.natural]);
+    expect([s, sum(d.players.map((p: any) => p.b2b_breaking))]).toEqual([s, want.b2b]);
+    expect([s, d.check.tspin_clears]).toEqual([s, want.clears]);
+    // the per-player scored counts must add up to the check's denominator — one number, two paths
+    expect(sum(d.players.map((p: any) => p.tspin_clears_scored))).toBe(d.check.tspin_clears);
+
+    // THE LICENSING FIGURE. `withT` (the per-lock board snapshot plus the lock's cells) and the
+    // engine's own clearedRows were built from different states; every scored clear is one they
+    // agreed about. A disagreement is dropped rather than scored, so a corpus that started
+    // disagreeing would quietly shrink the denominator instead of failing — hence the assertion.
+    expect([s, d.check.reconstruction_disagreed]).toEqual([s, 0]);
+    expect(d.check.reconstruction_agreed).toBe(d.check.tspin_clears);
+    expect(d.check.agrees).toBe(true);
+
+    // Every well in this corpus is garbage-derived, which is the caveat the section may not drop:
+    // the oracle keeps the engine's seeded-RNG hole columns, so WHICH column was donated into is
+    // not established. A self-built well appearing here would change that sentence.
+    expect([s, sum(d.players.map((p: any) => p.self_built_well))]).toEqual([s, 0]);
+    expect(sum(d.players.map((p: any) => p.garbage_derived_well))).toBe(want.donations);
+    // the three plug classes partition the donations
+    expect(sum(d.players.map((p: any) => p.natural + p.b2b_breaking + p.plug_unknown)))
+      .toBe(want.donations);
+  }
+});
+
+test('the STMB cave counts are pinned, and the corpus holds exactly one genuine cave', () => {
+  let deeper = 0;
+  for (const s of SESSIONS) {
+    const c = facts(s).stmb_cave;
+    const want = CAVE[s]!;
+    expect([s, sum(c.players.map((p: any) => p.width_ge_3))]).toEqual([s, want.width_ge_3]);
+    expect([s, sum(c.players.map((p: any) => p.min_depth_ge_2))]).toEqual([s, want.min_depth_ge_2]);
+    expect([s, c.triple_control.width_ge_3]).toEqual([s, want.triple_control]);
+    expect(c.min_width).toBe(CAVE_MIN_WIDTH);
+    // the two histograms and the per-player columns are the same events counted twice
+    expect(sum(Object.values<number>(c.width_histogram))).toBe(want.width_ge_3);
+    expect(sum(Object.values<number>(c.min_depth_histogram))).toBe(want.width_ge_3);
+    expect(sum(Object.entries<number>(c.min_depth_histogram)
+      .filter(([k]) => Number(k) >= 2).map(([, v]) => v))).toBe(want.min_depth_ge_2);
+    deeper += want.min_depth_ge_2;
+  }
+  // THE FINDING. One genuine cave in 592 player-rounds across five sessions — every other >=3-wide
+  // hit is a single row deep, i.e. a dimple. Pinned as a corpus total so a change has to break this
+  // test rather than silently re-rate the metric from "essentially never" to "occasionally".
+  expect(deeper).toBe(1);
+});
+
+/* ── instrument controls, from harddrop's own diagrams ─────────────────────────────────────────
+ * Rows are 10 wide, '.' empty and any other character filled; T cells are written (col,row) as
+ * the articles number them. The board handed to the predicates is the occupancy WITH the T in it,
+ * and the cleared rows are the ones that are full because of it — exactly the two values the
+ * session walk in emit-opener-facts.ts computes before calling them. */
+function drawn(rows: string[], t: [number, number][] | null) {
+  for (const r of rows) expect(r.length).toBe(10);
+  const g = rows.map(r => [...r].map(ch => ch !== '.'));
+  const cells = (t ?? []).map(([col, row]) => ({ row, col }));
+  for (const q of cells) g[q.row]![q.col] = true;
+  const cleared: number[] = [];
+  for (let r = 0; r < g.length; r++) if (g[r]!.every(Boolean)) cleared.push(r);
+  return { g, cells, cleared, h: g.length };
+}
+
+/** The controls come out of `wiki-tspin-techniques.json` rather than being typed here, and that is
+ *  the point: the same boards written down twice are two things that can drift, and this repo
+ *  gates that everywhere else. The JSON is generated from the raw wiki HTML by
+ *  `extract_wiki_techniques.py` (whose own selftest kills 19 mutants), and it carries each board's
+ *  EXPECTED outcome — `clears`, `well_col`, `cavity`, `cave_width` — so these tests assert that the
+ *  predicate reproduces the transcription's own declared values rather than merely returning
+ *  something. A control list that is silently emptied upstream fails here on the count assertions. */
+interface Ctl {
+  name: string; kind: string; rows: string[]; occupancy: string[]; cells: number;
+  t_cells: [number, number][] | null; clears: number;
+  well_col?: number; cavity?: number; cave_first_col?: number; cave_width?: number;
+}
+const WIKI_TECH = JSON.parse(
+  readFileSync(`${import.meta.dir}/wiki-tspin-techniques.json`, 'utf8')) as {
+    schema: string;
+    provenance: { page: string; oldid: number; sha256: string }[];
+    donation: { cavity_cells: number; walled_deepest_rows: number; controls: Ctl[];
+                near_miss: { works: string; fails: string; differing_cells: [number, number][] } };
+    stmb_cave: { min_width: number; controls: Ctl[] };
+  };
+
+const controls = (tech: 'donation' | 'stmb_cave', kind: 'positive' | 'negative') =>
+  WIKI_TECH[tech].controls.filter(c => c.kind === kind);
+const control = (tech: 'donation' | 'stmb_cave', name: string) =>
+  WIKI_TECH[tech].controls.find(c => c.name === name)!;
+
+const DONATION_POSITIVES = controls('donation', 'positive');
+const DONATION_NEGATIVES = controls('donation', 'negative');
+
+test('the committed controls still cover both techniques', () => {
+  // Guards the guards: every assertion below iterates these lists, so a transcription that lost its
+  // positives would turn each control test into a vacuous pass over an empty array.
+  expect(DONATION_POSITIVES.length).toBeGreaterThanOrEqual(3);
+  expect(DONATION_NEGATIVES.length).toBeGreaterThanOrEqual(1);
+  expect(controls('stmb_cave', 'positive').length).toBeGreaterThanOrEqual(3);
+  expect(controls('stmb_cave', 'negative').length).toBeGreaterThanOrEqual(1);
+});
+
+test('the transcription is pinned to a revision, self-consistent, and carries the thresholds', () => {
+  expect(WIKI_TECH.schema).toBe('wiki-tspin-techniques/1');
+  for (const p of WIKI_TECH.provenance) {
+    expect(p.oldid).toBeGreaterThan(0);        // a revision, not "the page as it stood one afternoon"
+    expect(p.sha256).toMatch(/^[0-9a-f]{64}$/);
+  }
+  // The transcription carries each board twice — as the pieces are DRAWN and as an occupancy mask —
+  // and the tests below read the drawn view. Two views that disagreed would mean the tests were
+  // scoring a board the article does not draw, so they are checked against each other here.
+  for (const tech of ['donation', 'stmb_cave'] as const)
+    for (const c of WIKI_TECH[tech].controls) {
+      for (const r of c.rows) expect(r.length).toBe(10);
+      expect([c.name, c.rows.map(r => [...r].map(x => (x === '.' ? '.' : '#')).join(''))])
+        .toEqual([c.name, c.occupancy]);
+      expect([c.name, c.cells])
+        .toEqual([c.name, sum(c.occupancy.map(r => [...r].filter(x => x === '#').length))]);
+    }
+  // AND THE THRESHOLDS ARE HARDDROP'S, now with two independent transcriptions of them to compare.
+  // `DONATION_CAVITY` and friends are the numbers the article's drawings support; a constant nobody
+  // can trace back to the source is a threshold chosen to fit the result, and this is what stops one
+  // being tuned quietly. (Read with the cavity-5 positive below: the code's 4 is a FLOOR, not a copy
+  // of one drawing.)
+  expect(WIKI_TECH.donation.cavity_cells).toBe(DONATION_CAVITY);
+  expect(WIKI_TECH.donation.walled_deepest_rows).toBe(DONATION_WALLED_ROWS);
+  expect(WIKI_TECH.stmb_cave.min_width).toBe(CAVE_MIN_WIDTH);
+});
+
+test('control — the donation predicate fires on every setup harddrop draws as a donation', () => {
+  // A count of 21 in a session of 795 T-spin clears is only a measurement if the instrument is
+  // shown to find the thing when it is unambiguously there. These are the article's own boards,
+  // and each is asserted against the outcome the transcription recorded for it — including the
+  // T-Spin Single donation, which clears ONE row over a five-cell cavity. Pinning "a Double with
+  // cavity 4" here would have quietly excluded it.
+  for (const ctl of DONATION_POSITIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);
+    const wells = donationCols(b.g, b.cleared, b.cells, b.h);
+    expect([ctl.name, wells.length]).toEqual([ctl.name, 1]);
+    expect([ctl.name, wells[0]!.col]).toEqual([ctl.name, ctl.well_col]);
+    expect([ctl.name, wells[0]!.cavity]).toEqual([ctl.name, ctl.cavity]);
+    expect([ctl.name, wells[0]!.cavity >= DONATION_CAVITY]).toEqual([ctl.name, true]);
+  }
+});
+
+test('control — and does not fire on harddrop\'s own "an S donation does not work" case', () => {
+  // The article draws this one to show the setup FAILING: the T-spin clears nothing, so nothing is
+  // donated. A predicate that scored it would be scoring the shape rather than the technique.
+  //
+  // It is the strongest negative on the page because it is a MINIMAL PAIR — `near_miss` records
+  // that it differs from the working T-Spin Single donation at exactly one cell — so it cannot be
+  // passed by a detector that merely dislikes the general look of the board.
+  for (const ctl of DONATION_NEGATIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
+  }
+});
+
+test('control — harddrop\'s own minimal pair: ONE cell decides the donation', () => {
+  // THE STRONGEST CONTROL HERE, and it is the article's rather than this test's. harddrop draws
+  // "A case where an S donation does not work" directly beneath the setup that does work, and the
+  // two boards differ in a single cell. A detector that fired on both would be reading the
+  // silhouette; one that fired on neither would be dead. The predicate has to SPLIT them, and
+  // splitting a one-cell difference is not something a coincidence does.
+  //
+  // The comment above the negatives test asserts this pair exists — so it is checked, not described:
+  // the differing cells are recomputed from the two boards and compared with what the transcription
+  // recorded, which also catches `near_miss` naming a pair that has since been re-transcribed apart.
+  const nm = WIKI_TECH.donation.near_miss;
+  const ok = drawn(control('donation', nm.works).rows, control('donation', nm.works).t_cells);
+  const no = drawn(control('donation', nm.fails).rows, control('donation', nm.fails).t_cells);
+  const diff: [number, number][] = [];
+  for (let r = 0; r < ok.g.length; r++)
+    for (let c = 0; c < 10; c++) if (ok.g[r]![c] !== no.g[r]![c]) diff.push([c, r]);
+  expect(diff).toEqual(nm.differing_cells);
+  expect(diff).toHaveLength(1);
+  expect(donationCols(ok.g, ok.cleared, ok.cells, ok.h)).toHaveLength(1);
+  expect(donationCols(no.g, no.cleared, no.cells, no.h)).toHaveLength(0);
+});
+
+/** Basic Structures from harddrop's STMB Cave page, read out of the committed transcription. The
+ *  cave is OFFSET from the T — it shares two of the T's three columns and reaches one column past
+ *  them — which is why the predicate tests overlap and never containment. */
+const CAVE_POSITIVES = controls('stmb_cave', 'positive');
+const CAVE_NEGATIVES = controls('stmb_cave', 'negative');
+
+test('control — the cave predicate fires on every Basic Structure harddrop draws', () => {
+  for (const ctl of CAVE_POSITIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);   // a Double, per the page
+    const cave = caveAt(b.g, b.cleared, b.cells, b.h);
+    expect([ctl.name, cave?.width ?? null]).toEqual([ctl.name, ctl.cave_width]);
+    expect([ctl.name, (cave?.width ?? 0) >= CAVE_MIN_WIDTH]).toEqual([ctl.name, true]);
+    // and it is the T's OWN cave: the run under the cleared rows overlaps the T's column span,
+    // starting at the column the transcription recorded
+    const tc = new Set(b.cells.map(q => q.col));
+    const run = runAt(b.g, Math.max(...b.cleared) + 1, tc);
+    expect([ctl.name, run?.from ?? null]).toEqual([ctl.name, ctl.cave_first_col]);
+    // DEPTH, and it is worth asserting right beside the corpus result above. harddrop's own drawn
+    // caves are 2-3 rows deep; 29 of the corpus's 30 >=3-wide hits are ONE row deep. So the metric's
+    // width column is not merely a weak signal — the shapes it counts are not the shape the article
+    // draws, and `min_depth_ge_2` is the only column that says so.
+    expect([ctl.name, (cave?.minDepth ?? 0) >= 2]).toEqual([ctl.name, true]);
+  }
+});
+
+test('control — harddrop\'s own unfinished setups have no cave yet', () => {
+  // The page draws each structure mid-build; before the overhang goes on there is nothing to spin
+  // into, so these must not score. Complements the flat-floor negative below, which is the harder
+  // case: a real T-spin Double that simply has no cave under it.
+  for (const ctl of CAVE_NEGATIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells ?? []);
+    expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);
+    expect([ctl.name, caveAt(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, null]);
+  }
+});
+
+test('control — a T-spin Double over a flat floor has no cave', () => {
+  // The null case the metric needs in order for its small counts to mean anything. Built so the
+  // Double really clears exactly TWO rows: the row beneath is one cell short of full, because a
+  // board of full rows would clear three and be rejected for the wrong reason.
+  const b = drawn(['####...###', '#####.####', '#########.', '#########.'],
+                  [[4, 0], [5, 0], [6, 0], [5, 1]]);
+  expect(b.cleared).toEqual([0, 1]);
+  expect(caveAt(b.g, b.cleared, b.cells, b.h)).toBeNull();
+});
+
+/** The maximal empty run at `row` overlapping `cols` — what `caveAt` measures, recomputed here
+ *  because the test needs something the return value does not carry: WHICH columns it spans. */
+function runAt(g: boolean[][], row: number, cols: Set<number>) {
+  let c = 0;
+  while (c < 10) {
+    if (g[row]![c]) { c++; continue; }
+    let e = c;
+    while (e < 10 && !g[row]![e]) e++;
+    if ([...cols].some(k => k >= c && k < e)) return { from: c, to: e };
+    c = e;
+  }
+  return null;
+}
+
+/* ── discriminating power ──────────────────────────────────────────────────────────────────────
+ * Same argument the `<= N 格` control makes for the named-opener table: a column that fires on
+ * almost everything is not evidence, whatever it is labelled. Both of these metrics have a naive
+ * reading that would fire constantly, so each one's distance from its naive reading is asserted. */
+
+test('the donation rate is nowhere near the naive reading, in every session', () => {
+  // The naive reading — "the well column was filled through the rows the spin cleared" — is FORCED
+  // BY ARITHMETIC (a full row requires every column filled) and fires on 70-89% of all T-spin
+  // clears. What is counted is the RE-OPENING clause on top of it. If the published rate ever
+  // approached the naive one, the clause would have stopped doing the work and the metric would be
+  // a line-clear counter. Measured: 2.0-3.3% across the five sessions.
+  for (const s of SESSIONS) {
+    const d = facts(s).donation;
+    const don = sum(d.players.map((p: any) => p.donations));
+    expect([s, don * 20 < d.check.tspin_clears]).toEqual([s, true]);   // under 5%
+  }
+});
+
+test('the cave metric\'s own controls have teeth: >=3 wide is not a cave count', () => {
+  // Two directions, and the section may not print the width count without both.
+  //   BY LINES — the same >=3-wide gap appears under T-spin TRIPLES, where it is ordinary TST
+  //   residue nobody calls a cave. In most sessions there are MORE of them under Triples than
+  //   under Doubles, off a much smaller base.
+  const tripleWins = SESSIONS.filter(s =>
+    CAVE[s]!.triple_control >= CAVE[s]!.width_ge_3);
+  expect(tripleWins.length).toBeGreaterThanOrEqual(1);
+  for (const s of SESSIONS) {
+    const c = facts(s).stmb_cave;
+    expect(c.triple_control.tspin_triples_scored).toBeGreaterThan(0);   // exposure, not a vacuous 0
+  }
+  //   BY DEPTH — nearly every hit is one row deep. 29 dimples to 1 cave over the corpus, so the
+  //   raw width count overstates the technique by an order of magnitude.
+  let oneDeep = 0, deeper = 0;
+  for (const s of SESSIONS)
+    for (const [k, v] of Object.entries<number>(facts(s).stmb_cave.min_depth_histogram))
+      Number(k) === 1 ? (oneDeep += v) : Number(k) >= 2 ? (deeper += v) : 0;
+  expect(oneDeep).toBeGreaterThan(deeper * 5);
+});
+
+test('mutation — containment instead of overlap would kill every drawn cave', () => {
+  // The predicate's load-bearing choice, asserted as behaviour rather than by editing the source:
+  // in all four of harddrop's drawn structures the cave reaches a column the T does not occupy, so
+  // a containment test (run ⊆ the T's span) rejects all four. That mutant is dead.
+  for (const ctl of CAVE_POSITIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    const tc = new Set(b.cells.map(q => q.col));
+    const run = runAt(b.g, Math.max(...b.cleared) + 1, tc)!;
+    const contained = [...Array(run.to - run.from)].every((_, i) => tc.has(run.from + i));
+    expect([ctl.name, contained]).toEqual([ctl.name, false]);
+    expect([ctl.name, caveAt(b.g, b.cleared, b.cells, b.h)?.width ?? null])
+      .toEqual([ctl.name, ctl.cave_width]);  // ... while the real predicate still fires
+  }
+});
+
+test('mutation — dropping the re-opening clause would fire on a board that must be rejected', () => {
+  // Every setup harddrop draws, with ONE extra cell: the well column also filled ABOVE the rows the
+  // spin clears. The shape is otherwise untouched — same plug, same walled cavity beneath, same
+  // cleared rows — but the clear no longer re-opens the column to the surface, so the plug is a wall
+  // and not a loan. This is the one clause carrying the whole metric (the naive reading without it
+  // fires on 70-89% of all T-spin clears), and it is asserted by BEHAVIOUR rather than by editing
+  // the source.
+  //
+  // Derived from the committed transcription rather than typed out, for the same reason the controls
+  // are: a board written down twice is a board that can drift, and a mutation board that had drifted
+  // from its positive would be testing a difference of two cells while claiming one.
+  for (const ctl of DONATION_POSITIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    const well = ctl.well_col!;
+    const before = donationCols(b.g, b.cleared, b.cells, b.h);
+    expect([ctl.name, before.map(w => w.col)]).toEqual([ctl.name, [well]]);
+
+    // the topmost row that the spin does NOT clear and where the well is still open
+    const row = b.g.findIndex((r, i) => !b.cleared.includes(i) && !r[well]);
+    expect([ctl.name, row]).not.toEqual([ctl.name, -1]);
+    b.g[row]![well] = true;
+
+    // the mutation must change exactly the one thing it claims to: the row it touched is still not
+    // full, so the same rows clear and the cavity beneath the plug is untouched
+    expect([ctl.name, b.g[row]!.every(Boolean)]).toEqual([ctl.name, false]);
+    const cleared: number[] = [];
+    for (let r = 0; r < b.g.length; r++) if (b.g[r]!.every(Boolean)) cleared.push(r);
+    expect([ctl.name, cleared]).toEqual([ctl.name, b.cleared]);
+    expect([ctl.name, cavity(b.g, well, b.h).cavity]).toEqual([ctl.name, ctl.cavity]);
+    // the naive clause still holds — the well is filled through every row the spin cleared ...
+    expect([ctl.name, b.cleared.every(r => b.g[r]![well]!)]).toEqual([ctl.name, true]);
+    // ... yet the real predicate now finds no well at all
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
   }
 });

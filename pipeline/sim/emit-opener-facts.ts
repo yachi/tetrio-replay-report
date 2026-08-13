@@ -11,7 +11,7 @@
  * these numbers. The file therefore carries `report_eligible: false`, the section it feeds mints no
  * claim ids and no ✓ badges, and none of it may be merged into report/facts.json.
  *
- * FIVE METRICS, each paired with the control that says what it is NOT.
+ * EIGHT METRICS, each paired with the control that says what it is NOT.
  *
  * 1. FIRST BAG vs the community catalogue. After seven locks with no clear and no garbage a board
  *    holds exactly 28 cells; `openers/match.ts` compares it with every catalogue page at that cell
@@ -74,6 +74,16 @@
  *    among them, so (2) names a CLASS and never a member. This was found by measuring (4): a
  *    session running Honey Cup every round produces exactly the 221-of-221 that had been read as
  *    a C-Spin result.
+ *
+ * 6. PERFECT CLEAR TIMING — where in the round each perfect clear landed. The control is the count
+ *    itself, checked per round against the replay's own `clears.allclear` (`perfectClearTiming`).
+ *
+ * 7-8. DONATION and STMB CAVE — two per-T-spin BOARD-STATE techniques, neither of them an opener.
+ *    Both are scored over the verified prefix and both are licensed by the same reconstruction
+ *    check (`reconstructionCheck`): the per-lock board snapshot plus the lock's cells must make
+ *    exactly the rows full that the engine independently recorded clearing. Their controls are on
+ *    `donationMetric` (the b2b split and the well provenance) and `stmbCaveMetric` (the depth
+ *    histogram and the same shape under a Triple).
  *
  * Rates are integers scaled x1000, matching report/facts.json and forecast-facts.json.
  */
@@ -146,6 +156,139 @@ const wikiMasks = WIKI_CSPIN.map(o => {
   return { mask: m, mirror: m.map(l => [...l].reverse().join('')) };
 });
 
+/** Cells of empty column beneath the plug for the shape to be a DONATION rather than a bump.
+ *  4 exactly, and it is harddrop's number rather than a threshold chosen here: of the 20 named
+ *  setups the article draws, 17 leave a four-cell well under the plug and 3 leave five — never
+ *  three, never six or more. Four is therefore the floor the drawings support. */
+export const DONATION_CAVITY = 4;
+/** How many of the well's cavity rows must be walled on both sides. The DEEPEST 4, not all of
+ *  them: the article's TSS L Donation leaves its topmost cavity row open on one side, so requiring
+ *  every cavity row to be walled drops a setup harddrop itself draws as a donation. */
+export const DONATION_WALLED_ROWS = 4;
+/** Narrowest gap harddrop calls a CAVE. Its Basic Structures are drawn three columns wide; two is
+ *  an ordinary overhang, which every board in this corpus produces constantly. */
+export const CAVE_MIN_WIDTH = 3;
+
+/** filled/empty view of a simulated board — the frame both board-state metrics work in. An absent
+ *  board (lock 0 has none before it) reads as an empty field rather than throwing. */
+const occupancyOf = (b: (string | null)[][] | undefined): boolean[][] =>
+  Array.from({ length: H }, (_, r) =>
+    Array.from({ length: BOARD_WIDTH }, (_, c) => (b ? b[r]?.[c] != null : false)));
+
+/** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
+ *  `lowest` is -1 for a wholly empty column, in which case the cavity is reported as 0 — an empty
+ *  column has no plug above it and so is not a well anybody donated into. */
+export function cavity(g: boolean[][], col: number, h: number) {
+  let lowest = -1;
+  for (let r = 0; r < h; r++) if (g[r]![col]) lowest = r;
+  if (lowest < 0) return { cavity: 0, lowest };
+  let n = 0;
+  for (let r = lowest + 1; r < h; r++) if (!g[r]![col]) n++;
+  return { cavity: n, lowest };
+}
+
+/**
+ * DONATION (harddrop.com/wiki/Donation) — the well columns this T-spin clear donated into.
+ *
+ * THE NAIVE FORM DISCRIMINATES NOTHING, and that is the trap this predicate is written around.
+ * "The well column is filled through the rows the spin cleared" is FORCED BY ARITHMETIC: a full
+ * row requires every column filled, so the naive test fires on 70-89% of all T-spin clears and
+ * says only that a line was cleared. All of the power is in the RE-OPENING clause — EVERY filled
+ * cell of the column must lie in a cleared row, so once the clear resolves the column is open from
+ * the surface to the floor again, which is what makes the plug a loan rather than a wall.
+ *
+ * The T's own slot is excluded, but only when the T occupies the column in EVERY cleared row: a
+ * column the T touches in just one of them can still be the well, and is in 3 of the article's 20
+ * named setups.
+ */
+export function donationCols(withT: boolean[][], cleared: number[], t: { row: number; col: number }[], h: number) {
+  const inCleared = new Set(cleared);
+  const tByCol = new Map<number, Set<number>>();
+  for (const q of t) {
+    if (!tByCol.has(q.col)) tByCol.set(q.col, new Set());
+    tByCol.get(q.col)!.add(q.row);
+  }
+  const out: { col: number; cavity: number }[] = [];
+  for (let c = 0; c < BOARD_WIDTH; c++) {
+    const tRows = tByCol.get(c);
+    if (tRows && cleared.every(r => tRows.has(r))) continue;   // the T's own slot, not a plug
+    let inR = 0, outR = 0;
+    for (let r = 0; r < h; r++) {
+      if (!withT[r]![c]) continue;
+      inCleared.has(r) ? inR++ : outR++;
+    }
+    if (inR === 0 || outR > 0) continue;                       // the re-opening clause
+    const { cavity: cav, lowest } = cavity(withT, c, h);
+    if (cav < DONATION_CAVITY) continue;
+    const deep: number[] = [];
+    for (let r = h - 1; r > lowest && deep.length < DONATION_WALLED_ROWS; r--) if (!withT[r]![c]) deep.push(r);
+    const walled = deep.every(r =>
+      (c === 0 || withT[r]![c - 1]) && (c === BOARD_WIDTH - 1 || withT[r]![c + 1]));
+    if (!walled) continue;
+    out.push({ col: c, cavity: cav });
+  }
+  return out;
+}
+
+/**
+ * STMB CAVE (harddrop.com/wiki/STMB_Cave) — the widest >= 3-wide empty run under a T-spin Double.
+ *
+ * TWO THINGS THE DRAWINGS CORRECT, and both were got wrong before them:
+ *
+ *   - The cave is OFFSET from the T, sharing only two of its three columns, so the test is OVERLAP
+ *     with the T's column span and never CONTAINMENT. Containment misses all six of the article's
+ *     drawn Basic Structures.
+ *   - The cave is NOT tested for being roofed, because that test is vacuous: the cave's roof is the
+ *     nub row, which the Double has just completed. A full row roofs everything beneath it by
+ *     definition — measured, 0 of 2378 real T-spin Doubles in this corpus have an unroofed one.
+ *
+ * `minDepth` is the shallowest column of the run, and it is the thing to read: a 3-wide run one row
+ * deep is a dimple, not a cave.
+ */
+export function caveAt(withT: boolean[][], cleared: number[], t: { col: number }[], h: number) {
+  if (cleared.length !== 2) return null;                        // a Double, by definition
+  const under = Math.max(...cleared) + 1;                       // the row beneath the lower cleared row
+  if (under >= h) return null;
+  const tc = new Set(t.map(q => q.col));
+  let best: { width: number; minDepth: number } | null = null;
+  let c = 0;
+  while (c < BOARD_WIDTH) {
+    if (withT[under]![c]) { c++; continue; }
+    let e = c;
+    while (e < BOARD_WIDTH && !withT[under]![e]) e++;
+    const width = e - c;
+    let overlaps = false;
+    for (let k = c; k < e; k++) if (tc.has(k)) overlaps = true;
+    if (overlaps && width >= CAVE_MIN_WIDTH) {
+      let minDepth = Infinity;
+      for (let k = c; k < e; k++) {
+        let d = 0;
+        for (let r = under; r < h && !withT[r]![k]; r++) d++;
+        minDepth = Math.min(minDepth, d);
+      }
+      if (!best || width > best.width) best = { width, minDepth };
+    }
+    c = e;
+  }
+  return best;
+}
+
+/** The cave metric's own control: the same >= 3-wide gap under the cleared rows, with the T's span
+ *  ignored. Run under a TRIPLE, where such a gap is ordinary TST residue and nobody calls it a cave. */
+function wideGapUnder(withT: boolean[][], cleared: number[], h: number) {
+  const under = Math.max(...cleared) + 1;
+  if (under >= h) return false;
+  let c = 0;
+  while (c < BOARD_WIDTH) {
+    if (withT[under]![c]) { c++; continue; }
+    let e = c;
+    while (e < BOARD_WIDTH && !withT[under]![e]) e++;
+    if (e - c >= CAVE_MIN_WIDTH) return true;
+    c = e;
+  }
+  return false;
+}
+
 const BANDS = ['0', '1-2', '3-4', '5-8', '9-14', '15+'] as const;
 const band = (d: number) => (d === 0 ? '0' : d <= 2 ? '1-2' : d <= 4 ? '3-4' : d <= 8 ? '5-8' : d <= 14 ? '9-14' : '15+');
 const emptyBands = () => Object.fromEntries(BANDS.map(b => [b, 0])) as Record<string, number>;
@@ -178,6 +321,20 @@ interface Round { user: string; verified: number; spinsVerified: { i: number; cl
                    *  replay's own tally. null when the replay did not carry the counter, which is
                    *  an UNKNOWN and must not be compared against the simulator as if it were 0. */
                   pcReal: number | null }
+/** One verified T-spin CLEAR, with everything the two board-state metrics read off it. Collected
+ *  once in the session walk because both metrics need the same three sources to line up: the
+ *  pre-lock board, the lock's own cells, and the engine's own record of which rows went. */
+interface TSpinClear {
+  user: string; lines: number;
+  /** the donation well this clear opened, if any — the first one, on the corpus's every event the
+   *  only one. `garbageWell` is the well's PROVENANCE and `plug` splits harddrop's own Natural
+   *  from its Other Examples: null when the plugging lock cannot be identified. */
+  donation: { cavity: number; garbageWell: boolean; plug: 'natural' | 'b2b_breaking' | null } | null;
+  /** the widest >= 3-wide gap under a Double that overlaps the T's columns (metric 8) */
+  cave: { width: number; minDepth: number } | null;
+  /** the control: the same gap width under a Triple, where it is TST residue rather than a cave */
+  wideGapUnderTriple: boolean;
+}
 
 /**
  * The whole artifact for one session directory, as a value.
@@ -193,6 +350,9 @@ const bags: Bag[] = [];
 const cleanBoards: CleanBoard[] = [];
 const rounds: Round[] = [];
 const spinWindows: { user: string; lines: number; drawn: boolean; mirrored: boolean }[] = [];
+const tspinClears: TSpinClear[] = [];
+/** The licensing check on metrics 7 and 8 — see `reconstructionCheck`. */
+let reconAgreed = 0, reconDisagreed = 0;
 let roundsTotal = 0;
 
 for (const c of loadCases(dir)) {
@@ -223,6 +383,59 @@ for (const c of loadCases(dir)) {
     spinWindows.push({ user: c.user, lines: s.cleared,
                        drawn: wikiMasks.some(w => eq(w.mask)),
                        mirrored: wikiMasks.some(w => eq(w.mirror)) });
+  }
+
+  // metrics 7 & 8 — the two board-state techniques, over the same verified prefix as the geometry
+  // above. Both read the board the T went into, so both are collected in one pass.
+  for (let i = 0; i < r.locks.length; i++) {
+    const lk = r.locks[i]!;
+    if (lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0 || i > v) continue;
+    const withT = occupancyOf(i > 0 ? (r.boards[i - 1] as (string | null)[][] | undefined) : undefined);
+    for (const q of lk.cells)
+      if (q.row >= 0 && q.row < H && q.col >= 0 && q.col < BOARD_WIDTH) withT[q.row]![q.col] = true;
+
+    // THE LICENSING CHECK. `withT` is the per-lock board snapshot plus this lock's cells; the rows
+    // it makes full must be exactly the rows the engine recorded clearing, which it derived from a
+    // different state (its pre-tick occupancy). Two sources, so their agreement is a real gate and
+    // not a tautology — and a clear they disagree about is dropped rather than scored.
+    const mine: number[] = [];
+    for (let rr = 0; rr < H; rr++) if (withT[rr]!.every(Boolean)) mine.push(rr);
+    const theirs = [...(r.records[i]?.clearedRows ?? [])].sort((a, b) => a - b);
+    if (!(mine.length === theirs.length && mine.every((x, k) => x === theirs[k]))) { reconDisagreed++; continue; }
+    if (!mine.length) continue;
+    reconAgreed++;
+
+    const wells = donationCols(withT, mine, lk.cells, H);
+    let donation: TSpinClear['donation'] = null;
+    if (wells.length) {
+      const w = wells[0]!;
+      const prov = i > 0 ? r.provSnaps[i - 1] : undefined;
+      // WELL PROVENANCE. A well ROW is garbage-derived when that row's FILLED cells are mostly
+      // garbage. Never test the well cell itself for the -1 garbage tag: it is EMPTY by
+      // construction and so carries null, which made an earlier pass report every well in the
+      // corpus as self-built — a guard that can never fire reads exactly like a measurement.
+      let garbageWell = false;
+      for (let rr = 0; rr < H && !garbageWell; rr++) {
+        if (withT[rr]![w.col]) continue;
+        let filled = 0, gb = 0;
+        for (let cc = 0; cc < BOARD_WIDTH; cc++) {
+          const q = prov?.[rr]?.[cc];
+          if (q != null) { filled++; if (q === -1) gb++; }
+        }
+        if (filled > 0 && gb * 2 >= filled) garbageWell = true;
+      }
+      // harddrop's own division: a Natural Donation plugs with a lock that cleared nothing, the
+      // Other Examples plug with one that cleared a row and so broke the back-to-back chain.
+      const plugLock = prov?.[mine[0]!]?.[w.col];
+      const plug = typeof plugLock === 'number' && plugLock >= 0 && r.locks[plugLock]
+        ? (r.locks[plugLock]!.cleared > 0 ? 'b2b_breaking' as const : 'natural' as const)
+        : null;
+      donation = { cavity: w.cavity, garbageWell, plug };
+    }
+
+    tspinClears.push({ user: c.user, lines: lk.cleared, donation,
+                       cave: caveAt(withT, mine, lk.cells, H),
+                       wideGapUnderTriple: lk.cleared === 3 && wideGapUnder(withT, mine, H) });
   }
 
   // The opening board after n locks, for each n an opener can end its first bag on: no line clear
@@ -556,6 +769,109 @@ function perfectClearTiming() {
   };
 }
 
+/**
+ * The check that licenses metrics 7 and 8, in the same shape `perfect_clear_timing` publishes its
+ * own: a per-event comparison of two states that were built separately, emitted rather than
+ * asserted. `withT` (the per-lock board snapshot plus the lock's cells) must make exactly the rows
+ * full that the engine's pre-tick occupancy said it cleared. Over the five committed sessions it
+ * does on every one of them; a clear they disagree about is dropped, never scored.
+ */
+const reconstructionCheck = () => ({
+  tspin_clears: reconAgreed + reconDisagreed,
+  reconstruction_agreed: reconAgreed,
+  reconstruction_disagreed: reconDisagreed,
+  agrees: reconDisagreed === 0 && reconAgreed > 0,
+});
+
+// ── metric 7: DONATION ─────────────────────────────────────────────────────────────────────────
+// THE CONTROL IS THE TWO SPLITS, and neither may be dropped. The b2b split reproduces harddrop's
+// own Natural-vs-Other-Examples division from the plugging lock; the provenance split says whose
+// well it was. Both matter because the corpus answers them the same way every time — all of these
+// wells are garbage-derived — which is exactly the finding, and also the caveat (see below).
+function donationMetric() {
+  return {
+    source: 'harddrop.com/wiki/Donation',
+    definition: 'plugging the well with a piece so a T-spin can clear the rows across it, the clear '
+              + 'then re-opening the well surface-to-floor — the plug is a loan, not a wall',
+    cavity_cells: DONATION_CAVITY,
+    walled_deepest_rows: DONATION_WALLED_ROWS,
+    scope: 'verified prefix',
+    check: reconstructionCheck(),
+    players: users.map(user => {
+      const mine = tspinClears.filter(e => e.user === user);
+      const d = mine.filter(e => e.donation).map(e => e.donation!);
+      return {
+        user,
+        tspin_clears_scored: mine.length,
+        donations: d.length,
+        self_built_well: d.filter(x => !x.garbageWell).length,
+        garbage_derived_well: d.filter(x => x.garbageWell).length,
+        natural: d.filter(x => x.plug === 'natural').length,
+        b2b_breaking: d.filter(x => x.plug === 'b2b_breaking').length,
+        plug_unknown: d.filter(x => x.plug === null).length,
+      };
+    }),
+    means: 'how many verified T-spin clears were fired across a plugged well that the clear then '
+         + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
+         + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
+         + '("the well was filled through the cleared rows") is FORCED BY ARITHMETIC — a full row '
+         + 'requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating '
+         + 'clause is the re-opening, and that is what is counted here',
+    caveat: 'every donation in this corpus sits on a GARBAGE-derived well, and the oracle board '
+          + 'source keeps the engine\'s own seeded-RNG hole columns, which disagree with the '
+          + 'ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board '
+          + 'offered this shape that often; it does not establish WHICH column any one donation used, '
+          + 'and it may never be read as "this player donated into that well"',
+  };
+}
+
+// ── metric 8: STMB CAVE ────────────────────────────────────────────────────────────────────────
+// THE CONTROL IS THE CROSS-TAB, in two directions, and this metric may not be printed without both:
+//   - by DEPTH: nearly every >=3-wide hit is ONE ROW deep, which is a dimple and not a cave. The
+//     width count on its own reads as dozens of STMB caves; the depth histogram beside it says how
+//     many are genuine (1 in 592 player-rounds, five sessions).
+//   - by LINES: the same >=3-wide gap appears under T-spin TRIPLES at a comparable rate, where it
+//     is ordinary TST residue that nobody calls a cave. A shape that fires as often under the spin
+//     the technique is NOT about is a shape test, not a technique test.
+function stmbCaveMetric() {
+  const wide = tspinClears.filter(e => e.cave && e.cave.width >= CAVE_MIN_WIDTH);
+  const hist = (xs: number[]) => {
+    const h: Record<string, number> = {};
+    for (const x of xs) h[String(x)] = (h[String(x)] ?? 0) + 1;
+    return h;
+  };
+  const triples = tspinClears.filter(e => e.lines === 3);
+  return {
+    source: 'harddrop.com/wiki/STMB_Cave',
+    definition: 'a floating T-spin Double placed over a cave at least three columns wide — the cave '
+              + 'is OFFSET from the T, sharing two of its three columns, so the test is overlap with '
+              + 'the T\'s span and never containment',
+    min_width: CAVE_MIN_WIDTH,
+    scope: 'verified prefix',
+    players: users.map(user => {
+      const mine = tspinClears.filter(e => e.user === user);
+      const w = mine.filter(e => e.cave && e.cave.width >= CAVE_MIN_WIDTH);
+      return {
+        user,
+        tspin_doubles_scored: mine.filter(e => e.lines === 2).length,
+        width_ge_3: w.length,
+        min_depth_ge_2: w.filter(e => e.cave!.minDepth >= 2).length,
+      };
+    }),
+    width_histogram: hist(wide.map(e => e.cave!.width)),
+    min_depth_histogram: hist(wide.map(e => e.cave!.minDepth)),
+    triple_control: {
+      tspin_triples_scored: triples.length,
+      width_ge_3: triples.filter(e => e.wideGapUnderTriple).length,
+    },
+    means: 'how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T\'s '
+         + 'columns. Read it against BOTH controls beside it and never on its own: '
+         + '`min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a '
+         + 'dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, '
+         + 'where it is ordinary TST residue',
+  };
+}
+
 // ── metric 3: slot geometry, cross-tabbed by lines (the control) ───────────────────────────────
 function slotRows() {
   const out = [];
@@ -640,6 +956,13 @@ function notEligibleBecause() {
     + `${cat.pages.length} catalogue pages are free of a full row and so could ever equal a `
     + 'no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is '
     + 'why harddrop\'s own diagrams are carried alongside');
+  const don = donationMetric().players.reduce((a, p) => a + p.donations, 0);
+  const gb = donationMetric().players.reduce((a, p) => a + p.garbage_derived_well, 0);
+  why.push(`the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: ${gb} of ${don} `
+    + 'donations here sit on a garbage-derived well, and the oracle keeps the engine\'s own '
+    + 'seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times '
+    + '(oracle-source.ts) — so the shape is counted, but which column any one donation used is not '
+    + 'established');
   return why;
 }
 
@@ -718,6 +1041,12 @@ return {
   /** WHERE in the round each Perfect Clear landed, with the per-round count check that licenses
    *  publishing it at all. See `perfectClearTiming`. */
   perfect_clear_timing: perfectClearTiming(),
+
+  /** Two per-T-spin BOARD-STATE techniques — neither is an opener, both are the same quarantined
+   *  tier as the slot geometry above. See `donationMetric` / `stmbCaveMetric` for the controls each
+   *  ships with, and `donation.caveat` for the bound the oracle's garbage hole columns put on them. */
+  donation: donationMetric(),
+  stmb_cave: stmbCaveMetric(),
 };
 }
 
@@ -775,6 +1104,20 @@ if (import.meta.main) {
     + (out.session_perfect_clears
        ? JSON.stringify(out.session_perfect_clears.per_player) + ' perfect clears in the session'
        : 'facts.json not present — not known here'));
+  const dk = out.donation.check;
+  console.log(`\ndonation / STMB cave (verified prefix; reconstruction ${dk.reconstruction_agreed}/`
+    + `${dk.tspin_clears}, disagreements ${dk.reconstruction_disagreed}):`);
+  for (const p of out.donation.players)
+    console.log(`  ${p.user.padEnd(10)} n=${String(p.tspin_clears_scored).padStart(4)}  `
+      + `donations=${String(p.donations).padStart(3)} (garbage well ${p.garbage_derived_well}, `
+      + `self-built ${p.self_built_well}; natural ${p.natural}, b2b-breaking ${p.b2b_breaking})`);
+  for (const p of out.stmb_cave.players)
+    console.log(`  ${p.user.padEnd(10)} TSD=${String(p.tspin_doubles_scored).padStart(4)}  `
+      + `cave >=${out.stmb_cave.min_width} wide=${String(p.width_ge_3).padStart(3)}  `
+      + `of which >=2 deep=${p.min_depth_ge_2}`);
+  console.log(`  control: the same >=${out.stmb_cave.min_width}-wide gap under a Triple — `
+    + `${out.stmb_cave.triple_control.width_ge_3} of ${out.stmb_cave.triple_control.tspin_triples_scored}`
+    + `   min-depth hist ${JSON.stringify(out.stmb_cave.min_depth_histogram)}`);
   console.log(`\nordering control: ${out.ordering_class.openers} openers share the `
     + `Triple-before-Double signature (${out.ordering_class.name})`);
   console.log('\nnot report-eligible because:');

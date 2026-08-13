@@ -101,6 +101,17 @@ under its own name, since otherwise the wide reading would be the narrow one rep
 `pipeline/sim/emit-opener-facts.ts` turns this into `sessions/<date>/sim/opener-facts.json`, which
 `pipeline/opener_section.py` renders into each report — quarantined exactly like the forecast
 section, with no claim ids and no ✓ badges, because it is simulator-derived. The first-bag
-comparison above is one of its three metrics; the other two are the **ordering** of the two T-spins
+comparison above is one of its metrics; the others are the **ordering** of the two T-spins
 (DT Cannon is a Double then a Triple, the C-Spin a Triple then a Double) and the **slot geometry**
 against harddrop's own diagrams. See that emitter's docstring for what each one's control is.
+
+## Two of these are not openers at all
+
+`wiki-tspin-techniques.json` (built by `extract_wiki_techniques.py`, same discipline as
+`wiki-openers.json`) carries harddrop's **Donation** and **STMB Cave** pages. Neither is an opener —
+both are filed under `Mid-game T-Spin setups` and drawn on partial stacks — so they are scored as
+per-T-spin board-state predicates over the whole round, never against a first bag. The file holds
+each page's drawn boards **with the outcome the article shows** (`clears`, `well_col`, `cavity`,
+`cave_width`), which is what makes them instrument controls rather than illustrations: `openers.test.ts`
+runs the shipped predicates over them and requires every positive to fire and every negative — including
+harddrop's own one-cell minimal pair, "a case where an S donation does not work" — to be rejected.

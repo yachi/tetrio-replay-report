@@ -1,0 +1,616 @@
+{
+  "schema": "wiki-tspin-techniques/1",
+  "source": "harddrop.com/wiki",
+  "why": "a Donation and an STMB Cave are mid-game geometries, not opening fields, so what is transcribable is the shape plus the boards harddrop draws it holding and not holding; the negative controls are the only external falsification a shape detector has",
+  "cell_legend": {
+    ".": "empty",
+    "#": "occupied (occupancy view)",
+    "T": "the placed T",
+    "IJLOSTZ": "that piece as drawn",
+    "G": "grey — any piece"
+  },
+  "coordinates": "t_cells are [col, row]; row 0 is the top row of `rows` as stored",
+  "provenance": [
+    {
+      "page": "Donation",
+      "url": "https://harddrop.com/wiki/Donation",
+      "oldid": 37456,
+      "sha256": "a601102d15885aae6cc5c2a90a8d1f43de263fd4e437a96c63e4e5b4a7dc4863",
+      "bytes": 1481953
+    },
+    {
+      "page": "STMB_Cave",
+      "url": "https://harddrop.com/wiki/STMB_Cave",
+      "oldid": 41496,
+      "sha256": "4345eff6296e30a56171033819ff859b888a094817867f1f38d92278fd5cc05f",
+      "bytes": 952341
+    }
+  ],
+  "donation": {
+    "wiki": "Donation",
+    "url": "https://harddrop.com/wiki/Donation",
+    "definition": "Donating is a method of \"plugging\" up the Tetris hole to send a T-Spin.",
+    "also_says": "After the T-Spin, the Tetris hole is opened up once again to allow the continuation of Tetris or downstacking.",
+    "categories": [
+      "T-Spin techniques",
+      "T-Spin setups",
+      "Donation setups",
+      "Back-to-Back T-Spin setups",
+      "Mid-game T-Spin setups"
+    ],
+    "controls": [
+      {
+        "name": "S Donation",
+        "kind": "positive",
+        "heading": "Natural Donations",
+        "diagram_index": 3,
+        "rows": [
+          "...J......",
+          "GGGJJJ..S.",
+          "GGGGG...SS",
+          "GGGGGG.GGS",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "occupancy": [
+          "...#......",
+          "######..#.",
+          "#####...##",
+          "######.###",
+          "#########.",
+          "#########.",
+          "#########.",
+          "#########."
+        ],
+        "cells": 60,
+        "t_cells": [
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "clears": 2,
+        "spin": "double",
+        "well_col": 9,
+        "cavity": 4
+      },
+      {
+        "name": "J Donation",
+        "kind": "positive",
+        "heading": "Natural Donations",
+        "diagram_index": 12,
+        "rows": [
+          "...OO.....",
+          "GGGOO.....",
+          "GGGG...JJJ",
+          "GGGGG.GGGJ",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "occupancy": [
+          "...##.....",
+          "#####.....",
+          "####...###",
+          "#####.####",
+          "#########.",
+          "#########.",
+          "#########.",
+          "#########."
+        ],
+        "cells": 59,
+        "t_cells": [
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "clears": 2,
+        "spin": "double",
+        "well_col": 9,
+        "cavity": 4
+      },
+      {
+        "name": "O Donation",
+        "kind": "positive",
+        "heading": "Natural Donations",
+        "diagram_index": 18,
+        "rows": [
+          "....SS....",
+          "GGGSS...OO",
+          "GGGGGG.GOO",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "occupancy": [
+          "....##....",
+          "#####...##",
+          "######.###",
+          "#########.",
+          "#########.",
+          "#########.",
+          "#########."
+        ],
+        "cells": 54,
+        "t_cells": [
+          [
+            5,
+            1
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            6,
+            2
+          ]
+        ],
+        "clears": 2,
+        "spin": "double",
+        "well_col": 9,
+        "cavity": 4
+      },
+      {
+        "name": "S Donation (T-Spin Single)",
+        "kind": "positive",
+        "heading": "T-Spin Single Donations",
+        "diagram_index": 72,
+        "rows": [
+          ".......OO.",
+          ".......OO.",
+          "GGGGG...SS",
+          "GGGGGG.SS.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "occupancy": [
+          ".......##.",
+          ".......##.",
+          "#####...##",
+          "######.##.",
+          "#########.",
+          "#########.",
+          "#########.",
+          "#########."
+        ],
+        "cells": 55,
+        "t_cells": [
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "clears": 1,
+        "spin": "single",
+        "well_col": 9,
+        "cavity": 5
+      },
+      {
+        "name": "S Donation (does not work)",
+        "kind": "negative",
+        "heading": "T-Spin Single Donations",
+        "diagram_index": 73,
+        "rows": [
+          ".......OO.",
+          ".......OO.",
+          "GGGG....SS",
+          "GGGGGG.SS.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "occupancy": [
+          ".......##.",
+          ".......##.",
+          "####....##",
+          "######.##.",
+          "#########.",
+          "#########.",
+          "#########.",
+          "#########."
+        ],
+        "cells": 54,
+        "t_cells": [
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "clears": 0,
+        "t_drawn": [
+          ".......OO.",
+          ".......OO.",
+          "GGGG.TTTSS",
+          "GGGGGGTSS.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG.",
+          "GGGGGGGGG."
+        ],
+        "t_drawn_index": 74,
+        "spin": null,
+        "well_col": null,
+        "cavity": null
+      }
+    ],
+    "cavity_cells": 4,
+    "walled_deepest_rows": 4,
+    "near_miss": {
+      "works": "S Donation (T-Spin Single)",
+      "fails": "S Donation (does not work)",
+      "says": "A case where an S donation does not work:",
+      "differing_cells": [
+        [
+          4,
+          2
+        ]
+      ]
+    }
+  },
+  "stmb_cave": {
+    "wiki": "STMB Cave",
+    "url": "https://harddrop.com/wiki/STMB_Cave",
+    "definition": "An STMB Cave is a floating T-Spin Double setup.",
+    "also_says": "It is typically created over a 3-wide gap using an S or Z piece as its base.",
+    "categories": [
+      "T-Spin techniques",
+      "T-Spin setups",
+      "Mid-game T-Spin setups"
+    ],
+    "controls": [
+      {
+        "name": "Z base, S overhang",
+        "kind": "positive",
+        "heading": "Basic Structures",
+        "diagram_index": 3,
+        "rows": [
+          "....Z.....",
+          "...ZZ.....",
+          "GGGZ...SSG",
+          "GGGGG.SSGG",
+          "GGGGG...GG",
+          "GGGGG...GG"
+        ],
+        "occupancy": [
+          "....#.....",
+          "...##.....",
+          "####...###",
+          "#####.####",
+          "#####...##",
+          "#####...##"
+        ],
+        "cells": 33,
+        "t_cells": [
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "clears": 2,
+        "cave_first_col": 5,
+        "cave_width": 3
+      },
+      {
+        "name": "O tower, S overhang",
+        "kind": "positive",
+        "heading": "Basic Structures",
+        "diagram_index": 6,
+        "rows": [
+          "...OO.....",
+          "...OO.....",
+          "GGGG...SSG",
+          "GGGGG.SSGG",
+          "GGGGG...GG",
+          "GGGGG...GG"
+        ],
+        "occupancy": [
+          "...##.....",
+          "...##.....",
+          "####...###",
+          "#####.####",
+          "#####...##",
+          "#####...##"
+        ],
+        "cells": 34,
+        "t_cells": [
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "clears": 2,
+        "cave_first_col": 5,
+        "cave_width": 3
+      },
+      {
+        "name": "O tower, Z overhang (mirrored)",
+        "kind": "positive",
+        "heading": "Basic Structures",
+        "diagram_index": 9,
+        "rows": [
+          "........OO",
+          "........OO",
+          "GGGGZZ...G",
+          "GGGGGZZ.GG",
+          "GGGGG...GG",
+          "GGGGG...GG"
+        ],
+        "occupancy": [
+          "........##",
+          "........##",
+          "######...#",
+          "#######.##",
+          "#####...##",
+          "#####...##"
+        ],
+        "cells": 34,
+        "t_cells": [
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            8,
+            2
+          ],
+          [
+            7,
+            3
+          ]
+        ],
+        "clears": 2,
+        "cave_first_col": 5,
+        "cave_width": 3
+      },
+      {
+        "name": "L and I base, Z overhang",
+        "kind": "positive",
+        "heading": "Basic Structures",
+        "diagram_index": 18,
+        "rows": [
+          ".......ZZ.",
+          "GIIII...ZZ",
+          "GGGLLL.GGG",
+          "GGGL...GGG",
+          "GGGG...GGG",
+          "GGGG...GGG"
+        ],
+        "occupancy": [
+          ".......##.",
+          "#####...##",
+          "######.###",
+          "####...###",
+          "####...###",
+          "####...###"
+        ],
+        "cells": 39,
+        "t_cells": [
+          [
+            5,
+            1
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            6,
+            2
+          ]
+        ],
+        "clears": 2,
+        "cave_first_col": 4,
+        "cave_width": 3
+      },
+      {
+        "name": "Z base, no overhang yet",
+        "kind": "negative",
+        "heading": "Basic Structures",
+        "diagram_index": 2,
+        "rows": [
+          "....Z.....",
+          "...ZZ.....",
+          "GGGZ.....G",
+          "GGGGG...GG",
+          "GGGGG...GG",
+          "GGGGG...GG"
+        ],
+        "occupancy": [
+          "....#.....",
+          "...##.....",
+          "####.....#",
+          "#####...##",
+          "#####...##",
+          "#####...##"
+        ],
+        "cells": 29,
+        "t_cells": null,
+        "clears": 0,
+        "cave_first_col": null,
+        "cave_width": null
+      }
+    ],
+    "min_width": 3,
+    "confusable": {
+      "why": "harddrop has no \"floating T-Spin\" category; Mid-game T-Spin setups is a WHEN rather than a shape, Back-to-Back T-Spin setups does not contain STMB Cave, and Donation setups is a two-member redlink — so the defensible class is the one the article names itself",
+      "source_section": "Variants, Other Uses, and Comparisons",
+      "techniques": [
+        "Cut copy",
+        "Shachiku Train",
+        "Sky Prop",
+        "Kaidan",
+        "Bennxt Prop",
+        "Pelican Opener"
+      ],
+      "says": [
+        {
+          "technique": "Cut copy",
+          "says": "Compare these variations of STMB Cave below with Cut copy. By definition, Cut copy is a technique where one invests a T shape underneath a T-Spin Double and the overhang for the second T-Spin could be placed beforehand for two consecutive T-Spin Doubles."
+        },
+        {
+          "technique": "Shachiku Train",
+          "says": "Compare this variation of STMB Cave below with Shachiku Train. Although this variation uses a floating T-Spin Double over 3 columns wide hole, this still has the same shape and steps as Shachiku Train."
+        },
+        {
+          "technique": "Sky Prop",
+          "says": "Compare these variations of STMB Cave below with Sky Prop. On some cases, STMB Cave is just Sky Prop but with 3 columns wide hole."
+        },
+        {
+          "technique": "Kaidan",
+          "says": "Compare this variation of STMB Cave below with Kaidan. On these kinds of terrain, one could choose either one of these techniques depending on their NEXT queue after the T-Spin Double or the terrain left over after the T-Spin Double."
+        },
+        {
+          "technique": "Bennxt Prop",
+          "says": "It is moderately hard to spot the opportunity, but one could make a T-Spin Double cut T-Spin Double by using STMB Cave. One can also cut more than a one T-Spin Double. This technique is called Bennxt Prop, named after the player who introduced it."
+        },
+        {
+          "technique": "Pelican Opener",
+          "says": "An STMB Cave could be used along with Donation T-Spin Double for effective usage of pieces. As similarly seen in the Pelican Opener shown."
+        }
+      ],
+      "category_evidence": [
+        {
+          "name": "Mid-game T-Spin setups",
+          "url": "https://harddrop.com/wiki/Category:Mid-game_T-Spin_setups",
+          "declares": 63,
+          "members": 63,
+          "holds_donation": true,
+          "holds_stmb_cave": true,
+          "verdict": "too broad — a WHEN, not a shape; 63 pages including Kaidan, Nuki and T-Spin Forecast, which share no geometry with a floating T-Spin Double",
+          "provenance": {
+            "page": "Category:Mid-game_T-Spin_setups",
+            "url": "https://harddrop.com/wiki/Category:Mid-game_T-Spin_setups",
+            "oldid": 31301,
+            "sha256": "5f6759023aca228b1152f36f8b51035b48bcf0dd8166c64cf33db1af048226fe",
+            "bytes": 35273
+          }
+        },
+        {
+          "name": "Back-to-Back T-Spin setups",
+          "url": "https://harddrop.com/wiki/Category:Back-to-Back_T-Spin_setups",
+          "declares": 38,
+          "members": 38,
+          "holds_donation": true,
+          "holds_stmb_cave": false,
+          "verdict": "does not contain STMB Cave at all — a category that omits the technique cannot be that technique's class",
+          "provenance": {
+            "page": "Category:Back-to-Back_T-Spin_setups",
+            "url": "https://harddrop.com/wiki/Category:Back-to-Back_T-Spin_setups",
+            "oldid": 31315,
+            "sha256": "7dfedff191f71c7e1ee255d1355a38606b95da259ac0f19815e7fbecfbdf9034",
+            "bytes": 32745
+          }
+        },
+        {
+          "name": "Donation setups",
+          "url": "https://harddrop.com/wiki/Category:Donation_setups",
+          "declares": 2,
+          "members": 2,
+          "holds_donation": true,
+          "holds_stmb_cave": false,
+          "verdict": "a class of two whose category page is a redlink; one of the two IS the article, so quoting it as a control would be self-reference",
+          "provenance": {
+            "page": "Category:Donation_setups",
+            "url": "https://harddrop.com/wiki/Category:Donation_setups",
+            "oldid": null,
+            "sha256": "a2486d20b14f4ea960eb67e44eb5883324ba4558748c25f9df4ac7865198adca",
+            "bytes": 26447
+          }
+        }
+      ]
+    }
+  }
+}

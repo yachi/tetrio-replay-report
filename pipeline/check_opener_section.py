@@ -8,7 +8,7 @@ report is protected by Dafny lemmas over facts.json, this section is deliberatel
 chain, so without its own guard its numbers could drift from their source with nothing to catch
 it. The argument for re-rendering rather than sampling is spelled out there and is not repeated.
 
-Seven things are checked:
+Nine things are checked:
   1. the committed region is EXACTLY what rendering this session's JSON produces;
   2. every per-player ordering figure appears in the rendered HTML;
   3. the section still declares itself unproved and carries no claim badge — promoting simulator
@@ -31,6 +31,17 @@ Seven things are checked:
      deadline. Those piece numbers are the only simulator figures in this section that a verified
      source could have contradicted; printing them without saying it did not is the same overclaim
      as a badge, and without the deadline "landed on piece 20" has nothing to be late for.
+  8. the DONATION table keeps its well-provenance paragraph. Every donation in this corpus sits on
+     a garbage-derived well, and the board source keeps the engine's seeded-RNG hole columns, which
+     disagree with the ige-recorded ones 97 of 103 times — so the count is a statement about a
+     SHAPE the board offered and never about which column a player donated into. Drop the paragraph
+     and a shape count becomes "this player donated into that well" 21 times, which is the strongest
+     claim in this section and the one the data supports least.
+  9. the STMB CAVE table keeps BOTH cross-tabs. By depth: nearly every >=3-wide hit is one row
+     deep, i.e. a dimple. By lines: the same gap fires MORE often under T-spin Triples, where it is
+     ordinary TST residue. Either one alone leaves the count readable as a cave count, so both are
+     demanded, together with the class note saying harddrop's own page calls the shape a Sky Prop
+     variant that Shachiku Train shares — the same rule as the ordering table's class control.
 
 Every one of these controls has a mutant in `--selftest` that deletes its sentence and expects
 a rejection. A control with no mutant proving it fires is a comment, not a gate.
@@ -81,6 +92,26 @@ PCO_MARKER = "clears.allclear"
 #   - harddrop's own ten-piece deadline — without it "landed on piece 20" has nothing to be late
 #     FOR, and the row reads as a PCO count rather than as the refutation of one.
 TIMING_MARKERS = ("個回合啱", "harddrop 畫 PCO 嘅死線")
+
+# The control the DONATION table may not be published without, and the one this section's board
+# source forces. Two sentences, each closing a different way of over-reading the count:
+#   - where the well came from — every donation here sits on a garbage-derived well, so the count
+#     is about a board the opponent built, not a Tetris well the player kept;
+#   - the oracle's 97-of-103 garbage-hole-column disagreement, which is what turns "donated into
+#     that column" into an unsupportable claim while leaving "this shape occurred" standing.
+DONATION_MARKERS = ("條井邊度嚟", "垃圾窿嗰條欄")
+
+# The STMB Cave table's two cross-tabs, kept as separate constants because they are demanded under
+# DIFFERENT conditions: the depth sentence exists only when there is a wide gap to be shallow, while
+# the Triple comparison is printed whenever there is anything to cross-tab — including the session
+# where the Doubles count is zero and the Triples count is not, which is the control working.
+CAVE_DEPTH_MARKER = "淨係深一行"
+CAVE_TRIPLE_MARKERS = ("嘅 T-spin 底下出現咗", "TST 本身嘅殘形")
+
+# And its class note, the same rule as CLASS_MARKERS one table up: harddrop's own page says the cave
+# "is just Sky Prop but with 3 columns wide hole" and that a variation shares Shachiku Train's shape,
+# so the geometry names a family. Without this the table reads as a count of one named technique.
+CAVE_CLASS_MARKERS = ("唔係邊一個定式",)
 
 
 def problems(data, doc):
@@ -184,6 +215,41 @@ def problems(data, doc):
                            "beside the per-round count check that licenses them and beside "
                            "harddrop's own deadline that gives them a meaning")
 
+    # 8. the donation count may not be published without the paragraph saying whose well it was and
+    #    what the board source cannot establish about it. Conditioned on there BEING a donation,
+    #    which is the same condition `_donation_note` renders under: an artifact predating the
+    #    metric, or a session that donated nothing, has no such paragraph and must not be asked for
+    #    one.
+    dn = data.get("donation")
+    if dn and sum(p["donations"] for p in dn["players"]):
+        for marker in DONATION_MARKERS:
+            if marker not in body:
+                bad.append(f"the donation well-provenance control is gone ({marker!r} missing) — "
+                           "every donation here sits on a garbage-derived well and the board "
+                           "source's hole columns disagree with the ige-recorded ones 97 of 103 "
+                           "times, so the count may not be published as which well was donated "
+                           "into")
+
+    # 9. the cave count may not be published without either cross-tab. Same split as the section
+    #    renders them under: the depth sentence needs a wide gap to exist, the Triple comparison
+    #    and the class note need only a scored T-spin to compare against.
+    sc = data.get("stmb_cave")
+    if sc:
+        scored = sum(p["tspin_doubles_scored"] for p in sc["players"])
+        scored += sc["triple_control"]["tspin_triples_scored"]
+        if sum(p["width_ge_3"] for p in sc["players"]) and CAVE_DEPTH_MARKER not in body:
+            bad.append(f"the cave depth control is gone ({CAVE_DEPTH_MARKER!r} missing) — a "
+                       "3-wide gap one row deep is a dimple, and the width count may not be "
+                       "published without the depth cross-tab that says how many were")
+        if scored:
+            for marker in (*CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS):
+                if marker not in body:
+                    bad.append(
+                        f"the cave Triple/class control is gone ({marker!r} missing) — the same "
+                        "shape fires under T-spin Triples as ordinary TST residue, and harddrop "
+                        "files the geometry as a Sky Prop variant, so the count names a family "
+                        "and may not stand alone as an STMB Cave figure")
+
     return bad
 
 
@@ -267,8 +333,11 @@ def _selftest(report_dir):
     # keeping its table must be a failure and not a cosmetic edit. Listed together because they
     # are the same rule applied four times, and because a control with no mutant proving it fires
     # is a comment, not a gate.
+    # The list is enumerated by name and is NOT derived, so a control added to `problems` without a
+    # line here has no mutant and is a comment. Every marker constant in this module belongs in it.
     for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER,
-                   PCO_MARKER, *TIMING_MARKERS):
+                   PCO_MARKER, *TIMING_MARKERS, *DONATION_MARKERS, CAVE_DEPTH_MARKER,
+                   *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

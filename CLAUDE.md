@@ -61,6 +61,8 @@ python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the 
 python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
 python3 -m pipeline.openers.extract_wiki_openers --selftest # its mutants
+python3 -m pipeline.openers.extract_wiki_techniques            # CI gate: the Donation / STMB Cave
+python3 -m pipeline.openers.extract_wiki_techniques --selftest #   drawings and their controls
 python3 -m pipeline.openers.extract_wiki_openers \
   --html-dir <dir> --write                                 # re-transcribe (needs the pages fetched)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
@@ -410,6 +412,59 @@ zeros). So the section prints "rounds won" beside "rounds with one" and refuses 
 denominators are 3-12 rounds per player, and a percentage over three rounds reads far more confident
 than the data is. Two more controls it may not lose: 全消次數 ≠ 有全消嘅局 (a round can hold two), and
 "whether" is facts.json while "when" is the simulator's, in the quarantined section below.
+
+## 捐窿 同 STMB Cave — two techniques that are not openers, and the arithmetic trap under one
+
+`pipeline/openers/wiki-tspin-techniques.json` → tables five and six of the quarantined section.
+Same tier as slot geometry: a **per-T-spin board-state predicate over the whole round**, scored on
+the verified prefix, no claim ids and no badges.
+
+**Neither page is an opener, and reading them as openers is the first mistake available.** harddrop
+files both under `T-Spin techniques / Mid-game T-Spin setups`; their diagrams are 24-112 cells drawn
+on partial stacks, so a 24- or 28-cell opening board can never equal one. Putting them in the
+六個具名定式 table would have printed a column of zeros meaning "never compared" while reading as
+"these players never do this" — the same shape as the `OPENER_LOCKS` coverage bug.
+
+**The naive Donation predicate is forced by arithmetic, and it fires on 70-89% of T-spin clears.**
+"The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
+every column filled, so that clause counts line clears. All the discriminating power is in the
+**re-opening** clause — every filled cell of the column must lie inside the cleared rows, so the
+clear leaves it open surface-to-floor. With it, the rate drops to ~2.5% (82 across five sessions).
+`D = 4` and "walled at the **deepest** 4 cavity rows" are harddrop's numbers, not tuned: of its 20
+named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
+cavity row to be walled drops TSS L Donation, which the page draws as a donation.
+
+**Every donation in this corpus sits on a garbage-derived well — 0 self-built, all five sessions.**
+The oracle keeps the engine's own seeded-RNG garbage hole *columns*, which disagree with the
+ige-recorded ones 97 of 103 times (`oracle-source.ts`), so the count says the board offered the
+shape that often and can never say which column was donated into. The check that finds this must
+read the row's **filled** cells for the `-1` garbage sentinel: the well cell is empty by
+construction and carries `null`, so testing it directly is a guard nothing can fire — that exact
+bug reported every well as self-built for a whole round of measurement.
+
+**The STMB cave is OFFSET from the T and its roof test is vacuous.** The cave shares two of the T's
+three columns and reaches one past them, so the test is *overlap*, never containment — containment
+misses all six drawn Basic Structures. And the cave's roof is the nub row the Double just
+completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**.
+A roof test would have been a decorative guard.
+
+Two cross-tabs, and the section may print neither number without both: **by depth**, 29 of the 30
+width≥3 hits are one row deep — a dimple, not a cave — leaving exactly **1 genuine cave in 592
+player-rounds**; **by lines**, the same gap appears under T-spin Triples at a *higher* rate (9.0%
+vs 1.7% on 08-09), where it is ordinary TST residue. A shape that fires more often under the spin
+the technique is not about is a shape test.
+
+**The class control is the article's own comparison list, not a category.** harddrop has no
+"floating T-spin" category; `Mid-game T-Spin setups` (63 pages) is a *when*, not a shape, and
+`Back-to-Back T-Spin setups` (38) does not even contain STMB Cave. The page itself says the cave
+"is just Sky Prop but with 3 columns wide hole" and that a variant "has the same shape and steps as
+Shachiku Train", so the metric names a **class** — the same move the `Triple Double openers`
+category makes for the ordering metric. All three category counts are recorded as evidence.
+
+Both metrics are licensed by one check: the per-lock board snapshot plus the lock's cells must make
+exactly the rows full that the engine independently recorded clearing. Different state, so it is a
+real gate — **3379/3379 across five sessions**, and a spin it cannot reconstruct is dropped, never
+scored.
 
 New claim families go at the **end** of `generators.py`. `build_claims` numbers claims in FAMILIES
 order, prose cites those ids, and a shifted id still resolves — to the wrong claim. Nothing checks

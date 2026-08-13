@@ -307,6 +307,20 @@ jobs:
           python3 -m pipeline.openers.extract_wiki_openers
           python3 -m pipeline.openers.extract_wiki_openers --selftest
 
+      # The Donation / STMB Cave drawings, which are the INSTRUMENT CONTROLS for
+      # the section's fifth and sixth tables: openers.test.ts feeds these very
+      # boards through the shipped predicates and requires every positive to fire
+      # and every negative to be rejected. A transcription that quietly lost its
+      # positives would turn those control tests into vacuous passes over an empty
+      # array, so the count assertions live in the test and the board-level checks
+      # live here. --selftest plants every defect verify() claims to catch,
+      # including a cave narrowed to 2 wide and Sky Prop dropped from the class.
+      - name: Check the harddrop wiki T-spin technique transcription
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.openers.extract_wiki_techniques
+          python3 -m pipeline.openers.extract_wiki_techniques --selftest
+
       # The C-Spin / DT-Cannon section, same quarantine and the same re-render
       # gate. It carries one extra invariant of its own: the slot-geometry share
       # (~9 in 10 Triples match the wiki window, ~1 in 10 Doubles) may not be

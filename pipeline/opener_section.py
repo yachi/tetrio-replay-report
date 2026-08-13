@@ -15,7 +15,7 @@ why the ordering table is the section's spine. Order is a property only the simu
 `facts.json` counts `tspin_doubles` and `tspin_triples` but not which came first — so this is
 exactly the kind of question the quarantined tier exists to answer.
 
-FOUR TABLES, EACH WITH ITS CONTROL. Each table is paired with the thing that says what it is
+SIX TABLES, EACH WITH ITS CONTROL. Each table is paired with the thing that says what it is
 NOT, because each of these metrics has a way of looking like a finding when it is an artefact:
 
   ordering      control = exposure. Scored only on rounds holding BOTH spins, so a zero is over
@@ -36,6 +36,20 @@ NOT, because each of these metrics has a way of looking like a finding when it i
                 prints both, and the paragraph saying which one to read is load-bearing.
                 Openers drawn into the SAME first-bag shape (Mountainous Stacking 1 and 2) keep
                 their own rows and carry a warning that they are the same rounds twice.
+  donation      control = where the well came from. Every donation in this corpus sits on a
+                GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG
+                hole columns, which disagree with the ige-recorded ones 97 of 103 times. So the
+                count says the board offered this SHAPE that often and never says which column any
+                one donation used. The metric also refuses the naive reading of the technique
+                ("the well was filled through the cleared rows"), which is forced by arithmetic —
+                a full row needs every column filled — and would fire on most T-spin clears.
+  STMB cave     control = the two cross-tabs, and neither may be dropped. By DEPTH: a 3-wide gap
+                one row deep is a dimple, not a cave. By LINES: the same gap appears under T-spin
+                TRIPLES at a HIGHER rate, where it is ordinary TST residue nobody calls a cave.
+                A shape that fires more often under the spin the technique is not about is a shape
+                test. Its class note is the third: harddrop's own page says the cave "is just Sky
+                Prop but with 3 columns wide hole" and shares a variation's shape with Shachiku
+                Train, so the count names a family and never STMB Cave.
 
 The ordering table gained a control of its own when this section grew its fourth: harddrop
 files 38 openers under `Triple Double openers`, C-Spin and Honey Cup among them, so
@@ -97,6 +111,17 @@ def _pct(x1000):
     effect is exactly nothing" — which this data cannot say. Same rule as `forecast_section._stat`.
     """
     return "—" if x1000 is None else f"{x1000 / 10:.1f}%"
+
+
+def _share(num, den):
+    """A floored per-mille share for `_pct`, or None when there is no denominator.
+
+    FLOORS, like `pipeline/fmt.py`, because a printed rate in this report always means "at least
+    this much". Returns None rather than 0 for an empty denominator: a breakdown of nothing is an
+    ABSENCE and renders as 「—」, while a real zero over a real denominator (a player who scored
+    T-spins and donated on none of them) is a measurement and keeps its 0.0%.
+    """
+    return None if not den else num * 1000 // den
 
 
 def _cells(n):
@@ -488,6 +513,233 @@ def _named_block(data):
     ]
 
 
+def _donation_note(data):
+    """THE control on the donation table: where the well came from, and what the board source
+    cannot say about it.
+
+    Every figure is read out of THIS session's artifact. The one constant is the oracle's own
+    97-of-103 garbage-hole-column disagreement, which is a property of the board source (see
+    `oracle-source.ts`) and not of any session — a five-session total printed here would say the
+    same thing in five reports and be true of none of them.
+
+    Returns "" when the session donated nothing: a caveat about which column a donation used has
+    nothing to bound when there are no donations, and `check_opener_section` asks for this
+    paragraph under exactly the same condition.
+    """
+    dn = data.get("donation")
+    if not dn:
+        return ""
+    total = sum(p["donations"] for p in dn["players"])
+    if not total:
+        return ""
+    gb = sum(p["garbage_derived_well"] for p in dn["players"])
+    sb = sum(p["self_built_well"] for p in dn["players"])
+    # Worded from the numbers, never asserted: "all of them are garbage-derived" is the finding on
+    # this corpus, and the sentence has to follow the data the day a self-built well appears.
+    if sb == 0 and gb == total:
+        prov = (f"呢場 {total} 次捐窿，條井<strong>全部都係垃圾行留低嘅窿</strong>，"
+                "冇一次係自己砌返嚟嘅 Tetris 井。")
+    else:
+        prov = (f"呢場 {total} 次捐窿入面，{gb} 次條井係垃圾行留低嘅，"
+                f"{sb} 次係自己砌返嚟嘅。")
+    return (
+        "<strong>呢個數要連「條井邊度嚟」一齊睇。</strong>" + prov
+        + "而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>"
+        "（見 <code>oracle-source.ts</code>）。"
+        "所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。"
+    )
+
+
+def _donation_table(data):
+    """One row per player: how many verified T-spin clears were scored, how many of them were
+    donations, and the two splits — whose well it was, and what the plug cost.
+
+    A player with no donation gets 「—」 across the whole breakdown rather than a row of zeros: the
+    split of nothing is an absence, and five columns of 0 read as five measured results.
+    """
+    dn = data["donation"]
+    per = {p["user"]: p for p in dn["players"]}
+    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>", "<th>捐窿</th>", "<th>佔可核 T-spin</th>",
+            "<th>自己砌嘅井</th>", "<th>垃圾行留低嘅井</th>",
+            "<th>塞嗰手冇消行（Natural）</th>", "<th>塞嗰手消咗行（斷 B2B）</th>",
+            "<th>塞嗰手查唔到</th>"]
+    rows = []
+    for p in _players(data):
+        q = per.get(p["user"])
+        cells = [f"<td>{html.escape(p['user'])}</td>"]
+        if q is None:
+            cells.append('<td class="mono">—</td>' * 8)
+        else:
+            cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>'
+                         f'<td class="mono">{q["donations"]}</td>'
+                         f'<td class="mono">'
+                         f'{_pct(_share(q["donations"], q["tspin_clears_scored"]))}</td>')
+            if q["donations"]:
+                cells.append(f'<td class="mono">{q["self_built_well"]}</td>'
+                             f'<td class="mono">{q["garbage_derived_well"]}</td>'
+                             f'<td class="mono">{q["natural"]}</td>'
+                             f'<td class="mono">{q["b2b_breaking"]}</td>'
+                             f'<td class="mono">{q["plug_unknown"]}</td>')
+            else:
+                cells.append('<td class="mono">—</td>' * 5)
+        rows.append("          <tr>" + "".join(cells) + "</tr>")
+    return head, rows
+
+
+def _donation_block(data):
+    """The fifth table, or nothing at all when the artifact predates it — same rule as
+    `_named_block`, and for the same reason: an older `opener-facts.json` must still render."""
+    dn = data.get("donation")
+    if not dn:
+        return []
+    chk = dn["check"]
+    return [
+        '',
+        '    <h3>五 · 捐窿（Donation）</h3>',
+        '    <div class="method-note">',
+        f'      <p><strong>捐窿</strong>係 harddrop 收嘅一招：'
+        f'落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，'
+        f'消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。'
+        f'呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、'
+        f'嗰條欄最低嗰格填咗嘅嘢下面仲有最少 {dn["cavity_cells"]} 格空、'
+        f'最深嗰 {dn["walled_deepest_rows"]} 行兩邊都有牆嘅 T-spin 消行。'
+        f'重砌返嘅板同引擎自己記低嘅消行逐個對過：'
+        f'<strong>{chk["reconstruction_agreed"]}／{chk["tspin_clears"]}</strong> 個對得上，'
+        f'對唔上嗰 {chk["reconstruction_disagreed"]} 個<strong>直接唔計</strong>。</p>',
+        # 「——一行」 sets as three dashes in a row at report body size, so the clause is joined with
+        # 因為 rather than a bare em-dash. Seen in the rendered page, not in the source.
+        '      <p>淨係睇「條井喺消嘅行度有冇填」係冇意義嘅——因為一行要滿，嗰格本來就一定要填，'
+        '咁樣數會數到絕大部分嘅 T-spin。'
+        '分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>',
+        '    </div>',
+        *_table(*_donation_table(data)),
+        *_note_block(_donation_note(data)),
+    ]
+
+
+def _cave_note(data):
+    """THE control on the STMB Cave table: the two cross-tabs, by depth and by lines.
+
+    The depth clause only exists when there is a wide gap to be shallow, so it is emitted under the
+    same condition the gate asks for it. The lines clause is emitted whenever there is anything to
+    cross-tab, including the case of zero Doubles hits and a pile of Triples ones — that reading is
+    the control working, not the control being unnecessary.
+    """
+    sc = data.get("stmb_cave")
+    if not sc:
+        return ""
+    w = sc["min_width"]
+    n = sum(p["width_ge_3"] for p in sc["players"])
+    doubles = sum(p["tspin_doubles_scored"] for p in sc["players"])
+    tc = sc["triple_control"]
+    triples = tc["tspin_triples_scored"]
+    if not doubles and not triples:
+        return ""
+
+    d_rate, t_rate = _share(n, doubles), _share(tc["width_ge_3"], triples)
+    parts = [f"<strong>睇埋深度同消三行嗰欄，唔好淨係睇個數。</strong>"]
+    if n:
+        hist = sc["min_depth_histogram"]
+        shallow = hist.get("1", 0)
+        deep = sum(p["min_depth_ge_2"] for p in sc["players"])
+        # The two histograms are printed only when they say something the sentence has not: a
+        # single-bucket histogram is the sentence again in table form, and a reader who has just
+        # been told "all 7 are one row deep" learns nothing from 「深 1 行 7 次」.
+        widths = ("" if set(sc["width_histogram"]) == {str(w)} else
+                  "闊度分佈：" + "、".join(
+                      f"{k} 格 {v} 次" for k, v in
+                      sorted(sc["width_histogram"].items(), key=lambda kv: int(kv[0]))) + "。")
+        depths = ("" if set(hist) <= {"1"} else
+                  "深度分佈：" + "、".join(
+                      f"深 {k} 行 {v} 次" for k, v in
+                      sorted(hist.items(), key=lambda kv: int(kv[0]))) + "。")
+        parts.append(
+            f"呢場消兩行嗰邊有 {n} 次 ≥{w} 格闊嘅窿，"
+            + (f"<strong>全部都淨係深一行</strong>——即係塊面凹咗一格，唔係一個窿；"
+               if shallow == n else
+               f"其中 {shallow} 次<strong>淨係深一行</strong>——即係塊面凹咗一格，唔係一個窿；"
+               if shallow else "<strong>冇一次淨係深一行</strong>；")
+            + (f"深兩行或者以上嘅得 <strong>{deep}</strong> 次。" if deep else
+               "<strong>冇一次</strong>深到兩行。")
+            + widths + depths)
+    else:
+        parts.append(f"呢場消兩行嗰邊<strong>一次 ≥{w} 格闊嘅窿都冇</strong>。")
+    same = ("<strong>密過</strong>消兩行嗰邊" if d_rate is not None and t_rate is not None
+            and t_rate > d_rate else "同消兩行嗰邊一樣有")
+    parts.append(
+        f"而同一個形喺<strong>消三行</strong>嘅 T-spin 底下出現咗 {tc['width_ge_3']} 次"
+        f"（{triples} 個入面，{_pct(t_rate)}），{same}"
+        f"（{n}／{doubles}，{_pct(d_rate)}）——"
+        "嗰啲係 TST 本身嘅殘形，冇人會叫佢做 STMB Cave。"
+        "一個喺「唔關佢事」嗰種 T-spin 底下出得仲密嘅形，係個形狀測試，唔係個技術測試。")
+    return "".join(parts)
+
+
+def _cave_class_note(data):
+    """The cave table's second control: the shape names a family, and harddrop says so itself.
+
+    Same rule as `_class_note` on the ordering table — a metric that matches a SHAPE may never be
+    printed as the count of one named technique when the source page lists the neighbours it shares
+    that shape with.
+    """
+    sc = data.get("stmb_cave")
+    if not sc:
+        return ""
+    return (
+        "<strong>呢個形唔淨止 STMB Cave 一個。</strong>"
+        "harddrop 篇文自己就話「STMB Cave is just Sky Prop but with 3 columns wide hole」，"
+        "又話有個變化「has the same shape and steps as Shachiku Train」。"
+        f"所以呢個數認得出嘅係「浮空 TSD 喺一個 ≥{sc['min_width']} 格闊嘅窿上面」呢一類，"
+        "<strong>唔係邊一個定式</strong>。"
+    )
+
+
+def _cave_table(data):
+    """One row per player: verified T-spin Doubles, how many sat over a wide gap, and how many of
+    those were deep enough to be a cave rather than a dimple."""
+    sc = data["stmb_cave"]
+    per = {p["user"]: p for p in sc["players"]}
+    w = sc["min_width"]
+    head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>", f"<th>底下有 ≥{w} 格闊嘅窿</th>",
+            "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
+    rows = []
+    for p in _players(data):
+        q = per.get(p["user"])
+        cells = [f"<td>{html.escape(p['user'])}</td>"]
+        if q is None:
+            cells.append('<td class="mono">—</td>' * 4)
+        else:
+            deep = q["min_depth_ge_2"] if q["width_ge_3"] else None
+            cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>'
+                         f'<td class="mono">{q["width_ge_3"]}</td>'
+                         f'<td class="mono">'
+                         f'{_pct(_share(q["width_ge_3"], q["tspin_doubles_scored"]))}</td>'
+                         f'<td class="mono">{"—" if deep is None else deep}</td>')
+        rows.append("          <tr>" + "".join(cells) + "</tr>")
+    return head, rows
+
+
+def _cave_block(data):
+    """The sixth table, or nothing at all when the artifact predates it."""
+    sc = data.get("stmb_cave")
+    if not sc:
+        return []
+    return [
+        '',
+        '    <h3>六 · STMB Cave（浮空 T-spin Double）</h3>',
+        '    <div class="method-note">',
+        f'      <p><strong>STMB Cave</strong> 係一個<em>浮空</em>嘅 T-spin Double：'
+        f'隻 T 唔係坐喺實地上面，而係架喺一個最少 <strong>{sc["min_width"]}</strong> 格闊嘅窿之上。'
+        f'個窿仲要係<em>側埋一邊</em>——佢同隻 T 得兩欄重疊，所以個測試係「有冇重疊」，'
+        f'唔係「包唔包得住」。呢度數嘅係可核嗰段入面，消兩行嗰啲 T-spin 落地嗰一刻，'
+        f'緊貼消嗰兩行下面嗰行有幾闊嘅空位。</p>',
+        '      <p>' + _cave_class_note(data) + '</p>',
+        '    </div>',
+        *_table(*_cave_table(data)),
+        *_note_block(_cave_note(data)),
+    ]
+
+
 def _ordering_table(data):
     ps = _players(data)
     head = ["<th>玩家</th>", "<th>可核回合</th>", "<th>兩種 T-spin 都有</th>",
@@ -642,6 +894,8 @@ def section(data):
         *_table(*_slot_table(data)),
         '    <div class="method-note"><p>' + _slot_note(data) + '</p></div>',
         *_named_block(data),
+        *_donation_block(data),
+        *_cave_block(data),
         '  </div>',
         '</section>',
     ]

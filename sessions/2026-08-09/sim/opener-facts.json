@@ -7,7 +7,8 @@
     "the slot-geometry match is a SHAPE test, not an opener test: 87.5% of Triples match the wiki window against 13.5% of Doubles, over 565 verified T-spins",
     "the ordering metric is scored on 56 of 97 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
     "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
-    "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside"
+    "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside",
+    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 13 of 13 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
   ],
   "session": "2026-08-09",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -994,5 +995,73 @@
         "within_pco_window": 0
       }
     ]
+  },
+  "donation": {
+    "source": "harddrop.com/wiki/Donation",
+    "definition": "plugging the well with a piece so a T-spin can clear the rows across it, the clear then re-opening the well surface-to-floor — the plug is a loan, not a wall",
+    "cavity_cells": 4,
+    "walled_deepest_rows": 4,
+    "scope": "verified prefix",
+    "check": {
+      "tspin_clears": 565,
+      "reconstruction_agreed": 565,
+      "reconstruction_disagreed": 0,
+      "agrees": true
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_clears_scored": 324,
+        "donations": 6,
+        "self_built_well": 0,
+        "garbage_derived_well": 6,
+        "natural": 4,
+        "b2b_breaking": 0,
+        "plug_unknown": 2
+      },
+      {
+        "user": "yachi",
+        "tspin_clears_scored": 241,
+        "donations": 7,
+        "self_built_well": 0,
+        "garbage_derived_well": 7,
+        "natural": 4,
+        "b2b_breaking": 0,
+        "plug_unknown": 3
+      }
+    ],
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating clause is the re-opening, and that is what is counted here",
+    "caveat": "every donation in this corpus sits on a GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\""
+  },
+  "stmb_cave": {
+    "source": "harddrop.com/wiki/STMB_Cave",
+    "definition": "a floating T-spin Double placed over a cave at least three columns wide — the cave is OFFSET from the T, sharing two of its three columns, so the test is overlap with the T's span and never containment",
+    "min_width": 3,
+    "scope": "verified prefix",
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_doubles_scored": 223,
+        "width_ge_3": 7,
+        "min_depth_ge_2": 0
+      },
+      {
+        "user": "yachi",
+        "tspin_doubles_scored": 167,
+        "width_ge_3": 0,
+        "min_depth_ge_2": 0
+      }
+    ],
+    "width_histogram": {
+      "3": 7
+    },
+    "min_depth_histogram": {
+      "1": 7
+    },
+    "triple_control": {
+      "tspin_triples_scored": 88,
+      "width_ge_3": 8
+    },
+    "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"
   }
 }
