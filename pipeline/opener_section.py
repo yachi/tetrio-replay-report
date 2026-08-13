@@ -21,6 +21,12 @@ NOT, because each of these metrics has a way of looking like a finding when it i
   ordering      control = exposure. Scored only on rounds holding BOTH spins, so a zero is over
                 rounds that had the material for either order — and re-run over the whole
                 simulated round as well, so the verified-prefix window cannot manufacture it.
+                Its SECOND control is the opener window itself (`_mid_game_note`): every ordering
+                count is over spins at lock <= `window_pieces`, which made the unanimity a claim
+                about OPENINGS that read exactly like a claim about how these two throw T-spins at
+                any point in a round. Scored again after the window they come apart, and the counts
+                stay counts — the corpus holds nine such rounds, so a rate there would be a
+                percentage over three.
   first bag     control = set choice. The C-Spin name set is genuinely doubtful (`isCSpin`
                 selects `Fake C-Spin`, `Secspin` and an `SDPC-Spin` compound), so the answer is
                 shown over a narrow and a widest reading of BOTH openers. What is reportable is
@@ -43,13 +49,20 @@ NOT, because each of these metrics has a way of looking like a finding when it i
                 one donation used. The metric also refuses the naive reading of the technique
                 ("the well was filled through the cleared rows"), which is forced by arithmetic —
                 a full row needs every column filled — and would fire on most T-spin clears.
+                It also splits by the opener window, which is what turns harddrop's filing of the
+                technique under `Mid-game T-Spin setups` from a citation into a measurement — and
+                on 2026-07-28 the measurement disagrees with the filing, which is why the verdict
+                is worded from the numbers.
   STMB cave     control = the two cross-tabs, and neither may be dropped. By DEPTH: a 3-wide gap
                 one row deep is a dimple, not a cave. By LINES: the same gap appears under T-spin
                 TRIPLES at a HIGHER rate, where it is ordinary TST residue nobody calls a cave.
                 A shape that fires more often under the spin the technique is not about is a shape
                 test. Its class note is the third: harddrop's own page says the cave "is just Sky
                 Prop but with 3 columns wide hole" and shares a variation's shape with Shachiku
-                Train, so the count names a family and never STMB Cave.
+                Train, so the count names a family and never STMB Cave. Its window split is the
+                section's one POSITIVE result: not one wide gap in the corpus falls inside the
+                opener window, so harddrop's `Mid-game T-Spin setups` filing is measured here rather
+                than quoted.
 
 The ordering table gained a control of its own when this section grew its fourth: harddrop
 files 38 openers under `Triple Double openers`, C-Spin and Honey Cup among them, so
@@ -139,6 +152,79 @@ def _players(data):
     """
     return sorted(data["ordering"]["players"],
                   key=lambda p: (-p["cspin_order"], p["user"]))
+
+
+def _mid_game(data):
+    """`{user: mid_game}` for the ordering block, or None for an artifact predating the control.
+
+    All-or-nothing on purpose: a table with the post-window trio for one player and 「—」 for the
+    other would look like a measured absence when it is a half-upgraded artifact.
+    """
+    ps = data["ordering"]["players"]
+    if not all(isinstance(p.get("mid_game"), dict) for p in ps):
+        return None
+    return {p["user"]: p["mid_game"] for p in ps}
+
+
+def _mid_game_note(data):
+    """THE control the ordering table never had: the same two orderings scored AFTER the window.
+
+    Every ordering count above it is taken over spins at lock <= `window_pieces`, so 「兩種都有嘅
+    回合全部先 Triple 後 Double」 was a statement about OPENINGS that the report gave the reader no
+    way to check. It reads identically to a statement about how these two throw T-spins at any point
+    in a round, and those mean completely different things about the C-Spin. This paragraph is the
+    only thing that separates them, which is why `check_opener_section` demands it beside the table.
+
+    Everything is derived from THIS session — a five-session total here would print the same
+    sentence in five reports and be a property of none of them — and everything is a COUNT. The
+    post-window denominator is a handful of rounds per session (the corpus has nine), and a
+    percentage over three rounds reads far more confident than the data is: the rule 全消 already
+    follows for its 3-12 round denominators.
+    """
+    mg = _mid_game(data)
+    if mg is None:
+        return ""
+    ps = data["ordering"]["players"]
+    w = data["window_pieces"]
+    dt_in = sum(p["dt_order"] for p in ps)
+    both_out = sum(m["rounds_with_both"] for m in mg.values())
+    cs_out = sum(m["cspin_order"] for m in mg.values())
+    dt_out = sum(m["dt_order"] for m in mg.values())
+
+    lead = (f"<strong>次序表嗰啲數，淨係開局窗入面嘅嘢。</strong>"
+            f"次序呢一項數嘅係頭 {w} 手之內落嘅 T-spin，"
+            f"所以「先 Triple 後 Double」講嘅係<em>開局</em>點行，"
+            f"唔係講呢兩位成個回合掟 T-spin 嘅習慣——兩樣嘢意思差好遠，"
+            f"而分得開佢哋嘅方法就係攞同一個次序，去計第 {w} 手<em>之後</em>嗰啲 T-spin，"
+            f"即係表入面後面嗰三欄。"
+            f"（上面段講「攤開成個模擬回合」係另一回事：嗰個淨係唔要求可核，"
+            f"個窗一樣係頭 {w} 手，所以佢答唔到「後尾點」呢條問題。）")
+
+    if not both_out:
+        body = (f"呢場第 {w} 手之後，<strong>冇一個回合</strong>同時有 T-spin Double 同 "
+                f"T-spin Triple——打到咁後面兩種都齊嘅回合本來就少，可核嗰段又再斬短咗——"
+                f"所以呢場<strong>對唔到</strong>：後面兩欄係「量唔到」，唔係 0。")
+    else:
+        body = (f"呢場第 {w} 手之後有 <strong>{both_out}</strong> 個回合兩種都有："
+                f"出現過先 Triple 後 Double 嘅 <strong>{cs_out}</strong> 個，"
+                f"出現過先 Double 後 Triple 嘅 <strong>{dt_out}</strong> 個"
+                f"（同一個回合可以兩樣都出現過，所以兩個數加埋可以多過個回合數）。")
+        if dt_out and not dt_in:
+            body += ("窗入面 DT 砲次序係 <strong>0</strong> 個，出咗窗<strong>就唔再係 0</strong>"
+                     "——即係話嗰個一面倒係<strong>開局</strong>先有嘅嘢，"
+                     "唔係呢兩位打 T-spin 嘅一般習慣。")
+        elif dt_out:
+            body += ("窗入面同窗外面都有 DT 砲次序，"
+                     "所以呢場<strong>分唔出</strong>個次序係咪開局獨有。")
+        else:
+            body += ("窗外面一樣<strong>冇一個</strong>先 Double 後 Triple，"
+                     "所以呢場淨係得一個方向嘅證據——要更多咁樣嘅回合先講得到「開局同中盤唔同」。")
+
+    rate = ("後面嗰三欄<strong>淨係報個數，唔會報比率</strong>："
+            + (f"分母得 {both_out} 個回合，" if both_out else "呢場連分母都冇，")
+            + "而三幾個回合嘅百分比，睇落會比啲數撐得住嘅自信好多——"
+              "同 全消 嗰節唔肯報率係同一個規矩。")
+    return lead + body + rate
 
 
 def _ordering_note(data):
@@ -550,6 +636,44 @@ def _donation_note(data):
     )
 
 
+def _donation_window_note(data):
+    """WHERE in the round the donations fell — harddrop's own filing of the technique, measured.
+
+    harddrop keeps Donation under `Mid-game T-Spin setups`. That is a citation, and a citation is
+    not a measurement: until the lock index was carried out of the simulator, this table could not
+    say whether the corpus agreed with the page it came from. It now can, per session — and on
+    2026-07-28 it does NOT, which is the reason the verdict is worded from the numbers instead of
+    written down once.
+
+    Empty when the session donated nothing (a split of nothing is an absence, and `check_opener_
+    section` asks for this paragraph under the same condition) and when the artifact predates the
+    split.
+    """
+    dn = data.get("donation")
+    if not dn or dn.get("opener_window_pieces") is None:
+        return ""
+    w = dn["opener_window_pieces"]
+    ino = sum(p["in_opener"] for p in dn["players"])
+    mid = sum(p["mid_game"] for p in dn["players"])
+    if not ino + mid:
+        return ""
+    if not ino:
+        verdict = ("即係話呢場<strong>冇一次</strong>係開局打出嚟嘅，全部都係中盤先出現，"
+                   "同 harddrop 收佢入嗰個分類啱。")
+    elif mid > ino:
+        verdict = "大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。"
+    else:
+        verdict = ("呢場反而係<strong>開局嗰邊多</strong>——所以 harddrop 個分類係一個「通常」，"
+                   "唔係一條定律，而呢一格數就係度返佢啱唔啱嘅嘢。")
+    return (
+        "<strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>"
+        "harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，"
+        f"而呢場 {ino + mid} 次捐窿，落喺頭 {w} 手（開局窗）之內嘅有 <strong>{ino}</strong> 次，"
+        f"之後嘅有 <strong>{mid}</strong> 次。{verdict}"
+        "（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）"
+    )
+
+
 def _donation_table(data):
     """One row per player: how many verified T-spin clears were scored, how many of them were
     donations, and the two splits — whose well it was, and what the plug cost.
@@ -559,29 +683,36 @@ def _donation_table(data):
     """
     dn = data["donation"]
     per = {p["user"]: p for p in dn["players"]}
-    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>", "<th>捐窿</th>", "<th>佔可核 T-spin</th>",
-            "<th>自己砌嘅井</th>", "<th>垃圾行留低嘅井</th>",
-            "<th>塞嗰手冇消行（Natural）</th>", "<th>塞嗰手消咗行（斷 B2B）</th>",
-            "<th>塞嗰手查唔到</th>"]
+    w = dn.get("opener_window_pieces")
+    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>", "<th>捐窿</th>", "<th>佔可核 T-spin</th>"]
+    if w is not None:
+        head += [f"<th>頭 {w} 手內</th>", f"<th>第 {w} 手之後</th>"]
+    head += ["<th>自己砌嘅井</th>", "<th>垃圾行留低嘅井</th>",
+             "<th>塞嗰手冇消行（Natural）</th>", "<th>塞嗰手消咗行（斷 B2B）</th>",
+             "<th>塞嗰手查唔到</th>"]
+    split = 5 if w is None else 7
     rows = []
     for p in _players(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * 8)
+            cells.append('<td class="mono">—</td>' * (3 + split))
         else:
             cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>'
                          f'<td class="mono">{q["donations"]}</td>'
                          f'<td class="mono">'
                          f'{_pct(_share(q["donations"], q["tspin_clears_scored"]))}</td>')
             if q["donations"]:
+                if w is not None:
+                    cells.append(f'<td class="mono">{q["in_opener"]}</td>'
+                                 f'<td class="mono">{q["mid_game"]}</td>')
                 cells.append(f'<td class="mono">{q["self_built_well"]}</td>'
                              f'<td class="mono">{q["garbage_derived_well"]}</td>'
                              f'<td class="mono">{q["natural"]}</td>'
                              f'<td class="mono">{q["b2b_breaking"]}</td>'
                              f'<td class="mono">{q["plug_unknown"]}</td>')
             else:
-                cells.append('<td class="mono">—</td>' * 5)
+                cells.append('<td class="mono">—</td>' * split)
         rows.append("          <tr>" + "".join(cells) + "</tr>")
     return head, rows
 
@@ -614,6 +745,7 @@ def _donation_block(data):
         '    </div>',
         *_table(*_donation_table(data)),
         *_note_block(_donation_note(data)),
+        *_note_block(_donation_window_note(data)),
     ]
 
 
@@ -694,20 +826,60 @@ def _cave_class_note(data):
     )
 
 
+def _cave_window_note(data):
+    """The cave's cleanest result, and the one place in this section where a citation became a
+    measurement.
+
+    harddrop files STMB Cave under `Mid-game T-Spin setups`. Every other control in this section
+    narrows what a count may be read as; this one is a POSITIVE finding, and it is only available
+    because the lock index is now carried through: not one wide gap in the corpus falls inside the
+    opener window. A zero over a real denominator is a measurement and keeps its place in the table
+    — what would be an absence is the split of a player who has no wide gap at all, and that renders
+    as 「—」 one function up.
+
+    Empty when nothing was scored (a split of nothing says nothing) and when the artifact predates
+    the field; `check_opener_section` asks for the paragraph under exactly those conditions.
+    """
+    sc = data.get("stmb_cave")
+    if not sc or sc.get("opener_window_pieces") is None:
+        return ""
+    lock = sc["opener_window_pieces"]
+    ino = sum(p["in_opener"] for p in sc["players"])
+    mid = sum(p["mid_game"] for p in sc["players"])
+    if not ino + mid:
+        return ""
+    if not ino:
+        found = (f"呢場 {ino + mid} 次 ≥{sc['min_width']} 格闊嘅窿，"
+                 f"<strong>冇一次</strong>落喺頭 {lock} 手之內，全部都喺開局窗之後。"
+                 "即係話呢個形<strong>真係中盤先出</strong>——"
+                 "harddrop 收佢入中盤嗰個分類，喺呢場係度返嚟嘅結果，唔係照抄。")
+    else:
+        found = (f"呢場 {ino + mid} 次 ≥{sc['min_width']} 格闊嘅窿入面，"
+                 f"有 <strong>{ino}</strong> 次落喺頭 {lock} 手之內，"
+                 f"<strong>{mid}</strong> 次喺之後——"
+                 "所以呢場<strong>唔可以</strong>講佢淨係中盤嘅嘢。")
+    return ("<strong>harddrop 將 STMB Cave 收喺 <code>Mid-game T-Spin setups</code> 呢個分類，"
+            "而呢一格數係度出嚟嘅，唔係一句引述。</strong>" + found
+            + f"（呢兩欄同上面次序表、捐窿表用嘅係同一條界：第 {lock} 手。）")
+
+
 def _cave_table(data):
     """One row per player: verified T-spin Doubles, how many sat over a wide gap, and how many of
     those were deep enough to be a cave rather than a dimple."""
     sc = data["stmb_cave"]
     per = {p["user"]: p for p in sc["players"]}
     w = sc["min_width"]
+    lock = sc.get("opener_window_pieces")
     head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>", f"<th>底下有 ≥{w} 格闊嘅窿</th>",
             "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
+    if lock is not None:
+        head += [f"<th>其中喺頭 {lock} 手內</th>", f"<th>其中喺第 {lock} 手之後</th>"]
     rows = []
     for p in _players(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * 4)
+            cells.append('<td class="mono">—</td>' * (4 if lock is None else 6))
         else:
             deep = q["min_depth_ge_2"] if q["width_ge_3"] else None
             cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>'
@@ -715,6 +887,12 @@ def _cave_table(data):
                          f'<td class="mono">'
                          f'{_pct(_share(q["width_ge_3"], q["tspin_doubles_scored"]))}</td>'
                          f'<td class="mono">{"—" if deep is None else deep}</td>')
+            if lock is not None:
+                # A player with no wide gap has nothing to split; 「—」 rather than two zeros, the
+                # same rule the 深 ≥2 行 column beside it already follows.
+                cells.append('<td class="mono">—</td>' * 2 if not q["width_ge_3"] else
+                             f'<td class="mono">{q["in_opener"]}</td>'
+                             f'<td class="mono">{q["mid_game"]}</td>')
         rows.append("          <tr>" + "".join(cells) + "</tr>")
     return head, rows
 
@@ -737,27 +915,58 @@ def _cave_block(data):
         '    </div>',
         *_table(*_cave_table(data)),
         *_note_block(_cave_note(data)),
+        *_note_block(_cave_window_note(data)),
     ]
 
 
 def _ordering_table(data):
+    """The ordering counts inside the opener window and — since the window became a measured thing
+    rather than an assumed one — the same two orderings outside it, in the same row.
+
+    Side by side rather than in a table of their own: the whole point of the second trio is the
+    CONTRAST with the first, and a reader comparing two tables three paragraphs apart is a reader
+    who will quote one of them alone. The headers carry the lock number instead of a 窗內／窗外
+    legend, because a legend defined in the paragraph below is not there when the table is
+    screenshotted.
+
+    An artifact predating `mid_game` renders the original six columns, same rule as `_named_block`.
+    """
     ps = _players(data)
+    mg = _mid_game(data)
+    w = data["window_pieces"]
     head = ["<th>玩家</th>", "<th>可核回合</th>", "<th>兩種 T-spin 都有</th>",
-            "<th>C-Spin 次序（先 Triple）</th>", "<th>DT 砲次序（先 Double）</th>",
-            "<th>第一個 Triple 喺第幾手（min／中位／max）</th>"]
+            "<th>C-Spin 次序（先 Triple）</th>", "<th>DT 砲次序（先 Double）</th>"]
+    if mg is not None:
+        head = ["<th>玩家</th>", "<th>可核回合</th>",
+                f"<th>頭 {w} 手內：兩種都有</th>",
+                f"<th>頭 {w} 手內：先 Triple（C-Spin 次序）</th>",
+                f"<th>頭 {w} 手內：先 Double（DT 砲次序）</th>",
+                f"<th>第 {w} 手之後：兩種都有</th>",
+                f"<th>第 {w} 手之後：先 Triple</th>",
+                f"<th>第 {w} 手之後：先 Double</th>"]
+    head.append("<th>第一個 Triple 喺第幾手（min／中位／max）</th>")
     rows = []
     for p in ps:
         ft = p["first_triple_lock"]
         span = "—" if ft["min"] is None else f"{ft['min']}／{ft['median']}／{ft['max']}"
-        rows.append(
-            "          <tr>"
-            f"<td>{html.escape(p['user'])}</td>"
-            f"<td class=\"mono\">{p['rounds_scored']}</td>"
-            f"<td class=\"mono\">{p['rounds_with_both']}</td>"
-            f"<td class=\"mono\">{p['cspin_order']}</td>"
-            f"<td class=\"mono\">{p['dt_order']}</td>"
-            f"<td class=\"mono\">{span}</td>"
-            "</tr>")
+        cells = [f"<td>{html.escape(p['user'])}</td>",
+                 f'<td class="mono">{p["rounds_scored"]}</td>',
+                 f'<td class="mono">{p["rounds_with_both"]}</td>',
+                 f'<td class="mono">{p["cspin_order"]}</td>',
+                 f'<td class="mono">{p["dt_order"]}</td>']
+        if mg is not None:
+            m = mg[p["user"]]
+            # `rounds_with_both` is a measurement even at zero — we looked at every round and none
+            # held both spins that late. The ORDER of nothing is not: it renders 「—」, the same
+            # rule `_donation_table` follows for a player who donated nothing.
+            cells.append(f'<td class="mono">{m["rounds_with_both"]}</td>')
+            if m["rounds_with_both"]:
+                cells.append(f'<td class="mono">{m["cspin_order"]}</td>'
+                             f'<td class="mono">{m["dt_order"]}</td>')
+            else:
+                cells.append('<td class="mono">—</td>' * 2)
+        cells.append(f'<td class="mono">{span}</td>')
+        rows.append("          <tr>" + "".join(cells) + "</tr>")
     return head, rows
 
 
@@ -869,6 +1078,7 @@ def section(data):
         '    <div class="method-note"><p>' + _ordering_note(data) + '</p></div>',
         *_table(*_ordering_table(data)),
         *_note_block(_class_note(data)),
+        *_note_block(_mid_game_note(data)),
         '',
         '    <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>',
         '    <div class="method-note">',

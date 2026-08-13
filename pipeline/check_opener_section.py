@@ -8,7 +8,7 @@ report is protected by Dafny lemmas over facts.json, this section is deliberatel
 chain, so without its own guard its numbers could drift from their source with nothing to catch
 it. The argument for re-rendering rather than sampling is spelled out there and is not repeated.
 
-Nine things are checked:
+Ten things are checked:
   1. the committed region is EXACTLY what rendering this session's JSON produces;
   2. every per-player ordering figure appears in the rendered HTML;
   3. the section still declares itself unproved and carries no claim badge — promoting simulator
@@ -22,6 +22,16 @@ Nine things are checked:
   5. the ORDERING table keeps its class control. `cspin_order` counts a Triple before a Double,
      and harddrop files 38 openers under that signature, so the count names a class. Drop the
      paragraph and the table beside it becomes the C-Spin count checks 4 exists to prevent.
+ 5b. the ORDERING table also keeps its WINDOW control, and that one says what the unanimity is
+     ABOUT. Every ordering count is scored on spins at lock <= window_pieces, so "354 of 354 rounds
+     ran Triple-first" is a claim about OPENINGS that reads exactly like a claim about how these two
+     throw T-spins at any point in a round. Measured after the window they come apart — 9 rounds
+     corpus-wide, 7 with a Triple first and 5 with a Double first, which overlap because one round
+     can hold both — so the section prints the two trios side by side and refuses to divide the
+     second: a rate over three rounds reads far more confident than the data is. Both sentences are
+     demanded whenever the artifact carries the split, INCLUDING for a session with no post-window
+     round, because "we looked and this session had none" is the reading, and dropping it as an
+     empty row leaves the table looking unqualified again.
   6. the NAMED-OPENER table keeps its three: the baseline column (the `<=N` band discriminates
      nothing, only an exact match does), the alias warning (two openers sharing a first-bag
      field are the same rounds twice), and the PCO ceiling (PCO is defined by an outcome, and
@@ -36,12 +46,19 @@ Nine things are checked:
      disagree with the ige-recorded ones 97 of 103 times — so the count is a statement about a
      SHAPE the board offered and never about which column a player donated into. Drop the paragraph
      and a shape count becomes "this player donated into that well" 21 times, which is the strongest
-     claim in this section and the one the data supports least.
+     claim in this section and the one the data supports least. It also keeps the paragraph behind
+     its window split: harddrop files the technique under `Mid-game T-Spin setups`, and these two
+     columns are the check on that filing rather than a repetition of it — a check this corpus does
+     not always pass (2026-07-28 donates more inside the opener than after it), which is exactly why
+     the sentence may not be dropped back to the citation.
   9. the STMB CAVE table keeps BOTH cross-tabs. By depth: nearly every >=3-wide hit is one row
      deep, i.e. a dimple. By lines: the same gap fires MORE often under T-spin Triples, where it is
      ordinary TST residue. Either one alone leaves the count readable as a cave count, so both are
      demanded, together with the class note saying harddrop's own page calls the shape a Sky Prop
-     variant that Shachiku Train shares — the same rule as the ordering table's class control.
+     variant that Shachiku Train shares — the same rule as the ordering table's class control. Its
+     window split is demanded on the same footing and is the section's one POSITIVE result: not one
+     wide gap in the corpus falls inside the opener window, so `Mid-game T-Spin setups` is measured
+     here instead of quoted, and losing the sentence costs the reader the finding.
 
 Every one of these controls has a mutant in `--selftest` that deletes its sentence and expects
 a rejection. A control with no mutant proving it fires is a comment, not a gate.
@@ -113,6 +130,28 @@ CAVE_TRIPLE_MARKERS = ("嘅 T-spin 底下出現咗", "TST 本身嘅殘形")
 # so the geometry names a family. Without this the table reads as a count of one named technique.
 CAVE_CLASS_MARKERS = ("唔係邊一個定式",)
 
+# The ORDERING table's second control, and the one that says what its unanimity is ABOUT. Every
+# ordering count is taken over spins at lock <= window_pieces, so 「兩種都有嘅回合全部先 Triple 後
+# Double」 is a statement about OPENINGS that reads identically to a statement about how these two
+# throw T-spins at any point in a round — and measured after the window, the two come apart. Two
+# sentences carry it, each closing a different way of publishing the table dishonestly:
+#   - the scope sentence, without which the table has no window in it at all and the reader has no
+#     reason to look at the last three columns;
+#   - the counts-not-a-rate sentence, because the post-window denominator is a handful of rounds per
+#     session and the first thing anyone does with two counts is divide them. Same rule 全消 follows.
+MIDGAME_MARKERS = ("淨係開局窗入面嘅嘢", "淨係報個數，唔會報比率")
+
+# The DONATION table's window split. harddrop files the technique under `Mid-game T-Spin setups`;
+# without this paragraph the two new columns are two more numbers, and with it they are the check on
+# the page they came from — one this corpus does not always pass (2026-07-28 donates more in the
+# opener than after it), which is exactly why it may not be dropped and replaced by the citation.
+DONATION_WINDOW_MARKER = "捐窿係開局招定係中盤招"
+
+# The STMB CAVE's window split, the section's one positive result: 0 of every wide gap in the corpus
+# falls inside the opener window. Drop the sentence and the two columns are a breakdown; keep it and
+# harddrop's `Mid-game T-Spin setups` filing is a thing this pipeline measured.
+CAVE_WINDOW_MARKER = "唔係一句引述"
+
 
 def problems(data, doc):
     """Every reason `doc`'s opener region disagrees with `data`; empty means it agrees."""
@@ -148,10 +187,20 @@ def problems(data, doc):
         bad.append("the committed opener region is not what this session's data renders to:\n"
                    + "\n".join("      " + d for d in diff[:40]))
 
-    # 2. the ordering figures, which are the section's spine
+    # 2. the ordering figures, which are the section's spine — inside the opener window and, since
+    #    the window stopped being an unstated scope, outside it. The post-window ORDER figures are
+    #    demanded only when there was a round to order: a session with none renders 「—」 for them,
+    #    and asking for a literal "0" that any other number in the region would satisfy is a check
+    #    that passes for the wrong reason.
     for p in data["ordering"]["players"]:
-        for w in (str(p["rounds_scored"]), str(p["rounds_with_both"]),
-                  str(p["cspin_order"]), str(p["dt_order"])):
+        want = [str(p["rounds_scored"]), str(p["rounds_with_both"]),
+                str(p["cspin_order"]), str(p["dt_order"])]
+        mg = p.get("mid_game")
+        if isinstance(mg, dict):
+            want.append(str(mg["rounds_with_both"]))
+            if mg["rounds_with_both"]:
+                want += [str(mg["cspin_order"]), str(mg["dt_order"])]
+        for w in want:
             if w not in body:
                 bad.append(f"{p['user']}: rendered HTML is missing ordering figure {w!r}")
 
@@ -180,6 +229,21 @@ def problems(data, doc):
                     f"{data['ordering_class']['openers']} catalogued openers share the "
                     "Triple-before-Double signature, so the count may not stand alone as a "
                     "C-Spin figure")
+
+    # 5b. and it may not be published without the WINDOW control either. `cspin_order` is scored on
+    #     spins at lock <= window_pieces, so the unanimity is a statement about OPENINGS; the same
+    #     ordering measured after the window goes both ways. Conditioned only on the artifact
+    #     carrying the split — NOT on there being post-window rounds, because the session that has
+    #     none renders "we looked and this session had none", which is the reading most likely to be
+    #     dropped as an empty row and the one that leaves the table looking unqualified.
+    if all(isinstance(p.get("mid_game"), dict) for p in data["ordering"]["players"]):
+        for marker in MIDGAME_MARKERS:
+            if marker not in body:
+                bad.append(
+                    f"the ordering window control is gone ({marker!r} missing) — every ordering "
+                    "count is taken inside the opener window, so the table may not be published "
+                    "without the post-window comparison beside it and without the sentence "
+                    "refusing to turn its handful of rounds into a rate")
 
     # 6. the named-opener table's own controls
     no = data.get("named_openers")
@@ -229,6 +293,14 @@ def problems(data, doc):
                            "source's hole columns disagree with the ige-recorded ones 97 of 103 "
                            "times, so the count may not be published as which well was donated "
                            "into")
+        # and the split by the opener window, which is the measurement behind harddrop's own filing
+        # of the technique. Demanded under the same condition the paragraph renders under: an
+        # artifact predating the split, or a session that donated nothing, has no such sentence.
+        if dn.get("opener_window_pieces") is not None and DONATION_WINDOW_MARKER not in body:
+            bad.append(f"the donation window split is gone ({DONATION_WINDOW_MARKER!r} missing) — "
+                       "harddrop files the technique under `Mid-game T-Spin setups`, and the two "
+                       "window columns may not be published without the paragraph saying this "
+                       "corpus was measured against that filing rather than quoting it")
 
     # 9. the cave count may not be published without either cross-tab. Same split as the section
     #    renders them under: the depth sentence needs a wide gap to exist, the Triple comparison
@@ -241,6 +313,17 @@ def problems(data, doc):
             bad.append(f"the cave depth control is gone ({CAVE_DEPTH_MARKER!r} missing) — a "
                        "3-wide gap one row deep is a dimple, and the width count may not be "
                        "published without the depth cross-tab that says how many were")
+        # The window split, demanded under the same condition it renders under: a wide gap to place,
+        # and an artifact that knows where the window ends. This is the section's one POSITIVE
+        # result — 0 of every wide gap in the corpus falls inside the opener — so losing the
+        # sentence costs the reader the finding, not just a caveat.
+        if (sc.get("opener_window_pieces") is not None
+                and sum(p["width_ge_3"] for p in sc["players"])
+                and CAVE_WINDOW_MARKER not in body):
+            bad.append(f"the cave window split is gone ({CAVE_WINDOW_MARKER!r} missing) — the "
+                       "two window columns may not be published without the sentence that turns "
+                       "harddrop's `Mid-game T-Spin setups` filing from a citation into this "
+                       "corpus's own measurement")
         if scored:
             for marker in (*CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS):
                 if marker not in body:
@@ -337,7 +420,8 @@ def _selftest(report_dir):
     # line here has no mutant and is a comment. Every marker constant in this module belongs in it.
     for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER,
                    PCO_MARKER, *TIMING_MARKERS, *DONATION_MARKERS, CAVE_DEPTH_MARKER,
-                   *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS):
+                   *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS, *MIDGAME_MARKERS,
+                   DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

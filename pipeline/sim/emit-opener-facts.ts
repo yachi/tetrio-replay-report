@@ -326,6 +326,11 @@ interface Round { user: string; verified: number; spinsVerified: { i: number; cl
  *  pre-lock board, the lock's own cells, and the engine's own record of which rows went. */
 interface TSpinClear {
   user: string; lines: number;
+  /** the lock index this clear happened at, so both techniques can be split by the opener window.
+   *  Carried because "is this an opening technique or a mid-game one" was a question the artifact
+   *  ASSERTED rather than answered: harddrop files both pages under `Mid-game T-Spin setups`, and
+   *  a citation is not a measurement. */
+  lock: number;
   /** the donation well this clear opened, if any — the first one, on the corpus's every event the
    *  only one. `garbageWell` is the well's PROVENANCE and `plug` splits harddrop's own Natural
    *  from its Other Examples: null when the plugging lock cannot be identified. */
@@ -433,7 +438,7 @@ for (const c of loadCases(dir)) {
       donation = { cavity: w.cavity, garbageWell, plug };
     }
 
-    tspinClears.push({ user: c.user, lines: lk.cleared, donation,
+    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation,
                        cave: caveAt(withT, mine, lk.cells, H),
                        wideGapUnderTriple: lk.cleared === 3 && wideGapUnder(withT, mine, H) });
   }
@@ -527,6 +532,41 @@ function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: num
     first_triple_lock: { min: firstT.length ? Math.min(...firstT) : null,
                          median: median(firstT),
                          max: firstT.length ? Math.max(...firstT) : null },
+    mid_game: midGameOrderingFor(user, pick),
+  };
+}
+
+/**
+ * THE SAME ORDERING, OUTSIDE the opener window — the control the window itself never had.
+ *
+ * Every count above is taken over spins at lock <= WINDOW_PIECES, so "354 of 354 rounds ran
+ * Triple-first" is a statement about openings that the artifact previously gave a reader no way to
+ * check. It could equally have been a statement about how these players throw T-spins at any point
+ * in a round, and the two readings imply completely different things about the C-Spin.
+ *
+ * They come apart when measured. Over five sessions the opener window holds 354 rounds with both
+ * spins and NOT ONE runs Double-first; outside it the order is mixed in both directions. So the
+ * window is doing real work, and this block is what shows it rather than asserting it.
+ *
+ * ITS DENOMINATOR IS SMALL AND THAT IS THE POINT OF REPORTING IT AS COUNTS. Only nine rounds in the
+ * whole corpus hold both spin types after piece 21 — rounds usually end first, and the verified
+ * prefix truncates what is left — so a percentage over them would read far more confident than the
+ * data is. Same rule the 全消 section follows for its 3-12 round denominators.
+ */
+function midGameOrderingFor(user: string, pick: (r: Round) => { i: number; cleared: number }[]) {
+  const mine = rounds.filter(r => r.user === user && r.verified >= 0);
+  const after = (r: Round, lines: number) =>
+    pick(r).filter(x => x.cleared === lines && x.i > WINDOW_PIECES);
+  const both = mine.filter(r => after(r, 2).length && after(r, 3).length);
+  const first = (a: { i: number }[], b: { i: number }[]) => a.some(x => b.some(y => x.i < y.i));
+  return {
+    rounds_with_both: both.length,
+    cspin_order: both.filter(r => first(after(r, 3), after(r, 2))).length,
+    dt_order: both.filter(r => first(after(r, 2), after(r, 3))).length,
+    means: 'the same two orderings scored on spins AFTER the opener window, which is the control on '
+         + 'the counts beside them: inside the window the corpus is unanimous, outside it the order '
+         + 'goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds '
+         + 'with both spin types this late',
   };
 }
 
@@ -809,8 +849,13 @@ function donationMetric() {
         natural: d.filter(x => x.plug === 'natural').length,
         b2b_breaking: d.filter(x => x.plug === 'b2b_breaking').length,
         plug_unknown: d.filter(x => x.plug === null).length,
+        // where in the round the donations fell. harddrop files Donation under `Mid-game T-Spin
+        // setups`, and this is the measurement behind that citation rather than a repetition of it.
+        in_opener: mine.filter(e => e.donation && e.lock <= WINDOW_PIECES).length,
+        mid_game: mine.filter(e => e.donation && e.lock > WINDOW_PIECES).length,
       };
     }),
+    opener_window_pieces: WINDOW_PIECES,
     means: 'how many verified T-spin clears were fired across a plugged well that the clear then '
          + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
          + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
@@ -856,8 +901,14 @@ function stmbCaveMetric() {
         tspin_doubles_scored: mine.filter(e => e.lines === 2).length,
         width_ge_3: w.length,
         min_depth_ge_2: w.filter(e => e.cave!.minDepth >= 2).length,
+        // Measured, five sessions: every single cave falls OUTSIDE the opener window — 0 in, 30
+        // out. That is this metric's cleanest result, and it is the one number here that confirms
+        // harddrop's own filing of the technique instead of citing it.
+        in_opener: w.filter(e => e.lock <= WINDOW_PIECES).length,
+        mid_game: w.filter(e => e.lock > WINDOW_PIECES).length,
       };
     }),
+    opener_window_pieces: WINDOW_PIECES,
     width_histogram: hist(wide.map(e => e.cave!.width)),
     min_depth_histogram: hist(wide.map(e => e.cave!.minDepth)),
     triple_control: {

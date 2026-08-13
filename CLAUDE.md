@@ -466,6 +466,34 @@ exactly the rows full that the engine independently recorded clearing. Different
 real gate — **3379/3379 across five sessions**, and a spin it cannot reconstruct is dropped, never
 scored.
 
+## 開局定式 定 中盤手法 — the window was asserted, now it is measured
+
+Three metrics answer "opener or mid-game" three different ways, and only one of them used to answer
+it at all:
+
+- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 3 of 65 inside it.
+- **The ordering metric did NOT.** Its spins are filtered to lock ≤ `WINDOW_PIECES` before counting,
+  so mid-game pairs were *excluded rather than counted*, and「先 Triple 後 Double」 was a claim about
+  openings that a reader had no way to check — it reads identically to a claim about how these
+  players throw T-spins at any point in a round, and the two mean completely different things about
+  the C-Spin. `ordering.players[].mid_game` is the missing control. **Inside the window 354 rounds
+  hold both spins and 354 run Triple-first, zero exceptions; outside it, 9 rounds hold both and the
+  order goes BOTH ways (7 Triple-first, 5 Double-first).** So the window is doing real work.
+- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. The cave's is the cleanest result
+  in the section: **0 of 30 fall inside the opener window, in every session** — which turns
+  harddrop's filing of it under `Mid-game T-Spin setups` from a citation into a measurement.
+  Donation splits about 1:3 (23 in-opener, 59 mid-game), so it is not purely mid-game.
+
+`ordering_full_round` is **not** the mid-game counterpart and must not be read as one — it applies
+the *same* 21-piece window and only drops the verification requirement, which is why its numbers are
+identical to `ordering`'s. It answers "did the verified prefix manufacture this", not "what happens
+later in the round".
+
+**The mid-game denominator is 9 rounds corpus-wide, so it is printed as counts and never as a rate**
+— rounds usually end before accumulating both spin types that late, and the verified prefix truncates
+what is left. Same rule 全消 follows for its 3-12 round denominators; two of the five sessions have
+no such round at all, which renders as an absence rather than a zero.
+
 New claim families go at the **end** of `generators.py`. `build_claims` numbers claims in FAMILIES
 order, prose cites those ids, and a shifted id still resolves — to the wrong claim. Nothing checks
 that.

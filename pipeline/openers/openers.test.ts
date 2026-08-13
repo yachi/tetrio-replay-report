@@ -799,3 +799,140 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
     expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
   }
 });
+
+/* ── OPENER vs MID-GAME ────────────────────────────────────────────────────────────────────────
+ * The window's own control. Every count in the ordering metric is taken over spins at
+ * lock <= `window_pieces`, so "354 of 354 rounds ran Triple-first" had two readings the artifact
+ * gave no way to separate: a fact about OPENINGS, or a fact about how these two players throw
+ * T-spins at any point in a round. They imply completely different things about the C-Spin, and
+ * only the first is what the section says.
+ *
+ * The same split is applied to the two techniques, where it answers a citation with a measurement:
+ * harddrop files Donation and STMB Cave under `Mid-game T-Spin setups`, and until now the artifact
+ * repeated that filing rather than testing it.
+ *
+ * Literals, same rule as PERFECT_CLEARS and DONATION above — a test that re-derives a value the way
+ * the code does can only catch a typo. */
+
+/** The ordering metric re-scored on spins AFTER the opener window, summed over both players.
+ *  `rounds_with_both` is the exposure and it is TINY (9 across the corpus against 354 inside the
+ *  window), which is why every figure here is a count and none of them may become a rate. */
+const MID_GAME_ORDER: Record<string, { rounds_with_both: number; cspin: number; dt: number }> = {
+  '2026-07-22': { rounds_with_both: 3, cspin: 3, dt: 1 },
+  '2026-07-24': { rounds_with_both: 0, cspin: 0, dt: 0 },
+  '2026-07-28': { rounds_with_both: 2, cspin: 1, dt: 2 },
+  '2026-08-01': { rounds_with_both: 0, cspin: 0, dt: 0 },
+  '2026-08-09': { rounds_with_both: 4, cspin: 3, dt: 2 },
+};
+
+/** Both techniques split by the same window, summed over both players. Read the cave's `in_opener`
+ *  column first: it is 0 in every session, which is harddrop's filing of the technique MEASURED. */
+const WINDOW_SPLIT: Record<string, { donation: [number, number]; cave: [number, number] }> = {
+  //              [in_opener, mid_game]
+  '2026-07-22': { donation: [3, 18], cave: [0, 4] },
+  '2026-07-24': { donation: [4, 11], cave: [0, 6] },
+  '2026-07-28': { donation: [9,  4], cave: [0, 5] },
+  '2026-08-01': { donation: [4, 16], cave: [0, 8] },
+  '2026-08-09': { donation: [3, 10], cave: [0, 7] },
+};
+
+const orderPlayers = (s: string) => facts(s).ordering.players as any[];
+
+test('the mid-game ordering counts are pinned per session', () => {
+  for (const s of SESSIONS) {
+    const mg = orderPlayers(s).map(p => p.mid_game);
+    const want = MID_GAME_ORDER[s]!;
+    expect([s, sum(mg.map(m => m.rounds_with_both))]).toEqual([s, want.rounds_with_both]);
+    expect([s, sum(mg.map(m => m.cspin_order))]).toEqual([s, want.cspin]);
+    expect([s, sum(mg.map(m => m.dt_order))]).toEqual([s, want.dt]);
+    // a round can hold both orders (a stray extra spin), so the two columns need not partition the
+    // exposure — but neither can exceed it, and a count above it would mean rounds counted twice
+    for (const m of mg) {
+      expect([s, m.cspin_order]).toEqual([s, Math.min(m.cspin_order, m.rounds_with_both)]);
+      expect([s, m.dt_order]).toEqual([s, Math.min(m.dt_order, m.rounds_with_both)]);
+    }
+  }
+});
+
+test('the opener window does real work: unanimous inside it, both ways outside it', () => {
+  // THE REASON THE SPLIT EXISTS. Inside the window the corpus is not merely lopsided, it is
+  // unanimous — every round holding both spins ran the Triple first, all five sessions, both
+  // players. Outside it the same instrument on the same rounds finds Double-first orders. So
+  // "Triple-before-Double" is a property of these OPENINGS and not of how these players throw
+  // T-spins, which is the sentence the section is entitled to only because of this test.
+  let insideBoth = 0, outsideBoth = 0, outsideDt = 0;
+  for (const s of SESSIONS) {
+    for (const p of orderPlayers(s)) {
+      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both]);
+      expect([s, p.user, p.dt_order]).toEqual([s, p.user, 0]);
+      insideBoth += p.rounds_with_both;
+      outsideBoth += p.mid_game.rounds_with_both;
+      outsideDt += p.mid_game.dt_order;
+    }
+  }
+  // and the other half of the contrast, without which the unanimity above is just a small sample:
+  // the DT order does happen in this corpus, it just never happens in the opener.
+  expect(outsideDt).toBeGreaterThan(0);
+  expect(outsideDt).toBe(sum(SESSIONS.map(s => MID_GAME_ORDER[s]!.dt)));
+  expect([insideBoth, outsideBoth]).toEqual([354, 9]);
+});
+
+test('the mid-game denominator is far too small to be published as a rate', () => {
+  // Nine rounds against 354. The 全消 section refuses a percentage over 3-12 rounds for the same
+  // reason, and this asserts the shape of the data that makes the refusal correct: if a future
+  // change ever printed "75% of mid-game rounds ran the C-Spin order", it would be a percentage of
+  // four. Pinned per session so the check cannot be satisfied by one session growing.
+  for (const s of SESSIONS) {
+    const [inside, outside] = [orderPlayers(s), orderPlayers(s).map(p => p.mid_game)]
+      .map(ps => sum(ps.map((p: any) => p.rounds_with_both)));
+    expect([s, outside! * 10 < inside!]).toEqual([s, true]);
+  }
+});
+
+test('the window splits every donation and every cave, losing none', () => {
+  // A split that drops rows is worse than no split: the two halves would still look like a finding.
+  // So each metric's own total is the sum of its two columns, per player, in every session.
+  for (const s of SESSIONS) {
+    const d = facts(s), want = WINDOW_SPLIT[s]!;
+    for (const p of d.donation.players)
+      expect([s, p.user, p.in_opener + p.mid_game]).toEqual([s, p.user, p.donations]);
+    for (const p of d.stmb_cave.players)
+      expect([s, p.user, p.in_opener + p.mid_game]).toEqual([s, p.user, p.width_ge_3]);
+
+    expect([s, [sum(d.donation.players.map((p: any) => p.in_opener)),
+                sum(d.donation.players.map((p: any) => p.mid_game))]]).toEqual([s, want.donation]);
+    expect([s, [sum(d.stmb_cave.players.map((p: any) => p.in_opener)),
+                sum(d.stmb_cave.players.map((p: any) => p.mid_game))]]).toEqual([s, want.cave]);
+    // and the totals the rest of this file already pins are the same numbers, one path further out
+    expect([s, sum(d.donation.players.map((p: any) => p.in_opener + p.mid_game))])
+      .toEqual([s, DONATION[s]!.donations]);
+    expect([s, sum(d.stmb_cave.players.map((p: any) => p.in_opener + p.mid_game))])
+      .toEqual([s, CAVE[s]!.width_ge_3]);
+  }
+});
+
+test('the STMB cave is a mid-game shape, and that is measured rather than cited', () => {
+  // harddrop files STMB Cave under `Mid-game T-Spin setups`. This is that filing as a number: not
+  // one >=3-wide hit in the whole corpus falls inside the opener window, in any session, for either
+  // player — 0 in, 30 out. If it ever becomes non-zero this test must break, because the sentence
+  // the section prints would then be a citation again and not a measurement.
+  let out = 0;
+  for (const s of SESSIONS) {
+    for (const p of facts(s).stmb_cave.players) expect([s, p.user, p.in_opener]).toEqual([s, p.user, 0]);
+    out += sum(facts(s).stmb_cave.players.map((p: any) => p.mid_game));
+  }
+  expect(out).toBe(30);
+  expect(out).toBe(sum(SESSIONS.map(s => CAVE[s]!.width_ge_3)));   // nothing was lost on the way
+});
+
+test('both splits are scored against the ordering metric\'s own window', () => {
+  // A technique split against a different window than the ordering counts would be silently
+  // incomparable with them — the two tables sit side by side in the section and would be read as
+  // one. One number, three places it has to agree.
+  for (const s of SESSIONS) {
+    const d = facts(s);
+    expect([s, d.donation.opener_window_pieces]).toEqual([s, d.window_pieces]);
+    expect([s, d.stmb_cave.opener_window_pieces]).toEqual([s, d.window_pieces]);
+    expect([s, d.window_pieces]).toEqual([s, 21]);
+  }
+});

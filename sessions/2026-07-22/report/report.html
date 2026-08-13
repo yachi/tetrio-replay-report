@@ -7095,15 +7095,16 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="scroll-x">
       <table class="appendix-table">
         <thead>
-          <tr><th>玩家</th><th>可核回合</th><th>兩種 T-spin 都有</th><th>C-Spin 次序（先 Triple）</th><th>DT 砲次序（先 Double）</th><th>第一個 Triple 喺第幾手（min／中位／max）</th></tr>
+          <tr><th>玩家</th><th>可核回合</th><th>頭 21 手內：兩種都有</th><th>頭 21 手內：先 Triple（C-Spin 次序）</th><th>頭 21 手內：先 Double（DT 砲次序）</th><th>第 21 手之後：兩種都有</th><th>第 21 手之後：先 Triple</th><th>第 21 手之後：先 Double</th><th>第一個 Triple 喺第幾手（min／中位／max）</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">79</td><td class="mono">58</td><td class="mono">58</td><td class="mono">0</td><td class="mono">12／13／15</td></tr>
-          <tr><td>yachi</td><td class="mono">77</td><td class="mono">39</td><td class="mono">39</td><td class="mono">0</td><td class="mono">11／13／15</td></tr>
+          <tr><td>pinglamb</td><td class="mono">79</td><td class="mono">58</td><td class="mono">58</td><td class="mono">0</td><td class="mono">0</td><td class="mono">—</td><td class="mono">—</td><td class="mono">12／13／15</td></tr>
+          <tr><td>yachi</td><td class="mono">77</td><td class="mono">39</td><td class="mono">39</td><td class="mono">0</td><td class="mono">3</td><td class="mono">3</td><td class="mono">1</td><td class="mono">11／13／15</td></tr>
         </tbody>
       </table>
     </div>
     <div class="method-note"><p><strong>上面個數講嘅係一個「類」，唔係一個定式。</strong>harddrop 自己有個分類叫 <code>Triple Double openers</code>，入面有 <strong>38</strong> 個定式，全部都係<em>先 Triple 後 Double</em> 開局——C-Spin、Honey Cup、Stray Cannon、Mountainous Stacking 都喺入面。所以「先 Triple 後 Double」呢個次序<strong>分得出呢一類同 DT 砲</strong>，但係<strong>分唔出呢一類入面邊個定式</strong>：如果成晚打嘅係 Honey Cup，上面個表一模一樣會咁樣寫。下面第四個表就係用開局個板嘅形去分呢一類入面邊個。</p></div>
+    <div class="method-note"><p><strong>次序表嗰啲數，淨係開局窗入面嘅嘢。</strong>次序呢一項數嘅係頭 21 手之內落嘅 T-spin，所以「先 Triple 後 Double」講嘅係<em>開局</em>點行，唔係講呢兩位成個回合掟 T-spin 嘅習慣——兩樣嘢意思差好遠，而分得開佢哋嘅方法就係攞同一個次序，去計第 21 手<em>之後</em>嗰啲 T-spin，即係表入面後面嗰三欄。（上面段講「攤開成個模擬回合」係另一回事：嗰個淨係唔要求可核，個窗一樣係頭 21 手，所以佢答唔到「後尾點」呢條問題。）呢場第 21 手之後有 <strong>3</strong> 個回合兩種都有：出現過先 Triple 後 Double 嘅 <strong>3</strong> 個，出現過先 Double 後 Triple 嘅 <strong>1</strong> 個（同一個回合可以兩樣都出現過，所以兩個數加埋可以多過個回合數）。窗入面 DT 砲次序係 <strong>0</strong> 個，出咗窗<strong>就唔再係 0</strong>——即係話嗰個一面倒係<strong>開局</strong>先有嘅嘢，唔係呢兩位打 T-spin 嘅一般習慣。後面嗰三欄<strong>淨係報個數，唔會報比率</strong>：分母得 3 個回合，而三幾個回合嘅百分比，睇落會比啲數撐得住嘅自信好多——同 全消 嗰節唔肯報率係同一個規矩。</p></div>
 
     <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>
     <div class="method-note">
@@ -7175,15 +7176,16 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="scroll-x">
       <table class="appendix-table">
         <thead>
-          <tr><th>玩家</th><th>可核 T-spin 消行</th><th>捐窿</th><th>佔可核 T-spin</th><th>自己砌嘅井</th><th>垃圾行留低嘅井</th><th>塞嗰手冇消行（Natural）</th><th>塞嗰手消咗行（斷 B2B）</th><th>塞嗰手查唔到</th></tr>
+          <tr><th>玩家</th><th>可核 T-spin 消行</th><th>捐窿</th><th>佔可核 T-spin</th><th>頭 21 手內</th><th>第 21 手之後</th><th>自己砌嘅井</th><th>垃圾行留低嘅井</th><th>塞嗰手冇消行（Natural）</th><th>塞嗰手消咗行（斷 B2B）</th><th>塞嗰手查唔到</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">434</td><td class="mono">13</td><td class="mono">2.9%</td><td class="mono">0</td><td class="mono">13</td><td class="mono">7</td><td class="mono">2</td><td class="mono">4</td></tr>
-          <tr><td>yachi</td><td class="mono">361</td><td class="mono">8</td><td class="mono">2.2%</td><td class="mono">0</td><td class="mono">8</td><td class="mono">6</td><td class="mono">0</td><td class="mono">2</td></tr>
+          <tr><td>pinglamb</td><td class="mono">434</td><td class="mono">13</td><td class="mono">2.9%</td><td class="mono">2</td><td class="mono">11</td><td class="mono">0</td><td class="mono">13</td><td class="mono">7</td><td class="mono">2</td><td class="mono">4</td></tr>
+          <tr><td>yachi</td><td class="mono">361</td><td class="mono">8</td><td class="mono">2.2%</td><td class="mono">1</td><td class="mono">7</td><td class="mono">0</td><td class="mono">8</td><td class="mono">6</td><td class="mono">0</td><td class="mono">2</td></tr>
         </tbody>
       </table>
     </div>
     <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 21 次捐窿，條井<strong>全部都係垃圾行留低嘅窿</strong>，冇一次係自己砌返嚟嘅 Tetris 井。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
+    <div class="method-note"><p><strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，而呢場 21 次捐窿，落喺頭 21 手（開局窗）之內嘅有 <strong>3</strong> 次，之後嘅有 <strong>18</strong> 次。大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）</p></div>
 
     <h3>六 · STMB Cave（浮空 T-spin Double）</h3>
     <div class="method-note">
@@ -7193,15 +7195,16 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="scroll-x">
       <table class="appendix-table">
         <thead>
-          <tr><th>玩家</th><th>可核 T-spin Double</th><th>底下有 ≥3 格闊嘅窿</th><th>佔可核 TSD</th><th>其中深 ≥2 行</th></tr>
+          <tr><th>玩家</th><th>可核 T-spin Double</th><th>底下有 ≥3 格闊嘅窿</th><th>佔可核 TSD</th><th>其中深 ≥2 行</th><th>其中喺頭 21 手內</th><th>其中喺第 21 手之後</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">307</td><td class="mono">0</td><td class="mono">0.0%</td><td class="mono">—</td></tr>
-          <tr><td>yachi</td><td class="mono">256</td><td class="mono">4</td><td class="mono">1.5%</td><td class="mono">0</td></tr>
+          <tr><td>pinglamb</td><td class="mono">307</td><td class="mono">0</td><td class="mono">0.0%</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td></tr>
+          <tr><td>yachi</td><td class="mono">256</td><td class="mono">4</td><td class="mono">1.5%</td><td class="mono">0</td><td class="mono">0</td><td class="mono">4</td></tr>
         </tbody>
       </table>
     </div>
     <div class="method-note"><p><strong>睇埋深度同消三行嗰欄，唔好淨係睇個數。</strong>呢場消兩行嗰邊有 4 次 ≥3 格闊嘅窿，<strong>全部都淨係深一行</strong>——即係塊面凹咗一格，唔係一個窿；<strong>冇一次</strong>深到兩行。而同一個形喺<strong>消三行</strong>嘅 T-spin 底下出現咗 8 次（133 個入面，6.0%），<strong>密過</strong>消兩行嗰邊（4／563，0.7%）——嗰啲係 TST 本身嘅殘形，冇人會叫佢做 STMB Cave。一個喺「唔關佢事」嗰種 T-spin 底下出得仲密嘅形，係個形狀測試，唔係個技術測試。</p></div>
+    <div class="method-note"><p><strong>harddrop 將 STMB Cave 收喺 <code>Mid-game T-Spin setups</code> 呢個分類，而呢一格數係度出嚟嘅，唔係一句引述。</strong>呢場 4 次 ≥3 格闊嘅窿，<strong>冇一次</strong>落喺頭 21 手之內，全部都喺開局窗之後。即係話呢個形<strong>真係中盤先出</strong>——harddrop 收佢入中盤嗰個分類，喺呢場係度返嚟嘅結果，唔係照抄。（呢兩欄同上面次序表、捐窿表用嘅係同一條界：第 21 手。）</p></div>
   </div>
 </section>
 <!-- END generated openers -->
