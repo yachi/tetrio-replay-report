@@ -19,7 +19,7 @@ import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, dis
          cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS,
          loadWikiOpeners, openerPages, hasFullRow } from './match.ts';
 import { analyse } from './run-openers.ts';
-import { build, serialise, donationCols, caveAt, cavity,
+import { build, serialise, donationCols, caveAt, cavity, dualVerdict,
          DONATION_CAVITY, DONATION_WALLED_ROWS, CAVE_MIN_WIDTH } from '../sim/emit-opener-facts.ts';
 
 const cat = loadCatalogue();
@@ -482,13 +482,13 @@ const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: num
  *  how far the comparison reached. The cave agrees on every positive in range and the donation on a
  *  quarter of them — two results the OVERALL agreement rate (98%+ for both) hides completely,
  *  because 1292 of the donation's 1301 agreements are two engines saying "no". */
-const DUAL: Record<string, { comparable: number; scored: number; cave: [number, number];
-                             don: [number, number] }> = {
-  '2026-07-22': { comparable: 360, scored: 795, cave: [3, 3], don: [2, 7] },
-  '2026-07-24': { comparable: 244, scored: 544, cave: [2, 2], don: [2, 9] },
-  '2026-07-28': { comparable: 273, scored: 626, cave: [2, 2], don: [0, 6] },
-  '2026-08-01': { comparable: 229, scored: 612, cave: [2, 2], don: [2, 9] },
-  '2026-08-09': { comparable: 240, scored: 565, cave: [4, 4], don: [3, 5] },
+const DUAL: Record<string, { comparable: number; scored: number; sameBoard: number;
+                             cave: [number, number]; don: [number, number] }> = {
+  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [2, 7] },
+  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [2, 9] },
+  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [0, 6] },
+  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 9] },
+  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [3, 5] },
 };
 
 const facts = (s: string) =>
@@ -540,6 +540,74 @@ test('the second engine agrees on every cave and on a quarter of the donations',
   const allCaves = sum(SESSIONS.map(s => sum(facts(s).stmb_cave.players.map((p: any) => p.width_ge_3))));
   expect(allCaves).toBe(30);
   expect(cavePos).toBeLessThan(allCaves);
+});
+
+test('the board split is what makes the donation 9/36 readable, and it is not the cave\'s story', () => {
+  // WHY THIS IS A SEPARATE TEST. `agreement_on_positives` says the two engines disagree about three
+  // donations in four; it does not say WHY. Splitting the positives by whether the other engine had
+  // the same board answers it — and answers it differently for the two metrics, which is why the
+  // section may not word them alike.
+  let same = 0, comparable = 0;
+  const agg = { don: [0, 0, 0, 0], cave: [0, 0, 0, 0] };  // [posSame, posDiff, agreeSame, agreeDiff]
+  for (const s of SESSIONS) {
+    const d = facts(s).donation.dual_engine;
+    expect([s, d.locks_same_board]).toEqual([s, DUAL[s]!.sameBoard]);   // pinned, never re-derived
+    same += d.locks_same_board; comparable += d.locks_comparable;
+    for (const k of ['don', 'cave'] as const) {
+      const b = d.board_split[k];
+      const m = d[k === 'don' ? 'donation' : 'cave'];
+      // the split must partition the SAME positives the confusion matrix counted, or the two blocks
+      // are describing different populations while sitting in one object
+      expect([s, k, b.positives_same_board + b.positives_diff_board]).toEqual([s, k, m.oracle_positives]);
+      expect([s, k, b.agree_same_board + b.agree_diff_board]).toEqual([s, k, m.both_yes]);
+      agg[k][0] += b.positives_same_board; agg[k][1] += b.positives_diff_board;
+      agg[k][2] += b.agree_same_board;     agg[k][3] += b.agree_diff_board;
+    }
+  }
+  // At 41% of the comparison points the two engines are judging DIFFERENT boards. Every figure in
+  // dual_engine has to be read inside that.
+  expect([same, comparable]).toEqual([795, 1346]);
+
+  // THE DONATION: where the boards agree the verdicts agree perfectly, and where they differ they
+  // mostly do not. So the disagreement is the BOARD (oracle-source.ts's garbage-hole columns), not
+  // the predicate — the opposite of what "the two engines disagree about donations" sounds like.
+  expect(agg.don).toEqual([6, 30, 6, 3]);
+  expect(agg.don[2]).toBe(agg.don[0]);                    // 6 of 6 on identical boards
+  expect(agg.don[3] * 3).toBeLessThan(agg.don[1]);        // 3 of 30 on boards that differ
+
+  // THE CAVE: a different statement, and it must not be worded like the donation's. Its verdict
+  // survives boards that differ (10 of 10), which is ROBUSTNESS — consistent with the drift sitting
+  // in low garbage rows while the cave is local to the spin. It is not evidence of correctness.
+  expect(agg.cave).toEqual([3, 10, 3, 10]);
+  expect(agg.cave[3]).toBe(agg.cave[1]);
+});
+
+test('dualVerdict refuses a lock its own engine contradicts, and refuses one it cannot check', () => {
+  // THE TEETH FOR THE STRONG LICENCE. Reverting to the index lookup or off-by-one-ing the frame is
+  // already caught by the byte-identity gate (locks_comparable collapses 1346 -> 0). What that gate
+  // CANNOT catch is weakening the licence itself: dropping back to `rows.length === lk.cleared`, or
+  // comparing only the LENGTH of clearedRows, leaves all five artefacts byte-identical on this
+  // corpus. Both are killed here, on synthetic boards, because no real lock exercises them.
+  const H = 40, W = 10;
+  const board = () => Array.from({ length: H }, (_, r) =>
+    Array.from({ length: W }, (_, c) => (r === 38 && c < 9 ? 'X' : null)));
+  const lk = { piece: 'T', spin: 'full', cleared: 1, frame: 100,
+               cells: [{ row: 38, col: 9 }, { row: 37, col: 9 }, { row: 37, col: 8 }] };
+  const at = (records: { frame: number; clearedRows: number[] }[]) =>
+    dualVerdict({ locks: [{ ...lk, frame: 1 }, lk], boards: [board(), board()], records }, 1);
+
+  // the board makes row 38 full; the engine's own record says it cleared row 37. Same LENGTH,
+  // different CONTENT — a length-only compare waves this through.
+  expect(at([{ frame: 100, clearedRows: [37] }])).toBeNull();
+  // no record at the lock's frame: UNKNOWN, compared against nothing.
+  expect(at([])).toBeNull();
+  // …and the licence is not simply refusing everything: the honest version of the same lock passes.
+  expect(at([{ frame: 100, clearedRows: [38] }])).not.toBeNull();
+
+  // NOT ASSERTED, DELIBERATELY: that a missing record is excluded rather than read as `[]`. A lock
+  // with cleared > 0 always makes at least one row full, so an empty `theirs` can never match and
+  // the two spellings return null for every possible input. It is an equivalent mutant, not a gap —
+  // writing a test that appeared to cover it would be writing for the checker.
 });
 
 test('the denominator is anchored to the replay\'s own twice-extracted T-spin counters', () => {

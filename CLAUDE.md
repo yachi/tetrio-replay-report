@@ -556,13 +556,47 @@ exactly as the counter anchor licenses a denominator without redefining it. What
 donation table is a *caveat it did not have*: the one metric here with no second implementation
 backing it, stated as a measurement.
 
+**The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** At **551
+of the 1346** comparison points the two engines are judging boards that differ cell for cell (median
+12 cells), so every figure in the table above is read inside that. Split the positives by board
+equality and the donation resolves completely:
+
+| | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
+|---|---|---|---|---|---|
+| cave | 13 | 3 | 13/13 | 3/3 | 10/10 |
+| donation | 36 | 6 | 9/36 | **6 / 6** | **3 / 30** |
+
+So the two engines do not disagree about what a donation *is* — they disagree about the board, which
+is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
+and must never be worded like the donation's**: agreeing 10 of 10 on boards that differ is the
+verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
+cave is local to the spin), not ten independent confirmations. `DUAL_SPLIT_MARKER` and
+`CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
+
 A false start worth not repeating: the first version of that probe pushed both engines through the
 reconstruction check and the hand-port licensed **0 of 1355**. A 0%/100% split is a bug report about
-the comparison, not a result — `records[].clearedRows` does not mean the same thing in the two
-engines (the hand-port leaves it empty on most clearing locks), while its board is fine. `dualVerdict`
-therefore uses the weaker check both engines can satisfy: the engine's own board plus its own cells
-must make exactly as many rows full as it says it cleared, and a lock that fails is compared against
-nothing rather than counted as a disagreement.
+the comparison, not a result. **The reason recorded here was wrong until 2026-08-14** — it said
+`records[].clearedRows` means different things in the two engines, "the hand-port leaves it empty on
+most clearing locks". Measured: **0 empty of 4326**, and `clearedRows.length == lines` every time in
+both engines. The real cause is that `records` and `locks` are **index-aligned in the oracle only**
+(`records[i].frame == locks[i].frame` 14744/14744); `sim.ts` pushes a record only inside the clear
+branch, and twice on an all-clear bonus, so the alignment holds **0 of 4326** times there and
+`records[i]` reads an unrelated record. Looked up by the lock's own **frame**, the hand-port passes
+the strong check **1346 of 1346** at that call site, so `dualVerdict` now uses the same reconstruction
+check as the shipped path — the weaker licence is gone, and all five artefacts are byte-identical
+under the change.
+
+Two things that follow, and both are load-bearing:
+
+- **The strong licence has no teeth from the artefacts.** Reverting to the index lookup or
+  off-by-one-ing the frame collapses `locks_comparable` 1346 → 0 and byte-identity catches it; but
+  weakening the *licence* (back to `rows.length == lk.cleared`, or comparing only the length of
+  `clearedRows`) leaves all five artefacts byte-identical. `dualVerdict` is exported and tested
+  directly on synthetic boards for exactly that reason. A guard no gate can falsify is decorative.
+- **A missing record is an EQUIVALENT mutant, not a coverage gap.** `?? []` instead of excluding it
+  cannot change any output: a lock with `cleared > 0` always makes at least one row full, so an empty
+  `theirs` never matches. The branch is also unreachable on this corpus (0 of 1596). It is written
+  explicitly because it states the intent — do not add a test that pretends to cover it.
 
 ## 開局定式 定 中盤手法 — the window was asserted, now it is measured
 

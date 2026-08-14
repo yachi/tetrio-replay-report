@@ -686,7 +686,48 @@ def _dual_engine_note(data, metric):
     warn = (f"<strong>唔好睇「成體 {_pct(_share(overall[0], overall[1]))} 啱」嗰個數</strong>"
             f"——嗰 {overall[0]} 次入面有 {m['both_no']} 次係兩邊都話「唔係」，"
             "咁樣量緊嘅係塊板嘅底，唔係呢個 metric。")
-    return head + warn + scope + tail
+    return head + warn + scope + _board_split_note(blk, metric) + tail
+
+
+def _board_split_note(blk, metric):
+    """WERE THE TWO ENGINES LOOKING AT THE SAME BOARD? — the sentence that makes the figure above
+    readable, and it says a different thing for each table.
+
+    `agreement_on_positives` states that the two engines disagree about three donations in four. It
+    does not say whether they disagree about what a donation IS or about what was on the board. Split
+    the oracle's positives by cell-for-cell board equality and the donation resolves completely —
+    every positive on an identical board agrees, almost none of the rest — so the disagreement is the
+    board, which is `oracle-source.ts`'s garbage-hole problem showing through rather than a wobble in
+    the predicate. That is a materially different (and more useful) statement than the raw 9/36.
+
+    The cave's split says something else and MUST NOT be worded like the donation's: its verdict
+    survives boards that differ, which is robustness, not correctness. Printing "10 of 10 agreed"
+    without saying the boards differed would read as ten independent confirmations.
+
+    Empty when the artifact predates the split, or when the metric has no positive in range.
+    """
+    split = (blk.get("board_split") or {}).get("cave" if metric == "stmb_cave" else "don")
+    if not split or "locks_same_board" not in blk:
+        return ""
+    same, cmp_ = blk["locks_same_board"], blk["locks_comparable"]
+    ps, pd = split["positives_same_board"], split["positives_diff_board"]
+    as_, ad = split["agree_same_board"], split["agree_diff_board"]
+    if ps + pd == 0:
+        return ""
+    base = (f"<strong>兩個引擎有冇睇緊同一塊板？</strong>"
+            f"可比嘅 {cmp_} 個 lock 入面，"
+            f"淨係 <strong>{same}</strong> 個（{_pct(_share(same, cmp_))}）兩邊逐格一模一樣，"
+            "上面每個數都要放喺呢個前提入面睇。")
+    if metric == "stmb_cave":
+        return base + (f"呢個表嘅 {ps + pd} 次入面，板一樣嗰 {ps} 次兩邊同意 {as_} 次，"
+                       f"板唔一樣嗰 {pd} 次<strong>照樣同意 {ad} 次</strong>——"
+                       "即係呢個判斷<strong>頂得住</strong>塊板有差異，"
+                       "咁係穩陣，唔等於啱：唔好當佢係多咗幾次獨立確認。")
+    return base + (f"而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義："
+                   f"板一樣嗰 {ps} 次，兩邊同意 <strong>{as_}</strong> 次；"
+                   f"板唔一樣嗰 {pd} 次，就淨係同意 {ad} 次。"
+                   "兩個引擎唔係對「乜嘢先算捐窿」有分歧，"
+                   "係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。")
 
 
 def _cave_anchor_note(data):

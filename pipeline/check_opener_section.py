@@ -181,6 +181,18 @@ DUAL_ENGINE_MARKER = "咁樣量緊嘅係塊板嘅底"
 # …and the coverage clause, without which "13 of 13, both engines" reads as the whole corpus when
 # the comparison reaches 1346 of 3142 scored clears — the hand-port verifies a far shorter prefix.
 DUAL_COVERAGE_MARKER = "hand-port 自己可核嗰段短好多"
+# …and the board split, which is what makes the figure above readable at all. At 551 of the 1346
+# comparison points the two engines are judging DIFFERENT boards, and splitting the positives by
+# board equality resolves the donation's 9/36 completely: 6 of 6 on identical boards, 3 of 30 on
+# boards that differ. Delete this and the section states a disagreement about donations while the
+# measurement says the disagreement is about the board. Demanded once — the sentence is shared by
+# both tables and each renders its own continuation.
+DUAL_SPLIT_MARKER = "兩個引擎有冇睇緊同一塊板"
+# The cave's continuation is its own marker because it is a DIFFERENT claim, and the failure mode is
+# copying the donation's wording onto it. Its verdict survives boards that differ (10 of 10), which
+# is robustness, not ten independent confirmations — that caveat is the whole reason the cave's
+# split may be printed beside the donation's.
+CAVE_SPLIT_MARKER = "咁係穩陣，唔等於啱"
 
 
 def problems(data, doc):
@@ -341,6 +353,23 @@ def problems(data, doc):
                            "with negatives (1292 of the donation's 1301), and neither the rate nor "
                            "the cave's 13-of-13 may be published without the sentence saying what "
                            "is in the denominator and how far the comparison reaches")
+        # …and the board split, whenever the artifact carries it. Conditioned on the data rather
+        # than demanded outright, so an artifact emitted before the split still passes.
+        if any((data.get(m) or {}).get("dual_engine", {}).get("board_split")
+               for m in ("donation", "stmb_cave")):
+            if DUAL_SPLIT_MARKER not in body:
+                bad.append(f"the board split is gone ({DUAL_SPLIT_MARKER!r} missing) — at 551 of "
+                           "the 1346 comparison points the two engines judge DIFFERENT boards, and "
+                           "that is what resolves the donation's 9/36 into 6-of-6 on identical "
+                           "boards and 3-of-30 on boards that differ. Without it the section "
+                           "reports a disagreement about donations that the measurement says is a "
+                           "disagreement about the board")
+            if CAVE_SPLIT_MARKER not in body:
+                bad.append(f"the cave's split caveat is gone ({CAVE_SPLIT_MARKER!r} missing) — the "
+                           "cave agrees 10 of 10 on boards that DIFFER, which is the verdict being "
+                           "robust to the drift, not ten independent confirmations. Printing it "
+                           "beside the donation's split without that sentence copies the donation's "
+                           "reading onto a claim of a different kind")
 
     if dn and sum(p["donations"] for p in dn["players"]):
         for marker in DONATION_MARKERS:
@@ -480,7 +509,8 @@ def _selftest(report_dir):
                    *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS, *MIDGAME_MARKERS,
                    DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER,
                    *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS,
-                   DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER):
+                   DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER,
+                   DUAL_SPLIT_MARKER, CAVE_SPLIT_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

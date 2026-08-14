@@ -1095,6 +1095,21 @@
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
       "locks_scored": 565,
       "locks_comparable": 240,
+      "locks_same_board": 141,
+      "board_split": {
+        "don": {
+          "positives_same_board": 2,
+          "positives_diff_board": 3,
+          "agree_same_board": 2,
+          "agree_diff_board": 1
+        },
+        "cave": {
+          "positives_same_board": 1,
+          "positives_diff_board": 3,
+          "agree_same_board": 1,
+          "agree_diff_board": 3
+        }
+      },
       "donation": {
         "both_yes": 3,
         "oracle_only": 2,
@@ -1226,6 +1241,21 @@
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
       "locks_scored": 565,
       "locks_comparable": 240,
+      "locks_same_board": 141,
+      "board_split": {
+        "don": {
+          "positives_same_board": 2,
+          "positives_diff_board": 3,
+          "agree_same_board": 2,
+          "agree_diff_board": 1
+        },
+        "cave": {
+          "positives_same_board": 1,
+          "positives_diff_board": 3,
+          "agree_same_board": 1,
+          "agree_diff_board": 3
+        }
+      },
       "donation": {
         "both_yes": 3,
         "oracle_only": 2,

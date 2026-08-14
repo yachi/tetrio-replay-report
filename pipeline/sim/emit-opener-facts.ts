@@ -203,17 +203,29 @@ const occupancyOf = (b: (string | null)[][] | undefined): boolean[][] =>
 /**
  * The two board-state verdicts for one lock of the OTHER engine — see `dualEngineCheck`.
  *
- * Deliberately NOT routed through the reconstruction check the shipped path uses. That check reads
- * `records[i].clearedRows`, and the two engines do not mean the same thing by that field: the
- * hand-port leaves it empty on most clearing locks, so licensing it that way rejected 1355 of 1355
- * and reported a total disagreement that was really a comparison bug. A 0%/100% split is a bug
- * report about the comparison, not a result.
+ * Held to the SAME reconstruction check as the shipped path: the rows this engine's board and cells
+ * make full must equal the rows the engine itself recorded clearing. What differs is how the record
+ * is found. `records` is index-aligned with `locks` in the ORACLE only — it pushes them adjacently,
+ * and `records[i].frame === locks[i].frame` 14744 times out of 14744. The HAND-PORT pushes a record
+ * only inside the clear branch, and twice on an all-clear bonus, so `records[i]` there reads an
+ * unrelated record: the alignment holds 0 of 4326 times. Indexing it that way is what rejected 1355
+ * of 1355 and looked like total disagreement, and a 0%/100% split is a bug report about the
+ * comparison rather than a result.
  *
- * What replaces it is the weaker thing that IS shared: the engine's own board plus its own cells
- * must make exactly as many rows full as the engine says it cleared. A lock whose board fails that
- * is returned as null and compared against nothing, rather than counted as a disagreement.
+ * (The earlier note here blamed the field's meaning — "the hand-port leaves clearedRows empty on
+ * most clearing locks". That is measurably false: 0 empty of 4326, and `clearedRows.length` equals
+ * `lines` every time in both engines. Looked up by the lock's own FRAME, the hand-port passes this
+ * check 1346 of 1346 at this call site. A wrong reason invites the wrong repair.)
+ *
+ * A lock with no record at its frame is UNKNOWN and compared against nothing. On this corpus that
+ * branch is unreachable (0 of 1596), and note it cannot be reached by a `?? []` bug either: a lock
+ * with `cleared > 0` always makes at least one row full, so an empty `theirs` can never match. It is
+ * written explicitly because it states the intent, not because a guard is doing work.
+ *
+ * Returns the board it judged, so the caller can ask whether the two engines were even looking at
+ * the same one — see `board_split`.
  */
-function dualVerdict(r: SimLike, i: number) {
+export function dualVerdict(r: SimLike, i: number) {
   const lk = r.locks[i];
   if (!lk || lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0) return null;
   const withT = occupancyOf(i > 0 ? (r.boards[i - 1] as (string | null)[][] | undefined) : undefined);
@@ -221,15 +233,21 @@ function dualVerdict(r: SimLike, i: number) {
     if (q.row >= 0 && q.row < H && q.col >= 0 && q.col < BOARD_WIDTH) withT[q.row]![q.col] = true;
   const rows: number[] = [];
   for (let rr = 0; rr < H; rr++) if (withT[rr]!.every(Boolean)) rows.push(rr);
-  if (rows.length !== lk.cleared) return null;
+  const rec = r.records.find(q => q.frame === lk.frame);
+  if (!rec) return null;
+  const theirs = [...rec.clearedRows].sort((a, b) => a - b);
+  if (!(rows.length === theirs.length && rows.every((x, k) => x === theirs[k]))) return null;
   const cv = caveAt(withT, rows, lk.cells, H);
   return { don: donationCols(withT, rows, lk.cells, H).length > 0,
-           cave: !!(cv && cv.width >= CAVE_MIN_WIDTH) };
+           cave: !!(cv && cv.width >= CAVE_MIN_WIDTH), board: withT };
 }
 
 type SimLike = {
-  locks: { piece: string; spin: string; cleared: number; cells: { row: number; col: number }[] }[];
+  /** `frame` is what joins a lock to its record — see `dualVerdict` on why the index does not. */
+  locks: { piece: string; spin: string; cleared: number; frame: number;
+           cells: { row: number; col: number }[] }[];
   boards: unknown[];
+  records: { frame: number; clearedRows: number[] }[];
 };
 
 /** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
@@ -431,6 +449,11 @@ let counterUnclassified = 0;
 /** The SECOND ENGINE's verdicts, as two confusion matrices — see `dualEngineCheck`. */
 const dual = { don: { tt: 0, tf: 0, ft: 0, ff: 0 }, cave: { tt: 0, tf: 0, ft: 0, ff: 0 } };
 let dualReachable = 0;
+let dualSameBoard = 0;
+const dualSplit = {
+  don: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
+  cave: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
+};
 
 for (const c of loadCases(dir)) {
   roundsTotal++;
@@ -559,9 +582,23 @@ for (const c of loadCases(dir)) {
       if (other) {
         dualReachable++;
         const mineV = { don: !!donation, cave: !!(cave && cave.width >= CAVE_MIN_WIDTH) };
+        // WERE THE TWO ENGINES EVEN LOOKING AT THE SAME BOARD? Both verdicts are rare, so an
+        // agreement figure is mostly negatives agreeing with negatives; splitting the positives by
+        // board equality is what says whether a disagreement is about the PREDICATE or about the
+        // BOARD. Corpus-wide it is the board: where the boards agree the donation verdicts agree
+        // perfectly, and where they differ they mostly do not.
+        let sameBoard = true;
+        for (let rr = 0; rr < H && sameBoard; rr++)
+          for (let cc = 0; cc < BOARD_WIDTH; cc++)
+            if (withT[rr]![cc] !== other.board[rr]![cc]) { sameBoard = false; break; }
+        if (sameBoard) dualSameBoard++;
         for (const k of ['don', 'cave'] as const) {
           const x = mineV[k], y = other[k];
           dual[k][x && y ? 'tt' : x ? 'tf' : y ? 'ft' : 'ff']++;
+          if (x) {
+            dualSplit[k][sameBoard ? 'positives_same_board' : 'positives_diff_board']++;
+            if (y) dualSplit[k][sameBoard ? 'agree_same_board' : 'agree_diff_board']++;
+          }
         }
       }
     }
@@ -1047,6 +1084,19 @@ function dualEngineCheck() {
           + 'both verdicts are rare, so the overall rate is negatives agreeing with negatives',
     locks_scored: tspinClears.length,
     locks_comparable: dualReachable,
+    /** Of the comparable locks, how many the two engines built IDENTICALLY, cell for cell. 795 of
+     *  1346 corpus-wide: at 41% of the comparison points the two engines are judging different
+     *  boards, which is the context every figure above has to be read in. */
+    locks_same_board: dualSameBoard,
+    /** THE READING of `agreement_on_positives`, and the reason it is emitted beside it. Split the
+     *  oracle's positives by whether the other engine had the same board and the donation's 9/36
+     *  resolves completely: 6 of 6 on identical boards, 3 of 30 on boards that differ. So the two
+     *  engines do not disagree about what a donation IS — they disagree about the board, which is
+     *  `oracle-source.ts`'s garbage-hole problem showing through. The cave is a different statement:
+     *  13 of 13 including 10 of 10 on differing boards, i.e. its verdict SURVIVES ~12 cells of
+     *  difference, consistent with the drift being low garbage rows while the cave is local to the
+     *  spin. That is robustness, not correctness, and the two must not be worded alike. */
+    board_split: dualSplit,
     donation: cell(dual.don),
     cave: cell(dual.cave),
   };
