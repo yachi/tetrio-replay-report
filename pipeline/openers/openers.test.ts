@@ -478,9 +478,69 @@ const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: num
   '2026-08-09': { rounds: 100, replay: 597, scored: 565 },
 };
 
+/** THE SECOND ENGINE, per session, as literals: [both_yes, oracle_positives] for each metric, and
+ *  how far the comparison reached. The cave agrees on every positive in range and the donation on a
+ *  quarter of them — two results the OVERALL agreement rate (98%+ for both) hides completely,
+ *  because 1292 of the donation's 1301 agreements are two engines saying "no". */
+const DUAL: Record<string, { comparable: number; scored: number; cave: [number, number];
+                             don: [number, number] }> = {
+  '2026-07-22': { comparable: 360, scored: 795, cave: [3, 3], don: [2, 7] },
+  '2026-07-24': { comparable: 244, scored: 544, cave: [2, 2], don: [2, 9] },
+  '2026-07-28': { comparable: 273, scored: 626, cave: [2, 2], don: [0, 6] },
+  '2026-08-01': { comparable: 229, scored: 612, cave: [2, 2], don: [2, 9] },
+  '2026-08-09': { comparable: 240, scored: 565, cave: [4, 4], don: [3, 5] },
+};
+
 const facts = (s: string) =>
   JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+test('the second engine agrees on every cave and on a quarter of the donations', () => {
+  let cavePos = 0, caveHit = 0, donPos = 0, donHit = 0, bothNo = 0;
+  let comparable = 0, scored = 0;
+  for (const s of SESSIONS) {
+    const f = facts(s);
+    const d = f.donation.dual_engine;
+    const want = DUAL[s]!;
+    // the same block is embedded under both metrics and must be the same object
+    expect(JSON.stringify(f.stmb_cave.dual_engine)).toBe(JSON.stringify(d));
+    expect([s, d.locks_comparable]).toEqual([s, want.comparable]);
+    expect([s, d.locks_scored]).toEqual([s, want.scored]);
+    // a check reaching everything would mean the hand-port's prefix had stopped being the limit,
+    // which is a change of premise rather than an improvement — it must fail here first
+    expect(d.locks_comparable).toBeLessThan(d.locks_scored);
+
+    for (const [k, w] of [['cave', want.cave], ['donation', want.don]] as const) {
+      const m = d[k];
+      expect([s, k, m.agreement_on_positives]).toEqual([s, k, w]);
+      expect([s, k, m.both_yes + m.oracle_only]).toEqual([s, k, m.oracle_positives]);
+      // the four cells partition the comparable locks
+      expect(m.both_yes + m.oracle_only + m.other_only + m.both_no).toBe(d.locks_comparable);
+      expect(m.agreement_overall).toEqual([m.both_yes + m.both_no, d.locks_comparable]);
+    }
+    cavePos += d.cave.oracle_positives; caveHit += d.cave.both_yes;
+    donPos += d.donation.oracle_positives; donHit += d.donation.both_yes;
+    bothNo += d.donation.both_no;
+    comparable += d.locks_comparable; scored += d.locks_scored;
+  }
+  // THE TWO CORPUS FIGURES, and the gap between them is the finding.
+  expect([caveHit, cavePos]).toEqual([13, 13]);      // every cave in range, both engines
+  expect([donHit, donPos]).toEqual([9, 36]);         // three donations in four disagree
+  expect([comparable, scored]).toEqual([1346, 3142]);
+
+  // …and the reason neither number may be quoted as an overall rate: the donation's 96.7% is
+  // almost entirely two engines agreeing that nothing happened. Asserted rather than commented,
+  // so a future change that makes the overall rate meaningful has to restate this.
+  const overallAgree = donHit + bothNo;
+  expect(bothNo / overallAgree).toBeGreaterThan(0.99);
+  expect(donHit / donPos).toBeLessThan(0.3);
+
+  // The cave result is REAL but PARTIAL, and the second half is what keeps it in quarantine: the
+  // corpus holds 30 wide gaps and only 13 are reachable by a second engine.
+  const allCaves = sum(SESSIONS.map(s => sum(facts(s).stmb_cave.players.map((p: any) => p.width_ge_3))));
+  expect(allCaves).toBe(30);
+  expect(cavePos).toBeLessThan(allCaves);
+});
 
 test('the denominator is anchored to the replay\'s own twice-extracted T-spin counters', () => {
   let rounds = 0, agreeing = 0, simTotal = 0, replayTotal = 0, scored = 0;

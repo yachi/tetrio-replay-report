@@ -88,7 +88,7 @@
  * Rates are integers scaled x1000, matching report/facts.json and forecast-facts.json.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { loadCases, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
+import { loadCases, runCase, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
 import { H } from './sim.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS,
@@ -199,6 +199,38 @@ export const TSPIN_COUNTERS = [
 const occupancyOf = (b: (string | null)[][] | undefined): boolean[][] =>
   Array.from({ length: H }, (_, r) =>
     Array.from({ length: BOARD_WIDTH }, (_, c) => (b ? b[r]?.[c] != null : false)));
+
+/**
+ * The two board-state verdicts for one lock of the OTHER engine — see `dualEngineCheck`.
+ *
+ * Deliberately NOT routed through the reconstruction check the shipped path uses. That check reads
+ * `records[i].clearedRows`, and the two engines do not mean the same thing by that field: the
+ * hand-port leaves it empty on most clearing locks, so licensing it that way rejected 1355 of 1355
+ * and reported a total disagreement that was really a comparison bug. A 0%/100% split is a bug
+ * report about the comparison, not a result.
+ *
+ * What replaces it is the weaker thing that IS shared: the engine's own board plus its own cells
+ * must make exactly as many rows full as the engine says it cleared. A lock whose board fails that
+ * is returned as null and compared against nothing, rather than counted as a disagreement.
+ */
+function dualVerdict(r: SimLike, i: number) {
+  const lk = r.locks[i];
+  if (!lk || lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0) return null;
+  const withT = occupancyOf(i > 0 ? (r.boards[i - 1] as (string | null)[][] | undefined) : undefined);
+  for (const q of lk.cells)
+    if (q.row >= 0 && q.row < H && q.col >= 0 && q.col < BOARD_WIDTH) withT[q.row]![q.col] = true;
+  const rows: number[] = [];
+  for (let rr = 0; rr < H; rr++) if (withT[rr]!.every(Boolean)) rows.push(rr);
+  if (rows.length !== lk.cleared) return null;
+  const cv = caveAt(withT, rows, lk.cells, H);
+  return { don: donationCols(withT, rows, lk.cells, H).length > 0,
+           cave: !!(cv && cv.width >= CAVE_MIN_WIDTH) };
+}
+
+type SimLike = {
+  locks: { piece: string; spin: string; cleared: number; cells: { row: number; col: number }[] }[];
+  boards: unknown[];
+};
 
 /** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
  *  `lowest` is -1 for a wholly empty column, in which case the cavity is reported as 0 — an empty
@@ -392,6 +424,9 @@ const counterByKind = Object.fromEntries(TSPIN_COUNTERS.map(k =>
   [k.key, { sim: 0, replay: 0, rounds_agreeing: 0 }])) as
   Record<string, { sim: number; replay: number; rounds_agreeing: number }>;
 let counterUnclassified = 0;
+/** The SECOND ENGINE's verdicts, as two confusion matrices — see `dualEngineCheck`. */
+const dual = { don: { tt: 0, tf: 0, ft: 0, ff: 0 }, cave: { tt: 0, tf: 0, ft: 0, ff: 0 } };
+let dualReachable = 0;
 
 for (const c of loadCases(dir)) {
   roundsTotal++;
@@ -437,6 +472,13 @@ for (const c of loadCases(dir)) {
     counterRounds.push({ user: c.user, sim: simTotal, byKind: realK,
                          replay: present ? realTotal : null, agrees });
   }
+
+  // THE SECOND ENGINE — see `dualEngineCheck`. The hand-port is run over the same case and its
+  // verdicts are compared lock by lock, but ONLY as far as both are verified: `runCase` verifies a
+  // far shorter prefix (27 locks against the oracle's 81 on average), and comparing past its end
+  // would be comparing against a board nothing vouches for.
+  const rs = runCase(c);
+  const dualTo = Math.min(v, verifiedIndex(rs, c.truth), r.locks.length - 1, rs.locks.length - 1);
 
   // slot geometry, over the verified prefix only
   for (const s of spinsAll) {
@@ -501,9 +543,24 @@ for (const c of loadCases(dir)) {
       donation = { cavity: w.cavity, garbageWell, plug };
     }
 
-    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation,
-                       cave: caveAt(withT, mine, lk.cells, H),
+    const cave = caveAt(withT, mine, lk.cells, H);
+    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave,
                        wideGapUnderTriple: lk.cleared === 3 && wideGapUnder(withT, mine, H) });
+
+    // …and the same lock through the OTHER engine, when it reaches this far and agrees the piece
+    // is the same one. Its board is built from its own snapshot, so the two verdicts share nothing
+    // but the lock index — which is what makes agreeing on them worth anything.
+    if (i <= dualTo && rs.locks[i]?.piece === lk.piece) {
+      const other = dualVerdict(rs, i);
+      if (other) {
+        dualReachable++;
+        const mineV = { don: !!donation, cave: !!(cave && cave.width >= CAVE_MIN_WIDTH) };
+        for (const k of ['don', 'cave'] as const) {
+          const x = mineV[k], y = other[k];
+          dual[k][x && y ? 'tt' : x ? 'tf' : y ? 'ft' : 'ff']++;
+        }
+      }
+    }
   }
 
   // The opening board after n locks, for each n an opener can end its first bag on: no line clear
@@ -939,6 +996,58 @@ function buildCounterCheck() {
   };
 }
 
+/**
+ * THE SECOND ENGINE, and the reason its headline number may not be quoted on its own.
+ *
+ * The dual-extractor rule never asked two implementations to agree on everything — extract.py and
+ * extract2.ts are only ever compared on facts.json. So the question for a quarantined metric is
+ * whether a second, independently written engine reaches the same verdict on the same lock. Two
+ * exist: the hand-port `runCase` and the vendored clean-room Triangle engine the section already
+ * runs on. They share no code.
+ *
+ * WHAT IS PUBLISHED IS THE CONFUSION MATRIX, NOT THE AGREEMENT RATE, and that is the whole point of
+ * this function. Both verdicts are rare — 30 caves and 82 donations in 3142 scored clears — so
+ * "the two engines agree 96.7% of the time" is 1292 negatives agreeing with each other and says
+ * nothing about the metric. Split by the oracle's verdict and the two metrics come apart:
+ *
+ *     cave     — 13 of 13 positives, both engines. A real cross-implementation result.
+ *     donation —  9 of 36 positives. The two engines disagree about three donations in four.
+ *
+ * Same failure mode as a detector whose clause is entailed by its siblings: a rate whose denominator
+ * is dominated by the easy case measures the substrate. `agreement_on_positives` is therefore the
+ * field the section reads, and `agreement_overall` is emitted beside it precisely so the gap is
+ * visible rather than hidden by publishing only one of them.
+ *
+ * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so only 1346 of the
+ * 3142 scored clears (42.8%) can be compared at all. This is a check, not a re-scoping: the tables
+ * still score the oracle's prefix, exactly as `tspinCounterCheck` licenses a denominator without
+ * redefining it. Neither metric leaves quarantine on this — cave's 13 positives are 13 of 30.
+ */
+function dualEngineCheck() {
+  const cell = (m: { tt: number; tf: number; ft: number; ff: number }) => {
+    const positives = m.tt + m.tf;
+    return {
+      both_yes: m.tt, oracle_only: m.tf, other_only: m.ft, both_no: m.ff,
+      oracle_positives: positives,
+      /** THE figure. Null rather than 1.0 when there is no positive to agree about: a check with
+       *  no positive in range is decorative, and must not read as perfect agreement. */
+      agreement_on_positives: positives ? [m.tt, positives] : null,
+      /** emitted only so the gap between the two is visible — see the note above */
+      agreement_overall: [m.tt + m.ff, m.tt + m.tf + m.ft + m.ff],
+    };
+  };
+  return {
+    engines: ['runCaseOracle (vendored Triangle, clean-room)', 'runCase (hand-port, sim.ts)'],
+    covers: 'a CHECK on the verdicts, not a re-scoping of the tables — they still score the '
+          + 'oracle\'s verified prefix. Read `agreement_on_positives`, never `agreement_overall`: '
+          + 'both verdicts are rare, so the overall rate is negatives agreeing with negatives',
+    locks_scored: tspinClears.length,
+    locks_comparable: dualReachable,
+    donation: cell(dual.don),
+    cave: cell(dual.cave),
+  };
+}
+
 /** The replay's own whole-round T-spin-clear total for one player, or null if any of that player's
  *  rounds did not carry the counters. The denominator the verified prefix is a subset OF. */
 const replayTspinClears = (user: string) => {
@@ -969,6 +1078,7 @@ function donationMetric() {
     scope: 'verified prefix',
     check: reconstructionCheck(),
     counter_anchor: tspinCounterCheck(),
+    dual_engine: dualEngineCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const d = mine.filter(e => e.donation).map(e => e.donation!);
@@ -1030,6 +1140,7 @@ function stmbCaveMetric() {
     min_width: CAVE_MIN_WIDTH,
     scope: 'verified prefix',
     counter_anchor: tspinCounterCheck(),
+    dual_engine: dualEngineCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const w = mine.filter(e => e.cave && e.cave.width >= CAVE_MIN_WIDTH);

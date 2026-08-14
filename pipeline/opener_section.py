@@ -639,6 +639,56 @@ def _anchor_note(data):
     )
 
 
+def _dual_engine_note(data, metric):
+    """THE SECOND ENGINE, and the reason its headline rate is never the sentence.
+
+    A quarantined metric's other route into the trust chain is a second independent implementation.
+    Two engines exist and share no code, so their verdicts on the same lock are compared — but both
+    verdicts are RARE, so the overall agreement rate is negatives agreeing with negatives and
+    measures the substrate rather than the metric. Split by the oracle's own verdict and the two
+    tables come apart completely: the cave agrees on every positive in range, the donation on a
+    quarter of them. Both sentences are written from `agreement_on_positives`, and the overall rate
+    is quoted beside it only so a reader who has seen 96.7% somewhere knows what it was.
+
+    Neither result takes anything out of quarantine, and the paragraph says so: the comparison
+    reaches under half the scored clears, because the hand-port verifies a far shorter prefix.
+
+    Empty when the artifact predates the check, and when nothing positive is in range — a check with
+    no positive to agree about is decorative and must not be printed as perfect agreement.
+    """
+    blk = (data.get(metric) or {}).get("dual_engine")
+    if not blk:
+        return ""
+    m = blk["cave" if metric == "stmb_cave" else "donation"]
+    pos = m["agreement_on_positives"]
+    if not pos:
+        return ""
+    hit, n = pos
+    reach = _pct(_share(blk["locks_comparable"], blk["locks_scored"]))
+    scope = (f"呢個對照淨係去到 <strong>{blk['locks_comparable']}／{blk['locks_scored']}</strong>"
+             f"（{reach}）個可核 T-spin —— hand-port 自己可核嗰段短好多，"
+             "去唔到嘅位就冇得對。")
+    if hit == n:
+        head = (f"<strong>呢個數係全節唯一一個俾第二個獨立實作對過嘅。</strong>"
+                f"兩個引擎（vendored Triangle 同手寫嗰個 hand-port）完全冇共用過 code，"
+                f"逐個 lock 各自睇自己塊板：認得出嘅 <strong>{n}</strong> 次，"
+                f"<strong>兩邊全部一樣</strong>，一個分歧都冇。")
+        tail = (f"所以呢個唔係「已經核實」，係「有 {n} 次俾人對過」——"
+                "數目細，而且淨係得一半範圍，所以呢個表一樣留喺隔離區。")
+    else:
+        head = (f"<strong>第二個引擎對唔上。</strong>"
+                f"兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>{n}</strong> 次入面，"
+                f"另一個引擎<strong>得 {hit} 次同意</strong>"
+                f"（另一邊反過來多認 {m['other_only']} 次）。")
+        tail = ("所以呢個表<strong>冇</strong>第二個實作撐住，"
+                "同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。")
+    overall = m["agreement_overall"]
+    warn = (f"<strong>唔好睇「成體 {_pct(_share(overall[0], overall[1]))} 啱」嗰個數</strong>"
+            f"——嗰 {overall[0]} 次入面有 {m['both_no']} 次係兩邊都話「唔係」，"
+            "咁樣量緊嘅係塊板嘅底，唔係呢個 metric。")
+    return head + warn + scope + tail
+
+
 def _cave_anchor_note(data):
     """The same anchor, restated at the table that also carries the columns.
 
@@ -823,6 +873,7 @@ def _donation_block(data):
         '    </div>',
         *_table(*_donation_table(data)),
         *_note_block(_anchor_note(data)),
+        *_note_block(_dual_engine_note(data, "donation")),
         *_note_block(_donation_note(data)),
         *_note_block(_donation_window_note(data)),
     ]
@@ -1005,6 +1056,7 @@ def _cave_block(data):
         '    </div>',
         *_table(*_cave_table(data)),
         *_note_block(_cave_anchor_note(data)),
+        *_note_block(_dual_engine_note(data, "stmb_cave")),
         *_note_block(_cave_note(data)),
         *_note_block(_cave_window_note(data)),
     ]

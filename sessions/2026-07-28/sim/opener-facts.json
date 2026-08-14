@@ -1087,6 +1087,45 @@
         }
       }
     },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 626,
+      "locks_comparable": 273,
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 6,
+        "other_only": 3,
+        "both_no": 264,
+        "oracle_positives": 6,
+        "agreement_on_positives": [
+          0,
+          6
+        ],
+        "agreement_overall": [
+          264,
+          273
+        ]
+      },
+      "cave": {
+        "both_yes": 2,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 271,
+        "oracle_positives": 2,
+        "agreement_on_positives": [
+          2,
+          2
+        ],
+        "agreement_overall": [
+          273,
+          273
+        ]
+      }
+    },
     "players": [
       {
         "user": "pinglamb",
@@ -1177,6 +1216,45 @@
           "replay": 0,
           "rounds_agreeing": 128
         }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 626,
+      "locks_comparable": 273,
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 6,
+        "other_only": 3,
+        "both_no": 264,
+        "oracle_positives": 6,
+        "agreement_on_positives": [
+          0,
+          6
+        ],
+        "agreement_overall": [
+          264,
+          273
+        ]
+      },
+      "cave": {
+        "both_yes": 2,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 271,
+        "oracle_positives": 2,
+        "agreement_on_positives": [
+          2,
+          2
+        ],
+        "agreement_overall": [
+          273,
+          273
+        ]
       }
     },
     "players": [

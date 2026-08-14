@@ -168,6 +168,20 @@ CAVE_WINDOW_MARKER = "唔係一句引述"
 ANCHOR_MARKERS = ("個分母而家有第二個來源，分子冇", "但係分子照舊隔離")
 CAVE_ANCHOR_MARKERS = ("呢個表個分母同樣錨咗", "分子一樣照舊隔離")
 
+# THE SECOND ENGINE, and the marker is the WARNING rather than the result — because the result is
+# the part nobody would delete and the warning is the part that carries it.
+#
+# Both verdicts are rare (30 caves and 82 donations in 3142 scored clears), so the overall
+# agreement rate between the two engines is negatives agreeing with negatives: 96.7% for the
+# donation, of which 1292 of 1301 are both engines saying "no". Split by the oracle's own verdict
+# and the two tables come apart — cave 13/13 positives, donation 9/36. Publishing the overall rate
+# without the sentence saying what is in its denominator is the single most misleading edit
+# available in this section, and it is misleading in the direction of looking verified.
+DUAL_ENGINE_MARKER = "咁樣量緊嘅係塊板嘅底"
+# …and the coverage clause, without which "13 of 13, both engines" reads as the whole corpus when
+# the comparison reaches 1346 of 3142 scored clears — the hand-port verifies a far shorter prefix.
+DUAL_COVERAGE_MARKER = "hand-port 自己可核嗰段短好多"
+
 
 def problems(data, doc):
     """Every reason `doc`'s opener region disagrees with `data`; empty means it agrees."""
@@ -314,6 +328,20 @@ def problems(data, doc):
                            "the sentence saying the numerators are still simulator-only. Keeping "
                            "the first without the second publishes a quarantined table as verified")
 
+    # 8c. the second engine. Demanded whenever either metric has a positive in comparison range —
+    #     the same condition `_dual_engine_note` renders under. A check with no positive to agree
+    #     about is decorative and prints nothing, so asking for the paragraph then would fail a
+    #     session that is behaving correctly.
+    if any((data.get(m) or {}).get("dual_engine", {}).get(k, {}).get("agreement_on_positives")
+           for m, k in (("donation", "donation"), ("stmb_cave", "cave"))):
+        for marker in (DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER):
+            if marker not in body:
+                bad.append(f"the second-engine reading is gone ({marker!r} missing) — both verdicts "
+                           "are rare, so the two engines' OVERALL agreement is negatives agreeing "
+                           "with negatives (1292 of the donation's 1301), and neither the rate nor "
+                           "the cave's 13-of-13 may be published without the sentence saying what "
+                           "is in the denominator and how far the comparison reaches")
+
     if dn and sum(p["donations"] for p in dn["players"]):
         for marker in DONATION_MARKERS:
             if marker not in body:
@@ -451,7 +479,8 @@ def _selftest(report_dir):
                    PCO_MARKER, *TIMING_MARKERS, *DONATION_MARKERS, CAVE_DEPTH_MARKER,
                    *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS, *MIDGAME_MARKERS,
                    DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER,
-                   *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS):
+                   *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS,
+                   DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

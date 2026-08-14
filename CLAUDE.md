@@ -509,18 +509,43 @@ Two traps, both of which have shipped here before in other forms:
   and counted in `unknown_rounds`; `openers.test.ts` pins `tspin_clears_replay` per session as a
   literal and asserts it is nonzero, and the mutant that zeroes both sides is killed by it.
 
-**The other route into the chain is a second engine, and it is measured but not taken.** Both engines
-already exist — the hand-port `runCase` and the vendored Triangle `runCaseOracle`. Scored lock by
-lock over the prefix where both verify (1346 comparable T-spin clears), they agree on **lines
-1346/1346**, on **cave 1346/1346**, and on **donation 1301/1346 (96.7%)**. So the cave metric is a
-real candidate for dual-implementation membership; donation is not, and the 45 disagreements sit
-where the documented garbage-hole-column problem is. Not shipped — the probe is the finding.
+### 第二個引擎 — `dual_engine`, and why its headline rate is never the sentence
+
+The other route is a second implementation, and two engines already exist that share no code: the
+hand-port `runCase` and the vendored clean-room Triangle `runCaseOracle`. `dualEngineCheck` runs
+both over every case and compares the two board-state verdicts lock by lock, as far as **both** are
+verified.
+
+**What is published is the confusion matrix, never the agreement rate**, and that distinction is the
+whole finding. Both verdicts are rare — 30 caves and 82 donations in 3142 scored clears — so an
+overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
+
+| | overall | **on the positives** |
+|---|---|---|
+| cave | 1346/1346 (100%) | **13 / 13** |
+| donation | 1301/1346 (96.7%) | **9 / 36** |
+
+The donation's 96.7% is 1292 of 1301 agreements being both engines saying "no". On the thing the
+table actually counts the two engines disagree about **three donations in four** — the opposite
+reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
+siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` so a future change cannot
+quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER` fails the build if the section
+prints a rate without the sentence saying what is in its denominator.
+
+**Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix (27 locks
+against 81 on average), so the comparison reaches **1346 of 3142** scored clears — cave's 13
+positives are 13 of the corpus's 30. It is a check on the verdicts, not a re-scoping of the tables,
+exactly as the counter anchor licenses a denominator without redefining it. What it buys the
+donation table is a *caveat it did not have*: the one metric here with no second implementation
+backing it, stated as a measurement.
 
 A false start worth not repeating: the first version of that probe pushed both engines through the
 reconstruction check and the hand-port licensed **0 of 1355**. A 0%/100% split is a bug report about
 the comparison, not a result — `records[].clearedRows` does not mean the same thing in the two
-engines (the hand-port leaves it empty on most clearing locks), while its board is fine. Compare the
-**metric**, from each engine's own pre-lock board plus its own T cells.
+engines (the hand-port leaves it empty on most clearing locks), while its board is fine. `dualVerdict`
+therefore uses the weaker check both engines can satisfy: the engine's own board plus its own cells
+must make exactly as many rows full as it says it cleared, and a lock that fails is compared against
+nothing rather than counted as a disagreement.
 
 ## 開局定式 定 中盤手法 — the window was asserted, now it is measured
 
