@@ -463,8 +463,64 @@ category makes for the ordering metric. All three category counts are recorded a
 
 Both metrics are licensed by one check: the per-lock board snapshot plus the lock's cells must make
 exactly the rows full that the engine independently recorded clearing. Different state, so it is a
-real gate — **3379/3379 across five sessions**, and a spin it cannot reconstruct is dropped, never
-scored.
+real gate — **3142/3142 across five sessions**, and a spin it cannot reconstruct is dropped, never
+scored. (This line read **3379/3379** until 2026-08-14. 3379 is the corpus's *whole-round* T-spin
+clear total; the check is scoped to the verified prefix and has always been 3142. The figure was
+written from a whole-round probe and matched no committed artefact — `donation.check.tspin_clears`
+sums to 3142 in the five `opener-facts.json`. Nothing caught it because CLAUDE.md is prose: a gate
+figure quoted here is not the gate.)
+
+### 分母錨咗 replay 自己數嘅 counter — the one part of this section that is not simulator-only
+
+The reconstruction check above is *internal*: two states the same engine built separately. It says
+the boards are coherent; it cannot say the engine counts T-spins the way the game does. That
+question has an outside witness — `results.stats.clears.tspindoubles` and its seven siblings, which
+`extract.py` and `extract2.ts` each read into facts.json as `tspin_doubles` etc. **Both extractors
+agree on them, so they are inside the trust chain**, and `tspinCounterCheck` compares them per
+player-round, per kind, over the whole round:
+
+| | |
+|---|---|
+| rounds where every kind agrees | **592 / 592** (five sessions, no unknowns) |
+| whole-round T-spin clears, sim vs replay | **3379 = 3379** |
+| what the verified prefix scores of them | **3142**, i.e. **93.0%** coverage |
+
+So the two tables' **denominator** leaves quarantine: `tspin_clears_scored` is now a subset of a
+total the trust chain already carries, and 「可核覆蓋」 names the subset. This is the
+`perfect_clear_timing` pattern (592/592 against `clears.allclear`) applied to a denominator instead
+of a timing.
+
+**The numerators do not.** Which clear was a donation, and how wide the gap under it was, still come
+from one simulator with no second implementation — so the section keeps `report_eligible: false`,
+mints no claim ids and carries no ✓ badges. `ANCHOR_MARKERS` / `CAVE_ANCHOR_MARKERS` in
+`check_opener_section.py` demand **both** sentences at both tables, because deleting the second
+while keeping the first is exactly the edit that reads as "this table has been verified".
+
+Two traps, both of which have shipped here before in other forms:
+
+- **Minis are part of the denominator**, so they are part of the anchor. The collection loop scores
+  any T lock with `spin !== 'none'` that cleared, so an anchor over `tspinsingles/doubles/triples`
+  alone would license a smaller set than it covers. All eight kinds are enumerated in
+  `TSPIN_COUNTERS`, including the four that are zero throughout — a kind that starts appearing must
+  surface as a disagreement, not vanish from both sides.
+- **A missing counter is UNKNOWN, never 0.** `?? 0` on both sides makes a corpus of zeros agree with
+  itself and `agrees` stay true — the same shape as the `?? 0` that published 「一個 Perfect Clear
+  都冇出過」 for five sessions holding 65. A round carrying none of the eight counters is excluded
+  and counted in `unknown_rounds`; `openers.test.ts` pins `tspin_clears_replay` per session as a
+  literal and asserts it is nonzero, and the mutant that zeroes both sides is killed by it.
+
+**The other route into the chain is a second engine, and it is measured but not taken.** Both engines
+already exist — the hand-port `runCase` and the vendored Triangle `runCaseOracle`. Scored lock by
+lock over the prefix where both verify (1346 comparable T-spin clears), they agree on **lines
+1346/1346**, on **cave 1346/1346**, and on **donation 1301/1346 (96.7%)**. So the cave metric is a
+real candidate for dual-implementation membership; donation is not, and the 45 disagreements sit
+where the documented garbage-hole-column problem is. Not shipped — the probe is the finding.
+
+A false start worth not repeating: the first version of that probe pushed both engines through the
+reconstruction check and the hand-port licensed **0 of 1355**. A 0%/100% split is a bug report about
+the comparison, not a result — `records[].clearedRows` does not mean the same thing in the two
+engines (the hand-port leaves it empty on most clearing locks), while its board is fine. Compare the
+**metric**, from each engine's own pre-lock board plus its own T cells.
 
 ## 開局定式 定 中盤手法 — the window was asserted, now it is measured
 

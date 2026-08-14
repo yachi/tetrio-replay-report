@@ -460,9 +460,81 @@ const CAVE: Record<string, { width_ge_3: number; min_depth_ge_2: number; triple_
   '2026-08-09': { width_ge_3: 7, min_depth_ge_2: 0, triple_control:  8 },
 };
 
+/** THE DENOMINATOR ANCHOR, per session, as literals: the replay's own whole-round T-spin-clear
+ *  total (the twice-extracted counters summed) and what the verified prefix scores out of it.
+ *
+ *  Written out rather than recomputed for the reason the whole block above is: a test that
+ *  re-derives a value the way the code does can only catch a typo. This one has a second reason —
+ *  the anchor's failure mode is silent in the direction that looks GOOD. Were the emitter to start
+ *  reading a counter that is absent, `?? 0` on both sides would make the comparison trivially agree
+ *  and `agrees` would stay true over a corpus of zeros, which is exactly the shape of the bug that
+ *  published "no perfect clears" for five sessions holding 65. So `replay` is pinned, and the sum
+ *  is asserted against the corpus figure. */
+const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: number }> = {
+  '2026-07-22': { rounds: 158, replay: 879, scored: 795 },
+  '2026-07-24': { rounds: 100, replay: 578, scored: 544 },
+  '2026-07-28': { rounds: 128, replay: 667, scored: 626 },
+  '2026-08-01': { rounds: 106, replay: 658, scored: 612 },
+  '2026-08-09': { rounds: 100, replay: 597, scored: 565 },
+};
+
 const facts = (s: string) =>
   JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+test('the denominator is anchored to the replay\'s own twice-extracted T-spin counters', () => {
+  let rounds = 0, agreeing = 0, simTotal = 0, replayTotal = 0, scored = 0;
+  for (const s of SESSIONS) {
+    const f = facts(s);
+    const a = f.donation.counter_anchor;
+    const want = TSPIN_ANCHOR[s]!;
+
+    // every player-round checked, none unknown, and every one of them agreeing
+    expect([s, a.player_rounds]).toEqual([s, want.rounds]);
+    expect([s, a.checked]).toEqual([s, want.rounds]);
+    expect([s, a.unknown_rounds]).toEqual([s, 0]);
+    expect([s, a.rounds_agreeing]).toEqual([s, want.rounds]);
+    expect([s, a.agrees]).toEqual([s, true]);
+    // a T-spin clear of a kind no counter names would be dropped from the SIM side only, which
+    // makes agreement easier — so it is asserted at zero rather than trusted
+    expect([s, a.unclassified_sim_clears]).toEqual([s, 0]);
+
+    // the two totals, pinned. Not `sim === replay` alone: two zeros satisfy that.
+    expect([s, a.tspin_clears_replay]).toEqual([s, want.replay]);
+    expect([s, a.tspin_clears_sim]).toEqual([s, want.replay]);
+    expect([s, a.tspin_clears_scored]).toEqual([s, want.scored]);
+    expect(a.tspin_clears_replay).toBeGreaterThan(0);
+
+    // the anchor covers the licensing denominator, and the prefix is a SUBSET of the whole round
+    expect([s, a.tspin_clears_scored]).toEqual([s, f.donation.check.tspin_clears]);
+    expect(a.tspin_clears_scored).toBeLessThanOrEqual(a.tspin_clears_replay);
+
+    // the per-kind tallies partition the total, and each kind agrees in every round
+    expect(sum(Object.values(a.by_kind).map((k: any) => k.replay))).toBe(a.tspin_clears_replay);
+    expect(sum(Object.values(a.by_kind).map((k: any) => k.sim))).toBe(a.tspin_clears_sim);
+    for (const [kind, k] of Object.entries<any>(a.by_kind))
+      expect([s, kind, k.rounds_agreeing]).toEqual([s, kind, want.rounds]);
+
+    // the per-player columns the section prints must add up to the same two numbers
+    expect([s, sum(f.donation.players.map((p: any) => p.tspin_clears_replay))])
+      .toEqual([s, want.replay]);
+    expect(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_replay)))
+      .toBe(a.by_kind.tspindoubles.replay + a.by_kind.minitspindoubles.replay);
+    expect(f.stmb_cave.triple_control.tspin_triples_replay)
+      .toBe(a.by_kind.tspintriples.replay + a.by_kind.minitspintriples.replay);
+    // the cave metric is a subset of the doubles it is scored over
+    expect(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_scored)))
+      .toBeLessThanOrEqual(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_replay)));
+
+    rounds += a.player_rounds; agreeing += a.rounds_agreeing;
+    simTotal += a.tspin_clears_sim; replayTotal += a.tspin_clears_replay; scored += a.tspin_clears_scored;
+  }
+  // The corpus figure this whole change rests on, stated once: the simulator reproduces the
+  // replay's own T-spin counters on every player-round of every session, and the verified prefix
+  // the two tables score covers 3142 of those 3379 clears.
+  expect([rounds, agreeing]).toEqual([592, 592]);
+  expect([simTotal, replayTotal, scored]).toEqual([3379, 3379, 3142]);
+});
 
 test('the donation counts are pinned per session, and the licensing check is clean', () => {
   for (const s of SESSIONS) {

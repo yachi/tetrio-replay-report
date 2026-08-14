@@ -169,6 +169,31 @@ export const DONATION_WALLED_ROWS = 4;
  *  an ordinary overhang, which every board in this corpus produces constantly. */
 export const CAVE_MIN_WIDTH = 3;
 
+/**
+ * Every kind of T-spin clear, paired with the counter the replay keeps for it — the ANCHOR for the
+ * two board-state metrics' denominator (`tspinCounterCheck`).
+ *
+ * The `.ttrm` spells these without underscores (`tspindoubles`); extract.py and extract2.ts read
+ * each one into facts.json as `tspin_doubles`, so every counter named here is twice-extracted and
+ * inside the trust chain. Minis are listed because the metrics score them: the collection loop
+ * takes any T lock with `spin !== 'none'` that cleared, so an anchor over full spins alone would be
+ * anchoring a smaller set than the denominator it licenses.
+ *
+ * Quads and mini doubles/triples are zero throughout this corpus and are still enumerated — a kind
+ * that starts appearing must show up as a disagreement rather than be silently dropped from both
+ * sides of the comparison.
+ */
+export const TSPIN_COUNTERS = [
+  { spin: 'full', lines: 1, key: 'tspinsingles' },
+  { spin: 'full', lines: 2, key: 'tspindoubles' },
+  { spin: 'full', lines: 3, key: 'tspintriples' },
+  { spin: 'full', lines: 4, key: 'tspinquads' },
+  { spin: 'mini', lines: 1, key: 'minitspinsingles' },
+  { spin: 'mini', lines: 2, key: 'minitspindoubles' },
+  { spin: 'mini', lines: 3, key: 'minitspintriples' },
+  { spin: 'mini', lines: 4, key: 'minitspinquads' },
+] as const;
+
 /** filled/empty view of a simulated board — the frame both board-state metrics work in. An absent
  *  board (lock 0 has none before it) reads as an empty field rather than throwing. */
 const occupancyOf = (b: (string | null)[][] | undefined): boolean[][] =>
@@ -359,6 +384,14 @@ const tspinClears: TSpinClear[] = [];
 /** The licensing check on metrics 7 and 8 — see `reconstructionCheck`. */
 let reconAgreed = 0, reconDisagreed = 0;
 let roundsTotal = 0;
+/** The ANCHOR on those metrics' denominator — see `tspinCounterCheck`. One entry per player-round,
+ *  plus a per-kind tally, plus any T-spin clear the counters have no kind for. */
+const counterRounds: { user: string; sim: number; replay: number | null; agrees: boolean;
+                       byKind: Record<string, number> }[] = [];
+const counterByKind = Object.fromEntries(TSPIN_COUNTERS.map(k =>
+  [k.key, { sim: 0, replay: 0, rounds_agreeing: 0 }])) as
+  Record<string, { sim: number; replay: number; rounds_agreeing: number }>;
+let counterUnclassified = 0;
 
 for (const c of loadCases(dir)) {
   roundsTotal++;
@@ -374,6 +407,36 @@ for (const c of loadCases(dir)) {
                 spinsVerified: spinsAll.filter(x => x.i <= v),
                 pcLocks: r.locks.flatMap((lk, i) => (lk as { allclear?: boolean }).allclear ? [i] : []),
                 pcReal: typeof acReal === 'number' ? acReal : null });
+
+  // THE DENOMINATOR ANCHOR, over the WHOLE round — see `tspinCounterCheck`. It has to be the whole
+  // round because that is what the replay's counters cover; the verified prefix is then a subset of
+  // a total that a twice-extracted field agrees with, rather than a number with no outside witness.
+  {
+    const simK: Record<string, number> = Object.fromEntries(TSPIN_COUNTERS.map(k => [k.key, 0]));
+    for (const lk of r.locks) {
+      if (lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0) continue;
+      const kind = TSPIN_COUNTERS.find(k => k.spin === lk.spin && k.lines === lk.cleared);
+      if (kind) simK[kind.key]!++; else counterUnclassified++;
+    }
+    // A round carrying none of these counters is UNKNOWN, not all-zero — the same rule
+    // `perfectClearTiming` applies to `allclear`. Defaulting a missing counter to 0 would let a
+    // round where the simulator also found nothing count as agreement, so a corpus that stopped
+    // carrying the field would read as perfect agreement instead of as unchecked.
+    const present = TSPIN_COUNTERS.some(k => typeof c.clears[k.key] === 'number');
+    const realK: Record<string, number> = {};
+    let agrees = present, simTotal = 0, realTotal = 0;
+    for (const k of TSPIN_COUNTERS) {
+      const real = c.clears[k.key] ?? 0;
+      realK[k.key] = real;
+      simTotal += simK[k.key]!; realTotal += real;
+      if (!present) continue;
+      counterByKind[k.key]!.sim += simK[k.key]!;
+      counterByKind[k.key]!.replay += real;
+      if (simK[k.key] === real) counterByKind[k.key]!.rounds_agreeing++; else agrees = false;
+    }
+    counterRounds.push({ user: c.user, sim: simTotal, byKind: realK,
+                         replay: present ? realTotal : null, agrees });
+  }
 
   // slot geometry, over the verified prefix only
   for (const s of spinsAll) {
@@ -823,6 +886,74 @@ const reconstructionCheck = () => ({
   agrees: reconDisagreed === 0 && reconAgreed > 0,
 });
 
+/**
+ * THE DENOMINATOR ANCHOR — the one thing in this file that reaches outside the simulator.
+ *
+ * `reconstructionCheck` above is an INTERNAL consistency check: two states the same engine built
+ * separately. It says the boards are coherent; it cannot say the engine counts T-spins the way the
+ * game does. That question has an outside witness, and it is the same one `perfectClearTiming`
+ * uses for全消: the replay's own per-kind counters, which extract.py and extract2.ts each read into
+ * facts.json. Two independent extractors agree on them, so they are inside this repo's trust chain.
+ *
+ * So every player-round is compared, per kind, over the WHOLE round — and what that buys is the
+ * denominator. The tables score the verified prefix; without this the reader has no way to know
+ * either what fraction of the round's T-spins that prefix reaches, or whether the simulator's idea
+ * of a T-spin clear matches the game's at all. With it, `tspin_clears_scored` is a subset of a
+ * total the trust chain already carries, and `prefix_coverage` names the subset.
+ *
+ * The NUMERATORS stay quarantined. Nothing here says a donation or a cave was correctly detected —
+ * only that the population they are counted out of is the population the replay recorded.
+ *
+ * Emitted as null-if-disagreeing, like `perfect_clear_timing.players[].by_piece`: a coverage figure
+ * over a denominator no counter agrees with is a ratio with nothing behind it.
+ */
+let counterAnchorMemo: ReturnType<typeof buildCounterCheck> | null = null;
+/** Memoised: both metrics embed it and each player row consults it, and it walks every round. */
+const tspinCounterCheck = () => (counterAnchorMemo ??= buildCounterCheck());
+
+function buildCounterCheck() {
+  const checked = counterRounds.filter(r => r.replay !== null);
+  const agree = checked.filter(r => r.agrees).length;
+  return {
+    source: 'the replay\'s own per-kind T-spin counters (results.stats.clears.tspindoubles and its '
+          + 'seven siblings) — the fields extract.py and extract2.ts read into facts.json as '
+          + 'tspin_doubles etc., so they are twice-extracted and inside the trust chain',
+    covers: 'the DENOMINATOR only. The tables\' numerators — which of those clears was a donation '
+          + 'or a cave — come from this simulator alone and stay quarantined',
+    player_rounds: counterRounds.length,
+    checked: checked.length,
+    unknown_rounds: counterRounds.length - checked.length,
+    rounds_agreeing: agree,
+    agrees: checked.length > 0 && agree === checked.length && counterUnclassified === 0,
+    /** a T-spin clear of a kind no counter names. Nonzero means the comparison is dropping events
+     *  from the simulator side, which would make agreement easier rather than harder. */
+    unclassified_sim_clears: counterUnclassified,
+    tspin_clears_sim: counterRounds.reduce((s, r) => s + r.sim, 0),
+    tspin_clears_replay: checked.reduce((s, r) => s + (r.replay ?? 0), 0),
+    /** what the tables actually score: the verified prefix, after the reconstruction check. The
+     *  two numbers beside it are the whole round, so this is the coverage the reader needs to
+     *  read every rate below — and it is a count, never a pre-rounded share, because the section
+     *  floors every printed figure (pipeline/fmt.py). */
+    tspin_clears_scored: tspinClears.length,
+    by_kind: counterByKind,
+  };
+}
+
+/** The replay's own whole-round T-spin-clear total for one player, or null if any of that player's
+ *  rounds did not carry the counters. The denominator the verified prefix is a subset OF. */
+const replayTspinClears = (user: string) => {
+  const mine = counterRounds.filter(r => r.user === user);
+  return mine.some(r => r.replay === null) ? null : mine.reduce((s, r) => s + (r.replay ?? 0), 0);
+};
+
+/** The same, restricted to named counters — the cave table's denominator is T-spin DOUBLES, and
+ *  full and mini are separate counters that the metric scores together. */
+const counterRoundsFor = (user: string, keys: readonly string[]) => {
+  const mine = counterRounds.filter(r => r.user === user);
+  if (mine.some(r => r.replay === null)) return null;
+  return mine.reduce((s, r) => s + keys.reduce((t, k) => t + (r.byKind[k] ?? 0), 0), 0);
+};
+
 // ── metric 7: DONATION ─────────────────────────────────────────────────────────────────────────
 // THE CONTROL IS THE TWO SPLITS, and neither may be dropped. The b2b split reproduces harddrop's
 // own Natural-vs-Other-Examples division from the plugging lock; the provenance split says whose
@@ -837,12 +968,17 @@ function donationMetric() {
     walled_deepest_rows: DONATION_WALLED_ROWS,
     scope: 'verified prefix',
     check: reconstructionCheck(),
+    counter_anchor: tspinCounterCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const d = mine.filter(e => e.donation).map(e => e.donation!);
+      const anchored = tspinCounterCheck().agrees;
       return {
         user,
         tspin_clears_scored: mine.length,
+        /** the replay's own count over the WHOLE round — the denominator `tspin_clears_scored` is
+         *  a subset of, null when the anchor does not hold. See `tspinCounterCheck`. */
+        tspin_clears_replay: anchored ? replayTspinClears(user) : null,
         donations: d.length,
         self_built_well: d.filter(x => !x.garbageWell).length,
         garbage_derived_well: d.filter(x => x.garbageWell).length,
@@ -893,12 +1029,18 @@ function stmbCaveMetric() {
               + 'the T\'s span and never containment',
     min_width: CAVE_MIN_WIDTH,
     scope: 'verified prefix',
+    counter_anchor: tspinCounterCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const w = mine.filter(e => e.cave && e.cave.width >= CAVE_MIN_WIDTH);
+      const ck = tspinCounterCheck();
       return {
         user,
         tspin_doubles_scored: mine.filter(e => e.lines === 2).length,
+        /** the replay's own whole-round count of the SAME kind, from the twice-extracted counter.
+         *  Full and mini are separate counters and the metric scores both, so both are summed. */
+        tspin_doubles_replay: ck.agrees
+          ? counterRoundsFor(user, ['tspindoubles', 'minitspindoubles']) : null,
         width_ge_3: w.length,
         min_depth_ge_2: w.filter(e => e.cave!.minDepth >= 2).length,
         // Measured, five sessions: every single cave falls OUTSIDE the opener window — 0 in, 30
@@ -913,6 +1055,9 @@ function stmbCaveMetric() {
     min_depth_histogram: hist(wide.map(e => e.cave!.minDepth)),
     triple_control: {
       tspin_triples_scored: triples.length,
+      tspin_triples_replay: tspinCounterCheck().agrees
+        ? users.reduce((s, u) => s + (counterRoundsFor(u, ['tspintriples', 'minitspintriples']) ?? 0), 0)
+        : null,
       width_ge_3: triples.filter(e => e.wideGapUnderTriple).length,
     },
     means: 'how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T\'s '

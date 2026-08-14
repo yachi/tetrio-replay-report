@@ -152,6 +152,22 @@ DONATION_WINDOW_MARKER = "捐窿係開局招定係中盤招"
 # harddrop's `Mid-game T-Spin setups` filing is a thing this pipeline measured.
 CAVE_WINDOW_MARKER = "唔係一句引述"
 
+# THE DENOMINATOR ANCHOR, and it is the one gate here guarding against publishing something as MORE
+# verified than it is rather than as less. Both tables now print a 「全局（replay 自己數）」 column
+# sourced from the twice-extracted counters, and the temptation the moment a quarantined section
+# gains a trust-chain number is to let that number's credibility spread over the whole table.
+#
+# Two sentences, and the pair is the point:
+#   - the anchor sentence, without which the new columns are two more simulator numbers and the
+#     reader has no way to know one of them is not;
+#   - the NUMERATOR sentence, without which the anchor reads as "this table has been verified". It
+#     has not: which clear was a donation, and how wide the gap under it was, still come from one
+#     simulator with no second implementation.
+# Deleting the second while keeping the first is precisely the edit that turns a denominator anchor
+# into a false claim of verification, so both are demanded together, at both tables.
+ANCHOR_MARKERS = ("個分母而家有第二個來源，分子冇", "但係分子照舊隔離")
+CAVE_ANCHOR_MARKERS = ("呢個表個分母同樣錨咗", "分子一樣照舊隔離")
+
 
 def problems(data, doc):
     """Every reason `doc`'s opener region disagrees with `data`; empty means it agrees."""
@@ -284,7 +300,20 @@ def problems(data, doc):
     #    which is the same condition `_donation_note` renders under: an artifact predating the
     #    metric, or a session that donated nothing, has no such paragraph and must not be asked for
     #    one.
+    # 8b. the denominator anchor. Demanded whenever the artifact carries a check that HELD — that is
+    #     the same condition `_anchor_note` / `_cave_anchor_note` render under, and the same one that
+    #     puts the 「全局」 columns in the two tables. An artifact predating the anchor, or one whose
+    #     per-round check failed, prints neither the columns nor the paragraphs.
     dn = data.get("donation")
+    if (dn or {}).get("counter_anchor", {}).get("agrees"):
+        for marker in (*ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS):
+            if marker not in body:
+                bad.append(f"the denominator anchor is gone ({marker!r} missing) — the 「全局」 "
+                           "columns come from the replay's own twice-extracted T-spin counters, "
+                           "and they may not be published without BOTH the sentence saying so and "
+                           "the sentence saying the numerators are still simulator-only. Keeping "
+                           "the first without the second publishes a quarantined table as verified")
+
     if dn and sum(p["donations"] for p in dn["players"]):
         for marker in DONATION_MARKERS:
             if marker not in body:
@@ -421,7 +450,8 @@ def _selftest(report_dir):
     for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER,
                    PCO_MARKER, *TIMING_MARKERS, *DONATION_MARKERS, CAVE_DEPTH_MARKER,
                    *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS, *MIDGAME_MARKERS,
-                   DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER):
+                   DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER,
+                   *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))

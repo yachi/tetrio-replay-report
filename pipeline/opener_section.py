@@ -599,6 +599,72 @@ def _named_block(data):
     ]
 
 
+def _anchor_note(data):
+    """THE DENOMINATOR ANCHOR — the one control in this section that reaches outside the simulator,
+    and the only reason these two tables' 「全局」 columns may be printed at all.
+
+    Every other note here narrows what a count may be READ as. This one changes where a number came
+    FROM: the replay keeps its own per-kind T-spin counters, both extractors read them into
+    facts.json, and `emit-opener-facts.ts` compares them per player-round against what the oracle
+    derived. So 可核 T-spin 消行 stops being a simulator-only figure and becomes a subset of a total
+    the trust chain already carries.
+
+    The paragraph must keep BOTH halves. Printing the agreement without "分子照舊隔離" would read as
+    the whole section having been verified, which is exactly what has not happened — the numerators
+    (which clear was a donation, which was a cave) still have one implementation and no second
+    source. `check_opener_section` fails when either half goes missing.
+
+    Empty when the artifact predates the anchor, and when the check did NOT hold: a coverage figure
+    over a denominator no counter agrees with is a ratio with nothing behind it, and the columns it
+    would explain are emitted as null in that case anyway.
+    """
+    dn = data.get("donation") or {}
+    ck = dn.get("counter_anchor")
+    if not ck or not ck.get("agrees"):
+        return ""
+    cov = _pct(_share(ck["tspin_clears_scored"], ck["tspin_clears_replay"]))
+    return (
+        "<strong>個分母而家有第二個來源，分子冇。</strong>"
+        "呢兩個表數嘅係「可核嗰段」入面嘅 T-spin 消行，而「全局」嗰欄係"
+        "<em>replay 自己數</em>嘅——<code>tspindoubles</code> 同佢七個兄弟，"
+        "<code>extract.py</code> 同 <code>extract2.ts</code> 兩個抽取器各自讀入 "
+        "<code>facts.json</code>，所以嗰個數本身已經喺信任鏈入面。"
+        f"逐個玩家回合、逐種消行對過："
+        f"<strong>{ck['rounds_agreeing']}／{ck['checked']}</strong> 個回合全中，"
+        f"全場 <strong>{ck['tspin_clears_sim']}</strong> 個對 "
+        f"<strong>{ck['tspin_clears_replay']}</strong> 個。"
+        f"即係話個分母唔再係模擬器自己講嘅數，可核嗰段覆蓋咗其中 <strong>{cov}</strong>。"
+        "<strong>但係分子照舊隔離</strong>——邊一次算捐窿、邊一次算窿，"
+        "依然淨係得呢一個模擬器講，所以呢一節仍然冇 claim id、冇 ✓ 章。"
+    )
+
+
+def _cave_anchor_note(data):
+    """The same anchor, restated at the table that also carries the columns.
+
+    Short rather than a repeat of `_anchor_note`, because the two tables sit in one section and the
+    long form is three paragraphs up — but it may not be dropped, and it may not lose either half.
+    A reader who reaches table six first would otherwise see 「全局 TSD（replay 自己數）」 with no
+    statement of what is anchored and what is not.
+    """
+    sc = data.get("stmb_cave") or {}
+    ck = sc.get("counter_anchor")
+    if not ck or not ck.get("agrees"):
+        return ""
+    tc = sc.get("triple_control") or {}
+    rep = tc.get("tspin_triples_replay")
+    triples = ("" if rep is None else
+               f"下面消三行嗰個對照組一樣："
+               f"{tc['tspin_triples_scored']} 個可核，replay 自己數係 {rep} 個。")
+    return (
+        "<strong>呢個表個分母同樣錨咗 replay 自己數嘅 counter</strong>"
+        f"（逐個回合對過，{ck['rounds_agreeing']}／{ck['checked']} 全中，"
+        "詳情見上面捐窿表下面嗰段）。" + triples
+        + "<strong>分子一樣照舊隔離</strong>——「底下有幾闊」係呢個模擬器自己睇塊板睇返嚟嘅，"
+        "冇第二個實作對得住，所以呢個表一樣冇 claim id、冇 ✓ 章。"
+    )
+
+
 def _donation_note(data):
     """THE control on the donation table: where the well came from, and what the board source
     cannot say about it.
@@ -684,22 +750,34 @@ def _donation_table(data):
     dn = data["donation"]
     per = {p["user"]: p for p in dn["players"]}
     w = dn.get("opener_window_pieces")
-    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>", "<th>捐窿</th>", "<th>佔可核 T-spin</th>"]
+    # The anchored column is emitted only when the artifact carries it AND the per-round check held
+    # — see `_anchor_note`. Its absence is what an older opener-facts.json renders as.
+    anchored = bool((dn.get("counter_anchor") or {}).get("agrees"))
+    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>"]
+    if anchored:
+        head += ["<th>全局（replay 自己數）</th>", "<th>可核覆蓋</th>"]
+    head += ["<th>捐窿</th>", "<th>佔可核 T-spin</th>"]
     if w is not None:
         head += [f"<th>頭 {w} 手內</th>", f"<th>第 {w} 手之後</th>"]
     head += ["<th>自己砌嘅井</th>", "<th>垃圾行留低嘅井</th>",
              "<th>塞嗰手冇消行（Natural）</th>", "<th>塞嗰手消咗行（斷 B2B）</th>",
              "<th>塞嗰手查唔到</th>"]
     split = 5 if w is None else 7
+    lead = 3 + (2 if anchored else 0)
     rows = []
     for p in _players(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * (3 + split))
+            cells.append('<td class="mono">—</td>' * (lead + split))
         else:
-            cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>'
-                         f'<td class="mono">{q["donations"]}</td>'
+            cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>')
+            if anchored:
+                rep = q["tspin_clears_replay"]
+                cells.append(f'<td class="mono">{"—" if rep is None else rep}</td>'
+                             f'<td class="mono">'
+                             f'{_pct(_share(q["tspin_clears_scored"], rep) if rep else None)}</td>')
+            cells.append(f'<td class="mono">{q["donations"]}</td>'
                          f'<td class="mono">'
                          f'{_pct(_share(q["donations"], q["tspin_clears_scored"]))}</td>')
             if q["donations"]:
@@ -744,6 +822,7 @@ def _donation_block(data):
         '分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>',
         '    </div>',
         *_table(*_donation_table(data)),
+        *_note_block(_anchor_note(data)),
         *_note_block(_donation_note(data)),
         *_note_block(_donation_window_note(data)),
     ]
@@ -870,8 +949,13 @@ def _cave_table(data):
     per = {p["user"]: p for p in sc["players"]}
     w = sc["min_width"]
     lock = sc.get("opener_window_pieces")
-    head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>", f"<th>底下有 ≥{w} 格闊嘅窿</th>",
-            "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
+    # Same anchored pair as the donation table, over the T-spin DOUBLE counters — see `_anchor_note`.
+    anchored = bool((sc.get("counter_anchor") or {}).get("agrees"))
+    head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>"]
+    if anchored:
+        head += ["<th>全局 TSD（replay 自己數）</th>", "<th>可核覆蓋</th>"]
+    head += [f"<th>底下有 ≥{w} 格闊嘅窿</th>",
+             "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
     if lock is not None:
         head += [f"<th>其中喺頭 {lock} 手內</th>", f"<th>其中喺第 {lock} 手之後</th>"]
     rows = []
@@ -879,11 +963,17 @@ def _cave_table(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * (4 if lock is None else 6))
+            cells.append('<td class="mono">—</td>'
+                         * ((4 if lock is None else 6) + (2 if anchored else 0)))
         else:
             deep = q["min_depth_ge_2"] if q["width_ge_3"] else None
-            cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>'
-                         f'<td class="mono">{q["width_ge_3"]}</td>'
+            cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>')
+            if anchored:
+                rep = q["tspin_doubles_replay"]
+                cells.append(f'<td class="mono">{"—" if rep is None else rep}</td>'
+                             f'<td class="mono">'
+                             f'{_pct(_share(q["tspin_doubles_scored"], rep) if rep else None)}</td>')
+            cells.append(f'<td class="mono">{q["width_ge_3"]}</td>'
                          f'<td class="mono">'
                          f'{_pct(_share(q["width_ge_3"], q["tspin_doubles_scored"]))}</td>'
                          f'<td class="mono">{"—" if deep is None else deep}</td>')
@@ -914,6 +1004,7 @@ def _cave_block(data):
         '      <p>' + _cave_class_note(data) + '</p>',
         '    </div>',
         *_table(*_cave_table(data)),
+        *_note_block(_cave_anchor_note(data)),
         *_note_block(_cave_note(data)),
         *_note_block(_cave_window_note(data)),
     ]

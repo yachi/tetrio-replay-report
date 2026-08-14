@@ -1032,10 +1032,66 @@
       "reconstruction_disagreed": 0,
       "agrees": true
     },
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 100,
+      "checked": 100,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 100,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 597,
+      "tspin_clears_replay": 597,
+      "tspin_clears_scored": 565,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 68,
+          "replay": 68,
+          "rounds_agreeing": 100
+        },
+        "tspindoubles": {
+          "sim": 415,
+          "replay": 415,
+          "rounds_agreeing": 100
+        },
+        "tspintriples": {
+          "sim": 89,
+          "replay": 89,
+          "rounds_agreeing": 100
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspinsingles": {
+          "sim": 25,
+          "replay": 25,
+          "rounds_agreeing": 100
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        }
+      }
+    },
     "players": [
       {
         "user": "pinglamb",
         "tspin_clears_scored": 324,
+        "tspin_clears_replay": 340,
         "donations": 6,
         "self_built_well": 0,
         "garbage_derived_well": 6,
@@ -1048,6 +1104,7 @@
       {
         "user": "yachi",
         "tspin_clears_scored": 241,
+        "tspin_clears_replay": 257,
         "donations": 7,
         "self_built_well": 0,
         "garbage_derived_well": 7,
@@ -1067,10 +1124,66 @@
     "definition": "a floating T-spin Double placed over a cave at least three columns wide — the cave is OFFSET from the T, sharing two of its three columns, so the test is overlap with the T's span and never containment",
     "min_width": 3,
     "scope": "verified prefix",
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 100,
+      "checked": 100,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 100,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 597,
+      "tspin_clears_replay": 597,
+      "tspin_clears_scored": 565,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 68,
+          "replay": 68,
+          "rounds_agreeing": 100
+        },
+        "tspindoubles": {
+          "sim": 415,
+          "replay": 415,
+          "rounds_agreeing": 100
+        },
+        "tspintriples": {
+          "sim": 89,
+          "replay": 89,
+          "rounds_agreeing": 100
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspinsingles": {
+          "sim": 25,
+          "replay": 25,
+          "rounds_agreeing": 100
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 100
+        }
+      }
+    },
     "players": [
       {
         "user": "pinglamb",
         "tspin_doubles_scored": 223,
+        "tspin_doubles_replay": 236,
         "width_ge_3": 7,
         "min_depth_ge_2": 0,
         "in_opener": 0,
@@ -1079,6 +1192,7 @@
       {
         "user": "yachi",
         "tspin_doubles_scored": 167,
+        "tspin_doubles_replay": 179,
         "width_ge_3": 0,
         "min_depth_ge_2": 0,
         "in_opener": 0,
@@ -1094,6 +1208,7 @@
     },
     "triple_control": {
       "tspin_triples_scored": 88,
+      "tspin_triples_replay": 89,
       "width_ge_3": 8
     },
     "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"
