@@ -1,0 +1,38 @@
+{
+  "eyebrow": "教練分析 · 下一步點練",
+  "title": "俾兩位嘅建議",
+  "lede": "個比數係 7 比 4<span class=\"badge\" data-claim=\"G001\"></span>，總局數 48 比 36<span class=\"badge\" data-claim=\"G002\"></span>，三場打到決勝局<span class=\"badge\" data-claim=\"G016\"></span>。但今晚最值得睇嘅唔係比數，係一條同上一晚啱啱掉轉嘅拆法：<strong>兩個人輸嘅時候已經冇分別，贏嘅時候先至有</strong><span class=\"badge\" data-claim=\"C002\"></span>。所以兩邊嘅功課亦都掉轉咗。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 quad 流",
+      "profile": [
+        "強項照舊，而且係實數：逐局平均 PPS 約 1.46 高過 pinglamb 嘅約 1.41<span class=\"badge\" data-claim=\"G043\"></span>，而且逐局 PPS 同 APM 嘅波動都平穩過對面<span class=\"badge\" data-claim=\"G048\"></span><span class=\"badge\" data-claim=\"G049\"></span>。quad 開多過對面（398 對 320）<span class=\"badge\" data-claim=\"G038\"></span>，hold 用得密（3221 對 2761）<span class=\"badge\" data-claim=\"G036\"></span>，清走嘅垃圾總數亦都多過對面（1508 對 1441）<span class=\"badge\" data-claim=\"G034\"></span>，仲有食多過對手垃圾都照贏嘅局 10 局對 4 局<span class=\"badge\" data-claim=\"G060\"></span>。",
+        "<strong>但今次問題唔係地板，係天花板。</strong> 你輸嗰啲局每粒方塊嘅攻擊係 0.56<span class=\"badge\" data-claim=\"G071\"></span>，pinglamb 輸嗰啲局係 0.57<span class=\"badge\" data-claim=\"G072\"></span>——爭唔夠 2%<span class=\"badge\" data-claim=\"C002\"></span>。即係話你打得差嗰陣，同佢打得差嗰陣，已經係同一個水平，呢格你追返咗。但你贏嗰啲局得 0.60，佢贏嗰啲局有 0.71，呢邊爭超過 18%<span class=\"badge\" data-claim=\"C002\"></span>。用你自己做尺就更加清楚：佢自己贏局同輸局爭 25%，你淨係爭 7%<span class=\"badge\" data-claim=\"C003\"></span>。",
+        "講到盡：你打得最好嗰啲局，離佢打得最差嗰啲局淨係 5%，但離佢打得最好嗰啲局差咗 15% 以上<span class=\"badge\" data-claim=\"C004\"></span>。<strong>你個天花板貼近對手個地板</strong>——上一晚係你跌得深，今晚係你企唔高，兩個問題唔同醫法。",
+        "個形亦都寫得好清楚：頭三場差超過 17%、中間第四至第九場唔夠 7%、尾兩場又彈返上 11% 以上<span class=\"badge\" data-claim=\"C007\"></span>，而你四場 match 全部喺中間嗰段贏返嚟<span class=\"badge\" data-claim=\"C001\"></span>。中段嗰六場你係做得到嘅——連贏八局都係喺嗰段<span class=\"badge\" data-claim=\"G017\"></span>。問題係頭尾兩段點解掉返轉。"
+      ],
+      "recs": [
+        "<strong>今次要練嘅係「贏嘅局點樣贏得再重啲」。</strong> 你贏局 0.60、輸局 0.56<span class=\"badge\" data-claim=\"G071\"></span>；pinglamb 同一條數係 0.71 對 0.57<span class=\"badge\" data-claim=\"G072\"></span>。地板已經睇齊，個 7 比 4 全部係喺天花板嗰邊砌出嚟<span class=\"badge\" data-claim=\"C002\"></span>。具體做法：局勢一好唔好即刻求快清走，改為留住 B2B 同 combo 條鏈，一次過出貨——你有 hold 用得密嘅底子<span class=\"badge\" data-claim=\"G036\"></span>，本錢係有嘅。",
+        "<strong>加速呢條路連續兩晚榨唔出嘢。</strong> 今晚多疊 415 粒方塊、打出嘅攻擊反而少 206 條，即係對面總攻擊嘅 4% 以上<span class=\"badge\" data-claim=\"C005\"></span>；上一晚同一條數係少 271 條。落多啲方塊要買得返效率，前提係每粒方塊嘅價值撐得住，而呢兩晚都撐唔住。",
+        "<strong>自爆呢格今晚係主因，唔好再當佢係副作用。</strong> 全晚 13 局自己頂到天花板收場<span class=\"badge\" data-claim=\"G067\"></span>，11 局係你，pinglamb 淨係 2 局<span class=\"badge\" data-claim=\"C006\"></span>——係六個 session 以嚟你最差嘅一次，而上一晚你仲要係零。多落方塊即係多囤，囤到頂就係呢個數。局勢一劣就先開行、後砌大招。",
+        "<strong>唔使去追手法嗰格。</strong> finesse 失誤兩個人差 6 個（1268 對 1262）<span class=\"badge\" data-claim=\"G035\"></span>，每粒方塊嘅 perfect 比率仲要係你高<span class=\"badge\" data-claim=\"G047\"></span>。而 KPP 同輸贏嘅關係，你同佢一樣講唔出口<span class=\"badge\" data-claim=\"G073\"></span><span class=\"badge\" data-claim=\"G074\"></span>——呢個係<strong>連續第六個 session</strong> 同一個結論。慳返啲時間練上面三樣。",
+        "<strong>第九場係樣板，抄返自己。</strong> 十一場入面淨係嗰場你每粒方塊嘅攻擊高過對面<span class=\"badge\" data-claim=\"C019\"></span>，比數 5 比 2<span class=\"badge\" data-claim=\"G012\"></span>，係全晚贏得最鬆嗰場。返去睇返嗰七局你點出貨，唔係睇你點快。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "power T-spin 效率流",
+      "profile": [
+        "老路線，執行得更硬：每粒方塊打出嘅攻擊全 session 高過對面<span class=\"badge\" data-claim=\"G045\"></span>，靠嘅係 T-spin——TSD 371 對 312<span class=\"badge\" data-claim=\"G039\"></span>、TST 89 對 50<span class=\"badge\" data-claim=\"G040\"></span>，加埋 460 對 362<span class=\"badge\" data-claim=\"G057\"></span>。單局最大 spike 19 對 16<span class=\"badge\" data-claim=\"G055\"></span>，逐局平均 APM 約 56.8 對約 50.2<span class=\"badge\" data-claim=\"G044\"></span>，全 session 嘅 DS 亦都高過對面<span class=\"badge\" data-claim=\"G078\"></span>。",
+        "<strong>今晚最值錢嗰樣係贏得夠重。</strong> 你贏嗰啲局每粒方塊打出 0.71，輸嗰啲局 0.57，爭 25%<span class=\"badge\" data-claim=\"G072\"></span>；yachi 同一條數係 0.60 對 0.56，淨係爭 7%<span class=\"badge\" data-claim=\"G071\"></span><span class=\"badge\" data-claim=\"C003\"></span>。兩個人輸嘅時候已經冇分別<span class=\"badge\" data-claim=\"C002\"></span>——你贏嘅唔係因為佢跌得深，係因為你企得高。",
+        "呢個亦都反映喺快局同高速局度：APM 上到 65 以上嘅局你有 21 局，21 局全贏<span class=\"badge\" data-claim=\"G052\"></span>；40 秒內收工嘅快局你贏 20、佢贏 10<span class=\"badge\" data-claim=\"G050\"></span>。而你全晚淨係自爆咗 2 次<span class=\"badge\" data-claim=\"C006\"></span>。"
+      ],
+      "recs": [
+        "<strong>唔好郁條主線。</strong> T-spin 兩格加埋 460 對 362<span class=\"badge\" data-claim=\"G057\"></span>，而每粒方塊嘅攻擊全 session 高過對面<span class=\"badge\" data-claim=\"G045\"></span>——呢個係六晚以嚟同一個結論。要加碼就加喺 TST（89 對 50）<span class=\"badge\" data-claim=\"G040\"></span>，唔好去追對面嘅 quad 數<span class=\"badge\" data-claim=\"G038\"></span>。",
+        "<strong>頭尾兩段係你嘅，中段唔係。</strong> 頭三場你每粒方塊嘅攻擊高過對面超過 17%、尾兩場 11% 以上，但中間第四至第九場淨係 7% 以下，對面就喺嗰段攞晒四場 match<span class=\"badge\" data-claim=\"C007\"></span><span class=\"badge\" data-claim=\"C001\"></span>。落波前同收尾嗰陣你打得最好，中段就散——換句話講，你要練嘅係<strong>長局嘅節奏</strong>，唔係開局。",
+        "<strong>連輸八局嗰段要記低。</strong> 第六場輸咗尾五局、第七場又輸埋頭三局<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"C014\"></span>，一口氣八局，係全場最長嘅一段連勝，而且係對面嘅<span class=\"badge\" data-claim=\"G017\"></span>。呢八局就係佢兩場 match 嘅來源<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"C014\"></span>。輸完一局之後嗰局點打，係你唯一一格明顯要執嘅節奏題。",
+        "<strong>Perfect Clear 唔好當成戰績。</strong> 你有 8 局做到全消、入面贏 6 局<span class=\"badge\" data-claim=\"G083\"></span>，但全場淨係你一個做到全消嘅 6 局入面，你仲要輸咗 1 局<span class=\"badge\" data-claim=\"G084\"></span>；對面 9 局全場淨係佢做到，佢輸咗 5 局<span class=\"badge\" data-claim=\"G082\"></span>。全消好睇，但同贏唔贏冇乜關係——呢個係六晚都一樣嘅結論。"
+      ]
+    }
+  },
+  "versus_note": "一句總結：<strong>上一晚係 yachi 跌得太深，今晚係佢企唔夠高。</strong> 同一條每粒方塊嘅攻擊差距，兩晚拆出嚟啱啱相反——上一晚贏局爭唔夠 2%、輸局爭超過 25%，今晚輸局爭唔夠 2%、贏局爭超過 18%<span class=\"badge\" data-claim=\"C002\"></span>。淨係睇 session 總數係睇唔出嘅，兩晚嘅總差距睇落差唔多。所以「練咩」呢個問題，每一晚都要重新拆過。"
+}
