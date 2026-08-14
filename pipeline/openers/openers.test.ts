@@ -849,8 +849,10 @@ function runAt(g: boolean[][], row: number, cols: Set<number>) {
 
 test('the donation rate is nowhere near the naive reading, in every session', () => {
   // The naive reading — "the well column was filled through the rows the spin cleared" — is FORCED
-  // BY ARITHMETIC (a full row requires every column filled) and fires on 70-89% of all T-spin
-  // clears. What is counted is the RE-OPENING clause on top of it. If the published rate ever
+  // BY ARITHMETIC (a full row requires every column filled) and so fires on 100% of all T-spin
+  // clears; proved as `NaiveClauseForced` in spec/DonationCave.dfy. As a predicate at the shipped
+  // thresholds with the re-opening clause deleted it fires on 29-34%.
+  // What is counted is the RE-OPENING clause on top of it. If the published rate ever
   // approached the naive one, the clause would have stopped doing the work and the metric would be
   // a line-clear counter. Measured: 2.0-3.3% across the five sessions.
   for (const s of SESSIONS) {
@@ -900,9 +902,9 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
   // Every setup harddrop draws, with ONE extra cell: the well column also filled ABOVE the rows the
   // spin clears. The shape is otherwise untouched — same plug, same walled cavity beneath, same
   // cleared rows — but the clear no longer re-opens the column to the surface, so the plug is a wall
-  // and not a loan. This is the one clause carrying the whole metric (the naive reading without it
-  // fires on 70-89% of all T-spin clears), and it is asserted by BEHAVIOUR rather than by editing
-  // the source.
+  // and not a loan. This is the one clause carrying the whole metric (the naive clause without it is
+  // forced by arithmetic and fires on 100%; the naive predicate at the shipped thresholds fires on
+  // 29-34%), and it is asserted by BEHAVIOUR rather than by editing the source.
   //
   // Derived from the committed transcription rather than typed out, for the same reason the controls
   // are: a board written down twice is a board that can drift, and a mutation board that had drifted

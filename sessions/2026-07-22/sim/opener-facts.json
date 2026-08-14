@@ -1157,7 +1157,7 @@
       }
     ],
     "opener_window_pieces": 21,
-    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating clause is the re-opening, and that is what is counted here",
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 29-34%. The discriminating clause is the re-opening, and that is what is counted here",
     "caveat": "every donation in this corpus sits on a GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\""
   },
   "stmb_cave": {

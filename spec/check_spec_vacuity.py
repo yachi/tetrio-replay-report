@@ -24,6 +24,7 @@ because of an awk bug, and `dafny verify` on a file with no lemmas prints "0 ver
 exits 0. The poison control must be caught and the healthy control must not be; either failure exits 2.
 
     python3 spec/check_spec_vacuity.py [spec/Forecast.dfy]
+    python3 spec/check_spec_vacuity.py spec/DonationCave.dfy
 """
 import os
 import re
@@ -34,13 +35,35 @@ SRC = sys.argv[1] if len(sys.argv) > 1 else 'spec/Forecast.dfy'
 ABS = os.path.abspath(SRC)
 src = open(SRC).read()
 
+_MOD = re.search(r'^module\s+(\w+)', src, re.M)
+if not _MOD:
+    sys.exit(f'{SRC}: no `module <Name>` declaration — a probe module has nothing to import')
+MODULE = _MOD.group(1)
+
 LEMMA = re.compile(r'^  lemma\s+(\w+)\s*\(([^)]*)\)([^\{]*?)\n  \{', re.M | re.S)
 
-CONTROLS = [
-    # (name, params, requires, must_be_flagged)
-    ('poison', 's: Step, a: int, b: int', ['a < b', 'b < a'], True),
-    ('healthy', 's: Step, a: int', ['Survives(s, a)'], False),
-]
+# The controls are written in each spec's OWN vocabulary on purpose, which is why they are
+# per-module rather than one shared pair. A module-agnostic control (`a < b && b < a` over bare
+# ints) would still pass with a BROKEN `include`, and catching that is half of what a control is
+# for. Generalising only the `import opened` line below is therefore not enough: pointed at
+# DonationCave.dfy, Forecast's `Step` / `Survives` fail to COMPILE, the poison probe reports "not
+# contradictory", and the gate exits 2 with HARNESS BROKEN. A module with no entry is a hard error
+# rather than a silently skipped check.
+CONTROLS_BY_MODULE = {
+    'Forecast': [
+        # (name, params, requires, must_be_flagged)
+        ('poison', 's: Step, a: int, b: int', ['a < b', 'b < a'], True),
+        ('healthy', 's: Step, a: int', ['Survives(s, a)'], False),
+    ],
+    'OpenerBoard': [
+        ('poison', 'g: Grid, h: nat, w: nat, a: int, b: int', ['Wf(g, h, w)', 'a < b', 'b < a'], True),
+        ('healthy', 'g: Grid, h: nat, w: nat', ['Wf(g, h, w)'], False),
+    ],
+}
+if MODULE not in CONTROLS_BY_MODULE:
+    sys.exit(f'{SRC}: module {MODULE} has no CONTROLS_BY_MODULE entry — add a poison and a healthy '
+             f'control written in its own vocabulary, or the run proves nothing')
+CONTROLS = CONTROLS_BY_MODULE[MODULE]
 
 
 def probe(name: str, params: str, reqs: list[str]) -> bool:
@@ -48,7 +71,7 @@ def probe(name: str, params: str, reqs: list[str]) -> bool:
     body = '\n'.join(f'    requires {r}' for r in reqs)
     path = f'{os.environ.get("TMPDIR", "/tmp")}/vac_{name}.dfy'
     with open(path, 'w') as fh:
-        fh.write(f'include "{ABS}"\nmodule Vac_{name} {{\n  import opened Forecast\n'
+        fh.write(f'include "{ABS}"\nmodule Vac_{name} {{\n  import opened {MODULE}\n'
                  f'  lemma Probe({params})\n{body}\n    ensures false\n  {{ }}\n}}\n')
     out = subprocess.run(['dafny', 'verify', path], capture_output=True, text=True, timeout=300)
     return ', 0 errors' in out.stdout

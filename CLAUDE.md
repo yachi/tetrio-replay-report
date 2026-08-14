@@ -72,7 +72,10 @@ dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-writte
 dafny verify spec/BfsKey.dfy               # why bestTspin's visited key carries the arrival mode
 bash spec/mutate-bfskey.sh                 # its mutants — a lemma none can kill is decorative
 bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
-python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true
+dafny verify spec/DonationCave.dfy         # why the naive Donation clause and the cave's roof test
+bash spec/mutate-donationcave.sh           #   discriminate nothing; 10 mutants, all killed
+python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true — controls are
+python3 spec/check_spec_vacuity.py spec/DonationCave.dfy   # per-module, so run it once per file
 python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts) agree with the
                                            #   proven witnesses (ForecastExamples.dfy); --write regens
                                            #   spec/forecast-examples.json, --selftest proves teeth
@@ -425,11 +428,20 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 六個具名定式 table would have printed a column of zeros meaning "never compared" while reading as
 "these players never do this" — the same shape as the `OPENER_LOCKS` coverage bug.
 
-**The naive Donation predicate is forced by arithmetic, and it fires on 70-89% of T-spin clears.**
+**The naive Donation clause is forced by arithmetic: it fires on 100% of T-spin clears.**
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
-every column filled, so that clause counts line clears. All the discriminating power is in the
-**re-opening** clause — every filled cell of the column must lie inside the cleared rows, so the
-clear leaves it open surface-to-floor. With it, the rate drops to ~2.5% (82 across five sessions).
+every column filled, so that clause counts line clears. That is not a measurement any more — it is
+`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly 100% of all 3142
+scored clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening
+clause deleted — it fires on **29-34%**. All the discriminating power is in the **re-opening**
+clause: every filled cell of the column must lie inside the cleared rows, so the clear leaves it
+open surface-to-floor. With it, the rate drops to ~2.5% (82 across five sessions).
+
+**This paragraph said 70-89% until 2026-08-14, and that figure names no variant of the clause it
+describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-33.6%; only a composite
+with `cavity ≥ 1` lands in the band (74.6-77.0%), and it never reaches 89%. A rate was being quoted
+for something proved to be always true — the same shape as the 3379-vs-3142 note above, and the same
+lesson: a figure quoted in prose is not the thing it describes.
 `D = 4` and "walled at the **deepest** 4 cavity rows" are harddrop's numbers, not tuned: of its 20
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
@@ -446,7 +458,12 @@ bug reported every well as self-built for a whole round of measurement.
 three columns and reaches one past them, so the test is *overlap*, never containment — containment
 misses all six drawn Basic Structures. And the cave's roof is the nub row the Double just
 completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**.
-A roof test would have been a decorative guard.
+A roof test would have been a decorative guard — and since 2026-08-14 that is proved rather than
+counted (`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`: conjoining a roof test
+to the cave predicate yields an equivalent predicate, over the whole board width and not merely over
+cave runs). The proof also shows the code assumes more than it needs: **maximality is not used** —
+any cleared row above the run roofs it, and a Double always has two full rows. `IsMaxCleared` and the
+two-row hypothesis are kept for fidelity to `caveAt`, not because the argument rests on them.
 
 Two cross-tabs, and the section may print neither number without both: **by depth**, 29 of the 30
 width≥3 hits are one row deep — a dimple, not a cave — leaving exactly **1 genuine cave in 592

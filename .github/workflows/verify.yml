@@ -530,7 +530,7 @@ jobs:
       - name: Verify the spec
         run: |
           set -euo pipefail
-          for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy; do
+          for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy spec/DonationCave.dfy; do
             out=$(dafny verify "$f" 2>&1) || true
             echo "$out" | tail -1
             case "$out" in
@@ -542,8 +542,13 @@ jobs:
       # A lemma whose hypotheses are contradictory is green and says nothing. The gate carries a
       # poison and a healthy control and exits 2 if either misbehaves — a uniform verdict is the
       # signature of a broken harness, which this repo has also shipped once.
+      # Each spec's controls are written in its OWN vocabulary, so the gate runs once per file and
+      # refuses a module it has no controls for — a shared, module-agnostic control would still pass
+      # with a broken `include`, which is half of what a control is for.
       - name: Check no lemma is vacuously true
-        run: python3 spec/check_spec_vacuity.py
+        run: |
+          python3 spec/check_spec_vacuity.py
+          python3 spec/check_spec_vacuity.py spec/DonationCave.dfy
 
       # The seven worked examples are described twice — as the machine-checked witnesses above and
       # as the drawn boards in example-boards.ts. The Dafny verifier never reads the TS, and the TS
@@ -559,7 +564,9 @@ jobs:
       # matching how the `verify` job gates its own mutation testing.
       - name: Mutation-test the spec
         if: github.event_name == 'schedule' || inputs.mutation
-        run: bash spec/mutate-forecast-spec.sh
+        run: |
+          bash spec/mutate-forecast-spec.sh
+          bash spec/mutate-donationcave.sh
 
   # The cc-oracle container image, built the way the local Mac could not: on a native aarch64-linux
   # runner. No cross-compile (so no zstd-sys/libiconv snag), no linux-builder, no root — cc-oracle

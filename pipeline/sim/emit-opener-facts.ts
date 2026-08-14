@@ -249,8 +249,12 @@ export function cavity(g: boolean[][], col: number, h: number) {
  *
  * THE NAIVE FORM DISCRIMINATES NOTHING, and that is the trap this predicate is written around.
  * "The well column is filled through the rows the spin cleared" is FORCED BY ARITHMETIC: a full
- * row requires every column filled, so the naive test fires on 70-89% of all T-spin clears and
- * says only that a line was cleared. All of the power is in the RE-OPENING clause — EVERY filled
+ * row requires every column filled, so the naive test fires on 100% of all T-spin clears and says
+ * only that a line was cleared. That is a theorem, not a measurement — `NaiveClauseForced` in
+ * spec/DonationCave.dfy, which also proves the `inR === 0` branch below is unreachable and that
+ * deleting the naive conjunct yields an equivalent predicate. As a PREDICATE at the thresholds
+ * below, with the re-opening clause deleted, it fires on 29-34%.
+ * All of the power is in the RE-OPENING clause — EVERY filled
  * cell of the column must lie in a cleared row, so once the clear resolves the column is open from
  * the surface to the floor again, which is what makes the plug a loan rather than a wall.
  *
@@ -1106,8 +1110,10 @@ function donationMetric() {
          + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
          + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
          + '("the well was filled through the cleared rows") is FORCED BY ARITHMETIC — a full row '
-         + 'requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating '
-         + 'clause is the re-opening, and that is what is counted here',
+         + 'requires every column filled — and so fires on 100% of all T-spin clears, which is proved '
+         + 'rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at '
+         + 'these thresholds without the re-opening clause fires on 29-34%. The discriminating clause '
+         + 'is the re-opening, and that is what is counted here',
     caveat: 'every donation in this corpus sits on a GARBAGE-derived well, and the oracle board '
           + 'source keeps the engine\'s own seeded-RNG hole columns, which disagree with the '
           + 'ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board '
