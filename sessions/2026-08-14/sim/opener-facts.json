@@ -1039,10 +1039,120 @@
       "reconstruction_disagreed": 0,
       "agrees": true
     },
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 168,
+      "checked": 168,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 168,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 948,
+      "tspin_clears_replay": 948,
+      "tspin_clears_scored": 893,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 91,
+          "replay": 91,
+          "rounds_agreeing": 168
+        },
+        "tspindoubles": {
+          "sim": 683,
+          "replay": 683,
+          "rounds_agreeing": 168
+        },
+        "tspintriples": {
+          "sim": 139,
+          "replay": 139,
+          "rounds_agreeing": 168
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinsingles": {
+          "sim": 35,
+          "replay": 35,
+          "rounds_agreeing": 168
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 893,
+      "locks_comparable": 373,
+      "locks_same_board": 197,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 7,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
+          "agree_diff_board": 3
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 7,
+        "other_only": 8,
+        "both_no": 358,
+        "oracle_positives": 7,
+        "agreement_on_positives": [
+          0,
+          7
+        ],
+        "agreement_overall": [
+          358,
+          373
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 370,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          373,
+          373
+        ]
+      }
+    },
     "players": [
       {
         "user": "pinglamb",
         "tspin_clears_scored": 505,
+        "tspin_clears_replay": 525,
         "donations": 13,
         "self_built_well": 0,
         "garbage_derived_well": 13,
@@ -1055,6 +1165,7 @@
       {
         "user": "yachi",
         "tspin_clears_scored": 388,
+        "tspin_clears_replay": 423,
         "donations": 8,
         "self_built_well": 0,
         "garbage_derived_well": 8,
@@ -1066,7 +1177,7 @@
       }
     ],
     "opener_window_pieces": 21,
-    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating clause is the re-opening, and that is what is counted here",
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 29-34%. The discriminating clause is the re-opening, and that is what is counted here",
     "caveat": "every donation in this corpus sits on a GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\""
   },
   "stmb_cave": {
@@ -1074,10 +1185,120 @@
     "definition": "a floating T-spin Double placed over a cave at least three columns wide — the cave is OFFSET from the T, sharing two of its three columns, so the test is overlap with the T's span and never containment",
     "min_width": 3,
     "scope": "verified prefix",
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 168,
+      "checked": 168,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 168,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 948,
+      "tspin_clears_replay": 948,
+      "tspin_clears_scored": 893,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 91,
+          "replay": 91,
+          "rounds_agreeing": 168
+        },
+        "tspindoubles": {
+          "sim": 683,
+          "replay": 683,
+          "rounds_agreeing": 168
+        },
+        "tspintriples": {
+          "sim": 139,
+          "replay": 139,
+          "rounds_agreeing": 168
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinsingles": {
+          "sim": 35,
+          "replay": 35,
+          "rounds_agreeing": 168
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 893,
+      "locks_comparable": 373,
+      "locks_same_board": 197,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 7,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
+          "agree_diff_board": 3
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 7,
+        "other_only": 8,
+        "both_no": 358,
+        "oracle_positives": 7,
+        "agreement_on_positives": [
+          0,
+          7
+        ],
+        "agreement_overall": [
+          358,
+          373
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 370,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          373,
+          373
+        ]
+      }
+    },
     "players": [
       {
         "user": "pinglamb",
         "tspin_doubles_scored": 356,
+        "tspin_doubles_replay": 371,
         "width_ge_3": 2,
         "min_depth_ge_2": 0,
         "in_opener": 0,
@@ -1086,6 +1307,7 @@
       {
         "user": "yachi",
         "tspin_doubles_scored": 284,
+        "tspin_doubles_replay": 312,
         "width_ge_3": 7,
         "min_depth_ge_2": 0,
         "in_opener": 0,
@@ -1101,6 +1323,7 @@
     },
     "triple_control": {
       "tspin_triples_scored": 138,
+      "tspin_triples_replay": 139,
       "width_ge_3": 9
     },
     "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"

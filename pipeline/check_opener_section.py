@@ -152,6 +152,48 @@ DONATION_WINDOW_MARKER = "捐窿係開局招定係中盤招"
 # harddrop's `Mid-game T-Spin setups` filing is a thing this pipeline measured.
 CAVE_WINDOW_MARKER = "唔係一句引述"
 
+# THE DENOMINATOR ANCHOR, and it is the one gate here guarding against publishing something as MORE
+# verified than it is rather than as less. Both tables now print a 「全局（replay 自己數）」 column
+# sourced from the twice-extracted counters, and the temptation the moment a quarantined section
+# gains a trust-chain number is to let that number's credibility spread over the whole table.
+#
+# Two sentences, and the pair is the point:
+#   - the anchor sentence, without which the new columns are two more simulator numbers and the
+#     reader has no way to know one of them is not;
+#   - the NUMERATOR sentence, without which the anchor reads as "this table has been verified". It
+#     has not: which clear was a donation, and how wide the gap under it was, still come from one
+#     simulator with no second implementation.
+# Deleting the second while keeping the first is precisely the edit that turns a denominator anchor
+# into a false claim of verification, so both are demanded together, at both tables.
+ANCHOR_MARKERS = ("個分母而家有第二個來源，分子冇", "但係分子照舊隔離")
+CAVE_ANCHOR_MARKERS = ("呢個表個分母同樣錨咗", "分子一樣照舊隔離")
+
+# THE SECOND ENGINE, and the marker is the WARNING rather than the result — because the result is
+# the part nobody would delete and the warning is the part that carries it.
+#
+# Both verdicts are rare (39 caves and 103 donations in 4035 scored clears), so the overall
+# agreement rate between the two engines is negatives agreeing with negatives: 96.5% for the
+# donation, of which 1650 of 1659 are both engines saying "no". Split by the oracle's own verdict
+# and the two tables come apart — cave 16/16 positives, donation 9/43. Publishing the overall rate
+# without the sentence saying what is in its denominator is the single most misleading edit
+# available in this section, and it is misleading in the direction of looking verified.
+DUAL_ENGINE_MARKER = "咁樣量緊嘅係塊板嘅底"
+# …and the coverage clause, without which "16 of 16, both engines" reads as the whole corpus when
+# the comparison reaches 1719 of 4035 scored clears — the hand-port verifies a far shorter prefix.
+DUAL_COVERAGE_MARKER = "hand-port 自己可核嗰段短好多"
+# …and the board split, which is what makes the figure above readable at all. At 727 of the 1719
+# comparison points the two engines are judging DIFFERENT boards, and splitting the positives by
+# board equality resolves the donation's 9/43 completely: 6 of 6 on identical boards, 3 of 37 on
+# boards that differ. Delete this and the section states a disagreement about donations while the
+# measurement says the disagreement is about the board. Demanded once — the sentence is shared by
+# both tables and each renders its own continuation.
+DUAL_SPLIT_MARKER = "兩個引擎有冇睇緊同一塊板"
+# The cave's continuation is its own marker because it is a DIFFERENT claim, and the failure mode is
+# copying the donation's wording onto it. Its verdict survives boards that differ (13 of 13), which
+# is robustness, not thirteen independent confirmations — that caveat is the whole reason the cave's
+# split may be printed beside the donation's.
+CAVE_SPLIT_MARKER = "咁係穩陣，唔等於啱"
+
 
 def problems(data, doc):
     """Every reason `doc`'s opener region disagrees with `data`; empty means it agrees."""
@@ -284,7 +326,51 @@ def problems(data, doc):
     #    which is the same condition `_donation_note` renders under: an artifact predating the
     #    metric, or a session that donated nothing, has no such paragraph and must not be asked for
     #    one.
+    # 8b. the denominator anchor. Demanded whenever the artifact carries a check that HELD — that is
+    #     the same condition `_anchor_note` / `_cave_anchor_note` render under, and the same one that
+    #     puts the 「全局」 columns in the two tables. An artifact predating the anchor, or one whose
+    #     per-round check failed, prints neither the columns nor the paragraphs.
     dn = data.get("donation")
+    if (dn or {}).get("counter_anchor", {}).get("agrees"):
+        for marker in (*ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS):
+            if marker not in body:
+                bad.append(f"the denominator anchor is gone ({marker!r} missing) — the 「全局」 "
+                           "columns come from the replay's own twice-extracted T-spin counters, "
+                           "and they may not be published without BOTH the sentence saying so and "
+                           "the sentence saying the numerators are still simulator-only. Keeping "
+                           "the first without the second publishes a quarantined table as verified")
+
+    # 8c. the second engine. Demanded whenever either metric has a positive in comparison range —
+    #     the same condition `_dual_engine_note` renders under. A check with no positive to agree
+    #     about is decorative and prints nothing, so asking for the paragraph then would fail a
+    #     session that is behaving correctly.
+    if any((data.get(m) or {}).get("dual_engine", {}).get(k, {}).get("agreement_on_positives")
+           for m, k in (("donation", "donation"), ("stmb_cave", "cave"))):
+        for marker in (DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER):
+            if marker not in body:
+                bad.append(f"the second-engine reading is gone ({marker!r} missing) — both verdicts "
+                           "are rare, so the two engines' OVERALL agreement is negatives agreeing "
+                           "with negatives (1292 of the donation's 1301), and neither the rate nor "
+                           "the cave's 13-of-13 may be published without the sentence saying what "
+                           "is in the denominator and how far the comparison reaches")
+        # …and the board split, whenever the artifact carries it. Conditioned on the data rather
+        # than demanded outright, so an artifact emitted before the split still passes.
+        if any((data.get(m) or {}).get("dual_engine", {}).get("board_split")
+               for m in ("donation", "stmb_cave")):
+            if DUAL_SPLIT_MARKER not in body:
+                bad.append(f"the board split is gone ({DUAL_SPLIT_MARKER!r} missing) — at 727 of "
+                           "the 1719 comparison points the two engines judge DIFFERENT boards, and "
+                           "that is what resolves the donation's 9/43 into 6-of-6 on identical "
+                           "boards and 3-of-37 on boards that differ. Without it the section "
+                           "reports a disagreement about donations that the measurement says is a "
+                           "disagreement about the board")
+            if CAVE_SPLIT_MARKER not in body:
+                bad.append(f"the cave's split caveat is gone ({CAVE_SPLIT_MARKER!r} missing) — the "
+                           "cave agrees 13 of 13 on boards that DIFFER, which is the verdict being "
+                           "robust to the drift, not thirteen independent confirmations. Printing it "
+                           "beside the donation's split without that sentence copies the donation's "
+                           "reading onto a claim of a different kind")
+
     if dn and sum(p["donations"] for p in dn["players"]):
         for marker in DONATION_MARKERS:
             if marker not in body:
@@ -421,7 +507,10 @@ def _selftest(report_dir):
     for marker in (*CONTROL_MARKERS, *CLASS_MARKERS, *NAMED_MARKERS, ALIAS_MARKER,
                    PCO_MARKER, *TIMING_MARKERS, *DONATION_MARKERS, CAVE_DEPTH_MARKER,
                    *CAVE_TRIPLE_MARKERS, *CAVE_CLASS_MARKERS, *MIDGAME_MARKERS,
-                   DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER):
+                   DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER,
+                   *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS,
+                   DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER,
+                   DUAL_SPLIT_MARKER, CAVE_SPLIT_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))
