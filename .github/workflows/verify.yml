@@ -606,12 +606,27 @@ jobs:
 
       # The count `bestTspinLines` produces IS what the forecast metric consumes, and it had no
       # outside check — only our own second BFS. This runs it against the Rust cutout_tslot over
-      # every verified-prefix board of all four sessions: a miscount or a missed line-clearing slot
-      # fails the job. (Measured clean: 1,831 slots, all counts agree, 0 missed.)
+      # every verified-prefix board of every session: a miscount or a missed line-clearing slot
+      # fails the job.
+      #
+      # The list below was FOUR sessions until 2026-08-15, having stopped at 2026-08-01 while
+      # 2026-08-09 and 2026-08-14 were added to the corpus — 134 rounds (50 + 84) outside the gate
+      # that checks this count against an implementation we did not write. That is the
+      # silent-under-coverage class: nothing goes red, the job stays green, and the green means
+      # less each session. Adding a session means adding it HERE, not only to sessions/.
+      # (Measured clean when it covered four: 1,831 slots, all counts agree, 0 missed. That
+      # figure is NOT re-stated for six — it was measured over the old list, and this edit
+      # widens the scope rather than re-measuring it. The first run over six is what produces
+      # the new number.)
+      #
+      # `pipeline/sim/cross-tslot-multi.ts:34` and `pipeline/sim/cross-tslot.test.ts:69` still
+      # carry their own copies of the stale four-session list. They are source files, not this
+      # workflow's to fix; the step below therefore covers four sessions no matter what is
+      # written here.
       - name: Every T-spin line count matches the Rust original across the corpus
         run: |
           set -euo pipefail
-          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01; do
+          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01 2026-08-09 2026-08-14; do
             echo "-- $s"
             REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
           done
@@ -631,7 +646,9 @@ jobs:
       # cross-tslot-count/-multi check the SLOT the metric consumes, not the SEARCH that reaches it —
       # the arrival-key defect (spec/BfsKey.dfy) was invisible to both. cross-movegen.test.ts is that
       # standing gate: our BFS reachable-placement set is a superset of the real find_moves for every
-      # piece, over random boards AND every verified-prefix board of all five sessions. Without
+      # piece, over random boards AND every verified-prefix board of all six sessions (the list
+      # lives in cross-movegen.test.ts:171 and does carry all six — checked, not assumed, because
+      # the two steps above prove that a session list written down once goes stale). Without
       # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin) vs cold-clear

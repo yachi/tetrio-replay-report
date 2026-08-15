@@ -286,8 +286,21 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 *single*-value mutation falsifies one without the other. Two changes break the tie: moving
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
-claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones. Per-session:
-07-22 85% → 83%, 07-24 98% → 98% (unmoved), 07-28 100% → **60%**.
+claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**,
+07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**.
+
+**07-28 is not the exception — five of six sessions lose coverage to the second family**, and
+every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020).
+`sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
+published alone is blind to exactly the headline claims. `check_equiv_coverage.py` fails the
+build if one is published without its two-site companion for a session holding windowed claims.
+
+**The single-value figures were a seeded sample until 2026-08-15.** One perturbation kind was
+drawn per site, so 07-22 read 85% at the committed seed, 87% at seed 3, 83% at seed 42 — with
+the denominator moving too — while the docstring claimed the whole space of one-value changes.
+Every kind is enumerated now: ~5× the mutants, deterministic across seed and `PYTHONHASHSEED`,
+and 07-22 settles at 81%. `--seed` survives only because `--samples` still draws.
 
 **The delta is HALF the source, and that is not a detail.** The first implementation moved the
 whole value, leaving every source round at 0 — 145 615 of 145 615 moves — so its evidence was

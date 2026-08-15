@@ -174,8 +174,17 @@ Measured the same way as the baseline, both trees on the same machine and the sa
 | `check_rate_coverage` 08‑01 | 2.19 s | 1.50 s | 1.5× | identical |
 | `claims.equiv` 07‑22 | 51.79 s | 13.88 s | 3.7× | identical |
 | `claims.equiv` 07‑24 | 18.36 s | 4.60 s | 4.0× | identical |
+| ↳ both superseded 2026‑08‑15 — see the note below the table | | | | |
 | **total** | **106.05 s** | **27.16 s** | **3.9×** | |
 | `bun test` (130 tests) | 17.5 s | 14.4 s | 1.2× | 130 pass, 0 fail |
+
+**The two `claims.equiv` rows are no longer that command's runtime, and the reason is not a
+regression.** On 2026-08-15 the single-value family stopped drawing one perturbation kind per
+site and started enumerating every kind, because the drawn version made the published coverage
+figure move with `--seed`. That is ~5× the mutants by construction: 07-22 goes 13.88 s → 71.5 s
+and 07-24 4.60 s → 23.7 s. The make/unmake speedup this table records is still in there and
+still worth its 3.7-4.0× — the work simply got five times larger, deliberately. Kept rather than
+rewritten, because a speedup table that silently absorbs a scope change stops being a measurement.
 
 Two numbers came in under what the profiler implied, and they are worth recording as
 calibration rather than quietly rounding up:

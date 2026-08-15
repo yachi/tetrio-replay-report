@@ -1,0 +1,220 @@
+name: equiv-coverage
+
+# `pipeline/claims/equiv.py` measures what fraction of a session's HAND-WRITTEN ledger the
+# generated families already imply, by perturbing the dataset rather than by comparing predicate
+# strings. Its percentages are published in THREE documents — README.md's table, ROADMAP.md and
+# CLAUDE.md — and until now nothing re-derived them. grep says equiv.py ran in no workflow and no
+# bin/ script at all: the figures were measured by hand, once, and typed in.
+#
+# ROADMAP item 1 names this the sharpest remaining instance of the manual-only-gate class, and it
+# demonstrated the gap itself: 2026-08-14 added seven generated claims per session directly under
+# that table and the published numbers held BY LUCK, not by a check. Same failure shape as
+# tools/triangle-oracle/dual-backed.json, where three staleness deltas stacked up behind a gate
+# nobody ran.
+#
+# WHY A FILE OF ITS OWN RATHER THAN A JOB IN verify.yml
+#
+# verify.yml has no path filters at all: every job runs on every push and every PR, and its header
+# comment states that as the property it exists to hold ("re-establishes that on every push"). This
+# gate must be path-filtered, because even its cheap form re-measures the whole corpus (~4m13s) and
+# its full form adds ~21 min on top. It cannot live there without breaking one of two things:
+#
+#   - GitHub Actions has NO job-level `paths` key. Filters exist only under `on.<push|
+#     pull_request>`, i.e. per workflow file. (The keys valid directly under jobs.<id> are name,
+#     permissions, needs, if, runs-on, environment, concurrency, outputs, env, defaults, steps,
+#     strategy, continue-on-error, container, services, timeout-minutes — no path filtering among
+#     them.) Adding `on.push.paths` to verify.yml would filter EVERY job in it, which is precisely
+#     the property that file promises not to have. The alternative — a third-party changed-files
+#     action to reimplement, inside a job, a filter the platform gives free one level up — buys a
+#     new pinned dependency to make the result strictly worse.
+#   - A workflow has one schedule list, and every cron in it triggers every job. verify.yml's
+#     '17 6 * * 1' already means "run the mutation tests too". The weekly re-measurement here needs
+#     its own cron, offset from that one and from dual-backed.yml's '41 6 * * 1', which a separate
+#     file is the only way to express.
+#
+# So this is dual-backed.yml's shape, deliberately, for dual-backed.yml's reason. And, as there, it
+# is BOTH:
+#   - path-filtered, so a change to an input it actually depends on is caught within one PR; and
+#   - scheduled weekly, because the path filter is a list someone has to maintain and a new import
+#     in equiv.py would escape it silently. The schedule is the backstop for the filter being
+#     wrong, which is the failure mode that produced both files.
+# Neither alone is sufficient. Do not delete one on the grounds that the other covers it.
+#
+# THE FILTER IS NOT `pipeline/claims/**`, and the difference is the whole point.
+# ROADMAP item 1 proposed exactly that, and it is wrong. The tool's import closure, measured by
+# importing it and filtering sys.modules to the repo root (4 modules statically, 7 after a real
+# run builds a ledger), is:
+#   pipeline/__init__.py, pipeline/claims/__init__.py, pipeline/claims/equiv.py,
+#   pipeline/claims/build_claims.py, pipeline/claims/generators.py, pipeline/claims/spec.py,
+#   pipeline/perturb.py
+# `pipeline/claims/**` misses TWO of those, and one is pipeline/perturb.py — the make/unmake module
+# the entire sweep's correctness rests on, and the one whose failure mode is a silently RAISED
+# baseline, i.e. a gate that passes when it should not.
+#
+# `sessions/**/equiv-coverage.json` is listed for a sharper reason than completeness: it is the
+# artefact this gate byte-compares. Filtered on `claims-*.json` alone, an edit to the artefact
+# itself would match nothing, and the byte-comparison would not run on the one PR that changed the
+# bytes it compares — the manual-only-gate shape reintroduced one level down.
+#
+# The three DOCUMENTS are filtered because this gate parses published prose. An edit that touches
+# no code at all can break it, and a reworded table that the parser can no longer match is a
+# FAILURE here, never a skip.
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/__init__.py'
+      - 'pipeline/perturb.py'
+      - 'pipeline/claims/**'
+      - 'sessions/**/facts.json'
+      - 'sessions/**/claims-*.json'
+      - 'sessions/**/equiv-coverage.json'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'CLAUDE.md'
+      - '.github/workflows/equiv-coverage.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/__init__.py'
+      - 'pipeline/perturb.py'
+      - 'pipeline/claims/**'
+      - 'sessions/**/facts.json'
+      - 'sessions/**/claims-*.json'
+      - 'sessions/**/equiv-coverage.json'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'CLAUDE.md'
+      - '.github/workflows/equiv-coverage.yml'
+  schedule:
+    - cron: '53 6 * * 1'   # weekly, the backstop for the path filter being incomplete
+  workflow_dispatch:
+    inputs:
+      round:
+        description: 'Also run the round-granularity sweep (~25 min for the whole corpus)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# NEITHER JOB IS A MATRIX, and that is not an oversight.
+# check_equiv_coverage is repo-wide by construction: it globs sessions off disk and takes no
+# session argument, deliberately, so that adding a session cannot leave a list behind (the class
+# of bug the two stale loops in verify.yml are). A 6-way session matrix would therefore run the
+# whole six-session sweep six times over.
+jobs:
+  # THE SPLIT IS BY GRANULARITY, NOT BY WHETHER ANYTHING IS MEASURED.
+  # Both jobs re-measure; this one measures the two cheap granularities and the weekly one adds the
+  # third. `--modes single_value,two_site_match` is ~4m13s for the whole corpus against ~25 min for
+  # all three, and that ratio is the only reason there are two jobs. `timeout-minutes: 30` is the
+  # ~4m13s with ~7x headroom for a slower hosted runner.
+  #
+  # --check (not --check-prose) so this job re-derives rather than compares two committed things.
+  # It byte-compares each session's equiv-coverage.json for the named modes and gates the three
+  # documents in the same pass, so the document check the push tier needs is included here and does
+  # not want a second step. --modes narrows the BYTE-COMPARISON, not the prose gate: figures
+  # published for two_site_round are still checked, against the committed artefact.
+  #
+  # BE PRECISE ABOUT THE GAP — it is narrower than "round is unchecked".
+  # The document check runs against a MERGED view: the named modes re-derived from facts.json, the
+  # unnamed ones read out of the committed artefact. So a hand-edit of the committed two_site_round
+  # block IS still caught here — the edited value flows straight into the comparison against the
+  # published prose. The only thing that escapes is GENERATOR DRIFT in the unmeasured mode: a change
+  # to the generators or to perturb.py that would make a fresh round measurement differ from the
+  # committed one. Nothing on this push path re-derives that number, so nothing can notice.
+  #
+  # So a narrowed run still catches: a figure edited in a document, an artefact hand-edited in ANY
+  # block including the round one, a session added with no artefact, a table with fewer rows than
+  # there are sessions on disk, a deleted two-site companion column, a block reworded past the
+  # parser, and — the point of measuring — generator or perturb.py drift that moves real
+  # single_value or two_site_match coverage.
+  #
+  # The one gap above is the weekly job's job, and the run says so itself on its first line rather
+  # than leaving it to this comment:
+  #   --  two_site_round not measured and not byte-compared in this run; their blocks in each
+  #       equiv-coverage.json are carried over unread, and the figures published for them were
+  #       checked against the COMMITTED artefact
+  coverage:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # No setup-python: every python gate in this repo runs on the runner's system python3, and a
+      # second interpreter here would mean this gate's numbers came from a different one than the
+      # gates in verify.yml that share its modules.
+      - name: Show tool versions
+        run: python3 --version
+
+      # --selftest FIRST, under `set -euo pipefail`, so a gate that has lost its teeth fails the
+      # build before the real check gets a chance to pass vacuously. Same order and same reason as
+      # check_dead_consts, check_ts_imports and build_report in verify.yml. It plants every figure,
+      # a dropped session, a reworded block, a relabelled granularity, a deleted two-site column and
+      # the --modes scoping cases, and requires each to be rejected, plus controls requiring the
+      # committed documents to still parse.
+      #
+      # The count is deliberately NOT in this step's name. It was "63 planted corruptions" and is
+      # now 68; a number in a step name is a second place to update and the command's own last line
+      # already prints the true count.
+      #
+      # A coverage gate is unusually exposed to toothlessness, because its output is a percentage
+      # and a percentage over an empty or truncated claim set prints exactly like one over the real
+      # thing. `equiv.py --samples 1` will happily print "coverage: 0/0 testable hand-written
+      # claims (0%)" — same shape as the `?? 0` that published "not one Perfect Clear" for five
+      # sessions holding 65.
+      - name: Check the coverage gate can fail (planted corruptions)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.check_equiv_coverage --selftest
+
+      # --check, never --write: CI re-derives and compares, it never regenerates. A CI job that
+      # rewrote the artefact would make every run agree with itself by construction, which is the
+      # one thing this gate must not do. (--modes is rejected outright alongside --write, so that
+      # mistake is not available here.)
+      - name: Re-measure the cheap granularities, byte-compare, and gate the published figures
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.check_equiv_coverage --check \
+            --modes single_value,two_site_match
+
+  # The third granularity. An unnarrowed --check measures and byte-compares all of
+  # single_value, two_site_match and two_site_round.
+  #
+  # COST, and read the denominator carefully — getting it wrong here is a 6x error. The round sweep
+  # is **854,937 moves corpus-wide**: the sum over all six sessions (217,480 + 82,802 + 137,970 +
+  # 92,737 + 79,301 + 244,647), NOT a per-session figure. At ~1.38 ms/mutant that is ~19.6 min, plus
+  # the ~231 s single-value base, so the whole --check is **~25 minutes for the entire corpus**.
+  # `timeout-minutes: 90` is that ~25 min with ~3.6x headroom for a slower hosted runner.
+  #
+  # Round granularity is what makes the published numbers honest rather than merely stable: `match`
+  # enumerates only moves out of the source match's largest round and into the target match's
+  # smallest, so a hand claim that turns on WHICH round is touched is outside its scope and can be
+  # scored covered when it is not. That is why a `match` figure is an upper bound (README.md:180-182)
+  # and why ROADMAP item 2 still carries 2026-07-22's 83% as an unresolved bound. A bound is honest
+  # only until something moves underneath it; this job is what notices.
+  #
+  # --selftest runs here too rather than being inherited from the `coverage` job: the two jobs are
+  # independent, and the job that does the most measuring must not be the one whose gate was never
+  # shown to bite.
+  coverage-round:
+    if: github.event_name == 'schedule' || inputs.round
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Show tool versions
+        run: python3 --version
+
+      - name: Check the coverage gate can fail (planted corruptions)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.check_equiv_coverage --selftest
+
+      # No --modes: the unnarrowed form measures and byte-compares all three granularities, which
+      # is the whole point of this job.
+      - name: Re-measure every granularity, byte-compare the artefacts, gate the published figures
+        run: python3 -m pipeline.claims.check_equiv_coverage --check

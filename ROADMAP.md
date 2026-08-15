@@ -143,19 +143,31 @@ single-value mutation of the dataset is applied (exhaustive: 4,440 sites for the
 session, 7,019 for the 10-match one) and a hand claim counts as covered only when a
 generated claim's truth is impossible without it, and both are falsifiable somewhere.
 
-| Session | Coverage | `--two-site match` | Identical behaviour |
-|---|---|---|---|
-| 2026-07-22 (10 matches, 54 hand claims) | 45/53 testable = **85%** | 44/53 = **83%** | 24 |
-| 2026-07-24 (7 matches, 52 hand claims) | 48/49 testable = **98%** | 48/49 = **98%** | 28 |
+| Session | Coverage | `--two-site match` | `--two-site round` | Identical behaviour |
+|---|---|---|---|---|
+| 2026-07-22 | 43/53 testable = **81%** | 42/53 = **79%** | 42/53 = **79%** | 24 |
+| 2026-07-24 | 48/50 testable = **96%** | 48/50 = **96%** | 47/50 = **94%** | 29 |
+| 2026-07-28 | 10/10 testable = **100%** | 6/10 = **60%** | 6/10 = **60%** | 2 |
+| 2026-08-01 | 13/13 testable = **100%** | 12/13 = **92%** | 12/13 = **92%** | 1 |
+| 2026-08-09 | 9/11 testable = **82%** | 8/11 = **73%** | 8/11 = **73%** | 0 |
+| 2026-08-14 | 16/19 testable = **84%** | 13/19 = **68%** | 13/19 = **68%** | 1 |
 
-Combined 93/102 = **91%** single-value, clearing the ≥85% acceptance gate; 92/102 = **90%**
-once value-preserving moves are included. Both combined figures are arithmetic over the two
-measured rows, not a single command. Claims no mutation can falsify are reported separately
-rather than counted as covered.
+Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
+that replaced. Claims no mutation can falsify are reported separately rather than counted
+as covered.
 
-2026-07-28 is the session where the distinction bites: 10/10 = 100% on single values,
-6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. See README's "Where this metric breaks down".
+**The ≥85% acceptance gate this phase set is not met by three of the six sessions**, and
+2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
+recorded here for three weeks. That figure was a seeded draw; enumerating every
+perturbation kind settles it lower. The gate is therefore restated as a measurement rather
+than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
+2026-07-28, and a floor all six pass would sit at 60%.
+
+2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
+values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
+single-value change. It is not an isolated artefact — five of the six sessions lose coverage
+under the second family, and every claim that drops is a windowed or per-match one. See
+README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
 * the "only one decider" claim restated that match's score without proving it was the
@@ -1458,7 +1470,8 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
 
 **TODO — seven open items, the first three raised by the user, in priority order:**
 
-1. **Gate `equiv.py` coverage — and it demonstrated the gap itself.** The coverage figure is published
+1. **DONE (2026-08-15) — see 「Gating equiv.py coverage」 below. Item 2 closed with it.**
+   ~~Gate `equiv.py` coverage — and it demonstrated the gap itself.~~ The coverage figure is published
    in a table and nothing re-derives it on push. This session added 7 generated claims per session
    directly under that table and the numbers held **by luck**, not by a check: claim-id stability was
    verified, coverage was not. Sharpest remaining instance of the manual-only-gate class. Same fix
@@ -1466,7 +1479,8 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
    `pipeline/claims/**` and `sessions/**/claims-generated.json`. While doing it: 07-28's 100% is the
    known single-value-mutation artefact and a new gate must not bless it as measured.
 
-2. **Run `--two-site` on 07-22.** Its 83% is a MATCH UPPER BOUND, labelled as such in three documents.
+2. **DONE (2026-08-15), with item 1 — measured at `round` for all six sessions, not just 07-22.**
+   ~~Run `--two-site` on 07-22.~~ Its 83% is a MATCH UPPER BOUND, labelled as such in three documents.
    One ~8-minute run replaces it with the measured figure; update all three together, since a resolved
    bound still described as a bound is the same staleness class as item 1.
 
@@ -1499,3 +1513,76 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
    pattern rather than diverging — but an unresolvable id is close to the failure `check_badge_links`
    exists to prevent. Accept it, extend the island, or stop printing ids the island lacks; whichever
    is chosen must apply to `pc_section` too.
+
+## Gating equiv.py coverage — and the sampled figure underneath it (2026-08-15)
+
+**DONE.** `pipeline/claims/check_equiv_coverage.py` re-derives the hand-claim coverage figures on
+push and fails when they drift. `.github/workflows/equiv-coverage.yml` runs it, path-filtered *and*
+weekly, per `dual-backed.yml`'s rule that neither alone is sufficient. Items 1 and 2 of 最癲一局's
+list both close here.
+
+**The item said the numbers "held by luck". They held by construction, which is worse.** The
+numerator is monotone non-decreasing in the generated ledger — adding a family can only ever cover
+more hand claims — so the seven `intense_round` families of 最癲一局 could not have moved the
+percentage whatever they did. Ablating them confirms it: 07-22 stays 45/53, 08-14 stays 16/19, the
+whole attribution block diffs clean. **A scalar gate of any shape — a floor, a byte-compared
+percentage, a delta bound — is structurally blind to the edit that motivated the item.** So the
+artefact stores verdict SETS and the percentages are derived at read time: a family that newly
+covers C007 moves it from `uncovered` to `covered` even when the count stands still, and that is a
+line in a diff.
+
+**The figure being gated turned out to be a seeded sample.** `equiv.py` was exhaustive over mutation
+*sites* but drew ONE of five perturbation kinds at each, so 07-22 read 85% at the committed seed,
+87% at seed 3, 83% at seed 42 — 82.7-86.8% across twelve seeds, with the *denominator* moving
+(51-53) because which claims are falsifiable at all depends on which mutants were drawn. The module
+docstring said the opposite in so many words: "the whole space of one-value changes — not a random
+sample of it." Pinning the seed would have gated a sample and inherited the false claim, so the draw
+is gone: every kind at every site, de-duped. ~5× the mutants, deterministic across `--seed` and
+`PYTHONHASHSEED`, and `--seed` survives only because `--samples` still draws.
+
+Three consequences, none of them cosmetic:
+
+- **Two published figures fall.** 07-22 85% → **81%**, 07-24 98% → **96%**. The mechanism is exact:
+  more samples can only BREAK implications, and 07-22's two losses (C007, C024) were pair-covered
+  conjunctions. 07-24 is the instructive one — C024 leaves the numerator while R006 is rescued from
+  `untested` into both sides, so the percentage falls with a flat numerator.
+- **The ≥85% acceptance gate P4 declared is not met by three of six sessions**, including 07-22, the
+  session it was declared on. Restated as a measurement rather than enforced: one hand claim is worth
+  10.0 points on 07-28, so no honest floor exists, and one all six pass would sit at 60% and bless
+  that session's artefact by definition.
+- **Three sessions had never been measured in public at all** (08-01, 08-09, 08-14), and every
+  `--two-site` figure ever published was a `match` upper bound. All six are now measured at all three
+  granularities, so the table carries no bounds.
+
+**07-28 was never the exception.** Five of six sessions lose coverage to the second family, and every
+claim that drops is windowed or per-match — 08-01 C002, 08-09 C005, 08-14 C007/C019/C020, the last of
+which are 08-14's own headline claims. `sum_round_range` arrived at 07-28 and every session since uses
+it. The gate therefore fails a single-value figure published without its two-site companion for any
+session holding windowed claims — a property, not a threshold, so session seven needs no edit.
+
+Four things worth keeping, each a bug that was live:
+
+- **The old match-vs-round gap was an artefact of the draw.** The docstring read "`round` finds two
+  implications `match` does not (44/53 vs 42/53)" — backwards, since `match`'s moves are a strict
+  subset of `round`'s and extra mutants only break implications. Under the exhaustive family both
+  granularities read 42/53 on 07-22, and the two claims that used to separate them are exactly the two
+  the single-value family now falsifies by itself. A gap that closes when the cheap family stops
+  sampling was never a fact about granularity.
+- **The equivalence proof for sharing one sweep across granularities did not gate what it claimed.**
+  Mutating the per-mode vector copy to an alias left all three modes returning unchanged results — the
+  leaked corpus is a superset and no implication happened to break on the extra moves. A length assert
+  in `_search` kills the mutant now. The check that was supposed to prove the refactor safe would have
+  passed over a real leak.
+- **The path filter `pipeline/claims/**` that this item proposed is too narrow.** The measured import
+  closure includes `pipeline/perturb.py` — the make/unmake module the sweep's correctness rests on,
+  whose failure mode is a silently *raised* baseline, i.e. a gate that passes when it should not.
+- **`PERF-PLAN.md`'s two `claims.equiv` rows stopped being that command's runtime** the moment the
+  corpus grew 5×. Annotated rather than rewritten: a speedup table that silently absorbs a scope change
+  stops being a measurement.
+
+Cost, measured: push tier (`--modes single_value,two_site_match`) **4m13s** for the whole corpus;
+weekly tier (all three granularities) **25m49s**. Neither is a matrix — the gate globs sessions off
+disk and takes no session argument, so adding a session cannot leave a list behind. Two such lists were
+found stale on the way and one fixed: `verify.yml`'s cross-tslot loop stopped at 08-01, leaving 134
+rounds outside it. `pipeline/sim/cross-tslot-multi.ts:34` and `cross-tslot.test.ts:69` carry the same
+stale list and are still open.
