@@ -6,113 +6,137 @@
     "@haelp/teto (Triangle.js)"
   ],
   "verified_prefix_locks": {
-    "total": 12278,
-    "dual": 11653
+    "total": 20226,
+    "dual": 19460
   },
   "sessions": {
     "2026-07-22": {
-      "prefix_locks": 3620,
-      "prefix_dual": 3482,
+      "prefix_locks": 4443,
+      "prefix_dual": 4194,
       "forecast": {
-        "total": 309,
-        "dual": 294,
+        "total": 384,
+        "dual": 365,
         "by_kind": {
           "reactive": {
-            "total": 138,
-            "dual": 127
+            "total": 175,
+            "dual": 165
           },
           "self_built": {
-            "total": 171,
+            "total": 209,
+            "dual": 200
+          }
+        }
+      },
+      "opener_rounds": 149,
+      "opener_dual": 142
+    },
+    "2026-07-24": {
+      "prefix_locks": 2827,
+      "prefix_dual": 2740,
+      "forecast": {
+        "total": 253,
+        "dual": 246,
+        "by_kind": {
+          "reactive": {
+            "total": 127,
+            "dual": 123
+          },
+          "self_built": {
+            "total": 126,
+            "dual": 123
+          }
+        }
+      },
+      "opener_rounds": 94,
+      "opener_dual": 90
+    },
+    "2026-07-28": {
+      "prefix_locks": 3256,
+      "prefix_dual": 3152,
+      "forecast": {
+        "total": 291,
+        "dual": 285,
+        "by_kind": {
+          "forecast_lineclear": {
+            "total": 1,
+            "dual": 0
+          },
+          "reactive": {
+            "total": 121,
+            "dual": 118
+          },
+          "self_built": {
+            "total": 169,
             "dual": 167
           }
         }
       },
-      "opener_rounds": 140,
-      "opener_dual": 132
+      "opener_rounds": 120,
+      "opener_dual": 113
     },
-    "2026-07-24": {
-      "prefix_locks": 2087,
-      "prefix_dual": 1964,
+    "2026-08-01": {
+      "prefix_locks": 2793,
+      "prefix_dual": 2676,
       "forecast": {
-        "total": 180,
-        "dual": 164,
+        "total": 247,
+        "dual": 236,
         "by_kind": {
           "reactive": {
-            "total": 77,
-            "dual": 71
+            "total": 106,
+            "dual": 100
           },
           "self_built": {
-            "total": 103,
-            "dual": 93
+            "total": 141,
+            "dual": 136
           }
         }
       },
-      "opener_rounds": 85,
-      "opener_dual": 77
+      "opener_rounds": 101,
+      "opener_dual": 95
     },
-    "2026-07-28": {
-      "prefix_locks": 2480,
-      "prefix_dual": 2322,
+    "2026-08-09": {
+      "prefix_locks": 2740,
+      "prefix_dual": 2645,
       "forecast": {
-        "total": 225,
-        "dual": 212,
+        "total": 251,
+        "dual": 241,
+        "by_kind": {
+          "reactive": {
+            "total": 118,
+            "dual": 113
+          },
+          "self_built": {
+            "total": 133,
+            "dual": 128
+          }
+        }
+      },
+      "opener_rounds": 93,
+      "opener_dual": 91
+    },
+    "2026-08-14": {
+      "prefix_locks": 4167,
+      "prefix_dual": 4053,
+      "forecast": {
+        "total": 384,
+        "dual": 368,
         "by_kind": {
           "forecast_lineclear": {
             "total": 1,
             "dual": 1
           },
           "reactive": {
-            "total": 86,
-            "dual": 79
+            "total": 166,
+            "dual": 161
           },
           "self_built": {
-            "total": 138,
-            "dual": 132
+            "total": 217,
+            "dual": 206
           }
         }
       },
-      "opener_rounds": 111,
-      "opener_dual": 100
-    },
-    "2026-08-01": {
-      "prefix_locks": 2108,
-      "prefix_dual": 2015,
-      "forecast": {
-        "total": 185,
-        "dual": 176,
-        "by_kind": {
-          "reactive": {
-            "total": 72,
-            "dual": 67
-          },
-          "self_built": {
-            "total": 113,
-            "dual": 109
-          }
-        }
-      },
-      "opener_rounds": 92,
-      "opener_dual": 90
-    },
-    "2026-08-09": {
-      "prefix_locks": 1983,
-      "prefix_dual": 1870,
-      "forecast": {
-        "total": 174,
-        "dual": 160,
-        "by_kind": {
-          "reactive": {
-            "total": 68,
-            "dual": 63
-          },
-          "self_built": {
-            "total": 106,
-            "dual": 97
-          }
-        }
-      },
-      "opener_rounds": 89,
-      "opener_dual": 84
+      "opener_rounds": 160,
+      "opener_dual": 149
     }
   }
 }

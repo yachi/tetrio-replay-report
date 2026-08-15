@@ -73,7 +73,10 @@ dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-writte
 dafny verify spec/BfsKey.dfy               # why bestTspin's visited key carries the arrival mode
 bash spec/mutate-bfskey.sh                 # its mutants — a lemma none can kill is decorative
 bash spec/mutate-forecast-spec.sh          # spec mutants — a TIMEOUT is UNRESOLVED, not killed
-python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true
+dafny verify spec/DonationCave.dfy         # why the naive Donation clause and the cave's roof test
+bash spec/mutate-donationcave.sh           #   discriminate nothing; 10 mutants, all killed
+python3 spec/check_spec_vacuity.py         # no lemma in the spec is vacuously true — controls are
+python3 spec/check_spec_vacuity.py spec/DonationCave.dfy   # per-module, so run it once per file
 python3 -m pipeline.forecast_examples      # the drawn boards (example-boards.ts) agree with the
                                            #   proven witnesses (ForecastExamples.dfy); --write regens
                                            #   spec/forecast-examples.json, --selftest proves teeth
@@ -532,12 +535,28 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 六個具名定式 table would have printed a column of zeros meaning "never compared" while reading as
 "these players never do this" — the same shape as the `OPENER_LOCKS` coverage bug.
 
-**The naive Donation predicate is forced by arithmetic, and it fires on 70-89% of T-spin clears.**
+**The naive Donation clause is forced by arithmetic: it fires on 100% of T-spin clears.**
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
-every column filled, so that clause counts line clears. All the discriminating power is in the
-**re-opening** clause — every filled cell of the column must lie inside the cleared rows, so the
-clear leaves it open surface-to-floor. With it, the rate drops to ~2.5% (103 across six sessions,
-over 4 035 T-spin clears).
+every column filled, so that clause counts line clears. That is not a measurement any more — it is
+`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly 100% of all 4035
+scored clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening
+clause deleted — it fires on **29-37%**. All the discriminating power is in the **re-opening**
+clause: every filled cell of the column must lie inside the cleared rows, so the clear leaves it
+open surface-to-floor. With it, the rate drops to ~2.5% (103 across six sessions).
+
+**This paragraph said 70-89% until 2026-08-14, and that figure names no variant of the clause it
+describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-36.8%; only a composite
+with `cavity ≥ 1` lands in the band (74.6-77.0%), and it never reaches 89%. A rate was being quoted
+for something proved to be always true — the same shape as the 3379-vs-3142 note above, and the same
+lesson: a figure quoted in prose is not the thing it describes.
+
+**Quote the band as a band, and re-measure it every session — it moved on the sixth.** Through five
+sessions the shipped-thresholds-minus-re-opening rate sat in 28.9-33.6%; 2026-08-14 fires at
+**36.8%**, three points above that ceiling, while the pooled rate barely moves (31.1% → 32.4%). The
+pooled figure alone would have hidden it. The `cavity ≥ 1` composite is the opposite case: its
+74.6-77.0% survives verbatim, but only because 08-14's 77.04% ties 08-09's 76.99% at one decimal
+place — a seventh session past 77.05 moves it. Both bands are per-session ranges, so a new session
+can break one without changing any pooled number.
 `D = 4` and "walled at the **deepest** 4 cavity rows" are harddrop's numbers, not tuned: of its 20
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
@@ -553,8 +572,15 @@ bug reported every well as self-built for a whole round of measurement.
 **The STMB cave is OFFSET from the T and its roof test is vacuous.** The cave shares two of the T's
 three columns and reaches one past them, so the test is *overlap*, never containment — containment
 misses all six drawn Basic Structures. And the cave's roof is the nub row the Double just
-completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**.
-A roof test would have been a decorative guard.
+completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**
+over the five sessions that existed when it was counted — not re-measured since, because it no longer
+carries the argument. A roof test would have been a decorative guard — and since 2026-08-14 that is
+proved rather than counted (`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`:
+conjoining a roof test
+to the cave predicate yields an equivalent predicate, over the whole board width and not merely over
+cave runs). The proof also shows the code assumes more than it needs: **maximality is not used** —
+any cleared row above the run roofs it, and a Double always has two full rows. `IsMaxCleared` and the
+two-row hypothesis are kept for fidelity to `caveAt`, not because the argument rests on them.
 
 Two cross-tabs, and the section may print neither number without both: **by depth**, 38 of the 39
 width≥3 hits are one row deep — a dimple, not a cave — leaving exactly **1 genuine cave in 760
@@ -572,7 +598,126 @@ category makes for the ordering metric. All three category counts are recorded a
 Both metrics are licensed by one check: the per-lock board snapshot plus the lock's cells must make
 exactly the rows full that the engine independently recorded clearing. Different state, so it is a
 real gate — **4035/4035 across six sessions**, and a spin it cannot reconstruct is dropped, never
-scored.
+scored. (This line read **3379/3379** until 2026-08-14. 3379 is the *whole-round* T-spin clear total
+over the five sessions there were then; the check is scoped to the verified prefix, which was 3142.
+The figure was written from a whole-round probe and matched no committed artefact —
+`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 4327, so
+the two still differ by 292. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
+is not the gate.)
+
+### 分母錨咗 replay 自己數嘅 counter — the one part of this section that is not simulator-only
+
+The reconstruction check above is *internal*: two states the same engine built separately. It says
+the boards are coherent; it cannot say the engine counts T-spins the way the game does. That
+question has an outside witness — `results.stats.clears.tspindoubles` and its seven siblings, which
+`extract.py` and `extract2.ts` each read into facts.json as `tspin_doubles` etc. **Both extractors
+agree on them, so they are inside the trust chain**, and `tspinCounterCheck` compares them per
+player-round, per kind, over the whole round:
+
+| | |
+|---|---|
+| rounds where every kind agrees | **760 / 760** (six sessions, no unknowns) |
+| whole-round T-spin clears, sim vs replay | **4327 = 4327** |
+| what the verified prefix scores of them | **4035**, i.e. **93.3%** coverage |
+
+So the two tables' **denominator** leaves quarantine: `tspin_clears_scored` is now a subset of a
+total the trust chain already carries, and 「可核覆蓋」 names the subset. This is the
+`perfect_clear_timing` pattern (760/760 against `clears.allclear`) applied to a denominator instead
+of a timing.
+
+**The numerators do not.** Which clear was a donation, and how wide the gap under it was, still come
+from one simulator with no second implementation — so the section keeps `report_eligible: false`,
+mints no claim ids and carries no ✓ badges. `ANCHOR_MARKERS` / `CAVE_ANCHOR_MARKERS` in
+`check_opener_section.py` demand **both** sentences at both tables, because deleting the second
+while keeping the first is exactly the edit that reads as "this table has been verified".
+
+Two traps, both of which have shipped here before in other forms:
+
+- **Minis are part of the denominator**, so they are part of the anchor. The collection loop scores
+  any T lock with `spin !== 'none'` that cleared, so an anchor over `tspinsingles/doubles/triples`
+  alone would license a smaller set than it covers. All eight kinds are enumerated in
+  `TSPIN_COUNTERS`, including the four that are zero throughout — a kind that starts appearing must
+  surface as a disagreement, not vanish from both sides.
+- **A missing counter is UNKNOWN, never 0.** `?? 0` on both sides makes a corpus of zeros agree with
+  itself and `agrees` stay true — the same shape as the `?? 0` that published 「一個 Perfect Clear
+  都冇出過」 for five sessions holding 65. A round carrying none of the eight counters is excluded
+  and counted in `unknown_rounds`; `openers.test.ts` pins `tspin_clears_replay` per session as a
+  literal and asserts it is nonzero, and the mutant that zeroes both sides is killed by it.
+
+### 第二個引擎 — `dual_engine`, and why its headline rate is never the sentence
+
+The other route is a second implementation, and two engines already exist that share no code: the
+hand-port `runCase` and the vendored clean-room Triangle `runCaseOracle`. `dualEngineCheck` runs
+both over every case and compares the two board-state verdicts lock by lock, as far as **both** are
+verified.
+
+**What is published is the confusion matrix, never the agreement rate**, and that distinction is the
+whole finding. Both verdicts are rare — 39 caves and 103 donations in 4035 scored clears — so an
+overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
+
+| | overall | **on the positives** |
+|---|---|---|
+| cave | 1719/1719 (100%) | **16 / 16** |
+| donation | 1659/1719 (96.5%) | **9 / 43** |
+
+The donation's 96.5% is 1650 of 1659 agreements being both engines saying "no". On the thing the
+table actually counts the two engines disagree about **four donations in five** — the opposite
+reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
+siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` so a future change cannot
+quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER` fails the build if the section
+prints a rate without the sentence saying what is in its denominator.
+
+**Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix (27 locks
+against 81 on average), so the comparison reaches **1719 of 4035** scored clears — cave's 16
+positives are 16 of the corpus's 39. It is a check on the verdicts, not a re-scoping of the tables,
+exactly as the counter anchor licenses a denominator without redefining it. What it buys the
+donation table is a *caveat it did not have*: the one metric here with no second implementation
+backing it, stated as a measurement.
+
+**The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** At **727
+of the 1719** comparison points the two engines are judging boards that differ cell for cell (median
+12 cells), so every figure in the table above is read inside that. Split the positives by board
+equality and the donation resolves completely:
+
+| | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
+|---|---|---|---|---|---|
+| cave | 16 | 3 | 16/16 | 3/3 | 13/13 |
+| donation | 43 | 6 | 9/43 | **6 / 6** | **3 / 37** |
+
+So the two engines do not disagree about what a donation *is* — they disagree about the board, which
+is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
+and must never be worded like the donation's**: agreeing 13 of 13 on boards that differ is the
+verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
+cave is local to the spin), not thirteen independent confirmations. `DUAL_SPLIT_MARKER` and
+`CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
+
+A false start worth not repeating: the first version of that probe pushed both engines through the
+reconstruction check and the hand-port licensed **0 of 1355** (over the five sessions there were
+then). A 0%/100% split is a bug report about the comparison, not a result. **The reason recorded here
+was wrong until 2026-08-14** — it said `records[].clearedRows` means different things in the two
+engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 empty of 5472**, and
+`clearedRows.length == lines` every time in both engines. The real cause is that `records` and
+`locks` are **index-aligned in the oracle only** (`records[i].frame == locks[i].frame` 18951/18951);
+`sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
+alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
+the lock's own **frame**, the hand-port passes the strong check **1719 of 1719** at that call site
+(the per-session figures are each session's `locks_comparable`, so the artefacts cross-check it), so
+`dualVerdict` now uses the same reconstruction
+check as the shipped path — the weaker licence is gone, and all six artefacts are byte-identical
+under the change.
+
+Two things that follow, and both are load-bearing:
+
+- **The strong licence has no teeth from the artefacts.** Reverting to the index lookup or
+  off-by-one-ing the frame collapses `locks_comparable` 1719 → 0 and byte-identity catches it; but
+  weakening the *licence* (back to `rows.length == lk.cleared`, or comparing only the length of
+  `clearedRows`) leaves all six artefacts byte-identical — re-checked on the sixth session, both
+  mutants, rather than carried over. `dualVerdict` is exported and tested directly on synthetic
+  boards for exactly that reason. A guard no gate can falsify is decorative.
+- **A missing record is an EQUIVALENT mutant, not a coverage gap.** `?? []` instead of excluding it
+  cannot change any output: a lock with `cleared > 0` always makes at least one row full, so an empty
+  `theirs` never matches. The branch is also unreachable on this corpus (0 of 2027). It is written
+  explicitly because it states the intent — do not add a test that pretends to cover it.
 
 ## 開局定式 定 中盤手法 — the window was asserted, now it is measured
 

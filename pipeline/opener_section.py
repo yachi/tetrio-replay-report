@@ -599,6 +599,163 @@ def _named_block(data):
     ]
 
 
+def _anchor_note(data):
+    """THE DENOMINATOR ANCHOR — the one control in this section that reaches outside the simulator,
+    and the only reason these two tables' 「全局」 columns may be printed at all.
+
+    Every other note here narrows what a count may be READ as. This one changes where a number came
+    FROM: the replay keeps its own per-kind T-spin counters, both extractors read them into
+    facts.json, and `emit-opener-facts.ts` compares them per player-round against what the oracle
+    derived. So 可核 T-spin 消行 stops being a simulator-only figure and becomes a subset of a total
+    the trust chain already carries.
+
+    The paragraph must keep BOTH halves. Printing the agreement without "分子照舊隔離" would read as
+    the whole section having been verified, which is exactly what has not happened — the numerators
+    (which clear was a donation, which was a cave) still have one implementation and no second
+    source. `check_opener_section` fails when either half goes missing.
+
+    Empty when the artifact predates the anchor, and when the check did NOT hold: a coverage figure
+    over a denominator no counter agrees with is a ratio with nothing behind it, and the columns it
+    would explain are emitted as null in that case anyway.
+    """
+    dn = data.get("donation") or {}
+    ck = dn.get("counter_anchor")
+    if not ck or not ck.get("agrees"):
+        return ""
+    cov = _pct(_share(ck["tspin_clears_scored"], ck["tspin_clears_replay"]))
+    return (
+        "<strong>個分母而家有第二個來源，分子冇。</strong>"
+        "呢兩個表數嘅係「可核嗰段」入面嘅 T-spin 消行，而「全局」嗰欄係"
+        "<em>replay 自己數</em>嘅——<code>tspindoubles</code> 同佢七個兄弟，"
+        "<code>extract.py</code> 同 <code>extract2.ts</code> 兩個抽取器各自讀入 "
+        "<code>facts.json</code>，所以嗰個數本身已經喺信任鏈入面。"
+        f"逐個玩家回合、逐種消行對過："
+        f"<strong>{ck['rounds_agreeing']}／{ck['checked']}</strong> 個回合全中，"
+        f"全場 <strong>{ck['tspin_clears_sim']}</strong> 個對 "
+        f"<strong>{ck['tspin_clears_replay']}</strong> 個。"
+        f"即係話個分母唔再係模擬器自己講嘅數，可核嗰段覆蓋咗其中 <strong>{cov}</strong>。"
+        "<strong>但係分子照舊隔離</strong>——邊一次算捐窿、邊一次算窿，"
+        "依然淨係得呢一個模擬器講，所以呢一節仍然冇 claim id、冇 ✓ 章。"
+    )
+
+
+def _dual_engine_note(data, metric):
+    """THE SECOND ENGINE, and the reason its headline rate is never the sentence.
+
+    A quarantined metric's other route into the trust chain is a second independent implementation.
+    Two engines exist and share no code, so their verdicts on the same lock are compared — but both
+    verdicts are RARE, so the overall agreement rate is negatives agreeing with negatives and
+    measures the substrate rather than the metric. Split by the oracle's own verdict and the two
+    tables come apart completely: the cave agrees on every positive in range, the donation on a
+    quarter of them. Both sentences are written from `agreement_on_positives`, and the overall rate
+    is quoted beside it only so a reader who has seen 96.7% somewhere knows what it was.
+
+    Neither result takes anything out of quarantine, and the paragraph says so: the comparison
+    reaches under half the scored clears, because the hand-port verifies a far shorter prefix.
+
+    Empty when the artifact predates the check, and when nothing positive is in range — a check with
+    no positive to agree about is decorative and must not be printed as perfect agreement.
+    """
+    blk = (data.get(metric) or {}).get("dual_engine")
+    if not blk:
+        return ""
+    m = blk["cave" if metric == "stmb_cave" else "donation"]
+    pos = m["agreement_on_positives"]
+    if not pos:
+        return ""
+    hit, n = pos
+    reach = _pct(_share(blk["locks_comparable"], blk["locks_scored"]))
+    scope = (f"呢個對照淨係去到 <strong>{blk['locks_comparable']}／{blk['locks_scored']}</strong>"
+             f"（{reach}）個可核 T-spin —— hand-port 自己可核嗰段短好多，"
+             "去唔到嘅位就冇得對。")
+    if hit == n:
+        head = (f"<strong>呢個數係全節唯一一個俾第二個獨立實作對過嘅。</strong>"
+                f"兩個引擎（vendored Triangle 同手寫嗰個 hand-port）完全冇共用過 code，"
+                f"逐個 lock 各自睇自己塊板：認得出嘅 <strong>{n}</strong> 次，"
+                f"<strong>兩邊全部一樣</strong>，一個分歧都冇。")
+        tail = (f"所以呢個唔係「已經核實」，係「有 {n} 次俾人對過」——"
+                "數目細，而且淨係得一半範圍，所以呢個表一樣留喺隔離區。")
+    else:
+        head = (f"<strong>第二個引擎對唔上。</strong>"
+                f"兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>{n}</strong> 次入面，"
+                f"另一個引擎<strong>得 {hit} 次同意</strong>"
+                f"（另一邊反過來多認 {m['other_only']} 次）。")
+        tail = ("所以呢個表<strong>冇</strong>第二個實作撐住，"
+                "同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。")
+    overall = m["agreement_overall"]
+    warn = (f"<strong>唔好睇「成體 {_pct(_share(overall[0], overall[1]))} 啱」嗰個數</strong>"
+            f"——嗰 {overall[0]} 次入面有 {m['both_no']} 次係兩邊都話「唔係」，"
+            "咁樣量緊嘅係塊板嘅底，唔係呢個 metric。")
+    return head + warn + scope + _board_split_note(blk, metric) + tail
+
+
+def _board_split_note(blk, metric):
+    """WERE THE TWO ENGINES LOOKING AT THE SAME BOARD? — the sentence that makes the figure above
+    readable, and it says a different thing for each table.
+
+    `agreement_on_positives` states that the two engines disagree about four donations in five. It
+    does not say whether they disagree about what a donation IS or about what was on the board. Split
+    the oracle's positives by cell-for-cell board equality and the donation resolves completely —
+    every positive on an identical board agrees, almost none of the rest — so the disagreement is the
+    board, which is `oracle-source.ts`'s garbage-hole problem showing through rather than a wobble in
+    the predicate. That is a materially different (and more useful) statement than the raw 9/43.
+
+    The cave's split says something else and MUST NOT be worded like the donation's: its verdict
+    survives boards that differ, which is robustness, not correctness. Printing "13 of 13 agreed"
+    without saying the boards differed would read as thirteen independent confirmations.
+
+    Empty when the artifact predates the split, or when the metric has no positive in range.
+    """
+    split = (blk.get("board_split") or {}).get("cave" if metric == "stmb_cave" else "don")
+    if not split or "locks_same_board" not in blk:
+        return ""
+    same, cmp_ = blk["locks_same_board"], blk["locks_comparable"]
+    ps, pd = split["positives_same_board"], split["positives_diff_board"]
+    as_, ad = split["agree_same_board"], split["agree_diff_board"]
+    if ps + pd == 0:
+        return ""
+    base = (f"<strong>兩個引擎有冇睇緊同一塊板？</strong>"
+            f"可比嘅 {cmp_} 個 lock 入面，"
+            f"淨係 <strong>{same}</strong> 個（{_pct(_share(same, cmp_))}）兩邊逐格一模一樣，"
+            "上面每個數都要放喺呢個前提入面睇。")
+    if metric == "stmb_cave":
+        return base + (f"呢個表嘅 {ps + pd} 次入面，板一樣嗰 {ps} 次兩邊同意 {as_} 次，"
+                       f"板唔一樣嗰 {pd} 次<strong>照樣同意 {ad} 次</strong>——"
+                       "即係呢個判斷<strong>頂得住</strong>塊板有差異，"
+                       "咁係穩陣，唔等於啱：唔好當佢係多咗幾次獨立確認。")
+    return base + (f"而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義："
+                   f"板一樣嗰 {ps} 次，兩邊同意 <strong>{as_}</strong> 次；"
+                   f"板唔一樣嗰 {pd} 次，就淨係同意 {ad} 次。"
+                   "兩個引擎唔係對「乜嘢先算捐窿」有分歧，"
+                   "係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。")
+
+
+def _cave_anchor_note(data):
+    """The same anchor, restated at the table that also carries the columns.
+
+    Short rather than a repeat of `_anchor_note`, because the two tables sit in one section and the
+    long form is three paragraphs up — but it may not be dropped, and it may not lose either half.
+    A reader who reaches table six first would otherwise see 「全局 TSD（replay 自己數）」 with no
+    statement of what is anchored and what is not.
+    """
+    sc = data.get("stmb_cave") or {}
+    ck = sc.get("counter_anchor")
+    if not ck or not ck.get("agrees"):
+        return ""
+    tc = sc.get("triple_control") or {}
+    rep = tc.get("tspin_triples_replay")
+    triples = ("" if rep is None else
+               f"下面消三行嗰個對照組一樣："
+               f"{tc['tspin_triples_scored']} 個可核，replay 自己數係 {rep} 個。")
+    return (
+        "<strong>呢個表個分母同樣錨咗 replay 自己數嘅 counter</strong>"
+        f"（逐個回合對過，{ck['rounds_agreeing']}／{ck['checked']} 全中，"
+        "詳情見上面捐窿表下面嗰段）。" + triples
+        + "<strong>分子一樣照舊隔離</strong>——「底下有幾闊」係呢個模擬器自己睇塊板睇返嚟嘅，"
+        "冇第二個實作對得住，所以呢個表一樣冇 claim id、冇 ✓ 章。"
+    )
+
+
 def _donation_note(data):
     """THE control on the donation table: where the well came from, and what the board source
     cannot say about it.
@@ -684,22 +841,34 @@ def _donation_table(data):
     dn = data["donation"]
     per = {p["user"]: p for p in dn["players"]}
     w = dn.get("opener_window_pieces")
-    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>", "<th>捐窿</th>", "<th>佔可核 T-spin</th>"]
+    # The anchored column is emitted only when the artifact carries it AND the per-round check held
+    # — see `_anchor_note`. Its absence is what an older opener-facts.json renders as.
+    anchored = bool((dn.get("counter_anchor") or {}).get("agrees"))
+    head = ["<th>玩家</th>", "<th>可核 T-spin 消行</th>"]
+    if anchored:
+        head += ["<th>全局（replay 自己數）</th>", "<th>可核覆蓋</th>"]
+    head += ["<th>捐窿</th>", "<th>佔可核 T-spin</th>"]
     if w is not None:
         head += [f"<th>頭 {w} 手內</th>", f"<th>第 {w} 手之後</th>"]
     head += ["<th>自己砌嘅井</th>", "<th>垃圾行留低嘅井</th>",
              "<th>塞嗰手冇消行（Natural）</th>", "<th>塞嗰手消咗行（斷 B2B）</th>",
              "<th>塞嗰手查唔到</th>"]
     split = 5 if w is None else 7
+    lead = 3 + (2 if anchored else 0)
     rows = []
     for p in _players(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * (3 + split))
+            cells.append('<td class="mono">—</td>' * (lead + split))
         else:
-            cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>'
-                         f'<td class="mono">{q["donations"]}</td>'
+            cells.append(f'<td class="mono">{q["tspin_clears_scored"]}</td>')
+            if anchored:
+                rep = q["tspin_clears_replay"]
+                cells.append(f'<td class="mono">{"—" if rep is None else rep}</td>'
+                             f'<td class="mono">'
+                             f'{_pct(_share(q["tspin_clears_scored"], rep) if rep else None)}</td>')
+            cells.append(f'<td class="mono">{q["donations"]}</td>'
                          f'<td class="mono">'
                          f'{_pct(_share(q["donations"], q["tspin_clears_scored"]))}</td>')
             if q["donations"]:
@@ -744,6 +913,8 @@ def _donation_block(data):
         '分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>',
         '    </div>',
         *_table(*_donation_table(data)),
+        *_note_block(_anchor_note(data)),
+        *_note_block(_dual_engine_note(data, "donation")),
         *_note_block(_donation_note(data)),
         *_note_block(_donation_window_note(data)),
     ]
@@ -870,8 +1041,13 @@ def _cave_table(data):
     per = {p["user"]: p for p in sc["players"]}
     w = sc["min_width"]
     lock = sc.get("opener_window_pieces")
-    head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>", f"<th>底下有 ≥{w} 格闊嘅窿</th>",
-            "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
+    # Same anchored pair as the donation table, over the T-spin DOUBLE counters — see `_anchor_note`.
+    anchored = bool((sc.get("counter_anchor") or {}).get("agrees"))
+    head = ["<th>玩家</th>", "<th>可核 T-spin Double</th>"]
+    if anchored:
+        head += ["<th>全局 TSD（replay 自己數）</th>", "<th>可核覆蓋</th>"]
+    head += [f"<th>底下有 ≥{w} 格闊嘅窿</th>",
+             "<th>佔可核 TSD</th>", "<th>其中深 ≥2 行</th>"]
     if lock is not None:
         head += [f"<th>其中喺頭 {lock} 手內</th>", f"<th>其中喺第 {lock} 手之後</th>"]
     rows = []
@@ -879,11 +1055,17 @@ def _cave_table(data):
         q = per.get(p["user"])
         cells = [f"<td>{html.escape(p['user'])}</td>"]
         if q is None:
-            cells.append('<td class="mono">—</td>' * (4 if lock is None else 6))
+            cells.append('<td class="mono">—</td>'
+                         * ((4 if lock is None else 6) + (2 if anchored else 0)))
         else:
             deep = q["min_depth_ge_2"] if q["width_ge_3"] else None
-            cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>'
-                         f'<td class="mono">{q["width_ge_3"]}</td>'
+            cells.append(f'<td class="mono">{q["tspin_doubles_scored"]}</td>')
+            if anchored:
+                rep = q["tspin_doubles_replay"]
+                cells.append(f'<td class="mono">{"—" if rep is None else rep}</td>'
+                             f'<td class="mono">'
+                             f'{_pct(_share(q["tspin_doubles_scored"], rep) if rep else None)}</td>')
+            cells.append(f'<td class="mono">{q["width_ge_3"]}</td>'
                          f'<td class="mono">'
                          f'{_pct(_share(q["width_ge_3"], q["tspin_doubles_scored"]))}</td>'
                          f'<td class="mono">{"—" if deep is None else deep}</td>')
@@ -914,6 +1096,8 @@ def _cave_block(data):
         '      <p>' + _cave_class_note(data) + '</p>',
         '    </div>',
         *_table(*_cave_table(data)),
+        *_note_block(_cave_anchor_note(data)),
+        *_note_block(_dual_engine_note(data, "stmb_cave")),
         *_note_block(_cave_note(data)),
         *_note_block(_cave_window_note(data)),
     ]

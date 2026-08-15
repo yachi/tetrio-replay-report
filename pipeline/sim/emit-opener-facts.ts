@@ -90,7 +90,7 @@
  * Rates are integers scaled x1000, matching report/facts.json and forecast-facts.json.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { loadCases, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
+import { loadCases, runCase, runCaseOracle, verifiedIndex, replayDir } from './verified-prefix.ts';
 import { H } from './sim.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS,
@@ -171,11 +171,86 @@ export const DONATION_WALLED_ROWS = 4;
  *  an ordinary overhang, which every board in this corpus produces constantly. */
 export const CAVE_MIN_WIDTH = 3;
 
+/**
+ * Every kind of T-spin clear, paired with the counter the replay keeps for it — the ANCHOR for the
+ * two board-state metrics' denominator (`tspinCounterCheck`).
+ *
+ * The `.ttrm` spells these without underscores (`tspindoubles`); extract.py and extract2.ts read
+ * each one into facts.json as `tspin_doubles`, so every counter named here is twice-extracted and
+ * inside the trust chain. Minis are listed because the metrics score them: the collection loop
+ * takes any T lock with `spin !== 'none'` that cleared, so an anchor over full spins alone would be
+ * anchoring a smaller set than the denominator it licenses.
+ *
+ * Quads and mini doubles/triples are zero throughout this corpus and are still enumerated — a kind
+ * that starts appearing must show up as a disagreement rather than be silently dropped from both
+ * sides of the comparison.
+ */
+export const TSPIN_COUNTERS = [
+  { spin: 'full', lines: 1, key: 'tspinsingles' },
+  { spin: 'full', lines: 2, key: 'tspindoubles' },
+  { spin: 'full', lines: 3, key: 'tspintriples' },
+  { spin: 'full', lines: 4, key: 'tspinquads' },
+  { spin: 'mini', lines: 1, key: 'minitspinsingles' },
+  { spin: 'mini', lines: 2, key: 'minitspindoubles' },
+  { spin: 'mini', lines: 3, key: 'minitspintriples' },
+  { spin: 'mini', lines: 4, key: 'minitspinquads' },
+] as const;
+
 /** filled/empty view of a simulated board — the frame both board-state metrics work in. An absent
  *  board (lock 0 has none before it) reads as an empty field rather than throwing. */
 const occupancyOf = (b: (string | null)[][] | undefined): boolean[][] =>
   Array.from({ length: H }, (_, r) =>
     Array.from({ length: BOARD_WIDTH }, (_, c) => (b ? b[r]?.[c] != null : false)));
+
+/**
+ * The two board-state verdicts for one lock of the OTHER engine — see `dualEngineCheck`.
+ *
+ * Held to the SAME reconstruction check as the shipped path: the rows this engine's board and cells
+ * make full must equal the rows the engine itself recorded clearing. What differs is how the record
+ * is found. `records` is index-aligned with `locks` in the ORACLE only — it pushes them adjacently,
+ * and `records[i].frame === locks[i].frame` 14744 times out of 14744. The HAND-PORT pushes a record
+ * only inside the clear branch, and twice on an all-clear bonus, so `records[i]` there reads an
+ * unrelated record: the alignment holds 0 of 4326 times. Indexing it that way is what rejected 1355
+ * of 1355 and looked like total disagreement, and a 0%/100% split is a bug report about the
+ * comparison rather than a result.
+ *
+ * (The earlier note here blamed the field's meaning — "the hand-port leaves clearedRows empty on
+ * most clearing locks". That is measurably false: 0 empty of 4326, and `clearedRows.length` equals
+ * `lines` every time in both engines. Looked up by the lock's own FRAME, the hand-port passes this
+ * check 1346 of 1346 at this call site. A wrong reason invites the wrong repair.)
+ *
+ * A lock with no record at its frame is UNKNOWN and compared against nothing. On this corpus that
+ * branch is unreachable (0 of 1596), and note it cannot be reached by a `?? []` bug either: a lock
+ * with `cleared > 0` always makes at least one row full, so an empty `theirs` can never match. It is
+ * written explicitly because it states the intent, not because a guard is doing work.
+ *
+ * Returns the board it judged, so the caller can ask whether the two engines were even looking at
+ * the same one — see `board_split`.
+ */
+export function dualVerdict(r: SimLike, i: number) {
+  const lk = r.locks[i];
+  if (!lk || lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0) return null;
+  const withT = occupancyOf(i > 0 ? (r.boards[i - 1] as (string | null)[][] | undefined) : undefined);
+  for (const q of lk.cells)
+    if (q.row >= 0 && q.row < H && q.col >= 0 && q.col < BOARD_WIDTH) withT[q.row]![q.col] = true;
+  const rows: number[] = [];
+  for (let rr = 0; rr < H; rr++) if (withT[rr]!.every(Boolean)) rows.push(rr);
+  const rec = r.records.find(q => q.frame === lk.frame);
+  if (!rec) return null;
+  const theirs = [...rec.clearedRows].sort((a, b) => a - b);
+  if (!(rows.length === theirs.length && rows.every((x, k) => x === theirs[k]))) return null;
+  const cv = caveAt(withT, rows, lk.cells, H);
+  return { don: donationCols(withT, rows, lk.cells, H).length > 0,
+           cave: !!(cv && cv.width >= CAVE_MIN_WIDTH), board: withT };
+}
+
+type SimLike = {
+  /** `frame` is what joins a lock to its record — see `dualVerdict` on why the index does not. */
+  locks: { piece: string; spin: string; cleared: number; frame: number;
+           cells: { row: number; col: number }[] }[];
+  boards: unknown[];
+  records: { frame: number; clearedRows: number[] }[];
+};
 
 /** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
  *  `lowest` is -1 for a wholly empty column, in which case the cavity is reported as 0 — an empty
@@ -194,8 +269,12 @@ export function cavity(g: boolean[][], col: number, h: number) {
  *
  * THE NAIVE FORM DISCRIMINATES NOTHING, and that is the trap this predicate is written around.
  * "The well column is filled through the rows the spin cleared" is FORCED BY ARITHMETIC: a full
- * row requires every column filled, so the naive test fires on 70-89% of all T-spin clears and
- * says only that a line was cleared. All of the power is in the RE-OPENING clause — EVERY filled
+ * row requires every column filled, so the naive test fires on 100% of all T-spin clears and says
+ * only that a line was cleared. That is a theorem, not a measurement — `NaiveClauseForced` in
+ * spec/DonationCave.dfy, which also proves the `inR === 0` branch below is unreachable and that
+ * deleting the naive conjunct yields an equivalent predicate. As a PREDICATE at the thresholds
+ * below, with the re-opening clause deleted, it fires on 29-34%.
+ * All of the power is in the RE-OPENING clause — EVERY filled
  * cell of the column must lie in a cleared row, so once the clear resolves the column is open from
  * the surface to the floor again, which is what makes the plug a loan rather than a wall.
  *
@@ -361,6 +440,22 @@ const tspinClears: TSpinClear[] = [];
 /** The licensing check on metrics 7 and 8 — see `reconstructionCheck`. */
 let reconAgreed = 0, reconDisagreed = 0;
 let roundsTotal = 0;
+/** The ANCHOR on those metrics' denominator — see `tspinCounterCheck`. One entry per player-round,
+ *  plus a per-kind tally, plus any T-spin clear the counters have no kind for. */
+const counterRounds: { user: string; sim: number; replay: number | null; agrees: boolean;
+                       byKind: Record<string, number> }[] = [];
+const counterByKind = Object.fromEntries(TSPIN_COUNTERS.map(k =>
+  [k.key, { sim: 0, replay: 0, rounds_agreeing: 0 }])) as
+  Record<string, { sim: number; replay: number; rounds_agreeing: number }>;
+let counterUnclassified = 0;
+/** The SECOND ENGINE's verdicts, as two confusion matrices — see `dualEngineCheck`. */
+const dual = { don: { tt: 0, tf: 0, ft: 0, ff: 0 }, cave: { tt: 0, tf: 0, ft: 0, ff: 0 } };
+let dualReachable = 0;
+let dualSameBoard = 0;
+const dualSplit = {
+  don: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
+  cave: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
+};
 
 for (const c of loadCases(dir)) {
   roundsTotal++;
@@ -376,6 +471,43 @@ for (const c of loadCases(dir)) {
                 spinsVerified: spinsAll.filter(x => x.i <= v),
                 pcLocks: r.locks.flatMap((lk, i) => (lk as { allclear?: boolean }).allclear ? [i] : []),
                 pcReal: typeof acReal === 'number' ? acReal : null });
+
+  // THE DENOMINATOR ANCHOR, over the WHOLE round — see `tspinCounterCheck`. It has to be the whole
+  // round because that is what the replay's counters cover; the verified prefix is then a subset of
+  // a total that a twice-extracted field agrees with, rather than a number with no outside witness.
+  {
+    const simK: Record<string, number> = Object.fromEntries(TSPIN_COUNTERS.map(k => [k.key, 0]));
+    for (const lk of r.locks) {
+      if (lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0) continue;
+      const kind = TSPIN_COUNTERS.find(k => k.spin === lk.spin && k.lines === lk.cleared);
+      if (kind) simK[kind.key]!++; else counterUnclassified++;
+    }
+    // A round carrying none of these counters is UNKNOWN, not all-zero — the same rule
+    // `perfectClearTiming` applies to `allclear`. Defaulting a missing counter to 0 would let a
+    // round where the simulator also found nothing count as agreement, so a corpus that stopped
+    // carrying the field would read as perfect agreement instead of as unchecked.
+    const present = TSPIN_COUNTERS.some(k => typeof c.clears[k.key] === 'number');
+    const realK: Record<string, number> = {};
+    let agrees = present, simTotal = 0, realTotal = 0;
+    for (const k of TSPIN_COUNTERS) {
+      const real = c.clears[k.key] ?? 0;
+      realK[k.key] = real;
+      simTotal += simK[k.key]!; realTotal += real;
+      if (!present) continue;
+      counterByKind[k.key]!.sim += simK[k.key]!;
+      counterByKind[k.key]!.replay += real;
+      if (simK[k.key] === real) counterByKind[k.key]!.rounds_agreeing++; else agrees = false;
+    }
+    counterRounds.push({ user: c.user, sim: simTotal, byKind: realK,
+                         replay: present ? realTotal : null, agrees });
+  }
+
+  // THE SECOND ENGINE — see `dualEngineCheck`. The hand-port is run over the same case and its
+  // verdicts are compared lock by lock, but ONLY as far as both are verified: `runCase` verifies a
+  // far shorter prefix (27 locks against the oracle's 81 on average), and comparing past its end
+  // would be comparing against a board nothing vouches for.
+  const rs = runCase(c);
+  const dualTo = Math.min(v, verifiedIndex(rs, c.truth), r.locks.length - 1, rs.locks.length - 1);
 
   // slot geometry, over the verified prefix only
   for (const s of spinsAll) {
@@ -440,9 +572,38 @@ for (const c of loadCases(dir)) {
       donation = { cavity: w.cavity, garbageWell, plug };
     }
 
-    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation,
-                       cave: caveAt(withT, mine, lk.cells, H),
+    const cave = caveAt(withT, mine, lk.cells, H);
+    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave,
                        wideGapUnderTriple: lk.cleared === 3 && wideGapUnder(withT, mine, H) });
+
+    // …and the same lock through the OTHER engine, when it reaches this far and agrees the piece
+    // is the same one. Its board is built from its own snapshot, so the two verdicts share nothing
+    // but the lock index — which is what makes agreeing on them worth anything.
+    if (i <= dualTo && rs.locks[i]?.piece === lk.piece) {
+      const other = dualVerdict(rs, i);
+      if (other) {
+        dualReachable++;
+        const mineV = { don: !!donation, cave: !!(cave && cave.width >= CAVE_MIN_WIDTH) };
+        // WERE THE TWO ENGINES EVEN LOOKING AT THE SAME BOARD? Both verdicts are rare, so an
+        // agreement figure is mostly negatives agreeing with negatives; splitting the positives by
+        // board equality is what says whether a disagreement is about the PREDICATE or about the
+        // BOARD. Corpus-wide it is the board: where the boards agree the donation verdicts agree
+        // perfectly, and where they differ they mostly do not.
+        let sameBoard = true;
+        for (let rr = 0; rr < H && sameBoard; rr++)
+          for (let cc = 0; cc < BOARD_WIDTH; cc++)
+            if (withT[rr]![cc] !== other.board[rr]![cc]) { sameBoard = false; break; }
+        if (sameBoard) dualSameBoard++;
+        for (const k of ['don', 'cave'] as const) {
+          const x = mineV[k], y = other[k];
+          dual[k][x && y ? 'tt' : x ? 'tf' : y ? 'ft' : 'ff']++;
+          if (x) {
+            dualSplit[k][sameBoard ? 'positives_same_board' : 'positives_diff_board']++;
+            if (y) dualSplit[k][sameBoard ? 'agree_same_board' : 'agree_diff_board']++;
+          }
+        }
+      }
+    }
   }
 
   // The opening board after n locks, for each n an opener can end its first bag on: no line clear
@@ -825,6 +986,139 @@ const reconstructionCheck = () => ({
   agrees: reconDisagreed === 0 && reconAgreed > 0,
 });
 
+/**
+ * THE DENOMINATOR ANCHOR — the one thing in this file that reaches outside the simulator.
+ *
+ * `reconstructionCheck` above is an INTERNAL consistency check: two states the same engine built
+ * separately. It says the boards are coherent; it cannot say the engine counts T-spins the way the
+ * game does. That question has an outside witness, and it is the same one `perfectClearTiming`
+ * uses for全消: the replay's own per-kind counters, which extract.py and extract2.ts each read into
+ * facts.json. Two independent extractors agree on them, so they are inside this repo's trust chain.
+ *
+ * So every player-round is compared, per kind, over the WHOLE round — and what that buys is the
+ * denominator. The tables score the verified prefix; without this the reader has no way to know
+ * either what fraction of the round's T-spins that prefix reaches, or whether the simulator's idea
+ * of a T-spin clear matches the game's at all. With it, `tspin_clears_scored` is a subset of a
+ * total the trust chain already carries, and `prefix_coverage` names the subset.
+ *
+ * The NUMERATORS stay quarantined. Nothing here says a donation or a cave was correctly detected —
+ * only that the population they are counted out of is the population the replay recorded.
+ *
+ * Emitted as null-if-disagreeing, like `perfect_clear_timing.players[].by_piece`: a coverage figure
+ * over a denominator no counter agrees with is a ratio with nothing behind it.
+ */
+let counterAnchorMemo: ReturnType<typeof buildCounterCheck> | null = null;
+/** Memoised: both metrics embed it and each player row consults it, and it walks every round. */
+const tspinCounterCheck = () => (counterAnchorMemo ??= buildCounterCheck());
+
+function buildCounterCheck() {
+  const checked = counterRounds.filter(r => r.replay !== null);
+  const agree = checked.filter(r => r.agrees).length;
+  return {
+    source: 'the replay\'s own per-kind T-spin counters (results.stats.clears.tspindoubles and its '
+          + 'seven siblings) — the fields extract.py and extract2.ts read into facts.json as '
+          + 'tspin_doubles etc., so they are twice-extracted and inside the trust chain',
+    covers: 'the DENOMINATOR only. The tables\' numerators — which of those clears was a donation '
+          + 'or a cave — come from this simulator alone and stay quarantined',
+    player_rounds: counterRounds.length,
+    checked: checked.length,
+    unknown_rounds: counterRounds.length - checked.length,
+    rounds_agreeing: agree,
+    agrees: checked.length > 0 && agree === checked.length && counterUnclassified === 0,
+    /** a T-spin clear of a kind no counter names. Nonzero means the comparison is dropping events
+     *  from the simulator side, which would make agreement easier rather than harder. */
+    unclassified_sim_clears: counterUnclassified,
+    tspin_clears_sim: counterRounds.reduce((s, r) => s + r.sim, 0),
+    tspin_clears_replay: checked.reduce((s, r) => s + (r.replay ?? 0), 0),
+    /** what the tables actually score: the verified prefix, after the reconstruction check. The
+     *  two numbers beside it are the whole round, so this is the coverage the reader needs to
+     *  read every rate below — and it is a count, never a pre-rounded share, because the section
+     *  floors every printed figure (pipeline/fmt.py). */
+    tspin_clears_scored: tspinClears.length,
+    by_kind: counterByKind,
+  };
+}
+
+/**
+ * THE SECOND ENGINE, and the reason its headline number may not be quoted on its own.
+ *
+ * The dual-extractor rule never asked two implementations to agree on everything — extract.py and
+ * extract2.ts are only ever compared on facts.json. So the question for a quarantined metric is
+ * whether a second, independently written engine reaches the same verdict on the same lock. Two
+ * exist: the hand-port `runCase` and the vendored clean-room Triangle engine the section already
+ * runs on. They share no code.
+ *
+ * WHAT IS PUBLISHED IS THE CONFUSION MATRIX, NOT THE AGREEMENT RATE, and that is the whole point of
+ * this function. Both verdicts are rare — 30 caves and 82 donations in 3142 scored clears — so
+ * "the two engines agree 96.7% of the time" is 1292 negatives agreeing with each other and says
+ * nothing about the metric. Split by the oracle's verdict and the two metrics come apart:
+ *
+ *     cave     — 13 of 13 positives, both engines. A real cross-implementation result.
+ *     donation —  9 of 36 positives. The two engines disagree about three donations in four.
+ *
+ * Same failure mode as a detector whose clause is entailed by its siblings: a rate whose denominator
+ * is dominated by the easy case measures the substrate. `agreement_on_positives` is therefore the
+ * field the section reads, and `agreement_overall` is emitted beside it precisely so the gap is
+ * visible rather than hidden by publishing only one of them.
+ *
+ * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so only 1346 of the
+ * 3142 scored clears (42.8%) can be compared at all. This is a check, not a re-scoping: the tables
+ * still score the oracle's prefix, exactly as `tspinCounterCheck` licenses a denominator without
+ * redefining it. Neither metric leaves quarantine on this — cave's 13 positives are 13 of 30.
+ */
+function dualEngineCheck() {
+  const cell = (m: { tt: number; tf: number; ft: number; ff: number }) => {
+    const positives = m.tt + m.tf;
+    return {
+      both_yes: m.tt, oracle_only: m.tf, other_only: m.ft, both_no: m.ff,
+      oracle_positives: positives,
+      /** THE figure. Null rather than 1.0 when there is no positive to agree about: a check with
+       *  no positive in range is decorative, and must not read as perfect agreement. */
+      agreement_on_positives: positives ? [m.tt, positives] : null,
+      /** emitted only so the gap between the two is visible — see the note above */
+      agreement_overall: [m.tt + m.ff, m.tt + m.tf + m.ft + m.ff],
+    };
+  };
+  return {
+    engines: ['runCaseOracle (vendored Triangle, clean-room)', 'runCase (hand-port, sim.ts)'],
+    covers: 'a CHECK on the verdicts, not a re-scoping of the tables — they still score the '
+          + 'oracle\'s verified prefix. Read `agreement_on_positives`, never `agreement_overall`: '
+          + 'both verdicts are rare, so the overall rate is negatives agreeing with negatives',
+    locks_scored: tspinClears.length,
+    locks_comparable: dualReachable,
+    /** Of the comparable locks, how many the two engines built IDENTICALLY, cell for cell. 795 of
+     *  1346 corpus-wide: at 41% of the comparison points the two engines are judging different
+     *  boards, which is the context every figure above has to be read in. */
+    locks_same_board: dualSameBoard,
+    /** THE READING of `agreement_on_positives`, and the reason it is emitted beside it. Split the
+     *  oracle's positives by whether the other engine had the same board and the donation's 9/36
+     *  resolves completely: 6 of 6 on identical boards, 3 of 30 on boards that differ. So the two
+     *  engines do not disagree about what a donation IS — they disagree about the board, which is
+     *  `oracle-source.ts`'s garbage-hole problem showing through. The cave is a different statement:
+     *  13 of 13 including 10 of 10 on differing boards, i.e. its verdict SURVIVES ~12 cells of
+     *  difference, consistent with the drift being low garbage rows while the cave is local to the
+     *  spin. That is robustness, not correctness, and the two must not be worded alike. */
+    board_split: dualSplit,
+    donation: cell(dual.don),
+    cave: cell(dual.cave),
+  };
+}
+
+/** The replay's own whole-round T-spin-clear total for one player, or null if any of that player's
+ *  rounds did not carry the counters. The denominator the verified prefix is a subset OF. */
+const replayTspinClears = (user: string) => {
+  const mine = counterRounds.filter(r => r.user === user);
+  return mine.some(r => r.replay === null) ? null : mine.reduce((s, r) => s + (r.replay ?? 0), 0);
+};
+
+/** The same, restricted to named counters — the cave table's denominator is T-spin DOUBLES, and
+ *  full and mini are separate counters that the metric scores together. */
+const counterRoundsFor = (user: string, keys: readonly string[]) => {
+  const mine = counterRounds.filter(r => r.user === user);
+  if (mine.some(r => r.replay === null)) return null;
+  return mine.reduce((s, r) => s + keys.reduce((t, k) => t + (r.byKind[k] ?? 0), 0), 0);
+};
+
 // ── metric 7: DONATION ─────────────────────────────────────────────────────────────────────────
 // THE CONTROL IS THE TWO SPLITS, and neither may be dropped. The b2b split reproduces harddrop's
 // own Natural-vs-Other-Examples division from the plugging lock; the provenance split says whose
@@ -839,12 +1133,18 @@ function donationMetric() {
     walled_deepest_rows: DONATION_WALLED_ROWS,
     scope: 'verified prefix',
     check: reconstructionCheck(),
+    counter_anchor: tspinCounterCheck(),
+    dual_engine: dualEngineCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const d = mine.filter(e => e.donation).map(e => e.donation!);
+      const anchored = tspinCounterCheck().agrees;
       return {
         user,
         tspin_clears_scored: mine.length,
+        /** the replay's own count over the WHOLE round — the denominator `tspin_clears_scored` is
+         *  a subset of, null when the anchor does not hold. See `tspinCounterCheck`. */
+        tspin_clears_replay: anchored ? replayTspinClears(user) : null,
         donations: d.length,
         self_built_well: d.filter(x => !x.garbageWell).length,
         garbage_derived_well: d.filter(x => x.garbageWell).length,
@@ -862,8 +1162,10 @@ function donationMetric() {
          + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
          + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
          + '("the well was filled through the cleared rows") is FORCED BY ARITHMETIC — a full row '
-         + 'requires every column filled — and fires on 70-89% of all T-spin clears; the discriminating '
-         + 'clause is the re-opening, and that is what is counted here',
+         + 'requires every column filled — and so fires on 100% of all T-spin clears, which is proved '
+         + 'rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at '
+         + 'these thresholds without the re-opening clause fires on 29-34%. The discriminating clause '
+         + 'is the re-opening, and that is what is counted here',
     caveat: 'every donation in this corpus sits on a GARBAGE-derived well, and the oracle board '
           + 'source keeps the engine\'s own seeded-RNG hole columns, which disagree with the '
           + 'ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board '
@@ -895,12 +1197,19 @@ function stmbCaveMetric() {
               + 'the T\'s span and never containment',
     min_width: CAVE_MIN_WIDTH,
     scope: 'verified prefix',
+    counter_anchor: tspinCounterCheck(),
+    dual_engine: dualEngineCheck(),
     players: users.map(user => {
       const mine = tspinClears.filter(e => e.user === user);
       const w = mine.filter(e => e.cave && e.cave.width >= CAVE_MIN_WIDTH);
+      const ck = tspinCounterCheck();
       return {
         user,
         tspin_doubles_scored: mine.filter(e => e.lines === 2).length,
+        /** the replay's own whole-round count of the SAME kind, from the twice-extracted counter.
+         *  Full and mini are separate counters and the metric scores both, so both are summed. */
+        tspin_doubles_replay: ck.agrees
+          ? counterRoundsFor(user, ['tspindoubles', 'minitspindoubles']) : null,
         width_ge_3: w.length,
         min_depth_ge_2: w.filter(e => e.cave!.minDepth >= 2).length,
         // Measured, six sessions: every single cave falls OUTSIDE the opener window — 0 in, 39
@@ -915,6 +1224,9 @@ function stmbCaveMetric() {
     min_depth_histogram: hist(wide.map(e => e.cave!.minDepth)),
     triple_control: {
       tspin_triples_scored: triples.length,
+      tspin_triples_replay: tspinCounterCheck().agrees
+        ? users.reduce((s, u) => s + (counterRoundsFor(u, ['tspintriples', 'minitspintriples']) ?? 0), 0)
+        : null,
       width_ge_3: triples.filter(e => e.wideGapUnderTriple).length,
     },
     means: 'how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T\'s '

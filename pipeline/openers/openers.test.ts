@@ -19,7 +19,7 @@ import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, dis
          cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS,
          loadWikiOpeners, openerPages, hasFullRow } from './match.ts';
 import { analyse } from './run-openers.ts';
-import { build, serialise, donationCols, caveAt, cavity,
+import { build, serialise, donationCols, caveAt, cavity, dualVerdict,
          DONATION_CAVITY, DONATION_WALLED_ROWS, CAVE_MIN_WIDTH } from '../sim/emit-opener-facts.ts';
 
 const cat = loadCatalogue();
@@ -473,9 +473,211 @@ const CAVE: Record<string, { width_ge_3: number; min_depth_ge_2: number; triple_
   '2026-08-14': { width_ge_3: 9, min_depth_ge_2: 0, triple_control:  9 },
 };
 
+/** THE DENOMINATOR ANCHOR, per session, as literals: the replay's own whole-round T-spin-clear
+ *  total (the twice-extracted counters summed) and what the verified prefix scores out of it.
+ *
+ *  Written out rather than recomputed for the reason the whole block above is: a test that
+ *  re-derives a value the way the code does can only catch a typo. This one has a second reason —
+ *  the anchor's failure mode is silent in the direction that looks GOOD. Were the emitter to start
+ *  reading a counter that is absent, `?? 0` on both sides would make the comparison trivially agree
+ *  and `agrees` would stay true over a corpus of zeros, which is exactly the shape of the bug that
+ *  published "no perfect clears" for five sessions holding 65. So `replay` is pinned, and the sum
+ *  is asserted against the corpus figure. */
+const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: number }> = {
+  '2026-07-22': { rounds: 158, replay: 879, scored: 795 },
+  '2026-07-24': { rounds: 100, replay: 578, scored: 544 },
+  '2026-07-28': { rounds: 128, replay: 667, scored: 626 },
+  '2026-08-01': { rounds: 106, replay: 658, scored: 612 },
+  '2026-08-09': { rounds: 100, replay: 597, scored: 565 },
+  '2026-08-14': { rounds: 168, replay: 948, scored: 893 },
+};
+
+/** THE SECOND ENGINE, per session, as literals: [both_yes, oracle_positives] for each metric, and
+ *  how far the comparison reached. The cave agrees on every positive in range and the donation on a
+ *  fifth of them — two results the OVERALL agreement rate (96%+ for both) hides completely,
+ *  because 1650 of the donation's 1659 agreements are two engines saying "no". */
+const DUAL: Record<string, { comparable: number; scored: number; sameBoard: number;
+                             cave: [number, number]; don: [number, number] }> = {
+  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [2, 7] },
+  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [2, 9] },
+  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [0, 6] },
+  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 9] },
+  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [3, 5] },
+  '2026-08-14': { comparable: 373, scored: 893, sameBoard: 197, cave: [3, 3], don: [0, 7] },
+};
+
 const facts = (s: string) =>
   JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+test('the second engine agrees on every cave and on a quarter of the donations', () => {
+  let cavePos = 0, caveHit = 0, donPos = 0, donHit = 0, bothNo = 0;
+  let comparable = 0, scored = 0;
+  for (const s of SESSIONS) {
+    const f = facts(s);
+    const d = f.donation.dual_engine;
+    const want = DUAL[s]!;
+    // the same block is embedded under both metrics and must be the same object
+    expect(JSON.stringify(f.stmb_cave.dual_engine)).toBe(JSON.stringify(d));
+    expect([s, d.locks_comparable]).toEqual([s, want.comparable]);
+    expect([s, d.locks_scored]).toEqual([s, want.scored]);
+    // a check reaching everything would mean the hand-port's prefix had stopped being the limit,
+    // which is a change of premise rather than an improvement — it must fail here first
+    expect(d.locks_comparable).toBeLessThan(d.locks_scored);
+
+    for (const [k, w] of [['cave', want.cave], ['donation', want.don]] as const) {
+      const m = d[k];
+      expect([s, k, m.agreement_on_positives]).toEqual([s, k, w]);
+      expect([s, k, m.both_yes + m.oracle_only]).toEqual([s, k, m.oracle_positives]);
+      // the four cells partition the comparable locks
+      expect(m.both_yes + m.oracle_only + m.other_only + m.both_no).toBe(d.locks_comparable);
+      expect(m.agreement_overall).toEqual([m.both_yes + m.both_no, d.locks_comparable]);
+    }
+    cavePos += d.cave.oracle_positives; caveHit += d.cave.both_yes;
+    donPos += d.donation.oracle_positives; donHit += d.donation.both_yes;
+    bothNo += d.donation.both_no;
+    comparable += d.locks_comparable; scored += d.locks_scored;
+  }
+  // THE TWO CORPUS FIGURES, and the gap between them is the finding.
+  expect([caveHit, cavePos]).toEqual([16, 16]);      // every cave in range, both engines
+  expect([donHit, donPos]).toEqual([9, 43]);         // four donations in five disagree
+  expect([comparable, scored]).toEqual([1719, 4035]);
+
+  // …and the reason neither number may be quoted as an overall rate: the donation's 96.7% is
+  // almost entirely two engines agreeing that nothing happened. Asserted rather than commented,
+  // so a future change that makes the overall rate meaningful has to restate this.
+  const overallAgree = donHit + bothNo;
+  expect(bothNo / overallAgree).toBeGreaterThan(0.99);
+  expect(donHit / donPos).toBeLessThan(0.3);
+
+  // The cave result is REAL but PARTIAL, and the second half is what keeps it in quarantine: the
+  // corpus holds 39 wide gaps and only 16 are reachable by a second engine.
+  const allCaves = sum(SESSIONS.map(s => sum(facts(s).stmb_cave.players.map((p: any) => p.width_ge_3))));
+  expect(allCaves).toBe(39);
+  expect(cavePos).toBeLessThan(allCaves);
+});
+
+test('the board split is what makes the donation 9/43 readable, and it is not the cave\'s story', () => {
+  // WHY THIS IS A SEPARATE TEST. `agreement_on_positives` says the two engines disagree about three
+  // donations in four; it does not say WHY. Splitting the positives by whether the other engine had
+  // the same board answers it — and answers it differently for the two metrics, which is why the
+  // section may not word them alike.
+  let same = 0, comparable = 0;
+  const agg = { don: [0, 0, 0, 0], cave: [0, 0, 0, 0] };  // [posSame, posDiff, agreeSame, agreeDiff]
+  for (const s of SESSIONS) {
+    const d = facts(s).donation.dual_engine;
+    expect([s, d.locks_same_board]).toEqual([s, DUAL[s]!.sameBoard]);   // pinned, never re-derived
+    same += d.locks_same_board; comparable += d.locks_comparable;
+    for (const k of ['don', 'cave'] as const) {
+      const b = d.board_split[k];
+      const m = d[k === 'don' ? 'donation' : 'cave'];
+      // the split must partition the SAME positives the confusion matrix counted, or the two blocks
+      // are describing different populations while sitting in one object
+      expect([s, k, b.positives_same_board + b.positives_diff_board]).toEqual([s, k, m.oracle_positives]);
+      expect([s, k, b.agree_same_board + b.agree_diff_board]).toEqual([s, k, m.both_yes]);
+      agg[k][0] += b.positives_same_board; agg[k][1] += b.positives_diff_board;
+      agg[k][2] += b.agree_same_board;     agg[k][3] += b.agree_diff_board;
+    }
+  }
+  // At 42% of the comparison points the two engines are judging DIFFERENT boards. Every figure in
+  // dual_engine has to be read inside that.
+  expect([same, comparable]).toEqual([992, 1719]);
+
+  // THE DONATION: where the boards agree the verdicts agree perfectly, and where they differ they
+  // mostly do not. So the disagreement is the BOARD (oracle-source.ts's garbage-hole columns), not
+  // the predicate — the opposite of what "the two engines disagree about donations" sounds like.
+  expect(agg.don).toEqual([6, 37, 6, 3]);
+  expect(agg.don[2]).toBe(agg.don[0]);                    // 6 of 6 on identical boards
+  expect(agg.don[3] * 3).toBeLessThan(agg.don[1]);        // 3 of 37 on boards that differ
+
+  // THE CAVE: a different statement, and it must not be worded like the donation's. Its verdict
+  // survives boards that differ (13 of 13), which is ROBUSTNESS — consistent with the drift sitting
+  // in low garbage rows while the cave is local to the spin. It is not evidence of correctness.
+  expect(agg.cave).toEqual([3, 13, 3, 13]);
+  expect(agg.cave[3]).toBe(agg.cave[1]);
+});
+
+test('dualVerdict refuses a lock its own engine contradicts, and refuses one it cannot check', () => {
+  // THE TEETH FOR THE STRONG LICENCE. Reverting to the index lookup or off-by-one-ing the frame is
+  // already caught by the byte-identity gate (locks_comparable collapses 1719 -> 0). What that gate
+  // CANNOT catch is weakening the licence itself: dropping back to `rows.length === lk.cleared`, or
+  // comparing only the LENGTH of clearedRows, leaves all five artefacts byte-identical on this
+  // corpus. Both are killed here, on synthetic boards, because no real lock exercises them.
+  const H = 40, W = 10;
+  const board = () => Array.from({ length: H }, (_, r) =>
+    Array.from({ length: W }, (_, c) => (r === 38 && c < 9 ? 'X' : null)));
+  const lk = { piece: 'T', spin: 'full', cleared: 1, frame: 100,
+               cells: [{ row: 38, col: 9 }, { row: 37, col: 9 }, { row: 37, col: 8 }] };
+  const at = (records: { frame: number; clearedRows: number[] }[]) =>
+    dualVerdict({ locks: [{ ...lk, frame: 1 }, lk], boards: [board(), board()], records }, 1);
+
+  // the board makes row 38 full; the engine's own record says it cleared row 37. Same LENGTH,
+  // different CONTENT — a length-only compare waves this through.
+  expect(at([{ frame: 100, clearedRows: [37] }])).toBeNull();
+  // no record at the lock's frame: UNKNOWN, compared against nothing.
+  expect(at([])).toBeNull();
+  // …and the licence is not simply refusing everything: the honest version of the same lock passes.
+  expect(at([{ frame: 100, clearedRows: [38] }])).not.toBeNull();
+
+  // NOT ASSERTED, DELIBERATELY: that a missing record is excluded rather than read as `[]`. A lock
+  // with cleared > 0 always makes at least one row full, so an empty `theirs` can never match and
+  // the two spellings return null for every possible input. It is an equivalent mutant, not a gap —
+  // writing a test that appeared to cover it would be writing for the checker.
+});
+
+test('the denominator is anchored to the replay\'s own twice-extracted T-spin counters', () => {
+  let rounds = 0, agreeing = 0, simTotal = 0, replayTotal = 0, scored = 0;
+  for (const s of SESSIONS) {
+    const f = facts(s);
+    const a = f.donation.counter_anchor;
+    const want = TSPIN_ANCHOR[s]!;
+
+    // every player-round checked, none unknown, and every one of them agreeing
+    expect([s, a.player_rounds]).toEqual([s, want.rounds]);
+    expect([s, a.checked]).toEqual([s, want.rounds]);
+    expect([s, a.unknown_rounds]).toEqual([s, 0]);
+    expect([s, a.rounds_agreeing]).toEqual([s, want.rounds]);
+    expect([s, a.agrees]).toEqual([s, true]);
+    // a T-spin clear of a kind no counter names would be dropped from the SIM side only, which
+    // makes agreement easier — so it is asserted at zero rather than trusted
+    expect([s, a.unclassified_sim_clears]).toEqual([s, 0]);
+
+    // the two totals, pinned. Not `sim === replay` alone: two zeros satisfy that.
+    expect([s, a.tspin_clears_replay]).toEqual([s, want.replay]);
+    expect([s, a.tspin_clears_sim]).toEqual([s, want.replay]);
+    expect([s, a.tspin_clears_scored]).toEqual([s, want.scored]);
+    expect(a.tspin_clears_replay).toBeGreaterThan(0);
+
+    // the anchor covers the licensing denominator, and the prefix is a SUBSET of the whole round
+    expect([s, a.tspin_clears_scored]).toEqual([s, f.donation.check.tspin_clears]);
+    expect(a.tspin_clears_scored).toBeLessThanOrEqual(a.tspin_clears_replay);
+
+    // the per-kind tallies partition the total, and each kind agrees in every round
+    expect(sum(Object.values(a.by_kind).map((k: any) => k.replay))).toBe(a.tspin_clears_replay);
+    expect(sum(Object.values(a.by_kind).map((k: any) => k.sim))).toBe(a.tspin_clears_sim);
+    for (const [kind, k] of Object.entries<any>(a.by_kind))
+      expect([s, kind, k.rounds_agreeing]).toEqual([s, kind, want.rounds]);
+
+    // the per-player columns the section prints must add up to the same two numbers
+    expect([s, sum(f.donation.players.map((p: any) => p.tspin_clears_replay))])
+      .toEqual([s, want.replay]);
+    expect(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_replay)))
+      .toBe(a.by_kind.tspindoubles.replay + a.by_kind.minitspindoubles.replay);
+    expect(f.stmb_cave.triple_control.tspin_triples_replay)
+      .toBe(a.by_kind.tspintriples.replay + a.by_kind.minitspintriples.replay);
+    // the cave metric is a subset of the doubles it is scored over
+    expect(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_scored)))
+      .toBeLessThanOrEqual(sum(f.stmb_cave.players.map((p: any) => p.tspin_doubles_replay)));
+
+    rounds += a.player_rounds; agreeing += a.rounds_agreeing;
+    simTotal += a.tspin_clears_sim; replayTotal += a.tspin_clears_replay; scored += a.tspin_clears_scored;
+  }
+  // The corpus figure this whole change rests on, stated once: the simulator reproduces the
+  // replay's own T-spin counters on every player-round of every session, and the verified prefix
+  // the two tables score covers 4035 of those 4327 clears.
+  expect([rounds, agreeing]).toEqual([760, 760]);
+  expect([simTotal, replayTotal, scored]).toEqual([4327, 4327, 4035]);
+});
 
 test('the donation counts are pinned per session, and the licensing check is clean', () => {
   for (const s of SESSIONS) {
@@ -730,8 +932,10 @@ function runAt(g: boolean[][], row: number, cols: Set<number>) {
 
 test('the donation rate is nowhere near the naive reading, in every session', () => {
   // The naive reading — "the well column was filled through the rows the spin cleared" — is FORCED
-  // BY ARITHMETIC (a full row requires every column filled) and fires on 70-89% of all T-spin
-  // clears. What is counted is the RE-OPENING clause on top of it. If the published rate ever
+  // BY ARITHMETIC (a full row requires every column filled) and so fires on 100% of all T-spin
+  // clears; proved as `NaiveClauseForced` in spec/DonationCave.dfy. As a predicate at the shipped
+  // thresholds with the re-opening clause deleted it fires on 29-34%.
+  // What is counted is the RE-OPENING clause on top of it. If the published rate ever
   // approached the naive one, the clause would have stopped doing the work and the metric would be
   // a line-clear counter. Measured: 2.0-3.3% across the six sessions.
   for (const s of SESSIONS) {
@@ -781,9 +985,9 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
   // Every setup harddrop draws, with ONE extra cell: the well column also filled ABOVE the rows the
   // spin clears. The shape is otherwise untouched — same plug, same walled cavity beneath, same
   // cleared rows — but the clear no longer re-opens the column to the surface, so the plug is a wall
-  // and not a loan. This is the one clause carrying the whole metric (the naive reading without it
-  // fires on 70-89% of all T-spin clears), and it is asserted by BEHAVIOUR rather than by editing
-  // the source.
+  // and not a loan. This is the one clause carrying the whole metric (the naive clause without it is
+  // forced by arithmetic and fires on 100%; the naive predicate at the shipped thresholds fires on
+  // 29-34%), and it is asserted by BEHAVIOUR rather than by editing the source.
   //
   // Derived from the committed transcription rather than typed out, for the same reason the controls
   // are: a board written down twice is a board that can drift, and a mutation board that had drifted
