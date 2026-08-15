@@ -47,9 +47,16 @@ garbage).
 `driftmap.mjs` prints per-session `%exact` (bit-exact locks, sim vs oracle) and lists cases that diverge
 before the final 20% of the round. It is a **disagreement map, not a certified sim-bug list**:
 
-- Corpus-wide `%exact` ≈ 63.3% (was 39.5% before the `hoisted`-DAS and iid hole-pairing fixes), and
-  95.3% over the verified prefix alone — the whole-round figure is dragged down by the topout flood past
-  the prefix.
+- Corpus-wide `%exact` ≈ 85.6% (measured 2026-08-15, `bun driftmap.mjs`, six sessions, 34311/40064 locks —
+  was 39.5% before the `hoisted`-DAS and iid hole-pairing fixes, 63.3% before the later sim fixes that
+  followed: documented garbagespeed, the garbage-cancel protocol port, and locktime 60→30), and 97.9%
+  over the verified prefix alone (19803/20226 locks, `bun driftmap.mjs --prefix`) — the whole-round
+  figure is dragged down by the topout flood past the prefix.
+- **97.9% here is not the 96.2% in the dual-backed section below**, and the two must not be quoted
+  interchangeably even though they share a denominator (20226). This one counts a lock if it matches
+  **individually**; `cross-extract.mjs` counts only the **contiguous** agreeing prefix, stopping at the
+  first divergence, so it is always the lower of the two. "Bit-exact over the verified prefix" is
+  ambiguous between them — say which.
 - Options are identical across files, so early divergences are **not** a per-game ruleset mismatch; they
   are genuine sim-vs-oracle *model* differences (movement/handling edge cases). Which engine is right at
   any given divergence needs a **live spot-check** for that round.

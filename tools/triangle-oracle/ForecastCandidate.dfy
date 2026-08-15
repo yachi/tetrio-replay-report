@@ -11,10 +11,17 @@
 // Reproduce: tools/triangle-oracle/probe-resolve-candidates.mjs (frame ordering) and
 // probe-oracle-verify.mjs (attack-stream match).
 //
-// Clause-2 (floorOrigin) verdict for the three full-round forecast_lineclear candidates the Triangle
-// oracle finds over the five sessions, decided from ground-truth recorded frames + documented
-// garbagespeed=20 ALONE — the linkage from frames to verdict is PROVEN, not asserted in comments.
-// This is the exact part of the forecast decision that provenance reconstruction left unstable.
+// Clause-2 (floorOrigin) verdict for three of the full-round forecast_lineclear candidates the Triangle
+// oracle finds, decided from ground-truth recorded frames + documented garbagespeed=20 ALONE — the
+// linkage from frames to verdict is PROVEN, not asserted in comments. This is the exact part of the
+// forecast decision that provenance reconstruction left unstable.
+//
+// These three were all `oracle-forecast.mjs` finds over the five-session corpus it was written against
+// (2026-08-11). Re-running that scan on 2026-08-15's six-session corpus (`bun oracle-forecast.mjs`)
+// finds a FOURTH full-round forecast_lineclear candidate: 2026-08-14 yachi 2026-08-14-10 r2 lock19.
+// It has NO lemma below — the ground-truth frame-ordering resolution this file does for A/B/C has not
+// been run against it, so its clause-2 verdict is UNPROVEN. Do not read "the three candidates" as
+// exhaustive over the current corpus.
 //
 // Model of forecast.ts:floorOrigin garbage branch (lines 333-343), for a garbage support cell:
 //   after   := (no garbage present at the roof frame)      => it must have arrived later
@@ -29,7 +36,15 @@
 datatype Origin = PreExisted | ArrivedLater | Undetermined
 datatype Batch = Batch(confirm: int)
 
-const SPEED: int := 20   // documented garbagespeed; also the verified-prefix sweep optimum in all 5 sessions
+// documented garbagespeed. Measured 2026-08-15 (`bun drift-speed-sweep.mjs`'s per-session table, six
+// sessions): the verified-prefix sweep's outright peak in 4 of 6 sessions (07-22, 07-24, 07-28,
+// 08-14) and TIED for peak in the other 2 (2026-08-01 ties speed 18 at 2793 locks each; 2026-08-09
+// ties speed 22 at 2740 locks each) — a reversal of this file's original (2026-08-11, five-session)
+// claim that 20 was the sweep peak in all five, which drift-speed-sweep.mjs's own history shows was
+// NOT true when written (the sweep then peaked at ~28, never 20); later sim fixes
+// (documented-garbagespeed default, the garbage-cancel protocol port, locktime 60->30) are what made
+// it true. See drift-speed-sweep.mjs.
+const SPEED: int := 20
 
 function InsertLB(b: Batch): int { b.confirm + SPEED }   // earliest possible insertion frame
 
@@ -91,8 +106,12 @@ lemma CandidateC_ArrivedLater()
   ensures PlacerVerdict(11, 6) == ArrivedLater
 { assert 11 > 6; }
 
-// ── Headline: exactly ONE candidate is clause-2 PreExisted, decided by recorded frames alone ─────────
-lemma ExactlyOnePreExisted()
+// ── Headline: of candidates A/B/C, exactly ONE is clause-2 PreExisted, decided by recorded frames
+// alone. This ranges over A/B/C ONLY — the three the ground-truth frame-ordering resolution above was
+// run against. A fourth full-round forecast_lineclear candidate (2026-08-14 yachi 2026-08-14-10 r2
+// lock19, noted above) is NOT covered: its clause-2 verdict is UNPROVEN, so it is neither asserted
+// PreExisted nor asserted otherwise here. Do not read this lemma as ranging over the full corpus.
+lemma ExactlyOnePreExistedAmongABC()
   ensures Verdict(true, false) == PreExisted    // A: the real forecast (no straddle, present at roof)
   ensures Verdict(true, true)  != PreExisted    // B: survivor, a real straddle => undetermined
   ensures PlacerVerdict(11, 6) != PreExisted    // C: arrived-later (placer support postdates the roof)

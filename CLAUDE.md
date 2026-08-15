@@ -281,12 +281,26 @@ Three consequences:
   middle window [C001]. Per-match, m9 is the only one of eleven where his attack per piece beats
   pinglamb's [C019].
 
-**`equiv.py` reports 100% for 07-28 and the number is an artefact** — read it before quoting
-it. It tries every *single*-value mutation, and a windowed claim shares its rounds with a
-session total, so nothing it can try falsifies one without the other. Two changes break the
-tie: moving 120 pieces from a match-3 round to a match-1 round keeps `total_pieces`,
-`total_garbage_attack` and C008 true while flipping C005 false. Extending it to
-value-preserving two-site moves is the obvious next step and is not done.
+**`equiv.py`'s single-value 100% for 07-28 was an artefact, and `--two-site` now measures it
+as 60%.** A windowed claim shares its rounds with the session total meant to imply it, so no
+*single*-value mutation falsifies one without the other. Two changes break the tie: moving
+pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
+and C008 true while flipping C005 false. The second family does exactly that, and the four
+claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones. Per-session:
+07-22 85% → 83%, 07-24 98% → 98% (unmoved), 07-28 100% → **60%**.
+
+**The delta is HALF the source, and that is not a detail.** The first implementation moved the
+whole value, leaving every source round at 0 — 145 615 of 145 615 moves — so its evidence was
+rounds like `pieces=0, lines=48, lifetime=65591`, which no extractor can emit. It also made
+both its asserts tautologies (`(va-d)+(vb+d)==va+vb` is an integer identity; `va-d>=0` with
+`d==va` is `0>=0`), i.e. decorative guards sitting under a comment claiming the very standard
+the code broke. And it *inflated* the result: 07-24 read 96% under whole-value moves against
+98% under legal ones. Sources below 2 are dropped and counted. The surviving guard
+(`1 <= d <= va - 1`) is unreachable by data and guards the delta *rule* — mutate it to `d = va`
+and it fires, which is the mutation test that licenses keeping it.
+
+`--two-site` is off by default; `match` granularity is an upper bound on coverage and `round`
+must be re-run before publishing a figure.
 
 07-28's own finding is about *change over a night*, which no earlier session asked: yachi won
 the first two matches and lost six straight, but his rate did not collapse — in matches 1-2 the

@@ -25,6 +25,19 @@
 // borderline and reconstruction-sensitive, and confirming them needs a 100%-bit-exact full board history,
 // which this reconstruction approaches (99%) but does not reach for these ultra-sensitive cases. The
 // earlier "truncation hid a forecast" claim was premature; this is the corrected, honest terminus.
+//
+// SUPERSEDED the same night: ForecastCandidate.dfy resolves clause 2 for these candidates by DIRECT
+// FRAME ORDERING against recorded ground-truth confirm frames (bypassing the unstable provenance
+// reconstruction above entirely), so the "UNRESOLVED" in the CONCLUSION above no longer holds — read
+// ForecastCandidate.dfy for the current, proven verdicts. The figures in this comment block (142/144,
+// 330 vs 328, 1 in 654, 99%) are a dated snapshot of the 2026-08-11 investigation over the then-five-
+// session corpus and are NOT re-derived here — re-run `bun oracle-forecast.mjs` for today's live
+// numbers. Doing so on 2026-08-15 (six sessions) gives PHASE 1 rounds=205, T-spin exact-agree 204/205
+// (100%), totals sim=549 oracle=548, and PHASE 2 finds 4 full-round forecast_lineclear candidates (not
+// 2-3): the three named in ForecastCandidate.dfy, plus a NEW one this file's driver has not yet been
+// run against ForecastCandidate.dfy's ground-truth-frame-ordering method: 2026-08-14 yachi
+// 2026-08-14-10 r2 lock19 forecast_lineclear (sim topped out @22 locks). It is UNPROVEN here — no
+// clause-2 lemma exists for it yet.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Classes } from "@haelp/teto";

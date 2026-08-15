@@ -1,8 +1,15 @@
-// Drill the DOMINANT drift-cut cause: "sim-shorter" (45%) — the sim produces fewer sent-attacks than
-// the real player, with no mismatch in the overlap. Is it a BUG (sim under-produces / tops out early
-// from over-inserted garbage) or CORRECT (the player is the round's loser, so the sim rightly ends when
-// they die)? Discriminator: alive (did the player survive?) + sim.topout + how far short + how early the
-// sim's simulation ends vs the round length.
+// Drill the DOMINANT drift-cut cause: "sim-shorter" (53.6%, six sessions, 407/760 — measured 2026-08-15
+// via `bun drift-cut.mjs`) — the sim produces fewer sent-attacks than the real player, with no mismatch
+// in the overlap. Is it a BUG (sim under-produces / tops out early from over-inserted garbage) or
+// CORRECT (the player is the round's loser, so the sim rightly ends when they die)? Discriminator:
+// alive (did the player survive?) + sim.topout + how far short + how early the sim's simulation ends
+// vs the round length.
+//
+// This 53.6% was 45% over the five-session corpus before later sim fixes (documented-garbagespeed
+// default, the garbage-cancel protocol port, locktime 60->30) — NOT because of the sixth session.
+// Re-running drift-cut.mjs's own classification restricted to the SAME five sessions gives 53.5% today
+// (317/592), and 2026-08-14 alone is 53.6% (90/168): the 8.5-point move from 45% to 53.6% is almost
+// entirely those later sim fixes, and adding 2026-08-14 moves the corpus rate by only ~0.1 point.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { loadCases, runCase } from "../../pipeline/sim/verified-prefix.ts";
