@@ -545,6 +545,55 @@ lemma G077_7_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_2_of_t
 {
 }
 
+// G078 [intense_round_profile] most intense round m8r8 — yachi: apm_x1000 78639, pps_x1000 1531, vs_x1000 157278, pieces 111, garbage_attack 95, garbagesent 84, garbagereceived 31, garbage_cleared 19, lines 59, maxspike 14, topbtb 7, inputs 410, finesse_faults 17, finaltime_ms 72733
+// 最癲嘅一局（m8 第 8 局）yachi 嘅數：APM 約 78.6、PPS 約 1.53、VS 約 157.2、粒數 111、攻擊 95、射埋 84、食 31、清走 19、行數 59、最大單波 14、最高 B2B 7、入力 410、手順失誤 17、佢自己嘅時間 約 72 秒
+lemma G078_most_intense_round_m8r8_yachi_apm_x1000_78639_pps_x1000_1531_vs_x1000()
+  ensures ((((m7_r7_yachi_apm == 78639) && ((m7_r7_yachi_pps == 1531) && (m7_r7_yachi_vs == 157278))) && (((m7_r7_yachi_pieces == 111) && (m7_r7_yachi_garbage_attack == 95)) && ((m7_r7_yachi_garbagesent == 84) && (m7_r7_yachi_garbagereceived == 31)))) && ((((m7_r7_yachi_garbage_cleared == 19) && (m7_r7_yachi_lines == 59)) && ((m7_r7_yachi_maxspike == 14) && (m7_r7_yachi_topbtb == 7))) && (((m7_r7_yachi_inputs == 410) && (m7_r7_yachi_finesse_faults == 17)) && ((m7_r7_yachi_finaltime_ms == 72733) && (m7_r7_winner == "yachi")))))
+{
+}
+
+// G079 [intense_round_profile] most intense round m8r8 — pinglamb: apm_x1000 50494, pps_x1000 1352, vs_x1000 129685, pieces 98, garbage_attack 61, garbagesent 31, garbagereceived 78, garbage_cleared 33, lines 68, maxspike 10, topbtb 2, inputs 359, finesse_faults 30, finaltime_ms 72485
+// 最癲嘅一局（m8 第 8 局）pinglamb 嘅數：APM 約 50.4、PPS 約 1.35、VS 約 129.6、粒數 98、攻擊 61、射埋 31、食 78、清走 33、行數 68、最大單波 10、最高 B2B 2、入力 359、手順失誤 30、佢自己嘅時間 約 72 秒
+lemma G079_most_intense_round_m8r8_pinglamb_apm_x1000_50494_pps_x1000_1352_vs_x10()
+  ensures ((((m7_r7_pinglamb_apm == 50494) && ((m7_r7_pinglamb_pps == 1352) && (m7_r7_pinglamb_vs == 129685))) && (((m7_r7_pinglamb_pieces == 98) && (m7_r7_pinglamb_garbage_attack == 61)) && ((m7_r7_pinglamb_garbagesent == 31) && (m7_r7_pinglamb_garbagereceived == 78)))) && ((((m7_r7_pinglamb_garbage_cleared == 33) && (m7_r7_pinglamb_lines == 68)) && ((m7_r7_pinglamb_maxspike == 10) && (m7_r7_pinglamb_topbtb == 2))) && (((m7_r7_pinglamb_inputs == 359) && (m7_r7_pinglamb_finesse_faults == 30)) && ((m7_r7_pinglamb_finaltime_ms == 72485) && (m7_r7_winner == "yachi")))))
+{
+}
+
+// G080 [intense_round_edges] m8r8 winner yachi trailed on 1 attacking columns: 行數
+// 最癲嘅一局係 yachi 贏，但佢喺 行數 呢 1 樣係落後嘅——贏嗰個唔係攻得最多嗰個
+lemma G080_m8r8_winner_yachi_trailed_on_1_attacking_columns()
+  ensures ((((m7_r7_winner == "yachi") && (m7_r7_yachi_apm > m7_r7_pinglamb_apm)) && ((m7_r7_yachi_pps > m7_r7_pinglamb_pps) && (m7_r7_yachi_pieces > m7_r7_pinglamb_pieces))) && (((m7_r7_yachi_garbage_attack > m7_r7_pinglamb_garbage_attack) && (m7_r7_yachi_maxspike > m7_r7_pinglamb_maxspike)) && ((m7_r7_yachi_topbtb > m7_r7_pinglamb_topbtb) && (m7_r7_yachi_lines < m7_r7_pinglamb_lines))))
+{
+}
+
+// G081 [intense_round_attack_rate] m8r8 attack per piece: yachi 0.855, pinglamb 0.622
+// 最癲嘅一局每粒棋嘅攻擊：yachi 約 0.855、pinglamb 約 0.622——yachi 高
+lemma G081_m8r8_attack_per_piece_yachi_0_855_pinglamb_0_622()
+  ensures (((m7_r7_winner == "yachi") && (94905 <= (1000 * m7_r7_yachi_garbage_attack) && (1000 * m7_r7_yachi_garbage_attack) < 95016)) && ((60956 <= (1000 * m7_r7_pinglamb_garbage_attack) && (1000 * m7_r7_pinglamb_garbage_attack) < 61054) && ((m7_r7_yachi_garbage_attack * 98) > (m7_r7_pinglamb_garbage_attack * 111))))
+{
+}
+
+// G082 [intense_round_downstack_rate] m8r8 downstack per piece: yachi 0.171, pinglamb 0.336
+// 最癲嘅一局每粒棋嘅清走：yachi 約 0.171、pinglamb 約 0.336——pinglamb 高
+lemma G082_m8r8_downstack_per_piece_yachi_0_171_pinglamb_0_336()
+  ensures (((m7_r7_winner == "yachi") && (18981 <= (1000 * m7_r7_yachi_garbage_cleared) && (1000 * m7_r7_yachi_garbage_cleared) < 19092)) && ((32928 <= (1000 * m7_r7_pinglamb_garbage_cleared) && (1000 * m7_r7_pinglamb_garbage_cleared) < 33026) && ((m7_r7_yachi_garbage_cleared * 98) < (m7_r7_pinglamb_garbage_cleared * 111))))
+{
+}
+
+// G083 [intense_round_vs_split] m8r8 yachi VS splits into attack 130.6 + downstack 26.1, residual under 0.55
+// 最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 130.6、清垃圾嗰邊約 26.1，兩邊加埋同佢實際 VS 約 157.2 相差唔夠 0.55
+lemma G083_m8r8_yachi_vs_splits_into_attack_130_6_downstack_26_1_residual_under_0()
+  ensures ((-39300774 <= ((m7_r7_yachi_vs * m7_r7_yachi_finaltime_ms) - (100000000 * (m7_r7_yachi_garbage_attack + m7_r7_yachi_garbage_cleared))) && ((m7_r7_yachi_vs * m7_r7_yachi_finaltime_ms) - (100000000 * (m7_r7_yachi_garbage_attack + m7_r7_yachi_garbage_cleared))) < 39300775) && ((9499948062 <= (100000000 * m7_r7_yachi_garbage_attack) && (100000000 * m7_r7_yachi_garbage_attack) < 9500020795) && (1899931426 <= (100000000 * m7_r7_yachi_garbage_cleared) && (100000000 * m7_r7_yachi_garbage_cleared) < 1900004159)))
+{
+}
+
+// G084 [intense_round_vs_split] m8r8 pinglamb VS splits into attack 84.1 + downstack 45.5, residual under 0.01
+// 最癲嘅一局 pinglamb 嘅 VS 拆得開兩邊：攻嗰邊約 84.1、清垃圾嗰邊約 45.5，兩邊加埋同佢實際 VS 約 129.6 相差唔夠 0.01
+lemma G084_m8r8_pinglamb_vs_splits_into_attack_84_1_downstack_45_5_residual_under()
+  ensures ((-217225 <= ((m7_r7_pinglamb_vs * m7_r7_pinglamb_finaltime_ms) - (100000000 * (m7_r7_pinglamb_garbage_attack + m7_r7_pinglamb_garbage_cleared))) && ((m7_r7_pinglamb_vs * m7_r7_pinglamb_finaltime_ms) - (100000000 * (m7_r7_pinglamb_garbage_attack + m7_r7_pinglamb_garbage_cleared))) < 217226) && ((6099975175 <= (100000000 * m7_r7_pinglamb_garbage_attack) && (100000000 * m7_r7_pinglamb_garbage_attack) < 6100047660) && (3299952110 <= (100000000 * m7_r7_pinglamb_garbage_cleared) && (100000000 * m7_r7_pinglamb_garbage_cleared) < 3300024595)))
+{
+}
+
 // C001 [?] yachi won the first two matches, pinglamb won all six after
 // 成晚嘅形狀：yachi 贏晒頭兩場，跟住 pinglamb 一口氣連贏埋落嚟六場
 lemma C001_yachi_won_the_first_two_matches_pinglamb_won_all_six_after()

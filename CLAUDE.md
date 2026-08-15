@@ -6,7 +6,7 @@ Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where eve
 factual sentence is badge-linked to a Dafny-verified lemma. Six sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
 2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0 · 2026-08-14: pinglamb 7:4),
-380 rounds, 164 hand-written + 464 generated claims. 2026-08-14 is the largest
+380 rounds, 164 hand-written + 526 generated claims. 2026-08-14 is the largest
 session by both matches (11) and rounds (84).
 
 ## The one invariant
@@ -471,6 +471,54 @@ clear and that player lost 34 of them** — the AUC block above says the same th
 denominators are 3-12 rounds per player, and a percentage over three rounds reads far more confident
 than the data is. Two more controls it may not lose: 全消次數 ≠ 有全消嘅局 (a round can hold two), and
 "whether" is facts.json while "when" is the simulator's, in the quarantined section below.
+
+## 最癲一局 — one round, deep-dived, and why it needed no new operator
+
+`pipeline/intense_round.py`, region `intense-round`, **inside** the trust chain. The round is the one
+`most_intense_round` already selects — highest combined VS among rounds of `QUALIFYING_MS` or more —
+via the shared `generators._intense_round`, so the section and the claim that announces it cannot
+describe different rounds. Seven new families per session (`intense_round_profile` ×2, `_edges`,
+`_attack_rate`, `_downstack_rate`, `_vs_split` ×2); every printed figure is read back out of the
+proved spec by `intense_round.py`'s readers, never re-derived.
+
+**The selected round is often won by the player losing the attacking exchange**, which is the reason
+the section exists: 逐局全數據 gives every round the same row and explains none.
+
+| session | round | winner trailed on | DS/piece W:L |
+|---|---|---|---|
+| 07-22 | m1r5 | APM, attack, maxspike, **APP** | ×2.00 |
+| 07-24 | m6r8 | APM, attack, maxspike, topbtb, **APP** | ×2.20 |
+| 07-28 | m8r8 | lines | ×0.51 |
+| 08-01 | m7r3 | topbtb | ×1.12 |
+| 08-09 | m5r7 | **nothing — led on everything** | ×0.82 |
+| 08-14 | m11r2 | APM, PPS, pieces, attack, maxspike, topbtb | ×1.81 |
+
+08-09 is why the generator has two shapes. A section that only had the dramatic sentence would be
+writing for the sessions it liked; the flat case prints「呢局冇得拗」 as the result it is.
+
+**Two idioms worth reusing, both of which the algebra already supported.** The algebra has no
+division, so a derived rate is *pinned* — not merely compared — by bounding the numerator against the
+denominator: `v = floor(1000·num/den)` iff `v·den <= 1000·num < (v+1)·den`, one `between`. It has
+teeth because the band is `den` wide while a one-unit change to `num` moves the left side by 1000.
+And `|d| <= ε` is `between(d, -ε, ε+1)` — `between` is `lo <= x < hi` in all three backends.
+
+**The VS split is a BOUND, never an equality, and that wording is load-bearing.** `vs_x1000 ·
+finaltime_ms == 10⁸ · (garbage_attack + garbage_cleared)` is an identity *observed in this data*;
+TETR.IO publishes no such formula and this repo must not assert one. Corpus-wide the residual is
+median 1.1e-4 for the player who died but reaches **13.4%** for a survivor, so `intense_round_vs_split`
+**skips any player whose residual reaches half a unit** rather than print a bound wide enough to
+swallow a line of attack. On the six selected rounds the worst residual is 0.489 of a one-unit change,
+which is also what makes every one of them mutation-killable.
+
+Two gate gaps the new figures exposed, both now closed in `check_prose_figures.pools`: it had no
+per-*round* derived rates (only session aggregates), and its seconds pool held `lifetime` but not
+`finaltime_ms` — 169748 ms floors to 169 and no `lifetime` in that session does. A correctly floored
+figure that resolves against nothing is the state the gate cries wolf from.
+
+**Every column in `_INTENSE_EDGES` must also be a row the section prints.** In-game `score` was in it
+and is not now: it has no row (it rewards drop distance, so it is not an attack proxy), which made the
+claim count seven trailing columns while the table could only mark six — and the section's sentence
+points *at* the marked cells. Caught by reading the rendered page, not by any gate.
 
 ## 捐窿 同 STMB Cave — two techniques that are not openers, and the arithmetic trap under one
 

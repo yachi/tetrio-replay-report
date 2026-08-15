@@ -24,7 +24,7 @@ import os
 import sys
 
 from pipeline import (appendix, chart_data, claim_cards, coaching, forecast_section, hero,
-                      matches, moments, opener_section, pc_section, records, region,
+                      intense_round, matches, moments, opener_section, pc_section, records, region,
                       stats_section)
 
 
@@ -69,6 +69,12 @@ def coaching_section(ctx):
 
 def records_section(ctx):
     return records.build(ctx["facts"], ctx["report_dir"])
+
+
+def intense_sec(ctx):
+    """最癲一局 — the highest-combined-VS round, deep-dived. None when the session has
+    no qualifying round, or no `intense_round_*` claims to read the figures out of."""
+    return intense_round.build(ctx["facts"], ctx["report_dir"])
 
 
 def pc_sec(ctx):
@@ -124,6 +130,11 @@ SECTIONS = [
     # "inserted: perfect-clear" and the finished file contains nothing, because coaching
     # replaced the span the block had just been placed in. Anchor on a marker, which is
     # by definition outside every other region.
+    # 最癲一局 sits between the records grid and 全消: both are round-level blocks, and
+    # this one explains a single round where 全場之最 ranks every round on one column.
+    # Anchored on the 全消 region's BEGIN marker — a marker comment, never a
+    # `<section id=...>` tag, which would put it inside a span a later pass rewrites.
+    ("intense-round", '<!-- BEGIN generated perfect-clear', intense_sec, None),
     ("perfect-clear", '<!-- BEGIN generated coaching', pc_sec, None),
     ("coaching", '<section id="rounds">', coaching_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),

@@ -572,5 +572,54 @@
   "file": "Claims.dfy",
   "family": "pc_solo_lost",
   "status": "verified"
+ },
+ {
+  "id": "G083",
+  "lemma": "G083_most_intense_round_m6r8_yachi_apm_x1000_62027_pps_x1000_1450_vs_x1000",
+  "file": "Claims.dfy",
+  "family": "intense_round_profile",
+  "status": "verified"
+ },
+ {
+  "id": "G084",
+  "lemma": "G084_most_intense_round_m6r8_pinglamb_apm_x1000_63624_pps_x1000_1302_vs_x10",
+  "file": "Claims.dfy",
+  "family": "intense_round_profile",
+  "status": "verified"
+ },
+ {
+  "id": "G085",
+  "lemma": "G085_m6r8_winner_yachi_trailed_on_4_attacking_columns_apm_b2b",
+  "file": "Claims.dfy",
+  "family": "intense_round_edges",
+  "status": "verified"
+ },
+ {
+  "id": "G086",
+  "lemma": "G086_m6r8_attack_per_piece_yachi_0_706_pinglamb_0_814",
+  "file": "Claims.dfy",
+  "family": "intense_round_attack_rate",
+  "status": "verified"
+ },
+ {
+  "id": "G087",
+  "lemma": "G087_m6r8_downstack_per_piece_yachi_0_385_pinglamb_0_175",
+  "file": "Claims.dfy",
+  "family": "intense_round_downstack_rate",
+  "status": "verified"
+ },
+ {
+  "id": "G088",
+  "lemma": "G088_m6r8_yachi_vs_splits_into_attack_103_0_downstack_56_1_residual_under_0",
+  "file": "Claims.dfy",
+  "family": "intense_round_vs_split",
+  "status": "verified"
+ },
+ {
+  "id": "G089",
+  "lemma": "G089_m6r8_pinglamb_vs_splits_into_attack_106_0_downstack_22_8_residual_unde",
+  "file": "Claims.dfy",
+  "family": "intense_round_vs_split",
+  "status": "verified"
  }
 ]

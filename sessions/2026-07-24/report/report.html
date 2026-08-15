@@ -695,6 +695,79 @@
 </section>
 <!-- END generated records -->
 
+<!-- BEGIN generated intense-round (pipeline/build_report.py) -->
+<style>
+/* ---------- 最癲一局 (generated) ---------- */
+/* Scoped under #intense-round and every class carries the ir- prefix. A generated
+   section's <style> is injected into the body, so at equal specificity it beats the
+   report's own stylesheet — 全場之最 once defined .rec-grid and silently collapsed
+   the coaching columns that had used that name for months. */
+#intense-round .ir-scroll { overflow-x: auto; margin: 1.3rem 0 0; }
+#intense-round .ir-table { width: 100%; border-collapse: collapse; font-size: .86rem;
+  min-width: 30rem; }
+#intense-round .ir-table th, #intense-round .ir-table td { padding: .5rem .7rem;
+  border-bottom: 1px solid var(--border); text-align: right; }
+#intense-round .ir-table th:first-child, #intense-round .ir-table td:first-child {
+  text-align: left; }
+#intense-round .ir-table thead th { font-family: var(--font-mono); font-size: .64rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+#intense-round .ir-table td.ir-num { font-variant-numeric: tabular-nums; }
+/* The losing side of a comparison the winner lost — the section's whole point, so it
+   is marked rather than left for the reader to diff two columns by eye. */
+#intense-round .ir-table td.ir-behind { font-weight: 700; }
+#intense-round .ir-who { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+#intense-round .ir-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+/* Positional classes, legacy tokens: the four earliest reports' :root predates the
+   positional --p1/--p2 slots and defines only --yachi/--pinglamb. Same rule
+   build_round_table follows. --accent is NOT used anywhere here: it is defined only
+   on .match-card[data-winner=...] and resolves empty elsewhere, which silently
+   invalidates any color-mix() that references it. */
+#intense-round .ir-dot.is-p1 { background: var(--yachi); }
+#intense-round .ir-dot.is-p2 { background: var(--pinglamb); }
+#intense-round .ir-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
+#intense-round .ir-find { margin: 1.2rem 0 0; font-size: .95rem; line-height: 1.9; }
+#intense-round .ir-split { margin: 1.1rem 0 0; font-size: .88rem; line-height: 1.85; }
+#intense-round .ir-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8;
+  color: var(--muted); }
+@media print {
+  #intense-round .ir-scroll { overflow-x: visible; }
+}
+</style>
+
+<section id="intense-round">
+  <div class="wrap">
+    <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
+    <h2 class="section-title">全晚打得最癲嘅一局：第 6 場第 8 局</h2>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。下面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
+    <div class="ir-scroll">
+      <table class="ir-table">
+        <thead><tr><th>數據</th><th><span class="ir-who"><span class="ir-dot is-p1"></span>yachi（贏）</span></th><th><span class="ir-who"><span class="ir-dot is-p2"></span>pinglamb</span></th></tr></thead>
+        <tbody>
+          <tr><td>APM</td><td class="ir-num ir-behind">62.0</td><td class="ir-num">63.6</td></tr>
+          <tr><td>PPS</td><td class="ir-num">1.45</td><td class="ir-num">1.30</td></tr>
+          <tr><td>VS</td><td class="ir-num">159.7</td><td class="ir-num">128.8</td></tr>
+          <tr><td>粒數</td><td class="ir-num">109</td><td class="ir-num">97</td></tr>
+          <tr><td>攻擊</td><td class="ir-num ir-behind">77</td><td class="ir-num">79</td></tr>
+          <tr><td>射埋</td><td class="ir-num">60</td><td class="ir-num">60</td></tr>
+          <tr><td>食</td><td class="ir-num">58</td><td class="ir-num">55</td></tr>
+          <tr><td>清走</td><td class="ir-num">42</td><td class="ir-num">17</td></tr>
+          <tr><td>行數</td><td class="ir-num">79</td><td class="ir-num">52</td></tr>
+          <tr><td>最大單波</td><td class="ir-num ir-behind">8</td><td class="ir-num">12</td></tr>
+          <tr><td>最高 B2B</td><td class="ir-num ir-behind">3</td><td class="ir-num">4</td></tr>
+          <tr><td>入力</td><td class="ir-num">401</td><td class="ir-num">347</td></tr>
+          <tr><td>手順失誤</td><td class="ir-num">13</td><td class="ir-num">10</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ir-find">贏嘅係 <strong>yachi</strong>，但佢喺 <strong>APM、攻擊、最大單波、最高 B2B</strong> 呢 4 樣都<strong>輸蝕</strong>畀 pinglamb——即係話呢局<strong>唔係攻得多嗰個贏</strong>。表入面粗體嗰啲就係佢落後嗰幾格。</p>
+    <p class="ir-split"><strong>每粒棋攻擊</strong>：yachi 約 0.706、pinglamb 約 0.814；<strong>每粒棋清走</strong>：yachi 約 0.385、pinglamb 約 0.175。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
+    <p class="ir-split">yachi 嘅 VS ＝ 攻 約 103.0 ＋ 清垃圾 約 56.1；pinglamb 嘅 VS ＝ 攻 約 106.0 ＋ 清垃圾 約 22.8。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
+    <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外三樣：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數；<strong>清走／食</strong>對輸嗰個嚟講係有偏差嘅，因為佢死嗰陣塊板上面嗰啲垃圾按定義就係冇清到；<strong>入力同手順失誤唔預測邊個贏</strong>——KPP 喺六個 session 嘅 AUC 都喺五成上下，擺喺度係當負面結果報，唔係當賣點。</p>
+    <p class="ir-note">Claim：G083 · G084 · G085 · G086 · G087 · G088 · G089 ✓</p>
+  </div>
+</section>
+<!-- END generated intense-round -->
+
 <!-- BEGIN generated perfect-clear (pipeline/build_report.py) -->
 <style>
 /* ---------- 全消 (generated) ---------- */

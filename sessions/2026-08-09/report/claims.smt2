@@ -3201,10 +3201,12 @@
 (define-fun m4_r6_yachi_kills () Int 1)
 (define-fun m4_r6_yachi_garbage_attack () Int 132)
 (define-fun m4_r6_yachi_garbage_cleared () Int 48)
+(define-fun m4_r6_yachi_garbagesent () Int 111)
 (define-fun m4_r6_yachi_garbagereceived () Int 73)
 (define-fun m4_r6_yachi_finesse_faults () Int 24)
 (define-fun m4_r6_yachi_finesse_perfect () Int 170)
 (define-fun m4_r6_yachi_score () Int 39721)
+(define-fun m4_r6_yachi_finaltime_ms () Int 128100)
 (define-fun m4_r6_yachi_garbage_sent_raw () Int 111)
 (define-fun m4_r6_yachi_garbage_sent_nomult () Int 111)
 (define-fun m4_r6_yachi_clears_quads () Int 12)
@@ -3253,10 +3255,12 @@
 (define-fun m4_r6_pinglamb_kills () Int 0)
 (define-fun m4_r6_pinglamb_garbage_attack () Int 110)
 (define-fun m4_r6_pinglamb_garbage_cleared () Int 50)
+(define-fun m4_r6_pinglamb_garbagesent () Int 85)
 (define-fun m4_r6_pinglamb_garbagereceived () Int 95)
 (define-fun m4_r6_pinglamb_finesse_faults () Int 31)
 (define-fun m4_r6_pinglamb_finesse_perfect () Int 144)
 (define-fun m4_r6_pinglamb_score () Int 36190)
+(define-fun m4_r6_pinglamb_finaltime_ms () Int 127765)
 (define-fun m4_r6_pinglamb_garbage_sent_raw () Int 85)
 (define-fun m4_r6_pinglamb_garbage_sent_nomult () Int 85)
 (define-fun m4_r6_pinglamb_clears_quads () Int 8)
@@ -4890,6 +4894,62 @@
 (push 1)
 (echo "G080")
 (assert (not (and (= (+ (ite (and (> m0_r0_pinglamb_clears_allclear 0) (= m0_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r1_pinglamb_clears_allclear 0) (= m0_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r2_pinglamb_clears_allclear 0) (= m0_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r3_pinglamb_clears_allclear 0) (= m0_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r4_pinglamb_clears_allclear 0) (= m0_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r5_pinglamb_clears_allclear 0) (= m0_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r6_pinglamb_clears_allclear 0) (= m0_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m0_r7_pinglamb_clears_allclear 0) (= m0_r7_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r0_pinglamb_clears_allclear 0) (= m1_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r1_pinglamb_clears_allclear 0) (= m1_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r2_pinglamb_clears_allclear 0) (= m1_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r3_pinglamb_clears_allclear 0) (= m1_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r4_pinglamb_clears_allclear 0) (= m1_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r5_pinglamb_clears_allclear 0) (= m1_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m1_r6_pinglamb_clears_allclear 0) (= m1_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r0_pinglamb_clears_allclear 0) (= m2_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r1_pinglamb_clears_allclear 0) (= m2_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r2_pinglamb_clears_allclear 0) (= m2_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r3_pinglamb_clears_allclear 0) (= m2_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r4_pinglamb_clears_allclear 0) (= m2_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r5_pinglamb_clears_allclear 0) (= m2_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r6_pinglamb_clears_allclear 0) (= m2_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r7_pinglamb_clears_allclear 0) (= m2_r7_yachi_clears_allclear 0)) 1 0) (ite (and (> m2_r8_pinglamb_clears_allclear 0) (= m2_r8_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r0_pinglamb_clears_allclear 0) (= m3_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r1_pinglamb_clears_allclear 0) (= m3_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r2_pinglamb_clears_allclear 0) (= m3_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r3_pinglamb_clears_allclear 0) (= m3_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r4_pinglamb_clears_allclear 0) (= m3_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r5_pinglamb_clears_allclear 0) (= m3_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r6_pinglamb_clears_allclear 0) (= m3_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m3_r7_pinglamb_clears_allclear 0) (= m3_r7_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r0_pinglamb_clears_allclear 0) (= m4_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r1_pinglamb_clears_allclear 0) (= m4_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r2_pinglamb_clears_allclear 0) (= m4_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r3_pinglamb_clears_allclear 0) (= m4_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r4_pinglamb_clears_allclear 0) (= m4_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r5_pinglamb_clears_allclear 0) (= m4_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r6_pinglamb_clears_allclear 0) (= m4_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r7_pinglamb_clears_allclear 0) (= m4_r7_yachi_clears_allclear 0)) 1 0) (ite (and (> m4_r8_pinglamb_clears_allclear 0) (= m4_r8_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r0_pinglamb_clears_allclear 0) (= m5_r0_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r1_pinglamb_clears_allclear 0) (= m5_r1_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r2_pinglamb_clears_allclear 0) (= m5_r2_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r3_pinglamb_clears_allclear 0) (= m5_r3_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r4_pinglamb_clears_allclear 0) (= m5_r4_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r5_pinglamb_clears_allclear 0) (= m5_r5_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r6_pinglamb_clears_allclear 0) (= m5_r6_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r7_pinglamb_clears_allclear 0) (= m5_r7_yachi_clears_allclear 0)) 1 0) (ite (and (> m5_r8_pinglamb_clears_allclear 0) (= m5_r8_yachi_clears_allclear 0)) 1 0)) 7) (= (+ (ite (and (> m0_r0_pinglamb_clears_allclear 0) (= m0_r0_yachi_clears_allclear 0) (= m0_r0_winner 1)) 1 0) (ite (and (> m0_r1_pinglamb_clears_allclear 0) (= m0_r1_yachi_clears_allclear 0) (= m0_r1_winner 1)) 1 0) (ite (and (> m0_r2_pinglamb_clears_allclear 0) (= m0_r2_yachi_clears_allclear 0) (= m0_r2_winner 1)) 1 0) (ite (and (> m0_r3_pinglamb_clears_allclear 0) (= m0_r3_yachi_clears_allclear 0) (= m0_r3_winner 1)) 1 0) (ite (and (> m0_r4_pinglamb_clears_allclear 0) (= m0_r4_yachi_clears_allclear 0) (= m0_r4_winner 1)) 1 0) (ite (and (> m0_r5_pinglamb_clears_allclear 0) (= m0_r5_yachi_clears_allclear 0) (= m0_r5_winner 1)) 1 0) (ite (and (> m0_r6_pinglamb_clears_allclear 0) (= m0_r6_yachi_clears_allclear 0) (= m0_r6_winner 1)) 1 0) (ite (and (> m0_r7_pinglamb_clears_allclear 0) (= m0_r7_yachi_clears_allclear 0) (= m0_r7_winner 1)) 1 0) (ite (and (> m1_r0_pinglamb_clears_allclear 0) (= m1_r0_yachi_clears_allclear 0) (= m1_r0_winner 1)) 1 0) (ite (and (> m1_r1_pinglamb_clears_allclear 0) (= m1_r1_yachi_clears_allclear 0) (= m1_r1_winner 1)) 1 0) (ite (and (> m1_r2_pinglamb_clears_allclear 0) (= m1_r2_yachi_clears_allclear 0) (= m1_r2_winner 1)) 1 0) (ite (and (> m1_r3_pinglamb_clears_allclear 0) (= m1_r3_yachi_clears_allclear 0) (= m1_r3_winner 1)) 1 0) (ite (and (> m1_r4_pinglamb_clears_allclear 0) (= m1_r4_yachi_clears_allclear 0) (= m1_r4_winner 1)) 1 0) (ite (and (> m1_r5_pinglamb_clears_allclear 0) (= m1_r5_yachi_clears_allclear 0) (= m1_r5_winner 1)) 1 0) (ite (and (> m1_r6_pinglamb_clears_allclear 0) (= m1_r6_yachi_clears_allclear 0) (= m1_r6_winner 1)) 1 0) (ite (and (> m2_r0_pinglamb_clears_allclear 0) (= m2_r0_yachi_clears_allclear 0) (= m2_r0_winner 1)) 1 0) (ite (and (> m2_r1_pinglamb_clears_allclear 0) (= m2_r1_yachi_clears_allclear 0) (= m2_r1_winner 1)) 1 0) (ite (and (> m2_r2_pinglamb_clears_allclear 0) (= m2_r2_yachi_clears_allclear 0) (= m2_r2_winner 1)) 1 0) (ite (and (> m2_r3_pinglamb_clears_allclear 0) (= m2_r3_yachi_clears_allclear 0) (= m2_r3_winner 1)) 1 0) (ite (and (> m2_r4_pinglamb_clears_allclear 0) (= m2_r4_yachi_clears_allclear 0) (= m2_r4_winner 1)) 1 0) (ite (and (> m2_r5_pinglamb_clears_allclear 0) (= m2_r5_yachi_clears_allclear 0) (= m2_r5_winner 1)) 1 0) (ite (and (> m2_r6_pinglamb_clears_allclear 0) (= m2_r6_yachi_clears_allclear 0) (= m2_r6_winner 1)) 1 0) (ite (and (> m2_r7_pinglamb_clears_allclear 0) (= m2_r7_yachi_clears_allclear 0) (= m2_r7_winner 1)) 1 0) (ite (and (> m2_r8_pinglamb_clears_allclear 0) (= m2_r8_yachi_clears_allclear 0) (= m2_r8_winner 1)) 1 0) (ite (and (> m3_r0_pinglamb_clears_allclear 0) (= m3_r0_yachi_clears_allclear 0) (= m3_r0_winner 1)) 1 0) (ite (and (> m3_r1_pinglamb_clears_allclear 0) (= m3_r1_yachi_clears_allclear 0) (= m3_r1_winner 1)) 1 0) (ite (and (> m3_r2_pinglamb_clears_allclear 0) (= m3_r2_yachi_clears_allclear 0) (= m3_r2_winner 1)) 1 0) (ite (and (> m3_r3_pinglamb_clears_allclear 0) (= m3_r3_yachi_clears_allclear 0) (= m3_r3_winner 1)) 1 0) (ite (and (> m3_r4_pinglamb_clears_allclear 0) (= m3_r4_yachi_clears_allclear 0) (= m3_r4_winner 1)) 1 0) (ite (and (> m3_r5_pinglamb_clears_allclear 0) (= m3_r5_yachi_clears_allclear 0) (= m3_r5_winner 1)) 1 0) (ite (and (> m3_r6_pinglamb_clears_allclear 0) (= m3_r6_yachi_clears_allclear 0) (= m3_r6_winner 1)) 1 0) (ite (and (> m3_r7_pinglamb_clears_allclear 0) (= m3_r7_yachi_clears_allclear 0) (= m3_r7_winner 1)) 1 0) (ite (and (> m4_r0_pinglamb_clears_allclear 0) (= m4_r0_yachi_clears_allclear 0) (= m4_r0_winner 1)) 1 0) (ite (and (> m4_r1_pinglamb_clears_allclear 0) (= m4_r1_yachi_clears_allclear 0) (= m4_r1_winner 1)) 1 0) (ite (and (> m4_r2_pinglamb_clears_allclear 0) (= m4_r2_yachi_clears_allclear 0) (= m4_r2_winner 1)) 1 0) (ite (and (> m4_r3_pinglamb_clears_allclear 0) (= m4_r3_yachi_clears_allclear 0) (= m4_r3_winner 1)) 1 0) (ite (and (> m4_r4_pinglamb_clears_allclear 0) (= m4_r4_yachi_clears_allclear 0) (= m4_r4_winner 1)) 1 0) (ite (and (> m4_r5_pinglamb_clears_allclear 0) (= m4_r5_yachi_clears_allclear 0) (= m4_r5_winner 1)) 1 0) (ite (and (> m4_r6_pinglamb_clears_allclear 0) (= m4_r6_yachi_clears_allclear 0) (= m4_r6_winner 1)) 1 0) (ite (and (> m4_r7_pinglamb_clears_allclear 0) (= m4_r7_yachi_clears_allclear 0) (= m4_r7_winner 1)) 1 0) (ite (and (> m4_r8_pinglamb_clears_allclear 0) (= m4_r8_yachi_clears_allclear 0) (= m4_r8_winner 1)) 1 0) (ite (and (> m5_r0_pinglamb_clears_allclear 0) (= m5_r0_yachi_clears_allclear 0) (= m5_r0_winner 1)) 1 0) (ite (and (> m5_r1_pinglamb_clears_allclear 0) (= m5_r1_yachi_clears_allclear 0) (= m5_r1_winner 1)) 1 0) (ite (and (> m5_r2_pinglamb_clears_allclear 0) (= m5_r2_yachi_clears_allclear 0) (= m5_r2_winner 1)) 1 0) (ite (and (> m5_r3_pinglamb_clears_allclear 0) (= m5_r3_yachi_clears_allclear 0) (= m5_r3_winner 1)) 1 0) (ite (and (> m5_r4_pinglamb_clears_allclear 0) (= m5_r4_yachi_clears_allclear 0) (= m5_r4_winner 1)) 1 0) (ite (and (> m5_r5_pinglamb_clears_allclear 0) (= m5_r5_yachi_clears_allclear 0) (= m5_r5_winner 1)) 1 0) (ite (and (> m5_r6_pinglamb_clears_allclear 0) (= m5_r6_yachi_clears_allclear 0) (= m5_r6_winner 1)) 1 0) (ite (and (> m5_r7_pinglamb_clears_allclear 0) (= m5_r7_yachi_clears_allclear 0) (= m5_r7_winner 1)) 1 0) (ite (and (> m5_r8_pinglamb_clears_allclear 0) (= m5_r8_yachi_clears_allclear 0) (= m5_r8_winner 1)) 1 0)) 4))))
+(check-sat)
+(pop 1)
+
+; G081 [intense_round_profile] most intense round m5r7 — yachi: apm_x1000 61883, pps_x1000 1477, vs_x1000 140643, pieces 189, garbage_attack 132, garbagesent 111, garbagereceived 73, garbage_cleared 48, lines 118, maxspike 17, topbtb 3, inputs 669, finesse_faults 24, finaltime_ms 128100
+; 最癲嘅一局（m5 第 7 局）yachi 嘅數：APM 約 61.8、PPS 約 1.47、VS 約 140.6、粒數 189、攻擊 132、射埋 111、食 73、清走 48、行數 118、最大單波 17、最高 B2B 3、入力 669、手順失誤 24、佢自己嘅時間 約 128 秒
+(push 1)
+(echo "G081")
+(assert (not (and (= m4_r6_yachi_apm 61883) (= m4_r6_yachi_pps 1477) (= m4_r6_yachi_vs 140643) (= m4_r6_yachi_pieces 189) (= m4_r6_yachi_garbage_attack 132) (= m4_r6_yachi_garbagesent 111) (= m4_r6_yachi_garbagereceived 73) (= m4_r6_yachi_garbage_cleared 48) (= m4_r6_yachi_lines 118) (= m4_r6_yachi_maxspike 17) (= m4_r6_yachi_topbtb 3) (= m4_r6_yachi_inputs 669) (= m4_r6_yachi_finesse_faults 24) (= m4_r6_yachi_finaltime_ms 128100) (= m4_r6_winner 1))))
+(check-sat)
+(pop 1)
+
+; G082 [intense_round_profile] most intense round m5r7 — pinglamb: apm_x1000 51663, pps_x1000 1260, vs_x1000 125245, pieces 161, garbage_attack 110, garbagesent 85, garbagereceived 95, garbage_cleared 50, lines 108, maxspike 7, topbtb 3, inputs 603, finesse_faults 31, finaltime_ms 127765
+; 最癲嘅一局（m5 第 7 局）pinglamb 嘅數：APM 約 51.6、PPS 約 1.26、VS 約 125.2、粒數 161、攻擊 110、射埋 85、食 95、清走 50、行數 108、最大單波 7、最高 B2B 3、入力 603、手順失誤 31、佢自己嘅時間 約 127 秒
+(push 1)
+(echo "G082")
+(assert (not (and (= m4_r6_pinglamb_apm 51663) (= m4_r6_pinglamb_pps 1260) (= m4_r6_pinglamb_vs 125245) (= m4_r6_pinglamb_pieces 161) (= m4_r6_pinglamb_garbage_attack 110) (= m4_r6_pinglamb_garbagesent 85) (= m4_r6_pinglamb_garbagereceived 95) (= m4_r6_pinglamb_garbage_cleared 50) (= m4_r6_pinglamb_lines 108) (= m4_r6_pinglamb_maxspike 7) (= m4_r6_pinglamb_topbtb 3) (= m4_r6_pinglamb_inputs 603) (= m4_r6_pinglamb_finesse_faults 31) (= m4_r6_pinglamb_finaltime_ms 127765) (= m4_r6_winner 1))))
+(check-sat)
+(pop 1)
+
+; G083 [intense_round_edges] m5r7 winner yachi led on every attacking column (APM, PPS, 粒數, 攻擊, 最大單波, 行數) — no inversion
+; 最癲嘅一局係 yachi 贏，而佢喺 APM、PPS、粒數、攻擊、最大單波、行數 每一樣都領先——呢局冇得拗，唔係靠守贏返嚟
+(push 1)
+(echo "G083")
+(assert (not (and (= m4_r6_winner 1) (> m4_r6_yachi_apm m4_r6_pinglamb_apm) (> m4_r6_yachi_pps m4_r6_pinglamb_pps) (> m4_r6_yachi_pieces m4_r6_pinglamb_pieces) (> m4_r6_yachi_garbage_attack m4_r6_pinglamb_garbage_attack) (> m4_r6_yachi_maxspike m4_r6_pinglamb_maxspike) (= m4_r6_yachi_topbtb m4_r6_pinglamb_topbtb) (> m4_r6_yachi_lines m4_r6_pinglamb_lines))))
+(check-sat)
+(pop 1)
+
+; G084 [intense_round_attack_rate] m5r7 attack per piece: yachi 0.698, pinglamb 0.683
+; 最癲嘅一局每粒棋嘅攻擊：yachi 約 0.698、pinglamb 約 0.683——yachi 高
+(push 1)
+(echo "G084")
+(assert (not (and (= m4_r6_winner 1) (and (<= 131922 (* 1000 m4_r6_yachi_garbage_attack)) (< (* 1000 m4_r6_yachi_garbage_attack) 132111)) (and (<= 109963 (* 1000 m4_r6_pinglamb_garbage_attack)) (< (* 1000 m4_r6_pinglamb_garbage_attack) 110124)) (> (* m4_r6_yachi_garbage_attack 161) (* m4_r6_pinglamb_garbage_attack 189)))))
+(check-sat)
+(pop 1)
+
+; G085 [intense_round_downstack_rate] m5r7 downstack per piece: yachi 0.253, pinglamb 0.310
+; 最癲嘅一局每粒棋嘅清走：yachi 約 0.253、pinglamb 約 0.310——pinglamb 高
+(push 1)
+(echo "G085")
+(assert (not (and (= m4_r6_winner 1) (and (<= 47817 (* 1000 m4_r6_yachi_garbage_cleared)) (< (* 1000 m4_r6_yachi_garbage_cleared) 48006)) (and (<= 49910 (* 1000 m4_r6_pinglamb_garbage_cleared)) (< (* 1000 m4_r6_pinglamb_garbage_cleared) 50071)) (< (* m4_r6_yachi_garbage_cleared 161) (* m4_r6_pinglamb_garbage_cleared 189)))))
+(check-sat)
+(pop 1)
+
+; G086 [intense_round_vs_split] m5r7 yachi VS splits into attack 103.0 + downstack 37.4, residual under 0.13
+; 最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 103.0、清垃圾嗰邊約 37.4，兩邊加埋同佢實際 VS 約 140.6 相差唔夠 0.13
+(push 1)
+(echo "G086")
+(assert (not (and (and (<= -16368300 (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared)))) (< (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared))) 16368301)) (and (<= 13199936400 (* 100000000 m4_r6_yachi_garbage_attack)) (< (* 100000000 m4_r6_yachi_garbage_attack) 13200064500)) (and (<= 4799907000 (* 100000000 m4_r6_yachi_garbage_cleared)) (< (* 100000000 m4_r6_yachi_garbage_cleared) 4800035100)))))
+(check-sat)
+(pop 1)
+
+; G087 [intense_round_vs_split] m5r7 pinglamb VS splits into attack 86.0 + downstack 39.1, residual under 0.02
+; 最癲嘅一局 pinglamb 嘅 VS 拆得開兩邊：攻嗰邊約 86.0、清垃圾嗰邊約 39.1，兩邊加埋同佢實際 VS 約 125.2 相差唔夠 0.02
+(push 1)
+(echo "G087")
+(assert (not (and (and (<= -1927425 (- (* m4_r6_pinglamb_vs m4_r6_pinglamb_finaltime_ms) (* 100000000 (+ m4_r6_pinglamb_garbage_attack m4_r6_pinglamb_garbage_cleared)))) (< (- (* m4_r6_pinglamb_vs m4_r6_pinglamb_finaltime_ms) (* 100000000 (+ m4_r6_pinglamb_garbage_attack m4_r6_pinglamb_garbage_cleared))) 1927426)) (and (<= 10999927675 (* 100000000 m4_r6_pinglamb_garbage_attack)) (< (* 100000000 m4_r6_pinglamb_garbage_attack) 11000055440)) (and (<= 4999955510 (* 100000000 m4_r6_pinglamb_garbage_cleared)) (< (* 100000000 m4_r6_pinglamb_garbage_cleared) 5000083275)))))
 (check-sat)
 (pop 1)
 

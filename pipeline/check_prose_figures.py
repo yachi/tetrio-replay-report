@@ -26,6 +26,8 @@ import os
 import re
 import sys
 
+from pipeline.claims import generators
+
 def _strings(node, path=""):
     """Every string leaf in a decoded JSON document, with a dotted path label.
 
@@ -69,7 +71,13 @@ def pools(facts):
         for r in m["rounds"]:
             for p in r["players"].values():
                 x1000.update(p[k] for k in ("apm_x1000", "pps_x1000", "vs_x1000"))
+                # Both clocks. `lifetime` and `finaltime_ms` differ by a fraction of a
+                # second and floor to DIFFERENT whole seconds often enough to matter:
+                # 最癲一局 prints each player's own finaltime, and 169748 ms floors to
+                # 169 while no `lifetime` in that session does. Holding only one of the
+                # two left a correctly floored figure unresolvable.
                 lifetimes.add(p["lifetime"])
+                lifetimes.add(p["finaltime_ms"])
     # The derived quantities the generators also print with 約: per-round means, and
     # the per-piece rates split by whether the round was won. Without them a correctly
     # floored derived figure matches no datum, collides with some *unrelated* datum's
@@ -89,6 +97,21 @@ def pools(facts):
                 den = sum(r["players"][pl]["pieces"] for r in sel)
                 if den:
                     x1000.add((num * 1000) // den)
+    # 最癲一局's figures, which are derived per-ROUND and so are covered by none of the
+    # above: the two halves of the VS split (10^8·counter/finaltime_ms, the same x1000
+    # scale as vs_x1000) and that round's two per-piece rates. The aggregate per-piece
+    # rates added just above are session-wide and floor to different integers. Without
+    # these the gate reported the split's own figures as unresolved — i.e. it was
+    # shrugging at exactly the numbers the new section added.
+    best = generators._intense_round(facts)
+    if best:
+        rnd = best[2]
+        for p in rnd["players"].values():
+            for f in ("garbage_attack", "garbage_cleared"):
+                if p["finaltime_ms"]:
+                    x1000.add(generators._VS_K * p[f] // p["finaltime_ms"])
+                if p["pieces"]:
+                    x1000.add(1000 * p[f] // p["pieces"])
     return x1000, lifetimes
 
 

@@ -726,6 +726,79 @@
 
 <!-- ============================= 建議 ============================= -->
 
+<!-- BEGIN generated intense-round (pipeline/build_report.py) -->
+<style>
+/* ---------- 最癲一局 (generated) ---------- */
+/* Scoped under #intense-round and every class carries the ir- prefix. A generated
+   section's <style> is injected into the body, so at equal specificity it beats the
+   report's own stylesheet — 全場之最 once defined .rec-grid and silently collapsed
+   the coaching columns that had used that name for months. */
+#intense-round .ir-scroll { overflow-x: auto; margin: 1.3rem 0 0; }
+#intense-round .ir-table { width: 100%; border-collapse: collapse; font-size: .86rem;
+  min-width: 30rem; }
+#intense-round .ir-table th, #intense-round .ir-table td { padding: .5rem .7rem;
+  border-bottom: 1px solid var(--border); text-align: right; }
+#intense-round .ir-table th:first-child, #intense-round .ir-table td:first-child {
+  text-align: left; }
+#intense-round .ir-table thead th { font-family: var(--font-mono); font-size: .64rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+#intense-round .ir-table td.ir-num { font-variant-numeric: tabular-nums; }
+/* The losing side of a comparison the winner lost — the section's whole point, so it
+   is marked rather than left for the reader to diff two columns by eye. */
+#intense-round .ir-table td.ir-behind { font-weight: 700; }
+#intense-round .ir-who { display: flex; align-items: center; gap: .45rem; white-space: nowrap; }
+#intense-round .ir-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: none; }
+/* Positional classes, legacy tokens: the four earliest reports' :root predates the
+   positional --p1/--p2 slots and defines only --yachi/--pinglamb. Same rule
+   build_round_table follows. --accent is NOT used anywhere here: it is defined only
+   on .match-card[data-winner=...] and resolves empty elsewhere, which silently
+   invalidates any color-mix() that references it. */
+#intense-round .ir-dot.is-p1 { background: var(--yachi); }
+#intense-round .ir-dot.is-p2 { background: var(--pinglamb); }
+#intense-round .ir-cid { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
+#intense-round .ir-find { margin: 1.2rem 0 0; font-size: .95rem; line-height: 1.9; }
+#intense-round .ir-split { margin: 1.1rem 0 0; font-size: .88rem; line-height: 1.85; }
+#intense-round .ir-note { margin: .9rem 0 0; font-size: .8rem; line-height: 1.8;
+  color: var(--muted); }
+@media print {
+  #intense-round .ir-scroll { overflow-x: visible; }
+}
+</style>
+
+<section id="intense-round">
+  <div class="wrap">
+    <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
+    <h2 class="section-title">全晚打得最癲嘅一局：第 11 場第 2 局</h2>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。下面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
+    <div class="ir-scroll">
+      <table class="ir-table">
+        <thead><tr><th>數據</th><th><span class="ir-who"><span class="ir-dot is-p2"></span>pinglamb（贏）</span></th><th><span class="ir-who"><span class="ir-dot is-p1"></span>yachi</span></th></tr></thead>
+        <tbody>
+          <tr><td>APM</td><td class="ir-num ir-behind">63.9</td><td class="ir-num">71.2</td></tr>
+          <tr><td>PPS</td><td class="ir-num ir-behind">1.37</td><td class="ir-num">1.54</td></tr>
+          <tr><td>VS</td><td class="ir-num">163.1</td><td class="ir-num">154.0</td></tr>
+          <tr><td>粒數</td><td class="ir-num ir-behind">233</td><td class="ir-num">263</td></tr>
+          <tr><td>攻擊</td><td class="ir-num ir-behind">181</td><td class="ir-num">202</td></tr>
+          <tr><td>射埋</td><td class="ir-num">133</td><td class="ir-num">165</td></tr>
+          <tr><td>食</td><td class="ir-num">142</td><td class="ir-num">109</td></tr>
+          <tr><td>清走</td><td class="ir-num">96</td><td class="ir-num">60</td></tr>
+          <tr><td>行數</td><td class="ir-num">178</td><td class="ir-num">156</td></tr>
+          <tr><td>最大單波</td><td class="ir-num ir-behind">12</td><td class="ir-num">15</td></tr>
+          <tr><td>最高 B2B</td><td class="ir-num ir-behind">3</td><td class="ir-num">6</td></tr>
+          <tr><td>入力</td><td class="ir-num">865</td><td class="ir-num">946</td></tr>
+          <tr><td>手順失誤</td><td class="ir-num">47</td><td class="ir-num">39</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ir-find">贏嘅係 <strong>pinglamb</strong>，但佢喺 <strong>APM、PPS、粒數、攻擊、最大單波、最高 B2B</strong> 呢 6 樣都<strong>輸蝕</strong>畀 yachi——即係話呢局<strong>唔係攻得多嗰個贏</strong>。表入面粗體嗰啲就係佢落後嗰幾格。</p>
+    <p class="ir-split"><strong>每粒棋攻擊</strong>：pinglamb 約 0.776、yachi 約 0.768；<strong>每粒棋清走</strong>：pinglamb 約 0.412、yachi 約 0.228。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
+    <p class="ir-split">pinglamb 嘅 VS ＝ 攻 約 106.6 ＋ 清垃圾 約 56.5；yachi 嘅 VS ＝ 攻 約 118.7 ＋ 清垃圾 約 35.2。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
+    <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外三樣：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數；<strong>清走／食</strong>對輸嗰個嚟講係有偏差嘅，因為佢死嗰陣塊板上面嗰啲垃圾按定義就係冇清到；<strong>入力同手順失誤唔預測邊個贏</strong>——KPP 喺六個 session 嘅 AUC 都喺五成上下，擺喺度係當負面結果報，唔係當賣點。</p>
+    <p class="ir-note">Claim：G085 · G086 · G087 · G088 · G089 · G090 · G091 ✓</p>
+  </div>
+</section>
+<!-- END generated intense-round -->
+
 <!-- BEGIN generated perfect-clear (pipeline/build_report.py) -->
 <style>
 /* ---------- 全消 (generated) ---------- */
@@ -7022,11 +7095,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
       <div class="chain">
         <div class="chain-step"><div class="n">1</div><div>數據由兩個獨立嘅 parser（extract.py 同 extract2.ts）各自由 11 個 replay 檔案（.ttrm）入面抽 facts，兩份輸出逐個欄位比對完全一致先算過關。</div></div>
-        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 104 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
+        <div class="chain-step"><div class="n">2</div><div>每一條 claim（下面表入面嘅 111 條）都會有一條 Dafny 引理做形式驗證，證實個講法喺數學上一定成立——唔係跑幾個 sample 就話啱，而係窮舉證明。</div></div>
         <div class="chain-step"><div class="n">3</div><div>仲會做 mutation test：刻意將條引理嘅 guard/前提拆走，睇下會唔會有 test 應聲斷——如果冧唔到，即係話條 guard 得個樣冇實際用，要補返。</div></div>
       </div>
-      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 104 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
-      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 104 / 104</div>
+      <p id="method-status-text">呢一版報告出爐嗰陣，claims-proof-map.json 已經落地，下面 111 條 claim 全部搵到對應嘅 Dafny 引理，逐條窮舉驗證完，加埋 mutation test 確認條 guard 唔係擺個樣——所以下面啲狀態全部顯示「已驗證」✓。呢個信任鏈以後如果重新驗證，淨係要再行一次 <code>python3 -m pipeline.build_report &lt;report dir&gt;</code> 就會自動同步，唔使再改呢份 HTML。</p>
+      <div id="status-line" class="mono" data-all-verified="true">proof-map 已載入 · 已驗證 111 / 111</div>
     </div>
 
     <div class="scroll-x">
@@ -7629,6 +7702,55 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <td class="lemma-cell">G084_6_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_1_of_th</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
+          <tr id="claim-G085">
+            <td class="id-cell">G085</td>
+            <td class="canto-cell">最癲嘅一局（m11 第 2 局）yachi 嘅數：APM 約 71.2、PPS 約 1.54、VS 約 154.0、粒數 263、攻擊 202、射埋 165、食 109、清走 60、行數 156、最大單波 15、最高 B2B 6、入力 946、手順失誤 39、佢自己嘅時間 約 170 秒</td>
+            <td class="gloss-cell">most intense round m11r2 — yachi: apm_x1000 71259, pps_x1000 1546, vs_x1000 154042, pieces 263, garbage_attack 202, garbagesent 165, garbagereceived 109, garbage_cleared 60, lines 156, maxspike 15, topbtb 6, inputs 946, finesse_faults 39, finaltime_ms 170095</td>
+            <td class="lemma-cell">G085_most_intense_round_m11r2_yachi_apm_x1000_71259_pps_x1000_1546_vs_x1000</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G086">
+            <td class="id-cell">G086</td>
+            <td class="canto-cell">最癲嘅一局（m11 第 2 局）pinglamb 嘅數：APM 約 63.9、PPS 約 1.37、VS 約 163.1、粒數 233、攻擊 181、射埋 133、食 142、清走 96、行數 178、最大單波 12、最高 B2B 3、入力 865、手順失誤 47、佢自己嘅時間 約 169 秒</td>
+            <td class="gloss-cell">most intense round m11r2 — pinglamb: apm_x1000 63983, pps_x1000 1373, vs_x1000 163197, pieces 233, garbage_attack 181, garbagesent 133, garbagereceived 142, garbage_cleared 96, lines 178, maxspike 12, topbtb 3, inputs 865, finesse_faults 47, finaltime_ms 169748</td>
+            <td class="lemma-cell">G086_most_intense_round_m11r2_pinglamb_apm_x1000_63983_pps_x1000_1373_vs_x1</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G087">
+            <td class="id-cell">G087</td>
+            <td class="canto-cell">最癲嘅一局係 pinglamb 贏，但佢喺 APM、PPS、粒數、攻擊、最大單波、最高 B2B 呢 6 樣係落後嘅——贏嗰個唔係攻得最多嗰個</td>
+            <td class="gloss-cell">m11r2 winner pinglamb trailed on 6 attacking columns: APM, PPS, 粒數, 攻擊, 最大單波, 最高 B2B</td>
+            <td class="lemma-cell">G087_m11r2_winner_pinglamb_trailed_on_6_attacking_columns_apm_pps_b2b</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G088">
+            <td class="id-cell">G088</td>
+            <td class="canto-cell">最癲嘅一局每粒棋嘅攻擊：pinglamb 約 0.776、yachi 約 0.768——pinglamb 高</td>
+            <td class="gloss-cell">m11r2 attack per piece: pinglamb 0.776, yachi 0.768</td>
+            <td class="lemma-cell">G088_m11r2_attack_per_piece_pinglamb_0_776_yachi_0_768</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G089">
+            <td class="id-cell">G089</td>
+            <td class="canto-cell">最癲嘅一局每粒棋嘅清走：pinglamb 約 0.412、yachi 約 0.228——pinglamb 高</td>
+            <td class="gloss-cell">m11r2 downstack per piece: pinglamb 0.412, yachi 0.228</td>
+            <td class="lemma-cell">G089_m11r2_downstack_per_piece_pinglamb_0_412_yachi_0_228</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G090">
+            <td class="id-cell">G090</td>
+            <td class="canto-cell">最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 118.7、清垃圾嗰邊約 35.2，兩邊加埋同佢實際 VS 約 154.0 相差唔夠 0.02</td>
+            <td class="gloss-cell">m11r2 yachi VS splits into attack 118.7 + downstack 35.2, residual under 0.02</td>
+            <td class="lemma-cell">G090_m11r2_yachi_vs_splits_into_attack_118_7_downstack_35_2_residual_under</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
+          <tr id="claim-G091">
+            <td class="id-cell">G091</td>
+            <td class="canto-cell">最癲嘅一局 pinglamb 嘅 VS 拆得開兩邊：攻嗰邊約 106.6、清垃圾嗰邊約 56.5，兩邊加埋同佢實際 VS 約 163.1 相差唔夠 0.02</td>
+            <td class="gloss-cell">m11r2 pinglamb VS splits into attack 106.6 + downstack 56.5, residual under 0.02</td>
+            <td class="lemma-cell">G091_m11r2_pinglamb_vs_splits_into_attack_106_6_downstack_56_5_residual_und</td>
+            <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
+          </tr>
           <tr id="claim-C001">
             <td class="id-cell">C001</td>
             <td class="canto-cell">成晚分三段：頭三場 pinglamb 食晒，尾兩場又係佢，yachi 贏嘅四場 match 全部夾喺中間第四至第九場入面</td>
@@ -7967,8 +8089,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 <script type="application/json" id="claims-data">
 {
   "proof_map_available": true,
-  "total_claims": 104,
-  "verified_count": 104,
+  "total_claims": 111,
+  "verified_count": 111,
   "claims": [
     {
       "id": "G001",
@@ -8807,6 +8929,76 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       "english_gloss": "6 rounds where only pinglamb got a perfect clear; pinglamb lost 1 of them",
       "category": "style",
       "lemma": "G084_6_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_1_of_th",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G085",
+      "source": "generated",
+      "canto": "最癲嘅一局（m11 第 2 局）yachi 嘅數：APM 約 71.2、PPS 約 1.54、VS 約 154.0、粒數 263、攻擊 202、射埋 165、食 109、清走 60、行數 156、最大單波 15、最高 B2B 6、入力 946、手順失誤 39、佢自己嘅時間 約 170 秒",
+      "english_gloss": "most intense round m11r2 — yachi: apm_x1000 71259, pps_x1000 1546, vs_x1000 154042, pieces 263, garbage_attack 202, garbagesent 165, garbagereceived 109, garbage_cleared 60, lines 156, maxspike 15, topbtb 6, inputs 946, finesse_faults 39, finaltime_ms 170095",
+      "category": "pace",
+      "lemma": "G085_most_intense_round_m11r2_yachi_apm_x1000_71259_pps_x1000_1546_vs_x1000",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G086",
+      "source": "generated",
+      "canto": "最癲嘅一局（m11 第 2 局）pinglamb 嘅數：APM 約 63.9、PPS 約 1.37、VS 約 163.1、粒數 233、攻擊 181、射埋 133、食 142、清走 96、行數 178、最大單波 12、最高 B2B 3、入力 865、手順失誤 47、佢自己嘅時間 約 169 秒",
+      "english_gloss": "most intense round m11r2 — pinglamb: apm_x1000 63983, pps_x1000 1373, vs_x1000 163197, pieces 233, garbage_attack 181, garbagesent 133, garbagereceived 142, garbage_cleared 96, lines 178, maxspike 12, topbtb 3, inputs 865, finesse_faults 47, finaltime_ms 169748",
+      "category": "pace",
+      "lemma": "G086_most_intense_round_m11r2_pinglamb_apm_x1000_63983_pps_x1000_1373_vs_x1",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G087",
+      "source": "generated",
+      "canto": "最癲嘅一局係 pinglamb 贏，但佢喺 APM、PPS、粒數、攻擊、最大單波、最高 B2B 呢 6 樣係落後嘅——贏嗰個唔係攻得最多嗰個",
+      "english_gloss": "m11r2 winner pinglamb trailed on 6 attacking columns: APM, PPS, 粒數, 攻擊, 最大單波, 最高 B2B",
+      "category": "pace",
+      "lemma": "G087_m11r2_winner_pinglamb_trailed_on_6_attacking_columns_apm_pps_b2b",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G088",
+      "source": "generated",
+      "canto": "最癲嘅一局每粒棋嘅攻擊：pinglamb 約 0.776、yachi 約 0.768——pinglamb 高",
+      "english_gloss": "m11r2 attack per piece: pinglamb 0.776, yachi 0.768",
+      "category": "pace",
+      "lemma": "G088_m11r2_attack_per_piece_pinglamb_0_776_yachi_0_768",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G089",
+      "source": "generated",
+      "canto": "最癲嘅一局每粒棋嘅清走：pinglamb 約 0.412、yachi 約 0.228——pinglamb 高",
+      "english_gloss": "m11r2 downstack per piece: pinglamb 0.412, yachi 0.228",
+      "category": "pace",
+      "lemma": "G089_m11r2_downstack_per_piece_pinglamb_0_412_yachi_0_228",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G090",
+      "source": "generated",
+      "canto": "最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 118.7、清垃圾嗰邊約 35.2，兩邊加埋同佢實際 VS 約 154.0 相差唔夠 0.02",
+      "english_gloss": "m11r2 yachi VS splits into attack 118.7 + downstack 35.2, residual under 0.02",
+      "category": "pace",
+      "lemma": "G090_m11r2_yachi_vs_splits_into_attack_118_7_downstack_35_2_residual_under",
+      "status": "verified",
+      "status_label": "已驗證"
+    },
+    {
+      "id": "G091",
+      "source": "generated",
+      "canto": "最癲嘅一局 pinglamb 嘅 VS 拆得開兩邊：攻嗰邊約 106.6、清垃圾嗰邊約 56.5，兩邊加埋同佢實際 VS 約 163.1 相差唔夠 0.02",
+      "english_gloss": "m11r2 pinglamb VS splits into attack 106.6 + downstack 56.5, residual under 0.02",
+      "category": "pace",
+      "lemma": "G091_m11r2_pinglamb_vs_splits_into_attack_106_6_downstack_56_5_residual_und",
       "status": "verified",
       "status_label": "已驗證"
     },

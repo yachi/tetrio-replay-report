@@ -539,6 +539,55 @@
   "status": "verified"
  },
  {
+  "id": "G078",
+  "lemma": "G078_most_intense_round_m8r8_yachi_apm_x1000_78639_pps_x1000_1531_vs_x1000",
+  "file": "Claims.dfy",
+  "family": "intense_round_profile",
+  "status": "verified"
+ },
+ {
+  "id": "G079",
+  "lemma": "G079_most_intense_round_m8r8_pinglamb_apm_x1000_50494_pps_x1000_1352_vs_x10",
+  "file": "Claims.dfy",
+  "family": "intense_round_profile",
+  "status": "verified"
+ },
+ {
+  "id": "G080",
+  "lemma": "G080_m8r8_winner_yachi_trailed_on_1_attacking_columns",
+  "file": "Claims.dfy",
+  "family": "intense_round_edges",
+  "status": "verified"
+ },
+ {
+  "id": "G081",
+  "lemma": "G081_m8r8_attack_per_piece_yachi_0_855_pinglamb_0_622",
+  "file": "Claims.dfy",
+  "family": "intense_round_attack_rate",
+  "status": "verified"
+ },
+ {
+  "id": "G082",
+  "lemma": "G082_m8r8_downstack_per_piece_yachi_0_171_pinglamb_0_336",
+  "file": "Claims.dfy",
+  "family": "intense_round_downstack_rate",
+  "status": "verified"
+ },
+ {
+  "id": "G083",
+  "lemma": "G083_m8r8_yachi_vs_splits_into_attack_130_6_downstack_26_1_residual_under_0",
+  "file": "Claims.dfy",
+  "family": "intense_round_vs_split",
+  "status": "verified"
+ },
+ {
+  "id": "G084",
+  "lemma": "G084_m8r8_pinglamb_vs_splits_into_attack_84_1_downstack_45_5_residual_under",
+  "file": "Claims.dfy",
+  "family": "intense_round_vs_split",
+  "status": "verified"
+ },
+ {
   "id": "C001",
   "lemma": "C001_yachi_won_the_first_two_matches_pinglamb_won_all_six_after",
   "file": "Claims.dfy",

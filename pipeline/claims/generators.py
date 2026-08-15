@@ -989,6 +989,23 @@ def decider_final_rounds(facts):
     return out
 
 
+def _intense_round(facts):
+    """(mi, ri, round, combined VS) for the session's most intense round, or None.
+
+    Factored out of `most_intense_round` so the deep-dive families below select the
+    same round by construction rather than by a copy of the rule that could drift
+    away from it. Every caller must treat None as "this session has no such round" —
+    a session all of whose rounds are shorter than QUALIFYING_MS has one, and a
+    generator that assumed otherwise would publish a section about a round that the
+    length qualifier says is not measurable.
+    """
+    qual = [(mi, ri, r) for mi, ri, r in _rounds(facts) if _dur(r) >= QUALIFYING_MS]
+    if not qual:
+        return None
+    return max(((mi, ri, r, sum(r["players"][p]["vs_x1000"] for p in r["players"]))
+                for mi, ri, r in qual), key=lambda t: t[3])
+
+
 @family
 def most_intense_round(facts):
     """Highest combined VS — the round where both players were swinging hardest.
@@ -998,10 +1015,9 @@ def most_intense_round(facts):
     twice over. The comparison conjuncts range over the qualifying rounds only.
     """
     qual = [(mi, ri, r) for mi, ri, r in _rounds(facts) if _dur(r) >= QUALIFYING_MS]
-    if not qual:
+    best = _intense_round(facts)
+    if not best:
         return []
-    best = max(((mi, ri, r, sum(r["players"][p]["vs_x1000"] for p in r["players"]))
-                for mi, ri, r in qual), key=lambda t: t[3])
     mi, ri, r, tot = best
     win = r["winner"]
     lose = [p for p in r["players"] if p != win][0]
@@ -1381,6 +1397,283 @@ def perfect_clears(facts):
                 eq(count_rounds(c_and(c_field(pl, "clears.allclear", ">", 0),
                                       c_field(other, "clears.allclear", "==", 0),
                                       c_winner(other))), lit(lost)),
+            ),
+        })
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# 最癲一局 — the most intense round, in the detail a single round can carry
+#
+# The round is the one `most_intense_round` already selects (highest combined VS
+# among rounds of QUALIFYING_MS or more) — `_intense_round` is the shared selector,
+# so these families cannot end up describing a different round than the claim that
+# announces it.
+#
+# Why a whole block of families for ONE round: a session report otherwise prints
+# per-round numbers only in 逐局全數據, where every round gets the same row and none
+# gets an explanation. These pin the round's measurements, the DIRECTION of every
+# offensive comparison, and the two per-piece rates — so a section can say how the
+# round was won using only figures a lemma covers.
+#
+# n=1 is the standing caveat and it belongs in the prose, not in a predicate: one
+# round establishes that a mechanism operated, never that it is a tendency.
+# --------------------------------------------------------------------------- #
+
+# Measurements pinned for both players. Each is a direct facts.json field, so each
+# renders as `eq(round(...), lit(v))` and any single-value mutation of it falsifies
+# the claim. `finaltime_ms` is here because the two VS terms below divide by it.
+_INTENSE_FIELDS = [
+    ("apm_x1000", "APM", _one_dp),
+    ("pps_x1000", "PPS", _two_dp),
+    ("vs_x1000", "VS", _one_dp),
+    ("pieces", "粒數", None),
+    ("garbage_attack", "攻擊", None),
+    ("garbagesent", "射埋", None),
+    ("garbagereceived", "食", None),
+    ("garbage_cleared", "清走", None),
+    ("lines", "行數", None),
+    ("maxspike", "最大單波", None),
+    ("topbtb", "最高 B2B", None),
+    ("inputs", "入力", None),
+    ("finesse_faults", "手順失誤", None),
+    ("finaltime_ms", "佢自己嘅時間", None),
+]
+
+# The offensive columns whose DIRECTION the inversion claim proves. Deliberately not
+# the full list above: 食 and 清走 are defensive, 入力 and 手順失誤 are mechanical
+# (KPP is a six-session negative result), and 局長 is shared. Comparing those here
+# would turn "the winner trailed on offence" into "the winner trailed on something".
+#
+# Every entry must ALSO be a row the section prints. The in-game `score` was here and
+# is not: it has no row (it rewards drop distance, so it is not an attack proxy), which
+# made the claim count seven columns while the table could only mark six of them —
+# and the section's sentence points AT the marked cells. A proved comparison the
+# reader cannot see is worse than one that was never made.
+_INTENSE_EDGES = [
+    ("apm_x1000", "APM"),
+    ("pps_x1000", "PPS"),
+    ("pieces", "粒數"),
+    ("garbage_attack", "攻擊"),
+    ("maxspike", "最大單波"),
+    ("topbtb", "最高 B2B"),
+    ("lines", "行數"),
+]
+
+
+def _per_piece_x1000(num, den):
+    """floor(1000 * num / den) — the printed 3dp form of a per-piece rate."""
+    return 1000 * num // den
+
+
+def _pin_rate(mi, ri, pl, f, num, den):
+    """Pin floor(1000·num/den) to its printed value, without dividing.
+
+    The algebra has no division, so a rate is pinned by bounding the numerator
+    against the denominator: v = floor(1000·num/den) iff v·den <= 1000·num < (v+1)·den.
+    Both bounds are integers at generation time, so this is one `between`.
+
+    It has teeth: the band is `den` wide and a one-unit change to `num` moves the
+    left-hand side by 1000, so every mutation of the numerator escapes the band for
+    any denominator under 1000 — every per-piece rate in this corpus qualifies.
+    """
+    v = _per_piece_x1000(num, den)
+    return between(mul(lit(1000), rnd(mi, ri, pl, f)), v * den, (v + 1) * den)
+
+
+@family
+def intense_round_profile(facts):
+    """Both players' measurements in the session's most intense round."""
+    best = _intense_round(facts)
+    if not best:
+        return []
+    mi, ri, r, _tot = best
+    out = []
+    for pl in _players(facts):
+        d = r["players"][pl]
+        parts = []
+        for f, label, fmt in _INTENSE_FIELDS:
+            # finaltime_ms is each player's OWN time on the board, not the round's —
+            # the survivor's runs a fraction of a second past the loser's. Printing it
+            # as 局長 made two claims about one round disagree about how long it was, so
+            # it is labelled as the player's own and formatted from the pinned field.
+            if f == "finaltime_ms":
+                parts.append(f"{label} 約 {_sec(d[f])} 秒")
+            else:
+                parts.append(f"{label} " + (f"約 {fmt(d[f])}" if fmt else f"{d[f]}"))
+        out.append({
+            "family": "intense_round_profile", "category": "pace",
+            "canto": f"最癲嘅一局（{_ordinal(mi)} 第 {ri + 1} 局）{pl} 嘅數："
+                     + "、".join(parts),
+            "english_gloss": (f"most intense round m{mi + 1}r{ri + 1} — {pl}: "
+                              + ", ".join(f"{f} {r['players'][pl][f]}"
+                                          for f, _l, _fm in _INTENSE_FIELDS)),
+            "spec": conj(
+                *[eq(rnd(mi, ri, pl, f), lit(d[f])) for f, _l, _fm in _INTENSE_FIELDS],
+                round_winner(mi, ri, r["winner"]),
+            ),
+        })
+    return out
+
+
+@family
+def intense_round_edges(facts):
+    """Which offensive columns the winner of that round was BEHIND on.
+
+    The point of the section: these rounds are often won by the player who was
+    losing the attacking exchange. The spec proves the direction of every column,
+    including the ones the winner led — so the sentence "he trailed on exactly
+    these" is covered, not just the trailing ones taken alone. A column the two
+    tied on is asserted equal for the same reason.
+    """
+    best = _intense_round(facts)
+    if not best:
+        return []
+    mi, ri, r, _tot = best
+    win = r["winner"]
+    lose = [p for p in r["players"] if p != win][0]
+    W, L = r["players"][win], r["players"][lose]
+
+    behind, ahead, level, conj_parts = [], [], [], []
+    for f, label in _INTENSE_EDGES:
+        a, b = rnd(mi, ri, win, f), rnd(mi, ri, lose, f)
+        if W[f] < L[f]:
+            behind.append(label)
+            conj_parts.append(lt(a, b))
+        elif W[f] > L[f]:
+            ahead.append(label)
+            conj_parts.append(gt(a, b))
+        else:
+            level.append(label)
+            conj_parts.append(eq(a, b))
+
+    if behind:
+        canto = (f"最癲嘅一局係 {win} 贏，但佢喺 {'、'.join(behind)} 呢 {len(behind)} 樣"
+                 f"係落後嘅——贏嗰個唔係攻得最多嗰個")
+        gloss = (f"m{mi + 1}r{ri + 1} winner {win} trailed on {len(behind)} attacking "
+                 f"columns: {', '.join(behind)}")
+    else:
+        canto = (f"最癲嘅一局係 {win} 贏，而佢喺 {'、'.join(ahead)} 每一樣都領先——"
+                 f"呢局冇得拗，唔係靠守贏返嚟")
+        gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on every attacking column "
+                 f"({', '.join(ahead)}) — no inversion")
+    return [{
+        "family": "intense_round_edges", "category": "pace",
+        "canto": canto, "english_gloss": gloss,
+        "spec": conj(round_winner(mi, ri, win), *conj_parts),
+    }]
+
+
+@family
+def intense_round_rates(facts):
+    """The two per-piece rates that decide these rounds: attack and downstack.
+
+    Both are pinned to their printed 3dp value AND compared between the players.
+    The comparison is cross-multiplied (`a·pieces_b` against `b·pieces_a`) because
+    the algebra has no division; the pin is `_pin_rate`. Printing only the
+    comparison would leave the figures uncovered, and printing only the pins would
+    leave the reader to do the comparison the section is asserting.
+    """
+    best = _intense_round(facts)
+    if not best:
+        return []
+    mi, ri, r, _tot = best
+    win = r["winner"]
+    lose = [p for p in r["players"] if p != win][0]
+    W, L = r["players"][win], r["players"][lose]
+    out = []
+    for f, label, what in (("garbage_attack", "攻擊", "attack"),
+                           ("garbage_cleared", "清走", "downstack")):
+        rw = _per_piece_x1000(W[f], W["pieces"])
+        rl = _per_piece_x1000(L[f], L["pieces"])
+        # Cross-multiplied comparison, in the direction the data actually runs.
+        cross = W[f] * L["pieces"], L[f] * W["pieces"]
+        order = (gt if cross[0] > cross[1] else (lt if cross[0] < cross[1] else eq))(
+            mul(rnd(mi, ri, win, f), lit(L["pieces"])),
+            mul(rnd(mi, ri, lose, f), lit(W["pieces"])))
+        lead = win if cross[0] > cross[1] else (lose if cross[0] < cross[1] else None)
+        tail = (f"{lead} 高" if lead else "兩邊一樣")
+        out.append({
+            "family": f"intense_round_{what}_rate", "category": "pace",
+            "canto": f"最癲嘅一局每粒棋嘅{label}：{win} 約 {_three_dp(rw)}、"
+                     f"{lose} 約 {_three_dp(rl)}——{tail}",
+            "english_gloss": (f"m{mi + 1}r{ri + 1} {what} per piece: {win} "
+                              f"{_three_dp(rw)}, {lose} {_three_dp(rl)}"),
+            "spec": conj(
+                round_winner(mi, ri, win),
+                _pin_rate(mi, ri, win, f, W[f], W["pieces"]),
+                _pin_rate(mi, ri, lose, f, L[f], L["pieces"]),
+                order,
+            ),
+        })
+    return out
+
+
+# VS is per minute and its two components are counted per round, so the identity
+# below is stated in x1000 units against milliseconds:
+#
+#     vs_x1000 · finaltime_ms  ==  10^8 · (garbage_attack + garbage_cleared)
+#
+# It is an OBSERVED identity, not a documented formula — TETR.IO publishes no such
+# definition and this repo has never asserted one. So the claim is a BOUND with the
+# record's own residual, never an equality, and the prose says 相差 rather than 等於.
+_VS_K = 100_000_000
+
+
+@family
+def intense_round_vs_split(facts):
+    """VS decomposed into its attacking and downstacking halves, bounded not asserted.
+
+    This is the claim that lets the section explain a round the winner lost the
+    attacking exchange in: it splits each player's VS into `10^8·attack/time` and
+    `10^8·cleared/time` and proves the two halves account for the whole to within a
+    stated residual.
+
+    The residual is the record's OWN error, so the bound is tight and every
+    single-value mutation kills it: a one-unit change to either counter moves the
+    right-hand side by 10^8, and the largest residual anywhere in this corpus's
+    selected rounds is under half of that.
+
+    Skipped for any player whose residual reaches half a unit — there the split
+    would be printed with a bound wide enough to swallow a whole line of attack,
+    which is a decomposition that cannot support the sentence it is under. This
+    has never triggered on a selected round; it is here because the corpus-wide
+    residual reaches 13% on some SURVIVING players' records and nothing guarantees
+    a future session's most intense round is not one of them.
+    """
+    best = _intense_round(facts)
+    if not best:
+        return []
+    mi, ri, r, _tot = best
+    out = []
+    for pl in _players(facts):
+        d = r["players"][pl]
+        ft, atk, clr = d["finaltime_ms"], d["garbage_attack"], d["garbage_cleared"]
+        resid = abs(d["vs_x1000"] * ft - _VS_K * (atk + clr))
+        if resid * 2 >= _VS_K:
+            continue
+        a_term = _VS_K * atk // ft
+        d_term = _VS_K * clr // ft
+        out.append({
+            "family": "intense_round_vs_split", "category": "pace",
+            "canto": f"最癲嘅一局 {pl} 嘅 VS 拆得開兩邊：攻嗰邊約 {_one_dp(a_term)}、"
+                     f"清垃圾嗰邊約 {_one_dp(d_term)}，兩邊加埋同佢實際 VS "
+                     f"約 {_one_dp(d['vs_x1000'])} 相差唔夠 "
+                     f"{_bound_dp(-(-resid // ft))}",
+            "english_gloss": (f"m{mi + 1}r{ri + 1} {pl} VS splits into attack "
+                              f"{_one_dp(a_term)} + downstack {_one_dp(d_term)}, "
+                              f"residual under {_bound_dp(-(-resid // ft))}"),
+            "spec": conj(
+                # the identity, as a two-sided bound on the residual
+                between(sub(mul(rnd(mi, ri, pl, "vs_x1000"), rnd(mi, ri, pl, "finaltime_ms")),
+                            mul(lit(_VS_K), add(rnd(mi, ri, pl, "garbage_attack"),
+                                                rnd(mi, ri, pl, "garbage_cleared")))),
+                        -resid, resid + 1),
+                # each half pinned to the figure the section prints
+                between(mul(lit(_VS_K), rnd(mi, ri, pl, "garbage_attack")),
+                        a_term * ft, (a_term + 1) * ft),
+                between(mul(lit(_VS_K), rnd(mi, ri, pl, "garbage_cleared")),
+                        d_term * ft, (d_term + 1) * ft),
             ),
         })
     return out

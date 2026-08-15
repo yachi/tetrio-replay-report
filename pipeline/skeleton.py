@@ -1067,6 +1067,10 @@ LAYOUT = [
 # they need no empty pair here. Each entry says why, because "it is missing" and
 # "it is deliberately absent" look identical in the output.
 SELF_INSERTING = {
+    "intense-round": "conditional — `_intense_round` returns None for a session whose rounds "
+                     "are all shorter than QUALIFYING_MS, so no claims are generated and "
+                     "`intense_round.build` returns None; it inserts itself before the "
+                     "perfect-clear region's BEGIN marker",
     "perfect-clear": "conditional — `generators.perfect_clears` emits nothing for a session "
                      "with no All Clear, so `pc_section.build` returns None and an empty pair "
                      "here would trip build_report's stale-region guard; it inserts the block "
