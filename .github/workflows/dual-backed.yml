@@ -1,0 +1,64 @@
+name: dual-backed
+
+# `tools/triangle-oracle/dual-backed.json` is deliberately a TOOLS artefact: computing it needs
+# @haelp/teto (161 packages), so it is not part of the per-push gates in verify.yml and its
+# reproducibility gate lives in the tool itself (`cross-extract.mjs --check`).
+#
+# "Manual-only" turned out to mean "never run". Three staleness deltas stacked up behind that gate
+# before anyone noticed — see the README section "A gate nobody runs is a gate that fails silently".
+# The largest was a *source* change (pipeline/sim/verified-prefix.ts) that invalidated an artefact
+# under tools/ without touching a single file there.
+#
+# So this workflow is deliberately BOTH:
+#   - path-filtered, so a change to an input it actually depends on is caught within one PR; and
+#   - scheduled weekly, because the path filter is a list someone has to maintain and a new import
+#     in cross-extract.mjs would escape it silently. The schedule is the backstop for the filter
+#     being wrong, which is the failure mode that produced this file.
+# Neither alone is sufficient. Do not delete one on the grounds that the other covers it.
+
+on:
+  pull_request:
+    paths:
+      - 'pipeline/sim/**'
+      - 'tools/triangle-oracle/**'
+      - 'sessions/**/*.ttrm'
+      - '.github/workflows/dual-backed.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pipeline/sim/**'
+      - 'tools/triangle-oracle/**'
+      - 'sessions/**/*.ttrm'
+      - '.github/workflows/dual-backed.yml'
+  schedule:
+    - cron: '41 6 * * 1'   # weekly, the backstop for the path filter being incomplete
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manifest:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
+        with:
+          bun-version: '1.2.4'
+
+      # --frozen-lockfile: the committed bun.lock is the pin. A run that silently resolved a
+      # different @haelp/teto would be comparing against a different second engine, which is the
+      # one thing this artefact exists to hold fixed.
+      - name: Install the oracle's isolated deps
+        working-directory: tools/triangle-oracle
+        run: bun install --frozen-lockfile
+
+      # Re-derives the manifest from the replays through BOTH engines and byte-compares it against
+      # the committed file, then checks that README.md's three published percentages match it —
+      # the JSON stores only counts, so byte-identity alone says nothing about the prose.
+      - name: Re-derive the dual-backed manifest and check the published figures
+        working-directory: tools/triangle-oracle
+        run: bun cross-extract.mjs --check

@@ -1,10 +1,40 @@
-// Quantify the STRENGTH of the dual-backed agreement, per DualExtractor.dfy's lemma: agreement on a
-// shared input is uninformative. Here the shared input is concrete — on garbage-bearing boards BOTH
-// engines write the same recorded hole `x`, so agreement on those boards is partly forced. So split
-// every dual-backed finding into:
-//   INDEPENDENT  — board is garbage-free at the finding's lock: sim & Triangle derived it from scratch
-//                  (movement/gravity/lock/clear), two genuinely separate clean-room implementations.
-//   COUPLED      — garbage present: agreement is partly on the shared recorded holes, weaker evidence.
+// Quantify the STRENGTH of the dual-backed agreement between the project sim (pipeline/sim/sim.ts)
+// and the Triangle oracle (./oracle.mjs), by splitting it on whether the agreeing cells could have
+// agreed for free.
+//
+// THE SHARED INPUT IS CONCRETE: the replay's own recorded garbage hole column `x`, carried by the
+// ige `interaction` events. Both engines write that same recorded column verbatim —
+//   - sim.ts:276-283   insertGarbage() fills the row with GARBAGE, then punches row[(x+s) % 10] = null
+//   - oracle.mjs:63-75 injectHoles() overwrites Triangle's own re-rolled column with the recorded
+//                      `x`, paired back to its batch by `iid`
+// and `size` is 1 in every ige garbage event of this corpus, so an as-inserted garbage row is nine
+// 'G' cells plus a hole at column `x`: a pure function of the shared input on BOTH sides, with no
+// derivation logic on either. Agreement on those cells is FORCED — it would hold between two engines
+// that agreed about nothing else. So each dual-backed finding is split by the board it reads:
+//
+//   INDEPENDENT  — garbage-free board at the finding's lock. NO cell of the compared string came from
+//                  the shared input, so the agreement is entirely between two clean-room derivations
+//                  (movement/gravity/lock/clear). The label is sound because `hasG` scans exactly the
+//                  rows 20..39 that `encSim` encodes: "no 'G'" really does mean "no forced cell in
+//                  the string that was compared". Keep those two ranges equal or the label lies.
+//   COUPLED      — garbage present. WEAKER evidence, not absent evidence, and the distinction is the
+//                  whole point: a coupled board is only PARTLY forced. The stack above the garbage is
+//                  derived by both engines, and whole-board agreement still requires all of it to
+//                  match. How much is actually forced is MEASURED and printed below rather than
+//                  asserted here — a share quoted in a comment is a share nothing checks, and this
+//                  file previously cited a proof that did not exist.
+//
+//                  The printed non-'G' share is an UPPER BOUND on independence, not a measure of it.
+//                  It counts a cell as independent when its TYPE is not garbage, but a stack cell's
+//                  ROW INDEX is a function of how many garbage rows were inserted — i.e. of the same
+//                  shared input — so some of what it counts is coupled through position even though
+//                  it is not coupled through type. The 'G' side is conservative in the argument's
+//                  favour; this side is not. The load-bearing figure is the share of boards that are
+//                  WHOLLY forced, which is bounded below by nothing and measures out near zero.
+//
+// NOT TRANSFERABLE TO THE SHIPPED ORACLE: `runCaseOracle` (pipeline/sim/oracle-source.ts:48) keeps
+// Triangle's own seeded-RNG hole columns instead of injecting the recorded ones, so its garbage cells
+// are NOT a shared input and this INDEPENDENT/COUPLED split says nothing about it.
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { loadCases, runCase, verifiedIndex } from "../../pipeline/sim/verified-prefix.ts";
@@ -26,6 +56,19 @@ const fc = { total: 0, dual: 0, indep: 0, coupled: 0 };
 const op = { rounds: 0, dual: 0, indep: 0, coupled: 0 };
 // prefix locks baseline
 const px = { total: 0, dual: 0, gfree: 0, dualGfree: 0 };
+// composition of the COUPLED boards: how much of one is the forced garbage, how much is still
+// derived. Computed, not quoted, so "coupled" can never be read as "uninformative".
+const cp = { boards: 0, cells: 0, g: 0, occ: 0, occG: 0, allForced: 0 };
+const cpAccum = (b) => {
+  cp.boards++; let occ = 0, occG = 0;
+  for (let r = 20; r < 40; r++) for (let c = 0; c < 10; c++) {
+    const cell = b[r][c]; cp.cells++;
+    if (cell === "G") cp.g++;
+    if (cell != null) { occ++; if (cell === "G") occG++; }
+  }
+  cp.occ += occ; cp.occG += occG;
+  if (occ > 0 && occG === occ) cp.allForced++;   // the only boards agreement is wholly forced on
+};
 
 for (const dir of dirs) {
   let cases; try { cases = loadCases(`${SESS}/${dir}`); } catch { continue; }
@@ -43,7 +86,7 @@ for (const dir of dirs) {
     for (let i = 0; i < sim.locks.length; i++) { const t = tri.gridAt(sim.locks[i].frame); if (t === undefined) continue; if (encSim(sim.boards[i]) !== t) { firstBad = i; break; } }
     const dualTop = Math.min(v, firstBad - 1);
 
-    for (let i = 0; i <= v && i < sim.boards.length; i++) { px.total++; const g = hasG(sim.boards[i]); if (!g) px.gfree++; if (i <= dualTop) { px.dual++; if (!g) px.dualGfree++; } }
+    for (let i = 0; i <= v && i < sim.boards.length; i++) { px.total++; const g = hasG(sim.boards[i]); if (!g) px.gfree++; if (i <= dualTop) { px.dual++; if (!g) px.dualGfree++; else cpAccum(sim.boards[i]); } }
 
     for (const rec of forecastMetric(sim, true).records) {
       if (rec.lockIndex > v) continue;
@@ -67,7 +110,7 @@ for (const dir of dirs) {
 
 const pct = (a, b) => b ? (100 * a / b).toFixed(1) : "—";
 const line = (label, k, n) => `  ${label.padEnd(34)} ${String(k).padStart(5)}/${String(n).padStart(5)}  ${pct(k, n).padStart(5)}%   (Wilson 95% lower ${(100 * wilsonLo(k, n)).toFixed(1)}%)`;
-console.log("VALUE OF THE DUAL-BACKING, decomposed by independence (DualExtractor.dfy: shared-input agreement is weak)\n");
+console.log("VALUE OF THE DUAL-BACKING, decomposed by independence (INDEPENDENT = no cell of the compared board came from the replay's recorded hole column)\n");
 console.log("verified-prefix locks");
 console.log(line("bit-exact (dual)", px.dual, px.total));
 console.log(line("  of which garbage-free (INDEP)", px.dualGfree, px.dual));
@@ -82,3 +125,12 @@ console.log(line("dual-backed", op.dual, op.rounds));
 console.log(line("  INDEPENDENT (garbage-free window)", op.indep, op.rounds));
 console.log(line("  COUPLED (garbage in window)", op.coupled, op.rounds));
 console.log(`  independent share of dual-backed: ${pct(op.indep, op.dual)}%`);
+
+// Why COUPLED is weaker evidence and not absent evidence: if agreement on a coupled board were
+// "uninformative", essentially every occupied cell would have to be a forced 'G'. It is not.
+console.log(`\nCOUPLED board composition (${cp.boards} dual-backed boards carrying garbage)`);
+console.log(line("forced 'G' of all cells", cp.g, cp.cells));
+console.log(line("forced 'G' of OCCUPIED cells", cp.occG, cp.occ));
+console.log(line("boards wholly forced (occupied all G)", cp.allForced, cp.boards));
+console.log(`  so AT MOST ${pct(cp.occ - cp.occG, cp.occ)}% of a coupled board's occupied cells are independently derived`);
+console.log(`  (upper bound: a stack cell's row index still depends on how many garbage rows went in).`);

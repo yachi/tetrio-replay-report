@@ -143,13 +143,19 @@ single-value mutation of the dataset is applied (exhaustive: 4,440 sites for the
 session, 7,019 for the 10-match one) and a hand claim counts as covered only when a
 generated claim's truth is impossible without it, and both are falsifiable somewhere.
 
-| Session | Coverage | Identical behaviour |
-|---|---|---|
-| 2026-07-22 (10 matches, 54 hand claims) | 45/53 testable = **85%** | 24 |
-| 2026-07-24 (7 matches, 52 hand claims) | 48/49 testable = **98%** | 28 |
+| Session | Coverage | `--two-site match` | Identical behaviour |
+|---|---|---|---|
+| 2026-07-22 (10 matches, 54 hand claims) | 45/53 testable = **85%** | 44/53 = **83%** | 24 |
+| 2026-07-24 (7 matches, 52 hand claims) | 48/49 testable = **98%** | 48/49 = **98%** | 28 |
 
-Combined 93/102 = **91%**, clearing the ≥85% acceptance gate. Claims no mutation can
-falsify are reported separately rather than counted as covered.
+Combined 93/102 = **91%** single-value, clearing the ≥85% acceptance gate; 92/102 = **90%**
+once value-preserving moves are included. Both combined figures are arithmetic over the two
+measured rows, not a single command. Claims no mutation can falsify are reported separately
+rather than counted as covered.
+
+2026-07-28 is the session where the distinction bites: 10/10 = 100% on single values,
+6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
+single-value change. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
 * the "only one decider" claim restated that match's score without proving it was the

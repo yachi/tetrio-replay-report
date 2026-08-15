@@ -150,26 +150,36 @@ mix, integer variance, and situational records.
 Coverage is measured rather than asserted. Comparing predicates as strings tells you
 nothing, since every predicate is true of the real data, so
 `pipeline/claims/equiv.py` applies **every single-value mutation** of the dataset
-(4,440 sites for the 7-match session; 7,019 for the 10-match one) and only counts a
-hand-written claim as covered when a generated claim cannot be true unless it is:
+(4,440 sites for the 7-match session; 7,019 for the 10-match one), and with `--two-site`
+a second family of **value-preserving moves**, and only counts a hand-written claim as
+covered when a generated claim cannot be true unless it is:
 
-| Session | Hand-written claims covered |
-|---|---|
-| 2026-07-22 | 45 of 53 testable — **85%** |
-| 2026-07-24 | 48 of 49 testable — **98%** |
-| 2026-07-28 | 10 of 10 testable — **100%**, and the number is an artefact (below) |
+| Session | single-value only | `--two-site match` |
+|---|---|---|
+| 2026-07-22 | 45 of 53 testable — **85%** | 44 of 53 — **83%** |
+| 2026-07-24 | 48 of 49 testable — **98%** | 48 of 49 — **98%** |
+| 2026-07-28 | 10 of 10 testable — **100%** | 6 of 10 — **60%** |
 
-**Where this metric breaks down.** 2026-07-28's hand claims are *windowed* — they compare
-matches 1-2 against matches 3-8 — and every window sum draws on the same rounds as a session
-total, so no single-value change can falsify one without falsifying the other. The tool
-duly reports 100%. But a total is preserved by *moving* value between two rounds, and that
-takes two changes: shifting 120 pieces from a match-3 round to a match-1 round leaves the
-`total_pieces`, `total_garbage_attack` and efficiency-gap claims all true while flipping
-"yachi's attack per piece fell after match 2" to false. So the generated totals do not in
-fact imply the windowed claims; the sampling depth just cannot see it. The docstring already
-warns that two simultaneous changes are out of scope — this is the first session where that
-caveat decides the headline number, which is why it is printed next to it rather than in a
-footnote.
+**2026-07-28's 100% was an artefact, and the second family is what shows it.** Its hand
+claims are *windowed* — they compare matches 1-2 against matches 3-8 — and every window sum
+draws on the same rounds as the session total meant to imply it, so no single-value change
+can falsify one without falsifying the other. A total survives *moving* value between two
+rounds, and that takes two changes: shifting half of one match-3 round's `pieces` into a
+match-1 round leaves `total_pieces`, `total_garbage_attack` and the efficiency-gap claims
+true while flipping "yachi's attack per piece fell after match 2" to false. Under
+`--two-site` exactly the four windowed claims (C002, C004, C005, C006) drop out, and the
+100% becomes 60%. The generated totals never did imply the windowed claims; the first
+family could not see it.
+
+The delta is **half** the source, not all of it. An earlier revision moved the whole value,
+which left every source round at 0 — a round with `pieces=0` but 48 lines cleared is not a
+dataset either extractor can emit, and a claim falsified only by an impossible dataset is
+not evidence. It also inflated the damage: under whole-value moves 2026-07-24 read 96%,
+under legal half-moves it is unchanged at 98%.
+
+`--two-site` is off by default. `match` granularity costs +50-60% wall clock; `round`
+granularity is exhaustive over round pairs and takes minutes, so a `match` figure is an
+**upper bound** on coverage and `round` should be re-run before publishing one.
 
 Claims that no single mutation can falsify are reported separately rather than counted.
 The remainder stay hand-written, which is the point: generation handles the recurring
