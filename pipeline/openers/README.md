@@ -12,7 +12,7 @@ recorded in the file and asserted in the test.
 ```fish
 bun run pipeline/openers/run-openers.ts sessions/2026-07-22 sessions/2026-07-24 \
                                         sessions/2026-07-28 sessions/2026-08-01 \
-                                        sessions/2026-08-09
+                                        sessions/2026-08-09 sessions/2026-08-14
 REPLAY_DIR=sessions/2026-07-22 bun test pipeline/openers/openers.test.ts
 bun add tetris-fumen; bun run pipeline/openers/fetch-catalogue.ts   # only to re-vendor
 ```

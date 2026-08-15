@@ -31,14 +31,18 @@ import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 const oracle = process.argv[2];
 if (!oracle) { console.error('usage: cross-tslot-multi.ts <path to cc-oracle>'); process.exit(2); }
 
-const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01'];
+// Every session. This stood at four from 2026-08-12 to 2026-08-15 while 08-09 and 08-14 joined
+// the corpus, so the CI step that runs this file covered four sessions no matter what the workflow
+// said — the same silent-under-coverage the workflow's own loop had. Adding a session means adding
+// it HERE too; nothing derives this list.
+const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14'];
 
 interface CC { any: boolean; lines: number; slots: number[]; }
 
 // Aggregates. `ours` is the scalar the metric actually consumes (bestTspinLines). `lines` is
 // cold-clear's max over its six named detectors (the quantity cross-tslot-count.ts already agrees
 // with). `slots` is the multi-slot chain.
-let N = 0;               // verified-prefix boards over all four sessions
+let N = 0;               // verified-prefix boards over every session in SESSIONS
 let ccAnySlot = 0;       // boards where cold-clear's chain finds >=1 slot (incl. 0-line spins)
 let ccLineClearing = 0;  // boards where at least one chained slot clears >=1 line
 let multi2 = 0;          // boards with >=2 slots in the chain
@@ -110,7 +114,7 @@ for (const s of SESSIONS) {
 const histStr = [...slotHist.entries()].sort((a, b) => a[0] - b[0])
   .map(([k, v]) => `${k}:${v}`).join('  ');
 
-console.log(`\n=== multi-slot differential over ${N} verified-prefix boards (4 sessions) ===\n`);
+console.log(`\n=== multi-slot differential over ${N} verified-prefix boards (${SESSIONS.length} sessions) ===\n`);
 console.log(perSession.join('\n'));
 console.log(`\nchain-length histogram (slots found per board):  ${histStr}`);
 console.log(`\ncold-clear finds >=1 slot (any):            ${ccAnySlot}`);
