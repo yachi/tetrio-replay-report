@@ -1,5 +1,9 @@
 // The sim's TRUE attack match vs real (the sim emits all-clear separately, acEmit:'separate', so its
 // records are already correct) — quantify the gap to the oracle's 100% ceiling.
+// The "(oracle ceiling: ...)" / "(oracle: ...)" labels below are NOT computed by this script — they are
+// oracle-ceiling.mjs's own numbers, hand-copied here for comparison. Re-run `bun oracle-ceiling.mjs` to
+// refresh them; last refreshed 2026-08-15 against the six-session corpus (760 rounds, 10741 attacks):
+// 10741/10741 = 100.0% attack match, 744/760 = 97.9% of rounds matching exhaustively.
 import { readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { loadCases, runCase } from "../../pipeline/sim/verified-prefix.ts";
@@ -14,5 +18,5 @@ for(const dir of dirs){ let cases; try{cases=loadCases(`${SESS}/${dir}`);}catch{
   }
 }
 console.log(`SIM-vs-real: ${matched}/${totalReal} attacks = ${(100*matched/totalReal).toFixed(1)}%  (oracle ceiling: 100%)`);
-console.log(`rounds matching EXHAUSTIVELY: ${exhaust}/${rounds} = ${(100*exhaust/rounds).toFixed(1)}%  (oracle: 98.3%)`);
+console.log(`rounds matching EXHAUSTIVELY: ${exhaust}/${rounds} = ${(100*exhaust/rounds).toFixed(1)}%  (oracle: 97.9%)`);
 console.log("first-mismatch cause:", JSON.stringify(cls));
