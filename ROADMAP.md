@@ -1424,3 +1424,72 @@ by `pipeline/sim/hoisted-das.test.ts`.
    where the oracle's `TL_DEFAULTS` are best-effort (holes and gravity are pinned; speed/cap are
    not; see the README caveat). Pin them against a live-capture sample of the early mid-round
    divergences to turn the disagreement map into a certified drift oracle for that class too.
+
+## 最癲一局 — one round deep-dived, and the gate class it re-exposed (2026-08-15)
+
+**DONE (2026-08-15), `2177531` + merge `177dfa5`.** Every report gains a section on the session's
+highest-combined-VS round. The selector is not new — `most_intense_round` has picked that round since
+the first session — so `generators._intense_round` was factored out and shared, and the section
+cannot describe a different round than the claim announcing it. Seven families per session
+(`intense_round_profile` ×2, `_edges`, `_attack_rate`, `_downstack_rate`, `_vs_split` ×2), 42 new
+lemmas, 526 generated + 164 hand = 690 claims. `pipeline/intense_round.py`, region `intense-round`,
+`SELF_INSERTING` (the selector returns None when no round qualifies).
+
+The finding it exists for: **in three of six sessions the winner of that round trailed on APM, on
+attack, or both**, and won on downstack — 07-22 m1r5 (DS/piece ×2.00) and 07-24 m6r8 (×2.20) with the
+winner also behind on APP, and 08-14 m11r2 (×1.81). 08-09 m5r7's winner led on everything, which is
+why the generator has two shapes; the flat case prints「冇得拗」as the result it is rather than as a
+failed reveal.
+
+Two idioms the algebra already supported, both reusable. With no division, a derived rate is **pinned**
+rather than merely compared: `v·den <= 1000·num < (v+1)·den`, one `between`, with teeth because the
+band is `den` wide while a one-unit change moves the left side by 1000. And `|d| <= ε` is
+`between(d, -ε, ε+1)` — `between` is `lo <= x < hi` in all three backends.
+
+The VS split is a **bound, never an equality**: `vs·time == 10^8·(attack + cleared)` is observed in
+this data, not a published formula. The residual is median 1.1e-4 for the player who died but reaches
+**13.4%** for a survivor, so the family skips any player whose residual reaches half a unit.
+
+**TODO — seven open items, the first three raised by the user, in priority order:**
+
+1. **Gate `equiv.py` coverage — and it demonstrated the gap itself.** The coverage figure is published
+   in a table and nothing re-derives it on push. This session added 7 generated claims per session
+   directly under that table and the numbers held **by luck**, not by a check: claim-id stability was
+   verified, coverage was not. Sharpest remaining instance of the manual-only-gate class. Same fix
+   shape as `tools/triangle-oracle/cross-extract.mjs --check`, path-filtered in CI on
+   `pipeline/claims/**` and `sessions/**/claims-generated.json`. While doing it: 07-28's 100% is the
+   known single-value-mutation artefact and a new gate must not bless it as measured.
+
+2. **Run `--two-site` on 07-22.** Its 83% is a MATCH UPPER BOUND, labelled as such in three documents.
+   One ~8-minute run replaces it with the measured figure; update all three together, since a resolved
+   bound still described as a bound is the same staleness class as item 1.
+
+3. **The 4th `forecast_lineclear` candidate — 08-14 yachi r2 lock19.** Flagged UNPROVEN, lemma renamed
+   so the name does not overstate. Genuinely new research, not a refresh. Prove it or record why it
+   cannot be; the rename was a holding action, not a conclusion.
+
+4. **Measure the new section's metric set.** The 13 printed columns are reasoned, not measured — the
+   research that was to settle it died on a usage limit. Three angles: paired AUC per candidate;
+   a sourced external glossary for what TETR.IO and the community mean by VS/DS/APP, so the Cantonese
+   labels are defensible; and an overlap map against all 10 existing generators. If 逐局全數據 already
+   prints the whole row, this section's value is the ANALYSIS and the printed set should shrink.
+
+5. **A leave-one-out gate for published pooled figures.** M11 R2 moves 08-14's published lost-regime
+   APP gap by 2.874 pp — rank 1 of 84 and 1.72× the next. "The floors have met" is substantially a
+   statement about one round and the narrative does not say so. A check that fails when one round
+   moves a pooled figure past some fraction of its own value generalises well past this case. Likely
+   falls out of item 1's harness rather than needing its own.
+
+6. **Two unexplained counter anomalies.** (a) All 8 player-rounds whose VS-identity residual exceeds
+   2% are `alive=True` AND are yachi — 8 of 8, same player; an answer could tighten or remove the
+   half-unit guard in `intense_round_vs_split`. (b) `finesse_perfect + finesse_faults` exceeds
+   `pieces` in 168/168 rounds; the hold-swap explanation is refuted (4 counterexamples, one with
+   `holds`=0, partial r = −0.076). No TETR.IO doc for `finesse.perfectpieces` has been read — that is
+   the open route.
+
+7. **Decide the 07-22/07-24 island question.** The section prints claim ids that are not in those two
+   reports' claims islands (their generated ledgers sit behind a separate proof map; the island is
+   deliberately capped at 54/52 rows). `pc_section` already does this, so the new section matched the
+   pattern rather than diverging — but an unresolvable id is close to the failure `check_badge_links`
+   exists to prevent. Accept it, extend the island, or stop printing ids the island lacks; whichever
+   is chosen must apply to `pc_section` too.
