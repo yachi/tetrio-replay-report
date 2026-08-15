@@ -84,12 +84,18 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
-over the verified prefix, sim and Triangle agree bit-exact on **95.3%** of locks, backing **93.9%** of
-forecast events and **93.5%** of opener rounds with an independent engine — the dual-implementation
+over the verified prefix, sim and Triangle agree bit-exact on **96.2%** of locks, backing **96.2%** of
+forecast events and **94.8%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
-was flagged non-dual purely because the oracle mis-paired a garbage hole; with the fix it is 1/1
-dual-backed. The sim matched ground truth throughout — the bug was the oracle's.
+was flagged non-dual purely because the oracle mis-paired a garbage hole. The sim matched ground truth
+throughout — the bug was the oracle's.
+
+**That event is no longer dual-backed, and the regression is the point.** Under the reference-engine
+board source, 2026-07-28's `forecast_lineclear` reads **0/1** where the hole-pairing fix had made it
+1/1; the corpus's other one, 2026-08-14's, reads 1/1. Nothing about the hole-pairing fix changed — the
+board underneath it did. A figure quoted for a *named single event* is the most fragile kind there is,
+because the event survives the change and only its verdict moves.
 
 ## The dual-backed manifest — checkable two-engine confirmation
 
@@ -109,3 +115,33 @@ Dafny proof — it carries no claim id and no ✓ badge, and never merges into `
 layer for a possible `✓ two-engine` marker in the forecast/opener sections; wiring that into the published
 report is a separate decision, because the report is pipeline-built (no oracle) and every report artifact
 is held to CI-reproducibility, which a manifest needing the oracle cannot meet.
+
+### A gate nobody runs is a gate that fails silently — this one had, for three deltas
+
+The `--check` above is real and it works: run today against the manifest as committed, it exited 1.
+It had been exiting 1 for a long time, and because it is manual-only *by design*, nothing noticed.
+Three separate staleness deltas had stacked up behind it, and the prose above quoted the oldest:
+
+| # | cause | locks bit-exact |
+|---|---|---|
+| 0 | figures as first written (`08ed03c`) — correct at the time | 95.3% |
+| 1 | `842f7c0` regenerated the manifest after the exact-attack default; prose not updated | → 94.9% |
+| 2 | the reference-engine board source landed; manifest **never** regenerated | → 95.9% |
+| 3 | the sixth session (2026-08-14) added | → 96.2% |
+
+Only delta 3 is the one a "new session" checklist would catch. Delta 1 is prose left behind by a
+regeneration, delta 2 is an artefact left behind by a *source* change — and delta 2 is the large one.
+
+**The manifest's own structure is what proves delta 2 is source drift and not the new session.**
+`cross-extract.mjs` builds a fresh `S` per session directory; nothing crosses sessions except the
+global total. So adding 2026-08-14 *cannot* change the other five blocks — and all five changed
+(2026-07-22's `prefix_locks` 3620 → 4443). That argument needs no git archaeology, only the loop.
+
+Two consequences for anyone regenerating this file:
+
+- **Re-derive the prose in the same commit as the artefact.** Every figure in the paragraphs above is
+  a percentage the JSON does not store (counts are stored precisely so the file stays byte-stable),
+  so nothing mechanically ties prose to manifest. `--check` gates the JSON and gates nothing else.
+- **Run `--check` after anything touching `pipeline/sim/verified-prefix.ts`, `pipeline/sim/forecast.ts`
+  or `oracle.mjs`** — the three modules `cross-extract.mjs` imports. A change to any of them
+  invalidates this manifest without touching a single file under `tools/`.

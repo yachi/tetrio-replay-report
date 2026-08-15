@@ -83,18 +83,44 @@ const argv = process.argv.slice(2);
 const outIdx = argv.indexOf("--out");
 const outPath = outIdx >= 0 ? argv[outIdx + 1] : `${HERE}dual-backed.json`;
 
+const pct1 = (a, b) => (b ? (100 * a / b).toFixed(1) : "—");
+
+// The three percentages the README publishes are DERIVED at read time — the manifest stores only
+// counts, so byte-identity of the JSON says nothing about the prose. That gap is not hypothetical:
+// the figures sat at their 08ed03c values through two regenerations that moved every one of them.
+// So --check gates the prose too, and a paragraph it cannot parse is a FAILURE, never a skip —
+// a rewording that silently disables the check is the same bug wearing a different hat.
+function checkReadme(totals) {
+  const path = `${HERE}README.md`;
+  if (!existsSync(path)) return [`README.md not found at ${path}`];
+  const md = readFileSync(path, "utf8");
+  const re = /agree bit-exact on \*\*([\d.]+)%\*\* of locks, backing \*\*([\d.]+)%\*\* of\s+forecast events and \*\*([\d.]+)%\*\* of opener rounds/;
+  const m = md.match(re);
+  if (!m) return ["README.md: could not find the published coverage sentence. If you reworded it, " +
+                  "update the regex in cross-extract.mjs so the figures stay gated."];
+  const want = [pct1(totals.locks.dual, totals.locks.total),
+                pct1(totals.forecast.dual, totals.forecast.total),
+                pct1(totals.opener.dual, totals.opener.total)];
+  const names = ["locks bit-exact", "forecast events dual-backed", "opener rounds dual-backed"];
+  return want.flatMap((w, i) => (m[i + 1] === w ? [] : [`README.md says ${m[i + 1]}% for ${names[i]}; the manifest gives ${w}%`]));
+}
+
+let ft = 0, fd = 0, ort = 0, ord = 0;
+for (const S of Object.values(sessions)) { ft += S.forecast.total; fd += S.forecast.dual; ort += S.opener_rounds; ord += S.opener_dual; }
+const totals = { locks: gPrefix, forecast: { total: ft, dual: fd }, opener: { total: ort, dual: ord } };
+
 if (argv.includes("--check")) {
   const cur = existsSync(outPath) ? readFileSync(outPath, "utf8") : "";
   if (cur !== json) { console.error(`STALE: ${outPath} differs from a fresh run. Regenerate with --out.`); process.exit(1); }
-  console.log(`ok  ${outPath} reproduces byte-for-byte`);
+  const bad = checkReadme(totals);
+  if (bad.length) { for (const b of bad) console.error(`STALE PROSE: ${b}`); process.exit(1); }
+  console.log(`ok  ${outPath} reproduces byte-for-byte, and README.md's 3 published figures match it`);
 } else if (outIdx >= 0 || argv.includes("--write")) {
   writeFileSync(outPath, json);
   console.log(`wrote ${outPath}`);
 } else {
-  const pct = (a, b) => b ? `${(100 * a / b).toFixed(1)}%` : "—";
+  const pct = (a, b) => `${pct1(a, b)}%`;
   console.log(`=== verified-prefix coverage ===\n  ${gPrefix.dual}/${gPrefix.total} locks bit-exact sim==Triangle (${pct(gPrefix.dual, gPrefix.total)})`);
-  let ft = 0, fd = 0, ort = 0, ord = 0;
-  for (const [d, S] of Object.entries(sessions)) { ft += S.forecast.total; fd += S.forecast.dual; ort += S.opener_rounds; ord += S.opener_dual; void d; }
   console.log(`\n=== FORECAST ===\n  ${fd}/${ft} events dual-backed (${pct(fd, ft)})`);
   console.log(`\n=== OPENER ===\n  ${ord}/${ort} rounds fully dual-backed in the opening window (${pct(ord, ort)})`);
   console.log(`\n(write the manifest with --out ./dual-backed.json; check it with --check)`);
