@@ -21,7 +21,7 @@
  *    artefact of picking that set — and the C-Spin set is genuinely doubtful (see `isCSpin`: its
  *    three members are `Fake C-Spin`, `Secspin` and an `SDPC-Spin` compound). So every set is
  *    reported, narrow and widest, with its member names, and the finding is whether the answer
- *    MOVES between them. Measured over all five sessions it does not: the nearest C-Spin page and
+ *    MOVES between them. Measured over all six sessions it does not: the nearest C-Spin page and
  *    the nearest DT page both sit at 6 cells whichever reading is taken.
  *
  * 2. ORDERING — which of the two T-spins comes first. This is the one metric that separates the two
@@ -41,7 +41,9 @@
  *    a statement about playstyle, not the opener. The hand-sim's short verified prefix hid this by
  *    truncating to the opening; the oracle board source reaches the whole round, so the window is now
  *    explicit. `ordering_full_round` applies the same opener window over the whole simulated round;
- *    both agree (cspin_order === rounds_with_both, dt_order == 0, five sessions).
+ *    both agree — 454 of 455 rounds run the C-Spin order over six sessions, the one exception being
+ *    yachi's exact DT Cannon on 2026-08-14 (replay-2026-08-14-2.ttrm round 3), which the first-bag
+ *    catalogue match names independently.
  *
  * 3. SLOT GEOMETRY vs harddrop.com/wiki/C-Spin's own 38 drawn placements. For each verified T-spin
  *    the local shape the T tucked into is extracted and compared with the article's.
@@ -619,7 +621,7 @@ for (const c of loadCases(dir)) {
     cleanBoards.push({ user: c.user, round: rounds.length - 1, locks: n, grid: occGrid(rows) });
     // `bags` is the seven-lock series the original first-bag metric is defined over. Kept as its
     // own list rather than filtered out of `cleanBoards` at each use, so that metric's numbers are
-    // provably untouched by the widening: five sessions re-emit byte-identical first_bag blocks.
+    // provably untouched by the widening: the pre-existing sessions re-emit byte-identical first_bag blocks.
     if (n === 7) bags.push({ user: c.user, grid: occGrid(rows) });
   }
 }
@@ -668,7 +670,7 @@ function firstBagFor(user: string) {
 // and over a whole round these players throw ordinary T-spin doubles by the dozen, so "did any triple
 // precede any double" is a statement about playstyle, not the opener. The hand-sim's short verified prefix
 // hid this by truncating to the opening; the oracle board source (runCaseOracle) reaches the whole round,
-// so the window must be made explicit. Measured (oracle, five sessions): at the opener window every round
+// so the window must be made explicit. Measured (oracle, six sessions): at the opener window all but one round
 // holding both spins runs the C-Spin order — cspin_order === rounds_with_both, dt_order == 0 — while over
 // the whole prefix 7 rounds show a late-game double-before-triple that is not a DT Cannon.
 function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: number }[]) {
@@ -1176,7 +1178,7 @@ function donationMetric() {
 // THE CONTROL IS THE CROSS-TAB, in two directions, and this metric may not be printed without both:
 //   - by DEPTH: nearly every >=3-wide hit is ONE ROW deep, which is a dimple and not a cave. The
 //     width count on its own reads as dozens of STMB caves; the depth histogram beside it says how
-//     many are genuine (1 in 592 player-rounds, five sessions).
+//     many are genuine (1 in 760 player-rounds, six sessions).
 //   - by LINES: the same >=3-wide gap appears under T-spin TRIPLES at a comparable rate, where it
 //     is ordinary TST residue that nobody calls a cave. A shape that fires as often under the spin
 //     the technique is NOT about is a shape test, not a technique test.
@@ -1210,7 +1212,7 @@ function stmbCaveMetric() {
           ? counterRoundsFor(user, ['tspindoubles', 'minitspindoubles']) : null,
         width_ge_3: w.length,
         min_depth_ge_2: w.filter(e => e.cave!.minDepth >= 2).length,
-        // Measured, five sessions: every single cave falls OUTSIDE the opener window — 0 in, 30
+        // Measured, six sessions: every single cave falls OUTSIDE the opener window — 0 in, 39
         // out. That is this metric's cleanest result, and it is the one number here that confirms
         // harddrop's own filing of the technique instead of citing it.
         in_opener: w.filter(e => e.lock <= WINDOW_PIECES).length,

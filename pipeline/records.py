@@ -148,12 +148,19 @@ def build(facts, report_dir):
     # Why two kinds of record live in one grid. Without this the reader sees a
     # 打足 60 秒 qualifier on some tiles and not others and has to guess whether
     # it is a rule or an oversight.
+    # CORPUS FIGURES, HAND-MAINTAINED. These describe every session pooled, so no single
+    # session's facts.json can derive them and nothing here can go stale loudly. They come
+    # from `Rscript analysis/rate_records.R`, whose session list is hardcoded for the same
+    # reason — when a session is added, re-run it and copy the new numbers into BOTH places.
+    # They were left at four sessions / 492 player-rounds through two additions before
+    # anyone read the rendered footnote.
     out.append(f'    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計'
                f'打足 {generators.QUALIFYING_MS // 1000} 秒嘅局。速率係「攻擊 ÷ 時間」，'
-               '局數愈短分母愈細，個數就愈飄——四個 session 夾埋 492 個 player-round 度'
-               '量過：VS 嘅標準差由 58.2（約 21 秒嗰批）跌到 15.2（約 144 秒嗰批），'
-               '但平均數企喺原地，即係短局唔係打得好啲，係量得唔準啲。'
-               '未設限之前，四個 session 全部 12 項速率紀錄都落喺最短嗰四分一嘅局度。'
+               '局數愈短分母愈細，個數就愈飄——六個 session 夾埋 760 個 player-round 度'
+               '量過：VS 嘅標準差由 59.9（約 19 秒嗰批）跌到 14.5（約 150 秒嗰批），'
+               '足足細咗四倍；同一段路平均數反而由 104 升到 120，即係短局唔止唔係打得好啲，'
+               '仲要係量得唔準好多。'
+               '未設限之前，六個 session 全部 18 項速率紀錄都落喺最短嗰四分一嘅局度。'
                '<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>'
                '——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>')
     if skipped:

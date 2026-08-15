@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人嘅分工同前五晚一樣：逐局 PPS，yachi 平均約 1.46 高過 pinglamb 嘅約 1.41<span class=\"badge\" data-claim=\"G043\"></span>；每粒方塊打出嘅攻擊（APP），pinglamb 全 session 高過對面<span class=\"badge\" data-claim=\"G045\"></span>。今晚埋單同上一晚一樣買唔返——yachi 多疊咗 415 粒方塊，打出嘅攻擊反而少 206 條，即係 pinglamb 總攻擊嘅 4% 以上<span class=\"badge\" data-claim=\"C005\"></span>。真正嘅原因喺輸贏拆開之後嗰兩行：輸嗰啲局兩個人爭唔夠 2%，贏嗰啲局爭超過 18%<span class=\"badge\" data-claim=\"C002\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（84局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。VS 呢一項喺今晚 84 局入面，每一局都係贏嗰個高過輸嗰個——冇一局例外<span class=\"badge\" data-claim=\"G028\"></span>。連續第六個 session 都係咁。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "今晚兩個人嘅開行方式一如以往分得好開：quad 係 yachi 開多啲（398 對 320）<span class=\"badge\" data-claim=\"G038\"></span>，但 T-spin 兩格都係 pinglamb 贏——T-spin double 371 對 312<span class=\"badge\" data-claim=\"G039\"></span>、T-spin triple 89 對 50<span class=\"badge\" data-claim=\"G040\"></span>。同樣清行，T-spin 用嘅方塊少好多，呢兩格就係佢每粒方塊打得重過 yachi 嘅主要來源<span class=\"badge\" data-claim=\"G045\"></span>。呢個分工六個 session 一次都冇掉轉過。"
+      ],
+      "footnote": "呢個圖表嘅 TSD 同 TST 兩條 bar 加埋，先啱「計埋 T-spin double 同 triple」嗰條數（pinglamb 460、yachi 362）<span class=\"badge\" data-claim=\"G057\"></span>——TSS（T-spin single）冇計落嗰個總數度。另外要留意，facts.json 入面嗰個 <code>tspins</code> 原始計數（pinglamb 531、yachi 430）<span class=\"badge\" data-claim=\"G037\"></span>係連冇清到行嘅轉都計埋，所以一定大過上面兩條 bar 加埋，兩者唔可以溝亂。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。今晚手法呢一格兩個人貼到實：finesse 失誤 1268 對 1262<span class=\"badge\" data-claim=\"G035\"></span>，每粒方塊嘅 perfect 比率 yachi 較好<span class=\"badge\" data-claim=\"G047\"></span>，KPP 就 pinglamb 較好<span class=\"badge\" data-claim=\"G066\"></span>。呢格一路都同輸贏冇乜關係，今晚亦冇例外<span class=\"badge\" data-claim=\"G073\"></span><span class=\"badge\" data-claim=\"G074\"></span>。守嗰邊就有分別：全 session 每粒方塊清走幾多垃圾（DS）係 pinglamb 高過 yachi<span class=\"badge\" data-claim=\"G078\"></span>，雖然清走嘅垃圾總數係 yachi 多（1508 對 1441）<span class=\"badge\" data-claim=\"G034\"></span>——即係守得住，但用多咗方塊去守。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

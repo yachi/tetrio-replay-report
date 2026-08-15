@@ -174,7 +174,7 @@ describe('detectTSpin vs cold-clear rotate() over seeded overhang boards', () =>
 
 // ── the two invariants also hold on REAL game boards (verified-prefix corpus, guarded) ───────────
 // Session list explicit, not globbed (memory: sim-test-corpus-silently-under-covers).
-const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09']
+const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
   .map(d => `${import.meta.dir}/../../sessions/${d}`).filter(existsSync);
 
 describe.skipIf(SIM_SESSIONS.length === 0)('detectTSpin vs cold-clear rotate() over real verified-prefix boards', () => {

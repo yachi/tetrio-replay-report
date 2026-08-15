@@ -1,0 +1,1331 @@
+{
+  "schema": "opener-facts/1",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
+    "the slot-geometry match is a SHAPE test, not an opener test: 90.5% of Triples match the wiki window against 14.5% of Doubles, over 893 verified T-spins",
+    "the ordering metric is scored on 101 of 165 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
+    "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
+    "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside",
+    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 21 of 21 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
+  ],
+  "session": "2026-08-14",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "board_source": "triangle-oracle (vendored @haelp/teto, byte-identical)",
+  "window_pieces": 21,
+  "near_cells": 4,
+  "definitions": {
+    "dt_order": "a T-spin Double before a T-spin Triple — DT Cannon (開幕DT砲) by definition",
+    "cspin_order": "a T-spin Triple before a T-spin Double — the C-Spin follow-up by definition"
+  },
+  "catalogue": {
+    "source": "https://github.com/swng/opener_db",
+    "commit": "b4a66878a47466b557165dec9171701bfeafab93",
+    "data_json_sha256": "d1fbade1f6df174766b5a354c6ab6d5be992e9c30cbaad3bc6ee1ba4a359a8bf",
+    "pages": 783,
+    "openers": 360,
+    "sets": {
+      "cspin": {
+        "label": "C-Spin (by name)",
+        "openers": 3,
+        "pages": 8,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}"
+        ]
+      },
+      "cspin_or_tki": {
+        "label": "C-Spin or TKI",
+        "openers": 6,
+        "pages": 24,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Amino TSD {JP: 開幕TSD亜種} / Kazu TKI {JP: None}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}"
+        ]
+      },
+      "dt_cannon": {
+        "label": "DT Cannon",
+        "openers": 6,
+        "pages": 12,
+        "names": [
+          "Center DT Cannon {JP: 確定DT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Super Speed DT Cannon {JP: 超DT}"
+        ]
+      },
+      "dt_family": {
+        "label": "DT family (widest)",
+        "openers": 48,
+        "pages": 115,
+        "names": [
+          "Soil MDDT {JP: None}",
+          "Bakkure SDT {JP: バックレSDT}",
+          "Chair SDT {JP: チェアSDT}",
+          "Dolphin {JP: None} / Misfire-Beta / Buhin SDT {JP: 舞浜SDT}",
+          "Juice ST {JP: ジュースST} / Deuru’s SDT {JP: でうる式SDT}",
+          "Pure SDT {JP: ピュアSDT}",
+          "SDDT Cannon {JP: SDDT砲}",
+          "SDT Cannon {JP: SDT砲}",
+          "SDT’s {JP: None}",
+          "SDTT {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Snail SDT {JP: スネイルSDT}",
+          "Flavor {JP: 風味} / Swift DTD {JP: スウィフトDTD}",
+          "Great DDT {JP: グレートDDT}",
+          "Pseudo 91 DT {JP: 杭DTもどき}",
+          "Variable DDT {JP: バリアブルDDT}",
+          "91DT {JP: 杭DT}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "Fast DT {JP: ファーストDT}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}",
+          "Flamingo DT {JP: フラミンゴDT}",
+          "airDT {JP: none}",
+          "AntiRotationDT {JP: none}",
+          "Center DT Cannon {JP: 確定DT砲}",
+          "Crescent DT {JP: クレセントDT}",
+          "Cycle DT {JP: サイクルDT}",
+          "DDT Cannon {JP: DDT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Gill DT {JP: ジルDT}",
+          "Hijiki DT {JP: ひじきDT}",
+          "HOLE DTD {JP: none}",
+          "Illuminate DT {JP: イルミネイトDT}",
+          "Muko DT {JP: 婿DT}",
+          "NEWDT Cannon {JP: NEWDT砲}",
+          "Parallel DT {JP: パラレルDT}",
+          "Pyramid DT {JP: ピラミッドDT}",
+          "Risu DT {JP: りすDT}",
+          "Sharp Jasda Logistics DT {JP: シャープジャスダロジスティクスDT}",
+          "Speerde Stacking {JP: スピアード積み} / Oxygen DT PC {JP: 酸素DTパフェ} / Beacon 6-3 {JP: None}",
+          "Starlight DT {JP: スターライトDT}",
+          "Super Speed DT Cannon {JP: 超DT}",
+          "SZDT 2 {JP: SZDT改}",
+          "SZDT Cannon Opener {JP: 開幕SZDT砲}",
+          "Toro DTD {JP: トロDTD}",
+          "Unbalance DT {JP: アンバランスDT}"
+        ]
+      }
+    }
+  },
+  "wiki_cspin": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38
+  },
+  "first_bag": {
+    "rounds": 168,
+    "clean": 141,
+    "players": [
+      {
+        "user": "pinglamb",
+        "clean_first_bags": 80,
+        "exact_matches": [],
+        "nearest": {
+          "any": {
+            "min_cells": 4,
+            "within_threshold": 66,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 66,
+              "5-8": 12,
+              "9-14": 2,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 65,
+              "9-14": 14,
+              "15+": 1
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 67,
+              "9-14": 12,
+              "15+": 1
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 10,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 0,
+              "9-14": 80,
+              "15+": 0
+            }
+          },
+          "dt_family": {
+            "min_cells": 4,
+            "within_threshold": 1,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 1,
+              "5-8": 77,
+              "9-14": 2,
+              "15+": 0
+            }
+          }
+        }
+      },
+      {
+        "user": "yachi",
+        "clean_first_bags": 61,
+        "exact_matches": [
+          {
+            "name": "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+            "rounds": 1
+          }
+        ],
+        "nearest": {
+          "any": {
+            "min_cells": 0,
+            "within_threshold": 31,
+            "bands": {
+              "0": 1,
+              "1-2": 0,
+              "3-4": 30,
+              "5-8": 30,
+              "9-14": 0,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 30,
+              "9-14": 31,
+              "15+": 0
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 36,
+              "9-14": 25,
+              "15+": 0
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 0,
+            "within_threshold": 2,
+            "bands": {
+              "0": 1,
+              "1-2": 0,
+              "3-4": 1,
+              "5-8": 4,
+              "9-14": 55,
+              "15+": 0
+            }
+          },
+          "dt_family": {
+            "min_cells": 0,
+            "within_threshold": 2,
+            "bands": {
+              "0": 1,
+              "1-2": 0,
+              "3-4": 1,
+              "5-8": 59,
+              "9-14": 0,
+              "15+": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ordering": {
+    "scope": "verified prefix",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 84,
+        "rounds_with_tspin_double": 68,
+        "rounds_with_tspin_triple": 78,
+        "rounds_with_both": 66,
+        "dt_order": 0,
+        "cspin_order": 66,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 66,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 16
+        },
+        "mid_game": {
+          "rounds_with_both": 2,
+          "cspin_order": 2,
+          "dt_order": 1,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 81,
+        "rounds_with_tspin_double": 63,
+        "rounds_with_tspin_triple": 48,
+        "rounds_with_both": 35,
+        "dt_order": 1,
+        "cspin_order": 34,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 34,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 18
+        },
+        "mid_game": {
+          "rounds_with_both": 1,
+          "cspin_order": 1,
+          "dt_order": 0,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      }
+    ]
+  },
+  "ordering_full_round": {
+    "scope": "whole simulated round, verification NOT required",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 84,
+        "rounds_with_tspin_double": 68,
+        "rounds_with_tspin_triple": 78,
+        "rounds_with_both": 66,
+        "dt_order": 0,
+        "cspin_order": 66,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 66,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 16
+        },
+        "mid_game": {
+          "rounds_with_both": 2,
+          "cspin_order": 2,
+          "dt_order": 1,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 81,
+        "rounds_with_tspin_double": 63,
+        "rounds_with_tspin_triple": 48,
+        "rounds_with_both": 35,
+        "dt_order": 1,
+        "cspin_order": 34,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 34,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 18
+        },
+        "mid_game": {
+          "rounds_with_both": 1,
+          "cspin_order": 1,
+          "dt_order": 0,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      }
+    ]
+  },
+  "slot_geometry": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38,
+    "rows": [
+      {
+        "lines": 1,
+        "n": 115,
+        "drawn": 3,
+        "mirrored": 4,
+        "matched": 7,
+        "share_x1000": 60
+      },
+      {
+        "lines": 2,
+        "n": 640,
+        "drawn": 37,
+        "mirrored": 56,
+        "matched": 93,
+        "share_x1000": 145
+      },
+      {
+        "lines": 3,
+        "n": 138,
+        "drawn": 44,
+        "mirrored": 81,
+        "matched": 125,
+        "share_x1000": 905
+      }
+    ]
+  },
+  "ordering_class": {
+    "source": "https://harddrop.com/wiki/Category:Triple_Double_openers",
+    "name": "Triple Double openers",
+    "says": "openers that begin with a Triple Double Attack, or any variant thereof",
+    "openers": 38,
+    "members": [
+      "1-11th Compromise Cannon",
+      "1-5th End Cannon",
+      "Aitch Stacking",
+      "Azyara Spin",
+      "Bakery TD",
+      "C-Spin",
+      "Desert stacking",
+      "Donut Stacking",
+      "Dot Cannon",
+      "Gamushiro Stacking",
+      "Gravity TD",
+      "Hardtack Stacking",
+      "Honey Cup",
+      "Lime Stacking",
+      "Loyal TD",
+      "Magic TD",
+      "Manhole Stacking",
+      "Mountainous Stacking",
+      "OJI Honey Cup",
+      "Olive Stacking",
+      "Operability TD",
+      "PC-Spin",
+      "PC-Spin (Okey Version)",
+      "Pancake Stacking",
+      "Plate TD",
+      "Pseudo-PC",
+      "Rabbit Stacking",
+      "Ruby Stacking",
+      "SkTD",
+      "Solitary Moon Stacking",
+      "Stray Cannon",
+      "Tandoori Chicken Stacking",
+      "Triple Triple PC",
+      "Tsar Cannon",
+      "Waiting Moon Stacking",
+      "Yamaha Stacking",
+      "Yuchan Cannon",
+      "：-0 Stacking"
+    ],
+    "means": "a Triple-before-Double opening is the signature of this whole category, not of any one opener in it — the ordering metric cannot name which member was played"
+  },
+  "named_openers": {
+    "source": "harddrop.com/wiki",
+    "why_a_second_source": "opener_db draws 484 of its 783 pages on a filled base, and a page with a full row can never equal a no-clear opening field; four of these six openers have no clean catalogue page at all",
+    "provenance": [
+      {
+        "page": "Honey_Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "oldid": 41477,
+        "sha256": "a12439a6f2747c3687b006c0aba9b2c334019d3e7b8ad375f377f388494d95b3",
+        "bytes": 599322
+      },
+      {
+        "page": "Mountainous_Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "oldid": 43651,
+        "sha256": "f26c3cb05e02fbb58a49744df6e2dabb77135caeab2175a456a2bc3af4e055cc",
+        "bytes": 1941960
+      },
+      {
+        "page": "Perfect_Clear_Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "oldid": 43630,
+        "sha256": "e3be1c1272fcbbba196b45dc39b8583d5869318a37a1a3904b9f82de11d5ab13",
+        "bytes": 2209943
+      },
+      {
+        "page": "Stray_Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "oldid": 41406,
+        "sha256": "5952028d6a1373593dfcc7d3d808e10283ec58dd59b21ddee36986edf628cdb3",
+        "bytes": 660851
+      },
+      {
+        "page": "TKI_3_Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "oldid": 41439,
+        "sha256": "024520e28e69f4d56de2f01f15881baa136a499ae8ddc2aa9112aeb466c5938c",
+        "bytes": 2350135
+      }
+    ],
+    "catalogue_pages": 783,
+    "catalogue_pages_clean": 299,
+    "sampled_at_locks": [
+      6,
+      7
+    ],
+    "round_overlap": {
+      "mountainous_1": {
+        "mountainous_2": 35
+      },
+      "mountainous_2": {
+        "mountainous_1": 35
+      }
+    },
+    "boards": {
+      "total": 302,
+      "by_locks": {
+        "6": 161,
+        "7": 141
+      }
+    },
+    "openers": [
+      {
+        "key": "honey_cup",
+        "wiki": "Honey Cup",
+        "jp": "はちみつ砲",
+        "page": "Honey Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "wiki_says": "a TST to TSD opener; the Perfect Clear rate is 90%",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          7
+        ],
+        "pages": {
+          "wiki_fields": 1,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 80,
+            "exact": 30,
+            "min_cells": 0,
+            "within_threshold": 65,
+            "share_x1000": 812,
+            "bands": {
+              "0": 30,
+              "1-2": 35,
+              "3-4": 0,
+              "5-8": 1,
+              "9-14": 13,
+              "15+": 1
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 65,
+              "pages": 224
+            },
+            "matched_rounds": 30,
+            "matched_and_delivered": 22
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 61,
+            "exact": 11,
+            "min_cells": 0,
+            "within_threshold": 28,
+            "share_x1000": 459,
+            "bands": {
+              "0": 11,
+              "1-2": 16,
+              "3-4": 1,
+              "5-8": 1,
+              "9-14": 26,
+              "15+": 6
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 31,
+              "pages": 224
+            },
+            "matched_rounds": 11,
+            "matched_and_delivered": 9
+          }
+        ]
+      },
+      {
+        "key": "stray_cannon",
+        "wiki": "Stray Cannon",
+        "jp": "迷走砲",
+        "page": "Stray Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "wiki_says": "a TD opener; 75% build rate on bag 1 (90% with mirror) if S/Z is held",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 83,
+            "exact": 28,
+            "min_cells": 0,
+            "within_threshold": 35,
+            "share_x1000": 421,
+            "bands": {
+              "0": 28,
+              "1-2": 7,
+              "3-4": 0,
+              "5-8": 46,
+              "9-14": 2,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 28,
+            "matched_and_delivered": 23
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 78,
+            "exact": 16,
+            "min_cells": 0,
+            "within_threshold": 19,
+            "share_x1000": 243,
+            "bands": {
+              "0": 16,
+              "1-2": 3,
+              "3-4": 0,
+              "5-8": 36,
+              "9-14": 20,
+              "15+": 3
+            },
+            "baseline": {
+              "exact": 27,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 16,
+            "matched_and_delivered": 8
+          }
+        ]
+      },
+      {
+        "key": "mountainous_1",
+        "wiki": "Mountainous Stacking",
+        "jp": "山岳積み",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "a Triple Double opener; T-Spin Triple in the second bag, Perfect Clear chance in the third; 53.33% setup rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking 2"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 2,
+          "catalogue_clean": 2
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 83,
+            "exact": 10,
+            "min_cells": 0,
+            "within_threshold": 36,
+            "share_x1000": 433,
+            "bands": {
+              "0": 10,
+              "1-2": 26,
+              "3-4": 0,
+              "5-8": 42,
+              "9-14": 5,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 78,
+            "exact": 25,
+            "min_cells": 0,
+            "within_threshold": 34,
+            "share_x1000": 435,
+            "bands": {
+              "0": 25,
+              "1-2": 8,
+              "3-4": 1,
+              "5-8": 21,
+              "9-14": 18,
+              "15+": 5
+            },
+            "baseline": {
+              "exact": 2,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 25,
+            "matched_and_delivered": 17
+          }
+        ]
+      },
+      {
+        "key": "mountainous_2",
+        "wiki": "Mountainous Stacking 2",
+        "jp": "山岳積み2",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking; the L piece (J mirrored) is held until the second bag; 100% stack rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 83,
+            "exact": 10,
+            "min_cells": 0,
+            "within_threshold": 36,
+            "share_x1000": 433,
+            "bands": {
+              "0": 10,
+              "1-2": 26,
+              "3-4": 0,
+              "5-8": 42,
+              "9-14": 5,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 78,
+            "exact": 25,
+            "min_cells": 0,
+            "within_threshold": 34,
+            "share_x1000": 435,
+            "bands": {
+              "0": 25,
+              "1-2": 8,
+              "3-4": 1,
+              "5-8": 21,
+              "9-14": 18,
+              "15+": 5
+            },
+            "baseline": {
+              "exact": 2,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 25,
+            "matched_and_delivered": 17
+          }
+        ]
+      },
+      {
+        "key": "mountainous_3",
+        "wiki": "Mountainous Stacking 3",
+        "jp": "山岳積み3",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking 2; the O piece is held; for a J/L start",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 83,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 38,
+            "share_x1000": 457,
+            "bands": {
+              "0": 0,
+              "1-2": 10,
+              "3-4": 28,
+              "5-8": 41,
+              "9-14": 4,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 78,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 33,
+            "share_x1000": 423,
+            "bands": {
+              "0": 0,
+              "1-2": 25,
+              "3-4": 8,
+              "5-8": 22,
+              "9-14": 7,
+              "15+": 16
+            },
+            "baseline": {
+              "exact": 27,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          }
+        ]
+      },
+      {
+        "key": "tki_3",
+        "wiki": "TKI 3 Opening",
+        "jp": "開幕TSD",
+        "page": "TKI 3 Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "wiki_says": "three T-Spin Doubles and a T-Spin Triple to finish; the I piece comes before Z",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 12,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 83,
+            "exact": 0,
+            "min_cells": 10,
+            "within_threshold": 0,
+            "share_x1000": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 0,
+              "9-14": 79,
+              "15+": 4
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 78,
+            "exact": 13,
+            "min_cells": 0,
+            "within_threshold": 18,
+            "share_x1000": 230,
+            "bands": {
+              "0": 13,
+              "1-2": 1,
+              "3-4": 4,
+              "5-8": 1,
+              "9-14": 59,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 27,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 13,
+            "matched_and_delivered": 13
+          }
+        ]
+      },
+      {
+        "key": "pco",
+        "wiki": "Perfect Clear Opener",
+        "jp": "パフェクリテンプレ",
+        "page": "Perfect Clear Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "wiki_says": "the standard way to get a Perfect Clear in the first 4 lines (10 dropped pieces); 84.6% if the I piece is kept on hold, 61.2% if it is dropped",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": "a perfect clear within 10 locks",
+        "drawn_at_locks": [
+          6,
+          7
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 4,
+          "catalogue_clean": 4
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 163,
+            "exact": 0,
+            "min_cells": 4,
+            "within_threshold": 4,
+            "share_x1000": 24,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 4,
+              "5-8": 0,
+              "9-14": 154,
+              "15+": 5
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 105,
+              "pages": 295
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 139,
+            "exact": 0,
+            "min_cells": 8,
+            "within_threshold": 0,
+            "share_x1000": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 2,
+              "9-14": 109,
+              "15+": 28
+            },
+            "baseline": {
+              "exact": 28,
+              "within_threshold": 71,
+              "pages": 295
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          }
+        ]
+      }
+    ]
+  },
+  "session_perfect_clears": {
+    "source": "report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)",
+    "means": "an upper bound on completed Perfect Clear Openers: a session cannot hold more completed PCOs than it holds perfect clears, whatever the opening fields looked like — and a session with none cannot hold one at all. Which of them arrived early enough to BE a PCO is `perfect_clear_timing`, and that answer comes from the simulator",
+    "per_player": {
+      "pinglamb": 9,
+      "yachi": 11
+    }
+  },
+  "perfect_clear_timing": {
+    "source": "the oracle board source (runCaseOracle), checked per round against the replay's own results.stats.clears.allclear — the field extract.py and extract2.ts read into facts.json",
+    "pco_window_locks": 10,
+    "check": {
+      "player_rounds": 168,
+      "checked": 168,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 168,
+      "agrees": true,
+      "perfect_clears_sim": 20,
+      "perfect_clears_replay": 20
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "perfect_clears": 9,
+        "rounds_with_one": 8,
+        "by_piece": {
+          "20": 7,
+          "36": 1,
+          "55": 1
+        },
+        "median_piece": 20,
+        "within_pco_window": 0
+      },
+      {
+        "user": "yachi",
+        "perfect_clears": 11,
+        "rounds_with_one": 11,
+        "by_piece": {
+          "15": 3,
+          "20": 8
+        },
+        "median_piece": 20,
+        "within_pco_window": 0
+      }
+    ]
+  },
+  "donation": {
+    "source": "harddrop.com/wiki/Donation",
+    "definition": "plugging the well with a piece so a T-spin can clear the rows across it, the clear then re-opening the well surface-to-floor — the plug is a loan, not a wall",
+    "cavity_cells": 4,
+    "walled_deepest_rows": 4,
+    "scope": "verified prefix",
+    "check": {
+      "tspin_clears": 893,
+      "reconstruction_agreed": 893,
+      "reconstruction_disagreed": 0,
+      "agrees": true
+    },
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 168,
+      "checked": 168,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 168,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 948,
+      "tspin_clears_replay": 948,
+      "tspin_clears_scored": 893,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 91,
+          "replay": 91,
+          "rounds_agreeing": 168
+        },
+        "tspindoubles": {
+          "sim": 683,
+          "replay": 683,
+          "rounds_agreeing": 168
+        },
+        "tspintriples": {
+          "sim": 139,
+          "replay": 139,
+          "rounds_agreeing": 168
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinsingles": {
+          "sim": 35,
+          "replay": 35,
+          "rounds_agreeing": 168
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 893,
+      "locks_comparable": 373,
+      "locks_same_board": 197,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 7,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
+          "agree_diff_board": 3
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 7,
+        "other_only": 8,
+        "both_no": 358,
+        "oracle_positives": 7,
+        "agreement_on_positives": [
+          0,
+          7
+        ],
+        "agreement_overall": [
+          358,
+          373
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 370,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          373,
+          373
+        ]
+      }
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_clears_scored": 505,
+        "tspin_clears_replay": 525,
+        "donations": 13,
+        "self_built_well": 0,
+        "garbage_derived_well": 13,
+        "natural": 8,
+        "b2b_breaking": 0,
+        "plug_unknown": 5,
+        "in_opener": 3,
+        "mid_game": 10
+      },
+      {
+        "user": "yachi",
+        "tspin_clears_scored": 388,
+        "tspin_clears_replay": 423,
+        "donations": 8,
+        "self_built_well": 0,
+        "garbage_derived_well": 8,
+        "natural": 5,
+        "b2b_breaking": 1,
+        "plug_unknown": 2,
+        "in_opener": 3,
+        "mid_game": 5
+      }
+    ],
+    "opener_window_pieces": 21,
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 29-34%. The discriminating clause is the re-opening, and that is what is counted here",
+    "caveat": "every donation in this corpus sits on a GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\""
+  },
+  "stmb_cave": {
+    "source": "harddrop.com/wiki/STMB_Cave",
+    "definition": "a floating T-spin Double placed over a cave at least three columns wide — the cave is OFFSET from the T, sharing two of its three columns, so the test is overlap with the T's span and never containment",
+    "min_width": 3,
+    "scope": "verified prefix",
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 168,
+      "checked": 168,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 168,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 948,
+      "tspin_clears_replay": 948,
+      "tspin_clears_scored": 893,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 91,
+          "replay": 91,
+          "rounds_agreeing": 168
+        },
+        "tspindoubles": {
+          "sim": 683,
+          "replay": 683,
+          "rounds_agreeing": 168
+        },
+        "tspintriples": {
+          "sim": 139,
+          "replay": 139,
+          "rounds_agreeing": 168
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinsingles": {
+          "sim": 35,
+          "replay": 35,
+          "rounds_agreeing": 168
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 168
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 893,
+      "locks_comparable": 373,
+      "locks_same_board": 197,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 7,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
+          "agree_diff_board": 3
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 7,
+        "other_only": 8,
+        "both_no": 358,
+        "oracle_positives": 7,
+        "agreement_on_positives": [
+          0,
+          7
+        ],
+        "agreement_overall": [
+          358,
+          373
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 370,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          373,
+          373
+        ]
+      }
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_doubles_scored": 356,
+        "tspin_doubles_replay": 371,
+        "width_ge_3": 2,
+        "min_depth_ge_2": 0,
+        "in_opener": 0,
+        "mid_game": 2
+      },
+      {
+        "user": "yachi",
+        "tspin_doubles_scored": 284,
+        "tspin_doubles_replay": 312,
+        "width_ge_3": 7,
+        "min_depth_ge_2": 0,
+        "in_opener": 0,
+        "mid_game": 7
+      }
+    ],
+    "opener_window_pieces": 21,
+    "width_histogram": {
+      "3": 9
+    },
+    "min_depth_histogram": {
+      "1": 9
+    },
+    "triple_control": {
+      "tspin_triples_scored": 138,
+      "tspin_triples_replay": 139,
+      "width_ge_3": 9
+    },
+    "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"
+  }
+}

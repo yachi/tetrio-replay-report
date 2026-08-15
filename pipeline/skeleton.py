@@ -1067,6 +1067,10 @@ LAYOUT = [
 # they need no empty pair here. Each entry says why, because "it is missing" and
 # "it is deliberately absent" look identical in the output.
 SELF_INSERTING = {
+    "perfect-clear": "conditional — `generators.perfect_clears` emits nothing for a session "
+                     "with no All Clear, so `pc_section.build` returns None and an empty pair "
+                     "here would trip build_report's stale-region guard; it inserts the block "
+                     "before the coaching region's BEGIN marker",
     "forecast": "conditional — only a session with sim/forecast-facts.json gets one; "
                 "build_report inserts it before the footer anchor",
     "openers": "conditional — only a session with sim/opener-facts.json gets one; "

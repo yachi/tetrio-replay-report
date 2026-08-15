@@ -693,16 +693,16 @@ def _board_split_note(blk, metric):
     """WERE THE TWO ENGINES LOOKING AT THE SAME BOARD? — the sentence that makes the figure above
     readable, and it says a different thing for each table.
 
-    `agreement_on_positives` states that the two engines disagree about three donations in four. It
+    `agreement_on_positives` states that the two engines disagree about four donations in five. It
     does not say whether they disagree about what a donation IS or about what was on the board. Split
     the oracle's positives by cell-for-cell board equality and the donation resolves completely —
     every positive on an identical board agrees, almost none of the rest — so the disagreement is the
     board, which is `oracle-source.ts`'s garbage-hole problem showing through rather than a wobble in
-    the predicate. That is a materially different (and more useful) statement than the raw 9/36.
+    the predicate. That is a materially different (and more useful) statement than the raw 9/43.
 
     The cave's split says something else and MUST NOT be worded like the donation's: its verdict
-    survives boards that differ, which is robustness, not correctness. Printing "10 of 10 agreed"
-    without saying the boards differed would read as ten independent confirmations.
+    survives boards that differ, which is robustness, not correctness. Printing "13 of 13 agreed"
+    without saying the boards differed would read as thirteen independent confirmations.
 
     Empty when the artifact predates the split, or when the metric has no positive in range.
     """

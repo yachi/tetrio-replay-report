@@ -11,8 +11,19 @@
 
 suppressPackageStartupMessages(library(jsonlite))
 
-repo <- "/Users/yachi/github/tetrio-replay-report"
-sessions <- c("2026-07-22", "2026-07-24", "2026-07-28", "2026-08-01", "2026-08-09")
+# Resolved from THIS script's own location, not hardcoded. An absolute path to one
+# checkout means a worktree (or anyone else's clone) silently regresses a different
+# tree's data than the one it is sitting in — the evidence would be for sessions the
+# working copy does not contain, and nothing would say so.
+script <- sub("^--file=", "",
+              grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[1])
+repo <- normalizePath(file.path(dirname(script), ".."))
+# Hardcoded, and adding a session means editing this line: the argument for
+# QUALIFYING_MS is a regression over the WHOLE corpus, so a list that quietly stops
+# covering the newest data leaves the threshold resting on evidence that no longer
+# includes the rounds it is applied to.
+sessions <- c("2026-07-22", "2026-07-24", "2026-07-28", "2026-08-01", "2026-08-09",
+              "2026-08-14")
 
 rows <- do.call(rbind, lapply(sessions, function(s) {
   f <- fromJSON(file.path(repo, "sessions", s, "report", "facts.json"),

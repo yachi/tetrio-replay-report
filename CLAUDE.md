@@ -3,10 +3,11 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Five sessions so far
+factual sentence is badge-linked to a Dafny-verified lemma. Six sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
-2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0), 296 rounds, 144 hand-written +
-380 generated claims.
+2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0 · 2026-08-14: pinglamb 7:4),
+380 rounds, 164 hand-written + 464 generated claims. 2026-08-14 is the largest
+session by both matches (11) and rounds (84).
 
 ## The one invariant
 
@@ -223,11 +224,16 @@ time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4
 83.0 · 64.0 and is a different series); the 129-round headline block above is 07-22 and 07-24
 pooled, not one session.
 
-Coaching conclusions, cross-validated over five sessions: **APP is the lever** (16–52% higher
-in rounds won, both players, 10 of 10 player-sessions); **DS matters** in 9 of 10 player-sessions
-(only 07-24 pinglamb is negative); **KPP is flat** (0–3%) — reported as a negative result. When
-adding a column or a claim, run `pipeline/claims/equiv.py` or the AUC probe rather than
-assuming a stat is informative.
+2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 91.7 · 送 82.7 ·
+**APP 81.0, the lowest of six** · 分 79.8 · DS 70.2 · 食/射埋 17.9 — and **KPP 40.5**, below
+chance for a sixth time.
+
+Coaching conclusions, cross-validated over six sessions: **APP is the lever** — higher in rounds
+won than rounds lost in 12 of 12 player-sessions, though the *size* of that separation is not
+stable (yachi/08-14 is only +7.2%, the smallest in the corpus, against pinglamb's +25.2% the same
+night); **DS matters** in 9 of 10 player-sessions through 08-09; **KPP is flat** (0–3%) — reported
+as a negative result. When adding a column or a claim, run `pipeline/claims/equiv.py` or the AUC
+probe rather than assuming a stat is informative.
 
 **08-09 splits APP the other way, and that is the finding of the fifth session.** Every earlier
 session had one player ahead in *both* regimes by a similar margin — a style difference. Pool
@@ -246,6 +252,34 @@ won-gap runs +5.8 · +10.8 · +5.9 · +7.9 · **+1.8**, the lost-gap +12.8 · +7
 - **Advice taken can leave the score wider.** 08-01 flagged that 6 of 8 topouts were yachi's.
   08-09 has 4 topouts, all pinglamb's, yachi none [C006] — and the match score went 4:3 to 0:6.
   A metric moving the right way is not the same as the metric that decides.
+
+**08-14 is 08-09's mirror, and that pair is why the split must be re-derived every session.**
+Same decomposition, opposite answer: won .6032 vs .7174 (+18.9%), lost .5629 vs .5729 (+1.8%)
+[C002]. The floors have met; the ceilings have not. The two per-session series now read
+
+    won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  **+18.9**
+    lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   **+1.8**
+
+so the *session-level* APP gap (110.0% here, 118.1% on 08-09) tells you nothing about which regime
+carries it — a 17-point swing in the decomposition between consecutive nights. Said within a
+player, pinglamb separates his own won and lost rounds by +25.2% and yachi by only +7.2% [C003],
+which is the first session where the regime separation is effectively one player's alone; yachi's
+won-round rate had sat in a .657–.674 band for five sessions and fell to .6032. His ceiling now
+sits nearer pinglamb's floor (+5.3%) than pinglamb's ceiling (−15.9%) [C004].
+
+Three consequences:
+
+- **The volume route failed a second time.** 415 more pieces, 206 less attack, over 4% of
+  pinglamb's total [C005] — after 08-09's 382 for −271. Two runs, two failures; 08-01's success
+  is the outlier, not the rule.
+- **The topout column swung from one extreme to the other in one session.** 11 of 13 are yachi's
+  [C006] — his worst — where 08-09 had all 4 on pinglamb and yachi none. A single night's death
+  tally is not a trend. What makes 08-14's worth acting on is that it moved *with* the piece
+  surplus, i.e. there is a mechanism.
+- **The night has three acts and the gap tracks them**: over 17% across matches 1-3, under 7%
+  across 4-9, over 11% across 10-11 [C007] — and all four of yachi's match wins fall in the
+  middle window [C001]. Per-match, m9 is the only one of eleven where his attack per piece beats
+  pinglamb's [C019].
 
 **`equiv.py` reports 100% for 07-28 and the number is an artefact** — read it before quoting
 it. It tries every *single*-value mutation, and a windowed claim shares its rounds with a
@@ -275,17 +309,28 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
-sample mean over a small n. Measured in `analysis/rate_records.R` over all 592 player-rounds:
-regressing log SD on log t gives **−0.648 for VS and −0.726 for APM**, both with −0.5 inside
-the 95% CI and slope 0 rejected (p 0.0006 / 0.0002), while the **mean stays flat** (100 → 119
-across the bins). Short rounds are not better play, only noisier. All 15 unqualified records
-(3 metrics × 5 sessions) came from the shortest quartile — p = 9e-10 — and 07-22's headline
-約262.6 was a 15.6 s round, 45% above that session's qualified peak.
+sample mean over a small n. Measured in `analysis/rate_records.R` over all 760 player-rounds
+(six sessions): regressing log SD on log t gives **−0.649 for VS and −0.724 for APM**, slope 0
+rejected for both (p 0.0002 / 0.0001). All **18** unqualified records (3 metrics × 6 sessions)
+came from the shortest quartile — p = 1.5e-11 — and 07-22's headline 約262.6 was a 15.6 s round,
+45% above that session's qualified peak.
+
+**Two things in that paragraph changed when the sixth session was added, and the honest version
+is weaker than the five-session one.** With 760 rounds the CIs tighten, and (a) APM's −0.5 is now
+**outside** its CI [−0.921, −0.528] — the decay is *steeper* than a pure sample mean, so the
+conclusion holds a fortiori, but "both with −0.5 inside the CI" is no longer true; (b) the mean
+is **no longer flat for VS** (104.4 → 120.0 across the bins, p ≈ 0.00) — longer rounds do carry a
+mildly higher mean VS. The SD still falls about 4× over the same span, so the variance effect
+dominates by an order of magnitude and the qualifier stands, but the control is now "the mean
+moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
+(p = 0.23).
 
 The script's session list is hardcoded, so **adding a session means editing it and re-running**
 — otherwise the evidence for `QUALIFYING_MS` silently stops covering the newest data. Adding
 08-09 also broke it: the records test carried a literal `12` for "3 metrics × 4 sessions", and
-`binom.test(15, 12, ...)` aborts. It derives `n_records` from `sessions` now.
+`binom.test(15, 12, ...)` aborts. It derives `n_records` from `sessions` now. `repo` used to be
+an absolute path to one checkout, which meant a git worktree silently regressed the *other*
+tree's sessions; it resolves from the script's own location now.
 
 `QUALIFYING_MS = 60_000` is where definition and data agree: APM and VS are per-*minute*, and
 each session's record names the same round for every cut-off from 50 s to 70 s, so nothing
@@ -326,8 +371,19 @@ Each metric ships with the control that says what it is NOT, and each control is
 merely documented:
 
 - **ordering** — control is *exposure*: scored only on rounds holding both spins, and re-run over
-  the whole simulated round so the short verified prefix cannot manufacture the result. Five
-  sessions: 221 of 221 run the C-Spin order, 0 the DT order; unwindowed, 277 of 277.
+  the whole simulated round so the short verified prefix cannot manufacture the result. Six
+  sessions: **454 of 455 run the C-Spin order and exactly one runs the DT order**.
+  **That one is the corpus's first positive, and two independent metrics name the same round.**
+  yachi, `replay-2026-08-14-2.ttrm` round 3 (m3r4): a T-spin Double on lock 13 and a Triple on
+  lock 18, and — from a completely different input, the board's occupancy at the end of bag 1 —
+  an **exact** match against harddrop's DT Cannon page, as drawn and mirrored. Through five
+  sessions every exact first-bag match had been a PCO, which made "the instrument only ever finds
+  one thing" a fair worry; it is answered. Both facts are pinned in `openers.test.ts`
+  (`DT_ORDER_IN_OPENER`, and the exact-match block) as a *named exception list* rather than a
+  relaxed bound, so a second one has to be investigated instead of absorbed. The verified prefix
+  of that round runs to lock 208, so it is not the short-prefix artefact the window control exists
+  to rule out. `opener_section.py` needed no change — it already had the branch for a non-zero
+  DT count, and prints「先 Double 後 Triple（DT 砲次序）有 1 個」.
   **It names a CLASS, not the C-Spin, and that was found by measuring the named openers.**
   harddrop files **38** openers under `Category:Triple Double openers` — C-Spin, Honey Cup, Stray
   Cannon and Mountainous Stacking among them — and every one opens Triple-before-Double. A session
@@ -358,7 +414,7 @@ through bag 1 has locked **six** pieces when the bag ends, and that is how hardd
 the six (Stray Cannon says "keep either S or Z in hold"). A 24-cell field can never equal a 28-cell
 board, so those openers were never *compared*, not scoring zero. `OPENER_LOCKS = [6, 7]` fixes it
 and also reaches the 75 clean 24-cell catalogue pages that were invisible — including the PCO setup
-that keeps I on hold. Pre-existing blocks re-emit byte-identical on all five sessions.
+that keeps I on hold. Pre-existing blocks re-emit byte-identical on all pre-existing sessions.
 
 **`opener_db` alone cannot answer this**, which is why `wiki-openers.json` exists: 484 of its 783
 pages are drawn on a filled base, and a page with a full row is a state that would have cleared.
@@ -372,7 +428,7 @@ almost any opener page. Only exact separates. `occupancy_aliases` and `round_ove
 columns that are the same rounds twice: MS1 and MS2 are one bag-1 shape built from different
 pieces, so their rows are identical in every session and must never be added.
 
-The repertoires split, reproduced independently in all five sessions (pinned in `openers.test.ts`):
+The repertoires split, reproduced independently in all six sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** (17-25 exact per session vs yachi's 6-11), **yachi opens Mountainous
 Stacking** (11-25 vs 2-11) **and is the only one who plays TKI-3 at all** (5-8; pinglamb 0, every
 session). PCO appears only for yachi, only on 07-24 and 08-01.
@@ -382,13 +438,16 @@ counterpart.** PCO is defined by an outcome, so the row splits in two. HOW MANY 
 `clears.allclear`, twice-extracted — see 全消 below. WHEN each landed only the simulator can say, and
 what licenses printing it is that `perfect_clear_timing` compares the simulator's per-round count
 with the replay's own counter for **every** player-round and emits the piece numbers as `null` unless
-all of them agree. They do: **592/592 rounds, 65/65 perfect clears**, five sessions. `check_opener_
+all of them agree. They do: **760/760 rounds, 85/85 perfect clears**, six sessions. `check_opener_
 section` fails if the piece numbers are published without that agreement figure or without
 harddrop's ten-piece deadline beside them.
 
-The finding is that **3 of the 65 arrived inside that deadline** and 53 landed on piece 20 — these
-are mid-game perfect clears, not the opener. 08-01 holds the corpus's only completed PCO: yachi
-matched the field twice and delivered once.
+The finding is that **3 of the 85 arrived inside that deadline** — still the same three, because
+08-14's twenty all landed on piece 15 or later — and the bulk land on piece 20. These are mid-game
+perfect clears, not the opener. 08-01 holds the corpus's only completed PCO: yachi matched the
+field twice and delivered once. 08-14 has the most All Clears of any session (20: yachi 11,
+pinglamb 9) and **none of them is inside the window**, which is the cleanest statement of the
+finding the corpus has.
 
 **An earlier revision of this section said the opposite** — that `eng.board.perfectClear` invented
 clears the sessions did not have — and it was wrong for a reason worth keeping: the facts.json
@@ -399,7 +458,7 @@ byte-identically, and the test recomputed the total down the same wrong path, so
 itself. Two rules came out of it — **a required field that goes missing must throw, never default**
 (`sessionPerfectClears` declares `clears.allclear` non-optional and dies on a non-number), and **a
 test that re-derives a value the way the code does can only catch a typo** (`openers.test.ts` now
-pins the five sessions' counts as literals and asserts the total is not zero).
+pins each session's counts as literals and asserts the total is not zero).
 
 ## 全消 — the Perfect Clear section, and the two questions it keeps apart
 
@@ -409,9 +468,9 @@ re-derived from facts.json, so the table cannot print a number no lemma covers. 
 read out of the `.ttrm` independently by both extractors, which is why this one is badged while the
 opener tables are not.
 
-The point is not the count. Across five sessions, **60 rounds had exactly one player with a perfect
-clear and that player lost 28 of them** — the AUC block above says the same thing (PC 50.8, 89%
-zeros). So the section prints "rounds won" beside "rounds with one" and refuses to print a rate: the
+The point is not the count. Across six sessions, **75 rounds had exactly one player with a perfect
+clear and that player lost 34 of them** — the AUC block above says the same thing (PC 50.8 pooled,
+52.4 on 08-14 with 68 of 84 rounds tied at zero). So the section prints "rounds won" beside "rounds with one" and refuses to print a rate: the
 denominators are 3-12 rounds per player, and a percentage over three rounds reads far more confident
 than the data is. Two more controls it may not lose: 全消次數 ≠ 有全消嘅局 (a round can hold two), and
 "whether" is facts.json while "when" is the simulator's, in the quarantined section below.
@@ -431,22 +490,30 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 **The naive Donation clause is forced by arithmetic: it fires on 100% of T-spin clears.**
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
 every column filled, so that clause counts line clears. That is not a measurement any more — it is
-`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly 100% of all 3142
+`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly 100% of all 4035
 scored clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening
-clause deleted — it fires on **29-34%**. All the discriminating power is in the **re-opening**
+clause deleted — it fires on **29-37%**. All the discriminating power is in the **re-opening**
 clause: every filled cell of the column must lie inside the cleared rows, so the clear leaves it
-open surface-to-floor. With it, the rate drops to ~2.5% (82 across five sessions).
+open surface-to-floor. With it, the rate drops to ~2.5% (103 across six sessions).
 
 **This paragraph said 70-89% until 2026-08-14, and that figure names no variant of the clause it
-describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-33.6%; only a composite
+describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-36.8%; only a composite
 with `cavity ≥ 1` lands in the band (74.6-77.0%), and it never reaches 89%. A rate was being quoted
 for something proved to be always true — the same shape as the 3379-vs-3142 note above, and the same
 lesson: a figure quoted in prose is not the thing it describes.
+
+**Quote the band as a band, and re-measure it every session — it moved on the sixth.** Through five
+sessions the shipped-thresholds-minus-re-opening rate sat in 28.9-33.6%; 2026-08-14 fires at
+**36.8%**, three points above that ceiling, while the pooled rate barely moves (31.1% → 32.4%). The
+pooled figure alone would have hidden it. The `cavity ≥ 1` composite is the opposite case: its
+74.6-77.0% survives verbatim, but only because 08-14's 77.04% ties 08-09's 76.99% at one decimal
+place — a seventh session past 77.05 moves it. Both bands are per-session ranges, so a new session
+can break one without changing any pooled number.
 `D = 4` and "walled at the **deepest** 4 cavity rows" are harddrop's numbers, not tuned: of its 20
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
 
-**Every donation in this corpus sits on a garbage-derived well — 0 self-built, all five sessions.**
+**Every donation in this corpus sits on a garbage-derived well — 0 self-built, all six sessions.**
 The oracle keeps the engine's own seeded-RNG garbage hole *columns*, which disagree with the
 ige-recorded ones 97 of 103 times (`oracle-source.ts`), so the count says the board offered the
 shape that often and can never say which column was donated into. The check that finds this must
@@ -457,16 +524,18 @@ bug reported every well as self-built for a whole round of measurement.
 **The STMB cave is OFFSET from the T and its roof test is vacuous.** The cave shares two of the T's
 three columns and reaches one past them, so the test is *overlap*, never containment — containment
 misses all six drawn Basic Structures. And the cave's roof is the nub row the Double just
-completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**.
-A roof test would have been a decorative guard — and since 2026-08-14 that is proved rather than
-counted (`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`: conjoining a roof test
+completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**
+over the five sessions that existed when it was counted — not re-measured since, because it no longer
+carries the argument. A roof test would have been a decorative guard — and since 2026-08-14 that is
+proved rather than counted (`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`:
+conjoining a roof test
 to the cave predicate yields an equivalent predicate, over the whole board width and not merely over
 cave runs). The proof also shows the code assumes more than it needs: **maximality is not used** —
 any cleared row above the run roofs it, and a Double always has two full rows. `IsMaxCleared` and the
 two-row hypothesis are kept for fidelity to `caveAt`, not because the argument rests on them.
 
-Two cross-tabs, and the section may print neither number without both: **by depth**, 29 of the 30
-width≥3 hits are one row deep — a dimple, not a cave — leaving exactly **1 genuine cave in 592
+Two cross-tabs, and the section may print neither number without both: **by depth**, 38 of the 39
+width≥3 hits are one row deep — a dimple, not a cave — leaving exactly **1 genuine cave in 760
 player-rounds**; **by lines**, the same gap appears under T-spin Triples at a *higher* rate (9.0%
 vs 1.7% on 08-09), where it is ordinary TST residue. A shape that fires more often under the spin
 the technique is not about is a shape test.
@@ -480,12 +549,13 @@ category makes for the ordering metric. All three category counts are recorded a
 
 Both metrics are licensed by one check: the per-lock board snapshot plus the lock's cells must make
 exactly the rows full that the engine independently recorded clearing. Different state, so it is a
-real gate — **3142/3142 across five sessions**, and a spin it cannot reconstruct is dropped, never
-scored. (This line read **3379/3379** until 2026-08-14. 3379 is the corpus's *whole-round* T-spin
-clear total; the check is scoped to the verified prefix and has always been 3142. The figure was
-written from a whole-round probe and matched no committed artefact — `donation.check.tspin_clears`
-sums to 3142 in the five `opener-facts.json`. Nothing caught it because CLAUDE.md is prose: a gate
-figure quoted here is not the gate.)
+real gate — **4035/4035 across six sessions**, and a spin it cannot reconstruct is dropped, never
+scored. (This line read **3379/3379** until 2026-08-14. 3379 is the *whole-round* T-spin clear total
+over the five sessions there were then; the check is scoped to the verified prefix, which was 3142.
+The figure was written from a whole-round probe and matched no committed artefact —
+`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 4327, so
+the two still differ by 292. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
+is not the gate.)
 
 ### 分母錨咗 replay 自己數嘅 counter — the one part of this section that is not simulator-only
 
@@ -498,13 +568,13 @@ player-round, per kind, over the whole round:
 
 | | |
 |---|---|
-| rounds where every kind agrees | **592 / 592** (five sessions, no unknowns) |
-| whole-round T-spin clears, sim vs replay | **3379 = 3379** |
-| what the verified prefix scores of them | **3142**, i.e. **93.0%** coverage |
+| rounds where every kind agrees | **760 / 760** (six sessions, no unknowns) |
+| whole-round T-spin clears, sim vs replay | **4327 = 4327** |
+| what the verified prefix scores of them | **4035**, i.e. **93.3%** coverage |
 
 So the two tables' **denominator** leaves quarantine: `tspin_clears_scored` is now a subset of a
 total the trust chain already carries, and 「可核覆蓋」 names the subset. This is the
-`perfect_clear_timing` pattern (592/592 against `clears.allclear`) applied to a denominator instead
+`perfect_clear_timing` pattern (760/760 against `clears.allclear`) applied to a denominator instead
 of a timing.
 
 **The numerators do not.** Which clear was a donation, and how wide the gap under it was, still come
@@ -534,68 +604,71 @@ both over every case and compares the two board-state verdicts lock by lock, as 
 verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
-whole finding. Both verdicts are rare — 30 caves and 82 donations in 3142 scored clears — so an
+whole finding. Both verdicts are rare — 39 caves and 103 donations in 4035 scored clears — so an
 overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
-| cave | 1346/1346 (100%) | **13 / 13** |
-| donation | 1301/1346 (96.7%) | **9 / 36** |
+| cave | 1719/1719 (100%) | **16 / 16** |
+| donation | 1659/1719 (96.5%) | **9 / 43** |
 
-The donation's 96.7% is 1292 of 1301 agreements being both engines saying "no". On the thing the
-table actually counts the two engines disagree about **three donations in four** — the opposite
+The donation's 96.5% is 1650 of 1659 agreements being both engines saying "no". On the thing the
+table actually counts the two engines disagree about **four donations in five** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER` fails the build if the section
 prints a rate without the sentence saying what is in its denominator.
 
 **Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix (27 locks
-against 81 on average), so the comparison reaches **1346 of 3142** scored clears — cave's 13
-positives are 13 of the corpus's 30. It is a check on the verdicts, not a re-scoping of the tables,
+against 81 on average), so the comparison reaches **1719 of 4035** scored clears — cave's 16
+positives are 16 of the corpus's 39. It is a check on the verdicts, not a re-scoping of the tables,
 exactly as the counter anchor licenses a denominator without redefining it. What it buys the
 donation table is a *caveat it did not have*: the one metric here with no second implementation
 backing it, stated as a measurement.
 
-**The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** At **551
-of the 1346** comparison points the two engines are judging boards that differ cell for cell (median
+**The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** At **727
+of the 1719** comparison points the two engines are judging boards that differ cell for cell (median
 12 cells), so every figure in the table above is read inside that. Split the positives by board
 equality and the donation resolves completely:
 
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
-| cave | 13 | 3 | 13/13 | 3/3 | 10/10 |
-| donation | 36 | 6 | 9/36 | **6 / 6** | **3 / 30** |
+| cave | 16 | 3 | 16/16 | 3/3 | 13/13 |
+| donation | 43 | 6 | 9/43 | **6 / 6** | **3 / 37** |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
-and must never be worded like the donation's**: agreeing 10 of 10 on boards that differ is the
+and must never be worded like the donation's**: agreeing 13 of 13 on boards that differ is the
 verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
-cave is local to the spin), not ten independent confirmations. `DUAL_SPLIT_MARKER` and
+cave is local to the spin), not thirteen independent confirmations. `DUAL_SPLIT_MARKER` and
 `CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
 
 A false start worth not repeating: the first version of that probe pushed both engines through the
-reconstruction check and the hand-port licensed **0 of 1355**. A 0%/100% split is a bug report about
-the comparison, not a result. **The reason recorded here was wrong until 2026-08-14** — it said
-`records[].clearedRows` means different things in the two engines, "the hand-port leaves it empty on
-most clearing locks". Measured: **0 empty of 4326**, and `clearedRows.length == lines` every time in
-both engines. The real cause is that `records` and `locks` are **index-aligned in the oracle only**
-(`records[i].frame == locks[i].frame` 14744/14744); `sim.ts` pushes a record only inside the clear
-branch, and twice on an all-clear bonus, so the alignment holds **0 of 4326** times there and
-`records[i]` reads an unrelated record. Looked up by the lock's own **frame**, the hand-port passes
-the strong check **1346 of 1346** at that call site, so `dualVerdict` now uses the same reconstruction
-check as the shipped path — the weaker licence is gone, and all five artefacts are byte-identical
+reconstruction check and the hand-port licensed **0 of 1355** (over the five sessions there were
+then). A 0%/100% split is a bug report about the comparison, not a result. **The reason recorded here
+was wrong until 2026-08-14** — it said `records[].clearedRows` means different things in the two
+engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 empty of 5472**, and
+`clearedRows.length == lines` every time in both engines. The real cause is that `records` and
+`locks` are **index-aligned in the oracle only** (`records[i].frame == locks[i].frame` 18951/18951);
+`sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
+alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
+the lock's own **frame**, the hand-port passes the strong check **1719 of 1719** at that call site
+(the per-session figures are each session's `locks_comparable`, so the artefacts cross-check it), so
+`dualVerdict` now uses the same reconstruction
+check as the shipped path — the weaker licence is gone, and all six artefacts are byte-identical
 under the change.
 
 Two things that follow, and both are load-bearing:
 
 - **The strong licence has no teeth from the artefacts.** Reverting to the index lookup or
-  off-by-one-ing the frame collapses `locks_comparable` 1346 → 0 and byte-identity catches it; but
+  off-by-one-ing the frame collapses `locks_comparable` 1719 → 0 and byte-identity catches it; but
   weakening the *licence* (back to `rows.length == lk.cleared`, or comparing only the length of
-  `clearedRows`) leaves all five artefacts byte-identical. `dualVerdict` is exported and tested
-  directly on synthetic boards for exactly that reason. A guard no gate can falsify is decorative.
+  `clearedRows`) leaves all six artefacts byte-identical — re-checked on the sixth session, both
+  mutants, rather than carried over. `dualVerdict` is exported and tested directly on synthetic
+  boards for exactly that reason. A guard no gate can falsify is decorative.
 - **A missing record is an EQUIVALENT mutant, not a coverage gap.** `?? []` instead of excluding it
   cannot change any output: a lock with `cleared > 0` always makes at least one row full, so an empty
-  `theirs` never matches. The branch is also unreachable on this corpus (0 of 1596). It is written
+  `theirs` never matches. The branch is also unreachable on this corpus (0 of 2027). It is written
   explicitly because it states the intent — do not add a test that pretends to cover it.
 
 ## 開局定式 定 中盤手法 — the window was asserted, now it is measured
@@ -603,32 +676,45 @@ Two things that follow, and both are load-bearing:
 Three metrics answer "opener or mid-game" three different ways, and only one of them used to answer
 it at all:
 
-- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 3 of 65 inside it.
+- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 3 of 85 inside it.
 - **The ordering metric did NOT.** Its spins are filtered to lock ≤ `WINDOW_PIECES` before counting,
   so mid-game pairs were *excluded rather than counted*, and「先 Triple 後 Double」 was a claim about
   openings that a reader had no way to check — it reads identically to a claim about how these
   players throw T-spins at any point in a round, and the two mean completely different things about
-  the C-Spin. `ordering.players[].mid_game` is the missing control. **Inside the window 354 rounds
-  hold both spins and 354 run Triple-first, zero exceptions; outside it, 9 rounds hold both and the
-  order goes BOTH ways (7 Triple-first, 5 Double-first).** So the window is doing real work.
+  the C-Spin. `ordering.players[].mid_game` is the missing control. **Inside the window 455 rounds
+  hold both spins and 454 run Triple-first — one exception in six sessions, and it is a real DT
+  Cannon (see above); outside it, 12 rounds hold both and the order goes BOTH ways (10
+  Triple-first, 6 Double-first).** The rate of Double-first orders is roughly 200x higher outside
+  the window than inside it, so the window is doing real work — and the test asserts that ratio
+  rather than a bare zero, which is what let the one genuine exception be recorded instead of
+  absorbed.
 - **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. The cave's is the cleanest result
-  in the section: **0 of 30 fall inside the opener window, in every session** — which turns
+  in the section: **0 of 39 fall inside the opener window, in every session** — which turns
   harddrop's filing of it under `Mid-game T-Spin setups` from a citation into a measurement.
-  Donation splits about 1:3 (23 in-opener, 59 mid-game), so it is not purely mid-game.
+  Donation splits about 1:2.5 (29 in-opener, 74 mid-game), so it is not purely mid-game.
 
 `ordering_full_round` is **not** the mid-game counterpart and must not be read as one — it applies
 the *same* 21-piece window and only drops the verification requirement, which is why its numbers are
 identical to `ordering`'s. It answers "did the verified prefix manufacture this", not "what happens
 later in the round".
 
-**The mid-game denominator is 9 rounds corpus-wide, so it is printed as counts and never as a rate**
+**The mid-game denominator is 12 rounds corpus-wide, so it is printed as counts and never as a rate**
 — rounds usually end before accumulating both spin types that late, and the verified prefix truncates
-what is left. Same rule 全消 follows for its 3-12 round denominators; two of the five sessions have
+what is left. Same rule 全消 follows for its 3-12 round denominators; two of the six sessions have
 no such round at all, which renders as an absence rather than a zero.
 
 New claim families go at the **end** of `generators.py`. `build_claims` numbers claims in FAMILIES
 order, prose cites those ids, and a shifted id still resolves — to the wrong claim. Nothing checks
 that.
+
+**A new `SECTIONS` entry must also be placed in `skeleton.LAYOUT` or named in `SELF_INSERTING`,
+and a CONDITIONAL section belongs in the latter.** `skeleton._check_coverage` refuses to emit
+otherwise, which is how 2026-08-14 — the first session created after 全消 shipped — failed at step
+6 of `bin/new-session` with `build_report.SECTIONS owns ['perfect-clear'] but LAYOUT does not place
+it`. The fix is `SELF_INSERTING`, not `LAYOUT`: `generators.perfect_clears` emits nothing for a
+session with no All Clear, so `pc_section.build` returns `None`, and an unconditional empty region
+in the skeleton would then trip `render`'s stale-region guard on that session instead. Same shape
+as `forecast` and `openers`.
 
 A `SECTIONS` entry's anchor must be a **marker comment**, not a `<section id=…>` tag. `<section
 id="coaching">` lives inside the coaching region, so anchoring there inserts the new block into a

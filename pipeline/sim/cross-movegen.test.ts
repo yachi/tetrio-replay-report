@@ -168,13 +168,13 @@ describe.skipIf(!HAVE_ORACLE)('reachable placements vs real cold-clear find_move
 // § Item 3): every verified-prefix board of every session, the piece bestTspin actually walks. Session
 // list is explicit, not globbed (memory: sim-test-corpus-silently-under-covers) — a new session's
 // directory existing is not enough to be included; it must be named here.
-const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09']
+const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
   .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
 
 describe.skipIf(!HAVE_ORACLE || SIM_SESSIONS.length === 0)(
   'reachable placements vs real cold-clear over the verified-prefix corpus (real game boards, T piece)',
   () => {
-    test('every verified-prefix board of all five sessions: cc ⊆ ours (0 false negatives)', () => {
+    test('every verified-prefix board of all six sessions: cc ⊆ ours (0 false negatives)', () => {
       const perSession: Record<string, number> = {};
       const cases: { board: Board; type: PieceType }[] = [];
       for (const session of SIM_SESSIONS) {
