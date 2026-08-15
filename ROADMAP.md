@@ -1583,6 +1583,12 @@ Four things worth keeping, each a bug that was live:
 Cost, measured: push tier (`--modes single_value,two_site_match`) **4m13s** for the whole corpus;
 weekly tier (all three granularities) **25m49s**. Neither is a matrix — the gate globs sessions off
 disk and takes no session argument, so adding a session cannot leave a list behind. Two such lists were
-found stale on the way and one fixed: `verify.yml`'s cross-tslot loop stopped at 08-01, leaving 134
-rounds outside it. `pipeline/sim/cross-tslot-multi.ts:34` and `cross-tslot.test.ts:69` carry the same
-stale list and are still open.
+found stale on the way, and all three are now fixed: `verify.yml`'s cross-tslot loop stopped at 08-01,
+leaving 134 rounds outside it, and `pipeline/sim/cross-tslot-multi.ts` and `cross-tslot.test.ts` each
+carried their own copy of the same four-session list — so that CI step covered four sessions whatever
+the workflow said. Extending the test's list failed it immediately, **39033 → 61656 boards**, which is
+a pinned table doing its job. The result worth keeping is not the larger denominator but that
+`unexplained` stayed EMPTY over the extra 22 623 boards: the two implementations sharing no code still
+disagree on nothing, now over six sessions. A repo-wide sweep found every other session list
+(`bin/build-docs`, `analysis/rate_records.R`, `cross-movegen`, `cross-tspin`, `openers.test.ts`)
+already at six.

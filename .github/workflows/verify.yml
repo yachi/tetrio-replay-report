@@ -619,10 +619,11 @@ jobs:
       # widens the scope rather than re-measuring it. The first run over six is what produces
       # the new number.)
       #
-      # `pipeline/sim/cross-tslot-multi.ts:34` and `pipeline/sim/cross-tslot.test.ts:69` still
-      # carry their own copies of the stale four-session list. They are source files, not this
-      # workflow's to fix; the step below therefore covers four sessions no matter what is
-      # written here.
+      # `pipeline/sim/cross-tslot-multi.ts` and `pipeline/sim/cross-tslot.test.ts` each carried
+      # their OWN copy of the same stale four-session list, so this step covered four sessions no
+      # matter what was written here. Both were extended to six on 2026-08-15; extending the test's
+      # copy failed it at once (39033 -> 61656 boards) while its differential stayed empty. If you
+      # add a session, all three lists need it — this loop is not the only one.
       - name: Every T-spin line count matches the Rust original across the corpus
         run: |
           set -euo pipefail
