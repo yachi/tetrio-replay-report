@@ -1768,8 +1768,15 @@ was struck. A cross-reference is not a single source of truth — it multiplies 
    placement difference is worse than no tolerance** — it does not merely lose precision, it
    misattributes the cause, and the misattribution is what got written down here for six days.
 
-3. **Certify mid-round garbage timing (`garbagespeed`/cap).** The opening class is closed but the
-   corpus is still only 49.6% bit-exact — the bulk of the remainder is garbage-insertion TIMING,
+3. **Certify mid-round garbage timing (`garbagespeed`/cap).** ~~The opening class is closed but the
+   corpus is still only 49.6% bit-exact~~ — **stale: it is 85.6% (2026-08-17, reproduced from
+   `bun driftmap.mjs`: 34311/40064 locks over 760 cases), and 97.9% restricted to the verified
+   prefixes (19803/20226, `--prefix`).** `tools/triangle-oracle/README.md` already carried both
+   figures, measured 2026-08-15; this entry was not updated alongside it, so the remaining work was
+   filed against a remainder of 50.4% when it is 14.4%. The two sites moved apart because nothing
+   re-runs `driftmap` — the same shape as `dual-backed.json`'s stacked staleness behind an un-run
+   `--check`. (97.9% is NOT the dual-backed section's 96.2%; the README says so explicitly and the two
+   answer different questions.) The item itself stands — the bulk of the remainder is garbage-insertion TIMING,
    where the oracle's `TL_DEFAULTS` are best-effort (holes and gravity are pinned; speed/cap are
    not; see the README caveat). Pin them against a live-capture sample of the early mid-round
    divergences to turn the disagreement map into a certified drift oracle for that class too.
