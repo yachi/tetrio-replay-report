@@ -50,6 +50,12 @@ name: equiv-coverage
 # `pipeline/claims/**` misses TWO of those, and one is pipeline/perturb.py — the make/unmake module
 # the entire sweep's correctness rests on, and the one whose failure mode is a silently RAISED
 # baseline, i.e. a gate that passes when it should not.
+# `pipeline/docs_gate.py` is the third, and it was missing until 2026-08-16. It is not in equiv.py's
+# closure at all — it is in check_equiv_coverage's, imported at module level, and it is the half that
+# reads the published prose. So the one edit that could break this gate while touching no measurement
+# code whatsoever was also the one the filter could not see. Re-measure the closure when adding an
+# import; the weekly cron caught nothing here because nothing had changed docs_gate.py since it was
+# written.
 #
 # `sessions/**/equiv-coverage.json` is listed for a sharper reason than completeness: it is the
 # artefact this gate byte-compares. Filtered on `claims-*.json` alone, an edit to the artefact
@@ -65,6 +71,7 @@ on:
     paths:
       - 'pipeline/__init__.py'
       - 'pipeline/perturb.py'
+      - 'pipeline/docs_gate.py'
       - 'pipeline/claims/**'
       - 'sessions/**/facts.json'
       - 'sessions/**/claims-*.json'
@@ -78,6 +85,7 @@ on:
     paths:
       - 'pipeline/__init__.py'
       - 'pipeline/perturb.py'
+      - 'pipeline/docs_gate.py'
       - 'pipeline/claims/**'
       - 'sessions/**/facts.json'
       - 'sessions/**/claims-*.json'
