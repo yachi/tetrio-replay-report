@@ -58,6 +58,10 @@ python3 -m pipeline.check_dead_consts sessions/<date>/report
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
+python3 -m pipeline.check_cross_artefact             # CI gate: two artefacts of ONE session agree
+python3 -m pipeline.check_cross_artefact --selftest  #   its mutants (8 planted, 4 controls)
+python3 -m pipeline.check_finesse_denominator sessions/<date>/report  # CI gate: every per-piece rate names 每粒
+python3 -m pipeline.check_finesse_denominator sessions/<date>/report --selftest  # its mutants
 python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the C-Spin / DT 砲 section
 python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
@@ -183,6 +187,16 @@ equivalent marker pair.
   is byte-identical to what is committed. Weekly runs add mutation testing.
 - Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
   asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
+- **Closing a ROADMAP item means striking it AT ITS ORIGINAL SITE, not only writing a new dated
+  section.** An audit on 2026-08-16 found **six** items filed as open that were already done in
+  committed code — 最癲一局 items 4 and 5, Re-classified item 7 (done the same day it was filed
+  "not yet actioned"), the `cc-movegen` standing gate, the `## P5 — in progress` header contradicted
+  by its own body 266 lines later, and Original TODO item 2 (false for eighteen days) — plus one
+  obsolete item arguing about a mechanism that had been deleted. Every one has the same shape: the
+  closure landed in a NEW section or in a commit message, and the original entry was never touched.
+  A commit message is not documentation; nothing re-derives it. **A DONE record that repeats a wrong
+  reason is worth less than none** — item 7's justification for its `<= 3` bound was measurably false
+  in both the item text and the commit that closed it.
 
 ## Data semantics that cost real debugging
 
@@ -236,6 +250,23 @@ equivalent marker pair.
   `faults/(faults+perfect)` = **15.85%** is on no meaningful denominator and must not be used. A
   bare「失誤率」 reads as the 10.65% and is usually the 16.83%. osk publishes no definition for any
   of the three fields, so the per-excess-input granularity is inferred, not specified.
+
+  **All six reports shipped the bare label, and `pipeline/check_finesse_denominator.py` is now the
+  gate.** The tape chart plotted `faults/pieces` as 「finesse 失誤率」 formatted `(v*100).toFixed(1)+"%"`
+  — 16.8% under a label that reads as 10.65%. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
+  now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
+  alone does not undo one: 16.8% reads as a share however the row is titled. `hold 使用率` keeps its
+  percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
+  data refutes the share reading outright: in **650 of 750** player-rounds the faults outnumber the
+  non-perfect pieces, and 07-24 m2r0 puts **7 faults on a single non-perfect piece**.
+
+  Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
+  renderer is in each session's committed shell, outside every marker region, so `build_report --check`
+  never saw it and fixing `skeleton.py` alone would have shipped to no existing report; all six
+  `report.html` had to be patched directly. So this gate reads the WHOLE document, generated regions
+  included, unlike `check_prose_figures`. And **every accessor the chart plots must be classified**
+  COUNT/SHARE/EVENT_RATE — an unclassified key fails, so a new row forces the decision instead of
+  leaving it to whoever writes the label.
 
 ## What the data actually says (measured, not asserted)
 
@@ -1070,3 +1101,15 @@ find *where* the time goes, then time the change to find out *how much*.
 3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
    It is a cross-check, not a published report — every fact in it is covered by that session's
    full report. Keep it gated by CI; do not resurrect it onto the site.
+
+   **What made it a cross-check was unenforced until 2026-08-16.** `bin/verify-session` takes ONE
+   artefact directory and every gate it runs is internal to that directory, so `proof/` and
+   `report/` both went green while describing the same night differently — and the only thing
+   keeping them together was somebody remembering to re-extract `proof/` whenever `report/` moved
+   (most recently for the apm/pps/vs change on 2026-08-15; it was remembered, and nothing would
+   have said so otherwise). `pipeline/check_cross_artefact.py` is the gate: 6 012 shared values,
+   globbed over `sessions/*` so a second artefact anywhere is covered without an edit, and no pair
+   at all is a failure rather than a quiet pass. The two schemas genuinely differ — `report/`
+   carries 30 per-player fields `proof/` never had — so the gate **names** every uncompared field
+   instead of silently intersecting, and separates a FIELD on one side only (tolerated, named)
+   from a RECORD on one side only (a missing match, round, player or garbage event — a failure).

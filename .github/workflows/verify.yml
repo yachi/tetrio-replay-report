@@ -252,6 +252,22 @@ jobs:
       - name: Check no generated CSS reaches outside its region
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
 
+      # `finesse.faults` counts fault EVENTS and `pieces` counts pieces — 1.580
+      # faults per faulty piece pooled — so faults/pieces (16.83%) and the share
+      # of pieces that were faulty (10.65%) are different numbers. The tape chart
+      # plotted the first under 「finesse 失誤率」 as a percentage, which reads as
+      # the second, in all six reports. This gate is run over the WHOLE document,
+      # generated regions included: the chart's renderer lives in each session's
+      # committed shell, outside every marker region, which is exactly why
+      # `build_report --check` never saw it. --selftest carries the mutants,
+      # including two negative controls so it cannot pass by banning percentages.
+      - name: Check every per-piece rate names its denominator
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_finesse_denominator "$W" --selftest
+          python3 -m pipeline.check_finesse_denominator "$W"
+
       # An unresolved badge is indistinguishable from a pending one: it renders
       # ⏳ G014 pointing at an anchor that does not exist. Both ways that has
       # happened are checked — a cited id the island does not carry, and
@@ -455,6 +471,25 @@ jobs:
             fi
           done
           exit $status
+
+      # The third axis, and the one nothing checked. The two steps above compare extractor A
+      # against extractor B WITHIN one artefact directory. `sessions/2026-07-24` holds two
+      # artefacts of the same night — `report/` and the lighter 20-claim `proof/` — built by
+      # different code, and `bin/verify-session` takes a single directory, so both go green while
+      # disagreeing with each other. What has kept them together is somebody remembering to
+      # re-extract `proof/` whenever `report/` moved; 2026-08-15's apm/pps/vs change is the most
+      # recent time that was remembered, and nothing would have said so had it not been.
+      #
+      # Globbed over sessions/*, so a second artefact anywhere is covered without an edit — and
+      # finding NO pair is a failure, because a sweep over nothing prints like a clean one.
+      # --selftest first: the interesting half of this gate is what it TOLERATES (the two
+      # artefacts carry different schemas, and 30 report-only fields are named rather than
+      # silently intersected), so a run that has never been shown to fail proves little.
+      - name: Compare the two artefacts of one session against each other
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_cross_artefact --selftest
+          python3 -m pipeline.check_cross_artefact
 
   # docs/ is the published GitHub Pages site, copied from the sessions by
   # bin/build-docs — and nothing reran it automatically. Every other gate here

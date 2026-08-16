@@ -179,7 +179,7 @@ README's "Where this metric breaks down".
 * `+1` mutations could not kill values that are only constrained beyond a threshold; the
   operator escalates before calling a mutant a survivor (14/14 killed)
 
-## P5 — in progress
+## P5 — DONE (2026-08-02); this header read 「in progress」 until 2026-08-16
 
 Report templating: `build_report.py` generating the scoreboard, match cards, charts and
 appendix from `facts.json` + the ledger, leaving prose sections as the only hand-written
@@ -666,11 +666,20 @@ clear impossible.
 simulator empties it, then model the line-clear delay (and check whether `results.stats` or the
 options block pins its length rather than fitting it).
 
-### 4 — not started
+### 4 — SUPERSEDED BY POLICY, not pending (annotated 2026-08-16)
 
 Gated on (3). Nothing from a simulator can carry a badge without a second independent
 implementation agreeing byte-for-byte, and there is no point writing one against a simulator that
 still fails its own gate.
+
+**Both halves of that have since happened, and the conclusion was replaced rather than reached.**
+Two engines sharing no code exist and are differentialed (`runCase` vs `runCaseOracle` —
+`dualEngineCheck`'s confusion matrix, cross-tslot's 61 656 boards with `unexplained` empty). But the
+goal as stated — simulator outputs entering `facts.json` carrying badges — was consciously abandoned
+for the **denominator-anchor** architecture: a twice-extracted counter licenses a denominator, the
+numerator stays quarantined, and the dual-engine figure is published as a confusion matrix
+*precisely because* it does not license badges. Read this item as a route not taken, not a route
+still planned. See CLAUDE.md's 分母錨咗 section.
 
 ### Original TODO, for reference
 
@@ -681,7 +690,10 @@ still fails its own gate.
    stop here — that is the whole answer and it costs an hour.
 2. **Close the two surviving mutants** on the T-spin availability probe ("accepts non-rotation
    landings", "`bestTspinLines` drops the spin test"). Either construct a board that distinguishes
-   them or demonstrate equivalence. Currently recorded as open, not as equivalent.
+   them or demonstrate equivalence. ~~Currently recorded as open, not as equivalent.~~
+   **DONE 2026-07-29 — see 「2 — mutation coverage closed, 5/5」 above**, which constructs exactly the
+   two boards this item names. This sentence stayed false for eighteen days because the closure was
+   written in a new section instead of struck here.
 3. **Fix the post-garbage divergence** — only if (1) says the sim is worth finishing. The per-attack
    oracle localises failures to individual pieces now, so this iterates far faster than it did.
 4. **A second independent simulator**, agreeing byte-for-byte on emitted per-round values. The
@@ -1335,13 +1347,29 @@ several did not survive that check and are called out below.
   Subtracting the pre-existing count would be identity on every corpus board and would BREAK the
   contract on the constructed boards where it is not, so nothing is subtracted. Verified against
   `localiseMechanism` source before closing; `bestTspin`'s doc now carries the contract line.
-- **7 — modelling `improved` was NOT blocked.** The premise "a finite max needs a bounded position
+- **7 — DONE 2026-08-09 in `300b358`, the same day this line was written — and its stated reason
+  is unsound.** `spec/Forecast.dfy` has carried `availAtJ`/`availAtK`, `predicate Improved` and both
+  halves of the difference theorem since then. The justification BOTH this item and that commit give
+  for the `<= 3` bound — "a max over LINE COUNTS, bounded by 3, regardless of the position set" — is
+  false: `bestTspin` scores every full row of the RESULTING board, so over n pre-existing full rows it
+  measures 1 · 2 · 3 · 4 · 6 · 11. That is settled correct behaviour (Re-classified item 3), but it
+  makes `<= 3` a well-formedness assumption about the caller — every board handed to `bestTspin` is
+  post-clear — rather than a geometric fact about the T. Corrected in the spec 2026-08-16 with
+  `BestTspinLinesIsBoundedOnlyOnClearedBoards` and `TheBoundOfThreeIsAttained`. A DONE record that
+  repeats a wrong reason is worth less than none.
+- ~~**7 — modelling `improved` was NOT blocked.**~~ The premise "a finite max needs a bounded position
   set" is false: `BestTspinLines` is a max over LINE COUNTS, bounded by 3, regardless of the
   position set's size. Cheap path (hours): add `availAtJ`/`availAtK: nat` to `Event` (exactly like
   the two flags already there, `<= 3`), prove `Improved` and `GapClosed` are *different* predicates
   with two witnesses + an anti-vacuity witness. No boundedness lemma. This matters: `improved`
   performs 653 of 654 corpus exclusions and is the single largest unmodelled thing.
-- **11 — `insertMode`, keep seven not eight.** Four *other* legal garbage-timing configs
+- **11 — OBSOLETE (2026-08-16): the seven-config sweep it argues about no longer exists.**
+  `emit-forecast-facts.ts:88` is now `CONFIGS = [['triangle-oracle', {}]]`, and :84-87 records why —
+  the multi-config sweep hedged the hand-sim's option uncertainty, the reference engine has no such
+  options, "so the sweep collapses to a single authoritative config and the printed simulator range
+  is a point" (`147e7f8`). Both recommendations below target a mechanism that was deleted rather than
+  narrowed; the artefact already states its config basis in `simulator_configs_for_range`.
+- ~~**11 — `insertMode`, keep seven not eight.**~~ Four *other* legal garbage-timing configs
   (`cancelMode:inTransit`, `readyFrom:confirm`, `garbagespeed:0`, `insertAfterClear`) all measure 0
   without throwing, which strengthens the 0%. But the published `simulator_range [0,0]` is over seven
   configs, six of which vary piece kinematics and only one touches garbage — the axis the metric is
@@ -1382,39 +1410,93 @@ included) and does not lose it. Fixed in `0b0aaf6`; proved in `spec/BfsKey.dfy` 
 unchanged on all five sessions, every committed `forecast-facts.json` byte-identical. Open items
 below are what the work turned up and did not close.
 
-- **`bfs-cap.ts` measures a REPLICA of the search, not the search.** It imports `sim.ts` and
-  `vendor/core/srs.ts` and never imports `forecast.ts`; it walks its own copy of the BFS. So it
-  printed the same 688 for the shipped and the fixed engine, and **that agreement is worth nothing
-  as evidence** — it cannot disagree with an engine it never calls. The real queue is 848 under the
-  landed key. Point it at `bestTspin`, or the next reader trusts a number the engine no longer
-  produces. This is the same class as「a gate exercised only against the input it already passes」.
-- **The control mutants `pipeline/sim/README.md` claimed do not exist and never did** — corrected in
-  `8d44543`, but corrected by *deleting the claim*, not by building them. The machinery now exists:
-  each entry in `mutate-forecast.ts` carries an optional `expect` defaulting to `killed`, and a
-  mismatch in either direction fails the run, so a killed control fails as loudly as a surviving
-  mutant. What is missing is the controls themselves — a semantics-preserving edit that must
-  survive, and a poison mutant that must die. Until they exist the harness still cannot detect its
-  own breakage, which is precisely what the deleted sentence pretended it could.
-- **`mutate-forecast.ts` restores its startup snapshot unconditionally.** It snapshots `forecast.ts`,
-  plants, tests, restores — with no check that the file moved underneath it, so a concurrent write is
-  silently overwritten. Strictly worse than the abort fixed in `d17a454`, because it destroys work
-  rather than mis-reporting. Recorded as a KNOWN HAZARD in the file header; the guard (compare
-  against the snapshot before restoring, refuse rather than clobber) is not written. Two related
-  traps, both hit on 2026-08-10 and both now documented: a planted mutant in a tracked file is
-  exactly `+1/-1` on `git diff --stat`, and a test run against a planted tree reports plausible
-  failures that are not regressions.
-- **`arrival-key.test.ts` is not in the mutation baseline.** `mutate-forecast.ts`'s default set is
-  `['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts']`, so the fixture that
-  proves this whole fix contributes no kills to the main sweep. Nothing measurable changes today —
-  all 50 already die — but there is no mutant in that harness for the arrival key at all, so a
-  future revert would be caught only by the separate `mutate-arrival-key.ts`. Either add the file to
-  the default set, or add a `key/revert-to-position` entry, or state why neither is wanted.
+- **`bfs-cap.ts` measured a REPLICA of the search — CLOSED 2026-08-16.** It imported `sim.ts` and
+  `vendor/core/srs.ts` and never imported `forecast.ts`; it walked its own copy of the BFS. So it
+  printed the same 688 for the shipped and the fixed engine, and **that agreement was worth nothing
+  as evidence** — it cannot disagree with an engine it never calls. It now drives the shipped
+  `bestTspin` through a new opt-in `withBfsTrace`, which derives its figures by walking the real
+  `q` AFTER the search, so the hot path pays one null test per call and nothing per edge.
+  **No published figure moves**, which is the useful part of the result: 688 distinct positions
+  and 848 pair queue both reproduce exactly, at 1.23 entries per position — verified against the
+  pre-change file run out of `git show HEAD:`, not against this entry's account of it. Every
+  committed `sessions/*/sim/*.json` re-emits byte-identical under the change.
+
+  **The replica was wrong TWO ways, and the second is the stronger argument for deleting replicas.**
+  The first is the one above: it could not disagree with an engine it never called. The second is
+  that it **printed a different number from the file it was supposedly measuring** — it divided the
+  40 000 cap by the position count and reported 58x of headroom, where `forecast.ts`'s own header
+  says ~47x. Those two numbers sat one file apart, in contradiction, and nobody noticed, because
+  noticing required knowing that「states explored」in one file and「pair queue」in the other were
+  different quantities wearing the same name. "It printed the same number twice" is a weak
+  indictment; "it silently disagreed with its subject" is the real one. It prints both quantities
+  now, separately labelled, and 47.17x.
+- ~~**PARTIAL (checked 2026-08-16): the machinery is done and better than this asked; the controls
+  themselves still do not exist.**~~ **CLOSED later the same day** — the audit was right at the time
+  it was written: `mutate-forecast.ts` carried the full expected-verdict system
+  (`Verdict = 'killed' | 'survived'` per entry, a control that starts dying fails the run, STALE as
+  a distinct outcome) and **no entry declared `expect: 'survived'`**, with no poison entry. The
+  three controls and the poison were added hours later; see the entry directly below, which is the
+  same item and carries the measurement.
+- **The control mutants `pipeline/sim/README.md` claimed did not exist and never had — CLOSED
+  2026-08-16.** The claim was corrected in `8d44543` by *deleting* it, not by building them, and
+  the machinery-without-controls state was annotated PARTIAL by the 2026-08-16 ROADMAP audit. Both
+  halves are now real. The machinery: each entry in `mutate-forecast.ts` carries an optional
+  `expect` defaulting to `killed`, and a mismatch in either direction fails the run. The controls:
+  three `expect: 'survived'` entries — `bestTspinLines(b) > 0` → `>= 1` on an integer count,
+  `x !== 'none'` → `!(x === 'none')`, `filter(...).length` → `reduce` — and `poison/spawn-column`,
+  the BFS spawning at column 9. Measured over the default suite: **52/55 killed, 3 controls held,
+  0 mismatched**, the poison among the killed.
+
+  **Each control is equivalent by an argument checkable by eye, and deliberately not by "the suite
+  still passes"** — justifying a control that way is circular, because the suite agreeing with it
+  is the exact thing the control exists to test. What the four buy is the one failure a mutation
+  harness cannot see about itself: if `bun test` silently stopped reaching `forecast.ts` — wrong
+  path, a test file erroring on import, an `execSync` throwing for its own reasons — every defect
+  injection would report `killed` and the run would look like the best in the file's history. So
+  the deleted companion sentence ("a sweep where everything dies is a syntax error") is true now
+  and was not before: everything dying means the three controls died.
+- **`mutate-forecast.ts` restored its startup snapshot unconditionally — CLOSED 2026-08-16.** It
+  snapshotted `forecast.ts`, planted, tested, restored — with no check that the file moved
+  underneath it, so a concurrent write was silently overwritten. Strictly worse than the abort fixed
+  in `d17a454`, because it destroyed work rather than mis-reporting. The guard is `ours()`: the
+  harness compares the file against what IT last wrote and refuses rather than clobbers.
+  **Checked before every PLANT, not only before the restore** — a restore-time check alone protects
+  the last write and nothing before it, because the next `writeFileSync` in the loop would have
+  overwritten the concurrent edit long before the restore ran and the comparison would then match
+  again. A refusal leaves the file alone, says so loudly, and deliberately does NOT unlink
+  `.mutbak`. Demonstrated, not reasoned: a write planted into `forecast.ts` mid-sweep aborts the run
+  at the next plant with rc 1 and the backup still on disk. Two related traps, both hit on
+  2026-08-10 and both still true: a planted mutant in a tracked file is exactly `+1/-1` on
+  `git diff --stat`, and a test run against a planted tree reports plausible failures that are not
+  regressions.
+- **`arrival-key.test.ts` was not in the mutation baseline — CLOSED 2026-08-16.** `mutate-forecast.ts`'s
+  default set was `['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts']`, so the
+  fixture that proves this whole fix contributed no kills to the main sweep, and there was no mutant
+  for the arrival key in that harness at all. Both halves are done: the file is in the default set,
+  and `key/revert-to-position` plants the pre-`0b0aaf6` behaviour (rotation arrivals dedup on the
+  position key, `expand: true`). The two are one change, not two — without the fixture the mutant is
+  not reliably killed by the corpus (191 of 8 995 boards gain a line and no published classification
+  moves), and without the mutant the fixture guards a line nothing attacks.
+
+  **This entry itself understated the hole, and that is worth recording.** It said a future revert
+  "would be caught only by the separate `mutate-arrival-key.ts`" — **there is no such file**, in
+  this tree or in git. So the honest statement of the pre-fix state is that a revert of the visited
+  key would have been caught by no mutation harness at all; `arrival-key.test.ts` would have failed
+  under `bun test`, but nothing was measuring whether that line was attackable. A named file that
+  does not exist reads as coverage.
 - **`sessions/2026-08-09/sim/forecast-facts.json` — CLOSED 2026-08-11 (`c9f3065`).** Was
   untracked, so the newest session was uncovered by the forecast-section gate (`verify.yml:280`
   guards with `if [ -f ... ]` and skipped it) and the blast radius of any forecast change was
   silently four sessions, not five. Committed alongside the hoisted-DAS regeneration, so all five
   sessions are now covered. Worth confirming `verify.yml` no longer skips it.
-- **The `cc-movegen.ts` standing gate is not built.** `cc-tslot.ts` cross-checks slot *presence* by
+- **DONE — `cross-movegen.test.ts` (`fe9d64b` + `5ab03cb`), in CI at `verify.yml:717-720`.** Five
+  deviations from the spec below, each deliberate: the oracle is the ORIGINAL cold-clear run as an
+  external nix-built binary rather than a vendored CC2 port (executing a binary sidesteps the
+  MPL-2.0 concern entirely); the invariant is `cc ⊆ ours`, not equality; the anti-vacuity liveness
+  assertion is present; `fast_mode` under-reporting is handled via `MovementMode::ZeroGComplete`;
+  and the no-180 shared-blind-spot statement lives in `pipeline/sim/README.md:233`, not the test.
+  The kick tables got the separate exact check the item asked for as well (`cross-srs-tables.test.ts`).
+  ~~The `cc-movegen.ts` standing gate is not built.~~ `cc-tslot.ts` cross-checks slot *presence* by
   shape-matching and structurally could not have caught this defect, which is about *reachability*.
   A cold-clear-2 port did catch it. Port from **CC2** (MIT/Apache — CC1 is MPL-2.0, see `fba5ddc`),
   run with `fast_mode` pruning disabled or it under-reports, carry an anti-vacuity liveness
@@ -1872,3 +1954,70 @@ claim does); and **match granularity is not a bound on round granularity** in ei
 Lifting the doc parser into `docs_gate.py` — so CLAUDE.md is parsed in exactly one place — exposed a
 latent off-by-one in `paragraph()`: `rfind(...) + 2` returns index 1 for a paragraph at byte 0,
 silently dropping its first character. Harmless for equiv's anchors, not harmless for a substring gate.
+
+## `localiseMechanism` has no bucket for "the clear opened the PATH" (2026-08-16) — OPEN
+
+Found by looping `forecast-facts.test.ts` over every session instead of the one it defaulted to. The
+test read `DISCOVERED[0]`, which is the *oldest* session, so a default run checked 2026-07-22 six
+times and reported as though it covered the corpus. Rescoped (236 → 312 tests, and a session
+directory with no artefact now fails); 2026-08-14 immediately went red on an invariant the file
+itself asserts.
+
+**`bestTspin` is a BFS from spawn, so its availability is REACHABILITY, not shape** — and the step
+model only reasons about *formation*. `forecast.ts:494` says a cleared row outside the slot
+"displaces the slot rigidly and cannot have formed it", which is true, and leaves **a clear that
+removes the lid over a pre-existing but unreachable slot** with nowhere to go.
+
+Demonstrated by deleting the cleared row from the pre-board **alone** — no piece cells, nothing else —
+with three controls, on 2026-08-14 `-0.ttrm` r4 yachi lock 74 (step 70):
+
+```
+A                        best= 1 rows [32,32,32,33,31]
+A minus row 33 (no T)    best= 2 rows [36,36,36,37,35]     <- the slot, already there
+A minus row 31 (control) best= 0 null
+A minus row 32 (control) best= 0 null
+A minus row 34 (control) best= 1 rows [33,33,33,34,32]
+rows 34..39 identical A vs A-minus-33: true
+```
+
+**The counter detects only half of its own class, and the undetected half is the dangerous one.**
+Sweeping all six sessions for the property rather than the bucket — cleared rows alone reach the
+target, no cleared row strictly inside the slot — gives **2 events in 1789 localised records**, 0
+beyond the verified prefixes, so neither is a coverage artefact waiting to grow. (1789 is the
+localised count; 3926 is every record in the verified prefixes, most of which are `reactive` or
+not-determinable and never reach `localiseMechanism` at all.)
+
+| session | event | filed as | why |
+|---|---|---|---|
+| 2026-08-14 | `-0.ttrm` r4 yachi lock 74 | `unattributed` | the piece does not touch the slot, so nothing claims it |
+| 2026-08-09 | `-6.ttrm` r7 pinglamb lock 24 | **`placement`** | a Z whose cells are provably outside the slot; `touches` fires on adjacency alone |
+
+So the same defect gives an honest "don't know" when the piece sits away from the slot and a
+**confident wrong verdict** when it happens to sit beside it. **2026-08-09's published report
+therefore says 「玩家自己落嗰隻棋整出嚟」 of a slot that piece did not make.** That sentence is the
+concrete cost, and it is the reason this is filed as a defect rather than a curiosity.
+
+**The repair is a fifth `Mechanism`, not a widened line-clear branch.** The report's line-clear gloss
+「消嗰行啱啱夾喺天花板同窿位中間」 *is* the strictly-inside test, so widening the branch would falsify
+a printed sentence to fix a miscount. Access needs its own value so both glosses stay true.
+
+**No published rate moves**, which is why this could be deferred rather than rushed: 08-14's event is
+rejected by clause 4 (its closing clear was itself a T-spin) and 08-09's by clause 2
+(`floorOrigin: arrived-later`), so `forecast_total`, `forecast_rate_x1000`, the CIs and the
+"0 forecasts" headline are all untouched. What moves on repair is the `self_built` count and gloss
+(08-14: 404 → 403 plus a `clause2_undecided`; 08-09: 232 → 231).
+
+Pinned meanwhile as a **named exception list** (`UNATTRIBUTED_STEP_MODEL_GAP` in
+`forecast-facts.test.ts`, the `DT_ORDER_IN_OPENER` shape), exact in both directions and with a
+reciprocal test so a renamed session cannot carry its own exception out of scope. Six mutants kill it:
+entry removed, count drifts up, named event disappears, exception spreads to another session, stale
+entry, wrong player named.
+
+**What that list does NOT cover, stated because it would otherwise be invisible: the 08-09 event is
+unpinned.** The list keys on the `unattributed` counter, and 08-09's event is filed `placement`, so it
+reaches no assertion — a third event arriving in the confidently-wrong shape would pass silently.
+Pinning it needs the record, which needs the simulator rather than the committed artefact. Until the
+fifth `Mechanism` lands, the only thing holding that half is this paragraph.
+
+**Related scoping hazard, unfixed:** `verify.yml` runs `REPLAY_DIR=sessions/2026-07-22 bun test`,
+which pins every OTHER sim test to one session in exactly the way this test was pinned.

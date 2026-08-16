@@ -99,8 +99,8 @@
   },
   {
     "id": "R015",
-    "canto": "pinglamb 嘅 finesse 失誤率高過 yachi 接近五成,手指效率係佢嘅弱項",
-    "english_gloss": "pinglamb's finesse-fault rate is ~46-48% higher than yachi's",
+    "canto": "pinglamb 每粒方塊嘅 finesse 失誤率高過 yachi 接近五成,手指效率係佢嘅弱項",
+    "english_gloss": "pinglamb's finesse faults per piece is ~46-48% higher than yachi's",
     "category": "finesse",
     "python_check": "146*(sum(r['players']['yachi']['finesse_faults'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) <= 100*(sum(r['players']['pinglamb']['finesse_faults'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])) < 148*(sum(r['players']['yachi']['finesse_faults'] for m in facts['matches'] for r in m['rounds'])*sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))"
   },

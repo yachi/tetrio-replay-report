@@ -247,7 +247,7 @@
   },
   {
     "id": "R015",
-    "lemma": "R015_pinglamb_s_finesse_fault_rate_is_46_48_higher_than_yachi_s",
+    "lemma": "R015_pinglamb_s_finesse_faults_per_piece_is_46_48_higher_than_yac",
     "file": "dafny/Claims_coaching.dfy",
     "status": "verified"
   },

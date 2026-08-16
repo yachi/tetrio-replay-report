@@ -95,6 +95,33 @@ function visitIndex(rotation: number, col: number, row: number): number {
   return (rotation * V_COL_N + c) * V_ROW_N + r;
 }
 
+/**
+ * What one `bestTspin` call actually explored. Opt-in, and the only reader is `bfs-cap.ts`.
+ *
+ * `bfs-cap.ts` used to walk its OWN copy of this BFS — it imported `vendor/core/srs.ts` and never
+ * imported this file — so it printed the same 688 for the shipped engine and for the 2026-08-10
+ * arrival-key fix, and that agreement was worth nothing: a replica cannot disagree with an engine
+ * it never calls. Every number that file prints is now this search's.
+ *
+ * The hot path pays one null test per call and nothing else. `queue` and the spans are derived by
+ * walking `q` AFTER the search, inside the `if (trace)`, rather than maintained per edge:
+ *   - `queue`     is `q.length`, the (position, arrival) PAIR queue — the thing `h < 40000` bounds
+ *   - `positions` is the distinct-position count, which is `expand === true` on exactly the entries
+ *     whose `seenOrMark` returned false (the spawn included), so it needs no second set
+ *   - the spans are over queued states, which is what makes the row range an observation rather
+ *     than the undischarged [-2, 39] assumption the caps exist to survive
+ */
+export interface BfsTrace { queue: number; positions: number; rowLo: number; rowHi: number; colLo: number; colHi: number }
+let trace: BfsTrace | null = null;
+
+/** Run `fn` with tracing on and return the LARGEST search it made. Scoped, so it cannot be left on. */
+export function withBfsTrace<T>(fn: () => T): { value: T; trace: BfsTrace } {
+  const outer = trace;
+  const t: BfsTrace = { queue: 0, positions: 0, rowLo: Infinity, rowHi: -Infinity, colLo: Infinity, colHi: -Infinity };
+  trace = t;
+  try { return { value: fn(), trace: t }; } finally { trace = outer; }
+}
+
 export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
   let best = 0, bestRows: number[] = [];
   const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
@@ -183,6 +210,14 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
       }
       if (rotSeenOrMark(n.rotation, n.col, n.row)) continue;
       q.push({ p: n, rot: true, kick: isKick, expand: !seenOrMark(n.rotation, n.col, n.row) });
+    }
+  }
+  if (trace) {
+    trace.queue = Math.max(trace.queue, q.length);
+    trace.positions = Math.max(trace.positions, q.reduce((n, e) => n + (e.expand ? 1 : 0), 0));
+    for (const e of q) {
+      trace.rowLo = Math.min(trace.rowLo, e.p.row); trace.rowHi = Math.max(trace.rowHi, e.p.row);
+      trace.colLo = Math.min(trace.colLo, e.p.col); trace.colHi = Math.max(trace.colHi, e.p.col);
     }
   }
   return best > 0 ? { lines: best, rows: bestRows } : null;

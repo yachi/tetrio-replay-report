@@ -39,6 +39,17 @@ module Forecast {
 
   predicate Filled(c: Cell) { c != Empty }
 
+  // A row is full when every one of its `Width` cells is filled — the condition `bestTspin` tests
+  // with `r.every(x => x !== null)`, and the condition a line clear removes a row for.
+  predicate FullRow(r: Row) { forall c :: 0 <= c < Width ==> Filled(r[c]) }
+
+  // The full rows of a board, as a SET of indices. A set because the thing being bounded below is
+  // HOW MANY distinct rows are full — the same reason `RowsBetween` is a set and `CountBetween`,
+  // which counts occurrences, needed `NoDup` beside it.
+  function FullRows(b: Board): set<int> { set i | 0 <= i < |b| && FullRow(b[i]) }
+
+  predicate NoFullRow(b: Board) { forall i :: 0 <= i < |b| ==> !FullRow(b[i]) }
+
   // ---------------------------------------------------------------------------------------------
   // One step of play: a piece locks, full rows are removed, then garbage rises. That order is the
   // simulator's (place -> clear -> insert) and it matters: garbage lifts the survivors of the clear.
@@ -471,7 +482,8 @@ module Forecast {
     && 0 <= e.j < e.k <= |h|
     && e.roofAt < e.floorAt          // the overhang is above the hole's floor
     && e.spinAtK == h[e.k - 1].wasSpin   // clause 1's flag is the history's flag, not a second one
-    && e.availAtJ <= 3 && e.availAtK <= 3 // a T occupies at most three rows, so bestTspinLines is in 0..3
+    && e.availAtJ <= 3 && e.availAtK <= 3 // 0..3, but NOT for the reason first written here: see
+                                          //   `BestTspinLinesIsBoundedOnlyOnClearedBoards` below
   }
 
   predicate Tucked(e: Event) { e.spinAtK }
@@ -743,10 +755,40 @@ module Forecast {
   //     availAtSpin > availAtRoof
   //
   // where availAtRoof = bestTspinLines(board at step j) and availAtSpin = bestTspinLines(board at
-  // step k-1). `bestTspinLines` is a max over LINE COUNTS, and a T-piece occupies at most three
-  // rows, so BOTH sides are in 0..3 whatever the board — the bound is on the max's VALUE, not on
-  // the position set the BFS searches. Boundedness of the position set is needed to COMPUTE the max
-  // in a terminating search; it is NOT needed to STATE it, and Dafny is being asked to state it.
+  // step k-1). `bestTspinLines` is a max over LINE COUNTS, so the bound is on the max's VALUE, not
+  // on the position set the BFS searches. Boundedness of the position set is needed to COMPUTE the
+  // max in a terminating search; it is NOT needed to STATE it, and Dafny is being asked to state it.
+  //
+  // THE PREMISE IS RIGHT AND ITS FIRST STATED REASON WAS INCOMPLETE, which is worth more than the
+  // conclusion. This comment used to read "a T-piece occupies at most three rows, so BOTH sides are
+  // in 0..3 WHATEVER THE BOARD". The second half does not follow from the first. `bestTspin` scores
+  // a placement with
+  //
+  //     const lines = after.filter(r => r.every(x => x !== null)).length;   // in `bestTspin`
+  //
+  // (cited by function rather than by line: the statement sat at forecast.ts:154 when this was
+  //  written and had already moved to :181 the same day, under an unrelated edit further up.)
+  //
+  // i.e. EVERY full row of `after`, not the rows the T completed. Measured 2026-08-16 on the
+  // shipped `bestTspinLines`, one T-Spin Single slot with n already-full rows stacked beneath it:
+  //
+  //     n = 0 -> 1     n = 1 -> 2     n = 2 -> 3     n = 3 -> 4     n = 5 -> 6     n = 10 -> 11
+  //
+  // THIS IS NOT A BUG REPORT, and reading it as one would re-open something already settled.
+  // ROADMAP "Re-classified" item 3 put exactly this behaviour through a patched classifier over
+  // 654 events x 6 configs — zero classification changes, zero rate changes — and closed it as
+  // CORRECT: `bestTspin.lines` means "the lines this T-spin would clear if it locked here", and the
+  // game clears every full row on lock, not merely the rows the T's own cells complete. Subtracting
+  // a pre-existing count would break that contract. Nothing here asks for a code change.
+  //
+  // What it does change is the STATUS of `WellFormed`'s `<= 3`. The bound holds because of a fact
+  // about the CALLER, not a fact about the T-piece: every board handed to `bestTspin` — `A`, `B`,
+  // and every `avail(t)` board — is post-clear and so carries no full row, therefore every full row
+  // of `after` was completed by the placement, and a T spans at most three rows. Drop that side
+  // condition and the bound is simply false, as the table above shows. So `<= 3` is a
+  // WELL-FORMEDNESS ASSUMPTION with a hypothesis attached, not a self-evident geometric fact, and
+  // `BestTspinLinesIsBoundedOnlyOnClearedBoards` writes the hypothesis down so it cannot be dropped
+  // silently — the same service `WellFormedStep` does for what a `Step` may look like.
   //
   // WHAT THIS PROVES, AND WHAT IT DELIBERATELY DOES NOT.
   //
@@ -767,8 +809,89 @@ module Forecast {
   // a difference theorem, which cannot be mistaken for validation of the search.
   // ---------------------------------------------------------------------------------------------
 
+  /**
+   * WHY `WellFormed`'s `<= 3` IS AN ASSUMPTION ABOUT THE CALLER, not a fact about the T-piece.
+   *
+   * `bestTspin` scores a placement by counting every full row of the resulting board. So the count
+   * splits in two — rows the placement completed, and rows that were full before it — and only the
+   * first is bounded by the T's height. Bound the second at zero and the total is bounded; leave it
+   * free and it is not, which is what the measured 1, 2, 3, 4, 6, 11 above says.
+   *
+   * Stated over the board vocabulary this file has always declared and never used (`Cell`, `Row`,
+   * `Board`, `Filled`, `Width`). `touched` is the set of rows the placement wrote into — at most 3
+   * for a T in any orientation — and everything outside it is untouched, so a row that is full
+   * afterwards and was not touched was full already.
+   *
+   * NOT a model of `bestTspinLines`, and it must not be read as one: it says nothing about which
+   * placements are reachable, which is the BFS's job and the part `Step` carries no board to
+   * express. It bounds the arithmetic the score is computed by, under the side condition the
+   * shipped code always meets and the old comment left out.
+   */
+  lemma BestTspinLinesIsBoundedOnlyOnClearedBoards(pre: Board, post: Board, touched: set<int>)
+    requires |pre| == |post|
+    requires NoFullRow(pre)                       // the side condition, and it is load-bearing
+    requires |touched| <= 3                       // a T occupies at most three rows
+    requires forall i :: 0 <= i < |post| && i !in touched ==> post[i] == pre[i]
+    ensures FullRows(post) <= touched
+    ensures |FullRows(post)| <= 3
+  {
+    forall i | i in FullRows(post) ensures i in touched {
+      if i !in touched {
+        assert post[i] == pre[i];                 // untouched, so it was full before — excluded
+        assert false;
+      }
+    }
+    SubsetCard(FullRows(post), touched);
+  }
+
+  /**
+   * ...and the bound is ATTAINED, so 3 is the right constant and not merely a safe one. Three rows
+   * each missing a single cell, and one placement that fills all three: `NoFullRow` holds before,
+   * every hypothesis is met, and the score is exactly 3. This is the T-Spin Triple, which is what
+   * `bestTspinLines <= 3` is a bound on.
+   *
+   * `check_spec_vacuity.py` reports `BestTspinLinesIsBoundedOnlyOnClearedBoards` as "not shown",
+   * which is no claim either way — so the universal still needs a board reaching its hypotheses,
+   * the discipline `NothingRemovedIsReachable` records.
+   */
+  lemma TheBoundOfThreeIsAttained() returns (pre: Board, post: Board, touched: set<int>)
+    ensures |pre| == |post| && NoFullRow(pre) && |touched| <= 3
+    ensures forall i :: 0 <= i < |post| && i !in touched ==> post[i] == pre[i]
+    ensures |FullRows(post)| == 3          // the bound is met, not merely respected
+  {
+    var gap: Row := seq(Width, i => if i == 0 then Empty else Stack(0));
+    var full: Row := seq(Width, _ => Stack(0));
+    assert !FullRow(gap) by { assert !Filled(gap[0]); }
+    assert FullRow(full);
+    pre := [gap, gap, gap];
+    post := [full, full, full];
+    touched := {0, 1, 2};
+    assert FullRows(post) == {0, 1, 2};
+  }
+
+  /**
+   * ...and the side condition is not free. Drop `NoFullRow` and the bound is false: here four rows
+   * are already full, the placement touches nothing, and the score is 4. This is the `n = 3 -> 4`
+   * row of the measurement, as a board.
+   *
+   * `returns`, so it states its own reachability rather than leaving `check_spec_vacuity.py` to
+   * report "not shown" — the discipline `SeparationOneIsReachable` set.
+   */
+  lemma AFullRowBreaksTheBound() returns (pre: Board, touched: set<int>)
+    ensures |pre| == 4 && touched == {}
+    ensures !NoFullRow(pre)
+    ensures FullRows(pre) == {0, 1, 2, 3}
+    ensures |FullRows(pre)| == 4 > 3              // the bound the side condition buys, violated
+  {
+    var full: Row := seq(Width, _ => Stack(0));
+    assert FullRow(full);
+    pre := [full, full, full, full];
+    touched := {};
+    assert FullRows(pre) == {0, 1, 2, 3};
+  }
+
   // The available T-spin lines rose between the overhang landing and the T going in. `bestTspinLines`
-  // is bounded by 3, which `WellFormed` records; the predicate itself only compares the two.
+  // is bounded by 3 on any board the game produces (above); the predicate itself only compares the two.
   predicate Improved(e: Event) { e.availAtK > e.availAtJ }
 
   // THE DIFFERENCE THEOREM, in two halves. `Improved` and `GapClosed` disagree in BOTH directions,
@@ -815,14 +938,107 @@ module Forecast {
   }
 
   /**
-   * `Improved` reads ONLY the two `Event` fields — it never consults `h`. Stated as a theorem so an
-   * edit that quietly makes `Improved` depend on the history (which would silently change what the
-   * predicate means, and what the difference theorem above compares against) fails here. No
-   * hypotheses, so `check_spec_vacuity.py` does not probe it; it is a definitional identity.
+   * `Improved` reads ONLY the two `Event` fields — it never consults `h`. No hypotheses, so
+   * `check_spec_vacuity.py` does not probe it; it is a definitional identity.
+   *
+   * ⚠️ READ WHAT THIS COSTS BEFORE TRUSTING A MUTATION SCORE ON `Improved`. The comment here used
+   * to say the lemma exists so that an edit making `Improved` depend on the history fails. It
+   * cannot do that job — `Improved(e: Event)` has no `h` parameter, so such an edit is a COMPILE
+   * error and the lemma is not what stops it. What the lemma actually does is restate the
+   * predicate's whole body, which makes EVERY mutation of that body die right here, on a
+   * restatement, whether or not any witness objects.
+   *
+   * Measured 2026-08-16, each mutant run twice — once as committed, once with this lemma's
+   * `ensures` neutralised to `true`, which is the only way to see whether the witnesses have teeth:
+   *
+   *   `>` -> `>=`   killed both ways        — really killed, by `GapCanCloseWithoutImproving`
+   *   `>` -> `!=`   killed only as committed, SURVIVES neutralised (both files, 0 errors)
+   *
+   * So the DIRECTION of `improved` — availability ROSE, not merely CHANGED — was pinned by nothing
+   * but this echo of the definition. `AvailabilityFallingIsNotImproving` below is the witness that
+   * pins it for real, and `spec/mutate-forecast-spec.sh` runs the `Improved` mutants with this
+   * lemma neutralised so a kill is attributable to a board rather than to a repetition.
+   *
+   * Deleting this lemma is the honest follow-up and is deliberately NOT done here: it is load-
+   * bearing for nothing, but removing it is a change to what the mutation suite measures, and that
+   * belongs in its own commit beside the suite's own numbers.
    */
   lemma ImprovedIsPurelyAnEventProperty(h: History, e: Event)
     ensures Improved(e) <==> e.availAtK > e.availAtJ
   { }
+
+  /**
+   * THE DIRECTION, on a board. Availability that FELL is not an improvement.
+   *
+   * This is the case neither existing witness reaches: `ImprovedNeedNotCloseTheGap` has availability
+   * rising (0 -> 2) and `GapCanCloseWithoutImproving` has it level (2 -> 2), so between them they
+   * pin `>` against `>=` and nothing else. An event whose best available spin got WORSE — the T
+   * that was on offer at the roof having been spent, or buried by garbage, before the tuck — reads
+   * as improved under any symmetric comparison, and `improved` gates 653 of the 654 corpus
+   * exclusions, so the direction is the last thing that should rest on a restated definition.
+   */
+  lemma AvailabilityFallingIsNotImproving() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures e.availAtJ == 3 && e.availAtK == 1   // strictly WORSE at the spin than at the roof
+    ensures !Improved(e)
+  {
+    h := [ Step([], false, 0), Step([], true, 0) ];
+    e := Event(0, 2, 25, 27, true, true, 3, 1);
+  }
+
+  /**
+   * ANTI-VACUITY FOR THE PAIR, and the one cell of the 2x2 that carries a claim about the METRIC.
+   *
+   * The two halves of the difference theorem show neither predicate implies the other. Neither of
+   * them shows the two can hold AT ONCE — and taken alone they are equally consistent with the
+   * conjunction being unsatisfiable, i.e. with `Improved && GapClosed` describing nothing. That is
+   * not an idle worry here: `pipeline/sim/forecast.ts` requires `improved` ON TOP of the gap
+   * machinery before it will emit `forecast_lineclear`, and the published corpus figure is 0 of
+   * 654. A reader is entitled to ask whether the count is 0 because the players did not forecast or
+   * because the conjunction is structurally empty. This lemma answers the second half: the
+   * conjunction is satisfiable on a well-formed, game-producible history, so a zero is a
+   * measurement rather than an artefact of the definition.
+   *
+   * It is a SINGLE-FIELD edit from each of the other two, which is what makes it minimal in the
+   * sense `ForecastExamples.dfy` uses:
+   *   from `ImprovedNeedNotCloseTheGap`  — h[0].clearedRows [] -> [26]  (the history alone)
+   *   from `GapCanCloseWithoutImproving` — e.availAtJ        2  -> 0    (the event alone)
+   *
+   * NOT THE UNIQUE KILLER OF ITS OWN MUTANT, and the first draft of this comment said it was.
+   * Measured 2026-08-16: the mutant that makes the two mutually exclusive (`GapClosed` additionally
+   * demanding `!Improved`) errors on TWO obligations, this one and `GapClosedIsExactlyRowsRemoved`
+   * — which characterises `GapClosed` as exactly "both survive and a row came out from between
+   * them", so a `GapClosed` that consults the avail fields at all breaks its `<==>`.
+   *
+   * The two catch it for different reasons and neither subsumes the other. `GapClosedIsExactlyRows
+   * Removed` is definitional: it constrains what `GapClosed` may READ. It says nothing about
+   * whether any well-formed event satisfies both predicates at once — `availAtJ`/`availAtK` are
+   * free `nat` fields, and a `WellFormed` that related them to `roofAt`/`floorAt` could empty the
+   * conjunction without disturbing that `<==>` at all. Satisfiability is this lemma's own content.
+   * Being killed alongside another obligation is the same standing `ForecastIsSatisfiable` has, and
+   * for the same reason: an anti-vacuity witness earns its place by ruling out the empty reading,
+   * not by being the sole objector to some mutant.
+   */
+  lemma ImprovedAndGapClosedTogether() returns (h: History, e: Event)
+    ensures WellFormedHistory(h) && WellFormed(h, e)
+    ensures Improved(e) && GapClosed(h, e)
+  {
+    h := [ Step([26], false, 0), Step([], true, 0) ];
+    e := Event(0, 2, 25, 27, true, true, 0, 2);
+    assert CountBetween([26], 25, 27) == 1;
+    assert RoofFinal(h, e) == At(26) && FloorFinal(h, e) == At(27);   // separation falls 2 -> 1
+  }
+
+  /**
+   * The fourth cell — both false — needs no lemma of its own, and saying so beats adding a
+   * decorative one. `NothingRemovedIsReachable` already returns a witness with
+   * `availAtJ == availAtK == 0`, hence `!Improved`, and with `ClosedByPlain == ClosedBySpins == 0`,
+   * which `NothingRemovedIsNotEvenForecastShaped` turns into `!GapClosed`. So all four cells of the
+   * 2x2 are reached by a board, which is logical INDEPENDENCE and not merely two non-implications.
+   *
+   * A lemma restating that pair would be killed by no mutation any of the four witnesses does not
+   * already kill, and this file's own standard is that such a lemma is decorative.
+   */
 
   // ---------------------------------------------------------------------------------------------
   // ANTI-VACUITY. Every lemma above is of the form "this is NOT a forecast", and all of them hold

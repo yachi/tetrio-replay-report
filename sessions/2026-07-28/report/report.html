@@ -7947,7 +7947,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       { label: "每粒攻擊", y: t.yachi.attack_per_piece, p: t.pinglamb.attack_per_piece, fmt: function (v) { return v.toFixed(3); } },
       { label: "總攻擊行數", y: t.yachi.garbage_attack, p: t.pinglamb.garbage_attack, fmt: function (v) { return Math.round(v); } },
       { label: "清垃圾行數", y: t.yachi.garbage_cleared, p: t.pinglamb.garbage_cleared, fmt: function (v) { return Math.round(v); } },
-      { label: "finesse 失誤率", y: t.yachi.finesse_fault_rate, p: t.pinglamb.finesse_fault_rate, fmt: function (v) { return (v * 100).toFixed(1) + "%"; }, lowerBetter: true },
+      { label: "每粒 finesse 失誤", y: t.yachi.finesse_fault_rate, p: t.pinglamb.finesse_fault_rate, fmt: function (v) { return v.toFixed(3); }, lowerBetter: true },
       { label: "hold 使用率", y: t.yachi.hold_rate, p: t.pinglamb.hold_rate, fmt: function (v) { return (v * 100).toFixed(1) + "%"; } }
     ];
 

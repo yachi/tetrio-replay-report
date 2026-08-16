@@ -48,6 +48,18 @@
  * with no workflow entry to forget — the manual-only-gate class this repo has been bitten by twice
  * (`dual-backed.json`, `equiv.py`'s coverage table). The CLI exists so the mutants are runnable and
  * nameable in isolation, and so a single session can be swept while working on it.
+ *
+ * ── WHAT `letter` CANNOT SEE, AND WHY THE WORDING IS "IMPOSSIBLE PLACER" ─────────────────────────
+ * The rule compares a placer's piece against the letter the board draws, so it separates the seven
+ * letters and nothing finer. A cell misattributed to a DIFFERENT lock of the SAME letter is
+ * admissible under every rule here and always will be — with seven piece types, roughly 1 in 7 of a
+ * uniformly wrong attribution is invisible to it. That is why every figure this gate produces is
+ * worded as "no placer is IMPOSSIBLE", never as "every placer is correct": `0 of 4202` is an upper
+ * bound on the defect it was written for, not a proof of the map. Deciding same-letter attribution
+ * needs cell identity — which is exactly what `oracle-source.ts` builds and what the deleted
+ * reconstruction did not have — so the honest check on it is that source's own WeakMap tagging, not
+ * a rule in this file. Do not upgrade the wording anywhere it appears (here, `provenance.test.ts`,
+ * ROADMAP) without building that second decision procedure first.
  */
 import { existsSync, readdirSync } from 'node:fs';
 import { GARBAGE, H, type SimResult } from './sim.ts';
@@ -203,7 +215,7 @@ const clone = (r: SimResult): SimResult => ({
  * clean fixture must report NOTHING, because a checker that fails on everything catches every
  * mutant below and gates nothing at all.
  */
-export function selftest(log: (s: string) => void = console.log): number {
+export async function selftest(log: (s: string) => void = console.log): Promise<number> {
   // `via` names WHICH detector has to fire, not merely that something did. Accepting either would
   // let the roof reader rot behind the full-grid walk, which is the one place a narrowing would not
   // show up — the roof cells are the subset `forecastMetric` reads.
@@ -256,13 +268,45 @@ export function selftest(log: (s: string) => void = console.log): number {
   const covers = base.roof > 0 && base.bad === 0;
   ok &&= covers;
   log(`  ${covers ? 'ok ' : 'BAD'} control: the fixture exercises the roof reader (${base.roof} roof cells, ${base.bad} bad)`);
+
+  // ── the CENSUS, which the seven rules above say nothing about ──────────────────────────────────
+  //
+  // Every mutant above breaks a provenance map that WAS built. None of them can reach the other
+  // failure mode: a builder that throws, whose case then never enters the sweep at all. A full
+  // die-off used to print `ok ... 0 placed cells over 0 rounds` and exit 0; a PARTIAL one printed a
+  // smaller, still-clean census with nothing naming what fell out — and the corpus test's bounds
+  // (`rounds > 0`, `placed > 1M`) only ever caught the extreme. These three cases plant the
+  // die-offs directly, over synthetic cases and builders, so they cost no disk and no engine.
+  const dead = () => { throw new Error('planted: the builder died'); };
+  const censusCases: [string, boolean, (c: number) => SimResult][] = [
+    ['control: a census that builds every case is clean', false, () => clone(fixture())],
+    ['a builder that throws on EVERY case fails instead of reporting a clean sweep of nothing', true, dead],
+    ['a builder that throws on SOME cases fails rather than shrinking its own denominator', true,
+      (c: number) => (c % 2 ? dead() : clone(fixture()))],
+  ];
+  for (const [name, mustFail, mk] of censusCases) {
+    const [res] = await sweep(['planted'], ['planted'], {
+      builders: { planted: mk }, load: () => [1, 2, 3, 4],
+    });
+    const why = sweepFailures(res!);
+    const fired = mustFail ? why.length > 0 : why.length === 0;
+    ok &&= fired;
+    planted += mustFail ? 1 : 0;
+    log(`  ${fired ? 'ok ' : 'BAD'} ${name} (${res!.rounds} built, ${res!.skipped} skipped)`);
+  }
+
   log(`${ok ? 'ok ' : 'FAIL'} selftest ${planted} planted mutants, ${ok ? 'all caught' : 'SOME MISSED'}`);
   return ok ? 0 : 1;
 }
 
 // ── corpus sweep ─────────────────────────────────────────────────────────────────────────────────
 
-export interface SourceResult { source: string; rounds: number; cells: number; placed: number; roof: number; roofBad: number; counts: Record<RuleName, number>; hits: Violation[] }
+export interface SourceResult {
+  source: string; rounds: number; cells: number; placed: number; roof: number; roofBad: number;
+  counts: Record<RuleName, number>; hits: Violation[];
+  /** cases whose builder threw, so this source produced no provenance map for them at all */
+  skipped: number; skips: { case: string; error: string }[];
+}
 
 /** Every `sessions/*` holding a `.ttrm`. Globbed, never listed — a seventh session needs no edit. */
 export function sessionDirs(root: string): string[] {
@@ -274,22 +318,37 @@ export function sessionDirs(root: string): string[] {
     .sort();
 }
 
-export async function sweep(dirs: string[], sources: string[]): Promise<SourceResult[]> {
-  const { loadCases, runCase, runCaseOracle } = await import('./verified-prefix.ts');
-  const build: Record<string, (c: any) => SimResult> = {
-    'oracle-source.ts (published)': runCaseOracle,
-    'sim.ts hand-port (published)': runCase,
+/** `builders`/`load` are injection points for the selftest only; production passes neither. */
+export async function sweep(
+  dirs: string[], sources: string[],
+  opts: { builders?: Record<string, (c: any) => SimResult>; load?: (dir: string) => any[] } = {},
+): Promise<SourceResult[]> {
+  const vp = await import('./verified-prefix.ts');
+  const build: Record<string, (c: any) => SimResult> = opts.builders ?? {
+    'oracle-source.ts (published)': vp.runCaseOracle,
+    'sim.ts hand-port (published)': vp.runCase,
   };
+  const loadCases = opts.load ?? vp.loadCases;
   const out: SourceResult[] = [];
   for (const source of sources) {
     const mk = build[source]!;
     const acc: SourceResult = {
-      source, rounds: 0, cells: 0, placed: 0, roof: 0, roofBad: 0, hits: [],
+      source, rounds: 0, cells: 0, placed: 0, roof: 0, roofBad: 0, hits: [], skipped: 0, skips: [],
       counts: { 'letter': 0, 'out-of-range': 0, 'future-placer': 0, 'prov-on-empty': 0, 'null-on-filled': 0, 'placer-on-garbage': 0, 'garbage-on-placed': 0 },
     };
     for (const dir of dirs) for (const c of loadCases(dir)) {
       let r: SimResult;
-      try { r = mk(c); } catch { continue; }
+      // A builder that throws produces no provenance map, so this case is NOT swept — it is
+      // missing from the census. It used to be a bare `continue`, which is the same shape as the
+      // `?? 0` that published "no perfect clears" for five sessions: the denominator shrinks and
+      // the printed line reads exactly like a clean sweep. `codegen.py:76-78`'s rule is to NAME
+      // what was left out; `sweepFailures` then refuses to call the run clean at all.
+      try { r = mk(c); } catch (e) {
+        acc.skipped++;
+        if (acc.skips.length < 20)
+          acc.skips.push({ case: `${c?.file ?? '?'} r${c?.round ?? '?'} ${c?.user ?? '?'}`, error: (e as Error).message });
+        continue;
+      }
       acc.rounds++;
       const v = provenanceViolations(r);
       const roof = roofAdmissibility(r);
@@ -302,13 +361,36 @@ export async function sweep(dirs: string[], sources: string[]): Promise<SourceRe
   return out;
 }
 
+/**
+ * Everything that makes a swept source a failure, named — the one place the CLI, the test and the
+ * selftest agree on what "clean" means.
+ *
+ * The skip floor is ZERO, not a tolerance: measured 2026-08-16 over the six-session corpus, both
+ * published sources build all 760 rounds, 0 throws. So any skip is a regression in the builder, and
+ * a gate that tolerated a few would be picking its own denominator.
+ */
+export function sweepFailures(res: SourceResult): string[] {
+  const out: string[] = [];
+  const total = Object.values(res.counts).reduce((a, b) => a + b, 0);
+  if (total) out.push(`${total} inadmissible cells of ${res.placed} placed`);
+  if (res.roofBad) out.push(`${res.roofBad} of ${res.roof} roof cells inadmissible`);
+  // A sweep of nothing reports no violations, which is the vacuous-clean shape the CLI's directory
+  // guards cover for an empty glob and this covers for a full die-off.
+  if (res.rounds === 0) out.push('0 rounds were built — a sweep over nothing reports no violations');
+  if (res.skipped)
+    out.push(`${res.skipped} case(s) were dropped because the builder threw, so the census covers `
+      + `${res.rounds} of ${res.rounds + res.skipped} rounds: `
+      + res.skips.map(s => `${s.case} (${s.error})`).join('; '));
+  return out;
+}
+
 // ── CLI ──────────────────────────────────────────────────────────────────────────────────────────
 
 if (import.meta.main) {
   const argv = process.argv.slice(2);
   const root = `${import.meta.dir}/../..`;
 
-  if (argv.includes('--selftest')) process.exit(selftest());
+  if (argv.includes('--selftest')) process.exit(await selftest());
 
   const named = argv.filter(a => !a.startsWith('--'));
   const dirs = named.length ? named : sessionDirs(root);
@@ -327,15 +409,17 @@ if (import.meta.main) {
 
   let bad = 0;
   for (const res of await sweep(dirs, ['oracle-source.ts (published)', 'sim.ts hand-port (published)'])) {
-    const total = Object.values(res.counts).reduce((a, b) => a + b, 0);
-    if (total || res.roofBad) {
+    const why = sweepFailures(res);
+    if (why.length) {
       bad = 1;
       for (const h of res.hits)
         console.error(`FAIL ${res.source}: ${h.rule} at lock ${h.lock} r${h.row}c${h.col} — prov ${h.prov} (${h.placer}) on a ${h.letter}`);
-      console.error(`FAIL ${res.source}: ${total} inadmissible cells of ${res.placed} placed, ${res.roofBad} of ${res.roof} roof cells`);
+      for (const w of why) console.error(`FAIL ${res.source}: ${w}`);
     } else {
+      // `0 skipped` is printed on a CLEAN run too, deliberately: a census that says how many cases
+      // it could not build is the only way a later partial die-off reads as a change.
       console.log(`  ok  ${res.source}: ${res.placed} placed cells over ${res.rounds} rounds (${res.cells} walked), `
-        + `${res.roof} roof cells, every placer admissible`);
+        + `${res.roof} roof cells, 0 skipped, every placer admissible`);
     }
   }
 
