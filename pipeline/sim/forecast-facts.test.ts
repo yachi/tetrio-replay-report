@@ -7,6 +7,7 @@
  */
 import { test, expect, describe } from 'bun:test';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { UNATTRIBUTED_STEP_MODEL_GAP as SHARED_UNATTRIBUTED_STEP_MODEL_GAP } from './step-model-gap.ts';
 
 // FORECAST_FACTS points the whole file at one session's artifact, so one guard covers every
 // emitted artifact rather than only the session it happens to live beside. The emitter is
@@ -59,9 +60,9 @@ test('every session directory has an artifact for the loop below to check', () =
  * force. The reciprocal — an entry that stops naming a real event — is checked separately below,
  * because a session that is renamed or removed would otherwise take its own exception with it.
  */
-const UNATTRIBUTED_STEP_MODEL_GAP: Record<string, Record<string, number>> = {
-  '2026-08-14': { yachi: 1 },   // replay-2026-08-14-0.ttrm r4 (m1r5), lock 74, causing step 70
-};
+// The list itself lives in step-model-gap.ts, because forecast-corpus.test.ts needs the same
+// events summed per session and a hand-written mirror of it is one fact in two places.
+const UNATTRIBUTED_STEP_MODEL_GAP = SHARED_UNATTRIBUTED_STEP_MODEL_GAP;
 
 // The other direction, and it cannot be folded into the loop above: the loop only visits sessions
 // that EXIST, so an entry naming a session that was renamed or dropped is never consulted and its
