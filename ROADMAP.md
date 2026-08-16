@@ -1157,7 +1157,29 @@ Until one of those exists, every C-Spin statement in this repo carries the cover
 **What the first bag could never answer, and now is answered elsewhere.** Board comparison asks
 "did they build this shape", which coverage bounds. The two openers are also distinguishable by
 something coverage cannot touch — the ORDER of their two T-spins. DT Cannon (開幕DT砲, "Double
-Triple Cannon") is a Double then a Triple; the C-Spin is a Triple then a Double. Over five sessions,
+Triple Cannon") is a Double then a Triple; the C-Spin is a Triple then a Double.
+
+**The five-session figures below were superseded by the sixth session, and the difference is the
+finding, not a rounding.** At six sessions the split is **454 C-Spin order to 1 DT order of 455**
+(summed from the committed `sim/opener-facts.json`, 2026-08-17) — so "0 run the DT order" is no
+longer true, and the single exception is the corpus's **first and only DT Cannon**: 2026-08-14
+`replay-2026-08-14-2.ttrm` r3 yachi, named independently by two metrics (the spin ORDER, and an exact
+first-bag match against harddrop's DT Cannon drawing). Through five sessions every exact first-bag
+match had been a PCO, which made "the instrument only ever finds one thing" a fair worry; that is
+what the sixth session answered. It is pinned as a named exception in `openers.test.ts`
+(`DT_ORDER_IN_OPENER`) rather than absorbed into a relaxed bound, so a second one must be
+investigated. The rest of this item's argument — that the null is bounded by catalogue coverage, and
+that widening the set does not move it — is unaffected.
+
+**A trap worth recording, because I nearly published it.** `first_bag.clean` in the artefacts sums to
+**663 of 760** at six sessions, and `pipeline/openers/README.md` says **358 of 592**. Those are NOT
+the same quantity measured at two corpus sizes: the README counts *7-piece* clean first bags, while
+`first_bag.clean` counts 6-**or**-7-lock ones, since `OPENER_LOCKS = [6, 7]` was added later to reach
+the players who hold a piece through bag 1. Replacing one number with the other would have looked
+like a routine staleness fix and would have silently changed what the sentence measures. The README's
+table is dated "all five sessions" and is a correct record of that date.
+
+Over five sessions,
 of the 221 verified rounds holding both spins, **221 run the C-Spin order and 0 run the DT order**,
 and dropping the verified-prefix window widens it to 277/277 with the split unchanged. That is a
 clean separation with no catalogue in it at all, and it is the spine of the new report section
