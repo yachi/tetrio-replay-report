@@ -1536,7 +1536,13 @@ heading is the one line nobody re-reads when they update the thing underneath it
   `Step` has none of today). Grounding clause 2 strictly subsumes `forecast_garbage`: clause 2 needs
   to know which cells each *placement* filled (`roofIsGarbage` is false for all 654), of which
   garbage hole columns are a subset. Driver is clause 2. Cheaper than it sounds — `Cell`, `Board`,
-  `Filled`, `Width` are already declared in `Forecast.dfy` and referenced by nothing (dead today).
+  `Filled`, `Width` are already declared in `Forecast.dfy` — ~~and referenced by nothing (dead
+  today)~~. **No longer dead, as of 2026-08-16**, which makes this item's case stronger rather than
+  weaker: `BestTspinLinesIsBoundedOnlyOnClearedBoards` (`Forecast.dfy:830`) and
+  `TheBoundOfThreeIsAttained` (`:857`) are stated over exactly that vocabulary, with `FullRow` /
+  `Filled` exercised in the proof. So the board vocabulary is not merely declared — it has been
+  proved about, and a board-carrying `Step` would extend something live instead of resurrecting
+  something dead. (`654` is a four-session figure; see the corrected heading above.)
 
 ### New, carried so they are not lost
 
@@ -1677,9 +1683,20 @@ Dafny and SMT were untouched (08-09 `verify-session`: 88/88 verified); the rippl
 the quarantined opener/forecast tiers and their audit count-pins, re-blessed with comments. Guarded
 by `pipeline/sim/hoisted-das.test.ts`.
 
-**TODO — three open items the fix left, in the order they were surfaced:**
+**TODO — three open items the fix left, in the order they were surfaced.** ~~three~~ **TWO: item 1
+below was resolved on 2026-08-12 and this copy of it was never struck** (see the DONE block on item
+2b). The decision went to the **GLOBAL** gate, with evidence — all 14 slot-local risers had a T-spin
+already globally available at the roof, so none was a masked forecast — and
+`forecast-saturation.test.ts` now asserts that property instead of pinning identities. `ROSE_KNOWN`,
+which item 1 names as the place both risers are pinned, was deleted with the list.
 
-1. **Resolve slot-local gating (the decision two gates now force).** The hoisted fix's longer
+This is the same closure as 2b's, at a second site, and it is worth naming as a pattern rather than
+just fixing: **the deferred decision was written down in three places** (2b, "T-Spin Forecast" item 7,
+and here), each pointing at the others, so resolving it required striking three entries and only one
+was struck. A cross-reference is not a single source of truth — it multiplies the sites that go stale.
+
+1. ~~**Resolve slot-local gating (the decision two gates now force).**~~ RESOLVED 2026-08-12,
+   `147e7f8` — global. The paragraph below is left for its measurement record only. The hoisted fix's longer
    prefix admitted a SECOND slot-local riser — `2026-08-01 pinglamb replay-6 r4 lock16`
    (localJ 0 → 1) — alongside the 08-09 one that section 2b already flagged. Both are now named
    in `forecast-saturation.test.ts`'s `ROSE_KNOWN`, and the full-round ordering control picked up
