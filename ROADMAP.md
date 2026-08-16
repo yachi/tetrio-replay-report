@@ -479,7 +479,22 @@ string outside any region.
 
 ---
 
-## Board reconstruction — open (2026-07-29)
+## Board reconstruction — open (2026-07-29) — TWO CLAIMS BELOW ARE NOW FALSE
+
+**Corrected 2026-08-16, at the two places it matters.** This section is otherwise a fair record of
+where things stood on 2026-07-29, but two of its statements read as present-tense fact and are not:
+
+- **"A frame-stepped TETR.IO simulator (session scratchpad, not in this repo)."** It IS in this repo,
+  and has been for a long time — `pipeline/sim/`, with a vendored clean-room second engine beside it
+  (`pipeline/sim/vendor/`). Every gate in the 開局定式 / 捐窿 / forecast sections runs on it.
+- **"2001/14517 placements, 13.8%".** That is 2026-07-22 under the hand-port. The oracle board source
+  (`147e7f8`) took the same session to **12180/14517 = 83.9%**, and the corpus to **61656/70493 =
+  87.5%** (measured 2026-08-16 from the six committed `sim/forecast-facts.json`, whose `session`
+  block carries both numbers). Per session: 83.9 · 89.2 · 88.2 · 87.8 · 89.9 · 87.5.
+
+The "what blocks it" diagnosis below is still the right shape — the board is provable only on a
+prefix — but a prefix of 87.5% supports a different set of questions than one of 13.8%, so do not
+re-derive scope decisions from the old figure.
 
 Everything above derives from `results.stats`. A whole class of question cannot: where the stack
 was, how deep the well ran, what the board looked like when the kill landed. Those need the board,
@@ -713,11 +728,21 @@ Items 3 and 4 are gated on 1. Item 2 is independent and small.
 
 ## T-Spin Forecast — the mechanism is settled, the gate in front of it is not (2026-08-02)
 
-The metric now establishes a mechanism for every event it counts (`1a5ce30`): the window is walked
-to find the step where the executed spin became available, and that step is decomposed into
-place → clear → insert garbage, so whichever edit the availability crosses IS the cause. Rate is
-**1 of 654**. What remains open is not the mechanism test but the gate that decides which events
-reach it.
+**This heading has since INVERTED, and both halves of it (2026-08-16).** The gate is what got settled
+and the mechanism is what kept moving — the exact opposite of what the title says:
+
+- **The gate is settled.** Clause 2 landed 2026-08-03, clause 4 on 2026-08-06, the `rejected_by`
+  breakdown on 2026-08-16 (`4d0f2f5`), and the global-vs-slot-local question — the gate that decides
+  which events reach the mechanism at all — was decided on 2026-08-12 in favour of the global measure
+  and is now gated by `forecast-saturation.test.ts`. See item 2b above.
+- **The mechanism was not settled.** It gained a FIFTH value on 2026-08-16 (`22ab03e`): `access` /
+  `path_opened`, for a clear that opened the PATH to an already-existing slot rather than forming one.
+  `bestTspin` measures reachability and the step model only asked about formation, so the model had a
+  whole class it could not express — which is not what "settled" describes.
+
+**`Rate is 1 of 654` is a four-session figure. At six sessions it is `6 of 3926`** (measured
+2026-08-16 by summing the six committed `sim/forecast-facts.json`). Every "654" in the sections below
+is the same vintage and should be read as such.
 
 ### 0 — RESOLVED: the user's own definition agrees with the published number
 
