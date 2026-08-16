@@ -33,3 +33,12 @@ sessions/*/sim/pairs-cache.json
 
 # git worktrees for isolated feature work (superpowers:using-git-worktrees)
 .worktrees/
+
+# JS deps. `tools/triangle-oracle/` has its own package.json, and running its scripts from a
+# git WORKTREE (which has no node_modules of its own) leaves a symlink here pointing at the main
+# checkout's copy. Untracked and unignored, it sat one `git add -A` away from being committed as
+# a symlink into a path that exists on exactly one machine.
+#
+# NO TRAILING SLASH, deliberately: `node_modules/` matches a directory, and git sees a symlink as
+# a FILE — so the slashed form left the exact artefact described above still untracked-and-unignored.
+node_modules
