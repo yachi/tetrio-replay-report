@@ -2097,11 +2097,26 @@ structurally impossible.)
    The options, restated with that measured:
 
    - **(a) accept** — now bounded rather than open-ended: the 66 ids are named, and a 67th fails.
-   - **(b) commit those two sessions' generated `Claims.dfy`**, as every session from 07-28 onward
-     already does, and the islands then extend by the existing rule with no special case. This is the
-     principled fix and makes 07-22/07-24 stop being the anomaly. Cost is real: generate, `dafny
-     verify`, commit, regenerate the proof map, re-render, and re-check the pinned 54/52 appendix
-     counts (which by design would change).
+   - **(b) migrate those two sessions to the 07-28+ model** — VERIFIED VIABLE 2026-08-17, and it is a
+     migration rather than an addition. Running codegen over all three of 07-22's ledgers emits
+     **144 lemmas** (54 hand + 90 generated, 1016 lines) and `dafny verify` returns **144 verified, 0
+     errors in ~22s** locally on the CI-pinned 4.11.0, so the proof side is not the obstacle.
+
+     What makes it a migration is a constraint neither this item nor the option list had recorded:
+     `gen_consistency.sh` emits **only the hand ledgers, deliberately** — "the generated ledger's
+     lemmas are not committed — CI renders them into a temp dir and checks
+     `claims-generated-proof-map.json` against that — so committing them here would put the same
+     lemma in two places." So (b) is not "also commit the .dfy"; it is switching these two sessions
+     off the temp-dir path entirely: regenerate `dafny/{Facts,Claims}.dfy` (Facts goes 4400 → 6525
+     lines, Claims 386 → 1016), widen `gen_consistency.sh` to all ledgers, fold
+     `claims-generated-proof-map.json` into `claims-proof-map.json` and delete it, drop the two
+     conditional steps in `verify.yml` that exist for the split, re-render both reports (the island
+     and appendix go 54 → 144 and 52 → 141), drop `PLAIN_CITE_ISLAND_GAP`, and re-verify every pinned
+     count that names 54/52 or 110 badges.
+
+     That is a change to two PUBLISHED sessions' proof artefacts, which is why it is still filed as a
+     decision and not done here: the repo's own rule is that this kind of thing is taken on its own
+     terms rather than as a side effect of an unrelated fix.
    - **(c) stop printing the ids** in those two sessions — cheapest, and it removes provenance a
      reader of the other four sessions gets.
 
