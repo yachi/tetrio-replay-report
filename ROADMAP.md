@@ -48,7 +48,7 @@ tetrio-replay-report/
 |---|---|---|
 | `extract.py` / `extract2.ts` | filename glob hardcoded per session | parameterize input dir + ordering rule → **reuse as-is** |
 | `check_claims.py` | already generic (argv) | **reuse unchanged** |
-| `codegen_dafny.py` Facts emitter + helper lib | generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`) | **promote to `dafny_lib.py`** |
+| ~~`codegen_dafny.py` Facts emitter + helper lib~~ | ~~generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`)~~ | ~~**promote to `dafny_lib.py`**~~ — OBSOLETE 2026-08-16: `codegen_dafny.py` itself is gone (both session-local copies deleted by the 106-claim spec port), so there is nothing left to promote and `dafny_lib.py` was never created. The helper names in the middle column name nothing in the repo today. |
 | `codegen_dafny.py` claim bodies | **hand-written `bC001…bR024` per session** ← the bottleneck | replaced by generators (§2) |
 | Claim text + predicates | hand-written by 2 opus agents per session | auto-generated for ~85%, agents add flavor |
 | `mutation_test.sh` / `gen_consistency.sh` / `build_proof_map.py` | near-generic | parameterize paths → **reuse** |
@@ -99,7 +99,7 @@ Runs, failing loudly at the first bad gate:
 6. `build_report.py` → `report.html` with charts, scoreboard, match cards, 52-row appendix — prose sections marked `TODO`
 7. print a summary table + the paths
 
-Then the optional prose pass (Claude Code, the phase that genuinely needs judgment): narrative beats + coaching recommendations written against the auto claims, re-run `build_report.py`. The adversarial audit prompt ships in the repo as `docs/AUDIT-PROMPT.md` so the review loop is reproducible too.
+Then the optional prose pass (Claude Code, the phase that genuinely needs judgment): narrative beats + coaching recommendations written against the auto claims, re-run `build_report.py`. ~~The adversarial audit prompt ships in the repo as `docs/AUDIT-PROMPT.md` so the review loop is reproducible too.~~ **False, and it was never true** (2026-08-16): no commit in this repo's history has ever added that file, and `docs/` is `bin/build-docs`' generated Pages output, so a hand-written document there would not survive a rebuild anyway. The review loop is NOT reproducible from the repo — the two `sessions/*/report/audit-phase5.md` files are records of audits that happened, not a prompt anyone can re-run. Left as a real gap rather than quietly deleted: the sentence was aspirational when written and hardened into a claim by sitting there.
 
 ## 4. CI + Pages
 
@@ -767,7 +767,9 @@ claim is false except the arithmetic.**
 row that arrived at **lock 11**, and the roof is at lock 33. The only garbage that arrived inside the
 window `(33, 36]` is a single row at lock 34, sitting at the very bottom of the field twelve rows
 below the slot. Delete just that row and the executed spin is untouched — still two lines. The 2 → 1
-drop comes from `withoutGarbage` stripping **all thirteen** garbage rows, including the one that is
+drop comes from `withoutGarbage` (the PRE-FIX function, deleted in `7a7aefe`; the counterfactual is
+`withoutRows` + `garbageArrivedAfter` now, deleting only post-roof arrivals) stripping **all thirteen**
+garbage rows, including the one that is
 the slot's own floor and predates the roof by 22 locks. The scalar falls because the board was
 mangled, not because any post-roof garbage held the spin up.
 
