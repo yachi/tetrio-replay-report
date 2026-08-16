@@ -125,12 +125,24 @@ Session-2's `proof/` (the lighter 20-claim report and its Dafny layer) moves und
 
 P1+P2 are mechanical. P4 is the real engineering.
 
-## 7. Open risks
+## 7. Open risks — THREE OF FOUR RETIRED (audited 2026-08-16)
 
-- **Third-party data**: public repo publishes pinglamb's replays, TETR.IO user ID, and a critique of their weaknesses. Worth a heads-up to them; README should credit both players. An `--anonymize` flag in the pipeline is cheap insurance if they'd rather not be named.
-- **Generator coverage**: if a future session's drama doesn't fit a family, the pipeline still produces a valid report — bespoke claims are additive, never required.
-- **Dafny in CI**: pin the Dafny version (4.11.0 locally); verify time is ~3-5s per session, so CI stays fast.
-- **`.ttrm` churn**: single-line JSON; marked `-diff` so PRs stay readable.
+- **Third-party data** — **RETIRED.** README's "Credits & licence" credits both players by name and
+  records that the replays are "published with the agreement of both players", plus an explicit
+  request not to repurpose them to characterise either player out of context. The `--anonymize` flag
+  was never built and no longer needs to be: it was insurance against *not* having consent, and the
+  consent is recorded. ~~Worth a heads-up to them; README should credit both players. An
+  `--anonymize` flag in the pipeline is cheap insurance if they'd rather not be named.~~
+- **Generator coverage**: if a future session's drama doesn't fit a family, the pipeline still produces a valid report — bespoke claims are additive, never required. **Still true, and it is a standing design property rather than a risk to close.**
+- **Dafny in CI** — **RETIRED, and the timing figure was wrong.** The version is pinned in
+  `verify.yml` *and* sha256-pinned (`dafny-4.11.0-x64-ubuntu-22.04.zip`, against the signed release
+  listing), which is stronger than the "pin the Dafny version" this asked for. ~~verify time is
+  ~3-5s per session~~ — measured, it is **3.8s (07-24, 52 lemmas) to 8.3s (07-22, 54 lemmas)** at
+  `--cores 4`; see the SMT-vs-Dafny table in CLAUDE.md. The conclusion ("CI stays fast") survives;
+  the number did not, and it is the number someone would budget against.
+- **`.ttrm` churn** — **RETIRED.** `.gitattributes` carries `*.ttrm linguist-vendored` and
+  `*.ttrm -diff`, and has since grown the same treatment for generated Dafny, `facts*.json`, the
+  reports, `claims.smt2`, and the extracted board JSON.
 
 ---
 
