@@ -2084,10 +2084,29 @@ structurally impossible.)
      directions: dropping one fails, and an entry that starts resolving fails too, so extending the
      islands later cannot leave a stale exemption behind. Both mutants verified.
 
-   The decision the item asks for is unchanged — accept, extend the islands, or stop printing ids —
-   and extending remains the only option that makes the citations true rather than merely tolerated.
-   It moves the pinned 54/52 appendix row counts and must be done for `pc_section` in the same
-   stroke.
+   **Correction, same day, to the sentence that stood here for one commit.** I wrote that "extending
+   the islands remains the only option that makes the citations true". That is wrong, and the reason
+   is the whole point of the item. The island is capped at claims **whose lemma is committed in this
+   session's `dafny/`** — measured: 2026-07-28's `Claims.dfy` carries 84 `lemma G0…`, while 07-22's
+   and 07-24's carry **0** (54 and 52 hand lemmas only). Their generated lemmas are generated and
+   verified **in CI and never committed**, which `check_proof_links.py`'s own header states as a
+   deliberate exclusion. So extending those two islands without committing the Dafny would point
+   badges at lemmas that are not in the tree — exactly the dangling-lemma condition
+   `check_proof_links` exists to gate. It would convert a dead reference into a worse one.
+
+   The options, restated with that measured:
+
+   - **(a) accept** — now bounded rather than open-ended: the 66 ids are named, and a 67th fails.
+   - **(b) commit those two sessions' generated `Claims.dfy`**, as every session from 07-28 onward
+     already does, and the islands then extend by the existing rule with no special case. This is the
+     principled fix and makes 07-22/07-24 stop being the anomaly. Cost is real: generate, `dafny
+     verify`, commit, regenerate the proof map, re-render, and re-check the pinned 54/52 appendix
+     counts (which by design would change).
+   - **(c) stop printing the ids** in those two sessions — cheapest, and it removes provenance a
+     reader of the other four sessions gets.
+
+   (b) is the recommendation. Whichever is chosen still has to apply to `pc_section` as well as
+   `intense_round`, since the measurement shows both are affected and across several regions.
 
 ## Gating equiv.py coverage — and the sampled figure underneath it (2026-08-15)
 
