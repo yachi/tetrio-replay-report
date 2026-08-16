@@ -2019,5 +2019,16 @@ reaches no assertion — a third event arriving in the confidently-wrong shape w
 Pinning it needs the record, which needs the simulator rather than the committed artefact. Until the
 fifth `Mechanism` lands, the only thing holding that half is this paragraph.
 
-**Related scoping hazard, unfixed:** `verify.yml` runs `REPLAY_DIR=sessions/2026-07-22 bun test`,
-which pins every OTHER sim test to one session in exactly the way this test was pinned.
+**Related scoping, narrower than it first looked — and the first version of this paragraph
+overstated it.** `REPLAY_DIR=sessions/2026-07-22 bun test` (`verify.yml:569`) supplies the session for
+exactly **one** file, `pipeline/sim/ige-y-oracle.test.ts`, whose third test measures the ige-`y`
+oracle's agreement rate over whatever `REPLAY_DIR` names — so in CI the other five sessions' rates are
+never measured, while its other two tests are hand-worked fixtures and session-independent. Every
+other sim and opener test names its own sessions, and the workflow comment at `:567` already says so
+("One test reads it; the rest name their sessions themselves"). Documented scope, not an accident.
+
+**Genuinely the same shape, and still open:** `pipeline/sim/forecast-corpus.test.ts:71` hardcodes
+2026-07-28 and pins `unattributed: 0` inside its bucket `toEqual`, commented "an improvement the step
+model cannot explain would invalidate the buckets above it". Choosing 07-28 is deliberate — it carries
+the corpus's only mechanism-established forecast — but it means that file never saw 08-14's 1 either.
+One file wide, same `DISCOVERED[0]` failure mode.

@@ -25,11 +25,30 @@
  *   clearAlone  = bestTspinLines(A minus the cleared rows) >= target
  *                 — the SAME rows deleted from A with the piece never placed. If this reaches the
  *                 target, the clear sufficed on its own, whether or not it formed anything.
- *   inside      = some cleared row lies strictly inside the slot found in B  (the model's own test)
+ *   pieceAlone  = bestTspinLines(Bpre) >= target
+ *                 — mirrors the engine's own branch order, which tests Bpre before it tests B.
  *
- * `clearAlone && !inside` is the access class. The discriminator has a real working set rather than
- * a token one: 9 records corpus-wide are `clearAlone`, and `inside` correctly attributes 7 of them
- * to the clear. The 2 it misses are named below.
+ * NOTHING ELSE IS RECOMPUTED. Whether the clear FORMED the slot is read off `rec.mechanism`, not
+ * re-derived: an earlier draft reimplemented the strictly-inside geometry, and mutation testing
+ * showed the copy was untestable here — widening `min < cr < max` to `<=` changed no result,
+ * because no cleared row in this corpus sits on a slot boundary. A replica cannot disagree with an
+ * engine it never calls (the `bfs-cap.ts` lesson), so the replica is gone and only the two
+ * counterfactuals remain, both of which mutants do kill.
+ *
+ * The 9 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
+ * by folding it into "formed":
+ *
+ *   5  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot  OK
+ *   2  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`  OK
+ *   2  ACCESS          neither — the clear only removed the lid       -> `unattributed`/`placement` GAP
+ *
+ * Overdetermined is not a defect: when the placement on its own reaches the target, crediting it is
+ * defensible even though the clear would have done too. Only the last row is the model gap.
+ *
+ * WHAT THIS FILE DOES NOT COVER: whether `localiseMechanism`'s inside test should be strict or
+ * inclusive. No cleared row in this corpus sits on a slot boundary, so the corpus cannot answer it;
+ * that is fixture territory (forecast.test.ts), not corpus territory. Said out loud so a green run
+ * here is not mistaken for evidence about it.
  *
  * NAMED, NOT BOUNDED — the `DT_ORDER_IN_OPENER` precedent (pipeline/openers/openers.test.ts) and
  * `check_loo.py`'s ANNOTATED. An inequality would be satisfied by any two such events anywhere;
@@ -37,13 +56,33 @@
  * disappearing or changing verdict fails just as loudly. A repair that lands a fifth `Mechanism`
  * SHOULD break this test — that is the point, and the list is where the repair gets recorded.
  *
+ * MUTATION STATUS, because "a guard no mutant can kill is decorative" applies to this file too.
+ * 13 mutants planted, 10 killed — every entry in ACCESS_CLASS (removed, reclassified, drifted,
+ * padded) and every counterfactual branch (clearAlone disabled, clearAlone asked of B instead of A,
+ * Bpre dropped, Bpre always taken, the engine-verdict test inverted, and never firing).
+ *
+ * Three survive, and all three are the same artefact — an assertion that a SET IS EMPTY cannot be
+ * killed by disabling whatever would fill it, when on this corpus nothing does:
+ *
+ *   `pieceBlocked` branch deleted        — no record takes that branch here, so deleting it and
+ *                                          asserting 0 are indistinguishable. It guards a case that
+ *                                          does not occur yet, the same way forecast.ts:571's
+ *                                          null-slot return is kept "for the type, not the value".
+ *   cross-check collector neutered       — `disagreements` is empty, so removing the recorder and
+ *   cross-check predicate forced true    — recording nothing look alike.
+ *
+ * The cross-check is NOT decorative, and that was checked rather than assumed: mutating the replica
+ * itself (`Bpre branch always taken`) fails three tests including `the replica can disagree with
+ * the engine, and does not`. It fires on the thing it guards — drift between the counterfactuals
+ * and `localiseMechanism` — just not on its own deletion.
+ *
  * Cost: ~13s, because it replays every case in every session through the oracle. That is the same
  * work forecast-corpus.test.ts does for one session, and the class cannot be measured any other
  * way — the committed artefacts carry counts, not boards.
  */
 import { test, expect } from 'bun:test';
 import { readdirSync, existsSync } from 'node:fs';
-import { bestTspin, bestTspinLines, forecastMetric } from './forecast.ts';
+import { bestTspinLines, forecastMetric } from './forecast.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import type { Board } from './vendor/core/srs.ts';
 
@@ -80,7 +119,8 @@ const ACCESS_CLASS: Member[] = [
   // formed — A minus row 23 alone gives best 0 -> 2, controls on rows 21/22/24 give 0/0/0. The Z is
   // credited anyway because one of its cells lands at B-row 23, which is slot row 24 minus one, and
   // `touches` accepts adjacency. The report prints this event inside 「玩家自己落嗰隻棋整出嚟」.
-
+  { session: '2026-08-09', file: 'replay-2026-08-09-6.ttrm', round: 7, user: 'pinglamb',
+    lock: 24, step: 20, mechanism: 'placement', kind: 'self_built' },
 ];
 
 const key = (m: Member) =>
@@ -97,7 +137,17 @@ function withoutRows(board: Board, rows: number[]): Board {
 function sweep() {
   const access: Member[] = [];
   const beyondPrefix: Member[] = [];
-  let localised = 0, clearAlone = 0, formed = 0, pieceBlocked = 0;
+  const disagreements: string[] = [];
+  let localised = 0, clearAlone = 0, formed = 0, overdetermined = 0, pieceBlocked = 0;
+  // The two branches this file decides for itself each predict what the engine must already have
+  // concluded. Recorded rather than asserted inline, so one drift does not mask the rest of the
+  // sweep. This is the only place the counterfactuals and `localiseMechanism` can contradict.
+  const check = (predicted: string, rec: { mechanism?: string }, where: string) => {
+    const ok = predicted === 'ACCESS'
+      ? rec.mechanism === 'placement' || rec.mechanism === 'unattributed'
+      : predicted === rec.mechanism;
+    if (!ok) disagreements.push(`${where}: replica says ${predicted}, engine says ${rec.mechanism}`);
+  };
 
   for (const session of SESSIONS) {
     for (const c of loadCases(`${SESSIONS_DIR}/${session}`)) {
@@ -120,27 +170,35 @@ function sweep() {
         // Did the clear alone suffice? This is the whole question the model never asks.
         if (bestTspinLines(withoutRows(A, cleared)) < target) continue;
         if (rec.lockIndex <= v) clearAlone++;
+        const where = `${session} ${c.file} r${c.round} ${c.user} lock=${rec.lockIndex} step=${t}`;
 
-        const B = withoutRows(Bpre, cleared);
-        if (bestTspinLines(B) < target) {
+        // Branch order is the ENGINE's, not a convenient one: `localiseMechanism` tests Bpre before
+        // it tests B, so a step where the placement alone already reached the target never reaches
+        // the clear's geometry at all. Those are overdetermined, not misattributed — the clear would
+        // also have done it, and crediting the piece is defensible.
+        if (bestTspinLines(Bpre) >= target) {
+          check('placement', rec, where);
+          if (rec.lockIndex <= v) overdetermined++;
+          continue;
+        }
+
+        if (bestTspinLines(withoutRows(Bpre, cleared)) < target) {
           // The clear alone reaches the target but the placement takes it away again. Not seen in
           // this corpus; counted rather than dropped, so it cannot start happening in silence.
           if (rec.lockIndex <= v) pieceBlocked++;
           continue;
         }
 
-        // The model's own test: a cleared row strictly inside the slot means the clear FORMED it,
-        // which `localiseMechanism` already attributes correctly.
-        const slot = bestTspin(B)!;
-        const back = (rB: number) => {
-          for (let p = 0; p < H; p++) if (p + cleared.filter(cr => cr > p).length === rB) return p;
-          return rB;
-        };
-        const ps = slot.rows.map(back);
-        if (cleared.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps))) {
-          if (rec.lockIndex <= v) formed++;
-          continue;
-        }
+        // "Did the clear FORM the slot" is ASKED OF THE ENGINE, not re-derived here. An earlier
+        // draft reimplemented `localiseMechanism`'s strictly-inside geometry, and two mutants
+        // proved that a mistake: widening `min < cr < max` to `<=` changed nothing (this corpus has
+        // no cleared row on a slot boundary, so the duplicate was untestable), and neutering the
+        // replica/engine cross-check changed nothing either. A copy of the engine's geometry cannot
+        // disagree with it in a way this corpus can see — the `bfs-cap.ts` lesson. So the only
+        // things computed here are the two COUNTERFACTUALS the engine never asks (clearAlone above,
+        // Bpre here), and the verdict itself comes from `rec.mechanism`.
+        if (rec.mechanism === 'line-clear') { if (rec.lockIndex <= v) formed++; continue; }
+        check('ACCESS', rec, where);
 
         const m: Member = { session, file: c.file, round: c.round, user: c.user,
           lock: rec.lockIndex, step: t, mechanism: rec.mechanism, kind: rec.kind };
@@ -148,7 +206,8 @@ function sweep() {
       }
     }
   }
-  return { access, beyondPrefix, localised, clearAlone, formed, pieceBlocked };
+  return { access, beyondPrefix, disagreements, localised, clearAlone, formed,
+           overdetermined, pieceBlocked };
 }
 
 const result = sweep();
@@ -169,17 +228,30 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the strictly-inside test is doing real work — 7 of 9 attributed, 2 missed', () => {
-  // The number that makes this a finding rather than a curiosity. 9 records corpus-wide are ones
-  // the clear ALONE explains; the model's geometric test correctly credits the clear in 7 of them
-  // and misses the 2 named above. A detector that fired on everything, or on nothing, would look
-  // the same in `access` alone — these are its denominator and its true positives.
+test('the model attributes 7 of the 9 candidates defensibly, and misses 2', () => {
+  // The numbers that make this a finding rather than a curiosity. 9 records corpus-wide are ones
+  // the clear ALONE explains; 5 the model credits to the clear correctly, 2 more are overdetermined
+  // (the placement alone also sufficed, so `placement` is a defensible verdict), and 2 are the gap.
+  // A detector that fired on everything, or on nothing, would look identical in `access` alone —
+  // these are its denominator, its true positives and the branch that pre-empts them.
   expect(result.clearAlone).toBe(9);
-  expect(result.formed).toBe(7);
-  expect(result.formed + result.access.length).toBe(result.clearAlone);
+  expect(result.formed).toBe(5);
+  expect(result.overdetermined).toBe(2);
+  expect(result.formed + result.overdetermined + result.pieceBlocked + result.access.length)
+    .toBe(result.clearAlone);
   // Not seen in this corpus, and it must not start silently: the clear suffices, then the piece
   // takes the slot back away. It is a real possibility, not an impossible one.
   expect(result.pieceBlocked).toBe(0);
+});
+
+test('the replica can disagree with the engine, and does not', () => {
+  // What stops this file being a second implementation that agrees by construction. Each branch
+  // above predicts the verdict `localiseMechanism` must already have reached; a drift between the
+  // two shows up here rather than silently changing which events land in ACCESS_CLASS. This is the
+  // check `bfs-cap.ts` did not have when it printed the same 688 before and after a real change.
+  expect(result.disagreements).toEqual([]);
+  // and the check must have actually run — over the 9 candidates, not over an empty set
+  expect(result.clearAlone).toBeGreaterThan(0);
 });
 
 test('the sweep reached the corpus it claims to have swept', () => {
