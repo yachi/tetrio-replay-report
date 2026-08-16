@@ -38,9 +38,9 @@
 (define-fun m0_lb_pinglamb_pps () Int 1340)
 (define-fun m0_lb_pinglamb_kills () Int 5)
 (define-fun m0_r0_winner () Int 1)  ; yachi
-(define-fun m0_r0_yachi_apm () Int 54946)
-(define-fun m0_r0_yachi_pps () Int 1526)
-(define-fun m0_r0_yachi_vs () Int 91577)
+(define-fun m0_r0_yachi_apm () Int 54761)
+(define-fun m0_r0_yachi_pps () Int 1521)
+(define-fun m0_r0_yachi_vs () Int 91268)
 (define-fun m0_r0_yachi_lifetime () Int 29604)
 (define-fun m0_r0_yachi_maxspike () Int 6)
 (define-fun m0_r0_yachi_topcombo () Int 1)
@@ -99,9 +99,9 @@
 (define-fun m0_r0_pinglamb_ge4 () Int 4)
 (define-fun m0_r0_pinglamb_ge5 () Int 5)
 (define-fun m0_r1_winner () Int 1)  ; yachi
-(define-fun m0_r1_yachi_apm () Int 63783)
-(define-fun m0_r1_yachi_pps () Int 1407)
-(define-fun m0_r1_yachi_vs () Int 121939)
+(define-fun m0_r1_yachi_apm () Int 63651)
+(define-fun m0_r1_yachi_pps () Int 1404)
+(define-fun m0_r1_yachi_vs () Int 121685)
 (define-fun m0_r1_yachi_lifetime () Int 32069)
 (define-fun m0_r1_yachi_maxspike () Int 8)
 (define-fun m0_r1_yachi_topcombo () Int 2)
@@ -382,9 +382,9 @@
 (define-fun m0_r4_pinglamb_ge5 () Int 1)
 (define-fun m0_r4_pinglamb_ge6 () Int 1)
 (define-fun m0_r5_winner () Int 1)  ; yachi
-(define-fun m0_r5_yachi_apm () Int 49705)
-(define-fun m0_r5_yachi_pps () Int 1334)
-(define-fun m0_r5_yachi_vs () Int 118202)
+(define-fun m0_r5_yachi_apm () Int 49588)
+(define-fun m0_r5_yachi_pps () Int 1341)
+(define-fun m0_r5_yachi_vs () Int 117924)
 (define-fun m0_r5_yachi_lifetime () Int 99221)
 (define-fun m0_r5_yachi_maxspike () Int 12)
 (define-fun m0_r5_yachi_topcombo () Int 5)
@@ -761,9 +761,9 @@
 (define-fun m1_r1_pinglamb_ge6 () Int 2)
 (define-fun m1_r1_pinglamb_ge7 () Int 2)
 (define-fun m1_r2_winner () Int 1)  ; yachi
-(define-fun m1_r2_yachi_apm () Int 52694)
-(define-fun m1_r2_yachi_pps () Int 1378)
-(define-fun m1_r2_yachi_vs () Int 134174)
+(define-fun m1_r2_yachi_apm () Int 52619)
+(define-fun m1_r2_yachi_pps () Int 1389)
+(define-fun m1_r2_yachi_vs () Int 133983)
 (define-fun m1_r2_yachi_lifetime () Int 82122)
 (define-fun m1_r2_yachi_maxspike () Int 8)
 (define-fun m1_r2_yachi_topcombo () Int 4)
@@ -1059,9 +1059,9 @@
 (define-fun m1_r4_pinglamb_ge45 () Int 1)
 (define-fun m1_r4_pinglamb_ge46 () Int 3)
 (define-fun m1_r5_winner () Int 1)  ; yachi
-(define-fun m1_r5_yachi_apm () Int 39749)
-(define-fun m1_r5_yachi_pps () Int 1364)
-(define-fun m1_r5_yachi_vs () Int 97424)
+(define-fun m1_r5_yachi_apm () Int 39689)
+(define-fun m1_r5_yachi_pps () Int 1362)
+(define-fun m1_r5_yachi_vs () Int 97276)
 (define-fun m1_r5_yachi_lifetime () Int 77128)
 (define-fun m1_r5_yachi_maxspike () Int 5)
 (define-fun m1_r5_yachi_topcombo () Int 5)
@@ -1211,9 +1211,9 @@
 (define-fun m2_lb_pinglamb_pps () Int 1351)
 (define-fun m2_lb_pinglamb_kills () Int 5)
 (define-fun m2_r0_winner () Int 1)  ; yachi
-(define-fun m2_r0_yachi_apm () Int 73429)
-(define-fun m2_r0_yachi_pps () Int 1521)
-(define-fun m2_r0_yachi_vs () Int 155458)
+(define-fun m2_r0_yachi_apm () Int 72747)
+(define-fun m2_r0_yachi_pps () Int 1507)
+(define-fun m2_r0_yachi_vs () Int 154014)
 (define-fun m2_r0_yachi_lifetime () Int 30537)
 (define-fun m2_r0_yachi_maxspike () Int 14)
 (define-fun m2_r0_yachi_topcombo () Int 4)
@@ -1278,9 +1278,9 @@
 (define-fun m2_r0_pinglamb_ge7 () Int 6)
 (define-fun m2_r0_pinglamb_ge8 () Int 3)
 (define-fun m2_r1_winner () Int 1)  ; yachi
-(define-fun m2_r1_yachi_apm () Int 55029)
-(define-fun m2_r1_yachi_pps () Int 1542)
-(define-fun m2_r1_yachi_vs () Int 124945)
+(define-fun m2_r1_yachi_apm () Int 54883)
+(define-fun m2_r1_yachi_pps () Int 1538)
+(define-fun m2_r1_yachi_vs () Int 124613)
 (define-fun m2_r1_yachi_lifetime () Int 75450)
 (define-fun m2_r1_yachi_maxspike () Int 6)
 (define-fun m2_r1_yachi_topcombo () Int 3)
@@ -1726,9 +1726,9 @@
 (define-fun m2_r5_pinglamb_ge20 () Int 4)
 (define-fun m2_r5_pinglamb_ge21 () Int 1)
 (define-fun m2_r6_winner () Int 1)  ; yachi
-(define-fun m2_r6_yachi_apm () Int 64482)
-(define-fun m2_r6_yachi_pps () Int 1555)
-(define-fun m2_r6_yachi_vs () Int 141768)
+(define-fun m2_r6_yachi_apm () Int 65430)
+(define-fun m2_r6_yachi_pps () Int 1568)
+(define-fun m2_r6_yachi_vs () Int 145399)
 (define-fun m2_r6_yachi_lifetime () Int 44035)
 (define-fun m2_r6_yachi_maxspike () Int 6)
 (define-fun m2_r6_yachi_topcombo () Int 3)
@@ -1800,9 +1800,9 @@
 (define-fun m2_r6_pinglamb_ge9 () Int 1)
 (define-fun m2_r6_pinglamb_ge10 () Int 5)
 (define-fun m2_r7_winner () Int 1)  ; yachi
-(define-fun m2_r7_yachi_apm () Int 60504)
-(define-fun m2_r7_yachi_pps () Int 1458)
-(define-fun m2_r7_yachi_vs () Int 138107)
+(define-fun m2_r7_yachi_apm () Int 60394)
+(define-fun m2_r7_yachi_pps () Int 1455)
+(define-fun m2_r7_yachi_vs () Int 137856)
 (define-fun m2_r7_yachi_lifetime () Int 91425)
 (define-fun m2_r7_yachi_maxspike () Int 9)
 (define-fun m2_r7_yachi_topcombo () Int 3)
@@ -1992,9 +1992,9 @@
 (define-fun m3_lb_pinglamb_pps () Int 1369)
 (define-fun m3_lb_pinglamb_kills () Int 5)
 (define-fun m3_r0_winner () Int 1)  ; yachi
-(define-fun m3_r0_yachi_apm () Int 75744)
-(define-fun m3_r0_yachi_pps () Int 1501)
-(define-fun m3_r0_yachi_vs () Int 178642)
+(define-fun m3_r0_yachi_apm () Int 75534)
+(define-fun m3_r0_yachi_pps () Int 1496)
+(define-fun m3_r0_yachi_vs () Int 178147)
 (define-fun m3_r0_yachi_lifetime () Int 42128)
 (define-fun m3_r0_yachi_maxspike () Int 13)
 (define-fun m3_r0_yachi_topcombo () Int 3)
@@ -2361,9 +2361,9 @@
 (define-fun m3_r2_pinglamb_ge41 () Int 1)
 (define-fun m3_r2_pinglamb_ge42 () Int 2)
 (define-fun m3_r3_winner () Int 1)  ; yachi
-(define-fun m3_r3_yachi_apm () Int 61419)
-(define-fun m3_r3_yachi_pps () Int 1489)
-(define-fun m3_r3_yachi_vs () Int 132610)
+(define-fun m3_r3_yachi_apm () Int 61206)
+(define-fun m3_r3_yachi_pps () Int 1484)
+(define-fun m3_r3_yachi_vs () Int 132148)
 (define-fun m3_r3_yachi_lifetime () Int 43154)
 (define-fun m3_r3_yachi_maxspike () Int 7)
 (define-fun m3_r3_yachi_topcombo () Int 3)
@@ -2601,9 +2601,9 @@
 (define-fun m3_r5_pinglamb_ge17 () Int 1)
 (define-fun m3_r5_pinglamb_ge18 () Int 1)
 (define-fun m3_r6_winner () Int 1)  ; yachi
-(define-fun m3_r6_yachi_apm () Int 76173)
-(define-fun m3_r6_yachi_pps () Int 1546)
-(define-fun m3_r6_yachi_vs () Int 157314)
+(define-fun m3_r6_yachi_apm () Int 75894)
+(define-fun m3_r6_yachi_pps () Int 1540)
+(define-fun m3_r6_yachi_vs () Int 156737)
 (define-fun m3_r6_yachi_lifetime () Int 36378)
 (define-fun m3_r6_yachi_maxspike () Int 15)
 (define-fun m3_r6_yachi_topcombo () Int 3)
@@ -2742,9 +2742,9 @@
 (define-fun m4_lb_pinglamb_pps () Int 1319)
 (define-fun m4_lb_pinglamb_kills () Int 5)
 (define-fun m4_r0_winner () Int 1)  ; yachi
-(define-fun m4_r0_yachi_apm () Int 63648)
-(define-fun m4_r0_yachi_pps () Int 1359)
-(define-fun m4_r0_yachi_vs () Int 126551)
+(define-fun m4_r0_yachi_apm () Int 63470)
+(define-fun m4_r0_yachi_pps () Int 1355)
+(define-fun m4_r0_yachi_vs () Int 126199)
 (define-fun m4_r0_yachi_lifetime () Int 53915)
 (define-fun m4_r0_yachi_maxspike () Int 14)
 (define-fun m4_r0_yachi_topcombo () Int 3)
@@ -2986,9 +2986,9 @@
 (define-fun m4_r2_pinglamb_ge23 () Int 5)
 (define-fun m4_r2_pinglamb_ge24 () Int 5)
 (define-fun m4_r3_winner () Int 1)  ; yachi
-(define-fun m4_r3_yachi_apm () Int 73086)
-(define-fun m4_r3_yachi_pps () Int 1636)
-(define-fun m4_r3_yachi_vs () Int 174014)
+(define-fun m4_r3_yachi_apm () Int 72664)
+(define-fun m4_r3_yachi_pps () Int 1626)
+(define-fun m4_r3_yachi_vs () Int 173010)
 (define-fun m4_r3_yachi_lifetime () Int 28923)
 (define-fun m4_r3_yachi_maxspike () Int 10)
 (define-fun m4_r3_yachi_topcombo () Int 5)
@@ -3050,9 +3050,9 @@
 (define-fun m4_r3_pinglamb_ge5 () Int 8)
 (define-fun m4_r3_pinglamb_ge6 () Int 5)
 (define-fun m4_r4_winner () Int 1)  ; yachi
-(define-fun m4_r4_yachi_apm () Int 53990)
-(define-fun m4_r4_yachi_pps () Int 1527)
-(define-fun m4_r4_yachi_vs () Int 104446)
+(define-fun m4_r4_yachi_apm () Int 53731)
+(define-fun m4_r4_yachi_pps () Int 1535)
+(define-fun m4_r4_yachi_vs () Int 103945)
 (define-fun m4_r4_yachi_lifetime () Int 62558)
 (define-fun m4_r4_yachi_maxspike () Int 6)
 (define-fun m4_r4_yachi_topcombo () Int 3)
@@ -3186,9 +3186,9 @@
 (define-fun m4_r5_pinglamb_ge1 () Int 5)
 (define-fun m4_r5_pinglamb_ge2 () Int 1)
 (define-fun m4_r6_winner () Int 1)  ; yachi
-(define-fun m4_r6_yachi_apm () Int 61883)
-(define-fun m4_r6_yachi_pps () Int 1477)
-(define-fun m4_r6_yachi_vs () Int 140643)
+(define-fun m4_r6_yachi_apm () Int 61827)
+(define-fun m4_r6_yachi_pps () Int 1475)
+(define-fun m4_r6_yachi_vs () Int 140515)
 (define-fun m4_r6_yachi_lifetime () Int 128130)
 (define-fun m4_r6_yachi_maxspike () Int 17)
 (define-fun m4_r6_yachi_topcombo () Int 6)
@@ -3543,9 +3543,9 @@
 (define-fun m5_r0_pinglamb_ge2 () Int 5)
 (define-fun m5_r0_pinglamb_ge3 () Int 1)
 (define-fun m5_r1_winner () Int 1)  ; yachi
-(define-fun m5_r1_yachi_apm () Int 60011)
-(define-fun m5_r1_yachi_pps () Int 1552)
-(define-fun m5_r1_yachi_vs () Int 136808)
+(define-fun m5_r1_yachi_apm () Int 59817)
+(define-fun m5_r1_yachi_pps () Int 1558)
+(define-fun m5_r1_yachi_vs () Int 136364)
 (define-fun m5_r1_yachi_lifetime () Int 87281)
 (define-fun m5_r1_yachi_maxspike () Int 5)
 (define-fun m5_r1_yachi_topcombo () Int 2)
@@ -3634,9 +3634,9 @@
 (define-fun m5_r1_pinglamb_ge17 () Int 2)
 (define-fun m5_r1_pinglamb_ge18 () Int 4)
 (define-fun m5_r2_winner () Int 1)  ; yachi
-(define-fun m5_r2_yachi_apm () Int 58287)
-(define-fun m5_r2_yachi_pps () Int 1545)
-(define-fun m5_r2_yachi_vs () Int 119223)
+(define-fun m5_r2_yachi_apm () Int 58158)
+(define-fun m5_r2_yachi_pps () Int 1551)
+(define-fun m5_r2_yachi_vs () Int 118960)
 (define-fun m5_r2_yachi_lifetime () Int 113512)
 (define-fun m5_r2_yachi_maxspike () Int 6)
 (define-fun m5_r2_yachi_topcombo () Int 3)
@@ -3734,9 +3734,9 @@
 (define-fun m5_r2_pinglamb_ge24 () Int 4)
 (define-fun m5_r2_pinglamb_ge25 () Int 5)
 (define-fun m5_r3_winner () Int 1)  ; yachi
-(define-fun m5_r3_yachi_apm () Int 117614)
-(define-fun m5_r3_yachi_pps () Int 1875)
-(define-fun m5_r3_yachi_vs () Int 196023)
+(define-fun m5_r3_yachi_apm () Int 115481)
+(define-fun m5_r3_yachi_pps () Int 1925)
+(define-fun m5_r3_yachi_vs () Int 192469)
 (define-fun m5_r3_yachi_lifetime () Int 11969)
 (define-fun m5_r3_yachi_maxspike () Int 12)
 (define-fun m5_r3_yachi_topcombo () Int 1)
@@ -3900,9 +3900,9 @@
 (define-fun m5_r4_pinglamb_ge25 () Int 2)
 (define-fun m5_r4_pinglamb_ge26 () Int 1)
 (define-fun m5_r5_winner () Int 1)  ; yachi
-(define-fun m5_r5_yachi_apm () Int 87154)
-(define-fun m5_r5_yachi_pps () Int 1690)
-(define-fun m5_r5_yachi_vs () Int 186759)
+(define-fun m5_r5_yachi_apm () Int 86428)
+(define-fun m5_r5_yachi_pps () Int 1705)
+(define-fun m5_r5_yachi_vs () Int 185203)
 (define-fun m5_r5_yachi_lifetime () Int 34029)
 (define-fun m5_r5_yachi_maxspike () Int 6)
 (define-fun m5_r5_yachi_topcombo () Int 2)
@@ -4545,19 +4545,19 @@
 (check-sat)
 (pop 1)
 
-; G037 [avg_pps_x1000] per-round mean PPS: yachi 1.461 > pinglamb 1.375
+; G037 [avg_pps_x1000] per-round mean PPS: yachi 1.462 > pinglamb 1.375
 ; 每局平均 PPS：yachi 約 1.46，高過 pinglamb 嘅約 1.37
 (push 1)
 (echo "G037")
-(assert (not (and (= (+ m0_r0_yachi_pps m0_r1_yachi_pps m0_r2_yachi_pps m0_r3_yachi_pps m0_r4_yachi_pps m0_r5_yachi_pps m0_r6_yachi_pps m0_r7_yachi_pps m1_r0_yachi_pps m1_r1_yachi_pps m1_r2_yachi_pps m1_r3_yachi_pps m1_r4_yachi_pps m1_r5_yachi_pps m1_r6_yachi_pps m2_r0_yachi_pps m2_r1_yachi_pps m2_r2_yachi_pps m2_r3_yachi_pps m2_r4_yachi_pps m2_r5_yachi_pps m2_r6_yachi_pps m2_r7_yachi_pps m2_r8_yachi_pps m3_r0_yachi_pps m3_r1_yachi_pps m3_r2_yachi_pps m3_r3_yachi_pps m3_r4_yachi_pps m3_r5_yachi_pps m3_r6_yachi_pps m3_r7_yachi_pps m4_r0_yachi_pps m4_r1_yachi_pps m4_r2_yachi_pps m4_r3_yachi_pps m4_r4_yachi_pps m4_r5_yachi_pps m4_r6_yachi_pps m4_r7_yachi_pps m4_r8_yachi_pps m5_r0_yachi_pps m5_r1_yachi_pps m5_r2_yachi_pps m5_r3_yachi_pps m5_r4_yachi_pps m5_r5_yachi_pps m5_r6_yachi_pps m5_r7_yachi_pps m5_r8_yachi_pps) 73060) (= (+ m0_r0_pinglamb_pps m0_r1_pinglamb_pps m0_r2_pinglamb_pps m0_r3_pinglamb_pps m0_r4_pinglamb_pps m0_r5_pinglamb_pps m0_r6_pinglamb_pps m0_r7_pinglamb_pps m1_r0_pinglamb_pps m1_r1_pinglamb_pps m1_r2_pinglamb_pps m1_r3_pinglamb_pps m1_r4_pinglamb_pps m1_r5_pinglamb_pps m1_r6_pinglamb_pps m2_r0_pinglamb_pps m2_r1_pinglamb_pps m2_r2_pinglamb_pps m2_r3_pinglamb_pps m2_r4_pinglamb_pps m2_r5_pinglamb_pps m2_r6_pinglamb_pps m2_r7_pinglamb_pps m2_r8_pinglamb_pps m3_r0_pinglamb_pps m3_r1_pinglamb_pps m3_r2_pinglamb_pps m3_r3_pinglamb_pps m3_r4_pinglamb_pps m3_r5_pinglamb_pps m3_r6_pinglamb_pps m3_r7_pinglamb_pps m4_r0_pinglamb_pps m4_r1_pinglamb_pps m4_r2_pinglamb_pps m4_r3_pinglamb_pps m4_r4_pinglamb_pps m4_r5_pinglamb_pps m4_r6_pinglamb_pps m4_r7_pinglamb_pps m4_r8_pinglamb_pps m5_r0_pinglamb_pps m5_r1_pinglamb_pps m5_r2_pinglamb_pps m5_r3_pinglamb_pps m5_r4_pinglamb_pps m5_r5_pinglamb_pps m5_r6_pinglamb_pps m5_r7_pinglamb_pps m5_r8_pinglamb_pps) 68773) (> (+ m0_r0_yachi_pps m0_r1_yachi_pps m0_r2_yachi_pps m0_r3_yachi_pps m0_r4_yachi_pps m0_r5_yachi_pps m0_r6_yachi_pps m0_r7_yachi_pps m1_r0_yachi_pps m1_r1_yachi_pps m1_r2_yachi_pps m1_r3_yachi_pps m1_r4_yachi_pps m1_r5_yachi_pps m1_r6_yachi_pps m2_r0_yachi_pps m2_r1_yachi_pps m2_r2_yachi_pps m2_r3_yachi_pps m2_r4_yachi_pps m2_r5_yachi_pps m2_r6_yachi_pps m2_r7_yachi_pps m2_r8_yachi_pps m3_r0_yachi_pps m3_r1_yachi_pps m3_r2_yachi_pps m3_r3_yachi_pps m3_r4_yachi_pps m3_r5_yachi_pps m3_r6_yachi_pps m3_r7_yachi_pps m4_r0_yachi_pps m4_r1_yachi_pps m4_r2_yachi_pps m4_r3_yachi_pps m4_r4_yachi_pps m4_r5_yachi_pps m4_r6_yachi_pps m4_r7_yachi_pps m4_r8_yachi_pps m5_r0_yachi_pps m5_r1_yachi_pps m5_r2_yachi_pps m5_r3_yachi_pps m5_r4_yachi_pps m5_r5_yachi_pps m5_r6_yachi_pps m5_r7_yachi_pps m5_r8_yachi_pps) (+ m0_r0_pinglamb_pps m0_r1_pinglamb_pps m0_r2_pinglamb_pps m0_r3_pinglamb_pps m0_r4_pinglamb_pps m0_r5_pinglamb_pps m0_r6_pinglamb_pps m0_r7_pinglamb_pps m1_r0_pinglamb_pps m1_r1_pinglamb_pps m1_r2_pinglamb_pps m1_r3_pinglamb_pps m1_r4_pinglamb_pps m1_r5_pinglamb_pps m1_r6_pinglamb_pps m2_r0_pinglamb_pps m2_r1_pinglamb_pps m2_r2_pinglamb_pps m2_r3_pinglamb_pps m2_r4_pinglamb_pps m2_r5_pinglamb_pps m2_r6_pinglamb_pps m2_r7_pinglamb_pps m2_r8_pinglamb_pps m3_r0_pinglamb_pps m3_r1_pinglamb_pps m3_r2_pinglamb_pps m3_r3_pinglamb_pps m3_r4_pinglamb_pps m3_r5_pinglamb_pps m3_r6_pinglamb_pps m3_r7_pinglamb_pps m4_r0_pinglamb_pps m4_r1_pinglamb_pps m4_r2_pinglamb_pps m4_r3_pinglamb_pps m4_r4_pinglamb_pps m4_r5_pinglamb_pps m4_r6_pinglamb_pps m4_r7_pinglamb_pps m4_r8_pinglamb_pps m5_r0_pinglamb_pps m5_r1_pinglamb_pps m5_r2_pinglamb_pps m5_r3_pinglamb_pps m5_r4_pinglamb_pps m5_r5_pinglamb_pps m5_r6_pinglamb_pps m5_r7_pinglamb_pps m5_r8_pinglamb_pps)))))
+(assert (not (and (= (+ m0_r0_yachi_pps m0_r1_yachi_pps m0_r2_yachi_pps m0_r3_yachi_pps m0_r4_yachi_pps m0_r5_yachi_pps m0_r6_yachi_pps m0_r7_yachi_pps m1_r0_yachi_pps m1_r1_yachi_pps m1_r2_yachi_pps m1_r3_yachi_pps m1_r4_yachi_pps m1_r5_yachi_pps m1_r6_yachi_pps m2_r0_yachi_pps m2_r1_yachi_pps m2_r2_yachi_pps m2_r3_yachi_pps m2_r4_yachi_pps m2_r5_yachi_pps m2_r6_yachi_pps m2_r7_yachi_pps m2_r8_yachi_pps m3_r0_yachi_pps m3_r1_yachi_pps m3_r2_yachi_pps m3_r3_yachi_pps m3_r4_yachi_pps m3_r5_yachi_pps m3_r6_yachi_pps m3_r7_yachi_pps m4_r0_yachi_pps m4_r1_yachi_pps m4_r2_yachi_pps m4_r3_yachi_pps m4_r4_yachi_pps m4_r5_yachi_pps m4_r6_yachi_pps m4_r7_yachi_pps m4_r8_yachi_pps m5_r0_yachi_pps m5_r1_yachi_pps m5_r2_yachi_pps m5_r3_yachi_pps m5_r4_yachi_pps m5_r5_yachi_pps m5_r6_yachi_pps m5_r7_yachi_pps m5_r8_yachi_pps) 73113) (= (+ m0_r0_pinglamb_pps m0_r1_pinglamb_pps m0_r2_pinglamb_pps m0_r3_pinglamb_pps m0_r4_pinglamb_pps m0_r5_pinglamb_pps m0_r6_pinglamb_pps m0_r7_pinglamb_pps m1_r0_pinglamb_pps m1_r1_pinglamb_pps m1_r2_pinglamb_pps m1_r3_pinglamb_pps m1_r4_pinglamb_pps m1_r5_pinglamb_pps m1_r6_pinglamb_pps m2_r0_pinglamb_pps m2_r1_pinglamb_pps m2_r2_pinglamb_pps m2_r3_pinglamb_pps m2_r4_pinglamb_pps m2_r5_pinglamb_pps m2_r6_pinglamb_pps m2_r7_pinglamb_pps m2_r8_pinglamb_pps m3_r0_pinglamb_pps m3_r1_pinglamb_pps m3_r2_pinglamb_pps m3_r3_pinglamb_pps m3_r4_pinglamb_pps m3_r5_pinglamb_pps m3_r6_pinglamb_pps m3_r7_pinglamb_pps m4_r0_pinglamb_pps m4_r1_pinglamb_pps m4_r2_pinglamb_pps m4_r3_pinglamb_pps m4_r4_pinglamb_pps m4_r5_pinglamb_pps m4_r6_pinglamb_pps m4_r7_pinglamb_pps m4_r8_pinglamb_pps m5_r0_pinglamb_pps m5_r1_pinglamb_pps m5_r2_pinglamb_pps m5_r3_pinglamb_pps m5_r4_pinglamb_pps m5_r5_pinglamb_pps m5_r6_pinglamb_pps m5_r7_pinglamb_pps m5_r8_pinglamb_pps) 68773) (> (+ m0_r0_yachi_pps m0_r1_yachi_pps m0_r2_yachi_pps m0_r3_yachi_pps m0_r4_yachi_pps m0_r5_yachi_pps m0_r6_yachi_pps m0_r7_yachi_pps m1_r0_yachi_pps m1_r1_yachi_pps m1_r2_yachi_pps m1_r3_yachi_pps m1_r4_yachi_pps m1_r5_yachi_pps m1_r6_yachi_pps m2_r0_yachi_pps m2_r1_yachi_pps m2_r2_yachi_pps m2_r3_yachi_pps m2_r4_yachi_pps m2_r5_yachi_pps m2_r6_yachi_pps m2_r7_yachi_pps m2_r8_yachi_pps m3_r0_yachi_pps m3_r1_yachi_pps m3_r2_yachi_pps m3_r3_yachi_pps m3_r4_yachi_pps m3_r5_yachi_pps m3_r6_yachi_pps m3_r7_yachi_pps m4_r0_yachi_pps m4_r1_yachi_pps m4_r2_yachi_pps m4_r3_yachi_pps m4_r4_yachi_pps m4_r5_yachi_pps m4_r6_yachi_pps m4_r7_yachi_pps m4_r8_yachi_pps m5_r0_yachi_pps m5_r1_yachi_pps m5_r2_yachi_pps m5_r3_yachi_pps m5_r4_yachi_pps m5_r5_yachi_pps m5_r6_yachi_pps m5_r7_yachi_pps m5_r8_yachi_pps) (+ m0_r0_pinglamb_pps m0_r1_pinglamb_pps m0_r2_pinglamb_pps m0_r3_pinglamb_pps m0_r4_pinglamb_pps m0_r5_pinglamb_pps m0_r6_pinglamb_pps m0_r7_pinglamb_pps m1_r0_pinglamb_pps m1_r1_pinglamb_pps m1_r2_pinglamb_pps m1_r3_pinglamb_pps m1_r4_pinglamb_pps m1_r5_pinglamb_pps m1_r6_pinglamb_pps m2_r0_pinglamb_pps m2_r1_pinglamb_pps m2_r2_pinglamb_pps m2_r3_pinglamb_pps m2_r4_pinglamb_pps m2_r5_pinglamb_pps m2_r6_pinglamb_pps m2_r7_pinglamb_pps m2_r8_pinglamb_pps m3_r0_pinglamb_pps m3_r1_pinglamb_pps m3_r2_pinglamb_pps m3_r3_pinglamb_pps m3_r4_pinglamb_pps m3_r5_pinglamb_pps m3_r6_pinglamb_pps m3_r7_pinglamb_pps m4_r0_pinglamb_pps m4_r1_pinglamb_pps m4_r2_pinglamb_pps m4_r3_pinglamb_pps m4_r4_pinglamb_pps m4_r5_pinglamb_pps m4_r6_pinglamb_pps m4_r7_pinglamb_pps m4_r8_pinglamb_pps m5_r0_pinglamb_pps m5_r1_pinglamb_pps m5_r2_pinglamb_pps m5_r3_pinglamb_pps m5_r4_pinglamb_pps m5_r5_pinglamb_pps m5_r6_pinglamb_pps m5_r7_pinglamb_pps m5_r8_pinglamb_pps)))))
 (check-sat)
 (pop 1)
 
-; G038 [avg_apm_x1000] per-round mean APM: pinglamb 56.879 > yachi 50.143
-; 每局平均 APM：pinglamb 約 56.8，高過 yachi 嘅約 50.1
+; G038 [avg_apm_x1000] per-round mean APM: pinglamb 56.879 > yachi 50.035
+; 每局平均 APM：pinglamb 約 56.8，高過 yachi 嘅約 50.0
 (push 1)
 (echo "G038")
-(assert (not (and (= (+ m0_r0_pinglamb_apm m0_r1_pinglamb_apm m0_r2_pinglamb_apm m0_r3_pinglamb_apm m0_r4_pinglamb_apm m0_r5_pinglamb_apm m0_r6_pinglamb_apm m0_r7_pinglamb_apm m1_r0_pinglamb_apm m1_r1_pinglamb_apm m1_r2_pinglamb_apm m1_r3_pinglamb_apm m1_r4_pinglamb_apm m1_r5_pinglamb_apm m1_r6_pinglamb_apm m2_r0_pinglamb_apm m2_r1_pinglamb_apm m2_r2_pinglamb_apm m2_r3_pinglamb_apm m2_r4_pinglamb_apm m2_r5_pinglamb_apm m2_r6_pinglamb_apm m2_r7_pinglamb_apm m2_r8_pinglamb_apm m3_r0_pinglamb_apm m3_r1_pinglamb_apm m3_r2_pinglamb_apm m3_r3_pinglamb_apm m3_r4_pinglamb_apm m3_r5_pinglamb_apm m3_r6_pinglamb_apm m3_r7_pinglamb_apm m4_r0_pinglamb_apm m4_r1_pinglamb_apm m4_r2_pinglamb_apm m4_r3_pinglamb_apm m4_r4_pinglamb_apm m4_r5_pinglamb_apm m4_r6_pinglamb_apm m4_r7_pinglamb_apm m4_r8_pinglamb_apm m5_r0_pinglamb_apm m5_r1_pinglamb_apm m5_r2_pinglamb_apm m5_r3_pinglamb_apm m5_r4_pinglamb_apm m5_r5_pinglamb_apm m5_r6_pinglamb_apm m5_r7_pinglamb_apm m5_r8_pinglamb_apm) 2843992) (= (+ m0_r0_yachi_apm m0_r1_yachi_apm m0_r2_yachi_apm m0_r3_yachi_apm m0_r4_yachi_apm m0_r5_yachi_apm m0_r6_yachi_apm m0_r7_yachi_apm m1_r0_yachi_apm m1_r1_yachi_apm m1_r2_yachi_apm m1_r3_yachi_apm m1_r4_yachi_apm m1_r5_yachi_apm m1_r6_yachi_apm m2_r0_yachi_apm m2_r1_yachi_apm m2_r2_yachi_apm m2_r3_yachi_apm m2_r4_yachi_apm m2_r5_yachi_apm m2_r6_yachi_apm m2_r7_yachi_apm m2_r8_yachi_apm m3_r0_yachi_apm m3_r1_yachi_apm m3_r2_yachi_apm m3_r3_yachi_apm m3_r4_yachi_apm m3_r5_yachi_apm m3_r6_yachi_apm m3_r7_yachi_apm m4_r0_yachi_apm m4_r1_yachi_apm m4_r2_yachi_apm m4_r3_yachi_apm m4_r4_yachi_apm m4_r5_yachi_apm m4_r6_yachi_apm m4_r7_yachi_apm m4_r8_yachi_apm m5_r0_yachi_apm m5_r1_yachi_apm m5_r2_yachi_apm m5_r3_yachi_apm m5_r4_yachi_apm m5_r5_yachi_apm m5_r6_yachi_apm m5_r7_yachi_apm m5_r8_yachi_apm) 2507152) (> (+ m0_r0_pinglamb_apm m0_r1_pinglamb_apm m0_r2_pinglamb_apm m0_r3_pinglamb_apm m0_r4_pinglamb_apm m0_r5_pinglamb_apm m0_r6_pinglamb_apm m0_r7_pinglamb_apm m1_r0_pinglamb_apm m1_r1_pinglamb_apm m1_r2_pinglamb_apm m1_r3_pinglamb_apm m1_r4_pinglamb_apm m1_r5_pinglamb_apm m1_r6_pinglamb_apm m2_r0_pinglamb_apm m2_r1_pinglamb_apm m2_r2_pinglamb_apm m2_r3_pinglamb_apm m2_r4_pinglamb_apm m2_r5_pinglamb_apm m2_r6_pinglamb_apm m2_r7_pinglamb_apm m2_r8_pinglamb_apm m3_r0_pinglamb_apm m3_r1_pinglamb_apm m3_r2_pinglamb_apm m3_r3_pinglamb_apm m3_r4_pinglamb_apm m3_r5_pinglamb_apm m3_r6_pinglamb_apm m3_r7_pinglamb_apm m4_r0_pinglamb_apm m4_r1_pinglamb_apm m4_r2_pinglamb_apm m4_r3_pinglamb_apm m4_r4_pinglamb_apm m4_r5_pinglamb_apm m4_r6_pinglamb_apm m4_r7_pinglamb_apm m4_r8_pinglamb_apm m5_r0_pinglamb_apm m5_r1_pinglamb_apm m5_r2_pinglamb_apm m5_r3_pinglamb_apm m5_r4_pinglamb_apm m5_r5_pinglamb_apm m5_r6_pinglamb_apm m5_r7_pinglamb_apm m5_r8_pinglamb_apm) (+ m0_r0_yachi_apm m0_r1_yachi_apm m0_r2_yachi_apm m0_r3_yachi_apm m0_r4_yachi_apm m0_r5_yachi_apm m0_r6_yachi_apm m0_r7_yachi_apm m1_r0_yachi_apm m1_r1_yachi_apm m1_r2_yachi_apm m1_r3_yachi_apm m1_r4_yachi_apm m1_r5_yachi_apm m1_r6_yachi_apm m2_r0_yachi_apm m2_r1_yachi_apm m2_r2_yachi_apm m2_r3_yachi_apm m2_r4_yachi_apm m2_r5_yachi_apm m2_r6_yachi_apm m2_r7_yachi_apm m2_r8_yachi_apm m3_r0_yachi_apm m3_r1_yachi_apm m3_r2_yachi_apm m3_r3_yachi_apm m3_r4_yachi_apm m3_r5_yachi_apm m3_r6_yachi_apm m3_r7_yachi_apm m4_r0_yachi_apm m4_r1_yachi_apm m4_r2_yachi_apm m4_r3_yachi_apm m4_r4_yachi_apm m4_r5_yachi_apm m4_r6_yachi_apm m4_r7_yachi_apm m4_r8_yachi_apm m5_r0_yachi_apm m5_r1_yachi_apm m5_r2_yachi_apm m5_r3_yachi_apm m5_r4_yachi_apm m5_r5_yachi_apm m5_r6_yachi_apm m5_r7_yachi_apm m5_r8_yachi_apm)))))
+(assert (not (and (= (+ m0_r0_pinglamb_apm m0_r1_pinglamb_apm m0_r2_pinglamb_apm m0_r3_pinglamb_apm m0_r4_pinglamb_apm m0_r5_pinglamb_apm m0_r6_pinglamb_apm m0_r7_pinglamb_apm m1_r0_pinglamb_apm m1_r1_pinglamb_apm m1_r2_pinglamb_apm m1_r3_pinglamb_apm m1_r4_pinglamb_apm m1_r5_pinglamb_apm m1_r6_pinglamb_apm m2_r0_pinglamb_apm m2_r1_pinglamb_apm m2_r2_pinglamb_apm m2_r3_pinglamb_apm m2_r4_pinglamb_apm m2_r5_pinglamb_apm m2_r6_pinglamb_apm m2_r7_pinglamb_apm m2_r8_pinglamb_apm m3_r0_pinglamb_apm m3_r1_pinglamb_apm m3_r2_pinglamb_apm m3_r3_pinglamb_apm m3_r4_pinglamb_apm m3_r5_pinglamb_apm m3_r6_pinglamb_apm m3_r7_pinglamb_apm m4_r0_pinglamb_apm m4_r1_pinglamb_apm m4_r2_pinglamb_apm m4_r3_pinglamb_apm m4_r4_pinglamb_apm m4_r5_pinglamb_apm m4_r6_pinglamb_apm m4_r7_pinglamb_apm m4_r8_pinglamb_apm m5_r0_pinglamb_apm m5_r1_pinglamb_apm m5_r2_pinglamb_apm m5_r3_pinglamb_apm m5_r4_pinglamb_apm m5_r5_pinglamb_apm m5_r6_pinglamb_apm m5_r7_pinglamb_apm m5_r8_pinglamb_apm) 2843992) (= (+ m0_r0_yachi_apm m0_r1_yachi_apm m0_r2_yachi_apm m0_r3_yachi_apm m0_r4_yachi_apm m0_r5_yachi_apm m0_r6_yachi_apm m0_r7_yachi_apm m1_r0_yachi_apm m1_r1_yachi_apm m1_r2_yachi_apm m1_r3_yachi_apm m1_r4_yachi_apm m1_r5_yachi_apm m1_r6_yachi_apm m2_r0_yachi_apm m2_r1_yachi_apm m2_r2_yachi_apm m2_r3_yachi_apm m2_r4_yachi_apm m2_r5_yachi_apm m2_r6_yachi_apm m2_r7_yachi_apm m2_r8_yachi_apm m3_r0_yachi_apm m3_r1_yachi_apm m3_r2_yachi_apm m3_r3_yachi_apm m3_r4_yachi_apm m3_r5_yachi_apm m3_r6_yachi_apm m3_r7_yachi_apm m4_r0_yachi_apm m4_r1_yachi_apm m4_r2_yachi_apm m4_r3_yachi_apm m4_r4_yachi_apm m4_r5_yachi_apm m4_r6_yachi_apm m4_r7_yachi_apm m4_r8_yachi_apm m5_r0_yachi_apm m5_r1_yachi_apm m5_r2_yachi_apm m5_r3_yachi_apm m5_r4_yachi_apm m5_r5_yachi_apm m5_r6_yachi_apm m5_r7_yachi_apm m5_r8_yachi_apm) 2501794) (> (+ m0_r0_pinglamb_apm m0_r1_pinglamb_apm m0_r2_pinglamb_apm m0_r3_pinglamb_apm m0_r4_pinglamb_apm m0_r5_pinglamb_apm m0_r6_pinglamb_apm m0_r7_pinglamb_apm m1_r0_pinglamb_apm m1_r1_pinglamb_apm m1_r2_pinglamb_apm m1_r3_pinglamb_apm m1_r4_pinglamb_apm m1_r5_pinglamb_apm m1_r6_pinglamb_apm m2_r0_pinglamb_apm m2_r1_pinglamb_apm m2_r2_pinglamb_apm m2_r3_pinglamb_apm m2_r4_pinglamb_apm m2_r5_pinglamb_apm m2_r6_pinglamb_apm m2_r7_pinglamb_apm m2_r8_pinglamb_apm m3_r0_pinglamb_apm m3_r1_pinglamb_apm m3_r2_pinglamb_apm m3_r3_pinglamb_apm m3_r4_pinglamb_apm m3_r5_pinglamb_apm m3_r6_pinglamb_apm m3_r7_pinglamb_apm m4_r0_pinglamb_apm m4_r1_pinglamb_apm m4_r2_pinglamb_apm m4_r3_pinglamb_apm m4_r4_pinglamb_apm m4_r5_pinglamb_apm m4_r6_pinglamb_apm m4_r7_pinglamb_apm m4_r8_pinglamb_apm m5_r0_pinglamb_apm m5_r1_pinglamb_apm m5_r2_pinglamb_apm m5_r3_pinglamb_apm m5_r4_pinglamb_apm m5_r5_pinglamb_apm m5_r6_pinglamb_apm m5_r7_pinglamb_apm m5_r8_pinglamb_apm) (+ m0_r0_yachi_apm m0_r1_yachi_apm m0_r2_yachi_apm m0_r3_yachi_apm m0_r4_yachi_apm m0_r5_yachi_apm m0_r6_yachi_apm m0_r7_yachi_apm m1_r0_yachi_apm m1_r1_yachi_apm m1_r2_yachi_apm m1_r3_yachi_apm m1_r4_yachi_apm m1_r5_yachi_apm m1_r6_yachi_apm m2_r0_yachi_apm m2_r1_yachi_apm m2_r2_yachi_apm m2_r3_yachi_apm m2_r4_yachi_apm m2_r5_yachi_apm m2_r6_yachi_apm m2_r7_yachi_apm m2_r8_yachi_apm m3_r0_yachi_apm m3_r1_yachi_apm m3_r2_yachi_apm m3_r3_yachi_apm m3_r4_yachi_apm m3_r5_yachi_apm m3_r6_yachi_apm m3_r7_yachi_apm m4_r0_yachi_apm m4_r1_yachi_apm m4_r2_yachi_apm m4_r3_yachi_apm m4_r4_yachi_apm m4_r5_yachi_apm m4_r6_yachi_apm m4_r7_yachi_apm m4_r8_yachi_apm m5_r0_yachi_apm m5_r1_yachi_apm m5_r2_yachi_apm m5_r3_yachi_apm m5_r4_yachi_apm m5_r5_yachi_apm m5_r6_yachi_apm m5_r7_yachi_apm m5_r8_yachi_apm)))))
 (check-sat)
 (pop 1)
 
@@ -4609,11 +4609,11 @@
 (check-sat)
 (pop 1)
 
-; G045 [high_apm_record] yachi in rounds with APM >= 65: 6/6
-; yachi 打到 APM 65 以上嘅局有 6 局，贏咗 6 局
+; G045 [high_apm_record] yachi in rounds with APM >= 65: 7/7
+; yachi 打到 APM 65 以上嘅局有 7 局，贏咗 7 局
 (push 1)
 (echo "G045")
-(assert (not (and (= (+ (ite (>= m0_r0_yachi_apm 65000) 1 0) (ite (>= m0_r1_yachi_apm 65000) 1 0) (ite (>= m0_r2_yachi_apm 65000) 1 0) (ite (>= m0_r3_yachi_apm 65000) 1 0) (ite (>= m0_r4_yachi_apm 65000) 1 0) (ite (>= m0_r5_yachi_apm 65000) 1 0) (ite (>= m0_r6_yachi_apm 65000) 1 0) (ite (>= m0_r7_yachi_apm 65000) 1 0) (ite (>= m1_r0_yachi_apm 65000) 1 0) (ite (>= m1_r1_yachi_apm 65000) 1 0) (ite (>= m1_r2_yachi_apm 65000) 1 0) (ite (>= m1_r3_yachi_apm 65000) 1 0) (ite (>= m1_r4_yachi_apm 65000) 1 0) (ite (>= m1_r5_yachi_apm 65000) 1 0) (ite (>= m1_r6_yachi_apm 65000) 1 0) (ite (>= m2_r0_yachi_apm 65000) 1 0) (ite (>= m2_r1_yachi_apm 65000) 1 0) (ite (>= m2_r2_yachi_apm 65000) 1 0) (ite (>= m2_r3_yachi_apm 65000) 1 0) (ite (>= m2_r4_yachi_apm 65000) 1 0) (ite (>= m2_r5_yachi_apm 65000) 1 0) (ite (>= m2_r6_yachi_apm 65000) 1 0) (ite (>= m2_r7_yachi_apm 65000) 1 0) (ite (>= m2_r8_yachi_apm 65000) 1 0) (ite (>= m3_r0_yachi_apm 65000) 1 0) (ite (>= m3_r1_yachi_apm 65000) 1 0) (ite (>= m3_r2_yachi_apm 65000) 1 0) (ite (>= m3_r3_yachi_apm 65000) 1 0) (ite (>= m3_r4_yachi_apm 65000) 1 0) (ite (>= m3_r5_yachi_apm 65000) 1 0) (ite (>= m3_r6_yachi_apm 65000) 1 0) (ite (>= m3_r7_yachi_apm 65000) 1 0) (ite (>= m4_r0_yachi_apm 65000) 1 0) (ite (>= m4_r1_yachi_apm 65000) 1 0) (ite (>= m4_r2_yachi_apm 65000) 1 0) (ite (>= m4_r3_yachi_apm 65000) 1 0) (ite (>= m4_r4_yachi_apm 65000) 1 0) (ite (>= m4_r5_yachi_apm 65000) 1 0) (ite (>= m4_r6_yachi_apm 65000) 1 0) (ite (>= m4_r7_yachi_apm 65000) 1 0) (ite (>= m4_r8_yachi_apm 65000) 1 0) (ite (>= m5_r0_yachi_apm 65000) 1 0) (ite (>= m5_r1_yachi_apm 65000) 1 0) (ite (>= m5_r2_yachi_apm 65000) 1 0) (ite (>= m5_r3_yachi_apm 65000) 1 0) (ite (>= m5_r4_yachi_apm 65000) 1 0) (ite (>= m5_r5_yachi_apm 65000) 1 0) (ite (>= m5_r6_yachi_apm 65000) 1 0) (ite (>= m5_r7_yachi_apm 65000) 1 0) (ite (>= m5_r8_yachi_apm 65000) 1 0)) 6) (= (+ (ite (and (>= m0_r0_yachi_apm 65000) (= m0_r0_winner 1)) 1 0) (ite (and (>= m0_r1_yachi_apm 65000) (= m0_r1_winner 1)) 1 0) (ite (and (>= m0_r2_yachi_apm 65000) (= m0_r2_winner 1)) 1 0) (ite (and (>= m0_r3_yachi_apm 65000) (= m0_r3_winner 1)) 1 0) (ite (and (>= m0_r4_yachi_apm 65000) (= m0_r4_winner 1)) 1 0) (ite (and (>= m0_r5_yachi_apm 65000) (= m0_r5_winner 1)) 1 0) (ite (and (>= m0_r6_yachi_apm 65000) (= m0_r6_winner 1)) 1 0) (ite (and (>= m0_r7_yachi_apm 65000) (= m0_r7_winner 1)) 1 0) (ite (and (>= m1_r0_yachi_apm 65000) (= m1_r0_winner 1)) 1 0) (ite (and (>= m1_r1_yachi_apm 65000) (= m1_r1_winner 1)) 1 0) (ite (and (>= m1_r2_yachi_apm 65000) (= m1_r2_winner 1)) 1 0) (ite (and (>= m1_r3_yachi_apm 65000) (= m1_r3_winner 1)) 1 0) (ite (and (>= m1_r4_yachi_apm 65000) (= m1_r4_winner 1)) 1 0) (ite (and (>= m1_r5_yachi_apm 65000) (= m1_r5_winner 1)) 1 0) (ite (and (>= m1_r6_yachi_apm 65000) (= m1_r6_winner 1)) 1 0) (ite (and (>= m2_r0_yachi_apm 65000) (= m2_r0_winner 1)) 1 0) (ite (and (>= m2_r1_yachi_apm 65000) (= m2_r1_winner 1)) 1 0) (ite (and (>= m2_r2_yachi_apm 65000) (= m2_r2_winner 1)) 1 0) (ite (and (>= m2_r3_yachi_apm 65000) (= m2_r3_winner 1)) 1 0) (ite (and (>= m2_r4_yachi_apm 65000) (= m2_r4_winner 1)) 1 0) (ite (and (>= m2_r5_yachi_apm 65000) (= m2_r5_winner 1)) 1 0) (ite (and (>= m2_r6_yachi_apm 65000) (= m2_r6_winner 1)) 1 0) (ite (and (>= m2_r7_yachi_apm 65000) (= m2_r7_winner 1)) 1 0) (ite (and (>= m2_r8_yachi_apm 65000) (= m2_r8_winner 1)) 1 0) (ite (and (>= m3_r0_yachi_apm 65000) (= m3_r0_winner 1)) 1 0) (ite (and (>= m3_r1_yachi_apm 65000) (= m3_r1_winner 1)) 1 0) (ite (and (>= m3_r2_yachi_apm 65000) (= m3_r2_winner 1)) 1 0) (ite (and (>= m3_r3_yachi_apm 65000) (= m3_r3_winner 1)) 1 0) (ite (and (>= m3_r4_yachi_apm 65000) (= m3_r4_winner 1)) 1 0) (ite (and (>= m3_r5_yachi_apm 65000) (= m3_r5_winner 1)) 1 0) (ite (and (>= m3_r6_yachi_apm 65000) (= m3_r6_winner 1)) 1 0) (ite (and (>= m3_r7_yachi_apm 65000) (= m3_r7_winner 1)) 1 0) (ite (and (>= m4_r0_yachi_apm 65000) (= m4_r0_winner 1)) 1 0) (ite (and (>= m4_r1_yachi_apm 65000) (= m4_r1_winner 1)) 1 0) (ite (and (>= m4_r2_yachi_apm 65000) (= m4_r2_winner 1)) 1 0) (ite (and (>= m4_r3_yachi_apm 65000) (= m4_r3_winner 1)) 1 0) (ite (and (>= m4_r4_yachi_apm 65000) (= m4_r4_winner 1)) 1 0) (ite (and (>= m4_r5_yachi_apm 65000) (= m4_r5_winner 1)) 1 0) (ite (and (>= m4_r6_yachi_apm 65000) (= m4_r6_winner 1)) 1 0) (ite (and (>= m4_r7_yachi_apm 65000) (= m4_r7_winner 1)) 1 0) (ite (and (>= m4_r8_yachi_apm 65000) (= m4_r8_winner 1)) 1 0) (ite (and (>= m5_r0_yachi_apm 65000) (= m5_r0_winner 1)) 1 0) (ite (and (>= m5_r1_yachi_apm 65000) (= m5_r1_winner 1)) 1 0) (ite (and (>= m5_r2_yachi_apm 65000) (= m5_r2_winner 1)) 1 0) (ite (and (>= m5_r3_yachi_apm 65000) (= m5_r3_winner 1)) 1 0) (ite (and (>= m5_r4_yachi_apm 65000) (= m5_r4_winner 1)) 1 0) (ite (and (>= m5_r5_yachi_apm 65000) (= m5_r5_winner 1)) 1 0) (ite (and (>= m5_r6_yachi_apm 65000) (= m5_r6_winner 1)) 1 0) (ite (and (>= m5_r7_yachi_apm 65000) (= m5_r7_winner 1)) 1 0) (ite (and (>= m5_r8_yachi_apm 65000) (= m5_r8_winner 1)) 1 0)) 6))))
+(assert (not (and (= (+ (ite (>= m0_r0_yachi_apm 65000) 1 0) (ite (>= m0_r1_yachi_apm 65000) 1 0) (ite (>= m0_r2_yachi_apm 65000) 1 0) (ite (>= m0_r3_yachi_apm 65000) 1 0) (ite (>= m0_r4_yachi_apm 65000) 1 0) (ite (>= m0_r5_yachi_apm 65000) 1 0) (ite (>= m0_r6_yachi_apm 65000) 1 0) (ite (>= m0_r7_yachi_apm 65000) 1 0) (ite (>= m1_r0_yachi_apm 65000) 1 0) (ite (>= m1_r1_yachi_apm 65000) 1 0) (ite (>= m1_r2_yachi_apm 65000) 1 0) (ite (>= m1_r3_yachi_apm 65000) 1 0) (ite (>= m1_r4_yachi_apm 65000) 1 0) (ite (>= m1_r5_yachi_apm 65000) 1 0) (ite (>= m1_r6_yachi_apm 65000) 1 0) (ite (>= m2_r0_yachi_apm 65000) 1 0) (ite (>= m2_r1_yachi_apm 65000) 1 0) (ite (>= m2_r2_yachi_apm 65000) 1 0) (ite (>= m2_r3_yachi_apm 65000) 1 0) (ite (>= m2_r4_yachi_apm 65000) 1 0) (ite (>= m2_r5_yachi_apm 65000) 1 0) (ite (>= m2_r6_yachi_apm 65000) 1 0) (ite (>= m2_r7_yachi_apm 65000) 1 0) (ite (>= m2_r8_yachi_apm 65000) 1 0) (ite (>= m3_r0_yachi_apm 65000) 1 0) (ite (>= m3_r1_yachi_apm 65000) 1 0) (ite (>= m3_r2_yachi_apm 65000) 1 0) (ite (>= m3_r3_yachi_apm 65000) 1 0) (ite (>= m3_r4_yachi_apm 65000) 1 0) (ite (>= m3_r5_yachi_apm 65000) 1 0) (ite (>= m3_r6_yachi_apm 65000) 1 0) (ite (>= m3_r7_yachi_apm 65000) 1 0) (ite (>= m4_r0_yachi_apm 65000) 1 0) (ite (>= m4_r1_yachi_apm 65000) 1 0) (ite (>= m4_r2_yachi_apm 65000) 1 0) (ite (>= m4_r3_yachi_apm 65000) 1 0) (ite (>= m4_r4_yachi_apm 65000) 1 0) (ite (>= m4_r5_yachi_apm 65000) 1 0) (ite (>= m4_r6_yachi_apm 65000) 1 0) (ite (>= m4_r7_yachi_apm 65000) 1 0) (ite (>= m4_r8_yachi_apm 65000) 1 0) (ite (>= m5_r0_yachi_apm 65000) 1 0) (ite (>= m5_r1_yachi_apm 65000) 1 0) (ite (>= m5_r2_yachi_apm 65000) 1 0) (ite (>= m5_r3_yachi_apm 65000) 1 0) (ite (>= m5_r4_yachi_apm 65000) 1 0) (ite (>= m5_r5_yachi_apm 65000) 1 0) (ite (>= m5_r6_yachi_apm 65000) 1 0) (ite (>= m5_r7_yachi_apm 65000) 1 0) (ite (>= m5_r8_yachi_apm 65000) 1 0)) 7) (= (+ (ite (and (>= m0_r0_yachi_apm 65000) (= m0_r0_winner 1)) 1 0) (ite (and (>= m0_r1_yachi_apm 65000) (= m0_r1_winner 1)) 1 0) (ite (and (>= m0_r2_yachi_apm 65000) (= m0_r2_winner 1)) 1 0) (ite (and (>= m0_r3_yachi_apm 65000) (= m0_r3_winner 1)) 1 0) (ite (and (>= m0_r4_yachi_apm 65000) (= m0_r4_winner 1)) 1 0) (ite (and (>= m0_r5_yachi_apm 65000) (= m0_r5_winner 1)) 1 0) (ite (and (>= m0_r6_yachi_apm 65000) (= m0_r6_winner 1)) 1 0) (ite (and (>= m0_r7_yachi_apm 65000) (= m0_r7_winner 1)) 1 0) (ite (and (>= m1_r0_yachi_apm 65000) (= m1_r0_winner 1)) 1 0) (ite (and (>= m1_r1_yachi_apm 65000) (= m1_r1_winner 1)) 1 0) (ite (and (>= m1_r2_yachi_apm 65000) (= m1_r2_winner 1)) 1 0) (ite (and (>= m1_r3_yachi_apm 65000) (= m1_r3_winner 1)) 1 0) (ite (and (>= m1_r4_yachi_apm 65000) (= m1_r4_winner 1)) 1 0) (ite (and (>= m1_r5_yachi_apm 65000) (= m1_r5_winner 1)) 1 0) (ite (and (>= m1_r6_yachi_apm 65000) (= m1_r6_winner 1)) 1 0) (ite (and (>= m2_r0_yachi_apm 65000) (= m2_r0_winner 1)) 1 0) (ite (and (>= m2_r1_yachi_apm 65000) (= m2_r1_winner 1)) 1 0) (ite (and (>= m2_r2_yachi_apm 65000) (= m2_r2_winner 1)) 1 0) (ite (and (>= m2_r3_yachi_apm 65000) (= m2_r3_winner 1)) 1 0) (ite (and (>= m2_r4_yachi_apm 65000) (= m2_r4_winner 1)) 1 0) (ite (and (>= m2_r5_yachi_apm 65000) (= m2_r5_winner 1)) 1 0) (ite (and (>= m2_r6_yachi_apm 65000) (= m2_r6_winner 1)) 1 0) (ite (and (>= m2_r7_yachi_apm 65000) (= m2_r7_winner 1)) 1 0) (ite (and (>= m2_r8_yachi_apm 65000) (= m2_r8_winner 1)) 1 0) (ite (and (>= m3_r0_yachi_apm 65000) (= m3_r0_winner 1)) 1 0) (ite (and (>= m3_r1_yachi_apm 65000) (= m3_r1_winner 1)) 1 0) (ite (and (>= m3_r2_yachi_apm 65000) (= m3_r2_winner 1)) 1 0) (ite (and (>= m3_r3_yachi_apm 65000) (= m3_r3_winner 1)) 1 0) (ite (and (>= m3_r4_yachi_apm 65000) (= m3_r4_winner 1)) 1 0) (ite (and (>= m3_r5_yachi_apm 65000) (= m3_r5_winner 1)) 1 0) (ite (and (>= m3_r6_yachi_apm 65000) (= m3_r6_winner 1)) 1 0) (ite (and (>= m3_r7_yachi_apm 65000) (= m3_r7_winner 1)) 1 0) (ite (and (>= m4_r0_yachi_apm 65000) (= m4_r0_winner 1)) 1 0) (ite (and (>= m4_r1_yachi_apm 65000) (= m4_r1_winner 1)) 1 0) (ite (and (>= m4_r2_yachi_apm 65000) (= m4_r2_winner 1)) 1 0) (ite (and (>= m4_r3_yachi_apm 65000) (= m4_r3_winner 1)) 1 0) (ite (and (>= m4_r4_yachi_apm 65000) (= m4_r4_winner 1)) 1 0) (ite (and (>= m4_r5_yachi_apm 65000) (= m4_r5_winner 1)) 1 0) (ite (and (>= m4_r6_yachi_apm 65000) (= m4_r6_winner 1)) 1 0) (ite (and (>= m4_r7_yachi_apm 65000) (= m4_r7_winner 1)) 1 0) (ite (and (>= m4_r8_yachi_apm 65000) (= m4_r8_winner 1)) 1 0) (ite (and (>= m5_r0_yachi_apm 65000) (= m5_r0_winner 1)) 1 0) (ite (and (>= m5_r1_yachi_apm 65000) (= m5_r1_winner 1)) 1 0) (ite (and (>= m5_r2_yachi_apm 65000) (= m5_r2_winner 1)) 1 0) (ite (and (>= m5_r3_yachi_apm 65000) (= m5_r3_winner 1)) 1 0) (ite (and (>= m5_r4_yachi_apm 65000) (= m5_r4_winner 1)) 1 0) (ite (and (>= m5_r5_yachi_apm 65000) (= m5_r5_winner 1)) 1 0) (ite (and (>= m5_r6_yachi_apm 65000) (= m5_r6_winner 1)) 1 0) (ite (and (>= m5_r7_yachi_apm 65000) (= m5_r7_winner 1)) 1 0) (ite (and (>= m5_r8_yachi_apm 65000) (= m5_r8_winner 1)) 1 0)) 7))))
 (check-sat)
 (pop 1)
 
@@ -4737,11 +4737,11 @@
 (check-sat)
 (pop 1)
 
-; G061 [most_intense_round] highest combined VS among rounds of 60s or more is m5r7 at 265.8, won by yachi
-; 打足 60 秒以上嘅局入面最癲嘅一局係 m5 第 7 局，兩邊 VS 加埋約 265.8（yachi 約 140.6 對 pinglamb 約 125.2）
+; G061 [most_intense_round] highest combined VS among rounds of 60s or more is m5r7 at 265.7, won by yachi
+; 打足 60 秒以上嘅局入面最癲嘅一局係 m5 第 7 局，兩邊 VS 加埋約 265.7（yachi 約 140.5 對 pinglamb 約 125.2）
 (push 1)
 (echo "G061")
-(assert (not (and (= m4_r6_winner 1) (= (+ m4_r6_yachi_vs m4_r6_pinglamb_vs) 265888) (<= (+ m0_r2_yachi_vs m0_r2_pinglamb_vs) 265888) (<= (+ m0_r5_yachi_vs m0_r5_pinglamb_vs) 265888) (<= (+ m1_r2_yachi_vs m1_r2_pinglamb_vs) 265888) (<= (+ m1_r4_yachi_vs m1_r4_pinglamb_vs) 265888) (<= (+ m1_r5_yachi_vs m1_r5_pinglamb_vs) 265888) (<= (+ m2_r1_yachi_vs m2_r1_pinglamb_vs) 265888) (<= (+ m2_r2_yachi_vs m2_r2_pinglamb_vs) 265888) (<= (+ m2_r4_yachi_vs m2_r4_pinglamb_vs) 265888) (<= (+ m2_r5_yachi_vs m2_r5_pinglamb_vs) 265888) (<= (+ m2_r7_yachi_vs m2_r7_pinglamb_vs) 265888) (<= (+ m2_r8_yachi_vs m2_r8_pinglamb_vs) 265888) (<= (+ m3_r1_yachi_vs m3_r1_pinglamb_vs) 265888) (<= (+ m3_r2_yachi_vs m3_r2_pinglamb_vs) 265888) (<= (+ m3_r5_yachi_vs m3_r5_pinglamb_vs) 265888) (<= (+ m4_r2_yachi_vs m4_r2_pinglamb_vs) 265888) (<= (+ m4_r4_yachi_vs m4_r4_pinglamb_vs) 265888) (<= (+ m4_r6_yachi_vs m4_r6_pinglamb_vs) 265888) (<= (+ m4_r7_yachi_vs m4_r7_pinglamb_vs) 265888) (<= (+ m5_r1_yachi_vs m5_r1_pinglamb_vs) 265888) (<= (+ m5_r2_yachi_vs m5_r2_pinglamb_vs) 265888) (<= (+ m5_r4_yachi_vs m5_r4_pinglamb_vs) 265888) (<= (+ m5_r6_yachi_vs m5_r6_pinglamb_vs) 265888))))
+(assert (not (and (= m4_r6_winner 1) (= (+ m4_r6_yachi_vs m4_r6_pinglamb_vs) 265760) (<= (+ m0_r2_yachi_vs m0_r2_pinglamb_vs) 265760) (<= (+ m0_r5_yachi_vs m0_r5_pinglamb_vs) 265760) (<= (+ m1_r2_yachi_vs m1_r2_pinglamb_vs) 265760) (<= (+ m1_r4_yachi_vs m1_r4_pinglamb_vs) 265760) (<= (+ m1_r5_yachi_vs m1_r5_pinglamb_vs) 265760) (<= (+ m2_r1_yachi_vs m2_r1_pinglamb_vs) 265760) (<= (+ m2_r2_yachi_vs m2_r2_pinglamb_vs) 265760) (<= (+ m2_r4_yachi_vs m2_r4_pinglamb_vs) 265760) (<= (+ m2_r5_yachi_vs m2_r5_pinglamb_vs) 265760) (<= (+ m2_r7_yachi_vs m2_r7_pinglamb_vs) 265760) (<= (+ m2_r8_yachi_vs m2_r8_pinglamb_vs) 265760) (<= (+ m3_r1_yachi_vs m3_r1_pinglamb_vs) 265760) (<= (+ m3_r2_yachi_vs m3_r2_pinglamb_vs) 265760) (<= (+ m3_r5_yachi_vs m3_r5_pinglamb_vs) 265760) (<= (+ m4_r2_yachi_vs m4_r2_pinglamb_vs) 265760) (<= (+ m4_r4_yachi_vs m4_r4_pinglamb_vs) 265760) (<= (+ m4_r6_yachi_vs m4_r6_pinglamb_vs) 265760) (<= (+ m4_r7_yachi_vs m4_r7_pinglamb_vs) 265760) (<= (+ m5_r1_yachi_vs m5_r1_pinglamb_vs) 265760) (<= (+ m5_r2_yachi_vs m5_r2_pinglamb_vs) 265760) (<= (+ m5_r4_yachi_vs m5_r4_pinglamb_vs) 265760) (<= (+ m5_r6_yachi_vs m5_r6_pinglamb_vs) 265760))))
 (check-sat)
 (pop 1)
 
@@ -4849,11 +4849,11 @@
 (check-sat)
 (pop 1)
 
-; G075 [round_peak_apm_x1000] unqualified session peak apm_x1000 is 117614 by yachi at m6r4, a 11s round — not the record
-; 唔設任何局長下限嘅話，全場最高單局 APM係 yachi 喺 m6 第 4 局打出嘅 約117.6，但嗰局只打咗 11 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局
+; G075 [round_peak_apm_x1000] unqualified session peak apm_x1000 is 115481 by yachi at m6r4, a 11s round — not the record
+; 唔設任何局長下限嘅話，全場最高單局 APM係 yachi 喺 m6 第 4 局打出嘅 約115.4，但嗰局只打咗 11 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局
 (push 1)
 (echo "G075")
-(assert (not (and (= m5_r3_yachi_apm 117614) (= (+ (ite (> m0_r0_yachi_apm 117614) 1 0) (ite (> m0_r1_yachi_apm 117614) 1 0) (ite (> m0_r2_yachi_apm 117614) 1 0) (ite (> m0_r3_yachi_apm 117614) 1 0) (ite (> m0_r4_yachi_apm 117614) 1 0) (ite (> m0_r5_yachi_apm 117614) 1 0) (ite (> m0_r6_yachi_apm 117614) 1 0) (ite (> m0_r7_yachi_apm 117614) 1 0) (ite (> m1_r0_yachi_apm 117614) 1 0) (ite (> m1_r1_yachi_apm 117614) 1 0) (ite (> m1_r2_yachi_apm 117614) 1 0) (ite (> m1_r3_yachi_apm 117614) 1 0) (ite (> m1_r4_yachi_apm 117614) 1 0) (ite (> m1_r5_yachi_apm 117614) 1 0) (ite (> m1_r6_yachi_apm 117614) 1 0) (ite (> m2_r0_yachi_apm 117614) 1 0) (ite (> m2_r1_yachi_apm 117614) 1 0) (ite (> m2_r2_yachi_apm 117614) 1 0) (ite (> m2_r3_yachi_apm 117614) 1 0) (ite (> m2_r4_yachi_apm 117614) 1 0) (ite (> m2_r5_yachi_apm 117614) 1 0) (ite (> m2_r6_yachi_apm 117614) 1 0) (ite (> m2_r7_yachi_apm 117614) 1 0) (ite (> m2_r8_yachi_apm 117614) 1 0) (ite (> m3_r0_yachi_apm 117614) 1 0) (ite (> m3_r1_yachi_apm 117614) 1 0) (ite (> m3_r2_yachi_apm 117614) 1 0) (ite (> m3_r3_yachi_apm 117614) 1 0) (ite (> m3_r4_yachi_apm 117614) 1 0) (ite (> m3_r5_yachi_apm 117614) 1 0) (ite (> m3_r6_yachi_apm 117614) 1 0) (ite (> m3_r7_yachi_apm 117614) 1 0) (ite (> m4_r0_yachi_apm 117614) 1 0) (ite (> m4_r1_yachi_apm 117614) 1 0) (ite (> m4_r2_yachi_apm 117614) 1 0) (ite (> m4_r3_yachi_apm 117614) 1 0) (ite (> m4_r4_yachi_apm 117614) 1 0) (ite (> m4_r5_yachi_apm 117614) 1 0) (ite (> m4_r6_yachi_apm 117614) 1 0) (ite (> m4_r7_yachi_apm 117614) 1 0) (ite (> m4_r8_yachi_apm 117614) 1 0) (ite (> m5_r0_yachi_apm 117614) 1 0) (ite (> m5_r1_yachi_apm 117614) 1 0) (ite (> m5_r2_yachi_apm 117614) 1 0) (ite (> m5_r3_yachi_apm 117614) 1 0) (ite (> m5_r4_yachi_apm 117614) 1 0) (ite (> m5_r5_yachi_apm 117614) 1 0) (ite (> m5_r6_yachi_apm 117614) 1 0) (ite (> m5_r7_yachi_apm 117614) 1 0) (ite (> m5_r8_yachi_apm 117614) 1 0)) 0) (= (+ (ite (> m0_r0_pinglamb_apm 117614) 1 0) (ite (> m0_r1_pinglamb_apm 117614) 1 0) (ite (> m0_r2_pinglamb_apm 117614) 1 0) (ite (> m0_r3_pinglamb_apm 117614) 1 0) (ite (> m0_r4_pinglamb_apm 117614) 1 0) (ite (> m0_r5_pinglamb_apm 117614) 1 0) (ite (> m0_r6_pinglamb_apm 117614) 1 0) (ite (> m0_r7_pinglamb_apm 117614) 1 0) (ite (> m1_r0_pinglamb_apm 117614) 1 0) (ite (> m1_r1_pinglamb_apm 117614) 1 0) (ite (> m1_r2_pinglamb_apm 117614) 1 0) (ite (> m1_r3_pinglamb_apm 117614) 1 0) (ite (> m1_r4_pinglamb_apm 117614) 1 0) (ite (> m1_r5_pinglamb_apm 117614) 1 0) (ite (> m1_r6_pinglamb_apm 117614) 1 0) (ite (> m2_r0_pinglamb_apm 117614) 1 0) (ite (> m2_r1_pinglamb_apm 117614) 1 0) (ite (> m2_r2_pinglamb_apm 117614) 1 0) (ite (> m2_r3_pinglamb_apm 117614) 1 0) (ite (> m2_r4_pinglamb_apm 117614) 1 0) (ite (> m2_r5_pinglamb_apm 117614) 1 0) (ite (> m2_r6_pinglamb_apm 117614) 1 0) (ite (> m2_r7_pinglamb_apm 117614) 1 0) (ite (> m2_r8_pinglamb_apm 117614) 1 0) (ite (> m3_r0_pinglamb_apm 117614) 1 0) (ite (> m3_r1_pinglamb_apm 117614) 1 0) (ite (> m3_r2_pinglamb_apm 117614) 1 0) (ite (> m3_r3_pinglamb_apm 117614) 1 0) (ite (> m3_r4_pinglamb_apm 117614) 1 0) (ite (> m3_r5_pinglamb_apm 117614) 1 0) (ite (> m3_r6_pinglamb_apm 117614) 1 0) (ite (> m3_r7_pinglamb_apm 117614) 1 0) (ite (> m4_r0_pinglamb_apm 117614) 1 0) (ite (> m4_r1_pinglamb_apm 117614) 1 0) (ite (> m4_r2_pinglamb_apm 117614) 1 0) (ite (> m4_r3_pinglamb_apm 117614) 1 0) (ite (> m4_r4_pinglamb_apm 117614) 1 0) (ite (> m4_r5_pinglamb_apm 117614) 1 0) (ite (> m4_r6_pinglamb_apm 117614) 1 0) (ite (> m4_r7_pinglamb_apm 117614) 1 0) (ite (> m4_r8_pinglamb_apm 117614) 1 0) (ite (> m5_r0_pinglamb_apm 117614) 1 0) (ite (> m5_r1_pinglamb_apm 117614) 1 0) (ite (> m5_r2_pinglamb_apm 117614) 1 0) (ite (> m5_r3_pinglamb_apm 117614) 1 0) (ite (> m5_r4_pinglamb_apm 117614) 1 0) (ite (> m5_r5_pinglamb_apm 117614) 1 0) (ite (> m5_r6_pinglamb_apm 117614) 1 0) (ite (> m5_r7_pinglamb_apm 117614) 1 0) (ite (> m5_r8_pinglamb_apm 117614) 1 0)) 0) (= m5_r3_winner 1) (= (+ (ite (and (< (ite (>= m0_r0_yachi_lifetime m0_r0_pinglamb_lifetime) m0_r0_yachi_lifetime m0_r0_pinglamb_lifetime) 60000) (= m0_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r1_yachi_lifetime m0_r1_pinglamb_lifetime) m0_r1_yachi_lifetime m0_r1_pinglamb_lifetime) 60000) (= m0_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r2_yachi_lifetime m0_r2_pinglamb_lifetime) m0_r2_yachi_lifetime m0_r2_pinglamb_lifetime) 60000) (= m0_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r3_yachi_lifetime m0_r3_pinglamb_lifetime) m0_r3_yachi_lifetime m0_r3_pinglamb_lifetime) 60000) (= m0_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r4_yachi_lifetime m0_r4_pinglamb_lifetime) m0_r4_yachi_lifetime m0_r4_pinglamb_lifetime) 60000) (= m0_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r5_yachi_lifetime m0_r5_pinglamb_lifetime) m0_r5_yachi_lifetime m0_r5_pinglamb_lifetime) 60000) (= m0_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r6_yachi_lifetime m0_r6_pinglamb_lifetime) m0_r6_yachi_lifetime m0_r6_pinglamb_lifetime) 60000) (= m0_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m0_r7_yachi_lifetime m0_r7_pinglamb_lifetime) m0_r7_yachi_lifetime m0_r7_pinglamb_lifetime) 60000) (= m0_r7_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r0_yachi_lifetime m1_r0_pinglamb_lifetime) m1_r0_yachi_lifetime m1_r0_pinglamb_lifetime) 60000) (= m1_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r1_yachi_lifetime m1_r1_pinglamb_lifetime) m1_r1_yachi_lifetime m1_r1_pinglamb_lifetime) 60000) (= m1_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r2_yachi_lifetime m1_r2_pinglamb_lifetime) m1_r2_yachi_lifetime m1_r2_pinglamb_lifetime) 60000) (= m1_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r3_yachi_lifetime m1_r3_pinglamb_lifetime) m1_r3_yachi_lifetime m1_r3_pinglamb_lifetime) 60000) (= m1_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r4_yachi_lifetime m1_r4_pinglamb_lifetime) m1_r4_yachi_lifetime m1_r4_pinglamb_lifetime) 60000) (= m1_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r5_yachi_lifetime m1_r5_pinglamb_lifetime) m1_r5_yachi_lifetime m1_r5_pinglamb_lifetime) 60000) (= m1_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m1_r6_yachi_lifetime m1_r6_pinglamb_lifetime) m1_r6_yachi_lifetime m1_r6_pinglamb_lifetime) 60000) (= m1_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r0_yachi_lifetime m2_r0_pinglamb_lifetime) m2_r0_yachi_lifetime m2_r0_pinglamb_lifetime) 60000) (= m2_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r1_yachi_lifetime m2_r1_pinglamb_lifetime) m2_r1_yachi_lifetime m2_r1_pinglamb_lifetime) 60000) (= m2_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r2_yachi_lifetime m2_r2_pinglamb_lifetime) m2_r2_yachi_lifetime m2_r2_pinglamb_lifetime) 60000) (= m2_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r3_yachi_lifetime m2_r3_pinglamb_lifetime) m2_r3_yachi_lifetime m2_r3_pinglamb_lifetime) 60000) (= m2_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r4_yachi_lifetime m2_r4_pinglamb_lifetime) m2_r4_yachi_lifetime m2_r4_pinglamb_lifetime) 60000) (= m2_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r5_yachi_lifetime m2_r5_pinglamb_lifetime) m2_r5_yachi_lifetime m2_r5_pinglamb_lifetime) 60000) (= m2_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r6_yachi_lifetime m2_r6_pinglamb_lifetime) m2_r6_yachi_lifetime m2_r6_pinglamb_lifetime) 60000) (= m2_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r7_yachi_lifetime m2_r7_pinglamb_lifetime) m2_r7_yachi_lifetime m2_r7_pinglamb_lifetime) 60000) (= m2_r7_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m2_r8_yachi_lifetime m2_r8_pinglamb_lifetime) m2_r8_yachi_lifetime m2_r8_pinglamb_lifetime) 60000) (= m2_r8_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r0_yachi_lifetime m3_r0_pinglamb_lifetime) m3_r0_yachi_lifetime m3_r0_pinglamb_lifetime) 60000) (= m3_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r1_yachi_lifetime m3_r1_pinglamb_lifetime) m3_r1_yachi_lifetime m3_r1_pinglamb_lifetime) 60000) (= m3_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r2_yachi_lifetime m3_r2_pinglamb_lifetime) m3_r2_yachi_lifetime m3_r2_pinglamb_lifetime) 60000) (= m3_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r3_yachi_lifetime m3_r3_pinglamb_lifetime) m3_r3_yachi_lifetime m3_r3_pinglamb_lifetime) 60000) (= m3_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r4_yachi_lifetime m3_r4_pinglamb_lifetime) m3_r4_yachi_lifetime m3_r4_pinglamb_lifetime) 60000) (= m3_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r5_yachi_lifetime m3_r5_pinglamb_lifetime) m3_r5_yachi_lifetime m3_r5_pinglamb_lifetime) 60000) (= m3_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r6_yachi_lifetime m3_r6_pinglamb_lifetime) m3_r6_yachi_lifetime m3_r6_pinglamb_lifetime) 60000) (= m3_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m3_r7_yachi_lifetime m3_r7_pinglamb_lifetime) m3_r7_yachi_lifetime m3_r7_pinglamb_lifetime) 60000) (= m3_r7_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r0_yachi_lifetime m4_r0_pinglamb_lifetime) m4_r0_yachi_lifetime m4_r0_pinglamb_lifetime) 60000) (= m4_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r1_yachi_lifetime m4_r1_pinglamb_lifetime) m4_r1_yachi_lifetime m4_r1_pinglamb_lifetime) 60000) (= m4_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r2_yachi_lifetime m4_r2_pinglamb_lifetime) m4_r2_yachi_lifetime m4_r2_pinglamb_lifetime) 60000) (= m4_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r3_yachi_lifetime m4_r3_pinglamb_lifetime) m4_r3_yachi_lifetime m4_r3_pinglamb_lifetime) 60000) (= m4_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r4_yachi_lifetime m4_r4_pinglamb_lifetime) m4_r4_yachi_lifetime m4_r4_pinglamb_lifetime) 60000) (= m4_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r5_yachi_lifetime m4_r5_pinglamb_lifetime) m4_r5_yachi_lifetime m4_r5_pinglamb_lifetime) 60000) (= m4_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r6_yachi_lifetime m4_r6_pinglamb_lifetime) m4_r6_yachi_lifetime m4_r6_pinglamb_lifetime) 60000) (= m4_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r7_yachi_lifetime m4_r7_pinglamb_lifetime) m4_r7_yachi_lifetime m4_r7_pinglamb_lifetime) 60000) (= m4_r7_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m4_r8_yachi_lifetime m4_r8_pinglamb_lifetime) m4_r8_yachi_lifetime m4_r8_pinglamb_lifetime) 60000) (= m4_r8_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r0_yachi_lifetime m5_r0_pinglamb_lifetime) m5_r0_yachi_lifetime m5_r0_pinglamb_lifetime) 60000) (= m5_r0_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r1_yachi_lifetime m5_r1_pinglamb_lifetime) m5_r1_yachi_lifetime m5_r1_pinglamb_lifetime) 60000) (= m5_r1_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r2_yachi_lifetime m5_r2_pinglamb_lifetime) m5_r2_yachi_lifetime m5_r2_pinglamb_lifetime) 60000) (= m5_r2_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r3_yachi_lifetime m5_r3_pinglamb_lifetime) m5_r3_yachi_lifetime m5_r3_pinglamb_lifetime) 60000) (= m5_r3_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r4_yachi_lifetime m5_r4_pinglamb_lifetime) m5_r4_yachi_lifetime m5_r4_pinglamb_lifetime) 60000) (= m5_r4_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r5_yachi_lifetime m5_r5_pinglamb_lifetime) m5_r5_yachi_lifetime m5_r5_pinglamb_lifetime) 60000) (= m5_r5_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r6_yachi_lifetime m5_r6_pinglamb_lifetime) m5_r6_yachi_lifetime m5_r6_pinglamb_lifetime) 60000) (= m5_r6_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r7_yachi_lifetime m5_r7_pinglamb_lifetime) m5_r7_yachi_lifetime m5_r7_pinglamb_lifetime) 60000) (= m5_r7_yachi_apm 117614)) 1 0) (ite (and (< (ite (>= m5_r8_yachi_lifetime m5_r8_pinglamb_lifetime) m5_r8_yachi_lifetime m5_r8_pinglamb_lifetime) 60000) (= m5_r8_yachi_apm 117614)) 1 0)) 1))))
+(assert (not (and (= m5_r3_yachi_apm 115481) (= (+ (ite (> m0_r0_yachi_apm 115481) 1 0) (ite (> m0_r1_yachi_apm 115481) 1 0) (ite (> m0_r2_yachi_apm 115481) 1 0) (ite (> m0_r3_yachi_apm 115481) 1 0) (ite (> m0_r4_yachi_apm 115481) 1 0) (ite (> m0_r5_yachi_apm 115481) 1 0) (ite (> m0_r6_yachi_apm 115481) 1 0) (ite (> m0_r7_yachi_apm 115481) 1 0) (ite (> m1_r0_yachi_apm 115481) 1 0) (ite (> m1_r1_yachi_apm 115481) 1 0) (ite (> m1_r2_yachi_apm 115481) 1 0) (ite (> m1_r3_yachi_apm 115481) 1 0) (ite (> m1_r4_yachi_apm 115481) 1 0) (ite (> m1_r5_yachi_apm 115481) 1 0) (ite (> m1_r6_yachi_apm 115481) 1 0) (ite (> m2_r0_yachi_apm 115481) 1 0) (ite (> m2_r1_yachi_apm 115481) 1 0) (ite (> m2_r2_yachi_apm 115481) 1 0) (ite (> m2_r3_yachi_apm 115481) 1 0) (ite (> m2_r4_yachi_apm 115481) 1 0) (ite (> m2_r5_yachi_apm 115481) 1 0) (ite (> m2_r6_yachi_apm 115481) 1 0) (ite (> m2_r7_yachi_apm 115481) 1 0) (ite (> m2_r8_yachi_apm 115481) 1 0) (ite (> m3_r0_yachi_apm 115481) 1 0) (ite (> m3_r1_yachi_apm 115481) 1 0) (ite (> m3_r2_yachi_apm 115481) 1 0) (ite (> m3_r3_yachi_apm 115481) 1 0) (ite (> m3_r4_yachi_apm 115481) 1 0) (ite (> m3_r5_yachi_apm 115481) 1 0) (ite (> m3_r6_yachi_apm 115481) 1 0) (ite (> m3_r7_yachi_apm 115481) 1 0) (ite (> m4_r0_yachi_apm 115481) 1 0) (ite (> m4_r1_yachi_apm 115481) 1 0) (ite (> m4_r2_yachi_apm 115481) 1 0) (ite (> m4_r3_yachi_apm 115481) 1 0) (ite (> m4_r4_yachi_apm 115481) 1 0) (ite (> m4_r5_yachi_apm 115481) 1 0) (ite (> m4_r6_yachi_apm 115481) 1 0) (ite (> m4_r7_yachi_apm 115481) 1 0) (ite (> m4_r8_yachi_apm 115481) 1 0) (ite (> m5_r0_yachi_apm 115481) 1 0) (ite (> m5_r1_yachi_apm 115481) 1 0) (ite (> m5_r2_yachi_apm 115481) 1 0) (ite (> m5_r3_yachi_apm 115481) 1 0) (ite (> m5_r4_yachi_apm 115481) 1 0) (ite (> m5_r5_yachi_apm 115481) 1 0) (ite (> m5_r6_yachi_apm 115481) 1 0) (ite (> m5_r7_yachi_apm 115481) 1 0) (ite (> m5_r8_yachi_apm 115481) 1 0)) 0) (= (+ (ite (> m0_r0_pinglamb_apm 115481) 1 0) (ite (> m0_r1_pinglamb_apm 115481) 1 0) (ite (> m0_r2_pinglamb_apm 115481) 1 0) (ite (> m0_r3_pinglamb_apm 115481) 1 0) (ite (> m0_r4_pinglamb_apm 115481) 1 0) (ite (> m0_r5_pinglamb_apm 115481) 1 0) (ite (> m0_r6_pinglamb_apm 115481) 1 0) (ite (> m0_r7_pinglamb_apm 115481) 1 0) (ite (> m1_r0_pinglamb_apm 115481) 1 0) (ite (> m1_r1_pinglamb_apm 115481) 1 0) (ite (> m1_r2_pinglamb_apm 115481) 1 0) (ite (> m1_r3_pinglamb_apm 115481) 1 0) (ite (> m1_r4_pinglamb_apm 115481) 1 0) (ite (> m1_r5_pinglamb_apm 115481) 1 0) (ite (> m1_r6_pinglamb_apm 115481) 1 0) (ite (> m2_r0_pinglamb_apm 115481) 1 0) (ite (> m2_r1_pinglamb_apm 115481) 1 0) (ite (> m2_r2_pinglamb_apm 115481) 1 0) (ite (> m2_r3_pinglamb_apm 115481) 1 0) (ite (> m2_r4_pinglamb_apm 115481) 1 0) (ite (> m2_r5_pinglamb_apm 115481) 1 0) (ite (> m2_r6_pinglamb_apm 115481) 1 0) (ite (> m2_r7_pinglamb_apm 115481) 1 0) (ite (> m2_r8_pinglamb_apm 115481) 1 0) (ite (> m3_r0_pinglamb_apm 115481) 1 0) (ite (> m3_r1_pinglamb_apm 115481) 1 0) (ite (> m3_r2_pinglamb_apm 115481) 1 0) (ite (> m3_r3_pinglamb_apm 115481) 1 0) (ite (> m3_r4_pinglamb_apm 115481) 1 0) (ite (> m3_r5_pinglamb_apm 115481) 1 0) (ite (> m3_r6_pinglamb_apm 115481) 1 0) (ite (> m3_r7_pinglamb_apm 115481) 1 0) (ite (> m4_r0_pinglamb_apm 115481) 1 0) (ite (> m4_r1_pinglamb_apm 115481) 1 0) (ite (> m4_r2_pinglamb_apm 115481) 1 0) (ite (> m4_r3_pinglamb_apm 115481) 1 0) (ite (> m4_r4_pinglamb_apm 115481) 1 0) (ite (> m4_r5_pinglamb_apm 115481) 1 0) (ite (> m4_r6_pinglamb_apm 115481) 1 0) (ite (> m4_r7_pinglamb_apm 115481) 1 0) (ite (> m4_r8_pinglamb_apm 115481) 1 0) (ite (> m5_r0_pinglamb_apm 115481) 1 0) (ite (> m5_r1_pinglamb_apm 115481) 1 0) (ite (> m5_r2_pinglamb_apm 115481) 1 0) (ite (> m5_r3_pinglamb_apm 115481) 1 0) (ite (> m5_r4_pinglamb_apm 115481) 1 0) (ite (> m5_r5_pinglamb_apm 115481) 1 0) (ite (> m5_r6_pinglamb_apm 115481) 1 0) (ite (> m5_r7_pinglamb_apm 115481) 1 0) (ite (> m5_r8_pinglamb_apm 115481) 1 0)) 0) (= m5_r3_winner 1) (= (+ (ite (and (< (ite (>= m0_r0_yachi_lifetime m0_r0_pinglamb_lifetime) m0_r0_yachi_lifetime m0_r0_pinglamb_lifetime) 60000) (= m0_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r1_yachi_lifetime m0_r1_pinglamb_lifetime) m0_r1_yachi_lifetime m0_r1_pinglamb_lifetime) 60000) (= m0_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r2_yachi_lifetime m0_r2_pinglamb_lifetime) m0_r2_yachi_lifetime m0_r2_pinglamb_lifetime) 60000) (= m0_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r3_yachi_lifetime m0_r3_pinglamb_lifetime) m0_r3_yachi_lifetime m0_r3_pinglamb_lifetime) 60000) (= m0_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r4_yachi_lifetime m0_r4_pinglamb_lifetime) m0_r4_yachi_lifetime m0_r4_pinglamb_lifetime) 60000) (= m0_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r5_yachi_lifetime m0_r5_pinglamb_lifetime) m0_r5_yachi_lifetime m0_r5_pinglamb_lifetime) 60000) (= m0_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r6_yachi_lifetime m0_r6_pinglamb_lifetime) m0_r6_yachi_lifetime m0_r6_pinglamb_lifetime) 60000) (= m0_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m0_r7_yachi_lifetime m0_r7_pinglamb_lifetime) m0_r7_yachi_lifetime m0_r7_pinglamb_lifetime) 60000) (= m0_r7_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r0_yachi_lifetime m1_r0_pinglamb_lifetime) m1_r0_yachi_lifetime m1_r0_pinglamb_lifetime) 60000) (= m1_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r1_yachi_lifetime m1_r1_pinglamb_lifetime) m1_r1_yachi_lifetime m1_r1_pinglamb_lifetime) 60000) (= m1_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r2_yachi_lifetime m1_r2_pinglamb_lifetime) m1_r2_yachi_lifetime m1_r2_pinglamb_lifetime) 60000) (= m1_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r3_yachi_lifetime m1_r3_pinglamb_lifetime) m1_r3_yachi_lifetime m1_r3_pinglamb_lifetime) 60000) (= m1_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r4_yachi_lifetime m1_r4_pinglamb_lifetime) m1_r4_yachi_lifetime m1_r4_pinglamb_lifetime) 60000) (= m1_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r5_yachi_lifetime m1_r5_pinglamb_lifetime) m1_r5_yachi_lifetime m1_r5_pinglamb_lifetime) 60000) (= m1_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m1_r6_yachi_lifetime m1_r6_pinglamb_lifetime) m1_r6_yachi_lifetime m1_r6_pinglamb_lifetime) 60000) (= m1_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r0_yachi_lifetime m2_r0_pinglamb_lifetime) m2_r0_yachi_lifetime m2_r0_pinglamb_lifetime) 60000) (= m2_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r1_yachi_lifetime m2_r1_pinglamb_lifetime) m2_r1_yachi_lifetime m2_r1_pinglamb_lifetime) 60000) (= m2_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r2_yachi_lifetime m2_r2_pinglamb_lifetime) m2_r2_yachi_lifetime m2_r2_pinglamb_lifetime) 60000) (= m2_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r3_yachi_lifetime m2_r3_pinglamb_lifetime) m2_r3_yachi_lifetime m2_r3_pinglamb_lifetime) 60000) (= m2_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r4_yachi_lifetime m2_r4_pinglamb_lifetime) m2_r4_yachi_lifetime m2_r4_pinglamb_lifetime) 60000) (= m2_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r5_yachi_lifetime m2_r5_pinglamb_lifetime) m2_r5_yachi_lifetime m2_r5_pinglamb_lifetime) 60000) (= m2_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r6_yachi_lifetime m2_r6_pinglamb_lifetime) m2_r6_yachi_lifetime m2_r6_pinglamb_lifetime) 60000) (= m2_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r7_yachi_lifetime m2_r7_pinglamb_lifetime) m2_r7_yachi_lifetime m2_r7_pinglamb_lifetime) 60000) (= m2_r7_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m2_r8_yachi_lifetime m2_r8_pinglamb_lifetime) m2_r8_yachi_lifetime m2_r8_pinglamb_lifetime) 60000) (= m2_r8_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r0_yachi_lifetime m3_r0_pinglamb_lifetime) m3_r0_yachi_lifetime m3_r0_pinglamb_lifetime) 60000) (= m3_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r1_yachi_lifetime m3_r1_pinglamb_lifetime) m3_r1_yachi_lifetime m3_r1_pinglamb_lifetime) 60000) (= m3_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r2_yachi_lifetime m3_r2_pinglamb_lifetime) m3_r2_yachi_lifetime m3_r2_pinglamb_lifetime) 60000) (= m3_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r3_yachi_lifetime m3_r3_pinglamb_lifetime) m3_r3_yachi_lifetime m3_r3_pinglamb_lifetime) 60000) (= m3_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r4_yachi_lifetime m3_r4_pinglamb_lifetime) m3_r4_yachi_lifetime m3_r4_pinglamb_lifetime) 60000) (= m3_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r5_yachi_lifetime m3_r5_pinglamb_lifetime) m3_r5_yachi_lifetime m3_r5_pinglamb_lifetime) 60000) (= m3_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r6_yachi_lifetime m3_r6_pinglamb_lifetime) m3_r6_yachi_lifetime m3_r6_pinglamb_lifetime) 60000) (= m3_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m3_r7_yachi_lifetime m3_r7_pinglamb_lifetime) m3_r7_yachi_lifetime m3_r7_pinglamb_lifetime) 60000) (= m3_r7_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r0_yachi_lifetime m4_r0_pinglamb_lifetime) m4_r0_yachi_lifetime m4_r0_pinglamb_lifetime) 60000) (= m4_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r1_yachi_lifetime m4_r1_pinglamb_lifetime) m4_r1_yachi_lifetime m4_r1_pinglamb_lifetime) 60000) (= m4_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r2_yachi_lifetime m4_r2_pinglamb_lifetime) m4_r2_yachi_lifetime m4_r2_pinglamb_lifetime) 60000) (= m4_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r3_yachi_lifetime m4_r3_pinglamb_lifetime) m4_r3_yachi_lifetime m4_r3_pinglamb_lifetime) 60000) (= m4_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r4_yachi_lifetime m4_r4_pinglamb_lifetime) m4_r4_yachi_lifetime m4_r4_pinglamb_lifetime) 60000) (= m4_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r5_yachi_lifetime m4_r5_pinglamb_lifetime) m4_r5_yachi_lifetime m4_r5_pinglamb_lifetime) 60000) (= m4_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r6_yachi_lifetime m4_r6_pinglamb_lifetime) m4_r6_yachi_lifetime m4_r6_pinglamb_lifetime) 60000) (= m4_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r7_yachi_lifetime m4_r7_pinglamb_lifetime) m4_r7_yachi_lifetime m4_r7_pinglamb_lifetime) 60000) (= m4_r7_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m4_r8_yachi_lifetime m4_r8_pinglamb_lifetime) m4_r8_yachi_lifetime m4_r8_pinglamb_lifetime) 60000) (= m4_r8_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r0_yachi_lifetime m5_r0_pinglamb_lifetime) m5_r0_yachi_lifetime m5_r0_pinglamb_lifetime) 60000) (= m5_r0_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r1_yachi_lifetime m5_r1_pinglamb_lifetime) m5_r1_yachi_lifetime m5_r1_pinglamb_lifetime) 60000) (= m5_r1_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r2_yachi_lifetime m5_r2_pinglamb_lifetime) m5_r2_yachi_lifetime m5_r2_pinglamb_lifetime) 60000) (= m5_r2_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r3_yachi_lifetime m5_r3_pinglamb_lifetime) m5_r3_yachi_lifetime m5_r3_pinglamb_lifetime) 60000) (= m5_r3_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r4_yachi_lifetime m5_r4_pinglamb_lifetime) m5_r4_yachi_lifetime m5_r4_pinglamb_lifetime) 60000) (= m5_r4_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r5_yachi_lifetime m5_r5_pinglamb_lifetime) m5_r5_yachi_lifetime m5_r5_pinglamb_lifetime) 60000) (= m5_r5_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r6_yachi_lifetime m5_r6_pinglamb_lifetime) m5_r6_yachi_lifetime m5_r6_pinglamb_lifetime) 60000) (= m5_r6_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r7_yachi_lifetime m5_r7_pinglamb_lifetime) m5_r7_yachi_lifetime m5_r7_pinglamb_lifetime) 60000) (= m5_r7_yachi_apm 115481)) 1 0) (ite (and (< (ite (>= m5_r8_yachi_lifetime m5_r8_pinglamb_lifetime) m5_r8_yachi_lifetime m5_r8_pinglamb_lifetime) 60000) (= m5_r8_yachi_apm 115481)) 1 0)) 1))))
 (check-sat)
 (pop 1)
 
@@ -4897,11 +4897,11 @@
 (check-sat)
 (pop 1)
 
-; G081 [intense_round_profile] most intense round m5r7 — yachi: apm_x1000 61883, pps_x1000 1477, vs_x1000 140643, pieces 189, garbage_attack 132, garbagesent 111, garbagereceived 73, garbage_cleared 48, lines 118, maxspike 17, topbtb 3, finaltime_ms 128100
-; 最癲嘅一局（m5 第 7 局）yachi 嘅數：APM 約 61.8、PPS 約 1.47、VS 約 140.6、粒數 189、攻擊 132、射埋 111、食 73、清走 48、行數 118、最大單波 17、最高 B2B 3、佢自己嘅時間 約 128 秒
+; G081 [intense_round_profile] most intense round m5r7 — yachi: apm_x1000 61827, pps_x1000 1475, vs_x1000 140515, pieces 189, garbage_attack 132, garbagesent 111, garbagereceived 73, garbage_cleared 48, lines 118, maxspike 17, topbtb 3, finaltime_ms 128100
+; 最癲嘅一局（m5 第 7 局）yachi 嘅數：APM 約 61.8、PPS 約 1.47、VS 約 140.5、粒數 189、攻擊 132、射埋 111、食 73、清走 48、行數 118、最大單波 17、最高 B2B 3、佢自己嘅時間 約 128 秒
 (push 1)
 (echo "G081")
-(assert (not (and (= m4_r6_yachi_apm 61883) (= m4_r6_yachi_pps 1477) (= m4_r6_yachi_vs 140643) (= m4_r6_yachi_pieces 189) (= m4_r6_yachi_garbage_attack 132) (= m4_r6_yachi_garbagesent 111) (= m4_r6_yachi_garbagereceived 73) (= m4_r6_yachi_garbage_cleared 48) (= m4_r6_yachi_lines 118) (= m4_r6_yachi_maxspike 17) (= m4_r6_yachi_topbtb 3) (= m4_r6_yachi_finaltime_ms 128100) (= m4_r6_winner 1))))
+(assert (not (and (= m4_r6_yachi_apm 61827) (= m4_r6_yachi_pps 1475) (= m4_r6_yachi_vs 140515) (= m4_r6_yachi_pieces 189) (= m4_r6_yachi_garbage_attack 132) (= m4_r6_yachi_garbagesent 111) (= m4_r6_yachi_garbagereceived 73) (= m4_r6_yachi_garbage_cleared 48) (= m4_r6_yachi_lines 118) (= m4_r6_yachi_maxspike 17) (= m4_r6_yachi_topbtb 3) (= m4_r6_yachi_finaltime_ms 128100) (= m4_r6_winner 1))))
 (check-sat)
 (pop 1)
 
@@ -4937,11 +4937,11 @@
 (check-sat)
 (pop 1)
 
-; G086 [intense_round_vs_split] m5r7 yachi VS splits into attack 103.0 + downstack 37.4, residual under 0.13
-; 最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 103.0、清垃圾嗰邊約 37.4，兩邊加埋同佢實際 VS 約 140.6 相差唔夠 0.13
+; G086 [intense_round_vs_split] m5r7 yachi VS splits into attack 103.0 + downstack 37.4, residual under 0.01
+; 最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 103.0、清垃圾嗰邊約 37.4，兩邊加埋同佢實際 VS 約 140.5 相差唔夠 0.01
 (push 1)
 (echo "G086")
-(assert (not (and (and (<= -16368300 (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared)))) (< (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared))) 16368301)) (and (<= 13199936400 (* 100000000 m4_r6_yachi_garbage_attack)) (< (* 100000000 m4_r6_yachi_garbage_attack) 13200064500)) (and (<= 4799907000 (* 100000000 m4_r6_yachi_garbage_cleared)) (< (* 100000000 m4_r6_yachi_garbage_cleared) 4800035100)))))
+(assert (not (and (and (<= -28500 (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared)))) (< (- (* m4_r6_yachi_vs m4_r6_yachi_finaltime_ms) (* 100000000 (+ m4_r6_yachi_garbage_attack m4_r6_yachi_garbage_cleared))) 28501)) (and (<= 13199936400 (* 100000000 m4_r6_yachi_garbage_attack)) (< (* 100000000 m4_r6_yachi_garbage_attack) 13200064500)) (and (<= 4799907000 (* 100000000 m4_r6_yachi_garbage_cleared)) (< (* 100000000 m4_r6_yachi_garbage_cleared) 4800035100)))))
 (check-sat)
 (pop 1)
 
