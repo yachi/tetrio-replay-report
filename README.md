@@ -58,10 +58,13 @@ This distinction matters, so it is stated plainly rather than buried:
              └─►  extract2.ts   ──►  facts2.json ─┴─► must be byte-identical
                                         │
                                         ▼
-                          claims-*.json  (Cantonese sentence + integer predicate)
+   hand_claims*.py + generators.py  ──►  claims-*.json
+                                           (Cantonese sentence + one spec, rendered
+                                        │   to a Python predicate, a Dafny ensures
+                                        │   and SMT-LIB from that single source)
                                         │  every predicate must evaluate True
                                         ▼
-                          codegen_dafny.py  ──►  Facts.dfy + Claims_*.dfy
+                          pipeline/codegen.py  ──►  Facts.dfy + Claims.dfy
                                         │  no hand-typed data; regeneration must be
                                         │  byte-identical to what is committed
                                         ▼

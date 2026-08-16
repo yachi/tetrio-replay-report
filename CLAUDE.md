@@ -106,22 +106,22 @@ two orders of magnitude faster — measured, over the same claims:
 
 | | Dafny (`--cores 4`) | `claims.smt2` + z3 |
 |---|---|---|
-| 2026-07-22 · 77 generated claims | ~4.6 s (54 hand claims) | **40 ms** |
-| 2026-07-24 · 76 generated claims | ~3 s (52 hand claims) | **10 ms** |
+| 2026-07-22 · 144 claims | ~8.3 s (the 54 committed hand lemmas) | **100 ms** |
+| 2026-07-24 · 141 claims | ~3.8 s (the 52 committed hand lemmas) | **60 ms** |
 
 That speed is what makes the anti-vacuity mutation test affordable on every push
 (`--mutate 12` finishes in under a second) rather than weekly. `claims.smt2` is committed and
 byte-identity gated, so it doubles as a portable artefact: any SMT-LIB solver can re-check the
 claims without this pipeline.
 
-The `.smt2` covers every **spec-carrying** ledger. For 07-22 and 07-24 that is the generated
-one only — their hand ledgers predate the spec algebra, carry a bare `python_check`, and are
-proved by a session-local ~500-line `codegen_dafny.py`. From 2026-07-28 on, hand claims are
-written as **specs** in `sessions/<date>/report/hand_claims.py` and built with
+**The `.smt2` covers every ledger of every session — there is no longer a second kind.** Hand
+claims are written as **specs** in `sessions/<date>/report/hand_claims*.py` and built with
 `pipeline.claims.build_hand`, so they render to all three backends and need no per-session
 emitter: `--claims` on `codegen`, `codegen_smt` and `build_proof_map` takes several ledgers,
-`pipeline.codegen.session_ledgers` defines their canonical order, and `check_smt` **names**
-any ledger it had to leave out rather than silently narrowing what the artefact covers.
+and `pipeline.codegen.session_ledgers` defines their canonical order. A session may hold more
+than one hand ledger (07-22 and 07-24 split theirs narrative/coaching); the module→ledger
+mapping is `build_hand.hand_ledgers`, which **raises on a ledger no module rebuilds** rather
+than skipping it, because a skip is what leaves a ledger with nothing checking it.
 
 Two windowed operators exist for claims about how a session *changed*:
 `sum_round_range` / `count_rounds_range` restrict to a contiguous window of matches. The

@@ -183,10 +183,16 @@ def _uses_window(node):
 def windowed_claims(hand_paths):
     """Ids of hand claims built on a window operator, or None when none of them carry a spec.
 
-    2026-07-22 and 2026-07-24's hand ledgers predate the spec algebra and carry a bare
-    `python_check`, so there is nothing to read a window out of. `null` is the honest answer
-    there — neither session has a windowed claim, but that is a fact about those ledgers and
-    not something a token scan of a predicate string established.
+    `None` means "not established", never "none" — the distinction exists because a ledger
+    with no spec offers nothing to read a window out of, and answering `[]` there would be a
+    claim about the data that only a token scan of a predicate string supported.
+
+    **No such ledger exists any more.** 07-22 and 07-24 were the last two, and porting them to
+    the spec algebra turned their `null` into a measurement: `[]` for 07-22 and `["R015",
+    "R018"]` for 07-24, which had been carrying two `count_rounds_range` claims that the
+    single-value coverage figure cannot falsify. The branch is kept because it states what the
+    field means, and the selftest exercises it on a synthetic session; nothing on disk reaches
+    it.
     """
     ids, saw_spec = [], False
     for path in hand_paths:

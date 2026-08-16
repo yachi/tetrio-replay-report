@@ -317,5 +317,5 @@
   "schema": "equiv-coverage/1",
   "session": "2026-07-22",
   "what": "Hand-claim coverage by exhaustive mutation, per pipeline/claims/equiv.py: a hand-written claim counts as COVERED when some generated claim (or a pair of them) cannot be true unless it is, over every mutation of the dataset in the corpus, and both are falsifiable somewhere. This is NOT a proof of equivalence \u2014 it is a statement about one dataset under one family of perturbations, so a claim listed as covered is a claim the generators would have caught, not a theorem. Verdict SETS are stored and percentages are derived at read time, because the numerator is monotone non-decreasing in the generated ledger: adding a generated family can never lower a percentage, so only the attribution shows what an edit did.",
-  "windowed_claims": null
+  "windowed_claims": []
 }

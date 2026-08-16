@@ -204,26 +204,29 @@ jobs:
           }
           echo "  ok  generated ledger reproduces byte-for-byte"
 
-      # A session whose hand claims carry specs builds them from hand_claims.py the
-      # same way, so the committed ledger cannot drift from the module either. The
-      # older sessions have no such module and are skipped by the guard, not silently.
-      - name: Regenerate the hand ledger and compare with the committed one
+      # Every hand ledger is built from a spec-carrying module, so none of them can
+      # drift from its module either. The pairing comes from `hand_ledgers`, which
+      # RAISES on a ledger no module rebuilds — this step used to test for one
+      # hardcoded `hand_claims.py` and `exit 0` on its absence, so a session that
+      # split its hand claims across two modules (07-22 and 07-24 do) would have had
+      # both ledgers silently unchecked.
+      - name: Regenerate the hand ledgers and compare with the committed ones
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
-          if [ ! -f "$W/hand_claims.py" ]; then
-            echo "  --  $W has no hand_claims.py (its hand claims predate the spec algebra)"
-            exit 0
-          fi
-          before=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
-          python3 -m pipeline.claims.build_hand "$W/hand_claims.py" \
-            --facts "$W/facts.json" --out "$W/claims-narrative.json"
-          after=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
-          [ "$before" = "$after" ] || {
-            echo "FAIL: regenerating the hand ledger changed it — commit the new one" >&2
-            exit 1
-          }
-          echo "  ok  hand ledger reproduces byte-for-byte"
+          python3 -m pipeline.claims.build_hand --selftest
+          PAIRS=$(python3 -c "import sys;from pipeline.claims.build_hand import hand_ledgers;print('\n'.join('%s %s' % p for p in hand_ledgers(sys.argv[1])))" "$W")
+          [ -n "$PAIRS" ] || { echo "FAIL: $W has no hand ledger at all" >&2; exit 1; }
+          while read -r MOD OUT; do
+            before=$(sha256sum "$OUT" | cut -d' ' -f1)
+            python3 -m pipeline.claims.build_hand "$MOD" --facts "$W/facts.json" --out "$OUT"
+            after=$(sha256sum "$OUT" | cut -d' ' -f1)
+            [ "$before" = "$after" ] || {
+              echo "FAIL: regenerating $OUT changed it — commit the new one" >&2
+              exit 1
+            }
+            echo "  ok  $OUT reproduces byte-for-byte from $MOD"
+          done <<< "$PAIRS"
 
       # The charts read a JSON island. It used to be hand-written, so a chart could
       # disagree with facts.json and nothing would catch it — this makes that a
@@ -404,7 +407,7 @@ jobs:
       # The same claims, rendered to SMT-LIB from the same specs and checked by a
       # solver directly. Runs in well under a second, so the anti-vacuity mutation
       # test runs on every push here rather than weekly like the Dafny one.
-      # 96, not a token dozen: the sample is stratified so this covers all 32 kinds
+      # 96, not a token dozen: the sample is stratified so this covers all 31-36 kinds
       # of datum, and a 12-constant sample is what let two operator bugs through.
       # Costs ~5s.
       - name: Check the SMT-LIB artefact (regenerates, then solves and mutates)

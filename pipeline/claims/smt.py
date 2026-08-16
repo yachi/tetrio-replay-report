@@ -29,7 +29,8 @@ every value here is non-negative, so the two agree with floor. The algebra emits
 division today; if a family ever needs one, that equivalence is the thing to re-check
 before trusting the two backends to agree.
 """
-from .spec import c_winner, dafny_field, dafny_suffix, rounds_in, rounds_of
+from .spec import (c_winner, dafny_field, dafny_suffix, round_pairs, rounds_in,
+                   rounds_of, rounds_window)
 
 # Every string value in the corpus, mapped to an integer code. Populated by
 # `code_table()` from facts.json before rendering, so the codes are derived from
@@ -110,6 +111,14 @@ def _op(op):
 # --------------------------------------------------------------------------- #
 
 
+def _dur(mi, ri):
+    """One round's duration, the SMT twin of spec._dfy_dur — same single notion of
+    "how long that round was" behind both the `dur_cmp` Cond and the `dur` expression."""
+    a = dafny_field(mi, ri, "yachi", "lifetime")
+    b = dafny_field(mi, ri, "pinglamb", "lifetime")
+    return _ite(f"(>= {a} {b})", a, b)
+
+
 def smt_cond(facts, mi, ri, cond):
     k = cond["c"]
     if k == "winner":
@@ -118,9 +127,7 @@ def smt_cond(facts, mi, ri, cond):
         return (f"({_op(cond['op'])} {dafny_field(mi, ri, cond['pl'], cond['f'])} "
                 f"{cond['v']})")
     if k == "dur_cmp":
-        a = dafny_field(mi, ri, "yachi", "lifetime")
-        b = dafny_field(mi, ri, "pinglamb", "lifetime")
-        return f"({_op(cond['op'])} {_ite(f'(>= {a} {b})', a, b)} {cond['v']})"
+        return f"({_op(cond['op'])} {_dur(mi, ri)} {cond['v']})"
     if k == "winner_gt_loser":
         f = cond["f"]
         y, p = dafny_field(mi, ri, "yachi", f), dafny_field(mi, ri, "pinglamb", f)
@@ -169,6 +176,16 @@ def smt_expr(facts, e):
         return f"m{e['mi']}_lb_{e['pl']}_{dafny_suffix(e['f'])}"
     if k == "score":
         return f"m{e['mi']}_score{_cap(e['pl'])}"
+    if k == "score_of_winner":
+        a, b = facts["players"]
+        return _ite(f'(= m{e["mi"]}_winner {code(a)})',
+                    f"m{e['mi']}_score{_cap(a)}", f"m{e['mi']}_score{_cap(b)}")
+    if k == "dur":
+        return _dur(e["mi"], e["ri"])
+    if k == "nrounds":
+        return f"m{e['mi']}_nrounds"
+    if k == "nmatches":
+        return "nmatches"
     if k == "total_rounds":
         # The sum of the per-match consts, never the literal count — a literal turns
         # "the session had 50 rounds" into 50 = 50, which is unsat-on-negation while
@@ -197,6 +214,17 @@ def smt_expr(facts, e):
     if k == "count_rounds_range":
         return nary("+", [_ite(smt_cond(facts, mi, ri, e["cond"]), "1", "0")
                           for mi, ri in rounds_in(facts, e["lo"], e["hi"])])
+    if k == "count_rounds_window":
+        return nary("+", [_ite(smt_cond(facts, mi, ri, e["cond"]), "1", "0")
+                          for mi, ri in rounds_window(facts, e["lo"], e["hi"])])
+    if k == "count_round_pairs":
+        terms = []
+        for mi, pi, ci in round_pairs(facts):
+            t = smt_cond(facts, mi, pi, e["prev"])
+            if e["cur"] is not None:
+                t = nary("and", [t, smt_cond(facts, mi, ci, e["cur"])], "true")
+            terms.append(_ite(t, "1", "0"))
+        return nary("+", terms)
     if k == "sum_lb":
         return nary("+", [f"m{mi}_lb_{e['pl']}_{dafny_suffix(e['f'])}"
                           for mi in range(len(facts["matches"]))])

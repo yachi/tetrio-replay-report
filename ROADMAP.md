@@ -1743,6 +1743,8 @@ structurally impossible.)
      **07-28 onward are immune** — their bounds are rendered from the spec by `pipeline.codegen`, so
      the ledger is the only source and `gen_consistency.sh` byte-compares the result. The exposure is
      exactly the two sessions whose hand claims predate the spec algebra, 07-22 and 07-24.
+     ~~**CLOSED (2026-08-16)** — both sessions ported to the spec algebra and both emitters deleted;
+     see 「106 條手寫 claim 入返 spec 代數」 below. The exposure is now zero sessions.~~
    - **A third copy again, and the mutation test found it.** `sessions/2026-07-22/report/
      mutation_test.sh:58` hardcoded `"m9_r8_yachi_apm: int := 74105"` as mutant [8]. After the
      re-source it reported `NOT-APPLIED ... pattern not found — TEST BROKEN` and the suite came out
@@ -2027,8 +2029,114 @@ never measured, while its other two tests are hand-worked fixtures and session-i
 other sim and opener test names its own sessions, and the workflow comment at `:567` already says so
 ("One test reads it; the rest name their sessions themselves"). Documented scope, not an accident.
 
-**Genuinely the same shape, and still open:** `pipeline/sim/forecast-corpus.test.ts:71` hardcodes
+~~**Genuinely the same shape, and still open:** `pipeline/sim/forecast-corpus.test.ts:71` hardcodes
 2026-07-28 and pins `unattributed: 0` inside its bucket `toEqual`, commented "an improvement the step
 model cannot explain would invalidate the buckets above it". Choosing 07-28 is deliberate — it carries
 the corpus's only mechanism-established forecast — but it means that file never saw 08-14's 1 either.
-One file wide, same `DISCOVERED[0]` failure mode.
+One file wide, same `DISCOVERED[0]` failure mode.~~
+
+**DONE (2026-08-16), `fac914c`.** `forecast-corpus.test.ts` now pins all six sessions' bucket totals
+and reads `unattributed` from `UNATTRIBUTED_BY_SESSION` in `pipeline/sim/step-model-gap.ts` — the one
+list both granularities derive from, so a third event is added once instead of being mirrored by hand
+in two files that agreed "by inspection".
+
+## 106 條手寫 claim 入返 spec 代數 — 兩個 session-local emitter 刪清 (2026-08-16) — DONE
+
+**DONE.** 2026-07-22 同 2026-07-24 嘅 54 + 52 條手寫 claim 全部改寫成 spec，
+`sessions/*/report/codegen_dafny.py`（783 + 522 行）同 `build_proof_map.py`（71 + 55 行）四個檔案
+一齊刪走。刪 **1431 行**、加 1232 行（四個 `hand_claims_*.py` 共 1162 行，加 `pipeline/claims/idioms.py` 70
+行），淨減 199 行 —— 但重點唔係行數，係刪走嗰 1431 行係**第二份 bound**。呢個直接收咗上面「The session-local emitters are a SECOND SOURCE OF
+TRUTH」嗰粒 —— 而家零個 session 有第二份 bound。
+
+### 收咗嘅係一整類，唔係一單嘢
+
+那兩個 emitter 將每條 claim 嘅 bound 硬寫多一次，同 ledger 無任何關係，所以 ledger 一改就出現
+「lemma 證住舊 bound、上面三行 comment 引住新數」。上次靠 `dafny verify` 見到，純粹因為五個過時
+bound 啱啱好被新數據 falsify —— **一個仍然成立嘅過時 bound 會 verify 得乾乾淨淨、proof map 照樣
+verified、badge 照樣出街**，全 repo 冇一個 gate 會比較兩者。而家 bound 只有 ledger 一個來源，
+`gen_consistency.sh` 逐 byte 比對，呢一類冇咗。
+
+### 代數加咗七樣嘢，全部有等價論證
+
+`score_of_winner` · `dur` · `nrounds` · `nmatches` · `count_rounds_window` · `count_round_pairs` ·
+`alive` 用 0/1 出（`_int_lit`，因為 Python `bool` 係 `int` 嘅 subclass，f-string 會寫出 `True`，
+Dafny 同 SMT-LIB 都唔收）。三個要記住嘅決定：
+
+- **代數繼續係 conjunctive** —— 冇 `or`、冇 negation。「最大值係 V」寫成
+  `count_rounds(f > V) == 0` 同 `count_rounds(f == V) >= 1` 一對，`pipeline/claims/idioms.py` 收埋
+  等價論證。用 witness round 釘住反而**證多過句子講嘅嘢**，同 badge 證少過句子一樣係 drift。
+- **兩個 window index space，揀錯會靜靜雞改咗個 claim。** `count_rounds_range` 係**場**嘅窗，
+  `count_rounds_window` 係全 session **局**位置嘅窗。連勝會跨場，所以只可以用後者；用前者會把個
+  run 截喺場界。
+- **C021 個 window bound 冇得用「放鬆 bound」嚟 mutate。** 5 放到 6 個 conjunct 仍然真，帶住一個
+  被削弱但仍然真嘅 conjunct 嘅 conjunction 一樣 verify 到 —— 個 mutant 生還講唔到個 lemma 任何嘢。
+  真正殺得死佢嘅係改**數據**：m1r3 由 pinglamb 反做 yachi，兩個相鄰嘅 run 併成一個七局嘅 run，
+  其他 conjunct 全部照樣成立，得個 window bound 捉到。`mutation_test.sh` 入面兩個 mutant 都係咁釘。
+
+### 驗證：八個 layer 入面跑咗六個
+
+| | 07-22 | 07-24 |
+|---|---|---|
+| `dafny verify` | 54 verified, 0 errors | 52 verified, 0 errors |
+| `gen_consistency.sh` byte-identity | ok | ok |
+| `mutation_test.sh` | **17/17 killed**（原本 12） | **16/16 killed** |
+| `check_lemma_vacuity` | 144/144 falsified | 141/141 falsified |
+| `claims.smt2` + z3 + cvc5 | 144 claims, 100 ms | 141 claims, 60 ms |
+| `equiv.py` verdict sets | 逐 byte 不變 | 逐 byte 不變 |
+
+**Port 唔止要「照樣成立」，要「逐個 dataset 都一樣」—— 而呢個測試捉到一單嘢。** `bin/verify-session`
+只證到每條 ported predicate 喺 committed facts.json 上面係 True，但**一條被削弱嘅 predicate 一樣係
+True**，所以嗰個 gate 分唔到翻譯同放水。攞 `git HEAD` 嘅舊 `python_check` 同新嗰個，喺 `equiv.py`
+同一份窮舉 single-value mutation corpus 上面逐個 dataset 比對真值：07-24 **52 條 claim × 22 060 個
+dataset 完全一致**，07-22 **53 條一致，C021 唔一致**。
+
+C021 唔一致嘅原因唔係個 port 錯，係**舊嗰條 predicate 喺 `equiv.py` 入面根本 evaluate 唔到**。佢用
+`all(facts[...] for mi,ri in [...])` —— `facts` 出現喺 generator **body** 而唔係第一個 iterable，而
+generator body 有自己嘅 scope，睇唔到 `eval` 嘅 locals。`equiv.py`（同 `build_claims.validate`）將
+`facts` 放 locals，`check_claims.py` 放 globals，所以同一條 predicate 喺主 gate 年年綠、喺 equiv 入面
+年年 `NameError`。量過：HEAD 有兩條係咁，07-22 C021 同 `sessions/2026-07-24/proof/claims-24.json`
+C018。
+
+**一條 evaluate 唔到嘅 hand claim 會被算做 covered。** C021 喺三個 mode 嘅 `covered` 入面 —— 一條真值
+向量全部 undefined 嘅 claim，vacuously 被任何 generated claim implies。Port 之後佢真係 evaluate 到
+（10 + 21 個 dataset falsify 佢），而 `covered` 個 set 照樣一樣，所以出街嗰個百分比冇郁；但**佢之前係
+啱嘅原因係錯嘅**。Spec 代數由構造上出唔到呢個形狀（每個 `facts` 引用都喺 top level 或者第一個
+iterable），`build_claims.validate` 又用嚴格 scoping，所以 106 條 ported claim 全部即刻入咗閘。
+**未收嘅係兩個 evaluator 用緊唔同 scoping** —— `check_claims.py` 寬鬆嗰個先係 `bin/verify-session`
+行嘅嗰個。下一個 increment 收。
+
+**`equiv-coverage.json` 逐 byte 不變係最有力嗰個獨立證據。** 個 coverage 講嘅係邏輯結構 —— 邊條
+generated claim 嘅 truth vector 喺同一批 mutation site 下 implies 邊條 hand claim —— 完全冇經過
+呢次改寫嘅任何一行代碼。106 條 claim 換晒表示法而每條嘅 truth vector 一個 bit 都冇郁，係翻譯
+而唔係重寫嘅證據。
+
+**唯一真係郁咗嘅一個 field，本身就係一個發現。** `windowed_claims` 由 `null`（＝「讀唔到，因為
+冇 spec」）變成量得出嚟嘅值：07-22 係 `[]`，07-24 係 `["R015", "R018"]`。即係話 07-24 一直帶住兩條
+`count_rounds_range` claim，而 single-value coverage figure **原則上 falsify 唔到佢哋** —— 呢個
+session 過去一直被當成冇 windowed claim 嚟讀。
+
+### 順手捉到一個 CI 窿，佢同呢次 port 係同一個形狀
+
+`verify.yml` 個 hand-ledger byte-identity step 寫死 `[ -f "$W/hand_claims.py" ] || exit 0`。07-22 同
+07-24 拆咗做 narrative + coaching 兩個模組，所以個 step 會**靜靜雞跳過**，兩個 session 嘅 hand
+ledger 冇任何嘢睇住佢哋同模組同步。而家改成行 `build_hand.hand_ledgers()`，佢對**冇模組重建嘅
+ledger 直接 raise**，唔係跳過；`--selftest` 四個 case（兩個 mutant 兩個 control）證明兩邊都有牙。
+Control 唔可以省：一個乜都 raise 嘅 check 會免費「殺死」兩個 mutant。
+
+### 出街嘅嘢郁咗 108 行，全部係 lemma 名
+
+兩份 `report.html` 各自嘅 appendix 同 `claims-data` island 入面嘅 `lemma` 值變長咗 —— 舊
+emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出嚟嘅名同真正 emit 嗰個一致。冇一行
+散文、數字或者 status 郁過（逐行核過），`check_proof_links` 同 `check_badge_links` 兩個都綠。
+
+### 跟手要決定嘅三樣（唔係 bug，係 contract）
+
+1. **`codegen.partition_spec_ledgers` 而家永遠 `without == []`。** 佢係為 07-22/07-24 而存在嘅
+   「講明我漏咗乜」機制，而家 repo 入面冇任何工具整得出冇 spec 嘅 ledger。照本 repo 嘅標準
+   「冇 mutation 殺得死嘅 guard 係擺設」佢應該刪，連 `check_smt` 嗰段 narrowing 一齊；留低嘅
+   理由只有「佢寫低咗個 contract」。要揀，唔好當清潔做。
+2. **`check_equiv_coverage.windowed_claims` 個 `None` 分支同上。** 得 selftest 嘅合成 session 行到。
+3. **`sessions/2026-07-24/proof/` 仲有佢自己嘅 `codegen_dafny.py`。** 佢係 cross-check artefact，
+   `check_cross_artefact` 睇住佢同 `report/` 講同一件事，`bin/verify-session` 亦全綠。但佢係
+   corpus 入面最後一個 session-local emitter，同上面收咗嗰個 hazard 同一個形狀 —— 分別係佢冇
+   badge 出街。
