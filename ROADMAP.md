@@ -2553,11 +2553,28 @@ emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出�
 
 ### 跟手要決定嘅三樣（唔係 bug，係 contract）
 
-1. **`codegen.partition_spec_ledgers` 而家永遠 `without == []`。** 佢係為 07-22/07-24 而存在嘅
-   「講明我漏咗乜」機制，而家 repo 入面冇任何工具整得出冇 spec 嘅 ledger。照本 repo 嘅標準
-   「冇 mutation 殺得死嘅 guard 係擺設」佢應該刪，連 `check_smt` 嗰段 narrowing 一齊；留低嘅
-   理由只有「佢寫低咗個 contract」。要揀，唔好當清潔做。
-2. **`check_equiv_coverage.windowed_claims` 個 `None` 分支同上。** 得 selftest 嘅合成 session 行到。
+1. ~~**`codegen.partition_spec_ledgers` 而家永遠 `without == []`。**~~ **決定咗:留,而且個前提
+   要拆開兩件事(2026-08-17,量過)。** 本項將「函數」同「講明我漏咗乜嗰段」當咗同一件事,佢哋
+   嘅證據唔同:
+
+   - **個函數殺得死,唔係擺設。** Mutant:令佢將每個 ledger 都當成冇 spec(`with_spec` 永遠唔
+     收)。`check_smt --regen` **exit 1**(`usable` 變空 → `claims.smt2` 重出唔返 144 條 → byte
+     identity 爆),而 `verify.yml:365` 攞嘅 `[0]` 亦都會變空 list,即係 codegen 乜都唔出、
+     `dafny verify` 0 條 lemma。留意個 mutant 喺**冇** `--regen` 嗰陣生還(輸出一模一樣)——
+     byte-identity 嗰條路淨係 `--regen` 行,所以「跑咗 check_smt」唔等於「試過呢個 guard」。
+   - **真係喺現有資料上面行唔到嘅,係 `for p in skipped: print(...)` 嗰三行。** 冇工具整得出冇
+     spec 嘅 ledger,所以個 loop 一世唔會行。呢個係 `bestTspin` 個 null-slot return 同一類
+     ——「for the type, not the value」,旁邊擺住個量度。刪佢慳三行,而代價係本 repo 最硬嗰條
+     規矩(「name what you left out」)冇咗一個寫低嘅實例。
+
+   所以:函數留(有證據),reporting loop 都留(當佢係 contract,同 `bestTspin` 一樣待遇),但
+   兩者嘅理由由今日起分開寫,唔好再當成一件事。
+2. ~~**`check_equiv_coverage.windowed_claims` 個 `None` 分支同上。** 得 selftest 嘅合成 session 行到。~~
+   **決定咗:留(2026-08-17)。「得 selftest 行到」喺呢度唔係擺設嘅證據,啱啱相反。** 個 selftest
+   特登 plant `a["windowed_claims"] = None` 做一個 **control**,而佢自己嘅註釋寫明點解要有:
+   「Without this case the rule could be "always demand a two-site column", which is a different rule
+   that happens to catch the same mutant.」即係話呢個 case 分開緊兩條**唔同嘅規則**,而唔係重複
+   驗證同一條。一個淨係 selftest 行得到、但用嚟分開兩條規則嘅分支,同一個乜都唔做嘅分支係兩回事。
    (路徑係 `pipeline/claims/check_equiv_coverage.py`,唔係 `pipeline/check_equiv_coverage.py` ——
    核過 2026-08-16。個 docstring 自己亦都寫住點解而家冇 ledger 行得到嗰條分支:07-22 同 07-24 係
    最後兩個,port 咗入 spec 代數之後,佢哋個 `null` 變咗真係量到嘅 `[]` 同 `["R015", ...]`。)
