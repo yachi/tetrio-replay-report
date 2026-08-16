@@ -543,6 +543,9 @@ jobs:
   # The import gate is the other half of the same hole. `forecast.test.ts` imported a name that no
   # file exported, for weeks, green the whole time: Bun does not validate named exports, there is
   # no tsc step, and the tests were not run here. See pipeline/check_ts_imports.py.
+  # Two of those three still hold; "the tests were not run here" was fixed by the step below, in
+  # the commit that created this job. Do not read that as retiring the import gate — the defect it
+  # caught was an import that is never CALLED, which running the suite cannot evaluate.
   typescript:
     runs-on: ubuntu-22.04
     steps:

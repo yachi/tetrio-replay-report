@@ -3,12 +3,18 @@
 Why this exists as a gate rather than a habit. `forecast.test.ts` imported
 `isForecastOrUnverified` for weeks. Nothing exported it — not that file, not any file. The suite
 ran green the whole time, because three separate things have to go wrong at once and all three
-were already true here:
+were true here when this file was written:
 
   * Bun does not validate named exports. A missing one is `undefined` at runtime, and a name that
-    is imported but never *called* is never evaluated, so nothing throws.
+    is imported but never *called* is never evaluated, so nothing throws. STILL TRUE.
   * There is no `tsc` step. No tsconfig, no typescript dependency, nothing that reads the types.
+    STILL TRUE — checked 2026-08-16, there is no `package.json` either.
   * `bun test` is not in CI. Only `cross-extractor` runs Bun, and only to re-run the extractors.
+    **NO LONGER TRUE**, and the same commit that added this gate is what changed it: the
+    `typescript` job runs `REPLAY_DIR=sessions/2026-07-22 bun test` (`verify.yml:569`). Running
+    the suite does not subsume this gate, because the original defect was an import that was never
+    *called* — no amount of test execution evaluates it. It does narrow the window: a renamed
+    export that some test does call now fails in CI.
 
 So the import was invisible to every gate in the repo. The interesting part is not the dead name;
 it is that the same hole hides a *renamed* export, which is a real breakage that shows up as a
