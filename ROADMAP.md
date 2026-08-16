@@ -2,6 +2,13 @@
 
 Decisions locked: **public repo**, **everything included** (replays + reports + full pipeline), goal = **repeatable: drop in a batch of replays → get a report**.
 
+> **呢個 header 之下、去到「## 7. Open risks」為止,係 2026-07 寫嗰份原始計劃,照原文留低做記錄,
+> 唔會改成今日份 tree。所以嗰個 tree diagram 同 reuse audit 表入面有幾個名而家已經唔啱:
+> `codegen_dafny.py` 同兩個 session-local `build_proof_map.py` 喺 2026-08-16 刪咗(`d7e6384`),
+> emitter 係 `pipeline/codegen.py`;`check_claims.py` 唔再係「argv,原樣重用」——佢一度變成八份
+> byte-identical 嘅副本,而家淨返一個 module(`python3 -m pipeline.check_claims`)。要睇今日嘅
+> 結構,睇 CLAUDE.md,唔好睇呢一段。
+
 ## 0. What the repo is
 
 Not an archive with two reports in it. A **tool** (`pipeline/`) plus **data** (`sessions/`), where adding a session is one command plus an optional prose pass.
@@ -1150,6 +1157,13 @@ instances, all now at six sessions** — the workflow loop, `cross-tslot.test.ts
 its differential stayed empty. This paragraph read as still-open for a day after the fix landed, two
 sections above the entry recording it; that is the same staleness class it describes.
 
+**2026-08-16 —— 呢一項同下面個 fifth `Mechanism` 係同一個形狀,做嗰陣要一齊諗。** 兩者都係「個
+metric 攞成塊板一個 global 數字嚟答一個 slot-local 嘅問題」:`improved` 用嘅係成塊板嘅 best
+availability,而兩個 riser 都係 slot-local 升;而 `localiseMechanism` 冇 access bucket,係因為
+`bestTspin` 嘅 availability 係 reachability,而個 step model 淨係識問 formation。新嗰個 access
+branch 都係用 `bestTspinLines`(即係 global),所以 slot-local 改寫一落嚟,佢要一齊改。寫個 branch
+嗰陣要留意呢一點,唔好寫到 slot-local 改寫要重做佢。
+
 ## T-Spin Forecast — covering the definition's state space (2026-08-08)
 
 A four-agent sweep enumerated the metric's dimensions and cross-tabbed every cell against corpus
@@ -2003,6 +2017,39 @@ concrete cost, and it is the reason this is filed as a defect rather than a curi
 「消嗰行啱啱夾喺天花板同窿位中間」 *is* the strictly-inside test, so widening the branch would falsify
 a printed sentence to fix a miscount. Access needs its own value so both glosses stay true.
 
+**設計已經定咗:出 `access` 呢個 Mechanism,同時出一個新 kind,但個新 kind 唔入
+`isVerifiedForecast`(Design A)。** 三樣量過嘅嘢定咗佢:
+
+1. **淨係加一個 Mechanism 乜都唔會變。** `forecast.ts:717-726` 個 kind ladder 收尾係
+   `: 'self_built'`,所以一個新 mechanism 會靜靜雞跌落 self_built,上面講嗰個
+   404 → 403 根本唔會發生。要一齊加 kind。
+2. **插邊度係量出嚟嘅,唔係揀嘅。** 新 branch 放喺 strictly-inside 測試之後、`touches` 之前:
+
+   | 位置 | 全 corpus 重新分類幾多條 |
+   |---|---|
+   | strictly-inside 之前 | **7** —— 兩條 access 加**全部 5 條 `formed`**,即係成個 corpus 出街嗰批 forecast_lineclear。唔收得。 |
+   | line-clear 之後、touches 之前 | **2** —— in-prefix,prefix 以外 0 |
+   | touches/placement 之後 | **1** —— `touches` 會 short-circuit 咗 08-09 嗰條做 placement,即係confidently-wrong 嗰半原封不動 |
+
+3. **新 kind 唔可以入 `isVerifiedForecast`,因為 `spec/Forecast.dfy:506-530` 唔准。** Clause 3
+   `GapClosed` 講嘅係「天花板同個底之間嗰啲行縮咗」——就係 strictly-inside 嗰條規則,寫喺手寫嘅概念
+   spec 入面。一條 access event 消嘅行喺 `[roofAt, floorAt]` 之外,所以 `IsForecast` 係 false。畀佢
+   入 numerator 就係 TS 同 Dafny spec 對唔上,而喺呢個 repo 入面 spec 先係定義。個 spec 亦都完全冇
+   reachability 呢個詞彙(`availAtJ`/`availAtK` 係 opaque int)。個 kind 亦都**唔好**用 `forecast_`
+   做前綴:今日 `forecast_*` 剛剛好標住可以入 numerator 嗰兩個 kind。
+
+**上面「加一個 clause2_undecided」嗰句要更正。** 喺 Design A 之下 `clause2_undecided` 維持 0。佢只
+會喺 Design B(新 kind 入 numerator)之下先至出現,因為 08-14 嗰條 event 個 floorOrigin 量出嚟係
+`undetermined`——即係 clause 2 對佢係*查唔到答案*,唔係「通過」。原文寫「rejected by clause 4」讀落
+好似 clause 2 過咗,兩句都啱但合埋會誤導。
+
+**`step-model-gap.ts` 修好之後應該刪,唔係清空。** 08-14 嗰條變咗 `access`,所以每個 session 每個
+player 嘅 `unattributed` 都係 0,個 record 會變空——而一張空嘅具名例外清單,正正就係佢自己個 header
+話唔准嘅嘢(「一條例外唔到嘢嘅 stale entry,同漏咗一條一樣衰」),而且 `forecast-facts.test.ts:71-85`
+嗰個 reciprocal test 係 iterate entries 嘅,空 record 令佢變 vacuous。文件內容(點解呢一類存在、點解
+個 counter 淨係見到一半)要搬入新 branch 嘅 doc comment 同 `forecast-access-class.test.ts` 個 header,
+唔可以連檔案一齊冇咗。
+
 **No published rate moves**, which is why this could be deferred rather than rushed: 08-14's event is
 rejected by clause 4 (its closing clear was itself a T-spin) and 08-09's by clause 2
 (`floorOrigin: arrived-later`), so `forecast_total`, `forecast_rate_x1000`, the CIs and the
@@ -2140,3 +2187,35 @@ emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出�
    `check_cross_artefact` 睇住佢同 `report/` 講同一件事，`bin/verify-session` 亦全綠。但佢係
    corpus 入面最後一個 session-local emitter，同上面收咗嗰個 hazard 同一個形狀 —— 分別係佢冇
    badge 出街。
+
+## 兩份出街報告寫錯咗個 event 為咩唔計數 (2026-08-16) — OPEN
+
+`pipeline/forecast_section.py:333-340`:一見到 `mechanism_established > forecast_total`,就render
+一句寫死咗嘅理由 ——「但（當中 N 個）嘅底係天花板之後先至嚟嘅,所以計唔到數」。嗰句係 **clause 2**
+(`floorOrigin === 'arrived-later'`)。但 JSON 冇任何一個 field 講邊條 clause 否決咗個 event,所以嗰句
+係假設,唔係讀返嚟嘅。
+
+量過(獨立探針,行 `runCaseOracle` + `verifiedIndex`,重現到六個 artefact 嘅
+`mechanism_established` 1·1·2·2·2·1):三個唔計數嘅 event 入面**得一個**係 clause 2。
+
+| session | event | floorOrigin | closingClearWasSpin | 真正否決佢嘅 | 出街嗰句 |
+|---|---|---|---|---|---|
+| 2026-07-28 | `-6.ttrm` r5 pinglamb lock 32 | arrived-later | false | **clause 2** | 啱 |
+| 2026-08-09 | `-6.ttrm` r6 yachi lock 213 | pre-existed | **true** | **clause 4** | **錯** |
+| 2026-08-14 | `-2.ttrm` r3 yachi lock 18 | pre-existed | **true** | **clause 4** | **錯** |
+
+08-14 嗰句最斬釘截鐵——「但佢個底係天花板之後先至嚟嘅」——而嗰個 event 個底係 pre-existed,佢唔計數
+係因為**收尾嗰下消行本身就係一個 T-spin**。而且嗰局就係全 corpus 唯一嗰個 DT 砲(`-2.ttrm` r3
+yachi),即係成個 repo 講得最多嗰局,個錯誤理由就貼喺嗰度。
+
+**點解冇 gate 捉到:** `check_forecast_section.py` 係攞住 JSON 再 render 一次同出街嗰份逐 byte 比,
+而 JSON 根本冇 clause 資料。一個由假設砌出嚟嘅句子,喺一個「重新 render 再比對」嘅 gate 面前永遠一致。
+同 `check_prose_figures` 捉唔到 finesse 標籤、同 tape chart 住喺 shell 入面係同一個形狀:gate 睇住
+generated content,但個**理由**唔喺數據入面。
+
+**收法:** emit 一個 `rejected_by` breakdown(每個 mechanism-established 但唔計數嘅 event 由邊條
+clause 否決),句子照住佢分支。**唔好**改成「clause 2 或者 clause 4」——嗰個係寫嚟氹 checker,唔係
+寫俾讀者。同時要有一個 mutant:將 `rejected_by` 嘅值調轉,而 render 出嚟嘅句子必須要變。
+
+呢單同下面個 fifth `Mechanism` 係兩單嘢,但兩單都要改 `forecast-facts` 個 schema 同重出六份 artefact
+加六份報告,所以要順住做,schema `/8` → `/9` → `/10`,唔好夾埋一個 commit。
