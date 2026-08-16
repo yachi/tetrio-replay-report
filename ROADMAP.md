@@ -1125,7 +1125,57 @@ clean separation with no catalogue in it at all, and it is the spine of the new 
 (`pipeline/opener_section.py`, fed by `pipeline/sim/emit-opener-facts.ts`, quarantined outside the
 claims chain like the forecast section).
 
-### 2b — The saturation gate has fired, and the decision it defers is now live
+### 2b — The saturation gate has fired, and the decision it defers is now live — DONE (RESOLVED, global)
+
+**DONE 2026-08-12, `147e7f8`; struck here 2026-08-16.** The decision was taken, **in favour of the
+GLOBAL gate**, and it is gated — not deferred. What settled it: the switch to the oracle board source
+(verified prefix 24.8% → 92.3%) took the deferred list from 2 risers to **14**, and on all 14 a T-spin
+was **already globally available when the roof went up**. A forecast is a slot built while none was
+available; if one was already on the board, executing a different slot that happened to rise
+slot-locally is opportunism, not foresight. So `forecast-saturation.test.ts` stopped pinning identities
+and now asserts the PROPERTY that makes the decision sound (`roseWithoutRoofTspin` empty) — a future
+riser on a board with NO global T-spin at the roof would be a genuine masked-forecast candidate and
+fails there, which is what the list protected, without enumerating a growing corpus.
+
+**Everything below this line is superseded.** In particular "changing `improved` moves every published
+forecast figure in four sessions" is no longer the reason to hesitate — the reason is that the global
+gate is now the *justified* choice, and a slot-local rewrite would be a regression rather than a
+deferred improvement.
+
+Measured 2026-08-16 at six sessions while confirming this, because the numbers below are worth having
+and the entry quoted none of them — global vs slot-local `improved` over all 3 926 records in the
+verified prefixes.
+
+**Provenance, per this section's own measured/unverified convention.** The counterfactual was computed
+by an agent's probe; what I re-ran on the main thread is its **control**, which is the part that can be
+checked against something committed: the probe's GLOBAL side reproduces all **12 player-entries of all
+six `sim/forecast-facts.json` exactly, 0 mismatches**, and its baseline corpus `forecast_total` of 6 is
+the committed sum. So the driver is the shipped one and the global column is not a re-derivation. The
+slot-local column has no committed counterpart to check it against and is **unverified** in that
+narrower sense — it is one probe, and its own `roseWithoutRoofTspin` analogue is separately gated by
+`forecast-saturation.test.ts`, which is green at six sessions.
+
+| | slot-local YES | slot-local NO |
+|---|---|---|
+| **global YES** | 1 769 | **20** |
+| **global NO** | **18** | 2 119 |
+
+Both off-diagonal cells matter and this entry counted neither correctly. `global-no / local-yes` is
+**18**, not the "two deferred risers" recorded below — the 2 were a five-session, hand-port figure.
+And `global-yes / local-NO` — 20 events the global max credits while the executed slot did not
+improve — **had never been counted at all**, in either direction. A slot-local rewrite is not
+"catch 2 more": it is 38 reclassifications, 20 of them removals.
+
+Following all 38 through clauses 2-4: `mechanism_established` 9 → 15, `forecast_total` **6 → 7**
+corpus-wide. The one addition is `2026-07-22 pinglamb replay-8 r0 lock 48`, which is the same event
+the `access` branch would claim if it were inserted before the strictly-inside test — so the two
+open questions overlapped on exactly one record. No session's published headline breaks: 2026-08-14 is
+the only session printing 「冇一個 tucked 消行 T-spin 符合曬四項條件」 and it stays at 0.
+
+The 2026-08-16 note further up — "the `access` branch must not be written so a slot-local rewrite has
+to redo it" — is satisfied and moot in the same stroke: the branch is a counterfactual on `A` alone,
+so global-vs-slot-local lives entirely in the availability function it calls, and there is no rewrite
+coming anyway.
 
 **`forecast-saturation.test.ts` held `reactiveRose === 0` over four sessions. On 2026-08-10 it went
 to one:** `2026-08-09 pinglamb replay-2 r5 lock 26` rises 1 → 2 slot-locally while the board's
@@ -1163,6 +1213,12 @@ availability,而兩個 riser 都係 slot-local 升;而 `localiseMechanism` 冇 a
 `bestTspin` 嘅 availability 係 reachability,而個 step model 淨係識問 formation。新嗰個 access
 branch 都係用 `bestTspinLines`(即係 global),所以 slot-local 改寫一落嚟,佢要一齊改。寫個 branch
 嗰陣要留意呢一點,唔好寫到 slot-local 改寫要重做佢。
+
+**收咗(2026-08-16),而且兩邊都收:** access branch 落咗(`22ab03e`),個形狀係「淨係喺 `A` 度刪走
+同一批行」嘅 counterfactual,global 定 slot-local 完全困喺佢叫嗰個 availability function 入面,所以
+一個 slot-local 改寫係換個 measure,唔使動個 branch 本身 —— 呢個 note 要求嘅嘢做到咗。而個 slot-local
+改寫本身亦都唔會嚟:上面 2b 已經話咗,個決定 2026-08-12 就落咗,揀咗 global,而且有證有 gate。所以呢
+兩件事嘅共同點仍然啱(兩者都係 global 數字答 slot-local 問題),但佢已經唔再係一個要一齊做嘅顧慮。
 
 ## T-Spin Forecast — covering the definition's state space (2026-08-08)
 
