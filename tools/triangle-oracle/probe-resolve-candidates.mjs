@@ -3,7 +3,11 @@
 // frame (recorded confirm + documented garbagespeed 20, next-non-clearing-lock gate).
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { oracleSim } from "./oracle-forecast.mjs";
+// Boards from the PUBLISHED source (2026-08-16). Under it, two of the three candidates below are
+// `reactive`: oracle-forecast.mjs's deleted reconstruction attributed their roof cells to locks
+// holding a different piece. Only the 2026-07-28-6 r5 candidate still has a roof to order frames
+// against. See ForecastCandidate.dfy.
+import { runCaseOracle as oracleSim } from "../../pipeline/sim/oracle-source.ts";
 import { forecastMetric } from "../../pipeline/sim/forecast.ts";
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const CANDS = [

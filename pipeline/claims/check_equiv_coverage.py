@@ -84,11 +84,20 @@ per session — while `single_value` + `two_site_match` is ~4m13s for the corpus
   substitute for a push tier that re-measures, and its own success line says so.
 """
 import argparse
-import glob
 import json
 import os
 import re
 import sys
+
+# The document-parsing layer is SHARED with pipeline/check_loo.py, which gates the same three
+# files. Two parsers over one document agree until the document is reworded; see
+# pipeline/docs_gate.py's header for why they live in one place.
+from ..docs_gate import Prose, Table, granularity
+from ..docs_gate import candidate_dirs as _candidate_dirs
+from ..docs_gate import load_docs as _load_docs
+from ..docs_gate import reword as _reword
+from ..docs_gate import row_membership as _row_membership
+from ..docs_gate import session_dirs as _session_dirs
 
 ARTEFACT = "equiv-coverage.json"
 GENERATED = "claims-generated.json"
@@ -136,46 +145,25 @@ UPPER_BOUND_REASON = {
 # match (`sum_round_range(pl, f, mi, mi + 1)`), so this catches those too.
 WINDOW_OPS = {"sum_round_range", "count_rounds_range"}
 
-REWORD = ("If you reworded it, update the spec in pipeline/claims/check_equiv_coverage.py "
-          "so the figures stay gated.")
+REWORD = _reword("pipeline/claims/check_equiv_coverage.py")
 
 
 # --------------------------------------------------------------------------- sessions
 
 
 def candidate_dirs(root):
-    """Every `sessions/<date>/<sub>` directory carrying a claim ledger, sorted.
-
-    Deliberately wider than `sessions/*/report`: a glob narrow enough to miss
-    `sessions/2026-07-24/proof` would leave nothing to name, and naming what was left out is
-    the whole point of the rule at pipeline/codegen.py:76-78.
-    """
-    out = []
-    for d in sorted(glob.glob(os.path.join(root, "sessions", "*", "*"))):
-        if os.path.isdir(d) and glob.glob(os.path.join(d, "claims*.json")):
-            out.append(d)
-    return out
+    """Every `sessions/<date>/<sub>` directory carrying a claim ledger, sorted."""
+    return _candidate_dirs(root)
 
 
 def session_dirs(root):
-    """(measurable, excluded) — excluded is [(dir, why)], and every caller prints it."""
-    measurable, excluded = [], []
-    for d in candidate_dirs(root):
-        missing = [n for n in ("facts.json", GENERATED)
-                   if not os.path.exists(os.path.join(d, n))]
-        if missing:
-            excluded.append((d, "no " + " and no ".join(missing)))
-        else:
-            measurable.append((os.path.basename(os.path.dirname(d)), d))
-    # Sessions are keyed by date everywhere below, so two measurable directories under one date
-    # would have the second's artefact quietly replace the first's in every dict. Loud, because
-    # the failure would look like a session that simply measured differently than expected.
-    seen = [s for s, _ in measurable]
-    dupes = sorted({s for s in seen if seen.count(s) > 1})
-    if dupes:
-        raise SystemExit(f"more than one measurable directory under {', '.join(dupes)}: "
-                         + ", ".join(d for s, d in measurable if s in dupes))
-    return measurable, excluded
+    """(measurable, excluded) — excluded is [(dir, why)], and every caller prints it.
+
+    This gate needs BOTH facts.json and the generated ledger: with no ledger there is nothing
+    to measure coverage against. `pipeline/check_loo.py` requires only facts.json, which is
+    why the requirement is the caller's and not docs_gate's.
+    """
+    return _session_dirs(root, require=("facts.json", GENERATED))
 
 
 def hand_ledgers(report_dir):
@@ -386,56 +374,6 @@ def figures(artefact, mode):
 # --------------------------------------------------------------------------- document specs
 
 
-class Table:
-    """A markdown table keyed by session, one column per mode."""
-
-    def __init__(self, name, header, cell):
-        self.name, self.header, self.cell = name, header, cell
-
-    def rows(self, text):
-        """(columns, [(session, {column index: cell text})]) or None if it cannot be found."""
-        m = self.header.search(text)
-        if not m:
-            return None
-        lines = text[m.start():].split("\n")
-        block = []
-        for line in lines:
-            if not line.startswith("|"):
-                break
-            block.append([c.strip() for c in line.strip().strip("|").split("|")])
-        if len(block) < 3:
-            return None
-        cols = [_column_mode(c) for c in block[0]]
-        rows = []
-        for cells in block[2:]:
-            sm = re.search(r"\d{4}-\d{2}-\d{2}", cells[0] if cells else "")
-            if not sm:
-                return None
-            rows.append((sm.group(0), dict(enumerate(cells))))
-        return cols, rows
-
-    def check(self, text, arts):
-        parsed = self.rows(text)
-        if parsed is None:
-            return [f"{self.name}: could not parse the coverage table. {REWORD}"]
-        cols, rows = parsed
-        out = _row_membership(self.name, [s for s, _ in rows], arts)
-        published = [c for c in cols if c and c != "identical"]
-        if not published:
-            return out + [f"{self.name}: the coverage table publishes no mode column. {REWORD}"]
-        out += _granularity(self.name, published, arts)
-        for session, cells in rows:
-            art = arts.get(session)
-            if art is None:
-                continue                       # already reported by _row_membership
-            out += _companion(self.name, session, art, published)
-            for i, mode in enumerate(cols):
-                if not mode or i not in cells:
-                    continue
-                out += self.cell(self.name, session, art, mode, cells[i])
-        return out
-
-
 def _column_mode(header_cell):
     h = header_cell.lower()
     m = re.search(r"--two-site\W*(match|round)", h)
@@ -481,97 +419,60 @@ def _table_cell(name, session, art, mode, cell):
     return bad
 
 
-class Prose:
-    """A sentence listing `MM-DD single-value% -> two-site%` per session."""
-
-    def __init__(self, name, anchor, item):
-        self.name, self.anchor, self.item = name, anchor, item
-
-    def rows(self, text):
-        m = self.anchor.search(text)
-        if not m:
-            return None
-        # The WHOLE paragraph, not the tail from the anchor line: the granularity token sits
-        # in the lead sentence, ahead of the per-session list, and reading only forwards from
-        # the anchor would report a labelled paragraph as unlabelled.
-        start = text.rfind("\n\n", 0, m.start()) + 2
-        end = text.find("\n\n", m.start())
-        para = text[start:end if end >= 0 else len(text)]
-        found = self.item.findall(para)
-        return (para, found) if found else None
-
-    def check(self, text, arts):
-        parsed = self.rows(text)
-        if parsed is None:
-            return [f"{self.name}: could not parse the per-session coverage sentence. {REWORD}"]
-        para, found = parsed
-        listed = [suf for suf, _, _ in found]
-        gran = re.search(r"--two-site\W*(match|round)", para)
-        if not gran:
-            # An unlabelled `--two-site` figure cannot be checked against either mode, and the
-            # two do not agree: `match` is an upper bound on `round`. Not a skip — and the
-            # membership problems are still reported, so one reword does not hide the rest.
-            return _row_membership(
-                self.name, [s for s in arts if s[5:] in listed], arts
-            ) + [f"{self.name}: the sentence quotes a two-site figure without naming its "
-                 f"granularity — `match` is itself an upper bound. {REWORD}"]
-        two_mode = "two_site_" + gran.group(1)
-        suffixes = {}
-        for session in arts:
-            suffixes.setdefault(session[5:], []).append(session)
-        named = []
-        out = _granularity(self.name, ["single_value", two_mode], arts)
-        for short, single, two in found:
-            full = suffixes.get(short) or []
-            if len(full) != 1:
-                out.append(f"{self.name}: {short!r} names "
-                           f"{'no session on disk' if not full else 'more than one session'}")
+def _prose_verdict(spec, para, found, arts):
+    """The policy over CLAUDE.md's parsed per-session sentence. The parse itself is
+    docs_gate.Prose's; everything below is about coverage percentages."""
+    listed = [suf for suf, _, _ in found]
+    gran = re.search(r"--two-site\W*(match|round)", para)
+    if not gran:
+        # An unlabelled `--two-site` figure cannot be checked against either mode, and the
+        # two do not agree: `match` is an upper bound on `round`. Not a skip — and the
+        # membership problems are still reported, so one reword does not hide the rest.
+        return _membership(
+            spec.name, [s for s in arts if s[5:] in listed], arts
+        ) + [f"{spec.name}: the sentence quotes a two-site figure without naming its "
+             f"granularity — `match` is itself an upper bound. {REWORD}"]
+    two_mode = "two_site_" + gran.group(1)
+    suffixes = {}
+    for session in arts:
+        suffixes.setdefault(session[5:], []).append(session)
+    named = []
+    out = _granularity(spec.name, ["single_value", two_mode], arts)
+    for short, single, two in found:
+        full = suffixes.get(short) or []
+        if len(full) != 1:
+            out.append(f"{spec.name}: {short!r} names "
+                       f"{'no session on disk' if not full else 'more than one session'}")
+            continue
+        session, art = full[0], arts.get(full[0])
+        named.append(session)
+        if art is None:
+            continue                       # already reported by _membership
+        for mode, got in (("single_value", single), (two_mode, two)):
+            if mode not in art["modes"]:
+                out.append(f"{spec.name}: {session} quotes a {mode} figure the artefact "
+                           f"does not carry")
                 continue
-            session, art = full[0], arts.get(full[0])
-            named.append(session)
-            if art is None:
-                continue                       # already reported by _row_membership
-            for mode, got in (("single_value", single), (two_mode, two)):
-                if mode not in art["modes"]:
-                    out.append(f"{self.name}: {session} quotes a {mode} figure the artefact "
-                               f"does not carry")
-                    continue
-                want = figures(art, mode)[2]
-                if got + "%" != want:
-                    out.append(f"{self.name}: {session} quotes {got}% for {mode}; "
-                               f"the artefact gives {want}")
-        return _row_membership(self.name, named, arts) + out
+            want = figures(art, mode)[2]
+            if got + "%" != want:
+                out.append(f"{spec.name}: {session} quotes {got}% for {mode}; "
+                           f"the artefact gives {want}")
+    return _membership(spec.name, named, arts) + out
 
 
-def _row_membership(name, listed, arts):
-    """Every session on disk appears exactly once, and nothing else appears at all."""
-    out = []
-    for session in sorted(set(listed) - set(arts)):
-        out.append(f"{name}: publishes a figure for {session}, which is not a session on disk")
-    missing = sorted(set(arts) - set(listed))
-    if missing:
-        out.append(f"{name}: publishes {len(set(listed) & set(arts))} of the "
-                   f"{len(arts)} sessions on disk — nothing is published for "
-                   f"{', '.join(missing)}, so those sessions' coverage is unmeasured in public")
-    for session in sorted(s for s in set(listed) if listed.count(s) > 1):
-        out.append(f"{name}: publishes {session} more than once")
-    for session in sorted(s for s in set(listed) & set(arts) if arts[s] is None):
-        out.append(f"{name}: publishes a figure for {session}, which has no {ARTEFACT} "
-                   f"to check it against")
-    return out
+def _membership(name, listed, arts):
+    return _row_membership(name, listed, arts, ARTEFACT)
 
 
 def _granularity(name, published, arts):
     """A `match` figure published with no `round` companion, when a round run exists."""
-    if "two_site_match" not in published or "two_site_round" in published:
-        return []
-    have = sorted(s for s, a in arts.items() if a and "two_site_round" in a["modes"])
-    if not have:
-        return []
-    return [f"{name}: publishes the `--two-site match` figure only, but the artefacts for "
+    return granularity(
+        name, published, arts, "two_site_match", "two_site_round",
+        lambda n, have: (
+            f"{n}: publishes the `--two-site match` figure only, but the artefacts for "
             f"{', '.join(have)} carry a `round` run. `match` enumerates one round pair per "
             f"match pair and is an upper bound; a resolved bound still described as a bound "
-            f"is the staleness this gate exists to close."]
+            f"is the staleness this gate exists to close."))
 
 
 def _companion(name, session, art, published):
@@ -589,30 +490,25 @@ def _companion(name, session, art, published):
             f"figure alone is an upper bound published as a measurement."]
 
 
+def _table(name, header):
+    return Table(name, header, _table_cell, _column_mode, REWORD, ARTEFACT,
+                 per_table=(_granularity,), per_row=(_companion,))
+
+
 DOCS = (
-    Table("README.md",
-          re.compile(r"^\|\s*Session\s*\|[^\n]*single-value[^\n]*\|\s*$", re.M),
-          _table_cell),
-    Table("ROADMAP.md",
-          re.compile(r"^\|\s*Session\s*\|\s*Coverage\s*\|[^\n]*$", re.M),
-          _table_cell),
+    _table("README.md", re.compile(r"^\|\s*Session\s*\|[^\n]*single-value[^\n]*\|\s*$", re.M)),
+    _table("ROADMAP.md", re.compile(r"^\|\s*Session\s*\|\s*Coverage\s*\|[^\n]*$", re.M)),
     Prose("CLAUDE.md",
           re.compile(r"^[^\n]*Per-session:[^\n]*$", re.M),
-          re.compile(r"(\d{2}-\d{2})\s+\*{0,2}(\d+)%\*{0,2}\s*(?:→|->)\s*\*{0,2}(\d+)%\*{0,2}")),
+          re.compile(r"(\d{2}-\d{2})\s+\*{0,2}(\d+)%\*{0,2}\s*(?:→|->)\s*\*{0,2}(\d+)%\*{0,2}"),
+          _prose_verdict, REWORD, ARTEFACT),
 )
 
 DOC_NAMES = tuple(d.name for d in DOCS)
 
 
 def load_docs(root):
-    docs = {}
-    for name in DOC_NAMES:
-        path = os.path.join(root, name)
-        docs[name] = None
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as fh:
-                docs[name] = fh.read()
-    return docs
+    return _load_docs(root, DOC_NAMES)
 
 
 # --------------------------------------------------------------------------- the gate

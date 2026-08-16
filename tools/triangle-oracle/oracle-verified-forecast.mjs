@@ -8,7 +8,10 @@ import { fileURLToPath } from "node:url";
 import { Classes } from "@haelp/teto";
 const Game = Classes.Game;
 import { loadCases } from "../../pipeline/sim/verified-prefix.ts";
-import { oracleSim } from "./oracle-forecast.mjs";
+// Boards from the PUBLISHED source (2026-08-16); oracle-forecast.mjs's own reconstruction was
+// deleted — it named an impossible placer for 26.9% of roof cells and ran 28% past the end of
+// each round. See its header.
+import { runCaseOracle as oracleSim } from "../../pipeline/sim/oracle-source.ts";
 import { forecastMetric } from "../../pipeline/sim/forecast.ts";
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const SESS = `${ROOT}sessions`;

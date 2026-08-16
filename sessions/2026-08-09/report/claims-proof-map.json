@@ -575,7 +575,7 @@
  },
  {
   "id": "G083",
-  "lemma": "G083_m5r7_winner_yachi_led_on_every_attacking_column_apm_pps_no_inversion",
+  "lemma": "G083_m5r7_winner_yachi_led_on_every_attacking_axis_no_inversion",
   "file": "Claims.dfy",
   "family": "intense_round_edges",
   "status": "verified"

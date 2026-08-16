@@ -6162,8 +6162,8 @@
  {
   "family": "intense_round_profile",
   "category": "pace",
-  "canto": "最癲嘅一局（m8 第 8 局）yachi 嘅數：APM 約 78.6、PPS 約 1.53、VS 約 157.2、粒數 111、攻擊 95、射埋 84、食 31、清走 19、行數 59、最大單波 14、最高 B2B 7、入力 410、手順失誤 17、佢自己嘅時間 約 72 秒",
-  "english_gloss": "most intense round m8r8 — yachi: apm_x1000 78639, pps_x1000 1531, vs_x1000 157278, pieces 111, garbage_attack 95, garbagesent 84, garbagereceived 31, garbage_cleared 19, lines 59, maxspike 14, topbtb 7, inputs 410, finesse_faults 17, finaltime_ms 72733",
+  "canto": "最癲嘅一局（m8 第 8 局）yachi 嘅數：APM 約 78.6、PPS 約 1.53、VS 約 157.2、粒數 111、攻擊 95、射埋 84、食 31、清走 19、行數 59、最大單波 14、最高 B2B 7、佢自己嘅時間 約 72 秒",
+  "english_gloss": "most intense round m8r8 — yachi: apm_x1000 78639, pps_x1000 1531, vs_x1000 157278, pieces 111, garbage_attack 95, garbagesent 84, garbagereceived 31, garbage_cleared 19, lines 59, maxspike 14, topbtb 7, finaltime_ms 72733",
   "spec": {
    "p": "and",
    "xs": [
@@ -6328,34 +6328,6 @@
       "mi": 7,
       "ri": 7,
       "pl": "yachi",
-      "f": "inputs"
-     },
-     "b": {
-      "e": "lit",
-      "v": 410
-     }
-    },
-    {
-     "p": "eq",
-     "a": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "yachi",
-      "f": "finesse_faults"
-     },
-     "b": {
-      "e": "lit",
-      "v": 17
-     }
-    },
-    {
-     "p": "eq",
-     "a": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "yachi",
       "f": "finaltime_ms"
      },
      "b": {
@@ -6372,13 +6344,13 @@
    ]
   },
   "id": "G078",
-  "python_check": "(facts['matches'][7]['rounds'][7]['players']['yachi']['apm_x1000'] == 78639) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pps_x1000'] == 1531) and (facts['matches'][7]['rounds'][7]['players']['yachi']['vs_x1000'] == 157278) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pieces'] == 111) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_attack'] == 95) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbagesent'] == 84) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbagereceived'] == 31) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_cleared'] == 19) and (facts['matches'][7]['rounds'][7]['players']['yachi']['lines'] == 59) and (facts['matches'][7]['rounds'][7]['players']['yachi']['maxspike'] == 14) and (facts['matches'][7]['rounds'][7]['players']['yachi']['topbtb'] == 7) and (facts['matches'][7]['rounds'][7]['players']['yachi']['inputs'] == 410) and (facts['matches'][7]['rounds'][7]['players']['yachi']['finesse_faults'] == 17) and (facts['matches'][7]['rounds'][7]['players']['yachi']['finaltime_ms'] == 72733) and (facts['matches'][7]['rounds'][7]['winner']=='yachi')"
+  "python_check": "(facts['matches'][7]['rounds'][7]['players']['yachi']['apm_x1000'] == 78639) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pps_x1000'] == 1531) and (facts['matches'][7]['rounds'][7]['players']['yachi']['vs_x1000'] == 157278) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pieces'] == 111) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_attack'] == 95) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbagesent'] == 84) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbagereceived'] == 31) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_cleared'] == 19) and (facts['matches'][7]['rounds'][7]['players']['yachi']['lines'] == 59) and (facts['matches'][7]['rounds'][7]['players']['yachi']['maxspike'] == 14) and (facts['matches'][7]['rounds'][7]['players']['yachi']['topbtb'] == 7) and (facts['matches'][7]['rounds'][7]['players']['yachi']['finaltime_ms'] == 72733) and (facts['matches'][7]['rounds'][7]['winner']=='yachi')"
  },
  {
   "family": "intense_round_profile",
   "category": "pace",
-  "canto": "最癲嘅一局（m8 第 8 局）pinglamb 嘅數：APM 約 50.4、PPS 約 1.35、VS 約 129.6、粒數 98、攻擊 61、射埋 31、食 78、清走 33、行數 68、最大單波 10、最高 B2B 2、入力 359、手順失誤 30、佢自己嘅時間 約 72 秒",
-  "english_gloss": "most intense round m8r8 — pinglamb: apm_x1000 50494, pps_x1000 1352, vs_x1000 129685, pieces 98, garbage_attack 61, garbagesent 31, garbagereceived 78, garbage_cleared 33, lines 68, maxspike 10, topbtb 2, inputs 359, finesse_faults 30, finaltime_ms 72485",
+  "canto": "最癲嘅一局（m8 第 8 局）pinglamb 嘅數：APM 約 50.4、PPS 約 1.35、VS 約 129.6、粒數 98、攻擊 61、射埋 31、食 78、清走 33、行數 68、最大單波 10、最高 B2B 2、佢自己嘅時間 約 72 秒",
+  "english_gloss": "most intense round m8r8 — pinglamb: apm_x1000 50494, pps_x1000 1352, vs_x1000 129685, pieces 98, garbage_attack 61, garbagesent 31, garbagereceived 78, garbage_cleared 33, lines 68, maxspike 10, topbtb 2, finaltime_ms 72485",
   "spec": {
    "p": "and",
    "xs": [
@@ -6543,34 +6515,6 @@
       "mi": 7,
       "ri": 7,
       "pl": "pinglamb",
-      "f": "inputs"
-     },
-     "b": {
-      "e": "lit",
-      "v": 359
-     }
-    },
-    {
-     "p": "eq",
-     "a": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "pinglamb",
-      "f": "finesse_faults"
-     },
-     "b": {
-      "e": "lit",
-      "v": 30
-     }
-    },
-    {
-     "p": "eq",
-     "a": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "pinglamb",
       "f": "finaltime_ms"
      },
      "b": {
@@ -6587,13 +6531,13 @@
    ]
   },
   "id": "G079",
-  "python_check": "(facts['matches'][7]['rounds'][7]['players']['pinglamb']['apm_x1000'] == 50494) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['pps_x1000'] == 1352) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['vs_x1000'] == 129685) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['pieces'] == 98) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_attack'] == 61) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbagesent'] == 31) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbagereceived'] == 78) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_cleared'] == 33) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['lines'] == 68) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['maxspike'] == 10) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['topbtb'] == 2) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['inputs'] == 359) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['finesse_faults'] == 30) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['finaltime_ms'] == 72485) and (facts['matches'][7]['rounds'][7]['winner']=='yachi')"
+  "python_check": "(facts['matches'][7]['rounds'][7]['players']['pinglamb']['apm_x1000'] == 50494) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['pps_x1000'] == 1352) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['vs_x1000'] == 129685) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['pieces'] == 98) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_attack'] == 61) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbagesent'] == 31) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbagereceived'] == 78) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_cleared'] == 33) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['lines'] == 68) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['maxspike'] == 10) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['topbtb'] == 2) and (facts['matches'][7]['rounds'][7]['players']['pinglamb']['finaltime_ms'] == 72485) and (facts['matches'][7]['rounds'][7]['winner']=='yachi')"
  },
  {
   "family": "intense_round_edges",
   "category": "pace",
-  "canto": "最癲嘅一局係 yachi 贏，但佢喺 行數 呢 1 樣係落後嘅——贏嗰個唔係攻得最多嗰個",
-  "english_gloss": "m8r8 winner yachi trailed on 1 attacking columns: 行數",
+  "canto": "最癲嘅一局係 yachi 贏，但佢喺 行數 呢 1 條軸係落後嘅——贏嗰個唔係攻得最多嗰個",
+  "english_gloss": "m8r8 winner yachi trailed on 1 of 4 attacking axes: 行數",
   "spec": {
    "p": "and",
    "xs": [
@@ -6610,14 +6554,14 @@
       "mi": 7,
       "ri": 7,
       "pl": "yachi",
-      "f": "apm_x1000"
+      "f": "garbage_attack"
      },
      "b": {
       "e": "round",
       "mi": 7,
       "ri": 7,
       "pl": "pinglamb",
-      "f": "apm_x1000"
+      "f": "garbage_attack"
      }
     },
     {
@@ -6627,14 +6571,14 @@
       "mi": 7,
       "ri": 7,
       "pl": "yachi",
-      "f": "pps_x1000"
+      "f": "apm_x1000"
      },
      "b": {
       "e": "round",
       "mi": 7,
       "ri": 7,
       "pl": "pinglamb",
-      "f": "pps_x1000"
+      "f": "apm_x1000"
      }
     },
     {
@@ -6661,14 +6605,14 @@
       "mi": 7,
       "ri": 7,
       "pl": "yachi",
-      "f": "garbage_attack"
+      "f": "pps_x1000"
      },
      "b": {
       "e": "round",
       "mi": 7,
       "ri": 7,
       "pl": "pinglamb",
-      "f": "garbage_attack"
+      "f": "pps_x1000"
      }
     },
     {
@@ -6686,23 +6630,6 @@
       "ri": 7,
       "pl": "pinglamb",
       "f": "maxspike"
-     }
-    },
-    {
-     "p": "gt",
-     "a": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "yachi",
-      "f": "topbtb"
-     },
-     "b": {
-      "e": "round",
-      "mi": 7,
-      "ri": 7,
-      "pl": "pinglamb",
-      "f": "topbtb"
      }
     },
     {
@@ -6725,7 +6652,7 @@
    ]
   },
   "id": "G080",
-  "python_check": "(facts['matches'][7]['rounds'][7]['winner']=='yachi') and (facts['matches'][7]['rounds'][7]['players']['yachi']['apm_x1000'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['apm_x1000']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pps_x1000'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['pps_x1000']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pieces'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['pieces']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_attack'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_attack']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['maxspike'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['maxspike']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['topbtb'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['topbtb']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['lines'] < facts['matches'][7]['rounds'][7]['players']['pinglamb']['lines'])"
+  "python_check": "(facts['matches'][7]['rounds'][7]['winner']=='yachi') and (facts['matches'][7]['rounds'][7]['players']['yachi']['garbage_attack'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['garbage_attack']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['apm_x1000'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['apm_x1000']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pieces'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['pieces']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['pps_x1000'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['pps_x1000']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['maxspike'] > facts['matches'][7]['rounds'][7]['players']['pinglamb']['maxspike']) and (facts['matches'][7]['rounds'][7]['players']['yachi']['lines'] < facts['matches'][7]['rounds'][7]['players']['pinglamb']['lines'])"
  },
  {
   "family": "intense_round_attack_rate",

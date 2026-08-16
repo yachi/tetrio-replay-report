@@ -19,16 +19,45 @@ for the same reason: a section that recomputes can print a number no lemma cover
 
 What this section must never become. It is ONE round. It can show that a mechanism
 operated; it cannot show a tendency, and the closing note says so in those words.
-The session-level version of the same question is 數據對決's job, and the corpus
-version is the AUC block in CLAUDE.md — neither is restated here.
+The session-level version of the same question is 數據對決's job.
+
+The lede states ONE corpus result, and stating it strengthens the n=1 caveat rather
+than weakening it. The old rule here was that the corpus is never restated in this
+section; that rule was protecting against the section claiming a tendency FROM its one
+round, and a corpus figure labelled with its own n, its adjustment and its controls is
+the opposite of that — it is what lets the closing note say "the corpus says the
+mechanism is real, this round is the illustration, and neither is the other". What is
+still banned is a corpus figure the round appears to license, or the round's numbers
+generalised without one.
+
+The result: over 380 decided rounds in six sessions, downstacking is the only printed
+measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
+combined VS runs 62.3 → 65.0 → 83.5 for the per-piece rate (Spearman rho +0.210 against
+intensity, Holm-adjusted p 0.0002 over the 20 columns tested; raw 清走 +0.200, p 0.0020).
+It survives both controls the closing note quotes: it is not round LENGTH (the same test
+against duration is rho +0.058, Holm p 1.000, while APM's and 攻擊's apparent decay IS a
+length effect at rho −0.187 / −0.184, Holm p 0.0040 / 0.0098 — which is why the attacking
+lede this section used to carry was not supported as stated), and it is not the loser
+dying with garbage still on the board (normalising by how much garbage ARRIVED strengthens
+it to rho +0.236, and 食 — which carries that same death bias but no skill — does not
+trend, rho +0.096, p 0.06). That death bias is real all the same, and the note keeps it.
 """
 import html
 
 from pipeline import claim_cards
 from pipeline.claims.build_claims import SIMPLIFIED
+from pipeline.claims.generators import INTENSE_AXES, axis_verdict
 
 # Printed in this order. The labels match the claim Cantonese so a reader moving
 # between the table and the claims island sees the same words.
+#
+# 入力 and 手順失誤 are gone — see the note above `INTENSE_AXES` in generators.py for the
+# measurements. They were the only two rows the section had to talk the reader OUT of, and
+# the disclaimer paragraph that did so went with them; keeping one of the two would have
+# left that paragraph paying rent for a single row. They are also the only rows here that
+# 逐局全數據 does not already print, so a reader who wants them still has nowhere fewer
+# places to look than before: they were never anywhere else either, and a column whose
+# direction reverses with exposure is not made trustworthy by being proved.
 FIELDS = [
     ("apm_x1000", "APM", "r1"),
     ("pps_x1000", "PPS", "r2"),
@@ -41,15 +70,12 @@ FIELDS = [
     ("lines", "行數", None),
     ("maxspike", "最大單波", None),
     ("topbtb", "最高 B2B", None),
-    ("inputs", "入力", None),
-    ("finesse_faults", "手順失誤", None),
 ]
 
-EDGE_LABELS = {
-    "apm_x1000": "APM", "pps_x1000": "PPS", "pieces": "粒數",
-    "garbage_attack": "攻擊", "maxspike": "最大單波", "topbtb": "最高 B2B",
-    "lines": "行數",
-}
+# field -> label, and field -> axis, both derived from the generator's own axis map so the
+# section cannot group the sentence differently from the way the claim counted it.
+EDGE_LABELS = {f: label for _axis, cols in INTENSE_AXES for f, label in cols}
+EDGE_AXIS = {f: axis for axis, cols in INTENSE_AXES for f, _label in cols}
 
 CSS = """
 <style>
@@ -134,11 +160,31 @@ def _edges(claim):
         a, b = x.get("a") or {}, x.get("b") or {}
         if a.get("e") != "round" or b.get("e") != "round" or a.get("f") != b.get("f"):
             continue
-        {"lt": behind, "gt": ahead, "eq": level}.get(x.get("p"), []).append(a["f"])
+        # `.get(x.get("p"), [])` typed as `str | None` into a `str` key — a spec with no `p`
+        # would look up None, miss, and append to the throwaway list, i.e. silently drop an edge
+        # rather than fail. Read the operator once and skip when it is absent.
+        op = x.get("p")
+        if op in ("lt", "gt", "eq"):
+            {"lt": behind, "gt": ahead, "eq": level}[op].append(a["f"])
     if winner is None:
         return None
     return {"winner": winner, "behind": behind, "ahead": ahead, "level": level,
             "id": claim["id"], "verified": claim["verified"]}
+
+
+def _dir(edges, f):
+    """"behind" / "ahead" / "level" for one column, out of the proved edge claim.
+
+    Raises rather than defaulting. A column named in `INTENSE_AXES` but absent from the
+    claim means the ledger and the axis map disagree about what was compared, and the
+    plausible default ("level") would silently drop it from the axis count — the same
+    shape as the `?? 0` that published 「一個 Perfect Clear 都冇出過」 for five sessions.
+    """
+    for key in ("behind", "ahead", "level"):
+        if f in edges[key]:
+            return key
+    raise SystemExit(f"intense_round: {edges['id']} proves no direction for {f!r}, but "
+                     "generators.INTENSE_AXES counts it — regenerate the ledger")
 
 
 def _pinned_rate(between):
@@ -245,7 +291,17 @@ def build(facts, report_dir):
            '即係雙方都攻得最狠嗰一局。'
            '揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，'
            '短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。'
-           '下面每個數都係由 claim 本身證嗰條式度攞返嚟，'
+           '點解要專登揀最癲嗰局出嚟拆：'
+           '<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。'
+           '呢句唔係由下面呢一局睇出嚟嘅——係喺六個 session、380 局有勝負嘅局度量返嚟：'
+           '將全部局按「兩邊 VS 加埋」由低到高分三份，'
+           '每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
+           '由 62.3% 升到 65.0% 再升到 83.5%'
+           '（Spearman rho ＋0.210，Holm 校正後 p 0.0002），'
+           '而攻擊同 APM 完全冇呢個升勢。'
+           '下面呢一局係<strong>個例子</strong>，唔係個證據——'
+           '兩個控制實驗喺最尾嗰段。'
+           '每個數都係由 claim 本身證嗰條式度攞返嚟，'
            '唔係喺呢度重新計一次。</p>',
            '    <div class="ir-scroll">',
            '      <table class="ir-table">',
@@ -275,19 +331,49 @@ def build(facts, report_dir):
     # it liked.
     lose = [c["player"] for c in cols if c["player"] != win]
     lose = lose[0] if lose else ""
-    if edges["behind"]:
-        names = "、".join(EDGE_LABELS.get(f, f) for f in edges["behind"])
+    # Count AXES, not columns. APM is 攻擊 over the player's own clock and PPS is 粒數 over
+    # the same, so a flat count says "he lost two things" where the data says one. The
+    # bold cells stay per-column — every column's direction is proved, so every one that
+    # ran against the winner is still marked — and the sentence explains why there are
+    # more bold cells than axes. Grouping comes from the generator's own map, so the
+    # number quoted here and the number inside the claim cannot drift apart.
+    behind_ax = [a for a, _c in INTENSE_AXES
+                 if axis_verdict([_dir(edges, f) for f, _l in _c]) == "behind"]
+    ahead_ax = [a for a, _c in INTENSE_AXES
+                if axis_verdict([_dir(edges, f) for f, _l in _c]) == "ahead"]
+    paired = [a for a, c in INTENSE_AXES if len(c) > 1]
+    if behind_ax:
+        names = "、".join(behind_ax)
+        # The bold cells are per-column, so there are more of them than axes exactly when a
+        # trailing axis is one of the two paired ones. Saying so unconditionally was wrong
+        # on 2026-07-28, whose only trailing axis is the singleton 行數 — one cell, one
+        # axis. The counts are printed rather than described for the same reason: a reader
+        # can check them against the table, which a claim about their relative size is not.
+        n_cells = len(edges["behind"])
+        gap = (f'：<strong>{n_cells} 格、{len(behind_ax)} 條軸</strong>——'
+               f'因為 APM 就係攻擊除返自己嘅時間、PPS 就係粒數除返自己嘅時間，'
+               f'同一件事數兩次會將個發現吹大，所以數「輸幾多樣」係數軸，唔係數格。'
+               if n_cells > len(behind_ax) else '。')
         out.append(f'    <p class="ir-find">贏嘅係 <strong>{html.escape(win)}</strong>，'
-                   f'但佢喺 <strong>{names}</strong> 呢 {len(edges["behind"])} 樣'
-                   f'都<strong>輸蝕</strong>畀 {html.escape(lose)}——'
+                   f'但佢喺 <strong>{names}</strong> 呢 {len(behind_ax)} 條軸'
+                   f'{"都" if len(behind_ax) > 1 else ""}<strong>輸蝕</strong>'
+                   f'畀 {html.escape(lose)}——'
                    f'即係話呢局<strong>唔係攻得多嗰個贏</strong>。'
-                   f'表入面粗體嗰啲就係佢落後嗰幾格。</p>')
+                   f'表入面粗體嗰啲就係佢落後嗰幾格{gap}</p>')
     else:
-        names = "、".join(EDGE_LABELS.get(f, f) for f in edges["ahead"])
+        rest_ax = [a for a, _c in INTENSE_AXES if a not in behind_ax and a not in ahead_ax]
+        # Mirrors the claim's three branches — a level axis is named as level, never
+        # swept under 「每一條軸都領先」 while the list quietly omits it.
+        lead = (f'而佢喺 <strong>{"、".join(ahead_ax)}</strong> 每一條軸都'
+                f'<strong>領先</strong>' if not rest_ax else
+                f'佢喺 <strong>{"、".join(ahead_ax)}</strong> 領先，'
+                f'喺 <strong>{"、".join(rest_ax)}</strong> 打成平手，一條軸都冇輸')
         out.append(f'    <p class="ir-find">贏嘅係 <strong>{html.escape(win)}</strong>，'
-                   f'而佢喺 <strong>{names}</strong> 每一樣都<strong>領先</strong>——'
+                   f'{lead}——'
                    f'呢局冇得拗，唔使靠守就贏咗。'
-                   f'呢個結果本身值得記低：最癲嘅一局唔係次次都有反轉。</p>')
+                   f'呢個結果本身值得記低：最癲嘅一局唔係次次都有反轉。'
+                   f'（{"、".join(paired)}每條軸都係一個總數加返佢自己嘅速率，'
+                   f'兩格當一條軸計。）</p>')
 
     # The two per-piece rates, which is where these rounds are usually decided.
     if rates:
@@ -323,15 +409,31 @@ def build(facts, report_dir):
     out.append('    <p class="ir-note">'
                '讀呢節要記住：<strong>呢度得一局</strong>。'
                '一局可以話畀你聽「有件事發生咗」，'
-               '<strong>話唔到你聽「呢個人一向係咁」</strong>——'
+               '<strong>話唔到你聽「呢個人一向係咁」</strong>。'
+               '開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；'
+               '呢一局淨係做個例子，話畀你睇件事點樣發生。'
+               '兩者邊個都唔證明到對方——'
                '成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。'
-               '另外三樣：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，'
-               '<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數；'
-               '<strong>清走／食</strong>對輸嗰個嚟講係有偏差嘅，'
-               '因為佢死嗰陣塊板上面嗰啲垃圾按定義就係冇清到；'
-               '<strong>入力同手順失誤唔預測邊個贏</strong>——'
-               'KPP 喺六個 session 嘅 AUC 都喺五成上下，'
-               '擺喺度係當負面結果報，唔係當賣點。</p>')
+               '另外：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，'
+               '<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數。</p>')
+    # The corpus figure in the lede is the one number here that is not a claim, so the
+    # two things that could manufacture it are stated where the reader meets it. Both
+    # were measured before the lede was written, not after — the death bias in
+    # particular is an objection this section already documented against itself.
+    out.append('    <p class="ir-note">'
+               '個升勢查咗兩樣嘢先敢寫：'
+               '一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，'
+               'rho 得 ＋0.058、Holm 校正後 p 1.000，即係乜都冇；'
+               '反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應'
+               '（rho −0.187 同 −0.184，p 0.0040 同 0.0098）——'
+               '所以呢節以前用攻擊做主打嗰句，其實撐唔住。'
+               '二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——'
+               '除返收到幾多垃圾之後個升勢仲強（rho ＋0.236），'
+               '而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇顯著升勢'
+               '（rho ＋0.096，p 0.06）。'
+               '不過個偏差本身係真嘅，唔好當佢唔存在：'
+               '<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，'
+               '因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。</p>')
     out.append('    <p class="ir-note">Claim：'
                + html.escape(" · ".join(ids))
                + (" ⏳" if pending else " ✓") + '</p>')

@@ -7209,27 +7209,27 @@
 (check-sat)
 (pop 1)
 
-; G084 [intense_round_profile] most intense round m1r5 — yachi: apm_x1000 75678, pps_x1000 1465, vs_x1000 180380, pieces 108, garbage_attack 93, garbagesent 79, garbagereceived 53, garbage_cleared 40, lines 77, maxspike 10, topbtb 4, inputs 386, finesse_faults 14, finaltime_ms 73982
-; 最癲嘅一局（m1 第 5 局）yachi 嘅數：APM 約 75.6、PPS 約 1.46、VS 約 180.3、粒數 108、攻擊 93、射埋 79、食 53、清走 40、行數 77、最大單波 10、最高 B2B 4、入力 386、手順失誤 14、佢自己嘅時間 約 73 秒
+; G084 [intense_round_profile] most intense round m1r5 — yachi: apm_x1000 75678, pps_x1000 1465, vs_x1000 180380, pieces 108, garbage_attack 93, garbagesent 79, garbagereceived 53, garbage_cleared 40, lines 77, maxspike 10, topbtb 4, finaltime_ms 73982
+; 最癲嘅一局（m1 第 5 局）yachi 嘅數：APM 約 75.6、PPS 約 1.46、VS 約 180.3、粒數 108、攻擊 93、射埋 79、食 53、清走 40、行數 77、最大單波 10、最高 B2B 4、佢自己嘅時間 約 73 秒
 (push 1)
 (echo "G084")
-(assert (not (and (= m0_r4_yachi_apm 75678) (= m0_r4_yachi_pps 1465) (= m0_r4_yachi_vs 180380) (= m0_r4_yachi_pieces 108) (= m0_r4_yachi_garbage_attack 93) (= m0_r4_yachi_garbagesent 79) (= m0_r4_yachi_garbagereceived 53) (= m0_r4_yachi_garbage_cleared 40) (= m0_r4_yachi_lines 77) (= m0_r4_yachi_maxspike 10) (= m0_r4_yachi_topbtb 4) (= m0_r4_yachi_inputs 386) (= m0_r4_yachi_finesse_faults 14) (= m0_r4_yachi_finaltime_ms 73982) (= m0_r4_winner 1))))
+(assert (not (and (= m0_r4_yachi_apm 75678) (= m0_r4_yachi_pps 1465) (= m0_r4_yachi_vs 180380) (= m0_r4_yachi_pieces 108) (= m0_r4_yachi_garbage_attack 93) (= m0_r4_yachi_garbagesent 79) (= m0_r4_yachi_garbagereceived 53) (= m0_r4_yachi_garbage_cleared 40) (= m0_r4_yachi_lines 77) (= m0_r4_yachi_maxspike 10) (= m0_r4_yachi_topbtb 4) (= m0_r4_yachi_finaltime_ms 73982) (= m0_r4_winner 1))))
 (check-sat)
 (pop 1)
 
-; G085 [intense_round_profile] most intense round m1r5 — pinglamb: apm_x1000 77323, pps_x1000 1465, vs_x1000 156003, pieces 108, garbage_attack 95, garbagesent 68, garbagereceived 65, garbage_cleared 20, lines 60, maxspike 16, topbtb 4, inputs 401, finesse_faults 25, finaltime_ms 73732
-; 最癲嘅一局（m1 第 5 局）pinglamb 嘅數：APM 約 77.3、PPS 約 1.46、VS 約 156.0、粒數 108、攻擊 95、射埋 68、食 65、清走 20、行數 60、最大單波 16、最高 B2B 4、入力 401、手順失誤 25、佢自己嘅時間 約 73 秒
+; G085 [intense_round_profile] most intense round m1r5 — pinglamb: apm_x1000 77323, pps_x1000 1465, vs_x1000 156003, pieces 108, garbage_attack 95, garbagesent 68, garbagereceived 65, garbage_cleared 20, lines 60, maxspike 16, topbtb 4, finaltime_ms 73732
+; 最癲嘅一局（m1 第 5 局）pinglamb 嘅數：APM 約 77.3、PPS 約 1.46、VS 約 156.0、粒數 108、攻擊 95、射埋 68、食 65、清走 20、行數 60、最大單波 16、最高 B2B 4、佢自己嘅時間 約 73 秒
 (push 1)
 (echo "G085")
-(assert (not (and (= m0_r4_pinglamb_apm 77323) (= m0_r4_pinglamb_pps 1465) (= m0_r4_pinglamb_vs 156003) (= m0_r4_pinglamb_pieces 108) (= m0_r4_pinglamb_garbage_attack 95) (= m0_r4_pinglamb_garbagesent 68) (= m0_r4_pinglamb_garbagereceived 65) (= m0_r4_pinglamb_garbage_cleared 20) (= m0_r4_pinglamb_lines 60) (= m0_r4_pinglamb_maxspike 16) (= m0_r4_pinglamb_topbtb 4) (= m0_r4_pinglamb_inputs 401) (= m0_r4_pinglamb_finesse_faults 25) (= m0_r4_pinglamb_finaltime_ms 73732) (= m0_r4_winner 1))))
+(assert (not (and (= m0_r4_pinglamb_apm 77323) (= m0_r4_pinglamb_pps 1465) (= m0_r4_pinglamb_vs 156003) (= m0_r4_pinglamb_pieces 108) (= m0_r4_pinglamb_garbage_attack 95) (= m0_r4_pinglamb_garbagesent 68) (= m0_r4_pinglamb_garbagereceived 65) (= m0_r4_pinglamb_garbage_cleared 20) (= m0_r4_pinglamb_lines 60) (= m0_r4_pinglamb_maxspike 16) (= m0_r4_pinglamb_topbtb 4) (= m0_r4_pinglamb_finaltime_ms 73732) (= m0_r4_winner 1))))
 (check-sat)
 (pop 1)
 
-; G086 [intense_round_edges] m1r5 winner yachi trailed on 3 attacking columns: APM, 攻擊, 最大單波
-; 最癲嘅一局係 yachi 贏，但佢喺 APM、攻擊、最大單波 呢 3 樣係落後嘅——贏嗰個唔係攻得最多嗰個
+; G086 [intense_round_edges] m1r5 winner yachi trailed on 2 of 4 attacking axes: 攻擊量, 最大單波
+; 最癲嘅一局係 yachi 贏，但佢喺 攻擊量、最大單波 呢 2 條軸係落後嘅——贏嗰個唔係攻得最多嗰個
 (push 1)
 (echo "G086")
-(assert (not (and (= m0_r4_winner 1) (< m0_r4_yachi_apm m0_r4_pinglamb_apm) (= m0_r4_yachi_pps m0_r4_pinglamb_pps) (= m0_r4_yachi_pieces m0_r4_pinglamb_pieces) (< m0_r4_yachi_garbage_attack m0_r4_pinglamb_garbage_attack) (< m0_r4_yachi_maxspike m0_r4_pinglamb_maxspike) (= m0_r4_yachi_topbtb m0_r4_pinglamb_topbtb) (> m0_r4_yachi_lines m0_r4_pinglamb_lines))))
+(assert (not (and (= m0_r4_winner 1) (< m0_r4_yachi_garbage_attack m0_r4_pinglamb_garbage_attack) (< m0_r4_yachi_apm m0_r4_pinglamb_apm) (= m0_r4_yachi_pieces m0_r4_pinglamb_pieces) (= m0_r4_yachi_pps m0_r4_pinglamb_pps) (< m0_r4_yachi_maxspike m0_r4_pinglamb_maxspike) (> m0_r4_yachi_lines m0_r4_pinglamb_lines))))
 (check-sat)
 (pop 1)
 

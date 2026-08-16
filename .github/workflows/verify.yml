@@ -470,6 +470,33 @@ jobs:
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 
+  # A pooled figure that one round carries, published as if the session carried it. 2026-08-14's
+  # lost-regime APP gap moves 2.874 pp when m11r2 is dropped — rank 1 of 84, 1.72x the next — and
+  # 「the floors have met」 did not say so. The gate fails a figure whose largest single-round
+  # leave-one-out shift reaches half its own value unless its sentence carries the annotation.
+  #
+  # Here and NOT in equiv-coverage.yml, which is path-filtered on pipeline/claims/** and
+  # sessions/**: the edit this gate exists to catch is a prose edit to CLAUDE.md, which that
+  # filter does not fire on. Unconditional and every push, because it is offline and finishes in
+  # well under a second (0.06 s over the six sessions) — there is no schedule to hang it on.
+  #
+  # --selftest first: the threshold rests on a 2.386x gap in a 17-figure population, and a gate
+  # whose failure has never been demonstrated is not evidence of anything. The planted cases
+  # include a sixth figure crossing the threshold with nobody having named it, a named figure
+  # that stops crossing (an unearned caveat is as stale as a missing one), and a space inside a
+  # round label — the mutant that says the line-wrap tolerance is not a whitespace strip.
+  leave-one-out:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check no published pooled figure rests on one round in silence
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_loo --selftest
+          python3 -m pipeline.check_loo --check
+
   # The simulator's own test suite ran nowhere. `cross-extractor` above is the only job that
   # touches Bun and it only re-runs the extractors, so every assertion about the T-Spin Forecast
   # metric — the corpus census, the wiki fixtures, the clause-2 verdicts — was verified on

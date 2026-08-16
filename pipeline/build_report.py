@@ -26,6 +26,7 @@ import sys
 from pipeline import (appendix, chart_data, claim_cards, coaching, forecast_section, hero,
                       intense_round, matches, moments, opener_section, pc_section, records, region,
                       stats_section)
+from pipeline.claims import generators
 
 
 def chart_section(ctx):
@@ -232,6 +233,37 @@ def _selftest(report_dir):
             claim_cards.load = real
     else:
         print("  --  no pc_rounds claim in this session; its guard is not exercised here")
+
+    # 3. the ledger and generators.INTENSE_AXES disagree about which columns were compared.
+    # 最癲一局 counts AXES, so a column the axis map names but the claim never proved would
+    # silently drop out of that count — the plausible default ("level") is exactly the `?? 0`
+    # shape this repo has shipped before. intense_round._dir refuses instead, and this is
+    # what proves it refuses.
+    if any(c["family"] == "intense_round_edges" for c in claims):
+        real = claim_cards.load
+        dropped = generators.INTENSE_AXES[0][1][0][0]
+
+        def unproved(rd, *a, **k):
+            out = real(rd, *a, **k)
+            for c in out:
+                if c["family"] == "intense_round_edges":
+                    c["spec"] = {"p": "and", "xs": [
+                        x for x in c["spec"]["xs"]
+                        if (x.get("a") or {}).get("f") != dropped]}
+                    break
+            return out
+
+        claim_cards.load = unproved
+        try:
+            intense_round.build(facts, report_dir)
+            cases.append((f"intense_round_edges stops proving {dropped}", False))
+        except SystemExit:
+            cases.append((f"intense_round_edges stops proving {dropped}", True))
+        finally:
+            claim_cards.load = real
+    else:
+        print("  --  no intense_round_edges claim in this session; its guard is not "
+              "exercised here")
 
     for name, caught in cases:
         ok &= caught

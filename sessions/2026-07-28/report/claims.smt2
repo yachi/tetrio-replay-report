@@ -5419,27 +5419,27 @@
 (check-sat)
 (pop 1)
 
-; G078 [intense_round_profile] most intense round m8r8 — yachi: apm_x1000 78639, pps_x1000 1531, vs_x1000 157278, pieces 111, garbage_attack 95, garbagesent 84, garbagereceived 31, garbage_cleared 19, lines 59, maxspike 14, topbtb 7, inputs 410, finesse_faults 17, finaltime_ms 72733
-; 最癲嘅一局（m8 第 8 局）yachi 嘅數：APM 約 78.6、PPS 約 1.53、VS 約 157.2、粒數 111、攻擊 95、射埋 84、食 31、清走 19、行數 59、最大單波 14、最高 B2B 7、入力 410、手順失誤 17、佢自己嘅時間 約 72 秒
+; G078 [intense_round_profile] most intense round m8r8 — yachi: apm_x1000 78639, pps_x1000 1531, vs_x1000 157278, pieces 111, garbage_attack 95, garbagesent 84, garbagereceived 31, garbage_cleared 19, lines 59, maxspike 14, topbtb 7, finaltime_ms 72733
+; 最癲嘅一局（m8 第 8 局）yachi 嘅數：APM 約 78.6、PPS 約 1.53、VS 約 157.2、粒數 111、攻擊 95、射埋 84、食 31、清走 19、行數 59、最大單波 14、最高 B2B 7、佢自己嘅時間 約 72 秒
 (push 1)
 (echo "G078")
-(assert (not (and (= m7_r7_yachi_apm 78639) (= m7_r7_yachi_pps 1531) (= m7_r7_yachi_vs 157278) (= m7_r7_yachi_pieces 111) (= m7_r7_yachi_garbage_attack 95) (= m7_r7_yachi_garbagesent 84) (= m7_r7_yachi_garbagereceived 31) (= m7_r7_yachi_garbage_cleared 19) (= m7_r7_yachi_lines 59) (= m7_r7_yachi_maxspike 14) (= m7_r7_yachi_topbtb 7) (= m7_r7_yachi_inputs 410) (= m7_r7_yachi_finesse_faults 17) (= m7_r7_yachi_finaltime_ms 72733) (= m7_r7_winner 1))))
+(assert (not (and (= m7_r7_yachi_apm 78639) (= m7_r7_yachi_pps 1531) (= m7_r7_yachi_vs 157278) (= m7_r7_yachi_pieces 111) (= m7_r7_yachi_garbage_attack 95) (= m7_r7_yachi_garbagesent 84) (= m7_r7_yachi_garbagereceived 31) (= m7_r7_yachi_garbage_cleared 19) (= m7_r7_yachi_lines 59) (= m7_r7_yachi_maxspike 14) (= m7_r7_yachi_topbtb 7) (= m7_r7_yachi_finaltime_ms 72733) (= m7_r7_winner 1))))
 (check-sat)
 (pop 1)
 
-; G079 [intense_round_profile] most intense round m8r8 — pinglamb: apm_x1000 50494, pps_x1000 1352, vs_x1000 129685, pieces 98, garbage_attack 61, garbagesent 31, garbagereceived 78, garbage_cleared 33, lines 68, maxspike 10, topbtb 2, inputs 359, finesse_faults 30, finaltime_ms 72485
-; 最癲嘅一局（m8 第 8 局）pinglamb 嘅數：APM 約 50.4、PPS 約 1.35、VS 約 129.6、粒數 98、攻擊 61、射埋 31、食 78、清走 33、行數 68、最大單波 10、最高 B2B 2、入力 359、手順失誤 30、佢自己嘅時間 約 72 秒
+; G079 [intense_round_profile] most intense round m8r8 — pinglamb: apm_x1000 50494, pps_x1000 1352, vs_x1000 129685, pieces 98, garbage_attack 61, garbagesent 31, garbagereceived 78, garbage_cleared 33, lines 68, maxspike 10, topbtb 2, finaltime_ms 72485
+; 最癲嘅一局（m8 第 8 局）pinglamb 嘅數：APM 約 50.4、PPS 約 1.35、VS 約 129.6、粒數 98、攻擊 61、射埋 31、食 78、清走 33、行數 68、最大單波 10、最高 B2B 2、佢自己嘅時間 約 72 秒
 (push 1)
 (echo "G079")
-(assert (not (and (= m7_r7_pinglamb_apm 50494) (= m7_r7_pinglamb_pps 1352) (= m7_r7_pinglamb_vs 129685) (= m7_r7_pinglamb_pieces 98) (= m7_r7_pinglamb_garbage_attack 61) (= m7_r7_pinglamb_garbagesent 31) (= m7_r7_pinglamb_garbagereceived 78) (= m7_r7_pinglamb_garbage_cleared 33) (= m7_r7_pinglamb_lines 68) (= m7_r7_pinglamb_maxspike 10) (= m7_r7_pinglamb_topbtb 2) (= m7_r7_pinglamb_inputs 359) (= m7_r7_pinglamb_finesse_faults 30) (= m7_r7_pinglamb_finaltime_ms 72485) (= m7_r7_winner 1))))
+(assert (not (and (= m7_r7_pinglamb_apm 50494) (= m7_r7_pinglamb_pps 1352) (= m7_r7_pinglamb_vs 129685) (= m7_r7_pinglamb_pieces 98) (= m7_r7_pinglamb_garbage_attack 61) (= m7_r7_pinglamb_garbagesent 31) (= m7_r7_pinglamb_garbagereceived 78) (= m7_r7_pinglamb_garbage_cleared 33) (= m7_r7_pinglamb_lines 68) (= m7_r7_pinglamb_maxspike 10) (= m7_r7_pinglamb_topbtb 2) (= m7_r7_pinglamb_finaltime_ms 72485) (= m7_r7_winner 1))))
 (check-sat)
 (pop 1)
 
-; G080 [intense_round_edges] m8r8 winner yachi trailed on 1 attacking columns: 行數
-; 最癲嘅一局係 yachi 贏，但佢喺 行數 呢 1 樣係落後嘅——贏嗰個唔係攻得最多嗰個
+; G080 [intense_round_edges] m8r8 winner yachi trailed on 1 of 4 attacking axes: 行數
+; 最癲嘅一局係 yachi 贏，但佢喺 行數 呢 1 條軸係落後嘅——贏嗰個唔係攻得最多嗰個
 (push 1)
 (echo "G080")
-(assert (not (and (= m7_r7_winner 1) (> m7_r7_yachi_apm m7_r7_pinglamb_apm) (> m7_r7_yachi_pps m7_r7_pinglamb_pps) (> m7_r7_yachi_pieces m7_r7_pinglamb_pieces) (> m7_r7_yachi_garbage_attack m7_r7_pinglamb_garbage_attack) (> m7_r7_yachi_maxspike m7_r7_pinglamb_maxspike) (> m7_r7_yachi_topbtb m7_r7_pinglamb_topbtb) (< m7_r7_yachi_lines m7_r7_pinglamb_lines))))
+(assert (not (and (= m7_r7_winner 1) (> m7_r7_yachi_garbage_attack m7_r7_pinglamb_garbage_attack) (> m7_r7_yachi_apm m7_r7_pinglamb_apm) (> m7_r7_yachi_pieces m7_r7_pinglamb_pieces) (> m7_r7_yachi_pps m7_r7_pinglamb_pps) (> m7_r7_yachi_maxspike m7_r7_pinglamb_maxspike) (< m7_r7_yachi_lines m7_r7_pinglamb_lines))))
 (check-sat)
 (pop 1)
 

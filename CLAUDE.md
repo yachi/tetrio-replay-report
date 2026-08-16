@@ -201,6 +201,29 @@ equivalent marker pair.
   card printed `第 {index} 場`, so a badge proving something about m1 would have sat on a
   card labelled 第 2 場. Both extractors renumber after sorting; every earlier session's
   `facts.json` is byte-identical under the change, which is what makes it safe.
+- **A round carries THREE stat objects and both extractors mix two of them.** `player.stats` is a
+  live in-game tick; `player.replay.results.stats` is the final snapshot; `player.replay.results.`
+  `aggregatestats` = `{apm, pps, vsscore}` is the final *rate* triple and nothing in the repo reads
+  it. `apm_x1000`/`pps_x1000`/`vs_x1000` come from the live tick while `garbage_attack` /
+  `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
+  can be one tick apart — the whole of the VS-identity residual. The live tick is stale in 183 of 760
+  player-rounds and **181 of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
+  in the residual is a fact about whose round ran longer, never about how someone plays.
+  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds — **exact up to
+  `finaltime`'s own millisecond rounding, not exact simpliciter** — as `100·(attack+cleared)/T`,
+  `60·attack/T`, `pieces/T` with **T = ⌊finaltime_ms·60/1000⌋/60**, the integer FRAME count, floored.
+  `finaltime_ms/1000` is not that T (it is fractional-frame) and leaves up to 1.2e-3 on 247 of the
+  760, all of it the clock, so a probe that uses it reports a discrepancy the data does not have.
+- **The finesse counters are on two different units, so any finesse rate must name its denominator.**
+  `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
+  several — pooled, 11 865 faults over 7 510 non-perfect pieces = **1.580 per faulty piece**. Four
+  defensible rates, four different numbers, and only one is what TETR.IO displays:
+  `faults/pieces` = **16.83%** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **10.65%**; TETR.IO's own figure is `perfect/pieces` = **89.35%**; and
+  `faults/(faults+perfect)` = **15.85%** is on no meaningful denominator and must not be used. A
+  bare「失誤率」 reads as the 10.65% and is usually the 16.83%. osk publishes no definition for any
+  of the three fields, so the per-excess-input granularity is inferred, not specified.
 
 ## What the data actually says (measured, not asserted)
 
@@ -238,7 +261,9 @@ probe rather than assuming a stat is informative.
 **08-09 splits APP the other way, and that is the finding of the fifth session.** Every earlier
 session had one player ahead in *both* regimes by a similar margin — a style difference. Pool
 attack over pieces after splitting the 50 rounds by who won them and the two regimes come
-apart: won .6738 vs .6862 (+1.8%), lost .5124 vs .6425 (+25.4%) [C002]. yachi's won-round rate
+apart: won .6738 vs .6862 (+1.8%), lost .5124 vs .6425 (+25.4%) [C002]。個 won-gap 得一局撐住
+（留一局：抽走 m2r5，數字變 +4.26%，即係郁 2.41 pp），50 局入面排第一，係第二大嗰局嘅
+1.38 倍——所以「+1.8，成個 corpus 最細」講得，「兩邊贏嘅局打成平手」講唔得。yachi's won-round rate
 is above pinglamb's *lost*-round rate [C003]. The rank test says this is not a variance
 artefact — over losing rounds P(yachi > pinglamb) = 0.138, permutation p = 1e-5; over winning
 rounds 0.464, p = 0.34 — and it survives dropping the three near-zero rounds. The per-session
@@ -255,7 +280,9 @@ won-gap runs +5.8 · +10.8 · +5.9 · +7.9 · **+1.8**, the lost-gap +12.8 · +7
 
 **08-14 is 08-09's mirror, and that pair is why the split must be re-derived every session.**
 Same decomposition, opposite answer: won .6032 vs .7174 (+18.9%), lost .5629 vs .5729 (+1.8%)
-[C002]. The floors have met; the ceilings have not. The two per-session series now read
+[C002]. The floors have met; the ceilings have not. 但個 lost-gap 得一局撐住
+（留一局：抽走 m11r2，數字變 +4.65%，即係郁 2.87 pp），84 局入面排第一，係第二大嗰局嘅
+1.72 倍——「地板撞埋」係成晚嘅講法,「差 1.8 pp」唔係。The two per-session series now read
 
     won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  **+18.9**
     lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   **+1.8**
@@ -319,14 +346,19 @@ must be re-run before publishing a figure.
 the first two matches and lost six straight, but his rate did not collapse — in matches 1-2 the
 two players' APP were level (0.62305 vs 0.62216, yachi ahead by 0.0009) and from match 3 they
 separated, pinglamb +4.99% and yachi −4.92%. Both totals are nearly equal (attack 3264 vs 3249)
-because yachi threw 378 more pieces to get there. That is what `sum_round_range` exists for.
+because yachi threw 378 more pieces to get there. 企得穩嘅係「兩邊差唔多」,唔係個差額:
+「差 15 行」得一局撐住（留一局：抽走 m8r8，數字變 -49 行，即係郁 34 行），連正負號都反轉。
+That is what `sum_round_range` exists for.
 
 08-01 asks the next question down: **APP decides a round, and it does not decide a night.**
 pinglamb's APP was higher in all seven matches and in both regimes — his won rounds beat
 yachi's won rounds, his lost rounds beat yachi's lost rounds — yet he lost the series 3:4. The
 totals land on top of each other (attack 3394 vs 3426, in-game score 1087345 vs 1087921, 0.05%
 apart) because yachi bought the 7% efficiency gap back with 326 extra pieces at a higher PPS
-in all seven matches. Two routes, one destination; the night was then decided by *which* rounds
+in all seven matches. 兩個差額都係一局話事——攻擊差額
+（留一局：抽走 m1r4，數字變 -1 行，即係郁 31 行），分數差額
+（留一局：抽走 m6r5，數字變 +11480 分，即係郁 12056 分），兩個都會反轉正負號。
+所以「差 32 行」同「差 576 分」唔好照抄,企得穩嘅係「兩邊撞埋一齊」。 Two routes, one destination; the night was then decided by *which* rounds
 fell where — the seven matches alternate winners perfectly, so it came down to the last one.
 Same window operator, per-match windows this time: `sum_round_range(pl, f, mi, mi+1)` is how
 "in all seven matches" gets proved match by match instead of asserted from a session sum.

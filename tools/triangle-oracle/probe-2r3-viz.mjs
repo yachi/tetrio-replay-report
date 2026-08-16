@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { oracleSim } from "./oracle-forecast.mjs";
+// Boards from the PUBLISHED source. This read `oracleSim` from oracle-forecast.mjs until
+// 2026-08-16, when that file's own reconstruction was deleted — see its header for the 26.9%
+// inadmissible-provenance measurement that withdrew the candidate this probe was drawing.
+import { runCaseOracle as oracleSim } from "../../pipeline/sim/oracle-source.ts";
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const d = JSON.parse(readFileSync(`${ROOT}sessions/2026-07-28/replay-2026-07-28-2.ttrm`,"utf8"));
 const rp = d.replay.rounds[3];

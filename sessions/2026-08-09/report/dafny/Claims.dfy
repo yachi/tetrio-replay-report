@@ -566,24 +566,24 @@ lemma G080_7_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_4_of_t
 {
 }
 
-// G081 [intense_round_profile] most intense round m5r7 — yachi: apm_x1000 61883, pps_x1000 1477, vs_x1000 140643, pieces 189, garbage_attack 132, garbagesent 111, garbagereceived 73, garbage_cleared 48, lines 118, maxspike 17, topbtb 3, inputs 669, finesse_faults 24, finaltime_ms 128100
-// 最癲嘅一局（m5 第 7 局）yachi 嘅數：APM 約 61.8、PPS 約 1.47、VS 約 140.6、粒數 189、攻擊 132、射埋 111、食 73、清走 48、行數 118、最大單波 17、最高 B2B 3、入力 669、手順失誤 24、佢自己嘅時間 約 128 秒
+// G081 [intense_round_profile] most intense round m5r7 — yachi: apm_x1000 61883, pps_x1000 1477, vs_x1000 140643, pieces 189, garbage_attack 132, garbagesent 111, garbagereceived 73, garbage_cleared 48, lines 118, maxspike 17, topbtb 3, finaltime_ms 128100
+// 最癲嘅一局（m5 第 7 局）yachi 嘅數：APM 約 61.8、PPS 約 1.47、VS 約 140.6、粒數 189、攻擊 132、射埋 111、食 73、清走 48、行數 118、最大單波 17、最高 B2B 3、佢自己嘅時間 約 128 秒
 lemma G081_most_intense_round_m5r7_yachi_apm_x1000_61883_pps_x1000_1477_vs_x1000()
-  ensures ((((m4_r6_yachi_apm == 61883) && ((m4_r6_yachi_pps == 1477) && (m4_r6_yachi_vs == 140643))) && (((m4_r6_yachi_pieces == 189) && (m4_r6_yachi_garbage_attack == 132)) && ((m4_r6_yachi_garbagesent == 111) && (m4_r6_yachi_garbagereceived == 73)))) && ((((m4_r6_yachi_garbage_cleared == 48) && (m4_r6_yachi_lines == 118)) && ((m4_r6_yachi_maxspike == 17) && (m4_r6_yachi_topbtb == 3))) && (((m4_r6_yachi_inputs == 669) && (m4_r6_yachi_finesse_faults == 24)) && ((m4_r6_yachi_finaltime_ms == 128100) && (m4_r6_winner == "yachi")))))
+  ensures ((((m4_r6_yachi_apm == 61883) && ((m4_r6_yachi_pps == 1477) && (m4_r6_yachi_vs == 140643))) && ((m4_r6_yachi_pieces == 189) && ((m4_r6_yachi_garbage_attack == 132) && (m4_r6_yachi_garbagesent == 111)))) && (((m4_r6_yachi_garbagereceived == 73) && ((m4_r6_yachi_garbage_cleared == 48) && (m4_r6_yachi_lines == 118))) && (((m4_r6_yachi_maxspike == 17) && (m4_r6_yachi_topbtb == 3)) && ((m4_r6_yachi_finaltime_ms == 128100) && (m4_r6_winner == "yachi")))))
 {
 }
 
-// G082 [intense_round_profile] most intense round m5r7 — pinglamb: apm_x1000 51663, pps_x1000 1260, vs_x1000 125245, pieces 161, garbage_attack 110, garbagesent 85, garbagereceived 95, garbage_cleared 50, lines 108, maxspike 7, topbtb 3, inputs 603, finesse_faults 31, finaltime_ms 127765
-// 最癲嘅一局（m5 第 7 局）pinglamb 嘅數：APM 約 51.6、PPS 約 1.26、VS 約 125.2、粒數 161、攻擊 110、射埋 85、食 95、清走 50、行數 108、最大單波 7、最高 B2B 3、入力 603、手順失誤 31、佢自己嘅時間 約 127 秒
+// G082 [intense_round_profile] most intense round m5r7 — pinglamb: apm_x1000 51663, pps_x1000 1260, vs_x1000 125245, pieces 161, garbage_attack 110, garbagesent 85, garbagereceived 95, garbage_cleared 50, lines 108, maxspike 7, topbtb 3, finaltime_ms 127765
+// 最癲嘅一局（m5 第 7 局）pinglamb 嘅數：APM 約 51.6、PPS 約 1.26、VS 約 125.2、粒數 161、攻擊 110、射埋 85、食 95、清走 50、行數 108、最大單波 7、最高 B2B 3、佢自己嘅時間 約 127 秒
 lemma G082_most_intense_round_m5r7_pinglamb_apm_x1000_51663_pps_x1000_1260_vs_x10()
-  ensures ((((m4_r6_pinglamb_apm == 51663) && ((m4_r6_pinglamb_pps == 1260) && (m4_r6_pinglamb_vs == 125245))) && (((m4_r6_pinglamb_pieces == 161) && (m4_r6_pinglamb_garbage_attack == 110)) && ((m4_r6_pinglamb_garbagesent == 85) && (m4_r6_pinglamb_garbagereceived == 95)))) && ((((m4_r6_pinglamb_garbage_cleared == 50) && (m4_r6_pinglamb_lines == 108)) && ((m4_r6_pinglamb_maxspike == 7) && (m4_r6_pinglamb_topbtb == 3))) && (((m4_r6_pinglamb_inputs == 603) && (m4_r6_pinglamb_finesse_faults == 31)) && ((m4_r6_pinglamb_finaltime_ms == 127765) && (m4_r6_winner == "yachi")))))
+  ensures ((((m4_r6_pinglamb_apm == 51663) && ((m4_r6_pinglamb_pps == 1260) && (m4_r6_pinglamb_vs == 125245))) && ((m4_r6_pinglamb_pieces == 161) && ((m4_r6_pinglamb_garbage_attack == 110) && (m4_r6_pinglamb_garbagesent == 85)))) && (((m4_r6_pinglamb_garbagereceived == 95) && ((m4_r6_pinglamb_garbage_cleared == 50) && (m4_r6_pinglamb_lines == 108))) && (((m4_r6_pinglamb_maxspike == 7) && (m4_r6_pinglamb_topbtb == 3)) && ((m4_r6_pinglamb_finaltime_ms == 127765) && (m4_r6_winner == "yachi")))))
 {
 }
 
-// G083 [intense_round_edges] m5r7 winner yachi led on every attacking column (APM, PPS, 粒數, 攻擊, 最大單波, 行數) — no inversion
-// 最癲嘅一局係 yachi 贏，而佢喺 APM、PPS、粒數、攻擊、最大單波、行數 每一樣都領先——呢局冇得拗，唔係靠守贏返嚟
-lemma G083_m5r7_winner_yachi_led_on_every_attacking_column_apm_pps_no_inversion()
-  ensures ((((m4_r6_winner == "yachi") && (m4_r6_yachi_apm > m4_r6_pinglamb_apm)) && ((m4_r6_yachi_pps > m4_r6_pinglamb_pps) && (m4_r6_yachi_pieces > m4_r6_pinglamb_pieces))) && (((m4_r6_yachi_garbage_attack > m4_r6_pinglamb_garbage_attack) && (m4_r6_yachi_maxspike > m4_r6_pinglamb_maxspike)) && ((m4_r6_yachi_topbtb == m4_r6_pinglamb_topbtb) && (m4_r6_yachi_lines > m4_r6_pinglamb_lines))))
+// G083 [intense_round_edges] m5r7 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion
+// 最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——呢局冇得拗，唔係靠守贏返嚟
+lemma G083_m5r7_winner_yachi_led_on_every_attacking_axis_no_inversion()
+  ensures (((m4_r6_winner == "yachi") && ((m4_r6_yachi_garbage_attack > m4_r6_pinglamb_garbage_attack) && (m4_r6_yachi_apm > m4_r6_pinglamb_apm))) && (((m4_r6_yachi_pieces > m4_r6_pinglamb_pieces) && (m4_r6_yachi_pps > m4_r6_pinglamb_pps)) && ((m4_r6_yachi_maxspike > m4_r6_pinglamb_maxspike) && (m4_r6_yachi_lines > m4_r6_pinglamb_lines))))
 {
 }
 

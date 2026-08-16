@@ -1484,9 +1484,58 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
    One ~8-minute run replaces it with the measured figure; update all three together, since a resolved
    bound still described as a bound is the same staleness class as item 1.
 
-3. **The 4th `forecast_lineclear` candidate — 08-14 yachi r2 lock19.** Flagged UNPROVEN, lemma renamed
-   so the name does not overstate. Genuinely new research, not a refresh. Prove it or record why it
-   cannot be; the rename was a holding action, not a conclusion.
+3. **CLOSED (2026-08-16) — it is not a forecast, and the instrument that found it was wrong for
+   three of its four candidates.** ~~The 4th `forecast_lineclear` candidate — 08-14 yachi r2
+   lock19.~~ The verdict is `reactive`: availability at the true roof is 2 and at the spin 1, so it
+   **fell**, and `improved` fails. Clause 2 fails independently — a support of the T is garbage while
+   `garbageRows(boards[j]) = 0` — so the event could not have passed even had `improved` held.
+
+   **Three independent confirmations, none of which needs the other two.** (a) The roof cell is drawn
+   `S`; `oracle-forecast.mjs` attributed it to lock 12, whose piece is a `T`. (b) A backward trace
+   using only `boards[]` and each lock's own `cells` — no provenance at all — follows the cell from
+   `boards[18]` row 30 back through the two-row clear at lock 12 and the garbage inserts at 14 and 18
+   to lock 10, an `S`; lock 12's only column-3 cells were cleared away at lock 13. (c) Both production
+   engines say lock 10, and they share no code: `runCaseOracle` (cell-identity provenance over the
+   vendored engine) and the `sim.ts` hand-port (its own bookkeeping). Lock 19 is **inside** the
+   hand-port's verified prefix (`verifiedIndex` 21), so its agreement is over a board that provably
+   matches the real game.
+
+   **Root cause: a superseded file nobody moved.** `tools/triangle-oracle/oracle-forecast.mjs`
+   (2026-08-11) rolled its own provenance by mirroring the engine's shift/splice with a force-align
+   fallback. `pipeline/sim/oracle-source.ts` replaced that a day later — 2026-08-12, `a53a952`, whose
+   message is "95% -> 100%" — with exact cell identity, a WeakMap tag on the engine's own cells. The
+   tool was never moved onto it. Same class as `25878d7` and the `dual-backed.json` staleness: not a
+   wrong calculation, a right one living in the wrong copy.
+
+   **The census that settles it needs no second engine and no frames.** A provenance index on a
+   non-garbage cell is admissible only if that lock's piece is the letter the board draws. Measured
+   over six sessions: the tool names an impossible placer for **544 of 2024 (26.9%)** roof cells and
+   **1 191 905 of 3 811 813 (31.3%)** placed cells; `oracle-source.ts` for **0 of 4202**, the hand-port
+   for **0 of 1988**. That check is now `pipeline/sim/check_provenance.ts` — seven named rules, one
+   planted mutant each, plus a positive control that the clean fixture reports nothing — carried into
+   CI by `pipeline/sim/provenance.test.ts` so it cannot become another manual-only gate.
+
+   **Three of the four candidates evaporate under the published board source, and nothing published
+   moves.** A's roof goes lock 12 → 8 (its `Z` roof cell blamed on a `T`) and C's 6 → 16 (an `L` cell
+   blamed on an `I`); both become `reactive`, as does D. Only B survives, roof lock 19 bit-identical
+   under both sources — and B still fails clause 2. None of A/C/D was ever in `forecast-facts.json`,
+   which is computed over `runCaseOracle` and the verified prefix, so no session artefact, ledger or
+   report changes; the four forecast test files pass unedited.
+
+   **The tool's second defect is larger than the first.** It also relocated garbage holes in the live
+   engine board — the move `oracle-source.ts:48-58` records as verified dead — and over the corpus it
+   produced **90 078** locks where the replays record **70 493** pieces placed. Its PHASE 2 was not
+   "scanning 100% of the material"; it was running 28% past the end of rounds that had finished.
+   `runCaseOracle` gives 70 500, seven locks off the game's own count over 760 rounds. So the fix was
+   a deletion: `oracleSim` is gone, the three probes that imported it read `oracle-source.ts` now, and
+   PHASE 1 went **204/205 rounds and 549-vs-548 to 205/205 and 549 = 549**. That "99%" had been read
+   as reconstruction noise for four days.
+
+   `ForecastCandidate.dfy`'s `ExactlyOnePreExistedAmongABC` is now `NonePreExistedAmongABCD`: its one
+   `PreExisted` disjunct rested on A. The A and C lemmas are kept and marked UNINSTANTIATED — the
+   arithmetic is sound, the constants name the wrong lock — and a `AdmissiblePlacer` layer proves the
+   letter test that withdrew them. `dafny verify`: 10 verified, 0 errors, and both mutants (declaring
+   D admissible; collapsing the predicate to `false`) are killed.
 
 4. **Measure the new section's metric set.** The 13 printed columns are reasoned, not measured — the
    research that was to settle it died on a usage limit. Three angles: paired AUC per candidate;
@@ -1500,12 +1549,80 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
    moves a pooled figure past some fraction of its own value generalises well past this case. Likely
    falls out of item 1's harness rather than needing its own.
 
-6. **Two unexplained counter anomalies.** (a) All 8 player-rounds whose VS-identity residual exceeds
-   2% are `alive=True` AND are yachi — 8 of 8, same player; an answer could tighten or remove the
-   half-unit guard in `intense_round_vs_split`. (b) `finesse_perfect + finesse_faults` exceeds
-   `pieces` in 168/168 rounds; the hold-swap explanation is refuted (4 counterexamples, one with
-   `holds`=0, partial r = −0.076). No TETR.IO doc for `finesse.perfectpieces` has been read — that is
-   the open route.
+6. **CLOSED (2026-08-16) — both counter anomalies. Neither was about the players.**
+
+   **(a) The VS-identity residual is a two-object artefact, not a measurement.** A round carries
+   three stat objects and `extract.py:160-162` reads across two of them: `apm_x1000` / `pps_x1000` /
+   `vs_x1000` come from `player.stats`, a **live in-game tick**, while `garbage_attack` /
+   `garbage_cleared` / `finaltime_ms` come from `player.replay.results.stats`, the **final
+   snapshot**. Two objects, two frames — so the identity is being asked of a rate and counters that
+   are one tick apart. The third object, `player.replay.results.aggregatestats` = `{apm, pps,
+   vsscore}`, is the final rate triple and nothing in the repo reads it.
+
+   The clean instrument is the **time-free** form, which removes the clock entirely:
+   `vs·60·attack == apm·100·(attack+cleared)`. Over all 760 player-rounds — **6 above 1% residual
+   using `player.stats`, 0 using `aggregatestats`.** (Under the original 2%-of-`10⁸(attack+cleared)`
+   screen the count is the roadmap's 8; against `max(|lhs|,|rhs|)` it is 7. All yachi, all
+   `alive=True`, under every denominator.)
+
+   The player skew follows mechanically and is not a fact about how anyone plays. The live snapshot
+   is stale in **183 of 760** player-rounds, and **181 of those 183 are the round's SURVIVOR** —
+   because the survivor keeps playing frames after the opponent tops out, and `player.stats` freezes
+   before those frames fold in. The dead player has nothing left to accumulate, so their live tick
+   and their final snapshot are the same object's worth of data: 2 of 380. Sharpened, staleness needs
+   a conjunction — **179 of the 181** rounds that are both `alive` and have that player's `finaltime`
+   running past the opponent's are stale, against **6 of the other 579**. yachi's recording runs later
+   in **374 of 380** rounds, so he is stale in 174 of his 177 survivals (98.3%) against pinglamb's 7
+   of 203 (3.4%). "8 of 8, same player" was whose client recorded the longer round, not a fact about
+   a person.
+
+   `aggregatestats` also settles the formula, and the honest statement is **exact up to `finaltime`'s
+   own millisecond rounding, not exact simpliciter**: `100·(attack+cleared)/T`, `60·attack/T`,
+   `pieces/T` reproduce all three fields to ≤4.2e-16 when T is read at the clock's true resolution,
+   **T = ⌊finaltime_ms·60/1000⌋/60** — the integer FRAME count, floored. Take `finaltime_ms/1000`
+   instead and the same identity leaves up to **1.2e-3** relative error on 247 of 760 rounds, all of
+   it traceable to the clock and none to the counters. That is large enough to look like a finding;
+   a probe using the millisecond value will report a discrepancy the data does not have.
+
+   **What this does NOT do is remove the guard, and re-sourcing is a sized decision, not a task
+   done here.** `intense_round_vs_split` skips any player whose residual reaches half a unit, and on
+   the six selected rounds it is one stale tick from firing: five of six sit at **0.16–0.49** of the
+   0.50 threshold, and all five are the round's **surviving** player (07-22 0.449, 07-24 0.426,
+   07-28 0.393, 08-01 0.489, 08-09 0.164; 08-14's survivor is pinglamb at 0.024, which is why it is
+   five and not six). The fix that would actually retire the guard is re-sourcing the three rate
+   fields from `aggregatestats` — that changes **183 player-rounds** of published APM/PPS/VS and
+   forces a full re-extraction of all six sessions, both extractors, every ledger and every proof
+   map. **Sized and pending; deliberately not started here.**
+
+   **(b) The finesse counters are on two different units.** `perfectpieces` counts **pieces**;
+   `faults` counts **fault events**, and one piece can register several. Pooled over six sessions,
+   11 865 faults over 7 510 non-perfect pieces = **1.580 fault events per faulty piece**, which is
+   the whole of the excess.
+
+   **The control this item stated was itself wrong.** It is **650/760**, not 168/168 — with **110
+   exact equalities and 0 below**; 168 was simply 2026-08-14's player-round count quoted as if it
+   were the corpus. The invariant is `perfect + faults >= pieces`, strict in 85.5%.
+
+   The decisive round admits no per-piece reading: **2026-07-24 `replay-2026-07-24-2.ttrm` r0
+   pinglamb — `pieces=30, perfect=29, combo=29, faults=7`.** A finesse combo of 29 leaves exactly
+   ONE non-perfect piece and it carries all 7 faults. Supporting, all 760/760: `perfect <= pieces`,
+   `faults >= pieces - perfect`, `combo <= perfect`; and `combo == perfect` in all 10 zero-fault
+   rounds. Each of the three is tight somewhere (10, 110 and 12 rounds respectively), so none is a
+   decorative guard. Excess rises monotonically across KPP quartiles (1.41 → 1.54 → 1.60 → 1.75
+   pooled, 1.42 → 1.50 → 1.59 → 1.81 as a mean of round ratios), which is why hold-swap was
+   refuted — holds are not what varies.
+
+   **No published spec exists**: `finesse`, `perfectpieces` and `faults` appear nowhere on
+   <https://tetr.io/about/api/>. The mechanism is inferred from the data plus the official wiki's
+   PRO MODE wording ("a percentage of perfect pieces placed, and total faults" — two counters, two
+   units) and TetraStats' `finessePercentage => perfectPieces / piecesPlaced`. The
+   per-excess-input granularity is **inferred, not specified**, and this repo should say so wherever
+   it says anything.
+
+   `pipeline/finesse-counters.test.ts` pins all of it — the three invariants at 760/760, the
+   650/110/0 split per session, session totals as literals rather than re-derived, the decisive
+   round, and the four rates as four different numbers. The units rule is in CLAUDE.md: **any
+   finesse rate must name its denominator.**
 
 7. **Decide the 07-22/07-24 island question.** The section prints claim ids that are not in those two
    reports' claims islands (their generated ledgers sit behind a separate proof map; the island is
