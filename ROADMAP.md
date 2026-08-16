@@ -1176,7 +1176,17 @@ That distinction is load-bearing — of the four agent reports, each contained a
 did not survive checking: a wrong symptom, a wrong file path, a crash misread as a false positive, a
 re-derivation of an already-closed finding, and a "surviving" mutant that dies.
 
-### 1 — The two-piece roof: a rule the corpus can NEVER exercise. Highest value.
+### 1 — The two-piece roof: a rule the corpus can NEVER exercise. Highest value. — DONE
+
+**DONE 2026-08-09, `33b233b`; struck here 2026-08-16.** The second two-placer fixture is
+`twoPlacerRoof()` in `forecast.test.ts`, provs {1,4}, and it asserts all three things this entry asks
+for: the window (`roofFrom` 4, `separation` 3), the ANSWER (`reactive` under `max`, a VERIFIED
+`forecast_garbage` under `min`), and clause 2's comparison base (its own test, one floor provenance
+either side of 4). With it and the provs-{1,5} fixture both skipped, the `max`→`min` mutant survives
+the entire corpus — so this entry's "no corpus can distinguish them" is now measured rather than
+argued. **This closure sat unrecorded for seven days**: it landed in `33b233b`'s commit message and
+the entry below was never touched, which is the failure mode CLAUDE.md names — a commit message is not
+documentation, nothing re-derives it.
 
 **measured.** `Math.max(...placers)` (`pipeline/sim/forecast.ts`) is the whole "the roof's most recent
 builder is the piece that set up the slot" rule. Censused over all 654 tucked T-spins: **every roof is
@@ -1189,7 +1199,11 @@ seals its only entry. That makes it permanent, which is exactly why it needs a f
 more data. Build a second two-placer board where `j` differs between `max` and `min`, and assert the
 window, `separation` and clause 2's comparison base all move with it.
 
-### 2 — A mini spin has never been the EXECUTED spin
+### 2 — A mini spin has never been the EXECUTED spin — DONE
+
+**DONE 2026-08-09, `33b233b`; struck here 2026-08-16.** No mini/full asymmetry exists, and the
+identity is now pinned (`forecast.test.ts`, "the EXECUTED spin has never been a mini") so a future one
+fails rather than passing unnoticed. Same seven-day recording gap as item 1.
 
 **measured.** `forecast.ts` admits any `spin !== 'none'`, and `bestTspin` counts minis as available.
 Across the four sessions the verified prefix holds **exactly one mini lock**; it cleared lines and is
@@ -1228,17 +1242,33 @@ predicate, so **the model cannot adjudicate this branch in either direction** �
 CONTENT and `Step` has no hole column. `GarbageAloneCannotMakeAForecast` is not a refutation of it.
 Adjudicating it needs `Step` to carry the hole column per inserted row, which is a model change.
 
-Related and open: `garbageLoadBearing` is vacuous. Garbage arrives in-window in **121 of 654** events
+~~Related and open: `garbageLoadBearing` is vacuous. Garbage arrives in-window in **121 of 654** events
 and the flag is true in 0, so the corpus test asserting classifier/oracle agreement asserts `0 === 0`.
-It needs the anti-vacuity treatment `property-forecast.test.ts` already applies elsewhere.
+It needs the anti-vacuity treatment `property-forecast.test.ts` already applies elsewhere.~~
 
-### 5 — Clause 2 `'undetermined'` has never reached a forecast kind
+**DONE 2026-08-09 (item 4b), `33b233b`; struck here 2026-08-16.** Reachable after all: 288 constructed
+cases, 144 of them load-bearing, so the corpus's 0 is asserted against a population where the flag is
+true rather than against an empty one. The arm's lack of a corpus instance (the rest of item 4 above)
+is unchanged and stays open — it is a different statement from the flag being untestable.
 
-**measured.** `undecidedClause2` and the emitted `clause2_undecided` are 0 in all four artifacts. The
+### 5 — Clause 2 `'undetermined'` has never reached a forecast kind — DONE
+
+~~**measured.** `undecidedClause2` and the emitted `clause2_undecided` are 0 in all four artifacts. The
 verdict is unit-tested but the reporting path that exists to stop a zero rate hiding an undecidable
-case has never carried a non-zero value.
+case has never carried a non-zero value.~~
 
-### 6 — Clause 3 is still witness-only
+**DONE 2026-08-09, `33b233b`; struck here 2026-08-16.** Constructed end to end in `forecast.test.ts`:
+`expect(r.undecidedClause2).toBe(1)`. The reporting path has now carried a non-zero value, so a zero
+in an artefact means "none occurred" rather than "this path has never run". It is still 0 in all
+**six** artefacts — that is the corpus, not the code. Same seven-day recording gap as item 1.
+
+### 6 — Clause 3 is still witness-only — DONE
+
+**DONE 2026-08-09, `6866f7a`; struck here 2026-08-16.** All three proposals below landed, plus one
+correction to this entry: clause 3 is **not** unconditionally redundant beside clause 4 at
+`minLines >= 1` — only given `BothSurvive`. See "Closed · 6" below for the detail; it is not repeated
+here, because two copies of a closure is how this inventory got into the state this sweep is fixing.
+The entry as originally written follows.
 
 **measured.** Clauses 2 and 4 each have a universal `...IsNotAForecast` lemma; `58378a5` added clause
 1's (`NotASpinIsNeverAForecast`). Clause 3 has none — nothing states `!GapClosed ==> !IsForecast`, and
@@ -1263,7 +1293,13 @@ proof", and that `h < 40000` is "a LIVE belt rather than dead code". Discharging
 lemma is the prerequisite; until then the spec's clause 3 and the implementation's are different
 predicates and the repo should keep saying so.
 
-### 8 — Two sources of truth for "was a spin"
+### 8 — Two sources of truth for "was a spin" — DONE
+
+**DONE 2026-08-09, `6866f7a`; struck here 2026-08-16.** `WellFormed` now requires
+`spinAtK == h[k-1].wasSpin`. Doing it exposed that `OnlyClause1SeparatesAFromF` had been green only
+because the flag floated free of the history, and that 17 witnesses carried the same defect — all
+fixed without weakening the invariant. See "Closed · 8" below. The entry as written follows.
+
 
 **measured.** In every witness in both spec files `e.spinAtK == true` while `h[e.k - 1]` has
 `wasSpin == false`, and nothing relates them. More broadly `WellFormed` never relates `spinAtK`,
@@ -1271,7 +1307,13 @@ predicates and the repo should keep saying so.
 content**, so the spec can prove the predicate reads those flags and never that a flag is right. The
 corpus result turns on clause 2, which is one of the two.
 
-### 9 — The spec mutation suite is 15 killed + 1 unresolved, not 16/16
+### 9 — The spec mutation suite is 15 killed + 1 unresolved, not 16/16 — DONE
+
+**DONE 2026-08-09, `6866f7a`; struck here 2026-08-16.** The root cause was not the time limit: the
+harness tested TIMEOUT before ERROR, so a mutant with nine proved errors sitting behind one slow
+obligation scored as a whole-file timeout. Fixed, and the obligation sped up — **18/18 killed**, so
+the "either raise the CI limit or speed it up" choice below was a false one. See "Closed · 9".
+
 
 **measured.** `58378a5` made `mutate-forecast-spec.sh` read the verifier's output instead of its exit
 code, because Dafny exits 4 on a TIMEOUT and the harness scored that as a kill. It immediately
@@ -1279,9 +1321,16 @@ reclassified "gap test inverted (>= not <)", which times out at the default and 
 `DAFNY_TIME_LIMIT=300`. Either speed that obligation up or run the suite at the higher limit in CI; a
 standing TIMEOUT is an unread survivor.
 
-### 10 — Unverified, carried from the sweep so they are not lost
+### 10 — Unverified, carried from the sweep so they are not lost — DONE
 
-Neither was reproduced. Do not act on them without checking first.
+**DONE 2026-08-09, `33b233b`; struck here 2026-08-16.** Both were reproduced, and the first was
+**refuted rather than fixed**: the negative roof row is the correct generalisation and clamping it
+would regress the straddle test, so it got a comment and no code change. Two of the three
+"unreachable" guards are reachable through the exported `localiseMechanism` and got mutants plus
+contract fixtures; the third is provably unreachable and got a comment. The census is **7,544
+boards, not the 7,579 claimed below**. See "Closed · Item 10".
+
+~~Neither was reproduced. Do not act on them without checking first.~~
 
 - **Negative-row slots.** `bestRows` appends `min(rows) - 1`, so a slot topping at row 0 yields roof
   row -1; `back(-1)` then finds no match and returns -1, and the straddle test would admit every
