@@ -1746,9 +1746,27 @@ was struck. A cross-reference is not a single source of truth — it multiplies 
    `improved`? — which moves every published forecast figure and must be taken on its own terms
    (see 2b and "T-Spin Forecast" item 7). Not resolved unilaterally.
 
-2. **Chase the 3 residual lock-0 divergences.** After the fix, 3/592 openers still diverge
+2. ~~**Chase the 3 residual lock-0 divergences.** After the fix, 3/592 openers still diverge
    sim-vs-oracle (2 "plain", i.e. non-hoisted, + 1). A separate, rarer cause — likely a
-   movement/spawn edge case. `diag.mjs <file> <round> <user>` dumps the boards to localise it.
+   movement/spawn edge case. `diag.mjs <file> <round> <user>` dumps the boards to localise it.~~
+   **DONE 2026-08-17 — there was nothing to chase, and the hypothesis was wrong.** Re-measured at
+   six sessions: **0 of 760 placement divergences**, against the 3 of 592 recorded here. Two closed
+   under later work (the corpus grew 592 → 760 while the count fell), and the third was never a
+   divergence:
+
+   `scan-lock0.mjs` samples the oracle at `sim.locks[0].frame + 2`, a tolerance with no derivation
+   behind it. The survivor — 2026-07-22 `replay-2026-07-22-2.ttrm` r0 pinglamb — has the sim locking
+   an S at frame 1028 and the oracle laying **the same two rows, cell for cell**, at 1032. At the
+   sample instant the oracle's board is still EMPTY, which encodes as a total mismatch and buckets as
+   centroid `?` — there being nothing to take a centroid of. So "likely a movement/spawn edge case"
+   was a guess at a phantom: the placement never differed.
+
+   The scanner now re-asks at a wider window before calling anything a divergence, and counts the two
+   outcomes separately, because they are different questions: a LATE LOCK is lock-timing (item 3's
+   territory), a differing PLACEMENT is handling/spawn. Corpus reads 0 placement divergences and 1
+   late lock, within +4 frames. **A tolerance constant that turns a timing difference into a
+   placement difference is worse than no tolerance** — it does not merely lose precision, it
+   misattributes the cause, and the misattribution is what got written down here for six days.
 
 3. **Certify mid-round garbage timing (`garbagespeed`/cap).** The opening class is closed but the
    corpus is still only 49.6% bit-exact — the bulk of the remainder is garbage-insertion TIMING,
