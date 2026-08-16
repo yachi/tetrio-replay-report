@@ -1038,6 +1038,23 @@ So: bank sessions until **~50 decided pairs exist outside the exploratory four**
 sessions at the current rate), test once, and report whatever comes out. Anything short of that is
 parked, not pending. Nothing here goes in a report until the above is satisfied.
 
+**Two updates this pre-registration needs, recorded 2026-08-16 and neither noticed when they
+happened.** First, the bank is about half full: 2026-08-09 and 2026-08-14 arrived after registration,
+134 rounds between them, so "roughly four more sessions" is now roughly two.
+
+Second, and this is the one that matters: **the estimand froze a computation that no longer exists.**
+The registration says "exactly as `board-metrics.ts` computes it today ... over the verified prefix
+only. No re-definition afterwards." Since then the hoisted-DAS fix (2026-08-11) lengthened the
+verified prefix by **+31%** and the board source moved to `runCaseOracle`. The metric is the same
+formula over a materially larger and differently-produced denominator. That is not cheating — nobody
+changed it to chase a result, and both changes are improvements — but it does mean "as computed then"
+is now ambiguous, and the ambiguity must be resolved **before** the test runs, not after seeing it.
+The honest options are: re-register against the current implementation and treat 08-09/08-14 as
+exploratory too (safest, costs two sessions), or run it on the current implementation and report the
+prefix change as a deviation with the exploratory figures re-derived under the new prefix for
+comparison. **Pick one in writing before the seventh session lands.** A pre-registration that quietly
+tracks its own implementation is not a pre-registration.
+
 ### 2 — The C-Spin negative is bounded by CATALOGUE COVERAGE, not by the matcher
 
 **Updated 2026-08-10: the corpus is five sessions now (358 clean bags), the same null holds, and it
@@ -1114,8 +1131,12 @@ decision is that much more live.
 it has a `sim/` directory. 2026-08-09 had none until `opener-facts.json` was written into one, so
 the test scanned four sessions while appearing to scan every session present — a corpus defined by
 an incidental directory's existence, reporting full coverage. Worth a sweep for the same shape
-elsewhere; `pipeline/sim/cross-tslot.test.ts` carries a hardcoded four-session list and has
-likewise never seen 2026-08-09.
+elsewhere; `pipeline/sim/cross-tslot.test.ts` carried a hardcoded four-session list and had
+likewise never seen 2026-08-09. **That sweep happened on 2026-08-15 (`ab962bc`) and found three
+instances, all now at six sessions** — the workflow loop, `cross-tslot.test.ts:74`, and
+`cross-tslot-multi.ts`. Extending the test's list failed it immediately, 39033 → 61656 boards, while
+its differential stayed empty. This paragraph read as still-open for a day after the fix landed, two
+sections above the entry recording it; that is the same staleness class it describes.
 
 ## T-Spin Forecast — covering the definition's state space (2026-08-08)
 
@@ -1542,13 +1563,15 @@ structurally impossible.)
    letter test that withdrew them. `dafny verify`: 10 verified, 0 errors, and both mutants (declaring
    D admissible; collapsing the predicate to `false`) are killed.
 
-4. **Measure the new section's metric set.** The 13 printed columns are reasoned, not measured — the
+4. **DONE (2026-08-16), `0cc719c` — and the section's stated lede was not what the corpus supports.**
+   ~~Measure the new section's metric set.~~ The 13 printed columns are reasoned, not measured — the
    research that was to settle it died on a usage limit. Three angles: paired AUC per candidate;
    a sourced external glossary for what TETR.IO and the community mean by VS/DS/APP, so the Cantonese
    labels are defensible; and an overlap map against all 10 existing generators. If 逐局全數據 already
    prints the whole row, this section's value is the ANALYSIS and the printed set should shrink.
 
-5. **A leave-one-out gate for published pooled figures.** M11 R2 moves 08-14's published lost-regime
+5. **DONE (2026-08-16), `0cc719c` — `pipeline/check_loo.py`, and M11 R2 is rank 3 of the corpus.**
+   ~~A leave-one-out gate for published pooled figures.~~ M11 R2 moves 08-14's published lost-regime
    APP gap by 2.874 pp — rank 1 of 84 and 1.72× the next. "The floors have met" is substantially a
    statement about one round and the narrative does not say so. A check that fails when one round
    moves a pooled figure past some fraction of its own value generalises well past this case. Likely
@@ -1781,3 +1804,71 @@ a pinned table doing its job. The result worth keeping is not the larger denomin
 disagree on nothing, now over six sessions. A repo-wide sweep found every other session list
 (`bin/build-docs`, `analysis/rate_records.R`, `cross-movegen`, `cross-tspin`, `openers.test.ts`)
 already at six.
+
+## 最癲一局 items 4 and 5, written up (2026-08-16)
+
+Both landed in `0cc719c`. They were left reading as OPEN in the list above for a day, and neither
+`pipeline/check_loo.py` nor `pipeline/docs_gate.py` was named anywhere in this file or CLAUDE.md —
+found by an adversarial audit, not by a gate. **That is this session's own failure mode occurring
+inside the session that was about it**: the commit message described the work, the ROADMAP did not,
+and a reader of the ROADMAP would have concluded two shipped gates were future work. A commit message
+is not documentation; nothing re-derives it.
+
+### 4 — the metric set, measured. The section's own lede was not supported.
+
+380 decided rounds over six sessions, reusing `pipeline/sim/pairs.ts`'s tie handling and reproducing
+CLAUDE.md's published 129-round AUC block exactly as a control first.
+
+- **入力 dropped** — AUC 61.6 overall but **89.8 / 16.1** split by whether the winner also placed more
+  pieces, and 44.7 once normalised as KPP. It is exposure wearing a hat, and it was the only one of
+  the 13 rows 逐局全數據 does not already print.
+- **手順失誤 dropped with it** — 62.5 inverted overall but 30.5 / 50.0 across the same strata. Cutting
+  both is what retired the disclaimer paragraph whose only job was to tell the reader to ignore them;
+  keeping one would have left that paragraph paying rent for a single row.
+- **最高 B2B demoted out of the edges, row kept** — it loses signal exactly where this section looks:
+  terciles 71.0 → 67.7 → **53.1**, rho −0.183, Holm p 0.0068.
+- **Edges count AXES, not columns** — APM↔攻擊量 agree directionally 98.2%, PPS↔粒數 97.1%, while no
+  other pair among the seven exceeds 73.4%. The old sentence inflated its own finding; this is a
+  correctness fix, not taste.
+- **The lede moved onto downstacking.** "The winner trailed on attack" is not an intensity effect —
+  APM/攻擊 rho ≈ −0.07, ns, and their apparent decay is a round-LENGTH effect (−0.187 / −0.184, Holm
+  0.0040 / 0.0098). What survives is 清走/DS rho **+0.200 / +0.210**, Holm **0.0020 / 0.0028**, against
+  a length control at +0.054 / +0.058 (Holm 1.000) and a death-bias control that *strengthens* it
+  (normalising by garbage received → +0.236, while 食 — same bias, no skill — does not trend).
+
+**The set did not shrink to nothing, and the reason is proof, not ink**: 逐局全數據 prints 12 of the
+13 rows already, but as *unproved* table cells — 10 of the 13 fields acquire a Dafny lemma only here.
+
+Two defects found by reading the rendered page rather than by any gate: the flat branch said "led on
+every axis" while listing only the *ahead* ones, so a level axis would be proved equal and then
+described as a lead; and "more cells than axes" is false when the only trailing axis is a singleton.
+
+### 5 — the leave-one-out gate. The motivating case is rank 3.
+
+`pipeline/check_loo.py` + `pipeline/docs_gate.py`, in `verify.yml` on **every push at 0.062 s**.
+
+The control reproduces (2.8742 pp, rank 1 of 84, 1.7233×), but over the 17 published round-pooled
+figures m11r2 is **third**. Worse are 08-01's in-game score gap (`rel` **20.93** — one round moves it
+20.9× its own value, while the two players differ by a **median 3 038 points per round**, so "0.05%
+apart" is cancellation across 53 rounds, not convergence) and 07-28's attack gap (2.27, sign flips).
+
+**`rel` = largest single-round shift / |value|, and the threshold 0.5 is derived, not picked**: among
+cuts that still catch the motivating case, 0.969 → 0.406 is the widest gap at 2.386×. 5 of 17 fire,
+0 false positives. Absolute shift does **not** distinguish these — m11r2's 2.87 pp is only 1.17× the
+largest absolute shift anywhere.
+
+**The remedy is the caveat, not silence**: a crossing figure is satisfied by its sentence carrying its
+own leave-one-out annotation, and the four affected CLAUDE.md sentences now do. `ANNOTATED` is a named
+exception list (`DT_ORDER_IN_OPENER` pattern) so a sixth crossing must be investigated rather than
+absorbed — and a *named* figure that stops crossing also fails, because an unearned caveat is as stale
+as a missing one. The gate prints the sorted `rel` distribution every run, so a seventh session filling
+the gap in is visible.
+
+Three limits stated in the artefact rather than in prose: the AUC block is **structurally immune**
+(one round moves a mean of {0, 0.5, 1} scores by at most 1/(n−1); measured `rel` ≈ 0.012); the claim
+layer is a **dead end** (260 of 463 claims break under some single-round drop, because any `sum == N`
+claim does); and **match granularity is not a bound on round granularity** in either direction.
+
+Lifting the doc parser into `docs_gate.py` — so CLAUDE.md is parsed in exactly one place — exposed a
+latent off-by-one in `paragraph()`: `rfind(...) + 2` returns index 1 for a paragraph at byte 0,
+silently dropping its first character. Harmless for equiv's anchors, not harmless for a substring gate.
