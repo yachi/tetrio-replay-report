@@ -215,6 +215,18 @@ equivalent marker pair.
   `60·attack/T`, `pieces/T` with **T = ⌊finaltime_ms·60/1000⌋/60**, the integer FRAME count, floored.
   `finaltime_ms/1000` is not that T (it is fractional-frame) and leaves up to 1.2e-3 on 247 of the
   760, all of it the clock, so a probe that uses it reports a discrepancy the data does not have.
+- **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
+  The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
+  of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
+  `player.stats.kills` in **201 of 760** player-rounds, and every one is the live tick reading 1
+  against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
+  taken when that player's own game ends, while the kill is credited later, when the opponent tops
+  out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
+  `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
+  than truncated; `garbagesent`/`garbagereceived` differ from their `results.stats` counterparts in 7
+  and 1 of 760 and are a different measure anyway (both sides are already extracted, as
+  `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
+  the bug the rate change removed.
 - **The finesse counters are on two different units, so any finesse rate must name its denominator.**
   `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
   several — pooled, 11 865 faults over 7 510 non-perfect pieces = **1.580 per faulty piece**. Four
@@ -229,7 +241,7 @@ equivalent marker pair.
 
 Paired AUC over 129 rounds — how often the round's winner held the higher value:
 
-- **Strong**: VS 100% · APM 94.6 · 攻 93.8 · APP 91.5 · 送 88.0 · 射埋 12.0 (88 inverted) ·
+- **Strong**: VS 100% · APM 93.8 · 攻 93.8 · APP 91.5 · 送 88.0 · 射埋 12.0 (88 inverted) ·
   食 14.3 · 分 85.3
 - **No signal**: COMBO 45.0 · PC 50.8 (89% zeros) · TST 55.8 · TSD 60.9 · KPP 39.9
 - Near-constant (CV 0.05): KPP, FIN% — their flatness is the finding, not a column of numbers
@@ -247,7 +259,7 @@ time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4
 83.0 · 64.0 and is a different series); the 129-round headline block above is 07-22 and 07-24
 pooled, not one session.
 
-2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 91.7 · 送 82.7 ·
+2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 90.5 · 送 82.7 ·
 **APP 81.0, the lowest of six** · 分 79.8 · DS 70.2 · 食/射埋 17.9 — and **KPP 40.5**, below
 chance for a sixth time.
 
@@ -369,16 +381,16 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
 sample mean over a small n. Measured in `analysis/rate_records.R` over all 760 player-rounds
-(six sessions): regressing log SD on log t gives **−0.649 for VS and −0.724 for APM**, slope 0
+(six sessions): regressing log SD on log t gives **−0.646 for VS and −0.721 for APM**, slope 0
 rejected for both (p 0.0002 / 0.0001). All **18** unqualified records (3 metrics × 6 sessions)
 came from the shortest quartile — p = 1.5e-11 — and 07-22's headline 約262.6 was a 15.6 s round,
-45% above that session's qualified peak.
+46% above that session's qualified peak.
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one.** With 760 rounds the CIs tighten, and (a) APM's −0.5 is now
-**outside** its CI [−0.921, −0.528] — the decay is *steeper* than a pure sample mean, so the
+**outside** its CI [−0.918, −0.525] — the decay is *steeper* than a pure sample mean, so the
 conclusion holds a fortiori, but "both with −0.5 inside the CI" is no longer true; (b) the mean
-is **no longer flat for VS** (104.4 → 120.0 across the bins, p ≈ 0.00) — longer rounds do carry a
+is **no longer flat for VS** (104.1 → 120.1 across the bins, p ≈ 0.00) — longer rounds do carry a
 mildly higher mean VS. The SD still falls about 4× over the same span, so the variance effect
 dominates by an order of magnitude and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
@@ -548,15 +560,32 @@ the section exists: 逐局全數據 gives every round the same row and explains 
 
 | session | round | winner trailed on | DS/piece W:L |
 |---|---|---|---|
-| 07-22 | m1r5 | APM, attack, maxspike, **APP** | ×2.00 |
+| 07-22 | m1r5 | APM, attack, PPS, maxspike, **APP** | ×2.00 |
 | 07-24 | m6r8 | APM, attack, maxspike, topbtb, **APP** | ×2.20 |
 | 07-28 | m8r8 | lines | ×0.51 |
 | 08-01 | m7r3 | topbtb | ×1.12 |
 | 08-09 | m5r7 | **nothing — led on everything** | ×0.82 |
 | 08-14 | m11r2 | APM, PPS, pieces, attack, maxspike, topbtb | ×1.81 |
 
+The table lists **columns**, while the claim and the rendered section count **axes** — APM and 攻擊量
+are one axis, PPS and 粒數 are another, so 07-22's five columns are three axes and the section says
+「3 條軸」. That is two vocabularies on purpose (a reader scanning the table wants the columns; the
+claim must not double-count an axis), and the bolded **APP** is a third thing again: it comes from
+`intense_round_attack_rate`, not from `_edges`, so it is proved but it is not one of the axes the
+count ranges over. Do not reconcile these by making the numbers agree — check which family a figure
+came from first.
+
 08-09 is why the generator has two shapes. A section that only had the dramatic sentence would be
 writing for the sessions it liked; the flat case prints「呢局冇得拗」 as the result it is.
+
+**07-22's PPS entry arrived on 2026-08-16 and is the sharpest argument in the repo for sourcing a
+rate at results-time.** Under the old `player.stats` tick both players read PPS 1465 in that round, so
+`intense_round_edges` rendered `==` and 落速 was not a trailing axis — the claim said "2 of 4". They
+threw the same 108 pieces, but yachi survived 250 ms longer (73982 vs 73732 ms), so his PPS is
+strictly lower: 108/73.9667 = 1.4601 against 108/73.7167 = 1.46506, exact under the frame-count T.
+The tie was two stale samples coinciding, and a verified lemma was proving it. Nothing but
+re-sourcing finds that class: the value was in range, every gate was green, and an equality is
+exactly the shape a mutation test cannot flag as suspicious.
 
 **Two idioms worth reusing, both of which the algebra already supported.** The algebra has no
 division, so a derived rate is *pinned* — not merely compared — by bounding the numerator against the
@@ -567,10 +596,22 @@ And `|d| <= ε` is `between(d, -ε, ε+1)` — `between` is `lo <= x < hi` in al
 **The VS split is a BOUND, never an equality, and that wording is load-bearing.** `vs_x1000 ·
 finaltime_ms == 10⁸ · (garbage_attack + garbage_cleared)` is an identity *observed in this data*;
 TETR.IO publishes no such formula and this repo must not assert one. Corpus-wide the residual is
-median 1.1e-4 for the player who died but reaches **13.4%** for a survivor, so `intense_round_vs_split`
+median 1.1e-4 for the player who died and at most **6.3e-4** for a survivor, so `intense_round_vs_split`
 **skips any player whose residual reaches half a unit** rather than print a bound wide enough to
-swallow a line of attack. On the six selected rounds the worst residual is 0.489 of a one-unit change,
+swallow a line of attack. On the six selected rounds the worst residual is 0.028 of a one-unit change,
 which is also what makes every one of them mutation-killable.
+
+**That paragraph read "reaches 13.4% for a survivor" and "0.489" until 2026-08-16, and the 13.4% was
+an artefact of the reader, not a property of the data.** The rates came from `player.stats`, a live
+in-game tick sampled before the round ended, so a survivor's mid-round VS was being checked against an
+end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
+survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
+that fired on **13 of 760** player-rounds now fires on **0 of 760**. Do not read that as a reason to
+delete it: the residual does not go to zero, it goes to a quantization floor. `finaltime_ms` is
+milliseconds while the clock is frames, so the residual grows with `attack + cleared`; the corpus's
+worst player-round sits at 0.057 of the trigger (~18× headroom), and on that round `attack + cleared`
+would have to reach ~1114 against its actual 63. That is a fact about how much garbage these two move
+in a round, not a theorem.
 
 Two gate gaps the new figures exposed, both now closed in `check_prose_figures.pools`: it had no
 per-*round* derived rates (only session aggregates), and its seconds pool held `lifetime` but not

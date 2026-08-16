@@ -250,7 +250,7 @@ def build_C005():
         f"135000 <= {S(9,r,'yachi','vs')} && {S(9,r,'yachi','vs')} < 136000",
         f"93000 <= {S(9,r,'pinglamb','vs')} && {S(9,r,'pinglamb','vs')} < 94000",
         f'{WR(9,r)} == "yachi"',
-        f"{S(9,r,'yachi','apm')} / 1000 == 74",
+        f"{S(9,r,'yachi','apm')} / 1000 == 73",
         f"{S(9,r,'pinglamb','apm')} / 1000 == 43",
     ])
 
@@ -283,7 +283,7 @@ def build_C008():
     return andjoin([
         f"({mx} == {V}) && ({ge})",
         f'{WR(5,1)} == "yachi"',
-        f"93000 <= {S(5,1,'yachi','apm')} && {S(5,1,'yachi','apm')} < 94000",
+        f"91000 <= {S(5,1,'yachi','apm')} && {S(5,1,'yachi','apm')} < 92000",
         f"24000 <= {S(5,1,'pinglamb','apm')} && {S(5,1,'pinglamb','apm')} < 25000",
     ])
 
@@ -449,7 +449,7 @@ def build_C024():
     scope_pp = [(2, ri, pl) for ri in range(len(MS[2]["rounds"])) for pl in ("yachi", "pinglamb")]
     V = PY["vs"](pobj(2, 5, "yachi"))
     return andjoin([
-        f"203000 <= {S(2,5,'yachi','vs')} && {S(2,5,'yachi','vs')} < 204000",
+        f"201000 <= {S(2,5,'yachi','vs')} && {S(2,5,'yachi','vs')} < 202000",
         f"{S(2,5,'yachi','vs')} == {V}",
         f"({all_le('vs', scope_pp, V)})",
     ])
@@ -502,7 +502,7 @@ def build_R004():
 
 def build_R005():
     ey, vy = sum_field("yachi", "pps"); ep, vp = sum_field("pinglamb", "pps")
-    return andjoin([f"{ey} / 79 == 1433", f"{vy} / 79 == 1433", f"{ep} / 79 == 1342", f"{vp} / 79 == 1342"])
+    return andjoin([f"{ey} / 79 == 1435", f"{vy} / 79 == 1435", f"{ep} / 79 == 1342", f"{vp} / 79 == 1342"])
 
 
 def build_R006():
@@ -614,8 +614,8 @@ def build_R021():
     return andjoin([
         f'{WR(9,li)} == "yachi"',
         f"{S(9,li,'yachi','alive')}",
-        f"{S(9,li,'yachi','pps')} == 1630",
-        f"{S(9,li,'yachi','apm')} == 74105",
+        f"{S(9,li,'yachi','pps')} == 1621",
+        f"{S(9,li,'yachi','apm')} == 73680",
         f"{S(9,li,'yachi','pps')} > {S(9,li,'pinglamb','pps')}",
         f"{S(9,li,'yachi','apm')} > {S(9,li,'pinglamb','apm')}",
     ])

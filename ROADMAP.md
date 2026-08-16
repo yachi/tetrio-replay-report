@@ -523,7 +523,7 @@ prefix on both sides:
 **Nothing reaches significance**, and every confidence interval includes chance. All six
 non-trivial measures point the same way — lower, cleaner board wins — which reads less like six
 findings than like six proxies for *played well*, a thing `APP` already measures at 91.5% AUC
-straight out of `results.stats`. Against a baseline of VS 100% / APM 94.6% / APP 91.5%, a
+straight out of `results.stats`. Against a baseline of VS 100% / APM 93.8% / APP 91.5%, a
 board metric would have to be far stronger than any of these to earn a column.
 
 **Caveat, stated so nobody over-reads this:** n=26 is underpowered, and the verified prefix is
@@ -1465,8 +1465,13 @@ band is `den` wide while a one-unit change moves the left side by 1000. And `|d|
 `between(d, -ε, ε+1)` — `between` is `lo <= x < hi` in all three backends.
 
 The VS split is a **bound, never an equality**: `vs·time == 10^8·(attack + cleared)` is observed in
-this data, not a published formula. The residual is median 1.1e-4 for the player who died but reaches
-**13.4%** for a survivor, so the family skips any player whose residual reaches half a unit.
+this data, not a published formula. The residual is median 1.1e-4 for the player who died and at most
+**6.3e-4** for a survivor, so the family skips any player whose residual reaches half a unit. (It read
+**13.4%** for a survivor until the rates were re-sourced from `aggregatestats` on 2026-08-16; that
+figure was a live in-game tick being compared against an end-of-round count, which is why it landed on
+survivors. The guard now fires on 0 of 760 player-rounds where it fired on 13 — kept, because the
+residual grows with `attack + cleared` and the corpus sits ~18× under the trigger, not because it is
+structurally impossible.)
 
 **TODO — seven open items, the first three raised by the user, in priority order:**
 
@@ -1584,15 +1589,82 @@ this data, not a published formula. The residual is median 1.1e-4 for the player
    it traceable to the clock and none to the counters. That is large enough to look like a finding;
    a probe using the millisecond value will report a discrepancy the data does not have.
 
-   **What this does NOT do is remove the guard, and re-sourcing is a sized decision, not a task
-   done here.** `intense_round_vs_split` skips any player whose residual reaches half a unit, and on
-   the six selected rounds it is one stale tick from firing: five of six sit at **0.16–0.49** of the
-   0.50 threshold, and all five are the round's **surviving** player (07-22 0.449, 07-24 0.426,
-   07-28 0.393, 08-01 0.489, 08-09 0.164; 08-14's survivor is pinglamb at 0.024, which is why it is
-   five and not six). The fix that would actually retire the guard is re-sourcing the three rate
-   fields from `aggregatestats` — that changes **183 player-rounds** of published APM/PPS/VS and
-   forces a full re-extraction of all six sessions, both extractors, every ledger and every proof
-   map. **Sized and pending; deliberately not started here.**
+   **DONE (2026-08-16) — the rates are re-sourced.** The sizing below is kept because it is what the
+   decision was made on, and every number in it held.
+
+   `intense_round_vs_split` skips any player whose residual reaches half a unit, and on the six
+   selected rounds it *was* one stale tick from firing: five of six sat at **0.16–0.49** of the
+   0.50 threshold, and all five were the round's **surviving** player (07-22 0.449, 07-24 0.426,
+   07-28 0.393, 08-01 0.489, 08-09 0.164; 08-14's survivor is pinglamb at 0.024, which is why it was
+   five and not six). The fix was re-sourcing the three rate fields from `aggregatestats` — it
+   changed **183 player-rounds** of published APM/PPS/VS (45/22/30/28/20/38, exactly as sized) and
+   forced a full re-extraction of all six sessions, both extractors, every ledger and every proof map.
+
+   Those five residuals are now 0.028, 0.0002, 0.0005, 0.0009, 0.0003; 08-14's 0.024 is unchanged
+   because pinglamb's rates in that round were already final. The guard is **kept** — see the note
+   above — but it no longer fires anywhere in the corpus.
+
+   **That collapse is measured from the committed artefacts, not from a probe**, which is what makes
+   it the strongest single number here: the `intense_round_vs_split` claims themselves re-emit with
+   `residual under 0.66` becoming `residual under 0.01` (08-01; 07-22 0.61→0.04, 07-24 0.57→0.01,
+   07-28 0.55→0.01, 08-09 0.13→0.01). A probe can be written to agree with whoever wrote it; a
+   published bound that moves two orders of magnitude when the source is corrected was describing
+   the reader, not the data. The guard's old docstring said it existed because the residual "reaches
+   13% on some surviving players' records" — that 13% was a mid-round VS being checked against an
+   end-of-round attack count, which is why it fell on survivors and only on survivors.
+
+   Seven things the sizing did not predict, all recorded because they are the reusable part:
+
+   - **A published lemma was proving a spurious tie.** 07-22 m1r5 had both players at PPS 1465 under
+     the live tick, and `intense_round_edges` rendered `==`. They threw the same 108 pieces but yachi
+     survived 250 ms longer, so his true PPS is strictly lower. The claim goes from "trailed on 2 of
+     4 attacking axes" to "3 of 4". An equality that holds only because two stale samples coincided
+     is the worst case for this repo, and nothing but re-sourcing would have found it.
+   - **The correction is not directional in the way the sizing said.** APM falls in 172 of the 183,
+     which made "winners' rates are overstated" the natural summary — but 11 rise, and three of them
+     cross a threshold: the `rounds with APM >= 65` counts go 15/15 → 16/16 (07-22), 6/6 → 7/7
+     (08-09) and 7/10 → 8/11 (08-14). Two published 約-figures also move *up*.
+   - **The session-local emitters are a SECOND SOURCE OF TRUTH for every bound, and that is a
+     standing hazard, not an incident.** 07-22's `codegen_dafny.py` writes each claim's constant as a
+     literal (`/ 1000 == 74`, `/ 79 == 1433`, `== 1630`, `== 74105`, and the C008/C024 bands) with no
+     reference to the ledger's `python_check`. Only the *comment* above each lemma is derived from the
+     ledger, so editing the claim JSON produced five lemmas proving the OLD bound underneath a comment
+     quoting the NEW value — the two disagreeing in the same file, three lines apart. `dafny verify`
+     caught it only because all five stale bounds happened to be falsified by the corrected data. **A
+     stale bound that still held would have verified clean, kept its status in the proof map, and
+     shipped a badge whose lemma proves something other than what the ledger says it proves** — with
+     no gate anywhere that compares the two. R021's value turned out to live in *three* places: the
+     ledger, this emitter, and `mutation_test.sh` (below).
+     **07-28 onward are immune** — their bounds are rendered from the spec by `pipeline.codegen`, so
+     the ledger is the only source and `gen_consistency.sh` byte-compares the result. The exposure is
+     exactly the two sessions whose hand claims predate the spec algebra, 07-22 and 07-24.
+   - **A third copy again, and the mutation test found it.** `sessions/2026-07-22/report/
+     mutation_test.sh:58` hardcoded `"m9_r8_yachi_apm: int := 74105"` as mutant [8]. After the
+     re-source it reported `NOT-APPLIED ... pattern not found — TEST BROKEN` and the suite came out
+     11/12, which `bin/verify-session` fails on. Credit where due: it announces a broken mutant rather
+     than scoring it, which is the only reason a *weakened* mutation suite could not pass silently.
+   - **A claim can re-emit with identical rendered text and a changed underlying record.** 07-28's
+     G039 and 08-14's G043 both print the same gloss before and after while their claim objects
+     differ. Diffing glosses — the obvious thing to do, and what a person reviewing a ledger does by
+     eye — would report those as unchanged. Compare claim objects field by field. Same lesson as the
+     equiv coverage figures: the rendered surface is not the artefact.
+   - **A hand list of affected prose runs about 30% short, and some corrections go UP.** The figures
+     to fix were enumerated by one method and came to 15; resolving every 約/~/≈ literal in every
+     `prose/*.json` against a datum pool built from the old and new facts, then disambiguating each
+     candidate by the sentence's own badge, found **22 across 13 sentences** — and ruled out 5
+     apparent hits that matched an unrelated datum by coincidence. Two of the seven missed go the
+     wrong way for any heuristic: 08-09's 約1.461 → **約1.462** and 08-14's 約50.2 → **約50.3**. The
+     method for this class is a datum pool plus badge resolution; `check_prose_figures` is not (it
+     passes on all six both before and after), and neither is a list.
+   - **`equiv.py` coverage did not move at all — including 07-22, which was expected to.** A full
+     `--write` re-measure of all three modes over all six sessions came back **byte-identical**:
+     corpus counts, and every mode's `covered` / `identical` set. The reason is worth keeping, because
+     it says what the artefact actually measures: coverage is a statement about *logical structure* —
+     which generated claim's truth vector implies which hand claim's under the same mutation sites —
+     and the hand constants were moved to track the data, so no claim's truth flips. A value change
+     that keeps every predicate true and every site in place is invisible to it **by design**. The
+     corollary is the warning: coverage being unchanged is not evidence the data is unchanged, and it
+     must never be read as one.
 
    **(b) The finesse counters are on two different units.** `perfectpieces` counts **pieces**;
    `faults` counts **fault events**, and one piece can register several. Pooled over six sessions,

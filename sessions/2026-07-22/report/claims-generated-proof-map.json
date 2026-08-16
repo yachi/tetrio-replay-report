@@ -113,7 +113,7 @@
  },
  {
   "id": "G017",
-  "lemma": "G017_session_max_vs_x1000_among_the_39_rounds_lasting_60s_or_more_is_180380",
+  "lemma": "G017_session_max_vs_x1000_among_the_39_rounds_lasting_60s_or_more_is_179811",
   "file": "Claims.dfy",
   "family": "round_max_vs_x1000",
   "status": "verified"
@@ -281,14 +281,14 @@
  },
  {
   "id": "G041",
-  "lemma": "G041_per_round_mean_pps_yachi_1_433_pinglamb_1_342",
+  "lemma": "G041_per_round_mean_pps_yachi_1_435_pinglamb_1_342",
   "file": "Claims.dfy",
   "family": "avg_pps_x1000",
   "status": "verified"
  },
  {
   "id": "G042",
-  "lemma": "G042_per_round_mean_apm_pinglamb_52_243_yachi_52_096",
+  "lemma": "G042_per_round_mean_apm_pinglamb_52_247_yachi_52_043",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
@@ -337,7 +337,7 @@
  },
  {
   "id": "G049",
-  "lemma": "G049_yachi_in_rounds_with_apm_65_15_15",
+  "lemma": "G049_yachi_in_rounds_with_apm_65_16_16",
   "file": "Claims.dfy",
   "family": "high_apm_record",
   "status": "verified"
@@ -435,14 +435,14 @@
  },
  {
   "id": "G063",
-  "lemma": "G063_m10_deciding_round_yachi_vs_135_8_apm_74_1_vs_pinglamb_vs_93_9_apm_43",
+  "lemma": "G063_m10_deciding_round_yachi_vs_135_0_apm_73_6_vs_pinglamb_vs_93_9_apm_43",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"
  },
  {
   "id": "G064",
-  "lemma": "G064_highest_combined_vs_among_rounds_of_60s_or_more_is_m1r5_at_336_3_won_b",
+  "lemma": "G064_highest_combined_vs_among_rounds_of_60s_or_more_is_m1r5_at_335_8_won_b",
   "file": "Claims.dfy",
   "family": "most_intense_round",
   "status": "verified"
@@ -582,7 +582,7 @@
  },
  {
   "id": "G084",
-  "lemma": "G084_most_intense_round_m1r5_yachi_apm_x1000_75678_pps_x1000_1465_vs_x1000",
+  "lemma": "G084_most_intense_round_m1r5_yachi_apm_x1000_75439_pps_x1000_1460_vs_x1000",
   "file": "Claims.dfy",
   "family": "intense_round_profile",
   "status": "verified"
@@ -596,7 +596,7 @@
  },
  {
   "id": "G086",
-  "lemma": "G086_m1r5_winner_yachi_trailed_on_2_of_4_attacking_axes",
+  "lemma": "G086_m1r5_winner_yachi_trailed_on_3_of_4_attacking_axes",
   "file": "Claims.dfy",
   "family": "intense_round_edges",
   "status": "verified"

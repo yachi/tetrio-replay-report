@@ -25,7 +25,7 @@
   },
   {
     "id": "C005",
-    "lemma": "C005_m10_final_round_yachi_vs_135_8_vs_pinglamb_93_9_apm_74_vs_43",
+    "lemma": "C005_m10_final_round_yachi_vs_135_0_vs_pinglamb_93_9_apm_73_vs_43",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
@@ -43,7 +43,7 @@
   },
   {
     "id": "C008",
-    "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_93_7_vs_pinglamb_24_3",
+    "lemma": "C008_shortest_round_is_m6r1_15s_yachi_apm_91_7_vs_pinglamb_24_3",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
@@ -139,7 +139,7 @@
   },
   {
     "id": "C024",
-    "lemma": "C024_in_m3_yachi_s_vs_203_9_in_round_6_idx5_is_the_highest_single",
+    "lemma": "C024_in_m3_yachi_s_vs_201_9_in_round_6_idx5_is_the_highest_single",
     "file": "dafny/Claims_narrative.dfy",
     "status": "verified"
   },
@@ -283,7 +283,7 @@
   },
   {
     "id": "R021",
-    "lemma": "R021_in_m10_s_decider_yachi_survived_alive_with_higher_pps_1630_a",
+    "lemma": "R021_in_m10_s_decider_yachi_survived_alive_with_higher_pps_1621_a",
     "file": "dafny/Claims_coaching.dfy",
     "status": "verified"
   },

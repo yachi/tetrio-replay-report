@@ -72,10 +72,10 @@ FIELDS = [
     ("topbtb", "最高 B2B", None),
 ]
 
-# field -> label, and field -> axis, both derived from the generator's own axis map so the
-# section cannot group the sentence differently from the way the claim counted it.
-EDGE_LABELS = {f: label for _axis, cols in INTENSE_AXES for f, label in cols}
-EDGE_AXIS = {f: axis for axis, cols in INTENSE_AXES for f, _label in cols}
+# There was a field -> label map here for the finding sentence. The sentence names AXES
+# now, and `INTENSE_AXES` carries those names, so a second map would be a copy of the
+# generator's grouping that nothing keeps in step with it — which is the drift this
+# section imports `INTENSE_AXES` to avoid in the first place.
 
 CSS = """
 <style>
@@ -346,9 +346,11 @@ def build(facts, report_dir):
         names = "、".join(behind_ax)
         # The bold cells are per-column, so there are more of them than axes exactly when a
         # trailing axis is one of the two paired ones. Saying so unconditionally was wrong
-        # on 2026-07-28, whose only trailing axis is the singleton 行數 — one cell, one
-        # axis. The counts are printed rather than described for the same reason: a reader
-        # can check them against the table, which a claim about their relative size is not.
+        # for any session whose only trailing axis is a singleton — 2026-07-28 was the one
+        # that caught it, with 行數 alone: one cell, one axis. Derived per render, never
+        # keyed to a session, because which round is selected moves with the facts. The
+        # counts are printed rather than described for the same reason: a reader can check
+        # them against the table, which a claim about their relative size is not.
         n_cells = len(edges["behind"])
         gap = (f'：<strong>{n_cells} 格、{len(behind_ax)} 條軸</strong>——'
                f'因為 APM 就係攻擊除返自己嘅時間、PPS 就係粒數除返自己嘅時間，'

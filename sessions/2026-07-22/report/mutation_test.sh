@@ -55,7 +55,7 @@ mutate "flip yachi garb-recv 127->128"     Facts.dfy Claims_coaching.dfy  R019 "
 mutate "flip max vs 262582->262581"        Facts.dfy Claims_narrative.dfy C010 "m6_r1_pinglamb_vs: int := 262582" "m6_r1_pinglamb_vs: int := 262581"
 mutate "flip max apm 114223->114224"       Facts.dfy Claims_narrative.dfy C009 "m6_r1_pinglamb_apm: int := 114223" "m6_r1_pinglamb_apm: int := 114224"
 mutate "flip max lifetime 228310->228311"  Facts.dfy Claims_narrative.dfy C006 "m1_r2_yachi_lifetime: int := 228310" "m1_r2_yachi_lifetime: int := 228311"
-mutate "flip m10-decider apm 74105->74106" Facts.dfy Claims_coaching.dfy  R021 "m9_r8_yachi_apm: int := 74105" "m9_r8_yachi_apm: int := 74106"
+mutate "flip m10-decider apm 73680->73681" Facts.dfy Claims_coaching.dfy  R021 "m9_r8_yachi_apm: int := 73680" "m9_r8_yachi_apm: int := 73681"
 mutate "flip m1r0 round winner p->y"       Facts.dfy Claims_narrative.dfy C022 'm0_r0_winner: string := "pinglamb"' 'm0_r0_winner: string := "yachi"'
 
 # --- Claims_*.dfy predicate mutations ---

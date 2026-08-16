@@ -1479,16 +1479,16 @@ _INTENSE_FIELDS = [
 # this section looks: paired AUC 71.0 → 67.7 → 53.1 across terciles of round intensity,
 # Spearman rho −0.183 against intensity, Holm-adjusted p 0.0068 over the 20 columns tested.
 # A bold-marked cell that means nothing in the intense rounds this section selects is a cell
-# the reader will over-read, and it was the ONLY column 2026-08-01's winner trailed on — so
-# that session moves from the inversion sentence to the flat one, which is the change doing
-# its job rather than a regression.
+# the reader will over-read. When this was written it was also the only column 2026-08-01's
+# winner trailed on, so that session moved from the inversion sentence to the flat one —
+# recorded as what the change did to the data of the day, not as a property of the session:
+# which round gets selected is `_intense_round`'s to decide and moves with the facts.
 INTENSE_AXES = [
     ("攻擊量", [("garbage_attack", "攻擊"), ("apm_x1000", "APM")]),
     ("落速", [("pieces", "粒數"), ("pps_x1000", "PPS")]),
     ("最大單波", [("maxspike", "最大單波")]),
     ("行數", [("lines", "行數")]),
 ]
-_INTENSE_EDGES = [col for _axis, cols in INTENSE_AXES for col in cols]
 
 
 def _per_piece_x1000(num, den):
@@ -1709,10 +1709,25 @@ def intense_round_vs_split(facts):
 
     Skipped for any player whose residual reaches half a unit — there the split
     would be printed with a bound wide enough to swallow a whole line of attack,
-    which is a decomposition that cannot support the sentence it is under. This
-    has never triggered on a selected round; it is here because the corpus-wide
-    residual reaches 13% on some SURVIVING players' records and nothing guarantees
-    a future session's most intense round is not one of them.
+    which is a decomposition that cannot support the sentence it is under.
+
+    **The reason recorded here was itself a stale-snapshot artefact until the rates
+    were re-sourced from `results.aggregatestats`.** It said the guard exists because
+    the residual "reaches 13%" on some SURVIVING players' records — but that 13% was
+    measured against `player.stats`, a live in-game tick sampled before the round
+    ended, so it was pairing a mid-round VS with an end-of-round attack count. Against
+    the final snapshot the identity is exact to floating-point, and the guard tripped
+    on 13 of 760 player-rounds before the change and **0 of 760** after.
+
+    Keep the guard anyway, for a reason that survives the correction: the residual does
+    not go to zero, it goes to a QUANTIZATION FLOOR. `finaltime_ms` is milliseconds but
+    the game's clock is frames, so T = floor(ft*60/1000)/60 differs from ft/1000 by up
+    to 1/60 s, and the residual is about (attack+cleared)*10^8*delta/T — it grows with
+    the counters. The corpus's worst player-round sits at 0.057 of the trigger, i.e.
+    ~18x headroom; on that round (attack+cleared) would have to reach ~1114 instead of
+    its actual 63. That margin is a property of how much garbage these two players move
+    in a round, not a theorem, so a future session that moves an order of magnitude more
+    would fire this — which is exactly when the section must not print the split.
     """
     best = _intense_round(facts)
     if not best:

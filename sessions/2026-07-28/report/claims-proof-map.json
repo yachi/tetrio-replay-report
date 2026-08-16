@@ -92,14 +92,14 @@
  },
  {
   "id": "G014",
-  "lemma": "G014_session_max_apm_x1000_among_the_23_rounds_lasting_60s_or_more_is_78639",
+  "lemma": "G014_session_max_apm_x1000_among_the_23_rounds_lasting_60s_or_more_is_78368",
   "file": "Claims.dfy",
   "family": "round_max_apm_x1000",
   "status": "verified"
  },
  {
   "id": "G015",
-  "lemma": "G015_session_max_vs_x1000_among_the_23_rounds_lasting_60s_or_more_is_157278",
+  "lemma": "G015_session_max_vs_x1000_among_the_23_rounds_lasting_60s_or_more_is_156737",
   "file": "Claims.dfy",
   "family": "round_max_vs_x1000",
   "status": "verified"
@@ -274,7 +274,7 @@
  },
  {
   "id": "G040",
-  "lemma": "G040_per_round_mean_apm_pinglamb_55_514_yachi_53_273",
+  "lemma": "G040_per_round_mean_apm_pinglamb_55_522_yachi_53_130",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
@@ -414,7 +414,7 @@
  },
  {
   "id": "G060",
-  "lemma": "G060_highest_combined_vs_among_rounds_of_60s_or_more_is_m8r8_at_286_9_won_b",
+  "lemma": "G060_highest_combined_vs_among_rounds_of_60s_or_more_is_m8r8_at_286_4_won_b",
   "file": "Claims.dfy",
   "family": "most_intense_round",
   "status": "verified"
@@ -498,7 +498,7 @@
  },
  {
   "id": "G072",
-  "lemma": "G072_unqualified_session_peak_apm_x1000_is_104282_by_yachi_at_m1r4_a_13s_ro",
+  "lemma": "G072_unqualified_session_peak_apm_x1000_is_103759_by_yachi_at_m1r4_a_13s_ro",
   "file": "Claims.dfy",
   "family": "round_peak_apm_x1000",
   "status": "verified"
@@ -540,7 +540,7 @@
  },
  {
   "id": "G078",
-  "lemma": "G078_most_intense_round_m8r8_yachi_apm_x1000_78639_pps_x1000_1531_vs_x1000",
+  "lemma": "G078_most_intense_round_m8r8_yachi_apm_x1000_78368_pps_x1000_1526_vs_x1000",
   "file": "Claims.dfy",
   "family": "intense_round_profile",
   "status": "verified"

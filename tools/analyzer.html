@@ -456,6 +456,12 @@
   function extractRoundPlayer(p) {
     var s = (p && p.stats) || {};
     var rs = (p && p.replay && p.replay.results && p.replay.results.stats) || {};
+    // Rates come from results.aggregatestats, the final snapshot, not from player.stats, a live
+    // in-game tick that predates the round's end. See pipeline/extract.py for the full argument.
+    // extractLeaderboardEntry above deliberately stays on `stats`: a leaderboard entry carries no
+    // aggregatestats. This browser extractor must agree with the pipeline's, or the published
+    // analyzer shows different APM/VS from the published report for the same round.
+    var ag = (p && p.replay && p.replay.results && p.replay.results.aggregatestats) || {};
     var cr = rs.clears || {};
     var gr = rs.garbage || {};
     var fr = rs.finesse || {};
@@ -464,7 +470,7 @@
     return {
       lifetime: intVal(p && p.lifetime),
       alive: (p && p.alive) === true,
-      apm_x1000: x1000(s.apm), pps_x1000: x1000(s.pps), vs_x1000: x1000(s.vsscore),
+      apm_x1000: x1000(ag.apm), pps_x1000: x1000(ag.pps), vs_x1000: x1000(ag.vsscore),
       garbagesent: intVal(s.garbagesent), garbagereceived: intVal(s.garbagereceived), kills: intVal(s.kills),
       lines: intVal(rs.lines), pieces: intVal(rs.piecesplaced), inputs: intVal(rs.inputs), holds: intVal(rs.holds),
       topcombo: intVal(rs.topcombo), topbtb: intVal(rs.topbtb), tspins: intVal(rs.tspins),

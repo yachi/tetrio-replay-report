@@ -302,7 +302,7 @@
  },
  {
   "id": "G044",
-  "lemma": "G044_per_round_mean_apm_pinglamb_56_803_yachi_50_264",
+  "lemma": "G044_per_round_mean_apm_pinglamb_56_750_yachi_50_329",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
@@ -351,7 +351,7 @@
  },
  {
   "id": "G051",
-  "lemma": "G051_yachi_in_rounds_with_apm_65_7_10",
+  "lemma": "G051_yachi_in_rounds_with_apm_65_8_11",
   "file": "Claims.dfy",
   "family": "high_apm_record",
   "status": "verified"
@@ -428,7 +428,7 @@
  },
  {
   "id": "G062",
-  "lemma": "G062_m4_deciding_round_yachi_vs_78_1_apm_46_8_vs_pinglamb_vs_24_9_apm_14_9",
+  "lemma": "G062_m4_deciding_round_yachi_vs_77_3_apm_46_4_vs_pinglamb_vs_24_9_apm_14_9",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"
@@ -442,7 +442,7 @@
  },
  {
   "id": "G064",
-  "lemma": "G064_m7_deciding_round_yachi_vs_109_1_apm_43_5_vs_pinglamb_vs_103_0_apm_45",
+  "lemma": "G064_m7_deciding_round_yachi_vs_108_9_apm_43_4_vs_pinglamb_vs_103_0_apm_45",
   "file": "Claims.dfy",
   "family": "decider_final_round",
   "status": "verified"

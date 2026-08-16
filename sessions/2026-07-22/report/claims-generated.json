@@ -937,8 +937,8 @@
  {
   "family": "round_max_vs_x1000",
   "category": "pace",
-  "canto": "打足 60 秒以上嘅 39 局入面，最高單局 VS係 yachi 喺 m1 第 5 局打出嘅 約180.3，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
-  "english_gloss": "session-max vs_x1000 among the 39 rounds lasting 60s or more is 180380 by yachi at m1r5",
+  "canto": "打足 60 秒以上嘅 39 局入面，最高單局 VS係 yachi 喺 m1 第 5 局打出嘅 約179.8，嗰局 yachi 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
+  "english_gloss": "session-max vs_x1000 among the 39 rounds lasting 60s or more is 179811 by yachi at m1r5",
   "spec": {
    "p": "and",
    "xs": [
@@ -953,7 +953,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 180380
+      "v": 179811
      }
     },
     {
@@ -973,14 +973,14 @@
          "pl": "yachi",
          "f": "vs_x1000",
          "op": ">",
-         "v": 180380
+         "v": 179811
         },
         {
          "c": "field_cmp",
          "pl": "pinglamb",
          "f": "vs_x1000",
          "op": ">",
-         "v": 180380
+         "v": 179811
         }
        ]
       }
@@ -1007,7 +1007,7 @@
          "pl": "yachi",
          "f": "vs_x1000",
          "op": ">",
-         "v": 180380
+         "v": 179811
         }
        ]
       }
@@ -1034,7 +1034,7 @@
          "pl": "pinglamb",
          "f": "vs_x1000",
          "op": ">",
-         "v": 180380
+         "v": 179811
         }
        ]
       }
@@ -1068,7 +1068,7 @@
    ]
   },
   "id": "G017",
-  "python_check": "(facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] == 180380) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 180380) and (r['players']['pinglamb']['vs_x1000'] > 180380)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 180380)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['pinglamb']['vs_x1000'] > 180380)) == 0) and (facts['matches'][0]['rounds'][4]['winner']=='yachi') and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) >= 60000) == 39)"
+  "python_check": "(facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] == 179811) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 179811) and (r['players']['pinglamb']['vs_x1000'] > 179811)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 179811)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['pinglamb']['vs_x1000'] > 179811)) == 0) and (facts['matches'][0]['rounds'][4]['winner']=='yachi') and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) >= 60000) == 39)"
  },
  {
   "family": "round_max_maxspike",
@@ -2525,7 +2525,7 @@
   "family": "avg_pps_x1000",
   "category": "pace",
   "canto": "每局平均 PPS：yachi 約 1.43，高過 pinglamb 嘅約 1.34",
-  "english_gloss": "per-round mean PPS: yachi 1.433 > pinglamb 1.342",
+  "english_gloss": "per-round mean PPS: yachi 1.435 > pinglamb 1.342",
   "spec": {
    "p": "and",
    "xs": [
@@ -2538,7 +2538,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 113285
+      "v": 113383
      }
     },
     {
@@ -2550,7 +2550,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 106035
+      "v": 106041
      }
     },
     {
@@ -2569,13 +2569,13 @@
    ]
   },
   "id": "G041",
-  "python_check": "(sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 113285) and (sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 106035) and (sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']))"
+  "python_check": "(sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 113383) and (sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 106041) and (sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']))"
  },
  {
   "family": "avg_apm_x1000",
   "category": "pace",
   "canto": "每局平均 APM：pinglamb 約 52.2，高過 yachi 嘅約 52.0",
-  "english_gloss": "per-round mean APM: pinglamb 52.243 > yachi 52.096",
+  "english_gloss": "per-round mean APM: pinglamb 52.247 > yachi 52.043",
   "spec": {
    "p": "and",
    "xs": [
@@ -2588,7 +2588,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 4127267
+      "v": 4127520
      }
     },
     {
@@ -2600,7 +2600,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 4115629
+      "v": 4111408
      }
     },
     {
@@ -2619,7 +2619,7 @@
    ]
   },
   "id": "G042",
-  "python_check": "(sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 4127267) and (sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 4115629) and (sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']))"
+  "python_check": "(sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 4127520) and (sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 4111408) and (sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']))"
  },
  {
   "family": "per_piece_garbage_attack",
@@ -2945,8 +2945,8 @@
  {
   "family": "high_apm_record",
   "category": "clutch",
-  "canto": "yachi 打到 APM 65 以上嘅局有 15 局，贏咗 15 局",
-  "english_gloss": "yachi in rounds with APM >= 65: 15/15",
+  "canto": "yachi 打到 APM 65 以上嘅局有 16 局，贏咗 16 局",
+  "english_gloss": "yachi in rounds with APM >= 65: 16/16",
   "spec": {
    "p": "and",
    "xs": [
@@ -2964,7 +2964,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 15
+      "v": 16
      }
     },
     {
@@ -2990,13 +2990,13 @@
      },
      "b": {
       "e": "lit",
-      "v": 15
+      "v": 16
      }
     }
    ]
   },
   "id": "G049",
-  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] >= 65000) == 15) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['apm_x1000'] >= 65000) and (r['winner']=='yachi')) == 15)"
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] >= 65000) == 16) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['apm_x1000'] >= 65000) and (r['winner']=='yachi')) == 16)"
  },
  {
   "family": "high_apm_record",
@@ -4969,8 +4969,8 @@
  {
   "family": "decider_final_round",
   "category": "clutch",
-  "canto": "m10 嘅生死局：yachi 打出 VS 約 135.8、APM 約 74.1，pinglamb 得 VS 約 93.9、APM 約 43.0",
-  "english_gloss": "m10 deciding round: yachi VS 135.8 / APM 74.1 vs pinglamb VS 93.9 / APM 43.0",
+  "canto": "m10 嘅生死局：yachi 打出 VS 約 135.0、APM 約 73.6，pinglamb 得 VS 約 93.9、APM 約 43.0",
+  "english_gloss": "m10 deciding round: yachi VS 135.0 / APM 73.6 vs pinglamb VS 93.9 / APM 43.0",
   "spec": {
    "p": "and",
    "xs": [
@@ -4989,8 +4989,8 @@
       "pl": "yachi",
       "f": "vs_x1000"
      },
-     "lo": 135800,
-     "hi": 135900
+     "lo": 135000,
+     "hi": 135100
     },
     {
      "p": "between",
@@ -5001,8 +5001,8 @@
       "pl": "yachi",
       "f": "apm_x1000"
      },
-     "lo": 74100,
-     "hi": 74200
+     "lo": 73600,
+     "hi": 73700
     },
     {
      "p": "between",
@@ -5031,13 +5031,13 @@
    ]
   },
   "id": "G063",
-  "python_check": "(facts['matches'][9]['rounds'][8]['winner']=='yachi') and (135800 <= facts['matches'][9]['rounds'][8]['players']['yachi']['vs_x1000'] < 135900) and (74100 <= facts['matches'][9]['rounds'][8]['players']['yachi']['apm_x1000'] < 74200) and (93900 <= facts['matches'][9]['rounds'][8]['players']['pinglamb']['vs_x1000'] < 94000) and (43000 <= facts['matches'][9]['rounds'][8]['players']['pinglamb']['apm_x1000'] < 43100)"
+  "python_check": "(facts['matches'][9]['rounds'][8]['winner']=='yachi') and (135000 <= facts['matches'][9]['rounds'][8]['players']['yachi']['vs_x1000'] < 135100) and (73600 <= facts['matches'][9]['rounds'][8]['players']['yachi']['apm_x1000'] < 73700) and (93900 <= facts['matches'][9]['rounds'][8]['players']['pinglamb']['vs_x1000'] < 94000) and (43000 <= facts['matches'][9]['rounds'][8]['players']['pinglamb']['apm_x1000'] < 43100)"
  },
  {
   "family": "most_intense_round",
   "category": "pace",
-  "canto": "打足 60 秒以上嘅局入面最癲嘅一局係 m1 第 5 局，兩邊 VS 加埋約 336.3（yachi 約 180.3 對 pinglamb 約 156.0）",
-  "english_gloss": "highest combined VS among rounds of 60s or more is m1r5 at 336.3, won by yachi",
+  "canto": "打足 60 秒以上嘅局入面最癲嘅一局係 m1 第 5 局，兩邊 VS 加埋約 335.8（yachi 約 179.8 對 pinglamb 約 156.0）",
+  "english_gloss": "highest combined VS among rounds of 60s or more is m1r5 at 335.8, won by yachi",
   "spec": {
    "p": "and",
    "xs": [
@@ -5068,7 +5068,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5092,7 +5092,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5116,7 +5116,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5140,7 +5140,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5164,7 +5164,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5188,7 +5188,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5212,7 +5212,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5236,7 +5236,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5260,7 +5260,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5284,7 +5284,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5308,7 +5308,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5332,7 +5332,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5356,7 +5356,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5380,7 +5380,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5404,7 +5404,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5428,7 +5428,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5452,7 +5452,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5476,7 +5476,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5500,7 +5500,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5524,7 +5524,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5548,7 +5548,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5572,7 +5572,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5596,7 +5596,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5620,7 +5620,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5644,7 +5644,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5668,7 +5668,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5692,7 +5692,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5716,7 +5716,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5740,7 +5740,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5764,7 +5764,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5788,7 +5788,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5812,7 +5812,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5836,7 +5836,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5860,7 +5860,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5884,7 +5884,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5908,7 +5908,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5932,7 +5932,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5956,7 +5956,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -5980,7 +5980,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     },
     {
@@ -6004,13 +6004,13 @@
      },
      "b": {
       "e": "lit",
-      "v": 336383
+      "v": 335814
      }
     }
    ]
   },
   "id": "G064",
-  "python_check": "(facts['matches'][0]['rounds'][4]['winner']=='yachi') and ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][4]['players']['pinglamb']['vs_x1000']) == 336383) and ((facts['matches'][0]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][0]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][1]['rounds'][8]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][8]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][2]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][2]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][2]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][2]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][3]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][3]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][3]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][3]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][4]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][4]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][4]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][4]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][5]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][5]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][5]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][5]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][6]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][6]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][6]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][7]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][7]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][7]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][7]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][7]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][8]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][8]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][8]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][9]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][9]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][9]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][9]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 336383) and ((facts['matches'][9]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 336383)"
+  "python_check": "(facts['matches'][0]['rounds'][4]['winner']=='yachi') and ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][4]['players']['pinglamb']['vs_x1000']) == 335814) and ((facts['matches'][0]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][0]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][1]['rounds'][8]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][8]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][2]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][2]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][2]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][2]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][3]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][3]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][3]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][3]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][3]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][4]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][4]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][4]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][4]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][4]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][5]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][5]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][5]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][5]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][6]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][6]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][6]['rounds'][7]['players']['yachi']['vs_x1000'] + facts['matches'][6]['rounds'][7]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][7]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][7]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][7]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][7]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][7]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][7]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][8]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][8]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][8]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][8]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][9]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][9]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][9]['rounds'][2]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][2]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][9]['rounds'][4]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][4]['players']['pinglamb']['vs_x1000']) <= 335814) and ((facts['matches'][9]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][9]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 335814)"
  },
  {
   "family": "keys_per_piece",
@@ -7258,8 +7258,8 @@
  {
   "family": "intense_round_profile",
   "category": "pace",
-  "canto": "最癲嘅一局（m1 第 5 局）yachi 嘅數：APM 約 75.6、PPS 約 1.46、VS 約 180.3、粒數 108、攻擊 93、射埋 79、食 53、清走 40、行數 77、最大單波 10、最高 B2B 4、佢自己嘅時間 約 73 秒",
-  "english_gloss": "most intense round m1r5 — yachi: apm_x1000 75678, pps_x1000 1465, vs_x1000 180380, pieces 108, garbage_attack 93, garbagesent 79, garbagereceived 53, garbage_cleared 40, lines 77, maxspike 10, topbtb 4, finaltime_ms 73982",
+  "canto": "最癲嘅一局（m1 第 5 局）yachi 嘅數：APM 約 75.4、PPS 約 1.46、VS 約 179.8、粒數 108、攻擊 93、射埋 79、食 53、清走 40、行數 77、最大單波 10、最高 B2B 4、佢自己嘅時間 約 73 秒",
+  "english_gloss": "most intense round m1r5 — yachi: apm_x1000 75439, pps_x1000 1460, vs_x1000 179811, pieces 108, garbage_attack 93, garbagesent 79, garbagereceived 53, garbage_cleared 40, lines 77, maxspike 10, topbtb 4, finaltime_ms 73982",
   "spec": {
    "p": "and",
    "xs": [
@@ -7274,7 +7274,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 75678
+      "v": 75439
      }
     },
     {
@@ -7288,7 +7288,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 1465
+      "v": 1460
      }
     },
     {
@@ -7302,7 +7302,7 @@
      },
      "b": {
       "e": "lit",
-      "v": 180380
+      "v": 179811
      }
     },
     {
@@ -7440,7 +7440,7 @@
    ]
   },
   "id": "G084",
-  "python_check": "(facts['matches'][0]['rounds'][4]['players']['yachi']['apm_x1000'] == 75678) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pps_x1000'] == 1465) and (facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] == 180380) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pieces'] == 108) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] == 93) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbagesent'] == 79) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbagereceived'] == 53) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared'] == 40) and (facts['matches'][0]['rounds'][4]['players']['yachi']['lines'] == 77) and (facts['matches'][0]['rounds'][4]['players']['yachi']['maxspike'] == 10) and (facts['matches'][0]['rounds'][4]['players']['yachi']['topbtb'] == 4) and (facts['matches'][0]['rounds'][4]['players']['yachi']['finaltime_ms'] == 73982) and (facts['matches'][0]['rounds'][4]['winner']=='yachi')"
+  "python_check": "(facts['matches'][0]['rounds'][4]['players']['yachi']['apm_x1000'] == 75439) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pps_x1000'] == 1460) and (facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] == 179811) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pieces'] == 108) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] == 93) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbagesent'] == 79) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbagereceived'] == 53) and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared'] == 40) and (facts['matches'][0]['rounds'][4]['players']['yachi']['lines'] == 77) and (facts['matches'][0]['rounds'][4]['players']['yachi']['maxspike'] == 10) and (facts['matches'][0]['rounds'][4]['players']['yachi']['topbtb'] == 4) and (facts['matches'][0]['rounds'][4]['players']['yachi']['finaltime_ms'] == 73982) and (facts['matches'][0]['rounds'][4]['winner']=='yachi')"
  },
  {
   "family": "intense_round_profile",
@@ -7632,8 +7632,8 @@
  {
   "family": "intense_round_edges",
   "category": "pace",
-  "canto": "最癲嘅一局係 yachi 贏，但佢喺 攻擊量、最大單波 呢 2 條軸係落後嘅——贏嗰個唔係攻得最多嗰個",
-  "english_gloss": "m1r5 winner yachi trailed on 2 of 4 attacking axes: 攻擊量, 最大單波",
+  "canto": "最癲嘅一局係 yachi 贏，但佢喺 攻擊量、落速、最大單波 呢 3 條軸係落後嘅——贏嗰個唔係攻得最多嗰個",
+  "english_gloss": "m1r5 winner yachi trailed on 3 of 4 attacking axes: 攻擊量, 落速, 最大單波",
   "spec": {
    "p": "and",
    "xs": [
@@ -7695,7 +7695,7 @@
      }
     },
     {
-     "p": "eq",
+     "p": "lt",
      "a": {
       "e": "round",
       "mi": 0,
@@ -7748,7 +7748,7 @@
    ]
   },
   "id": "G086",
-  "python_check": "(facts['matches'][0]['rounds'][4]['winner']=='yachi') and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['garbage_attack']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['apm_x1000'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['apm_x1000']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pieces'] == facts['matches'][0]['rounds'][4]['players']['pinglamb']['pieces']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pps_x1000'] == facts['matches'][0]['rounds'][4]['players']['pinglamb']['pps_x1000']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['maxspike'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['maxspike']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['lines'] > facts['matches'][0]['rounds'][4]['players']['pinglamb']['lines'])"
+  "python_check": "(facts['matches'][0]['rounds'][4]['winner']=='yachi') and (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['garbage_attack']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['apm_x1000'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['apm_x1000']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pieces'] == facts['matches'][0]['rounds'][4]['players']['pinglamb']['pieces']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['pps_x1000'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['pps_x1000']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['maxspike'] < facts['matches'][0]['rounds'][4]['players']['pinglamb']['maxspike']) and (facts['matches'][0]['rounds'][4]['players']['yachi']['lines'] > facts['matches'][0]['rounds'][4]['players']['pinglamb']['lines'])"
  },
  {
   "family": "intense_round_attack_rate",
@@ -7929,8 +7929,8 @@
  {
   "family": "intense_round_vs_split",
   "category": "pace",
-  "canto": "最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 125.7、清垃圾嗰邊約 54.0，兩邊加埋同佢實際 VS 約 180.3 相差唔夠 0.61",
-  "english_gloss": "m1r5 yachi VS splits into attack 125.7 + downstack 54.0, residual under 0.61",
+  "canto": "最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 125.7、清垃圾嗰邊約 54.0，兩邊加埋同佢實際 VS 約 179.8 相差唔夠 0.04",
+  "english_gloss": "m1r5 yachi VS splits into attack 125.7 + downstack 54.0, residual under 0.04",
   "spec": {
    "p": "and",
    "xs": [
@@ -7980,8 +7980,8 @@
        }
       }
      },
-     "lo": -44873160,
-     "hi": 44873161
+     "lo": -2777402,
+     "hi": 2777403
     },
     {
      "p": "between",
@@ -8024,7 +8024,7 @@
    ]
   },
   "id": "G089",
-  "python_check": "(-44873160 <= ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] * facts['matches'][0]['rounds'][4]['players']['yachi']['finaltime_ms']) - (100000000 * (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] + facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared']))) < 44873161) and (9299981292 <= (100000000 * facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack']) < 9300055274) and (3999984794 <= (100000000 * facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared']) < 4000058776)"
+  "python_check": "(-2777402 <= ((facts['matches'][0]['rounds'][4]['players']['yachi']['vs_x1000'] * facts['matches'][0]['rounds'][4]['players']['yachi']['finaltime_ms']) - (100000000 * (facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack'] + facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared']))) < 2777403) and (9299981292 <= (100000000 * facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_attack']) < 9300055274) and (3999984794 <= (100000000 * facts['matches'][0]['rounds'][4]['players']['yachi']['garbage_cleared']) < 4000058776)"
  },
  {
   "family": "intense_round_vs_split",

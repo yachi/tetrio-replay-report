@@ -29,10 +29,10 @@
   },
   {
     "id": "C005",
-    "canto": "第10場最尾一局 yachi 打到 vs 約135.8、pinglamb 得約93.9，APM 約74 對約43，一面倒收工",
-    "english_gloss": "m10 final round: yachi vs≈135.8 vs pinglamb≈93.9, apm 74 vs 43",
+    "canto": "第10場最尾一局 yachi 打到 vs 約135.0、pinglamb 得約93.9，APM 約73 對約43，一面倒收工",
+    "english_gloss": "m10 final round: yachi vs≈135.0 vs pinglamb≈93.9, apm 73 vs 43",
     "category": "clutch",
-    "python_check": "135000<=facts['matches'][9]['rounds'][8]['players']['yachi']['vs_x1000']<136000 and 93000<=facts['matches'][9]['rounds'][8]['players']['pinglamb']['vs_x1000']<94000 and facts['matches'][9]['rounds'][8]['winner']=='yachi' and facts['matches'][9]['rounds'][8]['players']['yachi']['apm_x1000']//1000==74 and facts['matches'][9]['rounds'][8]['players']['pinglamb']['apm_x1000']//1000==43"
+    "python_check": "135000<=facts['matches'][9]['rounds'][8]['players']['yachi']['vs_x1000']<136000 and 93000<=facts['matches'][9]['rounds'][8]['players']['pinglamb']['vs_x1000']<94000 and facts['matches'][9]['rounds'][8]['winner']=='yachi' and facts['matches'][9]['rounds'][8]['players']['yachi']['apm_x1000']//1000==73 and facts['matches'][9]['rounds'][8]['players']['pinglamb']['apm_x1000']//1000==43"
   },
   {
     "id": "C006",
@@ -50,10 +50,10 @@
   },
   {
     "id": "C008",
-    "canto": "最快嗰局係第6場第2局，約15秒就收咗工，yachi APM 爆到約93.7、pinglamb 得約24.3",
-    "english_gloss": "shortest round is m6r1 (~15s); yachi apm≈93.7 vs pinglamb≈24.3",
+    "canto": "最快嗰局係第6場第2局，約15秒就收咗工，yachi APM 爆到約91.7、pinglamb 得約24.3",
+    "english_gloss": "shortest round is m6r1 (~15s); yachi apm≈91.7 vs pinglamb≈24.3",
     "category": "duration",
-    "python_check": "min(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==15054 and facts['matches'][5]['rounds'][1]['winner']=='yachi' and 93000<=facts['matches'][5]['rounds'][1]['players']['yachi']['apm_x1000']<94000 and 24000<=facts['matches'][5]['rounds'][1]['players']['pinglamb']['apm_x1000']<25000"
+    "python_check": "min(max(d['lifetime'] for d in r['players'].values()) for m in facts['matches'] for r in m['rounds'])==15054 and facts['matches'][5]['rounds'][1]['winner']=='yachi' and 91000<=facts['matches'][5]['rounds'][1]['players']['yachi']['apm_x1000']<92000 and 24000<=facts['matches'][5]['rounds'][1]['players']['pinglamb']['apm_x1000']<25000"
   },
   {
     "id": "C009",
@@ -162,10 +162,10 @@
   },
   {
     "id": "C024",
-    "canto": "第3場入面 yachi 喺第6局 vs 爆到約203.9，係佢嗰場單局最高嘅 vs",
-    "english_gloss": "in m3, yachi's vs≈203.9 in round 6 (idx5) is the highest single-round vs of that match",
+    "canto": "第3場入面 yachi 喺第6局 vs 爆到約201.9，係佢嗰場單局最高嘅 vs",
+    "english_gloss": "in m3, yachi's vs≈201.9 in round 6 (idx5) is the highest single-round vs of that match",
     "category": "spike",
-    "python_check": "203000<=facts['matches'][2]['rounds'][5]['players']['yachi']['vs_x1000']<204000 and facts['matches'][2]['rounds'][5]['players']['yachi']['vs_x1000']==max(d['vs_x1000'] for r in facts['matches'][2]['rounds'] for d in r['players'].values())"
+    "python_check": "201000<=facts['matches'][2]['rounds'][5]['players']['yachi']['vs_x1000']<202000 and facts['matches'][2]['rounds'][5]['players']['yachi']['vs_x1000']==max(d['vs_x1000'] for r in facts['matches'][2]['rounds'] for d in r['players'].values())"
   },
   {
     "id": "C025",
