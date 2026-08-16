@@ -2060,12 +2060,34 @@ structurally impossible.)
    round, and the four rates as four different numbers. The units rule is in CLAUDE.md: **any
    finesse rate must name its denominator.**
 
-7. **Decide the 07-22/07-24 island question.** The section prints claim ids that are not in those two
+7. **Decide the 07-22/07-24 island question.** ~~The section prints claim ids that are not in those two
    reports' claims islands (their generated ledgers sit behind a separate proof map; the island is
    deliberately capped at 54/52 rows). `pc_section` already does this, so the new section matched the
    pattern rather than diverging — but an unresolvable id is close to the failure `check_badge_links`
-   exists to prevent. Accept it, extend the island, or stop printing ids the island lacks; whichever
-   is chosen must apply to `pc_section` too.
+   exists to prevent.~~ **MEASURED and GATED 2026-08-17; the decision itself is still open, but it is
+   no longer unquantified and no longer able to grow in silence.** Three corrections to the above:
+
+   - **It is not close to the badge failure, and saying so was wrong in a useful way.** These ids
+     carry no `data-claim` and no `<b>` wrapper — `intense_round` prints
+     `<p class="ir-note">Claim：G084 · …` and `pc_section` prints `<td class="pc-cid">G080 · G081 ✓`
+     — so `expandShorthandBadges` never builds a badge and **nothing renders ⏳**. What is real is
+     narrower: a reader of those two reports is pointed at a claim the report does not carry.
+   - **It is not this section's issue, and it is 33 per session, not 7.** Measured over every
+     generated region: **33 dead citations in 2026-07-22 and 33 in 2026-07-24, 0 in the other four.**
+     They span several generated regions, so filing this under 最癲一局 understated it by a factor of
+     five and attributed a systemic property of two capped islands to one new section.
+   - **`check_badge_links` could not see any of it**, because it scanned `data-claim` attributes and
+     `<b>` shorthand only. It now has a third check, scanned over every generated REGION rather than
+     by label — `pc_section`'s citations carry no label at all, so a `Claim：` pattern would have
+     caught one section and silently missed the other, which is the enumerate-the-containers trap
+     `check_prose_figures` already paid for. The 66 ids are a named exception list, exact in both
+     directions: dropping one fails, and an entry that starts resolving fails too, so extending the
+     islands later cannot leave a stale exemption behind. Both mutants verified.
+
+   The decision the item asks for is unchanged — accept, extend the islands, or stop printing ids —
+   and extending remains the only option that makes the citations true rather than merely tolerated.
+   It moves the pinned 54/52 appendix row counts and must be done for `pc_section` in the same
+   stroke.
 
 ## Gating equiv.py coverage — and the sampled figure underneath it (2026-08-15)
 
