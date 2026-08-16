@@ -67,6 +67,14 @@ counted `kind !== 'reactive'`, the idiom `isVerifiedForecast` exists to abolish,
 opener as a forecast. Both now route through `isVerifiedForecast`. **Nothing re-runs this table, so
 it goes stale silently — re-measure it whenever you touch the metric.**
 
+The omitted-key half came back on 2026-08-16, which is why the literal is gone rather than extended.
+`path_opened` (the fifth kind) would have reproduced it exactly — same file, same line, under a
+comment describing the bug — because "remember to add it here too" is not a mechanism. Both the
+initialiser and `forecastMetric`'s own `totals` now come from `zeroKindTotals()`, derived from the one
+`FORECAST_KINDS` list, and the runner throws if its printed breakdown does not sum to its own header.
+A `satisfies Record<ForecastKind, number>` was tried first and rejected: there is no `tsc` step in
+this repo, so a type-level guard here fires on nothing.
+
 The bottom two rows moved since they were written on 2026-07-30, and the table said nothing
 about it because nothing re-runs it. What changed:
 

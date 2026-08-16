@@ -7,7 +7,6 @@
  */
 import { test, expect, describe } from 'bun:test';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { UNATTRIBUTED_STEP_MODEL_GAP as SHARED_UNATTRIBUTED_STEP_MODEL_GAP } from './step-model-gap.ts';
 // Imported, never re-listed here: the artifact's key set and this guard's key set are one fact,
 // and a hand-written mirror is what lets a new verdict ship with nothing checking it.
 import { CLAUSE_VERDICTS } from './forecast.ts';
@@ -52,39 +51,41 @@ test('every session directory has an artifact for the loop below to check', () =
 });
 
 /**
- * The one improvement in six sessions that the step model cannot explain, named rather than
- * excused by a bound. The full trace, its controls and its corpus counts are at the assertion
- * that consumes this, in `counts are internally consistent and integers`.
+ * `path_opened` per session and player, pinned as literals.
  *
- * Shape borrowed from `DT_ORDER_IN_OPENER` in pipeline/openers/openers.test.ts, and for its
- * reason: `expect(x).toBe(known)` is exact in BOTH directions, so a second such event fails and
- * so does this one vanishing. `toBeLessThanOrEqual(1)` would be satisfied by any single
- * unexplained improvement anywhere in the corpus, which is the investigation this list exists to
- * force. The reciprocal — an entry that stops naming a real event — is checked separately below,
- * because a session that is renamed or removed would otherwise take its own exception with it.
+ * The fifth bucket (schema 10) is the class that used to split between `unattributed` and
+ * `self_built` depending on whether the causing piece happened to sit beside the slot it did not
+ * build. Two events in six sessions, and the pins are per PLAYER because that is the granularity
+ * the artefact emits and the granularity the report prints: 08-14's is yachi's and 08-09's is
+ * pinglamb's, which no session-level total would say.
+ *
+ * Literals, in the idiom `openers.test.ts` uses for every quarantined count — produced by this
+ * pipeline, not re-derived from it at test time, so a reclassification has to change a committed
+ * number rather than silently follow the code. Exact in both directions: a third event fails here,
+ * and so does either of these two disappearing.
  */
-// The list itself lives in step-model-gap.ts, because forecast-corpus.test.ts needs the same
-// events summed per session and a hand-written mirror of it is one fact in two places.
-const UNATTRIBUTED_STEP_MODEL_GAP = SHARED_UNATTRIBUTED_STEP_MODEL_GAP;
+const PATH_OPENED: Record<string, Record<string, number>> = {
+  '2026-07-22': { yachi: 0, pinglamb: 0 },
+  '2026-07-24': { yachi: 0, pinglamb: 0 },
+  '2026-07-28': { yachi: 0, pinglamb: 0 },
+  '2026-08-01': { yachi: 0, pinglamb: 0 },
+  // `replay-2026-08-09-6.ttrm` r7 lock 24 — a Z that cleared row 23, opening a slot at rows 24-26
+  // it did not build. Was `self_built`, i.e. 「玩家自己落嗰隻棋整出嚟」, in the published report.
+  '2026-08-09': { yachi: 0, pinglamb: 1 },
+  // `replay-2026-08-14-0.ttrm` r4 lock 74 — the same class with the piece NOT touching the slot,
+  // so it fell through to `unattributed` and was the corpus's only entry in that bucket.
+  '2026-08-14': { yachi: 1, pinglamb: 0 },
+};
 
-// The other direction, and it cannot be folded into the loop above: the loop only visits sessions
-// that EXIST, so an entry naming a session that was renamed or dropped is never consulted and its
-// exception silently stops being tested. Same reciprocal `check_loo.py` keeps for ANNOTATED — a
-// case that stops crossing has to come off the list, not sit there being satisfied by nothing.
-test('every UNATTRIBUTED_STEP_MODEL_GAP entry still names a real event', () => {
-  if (OVERRIDE) return;   // one artifact in view; the list as a whole is not what is being asked
-  for (const [s, byUser] of Object.entries(UNATTRIBUTED_STEP_MODEL_GAP)) {
-    const path = `${SESSIONS}/${s}/sim/forecast-facts.json`;
-    expect([s, existsSync(path)]).toEqual([s, true]);
-    const d = JSON.parse(readFileSync(path, 'utf8'));
-    for (const [user, n] of Object.entries(byUser)) {
-      const p = d.players.find((x: any) => x.user === user);
-      expect([s, user, p !== undefined]).toEqual([s, user, true]);
-      // an entry pinned at 0 would be an exception excusing nothing — take it out instead
-      expect(n).toBeGreaterThan(0);
-      expect([s, user, p.unattributed]).toEqual([s, user, n]);
-    }
-  }
+// The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits
+// sessions that EXIST, so an entry naming a session that was renamed or dropped would never be
+// consulted and would quietly stop being tested. Same reciprocal `check_loo.py` keeps for ANNOTATED.
+// Unlike the named-exception list this replaced, an entry here may legitimately be 0 — the table is
+// a per-session pin over the whole corpus, not a list of exceptions — so what is checked is that
+// every session on disk HAS a row, not that every row is non-zero.
+test('every session on disk has a PATH_OPENED row, and every row names a real session', () => {
+  if (OVERRIDE) return;   // one artifact in view; the table as a whole is not what is being asked
+  expect(Object.keys(PATH_OPENED).sort()).toEqual([...SESSION_DIRS].sort());
 });
 
 for (const PATH of ARTEFACTS) {
@@ -95,7 +96,7 @@ for (const PATH of ARTEFACTS) {
   test('the artifact exists and declares itself ineligible for the report', () => {
     expect(existsSync(PATH)).toBe(true);
     const d = JSON.parse(readFileSync(PATH, 'utf8'));
-    expect(d.schema).toBe('forecast-facts/9');
+    expect(d.schema).toBe('forecast-facts/10');
     // simulator-derived data must never be promoted to a report claim without the
     // dual-extractor rule being satisfied; this flag is the guard
     expect(d.report_eligible).toBe(false);
@@ -245,8 +246,28 @@ for (const PATH of ARTEFACTS) {
       // to every session (FORECAST_FACTS) here.
       expect(p.mechanism_established).toBe(p.forecast_garbage + p.forecast_lineclear);
       expect(p.forecast_total).toBeLessThanOrEqual(p.mechanism_established);
+      // THE BUCKET PARTITION, exhaustive over every kind (schema 10). `path_opened` had to be added
+      // here when it arrived, and that is the point of writing the identity out in full rather than
+      // checking a subset: a new kind that nobody adds to this line makes the sum fall short and
+      // fails, where an inequality or a four-term sum would let it be published as `reactive` — "the
+      // available spin did not improve" — which is the opposite of what `path_opened` means.
       expect(p.verified_tspins).toBe(
-        p.forecast_garbage + p.forecast_lineclear + p.self_built + p.reactive);
+        p.forecast_garbage + p.forecast_lineclear + p.path_opened + p.self_built + p.reactive);
+      // Bare reads on all five, so a schema-9 artefact throws here rather than reading `undefined`
+      // and quietly satisfying the sum by NaN-poisoning it into a failure that names nothing.
+      for (const k of ['forecast_garbage', 'forecast_lineclear', 'path_opened', 'self_built',
+                       'reactive']) {
+        expect([k, Number.isInteger(p[k])]).toEqual([k, true]);
+        expect(p[k]).toBeGreaterThanOrEqual(0);
+      }
+      // `path_opened` is NOT in `mechanism_established` and must never be: its mechanism IS
+      // established (the clear did it), but `spec/Forecast.dfy`'s clause 3 is the strictly-inside
+      // rule and an access event's cleared rows lie outside the roof-to-floor span, so it is not a
+      // forecast under the concept spec. `mechanism_established` is the denominator of the clause
+      // breakdown below, and folding this in would break that partition instead of passing quietly.
+      const po = PATH_OPENED[SESSION]?.[p.user];
+      expect([SESSION, p.user, po]).not.toEqual([SESSION, p.user, undefined]);
+      expect([SESSION, p.user, p.path_opened]).toEqual([SESSION, p.user, po]);
       // The DENOMINATOR's scope, gated (schema 8). `verified_tspins` is the TUCKED, line-clearing
       // T-spins; `admitted_lineclearing_tspins` is EVERY line-clearing verifiable T-spin, so the
       // difference is exactly the untucked and the snapshot-less. Without this the report could go
@@ -261,12 +282,13 @@ for (const PATH of ARTEFACTS) {
       expect(p.admitted_lineclearing_tspins).toBe(
         p.verified_tspins + p.tspins_excluded_untucked + p.tspins_excluded_no_snapshot);
       // An improvement the step model cannot explain is a defect in the model, not a category.
-      // If this ever exceeds 0, the buckets below it stop meaning what they say.
+      // If this ever exceeds 0, the buckets above it stop meaning what they say.
       //
-      // ── IT EXCEEDS 0 ONCE, AND THAT ONCE IS NAMED (2026-08-16) ──────────────────────────────
-      // 2026-08-14 yachi is 1, and has been since that session's first commit (d845b3f). Pinned
-      // by name in UNATTRIBUTED_STEP_MODEL_GAP above, NOT relaxed to a bound, because the event
-      // was traced and the model really is missing an edit:
+      // ── IT EXCEEDED 0 ONCE. THE MODEL WAS REPAIRED, AND IT IS NOW 0 EVERYWHERE (2026-08-16) ──
+      // 2026-08-14 yachi read 1 from that session's first commit (d845b3f) until the `access`
+      // mechanism landed. It was carried as a named exception (`UNATTRIBUTED_STEP_MODEL_GAP`, in a
+      // shared `step-model-gap.ts`) while the cause was traced, and the trace is why the repair is
+      // a fifth Mechanism rather than a widened branch:
       //
       //   replay-2026-08-14-0.ttrm r4 (m1r5) yachi, lock 74, a T-spin Double. Roof at lock 64,
       //   availability 1 -> 2, causing step localised to lock 70. The slot the T executed into
@@ -278,35 +300,36 @@ for (const PATH of ARTEFACTS) {
       //       A minus row 31/32/34   best=0 / 0 / 1     (controls: not "any deletion helps")
       //   So the clear did not FORM the slot — it removed the lid over one that already existed
       //   and was unreachable. `bestTspin` is a BFS from spawn, so its availability is
-      //   REACHABILITY, and `localiseMechanism`'s geometric rule ("a cleared row outside the
-      //   slot displaced it rigidly and cannot have formed it", forecast.ts:494) is sound about
-      //   formation and silent about access. There is no bucket for it, so it falls through.
+      //   REACHABILITY, and `localiseMechanism`'s geometric rule is sound about formation and was
+      //   silent about access. There was no bucket for it, so it fell through.
       //
-      // The reason the entry is one line and the hole is bigger than one line: `unattributed`
-      // DETECTS ONLY HALF OF ITS OWN CLASS. Sweeping all six sessions for "the cleared rows
-      // ALONE reach the target, and no cleared row lies strictly inside the slot" finds 2 events
-      // among 1789 localised records (3926 records in the verified prefixes; the rest are never
-      // localised at all), and 0 beyond the prefixes, so this is not a coverage artefact:
+      // THE COUNTER SAW ONLY HALF THE CLASS, which is why the exception list could never have been
+      // the fix. Sweeping all six sessions for "the cleared rows ALONE reach the target, and no
+      // cleared row lies strictly inside the slot" finds 2 events among 1789 localised records, and
+      // 0 beyond the verified prefixes, so it was not a coverage artefact:
       //
-      //   2026-08-14 …-0.ttrm r4 yachi lock 74  -> `unattributed`   (piece does not touch)
-      //   2026-08-09 …-6.ttrm r7 pinglamb lock 24 -> `placement`    (piece touches)
+      //   2026-08-14 …-0.ttrm r4 yachi lock 74    -> `unattributed`  (piece does not touch)
+      //   2026-08-09 …-6.ttrm r7 pinglamb lock 24 -> `placement`     (piece touches)
       //
       // The 08-09 one is a Z (`spin: none`) at rows 21-23 that cleared row 23, opening a slot at
-      // rows 24-26; A minus row 23 alone gives best=2 where the three controls give 0. It is
+      // rows 24-26; A minus row 23 alone gives best=2 where the three controls give 0. It was
       // reported as `placement` — self_built — purely because a lock cell at B-row 23 is adjacent
       // to slot row 24 and so satisfies `touches`; the Z's cells are provably not in the slot. So
-      // the same defect yields a confident WRONG verdict when the piece happens to sit beside the
-      // slot, and an honest "don't know" only when it does not. Only the honest half reaches this
-      // assertion, which is why the ROADMAP item is about the mechanism and this list is about the
-      // one event that surfaces.
+      // the same defect yielded a confident WRONG verdict when the piece happened to sit beside the
+      // slot, and an honest "don't know" only when it did not. Only the honest half ever reached
+      // this assertion — pinning it harder would have guarded the half that was already honest.
+      // Both are `path_opened` now, pinned per player in PATH_OPENED above, and the class itself is
+      // measured from the boards in forecast-access-class.test.ts.
       //
-      // No published rate moves under any repair: 08-14's event is rejected by clause 4 (the
-      // closing clear at lock 70 was itself a T-spin) and 08-09's by clause 2 (floorOrigin
-      // `arrived-later`), so `forecast_total` stays 0 either way. What a repair WOULD move is the
-      // `self_built` count the report prints as 「玩家自己落嗰隻棋整出嚟」 — a gloss already false
-      // for the 08-09 event — so it is a published-figure decision, not a test fix.
-      const known = UNATTRIBUTED_STEP_MODEL_GAP[SESSION]?.[p.user] ?? 0;
-      expect([SESSION, p.user, p.unattributed]).toEqual([SESSION, p.user, known]);
+      // No published rate moved: 08-14's event is rejected by clause 4 (the closing clear at lock 70
+      // was itself a T-spin) and 08-09's by clause 2 (floorOrigin `arrived-later`), so
+      // `forecast_total` was 0 either way. What moved is the `self_built` count the report prints as
+      // 「玩家自己落嗰隻棋整出嚟」 — a gloss that was false for the 08-09 event.
+      //
+      // 0 UNCONDITIONALLY, AND THE FIELD STAYS EMITTED. A counter that is identically zero is not a
+      // dead field: it is the model saying it can still explain everything it sees, and the next gap
+      // is what it is for. Deleting it would delete the only thing that can announce one.
+      expect([SESSION, p.user, p.unattributed]).toEqual([SESSION, p.user, 0]);
       expect(p.verified_placements).toBeLessThanOrEqual(p.total_placements);
       for (const k of ['forecast_rate_x1000','sampling_ci95_lo_x1000','sampling_ci95_hi_x1000'])
         expect(Number.isInteger(p[k])).toBe(true);

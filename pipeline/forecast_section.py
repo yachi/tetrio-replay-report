@@ -282,6 +282,11 @@ def _mechanism_clause(data):
     excl = sum(p.get("tspins_excluded_untucked", 0) + p.get("tspins_excluded_no_snapshot", 0) for p in ps)
     fg = sum(p.get("forecast_garbage", 0) for p in ps)
     lc = sum(p.get("forecast_lineclear", 0) for p in ps)
+    # Bare, deliberately, exactly as `_rejection_clause` reads `rejected_by`. A schema-9 artifact
+    # that was never re-emitted has no such key and must break the build; `.get(..., 0)` would fold
+    # the fifth bucket into 「其餘」 and publish a confident, wrong remainder — the shape that
+    # published 「一個 Perfect Clear 都冇出過」 for five sessions against 65 real ones.
+    po = sum(p["path_opened"] for p in ps)
     sb = sum(p.get("self_built", 0) for p in ps)
     re_ = sum(p.get("reactive", 0) for p in ps)
     mech = sum(p.get("mechanism_established", 0) for p in ps)
@@ -296,8 +301,58 @@ def _mechanism_clause(data):
     # keeps the undecidable ones' 「唔會當佢啱亦都唔會當佢錯」 wording. The count itself is still
     # gated: `forecast-facts.test.ts` asserts `clause2_undecided` equals the two undecidable
     # buckets of `rejected_by`, so dropping the read here cannot let the field drift unnoticed.
+
+    # The five kinds partition the tucked line-clearing T-spins, so 「其餘」 below is a REMAINDER and
+    # not a fifth number that happens to be printed last. Asserted in the same shape as
+    # `_rejection_clause`'s: a bucket the emitter grows without a sentence here would otherwise be
+    # swallowed silently, which is precisely how `path_opened` would have shipped as `reactive`.
+    if fg + lc + po + sb + re_ != tot:
+        raise ValueError(
+            "the mechanism buckets do not partition the tucked line-clearing T-spins: "
+            f"forecast_garbage {fg} + forecast_lineclear {lc} + path_opened {po} + "
+            f"self_built {sb} + reactive {re_} = {fg + lc + po + sb + re_} "
+            f"vs verified_tspins {tot}")
     if not tot:
         return ""
+
+    # The fifth bucket, rendered ONLY when it fired. Four of the six sessions have none, and this
+    # repo's rule is that an absence renders as an absence — 「0 個」 reads as a measured zero.
+    #
+    # The reason it is not a forecast is CLAUSE 3 and nothing else. `spec/Forecast.dfy`'s GapClosed
+    # is the strictly-inside rule; an access event's cleared rows lie OUTSIDE [roofAt, floorAt], so
+    # `IsForecast` is already false on geometry before clause 2 (個底幾時到) or clause 4
+    # (埋尾嗰下係咪 T-spin) is ever asked. Do NOT reword it as either of those, and do NOT let it
+    # read as a near miss: two published reports already carried a wrong clause here, and the gate
+    # re-renders from the same artifact, so it compares the sentence against itself and never
+    # against the truth. Nor may it be worded as 自己砌 — that names `self_built`, and this event is
+    # not in it.
+    #
+    # SAY WHAT THE PREDICATE SAYS, AND NOTHING MORE. The branch tests two things and only two:
+    # the cleared rows lie outside the slot's own rows (so the clear did not FORM it — a cleared row
+    # outside displaces the slot rigidly), and `bestTspinLines(withoutRows(A, clearedRows)) >= target`
+    # (the clear ALONE, with the piece never placed, already reaches the executed spin). The second
+    # is what takes the credit off the piece, which is the editorial defect this bucket retracts.
+    #
+    # It does NOT test that the slot is unchanged cell for cell. An earlier draft of this sentence
+    # said 「個窿位一格都冇變過，一早就已經喺度」, which is measured and true of both corpus events
+    # (`forecast-access-class.test.ts`'s ACCESS_CLASS records rows 34-39 and 24-39 bit-identical) and
+    # is NOT what put them in this bucket — nothing stops a future event satisfying the predicate
+    # while the piece contributes a wall. This module renders off the artefact's `path_opened` COUNT
+    # and never sees that list, so the sentence would have been resting on a property the renderer
+    # cannot check. Nor may the per-event detail be smuggled back in as 「呢兩件事上面…」: a
+    # corpus-shaped figure hardcoded into per-session prose is the same defect as the 「平均相隔 11
+    # 隻棋」 line two paragraphs down, which this section already had to remove once.
+    po_txt = (
+        f"<strong>{po} 個</strong>係消行<strong>通咗條路</strong>，唔係整咗個窿位出嚟——"
+        "<strong>消嗰行自己一個就已經夠</strong>：就算隻棋根本冇落過，"
+        "淨係喺落棋之前嗰塊板度刪走同一批行，個 T-spin 就已經入得到，"
+        "所以功勞唔算得落隻棋度。"
+        "呢一類唔計 forecast，而且唔係差少少："
+        "forecast 要求消嗰行啱啱夾喺天花板同窿位中間（即係上面嗰句），"
+        "而呢啲消行喺嗰個範圍以外——單睇消嗰行喺邊就已經唔合格，"
+        "後面「個底喺唔喺度」同「埋尾嗰下消行係咪 T-spin」根本問都唔使問；"
+        if po else "")
+
     parts = [
         "<strong>「Forecast」要求個窿位係<em>由外力</em>整出嚟嘅</strong>——"
         "即係垃圾升起或者消行，唔係自己砌出嚟。"
@@ -319,7 +374,8 @@ def _mechanism_clause(data):
         "消走咗兩者先貼埋一齊；"
         f"{sb} 個係<strong>玩家自己落嗰隻棋整出嚟</strong>嘅——開局定式（例如 C-Spin）就係咁，"
         "個天花板早過個窿位係定式本身嘅砌法，唔係預測；"
-        f"其餘 {re_} 個個窿位本身冇變好。",
+        + po_txt
+        + f"其餘 {re_} 個個窿位本身冇變好。",
         # Clause 2. Added 2026-08-03: the mechanism clause says WHAT closed the gap, and says
         # nothing about whether there was a hole to close onto. Without it a roof dropped on solid
         # stack that opens up underneath scores exactly like a roof laid over a cavity on purpose.

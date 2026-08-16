@@ -1,23 +1,33 @@
 /**
- * The step model's fourth mechanism, pinned by name over the whole corpus.
+ * The step model's `access` mechanism, measured from the boards and pinned by name over the whole
+ * corpus. THIS FILE IS NOW A REGRESSION GUARD ON THAT BRANCH. It was written as a report of a gap,
+ * and its own header said a repair that landed a fifth `Mechanism` SHOULD break it; the repair
+ * landed on 2026-08-16 and the break is recorded below in `ACCESS_CLASS`'s two verdicts.
  *
  * `localiseMechanism` decomposes a step into place -> clear -> insert-garbage and asks which of
- * those edits FORMED the slot the T executed into. Its test for the clear is geometric and stated
- * at forecast.ts:494 — "a cleared row outside the slot's own rows displaces the slot rigidly and
- * cannot have formed it". That is sound about formation and silent about ACCESS: `bestTspin` is a
- * BFS from spawn, so availability is REACHABILITY, and a clear also raises it by removing an
- * obstruction ABOVE a slot that already exists, cell for cell, and was merely unreachable.
+ * those edits FORMED the slot the T executed into. Its test for the clear is geometric — "a cleared
+ * row outside the slot's own rows displaces the slot rigidly and cannot have formed it". That is
+ * sound about formation and silent about ACCESS: `bestTspin` is a BFS from spawn, so availability is
+ * REACHABILITY, and a clear also raises it by removing an obstruction ABOVE a slot that already
+ * exists, cell for cell, and was merely unreachable.
  *
- * The model has nowhere to put that, so it lands in one of two places depending on an irrelevance
- * — whether the causing piece happens to sit next to the slot:
+ * ── WHAT THE MODEL USED TO ANSWER, AND WHY IT MATTERED (history — the reason this file exists) ────
+ * Before `access`, the model had nowhere to put that, so the verdict turned on an irrelevance —
+ * whether the causing piece happened to sit next to the slot:
  *
  *   piece does NOT touch  ->  `unattributed`   honest, and counted in the artefact
  *   piece DOES touch      ->  `placement`      confidently wrong, and counted NOWHERE
  *
- * WHICH IS WHY THIS FILE EXISTS AND WHY IT DOES NOT KEY ON `unattributed`. The artefact's
- * `unattributed` counter is pinned in forecast-facts.test.ts, but it can only ever see the honest
- * half. A third event of this class arriving as `placement` would pass that guard in silence — the
- * same defect one level down. This detects the CLASS from the boards and pins every member.
+ * The second row is the one that reached a reader: 2026-08-09's published report said
+ * 「玩家自己落嗰隻棋整出嚟」 — the player's own piece made that slot — of a slot the Z at lock 20
+ * provably did not make. `self_built`'s gloss was simply false for it.
+ *
+ * AND THE COUNTER COULD ONLY EVER SEE HALF THE CLASS, which is why the fix could never have been a
+ * tighter pin on `unattributed`. The artefact's `unattributed` counter is pinned in
+ * forecast-facts.test.ts; a third event arriving as `placement` would have passed that guard in
+ * silence — the same defect one level down, guarding the half that was already honest. This file
+ * detects the CLASS from the boards, so it sees both halves and pins every member. That is the
+ * point the deleted `step-model-gap.ts` carried, and it lives here now because the class lives here.
  *
  * DETECTION. For each record whose mechanism was localised to a step t > j, re-derive that step's
  * three edits and ask a counterfactual the model never asks:
@@ -38,12 +48,18 @@
  * The 9 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
  * by folding it into "formed":
  *
- *   5  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot  OK
- *   2  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`  OK
- *   2  ACCESS          neither — the clear only removed the lid       -> `unattributed`/`placement` GAP
+ *   5  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot
+ *   2  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`
+ *   2  ACCESS          neither — the clear only removed the lid       -> engine says `access`
  *
  * Overdetermined is not a defect: when the placement on its own reaches the target, crediting it is
- * defensible even though the clear would have done too. Only the last row is the model gap.
+ * defensible even though the clear would have done too.
+ *
+ * ALL THREE COUNTS ARE UNCHANGED BY THE REPAIR — only the last row's verdict moved, from
+ * `unattributed`/`placement` to `access`. That is what says the branch went in at the right place:
+ * placed before the strictly-inside test the same counterfactual takes all 9 and `formed` collapses
+ * to 0 (planted and killed — see MUTATION STATUS); placed after `touches` it takes 1 and leaves the
+ * confidently-wrong half exactly as it was.
  *
  * WHAT THIS FILE DOES NOT COVER: whether `localiseMechanism`'s inside test should be strict or
  * inclusive. No cleared row in this corpus sits on a slot boundary, so the corpus cannot answer it;
@@ -53,28 +69,58 @@
  * NAMED, NOT BOUNDED — the `DT_ORDER_IN_OPENER` precedent (pipeline/openers/openers.test.ts) and
  * `check_loo.py`'s ANNOTATED. An inequality would be satisfied by any two such events anywhere;
  * this names these two, so a third has to be investigated instead of absorbed, and either of them
- * disappearing or changing verdict fails just as loudly. A repair that lands a fifth `Mechanism`
- * SHOULD break this test — that is the point, and the list is where the repair gets recorded.
+ * disappearing or changing verdict fails just as loudly. It stays named now that the branch exists,
+ * for the same reason: `access` firing on a third event is a claim about the play, not a refactor.
  *
  * MUTATION STATUS, because "a guard no mutant can kill is decorative" applies to this file too.
- * 13 mutants planted, 10 killed — every entry in ACCESS_CLASS (removed, reclassified, drifted,
- * padded) and every counterfactual branch (clearAlone disabled, clearAlone asked of B instead of A,
- * Bpre dropped, Bpre always taken, the engine-verdict test inverted, and never firing).
+ * RE-MEASURED 2026-08-16 against the repaired engine — the previous header claimed 13/10 and three
+ * survivors, and that claim was about a file whose ACCESS_CLASS held different verdicts, so it was
+ * carried forward rather than re-run. **20 planted, 16 killed, 4 survive.** Every previously-killed
+ * mutant is still killed; nothing regressed from killed to surviving.
  *
- * Three survive, and all three are the same artefact — an assertion that a SET IS EMPTY cannot be
- * killed by disabling whatever would fill it, when on this corpus nothing does:
+ * Killed (16): both ACCESS_CLASS entries removed, reclassified and drifted separately (6), the list
+ * padded with an invented third (1), and every counterfactual branch — clearAlone disabled,
+ * clearAlone asked of B instead of A, Bpre dropped, Bpre always taken, the engine-verdict test
+ * inverted, and never firing (6). Plus three aimed at the branch this file now guards:
+ *
+ *   the `access` return DELETED from `localiseMechanism`  — the class reappears exactly as the two
+ *                                        rows above predict, `placement/self_built` and
+ *                                        `unattributed/self_built`, and BOTH the entry list and the
+ *                                        cross-check fail. This is the mutant that makes this file
+ *                                        a regression guard rather than a report.
+ *   the `access` branch moved BEFORE the strictly-inside test — `formed` 5 -> 0, i.e. it eats the
+ *                                        published `forecast_lineclear` numerator. Kills on the
+ *                                        decomposition, which is what that test is for.
+ *   the two above combined with the widened cross-check (see the survivor) — still killed, but by
+ *                                        the entry list ALONE.
+ *
+ * Four survive. Three are the artefact the previous header named — an assertion that a SET IS EMPTY
+ * cannot be killed by disabling whatever would fill it, when on this corpus nothing does:
  *
  *   `pieceBlocked` branch deleted        — no record takes that branch here, so deleting it and
  *                                          asserting 0 are indistinguishable. It guards a case that
- *                                          does not occur yet, the same way forecast.ts:571's
- *                                          null-slot return is kept "for the type, not the value".
+ *                                          does not occur yet, the same way forecast.ts's null-slot
+ *                                          return is kept "for the type, not the value".
  *   cross-check collector neutered       — `disagreements` is empty, so removing the recorder and
  *   cross-check predicate forced true    — recording nothing look alike.
  *
+ * The fourth is new, and it is an honest correction to the reasoning that tightened `check`:
+ *
+ *   check's ACCESS branch widened back to `access || placement || unattributed`
+ *                                        — SURVIVES on this corpus, because the engine says
+ *                                          `access` and the disjunction accepts that too. The
+ *                                          tightening does buy something — combined with the
+ *                                          deleted-branch mutant it is the difference between two
+ *                                          tests failing and one — but the kill is carried by
+ *                                          ACCESS_CLASS's verdicts either way. So the tightening is
+ *                                          correctness, not coverage, and must not be described as
+ *                                          the thing that catches a deleted branch.
+ *
  * The cross-check is NOT decorative, and that was checked rather than assumed: mutating the replica
  * itself (`Bpre branch always taken`) fails three tests including `the replica can disagree with
- * the engine, and does not`. It fires on the thing it guards — drift between the counterfactuals
- * and `localiseMechanism` — just not on its own deletion.
+ * the engine, and does not`, and so does deleting the engine's `access` return. It fires on the
+ * thing it guards — drift between the counterfactuals and `localiseMechanism` — just not on its own
+ * deletion.
  *
  * Cost: ~13s, because it replays every case in every session through the oracle. That is the same
  * work forecast-corpus.test.ts does for one session, and the class cannot be measured any other
@@ -102,25 +148,28 @@ type Member = {
 };
 
 /**
- * The two events this corpus contains, with the verdict each currently receives. The verdict is
- * part of the pin on purpose: 08-09's `placement` is the wrong half of the defect, and if a repair
- * reclassifies it, this list must be edited rather than quietly continuing to pass.
+ * The two events this corpus contains, with the verdict each receives. The verdict is part of the
+ * pin on purpose: it is what turned this file from a report of a gap into a regression guard on the
+ * branch that closed it. Both entries read `unattributed`/`self_built` and `placement`/`self_built`
+ * until 2026-08-16 — the two ways the model used to answer, recorded in the history above.
  */
 const ACCESS_CLASS: Member[] = [
   // A T-spin Single at lock 70 cleared row 33 — `LLLIIII.ZZ`, one open column. The slot is at rows
   // 35-37 and rows 34-39 are bit-identical in A = boards[69] and in B, so nothing was formed:
   // deleting row 33 from A ALONE yields the same 2-line slot [36,36,36,37,35] (best 1 -> 2), where
   // deleting rows 31/32/34 instead gives 0/0/1. The clear removed the lid. The T's own cells sit at
-  // B-row 33, outside the slot's 35-37 and its +/-1 margin, so `touches` is false.
+  // B-row 33, outside the slot's 35-37 and its +/-1 margin, so `touches` is false — which is why
+  // this half used to fall all the way through to `unattributed`.
   { session: '2026-08-14', file: 'replay-2026-08-14-0.ttrm', round: 4, user: 'yachi',
-    lock: 74, step: 70, mechanism: 'unattributed', kind: 'self_built' },
-  // The dangerous half. The causing piece is a Z (`spin: 'none'`) at rows 21-23 that cleared row 23;
-  // the slot is at rows 24-26 and rows 24-39 are bit-identical either side, so again nothing was
-  // formed — A minus row 23 alone gives best 0 -> 2, controls on rows 21/22/24 give 0/0/0. The Z is
-  // credited anyway because one of its cells lands at B-row 23, which is slot row 24 minus one, and
-  // `touches` accepts adjacency. The report prints this event inside 「玩家自己落嗰隻棋整出嚟」.
+    lock: 74, step: 70, mechanism: 'access', kind: 'path_opened' },
+  // The half that was dangerous. The causing piece is a Z (`spin: 'none'`) at rows 21-23 that cleared
+  // row 23; the slot is at rows 24-26 and rows 24-39 are bit-identical either side, so again nothing
+  // was formed — A minus row 23 alone gives best 0 -> 2, controls on rows 21/22/24 give 0/0/0. The Z
+  // used to be credited anyway, because one of its cells lands at B-row 23, which is slot row 24
+  // minus one, and `touches` accepts adjacency. The `access` branch is tested BEFORE `touches`, so
+  // the adjacency no longer decides it.
   { session: '2026-08-09', file: 'replay-2026-08-09-6.ttrm', round: 7, user: 'pinglamb',
-    lock: 24, step: 20, mechanism: 'placement', kind: 'self_built' },
+    lock: 24, step: 20, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -142,10 +191,16 @@ function sweep() {
   // The two branches this file decides for itself each predict what the engine must already have
   // concluded. Recorded rather than asserted inline, so one drift does not mask the rest of the
   // sweep. This is the only place the counterfactuals and `localiseMechanism` can contradict.
+  //
+  // `ACCESS` used to be checked as `placement || unattributed` — a disjunction, because before the
+  // repair the engine's answer really was either of those depending on `touches`, an irrelevance.
+  // It is `access` exactly now: a cross-check that still accepted the two verdicts the repair exists
+  // to remove would be strictly weaker than the engine it checks. Measured, not assumed — widening
+  // it back SURVIVES the mutation sweep on this corpus, and deleting the engine's `access` branch
+  // under the widened version still fails, on ACCESS_CLASS rather than here. So this line is about
+  // saying the right thing, not about being the thing that catches a deletion; see MUTATION STATUS.
   const check = (predicted: string, rec: { mechanism?: string }, where: string) => {
-    const ok = predicted === 'ACCESS'
-      ? rec.mechanism === 'placement' || rec.mechanism === 'unattributed'
-      : predicted === rec.mechanism;
+    const ok = predicted === 'ACCESS' ? rec.mechanism === 'access' : predicted === rec.mechanism;
     if (!ok) disagreements.push(`${where}: replica says ${predicted}, engine says ${rec.mechanism}`);
   };
 
@@ -212,7 +267,7 @@ function sweep() {
 
 const result = sweep();
 
-test('the access class is exactly the two named events — a third fails, a missing one fails', () => {
+test('the access class is exactly the two named events, and the engine calls both `access`', () => {
   // Sorted and compared as a SET of keys: an added member, a removed member, a member that moved
   // round or lock, and a member whose verdict changed all fail here. `toEqual` on the strings keeps
   // the failure readable, which matters because the reason lives beside each entry in ACCESS_CLASS.
@@ -228,12 +283,19 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the model attributes 7 of the 9 candidates defensibly, and misses 2', () => {
-  // The numbers that make this a finding rather than a curiosity. 9 records corpus-wide are ones
-  // the clear ALONE explains; 5 the model credits to the clear correctly, 2 more are overdetermined
-  // (the placement alone also sufficed, so `placement` is a defensible verdict), and 2 are the gap.
-  // A detector that fired on everything, or on nothing, would look identical in `access` alone —
-  // these are its denominator, its true positives and the branch that pre-empts them.
+test('the 9 candidates decompose 5 formed / 2 overdetermined / 2 access, and nothing else', () => {
+  // The numbers that make this a finding rather than a curiosity, and they did NOT move when the
+  // `access` branch landed — only the verdict on the last 2 did. 9 records corpus-wide are ones the
+  // clear ALONE explains; 5 the model credits to the clear because a cleared row lies strictly
+  // inside the slot, 2 more are overdetermined (the placement alone also sufficed, so `placement` is
+  // a defensible verdict and the engine tests it first), and 2 are the access class. A detector that
+  // fired on everything, or on nothing, would look identical in `access` alone — these are its
+  // denominator, its true positives and the branch that pre-empts them.
+  //
+  // This is also where the branch ORDER is pinned. Placed before the strictly-inside test the same
+  // counterfactual reclassifies all 9, i.e. the published numerator; placed after `touches` it
+  // reclassifies 1 and leaves the confidently-wrong half alone. `formed` staying 5 is what says the
+  // branch went in between.
   expect(result.clearAlone).toBe(9);
   expect(result.formed).toBe(5);
   expect(result.overdetermined).toBe(2);

@@ -1,5 +1,5 @@
 {
-  "schema": "forecast-facts/9",
+  "schema": "forecast-facts/10",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
@@ -25,6 +25,7 @@
       "tspins_excluded_zero_clear": 4,
       "forecast_garbage": 0,
       "forecast_lineclear": 1,
+      "path_opened": 0,
       "self_built": 126,
       "unattributed": 0,
       "mechanism_established": 1,
@@ -62,6 +63,7 @@
       "tspins_excluded_zero_clear": 3,
       "forecast_garbage": 0,
       "forecast_lineclear": 0,
+      "path_opened": 0,
       "self_built": 102,
       "unattributed": 0,
       "mechanism_established": 0,

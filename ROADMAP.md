@@ -1971,7 +1971,64 @@ Lifting the doc parser into `docs_gate.py` — so CLAUDE.md is parsed in exactly
 latent off-by-one in `paragraph()`: `rfind(...) + 2` returns index 1 for a paragraph at byte 0,
 silently dropping its first character. Harmless for equiv's anchors, not harmless for a substring gate.
 
-## `localiseMechanism` has no bucket for "the clear opened the PATH" (2026-08-16) — OPEN
+## `localiseMechanism` has no bucket for "the clear opened the PATH" (2026-08-16) — DONE
+
+**DONE (2026-08-16).** `access` is the fifth `Mechanism` and `path_opened` the fifth `ForecastKind`,
+inserted after the clear's own geometry and before the piece's, exactly as Design A below specifies.
+Both corpus events are reclassified, `unattributed` is 0 in every session and player,
+`step-model-gap.ts` is deleted, and **no published rate, CI or statistic moved** — the six artefacts
+differ only by the schema string, the new key, and `self_built` falling by 1 in two sessions.
+`sessions/2026-08-09/report/report.html` no longer says 「玩家自己落嗰隻棋整出嚟」 of the slot that
+Z did not make, which was the concrete cost this item was filed for.
+
+Four things came out of the implementation that the design below did not anticipate, and all four
+are worth more than the item itself:
+
+1. **The rejected row's own number was wrong here: it is 9, not 7.** Measured twice, independently —
+   a fresh probe that first reproduces all 1789 shipped verdicts, and `forecast-access-class.test.ts`'s
+   pre-existing sweep, whose `clearAlone` is 9 = 5 `formed` + 2 overdetermined + 2 `access`. The "7"
+   counted the 5 `formed` and the 2 `access` and silently dropped the 2 overdetermined. The chosen row
+   (2, in-prefix, 0 beyond) is confirmed by both.
+2. **The `touches` exit is now UNREACHED on this corpus, and that is the shape of the repair.** 11
+   records reach that block across six sessions: 9 `formed`, 2 `access`, **0** either way below.
+   Before the branch, `touches` fired exactly once — 08-09 r7 pinglamb lock 24, i.e. the entire
+   confidently-wrong half. It is kept as live code (a clear displacing a slot the piece *did* build is
+   an ordinary board), but the only thing exercising it is `forecast.test.ts`'s `DISP_*` fixture — and
+   that fixture is the **sole** killer of the mutant that asks the counterfactual of `Bpre` instead of
+   `A`. That mutant makes the branch fire unconditionally and **no corpus test notices**, because
+   everything reaching there takes the `access` exit anyway. A corpus-only mutation suite would have
+   scored it a survivor.
+3. **`run-forecast.ts` reproduced its own documented bug, one line under the comment describing it.**
+   Its hand-written zeroed tally had omitted `self_built` in 2026-08-08, printing `NaN` for 388 of 654
+   records; `path_opened` was about to do it again verbatim. The literal is gone rather than extended —
+   `FORECAST_KINDS` + `zeroKindTotals()` derive it, and the runner throws if its printed breakdown does
+   not sum to its own header. `satisfies Record<ForecastKind, number>` was written first and rejected:
+   **there is no `tsc` step in this repo**, so a type-level guard there fires on nothing. The same
+   `else`-swallows-a-bucket hazard existed in `emit-forecast-facts.ts`, where the fifth kind would have
+   been published as `reactive` — i.e. as "the available spin did not improve", the opposite of what it
+   means.
+4. **The first draft of the rendered sentence claimed more than the predicate proves.** It said
+   「個窿位一格都冇變過，一早就已經喺度」. Cell-identity is measured and true of both events (recorded
+   per entry in `ACCESS_CLASS`) but is **not** what puts an event in the bucket — the branch tests only
+   that the cleared rows alone already reach the target. The section renders off the artefact's *count*
+   and never sees that list, so the sentence would have rested on a property no gate in the render path
+   can check. It now states the counterfactual. Same family as the 4d0f2f5 trap: the gate re-renders
+   from the artefact, so it compares the sentence against itself and never against the truth.
+
+`check_forecast_section.py` gains two anchors — one for the CLAIM, one for the clause-3 REASON — for
+the reason `check_opener_section`'s `ANCHOR_MARKERS` exist: checks 1-2 are render-vs-renderer and are
+blind to a sentence the renderer stops producing. Its `path_opened` mutant is MANUFACTURED, since four
+of six sessions hold none and a perturbation mutant is vacuous there; the partition-assert case expects
+a **raise**, not a rejection, because with the assert deleted the input still renders. 17 corruptions,
+all caught, on every session.
+
+`forecast-access-class.test.ts`'s mutation header was re-measured rather than carried forward (the old
+13/10 described a file whose `ACCESS_CLASS` held different verdicts): **20 planted, 16 killed, 4
+survive**, nothing regressed. The fourth survivor is new and is an honest correction — widening the
+cross-check back to `access || placement || unattributed` survives, so tightening it to the exact
+`access` is *correctness, not coverage*, and must not be described as what catches a deleted branch.
+
+The original entry, unedited, follows.
 
 Found by looping `forecast-facts.test.ts` over every session instead of the one it defaulted to. The
 test read `DISCOVERED[0]`, which is the *oldest* session, so a default run checked 2026-07-22 six
@@ -2027,7 +2084,7 @@ a printed sentence to fix a miscount. Access needs its own value so both glosses
 
    | 位置 | 全 corpus 重新分類幾多條 |
    |---|---|
-   | strictly-inside 之前 | **7** —— 兩條 access 加**全部 5 條 `formed`**,即係成個 corpus 出街嗰批 forecast_lineclear。唔收得。 |
+   | strictly-inside 之前 | ~~**7**~~ **9** —— 兩條 access 加**全部 5 條 `formed`**(即係成個 corpus 出街嗰批 forecast_lineclear)**再加兩條 overdetermined**,原文漏咗最後嗰兩條。唔收得。 |
    | line-clear 之後、touches 之前 | **2** —— in-prefix,prefix 以外 0 |
    | touches/placement 之後 | **1** —— `touches` 會 short-circuit 咗 08-09 嗰條做 placement,即係confidently-wrong 嗰半原封不動 |
 
@@ -2062,11 +2119,18 @@ reciprocal test so a renamed session cannot carry its own exception out of scope
 entry removed, count drifts up, named event disappears, exception spreads to another session, stale
 entry, wrong player named.
 
-**What that list does NOT cover, stated because it would otherwise be invisible: the 08-09 event is
+~~**What that list does NOT cover, stated because it would otherwise be invisible: the 08-09 event is
 unpinned.** The list keys on the `unattributed` counter, and 08-09's event is filed `placement`, so it
 reaches no assertion — a third event arriving in the confidently-wrong shape would pass silently.
 Pinning it needs the record, which needs the simulator rather than the committed artefact. Until the
-fifth `Mechanism` lands, the only thing holding that half is this paragraph.
+fifth `Mechanism` lands, the only thing holding that half is this paragraph.~~
+
+**Both paragraphs above are obsolete as of the DONE block.** `UNATTRIBUTED_STEP_MODEL_GAP` and
+`step-model-gap.ts` are deleted — with `unattributed` at 0 everywhere the list would have been empty,
+and an exception list excusing nothing is what its own header forbade, besides making
+`forecast-facts.test.ts`'s reciprocal test vacuous. Both halves of the class are pinned by verdict in
+`forecast-access-class.test.ts`'s `ACCESS_CLASS`, which keys on the measured property rather than on a
+counter, so the 08-09 half is no longer held by prose.
 
 **Related scoping, narrower than it first looked — and the first version of this paragraph
 overstated it.** `REPLAY_DIR=sessions/2026-07-22 bun test` (`verify.yml:569`) supplies the session for
@@ -2086,6 +2150,11 @@ One file wide, same `DISCOVERED[0]` failure mode.~~
 and reads `unattributed` from `UNATTRIBUTED_BY_SESSION` in `pipeline/sim/step-model-gap.ts` — the one
 list both granularities derive from, so a third event is added once instead of being mirrored by hand
 in two files that agreed "by inspection".
+
+*(Superseded the same day by the fifth `Mechanism`: `unattributed` is 0 everywhere, so that shared
+list had nothing left to hold and the file is deleted. The bucket pins remain, with `path_opened`
+added. The point the file made — one fact in one place, never mirrored by hand — is why its content
+went into `localiseMechanism`'s own doc rather than into a second test header.)*
 
 ## 106 條手寫 claim 入返 spec 代數 — 兩個 session-local emitter 刪清 (2026-08-16) — DONE
 

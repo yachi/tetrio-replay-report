@@ -183,26 +183,35 @@ test('a clear that DISPLACES the slot is the placement, not a forecast', () => {
   expect(r.records[0]!.kind).toBe('self_built');
 });
 
-/* Neither mechanism: the slot is already built and merely UNREACHABLE, sealed under a row that is
- * full but for one column. The I completes that row from four rows up, the clear opens the path,
- * and the T walks in. The clear did not form the slot and the piece never went near it, so the
- * answer is `unattributed` — recorded rather than guessed. This never occurs in the corpus, which
- * is why it is here: an untested branch is where a silent default would live. */
+/* ACCESS, and it is now its own mechanism: the slot is already built and merely UNREACHABLE, sealed
+ * under a row that is full but for one column. The I completes that row from four rows up, the clear
+ * opens the path, and the T walks in. The clear did not FORM the slot — `bestTspin` is a BFS from
+ * spawn, so availability is reachability, and removing the lid raises it without building anything.
+ *
+ * This fixture used to assert `unattributed`/`self_built`, which was the model's answer BEFORE the
+ * fifth mechanism existed: nothing here formed the slot and the piece never went near it, so it fell
+ * through every branch. The corpus half of that defect — the same class landing on `placement` when
+ * the causing piece happened to sit beside the slot — is in forecast-access-class.test.ts. What this
+ * fixture pins now is the branch itself, on a board chosen to exercise it rather than found. */
 const ACC_ROOF = boardFrom(["#########.", "..........", "..##......", "###...####", "####.#####"]);
 const ACC_CELLS = [35, 34, 33, 32].map(row => ({ col: 9, row }));
 // the I's other three cells survive the clear and ride down with the rest of the stack
 const ACC_SPIN = boardFrom([".........#", ".........#", ".........#", "..........",
                             "..##......", "###...####", "####.#####"]);
 
-test('a clear that only opens ACCESS is attributed to neither, and says so', () => {
+test('a clear that only opens ACCESS is its own mechanism, and is not a forecast', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2],
     boardAtRoof: ACC_ROOF, boardAtSpin: ACC_SPIN, changeAt: 2, stepCells: ACC_CELLS }));
   expect(r.records[0]!.availAtSpin).toBe(2);
-  expect(r.records[0]!.mechanism).toBe('unattributed');
-  // it must NOT be counted as a forecast on the strength of a mechanism nobody established
-  expect(r.records[0]!.kind).toBe('self_built');
+  expect(r.records[0]!.mechanism).toBe('access');
+  // `path_opened`, NOT `self_built` — the piece did not build this slot, and `self_built` is what
+  // the report glosses 「玩家自己落嗰隻棋整出嚟」. And NOT `forecast_lineclear` either: the cleared
+  // row lies outside the slot, so `spec/Forecast.dfy`'s clause 3 (the strictly-inside rule) is
+  // false for it and it may not enter the numerator.
+  expect(r.records[0]!.kind).toBe('path_opened');
   expect(r.forecastRate).toBe(0);
-  expect(r.unattributed).toBe(1);
+  // and the model no longer has to say "don't know" about it — this is what the repair bought
+  expect(r.unattributed).toBe(0);
 });
 
 /* Availability OVERSHOOTS and settles back: 0 -> 2 -> 3 -> 2. The step that produced what the
@@ -466,7 +475,13 @@ test('a two-placer roof: the LATEST builder sets the window, and the ANSWER move
   // forecast_garbage localised to step 2, and the published rate goes 0 -> 1
   expect(isVerifiedForecast(rec)).toBe(false);
   expect(r.forecastRate).toBe(0);
-  expect(r.totals).toEqual({ forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 1 });
+  // Exhaustive over ForecastKind on purpose, so a new kind has to be acknowledged here rather than
+  // appearing in a bucket nobody looks at. `path_opened` arrived that way (2026-08-16) and this was
+  // the only assertion in the file it moved: the record is still `reactive` with no mechanism at
+  // all (asserted above), because nothing improved after the roof, so there is no window to
+  // localise inside and the `access` branch is never reached on this fixture.
+  expect(r.totals).toEqual({ forecast_garbage: 0, forecast_lineclear: 0, path_opened: 0,
+                             self_built: 0, reactive: 1 });
 });
 
 test('a two-placer roof also moves what clause 2 compares its supports against', () => {

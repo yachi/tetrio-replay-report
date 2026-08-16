@@ -16,27 +16,30 @@
  * This file hardcoded 2026-07-28 and pinned `unattributed: 0` inside its bucket `toEqual` —
  * deliberately, because 07-28 carries the corpus's only mechanism-established forecast. The
  * consequence nobody intended: the file never saw any OTHER session, including 2026-08-14, whose
- * `unattributed` is 1 (traced in forecast-facts.test.ts's `UNATTRIBUTED_STEP_MODEL_GAP` — a T-spin
- * Double whose slot was uncovered, not formed, by its closing clear; ROADMAP names the missing
- * `localiseMechanism` bucket). Same failure mode as `forecast-facts.test.ts` defaulting to
+ * `unattributed` was then 1. Same failure mode as `forecast-facts.test.ts` defaulting to
  * `DISCOVERED[0]`: a single hardcoded session reads as coverage but is one session six times.
  *
  * 07-28 keeps its dedicated, hand-verified test below — WIDENING MUST NOT TRADE IT AWAY. Every
  * OTHER session's totals/floors/forecasts/mechanism events are pinned the same way `openers.test.ts`
  * pins its per-session tables: literals produced by this code, not re-derived from it at test time,
  * so a regression has to change a committed number rather than the number silently following the
- * code. `unattributed` reuses the same named-exception idiom `forecast-facts.test.ts` uses for
- * `UNATTRIBUTED_STEP_MODEL_GAP` — this file can't import that (non-exported, and the file belongs
- * to a sibling change), so `CORPUS_UNATTRIBUTED_GAP` below is a session-level mirror of it: the
- * facts.json field is per-player, this file's `totals.unattributed` sums both players, and for
- * 2026-08-14 the only player with any is yachi (1), so the two numbers agree by inspection, not by
- * a shared import. Divergence between the two files' pins would itself be worth investigating.
+ * code.
+ *
+ * ── AND THE `unattributed` EXCEPTION IS GONE, BECAUSE THE MODEL WAS REPAIRED (2026-08-16) ────────
+ * That 08-14 event was one half of a class `localiseMechanism` had no bucket for: a clear that
+ * removed the LID over a slot which already existed rather than forming it. `access` is the fifth
+ * `Mechanism` and `path_opened` the fifth `ForecastKind`, so the event is now classified instead of
+ * excepted, and `unattributed` is 0 in every session. The named-exception machinery that carried it
+ * (`CORPUS_UNATTRIBUTED_GAP` here, `UNATTRIBUTED_STEP_MODEL_GAP` in forecast-facts.test.ts, both
+ * derived from `step-model-gap.ts`) is deleted rather than emptied — an exception list satisfied by
+ * nothing is the stale-entry failure its own header forbade. `unattributed` stays a PINNED 0 inside
+ * the bucket `toEqual` below: the counter is kept because the next gap is what it is for, and 0 is
+ * the strongest statement about it available.
  */
 import { test, expect, describe } from 'bun:test';
 import { existsSync, readdirSync } from 'node:fs';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import { forecastMetric, isVerifiedForecast, type ForecastKind, type FloorOrigin } from './forecast.ts';
-import { UNATTRIBUTED_BY_SESSION } from './step-model-gap.ts';
 
 const SESSIONS_ROOT = `${import.meta.dir}/../../sessions`;
 const SESSION_DIRS = readdirSync(SESSIONS_ROOT, { withFileTypes: true })
@@ -63,7 +66,8 @@ const isCSpinTriple = (lk: { piece: string; cleared: number; cells: { col: numbe
 // in here so widening to six sessions doesn't also double the wall clock.
 function run(dir: string) {
   const totals: Totals = {
-    forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0, unattributed: 0 };
+    forecast_garbage: 0, forecast_lineclear: 0, path_opened: 0, self_built: 0, reactive: 0,
+    unattributed: 0 };
   const floors: Floors = { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 };
   const forecasts: string[] = [];
   const mechanismOnly: string[] = [];
@@ -107,19 +111,29 @@ function run(dir: string) {
 
 // Regression pins. Every session's own audit trail lives beside its entry; 2026-07-28's is the
 // richest because it is the one hand-verified event in the corpus (see the dedicated test below).
+//
+// `path_opened` and the two `self_built` values it moved arrived on 2026-08-16 with the `access`
+// mechanism. The whole corpus-wide effect is TWO records — 08-09 (was `self_built`, the confidently
+// wrong half) and 08-14 (was `self_built` with mechanism `unattributed`, the honest half) — so every
+// other cell here is byte-identical to what it was before, which is the control on the change.
 const PINNED_TOTALS: Record<string, Totals> = {
-  '2026-07-22': { forecast_garbage: 0, forecast_lineclear: 1, self_built: 354, reactive: 424, unattributed: 0 },
-  '2026-07-24': { forecast_garbage: 0, forecast_lineclear: 1, self_built: 228, reactive: 306, unattributed: 0 },
+  '2026-07-22': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 0, self_built: 354, reactive: 424, unattributed: 0 },
+  '2026-07-24': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 0, self_built: 228, reactive: 306, unattributed: 0 },
   // Re-blessed 2026-08-12 for the ORACLE board source (runCaseOracle, verified prefix 24.8% -> 92.3%).
   // Every bucket grew (reactive 121 -> 306, self_built 169 -> 295); forecast_lineclear 1 -> 2 because the
   // longer prefix reaches a SECOND mechanism event, `yachi 07-28-4 r2 lock 29`, which SURVIVES all four
   // clauses (next test) — the hand-sim never reached it.
-  '2026-07-28': { forecast_garbage: 0, forecast_lineclear: 2, self_built: 295, reactive: 306, unattributed: 0 },
-  '2026-08-01': { forecast_garbage: 0, forecast_lineclear: 2, self_built: 267, reactive: 327, unattributed: 0 },
-  '2026-08-09': { forecast_garbage: 0, forecast_lineclear: 2, self_built: 232, reactive: 312, unattributed: 0 },
-  // unattributed: 1 is 2026-08-14's named, traced event (yachi, replay-2026-08-14-0.ttrm r4, lock 74)
-  // — see CORPUS_UNATTRIBUTED_GAP below and forecast-facts.test.ts's UNATTRIBUTED_STEP_MODEL_GAP.
-  '2026-08-14': { forecast_garbage: 0, forecast_lineclear: 1, self_built: 404, reactive: 462, unattributed: 1 },
+  '2026-07-28': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 0, self_built: 295, reactive: 306, unattributed: 0 },
+  '2026-08-01': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 0, self_built: 267, reactive: 327, unattributed: 0 },
+  // path_opened: 1 / self_built 232 -> 231. `replay-2026-08-09-6.ttrm` r7 pinglamb lock 24: a Z that
+  // cleared row 23 opened a slot at rows 24-26 it did not build, and was credited `placement` purely
+  // because a lock cell at B-row 23 satisfies `touches`. This is the half a `unattributed` counter
+  // could never see, and it was published as 「玩家自己落嗰隻棋整出嚟」.
+  '2026-08-09': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 1, self_built: 231, reactive: 312, unattributed: 0 },
+  // path_opened: 1 / self_built 404 -> 403 / unattributed 1 -> 0. `replay-2026-08-14-0.ttrm` r4 yachi
+  // lock 74: the same class with the piece NOT touching, so it used to fall through to `unattributed`
+  // and was the corpus's only entry in that bucket.
+  '2026-08-14': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 1, self_built: 403, reactive: 462, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -151,8 +165,9 @@ const PINNED_FORECASTS: Record<string, string[]> = {
     'yachi replay-2026-08-01-7.ttrm r4 lock 136 forecast_lineclear roof 130 0->2',
   ],
   '2026-08-09': ['pinglamb replay-2026-08-09-3.ttrm r8 lock 109 forecast_lineclear roof 100 0->2'],
-  // 0 verified forecasts: 08-14's one mechanism event below is rejected at clause 2/4 (see
-  // forecast-facts.test.ts's trace of the same event under UNATTRIBUTED_STEP_MODEL_GAP).
+  // 0 verified forecasts: 08-14's one mechanism event below is rejected at clause 2/4. Not to be
+  // confused with that session's `path_opened` event, which is a different lock and never was a
+  // forecast candidate — forecast-facts.test.ts traces both.
   '2026-08-14': [],
 };
 
@@ -174,23 +189,6 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
   '2026-08-14': ['yachi replay-2026-08-14-2.ttrm r3 lock 18 forecast_lineclear floor pre-existed from 3 roof 12'],
 };
 
-/**
- * `unattributed`'s named-exception list, session-level (this file sums both players; see the file
- * header for why it isn't a shared import with forecast-facts.test.ts's per-player one).
- *
- * `toBe(known)` is exact in both directions like `UNATTRIBUTED_STEP_MODEL_GAP`: a second such event
- * anywhere fails, and so does this one vanishing — `toBeLessThanOrEqual` would only catch the first.
- */
-// Derived from the single list in step-model-gap.ts. This was a hand-written mirror of
-// UNATTRIBUTED_STEP_MODEL_GAP that agreed with it 'by inspection' — one fact in two places,
-// which is the shape this repo has been bitten by three times. Import, do not re-type.
-const CORPUS_UNATTRIBUTED_GAP: Record<string, number> = UNATTRIBUTED_BY_SESSION;
-
-test('every CORPUS_UNATTRIBUTED_GAP entry names a session this file actually discovers', () => {
-  if (OVERRIDE) return;   // one session in view; the list as a whole is not what is being asked
-  for (const s of Object.keys(CORPUS_UNATTRIBUTED_GAP)) expect(SESSION_DIRS).toContain(s);
-});
-
 for (const SESSION of SESSIONS) {
   const dir = `${SESSIONS_ROOT}/${SESSION}`;
   const R = existsSync(dir) ? run(dir) : null;
@@ -210,9 +208,13 @@ for (const SESSION of SESSIONS) {
       expect(R!.totals).toEqual(PINNED_TOTALS[SESSION]);
     });
 
-    realData('the unattributed bucket matches the named exception, or is zero', () => {
-      const known = CORPUS_UNATTRIBUTED_GAP[SESSION] ?? 0;
-      expect(R!.totals.unattributed).toBe(known);
+    realData('no improvement in this session is unattributed', () => {
+      // Redundant with the `toEqual` above, and kept for the reason the counter itself is kept: this
+      // is the assertion whose failure NAMES the thing that went wrong, where the bucket comparison
+      // reports a diff of six numbers. It was a named-exception list until the `access` repair
+      // (2026-08-16); a bound would be the wrong replacement — an improvement the step model cannot
+      // explain is a defect in the model, so the number is 0 and a 1 has to be traced, not absorbed.
+      expect(R!.totals.unattributed).toBe(0);
     });
 
     realData('clause 2\'s floor origins are exactly what the audit settled on', () => {
