@@ -1454,7 +1454,14 @@ several did not survive that check and are called out below.
   project memory; the inventory's figure was the outlier). The `j = -1` crash the sweep surfaced is
   fixed (it read `boards[-1]`, contradicting its own doc comment; 0 corpus exposure).
 
-### Re-classified (fable-model review; not yet actioned)
+### Re-classified (fable-model review) — ALL ACTIONED
+
+**The header read "not yet actioned" until 2026-08-16, by which point every item under it was
+actioned** — 3 CLOSED, 7 DONE in `300b358` (the same day the line was written), 11 OBSOLETE. Each
+body entry was updated in place and the heading above them was not, so a reader scanning headings got
+the opposite of what the section says. That is the `## P5 — in progress` shape CLAUDE.md records,
+and this section is where the audit that found it was written down — which is the useful part: a
+heading is the one line nobody re-reads when they update the thing underneath it.
 
 - **3 — `bestTspinLines` counts pre-existing full rows — CLOSED, the count is correct** (fable
   reversed its own "recommend fixing" on second look; the main thread had already reverted the code
