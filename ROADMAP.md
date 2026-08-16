@@ -48,7 +48,7 @@ tetrio-replay-report/
 |---|---|---|
 | `extract.py` / `extract2.ts` | filename glob hardcoded per session | parameterize input dir + ordering rule → **reuse as-is** |
 | `check_claims.py` | already generic (argv) | **reuse unchanged** |
-| ~~`codegen_dafny.py` Facts emitter + helper lib~~ | ~~generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`)~~ | ~~**promote to `dafny_lib.py`**~~ — OBSOLETE 2026-08-16: `codegen_dafny.py` itself is gone (both session-local copies deleted by the 106-claim spec port), so there is nothing left to promote and `dafny_lib.py` was never created. The helper names in the middle column name nothing in the repo today. |
+| ~~`codegen_dafny.py` Facts emitter + helper lib~~ | ~~generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`)~~ | ~~**promote to `dafny_lib.py`**~~ — OBSOLETE 2026-08-16: the two `report/` copies of `codegen_dafny.py` were deleted by the 106-claim spec port, `dafny_lib.py` was never created, and the nine helper names in the middle column name nothing in the repo today. **Correction, same day:** an earlier version of this note said `codegen_dafny.py` "itself is gone", which is wrong and contradicted this document's own 「跟手要決定嘅三樣」 item 3 — `sessions/2026-07-24/proof/codegen_dafny.py` survives, and it is the corpus's last session-local emitter. It is a cross-check artefact carrying no published badge, and removing it is a live contract decision, not a tidy-up. |
 | `codegen_dafny.py` claim bodies | **hand-written `bC001…bR024` per session** ← the bottleneck | replaced by generators (§2) |
 | Claim text + predicates | hand-written by 2 opus agents per session | auto-generated for ~85%, agents add flavor |
 | `mutation_test.sh` / `gen_consistency.sh` / `build_proof_map.py` | near-generic | parameterize paths → **reuse** |
@@ -2386,8 +2386,15 @@ C018。
 （10 + 21 個 dataset falsify 佢），而 `covered` 個 set 照樣一樣，所以出街嗰個百分比冇郁；但**佢之前係
 啱嘅原因係錯嘅**。Spec 代數由構造上出唔到呢個形狀（每個 `facts` 引用都喺 top level 或者第一個
 iterable），`build_claims.validate` 又用嚴格 scoping，所以 106 條 ported claim 全部即刻入咗閘。
-**未收嘅係兩個 evaluator 用緊唔同 scoping** —— `check_claims.py` 寬鬆嗰個先係 `bin/verify-session`
-行嘅嗰個。下一個 increment 收。
+~~**未收嘅係兩個 evaluator 用緊唔同 scoping** —— `check_claims.py` 寬鬆嗰個先係 `bin/verify-session`
+行嘅嗰個。下一個 increment 收。~~ **收咗,同日,`7151499`。** `pipeline/claims/evaluate.py` 出一個
+`ClaimEvaluator`,五個 call site 全部行佢(`check_claims.py`、`check_rate_coverage.py`、
+`claims/equiv.py`、`claims/build_claims.py`)。綁 **lenient**,而個理由係包含關係唔係口味:top-level
+名先查 locals 再查 globals,所以 strict ⊆ lenient,將唯一嗰個 `facts` 綁去 globals 改變唔到任何一條
+本來已經 resolve 到嘅 expression,只會多咗 strict 本身冇嘅 resolution。夾埋捉到**第四個** evaluator
+—— `check_rate_coverage.py`,`math` 同 `statistics` 兩個都冇綁 —— 而佢個失敗方向係差嗰邊:一條
+raise 嘅 predicate 會被當成 falsified,即係個 gate 會**綠住**兼且瞞住一個窿。「三個」呢個數當時亦都
+係錯嘅。
 
 **`equiv-coverage.json` 逐 byte 不變係最有力嗰個獨立證據。** 個 coverage 講嘅係邏輯結構 —— 邊條
 generated claim 嘅 truth vector 喺同一批 mutation site 下 implies 邊條 hand claim —— 完全冇經過
@@ -2420,6 +2427,9 @@ emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出�
    「冇 mutation 殺得死嘅 guard 係擺設」佢應該刪，連 `check_smt` 嗰段 narrowing 一齊；留低嘅
    理由只有「佢寫低咗個 contract」。要揀，唔好當清潔做。
 2. **`check_equiv_coverage.windowed_claims` 個 `None` 分支同上。** 得 selftest 嘅合成 session 行到。
+   (路徑係 `pipeline/claims/check_equiv_coverage.py`,唔係 `pipeline/check_equiv_coverage.py` ——
+   核過 2026-08-16。個 docstring 自己亦都寫住點解而家冇 ledger 行得到嗰條分支:07-22 同 07-24 係
+   最後兩個,port 咗入 spec 代數之後,佢哋個 `null` 變咗真係量到嘅 `[]` 同 `["R015", ...]`。)
 3. **`sessions/2026-07-24/proof/` 仲有佢自己嘅 `codegen_dafny.py`。** 佢係 cross-check artefact，
    `check_cross_artefact` 睇住佢同 `report/` 講同一件事，`bin/verify-session` 亦全綠。但佢係
    corpus 入面最後一個 session-local emitter，同上面收咗嗰個 hazard 同一個形狀 —— 分別係佢冇
