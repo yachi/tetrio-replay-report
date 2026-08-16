@@ -8,6 +8,9 @@
 import { test, expect, describe } from 'bun:test';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { UNATTRIBUTED_STEP_MODEL_GAP as SHARED_UNATTRIBUTED_STEP_MODEL_GAP } from './step-model-gap.ts';
+// Imported, never re-listed here: the artifact's key set and this guard's key set are one fact,
+// and a hand-written mirror is what lets a new verdict ship with nothing checking it.
+import { CLAUSE_VERDICTS } from './forecast.ts';
 
 // FORECAST_FACTS points the whole file at one session's artifact, so one guard covers every
 // emitted artifact rather than only the session it happens to live beside. The emitter is
@@ -92,7 +95,7 @@ for (const PATH of ARTEFACTS) {
   test('the artifact exists and declares itself ineligible for the report', () => {
     expect(existsSync(PATH)).toBe(true);
     const d = JSON.parse(readFileSync(PATH, 'utf8'));
-    expect(d.schema).toBe('forecast-facts/8');
+    expect(d.schema).toBe('forecast-facts/9');
     // simulator-derived data must never be promoted to a report claim without the
     // dual-extractor rule being satisfied; this flag is the guard
     expect(d.report_eligible).toBe(false);
@@ -318,6 +321,30 @@ for (const PATH of ARTEFACTS) {
       // brackets the rate (asserted just above), which a bisection bug returning a spurious 0 would break.
       if (p.forecast_total === 0) expect(p.sampling_ci95_lo_x1000).toBe(0);
       expect(p.sampling_ci95_hi_x1000).toBeLessThan(1000);
+    }
+  });
+
+  test('the rejection breakdown partitions the mechanism-established events', () => {
+    const d = load();
+    for (const p of d.players) {
+      // Bare reads. A schema-8 artifact has no `rejected_by` and must throw here rather than
+      // read as a measured zero — `?? 0` on a required field is what published 「一個 Perfect
+      // Clear 都冇出過」 for five sessions against 65 real ones.
+      const rb = p.rejected_by;
+      expect(Object.keys(rb).sort()).toEqual([...CLAUSE_VERDICTS].sort());
+      for (const k of CLAUSE_VERDICTS) {
+        expect(Number.isInteger(rb[k])).toBe(true);
+        expect(rb[k]).toBeGreaterThanOrEqual(0);
+      }
+      // EXHAUSTIVE over mechanism_established, and `counted` IS the numerator. Without both of
+      // these the section could print a breakdown that does not add up to the rate beside it.
+      expect(CLAUSE_VERDICTS.reduce((n, k) => n + rb[k], 0)).toBe(p.mechanism_established);
+      expect(rb.counted).toBe(p.forecast_total);
+      // The undecidable buckets are exactly the pre-existing `clause2_undecided`, which is the
+      // one cross-check available against a field emitted by a different code path. Folding
+      // undecidable into a rejection would break this rather than pass quietly.
+      expect(rb.floor_undecidable + rb.floor_undecidable_and_closing_clear_was_spin)
+        .toBe(p.clause2_undecided);
     }
   });
 

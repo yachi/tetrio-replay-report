@@ -398,6 +398,57 @@ export const isVerifiedForecast = (r: ForecastRecord) =>
   // clause 4 — the gap must have been closed by a clear that was not itself a T-spin
   && r.closingClearWasSpin !== true;
 
+/**
+ * WHICH clause disqualified a mechanism-established event — the fact the report used to ASSUME.
+ *
+ * `isVerifiedForecast` is a boolean, so a consumer that wants to say *why* an event did not count
+ * has nothing to read and has to guess. `pipeline/forecast_section.py` guessed: whenever
+ * `mechanism_established > forecast_total` it printed clause 2 (「個底係天花板之後先至嚟」) as the
+ * reason. That was false on two published reports — 2026-08-09 and 2026-08-14 are both clause 4,
+ * and 08-14's sits on the corpus's only DT Cannon round — and no gate could see it, because the
+ * renderer and the checker were reading the same absent fact.
+ *
+ * The verdict is the JOINT one, never a first-match: clause 2 and clause 4 are independent tests
+ * and both can reject the same event, so the pairs where both fire are their own values rather
+ * than being attributed to whichever was asked first. Clause 2's UNDECIDABLE case is likewise its
+ * own value and is not folded into its rejection: "the floor is garbage and garbage straddles the
+ * window" is not "the floor arrived later", and printing one as the other is the same class of
+ * defect this function exists to end.
+ *
+ * `null` — not a bucket — for an event whose mechanism is not established at all (`reactive`,
+ * `self_built`). Those are excluded one clause earlier and a caller that bucketed them here would
+ * be reporting openers as clause-2 rejections.
+ *
+ * The mapping back to the boolean is exact and asserted by every caller: `rejectedBy(r) ===
+ * 'counted'` iff `isVerifiedForecast(r)`.
+ */
+export type ClauseVerdict =
+  | 'counted'
+  | 'floor_arrived_later'
+  | 'closing_clear_was_spin'
+  | 'floor_arrived_later_and_closing_clear_was_spin'
+  | 'floor_undecidable'
+  | 'floor_undecidable_and_closing_clear_was_spin';
+
+/** Every verdict, in the order the artifact emits them. `counted` first: it is the numerator. */
+export const CLAUSE_VERDICTS: ClauseVerdict[] = [
+  'counted',
+  'floor_arrived_later',
+  'closing_clear_was_spin',
+  'floor_arrived_later_and_closing_clear_was_spin',
+  'floor_undecidable',
+  'floor_undecidable_and_closing_clear_was_spin',
+];
+
+export function rejectedBy(r: ForecastRecord): ClauseVerdict | null {
+  if (!(r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')) return null;
+  const hole = holePreExisted(r.floorOrigin ?? 'undetermined');   // clause 2: true / false / null
+  const spin = r.closingClearWasSpin === true;                    // clause 4
+  if (hole === true) return spin ? 'closing_clear_was_spin' : 'counted';
+  if (hole === null) return spin ? 'floor_undecidable_and_closing_clear_was_spin' : 'floor_undecidable';
+  return spin ? 'floor_arrived_later_and_closing_clear_was_spin' : 'floor_arrived_later';
+}
+
 /** `board` with those rows deleted and the stack shifted down — the counterfactual board. */
 export function withoutRows(board: Board, rows: Set<number>): Board {
   const kept = board.filter((_, i) => !rows.has(i));

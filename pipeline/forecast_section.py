@@ -289,7 +289,13 @@ def _mechanism_clause(data):
     pre = sum(p.get("floor_pre_existed", 0) for p in ps)
     late = sum(p.get("floor_arrived_later", 0) for p in ps)
     und = sum(p.get("floor_undetermined", 0) for p in ps)
-    undec = sum(p.get("clause2_undecided", 0) for p in ps)
+    # `clause2_undecided` is no longer read here. It used to render its own trailing paragraph
+    # (「另外有 N 個機制成立、但呢一項查唔到答案」) beside a sentence that had ALREADY counted the
+    # same events as clause-2 rejections, so an undecidable event was narrated twice and as two
+    # different things. `_rejection_clause` enumerates every uncounted event exactly once, and it
+    # keeps the undecidable ones' 「唔會當佢啱亦都唔會當佢錯」 wording. The count itself is still
+    # gated: `forecast-facts.test.ts` asserts `clause2_undecided` equals the two undecidable
+    # buckets of `rejected_by`, so dropping the read here cannot let the field drift unnoticed.
     if not tot:
         return ""
     parts = [
@@ -331,17 +337,7 @@ def _mechanism_clause(data):
         "下面表入面嘅數，係<strong>四項條件全部符合</strong>先計。",
     ]
     if mech > fc:
-        rest = ("但佢哋個底" if fc == 0 and mech > 1
-                else "但佢個底" if fc == 0
-                else f"但當中 {mech - fc} 個嘅底")
-        parts.append(
-            f"<strong>今次呢一項改咗個數。</strong>有 {mech} 個嘅機制係成立嘅"
-            f"（消行或者垃圾真係整咗個窿位出嚟），{rest}"
-            "係天花板之後先至嚟嘅，所以計唔到數。")
-    if undec:
-        parts.append(
-            f"另外有 {undec} 個機制成立、但呢一項<strong>查唔到答案</strong>——"
-            "唔會當佢啱，亦都唔會當佢錯，淨係報出嚟。")
+        parts.append(_rejection_clause(ps, mech, fc))
     if fc == 0:
         parts.append(
             # The old justification here was 「喺平均相隔 11 隻棋嘅窗口入面，幾乎實會有」 — a
@@ -365,6 +361,98 @@ def _mechanism_clause(data):
     # simulator — so it says so rather than inheriting the section's disclaimer by silence.
     parts.append(_cspin_clause(data))
     return "".join(parts)
+
+
+# The six buckets of `rejected_by`, in the emitter's order. Named here so a bucket the emitter
+# grows without a sentence to render it is a KeyError in `_rejection_clause`, not a silent drop.
+CLAUSE_VERDICTS = (
+    "counted",
+    "floor_arrived_later",
+    "closing_clear_was_spin",
+    "floor_arrived_later_and_closing_clear_was_spin",
+    "floor_undecidable",
+    "floor_undecidable_and_closing_clear_was_spin",
+)
+
+# What to SAY about each rejecting bucket, in the order they are listed. Written to read as a
+# reason clause, so it works both after 「計唔到數——」 and after 「N 個因為」.
+_REJECTION_WORDING = (
+    ("floor_arrived_later",
+     "個底係天花板之後先至嚟"),
+    ("closing_clear_was_spin",
+     "埋尾整成個窿位嗰下消行，本身就係一個 T-spin"),
+    ("floor_arrived_later_and_closing_clear_was_spin",
+     "兩樣都中——個底係天花板之後先至嚟，而且埋尾整成個窿位嗰下消行本身就係一個 T-spin"),
+    ("floor_undecidable",
+     "個底查唔到（個底係垃圾，而垃圾喺天花板前後都升過）——唔會當佢啱，亦都唔會當佢錯"),
+    ("floor_undecidable_and_closing_clear_was_spin",
+     "埋尾整成個窿位嗰下消行本身就係一個 T-spin，而個底又查唔到"),
+)
+
+# The buckets clause 4 rejected. The gloss below is printed whenever any of them fired.
+_CLAUSE4_BUCKETS = ("closing_clear_was_spin",
+                    "floor_arrived_later_and_closing_clear_was_spin",
+                    "floor_undecidable_and_closing_clear_was_spin")
+
+
+def _rejection_clause(ps, mech, fc):
+    """WHY the mechanism-established events did not count — READ, never assumed.
+
+    This sentence hardcoded clause 2 (「個底係天花板之後先至嚟」) as the reason from 2026-08-03
+    until 2026-08-16. Nothing in the artifact said which clause had rejected an event, so the
+    renderer picked one, and it picked wrong on two published reports: 2026-08-09 and 2026-08-14
+    are both clause 4 — the clear that formed the slot was itself a T-spin — and 08-14's is the
+    round carrying the corpus's only DT Cannon. `check_forecast_section.py` re-renders and
+    byte-compares, so it could not see it either: both sides read the same absent fact.
+
+    Each clause gets its own wording, and a session where both fired says both with counts.
+    Writing 「clause 2 或者 clause 4」 would satisfy the checker and tell the reader nothing,
+    which is the trade this repo refuses everywhere else.
+    """
+    # Bare `p["rejected_by"][k]`, deliberately. A schema-8 artifact that was never re-emitted has
+    # no such key and must break the build here; `.get(k, 0)` would render a confident, wrong
+    # sentence off an all-zero breakdown — the shape that published 「一個 Perfect Clear 都冇出過」
+    # for five sessions against 65 real ones.
+    rej = {k: sum(p["rejected_by"][k] for p in ps) for k in CLAUSE_VERDICTS}
+    bits = [(rej[k], text) for k, text in _REJECTION_WORDING if rej[k]]
+    # The breakdown is exhaustive over the mechanism-established events, so anything that fails to
+    # add up means the artifact and this sentence disagree about how many events there are.
+    n_rejected = sum(n for n, _ in bits)
+    if rej["counted"] != fc or n_rejected != mech - fc:
+        raise ValueError(
+            f"rejected_by does not partition the mechanism-established events: "
+            f"counted {rej['counted']} vs forecast_total {fc}, "
+            f"rejected {n_rejected} vs mechanism_established - forecast_total {mech - fc}")
+
+    lead = ("但佢哋全部" if fc == 0 and mech > 1
+            else "但佢" if fc == 0
+            else f"但當中 {mech - fc} 個")
+    if len(bits) == 1:
+        body = f"{lead}計唔到數——{bits[0][1]}。"
+    else:
+        body = (f"{lead}計唔到數："
+                + "；".join(f"{n} 個因為{text}" for n, text in bits) + "。")
+
+    # Clause 4 needs its "so what" spelled out;「埋尾嗰下消行係 T-spin」disqualifies for a reason a
+    # reader cannot infer from the phrase. Clause 2's own reason is already spelled out in the
+    # paragraph above, so it needs none here.
+    #
+    # DO NOT word this as 「自己砌」 or as "not an outside force". Both are wrong in this section's
+    # own vocabulary, which is set two paragraphs up: 外力 is defined there as 「垃圾升起或者消行」,
+    # so a line clear IS one, and 自己砌 names the `self_built` bucket — which this event is not in.
+    # It is a `forecast_lineclear`, and a reader who was told it was 自己砌 would rightly ask why it
+    # is not in that count. The actual disqualifier is circularity: the clear that opened the slot
+    # was the spin itself, so the slot and its use are one event rather than a slot that was waiting
+    # under a roof built earlier. `spec/Forecast.dfy`'s GapClosedIsExactlyRowsRemoved says the same
+    # thing formally — the C-Spin closes its own gap, which is why clause 3 passes there and the
+    # rejection has to come from clause 4.
+    gloss = ("「埋尾嗰下消行本身係 T-spin」點解唔算數：咁樣即係嗰下 T-spin 自己消走啲行、"
+             "自己開返個窿位出嚟，跟住即刻用返佢——個窿位同用個窿位係同一下嘢，"
+             "唔係個窿位早就喺度、等住個蓋搭落去。"
+             if any(rej[k] for k in _CLAUSE4_BUCKETS) else "")
+
+    return (f"<strong>今次真係有數畀呢啲條件篩走咗。</strong>有 {mech} 個嘅機制係成立嘅"
+            f"（消行或者垃圾真係整咗個窿位出嚟），{body}{gloss}")
 
 
 def _cspin_clause(data):

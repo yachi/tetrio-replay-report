@@ -90,6 +90,36 @@ def problems(data, doc):
     return bad
 
 
+def _one_rejection(data, verdict):
+    """`data` with exactly one mechanism-established event rejected, and `verdict` the reason.
+
+    Built so the clause mutant below has the same teeth on every session. Three of the six have
+    `mechanism_established == forecast_total` and therefore no rejection to re-bucket; re-using
+    whatever a session happens to hold would make the case vacuous on exactly those three and
+    still print `ok`.
+
+    Only the ONE player is touched, and only the fields the rejection implies, so two calls with
+    different `verdict` differ in nothing but the clause — which is what makes a difference in the
+    rendered section attributable to the clause and to nothing else. Returns None when no player
+    has a mechanism-established event, which the caller must treat as a failure of the selftest
+    rather than as a skip.
+    """
+    d = json.loads(json.dumps(data))
+    for p in d["players"]:
+        if p["mechanism_established"] < 1:
+            continue
+        rb = p["rejected_by"]
+        for k in rb:
+            rb[k] = 0
+        rb["counted"] = p["mechanism_established"] - 1
+        rb[verdict] = 1
+        p["forecast_total"] = rb["counted"]
+        p["clause2_undecided"] = (rb["floor_undecidable"]
+                                  + rb["floor_undecidable_and_closing_clear_was_spin"])
+        return d
+    return None
+
+
 def _selftest(report_dir):
     """Controls: the gate must PASS the committed pair and FAIL every corruption of it.
 
@@ -171,6 +201,33 @@ def _selftest(report_dir):
               file=sys.stderr)
         return 1
     cases.append((f"data moved but the report was not rebuilt ({moved[0]})", moved[1], doc, True))
+
+    # ── WHICH CLAUSE rejected an event must move the render ──────────────────────────────────
+    #
+    # Every mutant above moves a NUMBER. None of them can see a sentence whose reason never
+    # varies, and from 2026-08-03 to 2026-08-16 that is exactly what this section had: whenever
+    # `mechanism_established > forecast_total` it printed clause 2 (「個底係天花板之後先至嚟」),
+    # while 2026-08-09 and 2026-08-14 were rejected by clause 4. Both reports shipped the false
+    # sentence and this gate said ok on both, because re-rendering compares the renderer against
+    # itself and neither side read the fact.
+    #
+    # So the mutant re-attributes an event between two clauses and requires the rendered sentence
+    # to change. If it does not, the branch is decorative and the defect is back.
+    #
+    # `_one_rejection` MANUFACTURES the rejection rather than re-bucketing an existing one, so the
+    # case has teeth on every session — three of the six have no uncounted event at all, and a
+    # mutant that quietly does nothing there is the hole this whole exercise is about. The control
+    # (same data, matching document) is what makes the failure attributable to the clause: without
+    # it, a malformed document would produce the same rejection and prove nothing.
+    a, b = _one_rejection(data, "floor_arrived_later"), _one_rejection(data, "closing_clear_was_spin")
+    if a is None or b is None:
+        print("FAIL selftest: no player has a mechanism-established event to re-attribute — "
+              "the clause mutant would prove nothing", file=sys.stderr)
+        return 1
+    doc_a = head + "\n" + forecast_section.section(a) + "\n" + tail
+    cases.append(("control: clause 2 rejects, and the report says so", a, doc_a, False))
+    cases.append(("the artifact says clause 4 rejected it, the report still says clause 2",
+                  b, doc_a, True))
 
     # And the invariants the section exists to hold. The badge must be planted INSIDE the
     # forecast region: the document's first `section-title` belongs to an earlier, legitimately

@@ -1,5 +1,5 @@
 {
-  "schema": "forecast-facts/8",
+  "schema": "forecast-facts/9",
   "report_eligible": false,
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
@@ -31,6 +31,14 @@
       "mechanism_established": 1,
       "forecast_total": 0,
       "clause2_undecided": 0,
+      "rejected_by": {
+        "counted": 0,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 1,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 0,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
       "floor_pre_existed": 320,
       "floor_arrived_later": 34,
       "floor_undetermined": 29,
@@ -60,6 +68,14 @@
       "mechanism_established": 0,
       "forecast_total": 0,
       "clause2_undecided": 0,
+      "rejected_by": {
+        "counted": 0,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 0,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 0,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
       "floor_pre_existed": 394,
       "floor_arrived_later": 50,
       "floor_undetermined": 40,
