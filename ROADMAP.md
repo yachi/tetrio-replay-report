@@ -2188,7 +2188,7 @@ emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出�
    corpus 入面最後一個 session-local emitter，同上面收咗嗰個 hazard 同一個形狀 —— 分別係佢冇
    badge 出街。
 
-## 兩份出街報告寫錯咗個 event 為咩唔計數 (2026-08-16) — OPEN
+## 兩份出街報告寫錯咗個 event 為咩唔計數 (2026-08-16) — DONE (`4d0f2f5`)
 
 `pipeline/forecast_section.py:333-340`:一見到 `mechanism_established > forecast_total`,就render
 一句寫死咗嘅理由 ——「但（當中 N 個）嘅底係天花板之後先至嚟嘅,所以計唔到數」。嗰句係 **clause 2**
@@ -2219,3 +2219,22 @@ clause 否決),句子照住佢分支。**唔好**改成「clause 2 或者 clause
 
 呢單同下面個 fifth `Mechanism` 係兩單嘢,但兩單都要改 `forecast-facts` 個 schema 同重出六份 artefact
 加六份報告,所以要順住做,schema `/8` → `/9` → `/10`,唔好夾埋一個 commit。
+
+**收咗(`4d0f2f5`),schema `/9`。** `forecast.ts` 出 `rejectedBy()`,六個互斥兼窮盡嘅 bucket;
+emitter 當場比對 `rejectedBy(rec)==='counted'` 同 `isVerifiedForecast(rec)`,唔一致就掟;section
+逐條 clause 分支,裸讀 `rejected_by` 加一個 partition assert。`check_forecast_section --selftest`
+加咗個 mutant:將一個 event 由 clause 2 改做 clause 4,render 出嚟嘅句子一定要變 —— 佢係**砌**個
+rejection 出嚟而唔係攞現成嘅,所以六個 session 都有牙(三個 session 根本冇 uncounted event)。
+
+**兩樣要記低嘅。** 第一,`clause2_undecided` 唔再由 section 讀:佢本來另開一段講「查唔到」,而上面
+嗰句已經將同一批 event 當成 clause 2 否決咗數過一次 —— 同一件事講兩次兼且講成兩樣嘢。而家
+`rejected_by` 對每個 uncounted event 淨係數一次,而 `forecast-facts.test.ts` 拿兩個 undecidable
+bucket 同 `clause2_undecided` 對數,所以個 field 唔會冇人睇住就飄。
+
+第二,寫 clause 4 嗰句解說嗰陣行差咗一步,值得記:第一版寫「屬於自己砌,唔係垃圾或者對手逼出嚟嘅
+外力」。喺呢一節自己嘅詞彙入面兩句都錯 —— 上面兩段先啱啱定義 外力 = 「垃圾升起或者消行」,即係消行
+本身就係外力;而 自己砌 係 `self_built` 嗰格嘅名,呢個 event 係 `forecast_lineclear`,唔喺嗰格。
+即係話:**改一句寫錯咗嘅理由,好容易換成另一句寫錯咗嘅理由**,而個 gate 一樣係綠嘅,因為 gate 對
+嘅係 render 出嚟同 artefact 一唔一致,唔係對嗰句講得啱唔啱。真正嘅理由係循環:開個窿位嗰下消行就係
+個 spin 自己。`spec/Forecast.dfy` 個 `GapClosedIsExactlyRowsRemoved` 講緊同一件事。散文啱唔啱,
+到今日為止仲係要人讀。
