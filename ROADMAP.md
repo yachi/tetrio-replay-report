@@ -1564,8 +1564,36 @@ heading is the one line nobody re-reads when they update the thing underneath it
   discriminating pair rather than a population: `roofOwner: -1` (garbage overhang) → true,
   `roofOwner: 2` (built) → false, both non-empty, mutation-checked (hardcoding the flag false fails
   the test). `forecast.test.ts`.
-- **`determinable` degrades silently at `j = -1`.** Even with the crash fixed, a garbage roof has
-  `determinable === false`, so the strict clause-2 rule falls back to loose co-occurrence there.
+- ~~**`determinable` degrades silently at `j = -1`.** Even with the crash fixed, a garbage roof has
+  `determinable === false`, so the strict clause-2 rule falls back to loose co-occurrence there.~~
+  **DONE 2026-08-17. It was worse than "degrades", and the entry understated it.** The kind ladder's
+  first condition was `!(strict && determinable)`, so a STRICT run with an undeterminable window took
+  the LOOSE branch outright and could emit `forecast_garbage` / `forecast_lineclear` with
+  `loc === null` — a forecast KIND with no mechanism behind it. Nothing downstream catches that:
+  `isVerifiedForecast` tests the kind and clauses 2 and 4 and never asks whether a mechanism was
+  established, and `emit-forecast-facts.ts` computes `mechanism_established` as `fg + fl`, so the
+  event would have been published as mechanism-established *by construction*. Proved on a constructed
+  fixture before the change, not argued: a garbage roof plus garbage in the window yielded
+  `forecast_garbage` with `mechanism: undefined` under `strict = true`.
+
+  Fixed by splitting the condition — `!strict` takes the loose ladder, `strict && !determinable` is
+  `reactive` (no board at the roof, so no mechanism can be established). `reactive` rather than a new
+  kind because the record already carries `determinable: false`, which is where "could not be asked"
+  is distinguishable from "did not improve".
+
+  **Exposure is 0 of 3926 records over six sessions** — `boardJ` is null exactly when `j === -1`, a
+  roof with no placing lock, i.e. a garbage overhang, and `roofIsGarbage` is false everywhere — so all
+  six artefacts are byte-identical under the change. That is what makes it safe, and it is also why
+  only a fixture can hold it: `forecast.test.ts`'s `a garbage roof (j = -1) is NOT scored by
+  co-occurrence in strict mode`. Reverting the condition kills 2 tests.
+
+  **One existing test was asserting the bug.** `forecast_lineclear: a line clear falls between
+  roof-build and execution` called `forecastMetric` at its default `strict = true` and asserted
+  co-occurrence behaviour — it passed only because `mk` without boards emits `boards: []`, which is
+  itself how `determinable` goes false. It is now an explicit `forecastMetric(f, false)` test of the
+  LOOSE rule (which `LOOSE=1` must keep reproducing) plus the strict assertion that would have caught
+  the fallback. A test that reads as covering the strict rule while exercising the fallback is the
+  same shape as this file's header already warns about.
 - **Layer 1 of the numerator gate is deferred.** A branded `VerifiedCount` type would make a
   hand-rolled numerator a *compile* error rather than a scanner finding — the right fix — but this
   tree has no typechecker (no tsconfig, no tsc step; `check_ts_imports.py` is the homemade stand-in).

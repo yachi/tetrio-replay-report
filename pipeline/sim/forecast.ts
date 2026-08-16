@@ -853,9 +853,34 @@ export function forecastMetric(r: SimResult, strict = true): {
       : supports.includes(-1) ? -1 : Math.max(...supports);
 
     // Loose mode: the original rule verbatim, co-occurrence and all.
-    const kind: ForecastKind = !(strict && determinable)
+    //
+    // THE `!determinable` CASE BELONGS TO STRICT MODE, NOT TO THE LOOSE LADDER, and it used to fall
+    // into it. The condition was `!(strict && determinable)`, so a STRICT run with an undeterminable
+    // window took the co-occurrence branch — the exact rule the strict rule exists to abolish — and
+    // could emit `forecast_garbage`/`forecast_lineclear` with `loc === null`, i.e. a forecast KIND
+    // with no mechanism behind it. `isVerifiedForecast` tests the kind and clauses 2 and 4, none of
+    // which asks whether a mechanism was established, so such an event counts; and the emitter's
+    // `mechanism_established = fg + fl` would report it as mechanism-established, which is false by
+    // construction. Proved on a constructed fixture before the change (a garbage roof plus garbage
+    // in the window yields `forecast_garbage` with `mechanism: undefined` under `strict = true`).
+    //
+    // The only way in is `determinable === false`, which needs `boardJ` or `boardK` missing, and
+    // `boardJ` is null exactly when `j === -1` — a roof with no placing lock, i.e. a garbage
+    // overhang. `roofIsGarbage` is false for every event in the corpus, so exposure is **0 of 3926
+    // records across six sessions** (measured 2026-08-16) and all six artefacts are byte-identical
+    // under this change. That is what makes the fix safe, not a reason to have left it: an
+    // unreachable branch that publishes a forecast on co-occurrence is a loaded gun, and the
+    // 2026-08-08 `insertMode` incident is this repo's precedent for a "legal but unswept" option
+    // silently producing 13 verified forecasts.
+    //
+    // `reactive` rather than a new kind: with no board at the roof there is nothing to compare, so
+    // no mechanism can be established, and every consumer already routes its numerator through
+    // `isVerifiedForecast`. The record still carries `determinable: false`, which is where the
+    // distinction between "did not improve" and "could not be asked" is readable.
+    const kind: ForecastKind = !strict
       ? (!improved ? 'reactive' : garbageBetween ? 'forecast_garbage'
          : clearBetween ? 'forecast_lineclear' : 'reactive')
+      : !determinable ? 'reactive'
       : !improved ? 'reactive'
       : loc!.mechanism === 'garbage' ? 'forecast_garbage'
       : loc!.mechanism === 'line-clear' ? 'forecast_lineclear'
