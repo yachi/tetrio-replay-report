@@ -49,8 +49,11 @@ for f in "${REPLAYS[@]}"; do
   # alone.
   [ -e "$dst" ] || cp "$f" "$dst"
 done
-# the extractors read ../*.ttrm relative to the report dir
-cp pipeline/extract.py pipeline/extract2.ts pipeline/check_claims.py "$WORK/" 2>/dev/null || true
+# the extractors read ../*.ttrm relative to the report dir, so they are copied in.
+# check_claims.py is NOT: it is one shared module now (`python3 -m pipeline.check_claims`,
+# which is what bin/verify-session runs), and copying it per session is how there came to
+# be eight byte-identical copies of the repo's primary claim gate.
+cp pipeline/extract.py pipeline/extract2.ts "$WORK/" 2>/dev/null || true
 ls "$DEST"/*.ttrm >/dev/null || die "no replays landed in $DEST"
 
 step "2/6 extracting twice and comparing"

@@ -21,6 +21,7 @@ set -euo pipefail
 DIR="${1:?usage: bin/verify-session <session-artefact-dir>}"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
+ADIR="$PWD"
 NAME="$(cd .. && basename "$PWD")/$(basename "$PWD")"
 fail() { echo "FAIL [$NAME] $*" >&2; exit 1; }
 ok()   { echo "  ok  $*"; }
@@ -41,9 +42,7 @@ EXTRACT=""; for f in extract.py extract-*.py; do [ -f "$f" ] && { EXTRACT="$f"; 
 [ -n "$FACTS2" ]  || fail "no second-extractor facts file found"
 [ -n "$EXTRACT" ] || fail "no Python extractor found"
 
-CHECKER="./check_claims.py"
-[ -f "$CHECKER" ] || CHECKER="$REPO/tools/check_claims.py"
-[ -f "$CHECKER" ] || fail "no check_claims.py available"
+[ -f "$REPO/pipeline/check_claims.py" ] || fail "no check_claims.py available"
 
 # --- 1. extractor agreement ------------------------------------------------
 command -v jq >/dev/null || fail "jq not installed"
@@ -64,7 +63,12 @@ ok "$EXTRACT reproduces committed $FACTS"
 FOUND=0
 for L in claims*.json; do
   case "$L" in *proof-map*) continue ;; esac
-  OUT="$(python3 "$CHECKER" "$L" "$FACTS" | tail -1)"
+  # Run the module from $REPO — it imports the shared evaluator out of its own package,
+  # so a bare script path would not resolve. We are cd'd into the artefact, hence the
+  # absolute arguments. There used to be a per-session copy of the checker preferred
+  # over the shared one; eight copies of a gate is eight chances for it to differ from
+  # itself, and this loop is the only thing that ever ran any of them.
+  OUT="$(cd "$REPO" && python3 -m pipeline.check_claims "$ADIR/$L" "$ADIR/$FACTS" | tail -1)"
   case "$OUT" in
     *", 0 fail"*) ok "$L — $OUT"; FOUND=$((FOUND+1)) ;;
     *) fail "$L — $OUT" ;;

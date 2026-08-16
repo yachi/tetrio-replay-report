@@ -26,6 +26,7 @@ import os
 import sys
 
 from pipeline import perturb
+from pipeline.claims.evaluate import ClaimEvaluator
 from pipeline.claims.generators import QUALIFYING_MS
 
 # UPWARD only, and the direction is the whole point.
@@ -49,10 +50,18 @@ RATE_FIELDS = ("apm_x1000", "vs_x1000")
 
 
 def _false_claims(claims, facts):
+    # Through the shared evaluator, not a local `eval`: this file used to bind `facts`
+    # and NOTHING else, so a predicate reaching for `math` or `statistics` — which the
+    # primary gate has always supplied — would raise here and be counted as falsified.
+    # For this gate that is the direction that makes it PASS, i.e. it would hide a hole
+    # rather than invent one, which is the same asymmetry the restore assertion in
+    # `main` exists for. No committed predicate uses either module today; the point is
+    # that there is now one definition of a claim's environment rather than four.
+    evaluate = ClaimEvaluator(facts)
     out = []
     for c in claims:
         try:
-            if not eval(c["python_check"], {"facts": facts}):
+            if not evaluate(c["python_check"]):
                 out.append(c["id"])
         except Exception:                      # a raising predicate is a falsified one
             out.append(c["id"])

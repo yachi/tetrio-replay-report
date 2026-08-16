@@ -49,6 +49,8 @@ import re
 
 from pipeline import perturb
 
+from .evaluate import ClaimEvaluationError, ClaimEvaluator
+
 SCALARS = [
     "apm_x1000", "pps_x1000", "vs_x1000", "lifetime", "maxspike", "topcombo",
     "topbtb", "tspins", "pieces", "garbage_attack", "garbage_cleared",
@@ -609,20 +611,35 @@ def measure_modes(facts_path, hand_paths, generated_path=None, two_site_modes=()
     gvecs = [[] for _ in gen_codes]
     hvecs = [[] for _ in hand_codes]
 
-    def evaluate(dataset, gv, hv):
-        env = {"__builtins__": __builtins__}
-        for i, (_, code) in enumerate(gen_codes):
-            try:
-                gv[i].append(bool(eval(code, env, {"facts": dataset})))
-            except Exception:            # noqa: BLE001 - mutation broke an index
-                gv[i].append(None)
-        for i, (_, code) in enumerate(hand_codes):
-            try:
-                hv[i].append(bool(eval(code, env, {"facts": dataset})))
-            except Exception:            # noqa: BLE001
-                hv[i].append(None)
+    ev = ClaimEvaluator(facts)
 
-    evaluate(facts, gvecs, hvecs)
+    def _append(codes, vecs, kind, unmutated):
+        for i, (claim, code) in enumerate(codes):
+            try:
+                vecs[i].append(bool(ev(code)))
+            except Exception as exc:     # noqa: BLE001 - mutation broke an index
+                # A mutant may legitimately raise: moving a datum can put an index out
+                # of range, and `None` is the honest answer there. The UNMUTATED dataset
+                # cannot — a predicate that raises against the facts it was written for
+                # is broken, full stop. Recording None for it is silent in the worst
+                # way: a truth vector that is undefined at every sample is vacuously
+                # implied by every generated claim, so the hand claim lands in `covered`
+                # while proving nothing, and the published coverage percentage comes out
+                # right for the wrong reason. That is what 07-22 C021 did — a `facts`
+                # reference inside a lambda body, invisible to the old strict eval's
+                # locals — and nothing said so until someone read the truth vectors.
+                if unmutated:
+                    raise ClaimEvaluationError(
+                        f"{kind} claim {claim.get('id', '?')} raised against the "
+                        f"unmutated facts: {type(exc).__name__}: {exc}") from exc
+                vecs[i].append(None)
+
+    def evaluate(dataset, gv, hv, unmutated=False):
+        assert dataset is facts, "the sweep perturbs `facts` in place; there is one tree"
+        _append(gen_codes, gv, "generated", unmutated)
+        _append(hand_codes, hv, "hand", unmutated)
+
+    evaluate(facts, gvecs, hvecs, unmutated=True)
     pristine = perturb.fingerprint(facts)
     for n, writes in enumerate(mutants, 1):
         with perturb.perturbed(writes):
