@@ -10,6 +10,13 @@
  * emits that chain as `slots:[...]` under `CC_ORACLE_SLOTS=1`; here we compare it, per board, to
  * what our scalar sees.
  *
+ * A CHAIN IS NOT A LIST OF COEXISTING SLOTS, and every comparison below turns on that. Each link
+ * REPLACES the board (`cur = c.result`), and `cutout_tslot` hands back a continuation only after a
+ * 2- or 3-line cut, so `slots[k]` for k>0 counts lines on a board from which k earlier spins have
+ * already been cleared. Only `slots[0]` describes the board we passed in. Anything gated against
+ * our scalar must therefore use `slots[0]`; `max(slots)` is a different quantity wearing the same
+ * units, which is precisely the bug this file shipped with (see THE GATE at the bottom).
+ *
  * WHY THIS MATTERS. This repo's memory (`scalar-gate-leaks-the-lineclear-arm`) records the exact
  * defect: the forecast metric walks `avail(t)` = the board's BEST T-spin, a scalar, and so "cannot
  * see a NEW slot born while another slot of equal line-count already exists". Multi-slot counting is
@@ -52,17 +59,28 @@ let equalTop = 0;        // boards with >=2 line-clearing slots SHARING the top 
 const slotHist = new Map<number, number>(); // chain length -> boards
 
 // Scalar-vs-multi divergences that could touch the metric.
+//
+// `slots[0]` and `max(slots)` ARE NOT THE SAME KIND OF QUANTITY, and conflating them is what this
+// gate did until 2026-08-17. The chain re-assigns the board on every link (`cur = c.result` in
+// cc-oracle.rs), and `cutout_tslot` only returns a continuation after a 2- or 3-line cut — so link
+// k>0 is measured on a board where k earlier spins have been executed AND their rows cleared.
+// Only `slots[0]` is about the board we handed in. Comparing `max(slots)` against a current-board
+// scalar is a category error that reads as a real finding, which is exactly how it fired.
 let oursNeMultiBest = 0; // ours != max(slots)   (any divergence)
 let oursGtMultiBest = 0; // ours >  max(slots)   (our BFS sees a spin outside cold-clear's named vocab)
-let multiBestGtOurs = 0; // max(slots) > ours    (multi sees a bigger CURRENT-board spin than scalar) -> would move the metric
+let multiBestGtOurs = 0; // max(slots) > ours    REPORTED, NOT GATED — contaminated by later links
+let firstGtOurs = 0;     // slots[0] > ours      THE GATE: the chain's first link, on the board as given
+let nonMonotone = 0;     // max(slots) > slots[0]  a later link clears MORE than the first
 let availDisagree = 0;   // (ours>0) != (max(slots)>0)   availability flip
 let hiddenCapacity = 0;  // sum over multi boards of (sum(slots) - max(slots)): line-clears the scalar drops
 
+const nonMonotoneWhere: string[] = [];
 const perSession: string[] = [];
 
 for (const s of SESSIONS) {
   const ours: number[] = [];
   const boards: string[] = [];
+  const where: string[] = [];
   for (const c of loadCases(resolve('sessions', s))) {
     const r = runCase(c);
     const v = verifiedIndex(r, c.truth);
@@ -71,6 +89,7 @@ for (const s of SESSIONS) {
       if (!b) continue;
       ours.push(bestTspinLines(b as never));
       boards.push(b.map(row => row.map(x => (x === null ? '.' : 'X')).join('')).join('\n'));
+      where.push(`${s} ${c.file} r${c.round} ${c.user} board ${t}`);
     }
   }
 
@@ -84,13 +103,14 @@ for (const s of SESSIONS) {
     console.error(`length mismatch in ${s}: ours ${ours.length}, cc ${cc.length}`); process.exit(2);
   }
 
-  let sMulti2 = 0, sEqualTop = 0, sMultiBestGtOurs = 0;
+  let sMulti2 = 0, sEqualTop = 0, sFirstGtOurs = 0, sNonMonotone = 0;
   for (let i = 0; i < cc.length; i++) {
     N++;
     const o = ours[i]!;
     const slots = cc[i]!.slots;
     const lc = slots.filter(x => x > 0);       // line-clearing slots in the chain
     const best = slots.length ? Math.max(...slots) : 0;
+    const first = slots.length ? slots[0]! : 0; // the only link measured on the board as given
 
     if (slots.length >= 1) ccAnySlot++;
     if (lc.length >= 1) ccLineClearing++;
@@ -103,12 +123,17 @@ for (const s of SESSIONS) {
 
     if (o !== best) oursNeMultiBest++;
     if (o > best) oursGtMultiBest++;
-    if (best > o) { multiBestGtOurs++; sMultiBestGtOurs++; }
+    if (best > o) multiBestGtOurs++;
+    if (first > o) { firstGtOurs++; sFirstGtOurs++; }
+    if (best > first) {
+      nonMonotone++; sNonMonotone++;
+      nonMonotoneWhere.push(`${where[i]}  slots=${JSON.stringify(slots)} cc-lines=${cc[i]!.lines} ours=${o}`);
+    }
     if ((o > 0) !== (best > 0)) availDisagree++;
     if (slots.length >= 2) hiddenCapacity += lc.reduce((a, x) => a + x, 0) - best;
   }
   perSession.push(`  ${s}: ${cc.length} boards | 2+ slots: ${sMulti2} | 2+ equal-top line-clearing: ${sEqualTop}`
-    + ` | multi-best > scalar: ${sMultiBestGtOurs}`);
+    + ` | slots[0] > scalar: ${sFirstGtOurs} | non-monotone chain: ${sNonMonotone}`);
 }
 
 const histStr = [...slotHist.entries()].sort((a, b) => a[0] - b[0])
@@ -126,24 +151,47 @@ console.log(`line-clears the scalar max drops (sum-max): ${hiddenCapacity}`);
 console.log(`\n--- does multi ever change what the metric CONSUMES? ---`);
 console.log(`scalar (bestTspinLines) != multi-best:      ${oursNeMultiBest}`);
 console.log(`  scalar > multi-best (spins outside cold-clear's named shapes; not a multi issue): ${oursGtMultiBest}`);
-console.log(`  multi-best > scalar (multi sees a bigger CURRENT-board spin):                     ${multiBestGtOurs}`);
+console.log(`  multi-best > scalar (NOT current-board — see below):                              ${multiBestGtOurs}`);
+console.log(`  slots[0] > scalar  (current-board; THIS is the gate):                             ${firstGtOurs}`);
 console.log(`availability flips (ours>0 vs multi-best>0): ${availDisagree}`);
+// REPORTED, NOT GATED, for the same reason `equalTop` is: this is a structural fact about the
+// chain, not a defect. Clearing the first slot's rows drops the stack, which can leave a well that
+// was 2 deep below the surface sitting 3 deep below the new one — so a later link legitimately
+// clears more than the first. It is called out by name because a `max(slots)` reading of it looks
+// exactly like a real scalar under-count, and did.
+console.log(`\nchains where a LATER link clears more than the first: ${nonMonotone}`);
+for (const w of nonMonotoneWhere) console.log(`  ${w}`);
 console.log('');
 
 // THE GATE. The forecast metric consumes ONE number per board — `bestTspinLines`, a max over
 // placements — and cross-tslot-count already pins it against cold-clear's single best detector.
-// This pins the STRONGER statement multi-slot could threaten: our scalar is never BELOW what
-// cold-clear's multi-slot cutout chain finds on the SAME board (`multi-best > scalar` must be 0).
-// If it ever fires, multi-slot sees a bigger current-board spin than the scalar, the metric is
-// reading a number lower than the board actually offers, and the "don't wire multi-slot in"
-// decision would need re-opening. `equalTop` (2+ line-clearing slots sharing the top count) is
-// the scalar-max blind spot's PRECONDITION and is reported, not gated: whether it yields a real
-// false-negative needs the slot-LOCAL temporal analysis (a slot at j vs at k), which is a separate
-// blocked item, not something this current-board differential can adjudicate.
-if (multiBestGtOurs > 0) {
-  console.error(`FAIL: multi-slot cutout saw a bigger current-board spin than the scalar on ${multiBestGtOurs} board(s). `
+// This pins the statement multi-slot could threaten: our scalar is never BELOW what cold-clear's
+// cutout finds on the board AS GIVEN. If it fires, the metric is reading a number lower than the
+// board actually offers and the "don't wire multi-slot in" decision would need re-opening.
+//
+// IT IS `slots[0]`, NOT `max(slots)`, AND THE DIFFERENCE IS THE WHOLE POINT. This gate compared
+// `max(slots)` from the day it was written until 2026-08-17, and that is a category error, not a
+// stricter bound: the chain re-assigns the board on every link, so `max` can be a count from a
+// board that has had two rows cleared out of it. Measured over all 20 226 boards — `slots[0] >
+// ours` is 0 and cold-clear's own current-board `lines > ours` is 0, while `max(slots) > ours` is
+// 1. That one board (2026-08-14 `replay-2026-08-14-2.ttrm` r3 yachi board 12) has `slots=[2,3]`
+// and cold-clear's OWN current-board answer on it is `lines: 2` — the same 2 our scalar reports.
+// So cold-clear and this repo never disagreed about that board at all; the gate was reading a
+// post-clear continuation as if it described the input.
+//
+// Nor is `slots[0]` merely `lines` under another name — the chain picks by PRIORITY with cave and
+// corner refinement, so it can select a placement the raw six-detector max does not: `slots[0] !=
+// lines` on 2 of the 20 226. Both checks are kept.
+//
+// `equalTop` (2+ line-clearing slots sharing the top count) is the scalar-max blind spot's
+// PRECONDITION and is reported, not gated: whether it yields a real false-negative needs the
+// slot-LOCAL temporal analysis (a slot at j vs at k), which is a separate blocked item, not
+// something this current-board differential can adjudicate.
+if (firstGtOurs > 0) {
+  console.error(`FAIL: cold-clear's cutout saw a bigger spin than the scalar on the board AS GIVEN, on ${firstGtOurs} board(s). `
     + `The forecast metric consumes the scalar, so it would understate availability. Re-open the multi-slot decision.`);
   process.exit(1);
 }
-console.log(`ok — the scalar the metric consumes is never below cold-clear's multi-slot chain on any of ${N} boards; `
-  + `multi-slot changes the path of exclusion, not the value (${equalTop} equal-top boards exist but move nothing).`);
+console.log(`ok — the scalar the metric consumes is never below cold-clear's cutout on the board as given, on any of ${N} boards; `
+  + `multi-slot changes the path of exclusion, not the value (${equalTop} equal-top boards exist but move nothing, `
+  + `and the ${nonMonotone} non-monotone chain(s) are measured on post-clear continuations, not on the input).`);

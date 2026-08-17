@@ -701,12 +701,18 @@ jobs:
           done
 
       # cross-tslot-count checks ours against cold-clear's SINGLE best detector. This checks the
-      # stronger thing multi-slot could threaten: the scalar the forecast metric consumes is never
-      # below what cold-clear's MULTI-slot cutout chain finds on the same board (`CC_ORACLE_SLOTS=1`
-      # makes the oracle emit the chain). It fails if multi-slot ever sees a bigger current-board
-      # spin than the scalar — the case that would force re-opening the "don't wire multi-slot into
-      # the metric" decision. Measured clean: 0 of 7,544 boards; multi-slot changes the path of
-      # exclusion, not the value.
+      # thing multi-slot could threaten: the scalar the forecast metric consumes is never below what
+      # cold-clear's cutout finds on the board AS GIVEN (`CC_ORACLE_SLOTS=1` makes the oracle emit
+      # the whole chain). Failing would force re-opening the "don't wire multi-slot into the metric"
+      # decision. Measured clean over all six sessions: 0 of 20,226 boards; multi-slot changes the
+      # path of exclusion, not the value.
+      #
+      # The comparison is against `slots[0]`, NOT `max(slots)`, and it was `max` until 2026-08-17 —
+      # a category error rather than a stricter bound. The chain re-assigns the board after every
+      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. On the six
+      # sessions `max(slots) > ours` fires once and `slots[0] > ours` never does; on that one board
+      # cold-clear's own current-board answer agrees with ours exactly. The stale "0 of 7,544" this
+      # comment used to carry was the four-session figure, measured before 08-09 and 08-14 existed.
       - name: Multi-slot cutout never exceeds the scalar the metric consumes
         env:
           CC_ORACLE_SLOTS: '1'
