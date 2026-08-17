@@ -24,6 +24,7 @@ purpose.
 """
 import html
 import json
+import math
 import os
 
 # Session-scoped, NOT global. The first version hardcoded the 2026-07-22 path and was
@@ -225,10 +226,20 @@ def _spread_clause(data):
     sa_lo, sa_hi = min(w[0] for w in widths), max(w[0] for w in widths)
     ratio_lo, ratio_hi = min(w[2] for w in widths), max(w[2] for w in widths)
     span = (lambda a, b: _pct(a) if a == b else f"{_pct(a)}–{_pct(b)}")
+    # THE RATIO IS DERIVED HERE, so unlike `_pct` and `_num` above this module owns its
+    # rounding — those two render an x1000 integer exactly and defer the 約-decision to the
+    # emitter, but `samp / sim` is computed in this function and no emitter ever sees it.
+    # It was `:.0f`, which is round-half-even: a ratio of 4.6 printed 大約 5, i.e. ABOVE the
+    # value, the one direction 約 must never go. Floor the low end and ceil the high end —
+    # `_bound_dp`'s rule, because an upper bound is the one figure that must round the other
+    # way. Nothing moves on the sessions that exist: every committed `sim` width is 1, so
+    # every ratio is an exact integer (16 / 19 / 20 / 23 / 19, and 08-14 renders no clause).
+    # The defect is latent, and it fires the first time a sweep spreads wider than one unit.
+    lo, hi = math.floor(ratio_lo), math.ceil(ratio_hi)
     return (
         "兩者一比就答咗一條好重要嘅問題："
         f"<strong>模擬器嘅飄幅（{span(sim_lo, sim_hi)}）遠細過抽樣嘅飄幅（{span(sa_lo, sa_hi)}）</strong>，"
-        f"爭大約 {ratio_lo:.0f}–{ratio_hi:.0f} 倍。"
+        f"爭大約 {lo}–{hi} 倍。"
         f"即係話喺<em>呢 {n_cfg} 個設定掃到嘅範圍之內</em>，改模擬器對收窄呢個數幫助有限，要收窄佢就要更多場數。"
         # The sweep varies seven FITTED options of one simulator. It bounds parameter
         # sensitivity and nothing else: a shared modelling error — something every one of the

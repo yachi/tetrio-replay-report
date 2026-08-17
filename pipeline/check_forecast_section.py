@@ -393,7 +393,37 @@ def _selftest(report_dir):
     eligible["report_eligible"] = True
     cases.append(("the artifact declares itself report-eligible", eligible, doc, True))
 
-    ok = True
+    # ── THE 約-RULE ON THE ONE FIGURE THIS SECTION DERIVES ITSELF ─────────────────────────────
+    #
+    # A separate assertion rather than another `cases` entry, because the cases above ask "does
+    # the gate reject a corrupted pair" and this asks "does the renderer round the right way" —
+    # a property of the render, not of the comparison.
+    #
+    # It has to be planted rather than measured on the corpus: every committed `sim` width is 1,
+    # so every ratio is an exact integer and floor, ceil and round agree on all of them. That is
+    # also why the planted-figure loop above cannot cover this figure — it walks `\d+\.\d+`, and
+    # the ratio renders with no decimal point, so it is matched by nothing there.
+    #
+    # 23/5 = 4.6 is chosen so the three rules disagree: floor 4, ceil 5, round 5. Under the old
+    # `:.0f` both ends printed 5, i.e. a 大約 figure ABOVE the value it describes.
+    ratio_ok = True
+    spread = json.loads(json.dumps(data))
+    for pl in spread["players"]:
+        pl["sampling_ci95_lo_x1000"], pl["sampling_ci95_hi_x1000"] = 0, 23
+        pl["simulator_range_lo_x1000"], pl["simulator_range_hi_x1000"] = 0, 5
+    got = re.search(r"爭大約 (\d+)–(\d+) 倍", render(spread))
+    if got is None:
+        print("  BAD 約-rule: the spread clause did not render — the case is testing nothing")
+        ratio_ok = False
+    elif (got.group(1), got.group(2)) != ("4", "5"):
+        print(f"  BAD 約-rule: ratio 4.6 rendered {got.group(0)!r}, expected 爭大約 4–5 倍 "
+              f"(floor the low end, ceil the high end)")
+        ratio_ok = False
+    else:
+        print("  ok  約-rule: a 4.6 ratio renders 爭大約 4–5 倍 — floored low, ceiled high, "
+              "never rounded up")
+
+    ok = ratio_ok
     for name, d, dc, must_fail in cases:
         # `must_fail` is False (must accept), True (must report problems) or "raise" (the input is
         # incoherent and the section must refuse to render it). The third is its own outcome and
