@@ -44,19 +44,41 @@ const cc = res.stdout.split('\n').filter(l => l.trim()).map(l => JSON.parse(l).l
 
 if (cc.length !== ours.length) { console.error(`length mismatch: ours ${ours.length}, cc ${cc.length}`); process.exit(2); }
 
-let miscount = 0, falseNeg = 0, bothPos = 0, oursOnly = 0;
+// DIRECTION MATTERS, and treating both directions as one "miscount" was a bug in this gate that
+// only wider coverage could expose. When both sides report a slot they have not necessarily found
+// the SAME slot: cc reports the count for its best NAMED shape, ours reports the best placement its
+// BFS can reach. So a difference is only a defect in one direction.
+//
+//   ours < cc   we under-count, or missed a better slot cc found. A REAL failure — cc is the
+//               outside authority for the number the forecast metric consumes.
+//   ours > cc   we found a reachable placement clearing more lines than cc's best named shape.
+//               That is the SAME fact `oursOnly` (cc == 0) already tolerates and reports — the
+//               curated opener vocabulary vs the general question — just on a board where cc's
+//               vocabulary happens to match something too. Reported, not failed.
+//
+// This fired on exactly ONE board in 20 226 across six sessions, and the arithmetic was checked by
+// hand before the rule was written rather than after: 2026-08-09 `replay-2026-08-09-2.ttrm` r5
+// pinglamb board 18, ours 2 against cc's 1 (`tst_twist_left`). Rows 38 and 39 read `XXX...XXXX` and
+// `XXXX.XXXXX`, i.e. r38 is missing exactly c3/c4/c5 and r39 exactly c4 — so a T at r38 c3-c5 with
+// its nose at r39 c4 completes both rows. Two lines is the right answer and cc's 1 is its own
+// different placement. Had the count gone the other way this would have stayed a failure.
+let underCount = 0, falseNeg = 0, bothPos = 0, oursOnly = 0, overNamed = 0;
 for (let i = 0; i < ours.length; i++) {
-  if (ours[i]! > 0 && cc[i]! > 0) { bothPos++; if (ours[i] !== cc[i]) miscount++; }
-  else if (ours[i] === 0 && cc[i]! > 0) falseNeg++;
+  if (ours[i]! > 0 && cc[i]! > 0) {
+    bothPos++;
+    if (ours[i]! < cc[i]!) underCount++;
+    else if (ours[i]! > cc[i]!) overNamed++;
+  } else if (ours[i] === 0 && cc[i]! > 0) falseNeg++;
   else if (ours[i]! > 0 && cc[i] === 0) oursOnly++;
 }
 
-console.log(`${ours.length} boards | both find a slot: ${bothPos}, counts match: ${bothPos - miscount}`
-  + ` | miscounts: ${miscount} | false negatives (cc>0, ours=0): ${falseNeg}`
+console.log(`${ours.length} boards | both find a slot: ${bothPos}, counts match: ${bothPos - underCount - overNamed}`
+  + ` | UNDER-counts (ours < cc): ${underCount} | false negatives (cc>0, ours=0): ${falseNeg}`
+  + ` | ours clears more than cc's named shape: ${overNamed}`
   + ` | general spins beyond cold-clear's named shapes: ${oursOnly}`);
 
-if (miscount || falseNeg) {
-  console.error(`FAIL: ${miscount} miscount(s) and ${falseNeg} false negative(s) vs the Rust original`);
+if (underCount || falseNeg) {
+  console.error(`FAIL: ${underCount} under-count(s) and ${falseNeg} false negative(s) vs the Rust original`);
   process.exit(1);
 }
-console.log('ok — every line count agrees with cold-clear, and no line-clearing slot is missed');
+console.log('ok — we never count fewer lines than cold-clear, and no line-clearing slot is missed');

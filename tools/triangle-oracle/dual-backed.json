@@ -101,13 +101,17 @@
         "total": 251,
         "dual": 241,
         "by_kind": {
+          "path_opened": {
+            "total": 1,
+            "dual": 1
+          },
           "reactive": {
             "total": 118,
             "dual": 113
           },
           "self_built": {
-            "total": 133,
-            "dual": 128
+            "total": 132,
+            "dual": 127
           }
         }
       },
