@@ -51,7 +51,18 @@ import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 const W = 10;
 const PIECES: PieceType[] = ['I', 'T', 'O', 'S', 'Z', 'L', 'J'];
-const ORACLE = process.env.CC_ORACLE ?? '/Users/yachi/github/tetrio-replay-report/result/bin/cc-oracle';
+// Resolved from THIS file, never an absolute path into one checkout. The default was
+// `/Users/yachi/github/tetrio-replay-report/result/bin/cc-oracle`, so in a worktree the BFS was
+// differentialled against a binary built from a different tree — measured: with CC_ORACLE unset
+// this file did not skip, it ran and passed through that other checkout's `result` symlink.
+// Same class as `analysis/rate_records.R`'s absolute `repo`, which silently measured the other
+// tree's sessions. Both symlinks happened to resolve to the same nix store path, so it was
+// latent rather than wrong today.
+//
+// Still a SKIP and not a failure when the binary is absent: the `typescript` job runs the whole
+// suite with no CC_ORACLE and no nix, so a hard failure here would turn that job red for a
+// dependency it is not meant to have. `oracle-image` sets CC_ORACLE explicitly and is unchanged.
+const ORACLE = process.env.CC_ORACLE ?? `${import.meta.dir}/../../result/bin/cc-oracle`;
 const HAVE_ORACLE = existsSync(ORACLE);
 
 // Canonical key for a placement = its four occupied [col,row] cells, sorted (row, col).

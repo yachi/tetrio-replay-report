@@ -21,13 +21,19 @@ import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, dis
 import { analyse } from './run-openers.ts';
 import { build, serialise, donationCols, caveAt, cavity, dualVerdict,
          DONATION_CAVITY, DONATION_WALLED_ROWS, CAVE_MIN_WIDTH } from '../sim/emit-opener-facts.ts';
+import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 
 const cat = loadCatalogue();
 const prepared = prepare(cat.pages);
 const cspin = prepared.filter(p => isCSpin(p.name));
 
-const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09',
-                  '2026-08-14'];
+// Listed, then checked against disk in both directions — see corpus-membership.ts. The list
+// stays rather than becoming a glob because every table below pins per-session literals, and a
+// session nobody has measured must not reach them; what the check adds is that a session which
+// ARRIVES fails here instead of being quietly left out.
+const SESSIONS = assertCorpusIsEverySessionOnDisk(
+  `${import.meta.dir}/../../sessions`,
+  ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 
 test('the vendored catalogue is the pinned upstream commit, decoded whole', () => {

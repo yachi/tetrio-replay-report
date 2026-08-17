@@ -428,11 +428,33 @@ jobs:
         with:
           bun-version: '1.2.4'
 
+      # DISCOVERED FROM DISK, NOT LISTED. Both loops in this job used to name their seven
+      # artefact directories, and they gate the repo's ONE invariant — that two independently
+      # written extractors agree byte-for-byte. A session absent from the list is not checked
+      # against that invariant at all, and a shorter sweep prints exactly like a clean one, so
+      # nothing goes red. equiv-coverage.yml's header already called these "the two stale loops
+      # in verify.yml"; this closes them. Measured on the seven that exist today: discovery
+      # returns the same seven directories and both loops print the same seven verdicts.
+      #
+      # The predicate is "carries extract2*.ts" — the file the loop RUNS, so a directory it
+      # cannot run is not an artefact. `facts*.json` also selects exactly these seven but is
+      # weaker: it would admit a directory holding data with no extractor to reproduce it.
+      #
+      # `find`, not a glob: `for d in sessions/*/*` with no match expands to the literal
+      # pattern and the loop then "sweeps" one nonexistent directory. And no `compgen` — it is
+      # a bash builtin, and while this `run:` is bash the inner `sh -c` is not.
       - name: Re-run the TypeScript extractor and compare against committed output
         run: |
           set -euo pipefail
+          DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
+                   -exec sh -c 'find "$1" -maxdepth 1 -name "extract2*.ts" | grep -q .' _ {} \; \
+                   -print | sort)
+          # Finding nothing is a FAILURE, never a quiet pass — the rule check_cross_artefact
+          # below already follows, for the same reason: a sweep over nothing looks like a clean
+          # sweep in the log.
+          [ -n "$DIRS" ] || { echo "FAIL: no artefact directory carries extract2*.ts" >&2; exit 1; }
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report sessions/2026-08-09/report sessions/2026-08-14/report; do
+          for d in $DIRS; do
             ts=$(ls "$d"/extract2*.ts | head -1)
             f2=$(ls "$d"/facts2*.json | head -1)
             before=$(sha256sum "$f2" | cut -d' ' -f1)
@@ -456,8 +478,12 @@ jobs:
       - name: Compare extractor A against extractor B
         run: |
           set -euo pipefail
+          DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
+                   -exec sh -c 'find "$1" -maxdepth 1 -name "extract2*.ts" | grep -q .' _ {} \; \
+                   -print | sort)
+          [ -n "$DIRS" ] || { echo "FAIL: no artefact directory carries extract2*.ts" >&2; exit 1; }
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report sessions/2026-08-09/report sessions/2026-08-14/report; do
+          for d in $DIRS; do
             # Globbed, not `ls`-ed: under `set -o pipefail` an `ls` with one non-matching operand
             # fails the whole assignment and the step exits before printing anything.
             f1=""; for f in "$d"/facts.json "$d"/facts-*.json; do [ -f "$f" ] && { f1="$f"; break; }; done
