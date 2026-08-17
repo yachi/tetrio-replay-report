@@ -321,7 +321,12 @@ export function donationCols(withT: boolean[][], cleared: number[], t: { row: nu
  *     drawn Basic Structures.
  *   - The cave is NOT tested for being roofed, because that test is vacuous: the cave's roof is the
  *     nub row, which the Double has just completed. A full row roofs everything beneath it by
- *     definition — measured, 0 of 2378 real T-spin Doubles in this corpus have an unroofed one.
+ *     definition — PROVED, not counted: `RoofForced` / `RoofCannotDiscriminate` in
+ *     `spec/DonationCave.dfy` show that conjoining a roof test to the cave predicate yields an
+ *     equivalent predicate. This line used to carry a corpus count instead ("0 of 2378 real T-spin
+ *     Doubles"), which by 2026-08-17 disagreed with CLAUDE.md's count of the same thing ("0
+ *     unroofed runs in 1914") and was re-derivable from neither — no artefact emits it. A count
+ *     that stands in for a proof only has to go stale once to become the weaker claim.
  *
  * `minDepth` is the shallowest column of the run, and it is the thing to read: a 3-wide run one row
  * deep is a dimple, not a cave.
@@ -670,9 +675,13 @@ function firstBagFor(user: string) {
 // and over a whole round these players throw ordinary T-spin doubles by the dozen, so "did any triple
 // precede any double" is a statement about playstyle, not the opener. The hand-sim's short verified prefix
 // hid this by truncating to the opening; the oracle board source (runCaseOracle) reaches the whole round,
-// so the window must be made explicit. Measured (oracle, six sessions): at the opener window all but one round
-// holding both spins runs the C-Spin order — cspin_order === rounds_with_both, dt_order == 0 — while over
-// the whole prefix 7 rounds show a late-game double-before-triple that is not a DT Cannon.
+// so the window must be made explicit. Measured (oracle, six sessions, summed over the committed
+// artefacts): inside the opener window 455 rounds hold both spins and 454 run the C-Spin order —
+// dt_order is 1, not 0, and that one is the corpus's real DT Cannon (08-14-2 r3 yachi; see openers.test.ts).
+// The equality `cspin_order === rounds_with_both` this comment used to assert went false the night that
+// round was played and was never revised, while the prose beside it had already been. Outside the window
+// (`mid_game`) 12 rounds hold both and the order goes BOTH ways — 10 Triple-first, 6 Double-first, which
+// sum past 12 because one round can hold both orderings — so the window is doing the work, not the corpus.
 function orderingFor(user: string, pick: (r: Round) => { i: number; cleared: number }[]) {
   const mine = rounds.filter(r => r.user === user && r.verified >= 0);
   const inOpener = (x: { i: number }) => x.i <= WINDOW_PIECES;
@@ -1049,22 +1058,28 @@ function buildCounterCheck() {
  * runs on. They share no code.
  *
  * WHAT IS PUBLISHED IS THE CONFUSION MATRIX, NOT THE AGREEMENT RATE, and that is the whole point of
- * this function. Both verdicts are rare — 30 caves and 82 donations in 3142 scored clears — so
- * "the two engines agree 96.7% of the time" is 1292 negatives agreeing with each other and says
+ * this function. Both verdicts are rare — 39 caves and 103 donations in 4035 scored clears — so
+ * "the two engines agree 96.5% of the time" is 1650 negatives agreeing with each other and says
  * nothing about the metric. Split by the oracle's verdict and the two metrics come apart:
  *
- *     cave     — 13 of 13 positives, both engines. A real cross-implementation result.
- *     donation —  9 of 36 positives. The two engines disagree about three donations in four.
+ *     cave     — 16 of 16 positives, both engines. A real cross-implementation result.
+ *     donation —  9 of 43 positives. The two engines disagree about four donations in five.
  *
  * Same failure mode as a detector whose clause is entailed by its siblings: a rate whose denominator
  * is dominated by the easy case measures the substrate. `agreement_on_positives` is therefore the
  * field the section reads, and `agreement_overall` is emitted beside it precisely so the gap is
  * visible rather than hidden by publishing only one of them.
  *
- * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so only 1346 of the
- * 3142 scored clears (42.8%) can be compared at all. This is a check, not a re-scoping: the tables
+ * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so only 1719 of the
+ * 4035 scored clears (42.6%) can be compared at all. This is a check, not a re-scoping: the tables
  * still score the oracle's prefix, exactly as `tspinCounterCheck` licenses a denominator without
- * redefining it. Neither metric leaves quarantine on this — cave's 13 positives are 13 of 30.
+ * redefining it. Neither metric leaves quarantine on this — cave's 16 positives are 16 of 39.
+ *
+ * Every figure in this block is the sum over the six committed `sim/opener-facts.json`, not a
+ * remembered one. It carried the five-session numbers (3142 scored, 1346 comparable, 13/13 and
+ * 9/36) from 2026-08-15, when the sixth session landed and every other corpus figure was
+ * re-derived, until 2026-08-17 — long enough for someone to quote "three donations in four" off a
+ * comment while the artefacts beside it said four in five.
  */
 function dualEngineCheck() {
   const cell = (m: { tt: number; tf: number; ft: number; ff: number }) => {

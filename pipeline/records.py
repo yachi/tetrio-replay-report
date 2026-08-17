@@ -26,9 +26,12 @@ from pipeline.claims import generators
 # (family, label, unit, how to format the proved integer)
 #
 # Ordered by how much each measure actually says about who won the round — the
-# paired AUC over both sessions' 129 rounds (VS 100%, APM 94.6%, 攻/lines strong,
-# spike and B2B weaker, COMBO 45% i.e. nothing). Records that decide games come
+# paired AUC over both sessions' 129 rounds (VS 100%, APM 93.8%, 攻/lines strong,
+# spike and B2B weaker, COMBO 45.0% i.e. nothing). Records that decide games come
 # first; COMBO is last because its tile is a curiosity, not a finding.
+# APM read 94.6% here until 2026-08-17 and matches no session at any pooling —
+# 93.8 pooled, 93.7 and 94.0 apart. Re-derived from facts.json, winner vs loser
+# per round, ties at half a win (the convention in pipeline/sim/pairs.ts).
 RECORDS = [
     ("round_max_vs_x1000", "單局最高 VS", "", "r1"),
     ("round_max_apm_x1000", "單局最高 APM", "", "r1"),

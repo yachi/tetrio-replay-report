@@ -169,10 +169,20 @@ claims.
 
 CI pins cvc5 by sha256 (`CVC5_SHA256` in the workflow), and that hash has **two independent
 authorities that agree**: cvc5's own Homebrew cask and GitHub's asset digest — verified against
-the downloaded bytes before use. z3 is *not* in CI because recent z3 releases only ship
-`x64-glibc-2.39` builds, which cannot run on the `ubuntu-22.04` runner the Dafny step pins
-(glibc 2.35); z3 ≤ 4.14.1 has 2.35 builds but GitHub reports no digest for those assets. So the
-split is z3 locally, cvc5 in CI, both over the same committed artefact.
+the downloaded bytes before use.
+
+**Both solvers run in CI, on different artefacts, and the difference between them is the PIN, not
+the presence.** The `verify` job installs z3 4.14.1 (`Z3_VERSION` / `Z3_SHA256`) because
+verify-session step 7's lemma-vacuity gate needs a solver and fails rather than skips without one —
+and it must be z3: cvc5 produced no result in 120 s on 2026-07-24's 78 claims where z3 settles them
+in 2.6 s, so the two are not interchangeable for those free-variable queries. 4.14.1 is the newest
+release still shipping an `x64-glibc-2.35` build, which is what the `ubuntu-22.04` runner has. What
+that pin lacks is a second authority: GitHub publishes no asset `digest` for **any** z3 build
+against glibc-2.35, and the release carries no signature, checksum or SBOM, so the hash is
+trust-on-first-use — it defends against the asset changing from here on, not against it having been
+wrong when first fetched. The `pipeline` job installs cvc5 for `check_smt` over the committed
+`claims.smt2`. So "z3 locally, cvc5 in CI" is true of the **.smt2** artefact only, which is where
+that sentence came from; as a statement about the workflow it is false.
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that
@@ -224,11 +234,18 @@ equivalent marker pair.
   player-rounds and **181 of those are the round's SURVIVOR**: the survivor keeps playing frames after
   the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
   in the residual is a fact about whose round ran longer, never about how someone plays.
-  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds — **exact up to
-  `finaltime`'s own millisecond rounding, not exact simpliciter** — as `100·(attack+cleared)/T`,
-  `60·attack/T`, `pieces/T` with **T = ⌊finaltime_ms·60/1000⌋/60**, the integer FRAME count, floored.
-  `finaltime_ms/1000` is not that T (it is fractional-frame) and leaves up to 1.2e-3 on 247 of the
-  760, all of it the clock, so a probe that uses it reports a discrepancy the data does not have.
+  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds as
+  `100·(attack+cleared)/T`, `60·attack/T`, `pieces/T` — where **T is the integer FRAME count, and
+  `finaltime_ms` does not yield it.** `⌊finaltime_ms·60/1000⌋/60` gives the wrong frame count on
+  **257 of the 760** and leaves up to 1.5e-3, because `finaltime_ms` is `results.stats.finaltime`
+  rounded to the millisecond (`extract.py`'s `x1`) while the clock ticks every 1/60 s — the rounding
+  destroys the frame the flooring is trying to recover. Recover it from `pps` instead:
+  `round(60·pieces/pps)` is an integer to 1.8e-12 on all 760, and under **T = round(60·pieces/pps)/60**
+  the residual is 2.4e-16 for APM and 4.2e-16 for VS, which is where the ≤4.2e-16 came from. PPS is
+  exact by construction on that route, so the **checkable** statement is the T-free identity
+  `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual **6.1e-16** over the 758 rounds
+  with a nonzero APM and VS. A probe that uses `finaltime_ms/1000` reports a discrepancy the data
+  does not have — up to 1.2e-3, and above 1e-4 on 245 of the 760.
 - **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
   The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
   of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
@@ -281,7 +298,7 @@ Paired AUC over 129 rounds — how often the round's winner held the higher valu
 攻 93.8 · DS 75.0 · 食 12.5 · 射埋 14.1 — and **KPP 42.2**, below chance for a third time.
 
 2026-08-01 (53 rounds) is the fourth independent reproduction: VS 100% · 攻 90.6 · APM 90.6 ·
-APP 83.0 · 食/射埋 15.1 — **DS 84.0, the highest of any session** (66.5 · 60.0 · 75.0 · 84.0
+APP 83.0 · 食 15.1 · 射埋 19.8 — **DS 84.0, the highest of any session** (66.5 · 60.0 · 75.0 · 84.0
 across the four) — and **KPP 53.8**, i.e. chance, for a fourth time.
 
 2026-08-09 (50 rounds) is the fifth: VS 100% · 攻 94.0 · APM 94.0 · APP 88.0 · 分 86.0 ·
@@ -291,7 +308,7 @@ time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4
 pooled, not one session.
 
 2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 90.5 · 送 82.7 ·
-**APP 81.0, the lowest of six** · 分 79.8 · DS 70.2 · 食/射埋 17.9 — and **KPP 40.5**, below
+**APP 81.0, the lowest of six** · 分 79.8 · DS 70.2 · 食 17.9 · 射埋 18.5 — and **KPP 40.5**, below
 chance for a sixth time.
 
 Coaching conclusions, cross-validated over six sessions: **APP is the lever** — higher in rounds
@@ -703,10 +720,14 @@ bug reported every well as self-built for a whole round of measurement.
 **The STMB cave is OFFSET from the T and its roof test is vacuous.** The cave shares two of the T's
 three columns and reaches one past them, so the test is *overlap*, never containment — containment
 misses all six drawn Basic Structures. And the cave's roof is the nub row the Double just
-completed, which roofs everything beneath it by definition: measured, **0 unroofed runs in 1914**
-over the five sessions that existed when it was counted — not re-measured since, because it no longer
-carries the argument. A roof test would have been a decorative guard — and since 2026-08-14 that is
-proved rather than counted (`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`:
+completed, which roofs everything beneath it by definition. A roof test would have been a decorative
+guard — and since 2026-08-14 that is **proved, so there is no count here to keep current**. Two
+five-session counts used to stand in for the proof and had drifted into disagreeing with each other
+by 2026-08-17 — "0 unroofed runs in 1914" here against "0 of 2378 real T-spin Doubles" at
+`emit-opener-facts.ts:324` — neither re-derivable from any committed artefact, because nothing emits
+a count of unroofed runs. Both are deleted rather than re-measured: a corpus count is weaker evidence
+than the proof it now duplicates, and it is the half that goes stale every session
+(`RoofForced` / `RoofCannotDiscriminate` in `spec/DonationCave.dfy`:
 conjoining a roof test
 to the cave predicate yields an equivalent predicate, over the whole board width and not merely over
 cave runs). The proof also shows the code assumes more than it needs: **maximality is not used** —
@@ -1034,8 +1055,17 @@ find *where* the time goes, then time the change to find out *how much*.
 1. One `innerHTML` assignment left in `report.html`, and it is the legitimate one: the
    match-card body expands authored prose carrying badge shorthand (`<b>C001</b>`). The other
    two are gone — the match-card score builds nodes, and the appendix row builder was deleted
-   with the section it served. Re-verify the 110 badge count and 54/52 appendix rows after
-   touching anything near them.
+   with the section it served. Re-verify after touching anything near them by running the gate —
+   `python3 -m pipeline.check_badge_links sessions/<date>/report` — which resolves every citation
+   against the claims island and prints its own counts. **Not by comparing a badge count**: the
+   "110" that used to sit here matched no report on any measure, and there are two measures that
+   disagree by design. `data-claim` *occurrences* in the document run 77 / 88 / 96 / 111 / 119 / 119
+   over the six sessions (`grep -o 'data-claim=' report.html | wc -l`; `grep -c` counts lines, and
+   this file puts many on one). The gate counts **distinct cited ids** and prints 43 / 40 / 49 / 55 /
+   56 / 57 badge plus 20 / 23 / 27 / 33 / 31 / 48 shorthand `<b>C001</b>` citations — lower because a
+   claim cited three times is one id. No single number was ever right for more than one session, so
+   the instruction is to re-run the gate, not to match a figure. The appendix's 54 / 52 rows for
+   07-22 / 07-24 do check out (`<tr>` inside the appendix region, less its header).
 2. ROADMAP P5. **The report body is fully generated** (`pipeline/build_report.py`,
    CI-gated with `--check`): hero/scoreboard, 戰況, 數據對決, 關鍵時刻, 全場之最, 建議, the
    appendix, and the `chart-data`, `match-copy` and `claims-data` islands, plus the round

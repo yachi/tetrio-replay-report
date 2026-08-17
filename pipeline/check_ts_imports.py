@@ -11,7 +11,10 @@ were true here when this file was written:
     STILL TRUE — checked 2026-08-16, there is no `package.json` either.
   * `bun test` is not in CI. Only `cross-extractor` runs Bun, and only to re-run the extractors.
     **NO LONGER TRUE**, and the same commit that added this gate is what changed it: the
-    `typescript` job runs `REPLAY_DIR=sessions/2026-07-22 bun test` (`verify.yml:569`). Running
+    `typescript` job's "Run the simulator test suite" step runs
+    `REPLAY_DIR=sessions/2026-07-22 bun test`. (Cited as `verify.yml:569` until 2026-08-17, by
+    which time the step had moved to line 601 — a line number is a citation that rots on every
+    edit above it, so this one names the job and the step instead.) Running
     the suite does not subsume this gate, because the original defect was an import that was never
     *called* — no amount of test execution evaluates it. It does narrow the window: a renamed
     export that some test does call now fails in CI.
