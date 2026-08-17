@@ -748,19 +748,19 @@
           <tr><td>VS</td><td class="ir-num">171.7</td><td class="ir-num">150.9</td></tr>
           <tr><td>粒數</td><td class="ir-num">115</td><td class="ir-num">114</td></tr>
           <tr><td>攻擊</td><td class="ir-num">93</td><td class="ir-num">81</td></tr>
-          <tr><td>射埋</td><td class="ir-num">77</td><td class="ir-num">63</td></tr>
+          <tr><td>送出</td><td class="ir-num">77</td><td class="ir-num">63</td></tr>
           <tr><td>食</td><td class="ir-num">45</td><td class="ir-num">67</td></tr>
           <tr><td>清走</td><td class="ir-num">35</td><td class="ir-num">31</td></tr>
           <tr><td>行數</td><td class="ir-num">74</td><td class="ir-num">71</td></tr>
           <tr><td>最大單波</td><td class="ir-num">10</td><td class="ir-num">6</td></tr>
-          <tr><td>最高 B2B</td><td class="ir-num">4</td><td class="ir-num">5</td></tr>
+          <tr><td>最高 B2B</td><td class="ir-num ir-behind">4</td><td class="ir-num">5</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="ir-find">贏嘅係 <strong>yachi</strong>，而佢喺 <strong>攻擊量、落速、最大單波、行數</strong> 每一條軸都<strong>領先</strong>——呢局冇得拗，唔使靠守就贏咗。呢個結果本身值得記低：最癲嘅一局唔係次次都有反轉。（攻擊量、落速每條軸都係一個總數加返佢自己嘅速率，兩格當一條軸計。）</p>
+    <p class="ir-find">贏嘅係 <strong>yachi</strong>，而佢喺 <strong>攻擊量、落速、最大單波、行數</strong> 每一條軸都<strong>領先</strong>——呢局冇得拗，唔使靠守就贏咗。另外，唔計呢四條軸，表入面仲有 <strong>1</strong> 格佢係輸蝕嘅：<strong>最高 B2B</strong>——呢啲每格都係一樣嘢自己一個，冇速率同佢配對，所以只計格、唔計軸。呢個結果本身值得記低：最癲嘅一局唔係次次都有反轉。（攻擊量、落速每條軸都係一個總數加返佢自己嘅速率，兩格當一條軸計。）</p>
     <p class="ir-split"><strong>每粒棋攻擊</strong>：yachi 約 0.808、pinglamb 約 0.710；<strong>每粒棋清走</strong>：yachi 約 0.304、pinglamb 約 0.271。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
     <p class="ir-split">yachi 嘅 VS ＝ 攻 約 124.8 ＋ 清垃圾 約 46.9；pinglamb 嘅 VS ＝ 攻 約 109.1 ＋ 清垃圾 約 41.7。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
-    <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數。</p>
+    <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：<strong>送出</strong>係佢掟出去嗰啲，<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。「逐局全數據」嗰邊仲有個<strong>射埋</strong>，嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——呢張表冇呢一欄。</p>
     <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.058、Holm 校正後 p 1.000，即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.187 同 −0.184，p 0.0040 同 0.0098）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.236），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇顯著升勢（rho ＋0.096，p 0.06）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。</p>
     <p class="ir-note">Claim：G079 · G080 · G081 · G082 · G083 · G084 · G085 ✓</p>
   </div>
@@ -5593,23 +5593,23 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           </tr>
           <tr id="claim-G079">
             <td class="id-cell">G079</td>
-            <td class="canto-cell">最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、射埋 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒</td>
+            <td class="canto-cell">最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、送出 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒</td>
             <td class="gloss-cell">most intense round m7r3 — yachi: apm_x1000 74883, pps_x1000 1543, vs_x1000 171774, pieces 115, garbage_attack 93, garbagesent 77, garbagereceived 45, garbage_cleared 35, lines 74, maxspike 10, topbtb 4, finaltime_ms 74517</td>
             <td class="lemma-cell">G079_most_intense_round_m7r3_yachi_apm_x1000_74883_pps_x1000_1543_vs_x1000</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G080">
             <td class="id-cell">G080</td>
-            <td class="canto-cell">最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、射埋 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒</td>
+            <td class="canto-cell">最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、送出 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒</td>
             <td class="gloss-cell">most intense round m7r3 — pinglamb: apm_x1000 65513, pps_x1000 1537, vs_x1000 150977, pieces 114, garbage_attack 81, garbagesent 63, garbagereceived 67, garbage_cleared 31, lines 71, maxspike 6, topbtb 5, finaltime_ms 74192</td>
             <td class="lemma-cell">G080_most_intense_round_m7r3_pinglamb_apm_x1000_65513_pps_x1000_1537_vs_x10</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G081">
             <td class="id-cell">G081</td>
-            <td class="canto-cell">最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——呢局冇得拗，唔係靠守贏返嚟</td>
-            <td class="gloss-cell">m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion</td>
-            <td class="lemma-cell">G081_m7r3_winner_yachi_led_on_every_attacking_axis_no_inversion</td>
+            <td class="canto-cell">最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——攻擊上冇得拗，亦唔使靠守就贏咗；另外，唔計呢四條軸，佢仲有 1 格輸蝕：最高 B2B</td>
+            <td class="gloss-cell">m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion; behind on 1 non-axis column(s): 最高 B2B</td>
+            <td class="lemma-cell">G081_m7r3_winner_yachi_led_on_every_attacking_axis_no_inversion_behind_on_1</td>
             <td><span class="status-pill" data-status="verified">✓ 已驗證</span></td>
           </tr>
           <tr id="claim-G082">
@@ -6725,7 +6725,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "G079",
       "source": "generated",
-      "canto": "最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、射埋 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒",
+      "canto": "最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、送出 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒",
       "english_gloss": "most intense round m7r3 — yachi: apm_x1000 74883, pps_x1000 1543, vs_x1000 171774, pieces 115, garbage_attack 93, garbagesent 77, garbagereceived 45, garbage_cleared 35, lines 74, maxspike 10, topbtb 4, finaltime_ms 74517",
       "category": "pace",
       "lemma": "G079_most_intense_round_m7r3_yachi_apm_x1000_74883_pps_x1000_1543_vs_x1000",
@@ -6735,7 +6735,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "G080",
       "source": "generated",
-      "canto": "最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、射埋 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒",
+      "canto": "最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、送出 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒",
       "english_gloss": "most intense round m7r3 — pinglamb: apm_x1000 65513, pps_x1000 1537, vs_x1000 150977, pieces 114, garbage_attack 81, garbagesent 63, garbagereceived 67, garbage_cleared 31, lines 71, maxspike 6, topbtb 5, finaltime_ms 74192",
       "category": "pace",
       "lemma": "G080_most_intense_round_m7r3_pinglamb_apm_x1000_65513_pps_x1000_1537_vs_x10",
@@ -6745,10 +6745,10 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     {
       "id": "G081",
       "source": "generated",
-      "canto": "最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——呢局冇得拗，唔係靠守贏返嚟",
-      "english_gloss": "m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion",
+      "canto": "最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——攻擊上冇得拗，亦唔使靠守就贏咗；另外，唔計呢四條軸，佢仲有 1 格輸蝕：最高 B2B",
+      "english_gloss": "m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion; behind on 1 non-axis column(s): 最高 B2B",
       "category": "pace",
-      "lemma": "G081_m7r3_winner_yachi_led_on_every_attacking_axis_no_inversion",
+      "lemma": "G081_m7r3_winner_yachi_led_on_every_attacking_axis_no_inversion_behind_on_1",
       "status": "verified",
       "status_label": "已驗證"
     },

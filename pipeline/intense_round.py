@@ -46,7 +46,8 @@ import html
 
 from pipeline import claim_cards
 from pipeline.claims.build_claims import SIMPLIFIED
-from pipeline.claims.generators import INTENSE_AXES, axis_verdict
+from pipeline.claims.generators import (INTENSE_AXES, INTENSE_DIRECTION,
+                                        INTENSE_EXTRA_COLS, axis_verdict)
 
 # Printed in this order. The labels match the claim Cantonese so a reader moving
 # between the table and the claims island sees the same words.
@@ -64,13 +65,25 @@ FIELDS = [
     ("vs_x1000", "VS", "r1"),
     ("pieces", "粒數", None),
     ("garbage_attack", "攻擊", None),
-    ("garbagesent", "射埋", None),
+    # 送出, not 射埋 — see the note on `_INTENSE_FIELDS` in generators.py. This column is
+    # what the player SENT; 射埋 is the queue aimed AT him, which this table never had.
+    # The closing note below explained the one that was not here.
+    ("garbagesent", "送出", None),
     ("garbagereceived", "食", None),
     ("garbage_cleared", "清走", None),
     ("lines", "行數", None),
     ("maxspike", "最大單波", None),
     ("topbtb", "最高 B2B", None),
 ]
+
+# Every printed column must be classified by generators.INTENSE_DIRECTION, so the table
+# and the finding cannot disagree about which columns are capable of running against the
+# winner. They did: FIELDS printed 11 while the sentence was scoped to the 6 in
+# INTENSE_AXES. Import-time, like the guard in generators.py, and for the same reason.
+_missing = [f for f, _l, _h in FIELDS if f not in INTENSE_DIRECTION]
+if _missing:
+    raise SystemExit("intense_round: " + ", ".join(_missing) + " printed with no entry "
+                     "in generators.INTENSE_DIRECTION")
 
 # There was a field -> label map here for the finding sentence. The sentence names AXES
 # now, and `INTENSE_AXES` carries those names, so a second map would be a copy of the
@@ -342,6 +355,15 @@ def build(facts, report_dir):
     ahead_ax = [a for a, _c in INTENSE_AXES
                 if axis_verdict([_dir(edges, f) for f, _l in _c]) == "ahead"]
     paired = [a for a, c in INTENSE_AXES if len(c) > 1]
+    # The directional columns no axis counts, and which of them ran against the winner.
+    # Their direction comes out of the same proved claim as the axes' — `_dir` raises if
+    # the ledger does not carry one — so these cells are marked and named on the same
+    # footing, not worked out here from two pinned literals.
+    extra_behind = [l for f, l in INTENSE_EXTRA_COLS if _dir(edges, f) == "behind"]
+    extra = (f'另外，唔計呢四條軸，表入面仲有 <strong>{len(extra_behind)}</strong> 格'
+             f'佢係輸蝕嘅：<strong>{"、".join(extra_behind)}</strong>——'
+             f'呢啲每格都係一樣嘢自己一個，冇速率同佢配對，所以只計格、唔計軸。'
+             if extra_behind else "")
     if behind_ax:
         names = "、".join(behind_ax)
         # The bold cells are per-column, so there are more of them than axes exactly when a
@@ -351,7 +373,12 @@ def build(facts, report_dir):
         # keyed to a session, because which round is selected moves with the facts. The
         # counts are printed rather than described for the same reason: a reader can check
         # them against the table, which a claim about their relative size is not.
-        n_cells = len(edges["behind"])
+        # AXIS cells only. `edges["behind"]` reaches the non-axis columns now, and the
+        # clause after this one names those separately — counting them here too made
+        # 2026-08-14 render 「7 格、3 條軸」 and then name 2 of the same 7 again. Found by
+        # reading the rendered page, which is the only thing that catches this class.
+        axis_cols = {f for _a, c in INTENSE_AXES for f, _l in c}
+        n_cells = len([f for f in edges["behind"] if f in axis_cols])
         gap = (f'：<strong>{n_cells} 格、{len(behind_ax)} 條軸</strong>——'
                f'因為 APM 就係攻擊除返自己嘅時間、PPS 就係粒數除返自己嘅時間，'
                f'同一件事數兩次會將個發現吹大，所以數「輸幾多樣」係數軸，唔係數格。'
@@ -361,7 +388,7 @@ def build(facts, report_dir):
                    f'{"都" if len(behind_ax) > 1 else ""}<strong>輸蝕</strong>'
                    f'畀 {html.escape(lose)}——'
                    f'即係話呢局<strong>唔係攻得多嗰個贏</strong>。'
-                   f'表入面粗體嗰啲就係佢落後嗰幾格{gap}</p>')
+                   f'表入面粗體嗰啲就係佢落後嗰幾格{gap}{extra}</p>')
     else:
         rest_ax = [a for a, _c in INTENSE_AXES if a not in behind_ax and a not in ahead_ax]
         # Mirrors the claim's three branches — a level axis is named as level, never
@@ -370,9 +397,19 @@ def build(facts, report_dir):
                 f'<strong>領先</strong>' if not rest_ax else
                 f'佢喺 <strong>{"、".join(ahead_ax)}</strong> 領先，'
                 f'喺 <strong>{"、".join(rest_ax)}</strong> 打成平手，一條軸都冇輸')
+        # 唔使靠守 is about DOWNSTACKING, and 清走 is not an axis — printed off the axis
+        # verdict it asserted something no lemma compared, and it was false on 2026-08-09,
+        # whose winner trailed 清走 48 against 50 in the table right above it. Conditioned
+        # on the proved 清走 comparison it stays on 2026-08-01, where the winner led it
+        # 35 against 31. Two sessions, one branch, two different sentences — which is the
+        # point: 08-01's defect was an unnamed 最高 B2B, 08-09's was a false claim.
+        defended = _dir(edges, "garbage_cleared") == "behind"
+        close = ('呢局攻擊上冇得拗，但唔可以話佢唔使守。'
+                 if defended else '呢局冇得拗，唔使靠守就贏咗。')
         out.append(f'    <p class="ir-find">贏嘅係 <strong>{html.escape(win)}</strong>，'
                    f'{lead}——'
-                   f'呢局冇得拗，唔使靠守就贏咗。'
+                   f'{close}'
+                   f'{extra}'
                    f'呢個結果本身值得記低：最癲嘅一局唔係次次都有反轉。'
                    f'（{"、".join(paired)}每條軸都係一個總數加返佢自己嘅速率，'
                    f'兩格當一條軸計。）</p>')
@@ -416,8 +453,12 @@ def build(facts, report_dir):
                '呢一局淨係做個例子，話畀你睇件事點樣發生。'
                '兩者邊個都唔證明到對方——'
                '成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。'
-               '另外：<strong>射埋</strong>係對面掟過嚟排緊隊嗰啲，'
-               '<strong>食</strong>係抵銷完之後真係跌落塊板嗰啲，兩個唔同數。</p>')
+               '另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：'
+               '<strong>送出</strong>係佢掟出去嗰啲，'
+               '<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。'
+               '「逐局全數據」嗰邊仲有個<strong>射埋</strong>，'
+               '嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——'
+               '呢張表冇呢一欄。</p>')
     # The corpus figure in the lede is the one number here that is not a claim, so the
     # two things that could manufacture it are stated where the reader meets it. Both
     # were measured before the lede was written, not after — the death bias in
