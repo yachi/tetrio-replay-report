@@ -21,6 +21,8 @@ set -x REPLAY_DIR (git rev-parse --show-toplevel)/sessions/2026-07-22
 
 bun test forecast.test.ts wiki-fixtures.test.ts property-forecast.test.ts forecast-corpus.test.ts arrival-key.test.ts
 bun run mutate-forecast.ts   # defaults to the fixture files PLUS forecast-corpus.test.ts
+                             #   and arrival-key.test.ts (added 2026-08-16 — the fixture that
+                             #   proves the visited-key fix was contributing no kills here)
 bun run board-metrics.ts ../../sessions/2026-07-22   # ROADMAP triage of board-derived metrics
 bun run run-forecast.ts
 bun run auc.ts
@@ -52,7 +54,7 @@ Expected output, all four re-measured against `sessions/2026-07-22` on **2026-08
 | command | result |
 |---|---|
 | the `bun test` line above | 103 pass, 0 fail, 8200 assertions, **8 files** |
-| `mutate-forecast.ts` | 50/50 killed |
+| `mutate-forecast.ts` | **52/55 killed, 3 controls held, 0 mismatched** (2026-08-16; was 50/50 before `key/revert-to-position`, the three controls and the poison were added) |
 | `run-forecast.ts` | pinglamb 97 tucked / 0 forecast / 0.0% · yachi 115 / 0 / 0.0% |
 | `auc.ts` | 50.0 · 50.0 · 50.0 · 57.0 · 50.0 — every forecast metric ties now that the rate is 0 |
 
@@ -64,6 +66,14 @@ the printed breakdown did not sum to its own header; and both the rate and the r
 counted `kind !== 'reactive'`, the idiom `isVerifiedForecast` exists to abolish, which scores every
 opener as a forecast. Both now route through `isVerifiedForecast`. **Nothing re-runs this table, so
 it goes stale silently — re-measure it whenever you touch the metric.**
+
+The omitted-key half came back on 2026-08-16, which is why the literal is gone rather than extended.
+`path_opened` (the fifth kind) would have reproduced it exactly — same file, same line, under a
+comment describing the bug — because "remember to add it here too" is not a mechanism. Both the
+initialiser and `forecastMetric`'s own `totals` now come from `zeroKindTotals()`, derived from the one
+`FORECAST_KINDS` list, and the runner throws if its printed breakdown does not sum to its own header.
+A `satisfies Record<ForecastKind, number>` was tried first and rejected: there is no `tsc` step in
+this repo, so a type-level guard here fires on nothing.
 
 The bottom two rows moved since they were written on 2026-07-30, and the table said nothing
 about it because nothing re-runs it. What changed:
@@ -83,26 +93,41 @@ the rounding, or the metric set changes, and date it.
 
 ## What is verified, and how
 
-- **Mutation — 50/50.** `mutate-forecast.ts` patches `forecast.ts`, runs the suite, restores.
+- **Mutation — 52/55 killed, 3 controls held, 0 mismatched.** `mutate-forecast.ts` patches
+  `forecast.ts`, runs the suite, restores.
 
-  **This file used to claim the harness validated itself with control mutants — "three
-  semantics-preserving edits must survive and a poison mutant (spawn column 3→9) must die". No
-  such mutants exist, and none ever did.** At `0dde1d8`, the commit that wrote that sentence, the
-  harness held 11 entries and contained neither the word `spawn` nor any notion of a control; at
-  `2911eb8` it held 49, still with no `spawn` and no expected-verdict field. `git log --all -S`
-  finds no such entry in any commit. The sentence described a regime nobody built, and its
-  companion — "a sweep where everything dies is a syntax error, not a passing gate" — condemned
-  every honest run this harness has ever produced, since with no controls **50/50 killed is the
-  correct result**. It was false on the day it was written and survived because it reads exactly
-  like the kind of thing this project does do.
+  **This file claimed for months that the harness validated itself with control mutants — "three
+  semantics-preserving edits must survive and a poison mutant (spawn column 3→9) must die" — and
+  no such mutants existed.** At `0dde1d8`, the commit that wrote that sentence, the harness held
+  11 entries and contained neither the word `spawn` nor any notion of a control; at `2911eb8` it
+  held 49, still with no `spawn` and no expected-verdict field. `git log --all -S` found no such
+  entry in any commit. The sentence described a regime nobody had built, and its companion — "a
+  sweep where everything dies is a syntax error, not a passing gate" — condemned every honest run
+  the harness had produced, since with no controls **50/50 killed was the correct result**. It was
+  false on the day it was written and survived because it reads exactly like the kind of thing
+  this project does do.
 
-  The machinery now exists even though the controls do not: each entry carries an optional
-  `expect`, defaulting to `killed`, and the run fails when any observed verdict differs from its
-  expected one — so a killed control fails as loudly as a surviving mutant. That is what makes a
-  control *possible*, and it forces an equivalence claim to be declared rather than tolerated,
-  which is this file's own doctrine: a surviving mutant is either a missing test or a
-  proven-equivalent mutant, and "probably equivalent" is not a status this project accepts.
-  Adding the controls is open work.
+  **Built on 2026-08-16, to that description.** Three `expect: 'survived'` controls —
+  `bestTspinLines(b) > 0` → `>= 1` on an integer count, `x !== 'none'` → `!(x === 'none')`, and
+  `filter(...).length` → `reduce` — plus `poison/spawn-column`, the BFS spawning at column 9. Each
+  control is equivalent by an argument checkable by eye; **none is justified by "the suite still
+  passes"**, which would be circular, since the suite agreeing with a control is the very thing the
+  control is supposed to test. Measured: all three survive, the poison dies.
+
+  So the deleted companion sentence is now true, and worth restating in the direction that matters:
+  a sweep in which *everything* dies means the three controls died, which means the suite has
+  stopped being able to tell equivalent code from broken code. **What the controls buy is the one
+  failure a mutation harness cannot see about itself** — if `bun test` silently stopped reaching
+  `forecast.ts` (wrong path, a test file erroring on import, an `execSync` throwing for its own
+  reasons), every defect would report `killed` and the run would look like the best in this file's
+  history. The poison is the smoke alarm for exactly that.
+
+  The machinery underneath is unchanged: each entry carries an optional `expect` defaulting to
+  `killed`, and the run fails when any observed verdict differs from its expected one — so a killed
+  control fails as loudly as a surviving mutant. It forces an equivalence claim to be declared
+  rather than tolerated, which is this file's own doctrine: a surviving mutant is either a missing
+  test or a proven-equivalent mutant, and "probably equivalent" is not a status this project
+  accepts.
 
   Two failure modes it could not report until 2026-08-10, both of which had already bitten it.
   A find string that no longer matches used to throw and **abort the sweep mid-list**, after
@@ -333,24 +358,30 @@ match-level rate. `validate.ts` is what establishes which prefixes are trustwort
 | `forecast-boards.ts` | re-export shim so fixtures import one surface |
 | `*.test.ts` | unit, external-golden, and property suites |
 | `mutate-forecast.ts`, `strip-tests.ts` | mutation harness and kill attribution |
-| `bfs-cap.ts` | how far the BFS runs from its cap — but against a REPLICA of the search, see below |
+| `bfs-cap.ts` | how far the BFS runs from its cap, measured against the real `bestTspin` |
 | `pairs.ts` | winner-vs-loser pairing, shared by both AUC consumers |
 | `run-forecast.ts`, `auc.ts`, `validate.ts` | the runners that produce the published figures |
 | `auc-power.ts` | CIs, exact tests, power, and required sample size for those figures |
 
-## `bfs-cap.ts` measures a replica, and its number is a state count
+## `bfs-cap.ts` prints two numbers, and only one of them is what the cap bounds
 
-**It does not import `forecast.ts`.** Its imports are `sim.ts` and `vendor/core/srs.ts`; it walks
-its own copy of the search. So whatever it prints is structurally blind to any change in the real
-BFS — it cannot disagree with an engine it never calls, and an agreement it reports across two
-variants of that engine is therefore worth nothing as evidence. Point it at the real `bestTspin`
-before quoting it again.
+**It measured a REPLICA until 2026-08-16.** Its imports were `sim.ts` and `vendor/core/srs.ts` and
+it never imported `forecast.ts`, so it walked its own copy of the search — structurally blind to
+any change in the real BFS. It printed the same 688 before and after the 2026-08-10 arrival-key
+fix, and **that agreement was worth nothing as evidence**: it cannot disagree with an engine it
+never calls. It now drives `bestTspin` through `withBfsTrace`, and reports:
 
-The figure it used to be quoted for, `max 688 over 2000 boards`, is also easy to read as the wrong
-quantity: it is the **largest number of states any sampled board reached**, which is what the
-20000 / 40000 caps are counted in. It is not a bound on queue length, and it is sampled evidence
-rather than a proof — the file's own header says so, and says the caps stay live belts because of
-it.
+| | over 2 000 generated stacks |
+|---|---|
+| max distinct **positions** (`rotation:col:row`, the expansion key) | **688** |
+| max **pair queue** (position × arrival — what `h < 40000` counts) | **848**, 1.23 per position |
+
+Both reproduce the figures `forecast.ts`'s header already carried; what changed is that they now
+come out of the engine rather than out of a copy of it, and the printed headroom is 47x rather than
+the replica's 58x — the replica was dividing the cap by the wrong quantity. `max 688` is the figure
+this file used to be quoted for and it is **not** what the cap bounds; quote the pair queue for
+that. Both are sampled evidence rather than a proof — the file's own header says so, and says the
+caps stay live belts because of it.
 
 ## Do not quote an AUC from here without `auc-power.ts`
 

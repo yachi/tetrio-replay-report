@@ -26,6 +26,9 @@ For any float `v` scaled to an int: `x1000 = floor(v * 1000 + 0.5)` computed in 
       "leaderboard": {
         "<username>": {
           "wins": int,
+          // A leaderboard entry has no aggregatestats, so these three stay on the live tick
+          // while the per-round ones below are results-time. Round sums therefore do NOT
+          // reconcile against these; that is a stated decision, not an oversight.
           "apm_x1000": int,                  // from leaderboard[].stats.apm
           "pps_x1000": int,
           "vs_x1000": int,                   // stats.vsscore
@@ -42,9 +45,13 @@ For any float `v` scaled to an int: `x1000 = floor(v * 1000 + 0.5)` computed in 
             "<username>": {
               "lifetime": int,               // player.lifetime (MILLISECONDS — verified empirically vs pieces/pps)
               "alive": true|false,           // player.alive
-              "apm_x1000": int,              // player.stats.apm
-              "pps_x1000": int,              // player.stats.pps
-              "vs_x1000": int,               // player.stats.vsscore
+              // ---- rates: from player.replay.results.aggregatestats, the FINAL snapshot ----
+              // NOT player.stats, which is a live in-game tick and predates the round's end in
+              // 183 of 760 player-rounds (181 of them the round winner, APM too high in 172).
+              // Only aggregatestats satisfies vs*60*attack == apm*100*(attack+cleared).
+              "apm_x1000": int,              // player.replay.results.aggregatestats.apm
+              "pps_x1000": int,              // player.replay.results.aggregatestats.pps
+              "vs_x1000": int,               // player.replay.results.aggregatestats.vsscore
               "garbagesent": int,            // player.stats.garbagesent
               "garbagereceived": int,        // player.stats.garbagereceived
               "kills": int,                  // player.stats.kills

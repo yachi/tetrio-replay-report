@@ -12,7 +12,7 @@ const STRICT_ROWS = process.env.LOOSEROWS !== '1';
  * The prefix, and therefore this metric's whole sample size, is a function of simulator
  * accuracy. See verified-prefix.ts for the shared gate and the settings.
  */
-import { forecastMetric, isVerifiedForecast, type ForecastKind } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, zeroKindTotals, type ForecastKind } from './forecast.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
 
 const byUser:Record<string,{tot:Record<ForecastKind,number>;verified:number;tspins:number;
@@ -24,9 +24,12 @@ for (const c of loadCases()) {
   const vIdx = verifiedIndex(r, c.truth, STRICT_ROWS);
   const u = c.user;
   // `self_built` was missing from this initialiser, so `tot[rec.kind]++` produced NaN for 388 of
-  // the 654 records and the printed breakdown silently failed to sum to the header count.
-  byUser[u] ??= {tot:{forecast_garbage:0,forecast_lineclear:0,self_built:0,reactive:0},verified:0,
-                tspins:0,verifiedPieces:0,totalPieces:0,seps:[]};
+  // the 654 records and the printed breakdown silently failed to sum to the header count. The
+  // literal is GONE now rather than extended: `path_opened` arriving would have reproduced the bug
+  // exactly, in the file whose own comment describes it, which is the evidence that "remember to
+  // add it here too" does not hold. `zeroKindTotals()` derives it from the one kind list.
+  byUser[u] ??= {tot:zeroKindTotals(),
+                verified:0,tspins:0,verifiedPieces:0,totalPieces:0,seps:[]};
   byUser[u]!.verifiedPieces += vIdx+1; byUser[u]!.totalPieces += c.placed;
   verifiedLocks += vIdx+1; totalLocks += c.placed;
   if (vIdx < 0) continue;
@@ -50,8 +53,13 @@ for(const [u,v] of Object.entries(byUser)){
   console.log(`  tucked T-spins on verified board : ${v.tspins}`);
   console.log(`    forecast (garbage)   : ${v.tot.forecast_garbage}`);
   console.log(`    forecast (line clear): ${v.tot.forecast_lineclear}`);
+  console.log(`    path_opened          : ${v.tot.path_opened}`);
   console.log(`    self_built           : ${v.tot.self_built}`);
   console.log(`    reactive             : ${v.tot.reactive}`);
+  // The breakdown must SUM to the header count. A zeroed tally that silently omits a kind was the
+  // original defect; a printer that silently omits one has the same effect on the reader.
+  const shown = Object.values(v.tot).reduce((a,b)=>a+b,0);
+  if (shown !== v.tspins) throw new Error(`${u}: breakdown sums to ${shown}, header says ${v.tspins}`);
   console.log(`  forecast rate: ${v.tspins?(100*fc/v.tspins).toFixed(1):'n/a'}%   median setup separation: ${med} pieces`);
 }
 

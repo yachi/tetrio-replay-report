@@ -135,14 +135,24 @@ def extract_round_player(player, ctx):
 
     clears = rstats.get("clears") if rstats else None
 
+    # Rates come from results.aggregatestats, the final snapshot, not from player.stats, a live
+    # in-game tick that predates the round's end. See pipeline/extract.py for the full argument.
+    # extract_leaderboard_entry above deliberately stays on `stats`: a leaderboard entry carries
+    # no aggregatestats. This copy must track the canonical extractor or the two facts files for
+    # this session disagree, and nothing gates that cross-comparison.
+    aggregate = results.get("aggregatestats")
+    if results and aggregate is None:
+        warn(f"{ctx}: missing/null 'replay.results.aggregatestats' -> defaults 0 for rates")
+    aggregate = aggregate or {}
+
     events = replay.get("events")
 
     return username, {
         "lifetime": get(player, "lifetime", 0, ctx),
         "alive": bool(get(player, "alive", False, ctx)),
-        "apm_x1000": x1000(get(stats, "apm", 0, ctx + ".stats")),
-        "pps_x1000": x1000(get(stats, "pps", 0, ctx + ".stats")),
-        "vs_x1000": x1000(get(stats, "vsscore", 0, ctx + ".stats")),
+        "apm_x1000": x1000(get(aggregate, "apm", 0, ctx + ".results.aggregatestats")),
+        "pps_x1000": x1000(get(aggregate, "pps", 0, ctx + ".results.aggregatestats")),
+        "vs_x1000": x1000(get(aggregate, "vsscore", 0, ctx + ".results.aggregatestats")),
         "garbagesent": get(stats, "garbagesent", 0, ctx + ".stats"),
         "garbagereceived": get(stats, "garbagereceived", 0, ctx + ".stats"),
         "kills": get(stats, "kills", 0, ctx + ".stats"),

@@ -77,6 +77,7 @@ import time
 
 from .check_smt import (CODED, DEFINE, LEGEND, SOLVERS, perturbations, run,
                         solvers_available, stratified)
+from .codegen import CONST_REF
 
 # Per-query time limit, one entry per name in `check_smt.SOLVERS` — that dict stays
 # the single list of solvers and their argv; this only adds the option each one
@@ -89,10 +90,15 @@ LIMITS = {"z3": "(set-option :timeout {ms})",
           "cvc5": "(set-option :tlimit-per {ms})",
           "yices-smt2": None}
 
-# Constants as codegen_smt names them: m3_r2_yachi_apm, m0_scoreYachi, m4_nrounds.
+# Constants as codegen_smt names them: m3_r2_yachi_apm, m0_scoreYachi, m4_nrounds —
+# and `nmatches`, the one that does not start with m<digits>_. That exception is why
+# the pattern is imported from the emitter rather than written again here: this was the
+# THIRD place spelling out the shape of a const name, and the first claim to read
+# `nmatches` made two of them wrong at once (the emitter dropped the const, and this
+# gate reported `unknown constant nmatches` from the solver).
 # Intersected with the file's own definitions before use, so a stray match in a
 # comment cannot invent a reference.
-NAME = re.compile(r"\bm\d+_[A-Za-z0-9_]+\b")
+NAME = re.compile(CONST_REF)
 # `; G014 [round_totals] 53 rounds total; yachi won 28` — the line codegen_smt writes
 # above each block. The gloss is what makes a finding readable, so it is parsed, but
 # its absence is never fatal: the claim id comes from the `(echo)`, which the solver

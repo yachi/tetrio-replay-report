@@ -21,6 +21,9 @@
  *          forecast_garbage   — the availability crossed on the garbage insertion.
  *          forecast_lineclear — it crossed on the row removal, and a cleared row lay strictly
  *                               inside the slot, so the clear FORMED it rather than moving it.
+ *          path_opened        — it crossed on the row removal, but the slot was already there and
+ *                               merely UNREACHABLE. The clear removed the lid, it did not build
+ *                               the room. Not a forecast under `spec/Forecast.dfy` — see below.
  *          self_built         — it crossed on the player's own placement. Openers land here.
  *     3. otherwise `reactive` — the spin on offer did not get better.
  *     4. and, independently of all that, WAS THERE A HOLE to close onto when the roof went up?
@@ -93,6 +96,33 @@ function visitIndex(rotation: number, col: number, row: number): number {
   const c = col - V_COL_MIN, r = row - V_ROW_MIN;
   if (c < 0 || c >= V_COL_N || r < 0 || r >= V_ROW_N) return -1;
   return (rotation * V_COL_N + c) * V_ROW_N + r;
+}
+
+/**
+ * What one `bestTspin` call actually explored. Opt-in, and the only reader is `bfs-cap.ts`.
+ *
+ * `bfs-cap.ts` used to walk its OWN copy of this BFS — it imported `vendor/core/srs.ts` and never
+ * imported this file — so it printed the same 688 for the shipped engine and for the 2026-08-10
+ * arrival-key fix, and that agreement was worth nothing: a replica cannot disagree with an engine
+ * it never calls. Every number that file prints is now this search's.
+ *
+ * The hot path pays one null test per call and nothing else. `queue` and the spans are derived by
+ * walking `q` AFTER the search, inside the `if (trace)`, rather than maintained per edge:
+ *   - `queue`     is `q.length`, the (position, arrival) PAIR queue — the thing `h < 40000` bounds
+ *   - `positions` is the distinct-position count, which is `expand === true` on exactly the entries
+ *     whose `seenOrMark` returned false (the spawn included), so it needs no second set
+ *   - the spans are over queued states, which is what makes the row range an observation rather
+ *     than the undischarged [-2, 39] assumption the caps exist to survive
+ */
+export interface BfsTrace { queue: number; positions: number; rowLo: number; rowHi: number; colLo: number; colHi: number }
+let trace: BfsTrace | null = null;
+
+/** Run `fn` with tracing on and return the LARGEST search it made. Scoped, so it cannot be left on. */
+export function withBfsTrace<T>(fn: () => T): { value: T; trace: BfsTrace } {
+  const outer = trace;
+  const t: BfsTrace = { queue: 0, positions: 0, rowLo: Infinity, rowHi: -Infinity, colLo: Infinity, colHi: -Infinity };
+  trace = t;
+  try { return { value: fn(), trace: t }; } finally { trace = outer; }
 }
 
 export function bestTspin(board: Board): { lines: number; rows: number[] } | null {
@@ -185,6 +215,14 @@ export function bestTspin(board: Board): { lines: number; rows: number[] } | nul
       q.push({ p: n, rot: true, kick: isKick, expand: !seenOrMark(n.rotation, n.col, n.row) });
     }
   }
+  if (trace) {
+    trace.queue = Math.max(trace.queue, q.length);
+    trace.positions = Math.max(trace.positions, q.reduce((n, e) => n + (e.expand ? 1 : 0), 0));
+    for (const e of q) {
+      trace.rowLo = Math.min(trace.rowLo, e.p.row); trace.rowHi = Math.max(trace.rowHi, e.p.row);
+      trace.colLo = Math.min(trace.colLo, e.p.col); trace.colHi = Math.max(trace.colHi, e.p.col);
+    }
+  }
   return best > 0 ? { lines: best, rows: bestRows } : null;
 }
 
@@ -244,10 +282,41 @@ export function tspinAvailable(board: Board): boolean {
  *                      available spin. Causally verified.
  * `forecast_lineclear` improved, and the clear FORMED the slot: a cleared row lay strictly inside
  *                      it, so removing that row is what brought roof and cavity together.
+ * `path_opened`        improved, and the clear did it, but by removing an obstruction ABOVE a slot
+ *                      that already existed cell for cell and was merely unreachable. See
+ *                      `localiseMechanism`'s `access` branch.
  * `self_built`         improved, but the player built the slot themselves. Openers land here.
  * `reactive`           the available spin did not improve between roof and execution.
+ *
+ * ONLY THE TWO `forecast_` KINDS MAY ENTER THE NUMERATOR, and the prefix is what marks them. That is
+ * why the fifth kind is NOT called `forecast_access`: `isVerifiedForecast` tests the two names, and a
+ * third `forecast_`-prefixed kind is one careless `startsWith` away from being counted. The exclusion
+ * is not a policy choice — `spec/Forecast.dfy`'s clause 3 (`GapClosed`, :506-530) is the
+ * strictly-inside rule stated in the hand-written concept spec, and an access event's cleared rows lie
+ * OUTSIDE `[roofAt, floorAt]`, so `IsForecast` is false for it. Counting it would put this file in
+ * disagreement with the spec, and in this repo the spec is the definition. The spec has no vocabulary
+ * for reachability at all (`availAtJ`/`availAtK` are opaque ints), which is the same fact from the
+ * other side: `path_opened` is a distinction the concept spec does not draw, so it cannot be a
+ * forecast under it.
  */
-export type ForecastKind = 'forecast_garbage' | 'forecast_lineclear' | 'self_built' | 'reactive';
+/**
+ * The kinds as a RUNTIME list, with the type derived from it rather than the other way round.
+ *
+ * Every consumer that needs a zeroed tally builds it from here. A bare object literal is how the
+ * `self_built` bug happened — `run-forecast.ts`'s initialiser omitted the kind, `tot[rec.kind]++`
+ * evaluated `undefined + 1`, and the printed breakdown was `NaN` for 388 of 654 records while the
+ * header count above it stayed right. A `satisfies Record<ForecastKind, number>` would NOT have
+ * caught it: there is no tsc step in this repo (see `check_ts_imports`'s header), so a type-level
+ * guard here is decorative by construction. Deriving the literal at runtime is the only version
+ * that cannot be forgotten.
+ */
+export const FORECAST_KINDS = [
+  'forecast_garbage', 'forecast_lineclear', 'path_opened', 'self_built', 'reactive',
+] as const;
+export type ForecastKind = typeof FORECAST_KINDS[number];
+/** a zeroed tally over every kind — the one place a new kind has to be added */
+export const zeroKindTotals = (): Record<ForecastKind, number> =>
+  Object.fromEntries(FORECAST_KINDS.map(k => [k, 0])) as Record<ForecastKind, number>;
 export interface ForecastRecord {
   lockIndex: number; frame: number; lines: number; spin: 'mini' | 'full';
   kind: ForecastKind; separation: number; roofFrom: number | null; roofIsGarbage: boolean;
@@ -363,6 +432,61 @@ export const isVerifiedForecast = (r: ForecastRecord) =>
   // clause 4 — the gap must have been closed by a clear that was not itself a T-spin
   && r.closingClearWasSpin !== true;
 
+/**
+ * WHICH clause disqualified a mechanism-established event — the fact the report used to ASSUME.
+ *
+ * `isVerifiedForecast` is a boolean, so a consumer that wants to say *why* an event did not count
+ * has nothing to read and has to guess. `pipeline/forecast_section.py` guessed: whenever
+ * `mechanism_established > forecast_total` it printed clause 2 (「個底係天花板之後先至嚟」) as the
+ * reason. That was false on two published reports — 2026-08-09 and 2026-08-14 are both clause 4,
+ * and 08-14's sits on the corpus's only DT Cannon round — and no gate could see it, because the
+ * renderer and the checker were reading the same absent fact.
+ *
+ * The verdict is the JOINT one, never a first-match: clause 2 and clause 4 are independent tests
+ * and both can reject the same event, so the pairs where both fire are their own values rather
+ * than being attributed to whichever was asked first. Clause 2's UNDECIDABLE case is likewise its
+ * own value and is not folded into its rejection: "the floor is garbage and garbage straddles the
+ * window" is not "the floor arrived later", and printing one as the other is the same class of
+ * defect this function exists to end.
+ *
+ * `null` — not a bucket — for an event whose mechanism is not established at all (`reactive`,
+ * `self_built`, `path_opened`). Those are excluded one clause earlier and a caller that bucketed
+ * them here would be reporting openers as clause-2 rejections. `path_opened` belongs in that list
+ * rather than in the guard above it: its mechanism IS established, and it is still not a forecast —
+ * the spec's clause 3 rejects it on geometry, before clauses 2 and 4 are ever reached. Giving it a
+ * `ClauseVerdict` would put it in a breakdown whose denominator (`mechanism_established`) it is not
+ * in, so the six buckets would stop summing.
+ *
+ * The mapping back to the boolean is exact and asserted by every caller: `rejectedBy(r) ===
+ * 'counted'` iff `isVerifiedForecast(r)`.
+ */
+export type ClauseVerdict =
+  | 'counted'
+  | 'floor_arrived_later'
+  | 'closing_clear_was_spin'
+  | 'floor_arrived_later_and_closing_clear_was_spin'
+  | 'floor_undecidable'
+  | 'floor_undecidable_and_closing_clear_was_spin';
+
+/** Every verdict, in the order the artifact emits them. `counted` first: it is the numerator. */
+export const CLAUSE_VERDICTS: ClauseVerdict[] = [
+  'counted',
+  'floor_arrived_later',
+  'closing_clear_was_spin',
+  'floor_arrived_later_and_closing_clear_was_spin',
+  'floor_undecidable',
+  'floor_undecidable_and_closing_clear_was_spin',
+];
+
+export function rejectedBy(r: ForecastRecord): ClauseVerdict | null {
+  if (!(r.kind === 'forecast_garbage' || r.kind === 'forecast_lineclear')) return null;
+  const hole = holePreExisted(r.floorOrigin ?? 'undetermined');   // clause 2: true / false / null
+  const spin = r.closingClearWasSpin === true;                    // clause 4
+  if (hole === true) return spin ? 'closing_clear_was_spin' : 'counted';
+  if (hole === null) return spin ? 'floor_undecidable_and_closing_clear_was_spin' : 'floor_undecidable';
+  return spin ? 'floor_arrived_later_and_closing_clear_was_spin' : 'floor_arrived_later';
+}
+
 /** `board` with those rows deleted and the stack shifted down — the counterfactual board. */
 export function withoutRows(board: Board, rows: Set<number>): Board {
   const kept = board.filter((_, i) => !rows.has(i));
@@ -461,8 +585,34 @@ export function garbageArrivedAfter(r: SimResult, j: number, k: number): Set<num
  * Where neither the clear nor the piece touches the slot, the answer is `unattributed` rather
  * than a default: an `else` that quietly returns 'placement' is how the opener confound survived
  * the first time.
+ *
+ * `access` IS THE FIFTH VALUE, AND IT EXISTS BECAUSE THE PARAGRAPH ABOVE IS ABOUT FORMATION WHILE
+ * `bestTspin` MEASURES REACHABILITY. The geometric test is sound about what it says — a cleared row
+ * outside the slot did not form it — and silent about the other way a clear raises availability:
+ * removing an obstruction ABOVE a slot that already existed, cell for cell, and was merely
+ * unreachable from spawn. The model had nowhere to put that, so it landed in one of two places
+ * depending on an irrelevance, whether the causing piece happened to sit beside the slot:
+ *
+ *     piece does NOT touch  ->  `unattributed`   honest, and counted in the artefact
+ *     piece DOES touch      ->  `placement`      confidently wrong, and counted NOWHERE
+ *
+ * The second half is why this was a defect rather than a curiosity: 2026-08-09's published report
+ * said 「玩家自己落嗰隻棋整出嚟」 of a slot that piece did not make. The counter over `unattributed`
+ * could only ever see the honest half, so a third event of the class would have arrived in silence.
+ *
+ * The test is the counterfactual the model never asked — delete the cleared rows FROM `A` ALONE,
+ * with the piece never placed, and see whether the target is already reached. Two events in 1789
+ * localised records over six sessions, 0 beyond the verified prefixes. `forecast-access-class.test.ts`
+ * measures the class independently of this branch and names both.
+ *
+ * BRANCH ORDER IS MEASURED, NOT CHOSEN, and it is the whole of the design. Placed before the
+ * strictly-inside test it reclassifies 9 events — every `forecast_lineclear` in the corpus, i.e. the
+ * published numerator, plus 2 more the placement alone also explains; placed after `touches` it
+ * reclassifies 1 and leaves the confidently-wrong half exactly as it was, since `touches` gets there
+ * first. Here — after the clear's own geometry, before the piece's — it reclassifies 2, which are the
+ * 2 the class contains.
  */
-export type Mechanism = 'garbage' | 'line-clear' | 'placement' | 'unattributed';
+export type Mechanism = 'garbage' | 'line-clear' | 'access' | 'placement' | 'unattributed';
 
 export function localiseMechanism(
   r: SimResult, j: number, k: number, target: number, avail: (t: number) => number,
@@ -542,8 +692,32 @@ export function localiseMechanism(
     const ps = slot.rows.map(back);
     if (clearedRows.some(cr => cr > Math.min(...ps) && cr < Math.max(...ps)))
       return { step: t, mechanism: 'line-clear' };
+    // The clear did not FORM the slot — but availability here is reachability, so it may still have
+    // opened the PATH to one that was already there. Asked of `A` alone, with the piece never
+    // placed: if the same rows removed from the pre-board already reach the target, the clear
+    // sufficed on its own and crediting the piece beside it would be the confidently-wrong verdict
+    // this branch exists to stop. `clearedRows` indexes `Bpre`, which is `A` plus cells and no rows
+    // removed, so the two frames coincide and no back-mapping is needed.
+    if (bestTspinLines(withoutRows(A, new Set(clearedRows))) >= target)
+      return { step: t, mechanism: 'access' };
     // The clear only displaced the slot, so the piece must have formed it — but only if the
     // piece actually went near it. Otherwise neither did, and that is a finding.
+    //
+    // BOTH EXITS BELOW ARE NOW UNREACHED ON THIS CORPUS, and that is the shape of the repair rather
+    // than an accident. Measured 2026-08-16 over all six sessions: 11 records reach this block at
+    // all — 9 `formed` above, 2 `access`, and **0** here, either way. Before the `access` branch the
+    // `touches` exit fired exactly once (2026-08-09 `-6.ttrm` r7 pinglamb lock 24), and that one
+    // firing is the whole defect: a Z whose cells provably sit outside the slot was credited with
+    // building it because one cell landed one row above, and the report published
+    // 「玩家自己落嗰隻棋整出嚟」 of a slot that piece did not make. The branch absorbed it.
+    //
+    // So the only thing exercising these two lines is the `DISP_*` fixture in `forecast.test.ts` —
+    // which is why that fixture is load-bearing and not decorative. It is the sole killer of the
+    // mutant that asks the counterfactual of `Bpre` instead of `A`: `withoutRows(Bpre, clearedRows)`
+    // IS `B`, and this block is already inside `bestTspinLines(B) >= target`, so that mutant makes
+    // the branch above fire unconditionally — and NO corpus test notices, because on this corpus
+    // everything reaching here takes the `access` exit anyway. Kept as live code, not deleted: a
+    // clear that displaces a slot the piece did build is an ordinary board, not an impossible one.
     const touches = lk.cells.some(c => {
       const rB = c.row + clearedRows.filter(cr => cr > c.row).length;
       return slot.rows.includes(rB) || slot.rows.includes(rB - 1) || slot.rows.includes(rB + 1);
@@ -588,7 +762,7 @@ export function forecastMetric(r: SimResult, strict = true): {
   // silently `continue`d, so the denominator's scope is measured — the asymmetry that let the
   // numerator bug live for weeks was that the numerator had a gate and this denominator had none.
   const drops = { zeroClear: [] as number[], noSnapshot: [] as number[], untucked: [] as number[] };
-  const totals: Record<ForecastKind, number> = { forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 0 };
+  const totals = zeroKindTotals();
   // Localising a mechanism walks back through the window re-evaluating boards the endpoints
   // already visited, and consecutive events share most of their windows. Memoised per call:
   // the boards are immutable, so this is arithmetic-identical to recomputing.
@@ -679,12 +853,42 @@ export function forecastMetric(r: SimResult, strict = true): {
       : supports.includes(-1) ? -1 : Math.max(...supports);
 
     // Loose mode: the original rule verbatim, co-occurrence and all.
-    const kind: ForecastKind = !(strict && determinable)
+    //
+    // THE `!determinable` CASE BELONGS TO STRICT MODE, NOT TO THE LOOSE LADDER, and it used to fall
+    // into it. The condition was `!(strict && determinable)`, so a STRICT run with an undeterminable
+    // window took the co-occurrence branch — the exact rule the strict rule exists to abolish — and
+    // could emit `forecast_garbage`/`forecast_lineclear` with `loc === null`, i.e. a forecast KIND
+    // with no mechanism behind it. `isVerifiedForecast` tests the kind and clauses 2 and 4, none of
+    // which asks whether a mechanism was established, so such an event counts; and the emitter's
+    // `mechanism_established = fg + fl` would report it as mechanism-established, which is false by
+    // construction. Proved on a constructed fixture before the change (a garbage roof plus garbage
+    // in the window yields `forecast_garbage` with `mechanism: undefined` under `strict = true`).
+    //
+    // The only way in is `determinable === false`, which needs `boardJ` or `boardK` missing, and
+    // `boardJ` is null exactly when `j === -1` — a roof with no placing lock, i.e. a garbage
+    // overhang. `roofIsGarbage` is false for every event in the corpus, so exposure is **0 of 3926
+    // records across six sessions** (measured 2026-08-16) and all six artefacts are byte-identical
+    // under this change. That is what makes the fix safe, not a reason to have left it: an
+    // unreachable branch that publishes a forecast on co-occurrence is a loaded gun, and the
+    // 2026-08-08 `insertMode` incident is this repo's precedent for a "legal but unswept" option
+    // silently producing 13 verified forecasts.
+    //
+    // `reactive` rather than a new kind: with no board at the roof there is nothing to compare, so
+    // no mechanism can be established, and every consumer already routes its numerator through
+    // `isVerifiedForecast`. The record still carries `determinable: false`, which is where the
+    // distinction between "did not improve" and "could not be asked" is readable.
+    const kind: ForecastKind = !strict
       ? (!improved ? 'reactive' : garbageBetween ? 'forecast_garbage'
          : clearBetween ? 'forecast_lineclear' : 'reactive')
+      : !determinable ? 'reactive'
       : !improved ? 'reactive'
       : loc!.mechanism === 'garbage' ? 'forecast_garbage'
       : loc!.mechanism === 'line-clear' ? 'forecast_lineclear'
+      // The clear opened the path to a slot that was already there. It gets its own kind rather
+      // than widening the line-clear branch, because the report's line-clear gloss
+      // 「消嗰行啱啱夾喺天花板同窿位中間」 IS the strictly-inside test — widening the branch would
+      // falsify a printed sentence in order to fix a miscount.
+      : loc!.mechanism === 'access' ? 'path_opened'
       // `placement` is the player building their own slot — openers land here. So does
       // `unattributed`, which must stay COUNTED rather than folded away: it means the step model
       // failed to explain an improvement, and a metric that cannot say so will never be corrected.

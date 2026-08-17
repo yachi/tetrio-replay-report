@@ -38,8 +38,8 @@
  * "measured, and the effect is exactly nothing", which is a finding this data cannot support.
  */
 import { writeFileSync } from 'node:fs';
-import { forecastMetric, isVerifiedForecast, holePreExisted } from './forecast.ts';
-import type { FloorOrigin } from './forecast.ts';
+import { forecastMetric, isVerifiedForecast, holePreExisted, rejectedBy, CLAUSE_VERDICTS } from './forecast.ts';
+import type { FloorOrigin, ClauseVerdict } from './forecast.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import { collectRows, pairsFor, auc, exactSignP } from './pairs.ts';
 import { eventLevel } from './forecast-event-level.ts';
@@ -87,9 +87,11 @@ function clopperPearson(k: number, n: number, alpha = 0.05): [number, number] {
 // a point. This is a stronger stance than seven agreeing guesses — see oracle-source.ts.
 const CONFIGS: [string, any][] = [['triangle-oracle', {}]];
 
-type Per = { tspins: number; fg: number; fl: number; sb: number; reactive: number;
+type Per = { tspins: number; fg: number; fl: number; po: number; sb: number; reactive: number;
              unattributed: number; verified: number; placed: number;
              floors: Record<FloorOrigin, number>; forecasts: number; undecided: number;
+             /** which clause disqualified each mechanism-established event — see `rejectedBy` */
+             rejected: Record<ClauseVerdict, number>;
              /** the GAME's own clear tallies, whole rounds — see Case.clears */
              tst: number; tsd: number; rounds: number;
              /** admitted T-spins in the verified prefix that never reached `tspins` — the
@@ -101,8 +103,9 @@ const tally = (extra: any) => {
   for (const c of loadCases()) {
     const r = runCaseOracle(c); void extra;
     const v = verifiedIndex(r, c.truth);
-    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
+    per[c.user] ??= { tspins: 0, fg: 0, fl: 0, po: 0, sb: 0, reactive: 0, unattributed: 0, verified: 0, placed: 0,
       floors: { 'pre-existed': 0, 'arrived-later': 0, undetermined: 0 },
+      rejected: Object.fromEntries(CLAUSE_VERDICTS.map(v => [v, 0])) as Record<ClauseVerdict, number>,
       forecasts: 0, undecided: 0, tst: 0, tsd: 0, rounds: 0,
       dropUntucked: 0, dropNoSnapshot: 0, dropZeroClear: 0 };
     const p = per[c.user]!;
@@ -121,17 +124,30 @@ const tally = (extra: any) => {
     for (const rec of metric.records) {
       if (rec.lockIndex > v) continue;
       p.tspins++;
-      // Four buckets, and the `else` must not swallow one: `self_built` was added precisely
+      // Five buckets, and the `else` must not swallow one: `self_built` was added precisely
       // because openers were landing in the forecast count, so folding it into `reactive`
-      // would hide the correction it exists to make.
+      // would hide the correction it exists to make. `path_opened` is the same hazard one kind
+      // later — it arrived with an `else` already standing here, and without its own branch the
+      // whole of the fifth mechanism would have been published as `reactive`, i.e. as "the
+      // available spin did not improve", which is the opposite of what it means.
       if (rec.kind === 'forecast_garbage') p.fg++;
       else if (rec.kind === 'forecast_lineclear') p.fl++;
+      else if (rec.kind === 'path_opened') p.po++;
       else if (rec.kind === 'self_built') p.sb++;
       else p.reactive++;
       if (rec.mechanism === 'unattributed') p.unattributed++;
       // Clause 2 is tallied for every event, not only the ones that reach the gate, so the report
       // can say how often the question is answerable rather than only how often the answer is yes.
       p.floors[rec.floorOrigin ?? 'undetermined']++;
+      // WHICH clause rejected it, tallied beside the boolean rather than derived from it later.
+      // The two must agree exactly — `counted` is the numerator by another name — and a
+      // disagreement means one of them has drifted, so it throws instead of publishing a
+      // breakdown that does not add up to the rate printed beside it.
+      const verdict = rejectedBy(rec);
+      if ((verdict === 'counted') !== isVerifiedForecast(rec))
+        throw new Error(`${c.file} r${c.round} ${c.user} lock ${rec.lockIndex}: rejectedBy said `
+          + `${verdict} but isVerifiedForecast said ${isVerifiedForecast(rec)}`);
+      if (verdict) p.rejected[verdict]++;
       if (isVerifiedForecast(rec)) p.forecasts++;
       else if ((rec.kind === 'forecast_garbage' || rec.kind === 'forecast_lineclear')
                && holePreExisted(rec.floorOrigin ?? 'undetermined') === null) p.undecided++;
@@ -195,10 +211,19 @@ const players = Object.entries(base).map(([user, v]) => {
     // what brought roof and cavity together. Auditing the 86 events the old co-occurrence rule
     // produced left exactly 1 — the other 85 were the player's own placement.
     forecast_lineclear: v.fl,
+    // The clear opened the PATH (schema 10): the slot was already there, cell for cell, and unreachable from
+    // spawn until the clear removed what was over it. NOT a forecast — `spec/Forecast.dfy`'s clause
+    // 3 is the strictly-inside rule, and these cleared rows lie outside the roof-to-floor span — so
+    // this is emitted beside the numerator, never inside it. Before it existed these events were
+    // split between `self_built` and `unattributed` by whether the causing piece happened to sit
+    // beside the slot, and the `self_built` half is what published 「玩家自己落嗰隻棋整出嚟」 of a
+    // slot that piece did not make.
+    path_opened: v.po,
     // improved, but the player's own placement did it. Openers land here.
     self_built: v.sb,
     // improvements the step model could not explain. Emitted so that a metric which has stopped
-    // understanding its own corpus says so, rather than absorbing the gap into self_built.
+    // understanding its own corpus says so, rather than absorbing the gap into self_built. It is 0
+    // in every session as of schema 10; it stays emitted because the next gap is what it is for.
     unattributed: v.unattributed,
     // mechanism-established before clause 2 is applied, so the effect of clause 2 is visible
     // rather than folded into a single smaller number
@@ -207,6 +232,21 @@ const players = Object.entries(base).map(([user, v]) => {
     // mechanism established but clause 2 undecidable: the floor is garbage and the board held
     // garbage both before and after the roof. Never counted either way, always reported.
     clause2_undecided: v.undecided,
+    // WHICH clause disqualified each mechanism-established event (schema 9). Six MUTUALLY
+    // EXCLUSIVE, EXHAUSTIVE buckets over `mechanism_established`, so the section can say the
+    // reason instead of assuming one: `counted` is `forecast_total`, and the other five sum to
+    // `mechanism_established - forecast_total`.
+    //
+    // It is emitted because the reason was UNRECOVERABLE from the rest of this artifact.
+    // `floor_arrived_later` here is not `floor_arrived_later` above: that one counts clause 2's
+    // verdict over EVERY tucked event, forecast or not, so it cannot say which of the
+    // mechanism-established ones it rejected. `forecast_section.py` filled the gap with a
+    // hardcoded clause-2 sentence and published it on two sessions the clause did not reject.
+    //
+    // Pairs are their own buckets rather than a first-match: clause 2 and clause 4 are
+    // independent, so an event can fail both, and naming one of them would be the same guess in
+    // a smaller form. See `rejectedBy` in forecast.ts.
+    rejected_by: v.rejected,
     floor_pre_existed: v.floors['pre-existed'],
     floor_arrived_later: v.floors['arrived-later'],
     floor_undetermined: v.floors.undetermined,
@@ -342,7 +382,7 @@ function notEligibleBecause(): string[] {
 }
 
 const out = {
-  schema: 'forecast-facts/8',
+  schema: 'forecast-facts/10',
   report_eligible: false,
   not_eligible_because: notEligibleBecause(),
   unit: 'player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption',

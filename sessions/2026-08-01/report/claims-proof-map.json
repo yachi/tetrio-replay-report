@@ -85,14 +85,14 @@
  },
  {
   "id": "G013",
-  "lemma": "G013_session_max_apm_x1000_among_the_28_rounds_lasting_60s_or_more_is_75168",
+  "lemma": "G013_session_max_apm_x1000_among_the_28_rounds_lasting_60s_or_more_is_74883",
   "file": "Claims.dfy",
   "family": "round_max_apm_x1000",
   "status": "verified"
  },
  {
   "id": "G014",
-  "lemma": "G014_session_max_vs_x1000_among_the_28_rounds_lasting_60s_or_more_is_172429",
+  "lemma": "G014_session_max_vs_x1000_among_the_28_rounds_lasting_60s_or_more_is_171774",
   "file": "Claims.dfy",
   "family": "round_max_vs_x1000",
   "status": "verified"
@@ -260,14 +260,14 @@
  },
  {
   "id": "G038",
-  "lemma": "G038_per_round_mean_pps_yachi_1_444_pinglamb_1_353",
+  "lemma": "G038_per_round_mean_pps_yachi_1_441_pinglamb_1_353",
   "file": "Claims.dfy",
   "family": "avg_pps_x1000",
   "status": "verified"
  },
  {
   "id": "G039",
-  "lemma": "G039_per_round_mean_apm_yachi_54_295_pinglamb_53_047",
+  "lemma": "G039_per_round_mean_apm_yachi_54_191_pinglamb_53_047",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
@@ -407,7 +407,7 @@
  },
  {
   "id": "G059",
-  "lemma": "G059_highest_combined_vs_among_rounds_of_60s_or_more_is_m7r3_at_323_4_won_b",
+  "lemma": "G059_highest_combined_vs_among_rounds_of_60s_or_more_is_m7r3_at_322_7_won_b",
   "file": "Claims.dfy",
   "family": "most_intense_round",
   "status": "verified"
@@ -505,14 +505,14 @@
  },
  {
   "id": "G073",
-  "lemma": "G073_unqualified_session_peak_apm_x1000_is_110547_by_yachi_at_m2r5_a_12s_ro",
+  "lemma": "G073_unqualified_session_peak_apm_x1000_is_110106_by_yachi_at_m2r5_a_12s_ro",
   "file": "Claims.dfy",
   "family": "round_peak_apm_x1000",
   "status": "verified"
  },
  {
   "id": "G074",
-  "lemma": "G074_unqualified_session_peak_vs_x1000_is_184246_by_yachi_at_m2r5_a_12s_rou",
+  "lemma": "G074_unqualified_session_peak_vs_x1000_is_183511_by_yachi_at_m2r5_a_12s_rou",
   "file": "Claims.dfy",
   "family": "round_peak_vs_x1000",
   "status": "verified"
@@ -547,7 +547,7 @@
  },
  {
   "id": "G079",
-  "lemma": "G079_most_intense_round_m7r3_yachi_apm_x1000_75168_pps_x1000_1549_vs_x1000",
+  "lemma": "G079_most_intense_round_m7r3_yachi_apm_x1000_74883_pps_x1000_1543_vs_x1000",
   "file": "Claims.dfy",
   "family": "intense_round_profile",
   "status": "verified"
@@ -561,7 +561,7 @@
  },
  {
   "id": "G081",
-  "lemma": "G081_m7r3_winner_yachi_trailed_on_1_attacking_columns_b2b",
+  "lemma": "G081_m7r3_winner_yachi_led_on_every_attacking_axis_no_inversion",
   "file": "Claims.dfy",
   "family": "intense_round_edges",
   "status": "verified"

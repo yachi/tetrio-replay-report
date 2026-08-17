@@ -66,7 +66,12 @@ function stackTop(board: any[][]): number {
   return H;
 }
 
-const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01']
+// Every session, not a list that stopped being every session. This stood at four from 2026-08-12
+// to 2026-08-15 while 08-09 and 08-14 joined the corpus, so 134 rounds sat outside the only check
+// that compares this count against an implementation we did not write — and nothing went red,
+// because a shorter list is indistinguishable from a clean run. `filter(existsSync)` keeps a
+// checkout without a session working; it is not licence to leave a session out.
+const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
   .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -114,5 +119,10 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // Triangle engine). Verified prefix jumped 24.8% -> 92.3%, so the denominator grew 13319 -> 39033 as
   // the far longer prefix admits many more verified boards per round. The differential above
   // (unexplained == []) is what this test guards; this total is the anti-vacuity denominator.
-  expect(both + oursOnly + ccOnly + neither).toBe(39033);
+  // 2026-08-15: 39033 -> 61656, purely from adding 2026-08-09 and 2026-08-14 to SESSIONS above —
+  // no code changed, the list had simply stopped being every session. Worth stating what the extra
+  // 22623 boards bought, since a denominator growing is not by itself a result: `unexplained` is
+  // still EMPTY over them, so the two implementations disagree on nothing across a corpus half
+  // again as large. That is the claim this file exists to make, now made over six sessions.
+  expect(both + oursOnly + ccOnly + neither).toBe(61656);
 });

@@ -108,8 +108,60 @@ run "the window runs past the spin's own lock" \
    s|RemovedBetween(h, e.j, e.k - 1, At(e.roofAt), At(e.floorAt), false)|RemovedBetween(h, e.j, e.k, At(e.roofAt), At(e.floorAt), false)|'
 
 # --- the `improved` guard added 2026-08-09 (ROADMAP item 7) --------------------------------------
-# `Improved` compares availAtK against availAtJ strictly. Weakening `>` to `>=` reclassifies an event
-# whose availability held steady as improved. Killed by GapCanCloseWithoutImproving, whose witness has
-# availAtJ == availAtK == 2 and asserts !Improved — false the moment the comparison admits equality.
+#
+# EVERY MUTANT OF `Improved`'s BODY IS RUN WITH `ImprovedIsPurelyAnEventProperty` NEUTRALISED, and
+# that is not a convenience — without it these two entries measure nothing about the witnesses.
+# That lemma's `ensures` restates the predicate's body verbatim, so it errors on any edit to the
+# body whatsoever and every mutant here would score `killed` even if no board objected. Measured
+# 2026-08-16, each mutant both ways:
+#
+#   `>` -> `>=`   killed as committed, killed neutralised  — a real kill, by GapCanCloseWithoutImproving
+#   `>` -> `!=`   killed as committed, SURVIVED neutralised — the "kill" was the restatement alone
+#
+# So the direction of `improved` was pinned by an echo of the definition until
+# AvailabilityFallingIsNotImproving was added. Neutralising is what tells the two apart; a suite that
+# cannot tell them apart is reporting the definition's own syntax back to itself.
+NEUT='s|    ensures Improved(e) <==> e.availAtK > e.availAtJ|    ensures true|'
+
+# Weakening `>` to `>=` reclassifies an event whose availability held steady as improved. Killed by
+# GapCanCloseWithoutImproving, whose witness has availAtJ == availAtK == 2 and asserts !Improved —
+# false the moment the comparison admits equality.
 run "Improved admits equality (> -> >=)" \
-  's|{ e.availAtK > e.availAtJ }|{ e.availAtK >= e.availAtJ }|'
+  's|{ e.availAtK > e.availAtJ }|{ e.availAtK >= e.availAtJ }|
+   '"$NEUT"
+
+# Weakening `>` to `!=` admits availability that FELL as an improvement. Killed by
+# AvailabilityFallingIsNotImproving (availAtJ 3 -> availAtK 1, asserts !Improved) and by nothing else
+# in the file: the other two witnesses have availability rising and level respectively, so neither
+# can see a symmetric comparison.
+run "Improved ignores direction (> -> !=)" \
+  's|{ e.availAtK > e.availAtJ }|{ e.availAtK != e.availAtJ }|
+   '"$NEUT"
+
+# --- the pair is SATISFIABLE, not merely non-implying (2026-08-16) -------------------------------
+# The difference theorem's two halves say neither predicate implies the other. They are both equally
+# consistent with the conjunction being EMPTY, which would make `forecast_lineclear` structurally
+# unreachable and the published 0-of-654 an artefact rather than a measurement. This mutant asserts
+# exactly that hypothesis: GapClosed additionally demands !Improved, making the two mutually
+# exclusive.
+#
+# Measured 2026-08-16 — TWO obligations error, ImprovedAndGapClosedTogether and
+# GapClosedIsExactlyRowsRemoved, and this comment claimed the first was the only one until the
+# mutant was actually read rather than predicted. They catch it differently: the universal
+# constrains what GapClosed may READ, the witness says the conjunction is inhabited, and neither
+# implies the other (see the note on the lemma). The seven worked boards all carry
+# availAtJ == availAtK == 0, hence !Improved, so the mutant leaves every one of their verdicts
+# untouched and ForecastExamples.dfy still reports 0 errors.
+run "Improved and GapClosed made mutually exclusive" \
+  's|^    && FloorFinal(h, e).row - RoofFinal(h, e).row < e.floorAt - e.roofAt$|    \&\& FloorFinal(h, e).row - RoofFinal(h, e).row < e.floorAt - e.roofAt\n    \&\& !Improved(e)|'
+
+# --- WellFormed's `<= 3`, and the side condition it actually needs (2026-08-16) -------------------
+# `bestTspin` counts EVERY full row of the post-placement board, so 3 bounds the score only on a
+# board carrying no already-full row. Measured on the shipped bestTspinLines: one T-Spin Single slot
+# over n already-full rows scores 1, 2, 3, 4, 6, 11 for n = 0, 1, 2, 3, 5, 10. Both hypotheses of
+# BestTspinLinesIsBoundedOnlyOnClearedBoards get a mutant, since a hypothesis nothing can falsify is
+# the same decorative guard as an unkillable lemma.
+run "the bound drops its no-full-row side condition" \
+  's@    requires NoFullRow(pre) .*@    requires true@'
+run "the bound allows a piece to touch four rows" \
+  's@    requires |touched| <= 3 .*@    requires |touched| <= 4@'

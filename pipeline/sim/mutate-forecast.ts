@@ -27,14 +27,18 @@ const GUARD = `if (d.row === cur.row && rot && detectTSpin(board, d, true, kick)
  * the kills" cannot express that a control dying means the harness has stopped controlling for
  * anything. It also gives STALE somewhere to sit — "never ran" matches no expectation at all.
  *
- * NOTE FOR ANYONE ADDING A CONTROL. `pipeline/sim/README.md` currently states that this harness
- * "validates itself with control mutants: three semantics-preserving edits must survive and a
- * poison mutant (spawn column 3→9) must die". No such entry has ever existed in this file — not
- * at 0dde1d8, the commit that wrote that sentence (11 entries, no control field, no spawn
- * mutant), and not now. Every entry below is a real defect injection and all of them die. The
- * README sentence describes a regime that was never built here, which is why its companion
- * claim "a sweep where everything dies is a syntax error" would condemn every honest run this
- * harness has ever produced. The mechanism is now here if someone wants to build it for real.
+ * HISTORY, because the shape of this one is worth keeping. `pipeline/sim/README.md` stated for
+ * months that this harness "validates itself with control mutants: three semantics-preserving
+ * edits must survive and a poison mutant (spawn column 3→9) must die". No such entry existed —
+ * not at 0dde1d8, the commit that wrote that sentence (11 entries, no control field, no spawn
+ * mutant), and not when the sentence was DELETED in 8d44543, which corrected the documentation
+ * without building the thing. Its companion claim, "a sweep where everything dies is a syntax
+ * error", would have condemned every honest run this harness had ever produced.
+ *
+ * Built for real on 2026-08-16, to the description: three controls and the spawn-column poison,
+ * at the end of `MUTANTS`. So a sweep where everything dies IS now suspicious — the three
+ * controls are supposed to survive, and a run reporting them killed is reporting that the suite
+ * has stopped being able to tell equivalent code from broken code.
  */
 type Verdict = 'killed' | 'survived';
 
@@ -278,6 +282,60 @@ const MUTANTS: Mutant[] = [
   { name: 'metric/garbage-arrived-no-empty-preboard', note: 'the j = -1 pre-board reads boards[-1] instead of an empty field',
     find: `    const Bpre = (r.boards[t - 1] ?? emptyBoard()).map(row => [...row]) as Board;`, nth: 1,
     repl: `    const Bpre = r.boards[t - 1]!.map(row => [...row]) as Board;` },
+
+  // --- the BFS visited key ------------------------------------------------------------------
+  // The 2026-08-10 defect, exactly: dedup rotation arrivals on the POSITION key, which is what
+  // the search did until `rotStamp` was added. A shift or soft-drop reaching a position first
+  // then marks it, and the kicked rotation arrival behind it — the only arrival the `rot` gate
+  // can accept — is discarded unexpanded, so a real T-spin is reported as none.
+  //
+  // `arrival-key.test.ts` was landed WITH the fix and then left out of this harness's default
+  // test set, so the fixture that proves the fix contributed no kills here and there was no
+  // arrival-key mutant at all — the one thing this file exists to make impossible. Both halves
+  // are fixed together: without the fixture in TESTS this mutant is not reliably killed by the
+  // corpus (191 of 8 995 boards gain a line, and none of the published classifications move),
+  // and without the mutant the fixture is guarding a line nothing attacks.
+  { name: 'key/revert-to-position', note: 'THE pre-2026-08-10 defect: rotation arrivals dedup on position alone',
+    find: `      if (rotSeenOrMark(n.rotation, n.col, n.row)) continue;
+      q.push({ p: n, rot: true, kick: isKick, expand: !seenOrMark(n.rotation, n.col, n.row) });`, nth: 1,
+    repl: `      if (seenOrMark(n.rotation, n.col, n.row)) continue;
+      q.push({ p: n, rot: true, kick: isKick, expand: true });` },
+
+  // --- THE HARNESS'S OWN CONTROLS ---------------------------------------------------------------
+  //
+  // Everything above is a defect injection, and a run in which all of them die tells you the suite
+  // is strict. It does NOT tell you the suite is measuring forecast.ts at all: a harness whose
+  // `bun test` invocation had silently broken — wrong path, a test file that errors on import, an
+  // `execSync` that throws for its own reasons — would report every mutant "killed" and look like
+  // the best run in this file's history. That is the failure mode a mutation harness cannot see
+  // about itself, and `pipeline/sim/README.md` claimed for months that these entries existed when
+  // they never had (see the NOTE on `Verdict` above). They exist now.
+  //
+  // THREE SEMANTICS-PRESERVING EDITS, declared `expect: 'survived'`. Each must be equivalent by an
+  // argument you can check by eye, not by "the tests still pass" — a control justified by the suite
+  // agreeing with it is circular. A control that starts DYING fails the run just as loudly as a
+  // mutant that starts surviving, which is what makes it a control and not a comment.
+  { name: 'control/ge-1-for-gt-0', expect: 'survived',
+    note: 'CONTROL: `> 0` and `>= 1` on an integer line count are the same predicate',
+    find: `  return bestTspinLines(board) > 0;`, nth: 1,
+    repl: `  return bestTspinLines(board) >= 1;` },
+  { name: 'control/double-negated-spin', expect: 'survived',
+    note: 'CONTROL: `!(x === "none")` is `x !== "none"`',
+    find: `    if (d.row === cur.row && rot && detectTSpin(board, d, true, kick) !== 'none') {`, nth: 1,
+    repl: `    if (d.row === cur.row && rot && !(detectTSpin(board, d, true, kick) === 'none')) {` },
+  { name: 'control/count-by-reduce', expect: 'survived',
+    note: 'CONTROL: counting full rows by reduce instead of filter().length',
+    find: `      const lines = after.filter(r => r.every(x => x !== null)).length;`, nth: 1,
+    repl: `      const lines = after.reduce((n, r) => n + (r.every(x => x !== null) ? 1 : 0), 0);` },
+
+  // THE POISON. Not a subtle defect — the search starts nine columns to the right, so the whole
+  // instrument is wrong. If this ever SURVIVES, nothing above means anything: the suite is not
+  // reaching `forecast.ts`, and every `killed` in the run is an artefact of the harness rather
+  // than a property of the tests. Read it as the harness's smoke alarm, not as a mutant.
+  { name: 'poison/spawn-column',
+    note: 'POISON: the BFS spawns at column 9 — if this survives, the suite is not running',
+    find: `  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };`, nth: 1,
+    repl: `  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 9, row: 18 };` },
 ];
 
 function replaceNth(src: string, find: string, nth: number, repl: string): string {
@@ -293,8 +351,13 @@ function replaceNth(src: string, find: string, nth: number, repl: string): strin
 // the shapes 654 real events do, and two mutants survived the fixture-only suite while changing
 // the corpus classification — which is the failure mode that matters, since the corpus is what
 // the report quotes.
+//
+// arrival-key.test.ts joined it on 2026-08-16. It landed with the visited-key fix and was never
+// added here, so for six days the fixture that proves that fix contributed no kills to the main
+// sweep — the shape of「a test that runs nowhere the gate looks」, and the reason
+// `key/revert-to-position` above could not be listed before now.
 const TESTS = process.argv.slice(2).length ? process.argv.slice(2)
-  : ['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts'];
+  : ['forecast.test.ts', 'wiki-fixtures.test.ts', 'forecast-corpus.test.ts', 'arrival-key.test.ts'];
 const original = readFileSync(SRC, 'utf8');
 copyFileSync(SRC, BAK);
 
@@ -312,21 +375,60 @@ copyFileSync(SRC, BAK);
  * `diff forecast.ts forecast.ts.mutbak` comes back identical and looks like proof of health.
  * Compare against git, not against the backup.
  *
- * KNOWN HAZARD, NOT FIXED — unconditional is not the same as safe. `original` is read ONCE at
- * startup and every restore path writes that snapshot back with no check that the file moved
- * underneath it. So a concurrent editor loses their work: anything written to `forecast.ts`
- * after the sweep starts is silently reverted when it ends, and `git status` reads the same
- * either way because the file is modified in both worlds. This is strictly worse than the abort
- * this file was just repaired for — that one lost a summary, this one loses source. The fix is a
- * guard that compares the file against the snapshot before restoring and REFUSES rather than
- * clobbers. Deliberately out of scope for this branch; do not run this harness against a
- * worktree anyone else is editing until it exists.
+ * FIXED 2026-08-16 — unconditional was not the same as safe. `original` is read ONCE at startup
+ * and every restore path used to write that snapshot back with no check that the file had moved
+ * underneath it, so a concurrent editor lost their work: anything written to `forecast.ts` after
+ * the sweep started was silently reverted when it ended, and `git status` read the same either
+ * way because the file is modified in both worlds. That was strictly worse than the abort this
+ * file was repaired for in `d17a454` — that one lost a summary, this one lost source.
+ *
+ * The guard is `ours()`: the harness only ever writes over its OWN last write. The comparison is
+ * against `onDisk` — the mutant currently planted, or `original` when none is — and NOT against
+ * `original` throughout, because a sweep spends nearly all of its wall clock with a mutant on the
+ * disk, so an `original`-only comparison would refuse every normal restore and the guard would
+ * have to be switched off to get any work done.
+ *
+ * It is checked before every PLANT as well as before the restore, and the plant is why: a restore-
+ * time check alone protects the last write and nothing before it, since the next `writeFileSync`
+ * in the loop would have overwritten the concurrent edit long before the restore ran, and `onDisk`
+ * would then match again. Refusing at plant time is what makes "this harness does not overwrite an
+ * edit it did not make" true for the whole run rather than for its final second.
+ *
+ * A refusal LEAVES the file alone and says so loudly. Putting the source back is the very thing
+ * being prevented; a loud message plus a `.mutbak` the reader can diff against git is the
+ * recoverable state, which is why that file is deliberately not unlinked on this path.
  */
 let restored = false;
+/** What this harness last wrote to `SRC`, so it can tell its own writes from anyone else's. */
+let onDisk = original;
+/** Set by any refusal, so a sweep that left the source mutated cannot exit 0 on its way out. */
+let refused = false;
+const refuse = (what: string) => {
+  refused = true;
+  console.error(`\nREFUSING TO ${what} ${SRC} — it changed underneath this run.\n`
+    + `Something else wrote to it while the sweep was going, and this harness will not overwrite\n`
+    + `an edit it did not make. Nothing has been written, so ${SRC} still holds whatever is there\n`
+    + `now — which may be a mutant plus somebody's edit, and MUST NOT be committed. The known-good\n`
+    + `source is in ${BAK}, left in place for this reason. Recover by diffing against git, never\n`
+    + `against the backup: re-running this harness copies an already-mutated source into it, so\n`
+    + `the two coming back identical proves nothing.`);
+};
+/** True if `SRC` still holds this harness's last write. */
+const ours = (): boolean => {
+  try { return readFileSync(SRC, 'utf8') === onDisk; }
+  catch (e) {
+    refused = true;
+    console.error(`REFUSING to touch ${SRC}: cannot read it (${(e as Error).message}). `
+      + `The known-good source is in ${BAK}.`);
+    return false;
+  }
+};
 const restore = () => {
   if (restored) return;
   restored = true;
+  if (!ours()) { refuse('RESTORE'); return; }
   writeFileSync(SRC, original);
+  onDisk = original;
 };
 process.on('exit', restore);
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(sig, () => { restore(); process.exit(130); });
@@ -364,7 +466,11 @@ for (const m of MUTANTS) {
     console.log(`   STALE    ${m.name.padEnd(26)} ${m.note}`);
     continue;
   }
+  // Before every plant, not only before the restore — see `ours()`'s comment. `restored` is set
+  // first so the exit handler does not undo the refusal on the way out.
+  if (!ours()) { restored = true; refuse('OVERWRITE'); process.exit(1); }
   writeFileSync(SRC, mutated);
+  onDisk = mutated;
   let killed = false;
   try { execSync(`bun test ${TESTS.join(' ')}`, { stdio: 'pipe' }); }
   catch { killed = true; }
@@ -379,8 +485,11 @@ for (const m of MUTANTS) {
     console.log(`! ${observed.toUpperCase().padEnd(9)} ${m.name.padEnd(26)} ${m.note}   ← expected to be ${expected}`);
   }
 }
-writeFileSync(SRC, original);
-unlinkSync(BAK);
+// The happy path goes through the SAME guard as the exit handlers — a second unguarded write here
+// would reopen the hole for the one path that runs every single time.
+restore();
+if (readFileSync(SRC, 'utf8') === original) unlinkSync(BAK);
+else console.error(`LEAVING ${BAK} in place: ${SRC} is not the source this run started from.`);
 
 const ran = MUTANTS.length - stale.length;
 console.log(`\n${killedCount}/${ran} killed, ${controlsHeld} control(s) held, ${mismatched.length} mismatched${
@@ -399,4 +508,10 @@ if (stale.length) {
   console.log('delete it, because an unapplied mutant is a hole, not a passing check:');
   for (const s of stale) console.log(`  - ${s.m.name}: ${s.why}`);
 }
-if (mismatched.length || stale.length) process.exit(1);
+if (refused)
+  console.log(`\nTHE SOURCE WAS NOT RESTORED — ${SRC} changed underneath this run and this harness `
+    + `refused to overwrite it. Every verdict above was measured before that point; nothing after `
+    + `it means anything.`);
+// `refused` is in the exit condition because a sweep in which every mutant died but the source was
+// left mutated is not a passing run — that is precisely the 2026-08-02 state, reached the other way.
+if (mismatched.length || stale.length || refused) process.exit(1);

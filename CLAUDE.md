@@ -58,6 +58,10 @@ python3 -m pipeline.check_dead_consts sessions/<date>/report
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
+python3 -m pipeline.check_cross_artefact             # CI gate: two artefacts of ONE session agree
+python3 -m pipeline.check_cross_artefact --selftest  #   its mutants (8 planted, 4 controls)
+python3 -m pipeline.check_finesse_denominator sessions/<date>/report  # CI gate: every per-piece rate names 每粒
+python3 -m pipeline.check_finesse_denominator sessions/<date>/report --selftest  # its mutants
 python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the C-Spin / DT 砲 section
 python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
@@ -102,22 +106,22 @@ two orders of magnitude faster — measured, over the same claims:
 
 | | Dafny (`--cores 4`) | `claims.smt2` + z3 |
 |---|---|---|
-| 2026-07-22 · 77 generated claims | ~4.6 s (54 hand claims) | **40 ms** |
-| 2026-07-24 · 76 generated claims | ~3 s (52 hand claims) | **10 ms** |
+| 2026-07-22 · 144 claims | ~8.3 s (the 54 committed hand lemmas) | **100 ms** |
+| 2026-07-24 · 141 claims | ~3.8 s (the 52 committed hand lemmas) | **60 ms** |
 
 That speed is what makes the anti-vacuity mutation test affordable on every push
 (`--mutate 12` finishes in under a second) rather than weekly. `claims.smt2` is committed and
 byte-identity gated, so it doubles as a portable artefact: any SMT-LIB solver can re-check the
 claims without this pipeline.
 
-The `.smt2` covers every **spec-carrying** ledger. For 07-22 and 07-24 that is the generated
-one only — their hand ledgers predate the spec algebra, carry a bare `python_check`, and are
-proved by a session-local ~500-line `codegen_dafny.py`. From 2026-07-28 on, hand claims are
-written as **specs** in `sessions/<date>/report/hand_claims.py` and built with
+**The `.smt2` covers every ledger of every session — there is no longer a second kind.** Hand
+claims are written as **specs** in `sessions/<date>/report/hand_claims*.py` and built with
 `pipeline.claims.build_hand`, so they render to all three backends and need no per-session
 emitter: `--claims` on `codegen`, `codegen_smt` and `build_proof_map` takes several ledgers,
-`pipeline.codegen.session_ledgers` defines their canonical order, and `check_smt` **names**
-any ledger it had to leave out rather than silently narrowing what the artefact covers.
+and `pipeline.codegen.session_ledgers` defines their canonical order. A session may hold more
+than one hand ledger (07-22 and 07-24 split theirs narrative/coaching); the module→ledger
+mapping is `build_hand.hand_ledgers`, which **raises on a ledger no module rebuilds** rather
+than skipping it, because a skip is what leaves a ledger with nothing checking it.
 
 Two windowed operators exist for claims about how a session *changed*:
 `sum_round_range` / `count_rounds_range` restrict to a contiguous window of matches. The
@@ -183,6 +187,16 @@ equivalent marker pair.
   is byte-identical to what is committed. Weekly runs add mutation testing.
 - Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
   asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
+- **Closing a ROADMAP item means striking it AT ITS ORIGINAL SITE, not only writing a new dated
+  section.** An audit on 2026-08-16 found **six** items filed as open that were already done in
+  committed code — 最癲一局 items 4 and 5, Re-classified item 7 (done the same day it was filed
+  "not yet actioned"), the `cc-movegen` standing gate, the `## P5 — in progress` header contradicted
+  by its own body 266 lines later, and Original TODO item 2 (false for eighteen days) — plus one
+  obsolete item arguing about a mechanism that had been deleted. Every one has the same shape: the
+  closure landed in a NEW section or in a commit message, and the original entry was never touched.
+  A commit message is not documentation; nothing re-derives it. **A DONE record that repeats a wrong
+  reason is worth less than none** — item 7's justification for its `<= 3` bound was measurably false
+  in both the item text and the commit that closed it.
 
 ## Data semantics that cost real debugging
 
@@ -201,12 +215,64 @@ equivalent marker pair.
   card printed `第 {index} 場`, so a badge proving something about m1 would have sat on a
   card labelled 第 2 場. Both extractors renumber after sorting; every earlier session's
   `facts.json` is byte-identical under the change, which is what makes it safe.
+- **A round carries THREE stat objects and both extractors mix two of them.** `player.stats` is a
+  live in-game tick; `player.replay.results.stats` is the final snapshot; `player.replay.results.`
+  `aggregatestats` = `{apm, pps, vsscore}` is the final *rate* triple and nothing in the repo reads
+  it. `apm_x1000`/`pps_x1000`/`vs_x1000` come from the live tick while `garbage_attack` /
+  `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
+  can be one tick apart — the whole of the VS-identity residual. The live tick is stale in 183 of 760
+  player-rounds and **181 of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
+  in the residual is a fact about whose round ran longer, never about how someone plays.
+  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds — **exact up to
+  `finaltime`'s own millisecond rounding, not exact simpliciter** — as `100·(attack+cleared)/T`,
+  `60·attack/T`, `pieces/T` with **T = ⌊finaltime_ms·60/1000⌋/60**, the integer FRAME count, floored.
+  `finaltime_ms/1000` is not that T (it is fractional-frame) and leaves up to 1.2e-3 on 247 of the
+  760, all of it the clock, so a probe that uses it reports a discrepancy the data does not have.
+- **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
+  The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
+  of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
+  `player.stats.kills` in **201 of 760** player-rounds, and every one is the live tick reading 1
+  against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
+  taken when that player's own game ends, while the kill is credited later, when the opponent tops
+  out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
+  `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
+  than truncated; `garbagesent`/`garbagereceived` differ from their `results.stats` counterparts in 7
+  and 1 of 760 and are a different measure anyway (both sides are already extracted, as
+  `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
+  the bug the rate change removed.
+- **The finesse counters are on two different units, so any finesse rate must name its denominator.**
+  `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
+  several — pooled, 11 865 faults over 7 510 non-perfect pieces = **1.580 per faulty piece**. Four
+  defensible rates, four different numbers, and only one is what TETR.IO displays:
+  `faults/pieces` = **16.83%** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **10.65%**; TETR.IO's own figure is `perfect/pieces` = **89.35%**; and
+  `faults/(faults+perfect)` = **15.85%** is on no meaningful denominator and must not be used. A
+  bare「失誤率」 reads as the 10.65% and is usually the 16.83%. osk publishes no definition for any
+  of the three fields, so the per-excess-input granularity is inferred, not specified.
+
+  **All six reports shipped the bare label, and `pipeline/check_finesse_denominator.py` is now the
+  gate.** The tape chart plotted `faults/pieces` as 「finesse 失誤率」 formatted `(v*100).toFixed(1)+"%"`
+  — 16.8% under a label that reads as 10.65%. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
+  now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
+  alone does not undo one: 16.8% reads as a share however the row is titled. `hold 使用率` keeps its
+  percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
+  data refutes the share reading outright: in **650 of 750** player-rounds the faults outnumber the
+  non-perfect pieces, and 07-24 m2r0 puts **7 faults on a single non-perfect piece**.
+
+  Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
+  renderer is in each session's committed shell, outside every marker region, so `build_report --check`
+  never saw it and fixing `skeleton.py` alone would have shipped to no existing report; all six
+  `report.html` had to be patched directly. So this gate reads the WHOLE document, generated regions
+  included, unlike `check_prose_figures`. And **every accessor the chart plots must be classified**
+  COUNT/SHARE/EVENT_RATE — an unclassified key fails, so a new row forces the decision instead of
+  leaving it to whoever writes the label.
 
 ## What the data actually says (measured, not asserted)
 
 Paired AUC over 129 rounds — how often the round's winner held the higher value:
 
-- **Strong**: VS 100% · APM 94.6 · 攻 93.8 · APP 91.5 · 送 88.0 · 射埋 12.0 (88 inverted) ·
+- **Strong**: VS 100% · APM 93.8 · 攻 93.8 · APP 91.5 · 送 88.0 · 射埋 12.0 (88 inverted) ·
   食 14.3 · 分 85.3
 - **No signal**: COMBO 45.0 · PC 50.8 (89% zeros) · TST 55.8 · TSD 60.9 · KPP 39.9
 - Near-constant (CV 0.05): KPP, FIN% — their flatness is the finding, not a column of numbers
@@ -224,7 +290,7 @@ time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4
 83.0 · 64.0 and is a different series); the 129-round headline block above is 07-22 and 07-24
 pooled, not one session.
 
-2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 91.7 · 送 82.7 ·
+2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 90.5 · 送 82.7 ·
 **APP 81.0, the lowest of six** · 分 79.8 · DS 70.2 · 食/射埋 17.9 — and **KPP 40.5**, below
 chance for a sixth time.
 
@@ -238,7 +304,9 @@ probe rather than assuming a stat is informative.
 **08-09 splits APP the other way, and that is the finding of the fifth session.** Every earlier
 session had one player ahead in *both* regimes by a similar margin — a style difference. Pool
 attack over pieces after splitting the 50 rounds by who won them and the two regimes come
-apart: won .6738 vs .6862 (+1.8%), lost .5124 vs .6425 (+25.4%) [C002]. yachi's won-round rate
+apart: won .6738 vs .6862 (+1.8%), lost .5124 vs .6425 (+25.4%) [C002]。個 won-gap 得一局撐住
+（留一局：抽走 m2r5，數字變 +4.26%，即係郁 2.41 pp），50 局入面排第一，係第二大嗰局嘅
+1.38 倍——所以「+1.8，成個 corpus 最細」講得，「兩邊贏嘅局打成平手」講唔得。yachi's won-round rate
 is above pinglamb's *lost*-round rate [C003]. The rank test says this is not a variance
 artefact — over losing rounds P(yachi > pinglamb) = 0.138, permutation p = 1e-5; over winning
 rounds 0.464, p = 0.34 — and it survives dropping the three near-zero rounds. The per-session
@@ -255,7 +323,9 @@ won-gap runs +5.8 · +10.8 · +5.9 · +7.9 · **+1.8**, the lost-gap +12.8 · +7
 
 **08-14 is 08-09's mirror, and that pair is why the split must be re-derived every session.**
 Same decomposition, opposite answer: won .6032 vs .7174 (+18.9%), lost .5629 vs .5729 (+1.8%)
-[C002]. The floors have met; the ceilings have not. The two per-session series now read
+[C002]. The floors have met; the ceilings have not. 但個 lost-gap 得一局撐住
+（留一局：抽走 m11r2，數字變 +4.65%，即係郁 2.87 pp），84 局入面排第一，係第二大嗰局嘅
+1.72 倍——「地板撞埋」係成晚嘅講法,「差 1.8 pp」唔係。The two per-session series now read
 
     won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  **+18.9**
     lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   **+1.8**
@@ -286,8 +356,21 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 *single*-value mutation falsifies one without the other. Two changes break the tie: moving
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
-claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones. Per-session:
-07-22 85% → 83%, 07-24 98% → 98% (unmoved), 07-28 100% → **60%**.
+claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**,
+07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**.
+
+**07-28 is not the exception — five of six sessions lose coverage to the second family**, and
+every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020).
+`sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
+published alone is blind to exactly the headline claims. `check_equiv_coverage.py` fails the
+build if one is published without its two-site companion for a session holding windowed claims.
+
+**The single-value figures were a seeded sample until 2026-08-15.** One perturbation kind was
+drawn per site, so 07-22 read 85% at the committed seed, 87% at seed 3, 83% at seed 42 — with
+the denominator moving too — while the docstring claimed the whole space of one-value changes.
+Every kind is enumerated now: ~5× the mutants, deterministic across seed and `PYTHONHASHSEED`,
+and 07-22 settles at 81%. `--seed` survives only because `--samples` still draws.
 
 **The delta is HALF the source, and that is not a detail.** The first implementation moved the
 whole value, leaving every source round at 0 — 145 615 of 145 615 moves — so its evidence was
@@ -306,14 +389,19 @@ must be re-run before publishing a figure.
 the first two matches and lost six straight, but his rate did not collapse — in matches 1-2 the
 two players' APP were level (0.62305 vs 0.62216, yachi ahead by 0.0009) and from match 3 they
 separated, pinglamb +4.99% and yachi −4.92%. Both totals are nearly equal (attack 3264 vs 3249)
-because yachi threw 378 more pieces to get there. That is what `sum_round_range` exists for.
+because yachi threw 378 more pieces to get there. 企得穩嘅係「兩邊差唔多」,唔係個差額:
+「差 15 行」得一局撐住（留一局：抽走 m8r8，數字變 -49 行，即係郁 34 行），連正負號都反轉。
+That is what `sum_round_range` exists for.
 
 08-01 asks the next question down: **APP decides a round, and it does not decide a night.**
 pinglamb's APP was higher in all seven matches and in both regimes — his won rounds beat
 yachi's won rounds, his lost rounds beat yachi's lost rounds — yet he lost the series 3:4. The
 totals land on top of each other (attack 3394 vs 3426, in-game score 1087345 vs 1087921, 0.05%
 apart) because yachi bought the 7% efficiency gap back with 326 extra pieces at a higher PPS
-in all seven matches. Two routes, one destination; the night was then decided by *which* rounds
+in all seven matches. 兩個差額都係一局話事——攻擊差額
+（留一局：抽走 m1r4，數字變 -1 行，即係郁 31 行），分數差額
+（留一局：抽走 m6r5，數字變 +11480 分，即係郁 12056 分），兩個都會反轉正負號。
+所以「差 32 行」同「差 576 分」唔好照抄,企得穩嘅係「兩邊撞埋一齊」。 Two routes, one destination; the night was then decided by *which* rounds
 fell where — the seven matches alternate winners perfectly, so it came down to the last one.
 Same window operator, per-match windows this time: `sum_round_range(pl, f, mi, mi+1)` is how
 "in all seven matches" gets proved match by match instead of asserted from a session sum.
@@ -324,16 +412,16 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
 sample mean over a small n. Measured in `analysis/rate_records.R` over all 760 player-rounds
-(six sessions): regressing log SD on log t gives **−0.649 for VS and −0.724 for APM**, slope 0
+(six sessions): regressing log SD on log t gives **−0.646 for VS and −0.721 for APM**, slope 0
 rejected for both (p 0.0002 / 0.0001). All **18** unqualified records (3 metrics × 6 sessions)
 came from the shortest quartile — p = 1.5e-11 — and 07-22's headline 約262.6 was a 15.6 s round,
-45% above that session's qualified peak.
+46% above that session's qualified peak.
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one.** With 760 rounds the CIs tighten, and (a) APM's −0.5 is now
-**outside** its CI [−0.921, −0.528] — the decay is *steeper* than a pure sample mean, so the
+**outside** its CI [−0.918, −0.525] — the decay is *steeper* than a pure sample mean, so the
 conclusion holds a fortiori, but "both with −0.5 inside the CI" is no longer true; (b) the mean
-is **no longer flat for VS** (104.4 → 120.0 across the bins, p ≈ 0.00) — longer rounds do carry a
+is **no longer flat for VS** (104.1 → 120.1 across the bins, p ≈ 0.00) — longer rounds do carry a
 mildly higher mean VS. The SD still falls about 4× over the same span, so the variance effect
 dominates by an order of magnitude and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
@@ -503,15 +591,32 @@ the section exists: 逐局全數據 gives every round the same row and explains 
 
 | session | round | winner trailed on | DS/piece W:L |
 |---|---|---|---|
-| 07-22 | m1r5 | APM, attack, maxspike, **APP** | ×2.00 |
+| 07-22 | m1r5 | APM, attack, PPS, maxspike, **APP** | ×2.00 |
 | 07-24 | m6r8 | APM, attack, maxspike, topbtb, **APP** | ×2.20 |
 | 07-28 | m8r8 | lines | ×0.51 |
 | 08-01 | m7r3 | topbtb | ×1.12 |
 | 08-09 | m5r7 | **nothing — led on everything** | ×0.82 |
 | 08-14 | m11r2 | APM, PPS, pieces, attack, maxspike, topbtb | ×1.81 |
 
+The table lists **columns**, while the claim and the rendered section count **axes** — APM and 攻擊量
+are one axis, PPS and 粒數 are another, so 07-22's five columns are three axes and the section says
+「3 條軸」. That is two vocabularies on purpose (a reader scanning the table wants the columns; the
+claim must not double-count an axis), and the bolded **APP** is a third thing again: it comes from
+`intense_round_attack_rate`, not from `_edges`, so it is proved but it is not one of the axes the
+count ranges over. Do not reconcile these by making the numbers agree — check which family a figure
+came from first.
+
 08-09 is why the generator has two shapes. A section that only had the dramatic sentence would be
 writing for the sessions it liked; the flat case prints「呢局冇得拗」 as the result it is.
+
+**07-22's PPS entry arrived on 2026-08-16 and is the sharpest argument in the repo for sourcing a
+rate at results-time.** Under the old `player.stats` tick both players read PPS 1465 in that round, so
+`intense_round_edges` rendered `==` and 落速 was not a trailing axis — the claim said "2 of 4". They
+threw the same 108 pieces, but yachi survived 250 ms longer (73982 vs 73732 ms), so his PPS is
+strictly lower: 108/73.9667 = 1.4601 against 108/73.7167 = 1.46506, exact under the frame-count T.
+The tie was two stale samples coinciding, and a verified lemma was proving it. Nothing but
+re-sourcing finds that class: the value was in range, every gate was green, and an equality is
+exactly the shape a mutation test cannot flag as suspicious.
 
 **Two idioms worth reusing, both of which the algebra already supported.** The algebra has no
 division, so a derived rate is *pinned* — not merely compared — by bounding the numerator against the
@@ -522,10 +627,22 @@ And `|d| <= ε` is `between(d, -ε, ε+1)` — `between` is `lo <= x < hi` in al
 **The VS split is a BOUND, never an equality, and that wording is load-bearing.** `vs_x1000 ·
 finaltime_ms == 10⁸ · (garbage_attack + garbage_cleared)` is an identity *observed in this data*;
 TETR.IO publishes no such formula and this repo must not assert one. Corpus-wide the residual is
-median 1.1e-4 for the player who died but reaches **13.4%** for a survivor, so `intense_round_vs_split`
+median 1.1e-4 for the player who died and at most **6.3e-4** for a survivor, so `intense_round_vs_split`
 **skips any player whose residual reaches half a unit** rather than print a bound wide enough to
-swallow a line of attack. On the six selected rounds the worst residual is 0.489 of a one-unit change,
+swallow a line of attack. On the six selected rounds the worst residual is 0.028 of a one-unit change,
 which is also what makes every one of them mutation-killable.
+
+**That paragraph read "reaches 13.4% for a survivor" and "0.489" until 2026-08-16, and the 13.4% was
+an artefact of the reader, not a property of the data.** The rates came from `player.stats`, a live
+in-game tick sampled before the round ended, so a survivor's mid-round VS was being checked against an
+end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
+survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
+that fired on **13 of 760** player-rounds now fires on **0 of 760**. Do not read that as a reason to
+delete it: the residual does not go to zero, it goes to a quantization floor. `finaltime_ms` is
+milliseconds while the clock is frames, so the residual grows with `attack + cleared`; the corpus's
+worst player-round sits at 0.057 of the trigger (~18× headroom), and on that round `attack + cleared`
+would have to reach ~1114 against its actual 63. That is a fact about how much garbage these two move
+in a round, not a theorem.
 
 Two gate gaps the new figures exposed, both now closed in `check_prose_figures.pools`: it had no
 per-*round* derived rates (only session aggregates), and its seconds pool held `lifetime` but not
@@ -984,3 +1101,15 @@ find *where* the time goes, then time the change to find out *how much*.
 3. `sessions/2026-07-24/proof/` is a *second, lighter* report with its own 20-claim proof layer.
    It is a cross-check, not a published report — every fact in it is covered by that session's
    full report. Keep it gated by CI; do not resurrect it onto the site.
+
+   **What made it a cross-check was unenforced until 2026-08-16.** `bin/verify-session` takes ONE
+   artefact directory and every gate it runs is internal to that directory, so `proof/` and
+   `report/` both went green while describing the same night differently — and the only thing
+   keeping them together was somebody remembering to re-extract `proof/` whenever `report/` moved
+   (most recently for the apm/pps/vs change on 2026-08-15; it was remembered, and nothing would
+   have said so otherwise). `pipeline/check_cross_artefact.py` is the gate: 6 012 shared values,
+   globbed over `sessions/*` so a second artefact anywhere is covered without an edit, and no pair
+   at all is a failure rather than a quiet pass. The two schemas genuinely differ — `report/`
+   carries 30 per-player fields `proof/` never had — so the gate **names** every uncompared field
+   instead of silently intersecting, and separates a FIELD on one side only (tolerated, named)
+   from a RECORD on one side only (a missing match, round, player or garbage event — a failure).

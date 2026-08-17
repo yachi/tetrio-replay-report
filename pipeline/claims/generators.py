@@ -1435,29 +1435,59 @@ _INTENSE_FIELDS = [
     ("lines", "行數", None),
     ("maxspike", "最大單波", None),
     ("topbtb", "最高 B2B", None),
-    ("inputs", "入力", None),
-    ("finesse_faults", "手順失誤", None),
     ("finaltime_ms", "佢自己嘅時間", None),
 ]
 
-# The offensive columns whose DIRECTION the inversion claim proves. Deliberately not
-# the full list above: 食 and 清走 are defensive, 入力 and 手順失誤 are mechanical
-# (KPP is a six-session negative result), and 局長 is shared. Comparing those here
-# would turn "the winner trailed on offence" into "the winner trailed on something".
+# 入力 and 手順失誤 were rows here and are not any more. 入力 is pure EXPOSURE: over the
+# 380 decided rounds its paired AUC is 61.6, but split by whether the round's winner also
+# placed more pieces it reads 89.8 / 16.1 — it tracks the piece count and flips sign with
+# it (directional agreement with 粒數 86.8%), and normalised as KPP it is 44.7, inside the
+# no-signal band. 手順失誤 is worse than uninformative, it is INCOHERENT: 62.5 inverted
+# overall, but 30.5 in the more-pieces stratum against exactly 50.0 in the other. Both were
+# printed under a disclaimer telling the reader to ignore them, which is rent a row should
+# never pay — a table that has to talk you out of two of its own rows is two rows too long.
+# They are also the only rows 逐局全數據 does not already print, so nothing is lost that a
+# reader cannot find; the claims are what this section adds, and a claim over a column that
+# reverses with exposure proves a number, not a fact.
+
+# The offensive columns whose DIRECTION the inversion claim proves, grouped by the AXIS
+# each one measures. Deliberately not the full list above: 食 and 清走 are defensive and
+# 局長 is shared, so comparing those here would turn "the winner trailed on offence" into
+# "the winner trailed on something".
+#
+# Why AXES and not a flat list — this is a correctness fix, not presentation taste. APM is
+# 攻擊 divided by the player's own time and PPS is 粒數 divided by the same, so each pair is
+# one quantity counted twice; measured over 380 rounds they agree in direction 98.2% and
+# 97.1% of the time, while no other pair among these columns exceeds 73.4%. The old flat
+# list had 7 entries but ~5 independent axes, so 「佢喺呢 {n} 樣都輸蝕」 inflated its own
+# finding by counting one axis twice. The spec still proves EVERY column's direction — that
+# proof is what this section adds over 逐局全數據's unproved cells, so none of it is thrown
+# away — and only the COUNT the sentence quotes is taken over axes.
+#
+# Grouping here rather than in the section is what keeps it honest: a column added to this
+# list has to declare which axis it belongs to, so the double-count cannot quietly return.
+# Public because `pipeline/intense_round.py` groups the section's sentence by the same map;
+# two copies of an axis map is exactly the drift this repo gates everywhere else.
 #
 # Every entry must ALSO be a row the section prints. The in-game `score` was here and
 # is not: it has no row (it rewards drop distance, so it is not an attack proxy), which
 # made the claim count seven columns while the table could only mark six of them —
 # and the section's sentence points AT the marked cells. A proved comparison the
 # reader cannot see is worse than one that was never made.
-_INTENSE_EDGES = [
-    ("apm_x1000", "APM"),
-    ("pps_x1000", "PPS"),
-    ("pieces", "粒數"),
-    ("garbage_attack", "攻擊"),
-    ("maxspike", "最大單波"),
-    ("topbtb", "最高 B2B"),
-    ("lines", "行數"),
+#
+# 最高 B2B was here and is not, though its ROW stays. It loses its signal exactly where
+# this section looks: paired AUC 71.0 → 67.7 → 53.1 across terciles of round intensity,
+# Spearman rho −0.183 against intensity, Holm-adjusted p 0.0068 over the 20 columns tested.
+# A bold-marked cell that means nothing in the intense rounds this section selects is a cell
+# the reader will over-read. When this was written it was also the only column 2026-08-01's
+# winner trailed on, so that session moved from the inversion sentence to the flat one —
+# recorded as what the change did to the data of the day, not as a property of the session:
+# which round gets selected is `_intense_round`'s to decide and moves with the facts.
+INTENSE_AXES = [
+    ("攻擊量", [("garbage_attack", "攻擊"), ("apm_x1000", "APM")]),
+    ("落速", [("pieces", "粒數"), ("pps_x1000", "PPS")]),
+    ("最大單波", [("maxspike", "最大單波")]),
+    ("行數", [("lines", "行數")]),
 ]
 
 
@@ -1516,15 +1546,39 @@ def intense_round_profile(facts):
     return out
 
 
+def axis_verdict(directions):
+    """Fold one axis's per-column directions into the axis's own direction.
+
+    `directions` is that axis's columns, each "behind" / "ahead" / "level". An axis
+    counts as behind or ahead only when every column that moved at all moved the same
+    way; all-level is "level", and columns that disagree are "split".
+
+    "split" is the case where a raw count and its own per-time rate point opposite ways,
+    which can only happen when the two players' clock times differ enough to outweigh
+    the count — so it is not an error, it is an axis that genuinely says nothing and
+    must not be counted on either side. It does not occur on any of the six sessions'
+    selected rounds; it is written because the 98.2% / 97.1% agreement measured over the
+    corpus is not 100%, and the round this section selects is not drawn at random.
+    """
+    moved = {d for d in directions if d != "level"}
+    if not moved:
+        return "level"
+    return moved.pop() if len(moved) == 1 else "split"
+
+
 @family
 def intense_round_edges(facts):
-    """Which offensive columns the winner of that round was BEHIND on.
+    """Which offensive AXES the winner of that round was BEHIND on.
 
     The point of the section: these rounds are often won by the player who was
     losing the attacking exchange. The spec proves the direction of every column,
     including the ones the winner led — so the sentence "he trailed on exactly
     these" is covered, not just the trailing ones taken alone. A column the two
     tied on is asserted equal for the same reason.
+
+    What the claim TEXT quotes is the axis count, not the column count, because APM/攻擊
+    and PPS/粒數 are each one quantity counted twice — see `INTENSE_AXES`. The spec is
+    unchanged in strength by that: every column is still compared.
     """
     best = _intense_round(facts)
     if not best:
@@ -1534,29 +1588,48 @@ def intense_round_edges(facts):
     lose = [p for p in r["players"] if p != win][0]
     W, L = r["players"][win], r["players"][lose]
 
-    behind, ahead, level, conj_parts = [], [], [], []
-    for f, label in _INTENSE_EDGES:
-        a, b = rnd(mi, ri, win, f), rnd(mi, ri, lose, f)
-        if W[f] < L[f]:
-            behind.append(label)
-            conj_parts.append(lt(a, b))
-        elif W[f] > L[f]:
-            ahead.append(label)
-            conj_parts.append(gt(a, b))
-        else:
-            level.append(label)
-            conj_parts.append(eq(a, b))
+    conj_parts, direction = [], {}
+    for axis, cols in INTENSE_AXES:
+        for f, _label in cols:
+            a, b = rnd(mi, ri, win, f), rnd(mi, ri, lose, f)
+            if W[f] < L[f]:
+                direction[f] = "behind"
+                conj_parts.append(lt(a, b))
+            elif W[f] > L[f]:
+                direction[f] = "ahead"
+                conj_parts.append(gt(a, b))
+            else:
+                direction[f] = "level"
+                conj_parts.append(eq(a, b))
+
+    verdict = {axis: axis_verdict([direction[f] for f, _l in cols])
+               for axis, cols in INTENSE_AXES}
+    behind = [a for a, _c in INTENSE_AXES if verdict[a] == "behind"]
+    ahead = [a for a, _c in INTENSE_AXES if verdict[a] == "ahead"]
+    rest = [a for a, _c in INTENSE_AXES if verdict[a] not in ("behind", "ahead")]
 
     if behind:
-        canto = (f"最癲嘅一局係 {win} 贏，但佢喺 {'、'.join(behind)} 呢 {len(behind)} 樣"
+        canto = (f"最癲嘅一局係 {win} 贏，但佢喺 {'、'.join(behind)} 呢 {len(behind)} 條軸"
                  f"係落後嘅——贏嗰個唔係攻得最多嗰個")
-        gloss = (f"m{mi + 1}r{ri + 1} winner {win} trailed on {len(behind)} attacking "
-                 f"columns: {', '.join(behind)}")
-    else:
-        canto = (f"最癲嘅一局係 {win} 贏，而佢喺 {'、'.join(ahead)} 每一樣都領先——"
+        gloss = (f"m{mi + 1}r{ri + 1} winner {win} trailed on {len(behind)} of "
+                 f"{len(INTENSE_AXES)} attacking axes: {', '.join(behind)}")
+    elif not rest:
+        canto = (f"最癲嘅一局係 {win} 贏，而佢喺 {'、'.join(ahead)} 每一條軸都領先——"
                  f"呢局冇得拗，唔係靠守贏返嚟")
-        gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on every attacking column "
+        gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on every attacking axis "
                  f"({', '.join(ahead)}) — no inversion")
+    else:
+        # Led on some, tied on the others, behind on none. The wording has to name the
+        # tied axes rather than let 「每一條軸都領先」 stand over a partial list: the
+        # previous version listed only the leading axes under that sentence, so a level
+        # axis would have been proved equal and then described as a lead. It has not
+        # happened on a selected round yet, and dropping 最高 B2B makes it likelier —
+        # that column was the level one on two of the six sessions.
+        canto = (f"最癲嘅一局係 {win} 贏，佢喺 {'、'.join(ahead)} 領先，"
+                 f"喺 {'、'.join(rest)} 同對手打成平手，一條軸都冇輸——"
+                 f"呢局冇得拗，唔係靠守贏返嚟")
+        gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on {', '.join(ahead)} and was level "
+                 f"on {', '.join(rest)}, behind on none — no inversion")
     return [{
         "family": "intense_round_edges", "category": "pace",
         "canto": canto, "english_gloss": gloss,
@@ -1636,10 +1709,25 @@ def intense_round_vs_split(facts):
 
     Skipped for any player whose residual reaches half a unit — there the split
     would be printed with a bound wide enough to swallow a whole line of attack,
-    which is a decomposition that cannot support the sentence it is under. This
-    has never triggered on a selected round; it is here because the corpus-wide
-    residual reaches 13% on some SURVIVING players' records and nothing guarantees
-    a future session's most intense round is not one of them.
+    which is a decomposition that cannot support the sentence it is under.
+
+    **The reason recorded here was itself a stale-snapshot artefact until the rates
+    were re-sourced from `results.aggregatestats`.** It said the guard exists because
+    the residual "reaches 13%" on some SURVIVING players' records — but that 13% was
+    measured against `player.stats`, a live in-game tick sampled before the round
+    ended, so it was pairing a mid-round VS with an end-of-round attack count. Against
+    the final snapshot the identity is exact to floating-point, and the guard tripped
+    on 13 of 760 player-rounds before the change and **0 of 760** after.
+
+    Keep the guard anyway, for a reason that survives the correction: the residual does
+    not go to zero, it goes to a QUANTIZATION FLOOR. `finaltime_ms` is milliseconds but
+    the game's clock is frames, so T = floor(ft*60/1000)/60 differs from ft/1000 by up
+    to 1/60 s, and the residual is about (attack+cleared)*10^8*delta/T — it grows with
+    the counters. The corpus's worst player-round sits at 0.057 of the trigger, i.e.
+    ~18x headroom; on that round (attack+cleared) would have to reach ~1114 instead of
+    its actual 63. That margin is a property of how much garbage these two players move
+    in a round, not a theorem, so a future session that moves an order of magnitude more
+    would fire this — which is exactly when the section must not print the split.
     """
     best = _intense_round(facts)
     if not best:

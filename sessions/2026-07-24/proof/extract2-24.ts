@@ -100,15 +100,25 @@ function extractRoundPlayer(player: any, ctx: string) {
   const finesseRaw = resultsStats?.finesse ?? {};
   if (!resultsStats?.finesse) warn(`${ctx}: missing results.stats.finesse, using 0s`);
 
+  // Rates come from results.aggregatestats, the final snapshot, not from player.stats, a live
+  // in-game tick that predates the round's end. See pipeline/extract2.ts for the full argument.
+  // extractLeaderboardEntry above deliberately stays on `stats`: a leaderboard entry carries no
+  // aggregatestats. This copy must track the canonical extractor or the two facts files for this
+  // session disagree, and nothing gates that cross-comparison.
+  const aggregate = player?.replay?.results?.aggregatestats ?? {};
+  if (!player?.replay?.results?.aggregatestats) {
+    warn(`${ctx}: missing replay.results.aggregatestats, using 0s for rates`);
+  }
+
   const events = player?.replay?.events;
   if (!Array.isArray(events)) warn(`${ctx}: missing replay.events, garbage_events will be empty`);
 
   return {
     lifetime: intVal(player?.lifetime, `${ctx} lifetime`),
     alive: player?.alive === true,
-    apm_x1000: x1000(stats?.apm, `${ctx} stats.apm`),
-    pps_x1000: x1000(stats?.pps, `${ctx} stats.pps`),
-    vs_x1000: x1000(stats?.vsscore, `${ctx} stats.vsscore`),
+    apm_x1000: x1000(aggregate?.apm, `${ctx} results.aggregatestats.apm`),
+    pps_x1000: x1000(aggregate?.pps, `${ctx} results.aggregatestats.pps`),
+    vs_x1000: x1000(aggregate?.vsscore, `${ctx} results.aggregatestats.vsscore`),
     garbagesent: intVal(stats?.garbagesent, `${ctx} stats.garbagesent`),
     garbagereceived: intVal(stats?.garbagereceived, `${ctx} stats.garbagereceived`),
     kills: intVal(stats?.kills, `${ctx} stats.kills`),

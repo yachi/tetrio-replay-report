@@ -204,26 +204,29 @@ jobs:
           }
           echo "  ok  generated ledger reproduces byte-for-byte"
 
-      # A session whose hand claims carry specs builds them from hand_claims.py the
-      # same way, so the committed ledger cannot drift from the module either. The
-      # older sessions have no such module and are skipped by the guard, not silently.
-      - name: Regenerate the hand ledger and compare with the committed one
+      # Every hand ledger is built from a spec-carrying module, so none of them can
+      # drift from its module either. The pairing comes from `hand_ledgers`, which
+      # RAISES on a ledger no module rebuilds — this step used to test for one
+      # hardcoded `hand_claims.py` and `exit 0` on its absence, so a session that
+      # split its hand claims across two modules (07-22 and 07-24 do) would have had
+      # both ledgers silently unchecked.
+      - name: Regenerate the hand ledgers and compare with the committed ones
         run: |
           set -euo pipefail
           W="sessions/${{ matrix.session }}/report"
-          if [ ! -f "$W/hand_claims.py" ]; then
-            echo "  --  $W has no hand_claims.py (its hand claims predate the spec algebra)"
-            exit 0
-          fi
-          before=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
-          python3 -m pipeline.claims.build_hand "$W/hand_claims.py" \
-            --facts "$W/facts.json" --out "$W/claims-narrative.json"
-          after=$(sha256sum "$W/claims-narrative.json" | cut -d' ' -f1)
-          [ "$before" = "$after" ] || {
-            echo "FAIL: regenerating the hand ledger changed it — commit the new one" >&2
-            exit 1
-          }
-          echo "  ok  hand ledger reproduces byte-for-byte"
+          python3 -m pipeline.claims.build_hand --selftest
+          PAIRS=$(python3 -c "import sys;from pipeline.claims.build_hand import hand_ledgers;print('\n'.join('%s %s' % p for p in hand_ledgers(sys.argv[1])))" "$W")
+          [ -n "$PAIRS" ] || { echo "FAIL: $W has no hand ledger at all" >&2; exit 1; }
+          while read -r MOD OUT; do
+            before=$(sha256sum "$OUT" | cut -d' ' -f1)
+            python3 -m pipeline.claims.build_hand "$MOD" --facts "$W/facts.json" --out "$OUT"
+            after=$(sha256sum "$OUT" | cut -d' ' -f1)
+            [ "$before" = "$after" ] || {
+              echo "FAIL: regenerating $OUT changed it — commit the new one" >&2
+              exit 1
+            }
+            echo "  ok  $OUT reproduces byte-for-byte from $MOD"
+          done <<< "$PAIRS"
 
       # The charts read a JSON island. It used to be hand-written, so a chart could
       # disagree with facts.json and nothing would catch it — this makes that a
@@ -251,6 +254,22 @@ jobs:
       # .rec-grid silently collapsed 建議's two columns; nothing failed.
       - name: Check no generated CSS reaches outside its region
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
+
+      # `finesse.faults` counts fault EVENTS and `pieces` counts pieces — 1.580
+      # faults per faulty piece pooled — so faults/pieces (16.83%) and the share
+      # of pieces that were faulty (10.65%) are different numbers. The tape chart
+      # plotted the first under 「finesse 失誤率」 as a percentage, which reads as
+      # the second, in all six reports. This gate is run over the WHOLE document,
+      # generated regions included: the chart's renderer lives in each session's
+      # committed shell, outside every marker region, which is exactly why
+      # `build_report --check` never saw it. --selftest carries the mutants,
+      # including two negative controls so it cannot pass by banning percentages.
+      - name: Check every per-piece rate names its denominator
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_finesse_denominator "$W" --selftest
+          python3 -m pipeline.check_finesse_denominator "$W"
 
       # An unresolved badge is indistinguishable from a pending one: it renders
       # ⏳ G014 pointing at an anchor that does not exist. Both ways that has
@@ -388,7 +407,7 @@ jobs:
       # The same claims, rendered to SMT-LIB from the same specs and checked by a
       # solver directly. Runs in well under a second, so the anti-vacuity mutation
       # test runs on every push here rather than weekly like the Dafny one.
-      # 96, not a token dozen: the sample is stratified so this covers all 32 kinds
+      # 96, not a token dozen: the sample is stratified so this covers all 31-36 kinds
       # of datum, and a 12-constant sample is what let two operator bugs through.
       # Costs ~5s.
       - name: Check the SMT-LIB artefact (regenerates, then solves and mutates)
@@ -456,6 +475,25 @@ jobs:
           done
           exit $status
 
+      # The third axis, and the one nothing checked. The two steps above compare extractor A
+      # against extractor B WITHIN one artefact directory. `sessions/2026-07-24` holds two
+      # artefacts of the same night — `report/` and the lighter 20-claim `proof/` — built by
+      # different code, and `bin/verify-session` takes a single directory, so both go green while
+      # disagreeing with each other. What has kept them together is somebody remembering to
+      # re-extract `proof/` whenever `report/` moved; 2026-08-15's apm/pps/vs change is the most
+      # recent time that was remembered, and nothing would have said so had it not been.
+      #
+      # Globbed over sessions/*, so a second artefact anywhere is covered without an edit — and
+      # finding NO pair is a failure, because a sweep over nothing prints like a clean one.
+      # --selftest first: the interesting half of this gate is what it TOLERATES (the two
+      # artefacts carry different schemas, and 30 report-only fields are named rather than
+      # silently intersected), so a run that has never been shown to fail proves little.
+      - name: Compare the two artefacts of one session against each other
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_cross_artefact --selftest
+          python3 -m pipeline.check_cross_artefact
+
   # docs/ is the published GitHub Pages site, copied from the sessions by
   # bin/build-docs — and nothing reran it automatically. Every other gate here
   # verifies sessions/, so a report could pass all of them while the page people
@@ -470,6 +508,33 @@ jobs:
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 
+  # A pooled figure that one round carries, published as if the session carried it. 2026-08-14's
+  # lost-regime APP gap moves 2.874 pp when m11r2 is dropped — rank 1 of 84, 1.72x the next — and
+  # 「the floors have met」 did not say so. The gate fails a figure whose largest single-round
+  # leave-one-out shift reaches half its own value unless its sentence carries the annotation.
+  #
+  # Here and NOT in equiv-coverage.yml, which is path-filtered on pipeline/claims/** and
+  # sessions/**: the edit this gate exists to catch is a prose edit to CLAUDE.md, which that
+  # filter does not fire on. Unconditional and every push, because it is offline and finishes in
+  # well under a second (0.06 s over the six sessions) — there is no schedule to hang it on.
+  #
+  # --selftest first: the threshold rests on a 2.386x gap in a 17-figure population, and a gate
+  # whose failure has never been demonstrated is not evidence of anything. The planted cases
+  # include a sixth figure crossing the threshold with nobody having named it, a named figure
+  # that stops crossing (an unearned caveat is as stale as a missing one), and a space inside a
+  # round label — the mutant that says the line-wrap tolerance is not a whitespace strip.
+  leave-one-out:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check no published pooled figure rests on one round in silence
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_loo --selftest
+          python3 -m pipeline.check_loo --check
+
   # The simulator's own test suite ran nowhere. `cross-extractor` above is the only job that
   # touches Bun and it only re-runs the extractors, so every assertion about the T-Spin Forecast
   # metric — the corpus census, the wiki fixtures, the clause-2 verdicts — was verified on
@@ -478,6 +543,9 @@ jobs:
   # The import gate is the other half of the same hole. `forecast.test.ts` imported a name that no
   # file exported, for weeks, green the whole time: Bun does not validate named exports, there is
   # no tsc step, and the tests were not run here. See pipeline/check_ts_imports.py.
+  # Two of those three still hold; "the tests were not run here" was fixed by the step below, in
+  # the commit that created this job. Do not read that as retiring the import gate — the defect it
+  # caught was an import that is never CALLED, which running the suite cannot evaluate.
   typescript:
     runs-on: ubuntu-22.04
     steps:
@@ -606,23 +674,45 @@ jobs:
 
       # The count `bestTspinLines` produces IS what the forecast metric consumes, and it had no
       # outside check — only our own second BFS. This runs it against the Rust cutout_tslot over
-      # every verified-prefix board of all four sessions: a miscount or a missed line-clearing slot
-      # fails the job. (Measured clean: 1,831 slots, all counts agree, 0 missed.)
+      # every verified-prefix board of every session: a miscount or a missed line-clearing slot
+      # fails the job.
+      #
+      # The list below was FOUR sessions until 2026-08-15, having stopped at 2026-08-01 while
+      # 2026-08-09 and 2026-08-14 were added to the corpus — 134 rounds (50 + 84) outside the gate
+      # that checks this count against an implementation we did not write. That is the
+      # silent-under-coverage class: nothing goes red, the job stays green, and the green means
+      # less each session. Adding a session means adding it HERE, not only to sessions/.
+      # (Measured clean when it covered four: 1,831 slots, all counts agree, 0 missed. That
+      # figure is NOT re-stated for six — it was measured over the old list, and this edit
+      # widens the scope rather than re-measuring it. The first run over six is what produces
+      # the new number.)
+      #
+      # `pipeline/sim/cross-tslot-multi.ts` and `pipeline/sim/cross-tslot.test.ts` each carried
+      # their OWN copy of the same stale four-session list, so this step covered four sessions no
+      # matter what was written here. Both were extended to six on 2026-08-15; extending the test's
+      # copy failed it at once (39033 -> 61656 boards) while its differential stayed empty. If you
+      # add a session, all three lists need it — this loop is not the only one.
       - name: Every T-spin line count matches the Rust original across the corpus
         run: |
           set -euo pipefail
-          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01; do
+          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01 2026-08-09 2026-08-14; do
             echo "-- $s"
             REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
           done
 
       # cross-tslot-count checks ours against cold-clear's SINGLE best detector. This checks the
-      # stronger thing multi-slot could threaten: the scalar the forecast metric consumes is never
-      # below what cold-clear's MULTI-slot cutout chain finds on the same board (`CC_ORACLE_SLOTS=1`
-      # makes the oracle emit the chain). It fails if multi-slot ever sees a bigger current-board
-      # spin than the scalar — the case that would force re-opening the "don't wire multi-slot into
-      # the metric" decision. Measured clean: 0 of 7,544 boards; multi-slot changes the path of
-      # exclusion, not the value.
+      # thing multi-slot could threaten: the scalar the forecast metric consumes is never below what
+      # cold-clear's cutout finds on the board AS GIVEN (`CC_ORACLE_SLOTS=1` makes the oracle emit
+      # the whole chain). Failing would force re-opening the "don't wire multi-slot into the metric"
+      # decision. Measured clean over all six sessions: 0 of 20,226 boards; multi-slot changes the
+      # path of exclusion, not the value.
+      #
+      # The comparison is against `slots[0]`, NOT `max(slots)`, and it was `max` until 2026-08-17 —
+      # a category error rather than a stricter bound. The chain re-assigns the board after every
+      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. On the six
+      # sessions `max(slots) > ours` fires once and `slots[0] > ours` never does; on that one board
+      # cold-clear's own current-board answer agrees with ours exactly. The stale "0 of 7,544" this
+      # comment used to carry was the four-session figure, measured before 08-09 and 08-14 existed.
       - name: Multi-slot cutout never exceeds the scalar the metric consumes
         env:
           CC_ORACLE_SLOTS: '1'
@@ -631,7 +721,9 @@ jobs:
       # cross-tslot-count/-multi check the SLOT the metric consumes, not the SEARCH that reaches it —
       # the arrival-key defect (spec/BfsKey.dfy) was invisible to both. cross-movegen.test.ts is that
       # standing gate: our BFS reachable-placement set is a superset of the real find_moves for every
-      # piece, over random boards AND every verified-prefix board of all five sessions. Without
+      # piece, over random boards AND every verified-prefix board of all six sessions (the list
+      # lives in cross-movegen.test.ts:171 and does carry all six — checked, not assumed, because
+      # the two steps above prove that a session list written down once goes stale). Without
       # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin) vs cold-clear

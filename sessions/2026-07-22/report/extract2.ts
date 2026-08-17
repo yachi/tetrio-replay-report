@@ -116,15 +116,30 @@ function extractRoundPlayer(player: any, ctx: string) {
   const finesseRaw = resultsStats?.finesse ?? {};
   if (!resultsStats?.finesse) warn(`${ctx}: missing results.stats.finesse, using 0s`);
 
+  // The rate triple comes from results.aggregatestats, NOT from player.stats: the latter is a
+  // live in-game tick that predates the round's end in 183 of 760 player-rounds, and the error is
+  // directional (181 of those are the round winner, APM too high in 172). aggregatestats is the
+  // final snapshot, the same results-time source as garbage/finaltime below, and only it satisfies
+  // vs*60*attack == apm*100*(attack+cleared) on every round.
+  //
+  // DECIDED, not overlooked: extractLeaderboardEntry above stays on `stats`, because a leaderboard
+  // entry carries no aggregatestats (0 of 98 in this corpus). So round-level rates are final-frame
+  // while the match-level rollup is the live tick, and round figures will not reconcile against the
+  // leaderboard's. There is no better source for the leaderboard.
+  const aggregate = player?.replay?.results?.aggregatestats ?? {};
+  if (!player?.replay?.results?.aggregatestats) {
+    warn(`${ctx}: missing replay.results.aggregatestats, using 0s for rates`);
+  }
+
   const events = player?.replay?.events;
   if (!Array.isArray(events)) warn(`${ctx}: missing replay.events, garbage_events will be empty`);
 
   return {
     lifetime: intVal(player?.lifetime, `${ctx} lifetime`),
     alive: player?.alive === true,
-    apm_x1000: x1000(stats?.apm, `${ctx} stats.apm`),
-    pps_x1000: x1000(stats?.pps, `${ctx} stats.pps`),
-    vs_x1000: x1000(stats?.vsscore, `${ctx} stats.vsscore`),
+    apm_x1000: x1000(aggregate?.apm, `${ctx} results.aggregatestats.apm`),
+    pps_x1000: x1000(aggregate?.pps, `${ctx} results.aggregatestats.pps`),
+    vs_x1000: x1000(aggregate?.vsscore, `${ctx} results.aggregatestats.vsscore`),
     garbagesent: intVal(stats?.garbagesent, `${ctx} stats.garbagesent`),
     garbagereceived: intVal(stats?.garbagereceived, `${ctx} stats.garbagereceived`),
     kills: intVal(stats?.kills, `${ctx} stats.kills`),

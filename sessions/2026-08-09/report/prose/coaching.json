@@ -6,7 +6,7 @@
     "yachi": {
       "tagline": "快手 quad 流",
       "profile": [
-        "強項照舊，而且係實數：六場 match 場場場均 PPS 高過 pinglamb<span class=\"badge\" data-claim=\"G049\"></span>，每局平均 PPS 約 1.461 對佢約 1.375<span class=\"badge\" data-claim=\"G037\"></span>。quad 開多過對面（258 對 209）<span class=\"badge\" data-claim=\"G032\"></span>，hold 用得密（2019 對 1703）<span class=\"badge\" data-claim=\"G030\"></span>，清走嘅垃圾總數亦都多過對面（966 對 930）<span class=\"badge\" data-claim=\"G028\"></span>。",
+        "強項照舊，而且係實數：六場 match 場場場均 PPS 高過 pinglamb<span class=\"badge\" data-claim=\"G049\"></span>，每局平均 PPS 約 1.462 對佢約 1.375<span class=\"badge\" data-claim=\"G037\"></span>。quad 開多過對面（258 對 209）<span class=\"badge\" data-claim=\"G032\"></span>，hold 用得密（2019 對 1703）<span class=\"badge\" data-claim=\"G030\"></span>，清走嘅垃圾總數亦都多過對面（966 對 930）<span class=\"badge\" data-claim=\"G028\"></span>。",
         "<strong>真正嘅問題唔係天花板，係地板。</strong> 你贏嗰啲局，每粒方塊嘅攻擊係 0.673<span class=\"badge\" data-claim=\"G067\"></span>；pinglamb 贏嗰啲局係 0.686<span class=\"badge\" data-claim=\"G068\"></span>——爭唔夠 2%<span class=\"badge\" data-claim=\"C002\"></span>。你打得好嗰陣，同佢打得好嗰陣，基本上係同一個水平。但你輸嗰啲局跌到 0.512，佢輸嗰啲局仲有 0.642，呢邊就爭超過 25%<span class=\"badge\" data-claim=\"C002\"></span>。講到盡：你贏嗰啲局嘅數字，仲要高過佢輸嗰啲局超過 4%<span class=\"badge\" data-claim=\"C003\"></span>。",
         "所以呢晚同上一晚係相反嘅拆法。上一晚佢贏局同輸局兩邊都穩定高過你，嗰個係<strong>風格</strong>差異；今晚贏嗰邊貼到實、輸嗰邊撐開，即係<strong>狀態</strong>差異——你唔需要一個更高嘅上限，你需要一個唔會塌落去嘅下限。",
         "順帶要講清楚一格：<strong>手法呢一格今晚你輸咗。</strong> finesse 失誤 880 對 680<span class=\"badge\" data-claim=\"G029\"></span>，每粒方塊嘅 perfect 比率<span class=\"badge\" data-claim=\"G041\"></span>同 KPP<span class=\"badge\" data-claim=\"G062\"></span>都係 pinglamb 較好，同上一晚啱啱掉轉。但唔好因為咁就衝去練手法——見下面第四條。"
@@ -28,7 +28,7 @@
       ],
       "recs": [
         "<strong>穩定係你今晚真正贏嘅嘢，唔好為咗追上限而搞散佢。</strong> 贏局同輸局嘅 APP，你 0.686 對 0.642<span class=\"badge\" data-claim=\"G068\"></span>，對面 0.673 對 0.512<span class=\"badge\" data-claim=\"G067\"></span>。贏嗰邊兩個人爭唔夠 2%<span class=\"badge\" data-claim=\"C002\"></span>，即係你嘅優勢唔喺上限度——係喺跌落去嗰陣跌得淺。",
-        "<strong>速度仍然係你唯一一格全輸嘅嘢。</strong> 六場場均 PPS 場場低過對面<span class=\"badge\" data-claim=\"G049\"></span>，每局平均約 1.375 對佢約 1.461<span class=\"badge\" data-claim=\"G037\"></span>。你 APM 一夠 65 就 10 局贏 7 局<span class=\"badge\" data-claim=\"G046\"></span>，即係去到嗰個檔一樣贏，問題係去唔去到——今晚你得 10 局去到，對面 6 局去到而且 6 局贏晒<span class=\"badge\" data-claim=\"G045\"></span>。練法照舊：開局同過渡位嘅手速先係樽頸，唔係 T-spin 本身。",
+        "<strong>速度仍然係你唯一一格全輸嘅嘢。</strong> 六場場均 PPS 場場低過對面<span class=\"badge\" data-claim=\"G049\"></span>，每局平均約 1.375 對佢約 1.462<span class=\"badge\" data-claim=\"G037\"></span>。你 APM 一夠 65 就 10 局贏 7 局<span class=\"badge\" data-claim=\"G046\"></span>，即係去到嗰個檔一樣贏，問題係去唔去到——今晚你得 10 局去到，對面 6 局去到而且 6 局贏晒<span class=\"badge\" data-claim=\"G045\"></span>。練法照舊：開局同過渡位嘅手速先係樽頸，唔係 T-spin 本身。",
         "<strong>留意個效率優勢一路收窄。</strong> 頭兩場你每粒方塊嘅攻擊高過對面超過三成半，尾兩場收窄到唔夠 8%<span class=\"badge\" data-claim=\"C005\"></span>。今晚照贏六場，但呢條線再走落去就會交叉。要守住呢格，靠嘅係 TST 呢個來源<span class=\"badge\" data-claim=\"G034\"></span>——同樣清行，TST 用嘅方塊少好多。",
         "<strong>自爆嗰格今晚係你嘅。</strong> 全晚 4 局自己頂到天花板收場，4 局都係你<span class=\"badge\" data-claim=\"C006\"></span>。四局都係你輸嘅局，即係代價已經計咗落個 6 比 0 度——但頂爆之前嗰幾秒通常有得救，值得逐局翻返睇。"
       ]

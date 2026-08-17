@@ -109,10 +109,29 @@ test('roofIsGarbage discriminates a garbage overhang from a built one (anti-vacu
   expect(builtRoof[0]!.roofIsGarbage).toBe(false);
 });
 
-test('forecast_lineclear: a line clear falls between roof-build and execution', () => {
-  const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2] }));
-  expect(r.records[0]!.kind).toBe('forecast_lineclear');
-  expect(r.records[0]!.separation).toBe(4);
+/* LOOSE mode's rule, stated as loose — which is what this test was always exercising.
+ *
+ * It called `forecastMetric(...)` with the default `strict = true` and asserted co-occurrence
+ * behaviour, and it passed because `mk` without boards emits `boards: []`, making `determinable`
+ * false and routing a STRICT call into the loose ladder (see this file's header). So it was a test
+ * OF the fallback, not of the strict rule, while reading as the latter.
+ *
+ * Since 2026-08-16 strict mode no longer falls back — an undeterminable window is `reactive`,
+ * because with no board at the roof no mechanism can be established — so the call is explicit now.
+ * `LOOSE=1` must keep reproducing the pre-correction figures, which is exactly what this pins.
+ * The strict counterpart is the wiki-grounded pair below and `a clear that DISPLACES the slot`,
+ * both of which supply real boards and go through `localiseMechanism`'s geometry.
+ */
+test('LOOSE mode: a line clear anywhere in the window is enough — co-occurrence, by design', () => {
+  const f = mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2] });
+  const loose = forecastMetric(f, false);
+  expect(loose.records[0]!.kind).toBe('forecast_lineclear');
+  expect(loose.records[0]!.separation).toBe(4);
+  // ...and the same board under the STRICT rule establishes nothing, because there is no board at
+  // the roof to compare against. This is the assertion that would have caught the fallback.
+  const strict = forecastMetric(f, true);
+  expect(strict.records[0]!.determinable).toBe(false);
+  expect(strict.records[0]!.kind).toBe('reactive');
 });
 
 /* Wiki-grounded boards: harddrop's "Forecasting T-Spin Triples > Garbage" pair. The second board
@@ -183,26 +202,35 @@ test('a clear that DISPLACES the slot is the placement, not a forecast', () => {
   expect(r.records[0]!.kind).toBe('self_built');
 });
 
-/* Neither mechanism: the slot is already built and merely UNREACHABLE, sealed under a row that is
- * full but for one column. The I completes that row from four rows up, the clear opens the path,
- * and the T walks in. The clear did not form the slot and the piece never went near it, so the
- * answer is `unattributed` — recorded rather than guessed. This never occurs in the corpus, which
- * is why it is here: an untested branch is where a silent default would live. */
+/* ACCESS, and it is now its own mechanism: the slot is already built and merely UNREACHABLE, sealed
+ * under a row that is full but for one column. The I completes that row from four rows up, the clear
+ * opens the path, and the T walks in. The clear did not FORM the slot — `bestTspin` is a BFS from
+ * spawn, so availability is reachability, and removing the lid raises it without building anything.
+ *
+ * This fixture used to assert `unattributed`/`self_built`, which was the model's answer BEFORE the
+ * fifth mechanism existed: nothing here formed the slot and the piece never went near it, so it fell
+ * through every branch. The corpus half of that defect — the same class landing on `placement` when
+ * the causing piece happened to sit beside the slot — is in forecast-access-class.test.ts. What this
+ * fixture pins now is the branch itself, on a board chosen to exercise it rather than found. */
 const ACC_ROOF = boardFrom(["#########.", "..........", "..##......", "###...####", "####.#####"]);
 const ACC_CELLS = [35, 34, 33, 32].map(row => ({ col: 9, row }));
 // the I's other three cells survive the clear and ride down with the rest of the stack
 const ACC_SPIN = boardFrom([".........#", ".........#", ".........#", "..........",
                             "..##......", "###...####", "####.#####"]);
 
-test('a clear that only opens ACCESS is attributed to neither, and says so', () => {
+test('a clear that only opens ACCESS is its own mechanism, and is not a forecast', () => {
   const r = forecastMetric(mk({ tLock: 4, tCells: T_CELLS, roofOwner: 0, clearsAt: [2],
     boardAtRoof: ACC_ROOF, boardAtSpin: ACC_SPIN, changeAt: 2, stepCells: ACC_CELLS }));
   expect(r.records[0]!.availAtSpin).toBe(2);
-  expect(r.records[0]!.mechanism).toBe('unattributed');
-  // it must NOT be counted as a forecast on the strength of a mechanism nobody established
-  expect(r.records[0]!.kind).toBe('self_built');
+  expect(r.records[0]!.mechanism).toBe('access');
+  // `path_opened`, NOT `self_built` — the piece did not build this slot, and `self_built` is what
+  // the report glosses 「玩家自己落嗰隻棋整出嚟」. And NOT `forecast_lineclear` either: the cleared
+  // row lies outside the slot, so `spec/Forecast.dfy`'s clause 3 (the strictly-inside rule) is
+  // false for it and it may not enter the numerator.
+  expect(r.records[0]!.kind).toBe('path_opened');
   expect(r.forecastRate).toBe(0);
-  expect(r.unattributed).toBe(1);
+  // and the model no longer has to say "don't know" about it — this is what the repair bought
+  expect(r.unattributed).toBe(0);
 });
 
 /* Availability OVERSHOOTS and settles back: 0 -> 2 -> 3 -> 2. The step that produced what the
@@ -466,7 +494,13 @@ test('a two-placer roof: the LATEST builder sets the window, and the ANSWER move
   // forecast_garbage localised to step 2, and the published rate goes 0 -> 1
   expect(isVerifiedForecast(rec)).toBe(false);
   expect(r.forecastRate).toBe(0);
-  expect(r.totals).toEqual({ forecast_garbage: 0, forecast_lineclear: 0, self_built: 0, reactive: 1 });
+  // Exhaustive over ForecastKind on purpose, so a new kind has to be acknowledged here rather than
+  // appearing in a bucket nobody looks at. `path_opened` arrived that way (2026-08-16) and this was
+  // the only assertion in the file it moved: the record is still `reactive` with no mechanism at
+  // all (asserted above), because nothing improved after the roof, so there is no window to
+  // localise inside and the `access` branch is never reached on this fixture.
+  expect(r.totals).toEqual({ forecast_garbage: 0, forecast_lineclear: 0, path_opened: 0,
+                             self_built: 0, reactive: 1 });
 });
 
 test('a two-placer roof also moves what clause 2 compares its supports against', () => {
@@ -1078,4 +1112,56 @@ test('garbageArrivedAfter starts at an empty pre-board when the roof has no plac
   // used to throw here; the row that arrived at lock 0 counts as after the (absent) roof.
   expect(() => garbageArrivedAfter(r, -1, 1)).not.toThrow();
   expect([...garbageArrivedAfter(r, -1, 1)]).toEqual([H - 1]);
+});
+
+/* ── strict mode must never fall back to co-occurrence ───────────────────────────────────────
+ *
+ * A roof with no placing lock (a garbage overhang) leaves `boardJ` null, so `determinable` is
+ * false. The kind ladder's first condition was `!(strict && determinable)`, which sent exactly
+ * that case into the LOOSE branch — so a STRICT run could emit `forecast_garbage` from bare
+ * co-occurrence, with `loc === null` and therefore no mechanism at all. Nothing downstream
+ * catches it: `isVerifiedForecast` tests the kind and clauses 2 and 4 and never asks whether a
+ * mechanism was established, and `emit-forecast-facts.ts` computes `mechanism_established` as
+ * `fg + fl`, so the event would have been reported as mechanism-established by definition.
+ *
+ * Corpus exposure is 0 of 3926 records over six sessions — `roofIsGarbage` is false everywhere —
+ * which is why all six artefacts are byte-identical under the fix, and also why only a fixture
+ * can hold this. An unreachable branch that publishes a forecast on co-occurrence is the shape
+ * `insertMode: 'immediate'` had in 2026-08-08, when a legal-but-unswept option quietly produced
+ * 13 verified forecasts.
+ */
+test('a garbage roof (j = -1) is NOT scored by co-occurrence in strict mode', () => {
+  const tCells = [{ col: 4, row: 36 }, { col: 3, row: 37 }, { col: 4, row: 37 }, { col: 5, row: 37 }];
+  const tLock = 6;
+  const locks: any[] = [], provSnaps: any[] = [], boards: any[] = [];
+  for (let i = 0; i <= tLock; i++) {
+    locks.push({ frame: i * 100, piece: i === tLock ? 'T' : 'L', cells: i === tLock ? tCells : [],
+                 cleared: i === tLock ? 2 : 0, spin: i === tLock ? 'full' : 'none' });
+    const g = Array.from({ length: H }, () => new Array<number | null>(W).fill(null));
+    for (const c of tCells) g[c.row - 1]![c.col] = -1;          // roof owned by garbage -> j = -1
+    const noseRow = Math.max(...tCells.map(c => c.row));
+    for (const c of tCells) if (c.row === noseRow) g[noseRow + 1]![c.col] = 0;
+    provSnaps.push(g);
+    boards.push(boardFrom(["..........", "....G.....", "GGGG.GGGGG"]));
+  }
+  const r = { locks, provSnaps, boards, records: [], events: [], topout: false,
+    garbageEvents: [{ frame: 300, amt: 4, lockIndex: 3 }],   // garbage INSIDE the window
+    lines: 0, placed: 0, holds: 0, clears: {}, topbtb: 0, topcombo: 0,
+    garbage: { sent: 0, received: 0, cleared: 0, attack: 0 } } as unknown as SimResult;
+
+  const rec = forecastMetric(r, true).records[0]!;
+  // the fixture's own premises, so a board that stopped exercising this is visible rather than green
+  expect(rec.roofFrom).toBeNull();
+  expect(rec.determinable).toBe(false);
+  expect(rec.mechanism).toBeUndefined();          // no board at the roof -> nothing to localise
+
+  // ...and therefore no forecast KIND may be assigned. This is the assertion the old ladder failed:
+  // it produced `forecast_garbage` here, purely because garbage happened to arrive in the window.
+  expect(rec.kind).toBe('reactive');
+  expect(isVerifiedForecast(rec)).toBe(false);
+  expect(forecastMetric(r, true).totals.forecast_garbage).toBe(0);
+
+  // LOOSE mode is the pre-correction rule verbatim and must be UNCHANGED — `LOOSE=1` exists to
+  // reproduce the old figures, so narrowing it would silently rewrite the comparison baseline.
+  expect(forecastMetric(r, false).records[0]!.kind).toBe('forecast_garbage');
 });

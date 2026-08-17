@@ -885,7 +885,17 @@ SCRIPT = r"""<script>
       { label: "每粒攻擊", get: function (s) { return s.attack_per_piece; }, fmt: function (v) { return v.toFixed(3); } },
       { label: "總攻擊行數", get: function (s) { return s.garbage_attack; }, fmt: function (v) { return Math.round(v); } },
       { label: "清垃圾行數", get: function (s) { return s.garbage_cleared; }, fmt: function (v) { return Math.round(v); } },
-      { label: "finesse 失誤率", get: function (s) { return s.finesse_fault_rate; }, fmt: function (v) { return (v * 100).toFixed(1) + "%"; }, lowerBetter: true },
+      /* Named 每粒, and NOT rendered as a percentage, because `finesse.faults`
+         counts fault EVENTS while `pieces` counts pieces — one piece can register
+         several. This row said 「finesse 失誤率」 and printed 16.8%, which a reader
+         parses as "the share of pieces that were faulty"; that number is 10.65%.
+         The corpus refutes the share reading outright: in 650 of 750 player-rounds
+         the faults outnumber the non-perfect pieces, and one round (07-24 m2r0,
+         pinglamb) puts 7 faults on a single non-perfect piece. So the row matches
+         每粒攻擊 above — same denominator, same decimal rendering — and hold 使用率
+         below stays a percentage because a hold IS at most one per piece. The
+         format now carries the distinction instead of flattening it. */
+      { label: "每粒 finesse 失誤", get: function (s) { return s.finesse_fault_rate; }, fmt: function (v) { return v.toFixed(3); }, lowerBetter: true },
       { label: "hold 使用率", get: function (s) { return s.hold_rate; }, fmt: function (v) { return (v * 100).toFixed(1) + "%"; } }
     ];
 

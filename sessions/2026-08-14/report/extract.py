@@ -152,14 +152,29 @@ def extract_round_player(player, ctx):
 
     clears = rstats.get("clears") if rstats else None
 
+    # The rate triple comes from results.aggregatestats, NOT from player.stats: the latter is a
+    # live in-game tick that predates the round's end in 183 of 760 player-rounds, and the error
+    # is directional (181 of those are the round winner, APM too high in 172). aggregatestats is
+    # the final snapshot, the same results-time source as garbage/finaltime below, and only it
+    # satisfies vs*60*attack == apm*100*(attack+cleared) on every round.
+    #
+    # DECIDED, not overlooked: extract_leaderboard_entry above stays on `stats`, because a
+    # leaderboard entry carries no aggregatestats (0 of 98 in this corpus). So round-level rates
+    # are final-frame while the match-level rollup is the live tick, and round figures will not
+    # reconcile against the leaderboard's. There is no better source for the leaderboard.
+    aggregate = results.get("aggregatestats")
+    if results and aggregate is None:
+        warn(f"{ctx}: missing/null 'replay.results.aggregatestats' -> defaults 0 for rates")
+    aggregate = aggregate or {}
+
     events = replay.get("events")
 
     return username, {
         "lifetime": get(player, "lifetime", 0, ctx),
         "alive": bool(get(player, "alive", False, ctx)),
-        "apm_x1000": x1000(get(stats, "apm", 0, ctx + ".stats")),
-        "pps_x1000": x1000(get(stats, "pps", 0, ctx + ".stats")),
-        "vs_x1000": x1000(get(stats, "vsscore", 0, ctx + ".stats")),
+        "apm_x1000": x1000(get(aggregate, "apm", 0, ctx + ".results.aggregatestats")),
+        "pps_x1000": x1000(get(aggregate, "pps", 0, ctx + ".results.aggregatestats")),
+        "vs_x1000": x1000(get(aggregate, "vsscore", 0, ctx + ".results.aggregatestats")),
         "garbagesent": get(stats, "garbagesent", 0, ctx + ".stats"),
         "garbagereceived": get(stats, "garbagereceived", 0, ctx + ".stats"),
         "kills": get(stats, "kills", 0, ctx + ".stats"),

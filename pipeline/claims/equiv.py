@@ -8,15 +8,30 @@ Why this is not a string comparison: every predicate in every ledger is True on 
 real data, so evaluating them there tells you nothing about whether two predicates pin
 the same fact. Instead we perturb the dataset many times and compare behaviour.
 
-A hand claim H counts as covered by a generated claim G when, across every sampled
-mutation, G being true forces H to be true (G implies H), and G is not trivially
+A hand claim H counts as covered by a generated claim G when, across every mutant in the
+corpus, G being true forces H to be true (G implies H), and G is not trivially
 always-true. If that holds, proving G gives you H for free.
 
-By default every single-value mutation of the dataset is tried, so the conclusion holds
-for the whole space of one-value changes — not a random sample of it. It is still not a
-proof of equivalence (two predicates could differ only under a simultaneous change to
-two values), and claims that no single mutation can falsify are reported separately
-rather than counted as covered.
+EXHAUSTIVE means both halves of "which value, changed how": every mutation *site*
+(`mutation_sites`) and, at each site, every perturbation *kind* (`_bumps` — zero, double,
+halve, a third either way, a twentieth either way; both signs for a match score),
+de-duped where two kinds land on the same value.
+
+It used to mean only the first half. One kind was DRAWN per site, so the published figure
+moved with `--seed`: 2026-07-22 read 45/53 = 85% at the committed seed, 46/53 = 87% at
+seed 3, 43/52 = 83% at seed 42 — 82.7-86.8% over twelve of them (the committed one, 1-10
+and 42), with the *denominator* moving too (51-53), because which claims are falsifiable
+at all depends on which mutants were drawn. A figure that moves with an argument nobody
+varies reads as a property of the data. Enumerating instead costs ~5x the mutants and ~5x
+the wall clock (7 019 sites, 34 779 mutants, 13.9 s to 69.2 s on that session), and
+2026-07-22 settles at 43/53 = 81%.
+
+What is still not exhaustive, and is not claimed to be: pairs. Two predicates can differ
+only under a simultaneous change to two values, so this remains no proof of equivalence;
+claims that no mutation can falsify are reported separately rather than counted as
+covered; `--two-site` below attacks one family of pairs under a bound of its own; and
+`--samples`, off by default, is the one path that still draws — it subsamples the site
+list, and is the only thing `--seed` governs.
 
 `--two-site` adds the second family, and it exists because that caveat decided a headline
 number. A *windowed* claim ("yachi's attack per piece fell after match 2") draws on the
@@ -33,6 +48,8 @@ import random
 import re
 
 from pipeline import perturb
+
+from .evaluate import ClaimEvaluationError, ClaimEvaluator
 
 SCALARS = [
     "apm_x1000", "pps_x1000", "vs_x1000", "lifetime", "maxspike", "topcombo",
@@ -71,20 +88,25 @@ def mutation_sites(facts):
     return sites
 
 
-def mutation_writes(facts, site, rng):
-    """The `(container, key, value)` writes that realise one mutation.
+def site_mutants(facts, site):
+    """Every mutant at one site, as lists of `(container, key, value)` writes.
 
-    Was `apply_mutation`, which deep-copied `facts` and wrote into the copy — an O(|facts|)
-    rebuild per O(1) edit, and 88 % of this tool's runtime. `pipeline.perturb.perturbed`
-    applies these in place and undoes them, which is the same mutant for a few hundred
-    nanoseconds instead of twelve milliseconds. See that module for what the trade costs
-    and which assertion buys it back.
+    Was `mutation_writes(facts, site, rng)`, which returned ONE mutant per site because it
+    drew a perturbation kind from `rng`. That draw is what made the tool's headline figure
+    depend on `--seed` (see the module note), so it is gone: this returns the whole fan-out
+    — one write-list per value in `_bumps`, or per sign for a score, or the single flip for
+    a winner — and nothing here consumes randomness. The seven branches are the seven site
+    kinds `mutation_sites` emits, unchanged.
 
-    The `rng` draws happen HERE, in site order, exactly as often as the deepcopy version
-    drew them — one `_bump` (or one `choice`) per site, none for the winner flips. That is
-    not incidental tidiness: the corpus is seeded, so any change to the number or order of
-    draws silently produces a different set of mutants and a different coverage figure,
-    which would read as a result rather than as a bug.
+    Each mutant is a list because a write can need a companion: flipping a round's winner
+    must also flip both players' `alive`. `pipeline.perturb.perturbed` applies a list in
+    place and undoes it in reverse, so a mutant exists for a few hundred nanoseconds rather
+    than the twelve milliseconds a `deepcopy` of `facts` used to cost. See that module for
+    what the trade gives up and which assertion buys it back.
+
+    Read the values BEFORE any perturbation is applied: each write's new value is computed
+    from the datum's current one, so building the corpus lazily inside the sweep would read
+    a slot some earlier mutant had not yet restored.
     """
     other = {facts["players"][0]: facts["players"][1],
              facts["players"][1]: facts["players"][0]}
@@ -92,35 +114,35 @@ def mutation_writes(facts, site, rng):
     if kind == "match_winner":
         _, mi = site
         m = facts["matches"][mi]
-        return [(m, "winner", other[m["winner"]])]
+        return [[(m, "winner", other[m["winner"]])]]
     if kind == "score":
         _, mi, pl = site
         s = facts["matches"][mi]["score"]
-        return [(s, pl, s[pl] + rng.choice([-1, 1]))]
+        return [[(s, pl, s[pl] + d)] for d in (-1, 1)]
     if kind == "lb":
         _, mi, pl, f = site
         lb = facts["matches"][mi]["leaderboard"][pl]
-        return [(lb, f, _bump(lb[f], rng))]
+        return [[(lb, f, v)] for v in _bumps(lb[f])]
     if kind == "round_winner":
         _, mi, ri = site
         r = facts["matches"][mi]["rounds"][ri]
         new = other[r["winner"]]
         # `alive` is derived from the winner, so flipping one without the other would
         # build a mutant no extractor could ever produce.
-        return ([(r, "winner", new)]
-                + [(r["players"][pl], "alive", pl == new) for pl in facts["players"]])
+        return [[(r, "winner", new)]
+                + [(r["players"][pl], "alive", pl == new) for pl in facts["players"]]]
     if kind == "field":
         _, mi, ri, pl, f = site
         p = facts["matches"][mi]["rounds"][ri]["players"][pl]
-        return [(p, f, _bump(p[f], rng))]
+        return [[(p, f, v)] for v in _bumps(p[f])]
     if kind == "clear":
         _, mi, ri, pl, f = site
         c = facts["matches"][mi]["rounds"][ri]["players"][pl]["clears"]
-        return [(c, f, _bump(c[f], rng))]
+        return [[(c, f, v)] for v in _bumps(c[f])]
     if kind == "ge":
         _, mi, ri, pl, gi = site
         g = facts["matches"][mi]["rounds"][ri]["players"][pl]["garbage_events"][gi]
-        return [(g, "amt", _bump(g["amt"], rng))]
+        return [[(g, "amt", v)] for v in _bumps(g["amt"])]
     raise AssertionError(f"unknown mutation site kind {kind!r}")
 
 
@@ -195,16 +217,37 @@ def move_sites(facts, claims, granularity, log=None):
       round's comparison). Those are exactly the claims single-site mutation is good at,
       which is why this is the cheap setting rather than the only one.
 
-      **That gap is measured, not assumed, and it is not the same on every session.** On
-      2026-07-28 the two granularities return the identical verdict — 6/10, same covered
-      set — from 2 429 moves instead of 143 186, 8.6 s instead of 165 s. On 2026-07-22
-      `round` finds two implications `match` does not (44/53 vs 42/53), and both are
-      per-round claims: C007 names one marathon round, C024 one round's peak VS. So quote
-      a `match`-granularity figure as an upper bound on coverage, and re-run `round`
-      before publishing one.
+      **`match`'s moves are a SUBSET of `round`'s**, which is why its figure is an upper
+      bound by construction and not by luck: the one pair it keeps per (source match,
+      target match, player, field) is one of the pairs `round` enumerates, and an
+      implication that survives more mutants survives fewer. The bound is on the
+      *implications*, not on the fraction — extra mutants also make more claims
+      falsifiable, which moves the denominator — so re-run `round` before publishing a
+      percentage.
+
+      **What the extra moves buy is measured, and against the exhaustive single-value
+      family it is less than it was against the seeded one.** 2026-07-28: identical
+      verdict, 6/10 and the same covered set, from 2 289 moves and 32 s against 137 970
+      moves and 179 s (total wall, single-value sweep included). 2026-07-22: also
+      identical, 42/53 either way, from 3 690 moves and 79 s against 217 480 and 517 s —
+      the finer granularity's only visible effect there is that R013 stops behaving
+      *identically* to G054, some move separating two predicates no single-value mutation
+      tells apart, while still being implied by it. Both granularities do move the
+      single-value figure on 2026-07-22, 43/53 to 42/53: R021 names one decider round, and
+      the pair that implied it (avg PPS + the decider family) survives a redistribution
+      that the round-level claim does not.
+
+      **Why the two granularities used to disagree there, and no longer do.** Under the
+      seeded family the figures were 44/53 at `match` and 42/53 at `round` — the finer
+      granularity BREAKING two implications the coarser one left standing, which is what
+      the subset argument above predicts and the opposite of what this paragraph said for
+      as long as the numbers sat in it. The two were C007 (a marathon round) and C024 (one
+      round's peak VS), and they are exactly the two the exhaustive single-value family now
+      falsifies on its own. A gap that closes when the cheap family stops sampling was
+      never a fact about granularity.
 
     The delta is HALF the source (`d = max(1, source[f] // 2)`). Two constraints pull
-    against each other here and half is where they meet. `_bump`'s argument says a gentle
+    against each other here and half is where they meet. `_bumps`'s argument says a gentle
     move never shifts an aggregate comparison, so a claim nothing falsifies reads as
     implied by anything — that pushes the delta up. But moving the *whole* value leaves
     the source at 0, and a round with `pieces=0, lines=48` is not a dataset any extractor
@@ -261,8 +304,10 @@ def move_writes(facts, site):
     """The two writes that realise one value-preserving move.
 
     No `rng` argument, deliberately: the delta is a fixed function of the source value, so
-    this family draws nothing. The single-site sweep's draws — and therefore its mutants
-    and its coverage figure — are byte-identical whether or not `--two-site` is given.
+    this family draws nothing. Neither does the single-value family any more, so the two
+    are independent in the strong sense — the single-value corpus is the same list of
+    mutants whether or not `--two-site` is given, and a granularity comparison is a
+    comparison of the moves alone.
     """
     _, kind, (mia, ria), (mib, rib), pl, f = site
     ca = _round_stats(facts, kind, mia, ria, pl)
@@ -294,23 +339,43 @@ def move_writes(facts, site):
     return [(ca, f, va - d), (cb, f, vb + d)]
 
 
-def _bump(v, rng):
-    """Perturb aggressively.
+def _bumps(v):
+    """Every perturbation of one datum, aggressive and in a fixed order.
 
     Gentle nudges are useless here: a +-1 change to one round out of fifty never flips
     an aggregate comparison, so the claim stays true under every mutation and then
-    looks "implied" by anything at all. Mutations have to be big enough to move totals.
+    looks "implied" by anything at all. Mutations have to be big enough to move totals —
+    hence zero, double, halve, and a third and a twentieth of the value in both
+    directions. What is new is that every kind is TRIED rather than one being drawn; a
+    drawn kind made the coverage figure a function of `--seed`, which is a knob, not a
+    finding.
+
+    Both directions of both offsets, and not just the direction that shrinks: a great many
+    of these claims are one-sided ("yachi's KPP is lower"), so a mutant that only ever
+    moves a datum one way cannot falsify half of them. That is the same argument
+    `check_smt --mutate` makes for escalating a measurement both ways.
+
+    De-duped, which is a cost saving and not a semantic choice: at `v = 0` five of the
+    seven collapse onto 0 or 1, and a repeated value is a repeated verdict — the same bit
+    in every truth vector, so no implication can turn on it. Measured rather than argued:
+    keeping the coincident values changes no covered, uncovered, untested, identical or
+    trivial list on either 2026-07-24 (22 059 mutants against 28 596, 1.30x) or
+    2026-08-09 (22 309 against 29 323, 1.31x). A candidate equal to `v` is dropped by the
+    same rule and is not a saving but a correctness point: it is not a mutation. The
+    de-dupe can never empty a site out: every datum here is non-negative, so `2v + 1`
+    differs from `v` always, and each site keeps at least that one mutant.
     """
-    kind = rng.choice(["zero", "double", "halve", "swing", "step"])
-    if kind == "zero":
-        return 0
-    if kind == "double":
-        return v * 2 + 1
-    if kind == "halve":
-        return v // 2
-    if kind == "swing":
-        return max(0, v + rng.choice([-1, 1]) * max(1, abs(v) // 3))
-    return max(0, v + rng.choice([-1, 1]) * max(1, abs(v) // 20))
+    out = [0, v * 2 + 1, v // 2]
+    for sign in (-1, 1):
+        out.append(max(0, v + sign * max(1, abs(v) // 3)))
+    for sign in (-1, 1):
+        out.append(max(0, v + sign * max(1, abs(v) // 20)))
+    seen, uniq = {v}, []
+    for x in out:
+        if x not in seen:
+            seen.add(x)
+            uniq.append(x)
+    return uniq
 
 
 class Vec:
@@ -323,10 +388,12 @@ class Vec:
 
     Why not a list of True/False/None: the pair-coverage search below tries every PAIR
     of generated claims against each uncovered hand claim — O(|hand| x |gen|^2) vector
-    operations, and on 2026-07-22 that is 167 million interpreter steps inside one
-    generator expression, the single hottest line in the tool. Python's ints are
-    arbitrary-precision bitmaps, so the same conjunction over 7 020 samples becomes a
-    couple of `&`s over ~110 machine words. This is the word-parallel trick behind
+    operations, and on 2026-07-22 that was 167 million interpreter steps inside one
+    generator expression, the single hottest line in the tool. That figure was measured
+    over the 7 020-sample seeded corpus; the cost is linear in the sample count, and the
+    exhaustive corpus is 34 780, so the list version would now be some 800 million.
+    Python's ints are arbitrary-precision bitmaps, so the same conjunction becomes a
+    couple of `&`s over ~544 machine words. This is the word-parallel trick behind
     Shift-Or approximate matching (Baeza-Yates & Gonnet, CACM 35(10), 1992) and bitset
     dataflow analysis; nothing about the answers changes, only how many operations
     compute them.
@@ -341,8 +408,8 @@ class Vec:
         """Pack a list of True/False/None, sample 0 in bit 0.
 
         Built from a binary string rather than by `|= 1 << i` in a loop: shifting into a
-        growing int is O(n) per bit and so O(n^2) overall, which for 7 020 samples costs
-        more than it saves.
+        growing int is O(n) per bit and so O(n^2) overall, which for a corpus of tens of
+        thousands of samples (34 780 on 2026-07-22) costs more than it saves.
         """
         d = "".join("1" if v is not None else "0" for v in reversed(verdicts))
         b = "".join("1" if v else "0" for v in reversed(verdicts))
@@ -376,128 +443,52 @@ def implies(g, h):
     return (g.value & (h.defined ^ h.value)) == 0
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("facts")
-    ap.add_argument("--hand", nargs="+", required=True, help="hand-written ledgers")
-    ap.add_argument("--generated", help="generated ledger (default: build it now)")
-    ap.add_argument("--samples", type=int, default=0,
-                    help="cap the mutation count (0 = exhaustive, the default)")
-    ap.add_argument("--seed", type=int, default=20260725)
-    ap.add_argument("--two-site", choices=["off", "match", "round"], default="off",
-                    help="add value-preserving two-site moves (see move_sites for the "
-                         "bound). 'match' is one move per match pair, 'round' every "
-                         "cross-match round pair. Neither is capped or sampled; "
-                         "--samples applies to the single-value family only.")
-    ap.add_argument("--min-coverage", type=float, default=0.0,
-                    help="exit non-zero if coverage falls below this fraction")
-    args = ap.parse_args(argv)
+DEFAULT_SEED = 20260725
 
-    with open(args.facts, encoding="utf-8") as fh:
-        facts = json.load(fh)
+GRANULARITIES = ("match", "round")
 
-    if args.generated:
-        with open(args.generated, encoding="utf-8") as fh:
-            gen = json.load(fh)
-    else:
-        from .build_claims import generate, render
-        gen = render(generate(facts))
 
-    hand = []
-    for path in args.hand:
-        with open(path, encoding="utf-8") as fh:
-            hand.extend(json.load(fh))
+def _search(gen_codes, hand_codes, gvecs, hvecs, corpus):
+    """The implication search over one pair of truth-vector sets, and the result it shapes.
 
-    rng = random.Random(args.seed)
-    sites = mutation_sites(facts)
-    if args.samples and args.samples < len(sites):
-        rng.shuffle(sites)
-        sites = sites[:args.samples]
-        note = f"{len(sites)} sampled single-value mutations"
-    else:
-        note = f"all {len(sites)} single-value mutation sites (exhaustive)"
-    print(f"mutation corpus: {note}")
+    Split out of `measure` so that every mode `measure_modes` reports goes through the
+    same search. The vectors are the only thing that distinguishes one mode from another:
+    a two-site mode's vectors are the single-value ones with that family's moves appended,
+    so if this function were duplicated per mode the modes could disagree for a reason
+    that had nothing to do with the mutants.
 
-    gen_codes = [(c, compile(c["python_check"], "<gen>", "eval")) for c in gen]
-    hand_codes = [(h, compile(h["python_check"], "<hand>", "eval")) for h in hand]
-
-    # Mutate `facts` in place, evaluate every claim, undo. Nothing is copied and nothing
-    # is held: the mutant exists only for the duration of the `with` block.
-    gvecs = [[] for _ in gen_codes]
-    hvecs = [[] for _ in hand_codes]
-
-    def evaluate(dataset):
-        env = {"__builtins__": __builtins__}
-        for i, (_, code) in enumerate(gen_codes):
-            try:
-                gvecs[i].append(bool(eval(code, env, {"facts": dataset})))
-            except Exception:            # noqa: BLE001 - mutation broke an index
-                gvecs[i].append(None)
-        for i, (_, code) in enumerate(hand_codes):
-            try:
-                hvecs[i].append(bool(eval(code, env, {"facts": dataset})))
-            except Exception:            # noqa: BLE001
-                hvecs[i].append(None)
-
-    evaluate(facts)
-    pristine = perturb.fingerprint(facts)
-    for n, site in enumerate(sites, 1):
-        with perturb.perturbed(mutation_writes(facts, site, rng)):
-            evaluate(facts)
-        if n % 500 == 0:
-            print(f"  ... {n}/{len(sites)} mutants evaluated")
-    # The one thing deepcopy gave for free. A restore that misses a single site leaves
-    # every later mutant on a wrong baseline and still prints a plausible coverage
-    # figure, so this is checked rather than assumed.
-    assert perturb.unchanged(facts, pristine), \
-        "the mutation sweep did not restore facts — coverage below would be measured " \
-        "against a corrupted baseline"
-
-    if args.two_site != "off":
-        log = {}
-        moves = move_sites(facts, gen + hand, args.two_site, log)
-        print(f"two-site corpus: {len(moves)} value-preserving moves "
-              f"({args.two_site} granularity)")
-        # Everything the bound threw away, named. A cap nobody can see is worse than a
-        # smaller one everybody can.
-        print(f"  fields never read by any predicate, so not moved: "
-              f"{log['dropped_fields'] or 'none'}")
-        print(f"  moves skipped because the source was too small to split (<2): {log['zero_source']}")
-        print(f"  round/field slots absent from the data: {log['absent_field']}")
-        print("  not enumerated by the bound: moves between two rounds of the SAME "
-              "match (no window and no total can see one), between different fields, "
-              "and between the two players")
-        if args.two_site == "match":
-            print("  not enumerated at this granularity: moves out of any round but the "
-                  "source match's largest, or into any but the target match's smallest "
-                  "— so a claim that turns on WHICH round is touched is out of scope")
-        for n, site in enumerate(moves, 1):
-            with perturb.perturbed(move_writes(facts, site)):
-                evaluate(facts)
-            if n % 500 == 0:
-                print(f"  ... {n}/{len(moves)} moves evaluated")
-        assert perturb.unchanged(facts, pristine), \
-            "the two-site sweep did not restore facts — coverage below would be " \
-            "measured against a corrupted baseline"
-
+    The length assert is the ONLY thing standing between a mode and the family that ran
+    before it, and it is here rather than in prose because the obvious check does not
+    work. Alias `measure_modes`' per-mode vector copies instead of copying them and every
+    later mode is measured over its predecessor's moves too — yet on 2026-08-09 that
+    mutant changes NO verdict in any of the three modes (measured, not assumed: the
+    aliased corpus is a superset, and coverage happens not to move on it). A leak that
+    the results cannot show is one the results cannot gate, so the corpus is checked by
+    size: one pristine sample, plus every mutant, plus this mode's moves, and nothing
+    else. The same mutant dies here immediately.
+    """
+    expect = 1 + corpus["mutants"] + corpus["moves"]
+    wrong = [len(v) for v in list(gvecs) + list(hvecs) if len(v) != expect]
+    assert not wrong, (
+        f"a truth vector carries {wrong[0]} samples, not the {expect} this mode's corpus "
+        f"has ({corpus['mutants']} mutants + {corpus['moves']} moves + the pristine "
+        f"dataset) — the vectors of another mode have leaked into this one")
     gtriples = []
     for (c, _), v in zip(gen_codes, gvecs):
         vt = Vec.of(v)
         gtriples.append((c, vt, vt.falsified()))
 
-    trivial = [c["id"] for c, _, nt in gtriples if not nt]
-    if trivial:
-        print(f"WARNING: generated claims never falsified by any mutation: {trivial}")
+    trivial = sorted(c["id"] for c, _, nt in gtriples if not nt)
 
     # A claim no mutation falsifies can imply nothing useful, and both loops below skipped
     # it. Filtering once keeps the quadratic pair search off them entirely.
     live = [(c, v) for c, v, nt in gtriples if nt]
 
-    covered, uncovered, untested = [], [], []
+    covered, uncovered, untested, identical, detail = [], [], [], [], {}
     for (h, _), v in zip(hand_codes, hvecs):
         hv = Vec.of(v)
         if not hv.falsified():
-            untested.append(h)
+            untested.append(h["id"])
             continue
         exact = next((c for c, gv in live if gv == hv), None)
         impl = exact or next((c for c, gv in live if implies(gv, hv)), None)
@@ -513,23 +504,281 @@ def main(argv=None):
                         break
                 if impl:
                     break
-        (covered if impl else uncovered).append((h, impl, exact is not None))
+        if impl:
+            covered.append(h["id"])
+            if exact is not None:
+                identical.append(h["id"])
+            detail[h["id"]] = {"implied_by": impl["id"], "family": impl["family"],
+                               "identical": exact is not None}
+        else:
+            uncovered.append(h["id"])
+            detail[h["id"]] = {"implied_by": None, "family": None, "identical": False,
+                               "category": h.get("category", "?"),
+                               "gloss": h["english_gloss"]}
 
+    return {"sites": corpus["sites"], "mutants": corpus["mutants"],
+            "moves": corpus["moves"],
+            "covered": sorted(covered), "uncovered": sorted(uncovered),
+            "untested": sorted(untested), "identical": sorted(identical),
+            "trivial_generated": trivial, "detail": detail,
+            "two_site_log": corpus["two_site_log"]}
+
+
+def measure_modes(facts_path, hand_paths, generated_path=None, two_site_modes=(),
+                  samples=0, seed=DEFAULT_SEED, progress=None):
+    """Measure several granularities from ONE single-value sweep.
+
+    Returns ``{'single_value': {...}, 'two_site_match': {...}, 'two_site_round': {...}}``
+    with only the requested modes present besides `single_value`. Each value has the same
+    shape `measure` returns, and `measure` is one call to this with one mode, so there is
+    a single implementation and the two cannot drift.
+
+    WHY THE SWEEP CAN BE SHARED
+    ---------------------------
+    A mode is not a different measurement of the same corpus — it is the single-value
+    corpus with a family of moves APPENDED. `move_writes` draws nothing and `site_mutants`
+    draws nothing, so the single-value mutants are a pure function of the dataset, and the
+    same list of verdicts prefixes every mode. Recomputing it per mode is recomputing an
+    identical answer: ~230 s across the six sessions, against ~20 s for all the match
+    moves.
+
+    WHAT THAT RISKS, AND THE SHAPE OF THE GUARD
+    -------------------------------------------
+    Truth vectors are accumulating state, which is exactly the kind of thing that leaks
+    between phases: append a family's verdicts to the shared lists rather than to a copy
+    and the *next* mode is measured over both families, silently reporting a `round`
+    number under a `match` label. So each mode gets its own `list(v)` copies and the
+    shared vectors are never appended to after the sweep.
+
+    Two things check that, and the weaker one is the one that looks convincing.
+    `measure_modes(..., ('match', 'round'))` returns per-mode results byte-identical to
+    three separate `measure()` calls on 2026-08-09 and 2026-07-24 — which says the sharing
+    is behaviour-preserving, but does NOT gate the copy: replacing it with an alias leaves
+    all three modes' results unchanged on 2026-08-09, because the leaked corpus is a
+    superset and no implication happens to break on the extra moves. `_search`'s length
+    assert is what actually kills that mutant. A guard whose only evidence is an
+    equivalence that survives its removal is decorative.
+
+    `facts` itself is shared too, and `perturb.unchanged` is asserted after the sweep and
+    after each family, so a mode never starts from a tree a previous mode left dirty.
+    """
+    say = progress or (lambda *_: None)
+    bad = [g for g in two_site_modes if g not in GRANULARITIES]
+    if bad:
+        # `move_sites` branches on `granularity == "match"` and treats everything else as
+        # `round`, so a typo would silently return the expensive granularity under the
+        # cheap one's name. Naming it is the whole difference between a bound and a bug.
+        raise ValueError(f"unknown two-site granularity {bad}, expected {GRANULARITIES}")
+
+    with open(facts_path, encoding="utf-8") as fh:
+        facts = json.load(fh)
+
+    if generated_path:
+        with open(generated_path, encoding="utf-8") as fh:
+            gen = json.load(fh)
+    else:
+        from .build_claims import generate, render
+        gen = render(generate(facts))
+
+    hand = []
+    for path in hand_paths:
+        with open(path, encoding="utf-8") as fh:
+            hand.extend(json.load(fh))
+
+    sites = mutation_sites(facts)
+    n_sites = len(sites)
+    if samples and samples < n_sites:
+        # The only draw left in the tool, and the only thing `seed` governs.
+        random.Random(seed).shuffle(sites)
+        sites = sites[:samples]
+    # Built before the sweep, not inside it: every new value is a function of the datum's
+    # CURRENT value, and inside the sweep a slot may be one an earlier mutant has restored
+    # only moments ago. Up front, every read is of the pristine tree.
+    mutants = [w for site in sites for w in site_mutants(facts, site)]
+    if len(sites) < n_sites:
+        note = (f"{len(sites)} of {n_sites} single-value mutation sites, sampled with "
+                f"--seed {seed}; {len(mutants)} mutants (every kind at each sampled site)")
+    else:
+        note = (f"all {n_sites} single-value mutation sites, {len(mutants)} mutants "
+                f"(every perturbation kind at every site, exhaustive)")
+    say(f"mutation corpus: {note}")
+
+    gen_codes = [(c, compile(c["python_check"], "<gen>", "eval")) for c in gen]
+    hand_codes = [(h, compile(h["python_check"], "<hand>", "eval")) for h in hand]
+
+    # Mutate `facts` in place, evaluate every claim, undo. Nothing is copied and nothing
+    # is held: the mutant exists only for the duration of the `with` block.
+    gvecs = [[] for _ in gen_codes]
+    hvecs = [[] for _ in hand_codes]
+
+    ev = ClaimEvaluator(facts)
+
+    def _append(codes, vecs, kind, unmutated):
+        for i, (claim, code) in enumerate(codes):
+            try:
+                vecs[i].append(bool(ev(code)))
+            except Exception as exc:     # noqa: BLE001 - mutation broke an index
+                # A mutant may legitimately raise: moving a datum can put an index out
+                # of range, and `None` is the honest answer there. The UNMUTATED dataset
+                # cannot — a predicate that raises against the facts it was written for
+                # is broken, full stop. Recording None for it is silent in the worst
+                # way: a truth vector that is undefined at every sample is vacuously
+                # implied by every generated claim, so the hand claim lands in `covered`
+                # while proving nothing, and the published coverage percentage comes out
+                # right for the wrong reason. That is what 07-22 C021 did — a `facts`
+                # reference inside a lambda body, invisible to the old strict eval's
+                # locals — and nothing said so until someone read the truth vectors.
+                if unmutated:
+                    raise ClaimEvaluationError(
+                        f"{kind} claim {claim.get('id', '?')} raised against the "
+                        f"unmutated facts: {type(exc).__name__}: {exc}") from exc
+                vecs[i].append(None)
+
+    def evaluate(dataset, gv, hv, unmutated=False):
+        assert dataset is facts, "the sweep perturbs `facts` in place; there is one tree"
+        _append(gen_codes, gv, "generated", unmutated)
+        _append(hand_codes, hv, "hand", unmutated)
+
+    evaluate(facts, gvecs, hvecs, unmutated=True)
+    pristine = perturb.fingerprint(facts)
+    for n, writes in enumerate(mutants, 1):
+        with perturb.perturbed(writes):
+            evaluate(facts, gvecs, hvecs)
+        if n % 2000 == 0:
+            say(f"  ... {n}/{len(mutants)} mutants evaluated")
+    # The one thing deepcopy gave for free. A restore that misses a single site leaves
+    # every later mutant on a wrong baseline and still prints a plausible coverage
+    # figure, so this is checked rather than assumed.
+    assert perturb.unchanged(facts, pristine), \
+        "the mutation sweep did not restore facts — coverage below would be measured " \
+        "against a corrupted baseline"
+
+    out = {"single_value": _search(gen_codes, hand_codes, gvecs, hvecs,
+                                   {"sites": len(sites), "mutants": len(mutants),
+                                    "moves": 0, "two_site_log": None})}
+
+    for gran in two_site_modes:
+        log = {}
+        moves = move_sites(facts, gen + hand, gran, log)
+        say(f"two-site corpus: {len(moves)} value-preserving moves "
+            f"({gran} granularity)")
+        # Everything the bound threw away, named. A cap nobody can see is worse than a
+        # smaller one everybody can.
+        say(f"  fields never read by any predicate, so not moved: "
+            f"{log['dropped_fields'] or 'none'}")
+        say(f"  moves skipped because the source was too small to split (<2): "
+            f"{log['zero_source']}")
+        say(f"  round/field slots absent from the data: {log['absent_field']}")
+        say("  not enumerated by the bound: moves between two rounds of the SAME "
+            "match (no window and no total can see one), between different fields, "
+            "and between the two players")
+        if gran == "match":
+            say("  not enumerated at this granularity: moves out of any round but the "
+                "source match's largest, or into any but the target match's smallest "
+                "— so a claim that turns on WHICH round is touched is out of scope")
+        # Copies, not the shared lists: see the module note above on what leaks otherwise.
+        gv = [list(v) for v in gvecs]
+        hv = [list(v) for v in hvecs]
+        for n, site in enumerate(moves, 1):
+            with perturb.perturbed(move_writes(facts, site)):
+                evaluate(facts, gv, hv)
+            if n % 2000 == 0:
+                say(f"  ... {n}/{len(moves)} moves evaluated")
+        assert perturb.unchanged(facts, pristine), \
+            "the two-site sweep did not restore facts — coverage below would be " \
+            "measured against a corrupted baseline"
+        out[f"two_site_{gran}"] = _search(gen_codes, hand_codes, gv, hv,
+                                          {"sites": len(sites), "mutants": len(mutants),
+                                           "moves": len(moves), "two_site_log": log})
+
+    return out
+
+
+def measure(facts_path, hand_paths, generated_path=None, two_site=None,
+            samples=0, seed=DEFAULT_SEED, progress=None):
+    """Measure hand-claim coverage. `two_site` is None | 'match' | 'round'.
+
+    One mode of `measure_modes`, and nothing else — a caller wanting several granularities
+    should call that directly rather than this three times, since the single-value sweep
+    is the expensive part and it is the same sweep for every mode.
+
+    Returns a dict with sorted lists and NO percentages::
+
+        {'sites': int, 'mutants': int, 'moves': int,
+         'covered': [claim_id, ...], 'uncovered': [...], 'untested': [...],
+         'identical': [...], 'trivial_generated': [...],
+         'detail': {claim_id: {...}}, 'two_site_log': {...} | None}
+
+    Ids rather than claim objects, and sorted, so a caller diffing two runs gets a stable
+    answer that does not move with ledger order. No percentages, because the denominator
+    is the interesting part: `covered + uncovered` is the *testable* set and `untested` is
+    the rest, and a caller that wants a rate has to decide which it is quoting — 08-09 is
+    9/11 over eleven claims, and a bare 82% hides that. `identical` is a subset of
+    `covered`: those hand claims whose truth vector equals some generated claim's exactly.
+    `trivial_generated` names generated claims no mutant falsified, which imply nothing
+    and are excluded from the search.
+
+    `detail` carries what the lists cannot — which generated claim (or pair) implied each
+    covered claim, and the category and gloss of each uncovered one — so the CLI's output
+    comes out of this function's answer rather than out of a second traversal.
+
+    `progress` is called with each line the CLI prints during the sweep; leave it None to
+    run silently.
+    """
+    if two_site in ("off", ""):
+        two_site = None
+    modes = measure_modes(facts_path, hand_paths, generated_path=generated_path,
+                          two_site_modes=(two_site,) if two_site else (),
+                          samples=samples, seed=seed, progress=progress)
+    return modes[f"two_site_{two_site}"] if two_site else modes["single_value"]
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("facts")
+    ap.add_argument("--hand", nargs="+", required=True, help="hand-written ledgers")
+    ap.add_argument("--generated", help="generated ledger (default: build it now)")
+    ap.add_argument("--samples", type=int, default=0,
+                    help="subsample the mutation SITES (0 = every site, the default). "
+                         "Every perturbation kind is still tried at each site that "
+                         "survives the draw; this is the only sampled path in the tool.")
+    ap.add_argument("--seed", type=int, default=DEFAULT_SEED,
+                    help="seeds the --samples draw and nothing else — with --samples 0, "
+                         "the default, the output is byte-identical for every seed")
+    ap.add_argument("--two-site", choices=["off", "match", "round"], default="off",
+                    help="add value-preserving two-site moves (see move_sites for the "
+                         "bound). 'match' is one move per match pair, 'round' every "
+                         "cross-match round pair. Neither is capped or sampled.")
+    ap.add_argument("--min-coverage", type=float, default=0.0,
+                    help="exit non-zero if coverage falls below this fraction")
+    args = ap.parse_args(argv)
+
+    res = measure(args.facts, args.hand, generated_path=args.generated,
+                  two_site=args.two_site, samples=args.samples, seed=args.seed,
+                  progress=print)
+
+    if res["trivial_generated"]:
+        print("WARNING: generated claims never falsified by any mutation: "
+              f"{res['trivial_generated']}")
+
+    covered, uncovered, untested = res["covered"], res["uncovered"], res["untested"]
     testable = len(covered) + len(uncovered)
     frac = len(covered) / testable if testable else 0.0
-    exact_n = sum(1 for _, _, e in covered if e)
     print(f"\ncoverage: {len(covered)}/{testable} testable hand-written claims "
           f"({frac:.0%}) are implied by a generated claim "
-          f"({exact_n} of them behave identically)")
+          f"({len(res['identical'])} of them behave identically)")
     if untested:
-        print(f"  ({len(untested)} claims were never falsified by any sampled mutation, "
-              f"so this run cannot judge them: {[h['id'] for h in untested]})")
+        print(f"  ({len(untested)} claims were never falsified by any mutant in this "
+              f"corpus, so this run cannot judge them: {untested})")
     print("\ncovered:")
-    for h, g, e in covered:
-        print(f"  {h['id']} <- {g['id']} {g['family']}{'  (identical)' if e else ''}")
+    for cid in covered:
+        d = res["detail"][cid]
+        print(f"  {cid} <- {d['implied_by']} {d['family']}"
+              f"{'  (identical)' if d['identical'] else ''}")
     print("\nNOT covered (these stay hand-written):")
-    for h, _, _ in uncovered:
-        print(f"  {h['id']} [{h.get('category','?')}] {h['english_gloss'][:88]}")
+    for cid in uncovered:
+        d = res["detail"][cid]
+        print(f"  {cid} [{d['category']}] {d['gloss'][:88]}")
 
     if args.min_coverage and frac < args.min_coverage:
         print(f"\nFAIL: coverage {frac:.0%} below required {args.min_coverage:.0%}")

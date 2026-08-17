@@ -58,10 +58,13 @@ This distinction matters, so it is stated plainly rather than buried:
              └─►  extract2.ts   ──►  facts2.json ─┴─► must be byte-identical
                                         │
                                         ▼
-                          claims-*.json  (Cantonese sentence + integer predicate)
+   hand_claims*.py + generators.py  ──►  claims-*.json
+                                           (Cantonese sentence + one spec, rendered
+                                        │   to a Python predicate, a Dafny ensures
+                                        │   and SMT-LIB from that single source)
                                         │  every predicate must evaluate True
                                         ▼
-                          codegen_dafny.py  ──►  Facts.dfy + Claims_*.dfy
+                          pipeline/codegen.py  ──►  Facts.dfy + Claims.dfy
                                         │  no hand-typed data; regeneration must be
                                         │  byte-identical to what is committed
                                         ▼
@@ -149,16 +152,35 @@ mix, integer variance, and situational records.
 
 Coverage is measured rather than asserted. Comparing predicates as strings tells you
 nothing, since every predicate is true of the real data, so
-`pipeline/claims/equiv.py` applies **every single-value mutation** of the dataset
-(4,440 sites for the 7-match session; 7,019 for the 10-match one), and with `--two-site`
-a second family of **value-preserving moves**, and only counts a hand-written claim as
-covered when a generated claim cannot be true unless it is:
+`pipeline/claims/equiv.py` applies **every single-value mutation** of the dataset — every
+site, and at each site every perturbation kind (34,779 mutants over 7,019 sites on the
+10-match session) — and with `--two-site` a second family of **value-preserving moves**,
+and only counts a hand-written claim as covered when a generated claim cannot be true
+unless it is:
 
-| Session | single-value only | `--two-site match` |
-|---|---|---|
-| 2026-07-22 | 45 of 53 testable — **85%** | 44 of 53 — **83%** |
-| 2026-07-24 | 48 of 49 testable — **98%** | 48 of 49 — **98%** |
-| 2026-07-28 | 10 of 10 testable — **100%** | 6 of 10 — **60%** |
+| Session | single-value only | `--two-site match` | `--two-site round` |
+|---|---|---|---|
+| 2026-07-22 | 43 of 53 testable — **81%** | 42 of 53 — **79%** | 42 of 53 — **79%** |
+| 2026-07-24 | 48 of 50 testable — **96%** | 48 of 50 — **96%** | 47 of 50 — **94%** |
+| 2026-07-28 | 10 of 10 testable — **100%** | 6 of 10 — **60%** | 6 of 10 — **60%** |
+| 2026-08-01 | 13 of 13 testable — **100%** | 12 of 13 — **92%** | 12 of 13 — **92%** |
+| 2026-08-09 | 9 of 11 testable — **82%** | 8 of 11 — **73%** | 8 of 11 — **73%** |
+| 2026-08-14 | 16 of 19 testable — **84%** | 13 of 19 — **68%** | 13 of 19 — **68%** |
+
+Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
+them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
+never been measured in public, every `--two-site` figure quoted was a `match` upper bound,
+and the single-value figures were a *seeded sample* — one perturbation kind was drawn per
+site, so 2026-07-22 read 85% at the committed seed, 87% at seed 3 and 83% at seed 42, with
+the denominator moving too. Enumerating every kind costs ~5× the wall clock and settles
+that session at 81%. A figure that moved with an argument nobody varied had been reading as
+a property of the data.
+
+Two of these sit below the **≥85%** acceptance gate that P4 declared, and 2026-07-22 —
+the session the gate was declared on — is one of them at 81%. That is reported rather than
+enforced: one hand claim is worth 10.0 points on 2026-07-28, so no threshold exists that is
+both honest and stable, and a floor all six pass would sit at 60% and bless that session's
+artefact by definition. The gate compares **verdict sets**, not a percentage.
 
 **2026-07-28's 100% was an artefact, and the second family is what shows it.** Its hand
 claims are *windowed* — they compare matches 1-2 against matches 3-8 — and every window sum
@@ -174,12 +196,16 @@ family could not see it.
 The delta is **half** the source, not all of it. An earlier revision moved the whole value,
 which left every source round at 0 — a round with `pieces=0` but 48 lines cleared is not a
 dataset either extractor can emit, and a claim falsified only by an impossible dataset is
-not evidence. It also inflated the damage: under whole-value moves 2026-07-24 read 96%,
-under legal half-moves it is unchanged at 98%.
+not evidence. It also inflated the damage: on 2026-07-24 the whole-value family reported a
+coverage loss that the legal half-move family does not.
 
-`--two-site` is off by default. `match` granularity costs +50-60% wall clock; `round`
-granularity is exhaustive over round pairs and takes minutes, so a `match` figure is an
-**upper bound** on coverage and `round` should be re-run before publishing one.
+`match` granularity keeps one move per (source match, target match, player, field), and
+those moves are a strict **subset** of `round`'s — so a `match` figure bounds the
+implications by construction, and the column above is published only because `round` has
+now been measured for every session. The bound is on the implications, not on the fraction:
+extra mutants also make more claims falsifiable, which moves the denominator, so the two
+columns can differ in either direction. The weekly CI job is what re-measures `round`;
+the per-push job measures the two cheaper granularities.
 
 Claims that no single mutation can falsify are reported separately rather than counted.
 The remainder stay hand-written, which is the point: generation handles the recurring

@@ -43,6 +43,11 @@ ROUND_FIELDS = [
     "clears.tspin_quads",
     "clears.mini_tspin_singles", "clears.mini_tspin_doubles", "clears.mini_tspin_triples",
     "clears.allclear",
+    # The corpus's one BOOLEAN datum. Emitted as 0/1 (see _int_lit) so it needs no
+    # bool sort in Dafny and no Bool in SMT-LIB, and so the algebra compares it the
+    # way it compares everything else. Python needs no coercion at all: facts.json
+    # carries `true` and `True == 1` already holds.
+    "alive",
 ]
 LB_FIELDS = ["apm_x1000", "pps_x1000", "vs_x1000", "garbagesent",
              "garbagereceived", "kills"]
@@ -52,6 +57,16 @@ STR_ROUND_FIELDS = ["gameoverreason"]
 
 def _cap(pl):
     return pl[:1].upper() + pl[1:]
+
+
+def _int_lit(v):
+    """A facts.json scalar as an integer literal.
+
+    `bool` is a subclass of `int` in Python, so a raw f-string renders True as the
+    word `True` — which is not a Dafny int literal and not an SMT-LIB numeral. Both
+    emitters go through here, so the two backends cannot disagree about a bool.
+    """
+    return str(int(v)) if isinstance(v, bool) else str(v)
 
 
 def session_ledgers(report_dir):
@@ -71,11 +86,16 @@ def session_ledgers(report_dir):
 def partition_spec_ledgers(paths):
     """Split ledgers into the spec-carrying ones and the rest.
 
-    The 07-22 and 07-24 hand ledgers predate the spec algebra: they carry only a
-    `python_check`, are proved by their own committed codegen_dafny.py, and cannot be
-    rendered to SMT-LIB. Callers that can only consume specs use this and **name what
-    they left out** — a silent skip here would understate the artefact's coverage,
-    which is the one thing this repo will not do.
+    Callers that can only consume specs use this and **name what they left out** — a
+    silent skip would understate the artefact's coverage, which is the one thing this
+    repo will not do.
+
+    **`without` is empty for every ledger on disk.** It existed for 07-22's and 07-24's
+    hand ledgers, which carried only a `python_check` and were proved by their own
+    committed codegen_dafny.py; both are ported and both emitters are deleted, and no
+    tool in the repo can now produce a spec-less ledger. Kept as the narrowing contract
+    rather than deleted on sight — see the ROADMAP entry that files removing it, which
+    is a decision about the contract, not a tidy-up.
     """
     with_spec, without = [], []
     for p in paths:
@@ -110,6 +130,13 @@ def load_ledgers(paths):
     return claims
 
 
+# Every const name a rendered claim can mention. `nmatches` is the one that does NOT
+# start with m<digits>_, so the obvious `\bm\d+_...` pattern silently drops it — and
+# a const dropped here is not emitted at all, which is a Dafny resolution error rather
+# than a wrong answer. Both emitters share this pattern.
+CONST_REF = r"\b(?:m\d+_[A-Za-z0-9_]+|nmatches)\b"
+
+
 def referenced_consts(facts, claims):
     """Exactly the const names the claims' ensures clauses mention.
 
@@ -119,7 +146,7 @@ def referenced_consts(facts, claims):
     """
     names = set()
     for c in claims:
-        names.update(re.findall(r"\bm\d+_[A-Za-z0-9_]+\b", to_dafny(facts, c["spec"])))
+        names.update(re.findall(CONST_REF, to_dafny(facts, c["spec"])))
     return names
 
 
@@ -133,6 +160,8 @@ def emit_facts(facts, keep=None):
         "// comes from facts.json; nothing here is hand-written.",
         "",
     ]
+    if wanted("nmatches"):
+        lines.append(f"const nmatches: int := {len(facts['matches'])}")
     for mi, m in enumerate(facts["matches"]):
         lines.append("")
         lines.append(f"// ---- match {mi + 1} ({m['file']}) ----")
@@ -161,7 +190,7 @@ def emit_facts(facts, keep=None):
                         continue
                     name = f"m{mi}_r{ri}_{pl}_{dafny_suffix(f)}"
                     if wanted(name):
-                        lines.append(f"const {name}: int := {v}")
+                        lines.append(f"const {name}: int := {_int_lit(v)}")
                 for f in STR_ROUND_FIELDS:
                     if f not in p:
                         continue

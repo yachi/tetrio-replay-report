@@ -1,198 +1,1903 @@
 [
-  {
-    "id": "C001",
-    "canto": "今場 pinglamb 贏咗四場、yachi 三場，pinglamb 反手攞返個系列",
-    "english_gloss": "pinglamb won 4 matches, yachi 3 — pinglamb takes the series",
-    "category": "score",
-    "python_check": "sum(1 for m in facts['matches'] if m['winner']=='pinglamb')==4 and sum(1 for m in facts['matches'] if m['winner']=='yachi')==3"
+ {
+  "id": "C001",
+  "category": "score",
+  "canto": "今場 pinglamb 贏咗四場、yachi 三場，pinglamb 反手攞返個系列",
+  "english_gloss": "pinglamb won 4 matches, yachi 3 — pinglamb takes the series",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    }
+   ]
   },
-  {
-    "id": "C002",
-    "canto": "數返總局數，pinglamb 贏咗 29 局，yachi 得 21 局",
-    "english_gloss": "round wins: pinglamb 29, yachi 21",
-    "category": "score",
-    "python_check": "sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')==29 and sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')==21"
+  "python_check": "(sum(1 for m in facts['matches'] if m['winner']=='pinglamb') == 4) and (sum(1 for m in facts['matches'] if m['winner']=='yachi') == 3)"
+ },
+ {
+  "id": "C002",
+  "category": "score",
+  "canto": "數返總局數，pinglamb 贏咗 29 局，yachi 得 21 局",
+  "english_gloss": "round wins: pinglamb 29, yachi 21",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 29
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 21
+     }
+    }
+   ]
   },
-  {
-    "id": "C003",
-    "canto": "開場第一 match，pinglamb 5:0 直落橫掃 yachi",
-    "english_gloss": "match 1: pinglamb sweeps yachi 5-0",
-    "category": "score",
-    "python_check": "facts['matches'][0]['winner']=='pinglamb' and facts['matches'][0]['score']=={'yachi':0,'pinglamb':5}"
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') == 29) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') == 21)"
+ },
+ {
+  "id": "C003",
+  "category": "score",
+  "canto": "開場第一 match，pinglamb 5:0 直落橫掃 yachi",
+  "english_gloss": "match 1: pinglamb sweeps yachi 5-0",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    }
+   ]
   },
-  {
-    "id": "C004",
-    "canto": "去到 m4，pinglamb 再一次 5:0 橫掃，一局都唔俾 yachi",
-    "english_gloss": "match 4: pinglamb sweeps 5-0 again",
-    "category": "score",
-    "python_check": "facts['matches'][3]['winner']=='pinglamb' and facts['matches'][3]['score']=={'yachi':0,'pinglamb':5}"
+  "python_check": "(facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][0]['score']['yachi'] == 0) and (facts['matches'][0]['score']['pinglamb'] == 5)"
+ },
+ {
+  "id": "C004",
+  "category": "score",
+  "canto": "去到 m4，pinglamb 再一次 5:0 橫掃，一局都唔俾 yachi",
+  "english_gloss": "match 4: pinglamb sweeps 5-0 again",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 3,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 3,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 3,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    }
+   ]
   },
-  {
-    "id": "C005",
-    "canto": "全場得兩個 5:0 橫掃，兩個都係 pinglamb 造出嚟",
-    "english_gloss": "the only two 5-0 sweeps of the session both belong to pinglamb",
-    "category": "score",
-    "python_check": "sum(1 for m in facts['matches'] if set(m['score'].values())=={0,5})==2 and all(m['winner']=='pinglamb' for m in facts['matches'] if set(m['score'].values())=={0,5})"
+  "python_check": "(facts['matches'][3]['winner']=='pinglamb') and (facts['matches'][3]['score']['yachi'] == 0) and (facts['matches'][3]['score']['pinglamb'] == 5)"
+ },
+ {
+  "id": "C005",
+  "category": "score",
+  "canto": "全場得兩個 5:0 橫掃，兩個都係 pinglamb 造出嚟",
+  "english_gloss": "the only two 5-0 sweeps of the session both belong to pinglamb",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_margin",
+      "margin": 5
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 3,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 3,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 3,
+     "pl": "pinglamb"
+    }
+   ]
   },
-  {
-    "id": "C006",
-    "canto": "由 m3 尾到 m4 尾，pinglamb 跨住兩場連贏九局",
-    "english_gloss": "pinglamb won 9 consecutive rounds spanning the end of m3 into m4",
-    "category": "clutch",
-    "python_check": "(lambda a: a[16:25]==['pinglamb']*9 and a[15]=='yachi' and a[25]=='yachi')([r['winner'] for m in facts['matches'] for r in m['rounds']])"
+  "python_check": "(sum(1 for m in facts['matches'] if max(m['score'].values())-min(m['score'].values())==5) == 2) and (facts['matches'][0]['score']['yachi'] == 0) and (facts['matches'][0]['score']['pinglamb'] == 5) and (facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][3]['score']['yachi'] == 0) and (facts['matches'][3]['score']['pinglamb'] == 5) and (facts['matches'][3]['winner']=='pinglamb')"
+ },
+ {
+  "id": "C006",
+  "category": "clutch",
+  "canto": "由 m3 尾到 m4 尾，pinglamb 跨住兩場連贏九局",
+  "english_gloss": "pinglamb won 9 consecutive rounds spanning the end of m3 into m4",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     4
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi"
+   ]
   },
-  {
-    "id": "C007",
-    "canto": "m5 第二局，pinglamb 打出成晚冇設限之下最勁嘅單局 APM，約 95.4——不過嗰局係一局短打，速率紀錄唔計短局",
-    "english_gloss": "m5 round 2 (index 1): pinglamb's ~95.4 APM is the session's highest single-round APM",
-    "category": "spike",
-    "python_check": "facts['matches'][4]['rounds'][1]['players']['pinglamb']['apm_x1000']==95498 and 95498==max(x['apm_x1000'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values()) and 95000<=95498<96000"
+  "python_check": "((facts['matches'][2]['rounds'][3]['winner'], facts['matches'][2]['rounds'][4]['winner'], facts['matches'][2]['rounds'][5]['winner'], facts['matches'][2]['rounds'][6]['winner'], facts['matches'][2]['rounds'][7]['winner'], facts['matches'][3]['rounds'][0]['winner'], facts['matches'][3]['rounds'][1]['winner'], facts['matches'][3]['rounds'][2]['winner'], facts['matches'][3]['rounds'][3]['winner'], facts['matches'][3]['rounds'][4]['winner'], facts['matches'][4]['rounds'][0]['winner'],) == ('yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi',))"
+ },
+ {
+  "id": "C007",
+  "category": "spike",
+  "canto": "m5 第二局，pinglamb 打出成晚冇設限之下最勁嘅單局 APM，約 95.4——不過嗰局係一局短打，速率紀錄唔計短局",
+  "english_gloss": "m5 round 2 (index 1): pinglamb's ~95.4 APM is the session's highest single-round APM",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 4,
+      "ri": 1,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 95498
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "apm_x1000",
+          "op": ">",
+          "v": 95498
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "apm_x1000",
+          "op": ">",
+          "v": 95498
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "apm_x1000",
+          "op": "==",
+          "v": 95498
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "apm_x1000",
+          "op": "==",
+          "v": 95498
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 4,
+      "ri": 1,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "lo": 95000,
+     "hi": 96000
+    }
+   ]
   },
-  {
-    "id": "C008",
-    "canto": "同一局 pinglamb 個 VS 約 178.4，同樣係冇設限之下全場最高，同樣因為局太短唔計入紀錄",
-    "english_gloss": "same round: pinglamb's ~178.4 VS is the session's highest single-round VS",
-    "category": "spike",
-    "python_check": "facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000']==178457 and 178457==max(x['vs_x1000'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values()) and 178000<=178457<179000"
+  "python_check": "(facts['matches'][4]['rounds'][1]['players']['pinglamb']['apm_x1000'] == 95498) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] > 95498) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000'] > 95498)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] == 95498) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000'] == 95498)) >= 1) and (95000 <= facts['matches'][4]['rounds'][1]['players']['pinglamb']['apm_x1000'] < 96000)"
+ },
+ {
+  "id": "C008",
+  "category": "spike",
+  "canto": "同一局 pinglamb 個 VS 約 178.4，同樣係冇設限之下全場最高，同樣因為局太短唔計入紀錄",
+  "english_gloss": "same round: pinglamb's ~178.4 VS is the session's highest single-round VS",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 4,
+      "ri": 1,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 178457
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "vs_x1000",
+          "op": ">",
+          "v": 178457
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "vs_x1000",
+          "op": ">",
+          "v": 178457
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "vs_x1000",
+          "op": "==",
+          "v": 178457
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "vs_x1000",
+          "op": "==",
+          "v": 178457
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 4,
+      "ri": 1,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "lo": 178000,
+     "hi": 179000
+    }
+   ]
   },
-  {
-    "id": "C009",
-    "canto": "呢一局淨係約 21 秒就完，係全場最短嘅一局，pinglamb 贏",
-    "english_gloss": "that round lasted ~21s, the shortest round of the session, won by pinglamb",
-    "category": "duration",
-    "python_check": "facts['matches'][4]['rounds'][1]['winner']=='pinglamb' and max(x['lifetime'] for x in facts['matches'][4]['rounds'][1]['players'].values())==21023 and 21023==min(max(r['players']['yachi']['lifetime'],r['players']['pinglamb']['lifetime']) for m in facts['matches'] for r in m['rounds']) and 21000<=21023<22000"
+  "python_check": "(facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000'] == 178457) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['vs_x1000'] > 178457) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['vs_x1000'] > 178457)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['vs_x1000'] == 178457) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['vs_x1000'] == 178457)) >= 1) and (178000 <= facts['matches'][4]['rounds'][1]['players']['pinglamb']['vs_x1000'] < 179000)"
+ },
+ {
+  "id": "C009",
+  "category": "duration",
+  "canto": "呢一局淨係約 21 秒就完，係全場最短嘅一局，pinglamb 贏",
+  "english_gloss": "that round lasted ~21s, the shortest round of the session, won by pinglamb",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 4,
+     "ri": 1,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "dur",
+      "mi": 4,
+      "ri": 1
+     },
+     "b": {
+      "e": "lit",
+      "v": 21023
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "count_rounds",
+        "cond": {
+         "c": "dur_cmp",
+         "op": "<",
+         "v": 21023
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "count_rounds",
+        "cond": {
+         "c": "dur_cmp",
+         "op": "==",
+         "v": 21023
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "dur",
+      "mi": 4,
+      "ri": 1
+     },
+     "lo": 21000,
+     "hi": 22000
+    }
+   ]
   },
-  {
-    "id": "C010",
-    "canto": "m5 第八局 pinglamb 一下打出 17 嘅單次 spike，係全場最大嘅一 spike",
-    "english_gloss": "m5 round 8 (index 7): pinglamb's maxspike of 17 is the biggest single spike of the session",
-    "category": "spike",
-    "python_check": "facts['matches'][4]['rounds'][7]['players']['pinglamb']['maxspike']==17 and 17==max(x['maxspike'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values())"
+  "python_check": "(facts['matches'][4]['rounds'][1]['winner']=='pinglamb') and (max(d['lifetime'] for d in facts['matches'][4]['rounds'][1]['players'].values()) == 21023) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) < 21023) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) == 21023) >= 1) and (21000 <= max(d['lifetime'] for d in facts['matches'][4]['rounds'][1]['players'].values()) < 22000)"
+ },
+ {
+  "id": "C010",
+  "category": "spike",
+  "canto": "m5 第八局 pinglamb 一下打出 17 嘅單次 spike，係全場最大嘅一 spike",
+  "english_gloss": "m5 round 8 (index 7): pinglamb's maxspike of 17 is the biggest single spike of the session",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 4,
+      "ri": 7,
+      "pl": "pinglamb",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 17
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "maxspike",
+          "op": ">",
+          "v": 17
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "maxspike",
+          "op": ">",
+          "v": 17
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "maxspike",
+          "op": "==",
+          "v": 17
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "maxspike",
+          "op": "==",
+          "v": 17
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    }
+   ]
   },
-  {
-    "id": "C011",
-    "canto": "m3 第三局係全場最長嘅一局，打足約 240 秒，最後 yachi 頂硬上贏咗",
-    "english_gloss": "m3 round 3 (index 2) is the longest round, ~240s, won by yachi",
-    "category": "duration",
-    "python_check": "facts['matches'][2]['rounds'][2]['winner']=='yachi' and max(x['lifetime'] for x in facts['matches'][2]['rounds'][2]['players'].values())==240131 and 240131==max(max(r['players']['yachi']['lifetime'],r['players']['pinglamb']['lifetime']) for m in facts['matches'] for r in m['rounds']) and 240000<=240131<241000"
+  "python_check": "(facts['matches'][4]['rounds'][7]['players']['pinglamb']['maxspike'] == 17) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike'] > 17) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike'] > 17)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike'] == 17) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike'] == 17)) >= 1)"
+ },
+ {
+  "id": "C011",
+  "category": "duration",
+  "canto": "m3 第三局係全場最長嘅一局，打足約 240 秒，最後 yachi 頂硬上贏咗",
+  "english_gloss": "m3 round 3 (index 2) is the longest round, ~240s, won by yachi",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "dur",
+      "mi": 2,
+      "ri": 2
+     },
+     "b": {
+      "e": "lit",
+      "v": 240131
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "count_rounds",
+        "cond": {
+         "c": "dur_cmp",
+         "op": ">",
+         "v": 240131
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "count_rounds",
+        "cond": {
+         "c": "dur_cmp",
+         "op": "==",
+         "v": 240131
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "dur",
+      "mi": 2,
+      "ri": 2
+     },
+     "lo": 240000,
+     "hi": 241000
+    }
+   ]
   },
-  {
-    "id": "C012",
-    "canto": "呢場馬拉松 yachi 面對 177 嘅射埋嚟攻擊，比對面 158 仲多，都照贏",
-    "english_gloss": "in that marathon yachi won facing 177 queued attack vs pinglamb's 158 — more incoming",
-    "category": "comeback",
-    "python_check": "sum(e['amt'] for e in facts['matches'][2]['rounds'][2]['players']['yachi']['garbage_events'])==177 and sum(e['amt'] for e in facts['matches'][2]['rounds'][2]['players']['pinglamb']['garbage_events'])==158"
+  "python_check": "(facts['matches'][2]['rounds'][2]['winner']=='yachi') and (max(d['lifetime'] for d in facts['matches'][2]['rounds'][2]['players'].values()) == 240131) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) > 240131) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) == 240131) >= 1) and (240000 <= max(d['lifetime'] for d in facts['matches'][2]['rounds'][2]['players'].values()) < 241000)"
+ },
+ {
+  "id": "C012",
+  "category": "comeback",
+  "canto": "呢場馬拉松 yachi 面對 177 嘅射埋嚟攻擊，比對面 158 仲多，都照贏",
+  "english_gloss": "in that marathon yachi won facing 177 queued attack vs pinglamb's 158 — more incoming",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "yachi",
+      "mi": 2,
+      "ri": 2
+     },
+     "b": {
+      "e": "lit",
+      "v": 177
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "pinglamb",
+      "mi": 2,
+      "ri": 2
+     },
+     "b": {
+      "e": "lit",
+      "v": 158
+     }
+    }
+   ]
   },
-  {
-    "id": "C013",
-    "canto": "呢場馬拉松 yachi 疊出全場最長嘅一條 8 combo",
-    "english_gloss": "in that marathon yachi hit an 8-combo, the session's top combo",
-    "category": "style",
-    "python_check": "facts['matches'][2]['rounds'][2]['players']['yachi']['topcombo']==8 and 8==max(x['topcombo'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values())"
+  "python_check": "(sum(g['amt'] for g in facts['matches'][2]['rounds'][2]['players']['yachi']['garbage_events']) == 177) and (sum(g['amt'] for g in facts['matches'][2]['rounds'][2]['players']['pinglamb']['garbage_events']) == 158)"
+ },
+ {
+  "id": "C013",
+  "category": "style",
+  "canto": "呢場馬拉松 yachi 疊出全場最長嘅一條 8 combo",
+  "english_gloss": "in that marathon yachi hit an 8-combo, the session's top combo",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 2,
+      "pl": "yachi",
+      "f": "topcombo"
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "topcombo",
+          "op": ">",
+          "v": 8
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "topcombo",
+          "op": ">",
+          "v": 8
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "topcombo",
+          "op": "==",
+          "v": 8
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "topcombo",
+          "op": "==",
+          "v": 8
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    }
+   ]
   },
-  {
-    "id": "C014",
-    "canto": "最後 m7 打足九局先分到勝負，yachi 5:4 收火",
-    "english_gloss": "m7 went the full 9 rounds, yachi won 5-4",
-    "category": "clutch",
-    "python_check": "len(facts['matches'][6]['rounds'])==9 and facts['matches'][6]['score']=={'yachi':5,'pinglamb':4} and facts['matches'][6]['winner']=='yachi'"
+  "python_check": "(facts['matches'][2]['rounds'][2]['players']['yachi']['topcombo'] == 8) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topcombo'] > 8) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topcombo'] > 8)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topcombo'] == 8) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topcombo'] == 8)) >= 1)"
+ },
+ {
+  "id": "C014",
+  "category": "clutch",
+  "canto": "最後 m7 打足九局先分到勝負，yachi 5:4 收火",
+  "english_gloss": "m7 went the full 9 rounds, yachi won 5-4",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "nrounds",
+      "mi": 6
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 6,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 6,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 6,
+     "pl": "yachi"
+    }
+   ]
   },
-  {
-    "id": "C015",
-    "canto": "m7 係全場唯一一場要打夠九局嘅 match",
-    "english_gloss": "m7 is the only match that reached 9 rounds",
-    "category": "duration",
-    "python_check": "len(facts['matches'][6]['rounds'])==9 and 9==max(len(m['rounds']) for m in facts['matches']) and sum(1 for m in facts['matches'] if len(m['rounds'])==9)==1"
+  "python_check": "(len(facts['matches'][6]['rounds']) == 9) and (facts['matches'][6]['score']['yachi'] == 5) and (facts['matches'][6]['score']['pinglamb'] == 4) and (facts['matches'][6]['winner']=='yachi')"
+ },
+ {
+  "id": "C015",
+  "category": "duration",
+  "canto": "m7 係全場唯一一場要打夠九局嘅 match",
+  "english_gloss": "m7 is the only match that reached 9 rounds",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "nrounds",
+      "mi": 6
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 0
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 1
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 2
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 3
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 4
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "nrounds",
+      "mi": 5
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    }
+   ]
   },
-  {
-    "id": "C016",
-    "canto": "m7 局勢反反覆覆：yachi 先贏兩局，pinglamb 連追三局反超，之後 yachi 又追返",
-    "english_gloss": "m7 seesaw: yachi wins first two, pinglamb takes three straight to lead, then yachi claws back",
-    "category": "clutch",
-    "python_check": "[r['winner'] for r in facts['matches'][6]['rounds']]==['yachi','yachi','pinglamb','pinglamb','pinglamb','yachi','yachi','pinglamb','yachi']"
+  "python_check": "(len(facts['matches'][6]['rounds']) == 9) and (len(facts['matches'][0]['rounds']) <= 8) and (len(facts['matches'][1]['rounds']) <= 8) and (len(facts['matches'][2]['rounds']) <= 8) and (len(facts['matches'][3]['rounds']) <= 8) and (len(facts['matches'][4]['rounds']) <= 8) and (len(facts['matches'][5]['rounds']) <= 8)"
+ },
+ {
+  "id": "C016",
+  "category": "clutch",
+  "canto": "m7 局勢反反覆覆：yachi 先贏兩局，pinglamb 連追三局反超，之後 yachi 又追返",
+  "english_gloss": "m7 seesaw: yachi wins first two, pinglamb takes three straight to lead, then yachi claws back",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "nrounds",
+      "mi": 6
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "round_seq",
+     "pairs": [
+      [
+       6,
+       0
+      ],
+      [
+       6,
+       1
+      ],
+      [
+       6,
+       2
+      ],
+      [
+       6,
+       3
+      ],
+      [
+       6,
+       4
+      ],
+      [
+       6,
+       5
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       6,
+       7
+      ],
+      [
+       6,
+       8
+      ]
+     ],
+     "winners": [
+      "yachi",
+      "yachi",
+      "pinglamb",
+      "pinglamb",
+      "pinglamb",
+      "yachi",
+      "yachi",
+      "pinglamb",
+      "yachi"
+     ]
+    }
+   ]
   },
-  {
-    "id": "C017",
-    "canto": "pinglamb 打平 4:4 逼出決勝局，yachi 最後嗰局頂硬上先贏到",
-    "english_gloss": "pinglamb tied m7 at 4-4 (round 8), forcing a final round that yachi won",
-    "category": "clutch",
-    "python_check": "facts['matches'][6]['rounds'][7]['winner']=='pinglamb' and facts['matches'][6]['rounds'][8]['winner']=='yachi'"
+  "python_check": "(len(facts['matches'][6]['rounds']) == 9) and ((facts['matches'][6]['rounds'][0]['winner'], facts['matches'][6]['rounds'][1]['winner'], facts['matches'][6]['rounds'][2]['winner'], facts['matches'][6]['rounds'][3]['winner'], facts['matches'][6]['rounds'][4]['winner'], facts['matches'][6]['rounds'][5]['winner'], facts['matches'][6]['rounds'][6]['winner'], facts['matches'][6]['rounds'][7]['winner'], facts['matches'][6]['rounds'][8]['winner'],) == ('yachi', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'yachi', 'pinglamb', 'yachi',))"
+ },
+ {
+  "id": "C017",
+  "category": "clutch",
+  "canto": "pinglamb 打平 4:4 逼出決勝局，yachi 最後嗰局頂硬上先贏到",
+  "english_gloss": "pinglamb tied m7 at 4-4 (round 8), forcing a final round that yachi won",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 6,
+     "ri": 7,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 6,
+     "ri": 8,
+     "pl": "yachi"
+    }
+   ]
   },
-  {
-    "id": "C018",
-    "canto": "m2 第三局 pinglamb 一局插足 18 個 T-spin，係全場之最，但係嗰局都輸咗俾 yachi",
-    "english_gloss": "m2 round 3 (index 2): pinglamb's 18 T-spins is the session max in one round, yet lost the round to yachi",
-    "category": "style",
-    "python_check": "facts['matches'][1]['rounds'][2]['players']['pinglamb']['tspins']==18 and 18==max(x['tspins'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values()) and facts['matches'][1]['rounds'][2]['winner']=='yachi'"
+  "python_check": "(facts['matches'][6]['rounds'][7]['winner']=='pinglamb') and (facts['matches'][6]['rounds'][8]['winner']=='yachi')"
+ },
+ {
+  "id": "C018",
+  "category": "style",
+  "canto": "m2 第三局 pinglamb 一局插足 18 個 T-spin，係全場之最，但係嗰局都輸咗俾 yachi",
+  "english_gloss": "m2 round 3 (index 2): pinglamb's 18 T-spins is the session max in one round, yet lost the round to yachi",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 2,
+      "pl": "pinglamb",
+      "f": "tspins"
+     },
+     "b": {
+      "e": "lit",
+      "v": 18
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "tspins",
+          "op": ">",
+          "v": 18
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "tspins",
+          "op": ">",
+          "v": 18
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "tspins",
+          "op": "==",
+          "v": 18
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "tspins",
+          "op": "==",
+          "v": 18
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 2,
+     "pl": "yachi"
+    }
+   ]
   },
-  {
-    "id": "C019",
-    "canto": "m6 第五局 pinglamb 疊到 8 條 back-to-back，係全場最長嘅 B2B chain",
-    "english_gloss": "m6 round 5 (index 4): pinglamb's top B2B of 8 is the session's longest back-to-back chain",
-    "category": "style",
-    "python_check": "facts['matches'][5]['rounds'][4]['players']['pinglamb']['topbtb']==8 and 8==max(x['topbtb'] for m in facts['matches'] for r in m['rounds'] for x in r['players'].values())"
+  "python_check": "(facts['matches'][1]['rounds'][2]['players']['pinglamb']['tspins'] == 18) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['tspins'] > 18) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['tspins'] > 18)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['tspins'] == 18) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['tspins'] == 18)) >= 1) and (facts['matches'][1]['rounds'][2]['winner']=='yachi')"
+ },
+ {
+  "id": "C019",
+  "category": "style",
+  "canto": "m6 第五局 pinglamb 疊到 8 條 back-to-back，係全場最長嘅 B2B chain",
+  "english_gloss": "m6 round 5 (index 4): pinglamb's top B2B of 8 is the session's longest back-to-back chain",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 5,
+      "ri": 4,
+      "pl": "pinglamb",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "topbtb",
+          "op": ">",
+          "v": 8
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "topbtb",
+          "op": ">",
+          "v": 8
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 0
+       }
+      },
+      {
+       "p": "ge",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "yachi",
+          "f": "topbtb",
+          "op": "==",
+          "v": 8
+         }
+        },
+        "b": {
+         "e": "count_rounds",
+         "cond": {
+          "c": "field_cmp",
+          "pl": "pinglamb",
+          "f": "topbtb",
+          "op": "==",
+          "v": 8
+         }
+        }
+       },
+       "b": {
+        "e": "lit",
+        "v": 1
+       }
+      }
+     ]
+    }
+   ]
   },
-  {
-    "id": "C020",
-    "canto": "m4 嗰場 pinglamb 個 match APM 高達約 64.9，係全場所有 match 最高",
-    "english_gloss": "m4: pinglamb's match APM ~64.9 is the highest match-level APM of the session",
-    "category": "pace",
-    "python_check": "facts['matches'][3]['leaderboard']['pinglamb']['apm_x1000']==64901 and 64901==max(m['leaderboard'][u]['apm_x1000'] for m in facts['matches'] for u in m['leaderboard']) and 64000<=64901<65000"
+  "python_check": "(facts['matches'][5]['rounds'][4]['players']['pinglamb']['topbtb'] == 8) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topbtb'] > 8) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topbtb'] > 8)) == 0) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topbtb'] == 8) + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topbtb'] == 8)) >= 1)"
+ },
+ {
+  "id": "C020",
+  "category": "pace",
+  "canto": "m4 嗰場 pinglamb 個 match APM 高達約 64.9，係全場所有 match 最高",
+  "english_gloss": "m4: pinglamb's match APM ~64.9 is the highest match-level APM of the session",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 4,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 4,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 5,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 5,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 6,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "lb",
+      "mi": 6,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 64901
+     }
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "lo": 64000,
+     "hi": 65000
+    }
+   ]
   },
-  {
-    "id": "C021",
-    "canto": "計返殺人數，pinglamb 收咗 29 條命，yachi 得 21 條",
-    "english_gloss": "total kills: pinglamb 29, yachi 21",
-    "category": "attack",
-    "python_check": "sum(m['leaderboard']['pinglamb']['kills'] for m in facts['matches'])==29 and sum(m['leaderboard']['yachi']['kills'] for m in facts['matches'])==21"
+  "python_check": "(facts['matches'][3]['leaderboard']['pinglamb']['apm_x1000'] == 64901) and (facts['matches'][0]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][0]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][1]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][1]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][2]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][2]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][3]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][3]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][4]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][4]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][5]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][5]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (facts['matches'][6]['leaderboard']['yachi']['apm_x1000'] <= 64901) and (facts['matches'][6]['leaderboard']['pinglamb']['apm_x1000'] <= 64901) and (64000 <= facts['matches'][3]['leaderboard']['pinglamb']['apm_x1000'] < 65000)"
+ },
+ {
+  "id": "C021",
+  "category": "attack",
+  "canto": "計返殺人數，pinglamb 收咗 29 條命，yachi 得 21 條",
+  "english_gloss": "total kills: pinglamb 29, yachi 21",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_lb",
+      "pl": "pinglamb",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 29
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_lb",
+      "pl": "yachi",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 21
+     }
+    }
+   ]
   },
-  {
-    "id": "C022",
-    "canto": "有樣嘢好諷刺：七場 match 入面 yachi 場場疊得快過 pinglamb（match PPS 全部高），但係都輸咗個系列",
-    "english_gloss": "yachi's match PPS was higher than pinglamb's in all 7 matches, yet still lost the series",
-    "category": "pace",
-    "python_check": "sum(1 for m in facts['matches'] if m['leaderboard']['yachi']['pps_x1000']>m['leaderboard']['pinglamb']['pps_x1000'])==7"
+  "python_check": "(sum(m['leaderboard']['pinglamb']['kills'] for m in facts['matches']) == 29) and (sum(m['leaderboard']['yachi']['kills'] for m in facts['matches']) == 21)"
+ },
+ {
+  "id": "C022",
+  "category": "pace",
+  "canto": "有樣嘢好諷刺：七場 match 入面 yachi 場場疊得快過 pinglamb（match PPS 全部高），但係都輸咗個系列",
+  "english_gloss": "yachi's match PPS was higher than pinglamb's in all 7 matches, yet still lost the series",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 3,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 4,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 4,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 5,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 5,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 6,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 6,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    }
+   ]
   },
-  {
-    "id": "C023",
-    "canto": "輸咗個系列都好，yachi 最後兩場 m6 同 m7 連贏，冇俾 pinglamb 攞多個 5:0 面",
-    "english_gloss": "despite losing the series, yachi won the last two matches m6 and m7",
-    "category": "comeback",
-    "python_check": "facts['matches'][5]['winner']=='yachi' and facts['matches'][6]['winner']=='yachi'"
+  "python_check": "(facts['matches'][0]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][0]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][1]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][1]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][2]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][2]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][3]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][3]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][4]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][4]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][5]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][5]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][6]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][6]['leaderboard']['pinglamb']['pps_x1000'])"
+ },
+ {
+  "id": "C023",
+  "category": "comeback",
+  "canto": "輸咗個系列都好，yachi 最後兩場 m6 同 m7 連贏，冇俾 pinglamb 攞多個 5:0 面",
+  "english_gloss": "despite losing the series, yachi won the last two matches m6 and m7",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 5,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 6,
+     "pl": "yachi"
+    }
+   ]
   },
-  {
-    "id": "C024",
-    "canto": "m7 最後決勝局打得好快，約 24 秒就分咗勝負，yachi 贏",
-    "english_gloss": "m7 final round (index 8) was quick, ~24s, won by yachi",
-    "category": "duration",
-    "python_check": "facts['matches'][6]['rounds'][8]['winner']=='yachi' and max(x['lifetime'] for x in facts['matches'][6]['rounds'][8]['players'].values())==24942 and 24000<=24942<25000"
+  "python_check": "(facts['matches'][5]['winner']=='yachi') and (facts['matches'][6]['winner']=='yachi')"
+ },
+ {
+  "id": "C024",
+  "category": "duration",
+  "canto": "m7 最後決勝局打得好快，約 24 秒就分咗勝負，yachi 贏",
+  "english_gloss": "m7 final round (index 8) was quick, ~24s, won by yachi",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 6,
+     "ri": 8,
+     "pl": "yachi"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "dur",
+      "mi": 6,
+      "ri": 8
+     },
+     "b": {
+      "e": "lit",
+      "v": 24942
+     }
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "dur",
+      "mi": 6,
+      "ri": 8
+     },
+     "lo": 24000,
+     "hi": 25000
+    }
+   ]
   },
-  {
-    "id": "C025",
-    "canto": "m2 yachi 反手 5:2 贏返嚟",
-    "english_gloss": "m2: yachi wins 5-2",
-    "category": "score",
-    "python_check": "facts['matches'][1]['score']=={'yachi':5,'pinglamb':2} and facts['matches'][1]['winner']=='yachi'"
+  "python_check": "(facts['matches'][6]['rounds'][8]['winner']=='yachi') and (max(d['lifetime'] for d in facts['matches'][6]['rounds'][8]['players'].values()) == 24942) and (24000 <= max(d['lifetime'] for d in facts['matches'][6]['rounds'][8]['players'].values()) < 25000)"
+ },
+ {
+  "id": "C025",
+  "category": "score",
+  "canto": "m2 yachi 反手 5:2 贏返嚟",
+  "english_gloss": "m2: yachi wins 5-2",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 1,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 1,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 1,
+     "pl": "yachi"
+    }
+   ]
   },
-  {
-    "id": "C026",
-    "canto": "m3 最後 pinglamb 5:3 收咗呢場",
-    "english_gloss": "m3: pinglamb wins 5-3",
-    "category": "score",
-    "python_check": "facts['matches'][2]['score']=={'yachi':3,'pinglamb':5} and facts['matches'][2]['winner']=='pinglamb'"
+  "python_check": "(facts['matches'][1]['score']['yachi'] == 5) and (facts['matches'][1]['score']['pinglamb'] == 2) and (facts['matches'][1]['winner']=='yachi')"
+ },
+ {
+  "id": "C026",
+  "category": "score",
+  "canto": "m3 最後 pinglamb 5:3 收咗呢場",
+  "english_gloss": "m3: pinglamb wins 5-3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 2,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 2,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 2,
+     "pl": "pinglamb"
+    }
+   ]
   },
-  {
-    "id": "C027",
-    "canto": "m5 pinglamb 一路壓住 5:3 攞落",
-    "english_gloss": "m5: pinglamb wins 5-3",
-    "category": "score",
-    "python_check": "facts['matches'][4]['score']=={'yachi':3,'pinglamb':5} and facts['matches'][4]['winner']=='pinglamb'"
+  "python_check": "(facts['matches'][2]['score']['yachi'] == 3) and (facts['matches'][2]['score']['pinglamb'] == 5) and (facts['matches'][2]['winner']=='pinglamb')"
+ },
+ {
+  "id": "C027",
+  "category": "score",
+  "canto": "m5 pinglamb 一路壓住 5:3 攞落",
+  "english_gloss": "m5: pinglamb wins 5-3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 4,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 4,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 4,
+     "pl": "pinglamb"
+    }
+   ]
   },
-  {
-    "id": "C028",
-    "canto": "m6 yachi 反手 5:3 贏返",
-    "english_gloss": "m6: yachi wins 5-3",
-    "category": "score",
-    "python_check": "facts['matches'][5]['score']=={'yachi':5,'pinglamb':3} and facts['matches'][5]['winner']=='yachi'"
-  }
+  "python_check": "(facts['matches'][4]['score']['yachi'] == 3) and (facts['matches'][4]['score']['pinglamb'] == 5) and (facts['matches'][4]['winner']=='pinglamb')"
+ },
+ {
+  "id": "C028",
+  "category": "score",
+  "canto": "m6 yachi 反手 5:3 贏返",
+  "english_gloss": "m6: yachi wins 5-3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 5,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 5,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 5,
+     "pl": "yachi"
+    }
+   ]
+  },
+  "python_check": "(facts['matches'][5]['score']['yachi'] == 5) and (facts['matches'][5]['score']['pinglamb'] == 3) and (facts['matches'][5]['winner']=='yachi')"
+ }
 ]

@@ -14,18 +14,31 @@
  * global-max gate is now losing a forecast and the slot-local rewrite is worth doing after all; the
  * gate turns that latent decision into a failing test on the data that forces it.
  *
- * IT HAS FIRED (2026-08-10). One event — 2026-08-09 pinglamb replay-2 r5 lock 26 — rises 1 -> 2
- * slot-locally while the global max holds, out of 313 reactive events over five sessions. So the
- * worry is REAL and no longer hypothetical, and `improved` is losing exactly one forecast today.
- * Nothing is rewritten here: changing `improved` moves every published forecast figure in four
- * sessions, which is a decision to take deliberately and not as a side effect. The gate now pins
- * the riser BY IDENTITY (`ROSE_KNOWN`) so a second one still fails.
+ * IT FIRED (2026-08-10), AND THE DECISION IT EXISTED TO FORCE IS NOW RESOLVED — in favour of the
+ * GLOBAL gate. Read the `roseWithoutRoofTspin` comment above `scan()` for the evidence; it is the
+ * live statement and this paragraph is only the pointer to it. Everything below in this header
+ * describing a pinned list of identities is HISTORY:
  *
- * Note how long it took to surface, because the mechanism is worth remembering: `SESSIONS` admits
- * a session only once it has a `sim/` directory. 2026-08-09 had no such directory until an
- * unrelated artifact was written into one, so for a session and a half this test silently scanned
- * four sessions while appearing to scan every session present. A corpus defined by an incidental
- * directory's existence is a coverage hole that reports full coverage.
+ *   2026-08-10  one riser (2026-08-09 pinglamb replay-2 r5 lock 26), pinned by identity
+ *   2026-08-11  a second (2026-08-01 pinglamb replay-6 r4 lock 16), from the hoisted-DAS fix's
+ *               longer prefix — the by-identity design working as intended, forcing a conscious
+ *               addition rather than a silent count bump
+ *   2026-08-12  the oracle board source (verified prefix 24.8% -> 92.3%) took the list to 14, which
+ *               is what forced the decision instead of deferring it again
+ *   resolved    all 14 had a T-spin ALREADY globally available at the roof, so none is a masked
+ *               forecast, and the gate asserts that PROPERTY instead of enumerating a growing list
+ *
+ * `ROSE_KNOWN` is gone with the list; this header named it for four days after it was deleted.
+ *
+ * Note how long the original riser took to surface, because the mechanism is worth remembering:
+ * `SESSIONS` used to admit a session only once it had a `sim/` directory. 2026-08-09 had no such
+ * directory until an unrelated artifact was written into one, so for a session and a half this test
+ * silently scanned four sessions while appearing to scan every session present. A corpus defined by
+ * an incidental directory's existence is a coverage hole that reports full coverage — and this file
+ * went on documenting that in the past tense while STILL USING the predicate, which is why it now
+ * discovers on `.ttrm` files (what makes a session a session) as `forecast-access-class.test.ts`
+ * does. Both predicates yield the same six today; only one of them would still be right for a
+ * seventh session that has not been simulated yet.
  *
  * Non-vacuity is the whole risk here: a `bestTspinLocal` that silently returned 0 would make "0
  * reactive rose" pass for free. So the test ALSO asserts the probe finds the executed spin at k for
@@ -41,8 +54,13 @@ import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.t
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 
 const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
+// Discovered on the REPLAYS, not on a `sim/` directory: what makes a session a session is that it
+// holds `.ttrm` files, and this test reads those. `sim/` is an output of some other tool, so keying
+// on it made the corpus depend on whether an unrelated artifact happened to have been written yet —
+// the hole this file's own header narrates. Same predicate as `forecast-access-class.test.ts`.
 const SESSIONS = existsSync(SESSIONS_DIR)
-  ? readdirSync(SESSIONS_DIR).map(s => `${SESSIONS_DIR}/${s}`).filter(p => existsSync(`${p}/sim`))
+  ? readdirSync(SESSIONS_DIR).map(s => `${SESSIONS_DIR}/${s}`)
+      .filter(p => existsSync(p) && readdirSync(p).some(f => f.endsWith('.ttrm')))
   : [];
 
 // `bestTspin`'s BFS (forecast.ts), but only counting spins whose T cells all fall within `cols` —

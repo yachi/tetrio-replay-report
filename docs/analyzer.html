@@ -456,6 +456,12 @@
   function extractRoundPlayer(p) {
     var s = (p && p.stats) || {};
     var rs = (p && p.replay && p.replay.results && p.replay.results.stats) || {};
+    // Rates come from results.aggregatestats, the final snapshot, not from player.stats, a live
+    // in-game tick that predates the round's end. See pipeline/extract.py for the full argument.
+    // extractLeaderboardEntry above deliberately stays on `stats`: a leaderboard entry carries no
+    // aggregatestats. This browser extractor must agree with the pipeline's, or the published
+    // analyzer shows different APM/VS from the published report for the same round.
+    var ag = (p && p.replay && p.replay.results && p.replay.results.aggregatestats) || {};
     var cr = rs.clears || {};
     var gr = rs.garbage || {};
     var fr = rs.finesse || {};
@@ -464,7 +470,7 @@
     return {
       lifetime: intVal(p && p.lifetime),
       alive: (p && p.alive) === true,
-      apm_x1000: x1000(s.apm), pps_x1000: x1000(s.pps), vs_x1000: x1000(s.vsscore),
+      apm_x1000: x1000(ag.apm), pps_x1000: x1000(ag.pps), vs_x1000: x1000(ag.vsscore),
       garbagesent: intVal(s.garbagesent), garbagereceived: intVal(s.garbagereceived), kills: intVal(s.kills),
       lines: intVal(rs.lines), pieces: intVal(rs.piecesplaced), inputs: intVal(rs.inputs), holds: intVal(rs.holds),
       topcombo: intVal(rs.topcombo), topbtb: intVal(rs.topbtb), tspins: intVal(rs.tspins),
@@ -1389,7 +1395,7 @@
     w.innerHTML = '<div class="eyebrow">VERIFICATION</div><h2 class="section-title">即場驗證 · Claims Ledger</h2>' +
       '<p class="section-lede">上面每個可數嘅講法都對應一條 predicate,render 之前即場拎 parsed 數據再計一次。全部 ✓ 先叫過關。</p>' +
       '<div class="status-line" id="status-line"></div>' +
-      '<div class="method-note"><b>方法論(要老實講):</b>呢版係<b>即場 JS 驗證</b>(runtime predicate re-evaluation),<b>唔係 Dafny 形式證明</b>。每條 claim 顯示嘅數字同佢個 predicate 由同一份 computed value 出,所以理論上唔會相反 — 若果邊條變 ✗,即係代碼有 bug(已經同步 console.error)。想要形式印章,禁上面「匯出 facts.json」再行離線嘅 Dafny pipeline(codegen_dafny.py)就得。</div>' +
+      '<div class="method-note"><b>方法論(要老實講):</b>呢版係<b>即場 JS 驗證</b>(runtime predicate re-evaluation),<b>唔係 Dafny 形式證明</b>。每條 claim 顯示嘅數字同佢個 predicate 由同一份 computed value 出,所以理論上唔會相反 — 若果邊條變 ✗,即係代碼有 bug(已經同步 console.error)。想要形式印章,禁上面「匯出 facts.json」再行離線嘅 Dafny pipeline(pipeline/codegen.py)就得。</div>' +
       '<div class="table-wrap"><table class="appendix"><thead><tr><th>ID</th><th>類別</th><th>廣東話講法</th><th>English gloss</th><th>Predicate（source）</th><th>結果</th></tr></thead><tbody id="appendix-tbody"></tbody></table></div>';
     s.appendChild(w);
     root.appendChild(s);

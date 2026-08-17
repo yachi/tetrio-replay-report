@@ -14,9 +14,22 @@
  * So this file measures rather than derives: it reports the row and column span actually reached
  * as well as the state count, which turns the row range from an assumption into an observation
  * over 2000 boards. Everything it prints is sampled evidence, and the caps stay as live belts.
+ *
+ * ── IT MEASURES THE SEARCH NOW, NOT A REPLICA OF IT (2026-08-16) ─────────────────────────────────
+ * Until this revision it imported `vendor/core/srs.ts` and walked its OWN copy of the BFS, never
+ * importing `forecast.ts` at all. So when the 2026-08-10 arrival-key fix split the visited key in
+ * two, this file printed the same 688 before and after — and **that agreement was worth nothing as
+ * evidence**, because a replica cannot disagree with an engine it never calls. The measured pair
+ * queue under the landed key is 848, a number this file could not produce.
+ *
+ * It now drives `bestTspin` through `withBfsTrace`, so every figure below is the shipped search's.
+ * The board generator and the self-check are unchanged, and the self-check deliberately stays on
+ * `vendor/core/srs.ts`: it is a claim about what the ENGINE admits as a legal position, which is
+ * upstream of any search and is the premise the caps rest on.
  */
 import { emptyBoard, H } from './sim.ts';
-import { tryMove, tryRotate, hardDrop, isValidPosition } from './vendor/core/srs.ts';
+import { bestTspin, withBfsTrace } from './forecast.ts';
+import { isValidPosition } from './vendor/core/srs.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 
 /**
@@ -42,26 +55,9 @@ function assertKeySpaceIsNotBounded() {
 }
 assertKeySpaceIsNotBounded();
 
-interface Explored { states: number; rowLo: number; rowHi: number; colLo: number; colHi: number }
-
-function statesExplored(board: Board): Explored {
-  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
-  const seen = new Set(['0:3:18']);
-  const q: ActivePiece[] = [spawn];
-  const span = { rowLo: spawn.row, rowHi: spawn.row, colLo: spawn.col, colHi: spawn.col };
-  for (let h = 0; h < q.length && h < 1e9; h++) {
-    const cur = q[h]!;
-    hardDrop(board, cur);
-    for (const n of [tryMove(board, cur, -1, 0), tryMove(board, cur, 1, 0),
-                     tryMove(board, cur, 0, 1), tryRotate(board, cur, 1), tryRotate(board, cur, -1)]) {
-      if (!n) continue;
-      const k = `${n.rotation}:${n.col}:${n.row}`;
-      if (seen.has(k)) continue; seen.add(k); q.push(n);
-      span.rowLo = Math.min(span.rowLo, n.row); span.rowHi = Math.max(span.rowHi, n.row);
-      span.colLo = Math.min(span.colLo, n.col); span.colHi = Math.max(span.colHi, n.col);
-    }
-  }
-  return { states: q.length, ...span };
+/** The shipped search's own numbers for one board. `queue` is the PAIR queue `h < 40000` bounds. */
+function statesExplored(board: Board) {
+  return withBfsTrace(() => bestTspin(board)).trace;
 }
 
 function rng(seed: number) { let t = seed % 2147483647; if (t <= 0) t += 2147483646;
@@ -79,11 +75,12 @@ function genStack(r: () => number): Board {
   return b as Board;
 }
 
-let max = 0, argmax = 0;
+let maxQ = 0, argmaxQ = 0, maxPos = 0;
 const span = { rowLo: Infinity, rowHi: -Infinity, colLo: Infinity, colHi: -Infinity };
 for (let s = 1; s <= 2000; s++) {
   const e = statesExplored(genStack(rng(s * 7919)));
-  if (e.states > max) { max = e.states; argmax = s; }
+  if (e.queue > maxQ) { maxQ = e.queue; argmaxQ = s; }
+  maxPos = Math.max(maxPos, e.positions);
   span.rowLo = Math.min(span.rowLo, e.rowLo); span.rowHi = Math.max(span.rowHi, e.rowHi);
   span.colLo = Math.min(span.colLo, e.colLo); span.colHi = Math.max(span.colHi, e.colHi);
 }
@@ -94,10 +91,15 @@ console.log(`col span reached       ${span.colLo}..${span.colHi}  (${cols} of th
 console.log(`row span reached       ${span.rowLo}..${span.rowHi}  (${rows} rows; the engine allows ANY row < ${H},`);
 console.log(`                       including negatives — srs.ts:129 is \`if (row < 0) continue\`)`);
 console.log(`key bound IF rows stay in [-2, ${H - 1}]   4 rot x 10 col x ${H + 2} row = ${4 * 10 * (H + 2)}`);
-console.log(`max states explored    ${max}  (seed ${argmax}, over 2000 stack boards)`);
-console.log(`empty board            ${empty.states}`);
-console.log(`tspinAvailable cap     20000  -> ${20000 / max}x headroom`);
-console.log(`bestTspinLines cap     40000  -> ${40000 / max}x headroom`);
-console.log(max < 20000
-  ? `\nNO SAMPLED BOARD COMES NEAR EITHER CAP (${max} vs 20000). That is evidence, not a proof:\nthe row range above is measured over 2000 generated stacks, and the engine itself does not\nbound rows, so the caps stay LIVE belts. What makes the merged BFS safe is that there is now\none loop, not that 40000 was shown to be unreachable.`
+// TWO numbers, because the search has two dedup keys since 2026-08-10 and only one of them
+// bounds the queue the cap tests. Reporting a single "states explored" is what let the pre-fix
+// and post-fix engines look identical here.
+console.log(`max distinct POSITIONS  ${maxPos}  (rotation:col:row — the expansion key)`);
+console.log(`max PAIR QUEUE          ${maxQ}  (seed ${argmaxQ}, over 2000 stack boards; this is`);
+console.log(`                        what \`h < 40000\` bounds, at ${(maxQ / maxPos).toFixed(2)} entries per position)`);
+console.log(`empty board             ${empty.queue} queued, ${empty.positions} positions`);
+console.log(`tspinAvailable cap      20000  -> ${20000 / maxQ}x headroom`);
+console.log(`bestTspinLines cap      40000  -> ${40000 / maxQ}x headroom`);
+console.log(maxQ < 20000
+  ? `\nNO SAMPLED BOARD COMES NEAR EITHER CAP (${maxQ} vs 20000). That is evidence, not a proof:\nthe row range above is measured over 2000 generated stacks, and the engine itself does not\nbound rows, so the caps stay LIVE belts. What makes the merged BFS safe is that there is now\none loop, not that 40000 was shown to be unreachable.`
   : '\nCAP IS REACHABLE — a capped BFS can genuinely truncate. The cap is doing real work.');

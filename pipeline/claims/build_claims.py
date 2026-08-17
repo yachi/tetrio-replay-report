@@ -19,6 +19,7 @@ import json
 import sys
 import unicodedata
 
+from .evaluate import ClaimEvaluator
 from .generators import FAMILIES
 from .spec import to_python
 
@@ -46,9 +47,10 @@ def render(claims):
 def validate(claims, facts):
     problems = []
     seen = {}
+    evaluate = ClaimEvaluator(facts)
     for c in claims:
         try:
-            ok = bool(eval(c["python_check"], {"__builtins__": __builtins__}, {"facts": facts}))
+            ok = bool(evaluate(c["python_check"]))
         except Exception as exc:  # noqa: BLE001 - report, do not mask
             problems.append(f"{c['id']} ({c['family']}): predicate raised {exc!r}")
             continue
