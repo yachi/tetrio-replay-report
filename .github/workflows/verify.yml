@@ -677,15 +677,27 @@ jobs:
       # every verified-prefix board of every session: a miscount or a missed line-clearing slot
       # fails the job.
       #
+      # "Every verified-prefix board" became true on 2026-08-17. Until then both scripts below ran
+      # the hand-port `runCase` while the published metric (`emit-forecast-facts.ts`) and
+      # `cross-tslot.test.ts` ran `runCaseOracle`, so the outside authority for the scalar was
+      # checked on 20,226 boards out of the 61,656 the metric consumes — a third, under a step name
+      # that said all of them. Both now use the metric's own board source. Measured over the six
+      # sessions at that scope: 10,834 boards where both sides find a slot, 0 under-counts, 8 where
+      # our reachable placement clears more than cold-clear's best named shape, 5,587 general spins
+      # outside its named vocabulary, and 6 boards where cold-clear names a line-clearing slot our
+      # BFS reaches nothing on — every one of the 6 near-topout (stackTop 17-19 against spawn 18),
+      # which is the class `pipeline/sim/tslot-sanction.ts` tolerates by name and prints. That
+      # sanction is shared by all three consumers, and it is not decorative: deleting it fails both
+      # scripts on those same 6 boards.
+      #
       # The list below was FOUR sessions until 2026-08-15, having stopped at 2026-08-01 while
       # 2026-08-09 and 2026-08-14 were added to the corpus — 134 rounds (50 + 84) outside the gate
       # that checks this count against an implementation we did not write. That is the
       # silent-under-coverage class: nothing goes red, the job stays green, and the green means
       # less each session. Adding a session means adding it HERE, not only to sessions/.
-      # (Measured clean when it covered four: 1,831 slots, all counts agree, 0 missed. That
-      # figure is NOT re-stated for six — it was measured over the old list, and this edit
-      # widens the scope rather than re-measuring it. The first run over six is what produces
-      # the new number.)
+      # (It read "1,831 slots, all counts agree, 0 missed" for the four-session hand-port scope.
+      # Superseded by the figures above, which were produced by a run over six sessions at the
+      # oracle scope rather than carried forward.)
       #
       # `pipeline/sim/cross-tslot-multi.ts` and `pipeline/sim/cross-tslot.test.ts` each carried
       # their OWN copy of the same stale four-session list, so this step covered four sessions no
@@ -704,15 +716,17 @@ jobs:
       # thing multi-slot could threaten: the scalar the forecast metric consumes is never below what
       # cold-clear's cutout finds on the board AS GIVEN (`CC_ORACLE_SLOTS=1` makes the oracle emit
       # the whole chain). Failing would force re-opening the "don't wire multi-slot into the metric"
-      # decision. Measured clean over all six sessions: 0 of 20,226 boards; multi-slot changes the
-      # path of exclusion, not the value.
+      # decision. Measured clean over all six sessions at the oracle board source: 0 unsanctioned of
+      # 61,656 boards; multi-slot changes the path of exclusion, not the value.
       #
       # The comparison is against `slots[0]`, NOT `max(slots)`, and it was `max` until 2026-08-17 —
       # a category error rather than a stricter bound. The chain re-assigns the board after every
-      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. On the six
-      # sessions `max(slots) > ours` fires once and `slots[0] > ours` never does; on that one board
-      # cold-clear's own current-board answer agrees with ours exactly. The stale "0 of 7,544" this
-      # comment used to carry was the four-session figure, measured before 08-09 and 08-14 existed.
+      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. At the
+      # oracle scope `max(slots) > ours` fires 8 times and `slots[0] > ours` 6; the 6 are the same
+      # near-topout boards the step above tolerates by name, and the extra 2 are non-monotone chains
+      # on which cold-clear's own current-board answer agrees with ours exactly. Two figures this
+      # comment carried before, both measured at a narrower scope and both replaced by runs at this
+      # one: "0 of 7,544" (four sessions, hand-port) and "0 of 20,226" (six sessions, hand-port).
       - name: Multi-slot cutout never exceeds the scalar the metric consumes
         env:
           CC_ORACLE_SLOTS: '1'

@@ -11,9 +11,8 @@ import { test, expect } from 'bun:test';
 import { readFileSync, existsSync } from 'node:fs';
 import { ccTslots, colHeight, occ } from './cc-tslot.ts';
 import { bestTspinLines } from './forecast.ts';
-import { detectTSpin, H } from './sim.ts';
-import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
-import type { ActivePiece } from './vendor/core/srs.ts';
+import { H } from './sim.ts';
+import { classify } from './tslot-sanction.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 
 const W = 10;
@@ -35,36 +34,10 @@ test('the coordinate conversion, which is the easiest thing in the port to get w
   expect(occ(b, 0, 0)).toBe(true);      // bottom-left, filled
 });
 
-/** bestTspin with the line-clear requirement dropped — the question cold-clear actually asks. */
-function anySpinLines(board: any[][]): number | null {
-  const spawn: ActivePiece = { type: 'T', rotation: 0, col: 3, row: 18 };
-  const seen = new Set(['0:3:18']);
-  const q: { p: ActivePiece; rot: boolean; kick: boolean }[] = [{ p: spawn, rot: false, kick: false }];
-  for (let h = 0; h < q.length && h < 40000; h++) {
-    const { p: cur, rot, kick } = q[h]!;
-    const d = hardDrop(board as any, cur);
-    if (d.row === cur.row && rot && detectTSpin(board as any, d, true, kick) !== 'none') {
-      const after = board.map(r => [...r]);
-      for (const c of getPieceCells(d)) if (c.row >= 0 && c.row < H) after[c.row]![c.col] = 'T';
-      return after.filter(r => r.every(x => x !== null)).length;
-    }
-    for (const [n, isRot] of [[tryMove(board as any, cur, -1, 0), false], [tryMove(board as any, cur, 1, 0), false],
-        [tryMove(board as any, cur, 0, 1), false], [tryRotate(board as any, cur, 1), true],
-        [tryRotate(board as any, cur, -1), true]] as [any, boolean][]) {
-      if (!n) continue;
-      const k = `${n.rotation}:${n.col}:${n.row}`;
-      if (seen.has(k)) continue; seen.add(k);
-      q.push({ p: n, rot: isRot, kick: isRot && (n.col !== cur.col || n.row !== cur.row) });
-    }
-  }
-  return null;
-}
-
-/** Highest filled row (lowest index) — a near-spawn value means a near-topout, low-manoeuvre board. */
-function stackTop(board: any[][]): number {
-  for (let r = 0; r < H; r++) if (board[r]!.some(x => x !== null)) return r;
-  return H;
-}
+// The near-topout sanction used to be written out here — `anySpinLines`, `stackTop` and the rule
+// combining them. It now lives in `tslot-sanction.ts`, because the same rule has to hold in the two
+// CI gates (`cross-tslot-count.ts`, `cross-tslot-multi.ts`) that were pointed at this file's board
+// source on 2026-08-17. Three copies of one sanction is three sanctions.
 
 // Every session, not a list that stopped being every session. This stood at four from 2026-08-12
 // to 2026-08-15 while 08-09 and 08-14 joined the corpus, so 134 rounds sat outside the only check
@@ -92,17 +65,14 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
         else if (ours) oursOnly++;
         else if (cc) {
           ccOnly++;
-          // Sanctioned: cold-clear counts slots that clear nothing (anySpinLines !== null — a spin is
-          // reachable, it just clears no line). The oracle board source reaches near-topout boards the
-          // sim never did, and there cold-clear's HEIGHT-pattern also over-counts a slot that is
-          // genuinely unreachable: on a stack within a few rows of spawn the T can barely manoeuvre.
-          // Verified on the single such case (08-01-4 r0 yachi lock 66, sky_tslot_right): the full
-          // reachability BFS enumerates only 16 placements (uncapped) and 0 T-spins, so our search is
-          // right and cold-clear over-counts. A slot our search cannot reach is a real defect ONLY when
-          // the board is NOT near-topout — there it would mean a BFS false-negative in the published
-          // instrument. `stackTop` = highest filled row (lowest index); <= 21 is within ~3 of spawn 18.
-          if (anySpinLines(b) === null && stackTop(b) > 21)
-            unexplained.push(`${c.file} r${c.round} ${c.user} lock ${step}: ${ccTslots(b).join(',')}`);
+          // The shared sanction (tslot-sanction.ts) says whether a slot cold-clear names and our
+          // search cannot reach is explained — a spin IS reachable and merely clears nothing, or the
+          // stack is near-topout where a height pattern and a reachability search legitimately part
+          // ways. Anything else is a false negative in the instrument every published figure rests on.
+          const s = classify(b);
+          if (!s.sanctioned)
+            unexplained.push(`${c.file} r${c.round} ${c.user} lock ${step}: ${ccTslots(b).join(',')}`
+              + ` [${s.reason}]`);
         } else neither++;
       }
     }
