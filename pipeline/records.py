@@ -19,9 +19,73 @@ coloured dot beside ink-coloured text rather than a value painted in the player'
 hue. No new colours are introduced: the validated yachi/pinglamb pair is reused.
 """
 import html
+import json
+from pathlib import Path
 
 from pipeline import claim_cards, fmt
 from pipeline.claims import generators
+
+# ── the footnote's corpus scope ────────────────────────────────────────────────
+#
+# The footnote describes EVERY session pooled, so the session being built cannot
+# derive it — which is exactly how it came to be typed by hand, and how it sat at
+# 四個 session / 492 player-round through two additions before anyone read the
+# rendered page. The two numbers a glob CAN derive are derived here; what remains
+# hand-maintained is guarded below.
+_CN_DIGITS = "零一二三四五六七八九十"
+#: 速率 metrics the R analysis takes one record per session from (VS, APM, PPS).
+_RATE_METRICS = 3
+
+
+def _cn(n):
+    """Chinese numeral for a small count, digits past ten.
+
+    Exists so the count can be DERIVED without changing a single byte of the
+    rendered string: the footnote has always read 「六個 session」, and every
+    committed report is byte-identity gated on what this function emits.
+    """
+    return _CN_DIGITS[n] if 0 <= n <= 10 else str(n)
+
+
+def corpus_scope():
+    """(sessions, player-rounds) over every committed session.
+
+    Located from THIS file, not from the report directory the caller passed: that
+    argument names one session and this figure is about all of them. Same reason
+    `analysis/rate_records.R` resolves its `repo` from the script's own path — an
+    assumption about the caller's cwd is how a corpus figure ends up describing a
+    different tree than the one it ships in.
+    """
+    root = Path(__file__).resolve().parents[1]
+    facts = sorted(root.glob("sessions/*/report/facts.json"))
+    if not facts:
+        raise SystemExit(f"records.py: no sessions/*/report/facts.json under {root} — "
+                         "the footnote's corpus figures cannot be derived")
+    rounds = 0
+    for f in facts:
+        d = json.loads(f.read_text(encoding="utf-8"))
+        rounds += sum(len(r["players"]) for m in d["matches"] for r in m["rounds"])
+    return len(facts), rounds
+
+
+# ── the R-derived statistics, hand-maintained and guarded ──────────────────────
+#
+# From `Rscript analysis/rate_records.R`. Copied rather than recomputed: the
+# slopes need two log-log regressions and the record test a binomial tail, and R
+# is not a CI dependency. Copied numbers rot, so `build` refuses to render them
+# for a corpus of a different size than the run they came from.
+#
+# WHAT THE GUARD DOES NOT COVER, stated because it has already happened once. On
+# 2026-08-16 `apm`/`pps`/`vs` were re-sourced from the live `player.stats` tick to
+# `results.aggregatestats`, which moved the shortest bin's VS SD from 59.91 to
+# 59.60 without adding a session. The footnote kept saying 59.9 for a day, and a
+# session-count assertion cannot see that class at all — the corpus was six
+# sessions on both sides of it. Re-run the R script when the DATA moves, not only
+# when a session lands.
+R_STATS_SESSIONS = 6            # `n = 760 player-rounds over 6 sessions`
+R_VS_SD_SHORT, R_VS_SD_LONG = "59.6", "14.5"    # SD of VS in the shortest / longest bin
+R_VS_T_SHORT, R_VS_T_LONG = 19, 150             # those bins' geometric-mean length, seconds
+R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 104, 120      # the control: the mean over the same bins
 
 # (family, label, unit, how to format the proved integer)
 #
@@ -151,19 +215,35 @@ def build(facts, report_dir):
     # Why two kinds of record live in one grid. Without this the reader sees a
     # 打足 60 秒 qualifier on some tiles and not others and has to guess whether
     # it is a rule or an oversight.
-    # CORPUS FIGURES, HAND-MAINTAINED. These describe every session pooled, so no single
-    # session's facts.json can derive them and nothing here can go stale loudly. They come
-    # from `Rscript analysis/rate_records.R`, whose session list is hardcoded for the same
-    # reason — when a session is added, re-run it and copy the new numbers into BOTH places.
-    # They were left at four sessions / 492 player-rounds through two additions before
-    # anyone read the rendered footnote.
+    #
+    # The session and player-round counts are DERIVED (`corpus_scope`); the R
+    # statistics are not, and this is where the two meet. A seventh session makes
+    # the derived half describe seven while the copied half still describes six,
+    # so refuse to render rather than publish a footnote that is two-thirds true.
+    n_sessions, n_player_rounds = corpus_scope()
+    if n_sessions != R_STATS_SESSIONS:
+        raise SystemExit(
+            f"records.py: the footnote's statistics were computed over {R_STATS_SESSIONS} "
+            f"session(s) but sessions/*/report/facts.json now holds {n_sessions}. "
+            f"Re-run `Rscript analysis/rate_records.R` — its own `sessions` list is "
+            f"hardcoded too, so add the session there first — then copy the new VS SD, "
+            f"mean and bin figures into the R_* constants in this file and set "
+            f"R_STATS_SESSIONS = {n_sessions}.")
+    # 3 metrics × one record per session, the same product `rate_records.R` derives
+    # rather than types. The count is arithmetic; what is hand-maintained is the
+    # claim that ALL of them land in the shortest quartile.
+    n_rate_records = _RATE_METRICS * n_sessions
     out.append(f'    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計'
                f'打足 {generators.QUALIFYING_MS // 1000} 秒嘅局。速率係「攻擊 ÷ 時間」，'
-               '局數愈短分母愈細，個數就愈飄——六個 session 夾埋 760 個 player-round 度'
-               '量過：VS 嘅標準差由 59.9（約 19 秒嗰批）跌到 14.5（約 150 秒嗰批），'
-               '足足細咗四倍；同一段路平均數反而由 104 升到 120，即係短局唔止唔係打得好啲，'
+               f'局數愈短分母愈細，個數就愈飄——{_cn(n_sessions)}個 session 夾埋 '
+               f'{n_player_rounds} 個 player-round 度'
+               f'量過：VS 嘅標準差由 {R_VS_SD_SHORT}（約 {R_VS_T_SHORT} 秒嗰批）跌到 '
+               f'{R_VS_SD_LONG}（約 {R_VS_T_LONG} 秒嗰批），'
+               f'足足細咗四倍；同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
+               '即係短局唔止唔係打得好啲，'
                '仲要係量得唔準好多。'
-               '未設限之前，六個 session 全部 18 項速率紀錄都落喺最短嗰四分一嘅局度。'
+               f'未設限之前，{_cn(n_sessions)}個 session 全部 {n_rate_records} 項速率紀錄'
+               '都落喺最短嗰四分一嘅局度。'
                '<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>'
                '——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>')
     if skipped:

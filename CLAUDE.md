@@ -894,9 +894,12 @@ it at all:
   Donation splits about 1:2.5 (29 in-opener, 74 mid-game), so it is not purely mid-game.
 
 `ordering_full_round` is **not** the mid-game counterpart and must not be read as one — it applies
-the *same* 21-piece window and only drops the verification requirement, which is why its numbers are
-identical to `ordering`'s. It answers "did the verified prefix manufacture this", not "what happens
-later in the round".
+the *same* 21-piece window and only drops the verification requirement, so its numbers are within a
+round of `ordering`'s rather than identical, which is the whole of what dropping verification buys:
+**456 / 455 / 1** against `ordering`'s **455 / 454 / 1** (rounds with both · C-Spin order · DT order,
+summed over the six committed artefacts). One extra round clears the window unverified. It answers
+"did the verified prefix manufacture this", not "what happens later in the round" — and the answer
+being *one round*, not zero, is what makes it evidence instead of a tautology.
 
 **The mid-game denominator is 12 rounds corpus-wide, so it is printed as counts and never as a rate**
 — rounds usually end before accumulating both spin types that late, and the verified prefix truncates
@@ -954,7 +957,12 @@ nothing at all.
   listed only the hand ledgers, and `expandShorthandBadges` matched `[CR]\d{3}` so `<b>G004</b>`
   in match-card copy stayed literal text. `appendix._rows` now includes every ledger the
   session's committed `claims-proof-map.json` covers — a rule that leaves 07-22 at 54 rows and
-  07-24 at 52 while giving 07-28 all 83 — and `claim_cards.load` falls back to that map when a
+  07-24 at 52 while giving 07-28 all **96** — its `claims-proof-map.json` holds 96 entries, its
+  appendix 96 data rows (`<tr>` in the region, less the header) and its island 96 claims, which is
+  the rule holding exactly. It said 83 until 2026-08-17, and 83 was correct when written: the proof
+  map held 83 entries that day. The rule is "every ledger the proof map covers", so its output
+  tracks the map and a number written beside it does not — and `claim_cards.load` falls back to
+  that map when a
   ledger has no `<stem>-proof-map.json` of its own, which is what made the round table's
   verdict cards show 待證 for claims the verifier had proved. Counting `.badge[data-status]`
   in the DOM does **not** catch either one; both were found by reading a screenshot.
