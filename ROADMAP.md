@@ -308,6 +308,34 @@ every 約 / `~` / `≈` figure in every hand-written surface against `facts.json
 datum floors to it but one rounds to it. Wired into CI per session. `check_claims` could never
 have caught this — every predicate compares the integer, not the printed text.
 
+**「every hand-written surface」 was the whole class only while every section had a ledger — corrected
+2026-08-17 (`bd01eec`).** The gate strips generated regions (`check_prose_figures.py:171`,
+`GENERATED.sub`) on the sound grounds that they are covered by the ledgers it scans. The two
+QUARANTINED sections have no ledger **by design** — their data lives in `sessions/*/sim/*.json` — so
+their 約-figures were covered by nothing at all, and `forecast_section.py`'s spread clause rendered
+`f"爭大約 {ratio_lo:.0f}–{ratio_hi:.0f} 倍"`. `:.0f` is round-half-even, so a ratio of 4.6 printed
+大約 **5** — above the value, the one direction 約 must never go. **Latent, not shipped**: every
+committed `sim` width is 1, so every ratio is an exact integer (16 · 19 · 20 · 23 · 19; 08-14 renders
+no clause) and floor, ceil and round agree on all of them.
+
+**The rule went to the quarantine gate, not here, and that was decided by measurement.** Extending
+`check_prose_figures` to the quarantined regions would have scored its five newly-visible figures as:
+one **false FAILURE** (07-22's 16 is in the round pool and not the floor pool — that gate's exact
+failure condition), two coincidental passes, two unresolved. Not one checked for the right reason,
+because the ratio is DERIVED (`samp / sim`, from an artefact this gate never opens) and has no
+counterpart in a pool built from `facts.json`. Making it work would mean a second implementation of
+`_spread_clause` inside the gate. `check_forecast_section` already re-renders the region by calling
+the section builder, so it owns the arithmetic by construction; the fix is `math.floor` / `math.ceil`
+in the module that derives the number, and the mutant lives in that gate's `--selftest`.
+
+**The generalisation is worth more than the fix**, and it is why `opener_section.py` came back clean
+on the same audit while this did not: **a rounding rule is only guarded by byte-identity while the
+corpus contains a value that discriminates it.** The opener section floors 26 of 36 published figures
+across a floor/round boundary, so a regression there moves bytes and the existing gate kills it — no
+new mutant needed, and adding one would be decorative. The forecast ratio discriminated nothing, so
+its `:.0f` sat correct-by-coincidence until the data changed shape, invisible to every gate in the
+repo. A section whose figures are all integers today has an unguarded rounding rule tomorrow.
+
 ### The second-order bug it caused
 
 `codegen` builds each lemma's *name* from the claim's `english_gloss`, so correcting 14 glosses
@@ -1268,6 +1296,32 @@ instances, all now at six sessions** — the workflow loop, `cross-tslot.test.ts
 its differential stayed empty. This paragraph read as still-open for a day after the fix landed, two
 sections above the entry recording it; that is the same staleness class it describes.
 
+**And the sweep fixed the three on ONE axis while leaving them inconsistent on another — closed
+2026-08-17 in `cd0ee11`.** The evidence was already sitting in this paragraph: `cross-tslot.test.ts`
+reports **61 656** boards, while `cross-tslot-count.ts` and `cross-tslot-multi.ts` reported **20 226**
+over the same six sessions. Same corpus, three-times-different denominators, because the test had
+migrated to `runCaseOracle` on 2026-08-12 and the two gates had not — they were still building their
+board population with `runCase`, the hand-port. So the two gates that check `bestTspinLines` against
+the compiled Rust `cc-oracle` — the scalar every published forecast figure is computed from — covered
+**32.8%** of the boards the metric actually consumes, under a CI comment advertising "every
+verified-prefix board of every session".
+
+Widening them to `runCaseOracle` makes both go red on **6** boards, and that is the part worth
+recording: it is not a detector defect. All six are near-topout (`stackTop` 17-19, no T-spin
+reachable at all), which is precisely the sanction `cross-tslot.test.ts` already carried and the two
+gates had never heard of — two gates on one question with different rules, and the weaker one scoped
+to the board source that hid the disagreement. `cd0ee11` moves both to the oracle source and hoists
+the sanction into `pipeline/sim/tslot-sanction.ts` so a third rule cannot drift in. **The two halves
+are not separable**: at the hand-port scope the sanction is unkillable (0 false negatives with and
+without it), so hoisting it alone would have shipped a decorative guard.
+
+**A session list going stale is the shape this section is about; a BOARD SOURCE going stale is the
+same defect one axis over, and nothing was watching that axis.** `147e7f8` moved the board source on
+2026-08-12; `ab962bc` swept the session lists three days later and reported "three instances, all now
+at six sessions" — a sweep along the axis it was looking at, past two gates left on the old source by
+the migration three days before it. Widening a gate's corpus is a mutation test of that gate; nothing
+plays the same role for the gate's INPUTS.
+
 **2026-08-16 —— 呢一項同下面個 fifth `Mechanism` 係同一個形狀,做嗰陣要一齊諗。** 兩者都係「個
 metric 攞成塊板一個 global 數字嚟答一個 slot-local 嘅問題」:`improved` 用嘅係成塊板嘅 best
 availability,而兩個 riser 都係 slot-local 升;而 `localiseMechanism` 冇 access bucket,係因為
@@ -1400,15 +1454,32 @@ dependency order:
 - `NothingRemovedIsNotEvenForecastShaped` — clause 3's first universal; strictly generalises
   `GapClauseIsLoadBearingAtZero` and the `minLines == 0` case `GarbageAloneCannotMakeAForecast` excludes.
 
-### 7 — Modelling `improved` in Dafny is BLOCKED, not pending
+### 7 — Modelling `improved` in Dafny is BLOCKED, not pending — DONE
 
-**measured, from the codebase's own words.** It needs `BestTspinLines` as a max over reachable
+**DONE 2026-08-09, `300b358`; struck here 2026-08-17.** `spec/Forecast.dfy` carries `availAtJ` /
+`availAtK` (`:452-453`), `predicate Improved` (`:895`) and both halves of the difference theorem
+(`:967` onward). **Read "Closed · 7" below before quoting a reason** — that entry already records
+that the justification this item and `300b358` both gave is unsound, and it is not repeated here,
+for item 6's reason: two copies of a closure is how this inventory reached the state the 08-16 sweep
+was fixing.
+
+**The blocker below was not discharged — it was side-stepped, and that distinction is the whole
+content of this closure.** `availAtJ`/`availAtK` are `nat` FIELDS of `Event`, pure extractor input
+(`spec/Forecast.dfy:451`), so no `BestTspinLines` function exists in the spec and no bounded position
+set is ever needed. `<= 3` (`:485-486`) is a well-formedness assumption about the caller — every
+board handed to `bestTspin` is post-clear — written down as `BestTspinLinesIsBoundedOnlyOnClearedBoards`
+(`:830`), not a geometric fact about the T. So the final sentence below is **still true as stated**:
+`:797` records that the spec does not prove `availAtJ`/`availAtK` are computed correctly, nor that
+`Improved` and clause 3 measure the same thing. The repo does still say so — in the spec rather than
+here, which is why this entry could sit stale for eight days.
+
+~~**measured, from the codebase's own words.** It needs `BestTspinLines` as a max over reachable
 placements; a finite max needs a bounded position set; `forecast.ts` states outright that the ROW
 coordinate is not bounded by the engine (`vendor/core/srs.ts` is `if (row < 0) continue`), that the
 `4*10*42 = 1680` bound is an ASSUMPTION resting on kick-table reasoning "nobody has turned into a
 proof", and that `h < 40000` is "a LIVE belt rather than dead code". Discharging that boundedness
 lemma is the prerequisite; until then the spec's clause 3 and the implementation's are different
-predicates and the repo should keep saying so.
+predicates and the repo should keep saying so.~~
 
 ### 8 — Two sources of truth for "was a spin" — DONE
 
@@ -1457,15 +1528,27 @@ boards, not the 7,579 claimed below**. See "Closed · Item 10".
   walk's exit condition may already establish it), `if (!slot)` after a positive `bestTspinLines`, and
   the `t <= j` early return. If genuinely unreachable they want deletion or a comment, not a mutant.
 
-### 11 — Decision, not a task: does `insertMode` join the swept configs?
+### 11 — Decision, not a task: does `insertMode` join the swept configs? — OBSOLETE
 
-**measured.** `insertMode: 'immediate'` is legal, is used by `coverage-strict.ts` and
+**OBSOLETE, struck here 2026-08-17.** There is no swept set left for `insertMode` to join:
+`pipeline/sim/emit-forecast-facts.ts:88` is `const CONFIGS: [string, any][] = [['triangle-oracle', {}]]`
+— **one** config, not seven. The decision below is about a sweep that no longer exists, so it cannot
+be taken either way. CLAUDE.md's rule applies: the reason the entry existed is gone, so it goes
+rather than getting redesigned.
+
+What survives the deletion is the *figure*, and it is unchanged in kind: the published spread is now
+a claim about **one** simulator config, which is a narrower statement than the seven-config one this
+item was arguing about — `forecast_section._spread_clause` reads `simulator_configs_for_range` out of
+the artefact and prints the count, so the report says which it is rather than implying a sweep.
+Whether one config is enough is a live question, but it is not this one.
+
+~~**measured.** `insertMode: 'immediate'` is legal, is used by `coverage-strict.ts` and
 `triage-garbage-totals.ts`, and is not among the seven swept. Before `7b4eb51` it returned **13
 verified forecasts** across the four sessions (2.83%) against 0.00% for `best`, every one
 `mechanism: 'garbage'` with `garbageLoadBearing: false`. It now throws 20 times instead, and all seven
 swept configs are unaffected. So the metric no longer reports a number it cannot justify — but the
 published 0% is still a claim about seven configs, and whether that set is the right one is an
-editorial call about what the figure asserts, not a bug.
+editorial call about what the figure asserts, not a bug.~~
 
 ## T-Spin Forecast — inventory resolved (2026-08-09)
 
@@ -2198,9 +2281,33 @@ carried their own copy of the same four-session list — so that CI step covered
 the workflow said. Extending the test's list failed it immediately, **39033 → 61656 boards**, which is
 a pinned table doing its job. The result worth keeping is not the larger denominator but that
 `unexplained` stayed EMPTY over the extra 22 623 boards: the two implementations sharing no code still
-disagree on nothing, now over six sessions. A repo-wide sweep found every other session list
+disagree on nothing, now over six sessions. ~~A repo-wide sweep found every other session list
 (`bin/build-docs`, `analysis/rate_records.R`, `cross-movegen`, `cross-tspin`, `openers.test.ts`)
-already at six.
+already at six.~~
+
+**That last sentence measured the wrong property, and it is struck 2026-08-17 (`722ef5c`).** "Already
+at six" is a statement about COVERAGE; the defect is about MEMBERSHIP, and the two are not the same
+check. Every list named there was indeed at six — and every one of them would still have admitted a
+seventh session in silence, because being complete today says nothing about failing tomorrow. The
+sweep also missed the two loops that matter most: `verify.yml:435,460`, which gate this repo's ONE
+invariant (that two independently written extractors agree byte-for-byte), and which
+`equiv-coverage.yml`'s own header had already named "the two stale loops in verify.yml" without
+anyone acting on it.
+
+Closed in `722ef5c` — the loops now discover artefact directories from disk (predicate: carries
+`extract2*.ts`; measured, exactly today's 7, same 7 verdicts as the hardcoded list, and a planted
+7th session whose two extractors disagree passes the old loop at exit 0 and fails the new one),
+`bin/build-docs` calls `docs_gate.row_membership`, and `openers.test.ts` / `finesse-counters.test.ts`
+assert their lists against disk in BOTH directions via `pipeline/corpus-membership.ts`.
+`cross-movegen.test.ts`'s absolute path into a second checkout was resolved to `import.meta.dir` in
+the same commit. **Finding nothing is now a failure in both loops** — a sweep over nothing prints
+exactly like a clean one, which is the shape this whole entry is about.
+
+**Still open, deliberately: the two matrices** (`verify.yml:44-51,179-180`). They cannot glob —
+`strategy.matrix` is evaluated before any step of the job runs, so the only route is a discovery job
+plus `fromJSON`. Held because the conversion can make CI *weaker*: an empty matrix SKIPS the job, and
+a skipped required job reads green in branch protection, which is worse than a stale list. Needs its
+own review, with an emptiness guard as a precondition rather than an afterthought.
 
 ## 最癲一局 items 4 and 5, written up (2026-08-16)
 
@@ -2633,3 +2740,68 @@ bucket 同 `clause2_undecided` 對數,所以個 field 唔會冇人睇住就飄�
 嘅係 render 出嚟同 artefact 一唔一致,唔係對嗰句講得啱唔啱。真正嘅理由係循環:開個窿位嗰下消行就係
 個 spin 自己。`spec/Forecast.dfy` 個 `GapClosedIsExactlyRowsRemoved` 講緊同一件事。散文啱唔啱,
 到今日為止仲係要人讀。
+
+## Corpus derivation — five sites closed, and the sweep before them measured the wrong property (2026-08-17)
+
+`cd0ee11` · `722ef5c` · `bd01eec`. **Struck at their original sites, not only here** — the closures
+live at 「T-Spin Forecast — covering the definition's state space」 item 7 and item 11, at the
+cross-tslot session-list paragraph, at the equiv.py coverage section's 「already at six」 sentence,
+and at the `check_prose_figures` 「closes the class」 paragraph. This section records only what is
+NEW or still OPEN; going and reading those five is the point of striking them there.
+
+The class in one line: **a population or a figure is fixed by hand where it could be derived, and
+nothing detects the drift when the thing it describes moves.** Three axes — which sessions a gate
+iterates, which engine's boards it scores, and which figures sit in prose that no script re-derives.
+
+### Still open, and each one is a measurement rather than a guess
+
+- **The two CI matrices** (`verify.yml:44-51`, `:179-180`). Deliberately held; the reason is at the
+  cross-tslot session-list entry and is the whole finding — an empty matrix SKIPS the job, and a
+  skipped required job reads green in branch protection. Worse than a stale list, so an emptiness
+  guard is a precondition of the conversion, not a follow-up.
+- **`intense_round.py`'s section lede and its `ir-note` control paragraph publish a corpus-wide
+  statistical result that no script in this repo computes.** 380 decided rounds; tercile paired AUC
+  **62.3 → 65.0 → 83.5**; Spearman rho **+0.210**; Holm-adjusted **p 0.0002** over 20 columns; plus
+  four control figures (rho +0.058 / p 1.000; −0.187 / −0.184 at p 0.0040 / 0.0098; +0.236;
+  +0.096 / p 0.06) in the note. **Cited by symbol, not by line, deliberately** — three agents were
+  rewriting that file the day this was written, and a line number would have rotted before anyone
+  read it; `check_loo.SENTENCES` makes the same choice for the same reason.
+  `grep -rn "Spearman|Holm|0.210|83.5" --include=*.py --include=*.R --include=*.ts --include=*.mjs`
+  returns that module and one comment in `generators.py` — nothing else. **Correct today**:
+  reconstructed exactly (380 rounds, terciles of combined `vs_x1000`, paired AUC of
+  `garbage_cleared/pieces`, ties 0.5, a **126/127/127** split) and unchanged across the apm/pps/vs
+  re-source (`0804a7e^` vs HEAD identical). Rendered into every report and onto the site, gated by
+  nothing; the region is generated, so `build_report --check` agrees with the stale source by
+  construction and a seventh session stamps the same sentence into the new report too.
+- **`records.py`'s `sr-foot` footnote** — 六個 session · 760 player-round · SD 59.9→14.5 · mean
+  104→120 · 18 項速率紀錄 — has the same shape, and its source `analysis/rate_records.R` runs in no
+  workflow and no `bin/` script (`grep -rn "rate_records|Rscript" .github/ bin/` → nothing). Every
+  figure reproduces today when the script is run by hand. In progress at time of writing.
+- **Ten hardcoded session lists remain**, of the fifteen inventoried: `verify.yml:44-51`, `:179-180`,
+  `:736`; `analysis/rate_records.R`'s `sessions`; `pipeline/records.py`; `pipeline/intense_round.py`;
+  and the four TypeScript consts `cross-tslot-multi.ts`'s `SESSIONS`, `cross-tslot.test.ts`'s
+  `SESSIONS`, `cross-tspin.test.ts`'s `SIM_SESSIONS`, `cross-movegen.test.ts`'s `SIM_SESSIONS` (that
+  last file's absolute oracle path was fixed in `722ef5c`; its session list was not). Named by
+  const rather than by line for the reason above — `cd0ee11` and `722ef5c` between them moved three
+  of these four before this paragraph was a day old. Four sites already fail loudly on an unlisted
+  session and are the shape to copy:
+  `check_loo.py:203`, `forecast-corpus.test.ts`, `forecast-facts.test.ts:269`,
+  `forecast-access-class.test.ts:324`.
+- **Candidate, not built: a standing rounding-discrimination check.** For every rendered rate, assert
+  that some corpus value distinguishes floor from round, and flag the ones where none does. It would
+  have found the `:.0f` above without anyone reading `forecast_section.py`, because the defect was
+  invisible precisely where no value discriminated the rule. New scope, recorded so it is not
+  re-derived from scratch next time.
+
+### Four decisions still with the user — recorded at their own sites, listed here only as an index
+
+1. **The 07-22 / 07-24 claims-island migration** (54 → 144 and 52 → 141 rows, drop
+   `PLAIN_CITE_ISLAND_GAP`, re-verify every pinned count) — see the 最癲一局 write-up. Largest blast
+   radius open, two *published* sessions.
+2. **Adopting `tsc`.** `check_ts_imports.py` is the homemade stand-in and says so; a real pass would
+   subsume it. A dependency decision, not an engineering one.
+3. **The downstack-under-pressure pre-registration.** ⚠️ **This one has a deadline: 「Pick one in
+   writing before the seventh session lands.」** A pre-registration that quietly tracks its own
+   implementation is not a pre-registration.
+4. **`sessions/2026-07-24/proof/codegen_dafny.py`**, the corpus's last session-local emitter — item 3
+   of 「跟手要決定嘅三樣」, where items 1 and 2 were decided on 2026-08-17 and this one was not.
