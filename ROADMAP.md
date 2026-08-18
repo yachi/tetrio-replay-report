@@ -4,7 +4,9 @@ Decisions locked: **public repo**, **everything included** (replays + reports + 
 
 > **呢個 header 之下、去到「## 7. Open risks」為止,係 2026-07 寫嗰份原始計劃,照原文留低做記錄,
 > 唔會改成今日份 tree。所以嗰個 tree diagram 同 reuse audit 表入面有幾個名而家已經唔啱:
-> `codegen_dafny.py` 同兩個 session-local `build_proof_map.py` 喺 2026-08-16 刪咗(`d7e6384`),
+> 兩個 `report/` 嘅 `codegen_dafny.py` 同兩個 session-local `build_proof_map.py` 喺 2026-08-16
+> 刪咗(`d7e6384`,四個檔;`sessions/2026-07-24/proof/codegen_dafny.py` 係第三個,留低,見
+> 「跟手要決定嘅三樣」item 3),
 > emitter 係 `pipeline/codegen.py`;`check_claims.py` 唔再係「argv,原樣重用」——佢一度變成八份
 > byte-identical 嘅副本,而家淨返一個 module(`python3 -m pipeline.check_claims`)。要睇今日嘅
 > 結構,睇 CLAUDE.md,唔好睇呢一段。
@@ -48,7 +50,7 @@ tetrio-replay-report/
 |---|---|---|
 | `extract.py` / `extract2.ts` | filename glob hardcoded per session | parameterize input dir + ordering rule → **reuse as-is** |
 | `check_claims.py` | already generic (argv) | **reuse unchanged** |
-| ~~`codegen_dafny.py` Facts emitter + helper lib~~ | ~~generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`)~~ | ~~**promote to `dafny_lib.py`**~~ — OBSOLETE 2026-08-16: the two `report/` copies of `codegen_dafny.py` were deleted by the 106-claim spec port, `dafny_lib.py` was never created, and the nine helper names in the middle column name nothing in the repo today. **Correction, same day:** an earlier version of this note said `codegen_dafny.py` "itself is gone", which is wrong and contradicted this document's own 「跟手要決定嘅三樣」 item 3 — `sessions/2026-07-24/proof/codegen_dafny.py` survives, and it is the corpus's last session-local emitter. It is a cross-check artefact carrying no published badge, and removing it is a live contract decision, not a tidy-up. |
+| ~~`codegen_dafny.py` Facts emitter + helper lib~~ | ~~generic (`bal`, `sum_rf`, `sumsq_rf`, `max_pp_is`, `rmin_is`, `rmax_is`, `lb_max_is`, `variance`, `count_expr`)~~ | ~~**promote to `dafny_lib.py`**~~ — OBSOLETE 2026-08-16: the two `report/` copies of `codegen_dafny.py` were deleted by the 106-claim spec port, `dafny_lib.py` was never created, and the nine helper names in the middle column name nothing in the repo today. **Correction, same day:** an earlier version of this note said `codegen_dafny.py` "itself is gone", which is wrong and contradicted this document's own 「跟手要決定嘅三樣」 item 3 — `sessions/2026-07-24/proof/codegen_dafny.py` survives, and it is the corpus's last session-local emitter. It is a cross-check artefact carrying no published badge, and removing it is a live contract decision, not a tidy-up. **決定咗 2026-08-18:留 —— 理由喺「跟手要決定嘅三樣」item 3 原址,量過先寫。** |
 | `codegen_dafny.py` claim bodies | **hand-written `bC001…bR024` per session** ← the bottleneck | replaced by generators (§2) |
 | Claim text + predicates | hand-written by 2 opus agents per session | auto-generated for ~85%, agents add flavor |
 | `mutation_test.sh` / `gen_consistency.sh` / `build_proof_map.py` | near-generic | parameterize paths → **reuse** |
@@ -2732,10 +2734,62 @@ emitter 截 60 個字元，`pipeline.codegen` 截得闊啲，所以而家印出�
    (路徑係 `pipeline/claims/check_equiv_coverage.py`,唔係 `pipeline/check_equiv_coverage.py` ——
    核過 2026-08-16。個 docstring 自己亦都寫住點解而家冇 ledger 行得到嗰條分支:07-22 同 07-24 係
    最後兩個,port 咗入 spec 代數之後,佢哋個 `null` 變咗真係量到嘅 `[]` 同 `["R015", ...]`。)
-3. **`sessions/2026-07-24/proof/` 仲有佢自己嘅 `codegen_dafny.py`。** 佢係 cross-check artefact，
+3. ~~**`sessions/2026-07-24/proof/` 仲有佢自己嘅 `codegen_dafny.py`。** 佢係 cross-check artefact，
    `check_cross_artefact` 睇住佢同 `report/` 講同一件事，`bin/verify-session` 亦全綠。但佢係
    corpus 入面最後一個 session-local emitter，同上面收咗嗰個 hazard 同一個形狀 —— 分別係佢冇
-   badge 出街。
+   badge 出街。~~
+   **決定咗:留(2026-08-18)。CLAUDE.md 講嘅係「port 咗佢入 spec 代數再刪,或者留低但寫明點解」
+   —— 之前一直冇人寫,係因為之前冇人量過。而家量咗:port 唔係做唔到,係要郁到共用嘅代數,而
+   代價同收益倒轉。**
+
+   - **佢唔係死 code,呢點要講清楚。** `bin/verify-session sessions/2026-07-24/proof` 今日全綠
+     (`22 verified, 0 errors`、proof map `20/20`、byte-identical、3.5 秒),而入面**有兩步係穿過
+     呢個 emitter 行**嘅:`sessions/2026-07-24/proof/gen_consistency.sh:8` 直接 `python3
+     codegen_dafny.py` 再逐 byte 比對 committed 嗰份 `.dfy`;`sessions/2026-07-24/proof/
+     mutation_test.sh:42-47` 逐個 mutant plant 入 `Facts24.dfy` / `Claims24.dfy`,連 const 名都寫死。
+     兩步都由 `bin/verify-session:101-113` 行。所以刪佢唔係清走剩餘物,係要重寫兩個仲有牙嘅 gate。
+   - **20 條 claim 入面有 13 條,代數而家寫唔出。** C006–C018 每條都 assert `m{mi}_index == N`
+     (`sessions/2026-07-24/proof/codegen_dafny.py:106-107` 嘅 `MI(mi)`),而 `pipeline/claims/spec.py`
+     冇任何一個 constructor 讀得到嗰個 field。個 const 本身係有嘅 —— `pipeline/codegen.py:169`
+     照出 `m{mi}_index` —— 但因為冇嘢引用得到,`referenced_consts` 就當佢係 dead const 掃走。
+     **`MI` 嘅工作係將位置 `m4` 綁死喺印出嚟嗰個「第 5 場」**,而 CLAUDE.md 入面「A match's
+     `index` is its position in the session」嗰段記低咗佢擋緊嘅係邊個 bug:2026-08-01 之前,
+     一個證緊 m1 嘅 badge 可以貼喺一張寫住「第 2 場」嘅卡上面。所以掉咗嗰粒 conjunct 唔係簡化,
+     係鬆咗個 claim。
+   - **C018 仲要多一樣:跟住嗰局個 winner 揀邊個玩家嘅 garbage 總和。** `spec.py:181` 個
+     `sum_ge(pl, mi, ri)` 淨係收一個寫死嘅玩家名,而 `codegen_dafny.py:130-135` 嗰個 `wq`/`lq`
+     係讀住 `m{mi}_r{ri}_winner` 即場揀。**繞開佢嘅三條路都試過,三條都令個 truth vector 變,
+     呢個先係呢粒 item 企得穩嘅理由 —— 唔係估,係量過。**
+
+     | 繞法 | 郁咗個 winner datum 之後 | 判定 |
+     |---|---|---|
+     | build 時就將 winner 焗死 | 原本嗰條會變 FALSE,我嗰條照 TRUE | **鬆咗** |
+     | 焗死 + 補返一粒 `round_winner` | 原本嗰條照 TRUE(掉轉個差額都仲係 ≤ 20),我嗰條變 FALSE | **緊咗** |
+     | 改成對稱嘅 `\|wq − lq\| <= 20` | 輸嗰邊射多過贏嗰邊 20 行以上嗰陣,原本 TRUE,我嗰條 FALSE | **緊咗** |
+
+     一鬆一緊都唔係同一條 claim。本 repo 記低咗嘅標準就係「『照樣 evaluate 到 True』分唔開一個
+     翻譯同一個放寬」,所以三條都唔收貨。
+   - **第三個障礙細啲但都係真嘅:** `hand_ledgers()` 今日行落 `sessions/2026-07-24/proof` 會直接
+     **raise** ——「hand ledger(s) with no module to rebuild them: claims-24.json」
+     (`pipeline/claims/build_hand.py:68-74`)。個 convention 係 `hand_claims.py` → `claims-narrative.json`,
+     而 `claims-24.json` 對唔到。即係話 port 埋要順手改個 ledger 名(連 `proof-map-24.json`、
+     `mutation_test.sh` 嗰堆引用),或者擴 `hand_ledgers` 個 mapping。
+   - **解得開佢嘅係兩個 operator:** 一個 `match_index(mi)`,一個 winner 揀邊邊嘅 `sum_ge` —— 三個
+     backend(`spec.py` 嘅 Python 同 Dafny、`smt.py`)加埋大約 +40 行。C004/C020 嗰個整數除法
+     (`codegen_dafny.py:191-195`)反而唔使加嘢:`floor(N/D) == V` ⟺ `V·D <= N < (V+1)·D`,一粒
+     `between` 就寫得返,同 CLAUDE.md 講嗰個 pinned-rate idiom 一模一樣。
+   - **點解今日唔加:blast radius 同收益倒轉。** `spec.py` / `smt.py` 係六個 session、526 條
+     generated claim 全部行經嘅路;為咗一個**冇 badge 出街**嘅 cross-check artefact 入面 20 條
+     claim 去郁佢,係攞成條 trust chain 去換 401 行 plumbing。呢粒嘢由「刪一個舊檔」中途變成
+     「改共用代數」,L8 自己嗰條規矩就係要對 scope 講唔。將來要做係另一件事,唔係一個 session
+     尾巴上面順手加嘅 extension。
+   - **順手改返一個數:** 上面 2026-08-16 嗰段(同 `d7e6384`)刪嘅係**四個**檔 —— 兩個
+     `codegen_dafny.py`(783 + 522 行)加兩個 `build_proof_map.py`(71 + 55 行),服務 07-22 同
+     07-24 兩個 **`report/`** ledger(54 + 52 條)。而家留低呢個係**第三個** emitter,服務 `proof/`
+     自己嗰 20 條 `claims-24.json`,同嗰四個唔係同一批嘢。
+   - **「冇 badge 出街」核過:** `bin/build-docs` 淨係出六份 `report/`,`docs/` 冇任何 `proof/`
+     artefact。`proof/report-2026-07-24.orig.html` 入面嗰 20 個 `data-claim` 係即場 JS 驗證
+     (佢自己嗰段方法論寫住「唔係 Dafny 形式證明」),而嗰個檔本身係封存,唔上線。
 
 ## 兩份出街報告寫錯咗個 event 為咩唔計數 (2026-08-16) — DONE (`4d0f2f5`)
 
@@ -2847,8 +2901,13 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
    radius open, two *published* sessions.
 2. **Adopting `tsc`.** `check_ts_imports.py` is the homemade stand-in and says so; a real pass would
    subsume it. A dependency decision, not an engineering one.
-3. **The downstack-under-pressure pre-registration.** ⚠️ **This one has a deadline: 「Pick one in
-   writing before the seventh session lands.」** A pre-registration that quietly tracks its own
-   implementation is not a pre-registration.
-4. **`sessions/2026-07-24/proof/codegen_dafny.py`**, the corpus's last session-local emitter — item 3
-   of 「跟手要決定嘅三樣」, where items 1 and 2 were decided on 2026-08-17 and this one was not.
+3. ~~**The downstack-under-pressure pre-registration.** ⚠️ **This one has a deadline: 「Pick one in
+   writing before the seventh session lands.」**~~ **決定咗(2026-08-18)— 行現時嘅 instrument,
+   用 commit hash 釘死,08-09 同 08-14 留喺 confirmatory bank,instrument 改動當 deviation 報。**
+   寫喺 `## Open — 2026-08-07` item 1 本身度,而家由 `pipeline/check_preregistrations.py` +
+   `pipeline/preregistrations.json` 睇住,唔再係一段散文。
+4. ~~**`sessions/2026-07-24/proof/codegen_dafny.py`**, the corpus's last session-local emitter — item 3
+   of 「跟手要決定嘅三樣」, where items 1 and 2 were decided on 2026-08-17 and this one was not.~~
+   **決定咗(2026-08-18)— 留,理由寫喺 item 3 原址。** 一句講晒:20 條 claim 有 13 條要
+   `match_index`、1 條仲要 winner 揀邊嘅 `sum_ge`,兩個都要加落共用代數;繞開嗰三條路量過全部
+   令 truth vector 變(一鬆兩緊)。呢四粒 decision 而家淨返第 1、第 2 兩粒。
