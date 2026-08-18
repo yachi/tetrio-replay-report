@@ -572,6 +572,39 @@ jobs:
   # Two of those three still hold; "the tests were not run here" was fixed by the step below, in
   # the commit that created this job. Do not read that as retiring the import gate — the defect it
   # caught was an import that is never CALLED, which running the suite cannot evaluate.
+  # 最癲一局's lede publishes a corpus result — n = 380, a tercile triple, seven Spearman rho
+  # with their raw and Bonferroni-adjusted p — and every one of them is a string literal in
+  # `pipeline/intense_round.CORPUS`. They have to be: the section renders once per session, so a
+  # generator reading every other session's facts.json would re-render all six reports the day a
+  # seventh landed. The cost of a literal is staleness, and it was paid inside 72 minutes — the
+  # lede landed at 0cc719c and 0804a7e re-sourced apm/pps/vs an hour later, moving five of the
+  # seven. Nothing noticed, because no script computed any of them.
+  #
+  # Here and not in a path-filtered workflow: the edit this gate exists to catch is a change to
+  # `sessions/*/report/facts.json` — a re-source, not a new session — and the second is an edit
+  # to a module DOCSTRING. Neither is a path a figures-oriented filter would think to watch.
+  # Unconditional and every push: it is offline, stdlib-only, and the whole measurement over six
+  # sessions runs in well under a second.
+  #
+  # --selftest first, because a gate whose failure has never been demonstrated is not evidence.
+  # The planted cases include a published figure moved one decimal place in each of the three
+  # formatter kinds, a seventh session that moves n and the headline rho, each document drifting
+  # while the other stays right, and the control that pins every string the gate searches for to
+  # one `intense_round.build()` actually emits — the first draft of that spec guessed two needles
+  # the renderer never produced, and only that control caught it.
+  intense-round-corpus:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check the corpus figures 最癲一局 publishes are the ones the data gives
+        run: |
+          set -euo pipefail
+          python3 -m analysis.corpus_stats --selftest
+          python3 -m pipeline.check_intense_corpus --selftest
+          python3 -m pipeline.check_intense_corpus --check
+
   typescript:
     runs-on: ubuntu-22.04
     steps:

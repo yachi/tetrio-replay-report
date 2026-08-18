@@ -32,15 +32,42 @@ generalised without one.
 
 The result: over 380 decided rounds in six sessions, downstacking is the only printed
 measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
-combined VS runs 62.3 → 65.0 → 83.5 for the per-piece rate (Spearman rho +0.210 against
-intensity, Holm-adjusted p 0.0002 over the 20 columns tested; raw 清走 +0.200, p 0.0020).
-It survives both controls the closing note quotes: it is not round LENGTH (the same test
-against duration is rho +0.058, Holm p 1.000, while APM's and 攻擊's apparent decay IS a
-length effect at rho −0.187 / −0.184, Holm p 0.0040 / 0.0098 — which is why the attacking
-lede this section used to carry was not supported as stated), and it is not the loser
-dying with garbage still on the board (normalising by how much garbage ARRIVED strengthens
-it to rho +0.236, and 食 — which carries that same death bias but no skill — does not
-trend, rho +0.096, p 0.06). That death bias is real all the same, and the note keeps it.
+combined VS runs 62.3 → 65.0 → 83.5 for the per-piece rate (Spearman rho +0.212 against
+intensity; raw 清走 +0.201). It survives both controls the closing note quotes: it is not
+round LENGTH (the same test against duration is rho +0.058, while APM's and 攻擊's apparent
+decay IS a length effect at rho −0.178 / −0.184 — which is why the attacking lede this
+section used to carry was not supported as stated), and it is not the loser dying with
+garbage still on the board (normalising by how much garbage ARRIVED strengthens it to
+rho +0.238, and 食 — which carries that same death bias but no skill — does not trend,
+rho +0.097). That death bias is real all the same, and the note keeps it.
+
+**The monotone progression and its controls are the finding; p is supporting evidence.**
+The 380 rounds are nested in matches, in sessions and in two players, so every p here
+assumes an independence the data does not have and is anti-conservative. They are printed
+raw AND Bonferroni-adjusted with the family size beside them, never Holm-adjusted: Holm's
+value for one test is a function of the ENTIRE vector of the family's raw p, so a re-source
+in an unrelated column moves it with no change in your data — which is exactly what
+happened here. `m * p` is a pure function of two numbers this section prints.
+
+**Every figure in this docstring and in the rendered lede is derived by
+`analysis/corpus_stats.py` and gated by `pipeline/check_intense_corpus.py`.** They were
+string literals that no script computed until 2026-08-18, and in that state five of the seven
+went stale in 72 minutes: the lede landed at 0cc719c (2026-08-16 01:42) and 0804a7e
+re-sourced apm/pps/vs from the live tick to `results.aggregatestats` at 02:54, moving every
+figure whose inputs contain APM or VS (rho +0.210 → +0.212, +0.200 → +0.201, −0.187 → −0.178,
++0.096 → +0.097, +0.236 → +0.238) and leaving the two built only from attack / cleared /
+pieces / duration (+0.058 and −0.184) exactly where they were. The published Holm triple was
+worse than stale — its implied multipliers rise with rank where Holm's must fall, so those
+three numbers were never the output of one computation for any family size. `CORPUS` below is
+the single site the prose reads them from, and `analysis/corpus_stats.py`'s docstring carries
+the measurement behind both sentences.
+
+**The family is m = 26 and it used to be published as 20.** 26 is thirteen columns against two
+x-variables, written out as a cross-product in that module and counted there; 20 matched no
+list in this repo, so the multiplicity correction's own denominator was unrecorded. That is a
+change a reader must be able to see, because `m` multiplies every adjusted p this section
+prints — which is why the rendered Cantonese states the family size beside the correction
+rather than only the result of applying it.
 """
 import html
 
@@ -84,6 +111,65 @@ _missing = [f for f, _l, _h in FIELDS if f not in INTENSE_DIRECTION]
 if _missing:
     raise SystemExit("intense_round: " + ", ".join(_missing) + " printed with no entry "
                      "in generators.INTENSE_DIRECTION")
+
+# The corpus figures the lede and the closing note quote, in ONE place.
+#
+# These are the only numbers in this section that are not read out of a proved claim, because
+# they are not about this session at all — they are about all six. They are literals here and
+# derived nowhere at render time on purpose: a per-session generator that read every other
+# session's facts.json would re-render all six reports whenever a seventh landed, and this
+# repo's byte-identity gates are what make an unrelated change reviewable.
+#
+# The cost of literals is staleness, so it is paid for by a gate rather than by care:
+# `pipeline/check_intense_corpus.py` re-derives every value below from `sessions/*/report/
+# facts.json` through `analysis/corpus_stats.py` and fails on any drift, and separately
+# requires each rendered report to still contain the strings these produce. Keys are that
+# module's test ids (`<column>/<x-variable>`); `m` is its `len(FAMILY)`.
+#
+# Every string here is what THAT module's formatters produce — `fmt_rho` rounds half-up
+# (rho is a two-sided point estimate), `fmt_auc` likewise, and `fmt_p` CEILS, because a
+# p-value is an upper bound on a false-positive rate and the safe direction is up.
+CORPUS = {
+    "n": 380,
+    "m": 26,
+    "tercile_test": "cleared_pp/intensity",
+    "terciles": ["62.3", "65.0", "83.5"],
+    "tests": {
+        # the finding
+        "cleared_pp/intensity": {"rho": "+0.212", "raw": "0.0001", "adj": "0.0009"},
+        "cleared/intensity": {"rho": "+0.201", "raw": "0.0001", "adj": "0.0021"},
+        # control 1 — length
+        "cleared_pp/duration": {"rho": "+0.058", "raw": "0.2611", "adj": "1.0000"},
+        "apm/duration": {"rho": "-0.178", "raw": "0.0006", "adj": "0.0132"},
+        "attack/duration": {"rho": "-0.184", "raw": "0.0004", "adj": "0.0081"},
+        # control 2 — the loser's death bias
+        "cleared_per_received/intensity": {"rho": "+0.238", "raw": "0.0001", "adj": "0.0001"},
+        "received/intensity": {"rho": "+0.097", "raw": "0.0580", "adj": "1.0000"},
+    },
+}
+
+
+def cjk(s):
+    """`+1.234` -> `＋1.234`. The prose renders the typographic signs; the gate searches for
+    exactly what was rendered, so the translation happens once, here.
+
+    The example is a made-up number on purpose. It used to be `+0.212`, which is a LIVE figure
+    — `cleared_pp/intensity`'s rho — and `check_intense_corpus` normalises ＋ to + before
+    searching, so this docstring counted as the module's prose quoting that figure. Two costs:
+    moving the rho would have failed the gate here, in an example that is not a finding; and it
+    masked the mutant that proves the docstring check works at all, which is how it was found.
+
+    Public, and named in this module rather than beside the formatters that produce the ASCII:
+    `pipeline/check_intense_corpus.py` imports it to build its needles, so the string it looks
+    for and the string this file emits are the same expression evaluated twice. A copy in the
+    gate would agree the day it was written — the rule check_loo.py:288 states.
+    """
+    return s.replace("+", "＋").replace("-", "−")
+
+
+def _rho(test):
+    return cjk(CORPUS["tests"][test]["rho"])
+
 
 # There was a field -> label map here for the finding sentence. The sentence names AXES
 # now, and `INTENSE_AXES` carries those names, so a second map would be a copy of the
@@ -306,16 +392,25 @@ def build(facts, report_dir):
            '短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。'
            '點解要專登揀最癲嗰局出嚟拆：'
            '<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。'
-           '呢句唔係由下面呢一局睇出嚟嘅——係喺六個 session、380 局有勝負嘅局度量返嚟：'
-           '將全部局按「兩邊 VS 加埋」由低到高分三份，'
-           '每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
-           '由 62.3% 升到 65.0% 再升到 83.5%'
-           '（Spearman rho ＋0.210，Holm 校正後 p 0.0002），'
-           '而攻擊同 APM 完全冇呢個升勢。'
-           '下面呢一局係<strong>個例子</strong>，唔係個證據——'
-           '兩個控制實驗喺最尾嗰段。'
-           '每個數都係由 claim 本身證嗰條式度攞返嚟，'
-           '唔係喺呢度重新計一次。</p>',
+           f'呢句唔係由下面呢一局睇出嚟嘅——係喺六個 session、{CORPUS["n"]} 局有勝負嘅局'
+           f'度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，'
+           f'每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
+           f'由 {CORPUS["terciles"][0]}% 升到 {CORPUS["terciles"][1]}% '
+           f'再升到 {CORPUS["terciles"][2]}%（Spearman rho {_rho("cleared_pp/intensity")}），'
+           f'而攻擊同 APM 完全冇呢個升勢。'
+           f'<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，'
+           f'唔係個 p 值：呢 {CORPUS["n"]} 局係喺同一場、同一晚、同兩個人身上打出嚟，'
+           f'唔係獨立嘅，所以呢度每個 p 都偏細。'
+           f'（旁證：raw p {CORPUS["tests"]["cleared_pp/intensity"]["raw"]}，'
+           f'成個 family {CORPUS["m"]} 個測試，Bonferroni 校正後 '
+           f'{CORPUS["tests"]["cleared_pp/intensity"]["adj"]}。'
+           f'用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——'
+           f'第二條 column 換咗來源，你呢個數都會跟住郁；'
+           f'Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）'
+           f'下面呢一局係<strong>個例子</strong>，唔係個證據——'
+           f'兩個控制實驗喺最尾嗰段。'
+           f'表入面每個數都係由 claim 本身證嗰條式度攞返嚟，'
+           f'唔係喺呢度重新計一次。</p>',
            '    <div class="ir-scroll">',
            '      <table class="ir-table">',
            '        <thead><tr><th>數據</th>'
@@ -463,20 +558,29 @@ def build(facts, report_dir):
     # two things that could manufacture it are stated where the reader meets it. Both
     # were measured before the lede was written, not after — the death bias in
     # particular is an objection this section already documented against itself.
+    t = CORPUS["tests"]
     out.append('    <p class="ir-note">'
                '個升勢查咗兩樣嘢先敢寫：'
                '一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，'
-               'rho 得 ＋0.058、Holm 校正後 p 1.000，即係乜都冇；'
+               f'rho 得 {_rho("cleared_pp/duration")}'
+               f'（raw p {t["cleared_pp/duration"]["raw"]}，校正後 '
+               f'{t["cleared_pp/duration"]["adj"]}），即係乜都冇；'
                '反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應'
-               '（rho −0.187 同 −0.184，p 0.0040 同 0.0098）——'
+               f'（rho {_rho("apm/duration")} 同 {_rho("attack/duration")}，'
+               f'校正後 {t["apm/duration"]["adj"]} 同 {t["attack/duration"]["adj"]}）——'
                '所以呢節以前用攻擊做主打嗰句，其實撐唔住。'
                '二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——'
-               '除返收到幾多垃圾之後個升勢仲強（rho ＋0.236），'
-               '而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇顯著升勢'
-               '（rho ＋0.096，p 0.06）。'
+               f'除返收到幾多垃圾之後個升勢仲強'
+               f'（rho {_rho("cleared_per_received/intensity")}），'
+               '而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢'
+               f'（rho {_rho("received/intensity")}，raw p {t["received/intensity"]["raw"]}，'
+               f'校正後 {t["received/intensity"]["adj"]}）。'
                '不過個偏差本身係真嘅，唔好當佢唔存在：'
                '<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，'
-               '因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。</p>')
+               '因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。'
+               '呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、'
+               '<code>pipeline/check_intense_corpus.py</code> 睇住，'
+               '唔係打上去嘅。</p>')
     out.append('    <p class="ir-note">Claim：'
                + html.escape(" · ".join(ids))
                + (" ⏳" if pending else " ✓") + '</p>')
