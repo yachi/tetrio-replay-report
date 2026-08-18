@@ -29,13 +29,13 @@
  * so the spin count, the presence of the last-kick branch (i==4), and a non-empty ledger are pinned.
  */
 import { test, expect, describe } from 'bun:test';
-import { existsSync } from 'node:fs';
 import { emptyBoard, H, detectTSpin } from './sim.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
 import { tryMove, tryRotate, isValidPosition, setKickset } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { occ, ccTspin, ccKickIndex } from './cc-tspin.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { discoverCorpus } from '../corpus-membership.ts';
 
 const W = 10;
 type Rot = 0 | 1 | 2 | 3;
@@ -173,9 +173,16 @@ describe('detectTSpin vs cold-clear rotate() over seeded overhang boards', () =>
 });
 
 // ── the two invariants also hold on REAL game boards (verified-prefix corpus, guarded) ───────────
-// Session list explicit, not globbed (memory: sim-test-corpus-silently-under-covers).
-const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
-  .map(d => `${import.meta.dir}/../../sessions/${d}`).filter(existsSync);
+// DISCOVERED. This read "explicit, not globbed (memory: sim-test-corpus-silently-under-covers)",
+// and that memory has since been resolved the other way: what it warns against is keying the corpus
+// on INCIDENTAL filesystem state — `forecast-saturation.test.ts` admitted a session only once some
+// other tool had written it a `sim/` directory. `.ttrm` is not incidental, it is what makes a
+// session a session, and it is the predicate that file and `forecast-access-class.test.ts` were both
+// moved to when the hole was closed. An explicit list defends against the wrong hazard here: every
+// assertion below is `toBe(0)` or `toBeGreaterThan(0)`, none of them per-session, so the list bought
+// nothing and cost the newest session's coverage.
+const SIM_SESSIONS = discoverCorpus(`${import.meta.dir}/../../sessions`)
+  .map(d => `${import.meta.dir}/../../sessions/${d}`);
 
 describe.skipIf(SIM_SESSIONS.length === 0)('detectTSpin vs cold-clear rotate() over real verified-prefix boards', () => {
   test('every verified-prefix board of all sessions: none-vs-spin exact, ledger fully explained', () => {

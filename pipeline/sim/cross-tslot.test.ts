@@ -8,12 +8,13 @@
  * share no code is worth more than any number of assertions about one of them.
  */
 import { test, expect } from 'bun:test';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { ccTslots, colHeight, occ } from './cc-tslot.ts';
 import { bestTspinLines } from './forecast.ts';
 import { H } from './sim.ts';
 import { classify } from './tslot-sanction.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
+import { assertCorpusIsEverySessionOnDisk, sessionsOnDisk } from '../corpus-membership.ts';
 
 const W = 10;
 const mk = (rows: string[]) => {
@@ -42,10 +43,23 @@ test('the coordinate conversion, which is the easiest thing in the port to get w
 // Every session, not a list that stopped being every session. This stood at four from 2026-08-12
 // to 2026-08-15 while 08-09 and 08-14 joined the corpus, so 134 rounds sat outside the only check
 // that compares this count against an implementation we did not write — and nothing went red,
-// because a shorter list is indistinguishable from a clean run. `filter(existsSync)` keeps a
-// checkout without a session working; it is not licence to leave a session out.
-const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
-  .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
+// because a shorter list is indistinguishable from a clean run.
+//
+// KEPT AS A LIST AND CHECKED AGAINST DISK, where the three sibling cross-* files were globbed
+// outright. The difference is the last assertion in this file: `toBe(61656)` pins the corpus's
+// total board count, so a literal here DOES depend on which sessions are read. Globbing would
+// cover a seventh session silently and leave that pin to fail with a bare number; the membership
+// check fails first and names the session, which is the difference between "re-bless 61656" and
+// "work out why 61656 moved".
+//
+// The empty case stays a SKIP rather than a throw — this file has always supported a checkout with
+// no sessions, which is what `realData` below expresses — so `sessionsOnDisk` is called directly
+// instead of `discoverCorpus`.
+const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
+const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
+  ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
+      ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14'])
+  : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
 

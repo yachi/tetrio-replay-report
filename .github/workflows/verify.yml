@@ -730,12 +730,23 @@ jobs:
       # matter what was written here. Both were extended to six on 2026-08-15; extending the test's
       # copy failed it at once (39033 -> 61656 boards) while its differential stayed empty. If you
       # add a session, all three lists need it — this loop is not the only one.
+      # DISCOVERED FROM DISK, like the two extractor loops in `cross-extractor` — but on a different
+      # UNIT, and the difference matters. Those iterate ARTEFACT directories (`sessions/*/report`,
+      # `sessions/*/proof`) and key on `extract2*.ts`. This one sets REPLAY_DIR, which `replayDir()`
+      # requires to hold `.ttrm` files, so its unit is the SESSION and its predicate is the replays —
+      # the same predicate `corpus-membership.sessionsOnDisk` and `check_provenance.sessionDirs` use.
+      # Keying this on `extract2*.ts` would iterate two directories per session and run the gate twice
+      # over the same replays.
       - name: Every T-spin line count matches the Rust original across the corpus
         run: |
           set -euo pipefail
-          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01 2026-08-09 2026-08-14; do
+          SESSIONS=$(find sessions -mindepth 1 -maxdepth 1 -type d \
+                       -exec sh -c 'find "$1" -maxdepth 1 -name "*.ttrm" | grep -q .' _ {} \; \
+                       -print | sort)
+          [ -n "$SESSIONS" ] || { echo "FAIL: no session directory holds .ttrm replays" >&2; exit 1; }
+          for s in $SESSIONS; do
             echo "-- $s"
-            REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
+            REPLAY_DIR="$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
           done
 
       # cross-tslot-count checks ours against cold-clear's SINGLE best detector. This checks the

@@ -37,6 +37,27 @@ export function sessionsOnDisk(sessionsRoot: string): string[] {
 }
 
 /**
+ * The corpus, discovered — for the files that pin NO per-session literal and so need no list.
+ *
+ * Throws on an empty corpus rather than returning `[]`, because every assertion downstream passes
+ * vacuously over an empty array and a sweep over nothing prints exactly like a clean one. Callers
+ * that deliberately support a session-less checkout want `sessionsOnDisk` and their own `skipIf`.
+ *
+ * This is NOT the discovery `sim-test-corpus-silently-under-covers` warns about. That memory is
+ * about keying the corpus on INCIDENTAL filesystem state — `forecast-saturation.test.ts` admitted a
+ * session only once some other tool had written it a `sim/` directory, so the corpus depended on
+ * whether an unrelated artifact happened to exist yet. `.ttrm` is not incidental: it is what makes
+ * a session a session, and it is the predicate `forecast-saturation.test.ts` and
+ * `forecast-access-class.test.ts` were both moved to when that hole was closed.
+ */
+export function discoverCorpus(sessionsRoot: string): string[] {
+  const disk = sessionsOnDisk(sessionsRoot);
+  if (!disk.length)
+    throw new Error(`corpus discovery: no session directories with .ttrm replays under ${sessionsRoot}`);
+  return disk;
+}
+
+/**
  * Throws unless `listed` is exactly the sessions on disk. Returns `listed` unchanged so the
  * caller reads `const SESSIONS = assertCorpusIsEverySessionOnDisk(root, [...])` and keeps the
  * array it already had.

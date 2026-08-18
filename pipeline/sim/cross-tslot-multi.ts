@@ -40,6 +40,7 @@
  */
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { discoverCorpus } from '../corpus-membership.ts';
 import { bestTspinLines } from './forecast.ts';
 import { classify } from './tslot-sanction.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
@@ -47,11 +48,15 @@ import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 const oracle = process.argv[2];
 if (!oracle) { console.error('usage: cross-tslot-multi.ts <path to cc-oracle>'); process.exit(2); }
 
-// Every session. This stood at four from 2026-08-12 to 2026-08-15 while 08-09 and 08-14 joined
-// the corpus, so the CI step that runs this file covered four sessions no matter what the workflow
-// said — the same silent-under-coverage the workflow's own loop had. Adding a session means adding
-// it HERE too; nothing derives this list.
-const SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14'];
+// DISCOVERED, not listed. This stood at four from 2026-08-12 to 2026-08-15 while 08-09 and 08-14
+// joined the corpus, so the CI step that runs this file covered four sessions no matter what the
+// workflow said — the same silent-under-coverage the workflow's own loop had. "Adding a session
+// means adding it HERE too" was the instruction that replaced it, and an instruction is not a gate.
+//
+// Globbed rather than membership-checked because this file pins NO per-session literal: it prints
+// a differential and gates on `firstGtOurs > 0`, so a seventh session is covered the day it lands
+// with nothing to re-bless. `cross-tslot.test.ts` gets the other treatment for the opposite reason.
+const SESSIONS = discoverCorpus(resolve('sessions'));
 
 interface CC { any: boolean; lines: number; slots: number[]; }
 
