@@ -134,8 +134,15 @@ def check(path, only=None):
         bad += len(wrong)
         if not wrong:
             print(f"  ok  {solver} — {len(pairs)} claims, all unsat")
-    for s in missing:
-        print(f"  --  {s} not installed, so this run is single-solver")
+    # The count is DERIVED, never a literal. This line read "so this run is
+    # single-solver" and printed once per absent solver, which was true only
+    # while CI installed one — as of 2026-08-18 the pipeline job installs both,
+    # and a log line denying the very property the second install exists to
+    # establish is worse than no line. `check_lemma_vacuity` has always phrased
+    # it this way; this is the same sentence.
+    if missing:
+        print(f"  --  {', '.join(missing)} not installed, so this run is "
+              f"{len(found)}-solver")
     return 1 if bad else 0
 
 

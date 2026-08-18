@@ -23,21 +23,38 @@ permissions:
 
 env:
   DAFNY_VERSION: 4.11.0
-  # sha256 of dafny-4.11.0-x64-ubuntu-22.04.zip, from the signed release listing
+  # The runners are ubuntu-24.04 and this asset is not, which is deliberate rather
+  # than a pin somebody forgot. `x64-ubuntu-22.04` is the ONLY Linux asset Dafny
+  # publishes — checked at 4.11.0, which is also the latest release — so the
+  # 24.04 URL a reader expects here does not exist and would 404 the whole
+  # verification. It is a variable so that the three install steps below say
+  # `${DAFNY_ASSET_OS}` and there is nothing at those sites to "correct".
+  #
+  # A glibc-2.35 build on a glibc-2.39 runner is glibc's supported direction, and
+  # Dafny's own xunit, integration, refman and doc-tests workflows all run on
+  # ubuntu-24.04, so upstream tests this configuration. What makes it safe to rely
+  # on rather than merely likely is that the dependency is FAIL-CLOSED: if the
+  # binary will not load, `dafny --version` in the next step dies before a single
+  # claim is checked. There is no arrangement here where a broken Dafny yields a
+  # green verification — the failure mode is a red job, not a quiet one.
+  DAFNY_ASSET_OS: ubuntu-22.04
+  # sha256 of dafny-4.11.0-x64-ubuntu-22.04.zip, from the signed release listing.
+  # GitHub's asset digest reports the same hash, so this pin has two authorities.
   DAFNY_SHA256: a46a9ff7cdd720f7955854c78e95df13f4cfe6b80691b05f8654fe19e8267179
   CVC5_VERSION: 1.3.4
   # sha256 of cvc5-Linux-x86_64-static.zip. Two independent authorities agree on
   # this: cvc5's own Homebrew cask (cvc5/homebrew-cvc5) and GitHub's asset digest.
   CVC5_SHA256: dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6
-  # Newest z3 still shipping a glibc-2.35 build (ubuntu-22.04's). See the install
-  # step for why the lemma-vacuity gate needs z3 specifically, and why this pin is
-  # weaker than the cvc5 one above.
-  Z3_VERSION: 4.14.1
-  Z3_SHA256: 76f797c849ae1487ce08840321d3334720434e0eb1a23e1bd755c3818ffb7265
+  # The x64-glibc-2.39 build, which is what ubuntu-24.04 runs. This hash is READ
+  # OUT OF GitHub's published asset digest rather than computed from our own
+  # download, which is the whole reason the version moved with the runner — see
+  # the install step for the pin's provenance and for why it must be z3 here.
+  Z3_VERSION: 4.16.0
+  Z3_SHA256: 7288c49a5bd6dbafd7b0b0d1f65956b91672da24b08f09242919af159be3418e
 
 jobs:
   verify:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +73,7 @@ jobs:
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
-          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-ubuntu-22.04.zip"
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
           curl -fsSL "$URL" -o dafny.zip
           echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
           unzip -q dafny.zip -d "$HOME/dafny-dist"
@@ -76,12 +93,11 @@ jobs:
       # one. The free-variable queries this gate asks are simply not cvc5's
       # ground, and the two solvers are not interchangeable for it.
       #
-      # 4.14.1 is the NEWEST z3 release still shipping a glibc-2.35 build, which
-      # is what ubuntu-22.04 has; every release after it is glibc-2.39 only, the
-      # constraint the SMT job's comment records.
-      #
-      # WEAKER PIN THAN THE cvc5 ONE BELOW, deliberately, and here is the search
-      # that settled it (2026-08-02) so nobody has to repeat it:
+      # THE VERSION IS PINNED TO THE RUNNER, and 2026-08-18 is when that stopped
+      # costing anything. The old pin was 4.14.1 — the NEWEST z3 still shipping a
+      # glibc-2.35 build, which is all ubuntu-22.04 could run — and its sha256 was
+      # trust-on-first-use, because the 2026-08-02 search below found no authority
+      # for any glibc-2.35 asset:
       #
       #   - GitHub asset `digest`: null for EVERY z3 release that ships a
       #     glibc-2.35 build (checked 4.13.4, 4.14.1). Every release that DOES
@@ -93,26 +109,35 @@ jobs:
       #   - nixpkgs builds z3 from source (`fetchFromGitHub` on a rev), as does
       #     its F* z3 pin, so neither is an authority for this binary zip.
       #
-      # So the sha256 below is trust-on-first-use: computed from a download whose
-      # byte length matches the API's (51650111). It defends against the asset
-      # changing from here on, not against it having been wrong when first
-      # fetched.
+      # That comment declined 4.16.0 and named its own trigger — "revisit if the
+      # job moves to 24.04 for its own reasons". ubuntu-22.04's deprecation is
+      # that reason, so the OS moved for itself and the solver came along.
+      # 4.16.0's x64-glibc-2.39 asset has a digest, and the hash above is COPIED
+      # FROM IT rather than computed from a download of ours, so the `sha256sum
+      # -c` below is now a check against an outside authority instead of against
+      # ourselves — and it is that line, on every run, that confirms the digest
+      # against the bytes.
       #
-      # The one way to reach a two-authority pin is ubuntu-24.04 + z3 4.16.0,
-      # whose digest GitHub publishes. NOT taken: that would move the OS under
-      # the Dafny proof run to strengthen a helper tool's provenance, and the
-      # verification result is the thing this repo exists to protect. Revisit if
-      # the job moves to 24.04 for its own reasons, or if Z3Prover starts
-      # publishing digests for the builds this runner can execute.
+      # The version bump was measured before it landed, on the thing it could
+      # break: the lemma-vacuity gate settles all six artefacts under z3 4.16.0
+      # as the ONLY solver on PATH, which is this job's configuration. That gate
+      # treats `unknown` as a failure, so "it passed" means the queries were
+      # decided, not that a slower solver was tolerated.
+      #
+      # STILL ONE AUTHORITY, NOT TWO — do not read this as reaching the cvc5 pin's
+      # standard. cvc5 has a Homebrew cask carrying an independently computed
+      # hash; z3 has no cask (the formula builds from source), and the 4.16.0
+      # asset has no attestation either (checked, still 404). What changed is
+      # zero authorities to one, which is worth having and is not the same claim.
       - name: Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
-          URL="https://github.com/Z3Prover/z3/releases/download/z3-${Z3_VERSION}/z3-${Z3_VERSION}-x64-glibc-2.35.zip"
+          URL="https://github.com/Z3Prover/z3/releases/download/z3-${Z3_VERSION}/z3-${Z3_VERSION}-x64-glibc-2.39.zip"
           curl -fsSL "$URL" -o z3.zip
           echo "${Z3_SHA256}  z3.zip" | sha256sum -c -
           unzip -q z3.zip -d "$HOME/z3-dist"
           mkdir -p "$HOME/bin"
-          cp "$HOME/z3-dist/z3-${Z3_VERSION}-x64-glibc-2.35/bin/z3" "$HOME/bin/z3"
+          cp "$HOME/z3-dist/z3-${Z3_VERSION}-x64-glibc-2.39/bin/z3" "$HOME/bin/z3"
           echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Show tool versions
@@ -172,7 +197,7 @@ jobs:
   # is byte-identical to what is committed, then generate and verify its Dafny. This is
   # what keeps "a new session is one command" true rather than aspirational.
   pipeline:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -185,7 +210,7 @@ jobs:
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
-          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-ubuntu-22.04.zip"
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
           curl -fsSL "$URL" -o dafny.zip
           echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
           unzip -q dafny.zip -d "$HOME/dafny-dist"
@@ -390,19 +415,34 @@ jobs:
       # cvc5 is the SECOND solver: independently implemented from Z3, checking the
       # same committed .smt2. Pinned by sha256 — the same hash cvc5's own Homebrew
       # cask carries and GitHub's asset digest reports, which agree with each other.
-      # (Recent z3 releases only ship glibc-2.39 builds, which will not run on this
-      # runner, so z3 is the local solver and cvc5 the CI one.)
-      - name: Install cvc5 ${{ env.CVC5_VERSION }} (pinned by sha256)
+      #
+      # Both solvers install here as of 2026-08-18. The parenthesis that used to
+      # sit at the end of this comment said z3 was the local solver and cvc5 the
+      # CI one, and the REASON it gave was real: recent z3 ships glibc-2.39 only,
+      # which ubuntu-22.04 could not run. The runner is ubuntu-24.04 now, the
+      # reason is gone, and "both solvers agree on every generated claim" was a
+      # sentence no CI job checked — a local result published as a property of
+      # the committed artefact. `check_smt` runs every solver on PATH and prints
+      # how many it found, so installing the second one is all it takes to turn
+      # that sentence into a gated one. Its per-solver line prints the claim
+      # count, which is why no count is written here.
+      - name: Install cvc5 ${{ env.CVC5_VERSION }} and z3 ${{ env.Z3_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
+          mkdir -p "$HOME/bin"
           URL="https://github.com/cvc5/cvc5/releases/download/cvc5-${CVC5_VERSION}/cvc5-Linux-x86_64-static.zip"
           curl -fsSL "$URL" -o cvc5.zip
           echo "${CVC5_SHA256}  cvc5.zip" | sha256sum -c -
           unzip -q cvc5.zip -d "$HOME/cvc5-dist"
-          mkdir -p "$HOME/bin"
           cp "$HOME/cvc5-dist/cvc5-Linux-x86_64-static/bin/cvc5" "$HOME/bin/cvc5"
+          URL="https://github.com/Z3Prover/z3/releases/download/z3-${Z3_VERSION}/z3-${Z3_VERSION}-x64-glibc-2.39.zip"
+          curl -fsSL "$URL" -o z3.zip
+          echo "${Z3_SHA256}  z3.zip" | sha256sum -c -
+          unzip -q z3.zip -d "$HOME/z3-dist"
+          cp "$HOME/z3-dist/z3-${Z3_VERSION}-x64-glibc-2.39/bin/z3" "$HOME/bin/z3"
           echo "$HOME/bin" >> "$GITHUB_PATH"
           "$HOME/bin/cvc5" --version | head -1
+          "$HOME/bin/z3" --version
 
       # The same claims, rendered to SMT-LIB from the same specs and checked by a
       # solver directly. Runs in well under a second, so the anti-vacuity mutation
@@ -418,7 +458,7 @@ jobs:
   # The second extractor is a genuinely independent implementation; re-running it
   # is what makes the "two parsers agree" claim mean something.
   cross-extractor:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -526,7 +566,7 @@ jobs:
   # actually load stayed stale. That happened: a whole section (T-Spin Forecast)
   # was live in sessions/ and absent from docs/ until someone noticed by hand.
   docs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -550,7 +590,7 @@ jobs:
   # that stops crossing (an unearned caveat is as stale as a missing one), and a space inside a
   # round label — the mutant that says the line-wrap tolerance is not a whitespace strip.
   leave-one-out:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -593,7 +633,7 @@ jobs:
   # one `intense_round.build()` actually emits — the first draft of that spec guessed two needles
   # the renderer never produced, and only that control caught it.
   intense-round-corpus:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -606,7 +646,7 @@ jobs:
           python3 -m pipeline.check_intense_corpus --check
 
   typescript:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -639,7 +679,7 @@ jobs:
   # outside CI and were green on one laptop. Everything below was already runnable; the omission
   # was that no job ran it.
   spec:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -647,7 +687,7 @@ jobs:
       - name: Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)
         run: |
           set -euo pipefail
-          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-ubuntu-22.04.zip"
+          URL="https://github.com/dafny-lang/dafny/releases/download/v${DAFNY_VERSION}/dafny-${DAFNY_VERSION}-x64-${DAFNY_ASSET_OS}.zip"
           curl -fsSL "$URL" -o dafny.zip
           echo "${DAFNY_SHA256}  dafny.zip" | sha256sum -c -
           unzip -q dafny.zip -d "$HOME/dafny-dist"
@@ -821,7 +861,7 @@ jobs:
   # that went stale 72 minutes after it was written, and a registration frozen against an
   # implementation nothing else uses. This job is the enforceable form.
   preregistrations:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
