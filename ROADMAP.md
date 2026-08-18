@@ -1084,6 +1084,10 @@ pairs" instead of silently dropping the line when the test has nothing to decide
 
 ### 1 — Pre-register `downstack rate under pressure` BEFORE the next session is recorded
 
+**Instrument question DECIDED 2026-08-18 (see the end of this item); the test itself is still parked
+on the bank, which is about half full.** Nothing here was breached — the registration landed
+2026-08-07, before every session it governs.
+
 The triage above left exactly one candidate alive: rows cleared per piece while garbage is on the
 board. Pooled AUC **67.6%** on 51 decided pairs, exact p=0.011, Holm 0.077, same sign in all four
 sessions (71.9 / 71.9 / 58.3 / 65.0), and its pre-declared control — the same rate with *no* garbage
@@ -1138,8 +1142,51 @@ is now ambiguous, and the ambiguity must be resolved **before** the test runs, n
 The honest options are: re-register against the current implementation and treat 08-09/08-14 as
 exploratory too (safest, costs two sessions), or run it on the current implementation and report the
 prefix change as a deviation with the exploratory figures re-derived under the new prefix for
-comparison. **Pick one in writing before the seventh session lands.** A pre-registration that quietly
-tracks its own implementation is not a pre-registration.
+comparison. ~~**Pick one in writing before the seventh session lands.**~~ A pre-registration that
+quietly tracks its own implementation is not a pre-registration.
+
+**DECIDED 2026-08-18 — option two. Run on the current instrument, pinned by hash; 08-09 and 08-14
+stay in the confirmatory bank; the instrument change is reported as a deviation.**
+
+- **The instrument, named by bytes rather than by "today".** `runCaseOracle` as the board source,
+  over the post-hoisted-DAS verified prefix, pinned at commit `5ee5796`. The estimand is not one
+  file: `pipeline/preregistrations.json` pins the hash and `pipeline/check_preregistrations.py`
+  walks the import closure of `board-metrics.ts` — **46 files**, the vendored Triangle engine
+  included, because a re-vendor changes the boards and therefore the number.
+- **This is a deviation in instrument, not a new hypothesis.** Estimand (paired AUC of rows cleared
+  per piece over locks whose PRE-lock board carries garbage, verified prefix only), unit (the
+  player-round, paired by `decideWinner`), direction (one-sided, winner higher), test (exact sign
+  test with the decided count printed beside it), threshold (p < 0.05 one-sided on the new data
+  alone) and controls (calm-clear rate inside 45–55%, prefix-length imbalance reported) are all
+  unchanged from 2026-08-07. What changed is the machine that computes it, and it changed for
+  reasons documented independently and blind to this hypothesis: the hoisted-DAS fix (`c9f3065`,
+  2026-08-11) and the oracle board source (`a38ccc1`, 2026-08-12) are both drift work, neither
+  mentions downstack, and the estimand has never been computed on either banked session.
+- **The ambiguity was sharper than "the prefix moved".** `board-metrics.ts:25` still imports the
+  hand-port `runCase` and `:109` still calls it; the file was last touched 2026-08-06 (`f5ee923`),
+  *before* the oracle migration. Fifteen other files in `pipeline/sim` and `pipeline/openers` are on
+  `runCaseOracle`. So "exactly as `board-metrics.ts` computes it today" named an instrument the rest
+  of the repo has demoted — the registration was not tracking its own implementation, it was frozen
+  against an implementation nothing else uses. Naming `runCaseOracle` is what makes the pin mean
+  the same thing as the rest of the corpus work.
+- **The apm/pps/vs re-source (2026-08-15) does not touch this.** `board-metrics.ts` reads none of
+  that triple — grep count 0 — so the third instrument change of the month is not a deviation here.
+- **PARTIAL UNBLINDING, disclosed.** CLAUDE.md publishes the *unconditional* per-piece DS paired AUC
+  for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the
+  registered one conditions on garbage being on the pre-lock board — but the two are correlated, so
+  the bank is not blind and the confirmatory test must say so when it runs. This is a caveat carried
+  forward, like the prefix-length imbalance above, not a reason to discard the bank: the conditional
+  estimand itself has never been computed on 08-09 or 08-14.
+- **What is still parked.** The test. Two banked sessions is roughly half of the ~50 decided pairs
+  the power table above prescribes. Nothing goes in a report until that is satisfied.
+
+The rule this encodes, and the reason it is a gate and not this paragraph: **a pre-registration is a
+script plus a pinned hash plus a gate, or it is a wish.** Three times in one week this repo has
+measured the same shape — an obligation with no gate does not survive contact with its own velocity.
+`check_cross_artefact` was one (two artefacts of one session drifting because `verify-session` only
+ever sees one directory), the 2026-08-16 ROADMAP audit was another (six items filed open that were
+already done). This item was the third, and the only thing that had noticed in eleven days was a
+person re-reading it.
 
 ### 2 — The C-Spin negative is bounded by CATALOGUE COVERAGE, not by the matcher
 
