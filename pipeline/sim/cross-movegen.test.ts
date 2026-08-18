@@ -48,10 +48,22 @@ import type { Board, ActivePiece } from './vendor/core/srs.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells, isValidPosition, setKickset } from './vendor/core/srs.ts';
 import type { PieceType } from './vendor/core/types.ts';
 import { loadCases, runCase, verifiedIndex } from './verified-prefix.ts';
+import { discoverCorpus } from '../corpus-membership.ts';
 
 const W = 10;
 const PIECES: PieceType[] = ['I', 'T', 'O', 'S', 'Z', 'L', 'J'];
-const ORACLE = process.env.CC_ORACLE ?? '/Users/yachi/github/tetrio-replay-report/result/bin/cc-oracle';
+// Resolved from THIS file, never an absolute path into one checkout. The default was
+// `/Users/yachi/github/tetrio-replay-report/result/bin/cc-oracle`, so in a worktree the BFS was
+// differentialled against a binary built from a different tree — measured: with CC_ORACLE unset
+// this file did not skip, it ran and passed through that other checkout's `result` symlink.
+// Same class as `analysis/rate_records.R`'s absolute `repo`, which silently measured the other
+// tree's sessions. Both symlinks happened to resolve to the same nix store path, so it was
+// latent rather than wrong today.
+//
+// Still a SKIP and not a failure when the binary is absent: the `typescript` job runs the whole
+// suite with no CC_ORACLE and no nix, so a hard failure here would turn that job red for a
+// dependency it is not meant to have. `oracle-image` sets CC_ORACLE explicitly and is unchanged.
+const ORACLE = process.env.CC_ORACLE ?? `${import.meta.dir}/../../result/bin/cc-oracle`;
 const HAVE_ORACLE = existsSync(ORACLE);
 
 // Canonical key for a placement = its four occupied [col,row] cells, sorted (row, col).
@@ -165,16 +177,22 @@ describe.skipIf(!HAVE_ORACLE)('reachable placements vs real cold-clear find_move
 
 // The random-board legs above exercise the tables broadly but prove nothing about the boards the
 // forecast metric actually runs on. This leg is item 3's corpus requirement (engine-verification-plan
-// § Item 3): every verified-prefix board of every session, the piece bestTspin actually walks. Session
-// list is explicit, not globbed (memory: sim-test-corpus-silently-under-covers) — a new session's
-// directory existing is not enough to be included; it must be named here.
-const SIM_SESSIONS = ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14']
-  .map(s => `${import.meta.dir}/../../sessions/${s}`).filter(existsSync);
+// § Item 3): every verified-prefix board of every session, the piece bestTspin actually walks.
+//
+// DISCOVERED. This read "explicit, not globbed … a new session's directory existing is not enough to
+// be included; it must be named here" — and "must be named here" is an instruction, which is the
+// thing that fails. The memory it cited warns against keying on INCIDENTAL filesystem state (a `sim/`
+// directory some other tool writes), not against discovery as such; `.ttrm` is what makes a session a
+// session. Nothing here is per-session: the corpus bound at the bottom is
+// `SIM_SESSIONS.length * 200`, which scales with the corpus by construction, so a seventh session
+// tightens it automatically instead of needing a re-bless.
+const SIM_SESSIONS = discoverCorpus(`${import.meta.dir}/../../sessions`)
+  .map(s => `${import.meta.dir}/../../sessions/${s}`);
 
 describe.skipIf(!HAVE_ORACLE || SIM_SESSIONS.length === 0)(
   'reachable placements vs real cold-clear over the verified-prefix corpus (real game boards, T piece)',
   () => {
-    test('every verified-prefix board of all six sessions: cc ⊆ ours (0 false negatives)', () => {
+    test('every verified-prefix board of every session: cc ⊆ ours (0 false negatives)', () => {
       const perSession: Record<string, number> = {};
       const cases: { board: Board; type: PieceType }[] = [];
       for (const session of SIM_SESSIONS) {

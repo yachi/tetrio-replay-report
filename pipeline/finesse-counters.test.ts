@@ -27,9 +27,13 @@
  */
 import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
+import { assertCorpusIsEverySessionOnDisk } from './corpus-membership.ts';
 
 // Pinned literals, not a glob: a session that stops being read must fail this file rather
-// than shrink the corpus it covers.
+// than shrink the corpus it covers. That guarded removal and not ARRIVAL — a seventh session
+// was simply absent from the rows below, every assertion still passed over the six that were
+// there, and nothing said the corpus had stopped being the corpus. The membership check under
+// the table is the other direction.
 const SESSIONS = [
   { dir: '2026-07-22', rounds: 158, strict: 140, equal: 18, faults: 2599, perfect: 12874, pieces: 14517 },
   { dir: '2026-07-24', rounds: 100, strict: 86, equal: 14, faults: 1543, perfect: 8189, pieces: 9187 },
@@ -38,6 +42,10 @@ const SESSIONS = [
   { dir: '2026-08-09', rounds: 100, strict: 82, equal: 18, faults: 1560, perfect: 8883, pieces: 9882 },
   { dir: '2026-08-14', rounds: 168, strict: 142, equal: 26, faults: 2530, perfect: 14096, pieces: 15707 },
 ];
+
+// At module scope, not inside a test: a membership check that lives in a test can be skipped
+// by whatever skips the test, and the whole point is that it runs before any literal is read.
+assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
 const CORPUS = { rounds: 760, strict: 650, equal: 110, faults: 11865, perfect: 62983, pieces: 70493 };
 

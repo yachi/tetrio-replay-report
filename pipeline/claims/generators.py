@@ -1429,7 +1429,17 @@ _INTENSE_FIELDS = [
     ("vs_x1000", "VS", _one_dp),
     ("pieces", "粒數", None),
     ("garbage_attack", "攻擊", None),
-    ("garbagesent", "射埋", None),
+    # 送出, NOT 射埋 — a separate defect from the direction table below, fixed in the same
+    # pass because writing a direction for a column under the wrong label is how a wrong
+    # reason gets a DONE record. `garbagesent` is what this player SENT: it equals the
+    # OPPONENT's queued incoming (`sum(garbage_events.amt)`) in 747 of 760 player-rounds,
+    # the 13 exceptions being the known dead-player class, and its paired AUC over the 380
+    # decided rounds is 83.9 — the winner holds the HIGHER value. 射埋 is the other
+    # direction: `build_round_table` reserves it (「俾人射埋嚟嘅攻擊」) for the ige queue
+    # aimed AT this player, whose AUC is 12. Both this label and the section's closing
+    # note said 射埋, so the table named an outgoing column with the incoming column's
+    # word and then explained the wrong one underneath.
+    ("garbagesent", "送出", None),
     ("garbagereceived", "食", None),
     ("garbage_cleared", "清走", None),
     ("lines", "行數", None),
@@ -1489,6 +1499,81 @@ INTENSE_AXES = [
     ("最大單波", [("maxspike", "最大單波")]),
     ("行數", [("lines", "行數")]),
 ]
+
+# Whether a lower value is a DEFICIENCY of the player holding it. Every column the
+# section prints needs an entry; `INTENSE_AXES` is a strict subset of the directional
+# ones, and the gap between those two lists is the defect this table closes.
+#
+# What the gap did. The table printed 11 columns while the finding sentence was scoped
+# to the 6 that `INTENSE_AXES` counts, so a column the winner was behind on could sit in
+# the table and be absent from every sentence about it — and worse, be contradicted by
+# one. 2026-08-09's claim said 「呢局冇得拗，唔係靠守贏返嚟」 over a printed 清走 of 48
+# against 50. Four of the six sessions have such a column: 07-24 最高 B2B, 07-28 清走,
+# 08-01 最高 B2B, 08-09 清走, 08-14 送出 and 最高 B2B.
+#
+# NEUTRAL is not "unmeasured", it is "a lower value is not a deficiency". 食 is garbage
+# that ARRIVED, i.e. the opponent's 攻擊 seen from the other side — reading a higher 食 as
+# the winner trailing would count one player's attack twice, which is the same inflation
+# the axis grouping exists to prevent, and reading a lower one as trailing is backwards.
+# `finaltime_ms` is each player's own clock and a survivor's runs longer by construction.
+#
+# Measured, not asserted — paired AUC over the 380 decided rounds of all six sessions,
+# share of rounds where the round's WINNER held the higher value:
+#
+#   VS 100.0 · APM 92.9 · 攻擊 92.8 · 送出 83.9 · 行數 81.2 · 清走 71.7 ·
+#   最大單波 68.2 · 最高 B2B 63.9 · PPS 63.2 · 粒數 62.4 · 食 15.7
+#
+# 食 is the only column below chance and the only NEUTRAL one. `vs_x1000` is DIRECTIONAL
+# and vacuously so — 380 of 380, the winner has never trailed it — and it is 攻擊 plus
+# 清走 by the identity `intense_round_vs_split` bounds, so it must never become an axis
+# of its own. Classify it anyway: a column exempted for being always-true is a column
+# nothing rechecks when a session finally breaks the streak.
+INTENSE_DIRECTION = {
+    "apm_x1000": "DIRECTIONAL",
+    "pps_x1000": "DIRECTIONAL",
+    "vs_x1000": "DIRECTIONAL",
+    "pieces": "DIRECTIONAL",
+    "garbage_attack": "DIRECTIONAL",
+    "garbagesent": "DIRECTIONAL",
+    "garbagereceived": "NEUTRAL",
+    "garbage_cleared": "DIRECTIONAL",
+    "lines": "DIRECTIONAL",
+    "maxspike": "DIRECTIONAL",
+    "topbtb": "DIRECTIONAL",
+    "finaltime_ms": "NEUTRAL",
+}
+
+# An unclassified printed column is a BUILD ERROR, not a column quietly left out of the
+# finding. Import-time, so it fails build_claims, codegen and every gate at once rather
+# than being routed around. Before this, adding a printed column that no axis counted
+# passed all sixteen gates — build_claims, codegen, codegen_smt, build_proof_map,
+# build_report and its --check and --selftest, check_smt --regen, gen_consistency,
+# check_prose_figures, check_badge_links, check_proof_links, check_report_shell,
+# check_generated_css, check_dead_consts, check_rate_coverage — and published the column.
+_unclassified = [f for f, _l, _fm in _INTENSE_FIELDS if f not in INTENSE_DIRECTION]
+if _unclassified:
+    raise SystemExit("generators.INTENSE_DIRECTION does not classify "
+                     + ", ".join(_unclassified) + " — every column the 最癲一局 table "
+                     "prints must declare whether a lower value is a deficiency")
+_stray = sorted(set(INTENSE_DIRECTION) - {f for f, _l, _fm in _INTENSE_FIELDS})
+if _stray:
+    raise SystemExit("generators.INTENSE_DIRECTION classifies " + ", ".join(_stray)
+                     + ", which _INTENSE_FIELDS does not print")
+_unaxed = [f for _a, cols in INTENSE_AXES for f, _l in cols
+           if INTENSE_DIRECTION.get(f) != "DIRECTIONAL"]
+if _unaxed:
+    raise SystemExit("generators.INTENSE_AXES counts " + ", ".join(_unaxed)
+                     + ", which INTENSE_DIRECTION does not call DIRECTIONAL")
+
+# The directional columns no axis counts. Their direction is proved alongside the axis
+# columns — same spec, same lemma — but the finding names them as COLUMNS and counts them
+# separately. That is the two-vocabulary rule, and here it is forced rather than chosen:
+# an axis exists because 攻擊/APM and 粒數/PPS are each one quantity counted twice, and a
+# column with no such partner has nothing to be folded with. Adding these to the axis
+# count would inflate exactly what the axis count exists to deflate.
+_AXIS_COLS = [f for _a, cols in INTENSE_AXES for f, _l in cols]
+INTENSE_EXTRA_COLS = [(f, l) for f, l, _fm in _INTENSE_FIELDS
+                      if f not in _AXIS_COLS and INTENSE_DIRECTION[f] == "DIRECTIONAL"]
 
 
 def _per_piece_x1000(num, den):
@@ -1588,19 +1673,25 @@ def intense_round_edges(facts):
     lose = [p for p in r["players"] if p != win][0]
     W, L = r["players"][win], r["players"][lose]
 
+    # Every DIRECTIONAL column, not only the ones an axis counts. The section marks a
+    # cell bold off this spec, so a column absent here can never be marked however
+    # plainly the table shows the winner behind on it — and the section is inside the
+    # trust chain, where a figure the reader sees must be one a lemma proved, not one the
+    # renderer worked out. 7 conjuncts became 11 on every session; the axis verdicts and
+    # therefore every axis count are untouched, which is the control on this change.
     conj_parts, direction = [], {}
-    for axis, cols in INTENSE_AXES:
-        for f, _label in cols:
-            a, b = rnd(mi, ri, win, f), rnd(mi, ri, lose, f)
-            if W[f] < L[f]:
-                direction[f] = "behind"
-                conj_parts.append(lt(a, b))
-            elif W[f] > L[f]:
-                direction[f] = "ahead"
-                conj_parts.append(gt(a, b))
-            else:
-                direction[f] = "level"
-                conj_parts.append(eq(a, b))
+    for f, _label in ([(c, l) for _a, cols in INTENSE_AXES for c, l in cols]
+                      + INTENSE_EXTRA_COLS):
+        a, b = rnd(mi, ri, win, f), rnd(mi, ri, lose, f)
+        if W[f] < L[f]:
+            direction[f] = "behind"
+            conj_parts.append(lt(a, b))
+        elif W[f] > L[f]:
+            direction[f] = "ahead"
+            conj_parts.append(gt(a, b))
+        else:
+            direction[f] = "level"
+            conj_parts.append(eq(a, b))
 
     verdict = {axis: axis_verdict([direction[f] for f, _l in cols])
                for axis, cols in INTENSE_AXES}
@@ -1608,16 +1699,39 @@ def intense_round_edges(facts):
     ahead = [a for a, _c in INTENSE_AXES if verdict[a] == "ahead"]
     rest = [a for a, _c in INTENSE_AXES if verdict[a] not in ("behind", "ahead")]
 
+    # The directional columns outside the axes that ran against the winner. Named, and
+    # counted apart from the axes — see INTENSE_EXTRA_COLS for why they cannot be added
+    # to the axis count.
+    extra_behind = [l for f, l in INTENSE_EXTRA_COLS if direction[f] == "behind"]
+    xb = (f"；另外，唔計呢四條軸，佢仲有 {len(extra_behind)} 格輸蝕："
+          f"{'、'.join(extra_behind)}" if extra_behind else "")
+    xg = (f"; behind on {len(extra_behind)} non-axis column(s): "
+          f"{', '.join(extra_behind)}" if extra_behind else "")
+    # 「唔係靠守贏返嚟」 is a statement about DOWNSTACKING, and 清走 is not an axis — so
+    # printing it off the axis verdict was asserting something the spec never compared.
+    # 2026-08-09's winner trailed 清走 48 against 50 and the claim said he won without
+    # defending. It is conditioned on 清走 now, which keeps it on 2026-08-01, where the
+    # winner led 清走 35 against 31 and the sentence was always true. The two sessions
+    # take the same branch and must not end up with the same sentence: 08-01's defect was
+    # an unnamed 最高 B2B, 08-09's was a false claim, and that difference is the finding.
+    #
+    # The gloss does not restate it. `no_defence` is false exactly when 清走 is behind,
+    # so 清走 is then in `extra_behind` and `xg` already names it — a second clause would
+    # be the same fact twice, which is what the axis count exists to stop elsewhere.
+    no_defence = (direction["garbage_cleared"] != "behind")
     if behind:
         canto = (f"最癲嘅一局係 {win} 贏，但佢喺 {'、'.join(behind)} 呢 {len(behind)} 條軸"
-                 f"係落後嘅——贏嗰個唔係攻得最多嗰個")
+                 f"係落後嘅——贏嗰個唔係攻得最多嗰個{xb}")
         gloss = (f"m{mi + 1}r{ri + 1} winner {win} trailed on {len(behind)} of "
-                 f"{len(INTENSE_AXES)} attacking axes: {', '.join(behind)}")
+                 f"{len(INTENSE_AXES)} attacking axes: {', '.join(behind)}{xg}")
     elif not rest:
+        tail = ("攻擊上冇得拗，亦唔使靠守就贏咗" if no_defence
+                else "攻擊上冇得拗，但唔可以話佢唔使守")
         canto = (f"最癲嘅一局係 {win} 贏，而佢喺 {'、'.join(ahead)} 每一條軸都領先——"
-                 f"呢局冇得拗，唔係靠守贏返嚟")
+                 f"{tail}{xb}")
         gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on every attacking axis "
-                 f"({', '.join(ahead)}) — no inversion")
+                 f"({', '.join(ahead)}) — no inversion"
+                 + xg)
     else:
         # Led on some, tied on the others, behind on none. The wording has to name the
         # tied axes rather than let 「每一條軸都領先」 stand over a partial list: the
@@ -1625,11 +1739,14 @@ def intense_round_edges(facts):
         # axis would have been proved equal and then described as a lead. It has not
         # happened on a selected round yet, and dropping 最高 B2B makes it likelier —
         # that column was the level one on two of the six sessions.
+        tail = ("攻擊上冇得拗，亦唔使靠守就贏咗" if no_defence
+                else "攻擊上冇得拗，但唔可以話佢唔使守")
         canto = (f"最癲嘅一局係 {win} 贏，佢喺 {'、'.join(ahead)} 領先，"
                  f"喺 {'、'.join(rest)} 同對手打成平手，一條軸都冇輸——"
-                 f"呢局冇得拗，唔係靠守贏返嚟")
+                 f"{tail}{xb}")
         gloss = (f"m{mi + 1}r{ri + 1} winner {win} led on {', '.join(ahead)} and was level "
-                 f"on {', '.join(rest)}, behind on none — no inversion")
+                 f"on {', '.join(rest)}, behind on no axis — no inversion"
+                 + xg)
     return [{
         "family": "intense_round_edges", "category": "pace",
         "canto": canto, "english_gloss": gloss,

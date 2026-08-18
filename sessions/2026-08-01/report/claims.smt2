@@ -5232,7 +5232,7 @@
 (pop 1)
 
 ; G079 [intense_round_profile] most intense round m7r3 — yachi: apm_x1000 74883, pps_x1000 1543, vs_x1000 171774, pieces 115, garbage_attack 93, garbagesent 77, garbagereceived 45, garbage_cleared 35, lines 74, maxspike 10, topbtb 4, finaltime_ms 74517
-; 最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、射埋 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒
+; 最癲嘅一局（m7 第 3 局）yachi 嘅數：APM 約 74.8、PPS 約 1.54、VS 約 171.7、粒數 115、攻擊 93、送出 77、食 45、清走 35、行數 74、最大單波 10、最高 B2B 4、佢自己嘅時間 約 74 秒
 (push 1)
 (echo "G079")
 (assert (not (and (= m6_r2_yachi_apm 74883) (= m6_r2_yachi_pps 1543) (= m6_r2_yachi_vs 171774) (= m6_r2_yachi_pieces 115) (= m6_r2_yachi_garbage_attack 93) (= m6_r2_yachi_garbagesent 77) (= m6_r2_yachi_garbagereceived 45) (= m6_r2_yachi_garbage_cleared 35) (= m6_r2_yachi_lines 74) (= m6_r2_yachi_maxspike 10) (= m6_r2_yachi_topbtb 4) (= m6_r2_yachi_finaltime_ms 74517) (= m6_r2_winner 1))))
@@ -5240,18 +5240,18 @@
 (pop 1)
 
 ; G080 [intense_round_profile] most intense round m7r3 — pinglamb: apm_x1000 65513, pps_x1000 1537, vs_x1000 150977, pieces 114, garbage_attack 81, garbagesent 63, garbagereceived 67, garbage_cleared 31, lines 71, maxspike 6, topbtb 5, finaltime_ms 74192
-; 最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、射埋 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒
+; 最癲嘅一局（m7 第 3 局）pinglamb 嘅數：APM 約 65.5、PPS 約 1.53、VS 約 150.9、粒數 114、攻擊 81、送出 63、食 67、清走 31、行數 71、最大單波 6、最高 B2B 5、佢自己嘅時間 約 74 秒
 (push 1)
 (echo "G080")
 (assert (not (and (= m6_r2_pinglamb_apm 65513) (= m6_r2_pinglamb_pps 1537) (= m6_r2_pinglamb_vs 150977) (= m6_r2_pinglamb_pieces 114) (= m6_r2_pinglamb_garbage_attack 81) (= m6_r2_pinglamb_garbagesent 63) (= m6_r2_pinglamb_garbagereceived 67) (= m6_r2_pinglamb_garbage_cleared 31) (= m6_r2_pinglamb_lines 71) (= m6_r2_pinglamb_maxspike 6) (= m6_r2_pinglamb_topbtb 5) (= m6_r2_pinglamb_finaltime_ms 74192) (= m6_r2_winner 1))))
 (check-sat)
 (pop 1)
 
-; G081 [intense_round_edges] m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion
-; 最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——呢局冇得拗，唔係靠守贏返嚟
+; G081 [intense_round_edges] m7r3 winner yachi led on every attacking axis (攻擊量, 落速, 最大單波, 行數) — no inversion; behind on 1 non-axis column(s): 最高 B2B
+; 最癲嘅一局係 yachi 贏，而佢喺 攻擊量、落速、最大單波、行數 每一條軸都領先——攻擊上冇得拗，亦唔使靠守就贏咗；另外，唔計呢四條軸，佢仲有 1 格輸蝕：最高 B2B
 (push 1)
 (echo "G081")
-(assert (not (and (= m6_r2_winner 1) (> m6_r2_yachi_garbage_attack m6_r2_pinglamb_garbage_attack) (> m6_r2_yachi_apm m6_r2_pinglamb_apm) (> m6_r2_yachi_pieces m6_r2_pinglamb_pieces) (> m6_r2_yachi_pps m6_r2_pinglamb_pps) (> m6_r2_yachi_maxspike m6_r2_pinglamb_maxspike) (> m6_r2_yachi_lines m6_r2_pinglamb_lines))))
+(assert (not (and (= m6_r2_winner 1) (> m6_r2_yachi_garbage_attack m6_r2_pinglamb_garbage_attack) (> m6_r2_yachi_apm m6_r2_pinglamb_apm) (> m6_r2_yachi_pieces m6_r2_pinglamb_pieces) (> m6_r2_yachi_pps m6_r2_pinglamb_pps) (> m6_r2_yachi_maxspike m6_r2_pinglamb_maxspike) (> m6_r2_yachi_lines m6_r2_pinglamb_lines) (> m6_r2_yachi_vs m6_r2_pinglamb_vs) (> m6_r2_yachi_garbagesent m6_r2_pinglamb_garbagesent) (> m6_r2_yachi_garbage_cleared m6_r2_pinglamb_garbage_cleared) (< m6_r2_yachi_topbtb m6_r2_pinglamb_topbtb))))
 (check-sat)
 (pop 1)
 

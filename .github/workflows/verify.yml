@@ -428,11 +428,33 @@ jobs:
         with:
           bun-version: '1.2.4'
 
+      # DISCOVERED FROM DISK, NOT LISTED. Both loops in this job used to name their seven
+      # artefact directories, and they gate the repo's ONE invariant — that two independently
+      # written extractors agree byte-for-byte. A session absent from the list is not checked
+      # against that invariant at all, and a shorter sweep prints exactly like a clean one, so
+      # nothing goes red. equiv-coverage.yml's header already called these "the two stale loops
+      # in verify.yml"; this closes them. Measured on the seven that exist today: discovery
+      # returns the same seven directories and both loops print the same seven verdicts.
+      #
+      # The predicate is "carries extract2*.ts" — the file the loop RUNS, so a directory it
+      # cannot run is not an artefact. `facts*.json` also selects exactly these seven but is
+      # weaker: it would admit a directory holding data with no extractor to reproduce it.
+      #
+      # `find`, not a glob: `for d in sessions/*/*` with no match expands to the literal
+      # pattern and the loop then "sweeps" one nonexistent directory. And no `compgen` — it is
+      # a bash builtin, and while this `run:` is bash the inner `sh -c` is not.
       - name: Re-run the TypeScript extractor and compare against committed output
         run: |
           set -euo pipefail
+          DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
+                   -exec sh -c 'find "$1" -maxdepth 1 -name "extract2*.ts" | grep -q .' _ {} \; \
+                   -print | sort)
+          # Finding nothing is a FAILURE, never a quiet pass — the rule check_cross_artefact
+          # below already follows, for the same reason: a sweep over nothing looks like a clean
+          # sweep in the log.
+          [ -n "$DIRS" ] || { echo "FAIL: no artefact directory carries extract2*.ts" >&2; exit 1; }
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report sessions/2026-08-09/report sessions/2026-08-14/report; do
+          for d in $DIRS; do
             ts=$(ls "$d"/extract2*.ts | head -1)
             f2=$(ls "$d"/facts2*.json | head -1)
             before=$(sha256sum "$f2" | cut -d' ' -f1)
@@ -456,8 +478,12 @@ jobs:
       - name: Compare extractor A against extractor B
         run: |
           set -euo pipefail
+          DIRS=$(find sessions -mindepth 2 -maxdepth 2 -type d \
+                   -exec sh -c 'find "$1" -maxdepth 1 -name "extract2*.ts" | grep -q .' _ {} \; \
+                   -print | sort)
+          [ -n "$DIRS" ] || { echo "FAIL: no artefact directory carries extract2*.ts" >&2; exit 1; }
           status=0
-          for d in sessions/2026-07-22/report sessions/2026-07-24/report sessions/2026-07-24/proof sessions/2026-07-28/report sessions/2026-08-01/report sessions/2026-08-09/report sessions/2026-08-14/report; do
+          for d in $DIRS; do
             # Globbed, not `ls`-ed: under `set -o pipefail` an `ls` with one non-matching operand
             # fails the whole assignment and the step exits before printing anything.
             f1=""; for f in "$d"/facts.json "$d"/facts-*.json; do [ -f "$f" ] && { f1="$f"; break; }; done
@@ -546,6 +572,39 @@ jobs:
   # Two of those three still hold; "the tests were not run here" was fixed by the step below, in
   # the commit that created this job. Do not read that as retiring the import gate — the defect it
   # caught was an import that is never CALLED, which running the suite cannot evaluate.
+  # 最癲一局's lede publishes a corpus result — n = 380, a tercile triple, seven Spearman rho
+  # with their raw and Bonferroni-adjusted p — and every one of them is a string literal in
+  # `pipeline/intense_round.CORPUS`. They have to be: the section renders once per session, so a
+  # generator reading every other session's facts.json would re-render all six reports the day a
+  # seventh landed. The cost of a literal is staleness, and it was paid inside 72 minutes — the
+  # lede landed at 0cc719c and 0804a7e re-sourced apm/pps/vs an hour later, moving five of the
+  # seven. Nothing noticed, because no script computed any of them.
+  #
+  # Here and not in a path-filtered workflow: the edit this gate exists to catch is a change to
+  # `sessions/*/report/facts.json` — a re-source, not a new session — and the second is an edit
+  # to a module DOCSTRING. Neither is a path a figures-oriented filter would think to watch.
+  # Unconditional and every push: it is offline, stdlib-only, and the whole measurement over six
+  # sessions runs in well under a second.
+  #
+  # --selftest first, because a gate whose failure has never been demonstrated is not evidence.
+  # The planted cases include a published figure moved one decimal place in each of the three
+  # formatter kinds, a seventh session that moves n and the headline rho, each document drifting
+  # while the other stays right, and the control that pins every string the gate searches for to
+  # one `intense_round.build()` actually emits — the first draft of that spec guessed two needles
+  # the renderer never produced, and only that control caught it.
+  intense-round-corpus:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check the corpus figures 最癲一局 publishes are the ones the data gives
+        run: |
+          set -euo pipefail
+          python3 -m analysis.corpus_stats --selftest
+          python3 -m pipeline.check_intense_corpus --selftest
+          python3 -m pipeline.check_intense_corpus --check
+
   typescript:
     runs-on: ubuntu-22.04
     steps:
@@ -677,42 +736,67 @@ jobs:
       # every verified-prefix board of every session: a miscount or a missed line-clearing slot
       # fails the job.
       #
+      # "Every verified-prefix board" became true on 2026-08-17. Until then both scripts below ran
+      # the hand-port `runCase` while the published metric (`emit-forecast-facts.ts`) and
+      # `cross-tslot.test.ts` ran `runCaseOracle`, so the outside authority for the scalar was
+      # checked on 20,226 boards out of the 61,656 the metric consumes — a third, under a step name
+      # that said all of them. Both now use the metric's own board source. Measured over the six
+      # sessions at that scope: 10,834 boards where both sides find a slot, 0 under-counts, 8 where
+      # our reachable placement clears more than cold-clear's best named shape, 5,587 general spins
+      # outside its named vocabulary, and 6 boards where cold-clear names a line-clearing slot our
+      # BFS reaches nothing on — every one of the 6 near-topout (stackTop 17-19 against spawn 18),
+      # which is the class `pipeline/sim/tslot-sanction.ts` tolerates by name and prints. That
+      # sanction is shared by all three consumers, and it is not decorative: deleting it fails both
+      # scripts on those same 6 boards.
+      #
       # The list below was FOUR sessions until 2026-08-15, having stopped at 2026-08-01 while
       # 2026-08-09 and 2026-08-14 were added to the corpus — 134 rounds (50 + 84) outside the gate
       # that checks this count against an implementation we did not write. That is the
       # silent-under-coverage class: nothing goes red, the job stays green, and the green means
       # less each session. Adding a session means adding it HERE, not only to sessions/.
-      # (Measured clean when it covered four: 1,831 slots, all counts agree, 0 missed. That
-      # figure is NOT re-stated for six — it was measured over the old list, and this edit
-      # widens the scope rather than re-measuring it. The first run over six is what produces
-      # the new number.)
+      # (It read "1,831 slots, all counts agree, 0 missed" for the four-session hand-port scope.
+      # Superseded by the figures above, which were produced by a run over six sessions at the
+      # oracle scope rather than carried forward.)
       #
       # `pipeline/sim/cross-tslot-multi.ts` and `pipeline/sim/cross-tslot.test.ts` each carried
       # their OWN copy of the same stale four-session list, so this step covered four sessions no
       # matter what was written here. Both were extended to six on 2026-08-15; extending the test's
       # copy failed it at once (39033 -> 61656 boards) while its differential stayed empty. If you
       # add a session, all three lists need it — this loop is not the only one.
+      # DISCOVERED FROM DISK, like the two extractor loops in `cross-extractor` — but on a different
+      # UNIT, and the difference matters. Those iterate ARTEFACT directories (`sessions/*/report`,
+      # `sessions/*/proof`) and key on `extract2*.ts`. This one sets REPLAY_DIR, which `replayDir()`
+      # requires to hold `.ttrm` files, so its unit is the SESSION and its predicate is the replays —
+      # the same predicate `corpus-membership.sessionsOnDisk` and `check_provenance.sessionDirs` use.
+      # Keying this on `extract2*.ts` would iterate two directories per session and run the gate twice
+      # over the same replays.
       - name: Every T-spin line count matches the Rust original across the corpus
         run: |
           set -euo pipefail
-          for s in 2026-07-22 2026-07-24 2026-07-28 2026-08-01 2026-08-09 2026-08-14; do
+          SESSIONS=$(find sessions -mindepth 1 -maxdepth 1 -type d \
+                       -exec sh -c 'find "$1" -maxdepth 1 -name "*.ttrm" | grep -q .' _ {} \; \
+                       -print | sort)
+          [ -n "$SESSIONS" ] || { echo "FAIL: no session directory holds .ttrm replays" >&2; exit 1; }
+          for s in $SESSIONS; do
             echo "-- $s"
-            REPLAY_DIR="sessions/$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
+            REPLAY_DIR="$s" bun pipeline/sim/cross-tslot-count.ts ./result/bin/cc-oracle
           done
 
       # cross-tslot-count checks ours against cold-clear's SINGLE best detector. This checks the
       # thing multi-slot could threaten: the scalar the forecast metric consumes is never below what
       # cold-clear's cutout finds on the board AS GIVEN (`CC_ORACLE_SLOTS=1` makes the oracle emit
       # the whole chain). Failing would force re-opening the "don't wire multi-slot into the metric"
-      # decision. Measured clean over all six sessions: 0 of 20,226 boards; multi-slot changes the
-      # path of exclusion, not the value.
+      # decision. Measured clean over all six sessions at the oracle board source: 0 unsanctioned of
+      # 61,656 boards; multi-slot changes the path of exclusion, not the value.
       #
       # The comparison is against `slots[0]`, NOT `max(slots)`, and it was `max` until 2026-08-17 —
       # a category error rather than a stricter bound. The chain re-assigns the board after every
-      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. On the six
-      # sessions `max(slots) > ours` fires once and `slots[0] > ours` never does; on that one board
-      # cold-clear's own current-board answer agrees with ours exactly. The stale "0 of 7,544" this
-      # comment used to carry was the four-session figure, measured before 08-09 and 08-14 existed.
+      # cut, so `slots[k>0]` counts lines on a board that has had rows cleared out of it. At the
+      # oracle scope `max(slots) > ours` fires 8 times and `slots[0] > ours` 6; the 6 are the same
+      # near-topout boards the step above tolerates by name, and the extra 2 are non-monotone chains
+      # on which cold-clear's own current-board answer agrees with ours exactly. Two figures this
+      # comment carried before, both measured at a narrower scope and both replaced by runs at this
+      # one: "0 of 7,544" (four sessions, hand-port) and "0 of 20,226" (six sessions, hand-port).
       - name: Multi-slot cutout never exceeds the scalar the metric consumes
         env:
           CC_ORACLE_SLOTS: '1'
@@ -730,3 +814,28 @@ jobs:
         env:
           CC_ORACLE: ./result/bin/cc-oracle
         run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts
+
+  # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has
+  # now measured three times in one week that an obligation recorded only in prose does not survive
+  # contact with its own velocity: a gate corpus that stopped at four sessions, a published figure
+  # that went stale 72 minutes after it was written, and a registration frozen against an
+  # implementation nothing else uses. This job is the enforceable form.
+  preregistrations:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          # The gate diffs the estimand's import CLOSURE against a PINNED commit. The default
+          # depth-1 checkout does not contain that object once the pin is an ancestor of HEAD, and
+          # the gate then fails with `bad object` on every push — measured on a clone one commit
+          # past the pin, not assumed. It fails loudly rather than passing silently, which is the
+          # right direction, but it would be red on every push without this. History is 286
+          # commits, so full depth is cheap.
+          fetch-depth: 0
+
+      - name: Check every pre-registration is pinned, classified and undrifted (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_preregistrations --selftest
+          python3 -m pipeline.check_preregistrations

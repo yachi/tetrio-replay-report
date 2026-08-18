@@ -29,15 +29,24 @@ DOCS = REPO / "docs"
 SESSIONS = REPO / "sessions"
 
 sys.path.insert(0, str(REPO))
-from pipeline import forecast_pooled  # noqa: E402  (needs REPO on the path first)
+from pipeline import docs_gate, forecast_pooled  # noqa: E402  (needs REPO on the path first)
 
 # (session dir, artefact subdir, output name, label, blurb)
+#
+# EDITORIAL METADATA, NOT THE LIST OF WHAT GETS PUBLISHED. What gets published is
+# discovered from disk in main() and this table is checked against it, because a list
+# of what gets published is a list the newest session is silently absent from: the loop
+# below only ever iterated these rows, so a seventh session with a complete report.html
+# would not be copied, would not appear on the index, and `--check` would compare the
+# six-session site against itself and print ok. Measured before the change — a planted
+# seventh session left `--check` at exit 0 saying "6 sessions".
 #
 # One published report per session. sessions/2026-07-24/ also contains a lighter
 # "即場戰報" with its own independent 20-claim proof layer (sessions/2026-07-24/proof),
 # but every fact in it is already covered by that session's full report — publishing
 # both just put two cards for the same night on the page. It stays in the repo as a
 # cross-check artefact and is still verified by CI; it is simply not a separate report.
+# It carries no report.html, so disk discovery leaves it out without being told to.
 ARTEFACTS = [
     ("2026-07-22", "report", "2026-07-22.html", "完整戰報",
      "十場 series、79 局，每個數字都有 Dafny lemma。"),
@@ -52,7 +61,6 @@ ARTEFACTS = [
     ("2026-08-14", "report", "2026-08-14.html", "完整戰報",
      "十一場 series、84 局，最大嘅一晚：輸嘅局兩個人已經睇齊，贏嘅局先至爭開。"),
 ]
-LOOSE_REPORTS = {}
 
 
 def load(path):
@@ -67,7 +75,7 @@ def proof_map_rows(path):
 
 def summarize(session, artefact):
     """Derive the headline numbers straight from the session's own data."""
-    base = SESSIONS / session / (artefact or "proof")
+    base = SESSIONS / session / artefact
     facts_file = next(
         (p for p in sorted(base.glob("facts*.json")) if not p.name.startswith("facts2")), None
     )
@@ -225,18 +233,36 @@ def main(argv=None):
     totals = {"sessions": 0, "matches": 0, "rounds": 0, "claims": 0}
     seen_sessions = set()
 
+    # Every session on disk appears exactly once in ARTEFACTS, and nothing else appears at
+    # all. `docs_gate.row_membership` is the helper `check_equiv_coverage` and `check_loo`
+    # already use for this rule, so all three gates agree on what "published" means; it
+    # covers the four ways this table can look complete and not be — on disk but unpublished,
+    # published but not on disk, listed twice, and published with no report.html behind it.
+    arts = {d.name: (d / "report" / "report.html" if (d / "report" / "report.html").exists() else None)
+            for d in sorted(SESSIONS.glob("*")) if d.is_dir()}
+    problems = docs_gate.row_membership(
+        "bin/build-docs", [a[0] for a in ARTEFACTS], arts, "report.html", noun="report")
+    if problems:
+        for p in problems:
+            print(f"FAIL {p}", file=sys.stderr)
+        return 1
+
+    # A MISSING REPORT IS A FAILURE, NOT A SKIP, and `row_membership` above is what delivers
+    # that: the `continue` that used to stand here dropped the session from the page and from
+    # `totals`, so a --check run compared a smaller site against itself and printed ok.
     for session, artefact, out_name, label, blurb in ARTEFACTS:
-        if artefact:
-            src = SESSIONS / session / artefact / "report.html"
-        else:
-            src = SESSIONS / session / LOOSE_REPORTS[(session, artefact)]
-        if not src.exists():
-            print(f"  skip {src.relative_to(REPO)} (missing)")
-            continue
+        src = SESSIONS / session / artefact / "report.html"
         summary = summarize(session, artefact)
+        # The same rule one level down, and the last skip in this loop. `row_membership` keys on
+        # report.html, so a session whose facts.json is missing gets past it and used to `continue`
+        # here — dropping its card and its counts, after which the only thing that noticed was
+        # docs/index.html drifting, three steps later, under a message about the index rather than
+        # about the missing file. `summarize` is what knows why it returned None, so it is what
+        # should say so.
         if summary is None:
-            print(f"  skip {session}/{artefact} (no facts)")
-            continue
+            print(f"FAIL {session}/{artefact} has no facts*.json — its headline numbers "
+                  f"cannot be derived, so it cannot be published", file=sys.stderr)
+            return 1
         if check:
             dst = DOCS / out_name
             if not dst.exists() or not filecmp.cmp(src, dst, shallow=False):
