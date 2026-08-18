@@ -36,7 +36,7 @@ for (const f of readdirSync(DIR).filter(x=>x.endsWith('.ttrm')).sort()) {
           .map((e:any)=>({frame:e.frame, sub:e.data.subframe??0, type:e.type, key:e.data.key})),
         gin: me.rp.events.filter((e:any)=>e.type==='ige'&&e.data.type==='interaction'&&e.data.data?.type==='garbage')
           .map((e:any)=>({frame:e.frame, amt:e.data.data.amt, x:e.data.data.x, size:e.data.data.size,
-            confirmFrame: CONFIRM(me.rp ?? rp, e.data.data.cid, e.data.data.iid)})),
+            confirmFrame: CONFIRM(me.rp, e.data.data.cid, e.data.data.iid)})),
         truth: other.rp.events.filter((e:any)=>e.type==='ige'&&e.data.type==='interaction'
           && e.data.data?.type==='garbage' && e.data.data.gameid===me.gameid)
           .map((e:any)=>({frame:e.data.data.frame??e.frame, amt:e.data.data.amt, y:e.data.data.y}))
