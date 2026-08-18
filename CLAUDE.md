@@ -150,9 +150,13 @@ Coded-ness is read from the constant's **name** (the emitter marks them with a t
 `; label`), never from its value — detecting by value quietly reclassified a `topcombo` of 4 as
 "the code for topout" and reported six real measurements as survivors.
 
-**Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on all 153
-generated claims (77 + 76). `check_smt` runs every solver on PATH and names the ones it did not
-find, so a single-solver run is stated rather than implied. Each solver needs different argv —
+**Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on every claim of
+every committed `claims.smt2` — 690 across the six artefacts on 2026-08-18, and that total is
+printed by the run rather than maintained here, because the figure that used to sit in this
+sentence ("153 generated claims, 77 + 76") was a two-session number still being published at six.
+`check_smt` runs every solver on PATH and reports how many it found, so an n-solver run is stated
+rather than implied — and the count is derived from that list, not a literal, which is what makes
+the line survive a solver being added to a job. Each solver needs different argv —
 z3 reads stdin only with `-in`, cvc5 needs `--incremental` before it honours the file's
 `push`/`pop` — so `SOLVERS` maps a name to its flags and the file is passed as a path.
 
@@ -171,18 +175,40 @@ CI pins cvc5 by sha256 (`CVC5_SHA256` in the workflow), and that hash has **two 
 authorities that agree**: cvc5's own Homebrew cask and GitHub's asset digest — verified against
 the downloaded bytes before use.
 
-**Both solvers run in CI, on different artefacts, and the difference between them is the PIN, not
-the presence.** The `verify` job installs z3 4.14.1 (`Z3_VERSION` / `Z3_SHA256`) because
-verify-session step 7's lemma-vacuity gate needs a solver and fails rather than skips without one —
-and it must be z3: cvc5 produced no result in 120 s on 2026-07-24's 78 claims where z3 settles them
-in 2.6 s, so the two are not interchangeable for those free-variable queries. 4.14.1 is the newest
-release still shipping an `x64-glibc-2.35` build, which is what the `ubuntu-22.04` runner has. What
-that pin lacks is a second authority: GitHub publishes no asset `digest` for **any** z3 build
-against glibc-2.35, and the release carries no signature, checksum or SBOM, so the hash is
-trust-on-first-use — it defends against the asset changing from here on, not against it having been
-wrong when first fetched. The `pipeline` job installs cvc5 for `check_smt` over the committed
-`claims.smt2`. So "z3 locally, cvc5 in CI" is true of the **.smt2** artefact only, which is where
-that sentence came from; as a statement about the workflow it is false.
+**Which solver runs where is decided by the QUERY, not by the runner — and that only became true
+on 2026-08-18.** The `verify` job installs z3 alone because verify-session step 7's lemma-vacuity
+gate needs a solver and fails rather than skips without one, and it must be z3: cvc5 produced no
+result in 120 s on 2026-07-24's 78 claims where z3 settles them in 2.6 s, so the two are not
+interchangeable for those free-variable queries. The `pipeline` job installs **both** and runs
+`check_smt` over the committed `claims.smt2`, so "the two solvers agree" is now checked on every
+push instead of only locally.
+
+Until that date the answer was the runner instead. CI sat on `ubuntu-22.04`, whose glibc is 2.35,
+and every z3 release after 4.14.1 ships `x64-glibc-2.39` only — so CI could run just the one z3 old
+enough to load, and the `pipeline` job could not run z3 at all. **ubuntu-22.04's deprecation is what
+moved the runners**, and the solver constraint fell out with it: all 13 jobs are on 24.04 (twelve
+`ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and `Z3_VERSION` is
+4.16.0.
+
+**The pin got better, and by exactly one step — do not write it up as two.** GitHub publishes no
+asset `digest` for **any** z3 build against glibc-2.35, and those releases carry no signature,
+checksum or SBOM, so 4.14.1's hash was trust-on-first-use: computed from a download of ours,
+defending against the asset changing from here on but not against it having been wrong when first
+fetched. 4.16.0's `x64-glibc-2.39` asset does have a digest, and `Z3_SHA256` is copied out of it,
+so `sha256sum -c` in the workflow now checks the bytes against someone else's number. That is one
+authority. It is **not** the cvc5 standard, which is two that agree — a Homebrew cask hash and the
+GitHub digest — because z3 has no cask (the formula builds from source) and no attestation either
+(`gh attestation`, still 404 at 4.16.0).
+
+**Dafny's asset stays `x64-ubuntu-22.04` and that is not a stale pin.** It is the only Linux asset
+Dafny publishes, at 4.11.0 and at latest, so the 24.04 URL a reader reaches for does not exist. The
+workflow names it `DAFNY_ASSET_OS` precisely so the three install steps have nothing to "correct".
+A glibc-2.35 build on a glibc-2.39 runner is glibc's supported direction, and Dafny's own xunit,
+integration, refman and doc-tests workflows all run on `ubuntu-24.04`. The reason that is safe to
+rely on rather than merely likely is that the dependency is **fail-closed**: a Dafny that will not
+load dies at `dafny --version`, before a claim is checked. There is no arrangement in which a broken
+verifier produces a green verification, which is the property worth checking whenever this pin moves
+— not "does it work", but "what does it do when it doesn't".
 
 Every generator replaces only the region between its HTML comment markers, so all of them are
 idempotent and safe to re-run over a hand-edited report. `pipeline/region.py` owns that

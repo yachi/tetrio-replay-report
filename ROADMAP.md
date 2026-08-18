@@ -138,7 +138,9 @@ P1+P2 are mechanical. P4 is the real engineering.
 - **Generator coverage**: if a future session's drama doesn't fit a family, the pipeline still produces a valid report — bespoke claims are additive, never required. **Still true, and it is a standing design property rather than a risk to close.**
 - **Dafny in CI** — **RETIRED, and the timing figure was wrong.** The version is pinned in
   `verify.yml` *and* sha256-pinned (`dafny-4.11.0-x64-ubuntu-22.04.zip`, against the signed release
-  listing), which is stronger than the "pin the Dafny version" this asked for. ~~verify time is
+  listing, and GitHub's asset digest agrees — the `22.04` is the asset Dafny publishes, not the
+  runner, which has been 24.04 since 2026-08-18), which is stronger than the "pin the Dafny
+  version" this asked for. ~~verify time is
   ~3-5s per session~~ — measured, it is **3.8s (07-24, 52 lemmas) to 8.3s (07-22, 54 lemmas)** at
   `--cores 4`; see the SMT-vs-Dafny table in CLAUDE.md. The conclusion ("CI stays fast") survives;
   the number did not, and it is the number someone would budget against.
@@ -438,10 +440,38 @@ the file is passed as a path, which every front end accepts.
 
 Cost of the whole gate with both solvers, byte-identity and 8 mutations: **0.33 s**.
 
-z3 is deliberately not in CI: recent z3 releases ship only `x64-glibc-2.39` builds, which cannot
+~~z3 is deliberately not in CI: recent z3 releases ship only `x64-glibc-2.39` builds, which cannot
 run on the `ubuntu-22.04` runner the Dafny step pins (glibc 2.35), and the ≤ 4.14.1 builds that
 target 2.35 have no GitHub-reported digest to pin against. So z3 runs locally and cvc5 in CI,
-over the same committed artefact.
+over the same committed artefact.~~
+
+**CLOSED 2026-08-18 — the constraint was the runner, and the runner moved.** Every job is
+`ubuntu-24.04` now (glibc 2.39), so the `pipeline` job installs z3 4.16.0 alongside cvc5 and
+`check_smt` runs both over the same committed `claims.smt2`. "The two solvers agree" was the
+repo's only published cross-solver result that no CI job checked; it is checked on every push
+now. The digest objection is gone the same way — 4.16.0's `x64-glibc-2.39` asset has one, and
+`Z3_SHA256` is copied out of it, so the workflow's `sha256sum -c` compares against a number
+somebody else computed. **One authority, not the cvc5 pin's two**: z3 has no Homebrew cask
+(the formula builds from source) and no attestation, so do not write this up as reaching that
+standard.
+
+Nothing about the solvers is what forced this. `ubuntu-22.04` begins deprecation 2026-09-17 and
+is fully unsupported 2027-04-17, with four brownout windows through March and April 2027
+(`actions/runner-images` #14254); the solver improvements are what fell out of moving. 24.04
+rather than 26.04 because 24.04 is what `ubuntu-latest` resolves to, i.e. the image with the most
+traffic over it, and this migration runs the Dafny proof on an asset Dafny builds for neither.
+
+The one thing that did NOT move: Dafny still installs `dafny-4.11.0-x64-ubuntu-22.04.zip`,
+because that is the only Linux asset it publishes at 4.11.0 or at latest. The workflow calls it
+`DAFNY_ASSET_OS` so nobody edits the three install steps into a 404. glibc-2.35-on-2.39 is the
+supported direction and Dafny's own workflows run on `ubuntu-24.04`, but what the argument rests on
+is that the dependency is fail-closed: `dafny --version` runs before any claim is checked, so a
+verifier that will not load reddens the job rather than passing an unverified session.
+
+What was measured before this landed, rather than argued: the lemma-vacuity gate settles all six
+artefacts with z3 4.16.0 as the only solver on PATH — the `verify` job's exact configuration — and
+that gate counts `unknown` as a failure, so passing means decided. `check_smt` is green 2-solver on
+every session, 96/96 mutants killed.
 
 ### Dead constants, found by the same probe
 
