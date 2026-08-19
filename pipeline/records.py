@@ -92,6 +92,40 @@ R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 107, 119      # the control: the mean over the
 # print a bigger rise than was measured. The six-session values (104.1, 120.1) floored and
 # rounded to the same integers, which is why the question had not come up before.
 
+# ── how far the SD falls, DERIVED from the two constants above ────────────────
+#
+# This was the word 「足足細咗四倍」, typed once and then sitting beside two constants that
+# move every session. It was true when written (59.60/14.54 = 4.10) and false the day the
+# seventh session landed (59.2/15.5 = 3.82), and it shipped into all seven reports in that
+# state. Nothing could have caught it: `check_prose_figures` resolves 約-figures against
+# facts.json and this is a derived R statistic that appears in no dataset, so the sentence
+# lived where no gate reads. Same shape as the 「70-89%」 and 「3379」 defects CLAUDE.md
+# records — a figure quoted in prose that is not the thing it describes.
+#
+# So it is computed, not typed. Floored to one decimal (`fmt.ratio1`), which is what lets
+# 足足 stay in the sentence: the printed 3.8 is a lower bound on the real 3.8195, so the
+# word is true by construction instead of by whoever last checked it.
+R_VS_SD_RATIO = fmt.ratio1(R_VS_SD_SHORT, R_VS_SD_LONG)
+
+# The floor the FOOTNOTE'S ARGUMENT needs, which is not the floor today's number happens to
+# sit near. The argument is "the spread moves a lot while the mean barely moves", so what
+# has to hold is that the SD effect dominates the mean effect — the mean moves by
+# 119/107 = 1.11 over the same span. Below 2 the SD does not even halve while the rounds get
+# ~7.7x longer, and 「量得唔準好多」 stops being supported by its own numbers.
+#
+# Deliberately NOT 4. Pinning it at 4 would re-freeze the value this guard exists because
+# somebody froze, and would fail the build for a corpus that still supports every word of
+# the sentence. A guard set to today's measurement is a copy of the measurement.
+_MIN_SD_RATIO = 2.0
+if float(R_VS_SD_RATIO) < _MIN_SD_RATIO:
+    raise SystemExit(
+        f"records.py: the VS SD falls only {R_VS_SD_RATIO}x from the shortest bin "
+        f"({R_VS_SD_SHORT}) to the longest ({R_VS_SD_LONG}), under the {_MIN_SD_RATIO}x this "
+        f"footnote's argument needs. The sentence claims the spread moves far more than the "
+        f"mean, and at this ratio it no longer does. Do not lower this bound to make the "
+        f"build pass — rewrite the footnote around what the corpus now shows, and re-check "
+        f"whether QUALIFYING_MS is still justified by `Rscript analysis/rate_records.R`.")
+
 # (family, label, unit, how to format the proved integer)
 #
 # Ordered by how much each measure actually says about who won the round — the
@@ -244,7 +278,8 @@ def build(facts, report_dir):
                f'{n_player_rounds} 個 player-round 度'
                f'量過：VS 嘅標準差由 {R_VS_SD_SHORT}（約 {R_VS_T_SHORT} 秒嗰批）跌到 '
                f'{R_VS_SD_LONG}（約 {R_VS_T_LONG} 秒嗰批），'
-               f'足足細咗四倍；同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
+               f'足足細咗 {R_VS_SD_RATIO} 倍；'
+               f'同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
                '即係短局唔止唔係打得好啲，'
                '仲要係量得唔準好多。'
                f'未設限之前，{_cn(n_sessions)}個 session 全部 {n_rate_records} 項速率紀錄'

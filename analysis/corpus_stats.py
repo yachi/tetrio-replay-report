@@ -334,12 +334,15 @@ def terciles(n):
 
     `floor(n/3)` and `floor(2n/3)`. The obvious alternative — `floor(n/3)` and `2*floor(n/3)`
     — gives a DIFFERENT published triple whenever n is not a multiple of 3: at n = 380 this
-    rule gives 126 / 127 / 127 and that one gives 126 / 126 / 128. The example stays at 380
-    on purpose. The corpus is 450 now, which is divisible by 3, so the two rules coincide at
-    150 / 150 / 150 and the current n cannot show what is at stake; `_selftest` pins that the
-    two rules disagree, so this line is a measured choice rather than a formatting detail
-    nobody would notice changing — and an n that happens to hide the disagreement is exactly
-    when that pin is doing the work.
+    rule gives 126 / 127 / 127 and that one gives 126 / 126 / 128.
+
+    **The n = 380 in the line above is deliberate and must not be "updated" to the current
+    corpus size.** The corpus is 450, and 450 is divisible by 3, so BOTH rules give
+    150 / 150 / 150 — the current n cannot demonstrate what the choice is between, and an
+    example rewritten to it would silently stop being an example. 380 is kept because it is
+    the smallest corpus this repo has actually held where the two rules disagree. `_selftest`
+    pins the disagreement independently, which is what keeps this honest for the sessions
+    where n happens to hide it.
 
     The rule keeps the three bins within one round of each other for every n, which the
     doubling rule does not: it drifts by up to 2 and puts the surplus in the top bin, the one

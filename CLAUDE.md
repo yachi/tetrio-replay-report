@@ -429,20 +429,31 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
 sample mean over a small n. Measured in `analysis/rate_records.R` over all 760 player-rounds
-(six sessions): regressing log SD on log t gives **−0.646 for VS and −0.721 for APM**, slope 0
-rejected for both (p 0.0002 / 0.0001). All **18** unqualified records (3 metrics × 6 sessions)
-came from the shortest quartile — p = 1.5e-11 — and 07-22's headline 約262.6 was a 15.6 s round,
+(seven sessions): regressing log SD on log t gives **−0.625 for VS and −0.715 for APM**, slope 0
+rejected for both (p 8.6e-05 / 5.3e-05). All **21** unqualified records (3 metrics × 7 sessions)
+came from the shortest quartile — p = 2.3e-13 — and 07-22's headline 約262.6 was a 15.6 s round,
 46% above that session's qualified peak.
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
-is weaker than the five-session one.** With 760 rounds the CIs tighten, and (a) APM's −0.5 is now
-**outside** its CI [−0.918, −0.525] — the decay is *steeper* than a pure sample mean, so the
-conclusion holds a fortiori, but "both with −0.5 inside the CI" is no longer true; (b) the mean
-is **no longer flat for VS** (104.1 → 120.1 across the bins, p ≈ 0.00) — longer rounds do carry a
-mildly higher mean VS. The SD still falls about 4× over the same span, so the variance effect
-dominates by an order of magnitude and the qualifier stands, but the control is now "the mean
+is weaker than the five-session one. Both still hold at seven.** (a) APM's −0.5 is **outside**
+its CI — [−0.918, −0.525] at six, [−0.887, −0.542] at seven — so the decay is *steeper* than a
+pure sample mean and the conclusion holds a fortiori, but "both with −0.5 inside the CI" is no
+longer true; (b) the mean is **no longer flat for VS** (106.9 → 119.4 across the bins, p = 0.01)
+— longer rounds do carry a mildly higher mean VS. The SD still falls several times over the same
+span, so the variance effect dominates and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
-(p = 0.23).
+(p = 0.25).
+
+**Do not quote a number for that SD fall from here, and do not put one in the report either.**
+It is `pipeline/records.R_VS_SD_RATIO`, derived from `R_VS_SD_SHORT` / `R_VS_SD_LONG` through
+`fmt.ratio1`, which floors — 4.1× at six sessions, **3.8× at seven**. The report's footnote said
+「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped **false into all
+seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of four and the ratio
+had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves 約-figures against
+facts.json, and this is a derived R statistic that appears in no dataset. It is computed now, and
+guarded — `_MIN_SD_RATIO = 2.0`, which is the ratio the *argument* needs (the mean moves 1.11×
+over the same span, so the spread must clearly dominate it), deliberately not the 4 the number
+happens to sit near. A guard set to today's measurement is a copy of the measurement.
 
 The script's session list is hardcoded, so **adding a session means editing it and re-running**
 — otherwise the evidence for `QUALIFYING_MS` silently stops covering the newest data. Adding
