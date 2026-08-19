@@ -1,27 +1,38 @@
 {
-  "eyebrow": "TODO · 關鍵時刻",
-  "title": "TODO — 呢一節嘅標題未寫",
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
   "cards": [
     {
-      "accent": "y",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "accent": null,
+      "label": "全晚最癲嘅一局",
+      "value": "313.5",
+      "body": "第8場第2局，兩邊 VS 加埋約 313.5，係打足 60 秒嘅局入面最高<span class=\"badge\" data-claim=\"G064\"></span>。全晚兩項速率紀錄都喺呢一局出，兩項都係 pinglamb 嘅：單局 APM 約 80.7<span class=\"badge\" data-claim=\"G017\"></span>、單局 VS 約 171.8<span class=\"badge\" data-claim=\"G018\"></span>。佢贏咗呢一局，但清行同清走垃圾兩格都係輸蝕嘅<span class=\"badge\" data-claim=\"G084\"></span>——分別喺每粒方塊嘅攻擊，約 0.929 對 yachi 嘅約 0.669<span class=\"badge\" data-claim=\"G085\"></span>。"
     },
     {
       "accent": "p",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "十二秒收工",
+      "value": "12s",
+      "body": "第9場第1局約 12 秒就散，係全晚最短嗰局<span class=\"badge\" data-claim=\"G025\"></span>。pinglamb 全局一行垃圾都冇食過<span class=\"badge\" data-claim=\"G062\"></span>，一次過劈出 25 行，係全場最大嘅單次 spike<span class=\"badge\" data-claim=\"G019\"></span>。佢嗰局個 APM 去到約 122.6，係全 session 未經局長篩選嘅最高值——但速率嘅分母就係局長，十二秒撐唔起一個紀錄<span class=\"badge\" data-claim=\"G076\"></span>。"
+    },
+    {
+      "accent": "y",
+      "label": "單局最多清行",
+      "value": "158 行",
+      "body": "第9場第7局，yachi 清咗 158 行，係全場單局最多<span class=\"badge\" data-claim=\"G023\"></span>。呢一局係佢由 1 比 3 連贏三局反超嗰段入面嘅最後一局，打完領先 4 比 3；之後兩局俾人連收，4 比 5<span class=\"badge\" data-claim=\"C017\"></span>。同一場亦係全晚唯一打到最後一局先分勝負嗰場<span class=\"badge\" data-claim=\"G015\"></span>。"
     },
     {
       "accent": "g",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "連贏十局，跨埋兩場",
+      "value": "10 局",
+      "body": "由第2場第2局起計，pinglamb 一口氣連贏 10 局，中間換咗場都停唔到，係全場最長連勝<span class=\"badge\" data-claim=\"G016\"></span>——第二場尾五局<span class=\"badge\" data-claim=\"C010\"></span>加第三場全場<span class=\"badge\" data-claim=\"C011\"></span>。呢十局包住成個第三場——全晚唯一一次 5 比 0<span class=\"badge\" data-claim=\"G014\"></span>，嗰場佢個場均 APM 拋離對手十以上<span class=\"badge\" data-claim=\"G059\"></span>。"
     }
   ],
   "trivia": [
-    "TODO：呢條冷知識未寫。"
+    "全晚最抵諗嘅一條數：<strong>贏嗰啲局兩個人爭 6% 幾，輸嗰啲局就爭到 11% 幾</strong><span class=\"badge\" data-claim=\"C002\"></span>。即係話分別唔喺天花板，喺地板——打得順嗰陣兩邊貼得幾埋，一打得差就散開。",
+    "用自己做把尺：yachi 自己贏局同輸局爭 23% 幾，pinglamb 淨係爭 17% 幾<span class=\"badge\" data-claim=\"C003\"></span>。郁得最多嗰個係輸波嗰個——yachi 贏嗰啲局每粒方塊打出約 0.68，輸嗰啲局跌到約 0.55<span class=\"badge\" data-claim=\"G068\"></span>；pinglamb 同一條數係約 0.72 對約 0.61<span class=\"badge\" data-claim=\"G069\"></span>。",
+    "十場排開，個效率差距同邊個贏場波分得好開：yachi 贏嗰三場，pinglamb 每粒方塊嘅攻擊高唔夠 1%；佢贏嗰七場每場都高過 11%，中間一場都冇<span class=\"badge\" data-claim=\"C007\"></span>。但個分界線唔係零——第四場 pinglamb 都仲係高少少，一樣係 yachi 贏。",
+    "多落方塊呢條路今次又買唔返個 gap：<strong>yachi 多疊咗 312 粒方塊，打出嘅攻擊反而少 236 條</strong><span class=\"badge\" data-claim=\"C005\"></span>，即係 pinglamb 總攻擊嘅 6% 幾。而今次個價錢唔喺死法度——全晚得 7 局係自己頂到天花板收場，4 局 yachi、3 局 pinglamb<span class=\"badge\" data-claim=\"C006\"></span>，其餘 63 局全部係俾垃圾頂爆<span class=\"badge\" data-claim=\"G066\"></span>。",
+    "全晚最平嘅一欄係手上功夫：每粒方塊要按幾多下，yachi 3.628 下、pinglamb 3.639 下，爭唔夠 0.3%<span class=\"badge\" data-claim=\"C008\"></span>。而喺各自身上，KPP 喺贏局同輸局之間都郁唔夠 2%<span class=\"badge\" data-claim=\"G070\"></span><span class=\"badge\" data-claim=\"G071\"></span>——兩個人做緊嘅功夫一樣咁多，分別喺每粒方塊買到啲乜<span class=\"badge\" data-claim=\"C004\"></span>。",
+    "Perfect Clear 兩邊都係 5 個<span class=\"badge\" data-claim=\"G040\"></span>，但同贏唔贏冇乜關係：yachi 有 5 局做到、贏咗 2 局<span class=\"badge\" data-claim=\"G078\"></span>，pinglamb 一樣係 5 局贏 2 局<span class=\"badge\" data-claim=\"G080\"></span>。全場淨係一個人做到全消嘅局，yachi 佔 4 局、輸咗 2 局<span class=\"badge\" data-claim=\"G079\"></span>，pinglamb 佔 4 局、輸咗 3 局<span class=\"badge\" data-claim=\"G081\"></span>。"
   ]
 }

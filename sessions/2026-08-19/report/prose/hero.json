@@ -1,10 +1,10 @@
 {
-  "kicker": "",
-  "title": "TODO — 大標題未寫（<span class=\"hl-y\">yachi</span> vs <span class=\"hl-p\">pinglamb</span>）",
+  "kicker": "第七回合",
+  "title": "7 比 3——\n爭嘅唔係天花板，係<span class=\"hl-p\">地板</span>",
   "tags": {
-    "yachi": "TODO · TAGLINE",
-    "pinglamb": "TODO · TAGLINE"
+    "yachi": "快手 volume 流 · VOLUME",
+    "pinglamb": "T-spin 效率流 · EFFICIENCY"
   },
-  "lede": "TODO：呢一段導言未寫。要講今晚嘅主線，每句數得出嚟嘅嘢帶返 claim id。",
+  "lede": "十場 match、70 局。<strong>pinglamb 7 比 3 收工</strong><span class=\"badge\" data-claim=\"G001\"></span>，總局數 42 比 28<span class=\"badge\" data-claim=\"G002\"></span>。yachi 攞到第一、第四同第七場，尾三場連輸<span class=\"badge\" data-claim=\"C001\"></span>。將 70 局按輸贏拆開嚟睇，重點先至出嚟——<strong>兩個人贏嗰啲局，每粒方塊嘅攻擊爭 6% 幾；輸嗰啲局就爭到 11% 幾</strong><span class=\"badge\" data-claim=\"C002\"></span>。即係話今晚唔係邊個企得高，係邊個跌得淺：打得順嗰陣兩邊貼得幾埋，一打得差就散開。用自己做把尺仲清楚——yachi 自己贏局同輸局爭 23% 幾，pinglamb 淨係爭 17% 幾<span class=\"badge\" data-claim=\"C003\"></span>，郁得最多嗰個係輸波嗰個。",
   "score_claim": "G001"
 }
