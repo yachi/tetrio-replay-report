@@ -129,12 +129,27 @@ if float(R_VS_SD_RATIO) < _MIN_SD_RATIO:
 # (family, label, unit, how to format the proved integer)
 #
 # Ordered by how much each measure actually says about who won the round — the
-# paired AUC over both sessions' 129 rounds (VS 100%, APM 93.8%, 攻/lines strong,
-# spike and B2B weaker, COMBO 45.0% i.e. nothing). Records that decide games come
-# first; COMBO is last because its tile is a curiosity, not a finding.
+# paired AUC (VS 100%, APM 93.8%, 攻/lines strong, spike and B2B weaker, COMBO
+# weakest of all). Records that decide games come first; COMBO is last because
+# its tile is a curiosity, not a finding.
 # APM read 94.6% here until 2026-08-17 and matches no session at any pooling —
 # 93.8 pooled, 93.7 and 94.0 apart. Re-derived from facts.json, winner vs loser
 # per round, ties at half a win (the convention in pipeline/sim/pairs.ts).
+# COMBO read "45.0% i.e. nothing" here until 2026-08-19, and 45.0 was correct when
+# written: it is the paired AUC over the 129 rounds of the FIRST TWO sessions,
+# which is all there was. It is not a corpus figure and never was. Re-derived the
+# same way over all 450 rounds of seven sessions it is 56.22 — raw p 0.00179 by a
+# sign-flip permutation, still 0.030 after Bonferroni over the 17 columns tested,
+# so the column carries weak signal rather than none. The per-session series drifts
+# steadily: 41.1 · 51.0 · 62.5 · 55.7 · 57.0 · 58.9 · 67.9.
+# COMBO's POSITION here is unaffected, and that was measured rather than assumed:
+# over the same 450 rounds the seven families with a per-round value rank COMBO
+# 56.22 < B2B 64.22 < spike 68.00 < T-spin 68.33 < 清行 81.33 < APM 92.89 < VS
+# 100.0, so it is still last. This is a stale sentence, not a stale ordering, and
+# nothing below moves.
+# The rule the two corrections share: an AUC quoted from the sessions that existed
+# when it was written goes stale without anyone touching this file. Re-derive
+# before quoting, and say which corpus the number is over.
 RECORDS = [
     ("round_max_vs_x1000", "單局最高 VS", "", "r1"),
     ("round_max_apm_x1000", "單局最高 APM", "", "r1"),
