@@ -211,16 +211,37 @@ equivalent marker pair.
   A commit message is not documentation; nothing re-derives it. **A DONE record that repeats a wrong
   reason is worth less than none** — item 7's justification for its `<= 3` bound was measurably false
   in both the item text and the commit that closed it.
-- **A figure published as a measurement with nothing re-deriving it is the same defect whether it
-  lives in prose or in a test.** 2026-08-19 produced three instances in one session: the two
-  repertoire ranges (17-25 / 11-25 / 5-8 — false for five days, and **no file in the repo contained
-  them**); the `cavity ≥ 1` donation band, which likewise nothing recomputes and which has to be
-  re-measured by hand every session; and `expect(out).toBe(sum(width_ge_3))` in `openers.test.ts`,
-  which was arithmetic quietly standing in for the empirical claim "no ≥3-wide hit is ever in an
-  opener" and broke on the day that stopped being true. The first two are prose with no gate; the
-  third is a gate that had become a tautology of the data it was written against. Before writing a
-  number here, ask what re-derives it — and when the answer is "nothing", either point at what does
-  or say plainly that it is hand-measured and must be re-measured.
+## 冇第二份 — a number whose only home is this prose
+
+**A figure whose only copy is here has nothing to disagree with it, so it cannot go stale loudly.**
+It goes stale silently, stays published, and reads exactly like a measurement until somebody happens
+to re-derive it by hand. Every other class of drift in this repo announces itself — a ledger stops
+being byte-identical, a lemma stops verifying, a gate goes red. This one has no announcement
+mechanism at all, which is what makes it the hardest class the document carries.
+
+Four instances, all live as of 2026-08-19, and they are not the same kind of thing on the surface:
+
+| | what it was | how it failed |
+|---|---|---|
+| the repertoire ranges | Honey Cup 17-25, MS1 11-25, TKI-3 5-8 | **two of three already false when 08-14 landed**; five days published. `grep` confirms no file in the repo ever contained them |
+| the `cavity ≥ 1` band | 74.6-77.0% | nothing recomputes it; it survives only because 08-14 ties 08-09 at one decimal, and it must be re-measured by hand every session |
+| the raw-DS AUC series | 68.4 · 62.0 · 81.2 · 83.0 · 64.0 | quoted from a probe; stopped at five sessions and nothing said so |
+| the `760` numerators | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900 |
+
+**A gate can have the same defect, so "it is checked" is not the test.**
+`expect(out).toBe(sum(width_ge_3))` in `openers.test.ts` looked like a gate and was arithmetic
+standing in for the empirical claim "no ≥3-wide hit is ever in an opener" — true only while
+`in_opener` was 0 everywhere, so it was a tautology of the data it was written against, and it broke
+on the day that stopped being true. The question is never "is there a check", it is **"what would
+have to change for this number to be recomputed"**.
+
+The corollary, and it is where to look next: **the remaining exposure is concentrated wherever a
+figure was quoted from a probe that was never committed.** A probe that ships an artefact leaves
+something to diff; a probe run once and discarded leaves a number in prose and no way back to it.
+So before writing a figure here, ask what re-derives it — and when the answer is "nothing", either
+point at what does (a committed artefact, a test, a generator) or say plainly, in the sentence
+itself, that it is hand-measured and must be re-measured. Both of those are done for each of the
+four rows below; a bare number is not.
 
 ## Data semantics that cost real debugging
 
@@ -539,7 +560,7 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
-sample mean over a small n. Measured in `analysis/rate_records.R` over all 760 player-rounds
+sample mean over a small n. Measured in `analysis/rate_records.R` over all 900 player-rounds
 (seven sessions): regressing log SD on log t gives **−0.625 for VS and −0.715 for APM**, slope 0
 rejected for both (p 8.6e-05 / 5.3e-05). All **21** unqualified records (3 metrics × 7 sessions)
 came from the shortest quartile — p = 2.3e-13 — and 07-22's headline 約262.6 was a 15.6 s round,
@@ -1074,7 +1095,14 @@ the two halves apart — they are not one claim.**
 Neither hit is a short-prefix artefact: the two rounds verify to lock 62 and 64 against spins at
 20 and 17. Both are pinned in `openers.test.ts` as `CAVE_IN_OPENER_EXCEPTIONS`, a **named exception
 list** rather than a relaxed bound (following `DT_ORDER_IN_OPENER`), so a third one — or either of
-these moving — fails and has to be investigated instead of absorbed. **The cave claim is now
+these moving — fails and has to be investigated instead of absorbed. **What makes that a list and
+not a bound in disguise is structural, and you can see it by reading the assertion**: it compares
+each player's `in_opener` against *the number of entries naming that session and that player*, so a
+phantom entry fails by construction (`known` exceeds a count the data does not support) and a
+deleted real hit fails the same way from the other side. A bound — `in_opener <= 2` — would be
+satisfied by any two in-opener hits anywhere in the corpus; this is satisfied only by these two.
+Note what is deliberately *not* claimed here: nothing in the repo re-runs a mutation over this, so
+the evidence is the shape of the assertion, not a mutation score. **The cave claim is now
 enforced rather than commented**: a session
 carrying an in-opener exception must have `min_depth_ge_2 === 0`, so the two claims can never be
 separated by session without the test saying so. That the two hits share a file, sit in consecutive

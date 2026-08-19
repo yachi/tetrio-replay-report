@@ -2856,45 +2856,129 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
 
 ### Still open, and each one is a measurement rather than a guess
 
-- **The two CI matrices** (`verify.yml:44-51`, `:179-180`). Deliberately held; the reason is at the
+- **The two CI matrices** (`verify.yml:45-52`, `:180-181`). Deliberately held; the reason is at the
   cross-tslot session-list entry and is the whole finding — an empty matrix SKIPS the job, and a
   skipped required job reads green in branch protection. Worse than a stale list, so an emptiness
-  guard is a precondition of the conversion, not a follow-up.
-- **`intense_round.py`'s section lede and its `ir-note` control paragraph publish a corpus-wide
+  guard is a precondition of the conversion, not a follow-up. **Re-affirmed 2026-08-19: this is a
+  DECISION, not a backlog item.** Both were updated by hand for the seventh session and both are
+  correct today. Do not "finish the job" by converting them — the emptiness guard has to come
+  first, and until it exists a glob here trades a loud failure for a silent green.
+- ~~**`intense_round.py`'s section lede and its `ir-note` control paragraph publish a corpus-wide
   statistical result that no script in this repo computes.** 380 decided rounds; tercile paired AUC
   **62.3 → 65.0 → 83.5**; Spearman rho **+0.210**; Holm-adjusted **p 0.0002** over 20 columns; plus
   four control figures (rho +0.058 / p 1.000; −0.187 / −0.184 at p 0.0040 / 0.0098; +0.236;
-  +0.096 / p 0.06) in the note. **Cited by symbol, not by line, deliberately** — three agents were
-  rewriting that file the day this was written, and a line number would have rotted before anyone
-  read it; `check_loo.SENTENCES` makes the same choice for the same reason.
-  `grep -rn "Spearman|Holm|0.210|83.5" --include=*.py --include=*.R --include=*.ts --include=*.mjs`
-  returns that module and one comment in `generators.py` — nothing else. **Correct today**:
-  reconstructed exactly (380 rounds, terciles of combined `vs_x1000`, paired AUC of
-  `garbage_cleared/pieces`, ties 0.5, a **126/127/127** split) and unchanged across the apm/pps/vs
-  re-source (`0804a7e^` vs HEAD identical). Rendered into every report and onto the site, gated by
+  +0.096 / p 0.06) in the note. Rendered into every report and onto the site, gated by
   nothing; the region is generated, so `build_report --check` agrees with the stale source by
-  construction and a seventh session stamps the same sentence into the new report too.
+  construction and a seventh session stamps the same sentence into the new report too.~~
+  **DONE (2026-08-18/19).** `analysis/corpus_stats.py` derives the family and
+  `pipeline/check_intense_corpus.py` gates all three links: derivation → `intense_round.CORPUS`
+  (a dict diff over one key space, so a key on one side only is reported rather than skipped),
+  CORPUS → the two module docstrings (`DOCSTRING_OWES`, and the two owe DIFFERENT sets on purpose —
+  requiring the deriving module to quote its own output is the coupling the gate exists to break),
+  and CORPUS → the rendered `report.html` of every session (`RENDERED`, needles carrying the words
+  that precede each figure, because a bare `＋0.212` is four characters that could fall out of a
+  table cell). CI runs it as the `intense-round-corpus:` job — `--selftest` on both modules then
+  `--check` — and that job is in `HEAD`, so it predates this session rather than being added with
+  the closure. Verified green here: `ok CORPUS re-derives and is quoted intact by 7 rendered
+  report(s) and 2 module docstring(s)`, over 450 decided rounds, family m = 26.
+  **Every figure quoted above is now stale, which is the point of the gate rather than a footnote
+  to it**: at seven sessions it is **450** rounds, terciles **64.3 → 67.0 → 81.0**, rho **+0.176**,
+  Bonferroni-adjusted **0.0045** over m = 26 — and the correction is *Bonferroni, not Holm*, because
+  Holm's value for one test is a function of the whole family's raw p and therefore not
+  re-derivable from anything a report prints. The seventh session did not stamp the old sentence
+  into the new report: the gate went red and forced the re-render. (I verified the gate, the CI job
+  and the current figures directly; that it fired red *at the moment* the seventh session landed is
+  the team lead's account, not something the artefacts record.)
 - **`records.py`'s `sr-foot` footnote** — 六個 session · 760 player-round · SD 59.9→14.5 · mean
-  104→120 · 18 項速率紀錄 — has the same shape, and its source `analysis/rate_records.R` runs in no
-  workflow and no `bin/` script (`grep -rn "rate_records|Rscript" .github/ bin/` → nothing). Every
-  figure reproduces today when the script is run by hand. In progress at time of writing.
-- **Ten hardcoded session lists remain**, of the fifteen inventoried: `verify.yml:44-51`, `:179-180`,
-  `:736`; `analysis/rate_records.R`'s `sessions`; `pipeline/records.py`; `pipeline/intense_round.py`;
-  and the four TypeScript consts `cross-tslot-multi.ts`'s `SESSIONS`, `cross-tslot.test.ts`'s
-  `SESSIONS`, `cross-tspin.test.ts`'s `SIM_SESSIONS`, `cross-movegen.test.ts`'s `SIM_SESSIONS` (that
-  last file's absolute oracle path was fixed in `722ef5c`; its session list was not). Named by
-  const rather than by line for the reason above — `cd0ee11` and `722ef5c` between them moved three
-  of these four before this paragraph was a day old. Four sites already fail loudly on an unlisted
-  session and are the shape to copy:
-  `check_loo.py:203`, `forecast-corpus.test.ts`, `forecast-facts.test.ts:269`,
-  `forecast-access-class.test.ts:324`.
+  104→120 · 18 項速率紀錄 — has the same shape. **HALF DONE (2026-08-19); read both halves before
+  striking it.**
+  - ~~the footnote's own figures are unguarded~~ **CLOSED.** `R_STATS_SESSIONS` is checked against
+    `corpus_scope()` and the renderer raises `SystemExit` rather than emit — refuse-to-render, not
+    a warning — because the derived half would otherwise describe seven sessions while the copied
+    half still described six. The SD ratio is DERIVED (`fmt.ratio1(R_VS_SD_SHORT, R_VS_SD_LONG)`)
+    behind a `_MIN_SD_RATIO = 2.0` floor whose failure message says in as many words not to lower
+    the bound to make the build pass. `fmt.py --selftest` covers it with **7 discriminating cases**
+    — every one a value where flooring and rounding differ, so it cannot pass by coincidence.
+    **What this cost, and why the guard is shaped as refuse-to-render:** the footnote shipped a
+    FALSE 「足足細咗四倍」 into all seven reports the day the seventh session landed. 足足 asserts a
+    floor of four and the real ratio had fallen to **3.8195**. Flooring to one decimal is what lets
+    足足 stay in the sentence at all — the printed 3.8 is a lower bound on the truth, where the typed
+    「四倍」 was not a bound on anything.
+  - **STILL OPEN: `analysis/rate_records.R` runs in no workflow and no `bin/` script.**
+    Re-checked at the time of writing — `grep -rn "rate_records|Rscript" .github/ bin/` still
+    returns **nothing**. So the footnote's constants are guarded against a corpus-size mismatch but
+    the script that produces them is still run by hand, and `QUALIFYING_MS`'s evidence is
+    re-derivable only by someone remembering to. The guard turns silent staleness into a loud
+    build failure; it does not make the number self-maintaining. This half is why the bullet is
+    not struck.
+- ~~**Ten hardcoded session lists remain**, of the fifteen inventoried: `verify.yml:44-51`,
+  `:179-180`, `:736`; `analysis/rate_records.R`'s `sessions`; `pipeline/records.py`;
+  `pipeline/intense_round.py`; and the four TypeScript consts `cross-tslot-multi.ts`'s `SESSIONS`,
+  `cross-tslot.test.ts`'s `SESSIONS`, `cross-tspin.test.ts`'s `SIM_SESSIONS`,
+  `cross-movegen.test.ts`'s `SIM_SESSIONS`.~~ **RE-COUNTED 2026-08-19: ONE is open and unguarded,
+  not ten.** The count was right when written; six of the ten moved during the seventh session.
+  **「Ten remain」 is the wrong shape of statement anyway, and that is the durable lesson here** —
+  it pools three states with completely different risk. A list that is *checked against disk* is not
+  the defect this entry is about; the defect is a list that goes stale in SILENCE. Counted by state:
+
+  | state | sites | risk |
+  |---|---|---|
+  | **derived from disk** | `intense_round.py` (no list at all — `CORPUS` comes from `corpus_stats` and is triple-gated), `cross-tslot-multi.ts`, `cross-tspin.test.ts`, `cross-movegen.test.ts` (all three now `discoverCorpus(...)`) | none |
+  | **listed but asserted against disk** | `cross-tslot.test.ts:61` and `openers/openers.test.ts:36` (both `assertCorpusIsEverySessionOnDisk`), `records.py`'s `R_STATS_SESSIONS` (a COUNT, checked against `corpus_scope()`, refuse-to-render on mismatch) | fails loudly; a list on purpose, because per-session literals are pinned below it and a session nobody has measured must not reach them |
+  | **deliberately held** | `verify.yml:45-52`, `:180-181` | see the first bullet of this section — NOT to be converted |
+  | **open and unguarded** | `analysis/rate_records.R:25` | the only one left |
+
+  Two corrections to the old list itself. **`verify.yml:736` no longer names anything**: the
+  workflow now holds exactly two session enumerations (the two matrices) plus a single-session
+  `REPLAY_DIR=sessions/2026-07-22` smoke run at `:635`, which is not a corpus list — and `HEAD`
+  reads the same, so that citation was either already closed when written or rotted immediately.
+  And **`openers/openers.test.ts:36` was never in the fifteen** — it is a guarded list today, so it
+  costs nothing, but an inventory that missed it is evidence the inventory was assembled by memory.
+  Six sites already fail loudly on an unlisted session and are the shape to copy: `check_loo.py:203`,
+  `forecast-corpus.test.ts`, `forecast-facts.test.ts:269`, `forecast-access-class.test.ts:324`,
+  `cross-tslot.test.ts:61`, `openers/openers.test.ts:36`.
+
 - **Candidate, not built: a standing rounding-discrimination check.** For every rendered rate, assert
   that some corpus value distinguishes floor from round, and flag the ones where none does. It would
   have found the `:.0f` above without anyone reading `forecast_section.py`, because the defect was
   invisible precisely where no value discriminated the rule. New scope, recorded so it is not
-  re-derived from scratch next time.
+  re-derived from scratch next time. **Still not built as of 2026-08-19** — no module in
+  `pipeline/` or `analysis/` implements it; `fmt.py --selftest`'s 7 discriminating cases are the
+  same IDEA applied to one formatter, not the standing corpus-wide check this describes.
 
-### Four decisions still with the user — recorded at their own sites, listed here only as an index
+- **NEW (2026-08-19): the quarantined section's per-session RANGES and BANDS are published figures
+  that no gate re-derives, and the failure mode is already demonstrated.** Two families:
+  - **The opener repertoire ranges** — Honey Cup 17-25, MS1 11-25, TKI-3 5-8. **Two of the three
+    were already false, and had been for five days before anyone noticed**, because no file in the
+    repo contained them: a grep for the numbers returned nothing, so there was no artefact to go
+    stale and no gate that could have fired. **Resolved by DELETION, not by a gate** — CLAUDE.md now
+    states the repertoire split qualitatively (「pinglamb opens Honey Cup more than yachi does」) and
+    keeps only the ordinal claims the committed artefacts pin. The deleted ranges are recorded at
+    their own site with the history, so the next session cannot re-introduce them by accident.
+  - **The `cavity >= 1` donation band, 74.6-77.0% — STILL OPEN, and it must be re-measured by hand
+    every session.** Nothing recomputes it. Its ceiling survives only by a rounding coincidence:
+    08-14's 77.04% ties 08-09's 76.99% at one decimal place, so any future session landing anywhere
+    in **77.05-77.94%** moves a figure that reads as stable. 08-19 came in at 76.51% and did not
+    move it — which is luck, not a gate. The per-session comment at `openers/openers.test.ts:964`
+    records the arithmetic; it is a comment, so it warns rather than fails.
+
+  **The candidate fix was considered and NOT taken, and its cost is the reason.** Adding these
+  columns to `analysis/corpus_stats.COLUMNS` would make them re-derivable and stale-detectable by
+  the machinery that just closed the `intense_round.py` item above. But `FAMILY` is the
+  cross-product of `COLUMNS` and `X_VARS` and `m = len(FAMILY)` is the Bonferroni denominator, so
+  **adding a column moves every adjusted p in the published corpus block.** That coupling is
+  intended — it is what a multiplicity correction MEANS, and `corpus_stats`'s docstring says so —
+  which makes it a decision about what the family IS, not a refactor. Recorded here rather than
+  taken, so the next person does not re-derive the trade from scratch and does not make it silently.
+
+### TWO decisions still with the user — recorded at their own sites, listed here only as an index
+
+*(This header read 「Four」 until 2026-08-19 while its own last line already said 「而家淨返第 1、第 2
+兩粒」 — items 3 and 4 were decided on 2026-08-18 and struck below, and the count above them was not
+touched. Same shape as the `## P5 — in progress` header CLAUDE.md records, and the reason the
+striking rule says to fix the ORIGINAL site: the strike landed on the items and stopped there.
+Items 1 and 2 re-verified still open — 07-22 / 07-24 still hold 54 and 52 proof-map rows, and there
+is no `tsconfig.json`.)*
 
 1. **The 07-22 / 07-24 claims-island migration** (54 → 144 and 52 → 141 rows, drop
    `PLAIN_CITE_ISLAND_GAP`, re-verify every pinned count) — see the 最癲一局 write-up. Largest blast
