@@ -614,5 +614,131 @@
   "file": "Claims.dfy",
   "family": "intense_round_vs_split",
   "status": "verified"
+ },
+ {
+  "id": "C001",
+  "lemma": "C001_yachi_won_matches_1_4_and_7_and_pinglamb_won_the_other_seven_including",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C002",
+  "lemma": "C002_in_the_rounds_each_won_pinglamb_s_attack_per_piece_is_between_6_and_7",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C003",
+  "lemma": "C003_each_player_s_attack_per_piece_is_higher_in_the_rounds_he_won_than_in",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C004",
+  "lemma": "C004_over_the_whole_session_pinglamb_s_attack_per_piece_is_between_12_and_1",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C005",
+  "lemma": "C005_yachi_placed_312_more_pieces_than_pinglamb_yet_landed_236_less_attack",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C006",
+  "lemma": "C006_seven_rounds_ended_in_a_topout_four_of_them_yachi_s_and_three_pinglamb",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C007",
+  "lemma": "C007_in_each_of_the_three_matches_yachi_won_pinglamb_s_attack_per_piece_is",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C008",
+  "lemma": "C008_keypresses_per_piece_are_nearly_identical_yachi_3_628_and_pinglamb_3_6",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C009",
+  "lemma": "C009_match_1_yachi_lost_the_opening_round_won_the_next_three_and_held_on_fo",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C010",
+  "lemma": "C010_match_2_yachi_won_the_first_round_then_lost_five_straight_1_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C011",
+  "lemma": "C011_match_3_the_night_s_only_sweep_pinglamb_won_all_five_rounds_0_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C012",
+  "lemma": "C012_match_4_yachi_won_the_first_lost_two_then_won_three_straight_and_took",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C013",
+  "lemma": "C013_match_5_yachi_took_the_first_and_the_fifth_rounds_and_lost_the_rest_2",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C014",
+  "lemma": "C014_match_6_the_same_run_as_match_5_the_first_and_the_fifth_rounds_only_2",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C015",
+  "lemma": "C015_match_7_yachi_s_cleanest_match_four_straight_from_the_start_over_in_si",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C016",
+  "lemma": "C016_match_8_yachi_won_only_the_third_round_1_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C017",
+  "lemma": "C017_match_9_the_night_s_longest_yachi_won_three_straight_to_level_at_4_4_a",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C018",
+  "lemma": "C018_match_10_yachi_won_the_first_lost_four_straight_and_his_two_back_were",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
  }
 ]
