@@ -1,0 +1,137 @@
+{
+  "schema": "forecast-facts/10",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the simulator fails its own full gate; only verified prefixes are used",
+    "per-round split-half reliability is undefined, not low: the per-round rate is identically 0 in every scorable round, so it has no variance to correlate with itself",
+    "no effect at any unit: round AUC undecidable — 0 decided pairs of 57, the rate ties everywhere"
+  ],
+  "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "board_source": "triangle-oracle (vendored @haelp/teto, byte-identical)",
+  "simulator_configs_for_range": [
+    "triangle-oracle"
+  ],
+  "players": [
+    {
+      "user": "pinglamb",
+      "tspin_triples_game_stats": 72,
+      "tspin_doubles_game_stats": 299,
+      "rounds_played": 70,
+      "verified_tspins": 384,
+      "admitted_lineclearing_tspins": 390,
+      "tspins_excluded_untucked": 6,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 2,
+      "forecast_garbage": 0,
+      "forecast_lineclear": 0,
+      "path_opened": 0,
+      "self_built": 191,
+      "unattributed": 0,
+      "mechanism_established": 0,
+      "forecast_total": 0,
+      "clause2_undecided": 0,
+      "rejected_by": {
+        "counted": 0,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 0,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 0,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
+      "floor_pre_existed": 299,
+      "floor_arrived_later": 50,
+      "floor_undetermined": 35,
+      "reactive": 193,
+      "forecast_rate_x1000": 0,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 10,
+      "simulator_range_lo_x1000": 0,
+      "simulator_range_hi_x1000": 0,
+      "verified_placements": 5280,
+      "total_placements": 5663
+    },
+    {
+      "user": "yachi",
+      "tspin_triples_game_stats": 48,
+      "tspin_doubles_game_stats": 255,
+      "rounds_played": 70,
+      "verified_tspins": 335,
+      "admitted_lineclearing_tspins": 338,
+      "tspins_excluded_untucked": 3,
+      "tspins_excluded_no_snapshot": 0,
+      "tspins_excluded_zero_clear": 5,
+      "forecast_garbage": 0,
+      "forecast_lineclear": 3,
+      "path_opened": 2,
+      "self_built": 153,
+      "unattributed": 0,
+      "mechanism_established": 3,
+      "forecast_total": 0,
+      "clause2_undecided": 1,
+      "rejected_by": {
+        "counted": 0,
+        "floor_arrived_later": 0,
+        "closing_clear_was_spin": 2,
+        "floor_arrived_later_and_closing_clear_was_spin": 0,
+        "floor_undecidable": 1,
+        "floor_undecidable_and_closing_clear_was_spin": 0
+      },
+      "floor_pre_existed": 284,
+      "floor_arrived_later": 27,
+      "floor_undetermined": 24,
+      "reactive": 177,
+      "forecast_rate_x1000": 0,
+      "sampling_ci95_lo_x1000": 0,
+      "sampling_ci95_hi_x1000": 11,
+      "simulator_range_lo_x1000": 0,
+      "simulator_range_hi_x1000": 0,
+      "verified_placements": 5405,
+      "total_placements": 5975
+    }
+  ],
+  "session": {
+    "player_rounds": 140,
+    "verified_placements": 10685,
+    "total_placements": 11638,
+    "coverage_x1000": 918
+  },
+  "statistics": {
+    "round": {
+      "metric": "forecast rate",
+      "auc_x1000": 500,
+      "wins": 0,
+      "losses": 0,
+      "ties": 57,
+      "decided": 0,
+      "exact_p_x1000": null
+    },
+    "event": {
+      "forecast_n": 0,
+      "reactive_n": 307,
+      "attack": null,
+      "lines": null,
+      "balance": {
+        "stack_height": null,
+        "garbage_pressure": null
+      },
+      "negative_control": null
+    },
+    "player": null,
+    "reliability": {
+      "split_half_r_x1000": {
+        "pinglamb": null,
+        "yachi": null
+      },
+      "scorable_rounds": {
+        "pinglamb": 64,
+        "yachi": 62
+      },
+      "rounds_for_r70": {
+        "pinglamb": null,
+        "yachi": null
+      }
+    }
+  }
+}

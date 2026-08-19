@@ -75,6 +75,9 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // `replay-2026-08-14-0.ttrm` r4 lock 74 — the same class with the piece NOT touching the slot,
   // so it fell through to `unattributed` and was the corpus's only entry in that bucket.
   '2026-08-14': { yachi: 1, pinglamb: 0 },
+  // Two of yachi's `path_opened` events this session — `forecast-corpus.test.ts` pins the
+  // corpus-wide count at 2, entirely on yachi.
+  '2026-08-19': { yachi: 2, pinglamb: 0 },
 };
 
 // The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits
