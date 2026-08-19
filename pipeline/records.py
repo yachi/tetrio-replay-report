@@ -82,10 +82,15 @@ def corpus_scope():
 # session-count assertion cannot see that class at all — the corpus was six
 # sessions on both sides of it. Re-run the R script when the DATA moves, not only
 # when a session lands.
-R_STATS_SESSIONS = 6            # `n = 760 player-rounds over 6 sessions`
-R_VS_SD_SHORT, R_VS_SD_LONG = "59.6", "14.5"    # SD of VS in the shortest / longest bin
-R_VS_T_SHORT, R_VS_T_LONG = 19, 150             # those bins' geometric-mean length, seconds
-R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 104, 120      # the control: the mean over the same bins
+R_STATS_SESSIONS = 7            # `n = 900 player-rounds over 7 sessions`
+R_VS_SD_SHORT, R_VS_SD_LONG = "59.2", "15.5"    # SD of VS in the shortest / longest bin
+R_VS_T_SHORT, R_VS_T_LONG = 19, 148             # those bins' geometric-mean length, seconds
+R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 107, 119      # the control: the mean over the same bins
+# 106.9 and 119.4, to the NEAREST integer and not floored. The two figures beside them
+# (R_VS_T_*) are floored because the sentence prefixes them with 約, which this repo defines
+# as "at least this much"; these two carry no 約 and are a rise, so flooring the low end would
+# print a bigger rise than was measured. The six-session values (104.1, 120.1) floored and
+# rounded to the same integers, which is why the question had not come up before.
 
 # (family, label, unit, how to format the proved integer)
 #

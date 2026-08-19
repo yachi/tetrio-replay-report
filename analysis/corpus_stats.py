@@ -5,7 +5,7 @@
     python3 -m analysis.corpus_stats --selftest # the split rule's control, and the estimator's
 
 **Why this file exists.** `pipeline/intense_round.py` published `n = 380`, a tercile triple,
-six Spearman rho and six adjusted p-values as string literals in a docstring and in the
+seven Spearman rho and seven adjusted p-values as string literals in a docstring and in the
 rendered Cantonese, and **no script in this repo computed any of them**. Two things followed,
 and both are established rather than hypothetical:
 
@@ -25,6 +25,18 @@ and both are established rather than hypothetical:
    into a scratch tree and
    this module run against both roots — the same shape as the leave-one-out gate's evidence,
    and the reason the two roots are worth naming is that `--root` makes it a one-line probe.
+
+   **Those five arrows are the SIX-session values and stay here as the record of that failure,
+   not as current figures.** 2026-08-19 took the corpus to seven sessions and 450 rounds, and it
+   moved all seven rho — the two the re-source had left alone included. That is the other half of
+   the same lesson: invariance to a re-source is not invariance to data, which is why the guard
+   downstream re-derives rather than counting sessions. As of that session they read **+0.176**
+   (cleared_pp/intensity), **+0.169** (cleared/intensity), **+0.060** (cleared_pp/duration),
+   **−0.173** (apm/duration), **−0.180** (attack/duration), **+0.223**
+   (cleared_per_received/intensity) and **+0.055** (received/intensity). Nothing else in this
+   repo needs them typed out again, and they are typed out here only because
+   `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
+   figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.
 2. **The published Holm triple was internally impossible.** Holm's multiplier decreases with
    rank by construction — the raw-ascending p are scaled by m, m−1, m−2, … before the running
    maximum. Divide each published adjusted value by the raw p it was computed from (i.e. by the
@@ -108,7 +120,7 @@ which axis you were reading, which is exactly the unauditable state above.
 
 # What this does NOT establish
 
-The 380 rounds are nested in matches, in sessions, and in two players. Every p here assumes
+The 450 rounds are nested in matches, in sessions, and in two players. Every p here assumes
 independent rounds, so every one of them is ANTI-CONSERVATIVE: the true family-wise error is
 larger than the number printed. The rank-order pattern (a monotone tercile progression that
 its own duration control does not reproduce) is the finding; p is supporting evidence for it,
@@ -270,7 +282,7 @@ def t_two_sided(t, df):
     """P(|T| > |t|) for Student's t on `df` degrees of freedom.
 
     The identity is P(|T| > t) = I_{df/(df+t^2)}(df/2, 1/2), which is exact and needs no
-    normal approximation — at n = 380 the two agree anyway, but the corpus will not always
+    normal approximation — at n = 450 the two agree anyway, but the corpus will not always
     be this size and an approximation whose error is invisible at one n is a trap.
     """
     if df <= 0:
@@ -320,10 +332,14 @@ def bonferroni(p, m):
 def terciles(n):
     """The two rank boundaries, as (b1, b2). Sizes are (b1, b2-b1, n-b2).
 
-    `floor(n/3)` and `floor(2n/3)`, which at n = 380 gives 126 / 127 / 127. The obvious
-    alternative — `floor(n/3)` and `2*floor(n/3)` — gives 126 / 126 / 128 and a DIFFERENT
-    published triple; `_selftest` pins that the two rules disagree, so this line is a
-    measured choice rather than a formatting detail nobody would notice changing.
+    `floor(n/3)` and `floor(2n/3)`. The obvious alternative — `floor(n/3)` and `2*floor(n/3)`
+    — gives a DIFFERENT published triple whenever n is not a multiple of 3: at n = 380 this
+    rule gives 126 / 127 / 127 and that one gives 126 / 126 / 128. The example stays at 380
+    on purpose. The corpus is 450 now, which is divisible by 3, so the two rules coincide at
+    150 / 150 / 150 and the current n cannot show what is at stake; `_selftest` pins that the
+    two rules disagree, so this line is a measured choice rather than a formatting detail
+    nobody would notice changing — and an n that happens to hide the disagreement is exactly
+    when that pin is doing the work.
 
     The rule keeps the three bins within one round of each other for every n, which the
     doubling rule does not: it drifts by up to 2 and puts the surplus in the top bin, the one

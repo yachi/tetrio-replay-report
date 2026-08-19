@@ -5,11 +5,11 @@
     python3 -m pipeline.check_intense_corpus --render       # print the CORPUS block to paste
     python3 -m pipeline.check_intense_corpus --selftest     # plant corruptions, require catches
 
-**The case.** `pipeline/intense_round.CORPUS` holds `n = 380`, a tercile triple and seven
+**The case.** `pipeline/intense_round.CORPUS` holds `n = 450`, a tercile triple and seven
 Spearman rho with their raw and adjusted p, as strings. They have to be literals: the section
 renders once per session, and a generator that read every other session's `facts.json` at render
-time would re-render all six reports the day a seventh landed, which is the opposite of what this
-repo's byte-identity gates are for. The cost of a literal is staleness, and it was paid within
+time would re-render all seven reports the day an eighth landed, which is the opposite of what
+this repo's byte-identity gates are for. The cost of a literal is staleness, and it was paid within
 the hour — the lede landed at `0cc719c` (2026-08-16 01:42) and `0804a7e` re-sourced apm/pps/vs
 from the live tick to `results.aggregatestats` at 02:54, moving five of the seven. Nobody could
 have noticed, because no script computed any of them.
@@ -32,7 +32,7 @@ the gate working, not the gate broken — the remedy is `build_report`, run by a
 list, or of the `facts.json` bytes, and re-derives only when it changes. That version would have
 passed straight through the failure it exists for: the re-source changed the *values* inside a
 fixed set of files under a fixed set of sessions, so a fingerprint that noticed would have to be
-a fingerprint of the whole data — at which point it is cheaper to measure. `measure()` over six
+a fingerprint of the whole data — at which point it is cheaper to measure. `measure()` over seven
 sessions is well under a second. There is no fingerprint here, on purpose.
 
 **One formatter, proved rather than asserted.** `analysis/corpus_stats.fmt_rho` / `fmt_auc` /
@@ -233,9 +233,9 @@ def strip_corpus(text):
     """`text` with any module-level `CORPUS = {...}` blanked out, line for line.
 
     **Without this the check is self-satisfying for the module that DEFINES the dict.**
-    `pipeline/intense_round.py` holds `{"rho": "+0.212", ...}` as source, so a haystack of the
+    `pipeline/intense_round.py` holds `{"rho": "+0.176", ...}` as source, so a haystack of the
     whole file contains every figure by construction and the docstring could say anything at
-    all. Mutant A found it: perturbing CORPUS to `+0.213` made that module's prose check pass,
+    all. Mutant A found it: perturbing CORPUS to `+0.177` made that module's prose check pass,
     because the perturbed literal was itself the match.
 
     Blanking LINES rather than deleting them keeps the rest of the file at its own offsets, so
@@ -443,31 +443,31 @@ def _selftest(root):
     #    it. That is the point: a gate comparing documents to literals alone would call a
     #    wholesale re-typing perfectly consistent.
     for key, field, value, what in (
-            ("cleared_pp/intensity", "rho", "+0.213", "the headline rho, one digit up"),
-            ("cleared_pp/duration", "rho", "+0.057", "the length control's rho, one digit down"),
-            ("cleared/intensity", "rho", "+0.202", "the docstring-only rho, one digit up"),
-            ("received/intensity", "raw", "0.0581", "a raw p, one digit up"),
-            ("attack/duration", "adj", "0.0080", "an adjusted p, one digit down"),
-            ("terciles", 2, "83.6", "the top tercile, one digit up"),
-            ("n", None, 379, "the round count"),
+            ("cleared_pp/intensity", "rho", "+0.177", "the headline rho, one digit up"),
+            ("cleared_pp/duration", "rho", "+0.059", "the length control's rho, one digit down"),
+            ("cleared/intensity", "rho", "+0.170", "the docstring-only rho, one digit up"),
+            ("received/intensity", "raw", "0.2413", "a raw p, one digit up"),
+            ("attack/duration", "adj", "0.0030", "an adjusted p, one digit down"),
+            ("terciles", 2, "81.1", "the top tercile, one digit up"),
+            ("n", None, 449, "the round count"),
             ("m", None, 25, "the family size")):
         c = mutant(key, field, value)
         assert c != corpus, (key, field)     # a no-op mutant proves nothing
         check(bool(run(c)), f"MUTANT A — a published figure drifts: {what}")
 
-    # 2. MUTANT B — a seventh session lands and moves a true value. Distinct from A and both
+    # 2. MUTANT B — an eighth session lands and moves a true value. Distinct from A and both
     #    are required: a corpus that GREW is what a session-list fingerprint would catch, and a
     #    re-source inside a fixed session list is what it would miss. This gate re-derives, so
     #    the same comparison catches both, which is the argument for not fingerprinting.
     grown = dict(want)
-    grown["n"] = str(int(want["n"]) + 84)
+    grown["n"] = str(int(want["n"]) + 70)
     grown["cleared_pp/intensity/rho"] = "+0.187"
     grown["cleared_pp/intensity/raw"] = "0.0004"
     grown["cleared_pp/intensity/adj"] = "0.0093"
     check(bool(run(want_=grown)),
-          "MUTANT B — a seventh session moves n and the headline rho")
-    check(bool(run(want_={**want, "n": str(int(want["n"]) + 84)})),
-          "MUTANT B — ...and a seventh session that moves ONLY n still fails")
+          "MUTANT B — an eighth session moves n and the headline rho")
+    check(bool(run(want_={**want, "n": str(int(want["n"]) + 70)})),
+          "MUTANT B — ...and an eighth session that moves ONLY n still fails")
 
     # 3. The documents fall behind a CORPUS that is itself right — link three, and link two.
     stale_section = syn_section(corpus).replace(
@@ -493,7 +493,7 @@ def _selftest(root):
     #     present in either would satisfy both — which is how a gate over two documents
     #     silently becomes a gate over their union.
     for name in sorted(DOCSTRING_OWES):
-        one = {k: (v.replace("-0.184", "-0.185") if k == name else v) for k, v in docs.items()}
+        one = {k: (v.replace("-0.180", "-0.181") if k == name else v) for k, v in docs.items()}
         assert one != docs, name
         check(bool(run(docs=one)), f"only {name}'s docstring drifts, the other is right")
 

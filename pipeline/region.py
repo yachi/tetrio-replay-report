@@ -34,6 +34,18 @@ def replace(html, start, end, body, anchor=None):
     missing region is an error, because silently appending would put generated
     markup outside the document's structure.
 
+    `anchor` may be a TUPLE of candidates, tried in order, first one present
+    wins. That exists because one conditional region may anchor on another
+    conditional region's marker: 最癲一局 anchors on 全消's BEGIN marker so that it
+    lands above it, but on a report being built from a fresh skeleton NEITHER
+    region exists yet, and on a session with no All Clear 全消 never will. A single
+    anchor is right for the retrofit case (inserting into a report that already
+    carries the other region) and impossible for the fresh case; the chain covers
+    both, by naming the region it wants to precede first and a marker the skeleton
+    always emits as the fallback. Order still comes out right in the fresh case:
+    the earlier section inserts before the shared fallback first, and the later one
+    then inserts before that same fallback, landing after it.
+
     Returns (html, how) where `how` is "replaced" or "inserted".
     """
     section = f"{start}\n{body.strip()}\n{end}"
@@ -46,6 +58,10 @@ def replace(html, start, end, body, anchor=None):
                          "the region is corrupt, refusing to guess where it ends")
     if anchor is None:
         raise ValueError(f"region {start!r} not found and no anchor given")
-    if anchor not in html:
-        raise ValueError(f"anchor {anchor!r} not found in the document")
-    return html.replace(anchor, section + "\n\n" + anchor, 1), "inserted"
+    candidates = (anchor,) if isinstance(anchor, str) else tuple(anchor)
+    if not candidates:
+        raise ValueError(f"region {start!r} not found and the anchor chain is empty")
+    for candidate in candidates:
+        if candidate in html:
+            return html.replace(candidate, section + "\n\n" + candidate, 1), "inserted"
+    raise ValueError(f"none of the anchors {list(candidates)!r} are in the document")
