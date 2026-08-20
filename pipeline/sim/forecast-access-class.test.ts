@@ -45,38 +45,56 @@
  * engine it never calls (the `bfs-cap.ts` lesson), so the replica is gone and only the two
  * counterfactuals remain, both of which mutants do kill.
  *
- * The 9 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
+ * The 13 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
  * by folding it into "formed":
  *
- *   5  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot
+ *   7  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot
  *   2  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`
- *   2  ACCESS          neither — the clear only removed the lid       -> engine says `access`
+ *   4  ACCESS          neither — the clear only removed the lid       -> engine says `access`
  *
  * Overdetermined is not a defect: when the placement on its own reaches the target, crediting it is
  * defensible even though the clear would have done too.
  *
- * ALL THREE COUNTS ARE UNCHANGED BY THE REPAIR — only the last row's verdict moved, from
+ * THE COUNTS WERE UNCHANGED BY THE 2026-08-16 REPAIR — only the last row's verdict moved, from
  * `unattributed`/`placement` to `access`. That is what says the branch went in at the right place:
- * placed before the strictly-inside test the same counterfactual takes all 9 and `formed` collapses
- * to 0 (planted and killed — see MUTATION STATUS); placed after `touches` it takes 1 and leaves the
- * confidently-wrong half exactly as it was.
+ * placed before the strictly-inside test the same counterfactual takes all of them and `formed`
+ * collapses to 0 (planted and killed — see MUTATION STATUS); placed after `touches` it takes 1 and
+ * leaves the confidently-wrong half exactly as it was.
+ *
+ * THEY DID MOVE WHEN 2026-08-19 ARRIVED, and that is this file working as designed rather than a
+ * regression: 9 -> 13 candidates, splitting 2 more `formed` and 2 more ACCESS, with
+ * `overdetermined` and `pieceBlocked` unmoved. The class's share of the candidates is flat
+ * (2/9 -> 4/13), so a seventh session did not expose a detector that had been mis-firing — the
+ * class simply keeps arriving. Both new members were verified by re-deriving the counterfactuals
+ * and their controls, not by trusting the engine; the working is beside them in `ACCESS_CLASS`.
  *
  * WHAT THIS FILE DOES NOT COVER: whether `localiseMechanism`'s inside test should be strict or
  * inclusive. No cleared row in this corpus sits on a slot boundary, so the corpus cannot answer it;
  * that is fixture territory (forecast.test.ts), not corpus territory. Said out loud so a green run
  * here is not mistaken for evidence about it.
  *
- * NAMED, NOT BOUNDED — the `DT_ORDER_IN_OPENER` precedent (pipeline/openers/openers.test.ts) and
- * `check_loo.py`'s ANNOTATED. An inequality would be satisfied by any two such events anywhere;
- * this names these two, so a third has to be investigated instead of absorbed, and either of them
- * disappearing or changing verdict fails just as loudly. It stays named now that the branch exists,
- * for the same reason: `access` firing on a third event is a claim about the play, not a refactor.
+ * NAMED, NOT BOUNDED — the `DT_ORDER_IN_OPENER` and `CAVE_IN_OPENER_EXCEPTIONS` precedents
+ * (pipeline/openers/openers.test.ts) and `check_loo.py`'s ANNOTATED. An inequality would be
+ * satisfied by any four such events anywhere; this names these four, so a fifth has to be
+ * investigated instead of absorbed, and any of them disappearing or changing verdict fails just as
+ * loudly. That is not hypothetical: 2026-08-19 arrived with two new members and failed here rather
+ * than passing a bound, which is the entire reason the class is pinned by name.
  *
  * MUTATION STATUS, because "a guard no mutant can kill is decorative" applies to this file too.
  * RE-MEASURED 2026-08-16 against the repaired engine — the previous header claimed 13/10 and three
  * survivors, and that claim was about a file whose ACCESS_CLASS held different verdicts, so it was
  * carried forward rather than re-run. **20 planted, 16 killed, 4 survive.** Every previously-killed
  * mutant is still killed; nothing regressed from killed to surviving.
+ *
+ * PARTIALLY RE-MEASURED 2026-08-19, when the class grew from two members to four. The 20-mutant
+ * figure above is NOT re-stated as covering this file, for precisely the reason the paragraph above
+ * records: ACCESS_CLASS changed, so a count measured against the old list is a claim about a
+ * different file. What WAS re-run are the five mutants that bear on what changed, all killed:
+ * a new entry removed, a new entry's verdict flipped to `placement`, a new entry's lock drifted by
+ * one, the list padded with an invented fifth member, and `formed` reverted to its old 5. The
+ * remaining fifteen — the counterfactual branches and the engine-branch mutants — were not re-run;
+ * they exercise code this change did not touch, and saying so is cheaper than implying coverage
+ * that was not measured.
  *
  * Killed (16): both ACCESS_CLASS entries removed, reclassified and drifted separately (6), the list
  * padded with an invented third (1), and every counterfactual branch — clearAlone disabled,
@@ -135,8 +153,9 @@ import type { Board } from './vendor/core/srs.ts';
 const H = 40;
 const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
 // Discovered, never listed. A hardcoded session list is the failure recorded in
-// `new-session-checklist`: the newest session is exactly the one a stale list omits, and this
-// corpus's only two members both arrived in the two most recent sessions.
+// `new-session-checklist`: the newest session is exactly the one a stale list omits, and every
+// member of this class has arrived in one of the three most recent sessions — 2026-08-19 alone
+// brought two. A list would have hidden them by construction.
 const SESSIONS = readdirSync(SESSIONS_DIR)
   .filter(s => existsSync(`${SESSIONS_DIR}/${s}`)
     && readdirSync(`${SESSIONS_DIR}/${s}`).some(f => f.endsWith('.ttrm')))
@@ -148,10 +167,13 @@ type Member = {
 };
 
 /**
- * The two events this corpus contains, with the verdict each receives. The verdict is part of the
+ * The four events this corpus contains, with the verdict each receives. The verdict is part of the
  * pin on purpose: it is what turned this file from a report of a gap into a regression guard on the
- * branch that closed it. Both entries read `unattributed`/`self_built` and `placement`/`self_built`
- * until 2026-08-16 — the two ways the model used to answer, recorded in the history above.
+ * branch that closed it. The first two read `unattributed`/`self_built` and `placement`/`self_built`
+ * until 2026-08-16 — the two ways the model used to answer, recorded in the history above — and are
+ * the two halves of the class, which is why they are kept in that order. The last two arrived with
+ * 2026-08-19 and were `access` from the moment they were first measured, the branch having landed
+ * three days earlier.
  */
 const ACCESS_CLASS: Member[] = [
   // A T-spin Single at lock 70 cleared row 33 — `LLLIIII.ZZ`, one open column. The slot is at rows
@@ -170,6 +192,31 @@ const ACCESS_CLASS: Member[] = [
   // the adjacency no longer decides it.
   { session: '2026-08-09', file: 'replay-2026-08-09-6.ttrm', round: 7, user: 'pinglamb',
     lock: 24, step: 20, mechanism: 'access', kind: 'path_opened' },
+  // ── 2026-08-19 added TWO, which is the event this file was built to catch ──────────────────────
+  // Both are the same shape as the two above and were verified the same way, by re-deriving the
+  // counterfactuals rather than by trusting the engine's own verdict:
+  //
+  //            causing piece   cleared   A    A-cleared   Bpre   target   controls (other rows)
+  //   r4/l23   L, spin none    row 35    0    2           0      2        32/33/34/36/37 -> all 0
+  //   r6/l32   L, spin none    row 36    0    2           1      2        33/34/35/37/38 -> all 0
+  //
+  // Read the control column first: deleting ANY other single row gives 0, so what raised
+  // availability is that row and not the act of deleting a row — the artefact a bare `clearAlone`
+  // could not rule out. And the slot PRE-EXISTED cell for cell: every row below the cleared row is
+  // occupancy-identical in A and in B (4 of 4, and 3 of 3), so nothing down there was formed. The
+  // clear removed the lid, exactly as for the two above.
+  //
+  // r6 is the more interesting of the pair and is why `overdetermined` is tested by `>= target` and
+  // never by `> 0`: its placement alone reaches 1, so the piece did contribute — just not enough.
+  // A rule that credited any non-zero contribution to the placement would have swallowed it.
+  //
+  // NOTED, NOT EXPLAINED: both are yachi, in the same replay file, two rounds apart, both an L with
+  // `spin: 'none'` clearing exactly one row against target 2. Four events is still too few to call
+  // that anything, and naming a mechanism for it here is how a coincidence becomes a finding.
+  { session: '2026-08-19', file: 'replay-2026-08-19-5.ttrm', round: 4, user: 'yachi',
+    lock: 23, step: 22, mechanism: 'access', kind: 'path_opened' },
+  { session: '2026-08-19', file: 'replay-2026-08-19-5.ttrm', round: 6, user: 'yachi',
+    lock: 32, step: 24, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -267,7 +314,7 @@ function sweep() {
 
 const result = sweep();
 
-test('the access class is exactly the two named events, and the engine calls both `access`', () => {
+test('the access class is exactly the four named events, and the engine calls each `access`', () => {
   // Sorted and compared as a SET of keys: an added member, a removed member, a member that moved
   // round or lock, and a member whose verdict changed all fail here. `toEqual` on the strings keeps
   // the failure readable, which matters because the reason lives beside each entry in ACCESS_CLASS.
@@ -283,21 +330,27 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the 9 candidates decompose 5 formed / 2 overdetermined / 2 access, and nothing else', () => {
-  // The numbers that make this a finding rather than a curiosity, and they did NOT move when the
-  // `access` branch landed — only the verdict on the last 2 did. 9 records corpus-wide are ones the
-  // clear ALONE explains; 5 the model credits to the clear because a cleared row lies strictly
+test('the 13 candidates decompose 7 formed / 2 overdetermined / 4 access, and nothing else', () => {
+  // The numbers that make this a finding rather than a curiosity. 13 records corpus-wide are ones
+  // the clear ALONE explains; 7 the model credits to the clear because a cleared row lies strictly
   // inside the slot, 2 more are overdetermined (the placement alone also sufficed, so `placement` is
-  // a defensible verdict and the engine tests it first), and 2 are the access class. A detector that
+  // a defensible verdict and the engine tests it first), and 4 are the access class. A detector that
   // fired on everything, or on nothing, would look identical in `access` alone — these are its
   // denominator, its true positives and the branch that pre-empts them.
+  //
+  // 2026-08-19 MOVED ALL OF THESE, and how it moved them is the reassuring part: +4 candidates
+  // splitting 2 formed and 2 access, with `overdetermined` and `pieceBlocked` unchanged. The
+  // proportion in the access class is essentially flat (2/9 -> 4/13), so the seventh session did not
+  // reveal a detector that had been quietly mis-firing — it added members to a class that keeps
+  // arriving at roughly the rate it always has. Before this session the decomposition read
+  // 5 / 2 / 2 out of 9, and it had been stable across the 2026-08-16 repair.
   //
   // This is also where the branch ORDER is pinned. Placed before the strictly-inside test the same
   // counterfactual reclassifies all 9, i.e. the published numerator; placed after `touches` it
   // reclassifies 1 and leaves the confidently-wrong half alone. `formed` staying 5 is what says the
   // branch went in between.
-  expect(result.clearAlone).toBe(9);
-  expect(result.formed).toBe(5);
+  expect(result.clearAlone).toBe(13);
+  expect(result.formed).toBe(7);
   expect(result.overdetermined).toBe(2);
   expect(result.formed + result.overdetermined + result.pieceBlocked + result.access.length)
     .toBe(result.clearAlone);
@@ -312,7 +365,7 @@ test('the replica can disagree with the engine, and does not', () => {
   // two shows up here rather than silently changing which events land in ACCESS_CLASS. This is the
   // check `bfs-cap.ts` did not have when it printed the same 688 before and after a real change.
   expect(result.disagreements).toEqual([]);
-  // and the check must have actually run — over the 9 candidates, not over an empty set
+  // and the check must have actually run — over the 13 candidates, not over an empty set
   expect(result.clearAlone).toBeGreaterThan(0);
 });
 
@@ -321,6 +374,10 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // empty set compares equal to an empty expectation — the shape this repo calls a gate that
   // proves nothing while reporting ok. These are REGRESSION PINS in the sense
   // forecast-corpus.test.ts means it: produced by this code, not by an outside oracle.
-  expect(SESSIONS.length).toBe(6);
-  expect(result.localised).toBe(1789);
+  // SESSIONS is read off disk (readdirSync above), never listed, so this compares a discovered
+  // count against a pin rather than one literal against another — a session arriving fails here,
+  // which is the whole job. `localised` is the second half: discovery finding 7 directories says
+  // nothing about the sweep having replayed them.
+  expect(SESSIONS.length).toBe(7);
+  expect(result.localised).toBe(2138);
 });
