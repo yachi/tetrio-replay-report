@@ -243,6 +243,17 @@ point at what does (a committed artefact, a test, a generator) or say plainly, i
 itself, that it is hand-measured and must be re-measured. Both of those are done for each of the
 four rows below; a bare number is not.
 
+**A count measured against a pinned SET is void the moment that set changes.** The fifth instance
+arrived while this section was being written, and it is the one that should worry a reader most.
+`forecast-access-class.test.ts` carried 「20 planted, 16 killed, 4 survive」 in its header — a
+mutation score measured on 2026-08-16 against an `ACCESS_CLASS` holding two entries. 2026-08-19
+added two more, and the score silently became a statement about a file that no longer existed.
+**That file already knew.** It carries a paragraph warning against exactly this, and the warning
+did not prevent the recurrence, for the reason the whole section is about: *prose cannot fail*.
+The header now says which five mutants were re-run and which fifteen were not. The actionable
+rule: when a pinned set changes, every count measured against the old set is void until it is
+re-run or explicitly scoped to the set it was measured on.
+
 ## Data semantics that cost real debugging
 
 - `lifetime` is **milliseconds**, not frames (verify via `pieces / pps`; 60 fps is ~15× off).
