@@ -60,8 +60,8 @@ marginally ahead — so this is a separation, not "whoever led on APP won the ma
    303 [G058]. Spikes follow — biggest single spike 25 to 20 [G054], and 30 rounds with a
    12-line-plus spike against 12 [G057]. If anything gets added, add it to TST.
 2. **His floor is his real edge, and it is what to protect.** Lost-round attack per piece
-   ~0.61 against yachi's ~0.55 [G068] [G069]; the lost-round gap, 11-12%, is nearly double
-   the won-round gap of 6-7% [C002]. He is not winning by having better good rounds — he is
+   ~0.61 against yachi's ~0.55 [G068] [G069]; the lost-round gap is 11-12% against 6-7% on
+   the won rounds [C002]. He is not winning by having better good rounds — he is
    winning by having less bad bad ones.
 3. **The three he lost were the three that were close.** Under 1% of efficiency separated
    them in all three [C007]. There is no data here saying what goes wrong in a close match,

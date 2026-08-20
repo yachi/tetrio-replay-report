@@ -31,6 +31,17 @@ Round-by-round, each match is pinned in its own claim [C009]–[C018]:
 | 9 | 9 | P Y P P Y Y Y P P | 4-5 | C017 · G012 · G015 |
 | 10 | 8 | Y P P P P Y Y P | 3-5 | C018 · G013 |
 
+**C017's own gloss is wrong and the prose does not follow it.** Its Cantonese says yachi
+「連贏三局追到 4 比 4」 and its `english_gloss` says "won three straight to level at 4-4".
+The running score after those three rounds is **4-3 to yachi** — he took the lead, he did
+not level; the match only reached 4-4 after pinglamb won round 8. The predicate is the
+nine-round winner sequence, which is correct and entails the right reading, so the lemma is
+sound and the *gloss beside it* is not. Every mention in the report says 「由 1 比 3 連贏
+三局反超做 4 比 3」 instead. `hand_claims.py` is outside this task's write scope, so the
+canto and gloss still need fixing at source — and because `codegen` builds lemma names from
+`english_gloss`, that edit renames C017's lemma and strands its badge until the proof map is
+rebuilt.
+
 Matches 5 and 6 run the identical sequence — first and fifth rounds only, 2-5 both times
 [C013] [C014]. One sweep, m3 [G014]; one match decided in its final round, m9 [G015].
 The longest streak of the night is pinglamb's ten rounds running from m2 into m3 [G016].
@@ -110,7 +121,8 @@ of garbage in total (1184 to 1183) [G033]. What differs is what a piece buys [C0
   ~122.6, is the session's unqualified peak and is explicitly *not* a record — a 12-second
   denominator [G076]. Same for yachi's ~205.6 VS in m4 round 6, over ~21 seconds [G077].
 - **m9 round 7 — 158 lines**, the session's highest single-round clear count, yachi's
-  [G023], inside the three straight rounds that levelled m9 at 4-4 [C017].
+  [G023]. It is the last of the three straight rounds that took him from 1-3 to a 4-3
+  lead; pinglamb then took rounds 8 and 9 [C017].
 - **m1 round 5 — ~172 seconds** [G024], the longest round; pinglamb survived it.
 - **m10 round 7 — the hardest hold** [G028]: yachi took 124 lines of incoming against
   pinglamb's 94 and won anyway.
