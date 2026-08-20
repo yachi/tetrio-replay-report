@@ -3026,3 +3026,56 @@ is no `tsconfig.json`.)*
    **決定咗(2026-08-18)— 留,理由寫喺 item 3 原址。** 一句講晒:20 條 claim 有 13 條要
    `match_index`、1 條仲要 winner 揀邊嘅 `sum_ge`,兩個都要加落共用代數;繞開嗰三條路量過全部
    令 truth vector 變(一鬆兩緊)。呢四粒 decision 而家淨返第 1、第 2 兩粒。
+
+## 兩個仲未有 gate 嘅數 — 開第八個 session 之前 (2026-08-20)
+
+Filed after 2026-08-19 landed (PR #14, `f77a22e`). Both are the 冇第二份 class CLAUDE.md now
+names: a figure published as a measurement with nothing that would re-derive it.
+
+**A third candidate was investigated and is NOT open, which is why it is written down.**
+`bin/build-docs`'s `ARTEFACTS` was believed to be self-satisfying — "without an entry the site
+renders one fewer card and `--check` STILL PASSES, because it compares docs/ against that same
+list". Measured 2026-08-20: **false**. `bin/build-docs:243` builds `arts` by globbing
+`sessions/*` off disk and hands it to `docs_gate.row_membership`, the helper
+`check_equiv_coverage` and `check_loo` already share; dropping the newest entry fails with
+`publishes 6 of the 7 sessions on disk`. Mutation-tested, not read. The stale version of that
+claim had outlived its fix in a memory file and would otherwise have been re-filed every
+session — a wrong DONE record is worth less than none, and so is a wrong OPEN one.
+
+1. **The two hand-typed counts beside the equiv-coverage tables.** Both sit next to tables
+   `check_equiv_coverage.py` already parses, and neither is derived from them:
+
+   - 「**Four of the seven** rows above sit below the ≥85% acceptance gate」 (README.md,
+     ROADMAP.md). This read 「**Two**」 until 2026-08-20. Two was correct at *five* sessions
+     (81%, 82%); 2026-08-14 landed at 84% making it three and 2026-08-19 made it four, so it
+     was wrong for two full sessions, one paragraph below the table that refutes it.
+   - 「**six of the seven** sessions lose coverage to the second family」 (ROADMAP.md,
+     CLAUDE.md). This one was never stale — it is **granularity-ambiguous**, which is worse
+     because re-measuring does not surface it. It is true at `match` (07-24 goes 48 → 48 and
+     loses nothing there) and false at `round` (all seven lose, 07-24 by R018), and it sat in
+     a paragraph quoting `round` figures. Both readings are now stated explicitly.
+
+   The fix is not to re-type them. `DOCS` already runs `per_table` hooks (`_granularity`,
+   `_companion`); a third hook can recompute both counts from the parsed rows and fail on
+   drift, and `render()` can emit them so the sentence is pasted rather than written. Done when
+   a planted corruption of each count is caught by `--selftest` — it is at 68 corruptions and
+   already feeds every committed document through the parser, so the control exists.
+
+2. **The `x of 760` family — 11 lines in CLAUDE.md, all six-session numbers in a seven-session
+   document.** `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
+   `257 of 760` and `245 of 760` (the `finaltime_ms` flooring), `13 of 760` → `0 of 760` (the
+   VS-split guard), `650 of 750` (faults outnumbering non-perfect pieces), `7 and 1 of 760`
+   (`garbagesent`/`garbagereceived`). Every one is **scoped honestly** — the text says it was
+   measured over the first six sessions and has not been re-run — so no sentence is false, and
+   that is exactly why nothing goes red. The corpus is 900 player-rounds now.
+
+   The ratios are what carries forward, not the numerators, so this is not urgent; it is filed
+   because "scoped" is a caveat, not a measurement, and the caveat has already survived one
+   session. Done when each figure is either re-derived at 900 or pointed at a committed
+   artefact that re-derives it. Note that `0 of 760` is the one that must NOT be silently
+   refreshed: it is a guard's firing count, and whether it still fires at 900 is a per-session
+   check, not a re-pool.
+
+Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow
+and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
+and unguarded session list.
