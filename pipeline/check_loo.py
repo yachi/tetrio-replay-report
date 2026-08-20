@@ -381,6 +381,28 @@ PUBLISHED = (
     ("2026-08-14", "app_gap_won", "regimes_0814"),
     ("2026-08-14", "app_gap_lost", "regimes_0814"),
     ("2026-08-14", "app_gap_session", "session_gap"),
+    # 2026-08-19 lands in the series sentence like 07-22 through 08-01 do, and it takes NO
+    # `ANNOTATED` entry. That absence is a measured result, not an entry someone forgot:
+    #
+    #     app_gap_won      +6.2225 pp   m1r5   -> +7.9732   rel 0.281   1.42x the next of 70
+    #     app_gap_lost    +11.0548 pp   m10r7  -> +9.1004   rel 0.177   1.31x
+    #     app_gap_session +12.3975 pp   m4r8   -> +13.1183  rel 0.058   1.02x
+    #     attack_diff         -236 行   m8r2   -> -204      rel 0.136   1.28x
+    #     score_diff       -61639 分    m8r2   -> -52260    rel 0.152   1.14x
+    #
+    # Nothing crosses THRESHOLD and nothing flips sign; the highest is 0.281, well inside the
+    # (0.406, 0.969) interval the threshold was derived in. Do NOT "fix" the missing caveats —
+    # `problems` fails an ANNOTATED entry that no longer crosses for the same reason it fails a
+    # missing one, so adding a 「得一局撐住」 here would break the build, not harden it.
+    #
+    # The last two figures are listed above but deliberately NOT published: no sentence quotes
+    # 08-19's attack or score shortfall yet. They are recorded because they make the statement
+    # stronger than 07-22's and 07-24's, which are also annotation-free — those two are quiet
+    # only across the figures PUBLISHED names (07-22's unpublished attack_diff is rel 1.179 and
+    # DOES flip sign), whereas every figure this session can measure sits below the threshold.
+    # If a later prose pass publishes either one, add its row here and a SENTENCES key with it.
+    ("2026-08-19", "app_gap_won", "series"),
+    ("2026-08-19", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

@@ -1,0 +1,144 @@
+{
+  "corpus": {
+    "moves_match": 3699,
+    "moves_round": 168260,
+    "single_value_mutants": 29994,
+    "single_value_sites": 6088
+  },
+  "modes": {
+    "single_value": {
+      "covered": [
+        "C001",
+        "C004",
+        "C005",
+        "C007",
+        "C009",
+        "C010",
+        "C011",
+        "C012",
+        "C013",
+        "C014",
+        "C015",
+        "C016",
+        "C017",
+        "C018"
+      ],
+      "granularity": null,
+      "identical": [
+        "C001"
+      ],
+      "is_upper_bound": true,
+      "trivial_generated": [
+        "G044",
+        "G045",
+        "G066",
+        "G067",
+        "G068",
+        "G069",
+        "G072",
+        "G073",
+        "G074"
+      ],
+      "uncovered": [
+        "C002",
+        "C003",
+        "C008"
+      ],
+      "untested": [
+        "C006"
+      ],
+      "upper_bound_reason": "a windowed claim shares its rounds with the session total meant to imply it, so no single-value mutation falsifies one without the other; see 2026-07-28, whose 100% here is 60% once value-preserving moves are added"
+    },
+    "two_site_match": {
+      "covered": [
+        "C001",
+        "C004",
+        "C005",
+        "C009",
+        "C010",
+        "C011",
+        "C012",
+        "C013",
+        "C014",
+        "C015",
+        "C016",
+        "C017",
+        "C018"
+      ],
+      "granularity": "match",
+      "identical": [
+        "C001"
+      ],
+      "is_upper_bound": true,
+      "trivial_generated": [
+        "G044",
+        "G045",
+        "G066",
+        "G067",
+        "G068",
+        "G069",
+        "G072",
+        "G073",
+        "G074"
+      ],
+      "uncovered": [
+        "C002",
+        "C003",
+        "C007",
+        "C008"
+      ],
+      "untested": [
+        "C006"
+      ],
+      "upper_bound_reason": "match granularity enumerates only moves out of the source match's largest round and into the target match's smallest, so a claim that turns on WHICH round is touched is out of scope; the round granularity enumerates every cross-match round pair"
+    },
+    "two_site_round": {
+      "covered": [
+        "C001",
+        "C004",
+        "C005",
+        "C009",
+        "C010",
+        "C011",
+        "C012",
+        "C013",
+        "C014",
+        "C015",
+        "C016",
+        "C017",
+        "C018"
+      ],
+      "granularity": "round",
+      "identical": [
+        "C001"
+      ],
+      "is_upper_bound": false,
+      "trivial_generated": [
+        "G044",
+        "G045",
+        "G066",
+        "G067",
+        "G068",
+        "G069",
+        "G072",
+        "G073",
+        "G074"
+      ],
+      "uncovered": [
+        "C002",
+        "C003",
+        "C007",
+        "C008"
+      ],
+      "untested": [
+        "C006"
+      ]
+    }
+  },
+  "schema": "equiv-coverage/1",
+  "session": "2026-08-19",
+  "what": "Hand-claim coverage by exhaustive mutation, per pipeline/claims/equiv.py: a hand-written claim counts as COVERED when some generated claim (or a pair of them) cannot be true unless it is, over every mutation of the dataset in the corpus, and both are falsifiable somewhere. This is NOT a proof of equivalence \u2014 it is a statement about one dataset under one family of perturbations, so a claim listed as covered is a claim the generators would have caught, not a theorem. Verdict SETS are stored and percentages are derived at read time, because the numerator is monotone non-decreasing in the generated ledger: adding a generated family can never lower a percentage, so only the attribution shows what an edit did.",
+  "windowed_claims": [
+    "C007"
+  ]
+}

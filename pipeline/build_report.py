@@ -135,7 +135,19 @@ SECTIONS = [
     # this one explains a single round where 全場之最 ranks every round on one column.
     # Anchored on the 全消 region's BEGIN marker — a marker comment, never a
     # `<section id=...>` tag, which would put it inside a span a later pass rewrites.
-    ("intense-round", '<!-- BEGIN generated perfect-clear', intense_sec, None),
+    #
+    # A CHAIN, because 全消 is itself conditional and self-inserting. Anchoring on it
+    # alone is right only for a report that already carries it, and 2026-08-19 — the
+    # first session built from a fresh skeleton since 最癲一局 shipped — is where that
+    # broke: neither region existed yet, this one is processed first, and the build
+    # died on a missing anchor. Every earlier report had 全消 in it before 最癲一局 was
+    # ever written, so the ordering was never exercised. The coaching marker is the
+    # fallback because the SKELETON always emits it, and falling back to it still
+    # yields document order — this block inserts before coaching, then 全消 inserts
+    # before coaching too and lands between them. A session with an intense round and
+    # NO All Clear needs the fallback permanently, not just on the first build.
+    ("intense-round", ('<!-- BEGIN generated perfect-clear',
+                       '<!-- BEGIN generated coaching'), intense_sec, None),
     ("perfect-clear", '<!-- BEGIN generated coaching', pc_sec, None),
     ("coaching", '<section id="rounds">', coaching_section, None),
     ("appendix", '<footer class="report-footer">', appendix_section, None),

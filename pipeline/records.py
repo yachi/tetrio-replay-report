@@ -82,20 +82,74 @@ def corpus_scope():
 # session-count assertion cannot see that class at all — the corpus was six
 # sessions on both sides of it. Re-run the R script when the DATA moves, not only
 # when a session lands.
-R_STATS_SESSIONS = 6            # `n = 760 player-rounds over 6 sessions`
-R_VS_SD_SHORT, R_VS_SD_LONG = "59.6", "14.5"    # SD of VS in the shortest / longest bin
-R_VS_T_SHORT, R_VS_T_LONG = 19, 150             # those bins' geometric-mean length, seconds
-R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 104, 120      # the control: the mean over the same bins
+R_STATS_SESSIONS = 7            # `n = 900 player-rounds over 7 sessions`
+R_VS_SD_SHORT, R_VS_SD_LONG = "59.2", "15.5"    # SD of VS in the shortest / longest bin
+R_VS_T_SHORT, R_VS_T_LONG = 19, 148             # those bins' geometric-mean length, seconds
+R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 107, 119      # the control: the mean over the same bins
+# 106.9 and 119.4, to the NEAREST integer and not floored. The two figures beside them
+# (R_VS_T_*) are floored because the sentence prefixes them with 約, which this repo defines
+# as "at least this much"; these two carry no 約 and are a rise, so flooring the low end would
+# print a bigger rise than was measured. The six-session values (104.1, 120.1) floored and
+# rounded to the same integers, which is why the question had not come up before.
+
+# ── how far the SD falls, DERIVED from the two constants above ────────────────
+#
+# This was the word 「足足細咗四倍」, typed once and then sitting beside two constants that
+# move every session. It was true when written (59.60/14.54 = 4.10) and false the day the
+# seventh session landed (59.2/15.5 = 3.82), and it shipped into all seven reports in that
+# state. Nothing could have caught it: `check_prose_figures` resolves 約-figures against
+# facts.json and this is a derived R statistic that appears in no dataset, so the sentence
+# lived where no gate reads. Same shape as the 「70-89%」 and 「3379」 defects CLAUDE.md
+# records — a figure quoted in prose that is not the thing it describes.
+#
+# So it is computed, not typed. Floored to one decimal (`fmt.ratio1`), which is what lets
+# 足足 stay in the sentence: the printed 3.8 is a lower bound on the real 3.8195, so the
+# word is true by construction instead of by whoever last checked it.
+R_VS_SD_RATIO = fmt.ratio1(R_VS_SD_SHORT, R_VS_SD_LONG)
+
+# The floor the FOOTNOTE'S ARGUMENT needs, which is not the floor today's number happens to
+# sit near. The argument is "the spread moves a lot while the mean barely moves", so what
+# has to hold is that the SD effect dominates the mean effect — the mean moves by
+# 119/107 = 1.11 over the same span. Below 2 the SD does not even halve while the rounds get
+# ~7.7x longer, and 「量得唔準好多」 stops being supported by its own numbers.
+#
+# Deliberately NOT 4. Pinning it at 4 would re-freeze the value this guard exists because
+# somebody froze, and would fail the build for a corpus that still supports every word of
+# the sentence. A guard set to today's measurement is a copy of the measurement.
+_MIN_SD_RATIO = 2.0
+if float(R_VS_SD_RATIO) < _MIN_SD_RATIO:
+    raise SystemExit(
+        f"records.py: the VS SD falls only {R_VS_SD_RATIO}x from the shortest bin "
+        f"({R_VS_SD_SHORT}) to the longest ({R_VS_SD_LONG}), under the {_MIN_SD_RATIO}x this "
+        f"footnote's argument needs. The sentence claims the spread moves far more than the "
+        f"mean, and at this ratio it no longer does. Do not lower this bound to make the "
+        f"build pass — rewrite the footnote around what the corpus now shows, and re-check "
+        f"whether QUALIFYING_MS is still justified by `Rscript analysis/rate_records.R`.")
 
 # (family, label, unit, how to format the proved integer)
 #
 # Ordered by how much each measure actually says about who won the round — the
-# paired AUC over both sessions' 129 rounds (VS 100%, APM 93.8%, 攻/lines strong,
-# spike and B2B weaker, COMBO 45.0% i.e. nothing). Records that decide games come
-# first; COMBO is last because its tile is a curiosity, not a finding.
+# paired AUC (VS 100%, APM 93.8%, 攻/lines strong, spike and B2B weaker, COMBO
+# weakest of all). Records that decide games come first; COMBO is last because
+# its tile is a curiosity, not a finding.
 # APM read 94.6% here until 2026-08-17 and matches no session at any pooling —
 # 93.8 pooled, 93.7 and 94.0 apart. Re-derived from facts.json, winner vs loser
 # per round, ties at half a win (the convention in pipeline/sim/pairs.ts).
+# COMBO read "45.0% i.e. nothing" here until 2026-08-19, and 45.0 was correct when
+# written: it is the paired AUC over the 129 rounds of the FIRST TWO sessions,
+# which is all there was. It is not a corpus figure and never was. Re-derived the
+# same way over all 450 rounds of seven sessions it is 56.22 — raw p 0.00179 by a
+# sign-flip permutation, still 0.030 after Bonferroni over the 17 columns tested,
+# so the column carries weak signal rather than none. The per-session series drifts
+# steadily: 41.1 · 51.0 · 62.5 · 55.7 · 57.0 · 58.9 · 67.9.
+# COMBO's POSITION here is unaffected, and that was measured rather than assumed:
+# over the same 450 rounds the seven families with a per-round value rank COMBO
+# 56.22 < B2B 64.22 < spike 68.00 < T-spin 68.33 < 清行 81.33 < APM 92.89 < VS
+# 100.0, so it is still last. This is a stale sentence, not a stale ordering, and
+# nothing below moves.
+# The rule the two corrections share: an AUC quoted from the sessions that existed
+# when it was written goes stale without anyone touching this file. Re-derive
+# before quoting, and say which corpus the number is over.
 RECORDS = [
     ("round_max_vs_x1000", "單局最高 VS", "", "r1"),
     ("round_max_apm_x1000", "單局最高 APM", "", "r1"),
@@ -239,7 +293,8 @@ def build(facts, report_dir):
                f'{n_player_rounds} 個 player-round 度'
                f'量過：VS 嘅標準差由 {R_VS_SD_SHORT}（約 {R_VS_T_SHORT} 秒嗰批）跌到 '
                f'{R_VS_SD_LONG}（約 {R_VS_T_LONG} 秒嗰批），'
-               f'足足細咗四倍；同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
+               f'足足細咗 {R_VS_SD_RATIO} 倍；'
+               f'同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
                '即係短局唔止唔係打得好啲，'
                '仲要係量得唔準好多。'
                f'未設限之前，{_cn(n_sessions)}個 session 全部 {n_rate_records} 項速率紀錄'

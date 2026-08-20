@@ -1,0 +1,39 @@
+{
+  "eyebrow": "教練分析 · 下一步點練",
+  "title": "俾兩位嘅建議",
+  "lede": "個比數係 7 比 3<span class=\"badge\" data-claim=\"G001\"></span>，總局數 42 比 28<span class=\"badge\" data-claim=\"G002\"></span>，一場白果<span class=\"badge\" data-claim=\"G014\"></span>、一場打到決勝局<span class=\"badge\" data-claim=\"G015\"></span>。但今晚最值得睇嘅唔係比數，係一條拆開就好清楚嘅數：<strong>贏嗰啲局兩個人爭 6% 幾，輸嗰啲局就爭到 11% 幾</strong><span class=\"badge\" data-claim=\"C002\"></span>。分別唔喺天花板，喺地板——所以兩邊嘅功課都要跟住呢個方向擺。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 volume 流",
+      "profile": [
+        "強項照舊，而且係實數：逐局平均 PPS 約 1.41 高過 pinglamb 嘅約 1.35<span class=\"badge\" data-claim=\"G042\"></span>，全晚落多咗方塊（5975 對 5663）<span class=\"badge\" data-claim=\"G031\"></span>，quad 開多過對面（287 對 242）<span class=\"badge\" data-claim=\"G037\"></span>，hold 用得密（2343 對 2103）<span class=\"badge\" data-claim=\"G035\"></span>，清走嘅垃圾總數同對面幾乎打成平手（1184 對 1183）<span class=\"badge\" data-claim=\"G033\"></span>，逐局 APM 嘅波動仲平穩過對面<span class=\"badge\" data-claim=\"G048\"></span>。",
+        "<strong>問題唔喺天花板，喺地板。</strong> 你贏嗰啲局每粒方塊打出約 0.68，輸嗰啲局跌到約 0.55<span class=\"badge\" data-claim=\"G068\"></span>；pinglamb 同一條數係約 0.72 對約 0.61<span class=\"badge\" data-claim=\"G069\"></span>。兩邊贏嘅局爭 6% 幾，輸嘅局就爭到 11% 幾<span class=\"badge\" data-claim=\"C002\"></span>——即係話你打得順嗰陣同佢差唔遠，一打得差就散得快過佢。",
+        "用你自己做把尺仲清楚：你贏局同輸局爭 23% 幾，佢淨係爭 17% 幾<span class=\"badge\" data-claim=\"C003\"></span>。<strong>今晚郁得最多嗰個係你</strong>，而且郁嘅方向係向下——所以要練嘅唔係「贏得再靚啲」，係「唔好輸得咁散」。",
+        "十場排開個形好清楚：你贏嗰三場，佢每粒方塊嘅攻擊高唔夠 1%；佢贏嗰七場，每場都高過 11%<span class=\"badge\" data-claim=\"C007\"></span>。中間一場都冇，即係你贏嘅場次全部係咬得最緊嗰啲。"
+      ],
+      "recs": [
+        "<strong>要練嘅係「輸嗰啲局點樣輸得冇咁散」。</strong> 你輸局得約 0.55<span class=\"badge\" data-claim=\"G068\"></span>，佢輸局仲有約 0.61<span class=\"badge\" data-claim=\"G069\"></span>，呢格爭 11% 幾，而贏嗰啲局兩個人淨係爭 6% 幾<span class=\"badge\" data-claim=\"C002\"></span>——差得最開嗰半邊就係呢半邊。具體做法：塊板一開始走樣就收貨，攞穩陣嗰個清行，唔好死等個 setup 砌返靚——目標係唔好俾嗰局冧咗，唔係要贏得靚。",
+        "<strong>加速呢條路今次一樣榨唔出嘢。</strong> 全晚多疊 312 粒方塊，打出嘅攻擊反而少 236 條，即係對面總攻擊嘅 6% 幾<span class=\"badge\" data-claim=\"C005\"></span>；方塊數 5975 對 5663<span class=\"badge\" data-claim=\"G031\"></span>，攻擊 3851 對 3615<span class=\"badge\" data-claim=\"G032\"></span>。落多啲方塊要買得返效率，前提係每粒方塊嘅價值撐得住。",
+        "<strong>今次唔好賴自爆。</strong> 全晚得 7 局係自己頂到天花板收場，4 局你、3 局佢<span class=\"badge\" data-claim=\"C006\"></span>，其餘 63 局全部係俾垃圾頂爆<span class=\"badge\" data-claim=\"G066\"></span>。死法呢一格兩邊差唔多，當佢係主因就會練錯嘢。",
+        "<strong>手上功夫亦都唔係重點，但 finesse 值得順手執。</strong> KPP 3.628 對 3.639，爭唔夠 0.3%<span class=\"badge\" data-claim=\"C008\"></span>，慳嗰邊仲要係你<span class=\"badge\" data-claim=\"G065\"></span>；而喺你自己身上，KPP 喺贏局同輸局之間郁唔夠 2%<span class=\"badge\" data-claim=\"G070\"></span>，即係同輸贏無關。真正蝕嗰格係 finesse 失誤，1123 對 976<span class=\"badge\" data-claim=\"G034\"></span>、每粒方塊嘅失誤亦係你多<span class=\"badge\" data-claim=\"G045\"></span>、perfect piece 比率係佢好<span class=\"badge\" data-claim=\"G046\"></span>。執得就執，但排喺頭兩條之後。",
+        "<strong>輸完一局之後嗰局，係你最明顯嘅漏洞。</strong> 你輸咗一局之後，35 次機會裏面即刻贏返 12 次<span class=\"badge\" data-claim=\"G052\"></span>；佢同一條數係 25 次贏返 15 次<span class=\"badge\" data-claim=\"G053\"></span>。呢個係可以單獨練嘅習慣，同砌波技術冇乜關係。",
+        "<strong>第七場係樣板，抄返自己。</strong> 開波連贏四局、六局收工，5 比 1<span class=\"badge\" data-claim=\"G010\"></span><span class=\"badge\" data-claim=\"C015\"></span>，係全晚贏得最鬆嗰場，亦係效率差距唔夠 1% 嗰三場之一<span class=\"badge\" data-claim=\"C007\"></span>。返去睇返嗰六局你點出貨。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "power T-spin 效率流",
+      "profile": [
+        "老路線，執行得好穩：每粒方塊打出嘅攻擊全 session 高過對面<span class=\"badge\" data-claim=\"G044\"></span>，靠嘅係 T-spin——TSD 299 對 255<span class=\"badge\" data-claim=\"G038\"></span>、TST 72 對 48<span class=\"badge\" data-claim=\"G039\"></span>，加埋 371 對 303<span class=\"badge\" data-claim=\"G058\"></span>。逐局平均 APM 約 56.9 對約 51.2<span class=\"badge\" data-claim=\"G043\"></span>，單一次 spike 嘅個人上限 25 對 20<span class=\"badge\" data-claim=\"G054\"></span>，劈到 12 行以上嘅局 30 對 12<span class=\"badge\" data-claim=\"G057\"></span>，全 session 嘅 DS 亦都高過對面<span class=\"badge\" data-claim=\"G075\"></span>。",
+        "<strong>今晚最值錢嗰樣係輸得冇咁散。</strong> 你輸嗰啲局每粒方塊仲有約 0.61<span class=\"badge\" data-claim=\"G069\"></span>，yachi 輸嗰啲局得約 0.55<span class=\"badge\" data-claim=\"G068\"></span>——呢格爭 11% 幾，而贏嗰啲局兩個人淨係爭 6% 幾<span class=\"badge\" data-claim=\"C002\"></span>。你贏唔係因為你打得順嗰陣勁好多，係因為你打得差嗰陣冇跌得咁深。",
+        "呢個亦都反映喺高速局同復原力度：APM 上到 65 以上嘅局你有 17 局，贏咗 16 局<span class=\"badge\" data-claim=\"G051\"></span>；40 秒內收工嘅快局共 26 局，你贏 15、佢贏 11<span class=\"badge\" data-claim=\"G049\"></span>；輸咗一局之後 25 次機會即刻贏返 15 次<span class=\"badge\" data-claim=\"G053\"></span>。逐局 PPS 嘅波動亦都係你平穩啲<span class=\"badge\" data-claim=\"G047\"></span>。"
+      ],
+      "recs": [
+        "<strong>唔好郁條主線。</strong> T-spin 兩格加埋 371 對 303<span class=\"badge\" data-claim=\"G058\"></span>，而每粒方塊嘅攻擊全 session 高過對面<span class=\"badge\" data-claim=\"G044\"></span>。要加碼就加喺 TST（72 對 48）<span class=\"badge\" data-claim=\"G039\"></span>，唔好去追對面嘅 quad 數（287 對 242）<span class=\"badge\" data-claim=\"G037\"></span>。",
+        "<strong>守住你個地板，唔使追個天花板。</strong> 你贏局約 0.72、輸局約 0.61<span class=\"badge\" data-claim=\"G069\"></span>，而對面係約 0.68 對約 0.55<span class=\"badge\" data-claim=\"G068\"></span>；兩邊贏嘅局爭 6% 幾、輸嘅局爭 11% 幾<span class=\"badge\" data-claim=\"C002\"></span>。你嘅優勢全部喺打得差嗰陣仲頂得住，所以要保養嘅係呢一格，唔係再谷高個上限。",
+        "<strong>你輸嗰三場，就係咬得最緊嗰三場。</strong> 嗰三場你每粒方塊嘅攻擊高唔夠 1%，其餘七場每場都高過 11%<span class=\"badge\" data-claim=\"C007\"></span>。今晚啲數講唔到你喺貼身局入面差咗啲乜——所以呢格係下次要留意嘅嘢，唔係而家可以盲改嘅嘢。",
+        "<strong>Perfect Clear 唔好當成戰績。</strong> 兩邊都係 5 個<span class=\"badge\" data-claim=\"G040\"></span>，你有 5 局做到、贏咗 2 局<span class=\"badge\" data-claim=\"G080\"></span>；全場淨係你一個做到全消嘅 4 局入面，你仲要輸咗 3 局<span class=\"badge\" data-claim=\"G081\"></span>。對面同一條數係 4 局輸 2 局<span class=\"badge\" data-claim=\"G079\"></span>。有得食就食，但唔好當佢係贏波嘅訊號。"
+      ]
+    }
+  },
+  "versus_note": "一句總結：<strong>兩個人今晚做緊嘅功夫一樣咁多，分別喺每粒方塊買到啲乜。</strong> 每粒方塊要按幾多下爭唔夠 0.3%<span class=\"badge\" data-claim=\"C008\"></span>，清走嘅垃圾總數 1184 對 1183<span class=\"badge\" data-claim=\"G033\"></span>，自爆 4 比 3<span class=\"badge\" data-claim=\"C006\"></span>——呢幾格全部打成平手。唔平手嗰格係每粒方塊打出嘅攻擊，成晚爭 12% 幾<span class=\"badge\" data-claim=\"C004\"></span>；而嗰格再拆開，爭得最緊要嘅一半唔係贏嗰啲局，係輸嗰啲局<span class=\"badge\" data-claim=\"C002\"></span>。淨係睇 session 總數係睇唔出呢件事嘅——成晚嗰個 12% 幾，兩個區間（6% 幾同 11% 幾）冇一個包得住佢，所以佢邊一邊都唔代表到。"
+}

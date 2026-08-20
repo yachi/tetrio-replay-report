@@ -1,32 +1,34 @@
 {
-  "downstack-under-pressure": {
-    "registered": "2026-08-07",
-    "roadmap_section": "## Open — 2026-08-07",
-    "roadmap_item": "1 — Pre-register `downstack rate under pressure` BEFORE the next session is recorded",
-    "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
-    "estimand_entry": "pipeline/sim/board-metrics.ts",
-    "board_source": "runCaseOracle",
-    "pinned_commit": "5ee57969ecc5f6b31f5a85cf562349c2335c549e",
-    "pinned_on": "2026-08-18",
-    "unblinding": [
-      "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such."
-    ],
-    "sessions": {
-      "2026-07-22": "exploratory",
-      "2026-07-24": "exploratory",
-      "2026-07-28": "exploratory",
-      "2026-08-01": "exploratory",
-      "2026-08-09": "banked",
-      "2026-08-14": "banked"
-    },
-    "deviations": [
-      {
-        "date": "2026-08-18",
-        "what": "The estimand is pinned to the CURRENT instrument — runCaseOracle over the post-hoisted-DAS verified prefix — rather than to the instrument that existed at registration. 08-09 and 08-14 stay in the confirmatory bank.",
-        "why": "Between registration (2026-08-07) and this pin the verified prefix grew ~31% (hoisted-DAS fix c9f3065, 2026-08-11) and the board source moved to runCaseOracle (a38ccc1, 2026-08-12). board-metrics.ts itself was last touched 2026-08-06 (f5ee923) and still imports the hand-port runCase, so 'as computed today' named an instrument the rest of the repo has demoted. Both changes were made for documented drift reasons, blind to this hypothesis, and the estimand has never been computed on the banked sessions. Estimand, unit, direction, test, threshold and controls are unchanged, so this is a deviation in instrument, not a new hypothesis.",
-        "pin_from": null,
-        "pin_to": "5ee57969ecc5f6b31f5a85cf562349c2335c549e"
-      }
-    ]
-  }
+ "downstack-under-pressure": {
+  "registered": "2026-08-07",
+  "roadmap_section": "## Open — 2026-08-07",
+  "roadmap_item": "1 — Pre-register `downstack rate under pressure` BEFORE the next session is recorded",
+  "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
+  "estimand_entry": "pipeline/sim/board-metrics.ts",
+  "board_source": "runCaseOracle",
+  "pinned_commit": "5ee57969ecc5f6b31f5a85cf562349c2335c549e",
+  "pinned_on": "2026-08-18",
+  "unblinding": [
+   "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such.",
+   "2026-08-19 is banked on the same terms and with the same caveat: CLAUDE.md's AUC block publishes its UNCONDITIONAL per-piece DS paired AUC (73.6) alongside the other six. Again that is not the registered estimand — which conditions on garbage being on the pre-lock board — but it is correlated, so this session enters the bank partially unblinded exactly as 08-09 and 08-14 did. Recorded at the time of banking rather than discovered at analysis time."
+  ],
+  "sessions": {
+   "2026-07-22": "exploratory",
+   "2026-07-24": "exploratory",
+   "2026-07-28": "exploratory",
+   "2026-08-01": "exploratory",
+   "2026-08-09": "banked",
+   "2026-08-14": "banked",
+   "2026-08-19": "banked"
+  },
+  "deviations": [
+   {
+    "date": "2026-08-18",
+    "what": "The estimand is pinned to the CURRENT instrument — runCaseOracle over the post-hoisted-DAS verified prefix — rather than to the instrument that existed at registration. 08-09 and 08-14 stay in the confirmatory bank.",
+    "why": "Between registration (2026-08-07) and this pin the verified prefix grew ~31% (hoisted-DAS fix c9f3065, 2026-08-11) and the board source moved to runCaseOracle (a38ccc1, 2026-08-12). board-metrics.ts itself was last touched 2026-08-06 (f5ee923) and still imports the hand-port runCase, so 'as computed today' named an instrument the rest of the repo has demoted. Both changes were made for documented drift reasons, blind to this hypothesis, and the estimand has never been computed on the banked sessions. Estimand, unit, direction, test, threshold and controls are unchanged, so this is a deviation in instrument, not a new hypothesis.",
+    "pin_from": null,
+    "pin_to": "5ee57969ecc5f6b31f5a85cf562349c2335c549e"
+   }
+  ]
+ }
 }

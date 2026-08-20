@@ -718,7 +718,7 @@
         <div class="sr-cid">G021 · ✓ Dafny 已證</div>
       </div>
     </div>
-    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——六個 session 夾埋 760 個 player-round 度量過：VS 嘅標準差由 59.6（約 19 秒嗰批）跌到 14.5（約 150 秒嗰批），足足細咗四倍；同一段路平均數反而由 104 升到 120，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，六個 session 全部 18 項速率紀錄都落喺最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——七個 session 夾埋 900 個 player-round 度量過：VS 嘅標準差由 59.2（約 19 秒嗰批）跌到 15.5（約 148 秒嗰批），足足細咗 3.8 倍；同一段路平均數反而由 107 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，七個 session 全部 21 項速率紀錄都落喺最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G027）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -769,7 +769,7 @@
   <div class="wrap">
     <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
     <h2 class="section-title">全晚打得最癲嘅一局：第 11 場第 2 局</h2>
-    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺六個 session、380 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 62.3% 升到 65.0% 再升到 83.5%（Spearman rho ＋0.212），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 380 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0009。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺七個 session、450 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 64.3% 升到 67.0% 再升到 81.0%（Spearman rho ＋0.176），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 450 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0002，成個 family 26 個測試，Bonferroni 校正後 0.0045。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
     <div class="ir-scroll">
       <table class="ir-table">
         <thead><tr><th>數據</th><th><span class="ir-who"><span class="ir-dot is-p2"></span>pinglamb（贏）</span></th><th><span class="ir-who"><span class="ir-dot is-p1"></span>yachi</span></th></tr></thead>
@@ -792,7 +792,7 @@
     <p class="ir-split"><strong>每粒棋攻擊</strong>：pinglamb 約 0.776、yachi 約 0.768；<strong>每粒棋清走</strong>：pinglamb 約 0.412、yachi 約 0.228。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
     <p class="ir-split">pinglamb 嘅 VS ＝ 攻 約 106.6 ＋ 清垃圾 約 56.5；yachi 嘅 VS ＝ 攻 約 118.7 ＋ 清垃圾 約 35.2。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
     <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：<strong>送出</strong>係佢掟出去嗰啲，<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。「逐局全數據」嗰邊仲有個<strong>射埋</strong>，嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——呢張表冇呢一欄。</p>
-    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.058（raw p 0.2611，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.178 同 −0.184，校正後 0.0132 同 0.0081）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.238），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.097，raw p 0.0580，校正後 1.0000）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
+    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.060（raw p 0.2064，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.173 同 −0.180，校正後 0.0059 同 0.0031）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.223），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.055，raw p 0.2412，校正後 1.0000）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
     <p class="ir-note">Claim：G085 · G086 · G087 · G088 · G089 · G090 · G091 ✓</p>
   </div>
 </section>

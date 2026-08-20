@@ -134,6 +134,7 @@ const PINNED_TOTALS: Record<string, Totals> = {
   // lock 74: the same class with the piece NOT touching, so it used to fall through to `unattributed`
   // and was the corpus's only entry in that bucket.
   '2026-08-14': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 1, self_built: 403, reactive: 462, unattributed: 0 },
+  '2026-08-19': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 2, self_built: 344, reactive: 370, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -147,6 +148,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-08-01': { 'pre-existed': 508, 'arrived-later': 47, undetermined: 41 },
   '2026-08-09': { 'pre-existed': 449, 'arrived-later': 55, undetermined: 42 },
   '2026-08-14': { 'pre-existed': 714, 'arrived-later': 84, undetermined: 69 },
+  '2026-08-19': { 'pre-existed': 583, 'arrived-later': 77, undetermined: 59 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -154,6 +156,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
 // that matters) is 0 in every session: no such T-spin is ever counted as a forecast.
 const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
+  '2026-08-19': 80,
 };
 
 const PINNED_FORECASTS: Record<string, string[]> = {
@@ -169,6 +172,10 @@ const PINNED_FORECASTS: Record<string, string[]> = {
   // confused with that session's `path_opened` event, which is a different lock and never was a
   // forecast candidate — forecast-facts.test.ts traces both.
   '2026-08-14': [],
+  // 0 verified forecasts: both `pre-existed` mechanism events below (lock 35, lock 38) are
+  // rejected at clause 4; the third mechanism event (lock 43) is rejected earlier at clause 2
+  // (floor undetermined).
+  '2026-08-19': [],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -187,6 +194,11 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
     'yachi replay-2026-08-09-6.ttrm r6 lock 213 forecast_lineclear floor pre-existed from 191 roof 207',
   ],
   '2026-08-14': ['yachi replay-2026-08-14-2.ttrm r3 lock 18 forecast_lineclear floor pre-existed from 3 roof 12'],
+  '2026-08-19': [
+    'yachi replay-2026-08-19-1.ttrm r5 lock 35 forecast_lineclear floor pre-existed from 20 roof 26',
+    'yachi replay-2026-08-19-10.ttrm r3 lock 43 forecast_lineclear floor undetermined from -1 roof 35',
+    'yachi replay-2026-08-19-7.ttrm r5 lock 38 forecast_lineclear floor pre-existed from 14 roof 25',
+  ],
 };
 
 for (const SESSION of SESSIONS) {

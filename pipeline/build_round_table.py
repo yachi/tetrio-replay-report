@@ -560,10 +560,20 @@ SORT_JS = """
 </script>
 """
 
-# Columns whose measured value does not justify a permanent slot. Over 129 rounds
-# (both sessions), each was scored on how often the round's winner held the higher
-# value — the paired AUC, where 50% means the column says nothing about who won —
-# plus its spread and its share of zeros:
+# Columns hidden by default. THE JUSTIFICATION IS LAYOUT, NOT SIGNAL — read the
+# next paragraph before changing this set, because the signal argument that
+# originally chose these six no longer holds for all of them.
+#
+# Hiding exactly these six takes the table from 1430px to 1121px, inside the
+# 1130px container, so the default view needs no horizontal scrolling at all.
+# That is the load-bearing reason and it is a property of the set's SIZE: promote
+# any one of them and the default table goes back over the container and
+# reintroduces the sideways scroll. They stay reachable behind a toggle, so
+# nothing is lost — a hidden column here is one click away, not deleted.
+#
+# The six were originally chosen on their paired AUC over 129 rounds — the share
+# of rounds whose winner held the higher value, where 50% means the column says
+# nothing about who won — plus spread and share of zeros:
 #
 #   PC     AUC 50.8%, 89.1% zeros   — says nothing, and is empty nine times in ten
 #   COMBO  AUC 45.0%                — no signal
@@ -572,14 +582,28 @@ SORT_JS = """
 #   KPP    AUC 39.9%, CV 0.05       — near-constant; the finding is its flatness,
 #   FIN%   AUC 64.0%, CV 0.05         which the verdict cards already state
 #
-# They stay available behind a toggle rather than being deleted: hiding them takes
-# the table from 1430px to 1121px, inside the 1130px container, so the default view
-# needs no horizontal scrolling at all.
+# Those numbers are over the FIRST TWO sessions, which is all there was when they
+# were measured. Re-derived the same way over all 450 rounds of seven sessions,
+# two of them have moved off "no signal": COMBO 45.0 -> 56.22 (raw p 0.00179,
+# 0.030 after Bonferroni over the 17 columns tested) and TST 55.8 -> 56.11
+# (0.00031, 0.0053 adjusted). Both now carry weak but real signal. PC is the one
+# the corpus confirms outright: 50.67, p 0.586, i.e. nothing.
+#
+# So DO NOT promote a column out of this set by re-deriving its AUC and finding it
+# above some bar — that is the edit this paragraph exists to stop. The AUC chose
+# the six; the container width is what keeps them. Trading 9px of overflow for a
+# 56% column is not a trade this table wants, and the toggle already serves the
+# reader who disagrees. If the set must change, re-measure the rendered widths.
 OPTIONAL_COLS = {"PC", "COMBO", "TST", "TSD", "KPP", "FIN%"}
 
 # In-cell magnitude bars, only on the columns that measured as strongly tied to the
 # round result (paired AUC >= 85%, counting inverted). Barring all 22 would be noise;
 # these four are where a glance is worth as much as reading the number.
+# The threshold is closer than it looks, so a future session moving it is expected
+# rather than surprising: over 450 rounds of seven sessions 分 and 送 both sit at
+# 84.44, i.e. 0.56 of a point under the bar that excludes them, and 分 reached 91.4
+# on 2026-08-19 alone. The set is still correct — this is a note that it is decided
+# by a margin thinner than the round number suggests, not a reason to change it.
 # The scale is session-wide, not per match, so a bar length means the same thing in
 # every table. One hue, light to dark by magnitude — sequential data, sequential ramp.
 BAR_COLS = {"APM", "VS", "APP", "攻"}

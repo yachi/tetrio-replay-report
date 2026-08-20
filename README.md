@@ -166,6 +166,7 @@ unless it is:
 | 2026-08-01 | 13 of 13 testable — **100%** | 12 of 13 — **92%** | 12 of 13 — **92%** |
 | 2026-08-09 | 9 of 11 testable — **82%** | 8 of 11 — **73%** | 8 of 11 — **73%** |
 | 2026-08-14 | 16 of 19 testable — **84%** | 13 of 19 — **68%** | 13 of 19 — **68%** |
+| 2026-08-19 | 14 of 17 testable — **82%** | 13 of 17 — **76%** | 13 of 17 — **76%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -176,11 +177,12 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-Two of these sit below the **≥85%** acceptance gate that P4 declared, and 2026-07-22 —
-the session the gate was declared on — is one of them at 81%. That is reported rather than
-enforced: one hand claim is worth 10.0 points on 2026-07-28, so no threshold exists that is
-both honest and stable, and a floor all six pass would sit at 60% and bless that session's
-artefact by definition. The gate compares **verdict sets**, not a percentage.
+Four of the seven rows above sit below the **≥85%** acceptance gate that P4 declared
+(2026-07-22, 08-09, 08-14 and 08-19), and 2026-07-22 — the session the gate was declared on —
+is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
+points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
+seven pass would sit at 60% and bless that session's artefact by definition. The gate compares
+**verdict sets**, not a percentage.
 
 **2026-07-28's 100% was an artefact, and the second family is what shows it.** Its hand
 claims are *windowed* — they compare matches 1-2 against matches 3-8 — and every window sum

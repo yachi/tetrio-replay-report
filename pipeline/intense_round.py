@@ -9,7 +9,7 @@ Why the section exists. Every other per-round number in the report lives in
 逐局全數據, where all rounds get the same row and none gets an explanation. This
 takes one round and says *how it was won*, which is a different question from
 *what the numbers were* — and the answer is often not the one the attacking
-columns suggest. In three of the six sessions the winner of this round was behind
+columns suggest. In three of the seven sessions the winner of this round was behind
 on APM, on attack, or on both.
 
 Every figure is read out of the claims' own specs — the operands of what the
@@ -30,19 +30,19 @@ mechanism is real, this round is the illustration, and neither is the other". Wh
 still banned is a corpus figure the round appears to license, or the round's numbers
 generalised without one.
 
-The result: over 380 decided rounds in six sessions, downstacking is the only printed
+The result: over 450 decided rounds in seven sessions, downstacking is the only printed
 measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
-combined VS runs 62.3 → 65.0 → 83.5 for the per-piece rate (Spearman rho +0.212 against
-intensity; raw 清走 +0.201). It survives both controls the closing note quotes: it is not
-round LENGTH (the same test against duration is rho +0.058, while APM's and 攻擊's apparent
-decay IS a length effect at rho −0.178 / −0.184 — which is why the attacking lede this
+combined VS runs 64.3 → 67.0 → 81.0 for the per-piece rate (Spearman rho +0.176 against
+intensity; raw 清走 +0.169). It survives both controls the closing note quotes: it is not
+round LENGTH (the same test against duration is rho +0.060, while APM's and 攻擊's apparent
+decay IS a length effect at rho −0.173 / −0.180 — which is why the attacking lede this
 section used to carry was not supported as stated), and it is not the loser dying with
 garbage still on the board (normalising by how much garbage ARRIVED strengthens it to
-rho +0.238, and 食 — which carries that same death bias but no skill — does not trend,
-rho +0.097). That death bias is real all the same, and the note keeps it.
+rho +0.223, and 食 — which carries that same death bias but no skill — does not trend,
+rho +0.055). That death bias is real all the same, and the note keeps it.
 
 **The monotone progression and its controls are the finding; p is supporting evidence.**
-The 380 rounds are nested in matches, in sessions and in two players, so every p here
+The 450 rounds are nested in matches, in sessions and in two players, so every p here
 assumes an independence the data does not have and is anti-conservative. They are printed
 raw AND Bonferroni-adjusted with the family size beside them, never Holm-adjusted: Holm's
 value for one test is a function of the ENTIRE vector of the family's raw p, so a re-source
@@ -56,7 +56,11 @@ went stale in 72 minutes: the lede landed at 0cc719c (2026-08-16 01:42) and 0804
 re-sourced apm/pps/vs from the live tick to `results.aggregatestats` at 02:54, moving every
 figure whose inputs contain APM or VS (rho +0.210 → +0.212, +0.200 → +0.201, −0.187 → −0.178,
 +0.096 → +0.097, +0.236 → +0.238) and leaving the two built only from attack / cleared /
-pieces / duration (+0.058 and −0.184) exactly where they were. The published Holm triple was
+pieces / duration (+0.058 and −0.184) exactly where they were. Those five arrows are the
+SIX-session values and are kept as the record of that failure, not as current figures: the
+seventh session moved all seven, the two invariant ones included. Invariance to a re-source
+is not invariance to data, which is why the guard here re-derives rather than counting
+sessions. The published Holm triple was
 worse than stale — its implied multipliers rise with rank where Holm's must fall, so those
 three numbers were never the output of one computation for any family size. `CORPUS` below is
 the single site the prose reads them from, and `analysis/corpus_stats.py`'s docstring carries
@@ -115,9 +119,9 @@ if _missing:
 # The corpus figures the lede and the closing note quote, in ONE place.
 #
 # These are the only numbers in this section that are not read out of a proved claim, because
-# they are not about this session at all — they are about all six. They are literals here and
+# they are not about this session at all — they are about all seven. They are literals here and
 # derived nowhere at render time on purpose: a per-session generator that read every other
-# session's facts.json would re-render all six reports whenever a seventh landed, and this
+# session's facts.json would re-render all seven reports whenever an eighth landed, and this
 # repo's byte-identity gates are what make an unrelated change reviewable.
 #
 # The cost of literals is staleness, so it is paid for by a gate rather than by care:
@@ -130,21 +134,21 @@ if _missing:
 # (rho is a two-sided point estimate), `fmt_auc` likewise, and `fmt_p` CEILS, because a
 # p-value is an upper bound on a false-positive rate and the safe direction is up.
 CORPUS = {
-    "n": 380,
+    "n": 450,
     "m": 26,
     "tercile_test": "cleared_pp/intensity",
-    "terciles": ["62.3", "65.0", "83.5"],
+    "terciles": ["64.3", "67.0", "81.0"],
     "tests": {
         # the finding
-        "cleared_pp/intensity": {"rho": "+0.212", "raw": "0.0001", "adj": "0.0009"},
-        "cleared/intensity": {"rho": "+0.201", "raw": "0.0001", "adj": "0.0021"},
+        "cleared_pp/intensity": {"rho": "+0.176", "raw": "0.0002", "adj": "0.0045"},
+        "cleared/intensity": {"rho": "+0.169", "raw": "0.0004", "adj": "0.0085"},
         # control 1 — length
-        "cleared_pp/duration": {"rho": "+0.058", "raw": "0.2611", "adj": "1.0000"},
-        "apm/duration": {"rho": "-0.178", "raw": "0.0006", "adj": "0.0132"},
-        "attack/duration": {"rho": "-0.184", "raw": "0.0004", "adj": "0.0081"},
+        "cleared_pp/duration": {"rho": "+0.060", "raw": "0.2064", "adj": "1.0000"},
+        "apm/duration": {"rho": "-0.173", "raw": "0.0003", "adj": "0.0059"},
+        "attack/duration": {"rho": "-0.180", "raw": "0.0002", "adj": "0.0031"},
         # control 2 — the loser's death bias
-        "cleared_per_received/intensity": {"rho": "+0.238", "raw": "0.0001", "adj": "0.0001"},
-        "received/intensity": {"rho": "+0.097", "raw": "0.0580", "adj": "1.0000"},
+        "cleared_per_received/intensity": {"rho": "+0.223", "raw": "0.0001", "adj": "0.0001"},
+        "received/intensity": {"rho": "+0.055", "raw": "0.2412", "adj": "1.0000"},
     },
 }
 
@@ -392,7 +396,7 @@ def build(facts, report_dir):
            '短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。'
            '點解要專登揀最癲嗰局出嚟拆：'
            '<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。'
-           f'呢句唔係由下面呢一局睇出嚟嘅——係喺六個 session、{CORPUS["n"]} 局有勝負嘅局'
+           f'呢句唔係由下面呢一局睇出嚟嘅——係喺七個 session、{CORPUS["n"]} 局有勝負嘅局'
            f'度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，'
            f'每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
            f'由 {CORPUS["terciles"][0]}% 升到 {CORPUS["terciles"][1]}% '
@@ -433,7 +437,7 @@ def build(facts, report_dir):
     out += ['        </tbody>', '      </table>', '    </div>']
 
     # The finding. Two shapes, because the selected round genuinely comes both ways:
-    # in three of six sessions the winner trailed on real attacking columns, and in
+    # in three of seven sessions the winner trailed on real attacking columns, and in
     # the others he simply led. The flat case is printed as the result it is — a
     # generator that only had the dramatic sentence would be writing for the sessions
     # it liked.
