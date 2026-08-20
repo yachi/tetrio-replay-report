@@ -172,23 +172,24 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-08-01 | 13/13 testable = **100%** | 12/13 = **92%** | 12/13 = **92%** | 1 |
 | 2026-08-09 | 9/11 testable = **82%** | 8/11 = **73%** | 8/11 = **73%** | 0 |
 | 2026-08-14 | 16/19 testable = **84%** | 13/19 = **68%** | 13/19 = **68%** | 1 |
+| 2026-08-19 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by three of the six sessions**, and
+**The ≥85% acceptance gate this phase set is not met by four of the seven sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all six pass would sit at 60%.
+2026-07-28, and a floor all seven pass would sit at 60%.
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — five of the six sessions lose coverage
-under the second family, and every claim that drops is a windowed or per-match one. See
-README's "Where this metric breaks down".
+single-value change. It is not an isolated artefact — six of the seven sessions lose coverage
+under the second family at `match` granularity (and all seven at `round`), and every claim that
+drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
 * the "only one decider" claim restated that match's score without proving it was the

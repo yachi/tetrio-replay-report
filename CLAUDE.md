@@ -513,15 +513,16 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session, over the six sessions that have an
-`equiv-coverage.json`: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**,
-08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**. 2026-08-19 has no artefact
-yet — the sweep needs the session's hand ledgers, which land after the session does, so a
-seven-session figure is not available and must not be inferred from the six.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**.
 
-**07-28 is not the exception — five of the six measured sessions lose coverage to the second
+**07-28 is not the exception — six of the seven measured sessions lose coverage to the second
 family**, and
-every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020).
+every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
+08-19 C007). **That count is at `match` granularity, and it is the only reading on which any
+session is exempt**: 07-24 is the one that loses nothing there (48 → 48), and it loses R018 at
+`round`, so at the granularity the figures above are quoted at the count is **seven of seven**.
+Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
+was measured on — check which one a count came from before carrying it forward.
 `sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
 published alone is blind to exactly the headline claims. `check_equiv_coverage.py` fails the
 build if one is published without its two-site companion for a session holding windowed claims.
