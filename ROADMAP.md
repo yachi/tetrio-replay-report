@@ -3079,3 +3079,35 @@ session — a wrong DONE record is worth less than none, and so is a wrong OPEN 
 Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow
 and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
 and unguarded session list.
+
+## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23)
+
+Filed from the 2026-08-20 retrospective. Four gates went red on PR #14 (`docs`, `manifest`,
+`preregistrations`, `coverage`) and **three of them were reproducible locally in minutes** — they
+were found by pushing and reading GitHub instead, which cost three push→CI→fix cycles and put the
+user in the loop for each one.
+
+That is not four oversights. It is a missing tool, and the shape is measurable:
+
+| | |
+|---|---|
+| job definitions | **13** across 3 workflows (26 check runs on 2026-08-20; `verify` and `pipeline` are matrices) |
+| repo-wide (not per-session) | `cross-extractor` `docs` `leave-one-out` `intense-round-corpus` `typescript` `spec` `oracle-image` `preregistrations` `manifest` `coverage` — **10** |
+| runnable from `bin/` | **1** — `docs`, via `bin/build-docs --check` |
+
+`bin/new-session` covers steps 1-6 of adding a session. `bin/verify-session` takes ONE artefact
+directory and every gate it runs is internal to it — that scoping is deliberate and is what
+`check_cross_artefact` exists to compensate for. Neither is wrong; there is simply no third thing
+that runs the cross-cutting set.
+
+**The one design constraint that matters: derive the command list from the workflow files, do not
+copy it.** A hardcoded list inside `bin/verify-repo` would be the eleventh hand-maintained session
+list in this repo, and it would fail in the direction that reads green — a job added to CI and not
+to the script leaves the script silently narrower than the thing it stands in for. That is exactly
+the `bin/build-docs` `ARTEFACTS` failure mode, which was closed by checking the list against disk
+rather than by maintaining it more carefully.
+
+Two tiers, because wall clock is the reason a person skips it: `--fast` omits `coverage`
+(~25 min for the corpus at two granularities) and `oracle-image` (~6 min); the default runs
+everything. Done when the four failures of 2026-08-20 are all caught by one local command, and
+when a job added to a workflow but unknown to the script is itself an error rather than a skip.

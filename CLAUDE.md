@@ -223,8 +223,35 @@ equivalent marker pair.
 
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
-- CI (6 jobs) re-runs every gate on push, including regenerating each ledger and checking it
-  is byte-identical to what is committed. Weekly runs add mutation testing.
+- CI re-runs every gate on push, including regenerating each ledger and checking it is
+  byte-identical to what is committed. Weekly runs add mutation testing. **13 job definitions
+  across 3 workflows, which expanded to 26 check runs on 2026-08-20** — `verify` is a matrix over
+  artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
+  and neither should be typed from memory. Re-derive the first with
+  `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
+  .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
+  across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
+  the 冇第二份 class, in the paragraph describing the gates.)
+- **Ten of those jobs are repo-wide, and `bin/` can run exactly one of them.** `bin/new-session`
+  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and
+  every gate it runs is internal to it. Nothing runs `cross-extractor`, `leave-one-out`,
+  `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
+  `coverage` — only `docs`, via `bin/build-docs --check`. So the last mile of adding a session is
+  discovered from CI rather than locally, which on 2026-08-20 cost three push→CI→fix cycles for
+  four failures that were all reproducible in minutes. See the ROADMAP item for `bin/verify-repo`;
+  until it exists, read the workflow files and run their commands by hand before the first push.
+- **A figure with a renderer is PASTED, never typed.** `check_equiv_coverage`, `check_intense_corpus`
+  and `check_loo` each emit their published blocks (`--render`), and the renderer and the parser
+  live in one file so a reword is a one-place edit. Hand-editing one of those sentences can
+  disable the gate that checks it: on 2026-08-20 a scope caveat added to this file's per-session
+  coverage line — honest, because the session's artefact genuinely did not exist yet — broke the
+  single-line match `check_equiv_coverage.DOCS` anchors on, and the gate went from checking six
+  figures to checking none. **When a required artefact is missing, generate it rather than
+  documenting its absence**; the caveat is only correct when the artefact cannot yet be produced.
+  **Do not write that line's anchor token anywhere else in this file.** The spec matches the
+  FIRST line carrying it, so a mention shadows the real sentence and the gate fails to parse —
+  which is how this very bullet broke it on 2026-08-23, one paragraph after describing the
+  hazard. Quote the rule, never the token.
 - Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
   asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
 - **Closing a ROADMAP item means striking it AT ITS ORIGINAL SITE, not only writing a new dated
