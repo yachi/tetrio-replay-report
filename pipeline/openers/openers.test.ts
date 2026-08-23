@@ -1106,6 +1106,46 @@ test('the mid-game ordering counts are pinned per session', () => {
   }
 });
 
+/**
+ * THE C-SPIN PAGE'S PROVENANCE, and the count that reading it corrected.
+ *
+ * Until 2026-08-23 `wiki_cspin` carried `placements: 38` and nothing else, while the five
+ * `named_openers` pages each carried an oldid and a sha256 — so the one page the section QUOTES in
+ * prose was the one page with nothing pinning it. Both revisions now carry MediaWiki's own
+ * `rev_sha1`, independently reproduced from `action=raw`.
+ *
+ * The `replaces_the_double` flags are the reason this file exists rather than a URL in a comment.
+ * The section's caveat had claimed harddrop lists SIX non-Double continuations; that came from
+ * counting the page's section headings. Reading them, exactly ONE says to replace the Double —
+ * LST Stacking and T-Spin Triple Tower both describe what happens AFTER a T-Spin Double, and
+ * Trinity / STSD branches on whether the TSD was already done, so all three still fire the metric.
+ * Pinned as literals so the corrected count cannot silently drift back.
+ */
+test('the quoted wiki pages are pinned, and exactly one continuation replaces the Double', () => {
+  for (const s of SESSIONS) {
+    const w = facts(s).wiki_cspin;
+    expect([s, w.placements]).toEqual([s, 38]);
+    const byPage = Object.fromEntries((w.pages as any[]).map(p => [p.page, p]));
+    expect([s, byPage['C-Spin'].oldid, byPage['C-Spin'].rev_sha1])
+      .toEqual([s, 42266, '0fa75e5a12a8a8a454907a11f1ea84ded0414d02']);
+    expect([s, byPage['Triple Double Attack Setups'].oldid,
+            byPage['Triple Double Attack Setups'].rev_sha1])
+      .toEqual([s, 42795, '7f141bd88c20f32226f298c5cfa421b37dde2239']);
+
+    const conts = byPage['C-Spin'].continuations as any[];
+    expect([s, conts.length]).toEqual([s, 7]);
+    expect([s, conts.filter(c => c.replaces_the_double).map(c => c.heading)])
+      .toEqual([s, ['T-Spin Triple and Imperial Cross']]);
+    // the three that read like non-Double continuations and are not — the actual trap
+    for (const h of ['LST Stacking', 'T-Spin Triple Tower', 'Trinity / STSD'])
+      expect([s, h, conts.find(c => c.heading === h)!.replaces_the_double]).toEqual([s, h, false]);
+
+    // the two 38s are DIFFERENT quantities that collide numerically; both pinned so a reader
+    // who conflates them is contradicted by the file rather than by nothing
+    expect([s, facts(s).ordering_class.openers]).toEqual([s, 38]);
+  }
+});
+
 /** Nulls per session — the count of per-round cells the verified prefix could not answer.
  *  Literals, not a re-derivation: a test that recomputes the value the way the code does can only
  *  catch a typo (the 「一個 Perfect Clear 都冇出過」 lesson). */

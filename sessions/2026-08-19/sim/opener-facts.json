@@ -121,7 +121,72 @@
   },
   "wiki_cspin": {
     "source": "harddrop.com/wiki/C-Spin",
-    "placements": 38
+    "placements": 38,
+    "schema": "wiki-cspin-source/1",
+    "why": "the C-Spin section quotes harddrop in prose; a wiki sentence with no committed copy is a figure whose only home is prose, and nothing re-derives it.",
+    "provenance_standard": "Both revisions carry MediaWiki's OWN rev_sha1 AND a sha1 recomputed here from action=raw. Two independent authorities that agree — the cvc5 standard, not z3's trust-on-first-use. Reproduce: sha1 of the action=raw body, CRLF->LF, trailing newline stripped.",
+    "the_count_trap": "`replaces_the_double` is set by READING each continuation, never by counting headings. Counting them gave 'six non-Double continuations', which is false and shipped to seven reports before this file was written: LST Stacking and T-Spin Triple Tower both describe what happens AFTER a T-Spin Double, and Trinity / STSD branches on whether the TSD was already done, so all three still produce the Double the ordering metric counts. Of the 7 continuations, exactly 1 replaces it.",
+    "pages": [
+      {
+        "page": "C-Spin",
+        "url": "https://harddrop.com/wiki/C-Spin",
+        "raw": "https://harddrop.com/w/index.php?title=C-Spin&action=raw&oldid=42266",
+        "oldid": 42266,
+        "timestamp": "2025-01-30T09:17:20Z",
+        "bytes": 31806,
+        "rev_sha1": "0fa75e5a12a8a8a454907a11f1ea84ded0414d02",
+        "lead": "The C-Spin (TKI積み) is a kind of Triple Double Attack. It is invented by TKI. This name is given because of the \"C\" shape that is formed by the J and L. As the name suggests, it results in a T-Spin Triple which is usually followed by a T-Spin Double within three bags. As an opener, it is most often built with an ZST core whereas L and J are used to build the overhang.",
+        "continuations": [
+          {
+            "heading": "T-Spin Triple and Imperial Cross",
+            "first_sentence": "No matter how wide the gap between the overhang and the stack on the right is, you can replace the T-Spin Double with a T-Spin Triple or Imperial Cross after the T-Spin Triple from any C-Spin setup.",
+            "replaces_the_double": true
+          },
+          {
+            "heading": "STMB Cave",
+            "first_sentence": "The STMB Cave continuation will only work if the following cells in diagram 1 (marked with X's) are free.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Trinity / STSD",
+            "first_sentence": "If you used a J piece as the overhang and there is an S piece or nothing on the overhang, you can make a Trinity (if the TSD is not done beforehand) or STSD (if the TSD is done beforehand) by placing an S piece on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Fractal",
+            "first_sentence": "If you have a 4-columns wide gap, you can place the third bag's Z and S pieces as the base, if the second Z piece was placed on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "LST Stacking",
+            "first_sentence": "Generally, if you have a 2-columns wide gap, you can follow with LST Stacking by placing an L piece on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "T-Spin Triple Tower",
+            "first_sentence": "If there is a Z piece on a J piece overhang, regardless if that Z piece is from the second or third bag, you can stack a T-Spin Triple Tower after a T-Spin Double.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Perfect Clear",
+            "first_sentence": "",
+            "replaces_the_double": false
+          }
+        ]
+      },
+      {
+        "page": "Triple Double Attack Setups",
+        "url": "https://harddrop.com/wiki/Triple_Double_Attack_Setups",
+        "raw": "https://harddrop.com/w/index.php?title=Triple_Double_Attack_Setups&action=raw&oldid=42795",
+        "oldid": 42795,
+        "timestamp": "2025-05-21T11:04:04Z",
+        "bytes": 18082,
+        "rev_sha1": "7f141bd88c20f32226f298c5cfa421b37dde2239",
+        "lead": "The Triple Double attack, also known as Triple-Double, C-Spin, or abbreviated as TD, is a combo T-Spin setup that consists of a T-Spin Triple followed by a T-Spin Double.",
+        "empty_field": "Empty field Triple Double setups are also known as C-Spins."
+      }
+    ],
+    "the_tension": "the two pages do not agree. Triple_Double_Attack_Setups equates an empty-field Triple Double with a C-Spin outright, which would make the ordering metric the wiki's own definition; C-Spin attributes the name to the C shape formed by J and L, says the Double is 'usually' the follow-up, and gives one continuation that replaces it. So Triple-then-Double OVER-counts and UNDER-counts. Recorded, not resolved: a wiki contradicting itself is not a licence to adopt the reading that flatters the metric."
   },
   "first_bag": {
     "rounds": 140,

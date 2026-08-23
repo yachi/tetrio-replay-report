@@ -28,6 +28,17 @@ Corollaries that are gates, not preferences:
   `pipeline/check_proof_links.py` is the gate; rebuild a stranded map with the session's
   `build_proof_map.py` (the committed hand layout) or `pipeline.build_proof_map` (generated)
 - a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant
+- **before adding a check, ask whether an existing gate already entails it.** A check that cannot
+  fail against correctly-produced data is not a weak gate, it is a comment — and this repo has
+  produced four of them by four different routes: the naive Donation clause (`NaiveClauseForced` —
+  entailed by what a line clear *is*), the STMB cave's roof test (`RoofCannotDiscriminate` —
+  vacuous), `width_ge_3` in `openers.test.ts` (a tautology of the data it was written against,
+  which broke the day that data changed), and `cspin <= min(TST, TSD)` (entailed by
+  `tspinCounterCheck`'s existing 900/900 agreement, caught before shipping on 2026-08-23). The
+  screening question is one line and catches all four: *what would have to be true for this to
+  fire?* If the answer needs a bug that another gate already rejects, the check belongs somewhere
+  else or nowhere — `cspin <= min(TST, TSD)` survives only because it was re-scoped to guard the
+  ROW JOIN, which nothing else does, and given a mutant that fires
 - every countable statement in a report needs a claim id whose predicate covers *that*
   number — not a weaker one nearby
 - a **rate** record (APM, VS) is only over rounds of `generators.QUALIFYING_MS` or more;

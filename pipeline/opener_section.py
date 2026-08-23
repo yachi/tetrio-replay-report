@@ -397,15 +397,20 @@ def _class_note(data):
         "如果成晚打嘅係 Honey Cup，上面個表一模一樣會咁樣寫。"
         "下面第四個表就係用開局個板嘅形去分呢一類入面邊個。"
         # BOTH directions, because stating only the over-count is a sentence stronger than its
-        # evidence. harddrop's own C-Spin page (oldid 42266) says the Triple 「usually」 leads to a
-        # Double and then lists six continuations that are not one — Imperial Cross, Trinity/STSD,
-        # Fractal, LST Stacking, TST Tower, Perfect Clear. A C-Spin taken down any of those roads
-        # never produces the Double this column counts.
-        "反過嚟講都要講清楚：harddrop 嗰版 C-Spin 自己寫「<em>usually</em> followed by a "
-        "T-Spin Double」，跟住列咗六個唔係 Double 嘅接法"
-        "（Imperial Cross、Trinity／STSD、Fractal、LST Stacking、T-Spin Triple Tower、全消）。"
+        # evidence. THE UNDER-COUNT RESTS ON ONE DOCUMENTED CONTINUATION, NOT SIX. An earlier
+        # revision of this sentence said harddrop lists six continuations that are not a Double;
+        # reading the page's wikitext (oldid 42266) rather than its table of contents, that is
+        # false. 「T-Spin Triple and Imperial Cross」 does say you 「replace the T-Spin Double with
+        # a T-Spin Triple or Imperial Cross」 — that one is real. But 「LST Stacking」 and 「T-Spin
+        # Triple Tower」 both describe what happens AFTER a T-Spin Double, and 「Trinity / STSD」
+        # branches on whether the TSD was done beforehand, so all three still fire this column.
+        # The honest under-count is that one continuation plus the article's own 「usually」.
+        "反過嚟講都要講清楚：harddrop 嗰版 C-Spin 自己寫個 Triple「<em>usually</em> followed by a "
+        "T-Spin Double」——即係個 Double 唔係定義嘅一部分；"
+        "而佢列嘅接法入面，「T-Spin Triple and Imperial Cross」係明寫住"
+        "「<em>replace the T-Spin Double with</em> a T-Spin Triple or Imperial Cross」。"
         "所以呢個次序<strong>兩邊都唔準</strong>——"
-        "數多咗（成類定式都會中），亦都數少咗（C-Spin 接落嗰六個之一就永遠唔會出到個 Double）。"
+        "數多咗（成類定式都會中），亦都數少咗（行呢個接法就永遠唔會出到個 Double）。"
     )
 
 
