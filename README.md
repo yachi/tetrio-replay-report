@@ -195,9 +195,9 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-Four of the seven rows above sit below the **≥85%** acceptance gate that P4 declared
-(2026-07-22, 08-09, 08-14 and 08-19), and 2026-07-22 — the session the gate was declared on —
-is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->four of the seven<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14 and 08-19<!--/equiv:gate-sessions-->), and
+2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
 seven pass would sit at 60% and bless that session's artefact by definition. The gate compares
 **verdict sets**, not a percentage.

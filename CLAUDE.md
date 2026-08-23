@@ -307,6 +307,21 @@ equivalent marker pair.
   FIRST line carrying it, so a mention shadows the real sentence and the gate fails to parse —
   which is how this very bullet broke it on 2026-08-23, one paragraph after describing the
   hazard. Quote the rule, never the token.
+
+  **A sentence beside a table is gated by a MARKED FRAGMENT, not by an anchor regex, and the
+  difference is what the paragraph above keeps failing at.** Since 2026-08-23 the four counts
+  in the equiv-coverage prose — how many sessions sit below the ≥85% gate, which ones, and how
+  many lose coverage to the second family at each of the two granularities — sit inside inline
+  HTML-comment pairs whose contents `check_equiv_coverage` byte-compares against its renderer.
+  An anchor regex could not do it: this repo's own dated sections carry EARLIER VERSIONS of both
+  sentences (ROADMAP.md's 2026-08-15 block says 「three of six sessions」 and 「Five of six
+  sessions lose coverage」), and `paragraph()` takes the first match, so the gate would have
+  checked the historical paragraph and passed the live one. The rule the markers enforce is
+  **exactly one pair per document** — not "at least one" — which is the shadowing hazard turned
+  from a written warning into a red build. It fired within a minute of being written, on the
+  ROADMAP section documenting it, because the example spelled a real fragment name. Use a
+  placeholder when writing one down. And note what this buys over 「quote the rule, never the
+  token」: the marker is enforced, the rule is not.
 - Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
   asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
 - **Closing a ROADMAP item means striking it AT ITS ORIGINAL SITE, not only writing a new dated
@@ -623,12 +638,13 @@ and C008 true while flipping C005 false. The second family does exactly that, an
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
 Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**.
 
-**07-28 is not the exception — six of the seven measured sessions lose coverage to the second
-family**, and
+**07-28 is not the exception — <!--equiv:sf-match-->six of the seven<!--/equiv:sf-match--> measured sessions lose coverage
+to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
 08-19 C007). **That count is at `match` granularity, and it is the only reading on which any
 session is exempt**: 07-24 is the one that loses nothing there (48 → 48), and it loses R018 at
-`round`, so at the granularity the figures above are quoted at the count is **seven of seven**.
+`round`, so at the granularity the figures above are quoted at the count is
+**<!--equiv:sf-round-->seven of the seven<!--/equiv:sf-round-->**.
 Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
 was measured on — check which one a count came from before carrying it forward.
 `sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure

@@ -180,7 +180,7 @@ Every cell is measured, and gated on push — see "Gating equiv.py coverage" bel
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by four of the seven sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->four of the seven<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -189,9 +189,9 @@ than a threshold: no honest floor exists when one hand claim is worth 10.0 point
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — six of the seven sessions lose coverage
-under the second family at `match` granularity (and all seven at `round`), and every claim that
-drops is a windowed or per-match one. See README's "Where this metric breaks down".
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->six of the seven<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->seven of the seven<!--/equiv:sf-round-->
+at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
 * the "only one decider" claim restated that match's score without proving it was the
@@ -3042,8 +3042,9 @@ list". Measured 2026-08-20: **false**. `bin/build-docs:243` builds `arts` by glo
 claim had outlived its fix in a memory file and would otherwise have been re-filed every
 session — a wrong DONE record is worth less than none, and so is a wrong OPEN one.
 
-1. **The two hand-typed counts beside the equiv-coverage tables.** Both sit next to tables
-   `check_equiv_coverage.py` already parses, and neither is derived from them:
+1. **The two hand-typed counts beside the equiv-coverage tables.** — **DONE (2026-08-23)**;
+   see the section below. Both sat next to tables `check_equiv_coverage.py` already parses, and
+   neither was derived from them:
 
    - 「**Four of the seven** rows above sit below the ≥85% acceptance gate」 (README.md,
      ROADMAP.md). This read 「**Two**」 until 2026-08-20. Two was correct at *five* sessions
@@ -3055,11 +3056,18 @@ session — a wrong DONE record is worth less than none, and so is a wrong OPEN 
      loses nothing there) and false at `round` (all seven lose, 07-24 by R018), and it sat in
      a paragraph quoting `round` figures. Both readings are now stated explicitly.
 
-   The fix is not to re-type them. `DOCS` already runs `per_table` hooks (`_granularity`,
+   ~~The fix is not to re-type them. `DOCS` already runs `per_table` hooks (`_granularity`,
    `_companion`); a third hook can recompute both counts from the parsed rows and fail on
-   drift, and `render()` can emit them so the sentence is pasted rather than written. Done when
-   a planted corruption of each count is caught by `--selftest` — it is at 68 corruptions and
-   already feeds every committed document through the parser, so the control exists.
+   drift, and `render()` can emit them so the sentence is pasted rather than written.~~
+   **A third `per_table` hook was the wrong shape and the reason is worth keeping: a hook is
+   handed the parsed columns, not the document, so it cannot see a sentence at all.** Shipped
+   instead as four *marked fragments* — an inline HTML-comment pair around each figure, whose
+   contents are byte-compared against a renderer. Not a parse, because an anchor regex over
+   editorial prose can be shadowed by an earlier paragraph carrying the same words, and both
+   sentences have exactly that hazard in ROADMAP.md's own dated 2026-08-15 section (「three of
+   six sessions」, 「Five of six sessions lose coverage」). Done: `--selftest` is at **108
+   corruptions, all caught** (was 68), of which 40 are the fragments, plus two new controls
+   over the committed documents.
 
 2. **The `x of 760` family — 11 lines in CLAUDE.md, all six-session numbers in a seven-session
    document.** `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
@@ -3366,3 +3374,93 @@ is still that item's.
   local version is not the workflow's pin, and the per-session gates it did not run. A run that
   quietly covered less than it claimed is the failure this tool was written to stop; a tool that
   produced it would be the joke version of itself.
+
+## 表旁邊嗰兩個數 —— marked fragments (2026-08-23)
+
+Closes item 1 of 「兩個仲未有 gate 嘅數」. The cells of the equiv-coverage tables were gated from the
+day `check_equiv_coverage.py` existed; the **sentences beside them** were not, and both went wrong,
+in the two different ways prose goes wrong.
+
+| | how it failed |
+|---|---|
+| 「Four of the seven rows sit below the ≥85% gate」 | ordinary **staleness** — read 「Two」 for two whole sessions |
+| 「six of the seven sessions lose coverage to the second family」 | never stale, **granularity-ambiguous** — true at `match`, false at `round`, in a paragraph quoting `round` figures |
+
+The second is the harder one and the reason this is not just "recompute it": **re-measuring does not
+surface an ambiguity.** A gate that recomputed "six" would agree with the sentence forever while the
+sentence went on meaning two different things. The fix has to make the granularity part of the
+figure, so it ships as *two* figures — `sf-match` and `sf-round` — that cannot be written as one.
+
+### Why a hook was the wrong shape, and a marker the right one
+
+The item proposed a third `per_table` hook. That cannot work, and finding out why took one reading
+of `docs_gate.Table.check`: **a hook is handed `(name, published_columns, arts)` — it never sees the
+document.** The counts are not in the table.
+
+The available alternative was a `Prose` spec, which is what CLAUDE.md's per-session sentence already
+uses: anchor a paragraph by regex, pull figures out of it, compare. It is the wrong tool here for a
+specific reason rather than a general one. **An anchor over editorial prose can be shadowed by an
+earlier paragraph carrying the same words, and both sentences have exactly that hazard inside
+ROADMAP.md itself** — the dated 2026-08-15 section says 「**The ≥85% acceptance gate P4 declared is
+not met by three of six sessions**」 and 「**Five of six sessions lose coverage to the second
+family**」. Those are historical records of a six-session corpus and must stay as written. An anchor
+loose enough to match the live sentence matches the dead one too, and `paragraph()` takes the FIRST
+match — so the gate would have checked the historical paragraph and reported the live one as fine.
+This is `check_equiv_coverage.DOCS`'s own documented hazard (CLAUDE.md: the spec matches the first
+line carrying the anchor token) arriving from a direction the rule did not cover: not a *mention*
+shadowing the sentence, but a *previous version of the sentence*.
+
+So each figure is wrapped in an inline HTML-comment pair and **byte-compared against its renderer**:
+
+```
+**The ≥85% acceptance gate this phase set is not met by
+<!--equiv:KEY-->four of the seven<!--/equiv:KEY--> sessions**
+```
+
+The example above writes `KEY` and not the real fragment name **because writing the real one here
+broke the build in the minute this section was drafted** — `expected exactly one pair, found 2`.
+That is the third time this repo has walked into the anchor-shadowing hazard *inside the paragraph
+describing it* (CLAUDE.md's own coverage-line bullet did it on 2026-08-20 and again on 2026-08-23).
+The difference is that this time the rule is enforced rather than written down, so the cost was one
+red run instead of a silently disabled gate. Prose warning readers off a token loses to a gate that
+counts them.
+
+Four fragments — `gate-count` (README, ROADMAP), `gate-sessions` (README, the named list),
+`sf-match` and `sf-round` (ROADMAP, CLAUDE) — rendered by `--render` beside the table blocks. The
+comments render invisibly on GitHub, so the published sentence is unchanged prose.
+
+Three properties the marker buys that a parse does not:
+
+- **Exactly one pair per document, or it fails.** Not "at least one". A second copy is precisely
+  the shadowing case above, and this turns it from a rule somebody has to remember into a red build.
+- **A fragment in a document that does not publish it fails too.** A second copy of a gated figure
+  is a second place for it to go stale, so the gate runs over *every* document, not only the ones
+  a `FRAGMENTS` entry lists.
+- **The editorial prose around it is free.** README says "is missed by", ROADMAP says "is not met
+  by"; only the quantified clause is pasted, so a reword costs nothing and a figure cannot be typed.
+
+### What each figure is measured over, stated because both choices could have gone the other way
+
+- **below the gate** reads the **published** `pct` string, not a fresh division. A reader checks the
+  sentence against the row above it, so a session printed as 85% counts as 85 even if it divides to
+  84.6. Same formatter, one place.
+- **loses coverage** compares the **covered COUNT**, not the percentage. `testable` moves between
+  modes, so a percentage can fall with a flat numerator — that is not a session losing coverage,
+  and the sentence itself cites 07-24's `48 → 48`.
+
+### Measured
+
+| | |
+|---|---|
+| `--selftest` | **108 corruptions, all caught** (was 68) — 40 of them the fragments |
+| new controls | the committed documents carry every fragment they publish; and those fragments **byte-match the committed artefacts** |
+| fragment mutants per owned fragment | wrong value · deleted · **appears twice** · closing marker lost · markers swapped |
+| the renderer's first output | reproduced all four published values verbatim — the figures were correct today, and now they cannot silently stop being |
+
+**One thing the build had to fix that is not about markers.** `figures()` raises `SystemExit` when an
+artefact lacks a mode, which is right for a renderer and wrong for the gate: `_artefact_problems`
+has already reported the missing mode, and dying there reports ONE problem where a run should list
+all of them. The fragment functions raise `_Incomplete` instead; `_fragment_problems` turns it into a
+line and `render_fragments` turns it back into the same `SystemExit` a reader of `--render` needs.
+Found by a pre-existing selftest case ("a mode is missing from the artefact") going from rejected to
+*crashed*, which is why the count is the thing to watch and not the exit code.
