@@ -201,8 +201,8 @@ push instead of only locally.
 Until that date the answer was the runner instead. CI sat on `ubuntu-22.04`, whose glibc is 2.35,
 and every z3 release after 4.14.1 ships `x64-glibc-2.39` only — so CI could run just the one z3 old
 enough to load, and the `pipeline` job could not run z3 at all. **ubuntu-22.04's deprecation is what
-moved the runners**, and the solver constraint fell out with it: all 14 jobs are on 24.04
-(thirteen `ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and
+moved the runners**, and the solver constraint fell out with it: all 15 jobs are on 24.04
+(fourteen `ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and
 `Z3_VERSION` is 4.16.0.
 
 **The pin got better, and by exactly one step — do not write it up as two.** GitHub publishes no
@@ -235,7 +235,7 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **14 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **15 job definitions
   across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
@@ -243,7 +243,7 @@ equivalent marker pair.
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Eleven of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+- **Twelve of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
   covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
@@ -349,7 +349,7 @@ Four instances, all live as of 2026-08-19, and they are not the same kind of thi
 | the repertoire ranges | Honey Cup 17-25, MS1 11-25, TKI-3 5-8 | **two of three already false when 08-14 landed**; five days published. `grep` confirms no file in the repo ever contained them |
 | the `cavity ≥ 1` band | 74.6-77.0% | nothing recomputes it; it survives only because 08-14 ties 08-09 at one decimal, and it must be re-measured by hand every session |
 | the raw-DS AUC series | 68.4 · 62.0 · 81.2 · 83.0 · 64.0 | quoted from a probe; stopped at five sessions and nothing said so |
-| the `760` numerators | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900 |
+| ~~the `760` numerators~~ | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900. **CLOSED 2026-08-23**: `analysis/stat_sources.py` re-derives all 28 of them and `pipeline/check_stat_sources.py` gates the sentences. They were the hardest row here because **every one carried an honest caveat** — 「measured over the first six sessions, not re-run at 900」 — and a caveat cannot go red |
 
 **A gate can have the same defect, so "it is checked" is not the test.**
 `expect(out).toBe(sum(width_ge_3))` in `openers.test.ts` looked like a gate and was arithmetic
@@ -400,56 +400,72 @@ re-run or explicitly scoped to the set it was measured on.
   it. `apm_x1000`/`pps_x1000`/`vs_x1000` come from the live tick while `garbage_attack` /
   `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
   can be one tick apart — the whole of the VS-identity residual. **Every count in the rest of this
-  bullet and the next was measured over the 760 player-rounds of the first six sessions and has not
-  been re-run at 900; the ratios are what to carry forward, not the numerators.** The live tick is
-  stale in 183 of 760 player-rounds and **181 of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  bullet and the next is re-derived by `analysis/stat_sources.py` over all
+  <!--stat:corpus-->900 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
+  none of them is typed.** (They were, until 2026-08-23: six-session numbers in a
+  seven-session document, each honestly captioned 「not re-run at 900」 — which is why none of
+  them ever went red. A caveat is not a measurement.) The live tick is
+  stale in <!--stat:tick-stale-->211 of 900<!--/stat:tick-stale--> player-rounds and
+  **<!--stat:tick-stale-survivor-->209<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
   the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
   in the residual is a fact about whose round ran longer, never about how someone plays.
-  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds as
+  `aggregatestats` reproduces every rate to ≤<!--stat:resid-worst-->4.2e-16<!--/stat:resid-worst--> over
+  <!--stat:corpus-agg-->900 player-rounds<!--/stat:corpus-agg--> as
   `100·(attack+cleared)/T`, `60·attack/T`, `pieces/T` — where **T is the integer FRAME count, and
   `finaltime_ms` does not yield it.** `⌊finaltime_ms·60/1000⌋/60` gives the wrong frame count on
-  **257 of the 760** and leaves up to 1.5e-3, because `finaltime_ms` is `results.stats.finaltime`
+  **<!--stat:floor-wrong-->313 of the 900<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
   rounded to the millisecond (`extract.py`'s `x1`) while the clock ticks every 1/60 s — the rounding
   destroys the frame the flooring is trying to recover. Recover it from `pps` instead:
-  `round(60·pieces/pps)` is an integer to 1.8e-12 on all 760, and under **T = round(60·pieces/pps)/60**
-  the residual is 2.4e-16 for APM and 4.2e-16 for VS, which is where the ≤4.2e-16 came from. PPS is
+  `round(60·pieces/pps)` is an integer to <!--stat:frames-integer-->1.9e-12<!--/stat:frames-integer--> on all
+  <!--stat:corpus-frames-->900<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
+  the residual is <!--stat:resid-pair-->2.5e-16 for APM and 4.2e-16 for VS<!--/stat:resid-pair-->, which is where the ≤ above came from. PPS is
   exact by construction on that route, so the **checkable** statement is the T-free identity
-  `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual **6.1e-16** over the 758 rounds
+  `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual
+  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->898<!--/stat:identity-rounds--> rounds
   with a nonzero APM and VS. A probe that uses `finaltime_ms/1000` reports a discrepancy the data
-  does not have — up to 1.2e-3, and above 1e-4 on 245 of the 760.
+  does not have — up to <!--stat:secs-worst-->1.3e-3<!--/stat:secs-worst-->, and above 1e-4 on
+  <!--stat:secs-over-->289 of the 900<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
+  APM alone give two fewer. `aggregatestats` is a triple, so a route claiming to reconstruct
+  it has to reconstruct the triple.)
 - **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
   The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
   of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
-  `player.stats.kills` in **201 of 760** player-rounds, and every one is the live tick reading 1
+  `player.stats.kills` in **<!--stat:kills-->243 of 900<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
   against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
   taken when that player's own game ends, while the kill is credited later, when the opponent tops
   out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
   `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
-  than truncated; `garbagesent`/`garbagereceived` differ from their `results.stats` counterparts in 7
-  and 1 of 760 and are a different measure anyway (both sides are already extracted, as
+  than truncated; and the match-level rollup stays on the live tick because
+  **<!--stat:leaderboard-agg-->0 of 118<!--/stat:leaderboard-agg--> leaderboard entries carry
+  `aggregatestats` at all** — so round figures will not reconcile against the leaderboard's, and
+  there is no better source for it. `garbagesent`/`garbagereceived` differ from their
+  `results.stats` counterparts in
+  <!--stat:garbage-differ-->9 and 2 of 900<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
   `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
   the bug the rate change removed.
 - **The finesse counters are on two different units, so any finesse rate must name its denominator.**
   `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
-  several — pooled, 11 865 faults over 7 510 non-perfect pieces = **1.580 per faulty piece**. Four
+  several — pooled, <!--stat:finesse-pool-->13 964 faults over 8 772 non-perfect pieces<!--/stat:finesse-pool--> =
+  **<!--stat:finesse-per-piece-->1.592<!--/stat:finesse-per-piece--> per faulty piece**. Four
   defensible rates, four different numbers, and only one is what TETR.IO displays:
-  `faults/pieces` = **16.83%** is fault events per piece; the share of pieces that were faulty is
-  `1 − perfect/pieces` = **10.65%**; TETR.IO's own figure is `perfect/pieces` = **89.35%**; and
-  `faults/(faults+perfect)` = **15.85%** is on no meaningful denominator and must not be used. A
-  bare「失誤率」 reads as the 10.65% and is usually the 16.83%. osk publishes no definition for any
-  of the three fields, so the per-excess-input granularity is inferred, not specified. (Pooled over
-  the first six sessions; not re-run at 900 player-rounds. The four rates are definitions, so they
-  keep their meaning at any n — the four *numbers* are a six-session measurement.)
+  `faults/pieces` = **<!--stat:finesse-fault-rate-->17.00%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **<!--stat:finesse-share-->10.68%<!--/stat:finesse-share-->**; TETR.IO's own figure is
+  `perfect/pieces` = **<!--stat:finesse-tetrio-->89.32%<!--/stat:finesse-tetrio-->**; and
+  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->15.99%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
+  bare「失誤率」 reads as the share and is usually the event rate. osk publishes no definition for any
+  of the three fields, so the per-excess-input granularity is inferred, not specified. The four
+  rates are definitions and keep their meaning at any n; the four *numbers* are re-derived over
+  the whole corpus by `analysis/stat_sources.py`.
 
   **All six reports then in the corpus shipped the bare label, and
   `pipeline/check_finesse_denominator.py` is now the
   gate.** The tape chart plotted `faults/pieces` as 「finesse 失誤率」 formatted `(v*100).toFixed(1)+"%"`
-  — 16.8% under a label that reads as 10.65%. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
+  — the event rate under a label that reads as the share. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
   now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
-  alone does not undo one: 16.8% reads as a share however the row is titled. `hold 使用率` keeps its
+  alone does not undo one: an event rate reads as a share however the row is titled. `hold 使用率` keeps its
   percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
-  data refutes the share reading outright: in **650 of 750** player-rounds the faults outnumber the
-  non-perfect pieces, and 07-24 m2r0 puts **7 faults on a single non-perfect piece**.
+  data refutes the share reading outright: in **<!--stat:finesse-exceed-->770 of 884<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
+  non-perfect pieces, and **<!--stat:finesse-worst-->07-24 m2r0 puts 7 faults on a single non-perfect piece<!--/stat:finesse-worst-->**.
 
   Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
   renderer is in each session's committed shell, outside every marker region, so `build_report --check`
@@ -956,13 +972,16 @@ an artefact of the reader, not a property of the data.** The rates came from `pl
 in-game tick sampled before the round ended, so a survivor's mid-round VS was being checked against an
 end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
 survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
-that fired on **13 of 760** player-rounds now fires on **0 of 760**. Do not read that as a reason to
-delete it: the residual does not go to zero, it goes to a quantization floor. (Both `760` figures
-are the first six sessions; the guard's per-session output is what says whether it still fires at
-900, and it is checked per session rather than re-pooled here.) `finaltime_ms` is
+that fired on **13 of the 760 player-rounds then in the corpus** now fires on
+**<!--stat:vs-guard-->0 of 900<!--/stat:vs-guard-->**. Do not read that as a reason to
+delete it: the residual does not go to zero, it goes to a quantization floor. The `13` stays a
+six-session figure on purpose — it is a measurement of the data BEFORE the 2026-08-16 re-source
+and there is nothing at 900 for it to be re-derived from; the `0` beside it is re-derived by
+`analysis/stat_sources.py` over every round, which is the only form of "does it still fire"
+worth publishing. `finaltime_ms` is
 milliseconds while the clock is frames, so the residual grows with `attack + cleared`; the corpus's
-worst player-round sits at 0.057 of the trigger (~18× headroom), and on that round `attack + cleared`
-would have to reach ~1114 against its actual 63. That is a fact about how much garbage these two move
+worst player-round sits at <!--stat:vs-guard-worst-->0.057 of the trigger (~18× headroom)<!--/stat:vs-guard-worst-->, and on that round `attack + cleared`
+would have to reach <!--stat:vs-guard-need-->~1114 against its actual 63<!--/stat:vs-guard-need-->. That is a fact about how much garbage these two move
 in a round, not a theorem.
 
 Two gate gaps the new figures exposed, both now closed in `check_prose_figures.pools`: it had no

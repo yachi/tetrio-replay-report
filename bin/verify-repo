@@ -350,6 +350,7 @@ PLAN = {
     "leave-one-out": Entry(FAST),
     "intense-round-corpus": Entry(FAST),
     "preregistrations": Entry(FAST),
+    "stat-sources": Entry(FAST),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.

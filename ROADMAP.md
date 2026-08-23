@@ -3070,19 +3070,25 @@ session — a wrong DONE record is worth less than none, and so is a wrong OPEN 
    over the committed documents.
 
 2. **The `x of 760` family — 11 lines in CLAUDE.md, all six-session numbers in a seven-session
-   document.** `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
+   document.** — **DONE (2026-08-23)**; see the section below. It was 28 figures, not 11, and
+   17 more copies sat in `extract.py` / `extract2.ts` / `SCHEMA.md`. `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
    `257 of 760` and `245 of 760` (the `finaltime_ms` flooring), `13 of 760` → `0 of 760` (the
    VS-split guard), `650 of 750` (faults outnumbering non-perfect pieces), `7 and 1 of 760`
    (`garbagesent`/`garbagereceived`). Every one is **scoped honestly** — the text says it was
    measured over the first six sessions and has not been re-run — so no sentence is false, and
    that is exactly why nothing goes red. The corpus is 900 player-rounds now.
 
-   The ratios are what carries forward, not the numerators, so this is not urgent; it is filed
+   ~~The ratios are what carries forward, not the numerators, so this is not urgent~~ — **and
+   that is now measured rather than assumed: every FLOAT bound is byte-identical at six sessions
+   and at seven** (the worst-case rounds all sit in the first six), so only the counts ever
+   moved. It is filed
    because "scoped" is a caveat, not a measurement, and the caveat has already survived one
    session. Done when each figure is either re-derived at 900 or pointed at a committed
    artefact that re-derives it. Note that `0 of 760` is the one that must NOT be silently
    refreshed: it is a guard's firing count, and whether it still fires at 900 is a per-session
-   check, not a re-pool.
+   check, not a re-pool. **Honoured**: the `13` beside it stays a six-session figure, because it
+   measures the data BEFORE the 2026-08-16 re-source and nothing at 900 can re-derive it; the
+   `0` is derived per round over all 900.
 
 Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow
 and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
@@ -3414,11 +3420,14 @@ So each figure is wrapped in an inline HTML-comment pair and **byte-compared aga
 
 ```
 **The ≥85% acceptance gate this phase set is not met by
-<!--equiv:KEY-->four of the seven<!--/equiv:KEY--> sessions**
+<!--KEY-->four of the seven<!--/KEY--> sessions**
 ```
 
-The example above writes `KEY` and not the real fragment name **because writing the real one here
-broke the build in the minute this section was drafted** — `expected exactly one pair, found 2`.
+The example above writes a bare `KEY`, outside the `equiv:` namespace, and both halves of that
+are load-bearing. **Writing the real fragment name broke the build in the minute this section was
+drafted** — `expected exactly one pair, found 2`. Writing `equiv:KEY` broke it a second time,
+after the gate learned to reject any marker in its namespace that no spec claims — because a
+marker nobody reads is a figure that looks gated and is not.
 That is the third time this repo has walked into the anchor-shadowing hazard *inside the paragraph
 describing it* (CLAUDE.md's own coverage-line bullet did it on 2026-08-20 and again on 2026-08-23).
 The difference is that this time the rule is enforced rather than written down, so the cost was one
@@ -3464,3 +3473,98 @@ all of them. The fragment functions raise `_Incomplete` instead; `_fragment_prob
 line and `render_fragments` turns it back into the same `SystemExit` a reader of `--render` needs.
 Found by a pre-existing selftest case ("a mode is missing from the artefact") going from rejected to
 *crashed*, which is why the count is the thing to watch and not the exit code.
+
+## `x of 760` —— 28 個數,一句都冇錯過 (2026-08-23)
+
+Closes item 2 of 「兩個仲未有 gate 嘅數」. `analysis/stat_sources.py` re-derives every corpus figure
+CLAUDE.md publishes about a round's three stat objects; `pipeline/check_stat_sources.py` gates the
+sentences; `stat-sources` is the CI job.
+
+**This is the hardest row in the 冇第二份 table and the reason is worth stating plainly: none of
+these sentences was wrong.** Each carried an honest caveat — 「measured over the 760 player-rounds of
+the first six sessions and has not been re-run at 900」 — which is exactly why nothing ever went red.
+A caveat is not a measurement. It is a promise to re-measure later, published in the same typeface
+as a result, and it reads to any later hand as a number somebody still stands behind. The other
+rows in that table go stale; this one **announces** that it is stale and stays published anyway.
+There is no gate shape that catches that except one that re-derives the figure.
+
+### The control is the whole argument
+
+At 900 rounds there is no published number left to disagree with, so a fresh derivation could be
+measuring something adjacent and every run would be green. `--selftest` therefore restricts the
+derivation to the six sessions the figures were hand-measured on and requires every published
+integer back **exactly**:
+
+    183 · 181 · 172 · 257 · 245 · 201 · 7 · 1 · 758 · 11865 · 7510 · 650 · 750 · 760 · 98
+
+Fourteen of the fifteen came back first try. **The fifteenth is the useful one.** 「245 of the 760」
+came back 243, and the hand measurement was right where the re-derivation was not: 245 is the count
+only when the residual is maximised over **all three** rates. VS and APM alone give 243, and the two
+rounds between them are the entire difference. `aggregatestats` is a triple, so a route claiming to
+reconstruct it has to reconstruct the triple — the definition was corrected, not the figure.
+
+### What actually moved, and what did not
+
+| | six sessions | seven |
+|---|---|---|
+| live tick stale | 183 of 760 | **211 of 900** |
+| … of them the survivor | 181 | **209** |
+| `floor(ft·60/1000)` wrong | 257 | **313** |
+| `finaltime_ms/1000` above 1e-4 | 245 | **289** |
+| `kills` disagree | 201 | **243** |
+| `garbagesent` / `garbagereceived` | 7 and 1 | **9 and 2** |
+| faults > non-perfect pieces | 650 of 750 | **770 of 884** |
+| pooled faults / non-perfect pieces | 11 865 / 7 510 | **13 964 / 8 772** |
+| **every float bound** | — | **byte-identical** |
+
+That last row is the finding. `1.81899e-12`, `2.43096e-16`, `4.16852e-16`, `6.13187e-16`,
+`1.51976e-3`, `1.25354e-3` and the VS guard's `0.0565699` are the SAME at six sessions and at seven,
+to every digit — the worst-case rounds all sit in the first six. 「The ratios are what to carry
+forward, not the numerators」 was written as a hedge and turns out to be exactly true.
+
+### Five published bounds were rounded the wrong way
+
+Every one of those floats is an 「up to X」 statement, and five of the six were published rounded
+DOWN — each asserting a **tighter** bound than the data supports:
+
+| measured | published | correct |
+|---|---|---|
+| 1.81899e-12 | 1.8e-12 | **1.9e-12** |
+| 2.43096e-16 | 2.4e-16 | **2.5e-16** |
+| 6.13187e-16 | 6.1e-16 | **6.2e-16** |
+| 1.51976e-3 | 1.5e-3 | **1.6e-3** |
+| 1.25354e-3 | 1.2e-3 | **1.3e-3** |
+
+This is the rule `pipeline/fmt._bound_dp` already states for the reports — an upper bound is the one
+figure that must round the other way — applied to CLAUDE.md, which no formatter had ever touched.
+`check_stat_sources._bound` ceils at two significant figures and has its own controls, because a
+rounding helper that rounds would pass every other case in the file. The corrections are tiny; the
+class is 「差距唔夠 0.01」 against a lemma proving 0.015, which this repo has shipped before.
+
+### 17 copies with no home
+
+`183 of 760`, `181`, `172` and `0 of 98` also sat in **seven `extract.py`, seven `extract2.ts` and
+three `SCHEMA.md`** — seventeen copies of one comment, all stale at once. Those are not gated;
+the numerals are **deleted**, and the comments now point at `analysis/stat_sources.py`. Nobody
+maintains a figure in seventeen places, and CLAUDE.md's own rule allows removing a figure as well as
+gating one. The one fact worth keeping from them — that no leaderboard entry carries
+`aggregatestats`, which is why the match-level rollup stays on the live tick — moved into CLAUDE.md
+as a gated fragment, so it went from seventeen ungated copies to one derived one.
+
+### The mechanism, shared
+
+The marked-fragment machinery moved out of `check_equiv_coverage` into `pipeline/docs_gate.py`, so
+both gates use one implementation of the marker format, the per-document check and the mutant sweep
+— a second caller cannot ship the mechanism with a thinner sweep than the first. Two things were
+added while generalising it:
+
+- **A marker in the namespace that no spec claims is an error.** Without that rule
+  `fragment_problems` simply never looks at it, so the figure inside reads as gated while nothing
+  reads it. Found by typing two — `stat:corpus2` and `stat:corpus3` sat unclaimed in CLAUDE.md and
+  the gate said everything agreed. The rule then immediately failed ROADMAP.md's own example, which
+  is why the example above writes a bare `KEY` outside any namespace.
+- **`Incomplete`** — a fragment whose data is not yet derivable is reported as a line, never as a
+  crash. `figures()` exits the process on a missing mode, which is right for a renderer and wrong
+  for a gate that should list every problem in one run.
+
+`--selftest` counts: `check_equiv_coverage` 108 → **111**, `check_stat_sources` **141**.

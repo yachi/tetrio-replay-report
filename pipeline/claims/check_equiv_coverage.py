@@ -92,10 +92,12 @@ import sys
 # The document-parsing layer is SHARED with pipeline/check_loo.py, which gates the same three
 # files. Two parsers over one document agree until the document is reworded; see
 # pipeline/docs_gate.py's header for why they live in one place.
-from ..docs_gate import Prose, Table, granularity
+from ..docs_gate import Incomplete, Prose, Table, frag_close, frag_open, granularity
+from ..docs_gate import fragment_mutants, fragment_problems
 from ..docs_gate import candidate_dirs as _candidate_dirs
 from ..docs_gate import load_docs as _load_docs
 from ..docs_gate import reword as _reword
+from ..docs_gate import render_fragments as _render_fragments
 from ..docs_gate import row_membership as _row_membership
 from ..docs_gate import session_dirs as _session_dirs
 
@@ -533,18 +535,16 @@ def _numword(n):
     return _WORDS[n] if 0 <= n < len(_WORDS) else str(n)
 
 
-class _Incomplete(Exception):
+def _incomplete(session, mode):
     """An artefact is missing a mode a fragment needs.
 
     `figures()` exits the process on that, which is right for a renderer and wrong for the
     gate: `_artefact_problems` has already reported the missing mode, and a gate that dies
     there reports ONE problem where the run should list all of them. So the fragment
-    functions raise this, `_fragment_problems` turns it into a line, and `render_fragments`
-    turns it back into the same SystemExit a reader of `--render` needs.
+    functions raise `docs_gate.Incomplete`, `fragment_problems` turns it into a line, and
+    `render_fragments` turns it back into the same SystemExit a reader of `--render` needs.
     """
-
-    def __init__(self, session, mode):
-        super().__init__(f"{session} carries no {mode} mode")
+    return Incomplete(f"{session} carries no {mode} mode")
 
 
 def live_sessions(arts):
@@ -553,7 +553,7 @@ def live_sessions(arts):
 
 def _fig(arts, session, mode):
     if mode not in arts[session].get("modes", {}):
-        raise _Incomplete(session, mode)
+        raise _incomplete(session, mode)
     return figures(arts[session], mode)
 
 
@@ -598,65 +598,30 @@ def _named(sessions):
 # key -> (renderer, the documents that must carry it). A marker in a document NOT listed here
 # is an error too: that is how a second copy of the sentence goes uncheked somewhere else.
 FRAGMENTS = {
-    "gate-count": (lambda arts: _of(len(below_gate(arts)), arts),
-                   ("README.md", "ROADMAP.md")),
-    "gate-sessions": (lambda arts: _named(below_gate(arts)),
-                      ("README.md",)),
-    "sf-match": (lambda arts: _of(len(loses_second_family(arts, "two_site_match")), arts),
-                 ("ROADMAP.md", "CLAUDE.md")),
-    "sf-round": (lambda arts: _of(len(loses_second_family(arts, "two_site_round")), arts),
-                 ("ROADMAP.md", "CLAUDE.md")),
+    "equiv:gate-count": (lambda arts: _of(len(below_gate(arts)), arts),
+                         ("README.md", "ROADMAP.md")),
+    "equiv:gate-sessions": (lambda arts: _named(below_gate(arts)),
+                            ("README.md",)),
+    "equiv:sf-match": (lambda arts: _of(len(loses_second_family(arts, "two_site_match")), arts),
+                       ("ROADMAP.md", "CLAUDE.md")),
+    "equiv:sf-round": (lambda arts: _of(len(loses_second_family(arts, "two_site_round")), arts),
+                       ("ROADMAP.md", "CLAUDE.md")),
 }
 
-
-def _open(key):
-    return f"<!--equiv:{key}-->"
-
-
-def _close(key):
-    return f"<!--/equiv:{key}-->"
+_open, _close = frag_open, frag_close
 
 
 def render_fragments(arts, name):
     """Every marked fragment `name` must carry, one per line, ready to paste."""
     try:
-        return "".join(f"{_open(k)}{fn(arts)}{_close(k)}\n"
-                       for k, (fn, docs) in FRAGMENTS.items() if name in docs)
-    except _Incomplete as e:
+        return _render_fragments(FRAGMENTS, arts, name)
+    except Incomplete as e:
         raise SystemExit(f"{e}, so there is no fragment to publish for it — "
                          f"regenerate with --write")
 
 
 def _fragment_problems(name, text, arts):
-    out = []
-    for key, (fn, docs) in FRAGMENTS.items():
-        o, c = _open(key), _close(key)
-        n_o, n_c = text.count(o), text.count(c)
-        if name not in docs:
-            if n_o or n_c:
-                out.append(f"{name}: carries the {key!r} fragment, which is published in "
-                           f"{', '.join(docs)} and not here. A second copy of a gated figure "
-                           f"is a second place for it to go stale")
-            continue
-        if n_o != 1 or n_c != 1:
-            out.append(f"{name}: expected exactly one {o}...{c} pair, found {n_o} open and "
-                       f"{n_c} close. Exactly one, because a second copy shadows the first "
-                       f"and the gate would then check the wrong sentence. {REWORD}")
-            continue
-        i, j = text.index(o) + len(o), text.index(c)
-        if j < i:
-            out.append(f"{name}: the {key!r} fragment's markers are in the wrong order. {REWORD}")
-            continue
-        try:
-            want = fn(arts)
-        except _Incomplete as e:
-            out.append(f"{name}: the {key!r} fragment cannot be re-derived — {e}")
-            continue
-        got = text[i:j]
-        if got != want:
-            out.append(f"{name}: the {key!r} fragment reads {got!r}; the artefacts give "
-                       f"{want!r}. Paste it from `--render`, do not retype it")
-    return out
+    return fragment_problems(name, text, FRAGMENTS, arts, REWORD, "equiv:")
 
 
 def _table(name, header):
@@ -919,37 +884,11 @@ def _selftest(root):
                           dict(docs, **{name: doc(arts, name, block.replace(rows[-1], rows[-1] + "\n" + extra))}),
                           True))
 
-    # --- the marked fragments beside the tables.
-    # Enumerated per (document, fragment) rather than sampled: the two counts these carry went
-    # wrong in DIFFERENT ways (one stale, one granularity-ambiguous), and a mutant on one says
-    # nothing about the other. Each family names the failure it stands for.
-    for fname in dict.fromkeys(DOC_NAMES):
-        for key, (fn, owners) in FRAGMENTS.items():
-            o, c = _open(key), _close(key)
-            base = doc(arts, fname)
-            if fname not in owners:
-                # A fragment turning up where it is not published: a second copy of a gated
-                # figure is a second place for it to go stale, and the gate must say so.
-                cases.append((f"{fname}: carries the {key} fragment it does not publish", arts,
-                              dict(docs, **{fname: base + f"\n{o}whatever{c}\n"}), True))
-                continue
-            text = fn(arts)
-            cases.append((f"{fname}: the {key} fragment says something else", arts,
-                          dict(docs, **{fname: base.replace(o + text + c,
-                                                            o + "eleven of the twelve" + c)}),
-                          True))
-            cases.append((f"{fname}: the {key} fragment is deleted", arts,
-                          dict(docs, **{fname: base.replace(o + text + c, text)}), True))
-            # The shadowing case, and the reason the rule is EXACTLY one rather than at least
-            # one: a second pair earlier in the file would otherwise be what the gate reads.
-            cases.append((f"{fname}: the {key} fragment appears twice", arts,
-                          dict(docs, **{fname: base.replace(o + text + c,
-                                                            o + text + c + " " + o + text + c)}),
-                          True))
-            cases.append((f"{fname}: the {key} fragment loses its closing marker", arts,
-                          dict(docs, **{fname: base.replace(o + text + c, o + text)}), True))
-            cases.append((f"{fname}: the {key} fragment's markers are swapped", arts,
-                          dict(docs, **{fname: base.replace(o + text + c, c + text + o)}), True))
+    # --- the marked fragments beside the tables. The sweep is docs_gate's, shared with every
+    # other gate that uses the mechanism, so a second caller cannot ship it with fewer mutants.
+    for label, fname, text, must_fail in fragment_mutants(
+            FRAGMENTS, arts, dict.fromkeys(DOC_NAMES), lambda n: doc(arts, n), "equiv:"):
+        cases.append((label, arts, dict(docs, **{fname: text}), must_fail))
 
     # The one shape that turns an artefact into a measurement: keep the single-value column,
     # drop its two-site companion, for a session whose hand claims are windowed.

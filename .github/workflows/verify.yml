@@ -881,6 +881,39 @@ jobs:
           python3 -m pipeline.check_preregistrations --selftest
           python3 -m pipeline.check_preregistrations
 
+  # The two long CLAUDE.md bullets about a round's THREE stat objects are almost entirely counts
+  # of how often those three disagree, and every one of them was measured once by hand over the
+  # 760 player-rounds of the first six sessions and typed into prose. The corpus reached 900 and
+  # nothing said so.
+  #
+  # This is the 冇第二份 class at its purest, and it is the hardest one the document carries
+  # BECAUSE THE SENTENCES WERE NOT WRONG: each said, in as many words, that it was measured over
+  # the first six sessions and had not been re-run. A caveat is honest and it is not a
+  # measurement — nothing goes red, the figure stays published, and it reads exactly like a
+  # number somebody still stands behind. There is no gate shape that catches that except one
+  # that re-derives the figure.
+  #
+  # Here and not in a path-filtered workflow, for the reason `leave-one-out` gives: the edit this
+  # catches is a prose edit to CLAUDE.md or a new session landing in sessions/, and no
+  # figures-oriented filter watches both. Offline, stdlib-only, ~1 s over all 118 replays.
+  #
+  # --selftest first, and its FIRST control is the one that matters: restricted to the six
+  # sessions the figures were hand-measured on, the derivation must reproduce every published
+  # integer exactly (183, 181, 172, 257, 245, 201, 7, 1, 758, 11865, 7510, 650, 750, 760, 98).
+  # At 900 rounds there is no published number left to disagree with, so without that control the
+  # module could be measuring something adjacent and every run would still be green.
+  stat-sources:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check every three-stat-objects figure is the one the corpus gives (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_stat_sources --selftest
+          python3 -m pipeline.check_stat_sources
+
   # `bin/verify-repo` is the local stand-in for the ten repo-wide jobs above — the
   # ones `bin/verify-session` cannot reach because it takes ONE artefact directory.
   # Its whole value rests on one property: that it still knows every job and every

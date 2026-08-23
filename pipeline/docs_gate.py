@@ -260,3 +260,126 @@ def load_docs(root, names):
             with open(path, encoding="utf-8") as fh:
                 docs[name] = fh.read()
     return docs
+
+
+# --------------------------------------------------------------- marked fragments
+
+# A figure that lives INSIDE editorial prose cannot be gated by an anchor regex, and the
+# reason is history rather than typos: a long-lived document accumulates earlier versions of
+# the same sentence — dated sections, retrospectives, "this used to read…" — which must stay
+# as written. An anchor loose enough to match the live sentence matches the dead one too, and
+# `paragraph()` above takes the FIRST match, so the gate silently checks the historical
+# paragraph and reports the live one as fine. ROADMAP.md has exactly that shape for both of
+# check_equiv_coverage's counts.
+#
+# So the figure is DELIMITED instead of matched: an inline HTML comment pair (invisible when
+# the Markdown renders) whose contents are byte-compared against a renderer. Three rules, each
+# of which is a failure and not a skip:
+#
+#   * EXACTLY ONE pair per document, never "at least one" — a second copy is precisely the
+#     shadowing case, so counting turns it from a rule somebody remembers into a red build;
+#   * a fragment in a document that does not publish it fails too, because a second copy of a
+#     gated figure is a second place for it to go stale;
+#   * only the quantified clause is inside the markers, so the prose around it stays free and a
+#     reword costs nothing.
+
+
+class Incomplete(Exception):
+    """The data cannot produce this fragment yet — reported as a line, never as a crash."""
+
+
+def frag_open(key):
+    return f"<!--{key}-->"
+
+
+def frag_close(key):
+    return f"<!--/{key}-->"
+
+
+def render_fragments(specs, data, name):
+    """Every fragment `name` must carry, one per line, ready to paste."""
+    return "".join(f"{frag_open(k)}{fn(data)}{frag_close(k)}\n"
+                   for k, (fn, docs) in specs.items() if name in docs)
+
+
+def fragment_problems(name, text, specs, data, reword, namespace=None):
+    """Check one document against every fragment spec — including the ones it must NOT carry.
+
+    `namespace` (e.g. "stat:") makes a marker in that namespace whose key is in no spec an
+    ERROR. Without it a mistyped or renamed key is INVISIBLE: `fragment_problems` iterates the
+    specs, so a marker nobody claims is simply never looked at, and the figure inside it reads
+    as gated while nothing reads it. Found by typing one — two markers sat unclaimed in
+    CLAUDE.md and the gate said everything agreed.
+    """
+    out = []
+    if namespace:
+        known = {frag_open(k) for k in specs} | {frag_close(k) for k in specs}
+        for m in re.finditer(r"<!--/?" + re.escape(namespace) + r"[^>]*-->", text):
+            if m.group(0) not in known:
+                out.append(f"{name}: carries {m.group(0)}, which no fragment spec claims. "
+                           f"A marker nobody reads is a figure that looks gated and is not")
+    for key, (fn, docs) in specs.items():
+        o, c = frag_open(key), frag_close(key)
+        n_o, n_c = text.count(o), text.count(c)
+        if name not in docs:
+            if n_o or n_c:
+                out.append(f"{name}: carries the {key!r} fragment, which is published in "
+                           f"{', '.join(docs)} and not here. A second copy of a gated figure "
+                           f"is a second place for it to go stale")
+            continue
+        if n_o != 1 or n_c != 1:
+            out.append(f"{name}: expected exactly one {o}...{c} pair, found {n_o} open and "
+                       f"{n_c} close. Exactly one, because a second copy shadows the first "
+                       f"and the gate would then check the wrong sentence. {reword}")
+            continue
+        i, j = text.index(o) + len(o), text.index(c)
+        if j < i:
+            out.append(f"{name}: the {key!r} fragment's markers are in the wrong order. {reword}")
+            continue
+        try:
+            want = fn(data)
+        except Incomplete as e:
+            out.append(f"{name}: the {key!r} fragment cannot be re-derived — {e}")
+            continue
+        got = text[i:j]
+        if got != want:
+            out.append(f"{name}: the {key!r} fragment reads {got!r}; the data gives {want!r}. "
+                       f"Paste it from `--render`, do not retype it")
+    return out
+
+
+def fragment_mutants(specs, data, doc_names, doc_of, namespace=None):
+    """(label, document name, corrupted text, must_fail) for every (document, fragment).
+
+    Enumerated per pair rather than sampled: two figures in one document fail for unrelated
+    reasons, and a mutant on one says nothing about the other. Shared so a second caller
+    cannot ship the mechanism with a thinner sweep than the first.
+    """
+    cases = []
+    for name in doc_names:
+        base = doc_of(name)
+        if namespace:
+            # A marker in the namespace that no spec claims. Without this rule the gate simply
+            # never looks at it, so the figure inside reads as gated while nothing reads it.
+            cases.append((f"{name}: carries an unclaimed {namespace}marker", name,
+                          base + f"\n{frag_open(namespace + 'nobody')}x"
+                                 f"{frag_close(namespace + 'nobody')}\n", True))
+        for key, (fn, owners) in specs.items():
+            o, c = frag_open(key), frag_close(key)
+            if name not in owners:
+                cases.append((f"{name}: carries the {key} fragment it does not publish",
+                              name, base + f"\n{o}whatever{c}\n", True))
+                continue
+            text = fn(data)
+            whole = o + text + c
+            for label, repl in (
+                    ("says something else", o + "eleven of the twelve" + c),
+                    ("is deleted", text),
+                    # The shadowing case, and why the rule is EXACTLY one rather than at least
+                    # one: a second pair earlier in the file is what the gate would read.
+                    ("appears twice", whole + " " + whole),
+                    ("loses its closing marker", o + text),
+                    ("has its markers swapped", c + text + o)):
+                cases.append((f"{name}: the {key} fragment {label}", name,
+                              base.replace(whole, repl), True))
+    return cases
