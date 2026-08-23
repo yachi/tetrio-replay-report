@@ -96,7 +96,7 @@ CI itself checks (`workflow-plan`).
 
 Scope, stated because the two do not overlap: `bin/verify-session` runs 7 gates over ONE
 artefact directory, CI's per-session `pipeline` job runs 18 steps, and `bin/verify-repo`
-by default runs neither — it runs the 11 repo-wide jobs. `bin/verify-repo --sessions`
+by default runs neither — it runs the 13 repo-wide jobs. `bin/verify-repo --sessions`
 adds both matrices and is the only local command that runs everything a push runs.
 
 ## Repository layout
@@ -130,6 +130,8 @@ sessions/<date>/
     recommendations.md         coaching prose source
     review-phase2.md           adversarial review of the ledgers
     audit-phase5.md            adversarial audit of the finished report
+analysis/rate_records.R        the R regression behind QUALIFYING_MS
+analysis/rate-records.json     its committed output — the only home of those figures
 tools/analyzer.html            drop in a .ttrm, get an instant report (runs locally)
 bin/new-session                replays in, verified ledger and proofs out
 bin/verify-session             re-run every gate for one artefact

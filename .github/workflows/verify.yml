@@ -914,7 +914,29 @@ jobs:
           python3 -m pipeline.check_stat_sources --selftest
           python3 -m pipeline.check_stat_sources
 
-  # `bin/verify-repo` is the local stand-in for the ten repo-wide jobs above — the
+  # The evidence for QUALIFYING_MS. `analysis/rate_records.R` needs R, which is not a
+  # CI dependency and does not need to be: the artefact it writes records the md5 of
+  # every facts.json it read AND of the script itself, so every way it can go stale is
+  # a mismatch this job can see without running R. What R would add is reproducibility
+  # of the statistic. `--rerun` asks for exactly that and SAYS which of the two it did:
+  # here it prints that Rscript is absent and only the fingerprints were checked, while
+  # the same command under `bin/verify-repo` on a developer's machine re-derives the
+  # artefact and demands the committed bytes back. Which check runs is decided by what
+  # is installed, not by a different command per runner — and a skip that is printed is
+  # the only kind this repo allows.
+  rate-records:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check the R analysis is current and every figure it feeds agrees (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_rate_records --selftest
+          python3 -m pipeline.check_rate_records --rerun
+
+  # `bin/verify-repo` is the local stand-in for the repo-wide jobs above — the
   # ones `bin/verify-session` cannot reach because it takes ONE artefact directory.
   # Its whole value rests on one property: that it still knows every job and every
   # step in this directory. That property degrades in the direction that reads

@@ -2935,13 +2935,12 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
     floor of four and the real ratio had fallen to **3.8195**. Flooring to one decimal is what lets
     足足 stay in the sentence at all — the printed 3.8 is a lower bound on the truth, where the typed
     「四倍」 was not a bound on anything.
-  - **STILL OPEN: `analysis/rate_records.R` runs in no workflow and no `bin/` script.**
-    Re-checked at the time of writing — `grep -rn "rate_records|Rscript" .github/ bin/` still
-    returns **nothing**. So the footnote's constants are guarded against a corpus-size mismatch but
-    the script that produces them is still run by hand, and `QUALIFYING_MS`'s evidence is
-    re-derivable only by someone remembering to. The guard turns silent staleness into a loud
-    build failure; it does not make the number self-maintaining. This half is why the bullet is
-    not struck.
+  - ~~**STILL OPEN: `analysis/rate_records.R` runs in no workflow and no `bin/` script.**~~
+    **CLOSED 2026-08-23** — see 「`rate_records.R` —— 個 producer 都要有 gate」 below. The script
+    globs its sessions, emits `analysis/rate-records.json`, and `records.py` READS that artefact
+    instead of holding copies of its output; `rate-records` is the CI job. The fix that mattered
+    is not "it runs now" but WHAT the artefact carries: the md5 of every facts.json it read and
+    of the script itself, which is the half a session-count guard could never see.
 - ~~**Ten hardcoded session lists remain**, of the fifteen inventoried: `verify.yml:44-51`,
   `:179-180`, `:736`; `analysis/rate_records.R`'s `sessions`; `pipeline/records.py`;
   `pipeline/intense_round.py`; and the four TypeScript consts `cross-tslot-multi.ts`'s `SESSIONS`,
@@ -2957,7 +2956,7 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
   | **derived from disk** | `intense_round.py` (no list at all — `CORPUS` comes from `corpus_stats` and is triple-gated), `cross-tslot-multi.ts`, `cross-tspin.test.ts`, `cross-movegen.test.ts` (all three now `discoverCorpus(...)`) | none |
   | **listed but asserted against disk** | `cross-tslot.test.ts:61` and `openers/openers.test.ts:36` (both `assertCorpusIsEverySessionOnDisk`), `records.py`'s `R_STATS_SESSIONS` (a COUNT, checked against `corpus_scope()`, refuse-to-render on mismatch) | fails loudly; a list on purpose, because per-session literals are pinned below it and a session nobody has measured must not reach them |
   | **deliberately held** | `verify.yml:45-52`, `:180-181` | see the first bullet of this section — NOT to be converted |
-  | **open and unguarded** | `analysis/rate_records.R:25` | the only one left |
+  | ~~**open and unguarded**~~ | ~~`analysis/rate_records.R:25`~~ | **CLOSED 2026-08-23** — globbed off disk. The inventory is now empty at every state that fails silently |
 
   Two corrections to the old list itself. **`verify.yml:736` no longer names anything**: the
   workflow now holds exactly two session enumerations (the two matrices) plus a single-session
@@ -3090,9 +3089,7 @@ session — a wrong DONE record is worth less than none, and so is a wrong OPEN 
    measures the data BEFORE the 2026-08-16 re-source and nothing at 900 can re-derive it; the
    `0` is derived per round over all 900.
 
-Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow
-and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
-and unguarded session list.
+~~Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow and no `bin/` script.~~ **CLOSED 2026-08-23.**
 
 ## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23) — DONE (2026-08-23)
 
@@ -3568,3 +3565,60 @@ added while generalising it:
   for a gate that should list every problem in one run.
 
 `--selftest` counts: `check_equiv_coverage` 108 → **111**, `check_stat_sources` **141**.
+
+
+## `rate_records.R` —— 個 producer 都要有 gate,唔係淨係個 consumer (2026-08-23)
+
+**收咗個 roadmap 最後一條「open and unguarded」。** 但真正值錢嗰樣唔係「而家會 run」,係度到嘅
+三個錯 —— 全部係啲 figure 有 consumer 有 gate、個 **producer** 冇。
+
+### 個 shape
+
+`analysis/rate_records.R` 係 `QUALIFYING_MS = 60_000` 嘅全部證據。之前:
+session list 硬寫、冇 workflow 行、冇 `bin/` script 行,output 手抄入 `pipeline/records.py`
+(八個 `R_*` const) 同 CLAUDE.md 十八個 figure。個 guard 淨係一個 session **count**。
+
+而家:`sessions` glob 落 disk,`--json` 寫 `analysis/rate-records.json`(commit 咗),
+`records.py` **讀** 佢(八個 const 刪晒),`pipeline/check_rate_records.py` gate 十八個
+marked fragment,`rate-records` 係 CI job。個 artefact 帶住佢讀過嘅每個 `facts.json` 嘅 md5
+**同埋 script 自己嘅 md5** —— 三條 staleness 路全部會紅:落新 session、data 郁、analysis 郁。
+第二條就係 2026-08-16 真係發生過嗰條(rates re-source,corpus 停喺六個 session,VS SD
+59.91 → 59.60),而 session-count guard 睇唔到嗰半。
+
+### 三個錯,同點解冇人捉到
+
+1. **「50 s to 70 s」是錯嘅。** 呢句話講「APM 同 VS 兩個 metric,每個 session 嘅紀錄喺 50-70 秒
+   任何一個 cut-off 都係同一局」。[50, 72] 係 **VS 一個 metric** 嘅 band;APM 嘅係 **[54, 62]**
+   —— 07-24 同 08-14 都會喺 50-70 之間換咗個 APM 紀錄,07-24 換兩次。**點解冇人捉到先係重點**:
+   句下面印住嘅證據係 R script section 4,一張 **淨係 VS 嘅表**。個 claim 錯嗰個 metric,
+   啱好就係張表冇得顯示嗰個。呢個係 repo 一路捉緊嘅「個 check fire 唔到」再多一個形狀 ——
+   唔係 tautology、唔係 vacuous clause,而係 **證據個 scope 窄過佢旁邊句 claim**。
+   `rate_records.R` 而家三個 metric 都印,而且每條 band 都係 **算** 出嚟。三個夾埋係 [58, 62],
+   60 差唔多喺正中,呢個先係啲數撐得住嘅「唔係 tuned knob」講法。
+2. **`generators.py` 個 `QUALIFYING_MS` 上面有 26 行四個 session 嘅數。** 492 player-rounds、
+   slope −0.616/−0.697、「both with −0.5 inside the 95% CI」、「the MEAN stays flat (108 → 118)」、
+   12 records、p = 6e-08。**CLAUDE.md 自己已經記低咗其中兩條喺七個 session 度係假嘅** ——
+   APM 個 −0.5 出咗 CI,VS 個 mean 唔平(p = 0.01)—— 但個 comment 由頭到尾冇人掂。
+   source comment fire 唔到,所以刪咗,唔係更新。
+3. **CLAUDE.md 仲寫住 約262.6。** 每份 report 都係 **約262.5**;2026-07-26 嗰次 約-floor pass
+   就係改呢個。同一份文件喺六百行之後,列 262.6 做嗰次 pass 改走咗嘅**錯處**。
+   `check_prose_figures` 只行 session 嘅 report directory,所以唯一仲登住舊值嗰處,
+   就係寫住條 rule 嗰份文件。
+
+### 兩樣可以搬去第二度嘅嘢
+
+- **Rounding 有方向,而且係 per claim,唔係 per number。** 撐「rejected」嘅 p 要 **ceil**
+  (round 落去等於話個 significance 大過度到);撐「still flat」嘅 p 要 **floor**;攞嚟證
+  −0.5 喺 CI **外面** 嘅 interval 要 **闊** 唔可以窄;兩個互相比較嘅 ratio,argument 要佢大嗰個
+  floor、要佢細嗰個 ceil。行落去郁咗三個已出街嘅數:8.6e-05 → 8.7e-05、5.3e-05 → 5.4e-05、
+  1.11× → 1.12×。(上一個 commit 係「bounds ceil」,呢個係佢嘅一般式。)
+- **唔使用 R 落 CI 都 close 到。** 個 artefact 有 fingerprint,所以三條 staleness 路唔使 re-run
+  都睇得到;`--rerun` 加多一層 byte-identity,而 **行唔行係睇部機有冇 Rscript,唔係睇邊個
+  runner** —— CI 印「Rscript not on PATH — fingerprints only」,本機 `bin/verify-repo` 就真係
+  re-derive。同一條命令,兩個誠實結果,弱嗰個會自己出聲。個 emitter round 到六個有效數字
+  (published 最多三個,BLAS 之間差 ~1e-15),byte-identity 先量得到個 analysis 而唔係部機。
+
+### 仲喺度嘅
+
+`bin/verify-repo --check` 一加咗個 job 就即刻紅(「job 'rate-records' is in CI and unknown to
+bin/verify-repo」),即係上個 commit 起嗰個 derive-don't-copy 性質係真嘅。16 個 job 喇。

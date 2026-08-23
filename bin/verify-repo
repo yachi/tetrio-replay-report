@@ -351,6 +351,11 @@ PLAN = {
     "intense-round-corpus": Entry(FAST),
     "preregistrations": Entry(FAST),
     "stat-sources": Entry(FAST),
+    # The job's command is `--rerun`, and what it does is decided by whether Rscript is
+    # installed, not by which runner it is on: CI has no R and prints that it checked the
+    # fingerprints only; here it re-derives the artefact and demands the committed bytes
+    # back. Same command, two honest outcomes, and the weaker one announces itself.
+    "rate-records": Entry(FAST),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.

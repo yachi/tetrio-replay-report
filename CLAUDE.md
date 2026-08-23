@@ -88,6 +88,10 @@ python3 -m pipeline.openers.extract_wiki_openers \
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
   --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
+Rscript analysis/rate_records.R --json analysis/rate-records.json  #   ...as the committed artefact
+python3 -m pipeline.check_rate_records            # CI gate: that artefact is current, and every
+python3 -m pipeline.check_rate_records --rerun    #   figure CLAUDE.md quotes from it agrees
+python3 -m pipeline.check_rate_records --selftest #   its mutants
 dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
 dafny verify spec/BfsKey.dfy               # why bestTspin's visited key carries the arrival mode
 bash spec/mutate-bfskey.sh                 # its mutants — a lemma none can kill is decorative
@@ -235,7 +239,7 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **15 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **16 job definitions
   across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
@@ -243,7 +247,7 @@ equivalent marker pair.
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Twelve of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+- **Thirteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
   covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
@@ -350,6 +354,7 @@ Four instances, all live as of 2026-08-19, and they are not the same kind of thi
 | the `cavity ≥ 1` band | 74.6-77.0% | nothing recomputes it; it survives only because 08-14 ties 08-09 at one decimal, and it must be re-measured by hand every session |
 | the raw-DS AUC series | 68.4 · 62.0 · 81.2 · 83.0 · 64.0 | quoted from a probe; stopped at five sessions and nothing said so |
 | ~~the `760` numerators~~ | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900. **CLOSED 2026-08-23**: `analysis/stat_sources.py` re-derives all 28 of them and `pipeline/check_stat_sources.py` gates the sentences. They were the hardest row here because **every one carried an honest caveat** — 「measured over the first six sessions, not re-run at 900」 — and a caveat cannot go red |
+| ~~the R statistics~~ | slopes, CIs, p's, the SD fall, the cut-off band | the only family whose producer ran in NO workflow and no `bin/` script, so its figures could not even be re-derived without remembering to. **CLOSED 2026-08-23**: `analysis/rate_records.R --json` writes a committed artefact, `records.py` reads it instead of holding copies, `pipeline/check_rate_records.py` gates the eighteen sentences. THREE of them were already wrong — the band (VS's quoted for a claim naming APM), 約262.6 (the rounded value this file's own 約 section names as the mistake), and twenty-six lines of four-session figures in `generators.py` beside the `QUALIFYING_MS` they justify |
 
 **A gate can have the same defect, so "it is checked" is not the test.**
 `expect(out).toBe(sum(width_ge_3))` in `openers.test.ts` looked like a gate and was arithmetic
@@ -712,44 +717,84 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
-sample mean over a small n. Measured in `analysis/rate_records.R` over all 900 player-rounds
-(seven sessions): regressing log SD on log t gives **−0.625 for VS and −0.715 for APM**, slope 0
-rejected for both (p 8.6e-05 / 5.3e-05). All **21** unqualified records (3 metrics × 7 sessions)
-came from the shortest quartile — p = 2.3e-13 — and 07-22's headline 約262.6 was a 15.6 s round,
-46% above that session's qualified peak.
+sample mean over a small n. Measured in `analysis/rate_records.R` over all
+<!--rate:corpus-->900 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->seven sessions<!--/rate:sessions-->):
+regressing log SD on log t gives **<!--rate:slopes-->−0.625 for VS and −0.715 for APM<!--/rate:slopes-->**,
+slope 0 rejected for both (p <!--rate:slope-p-->8.7e-05 / 5.4e-05<!--/rate:slope-p-->). All
+**<!--rate:records-->21<!--/rate:records-->** unqualified records
+(<!--rate:records-basis-->3 metrics × 7 sessions<!--/rate:records-basis-->) came from the shortest
+quartile — p = <!--rate:records-p-->2.3e-13<!--/rate:records-p--> — and 07-22's headline
+約<!--rate:headline-vs-->262.5<!--/rate:headline-vs--> was a <!--rate:headline-t-->15.6 s<!--/rate:headline-t--> round,
+<!--rate:headline-pct-->46%<!--/rate:headline-pct--> above that session's qualified peak.
+
+**Every figure in that paragraph, and in the three below it, is a marked fragment byte-compared
+against `analysis/rate-records.json` by `pipeline/check_rate_records.py`.** Until 2026-08-23 they
+were hand copies of a script that ran in no workflow and no `bin/` script. Two of them were
+wrong — the band below, and 「約262.6」, which this very document identifies six hundred lines
+further down as the ROUNDED figure the 2026-07-26 約-floor pass replaced with 約262.5 in every
+report. (`check_prose_figures` runs over a session's report directory, so the one place still
+publishing the value it corrected away was the file that records the rule.) A third copy lived
+outside this section entirely: twenty-six lines of FOUR-session statistics in a comment beside
+`QUALIFYING_MS` in `generators.py`, deleted rather than refreshed.
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one. Both still hold at seven.** (a) APM's −0.5 is **outside**
-its CI — [−0.918, −0.525] at six, [−0.887, −0.542] at seven — so the decay is *steeper* than a
-pure sample mean and the conclusion holds a fortiori, but "both with −0.5 inside the CI" is no
-longer true; (b) the mean is **no longer flat for VS** (106.9 → 119.4 across the bins, p = 0.01)
+its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.887, −0.542]<!--/rate:apm-ci--> at seven — so
+the decay is *steeper* than a pure sample mean and the conclusion holds a fortiori, but "both with
+−0.5 inside the CI" is no longer true; (b) the mean is **no longer flat for VS**
+(<!--rate:vs-mean-->106.9 → 119.4<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->0.01<!--/rate:vs-mean-p-->)
 — longer rounds do carry a mildly higher mean VS. The SD still falls several times over the same
 span, so the variance effect dominates and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
-(p = 0.25).
+(p = <!--rate:pps-mean-p-->0.25<!--/rate:pps-mean-p-->).
 
-**Do not quote a number for that SD fall from here, and do not put one in the report either.**
-It is `pipeline/records.R_VS_SD_RATIO`, derived from `R_VS_SD_SHORT` / `R_VS_SD_LONG` through
-`fmt.ratio1`, which floors — 4.1× at six sessions, **3.8× at seven**. The report's footnote said
-「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped **false into all
-seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of four and the ratio
-had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves 約-figures against
-facts.json, and this is a derived R statistic that appears in no dataset. It is computed now, and
-guarded — `_MIN_SD_RATIO = 2.0`, which is the ratio the *argument* needs (the mean moves 1.11×
-over the same span, so the spread must clearly dominate it), deliberately not the 4 the number
-happens to sit near. A guard set to today's measurement is a copy of the measurement.
+**A rounding DIRECTION is per claim, not per number, and applying that moved three of these.**
+A p supporting 「rejected」 must ceil, because a p rounded down claims more significance than the
+fit gives — 8.6e-05 / 5.3e-05 became 8.7e-05 / 5.4e-05. A p supporting 「still flat」 must floor,
+which is why PPS's 0.25 did not move. A CI quoted to show −0.5 lies outside it widens rather than
+narrows. And the two ratios below are quoted against each other, so the one the argument needs to
+be large floors and the one it needs to be small ceils.
 
-The script's session list is hardcoded, so **adding a session means editing it and re-running**
-— otherwise the evidence for `QUALIFYING_MS` silently stops covering the newest data. Adding
-08-09 also broke it: the records test carried a literal `12` for "3 metrics × 4 sessions", and
-`binom.test(15, 12, ...)` aborts. It derives `n_records` from `sessions` now. `repo` used to be
-an absolute path to one checkout, which meant a git worktree silently regressed the *other*
-tree's sessions; it resolves from the script's own location now.
+**Do not quote a number for that SD fall from here, and do not put one in the report either** —
+paste it. `records.r_stats()["sd_ratio"]` derives it through `fmt.ratio1`, which floors:
+4.1× at six sessions, **<!--rate:sd-ratio-->3.8×<!--/rate:sd-ratio--> at seven**. The report's
+footnote said 「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped
+**false into all seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of
+four and the ratio had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves
+約-figures against facts.json, and this is a derived R statistic that appears in no dataset. It is
+computed now, and guarded — `_MIN_SD_RATIO = 2.0`, which is the ratio the *argument* needs (the
+mean moves <!--rate:mean-ratio-->1.12×<!--/rate:mean-ratio--> over the same span, so the spread must
+clearly dominate it), deliberately not the 4 the number happens to sit near. A guard set to
+today's measurement is a copy of the measurement.
+
+**The script's session list was the last unguarded one in the repo, and it is gone**: `sessions`
+is globbed off disk, `--json` writes `analysis/rate-records.json`, and `pipeline/records.py` reads
+that artefact instead of holding copies of its output. The artefact records the md5 of every
+`facts.json` it read AND of the R script itself, which is what closes the half a session-count
+guard never could — on 2026-08-16 the rates were re-sourced from the live tick to
+`results.aggregatestats` and the shortest bin's VS SD moved 59.91 → 59.60 with the corpus
+unchanged at six. Three ways to go stale, three loud failures: a session lands, the data moves,
+the analysis moves. The script hash is over the WHOLE file, comments included, because a rule
+that tries to tell a comment from a statistic can be fooled; the cost is one re-run.
+(Two older repairs, kept because both are still the reason a line reads as it does: the records
+test carried a literal `12` for "3 metrics × 4 sessions" and `binom.test(15, 12, ...)` aborts when
+the fifth session landed, so `n_records` is derived; and `repo` was an absolute path to one
+checkout, so a git worktree silently regressed the *other* tree's sessions.)
 
 `QUALIFYING_MS = 60_000` is where definition and data agree: APM and VS are per-*minute*, and
-each session's record names the same round for every cut-off from 50 s to 70 s, so nothing
-rests on the number. Counts are deliberately unqualified — fitting more lines into a short
-round is harder, not easier.
+every session's record for both names the same round for every cut-off in
+<!--rate:band-->[54, 62] s<!--/rate:band-->, so the exact number is not load-bearing within a few
+seconds either side. **It is not the 「50 s to 70 s」 this paragraph claimed until 2026-08-23, and
+how that survived is worth more than the correction.** [50, 72] is VS's band *alone*; the sentence
+named APM as well, and APM's is [54, 62] — 07-24 and 08-14 each move their APM record at a cut-off
+inside 50-70, 07-24 twice. The evidence printed underneath was section 4 of the R script, **a
+table of VS only**, so the one metric the claim was false for was the one the evidence could not
+display. A check that cannot fail, arriving from a direction this file has not listed before: not
+a tautology, not a vacuous clause, but a table scoped to a subset of the claim beside it. The
+script prints all three metrics and computes each band now. Over all three the band is
+<!--rate:band-all-->[58, 62] s<!--/rate:band-all-->, and 60 sits near its centre — which is the
+form of "not a tuned knob" the data actually supports. Counts are deliberately unqualified —
+fitting more lines into a short round is harder, not easier.
 
 Two holes opened the moment the qualifier was written, and both are now gated:
 
