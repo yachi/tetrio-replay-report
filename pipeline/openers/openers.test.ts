@@ -1185,6 +1185,41 @@ test('a null is UNKNOWN and only ever replaces a zero — an observed order is n
   }
 });
 
+/**
+ * THE WINDOW GATE — the one thing the join gate provably cannot catch.
+ *
+ * The BOUND `cspin <= min(TST, TSD)` is blind to a widened window: relaxing `inOpener` only ever
+ * grows the boolean on rounds where the whole-round counters already permit it, so the bound itself
+ * still holds on every row. (Measured: dropping the filter entirely does fail the join test too —
+ * but on its pinned tightness literals `[839, 520]`, not on the bound, which is a different check
+ * happening to move. Do not read that as the bound covering this case.)
+ * What pins the window is the DT column, because Double-first is common
+ * outside the window (9 such rounds pooled) and essentially absent inside it (one, a real DT
+ * Cannon). Drop the window filter and those 9 arrive as phantom per-round rows.
+ *
+ * Asserted against `DT_ORDER_IN_OPENER` — a NAMED exception list, not a bound. It compares each
+ * player's per-round DT count to the number of entries naming that session and that player, so a
+ * phantom row fails by construction and so does a deleted real one. `dt_order <= 1` would be
+ * satisfied by any single Double-first round anywhere in the corpus; this is satisfied only by
+ * the one that is really there.
+ */
+test('the window gate: per-round DT rows equal the named exception list, and the mid-game rounds are outside', () => {
+  let midGameDouble = 0;
+  for (const s of SESSIONS) {
+    const o = facts(s).ordering;
+    for (const p of o.players as any[]) {
+      const mine = (o.per_round as any[]).filter(r => r.user === p.user);
+      const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
+      expect([s, p.user, sum(mine.map(r => r.dt_order ?? 0))]).toEqual([s, p.user, known]);
+      // the per-round rows must also reproduce the aggregate they were split out of
+      expect([s, p.user, sum(mine.map(r => r.cspin_order ?? 0))]).toEqual([s, p.user, p.cspin_order]);
+      midGameDouble += p.mid_game.dt_order;
+    }
+  }
+  // the phantoms a dropped window filter would admit — pooled, and they are NOT in the rows above
+  expect(midGameDouble).toBe(9);
+});
+
 test('the join gate: cspin <= min(TST, TSD) per row, and an off-by-one join breaks it', () => {
   let bound = 0, rows = 0;
   for (const s of SESSIONS) {

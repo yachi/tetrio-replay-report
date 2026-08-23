@@ -3176,32 +3176,31 @@ passed 0 of 1355). Because the bound binds on 520 of 900 rows, almost any shuffl
 somewhere. The licensing mutant is in the test: shift the join by one round, and it must fire — it
 does, on every session.
 
-### Still to do
+### Phase 2 landed the same day — items 1-5 below are DONE, 6 is not
 
-1. **The section.** A per-MATCH table in the quarantined section (`opener_section.py`), never a
-   column in 逐局全數據 — the round table's other 25 columns are all `facts.json`, and a
-   simulator column among them reads as verified. Whole-round TSD/TST beside it as anchors,
-   labelled 全局.
-2. **`check_opener_section.py` markers**, three of them, all `--selftest`-registered:
-   - the SCOPE-SPLIT sentence. The window sees **96.0%** of all TST (735/766) but only **20.4%** of
-     all TSD (743/3638), so a row reading `[✓ | TST 1 | TSD 4]` invites scoping all three to the
-     opening when one column is 5× its own window figure. Printing windowed TSD instead is not the
-     fix — `facts.json` has no lock indices, so that column would be simulator-only and the anchor
-     is lost.
-   - the NULL count in the rendered table must equal `per_round`'s null count. Mutant: `cspin: null`
-     → `cspin: 0`.
-   - the CLASS sentence, rewritten in BOTH directions (below).
-3. **The window gate**: per-round DT-order rows must equal `DT_ORDER_IN_OPENER`. Mutant: drop the
-   window filter, which admits the 9 mid-game Double-first rounds as phantom rows. The join gate
-   cannot catch this — widening `inOpener` only grows the boolean where the whole-round counters
-   already permit it.
-4. **The header must never say 「C-Spin」.** Not a style preference: `openers/README.md:36` records
-   0 of 358 clean first bags within 4 cells of any catalogued C-Spin (nearest 6 cells, and the
-   widest name set does not move it), so the identity is refuted by this repo's own metric one table
-   away. Measured mechanism for the 527: **pinglamb opens Honey Cup 153 times pooled against yachi's
-   62** (`named_openers`, harddrop's own drawings), and Honey Cup is a `Triple Double openers`
-   member. Header is 「先Triple後Double（頭三包）」.
-5. **Rewrite the `ordering_class` caveat in both directions.** harddrop, fetched 2026-08-23:
+~~1. **The section.**~~ **DONE.** `_per_match_block` in `opener_section.py`, under 「一 · 次序」 as
+   its own 逐場 table. Not a column in 逐局全數據 — that table's other 25 columns are all
+   `facts.json`, and a simulator column among them reads as verified.
+~~2. **`check_opener_section.py` markers.**~~ **DONE** — `PER_MATCH_SCOPE_MARKER`,
+   `PER_MATCH_NULL_MARKER` / `PER_MATCH_NULL_ZERO_MARKER`, `CLASS_BOTH_MARKER`, all four registered
+   in the `--selftest` deletion loop, plus a named `?? 0` mutant that zeroes every unanswerable
+   round. Selftest went 117 → 116-127 corruptions per session, all caught.
+~~3. **The window gate.**~~ **DONE**, and mutation-tested: dropping the window filter from
+   `orderingRounds` and re-emitting all seven makes it fail. One correction to what was filed here
+   — the join test ALSO fails on that mutant, but on its pinned tightness literals `[839, 520]`,
+   not on the bound, which does still hold on every row. The distinction is written into the test's
+   own comment so the next reader does not conclude the bound covers this case.
+~~4. **The header must never say 「C-Spin」.**~~ **DONE**, and applied to the pre-existing aggregate
+   table too, which read 「C-Spin 次序（先 Triple）」 — leaving two headers in one section naming the
+   same order two different ways would have been worse than either. Both now say 先 Triple 後
+   Double / 先 Double 後 Triple; the opener names live in `_class_note` and the preamble, where the
+   caveat that governs them is. `openers/README.md:36` records 0 of 358 clean first bags within 4
+   cells of any catalogued C-Spin (nearest 6 cells, widest name set does not move it), so the
+   identity is refuted by this repo's own metric one table away. Measured mechanism for the 527:
+   **pinglamb opens Honey Cup 153 times pooled against yachi's 62** (`named_openers`, harddrop's own
+   drawings), and Honey Cup is a `Triple Double openers` member.
+~~5. **Rewrite the `ordering_class` caveat in both directions.**~~ **DONE** — `_class_note` now
+   carries both, gated by `CLASS_BOTH_MARKER`. harddrop, fetched 2026-08-23:
    `Triple_Double_Attack_Setups` says "The Triple Double attack, also known as … **C-Spin** …
    consists of a T-Spin Triple followed by a T-Spin Double" and "Empty field Triple Double setups
    are also known as C-Spins" — which argues the ordering metric IS the wiki's own definition. But
@@ -3210,7 +3209,7 @@ does, on every session.
    Perfect Clear). So Triple→Double over-counts AND under-counts, and the current caveat states only
    the over-direction — the sentence-stronger-than-its-lemma pattern. **The wiki contradicting
    itself is not a licence to adopt the reading that flatters the metric**; record both.
-6. **`wiki_cspin` provenance.** It carries `placements: 38` and nothing else, where the five
+6. **STILL OPEN — `wiki_cspin` provenance.** It carries `placements: 38` and nothing else, where the five
    `named_openers` pages each carry `oldid` + `sha256`. Add `oldid: 42266`, and transcribe the
    definition into a committed JSON — a wiki sentence quoted only in prose is the 冇第二份 class.
    Note also that `wiki_cspin.placements` (38 drawings) and `ordering_class.openers` (38 category

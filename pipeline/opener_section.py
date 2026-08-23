@@ -396,6 +396,16 @@ def _class_note(data):
         "但係<strong>分唔出呢一類入面邊個定式</strong>："
         "如果成晚打嘅係 Honey Cup，上面個表一模一樣會咁樣寫。"
         "下面第四個表就係用開局個板嘅形去分呢一類入面邊個。"
+        # BOTH directions, because stating only the over-count is a sentence stronger than its
+        # evidence. harddrop's own C-Spin page (oldid 42266) says the Triple 「usually」 leads to a
+        # Double and then lists six continuations that are not one — Imperial Cross, Trinity/STSD,
+        # Fractal, LST Stacking, TST Tower, Perfect Clear. A C-Spin taken down any of those roads
+        # never produces the Double this column counts.
+        "反過嚟講都要講清楚：harddrop 嗰版 C-Spin 自己寫「<em>usually</em> followed by a "
+        "T-Spin Double」，跟住列咗六個唔係 Double 嘅接法"
+        "（Imperial Cross、Trinity／STSD、Fractal、LST Stacking、T-Spin Triple Tower、全消）。"
+        "所以呢個次序<strong>兩邊都唔準</strong>——"
+        "數多咗（成類定式都會中），亦都數少咗（C-Spin 接落嗰六個之一就永遠唔會出到個 Double）。"
     )
 
 
@@ -1118,13 +1128,19 @@ def _ordering_table(data):
     ps = _players(data)
     mg = _mid_game(data)
     w = data["window_pieces"]
+    # THE HEADER NAMES THE ORDER, NEVER AN OPENER. It used to read 「C-Spin 次序（先 Triple）」,
+    # which asserts an identity this same section refutes one table down: `openers/README.md`
+    # records 0 of 358 clean first bags within 4 cells of any catalogued C-Spin, and the opener
+    # these players actually run most is Honey Cup — a different member of the same category. The
+    # opener names stay, in `_class_note` and in the section's own preamble, where the caveat that
+    # governs them is; they do not belong in a column head that survives being screenshotted.
     head = ["<th>玩家</th>", "<th>可核回合</th>", "<th>兩種 T-spin 都有</th>",
-            "<th>C-Spin 次序（先 Triple）</th>", "<th>DT 砲次序（先 Double）</th>"]
+            "<th>先 Triple 後 Double</th>", "<th>先 Double 後 Triple</th>"]
     if mg is not None:
         head = ["<th>玩家</th>", "<th>可核回合</th>",
                 f"<th>頭 {w} 手內：兩種都有</th>",
-                f"<th>頭 {w} 手內：先 Triple（C-Spin 次序）</th>",
-                f"<th>頭 {w} 手內：先 Double（DT 砲次序）</th>",
+                f"<th>頭 {w} 手內：先 Triple 後 Double</th>",
+                f"<th>頭 {w} 手內：先 Double 後 Triple</th>",
                 f"<th>第 {w} 手之後：兩種都有</th>",
                 f"<th>第 {w} 手之後：先 Triple</th>",
                 f"<th>第 {w} 手之後：先 Double</th>"]
@@ -1152,6 +1168,142 @@ def _ordering_table(data):
         cells.append(f'<td class="mono">{span}</td>')
         rows.append("          <tr>" + "".join(cells) + "</tr>")
     return head, rows
+
+
+def _per_match(data):
+    """`{(file, user): row}` for the per-match block, or None for an artifact predating it."""
+    pm = data.get("ordering", {}).get("per_match")
+    return pm or None
+
+
+def _per_match_table(data):
+    """One row per match per player: how many of that match's rounds ran Triple-then-Double.
+
+    WHY A SECOND TABLE RATHER THAN A COLUMN IN THE FIRST. The table above is one row per player per
+    SESSION, which cannot show a match where one player ran the order six times out of seven and the
+    other once. On 2026-08-19 that is exactly what happens twice (m6 6:1, m10 6:2) and the session
+    totals 43 and 30 say nothing about it.
+
+    WHY NOT ONE ROW PER ROUND. Measured over 900 player-rounds, the per-round count never reaches 2 —
+    it is the boolean the table above already aggregates, so 900 rows would buy a reader nothing but
+    the chance to misread three differently-scoped columns side by side.
+
+    THE DENOMINATOR TRAVELS WITH THE COUNT. `rounds_scored` is 4-8 per match, which is why this is
+    counts and never a rate, and why 「可核」 is its own column rather than a footnote: k alone
+    invites a reader to supply their own denominator.
+    """
+    pm = _per_match(data)
+    order = {p["user"]: i for i, p in enumerate(_players(data))}
+    rows = []
+    # Sort by match NUMBER, then by the ordering table's own player order so the two tables scan
+    # alike. The number has to be parsed out: a lexicographic sort on `file` puts 第 10 場 second,
+    # right after 第 1 場, which reads as a data error rather than as a sort.
+    for r in sorted(pm, key=lambda r: (_match_no(r["file"]), r["file"], order.get(r["user"], 99))):
+        unscored = r["rounds_unscored"]
+        rows.append(
+            "          <tr>"
+            f'<td class="mono">{html.escape(_match_label(r["file"]))}</td>'
+            f"<td>{html.escape(r['user'])}</td>"
+            f'<td class="mono">{r["cspin_order"]}</td>'
+            f'<td class="mono">{r["rounds_scored"]}</td>'
+            # 0 unscorable rounds is a measurement (every round reached the window); rendering it as
+            # 「—」 would lose that. A NULL CELL and a zero are different claims — see `_null_note`.
+            f'<td class="mono">{unscored if unscored else "—"}</td>'
+            f'<td class="mono">{r["dt_order"]}</td>'
+            "</tr>")
+    w = data["window_pieces"]
+    head = ["<th>場</th>", "<th>玩家</th>",
+            f"<th>先 Triple 後 Double（頭 {w} 手內）</th>",
+            "<th>可核回合</th>", "<th>答唔到</th>",
+            f"<th>先 Double 後 Triple（頭 {w} 手內）</th>"]
+    return head, rows
+
+
+def _match_no(file_name):
+    """The export number in the filename, for ordering. Non-numeric tails sort last rather than
+    raising — a session naming its replays some other way must still render."""
+    tail = file_name.rsplit(".", 1)[0].rsplit("-", 1)[-1]
+    return int(tail) if tail.isdigit() else 10 ** 9
+
+
+def _match_label(file_name):
+    """`replay-2026-08-19-10.ttrm` → `第 10 場`. The trailing number is the EXPORT number in the
+    filename, which is what identifies the file on disk; it is deliberately not renumbered to the
+    match's position in the session, because this table's job is to be joinable against the
+    artifact, and the artifact keys on `file`."""
+    stem = file_name.rsplit(".", 1)[0]
+    tail = stem.rsplit("-", 1)[-1]
+    return f"第 {tail} 場" if tail.isdigit() else stem
+
+
+def _scope_note(data):
+    """THE control this table cannot ship without: its column and the report's TSD/TST columns are
+    scoped to different spans of the round.
+
+    A reader who has both in view will scope all of them to the opening, and the T-spin Double
+    counters do not survive that reading — the opener window holds essentially every Triple and
+    only a fifth of the Doubles. The figures come out of the artifact's own per-round rows rather
+    than being typed, so a corpus that moves moves this sentence with it.
+    """
+    pm = _per_match(data)
+    if not pm:
+        return ""
+    per = data["ordering"]["per_round"]
+    w = data["window_pieces"]
+    tsd = sum(r["tspin_doubles_window"] for r in per)
+    tst = sum(r["tspin_triples_window"] for r in per)
+    return (
+        "<strong>呢個表同報告入面 TSD／TST 嗰兩欄唔同範圍，唔好擺埋一齊讀。</strong>"
+        f"呢度數嘅係頭 {w} 手（三包）之內落嘅 T-spin；"
+        "報告 <code>逐局全數據</code> 嗰兩欄係<strong>成個回合</strong>嘅數，"
+        "由 <code>facts.json</code> 兩個 counter 嚟，兩個抽取器各自讀過。"
+        f"呢個 session 頭 {w} 手入面得 <strong>{tsd}</strong> 個 T-spin Double、"
+        f"<strong>{tst}</strong> 個 T-spin Triple——"
+        "Triple 差唔多全部落喺開局，Double 就大部分喺後面，"
+        "所以兩欄嘅分母差好遠，唔可以當成同一件事嘅兩面。"
+    )
+
+
+def _null_note(data):
+    """「答唔到」 is not 「冇」, and the rule behind it is ASYMMETRIC.
+
+    A round is scored over the verified prefix, which often ends before the opener window does.
+    Truncation can only ever LOSE an order, never invent one — so an observed 1 stands whatever the
+    unobserved remainder holds, and only an unobservable 0 becomes unknown. Nulling every truncated
+    round instead would have moved the published corpus figure 527 → 469.
+    """
+    pm = _per_match(data)
+    if not pm:
+        return ""
+    per = data["ordering"]["per_round"]
+    unknown = sum(1 for r in per if r["cspin_order"] is None)
+    if not unknown:
+        return ("<strong>「答唔到」呢一欄今個 session 全部係零。</strong>"
+                "即係每個回合嘅可核段都行到過個開局窗，冇一格係估。")
+    w = data["window_pieces"]
+    return (
+        "<strong>「答唔到」唔係「冇」。</strong>"
+        f"模擬器可核嗰段有時喺第 {w} 手之前就斷咗；"
+        "斷咗而喺睇到嗰段又搵唔到個次序，咁就係答唔到，唔係答冇。"
+        f"今個 session 有 <strong>{unknown}</strong> 個回合係咁。"
+        "反過嚟，睇到咗嘅就實係真：截斷淨係會令個次序<strong>漏數</strong>，"
+        "整唔出一個本來冇嘅次序出嚟——"
+        "所以「睇到」嘅照計，淨係「睇唔到而又係零」嗰啲先至出「—」。"
+    )
+
+
+def _per_match_block(data):
+    """The per-match table, or nothing at all when the artifact predates it."""
+    pm = _per_match(data)
+    if not pm:
+        return []
+    return [
+        '',
+        '    <h4>逐場</h4>',
+        *_table(*_per_match_table(data)),
+        *_note_block(_scope_note(data)),
+        *_note_block(_null_note(data)),
+    ]
 
 
 def _first_bag_table(data):
@@ -1263,6 +1415,7 @@ def section(data):
         *_table(*_ordering_table(data)),
         *_note_block(_class_note(data)),
         *_note_block(_mid_game_note(data)),
+        *_per_match_block(data),
         '',
         '    <h3>二 · 開局第一個 bag 對唔對得上社群定式庫</h3>',
         '    <div class="method-note">',
