@@ -132,6 +132,12 @@ const catClean = prepared.filter(p => !hasFullRow(p.page.rows)).length;
 const WIKI_CSPIN = JSON.parse(readFileSync(`${import.meta.dir}/wiki-cspin-boards.json`, 'utf8')) as
   { rows: string[]; piece: { row: number; col: number }[]; lines: number }[];
 
+/** harddrop's own words for the two pages this section quotes, with both revisions pinned — see
+ *  `wiki-cspin-source.json`. Committed rather than fetched so the quote has something to disagree
+ *  with it; a wiki sentence living only in prose is the class this repo keeps getting caught by. */
+const WIKI_CSPIN_SOURCE = JSON.parse(
+  readFileSync(`${import.meta.dir}/wiki-cspin-source.json`, 'utf8')) as Record<string, unknown>;
+
 /** filled/empty mask of the window around `cells`, with those cells forced empty — i.e. what the
  *  board looked like just before the piece went in. Same frame as `cspin-match.ts` so the two
  *  agree: rows [minRow-2 .. maxRow+1] x cols [minCol-1 .. maxCol+1]. */
@@ -1442,7 +1448,18 @@ return {
     sets: Object.fromEntries(sets.map(s =>
       [s.key, { label: s.label, openers: s.names.length, pages: s.pages.length, names: s.names }])),
   },
-  wiki_cspin: { source: 'harddrop.com/wiki/C-Spin', placements: WIKI_CSPIN.length },
+  // PROVENANCE, and it is two authorities that agree rather than a hash of our own download.
+  // `placements: 38` was the whole of this key until 2026-08-23, where the five `named_openers`
+  // pages each carried an oldid and a sha256 — so the one page the section quotes in prose was the
+  // one page with nothing pinning it. Each revision below carries MediaWiki's OWN rev_sha1 and a
+  // sha1 recomputed from `action=raw`; they agree, which is the cvc5 standard rather than z3's
+  // trust-on-first-use. Note the two numbers that are both 38 and are unrelated: the C-Spin page's
+  // PLACEMENTS here, and `ordering_class.openers`, the category's MEMBERS.
+  wiki_cspin: {
+    source: 'harddrop.com/wiki/C-Spin',
+    placements: WIKI_CSPIN.length,
+    ...WIKI_CSPIN_SOURCE,
+  },
   first_bag: {
     rounds: roundsTotal,
     clean: bags.length,

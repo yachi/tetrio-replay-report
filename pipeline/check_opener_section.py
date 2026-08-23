@@ -218,8 +218,12 @@ PER_MATCH_NULL_ZERO_MARKER = "冇一格係估"
 
 # THE CLASS CAVEAT'S SECOND DIRECTION. `_class_note` has always said the ordering over-counts (the
 # whole `Triple Double openers` category fires it). It also UNDER-counts: harddrop's C-Spin page
-# (oldid 42266) says the Triple is 「usually」 followed by a Double and then lists six continuations
-# that are not one, so a C-Spin taken down any of them never produces the Double this column counts.
+# (oldid 42266) says the Triple is 「usually」 followed by a Double, and its 「T-Spin Triple and
+# Imperial Cross」 continuation says to replace the Double outright — so a C-Spin down that road
+# never produces the Double this column counts. ONE continuation, not six: an earlier revision of
+# this comment said six, counting the section headings instead of reading them. LST Stacking and
+# T-Spin Triple Tower both describe what follows a T-Spin Double, and Trinity / STSD branches on
+# whether the TSD was already done, so all three still fire the column.
 # Stating one direction and not the other is a sentence stronger than its evidence, which is the
 # defect this repo keeps re-shipping under new names.
 CLASS_BOTH_MARKER = "兩邊都唔準"
@@ -330,7 +334,8 @@ def problems(data, doc):
             bad.append(
                 f"the class caveat states only one direction ({CLASS_BOTH_MARKER!r} missing) — "
                 "the ordering over-counts (the whole Triple Double category fires it) AND "
-                "under-counts (harddrop lists six non-Double continuations of the C-Spin); "
+                "under-counts (harddrop's C-Spin page says 「usually」, and its 「T-Spin Triple "
+                "and Imperial Cross」 continuation replaces the Double outright); "
                 "publishing half of that is a sentence stronger than its evidence")
         unknown = sum(1 for r in data["ordering"]["per_round"] if r["cspin_order"] is None)
         marker = PER_MATCH_NULL_MARKER if unknown else PER_MATCH_NULL_ZERO_MARKER

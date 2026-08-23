@@ -3204,12 +3204,37 @@ does, on every session.
    `Triple_Double_Attack_Setups` says "The Triple Double attack, also known as … **C-Spin** …
    consists of a T-Spin Triple followed by a T-Spin Double" and "Empty field Triple Double setups
    are also known as C-Spins" — which argues the ordering metric IS the wiki's own definition. But
-   `C-Spin` (oldid 42266) attributes the name to the C shape formed by J and L and lists six
-   non-Double continuations (Imperial Cross, Trinity/STSD, Fractal, LST Stacking, TST Tower,
-   Perfect Clear). So Triple→Double over-counts AND under-counts, and the current caveat states only
+   `C-Spin` (oldid 42266) attributes the name to the C shape formed by J and L, says the Double is
+   「usually」 the follow-up rather than part of the definition, and in 「T-Spin Triple and Imperial
+   Cross」 says to *replace the T-Spin Double* with a Triple or an Imperial Cross. **That is ONE
+   continuation, not the six this entry first claimed** — the six came from counting the section
+   headings; reading them, LST Stacking and T-Spin Triple Tower both describe what happens AFTER a
+   T-Spin Double and Trinity / STSD branches on whether the TSD was already done, so all three
+   still fire the column. Caught while transcribing the page for item 6, i.e. by doing the thing
+   the item exists to force. So Triple→Double over-counts AND under-counts, and the caveat stated only
    the over-direction — the sentence-stronger-than-its-lemma pattern. **The wiki contradicting
    itself is not a licence to adopt the reading that flatters the metric**; record both.
-6. **STILL OPEN — `wiki_cspin` provenance.** It carries `placements: 38` and nothing else, where the five
+~~6. **`wiki_cspin` provenance.**~~ **DONE** — `pipeline/sim/wiki-cspin-source.json`, merged into
+   `wiki_cspin` by the emitter. Both revisions are pinned by **two independent authorities that
+   agree**: MediaWiki's own `rev_sha1`, and a sha1 recomputed here from `action=raw` (C-Spin
+   `0fa75e5a…`, 31 806 bytes, oldid 42266; Triple Double Attack Setups `7f141bd8…`, 18 082 bytes,
+   oldid 42795). That is the cvc5 standard in CLAUDE.md, not z3's trust-on-first-use — worth saying
+   because a sha256 of our own download would have looked identical in the file and proved less.
+   Everything outside `wiki_cspin` re-emitted byte-identical on all seven sessions.
+
+   **Transcribing the page corrected a figure this very ROADMAP entry had shipped.** Item 5 above
+   said harddrop lists SIX non-Double continuations. That was arrived at by counting the page's
+   section headings. Reading them, of the 7 continuations exactly **one** replaces the Double —
+   「T-Spin Triple and Imperial Cross」, which says so in those words; 「LST Stacking」 and 「T-Spin
+   Triple Tower」 both describe what happens AFTER a T-Spin Double and 「Trinity / STSD」 branches on
+   whether the TSD was already done, so all three still fire the metric. The wrong count reached
+   `CLAUDE.md`'s neighbouring text, this file, `opener_section.py` and all seven `report.html`
+   before the transcription existed to contradict it. `replaces_the_double` is now a per-heading
+   flag set by reading, pinned as literals in `openers.test.ts`, and the whole episode is the
+   argument for the item: **the under-count claim was itself a sentence stronger than its evidence,
+   and only a committed copy of the source could catch that.** A URL in a comment could not.
+
+   Left as originally filed, because it is still true: It carries `placements: 38` and nothing else, where the five
    `named_openers` pages each carry `oldid` + `sha256`. Add `oldid: 42266`, and transcribe the
    definition into a committed JSON — a wiki sentence quoted only in prose is the 冇第二份 class.
    Note also that `wiki_cspin.placements` (38 drawings) and `ordering_class.openers` (38 category
