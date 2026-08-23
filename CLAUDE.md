@@ -201,9 +201,9 @@ push instead of only locally.
 Until that date the answer was the runner instead. CI sat on `ubuntu-22.04`, whose glibc is 2.35,
 and every z3 release after 4.14.1 ships `x64-glibc-2.39` only — so CI could run just the one z3 old
 enough to load, and the `pipeline` job could not run z3 at all. **ubuntu-22.04's deprecation is what
-moved the runners**, and the solver constraint fell out with it: all 13 jobs are on 24.04 (twelve
-`ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and `Z3_VERSION` is
-4.16.0.
+moved the runners**, and the solver constraint fell out with it: all 14 jobs are on 24.04
+(thirteen `ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and
+`Z3_VERSION` is 4.16.0.
 
 **The pin got better, and by exactly one step — do not write it up as two.** GitHub publishes no
 asset `digest` for **any** z3 build against glibc-2.35, and those releases carry no signature,
@@ -235,22 +235,66 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **13 job definitions
-  across 3 workflows, which expanded to 26 check runs on 2026-08-20** — `verify` is a matrix over
+  byte-identical to what is committed. Weekly runs add mutation testing. **14 job definitions
+  across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
   `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Ten of those jobs are repo-wide, and `bin/` can run exactly one of them.** `bin/new-session`
-  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and
-  every gate it runs is internal to it. Nothing runs `cross-extractor`, `leave-one-out`,
+- **Eleven of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
+  gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
-  `coverage` — only `docs`, via `bin/build-docs --check`. So the last mile of adding a session is
+  `coverage` — only `docs`, via `bin/build-docs --check` — so the last mile of adding a session was
   discovered from CI rather than locally, which on 2026-08-20 cost three push→CI→fix cycles for
-  four failures that were all reproducible in minutes. See the ROADMAP item for `bin/verify-repo`;
-  until it exists, read the workflow files and run their commands by hand before the first push.
+  four failures that were all reproducible in minutes.
+
+  `bin/verify-repo` closes that, and **the way it holds is the part to keep, not the fact that it
+  exists**: it does not carry a list of commands, it READS the workflow files and runs each job's
+  own `run:` blocks. A list would have been the eleventh hand-maintained list in this repo and it
+  would go stale in the direction that reads green. So every job must appear in its `PLAN` — run at
+  a tier, or excused by a named predicate with a reason — and six things are errors rather than
+  skips: a job in CI that `PLAN` does not name, a `PLAN` entry no job answers to, a step skipped by
+  a name no step has, a step carrying an `if:` nobody decided, a step whose `${{ }}` cannot be
+  resolved here, and a step reading a `$GITHUB_*` / `$RUNNER_*` variable the script does not supply.
+  A plain new `run:` step, by contrast, is **absorbed silently and runs**, and there is a control
+  asserting exactly that, because it is what tells derivation from copying. `workflow-plan` is the
+  CI job that checks all of it, because a script standing in for CI that CI does not check is the
+  manual-only gate this repo has now paid for three times.
+
+  ```bash
+  bin/verify-repo               # every repo-wide gate a push would run
+  bin/verify-repo --fast        # omit the slow tier (coverage, oracle-image)
+  bin/verify-repo --weekly      # add the schedule-only jobs and steps (mutation, coverage-round)
+  bin/verify-repo --sessions    # add the `verify` and `pipeline` matrices, from the workflow's own lists
+  bin/verify-repo --only docs   # reproduce ONE red job, whatever its tier
+  bin/verify-repo --check       # completeness only: is this script still CI's equal
+  ```
+
+  **`RUNNER_TEMP` is why "run the workflow's own commands" is not free.** The `pipeline` job's Dafny
+  step reads it, and under `set -u` a local run dies with `unbound variable` — which is how the first
+  `--only pipeline` failed all seven sessions in nine seconds. The runner-provided variables with an
+  honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
+  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+  `$GITHUB_*` or `$RUNNER_*` reference is a completeness error**, so the next one is refused up front
+  rather than dying halfway through a matrix.
+
+  Two things it deliberately does NOT do. `oracle-image` needs an aarch64-**linux** runner, so on a
+  Mac it is named as skipped rather than quietly dropped — every unrun job, unrun step and toolchain
+  version that differs from the workflow's pin is printed in the summary, because a run that covered
+  less than it claimed is the failure the tool was written to stop. And it does not replace
+  `bin/verify-session`: `--sessions` runs the two matrices, but the default does not, and the
+  summary says so.
+
+  **The `pipeline` matrix is where `bin/verify-session` turned out to be narrower than CI**, found
+  while writing this: `verify-session` runs 7 gates over an artefact directory, while CI's
+  `pipeline` job runs 18 steps per session — `build_report --check`, `check_prose_figures`,
+  `check_generated_css`, `check_finesse_denominator`, `check_badge_links`, `check_report_shell`, the
+  forecast/opener/wiki section gates and `check_smt` are in the second list and not the first. That
+  is not a bug in `verify-session`, whose scope is deliberate, but it does mean **`bin/verify-repo
+  --sessions` is the only local command that runs everything a push runs**.
 - **A figure with a renderer is PASTED, never typed.** `check_equiv_coverage`, `check_intense_corpus`
   and `check_loo` each emit their published blocks (`--render`), and the renderer and the parser
   live in one file so a reword is a one-place edit. Hand-editing one of those sentences can

@@ -3080,7 +3080,7 @@ Not filed, because it is already open above: `analysis/rate_records.R` running i
 and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
 and unguarded session list.
 
-## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23)
+## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23) — DONE (2026-08-23)
 
 Filed from the 2026-08-20 retrospective. Four gates went red on PR #14 (`docs`, `manifest`,
 `preregistrations`, `coverage`) and **three of them were reproducible locally in minutes** — they
@@ -3107,10 +3107,20 @@ to the script leaves the script silently narrower than the thing it stands in fo
 the `bin/build-docs` `ARTEFACTS` failure mode, which was closed by checking the list against disk
 rather than by maintaining it more carefully.
 
-Two tiers, because wall clock is the reason a person skips it: `--fast` omits `coverage`
+~~Two tiers, because wall clock is the reason a person skips it: `--fast` omits `coverage`
 (~25 min for the corpus at two granularities) and `oracle-image` (~6 min); the default runs
-everything. Done when the four failures of 2026-08-20 are all caught by one local command, and
-when a job added to a workflow but unknown to the script is itself an error rather than a skip.
+everything.~~ **Shipped with four tiers rather than two, and that parenthetical was wrong in a way
+worth keeping: ~25 min is the UNNARROWED `check_equiv_coverage --check`, which is the
+`coverage-round` job.** The `coverage` job runs `--modes single_value,two_site_match` and takes
+~4 min. Two figures from the same tool, one of them six times the other; the workflow's own comment
+distinguishes them and this item did not.
+
+**Done, on both criteria.** The four failures of 2026-08-20 are all caught by `bin/verify-repo`
+(`docs`, `manifest`, `preregistrations`, `coverage` — measured, all four run and pass locally), and
+a job added to a workflow and unknown to the script is an error rather than a skip — demonstrated
+against the real thing, because appending the `workflow-plan` job to `verify.yml` made
+`bin/verify-repo --check` exit 1 naming it before its `PLAN` entry was written. See the section
+below for what the build turned up.
 
 ## C-Spin 逐局／逐場 — Phase 1 landed, the section and its gates are not (2026-08-23)
 
@@ -3243,3 +3253,116 @@ does, on every session.
 **Never a rate, at any granularity.** Per-match `rounds_scored` is 4-8. Same rule 全消 follows for
 its 3-12 round denominators, and `per_match` carries `rounds_unscored` so the denominator travels
 with the count rather than being reconstructed by a reader.
+
+## `bin/verify-repo` — 個 last mile 有工具喇 (2026-08-23)
+
+Closes the item above. `bin/verify-repo` runs the repo-wide CI jobs locally; `workflow-plan` is the
+CI job that checks it still can.
+
+**The shape is the deliverable, not the coverage.** The item's one design constraint was "derive the
+command list from the workflow files, do not copy it", and the script takes that literally: it scans
+`.github/workflows/*.yml`, and the text it executes is each step's own `run:` block. Nothing in the
+script names a gate. What it carries instead is a `PLAN` — one entry per job, either a tier to run it
+at or a reason it cannot run here — and six completeness rules, each of which is an error rather
+than a skip:
+
+| rule | the drift it closes |
+|---|---|
+| every job in CI is in `PLAN` | a job added to CI, script silently narrower |
+| every `PLAN` entry names a real job | a job removed or renamed, entry rots |
+| every skipped step name exists | a step renamed, its skip silently covers nothing |
+| every step carrying `if:` is decided in `PLAN` | a conditional step neither run nor declared |
+| every runnable step's `${{ }}` resolves | a step run with a hole in it, green and wrong |
+| every `$GITHUB_*` / `$RUNNER_*` read is supplied | a runner variable that dies mid-matrix under `set -u` |
+
+And one rule that runs the other way, which is the one that says the list is derived: **a plain new
+`run:` step is absorbed and runs**, with a control asserting it. If that control ever fails, the
+command list has become a copy and the argument for the script's shape is gone.
+
+**The gate was demonstrated against the real workflow, not only against a mutant.** Appending
+`workflow-plan` to `verify.yml` made `bin/verify-repo --check` exit 1 —
+`verify.yml:908: job 'workflow-plan' is in CI and unknown to bin/verify-repo` — before its `PLAN`
+entry existed. That is the acceptance criterion firing on the first real job added after it was
+written, which is better evidence than any planted case.
+
+**Two independent parsers, and PyYAML is the oracle.** The scanner is stdlib-only, because every
+python gate in this repo runs on whatever `python3` is on PATH and a runtime dependency on PyYAML
+would be a new way for the gate to be absent rather than red. It is strict: any construct it does
+not recognise is a parse error, so it cannot silently read less than is there. `--selftest`
+cross-checks it against PyYAML when PyYAML is importable, on every job id, step name and `run:` text
+— 14 jobs, 72 steps. **The oracle earned its place on the first run**: the scanner kept the trailing
+`# v4.2.2` on `uses: actions/checkout@<sha>  # v4.2.2`, where YAML ends a plain scalar at an unquoted
+` #`. Harmless there, but it is the class of difference that would have made a `run:` line execute a
+shell comment as an argument.
+
+`--selftest` is 10 planted corruptions (all caught) plus 4 controls: the committed workflows parse
+and are fully planned, the PyYAML oracle agrees, no scanned matrix is empty (an empty one would make
+`--sessions` a silent no-op), and the absorption control above.
+
+**The tenth corruption exists because the first real matrix run failed, and the failure is the most
+transferable thing here.** `--only pipeline` died on all seven sessions in nine seconds:
+`RUNNER_TEMP: unbound variable`. `RUNNER_TEMP` is provided by the GitHub runner, the `pipeline` job's
+Dafny step reads it, and `set -u` does the rest. Running CI's commands verbatim means providing CI's
+*environment* too — and the fix is not only to supply it. Supplying variables one crash at a time is
+the same shape as discovering red jobs one push at a time, one level down. So the ones with an
+honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
+`GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+`$GITHUB_*` or `$RUNNER_*` reference is a completeness error**. The mutant plants `$RUNNER_ARCH` in a
+step and requires it refused.
+
+### Measured, and one of them changes what the item said
+
+| | |
+|---|---|
+| jobs | **14** across 3 workflows (13 before `workflow-plan`) |
+| repo-wide | **11** — was 10; `bin/` could run 1 of them, now 10 of 11 on a Mac (`oracle-image` needs Linux) |
+| `bin/verify-repo --fast` | **4 m 12 s**, 8 jobs, all pass — `bun test` is 177 s of it |
+| `bin/verify-repo` (default) | **10 m 20 s**, 10 of 10 jobs pass |
+| `bin/verify-repo --sessions` | **16 m 00 s**, **25 of 25 jobs pass**, working tree clean after |
+| `--only pipeline` / `--only verify` | **3 m 31 s** (7 sessions) · **3 m 50 s** (8 artefacts) |
+| the `coverage` job | **~4 min**, not the ~25 min the item wrote |
+| toolchain divergence | none — local dafny 4.11.0, z3 4.16.0, cvc5 1.3.4 are the pins |
+
+The `~25 min` in the item was the unnarrowed `check_equiv_coverage --check`, i.e. the `coverage-round`
+job, quoted against `coverage`. Both figures are in `equiv-coverage.yml`'s own comments and the item
+took the wrong one, which is the ordinary way a number goes wrong here: not measured freshly and
+wrong, but measured correctly for a neighbour.
+
+### What the build found that the item did not: `bin/verify-session` is narrower than CI
+
+Writing the `PLAN` entry for the `pipeline` matrix meant reading its steps, and they do not match
+what any `bin/` script runs:
+
+| | steps |
+|---|---|
+| CI's `pipeline` job, per session | **18** |
+| `bin/verify-session`, per artefact | **7** |
+
+`build_report --check`, `check_prose_figures`, `check_generated_css`, `check_finesse_denominator`,
+`check_badge_links`, `check_report_shell`, the forecast / opener / wiki-transcription gates and
+`check_smt` are in the first list and not the second. That is not a defect in `verify-session` —
+its scope is one artefact directory and it says so — but it does mean the per-session last mile had
+the same hole as the repo-wide one, one level down, and the item only named the repo-wide half.
+`bin/verify-repo --sessions` expands both matrices **from the workflow's own matrix lists** and runs
+them, so it is now the only local command that runs everything a push runs.
+
+Note what it inherits by doing that: those two matrix lists are hand-maintained session lists
+(`verify.yml:44-51,179-180`), and 「Gating equiv.py coverage」 (2026-08-15) records them as
+deliberately still open because they cannot glob. `--sessions` reproduces CI faithfully, which means
+it reproduces that staleness too. It does not make the lists worse and it does not fix them; a fix
+is still that item's.
+
+### Standing rules this adds
+
+- **A script that stands in for CI must be checked BY CI.** `workflow-plan` exists for the reason
+  `dual-backed.yml` and `equiv-coverage.yml` exist: this repo has measured three times what a gate
+  nobody runs is worth. A completeness check that only runs when someone remembers to run the tool
+  degrades exactly when the tool is most out of date.
+- **One escape hatch, not two.** The first draft could excuse a job two ways — a `why=` reason and a
+  `linux_only=` flag — and only the second was ever taken, so the first was a capability the
+  contract advertised and nothing exercised. They are one named predicate now, evaluated per run,
+  which also means a Linux machine runs `oracle-image` instead of excusing it forever.
+- **Print every skip.** The summary names each unrun job, each skipped step, each toolchain whose
+  local version is not the workflow's pin, and the per-session gates it did not run. A run that
+  quietly covered less than it claimed is the failure this tool was written to stop; a tool that
+  produced it would be the joke version of itself.

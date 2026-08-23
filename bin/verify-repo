@@ -1,0 +1,817 @@
+#!/usr/bin/env python3
+"""Run the REPO-WIDE CI gates locally — the last mile no other bin/ script reaches.
+
+    bin/verify-repo              every repo-wide gate a push to a PR would run
+    bin/verify-repo --fast       omit the slow tier (coverage, oracle-image)
+    bin/verify-repo --weekly     add the schedule-only jobs and steps
+    bin/verify-repo --sessions   add the two per-session matrices, expanded from the workflow
+    bin/verify-repo --check      completeness only: run nothing, just check this script
+                                 still knows every job and step in .github/workflows/
+    bin/verify-repo --list       print the plan and exit
+    bin/verify-repo --selftest   plant corruptions and require each to be rejected
+
+WHY THIS EXISTS.  `bin/new-session` covers steps 1-6 of adding a session and
+`bin/verify-session` takes ONE artefact directory, where every gate it runs is
+internal to that directory.  Ten of the thirteen CI jobs are repo-wide, and `bin/`
+could run exactly one of them (`docs`, via `bin/build-docs --check`).  So the last
+mile of adding a session was discovered from GitHub rather than locally: on
+2026-08-20 four jobs went red on PR #14 (`docs`, `manifest`, `preregistrations`,
+`coverage`) and three were reproducible here in minutes.  Three push->CI->fix
+cycles, with the user in the loop for each.
+
+THE ONE DESIGN CONSTRAINT.  The command list is DERIVED from the workflow files,
+never copied.  A hardcoded list in here would be the eleventh hand-maintained
+list in this repo and it would fail in the direction that reads green — a job
+added to CI and not to the script leaves the script silently narrower than the
+thing it stands in for.  So:
+
+  * every job in .github/workflows/*.yml must appear in PLAN, and every PLAN
+    entry must name a job that exists.  Either direction is an error.
+  * inside a job we run, every `run:` step must be either executed or named in
+    that entry's `skips` with a reason.  A new step is an error, and so is a
+    `skips` key no step matches.
+  * the text executed is the step's own `run:` block, read out of the YAML.  A
+    command that changes in CI changes here, with nothing to update.
+
+That is the same shape as check_finesse_denominator's rule that every plotted
+accessor must be classified: an unclassified key fails, so a new one forces the
+decision instead of leaving it to whoever notices.
+
+WHAT IT IS NOT.  It does not replace `bin/verify-session`; by default it does not
+run the `verify` and `pipeline` matrices at all (`--sessions` does).  And it
+reports, rather than hides, every divergence from CI: a job it could not run, a
+step it skipped, a toolchain whose local version is not the pinned one.  A run
+that quietly covered less than it claimed would be the very failure this tool was
+written to stop happening in CI.
+
+NO PyYAML AT RUNTIME.  Every python gate in this repo is stdlib-only and runs on
+whatever `python3` is on PATH, in CI too.  The scanner below is a strict line
+reader that REFUSES any construct it does not recognise, so it cannot silently
+parse less than is there.  `--selftest` cross-checks it against PyYAML when PyYAML
+is importable — a second implementation as the oracle, which is this repo's own
+argument for the extractors applied one level up.
+"""
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+WORKFLOWS = REPO / ".github" / "workflows"
+
+# ---------------------------------------------------------------- the scanner
+
+# Keys valid directly under jobs.<id> per the workflow syntax.  An unknown key is
+# a parse error, not a skip: a job carrying something this scanner cannot model
+# may well be doing something it cannot reproduce.
+JOB_KEYS = {
+    "name", "permissions", "needs", "if", "runs-on", "environment", "concurrency",
+    "outputs", "env", "defaults", "steps", "strategy", "continue-on-error",
+    "container", "services", "timeout-minutes",
+}
+STEP_KEYS = {
+    "name", "id", "if", "uses", "run", "with", "env", "working-directory",
+    "shell", "continue-on-error", "timeout-minutes",
+}
+
+
+class ParseError(Exception):
+    pass
+
+
+class Step:
+    def __init__(self, name, uses=None, run=None, cond=None, workdir=None, line=0):
+        self.name, self.uses, self.run = name, uses, run
+        self.cond, self.workdir, self.line = cond, workdir, line
+
+    @property
+    def kind(self):
+        return "uses" if self.uses is not None else "run"
+
+
+class Job:
+    def __init__(self, file, name, line, env=None):
+        self.file, self.name, self.line = file, name, line
+        # The workflow-level `env:` this job sees. Held per job rather than merged
+        # across files: today only verify.yml defines one, so a union is harmless —
+        # and that is exactly the kind of accident that stops being harmless quietly.
+        self.env = env if env is not None else {}
+        self.runs_on = None
+        self.cond = None
+        self.matrix = {}
+        self.steps = []
+
+
+def _indent(s):
+    return len(s) - len(s.lstrip(" "))
+
+
+def _blank(s):
+    return not s.strip() or s.lstrip().startswith("#")
+
+
+def _plain(val):
+    """A plain YAML scalar ends at an unquoted ` #`.  The scanner must strip that
+    the way the real parser does, or `uses: x@sha  # v4.2.2` compares unequal to
+    what GitHub reads — which is exactly what the PyYAML oracle caught."""
+    return re.sub(r"\s+#.*$", "", val.strip()).strip()
+
+
+def scan_workflow(path, text):
+    """Return (env, [Job]) for one workflow file.  Raises on anything unrecognised."""
+    lines = text.split("\n")
+    env, jobs = {}, []
+
+    # top-level `env:` — the map the ${{ env.X }} interpolations resolve against.
+    i = 0
+    while i < len(lines):
+        if lines[i].rstrip() == "env:":
+            i += 1
+            while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) >= 2):
+                m = re.match(r"^  ([A-Za-z_][A-Za-z0-9_]*): *(.*)$", lines[i])
+                if m:
+                    env[m.group(1)] = m.group(2).strip()
+                i += 1
+            continue
+        if lines[i].rstrip() == "jobs:":
+            break
+        i += 1
+    else:
+        raise ParseError(f"{path.name}: no top-level `jobs:`")
+
+    i += 1
+    job = None
+    while i < len(lines):
+        ln, n = lines[i], _indent(lines[i])
+        if _blank(ln):
+            i += 1
+            continue
+        if n == 0:
+            # `jobs:` is last in all three files, and this scanner assumes it.
+            raise ParseError(f"{path.name}:{i+1}: column-0 content after `jobs:` — "
+                             f"the scanner assumes `jobs:` is the final top-level key")
+        if n == 2:
+            m = re.match(r"^  ([A-Za-z0-9_-]+): *$", ln)
+            if not m:
+                raise ParseError(f"{path.name}:{i+1}: expected a job id, got {ln!r}")
+            job = Job(path.name, m.group(1), i + 1, env)
+            jobs.append(job)
+            i += 1
+            continue
+        if job is None:
+            raise ParseError(f"{path.name}:{i+1}: content before the first job")
+        if n == 4:
+            m = re.match(r"^    ([A-Za-z0-9_-]+): *(.*)$", ln)
+            if not m:
+                raise ParseError(f"{path.name}:{i+1}: expected a job key, got {ln!r}")
+            key, val = m.group(1), _plain(m.group(2))
+            if key not in JOB_KEYS:
+                raise ParseError(f"{path.name}:{i+1}: unknown job key {key!r} in job {job.name!r}")
+            if key == "runs-on":
+                job.runs_on = val
+            elif key == "if":
+                job.cond = val
+            if key == "steps":
+                i = _scan_steps(path, lines, i + 1, job)
+                continue
+            if key == "strategy":
+                i = _scan_strategy(path, lines, i + 1, job)
+                continue
+            i += 1
+            # consume any nested block belonging to this key
+            while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 4):
+                i += 1
+            continue
+        raise ParseError(f"{path.name}:{i+1}: unexpected indent {n} — {ln!r}")
+    return env, jobs
+
+
+def _scan_strategy(path, lines, i, job):
+    """Capture matrix dimensions so the two matrices can be expanded, not retyped."""
+    dim = None
+    while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 4):
+        ln = lines[i]
+        if _blank(ln):
+            i += 1
+            continue
+        n = _indent(ln)
+        if n == 8:                                  # matrix dimension name
+            m = re.match(r"^        ([A-Za-z0-9_-]+): *(.*)$", ln)
+            if not m:
+                raise ParseError(f"{path.name}:{i+1}: expected a matrix key, got {ln!r}")
+            dim, inline = m.group(1), _plain(m.group(2))
+            job.matrix.setdefault(dim, [])
+            if inline:                              # flow sequence on one or more lines
+                buf = inline
+                while not buf.rstrip().endswith("]"):
+                    i += 1
+                    buf += " " + lines[i].strip()
+                job.matrix[dim] = [v.strip().strip("'\"")
+                                   for v in buf.strip()[1:-1].split(",") if v.strip()]
+        elif n == 10 and ln.lstrip().startswith("- "):
+            if dim is None:
+                raise ParseError(f"{path.name}:{i+1}: matrix entry before a dimension")
+            job.matrix[dim].append(ln.strip()[2:].strip().strip("'\""))
+        i += 1
+    return i
+
+
+def _scan_steps(path, lines, i, job):
+    step = None
+    while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 4):
+        ln = lines[i]
+        if _blank(ln):
+            i += 1
+            continue
+        n = _indent(ln)
+        if n == 6 and ln.lstrip().startswith("- "):
+            step = Step(None, line=i + 1)
+            job.steps.append(step)
+            rest = ln[8:]
+            ln, n = "        " + rest, 8            # fall through to the key below
+        if n != 8:
+            raise ParseError(f"{path.name}:{i+1}: expected a step key at indent 8, got {ln!r}")
+        if step is None:
+            raise ParseError(f"{path.name}:{i+1}: step key before any `- `")
+        m = re.match(r"^        ([A-Za-z0-9_-]+): *(.*)$", ln)
+        if not m:
+            raise ParseError(f"{path.name}:{i+1}: expected a step key, got {ln!r}")
+        key, val = m.group(1), m.group(2)
+        if key not in STEP_KEYS:
+            raise ParseError(f"{path.name}:{i+1}: unknown step key {key!r}")
+        if key == "run":
+            if val.strip() == "|":
+                body, i = _block(path, lines, i + 1)
+                step.run = body
+                continue
+            if val.strip() in (">", ">-", "|-", "|+"):
+                raise ParseError(f"{path.name}:{i+1}: unsupported block scalar {val.strip()!r} "
+                                 f"— only `run: |` and a single line are modelled")
+            step.run = _plain(val)
+        elif key == "name":
+            step.name = _plain(val)
+        elif key == "uses":
+            step.uses = _plain(val)
+        elif key == "if":
+            step.cond = _plain(val)
+        elif key == "working-directory":
+            step.workdir = _plain(val)
+        i += 1
+        if key in ("with", "env"):                  # nested map
+            while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 8):
+                i += 1
+    return i
+
+
+def _block(path, lines, i):
+    """Read a `run: |` literal block scalar.  Comment lines inside it are SHELL
+    comments and part of the script — never skipped."""
+    while i < len(lines) and not lines[i].strip():
+        i += 1
+    if i >= len(lines):
+        raise ParseError(f"{path.name}: `run: |` with no body")
+    base = _indent(lines[i])
+    if base <= 8:
+        raise ParseError(f"{path.name}:{i+1}: `run: |` body is not indented past the key")
+    out = []
+    while i < len(lines) and (not lines[i].strip() or _indent(lines[i]) >= base):
+        out.append(lines[i][base:] if lines[i].strip() else "")
+        i += 1
+    return "\n".join(out).rstrip() + "\n", i
+
+
+def load():
+    env, jobs = {}, []
+    for p in sorted(WORKFLOWS.glob("*.yml")):
+        e, j = scan_workflow(p, p.read_text())
+        env.update(e)
+        jobs.extend(j)
+    return env, jobs      # `env` is the union, kept only for callers wanting a summary
+
+
+# ------------------------------------------------------------------- the plan
+
+FAST, DEFAULT, SLOW, WEEKLY, SESSIONS = "fast", "default", "slow", "weekly", "sessions"
+
+# The pinned toolchains.  CI installs each by sha256; locally we use what is on
+# PATH and REPORT the version, because a gate that verified with a different
+# verifier reproduced something other than CI.
+TOOLCHAIN = {"dafny": "DAFNY_VERSION", "z3": "Z3_VERSION", "cvc5": "CVC5_VERSION"}
+
+# Why every install step is skipped rather than run: they `curl` a pinned asset
+# and append to $GITHUB_PATH, neither of which means anything here.  The version
+# check in its place is what says whether the local toolchain is CI's.
+_TOOLCHAIN_SKIP = "installs a pinned asset into $GITHUB_PATH; the local %s is checked instead"
+
+
+# A job may be unrunnable HERE without being unplanned. `unless` is the one
+# mechanism for that — a named predicate and the reason — deliberately not a second
+# "skip" field beside it: two ways to excuse a job is how one of them stops being
+# exercised, and an escape hatch nothing takes is indistinguishable from a comment.
+# The predicate is evaluated per run, so on a Linux box `oracle-image` runs rather
+# than being permanently excused, and either way the summary names it.
+PREDICATES = {"linux": (lambda: sys.platform == "linux")}
+
+
+class Entry:
+    def __init__(self, tier, skips=None, needs=(), matrix=None, unless=None):
+        self.tier, self.skips = tier, dict(skips or {})
+        self.needs, self.matrix = tuple(needs), matrix
+        self.unless = unless          # (predicate name, reason) or None
+
+    def blocked(self):
+        """The reason this cannot run here, or None."""
+        if self.unless and not PREDICATES[self.unless[0]]():
+            return self.unless[1]
+        return None
+
+
+PLAN = {
+    # ---- the two per-session matrices.  Not repo-wide, so not in any default run.
+    "verify": Entry(SESSIONS, matrix="artefact", needs=["dafny", "z3"], skips={
+        "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
+        "Install z3 ${{ env.Z3_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "z3",
+    }),
+    "pipeline": Entry(SESSIONS, matrix="session", needs=["dafny", "z3", "cvc5"], skips={
+        "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
+        "Install cvc5 ${{ env.CVC5_VERSION }} and z3 ${{ env.Z3_VERSION }} (pinned by sha256)":
+            _TOOLCHAIN_SKIP % "cvc5/z3",
+        "Mutation-test the generated proofs":
+            "schedule/inputs.mutation only — MUTATION=1 bin/verify-session runs it",
+    }),
+
+    # ---- the repo-wide set: what only this script reaches.
+    "cross-extractor": Entry(DEFAULT, needs=["bun", "jq", "sha256sum"]),
+    "docs": Entry(FAST),
+    "leave-one-out": Entry(FAST),
+    "intense-round-corpus": Entry(FAST),
+    "preregistrations": Entry(FAST),
+    # This script's own gate. Running it here is not circular: the job's two commands
+    # are --selftest and --check, neither of which executes any job, and both of which
+    # are exactly what a local run should confirm before a push.
+    "workflow-plan": Entry(FAST),
+    "typescript": Entry(DEFAULT, needs=["bun"]),
+    "manifest": Entry(DEFAULT, needs=["bun"]),
+    "spec": Entry(DEFAULT, needs=["dafny"], skips={
+        "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
+        "Mutation-test the spec": "schedule/inputs.mutation only — --weekly runs it",
+    }),
+    "coverage": Entry(SLOW),
+    # `nix build .#cc-oracle-image` targets aarch64-linux; the job's own comment says
+    # it is built "the way the local Mac could not".
+    "oracle-image": Entry(SLOW, needs=["nix", "bun"], unless=(
+        "linux", "needs a Linux runner (ubuntu-24.04-arm) — the image is aarch64-linux "
+                 "and nix has no builder for it here")),
+    "coverage-round": Entry(WEEKLY),
+}
+
+WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs"}
+
+
+# ------------------------------------------------------------- completeness
+
+_INTERP = re.compile(r"\$\{\{\s*([a-z]+)\.([A-Za-z0-9_-]+)\s*\}\}")
+
+# Variables the GitHub runner puts in the environment.  A step that reads one dies
+# under `set -u` here, which is how `pipeline`'s Dafny step failed the first time
+# --only ran it.  Only those with an honest local equivalent are supplied; anything
+# else in this namespace is a completeness ERROR, so a step that starts reading a new
+# runner variable is refused rather than failing mid-run with `unbound variable`.
+RUNNER_VARS = ("RUNNER_TEMP", "GITHUB_WORKSPACE", "GITHUB_ENV", "GITHUB_PATH",
+               "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY")
+_RUNNER_REF = re.compile(r"\$\{?((?:GITHUB|RUNNER)_[A-Z_]+)\}?")
+
+
+def runner_env(scratch):
+    """The runner-provided variables, pointed at a scratch directory of our own.
+    `RUNNER_TEMP` is literally "a temporary directory the runner cleans up", so a
+    tempdir here is the same thing rather than a stand-in for it."""
+    e = dict(os.environ)
+    e["RUNNER_TEMP"] = str(scratch)
+    e["GITHUB_WORKSPACE"] = str(REPO)
+    for f in ("GITHUB_ENV", "GITHUB_PATH", "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY"):
+        e[f] = str(scratch / f.lower())
+    e["CI"] = "true"
+    return e
+
+
+def interpolate(text, env, matrix_dim=None, matrix_val=None):
+    """Resolve ${{ env.X }} and ${{ matrix.X }}.  Anything else is refused: a step
+    whose text still carries an unresolved expression must not be run as if it
+    were the CI command."""
+    def sub(m):
+        ns, key = m.group(1), m.group(2)
+        if ns == "env" and key in env:
+            return env[key]
+        if ns == "matrix" and key == matrix_dim:
+            return matrix_val
+        raise ParseError(f"cannot resolve ${{{{ {ns}.{key} }}}}")
+    return _INTERP.sub(sub, text)
+
+
+def completeness(env, jobs):
+    """Every job planned, every plan entry real, every run step decided.  Returns
+    a list of problems; empty means this script still stands in for CI."""
+    bad = []
+    on_disk = {j.name: j for j in jobs}
+    for name in sorted(set(on_disk) - set(PLAN)):
+        j = on_disk[name]
+        bad.append(f"{j.file}:{j.line}: job {name!r} is in CI and unknown to bin/verify-repo — "
+                   f"add it to PLAN (run it, or skip it with a reason)")
+    for name in sorted(set(PLAN) - set(on_disk)):
+        bad.append(f"PLAN names job {name!r}, which no workflow defines")
+
+    for name, entry in sorted(PLAN.items()):
+        j = on_disk.get(name)
+        if j is None:
+            continue
+        if entry.unless and entry.unless[0] not in PREDICATES:
+            bad.append(f"PLAN[{name}].unless names predicate {entry.unless[0]!r}, "
+                       f"which does not exist")
+        # A job blocked on this machine is still fully PLANNED: its steps are checked
+        # here so the declaration cannot rot while the platform excuses the run.
+        step_names = [s.name for s in j.steps]
+        for key in sorted(entry.skips):
+            if key not in step_names:
+                bad.append(f"PLAN[{name}].skips names step {key!r}, which the job no longer has")
+        for s in j.steps:
+            if s.kind == "uses" or s.name in entry.skips:
+                continue
+            if s.name is None:
+                bad.append(f"{j.file}:{s.line}: unnamed `run:` step in job {name!r} — "
+                           f"this script addresses steps by name")
+                continue
+            if s.cond and s.name not in entry.skips:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r} carries `if: {s.cond}` "
+                           f"and is not in PLAN[{name}].skips — decide it explicitly")
+        if entry.matrix and entry.matrix not in j.matrix:
+            bad.append(f"PLAN[{name}] expands matrix {entry.matrix!r}, which the job does not define")
+            continue
+        # Every step we would run must interpolate NOW.  `${{ secrets.x }}` or a
+        # `${{ env.X }}` with no X resolves to nothing useful, and a step run with a
+        # hole in it is not the CI command however green it exits.
+        mv = j.matrix.get(entry.matrix, [None])[0] if entry.matrix else None
+        for s in j.steps:
+            if s.kind == "uses" or s.name in entry.skips or s.run is None:
+                continue
+            try:
+                interpolate(s.run, j.env, entry.matrix, mv)
+            except ParseError as e:
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r}: {e}")
+            for v in sorted(set(_RUNNER_REF.findall(s.run)) - set(RUNNER_VARS)):
+                bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r} reads ${v}, "
+                           f"which the runner provides and bin/verify-repo does not — "
+                           f"add it to RUNNER_VARS with a local equivalent, or skip the step")
+    return bad
+
+
+# ------------------------------------------------------------------ execution
+
+def run_step(step, env, cwd, matrix=(None, None), dry=False, envvars=None):
+    cmd = interpolate(step.run, env, *matrix)
+    # CI's default shell is `bash -e {0}`; the run bodies that need more set it
+    # themselves on their first line.
+    if dry:
+        return True, cmd
+    r = subprocess.run(["bash", "-e", "-c", cmd], cwd=cwd, env=envvars)
+    return r.returncode == 0, cmd
+
+
+def tool_versions(env):
+    """(available, divergences) — a pinned tool whose local version is not CI's is
+    reported, never silently accepted."""
+    have, diverge = {}, []
+    for tool, key in TOOLCHAIN.items():
+        path = shutil.which(tool)
+        have[tool] = path
+        if not path or key not in env:
+            continue
+        try:
+            out = subprocess.run([tool, "--version"], capture_output=True, text=True,
+                                 timeout=60).stdout
+        except Exception:
+            continue
+        want = env[key]
+        if want not in out:
+            diverge.append(f"{tool}: CI pins {want}, local is {out.strip().splitlines()[0]}")
+    for t in ("bun", "jq", "nix", "sha256sum"):
+        have[t] = shutil.which(t)
+    return have, diverge
+
+
+def selected(entry, args, name=None):
+    # --only is the "CI went red on X, reproduce X" path, and it overrides the tiers
+    # outright: naming a job is a decision, so it does not also need the right flag.
+    if args.only:
+        return name in args.only
+    if entry.tier == SESSIONS:
+        return args.sessions
+    if entry.tier == WEEKLY:
+        return args.weekly
+    if entry.tier == SLOW:
+        return not args.fast
+    return True
+
+
+def execute(env, jobs, args):
+    by_name = {j.name: j for j in jobs}
+    have, diverge = tool_versions(env)
+    scratch = Path(tempfile.mkdtemp(prefix="verify-repo-"))
+    shellenv = runner_env(scratch)
+    ran, failed, skipped = [], [], []
+
+    order = [n for n in PLAN if n in by_name]
+    order.sort(key=lambda n: ({FAST: 0, DEFAULT: 1, SLOW: 2, WEEKLY: 3, SESSIONS: 4}
+                              .get(PLAN[n].tier, 5), n))
+
+    for name in order:
+        entry, job = PLAN[name], by_name[name]
+        if not selected(entry, args, name):
+            skipped.append((name, f"tier {entry.tier}, not selected"))
+            continue
+        blocked = entry.blocked()
+        if blocked:
+            skipped.append((name, blocked))
+            continue
+        missing = [t for t in entry.needs if not have.get(t)]
+        if missing:
+            print(f"FAIL  {name} — not on PATH: {', '.join(missing)}", file=sys.stderr)
+            failed.append(name)
+            continue
+
+        combos = [(None, None)]
+        if entry.matrix:
+            combos = [(entry.matrix, v) for v in job.matrix[entry.matrix]]
+
+        for dim, val in combos:
+            label = name if val is None else f"{name}[{val}]"
+            print(f"\n== {label} ==", flush=True)
+            bad = False
+            for s in job.steps:
+                if s.kind == "uses":
+                    continue
+                if s.name in entry.skips:
+                    if not (args.weekly and s.name in WEEKLY_STEP_SKIPS):
+                        continue
+                cwd = REPO / s.workdir if s.workdir else REPO
+                print(f"-- {s.name}" + (f"  (in {s.workdir})" if s.workdir else ""), flush=True)
+                try:
+                    ok, cmd = run_step(s, job.env, cwd, (dim, val), args.dry_run, shellenv)
+                    if args.dry_run:
+                        print("\n".join("     " + l for l in cmd.rstrip().split("\n")))
+                except ParseError as e:
+                    print(f"FAIL  {label} / {s.name}: {e}", file=sys.stderr)
+                    ok = False
+                if not ok:
+                    print(f"FAIL  {label} / {s.name}", file=sys.stderr)
+                    bad = True
+                    break
+            (failed if bad else ran).append(label)
+
+    print("\n" + "=" * 72)
+    print(f"ran {len(ran)}, failed {len(failed)}")
+    for n in ran:
+        print(f"  ok   {n}")
+    for n in failed:
+        print(f"  FAIL {n}")
+    # Everything NOT run is named.  A run that quietly covered less than it claims
+    # is the failure this tool exists to stop.
+    for n, why in skipped:
+        print(f"  --   {n}: {why}")
+    for name in order:
+        e = PLAN[name]
+        if selected(e, args, name) and not e.blocked():
+            for s, why in sorted(e.skips.items()):
+                if not (args.weekly and s in WEEKLY_STEP_SKIPS):
+                    print(f"  --   {name} / {s}: {why}")
+    for d in diverge:
+        print(f"  !!   toolchain divergence — {d}")
+    shutil.rmtree(scratch, ignore_errors=True)
+    if not args.sessions and not args.only:
+        print("  --   per-session gates: bin/verify-session <artefact-dir> "
+              "(or bin/verify-repo --sessions)")
+    return 1 if failed else 0
+
+
+# ------------------------------------------------------------------- selftest
+
+def _corrupt(kind, texts):
+    t = dict(texts)
+    v, d = "verify.yml", "dual-backed.yml"
+    if kind == "job added to CI":
+        t[v] = t[v] + "\n  brand-new-job:\n    runs-on: ubuntu-24.04\n    steps:\n" \
+                      "      - name: Do a thing\n        run: echo hi\n"
+    elif kind == "job removed from CI":
+        t[v] = t[v].replace("\n  docs:\n    runs-on: ubuntu-24.04\n"
+                            "    steps:\n      - name: Checkout", "\n  docs-renamed:\n"
+                            "    runs-on: ubuntu-24.04\n    steps:\n      - name: Checkout")
+    elif kind == "step added carrying an unresolvable expression":
+        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions",
+                            "      - name: Newly added step\n"
+                            "        run: echo ${{ secrets.TOKEN }}\n"
+                            "      - name: Check docs/ was republished from the sessions")
+    elif kind == "skipped step renamed":
+        t[v] = t[v].replace("      - name: Mutation-test the spec",
+                            "      - name: Mutation-test the spec (renamed)")
+    elif kind == "conditional step added undeclared":
+        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions",
+                            "      - name: Check docs/ was republished from the sessions\n"
+                            "        if: github.event_name == 'schedule'")
+    elif kind == "step reads an unsupplied runner variable":
+        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions\n"
+                            "        run: python3 bin/build-docs --check",
+                            "      - name: Check docs/ was republished from the sessions\n"
+                            "        run: python3 bin/build-docs --check \"$RUNNER_ARCH\"")
+    elif kind == "unknown job key":
+        t[d] = t[d].replace("  manifest:\n    runs-on:", "  manifest:\n    runz-on:")
+    elif kind == "unknown step key":
+        t[d] = t[d].replace("      - name: Setup Bun\n        uses:",
+                            "      - name: Setup Bun\n        usez:")
+    elif kind == "content after the jobs block":
+        t[d] = t[d] + "\nafterwards: true\n"
+    elif kind == "folded block scalar":
+        t[d] = t[d].replace("        run: bun cross-extract.mjs --check",
+                            "        run: >\n          bun cross-extract.mjs --check")
+    else:
+        raise AssertionError(kind)
+    if t == texts:
+        raise AssertionError(f"corruption {kind!r} changed nothing — its anchor moved")
+    return t
+
+
+def _load_texts(texts):
+    """Scan a set of workflow texts as if they were the committed ones."""
+    global WORKFLOWS
+    with tempfile.TemporaryDirectory() as td:
+        d = Path(td)
+        for n, body in texts.items():
+            (d / n).write_text(body)
+        old, WORKFLOWS = WORKFLOWS, d
+        try:
+            return load()
+        finally:
+            WORKFLOWS = old
+
+
+def _check_texts(texts):
+    """Parse + completeness over a set of workflow texts.  Returns problems."""
+    return completeness(*_load_texts(texts))
+
+
+def selftest():
+    texts = {p.name: p.read_text() for p in sorted(WORKFLOWS.glob("*.yml"))}
+    planted = failures = 0
+
+    # Control 1 — the committed workflows parse and this script is complete for them.
+    problems = _check_texts(texts)
+    if problems:
+        print("CONTROL FAILED — the committed workflows are not fully planned:", file=sys.stderr)
+        for p in problems:
+            print(f"  {p}", file=sys.stderr)
+        return 1
+
+    # Control 2 — PyYAML, when importable, is the second implementation.  It must
+    # agree on job ids, step names and the text of every `run:` block.
+    try:
+        import yaml
+    except ImportError:
+        print("  --   PyYAML not importable; the oracle control did not run")
+    else:
+        env, jobs = load()
+        mine = {(j.file, j.name): [(s.name, s.uses, s.run) for s in j.steps] for j in jobs}
+        theirs = {}
+        for p in sorted(WORKFLOWS.glob("*.yml")):
+            for name, body in yaml.safe_load(p.read_text())["jobs"].items():
+                theirs[(p.name, name)] = [
+                    (s.get("name"), s.get("uses"),
+                     s["run"] if "run" in s and "\n" in s["run"] else
+                     (s["run"].strip() if "run" in s else None))
+                    for s in body.get("steps", [])]
+        if set(mine) != set(theirs):
+            print(f"ORACLE FAILED — job sets differ: "
+                  f"{set(mine) ^ set(theirs)}", file=sys.stderr)
+            return 1
+        for k in sorted(mine):
+            if mine[k] != theirs[k]:
+                for a, b in zip(mine[k], theirs[k]):
+                    if a != b:
+                        print(f"ORACLE FAILED — {k} step {a[0]!r}:\n"
+                              f"  scanner: {a!r}\n  pyyaml : {b!r}", file=sys.stderr)
+                        return 1
+                print(f"ORACLE FAILED — {k} step count "
+                      f"{len(mine[k])} vs {len(theirs[k])}", file=sys.stderr)
+                return 1
+        print(f"  ok   PyYAML oracle agrees on {len(mine)} jobs, "
+              f"{sum(len(v) for v in mine.values())} steps")
+
+    # Control 3 — every matrix this script expands is non-empty, and the two known
+    # ones still hold the sessions on disk.  A matrix read as empty would make
+    # `--sessions` a silent no-op.
+    env, jobs = load()
+    for j in jobs:
+        for dim, vals in j.matrix.items():
+            if not vals:
+                print(f"CONTROL FAILED — matrix {j.name}.{dim} scanned empty", file=sys.stderr)
+                return 1
+
+    # Control 4 — DERIVATION, not copying.  A plain new `run:` step in a job we run
+    # must be absorbed silently and end up in the executed set.  If this control
+    # ever fails, the command list has become a copy and the whole argument for
+    # this script's shape is gone.
+    added = dict(texts)
+    added["verify.yml"] = added["verify.yml"].replace(
+        "      - name: Check docs/ was republished from the sessions",
+        "      - name: Newly added step\n        run: echo hi\n"
+        "      - name: Check docs/ was republished from the sessions")
+    if added == texts:
+        print("CONTROL FAILED — the absorption control's anchor moved", file=sys.stderr)
+        return 1
+    if _check_texts(added):
+        print("CONTROL FAILED — a plain new step was rejected instead of absorbed",
+              file=sys.stderr)
+        return 1
+    _, js = _load_texts(added)
+    names = [st.name for j in js if j.name == "docs" for st in j.steps]
+    if "Newly added step" not in names:
+        print(f"CONTROL FAILED — the new step is not in the docs plan: {names}", file=sys.stderr)
+        return 1
+    print("  ok   a plain new run step is absorbed, not rejected")
+
+    # The planted corruptions.  Each must be REJECTED — by the scanner or by the
+    # completeness check; which one does not matter, going green does.
+    for kind in ("job added to CI", "job removed from CI",
+                 "step added carrying an unresolvable expression",
+                 "skipped step renamed", "conditional step added undeclared",
+                 "step reads an unsupplied runner variable", "unknown job key", "unknown step key", "content after the jobs block",
+                 "folded block scalar"):
+        planted += 1
+        bad = _corrupt(kind, texts)
+        try:
+            problems = _check_texts(bad)
+            caught = bool(problems)
+        except ParseError:
+            caught = True
+        if caught:
+            print(f"  ok   caught: {kind}")
+        else:
+            print(f"  FAIL not caught: {kind}", file=sys.stderr)
+            failures += 1
+
+    print(f"\n{planted} planted corruptions, {planted - failures} caught")
+    return 1 if failures else 0
+
+
+# ----------------------------------------------------------------------- main
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--fast", action="store_true", help="omit the slow tier")
+    ap.add_argument("--weekly", action="store_true", help="add the schedule-only jobs and steps")
+    ap.add_argument("--sessions", action="store_true", help="add the two per-session matrices")
+    ap.add_argument("--only", action="append", metavar="JOB",
+                    help="run only these jobs, whatever their tier (repeatable)")
+    ap.add_argument("--check", action="store_true", help="completeness only; run nothing")
+    ap.add_argument("--list", action="store_true", help="print the plan and exit")
+    ap.add_argument("--dry-run", action="store_true", help="print each command instead of running it")
+    ap.add_argument("--selftest", action="store_true")
+    args = ap.parse_args()
+
+    if args.selftest:
+        return selftest()
+
+    env, jobs = load()
+    problems = completeness(env, jobs)
+    if args.only:
+        unknown = sorted(set(args.only) - set(PLAN))
+        if unknown:
+            problems += [f"--only names {n!r}, which is not a job" for n in unknown]
+    if problems:
+        print("bin/verify-repo no longer stands in for CI:", file=sys.stderr)
+        for p in problems:
+            print(f"  {p}", file=sys.stderr)
+        return 1
+    if args.check:
+        print(f"ok — {len(jobs)} jobs across "
+              f"{len(list(WORKFLOWS.glob('*.yml')))} workflows, all planned")
+        return 0
+
+    if args.list:
+        for name in sorted(PLAN):
+            e = PLAN[name]
+            tier = f"tier={e.tier}" + (f" matrix={e.matrix}" if e.matrix else "")
+            if e.unless:
+                tier += f"  unless {e.unless[0]}: {e.unless[1]}"
+            print(f"{name:22} {tier}")
+            for s, why in sorted(e.skips.items()):
+                print(f"{'':22}   -- {s}: {why}")
+        return 0
+
+    return execute(env, jobs, args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

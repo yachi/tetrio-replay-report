@@ -880,3 +880,39 @@ jobs:
           set -euo pipefail
           python3 -m pipeline.check_preregistrations --selftest
           python3 -m pipeline.check_preregistrations
+
+  # `bin/verify-repo` is the local stand-in for the ten repo-wide jobs above — the
+  # ones `bin/verify-session` cannot reach because it takes ONE artefact directory.
+  # Its whole value rests on one property: that it still knows every job and every
+  # step in this directory. That property degrades in the direction that reads
+  # green — a job added here and unknown to the script leaves the script silently
+  # narrower than the thing it stands in for, and nothing about the script's own
+  # output would say so.
+  #
+  # So the completeness check cannot be manual-only. This repo has measured three
+  # times what a gate nobody runs is worth: tools/triangle-oracle/dual-backed.json
+  # stacked three staleness deltas behind an un-run `--check`, equiv.py's published
+  # percentages were typed once and re-derived by nothing, and the cc-oracle corpus
+  # loop stopped at four sessions while two more were added. A script that stands in
+  # for CI must be checked BY CI.
+  #
+  # --selftest first, same order and same reason as every other gate here: it plants
+  # a job added, a job removed, a renamed skipped step, an undeclared conditional
+  # step, an unresolvable `${{ }}` expression and four malformed constructs, and
+  # requires each to be rejected. Its controls are the ones that matter more than
+  # the mutants — that a plain new `run:` step is ABSORBED rather than rejected (the
+  # command list is derived, not copied) and that PyYAML, as an independent second
+  # parser, agrees with the stdlib scanner on every job id, step name and run block.
+  #
+  # Offline, stdlib-only, well under a second. No Bun, no Dafny, no network.
+  workflow-plan:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check bin/verify-repo still knows every job and step (and that it can fail)
+        run: |
+          set -euo pipefail
+          python3 bin/verify-repo --selftest
+          python3 bin/verify-repo --check
