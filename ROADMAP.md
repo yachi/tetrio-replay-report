@@ -3111,3 +3111,111 @@ Two tiers, because wall clock is the reason a person skips it: `--fast` omits `c
 (~25 min for the corpus at two granularities) and `oracle-image` (~6 min); the default runs
 everything. Done when the four failures of 2026-08-20 are all caught by one local command, and
 when a job added to a workflow but unknown to the script is itself an error rather than a skip.
+
+## C-Spin 逐局／逐場 — Phase 1 landed, the section and its gates are not (2026-08-23)
+
+Asked for: "C-Spin count with successful TST and TSD count each round / match". Measuring it first
+changed the shape of the answer twice, and both changes are the point of this entry.
+
+**Half of it already shipped.** `build_round_table.py:626-627` has carried `("TSD", …)` and
+`("TST", …)` since the round table existed; they sit in `OPTIONAL_COLS:597`, so they render behind
+the 全部 28 欄 toggle rather than not at all. Per-round TSD/TST is already in every report, from
+`facts.json`, inside the trust chain. Nothing to build — at most one line if they should be visible
+by default. **This was found by reading `COLUMNS`, not by grepping for the feature**, which is the
+reusable part: "does the report already do this" is a question about a list, and the list is short.
+
+**A per-ROUND C-Spin count is a boolean wearing a costume.** Over the 900 player-rounds, greedy
+non-overlapping Triple→Double chains inside the 21-lock window never reach 2 — the distribution is
+`{0: 373, 1: 527}`, identical to the existing per-round predicate. Only an unordered (T,D)-pair
+count reaches 2 (29 rounds), and that counts one Triple against two later Doubles, i.e. it is a
+counting artefact. The granularity that carries information is the MATCH: 1-9 per match-player over
+118 rows, and on 2026-08-19 that is 6-vs-1 in m6 and 6-vs-2 in m10, both invisible in the session
+totals 43 and 30.
+
+### What landed (Phase 1)
+
+`Round` now carries `file`/`round` (`emit-opener-facts.ts:402`; `Case` always had them, the push at
+`:475` dropped them, which is the whole reason every ordering figure could only be a session total).
+`ordering` gained `per_round`, `per_match` and `cell_legend`. All seven artefacts re-emitted:
+**byte-identical outside the three new keys**, and every `per_match` fold reproduces that session's
+committed `players[].cspin_order` exactly.
+
+| | 1 | 0 | null | rows |
+|---|---|---|---|---|
+| `per_round.cspin_order`, seven sessions | **527** | 312 | **61** | 900 |
+
+Nulls per session: 9 · 3 · 8 · 8 · 10 · 11 · 12, pinned as literals in `openers.test.ts`
+(`ORDER_NULLS`) rather than re-derived — a test that recomputes a value the way the code does can
+only catch a typo.
+
+### The null rule is ASYMMETRIC, and the symmetric one was wrong
+
+First draft was "verified prefix ended before lock 21 → emit `—`". Measured, that drops the corpus
+headline **527 → 469 (−11.0%)** and moves all seven sessions. A *rendering* rule would have quietly
+restated a published measurement, and in the wrong direction.
+
+Truncation can only ever LOSE a C-Spin, never invent one. A round verified to lock 15 with a Triple
+at 12 and a Double at 14 genuinely ran the order; what cannot be answered is a round that *looks*
+like 0 with the window unobserved. So: **an observed 1 stays 1; only an unobservable 0 becomes
+null.** Under that rule every session's `cspin_order` is reproduced exactly and 61 cells go null —
+19 with no verified prefix at all, 42 truncated-and-zero. The general form is worth keeping: before
+adopting a rendering rule for missing data, check whether it moves a number that is already
+published, and check the direction the underlying defect can actually push.
+
+### The obvious gate is a tautology; it is kept for a different reason
+
+`cspin <= min(TST, TSD)` looks like a strong cross-boundary check — 0 violations in 900, binding on
+520. It is **entailed by a gate that already exists**: `cspin = 1` ⟹ the simulator saw both spins,
+and `tspinCounterCheck` already agrees with the replay's counters 900/900, so both are ≥ 1. Shipping
+it as a check on the METRIC would be `width_ge_3` again, and the 520 bindings are 519 rounds where
+TST happens to be exactly 1 — a fact about how rarely these two throw a second Triple, not evidence.
+
+It survives as a **join gate**, which is not vacuous: `file`/`round` is new plumbing, and this
+repo's canonical failure at that seam is index misalignment (`records[]`/`locks[]`, a licence that
+passed 0 of 1355). Because the bound binds on 520 of 900 rows, almost any shuffle violates
+somewhere. The licensing mutant is in the test: shift the join by one round, and it must fire — it
+does, on every session.
+
+### Still to do
+
+1. **The section.** A per-MATCH table in the quarantined section (`opener_section.py`), never a
+   column in 逐局全數據 — the round table's other 25 columns are all `facts.json`, and a
+   simulator column among them reads as verified. Whole-round TSD/TST beside it as anchors,
+   labelled 全局.
+2. **`check_opener_section.py` markers**, three of them, all `--selftest`-registered:
+   - the SCOPE-SPLIT sentence. The window sees **96.0%** of all TST (735/766) but only **20.4%** of
+     all TSD (743/3638), so a row reading `[✓ | TST 1 | TSD 4]` invites scoping all three to the
+     opening when one column is 5× its own window figure. Printing windowed TSD instead is not the
+     fix — `facts.json` has no lock indices, so that column would be simulator-only and the anchor
+     is lost.
+   - the NULL count in the rendered table must equal `per_round`'s null count. Mutant: `cspin: null`
+     → `cspin: 0`.
+   - the CLASS sentence, rewritten in BOTH directions (below).
+3. **The window gate**: per-round DT-order rows must equal `DT_ORDER_IN_OPENER`. Mutant: drop the
+   window filter, which admits the 9 mid-game Double-first rounds as phantom rows. The join gate
+   cannot catch this — widening `inOpener` only grows the boolean where the whole-round counters
+   already permit it.
+4. **The header must never say 「C-Spin」.** Not a style preference: `openers/README.md:36` records
+   0 of 358 clean first bags within 4 cells of any catalogued C-Spin (nearest 6 cells, and the
+   widest name set does not move it), so the identity is refuted by this repo's own metric one table
+   away. Measured mechanism for the 527: **pinglamb opens Honey Cup 153 times pooled against yachi's
+   62** (`named_openers`, harddrop's own drawings), and Honey Cup is a `Triple Double openers`
+   member. Header is 「先Triple後Double（頭三包）」.
+5. **Rewrite the `ordering_class` caveat in both directions.** harddrop, fetched 2026-08-23:
+   `Triple_Double_Attack_Setups` says "The Triple Double attack, also known as … **C-Spin** …
+   consists of a T-Spin Triple followed by a T-Spin Double" and "Empty field Triple Double setups
+   are also known as C-Spins" — which argues the ordering metric IS the wiki's own definition. But
+   `C-Spin` (oldid 42266) attributes the name to the C shape formed by J and L and lists six
+   non-Double continuations (Imperial Cross, Trinity/STSD, Fractal, LST Stacking, TST Tower,
+   Perfect Clear). So Triple→Double over-counts AND under-counts, and the current caveat states only
+   the over-direction — the sentence-stronger-than-its-lemma pattern. **The wiki contradicting
+   itself is not a licence to adopt the reading that flatters the metric**; record both.
+6. **`wiki_cspin` provenance.** It carries `placements: 38` and nothing else, where the five
+   `named_openers` pages each carry `oldid` + `sha256`. Add `oldid: 42266`, and transcribe the
+   definition into a committed JSON — a wiki sentence quoted only in prose is the 冇第二份 class.
+   Note also that `wiki_cspin.placements` (38 drawings) and `ordering_class.openers` (38 category
+   members) are unrelated quantities that collide numerically; any prose naming 38 must say which.
+
+**Never a rate, at any granularity.** Per-match `rounds_scored` is 4-8. Same rule 全消 follows for
+its 3-12 round denominators, and `per_match` carries `rounds_unscored` so the denominator travels
+with the count rather than being reconstructed by a reader.
