@@ -194,6 +194,36 @@ DUAL_SPLIT_MARKER = "兩個引擎有冇睇緊同一塊板"
 # split may be printed beside the donation's.
 CAVE_SPLIT_MARKER = "咁係穩陣，唔等於啱"
 
+# THE PER-MATCH TABLE's two controls, and they guard different things.
+#
+# SCOPE. This table counts T-spins at lock <= window_pieces; the round table three sections up
+# prints whole-round TSD and TST from facts.json. Over the corpus the window holds 96.0% of every
+# Triple and 20.4% of every Double, so the Double column is FIVE TIMES its own in-window figure. A
+# reader with both in view will scope all of them to the opening, and the sentence is the only
+# thing standing between them and that reading. Printing windowed TSD instead is not the repair:
+# facts.json has no lock indices, so that column would be simulator-derived and the anchor — the
+# whole reason a quarantined table may sit beside trust-chain numbers — is what would be lost.
+PER_MATCH_SCOPE_MARKER = "唔同範圍，唔好擺埋一齊讀"
+# NULL vs ZERO, and the rule behind it is ASYMMETRIC — which is why the sentence has to say so
+# rather than just flag the column. Truncation of the verified prefix can only ever LOSE an order,
+# never invent one, so an observed 1 stands and only an unobservable 0 is unknown. The symmetric
+# rule (null every truncated round) was measured and moves the published corpus figure 527 -> 469,
+# i.e. a rendering rule silently restating a measurement. `?? 0` here is the shape that published
+# 「一個 Perfect Clear 都冇出過」 for five sessions holding 65.
+PER_MATCH_NULL_MARKER = "截斷淨係會令個次序"
+# …and its counterpart for a session where every round reached the window. Its own marker because
+# it is a DIFFERENT claim — "we looked and none were unknown", not "unknown means unknown" — and
+# because a session with no nulls is exactly where the column looks droppable.
+PER_MATCH_NULL_ZERO_MARKER = "冇一格係估"
+
+# THE CLASS CAVEAT'S SECOND DIRECTION. `_class_note` has always said the ordering over-counts (the
+# whole `Triple Double openers` category fires it). It also UNDER-counts: harddrop's C-Spin page
+# (oldid 42266) says the Triple is 「usually」 followed by a Double and then lists six continuations
+# that are not one, so a C-Spin taken down any of them never produces the Double this column counts.
+# Stating one direction and not the other is a sentence stronger than its evidence, which is the
+# defect this repo keeps re-shipping under new names.
+CLASS_BOTH_MARKER = "兩邊都唔準"
+
 
 def problems(data, doc):
     """Every reason `doc`'s opener region disagrees with `data`; empty means it agrees."""
@@ -286,6 +316,33 @@ def problems(data, doc):
                     "count is taken inside the opener window, so the table may not be published "
                     "without the post-window comparison beside it and without the sentence "
                     "refusing to turn its handful of rounds into a rate")
+
+    # 5b. the per-match table's controls, demanded only when the artifact carries the block.
+    per_match = data["ordering"].get("per_match")
+    if per_match:
+        if PER_MATCH_SCOPE_MARKER not in body:
+            bad.append(
+                f"the per-match scope control is gone ({PER_MATCH_SCOPE_MARKER!r} missing) — this "
+                "table counts T-spins inside the opener window while the round table prints "
+                "whole-round TSD/TST, and the window holds ~96% of Triples against ~20% of "
+                "Doubles, so the two may not be published without the sentence saying so")
+        if CLASS_BOTH_MARKER not in body:
+            bad.append(
+                f"the class caveat states only one direction ({CLASS_BOTH_MARKER!r} missing) — "
+                "the ordering over-counts (the whole Triple Double category fires it) AND "
+                "under-counts (harddrop lists six non-Double continuations of the C-Spin); "
+                "publishing half of that is a sentence stronger than its evidence")
+        unknown = sum(1 for r in data["ordering"]["per_round"] if r["cspin_order"] is None)
+        marker = PER_MATCH_NULL_MARKER if unknown else PER_MATCH_NULL_ZERO_MARKER
+        if marker not in body:
+            bad.append(
+                f"the per-match null control is gone ({marker!r} missing) — {unknown} round(s) "
+                "could not be answered, and a table printing 「—」 without the sentence "
+                "distinguishing UNKNOWN from zero reads as a measured absence")
+        # the null count is a FIGURE, so it must also be present rather than merely described
+        if unknown and str(unknown) not in body:
+            bad.append(f"the per-match null count ({unknown}) is not printed anywhere in the "
+                       "region — the reader cannot check the 「答唔到」 column sums to anything")
 
     # 6. the named-opener table's own controls
     no = data.get("named_openers")
@@ -510,10 +567,28 @@ def _selftest(report_dir):
                    DONATION_WINDOW_MARKER, CAVE_WINDOW_MARKER,
                    *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS,
                    DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER,
-                   DUAL_SPLIT_MARKER, CAVE_SPLIT_MARKER):
+                   DUAL_SPLIT_MARKER, CAVE_SPLIT_MARKER,
+                   PER_MATCH_SCOPE_MARKER, PER_MATCH_NULL_MARKER, PER_MATCH_NULL_ZERO_MARKER,
+                   CLASS_BOTH_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
                           head + body.replace(marker, "", 1) + tail, True))
+
+    # THE `?? 0` MUTANT, named rather than left to the exact-re-render check to catch by accident.
+    # Turning every unanswerable round into a zero is the edit that makes a corpus of plausible
+    # zeros agree with itself, and it must be a build failure rather than a quieter table.
+    if any(r["cspin_order"] is None for r in data["ordering"].get("per_round", [])):
+        zeroed = json.loads(json.dumps(data))
+        for r in zeroed["ordering"]["per_round"]:
+            if r["cspin_order"] is None:
+                r["cspin_order"] = 0
+            if r["dt_order"] is None:
+                r["dt_order"] = 0
+        for m in zeroed["ordering"]["per_match"]:
+            m["rounds_scored"] += m["rounds_unscored"]
+            m["rounds_unscored"] = 0
+        cases.append(("an unanswerable round is published as 0 (the `?? 0` shape)",
+                      zeroed, doc, True))
 
     eligible = json.loads(json.dumps(data))
     eligible["report_eligible"] = True

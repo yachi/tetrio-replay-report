@@ -401,6 +401,10 @@ interface Bag { user: string; grid: string[] }
 interface CleanBoard { user: string; round: number; locks: number; grid: string[] }
 interface Round { user: string; verified: number; spinsVerified: { i: number; cleared: number }[];
                   spinsAll: { i: number; cleared: number }[];
+                  /** The round's own identity, so the per-round block can be joined against
+                   *  facts.json. `Case` has carried both all along; `rounds` dropped them, which is
+                   *  why every ordering figure could only ever be a per-player session total. */
+                  file: string; round: number;
                   /** 0-based lock indices at which the simulated board came out empty. */
                   pcLocks: number[];
                   /** the same round's Perfect Clear count from `results.stats.clears`, i.e. the
@@ -472,7 +476,7 @@ for (const c of loadCases(dir)) {
     .filter(x => x.spin !== 'none' && x.cleared > 0)     // detectTSpin returns 'none' unless the piece is a T
     .map(({ i, cleared }) => ({ i, cleared }));
   const acReal = c.clears.allclear;
-  rounds.push({ user: c.user, verified: v, spinsAll,
+  rounds.push({ user: c.user, file: c.file, round: c.round, verified: v, spinsAll,
                 spinsVerified: spinsAll.filter(x => x.i <= v),
                 pcLocks: r.locks.flatMap((lk, i) => (lk as { allclear?: boolean }).allclear ? [i] : []),
                 pcReal: typeof acReal === 'number' ? acReal : null });
@@ -740,6 +744,72 @@ function midGameOrderingFor(user: string, pick: (r: Round) => { i: number; clear
          + 'goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds '
          + 'with both spin types this late',
   };
+}
+
+/**
+ * THE SAME ORDERING, PER ROUND AND PER MATCH — the granularity the aggregate above cannot give.
+ *
+ * `orderingFor` returns one row per player per SESSION, so a match where one player ran the order
+ * six times out of seven and the other once is indistinguishable from two even matches. On
+ * 2026-08-19 that is exactly what happens (m6: pinglamb 6, yachi 1; m10: 6 and 2), and the session
+ * totals 43 and 30 hide it.
+ *
+ * THE CELL IS THREE-VALUED, AND THE THIRD VALUE IS NOT A DECORATION. A round is scored over the
+ * VERIFIED PREFIX, which frequently ends before lock `WINDOW_PIECES`. Truncation is asymmetric:
+ *
+ *   - a 1 is SAFE. The Triple and the Double were both observed inside the prefix, so the order
+ *     happened, whatever the unobserved remainder holds.
+ *   - a 0 is NOT. The Double may sit at lock 19 in a round verified to lock 15.
+ *
+ * So the rule is "observed 1 stays 1; an unobservable 0 becomes null", not "truncated becomes
+ * null". The distinction is worth 58 rounds: nulling every truncated round drops the corpus
+ * headline from 527 to 469 (-11.0%) and moves all seven sessions, i.e. a RENDERING rule would have
+ * silently restated a published measurement — and in the wrong direction, since truncation can
+ * only ever lose a C-Spin, never invent one. Under the asymmetric rule every session's `cspin_order`
+ * is reproduced exactly and 61 cells of 900 go null (19 with no verified prefix at all, 42
+ * truncated-and-zero).
+ *
+ * `null` is emitted, never `0` — the `?? 0` that published 「一個 Perfect Clear 都冇出過」 for five
+ * sessions holding 65 is the same shape, and a corpus of plausible zeros agrees with itself.
+ */
+function orderingRounds(pick: (r: Round) => { i: number; cleared: number }[]) {
+  const inOpener = (x: { i: number }) => x.i <= WINDOW_PIECES;
+  return rounds.map(r => {
+    const D = pick(r).filter(x => x.cleared === 2 && inOpener(x));
+    const T = pick(r).filter(x => x.cleared === 3 && inOpener(x));
+    const seen = (a: { i: number }[], b: { i: number }[]) => a.some(x => b.some(y => x.i < y.i));
+    const cspin = seen(T, D), dt = seen(D, T);
+    // the window is observed to its end only when the verified prefix reaches it
+    const complete = r.verified >= WINDOW_PIECES;
+    return {
+      file: r.file, round: r.round, user: r.user,
+      verified: r.verified,
+      window_complete: complete,
+      cspin_order: cspin ? 1 : complete ? 0 : null,
+      dt_order: dt ? 1 : complete ? 0 : null,
+      tspin_doubles_window: D.length,
+      tspin_triples_window: T.length,
+    };
+  });
+}
+
+/** The per-round rows folded up by (file, user). `rounds_unscored` travels WITH the count because
+ *  the count's denominator is `rounds_scored`, not `rounds` — publishing k without n is how a
+ *  small-denominator figure gets read as a rate. */
+function orderingMatches(per: ReturnType<typeof orderingRounds>) {
+  const key = (r: { file: string; user: string }) => `${r.file}\u0000${r.user}`;
+  const out = new Map<string, { file: string; user: string; rounds: number; rounds_scored: number;
+                                rounds_unscored: number; cspin_order: number; dt_order: number }>();
+  for (const r of per) {
+    const k = key(r);
+    const a = out.get(k) ?? { file: r.file, user: r.user, rounds: 0, rounds_scored: 0,
+                              rounds_unscored: 0, cspin_order: 0, dt_order: 0 };
+    a.rounds++;
+    if (r.cspin_order === null) a.rounds_unscored++;
+    else { a.rounds_scored++; a.cspin_order += r.cspin_order; a.dt_order += r.dt_order ?? 0; }
+    out.set(k, a);
+  }
+  return [...out.values()];
 }
 
 // ── metric 4: the named openers ────────────────────────────────────────────────────────────────
@@ -1269,6 +1339,8 @@ function slotRows() {
 // ── assemble ───────────────────────────────────────────────────────────────────────────────────
 const session = dir.split('/').filter(Boolean).pop()!;
 const ordering = users.map(u => orderingFor(u, r => r.spinsVerified));
+const orderingPerRound = orderingRounds(r => r.spinsVerified);
+const orderingPerMatch = orderingMatches(orderingPerRound);
 const orderingFull = users.map(u => orderingFor(u, r => r.spinsAll));
 const namedRaw = wiki.openers.map(namedOpenerFor);
 
@@ -1376,7 +1448,23 @@ return {
     clean: bags.length,
     players: users.map(firstBagFor),
   },
-  ordering: { scope: 'verified prefix', players: ordering },
+  ordering: {
+    scope: 'verified prefix',
+    players: ordering,
+    /** Three-valued per round — see `orderingRounds`. A null is "the verified prefix ended before
+     *  the opener window did AND nothing was seen", never "no". */
+    per_round: orderingPerRound,
+    /** The same rows by (file, user). `cspin_order` here sums the per-round 1s and therefore
+     *  reproduces `players[].cspin_order` exactly; `rounds_unscored` is the null count. */
+    per_match: orderingPerMatch,
+    cell_legend: {
+      '1': 'a T-spin Triple then a T-spin Double, both inside the opener window, both observed',
+      '0': 'the window was verified to its end and the order did not happen',
+      'null': 'the verified prefix ended before the window did and nothing was seen — UNKNOWN, '
+            + 'not zero. A 1 needs no such caveat: an observed order cannot be undone by an '
+            + 'unobserved remainder, so truncation loses C-Spins and never invents one',
+    },
+  },
   ordering_full_round: { scope: 'whole simulated round, verification NOT required', players: orderingFull },
   slot_geometry: { source: 'harddrop.com/wiki/C-Spin', placements: WIKI_CSPIN.length, rows: slotRows() },
 

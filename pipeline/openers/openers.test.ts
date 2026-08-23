@@ -1106,6 +1106,150 @@ test('the mid-game ordering counts are pinned per session', () => {
   }
 });
 
+/** Nulls per session — the count of per-round cells the verified prefix could not answer.
+ *  Literals, not a re-derivation: a test that recomputes the value the way the code does can only
+ *  catch a typo (the 「一個 Perfect Clear 都冇出過」 lesson). */
+const ORDER_NULLS: Record<string, number> = {
+  '2026-07-22': 9, '2026-07-24': 3, '2026-07-28': 8, '2026-08-01': 8,
+  '2026-08-09': 10, '2026-08-14': 11, '2026-08-19': 12,
+};
+
+/**
+ * THE JOIN GATE, and it is the only reason `cspin <= min(TST, TSD)` is in this file.
+ *
+ * As a statement about the metric the bound is VACUOUS — it is entailed by a gate that already
+ * exists. `cspin = 1` means the simulator saw a Triple and a Double, and `tspinCounterCheck`
+ * already agrees with the replay's own counters on 900 of 900 rounds, so both counters are
+ * necessarily >= 1. Shipping it as a semantic check would be the `width_ge_3` mistake: a
+ * tautology of the data it was written against, green from the day it was written.
+ *
+ * What it is NOT vacuous about is the JOIN. `per_round` carries `file`/`round` newly threaded
+ * through `Round`, and this repo's canonical failure at exactly that seam is index misalignment —
+ * `records[]`/`locks[]` were index-aligned in the oracle only, which shipped a licence that passed
+ * 0 of 1355 times. A misaligned join puts one round's boolean beside another round's counters, and
+ * because the bound BINDS on 520 of the 900 rows (519 of them because that round's TST is exactly
+ * 1), almost any shuffle violates somewhere.
+ *
+ * The mutation below is what licenses keeping it: shift the join by one round and it must fire.
+ */
+function factsRounds(s: string) {
+  const f = JSON.parse(readFileSync(`${sessionDir(s)}/report/facts.json`, 'utf8'));
+  const out = new Map<string, { tst: number; tsd: number }>();
+  for (const m of f.matches)
+    for (const r of m.rounds)
+      for (const [user, p] of Object.entries(r.players as Record<string, any>))
+        out.set(`${m.file}|${r.index}|${user}`,
+                { tst: p.clears.tspin_triples, tsd: p.clears.tspin_doubles });
+  return out;
+}
+
+test('per_match rolls up per_round exactly, and both reproduce the session total', () => {
+  for (const s of SESSIONS) {
+    const o = facts(s).ordering;
+    const per = o.per_round as any[], byMatch = o.per_match as any[];
+    expect([s, per.length]).toEqual([s, sum(byMatch.map((m: any) => m.rounds))]);
+
+    // per_match is the fold of per_round, per (file, user) — recomputed here from the rows
+    const want = new Map<string, { k: number; scored: number; unscored: number }>();
+    for (const r of per) {
+      const key = `${r.file}|${r.user}`;
+      const a = want.get(key) ?? { k: 0, scored: 0, unscored: 0 };
+      if (r.cspin_order === null) a.unscored++; else { a.scored++; a.k += r.cspin_order; }
+      want.set(key, a);
+    }
+    for (const m of byMatch) {
+      const a = want.get(`${m.file}|${m.user}`)!;
+      expect([s, m.file, m.user, m.cspin_order, m.rounds_scored, m.rounds_unscored])
+        .toEqual([s, m.file, m.user, a.k, a.scored, a.unscored]);
+    }
+    // and the fold reproduces the aggregate the section has always published
+    for (const p of orderPlayers(s)) {
+      const mine = byMatch.filter((m: any) => m.user === p.user);
+      expect([s, p.user, sum(mine.map((m: any) => m.cspin_order))]).toEqual([s, p.user, p.cspin_order]);
+    }
+  }
+});
+
+test('a null is UNKNOWN and only ever replaces a zero — an observed order is never nulled', () => {
+  for (const s of SESSIONS) {
+    const per = facts(s).ordering.per_round as any[];
+    expect([s, per.filter(r => r.cspin_order === null).length]).toEqual([s, ORDER_NULLS[s]!]);
+    for (const r of per) {
+      // truncation is asymmetric: it can lose a C-Spin, never invent one, so a 1 stands whatever
+      // the prefix did. Only an unobservable ZERO becomes null.
+      if (r.cspin_order === null) expect([s, r.file, r.round, r.window_complete]).toEqual([s, r.file, r.round, false]);
+      if (r.window_complete) expect([s, r.cspin_order === null]).toEqual([s, false]);
+    }
+    // never `?? 0`: a corpus of plausible zeros agrees with itself
+    expect([s, per.some(r => r.cspin_order === null)]).toEqual([s, true]);
+  }
+});
+
+/**
+ * THE WINDOW GATE — the one thing the join gate provably cannot catch.
+ *
+ * The BOUND `cspin <= min(TST, TSD)` is blind to a widened window: relaxing `inOpener` only ever
+ * grows the boolean on rounds where the whole-round counters already permit it, so the bound itself
+ * still holds on every row. (Measured: dropping the filter entirely does fail the join test too —
+ * but on its pinned tightness literals `[839, 520]`, not on the bound, which is a different check
+ * happening to move. Do not read that as the bound covering this case.)
+ * What pins the window is the DT column, because Double-first is common
+ * outside the window (9 such rounds pooled) and essentially absent inside it (one, a real DT
+ * Cannon). Drop the window filter and those 9 arrive as phantom per-round rows.
+ *
+ * Asserted against `DT_ORDER_IN_OPENER` — a NAMED exception list, not a bound. It compares each
+ * player's per-round DT count to the number of entries naming that session and that player, so a
+ * phantom row fails by construction and so does a deleted real one. `dt_order <= 1` would be
+ * satisfied by any single Double-first round anywhere in the corpus; this is satisfied only by
+ * the one that is really there.
+ */
+test('the window gate: per-round DT rows equal the named exception list, and the mid-game rounds are outside', () => {
+  let midGameDouble = 0;
+  for (const s of SESSIONS) {
+    const o = facts(s).ordering;
+    for (const p of o.players as any[]) {
+      const mine = (o.per_round as any[]).filter(r => r.user === p.user);
+      const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
+      expect([s, p.user, sum(mine.map(r => r.dt_order ?? 0))]).toEqual([s, p.user, known]);
+      // the per-round rows must also reproduce the aggregate they were split out of
+      expect([s, p.user, sum(mine.map(r => r.cspin_order ?? 0))]).toEqual([s, p.user, p.cspin_order]);
+      midGameDouble += p.mid_game.dt_order;
+    }
+  }
+  // the phantoms a dropped window filter would admit — pooled, and they are NOT in the rows above
+  expect(midGameDouble).toBe(9);
+});
+
+test('the join gate: cspin <= min(TST, TSD) per row, and an off-by-one join breaks it', () => {
+  let bound = 0, rows = 0;
+  for (const s of SESSIONS) {
+    const per = facts(s).ordering.per_round as any[];
+    const fr = factsRounds(s);
+    const key = (r: any) => `${r.file}|${r.round}|${r.user}`;
+    for (const r of per) {
+      const c = fr.get(key(r));
+      expect([s, key(r), c === undefined]).toEqual([s, key(r), false]);   // every row must join
+      if (r.cspin_order === null) continue;
+      rows++;
+      const lim = Math.min(c!.tst, c!.tsd);
+      expect([s, key(r), r.cspin_order <= lim]).toEqual([s, key(r), true]);
+      if (r.cspin_order === lim && lim > 0) bound++;
+    }
+
+    // MUTATION — shift the join by one round. The bound has teeth only if this fires.
+    const shifted = per.map((r, i) => ({ ...r, joinTo: per[(i + 1) % per.length]! }));
+    const broke = shifted.some(r => {
+      if (r.cspin_order === null) return false;
+      const c = fr.get(key(r.joinTo));
+      return c !== undefined && r.cspin_order > Math.min(c.tst, c.tsd);
+    });
+    expect([s, 'off-by-one join must violate the bound', broke])
+      .toEqual([s, 'off-by-one join must violate the bound', true]);
+  }
+  // the bound is not decorative arithmetic — it is tight on most of the corpus
+  expect([rows, bound]).toEqual([839, 520]);
+});
+
 /** The ONE opener in the corpus that runs the DT order, named rather than absorbed.
  *
  *  Through five sessions this test asserted `dt_order === 0` for every player, and the section's
