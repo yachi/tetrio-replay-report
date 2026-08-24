@@ -437,6 +437,14 @@ interface Bag { user: string; grid: string[] }
 interface CleanBoard { user: string; round: number; locks: number; grid: string[] }
 interface Round { user: string; verified: number; spinsVerified: { i: number; cleared: number }[];
                   spinsAll: { i: number; cleared: number }[];
+                  /** the replay's OWN per-kind T-spin counters for this whole round — the
+                   *  twice-extracted `results.stats.clears.tspindoubles` and its siblings, the same
+                   *  fields facts.json carries. null when the round carries none of them, which is
+                   *  an UNKNOWN and never a row of zeros: `?? 0` on a missing counter is what once
+                   *  published 「一個 Perfect Clear 都冇出過」 for five sessions holding 65.
+                   *  `tspinCounterCheck` proves the simulator reproduces every one of these, so a
+                   *  row joining them to a simulator-derived count is licensed rather than mixed. */
+                  tspinReplayByKind: Record<string, number> | null;
                   /** The round's own identity, so the per-round block can be joined against
                    *  facts.json. `Case` has carried both all along; `rounds` dropped them, which is
                    *  why every ordering figure could only ever be a per-player session total. */
@@ -527,6 +535,7 @@ for (const c of loadCases(dir)) {
     .map(({ i, cleared }) => ({ i, cleared }));
   const acReal = c.clears.allclear;
   rounds.push({ user: c.user, file: c.file, round: c.round, verified: v, spinsAll,
+                tspinReplayByKind: null,   // filled by the denominator-anchor block below
                 spinsVerified: spinsAll.filter(x => x.i <= v),
                 pcLocks: r.locks.flatMap((lk, i) => (lk as { allclear?: boolean }).allclear ? [i] : []),
                 pcReal: typeof acReal === 'number' ? acReal : null });
@@ -559,6 +568,11 @@ for (const c of loadCases(dir)) {
     }
     counterRounds.push({ user: c.user, sim: simTotal, byKind: realK,
                          replay: present ? realTotal : null, agrees });
+    // ...and onto the round itself, so the ordering rows can publish the C-Spin count beside the
+    // T-spin counts it is bounded by. Pushed here rather than recomputed there because a second
+    // pass over the locks would be a second classifier, and two classifiers of one thing is how
+    // `tspindoubles` and `minitspindoubles` quietly become the same column.
+    rounds[rounds.length - 1]!.tspinReplayByKind = present ? realK : null;
   }
 
   // THE SECOND ENGINE — see `dualEngineCheck`. The hand-port is run over the same case and its
@@ -857,8 +871,17 @@ function orderingRounds(pick: (r: Round) => { i: number; cleared: number }[]) {
       window_complete: complete,
       cspin_order: cspin ? 1 : complete ? 0 : null,
       dt_order: dt ? 1 : complete ? 0 : null,
+      // WINDOW-scoped: spins at lock <= WINDOW_PIECES, i.e. the population the two orders above are
+      // decided on. Not the round's T-spin count, and the gap is large — 08-19 m1r0 has one Double
+      // in the window against six in the round.
       tspin_doubles_window: D.length,
       tspin_triples_window: T.length,
+      // WHOLE ROUND, from the replay's own twice-extracted counters. Both columns are published
+      // because they answer different questions and reading one as the other is the whole hazard:
+      // the window pair says what the C-Spin verdict was decided on, this pair says how many the
+      // player actually landed. null is UNKNOWN — a round carrying no counter, never a zero.
+      tspin_doubles: r.tspinReplayByKind ? r.tspinReplayByKind['tspindoubles'] ?? 0 : null,
+      tspin_triples: r.tspinReplayByKind ? r.tspinReplayByKind['tspintriples'] ?? 0 : null,
     };
   });
 }
@@ -866,17 +889,42 @@ function orderingRounds(pick: (r: Round) => { i: number; cleared: number }[]) {
 /** The per-round rows folded up by (file, user). `rounds_unscored` travels WITH the count because
  *  the count's denominator is `rounds_scored`, not `rounds` — publishing k without n is how a
  *  small-denominator figure gets read as a rate. */
+/**
+ * The same rows rolled up per match — one row per (file, user).
+ *
+ * TWO DENOMINATORS, and they are not the same rounds. `cspin_order` and `dt_order` sum only over
+ * SCORED rounds (a round whose window the verified prefix never reached contributes nothing and is
+ * counted in `rounds_unscored`), while the T-spin counters come from the replay and cover EVERY
+ * round of the match. So `cspin_order <= min(tspin_doubles, tspin_triples)` still holds — the
+ * C-Spin side can only lose rounds — but the reverse reading, "this many of those spins were
+ * C-Spins", does not follow and the two must never be divided into each other.
+ *
+ * A single round with no T-spin counter makes the match total UNKNOWN rather than short by that
+ * round: summing over the rest would silently publish a smaller number that reads exactly like a
+ * complete one, which is the `?? 0` failure this file has shipped once already.
+ */
 function orderingMatches(per: ReturnType<typeof orderingRounds>) {
   const key = (r: { file: string; user: string }) => `${r.file}\u0000${r.user}`;
-  const out = new Map<string, { file: string; user: string; rounds: number; rounds_scored: number;
-                                rounds_unscored: number; cspin_order: number; dt_order: number }>();
+  type Row = { file: string; user: string; rounds: number; rounds_scored: number;
+               rounds_unscored: number; cspin_order: number; dt_order: number;
+               tspin_doubles_window: number; tspin_triples_window: number;
+               tspin_doubles: number | null; tspin_triples: number | null };
+  const out = new Map<string, Row>();
   for (const r of per) {
     const k = key(r);
     const a = out.get(k) ?? { file: r.file, user: r.user, rounds: 0, rounds_scored: 0,
-                              rounds_unscored: 0, cspin_order: 0, dt_order: 0 };
+                              rounds_unscored: 0, cspin_order: 0, dt_order: 0,
+                              tspin_doubles_window: 0, tspin_triples_window: 0,
+                              tspin_doubles: 0, tspin_triples: 0 };
     a.rounds++;
     if (r.cspin_order === null) a.rounds_unscored++;
     else { a.rounds_scored++; a.cspin_order += r.cspin_order; a.dt_order += r.dt_order ?? 0; }
+    a.tspin_doubles_window += r.tspin_doubles_window;
+    a.tspin_triples_window += r.tspin_triples_window;
+    a.tspin_doubles = r.tspin_doubles === null || a.tspin_doubles === null
+      ? null : a.tspin_doubles + r.tspin_doubles;
+    a.tspin_triples = r.tspin_triples === null || a.tspin_triples === null
+      ? null : a.tspin_triples + r.tspin_triples;
     out.set(k, a);
   }
   return [...out.values()];
@@ -1448,6 +1496,30 @@ const session = dir.split('/').filter(Boolean).pop()!;
 const ordering = users.map(u => orderingFor(u, r => r.spinsVerified));
 const orderingPerRound = orderingRounds(r => r.spinsVerified);
 const orderingPerMatch = orderingMatches(orderingPerRound);
+
+/**
+ * THE JOIN BOUND, checked where the rows are BUILT.
+ *
+ * An observed Triple-then-Double order requires at least one of each to have happened, so
+ * `cspin_order <= min(tspin_doubles, tspin_triples)` on every row. It has teeth because the two
+ * sides come from different places — the order from this simulator's locks, the counts from the
+ * replay's own twice-extracted counters — so an off-by-one join violates it, which is what
+ * `openers.test.ts` mutates to prove.
+ *
+ * It lived ONLY in that test until 2026-08-24, which meant the bound was checked where the rows are
+ * READ and not where they are written. Here it is a build failure: an emitter that mis-joins cannot
+ * produce an artefact at all, rather than producing one that a later test declines.
+ */
+for (const rows of [orderingPerRound, orderingPerMatch]) {
+  for (const r of rows) {
+    if (r.cspin_order === null || r.tspin_doubles === null || r.tspin_triples === null) continue;
+    const lim = Math.min(r.tspin_doubles, r.tspin_triples);
+    if (r.cspin_order > lim)
+      throw new Error(`${r.file} ${r.user}: cspin_order ${r.cspin_order} exceeds `
+        + `min(tspin_doubles ${r.tspin_doubles}, tspin_triples ${r.tspin_triples}) — the C-Spin `
+        + `count and the T-spin counters are not describing the same rounds`);
+  }
+}
 const orderingFull = users.map(u => orderingFor(u, r => r.spinsAll));
 const namedRaw = wiki.openers.map(namedOpenerFor);
 
@@ -1582,6 +1654,26 @@ return {
             + 'not zero. A 1 needs no such caveat: an observed order cannot be undone by an '
             + 'unobserved remainder, so truncation loses C-Spins and never invents one',
     },
+    column_legend: {
+      cspin_order: 'the Triple-then-Double order. 0/1 on a per_round row (a round either showed it '
+                 + 'or did not); on a per_match row, how many of that match\'s SCORED rounds did',
+      tspin_doubles_window: 'T-spin Doubles at lock <= window_pieces — the population the order '
+                          + 'above is decided on, and NOT the round\'s T-spin count',
+      tspin_triples_window: 'the same, for Triples',
+      tspin_doubles: 'T-spin Doubles over the WHOLE round, from the replay\'s own '
+                   + 'results.stats.clears.tspindoubles — the twice-extracted field facts.json '
+                   + 'carries, which tspinCounterCheck proves this simulator reproduces on every '
+                   + 'round. null is UNKNOWN (the round carried no counter), never zero',
+      tspin_triples: 'the same, from results.stats.clears.tspintriples',
+    },
+    denominators: 'THE TWO SIDES OF A ROW ARE NOT THE SAME ROUNDS, and dividing one into the other '
+                + 'is the mistake this note exists to stop. cspin_order sums over SCORED rounds '
+                + 'only — a round whose opener window the verified prefix never reached is in '
+                + 'rounds_unscored and contributes nothing — while the T-spin counters come from '
+                + 'the replay and cover every round of the match. cspin_order <= '
+                + 'min(tspin_doubles, tspin_triples) therefore still holds, because the C-Spin '
+                + 'side can only lose rounds; "this share of those spins were C-Spins" does not '
+                + 'follow and must not be printed. The bound is asserted at build time',
   },
   ordering_full_round: { scope: 'whole simulated round, verification NOT required', players: orderingFull },
   slot_geometry: { source: 'harddrop.com/wiki/C-Spin', placements: WIKI_CSPIN.length, rows: slotRows() },

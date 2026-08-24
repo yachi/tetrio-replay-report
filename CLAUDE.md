@@ -867,6 +867,25 @@ merely documented:
   sentence is deleted while the share stays, because that edit turns a shape test into "89% of
   these were C-Spins".
 
+**The per-round and per-match rows carry the C-Spin count beside the T-spin counts it is bounded
+by, and the two sides are NOT the same rounds.** `ordering.per_round` gives every (file, round,
+player) its `cspin_order`, `dt_order`, the WINDOW-scoped `tspin_doubles_window` /
+`tspin_triples_window` the order is decided on, and the WHOLE-ROUND `tspin_doubles` /
+`tspin_triples` read out of the replay's own twice-extracted counters; `ordering.per_match` rolls
+all five up per (file, player). The two T-spin pairs are both published because reading one as the
+other is the hazard — 08-19 m1r0 pinglamb has **one** Double in the opener window and **six** in the
+round. The `column_legend` and `denominators` fields say this inside the artefact.
+
+`cspin_order <= min(tspin_doubles, tspin_triples)` holds on every row and is **asserted at build
+time**, so a mis-joined emitter cannot produce an artefact at all; it lived only in `openers.test.ts`
+until 2026-08-24, i.e. it was checked where the rows are read and not where they are written. What
+the test keeps is the part only it can do: the emitted columns must EQUAL facts.json's, which is two
+independent readers of the `.ttrm` agreeing rather than one value copied twice, plus the off-by-one
+join mutant that gives the bound its teeth. **Never divide the two sides into each other**:
+`cspin_order` sums over SCORED rounds only (a round whose window the verified prefix never reached
+is in `rounds_unscored`), while the counters cover every round, so 「呢啲 spin 入面咁多個 % 係
+C-Spin」 does not follow from the row.
+
 `emit-opener-facts.ts` exports `build()` so `openers.test.ts` can assert the committed artefact
 reproduces byte-for-byte — the same rule facts.json, the ledgers and the .dfy are held to.
 
