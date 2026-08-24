@@ -271,24 +271,53 @@ export function cavity(g: boolean[][], col: number, h: number) {
 }
 
 /**
+ * The ABLATIONS of the donation predicate, and the reason they are emitted rather than described.
+ *
+ * Each entry deletes one clause and keeps the rest, so `donation.ablation` in the artifact carries
+ * what every clause is WORTH on this session's own data. They exist because the alternative was a
+ * corpus band typed into a comment: this file said the predicate "fires on 29-34%" for months
+ * while the seven-session range was 28.93-36.84%, wrong at both ends, and the same string was
+ * pinned inside seven byte-identity-gated artifacts where it read as a verified figure. A number
+ * is emitted here or it is not published.
+ *
+ * `naive` is the control that says the trap is real, and it is a THEOREM this measures rather than
+ * establishes: "the well column is filled through the rows the spin cleared" is forced by
+ * arithmetic — a full row requires every column filled — so it fires on every T-spin clear and says
+ * only that a line went. `NaiveClauseForced` in spec/DonationCave.dfy proves it, also proving the
+ * `inR === 0` branch below unreachable and the naive conjunct removable without changing the
+ * predicate. If this ever emits anything but 100%, the reconstruction is broken, not the theorem.
+ */
+export const DONATION_ABLATIONS = {
+  /** every clause — what the tables actually count */
+  shipped:           { minCavity: DONATION_CAVITY, walled: true,  reopen: true },
+  /** the re-opening clause deleted: the plug may be a wall. This is where the power is */
+  no_reopen:         { minCavity: DONATION_CAVITY, walled: true,  reopen: false },
+  /** ...and the cavity floor dropped to a single cell, i.e. any dent under any plug */
+  cavity1_no_reopen: { minCavity: 1,               walled: true,  reopen: false },
+  /** the naive reading alone. Proved to fire on everything; emitted as the control */
+  naive:             { minCavity: 0,               walled: false, reopen: false },
+} as const;
+export type DonationAblation = keyof typeof DONATION_ABLATIONS;
+
+/**
  * DONATION (harddrop.com/wiki/Donation) — the well columns this T-spin clear donated into.
  *
- * THE NAIVE FORM DISCRIMINATES NOTHING, and that is the trap this predicate is written around.
- * "The well column is filled through the rows the spin cleared" is FORCED BY ARITHMETIC: a full
- * row requires every column filled, so the naive test fires on 100% of all T-spin clears and says
- * only that a line was cleared. That is a theorem, not a measurement — `NaiveClauseForced` in
- * spec/DonationCave.dfy, which also proves the `inR === 0` branch below is unreachable and that
- * deleting the naive conjunct yields an equivalent predicate. As a PREDICATE at the thresholds
- * below, with the re-opening clause deleted, it fires on 29-34%.
- * All of the power is in the RE-OPENING clause — EVERY filled
- * cell of the column must lie in a cleared row, so once the clear resolves the column is open from
- * the surface to the floor again, which is what makes the plug a loan rather than a wall.
+ * All of the power is in the RE-OPENING clause — EVERY filled cell of the column must lie in a
+ * cleared row, so once the clear resolves the column is open from the surface to the floor again,
+ * which is what makes the plug a loan rather than a wall. How much power, on this corpus, is what
+ * `DONATION_ABLATIONS` above exists to emit instead of assert.
  *
  * The T's own slot is excluded, but only when the T occupies the column in EVERY cleared row: a
  * column the T touches in just one of them can still be the well, and is in 3 of the article's 20
  * named setups.
+ *
+ * `abl` names an ablation to evaluate INSTEAD of the shipped predicate. It is a parameter rather
+ * than a second function on purpose: an ablation implemented as a copy is not an ablation of this
+ * code, and would keep answering the old question after this one changed.
  */
-export function donationCols(withT: boolean[][], cleared: number[], t: { row: number; col: number }[], h: number) {
+export function donationCols(withT: boolean[][], cleared: number[], t: { row: number; col: number }[], h: number,
+                             abl: DonationAblation = 'shipped') {
+  const A = DONATION_ABLATIONS[abl];
   const inCleared = new Set(cleared);
   const tByCol = new Map<number, Set<number>>();
   for (const q of t) {
@@ -304,14 +333,15 @@ export function donationCols(withT: boolean[][], cleared: number[], t: { row: nu
       if (!withT[r]![c]) continue;
       inCleared.has(r) ? inR++ : outR++;
     }
-    if (inR === 0 || outR > 0) continue;                       // the re-opening clause
+    if (inR === 0) continue;                                   // the naive clause (proved forced)
+    if (A.reopen && outR > 0) continue;                        // the re-opening clause
     const { cavity: cav, lowest } = cavity(withT, c, h);
-    if (cav < DONATION_CAVITY) continue;
+    if (cav < A.minCavity) continue;
     const deep: number[] = [];
     for (let r = h - 1; r > lowest && deep.length < DONATION_WALLED_ROWS; r--) if (!withT[r]![c]) deep.push(r);
     const walled = deep.every(r =>
       (c === 0 || withT[r]![c - 1]) && (c === BOARD_WIDTH - 1 || withT[r]![c + 1]));
-    if (!walled) continue;
+    if (A.walled && !walled) continue;
     out.push({ col: c, cavity: cav });
   }
   return out;
@@ -435,6 +465,10 @@ interface TSpinClear {
   cave: { width: number; minDepth: number } | null;
   /** the control: the same gap width under a Triple, where it is TST residue rather than a cave */
   wideGapUnderTriple: boolean;
+  /** which of `DONATION_ABLATIONS` fired on this clear. `abl.shipped` is `donation !== null` by
+   *  construction and is asserted to be, so the ablation counts and the table's own count cannot
+   *  come apart — a copy of the predicate that agreed with itself is exactly what this avoids. */
+  abl: Record<DonationAblation, boolean>;
 }
 
 /**
@@ -588,7 +622,11 @@ for (const c of loadCases(dir)) {
     }
 
     const cave = caveAt(withT, mine, lk.cells, H);
-    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave,
+    const abl = Object.fromEntries((Object.keys(DONATION_ABLATIONS) as DonationAblation[])
+      .map(k => [k, donationCols(withT, mine, lk.cells, H, k).length > 0])) as Record<DonationAblation, boolean>;
+    if (abl.shipped !== (donation !== null))
+      throw new Error(`donation ablation 'shipped' disagrees with the shipped path at lock ${i}`);
+    tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave, abl,
                        wideGapUnderTriple: lk.cleared === 3 && wideGapUnder(withT, mine, H) });
 
     // …and the same lock through the OTHER engine, when it reaches this far and agrees the piece
@@ -1134,28 +1172,28 @@ function buildCounterCheck() {
  * runs on. They share no code.
  *
  * WHAT IS PUBLISHED IS THE CONFUSION MATRIX, NOT THE AGREEMENT RATE, and that is the whole point of
- * this function. Both verdicts are rare — 39 caves and 103 donations in 4035 scored clears — so
- * "the two engines agree 96.5% of the time" is 1650 negatives agreeing with each other and says
- * nothing about the metric. Split by the oracle's verdict and the two metrics come apart:
+ * this function. Both verdicts are rare, so "the two engines agree 96% of the time" is overwhelmingly
+ * negatives agreeing with negatives and says nothing about the metric. Split by the oracle's verdict
+ * and the two metrics come apart: the cave agrees on every positive, the donation on about one in
+ * five. Same failure mode as a detector whose clause is entailed by its siblings — a rate whose
+ * denominator is dominated by the easy case measures the substrate. `agreement_on_positives` is
+ * therefore the field the section reads, and `agreement_overall` is emitted beside it precisely so
+ * the gap is visible rather than hidden by publishing only one of them.
  *
- *     cave     — 16 of 16 positives, both engines. A real cross-implementation result.
- *     donation —  9 of 43 positives. The two engines disagree about four donations in five.
+ * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so under half the scored
+ * clears can be compared at all. This is a check, not a re-scoping: the tables still score the
+ * oracle's prefix, exactly as `tspinCounterCheck` licenses a denominator without redefining it.
+ * Neither metric leaves quarantine on this.
  *
- * Same failure mode as a detector whose clause is entailed by its siblings: a rate whose denominator
- * is dominated by the easy case measures the substrate. `agreement_on_positives` is therefore the
- * field the section reads, and `agreement_overall` is emitted beside it precisely so the gap is
- * visible rather than hidden by publishing only one of them.
- *
- * COVERAGE IS THE OTHER HALF. The hand-port verifies a much shorter prefix, so only 1719 of the
- * 4035 scored clears (42.6%) can be compared at all. This is a check, not a re-scoping: the tables
- * still score the oracle's prefix, exactly as `tspinCounterCheck` licenses a denominator without
- * redefining it. Neither metric leaves quarantine on this — cave's 16 positives are 16 of 39.
- *
- * Every figure in this block is the sum over the six committed `sim/opener-facts.json`, not a
- * remembered one. It carried the five-session numbers (3142 scored, 1346 comparable, 13/13 and
- * 9/36) from 2026-08-15, when the sixth session landed and every other corpus figure was
- * re-derived, until 2026-08-17 — long enough for someone to quote "three donations in four" off a
- * comment while the artefacts beside it said four in five.
+ * NO CORPUS COUNTS IN THIS COMMENT, AND THAT IS THE FIX RATHER THAN AN OMISSION. It carried them
+ * twice and they went stale twice: the five-session set survived the sixth session for two days,
+ * long enough for someone to quote "three donations in four" off a comment while the artefacts
+ * beside it said four in five; the six-session set that replaced it — under a sentence promising
+ * "every figure in this block is the sum over the six committed sim/opener-facts.json, not a
+ * remembered one" — was wrong the moment the seventh landed and stayed wrong for five days. A
+ * comment cannot go red. `locks_comparable`, `locks_same_board` and both confusion matrices are
+ * emitted below, per session; roll them up over every `sessions/<date>/sim/opener-facts.json` when a corpus
+ * figure is wanted, exactly as `pipeline/check_donation_bands.py` does for the ablation bands.
  */
 function dualEngineCheck() {
   const cell = (m: { tt: number; tf: number; ft: number; ff: number }) => {
@@ -1182,7 +1220,7 @@ function dualEngineCheck() {
      *  boards, which is the context every figure above has to be read in. */
     locks_same_board: dualSameBoard,
     /** THE READING of `agreement_on_positives`, and the reason it is emitted beside it. Split the
-     *  oracle's positives by whether the other engine had the same board and the donation's 9/36
+     *  oracle's positives by whether the other engine had the same board and the donation's split
      *  resolves completely: 6 of 6 on identical boards, 3 of 30 on boards that differ. So the two
      *  engines do not disagree about what a donation IS — they disagree about the board, which is
      *  `oracle-source.ts`'s garbage-hole problem showing through. The cave is a different statement:
@@ -1215,7 +1253,17 @@ const counterRoundsFor = (user: string, keys: readonly string[]) => {
 // own Natural-vs-Other-Examples division from the plugging lock; the provenance split says whose
 // well it was. Both matter because the corpus answers them the same way every time — all of these
 // wells are garbage-derived — which is exactly the finding, and also the caveat (see below).
+/** A rate as a 2-dp percentage STRING, rounded half-up on the exact ratio.
+ *  `pipeline/check_donation_bands.py` renders the same figures with `floor(n*10000/d + 0.5)`, which
+ *  is this expression in the other language over the same double — and it cross-checks the string
+ *  below against its own rendering, so a divergence in the last digit is a red build rather than a
+ *  disagreement nobody looks at. */
+function pct2(n: number, d: number) { return (Math.round(n * 10000 / d) / 100).toFixed(2); }
+
 function donationMetric() {
+  const scored = tspinClears.length;
+  const ablation = Object.fromEntries((Object.keys(DONATION_ABLATIONS) as DonationAblation[])
+    .map(k => [k, tspinClears.filter(e => e.abl[k]).length]));
   return {
     source: 'harddrop.com/wiki/Donation',
     definition: 'plugging the well with a piece so a T-spin can clear the rows across it, the clear '
@@ -1249,14 +1297,27 @@ function donationMetric() {
       };
     }),
     opener_window_pieces: WINDOW_PIECES,
+    /** WHAT EACH CLAUSE IS WORTH, on this session's data — see `DONATION_ABLATIONS`. Counts, over
+     *  `tspin_clears_scored` pooled across both players, plus the rate each renders to. A corpus
+     *  BAND is deliberately not here: a per-session artifact cannot see the other sessions, so a
+     *  band written into one is a claim it has no way to check, which is how "29-34%" sat wrong in
+     *  all seven of these files at once. The band is rendered from the seven artifacts by
+     *  `pipeline/check_donation_bands.py`, which is also what gates the bands published in prose. */
+    ablation: {
+      scored,
+      counts: ablation,
+      rate_pct: Object.fromEntries(Object.entries(ablation).map(([k, v]) => [k, pct2(v as number, scored)])),
+    },
     means: 'how many verified T-spin clears were fired across a plugged well that the clear then '
          + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
          + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
          + '("the well was filled through the cleared rows") is FORCED BY ARITHMETIC — a full row '
          + 'requires every column filled — and so fires on 100% of all T-spin clears, which is proved '
          + 'rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at '
-         + 'these thresholds without the re-opening clause fires on 29-34%. The discriminating clause '
-         + 'is the re-opening, and that is what is counted here',
+         + `these thresholds without the re-opening clause fires on ${pct2(ablation.no_reopen!, scored)}% of `
+         + `this session's ${scored}. The discriminating clause is the re-opening, and that is what is `
+         + 'counted here. That figure is THIS SESSION\'s and no other: the corpus band belongs to '
+         + 'whatever can see every session, which this file cannot',
     caveat: 'every donation in this corpus sits on a GARBAGE-derived well, and the oracle board '
           + 'source keeps the engine\'s own seeded-RNG hole columns, which disagree with the '
           + 'ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board '
@@ -1269,7 +1330,9 @@ function donationMetric() {
 // THE CONTROL IS THE CROSS-TAB, in two directions, and this metric may not be printed without both:
 //   - by DEPTH: nearly every >=3-wide hit is ONE ROW deep, which is a dimple and not a cave. The
 //     width count on its own reads as dozens of STMB caves; the depth histogram beside it says how
-//     many are genuine (1 in 760 player-rounds, six sessions).
+//     many are genuine — a corpus count is deliberately not quoted here, because the last two in
+//     this file were both stale within days of the session that broke them. `min_depth_hist` is
+//     emitted per session; roll it up when the figure is wanted.
 //   - by LINES: the same >=3-wide gap appears under T-spin TRIPLES at a comparable rate, where it
 //     is ordinary TST residue that nobody calls a cave. A shape that fires as often under the spin
 //     the technique is NOT about is a shape test, not a technique test.

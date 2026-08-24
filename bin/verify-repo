@@ -356,6 +356,9 @@ PLAN = {
     # fingerprints only; here it re-derives the artefact and demands the committed bytes
     # back. Same command, two honest outcomes, and the weaker one announces itself.
     "rate-records": Entry(FAST),
+    # Reads the seven committed opener-facts.json and byte-compares CLAUDE.md's bands
+    # against them. No simulator run, so it is FAST — the artefacts are the input.
+    "donation-bands": Entry(FAST),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.

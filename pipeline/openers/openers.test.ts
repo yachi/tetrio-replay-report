@@ -19,7 +19,7 @@ import { loadCatalogue, prepare, occGrid, mirrorRows, exactMatches, nearest, dis
          cellsOf, isCSpin, isTKI, isDTCannon, isDTFamily, NAME_SETS, ROWS,
          loadWikiOpeners, openerPages, hasFullRow } from './match.ts';
 import { analyse } from './run-openers.ts';
-import { build, serialise, donationCols, caveAt, cavity, dualVerdict,
+import { build, serialise, donationCols, DONATION_ABLATIONS, caveAt, cavity, dualVerdict,
          DONATION_CAVITY, DONATION_WALLED_ROWS, CAVE_MIN_WIDTH } from '../sim/emit-opener-facts.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 
@@ -1013,9 +1013,12 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
   // Every setup harddrop draws, with ONE extra cell: the well column also filled ABOVE the rows the
   // spin clears. The shape is otherwise untouched — same plug, same walled cavity beneath, same
   // cleared rows — but the clear no longer re-opens the column to the surface, so the plug is a wall
-  // and not a loan. This is the one clause carrying the whole metric (the naive clause without it is
-  // forced by arithmetic and fires on 100%; the naive predicate at the shipped thresholds fires on
-  // 29-34%), and it is asserted by BEHAVIOUR rather than by editing the source.
+  // and not a loan. This is the one clause carrying the whole metric — the naive clause without it is
+  // forced by arithmetic and fires on 100% (proved: NaiveClauseForced), and what the rest of the
+  // predicate is worth without it is MEASURED rather than typed here: `donation.ablation` in each
+  // artefact, rolled up by `pipeline/check_donation_bands.py`. The band that used to sit in this
+  // comment said 29-34% while the truth was 28.93-36.84%. This assertion is by BEHAVIOUR rather
+  // than by editing the source, which is the other half of the same rule.
   //
   // Derived from the committed transcription rather than typed out, for the same reason the controls
   // are: a board written down twice is a board that can drift, and a mutation board that had drifted
@@ -1042,6 +1045,33 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
     expect([ctl.name, b.cleared.every(r => b.g[r]![well]!)]).toEqual([ctl.name, true]);
     // ... yet the real predicate now finds no well at all
     expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
+
+    // ...and the ABLATION accepts exactly the board the shipped predicate just rejected, which is
+    // what makes `no_reopen` a measurement of THIS clause rather than of some other difference.
+    // Behavioural, on a drawn board: the corpus can only report that four numbers are ordered, and
+    // an ablation that had drifted into deleting a different clause would keep that ordering.
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, 'no_reopen').map(w => w.col)])
+      .toEqual([ctl.name, [well]]);
+  }
+});
+
+test('the donation ablations are a CHAIN — each one accepts everything the previous one does', () => {
+  // The lattice `pipeline/check_donation_bands.py` asserts over the corpus, asserted here over the
+  // article's own drawings instead. Corpus ordering is weak evidence on its own: it holds for any
+  // four predicates that happen to be nested, including a set that has drifted into ablating the
+  // wrong clause. Every entry deletes a clause the one before it keeps, so on EVERY board the
+  // accepted column sets must nest.
+  const CHAIN = ['shipped', 'no_reopen', 'cavity1_no_reopen', 'naive'] as const;
+  expect(Object.keys(DONATION_ABLATIONS).sort()).toEqual([...CHAIN].sort());
+  for (const ctl of [...DONATION_POSITIVES, ...DONATION_NEGATIVES]) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    const sets = CHAIN.map(k => new Set(donationCols(b.g, b.cleared, b.cells, b.h, k).map(w => w.col)));
+    for (let i = 0; i + 1 < CHAIN.length; i++)
+      expect([ctl.name, CHAIN[i], [...sets[i]!].filter(c => !sets[i + 1]!.has(c))])
+        .toEqual([ctl.name, CHAIN[i], []]);
+    // the naive end of the chain is the FORCED one: on any board with a cleared row it fires,
+    // because a full row fills every column. That is `NaiveClauseForced`, checked as behaviour.
+    expect([ctl.name, sets[3]!.size > 0]).toEqual([ctl.name, b.cleared.length > 0]);
   }
 });
 

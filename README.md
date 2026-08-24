@@ -96,7 +96,7 @@ CI itself checks (`workflow-plan`).
 
 Scope, stated because the two do not overlap: `bin/verify-session` runs 7 gates over ONE
 artefact directory, CI's per-session `pipeline` job runs 18 steps, and `bin/verify-repo`
-by default runs neither — it runs the 13 repo-wide jobs. `bin/verify-repo --sessions`
+by default runs neither — it runs the 14 repo-wide jobs. `bin/verify-repo --sessions`
 adds both matrices and is the only local command that runs everything a push runs.
 
 ## Repository layout

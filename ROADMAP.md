@@ -2985,21 +2985,26 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
     states the repertoire split qualitatively (「pinglamb opens Honey Cup more than yachi does」) and
     keeps only the ordinal claims the committed artefacts pin. The deleted ranges are recorded at
     their own site with the history, so the next session cannot re-introduce them by accident.
-  - **The `cavity >= 1` donation band, 74.6-77.0% — STILL OPEN, and it must be re-measured by hand
+  - ~~**The `cavity >= 1` donation band, 74.6-77.0% — STILL OPEN, and it must be re-measured by hand
     every session.** Nothing recomputes it. Its ceiling survives only by a rounding coincidence:
     08-14's 77.04% ties 08-09's 76.99% at one decimal place, so any future session landing anywhere
     in **77.05-77.94%** moves a figure that reads as stable. 08-19 came in at 76.51% and did not
     move it — which is luck, not a gate. The per-session comment at `openers/openers.test.ts:964`
-    records the arithmetic; it is a comment, so it warns rather than fails.
+    records the arithmetic; it is a comment, so it warns rather than fails.~~
+    **搞掂咗(2026-08-24)** —— 見下面 `donation.ablation` 嗰節。三條 band 全部由七份 artefact
+    render 返出嚟,`pipeline/check_donation_bands.py` byte-compare CLAUDE.md 入面嘅 fragment。
+    順帶執返個 `77.05-77.94%`:個 band 而家報到兩個位,所以「高過 77.04 就郁」,冇咗個
+    round-to-1dp 嘅窿。
 
-  **The candidate fix was considered and NOT taken, and its cost is the reason.** Adding these
-  columns to `analysis/corpus_stats.COLUMNS` would make them re-derivable and stale-detectable by
-  the machinery that just closed the `intense_round.py` item above. But `FAMILY` is the
-  cross-product of `COLUMNS` and `X_VARS` and `m = len(FAMILY)` is the Bonferroni denominator, so
-  **adding a column moves every adjusted p in the published corpus block.** That coupling is
-  intended — it is what a multiplicity correction MEANS, and `corpus_stats`'s docstring says so —
-  which makes it a decision about what the family IS, not a refactor. Recorded here rather than
-  taken, so the next person does not re-derive the trade from scratch and does not make it silently.
+  **The `corpus_stats.COLUMNS` route was considered and NOT taken, and that refusal still stands —
+  the route actually taken is a different one.** Adding these columns to `analysis/corpus_stats.
+  COLUMNS` would make them re-derivable, but `FAMILY` is the cross-product of `COLUMNS` and
+  `X_VARS` and `m = len(FAMILY)` is the Bonferroni denominator, so **adding a column moves every
+  adjusted p in the published corpus block.** That coupling is intended — it is what a multiplicity
+  correction MEANS — which makes it a decision about what the family IS, not a refactor. The 08-24
+  fix does not touch `corpus_stats` at all: the counts are emitted into each session's own
+  artefact and rolled up by a gate that reads the seven artefacts, so nothing enters the
+  multiplicity family and the trade above never has to be made.
 
 ### TWO decisions still with the user — recorded at their own sites, listed here only as an index
 
@@ -3622,3 +3627,66 @@ marked fragment,`rate-records` 係 CI job。個 artefact 帶住佢讀過嘅每�
 
 `bin/verify-repo --check` 一加咗個 job 就即刻紅(「job 'rate-records' is in CI and unknown to
 bin/verify-repo」),即係上個 commit 起嗰個 derive-don't-copy 性質係真嘅。16 個 job 喇。
+
+## `29-34%` —— 一個數,錯足七份 byte-identity gated 嘅 artefact (2026-08-24)
+
+捐窿 metric 有三條 band 冇人 re-derive:donation 2.1-3.3%、shipped-minus-re-opening
+28.9-36.8%、`cavity ≥ 1` composite 74.6-77.0%。開工前以為淨係「攞返個 renderer 出嚟」,
+埋到去先發現個窿深好多。
+
+### 個窿
+
+`emit-opener-facts.ts` 兩個 comment、`openers.test.ts` 一個 comment,加埋七份
+`sessions/*/sim/opener-facts.json` 嘅 `means` prose,全部寫住個 predicate 拆走 re-opening
+clause 之後「fires on 29-34%」。**真數係 28.93-36.84%,兩頭都錯,個天花板差近三個 point。**
+
+要緊嘅唔係個數錯,係**佢錯得幾靜**:嗰七份 artefact 係 byte-identity gated 嘅,重新 emit 一次
+會一個 byte 都唔差咁噴返同一句錯嘢出嚟,所以 repo 入面**每一個 gate 都同意佢**。
+Byte-identity 證嘅係「冇變過」,唔係「啱」;一個人手打嘅數擺喺 byte-identity gate 入面
+係釘死咗,唔係查過。
+
+### 兩個修法,第二個先係可以搬走嘅嗰個
+
+1. 三條 band 由 `pipeline/check_donation_bands.py` render,CLAUDE.md 嗰幾句用 marked
+   fragment byte-compare。
+2. **一份 per-session artefact 唔可以再寫 corpus band。** 佢睇唔到第二個 session,所以寫落去
+   嗰個 band 係佢冇辦法 check 嘅一句話 —— 呢個就係點解一句嘢可以同時錯足七份檔。而家
+   `donation.ablation` 淨係擺自己嗰個 session 嘅 counts 同 rate,`means` 都改成講自己嗰個數,
+   仲寫明「呢個係本 session 嘅,唔係 corpus 嘅」。
+
+### Ablation 係 predicate 嘅 parameter,唔係 copy
+
+`DONATION_ABLATIONS` 拆一條 clause、其餘照行 shipped 嗰條 code path。Emitter 見到
+`shipped` ablation 同 shipped path 唔同就 throw。抄一份出嚟寫嘅 ablation 寫嗰日會啱,
+之後 predicate 一改就永世答緊舊問題。
+
+### 第三個錯:band 嘅 rounding direction
+
+Shipped band publish 咗做 2.1-3.3%,但個地板係 **2.08** —— band 嘅低位要 floor、高位要 ceil,
+唔係就個 band 包唔住自己 range 到嘅嘢(2.1 剔走咗 07-28)。而家三條 band 全部報兩個位,
+同佢自己條 series 一樣精度,連個決定都唔使做。同一個 rounding 亦係「74.6-77.0%」四個 session
+都冇郁過嘅原因:08-14 嘅 77.04 同 08-09 嘅 76.99 淨係喺一個小數位度打和。
+
+### 點解呢次 recompute 係啱,repertoire ranges 嗰次唔係
+
+上面 2026-08-19 嗰粒否決咗「整個 gate recompute 啲 band」,理由係七個 session 入面五條
+band 郁咗三條,個 gate 平時就係紅嘅,而**平時紅嘅 gate 唔係 gate**。個反對從來唔係反對
+recompute,係當時紅代表「再度過一次」。有咗 `--render`,band 郁咗嘅成本係 paste 一次 ——
+呢個就係 repo 對任何有 renderer 嘅數嘅企硬規矩。
+
+### 順手清咗嘅,同刻意唔清嘅
+
+`dualEngineCheck` 個 comment 入面六個 session 嘅數(39 caves / 103 donations / 4035 scored /
+1719 comparable / 16 of 16 / 9 of 43)第七個 session 落地嗰日就錯咗,而佢自己上面寫住
+「every figure in this block is the sum over the six committed sim/opener-facts.json, not a
+remembered one」。**冇 refresh,係刪咗** —— 論點留低,數叫人自己 roll up。同樣處理 STMB
+嗰句「1 in 760 player-rounds」。
+
+**仲未清嘅,filed here:**
+
+- `emit-opener-facts.ts:219`、`:224` 嘅 `0 of 4326`,同 `:867` 嘅 `0 of 522 / 0 of 431` ——
+  同一批六個 session 嘅數,冇度過就唔亂改。
+- CLAUDE.md 第二個引擎嗰節成家人(11/58、23/23、2019/2019、96.3%、1933/1944、0.9943、
+  1146/2019、43.2%、split table 全部)。**今日查過,七個 session 之下全部啱**,所以唔急,
+  但一個都冇 gate。全部 derivable from `donation.dual_engine`,除咗「median 12 cells」。
+  下一粒就係佢。
