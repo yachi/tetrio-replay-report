@@ -386,7 +386,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -397,7 +399,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -408,7 +412,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 7,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -419,7 +425,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 2,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -430,7 +438,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -441,7 +451,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -452,7 +464,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -463,7 +477,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -474,7 +490,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 10,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -485,7 +503,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 10,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -496,7 +516,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -507,7 +529,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -518,7 +542,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -529,7 +555,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -540,7 +568,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -551,7 +581,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -562,7 +594,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 7,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -573,7 +607,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -584,7 +620,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -595,7 +633,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -606,7 +646,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -617,7 +659,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -628,7 +672,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -639,7 +685,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -650,7 +698,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -661,7 +711,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -672,7 +724,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -683,7 +737,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -694,7 +750,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -705,7 +763,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 10,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -716,7 +776,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -727,7 +789,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -738,7 +802,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -749,7 +815,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 1,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -760,7 +828,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -771,7 +841,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -782,7 +854,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -793,7 +867,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -804,7 +880,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -815,7 +893,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -826,7 +906,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -837,7 +919,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -848,7 +932,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -859,7 +945,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -870,7 +958,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 1,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -881,7 +971,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 3
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -892,7 +984,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -903,7 +997,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -914,7 +1010,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 2,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -925,7 +1023,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -936,7 +1036,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 5,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -947,7 +1049,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 9,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -958,7 +1062,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -969,7 +1075,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -980,7 +1088,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -991,7 +1101,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1002,7 +1114,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1013,7 +1127,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1024,7 +1140,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 4,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1035,7 +1153,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1046,7 +1166,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1057,7 +1179,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1068,7 +1192,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1079,7 +1205,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1090,7 +1218,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1101,7 +1231,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1112,7 +1244,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1123,7 +1257,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1134,7 +1270,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1145,7 +1283,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1156,7 +1296,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1167,7 +1309,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1178,7 +1322,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1189,7 +1335,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1200,7 +1348,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1211,7 +1361,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1222,7 +1374,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1233,7 +1387,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1244,7 +1400,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1255,7 +1413,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1266,7 +1426,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1277,7 +1439,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1288,7 +1452,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 3,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -1299,7 +1465,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1310,7 +1478,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1321,7 +1491,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1332,7 +1504,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 11,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1343,7 +1517,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 9,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1354,7 +1530,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 8,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1365,7 +1543,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1376,7 +1556,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1387,7 +1569,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1398,7 +1582,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 3,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1409,7 +1595,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1420,7 +1608,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 12,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1431,7 +1621,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 11,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1442,7 +1634,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -1453,7 +1647,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1464,7 +1660,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1475,7 +1673,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1486,7 +1686,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1497,7 +1699,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1508,7 +1712,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1519,7 +1725,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 0,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1530,7 +1738,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1541,7 +1751,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1552,7 +1764,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1563,7 +1777,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1574,7 +1790,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -1585,7 +1803,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1596,7 +1816,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 2,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1607,7 +1829,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1618,7 +1842,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1629,7 +1855,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1640,7 +1868,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1651,7 +1881,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1662,7 +1894,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1673,7 +1907,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1684,7 +1920,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1695,7 +1933,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1706,7 +1946,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -1717,7 +1959,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1728,7 +1972,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1739,7 +1985,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1750,7 +1998,9 @@
         "cspin_order": 1,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1761,7 +2011,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1772,7 +2024,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 2
+        "tspin_triples_window": 2,
+        "tspin_doubles": 1,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1783,7 +2037,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1794,7 +2050,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1805,7 +2063,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1816,7 +2076,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1827,7 +2089,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1838,7 +2102,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1849,7 +2115,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1860,7 +2128,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 9,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1871,7 +2141,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 10,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1882,7 +2154,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1893,7 +2167,9 @@
         "cspin_order": null,
         "dt_order": null,
         "tspin_doubles_window": 2,
-        "tspin_triples_window": 0
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1904,7 +2180,9 @@
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 11,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -1915,7 +2193,9 @@
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
-        "tspin_triples_window": 1
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
       }
     ],
     "per_match": [
@@ -1926,7 +2206,11 @@
         "rounds_scored": 8,
         "rounds_unscored": 0,
         "cspin_order": 5,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 41,
+        "tspin_triples": 7
       },
       {
         "file": "replay-2026-08-19-1.ttrm",
@@ -1935,7 +2219,11 @@
         "rounds_scored": 7,
         "rounds_unscored": 1,
         "cspin_order": 4,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 4,
+        "tspin_doubles": 38,
+        "tspin_triples": 5
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -1944,7 +2232,11 @@
         "rounds_scored": 7,
         "rounds_unscored": 1,
         "cspin_order": 2,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 27,
+        "tspin_triples": 2
       },
       {
         "file": "replay-2026-08-19-10.ttrm",
@@ -1953,7 +2245,11 @@
         "rounds_scored": 8,
         "rounds_unscored": 0,
         "cspin_order": 6,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 6,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 43,
+        "tspin_triples": 8
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -1962,7 +2258,11 @@
         "rounds_scored": 6,
         "rounds_unscored": 0,
         "cspin_order": 5,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 5,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 23,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-2.ttrm",
@@ -1971,7 +2271,11 @@
         "rounds_scored": 6,
         "rounds_unscored": 0,
         "cspin_order": 4,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 25,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -1980,7 +2284,11 @@
         "rounds_scored": 5,
         "rounds_unscored": 0,
         "cspin_order": 2,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 18,
+        "tspin_triples": 8
       },
       {
         "file": "replay-2026-08-19-3.ttrm",
@@ -1989,7 +2297,11 @@
         "rounds_scored": 5,
         "rounds_unscored": 0,
         "cspin_order": 2,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 14,
+        "tspin_triples": 5
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -1998,7 +2310,11 @@
         "rounds_scored": 8,
         "rounds_unscored": 0,
         "cspin_order": 5,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 26,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-4.ttrm",
@@ -2007,7 +2323,11 @@
         "rounds_scored": 8,
         "rounds_unscored": 0,
         "cspin_order": 5,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 6,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 29,
+        "tspin_triples": 7
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -2016,7 +2336,11 @@
         "rounds_scored": 7,
         "rounds_unscored": 0,
         "cspin_order": 4,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 20,
+        "tspin_triples": 7
       },
       {
         "file": "replay-2026-08-19-5.ttrm",
@@ -2025,7 +2349,11 @@
         "rounds_scored": 5,
         "rounds_unscored": 2,
         "cspin_order": 2,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 22,
+        "tspin_triples": 7
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -2034,7 +2362,11 @@
         "rounds_scored": 7,
         "rounds_unscored": 0,
         "cspin_order": 1,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 4,
+        "tspin_doubles": 47,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-6.ttrm",
@@ -2043,7 +2375,11 @@
         "rounds_scored": 7,
         "rounds_unscored": 0,
         "cspin_order": 6,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 53,
+        "tspin_triples": 8
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -2052,7 +2388,11 @@
         "rounds_scored": 6,
         "rounds_unscored": 0,
         "cspin_order": 4,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 5,
+        "tspin_doubles": 15,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-7.ttrm",
@@ -2061,7 +2401,11 @@
         "rounds_scored": 4,
         "rounds_unscored": 2,
         "cspin_order": 3,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 13,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -2070,7 +2414,11 @@
         "rounds_scored": 6,
         "rounds_unscored": 0,
         "cspin_order": 4,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 20,
+        "tspin_triples": 6
       },
       {
         "file": "replay-2026-08-19-8.ttrm",
@@ -2079,7 +2427,11 @@
         "rounds_scored": 4,
         "rounds_unscored": 2,
         "cspin_order": 1,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 13,
+        "tspin_triples": 1
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -2088,7 +2440,11 @@
         "rounds_scored": 8,
         "rounds_unscored": 1,
         "cspin_order": 6,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 35,
+        "tspin_triples": 9
       },
       {
         "file": "replay-2026-08-19-9.ttrm",
@@ -2097,14 +2453,26 @@
         "rounds_scored": 6,
         "rounds_unscored": 3,
         "cspin_order": 2,
-        "dt_order": 0
+        "dt_order": 0,
+        "tspin_doubles_window": 11,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 32,
+        "tspin_triples": 4
       }
     ],
     "cell_legend": {
       "0": "the window was verified to its end and the order did not happen",
       "1": "a T-spin Triple then a T-spin Double, both inside the opener window, both observed",
       "null": "the verified prefix ended before the window did and nothing was seen — UNKNOWN, not zero. A 1 needs no such caveat: an observed order cannot be undone by an unobserved remainder, so truncation loses C-Spins and never invents one"
-    }
+    },
+    "column_legend": {
+      "cspin_order": "the Triple-then-Double order. 0/1 on a per_round row (a round either showed it or did not); on a per_match row, how many of that match's SCORED rounds did",
+      "tspin_doubles_window": "T-spin Doubles at lock <= window_pieces — the population the order above is decided on, and NOT the round's T-spin count",
+      "tspin_triples_window": "the same, for Triples",
+      "tspin_doubles": "T-spin Doubles over the WHOLE round, from the replay's own results.stats.clears.tspindoubles — the twice-extracted field facts.json carries, which tspinCounterCheck proves this simulator reproduces on every round. null is UNKNOWN (the round carried no counter), never zero",
+      "tspin_triples": "the same, from results.stats.clears.tspintriples"
+    },
+    "denominators": "THE TWO SIDES OF A ROW ARE NOT THE SAME ROUNDS, and dividing one into the other is the mistake this note exists to stop. cspin_order sums over SCORED rounds only — a round whose opener window the verified prefix never reached is in rounds_unscored and contributes nothing — while the T-spin counters come from the replay and cover every round of the match. cspin_order <= min(tspin_doubles, tspin_triples) therefore still holds, because the C-Spin side can only lose rounds; \"this share of those spins were C-Spins\" does not follow and must not be printed. The bound is asserted at build time"
   },
   "ordering_full_round": {
     "scope": "whole simulated round, verification NOT required",

@@ -1215,12 +1215,19 @@ def _per_match_table(data):
             # 「—」 would lose that. A NULL CELL and a zero are different claims — see `_null_note`.
             f'<td class="mono">{unscored if unscored else "—"}</td>'
             f'<td class="mono">{r["dt_order"]}</td>'
+            # The two T-spin columns are a DIFFERENT scope from the two beside them, and the header
+            # says so in every cell's column name rather than only in the note below: a reader
+            # scanning a row does not read the note first. null is UNKNOWN — a match holding a round
+            # with no counter — and renders 「?」, never 0.
+            f'<td class="mono">{r["tspin_doubles"] if r.get("tspin_doubles") is not None else "?"}</td>'
+            f'<td class="mono">{r["tspin_triples"] if r.get("tspin_triples") is not None else "?"}</td>'
             "</tr>")
     w = data["window_pieces"]
     head = ["<th>場</th>", "<th>玩家</th>",
             f"<th>先 Triple 後 Double（頭 {w} 手內）</th>",
             "<th>可核回合</th>", "<th>答唔到</th>",
-            f"<th>先 Double 後 Triple（頭 {w} 手內）</th>"]
+            f"<th>先 Double 後 Triple（頭 {w} 手內）</th>",
+            "<th>成功 TSD（成場、每個回合）</th>", "<th>成功 TST（成場、每個回合）</th>"]
     return head, rows
 
 
@@ -1258,14 +1265,17 @@ def _scope_note(data):
     tsd = sum(r["tspin_doubles_window"] for r in per)
     tst = sum(r["tspin_triples_window"] for r in per)
     return (
-        "<strong>呢個表同報告入面 TSD／TST 嗰兩欄唔同範圍，唔好擺埋一齊讀。</strong>"
-        f"呢度數嘅係頭 {w} 手（三包）之內落嘅 T-spin；"
-        "報告 <code>逐局全數據</code> 嗰兩欄係<strong>成個回合</strong>嘅數，"
+        "<strong>同一行入面呢兩對數唔同範圍，唔好夾埋計。</strong>"
+        f"頭兩欄嘅次序係喺頭 {w} 手（三包）之內數，"
+        "而且淨係數<strong>可核</strong>嗰啲回合（「答唔到」嗰欄嗰啲唔計）；"
+        "「成功 TSD／TST」兩欄係<strong>成個回合、成場每一個回合</strong>嘅數，"
         "由 <code>facts.json</code> 兩個 counter 嚟，兩個抽取器各自讀過。"
         f"呢個 session 頭 {w} 手入面得 <strong>{tsd}</strong> 個 T-spin Double、"
         f"<strong>{tst}</strong> 個 T-spin Triple——"
-        "Triple 差唔多全部落喺開局，Double 就大部分喺後面，"
-        "所以兩欄嘅分母差好遠，唔可以當成同一件事嘅兩面。"
+        "Triple 差唔多全部落喺開局，Double 就大部分喺後面。"
+        "所以「C-Spin 次數 ÷ TSD」<strong>唔係</strong>「幾多 % 嘅 TSD 係 C-Spin」，"
+        "兩個分母根本唔同——次序嗰欄只可能<strong>少過</strong>另外兩欄，"
+        "所以行得通嘅只有「次序 ≤ min(TSD, TST)」呢個界，emit 嗰陣就已經 assert 咗。"
     )
 
 

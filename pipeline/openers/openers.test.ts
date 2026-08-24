@@ -1320,6 +1320,62 @@ test('the join gate: cspin <= min(TST, TSD) per row, and an off-by-one join brea
   expect([rows, bound]).toEqual([839, 520]);
 });
 
+test('the emitted whole-round T-spin columns ARE facts.json\'s, per round and per match', () => {
+  // The artefact now publishes `tspin_doubles` / `tspin_triples` beside `cspin_order` so a reader
+  // no longer has to perform this join. That makes the join a thing to CHECK rather than a thing to
+  // do: the emitter reads the .ttrm through its own loader and facts.json comes from extract.py and
+  // extract2.ts, so equality here is two independent readers agreeing, not a value copied twice.
+  let perRound = 0, perMatch = 0;
+  for (const s of SESSIONS) {
+    const o = facts(s).ordering as any;
+    const fr = factsRounds(s);
+    for (const r of o.per_round) {
+      const c = fr.get(`${r.file}|${r.round}|${r.user}`)!;
+      expect([s, r.file, r.round, r.user, r.tspin_doubles, r.tspin_triples])
+        .toEqual([s, r.file, r.round, r.user, c.tsd, c.tst]);
+      perRound++;
+    }
+    // ...and the match rows are the sum of exactly their own rounds. Rolled up from facts.json
+    // rather than from the per_round rows above, so a bug that dropped a round from BOTH the sum
+    // and the row list would still fail here.
+    const want = new Map<string, [number, number]>();
+    for (const r of o.per_round) {
+      const c = fr.get(`${r.file}|${r.round}|${r.user}`)!;
+      const k = `${r.file}|${r.user}`;
+      const a = want.get(k) ?? [0, 0];
+      want.set(k, [a[0] + c.tsd, a[1] + c.tst]);
+    }
+    for (const m of o.per_match) {
+      expect([s, m.file, m.user, m.tspin_doubles, m.tspin_triples])
+        .toEqual([s, m.file, m.user, ...want.get(`${m.file}|${m.user}`)!]);
+      // the C-Spin count sums over SCORED rounds only, so it can only be short of the T-spin side
+      expect([s, m.file, m.user, m.cspin_order <= Math.min(m.tspin_doubles, m.tspin_triples)])
+        .toEqual([s, m.file, m.user, true]);
+      expect([s, m.file, m.user, m.rounds_scored + m.rounds_unscored]).toEqual([s, m.file, m.user, m.rounds]);
+      perMatch++;
+    }
+  }
+  // pinned so a session dropping out of the sweep is a failure rather than a smaller green run
+  expect([perRound, perMatch]).toEqual([900, 118]);
+});
+
+test('the window columns are NOT the whole-round ones — the corpus separates them', () => {
+  // The two pairs answer different questions, and the artefact's `denominators` note says so. If
+  // they happened to be equal everywhere the distinction would be untested and the note decorative,
+  // so this asserts the corpus actually discriminates them — and in which direction it can: the
+  // window is a subset of the round, so window <= round on every row, with strict inequality common.
+  let strictly = 0, total = 0;
+  for (const s of SESSIONS)
+    for (const r of (facts(s).ordering as any).per_round) {
+      expect([s, r.file, r.round, r.user,
+              r.tspin_doubles_window <= r.tspin_doubles && r.tspin_triples_window <= r.tspin_triples])
+        .toEqual([s, r.file, r.round, r.user, true]);
+      total++;
+      if (r.tspin_doubles_window < r.tspin_doubles || r.tspin_triples_window < r.tspin_triples) strictly++;
+    }
+  expect([total, strictly]).toEqual([900, 778]);
+});
+
 /** The ONE opener in the corpus that runs the DT order, named rather than absorbed.
  *
  *  Through five sessions this test asserted `dt_order === 0` for every player, and the section's

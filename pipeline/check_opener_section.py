@@ -203,7 +203,15 @@ CAVE_SPLIT_MARKER = "咁係穩陣，唔等於啱"
 # thing standing between them and that reading. Printing windowed TSD instead is not the repair:
 # facts.json has no lock indices, so that column would be simulator-derived and the anchor — the
 # whole reason a quarantined table may sit beside trust-chain numbers — is what would be lost.
-PER_MATCH_SCOPE_MARKER = "唔同範圍，唔好擺埋一齊讀"
+PER_MATCH_SCOPE_MARKER = "唔同範圍，唔好夾埋計"
+# THE RATIO REFUSAL, and it became necessary the day the two T-spin columns moved INTO this table
+# (2026-08-24). Before that the scope warning was about two tables a reader had to hold in mind at
+# once; now the C-Spin count and the T-spin counts sit in one row, which is what was asked for and
+# also what makes the division look inviting. It is not available: the order is counted over SCORED
+# rounds inside the opener window, the counters over EVERY round of the match, so a quotient has a
+# numerator and a denominator drawn from different populations. The only relation that survives is
+# the bound, which `emit-opener-facts.ts` asserts at build time.
+PER_MATCH_RATIO_MARKER = "兩個分母根本唔同"
 # NULL vs ZERO, and the rule behind it is ASYMMETRIC — which is why the sentence has to say so
 # rather than just flag the column. Truncation of the verified prefix can only ever LOSE an order,
 # never invent one, so an observed 1 stands and only an unobservable 0 is unknown. The symmetric
@@ -326,10 +334,18 @@ def problems(data, doc):
     if per_match:
         if PER_MATCH_SCOPE_MARKER not in body:
             bad.append(
-                f"the per-match scope control is gone ({PER_MATCH_SCOPE_MARKER!r} missing) — this "
-                "table counts T-spins inside the opener window while the round table prints "
-                "whole-round TSD/TST, and the window holds ~96% of Triples against ~20% of "
-                "Doubles, so the two may not be published without the sentence saying so")
+                f"the per-match scope control is gone ({PER_MATCH_SCOPE_MARKER!r} missing) — the "
+                "ordering columns are counted inside the opener window over scored rounds while "
+                "the TSD/TST columns beside them are whole-round over every round, and the window "
+                "holds ~96% of Triples against ~20% of Doubles, so the row may not be published "
+                "without the sentence saying so")
+        if any(r.get("tspin_doubles") is not None for r in per_match) \
+                and PER_MATCH_RATIO_MARKER not in body:
+            bad.append(
+                f"the per-match ratio refusal is gone ({PER_MATCH_RATIO_MARKER!r} missing) — the "
+                "C-Spin count and the T-spin counters now sit in ONE row, which is exactly the "
+                "layout that invites dividing them; they are drawn from different populations "
+                "(scored rounds in-window against every round) and only the bound survives")
         if CLASS_BOTH_MARKER not in body:
             bad.append(
                 f"the class caveat states only one direction ({CLASS_BOTH_MARKER!r} missing) — "
@@ -573,7 +589,8 @@ def _selftest(report_dir):
                    *ANCHOR_MARKERS, *CAVE_ANCHOR_MARKERS,
                    DUAL_ENGINE_MARKER, DUAL_COVERAGE_MARKER,
                    DUAL_SPLIT_MARKER, CAVE_SPLIT_MARKER,
-                   PER_MATCH_SCOPE_MARKER, PER_MATCH_NULL_MARKER, PER_MATCH_NULL_ZERO_MARKER,
+                   PER_MATCH_SCOPE_MARKER, PER_MATCH_RATIO_MARKER,
+                   PER_MATCH_NULL_MARKER, PER_MATCH_NULL_ZERO_MARKER,
                    CLASS_BOTH_MARKER):
         if marker in body:
             cases.append((f"a control sentence is deleted ({marker})", data,
