@@ -3686,7 +3686,59 @@ remembered one」。**冇 refresh,係刪咗** —— 論點留低,數叫人自�
 
 - `emit-opener-facts.ts:219`、`:224` 嘅 `0 of 4326`,同 `:867` 嘅 `0 of 522 / 0 of 431` ——
   同一批六個 session 嘅數,冇度過就唔亂改。
-- CLAUDE.md 第二個引擎嗰節成家人(11/58、23/23、2019/2019、96.3%、1933/1944、0.9943、
+- ~~CLAUDE.md 第二個引擎嗰節成家人(11/58、23/23、2019/2019、96.3%、1933/1944、0.9943、
   1146/2019、43.2%、split table 全部)。**今日查過,七個 session 之下全部啱**,所以唔急,
   但一個都冇 gate。全部 derivable from `donation.dual_engine`,除咗「median 12 cells」。
-  下一粒就係佢。
+  下一粒就係佢。~~ **搞掂咗(2026-08-24)** —— 見下面 `check_dual_engine` 嗰節。
+  「median 12 cells」原本真係 derive 唔到,所以 emitter 加咗 `board_diff_hist`;
+  順帶連「27 locks against 81」都 emit 埋(`prefix_locks`),而嗰個 81 係錯嘅。
+
+## 第二個引擎 —— 十七個啱嘅數,冇一個有 gate (2026-08-24)
+
+上面嗰粒 file 落嚟嘅時候寫住「今日查過全部啱,所以唔急」。**「啱」正正就係一個冇 gate 嘅數
+嘅正常狀態** —— 呢一節自己已經睇住兩份 copy stale 過:`emit-opener-facts.ts` 入面五個
+session 嗰份撐咗第六個 session 兩日;換佢嗰份六個 session 嘅,**上面寫住「not a remembered
+one」**,第七個 session 落地嗰日就錯,錯足五日。所以呢粒唔係「唔急」,係「未紅過」。
+
+### 兩個數本身 derive 唔到,所以 emitter 要改
+
+- `prefix_locks`(每個 session 兩條 prefix 嘅總長 + 局數)—— corpus mean 要 roll up,唔可以
+  攞七個 session 嘅 mean 再平均。
+- `board_diff_hist`(兩個 engine 塊板差幾多格,只 bin 差異 > 0 嗰啲)—— **median 唔會 roll
+  up**,所以出 histogram 唔出 median。順手拆咗個 early exit:原本數到第一格唔同就收工,
+  而「差幾遠」先係話到「啲 drift 係幾行垃圾,唔係另一場波」嗰個數。
+
+七份 artefact 重新 emit,其餘部分 byte-identical。
+
+### 個錯:`27 locks against 81`
+
+真數 **26.2 同 80.4**。Hand-port 嗰個向上冚(冇殺傷力嘅方向),oracle 嗰個都向上冚
+(**擦鞋嘅方向**)—— 個 gap 睇落大過真實。**呢條 branch 第四個同一個方向嘅錯**,前面三個係
+shipped band 個地板、`sd_ratio`、同個 cut-off band。
+
+Rounding 方向係跟 **claim**,唔係跟個數:短嗰條 ceil、長嗰條 floor,所以「26.3 against 80.3」
+喺最益短嗰條、最蝕長嗰條嘅讀法下都仲企得住。`--selftest` 會攞每個有方向嘅數用相反規則
+re-render 再夾埋印出嚟,所以**呢個 corpus 分唔到方向嗰個數會被點名**,唔會靜靜當有 check。
+今次五個全部分得到。
+
+### Gate 唔淨係查啲位數,查埋個 shape
+
+`_invariants` 十條,其中三條係論點本身:
+
+- **`both_no` 一定要壓倒性咁多數**(`_MIN_BOTH_NO_SHARE = 0.99`,係 `openers.test.ts` 已經
+  assert 嘅 bound,唔係今日度到嗰個 0.9943 —— set 做今日個 measurement 嘅 guard 係
+  measurement 嘅 copy)。呢句一唔啱,「個 overall rate 係負對負」就唔再係真,而個 section
+  仲印緊個 rate。
+- **hand-port 一定要係短嗰條 prefix**,唔係嘅話 coverage 嗰句講緊第二個 engine。
+- **個 board split 一定要係 partition**(兩邊 positives 加返等於總數,agreements 同樣),
+  唔係嘅話「個分歧係塊板」係企喺一個冇人講過嘅 subset 上面。
+
+另外 `roll_up` 會 assert `donation.dual_engine == stmb_cave.dual_engine` —— 讀其中一份當另一份
+publish 係睇唔到嘅,只要佢哋仲一樣。
+
+### 一個 loader,兩個 gate
+
+`check_donation_bands.opener_artefacts` 而家兩邊共用。兩個 gate 各自 glob `sessions/*` 嘅話,
+第一次有 session directory 生咗個 exception 就會唔同步 —— 而**讀少咗 session 嗰個會靜靜咁綠**。
+
+18 個 job,15 個 repo-wide。

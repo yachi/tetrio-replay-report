@@ -2466,6 +2466,27 @@
       ],
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
       "locks_scored": 612,
+      "prefix_locks": {
+        "rounds": 106,
+        "oracle_locks": 9416,
+        "hand_port_locks": 2793
+      },
+      "board_diff_hist": {
+        "2": 13,
+        "4": 4,
+        "6": 5,
+        "8": 13,
+        "10": 10,
+        "12": 32,
+        "14": 5,
+        "16": 2,
+        "18": 2,
+        "20": 3,
+        "22": 2,
+        "24": 1,
+        "26": 3,
+        "32": 1
+      },
       "locks_comparable": 229,
       "locks_same_board": 133,
       "board_split": {
@@ -2627,6 +2648,27 @@
       ],
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
       "locks_scored": 612,
+      "prefix_locks": {
+        "rounds": 106,
+        "oracle_locks": 9416,
+        "hand_port_locks": 2793
+      },
+      "board_diff_hist": {
+        "2": 13,
+        "4": 4,
+        "6": 5,
+        "8": 13,
+        "10": 10,
+        "12": 32,
+        "14": 5,
+        "16": 2,
+        "18": 2,
+        "20": 3,
+        "22": 2,
+        "24": 1,
+        "26": 3,
+        "32": 1
+      },
       "locks_comparable": 229,
       "locks_same_board": 133,
       "board_split": {

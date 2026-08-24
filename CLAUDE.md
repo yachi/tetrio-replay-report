@@ -82,6 +82,9 @@ python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
 python3 -m pipeline.check_donation_bands            # CI gate: the Donation ablation bands, rolled
 python3 -m pipeline.check_donation_bands --render   #   up from the seven artefacts. --render prints
 python3 -m pipeline.check_donation_bands --selftest #   the fragments to paste; --selftest its mutants
+python3 -m pipeline.check_dual_engine               # CI gate: the dual_engine confusion matrix, its
+python3 -m pipeline.check_dual_engine --render      #   board split, coverage and prefix lengths —
+python3 -m pipeline.check_dual_engine --selftest    #   --selftest also checks each rounding DIRECTION
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
 python3 -m pipeline.openers.extract_wiki_openers --selftest # its mutants
 python3 -m pipeline.openers.extract_wiki_techniques            # CI gate: the Donation / STMB Cave
@@ -242,7 +245,7 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **17 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **18 job definitions
   across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
@@ -250,7 +253,7 @@ equivalent marker pair.
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Fourteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+- **Fifteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
   covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
@@ -1222,39 +1225,48 @@ both over every case and compares the two board-state verdicts lock by lock, as 
 verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
-whole finding. Both verdicts are rare — 49 caves and 127 donations in 4763 scored clears — so an
-overall rate is negatives agreeing with negatives. Split by the oracle's own verdict, over seven
-sessions:
+whole finding. Both verdicts are rare —
+<!--dual:rare-->49 caves and 127 donations in 4763 scored clears<!--/dual:rare--> — so an
+overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
-| cave | 2019/2019 (100%) | **23 / 23** |
-| donation | 1944/2019 (96.3%) | **11 / 58** (19.0%) |
+| cave | <!--dual:cave-overall-->2019/2019 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->23 / 23<!--/dual:cave-pos-->** |
+| donation | <!--dual:don-overall-->1944/2019 (96.3%)<!--/dual:don-overall--> | **<!--dual:don-pos-->11 / 58<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->19.0%<!--/dual:don-pos-pct-->) |
 
-The donation's 96.3% is **1933 of 1944** agreements being both engines saying "no". On the thing the
+The donation's overall rate is **<!--dual:don-bothno-->1933 of 1944<!--/dual:don-bothno-->**
+agreements being both engines saying "no". On the thing the
 table actually counts the two engines disagree about **four donations in five** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
-siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is 0.9943 at seven
-sessions) so a future change cannot quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
+siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
+<!--dual:bothno-share-->0.9943<!--/dual:bothno-share--> at seven sessions) so a future change cannot
+quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
+`pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
+dominating while the section still prints the rate**, because the bound is what makes the sentence
+beside the table true and not merely what the number happens to be.
 
-**Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix (27 locks
-against 81 on average), so the comparison reaches **2019 of 4763** scored clears — cave's 23
-positives are 23 of the corpus's 49. It is a check on the verdicts, not a re-scoping of the tables,
+**Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix
+(<!--dual:prefix-->26.3 locks against 80.3<!--/dual:prefix--> on average), so the comparison reaches
+**<!--dual:coverage-->2019 of 4763<!--/dual:coverage-->** scored clears — cave's
+<!--dual:cave-of-corpus-->23 of the corpus's 49<!--/dual:cave-of-corpus-->. It is a check on the
+verdicts, not a re-scoping of the tables,
 exactly as the counter anchor licenses a denominator without redefining it. What it buys the
 donation table is a *caveat it did not have*: the one metric here with no second implementation
 backing it, stated as a measurement.
 
 **The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** Only
-**1146 of the 2019** comparison points put the two engines on the same board, so at **43.2%** of
-them they are judging boards that differ cell for cell (median 12 cells), and every figure in the
+**<!--dual:same-board-->1146 of the 2019<!--/dual:same-board-->** comparison points put the two
+engines on the same board, so at **<!--dual:diff-share-->43.2%<!--/dual:diff-share-->** of
+them they are judging boards that differ cell for cell (median
+<!--dual:diff-median-->12<!--/dual:diff-median--> cells), and every figure in the
 table above is read inside that. Split the positives by board equality and the donation resolves
 completely:
 
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
-| cave | 23 | 4 | 23/23 | 4/4 | 19/19 |
-| donation | 58 | 7 | 11/58 | **7 / 7** | **4 / 51** |
+| cave | <!--dual:row-cave-->23 | 4 | 23/23 | 4/4 | 19/19<!--/dual:row-cave--> |
+| donation | <!--dual:row-don-->58 | 7 | 11/58 | 7/7 | 4/51<!--/dual:row-don--> |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
@@ -1262,6 +1274,23 @@ and must never be worded like the donation's**: agreeing 19 of 19 on boards that
 verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
 cave is local to the spin), not nineteen independent confirmations. `DUAL_SPLIT_MARKER` and
 `CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
+
+**Every figure in this section is a marked fragment as of 2026-08-24, and all but one of them was
+already correct.** That is the point rather than a footnote: correct-today is the normal state of an
+ungated figure, and this same section has watched two copies of these numbers go stale — a
+five-session set in `emit-opener-facts.ts` that survived the sixth session by two days, and a
+six-session set that replaced it *under a sentence promising it was "not a remembered one"* and was
+wrong the day the seventh landed. `prefix_locks` and `board_diff_hist` are emitted per session now,
+so the two figures that had no artefact behind them at all — the prefix means and the median board
+difference — roll up like the rest. The one that was wrong is the prefix pair: published as 「27
+locks against 81」, measured at 26.2 and 80.4. The hand-port's figure was rounded the harmless way
+and the oracle's the flattering way, which made the gap look bigger than it is — **the fourth
+figure on this branch to fail in exactly that direction**, after the shipped band's floor, the
+`sd_ratio` and the cut-off band. A rounding rule is per CLAIM: the short prefix ceils and the long
+one floors, so 「26.3 against 80.3」 holds at the most generous reading of the one and the least
+generous of the other. `check_dual_engine.py --selftest` re-renders every directional figure with
+the opposite rule and prints the pair, so a direction this corpus cannot discriminate is NAMED
+rather than assumed.
 
 A false start worth not repeating: the first version of that probe pushed both engines through the
 reconstruction check and the hand-port licensed **0 of 1355** (over the five sessions there were
@@ -1273,7 +1302,8 @@ engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 e
 `sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
 alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
 the lock's own **frame**, the hand-port passes the strong check at that call site on every
-comparable lock — **2019 of 2019** at seven sessions (the per-session figures are each session's
+comparable lock — **<!--dual:strong-licence-->2019 of 2019<!--/dual:strong-licence-->** at seven
+sessions (the per-session figures are each session's
 `locks_comparable`, so the artefacts cross-check it and this number tracks them), so
 `dualVerdict` now uses the same reconstruction
 check as the shipped path — the weaker licence is gone, and every artefact was byte-identical

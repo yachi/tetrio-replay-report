@@ -501,6 +501,16 @@ let counterUnclassified = 0;
 const dual = { don: { tt: 0, tf: 0, ft: 0, ff: 0 }, cave: { tt: 0, tf: 0, ft: 0, ff: 0 } };
 let dualReachable = 0;
 let dualSameBoard = 0;
+/** How many cells the two engines' boards differ by, over the comparison points where they differ
+ *  at all. A HISTOGRAM rather than a running median, because a median does not roll up: taking the
+ *  median of seven per-session medians is not the corpus median, and the corpus figure is the one
+ *  CLAUDE.md publishes. Counts are small (0-400 possible values, a handful occupied). */
+const dualDiffHist: Record<number, number> = {};
+/** The two engines' verified prefix lengths, summed with their round count so a corpus MEAN is a
+ *  roll-up and not a mean of means — the sessions have very different round counts. This replaced
+ *  「27 locks against the oracle's 81 on average」 typed into a comment below and into CLAUDE.md,
+ *  with nothing anywhere re-deriving either number. */
+const dualPrefix = { rounds: 0, oracle_locks: 0, hand_port_locks: 0 };
 const dualSplit = {
   don: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
   cave: { positives_same_board: 0, positives_diff_board: 0, agree_same_board: 0, agree_diff_board: 0 },
@@ -553,10 +563,19 @@ for (const c of loadCases(dir)) {
 
   // THE SECOND ENGINE — see `dualEngineCheck`. The hand-port is run over the same case and its
   // verdicts are compared lock by lock, but ONLY as far as both are verified: `runCase` verifies a
-  // far shorter prefix (27 locks against the oracle's 81 on average), and comparing past its end
-  // would be comparing against a board nothing vouches for.
+  // far shorter prefix, and comparing past its end would be comparing against a board nothing
+  // vouches for. HOW MUCH shorter is `prefix_locks` below rather than a figure here — this comment
+  // said "27 locks against the oracle's 81 on average" and the corpus gives 26.2 and 80.4, the 81
+  // rounded in the direction that made the gap look bigger.
   const rs = runCase(c);
-  const dualTo = Math.min(v, verifiedIndex(rs, c.truth), r.locks.length - 1, rs.locks.length - 1);
+  const handV = verifiedIndex(rs, c.truth);
+  const dualTo = Math.min(v, handV, r.locks.length - 1, rs.locks.length - 1);
+  // `verifiedIndex` is the index of the last verified lock, so the PREFIX LENGTH is one more. Both
+  // are counted on every round, including rounds that contribute no comparison point, because the
+  // figure is "how far does each engine get", not "how far do the compared ones get".
+  dualPrefix.rounds++;
+  dualPrefix.oracle_locks += v + 1;
+  dualPrefix.hand_port_locks += handV + 1;
 
   // slot geometry, over the verified prefix only
   for (const s of spinsAll) {
@@ -642,11 +661,18 @@ for (const c of loadCases(dir)) {
         // board equality is what says whether a disagreement is about the PREDICATE or about the
         // BOARD. Corpus-wide it is the board: where the boards agree the donation verdicts agree
         // perfectly, and where they differ they mostly do not.
-        let sameBoard = true;
-        for (let rr = 0; rr < H && sameBoard; rr++)
+        let diff = 0;
+        for (let rr = 0; rr < H; rr++)
           for (let cc = 0; cc < BOARD_WIDTH; cc++)
-            if (withT[rr]![cc] !== other.board[rr]![cc]) { sameBoard = false; break; }
+            if (withT[rr]![cc] !== other.board[rr]![cc]) diff++;
+        const sameBoard = diff === 0;
         if (sameBoard) dualSameBoard++;
+        // No early exit any more: the loop counts every differing cell rather than stopping at the
+        // first, because HOW FAR apart the two boards are is the figure that says the drift is a
+        // few garbage rows and not a different game. Only differing points are binned; `diff === 0`
+        // is already `dualSameBoard`, and binning it would put a mode at 0 in a distribution whose
+        // whole subject is the non-zero tail.
+        if (diff > 0) dualDiffHist[diff] = (dualDiffHist[diff] ?? 0) + 1;
         for (const k of ['don', 'cave'] as const) {
           const x = mineV[k], y = other[k];
           dual[k][x && y ? 'tt' : x ? 'tf' : y ? 'ft' : 'ff']++;
@@ -1214,6 +1240,18 @@ function dualEngineCheck() {
           + 'oracle\'s verified prefix. Read `agreement_on_positives`, never `agreement_overall`: '
           + 'both verdicts are rare, so the overall rate is negatives agreeing with negatives',
     locks_scored: tspinClears.length,
+    /** How far each engine verifies, summed over every round of this session. The corpus mean is
+     *  `oracle_locks / rounds` and `hand_port_locks / rounds` — a roll-up, never a mean of means.
+     *  This is WHY the comparison reaches under half the scored clears, so it belongs beside
+     *  `locks_comparable` rather than in a comment. */
+    prefix_locks: { ...dualPrefix },
+    /** Cells the two boards differ by, over the comparison points where they differ at all. The
+     *  histogram rather than a summary statistic, because the corpus MEDIAN is what is published
+     *  and a median of per-session medians is not it. Keys are ascending so the artefact diffs
+     *  readably; the empty case is an empty object, which is a session whose engines never
+     *  disagreed on a board and not a missing field. */
+    board_diff_hist: Object.fromEntries(Object.keys(dualDiffHist)
+      .map(Number).sort((a, b) => a - b).map(k => [k, dualDiffHist[k]!])),
     locks_comparable: dualReachable,
     /** Of the comparable locks, how many the two engines built IDENTICALLY, cell for cell. 795 of
      *  1346 corpus-wide: at 41% of the comparison points the two engines are judging different

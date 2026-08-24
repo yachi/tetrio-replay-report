@@ -359,6 +359,9 @@ PLAN = {
     # Reads the seven committed opener-facts.json and byte-compares CLAUDE.md's bands
     # against them. No simulator run, so it is FAST — the artefacts are the input.
     "donation-bands": Entry(FAST),
+    # Same seven artefacts, the other block: the confusion matrix, its board-equality
+    # split, and the two engines' prefix lengths. Also FAST — no simulator run.
+    "dual-engine": Entry(FAST),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.
