@@ -948,6 +948,18 @@ jobs:
           python3 -m pipeline.check_donation_bands --selftest
           python3 -m pipeline.check_donation_bands
 
+  dual-engine:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Check the dual-engine corpus figures against the artefacts (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_dual_engine --selftest
+          python3 -m pipeline.check_dual_engine
+
   # `bin/verify-repo` is the local stand-in for the repo-wide jobs above — the
   # ones `bin/verify-session` cannot reach because it takes ONE artefact directory.
   # Its whole value rests on one property: that it still knows every job and every

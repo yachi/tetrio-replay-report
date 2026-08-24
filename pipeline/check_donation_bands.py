@@ -62,8 +62,14 @@ def pct2(n, d):
     return f"{math.floor(n * 10000 / d + 0.5) / 100:.2f}"
 
 
-def artefacts(root=REPO):
-    """[(session, ablation)] over every committed opener-facts.json, plus what was left out."""
+def opener_artefacts(root=REPO):
+    """[(session, whole artefact)] over every committed opener-facts.json, plus what was left out.
+
+    Shared with `pipeline/check_dual_engine.py`, which rolls up a different block of the same seven
+    files. One loader, because two gates that each glob `sessions/*` disagree the first time a
+    session directory grows an exception — and the one that reads FEWER sessions is the one that
+    goes quietly green on a narrower corpus.
+    """
     out, excluded = [], []
     for d in sorted(glob.glob(os.path.join(root, "sessions", "*"))):
         if not os.path.isdir(d):
@@ -73,7 +79,16 @@ def artefacts(root=REPO):
         if not os.path.exists(p):
             excluded.append((s, "no sim/opener-facts.json"))
             continue
-        art = json.load(open(p, encoding="utf-8"))["donation"]
+        out.append((s, json.load(open(p, encoding="utf-8"))))
+    return out, excluded
+
+
+def artefacts(root=REPO):
+    """[(session, ablation, means)] over every committed opener-facts.json, plus what was left out."""
+    whole, excluded = opener_artefacts(root)
+    out = []
+    for s, art_all in whole:
+        art = art_all["donation"]
         if "ablation" not in art:
             # Never a skip. An artefact predating the field would otherwise drop out of the band
             # silently, and a band measured over fewer sessions than the corpus reads identically
