@@ -20,8 +20,10 @@ hue. No new colours are introduced: the validated yachi/pinglamb pair is reused.
 """
 import html
 import json
+import math
 from pathlib import Path
 
+from analysis import rate_records_artefact
 from pipeline import claim_cards, fmt
 from pipeline.claims import generators
 
@@ -33,8 +35,6 @@ from pipeline.claims import generators
 # rendered page. The two numbers a glob CAN derive are derived here; what remains
 # hand-maintained is guarded below.
 _CN_DIGITS = "零一二三四五六七八九十"
-#: 速率 metrics the R analysis takes one record per session from (VS, APM, PPS).
-_RATE_METRICS = 3
 
 
 def _cn(n):
@@ -68,63 +68,100 @@ def corpus_scope():
     return len(facts), rounds
 
 
-# ── the R-derived statistics, hand-maintained and guarded ──────────────────────
+# ── the R-derived statistics, READ from the committed artefact ─────────────
 #
-# From `Rscript analysis/rate_records.R`. Copied rather than recomputed: the
-# slopes need two log-log regressions and the record test a binomial tail, and R
-# is not a CI dependency. Copied numbers rot, so `build` refuses to render them
-# for a corpus of a different size than the run they came from.
+# `analysis/rate-records.json`, written by `Rscript analysis/rate_records.R --json`.
+# These were hand-copied literals until 2026-08-23, guarded only by a session COUNT.
+# The count could not see the class that actually happened: on 2026-08-16 apm/pps/vs
+# were re-sourced from the live `player.stats` tick to `results.aggregatestats`, which
+# moved the shortest bin's VS SD from 59.91 to 59.60 with the corpus unchanged at six
+# sessions, and the footnote kept saying 59.9. The artefact fingerprints every
+# facts.json it read and the script itself, so `load()` refuses on all three staleness
+# routes — a session lands, the data moves, the analysis moves.
 #
-# WHAT THE GUARD DOES NOT COVER, stated because it has already happened once. On
-# 2026-08-16 `apm`/`pps`/`vs` were re-sourced from the live `player.stats` tick to
-# `results.aggregatestats`, which moved the shortest bin's VS SD from 59.91 to
-# 59.60 without adding a session. The footnote kept saying 59.9 for a day, and a
-# session-count assertion cannot see that class at all — the corpus was six
-# sessions on both sides of it. Re-run the R script when the DATA moves, not only
-# when a session lands.
-R_STATS_SESSIONS = 7            # `n = 900 player-rounds over 7 sessions`
-R_VS_SD_SHORT, R_VS_SD_LONG = "59.2", "15.5"    # SD of VS in the shortest / longest bin
-R_VS_T_SHORT, R_VS_T_LONG = 19, 148             # those bins' geometric-mean length, seconds
-R_VS_MEAN_SHORT, R_VS_MEAN_LONG = 107, 119      # the control: the mean over the same bins
-# 106.9 and 119.4, to the NEAREST integer and not floored. The two figures beside them
-# (R_VS_T_*) are floored because the sentence prefixes them with 約, which this repo defines
-# as "at least this much"; these two carry no 約 and are a rise, so flooring the low end would
-# print a bigger rise than was measured. The six-session values (104.1, 120.1) floored and
-# rounded to the same integers, which is why the question had not come up before.
+# Read at build time rather than at import: a module-level `SystemExit` would take out
+# every importer of `records` (including gates that never render the footnote) over an
+# artefact only `build` consumes.
 
-# ── how far the SD falls, DERIVED from the two constants above ────────────────
-#
-# This was the word 「足足細咗四倍」, typed once and then sitting beside two constants that
-# move every session. It was true when written (59.60/14.54 = 4.10) and false the day the
-# seventh session landed (59.2/15.5 = 3.82), and it shipped into all seven reports in that
-# state. Nothing could have caught it: `check_prose_figures` resolves 約-figures against
-# facts.json and this is a derived R statistic that appears in no dataset, so the sentence
-# lived where no gate reads. Same shape as the 「70-89%」 and 「3379」 defects CLAUDE.md
-# records — a figure quoted in prose that is not the thing it describes.
-#
-# So it is computed, not typed. Floored to one decimal (`fmt.ratio1`), which is what lets
-# 足足 stay in the sentence: the printed 3.8 is a lower bound on the real 3.8195, so the
-# word is true by construction instead of by whoever last checked it.
-R_VS_SD_RATIO = fmt.ratio1(R_VS_SD_SHORT, R_VS_SD_LONG)
+
+def _dp1(x):
+    """One decimal place, FLOORED, as the string `ratio1` wants.
+
+    Floors for the same reason everything in `fmt` does. It also puts the numerator of
+    the SD ratio on the safe side; the denominator is the unsafe side, which is what
+    `_check_sd_ratio` measures rather than assumes.
+    """
+    return f"{math.floor(x * 10) / 10:.1f}"
+
+
+def r_stats():
+    """The R figures the footnote prints, at the precision it prints them.
+
+    The two bin lengths floor because the sentence prefixes them with 約, which this repo
+    defines as "at least this much". The SD endpoints floor too, on `fmt`'s convention.
+    The mean endpoints ROUND: they carry no 約 and they are a rise, so flooring the low
+    end would print a bigger rise than was measured. The six-session values (104.1, 120.1)
+    floored and rounded to the same integers, which is why that had not come up before.
+    """
+    art = rate_records_artefact.load()
+    vs = art["metrics"]["vs"]
+    sd_short, sd_long = _dp1(vs["sd_short"]), _dp1(vs["sd_long"])
+    return {
+        "sessions": len(art["sessions"]),
+        "sd_short": sd_short,
+        "sd_long": sd_long,
+        "t_short": math.floor(vs["t_short"]),
+        "t_long": math.floor(vs["t_long"]),
+        "mean_short": round(vs["mean_short"]),
+        "mean_long": round(vs["mean_long"]),
+        # Derived from the two PRINTED strings, so a reader dividing the digits in the
+        # sentence gets the digits in the sentence — `ratio1`'s whole reason for taking
+        # decimal strings. `_check_sd_ratio` is what says that route never overstates the
+        # true fall, which flooring the denominator could in principle do.
+        "sd_ratio": fmt.ratio1(sd_short, sd_long),
+        "sd_ratio_exact": vs["sd_short"] / vs["sd_long"],
+        "mean_ratio": vs["mean_long"] / vs["mean_short"],
+        "n_records": art["records"]["n"],
+    }
+
 
 # The floor the FOOTNOTE'S ARGUMENT needs, which is not the floor today's number happens to
 # sit near. The argument is "the spread moves a lot while the mean barely moves", so what
-# has to hold is that the SD effect dominates the mean effect — the mean moves by
-# 119/107 = 1.11 over the same span. Below 2 the SD does not even halve while the rounds get
-# ~7.7x longer, and 「量得唔準好多」 stops being supported by its own numbers.
+# has to hold is that the SD effect dominates the mean effect — the mean moves 1.12x over
+# the same span. Below 2 the SD does not even halve while the rounds get ~7.7x longer, and
+# 「量得唔準好多」 stops being supported by its own numbers.
 #
 # Deliberately NOT 4. Pinning it at 4 would re-freeze the value this guard exists because
 # somebody froze, and would fail the build for a corpus that still supports every word of
 # the sentence. A guard set to today's measurement is a copy of the measurement.
 _MIN_SD_RATIO = 2.0
-if float(R_VS_SD_RATIO) < _MIN_SD_RATIO:
-    raise SystemExit(
-        f"records.py: the VS SD falls only {R_VS_SD_RATIO}x from the shortest bin "
-        f"({R_VS_SD_SHORT}) to the longest ({R_VS_SD_LONG}), under the {_MIN_SD_RATIO}x this "
-        f"footnote's argument needs. The sentence claims the spread moves far more than the "
-        f"mean, and at this ratio it no longer does. Do not lower this bound to make the "
-        f"build pass — rewrite the footnote around what the corpus now shows, and re-check "
-        f"whether QUALIFYING_MS is still justified by `Rscript analysis/rate_records.R`.")
+
+
+def _check_sd_ratio(r):
+    """Two conditions, and the second is why the printed digits may be divided at all.
+
+    (1) the fall is big enough for the sentence's argument, and (2) the ratio derived
+    from the two PRINTED endpoints does not exceed the ratio the unrounded data gives.
+    Flooring the denominator inflates a quotient, so 足足 could in principle end up
+    asserting a floor the corpus does not support — one comparison, and it never has to
+    be reasoned about again.
+    """
+    if float(r["sd_ratio"]) > r["sd_ratio_exact"]:
+        raise SystemExit(
+            f"records.py: the footnote would print 足足細咗 {r['sd_ratio']} 倍 from the "
+            f"printed endpoints {r['sd_short']} / {r['sd_long']}, but the unrounded data "
+            f"gives only {r['sd_ratio_exact']:.4f}x. 足足 asserts a floor, so the printed "
+            f"ratio may never exceed the measured one.")
+    if float(r["sd_ratio"]) < _MIN_SD_RATIO:
+        raise SystemExit(
+            f"records.py: the VS SD falls only {r['sd_ratio']}x from the shortest bin "
+            f"({r['sd_short']}) to the longest ({r['sd_long']}), under the "
+            f"{_MIN_SD_RATIO}x this footnote's argument needs. The sentence claims the "
+            f"spread moves far more than the mean, and at this ratio it no longer does. "
+            f"Do not lower this bound to make the build pass — rewrite the footnote "
+            f"around what the corpus now shows, and re-check whether QUALIFYING_MS is "
+            f"still justified by `Rscript analysis/rate_records.R`.")
+
 
 # (family, label, unit, how to format the proved integer)
 #
@@ -275,26 +312,30 @@ def build(facts, report_dir):
     # the derived half describe seven while the copied half still describes six,
     # so refuse to render rather than publish a footnote that is two-thirds true.
     n_sessions, n_player_rounds = corpus_scope()
-    if n_sessions != R_STATS_SESSIONS:
+    r = r_stats()
+    _check_sd_ratio(r)
+    if r["sessions"] != n_sessions:
         raise SystemExit(
-            f"records.py: the footnote's statistics were computed over {R_STATS_SESSIONS} "
+            f"records.py: analysis/rate-records.json was measured over {r['sessions']} "
             f"session(s) but sessions/*/report/facts.json now holds {n_sessions}. "
-            f"Re-run `Rscript analysis/rate_records.R` — its own `sessions` list is "
-            f"hardcoded too, so add the session there first — then copy the new VS SD, "
-            f"mean and bin figures into the R_* constants in this file and set "
-            f"R_STATS_SESSIONS = {n_sessions}.")
-    # 3 metrics × one record per session, the same product `rate_records.R` derives
-    # rather than types. The count is arithmetic; what is hand-maintained is the
-    # claim that ALL of them land in the shortest quartile.
-    n_rate_records = _RATE_METRICS * n_sessions
+            f"Run `{rate_records_artefact.REGEN}` and commit the artefact.")
+    # The R analysis takes one record per session from THREE metrics; the report ranks
+    # two of them (`generators._SUPERLATIVES` has no pps entry). The footnote's count is
+    # the evidence's, not the tile row's, which is right — the claim it makes is about
+    # what the unqualified argmax does, and pps is an unqualified argmax too. Read out
+    # of the artefact so it cannot disagree with the run that produced the p-value.
+    n_rate_records = r["n_records"]
+    sd_short, sd_long, sd_ratio = r["sd_short"], r["sd_long"], r["sd_ratio"]
+    t_short, t_long = r["t_short"], r["t_long"]
+    mean_short, mean_long = r["mean_short"], r["mean_long"]
     out.append(f'    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計'
                f'打足 {generators.QUALIFYING_MS // 1000} 秒嘅局。速率係「攻擊 ÷ 時間」，'
                f'局數愈短分母愈細，個數就愈飄——{_cn(n_sessions)}個 session 夾埋 '
                f'{n_player_rounds} 個 player-round 度'
-               f'量過：VS 嘅標準差由 {R_VS_SD_SHORT}（約 {R_VS_T_SHORT} 秒嗰批）跌到 '
-               f'{R_VS_SD_LONG}（約 {R_VS_T_LONG} 秒嗰批），'
-               f'足足細咗 {R_VS_SD_RATIO} 倍；'
-               f'同一段路平均數反而由 {R_VS_MEAN_SHORT} 升到 {R_VS_MEAN_LONG}，'
+               f'量過：VS 嘅標準差由 {sd_short}（約 {t_short} 秒嗰批）跌到 '
+               f'{sd_long}（約 {t_long} 秒嗰批），'
+               f'足足細咗 {sd_ratio} 倍；'
+               f'同一段路平均數反而由 {mean_short} 升到 {mean_long}，'
                '即係短局唔止唔係打得好啲，'
                '仲要係量得唔準好多。'
                f'未設限之前，{_cn(n_sessions)}個 session 全部 {n_rate_records} 項速率紀錄'

@@ -79,6 +79,9 @@ python3 -m pipeline.check_finesse_denominator sessions/<date>/report  # CI gate:
 python3 -m pipeline.check_finesse_denominator sessions/<date>/report --selftest  # its mutants
 python3 -m pipeline.check_opener_section sessions/<date>/report  # CI gate: the C-Spin / DT 砲 section
 python3 -m pipeline.check_opener_section sessions/<date>/report --selftest
+python3 -m pipeline.check_donation_bands            # CI gate: the Donation ablation bands, rolled
+python3 -m pipeline.check_donation_bands --render   #   up from the seven artefacts. --render prints
+python3 -m pipeline.check_donation_bands --selftest #   the fragments to paste; --selftest its mutants
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
 python3 -m pipeline.openers.extract_wiki_openers --selftest # its mutants
 python3 -m pipeline.openers.extract_wiki_techniques            # CI gate: the Donation / STMB Cave
@@ -88,6 +91,10 @@ python3 -m pipeline.openers.extract_wiki_openers \
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
   --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
+Rscript analysis/rate_records.R --json analysis/rate-records.json  #   ...as the committed artefact
+python3 -m pipeline.check_rate_records            # CI gate: that artefact is current, and every
+python3 -m pipeline.check_rate_records --rerun    #   figure CLAUDE.md quotes from it agrees
+python3 -m pipeline.check_rate_records --selftest #   its mutants
 dafny verify spec/Forecast.dfy spec/ForecastExamples.dfy       # the hand-written concept spec
 dafny verify spec/BfsKey.dfy               # why bestTspin's visited key carries the arrival mode
 bash spec/mutate-bfskey.sh                 # its mutants — a lemma none can kill is decorative
@@ -201,9 +208,9 @@ push instead of only locally.
 Until that date the answer was the runner instead. CI sat on `ubuntu-22.04`, whose glibc is 2.35,
 and every z3 release after 4.14.1 ships `x64-glibc-2.39` only — so CI could run just the one z3 old
 enough to load, and the `pipeline` job could not run z3 at all. **ubuntu-22.04's deprecation is what
-moved the runners**, and the solver constraint fell out with it: all 13 jobs are on 24.04 (twelve
-`ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and `Z3_VERSION` is
-4.16.0.
+moved the runners**, and the solver constraint fell out with it: all 15 jobs are on 24.04
+(fourteen `ubuntu-24.04`, `oracle-image` on `ubuntu-24.04-arm`, where it already was) and
+`Z3_VERSION` is 4.16.0.
 
 **The pin got better, and by exactly one step — do not write it up as two.** GitHub publishes no
 asset `digest` for **any** z3 build against glibc-2.35, and those releases carry no signature,
@@ -235,22 +242,66 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **13 job definitions
-  across 3 workflows, which expanded to 26 check runs on 2026-08-20** — `verify` is a matrix over
+  byte-identical to what is committed. Weekly runs add mutation testing. **17 job definitions
+  across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
   `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Ten of those jobs are repo-wide, and `bin/` can run exactly one of them.** `bin/new-session`
-  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and
-  every gate it runs is internal to it. Nothing runs `cross-extractor`, `leave-one-out`,
+- **Fourteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
+  gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
-  `coverage` — only `docs`, via `bin/build-docs --check`. So the last mile of adding a session is
+  `coverage` — only `docs`, via `bin/build-docs --check` — so the last mile of adding a session was
   discovered from CI rather than locally, which on 2026-08-20 cost three push→CI→fix cycles for
-  four failures that were all reproducible in minutes. See the ROADMAP item for `bin/verify-repo`;
-  until it exists, read the workflow files and run their commands by hand before the first push.
+  four failures that were all reproducible in minutes.
+
+  `bin/verify-repo` closes that, and **the way it holds is the part to keep, not the fact that it
+  exists**: it does not carry a list of commands, it READS the workflow files and runs each job's
+  own `run:` blocks. A list would have been the eleventh hand-maintained list in this repo and it
+  would go stale in the direction that reads green. So every job must appear in its `PLAN` — run at
+  a tier, or excused by a named predicate with a reason — and six things are errors rather than
+  skips: a job in CI that `PLAN` does not name, a `PLAN` entry no job answers to, a step skipped by
+  a name no step has, a step carrying an `if:` nobody decided, a step whose `${{ }}` cannot be
+  resolved here, and a step reading a `$GITHUB_*` / `$RUNNER_*` variable the script does not supply.
+  A plain new `run:` step, by contrast, is **absorbed silently and runs**, and there is a control
+  asserting exactly that, because it is what tells derivation from copying. `workflow-plan` is the
+  CI job that checks all of it, because a script standing in for CI that CI does not check is the
+  manual-only gate this repo has now paid for three times.
+
+  ```bash
+  bin/verify-repo               # every repo-wide gate a push would run
+  bin/verify-repo --fast        # omit the slow tier (coverage, oracle-image)
+  bin/verify-repo --weekly      # add the schedule-only jobs and steps (mutation, coverage-round)
+  bin/verify-repo --sessions    # add the `verify` and `pipeline` matrices, from the workflow's own lists
+  bin/verify-repo --only docs   # reproduce ONE red job, whatever its tier
+  bin/verify-repo --check       # completeness only: is this script still CI's equal
+  ```
+
+  **`RUNNER_TEMP` is why "run the workflow's own commands" is not free.** The `pipeline` job's Dafny
+  step reads it, and under `set -u` a local run dies with `unbound variable` — which is how the first
+  `--only pipeline` failed all seven sessions in nine seconds. The runner-provided variables with an
+  honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
+  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+  `$GITHUB_*` or `$RUNNER_*` reference is a completeness error**, so the next one is refused up front
+  rather than dying halfway through a matrix.
+
+  Two things it deliberately does NOT do. `oracle-image` needs an aarch64-**linux** runner, so on a
+  Mac it is named as skipped rather than quietly dropped — every unrun job, unrun step and toolchain
+  version that differs from the workflow's pin is printed in the summary, because a run that covered
+  less than it claimed is the failure the tool was written to stop. And it does not replace
+  `bin/verify-session`: `--sessions` runs the two matrices, but the default does not, and the
+  summary says so.
+
+  **The `pipeline` matrix is where `bin/verify-session` turned out to be narrower than CI**, found
+  while writing this: `verify-session` runs 7 gates over an artefact directory, while CI's
+  `pipeline` job runs 18 steps per session — `build_report --check`, `check_prose_figures`,
+  `check_generated_css`, `check_finesse_denominator`, `check_badge_links`, `check_report_shell`, the
+  forecast/opener/wiki section gates and `check_smt` are in the second list and not the first. That
+  is not a bug in `verify-session`, whose scope is deliberate, but it does mean **`bin/verify-repo
+  --sessions` is the only local command that runs everything a push runs**.
 - **A figure with a renderer is PASTED, never typed.** `check_equiv_coverage`, `check_intense_corpus`
   and `check_loo` each emit their published blocks (`--render`), and the renderer and the parser
   live in one file so a reword is a one-place edit. Hand-editing one of those sentences can
@@ -263,6 +314,21 @@ equivalent marker pair.
   FIRST line carrying it, so a mention shadows the real sentence and the gate fails to parse —
   which is how this very bullet broke it on 2026-08-23, one paragraph after describing the
   hazard. Quote the rule, never the token.
+
+  **A sentence beside a table is gated by a MARKED FRAGMENT, not by an anchor regex, and the
+  difference is what the paragraph above keeps failing at.** Since 2026-08-23 the four counts
+  in the equiv-coverage prose — how many sessions sit below the ≥85% gate, which ones, and how
+  many lose coverage to the second family at each of the two granularities — sit inside inline
+  HTML-comment pairs whose contents `check_equiv_coverage` byte-compares against its renderer.
+  An anchor regex could not do it: this repo's own dated sections carry EARLIER VERSIONS of both
+  sentences (ROADMAP.md's 2026-08-15 block says 「three of six sessions」 and 「Five of six
+  sessions lose coverage」), and `paragraph()` takes the first match, so the gate would have
+  checked the historical paragraph and passed the live one. The rule the markers enforce is
+  **exactly one pair per document** — not "at least one" — which is the shadowing hazard turned
+  from a written warning into a red build. It fired within a minute of being written, on the
+  ROADMAP section documenting it, because the example spelled a real fragment name. Use a
+  placeholder when writing one down. And note what this buys over 「quote the rule, never the
+  token」: the marker is enforced, the rule is not.
 - Report prose is Hong Kong colloquial Cantonese, traditional characters. `build_claims.py`
   asserts no simplified glyphs; reviews have repeatedly caught 净/实/约 slipping in.
 - **Closing a ROADMAP item means striking it AT ITS ORIGINAL SITE, not only writing a new dated
@@ -288,9 +354,10 @@ Four instances, all live as of 2026-08-19, and they are not the same kind of thi
 | | what it was | how it failed |
 |---|---|---|
 | the repertoire ranges | Honey Cup 17-25, MS1 11-25, TKI-3 5-8 | **two of three already false when 08-14 landed**; five days published. `grep` confirms no file in the repo ever contained them |
-| the `cavity ≥ 1` band | 74.6-77.0% | nothing recomputes it; it survives only because 08-14 ties 08-09 at one decimal, and it must be re-measured by hand every session |
+| ~~the `cavity ≥ 1` band~~ | 74.6-77.0% | nothing recomputed it; it survived only because 08-14 tied 08-09 at one decimal. **CLOSED 2026-08-24**: `donation.ablation` in each artefact carries the session's own counts and `pipeline/check_donation_bands.py` renders all three bands. The band it replaces was `29-34%` — wrong at both ends and **pinned inside seven byte-identity-gated artefacts**, which is the sharpest form this class takes: re-emitting reproduced the wrong string exactly, so every gate agreed with it |
 | the raw-DS AUC series | 68.4 · 62.0 · 81.2 · 83.0 · 64.0 | quoted from a probe; stopped at five sessions and nothing said so |
-| the `760` numerators | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900 |
+| ~~the `760` numerators~~ | 183, 257, 245, 201, 650/750 … | correct when written, silently wrong the moment the corpus reached 900. **CLOSED 2026-08-23**: `analysis/stat_sources.py` re-derives all 28 of them and `pipeline/check_stat_sources.py` gates the sentences. They were the hardest row here because **every one carried an honest caveat** — 「measured over the first six sessions, not re-run at 900」 — and a caveat cannot go red |
+| ~~the R statistics~~ | slopes, CIs, p's, the SD fall, the cut-off band | the only family whose producer ran in NO workflow and no `bin/` script, so its figures could not even be re-derived without remembering to. **CLOSED 2026-08-23**: `analysis/rate_records.R --json` writes a committed artefact, `records.py` reads it instead of holding copies, `pipeline/check_rate_records.py` gates the eighteen sentences. THREE of them were already wrong — the band (VS's quoted for a claim naming APM), 約262.6 (the rounded value this file's own 約 section names as the mistake), and twenty-six lines of four-session figures in `generators.py` beside the `QUALIFYING_MS` they justify |
 
 **A gate can have the same defect, so "it is checked" is not the test.**
 `expect(out).toBe(sum(width_ge_3))` in `openers.test.ts` looked like a gate and was arithmetic
@@ -341,56 +408,72 @@ re-run or explicitly scoped to the set it was measured on.
   it. `apm_x1000`/`pps_x1000`/`vs_x1000` come from the live tick while `garbage_attack` /
   `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
   can be one tick apart — the whole of the VS-identity residual. **Every count in the rest of this
-  bullet and the next was measured over the 760 player-rounds of the first six sessions and has not
-  been re-run at 900; the ratios are what to carry forward, not the numerators.** The live tick is
-  stale in 183 of 760 player-rounds and **181 of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  bullet and the next is re-derived by `analysis/stat_sources.py` over all
+  <!--stat:corpus-->900 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
+  none of them is typed.** (They were, until 2026-08-23: six-session numbers in a
+  seven-session document, each honestly captioned 「not re-run at 900」 — which is why none of
+  them ever went red. A caveat is not a measurement.) The live tick is
+  stale in <!--stat:tick-stale-->211 of 900<!--/stat:tick-stale--> player-rounds and
+  **<!--stat:tick-stale-survivor-->209<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
   the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
   in the residual is a fact about whose round ran longer, never about how someone plays.
-  `aggregatestats` reproduces every rate to ≤4.2e-16 over 760 player-rounds as
+  `aggregatestats` reproduces every rate to ≤<!--stat:resid-worst-->4.2e-16<!--/stat:resid-worst--> over
+  <!--stat:corpus-agg-->900 player-rounds<!--/stat:corpus-agg--> as
   `100·(attack+cleared)/T`, `60·attack/T`, `pieces/T` — where **T is the integer FRAME count, and
   `finaltime_ms` does not yield it.** `⌊finaltime_ms·60/1000⌋/60` gives the wrong frame count on
-  **257 of the 760** and leaves up to 1.5e-3, because `finaltime_ms` is `results.stats.finaltime`
+  **<!--stat:floor-wrong-->313 of the 900<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
   rounded to the millisecond (`extract.py`'s `x1`) while the clock ticks every 1/60 s — the rounding
   destroys the frame the flooring is trying to recover. Recover it from `pps` instead:
-  `round(60·pieces/pps)` is an integer to 1.8e-12 on all 760, and under **T = round(60·pieces/pps)/60**
-  the residual is 2.4e-16 for APM and 4.2e-16 for VS, which is where the ≤4.2e-16 came from. PPS is
+  `round(60·pieces/pps)` is an integer to <!--stat:frames-integer-->1.9e-12<!--/stat:frames-integer--> on all
+  <!--stat:corpus-frames-->900<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
+  the residual is <!--stat:resid-pair-->2.5e-16 for APM and 4.2e-16 for VS<!--/stat:resid-pair-->, which is where the ≤ above came from. PPS is
   exact by construction on that route, so the **checkable** statement is the T-free identity
-  `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual **6.1e-16** over the 758 rounds
+  `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual
+  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->898<!--/stat:identity-rounds--> rounds
   with a nonzero APM and VS. A probe that uses `finaltime_ms/1000` reports a discrepancy the data
-  does not have — up to 1.2e-3, and above 1e-4 on 245 of the 760.
+  does not have — up to <!--stat:secs-worst-->1.3e-3<!--/stat:secs-worst-->, and above 1e-4 on
+  <!--stat:secs-over-->289 of the 900<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
+  APM alone give two fewer. `aggregatestats` is a triple, so a route claiming to reconstruct
+  it has to reconstruct the triple.)
 - **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
   The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
   of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
-  `player.stats.kills` in **201 of 760** player-rounds, and every one is the live tick reading 1
+  `player.stats.kills` in **<!--stat:kills-->243 of 900<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
   against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
   taken when that player's own game ends, while the kill is credited later, when the opponent tops
   out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
   `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
-  than truncated; `garbagesent`/`garbagereceived` differ from their `results.stats` counterparts in 7
-  and 1 of 760 and are a different measure anyway (both sides are already extracted, as
+  than truncated; and the match-level rollup stays on the live tick because
+  **<!--stat:leaderboard-agg-->0 of 118<!--/stat:leaderboard-agg--> leaderboard entries carry
+  `aggregatestats` at all** — so round figures will not reconcile against the leaderboard's, and
+  there is no better source for it. `garbagesent`/`garbagereceived` differ from their
+  `results.stats` counterparts in
+  <!--stat:garbage-differ-->9 and 2 of 900<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
   `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
   the bug the rate change removed.
 - **The finesse counters are on two different units, so any finesse rate must name its denominator.**
   `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
-  several — pooled, 11 865 faults over 7 510 non-perfect pieces = **1.580 per faulty piece**. Four
+  several — pooled, <!--stat:finesse-pool-->13 964 faults over 8 772 non-perfect pieces<!--/stat:finesse-pool--> =
+  **<!--stat:finesse-per-piece-->1.592<!--/stat:finesse-per-piece--> per faulty piece**. Four
   defensible rates, four different numbers, and only one is what TETR.IO displays:
-  `faults/pieces` = **16.83%** is fault events per piece; the share of pieces that were faulty is
-  `1 − perfect/pieces` = **10.65%**; TETR.IO's own figure is `perfect/pieces` = **89.35%**; and
-  `faults/(faults+perfect)` = **15.85%** is on no meaningful denominator and must not be used. A
-  bare「失誤率」 reads as the 10.65% and is usually the 16.83%. osk publishes no definition for any
-  of the three fields, so the per-excess-input granularity is inferred, not specified. (Pooled over
-  the first six sessions; not re-run at 900 player-rounds. The four rates are definitions, so they
-  keep their meaning at any n — the four *numbers* are a six-session measurement.)
+  `faults/pieces` = **<!--stat:finesse-fault-rate-->17.00%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **<!--stat:finesse-share-->10.68%<!--/stat:finesse-share-->**; TETR.IO's own figure is
+  `perfect/pieces` = **<!--stat:finesse-tetrio-->89.32%<!--/stat:finesse-tetrio-->**; and
+  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->15.99%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
+  bare「失誤率」 reads as the share and is usually the event rate. osk publishes no definition for any
+  of the three fields, so the per-excess-input granularity is inferred, not specified. The four
+  rates are definitions and keep their meaning at any n; the four *numbers* are re-derived over
+  the whole corpus by `analysis/stat_sources.py`.
 
   **All six reports then in the corpus shipped the bare label, and
   `pipeline/check_finesse_denominator.py` is now the
   gate.** The tape chart plotted `faults/pieces` as 「finesse 失誤率」 formatted `(v*100).toFixed(1)+"%"`
-  — 16.8% under a label that reads as 10.65%. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
+  — the event rate under a label that reads as the share. The row is 「每粒 finesse 失誤」 rendered `toFixed(3)`
   now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
-  alone does not undo one: 16.8% reads as a share however the row is titled. `hold 使用率` keeps its
+  alone does not undo one: an event rate reads as a share however the row is titled. `hold 使用率` keeps its
   percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
-  data refutes the share reading outright: in **650 of 750** player-rounds the faults outnumber the
-  non-perfect pieces, and 07-24 m2r0 puts **7 faults on a single non-perfect piece**.
+  data refutes the share reading outright: in **<!--stat:finesse-exceed-->770 of 884<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
+  non-perfect pieces, and **<!--stat:finesse-worst-->07-24 m2r0 puts 7 faults on a single non-perfect piece<!--/stat:finesse-worst-->**.
 
   Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
   renderer is in each session's committed shell, outside every marker region, so `build_report --check`
@@ -579,12 +662,13 @@ and C008 true while flipping C005 false. The second family does exactly that, an
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
 Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**.
 
-**07-28 is not the exception — six of the seven measured sessions lose coverage to the second
-family**, and
+**07-28 is not the exception — <!--equiv:sf-match-->six of the seven<!--/equiv:sf-match--> measured sessions lose coverage
+to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
 08-19 C007). **That count is at `match` granularity, and it is the only reading on which any
 session is exempt**: 07-24 is the one that loses nothing there (48 → 48), and it loses R018 at
-`round`, so at the granularity the figures above are quoted at the count is **seven of seven**.
+`round`, so at the granularity the figures above are quoted at the count is
+**<!--equiv:sf-round-->seven of the seven<!--/equiv:sf-round-->**.
 Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
 was measured on — check which one a count came from before carrying it forward.
 `sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
@@ -636,44 +720,84 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
-sample mean over a small n. Measured in `analysis/rate_records.R` over all 900 player-rounds
-(seven sessions): regressing log SD on log t gives **−0.625 for VS and −0.715 for APM**, slope 0
-rejected for both (p 8.6e-05 / 5.3e-05). All **21** unqualified records (3 metrics × 7 sessions)
-came from the shortest quartile — p = 2.3e-13 — and 07-22's headline 約262.6 was a 15.6 s round,
-46% above that session's qualified peak.
+sample mean over a small n. Measured in `analysis/rate_records.R` over all
+<!--rate:corpus-->900 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->seven sessions<!--/rate:sessions-->):
+regressing log SD on log t gives **<!--rate:slopes-->−0.625 for VS and −0.715 for APM<!--/rate:slopes-->**,
+slope 0 rejected for both (p <!--rate:slope-p-->8.7e-05 / 5.4e-05<!--/rate:slope-p-->). All
+**<!--rate:records-->21<!--/rate:records-->** unqualified records
+(<!--rate:records-basis-->3 metrics × 7 sessions<!--/rate:records-basis-->) came from the shortest
+quartile — p = <!--rate:records-p-->2.3e-13<!--/rate:records-p--> — and 07-22's headline
+約<!--rate:headline-vs-->262.5<!--/rate:headline-vs--> was a <!--rate:headline-t-->15.6 s<!--/rate:headline-t--> round,
+<!--rate:headline-pct-->46%<!--/rate:headline-pct--> above that session's qualified peak.
+
+**Every figure in that paragraph, and in the three below it, is a marked fragment byte-compared
+against `analysis/rate-records.json` by `pipeline/check_rate_records.py`.** Until 2026-08-23 they
+were hand copies of a script that ran in no workflow and no `bin/` script. Two of them were
+wrong — the band below, and 「約262.6」, which this very document identifies six hundred lines
+further down as the ROUNDED figure the 2026-07-26 約-floor pass replaced with 約262.5 in every
+report. (`check_prose_figures` runs over a session's report directory, so the one place still
+publishing the value it corrected away was the file that records the rule.) A third copy lived
+outside this section entirely: twenty-six lines of FOUR-session statistics in a comment beside
+`QUALIFYING_MS` in `generators.py`, deleted rather than refreshed.
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one. Both still hold at seven.** (a) APM's −0.5 is **outside**
-its CI — [−0.918, −0.525] at six, [−0.887, −0.542] at seven — so the decay is *steeper* than a
-pure sample mean and the conclusion holds a fortiori, but "both with −0.5 inside the CI" is no
-longer true; (b) the mean is **no longer flat for VS** (106.9 → 119.4 across the bins, p = 0.01)
+its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.887, −0.542]<!--/rate:apm-ci--> at seven — so
+the decay is *steeper* than a pure sample mean and the conclusion holds a fortiori, but "both with
+−0.5 inside the CI" is no longer true; (b) the mean is **no longer flat for VS**
+(<!--rate:vs-mean-->106.9 → 119.4<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->0.01<!--/rate:vs-mean-p-->)
 — longer rounds do carry a mildly higher mean VS. The SD still falls several times over the same
 span, so the variance effect dominates and the qualifier stands, but the control is now "the mean
 moves a little, the spread moves a lot", not "the mean is flat". PPS's mean is still flat
-(p = 0.25).
+(p = <!--rate:pps-mean-p-->0.25<!--/rate:pps-mean-p-->).
 
-**Do not quote a number for that SD fall from here, and do not put one in the report either.**
-It is `pipeline/records.R_VS_SD_RATIO`, derived from `R_VS_SD_SHORT` / `R_VS_SD_LONG` through
-`fmt.ratio1`, which floors — 4.1× at six sessions, **3.8× at seven**. The report's footnote said
-「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped **false into all
-seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of four and the ratio
-had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves 約-figures against
-facts.json, and this is a derived R statistic that appears in no dataset. It is computed now, and
-guarded — `_MIN_SD_RATIO = 2.0`, which is the ratio the *argument* needs (the mean moves 1.11×
-over the same span, so the spread must clearly dominate it), deliberately not the 4 the number
-happens to sit near. A guard set to today's measurement is a copy of the measurement.
+**A rounding DIRECTION is per claim, not per number, and applying that moved three of these.**
+A p supporting 「rejected」 must ceil, because a p rounded down claims more significance than the
+fit gives — 8.6e-05 / 5.3e-05 became 8.7e-05 / 5.4e-05. A p supporting 「still flat」 must floor,
+which is why PPS's 0.25 did not move. A CI quoted to show −0.5 lies outside it widens rather than
+narrows. And the two ratios below are quoted against each other, so the one the argument needs to
+be large floors and the one it needs to be small ceils.
 
-The script's session list is hardcoded, so **adding a session means editing it and re-running**
-— otherwise the evidence for `QUALIFYING_MS` silently stops covering the newest data. Adding
-08-09 also broke it: the records test carried a literal `12` for "3 metrics × 4 sessions", and
-`binom.test(15, 12, ...)` aborts. It derives `n_records` from `sessions` now. `repo` used to be
-an absolute path to one checkout, which meant a git worktree silently regressed the *other*
-tree's sessions; it resolves from the script's own location now.
+**Do not quote a number for that SD fall from here, and do not put one in the report either** —
+paste it. `records.r_stats()["sd_ratio"]` derives it through `fmt.ratio1`, which floors:
+4.1× at six sessions, **<!--rate:sd-ratio-->3.8×<!--/rate:sd-ratio--> at seven**. The report's
+footnote said 「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped
+**false into all seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of
+four and the ratio had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves
+約-figures against facts.json, and this is a derived R statistic that appears in no dataset. It is
+computed now, and guarded — `_MIN_SD_RATIO = 2.0`, which is the ratio the *argument* needs (the
+mean moves <!--rate:mean-ratio-->1.12×<!--/rate:mean-ratio--> over the same span, so the spread must
+clearly dominate it), deliberately not the 4 the number happens to sit near. A guard set to
+today's measurement is a copy of the measurement.
+
+**The script's session list was the last unguarded one in the repo, and it is gone**: `sessions`
+is globbed off disk, `--json` writes `analysis/rate-records.json`, and `pipeline/records.py` reads
+that artefact instead of holding copies of its output. The artefact records the md5 of every
+`facts.json` it read AND of the R script itself, which is what closes the half a session-count
+guard never could — on 2026-08-16 the rates were re-sourced from the live tick to
+`results.aggregatestats` and the shortest bin's VS SD moved 59.91 → 59.60 with the corpus
+unchanged at six. Three ways to go stale, three loud failures: a session lands, the data moves,
+the analysis moves. The script hash is over the WHOLE file, comments included, because a rule
+that tries to tell a comment from a statistic can be fooled; the cost is one re-run.
+(Two older repairs, kept because both are still the reason a line reads as it does: the records
+test carried a literal `12` for "3 metrics × 4 sessions" and `binom.test(15, 12, ...)` aborts when
+the fifth session landed, so `n_records` is derived; and `repo` was an absolute path to one
+checkout, so a git worktree silently regressed the *other* tree's sessions.)
 
 `QUALIFYING_MS = 60_000` is where definition and data agree: APM and VS are per-*minute*, and
-each session's record names the same round for every cut-off from 50 s to 70 s, so nothing
-rests on the number. Counts are deliberately unqualified — fitting more lines into a short
-round is harder, not easier.
+every session's record for both names the same round for every cut-off in
+<!--rate:band-->[54, 62] s<!--/rate:band-->, so the exact number is not load-bearing within a few
+seconds either side. **It is not the 「50 s to 70 s」 this paragraph claimed until 2026-08-23, and
+how that survived is worth more than the correction.** [50, 72] is VS's band *alone*; the sentence
+named APM as well, and APM's is [54, 62] — 07-24 and 08-14 each move their APM record at a cut-off
+inside 50-70, 07-24 twice. The evidence printed underneath was section 4 of the R script, **a
+table of VS only**, so the one metric the claim was false for was the one the evidence could not
+display. A check that cannot fail, arriving from a direction this file has not listed before: not
+a tautology, not a vacuous clause, but a table scoped to a subset of the claim beside it. The
+script prints all three metrics and computes each band now. Over all three the band is
+<!--rate:band-all-->[58, 62] s<!--/rate:band-all-->, and 60 sits near its centre — which is the
+form of "not a tuned knob" the data actually supports. Counts are deliberately unqualified —
+fitting more lines into a short round is harder, not easier.
 
 Two holes opened the moment the qualifier was written, and both are now gated:
 
@@ -896,13 +1020,16 @@ an artefact of the reader, not a property of the data.** The rates came from `pl
 in-game tick sampled before the round ended, so a survivor's mid-round VS was being checked against an
 end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
 survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
-that fired on **13 of 760** player-rounds now fires on **0 of 760**. Do not read that as a reason to
-delete it: the residual does not go to zero, it goes to a quantization floor. (Both `760` figures
-are the first six sessions; the guard's per-session output is what says whether it still fires at
-900, and it is checked per session rather than re-pooled here.) `finaltime_ms` is
+that fired on **13 of the 760 player-rounds then in the corpus** now fires on
+**<!--stat:vs-guard-->0 of 900<!--/stat:vs-guard-->**. Do not read that as a reason to
+delete it: the residual does not go to zero, it goes to a quantization floor. The `13` stays a
+six-session figure on purpose — it is a measurement of the data BEFORE the 2026-08-16 re-source
+and there is nothing at 900 for it to be re-derived from; the `0` beside it is re-derived by
+`analysis/stat_sources.py` over every round, which is the only form of "does it still fire"
+worth publishing. `finaltime_ms` is
 milliseconds while the clock is frames, so the residual grows with `attack + cleared`; the corpus's
-worst player-round sits at 0.057 of the trigger (~18× headroom), and on that round `attack + cleared`
-would have to reach ~1114 against its actual 63. That is a fact about how much garbage these two move
+worst player-round sits at <!--stat:vs-guard-worst-->0.057 of the trigger (~18× headroom)<!--/stat:vs-guard-worst-->, and on that round `attack + cleared`
+would have to reach <!--stat:vs-guard-need-->~1114 against its actual 63<!--/stat:vs-guard-need-->. That is a fact about how much garbage these two move
 in a round, not a theorem.
 
 Two gate gaps the new figures exposed, both now closed in `check_prose_figures.pools`: it had no
@@ -930,42 +1057,75 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 **The naive Donation clause is forced by arithmetic: it fires on 100% of T-spin clears.**
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
 every column filled, so that clause counts line clears. That is not a measurement any more — it is
-`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly 100.00% of all
-**4763** scored clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the
-re-opening clause deleted — it fires on **29-37%**. All the discriminating power is in the
-**re-opening** clause: every filled cell of the column must lie inside the cleared rows, so the
-clear leaves it open surface-to-floor. With it, the rate drops to 2.1-3.3% per session
-(**127** donations across seven sessions).
+`NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly
+<!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->4763<!--/don:scored--> scored
+clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening clause
+deleted — it fires on <!--don:noreopen-band-->28.93-36.84%<!--/don:noreopen-band-->. All the
+discriminating power is in the **re-opening** clause: every filled cell of the column must lie
+inside the cleared rows, so the clear leaves it open surface-to-floor. With it, the rate drops to
+<!--don:shipped-band-->2.08-3.30%<!--/don:shipped-band--> per session
+(<!--don:donations-->127<!--/don:donations--> donations across
+<!--don:sessions-->seven<!--/don:sessions--> sessions).
 
-**This paragraph said 70-89% until 2026-08-14, and that figure names no variant of the clause it
-describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-36.8%; only a composite
-with `cavity ≥ 1` lands in the band (74.6-77.0%), and it never reaches 89%. A rate was being quoted
-for something proved to be always true — the same shape as the 3379-vs-3142 note above, and the same
-lesson: a figure quoted in prose is not the thing it describes.
+**Every band above is RENDERED from the seven artefacts, and until 2026-08-24 none of them was.**
+`pipeline/check_donation_bands.py --render` prints each marked fragment; `donation.ablation` in
+every `sessions/*/sim/opener-facts.json` carries that session's own counts. The per-session series
+read <!--don:noreopen-series-->28.93 · 33.64 · 30.99 · 29.74 · 33.27 · 36.84 · 36.13<!--/don:noreopen-series-->
+for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-08-14<!--/don:noreopen-ceiling--> is
+the ceiling) and
+<!--don:cav1-series-->74.72 · 76.84 · 74.60 · 76.80 · 76.99 · 77.04 · 76.51<!--/don:cav1-series-->
+for the `cavity ≥ 1` composite, whose band is
+<!--don:cav1-band-->74.60-77.04%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
+<!--don:pooled-noreopen-->32.94<!--/don:pooled-noreopen-->, cav1
+<!--don:pooled-cav1-->76.19<!--/don:pooled-cav1--> — a per-session band can break while no pooled
+number moves, which is why the series is published beside them. An eighth session above
+<!--don:cav1-ceiling-->77.04<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
 
-**Quote the band as a band, and re-measure it every session — it moved on the sixth.** Through five
-sessions the shipped-thresholds-minus-re-opening rate sat in 28.9-33.6%; 2026-08-14 fires at
-**36.8%**, three points above that ceiling, while the pooled rate barely moves (31.1% → 32.4%). The
-pooled figure alone would have hidden it. The `cavity ≥ 1` composite is the opposite case: its
-74.6-77.0% survives verbatim, but only because 08-14's 77.04% ties 08-09's 76.99% at one decimal
-place — a seventh session past 77.05 moves it. Both bands are per-session ranges, so a new session
-can break one without changing any pooled number.
+**The bands are quoted at two decimals on purpose, and rounding them cost the third defect.** At one
+decimal the shipped band was published as 「2.1-3.3%」 while its floor is 2.08 — a band's low end
+must FLOOR and its high end must CEIL or the band no longer contains what it ranges over, and 2.1
+excludes 07-28. Quoting a band at the same precision as its own series removes the decision
+entirely. The same rounding is what made 「74.6-77.0%」 survive four sessions unchanged: 08-14's
+77.04 tied 08-09's 76.99 only at one decimal place.
+
+**`29-34%` was wrong in ten places at once, and seven of them were byte-identity gated.** Two
+comments in `emit-opener-facts.ts`, one in `openers.test.ts`, and the `means` prose of all seven
+committed artefacts said the predicate minus its re-opening clause "fires on 29-34%"; the range is 28.93-36.84%, wrong at both
+ends and at the ceiling by nearly three points. Re-emitting an artefact reproduced the string
+exactly, so **every gate in the repo agreed with it** — a byte-identity gate certifies *unchanged*,
+never *correct*, and a typed figure inside one is pinned rather than checked. The repair has two
+halves and the second is the transferable one: the band is rendered here, and a per-session
+artefact no longer carries a corpus figure at all, because it cannot see the other sessions and so
+has no way to check one.
+
+**This is the repair the repertoire ranges refused, and the difference is a renderer.** That entry
+rejected "a gate that recomputes the bands" because three of five bands moved inside seven sessions,
+so its normal state would be red — and a gate whose normal state is red is not a gate. The
+objection was never to recomputing; it was that red meant *hand-measuring again*. With `--render`,
+a moved band costs a paste, which is this repo's standing rule for every figure that has one.
+
+**The two paragraphs below are the RECORD of what was corrected, and their figures are the ones
+that were published at the time.** They are deliberately not re-derived; read the fragments above
+for the live values.
+
+> **This paragraph said 70-89% until 2026-08-14, and that figure names no variant of the clause it
+> describes.** The bare clause is 100%; at the shipped thresholds it is 28.9-36.8%; only a composite
+> with `cavity ≥ 1` lands in the band (74.6-77.0%), and it never reaches 89%. A rate was being quoted
+> for something proved to be always true — the same shape as the 3379-vs-3142 note above, and the same
+> lesson: a figure quoted in prose is not the thing it describes.
+>
+> **Quote the band as a band, and re-measure it every session — it moved on the sixth.** Through five
+> sessions the shipped-thresholds-minus-re-opening rate sat in 28.9-33.6%; 2026-08-14 fires at
+> **36.8%**, three points above that ceiling, while the pooled rate barely moves (31.1% → 32.4%). The
+> pooled figure alone would have hidden it.
+
 `D = 4` and "walled at the **deepest** 4 cavity rows" are harddrop's numbers, not tuned: of its 20
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
 
-**Both bands survive the seventh session, and both survive for the reason that paragraph warned
-about rather than by a margin.** The per-session series now read 28.93 · 33.64 · 30.99 · 29.74 ·
-33.27 · 36.84 · **36.13** for shipped-minus-re-opening (08-14's 36.84 is still the ceiling) and
-74.72 · 76.84 · 74.60 · 76.80 · 76.99 · 77.04 · **76.51** for the `cavity ≥ 1` composite. So
-74.6-77.0 still rests entirely on 08-14 tying 08-09 at one decimal place, and an eighth session
-anywhere in 77.05-77.94 moves it. Pooled, neither says anything: noReopen 32.37 → 32.94, cav1
-76.13 → 76.19. **Nothing in the repo re-derives either band** — like the repertoire ranges above,
-they exist only in this prose, so re-measuring them by hand is part of adding a session, and the
-per-session series is written out here so the next hand has something to check against.
-
-**Every donation in this corpus sits on a garbage-derived well — 0 self-built, all seven sessions**
-(08-19 adds 24 of 24; **0 of 127** corpus-wide).
+**Every donation in this corpus sits on a garbage-derived well — 0 self-built, every session**
+(<!--don:latest-garbage-->08-19 adds 24 of 24<!--/don:latest-garbage-->;
+**<!--don:self-built-->0 of 127<!--/don:self-built-->** corpus-wide).
 The oracle keeps the engine's own seeded-RNG garbage hole *columns*, which disagree with the
 ige-recorded ones 97 of 103 times over the first six sessions (`oracle-source.ts`), so the count
 says the board offered the

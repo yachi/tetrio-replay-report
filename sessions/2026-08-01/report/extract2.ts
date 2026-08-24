@@ -119,13 +119,16 @@ function extractRoundPlayer(player: any, ctx: string) {
   if (!resultsStats?.finesse) warn(`${ctx}: missing results.stats.finesse, using 0s`);
 
   // The rate triple comes from results.aggregatestats, NOT from player.stats: the latter is a
-  // live in-game tick that predates the round's end in 183 of 760 player-rounds, and the error is
-  // directional (181 of those are the round winner, APM too high in 172). aggregatestats is the
-  // final snapshot, the same results-time source as garbage/finaltime below, and only it satisfies
-  // vs*60*attack == apm*100*(attack+cleared) on every round.
+  // live in-game tick that predates the round's end on a large minority of player-rounds, and the
+  // error is directional (almost all of them the round's survivor, APM too high). Only
+  // aggregatestats satisfies vs*60*attack == apm*100*(attack+cleared) on every round.
   //
-  // DECIDED, not overlooked: extractLeaderboardEntry above stays on `stats`, because a leaderboard
-  // entry carries no aggregatestats (0 of 98 in this corpus). So round-level rates are final-frame
+  // No counts here, deliberately: this comment exists in seven copies and the figures it used to
+  // carry were six-session numbers in a seven-session corpus. analysis/stat_sources.py re-derives
+  // them; pipeline/check_stat_sources.py gates the sentences in CLAUDE.md that publish them.
+  //
+  // DECIDED, not overlooked: extractLeaderboardEntry above stays on `stats`, because no
+  // leaderboard entry in this corpus carries aggregatestats. So round-level rates are final-frame
   // while the match-level rollup is the live tick, and round figures will not reconcile against the
   // leaderboard's. There is no better source for the leaderboard.
   const aggregate = player?.replay?.results?.aggregatestats ?? {};

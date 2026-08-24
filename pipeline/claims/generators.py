@@ -290,19 +290,25 @@ def longest_streak(facts):
 # A RATE record needs a qualifying round, the way a batting title needs a minimum
 # number of plate appearances. APM and VS are ratios with the round's length in
 # the denominator, so over a short round they behave like a sample mean over a
-# small n: measured across all 492 player-rounds of the four sessions, the SD of
-# VS falls from 58.2 (21 s bin) to 15.2 (144 s bin) while the MEAN stays flat
-# (108 -> 118). Fitting log SD on log t gives -0.616 for VS and -0.697 for APM,
-# both with -0.5 inside the 95% CI and slope 0 rejected (p 0.001 / 0.0003) —
-# the signature of sampling noise, not of better play. The consequence shipped:
-# all 12 unqualified rate records (3 metrics x 4 sessions) came from the shortest
-# quartile of rounds, which under chance is p = 6e-08, and 07-22's headline
-# "約262.6" was a 15.6-second round 45% above that session's qualified peak.
+# small n: the SD of VS falls several times over the corpus's range of round
+# lengths while the mean barely moves, which is the signature of sampling noise
+# and not of better play. Every unqualified rate record in the corpus has come
+# from the shortest quartile of rounds.
 #
 # 60_000 ms is where the definition and the data agree: APM and VS are per-MINUTE
-# rates, so the window should be at least a minute — and each session's record
-# names the identical round for every cut-off from 50 s to 70 s, so nothing here
-# rests on the exact number. The full analysis is `analysis/rate_records.R`.
+# rates, so the window should be at least a minute — and every session's record
+# for both is unchanged over a band of cut-offs that contains it.
+#
+# NO FIGURES HERE ON PURPOSE. This comment carried twenty-six lines of them until
+# 2026-08-23 — 492 player-rounds, slopes -0.616/-0.697, "both with -0.5 inside the
+# 95% CI", "the MEAN stays flat (108 -> 118)", 12 records, p = 6e-08, and a band of
+# "50 s to 70 s". They were measured over FOUR sessions and never re-run; by seven,
+# APM's -0.5 is outside its CI, the VS mean is not flat (p = 0.01), there are 21
+# records, and the band for APM and VS together is [54, 62]. A source comment cannot
+# go red, so a figure in one is published with no way back to what produced it.
+# The analysis is `analysis/rate_records.R`, its output is the committed
+# `analysis/rate-records.json`, and every figure the repo publishes from it is a
+# marked fragment gated by `pipeline/check_rate_records.py`.
 #
 # COUNT records are deliberately NOT qualified: the artifact runs the other way
 # for them. Fitting more lines or a longer B2B chain into a short round is

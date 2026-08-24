@@ -180,7 +180,7 @@ Every cell is measured, and gated on push — see "Gating equiv.py coverage" bel
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by four of the seven sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->four of the seven<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -189,9 +189,9 @@ than a threshold: no honest floor exists when one hand claim is worth 10.0 point
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — six of the seven sessions lose coverage
-under the second family at `match` granularity (and all seven at `round`), and every claim that
-drops is a windowed or per-match one. See README's "Where this metric breaks down".
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->six of the seven<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->seven of the seven<!--/equiv:sf-round-->
+at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
 * the "only one decider" claim restated that match's score without proving it was the
@@ -2935,13 +2935,12 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
     floor of four and the real ratio had fallen to **3.8195**. Flooring to one decimal is what lets
     足足 stay in the sentence at all — the printed 3.8 is a lower bound on the truth, where the typed
     「四倍」 was not a bound on anything.
-  - **STILL OPEN: `analysis/rate_records.R` runs in no workflow and no `bin/` script.**
-    Re-checked at the time of writing — `grep -rn "rate_records|Rscript" .github/ bin/` still
-    returns **nothing**. So the footnote's constants are guarded against a corpus-size mismatch but
-    the script that produces them is still run by hand, and `QUALIFYING_MS`'s evidence is
-    re-derivable only by someone remembering to. The guard turns silent staleness into a loud
-    build failure; it does not make the number self-maintaining. This half is why the bullet is
-    not struck.
+  - ~~**STILL OPEN: `analysis/rate_records.R` runs in no workflow and no `bin/` script.**~~
+    **CLOSED 2026-08-23** — see 「`rate_records.R` —— 個 producer 都要有 gate」 below. The script
+    globs its sessions, emits `analysis/rate-records.json`, and `records.py` READS that artefact
+    instead of holding copies of its output; `rate-records` is the CI job. The fix that mattered
+    is not "it runs now" but WHAT the artefact carries: the md5 of every facts.json it read and
+    of the script itself, which is the half a session-count guard could never see.
 - ~~**Ten hardcoded session lists remain**, of the fifteen inventoried: `verify.yml:44-51`,
   `:179-180`, `:736`; `analysis/rate_records.R`'s `sessions`; `pipeline/records.py`;
   `pipeline/intense_round.py`; and the four TypeScript consts `cross-tslot-multi.ts`'s `SESSIONS`,
@@ -2957,7 +2956,7 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
   | **derived from disk** | `intense_round.py` (no list at all — `CORPUS` comes from `corpus_stats` and is triple-gated), `cross-tslot-multi.ts`, `cross-tspin.test.ts`, `cross-movegen.test.ts` (all three now `discoverCorpus(...)`) | none |
   | **listed but asserted against disk** | `cross-tslot.test.ts:61` and `openers/openers.test.ts:36` (both `assertCorpusIsEverySessionOnDisk`), `records.py`'s `R_STATS_SESSIONS` (a COUNT, checked against `corpus_scope()`, refuse-to-render on mismatch) | fails loudly; a list on purpose, because per-session literals are pinned below it and a session nobody has measured must not reach them |
   | **deliberately held** | `verify.yml:45-52`, `:180-181` | see the first bullet of this section — NOT to be converted |
-  | **open and unguarded** | `analysis/rate_records.R:25` | the only one left |
+  | ~~**open and unguarded**~~ | ~~`analysis/rate_records.R:25`~~ | **CLOSED 2026-08-23** — globbed off disk. The inventory is now empty at every state that fails silently |
 
   Two corrections to the old list itself. **`verify.yml:736` no longer names anything**: the
   workflow now holds exactly two session enumerations (the two matrices) plus a single-session
@@ -2986,21 +2985,26 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
     states the repertoire split qualitatively (「pinglamb opens Honey Cup more than yachi does」) and
     keeps only the ordinal claims the committed artefacts pin. The deleted ranges are recorded at
     their own site with the history, so the next session cannot re-introduce them by accident.
-  - **The `cavity >= 1` donation band, 74.6-77.0% — STILL OPEN, and it must be re-measured by hand
+  - ~~**The `cavity >= 1` donation band, 74.6-77.0% — STILL OPEN, and it must be re-measured by hand
     every session.** Nothing recomputes it. Its ceiling survives only by a rounding coincidence:
     08-14's 77.04% ties 08-09's 76.99% at one decimal place, so any future session landing anywhere
     in **77.05-77.94%** moves a figure that reads as stable. 08-19 came in at 76.51% and did not
     move it — which is luck, not a gate. The per-session comment at `openers/openers.test.ts:964`
-    records the arithmetic; it is a comment, so it warns rather than fails.
+    records the arithmetic; it is a comment, so it warns rather than fails.~~
+    **搞掂咗(2026-08-24)** —— 見下面 `donation.ablation` 嗰節。三條 band 全部由七份 artefact
+    render 返出嚟,`pipeline/check_donation_bands.py` byte-compare CLAUDE.md 入面嘅 fragment。
+    順帶執返個 `77.05-77.94%`:個 band 而家報到兩個位,所以「高過 77.04 就郁」,冇咗個
+    round-to-1dp 嘅窿。
 
-  **The candidate fix was considered and NOT taken, and its cost is the reason.** Adding these
-  columns to `analysis/corpus_stats.COLUMNS` would make them re-derivable and stale-detectable by
-  the machinery that just closed the `intense_round.py` item above. But `FAMILY` is the
-  cross-product of `COLUMNS` and `X_VARS` and `m = len(FAMILY)` is the Bonferroni denominator, so
-  **adding a column moves every adjusted p in the published corpus block.** That coupling is
-  intended — it is what a multiplicity correction MEANS, and `corpus_stats`'s docstring says so —
-  which makes it a decision about what the family IS, not a refactor. Recorded here rather than
-  taken, so the next person does not re-derive the trade from scratch and does not make it silently.
+  **The `corpus_stats.COLUMNS` route was considered and NOT taken, and that refusal still stands —
+  the route actually taken is a different one.** Adding these columns to `analysis/corpus_stats.
+  COLUMNS` would make them re-derivable, but `FAMILY` is the cross-product of `COLUMNS` and
+  `X_VARS` and `m = len(FAMILY)` is the Bonferroni denominator, so **adding a column moves every
+  adjusted p in the published corpus block.** That coupling is intended — it is what a multiplicity
+  correction MEANS — which makes it a decision about what the family IS, not a refactor. The 08-24
+  fix does not touch `corpus_stats` at all: the counts are emitted into each session's own
+  artefact and rolled up by a gate that reads the seven artefacts, so nothing enters the
+  multiplicity family and the trade above never has to be made.
 
 ### TWO decisions still with the user — recorded at their own sites, listed here only as an index
 
@@ -3042,8 +3046,9 @@ list". Measured 2026-08-20: **false**. `bin/build-docs:243` builds `arts` by glo
 claim had outlived its fix in a memory file and would otherwise have been re-filed every
 session — a wrong DONE record is worth less than none, and so is a wrong OPEN one.
 
-1. **The two hand-typed counts beside the equiv-coverage tables.** Both sit next to tables
-   `check_equiv_coverage.py` already parses, and neither is derived from them:
+1. **The two hand-typed counts beside the equiv-coverage tables.** — **DONE (2026-08-23)**;
+   see the section below. Both sat next to tables `check_equiv_coverage.py` already parses, and
+   neither was derived from them:
 
    - 「**Four of the seven** rows above sit below the ≥85% acceptance gate」 (README.md,
      ROADMAP.md). This read 「**Two**」 until 2026-08-20. Two was correct at *five* sessions
@@ -3055,32 +3060,43 @@ session — a wrong DONE record is worth less than none, and so is a wrong OPEN 
      loses nothing there) and false at `round` (all seven lose, 07-24 by R018), and it sat in
      a paragraph quoting `round` figures. Both readings are now stated explicitly.
 
-   The fix is not to re-type them. `DOCS` already runs `per_table` hooks (`_granularity`,
+   ~~The fix is not to re-type them. `DOCS` already runs `per_table` hooks (`_granularity`,
    `_companion`); a third hook can recompute both counts from the parsed rows and fail on
-   drift, and `render()` can emit them so the sentence is pasted rather than written. Done when
-   a planted corruption of each count is caught by `--selftest` — it is at 68 corruptions and
-   already feeds every committed document through the parser, so the control exists.
+   drift, and `render()` can emit them so the sentence is pasted rather than written.~~
+   **A third `per_table` hook was the wrong shape and the reason is worth keeping: a hook is
+   handed the parsed columns, not the document, so it cannot see a sentence at all.** Shipped
+   instead as four *marked fragments* — an inline HTML-comment pair around each figure, whose
+   contents are byte-compared against a renderer. Not a parse, because an anchor regex over
+   editorial prose can be shadowed by an earlier paragraph carrying the same words, and both
+   sentences have exactly that hazard in ROADMAP.md's own dated 2026-08-15 section (「three of
+   six sessions」, 「Five of six sessions lose coverage」). Done: `--selftest` is at **108
+   corruptions, all caught** (was 68), of which 40 are the fragments, plus two new controls
+   over the committed documents.
 
 2. **The `x of 760` family — 11 lines in CLAUDE.md, all six-session numbers in a seven-session
-   document.** `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
+   document.** — **DONE (2026-08-23)**; see the section below. It was 28 figures, not 11, and
+   17 more copies sat in `extract.py` / `extract2.ts` / `SCHEMA.md`. `183 of 760` (stale live tick), `201 of 760` (`kills` the other way),
    `257 of 760` and `245 of 760` (the `finaltime_ms` flooring), `13 of 760` → `0 of 760` (the
    VS-split guard), `650 of 750` (faults outnumbering non-perfect pieces), `7 and 1 of 760`
    (`garbagesent`/`garbagereceived`). Every one is **scoped honestly** — the text says it was
    measured over the first six sessions and has not been re-run — so no sentence is false, and
    that is exactly why nothing goes red. The corpus is 900 player-rounds now.
 
-   The ratios are what carries forward, not the numerators, so this is not urgent; it is filed
+   ~~The ratios are what carries forward, not the numerators, so this is not urgent~~ — **and
+   that is now measured rather than assumed: every FLOAT bound is byte-identical at six sessions
+   and at seven** (the worst-case rounds all sit in the first six), so only the counts ever
+   moved. It is filed
    because "scoped" is a caveat, not a measurement, and the caveat has already survived one
    session. Done when each figure is either re-derived at 900 or pointed at a committed
    artefact that re-derives it. Note that `0 of 760` is the one that must NOT be silently
    refreshed: it is a guard's firing count, and whether it still fires at 900 is a per-session
-   check, not a re-pool.
+   check, not a re-pool. **Honoured**: the `13` beside it stays a six-session figure, because it
+   measures the data BEFORE the 2026-08-16 re-source and nothing at 900 can re-derive it; the
+   `0` is derived per round over all 900.
 
-Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow
-and no `bin/` script — see 「Corpus derivation」 (2026-08-17), which names it as the one open
-and unguarded session list.
+~~Not filed, because it is already open above: `analysis/rate_records.R` running in no workflow and no `bin/` script.~~ **CLOSED 2026-08-23.**
 
-## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23)
+## `bin/verify-repo` — 個 last mile 冇工具 (2026-08-23) — DONE (2026-08-23)
 
 Filed from the 2026-08-20 retrospective. Four gates went red on PR #14 (`docs`, `manifest`,
 `preregistrations`, `coverage`) and **three of them were reproducible locally in minutes** — they
@@ -3107,10 +3123,20 @@ to the script leaves the script silently narrower than the thing it stands in fo
 the `bin/build-docs` `ARTEFACTS` failure mode, which was closed by checking the list against disk
 rather than by maintaining it more carefully.
 
-Two tiers, because wall clock is the reason a person skips it: `--fast` omits `coverage`
+~~Two tiers, because wall clock is the reason a person skips it: `--fast` omits `coverage`
 (~25 min for the corpus at two granularities) and `oracle-image` (~6 min); the default runs
-everything. Done when the four failures of 2026-08-20 are all caught by one local command, and
-when a job added to a workflow but unknown to the script is itself an error rather than a skip.
+everything.~~ **Shipped with four tiers rather than two, and that parenthetical was wrong in a way
+worth keeping: ~25 min is the UNNARROWED `check_equiv_coverage --check`, which is the
+`coverage-round` job.** The `coverage` job runs `--modes single_value,two_site_match` and takes
+~4 min. Two figures from the same tool, one of them six times the other; the workflow's own comment
+distinguishes them and this item did not.
+
+**Done, on both criteria.** The four failures of 2026-08-20 are all caught by `bin/verify-repo`
+(`docs`, `manifest`, `preregistrations`, `coverage` — measured, all four run and pass locally), and
+a job added to a workflow and unknown to the script is an error rather than a skip — demonstrated
+against the real thing, because appending the `workflow-plan` job to `verify.yml` made
+`bin/verify-repo --check` exit 1 naming it before its `PLAN` entry was written. See the section
+below for what the build turned up.
 
 ## C-Spin 逐局／逐場 — Phase 1 landed, the section and its gates are not (2026-08-23)
 
@@ -3243,3 +3269,424 @@ does, on every session.
 **Never a rate, at any granularity.** Per-match `rounds_scored` is 4-8. Same rule 全消 follows for
 its 3-12 round denominators, and `per_match` carries `rounds_unscored` so the denominator travels
 with the count rather than being reconstructed by a reader.
+
+## `bin/verify-repo` — 個 last mile 有工具喇 (2026-08-23)
+
+Closes the item above. `bin/verify-repo` runs the repo-wide CI jobs locally; `workflow-plan` is the
+CI job that checks it still can.
+
+**The shape is the deliverable, not the coverage.** The item's one design constraint was "derive the
+command list from the workflow files, do not copy it", and the script takes that literally: it scans
+`.github/workflows/*.yml`, and the text it executes is each step's own `run:` block. Nothing in the
+script names a gate. What it carries instead is a `PLAN` — one entry per job, either a tier to run it
+at or a reason it cannot run here — and six completeness rules, each of which is an error rather
+than a skip:
+
+| rule | the drift it closes |
+|---|---|
+| every job in CI is in `PLAN` | a job added to CI, script silently narrower |
+| every `PLAN` entry names a real job | a job removed or renamed, entry rots |
+| every skipped step name exists | a step renamed, its skip silently covers nothing |
+| every step carrying `if:` is decided in `PLAN` | a conditional step neither run nor declared |
+| every runnable step's `${{ }}` resolves | a step run with a hole in it, green and wrong |
+| every `$GITHUB_*` / `$RUNNER_*` read is supplied | a runner variable that dies mid-matrix under `set -u` |
+
+And one rule that runs the other way, which is the one that says the list is derived: **a plain new
+`run:` step is absorbed and runs**, with a control asserting it. If that control ever fails, the
+command list has become a copy and the argument for the script's shape is gone.
+
+**The gate was demonstrated against the real workflow, not only against a mutant.** Appending
+`workflow-plan` to `verify.yml` made `bin/verify-repo --check` exit 1 —
+`verify.yml:908: job 'workflow-plan' is in CI and unknown to bin/verify-repo` — before its `PLAN`
+entry existed. That is the acceptance criterion firing on the first real job added after it was
+written, which is better evidence than any planted case.
+
+**Two independent parsers, and PyYAML is the oracle.** The scanner is stdlib-only, because every
+python gate in this repo runs on whatever `python3` is on PATH and a runtime dependency on PyYAML
+would be a new way for the gate to be absent rather than red. It is strict: any construct it does
+not recognise is a parse error, so it cannot silently read less than is there. `--selftest`
+cross-checks it against PyYAML when PyYAML is importable, on every job id, step name and `run:` text
+— 14 jobs, 72 steps. **The oracle earned its place on the first run**: the scanner kept the trailing
+`# v4.2.2` on `uses: actions/checkout@<sha>  # v4.2.2`, where YAML ends a plain scalar at an unquoted
+` #`. Harmless there, but it is the class of difference that would have made a `run:` line execute a
+shell comment as an argument.
+
+`--selftest` is 10 planted corruptions (all caught) plus 4 controls: the committed workflows parse
+and are fully planned, the PyYAML oracle agrees, no scanned matrix is empty (an empty one would make
+`--sessions` a silent no-op), and the absorption control above.
+
+**The tenth corruption exists because the first real matrix run failed, and the failure is the most
+transferable thing here.** `--only pipeline` died on all seven sessions in nine seconds:
+`RUNNER_TEMP: unbound variable`. `RUNNER_TEMP` is provided by the GitHub runner, the `pipeline` job's
+Dafny step reads it, and `set -u` does the rest. Running CI's commands verbatim means providing CI's
+*environment* too — and the fix is not only to supply it. Supplying variables one crash at a time is
+the same shape as discovering red jobs one push at a time, one level down. So the ones with an
+honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
+`GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+`$GITHUB_*` or `$RUNNER_*` reference is a completeness error**. The mutant plants `$RUNNER_ARCH` in a
+step and requires it refused.
+
+### Measured, and one of them changes what the item said
+
+| | |
+|---|---|
+| jobs | **14** across 3 workflows (13 before `workflow-plan`) |
+| repo-wide | **11** — was 10; `bin/` could run 1 of them, now 10 of 11 on a Mac (`oracle-image` needs Linux) |
+| `bin/verify-repo --fast` | **4 m 12 s**, 8 jobs, all pass — `bun test` is 177 s of it |
+| `bin/verify-repo` (default) | **10 m 20 s**, 10 of 10 jobs pass |
+| `bin/verify-repo --sessions` | **16 m 00 s**, **25 of 25 jobs pass**, working tree clean after |
+| `--only pipeline` / `--only verify` | **3 m 31 s** (7 sessions) · **3 m 50 s** (8 artefacts) |
+| the `coverage` job | **~4 min**, not the ~25 min the item wrote |
+| toolchain divergence | none — local dafny 4.11.0, z3 4.16.0, cvc5 1.3.4 are the pins |
+
+The `~25 min` in the item was the unnarrowed `check_equiv_coverage --check`, i.e. the `coverage-round`
+job, quoted against `coverage`. Both figures are in `equiv-coverage.yml`'s own comments and the item
+took the wrong one, which is the ordinary way a number goes wrong here: not measured freshly and
+wrong, but measured correctly for a neighbour.
+
+### What the build found that the item did not: `bin/verify-session` is narrower than CI
+
+Writing the `PLAN` entry for the `pipeline` matrix meant reading its steps, and they do not match
+what any `bin/` script runs:
+
+| | steps |
+|---|---|
+| CI's `pipeline` job, per session | **18** |
+| `bin/verify-session`, per artefact | **7** |
+
+`build_report --check`, `check_prose_figures`, `check_generated_css`, `check_finesse_denominator`,
+`check_badge_links`, `check_report_shell`, the forecast / opener / wiki-transcription gates and
+`check_smt` are in the first list and not the second. That is not a defect in `verify-session` —
+its scope is one artefact directory and it says so — but it does mean the per-session last mile had
+the same hole as the repo-wide one, one level down, and the item only named the repo-wide half.
+`bin/verify-repo --sessions` expands both matrices **from the workflow's own matrix lists** and runs
+them, so it is now the only local command that runs everything a push runs.
+
+Note what it inherits by doing that: those two matrix lists are hand-maintained session lists
+(`verify.yml:44-51,179-180`), and 「Gating equiv.py coverage」 (2026-08-15) records them as
+deliberately still open because they cannot glob. `--sessions` reproduces CI faithfully, which means
+it reproduces that staleness too. It does not make the lists worse and it does not fix them; a fix
+is still that item's.
+
+### Standing rules this adds
+
+- **A script that stands in for CI must be checked BY CI.** `workflow-plan` exists for the reason
+  `dual-backed.yml` and `equiv-coverage.yml` exist: this repo has measured three times what a gate
+  nobody runs is worth. A completeness check that only runs when someone remembers to run the tool
+  degrades exactly when the tool is most out of date.
+- **One escape hatch, not two.** The first draft could excuse a job two ways — a `why=` reason and a
+  `linux_only=` flag — and only the second was ever taken, so the first was a capability the
+  contract advertised and nothing exercised. They are one named predicate now, evaluated per run,
+  which also means a Linux machine runs `oracle-image` instead of excusing it forever.
+- **Print every skip.** The summary names each unrun job, each skipped step, each toolchain whose
+  local version is not the workflow's pin, and the per-session gates it did not run. A run that
+  quietly covered less than it claimed is the failure this tool was written to stop; a tool that
+  produced it would be the joke version of itself.
+
+## 表旁邊嗰兩個數 —— marked fragments (2026-08-23)
+
+Closes item 1 of 「兩個仲未有 gate 嘅數」. The cells of the equiv-coverage tables were gated from the
+day `check_equiv_coverage.py` existed; the **sentences beside them** were not, and both went wrong,
+in the two different ways prose goes wrong.
+
+| | how it failed |
+|---|---|
+| 「Four of the seven rows sit below the ≥85% gate」 | ordinary **staleness** — read 「Two」 for two whole sessions |
+| 「six of the seven sessions lose coverage to the second family」 | never stale, **granularity-ambiguous** — true at `match`, false at `round`, in a paragraph quoting `round` figures |
+
+The second is the harder one and the reason this is not just "recompute it": **re-measuring does not
+surface an ambiguity.** A gate that recomputed "six" would agree with the sentence forever while the
+sentence went on meaning two different things. The fix has to make the granularity part of the
+figure, so it ships as *two* figures — `sf-match` and `sf-round` — that cannot be written as one.
+
+### Why a hook was the wrong shape, and a marker the right one
+
+The item proposed a third `per_table` hook. That cannot work, and finding out why took one reading
+of `docs_gate.Table.check`: **a hook is handed `(name, published_columns, arts)` — it never sees the
+document.** The counts are not in the table.
+
+The available alternative was a `Prose` spec, which is what CLAUDE.md's per-session sentence already
+uses: anchor a paragraph by regex, pull figures out of it, compare. It is the wrong tool here for a
+specific reason rather than a general one. **An anchor over editorial prose can be shadowed by an
+earlier paragraph carrying the same words, and both sentences have exactly that hazard inside
+ROADMAP.md itself** — the dated 2026-08-15 section says 「**The ≥85% acceptance gate P4 declared is
+not met by three of six sessions**」 and 「**Five of six sessions lose coverage to the second
+family**」. Those are historical records of a six-session corpus and must stay as written. An anchor
+loose enough to match the live sentence matches the dead one too, and `paragraph()` takes the FIRST
+match — so the gate would have checked the historical paragraph and reported the live one as fine.
+This is `check_equiv_coverage.DOCS`'s own documented hazard (CLAUDE.md: the spec matches the first
+line carrying the anchor token) arriving from a direction the rule did not cover: not a *mention*
+shadowing the sentence, but a *previous version of the sentence*.
+
+So each figure is wrapped in an inline HTML-comment pair and **byte-compared against its renderer**:
+
+```
+**The ≥85% acceptance gate this phase set is not met by
+<!--KEY-->four of the seven<!--/KEY--> sessions**
+```
+
+The example above writes a bare `KEY`, outside the `equiv:` namespace, and both halves of that
+are load-bearing. **Writing the real fragment name broke the build in the minute this section was
+drafted** — `expected exactly one pair, found 2`. Writing `equiv:KEY` broke it a second time,
+after the gate learned to reject any marker in its namespace that no spec claims — because a
+marker nobody reads is a figure that looks gated and is not.
+That is the third time this repo has walked into the anchor-shadowing hazard *inside the paragraph
+describing it* (CLAUDE.md's own coverage-line bullet did it on 2026-08-20 and again on 2026-08-23).
+The difference is that this time the rule is enforced rather than written down, so the cost was one
+red run instead of a silently disabled gate. Prose warning readers off a token loses to a gate that
+counts them.
+
+Four fragments — `gate-count` (README, ROADMAP), `gate-sessions` (README, the named list),
+`sf-match` and `sf-round` (ROADMAP, CLAUDE) — rendered by `--render` beside the table blocks. The
+comments render invisibly on GitHub, so the published sentence is unchanged prose.
+
+Three properties the marker buys that a parse does not:
+
+- **Exactly one pair per document, or it fails.** Not "at least one". A second copy is precisely
+  the shadowing case above, and this turns it from a rule somebody has to remember into a red build.
+- **A fragment in a document that does not publish it fails too.** A second copy of a gated figure
+  is a second place for it to go stale, so the gate runs over *every* document, not only the ones
+  a `FRAGMENTS` entry lists.
+- **The editorial prose around it is free.** README says "is missed by", ROADMAP says "is not met
+  by"; only the quantified clause is pasted, so a reword costs nothing and a figure cannot be typed.
+
+### What each figure is measured over, stated because both choices could have gone the other way
+
+- **below the gate** reads the **published** `pct` string, not a fresh division. A reader checks the
+  sentence against the row above it, so a session printed as 85% counts as 85 even if it divides to
+  84.6. Same formatter, one place.
+- **loses coverage** compares the **covered COUNT**, not the percentage. `testable` moves between
+  modes, so a percentage can fall with a flat numerator — that is not a session losing coverage,
+  and the sentence itself cites 07-24's `48 → 48`.
+
+### Measured
+
+| | |
+|---|---|
+| `--selftest` | **108 corruptions, all caught** (was 68) — 40 of them the fragments |
+| new controls | the committed documents carry every fragment they publish; and those fragments **byte-match the committed artefacts** |
+| fragment mutants per owned fragment | wrong value · deleted · **appears twice** · closing marker lost · markers swapped |
+| the renderer's first output | reproduced all four published values verbatim — the figures were correct today, and now they cannot silently stop being |
+
+**One thing the build had to fix that is not about markers.** `figures()` raises `SystemExit` when an
+artefact lacks a mode, which is right for a renderer and wrong for the gate: `_artefact_problems`
+has already reported the missing mode, and dying there reports ONE problem where a run should list
+all of them. The fragment functions raise `_Incomplete` instead; `_fragment_problems` turns it into a
+line and `render_fragments` turns it back into the same `SystemExit` a reader of `--render` needs.
+Found by a pre-existing selftest case ("a mode is missing from the artefact") going from rejected to
+*crashed*, which is why the count is the thing to watch and not the exit code.
+
+## `x of 760` —— 28 個數,一句都冇錯過 (2026-08-23)
+
+Closes item 2 of 「兩個仲未有 gate 嘅數」. `analysis/stat_sources.py` re-derives every corpus figure
+CLAUDE.md publishes about a round's three stat objects; `pipeline/check_stat_sources.py` gates the
+sentences; `stat-sources` is the CI job.
+
+**This is the hardest row in the 冇第二份 table and the reason is worth stating plainly: none of
+these sentences was wrong.** Each carried an honest caveat — 「measured over the 760 player-rounds of
+the first six sessions and has not been re-run at 900」 — which is exactly why nothing ever went red.
+A caveat is not a measurement. It is a promise to re-measure later, published in the same typeface
+as a result, and it reads to any later hand as a number somebody still stands behind. The other
+rows in that table go stale; this one **announces** that it is stale and stays published anyway.
+There is no gate shape that catches that except one that re-derives the figure.
+
+### The control is the whole argument
+
+At 900 rounds there is no published number left to disagree with, so a fresh derivation could be
+measuring something adjacent and every run would be green. `--selftest` therefore restricts the
+derivation to the six sessions the figures were hand-measured on and requires every published
+integer back **exactly**:
+
+    183 · 181 · 172 · 257 · 245 · 201 · 7 · 1 · 758 · 11865 · 7510 · 650 · 750 · 760 · 98
+
+Fourteen of the fifteen came back first try. **The fifteenth is the useful one.** 「245 of the 760」
+came back 243, and the hand measurement was right where the re-derivation was not: 245 is the count
+only when the residual is maximised over **all three** rates. VS and APM alone give 243, and the two
+rounds between them are the entire difference. `aggregatestats` is a triple, so a route claiming to
+reconstruct it has to reconstruct the triple — the definition was corrected, not the figure.
+
+### What actually moved, and what did not
+
+| | six sessions | seven |
+|---|---|---|
+| live tick stale | 183 of 760 | **211 of 900** |
+| … of them the survivor | 181 | **209** |
+| `floor(ft·60/1000)` wrong | 257 | **313** |
+| `finaltime_ms/1000` above 1e-4 | 245 | **289** |
+| `kills` disagree | 201 | **243** |
+| `garbagesent` / `garbagereceived` | 7 and 1 | **9 and 2** |
+| faults > non-perfect pieces | 650 of 750 | **770 of 884** |
+| pooled faults / non-perfect pieces | 11 865 / 7 510 | **13 964 / 8 772** |
+| **every float bound** | — | **byte-identical** |
+
+That last row is the finding. `1.81899e-12`, `2.43096e-16`, `4.16852e-16`, `6.13187e-16`,
+`1.51976e-3`, `1.25354e-3` and the VS guard's `0.0565699` are the SAME at six sessions and at seven,
+to every digit — the worst-case rounds all sit in the first six. 「The ratios are what to carry
+forward, not the numerators」 was written as a hedge and turns out to be exactly true.
+
+### Five published bounds were rounded the wrong way
+
+Every one of those floats is an 「up to X」 statement, and five of the six were published rounded
+DOWN — each asserting a **tighter** bound than the data supports:
+
+| measured | published | correct |
+|---|---|---|
+| 1.81899e-12 | 1.8e-12 | **1.9e-12** |
+| 2.43096e-16 | 2.4e-16 | **2.5e-16** |
+| 6.13187e-16 | 6.1e-16 | **6.2e-16** |
+| 1.51976e-3 | 1.5e-3 | **1.6e-3** |
+| 1.25354e-3 | 1.2e-3 | **1.3e-3** |
+
+This is the rule `pipeline/fmt._bound_dp` already states for the reports — an upper bound is the one
+figure that must round the other way — applied to CLAUDE.md, which no formatter had ever touched.
+`check_stat_sources._bound` ceils at two significant figures and has its own controls, because a
+rounding helper that rounds would pass every other case in the file. The corrections are tiny; the
+class is 「差距唔夠 0.01」 against a lemma proving 0.015, which this repo has shipped before.
+
+### 17 copies with no home
+
+`183 of 760`, `181`, `172` and `0 of 98` also sat in **seven `extract.py`, seven `extract2.ts` and
+three `SCHEMA.md`** — seventeen copies of one comment, all stale at once. Those are not gated;
+the numerals are **deleted**, and the comments now point at `analysis/stat_sources.py`. Nobody
+maintains a figure in seventeen places, and CLAUDE.md's own rule allows removing a figure as well as
+gating one. The one fact worth keeping from them — that no leaderboard entry carries
+`aggregatestats`, which is why the match-level rollup stays on the live tick — moved into CLAUDE.md
+as a gated fragment, so it went from seventeen ungated copies to one derived one.
+
+### The mechanism, shared
+
+The marked-fragment machinery moved out of `check_equiv_coverage` into `pipeline/docs_gate.py`, so
+both gates use one implementation of the marker format, the per-document check and the mutant sweep
+— a second caller cannot ship the mechanism with a thinner sweep than the first. Two things were
+added while generalising it:
+
+- **A marker in the namespace that no spec claims is an error.** Without that rule
+  `fragment_problems` simply never looks at it, so the figure inside reads as gated while nothing
+  reads it. Found by typing two — `stat:corpus2` and `stat:corpus3` sat unclaimed in CLAUDE.md and
+  the gate said everything agreed. The rule then immediately failed ROADMAP.md's own example, which
+  is why the example above writes a bare `KEY` outside any namespace.
+- **`Incomplete`** — a fragment whose data is not yet derivable is reported as a line, never as a
+  crash. `figures()` exits the process on a missing mode, which is right for a renderer and wrong
+  for a gate that should list every problem in one run.
+
+`--selftest` counts: `check_equiv_coverage` 108 → **111**, `check_stat_sources` **141**.
+
+
+## `rate_records.R` —— 個 producer 都要有 gate,唔係淨係個 consumer (2026-08-23)
+
+**收咗個 roadmap 最後一條「open and unguarded」。** 但真正值錢嗰樣唔係「而家會 run」,係度到嘅
+三個錯 —— 全部係啲 figure 有 consumer 有 gate、個 **producer** 冇。
+
+### 個 shape
+
+`analysis/rate_records.R` 係 `QUALIFYING_MS = 60_000` 嘅全部證據。之前:
+session list 硬寫、冇 workflow 行、冇 `bin/` script 行,output 手抄入 `pipeline/records.py`
+(八個 `R_*` const) 同 CLAUDE.md 十八個 figure。個 guard 淨係一個 session **count**。
+
+而家:`sessions` glob 落 disk,`--json` 寫 `analysis/rate-records.json`(commit 咗),
+`records.py` **讀** 佢(八個 const 刪晒),`pipeline/check_rate_records.py` gate 十八個
+marked fragment,`rate-records` 係 CI job。個 artefact 帶住佢讀過嘅每個 `facts.json` 嘅 md5
+**同埋 script 自己嘅 md5** —— 三條 staleness 路全部會紅:落新 session、data 郁、analysis 郁。
+第二條就係 2026-08-16 真係發生過嗰條(rates re-source,corpus 停喺六個 session,VS SD
+59.91 → 59.60),而 session-count guard 睇唔到嗰半。
+
+### 三個錯,同點解冇人捉到
+
+1. **「50 s to 70 s」是錯嘅。** 呢句話講「APM 同 VS 兩個 metric,每個 session 嘅紀錄喺 50-70 秒
+   任何一個 cut-off 都係同一局」。[50, 72] 係 **VS 一個 metric** 嘅 band;APM 嘅係 **[54, 62]**
+   —— 07-24 同 08-14 都會喺 50-70 之間換咗個 APM 紀錄,07-24 換兩次。**點解冇人捉到先係重點**:
+   句下面印住嘅證據係 R script section 4,一張 **淨係 VS 嘅表**。個 claim 錯嗰個 metric,
+   啱好就係張表冇得顯示嗰個。呢個係 repo 一路捉緊嘅「個 check fire 唔到」再多一個形狀 ——
+   唔係 tautology、唔係 vacuous clause,而係 **證據個 scope 窄過佢旁邊句 claim**。
+   `rate_records.R` 而家三個 metric 都印,而且每條 band 都係 **算** 出嚟。三個夾埋係 [58, 62],
+   60 差唔多喺正中,呢個先係啲數撐得住嘅「唔係 tuned knob」講法。
+2. **`generators.py` 個 `QUALIFYING_MS` 上面有 26 行四個 session 嘅數。** 492 player-rounds、
+   slope −0.616/−0.697、「both with −0.5 inside the 95% CI」、「the MEAN stays flat (108 → 118)」、
+   12 records、p = 6e-08。**CLAUDE.md 自己已經記低咗其中兩條喺七個 session 度係假嘅** ——
+   APM 個 −0.5 出咗 CI,VS 個 mean 唔平(p = 0.01)—— 但個 comment 由頭到尾冇人掂。
+   source comment fire 唔到,所以刪咗,唔係更新。
+3. **CLAUDE.md 仲寫住 約262.6。** 每份 report 都係 **約262.5**;2026-07-26 嗰次 約-floor pass
+   就係改呢個。同一份文件喺六百行之後,列 262.6 做嗰次 pass 改走咗嘅**錯處**。
+   `check_prose_figures` 只行 session 嘅 report directory,所以唯一仲登住舊值嗰處,
+   就係寫住條 rule 嗰份文件。
+
+### 兩樣可以搬去第二度嘅嘢
+
+- **Rounding 有方向,而且係 per claim,唔係 per number。** 撐「rejected」嘅 p 要 **ceil**
+  (round 落去等於話個 significance 大過度到);撐「still flat」嘅 p 要 **floor**;攞嚟證
+  −0.5 喺 CI **外面** 嘅 interval 要 **闊** 唔可以窄;兩個互相比較嘅 ratio,argument 要佢大嗰個
+  floor、要佢細嗰個 ceil。行落去郁咗三個已出街嘅數:8.6e-05 → 8.7e-05、5.3e-05 → 5.4e-05、
+  1.11× → 1.12×。(上一個 commit 係「bounds ceil」,呢個係佢嘅一般式。)
+- **唔使用 R 落 CI 都 close 到。** 個 artefact 有 fingerprint,所以三條 staleness 路唔使 re-run
+  都睇得到;`--rerun` 加多一層 byte-identity,而 **行唔行係睇部機有冇 Rscript,唔係睇邊個
+  runner** —— CI 印「Rscript not on PATH — fingerprints only」,本機 `bin/verify-repo` 就真係
+  re-derive。同一條命令,兩個誠實結果,弱嗰個會自己出聲。個 emitter round 到六個有效數字
+  (published 最多三個,BLAS 之間差 ~1e-15),byte-identity 先量得到個 analysis 而唔係部機。
+
+### 仲喺度嘅
+
+`bin/verify-repo --check` 一加咗個 job 就即刻紅(「job 'rate-records' is in CI and unknown to
+bin/verify-repo」),即係上個 commit 起嗰個 derive-don't-copy 性質係真嘅。16 個 job 喇。
+
+## `29-34%` —— 一個數,錯足七份 byte-identity gated 嘅 artefact (2026-08-24)
+
+捐窿 metric 有三條 band 冇人 re-derive:donation 2.1-3.3%、shipped-minus-re-opening
+28.9-36.8%、`cavity ≥ 1` composite 74.6-77.0%。開工前以為淨係「攞返個 renderer 出嚟」,
+埋到去先發現個窿深好多。
+
+### 個窿
+
+`emit-opener-facts.ts` 兩個 comment、`openers.test.ts` 一個 comment,加埋七份
+`sessions/*/sim/opener-facts.json` 嘅 `means` prose,全部寫住個 predicate 拆走 re-opening
+clause 之後「fires on 29-34%」。**真數係 28.93-36.84%,兩頭都錯,個天花板差近三個 point。**
+
+要緊嘅唔係個數錯,係**佢錯得幾靜**:嗰七份 artefact 係 byte-identity gated 嘅,重新 emit 一次
+會一個 byte 都唔差咁噴返同一句錯嘢出嚟,所以 repo 入面**每一個 gate 都同意佢**。
+Byte-identity 證嘅係「冇變過」,唔係「啱」;一個人手打嘅數擺喺 byte-identity gate 入面
+係釘死咗,唔係查過。
+
+### 兩個修法,第二個先係可以搬走嘅嗰個
+
+1. 三條 band 由 `pipeline/check_donation_bands.py` render,CLAUDE.md 嗰幾句用 marked
+   fragment byte-compare。
+2. **一份 per-session artefact 唔可以再寫 corpus band。** 佢睇唔到第二個 session,所以寫落去
+   嗰個 band 係佢冇辦法 check 嘅一句話 —— 呢個就係點解一句嘢可以同時錯足七份檔。而家
+   `donation.ablation` 淨係擺自己嗰個 session 嘅 counts 同 rate,`means` 都改成講自己嗰個數,
+   仲寫明「呢個係本 session 嘅,唔係 corpus 嘅」。
+
+### Ablation 係 predicate 嘅 parameter,唔係 copy
+
+`DONATION_ABLATIONS` 拆一條 clause、其餘照行 shipped 嗰條 code path。Emitter 見到
+`shipped` ablation 同 shipped path 唔同就 throw。抄一份出嚟寫嘅 ablation 寫嗰日會啱,
+之後 predicate 一改就永世答緊舊問題。
+
+### 第三個錯:band 嘅 rounding direction
+
+Shipped band publish 咗做 2.1-3.3%,但個地板係 **2.08** —— band 嘅低位要 floor、高位要 ceil,
+唔係就個 band 包唔住自己 range 到嘅嘢(2.1 剔走咗 07-28)。而家三條 band 全部報兩個位,
+同佢自己條 series 一樣精度,連個決定都唔使做。同一個 rounding 亦係「74.6-77.0%」四個 session
+都冇郁過嘅原因:08-14 嘅 77.04 同 08-09 嘅 76.99 淨係喺一個小數位度打和。
+
+### 點解呢次 recompute 係啱,repertoire ranges 嗰次唔係
+
+上面 2026-08-19 嗰粒否決咗「整個 gate recompute 啲 band」,理由係七個 session 入面五條
+band 郁咗三條,個 gate 平時就係紅嘅,而**平時紅嘅 gate 唔係 gate**。個反對從來唔係反對
+recompute,係當時紅代表「再度過一次」。有咗 `--render`,band 郁咗嘅成本係 paste 一次 ——
+呢個就係 repo 對任何有 renderer 嘅數嘅企硬規矩。
+
+### 順手清咗嘅,同刻意唔清嘅
+
+`dualEngineCheck` 個 comment 入面六個 session 嘅數(39 caves / 103 donations / 4035 scored /
+1719 comparable / 16 of 16 / 9 of 43)第七個 session 落地嗰日就錯咗,而佢自己上面寫住
+「every figure in this block is the sum over the six committed sim/opener-facts.json, not a
+remembered one」。**冇 refresh,係刪咗** —— 論點留低,數叫人自己 roll up。同樣處理 STMB
+嗰句「1 in 760 player-rounds」。
+
+**仲未清嘅,filed here:**
+
+- `emit-opener-facts.ts:219`、`:224` 嘅 `0 of 4326`,同 `:867` 嘅 `0 of 522 / 0 of 431` ——
+  同一批六個 session 嘅數,冇度過就唔亂改。
+- CLAUDE.md 第二個引擎嗰節成家人(11/58、23/23、2019/2019、96.3%、1933/1944、0.9943、
+  1146/2019、43.2%、split table 全部)。**今日查過,七個 session 之下全部啱**,所以唔急,
+  但一個都冇 gate。全部 derivable from `donation.dual_engine`,除咗「median 12 cells」。
+  下一粒就係佢。

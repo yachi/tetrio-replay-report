@@ -46,8 +46,9 @@ For any float `v` scaled to an int: `x1000 = floor(v * 1000 + 0.5)` computed in 
               "lifetime": int,               // player.lifetime (MILLISECONDS — verified empirically vs pieces/pps)
               "alive": true|false,           // player.alive
               // ---- rates: from player.replay.results.aggregatestats, the FINAL snapshot ----
-              // NOT player.stats, which is a live in-game tick and predates the round's end in
-              // 183 of 760 player-rounds (181 of them the round winner, APM too high in 172).
+              // NOT player.stats, which is a live in-game tick and predates the round's end
+              // on a large minority of player-rounds (almost all of them the round's survivor).
+              // Counts are re-derived by analysis/stat_sources.py, never typed here.
               // Only aggregatestats satisfies vs*60*attack == apm*100*(attack+cleared).
               "apm_x1000": int,              // player.replay.results.aggregatestats.apm
               "pps_x1000": int,              // player.replay.results.aggregatestats.pps

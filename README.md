@@ -85,9 +85,19 @@ Run the whole chain for any session yourself:
 ```bash
 bin/verify-session sessions/2026-07-24/report      # gates 1-5
 MUTATION=1 bin/verify-session sessions/2026-07-24/report   # + mutation testing
+bin/verify-repo                                    # the repo-wide gates, derived from CI
 ```
 
-CI runs exactly this on every push, so the badge above is not decorative.
+CI runs both on every push, so the badge above is not decorative — and `bin/verify-repo`
+is how the second half is reproducible here rather than only on GitHub. It reads
+`.github/workflows/*.yml` and runs each job's own commands, so it cannot fall behind
+the workflows it stands in for; a job CI gains and it does not know is an error, which
+CI itself checks (`workflow-plan`).
+
+Scope, stated because the two do not overlap: `bin/verify-session` runs 7 gates over ONE
+artefact directory, CI's per-session `pipeline` job runs 18 steps, and `bin/verify-repo`
+by default runs neither — it runs the 14 repo-wide jobs. `bin/verify-repo --sessions`
+adds both matrices and is the only local command that runs everything a push runs.
 
 ## Repository layout
 
@@ -120,9 +130,12 @@ sessions/<date>/
     recommendations.md         coaching prose source
     review-phase2.md           adversarial review of the ledgers
     audit-phase5.md            adversarial audit of the finished report
+analysis/rate_records.R        the R regression behind QUALIFYING_MS
+analysis/rate-records.json     its committed output — the only home of those figures
 tools/analyzer.html            drop in a .ttrm, get an instant report (runs locally)
 bin/new-session                replays in, verified ledger and proofs out
 bin/verify-session             re-run every gate for one artefact
+bin/verify-repo                run the repo-wide CI jobs, read out of the workflow files
 bin/build-docs                 regenerate the Pages site from the sessions
 docs/                          the published site
 ```
@@ -137,6 +150,13 @@ That extracts the batch twice and compares, generates the claim ledger, generate
 Dafny, verifies it, and records the proof map — failing at the first gate that does not
 hold. Then write the Cantonese prose against the generated ledger, add hand-written
 claims for whatever is genuinely unique about the session, and run `bin/build-docs`.
+
+Before the first push, run `bin/verify-repo`. `bin/new-session` covers steps 1-6 and
+`bin/verify-session` is scoped to one directory, so the cross-cutting gates — the two
+extractors against each other, the published figures against the corpus, the wiki
+transcriptions, the pre-registrations — were previously discovered from a red CI run.
+On 2026-08-20 that cost three push→CI→fix cycles for four failures reproducible here
+in minutes.
 
 ### How the claims are generated
 
@@ -177,9 +197,9 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-Four of the seven rows above sit below the **≥85%** acceptance gate that P4 declared
-(2026-07-22, 08-09, 08-14 and 08-19), and 2026-07-22 — the session the gate was declared on —
-is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->four of the seven<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14 and 08-19<!--/equiv:gate-sessions-->), and
+2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
 seven pass would sit at 60% and bless that session's artefact by definition. The gate compares
 **verdict sets**, not a percentage.

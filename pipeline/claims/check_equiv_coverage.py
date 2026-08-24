@@ -92,10 +92,12 @@ import sys
 # The document-parsing layer is SHARED with pipeline/check_loo.py, which gates the same three
 # files. Two parsers over one document agree until the document is reworded; see
 # pipeline/docs_gate.py's header for why they live in one place.
-from ..docs_gate import Prose, Table, granularity
+from ..docs_gate import Incomplete, Prose, Table, frag_close, frag_open, granularity
+from ..docs_gate import fragment_mutants, fragment_problems
 from ..docs_gate import candidate_dirs as _candidate_dirs
 from ..docs_gate import load_docs as _load_docs
 from ..docs_gate import reword as _reword
+from ..docs_gate import render_fragments as _render_fragments
 from ..docs_gate import row_membership as _row_membership
 from ..docs_gate import session_dirs as _session_dirs
 
@@ -496,6 +498,132 @@ def _companion(name, session, art, published):
             f"figure alone is an upper bound published as a measurement."]
 
 
+# ------------------------------------------------- the two counts BESIDE the tables
+
+# A table's cells were gated from the day this file existed; the SENTENCES beside them were
+# not, and both went wrong in the two ways prose goes wrong.
+#
+#   * 「Four of the seven rows sit below the >=85% gate」 read 「Two」 for two whole sessions.
+#     Two was right at five sessions; 2026-08-14 made it three and 2026-08-19 four, one
+#     paragraph below the table that refutes it. Ordinary staleness — and invisible, because
+#     nothing recomputed it.
+#   * 「six of the seven sessions lose coverage to the second family」 was never stale. It is
+#     GRANULARITY-AMBIGUOUS, which is worse: true at `match` (07-24 goes 48 -> 48 and loses
+#     nothing there), false at `round` (all seven lose), and it sat in a paragraph quoting
+#     `round` figures. Re-measuring does not surface that; only naming the granularity does.
+#
+# So both are rendered and PASTED, never typed, inside an inline marker pair. Byte-comparison
+# rather than a parse, for a reason the rest of this file has paid for: an anchor regex over
+# editorial prose can be shadowed by an EARLIER paragraph carrying the same words, and both
+# sentences have exactly that hazard — ROADMAP.md's dated 2026-08-15 section says 「three of
+# six sessions」 and 「Five of six sessions lose coverage」 about the six-session corpus, and
+# those historical figures must stay as written. A marker cannot be shadowed, and requiring
+# EXACTLY ONE pair per document turns the shadowing hazard into a failure instead of a rule
+# somebody has to remember.
+#
+# Markers are HTML comments, so they render invisibly on GitHub and the published sentence
+# reads as prose.
+
+GATE_PCT = 85
+
+_WORDS = ("zero one two three four five six seven eight nine ten eleven twelve thirteen "
+          "fourteen fifteen sixteen seventeen eighteen nineteen twenty").split()
+
+
+def _numword(n):
+    """Number words up to twenty, digits above. The published sentences are prose."""
+    return _WORDS[n] if 0 <= n < len(_WORDS) else str(n)
+
+
+def _incomplete(session, mode):
+    """An artefact is missing a mode a fragment needs.
+
+    `figures()` exits the process on that, which is right for a renderer and wrong for the
+    gate: `_artefact_problems` has already reported the missing mode, and a gate that dies
+    there reports ONE problem where the run should list all of them. So the fragment
+    functions raise `docs_gate.Incomplete`, `fragment_problems` turns it into a line, and
+    `render_fragments` turns it back into the same SystemExit a reader of `--render` needs.
+    """
+    return Incomplete(f"{session} carries no {mode} mode")
+
+
+def live_sessions(arts):
+    return sorted(s for s, a in arts.items() if a)
+
+
+def _fig(arts, session, mode):
+    if mode not in arts[session].get("modes", {}):
+        raise _incomplete(session, mode)
+    return figures(arts[session], mode)
+
+
+def below_gate(arts):
+    """Sessions whose PUBLISHED single-value percentage sits below the >=85% gate.
+
+    Read off `pct` — the same integer the table prints — never a fresh division. A reader
+    checks this sentence against the row above it, so a session published as 85% must count
+    as 85 even if it divides to 84.6.
+    """
+    out = []
+    for s in live_sessions(arts):
+        p = _fig(arts, s, "single_value")[2]
+        if p != "—" and int(p.rstrip("%")) < GATE_PCT:
+            out.append(s)
+    return out
+
+
+def loses_second_family(arts, mode):
+    """Sessions whose COVERED COUNT falls from single_value to `mode`.
+
+    Count, not percentage. `testable` moves between modes, so a percentage can fall with a
+    flat numerator — that is not a session losing coverage, and the published sentence cites
+    07-24's `48 -> 48`, i.e. counts.
+    """
+    return [s for s in live_sessions(arts)
+            if _fig(arts, s, mode)[0] < _fig(arts, s, "single_value")[0]]
+
+
+def _of(n, arts):
+    return f"{_numword(n)} of the {_numword(len(live_sessions(arts)))}"
+
+
+def _named(sessions):
+    """`2026-07-22, 08-09, 08-14 and 08-19` — the first in full, the rest short, as published."""
+    if not sessions:
+        return "none"
+    short = [sessions[0]] + [x[5:] for x in sessions[1:]]
+    return short[0] if len(short) == 1 else ", ".join(short[:-1]) + " and " + short[-1]
+
+
+# key -> (renderer, the documents that must carry it). A marker in a document NOT listed here
+# is an error too: that is how a second copy of the sentence goes uncheked somewhere else.
+FRAGMENTS = {
+    "equiv:gate-count": (lambda arts: _of(len(below_gate(arts)), arts),
+                         ("README.md", "ROADMAP.md")),
+    "equiv:gate-sessions": (lambda arts: _named(below_gate(arts)),
+                            ("README.md",)),
+    "equiv:sf-match": (lambda arts: _of(len(loses_second_family(arts, "two_site_match")), arts),
+                       ("ROADMAP.md", "CLAUDE.md")),
+    "equiv:sf-round": (lambda arts: _of(len(loses_second_family(arts, "two_site_round")), arts),
+                       ("ROADMAP.md", "CLAUDE.md")),
+}
+
+_open, _close = frag_open, frag_close
+
+
+def render_fragments(arts, name):
+    """Every marked fragment `name` must carry, one per line, ready to paste."""
+    try:
+        return _render_fragments(FRAGMENTS, arts, name)
+    except Incomplete as e:
+        raise SystemExit(f"{e}, so there is no fragment to publish for it — "
+                         f"regenerate with --write")
+
+
+def _fragment_problems(name, text, arts):
+    return fragment_problems(name, text, FRAGMENTS, arts, REWORD, "equiv:")
+
+
 def _table(name, header):
     return Table(name, header, _table_cell, _column_mode, REWORD, ARTEFACT,
                  per_table=(_granularity,), per_row=(_companion,))
@@ -579,6 +707,13 @@ def problems(arts, docs):
             out.append(f"{spec.name}: not found. {REWORD}")
             continue
         out += spec.check(text, arts)
+    # The sentences BESIDE the tables, byte-compared against their renderer. Over every
+    # document, not only the ones a FRAGMENTS entry lists, so a marker that turns up where it
+    # does not belong is caught rather than ignored.
+    for name in dict.fromkeys(DOC_NAMES):
+        text = docs.get(name)
+        if text is not None:
+            out += _fragment_problems(name, text, arts)
     return out
 
 
@@ -665,8 +800,19 @@ def _synthetic():
 
 def _selftest(root):
     arts = _synthetic()
-    docs = {name: "prelude 2026-01-01 999%\n\n" + render(arts, name) + "\npostlude\n"
-            for name in DOC_NAMES}
+
+    def doc(a_, name, block=None):
+        """A synthetic document: prelude, the rendered block, the marked fragments, postlude.
+
+        The fragments are ALWAYS included, including in the mutated copies below. Without
+        that every planted case would be rejected for a missing fragment rather than for the
+        thing it plants — a mutant caught by the wrong rule is a mutant that proves nothing.
+        """
+        return ("prelude 2026-01-01 999%\n\n"
+                + (render(a_, name) if block is None else block)
+                + "\n\n" + render_fragments(a_, name) + "\npostlude\n")
+
+    docs = {name: doc(arts, name) for name in dict.fromkeys(DOC_NAMES)}
 
     # Annotated because one planted case maps a session to None — an artefact that is absent —
     # and inferring the element type from the first entry alone would make that an error rather
@@ -712,7 +858,7 @@ def _selftest(root):
             alt = tok[:-1] + str((int(tok[-1]) + 1) % 10)
             bad = block[:hit.start()] + alt + block[hit.end():]
             cases.append((f"{name}: planted figure {tok} -> {alt}", arts,
-                          dict(docs, **{name: bad}), True))
+                          dict(docs, **{name: doc(arts, name, bad)}), True))
 
         # Marker-style mutants, enumerated BY NAME. A derived list would let a rule ship with
         # no mutant proving it fires — check_opener_section.py:505-506 makes the same point.
@@ -720,29 +866,35 @@ def _selftest(root):
         if rows:
             cut = "\n".join(rows[:-1] + [""]) if len(rows) > 2 else ""
             cases.append((f"{name}: a session's row is deleted", arts,
-                          dict(docs, **{name: block.replace("\n".join(rows), cut)}), True))
+                          dict(docs, **{name: doc(arts, name, block.replace("\n".join(rows), cut))}), True))
         else:
             first = block.split("Per-session: ")[1].split(", ")[0]
             cases.append((f"{name}: a session is dropped from the sentence", arts,
-                          dict(docs, **{name: block.replace(first + ", ", "")}), True))
+                          dict(docs, **{name: doc(arts, name, block.replace(first + ", ", ""))}), True))
 
         cases.append((f"{name}: the block is reworded past the parser", arts,
-                      dict(docs, **{name: "coverage held steady this session.\n"}), True))
+                      dict(docs, **{name: doc(arts, name, "coverage held steady this session.\n")}), True))
 
         cases.append((f"{name}: the round granularity is relabelled `match`", arts,
-                      dict(docs, **{name: _to_match_only(block)}), True))
+                      dict(docs, **{name: doc(arts, name, _to_match_only(block))}), True))
 
         if rows:
             extra = rows[-1].replace(sorted(arts)[-1], "2026-09-99")
             cases.append((f"{name}: a row names a session that is not on disk", arts,
-                          dict(docs, **{name: block.replace(rows[-1], rows[-1] + "\n" + extra)}),
+                          dict(docs, **{name: doc(arts, name, block.replace(rows[-1], rows[-1] + "\n" + extra))}),
                           True))
+
+    # --- the marked fragments beside the tables. The sweep is docs_gate's, shared with every
+    # other gate that uses the mechanism, so a second caller cannot ship it with fewer mutants.
+    for label, fname, text, must_fail in fragment_mutants(
+            FRAGMENTS, arts, dict.fromkeys(DOC_NAMES), lambda n: doc(arts, n), "equiv:"):
+        cases.append((label, arts, dict(docs, **{fname: text}), must_fail))
 
     # The one shape that turns an artefact into a measurement: keep the single-value column,
     # drop its two-site companion, for a session whose hand claims are windowed.
     for name in ("README.md", "ROADMAP.md"):
         cases.append((f"{name}: the two-site columns are deleted, single-value stays", arts,
-                      dict(docs, **{name: _single_column_only(render(arts, name))}), True))
+                      dict(docs, **{name: doc(arts, name, _single_column_only(render(arts, name)))}), True))
 
     # ...and the control that says what that rule is NOT. The same deletion over sessions with
     # no windowed claim is not a failure: the single-value figure is only an upper bound where
@@ -751,9 +903,9 @@ def _selftest(root):
     nowindow = json.loads(json.dumps(arts))
     for a in nowindow.values():
         a["windowed_claims"] = None
-    nw_docs = {n: "prelude\n\n" + (_single_column_only(render(nowindow, n))
-                                   if n != "CLAUDE.md" else render(nowindow, n)) + "\npostlude\n"
-               for n in DOC_NAMES}
+    nw_docs = {n: doc(nowindow, n, _single_column_only(render(nowindow, n))
+                      if n != "CLAUDE.md" else render(nowindow, n))
+               for n in dict.fromkeys(DOC_NAMES)}
     cases.append(("control: no two-site column, and no session has a windowed claim",
                   nowindow, nw_docs, False))
 
@@ -812,6 +964,21 @@ def _selftest(root):
     # gating nothing that is actually published. Parsing only — the committed figures are
     # allowed to be stale (they are, today), but they must still be FOUND.
     live = load_docs(root)
+    live_arts = load_artefacts(root)
+    for fname in dict.fromkeys(DOC_NAMES):
+        text, want = live.get(fname), [k for k, (_, d) in FRAGMENTS.items() if fname in d]
+        found = text is not None and all(text.count(_open(k)) == 1 for k in want)
+        ok &= found
+        print(f"  {'ok ' if found else 'BAD'} control: the committed {fname} carries its "
+              f"{len(want)} marked fragment(s): {'yes' if found else 'NO'}")
+    # ...and they are not merely present. This is the half a parse control cannot give: the
+    # figures the repo actually publishes are re-derived and byte-compared here, so a
+    # selftest that passes on a document nobody has updated is not available.
+    stale = [pr for fname in dict.fromkeys(DOC_NAMES) if live.get(fname) is not None
+             for pr in _fragment_problems(fname, live[fname], live_arts)]
+    ok &= not stale
+    print(f"  {'ok ' if not stale else 'BAD'} control: the committed fragments match the "
+          f"committed artefacts: {'agree' if not stale else stale[0]}")
     for spec in DOCS:
         text = live.get(spec.name)
         good = text is not None and spec.rows(text) is not None
@@ -919,8 +1086,12 @@ def main(argv=None):
         return 1
 
     if args.render:
-        for name in DOC_NAMES:
-            print(f"\n=== {name} ===\n{render(load_artefacts(root), name)}", end="")
+        arts = load_artefacts(root)
+        for name in dict.fromkeys(DOC_NAMES):
+            print(f"\n=== {name} ===\n{render(arts, name)}", end="")
+            frags = render_fragments(arts, name)
+            if frags:
+                print(f"--- and the marked fragments beside it ---\n{frags}", end="")
         return 0
 
     if args.check_prose and not (args.write or args.check):
