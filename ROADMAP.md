@@ -2969,13 +2969,17 @@ iterates, which engine's boards it scores, and which figures sit in prose that n
   `forecast-corpus.test.ts`, `forecast-facts.test.ts:269`, `forecast-access-class.test.ts:324`,
   `cross-tslot.test.ts:61`, `openers/openers.test.ts:36`.
 
-- **Candidate, not built: a standing rounding-discrimination check.** For every rendered rate, assert
+- ~~**Candidate, not built: a standing rounding-discrimination check.** For every rendered rate, assert
   that some corpus value distinguishes floor from round, and flag the ones where none does. It would
   have found the `:.0f` above without anyone reading `forecast_section.py`, because the defect was
   invisible precisely where no value discriminated the rule. New scope, recorded so it is not
   re-derived from scratch next time. **Still not built as of 2026-08-19** — no module in
   `pipeline/` or `analysis/` implements it; `fmt.py --selftest`'s 7 discriminating cases are the
-  same IDEA applied to one formatter, not the standing corpus-wide check this describes.
+  same IDEA applied to one formatter, not the standing corpus-wide check this describes.~~
+  **搞掂咗(2026-08-24)** —— `pipeline/check_rounding.py`,見下面嗰節。個 item 講「one
+  formatter」講得啱,不過低估咗:嗰條 rule 當時有**六份 copy**,所以要先合埋做一個
+  `fmt.quant`(rule 做參數)先有得講「一個 site」。11 554 個 figure、21 對 (site, helper)、
+  15 個有 corpus 撐住。
 
 - **NEW (2026-08-19): the quarantined section's per-session RANGES and BANDS are published figures
   that no gate re-derives, and the failure mode is already demonstrated.** Two families:
@@ -3743,3 +3747,54 @@ publish 係睇唔到嘅,只要佢哋仲一樣。
 第一次有 session directory 生咗個 exception 就會唔同步 —— 而**讀少咗 session 嗰個會靜靜咁綠**。
 
 18 個 job,15 個 repo-wide。
+
+
+## 條 rounding rule邊個守住 —— 一個 quantizer,六份 copy (2026-08-24)
+
+2026-08-19 file 落嚟嗰粒:「For every rendered rate, assert that some corpus value distinguishes
+floor from round, and flag the ones where none does.」開工先發現個 item 低估咗個規模。
+
+### 做唔到,因為條 rule 有六份 copy
+
+`fmt.r1`/`r2`、`generators._one_dp`/`_two_dp`、`intense_round._r1`/`_r2` 三對一模一樣嘅
+`x // 100 / 10`;三份逐個字一樣嘅 `_pct`;`build_round_table.ratio`/`pct`;
+`opener_section._share`。**一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住** ——
+「呢個 site 條規則有冇數撐住」呢句嘢根本問唔出。
+
+所以先合埋:`fmt.quant`(x1000 整數)、`quantf`(float,弱啲)、`permille`、`mean_x1000`,
+**rule 係參數**。同 `DONATION_ABLATIONS` 一樣嘅道理:抄一份出嚟嘅 alternative 唔係呢段 code 嘅
+alternative。`check_rounding` 重播嗰陣行返同一個 helper,唔係自己寫多次。
+
+七份 artefact、七份 report、七份 ledger 合埋之後 **全部 byte-identical** —— 呢個就係 control。
+
+### 結果
+
+**11 554 個 quantized figure、21 對 (site, helper)**:15 個 corpus 分得開,6 個至少有一對規則
+分唔開。四個 `_pct` 兩個方向都靠信,而且係**結構性**咁靠信:餵入去嘅 per-mille 已經 floor 咗,
+第二次 quantize 精確,條規則永遠行使唔到。`records._dp1` 分得開 floor/ceil(14 個 call),
+分唔開 floor/round(0 個)—— 所以報 ok 嘅條件係**每一個** alternative 都分得開,唔係其中一個。
+
+### 個 scanner 自己中咗同一個窿
+
+條 reducer pattern 本來係 `//\s*\d`,讀落似「integer division」但唔係:`_share` 用
+`num * 1000 // den` floor,除嘅係一個**名**。個 scan 報咗嗰個 module 乾淨,而成個 約 convention
+靠住嗰個 floor 完全冇睇過。而家淨一個 `//`,over-report,每個 index 減半同毫秒轉換都要入
+`EXCUSED` 連理由。
+
+`EXCUSED` 用**函數名**做 key 唔用 substring —— 一個 substring excuse 會靜靜咁擴大。而且
+**一條配唔到嘢嘅 excuse 都係 failure**:一份開始講大話嘅 list 同一份冇講大話嘅睇落一樣。
+
+### 兩個自己整出嚟嘅 bug,都係同一類
+
+- 個 summary 用 site 做 key,但 `build_round_table.ratio` quantize 兩次(per-mille + quant),
+  同一個 site 名 —— 第二次冚咗第一次,報 7 954 而 trace 有 11 554,**靜靜跌咗 3 600 個
+  call**,而個數字讀落完全正常。而家 key 係 (site, helper)。
+- Fragment mutant 嗰行用咗**累積**嘅 `ok` flag,所以早啲有 case 炒咗就會賴落 mutant 度。同一個
+  bug 上個禮拜喺 `check_donation_bands` 出過一次。
+
+### 佢做唔到嘅嘢
+
+分唔到一條**宣告咗嘅方向啱唔啱**。「27 locks against 81」有規則、一致地 applied、方向錯。呢個
+gate 報邊啲 site 有數撐住、邊啲靠信;揀方向仍然係人手判斷。
+
+19 個 job,16 個 repo-wide。

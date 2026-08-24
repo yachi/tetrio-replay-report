@@ -78,7 +78,7 @@ rather than only the result of applying it.
 """
 import html
 
-from pipeline import claim_cards
+from pipeline import claim_cards, fmt
 from pipeline.claims.build_claims import SIMPLIFIED
 from pipeline.claims.generators import (INTENSE_AXES, INTENSE_DIRECTION,
                                         INTENSE_EXTRA_COLS, axis_verdict)
@@ -222,12 +222,17 @@ CSS = """
 """
 
 
+# The third copy of `fmt`'s rule, delegating since 2026-08-24 — see `fmt.quant`.
 def _r1(x):
-    return f"{x // 100 / 10:.1f}"
+    return fmt.quant(x, 1, "floor", site="intense_round._r1")
 
 
 def _r2(x):
-    return f"{x // 10 / 100:.2f}"
+    return fmt.quant(x, 2, "floor", site="intense_round._r2")
+
+
+def _r3(x):
+    return fmt.quant(x, 3, "floor", site="intense_round._r3")
 
 
 def _fmt(value, how):
@@ -521,7 +526,11 @@ def build(facts, report_dir):
             r = rates.get(f)
             if not r:
                 continue
-            pairs = "、".join(f'{html.escape(p)} 約 {r["values"][p] / 1000:.3f}'
+            # 約, so the rule is the flooring one — routed through `fmt.quant` rather than
+            # spelled `/1000:.3f` inline. At three places on an x1000 integer every rule agrees,
+            # which is precisely why it had to be declared: an inline spelling here is a rule the
+            # corpus can never contradict, and `check_rounding` now says so by name.
+            pairs = "、".join(f'{html.escape(p)} 約 {_r3(r["values"][p])}'
                              for p in [c["player"] for c in cols] if p in r["values"])
             bits.append(f'<strong>{label}</strong>：{pairs}')
         out.append('    <p class="ir-split">' + "；".join(bits) + '。'

@@ -91,7 +91,7 @@ def _dp1(x):
     the SD ratio on the safe side; the denominator is the unsafe side, which is what
     `_check_sd_ratio` measures rather than assumes.
     """
-    return f"{math.floor(x * 10) / 10:.1f}"
+    return fmt.quantf(x, 1, "floor", site="records._dp1")
 
 
 def r_stats():

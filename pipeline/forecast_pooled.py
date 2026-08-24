@@ -27,6 +27,8 @@ import json
 import math
 import os
 
+from pipeline import fmt
+
 # A p at or below this says the sessions are NOT measuring the same thing, and pooling them would
 # average away a real difference rather than sharpen a real level.
 HOMOGENEITY_ALPHA = 0.05
@@ -252,7 +254,7 @@ def pool(artefacts):
 
 
 def _pct(x1000):
-    return f"{x1000 / 10:.1f}%"
+    return fmt.pct1(x1000, site="forecast_pooled._pct")
 
 
 def section(pooled):
@@ -289,7 +291,8 @@ def section(pooled):
         "呢個數<strong>唔係</strong>由兩個獨立 parser 抽出嚟、亦<strong>冇</strong>經 Dafny 證明——"
         "佢由一個 replay 模擬器重跑操作記錄推導出嚟，所以冇 claim 編號、冇 ✓ 標記。</p>",
         "<p class='blurb'>合併之前有驗過各 session 一唔一致（"
-        + "、".join(f"{u} p = {r['p']:.3f}" for u, r in sorted(pooled["homogeneity"].items()))
+        + "、".join(f"{u} p = {fmt.quantf(r['p'], 3, 'floor', site='forecast_pooled.homogeneity_p')}"
+                            for u, r in sorted(pooled["homogeneity"].items()))
         + "）。合併淨係令<em>水平</em>嘅區間窄咗；"
         "兩個玩家邊個高呢一點<strong>唔穩陣</strong>（換個模擬器設定就會反轉），所以呢度唔排名。</p>",
         "<div class='meta'>"

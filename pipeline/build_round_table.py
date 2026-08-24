@@ -21,7 +21,7 @@ import json
 import os
 import re
 
-from pipeline import claim_cards
+from pipeline import claim_cards, fmt
 from pipeline.fmt import fmt_clock, r1, r2
 
 START = "<!-- BEGIN generated round-table (pipeline/build_round_table.py) -->"
@@ -639,14 +639,28 @@ COLUMNS = [
 
 
 def ratio(num, den, dp=2):
+    """`num / den` at `dp` places, FLOORED — the 約 rule, declared rather than spelled inline.
+
+    Was `f"{(num * scale) // den / scale:.{dp}f}"`, a sixth copy of the repo's quantizer sitting
+    in the one generator that predates `pipeline/region.py`. It composes two floors now — a
+    per-mille and then a quantize — which is the same value by construction because the second
+    truncates what the first already truncated.
+    """
     if not den:
         return "–"
-    scale = 10 ** dp
-    return f"{(num * scale) // den / scale:.{dp}f}"
+    return fmt.quant(fmt.permille(num, den, "floor", site="build_round_table.ratio"), dp,
+                     "floor", site="build_round_table.ratio")
 
 
 def pct(num, den):
-    return "–" if not den else f"{(num * 100) // den}%"
+    """A whole-number percentage, floored. Same rule, same reason."""
+    if not den:
+        return "–"
+    # `// 10` would be a SECOND, undeclared floor on the tenths the per-mille just kept —
+    # 432 per-mille is 43.2%, and printing 43 is a rounding decision however obvious it looks.
+    # Routed through quant at 0 places so the rule is stated once and traced once.
+    return fmt.quant(fmt.permille(num, den, "floor", site="build_round_table.pct") * 100, 0,
+                     "floor", site="build_round_table.pct") + "%"
 
 
 END_LABEL = {"winner": "生還", "garbagesmash": "俾垃圾頂爆",

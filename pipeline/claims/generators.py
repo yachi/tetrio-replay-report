@@ -29,6 +29,7 @@ a shifted id still RESOLVES — it just resolves to a different claim than the s
 about, which no gate can see. Appending keeps every existing id where it was.
 """
 
+from .. import fmt
 from .spec import (add, all_rounds, c_str, le, lt, sum_round_where, between, c_and, c_dur, c_field, c_winner,
                   count_matches_margin, sum_lb,
                   c_winner_gt_loser, conj, count_matches_won, count_rounds,
@@ -89,18 +90,34 @@ def _sec(ms):
     return ms // 1000
 
 
+# These four were their own spellings of `x // 100 / 10` until 2026-08-24, i.e. a third copy of
+# `fmt`'s rule sitting where nothing compared them. They delegate now, which is what makes
+# `check_rounding` able to name a SITE: a convention in three places has three sites and no
+# enforced agreement between them. The names stay because the call sites read better with them.
+def _permille(num, den):
+    """floor(1000·num/den) as an x1000 integer — the 約 rule, declared. See `fmt.permille`."""
+    return fmt.permille(num, den, "floor", site="generators._permille")
+
+
+def _mean(total, n):
+    """A floored mean of x1000 values. See `fmt.mean_x1000`."""
+    return fmt.mean_x1000(total, n, "floor", site="generators._mean")
+
+
 def _one_dp(x_x1000):
     """x1000 integer -> '12.3' using floor, matching the 約 convention."""
-    return f"{x_x1000 // 100 / 10:.1f}"
+    return fmt.quant(x_x1000, 1, "floor", site="generators._one_dp")
 
 
 def _two_dp(x_x1000):
-    return f"{x_x1000 // 10 / 100:.2f}"
+    return fmt.quant(x_x1000, 2, "floor", site="generators._two_dp")
 
 
 def _three_dp(x_x1000):
-    """x1000 integer -> '0.666'. Exact, so flooring and rounding coincide."""
-    return f"{x_x1000 / 1000:.3f}"
+    """x1000 integer -> '0.666'. Exact, so flooring and rounding coincide — and
+    `check_rounding` reports it as a site the corpus cannot discriminate rather than
+    leaving that true fact unsaid."""
+    return fmt.quant(x_x1000, 3, "floor", site="generators._three_dp")
 
 
 def _bound_dp(x_x1000):
@@ -112,7 +129,7 @@ def _bound_dp(x_x1000):
     "under 0.01" for a bound the lemma proved at 0.015: a claim strictly stronger
     than its own proof.
     """
-    return f"{-(-x_x1000 // 10) / 100:.2f}"
+    return fmt.quant(x_x1000, 2, "ceil", site="generators._bound_dp")
 
 
 def _ordinal(mi):
@@ -597,10 +614,10 @@ def average_rates(facts):
             continue
         out.append({
             "family": f"avg_{f}", "category": "pace",
-            "canto": f"每局平均 {label}：{hi} 約 {fmt(sums[hi] // n)}，"
-                     f"高過 {lo} 嘅約 {fmt(sums[lo] // n)}",
-            "english_gloss": (f"per-round mean {label}: {hi} {_three_dp(sums[hi] // n)} > "
-                              f"{lo} {_three_dp(sums[lo] // n)}"),
+            "canto": f"每局平均 {label}：{hi} 約 {fmt(_mean(sums[hi], n))}，"
+                     f"高過 {lo} 嘅約 {fmt(_mean(sums[lo], n))}",
+            "english_gloss": (f"per-round mean {label}: {hi} {_three_dp(_mean(sums[hi], n))} > "
+                              f"{lo} {_three_dp(_mean(sums[lo], n))}"),
             "spec": conj(eq(sum_round(hi, f), lit(sums[hi])),
                          eq(sum_round(lo, f), lit(sums[lo])),
                          gt(sum_round(hi, f), sum_round(lo, f))),
@@ -1159,7 +1176,7 @@ def _rate_x1000(facts, pl, f, won):
             continue
         num += r["players"][pl][f]
         den += r["players"][pl]["pieces"]
-    return ((num * 1000) // den if den else 0), num, den
+    return (_permille(num, den) if den else 0), num, den
 
 
 @family
@@ -1584,7 +1601,7 @@ INTENSE_EXTRA_COLS = [(f, l) for f, l, _fm in _INTENSE_FIELDS
 
 def _per_piece_x1000(num, den):
     """floor(1000 * num / den) — the printed 3dp form of a per-piece rate."""
-    return 1000 * num // den
+    return _permille(num, den)
 
 
 def _pin_rate(mi, ri, pl, f, num, den):
