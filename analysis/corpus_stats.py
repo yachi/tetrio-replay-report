@@ -28,12 +28,14 @@ and both are established rather than hypothetical:
 
    **Those five arrows are the SIX-session values and stay here as the record of that failure,
    not as current figures.** 2026-08-19 took the corpus to seven sessions and 450 rounds, and it
-   moved all seven rho — the two the re-source had left alone included. That is the other half of
-   the same lesson: invariance to a re-source is not invariance to data, which is why the guard
-   downstream re-derives rather than counting sessions. As of that session they read **+0.176**
-   (cleared_pp/intensity), **+0.169** (cleared/intensity), **+0.060** (cleared_pp/duration),
-   **−0.173** (apm/duration), **−0.180** (attack/duration), **+0.223**
-   (cleared_per_received/intensity) and **+0.055** (received/intensity). Nothing else in this
+   moved all seven rho — the two the re-source had left alone included. 2026-08-25 took it to
+   eight and 523 rounds and moved all seven again, every one of them further from zero in the
+   direction it already had. That is the other half of the same lesson, now twice over:
+   invariance to a re-source is not invariance to data, which is why the guard downstream
+   re-derives rather than counting sessions. As of the current corpus they read **+0.203**
+   (cleared_pp/intensity), **+0.187** (cleared/intensity), **+0.035** (cleared_pp/duration),
+   **-0.186** (apm/duration), **-0.191** (attack/duration), **+0.211**
+   (cleared_per_received/intensity) and **+0.089** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.
@@ -333,16 +335,25 @@ def terciles(n):
     """The two rank boundaries, as (b1, b2). Sizes are (b1, b2-b1, n-b2).
 
     `floor(n/3)` and `floor(2n/3)`. The obvious alternative — `floor(n/3)` and `2*floor(n/3)`
-    — gives a DIFFERENT published triple whenever n is not a multiple of 3: at n = 380 this
+    — gives a DIFFERENT published triple **exactly when n ≡ 2 (mod 3)**: at n = 380 this
     rule gives 126 / 127 / 127 and that one gives 126 / 126 / 128.
 
+    **That condition read 「whenever n is not a multiple of 3」 until 2026-08-25, and it was
+    wrong for one of the two non-zero residues.** Write n = 3k + r. At r = 0 both give 2k; at
+    r = 1, floor((6k+2)/3) = 2k and 2*floor(n/3) = 2k, so they agree there too; only at r = 2
+    does floor((6k+4)/3) = 2k+1 pull ahead. The corpus was 450 (r = 0) when the sentence was
+    written, so the half that was wrong could not be exercised — and it stayed unexercised
+    until the corpus reached 523 (r = 1), where the rules agree and the docstring said they
+    should differ. `_selftest`'s escape hatch carried the same `n % 3 == 0` and so reported a
+    perfectly ordinary n as a control that proves nothing.
+
     **The n = 380 in the line above is deliberate and must not be "updated" to the current
-    corpus size.** The corpus is 450, and 450 is divisible by 3, so BOTH rules give
-    150 / 150 / 150 — the current n cannot demonstrate what the choice is between, and an
+    corpus size.** At 523 the current n cannot demonstrate what the choice is between, and an
     example rewritten to it would silently stop being an example. 380 is kept because it is
     the smallest corpus this repo has actually held where the two rules disagree. `_selftest`
     pins the disagreement independently, which is what keeps this honest for the sessions
-    where n happens to hide it.
+    where n happens to hide it — and 「happens to hide it」 is now two thirds of all n, not
+    one third.
 
     The rule keeps the three bins within one round of each other for every n, which the
     doubling rule does not: it drifts by up to 2 and puts the surplus in the top bin, the one
@@ -503,12 +514,25 @@ def _selftest(root):
 
     # 1. The split rule is a CHOICE. If the two candidate rules agreed at this corpus size the
     #    docstring above would be describing a distinction with no consequence.
+    #    The escape hatch is `n % 3 != 2`, not `n % 3 == 0`: the two rules agree at BOTH
+    #    r = 0 and r = 1 and part company only at r = 2 (see `terciles`). With the narrower
+    #    hatch this control failed the build at n = 523 — a legitimate corpus size — while
+    #    reporting it as the rule having stopped being load-bearing, which it had not.
     n = len(load_rounds(root))
     b1, b2 = terciles(n)
     alt = (n // 3, 2 * (n // 3))
-    check((b1, b2) != alt or n % 3 == 0,
+    check((b1, b2) != alt or n % 3 != 2,
           f"split rule: floor(n/3), floor(2n/3) = {(b1, b2)} at n = {n}; the doubling rule "
-          f"gives {alt} — {'they differ, so the rule is load-bearing' if (b1, b2) != alt else 'IDENTICAL, so this control proves nothing at this n'}")
+          f"gives {alt} — "
+          + ("they differ, so the rule is load-bearing" if (b1, b2) != alt else
+             f"identical, as they must be at n % 3 == {n % 3}; only n % 3 == 2 separates them, "
+             f"and _selftest's own n = 380 case pins that"))
+    # ...and that hatch must not become a way to never test anything: the disagreement is
+    # pinned at a fixed n, independent of what the corpus happens to be today.
+    check(terciles(380) == (126, 253) and (380 // 3, 2 * (380 // 3)) == (126, 252),
+          "split rule: at n = 380 the two rules give 126/127/127 against 126/126/128")
+    check(all((terciles(m) != (m // 3, 2 * (m // 3))) == (m % 3 == 2) for m in range(1, 400)),
+          "split rule: the two rules differ at exactly the n with n % 3 == 2, over 1..399")
     sizes = [b1, b2 - b1, n - b2]
     check(max(sizes) - min(sizes) <= 1,
           f"split rule: bins within one round of each other {sizes}")

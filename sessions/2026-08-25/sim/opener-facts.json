@@ -1,0 +1,3601 @@
+{
+  "schema": "opener-facts/1",
+  "report_eligible": false,
+  "not_eligible_because": [
+    "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
+    "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
+    "the slot-geometry match is a SHAPE test, not an opener test: 92.5% of Triples match the wiki window against 12.3% of Doubles, over 898 verified T-spins",
+    "the ordering metric is scored on 90 of 144 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
+    "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
+    "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside",
+    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 23 of 23 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
+  ],
+  "session": "2026-08-25",
+  "gate": "frame+amount+row (ige row oracle must agree)",
+  "board_source": "triangle-oracle (vendored @haelp/teto, byte-identical)",
+  "window_pieces": 21,
+  "near_cells": 4,
+  "definitions": {
+    "dt_order": "a T-spin Double before a T-spin Triple — DT Cannon (開幕DT砲) by definition",
+    "cspin_order": "a T-spin Triple before a T-spin Double — the C-Spin follow-up by definition"
+  },
+  "catalogue": {
+    "source": "https://github.com/swng/opener_db",
+    "commit": "b4a66878a47466b557165dec9171701bfeafab93",
+    "data_json_sha256": "d1fbade1f6df174766b5a354c6ab6d5be992e9c30cbaad3bc6ee1ba4a359a8bf",
+    "pages": 783,
+    "openers": 360,
+    "sets": {
+      "cspin": {
+        "label": "C-Spin (by name)",
+        "openers": 3,
+        "pages": 8,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}"
+        ]
+      },
+      "cspin_or_tki": {
+        "label": "C-Spin or TKI",
+        "openers": 6,
+        "pages": 24,
+        "names": [
+          "Fake C-Spin {JP: 偽TKI}",
+          "Secspin {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Amino TSD {JP: 開幕TSD亜種} / Kazu TKI {JP: None}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}"
+        ]
+      },
+      "dt_cannon": {
+        "label": "DT Cannon",
+        "openers": 6,
+        "pages": 12,
+        "names": [
+          "Center DT Cannon {JP: 確定DT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Super Speed DT Cannon {JP: 超DT}"
+        ]
+      },
+      "dt_family": {
+        "label": "DT family (widest)",
+        "openers": 48,
+        "pages": 115,
+        "names": [
+          "Soil MDDT {JP: None}",
+          "Bakkure SDT {JP: バックレSDT}",
+          "Chair SDT {JP: チェアSDT}",
+          "Dolphin {JP: None} / Misfire-Beta / Buhin SDT {JP: 舞浜SDT}",
+          "Juice ST {JP: ジュースST} / Deuru’s SDT {JP: でうる式SDT}",
+          "Pure SDT {JP: ピュアSDT}",
+          "SDDT Cannon {JP: SDDT砲}",
+          "SDT Cannon {JP: SDT砲}",
+          "SDT’s {JP: None}",
+          "SDTT {JP: None}",
+          "Single Double PC {Abbreviated: SDPC, Alt name: Singleyou, JP: SDパフェ} / Motchi PC {JP: もっちパフェ} / Stickspin {JP: None} / SDPC-Spin {JP: None} / SDPC Extension {JP: None} / Pyramid SDTD {JP: ピラミッドSDTD} / O Base SST {JP: O土台SST} / CHATEAUpener {JP: None}",
+          "Snail SDT {JP: スネイルSDT}",
+          "Flavor {JP: 風味} / Swift DTD {JP: スウィフトDTD}",
+          "Great DDT {JP: グレートDDT}",
+          "Pseudo 91 DT {JP: 杭DTもどき}",
+          "Variable DDT {JP: バリアブルDDT}",
+          "91DT {JP: 杭DT}",
+          "Trustworthy DT {JP: 信用可能DT, Alt: Snail TKI}",
+          "Fast DT {JP: ファーストDT}",
+          "TKI-3 {Alt: TKI, JP: 開幕TSD, lit: TSD Opener / Amino TSD} / Perfect DT {JP: パーフェクトDT}",
+          "Flamingo DT {JP: フラミンゴDT}",
+          "airDT {JP: none}",
+          "AntiRotationDT {JP: none}",
+          "Center DT Cannon {JP: 確定DT砲}",
+          "Crescent DT {JP: クレセントDT}",
+          "Cycle DT {JP: サイクルDT}",
+          "DDT Cannon {JP: DDT砲}",
+          "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+          "DT Cannon (TZ Base) {JP: None}",
+          "DT Cannon 2 {JP: 開幕DT砲2号}",
+          "DT Cannon Well n((( {JP: DT砲でよくn(((}",
+          "Gill DT {JP: ジルDT}",
+          "Hijiki DT {JP: ひじきDT}",
+          "HOLE DTD {JP: none}",
+          "Illuminate DT {JP: イルミネイトDT}",
+          "Muko DT {JP: 婿DT}",
+          "NEWDT Cannon {JP: NEWDT砲}",
+          "Parallel DT {JP: パラレルDT}",
+          "Pyramid DT {JP: ピラミッドDT}",
+          "Risu DT {JP: りすDT}",
+          "Sharp Jasda Logistics DT {JP: シャープジャスダロジスティクスDT}",
+          "Speerde Stacking {JP: スピアード積み} / Oxygen DT PC {JP: 酸素DTパフェ} / Beacon 6-3 {JP: None}",
+          "Starlight DT {JP: スターライトDT}",
+          "Super Speed DT Cannon {JP: 超DT}",
+          "SZDT 2 {JP: SZDT改}",
+          "SZDT Cannon Opener {JP: 開幕SZDT砲}",
+          "Toro DTD {JP: トロDTD}",
+          "Unbalance DT {JP: アンバランスDT}"
+        ]
+      }
+    }
+  },
+  "wiki_cspin": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38,
+    "schema": "wiki-cspin-source/1",
+    "why": "the C-Spin section quotes harddrop in prose; a wiki sentence with no committed copy is a figure whose only home is prose, and nothing re-derives it.",
+    "provenance_standard": "Both revisions carry MediaWiki's OWN rev_sha1 AND a sha1 recomputed here from action=raw. Two independent authorities that agree — the cvc5 standard, not z3's trust-on-first-use. Reproduce: sha1 of the action=raw body, CRLF->LF, trailing newline stripped.",
+    "the_count_trap": "`replaces_the_double` is set by READING each continuation, never by counting headings. Counting them gave 'six non-Double continuations', which is false and shipped to seven reports before this file was written: LST Stacking and T-Spin Triple Tower both describe what happens AFTER a T-Spin Double, and Trinity / STSD branches on whether the TSD was already done, so all three still produce the Double the ordering metric counts. Of the 7 continuations, exactly 1 replaces it.",
+    "pages": [
+      {
+        "page": "C-Spin",
+        "url": "https://harddrop.com/wiki/C-Spin",
+        "raw": "https://harddrop.com/w/index.php?title=C-Spin&action=raw&oldid=42266",
+        "oldid": 42266,
+        "timestamp": "2025-01-30T09:17:20Z",
+        "bytes": 31806,
+        "rev_sha1": "0fa75e5a12a8a8a454907a11f1ea84ded0414d02",
+        "lead": "The C-Spin (TKI積み) is a kind of Triple Double Attack. It is invented by TKI. This name is given because of the \"C\" shape that is formed by the J and L. As the name suggests, it results in a T-Spin Triple which is usually followed by a T-Spin Double within three bags. As an opener, it is most often built with an ZST core whereas L and J are used to build the overhang.",
+        "continuations": [
+          {
+            "heading": "T-Spin Triple and Imperial Cross",
+            "first_sentence": "No matter how wide the gap between the overhang and the stack on the right is, you can replace the T-Spin Double with a T-Spin Triple or Imperial Cross after the T-Spin Triple from any C-Spin setup.",
+            "replaces_the_double": true
+          },
+          {
+            "heading": "STMB Cave",
+            "first_sentence": "The STMB Cave continuation will only work if the following cells in diagram 1 (marked with X's) are free.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Trinity / STSD",
+            "first_sentence": "If you used a J piece as the overhang and there is an S piece or nothing on the overhang, you can make a Trinity (if the TSD is not done beforehand) or STSD (if the TSD is done beforehand) by placing an S piece on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Fractal",
+            "first_sentence": "If you have a 4-columns wide gap, you can place the third bag's Z and S pieces as the base, if the second Z piece was placed on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "LST Stacking",
+            "first_sentence": "Generally, if you have a 2-columns wide gap, you can follow with LST Stacking by placing an L piece on the overhang.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "T-Spin Triple Tower",
+            "first_sentence": "If there is a Z piece on a J piece overhang, regardless if that Z piece is from the second or third bag, you can stack a T-Spin Triple Tower after a T-Spin Double.",
+            "replaces_the_double": false
+          },
+          {
+            "heading": "Perfect Clear",
+            "first_sentence": "",
+            "replaces_the_double": false
+          }
+        ]
+      },
+      {
+        "page": "Triple Double Attack Setups",
+        "url": "https://harddrop.com/wiki/Triple_Double_Attack_Setups",
+        "raw": "https://harddrop.com/w/index.php?title=Triple_Double_Attack_Setups&action=raw&oldid=42795",
+        "oldid": 42795,
+        "timestamp": "2025-05-21T11:04:04Z",
+        "bytes": 18082,
+        "rev_sha1": "7f141bd88c20f32226f298c5cfa421b37dde2239",
+        "lead": "The Triple Double attack, also known as Triple-Double, C-Spin, or abbreviated as TD, is a combo T-Spin setup that consists of a T-Spin Triple followed by a T-Spin Double.",
+        "empty_field": "Empty field Triple Double setups are also known as C-Spins."
+      }
+    ],
+    "the_tension": "the two pages do not agree. Triple_Double_Attack_Setups equates an empty-field Triple Double with a C-Spin outright, which would make the ordering metric the wiki's own definition; C-Spin attributes the name to the C shape formed by J and L, says the Double is 'usually' the follow-up, and gives one continuation that replaces it. So Triple-then-Double OVER-counts and UNDER-counts. Recorded, not resolved: a wiki contradicting itself is not a licence to adopt the reading that flatters the metric."
+  },
+  "first_bag": {
+    "rounds": 146,
+    "clean": 130,
+    "players": [
+      {
+        "user": "pinglamb",
+        "clean_first_bags": 70,
+        "exact_matches": [],
+        "nearest": {
+          "any": {
+            "min_cells": 4,
+            "within_threshold": 54,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 54,
+              "5-8": 16,
+              "9-14": 0,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 59,
+              "9-14": 11,
+              "15+": 0
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 59,
+              "9-14": 11,
+              "15+": 0
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 4,
+              "9-14": 65,
+              "15+": 1
+            }
+          },
+          "dt_family": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 69,
+              "9-14": 1,
+              "15+": 0
+            }
+          }
+        }
+      },
+      {
+        "user": "yachi",
+        "clean_first_bags": 60,
+        "exact_matches": [
+          {
+            "name": "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+            "rounds": 1
+          }
+        ],
+        "nearest": {
+          "any": {
+            "min_cells": 0,
+            "within_threshold": 32,
+            "bands": {
+              "0": 1,
+              "1-2": 1,
+              "3-4": 30,
+              "5-8": 27,
+              "9-14": 1,
+              "15+": 0
+            }
+          },
+          "cspin": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 35,
+              "9-14": 25,
+              "15+": 0
+            }
+          },
+          "cspin_or_tki": {
+            "min_cells": 6,
+            "within_threshold": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 41,
+              "9-14": 19,
+              "15+": 0
+            }
+          },
+          "dt_cannon": {
+            "min_cells": 0,
+            "within_threshold": 1,
+            "bands": {
+              "0": 1,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 9,
+              "9-14": 49,
+              "15+": 1
+            }
+          },
+          "dt_family": {
+            "min_cells": 0,
+            "within_threshold": 1,
+            "bands": {
+              "0": 1,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 57,
+              "9-14": 2,
+              "15+": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ordering": {
+    "scope": "verified prefix",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 73,
+        "rounds_with_tspin_double": 59,
+        "rounds_with_tspin_triple": 67,
+        "rounds_with_both": 54,
+        "dt_order": 0,
+        "cspin_order": 54,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 54,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 21
+        },
+        "mid_game": {
+          "rounds_with_both": 1,
+          "cspin_order": 1,
+          "dt_order": 0,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 71,
+        "rounds_with_tspin_double": 53,
+        "rounds_with_tspin_triple": 43,
+        "rounds_with_both": 36,
+        "dt_order": 1,
+        "cspin_order": 35,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 35,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 18
+        },
+        "mid_game": {
+          "rounds_with_both": 3,
+          "cspin_order": 2,
+          "dt_order": 2,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      }
+    ],
+    "per_round": [
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 68,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 62,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 25,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 23,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 112,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 7,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 82,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 135,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 122,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 100,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 80,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 110,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 6,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 111,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 146,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 5,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 149,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 100,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 94,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 72,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 63,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 60,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 95,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 95,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 147,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 117,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 95,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 87,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 117,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 90,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": -1,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 117,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 10,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 27,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 136,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 15,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 242,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 15,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 255,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 62,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 49,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 48,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 34,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 2,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 246,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 275,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 13,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 67,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 105,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 238,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 16,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 207,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 12,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 49,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 40,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 39,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 33,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 61,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 56,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": -1,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 99,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 96,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 195,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 77,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 70,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 86,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 68,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 231,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 10,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 210,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 13,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 58,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 52,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 127,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 135,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 68,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 61,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 142,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 153,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 97,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 87,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 135,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 142,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 184,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 13,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 192,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 91,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 80,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 9,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 93,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 48,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 41,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 44,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 285,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 15,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 314,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 182,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 40,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 31,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 232,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 208,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 143,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 121,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 6,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 144,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 157,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 73,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 54,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 93,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 81,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 59,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 156,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 143,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 144,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 156,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 37,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 29,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 59,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 46,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 37,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 32,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 226,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 235,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 11,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 272,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 242,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 15,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 162,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 144,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 113,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 103,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 58,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 42,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 111,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 93,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 117,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 1,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 103,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 15,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 13,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 52,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 43,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 160,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 11,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 116,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 119,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 108,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 94,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 152,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 109,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 2
+      }
+    ],
+    "per_match": [
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 4,
+        "dt_order": 0,
+        "tspin_doubles_window": 6,
+        "tspin_triples_window": 9,
+        "tspin_doubles": 40,
+        "tspin_triples": 9
+      },
+      {
+        "file": "replay-2026-08-25-01.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 3,
+        "dt_order": 0,
+        "tspin_doubles_window": 9,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 36,
+        "tspin_triples": 3
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "user": "pinglamb",
+        "rounds": 8,
+        "rounds_scored": 8,
+        "rounds_unscored": 0,
+        "cspin_order": 8,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 47,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-08-25-02.ttrm",
+        "user": "yachi",
+        "rounds": 8,
+        "rounds_scored": 6,
+        "rounds_unscored": 2,
+        "cspin_order": 3,
+        "dt_order": 0,
+        "tspin_doubles_window": 5,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 31,
+        "tspin_triples": 3
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "user": "yachi",
+        "rounds": 7,
+        "rounds_scored": 6,
+        "rounds_unscored": 1,
+        "cspin_order": 5,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 5,
+        "tspin_doubles": 33,
+        "tspin_triples": 5
+      },
+      {
+        "file": "replay-2026-08-25-03.ttrm",
+        "user": "pinglamb",
+        "rounds": 7,
+        "rounds_scored": 7,
+        "rounds_unscored": 0,
+        "cspin_order": 2,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 41,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "user": "yachi",
+        "rounds": 7,
+        "rounds_scored": 6,
+        "rounds_unscored": 1,
+        "cspin_order": 2,
+        "dt_order": 0,
+        "tspin_doubles_window": 4,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 29,
+        "tspin_triples": 3
+      },
+      {
+        "file": "replay-2026-08-25-04.ttrm",
+        "user": "pinglamb",
+        "rounds": 7,
+        "rounds_scored": 7,
+        "rounds_unscored": 0,
+        "cspin_order": 6,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 35,
+        "tspin_triples": 6
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 7,
+        "dt_order": 0,
+        "tspin_doubles_window": 9,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 57,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-08-25-05.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 4,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 5,
+        "tspin_doubles": 39,
+        "tspin_triples": 5
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "user": "pinglamb",
+        "rounds": 7,
+        "rounds_scored": 6,
+        "rounds_unscored": 1,
+        "cspin_order": 6,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 53,
+        "tspin_triples": 6
+      },
+      {
+        "file": "replay-2026-08-25-06.ttrm",
+        "user": "yachi",
+        "rounds": 7,
+        "rounds_scored": 7,
+        "rounds_unscored": 0,
+        "cspin_order": 4,
+        "dt_order": 0,
+        "tspin_doubles_window": 5,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 24,
+        "tspin_triples": 7
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "user": "pinglamb",
+        "rounds": 8,
+        "rounds_scored": 8,
+        "rounds_unscored": 0,
+        "cspin_order": 7,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 9,
+        "tspin_doubles": 37,
+        "tspin_triples": 9
+      },
+      {
+        "file": "replay-2026-08-25-07.ttrm",
+        "user": "yachi",
+        "rounds": 8,
+        "rounds_scored": 8,
+        "rounds_unscored": 0,
+        "cspin_order": 5,
+        "dt_order": 0,
+        "tspin_doubles_window": 6,
+        "tspin_triples_window": 5,
+        "tspin_doubles": 32,
+        "tspin_triples": 7
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 7,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 9,
+        "tspin_doubles": 56,
+        "tspin_triples": 9
+      },
+      {
+        "file": "replay-2026-08-25-08.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 3,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 5,
+        "tspin_doubles": 41,
+        "tspin_triples": 5
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 8,
+        "rounds_unscored": 1,
+        "cspin_order": 6,
+        "dt_order": 1,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 33,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-08-25-09.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 7,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 10,
+        "tspin_doubles": 50,
+        "tspin_triples": 11
+      }
+    ],
+    "cell_legend": {
+      "0": "the window was verified to its end and the order did not happen",
+      "1": "a T-spin Triple then a T-spin Double, both inside the opener window, both observed",
+      "null": "the verified prefix ended before the window did and nothing was seen — UNKNOWN, not zero. A 1 needs no such caveat: an observed order cannot be undone by an unobserved remainder, so truncation loses C-Spins and never invents one"
+    },
+    "column_legend": {
+      "cspin_order": "the Triple-then-Double order. 0/1 on a per_round row (a round either showed it or did not); on a per_match row, how many of that match's SCORED rounds did",
+      "tspin_doubles_window": "T-spin Doubles at lock <= window_pieces — the population the order above is decided on, and NOT the round's T-spin count",
+      "tspin_triples_window": "the same, for Triples",
+      "tspin_doubles": "T-spin Doubles over the WHOLE round, from the replay's own results.stats.clears.tspindoubles — the twice-extracted field facts.json carries, which tspinCounterCheck proves this simulator reproduces on every round. null is UNKNOWN (the round carried no counter), never zero",
+      "tspin_triples": "the same, from results.stats.clears.tspintriples"
+    },
+    "denominators": "THE TWO SIDES OF A ROW ARE NOT THE SAME ROUNDS, and dividing one into the other is the mistake this note exists to stop. cspin_order sums over SCORED rounds only — a round whose opener window the verified prefix never reached is in rounds_unscored and contributes nothing — while the T-spin counters come from the replay and cover every round of the match. cspin_order <= min(tspin_doubles, tspin_triples) therefore still holds, because the C-Spin side can only lose rounds; \"this share of those spins were C-Spins\" does not follow and must not be printed. The bound is asserted at build time"
+  },
+  "ordering_full_round": {
+    "scope": "whole simulated round, verification NOT required",
+    "players": [
+      {
+        "user": "pinglamb",
+        "rounds_scored": 73,
+        "rounds_with_tspin_double": 59,
+        "rounds_with_tspin_triple": 67,
+        "rounds_with_both": 54,
+        "dt_order": 0,
+        "cspin_order": 54,
+        "dt_order_within_window": 0,
+        "cspin_order_within_window": 54,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 21
+        },
+        "mid_game": {
+          "rounds_with_both": 1,
+          "cspin_order": 1,
+          "dt_order": 0,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      },
+      {
+        "user": "yachi",
+        "rounds_scored": 71,
+        "rounds_with_tspin_double": 53,
+        "rounds_with_tspin_triple": 43,
+        "rounds_with_both": 36,
+        "dt_order": 1,
+        "cspin_order": 35,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 35,
+        "first_triple_lock": {
+          "min": 12,
+          "median": 13,
+          "max": 18
+        },
+        "mid_game": {
+          "rounds_with_both": 3,
+          "cspin_order": 2,
+          "dt_order": 2,
+          "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
+        }
+      }
+    ]
+  },
+  "slot_geometry": {
+    "source": "harddrop.com/wiki/C-Spin",
+    "placements": 38,
+    "rows": [
+      {
+        "lines": 1,
+        "n": 123,
+        "drawn": 4,
+        "mirrored": 1,
+        "matched": 5,
+        "share_x1000": 40
+      },
+      {
+        "lines": 2,
+        "n": 655,
+        "drawn": 39,
+        "mirrored": 42,
+        "matched": 81,
+        "share_x1000": 123
+      },
+      {
+        "lines": 3,
+        "n": 120,
+        "drawn": 47,
+        "mirrored": 64,
+        "matched": 111,
+        "share_x1000": 925
+      }
+    ]
+  },
+  "ordering_class": {
+    "source": "https://harddrop.com/wiki/Category:Triple_Double_openers",
+    "name": "Triple Double openers",
+    "says": "openers that begin with a Triple Double Attack, or any variant thereof",
+    "openers": 38,
+    "members": [
+      "1-11th Compromise Cannon",
+      "1-5th End Cannon",
+      "Aitch Stacking",
+      "Azyara Spin",
+      "Bakery TD",
+      "C-Spin",
+      "Desert stacking",
+      "Donut Stacking",
+      "Dot Cannon",
+      "Gamushiro Stacking",
+      "Gravity TD",
+      "Hardtack Stacking",
+      "Honey Cup",
+      "Lime Stacking",
+      "Loyal TD",
+      "Magic TD",
+      "Manhole Stacking",
+      "Mountainous Stacking",
+      "OJI Honey Cup",
+      "Olive Stacking",
+      "Operability TD",
+      "PC-Spin",
+      "PC-Spin (Okey Version)",
+      "Pancake Stacking",
+      "Plate TD",
+      "Pseudo-PC",
+      "Rabbit Stacking",
+      "Ruby Stacking",
+      "SkTD",
+      "Solitary Moon Stacking",
+      "Stray Cannon",
+      "Tandoori Chicken Stacking",
+      "Triple Triple PC",
+      "Tsar Cannon",
+      "Waiting Moon Stacking",
+      "Yamaha Stacking",
+      "Yuchan Cannon",
+      "：-0 Stacking"
+    ],
+    "means": "a Triple-before-Double opening is the signature of this whole category, not of any one opener in it — the ordering metric cannot name which member was played"
+  },
+  "named_openers": {
+    "source": "harddrop.com/wiki",
+    "why_a_second_source": "opener_db draws 484 of its 783 pages on a filled base, and a page with a full row can never equal a no-clear opening field; four of these six openers have no clean catalogue page at all",
+    "provenance": [
+      {
+        "page": "Honey_Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "oldid": 41477,
+        "sha256": "a12439a6f2747c3687b006c0aba9b2c334019d3e7b8ad375f377f388494d95b3",
+        "bytes": 599322
+      },
+      {
+        "page": "Mountainous_Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "oldid": 43651,
+        "sha256": "f26c3cb05e02fbb58a49744df6e2dabb77135caeab2175a456a2bc3af4e055cc",
+        "bytes": 1941960
+      },
+      {
+        "page": "Perfect_Clear_Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "oldid": 43630,
+        "sha256": "e3be1c1272fcbbba196b45dc39b8583d5869318a37a1a3904b9f82de11d5ab13",
+        "bytes": 2209943
+      },
+      {
+        "page": "Stray_Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "oldid": 41406,
+        "sha256": "5952028d6a1373593dfcc7d3d808e10283ec58dd59b21ddee36986edf628cdb3",
+        "bytes": 660851
+      },
+      {
+        "page": "TKI_3_Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "oldid": 41439,
+        "sha256": "024520e28e69f4d56de2f01f15881baa136a499ae8ddc2aa9112aeb466c5938c",
+        "bytes": 2350135
+      }
+    ],
+    "catalogue_pages": 783,
+    "catalogue_pages_clean": 299,
+    "sampled_at_locks": [
+      6,
+      7
+    ],
+    "round_overlap": {
+      "mountainous_1": {
+        "mountainous_2": 27
+      },
+      "mountainous_2": {
+        "mountainous_1": 27
+      }
+    },
+    "boards": {
+      "total": 270,
+      "by_locks": {
+        "6": 140,
+        "7": 130
+      }
+    },
+    "openers": [
+      {
+        "key": "honey_cup",
+        "wiki": "Honey Cup",
+        "jp": "はちみつ砲",
+        "page": "Honey Cup",
+        "url": "https://harddrop.com/wiki/Honey_Cup",
+        "wiki_says": "a TST to TSD opener; the Perfect Clear rate is 90%",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          7
+        ],
+        "pages": {
+          "wiki_fields": 1,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 70,
+            "exact": 26,
+            "min_cells": 0,
+            "within_threshold": 54,
+            "share_x1000": 771,
+            "bands": {
+              "0": 26,
+              "1-2": 28,
+              "3-4": 0,
+              "5-8": 6,
+              "9-14": 10,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 54,
+              "pages": 224
+            },
+            "matched_rounds": 26,
+            "matched_and_delivered": 21
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 60,
+            "exact": 13,
+            "min_cells": 0,
+            "within_threshold": 29,
+            "share_x1000": 483,
+            "bands": {
+              "0": 13,
+              "1-2": 16,
+              "3-4": 0,
+              "5-8": 7,
+              "9-14": 20,
+              "15+": 4
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 32,
+              "pages": 224
+            },
+            "matched_rounds": 13,
+            "matched_and_delivered": 8
+          }
+        ]
+      },
+      {
+        "key": "stray_cannon",
+        "wiki": "Stray Cannon",
+        "jp": "迷走砲",
+        "page": "Stray Cannon",
+        "url": "https://harddrop.com/wiki/Stray_Cannon",
+        "wiki_says": "a TD opener; 75% build rate on bag 1 (90% with mirror) if S/Z is held",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 71,
+            "exact": 22,
+            "min_cells": 0,
+            "within_threshold": 25,
+            "share_x1000": 352,
+            "bands": {
+              "0": 22,
+              "1-2": 3,
+              "3-4": 0,
+              "5-8": 44,
+              "9-14": 2,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 22,
+            "matched_and_delivered": 16
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 69,
+            "exact": 17,
+            "min_cells": 0,
+            "within_threshold": 20,
+            "share_x1000": 289,
+            "bands": {
+              "0": 17,
+              "1-2": 3,
+              "3-4": 0,
+              "5-8": 32,
+              "9-14": 15,
+              "15+": 2
+            },
+            "baseline": {
+              "exact": 18,
+              "within_threshold": 33,
+              "pages": 75
+            },
+            "matched_rounds": 17,
+            "matched_and_delivered": 13
+          }
+        ]
+      },
+      {
+        "key": "mountainous_1",
+        "wiki": "Mountainous Stacking",
+        "jp": "山岳積み",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "a Triple Double opener; T-Spin Triple in the second bag, Perfect Clear chance in the third; 53.33% setup rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking 2"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 2,
+          "catalogue_clean": 2
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 71,
+            "exact": 10,
+            "min_cells": 0,
+            "within_threshold": 35,
+            "share_x1000": 492,
+            "bands": {
+              "0": 10,
+              "1-2": 25,
+              "3-4": 0,
+              "5-8": 31,
+              "9-14": 5,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 69,
+            "exact": 17,
+            "min_cells": 0,
+            "within_threshold": 29,
+            "share_x1000": 420,
+            "bands": {
+              "0": 17,
+              "1-2": 12,
+              "3-4": 0,
+              "5-8": 22,
+              "9-14": 15,
+              "15+": 3
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 33,
+              "pages": 73
+            },
+            "matched_rounds": 17,
+            "matched_and_delivered": 14
+          }
+        ]
+      },
+      {
+        "key": "mountainous_2",
+        "wiki": "Mountainous Stacking 2",
+        "jp": "山岳積み2",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking; the L piece (J mirrored) is held until the second bag; 100% stack rate counting the mirror",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [
+          "Mountainous Stacking"
+        ],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 71,
+            "exact": 10,
+            "min_cells": 0,
+            "within_threshold": 35,
+            "share_x1000": 492,
+            "bands": {
+              "0": 10,
+              "1-2": 25,
+              "3-4": 0,
+              "5-8": 31,
+              "9-14": 5,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 40,
+              "pages": 73
+            },
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 69,
+            "exact": 17,
+            "min_cells": 0,
+            "within_threshold": 29,
+            "share_x1000": 420,
+            "bands": {
+              "0": 17,
+              "1-2": 12,
+              "3-4": 0,
+              "5-8": 22,
+              "9-14": 15,
+              "15+": 3
+            },
+            "baseline": {
+              "exact": 1,
+              "within_threshold": 33,
+              "pages": 73
+            },
+            "matched_rounds": 17,
+            "matched_and_delivered": 14
+          }
+        ]
+      },
+      {
+        "key": "mountainous_3",
+        "wiki": "Mountainous Stacking 3",
+        "jp": "山岳積み3",
+        "page": "Mountainous Stacking",
+        "url": "https://harddrop.com/wiki/Mountainous_Stacking",
+        "wiki_says": "successor to Mountainous Stacking 2; the O piece is held; for a J/L start",
+        "in_triple_double_category": true,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Triple before a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 2,
+          "catalogue_named": 0,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 71,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 35,
+            "share_x1000": 492,
+            "bands": {
+              "0": 0,
+              "1-2": 10,
+              "3-4": 25,
+              "5-8": 30,
+              "9-14": 6,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 69,
+            "exact": 0,
+            "min_cells": 2,
+            "within_threshold": 29,
+            "share_x1000": 420,
+            "bands": {
+              "0": 0,
+              "1-2": 17,
+              "3-4": 12,
+              "5-8": 21,
+              "9-14": 10,
+              "15+": 9
+            },
+            "baseline": {
+              "exact": 18,
+              "within_threshold": 33,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          }
+        ]
+      },
+      {
+        "key": "tki_3",
+        "wiki": "TKI 3 Opening",
+        "jp": "開幕TSD",
+        "page": "TKI 3 Opening",
+        "url": "https://harddrop.com/wiki/TKI_3_Opening",
+        "wiki_says": "three T-Spin Doubles and a T-Spin Triple to finish; the I piece comes before Z",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": "a T-spin Double within 21 pieces",
+        "drawn_at_locks": [
+          6
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 12,
+          "catalogue_clean": 0
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 71,
+            "exact": 0,
+            "min_cells": 10,
+            "within_threshold": 0,
+            "share_x1000": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 0,
+              "9-14": 65,
+              "15+": 6
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 40,
+              "pages": 75
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 69,
+            "exact": 7,
+            "min_cells": 0,
+            "within_threshold": 10,
+            "share_x1000": 144,
+            "bands": {
+              "0": 7,
+              "1-2": 1,
+              "3-4": 2,
+              "5-8": 3,
+              "9-14": 56,
+              "15+": 0
+            },
+            "baseline": {
+              "exact": 18,
+              "within_threshold": 33,
+              "pages": 75
+            },
+            "matched_rounds": 7,
+            "matched_and_delivered": 7
+          }
+        ]
+      },
+      {
+        "key": "pco",
+        "wiki": "Perfect Clear Opener",
+        "jp": "パフェクリテンプレ",
+        "page": "Perfect Clear Opener",
+        "url": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+        "wiki_says": "the standard way to get a Perfect Clear in the first 4 lines (10 dropped pieces); 84.6% if the I piece is kept on hold, 61.2% if it is dropped",
+        "in_triple_double_category": false,
+        "occupancy_aliases": [],
+        "delivers": "a perfect clear within 10 locks",
+        "drawn_at_locks": [
+          6,
+          7
+        ],
+        "pages": {
+          "wiki_fields": 4,
+          "catalogue_named": 4,
+          "catalogue_clean": 4
+        },
+        "players": [
+          {
+            "user": "pinglamb",
+            "boards_scored": 141,
+            "exact": 0,
+            "min_cells": 4,
+            "within_threshold": 5,
+            "share_x1000": 35,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 5,
+              "5-8": 0,
+              "9-14": 131,
+              "15+": 5
+            },
+            "baseline": {
+              "exact": 10,
+              "within_threshold": 94,
+              "pages": 295
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 129,
+            "exact": 0,
+            "min_cells": 10,
+            "within_threshold": 0,
+            "share_x1000": 0,
+            "bands": {
+              "0": 0,
+              "1-2": 0,
+              "3-4": 0,
+              "5-8": 0,
+              "9-14": 103,
+              "15+": 26
+            },
+            "baseline": {
+              "exact": 19,
+              "within_threshold": 65,
+              "pages": 295
+            },
+            "matched_rounds": 0,
+            "matched_and_delivered": 0
+          }
+        ]
+      }
+    ]
+  },
+  "session_perfect_clears": {
+    "source": "report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)",
+    "means": "an upper bound on completed Perfect Clear Openers: a session cannot hold more completed PCOs than it holds perfect clears, whatever the opening fields looked like — and a session with none cannot hold one at all. Which of them arrived early enough to BE a PCO is `perfect_clear_timing`, and that answer comes from the simulator",
+    "per_player": {
+      "pinglamb": 12,
+      "yachi": 7
+    }
+  },
+  "perfect_clear_timing": {
+    "source": "the oracle board source (runCaseOracle), checked per round against the replay's own results.stats.clears.allclear — the field extract.py and extract2.ts read into facts.json",
+    "pco_window_locks": 10,
+    "check": {
+      "player_rounds": 146,
+      "checked": 146,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 146,
+      "agrees": true,
+      "perfect_clears_sim": 19,
+      "perfect_clears_replay": 19
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "perfect_clears": 12,
+        "rounds_with_one": 12,
+        "by_piece": {
+          "20": 11,
+          "30": 1
+        },
+        "median_piece": 20,
+        "within_pco_window": 0
+      },
+      {
+        "user": "yachi",
+        "perfect_clears": 7,
+        "rounds_with_one": 7,
+        "by_piece": {
+          "15": 1,
+          "20": 6
+        },
+        "median_piece": 20,
+        "within_pco_window": 0
+      }
+    ]
+  },
+  "donation": {
+    "source": "harddrop.com/wiki/Donation",
+    "definition": "plugging the well with a piece so a T-spin can clear the rows across it, the clear then re-opening the well surface-to-floor — the plug is a loan, not a wall",
+    "cavity_cells": 4,
+    "walled_deepest_rows": 4,
+    "scope": "verified prefix",
+    "check": {
+      "tspin_clears": 898,
+      "reconstruction_agreed": 898,
+      "reconstruction_disagreed": 0,
+      "agrees": true
+    },
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 146,
+      "checked": 146,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 146,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 973,
+      "tspin_clears_replay": 973,
+      "tspin_clears_scored": 898,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 97,
+          "replay": 97,
+          "rounds_agreeing": 146
+        },
+        "tspindoubles": {
+          "sim": 714,
+          "replay": 714,
+          "rounds_agreeing": 146
+        },
+        "tspintriples": {
+          "sim": 120,
+          "replay": 120,
+          "rounds_agreeing": 146
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspinsingles": {
+          "sim": 42,
+          "replay": 42,
+          "rounds_agreeing": 146
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 898,
+      "prefix_locks": {
+        "rounds": 146,
+        "oracle_locks": 14562,
+        "hand_port_locks": 3773
+      },
+      "board_diff_hist": {
+        "2": 11,
+        "4": 8,
+        "6": 4,
+        "8": 21,
+        "10": 10,
+        "12": 41,
+        "14": 10,
+        "16": 2,
+        "18": 2,
+        "20": 4,
+        "22": 5,
+        "24": 9,
+        "26": 1,
+        "30": 2
+      },
+      "locks_comparable": 313,
+      "locks_same_board": 183,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 5,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 1,
+          "positives_diff_board": 2,
+          "agree_same_board": 1,
+          "agree_diff_board": 2
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 5,
+        "other_only": 2,
+        "both_no": 306,
+        "oracle_positives": 5,
+        "agreement_on_positives": [
+          0,
+          5
+        ],
+        "agreement_overall": [
+          306,
+          313
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 310,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          313,
+          313
+        ]
+      }
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_clears_scored": 508,
+        "tspin_clears_replay": 557,
+        "donations": 11,
+        "self_built_well": 0,
+        "garbage_derived_well": 11,
+        "natural": 8,
+        "b2b_breaking": 1,
+        "plug_unknown": 2,
+        "in_opener": 1,
+        "mid_game": 10
+      },
+      {
+        "user": "yachi",
+        "tspin_clears_scored": 390,
+        "tspin_clears_replay": 416,
+        "donations": 12,
+        "self_built_well": 0,
+        "garbage_derived_well": 12,
+        "natural": 6,
+        "b2b_breaking": 1,
+        "plug_unknown": 5,
+        "in_opener": 3,
+        "mid_game": 9
+      }
+    ],
+    "opener_window_pieces": 21,
+    "ablation": {
+      "scored": 898,
+      "counts": {
+        "shipped": 23,
+        "no_reopen": 287,
+        "cavity1_no_reopen": 664,
+        "naive": 898
+      },
+      "rate_pct": {
+        "shipped": "2.56",
+        "no_reopen": "31.96",
+        "cavity1_no_reopen": "73.94",
+        "naive": "100.00"
+      }
+    },
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 31.96% of this session's 898. The discriminating clause is the re-opening, and that is what is counted here. That figure is THIS SESSION's and no other: the corpus band belongs to whatever can see every session, which this file cannot",
+    "caveat": "every donation in this corpus sits on a GARBAGE-derived well, and the oracle board source keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\""
+  },
+  "stmb_cave": {
+    "source": "harddrop.com/wiki/STMB_Cave",
+    "definition": "a floating T-spin Double placed over a cave at least three columns wide — the cave is OFFSET from the T, sharing two of its three columns, so the test is overlap with the T's span and never containment",
+    "min_width": 3,
+    "scope": "verified prefix",
+    "counter_anchor": {
+      "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
+      "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
+      "player_rounds": 146,
+      "checked": 146,
+      "unknown_rounds": 0,
+      "rounds_agreeing": 146,
+      "agrees": true,
+      "unclassified_sim_clears": 0,
+      "tspin_clears_sim": 973,
+      "tspin_clears_replay": 973,
+      "tspin_clears_scored": 898,
+      "by_kind": {
+        "tspinsingles": {
+          "sim": 97,
+          "replay": 97,
+          "rounds_agreeing": 146
+        },
+        "tspindoubles": {
+          "sim": 714,
+          "replay": 714,
+          "rounds_agreeing": 146
+        },
+        "tspintriples": {
+          "sim": 120,
+          "replay": 120,
+          "rounds_agreeing": 146
+        },
+        "tspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspinsingles": {
+          "sim": 42,
+          "replay": 42,
+          "rounds_agreeing": 146
+        },
+        "minitspindoubles": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspintriples": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        },
+        "minitspinquads": {
+          "sim": 0,
+          "replay": 0,
+          "rounds_agreeing": 146
+        }
+      }
+    },
+    "dual_engine": {
+      "engines": [
+        "runCaseOracle (vendored Triangle, clean-room)",
+        "runCase (hand-port, sim.ts)"
+      ],
+      "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
+      "locks_scored": 898,
+      "prefix_locks": {
+        "rounds": 146,
+        "oracle_locks": 14562,
+        "hand_port_locks": 3773
+      },
+      "board_diff_hist": {
+        "2": 11,
+        "4": 8,
+        "6": 4,
+        "8": 21,
+        "10": 10,
+        "12": 41,
+        "14": 10,
+        "16": 2,
+        "18": 2,
+        "20": 4,
+        "22": 5,
+        "24": 9,
+        "26": 1,
+        "30": 2
+      },
+      "locks_comparable": 313,
+      "locks_same_board": 183,
+      "board_split": {
+        "don": {
+          "positives_same_board": 0,
+          "positives_diff_board": 5,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
+        },
+        "cave": {
+          "positives_same_board": 1,
+          "positives_diff_board": 2,
+          "agree_same_board": 1,
+          "agree_diff_board": 2
+        }
+      },
+      "donation": {
+        "both_yes": 0,
+        "oracle_only": 5,
+        "other_only": 2,
+        "both_no": 306,
+        "oracle_positives": 5,
+        "agreement_on_positives": [
+          0,
+          5
+        ],
+        "agreement_overall": [
+          306,
+          313
+        ]
+      },
+      "cave": {
+        "both_yes": 3,
+        "oracle_only": 0,
+        "other_only": 0,
+        "both_no": 310,
+        "oracle_positives": 3,
+        "agreement_on_positives": [
+          3,
+          3
+        ],
+        "agreement_overall": [
+          313,
+          313
+        ]
+      }
+    },
+    "players": [
+      {
+        "user": "pinglamb",
+        "tspin_doubles_scored": 379,
+        "tspin_doubles_replay": 416,
+        "width_ge_3": 11,
+        "min_depth_ge_2": 0,
+        "in_opener": 2,
+        "mid_game": 9
+      },
+      {
+        "user": "yachi",
+        "tspin_doubles_scored": 276,
+        "tspin_doubles_replay": 298,
+        "width_ge_3": 0,
+        "min_depth_ge_2": 0,
+        "in_opener": 0,
+        "mid_game": 0
+      }
+    ],
+    "opener_window_pieces": 21,
+    "width_histogram": {
+      "3": 11
+    },
+    "min_depth_histogram": {
+      "1": 11
+    },
+    "triple_control": {
+      "tspin_triples_scored": 120,
+      "tspin_triples_replay": 120,
+      "width_ge_3": 6
+    },
+    "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"
+  }
+}

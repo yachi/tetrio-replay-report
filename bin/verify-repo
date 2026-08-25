@@ -478,6 +478,63 @@ def completeness(env, jobs):
                 bad.append(f"{j.file}:{s.line}: step {s.name!r} in {name!r} reads ${v}, "
                            f"which the runner provides and bin/verify-repo does not — "
                            f"add it to RUNNER_VARS with a local equivalent, or skip the step")
+    bad += matrix_membership_problems(on_disk)
+    return bad
+
+
+# `verify` and `pipeline` are matrices over HAND-WRITTEN lists in the workflow, and until
+# 2026-08-25 nothing compared either list against the sessions on disk. That is the failure
+# this whole script exists to stop, arriving one level down from where it was being watched:
+# the completeness check above asks whether every JOB is planned, and both were, while the
+# `verify` matrix named eight artefacts and the `pipeline` matrix seven — with a ninth and an
+# eighth sitting in `sessions/`. CI went green over a corpus that was missing the session the
+# push was about, and `--sessions` reproduced the same narrow run locally, because it expands
+# "the workflow's own lists" and those lists were the thing that was wrong.
+#
+# So this is the same rule `assertCorpusIsEverySessionOnDisk` enforces for the TypeScript
+# corpus and `check_preregistrations` for its session classification, applied to the two
+# matrices: BOTH directions are errors. A session on disk that no matrix entry names would
+# silently narrow CI; an entry naming a directory that does not exist would fail every run.
+MATRIX_ON_DISK = {
+    # job -> (dimension, how a session directory maps to an entry, what an entry must contain)
+    "verify": ("artefact", lambda d: f"sessions/{d}/report", ("facts.json",)),
+    "pipeline": ("session", lambda d: d, ("report/facts.json",)),
+}
+
+
+def matrix_membership_problems(jobs_by_name):
+    bad = []
+    sessions_dir = REPO / "sessions"
+    if not sessions_dir.is_dir():
+        return [f"{sessions_dir} does not exist, so the matrices cannot be checked against it"]
+    on_disk = sorted(d.name for d in sessions_dir.iterdir()
+                     if d.is_dir() and (d / "report" / "facts.json").exists())
+    if not on_disk:
+        return ["no session on disk carries report/facts.json — an empty corpus would make "
+                "every membership check below vacuous"]
+    for job, (dim, to_entry, _) in MATRIX_ON_DISK.items():
+        j = jobs_by_name.get(job)
+        if j is None or dim not in j.matrix:
+            bad.append(f"{job}: no {dim!r} matrix to check against sessions/")
+            continue
+        listed = list(j.matrix[dim])
+        want = [to_entry(d) for d in on_disk]
+        for w, d in zip(want, on_disk):
+            if w not in listed:
+                bad.append(f"{j.file}: the {job!r} matrix does not name {w!r}, but "
+                           f"sessions/{d} is on disk. A session missing from a matrix makes "
+                           f"CI narrower than the corpus while every job it does run goes green")
+        # ...and the other direction, restricted to the entries this rule generates: the
+        # `verify` matrix legitimately carries sessions/2026-07-24/proof, which is a second
+        # artefact of one session and not a session, so only session-shaped entries are checked.
+        for e in listed:
+            if e in want:
+                continue
+            m = re.fullmatch(r"sessions/(\d{4}-\d{2}-\d{2})/report", e) if dim == "artefact" \
+                else re.fullmatch(r"\d{4}-\d{2}-\d{2}", e)
+            if m and (m.group(1) if dim == "artefact" else e) not in on_disk:
+                bad.append(f"{j.file}: the {job!r} matrix names {e!r}, which is not a session "
+                           f"on disk carrying report/facts.json")
     return bad
 
 
@@ -614,7 +671,16 @@ def execute(env, jobs, args):
 def _corrupt(kind, texts):
     t = dict(texts)
     v, d = "verify.yml", "dual-backed.yml"
-    if kind == "job added to CI":
+    # The three matrix-membership mutants. They are the ones the completeness check could not
+    # see until 2026-08-25: every JOB stayed planned while the two matrices named a corpus
+    # smaller than `sessions/`, so CI ran green over a session it never looked at.
+    if kind == "a session dropped from the verify matrix":
+        t[v] = re.sub(r"\n *- sessions/\d{4}-\d{2}-\d{2}/report(?=\n    steps:)", "", t[v], count=1)
+    elif kind == "a session dropped from the pipeline matrix":
+        t[v] = re.sub(r", '\d{4}-\d{2}-\d{2}'\]", "]", t[v], count=1)
+    elif kind == "a matrix names a session that is not on disk":
+        t[v] = re.sub(r"('\d{4}-\d{2}-\d{2}')\]", r"\1, '1999-01-01']", t[v], count=1)
+    elif kind == "job added to CI":
         t[v] = t[v] + "\n  brand-new-job:\n    runs-on: ubuntu-24.04\n    steps:\n" \
                       "      - name: Do a thing\n        run: echo hi\n"
     elif kind == "job removed from CI":
@@ -759,7 +825,10 @@ def selftest():
                  "step added carrying an unresolvable expression",
                  "skipped step renamed", "conditional step added undeclared",
                  "step reads an unsupplied runner variable", "unknown job key", "unknown step key", "content after the jobs block",
-                 "folded block scalar"):
+                 "folded block scalar",
+                 "a session dropped from the verify matrix",
+                 "a session dropped from the pipeline matrix",
+                 "a matrix names a session that is not on disk"):
         planted += 1
         bad = _corrupt(kind, texts)
         try:

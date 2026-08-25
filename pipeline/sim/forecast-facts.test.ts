@@ -78,6 +78,8 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // Two of yachi's `path_opened` events this session — `forecast-corpus.test.ts` pins the
   // corpus-wide count at 2, entirely on yachi.
   '2026-08-19': { yachi: 2, pinglamb: 0 },
+  // No `path_opened` event either side this session.
+  '2026-08-25': { yachi: 0, pinglamb: 0 },
 };
 
 // The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits

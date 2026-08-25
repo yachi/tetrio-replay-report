@@ -1,0 +1,36 @@
+{
+  "eyebrow": "教練分析 · 對症下藥",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚兩條線都指返同一個地方：唔係手速，係每粒方塊買到啲乜。yachi 場場 PPS 高<span class=\"badge\" data-claim=\"G052\"></span>、全晚多疊 645 粒<span class=\"badge\" data-claim=\"C005\"></span>，一樣輸個系列；而個效率差距同邊個贏場波完全分得開<span class=\"badge\" data-claim=\"C007\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 volume 流 · VOLUME",
+      "profile": [
+        "落速係佢嘅底：九場 match 場均 PPS 場場高過對手<span class=\"badge\" data-claim=\"G052\"></span>，全晚多疊 645 粒方塊<span class=\"badge\" data-claim=\"C005\"></span>，逐局平均 PPS 約 1.46 對約 1.36<span class=\"badge\" data-claim=\"G040\"></span>。開行方式偏 quad，456 對 333<span class=\"badge\" data-claim=\"G035\"></span>。",
+        "守嗰邊今晚係佢佔優：全 session 清走 1854 對 1707<span class=\"badge\" data-claim=\"G031\"></span>，每粒方塊清走幾多垃圾亦係佢高<span class=\"badge\" data-claim=\"G077\"></span>。全晚最癲嗰局佢贏就係贏喺呢度——每粒方塊嘅攻擊輸蝕，清走贏返<span class=\"badge\" data-claim=\"G087\"></span><span class=\"badge\" data-claim=\"G088\"></span>。",
+        "佢自己贏局同輸局爭 23% 幾，係兩個人入面郁得最多嗰個<span class=\"badge\" data-claim=\"C003\"></span>——即係話佢個上限唔差，落差先係問題。"
+      ],
+      "recs": [
+        "<strong>唔好再加粒數。</strong>今晚 645 粒盈餘已經係全 corpus 最大嗰批，而佢最多只可以填返 8 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，個 gap 係 11% 幾<span class=\"badge\" data-claim=\"C004\"></span>。條路本身冇壞，係填唔曬——再加落去買返嘅係同一個比例，唔會追得上。",
+        "<strong>要郁嘅係輸嗰啲局個地板。</strong>贏嗰啲局兩個人只爭 4% 幾，輸嗰啲局爭到 17% 幾<span class=\"badge\" data-claim=\"C002\"></span>。天花板已經貼得好近，所有空間都喺打得差嗰啲局——佢輸局每粒方塊得約 0.52，贏局約 0.64<span class=\"badge\" data-claim=\"G071\"></span>。",
+        "<strong>死法要收。</strong>全晚 13 局自己頂到天花板收場，9 局係佢<span class=\"badge\" data-claim=\"C006\"></span>，係佢八晚以嚟第二差。落多方塊唔應該連埋落多次自己撞頂。",
+        "<strong>T-spin 呢兩格要追。</strong>T-spin double 298 對 416、triple 46 對 74<span class=\"badge\" data-claim=\"G036\"></span><span class=\"badge\" data-claim=\"G037\"></span>——每粒方塊打得重過人嘅來源就喺呢度，而唔係喺 quad。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "T-spin 效率流 · EFFICIENCY",
+      "profile": [
+        "每粒方塊打得重係佢個底：全 session APP 高過 yachi<span class=\"badge\" data-claim=\"G042\"></span>，九場 match 場場都高<span class=\"badge\" data-claim=\"C007\"></span>，成晚夾埋高 11% 幾<span class=\"badge\" data-claim=\"C004\"></span>。T-spin 兩格都係佢贏<span class=\"badge\" data-claim=\"G057\"></span>，逐局 APM 約 54.4 對約 49.8<span class=\"badge\" data-claim=\"G041\"></span>。",
+        "穩定度兩格都係佢：逐局 PPS<span class=\"badge\" data-claim=\"G045\"></span>同逐局 APM<span class=\"badge\" data-claim=\"G046\"></span>波動都細過對手。",
+        "但佢自己贏局同輸局淨係爭 10% 出頭<span class=\"badge\" data-claim=\"C003\"></span>——八晚以嚟第二細。個底夠硬，但打得順嗰陣冇再上到一層。"
+      ],
+      "recs": [
+        "<strong>個天花板係下一格。</strong>贏嗰啲局佢只高對手 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>，而佢自己贏局比輸局只高 10% 出頭<span class=\"badge\" data-claim=\"C003\"></span>。佢贏場波係贏喺唔會跌，唔係贏喺打得起——尾三場連輸就係呢個限制浮咗上嚟<span class=\"badge\" data-claim=\"C001\"></span>。",
+        "<strong>守嗰邊今晚俾人爬頭。</strong>清走 1707 對 1854<span class=\"badge\" data-claim=\"G031\"></span>，每粒方塊清走亦係輸蝕<span class=\"badge\" data-claim=\"G077\"></span>。佢贏局同輸局嘅 DS 只爭約 0.22 對 0.20<span class=\"badge\" data-claim=\"G075\"></span>，比 yachi 嗰 0.24 對 0.19 平<span class=\"badge\" data-claim=\"G074\"></span>——即係佢守嗰邊冇因應局勢加碼。",
+        "<strong>Perfect Clear 唔使追住做。</strong>佢做咗 12 個、yachi 7 個<span class=\"badge\" data-claim=\"G038\"></span>，但全場淨係佢做到全消嗰 8 局佢仲輸咗 3 局<span class=\"badge\" data-claim=\"G083\"></span>——呢一格同輸贏講唔上關係。",
+        "<strong>落速可以再要多少少。</strong>九場 match 場均 PPS 場場輸<span class=\"badge\" data-claim=\"G052\"></span>。佢唔需要變成 volume 流，但每粒打得咁重之下再快少少，就係對手填唔返嗰 3 個百分點。"
+      ]
+    }
+  },
+  "versus_note": "兩條路今晚交足貨：yachi 嘅 volume 買返 8 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，pinglamb 嘅效率開出 11% 幾嘅 gap<span class=\"badge\" data-claim=\"C004\"></span>。差額就係個系列——但逐局計 pinglamb 38 對 yachi 35<span class=\"badge\" data-claim=\"G002\"></span>同尾三場連贏<span class=\"badge\" data-claim=\"C001\"></span>講緊，呢個差額冇大到收唔窄。"
+}

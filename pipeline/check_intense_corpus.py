@@ -121,7 +121,8 @@ def derived(root):
     reported problem rather than a silently skipped one.
     """
     data = corpus_stats.measure(root)
-    out = {"n": str(data["n_rounds"]), "m": str(data["family_size"])}
+    out = {"n": str(data["n_rounds"]), "m": str(data["family_size"]),
+           "sessions": str(len(data["sessions"]))}
 
     tercile_test = intense_round.CORPUS["tercile_test"]
     if tercile_test in data["tests"]:
@@ -141,7 +142,8 @@ def derived(root):
 
 def published(corpus):
     """The same key space, read out of `intense_round.CORPUS`."""
-    out = {"n": str(corpus["n"]), "m": str(corpus["m"])}
+    out = {"n": str(corpus["n"]), "m": str(corpus["m"]),
+           "sessions": str(corpus["sessions"])}
     for i, v in enumerate(corpus["terciles"]):
         out[f"tercile{i}"] = v
     for test, fields in corpus["tests"].items():
@@ -168,6 +170,12 @@ def quoted(corpus):
     """`{key: [strings that must appear in the rendered section]}`, per `RENDERED`."""
     out = {
         "n": [f'{corpus["n"]} 局'],
+        # The session count sat beside the round count as a TYPED WORD (「七個 session」) while
+        # the round count next to it came from CORPUS. It survived 2026-08-19 and was published
+        # false the day 2026-08-25 landed — 「七個 session、523 局」, where 523 is eight sessions.
+        # Neither a gate nor a reader catches that: both halves look like figures, and only one
+        # was one. Derived and gated now, like every other number in the sentence.
+        "sessions": [f'{corpus["sessions"]} 個 session'],
         "m": [f'family {corpus["m"]} 個測試'],
         "tercile0": [f'由 {corpus["terciles"][0]}%'],
         "tercile1": [f'升到 {corpus["terciles"][1]}%'],
@@ -362,6 +370,7 @@ def render(root):
     corpus = intense_round.CORPUS
     lines = ["CORPUS = {",
              f'    "n": {want["n"]},',
+             f'    "sessions": {want["sessions"]},',
              f'    "m": {want["m"]},',
              f'    "tercile_test": "{corpus["tercile_test"]}",',
              '    "terciles": ['
@@ -492,9 +501,18 @@ def _selftest(root):
     #     still fail. Without this the two could be concatenated into one haystack and a figure
     #     present in either would satisfy both — which is how a gate over two documents
     #     silently becomes a gate over their union.
+    #     The rho this perturbs is DERIVED from the live CORPUS rather than pinned. It was the
+    #     literal "-0.180" until 2026-08-25, i.e. a figure measured on an earlier corpus sitting
+    #     inside the control that proves the gate can fail — and when the eighth session moved
+    #     every rho, the string was in neither docstring and the `assert` below fired. Loud, so
+    #     nothing shipped; but a control whose mutation is a stale literal tests less each time
+    #     the data moves, and this one had to be repaired by hand at exactly the moment the
+    #     corpus changed. Reading it off CORPUS makes it a mutation of whatever is current.
+    rho = corpus["tests"][corpus["tercile_test"]]["rho"]
+    bumped = rho[:-1] + str((int(rho[-1]) + 1) % 10)
     for name in sorted(DOCSTRING_OWES):
-        one = {k: (v.replace("-0.180", "-0.181") if k == name else v) for k, v in docs.items()}
-        assert one != docs, name
+        one = {k: (v.replace(rho, bumped) if k == name else v) for k, v in docs.items()}
+        assert one != docs, f"{name} does not quote {rho}, so this control mutates nothing"
         check(bool(run(docs=one)), f"only {name}'s docstring drifts, the other is right")
 
     # 3c. ...and the split itself is load-bearing in BOTH directions. The two modules owe

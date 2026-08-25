@@ -7,81 +7,91 @@
     "2026-08-01": "afa8bf221b857319777c4dde135927a8",
     "2026-08-09": "5aff1e7d6f291a5c05efda9e630b82ea",
     "2026-08-14": "5e24b56ae9bb6bdb1e26cb86b47db1f9",
-    "2026-08-19": "e0660f376a03ae92096d9ae83afc5ee6"
+    "2026-08-19": "e0660f376a03ae92096d9ae83afc5ee6",
+    "2026-08-25": "480a30d9388253cbe1ad4152c366466d"
   },
   "generated_by": "analysis/rate_records.R --json",
   "metrics": {
     "vs": {
-      "slope": -0.625129,
-      "ci_lo": -0.789161,
-      "ci_hi": -0.461097,
-      "r2": 0.935456,
-      "p": 8.61434e-05,
-      "mean_p": 0.00714048,
+      "slope": -0.635953,
+      "ci_lo": -0.783513,
+      "ci_hi": -0.488393,
+      "r2": 0.94881,
+      "p": 4.27479e-05,
+      "mean_p": 0.00129472,
       "half_inside_ci": true,
-      "sd_short": 59.2419,
-      "sd_long": 15.5099,
-      "mean_short": 106.861,
-      "mean_long": 119.418,
-      "t_short": 19.2101,
-      "t_long": 148.553,
-      "top_decile_short": 45,
-      "top_decile_n": 90,
-      "top_decile_p": 2.94252e-07
+      "sd_short": 59.09,
+      "sd_long": 14.4761,
+      "mean_short": 103.039,
+      "mean_long": 119.359,
+      "t_short": 19.4215,
+      "t_long": 152.814,
+      "top_decile_short": 50,
+      "top_decile_n": 105,
+      "top_decile_p": 4.58558e-07
     },
     "apm": {
-      "slope": -0.714562,
-      "ci_lo": -0.886892,
-      "ci_hi": -0.542233,
-      "r2": 0.944925,
-      "p": 5.33199e-05,
-      "mean_p": 0.0177769,
+      "slope": -0.717952,
+      "ci_lo": -0.871565,
+      "ci_hi": -0.564339,
+      "r2": 0.956137,
+      "p": 2.68177e-05,
+      "mean_p": 0.0144891,
       "half_inside_ci": false,
-      "sd_short": 30.7269,
-      "sd_long": 6.6779,
-      "mean_short": 57.9739,
-      "mean_long": 51.8356,
-      "t_short": 19.2101,
-      "t_long": 148.553,
-      "top_decile_short": 62,
-      "top_decile_n": 90,
-      "top_decile_p": 2.70945e-18
+      "sd_short": 30.8737,
+      "sd_long": 6.42102,
+      "mean_short": 56.1119,
+      "mean_long": 51.5587,
+      "t_short": 19.4215,
+      "t_long": 152.814,
+      "top_decile_short": 72,
+      "top_decile_n": 105,
+      "top_decile_p": 8.07899e-21
     },
     "pps": {
-      "slope": -0.4228,
-      "ci_lo": -0.642224,
-      "ci_hi": -0.203376,
-      "r2": 0.78746,
-      "p": 0.00327534,
-      "mean_p": 0.254411,
+      "slope": -0.43438,
+      "ci_lo": -0.632795,
+      "ci_hi": -0.235964,
+      "r2": 0.82707,
+      "p": 0.00173325,
+      "mean_p": 0.156114,
       "half_inside_ci": true,
-      "sd_short": 0.228504,
-      "sd_long": 0.0829828,
-      "mean_short": 1.45396,
-      "mean_long": 1.41144,
-      "t_short": 19.2101,
-      "t_long": 148.553,
-      "top_decile_short": 54,
-      "top_decile_n": 90,
-      "top_decile_p": 2.16012e-12
+      "sd_short": 0.228076,
+      "sd_long": 0.0796178,
+      "mean_short": 1.44047,
+      "mean_long": 1.4096,
+      "t_short": 19.4215,
+      "t_long": 152.814,
+      "top_decile_short": 58,
+      "top_decile_n": 106,
+      "top_decile_p": 6.50022e-11
     }
   },
-  "n_player_rounds": 900,
-  "n_rounds": 450,
+  "n_player_rounds": 1046,
+  "n_rounds": 523,
   "predict": {
-    "r": -0.11084,
-    "p": 0.706006,
-    "n": 14
+    "r": -0.133036,
+    "p": 0.623305,
+    "n": 16
   },
   "records": {
-    "n": 21,
+    "n": 24,
     "n_metrics": 3,
-    "in_shortest_quartile": 21,
-    "p": 2.27374e-13,
-    "quartile_cut_s": 34.27
+    "in_shortest_quartile": 23,
+    "p": 2.59348e-13,
+    "quartile_cut_s": 35.5345
   },
   "script_md5": "19a718d6cfcea37f470f779620be6921",
-  "sessions": ["2026-07-22", "2026-07-24", "2026-07-28", "2026-08-01", "2026-08-09", "2026-08-14", "2026-08-19"],
+  "sessions": [
+    "2026-07-22",
+    "2026-07-24",
+    "2026-07-28",
+    "2026-08-01",
+    "2026-08-09",
+    "2026-08-14",
+    "2026-08-19",
+    "2026-08-25"
+  ],
   "stability": {
     "threshold_s": 60,
     "per_metric": {
@@ -95,16 +105,23 @@
       },
       "pps": {
         "lo": 58,
-        "hi": 74
+        "hi": 68
       }
     },
     "rate_records": {
-      "metrics": ["vs", "apm"],
+      "metrics": [
+        "vs",
+        "apm"
+      ],
       "lo": 54,
       "hi": 62
     },
     "all_metrics": {
-      "metrics": ["vs", "apm", "pps"],
+      "metrics": [
+        "vs",
+        "apm",
+        "pps"
+      ],
       "lo": 58,
       "hi": 62
     }
@@ -221,6 +238,23 @@
         "qualified": 80.786,
         "pct_above": 51.7788
       }
+    },
+    "2026-08-25": {
+      "vs": {
+        "value": 178.087,
+        "round_s": 45.87,
+        "player": "pinglamb",
+        "qualified": 164.371,
+        "pct_above": 8.34454
+      },
+      "apm": {
+        "value": 103.665,
+        "round_s": 13.037,
+        "player": "pinglamb",
+        "qualified": 69.561,
+        "pct_above": 49.0275
+      }
     }
   }
 }
+
