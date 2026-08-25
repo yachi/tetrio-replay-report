@@ -18,6 +18,7 @@ documented.
 """
 import argparse
 import decimal
+import math
 import sys
 
 
@@ -47,14 +48,167 @@ def ratio1(num, den):
     return str(q.quantize(decimal.Decimal("0.1"), rounding=decimal.ROUND_FLOOR))
 
 
+# --------------------------------------------------------------------------- the one quantizer
+#
+# THREE COPIES OF THIS EXISTED until 2026-08-24 — `fmt.r1`/`r2`, `generators._one_dp`/`_two_dp`,
+# and `intense_round._r1`/`_r2` — each spelling `x // 100 / 10` inline. Copies are why the
+# convention could only ever be documented: a check that the corpus discriminates flooring from
+# rounding has to name the site it is checking, and a rule living in three places has three sites
+# whose agreement nothing enforces.
+#
+# The RULE IS A PARAMETER, not a second function. That is the same rule `DONATION_ABLATIONS`
+# follows in the simulator: an alternative implemented as a copy is not an alternative to this
+# code, and `pipeline/check_rounding.py` replays every recorded call under the other two rules to
+# ask whether the corpus can tell them apart. If the alternative were a copy, that question would
+# be about the copy.
+RULES = ("floor", "ceil", "round")
+
+#: Set to a list by `check_rounding` to record every call as `(site, kind, args, rule)`. None in
+#: every other run — the tracer costs one `is not None` per call and is off in the pipeline itself.
+#: `kind` names the helper so the replay can call the SAME function under another rule; recording
+#: only the arguments made the four helpers indistinguishable and the replay guessed wrong.
+TRACE = None
+
+#: kind -> the helper, so `check_rounding` replays through this module rather than reimplementing.
+def _helpers():
+    return {"quant": quant, "quantf": quantf, "permille": permille, "mean_x1000": mean_x1000}
+
+
+def quant(x1000, dp, rule="floor", site=None):
+    """An x1000 integer printed at `dp` places under `rule`, as a string.
+
+    The arithmetic is INTEGER all the way to the last division, so the rule is applied exactly
+    rather than to a float that has already lost the bit being decided. `x1000` counts thousandths;
+    `unit` is how many thousandths one printed place is worth.
+
+    `site` names the caller for the tracer, and it is required of anything the check covers — an
+    unnamed call is recorded as an unnamed site and reported as one, rather than merged into
+    whatever else shares its arguments.
+    """
+    if rule not in RULES:
+        raise ValueError(f"unknown rounding rule {rule!r} — one of {RULES}")
+    unit = 10 ** (3 - dp)
+    if unit < 1:
+        raise ValueError(f"dp={dp} asks for more places than an x1000 integer carries")
+    if rule == "floor":
+        n = x1000 // unit
+    elif rule == "ceil":
+        n = -(-x1000 // unit)
+    else:                                  # round-half-up, on the exact integer
+        n = (x1000 + unit // 2) // unit
+    if TRACE is not None:
+        TRACE.append((site, "quant", (x1000, dp), rule))
+    return f"{n / 10 ** dp:.{dp}f}"
+
+
 def r1(x1000):
     """An x1000 integer as one decimal place, floored: 114223 -> "114.2"."""
-    return f"{x1000 // 100 / 10:.1f}"
+    return quant(x1000, 1, "floor", site="fmt.r1")
 
 
 def r2(x1000):
     """An x1000 integer as two decimal places, floored: 1423 -> "1.42"."""
-    return f"{x1000 // 10 / 100:.2f}"
+    return quant(x1000, 2, "floor", site="fmt.r2")
+
+
+def r3(x1000):
+    """An x1000 integer as three decimal places. EXACT — every rule agrees, and that is the
+    point of routing it through `quant` anyway: `check_rounding` then reports it as a site the
+    corpus cannot discriminate, which is a true statement about it rather than a silence."""
+    return quant(x1000, 3, "floor", site="fmt.r3")
+
+
+def pct1(permille, site="fmt.pct1"):
+    """A per-mille integer as a one-decimal percentage: 432 -> "43.2%".
+
+    THE FOURTH COPY of the same rule, consolidated 2026-08-24. `opener_section._pct`,
+    `forecast_section._pct` and `forecast_pooled._pct` each spelled `f"{x1000 / 10:.1f}%"`, which
+    is round-half-even applied to a float — safe only because every caller feeds it an already
+    floored per-mille, so the division is exact and no rule is ever exercised. That is precisely
+    the state this module's docstring calls a comment: correct today, unenforced by any value, and
+    a `_share` that stopped flooring would move all three at once with nothing to say so.
+    """
+    return quant(permille * 100, 1, "floor", site=site) + "%"
+
+
+def permille(num, den, rule="floor", site=None):
+    """`num / den` as a per-mille INTEGER under `rule`, in integer arithmetic throughout.
+
+    THE FIFTH SPELLING of the same decision, and the one the scanner nearly missed: `num * 1000 //
+    den` divides by a NAME, so a reducer pattern written as "integer division by a literal" reports
+    the module clean while the floor the whole 約 convention rests on sits unexamined. That is what
+    `_REDUCERS` records at the top of `check_rounding`.
+
+    The result is an x1000 integer, so it feeds `quant`/`pct1` and the two quantizations compose
+    without a second float anywhere in between.
+    """
+    if rule not in RULES:
+        raise ValueError(f"unknown rounding rule {rule!r} — one of {RULES}")
+    scaled = num * 1000
+    if rule == "floor":
+        n = scaled // den
+    elif rule == "ceil":
+        n = -(-scaled // den)
+    else:
+        n = (2 * scaled + den) // (2 * den)
+    if TRACE is not None:
+        TRACE.append((site, "permille", (num, den), rule))
+    return n
+
+
+def mean_x1000(total, n, rule="floor", site=None):
+    """A mean of x1000 values as an x1000 integer under `rule` — `total // n`, declared.
+
+    A mean is not a rate: `permille` scales by 1000 first because its inputs are counts, while
+    both of these are already thousandths. Two helpers rather than one flag, because a caller who
+    picked the wrong one would get a figure off by a factor of a thousand and notice, where a
+    wrong flag prints something plausible.
+    """
+    if rule not in RULES:
+        raise ValueError(f"unknown rounding rule {rule!r} — one of {RULES}")
+    if rule == "floor":
+        v = total // n
+    elif rule == "ceil":
+        v = -(-total // n)
+    else:
+        v = (2 * total + n) // (2 * n)
+    if TRACE is not None:
+        TRACE.append((site, "mean_x1000", (total, n), rule))
+    return v
+
+
+def quantf(x, dp, rule="floor", site=None):
+    """The same three rules over a FLOAT, for values that never were an x1000 integer.
+
+    Weaker than `quant` and deliberately a different name: the input has already lost bits, so a
+    value one ulp below a boundary floors to the wrong side and nothing here can tell. `ratio1`'s
+    docstring measures exactly that — 200 000 random pairs, and the two float spellings disagree
+    with the decimal one 1 006 and 429 times. Use `quant` whenever an exact integer exists;
+    reach for this only when the quantity is a float all the way down (an R statistic, a p-value).
+    """
+    if rule not in RULES:
+        raise ValueError(f"unknown rounding rule {rule!r} — one of {RULES}")
+    f = 10 ** dp
+    if rule == "floor":
+        n = math.floor(x * f)
+    elif rule == "ceil":
+        n = math.ceil(x * f)
+    else:
+        n = math.floor(x * f + 0.5)
+    if TRACE is not None:
+        TRACE.append((site, "quantf", (x, dp), rule))
+    return f"{n / f:.{dp}f}"
+
+
+def bound2(x1000):
+    """An UPPER bound as 2dp, rounded **up**: 13 -> '0.02', not '0.01'.
+
+    The flooring convention exists so 約 means "at least this much". A bound runs the other way —
+    "the gap is under X" is only true if the printed X is at least the proved one, so this is the
+    one place that must ceil. Flooring here printed "under 0.01" for a bound the lemma proved at
+    0.015: a claim strictly stronger than its own proof.
+    """
+    return quant(x1000, 2, "ceil", site="fmt.bound2")
 
 
 def secs(ms):

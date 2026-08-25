@@ -27,6 +27,8 @@ import json
 import math
 import os
 
+from pipeline import fmt
+
 # Session-scoped, NOT global. The first version hardcoded the 2026-07-22 path and was
 # registered for every session, so `build_report --check` on 2026-07-24 and 2026-07-28
 # reported DRIFT — it was trying to graft one session's simulator output into another
@@ -57,7 +59,7 @@ def _pct(x1000):
     "never rounded up" here was a claim about the *input* that the emitter did not honour
     — it used `Math.round`, and this function faithfully printed 12.2% for 12.1739%.
     """
-    return f"{x1000 / 10:.1f}%"
+    return fmt.pct1(x1000, site="forecast_section._pct")
 
 
 def _num(x1000):
@@ -68,7 +70,7 @@ def _num(x1000):
     and this module must not make a second rounding decision. Uses U+2212 MINUS, matching the
     typography the rest of the report uses for negative figures.
     """
-    return f"{x1000 / 1000:.3f}".replace("-", "−")
+    return fmt.quant(x1000, 3, "floor", site="forecast_section._num").replace("-", "−")
 
 
 def _stat(data, *path):

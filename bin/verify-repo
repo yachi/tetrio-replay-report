@@ -362,6 +362,9 @@ PLAN = {
     # Same seven artefacts, the other block: the confusion matrix, its board-equality
     # split, and the two engines' prefix lengths. Also FAST — no simulator run.
     "dual-engine": Entry(FAST),
+    # Renders every session to trace the quantizers, so it is not instant — but it
+    # writes nothing (the round table renders into a copy) and needs no toolchain.
+    "rounding": Entry(FAST),
     # This script's own gate. Running it here is not circular: the job's two commands
     # are --selftest and --check, neither of which executes any job, and both of which
     # are exactly what a local run should confirm before a push.

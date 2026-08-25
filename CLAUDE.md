@@ -86,6 +86,8 @@ python3 -m pipeline.check_donation_bands --selftest #   the fragments to paste; 
 python3 -m pipeline.check_dual_engine               # CI gate: the dual_engine confusion matrix, its
 python3 -m pipeline.check_dual_engine --render      #   board split, coverage and prefix lengths —
 python3 -m pipeline.check_dual_engine --selftest    #   --selftest also checks each rounding DIRECTION
+python3 -m pipeline.check_rounding           # CI gate: every rendered figure declares a rounding
+python3 -m pipeline.check_rounding --selftest #   rule, and which rule PAIRS the corpus enforces
 python3 -m pipeline.openers.extract_wiki_openers            # CI gate: harddrop's own opener drawings
 python3 -m pipeline.openers.extract_wiki_openers --selftest # its mutants
 python3 -m pipeline.openers.extract_wiki_techniques            # CI gate: the Donation / STMB Cave
@@ -246,7 +248,7 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **18 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **19 job definitions
   across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (8) and `pipeline` over sessions (7), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
@@ -254,7 +256,7 @@ equivalent marker pair.
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **Fifteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+- **Sixteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
   covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
@@ -1572,6 +1574,60 @@ nothing at all.
   verdict cards show 待證 for claims the verifier had proved. Counting `.badge[data-status]`
   in the DOM does **not** catch either one; both were found by reading a screenshot.
 - The `.ttrm` files are single-line JSON; `.gitattributes` marks them `-diff linguist-vendored`.
+
+## 一個 quantizer,三條規則 —— 邊條規則有數撐住,係度出嚟嘅
+
+**印出嚟嘅數要縮短,縮短就要有規則,而條規則淨係得一樣嘢守住:corpus 入面有個值令兩條規則
+答案唔同。** 冇咁嘅值,條規則就係一句 comment —— 換咗佢,byte-identity gate、ledger 重生、
+report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`forecast_section` 用 `:.0f`
+(round-half-even)印一個周圍都 floor 嘅 ratio,冇人見到,就係因為冇一個 ratio 啱啱落喺半格上面。
+
+`pipeline/check_rounding.py` 逐個 site 答兩條問題,第二條先係之前冇人問嘅:
+
+1. **條規則有冇被行使過?** 把每一個記低咗嘅 call 用另外兩條規則重播。有 call 出唔同嘅字,
+   就係 corpus 分得開,條規則有 artefact 撐住。
+2. **條規則有冇宣告過?** `fmt.quant` 收 rule 做參數,所以每個 call 都講明自己要邊條。冇宣告
+   嘅 site 根本查唔到,而 `_uncovered` 當佢係 failure,唔係當佢唔存在。
+
+**佢做唔到嘅嘢,照直講** —— 佢分唔到一條**宣告咗嘅方向啱唔啱**。「27 locks against 81」有規則、
+一致地applied、方向錯。佢報邊啲 site 有數撐住、邊啲係靠信,揀方向仍然係人手判斷,寫喺 call
+旁邊。
+
+七個 helper,一個 quantizer:`quant`(x1000 整數)、`quantf`(float,弱啲,因為個 input 已經
+甩咗 bit)、`permille`(num/den 出 x1000)、`mean_x1000`,加上 `r1`/`r2`/`r3`/`bound2`/`pct1`。
+**呢個 rule 之前有六份 copy** —— `fmt.r1`/`r2`、`generators._one_dp`/`_two_dp`、
+`intense_round._r1`/`_r2`、三份一模一樣嘅 `_pct`、`build_round_table.ratio`/`pct`、
+`opener_section._share` —— 每份自己 spell `x // 100 / 10`。Copy 就係點解條 convention 只可以
+被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
+consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
+
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->13413<!--/round:figures--> 個
+quantized figure、<!--round:sites-->21<!--/round:sites--> 對 (site, helper)**:
+<!--round:enforced-->16<!--/round:enforced--> 個有 corpus 撐住,
+<!--round:ontrust-->5<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
+而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
+條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。
+
+**但第六對會,而且已經變咗 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
+喺七個 session 之下分得開 floor 同 ceil,分唔開 floor 同 round(0 個 call)。第八個 session
+一落地,冇人郁過一行 code,佢就分得開喇
+(<!--round:dp1-split-->16 個 call<!--/round:dp1-split-->)。所以「有一個 alternative 分得開」
+唔算數,**每一個 alternative 都要分得開**先報 ok —— 而一個今日靠信嘅 site,唔代表佢永遠靠信,
+反之亦然:條 rule 一路都係嗰條,郁嘅係啲數。
+
+**個 key 一定要係 (site, helper) 而唔係 site。** `build_round_table.ratio` quantize 兩次(一次
+per-mille、一次 quant),同一個 site 名;淨係用 site 做 key 嘅話第二次會冚咗第一次,個 summary
+就報 7 954 而個 trace 有 11 554 —— **靜靜咁跌咗自己已經記低嘅 3 600 個 call**,而個數字讀落
+完全正常。
+
+**個 scanner 自己中過同一個窿,而且係第一次行就中。** 條 pattern 本來係 `//\s*\d`,讀落似
+「integer division」但唔係:`opener_section._share` 用 `num * 1000 // den` floor,除嘅係一個
+**名**,所以個 scan 報咗嗰個 module 乾淨,而成個 約 convention 靠住嗰個 floor 完全冇睇過。
+而家係淨一個 `//`,over-report,每個 index 減半同每個毫秒轉換都要入 `EXCUSED` 連理由 ——
+**over-report 先係佢應該壞嘅方向**。`EXCUSED` 用**函數名**做 key 唔用行入面嘅 substring:
+一個 substring excuse 會靜靜咁擴大(寫嚟 excuse 一個 `// 1000` 嘅,連之後任何人加嘅
+`// 1000` 都一齊 excuse 埋),而**一條配唔到任何嘢嘅 excuse 都係 failure**,因為一份開始講大話
+嘅 list 同一份冇講大話嘅睇落一模一樣。
 
 ## 約 means the floored value — everywhere, and it is gated
 

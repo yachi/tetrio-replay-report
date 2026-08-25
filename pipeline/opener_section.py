@@ -77,6 +77,7 @@ import html
 import json
 import os
 
+from pipeline import fmt
 from pipeline.claims.build_claims import SIMPLIFIED
 
 # Session-scoped, exactly like forecast_section.FACTS_REL: a session with no simulator output
@@ -123,7 +124,7 @@ def _pct(x1000):
     over nothing is an ABSENCE, and printing zero for it would publish "measured, and the
     effect is exactly nothing" — which this data cannot say. Same rule as `forecast_section._stat`.
     """
-    return "—" if x1000 is None else f"{x1000 / 10:.1f}%"
+    return "—" if x1000 is None else fmt.pct1(x1000, site="opener_section._pct")
 
 
 def _share(num, den):
@@ -134,7 +135,7 @@ def _share(num, den):
     ABSENCE and renders as 「—」, while a real zero over a real denominator (a player who scored
     T-spins and donated on none of them) is a measurement and keeps its 0.0%.
     """
-    return None if not den else num * 1000 // den
+    return None if not den else fmt.permille(num, den, "floor", site="opener_section._share")
 
 
 def _cells(n):
