@@ -1601,14 +1601,19 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->11554<!--/round:figures--> 個
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->13413<!--/round:figures--> 個
 quantized figure、<!--round:sites-->21<!--/round:sites--> 對 (site, helper)**:
-<!--round:enforced-->15<!--/round:enforced--> 個有 corpus 撐住,
-<!--round:ontrust-->6<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
+<!--round:enforced-->16<!--/round:enforced--> 個有 corpus 撐住,
+<!--round:ontrust-->5<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
 而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
-條規則永遠行使唔到。`records._dp1` 分得開 floor 同 ceil
-(<!--round:dp1-split-->14 個 call<!--/round:dp1-split-->),分唔開 floor 同 round(0 個)—— 所以
-「有一個 alternative 分得開」唔算數,**每一個 alternative 都要分得開**先報 ok。
+條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。
+
+**但第六對會,而且已經變咗 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
+喺七個 session 之下分得開 floor 同 ceil,分唔開 floor 同 round(0 個 call)。第八個 session
+一落地,冇人郁過一行 code,佢就分得開喇
+(<!--round:dp1-split-->16 個 call<!--/round:dp1-split-->)。所以「有一個 alternative 分得開」
+唔算數,**每一個 alternative 都要分得開**先報 ok —— 而一個今日靠信嘅 site,唔代表佢永遠靠信,
+反之亦然:條 rule 一路都係嗰條,郁嘅係啲數。
 
 **個 key 一定要係 (site, helper) 而唔係 site。** `build_round_table.ratio` quantize 兩次(一次
 per-mille、一次 quant),同一個 site 名;淨係用 site 做 key 嘅話第二次會冚咗第一次,個 summary

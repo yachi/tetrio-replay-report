@@ -3798,3 +3798,44 @@ alternative。`check_rounding` 重播嗰陣行返同一個 helper,唔係自己�
 gate 報邊啲 site 有數撐住、邊啲靠信;揀方向仍然係人手判斷。
 
 19 個 job,16 個 repo-wide。
+
+
+## `rate-records.json` 嘅 byte-identity 靜靜咁停咗檢查 (2026-08-25)
+
+**唔係呢條 branch 整出嚟嘅,亦都唔會令 CI 紅 —— 呢兩樣加埋先係個問題。**
+
+`bin/verify-repo --fast` 本地行 `rate-records` 紅咗:重新行一次 `analysis/rate_records.R`
+出唔返 committed 嗰份 `analysis/rate-records.json`。內容**一個 field 都冇差**(逐個 key 比較過),
+差嘅係 **array 嘅排版** —— committed 嗰份每個 element 一行,重生嗰份 short array 打橫擺。
+
+```
+<   "sessions": [
+<     "2026-07-22",
+...
+>   "sessions": ["2026-07-22", "2026-07-24", ...],
+```
+
+`toJSON(..., pretty = 2)` 喺唔同 jsonlite 版本之下排法唔同。呢度係 jsonlite 2.0.0 / R 4.6.1;
+2026-08-23 我喺同一部機生嗰份係打橫嘅,而家 committed 嗰份係打直 —— 即係第八個 session 落地
+嗰陣(PR #21)係喺**另一個環境**重生嘅。
+
+### 點解冇人見到
+
+`check_rate_records --rerun` 個 byte-identity check **淨係喺 Rscript 裝咗先行**。CI 冇 R,所以
+CI 一路淨係行 fingerprint(session list、facts.json md5、script md5)—— 嗰三條路照樣捉到「落多個
+session」同「data 郁咗」,但捉唔到「份 artefact 同個 script 而家出唔返同一份」。
+
+**所以呢個 gate 最強嗰半,喺冇人留意之下停咗喺一個冇人行嘅地方。** 呢個係
+CLAUDE.md「manual-only gate fails silently」嗰一類,不過換咗個樣:唔係冇人行,係**行嘅人同
+唔行嘅人分開咗**,而行嗰個(本地)紅咗都唔會擋 push。
+
+### 唔喺呢條 branch 修,理由
+
+用我部機重生一次會令 bytes 反返轉頭,即係下次另一個環境重生又紅一次 —— **嗰個係搬窿唔係補窿**。
+真正嘅修法二選一,兩個都係另一件事:
+
+1. 個 writer 出一份**同版本無關**嘅 canonical JSON(自己 format,唔靠 jsonlite 個 pretty),或者
+2. 有 Rscript 嗰陣比較 **parsed content** 而唔係 bytes,而 bytes 嗰層改由一個 canonical writer 保證。
+
+第 2 個聽落弱啲,但其實係啱嘅分工:byte-identity 想守嘅係「份 artefact 同個 script 一致」,
+唔係「你部機部 jsonlite 同我嗰部一樣」。
