@@ -1,0 +1,55 @@
+{
+  "eyebrow": "戰況直擊 · 逐場睇",
+  "title": "九場戰況",
+  "lede": "九場入面有四場打到最後一局先分勝負<span class=\"badge\" data-claim=\"G013\"></span>——頭兩場生死局俾 pinglamb 執，尾兩場俾 yachi 執返。個系列 5 比 4，但係走勢唔係平均分佈嘅：pinglamb 頭六場攞五場，之後三場一場都冇攞到<span class=\"badge\" data-claim=\"C001\"></span>。",
+  "closer": "九場排開，個效率差距同邊個贏場波完全分得開：yachi 贏嗰四場，pinglamb 每粒方塊嘅攻擊高唔夠 9%；pinglamb 贏嗰五場，佢每場都高過 10%，中間一場都冇<span class=\"badge\" data-claim=\"C007\"></span>。但要睇清楚個分界線喺邊——<strong>九場 match pinglamb 每場都高過 yachi</strong>，連 yachi 贏嗰四場都係。分得開嘅係個差距幾大，唔係邊個高。",
+  "hero_match": 8,
+  "score_claim": "G058",
+  "cards": {
+    "1": {
+      "title": "一度 4 比 2，最後三局連丟",
+      "flag": null,
+      "body": "打足九局。yachi 中段連贏三局反超到 4 比 2，跟住最後三局俾人連追走晒<span class=\"badge\" data-claim=\"C010\"></span>。生死局係 pinglamb 執：佢打出 VS 約 110.9、APM 約 53.4，yachi 得 VS 約 88.5、APM 約 37.4<span class=\"badge\" data-claim=\"G061\"></span>。"
+    },
+    "2": {
+      "title": "開波連失三局，追唔切",
+      "flag": null,
+      "body": "yachi 開波連失三局，中段追返三局到 3 比 4，最後一局收唔到<span class=\"badge\" data-claim=\"C011\"></span>。呢場係 pinglamb 全晚場均 APM 最高嗰場，約 56.9<span class=\"badge\" data-claim=\"G024\"></span>；佢由第一場尾段開始連贏 6 局，跨埋兩場，係全晚最長連勝<span class=\"badge\" data-claim=\"G014\"></span>。"
+    },
+    "3": {
+      "title": "全晚最順嗰場",
+      "flag": "y",
+      "body": "七局攞五局，5 比 2<span class=\"badge\" data-claim=\"C012\"></span>——yachi 打得最順嗰場，亦係佢頭六場入面唯一贏嗰場。"
+    },
+    "4": {
+      "title": "頭局之後淨係再贏一局",
+      "flag": null,
+      "body": "yachi 贏頭局，之後七局入面淨係再贏到一局，2 比 5<span class=\"badge\" data-claim=\"C013\"></span>。第三局係全晚最乾淨嘅一局：pinglamb 全局一行垃圾都冇食過，直接封死<span class=\"badge\" data-claim=\"G060\"></span>。"
+    },
+    "5": {
+      "title": "3 比 1 領先，跟住連失三局",
+      "flag": null,
+      "body": "yachi 連贏三局做到 3 比 1，跟住連失三局，最後一局輸波，4 比 5<span class=\"badge\" data-claim=\"C014\"></span>。生死局兩邊都企得住，pinglamb VS 約 120.5 對 yachi 約 112.2<span class=\"badge\" data-claim=\"G062\"></span>。第六局 pinglamb 同時做出全晚最大單波 19 行<span class=\"badge\" data-claim=\"G017\"></span>同最長 combo 9 下<span class=\"badge\" data-claim=\"G018\"></span>。"
+    },
+    "6": {
+      "title": "開波連失四局",
+      "flag": null,
+      "body": "開波連失四局，追返兩局都太遲，2 比 5<span class=\"badge\" data-claim=\"C015\"></span>。第七局係全晚最長嗰局，打咗約 218 秒<span class=\"badge\" data-claim=\"G022\"></span>：yachi 喺嗰局清咗 196 行，係全場單局最多<span class=\"badge\" data-claim=\"G021\"></span>，但生還嗰個係 pinglamb——同一局佢做出全晚單局最多 T-spin，20 個<span class=\"badge\" data-claim=\"G020\"></span>。"
+    },
+    "7": {
+      "title": "反攻由呢場開始",
+      "flag": "y",
+      "body": "連贏三局，中段俾人追返兩局，最後連贏兩局收波，5 比 3<span class=\"badge\" data-claim=\"C016\"></span>。第一局係全晚最硬淨嘅一局：pinglamb 俾人射埋嚟 108 行，多過 yachi 嘅 84 行，照樣頂住贏返<span class=\"badge\" data-claim=\"G026\"></span>。第七局 yachi 打出全晚合格局最高 APM，約 69.5<span class=\"badge\" data-claim=\"G015\"></span>，同全晚最長 B2B 鏈 9 段<span class=\"badge\" data-claim=\"G019\"></span>。"
+    },
+    "8": {
+      "title": "尾三局連贏，執返一場",
+      "flag": "y",
+      "body": "打足九局，yachi 最後連贏三局收工，5 比 4<span class=\"badge\" data-claim=\"C017\"></span>。生死局係佢執：VS 約 113.7 對 pinglamb 約 93.6<span class=\"badge\" data-claim=\"G063\"></span>。第八局係全晚最癲嘅一局，兩邊 VS 加埋約 313.7<span class=\"badge\" data-claim=\"G065\"></span>，亦係全晚合格局最高單局 VS 約 164.3 出嘅地方<span class=\"badge\" data-claim=\"G016\"></span>。"
+    },
+    "9": {
+      "title": "三比零開波，四連敗，再執返",
+      "flag": "y",
+      "body": "yachi 開波連贏三局，跟住連失四局，最後兩局又贏返，5 比 4<span class=\"badge\" data-claim=\"C018\"></span>。生死局兩邊都出足力，yachi VS 約 130.5、APM 約 56.9 對 pinglamb VS 約 111.7、APM 約 45.0<span class=\"badge\" data-claim=\"G064\"></span>。第四局係全晚最短嗰局，約 13 秒就散<span class=\"badge\" data-claim=\"G023\"></span>。"
+    }
+  }
+}

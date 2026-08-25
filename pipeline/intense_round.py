@@ -30,16 +30,19 @@ mechanism is real, this round is the illustration, and neither is the other". Wh
 still banned is a corpus figure the round appears to license, or the round's numbers
 generalised without one.
 
-The result: over 450 decided rounds in seven sessions, downstacking is the only printed
+The result: over 523 decided rounds in eight sessions, downstacking is the only printed
 measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
-combined VS runs 64.3 → 67.0 → 81.0 for the per-piece rate (Spearman rho +0.176 against
-intensity; raw 清走 +0.169). It survives both controls the closing note quotes: it is not
-round LENGTH (the same test against duration is rho +0.060, while APM's and 攻擊's apparent
-decay IS a length effect at rho −0.173 / −0.180 — which is why the attacking lede this
+combined VS runs 62.6 → 67.0 → 80.9 for the per-piece rate (Spearman rho +0.203 against
+intensity; raw 清走 +0.187). It survives both controls the closing note quotes: it is not
+round LENGTH (the same test against duration is rho +0.035, while APM's and 攻擊's apparent
+decay IS a length effect at rho −0.186 / −0.191 — which is why the attacking lede this
 section used to carry was not supported as stated), and it is not the loser dying with
 garbage still on the board (normalising by how much garbage ARRIVED strengthens it to
-rho +0.223, and 食 — which carries that same death bias but no skill — does not trend,
-rho +0.055). That death bias is real all the same, and the note keeps it.
+rho +0.211, and 食 — which carries that same death bias but no skill — does not trend,
+rho +0.089).
+
+Every figure in that paragraph is a string CORPUS holds, and `check_intense_corpus` compares
+them; do not edit one without re-rendering the block. That death bias is real all the same, and the note keeps it.
 
 **The monotone progression and its controls are the finding; p is supporting evidence.**
 The 450 rounds are nested in matches, in sessions and in two players, so every p here
@@ -134,21 +137,18 @@ if _missing:
 # (rho is a two-sided point estimate), `fmt_auc` likewise, and `fmt_p` CEILS, because a
 # p-value is an upper bound on a false-positive rate and the safe direction is up.
 CORPUS = {
-    "n": 450,
+    "n": 523,
     "m": 26,
     "tercile_test": "cleared_pp/intensity",
-    "terciles": ["64.3", "67.0", "81.0"],
+    "terciles": ["62.6", "67.0", "80.9"],
     "tests": {
-        # the finding
-        "cleared_pp/intensity": {"rho": "+0.176", "raw": "0.0002", "adj": "0.0045"},
-        "cleared/intensity": {"rho": "+0.169", "raw": "0.0004", "adj": "0.0085"},
-        # control 1 — length
-        "cleared_pp/duration": {"rho": "+0.060", "raw": "0.2064", "adj": "1.0000"},
-        "apm/duration": {"rho": "-0.173", "raw": "0.0003", "adj": "0.0059"},
-        "attack/duration": {"rho": "-0.180", "raw": "0.0002", "adj": "0.0031"},
-        # control 2 — the loser's death bias
-        "cleared_per_received/intensity": {"rho": "+0.223", "raw": "0.0001", "adj": "0.0001"},
-        "received/intensity": {"rho": "+0.055", "raw": "0.2412", "adj": "1.0000"},
+        "cleared_pp/intensity": {"rho": "+0.203", "raw": "0.0001", "adj": "0.0001"},
+        "cleared/intensity": {"rho": "+0.187", "raw": "0.0001", "adj": "0.0005"},
+        "cleared_pp/duration": {"rho": "+0.035", "raw": "0.4187", "adj": "1.0000"},
+        "apm/duration": {"rho": "-0.186", "raw": "0.0001", "adj": "0.0005"},
+        "attack/duration": {"rho": "-0.191", "raw": "0.0001", "adj": "0.0003"},
+        "cleared_per_received/intensity": {"rho": "+0.211", "raw": "0.0001", "adj": "0.0001"},
+        "received/intensity": {"rho": "+0.089", "raw": "0.0427", "adj": "1.0000"},
     },
 }
 

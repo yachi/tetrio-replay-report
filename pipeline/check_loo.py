@@ -403,6 +403,26 @@ PUBLISHED = (
     # If a later prose pass publishes either one, add its row here and a SENTENCES key with it.
     ("2026-08-19", "app_gap_won", "series"),
     ("2026-08-19", "app_gap_lost", "series"),
+    # 2026-08-25 lands in the series sentence too, and it takes NO `ANNOTATED` entry either.
+    # Measured over all five figures the session can carry, exactly as 08-19's are above:
+    #
+    #     app_gap_won      +4.9454 pp   m8r1   -> +6.2874   rel 0.271   1.48x the next of 73
+    #     app_gap_lost    +17.4771 pp   m8r8   -> +15.7720  rel 0.098   1.29x
+    #     app_gap_session +11.9087 pp   m6r7   -> +11.1063  rel 0.067   1.26x
+    #     attack_diff         -176 行   m9r6   -> -140      rel 0.205   1.03x
+    #     score_diff       -85057 分    m6r7   -> -73066    rel 0.141   1.15x
+    #
+    # Nothing crosses THRESHOLD and nothing flips sign; the highest is 0.271, within a
+    # hundredth of 08-19's 0.281 and likewise inside the (0.406, 0.969) interval the threshold
+    # was derived in. So two sessions running need no caveat, which is worth stating because
+    # 07-28 through 08-14 each carry one and four in a row reads as though it were universal.
+    #
+    # `attack_diff` is measured and NOT published, following 08-19: the shortfall table in
+    # CLAUDE.md quotes this session's -176 exactly as it quotes 08-19's -236, and that table
+    # has never been a `SENTENCES` target. The decision is recorded rather than left implicit —
+    # if a later pass makes the shortfall table a gated sentence, both rows go in together.
+    ("2026-08-25", "app_gap_won", "series"),
+    ("2026-08-25", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

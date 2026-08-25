@@ -42,13 +42,14 @@ const SESSIONS = [
   { dir: '2026-08-09', rounds: 100, strict: 82, equal: 18, faults: 1560, perfect: 8883, pieces: 9882 },
   { dir: '2026-08-14', rounds: 168, strict: 142, equal: 26, faults: 2530, perfect: 14096, pieces: 15707 },
   { dir: '2026-08-19', rounds: 140, strict: 120, equal: 20, faults: 2099, perfect: 10376, pieces: 11638 },
+  { dir: '2026-08-25', rounds: 146, strict: 132, equal: 14, faults: 2747, perfect: 14893, pieces: 16599 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 900, strict: 770, equal: 130, faults: 13964, perfect: 73359, pieces: 82131 };
+const CORPUS = { rounds: 1046, strict: 902, equal: 144, faults: 16711, perfect: 88252, pieces: 98730 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -83,7 +84,7 @@ function load(): Row[] {
 
 const rows = load();
 
-test('the corpus is the seven sessions, at the pinned player-round counts', () => {
+test('the corpus is the eight sessions, at the pinned player-round counts', () => {
   expect(rows.length).toBe(CORPUS.rounds);
   for (const s of SESSIONS)
     expect(rows.filter(r => r.session === s.dir).length).toBe(s.rounds);
@@ -104,7 +105,7 @@ test('combo <= perfect — the longest run of perfect placements is a run OF the
   expect(bad).toEqual([]);
 });
 
-test('perfect + faults exceeds pieces in 770 of 900, equals it in 130, and never falls short', () => {
+test('perfect + faults exceeds pieces in 902 of 1046, equals it in 144, and never falls short', () => {
   const strict = rows.filter(r => r.perfect + r.faults > r.pieces).length;
   const equal = rows.filter(r => r.perfect + r.faults === r.pieces).length;
   const below = rows.filter(r => r.perfect + r.faults < r.pieces).length;
@@ -149,10 +150,10 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 16 rounds, all seven sessions pooled (10 -> 16 when
-  // 2026-08-19 joined, contributing 6 of its own).
+  // longest perfect run is the whole round. 18 rounds, all eight sessions pooled (16 -> 18 when
+  // 2026-08-25 joined, contributing 2 of its own).
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(16);
+  expect(clean.length).toBe(18);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -167,13 +168,13 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
-  // Seven-session figures (2026-08-19 added): 16.83 -> 17.00, 10.65 -> 10.68, 89.35 -> 89.32,
-  // 15.85 -> 15.99, 1.58 -> 1.592 — none of the four crosses another's old value.
-  expect(pct(faults / pieces)).toBe(17.00);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.68);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.32);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(15.99);   // on no meaningful denominator
+  // Eight-session figures (2026-08-25 added): 17.00 -> 16.93, 10.68 -> 10.61, 89.32 -> 89.39,
+  // 15.99 -> 15.92, 1.592 -> 1.595 — none of the four crosses another's old value.
+  expect(pct(faults / pieces)).toBe(16.93);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.61);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.39);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(15.92);   // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.592);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.595);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });

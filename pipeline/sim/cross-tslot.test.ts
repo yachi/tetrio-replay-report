@@ -58,7 +58,7 @@ test('the coordinate conversion, which is the easiest thing in the port to get w
 const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
 const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
-      ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19'])
+      ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -110,5 +110,7 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // again as large. That is the claim this file exists to make, now made over six sessions.
   // 2026-08-19: 61656 -> 72341, purely from adding 2026-08-19 to SESSIONS above — same story,
   // `unexplained` is still EMPTY over the extra 10685 boards.
-  expect(both + oursOnly + ccOnly + neither).toBe(72341);
+  // 2026-08-25: 72341 -> 86903, the largest single addition the file has taken (14562 boards),
+  // and `unexplained` is still EMPTY over all of them.
+  expect(both + oursOnly + ccOnly + neither).toBe(86903);
 });

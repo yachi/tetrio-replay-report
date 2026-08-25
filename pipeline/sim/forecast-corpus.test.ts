@@ -135,6 +135,7 @@ const PINNED_TOTALS: Record<string, Totals> = {
   // and was the corpus's only entry in that bucket.
   '2026-08-14': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 1, self_built: 403, reactive: 462, unattributed: 0 },
   '2026-08-19': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 2, self_built: 344, reactive: 370, unattributed: 0 },
+  '2026-08-25': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 0, self_built: 387, reactive: 474, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -149,6 +150,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-08-09': { 'pre-existed': 449, 'arrived-later': 55, undetermined: 42 },
   '2026-08-14': { 'pre-existed': 714, 'arrived-later': 84, undetermined: 69 },
   '2026-08-19': { 'pre-existed': 583, 'arrived-later': 77, undetermined: 59 },
+  '2026-08-25': { 'pre-existed': 718, 'arrived-later': 64, undetermined: 82 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -156,7 +158,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
 // that matters) is 0 in every session: no such T-spin is ever counted as a forecast.
 const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
-  '2026-08-19': 80,
+  '2026-08-19': 80, '2026-08-25': 102,
 };
 
 const PINNED_FORECASTS: Record<string, string[]> = {
@@ -176,6 +178,10 @@ const PINNED_FORECASTS: Record<string, string[]> = {
   // rejected at clause 4; the third mechanism event (lock 43) is rejected earlier at clause 2
   // (floor undetermined).
   '2026-08-19': [],
+  // 1 verified forecast, the first since 08-09 — 08-14 and 08-19 both had none. The other two
+  // mechanism events below are rejected: lock 211 at clause 2 (floor undetermined), lock 14 at
+  // clause 4.
+  '2026-08-25': ['yachi replay-2026-08-25-06.ttrm r3 lock 41 forecast_lineclear roof 37 0->2'],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -198,6 +204,11 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
     'yachi replay-2026-08-19-1.ttrm r5 lock 35 forecast_lineclear floor pre-existed from 20 roof 26',
     'yachi replay-2026-08-19-10.ttrm r3 lock 43 forecast_lineclear floor undetermined from -1 roof 35',
     'yachi replay-2026-08-19-7.ttrm r5 lock 38 forecast_lineclear floor pre-existed from 14 roof 25',
+  ],
+  '2026-08-25': [
+    'yachi replay-2026-08-25-05.ttrm r2 lock 211 forecast_lineclear floor undetermined from -1 roof 204',
+    'yachi replay-2026-08-25-06.ttrm r3 lock 41 forecast_lineclear floor pre-existed from -1 roof 37',
+    'yachi replay-2026-08-25-09.ttrm r2 lock 14 forecast_lineclear floor pre-existed from 2 roof 12',
   ],
 };
 

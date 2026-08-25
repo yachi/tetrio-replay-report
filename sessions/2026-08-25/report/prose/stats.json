@@ -1,0 +1,44 @@
+{
+  "eyebrow": "數據對決 · 逐格拆解",
+  "title": "數據對決",
+  "lede": "兩個人嘅分工照舊：逐局 PPS，yachi 平均約 1.46 高過 pinglamb 嘅約 1.36<span class=\"badge\" data-claim=\"G040\"></span>；逐局 APM 就掉轉，pinglamb 約 54.4 高過 yachi 嘅約 49.8<span class=\"badge\" data-claim=\"G041\"></span>，而每粒方塊打出嘅攻擊（APP）全 session 都係 pinglamb 高<span class=\"badge\" data-claim=\"G042\"></span>。今晚埋單一樣買唔返——yachi 多疊咗 645 粒方塊，打出嘅攻擊反而少 176 條<span class=\"badge\" data-claim=\"C005\"></span>，但唔好讀成「落多啲方塊冇用」：645 粒盈餘最多填得返 8 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，而個 gap 係 11% 幾<span class=\"badge\" data-claim=\"C004\"></span>。真正嘅重點喺輸贏拆開之後嗰兩行：贏嗰啲局兩個人爭 4% 幾，輸嗰啲局就爭到 17% 幾<span class=\"badge\" data-claim=\"C002\"></span>。以下數字全部由 facts.json 直接算出，冇眼㷫。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢（73局全紀錄）",
+      "caps": [
+        "每個細格係一場波，X 軸係場入面第幾局，Y 軸係 vs score。VS 呢一項喺今晚 73 局入面，每一局都係贏嗰個高過輸嗰個——冇一局例外<span class=\"badge\" data-claim=\"G025\"></span>，八晚都係一樣。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "兩個人嘅開行方式分得好開：quad 係 yachi 開多好多（456 對 333）<span class=\"badge\" data-claim=\"G035\"></span>，但 T-spin 兩格都係 pinglamb 贏——T-spin double 416 對 298<span class=\"badge\" data-claim=\"G036\"></span>、T-spin triple 74 對 46<span class=\"badge\" data-claim=\"G037\"></span>。同樣清行，T-spin 用嘅方塊少好多，呢兩格就係佢每粒方塊打得重過 yachi 嘅主要來源<span class=\"badge\" data-claim=\"G042\"></span>。劈到 12 行以上嘅局，佢有 24 局、yachi 得 12 局<span class=\"badge\" data-claim=\"G056\"></span>，單一次 spike 嘅個人上限亦係 19 對 17<span class=\"badge\" data-claim=\"G053\"></span>。"
+      ],
+      "footnote": "呢個圖表嘅 TSD 同 TST 兩條 bar 加埋，先啱「計埋 T-spin double 同 triple」嗰條數（pinglamb 490、yachi 344）<span class=\"badge\" data-claim=\"G057\"></span>——TSS（T-spin single）冇計落嗰個總數度。另外要留意，facts.json 入面嗰個 <code>tspins</code> 原始計數（pinglamb 563、yachi 429）<span class=\"badge\" data-claim=\"G034\"></span>係連冇消到行嘅轉都計埋，所以一定大過上面兩條 bar 加埋，兩者唔可以溝亂。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。手上功夫呢格今晚係全 session 最平嘅一欄：每粒方塊要按幾多下（KPP）yachi 3.581、pinglamb 3.621，yachi 按少約 1%<span class=\"badge\" data-claim=\"C008\"></span><span class=\"badge\" data-claim=\"G066\"></span>；而喺 yachi 自己身上，KPP 喺贏局同輸局之間郁唔夠 0.04<span class=\"badge\" data-claim=\"G073\"></span>，即係呢一格同輸贏講唔上關係。Finesse 就係 yachi 蝕嗰格：失誤總數 1400 對 1347<span class=\"badge\" data-claim=\"G032\"></span>，每粒方塊嘅 finesse 失誤反而係 pinglamb 多<span class=\"badge\" data-claim=\"G043\"></span>——因為 yachi 落多咗方塊，兩個數方向可以唔同；perfect piece 嘅比率就 pinglamb 較好<span class=\"badge\" data-claim=\"G044\"></span>。",
+        "守嗰邊係 yachi 佔優：全 session 清走嘅垃圾總數 1854 對 1707<span class=\"badge\" data-claim=\"G031\"></span>，每粒方塊清走幾多垃圾（DS）一樣係 yachi 高<span class=\"badge\" data-claim=\"G077\"></span>。兩個人贏嗰啲局都係 DS 高過自己輸嗰啲局——yachi 約 0.24 對約 0.19<span class=\"badge\" data-claim=\"G074\"></span>、pinglamb 約 0.22 對約 0.20<span class=\"badge\" data-claim=\"G075\"></span>，即係守得住先贏得到。至於穩定度就兩格都係 pinglamb：逐局 PPS<span class=\"badge\" data-claim=\"G045\"></span>同逐局 APM<span class=\"badge\" data-claim=\"G046\"></span>都係佢平穩啲。"
+      ],
+      "footnote": "「每粒 finesse 失誤」呢一行係<strong>每粒方塊嘅失誤次數</strong>，唔係「有幾多成方塊出過錯」——一粒方塊可以計到多過一次失誤，兩個數唔同，唔好當成同一件事。",
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}
