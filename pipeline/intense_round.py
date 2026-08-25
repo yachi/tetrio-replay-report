@@ -138,6 +138,7 @@ if _missing:
 # p-value is an upper bound on a false-positive rate and the safe direction is up.
 CORPUS = {
     "n": 523,
+    "sessions": 8,
     "m": 26,
     "tercile_test": "cleared_pp/intensity",
     "terciles": ["62.6", "67.0", "80.9"],
@@ -396,7 +397,7 @@ def build(facts, report_dir):
            '短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。'
            '點解要專登揀最癲嗰局出嚟拆：'
            '<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。'
-           f'呢句唔係由下面呢一局睇出嚟嘅——係喺七個 session、{CORPUS["n"]} 局有勝負嘅局'
+           f'呢句唔係由下面呢一局睇出嚟嘅——係喺 {CORPUS["sessions"]} 個 session、{CORPUS["n"]} 局有勝負嘅局'
            f'度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，'
            f'每粒棋清走呢個速率分辨到邊個贏嘅準確度，'
            f'由 {CORPUS["terciles"][0]}% 升到 {CORPUS["terciles"][1]}% '
