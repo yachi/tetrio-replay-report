@@ -602,7 +602,7 @@ lemma G085_m1r7_pinglamb_vs_splits_into_attack_130_1_downstack_36_3_residual_und
 }
 
 // C001 [?] pinglamb won matches 1, 2, 4, 5 and 6 and yachi won match 3, five matches to one
-// 六場 match 入面 yachi 淨係贏到第三場，其餘五場全部俾 pinglamb 攞走，5 比 1 收——但頭兩場都係打到最後一局先分勝負
+// 六場 match 入面 yachi 淨係贏到第三場，其餘五場全部俾 pinglamb 攞走，5 比 1 收
 lemma C001_pinglamb_won_matches_1_2_4_5_and_6_and_yachi_won_match_3_five_matches()
   ensures (((m0_winner == "pinglamb") && ((m1_winner == "pinglamb") && (m2_winner == "yachi"))) && ((m3_winner == "pinglamb") && ((m4_winner == "pinglamb") && (m5_winner == "pinglamb"))))
 {
@@ -706,9 +706,9 @@ lemma C016_match_4_yachi_took_only_the_middle_round_and_the_second_last_2_5()
 {
 }
 
-// C017 [?] match 5: yachi won the opening round and lost four of the last five, 2-5
-// 第五場 yachi 開波贏頭局，之後五局連失四局收波，2 比 5
-lemma C017_match_5_yachi_won_the_opening_round_and_lost_four_of_the_last_five_2_5()
+// C017 [?] match 5: yachi won the opening round and the third, then lost the last four, 2-5
+// 第五場 yachi 開波贏頭局，第三局再贏返一局，之後四局全失，2 比 5
+lemma C017_match_5_yachi_won_the_opening_round_and_the_third_then_lost_the_last_f()
   ensures (((m4_r0_winner == "yachi") && ((m4_r1_winner == "pinglamb") && (m4_r2_winner == "yachi"))) && (((m4_r3_winner == "pinglamb") && (m4_r4_winner == "pinglamb")) && ((m4_r5_winner == "pinglamb") && (m4_r6_winner == "pinglamb"))))
 {
 }

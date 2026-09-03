@@ -4692,7 +4692,7 @@
 (pop 1)
 
 ; C001 [?] pinglamb won matches 1, 2, 4, 5 and 6 and yachi won match 3, five matches to one
-; 六場 match 入面 yachi 淨係贏到第三場，其餘五場全部俾 pinglamb 攞走，5 比 1 收——但頭兩場都係打到最後一局先分勝負
+; 六場 match 入面 yachi 淨係贏到第三場，其餘五場全部俾 pinglamb 攞走，5 比 1 收
 (push 1)
 (echo "C001")
 (assert (not (and (= m0_winner 2) (= m1_winner 2) (= m2_winner 1) (= m3_winner 2) (= m4_winner 2) (= m5_winner 2))))
@@ -4811,8 +4811,8 @@
 (check-sat)
 (pop 1)
 
-; C017 [?] match 5: yachi won the opening round and lost four of the last five, 2-5
-; 第五場 yachi 開波贏頭局，之後五局連失四局收波，2 比 5
+; C017 [?] match 5: yachi won the opening round and the third, then lost the last four, 2-5
+; 第五場 yachi 開波贏頭局，第三局再贏返一局，之後四局全失，2 比 5
 (push 1)
 (echo "C017")
 (assert (not (and (= m4_r0_winner 1) (= m4_r1_winner 2) (= m4_r2_winner 1) (= m4_r3_winner 2) (= m4_r4_winner 2) (= m4_r5_winner 2) (= m4_r6_winner 2))))
