@@ -423,12 +423,27 @@ PUBLISHED = (
     # if a later pass makes the shortfall table a gated sentence, both rows go in together.
     ("2026-08-25", "app_gap_won", "series"),
     ("2026-08-25", "app_gap_lost", "series"),
+    ("2026-09-03", "app_gap_won", "series"),
+    ("2026-09-03", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-09-03", "app_gap_won"): (
+        "the won-regime gap is 7.6621 pp and m3r6 alone is 4.7659 of it. `rel` 0.622 is only the "
+        "sixth-largest in the corpus — but 2.57x the next round's shift IS the corpus maximum on "
+        "the x2nd column (runner-up 1.72), so this is the most CONCENTRATED dependence rather "
+        "than the most fragile figure; the five above it are mostly near-zero values, which this "
+        "file's header already names as the fragile kind. m3r6 is "
+        "the session's longest round (~210 s) and its highest line count (198), so it carries "
+        "far more pooled pieces than any other; a pooled ratio over 46 rounds is exposed to "
+        "exactly that. Without it the won gap is +2.90% against a lost gap of +3.88%, i.e. the "
+        "「ceilings apart, floors close」 reading is that one round's and the session is level "
+        "in both regimes. 「兩邊都爭得唔多」 survives; 「天花板爭得多過地板」 does not. Note "
+        "the lost gap is fragile too at rel 0.485 — under THRESHOLD, so unannotated, but the "
+        "level reading is the robust one from both sides."),
     ("2026-08-01", "score_diff"): (
         "the two in-game score totals are 0.05% apart, so their difference is -576 against "
         "totals near 1.09 million; m6r5 alone is +12056 and flips the sign. The convergence "

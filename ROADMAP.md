@@ -176,12 +176,13 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-08-14 | 16/19 testable = **84%** | 13/19 = **68%** | 13/19 = **68%** | 1 |
 | 2026-08-19 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
 | 2026-08-25 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
+| 2026-09-03 | 13/16 testable = **81%** | 11/16 = **69%** | 11/16 = **69%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->five of the eight<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->six of the nine<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -190,8 +191,8 @@ than a threshold: no honest floor exists when one hand claim is worth 10.0 point
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->seven of the eight<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->eight of the eight<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eight of the nine<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->nine of the nine<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3839,3 +3840,84 @@ CLAUDE.md「manual-only gate fails silently」嗰一類,不過換咗個樣:唔�
 
 第 2 個聽落弱啲,但其實係啱嘅分工:byte-identity 想守嘅係「份 artefact 同個 script 一致」,
 唔係「你部機部 jsonlite 同我嗰部一樣」。
+
+## 第九個 session：一個寫低咗先落地嘅 prediction，miss 咗 (2026-09-03)
+
+2026-09-03 落地(6 場、46 局、pinglamb 5:1)。**呢個 session 值得寫低嘅唔係佢自己嘅數，係佢
+證偽咗一個之前寫死咗嘅 corpus claim** —— 而個 claim 之所以證偽得到，正正因為佢當初係寫成
+一個 out-of-sample prediction，唔係一個 fit。
+
+### 1. 個 shortfall ordering 唔再係 perfect
+
+CLAUDE.md 之前寫:「Subtract it from the session's APP gap and the remainder — the shortfall —
+rank-orders the attack difference **perfectly** across all eight sessions」，仲寫明「the eighth
+arriving in its slot is the first evidence that the ordering is a property of the data」。
+
+09-03 個 shortfall 係 4.79 pp，夾喺 08-14 嘅 4.61(−206 行)同 08-19 嘅 6.89(−236 行)之間，
+所以個 ordering 預測佢個 attack difference 要落喺 −206 同 −236 之間。實際量到:**−120** ——
+喺個 band 之外，落咗喺 shortfall 大約 3 應該去嘅位。九個點入面排錯兩格。
+
+- Spearman ρ 由 1.000(八個 session)跌到 **0.950**(九個)，exact permutation p = 0.0002。
+- **即係話個關係企得住，「perfect」呢個字企唔住。** 條路照樣有用，shortfall 照樣預測得好過
+  surplus 自己，但「rank-orders perfectly」係八個點嘅性質，唔係啲數嘅性質。
+- **唔好用 re-fit 嚟修佢。** 佢係一個 rank-ordering，唔係一條 curve，冇 coefficient 讀。
+
+呢個係呢個 repo 第一次有一個**寫低咗、跟住先有新數據嚟考**嘅 corpus claim 真係俾人考到。
+值得記住嘅係當初點解寫得成:因為嗰段特登寫明咗「08-25 is the first point added since the
+ordering was written, so it is a prediction rather than a fit」—— 有咗嗰句，第九個點先至有嘢
+可以 miss。冇嗰句嘅話，今次就會變成靜靜咁加多一格入個 table。
+
+### 2. 個 pooled AUC table 嘅 p 值，唔係佢自己講嗰個 test 出嘅
+
+個 table 有一句係特登加落去嘅:「**The test is the two-sided exact binomial sign test over
+decided pairs** — named here because the previous revision of this table published p's that
+nothing in the repo could re-derive」。
+
+重新量嗰陣發現:**啲 AUC 逐個 session 完全對得返(九個 session、十六條 column，一個唔差)，
+但啲 p 值對唔返嗰個 test。** 八個 session 嘅數據之下:
+
+| | published | 個 test 實際出 |
+|---|---|---|
+| COMBO | 0.000316 | 0.00037 |
+| TST | 0.000208 | 0.00025 |
+| KPP | 0.0097 | 0.011 |
+| PC | 0.473 | 0.54 |
+
+四個都係 published 細過實際，即係方向一致，唔似打錯字。用 `binom.test`(R)同一個獨立嘅 exact
+implementation 對過，兩邊逐個位一樣。冇一個 verdict 郁過，冇一個 AUC 郁過 —— 但**「呢個數係
+邊個 test 出嘅」呢一行，要對得住旁邊嗰個數**，唔係就同佢想修嗰個問題一模一樣。九個 session
+嘅版本兩欄一齊重新量過。
+
+**呢個係 CLAUDE.md 講嘅 冇第二份 class 最尷尬嗰個變種:唔係冇人講個 test 係乜，係講咗，
+但講嘅同做嘅唔同。** 一句「我用嘅係 X test」讀落好似一個 gate，其實佢係一句 prose，同一份
+prose 一樣冇嘢守住。
+
+### 3. 三個「從來冇發生過」變咗「未發生過」
+
+- **TKI-3**:「yachi 係唯一一個會開 TKI-3 嘅人(pinglamb 每個 session 都係 0)」—— 八個 session
+  之後，09-03 有 pinglamb 一塊板 exact match 到 TKI-3，而且 outcome column 對得返
+  (`matched_and_delivered` 1/1)。**個 ordinal claim(yachi 開得多過 pinglamb)九個 session 都企得住
+  (10 對 1)**，跌嘅係入面嗰個 absolute。跟 `DT_ORDER_IN_OPENER` 嘅做法，用
+  `TKI3_OFF_REPERTOIRE` 一個 named list 收起佢，唔用 `<= 1` bound。
+- **STMB cave 第五個 in-opener exception**:08-25 嗰個坐喺 prefix boundary 上面(lock 18 / verified
+  to 18)，當時寫低咗「if a fifth exception also lands at its boundary, the two facts together are
+  a reason to suspect the edge」。09-03 呢個都係 lock 18，但 verified to **45** —— 即係
+  **答咗嗰條題，答案係唔使懷疑條邊**。08-25 嗰個維持一個孤例。呢個係「寫低個 follow-up 條件」
+  真係派到用場嘅一次。
+- **個 cave claim 本身冇跌**:五個 exception 全部 `minDepth` 1，全 corpus 仍然得一個真 cave，
+  而佢唔喺 opener 入面。
+
+### 4. 全 corpus 逐局計最脆嗰個數
+
+09-03 個 won-gap(+7.66%)嘅 `check_loo` rel 係 **0.622**，係第二大嗰局嘅 **2.57 倍** ——
+兩樣都係 corpus 之最。m3r6 係嗰晚最長(約 210 秒)兼清行最多(198 行)嗰局，所以佢一局嘅
+pooled 粒數重過任何一局；46 局係九個 session 入面最少，兩樣夾埋就係咁。抽走佢之後
+won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly level」嗰組，唔係
+08-14 嗰種 mirror。已經入咗 `ANNOTATED`。
+
+### 未做嘅
+
+個 pooled AUC table 仍然係 冇第二份 —— 今次係人手量、人手核(兩個 implementation 夾過)，
+但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
+test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
+renderer + gate，唔係再寫多一句。

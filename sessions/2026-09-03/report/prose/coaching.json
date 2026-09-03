@@ -1,0 +1,32 @@
+{
+  "eyebrow": "教練分析 · 落地建議",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚個比數 5 比 1<span class=\"badge\" data-claim=\"G001\"></span>，但拆開嚟睇係兩晚：頭三場 13 比 12，尾三場 6 比 15<span class=\"badge\" data-claim=\"C010\"></span>。所以建議唔應該係「點樣打贏 pinglamb」，而係「點樣唔好喺第三場之後散」。而斷開嗰欄唔喺攻擊——攻擊效率兩橛差唔多<span class=\"badge\" data-claim=\"C011\"></span>，掉轉頭嗰欄係清垃圾<span class=\"badge\" data-claim=\"C012\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 volume 流 · VOLUME",
+      "profile": [
+        "落得快、劈得大：每局平均 PPS 約 1.43<span class=\"badge\" data-claim=\"G037\"></span>，單一次 spike 上限 16 行對 12 行<span class=\"badge\" data-claim=\"G049\"></span>，劈到 12 行以上嘅局 11 局對 7 局<span class=\"badge\" data-claim=\"G052\"></span>，Quad 203 個對 167 個<span class=\"badge\" data-claim=\"G032\"></span>。手上功夫亦係企得住嘅：perfect piece 比率高過對手<span class=\"badge\" data-claim=\"G041\"></span>，KPP 同對手爭唔到 0.3%<span class=\"badge\" data-claim=\"C008\"></span>。",
+        "但每粒方塊嘅攻擊全 session 都輸蝕<span class=\"badge\" data-claim=\"G039\"></span>，而多疊嘅 207 粒方塊填唔滿個窿：最多填得返 4 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>，個 gap 係 9% 幾<span class=\"badge\" data-claim=\"C004\"></span>。連續第五晚係咁。"
+      ],
+      "recs": [
+        "<strong>唔好再加粒數。</strong>連續五晚多落方塊都買唔返個 gap<span class=\"badge\" data-claim=\"C005\"></span>，而今晚可以計到條數點解：盈餘只值 4 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>。條路本身冇壞，係俾佢填嘅窿大過佢填得起——所以要郁嘅係窿，唔係粒數。",
+        "<strong>攞多幾個 T-spin。</strong>今晚 T-spin double 185 對 224、triple 28 對 43<span class=\"badge\" data-claim=\"G033\"></span><span class=\"badge\" data-claim=\"G034\"></span>，而 Quad 反而係你多<span class=\"badge\" data-claim=\"G032\"></span>。同樣清行，T-spin 用少好多方塊，呢兩格就係對手每粒打得重嘅來源<span class=\"badge\" data-claim=\"G039\"></span>。劈得大（spike 上限 16 對 12<span class=\"badge\" data-claim=\"G049\"></span>）唔等於打得重，今晚兩格啱啱相反。",
+        "<strong>後半晚守嗰邊要頂得返。</strong>頭三場你每粒方塊清走嘅垃圾仲高過對手，尾三場俾佢高過你去到 115% 幾<span class=\"badge\" data-claim=\"C012\"></span>——而同一段時間攻擊效率幾乎冇郁<span class=\"badge\" data-claim=\"C011\"></span>。要留意呢個係觀察，唔係已證嘅因果；但落手練嘅話，呢一欄係全晚唯一喺分水嶺度轉咗正負嗰欄。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "T-spin 效率流 · EFFICIENCY",
+      "profile": [
+        "每粒方塊打得重：APP 全 session 高過對手<span class=\"badge\" data-claim=\"G039\"></span>，T-spin double 224 對 185<span class=\"badge\" data-claim=\"G033\"></span>、triple 43 對 28<span class=\"badge\" data-claim=\"G034\"></span>，T-spin 總數 302 對 249<span class=\"badge\" data-claim=\"G031\"></span>。穩定度兩格都係你：逐局 PPS<span class=\"badge\" data-claim=\"G042\"></span>同逐局 APM<span class=\"badge\" data-claim=\"G043\"></span>都平穩過對手。",
+        "自己贏局同輸局爭 23% 幾<span class=\"badge\" data-claim=\"C003\"></span>——今晚分得開啲嗰個係你，之前兩晚係對手。兩場生死局都係你執<span class=\"badge\" data-claim=\"G010\"></span>。"
+      ],
+      "recs": [
+        "<strong>守嗰邊係今晚贏波嗰格，值得記住點樣返到嚟。</strong>頭三場你每粒方塊清走嘅垃圾仲低過對手（得佢 94% 幾），尾三場去到 115% 幾<span class=\"badge\" data-claim=\"C012\"></span>，而同一段攻擊效率只係由 8% 幾行到 10% 幾<span class=\"badge\" data-claim=\"C011\"></span>。贏嘅局 DS 高過輸嘅局<span class=\"badge\" data-claim=\"G070\"></span>，方向一致。",
+        "<strong>劈嗰邊仲有位。</strong>單一次 spike 上限 12 行對 16 行<span class=\"badge\" data-claim=\"G049\"></span>，劈到 12 行以上嘅局 7 局對 11 局<span class=\"badge\" data-claim=\"G052\"></span>——兩格都輸蝕。你贏喺持續輸出唔係一波過，但生死局要一次過收工嗰陣，呢格會係差別。",
+        "<strong>頭三場係真係打成平手，唔好當成慢熱。</strong>頭三場局數 12 比 13 落後<span class=\"badge\" data-claim=\"C010\"></span>，兩場生死局都係最後一局先分勝負<span class=\"badge\" data-claim=\"G010\"></span>，其中第一場個 VS 差距得約 122.1 對約 112.9<span class=\"badge\" data-claim=\"G057\"></span>。呢兩場執唔到嘅話，今晚個比數會完全唔同。"
+      ]
+    }
+  },
+  "versus_note": "兩個人今晚做緊嘅功夫幾乎一樣——KPP 爭唔到 0.3%<span class=\"badge\" data-claim=\"C008\"></span>，finesse 兩格幾乎撞埋<span class=\"badge\" data-claim=\"G029\"></span>，連死法都貼（3 比 4<span class=\"badge\" data-claim=\"C006\"></span>，差一局）。分別由頭到尾都喺每粒方塊買到啲乜<span class=\"badge\" data-claim=\"C004\"></span>。而今晚多咗一件之前八晚未見過嘅嘢：呢個差距<strong>唔係</strong>解釋到後半晚點解散——攻擊效率兩橛差唔多<span class=\"badge\" data-claim=\"C011\"></span>，局數就由 13 比 12 變 6 比 15<span class=\"badge\" data-claim=\"C010\"></span>。要搵解釋，要去清垃圾嗰欄搵<span class=\"badge\" data-claim=\"C012\"></span>；而一晚就係一個觀察，下次要再度過。"
+}

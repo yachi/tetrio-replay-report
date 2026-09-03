@@ -451,10 +451,17 @@ def _selftest(root):
     #    The documents are re-rendered from the mutant, so ONLY the derivation half can catch
     #    it. That is the point: a gate comparing documents to literals alone would call a
     #    wholesale re-typing perfectly consistent.
+    #    THE LITERALS ARE PICKED AGAINST THE CURRENT CORPUS, and the assert below is what says
+    #    so out loud. A mutant value is only a mutant while it differs from the true one, and a
+    #    corpus figure that drifts ONTO its own mutant turns that row into a no-op that would
+    #    otherwise pass silently — the 冇第二份 shape, arriving through a test fixture. It has
+    #    happened once: 2026-09-03 moved cleared_pp/intensity to +0.177 and cleared/intensity to
+    #    +0.170, which were exactly these two literals, and the assert failed the build. Re-pick
+    #    a collided row one digit off the NEW value; never delete the assert.
     for key, field, value, what in (
-            ("cleared_pp/intensity", "rho", "+0.177", "the headline rho, one digit up"),
+            ("cleared_pp/intensity", "rho", "+0.178", "the headline rho, one digit up"),
             ("cleared_pp/duration", "rho", "+0.059", "the length control's rho, one digit down"),
-            ("cleared/intensity", "rho", "+0.170", "the docstring-only rho, one digit up"),
+            ("cleared/intensity", "rho", "+0.171", "the docstring-only rho, one digit up"),
             ("received/intensity", "raw", "0.2413", "a raw p, one digit up"),
             ("attack/duration", "adj", "0.0030", "an adjusted p, one digit down"),
             ("terciles", 2, "81.1", "the top tercile, one digit up"),

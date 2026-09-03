@@ -45,11 +45,11 @@
  * engine it never calls (the `bfs-cap.ts` lesson), so the replica is gone and only the two
  * counterfactuals remain, both of which mutants do kill.
  *
- * The 13 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
+ * The 17 candidates decompose, and the middle row is the one an earlier draft of this file got wrong
  * by folding it into "formed":
  *
- *   7  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot
- *   2  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`
+ *  10  formed          the engine says `line-clear` — a cleared row IS strictly inside the slot
+ *   3  overdetermined  the PIECE alone also sufficed (Bpre >= target) -> engine says `placement`
  *   4  ACCESS          neither — the clear only removed the lid       -> engine says `access`
  *
  * Overdetermined is not a defect: when the placement on its own reaches the target, crediting it is
@@ -67,6 +67,12 @@
  * (2/9 -> 4/13), so a seventh session did not expose a detector that had been mis-firing — the
  * class simply keeps arriving. Both new members were verified by re-deriving the counterfactuals
  * and their controls, not by trusting the engine; the working is beside them in `ACCESS_CLASS`.
+ *
+ * THEY HAVE NOT MOVED SINCE. 2026-08-25 added 2 candidates (both `formed`) and 2026-09-03 added 2
+ * more (1 `formed`, 1 `overdetermined`); the class stayed at four across both, so its share fell
+ * 4/13 -> 4/15 -> 4/17 by denominator alone. Read that as what it is — two sessions with no new
+ * member — and NOT as "the class has stopped arriving": four events over nine sessions is too few
+ * to carry a rate, which is the same reason the 08-19 pair was recorded with no mechanism proposed.
  *
  * WHAT THIS FILE DOES NOT COVER: whether `localiseMechanism`'s inside test should be strict or
  * inclusive. No cleared row in this corpus sits on a slot boundary, so the corpus cannot answer it;
@@ -95,6 +101,13 @@
  * remaining fifteen — the counterfactual branches and the engine-branch mutants — were not re-run;
  * they exercise code this change did not touch, and saying so is cheaper than implying coverage
  * that was not measured.
+ *
+ * NOT RE-MEASURED 2026-08-25 or 2026-09-03, and that is a statement rather than an omission.
+ * ACCESS_CLASS held the same four entries through both — the candidates grew 13 -> 15 -> 17 and the
+ * class did not — so the SET the five re-run mutants were measured against is intact, and the
+ * scoping paragraph above still says exactly what it said. A count is void when its pinned set
+ * moves; this one has not moved in two sessions. The fifteen that were never re-run are still
+ * never re-run, and no session since has changed that either way.
  *
  * Killed (16): both ACCESS_CLASS entries removed, reclassified and drifted separately (6), the list
  * padded with an invented third (1), and every counterfactual branch — clearAlone disabled,
@@ -330,7 +343,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the 15 candidates decompose 9 formed / 2 overdetermined / 4 access, and nothing else', () => {
+test('the 17 candidates decompose 10 formed / 3 overdetermined / 4 access, and nothing else', () => {
   // The numbers that make this a finding rather than a curiosity. 13 records corpus-wide are ones
   // the clear ALONE explains; 7 the model credits to the clear because a cleared row lies strictly
   // inside the slot, 2 more are overdetermined (the placement alone also sufficed, so `placement` is
@@ -357,9 +370,17 @@ test('the 15 candidates decompose 9 formed / 2 overdetermined / 4 access, and no
   // pinned set did not move, so nothing measured against it is void (see CLAUDE.md's rule — a
   // count measured against a pinned SET is void the moment that set changes; this one did not).
   // The access share falls 4/13 -> 4/15 purely by the denominator growing.
-  expect(result.clearAlone).toBe(15);
-  expect(result.formed).toBe(9);
-  expect(result.overdetermined).toBe(2);
+  //
+  // 2026-09-03 adds 2 more, splitting 1 `formed` and 1 `overdetermined` — clearAlone 15 -> 17,
+  // formed 9 -> 10, overdetermined 2 -> 3. `pieceBlocked` and the ACCESS CLASS are both unchanged
+  // again, so for the second session running the pinned set did not move and the header's mutation
+  // score stays a statement about the file that exists. The access share falls 4/15 -> 4/17, once
+  // more purely by the denominator growing: this is the third consecutive session to add
+  // candidates without adding a member, which is what "the class keeps arriving at roughly the rate
+  // it always has" now rests on — it has NOT arrived in the last two.
+  expect(result.clearAlone).toBe(17);
+  expect(result.formed).toBe(10);
+  expect(result.overdetermined).toBe(3);
   expect(result.formed + result.overdetermined + result.pieceBlocked + result.access.length)
     .toBe(result.clearAlone);
   // Not seen in this corpus, and it must not start silently: the clear suffices, then the piece
@@ -373,7 +394,7 @@ test('the replica can disagree with the engine, and does not', () => {
   // two shows up here rather than silently changing which events land in ACCESS_CLASS. This is the
   // check `bfs-cap.ts` did not have when it printed the same 688 before and after a real change.
   expect(result.disagreements).toEqual([]);
-  // and the check must have actually run — over the 15 candidates, not over an empty set
+  // and the check must have actually run — over the 17 candidates, not over an empty set
   expect(result.clearAlone).toBeGreaterThan(0);
 });
 
@@ -386,6 +407,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(8);
-  expect(result.localised).toBe(2528);
+  expect(SESSIONS.length).toBe(9);
+  expect(result.localised).toBe(2748);
 });
