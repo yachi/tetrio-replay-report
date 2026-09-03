@@ -607,7 +607,8 @@ comparison across them would go wrong silently.) The per-session won-gap runs +5
 +7.9 · **+1.8**, the lost-gap +12.8 · +7.3 · +6.0 · +6.1 · **+25.4**。九個 session 嘅全套系列喺
 下面；其中 09-03 個 won-gap 一樣得一局撐住
 （留一局：抽走 m3r6，數字變 +2.89%，即係郁 4.76 pp），
-係全 corpus 逐局計最脆嗰個數，2.57 倍於第二大嗰局。Two consequences worth
+佢 rel 0.622 喺 corpus 排第六，但**最大嗰局係第二大嗰局嘅 2.57 倍,呢個係全 corpus 最集中
+嘅一次**（下一個係 08-14 嘅 1.72）—— 脆喺得一局孭住，唔係脆喺個數細。Two consequences worth
 knowing before writing another report:
 
 - **The volume route is not a law.** 08-01's headline was that 326 extra pieces bought back a
@@ -637,7 +638,7 @@ floors apart. **08-25 then reproduces that shape a third time** — won .6417 vs
 floor gap in the corpus bar 08-09's. **09-03 then lands level in both regimes** — won .6329 vs
 .6814 (+4.85 pp, +7.66%), lost .5303 vs .5509 (+2.06 pp, +3.88%), session gap +5.48 pp (109.5%).
 個 won-gap 得一局撐住（留一局：抽走 m3r6，數字變 +2.89%，即係郁 4.76 pp），46 局入面排第一，
-係第二大嗰局嘅 2.57 倍——全 corpus 逐局計最脆嗰個數。m3r6 係嗰晚最長（約 210 秒）同清行最多
+係第二大嗰局嘅 2.57 倍，而 2.57 呢個比例係全 corpus 最高。m3r6 係嗰晚最長（約 210 秒）同清行最多
 （198 行）嗰局，所以佢一局嘅 pooled 粒數重過任何一局。抽走佢之後 won-gap 剩返 +2.89% 對 lost-gap
 +3.88%，即係「天花板爭得多過地板」係嗰一局講嘅,「兩邊都爭得唔多」先係成晚企得住嘅講法。
 （lost-gap 自己都唔算硬淨，rel 0.485，喺 THRESHOLD 之下所以冇 annotation，但兩邊都指向同一個
@@ -649,7 +650,7 @@ floor gap in the corpus bar 08-09's. **09-03 then lands level in both regimes** 
 so **the 17-point swing between 08-09 and 08-14 was a two-session excursion, not a trend in either
 direction**, and the split returned to where the corpus started — three times now, which is what
 turns 「excursion」 from a reading into the default one. Read the last column with its
-leave-one-out caveat: it is the corpus's only won-gap that one round can halve.
+leave-one-out caveat — one round takes it from +7.7 to +2.9.
 
 **Read the two rows as rows, not as a pair of trends.** Three of the nine sessions (07-22, 08-19,
 08-25) sit in the ceilings-close/floors-apart shape, one is its mirror (08-14), one is an extreme
@@ -790,9 +791,16 @@ one above, and four in a row reads as though the caveat were universal rather th
 figure. Two in a row now say the opposite just as loudly, and neither direction is the rule: the
 caveat is per figure, per session, and measured.
 
-**09-03 ends that run, and it does so with the corpus's most fragile figure.** Its won-gap sits at
-`rel` 0.622, **2.57× the next round's** — the largest single-round dependence any published figure
-has carried. m3r6 is that session's longest round (~210 s) and its highest line count (198), so it
+**09-03 ends that run, and it does so with the corpus's most CONCENTRATED single-round
+dependence — which is not the same as its most fragile figure, and the difference is worth
+keeping.** Its won-gap sits at `rel` 0.622, sixth-largest in the corpus and the lowest of the six
+that cross THRESHOLD: 08-01's `score_diff` (20.931), 07-28's `attack_diff` (2.267), 08-14's
+`app_gap_lost` (1.615), 08-09's `app_gap_won` (1.306) and 08-01's `attack_diff` (0.969) are all
+more fragile, and four of those are figures whose VALUE is near zero, which `check_loo`'s own
+header says is correctly the most fragile kind. What IS a corpus maximum is the `x2nd` column:
+09-03's worst round moves the figure **2.57× as far as the next round does**, against 1.72 for the
+runner-up — so the dependence is unusually concentrated in one round rather than spread over
+several. m3r6 is that session's longest round (~210 s) and its highest line count (198), so it
 brings more pooled pieces than any other round in a 46-round session; a pooled ratio over the
 corpus's smallest session is exactly where this shows up. The annotation is in the series
 paragraph above. Read it as the reason 09-03 is filed 「roughly level」 rather than as a mirror of
