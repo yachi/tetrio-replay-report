@@ -52,11 +52,15 @@ before the final 20% of the round. It is a **disagreement map, not a certified s
   followed: documented garbagespeed, the garbage-cancel protocol port, and locktime 60→30), and 97.9%
   over the verified prefix alone (19803/20226 locks, `bun driftmap.mjs --prefix`) — the whole-round
   figure is dragged down by the topout flood past the prefix.
-- **97.9% here is not the 96.2% in the dual-backed section below**, and the two must not be quoted
-  interchangeably even though they share a denominator (20226). This one counts a lock if it matches
-  **individually**; `cross-extract.mjs` counts only the **contiguous** agreeing prefix, stopping at the
-  first divergence, so it is always the lower of the two. "Bit-exact over the verified prefix" is
-  ambiguous between them — say which.
+- **97.9% here is not the 96.1% in the dual-backed section below**, and the two must not be quoted
+  interchangeably. This one counts a lock if it matches **individually**; `cross-extract.mjs` counts
+  only the **contiguous** agreeing prefix, stopping at the first divergence, so it is always the
+  lower of the two. "Bit-exact over the verified prefix" is ambiguous between them — say which.
+  They no longer share a denominator either: the 97.9% is the six-session measurement above
+  (20226 locks, dated 2026-08-15 and not re-run), while the dual-backed figure is re-derived from
+  every session on disk by `cross-extract.mjs --check` and is at nine. Comparing them now compares
+  two corpora as well as two definitions — the definitional point stands, the arithmetic
+  cross-check does not.
 - Options are identical across files, so early divergences are **not** a per-game ruleset mismatch; they
   are genuine sim-vs-oracle *model* differences (movement/handling edge cases). Which engine is right at
   any given divergence needs a **live spot-check** for that round.
@@ -91,8 +95,8 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
-over the verified prefix, sim and Triangle agree bit-exact on **96.2%** of locks, backing **96.3%** of
-forecast events and **94.6%** of opener rounds with an independent engine — the dual-implementation
+over the verified prefix, sim and Triangle agree bit-exact on **96.1%** of locks, backing **96.2%** of
+forecast events and **94.4%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
 was flagged non-dual purely because the oracle mis-paired a garbage hole. The sim matched ground truth

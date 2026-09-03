@@ -30,12 +30,17 @@ and both are established rather than hypothetical:
    not as current figures.** 2026-08-19 took the corpus to seven sessions and 450 rounds, and it
    moved all seven rho — the two the re-source had left alone included. 2026-08-25 took it to
    eight and 523 rounds and moved all seven again, every one of them further from zero in the
-   direction it already had. That is the other half of the same lesson, now twice over:
+   direction it already had. 2026-09-03 took it to nine and 569 rounds and moved all seven a
+   THIRD time — and this time not all in one direction: the two downstack-vs-intensity rho fell
+   back toward zero (+0.203 → +0.177, +0.187 → +0.170) while the two duration controls moved
+   further from it. So 「every one further from zero」 was a description of two increments, not a
+   tendency, and the sign and ordering are what have actually held. That is the other half of the
+   same lesson, now three times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.203**
-   (cleared_pp/intensity), **+0.187** (cleared/intensity), **+0.035** (cleared_pp/duration),
-   **-0.186** (apm/duration), **-0.191** (attack/duration), **+0.211**
-   (cleared_per_received/intensity) and **+0.089** (received/intensity). Nothing else in this
+   re-derives rather than counting sessions. As of the current corpus they read **+0.177**
+   (cleared_pp/intensity), **+0.170** (cleared/intensity), **+0.037** (cleared_pp/duration),
+   **-0.193** (apm/duration), **-0.196** (attack/duration), **+0.223**
+   (cleared_per_received/intensity) and **+0.091** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.

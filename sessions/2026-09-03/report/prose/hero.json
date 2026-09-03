@@ -1,0 +1,10 @@
+{
+  "kicker": "第九回合",
+  "title": "5 比 1——\n斷開兩橛嘅一晚，掉轉頭嗰欄係<span class=\"hl-p\">清垃圾</span>",
+  "tags": {
+    "yachi": "快手 volume 流 · VOLUME",
+    "pinglamb": "T-spin 效率流 · EFFICIENCY"
+  },
+  "lede": "六場 match、46 局。<strong>pinglamb 5 比 1 收工</strong><span class=\"badge\" data-claim=\"G001\"></span>，逐局計 27 對 19<span class=\"badge\" data-claim=\"G002\"></span>。但個比數讀落闊過實際：<strong>頭三場打完，局數係 yachi 13 對 12</strong><span class=\"badge\" data-claim=\"C010\"></span>，而頭兩場都係打到最後一局先分勝負，兩場都俾 pinglamb 執<span class=\"badge\" data-claim=\"G010\"></span>。跟住尾三場 6 對 15<span class=\"badge\" data-claim=\"C010\"></span>——場數 5 比 1，但真正輸嘅係後半晚。<strong>想知邊一欄斷開，最順手嗰個答案係錯嘅</strong>：每粒方塊嘅攻擊兩橛都差唔多，頭三場 pinglamb 高 8% 幾、尾三場高 10% 幾<span class=\"badge\" data-claim=\"C011\"></span>——局數由 13 比 12 變 6 比 15，效率個差距就只係闊咗一個幾百分點。<strong>全晚淨係一欄喺個分水嶺度轉咗正負：清垃圾。</strong>頭三場 pinglamb 每粒方塊清走嘅垃圾仲少過 yachi，得佢 94% 幾；尾三場反過來去到 115% 幾<span class=\"badge\" data-claim=\"C012\"></span>。",
+  "score_claim": "G001"
+}

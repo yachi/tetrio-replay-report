@@ -8,78 +8,79 @@
     "2026-08-09": "5aff1e7d6f291a5c05efda9e630b82ea",
     "2026-08-14": "5e24b56ae9bb6bdb1e26cb86b47db1f9",
     "2026-08-19": "e0660f376a03ae92096d9ae83afc5ee6",
-    "2026-08-25": "480a30d9388253cbe1ad4152c366466d"
+    "2026-08-25": "480a30d9388253cbe1ad4152c366466d",
+    "2026-09-03": "bc48dbad414756300367545552060181"
   },
   "generated_by": "analysis/rate_records.R --json",
   "metrics": {
     "vs": {
-      "slope": -0.635953,
-      "ci_lo": -0.783513,
-      "ci_hi": -0.488393,
-      "r2": 0.94881,
-      "p": 4.27479e-05,
-      "mean_p": 0.00129472,
-      "half_inside_ci": true,
-      "sd_short": 59.09,
-      "sd_long": 14.4761,
-      "mean_short": 103.039,
-      "mean_long": 119.359,
-      "t_short": 19.4215,
-      "t_long": 152.814,
-      "top_decile_short": 50,
-      "top_decile_n": 105,
-      "top_decile_p": 4.58558e-07
+      "slope": -0.668791,
+      "ci_lo": -0.797426,
+      "ci_hi": -0.540156,
+      "r2": 0.964253,
+      "p": 1.44707e-05,
+      "mean_p": 0.000302691,
+      "half_inside_ci": false,
+      "sd_short": 59.7608,
+      "sd_long": 14.0447,
+      "mean_short": 100.961,
+      "mean_long": 119.855,
+      "t_short": 19.3206,
+      "t_long": 153.737,
+      "top_decile_short": 55,
+      "top_decile_n": 114,
+      "top_decile_p": 7.22587e-08
     },
     "apm": {
-      "slope": -0.717952,
-      "ci_lo": -0.871565,
-      "ci_hi": -0.564339,
-      "r2": 0.956137,
-      "p": 2.68177e-05,
-      "mean_p": 0.0144891,
+      "slope": -0.740755,
+      "ci_lo": -0.879596,
+      "ci_hi": -0.601913,
+      "r2": 0.965992,
+      "p": 1.24508e-05,
+      "mean_p": 0.0371259,
       "half_inside_ci": false,
-      "sd_short": 30.8737,
-      "sd_long": 6.42102,
-      "mean_short": 56.1119,
-      "mean_long": 51.5587,
-      "t_short": 19.4215,
-      "t_long": 152.814,
-      "top_decile_short": 72,
-      "top_decile_n": 105,
-      "top_decile_p": 8.07899e-21
+      "sd_short": 31.3689,
+      "sd_long": 6.44786,
+      "mean_short": 55.1443,
+      "mean_long": 51.6473,
+      "t_short": 19.3206,
+      "t_long": 153.737,
+      "top_decile_short": 77,
+      "top_decile_n": 114,
+      "top_decile_p": 1.57615e-21
     },
     "pps": {
-      "slope": -0.43438,
-      "ci_lo": -0.632795,
-      "ci_hi": -0.235964,
-      "r2": 0.82707,
-      "p": 0.00173325,
-      "mean_p": 0.156114,
+      "slope": -0.497356,
+      "ci_lo": -0.710137,
+      "ci_hi": -0.284576,
+      "r2": 0.84501,
+      "p": 0.00123817,
+      "mean_p": 0.2985,
       "half_inside_ci": true,
-      "sd_short": 0.228076,
-      "sd_long": 0.0796178,
-      "mean_short": 1.44047,
-      "mean_long": 1.4096,
-      "t_short": 19.4215,
-      "t_long": 152.814,
-      "top_decile_short": 58,
-      "top_decile_n": 106,
-      "top_decile_p": 6.50022e-11
+      "sd_short": 0.226666,
+      "sd_long": 0.0778882,
+      "mean_short": 1.44135,
+      "mean_long": 1.41363,
+      "t_short": 19.3206,
+      "t_long": 153.737,
+      "top_decile_short": 64,
+      "top_decile_n": 114,
+      "top_decile_p": 1.46932e-12
     }
   },
-  "n_player_rounds": 1046,
-  "n_rounds": 523,
+  "n_player_rounds": 1138,
+  "n_rounds": 569,
   "predict": {
-    "r": -0.133036,
-    "p": 0.623305,
-    "n": 16
+    "r": -0.277898,
+    "p": 0.264186,
+    "n": 18
   },
   "records": {
-    "n": 24,
+    "n": 27,
     "n_metrics": 3,
-    "in_shortest_quartile": 23,
-    "p": 2.59348e-13,
-    "quartile_cut_s": 35.5345
+    "in_shortest_quartile": 26,
+    "p": 4.55191e-15,
+    "quartile_cut_s": 35.133
   },
   "script_md5": "19a718d6cfcea37f470f779620be6921",
   "sessions": [
@@ -90,14 +91,15 @@
     "2026-08-09",
     "2026-08-14",
     "2026-08-19",
-    "2026-08-25"
+    "2026-08-25",
+    "2026-09-03"
   ],
   "stability": {
     "threshold_s": 60,
     "per_metric": {
       "vs": {
         "lo": 50,
-        "hi": 72
+        "hi": 71
       },
       "apm": {
         "lo": 54,
@@ -253,6 +255,22 @@
         "player": "pinglamb",
         "qualified": 69.561,
         "pct_above": 49.0275
+      }
+    },
+    "2026-09-03": {
+      "vs": {
+        "value": 184.049,
+        "round_s": 21.733,
+        "player": "yachi",
+        "qualified": 166.472,
+        "pct_above": 10.5585
+      },
+      "apm": {
+        "value": 101.099,
+        "round_s": 13.65,
+        "player": "yachi",
+        "qualified": 78.06,
+        "pct_above": 29.5145
       }
     }
   }
