@@ -14,9 +14,10 @@ the session does. 2026-08-14 is the largest session by both matches (11) and rou
 2026-08-19 is fourth by rounds (70) and **ties** 07-22 at 10 matches rather than sitting
 second alone; 2026-08-25 sits third by rounds (73, behind 07-22's 79) with 9 matches, and
 is the **closest** session on either measure — 5:4 in matches and 38:35 in rounds.
-2026-09-03 is the **smallest** session on both measures (6 matches, 46 rounds) and the most
-lopsided in matches (5:1), but read that scoreline with C010 beside it: the round split
-after three matches was 13:12 to yachi, and the whole margin is in the last three.
+2026-09-03 has the fewest rounds of the nine (46) and **ties** 08-09 at 6 matches rather than
+being smallest on both, and it is the most lopsided in matches (5:1) — but read that scoreline
+with C010 beside it: the round split after three matches was 13:12 to yachi, and the whole
+margin is in the last three.
 
 ## The one invariant
 
@@ -693,8 +694,9 @@ Three consequences:
   tally and **not the series**, which went 4:7 → 3:7. **08-25 is the third data point and it settles
   the column: this is a quantity that swings hard every session and predicts nothing.** Nine values
   spanning 0:4 to 11:2 with no run of three in the same direction — read a night's tally as that
-  night's, and stop reading a trend into it. 09-03 is the flattest of the nine (3:4, [C006]) and it
-  arrives right after the highest rate, which is the column doing what it always does.
+  night's, and stop reading a trend into it. 09-03 sits one apart (3:4, [C006]) right after the
+  highest rate — close, but NOT the flattest: 07-24's 4:4 is the corpus's only even split, and
+  07-28 and 08-19 are one apart too. The column doing what it always does.
 - **The night has three acts and the gap tracks them**: over 17% across matches 1-3, under 7%
   across 4-9, over 11% across 10-11 [C007] — and all four of yachi's match wins fall in the
   middle window [C001]. Per-match, m9 is the only one of eleven where his attack per piece beats

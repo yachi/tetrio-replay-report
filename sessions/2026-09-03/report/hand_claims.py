@@ -61,8 +61,9 @@ The claims are of six kinds:
     rounds they won than in the rounds they lost, the ninth session running that this holds
     for both. Here pinglamb separates himself more than yachi does (+23.7% against +19.3%),
     ending the two-session run in which yachi was the wider of the two.
-  * **the route and its price** — C005 and C009. C006 is the death tally, and it is the
-    flattest of the corpus: 3 against 4 over 46 rounds.
+  * **the route and its price** — C005 and C009. C006 is the death tally, one apart at 3
+    against 4 over 46 rounds — one of the corpus's closest, though not its flattest: 2026-07-24's
+    4:4 is the only even split of the nine.
   * **the break at m3** — C010, C011, C012.
   * **the six matches, one each** — C013-C018 as `round_seq` runs, the rule every session
     since 2026-08-01 follows: cover *all* of them, so no match card can describe a lead or a
@@ -74,7 +75,10 @@ players, and the cond language (`c_field`, `c_winner_gt_loser`, `c_str`, `c_dur`
 field against a literal or against the other player's same field — it has no cross-field
 ratio, so no `count_rounds` predicate can express it. What C008 can say is the flatness the
 AUC is a consequence of: pooled over the night the two players' KPP differ by under 0.3%,
-which is the narrowest this column has been in the corpus, with pinglamb on the lower side.
+which is the narrowest this column has been ACROSS the nine sessions (0.284% against 08-19's
+0.303%), with pinglamb on the lower side. It is deliberately not called the flattest column of
+this night — per-piece finesse faults are flatter still at 0.067%, and a within-session
+superlative and a cross-session one are different claims.
 
 THE PER-MATCH SEPARATION DOES NOT REPRODUCE, and there is deliberately no claim for it.
 2026-08-19 and 2026-08-25 each ordered their matches by pinglamb's APP advantage and had the
@@ -278,7 +282,7 @@ CLAIMS = [
         "id": "C006",
         "category": "style",
         "canto": "全晚 7 局頂到上天花板收場，3 局係 yachi 頂爆、4 局係 pinglamb——"
-                 "呢一欄係九晚以嚟最平嘅一晚",
+                 "差一局，係九晚以嚟最貼嘅幾晚之一（得 2026-07-24 嘅 4 比 4 打成平手）",
         "english_gloss": "seven rounds ended in a topout, three of them yachi's and four "
                          "pinglamb's",
         "spec": conj(
@@ -290,7 +294,7 @@ CLAIMS = [
         "id": "C008",
         "category": "style",
         "canto": "每粒方塊要按幾多下（KPP）兩個人幾乎一模一樣：yachi 3.619 下，"
-                 "pinglamb 3.609 下，爭唔到 0.3%——呢個係全晚最平嘅一欄",
+                 "pinglamb 3.609 下，爭唔到 0.3%——呢個差距係九晚以嚟最窄嘅一次",
         "english_gloss": "keypresses per piece are near-identical: yachi 3.619 and pinglamb "
                          "3.609, under a third of a percent apart",
         "spec": conj(
