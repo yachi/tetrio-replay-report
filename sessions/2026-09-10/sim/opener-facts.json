@@ -4,13 +4,13 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the first-bag metric is bounded by CATALOGUE COVERAGE, not by the matcher: a null means \"not these catalogued pages\", never \"not this opener\"",
-    "the slot-geometry match is a SHAPE test, not an opener test: 88.0% of Triples match the wiki window against 11.3% of Doubles, over 544 verified T-spins",
-    "the ordering metric is scored on 60 of 98 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
+    "the slot-geometry match is a SHAPE test, not an opener test: 92.5% of Triples match the wiki window against 12.0% of Doubles, over 612 verified T-spins",
+    "the ordering metric is scored on 82 of 127 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
     "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
     "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside",
-    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 15 of 15 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
+    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 13 of 15 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
   ],
-  "session": "2026-07-24",
+  "session": "2026-09-10",
   "gate": "frame+amount+row (ige row oracle must agree)",
   "board_source": "triangle-oracle (vendored @haelp/teto, byte-identical)",
   "window_pieces": 21,
@@ -189,23 +189,23 @@
     "the_tension": "the two pages do not agree. Triple_Double_Attack_Setups equates an empty-field Triple Double with a C-Spin outright, which would make the ordering metric the wiki's own definition; C-Spin attributes the name to the C shape formed by J and L, says the Double is 'usually' the follow-up, and gives one continuation that replaces it. So Triple-then-Double OVER-counts and UNDER-counts. Recorded, not resolved: a wiki contradicting itself is not a licence to adopt the reading that flatters the metric."
   },
   "first_bag": {
-    "rounds": 100,
-    "clean": 89,
+    "rounds": 130,
+    "clean": 114,
     "players": [
       {
         "user": "pinglamb",
-        "clean_first_bags": 48,
+        "clean_first_bags": 60,
         "exact_matches": [],
         "nearest": {
           "any": {
-            "min_cells": 4,
-            "within_threshold": 38,
+            "min_cells": 2,
+            "within_threshold": 46,
             "bands": {
               "0": 0,
-              "1-2": 0,
-              "3-4": 38,
-              "5-8": 8,
-              "9-14": 2,
+              "1-2": 1,
+              "3-4": 45,
+              "5-8": 13,
+              "9-14": 1,
               "15+": 0
             }
           },
@@ -216,9 +216,9 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 39,
-              "9-14": 8,
-              "15+": 1
+              "5-8": 45,
+              "9-14": 15,
+              "15+": 0
             }
           },
           "cspin_or_tki": {
@@ -228,9 +228,9 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 43,
-              "9-14": 4,
-              "15+": 1
+              "5-8": 46,
+              "9-14": 14,
+              "15+": 0
             }
           },
           "dt_cannon": {
@@ -240,9 +240,9 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 2,
-              "9-14": 44,
-              "15+": 2
+              "5-8": 4,
+              "9-14": 55,
+              "15+": 1
             }
           },
           "dt_family": {
@@ -252,31 +252,26 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 46,
-              "9-14": 1,
-              "15+": 1
+              "5-8": 58,
+              "9-14": 2,
+              "15+": 0
             }
           }
         }
       },
       {
         "user": "yachi",
-        "clean_first_bags": 41,
-        "exact_matches": [
-          {
-            "name": "Perfect Clear Opener {Abbr: PCO, JP: パフェクリテンプレ or 開幕パフェ積み}",
-            "rounds": 2
-          }
-        ],
+        "clean_first_bags": 54,
+        "exact_matches": [],
         "nearest": {
           "any": {
-            "min_cells": 0,
-            "within_threshold": 27,
+            "min_cells": 4,
+            "within_threshold": 35,
             "bands": {
-              "0": 2,
+              "0": 0,
               "1-2": 0,
-              "3-4": 25,
-              "5-8": 14,
+              "3-4": 35,
+              "5-8": 19,
               "9-14": 0,
               "15+": 0
             }
@@ -288,9 +283,9 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 30,
-              "9-14": 11,
-              "15+": 0
+              "5-8": 36,
+              "9-14": 17,
+              "15+": 1
             }
           },
           "cspin_or_tki": {
@@ -300,8 +295,8 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 31,
-              "9-14": 10,
+              "5-8": 37,
+              "9-14": 17,
               "15+": 0
             }
           },
@@ -312,9 +307,9 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 3,
-              "9-14": 38,
-              "15+": 0
+              "5-8": 2,
+              "9-14": 51,
+              "15+": 1
             }
           },
           "dt_family": {
@@ -324,8 +319,8 @@
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 40,
-              "9-14": 1,
+              "5-8": 52,
+              "9-14": 2,
               "15+": 0
             }
           }
@@ -338,40 +333,40 @@
     "players": [
       {
         "user": "pinglamb",
-        "rounds_scored": 50,
-        "rounds_with_tspin_double": 33,
-        "rounds_with_tspin_triple": 42,
-        "rounds_with_both": 31,
-        "dt_order": 0,
-        "cspin_order": 31,
-        "dt_order_within_window": 0,
-        "cspin_order_within_window": 31,
+        "rounds_scored": 64,
+        "rounds_with_tspin_double": 52,
+        "rounds_with_tspin_triple": 57,
+        "rounds_with_both": 46,
+        "dt_order": 1,
+        "cspin_order": 46,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 46,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
-          "max": 14
+          "max": 15
         },
         "mid_game": {
-          "rounds_with_both": 0,
-          "cspin_order": 0,
-          "dt_order": 0,
+          "rounds_with_both": 3,
+          "cspin_order": 3,
+          "dt_order": 1,
           "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
         }
       },
       {
         "user": "yachi",
-        "rounds_scored": 48,
-        "rounds_with_tspin_double": 39,
-        "rounds_with_tspin_triple": 32,
-        "rounds_with_both": 29,
+        "rounds_scored": 63,
+        "rounds_with_tspin_double": 49,
+        "rounds_with_tspin_triple": 41,
+        "rounds_with_both": 36,
         "dt_order": 0,
-        "cspin_order": 29,
+        "cspin_order": 36,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 29,
+        "cspin_order_within_window": 36,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
-          "max": 16
+          "max": 17
         },
         "mid_game": {
           "rounds_with_both": 0,
@@ -383,10 +378,10 @@
     ],
     "per_round": [
       {
-        "file": "replay-2026-07-24-1.ttrm",
+        "file": "replay-2026-09-10-01.ttrm",
         "round": 0,
-        "user": "pinglamb",
-        "verified": 38,
+        "user": "yachi",
+        "verified": 67,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -396,9 +391,295 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-1.ttrm",
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 41,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 63,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 57,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 43,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": -1,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 42,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 29,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 177,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 155,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 7,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 143,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 6,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 136,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 64,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-01.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 45,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 103,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
         "round": 0,
         "user": "yachi",
+        "verified": 95,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": -1,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 60,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 53,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 62,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 47,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 4,
+        "user": "pinglamb",
         "verified": 36,
         "window_complete": true,
         "cspin_order": 1,
@@ -409,309 +690,10 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 138,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 7,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 1,
-        "user": "yachi",
-        "verified": 126,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 8,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 34,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 2,
-        "user": "yachi",
-        "verified": 26,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 0,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 3,
-        "user": "pinglamb",
-        "verified": 14,
-        "window_complete": false,
-        "cspin_order": 1,
-        "dt_order": null,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 34,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 1,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 143,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": -1,
-        "window_complete": false,
-        "cspin_order": null,
-        "dt_order": null,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 0,
-        "user": "yachi",
-        "verified": 38,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 0,
-        "user": "pinglamb",
-        "verified": 25,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 1,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 1,
-        "user": "yachi",
-        "verified": 62,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 3,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 51,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 2,
-        "user": "yachi",
-        "verified": 255,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 8,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 209,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 13,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 3,
-        "user": "pinglamb",
-        "verified": 88,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 97,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 148,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": 150,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 5,
-        "user": "yachi",
-        "verified": 139,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
+        "file": "replay-2026-09-10-02.ttrm",
         "round": 5,
         "user": "pinglamb",
-        "verified": 115,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 5,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 6,
-        "user": "yachi",
-        "verified": 87,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-2.ttrm",
-        "round": 6,
-        "user": "pinglamb",
-        "verified": 54,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 0,
-        "user": "pinglamb",
-        "verified": 116,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 9,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 0,
-        "user": "yachi",
-        "verified": 118,
+        "verified": 86,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -721,153 +703,192 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 1,
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 5,
         "user": "yachi",
-        "verified": 183,
+        "verified": 96,
         "window_complete": true,
-        "cspin_order": 0,
+        "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
+        "tspin_triples_window": 1,
         "tspin_doubles": 4,
-        "tspin_triples": 0
+        "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 136,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 9,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 2,
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 6,
         "user": "yachi",
-        "verified": 333,
+        "verified": 182,
         "window_complete": true,
-        "cspin_order": 0,
+        "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 15,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
         "tspin_doubles": 12,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 310,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 14,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 16,
-        "window_complete": false,
-        "cspin_order": 1,
-        "dt_order": null,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 3,
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 7,
         "user": "pinglamb",
-        "verified": 27,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 1,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 140,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 6,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": 133,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 5,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 5,
-        "user": "pinglamb",
-        "verified": 62,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 2,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 5,
-        "user": "yachi",
         "verified": 63,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 3,
+        "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 6,
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 63,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 8,
         "user": "pinglamb",
-        "verified": 91,
+        "verified": 15,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 11,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 209,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
         "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 66,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 60,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 103,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 3,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 93,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
         "tspin_doubles": 5,
         "tspin_triples": 0
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 6,
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 22,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 2,
         "user": "yachi",
-        "verified": 75,
+        "verified": 12,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 58,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 68,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -877,112 +898,21 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 7,
-        "user": "pinglamb",
-        "verified": 37,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 2,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
-        "round": 7,
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 4,
         "user": "yachi",
-        "verified": 26,
+        "verified": 98,
         "window_complete": true,
-        "cspin_order": 0,
+        "cspin_order": 1,
         "dt_order": 0,
-        "tspin_doubles_window": 2,
-        "tspin_triples_window": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
         "tspin_doubles": 3,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 0,
-        "user": "pinglamb",
-        "verified": 48,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 0,
-        "user": "yachi",
-        "verified": 43,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 3,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 33,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 2,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 1,
-        "user": "yachi",
-        "verified": 16,
-        "window_complete": false,
-        "cspin_order": 1,
-        "dt_order": null,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 1,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 33,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 2,
-        "user": "yachi",
-        "verified": 35,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 3,
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 4,
         "user": "pinglamb",
         "verified": 81,
         "window_complete": true,
@@ -990,118 +920,40 @@
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 5,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 14,
-        "window_complete": false,
-        "cspin_order": 1,
-        "dt_order": null,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 7,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 111,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 5,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": 107,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 0,
-        "user": "yachi",
-        "verified": 204,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 0,
-        "user": "pinglamb",
-        "verified": 177,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 10,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 19,
-        "window_complete": false,
-        "cspin_order": 1,
-        "dt_order": null,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 1,
-        "user": "yachi",
-        "verified": 17,
-        "window_complete": false,
-        "cspin_order": null,
-        "dt_order": null,
-        "tspin_doubles_window": 3,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 3,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 49,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
         "tspin_doubles": 4,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 2,
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 53,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "round": 5,
         "user": "yachi",
-        "verified": 46,
+        "verified": 39,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 51,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
@@ -1111,86 +963,47 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 3,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 0,
         "user": "pinglamb",
-        "verified": 80,
+        "verified": 22,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 3,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 85,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 51,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 2,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": 51,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 5,
-        "user": "yachi",
-        "verified": 158,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 5,
-        "user": "pinglamb",
-        "verified": 120,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
         "tspin_triples_window": 0,
-        "tspin_doubles": 4,
+        "tspin_doubles": 2,
         "tspin_triples": 0
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 6,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 16,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 13,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 2,
         "user": "yachi",
         "verified": 41,
         "window_complete": true,
@@ -1198,170 +1011,144 @@
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 2,
+        "tspin_doubles": 3,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 6,
-        "user": "pinglamb",
-        "verified": 35,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 2,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 7,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 2,
         "user": "pinglamb",
         "verified": 40,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 1,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 59,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
         "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "round": 7,
-        "user": "yachi",
-        "verified": 34,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 2,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 0,
-        "user": "yachi",
-        "verified": -1,
-        "window_complete": false,
-        "cspin_order": null,
-        "dt_order": null,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 0,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 3,
         "user": "pinglamb",
-        "verified": 99,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 7,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 82,
+        "verified": 40,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
-        "tspin_doubles_window": 1,
+        "tspin_doubles_window": 2,
         "tspin_triples_window": 1,
         "tspin_doubles": 4,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 1,
-        "user": "yachi",
-        "verified": 87,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 1,
-        "tspin_triples": 0
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 12,
+        "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 2,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 4,
         "user": "yachi",
-        "verified": 86,
+        "verified": 146,
         "window_complete": true,
-        "cspin_order": 0,
+        "cspin_order": 1,
         "dt_order": 0,
-        "tspin_doubles_window": 2,
-        "tspin_triples_window": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 65,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
         "tspin_doubles": 5,
-        "tspin_triples": 0
+        "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 71,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 46,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 6,
+        "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 94,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 2,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 3,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 6,
         "user": "pinglamb",
-        "verified": 85,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 1,
-        "tspin_triples": 2
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 132,
+        "verified": 206,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 9,
+        "tspin_doubles": 7,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 4,
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 6,
         "user": "yachi",
-        "verified": 109,
+        "verified": 210,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 33,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 38,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
@@ -1371,23 +1158,62 @@
         "tspin_triples": 0
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 5,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 19,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 11,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 0,
         "user": "yachi",
-        "verified": 64,
+        "verified": 175,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 6,
+        "tspin_doubles": 7,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 5,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 1,
         "user": "pinglamb",
-        "verified": 56,
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": -1,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 33,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -1397,21 +1223,60 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 6,
-        "user": "pinglamb",
-        "verified": 74,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 34,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 95,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 6,
+        "tspin_doubles": 5,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 6,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 80,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 66,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 4,
         "user": "yachi",
         "verified": 65,
         "window_complete": true,
@@ -1423,10 +1288,23 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 7,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 5,
         "user": "yachi",
-        "verified": 104,
+        "verified": 111,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 3,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 85,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -1436,36 +1314,10 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-6.ttrm",
-        "round": 7,
-        "user": "pinglamb",
-        "verified": 80,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 7,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 0,
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 6,
         "user": "yachi",
-        "verified": 63,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 0,
-        "user": "pinglamb",
-        "verified": 50,
+        "verified": 29,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -1475,8 +1327,203 @@
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 113,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 95,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 88,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 75,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 7,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 37,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 33,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 1,
+        "user": "pinglamb",
+        "verified": 64,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 59,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 150,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 133,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 78,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 60,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 51,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 50,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 5,
         "user": "yachi",
         "verified": 32,
         "window_complete": true,
@@ -1484,239 +1531,668 @@
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 3,
+        "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 1,
-        "user": "pinglamb",
-        "verified": 29,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 0,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 2,
-        "user": "pinglamb",
-        "verified": 132,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 6,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 2,
-        "user": "yachi",
-        "verified": 118,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 6,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 3,
-        "user": "pinglamb",
-        "verified": 39,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 3,
-        "user": "yachi",
-        "verified": 26,
-        "window_complete": true,
-        "cspin_order": 0,
-        "dt_order": 0,
-        "tspin_doubles_window": 0,
-        "tspin_triples_window": 0,
-        "tspin_doubles": 0,
-        "tspin_triples": 0
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 4,
-        "user": "pinglamb",
-        "verified": 98,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 11,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 4,
-        "user": "yachi",
-        "verified": 102,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 5,
-        "user": "yachi",
-        "verified": 42,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 3,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 5,
         "user": "pinglamb",
-        "verified": 21,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
+        "verified": 9,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
         "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 1,
-        "tspin_triples": 1
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 6,
         "user": "yachi",
-        "verified": 125,
+        "verified": 165,
         "window_complete": true,
         "cspin_order": 0,
         "dt_order": 0,
         "tspin_doubles_window": 0,
         "tspin_triples_window": 0,
-        "tspin_doubles": 4,
+        "tspin_doubles": 8,
         "tspin_triples": 0
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 6,
         "user": "pinglamb",
-        "verified": 117,
+        "verified": 158,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 7,
+        "tspin_doubles": 5,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 7,
-        "user": "pinglamb",
-        "verified": 42,
-        "window_complete": true,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 1,
-        "tspin_triples_window": 1,
-        "tspin_doubles": 4,
-        "tspin_triples": 1
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 7,
         "user": "yachi",
-        "verified": 36,
+        "verified": 122,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
-        "tspin_doubles": 1,
+        "tspin_doubles": 5,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 92,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 9,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
         "round": 8,
         "user": "yachi",
-        "verified": 14,
+        "verified": 128,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 5,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-06.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 106,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 15,
         "window_complete": false,
         "cspin_order": 1,
         "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 3,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 35,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 30,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 1,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 1,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 67,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 1,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 3,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 56,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 58,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 44,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
         "tspin_doubles": 2,
         "tspin_triples": 1
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
-        "round": 8,
-        "user": "pinglamb",
-        "verified": 25,
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 75,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
         "tspin_doubles_window": 1,
         "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 52,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 3,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 14,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
         "tspin_doubles": 1,
         "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 19,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 122,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 7,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 82,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 4,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-07.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 69,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 2,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 0,
+        "user": "yachi",
+        "verified": 159,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 0,
+        "user": "pinglamb",
+        "verified": 145,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 5,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 1,
+        "user": "pinglamb",
+        "verified": 123,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 2,
+        "tspin_doubles": 5,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 1,
+        "user": "yachi",
+        "verified": 81,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 2,
+        "user": "yachi",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": 1,
+        "dt_order": null,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 2,
+        "user": "pinglamb",
+        "verified": 73,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 4,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 3,
+        "user": "pinglamb",
+        "verified": 181,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 8,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 3,
+        "user": "yachi",
+        "verified": 170,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 14,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 4,
+        "user": "yachi",
+        "verified": 27,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 4,
+        "user": "pinglamb",
+        "verified": 13,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 5,
+        "user": "pinglamb",
+        "verified": 26,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 5,
+        "user": "yachi",
+        "verified": 18,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 0,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 6,
+        "user": "pinglamb",
+        "verified": 26,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 6,
+        "user": "yachi",
+        "verified": 17,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 7,
+        "user": "yachi",
+        "verified": 233,
+        "window_complete": true,
+        "cspin_order": 0,
+        "dt_order": 0,
+        "tspin_doubles_window": 2,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 8,
+        "tspin_triples": 0
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 7,
+        "user": "pinglamb",
+        "verified": 201,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 6,
+        "tspin_triples": 2
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 8,
+        "user": "pinglamb",
+        "verified": 22,
+        "window_complete": true,
+        "cspin_order": 1,
+        "dt_order": 0,
+        "tspin_doubles_window": 1,
+        "tspin_triples_window": 1,
+        "tspin_doubles": 2,
+        "tspin_triples": 1
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
+        "round": 8,
+        "user": "yachi",
+        "verified": 19,
+        "window_complete": false,
+        "cspin_order": null,
+        "dt_order": null,
+        "tspin_doubles_window": 0,
+        "tspin_triples_window": 0,
+        "tspin_doubles": 0,
+        "tspin_triples": 0
       }
     ],
     "per_match": [
       {
-        "file": "replay-2026-07-24-1.ttrm",
-        "user": "pinglamb",
-        "rounds": 5,
-        "rounds_scored": 5,
-        "rounds_unscored": 0,
-        "cspin_order": 4,
-        "dt_order": 0,
-        "tspin_doubles_window": 4,
-        "tspin_triples_window": 6,
-        "tspin_doubles": 22,
-        "tspin_triples": 6
-      },
-      {
-        "file": "replay-2026-07-24-1.ttrm",
+        "file": "replay-2026-09-10-01.ttrm",
         "user": "yachi",
-        "rounds": 5,
-        "rounds_scored": 4,
+        "rounds": 7,
+        "rounds_scored": 6,
         "rounds_unscored": 1,
-        "cspin_order": 1,
+        "cspin_order": 2,
         "dt_order": 0,
-        "tspin_doubles_window": 3,
-        "tspin_triples_window": 2,
-        "tspin_doubles": 17,
-        "tspin_triples": 2
+        "tspin_doubles_window": 5,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 18,
+        "tspin_triples": 3
       },
       {
-        "file": "replay-2026-07-24-2.ttrm",
-        "user": "yachi",
+        "file": "replay-2026-09-10-01.ttrm",
+        "user": "pinglamb",
         "rounds": 7,
         "rounds_scored": 7,
         "rounds_unscored": 0,
+        "cspin_order": 5,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 26,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 8,
+        "rounds_unscored": 1,
+        "cspin_order": 8,
+        "dt_order": 0,
+        "tspin_doubles_window": 9,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 46,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-09-10-02.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 7,
+        "dt_order": 0,
+        "tspin_doubles_window": 9,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 33,
+        "tspin_triples": 7
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "user": "pinglamb",
+        "rounds": 6,
+        "rounds_scored": 6,
+        "rounds_unscored": 0,
+        "cspin_order": 3,
+        "dt_order": 0,
+        "tspin_doubles_window": 3,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 19,
+        "tspin_triples": 6
+      },
+      {
+        "file": "replay-2026-09-10-03.ttrm",
+        "user": "yachi",
+        "rounds": 6,
+        "rounds_scored": 5,
+        "rounds_unscored": 1,
+        "cspin_order": 3,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 3,
+        "tspin_doubles": 17,
+        "tspin_triples": 3
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "user": "yachi",
+        "rounds": 8,
+        "rounds_scored": 7,
+        "rounds_unscored": 1,
+        "cspin_order": 5,
+        "dt_order": 0,
+        "tspin_doubles_window": 5,
+        "tspin_triples_window": 7,
+        "tspin_doubles": 22,
+        "tspin_triples": 7
+      },
+      {
+        "file": "replay-2026-09-10-04.ttrm",
+        "user": "pinglamb",
+        "rounds": 8,
+        "rounds_scored": 8,
+        "rounds_unscored": 0,
         "cspin_order": 6,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 34,
+        "tspin_triples": 8
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "user": "pinglamb",
+        "rounds": 9,
+        "rounds_scored": 9,
+        "rounds_unscored": 0,
+        "cspin_order": 8,
+        "dt_order": 0,
+        "tspin_doubles_window": 8,
+        "tspin_triples_window": 9,
+        "tspin_doubles": 40,
+        "tspin_triples": 10
+      },
+      {
+        "file": "replay-2026-09-10-05.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 8,
+        "rounds_unscored": 1,
+        "cspin_order": 5,
         "dt_order": 0,
         "tspin_doubles_window": 6,
         "tspin_triples_window": 6,
@@ -1724,147 +2200,82 @@
         "tspin_triples": 6
       },
       {
-        "file": "replay-2026-07-24-2.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "user": "pinglamb",
-        "rounds": 7,
-        "rounds_scored": 7,
-        "rounds_unscored": 0,
+        "rounds": 9,
+        "rounds_scored": 8,
+        "rounds_unscored": 1,
         "cspin_order": 5,
         "dt_order": 0,
-        "tspin_doubles_window": 5,
-        "tspin_triples_window": 7,
-        "tspin_doubles": 34,
-        "tspin_triples": 7
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 8,
+        "tspin_doubles": 41,
+        "tspin_triples": 8
       },
       {
-        "file": "replay-2026-07-24-3.ttrm",
-        "user": "pinglamb",
-        "rounds": 8,
-        "rounds_scored": 8,
-        "rounds_unscored": 0,
-        "cspin_order": 1,
-        "dt_order": 0,
-        "tspin_doubles_window": 2,
-        "tspin_triples_window": 7,
-        "tspin_doubles": 48,
-        "tspin_triples": 7
-      },
-      {
-        "file": "replay-2026-07-24-3.ttrm",
+        "file": "replay-2026-09-10-06.ttrm",
         "user": "yachi",
-        "rounds": 8,
-        "rounds_scored": 8,
+        "rounds": 9,
+        "rounds_scored": 9,
         "rounds_unscored": 0,
         "cspin_order": 5,
         "dt_order": 0,
         "tspin_doubles_window": 9,
         "tspin_triples_window": 5,
-        "tspin_doubles": 38,
+        "tspin_doubles": 34,
         "tspin_triples": 5
       },
       {
-        "file": "replay-2026-07-24-4.ttrm",
-        "user": "pinglamb",
-        "rounds": 5,
-        "rounds_scored": 5,
-        "rounds_unscored": 0,
+        "file": "replay-2026-09-10-07.ttrm",
+        "user": "yachi",
+        "rounds": 8,
+        "rounds_scored": 7,
+        "rounds_unscored": 1,
         "cspin_order": 4,
         "dt_order": 0,
-        "tspin_doubles_window": 4,
-        "tspin_triples_window": 6,
-        "tspin_doubles": 20,
-        "tspin_triples": 6
-      },
-      {
-        "file": "replay-2026-07-24-4.ttrm",
-        "user": "yachi",
-        "rounds": 5,
-        "rounds_scored": 5,
-        "rounds_unscored": 0,
-        "cspin_order": 3,
-        "dt_order": 0,
-        "tspin_doubles_window": 3,
+        "tspin_doubles_window": 9,
         "tspin_triples_window": 4,
-        "tspin_doubles": 16,
+        "tspin_doubles": 25,
         "tspin_triples": 4
       },
       {
-        "file": "replay-2026-07-24-5.ttrm",
-        "user": "yachi",
+        "file": "replay-2026-09-10-07.ttrm",
+        "user": "pinglamb",
         "rounds": 8,
         "rounds_scored": 7,
         "rounds_unscored": 1,
         "cspin_order": 4,
-        "dt_order": 0,
-        "tspin_doubles_window": 9,
-        "tspin_triples_window": 5,
-        "tspin_doubles": 30,
-        "tspin_triples": 5
-      },
-      {
-        "file": "replay-2026-07-24-5.ttrm",
-        "user": "pinglamb",
-        "rounds": 8,
-        "rounds_scored": 8,
-        "rounds_unscored": 0,
-        "cspin_order": 4,
-        "dt_order": 0,
-        "tspin_doubles_window": 4,
-        "tspin_triples_window": 9,
-        "tspin_doubles": 29,
-        "tspin_triples": 9
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "user": "yachi",
-        "rounds": 8,
-        "rounds_scored": 7,
-        "rounds_unscored": 1,
-        "cspin_order": 3,
-        "dt_order": 0,
-        "tspin_doubles_window": 7,
-        "tspin_triples_window": 3,
-        "tspin_doubles": 33,
-        "tspin_triples": 3
-      },
-      {
-        "file": "replay-2026-07-24-6.ttrm",
-        "user": "pinglamb",
-        "rounds": 8,
-        "rounds_scored": 8,
-        "rounds_unscored": 0,
-        "cspin_order": 6,
-        "dt_order": 0,
-        "tspin_doubles_window": 6,
-        "tspin_triples_window": 10,
-        "tspin_doubles": 43,
-        "tspin_triples": 10
-      },
-      {
-        "file": "replay-2026-07-24-7.ttrm",
-        "user": "yachi",
-        "rounds": 9,
-        "rounds_scored": 9,
-        "rounds_unscored": 0,
-        "cspin_order": 7,
-        "dt_order": 0,
-        "tspin_doubles_window": 7,
+        "dt_order": 1,
+        "tspin_doubles_window": 8,
         "tspin_triples_window": 7,
-        "tspin_doubles": 27,
+        "tspin_doubles": 18,
         "tspin_triples": 7
       },
       {
-        "file": "replay-2026-07-24-7.ttrm",
+        "file": "replay-2026-09-10-08.ttrm",
+        "user": "yachi",
+        "rounds": 9,
+        "rounds_scored": 6,
+        "rounds_unscored": 3,
+        "cspin_order": 5,
+        "dt_order": 0,
+        "tspin_doubles_window": 7,
+        "tspin_triples_window": 6,
+        "tspin_doubles": 35,
+        "tspin_triples": 6
+      },
+      {
+        "file": "replay-2026-09-10-08.ttrm",
         "user": "pinglamb",
         "rounds": 9,
-        "rounds_scored": 9,
-        "rounds_unscored": 0,
+        "rounds_scored": 8,
+        "rounds_unscored": 1,
         "cspin_order": 7,
         "dt_order": 0,
         "tspin_doubles_window": 8,
-        "tspin_triples_window": 7,
-        "tspin_doubles": 36,
-        "tspin_triples": 7
+        "tspin_triples_window": 10,
+        "tspin_doubles": 34,
+        "tspin_triples": 11
       }
     ],
     "cell_legend": {
@@ -1886,40 +2297,40 @@
     "players": [
       {
         "user": "pinglamb",
-        "rounds_scored": 50,
-        "rounds_with_tspin_double": 33,
-        "rounds_with_tspin_triple": 42,
-        "rounds_with_both": 31,
-        "dt_order": 0,
-        "cspin_order": 31,
-        "dt_order_within_window": 0,
-        "cspin_order_within_window": 31,
+        "rounds_scored": 64,
+        "rounds_with_tspin_double": 52,
+        "rounds_with_tspin_triple": 57,
+        "rounds_with_both": 46,
+        "dt_order": 1,
+        "cspin_order": 46,
+        "dt_order_within_window": 1,
+        "cspin_order_within_window": 46,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
-          "max": 14
+          "max": 15
         },
         "mid_game": {
-          "rounds_with_both": 0,
-          "cspin_order": 0,
-          "dt_order": 0,
+          "rounds_with_both": 3,
+          "cspin_order": 3,
+          "dt_order": 1,
           "means": "the same two orderings scored on spins AFTER the opener window, which is the control on the counts beside them: inside the window the corpus is unanimous, outside it the order goes both ways. Counts, never a rate — the whole corpus holds only a handful of rounds with both spin types this late"
         }
       },
       {
         "user": "yachi",
-        "rounds_scored": 48,
-        "rounds_with_tspin_double": 39,
-        "rounds_with_tspin_triple": 32,
-        "rounds_with_both": 29,
+        "rounds_scored": 63,
+        "rounds_with_tspin_double": 49,
+        "rounds_with_tspin_triple": 41,
+        "rounds_with_both": 36,
         "dt_order": 0,
-        "cspin_order": 29,
+        "cspin_order": 36,
         "dt_order_within_window": 0,
-        "cspin_order_within_window": 29,
+        "cspin_order_within_window": 36,
         "first_triple_lock": {
           "min": 12,
           "median": 13,
-          "max": 16
+          "max": 17
         },
         "mid_game": {
           "rounds_with_both": 0,
@@ -1936,27 +2347,27 @@
     "rows": [
       {
         "lines": 1,
-        "n": 64,
-        "drawn": 1,
-        "mirrored": 0,
-        "matched": 1,
-        "share_x1000": 15
+        "n": 90,
+        "drawn": 3,
+        "mirrored": 2,
+        "matched": 5,
+        "share_x1000": 55
       },
       {
         "lines": 2,
-        "n": 396,
-        "drawn": 19,
-        "mirrored": 26,
-        "matched": 45,
-        "share_x1000": 113
+        "n": 415,
+        "drawn": 22,
+        "mirrored": 28,
+        "matched": 50,
+        "share_x1000": 120
       },
       {
         "lines": 3,
-        "n": 84,
-        "drawn": 24,
-        "mirrored": 50,
-        "matched": 74,
-        "share_x1000": 880
+        "n": 107,
+        "drawn": 39,
+        "mirrored": 60,
+        "matched": 99,
+        "share_x1000": 925
       }
     ]
   },
@@ -2055,17 +2466,17 @@
     ],
     "round_overlap": {
       "mountainous_1": {
-        "mountainous_2": 14
+        "mountainous_2": 24
       },
       "mountainous_2": {
-        "mountainous_1": 14
+        "mountainous_1": 24
       }
     },
     "boards": {
-      "total": 187,
+      "total": 238,
       "by_locks": {
-        "6": 98,
-        "7": 89
+        "6": 124,
+        "7": 114
       }
     },
     "openers": [
@@ -2090,49 +2501,49 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 48,
-            "exact": 17,
+            "boards_scored": 60,
+            "exact": 24,
             "min_cells": 0,
-            "within_threshold": 38,
-            "share_x1000": 791,
+            "within_threshold": 45,
+            "share_x1000": 750,
             "bands": {
-              "0": 17,
+              "0": 24,
               "1-2": 21,
               "3-4": 0,
               "5-8": 3,
-              "9-14": 6,
-              "15+": 1
-            },
-            "baseline": {
-              "exact": 0,
-              "within_threshold": 38,
-              "pages": 224
-            },
-            "matched_rounds": 17,
-            "matched_and_delivered": 12
-          },
-          {
-            "user": "yachi",
-            "boards_scored": 41,
-            "exact": 6,
-            "min_cells": 0,
-            "within_threshold": 25,
-            "share_x1000": 609,
-            "bands": {
-              "0": 6,
-              "1-2": 19,
-              "3-4": 0,
-              "5-8": 4,
               "9-14": 12,
               "15+": 0
             },
             "baseline": {
-              "exact": 2,
-              "within_threshold": 27,
+              "exact": 0,
+              "within_threshold": 46,
               "pages": 224
             },
-            "matched_rounds": 6,
-            "matched_and_delivered": 4
+            "matched_rounds": 24,
+            "matched_and_delivered": 17
+          },
+          {
+            "user": "yachi",
+            "boards_scored": 54,
+            "exact": 12,
+            "min_cells": 0,
+            "within_threshold": 32,
+            "share_x1000": 592,
+            "bands": {
+              "0": 12,
+              "1-2": 20,
+              "3-4": 0,
+              "5-8": 2,
+              "9-14": 18,
+              "15+": 2
+            },
+            "baseline": {
+              "exact": 0,
+              "within_threshold": 33,
+              "pages": 224
+            },
+            "matched_rounds": 12,
+            "matched_and_delivered": 9
           }
         ]
       },
@@ -2157,49 +2568,49 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 50,
-            "exact": 14,
+            "boards_scored": 61,
+            "exact": 16,
             "min_cells": 0,
-            "within_threshold": 19,
-            "share_x1000": 380,
+            "within_threshold": 21,
+            "share_x1000": 344,
             "bands": {
-              "0": 14,
+              "0": 16,
               "1-2": 5,
               "3-4": 0,
-              "5-8": 27,
-              "9-14": 3,
-              "15+": 1
+              "5-8": 36,
+              "9-14": 4,
+              "15+": 0
             },
             "baseline": {
-              "exact": 3,
-              "within_threshold": 19,
+              "exact": 10,
+              "within_threshold": 34,
               "pages": 75
             },
-            "matched_rounds": 14,
-            "matched_and_delivered": 9
+            "matched_rounds": 16,
+            "matched_and_delivered": 13
           },
           {
             "user": "yachi",
-            "boards_scored": 48,
+            "boards_scored": 63,
             "exact": 20,
             "min_cells": 0,
-            "within_threshold": 20,
-            "share_x1000": 416,
+            "within_threshold": 21,
+            "share_x1000": 333,
             "bands": {
               "0": 20,
-              "1-2": 0,
+              "1-2": 1,
               "3-4": 0,
-              "5-8": 20,
-              "9-14": 7,
-              "15+": 1
+              "5-8": 30,
+              "9-14": 10,
+              "15+": 2
             },
             "baseline": {
-              "exact": 12,
-              "within_threshold": 20,
+              "exact": 14,
+              "within_threshold": 28,
               "pages": 75
             },
             "matched_rounds": 20,
-            "matched_and_delivered": 15
+            "matched_and_delivered": 17
           }
         ]
       },
@@ -2226,48 +2637,48 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 50,
-            "exact": 3,
+            "boards_scored": 61,
+            "exact": 10,
             "min_cells": 0,
-            "within_threshold": 17,
-            "share_x1000": 340,
+            "within_threshold": 31,
+            "share_x1000": 508,
             "bands": {
-              "0": 3,
-              "1-2": 14,
-              "3-4": 0,
-              "5-8": 27,
-              "9-14": 5,
+              "0": 10,
+              "1-2": 20,
+              "3-4": 1,
+              "5-8": 26,
+              "9-14": 3,
               "15+": 1
             },
             "baseline": {
               "exact": 0,
-              "within_threshold": 19,
+              "within_threshold": 33,
               "pages": 73
             },
-            "matched_rounds": 3,
-            "matched_and_delivered": 3
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
           },
           {
             "user": "yachi",
-            "boards_scored": 48,
-            "exact": 11,
+            "boards_scored": 63,
+            "exact": 14,
             "min_cells": 0,
-            "within_threshold": 18,
-            "share_x1000": 375,
+            "within_threshold": 25,
+            "share_x1000": 396,
             "bands": {
-              "0": 11,
-              "1-2": 6,
-              "3-4": 1,
-              "5-8": 23,
-              "9-14": 6,
-              "15+": 1
+              "0": 14,
+              "1-2": 11,
+              "3-4": 0,
+              "5-8": 25,
+              "9-14": 10,
+              "15+": 3
             },
             "baseline": {
-              "exact": 1,
-              "within_threshold": 19,
+              "exact": 0,
+              "within_threshold": 28,
               "pages": 73
             },
-            "matched_rounds": 11,
+            "matched_rounds": 14,
             "matched_and_delivered": 10
           }
         ]
@@ -2295,48 +2706,48 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 50,
-            "exact": 3,
+            "boards_scored": 61,
+            "exact": 10,
             "min_cells": 0,
-            "within_threshold": 17,
-            "share_x1000": 340,
+            "within_threshold": 31,
+            "share_x1000": 508,
             "bands": {
-              "0": 3,
-              "1-2": 14,
-              "3-4": 0,
-              "5-8": 27,
-              "9-14": 5,
+              "0": 10,
+              "1-2": 20,
+              "3-4": 1,
+              "5-8": 26,
+              "9-14": 3,
               "15+": 1
             },
             "baseline": {
               "exact": 0,
-              "within_threshold": 19,
+              "within_threshold": 33,
               "pages": 73
             },
-            "matched_rounds": 3,
-            "matched_and_delivered": 3
+            "matched_rounds": 10,
+            "matched_and_delivered": 10
           },
           {
             "user": "yachi",
-            "boards_scored": 48,
-            "exact": 11,
+            "boards_scored": 63,
+            "exact": 14,
             "min_cells": 0,
-            "within_threshold": 18,
-            "share_x1000": 375,
+            "within_threshold": 25,
+            "share_x1000": 396,
             "bands": {
-              "0": 11,
-              "1-2": 6,
-              "3-4": 1,
-              "5-8": 23,
-              "9-14": 6,
-              "15+": 1
+              "0": 14,
+              "1-2": 11,
+              "3-4": 0,
+              "5-8": 25,
+              "9-14": 10,
+              "15+": 3
             },
             "baseline": {
-              "exact": 1,
-              "within_threshold": 19,
+              "exact": 0,
+              "within_threshold": 28,
               "pages": 73
             },
-            "matched_rounds": 11,
+            "matched_rounds": 14,
             "matched_and_delivered": 10
           }
         ]
@@ -2362,22 +2773,22 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 50,
+            "boards_scored": 61,
             "exact": 0,
             "min_cells": 2,
-            "within_threshold": 20,
-            "share_x1000": 400,
+            "within_threshold": 32,
+            "share_x1000": 524,
             "bands": {
               "0": 0,
-              "1-2": 3,
-              "3-4": 17,
-              "5-8": 22,
-              "9-14": 7,
+              "1-2": 11,
+              "3-4": 21,
+              "5-8": 25,
+              "9-14": 3,
               "15+": 1
             },
             "baseline": {
-              "exact": 3,
-              "within_threshold": 19,
+              "exact": 10,
+              "within_threshold": 34,
               "pages": 75
             },
             "matched_rounds": 0,
@@ -2385,22 +2796,22 @@
           },
           {
             "user": "yachi",
-            "boards_scored": 48,
+            "boards_scored": 63,
             "exact": 0,
             "min_cells": 2,
-            "within_threshold": 17,
-            "share_x1000": 354,
+            "within_threshold": 26,
+            "share_x1000": 412,
             "bands": {
               "0": 0,
-              "1-2": 11,
-              "3-4": 6,
+              "1-2": 14,
+              "3-4": 12,
               "5-8": 24,
-              "9-14": 2,
-              "15+": 5
+              "9-14": 4,
+              "15+": 9
             },
             "baseline": {
-              "exact": 12,
-              "within_threshold": 20,
+              "exact": 14,
+              "within_threshold": 28,
               "pages": 75
             },
             "matched_rounds": 0,
@@ -2429,22 +2840,22 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 50,
+            "boards_scored": 61,
             "exact": 0,
-            "min_cells": 8,
+            "min_cells": 10,
             "within_threshold": 0,
             "share_x1000": 0,
             "bands": {
               "0": 0,
               "1-2": 0,
               "3-4": 0,
-              "5-8": 1,
-              "9-14": 46,
-              "15+": 3
+              "5-8": 0,
+              "9-14": 56,
+              "15+": 5
             },
             "baseline": {
-              "exact": 3,
-              "within_threshold": 19,
+              "exact": 10,
+              "within_threshold": 34,
               "pages": 75
             },
             "matched_rounds": 0,
@@ -2452,26 +2863,26 @@
           },
           {
             "user": "yachi",
-            "boards_scored": 48,
-            "exact": 5,
+            "boards_scored": 63,
+            "exact": 7,
             "min_cells": 0,
-            "within_threshold": 5,
-            "share_x1000": 104,
+            "within_threshold": 7,
+            "share_x1000": 111,
             "bands": {
-              "0": 5,
+              "0": 7,
               "1-2": 0,
               "3-4": 0,
               "5-8": 2,
-              "9-14": 39,
-              "15+": 2
+              "9-14": 53,
+              "15+": 1
             },
             "baseline": {
-              "exact": 12,
-              "within_threshold": 20,
+              "exact": 14,
+              "within_threshold": 28,
               "pages": 75
             },
-            "matched_rounds": 5,
-            "matched_and_delivered": 5
+            "matched_rounds": 7,
+            "matched_and_delivered": 7
           }
         ]
       },
@@ -2497,22 +2908,22 @@
         "players": [
           {
             "user": "pinglamb",
-            "boards_scored": 98,
+            "boards_scored": 121,
             "exact": 0,
             "min_cells": 4,
-            "within_threshold": 2,
-            "share_x1000": 20,
+            "within_threshold": 3,
+            "share_x1000": 24,
             "bands": {
               "0": 0,
               "1-2": 0,
-              "3-4": 2,
-              "5-8": 0,
-              "9-14": 87,
-              "15+": 9
+              "3-4": 3,
+              "5-8": 1,
+              "9-14": 115,
+              "15+": 2
             },
             "baseline": {
-              "exact": 3,
-              "within_threshold": 57,
+              "exact": 10,
+              "within_threshold": 80,
               "pages": 295
             },
             "matched_rounds": 0,
@@ -2520,25 +2931,25 @@
           },
           {
             "user": "yachi",
-            "boards_scored": 89,
-            "exact": 3,
-            "min_cells": 0,
-            "within_threshold": 3,
-            "share_x1000": 33,
+            "boards_scored": 117,
+            "exact": 0,
+            "min_cells": 8,
+            "within_threshold": 0,
+            "share_x1000": 0,
             "bands": {
-              "0": 3,
+              "0": 0,
               "1-2": 0,
               "3-4": 0,
               "5-8": 1,
-              "9-14": 77,
-              "15+": 8
+              "9-14": 101,
+              "15+": 15
             },
             "baseline": {
-              "exact": 11,
-              "within_threshold": 47,
+              "exact": 14,
+              "within_threshold": 61,
               "pages": 295
             },
-            "matched_rounds": 2,
+            "matched_rounds": 0,
             "matched_and_delivered": 0
           }
         ]
@@ -2549,42 +2960,40 @@
     "source": "report/facts.json (clears.allclear, read independently by extract.py and extract2.ts)",
     "means": "an upper bound on completed Perfect Clear Openers: a session cannot hold more completed PCOs than it holds perfect clears, whatever the opening fields looked like — and a session with none cannot hold one at all. Which of them arrived early enough to BE a PCO is `perfect_clear_timing`, and that answer comes from the simulator",
     "per_player": {
-      "pinglamb": 4,
-      "yachi": 6
+      "pinglamb": 9,
+      "yachi": 5
     }
   },
   "perfect_clear_timing": {
     "source": "the oracle board source (runCaseOracle), checked per round against the replay's own results.stats.clears.allclear — the field extract.py and extract2.ts read into facts.json",
     "pco_window_locks": 10,
     "check": {
-      "player_rounds": 100,
-      "checked": 100,
+      "player_rounds": 130,
+      "checked": 130,
       "unknown_rounds": 0,
-      "rounds_agreeing": 100,
+      "rounds_agreeing": 130,
       "agrees": true,
-      "perfect_clears_sim": 10,
-      "perfect_clears_replay": 10
+      "perfect_clears_sim": 14,
+      "perfect_clears_replay": 14
     },
     "players": [
       {
         "user": "pinglamb",
-        "perfect_clears": 4,
-        "rounds_with_one": 4,
+        "perfect_clears": 9,
+        "rounds_with_one": 9,
         "by_piece": {
-          "20": 2,
-          "21": 1,
-          "34": 1
+          "20": 9
         },
-        "median_piece": 21,
+        "median_piece": 20,
         "within_pco_window": 0
       },
       {
         "user": "yachi",
-        "perfect_clears": 6,
-        "rounds_with_one": 6,
+        "perfect_clears": 5,
+        "rounds_with_one": 5,
         "by_piece": {
           "10": 1,
-          "20": 5
+          "20": 4
         },
         "median_piece": 20,
         "within_pco_window": 1
@@ -2598,63 +3007,63 @@
     "walled_deepest_rows": 4,
     "scope": "verified prefix",
     "check": {
-      "tspin_clears": 544,
-      "reconstruction_agreed": 544,
+      "tspin_clears": 612,
+      "reconstruction_agreed": 612,
       "reconstruction_disagreed": 0,
       "agrees": true
     },
     "counter_anchor": {
       "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
       "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
-      "player_rounds": 100,
-      "checked": 100,
+      "player_rounds": 130,
+      "checked": 130,
       "unknown_rounds": 0,
-      "rounds_agreeing": 100,
+      "rounds_agreeing": 130,
       "agrees": true,
       "unclassified_sim_clears": 0,
-      "tspin_clears_sim": 578,
-      "tspin_clears_replay": 578,
-      "tspin_clears_scored": 544,
+      "tspin_clears_sim": 683,
+      "tspin_clears_replay": 683,
+      "tspin_clears_scored": 612,
       "by_kind": {
         "tspinsingles": {
-          "sim": 57,
-          "replay": 57,
-          "rounds_agreeing": 100
-        },
-        "tspindoubles": {
-          "sim": 421,
-          "replay": 421,
-          "rounds_agreeing": 100
-        },
-        "tspintriples": {
           "sim": 84,
           "replay": 84,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
+        },
+        "tspindoubles": {
+          "sim": 470,
+          "replay": 470,
+          "rounds_agreeing": 130
+        },
+        "tspintriples": {
+          "sim": 107,
+          "replay": 107,
+          "rounds_agreeing": 130
         },
         "tspinquads": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspinsingles": {
-          "sim": 16,
-          "replay": 16,
-          "rounds_agreeing": 100
+          "sim": 22,
+          "replay": 22,
+          "rounds_agreeing": 130
         },
         "minitspindoubles": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspintriples": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspinquads": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         }
       }
     },
@@ -2664,36 +3073,35 @@
         "runCase (hand-port, sim.ts)"
       ],
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
-      "locks_scored": 544,
+      "locks_scored": 612,
       "prefix_locks": {
-        "rounds": 100,
-        "oracle_locks": 8198,
-        "hand_port_locks": 2827
+        "rounds": 130,
+        "oracle_locks": 9248,
+        "hand_port_locks": 3305
       },
       "board_diff_hist": {
-        "2": 12,
-        "4": 4,
-        "6": 5,
-        "8": 11,
-        "10": 12,
-        "12": 27,
-        "14": 8,
-        "16": 4,
-        "18": 4,
-        "20": 3,
-        "22": 4,
-        "24": 5,
-        "26": 2,
-        "30": 1
+        "2": 9,
+        "4": 7,
+        "8": 14,
+        "10": 13,
+        "12": 30,
+        "14": 9,
+        "16": 2,
+        "18": 8,
+        "20": 2,
+        "22": 8,
+        "24": 2,
+        "26": 4,
+        "30": 2
       },
-      "locks_comparable": 244,
-      "locks_same_board": 142,
+      "locks_comparable": 278,
+      "locks_same_board": 168,
       "board_split": {
         "don": {
-          "positives_same_board": 1,
-          "positives_diff_board": 8,
-          "agree_same_board": 1,
-          "agree_diff_board": 1
+          "positives_same_board": 0,
+          "positives_diff_board": 2,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
         },
         "cave": {
           "positives_same_board": 0,
@@ -2703,81 +3111,81 @@
         }
       },
       "donation": {
-        "both_yes": 2,
-        "oracle_only": 7,
-        "other_only": 7,
-        "both_no": 228,
-        "oracle_positives": 9,
+        "both_yes": 0,
+        "oracle_only": 2,
+        "other_only": 5,
+        "both_no": 271,
+        "oracle_positives": 2,
         "agreement_on_positives": [
-          2,
-          9
+          0,
+          2
         ],
         "agreement_overall": [
-          230,
-          244
+          271,
+          278
         ]
       },
       "cave": {
         "both_yes": 2,
         "oracle_only": 0,
         "other_only": 0,
-        "both_no": 242,
+        "both_no": 276,
         "oracle_positives": 2,
         "agreement_on_positives": [
           2,
           2
         ],
         "agreement_overall": [
-          244,
-          244
+          278,
+          278
         ]
       }
     },
     "players": [
       {
         "user": "pinglamb",
-        "tspin_clears_scored": 309,
-        "tspin_clears_replay": 317,
-        "donations": 9,
+        "tspin_clears_scored": 315,
+        "tspin_clears_replay": 374,
+        "donations": 5,
         "self_built_well": 0,
-        "garbage_derived_well": 9,
-        "natural": 5,
+        "garbage_derived_well": 5,
+        "natural": 3,
         "b2b_breaking": 1,
-        "plug_unknown": 3,
+        "plug_unknown": 1,
         "in_opener": 2,
-        "mid_game": 7
+        "mid_game": 3
       },
       {
         "user": "yachi",
-        "tspin_clears_scored": 235,
-        "tspin_clears_replay": 261,
-        "donations": 6,
-        "self_built_well": 0,
-        "garbage_derived_well": 6,
-        "natural": 5,
+        "tspin_clears_scored": 297,
+        "tspin_clears_replay": 309,
+        "donations": 10,
+        "self_built_well": 2,
+        "garbage_derived_well": 8,
+        "natural": 9,
         "b2b_breaking": 0,
         "plug_unknown": 1,
         "in_opener": 2,
-        "mid_game": 4
+        "mid_game": 8
       }
     ],
     "opener_window_pieces": 21,
     "ablation": {
-      "scored": 544,
+      "scored": 612,
       "counts": {
         "shipped": 15,
-        "no_reopen": 183,
-        "cavity1_no_reopen": 418,
-        "naive": 544
+        "no_reopen": 196,
+        "cavity1_no_reopen": 463,
+        "naive": 612
       },
       "rate_pct": {
-        "shipped": "2.76",
-        "no_reopen": "33.64",
-        "cavity1_no_reopen": "76.84",
+        "shipped": "2.45",
+        "no_reopen": "32.03",
+        "cavity1_no_reopen": "75.65",
         "naive": "100.00"
       }
     },
-    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 33.64% of this session's 544. The discriminating clause is the re-opening, and that is what is counted here. That figure is THIS SESSION's and no other: the corpus band belongs to whatever can see every session, which this file cannot",
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 32.03% of this session's 612. The discriminating clause is the re-opening, and that is what is counted here. That figure is THIS SESSION's and no other: the corpus band belongs to whatever can see every session, which this file cannot",
     "caveat": "the oracle board source keeps the engine's own seeded-RNG garbage hole columns, which disagree with the ige-recorded ones 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\". How many of THIS session's wells were garbage-derived is the per-player split beside it (garbage_derived_well / self_built_well) — read that, never a corpus absolute: this sentence said \"every donation in this corpus sits on a garbage-derived well\" until 2026-09-10, which held for nine sessions and then did not, and no per-session file can check a claim about the corpus. Same rule as the ablation band above"
   },
   "stmb_cave": {
@@ -2788,55 +3196,55 @@
     "counter_anchor": {
       "source": "the replay's own per-kind T-spin counters (results.stats.clears.tspindoubles and its seven siblings) — the fields extract.py and extract2.ts read into facts.json as tspin_doubles etc., so they are twice-extracted and inside the trust chain",
       "covers": "the DENOMINATOR only. The tables' numerators — which of those clears was a donation or a cave — come from this simulator alone and stay quarantined",
-      "player_rounds": 100,
-      "checked": 100,
+      "player_rounds": 130,
+      "checked": 130,
       "unknown_rounds": 0,
-      "rounds_agreeing": 100,
+      "rounds_agreeing": 130,
       "agrees": true,
       "unclassified_sim_clears": 0,
-      "tspin_clears_sim": 578,
-      "tspin_clears_replay": 578,
-      "tspin_clears_scored": 544,
+      "tspin_clears_sim": 683,
+      "tspin_clears_replay": 683,
+      "tspin_clears_scored": 612,
       "by_kind": {
         "tspinsingles": {
-          "sim": 57,
-          "replay": 57,
-          "rounds_agreeing": 100
-        },
-        "tspindoubles": {
-          "sim": 421,
-          "replay": 421,
-          "rounds_agreeing": 100
-        },
-        "tspintriples": {
           "sim": 84,
           "replay": 84,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
+        },
+        "tspindoubles": {
+          "sim": 470,
+          "replay": 470,
+          "rounds_agreeing": 130
+        },
+        "tspintriples": {
+          "sim": 107,
+          "replay": 107,
+          "rounds_agreeing": 130
         },
         "tspinquads": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspinsingles": {
-          "sim": 16,
-          "replay": 16,
-          "rounds_agreeing": 100
+          "sim": 22,
+          "replay": 22,
+          "rounds_agreeing": 130
         },
         "minitspindoubles": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspintriples": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         },
         "minitspinquads": {
           "sim": 0,
           "replay": 0,
-          "rounds_agreeing": 100
+          "rounds_agreeing": 130
         }
       }
     },
@@ -2846,36 +3254,35 @@
         "runCase (hand-port, sim.ts)"
       ],
       "covers": "a CHECK on the verdicts, not a re-scoping of the tables — they still score the oracle's verified prefix. Read `agreement_on_positives`, never `agreement_overall`: both verdicts are rare, so the overall rate is negatives agreeing with negatives",
-      "locks_scored": 544,
+      "locks_scored": 612,
       "prefix_locks": {
-        "rounds": 100,
-        "oracle_locks": 8198,
-        "hand_port_locks": 2827
+        "rounds": 130,
+        "oracle_locks": 9248,
+        "hand_port_locks": 3305
       },
       "board_diff_hist": {
-        "2": 12,
-        "4": 4,
-        "6": 5,
-        "8": 11,
-        "10": 12,
-        "12": 27,
-        "14": 8,
-        "16": 4,
-        "18": 4,
-        "20": 3,
-        "22": 4,
-        "24": 5,
-        "26": 2,
-        "30": 1
+        "2": 9,
+        "4": 7,
+        "8": 14,
+        "10": 13,
+        "12": 30,
+        "14": 9,
+        "16": 2,
+        "18": 8,
+        "20": 2,
+        "22": 8,
+        "24": 2,
+        "26": 4,
+        "30": 2
       },
-      "locks_comparable": 244,
-      "locks_same_board": 142,
+      "locks_comparable": 278,
+      "locks_same_board": 168,
       "board_split": {
         "don": {
-          "positives_same_board": 1,
-          "positives_diff_board": 8,
-          "agree_same_board": 1,
-          "agree_diff_board": 1
+          "positives_same_board": 0,
+          "positives_diff_board": 2,
+          "agree_same_board": 0,
+          "agree_diff_board": 0
         },
         "cave": {
           "positives_same_board": 0,
@@ -2885,68 +3292,67 @@
         }
       },
       "donation": {
-        "both_yes": 2,
-        "oracle_only": 7,
-        "other_only": 7,
-        "both_no": 228,
-        "oracle_positives": 9,
+        "both_yes": 0,
+        "oracle_only": 2,
+        "other_only": 5,
+        "both_no": 271,
+        "oracle_positives": 2,
         "agreement_on_positives": [
-          2,
-          9
+          0,
+          2
         ],
         "agreement_overall": [
-          230,
-          244
+          271,
+          278
         ]
       },
       "cave": {
         "both_yes": 2,
         "oracle_only": 0,
         "other_only": 0,
-        "both_no": 242,
+        "both_no": 276,
         "oracle_positives": 2,
         "agreement_on_positives": [
           2,
           2
         ],
         "agreement_overall": [
-          244,
-          244
+          278,
+          278
         ]
       }
     },
     "players": [
       {
         "user": "pinglamb",
-        "tspin_doubles_scored": 228,
-        "tspin_doubles_replay": 232,
+        "tspin_doubles_scored": 211,
+        "tspin_doubles_replay": 258,
+        "width_ge_3": 1,
+        "min_depth_ge_2": 0,
+        "in_opener": 0,
+        "mid_game": 1
+      },
+      {
+        "user": "yachi",
+        "tspin_doubles_scored": 204,
+        "tspin_doubles_replay": 212,
         "width_ge_3": 2,
         "min_depth_ge_2": 0,
         "in_opener": 0,
         "mid_game": 2
-      },
-      {
-        "user": "yachi",
-        "tspin_doubles_scored": 168,
-        "tspin_doubles_replay": 189,
-        "width_ge_3": 4,
-        "min_depth_ge_2": 1,
-        "in_opener": 0,
-        "mid_game": 4
       }
     ],
     "opener_window_pieces": 21,
     "width_histogram": {
-      "3": 6
+      "3": 3
     },
     "min_depth_histogram": {
-      "1": 5,
-      "3": 1
+      "1": 3
     },
     "triple_control": {
-      "tspin_triples_scored": 84,
-      "tspin_triples_replay": 84,
-      "width_ge_3": 10
+      "tspin_triples_scored": 107,
+      "tspin_triples_replay": 107,
+      "width_ge_3": 5
     },
     "means": "how many verified T-spin Doubles landed over a >= 3-wide gap overlapping the T's columns. Read it against BOTH controls beside it and never on its own: `min_depth_histogram` says how deep those gaps were, and a one-row-deep 3-wide gap is a dimple rather than a cave; `triple_control` counts the same shape under T-spin Triples, where it is ordinary TST residue"
   }

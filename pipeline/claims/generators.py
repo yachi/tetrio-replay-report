@@ -152,16 +152,48 @@ def _rank_desc(facts, key):
 
 @family
 def series_result(facts):
+    """The two match-win counts, and — only when they differ — who took the series.
+
+    The DRAW branch is not defensive coding. `max` returns the first maximal key, so on a
+    level series this family used to name whichever player `facts["players"]` listed first
+    and assert 「攞低個系列」 about him. The spec pins both counts and nothing else, so the
+    predicate evaluated True, the lemma verified, and the mutation sweep found no survivor —
+    every gate agreed with a sentence that was false. It went unseen for nine sessions
+    because no session had ever been level; 2026-09-10 is the first, at 4-4.
+
+    That is this repo's recurring shape — a claim whose PROSE says more than its spec proves
+    — and the fix is to say only what the spec pins. A draw gets the two counts and the word
+    打成平手; nothing here ranks a level series.
+    """
+    a, b = _players(facts)
     w = _match_wins(facts)
-    champ = max(w, key=lambda p: w[p])
-    other = [p for p in _players(facts) if p != champ][0]
+    n = len(facts["matches"])
+
+    def counts(first, second):
+        """The two match-win totals. Conjunct ORDER is part of the emitted spec, so the
+        decided branch keeps the champion first exactly as this family always emitted it —
+        reordering the terms would rewrite eight committed ledgers to say the same thing."""
+        return conj(eq(count_matches_won(first), lit(w[first])),
+                    eq(count_matches_won(second), lit(w[second])))
+
+    if w[a] == w[b]:
+        # No champion to lead with, so the level branch takes facts["players"] order — the
+        # same rule the report shell follows for a scoreline.
+        return [{
+            "family": "series_result", "category": "score",
+            "canto": f"成個 series {n} 場，{a} 同 {b} 各贏 {w[a]} 場，打成平手，"
+                     f"冇人攞低個系列",
+            "english_gloss": f"the series is level at {w[a]}-{w[b]}: {a} and {b} won "
+                             f"{w[a]} matches each and neither took it",
+            "spec": counts(a, b),
+        }]
+    champ, other = (a, b) if w[a] > w[b] else (b, a)
     return [{
         "family": "series_result", "category": "score",
-        "canto": f"成個 series {len(facts['matches'])} 場，{champ} 贏咗 {w[champ]} 場、"
+        "canto": f"成個 series {n} 場，{champ} 贏咗 {w[champ]} 場、"
                  f"{other} 贏 {w[other]} 場，{champ} 攞低個系列",
         "english_gloss": f"{champ} won the series {w[champ]}-{w[other]}",
-        "spec": conj(eq(count_matches_won(champ), lit(w[champ])),
-                     eq(count_matches_won(other), lit(w[other]))),
+        "spec": counts(champ, other),
     }]
 
 
@@ -785,8 +817,17 @@ def match_rate_dominance(facts):
             if not all(m["leaderboard"][hi][f] > m["leaderboard"][lo][f]
                        for m in facts["matches"]):
                 continue
-            lost = wins[hi] < wins[lo]
-            tail = ("，但係都輸咗個系列 —— 快唔等於贏" if lost else "，全面壓住對手")
+            # Three-way, because a level series is neither. `wins[hi] < wins[lo]` alone made
+            # a drawn night read 「全面壓住對手」 — the same defect `series_result` above
+            # carried, and found the same day. This family happens not to fire on 2026-09-10,
+            # so nothing in the corpus changes; it is fixed here because the next drawn
+            # session that DOES trip it would publish the false half silently.
+            if wins[hi] < wins[lo]:
+                tail = "，但係都輸咗個系列 —— 快唔等於贏"
+            elif wins[hi] == wins[lo]:
+                tail = "，但係個系列打成平手 —— 快唔等於贏"
+            else:
+                tail = "，全面壓住對手"
             out.append({
                 "family": f"match_dominance_{f}", "category": "pace",
                 "canto": f"{len(facts['matches'])} 場 match，{hi} 嘅場均 {label} "

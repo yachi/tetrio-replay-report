@@ -360,6 +360,8 @@ SENTENCES = {
                     "2026-07-28's near-equal attack totals"),
     "totals_0801": ("CLAUDE.md", re.compile(r"totals land on top of each other"),
                     "2026-08-01's near-equal attack and score totals"),
+    "totals_0910": ("CLAUDE.md", re.compile(r"the route covered nearly all of it"),
+                    "2026-09-10's 47-line attack shortfall"),
 }
 
 # (session, figure id, the sentence that publishes it). Every measurable session must appear.
@@ -425,12 +427,47 @@ PUBLISHED = (
     ("2026-08-25", "app_gap_lost", "series"),
     ("2026-09-03", "app_gap_won", "series"),
     ("2026-09-03", "app_gap_lost", "series"),
+    # 2026-09-10 ends the two-session quiet run and takes TWO `ANNOTATED` entries, which no
+    # session but 2026-08-01 has done. Measured over all five:
+    #
+    #     app_gap_won     +11.9851 pp   m8r3   -> +13.9798  rel 0.166   1.12x the next of 65
+    #     app_gap_lost     +1.2535 pp   m8r4   ->  +3.8619  rel 2.081   1.61x   <- annotated
+    #     app_gap_session  +6.6492 pp   m8r3   ->  +7.6256  rel 0.147   1.09x
+    #     attack_diff          -47 行   m2r9   ->      -11  rel 0.766   1.33x   <- annotated
+    #     score_diff        -35607 分   m2r9   ->   -21310  rel 0.402   1.89x
+    #
+    # Neither annotated figure flips sign, and both are the 「these two totals converged」 move
+    # this threshold was derived to catch. `score_diff` at 0.402 sits just under the cut and is
+    # correctly silent — it is inside the (0.406, 0.969) interval's lower neighbourhood, which is
+    # the closest any figure has come to the boundary without crossing it; recorded so that a
+    # later session nudging it over is a decision rather than a surprise.
+    #
+    # `attack_diff` IS published here, unlike 08-19's and 08-25's, because this session's prose
+    # quotes the −47 in its own sentences rather than only in CLAUDE.md's shortfall table.
+    ("2026-09-10", "app_gap_won", "series"),
+    ("2026-09-10", "app_gap_lost", "series"),
+    ("2026-09-10", "attack_diff", "totals_0910"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-09-10", "app_gap_lost"): (
+        "the lost-regime gap is +1.2535 pp — the narrowest in the corpus — and m8r4 alone is "
+        "2.6084 of it, taking it to +3.8619. `rel` 2.081 is the third-largest ever measured "
+        "here, behind 2026-08-01's score_diff and 2026-07-28's attack_diff, and it is the same "
+        "rhetorical move as both: 「these two totals have converged」. m8r4 is the round where "
+        "yachi threw .7207 attack per piece, his second-highest of the night, and LOST it — one "
+        "high-efficiency losing round lifting his whole losing-round pool. The direction "
+        "survives (the gap stays positive and stays the corpus's narrowest either way); the "
+        "SIZE does not, and 「地板貼到實」 is that round's statement as much as the night's."),
+    ("2026-09-10", "attack_diff"): (
+        "the attack totals are 3280 vs 3327, so the difference is -47, and m2r9 alone is 36 of "
+        "it — without that round it is -11. m2r9 is the round where yachi cleared 150 lines, "
+        "the session's most, and pinglamb survived anyway. 「兩邊嘅總攻擊撞埋一齊」 survives; "
+        "「爭 47 行」 is a figure one round owns. Same shape as 2026-08-01's -32 and "
+        "2026-07-28's -15, except that this one does not flip sign."),
     ("2026-09-03", "app_gap_won"): (
         "the won-regime gap is 7.6621 pp and m3r6 alone is 4.7659 of it. `rel` 0.622 is only the "
         "sixth-largest in the corpus — but 2.57x the next round's shift IS the corpus maximum on "

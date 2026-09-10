@@ -82,6 +82,8 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   '2026-08-25': { yachi: 0, pinglamb: 0 },
   // Nor this one — so the corpus-wide count stays 2, still entirely on yachi and entirely 08-19's.
   '2026-09-03': { yachi: 0, pinglamb: 0 },
+  // Nor this one. Three sessions running with none, and the corpus count is still 2.
+  '2026-09-10': { yachi: 0, pinglamb: 0 },
 };
 
 // The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits

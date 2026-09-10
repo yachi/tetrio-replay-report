@@ -407,6 +407,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(9);
-  expect(result.localised).toBe(2748);
+  expect(SESSIONS.length).toBe(10);
+  expect(result.localised).toBe(3002);
 });

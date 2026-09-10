@@ -1,0 +1,45 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": null,
+      "label": "全晚最癲嘅一局",
+      "value": "283.7",
+      "body": "第2場第1局，兩邊 VS 加埋約 283.7，係打足 60 秒嘅局入面最高<span class=\"badge\" data-claim=\"G062\"></span>。pinglamb 贏咗呢一局，但佢喺行數呢條軸落後，清走嗰格亦係輸蝕<span class=\"badge\" data-claim=\"G082\"></span>——佢贏喺每粒方塊嘅重量：攻擊約 0.790 對 0.647<span class=\"badge\" data-claim=\"G083\"></span>，而清垃圾嗰邊反而係 yachi 高，約 0.254 對 0.180<span class=\"badge\" data-claim=\"G084\"></span>。落得少、清得少，一樣贏。"
+    },
+    {
+      "accent": "p",
+      "label": "食多啲都照頂返",
+      "value": "102 行",
+      "body": "第8場第4局，pinglamb 俾人射埋嚟 102 行，多過 yachi 嘅 81 行，照樣頂住贏返<span class=\"badge\" data-claim=\"G025\"></span>。全晚有 11 局係食多過對手嘅垃圾都照贏，pinglamb 佔 7 局<span class=\"badge\" data-claim=\"G056\"></span>。呢一局仲有第二個身份，見下面「一局撐住」嗰條。"
+    },
+    {
+      "accent": "y",
+      "label": "一局都冇食過",
+      "value": "0 行",
+      "body": "第2場第2局，yachi 全局只食咗 0 行垃圾，直接封死 pinglamb<span class=\"badge\" data-claim=\"G057\"></span>。同一局亦係全場最短，打咗約 12 秒<span class=\"badge\" data-claim=\"G022\"></span>，而佢喺嗰 12 秒入面劈出全場最高單次 spike，17 行<span class=\"badge\" data-claim=\"G016\"></span>。"
+    },
+    {
+      "accent": "g",
+      "label": "四場生死局，一人兩場",
+      "value": "2 : 2",
+      "body": "八場入面有四場打到最後一局先分勝負，兩個人一人執兩場<span class=\"badge\" data-claim=\"G012\"></span>。四場嘅級數差好遠：m2 係 VS 約 140.3 對約 134.5<span class=\"badge\" data-claim=\"G058\"></span>，m5 約 123.4 對約 97.1<span class=\"badge\" data-claim=\"G059\"></span>，m6 約 119.7 對約 99.7<span class=\"badge\" data-claim=\"G060\"></span>，而決定成晚嘅 m8 係約 94.2 對約 5.7<span class=\"badge\" data-claim=\"G061\"></span>。成晚咁貼，收尾嗰局反而唔算打過。"
+    }
+  ],
+  "trivia": [
+    "全晚最抵諗嘅一條數：<strong>八場 4 比 4</strong><span class=\"badge\" data-claim=\"G001\"></span>、<strong>逐局 32 比 33</strong><span class=\"badge\" data-claim=\"G002\"></span>、<strong>打完七場 28 比 28</strong><span class=\"badge\" data-claim=\"C010\"></span>。前面九晚，場數同局數都一定分到高低，最貼嗰晚（08-25）都係 5 比 4、38 比 35。今晚兩樣都係第一次咁貼。",
+    "第五同第六場嘅局序一模一樣：兩場都係 0 比 3 落後，兩場都係第四局贏返、第五局再失，之後尾四局連贏，兩場都 5 比 4 收<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"C016\"></span>——九局逐格對逐格，冇一格唔同。要講清楚：呢個係巧合，唔係打法。兩場就係兩場，呢度冇提出任何解釋。",
+    "拆開贏同輸嘅局：贏嗰啲局兩個人每粒方塊嘅攻擊爭 11% 幾，輸嗰啲局淨係爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>。<strong>1% 幾係十晚以嚟最窄嘅地板差距</strong>，比 08-14 嗰 1.8% 仲窄。天花板拉開、地板貼實——同 08-14 一樣嘅形狀，十晚入面得兩晚係咁。",
+    "<strong>但「地板貼到實」呢句得一局撐住</strong>：抽走 m8 第 4 局，個差距由 1.25% 跳到 3.86%，郁咗成 2.6 個百分點。嗰局 yachi 每粒方塊打出 0.72（全晚第二高），但佢輸咗<span class=\"badge\" data-claim=\"G025\"></span>——一局輸咗嘅高效率局，就係咁樣托起佢成個「輸嘅局」個池。方向企得穩，個尺寸企唔穩。",
+    "用自己做把尺：yachi 自己贏局同輸局爭 17% 幾，pinglamb 爭 30% 幾<span class=\"badge\" data-claim=\"C003\"></span>。yachi 贏嗰啲局每粒方塊打出約 0.62，輸嗰啲局跌到約 0.53<span class=\"badge\" data-claim=\"G066\"></span>；pinglamb 同一條數係約 0.70 對約 0.53<span class=\"badge\" data-claim=\"G067\"></span>。<strong>pinglamb 嗰 30% 幾係佢自己十晚以嚟最闊</strong>，二十個 player-session 入面排第二，得 08-09 嘅 yachi（31% 幾）高過佢。",
+    "多落方塊呢條路連續第六晚買唔返個 gap，但今晚差啲得手：<strong>yachi 多疊咗 276 粒方塊，攻擊少 47 條</strong><span class=\"badge\" data-claim=\"C005\"></span>。計清楚：276 粒即係多過對手 5% 幾，可以填返 5 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>，而要填嘅得 6 個幾<span class=\"badge\" data-claim=\"C004\"></span>。前面五次條路都係俾人派咗個大過佢買得起嘅窿；今次個窿細返，佢就差 47 條。",
+    "<strong>「爭 47 條」呢句一樣得一局撐住</strong>：抽走 m2 第 9 局，個差額由 47 條變返 11 條。嗰局 yachi 清咗 150 行，係全場單局最多，但生還嗰個係 pinglamb<span class=\"badge\" data-claim=\"G020\"></span>。企得穩嘅係「兩邊總攻擊撞埋一齊」，唔係「爭 47 條」呢個數。",
+    "<strong>6 個幾百分點呢個效率差距，係十晚以嚟最窄</strong><span class=\"badge\" data-claim=\"C004\"></span>，比之前最窄嘅 08-01（7.3%）仲窄。場數平手、局數爭一局、效率差距最窄——三個唔同嘅量度今晚指住同一個方向。",
+    "手上功夫兩個人幾乎一模一樣：每粒方塊要按幾多下，yachi 3.598 下、pinglamb 3.606 下，爭 0.22%<span class=\"badge\" data-claim=\"C008\"></span>——<strong>十晚以嚟最窄</strong>。而喺兩個人自己身上，KPP 喺贏局同輸局之間都郁唔夠 0.05<span class=\"badge\" data-claim=\"G068\"></span><span class=\"badge\" data-claim=\"G069\"></span>。要補一句：今晚仲有一欄更加貼——每粒方塊清走幾多垃圾，兩個人爭 0.26%<span class=\"badge\" data-claim=\"G073\"></span>，所以 KPP 係「十晚以嚟最窄」，唔係「今晚最窄嗰欄」。",
+    "兩個人揀嘅路一路都唔同：yachi 嘅 Quad 267 對 185<span class=\"badge\" data-claim=\"G034\"></span>；pinglamb 嘅 T-spin double 258 對 212<span class=\"badge\" data-claim=\"G035\"></span>、triple 66 對 41<span class=\"badge\" data-claim=\"G036\"></span>。yachi 落得快（每局平均 PPS 約 1.46 對約 1.38<span class=\"badge\" data-claim=\"G039\"></span>），pinglamb 每粒打得重<span class=\"badge\" data-claim=\"G041\"></span>。",
+    "Perfect Clear 係 pinglamb 9 個、yachi 5 個<span class=\"badge\" data-claim=\"G037\"></span>，但同贏唔贏冇乜關係：全場淨係 pinglamb 做到全消嗰 9 局，佢輸咗 1 局<span class=\"badge\" data-claim=\"G079\"></span>；淨係 yachi 做到嗰 5 局，佢一樣輸咗 1 局<span class=\"badge\" data-claim=\"G077\"></span>。九個全消換返嚟嘅，成晚計係一局。",
+    "死法今晚一樣咁貼：全晚 11 局係自己頂到天花板收場，5 局係 yachi、6 局係 pinglamb<span class=\"badge\" data-claim=\"C006\"></span>，其餘 54 局全部係俾垃圾頂爆<span class=\"badge\" data-claim=\"G064\"></span>。差一局——不過呢一欄一路都係咁上咁落，唔好當佢係趨勢。",
+    "65 局裏面，每一局贏嗰個嘅 VS 都高過輸嗰個，零例外<span class=\"badge\" data-claim=\"G024\"></span>——十晚都係咁。要留意呢個唔係第二個獨立訊號：1v1 一局一命，KO 數等於局數<span class=\"badge\" data-claim=\"G038\"></span>。"
+  ]
+}
