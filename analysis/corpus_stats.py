@@ -34,13 +34,18 @@ and both are established rather than hypothetical:
    THIRD time — and this time not all in one direction: the two downstack-vs-intensity rho fell
    back toward zero (+0.203 → +0.177, +0.187 → +0.170) while the two duration controls moved
    further from it. So 「every one further from zero」 was a description of two increments, not a
-   tendency, and the sign and ordering are what have actually held. That is the other half of the
-   same lesson, now three times over:
+   tendency, and the sign and ordering are what have actually held. 2026-09-10 took it to ten and
+   634 rounds and moved all seven a FOURTH time, with the two downstack-vs-intensity rho turning
+   back OUT again (+0.177 → +0.183, +0.170 → +0.169 — one out, one in, at the third decimal).
+   Four increments, no run of three in any one direction, and the sign and ordering unmoved
+   throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
+   reason none of these digits is a finding. That is the other half of the
+   same lesson, now four times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.177**
-   (cleared_pp/intensity), **+0.170** (cleared/intensity), **+0.037** (cleared_pp/duration),
-   **-0.193** (apm/duration), **-0.196** (attack/duration), **+0.223**
-   (cleared_per_received/intensity) and **+0.091** (received/intensity). Nothing else in this
+   re-derives rather than counting sessions. As of the current corpus they read **+0.183**
+   (cleared_pp/intensity), **+0.169** (cleared/intensity), **+0.044** (cleared_pp/duration),
+   **-0.202** (apm/duration), **-0.203** (attack/duration), **+0.243**
+   (cleared_per_received/intensity) and **+0.102** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.
