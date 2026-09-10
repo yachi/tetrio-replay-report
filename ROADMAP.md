@@ -3921,3 +3921,112 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 第十個 session：第一次打成平手，同三個「九個 session 都係咁」嘅假設 (2026-09-10)
+
+2026-09-10 落地(8 場、65 局、**4 比 4**)。**呢個 session 值得寫低嘅唔係佢打成平手，係佢
+順手照出三個假設 —— 三個都係「一路都啱，因為證偽佢嗰個 case 從來未出現過」。**
+
+場數 4 比 4、局數 32 比 33、打完七場 28 比 28[C010]：兩樣量度都係全 corpus 最貼，08-25
+(5:4、38 比 35)兩樣都退做第二。
+
+### 1. 一句 verified、mutation-killed、proof-map 100% 嘅假話
+
+`series_result` 見到 4 比 4，用 `max(w, key=…)` 揀咗頭嗰個 player，寫住「yachi 攞低個系列」。
+佢個 spec pin 住兩個 match-win count，**冇 pin 邊個贏**。結果:
+
+- `build_claims` 話 predicate True
+- `dafny verify` 話 86 verified, 0 errors
+- `check_smt --mutate 12` 話 12/12 killed，冇 survivor
+- `claims-proof-map.json` 話 86/86 verified
+
+**成個 proof chain 同意咗一句錯嘅嘢，因為 chain 入面冇一個 gate 讀 Cantonese。** 呢個係
+`29-34%` 嗰個窿換咗個殼:嗰次係 byte-identity gate 證明「冇變」當咗「啱」，今次係 verifier
+證明「個 spec 講嘅嘢」當咗「隔籬句 prose 講嘅嘢」。
+
+可以一般化嘅兩點，已經入咗 CLAUDE.md 嘅 冇第二份 section 做第六個 instance:
+
+- **一個 claim 嘅 prose 加咗個 spec 冇 carry 嘅字，就係 unfalsifiable by construction。**
+  攞低、全面壓住、最、淨係 —— 全部係呢個形狀。screening question 同 section 上面嗰條一樣:
+  *乜嘢要成立先會 fire 到佢?* 答案係「spec 冇提過嘅嘢」嘅話，個字要入 spec，唔係就唔好寫。
+- **一枝從來未行過嘅 branch，九個綠色 session 唔算測過佢**，係未測過。
+  `match_rate_dominance` 隔幾行有一模一樣嘅窿(打成平手嗰陣照寫「全面壓住對手」)，今次唔
+  fire，一齊補咗 —— 一個從來未打成平手嘅 corpus，唔係「打成平手嗰枝行得通」嘅證據。
+
+修嘅時候中咗個副作用值得記:第一版順手把兩個 count 改成 players order，**七個 session 嘅
+committed ledger 即刻唔 byte-identical** —— conjunct 嘅次序係 emitted spec 嘅一部分。decided
+branch 保持返 champion-first，十個 session 全部 byte-identical。
+
+### 2. 「0 self-built well, every session」—— 兼且寫死咗喺十份 artefact 入面
+
+09-10 十五個 donation 入面有 **2 個唔係 garbage-derived well**(兩個都係 yachi，兩個都係
+mid-game natural plug，兩個都喺 verified prefix 深處 —— lock 40/64 同 lock 75/82，唔係
+prefix edge)。
+
+問題唔淨止係個數字。嗰句 absolute **同時寫死咗喺每一份 per-session `opener-facts.json` 嘅
+`donation.caveat` 入面**:「every donation in this corpus sits on a GARBAGE-derived well」。
+即係話一份**睇唔到其他 session** 嘅檔案，carry 住一句關於 corpus 嘅 claim —— 同 `29-34%` 當年
+pin 喺七份 byte-identity-gated artefact 入面一模一樣。re-emit 會原原本本重出嗰串字，所以每
+一個 gate 都同意佢。
+
+改法跟返 `29-34%` 嗰次:**caveat 指返自己嗰兩欄**(`garbage_derived_well` / `self_built_well`)，
+corpus 級嘅嘢交返俾睇得到 corpus 嗰啲 gate。十份 artefact 重出，diff 逐份淨係嗰一行。個
+substantive caveat(oracle 嘅 seeded-RNG hole column 信唔過)一個字都冇郁 —— 佢本來就唔靠嗰欄。
+兩個 exception 入咗 `SELF_BUILT_WELLS`，named list，唔係 `<= 2` bound。
+
+### 3. 第三個 DT order 冇佐證 —— 而個 pairing 本身先係之前寫低嘅結果
+
+頭兩個 DT order(08-14、08-25)各自有第二個 metric(first-bag occupancy)指住同一局，
+CLAUDE.md 寫住「Both positives have two independent metrics naming the same round, and that
+pairing is now the result rather than the coincidence」，同埋「A third must be investigated
+the same way」。
+
+第三個嚟咗:pinglamb `replay-2026-09-10-07.ttrm` r2，prefix verify 到 lock 67(唔係 short-prefix
+artefact)。兩樣嘢新:佢係第一個**唔係 yachi** 嘅，同埋 —— 重要嗰樣 —— **first-bag metric 完全
+搭唔到佢**:09-10 一個 exact match 都冇，pinglamb 成晚最近嘅 DT Cannon first bag 差 8 格。
+
+所以個 pairing 係 **2 of 3，唔係個 metric 嘅性質**。嗰句當初寫得啱(佢 cover 晒當時每一個 case)，
+錯嘅會係照抄落去。留返嘅講法反而好過原本嗰句:**ordering metric 搵到 first-bag metric 睇唔到
+嘅 Double-first opener** —— 兩個 metric 食唔同 input，本來就係為咗呢樣。
+
+順帶撞爆咗一條減數。m7r3 個 window 有一個 Double 兩個 Triple，即係 Triple-Double-Triple，
+**同一局同時 register 咗 cspin_order 1 同 dt_order 1**。`openers.test.ts` 一路寫住
+`cspin_order === rounds_with_both - DT_ORDER_IN_OPENER[…]`，即係靜靜咁假設咗「一局 DT 就唔係
+C-Spin 局」—— window 得一個 Double 一個 Triple 嗰陣係啱嘅，而之前每一個 case 都係咁。而家個
+減數行 `DT_ONLY_IN_OPENER`(09-10 冇 entry，因為佢減零)，而條 identity 講返正確嗰個量:
+`rounds_with_both - cspin_order` = 冇 Triple 行喺 Double 之前嘅局數，同 `dt_order` 唔同嘢。
+
+### 4. 一個 fragment 頂兩個位
+
+`check_rounding` 個 `round:dp1-split` fragment render 嘅係 `records._dp1` 嘅 **ceil** 欄，但
+CLAUDE.md 包住佢嗰句講緊 **round** 嗰對(「分唔開 floor 同 round(0 個 call)…佢就分得開喇」)。
+八個 session 之下 round 欄真係 0，兩句都啱得晒，睇唔出;第十個 session 一到，ceil 變 20、
+round 變 10，嗰句就攞住 20 去講一件 10 嘅事。
+
+**個 fragment 有 gate、有 renderer、每次都啱 —— 佢隔籬嗰句描述緊另一個量。** 呢個係
+CLAUDE.md 寫過嘅「a fragment pair whose sentence asserts a relation between them is not made
+safe by both fragments being gated」，不過今次連 pair 都冇，係一個 fragment 頂兩個位。而家
+`round:dp1-round` 有自己個 fragment，一句講邊欄就印邊欄。
+
+### 5. 個 shortfall ordering:第二個 out-of-sample 點，今次中
+
+09-03 打爆咗 perfect ordering(ρ 1.000 → 0.950)。09-10 係第二個 out-of-sample 點:shortfall
+1.51 pp(276 粒盈餘買到 5.14 pp，對住 C004 個 6.65 pp gap)，夾喺 08-01 嘅 1.00(−32 行)同
+07-24 嘅 2.66(−72 行)之間 —— 個 ordering 預測 −32 至 −72，實際 **−47**，中咗。
+ρ 由 0.950 升到 **0.9636**(exact permutation p = 2.5e-05)，09-03 仍然係唯一嗰個排錯位。
+
+**兩個點各企一邊，先至係呢個 claim 而家嘅狀態:** 一個打爆「perfect」，一個印證返「strong
+monotone」。09-03 嗰段特登寫住「Do not repair it by re-fitting」，冇 re-fit 過，所以今次呢個
+點係真嘅 out-of-sample，唔係一格靜靜咁加入去嘅 table row。
+
+順帶一提呢個 session 點解係 corpus 入面最細嗰次失手(−47 行):**唔係條路變好，係個窿變細。**
+6.65 pp 係十個 session 最窄嘅 gap，而條路照樣交足佢嗰 5.14 pp。「加粒數買唔返」第六次字面上
+啱，第六次都係錯嘅講法。
+
+### 未做嘅
+
+個 pooled AUC table 依然係 冇第二份，第九個 session 個 entry 講嘅嘢一個字都冇變:今次一樣係
+人手量、人手核(逐個 session 十六條 column 對得返 published 值，binomial 用兩個獨立
+implementation 夾過)，但依然冇 committed artefact re-derive 佢。今次 COMBO 由 corrected
+0.0081 行到 **0.022** —— 仲係 survivor，但已經唔算舒服，再多一個 sub-50 session 就過返界。
+**一個會郁到 verdict 邊緣嘅 table，冇 gate 守住，係而家個 repo 最大嗰個 冇第二份 exposure。**
