@@ -34,7 +34,7 @@ const cspin = prepared.filter(p => isCSpin(p.name));
 const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
-   '2026-08-19', '2026-08-25', '2026-09-03']);
+   '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 
 test('the vendored catalogue is the pinned upstream commit, decoded whole', () => {
@@ -142,7 +142,7 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   // prefix (24.8% -> 92.3%) admits more clean-first-bag rounds, 505 -> 522. 2026-08-14 adds 141 of its
   // own, 522 -> 663. The finding is the line below — `d <= 4` is still empty — not the population.
   // 2026-09-03 takes it 907 -> 981, and the zero is unmoved at nine sessions.
-  expect(clean.length).toBe(981);
+  expect(clean.length).toBe(1095);
   expect(clean.filter(r => r.bestCSpin!.d <= 4)).toHaveLength(0);
   // ... and the instrument is not simply blind: it finds exact matches. Through five sessions all four
   // were the same opener (a PCO), which made "it only ever finds one thing" a fair worry. 2026-08-14
@@ -168,7 +168,7 @@ test('no round comes within four cells of a catalogued C-Spin', () => {
   ]);
   // the Triple-bearing rounds are the bulk of the corpus, so the zero is not a small-n dodge
   // (oracle: 374 -> 380; 2026-08-14 takes it to 478; still the bulk of clean)
-  expect(clean.filter(r => r.sbTriple).length).toBe(700);
+  expect(clean.filter(r => r.sbTriple).length).toBe(778);
 }, 300_000);
 
 /* ── the artifact the report reads ─────────────────────────────────────────────────────────────
@@ -195,7 +195,7 @@ test('the ordering metric separates the two openers, in every session, both play
       // simulator has to face it. Subtracting a named exception rather than relaxing to an
       // inequality keeps the assertion exact: a second Double-first round still fails here.
       const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
-      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - known]);
+      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - dtOnly(s, p.user)]);
       // ... and it never RIVALS the C-Spin order, which is the shape of the result the section
       // prints. Bounded exactly as the full-round metric below.
       expect(p.dt_order).toBe(known);
@@ -203,7 +203,7 @@ test('the ordering metric separates the two openers, in every session, both play
     }
     for (const p of data.ordering_full_round.players) {
       const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
-      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - known]);
+      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - dtOnly(s, p.user)]);
       expect(p.dt_order).toBe(known);
       expect(p.dt_order).toBeLessThan(p.cspin_order / 10);
     }
@@ -402,6 +402,7 @@ const PERFECT_CLEARS: Record<string, Record<string, number>> = {
   '2026-08-19': { yachi: 5, pinglamb: 5 },
   '2026-08-25': { yachi: 7, pinglamb: 12 },
   '2026-09-03': { yachi: 4, pinglamb: 6 },
+  '2026-09-10': { yachi: 5, pinglamb: 9 },
 };
 
 test('the Perfect Clear count comes from the verified extractors, and is not zero', () => {
@@ -460,6 +461,10 @@ test('Perfect Clear timing is published only where the simulator matched the rep
 const IN_PCO_WINDOW: Record<string, number> = {
   '2026-07-22': 1, '2026-07-24': 1, '2026-07-28': 0, '2026-08-01': 1, '2026-08-09': 0,
   '2026-08-14': 0, '2026-08-19': 0, '2026-08-25': 0, '2026-09-03': 0,
+  // the fourth in the corpus, and the first since 2026-08-01: yachi lands one on piece 10,
+  // exactly harddrop's deadline. 20 more sessions' worth of clears have arrived since the
+  // numerator last moved, so the reading ('these are mid-game PCs') is reinforced, not upset.
+  '2026-09-10': 1,
 };
 
 test('these sessions run mid-game Perfect Clears, not the Perfect Clear Opener', () => {
@@ -515,6 +520,7 @@ const DONATION: Record<string, { donations: number; natural: number; b2b: number
   '2026-08-19': { donations: 24, natural: 16, b2b: 1, clears: 728 },
   '2026-08-25': { donations: 23, natural: 14, b2b: 2, clears: 898 },
   '2026-09-03': { donations: 13, natural:  9, b2b: 0, clears: 518 },
+  '2026-09-10': { donations: 15, natural: 12, b2b: 1, clears: 612 },
 };
 
 /** `width_ge_3` is the RAW shape count and is NOT a cave count — `min_depth_ge_2` is the column
@@ -529,6 +535,7 @@ const CAVE: Record<string, { width_ge_3: number; min_depth_ge_2: number; triple_
   '2026-08-19': { width_ge_3: 10, min_depth_ge_2: 0, triple_control: 11 },
   '2026-08-25': { width_ge_3: 11, min_depth_ge_2: 0, triple_control:  6 },
   '2026-09-03': { width_ge_3:  6, min_depth_ge_2: 0, triple_control:  5 },
+  '2026-09-10': { width_ge_3:  3, min_depth_ge_2: 0, triple_control:  5 },
 };
 
 /** THE DENOMINATOR ANCHOR, per session, as literals: the replay's own whole-round T-spin-clear
@@ -551,6 +558,7 @@ const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: num
   '2026-08-19': { rounds: 140, replay: 751, scored: 728 },
   '2026-08-25': { rounds: 146, replay: 973, scored: 898 },
   '2026-09-03': { rounds:  92, replay: 548, scored: 518 },
+  '2026-09-10': { rounds: 130, replay: 683, scored: 612 },
 };
 
 /** THE SECOND ENGINE, per session, as literals: [both_yes, oracle_positives] for each metric, and
@@ -568,6 +576,7 @@ const DUAL: Record<string, { comparable: number; scored: number; sameBoard: numb
   '2026-08-19': { comparable: 300, scored: 728, sameBoard: 154, cave: [7, 7], don: [2, 15] },
   '2026-08-25': { comparable: 313, scored: 898, sameBoard: 183, cave: [3, 3], don: [0, 5] },
   '2026-09-03': { comparable: 216, scored: 518, sameBoard: 112, cave: [1, 1], don: [0, 7] },
+  '2026-09-10': { comparable: 278, scored: 612, sameBoard: 168, cave: [2, 2], don: [0, 2] },
 };
 
 const facts = (s: string) =>
@@ -603,9 +612,9 @@ test('the second engine agrees on every cave and on a quarter of the donations',
     comparable += d.locks_comparable; scored += d.locks_scored;
   }
   // THE TWO CORPUS FIGURES, and the gap between them is the finding.
-  expect([caveHit, cavePos]).toEqual([27, 27]);      // every cave in range, both engines
-  expect([donHit, donPos]).toEqual([11, 70]);        // four donations in five disagree
-  expect([comparable, scored]).toEqual([2548, 6179]);
+  expect([caveHit, cavePos]).toEqual([29, 29]);      // every cave in range, both engines
+  expect([donHit, donPos]).toEqual([11, 72]);        // four donations in five disagree
+  expect([comparable, scored]).toEqual([2826, 6791]);
 
   // …and the reason neither number may be quoted as an overall rate: the donation's 96.7% is
   // almost entirely two engines agreeing that nothing happened. Asserted rather than commented,
@@ -615,9 +624,9 @@ test('the second engine agrees on every cave and on a quarter of the donations',
   expect(donHit / donPos).toBeLessThan(0.3);
 
   // The cave result is REAL but PARTIAL, and the second half is what keeps it in quarantine: the
-  // corpus holds 66 wide gaps and only 27 are reachable by a second engine.
+  // corpus holds 69 wide gaps and only 29 are reachable by a second engine.
   const allCaves = sum(SESSIONS.map(s => sum(facts(s).stmb_cave.players.map((p: any) => p.width_ge_3))));
-  expect(allCaves).toBe(66);
+  expect(allCaves).toBe(69);
   expect(cavePos).toBeLessThan(allCaves);
 });
 
@@ -645,19 +654,19 @@ test('the board split is what makes the donation 9/43 readable, and it is not th
   }
   // At 42% of the comparison points the two engines are judging DIFFERENT boards. Every figure in
   // dual_engine has to be read inside that.
-  expect([same, comparable]).toEqual([1441, 2548]);
+  expect([same, comparable]).toEqual([1609, 2826]);
 
   // THE DONATION: where the boards agree the verdicts agree perfectly, and where they differ they
   // mostly do not. So the disagreement is the BOARD (oracle-source.ts's garbage-hole columns), not
   // the predicate — the opposite of what "the two engines disagree about donations" sounds like.
-  expect(agg.don).toEqual([7, 63, 7, 4]);
+  expect(agg.don).toEqual([7, 65, 7, 4]);
   expect(agg.don[2]).toBe(agg.don[0]);                    // 7 of 7 on identical boards
   expect(agg.don[3] * 3).toBeLessThan(agg.don[1]);        // 4 of 63 on boards that differ
 
   // THE CAVE: a different statement, and it must not be worded like the donation's. Its verdict
   // survives boards that differ (22 of 22), which is ROBUSTNESS — consistent with the drift sitting
   // in low garbage rows while the cave is local to the spin. It is not evidence of correctness.
-  expect(agg.cave).toEqual([5, 22, 5, 22]);
+  expect(agg.cave).toEqual([5, 24, 5, 24]);
   expect(agg.cave[3]).toBe(agg.cave[1]);
 });
 
@@ -739,9 +748,24 @@ test('the denominator is anchored to the replay\'s own twice-extracted T-spin co
   // The corpus figure this whole change rests on, stated once: the simulator reproduces the
   // replay's own T-spin counters on every player-round of every session, and the verified prefix
   // the two tables score covers 4035 of those 4327 clears.
-  expect([rounds, agreeing]).toEqual([1138, 1138]);
-  expect([simTotal, replayTotal, scored]).toEqual([6599, 6599, 6179]);
+  expect([rounds, agreeing]).toEqual([1268, 1268]);
+  expect([simTotal, replayTotal, scored]).toEqual([7282, 7282, 6791]);
 });
+
+/** Donations whose well was NOT garbage-derived, per session — named, not bounded.
+ *
+ *  `sum(self_built_well) === 0` held for nine sessions and read as a property of these players.
+ *  2026-09-10 breaks it with two, both yachi's, and both survive the checks that would make a
+ *  detection cheap: `replay-2026-09-10-01.ttrm` round 6 plugs a 4-cell cavity at lock 40 of a
+ *  prefix verified to 64, and `replay-2026-09-10-07.ttrm` round 7 a 5-cell cavity at lock 75 of
+ *  one verified to 82 — so neither is a prefix-edge effect, and both are `natural` plugs, i.e.
+ *  the plugging lock cleared nothing. Both are mid-game (lock > WINDOW_PIECES).
+ *
+ *  A count, not a bound: `<= 2` would be satisfied by any two self-built wells anywhere in the
+ *  corpus, and this is satisfied only by a session whose total is exactly its entry. A third has
+ *  to be investigated rather than absorbed. This is the third 「never happens」 in this file to
+ *  turn out to be 「has not happened yet」, after DT_ORDER_IN_OPENER and CAVE_IN_OPENER_EXCEPTIONS. */
+const SELF_BUILT_WELLS: Record<string, number> = { '2026-09-10': 2 };
 
 test('the donation counts are pinned per session, and the licensing check is clean', () => {
   for (const s of SESSIONS) {
@@ -762,11 +786,16 @@ test('the donation counts are pinned per session, and the licensing check is cle
     expect(d.check.reconstruction_agreed).toBe(d.check.tspin_clears);
     expect(d.check.agrees).toBe(true);
 
-    // Every well in this corpus is garbage-derived, which is the caveat the section may not drop:
-    // the oracle keeps the engine's seeded-RNG hole columns, so WHICH column was donated into is
-    // not established. A self-built well appearing here would change that sentence.
-    expect([s, sum(d.players.map((p: any) => p.self_built_well))]).toEqual([s, 0]);
-    expect(sum(d.players.map((p: any) => p.garbage_derived_well))).toBe(want.donations);
+    // The provenance split, as a NAMED exception list rather than the `=== 0` absolute this was
+    // for nine sessions — the `DT_ORDER_IN_OPENER` precedent a fourth time. The caveat the section
+    // may not drop is unchanged and does not rest on this column: the oracle keeps the engine's
+    // seeded-RNG hole columns, so WHICH column was donated into is never established either way.
+    // What the column does say is whose well the shape sat on, and 2026-09-10 is the first session
+    // where the answer is not "garbage, every time".
+    expect([s, sum(d.players.map((p: any) => p.self_built_well))])
+      .toEqual([s, SELF_BUILT_WELLS[s] ?? 0]);
+    expect(sum(d.players.map((p: any) => p.garbage_derived_well)))
+      .toBe(want.donations - (SELF_BUILT_WELLS[s] ?? 0));
     // the three plug classes partition the donations
     expect(sum(d.players.map((p: any) => p.natural + p.b2b_breaking + p.plug_unknown)))
       .toBe(want.donations);
@@ -1146,6 +1175,7 @@ const MID_GAME_ORDER: Record<string, { rounds_with_both: number; cspin: number; 
   '2026-08-19': { rounds_with_both: 4, cspin: 2, dt: 3 },
   '2026-08-25': { rounds_with_both: 4, cspin: 3, dt: 2 },
   '2026-09-03': { rounds_with_both: 2, cspin: 2, dt: 1 },
+  '2026-09-10': { rounds_with_both: 3, cspin: 3, dt: 1 },
 };
 
 /** Both techniques split by the same window, summed over both players. Read the cave's `in_opener`
@@ -1164,6 +1194,7 @@ const WINDOW_SPLIT: Record<string, { donation: [number, number]; cave: [number, 
   '2026-08-19': { donation: [10, 14], cave: [2, 8] },
   '2026-08-25': { donation: [4, 19], cave: [2, 9] },
   '2026-09-03': { donation: [5, 8], cave: [1, 5] },
+  '2026-09-10': { donation: [4, 11], cave: [0, 3] },
 };
 
 const orderPlayers = (s: string) => facts(s).ordering.players as any[];
@@ -1230,7 +1261,7 @@ test('the quoted wiki pages are pinned, and exactly one continuation replaces th
 const ORDER_NULLS: Record<string, number> = {
   '2026-07-22': 9, '2026-07-24': 3, '2026-07-28': 8, '2026-08-01': 8,
   '2026-08-09': 10, '2026-08-14': 11, '2026-08-19': 12, '2026-08-25': 6,
-  '2026-09-03': 8,
+  '2026-09-03': 8, '2026-09-10': 12,
 };
 
 /**
@@ -1336,7 +1367,7 @@ test('the window gate: per-round DT rows equal the named exception list, and the
     }
   }
   // the phantoms a dropped window filter would admit — pooled, and they are NOT in the rows above
-  expect(midGameDouble).toBe(12);
+  expect(midGameDouble).toBe(13);
 });
 
 test('the join gate: cspin <= min(TST, TSD) per row, and an off-by-one join breaks it', () => {
@@ -1366,7 +1397,7 @@ test('the join gate: cspin <= min(TST, TSD) per row, and an off-by-one join brea
       .toEqual([s, 'off-by-one join must violate the bound', true]);
   }
   // the bound is not decorative arithmetic — it is tight on most of the corpus
-  expect([rows, bound]).toEqual([1063, 661]);
+  expect([rows, bound]).toEqual([1181, 739]);
 });
 
 test('the emitted whole-round T-spin columns ARE facts.json\'s, per round and per match', () => {
@@ -1405,7 +1436,7 @@ test('the emitted whole-round T-spin columns ARE facts.json\'s, per round and pe
     }
   }
   // pinned so a session dropping out of the sweep is a failure rather than a smaller green run
-  expect([perRound, perMatch]).toEqual([1138, 148]);
+  expect([perRound, perMatch]).toEqual([1268, 164]);
 });
 
 test('the window columns are NOT the whole-round ones — the corpus separates them', () => {
@@ -1422,7 +1453,7 @@ test('the window columns are NOT the whole-round ones — the corpus separates t
       total++;
       if (r.tspin_doubles_window < r.tspin_doubles || r.tspin_triples_window < r.tspin_triples) strictly++;
     }
-  expect([total, strictly]).toEqual([1138, 981]);
+  expect([total, strictly]).toEqual([1268, 1089]);
 });
 
 /** The ONE opener in the corpus that runs the DT order, named rather than absorbed.
@@ -1446,7 +1477,40 @@ const DT_ORDER_IN_OPENER: Record<string, Record<string, number>> = {
   //  DT Cannon match, as 2026-08-14's was. Two exceptions, both yachi, both corroborated by
   //  the other metric.
   '2026-08-25': { yachi: 1 },
+  //  THE THIRD, and it breaks the pattern the first two established rather than extending it.
+  //  pinglamb opened replay-2026-09-10-07.ttrm round 2 (m7r3) Double-before-Triple inside the
+  //  window; the prefix verifies to lock 67, so it is not a short-prefix artefact either. Two
+  //  things are new. It is the first that is NOT yachi's, and — the one that matters — it is the
+  //  first with NO first-bag corroboration: 2026-09-10 has zero exact matches of any opener, and
+  //  pinglamb's nearest DT Cannon first bag in the session is 8 cells away. So the pairing is 2
+  //  of 3, not 3 of 3. 「Both positives have two independent metrics naming the same round」 was
+  //  a statement about two rounds and must not be carried forward as a property of the metric;
+  //  what survives is that the ordering metric finds Double-first openers the first-bag metric
+  //  sometimes cannot see, which is what two metrics scored on different inputs are FOR.
+  '2026-09-10': { pinglamb: 1 },
 };
+
+/** Rounds where the DT order was the ONLY order the window showed, per session and player.
+ *
+ *  NOT the same quantity as `DT_ORDER_IN_OPENER`, and 2026-09-10 is what proved it. These three
+ *  assertions used to read `cspin_order === rounds_with_both - DT_ORDER_IN_OPENER[...]`, which
+ *  silently assumed a round showing the DT order cannot also show the C-Spin order. That holds
+ *  when the window carries exactly one Double and one Triple, which is every case the corpus had
+ *  through nine sessions. pinglamb's replay-2026-09-10-07.ttrm round 2 carries ONE Double and TWO
+ *  Triples, so the window reads Triple-Double-Triple and registers BOTH orders: `cspin_order` 1,
+ *  `dt_order` 1, in one round. The old form then expected 45 against the artefact's 46.
+ *
+ *  The subtraction is over rounds that showed no Triple before a Double, which is what
+ *  `rounds_with_both - cspin_order` means, so this list is the honest operand. It stays a named
+ *  list for the same reason the one above is: a value here that the data does not support fails,
+ *  and so does a missing one. */
+const DT_ONLY_IN_OPENER: Record<string, Record<string, number>> = {
+  '2026-08-14': { yachi: 1 },
+  '2026-08-25': { yachi: 1 },
+  // 2026-09-10 is deliberately absent: its DT round showed the C-Spin order too, so it subtracts
+  // nothing. An entry of 1 here would fail, which is the point of listing rather than bounding.
+};
+const dtOnly = (s: string, user: string) => DT_ONLY_IN_OPENER[s]?.[user] ?? 0;
 
 test('the opener window does real work: 454 of 455 inside it, both ways outside it', () => {
   // THE REASON THE SPLIT EXISTS. Inside the window the corpus is overwhelmingly one-directional —
@@ -1460,7 +1524,7 @@ test('the opener window does real work: 454 of 455 inside it, both ways outside 
     for (const p of orderPlayers(s)) {
       const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
       expect([s, p.user, p.dt_order]).toEqual([s, p.user, known]);
-      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - known]);
+      expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - dtOnly(s, p.user)]);
       insideBoth += p.rounds_with_both;
       insideDt += p.dt_order;
       outsideBoth += p.mid_game.rounds_with_both;
@@ -1473,7 +1537,7 @@ test('the opener window does real work: 454 of 455 inside it, both ways outside 
   expect(outsideDt).toBeGreaterThan(0);
   expect(outsideDt).toBe(sum(SESSIONS.map(s => MID_GAME_ORDER[s]!.dt)));
   expect(outsideDt * insideBoth).toBeGreaterThan(insideDt * outsideBoth * 20);
-  expect([insideBoth, insideDt, outsideBoth]).toEqual([672, 2, 22]);
+  expect([insideBoth, insideDt, outsideBoth]).toEqual([754, 3, 25]);
 });
 
 test('the mid-game denominator is far too small to be published as a rate', () => {
@@ -1591,7 +1655,7 @@ test('the STMB cave is a mid-game shape, and that is measured rather than cited'
       expect([s, CAVE[s]!.min_depth_ge_2]).toEqual([s, 0]);
     out += sum(facts(s).stmb_cave.players.map((p: any) => p.mid_game));
   }
-  expect([inOpener, out]).toEqual([5, 61]);
+  expect([inOpener, out]).toEqual([5, 64]);
   expect(inOpener).toBe(CAVE_IN_OPENER_EXCEPTIONS.length);
   // NOTHING WAS LOST ON THE WAY. This used to read `out === sum(width_ge_3)`, which was true only
   // while `in_opener` was 0 everywhere — so it silently encoded "no hit is ever in an opener" as

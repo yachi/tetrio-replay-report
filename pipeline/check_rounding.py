@@ -335,10 +335,13 @@ def discriminate(trace):
         # 11 554, i.e. the summary silently dropped 3 600 calls it had recorded.
         out[f"{site} [{kind}]" if site else f"<unnamed {kind} call>"] = {
             "calls": len(calls), "kind": kind, "rule": "/".join(sorted(rules)), "alt": alt,
-            # EVERY alternative must be discriminated, not just one. `records._dp1` separates
-            # floor from ceil on 14 calls and from ROUND on none, so a mutant swapping its floor
-            # for round changes no published byte — a site reported as enforced on the strength of
-            # the ceil column would be hiding exactly the defect this gate is named after.
+            # EVERY alternative must be discriminated, not just one. At seven sessions
+            # `records._dp1` separated floor from ceil on 14 calls and from ROUND on none, so a
+            # mutant swapping its floor for round changed no published byte — a site reported as
+            # enforced on the strength of the ceil column alone would have hidden exactly the
+            # defect this gate is named after. Ten sessions later the round column is non-zero
+            # too and the site is genuinely enforced; the rule did not move, the data did, which
+            # is the whole argument for measuring this rather than asserting it.
             "unenforced": sorted(k for k, v in alt.items() if not v),
             "discriminating": bool(alt) and all(alt.values())}
     return out
@@ -356,6 +359,7 @@ SPECS = {
     NS + "enforced": (lambda r: str(r["enforced"]), DOCS),
     NS + "ontrust": (lambda r: str(r["sites"] - r["enforced"]), DOCS),
     NS + "dp1-split": (lambda r: f"{r['dp1_ceil']} 個 call", DOCS),
+    NS + "dp1-round": (lambda r: f"{r['dp1_round']} 個 call", DOCS),
 }
 
 
@@ -371,7 +375,12 @@ def headline(res):
     dp1 = res.get("records._dp1 [quantf]", {})
     return {"figures": sum(v["calls"] for v in res.values()), "sites": len(res),
             "enforced": sum(1 for v in res.values() if v["discriminating"]),
-            "dp1_ceil": dp1.get("alt", {}).get("ceil", 0)}
+            "dp1_ceil": dp1.get("alt", {}).get("ceil", 0),
+            # BOTH alternatives, because the prose quoting this site names the floor-vs-ROUND
+            # pair specifically. Only `dp1_ceil` was exposed, so CLAUDE.md's sentence about the
+            # round pair was rendered from the ceil column — gated, and describing the wrong
+            # comparison. Both are fragments now; a sentence naming one may not print the other.
+            "dp1_round": dp1.get("alt", {}).get("round", 0)}
 
 
 def main(argv=None):

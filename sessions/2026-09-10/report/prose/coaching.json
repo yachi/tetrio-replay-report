@@ -1,0 +1,35 @@
+{
+  "eyebrow": "教練分析 · 第十回合",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚唔使問「點解一個人領先」——場數 4 比 4<span class=\"badge\" data-claim=\"G001\"></span>、局數 32 比 33<span class=\"badge\" data-claim=\"G002\"></span>、打完七場 28 比 28<span class=\"badge\" data-claim=\"C010\"></span>。要問嘅係：兩個打成平手嘅人，仲有咩分開緊佢哋。答案同前面九晚同一欄——每粒方塊嘅攻擊，不過今晚係史上最窄嗰個版本<span class=\"badge\" data-claim=\"C004\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "條路冇壞，係個窿終於細返",
+      "profile": [
+        "多疊咗 276 粒方塊，攻擊少 47 條<span class=\"badge\" data-claim=\"C005\"></span>。276 粒即係多過對手 5% 幾，可以填返 5 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>，要填嘅得 6 個幾<span class=\"badge\" data-claim=\"C004\"></span>——前面五次，派俾呢條路嘅窿全部大過佢買得起。",
+        "自己贏局同輸局爭 17% 幾，係兩個人入面窄嗰個<span class=\"badge\" data-claim=\"C003\"></span>。即係話你差嗰啲局唔算差得好緊要，但你好嗰啲局都仲有位。",
+        "落得快、逐局波動細<span class=\"badge\" data-claim=\"G039\"></span><span class=\"badge\" data-claim=\"G044\"></span><span class=\"badge\" data-claim=\"G045\"></span>，perfect piece 比率高過對手<span class=\"badge\" data-claim=\"G043\"></span>。手上功夫冇嘢好執。"
+      ],
+      "recs": [
+        "<strong>唔好再加粒數。</strong>條路一直都交足貨——今晚就係證明：個窿細到 6 個幾百分點嘅時候，佢差 47 條就填得晒<span class=\"badge\" data-claim=\"C005\"></span>。要郁嘅係個窿，唔係粒數。",
+        "<strong>位喺天花板，唔喺地板。</strong>輸嗰啲局兩個人爭 1% 幾，贏嗰啲局爭 11% 幾<span class=\"badge\" data-claim=\"C002\"></span>。（呢句要記住得一局撐住：抽走 m8 第 4 局，地板差距就變 3.86%。）守嗰邊唔係扣緊你分嘅嘢。",
+        "<strong>KPP 唔使睇。</strong>3.598 對 3.606<span class=\"badge\" data-claim=\"C008\"></span>，喺自己贏局輸局之間郁唔夠 0.05<span class=\"badge\" data-claim=\"G068\"></span>。呢一欄冇嘢執得返。",
+        "<strong>真係要睇嘅係 m8。</strong>成晚 28 比 28<span class=\"badge\" data-claim=\"C010\"></span>，最後嗰局 VS 約 5.7 對約 94.2<span class=\"badge\" data-claim=\"G061\"></span>。四場生死局你執到兩場<span class=\"badge\" data-claim=\"G012\"></span>，呢場唔算打過——打成平手嘅一晚，輸喺一局唔算比賽嘅局，係最唔抵嘅一種輸法。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "贏喺天花板，地板拉唔開",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過對手 11% 幾，輸嗰啲局淨係高 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>。",
+        "自己贏局同輸局爭 30% 幾<span class=\"badge\" data-claim=\"C003\"></span>——十晚以嚟你自己最闊嗰次，二十個 player-session 入面排第二。呢個形狀夠硬淨，但都夠脆：好嗰啲局好得好交關，差嗰啲局就好普通。",
+        "T-spin 兩款都領先<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G036\"></span>，每粒方塊打得重<span class=\"badge\" data-claim=\"G041\"></span>，APM 高<span class=\"badge\" data-claim=\"G040\"></span>。"
+      ],
+      "recs": [
+        "<strong>要郁嘅係地板。</strong>你輸嗰啲局每粒方塊打出約 0.53<span class=\"badge\" data-claim=\"G067\"></span>，同對手輸局嘅數字爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>。你今晚輸嘅每一局，都係跌返落佢個水平打，唔係你個水平。",
+        "<strong>Perfect Clear 唔見數。</strong>9 個對 5 個<span class=\"badge\" data-claim=\"G037\"></span>，但全場淨係你做到全消嗰 9 局，你仲要輸咗一局<span class=\"badge\" data-claim=\"G079\"></span>。九個全消，成晚計換返一局。",
+        "<strong>條路本身冇嘢改。</strong>T-spin double 258 對 212、triple 66 對 41<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G036\"></span>，對手多疊嗰 276 粒方塊冇翻到你隻船<span class=\"badge\" data-claim=\"C005\"></span>——差 47 條就得，但都係冇。"
+      ]
+    }
+  },
+  "versus_note": "效率差距 6 個幾百分點<span class=\"badge\" data-claim=\"C004\"></span>，十晚以嚟最窄。兩個場數 4 比 4、局數 32 比 33、打完七場 28 比 28、每粒方塊按鍵數爭 0.22%<span class=\"badge\" data-claim=\"C008\"></span> 嘅人，基本上係喺同一個水平打同一隻遊戲。剩返嘅係贏局嗰邊嗰一成幾嘅天花板差距<span class=\"badge\" data-claim=\"C002\"></span>——同埋成晚 47 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>。"
+}

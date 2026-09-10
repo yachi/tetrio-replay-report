@@ -1337,8 +1337,11 @@ const counterRoundsFor = (user: string, keys: readonly string[]) => {
 // ── metric 7: DONATION ─────────────────────────────────────────────────────────────────────────
 // THE CONTROL IS THE TWO SPLITS, and neither may be dropped. The b2b split reproduces harddrop's
 // own Natural-vs-Other-Examples division from the plugging lock; the provenance split says whose
-// well it was. Both matter because the corpus answers them the same way every time — all of these
-// wells are garbage-derived — which is exactly the finding, and also the caveat (see below).
+// well it was. This comment used to add "and the corpus answers them the same way every time — all
+// of these wells are garbage-derived". That was true of nine sessions and false on the tenth:
+// 2026-09-10 has two self-built wells, both yachi's, both mid-game naturals well inside their
+// verified prefixes. The split is a MEASUREMENT per session, which is why it is emitted per player
+// rather than asserted here — see the caveat below.
 /** A rate as a 2-dp percentage STRING, rounded half-up on the exact ratio.
  *  `pipeline/check_donation_bands.py` renders the same figures with `floor(n*10000/d + 0.5)`, which
  *  is this expression in the other language over the same double — and it cross-checks the string
@@ -1404,11 +1407,15 @@ function donationMetric() {
          + `this session's ${scored}. The discriminating clause is the re-opening, and that is what is `
          + 'counted here. That figure is THIS SESSION\'s and no other: the corpus band belongs to '
          + 'whatever can see every session, which this file cannot',
-    caveat: 'every donation in this corpus sits on a GARBAGE-derived well, and the oracle board '
-          + 'source keeps the engine\'s own seeded-RNG hole columns, which disagree with the '
-          + 'ige-recorded columns 97 of 103 times (see oracle-source.ts). So the count says the board '
-          + 'offered this shape that often; it does not establish WHICH column any one donation used, '
-          + 'and it may never be read as "this player donated into that well"',
+    caveat: 'the oracle board source keeps the engine\'s own seeded-RNG garbage hole columns, which '
+          + 'disagree with the ige-recorded ones 97 of 103 times (see oracle-source.ts). So the count '
+          + 'says the board offered this shape that often; it does not establish WHICH column any one '
+          + 'donation used, and it may never be read as "this player donated into that well". How '
+          + 'many of THIS session\'s wells were garbage-derived is the per-player split beside it '
+          + '(garbage_derived_well / self_built_well) — read that, never a corpus absolute: this '
+          + 'sentence said "every donation in this corpus sits on a garbage-derived well" until '
+          + '2026-09-10, which held for nine sessions and then did not, and no per-session file can '
+          + 'check a claim about the corpus. Same rule as the ablation band above',
   };
 }
 

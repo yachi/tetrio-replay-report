@@ -52,7 +52,7 @@ before the final 20% of the round. It is a **disagreement map, not a certified s
   followed: documented garbagespeed, the garbage-cancel protocol port, and locktime 60→30), and 97.9%
   over the verified prefix alone (19803/20226 locks, `bun driftmap.mjs --prefix`) — the whole-round
   figure is dragged down by the topout flood past the prefix.
-- **97.9% here is not the 96.1% in the dual-backed section below**, and the two must not be quoted
+- **97.9% here is not the 95.9% in the dual-backed section below**, and the two must not be quoted
   interchangeably. This one counts a lock if it matches **individually**; `cross-extract.mjs` counts
   only the **contiguous** agreeing prefix, stopping at the first divergence, so it is always the
   lower of the two. "Bit-exact over the verified prefix" is ambiguous between them — say which.
@@ -95,8 +95,8 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
-over the verified prefix, sim and Triangle agree bit-exact on **96.1%** of locks, backing **96.2%** of
-forecast events and **94.4%** of opener rounds with an independent engine — the dual-implementation
+over the verified prefix, sim and Triangle agree bit-exact on **95.9%** of locks, backing **96.1%** of
+forecast events and **94.5%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
 was flagged non-dual purely because the oracle mis-paired a garbage hole. The sim matched ground truth
@@ -139,6 +139,7 @@ Three separate staleness deltas had stacked up behind it, and the prose above qu
 | 1 | `842f7c0` regenerated the manifest after the exact-attack default; prose not updated | → 94.9% |
 | 2 | the reference-engine board source landed; manifest **never** regenerated | → 95.9% |
 | 3 | the sixth session (2026-08-14) added | → 96.2% |
+| 4 | four more sessions (08-19, 08-25, 09-03, 09-10) added, one at a time | → 95.9% |
 
 Only delta 3 is the one a "new session" checklist would catch. Delta 1 is prose left behind by a
 regeneration, delta 2 is an artefact left behind by a *source* change — and delta 2 is the large one.
