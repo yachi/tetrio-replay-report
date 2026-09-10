@@ -177,12 +177,13 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-08-19 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
 | 2026-08-25 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
 | 2026-09-03 | 13/16 testable = **81%** | 11/16 = **69%** | 11/16 = **69%** | 2 |
+| 2026-09-10 | 13/16 testable = **81%** | 13/16 = **81%** | 13/16 = **81%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->six of the nine<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->seven of the ten<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -191,8 +192,8 @@ than a threshold: no honest floor exists when one hand claim is worth 10.0 point
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eight of the nine<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->nine of the nine<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eight of the ten<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->nine of the ten<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -4022,6 +4023,23 @@ monotone」。09-03 嗰段特登寫住「Do not repair it by re-fitting」，冇
 順帶一提呢個 session 點解係 corpus 入面最細嗰次失手(−47 行):**唔係條路變好，係個窿變細。**
 6.65 pp 係十個 session 最窄嘅 gap，而條路照樣交足佢嗰 5.14 pp。「加粒數買唔返」第六次字面上
 啱，第六次都係錯嘅講法。
+
+### 6. 第一個「second family 攞唔走嘢」嘅 session —— 但唔係因為 cover 得好
+
+`equiv.py` 逐個 session 量:09-10 三個 granularity 全部 **13/16 = 81%**，covered set 逐個
+一模一樣。之前九個 session 入面，`round` granularity 個個都俾第二個 family 攞走嘢(07-24
+淨係喺 `match` 度豁免，一到 `round` 就跌 R018)，所以「nine of the nine」呢個數而家變
+「nine of the ten」。
+
+**點解豁免 —— 呢個先係要記嘅嘢:唔係佢 cover 得好，係佢 windowed claim 少。** 佢個 81% 同
+07-22、09-03 打和，係全 corpus 最低嗰組。佢得一條 windowed claim(C010:局數同打完七場
+28 比 28)，而 C010 喺 single-value 已經係 covered —— 有 generated claim implies 咗佢 ——
+所以第二個 family 冇嘢剩返可以攞。其他 session 跌嗰啲，全部係 single-value falsify 唔到、
+two-site falsify 到嗰種;呢度一條都冇，因為呢個 ledger 把 window 集中喺一條 claim 度，冇
+散落 regime 同 route 嗰幾條。
+
+C002、C003、C008 三條喺三個 granularity 都係 uncovered，同 single-value 一模一樣。
+**所以「second family 攞唔走嘢」永遠唔可以讀成「cover 得好」**，兩句講緊完全唔同嘅嘢。
 
 ### 未做嘅
 

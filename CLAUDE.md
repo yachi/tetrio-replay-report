@@ -913,17 +913,29 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**.
 
-**07-28 is not the exception — <!--equiv:sf-match-->eight of the nine<!--/equiv:sf-match--> measured sessions lose coverage
+**07-28 is not the exception — <!--equiv:sf-match-->eight of the ten<!--/equiv:sf-match--> measured sessions lose coverage
 to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
-08-19 C007). **That count is at `match` granularity, and it is the only reading on which any
-session is exempt**: 07-24 is the one that loses nothing there (48 → 48), and it loses R018 at
-`round`, so at the granularity the figures above are quoted at the count is
-**<!--equiv:sf-round-->nine of the nine<!--/equiv:sf-round-->**.
+08-19 C007). **That count used to be at `match` granularity only, and `match` used to be the only
+reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but loses R018 at
+`round`, so for nine sessions the `round` count was every session measured. At ten it is
+**<!--equiv:sf-round-->nine of the ten<!--/equiv:sf-round-->**, because 2026-09-10 loses nothing
+at EITHER granularity — 13 of 16 at all three, the same covered set each time.
 Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
 was measured on — check which one a count came from before carrying it forward.
+
+**Why 09-10 is exempt is worth reading, because it is not the session being better covered.** Its
+81% is joint-lowest with 07-22 and 09-03. It holds exactly ONE windowed claim (C010, the round
+totals and the 28-28 after seven matches), and C010 is already in the `covered` set at single
+value — a generated claim implies it — so the second family has nothing left to take. The other
+sessions' drops are all claims that single-value could not falsify and two-site could; here there
+are none of those, because this session's hand ledger puts its windows in one claim rather than
+spreading them across the regime and route claims. **So a session can be exempt for having FEWER
+windowed claims, not better ones**, and 「loses nothing to the second family」 must never be read as
+「is well covered」. C002, C003 and C008 are uncovered at all three granularities, exactly as they
+are at single value.
 `sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
 published alone is blind to exactly the headline claims. `check_equiv_coverage.py` fails the
 build if one is published without its two-site companion for a session holding windowed claims.
