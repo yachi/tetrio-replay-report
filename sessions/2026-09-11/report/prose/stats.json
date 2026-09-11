@@ -32,7 +32,7 @@
       "heading": "身手大比拼",
       "caps": [
         "手上功夫幾乎冇分別：每粒方塊要按幾多下，3.620 對 3.608，爭 0.33%<span class=\"badge\" data-claim=\"C008\"></span>。yachi 落得快<span class=\"badge\" data-claim=\"G037\"></span>、清得多<span class=\"badge\" data-claim=\"G069\"></span>，pinglamb 每粒打得重<span class=\"badge\" data-claim=\"G039\"></span>、APM 高好多<span class=\"badge\" data-claim=\"G038\"></span>、逐局波動細啲<span class=\"badge\" data-claim=\"G042\"></span><span class=\"badge\" data-claim=\"G043\"></span>。",
-        "真係拉得開嘅得一欄，而且兩邊都拉開咗：贏嗰啲局兩個人爭 9% 幾，輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>。"
+        "真係拉得開嘅得一欄：贏嗰啲局兩個人爭 9% 幾，輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>——天花板闊啲，但兩個數擺返落全 corpus 排位睇，贏嗰欄排第四、輸嗰欄排第八。"
       ],
       "footnote": "「每粒 finesse 失誤」係 fault 事件除以粒數，唔係「有幾多 % 粒方塊出錯」——一粒方塊可以記幾次 fault，所以呢一行用 toFixed(3) 唔用百分比。",
       "mount": {

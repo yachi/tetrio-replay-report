@@ -17,8 +17,13 @@ Seven matches, 51 rounds. **pinglamb 6-1, rounds 32-19.**
 ## The mechanism
 
 - Session APP gap **+12.41%** [C004] — wide, not a record (2026-08-09's +18.1% is).
-- **Both regimes move, which is the departure from last session.** Won +9.82%, lost +4.65%
-  [C002]. 2026-09-10 was +11.99 / +1.25 — the floor was level there and is not here.
+- **The floor stops being level, and the ceiling narrows slightly.** Won +9.82%, lost +4.65%
+  [C002] against 2026-09-10's +11.99 / +1.25. **Do not read this as 「both gaps are large」** —
+  ranked within their own columns the won-gap is 4th of eleven and the lost-gap is 8th, below
+  its column's median of +6.1. The won/lost ratio is 2.11, which makes this a mild mirror beside
+  09-03's 1.98, not a new shape. A first draft of the corpus write-up called it a falsification
+  of 「both gaps are never large together」; it is not, and the fix was to rank each figure
+  against its own column before characterising the pair.
 - Note for anyone reading the three numbers together: **both regime gaps are smaller than the
   session gap**, and that is pooling arithmetic, not a finding. pinglamb won more rounds, and
   each player is better in his own won rounds, so the pooled figure exceeds both. The report

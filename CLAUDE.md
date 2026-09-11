@@ -784,16 +784,16 @@ vs .7022 (+7.52 pp, +11.99%), lost .5317 vs .5384 (+0.67 pp, +1.25%), session ga
 （留一局：抽走 m8r4，數字變 +3.86%，即係郁 2.60 pp），
 `rel` 2.081 喺 corpus 排第三，而且 +1.25% 本身係全 corpus 最窄嘅地板差距——所以
 「地板貼到實」呢個講法企唔企得穩，同「差 1.25 pp」呢個數字企唔企得穩，係兩件事：方向企得穩，
-個尺寸企唔穩。**09-11 then does what no session has done: BOTH gaps move out together** — won
-.6371 vs .6996 (+6.25 pp, +9.82%), lost .5479 vs .5734 (+2.55 pp, +4.65%), session gap +7.21 pp
-(112.4%) [C002][C004]。冇一個數要 annotation：最脆嗰個係 lost-gap 嘅 `rel` 0.447，喺
-THRESHOLD 之下，不過亦係全 corpus 最貼門檻而又過到嘅一個。The eleven-session series now read
+個尺寸企唔穩。**09-11 is the third session to lean mirror-wards, by far the mildest of them, and
+the only one of the three that needs no caveat** — won .6371 vs .6996 (+6.25 pp, +9.82%), lost .5479 vs .5734 (+2.55 pp, +4.65%), session
+gap +7.21 pp (112.4%) [C002][C004]。冇一個數要 annotation：最脆嗰個係 lost-gap 嘅 `rel` 0.447，
+喺 THRESHOLD 之下，不過亦係全 corpus 最貼門檻而又過到嘅一個。The eleven-session series now read
 
-    won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  +18.9   +6.2   +5.0   +7.7  +12.0   +9.8
-    lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   +1.8  +11.1  +17.5   +3.9   +1.3   +4.7
+    won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  +18.9   +6.2   +4.9   +7.7  +12.0   +9.8
+    lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   +1.8  +11.1  +17.5   +3.9   +1.3   +4.6
 
 (**Units, because this paragraph mixes two and one line used to get them wrong.** The two series
-rows below and every 「+X% / +X pp」 pair above quote the RATIO gap — 100·(pinglamb's rate /
+rows above and every 「+X% / +X pp」 pair above quote the RATIO gap — 100·(pinglamb's rate /
 yachi's rate) − 100 — which is what the C002-family claims pin; the 「pp」 figure beside it is the
 plain difference of the two rates. 08-19's line published its ratio figures labelled 「pp」 for
 several sessions, so its +6.22 and +11.05 read as rates-difference when they are ratio gaps; it is
@@ -804,33 +804,33 @@ direction**, and the split returned to where the corpus started — three times 
 turns 「excursion」 from a reading into the default one. Read 09-03's column with its
 leave-one-out caveat — one round takes it from +7.7 to +2.9.
 
-**Note what 09-11 costs the sentence below, because it is the one shape the corpus had never
-shown.** Ten sessions supported 「what does NOT happen is both gaps large together」. 09-11 is
-+9.8/+4.7: the second-largest won-gap outside 08-14's excursion sitting beside a lost-gap larger
-than five other sessions'. It is not the extreme version of that shape — neither column takes a
-corpus maximum — but it is the first session where both sit clearly above the corpus median
-(+7.7 and +6.1), so the old sentence is no longer available as written and is corrected below
-rather than quietly kept.
+**A first draft of this section said 09-11 falsified 「both gaps are never large together」. It
+does not, and the check that caught it is the one worth keeping.** +9.8/+4.6 reads like two large
+gaps until both are placed in their own columns: the won-gap ranks 4th of eleven and the lost-gap
+ranks **8th of eleven**, i.e. below its column's median of +6.1. The ratio between them is 2.11,
+which puts this session with 09-03 (1.98) and nowhere near 08-14 (10.6) or 09-10 (9.6). It is a
+mild mirror, and the ten-session sentence survives its eleventh test.
+
+The general form, because this is the third time the two-row table has invited it: **a pair of
+numbers cannot be read as 「both large」 without ranking each against ITS OWN column.** +4.6 looks
+large beside +1.3 and +1.8, which are the two values a reader of the mirror paragraph has just
+been looking at — and those are the two smallest in the corpus. Rank before you characterise.
 
 **Read the two rows as rows, not as a pair of trends.** Three of the eleven sessions (07-22,
 08-19, 08-25) sit in the ceilings-close/floors-apart shape, **two are its mirror (08-14 and
-09-10)**, one is an extreme version of the first (08-09), four are roughly level (07-24, 07-28,
-08-01, 09-03), and **09-11 is the first that is neither — both gaps above the corpus median**.
-09-03 joins the level group on the robust reading rather than on its printed pair: at +7.7/+3.9 it
-looks like a mild mirror, but its won-gap is the one round m3r6 carries, and without that round it
-is +2.9/+3.9, i.e. level.
+09-10)**, one is an extreme version of the first (08-09), three are roughly level (07-24, 07-28,
+08-01), and **two are mild mirrors (09-03 and 09-11)** at won/lost ratios of 1.98 and 2.11 against
+the true mirrors' 10.6 and 9.6. 09-03 reads as level on the ROBUST reading rather than on its
+printed pair: its won-gap is the one round m3r6 carries, and without that round it is +2.9/+3.9.
+09-11 has no such caveat, so it is the one unambiguous mild mirror the corpus holds.
 
-**The sentence this paragraph carried for ten sessions — 「what does NOT happen is both gaps large
-together」 — did not survive the eleventh, and the way it failed is the interesting part.** It was
-never a law; it was a description of ten points that read like one, and the reason it read like
-one is that a two-row table invites a reader to look for a shape and then to treat the shapes
-present as the shapes possible. 09-11 is not even an extreme case — its won-gap is smaller than
-08-14's and its lost-gap smaller than five other sessions' — which means the statement was one
-ordinary session away from false the whole time it stood. Keep the underlying rule, which is
-undamaged and in fact strengthened: the decomposition must be re-derived every session rather than
+**What still does NOT happen in any of the eleven is the shape a reader keeps expecting: both gaps
+large together.** The closest is 07-24 at +10.8/+7.3, and even there the second figure is only
+just above its column's median. That is the strongest support this corpus has produced for the
+standing rule: the decomposition must be re-derived every session rather than
 extrapolated: the *session-level* APP gap (110.0% on 08-14, 118.1% on 08-09, 112.4% on 08-19,
 106.6% on 09-10, **112.4% on 09-11**) tells you nothing about which regime carries it — 08-19 and
-09-11 share that 112.4% to one decimal and split it +6.2/+11.1 against +9.8/+4.7, which is very
+09-11 share that 112.4% to one decimal and split it +6.2/+11.1 against +9.8/+4.6, which is very
 nearly the cleanest demonstration of the rule the corpus could have produced — and neither does
 the previous session's decomposition.
 

@@ -3988,15 +3988,19 @@ session 嘅 series，寫「十一個入面 N 個」(配住個 series)好過寫�
 08-19 條 decomposition 線一路用 ratio-percent 但標住「pp」，同隔籬幾條線唔同 convention，
 改返同埋寫明。
 
-### 5. 「兩個 gap 唔會一齊大」呢句，第十一個 session 打爆咗
+### 5. 差啲寫錯:「兩個 gap 一齊大」——其實冇
 
-十個 session 嘅 decomposition 撐住「what does NOT happen is both gaps large together」。
-09-11 係 +9.8/+4.7，兩個都喺 corpus median(+7.7 同 +6.1)之上。
+呢一段第一版寫住 09-11 打爆咗「what does NOT happen is both gaps large together」。**打唔爆。**
++9.8/+4.6 睇落似兩個都大，但逐欄排返位:won-gap 喺十一個入面排第四，**lost-gap 排第八**，
+即係喺佢自己嗰欄嘅中位數(+6.1)之下。兩者之比 2.11，同 09-03(1.98)一組，差 08-14(10.6)同
+09-10(9.6)好遠 —— 係一個溫和嘅 mirror，十個 session 嗰句話企得住。
 
-**值得留意嘅係佢唔係一個極端 case** —— won-gap 細過 08-14，lost-gap 細過五個 session ——
-即係話呢句嘢一路都係「一個普通 session 就推得跌」。底下條規矩(每個 session 要重新拆一次)
-冇事，而且更硬淨:08-19 同 09-11 兩個 session 嘅 session-level gap 都係 112.4%，拆開一個係
-+6.2/+11.1、一個係 +9.8/+4.7。
+可以一般化嘅一點:**一對數要講「兩個都大」，一定要逐個同自己嗰欄比。** +4.6 擺喺 +1.3 同
++1.8 隔籬睇落好大 —— 而嗰兩個係全 corpus 最細嘅兩個，亦啱啱好係讀 mirror 嗰段嘅人啱啱睇完
+嘅兩個數。先排位，再形容。
+
+底下條規矩(每個 session 要重新拆一次)冇事，而且更硬淨:08-19 同 09-11 兩個 session 嘅
+session-level gap 都係 112.4%，拆開一個係 +6.2/+11.1、一個係 +9.8/+4.6。
 
 ### 6. 一個 formally separate 但唔算數嘅 per-match ordering
 
