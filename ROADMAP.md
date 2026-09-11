@@ -3923,6 +3923,100 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
 
+## 第十一個 session：全 corpus 最一面倒，同兩個計錯咗嘅數 (2026-09-11)
+
+2026-09-11 落地(7 場、51 局、**pinglamb 6 比 1**)。**逐局計 32 比 19，即係佢食咗 62.7% 嘅
+局 —— 係全 corpus 最一面倒嘅一次**，越過 08-09 同 08-19 嗰 60.0%。場數嗰邊 6 比 1 排第二,
+輸畀 08-09 個 6 比 0。兩個量度指去唔同 session，所以講「最一面倒」嗰陣一定要講明講緊邊個。
+
+佢緊接住全 corpus 唯一一個打成平手嘅 session。呢件事記低，唔解釋:兩晚就係兩晚。
+
+### 1. 個 shortfall ordering 收到第三個 out-of-sample 點，中咗
+
+shortfall 10.28 pp(110 粒盈餘買到 2.13 pp，對住 C004 個 12.41 pp gap)，**兩樣都係全 corpus
+最大**，個 ordering 預測佢排最尾，實際 attack 差額 **−309 行**,排最尾。ρ 由 0.9636 升到
+**0.9727**，09-03 仍然係唯一排錯位嗰個。
+
+**但呢個測試弱過 09-10 嗰個，段落要寫明。** 排喺一個 ordering 嘅盡頭，只需要贏過一個鄰居;
+09-10 個位兩邊都要夾住。一個 claim 收到一個「中咗」嘅點嘅時候，最容易發生嘅錯係唔分呢兩種
+中法。
+
+順帶手執返個 p 嘅 convention:published 嗰個 2.5e-05 係 **one-sided**，而隔籬個 binomial
+table 全部 two-sided。冇結論郁到(冇嘢攞呢兩個 p 嚟比)，但 CLAUDE.md 自己記低過「one-sided
+擺喺 two-sided 隔籬」搞咗幾個月，所以而家寫明:**two-sided，6.1e-06**。
+
+### 2. 09-10 同 09-11 合埋先係「條路 vs 個窿」最乾淨嘅示範
+
+同一條路、隔一晚:09-10 要填 6.65 pp，差 47 行;09-11 要填 12.41 pp，差 309 行。**個窿大咗
+一倍，個結果差咗六倍，而條路冇變過。**「加粒數買唔返」第七次字面上啱，第七次都係錯嘅講法。
+
+### 3. KPP 過咗 correction 條線 —— 而個 margin 就係成件事
+
+KPP 一路都係呢個 repo 嘅標準 negative result。11 個 session pooled AUC 44.23、corrected
+p **0.048**。過咗 0.05，過咗兩個千分之一，而推佢過去嘅係一個 session(09-11 嘅 37.3，全
+corpus 最低，corrected p 由 0.16 跌到 0.048)。
+
+三件事跟住嚟，冇一件係「KPP 係 inverted」:
+
+- **講個 margin，唔係就唔好講個結論。** 0.048 對 0.05，一個 session 推得過就一個 session
+  推得返。
+- **一條線唔係一個發現。** 個 data 喺 0.05 嗰度冇發生過任何事，郁咗嘅係個 p 企喺條線邊一邊。
+  AUC 由 44.79 郁到 44.23，即係半點。
+- **方向係舊聞，effect 細。** 44.23 即係贏嗰個 KPP 低啲，喺大約 56% 嘅 decided round ——
+  真嘅、細嘅、同每個 session 嘅讀數一致。Coaching 結論「KPP 係平嘅」冇郁過。
+
+### 4. 兩個計錯咗嘅數，同一個新嘅 冇第二份 sub-class
+
+執呢個 session 嗰陣度到兩個錯數，兩個都係講 within-player APP separation 嗰個 series 嘅:
+
+- 「Three of ten with pinglamb wider」—— 實際係五個
+- 「09-10 makes it three in a row」—— 實際係兩個
+
+**佢哋 summarise 緊嘅嗰個 series，就印喺上面三行。** 兩個數都可以抬頭望一望就證偽，兩個都
+冇人望。同一個形狀隔一個 section 仲有第三個:「APP … 14 of 14 player-sessions」，一個七
+session 嘅數企到十個 session，而個量根本就係 session 數乘二。
+
+呢個係 CLAUDE.md 冇第二份 嘅**第八個 instance**，而佢同前七個唔同:**啲證據本身就喺同一份
+document 入面。** 普通嘅 冇第二份 figure 冇嘢可以對;呢種乜都有得對，但一樣冇人對,因為一句
+擺喺 list 後面嘅句子睇落就係喺 summarise 嗰個 list。可操作嘅規矩:**同一份 document 入面
+由一個 list 數出嚟嘅 count，要由個 list 重新數，唔可以照抄** —— 而如果個 list 係逐個
+session 嘅 series，寫「十一個入面 N 個」(配住個 series)好過寫「連續三個」(呢個係講 ORDER
+嘅 claim，新 session 兩頭都可以證偽佢)。
+
+同一個 pass 仲執咗兩樣:`rate:records` 嗰句個分母(一路寫住 24，而個 basis fragment 已經係
+3 × 11，即係「32 of the 24」呢個算術上不可能嘅句子)而家由 `rate:records-denom` render 出嚟;
+08-19 條 decomposition 線一路用 ratio-percent 但標住「pp」，同隔籬幾條線唔同 convention，
+改返同埋寫明。
+
+### 5. 「兩個 gap 唔會一齊大」呢句，第十一個 session 打爆咗
+
+十個 session 嘅 decomposition 撐住「what does NOT happen is both gaps large together」。
+09-11 係 +9.8/+4.7，兩個都喺 corpus median(+7.7 同 +6.1)之上。
+
+**值得留意嘅係佢唔係一個極端 case** —— won-gap 細過 08-14，lost-gap 細過五個 session ——
+即係話呢句嘢一路都係「一個普通 session 就推得跌」。底下條規矩(每個 session 要重新拆一次)
+冇事，而且更硬淨:08-19 同 09-11 兩個 session 嘅 session-level gap 都係 112.4%，拆開一個係
++6.2/+11.1、一個係 +9.8/+4.7。
+
+### 6. 一個 formally separate 但唔算數嘅 per-match ordering
+
+將七場按 pinglamb 每粒方塊嘅優勢排開，yachi 贏嗰一場(+0.21%)啱啱好排最細，其餘六場
++5.57% 到 +19.57%，中間乜都冇。**照字面係第三個 separating session。唔係，而且個理由計得出:**
+k 場贏喺 m 場入面，隨機排都全部排晒最底嘅機會係 1/C(m,k) —— 08-19 係 1/120、08-25 係 1/126、
+今次係 **1/7**。冇開 C007，個數仍然係 11 個 session 入面 2 個。
+
+呢個 case 補咗兩樣落條規矩:**degenerate class 唔係「一場都冇贏」**，係「贏得太少，個 ordering
+根本冇得失敗」，而條界係一個機率唔係一個場數;同埋**一個 session 可以滿足個明文條件而幾乎
+唔提供證據** —— 一個喺每個 instance 都夠 power 嗰陣寫低嘅條件，唔會自己帶住個 power。
+
+### 7. 第三個 self-built well
+
+`SELF_BUILT_WELLS` 由 2 變 3:`replay-2026-09-11-02.ttrm` r4，又係 yachi，lock 135 嘅
+4-cell cavity，prefix verify 到 219，`natural` plug、mid-game。同 09-10 嗰兩個同一個 shape、
+同一個 player。**買到嘅嘢細過睇落嘅:** 三件事、兩個相鄰 session、全部一個人，同「習慣」一樣
+consistent，同「兩晚」一樣 consistent。仍然係 named count 唔係 bound，第四個一樣要查。
+pinglamb 十一個 session 全部係 0。
+
 ## 第十個 session：第一次打成平手，同三個「九個 session 都係咁」嘅假設 (2026-09-10)
 
 2026-09-10 落地(8 場、65 局、**4 比 4**)。**呢個 session 值得寫低嘅唔係佢打成平手，係佢

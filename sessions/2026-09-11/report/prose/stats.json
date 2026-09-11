@@ -1,0 +1,45 @@
+{
+  "eyebrow": "數據對決 · 十一晚以嚟最一面倒",
+  "title": "數據對決",
+  "lede": "場數 1 比 6<span class=\"badge\" data-claim=\"G001\"></span>、局數 19 比 32<span class=\"badge\" data-claim=\"G002\"></span>，但總數唔似個比數咁散：方塊 5280 對 5170<span class=\"badge\" data-claim=\"G026\"></span>，清走垃圾 1049 對 962<span class=\"badge\" data-claim=\"G028\"></span>，兩樣都係 yachi 多。散嘅係攻擊，3069 對 3378<span class=\"badge\" data-claim=\"G027\"></span>——同一堆方塊，買到嘅嘢差 12% 幾<span class=\"badge\" data-claim=\"C004\"></span>。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢",
+      "caps": [
+        "七場冇一場打到最後一局<span class=\"badge\" data-claim=\"G053\"></span>。yachi 六場輸嘅比數全部係 3-5 或者更差，唯一贏嘅第五場就係 5-2<span class=\"badge\" data-claim=\"G008\"></span>——條線唔係喺尾段斷，係由中段就一路斷。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "兩條路冇變：yachi 靠 Quad，235 對 207<span class=\"badge\" data-claim=\"G032\"></span>；pinglamb 靠 T-spin，double 258 對 213<span class=\"badge\" data-claim=\"G033\"></span>、triple 54 對 29<span class=\"badge\" data-claim=\"G034\"></span>，加埋 312 對 242<span class=\"badge\" data-claim=\"G052\"></span>。",
+        "Perfect Clear pinglamb 14 個、yachi 8 個<span class=\"badge\" data-claim=\"G035\"></span>，加埋 22 個，係十一晚以嚟最多。但換返嚟嘅局數一樣咁散<span class=\"badge\" data-claim=\"G073\"></span><span class=\"badge\" data-claim=\"G075\"></span>。"
+      ],
+      "footnote": "T-spin 總數（368 對 299<span class=\"badge\" data-claim=\"G031\"></span>）計埋冇消行嘅 T-spin，所以會大過上面幾款消行類型加埋。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "手上功夫幾乎冇分別：每粒方塊要按幾多下，3.620 對 3.608，爭 0.33%<span class=\"badge\" data-claim=\"C008\"></span>。yachi 落得快<span class=\"badge\" data-claim=\"G037\"></span>、清得多<span class=\"badge\" data-claim=\"G069\"></span>，pinglamb 每粒打得重<span class=\"badge\" data-claim=\"G039\"></span>、APM 高好多<span class=\"badge\" data-claim=\"G038\"></span>、逐局波動細啲<span class=\"badge\" data-claim=\"G042\"></span><span class=\"badge\" data-claim=\"G043\"></span>。",
+        "真係拉得開嘅得一欄，而且兩邊都拉開咗：贏嗰啲局兩個人爭 9% 幾，輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>。"
+      ],
+      "footnote": "「每粒 finesse 失誤」係 fault 事件除以粒數，唔係「有幾多 % 粒方塊出錯」——一粒方塊可以記幾次 fault，所以呢一行用 toFixed(3) 唔用百分比。",
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

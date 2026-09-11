@@ -111,7 +111,7 @@ const totals = { locks: gPrefix, forecast: { total: ft, dual: fd }, opener: { to
 
 if (argv.includes("--check")) {
   const cur = existsSync(outPath) ? readFileSync(outPath, "utf8") : "";
-  if (cur !== json) { console.error(`STALE: ${outPath} differs from a fresh run. Regenerate with --out.`); process.exit(1); }
+  if (cur !== json) { console.error(`STALE: ${outPath} differs from a fresh run. Regenerate with --write (or --out <path>; a bare --out has no path to write to).`); process.exit(1); }
   const bad = checkReadme(totals);
   if (bad.length) { for (const b of bad) console.error(`STALE PROSE: ${b}`); process.exit(1); }
   console.log(`ok  ${outPath} reproduces byte-for-byte, and README.md's 3 published figures match it`);

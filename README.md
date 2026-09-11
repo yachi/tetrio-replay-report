@@ -12,8 +12,23 @@ formal claim, and proved with [Dafny](https://dafny.org).
 |---|---|---|---|
 | [2026-07-22](sessions/2026-07-22) | yachi 6 : 4 pinglamb | 79 over 10 matches | 54 |
 | [2026-07-24](sessions/2026-07-24) | yachi 3 : 4 pinglamb | 50 over 7 matches | 52 |
-| [2026-07-28](sessions/2026-07-28) | yachi 2 : 6 pinglamb | 64 over 8 matches | 85 |
-| [2026-08-01](sessions/2026-08-01) | yachi 4 : 3 pinglamb | 53 over 7 matches | 88 |
+| [2026-07-28](sessions/2026-07-28) | yachi 2 : 6 pinglamb | 64 over 8 matches | 96 |
+| [2026-08-01](sessions/2026-08-01) | yachi 4 : 3 pinglamb | 53 over 7 matches | 99 |
+| [2026-08-09](sessions/2026-08-09) | yachi 0 : 6 pinglamb | 50 over 6 matches | 99 |
+| [2026-08-14](sessions/2026-08-14) | yachi 4 : 7 pinglamb | 84 over 11 matches | 111 |
+| [2026-08-19](sessions/2026-08-19) | yachi 3 : 7 pinglamb | 70 over 10 matches | 106 |
+| [2026-08-25](sessions/2026-08-25) | yachi 4 : 5 pinglamb | 73 over 9 matches | 108 |
+| [2026-09-03](sessions/2026-09-03) | yachi 1 : 5 pinglamb | 46 over 6 matches | 102 |
+| [2026-09-10](sessions/2026-09-10) | yachi 4 : 4 pinglamb | 65 over 8 matches | 103 |
+| [2026-09-11](sessions/2026-09-11) | yachi 1 : 6 pinglamb | 51 over 7 matches | 98 |
+
+**Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
+`dafny verify` actually certified for that session — not a target and not comparable across
+rows without one caveat: **2026-07-22 and 2026-07-24 carry hand-only proof maps** (54 and 52),
+a layout that predates the generated ledger being folded into the same map, while every later
+session's number covers both ledgers. And the table stopped at 2026-08-01 for seven sessions,
+during which 2026-07-28's and 2026-08-01's own figures went stale too (85 → 96 and 88 → 99 as
+their proof maps grew). It is re-derived from the committed maps rather than appended to.
 
 2026-07-24 also carries a lighter "即場戰報" (`report-2026-07-24.html`) with its own
 independent 20-claim proof layer in [`sessions/2026-07-24/proof`](sessions/2026-07-24/proof).

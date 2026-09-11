@@ -1,0 +1,35 @@
+{
+  "eyebrow": "教練分析 · 第十一回合",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚係十一晚以嚟最一面倒嘅一晚——場數 1 比 6<span class=\"badge\" data-claim=\"G001\"></span>、局數 19 比 32<span class=\"badge\" data-claim=\"G002\"></span>、打完頭四場已經 8 比 20<span class=\"badge\" data-claim=\"C010\"></span>。但要問嘅唔係「點解會散成咁」，而係「散喺邊一欄」。答案同前面十晚同一欄——每粒方塊嘅攻擊，不過今晚係好闊嗰個版本，12 個幾百分點<span class=\"badge\" data-claim=\"C004\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "唔係條路唔得，係個窿大過條路成五倍",
+      "profile": [
+        "多疊咗 110 粒方塊，攻擊少 309 條<span class=\"badge\" data-claim=\"C005\"></span>。110 粒即係多過對手 2% 幾，最多填返 2 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>，而要填嘅係 12 個幾<span class=\"badge\" data-claim=\"C004\"></span>。上一晚同一條路要填嘅得 6 個幾，你就差 47 條——分別唔喺你點行。",
+        "自己贏局同輸局爭 16% 幾，係兩個人入面窄嗰個<span class=\"badge\" data-claim=\"C003\"></span>。你差嗰啲局唔算差得好緊要，但你好嗰啲局都仲有大把位。",
+        "落得快<span class=\"badge\" data-claim=\"G037\"></span>、清垃圾清得多<span class=\"badge\" data-claim=\"G069\"></span>、perfect piece 比率高過對手<span class=\"badge\" data-claim=\"G041\"></span>。手上功夫冇嘢好執。"
+      ],
+      "recs": [
+        "<strong>唔好再加粒數。</strong>今晚係最清楚嘅一次示範：110 粒方塊喺 12 個幾百分點嘅窿面前，最多填返 2 個幾<span class=\"badge\" data-claim=\"C009\"></span>。呢條路連續七晚買唔返，但七次入面有六次都係俾人派咗個大過佢買得起嘅窿——要郁嘅一直都係個窿。",
+        "<strong>今晚兩邊都要郁，唔淨係天花板。</strong>贏嗰啲局爭 9% 幾、輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>——上一晚地板貼到實，今晚地板都拉開咗。守嗰邊由「唔扣分」變返「都扣緊分」。",
+        "<strong>頂爆率要睇。</strong>全晚 12 局頂到天花板收，7 局係你<span class=\"badge\" data-claim=\"C006\"></span>，23.5% 係十一晚以嚟最高。不過呢一欄十一晚都係大上大落，所以當佢係今晚嘅事，唔好當佢係一個要長期修嘅毛病。",
+        "<strong>KPP 唔使睇。</strong>3.620 對 3.608<span class=\"badge\" data-claim=\"C008\"></span>，喺自己贏局輸局之間一樣郁唔郁得幾多<span class=\"badge\" data-claim=\"G064\"></span>。呢一欄冇嘢執得返。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "天花板同地板一齊拉開",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過對手 9% 幾，輸嗰啲局高 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>——上一晚你地板貼到實，今晚兩邊都企得住。",
+        "自己贏局同輸局爭 22% 幾<span class=\"badge\" data-claim=\"C003\"></span>，連續第三晚闊過對手。呢個形狀夠硬淨，但都夠脆：好嗰啲局好得好交關，差嗰啲局就普通。",
+        "T-spin 兩款都領先<span class=\"badge\" data-claim=\"G033\"></span><span class=\"badge\" data-claim=\"G034\"></span>，每粒方塊打得重<span class=\"badge\" data-claim=\"G039\"></span>，APM 高好多<span class=\"badge\" data-claim=\"G038\"></span>。"
+      ],
+      "recs": [
+        "<strong>唔好由呢個比數推論任何嘢。</strong>1 比 6 同上一晚嘅 4 比 4 隔一晚。兩晚之間你冇變過打法——變嘅係每粒方塊嘅差距由 6 個幾去到 12 個幾<span class=\"badge\" data-claim=\"C004\"></span>。要追嘅係嗰一欄，唔係個比數。",
+        "<strong>Perfect Clear 依然唔見數。</strong>14 個對 8 個<span class=\"badge\" data-claim=\"G035\"></span>，係十一晚最多，但全場淨係你做到全消嗰 9 局你仲要輸咗一局<span class=\"badge\" data-claim=\"G075\"></span>；對手嗰 4 局就一局都冇輸<span class=\"badge\" data-claim=\"G073\"></span>。分母得幾局，所以呢度唔會計百分比——但「做多啲全消」唔係今晚贏嘅原因。",
+        "<strong>清走嗰欄係你唯一輸嘅總數。</strong>1049 對 962<span class=\"badge\" data-claim=\"G028\"></span>，每粒方塊計一樣係對手高<span class=\"badge\" data-claim=\"G069\"></span>。今晚贏得咁鬆，靠嘅係攻，唔係守——如果下一晚攻嗰邊追返啲，呢一欄就會變返緊要。"
+      ]
+    }
+  },
+  "versus_note": "效率差距 12 個幾百分點<span class=\"badge\" data-claim=\"C004\"></span>。兩個每粒方塊按鍵數爭 0.33%<span class=\"badge\" data-claim=\"C008\"></span>、方塊數爭 2% 幾<span class=\"badge\" data-claim=\"C009\"></span> 嘅人，用差唔多一樣嘅手速同一樣多嘅方塊，打出 3069 對 3378 嘅攻擊<span class=\"badge\" data-claim=\"G027\"></span>。全晚就係呢一句。"
+}

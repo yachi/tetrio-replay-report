@@ -45,13 +45,14 @@ const SESSIONS = [
   { dir: '2026-08-25', rounds: 146, strict: 132, equal: 14, faults: 2747, perfect: 14893, pieces: 16599 },
   { dir: '2026-09-03', rounds: 92, strict: 80, equal: 12, faults: 1707, perfect: 7897, pieces: 8929 },
   { dir: '2026-09-10', rounds: 130, strict: 107, equal: 23, faults: 1804, perfect: 9856, pieces: 11010 },
+  { dir: '2026-09-11', rounds: 102, strict: 87, equal: 15, faults: 1874, perfect: 9295, pieces: 10450 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 1268, strict: 1089, equal: 179, faults: 20222, perfect: 106005, pieces: 118669 };
+const CORPUS = { rounds: 1370, strict: 1176, equal: 194, faults: 22096, perfect: 115300, pieces: 129119 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -86,7 +87,11 @@ function load(): Row[] {
 
 const rows = load();
 
-test('the corpus is the nine sessions, at the pinned player-round counts', () => {
+// The titles below are DERIVED from the pins, not typed beside them. Both carried stale figures
+// — 「the nine sessions」 at eleven, and 「982 of 1138 ... 156」 at 1176 of 1370 — for the reason
+// CLAUDE.md's 冇第二份 section gives: a test name is prose, and prose cannot go red. A title built
+// from CORPUS moves when CORPUS does, so there is nothing left here to go stale.
+test(`the corpus is the ${SESSIONS.length} sessions, at the pinned player-round counts`, () => {
   expect(rows.length).toBe(CORPUS.rounds);
   for (const s of SESSIONS)
     expect(rows.filter(r => r.session === s.dir).length).toBe(s.rounds);
@@ -107,7 +112,8 @@ test('combo <= perfect — the longest run of perfect placements is a run OF the
   expect(bad).toEqual([]);
 });
 
-test('perfect + faults exceeds pieces in 982 of 1138, equals it in 156, and never falls short', () => {
+test(`perfect + faults exceeds pieces in ${CORPUS.strict} of ${CORPUS.rounds}, `
+   + `equals it in ${CORPUS.equal}, and never falls short`, () => {
   const strict = rows.filter(r => r.perfect + r.faults > r.pieces).length;
   const equal = rows.filter(r => r.perfect + r.faults === r.pieces).length;
   const below = rows.filter(r => r.perfect + r.faults < r.pieces).length;
@@ -152,10 +158,11 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 23 rounds, all ten sessions pooled (18 -> 20 when
-  // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, contributing 3 of its own).
+  // longest perfect run is the whole round. 26 rounds, all eleven sessions pooled (18 -> 20 when
+  // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
+  // contributing 3 apiece).
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(23);
+  expect(clean.length).toBe(26);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -170,15 +177,19 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
-  // Ten-session figures (2026-09-10 added): 17.11 -> 17.04, 10.69 -> 10.67, 89.31 -> 89.33,
-  // 16.08 -> 16.02, 1.600 -> 1.597 — none of the four crosses another's old value, and the
-  // ORDER is unchanged (perfect share > event rate > the meaningless one > faulty share),
-  // which is the property the test exists to defend.
-  expect(pct(faults / pieces)).toBe(17.04);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.67);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.33);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(16.02);   // on no meaningful denominator
+  // Eleven-session figures (2026-09-11 added): 17.04 -> 17.11, 10.67 -> 10.7, 89.33 -> 89.3,
+  // 16.02 -> 16.08, 1.597 -> 1.599. Note what that is: three of the five have returned to the
+  // NINE-session values they held before 2026-09-10 moved them. A corpus rate wandering back to a
+  // figure it published two sessions ago is exactly why the pinned numbers are not the finding —
+  // none of the four crosses another's old value, and the ORDER is unchanged (perfect share >
+  // event rate > the meaningless one > faulty share), which is the property the test exists to
+  // defend. A reader who took 17.04 away as "the" fault rate would be wrong twice over: it is one
+  // session's reading of a quantity that moves, and it is one of four defensible ones.
+  expect(pct(faults / pieces)).toBe(17.11);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.7);           // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.3);               // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(16.08);   // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.597);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.599);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });

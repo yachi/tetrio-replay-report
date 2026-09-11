@@ -680,7 +680,12 @@ def _corrupt(kind, texts):
     if kind == "a session dropped from the verify matrix":
         t[v] = re.sub(r"\n *- sessions/\d{4}-\d{2}-\d{2}/report(?=\n    steps:)", "", t[v], count=1)
     elif kind == "a session dropped from the pipeline matrix":
-        t[v] = re.sub(r", '\d{4}-\d{2}-\d{2}'\]", "]", t[v], count=1)
+        # `,\s*` and not `, `: the matrix is a YAML flow sequence that wraps when it grows, so
+        # the last entry sits on its own line as often as not. Pinned to a literal space, this
+        # corruption silently stopped corrupting when 2026-09-11 pushed the list onto a third
+        # line — and a mutation that changes nothing is a selftest that proves nothing. The
+        # assertion in `_corrupt` is what turned that into a red build rather than a quiet pass.
+        t[v] = re.sub(r",\s*'\d{4}-\d{2}-\d{2}'\]", "]", t[v], count=1)
     elif kind == "a matrix names a session that is not on disk":
         t[v] = re.sub(r"('\d{4}-\d{2}-\d{2}')\]", r"\1, '1999-01-01']", t[v], count=1)
     elif kind == "job added to CI":

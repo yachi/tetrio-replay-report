@@ -44,7 +44,9 @@ from .docs_gate import (Incomplete, fragment_mutants, fragment_problems, load_do
 
 DOCS = ("CLAUDE.md",)
 REWORD = reword("pipeline/check_rate_records.py")
-_EN = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+_EN = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+       "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+       "seventeen", "eighteen", "nineteen", "twenty")
 MINUS = "−"          # the character the section uses, not an ASCII hyphen
 
 
@@ -124,6 +126,14 @@ FRAGMENTS = {
     "rate:pps-mean-p": (lambda a: _p(a["metrics"]["pps"]["mean_p"], "floor"), DOCS),
     # --- the records test
     "rate:records": (lambda a: str(a["records"]["in_shortest_quartile"]), DOCS),
+    # The DENOMINATOR of the line above. It existed only as a typed 「24」 beside these two
+    # fragments until 2026-09-11, where it had been correct at eight sessions and was then
+    # carried through three more — so the sentence read 「32 of the 24 unqualified records
+    # (3 metrics x 11 sessions)」, an arithmetic impossibility sitting between two gated spans.
+    # That is CLAUDE.md's eighth 冇第二份 instance exactly: a count derivable from the fragment
+    # beside it, typed instead of derived. Rendered now, so the product and its factors move
+    # together or the build goes red.
+    "rate:records-denom": (lambda a: str(a["records"]["n_metrics"] * len(a["sessions"])), DOCS),
     "rate:records-basis": (lambda a: f"{a['records']['n_metrics']} metrics × "
                                      f"{len(a['sessions'])} sessions", DOCS),
     "rate:records-p": (lambda a: _p(a["records"]["p"], "ceil"), DOCS),
