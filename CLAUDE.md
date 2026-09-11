@@ -422,6 +422,24 @@ ever taken is not tested by nine green sessions**; it is untested. `match_rate_d
 the identical defect one function away, does not fire on 09-10, and was fixed in the same commit
 precisely because a corpus that has never drawn is not evidence that the draw branch works.
 
+**The seventh instance is the one this section makes MORE likely, and it landed on 2026-09-10's own
+write-up.** Seven figures in this file went stale in the same pass that updated their neighbours:
+「3 of the 114」 PCO-window clears (now 4 of 138), the whole-round T-spin total in the gate-figure
+aside (6599, now 7282), the cave's differing-board row (19 of 19, now 24 of 24), 全消's
+「3 of 124」, PC's pooled AUC quoted out of the block above (50.67 over 450, now 51.66 over 634),
+and two 「seven sessions」 that are ten. Every one sits in a paragraph whose OTHER figures are
+marked fragments, and the gates went green because the gates only read the markers.
+
+**A gated fragment beside an ungated one makes the ungated one harder to see, not easier.** A
+paragraph with markers in it reads as a checked paragraph; the green build is evidence about the
+marked spans only, and the eye takes it as evidence about the prose. That is the reverse of the
+usual 冇第二份 shape — there the figure is alone and obviously unbacked, here it is camouflaged by
+a neighbour that IS backed. The actionable rule: **when a marked fragment's value changes, re-read
+the whole paragraph for unmarked numbers that move with it**, because the gate that just went green
+did not. And the one that changed the underlying claim — the PCO numerator moving 3 → 4 — is why a
+digit swap is not enough: that paragraph's argument was 「the numerator did not move」, so the
+sentence had to be rewritten rather than corrected.
+
 ## Data semantics that cost real debugging
 
 - `lifetime` is **milliseconds**, not frames (verify via `pieces / pps`; 60 fps is ~15× off).
@@ -633,7 +651,7 @@ session, which is why the pooled row above is no longer comfortable. KPP is a sh
 than a reversal — below chance in 7 of the 10 sessions and pooled below 50, but not distinguishable
 from chance after correction, so it stays a negative result and must not be upgraded to "inverted".
 
-Coaching conclusions, cross-validated over seven sessions: **APP is the lever** — higher in rounds
+Coaching conclusions, cross-validated over ten sessions: **APP is the lever** — higher in rounds
 won than rounds lost in 14 of 14 player-sessions, though the *size* of that separation is not
 stable and does not settle (yachi's own series runs 24.9 · 17.4 · 23.2 · 15.9 · 31.5 · **7.2** ·
 23.1, so 08-14's +7.2% is the outlier of his series, not a level he fell to); **DS matters** in 9
@@ -1222,7 +1240,7 @@ almost any opener page. Only exact separates. `occupancy_aliases` and `round_ove
 columns that are the same rounds twice: MS1 and MS2 are one bag-1 shape built from different
 pieces, so their rows are identical in every session and must never be added.
 
-The repertoires split, reproduced independently in all seven sessions (pinned in `openers.test.ts`):
+The repertoires split, reproduced independently in all ten sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
 pinglamb does **and is the only one who plays TKI-3 at all** (pinglamb 0, every session). PCO
 appears only for yachi, only on 07-24 and 08-01. **The per-session counts are deliberately not
@@ -1260,15 +1278,21 @@ all of them agree. They do: **1268/1268 rounds, 138/138 perfect clears**, ten se
 `check_opener_section` fails if the piece numbers are published without that agreement figure or
 without harddrop's ten-piece deadline beside them.
 
-The finding is that **3 of the 114 arrived inside that deadline** — still the same three, because
-08-14's twenty all landed on piece 15 or later, 08-19's ten did too (yachi 15 · 20 ×4, pinglamb
-20 ×5), and 08-25's nineteen likewise (yachi 15 ×1 · 20 ×6, pinglamb 20 ×11 · 30 ×1) — and the
-bulk land on piece 20. These are mid-game perfect clears, not the
-opener. 08-01 holds the corpus's only completed PCO: yachi matched the field twice and delivered
-once. 08-14 has the most All Clears of any session (20: yachi 11, pinglamb 9) and **none of them
-is inside the window**; 08-19's ten (5 each) are likewise all outside, so the denominator has
-grown by 29 across two more sessions without moving the numerator — the reading is *reinforced*
-by each of them rather than merely surviving them.
+The finding is that **4 of the 138 arrived inside that deadline**, and the bulk land on piece 20.
+These are mid-game perfect clears, not the opener. 08-01 holds the corpus's only completed PCO:
+yachi matched the field twice and delivered once. 08-14 has the most All Clears of any session
+(20: yachi 11, pinglamb 9) and **none of them is inside the window**; 08-19's ten (5 each) are
+likewise all outside.
+
+**That numerator was 3 for five sessions and 2026-09-10 moved it, so the argument this paragraph
+used to make is no longer available.** It read 「the denominator has grown by 29 across two more
+sessions without moving the numerator — the reading is *reinforced* by each of them」. 09-10 adds
+one (yachi, on piece 10 — exactly harddrop's deadline), so the honest version is weaker and
+simpler: the RATE is what has been stable, at roughly one PCO-timed clear in thirty-five, and it
+has never been zero. 「Still the same three」 was a sentence that could only ever be falsified by
+a session doing what this one did, and it took five to do it — which is the argument for writing
+the rate rather than the streak. `IN_PCO_WINDOW` in `openers.test.ts` pins it per session, so the
+next one is a red build either way.
 
 **An earlier revision of this section said the opposite** — that `eng.board.perfectClear` invented
 clears the sessions did not have — and it was wrong for a reason worth keeping: the facts.json
@@ -1290,9 +1314,9 @@ read out of the `.ttrm` independently by both extractors, which is why this one 
 opener tables are not.
 
 The point is not the count. Across ten sessions, **114 rounds had exactly one player with a perfect
-clear and that player lost 47 of them** — the AUC block above says the same thing (PC **50.67**
-pooled over 450 rounds with p = 0.586, 52.4 on 08-14 with 68 of 84 rounds tied at zero, 48.6 on
-08-19). So the section prints "rounds won" beside "rounds with one" and refuses to print a rate: the
+clear and that player lost 47 of them** — the AUC block above says the same thing (PC **51.66**
+pooled over 634 rounds with a corrected p of 1, 52.4 on 08-14 with 68 of 84 rounds tied at zero,
+48.6 on 08-19). So the section prints "rounds won" beside "rounds with one" and refuses to print a rate: the
 denominators are 3-12 rounds per player, and a percentage over three rounds reads far more confident
 than the data is. Two more controls it may not lose: 全消次數 ≠ 有全消嘅局 (a round can hold two), and
 "whether" is facts.json while "when" is the simulator's, in the quarantined section below.
@@ -1526,8 +1550,8 @@ real gate — **6791/6791 across ten sessions**, and a spin it cannot reconstruc
 scored. (This line read **3379/3379** until 2026-08-14. 3379 is the *whole-round* T-spin clear total
 over the five sessions there were then; the check is scoped to the verified prefix, which was 3142.
 The figure was written from a whole-round probe and matched no committed artefact —
-`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 6599, so
-the two still differ by 420. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
+`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 7282, so
+the two still differ by 491. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
 is not the gate.)
 
 ### 分母錨咗 replay 自己數嘅 counter — the one part of this section that is not simulator-only
@@ -1622,7 +1646,7 @@ completely:
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
-and must never be worded like the donation's**: agreeing 19 of 19 on boards that differ is the
+and must never be worded like the donation's**: agreeing 24 of 24 on boards that differ is the
 verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
 cave is local to the spin), not nineteen independent confirmations. `DUAL_SPLIT_MARKER` and
 `CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
@@ -1680,7 +1704,7 @@ Two things that follow, and both are load-bearing:
 Three metrics answer "opener or mid-game" three different ways, and only one of them used to answer
 it at all:
 
-- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 3 of 124 inside it.
+- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 4 of 138 inside it.
 - **The ordering metric did NOT.** Its spins are filtered to lock ≤ `WINDOW_PIECES` before counting,
   so mid-game pairs were *excluded rather than counted*, and「先 Triple 後 Double」 was a claim about
   openings that a reader had no way to check — it reads identically to a claim about how these
