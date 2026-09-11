@@ -162,24 +162,49 @@ def _one_rejection(data, verdict):
 
     Only the ONE player is touched, and only the fields the rejection implies, so two calls with
     different `verdict` differ in nothing but the clause — which is what makes a difference in the
-    rendered section attributable to the clause and to nothing else. Returns None when no player
-    has a mechanism-established event, which the caller must treat as a failure of the selftest
-    rather than as a skip.
+    rendered section attributable to the clause and to nothing else.
+
+    AND IT MANUFACTURES THE MECHANISM EVENT TOO, on a session that has none. That case arrived at
+    2026-09-11, the first session in the corpus where BOTH players read `mechanism_established: 0`
+    — not one candidate reaches the mechanism stage all night. The earlier version returned None
+    there and the caller failed the selftest, so a session whose data is perfectly valid turned CI
+    red; and the alternative a reader reaches for first, skipping the case, would silently drop the
+    clause mutant on exactly the session that cannot otherwise run it. Manufacturing is strictly
+    stronger than either and is the same move this function already makes one level down.
+
+    The synthesis is COHERENT with real data rather than invented: `mechanism_established` is an
+    OVERLAY on the five-bucket partition, not a sixth bucket, so a rejected mechanism event needs
+    no bucket to pay for it. 2026-08-14's yachi is exactly this shape in the committed artifact —
+    `mechanism_established: 1`, `forecast_total: 0`, and the five buckets still summing to
+    `verified_tspins`. So bumping the count and writing the rejection leaves every invariant the
+    section asserts intact, which is what keeps `_broken_partition` the only case that trips it.
+
+    Returns None only for an artifact with no players at all, which the caller must treat as a
+    failure of the selftest rather than as a skip.
     """
     d = json.loads(json.dumps(data))
     for p in d["players"]:
         if p["mechanism_established"] < 1:
             continue
-        rb = p["rejected_by"]
-        for k in rb:
-            rb[k] = 0
-        rb["counted"] = p["mechanism_established"] - 1
-        rb[verdict] = 1
-        p["forecast_total"] = rb["counted"]
-        p["clause2_undecided"] = (rb["floor_undecidable"]
-                                  + rb["floor_undecidable_and_closing_clear_was_spin"])
-        return d
+        return _reject_one(p, d, verdict)
+    # No player reached the mechanism stage — synthesise the event on the first player.
+    for p in d["players"]:
+        p["mechanism_established"] = 1
+        return _reject_one(p, d, verdict)
     return None
+
+
+def _reject_one(p, d, verdict):
+    """`p`'s mechanism-established events, all counted but one, that one rejected by `verdict`."""
+    rb = p["rejected_by"]
+    for k in rb:
+        rb[k] = 0
+    rb["counted"] = p["mechanism_established"] - 1
+    rb[verdict] = 1
+    p["forecast_total"] = rb["counted"]
+    p["clause2_undecided"] = (rb["floor_undecidable"]
+                              + rb["floor_undecidable_and_closing_clear_was_spin"])
+    return d
 
 
 def _one_path_opened(data):
