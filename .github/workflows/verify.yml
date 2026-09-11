@@ -70,6 +70,7 @@ jobs:
           - sessions/2026-08-25/report
           - sessions/2026-09-03/report
           - sessions/2026-09-10/report
+          - sessions/2026-09-11/report
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -206,7 +207,8 @@ jobs:
       fail-fast: false
       matrix:
         session: ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09',
-                  '2026-08-14', '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10']
+                  '2026-08-14', '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10',
+                  '2026-09-11']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2

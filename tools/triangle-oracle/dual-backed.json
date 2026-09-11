@@ -6,8 +6,8 @@
     "@haelp/teto (Triangle.js)"
   ],
   "verified_prefix_locks": {
-    "total": 33094,
-    "dual": 31747
+    "total": 36070,
+    "dual": 34621
   },
   "sessions": {
     "2026-07-22": {
@@ -233,6 +233,26 @@
       },
       "opener_rounds": 119,
       "opener_dual": 113
+    },
+    "2026-09-11": {
+      "prefix_locks": 2976,
+      "prefix_dual": 2874,
+      "forecast": {
+        "total": 255,
+        "dual": 248,
+        "by_kind": {
+          "reactive": {
+            "total": 117,
+            "dual": 113
+          },
+          "self_built": {
+            "total": 138,
+            "dual": 135
+          }
+        }
+      },
+      "opener_rounds": 97,
+      "opener_dual": 94
     }
   }
 }

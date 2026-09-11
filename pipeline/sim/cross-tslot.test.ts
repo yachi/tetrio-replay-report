@@ -59,7 +59,7 @@ const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
 const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
-       '2026-09-03', '2026-09-10'])
+       '2026-09-03', '2026-09-10', '2026-09-11'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -115,7 +115,8 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // and `unexplained` is still EMPTY over all of them.
   // 2026-09-03: 86903 -> 94837, and `unexplained` is still EMPTY over the extra 7934 boards.
   // 2026-09-10: 94837 -> 104085, and `unexplained` is still EMPTY over the extra 9248 boards.
-  expect(both + oursOnly + ccOnly + neither).toBe(104085);
+  // 2026-09-11: 104085 -> 113159, and `unexplained` is still EMPTY over the extra 9074 boards.
+  expect(both + oursOnly + ccOnly + neither).toBe(113159);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

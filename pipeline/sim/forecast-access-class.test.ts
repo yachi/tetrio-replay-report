@@ -343,7 +343,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the 17 candidates decompose 10 formed / 3 overdetermined / 4 access, and nothing else', () => {
+test('the 18 candidates decompose 10 formed / 4 overdetermined / 4 access, and nothing else', () => {
   // The numbers that make this a finding rather than a curiosity. 13 records corpus-wide are ones
   // the clear ALONE explains; 7 the model credits to the clear because a cleared row lies strictly
   // inside the slot, 2 more are overdetermined (the placement alone also sufficed, so `placement` is
@@ -378,9 +378,18 @@ test('the 17 candidates decompose 10 formed / 3 overdetermined / 4 access, and n
   // more purely by the denominator growing: this is the third consecutive session to add
   // candidates without adding a member, which is what "the class keeps arriving at roughly the rate
   // it always has" now rests on — it has NOT arrived in the last two.
-  expect(result.clearAlone).toBe(17);
+  //
+  // 2026-09-11 adds 1, and it lands in `overdetermined` — clearAlone 17 -> 18, overdetermined 3 -> 4,
+  // with `formed`, `pieceBlocked` and the ACCESS CLASS all unchanged. Fourth consecutive session to
+  // add a candidate and no member, so the pinned set has now stood for four sessions and the header's
+  // mutation score is still a statement about the file that exists. The access share falls 4/17 ->
+  // 4/18, again purely by the denominator. Four sessions is where "it has NOT arrived recently"
+  // stops being a gap in the record and starts being the record: the sentence above still may not be
+  // upgraded to a rate, because what would falsify it is one member arriving, and nothing here
+  // predicts when.
+  expect(result.clearAlone).toBe(18);
   expect(result.formed).toBe(10);
-  expect(result.overdetermined).toBe(3);
+  expect(result.overdetermined).toBe(4);
   expect(result.formed + result.overdetermined + result.pieceBlocked + result.access.length)
     .toBe(result.clearAlone);
   // Not seen in this corpus, and it must not start silently: the clear suffices, then the piece
@@ -394,7 +403,7 @@ test('the replica can disagree with the engine, and does not', () => {
   // two shows up here rather than silently changing which events land in ACCESS_CLASS. This is the
   // check `bfs-cap.ts` did not have when it printed the same 688 before and after a real change.
   expect(result.disagreements).toEqual([]);
-  // and the check must have actually run — over the 17 candidates, not over an empty set
+  // and the check must have actually run — over the 18 candidates, not over an empty set
   expect(result.clearAlone).toBeGreaterThan(0);
 });
 
@@ -407,6 +416,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(10);
-  expect(result.localised).toBe(3002);
+  expect(SESSIONS.length).toBe(11);
+  expect(result.localised).toBe(3278);
 });

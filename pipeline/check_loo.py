@@ -447,6 +447,33 @@ PUBLISHED = (
     ("2026-09-10", "app_gap_won", "series"),
     ("2026-09-10", "app_gap_lost", "series"),
     ("2026-09-10", "attack_diff", "totals_0910"),
+    # 2026-09-11 takes NO `ANNOTATED` entry, and the reason is worth recording because the
+    # session's headline figures are the largest in the corpus. Measured over all five:
+    #
+    #     app_gap_won      +9.8152 pp   m6r6   ->  +7.6456  rel 0.221   1.40x the next of 51
+    #     app_gap_lost     +4.6468 pp   m2r5   ->  +6.7258  rel 0.447   1.51x
+    #     app_gap_session +12.4103 pp   m1r1   -> +14.0967  rel 0.136   1.94x
+    #     attack_diff         -309 行   m4r4   ->     -276  rel 0.107   1.03x
+    #     score_diff       -100950 分   m4r4   ->   -88913  rel 0.119   1.33x
+    #
+    # Nothing crosses THRESHOLD and nothing flips sign. But `app_gap_lost` at 0.447 is now the
+    # CLOSEST any figure has come to the cut without crossing it, taking that place from
+    # 2026-09-10's score_diff at 0.402 — and it sits inside the (0.406, 0.969) interval the
+    # threshold was derived in, i.e. in the region where the derivation could not separate the
+    # fragile from the robust. It is correctly silent under the rule as written and it is one
+    # round from not being. Recorded for the same reason 09-10's 0.402 was: a later session
+    # nudging this class over is then a decision rather than a surprise.
+    #
+    # Note what is NOT fragile here. The −309 attack difference is the largest in the corpus and
+    # its rel is 0.107, the second-lowest ever measured on that figure — a big difference pooled
+    # over 51 rounds is exactly the case leave-one-out cannot dent, which is the mirror image of
+    # 09-10's −47 at rel 0.766. The two sessions are adjacent and opposite on the same figure.
+    #
+    # `attack_diff` and `score_diff` are measured and NOT published, following 08-19 and 08-25:
+    # CLAUDE.md's shortfall table quotes the −309 but that table has never been a `SENTENCES`
+    # target. If a later pass makes it one, both rows go in together.
+    ("2026-09-11", "app_gap_won", "series"),
+    ("2026-09-11", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

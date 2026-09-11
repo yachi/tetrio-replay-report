@@ -1,0 +1,43 @@
+{
+  "eyebrow": "高光時刻 · 全場之最",
+  "title": "關鍵時刻",
+  "cards": [
+    {
+      "accent": null,
+      "label": "全晚最癲嘅一局",
+      "value": "297.5",
+      "body": "第3場第5局，兩邊 VS 加埋約 297.5，係打足 60 秒嘅局入面最高<span class=\"badge\" data-claim=\"G056\"></span>。pinglamb 贏咗呢一局，但佢喺最大單波同行數兩條軸都落後，連清走都係輸蝕<span class=\"badge\" data-claim=\"G078\"></span>——佢贏喺每粒方塊嘅重量：攻擊約 0.903 對 0.718<span class=\"badge\" data-claim=\"G079\"></span>，而清垃圾嗰邊反而係 yachi 高，約 0.242 對 0.230<span class=\"badge\" data-claim=\"G080\"></span>。成晚嘅故事縮喺一局度。"
+    },
+    {
+      "accent": "p",
+      "label": "食多啲都照頂返",
+      "value": "70 行",
+      "body": "第4場第2局，pinglamb 俾人射埋嚟 70 行，多過 yachi 嘅 43 行，照樣頂住贏返<span class=\"badge\" data-claim=\"G023\"></span>。佢嗰局仲少落咗 22 粒方塊。全晚有 8 局係食多過對手嘅真垃圾都照贏，不過呢一欄今晚係 yachi 佔多，5 比 3<span class=\"badge\" data-claim=\"G054\"></span>。"
+    },
+    {
+      "accent": "y",
+      "label": "十一秒，一波打完",
+      "value": "約 110.9",
+      "body": "第7場第6局，yachi 十一秒收工<span class=\"badge\" data-claim=\"G020\"></span>，APM 約 110.9<span class=\"badge\" data-claim=\"G070\"></span>——全晚最高，而且高過佢合資格紀錄成一倍。<strong>但呢個數唔計入紀錄</strong>：APM 同 VS 係「每分鐘」，一局得十一秒，個分母細到一兩粒方塊都可以搬郁佢。呢個唔係意見，係度過嘅——全 corpus 33 個唔設局長下限嘅紀錄入面，32 個嚟自最短嗰四分一局。"
+    },
+    {
+      "accent": "g",
+      "label": "冇一場打到最後一局",
+      "value": "0 場",
+      "body": "七個比數 3-5、1-5、2-5、2-5、5-2、3-5、3-5<span class=\"badge\" data-claim=\"G053\"></span>——一個 5 比 4 都冇。上一晚八場有四場係生死局，今晚零場。yachi 每一場都贏到頭，六場都守唔到尾。"
+    }
+  ],
+  "trivia": [
+    "全晚最抵諗嘅一條數：<strong>七場 1 比 6</strong><span class=\"badge\" data-claim=\"G001\"></span>、<strong>逐局 19 比 32</strong><span class=\"badge\" data-claim=\"G002\"></span>。逐局嗰個比例係 62.7%，<strong>係十一晚以嚟最一面倒嘅一次</strong>——之前最高係 08-09 同 08-19 嘅 60.0%。打完頭四場已經 8 比 20<span class=\"badge\" data-claim=\"C010\"></span>。",
+    "拆開贏同輸嘅局：贏嗰啲局兩個人每粒方塊嘅攻擊爭 9% 幾，輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>。留意兩個數都細過成晚夾埋嗰 12% 幾<span class=\"badge\" data-claim=\"C004\"></span>——呢個唔係發現，係加權嘅算術：pinglamb 贏咗嘅局多，而每個人喺自己贏嘅局都打得好啲，所以成晚夾埋嗰個數會大過任何一邊。<strong>正因為咁，每晚都要重新拆一次，唔可以由成晚嗰個數推返落去。</strong>",
+    "用自己做把尺：yachi 自己贏局同輸局爭 16% 幾，pinglamb 爭 22% 幾<span class=\"badge\" data-claim=\"C003\"></span>。yachi 贏嗰啲局每粒方塊打出約 0.637，輸嗰啲局跌到約 0.547<span class=\"badge\" data-claim=\"G062\"></span>；pinglamb 同一條數係約 0.699 對約 0.573<span class=\"badge\" data-claim=\"G063\"></span>。<strong>呢個係連續第三晚 pinglamb 闊過 yachi</strong>——十一晚計，六晚係佢闊。要講清楚：呢個係一個數，唔係一個趨勢；同一欄 08-09 嗰晚 yachi 闊過佢成 24.7 個百分點，而成個 corpus 最闊嗰個仍然係 yachi 嘅。",
+    "多落方塊呢條路連續第七晚買唔返個 gap，而今晚係買得最少嘅一晚：<strong>yachi 多疊咗 110 粒方塊，攻擊少 309 條</strong><span class=\"badge\" data-claim=\"C005\"></span>，即係對手總攻擊嘅 9% 幾。計清楚：110 粒即係多過對手 2% 幾，最多填返 2 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>，而要填嘅係 12 個幾<span class=\"badge\" data-claim=\"C004\"></span>。<strong>個窿大過條路成五倍。</strong>上一晚同一條路要填嘅得 6 個幾，佢就差 47 條；分別唔喺佢點行，喺個窿幾大。",
+    "<strong>今晚冇一個數字係「得一局撐住」，而呢句係度過嘅。</strong>逐個抽走一局再計，郁得最勁嗰個係「輸嘅局差 4% 幾」，抽走 m2 第 5 局會郁 0.447 個單位——喺門檻 0.5 之下，而且成個 corpus 未試過咁貼門檻都過到。另一邊更加穩：<strong>「攻擊差 309 條」抽走任何一局都只郁 0.107</strong>，係呢一欄歷來第二穩。上一晚嗰個「差 47 條」抽走一局就郁 0.766——同一個量、隔一晚、穩定程度啱啱調轉。個差額愈大，愈唔會俾一局話事。",
+    "手上功夫兩個人一路都差唔多：每粒方塊要按幾多下，yachi 3.620 下、pinglamb 3.608 下，爭 0.33%<span class=\"badge\" data-claim=\"C008\"></span>。<strong>今次高嗰個係 yachi，同上一晚啱啱調轉</strong>——上一晚係 3.598 對 3.606，pinglamb 高。兩晚夾埋講嘅係：呢一欄邊個高，唔係邊個嘅性格，係嗰晚嘅事。喺兩個人自己身上，KPP 喺贏局同輸局之間一樣郁唔郁得幾多<span class=\"badge\" data-claim=\"G064\"></span><span class=\"badge\" data-claim=\"G065\"></span>。",
+    "兩個人揀嘅路一路都唔同：yachi 嘅 Quad 235 對 207<span class=\"badge\" data-claim=\"G032\"></span>；pinglamb 嘅 T-spin double 258 對 213<span class=\"badge\" data-claim=\"G033\"></span>、triple 54 對 29<span class=\"badge\" data-claim=\"G034\"></span>，加埋 312 對 242<span class=\"badge\" data-claim=\"G052\"></span>。yachi 落得快（每局平均 PPS 約 1.421 對約 1.405<span class=\"badge\" data-claim=\"G037\"></span>），pinglamb 每粒打得重<span class=\"badge\" data-claim=\"G039\"></span>、APM 高好多（每局平均約 57.4 對約 48.9<span class=\"badge\" data-claim=\"G038\"></span>）。",
+    "Perfect Clear 係 pinglamb 14 個、yachi 8 個<span class=\"badge\" data-claim=\"G035\"></span>，加埋 22 個，<strong>係十一晚以嚟最多</strong>（之前最多係 08-14 嘅 20 個）。但同贏唔贏嘅關係一如既往咁散：全場淨係 pinglamb 做到全消嗰 9 局，佢輸咗 1 局<span class=\"badge\" data-claim=\"G075\"></span>；淨係 yachi 做到嗰 4 局，佢一局都冇輸<span class=\"badge\" data-claim=\"G073\"></span>。分母得幾局，所以呢度印次數，唔印百分比。",
+    "死法：全晚 12 局係自己頂到天花板收場，7 局係 yachi、5 局係 pinglamb<span class=\"badge\" data-claim=\"C006\"></span>，其餘 39 局全部係俾垃圾頂爆<span class=\"badge\" data-claim=\"G058\"></span>。12 局即係 23.5% 嘅局，<strong>係十一晚以嚟最高嘅頂爆率</strong>。不過呢一欄一路都係咁上咁落——十一晚由 0 比 4 去到 11 比 2 都試過，唔好當佢係趨勢。",
+    "51 局裏面，每一局贏嗰個嘅 VS 都高過輸嗰個，零例外<span class=\"badge\" data-claim=\"G022\"></span>——十一晚都係咁。要留意呢個唔係第二個獨立訊號：1v1 一局一命，KO 數等於局數<span class=\"badge\" data-claim=\"G036\"></span>。",
+    "<strong>有一件事今晚睇落成立，但唔應該當佢成立。</strong>如果將七場按「pinglamb 每粒方塊贏幾多」排開，yachi 贏嗰場（第五場，爭 0.21%）啱啱好排最細，其餘六場由 5.57% 排到 19.57%，中間乜都冇。08-19 同 08-25 兩晚都出現過同樣嘅形狀，當時都開咗 claim。<strong>今晚冇開，而且係特登唔開。</strong>08-19 係三場贏排晒最細三位，靠彩數撞啱嘅機會係 120 分之一；08-25 係四場排晒最細四位，126 分之一。今晚 yachi 得一場贏，佢「排第一」嘅機會係 <strong>七分之一</strong>。七分之一嘅巧合唔係一百二十分之一嗰個發現嘅重複，所以「排開就分得開」呢個數仍然係十一晚入面兩晚，今晚同 08-09（yachi 一場都冇贏）一齊歸入「講唔出嘢」嗰邊。"
+  ]
+}
