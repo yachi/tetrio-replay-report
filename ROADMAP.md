@@ -178,12 +178,13 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-08-25 | 14/17 testable = **82%** | 13/17 = **76%** | 13/17 = **76%** | 1 |
 | 2026-09-03 | 13/16 testable = **81%** | 11/16 = **69%** | 11/16 = **69%** | 2 |
 | 2026-09-10 | 13/16 testable = **81%** | 13/16 = **81%** | 13/16 = **81%** | 2 |
+| 2026-09-11 | 12/15 testable = **80%** | 12/15 = **80%** | 12/15 = **80%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->seven of the ten<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->eight of the eleven<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -192,8 +193,8 @@ than a threshold: no honest floor exists when one hand claim is worth 10.0 point
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eight of the ten<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->nine of the ten<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eight of the eleven<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->nine of the eleven<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
