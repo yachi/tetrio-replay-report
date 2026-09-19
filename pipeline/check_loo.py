@@ -494,6 +494,35 @@ PUBLISHED = (
     # sentence quotes them), following 08-19 and 08-25.
     ("2026-09-17", "app_gap_won", "series"),
     ("2026-09-17", "app_gap_lost", "series"),
+    # 2026-09-19 takes NO `ANNOTATED` entry and sets the corpus minimum on this measurement —
+    # every one of its five figures is quieter than any earlier session's version of it bar one.
+    # Measured over all five:
+    #
+    #     app_gap_won      +5.8413 pp   m13r3 ->  +4.9635  rel 0.150  1.10x the next of 150
+    #     app_gap_lost     +6.3927 pp    m5r4 ->  +7.1379  rel 0.117  1.10x
+    #     app_gap_session +11.1598 pp    m1r5 -> +11.7174  rel 0.050  1.50x
+    #     attack_diff         -476 行    m7r3 ->     -444  rel 0.067  1.03x
+    #     score_diff       -117513 分    m7r3 ->  -105625  rel 0.101  1.08x
+    #
+    # Nothing crosses THRESHOLD, nothing flips sign, and the maximum (0.150) is the lowest any
+    # session has recorded — the previous lowest was 09-17's 0.226. Four of the five are the
+    # lowest `rel` ever measured on their own figure (08-14's app_gap_won at 0.080 is the one
+    # exception).
+    #
+    # **Do not read that as 「150 rounds makes a pooled figure robust」.** It is the inference
+    # this row invites and it is measured and false: over the thirteen sessions the rank
+    # correlation between round count and maximum `rel` is −0.06. 08-01 at 53 rounds reads
+    # 20.931 and 09-10 at 65 reads 2.081, while 07-22 at 79 reads 1.179. What makes this
+    # session's figures quiet is that none of them sits near zero — the fragile kind this
+    # file's header names — and its longest session happening also to be its quietest is a
+    # coincidence of those two facts, not a relationship between them. Recorded here because
+    # the next long session will invite the same inference.
+    #
+    # `attack_diff` and `score_diff` are measured and NOT published, following 08-19, 08-25 and
+    # 09-11: CLAUDE.md's shortfall table quotes the −476, but that table has never been a
+    # `SENTENCES` target. If a later pass makes it one, both rows go in together.
+    ("2026-09-19", "app_gap_won", "series"),
+    ("2026-09-19", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

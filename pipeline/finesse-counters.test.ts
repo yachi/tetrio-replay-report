@@ -47,13 +47,14 @@ const SESSIONS = [
   { dir: '2026-09-10', rounds: 130, strict: 107, equal: 23, faults: 1804, perfect: 9856, pieces: 11010 },
   { dir: '2026-09-11', rounds: 102, strict: 87, equal: 15, faults: 1874, perfect: 9295, pieces: 10450 },
   { dir: '2026-09-17', rounds:  98, strict: 91, equal:  7, faults: 1805, perfect: 8422, pieces:  9509 },
+  { dir: '2026-09-19', rounds: 300, strict: 267, equal: 33, faults: 5280, perfect: 25015, pieces: 28176 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 1468, strict: 1267, equal: 201, faults: 23901, perfect: 123722, pieces: 138628 };
+const CORPUS = { rounds: 1768, strict: 1534, equal: 234, faults: 29181, perfect: 148737, pieces: 166804 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -159,11 +160,13 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 28 rounds, all twelve sessions pooled (18 -> 20 when
+  // longest perfect run is the whole round. 33 rounds, all thirteen sessions pooled (18 -> 20 when
   // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
-  // contributing 3 apiece — and 26 -> 28 when 2026-09-17 did).
+  // contributing 3 apiece — 26 -> 28 when 2026-09-17 did, and 28 -> 33 when 2026-09-19 did).
+  // Five in one session is the largest single addition, and it is also the smallest per round:
+  // 5 of 300 against 2 of 98, so the RATE fell while the count rose.
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(28);
+  expect(clean.length).toBe(33);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -178,20 +181,21 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
-  // Twelve-session figures (2026-09-17 added): 17.11 -> 17.24, 10.7 -> 10.75, 89.3 -> 89.25,
-  // 16.08 -> 16.19, 1.599 -> 1.603. Every one moved AWAY from the value it had at eleven, and
-  // away from the nine-session value three of them had wandered back to — which is the same
-  // lesson the previous revision of this comment drew and is worth keeping for the opposite
-  // reason: a rate that returns to an old value one session and leaves it the next is not
-  // converging on anything. The pinned numbers are still not the finding. The ORDER is, and it
-  // is unchanged (perfect share > event rate > the meaningless one > faulty share). A reader who
-  // took 17.24 away as "the" fault rate would be wrong twice over: it is one corpus-state's
-  // reading of a quantity that moves, and it is one of four defensible ones.
-  expect(pct(faults / pieces)).toBe(17.24);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.75);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.25);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(16.19);   // on no meaningful denominator
+  // Thirteen-session figures (2026-09-19 added): 17.24 -> 17.49, 10.75 -> 10.83, 89.25 -> 89.17,
+  // 16.19 -> 16.40, 1.603 -> 1.615. Every one moved further in the direction it moved last time,
+  // and by roughly twice as much — which is what adding a session 1.8x the size of any other
+  // does and is NOT evidence of a trend. The previous revision of this comment noted that three
+  // of them had wandered back to a nine-session value and then left it; this one notes the
+  // opposite motion, and both notes exist to make the same point: the pinned numbers are not the
+  // finding. The ORDER is, and it is unchanged across all thirteen (perfect share > event rate >
+  // the meaningless one > faulty share). A reader who took 17.49 away as "the" fault rate would
+  // be wrong twice over: it is one corpus-state's reading of a quantity that moves, and it is one
+  // of four defensible ones.
+  expect(pct(faults / pieces)).toBe(17.49);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.83);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.17);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(16.4);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.603);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.615);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });
