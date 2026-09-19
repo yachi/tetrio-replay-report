@@ -881,7 +881,8 @@ ranks **8th of eleven**, i.e. below its column's median of +6.1. The ratio betwe
 which puts this session with 09-03 (1.98) and nowhere near 08-14 (10.6) or 09-10 (9.6). It is a
 mild mirror, and the ten-session sentence survives its eleventh test.
 
-**Kept because 09-17 then did falsify it, and the two cases are worth reading side by side.** The
+**Kept because 09-17 then did falsify it (three paragraphs down), and the two cases are worth
+reading side by side.** The
 draft above was wrong about 09-11 and the sentence was right about 09-11; one session later the
 same sentence is false, and the thing that settled both was the same ranking. A reader who
 concluded from this paragraph that 「both gaps large」 simply never happens would have been reading
