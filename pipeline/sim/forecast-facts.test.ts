@@ -375,8 +375,8 @@ for (const PATH of ARTEFACTS) {
       // holding two placements has no answer to 「which edit raised availability」 and crediting one
       // of them would be the confidently-wrong verdict the 08-09 case above is about.
       //
-      // The phenomenon is old: 24 extra same-frame locks in 21 rounds of 8 sessions, 13 of them
-      // inside a verified prefix, and every one yachi's. What is new is that one of them finally
+      // The phenomenon is old: 24 extra same-frame locks over 23 player-rounds of 8 sessions,
+      // 15 of them inside a verified prefix, and all 24 yachi's. What is new is that one of them finally
       // lies on a walk this function takes — which is why re-emitting every earlier session's
       // artefact after the change produced byte-identical files. A dormant assertion is not an
       // absent one, and this is the same lesson the 08-09 entry above records from the other side.

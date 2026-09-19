@@ -4005,7 +4005,8 @@ session **入面**嘅 claim。呢張表比較嘅係唔同大細嘅 window ——
   「N 項之中有 M 項」,M == N 都啱,所以以後唔會再變成一個要靠數據一路守住嘅 absolute。
 * **`localiseMechanism` 撞到兩個 lock 同一個 frame。** `boards[]` 係逐個 lock index,但係逐個
   frame 影相,所以兩個 lock 同 frame 嗰陣,第一個嗰張相已經有埋第二個。全 corpus 24 個,喺 8 個
-  session 嘅 21 局入面,13 個喺 verified prefix 入面,**而且全部都係 yachi 嘅**;之所以十二個
+  session 嘅 23 個 player-round 入面,15 個喺 verified prefix 入面,**24 個全部都係 yachi 嘅**
+  (24 個 lock 得 23 局,因為有一局自己有兩對);之所以十二個
   session 都冇響過,係因為呢個 function 淨係去到有 forecast record 行返轉頭嗰啲 step,而之前
   嗰十三個啱啱好冇一個喺嗰啲 step 上面。**一個瞓着咗嘅 assertion 唔等於冇 assertion。** 改法
   係將成串同 frame 嘅 lock 一次過重建、照舊 assert(所以個 model 冇鬆過),然後出

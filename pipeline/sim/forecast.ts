@@ -633,9 +633,10 @@ export function localiseMechanism(
   // `boards[151]` already carries lock 152's J.
   //
   // The phenomenon is NOT new and that is the part worth keeping. Measured over all thirteen
-  // sessions: 24 extra same-frame locks in 21 rounds of 8 sessions, 13 of them inside a verified
-  // prefix — and **every one is yachi's**, which makes it a fact about one player's input clock
-  // rather than a simulator artefact. It went unseen for twelve sessions because this function is
+  // sessions: 24 extra same-frame locks over 23 player-rounds of 8 sessions, 15 of them inside a
+  // verified prefix — and **all 24 are yachi's**, which makes it a fact about one player's input
+  // clock rather than a simulator artefact. (24 locks over 23 rounds because one round carries
+  // two separate same-frame pairs.) It went unseen for twelve sessions because this function is
   // only reached at a step some forecast record walks back through, and none of the earlier
   // thirteen happened to lie on such a walk. A dormant assertion is not an absent one.
   //
