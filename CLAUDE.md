@@ -27,9 +27,9 @@ bottom of both measures without being lowest on either.
 
 **2026-09-19's size IS its finding, and the finding is about this document rather than about the
 night.** 15:5 in matches and 91:59 in rounds is a one-sided scoreline and nothing more: 60.67% of
-the night's rounds is **second** behind 09-11's 62.75%, and 75.00% of its matches ties 07-28 for
-**third** behind 08-09's sweep and 09-11's 85.71%, so it is not the most lopsided night on either
-measure. Its C002 puts both regime gaps back in the middle of their columns (10th and 7th of
+the night's rounds is **third** (behind 09-11's 62.75% and 09-17's 61.22%), and 75.00% of its
+matches ties 07-28 for **fourth** (behind 08-09's sweep, 09-11's 85.71% and 09-03's 83.33%), so it
+is not the most lopsided night on either measure and is not close to it on either. Its C002 puts both regime gaps back in the middle of their columns (10th and 7th of
 thirteen), which is the 「roughly level」 class and the answer to whether 09-17's 「both large」 was
 one instance — it was. What the session actually produces is this: **a corpus quantity that is
 secretly proportional to session length cannot be caught by twelve sessions that all sit within a
@@ -1028,11 +1028,15 @@ made it three consecutive sessions with pinglamb wider. **09-17 ends THAT run at
 the thirteen is **seven yachi, six pinglamb** — re-derived from the series above rather than
 carried, and as close to nothing as a column can say.
 
-**09-19's entry is the closest pair the column has ever produced (0.6 points apart) and it is the
-one the corpus can least dismiss**, because it sits on 150 rounds. The previous closest is 07-28's
-(23.2, 23.1) on 64. Note what that does NOT license: the column's two extremes are 24.7 points
-apart and belong to different players two sessions apart, so a near-tie at the largest n is one
-more reading and not a convergence. Written as a count, never as a trend.
+**09-19's entry is the SECOND-closest pair the column has produced (0.62 points apart, behind
+07-28's 0.11) and it is the one the corpus can least dismiss**, because it sits on 150 rounds
+against 07-28's 64. A first draft of this sentence called it the closest and named 07-28's
+(23.2, 23.1) as the previous closest in the same breath — 23.19 against 23.08 is 0.11 apart, so
+the sentence contradicted its own example. That is 冇第二份's eighth class exactly: a superlative
+standing next to the data that refutes it, in a paragraph whose series is printed three lines
+above. Note what the corrected version does NOT license either: the column's two extremes are
+24.7 points apart and belong to different players two sessions apart, so a near-tie at the
+largest n is one more reading and not a convergence. Written as a count, never as a trend.
 
 **Both counts in the sentence that stood here were wrong, and they are worth recording rather than
 just fixing.** It read 「09-10 makes it three in a row … Three of ten with pinglamb wider」. At ten
@@ -1678,7 +1682,7 @@ merely documented:
   **2026-09-19 TRIPLES the DT count in one night, and that changes what this bullet can say.**
   Ten in one session against five in the previous twelve. Per round holding both spins the DT rate
   runs 0 · 0 · 0 · 0 · 0 · 0.99 · 0 · 1.11 · 0 · 1.22 · 0 · 4.00 · **6.06** %, so the last two
-  sessions hold 12 of the 15 on 215 of the 1022 rounds — 5.58% against 0.46% for the first eleven.
+  sessions hold 12 of the 15 on 215 of the 1022 rounds — 5.58% against 0.37% for the first eleven.
   None of the ten is a prefix artefact (`ordering_full_round` drops the verification requirement
   and finds the same ten) and every one carries exactly one Double and one Triple in its window,
   which is the shape all five earlier cases had. Two sessions is not a trend and no mechanism is

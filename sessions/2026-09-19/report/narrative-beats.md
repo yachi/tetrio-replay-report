@@ -7,11 +7,12 @@ Twenty matches, 150 rounds. **The largest session the corpus has, by 1.79x on ro
 
 * pinglamb 15-5 in matches [C001][G001], 91-59 in rounds [C010][G002].
 * Every match went to whoever reached five rounds first — no exceptions in twenty [G003].
-* 60.67% of the night's rounds are pinglamb's. That is **second** in the corpus behind
-  09-11's 62.75%, above 08-09's and 08-19's 60.00%. In MATCHES its 75.00% ties 07-28 and
-  sits third behind 08-09's sweep and 09-11's 85.71%. The two measures disagree, as they
-  did on 09-11, so any sentence calling this the most one-sided night has to say which
-  one it means — and on neither is it first.
+* 60.67% of the night's rounds are pinglamb's. That is **third** in the corpus, behind
+  09-11's 62.75% and 09-17's 61.22% and above 08-09's and 08-19's 60.00%. In MATCHES its
+  75.00% ties 07-28 for **fourth**, behind 08-09's sweep, 09-11's 85.71% and 09-03's
+  83.33%. The two measures disagree, as they did on 09-11, so any sentence calling this
+  the most one-sided night has to say which one it means — and on neither is it close to
+  first.
 * The night has no act structure. First ten matches 28-47, last ten 31-44, **over exactly
   75 rounds each** [C010]. Two windows of the same size, so the raw counts compare without
   cross-multiplying — the one case the repo's window rule allows. yachi trailed from match
@@ -33,8 +34,8 @@ that a thirteenth session could not promote to a class. The thirteenth session i
 and it does not reproduce it.
 
 Within a player [C003]: yachi +19.55%, pinglamb +18.93%. yachi wider, so seven of thirteen.
-The two are **six-tenths of a point apart, the closest this column has ever been** — its
-previous closest was 07-28's 23.19 against 23.08, and its extremes are 24.7 points apart.
+The two are **six-tenths of a point apart, the second-closest this column has been** —
+07-28's 23.19 against 23.08 is closer at 0.11 — and its extremes are 24.7 points apart.
 
 ## The volume route, a ninth time — and the trap in reading it
 

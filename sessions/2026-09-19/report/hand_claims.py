@@ -101,7 +101,7 @@ The claims are of six kinds:
     pinglamb's +18.93% puts **yachi the wider of the two** by six-tenths of a point, taking the
     count to seven of thirteen yachi. Stated as a count and not as a trend: the same column put
     yachi 24.7 points ahead on 08-09 and pinglamb 12.5 ahead on 09-10, and the gap here is the
-    smallest the column has ever shown.
+    second-smallest the column has shown, behind 07-28's 0.11.
   * **the route and its price** — C005 and C009, each pinning a rate beside its raw count.
   * **the death tally** — C006.
   * **the twenty matches, one each** — C011-C030 as `round_seq` runs, the rule every session
@@ -302,10 +302,10 @@ CLAIMS = [
         "category": "style",
         "canto": "喺一個人自己身上講：兩個人贏嗰啲局每粒方塊嘅攻擊都高過自己輸嗰啲局——"
                  "yachi 高 19% 幾，pinglamb 高 18% 幾。兩個人爭唔夠一個百分點，"
-                 "係呢一欄十三晚以嚟最貼嘅一次",
+                 "喺呢一欄十三晚以嚟排第二貼，僅次於 07-28 嗰次",
         "english_gloss": "each player's attack per piece is higher in the rounds he won than in "
                          "the rounds he lost — yachi by between 19 and 20 percent, pinglamb by "
-                         "between 18 and 19 percent, the closest this column has ever been",
+                         "between 18 and 19 percent",
         "spec": conj(
             pct_between(won(Y, "garbage_attack"), won(Y, "pieces"),
                         lost(Y, "garbage_attack"), lost(Y, "pieces"), 119, 120),

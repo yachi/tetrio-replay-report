@@ -1616,7 +1616,7 @@ const DT_ORDER_IN_OPENER: Record<string, Record<string, number>> = {
   //  What changed is the RATE, and it is the honest unit now that the count is double digits.
   //  Per round holding both spins the DT order runs 0 · 0 · 0 · 0 · 0 · 0.99 · 0 · 1.11 · 0 ·
   //  1.22 · 0 · 4.00 · 6.06 %, so the last two sessions hold 12 of the corpus's 15 on 215 of its
-  //  1022 rounds — 5.58% against 0.46% for the first eleven. That is a real difference and it is
+  //  1022 rounds — 5.58% against 0.37% for the first eleven. That is a real difference and it is
   //  TWO SESSIONS, which this repo's own rule says is not a trend; it is recorded as a count and
   //  a rate, with no mechanism proposed.
   //
