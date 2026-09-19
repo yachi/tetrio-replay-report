@@ -474,6 +474,26 @@ PUBLISHED = (
     # target. If a later pass makes it one, both rows go in together.
     ("2026-09-11", "app_gap_won", "series"),
     ("2026-09-11", "app_gap_lost", "series"),
+    # 2026-09-17 takes NO `ANNOTATED` entry, and for this session that absence carries more than
+    # usual — it is the first session where BOTH regime gaps are large (won-gap rank 2 of twelve,
+    # lost-gap rank 3), so 「both gaps large together」 is a claim about two pooled ratios and the
+    # obvious question is whether either is one round's. Measured over both figures the session
+    # can carry:
+    #
+    #     app_gap_won     +14.5734 pp   m5r1  -> +13.0205  rel 0.107  1.02x the next of 49
+    #     app_gap_lost    +15.6310 pp   m3r8  -> +12.1009  rel 0.226  1.77x
+    #
+    # Neither crosses THRESHOLD, neither flips sign, and the larger of the two (0.226) is under
+    # half the cut. The won-gap's 1.02x is the flattest x2nd column in the corpus: no single round
+    # stands out at all, which is the opposite of 09-03's 2.57x. So the headline survives
+    # leave-one-out on both figures, which is what entitles the prose to state it without a
+    # caveat — and the measurement is recorded here precisely because 「no caveat」 must never be
+    # an omission.
+    #
+    # `attack_diff` and `score_diff` are not built for this session (no near-equal-totals
+    # sentence quotes them), following 08-19 and 08-25.
+    ("2026-09-17", "app_gap_won", "series"),
+    ("2026-09-17", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

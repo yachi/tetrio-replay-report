@@ -431,10 +431,24 @@ def problems(data, doc):
                            "with negatives (1292 of the donation's 1301), and neither the rate nor "
                            "the cave's 13-of-13 may be published without the sentence saying what "
                            "is in the denominator and how far the comparison reaches")
-        # …and the board split, whenever the artifact carries it. Conditioned on the data rather
-        # than demanded outright, so an artifact emitted before the split still passes.
-        if any((data.get(m) or {}).get("dual_engine", {}).get("board_split")
-               for m in ("donation", "stmb_cave")):
+        # …and the board split, PER METRIC. Each sentence is demanded only when its OWN metric has
+        # a positive in the split, which is the condition `_board_split_note` renders under — it
+        # returns "" for a metric whose `positives_same_board + positives_diff_board` is 0, because
+        # there is no row to caveat.
+        #
+        # This used to demand BOTH sentences whenever EITHER metric carried a `board_split`, and
+        # 2026-09-17 is the first session where that is wrong: the comparison reaches 2 donation
+        # positives and NO cave positive, so the generator correctly prints the donation's split and
+        # no cave caveat, and the gate failed a report that was behaving exactly as designed. The
+        # repair is not a relaxation — a metric WITH positives still owes its sentence, so the only
+        # reports that newly pass are the ones with nothing to say. The lesson is the one CLAUDE.md
+        # states for `OPENER_LOCKS`: a gate whose condition is coarser than its generator's reads as
+        # "this caveat is missing" when the truth is "this table is empty".
+        def _split_positives(metric, key):
+            sp = ((data.get(metric) or {}).get("dual_engine", {}).get("board_split") or {}).get(key)
+            return (sp["positives_same_board"] + sp["positives_diff_board"]) if sp else 0
+
+        if _split_positives("donation", "don"):
             if DUAL_SPLIT_MARKER not in body:
                 bad.append(f"the board split is gone ({DUAL_SPLIT_MARKER!r} missing) — at 727 of "
                            "the 1719 comparison points the two engines judge DIFFERENT boards, and "
@@ -442,6 +456,7 @@ def problems(data, doc):
                            "boards and 3-of-37 on boards that differ. Without it the section "
                            "reports a disagreement about donations that the measurement says is a "
                            "disagreement about the board")
+        if _split_positives("stmb_cave", "cave"):
             if CAVE_SPLIT_MARKER not in body:
                 bad.append(f"the cave's split caveat is gone ({CAVE_SPLIT_MARKER!r} missing) — the "
                            "cave agrees 13 of 13 on boards that DIFFER, which is the verdict being "

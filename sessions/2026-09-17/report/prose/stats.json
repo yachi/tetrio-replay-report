@@ -1,0 +1,46 @@
+{
+ "eyebrow": "數據對決 · 三張圖",
+ "title": "數據對決",
+ "lede": "三張圖答三條唔同嘅問題：邊場開始散、散喺邊種清行、同埋逐項身手邊個高。睇之前記住一件事——<strong>今晚兩個人嘅速度同按鍵都差唔多</strong>（PPS 1.463 對 1.377<span class=\"badge\" data-claim=\"G039\"></span>、KPP 3.592 對 3.623<span class=\"badge\" data-claim=\"C008\"></span>），所以下面每一個差距都唔係「快慢」或者「手法」解釋得到。",
+ "panels": [
+  {
+   "heading": "逐場 VS 走勢——頭三場同尾四場係兩晚",
+   "caps": [
+    "頭三場 yachi 逐局 14 比 10 領先<span class=\"badge\" data-claim=\"C010\"></span>，尾四場逐場贏 1、1、3、0 局。條線喺第四場轉向，之後冇再返過頭。",
+    "成晚 49 局，每一局贏嗰個 VS 都高過輸嗰個<span class=\"badge\" data-claim=\"G024\"></span>——呢個係 corpus 十二晚都成立嘅唯一一條，所以 VS 嘅 AUC 永遠 100%，佢係定義出嚟嘅結果，唔係一個發現。"
+   ],
+   "footnote": null,
+   "mount": {
+    "id": "vs-small-multiples",
+    "class": "sm-grid",
+    "scroll_x": false
+   }
+  },
+  {
+   "heading": "清行類型分布——20 個百分點住喺 T-spin 裏面",
+   "caps": [
+    "會清行嘅 T-spin：pinglamb 277、yachi 191<span class=\"badge\" data-claim=\"G054\"></span>；當中 T-spin Triple 53 對 17<span class=\"badge\" data-claim=\"G036\"></span>。yachi 嘅 Quad 多（247 對 191<span class=\"badge\" data-claim=\"G034\"></span>），但 Quad 要四行先出四行貨，T-spin Triple 三行出六行——<strong>C004 嗰 20% 幾主要就住喺呢條轉換率裏面</strong>。",
+    "全消 pinglamb 5 次、yachi 2 次<span class=\"badge\" data-claim=\"G037\"></span>。下面「全消」一節講得好清楚：有全消嗰個唔代表贏嗰局——yachi 兩局全消兩局都輸<span class=\"badge\" data-claim=\"G076\"></span>，pinglamb 五局贏三局<span class=\"badge\" data-claim=\"G078\"></span>。"
+   ],
+   "footnote": null,
+   "mount": {
+    "id": "clears-bar-chart",
+    "class": null,
+    "scroll_x": true
+   }
+  },
+  {
+   "heading": "身手大比拼——快、手靚、挖得深，淨係唔夠攻擊",
+   "caps": [
+    "yachi 快啲（PPS 1.463 對 1.377<span class=\"badge\" data-claim=\"G039\"></span>）、按少啲（KPP 低<span class=\"badge\" data-claim=\"G061\"></span>），而 pinglamb 平均 APM 高（56.1 對 47.4<span class=\"badge\" data-claim=\"G040\"></span>）。同一雙手、同樣嘅按鍵密度，差喺每粒方塊變幾多條攻擊<span class=\"badge\" data-claim=\"G041\"></span>。",
+    "每粒 finesse 失誤呢一行係<strong>每粒計嘅事件率</strong>，唔係「有幾多成粒有失誤」——一粒方塊可以記幾次失誤，所以呢一行唔會用百分比印。"
+   ],
+   "footnote": "成晚 yachi finesse 失誤 988 次、pinglamb 817 次<span class=\"badge\" data-claim=\"G031\"></span>，但每粒計 pinglamb 完美粒數比率高<span class=\"badge\" data-claim=\"G043\"></span>。兩個數講唔同嘢，唔好混。",
+   "mount": {
+    "id": "tape-chart",
+    "class": null,
+    "scroll_x": true
+   }
+  }
+ ]
+}

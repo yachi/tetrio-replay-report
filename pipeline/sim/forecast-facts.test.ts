@@ -85,6 +85,10 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // Nor this one. Three sessions running with none, and the corpus count is still 2.
   '2026-09-10': { yachi: 0, pinglamb: 0 },
   '2026-09-11': { yachi: 0, pinglamb: 0 },
+  // Nor this one, and this session has no forecast of ANY kind on either side (0 of 220 and 0 of
+  // 288 scorable T-spins), which is the first time that has happened. Five sessions running with
+  // no `path_opened`, and the corpus count is still 2.
+  '2026-09-17': { yachi: 0, pinglamb: 0 },
 };
 
 // The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits
