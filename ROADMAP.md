@@ -3924,6 +3924,39 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
 
+## 補做 09-11 嗰轉漏咗嘅數，同第九個 冇第二份 instance (2026-09-12)
+
+09-11 落地嗰轉 paste 晒所有 marked fragment，但**冇逐段重讀隔籬冇 marker 嗰啲數**——即係
+CLAUDE.md 自己第七個 instance 講嘅嗰件事，喺寫完嗰段之後嗰一轉就再犯一次。漏咗十四處，
+全部都係同一個形狀:一個 session count 或者一個 corpus 總數，擺喺一個有 gate 嘅 fragment 隔籬。
+
+度返、改咗嘅（每個都用 data 重新度過，唔係估）:
+
+| | 舊 | 新 |
+|---|---|---|
+| 全消 solo-PC 局數 | 114 局、輸 47 | **127 局、輸 48** |
+| 全消 PC pooled AUC | 51.66 / 634 局 / corrected 1 | **52.26 / 685 局 / corrected 0.14** |
+| cave 一行深 | 68 of 69 | **74 of 75** |
+| cave 分母 | 1268 player-rounds | **1370** |
+| PCO window | 4 of 138 | **4 of 160** |
+| dual cave 差板同意 | 24 of 24 | **25 of 25** |
+| 逐場排開 | twice of ten | **twice of eleven** |
+| 其餘七處 session count | ten / seven sessions | **eleven** |
+
+**入面有一個唔係 stale，係一路都錯——而且錯法值得記。**「`pinglamb leads every match` …
+it held in eight of ten sessions and this is one of the two where it does not」:度返係
+**十一個 session 入面得六個成立**(07-22、07-28、08-14、08-19、09-10 都至少有一場 yachi 領先)，
+而十個嗰陣嘅真數係五個，唔係八個。**冇人度過**——隔籬段講 09-10 嗰兩場，個「two」就係由嗰一個
+session 讀出嚟，唔係由 corpus 讀出嚟。
+
+呢個係 冇第二份 **第八個 instance 嘅同一個 sub-class**(由同一份 document 入面一個 list 數出嚟
+嘅 count)，不過個 list 隔咗一節而唔係隔三行。第八個 instance 嗰兩個數，個 series 就印喺上面
+三行;呢個嘅證據要行去另一節先搵到，所以更加冇人對。可操作嘅補充:**「N of M」呢種寫法，M 係
+session 數嘅時候要當佢係一個 measurement，唔係一個 summary**——會隨 corpus 郁，而且冇 gate。
+
+同一轉仲有一個教訓係關於改嘅人:第一版嘅修正寫住「nine of eleven」，**都係估嘅，一樣錯**。
+度完先寫，係呢一節唯一行得通嘅做法。
+
 ## 第十一個 session：全 corpus 最一面倒，同兩個計錯咗嘅數 (2026-09-11)
 
 2026-09-11 落地(7 場、51 局、**pinglamb 6 比 1**)。**逐局計 32 比 19，即係佢食咗 62.7% 嘅
