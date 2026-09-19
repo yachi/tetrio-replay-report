@@ -633,7 +633,7 @@ time. DS is the per-*piece* variant throughout (raw `garbage_cleared` gives 68.4
 pooled, not one session.
 
 2026-08-14 (84 rounds) is the sixth, and the largest: VS 100% · 攻 91.1 · APM 90.5 · 送 82.7 ·
-**APP 81.0, still the lowest of seven** · 分 79.8 · DS 70.2 · 食 17.9 · 射埋 18.5 — and **KPP 40.5**, below
+**APP 81.0, still the lowest of eleven** · 分 79.8 · DS 70.2 · 食 17.9 · 射埋 18.5 — and **KPP 40.5**, below
 chance for a sixth time.
 
 2026-08-19 (70 rounds) is the seventh: VS 100.0 · 攻 93.6 · APM 92.9 · **分 91.4, the highest of
@@ -1070,20 +1070,20 @@ Three things this must not be turned into, each of which is a sentence someone w
   nine matches*, yachi's four wins included, so 「yachi won the matches where his attack per piece
   was higher」 is false nine times over. 08-19's version had one match on the wrong side of zero; at
   twelve sessions the safe wording is that what separates is the SIZE of the gap, never who leads —
-  and 09-10 shows even 「who leads」 is not fixed. 09-17 is the same shape as 08-25 on this point:
-  pinglamb's attack per piece is higher in all seven matches, yachi's two wins included.
+  and 09-10 shows even 「who leads」 is not fixed.
   09-03 says the same thing from the failing side: pinglamb leads APP in all six matches there
   too, and the winner does *not* fall out. **09-10 removes even the premise**: yachi leads attack
   per piece outright in m1 (−1.49%) and m7 (−8.43%), so 「pinglamb leads every match」 is not a
-  corpus regularity either — **it holds in 7 of the twelve sessions**, and yachi leads at least one
-  match's attack per piece in 07-22, 07-28, 08-14, 08-19 and 09-10.
-
-  (**That count read 「eight of ten … one of the two where it does not」 and was wrong when
-  written**: at ten it was five of ten and 09-10 was one of FIVE. It is the 冇第二份 eighth-instance
-  shape in its purest form — the bullet two above this one lists 08-19's three smallest gaps as
-  「−10.13, −0.98, +0.72」, i.e. the document already recorded two negative gaps for a session the
-  count treated as having none, and nothing re-derived the count from the list. Re-derive it from
-  the per-match gaps, never carry it.)
+  corpus regularity either — **measured, it holds in 7 of the 12** (07-22, 07-28, 08-14, 08-19
+  and 09-10 each have at least one match yachi leads). This sentence published 「it held in eight
+  of ten sessions and this is one of the two where it does not」 until 2026-09-12, and that was
+  wrong at ten as well as at eleven: the true ten-session count was five of ten. Nobody had
+  measured it — the 09-10 paragraph beside it names two matches, and 「the two where it does not」
+  was read off that one session rather than off the corpus. Same sub-class as the separation
+  series' miscounts (冇第二份's eighth instance), with the list one section away instead of three
+  lines up. 09-11 and 09-17 are both among the seven where it holds: pinglamb leads all seven
+  matches in each. 09-17 is therefore the same shape as 08-25 on this point — he leads every
+  match and still loses two of them.
 - **The cut point is not a constant, and the third instance widens the spread rather than
   narrowing it.** 08-19's separation falls between +0.72% and +11.53%, 08-25's between +8.21% and
   +10.32%, **09-17's between +13.47% and +16.91%**. There is no corpus-wide threshold: 08-25's
@@ -1098,9 +1098,10 @@ Three things this must not be turned into, each of which is a sentence someone w
   08-25, and an earlier revision of this bullet said a third session interleaving would refute
   nothing because the six earlier ones already did. 09-03 was that third session and 09-10 is the
   fourth — the statement stands as written both times, but note what it costs: the honest count is
-  now 2 of 10 with the two adjacent in the MIDDLE of the corpus and two interleaving sessions
-  after them, so 「the two most recent sessions」 is not available as a reason to expect the next
-  one, and neither is 「it separates more often than not」.
+  now 2 of 11 with the two adjacent in the MIDDLE of the corpus and three sessions since that do
+  not reproduce it (09-03 and 09-10 interleave, 09-11 separates only degenerately), so 「the two
+  most recent sessions」 is not available as a reason to expect the next one, and neither is
+  「it separates more often than not」.
 
 ### 個 shortfall 先係話事嗰個 — the volume route is bounded, not unreliable
 
@@ -1980,7 +1981,7 @@ agreements being both engines saying "no". On the thing the
 table actually counts the two engines disagree about **four donations in five** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
-<!--dual:bothno-share-->0.9962<!--/dual:bothno-share--> at seven sessions) so a future change cannot
+<!--dual:bothno-share-->0.9962<!--/dual:bothno-share--> at twelve sessions) so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
 `pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
@@ -2013,7 +2014,7 @@ So the two engines do not disagree about what a donation *is* — they disagree 
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
 and must never be worded like the donation's**: agreeing 25 of 25 on boards that differ is the
 verdict being *robust* to the drift (consistent with the drift sitting in low garbage rows while the
-cave is local to the spin), not nineteen independent confirmations. `DUAL_SPLIT_MARKER` and
+cave is local to the spin), not twenty-five independent confirmations. `DUAL_SPLIT_MARKER` and
 `CAVE_SPLIT_MARKER` fail the build if either sentence goes missing.
 
 **Every figure in this section is a marked fragment as of 2026-08-24, and all but one of them was
@@ -2043,7 +2044,7 @@ engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 e
 `sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
 alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
 the lock's own **frame**, the hand-port passes the strong check at that call site on every
-comparable lock — **<!--dual:strong-licence-->3273 of 3273<!--/dual:strong-licence-->** at seven
+comparable lock — **<!--dual:strong-licence-->3273 of 3273<!--/dual:strong-licence-->** at twelve
 sessions (the per-session figures are each session's
 `locks_comparable`, so the artefacts cross-check it and this number tracks them), so
 `dualVerdict` now uses the same reconstruction
