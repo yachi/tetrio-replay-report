@@ -6,7 +6,7 @@
     "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
     "estimand_entry": "pipeline/sim/board-metrics.ts",
     "board_source": "runCaseOracle",
-    "pinned_commit": "38d7b2a434bc5b066ba9f4edb760bb4dbed731dd",
+    "pinned_commit": "d1e434ef5ef1da219e9d53169b74252180689530",
     "pinned_on": "2026-09-19",
     "unblinding": [
       "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such.",
@@ -43,10 +43,10 @@
       },
       {
         "date": "2026-09-19",
-        "what": "The estimand's import closure moved: `pipeline/sim/forecast.ts` gained a same-frame branch in `localiseMechanism`. The pin advances to the commit carrying it. All thirteen sessions stay classified as they were; 2026-09-19 joins the confirmatory bank.",
+        "what": "The estimand's import closure moved: `pipeline/sim/forecast.ts` gained a same-frame branch in `localiseMechanism`. The pin advances to the commit carrying it. All thirteen sessions stay classified as they were; 2026-09-19 joins the confirmatory bank. The pin was re-advanced within this same deviation when a COMMENT in the same file was corrected (the same-frame counts had been read off a truncated scan); no second deviation is recorded because the substantive change is the one above and the closure's behaviour is unaltered.",
         "why": "`boards[]` is indexed per lock but snapshotted per FRAME, so when two locks share a frame the snapshot after the first already contains the second and the step model — place one piece, clear, snapshot — is not what happened. The existing assertion caught this on 2026-09-19 (replay-2026-09-19-06.ttrm r4 yachi, lock 151); it had been dormant rather than absent, since 24 such locks exist across 8 sessions, over 23 player-rounds, and 15 sit inside a verified prefix, but none had previously lain on a step this function walks. The branch reconstructs the whole same-frame run, still asserts it against boards[t], and returns `unattributed` because a step holding two placements cannot attribute an availability rise to one of them. THE RELEVANT FACT FOR THIS REGISTRATION is that the change is INERT on the banked data: every prior session's sim/forecast-facts.json re-emits byte-identical, which was checked on all seven sessions that contain same-frame locks before the pin was advanced. So the instrument did not move on any banked session — it gained a branch that fires on one round of the newest one. Estimand, unit, direction, test, threshold and controls are unchanged, and `board-metrics.ts` itself is untouched; this is a deviation in the closure, not in the hypothesis. The change was made to emit the new session's artefact at all, blind to this registration, and the registered estimand has still never been computed on any banked session.",
         "pin_from": "5ee57969ecc5f6b31f5a85cf562349c2335c549e",
-        "pin_to": "38d7b2a434bc5b066ba9f4edb760bb4dbed731dd"
+        "pin_to": "d1e434ef5ef1da219e9d53169b74252180689530"
       }
     ]
   }
