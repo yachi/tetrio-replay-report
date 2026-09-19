@@ -1,0 +1,34 @@
+{
+ "eyebrow": "教練分析 · 兩邊",
+ "title": "俾兩位嘅建議",
+ "lede": "今晚有一件事同前面十一晚都唔同，而佢改咗建議嘅寫法：<strong>yachi 輸嗰啲局同贏嗰啲局，落後嘅幅度差唔多一樣</strong><span class=\"badge\" data-claim=\"C002\"></span>。以前每一晚總有一邊貼得實，所以可以講「執返衰嗰啲局」或者「頂返好嗰啲局」；今晚兩個池都跌咗差唔多同一個比例，所以呢兩句都唔適用。",
+ "columns": {
+  "yachi": {
+   "tagline": "快、手靚、挖得深 · 差喺轉換率",
+   "profile": [
+    "成晚多疊咗 455 粒方塊，攻擊少 250 條<span class=\"badge\" data-claim=\"C005\"></span>。455 粒即係多過對手 10% 幾，換返做效率最多填 10 個幾百分點<span class=\"badge\" data-claim=\"C009\"></span>——<strong>係十二晚以嚟買得最多嘅一次</strong>，而個窿係 20 個幾<span class=\"badge\" data-claim=\"C004\"></span>，一樣係十二晚最大。冇任何一個落方塊嘅版本可以填一個大過自己兩倍嘅窿。",
+    "<strong>有三欄講明問題唔喺輸入。</strong>KPP 3.592 對 3.623<span class=\"badge\" data-claim=\"C008\"></span>——按鍵密度冇多；PPS 1.463 對 1.377<span class=\"badge\" data-claim=\"G039\"></span>——佢快啲，唔係慢;清走每粒計，喺最激一局 .367 對 .309<span class=\"badge\" data-claim=\"G084\"></span>，全晚 DS 嘅 AUC 79.6，係十二晚第二高。<strong>唔係手速、唔係手法、唔係挖唔到——係每粒方塊變幾多條攻擊。</strong>",
+    "講得具體啲：會清行嘅 T-spin 191 對 277<span class=\"badge\" data-claim=\"G054\"></span>，T-spin Triple 17 對 53<span class=\"badge\" data-claim=\"G036\"></span>。三行出六行同四行出四行嘅分別，乘以成晚粒數，就係 C004 嗰 20 個幾百分點。"
+   ],
+   "recs": [
+    "<strong>唔好再加粒數。</strong>今晚已經證明咗上限：十二晚買得最多嘅一次，都淨係填得返一半<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>。再多疊一百粒方塊，最多再填兩個百分點。",
+    "<strong>練 T-spin Triple 嘅開局到中盤銜接。</strong>17 對 53<span class=\"badge\" data-claim=\"G036\"></span>係全晚最單一嘅一個差距。佢 Quad 打得多（247 對 191<span class=\"badge\" data-claim=\"G034\"></span>），手係得嘅——要換嘅係開槽嘅習慣，唔係手速。",
+    "<strong>第一場值得逐局重睇。</strong>4 比 1 領先跟住連失四局<span class=\"badge\" data-claim=\"C011\"></span>，而 pinglamb 由呢場尾段一路連贏 7 局<span class=\"badge\" data-claim=\"G013\"></span>。今晚地板已經跌到 −15.63%<span class=\"badge\" data-claim=\"C002\"></span>，所以由領先變落後之後，每一局都係喺一個更闊嘅差距下面打——呢個係最值得搞清楚嘅一段。"
+   ]
+  },
+  "pinglamb": {
+   "tagline": "T-spin 效率流 · 天花板同地板一齊高",
+   "profile": [
+    "5 比 2 攞低系列<span class=\"badge\" data-claim=\"C001\"></span>、逐局 30 比 19<span class=\"badge\" data-claim=\"C010\"></span>。<strong>但打完三場佢逐局係 10 比 14 落後</strong><span class=\"badge\" data-claim=\"C010\"></span>——兩個比數都睇唔出呢件事，所以要寫出嚟。",
+    "每粒方塊嘅攻擊高過對手 20% 幾<span class=\"badge\" data-claim=\"C004\"></span>，係十二晚最闊。而且唔係靠一邊：贏嘅局高 14% 幾、輸嘅局高 15% 幾<span class=\"badge\" data-claim=\"C002\"></span>。佢自己贏輸之間嘅分別係 17% 幾<span class=\"badge\" data-claim=\"C003\"></span>，對佢嚟講屬中間水平，今晚仲窄過 yachi。讀法係「天花板同地板一齊高」，唔係「佢多咗一個檔」。",
+    "尾四場個效率優勢係 +36.82%、+30.83%、+21.17%、+44.36%<span class=\"badge\" data-claim=\"C007\"></span>，最後嗰個係全 corpus 單場最闊。佢唔係靠收尾贏呢四場，係靠一個對手加幾多粒都填唔到嘅差距。"
+   ],
+   "recs": [
+    "<strong>冇嘢要改。</strong>呢一欄擺喺度係為咗講清楚數據冇記佢功勞嘅地方：由逐局 10 比 14 追到 30 比 19<span class=\"badge\" data-claim=\"C010\"></span>，兩個比數都冇呢一段。",
+    "<strong>全消唔好當係贏局嘅工具。</strong>五次全消，輸咗其中兩局<span class=\"badge\" data-claim=\"G078\"></span>。十二晚嘅「全消」一節一直係同一個結論——有全消同贏唔贏嗰局係兩件事。冇嘢要練，係唔好讀多咗。",
+    "<strong>如果要搵一樣嘢守住：頭三場。</strong>七場入面佢輸咗嗰兩場（第二、第三場）啱啱好就係兩個人每粒方塊爭得最少嘅兩場，+3.90% 同 +13.47%<span class=\"badge\" data-claim=\"C007\"></span>。即係佢嘅波路一跌到爭一成左右，就會輸波。"
+   ]
+  }
+ },
+ "versus_note": "逐場排開個效率差距同邊個贏場波分得開<span class=\"badge\" data-claim=\"C007\"></span>，十二晚以嚟第三次。<strong>但要連埋份量一齊講</strong>：兩勝七場排成咁，隨機都有 1/21 機會，而 08-19 係 1/120、08-25 係 1/126。分得開係真嘅，證據薄過前兩次差唔多六倍，三分之十二亦唔係一條定律。"
+}

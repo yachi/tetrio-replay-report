@@ -335,6 +335,9 @@ test('the access class is exactly the four named events, and the engine calls ea
   // ...and the list may not be padded with entries the sweep never produced, which is the
   // reciprocal `check_loo.py` keeps for ANNOTATED: an exception satisfied by nothing is stale.
   expect(ACCESS_CLASS.length).toBe(result.access.length);
+  // ...and the count the decomposition's own title publishes is the same one, so the two cannot
+  // drift apart while both look right.
+  expect(ACCESS_CLASS.length).toBe(DECOMP.access);
 });
 
 test('the class does not exist beyond the verified prefixes either', () => {
@@ -343,7 +346,17 @@ test('the class does not exist beyond the verified prefixes either', () => {
   expect(result.beyondPrefix.map(key)).toEqual([]);
 });
 
-test('the 18 candidates decompose 10 formed / 4 overdetermined / 4 access, and nothing else', () => {
+/** The decomposition, pinned once so the test NAME can be derived from it.
+ *
+ *  The title read 「the 18 candidates decompose 10 formed / 4 overdetermined / 4 access」 while the
+ *  assertions below had been moved to 20 / 11 / 5 — four numbers of prose beside four that go red,
+ *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
+ *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
+ *  constants the assertions use, it moves when they do. */
+const DECOMP = { clearAlone: 20, formed: 11, overdetermined: 5, access: 4 };
+
+test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
+   + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
   // The numbers that make this a finding rather than a curiosity. 13 records corpus-wide are ones
   // the clear ALONE explains; 7 the model credits to the clear because a cleared row lies strictly
   // inside the slot, 2 more are overdetermined (the placement alone also sufficed, so `placement` is
@@ -387,9 +400,19 @@ test('the 18 candidates decompose 10 formed / 4 overdetermined / 4 access, and n
   // stops being a gap in the record and starts being the record: the sentence above still may not be
   // upgraded to a rate, because what would falsify it is one member arriving, and nothing here
   // predicts when.
-  expect(result.clearAlone).toBe(18);
-  expect(result.formed).toBe(10);
-  expect(result.overdetermined).toBe(4);
+  //
+  // 2026-09-17 adds 2, splitting 1 `formed` and 1 `overdetermined` — clearAlone 18 -> 20, formed
+  // 10 -> 11, overdetermined 4 -> 5, with `pieceBlocked` and the ACCESS CLASS both unchanged. FIFTH
+  // consecutive session to add candidates and no member; the pinned set has now stood for five, so
+  // the header's mutation score is still a statement about the file that exists. The access share
+  // falls 4/18 -> 4/20 purely by the denominator, the fifth time in a row that is the only thing
+  // that moved it. Note what five sessions does NOT license: the share has fallen 4/13 -> 4/20
+  // across them, and reading that as the class becoming rarer would be reading a denominator as a
+  // rate. The class has arrived 4 times and the honest statement is still that nothing here
+  // predicts when it next will.
+  expect(result.clearAlone).toBe(DECOMP.clearAlone);
+  expect(result.formed).toBe(DECOMP.formed);
+  expect(result.overdetermined).toBe(DECOMP.overdetermined);
   expect(result.formed + result.overdetermined + result.pieceBlocked + result.access.length)
     .toBe(result.clearAlone);
   // Not seen in this corpus, and it must not start silently: the clear suffices, then the piece
@@ -403,7 +426,7 @@ test('the replica can disagree with the engine, and does not', () => {
   // two shows up here rather than silently changing which events land in ACCESS_CLASS. This is the
   // check `bfs-cap.ts` did not have when it printed the same 688 before and after a real change.
   expect(result.disagreements).toEqual([]);
-  // and the check must have actually run — over the 18 candidates, not over an empty set
+  // and the check must have actually run — over the 20 candidates, not over an empty set
   expect(result.clearAlone).toBeGreaterThan(0);
 });
 
@@ -416,6 +439,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(11);
-  expect(result.localised).toBe(3278);
+  expect(SESSIONS.length).toBe(12);
+  expect(result.localised).toBe(3498);
 });

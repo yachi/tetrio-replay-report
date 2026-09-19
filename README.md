@@ -21,6 +21,7 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-09-03](sessions/2026-09-03) | yachi 1 : 5 pinglamb | 46 over 6 matches | 102 |
 | [2026-09-10](sessions/2026-09-10) | yachi 4 : 4 pinglamb | 65 over 8 matches | 103 |
 | [2026-09-11](sessions/2026-09-11) | yachi 1 : 6 pinglamb | 51 over 7 matches | 98 |
+| [2026-09-17](sessions/2026-09-17) | yachi 2 : 5 pinglamb | 49 over 7 matches | 103 |
 
 **Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
 `dafny verify` actually certified for that session — not a target and not comparable across

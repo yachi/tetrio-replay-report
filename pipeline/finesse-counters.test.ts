@@ -46,13 +46,14 @@ const SESSIONS = [
   { dir: '2026-09-03', rounds: 92, strict: 80, equal: 12, faults: 1707, perfect: 7897, pieces: 8929 },
   { dir: '2026-09-10', rounds: 130, strict: 107, equal: 23, faults: 1804, perfect: 9856, pieces: 11010 },
   { dir: '2026-09-11', rounds: 102, strict: 87, equal: 15, faults: 1874, perfect: 9295, pieces: 10450 },
+  { dir: '2026-09-17', rounds:  98, strict: 91, equal:  7, faults: 1805, perfect: 8422, pieces:  9509 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 1370, strict: 1176, equal: 194, faults: 22096, perfect: 115300, pieces: 129119 };
+const CORPUS = { rounds: 1468, strict: 1267, equal: 201, faults: 23901, perfect: 123722, pieces: 138628 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -158,11 +159,11 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 26 rounds, all eleven sessions pooled (18 -> 20 when
+  // longest perfect run is the whole round. 28 rounds, all twelve sessions pooled (18 -> 20 when
   // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
-  // contributing 3 apiece).
+  // contributing 3 apiece — and 26 -> 28 when 2026-09-17 did).
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(26);
+  expect(clean.length).toBe(28);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -177,19 +178,20 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
-  // Eleven-session figures (2026-09-11 added): 17.04 -> 17.11, 10.67 -> 10.7, 89.33 -> 89.3,
-  // 16.02 -> 16.08, 1.597 -> 1.599. Note what that is: three of the five have returned to the
-  // NINE-session values they held before 2026-09-10 moved them. A corpus rate wandering back to a
-  // figure it published two sessions ago is exactly why the pinned numbers are not the finding —
-  // none of the four crosses another's old value, and the ORDER is unchanged (perfect share >
-  // event rate > the meaningless one > faulty share), which is the property the test exists to
-  // defend. A reader who took 17.04 away as "the" fault rate would be wrong twice over: it is one
-  // session's reading of a quantity that moves, and it is one of four defensible ones.
-  expect(pct(faults / pieces)).toBe(17.11);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.7);           // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.3);               // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(16.08);   // on no meaningful denominator
+  // Twelve-session figures (2026-09-17 added): 17.11 -> 17.24, 10.7 -> 10.75, 89.3 -> 89.25,
+  // 16.08 -> 16.19, 1.599 -> 1.603. Every one moved AWAY from the value it had at eleven, and
+  // away from the nine-session value three of them had wandered back to — which is the same
+  // lesson the previous revision of this comment drew and is worth keeping for the opposite
+  // reason: a rate that returns to an old value one session and leaves it the next is not
+  // converging on anything. The pinned numbers are still not the finding. The ORDER is, and it
+  // is unchanged (perfect share > event rate > the meaningless one > faulty share). A reader who
+  // took 17.24 away as "the" fault rate would be wrong twice over: it is one corpus-state's
+  // reading of a quantity that moves, and it is one of four defensible ones.
+  expect(pct(faults / pieces)).toBe(17.24);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.75);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.25);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(16.19);   // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.599);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.603);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });

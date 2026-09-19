@@ -3924,6 +3924,137 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
 
+## 第十二個 session：兩邊 gap 第一次一齊大，同一個自己應驗咗嘅預言 (2026-09-17)
+
+2026-09-17 落地(7 場、49 局、**pinglamb 5 比 2**)。個比數唔係重點。**打完頭三場，逐局係
+14 比 10 — yachi 領先**[C010]；之後二十局佢贏五局，收 19 比 30。七場比數 4-5、5-2、5-3、
+1-5、1-5、3-5、0-5，即係尾四場逐場贏 1、1、3、0 局。呢個唔係慢慢滑落，係四場之內冇咗。
+
+### 1. 「兩邊 gap 從來冇一齊大過」—— 十一個 session 之後，今晚發生咗
+
+    won-gap    yachi .6093  pinglamb .6981  ->  +14.57%   [C002]
+    lost-gap   yachi .5120  pinglamb .5920  ->  +15.63%   [C002]
+    session                                    +20.11%   [C004]
+
+**照 CLAUDE.md 自己嗰條規矩,逐欄排位先講得:** won-gap 喺自己嗰欄排 **第二**(十二個
+session，中位數 +7.78)，lost-gap 排 **第三**(中位數 +6.65)。之前最接近嘅 07-24 係第四同
+第六，而佢第二個數啱啱高過中位數少少 —— 所以 CLAUDE.md 一直叫佢做「最接近嘅 case」而唔係
+一個 instance，寫法一直啱。
+
+**有兩句唔可以寫。** 呢晚**唔係**最平衡嘅一晚 —— won/lost ratio 0.93，07-28 係 0.98，貼近 1
+啲。新嘅嘢係「平衡喺兩個都大嘅數上面」:07-28 係 +5.9/+6.0，兩個都喺中位數之下，即係「打成
+平手」嗰一類，讀法啱啱相反。同埋呢晚**唔係** mirror 都唔係 mirror 嘅反面 —— mirror(08-14、
+09-10)係「天花板闊、地板貼實」，兩半都唔似呢晚。
+
+C004 個 +20.11% 係全 corpus 最闊，越過 08-09 個 +18.08%；佢**大過兩個 regime 各自嘅 gap**,
+呢個係兩個唔同大細嘅 round pool pool 埋嘅算術，唔係一個發現。
+
+**兩個數都唔使加「得一局撐住」，而呢一次「冇加註」本身就係主張嘅一部分。**「兩邊都大」係
+一個關於兩個 pooled ratio 嘅講法，所以第一個要問嘅就係有冇一局孭住:won-gap `rel` 0.107
+(而且 x2nd 1.02 倍 —— 全 corpus 最平嘅一欄，即係冇一局特別突出)，lost-gap `rel` 0.226。
+兩個都唔夠 THRESHOLD 一半，正負號都唔變。量度過先講，記喺 `check_loo.PUBLISHED`。
+
+### 2. KPP 過咗界，跟住一個 session 就退返 —— 而上一版文件白紙黑字預告過
+
+11 個 session KPP corrected p 係 **0.048**，過咗 0.05 兩個千分之一。當時嗰段寫住:
+「0.048 對住 0.05 呢條界，一個 session 就推得返出去，正如當初一個 session 推佢入嚟」。
+隔一個 session，佢係 **0.059**。
+
+呢個係成份文件最抵讀嘅一次自我驗證,而佢證明嘅唔係 KPP 有咩性質,係**「講個 margin,
+或者唔好講個結果」呢條規矩本身**:
+
+- 如果當時寫嘅係「KPP survives correction」而冇擺 0.048 喺隔籬，今晚就唔係「過時」，
+  係「錯」。個 margin 就係令呢個反轉變成記錄嘅延續而唔係記錄嘅矛盾。
+- **一條界唔係一個發現，兩個方向都係。** AUC 由 44.23 郁到 44.55，即係三分之一點,
+  因為 09-17 個 49.0 幾乎係 chance,拉個 pool 埋佢嗰邊。
+- 個標準結論由頭到尾都唔靠呢個 crossing。「KPP is flat — reported as a negative result」
+  而家捱過咗過界同退返界兩次，比淨係捱過其中一邊好。
+
+順帶:COMBO 亦都反方向郁。佢 corrected p 兩個 session 由 0.022 行到 0.029,一路行埋去條界;
+09-17 個 67.3(全 corpus 第二高)一到，佢返到 **0.0028**。所以上兩版嗰句「the row to watch」
+係收返，唔係帶落去 —— 而收返佢嘅係一個反方向嘅 session，同 KPP 嗰行一模一樣嘅道理。
+
+### 3. 第三個「逐場排開分得開」—— 但證據弱六倍，所以要連份量一齊講
+
+七場按 pinglamb 每粒方塊嘅優勢排:+3.90、+13.47(yachi 贏嗰兩場)、+16.91、+21.17、+30.83、
++36.82、+44.36，13.47 同 16.91 中間乜都冇[C007]。**兩勝七場排成咁，隨機有 1/C(7,2) = 1/21
+機會。** 08-19 三勝十場係 1/120，08-25 四勝九場係 1/126。
+
+**1/21 唔係 1/120，亦都唔係 09-11 嗰 1/7。** 09-11 嗰個 CLAUDE.md 當 degenerate 處理 ——
+一勝七場，個 ordering 幾乎冇得失敗;兩勝七場有二十種失敗方法而佢一種都冇行，所以 claim 照
+mint,但個 1/21 要跟住句子行。個 count 變 **3 of 12，而三個唔係同一種證據**。
+
+條規矩而家有三層而唔係兩層，而三層都係機率:夠 power(08-19、08-25)、中間(09-17)、
+degenerate(08-09、09-11)。第四個 instance 要先計 1/C(m,k) 再睇個大細，唔係數場數。
+
+m7 個 +44.36% 係全 corpus 單場最闊，越過 08-19 個 +40.67%。
+
+### 4. shortfall ordering:第十二點，而佢係個 ordering 分唔開嗰種
+
+shortfall 10.06 pp(455 粒盈餘買到 10.05 pp，對住 C004 個 20.11 pp gap)。個 ordering 預測
+attack 差額喺 −271 同 −309 之間,實際 **−250** —— 出咗界。
+
+**但照字面叫佢做「第二個 miss」係講大咗，而個分別係 0.03 pp。** 佢同 08-09 喺 x 軸上面爭
+0.03 個百分點,呢個距離呢個量度根本分唔開,所以「09-17 排錯位」同「個 ordering 喺 0.03 pp
+嘅距離冇解析度」係同一件事,而淨係第二句有資訊。對比 09-03 嗰個真 miss:排錯兩位,而佢兩個
+鄰居喺 2.1 pp 以外。ρ 由 0.9727 變 **0.9720**,即係幾乎冇郁 —— 一個分唔開嘅相鄰對調對
+rank correlation 就係咁。
+
+**兩頭都係紀錄，而且啱啱抵銷。** 個盈餘買到 10.05 pp 係全 corpus 最多;個窿 20.11 pp 係全
+corpus 最大。08-09 係 8.04 對 18.08 —— 同一個 residue,兩個部分各高兩點。呢個係「個
+shortfall 先係話事嗰個」最乾淨嘅一次示範:個 ordering 睇嘅係個 residue,唔係任何一頭嘅大細。
+
+### 5. 第四同第五個 DT order，一晚兩個，一邊一個
+
+`DT_ORDER_IN_OPENER` 由 3 變 5，兩個都係 yachi，同一晚:
+
+- `replay-2026-09-17-02.ttrm` r6，prefix verify 到 28(過咗 21-lock window)。**冇 first-bag
+  corroboration** —— 09-10 嗰個 pattern。
+- `replay-2026-09-17-07.ttrm` r3，prefix verify 到 103。**first-bag metric 獨立咁行到同一局**,
+  exact DT Cannon match —— 08-14 同 08-25 嗰個 pattern。
+
+09-10 嗰陣 CLAUDE.md 問嘅係「第四個會加入邊個 pattern」。答案係**兩個都加入,一邊一個**。
+所以個 corroboration 係 3 of 5，而真正有用嗰句唔係個比例,係**一個 session、一個 player、
+一晚之內兩種結果都出現** —— 即係決定 first-bag metric 見唔見到一個 Double-first opener 嗰樣
+嘢,唔係個 session、唔係邊個打、亦唔係邊個 instrument 變咗。係嗰一局。兩個都係 DT-only,所以
+兩個 list 都有佢哋;09-10 淨係喺第一個 list —— 呢個就係點解兩個 list 要分開。
+
+### 6. TKI-3 第二個例外
+
+`TKI3_OFF_REPERTOIRE` 由 1 變 2:pinglamb 又有一塊板 exact match 一個 TKI-3 field,
+`matched_and_delivered` 1 of 1，對住 yachi 嗰晚嘅 9。**佢證明嘅唔係「pinglamb 打 TKI-3」**
+—— 十二個 session 兩塊板對住 yachi 96 塊,個 ordinal claim 反而闊咗(96 比 2,之前八個
+session 係 82 比 1)。佢收返嘅係「再絕對化」呢個誘惑:09-03 嗰個單一事件可以係一次過,隔三個
+session 又一個,「pinglamb 從來唔打 TKI-3」呢句已經被證偽咗兩次。第三個一樣要查。
+
+### 7. 一個 gate 嘅條件粗過佢個 generator
+
+`check_opener_section` 見到 artefact 有 `board_split` 就同時要求 donation 同 cave 兩句
+caveat。09-17 係第一個 session 個 dual-engine comparison 行到 2 個 donation positive 而
+**cave 一個都冇**,所以 `_board_split_note` 照計冇印 cave 嗰句(冇嘢好 caveat),個 gate 就
+fail 咗一份完全正常嘅 report。
+
+**呢個修正唔係放寬。** 而家每句 caveat 各自睇自己 metric 有冇 positive —— 即係 generator
+自己嗰個條件。有 positive 嘅 metric 照樣欠嗰句,`--selftest` 喺 09-11 同 08-19 照樣殺得死
+刪走 cave 嗰句嘅 mutant。新過到嘅淨係「冇嘢好講」嗰啲 report。教訓同 `OPENER_LOCKS` 嗰個
+coverage bug 一樣:**一個條件粗過佢 generator 嘅 gate,會將「呢個表係空嘅」讀成「呢句
+caveat 唔見咗」。**
+
+### 8. 兩個新嘅 冇第二份 instance，第二個最嚴重
+
+- 「pinglamb 每場 APP 都高過 yachi」嗰句寫住 **eight of ten sessions**。實際係 five of ten。
+  而上面隔幾行嗰個 bullet 自己列住 08-19 三個最細嘅 gap 係「−10.13, −0.98, +0.72」—— 兩個
+  負數,即係兩場 yachi 高,而個 count 當嗰個 session 一場都冇。**份文件自己載住自己嘅反證,
+  而個 count 照樣帶咗兩個 session。**
+- topout 嗰個 bullet 有**兩份自己嘅 series**,一份十個值喺段中間、一份十一個值喺下面。兩份
+  寫嗰陣都啱;第一份只係喺第二份加入之後冇再更新。
+
+**由呢兩個逼出嚟嘅一般化係關於「重複」,唔係關於「數數」。** 第八類原本假設個 list 同個 count
+擺埋一齊,所以解藥係「向上望」。呢兩個都唔係擺埋一齊:一個隔住四行同一個段落,另一個根本就係
+佢唔同意嗰個 list 嘅複本。所以解藥要係結構性而唔係靠專心 —— **一個量喺呢份文件淨係得一個
+家,見到第二份就係 defect,就算兩份而家都啱。** 第二份就係令第一份讀極都讀唔出問題嗰樣嘢:
+查咗其中一份嘅讀者,冇理由懷疑另一份存在。
+
 ## 第十一個 session：全 corpus 最一面倒，同兩個計錯咗嘅數 (2026-09-11)
 
 2026-09-11 落地(7 場、51 局、**pinglamb 6 比 1**)。**逐局計 32 比 19，即係佢食咗 62.7% 嘅

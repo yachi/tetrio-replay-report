@@ -143,6 +143,9 @@ const PINNED_TOTALS: Record<string, Totals> = {
   // here is a measurement, not a refactor that stopped looking — `behindACSpin` 61 and the 590
   // attributed events below are the population that says the sweep ran.
   '2026-09-11': { forecast_garbage: 0, forecast_lineclear: 0, path_opened: 0, self_built: 276, reactive: 314, unattributed: 0 },
+  // Back to one candidate after 09-11's none — so the zero there was a session and not a change of
+  // instrument, which is what a single zero could never settle on its own.
+  '2026-09-17': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 0, self_built: 219, reactive: 288, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -161,6 +164,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-09-03': { 'pre-existed': 412, 'arrived-later': 41, undetermined: 51 },
   '2026-09-10': { 'pre-existed': 515, 'arrived-later': 44, undetermined: 41 },
   '2026-09-11': { 'pre-existed': 492, 'arrived-later': 47, undetermined: 51 },
+  '2026-09-17': { 'pre-existed': 417, 'arrived-later': 39, undetermined: 52 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -169,7 +173,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
 const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
-  '2026-09-11': 61,
+  '2026-09-11': 61, '2026-09-17': 52,
 };
 
 const PINNED_FORECASTS: Record<string, string[]> = {
@@ -200,6 +204,11 @@ const PINNED_FORECASTS: Record<string, string[]> = {
   // 0 verified forecasts, and unlike 08-14 and 08-19 not because the candidates were REJECTED:
   // there are none to reject. See PINNED_MECHANISM_ONLY.
   '2026-09-11': [],
+  // 0 again, but for 08-14's reason rather than 09-11's: there IS a mechanism event and it is
+  // rejected downstream. The two adjacent zeroes therefore have different causes, which is why
+  // this table and PINNED_MECHANISM_ONLY are kept separate — a session's entry being empty here
+  // says nothing on its own about whether anything was looked at.
+  '2026-09-17': [],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -240,6 +249,11 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
   // mechanism and is then accepted or rejected downstream; this one has none, so there is no clause
   // for a rejection to be attributed to.
   '2026-09-11': [],
+  // One event, rejected downstream, so 2026-09-11 stays the only empty entry. It sits in
+  // replay-2026-09-17-07.ttrm r3 — which is also the round the ordering metric and the first-bag
+  // metric independently name as a DT Cannon opener. Noted because it is the same round, not
+  // because anything here depends on that: this sweep and those two metrics share no code.
+  '2026-09-17': ['yachi replay-2026-09-17-07.ttrm r3 lock 14 forecast_lineclear floor pre-existed from 4 roof 9'],
 };
 
 for (const SESSION of SESSIONS) {
