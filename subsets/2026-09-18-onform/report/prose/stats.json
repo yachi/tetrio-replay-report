@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決",
+  "title": "數據對決",
+  "lede": "呢一節嘅數字全部淨係講呢三場。揀場嘅條件係 VS，所以 VS 相關嘅欄天生偏高，唔可以攞去同完整 session 比。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢",
+      "caps": [
+        "三場都係 <span class=\"hl-p\">pinglamb</span> 企喺上面，但兩邊都高過自己嘅 corpus 中位數——呢個就係揀呢三場嘅原因。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "<span class=\"hl-p\">pinglamb</span> 嘅 maxspike 同 topbtb 都係子集最高（<b>G047</b>、<b>G048</b>）。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "<span class=\"hl-y\">yachi</span> 嘅 finesse 失誤總數多啲（410 對 362，<b>G026</b>），每粒計亦然（<b>G037</b>）。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

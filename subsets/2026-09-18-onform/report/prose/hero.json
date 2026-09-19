@@ -1,0 +1,10 @@
+{
+  "kicker": "2026-09-18 · 篩選子集 · 唔係當晚戰報",
+  "title": "兩邊都喺狀態嗰三場（<span class=\"hl-y\">yachi</span> vs <span class=\"hl-p\">pinglamb</span>）",
+  "tags": {
+    "yachi": "單晚 18 場入面嘅三場",
+    "pinglamb": "三場全取 · 但係揀出嚟嘅三場"
+  },
+  "lede": "<b>呢份唔係 2026-09-18 嘅戰報，係嗰晚 18 場入面揀出嚟嘅 3 場。</b>篩選條件淨係一個：嗰場入面 <span class=\"hl-y\">yachi</span> 同 <span class=\"hl-p\">pinglamb</span> 兩個人嘅每場 pooled VS，都要高過佢哋自己喺之前 12 個 session、96 場入面嘅中位數（yachi 113.0、pinglamb 116.4）。合格嘅係原本嗰晚嘅第 1、3、5 場，喺呢度重新編號做第 1、2、3 場，原本個檔名留喺 <code>facts.json</code> 嘅 <code>file</code> 度對得返。<br><br><b>所以 <b>G001</b> 嗰個 3:0 係呢三場嘅比數，唔係嗰晚嘅比數。</b>成晚打足 18 場，<span class=\"hl-p\">pinglamb</span> 攞 11 場、<span class=\"hl-y\">yachi</span> 攞 7 場。篩選條件本身就偏向咗 <span class=\"hl-p\">pinglamb</span>：佢三場都贏，而全部 24 局入面，贏嗰個嘅 VS 都高過輸嗰個（<b>G019</b>），所以「兩邊都在狀態」揀出嚟嘅，係佢在狀態而 <span class=\"hl-y\">yachi</span> 都唔失準嗰啲場。呢份嘢係一個子集分析，唔會出上個網站，亦都冇計入 corpus。",
+  "score_claim": "G001"
+}

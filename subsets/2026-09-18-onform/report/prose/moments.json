@@ -1,0 +1,28 @@
+{
+  "eyebrow": "關鍵時刻",
+  "title": "三場入面最頂嗰幾下",
+  "cards": [
+    {
+      "accent": "p",
+      "label": "m2r7 · 合併 VS",
+      "value": "304.5",
+      "body": "打足 60 秒嘅局入面最高嘅一局，<span class=\"hl-p\">pinglamb</span> 贏（<b>G055</b>）。同一局亦係子集 VS 同 APM 嘅最高（<b>G010</b>、<b>G009</b>）。"
+    },
+    {
+      "accent": "g",
+      "label": "贏嗰個 VS 較高",
+      "value": "24 / 24",
+      "body": "全部 24 局，贏嗰個嘅 VS 都高過輸嗰個（<b>G019</b>）。呢個係揀場條件本身帶出嚟嘅，唔係發現。"
+    },
+    {
+      "accent": "y",
+      "label": "最短一局",
+      "value": "14364 ms",
+      "body": "m1r4，<span class=\"hl-y\">yachi</span> 贏（<b>G017</b>）。同場最長嗰局 190294 毫秒（<b>G016</b>），相差超過十三倍。"
+    }
+  ],
+  "trivia": [
+    "三場嘅總粒數幾乎一樣：<span class=\"hl-y\">yachi</span> 2236 粒、<span class=\"hl-p\">pinglamb</span> 2216 粒（<b>G023</b>），但攻擊量 <span class=\"hl-p\">pinglamb</span> 1489 行、<span class=\"hl-y\">yachi</span> 1332 行（<b>G024</b>）。",
+    "<span class=\"hl-y\">yachi</span> 清走嘅垃圾行數多過 <span class=\"hl-p\">pinglamb</span>（477 對 422，<b>G025</b>），每粒計都係佢高（<b>G067</b>）。"
+  ]
+}

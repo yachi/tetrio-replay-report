@@ -678,7 +678,15 @@ def _corrupt(kind, texts):
     # see until 2026-08-25: every JOB stayed planned while the two matrices named a corpus
     # smaller than `sessions/`, so CI ran green over a session it never looked at.
     if kind == "a session dropped from the verify matrix":
-        t[v] = re.sub(r"\n *- sessions/\d{4}-\d{2}-\d{2}/report(?=\n    steps:)", "", t[v], count=1)
+        # No `(?=\n    steps:)` lookahead, for the reason spelled out under the pipeline
+        # matrix below: an anchor pinned to the entry that happens to sit LAST stops
+        # corrupting the moment anything is appended after it. It did, when
+        # `subsets/2026-09-18-onform/report` was added to this matrix — the lookahead
+        # matched nothing, the mutant mutated nothing, and `_corrupt`'s assertion is what
+        # turned that into a red build instead of a selftest quietly proving nothing.
+        # Dropping ANY session entry is the corruption under test; which one is irrelevant,
+        # because the completeness check rejects a matrix naming fewer sessions than disk.
+        t[v] = re.sub(r"\n *- sessions/\d{4}-\d{2}-\d{2}/report\b", "", t[v], count=1)
     elif kind == "a session dropped from the pipeline matrix":
         # `,\s*` and not `, `: the matrix is a YAML flow sequence that wraps when it grows, so
         # the last entry sits on its own line as often as not. Pinned to a literal space, this

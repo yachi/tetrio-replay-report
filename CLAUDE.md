@@ -289,7 +289,8 @@ equivalent marker pair.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
   byte-identical to what is committed. Weekly runs add mutation testing. **19 job definitions
   across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
-  artefact directories (13) and `pipeline` over sessions (12), so both counts move with the corpus
+  artefact directories (14 — thirteen session artefacts plus the `subsets/2026-09-18-onform`
+  filtered subset, which is NOT in the corpus) and `pipeline` over sessions (12), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
   `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
