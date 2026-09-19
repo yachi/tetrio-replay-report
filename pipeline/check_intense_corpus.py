@@ -455,11 +455,18 @@ def _selftest(root):
     #    so out loud. A mutant value is only a mutant while it differs from the true one, and a
     #    corpus figure that drifts ONTO its own mutant turns that row into a no-op that would
     #    otherwise pass silently — the 冇第二份 shape, arriving through a test fixture. It has
-    #    happened once: 2026-09-03 moved cleared_pp/intensity to +0.177 and cleared/intensity to
-    #    +0.170, which were exactly these two literals, and the assert failed the build. Re-pick
-    #    a collided row one digit off the NEW value; never delete the assert.
+    #    happened TWICE, on two of the four sessions since the assert was written, which is
+    #    often enough that it should be expected rather than treated as a surprise:
+    #    2026-09-03 moved cleared_pp/intensity to +0.177 and cleared/intensity to +0.170, which
+    #    were exactly these two literals; 2026-09-17 moved cleared_pp/intensity to +0.178, which
+    #    was again exactly this literal (re-picked from +0.177 to +0.178 the first time — i.e.
+    #    the repair walked the literal INTO the value the next session would take). Re-pick a
+    #    collided row one digit off the NEW value; never delete the assert. And prefer moving it
+    #    AWAY from the direction the figure has been drifting: this rho has gone
+    #    +0.183 -> +0.182 -> +0.178, so a literal below the true value is the one likely to be
+    #    collided with next, and +0.179 is chosen above it for that reason.
     for key, field, value, what in (
-            ("cleared_pp/intensity", "rho", "+0.178", "the headline rho, one digit up"),
+            ("cleared_pp/intensity", "rho", "+0.179", "the headline rho, one digit up"),
             ("cleared_pp/duration", "rho", "+0.059", "the length control's rho, one digit down"),
             ("cleared/intensity", "rho", "+0.171", "the docstring-only rho, one digit up"),
             ("received/intensity", "raw", "0.2413", "a raw p, one digit up"),
