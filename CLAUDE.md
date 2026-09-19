@@ -315,6 +315,17 @@ equivalent marker pair.
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
+- **`subsets/2026-09-18-onform`'s report is in ONE matrix and the drift gate is in the other, so
+  nothing catches it drifting.** The subset sits in `verify` (per-artefact gates, all internal to
+  the directory) and is deliberately absent from `pipeline`, which builds `sessions/<date>/report`
+  from a date list — and `build_report --check` runs only in `pipeline`. Its report nonetheless
+  carries the two CORPUS-WIDE blocks every report carries (the `QUALIFYING_MS` footnote and the
+  最癲一局 lede), both of which move whenever a session lands. So it drifts on exactly the
+  occasions the twelve sessions do, and only they are checked. Found on 2026-09-19 by running the
+  check by hand, not by a red build; the report was rebuilt in the same pass. **Until a gate
+  covers it, re-run `python3 -m pipeline.build_report subsets/*/report --check` whenever a session
+  is added** — that is a manual-only step, which this file elsewhere calls the thing
+  `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
 - **Sixteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
   covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
