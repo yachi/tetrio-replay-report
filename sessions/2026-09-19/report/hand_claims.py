@@ -82,9 +82,16 @@ a bad night for him. The session total of 24 in 150 rounds is 16.0%, which ties 
 mid-table. The claim pins the two counts; the report prose is what has to carry the rate, and it
 does.
 
-**C008 pins keypresses per piece, pooled: yachi 3.646 and pinglamb 3.608**, 1.04% apart with
-**yachi on the higher side** — the opposite of 09-17, where he was lower. Three of the last four
-sessions have flipped this column's sign, so it is a fact about a night. As before, this is
+**C008 pins keypresses per piece, pooled: yachi 3.646 and pinglamb 3.608**, with **yachi 1.05%
+ABOVE pinglamb** — the opposite of 09-17, where he was lower. Three of the last four
+sessions have flipped this column's sign, so it is a fact about a night.
+
+The percentage names its direction on purpose. A draft wrote 「1.04% apart」, which is
+100·(pinglamb/yachi)−100 — the C002 family's convention, where pinglamb is the numerator — set
+beside the words 「yachi is higher」, so a reader recomputing it from the two printed rates would
+get 1.05 and not 1.04. Both numbers are right about different ratios and the pair of them is
+wrong about one, which is the mixed-convention failure CLAUDE.md records costing months
+elsewhere. Written as 「A is X% above B」 it cannot be read two ways. As before, this is
 deliberately NOT a claim about KPP's paired AUC: that statistic compares a per-round ratio
 between the two players, and the cond language has no cross-field ratio, so no `count_rounds`
 predicate can express it.
@@ -353,7 +360,7 @@ CLAIMS = [
         "id": "C008",
         "category": "style",
         "canto": "每粒方塊要按幾多下（KPP）兩個人差唔多：yachi 3.646 下，pinglamb 3.608 下，"
-                 "爭 1.04%——今次高嗰個係 yachi，同上一晚啱啱掉轉",
+                 "yachi 高 pinglamb 1.05%——同上一晚啱啱掉轉",
         "english_gloss": "keypresses per piece are near-identical: yachi 3.646 and pinglamb "
                          "3.608, about one percent apart, with yachi the higher",
         "spec": conj(
