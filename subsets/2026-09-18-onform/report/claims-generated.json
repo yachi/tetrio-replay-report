@@ -1,0 +1,5680 @@
+[
+ {
+  "family": "series_result",
+  "category": "score",
+  "canto": "成個 series 3 場，pinglamb 贏咗 3 場、yachi 贏 0 場，pinglamb 攞低個系列",
+  "english_gloss": "pinglamb won the series 3-0",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    }
+   ]
+  },
+  "id": "G001",
+  "python_check": "(sum(1 for m in facts['matches'] if m['winner']=='pinglamb') == 3) and (sum(1 for m in facts['matches'] if m['winner']=='yachi') == 0)"
+ },
+ {
+  "family": "round_totals",
+  "category": "score",
+  "canto": "分開一局局計，全 session 打足 24 局：pinglamb 贏 15 局、yachi 贏 9 局",
+  "english_gloss": "24 rounds total; pinglamb won 15, yachi won 9",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "total_rounds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 24
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 15
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    }
+   ]
+  },
+  "id": "G002",
+  "python_check": "(sum(len(m['rounds']) for m in facts['matches']) == 24) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') == 15) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') == 9)"
+ },
+ {
+  "family": "first_to_five",
+  "category": "score",
+  "canto": "3 場都係先贏五局嗰個贏，冇一場例外",
+  "english_gloss": "every match was first-to-5",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 1,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 2,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    }
+   ]
+  },
+  "id": "G003",
+  "python_check": "(facts['matches'][0]['score']['pinglamb'] == 5) and (facts['matches'][1]['score']['pinglamb'] == 5) and (facts['matches'][2]['score']['pinglamb'] == 5)"
+ },
+ {
+  "family": "per_match_score",
+  "category": "score",
+  "canto": "m1：pinglamb 5:4 贏 yachi",
+  "english_gloss": "match 1: pinglamb won 5-4",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 0,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    }
+   ]
+  },
+  "id": "G004",
+  "python_check": "(facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][0]['score']['pinglamb'] == 5) and (facts['matches'][0]['score']['yachi'] == 4)"
+ },
+ {
+  "family": "per_match_score",
+  "category": "score",
+  "canto": "m2：pinglamb 5:3 贏 yachi",
+  "english_gloss": "match 2: pinglamb won 5-3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 1,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 1,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 1,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    }
+   ]
+  },
+  "id": "G005",
+  "python_check": "(facts['matches'][1]['winner']=='pinglamb') and (facts['matches'][1]['score']['pinglamb'] == 5) and (facts['matches'][1]['score']['yachi'] == 3)"
+ },
+ {
+  "family": "per_match_score",
+  "category": "score",
+  "canto": "m3：pinglamb 5:2 贏 yachi",
+  "english_gloss": "match 3: pinglamb won 5-2",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 2,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 2,
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "score",
+      "mi": 2,
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    }
+   ]
+  },
+  "id": "G006",
+  "python_check": "(facts['matches'][2]['winner']=='pinglamb') and (facts['matches'][2]['score']['pinglamb'] == 5) and (facts['matches'][2]['score']['yachi'] == 2)"
+ },
+ {
+  "family": "deciders",
+  "category": "clutch",
+  "canto": "有 1 場打到最後一局先分勝負（m1 pinglamb 執），場場都貼到最後",
+  "english_gloss": "1 match(es) went to a deciding final round",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_matches_margin",
+      "margin": 1
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 0,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 0,
+        "pl": "pinglamb"
+       },
+       "b": {
+        "e": "lit",
+        "v": 5
+       }
+      },
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 0,
+        "pl": "yachi"
+       },
+       "b": {
+        "e": "lit",
+        "v": 4
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "id": "G007",
+  "python_check": "(sum(1 for m in facts['matches'] if max(m['score'].values())-min(m['score'].values())==1) == 1) and (facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][0]['score']['pinglamb'] == 5) and (facts['matches'][0]['score']['yachi'] == 4)"
+ },
+ {
+  "family": "longest_streak",
+  "category": "clutch",
+  "canto": "全場最長連勝係 pinglamb 連贏 3 局，喺 m2 之內",
+  "english_gloss": "pinglamb's longest run is 3 consecutive rounds, spanning match 2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     1,
+     5
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     7
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "pinglamb",
+    "pinglamb"
+   ]
+  },
+  "id": "G008",
+  "python_check": "((facts['matches'][1]['rounds'][5]['winner'], facts['matches'][1]['rounds'][6]['winner'], facts['matches'][1]['rounds'][7]['winner'],) == ('pinglamb', 'pinglamb', 'pinglamb',))"
+ },
+ {
+  "family": "round_max_apm_x1000",
+  "category": "pace",
+  "canto": "打足 60 秒以上嘅 10 局入面，最高單局 APM係 pinglamb 喺 m2 第 7 局打出嘅 約71.4，嗰局 pinglamb 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
+  "english_gloss": "session-max apm_x1000 among the 10 rounds lasting 60s or more is 71412 by pinglamb at m2r7",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 71412
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "apm_x1000",
+         "op": ">",
+         "v": 71412
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "apm_x1000",
+         "op": ">",
+         "v": 71412
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "apm_x1000",
+         "op": ">",
+         "v": 71412
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "apm_x1000",
+         "op": ">",
+         "v": 71412
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "dur_cmp",
+       "op": ">=",
+       "v": 60000
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 10
+     }
+    }
+   ]
+  },
+  "id": "G009",
+  "python_check": "(facts['matches'][1]['rounds'][6]['players']['pinglamb']['apm_x1000'] == 71412) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['apm_x1000'] > 71412) and (r['players']['pinglamb']['apm_x1000'] > 71412)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['apm_x1000'] > 71412)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['pinglamb']['apm_x1000'] > 71412)) == 0) and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) >= 60000) == 10)"
+ },
+ {
+  "family": "round_max_vs_x1000",
+  "category": "pace",
+  "canto": "打足 60 秒以上嘅 10 局入面，最高單局 VS係 pinglamb 喺 m2 第 7 局打出嘅 約162.0，嗰局 pinglamb 生還（短局嘅 APM／VS 係細分母嘅產物，唔計入紀錄）",
+  "english_gloss": "session-max vs_x1000 among the 10 rounds lasting 60s or more is 162027 by pinglamb at m2r7",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 162027
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "vs_x1000",
+         "op": ">",
+         "v": 162027
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "vs_x1000",
+         "op": ">",
+         "v": 162027
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "vs_x1000",
+         "op": ">",
+         "v": 162027
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": ">=",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "vs_x1000",
+         "op": ">",
+         "v": 162027
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "dur_cmp",
+       "op": ">=",
+       "v": 60000
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 10
+     }
+    }
+   ]
+  },
+  "id": "G010",
+  "python_check": "(facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000'] == 162027) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 162027) and (r['players']['pinglamb']['vs_x1000'] > 162027)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['yachi']['vs_x1000'] > 162027)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) >= 60000) and (r['players']['pinglamb']['vs_x1000'] > 162027)) == 0) and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) >= 60000) == 10)"
+ },
+ {
+  "family": "round_max_maxspike",
+  "category": "spike",
+  "canto": "全場最高單一次 spike係 pinglamb 喺 m3 第 3 局打出嘅 18，嗰局 pinglamb 生還",
+  "english_gloss": "session-max maxspike is 18 by pinglamb at m3r3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 2,
+      "pl": "pinglamb",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 18
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "maxspike",
+         "op": ">",
+         "v": 18
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "maxspike",
+         "op": ">",
+         "v": 18
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "maxspike",
+       "op": ">",
+       "v": 18
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "maxspike",
+       "op": ">",
+       "v": 18
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 2,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G011",
+  "python_check": "(facts['matches'][2]['rounds'][2]['players']['pinglamb']['maxspike'] == 18) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['maxspike'] > 18) and (r['players']['pinglamb']['maxspike'] > 18)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike'] > 18) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike'] > 18) == 0) and (facts['matches'][2]['rounds'][2]['winner']=='pinglamb')"
+ },
+ {
+  "family": "round_max_topcombo",
+  "category": "style",
+  "canto": "全場最高combo係 yachi 喺 m2 第 1 局打出嘅 6，嗰局 pinglamb 生還（呢個數字全場出現過 2 次）",
+  "english_gloss": "session-max topcombo is 6 by yachi at m2r1",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 0,
+      "pl": "yachi",
+      "f": "topcombo"
+     },
+     "b": {
+      "e": "lit",
+      "v": 6
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "topcombo",
+         "op": ">",
+         "v": 6
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "topcombo",
+         "op": ">",
+         "v": 6
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "topcombo",
+       "op": ">",
+       "v": 6
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "topcombo",
+       "op": ">",
+       "v": 6
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 0,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G012",
+  "python_check": "(facts['matches'][1]['rounds'][0]['players']['yachi']['topcombo'] == 6) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['topcombo'] > 6) and (r['players']['pinglamb']['topcombo'] > 6)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topcombo'] > 6) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topcombo'] > 6) == 0) and (facts['matches'][1]['rounds'][0]['winner']=='pinglamb')"
+ },
+ {
+  "family": "round_max_topbtb",
+  "category": "style",
+  "canto": "全場最高B2B 鏈係 pinglamb 喺 m3 第 7 局打出嘅 8，嗰局 pinglamb 生還",
+  "english_gloss": "session-max topbtb is 8 by pinglamb at m3r7",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "topbtb",
+         "op": ">",
+         "v": 8
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "topbtb",
+         "op": ">",
+         "v": 8
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "topbtb",
+       "op": ">",
+       "v": 8
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "topbtb",
+       "op": ">",
+       "v": 8
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 6,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G013",
+  "python_check": "(facts['matches'][2]['rounds'][6]['players']['pinglamb']['topbtb'] == 8) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['topbtb'] > 8) and (r['players']['pinglamb']['topbtb'] > 8)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topbtb'] > 8) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topbtb'] > 8) == 0) and (facts['matches'][2]['rounds'][6]['winner']=='pinglamb')"
+ },
+ {
+  "family": "round_max_tspins",
+  "category": "style",
+  "canto": "全場最高單局 T-spin 數係 pinglamb 喺 m3 第 1 局打出嘅 16（計埋冇消行嘅 T-spin），嗰局 yachi 生還",
+  "english_gloss": "session-max tspins is 16 by pinglamb at m3r1",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 0,
+      "pl": "pinglamb",
+      "f": "tspins"
+     },
+     "b": {
+      "e": "lit",
+      "v": 16
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "tspins",
+         "op": ">",
+         "v": 16
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "tspins",
+         "op": ">",
+         "v": 16
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "tspins",
+       "op": ">",
+       "v": 16
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "tspins",
+       "op": ">",
+       "v": 16
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 0,
+     "pl": "yachi"
+    }
+   ]
+  },
+  "id": "G014",
+  "python_check": "(facts['matches'][2]['rounds'][0]['players']['pinglamb']['tspins'] == 16) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['tspins'] > 16) and (r['players']['pinglamb']['tspins'] > 16)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['tspins'] > 16) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['tspins'] > 16) == 0) and (facts['matches'][2]['rounds'][0]['winner']=='yachi')"
+ },
+ {
+  "family": "round_max_lines",
+  "category": "style",
+  "canto": "全場最高單局清行數係 yachi 喺 m2 第 4 局打出嘅 164，嗰局 pinglamb 生還",
+  "english_gloss": "session-max lines is 164 by yachi at m2r4",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 3,
+      "pl": "yachi",
+      "f": "lines"
+     },
+     "b": {
+      "e": "lit",
+      "v": 164
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "lines",
+         "op": ">",
+         "v": 164
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "lines",
+         "op": ">",
+         "v": 164
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "lines",
+       "op": ">",
+       "v": 164
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "lines",
+       "op": ">",
+       "v": 164
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 3,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G015",
+  "python_check": "(facts['matches'][1]['rounds'][3]['players']['yachi']['lines'] == 164) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['lines'] > 164) and (r['players']['pinglamb']['lines'] > 164)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['lines'] > 164) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['lines'] > 164) == 0) and (facts['matches'][1]['rounds'][3]['winner']=='pinglamb')"
+ },
+ {
+  "family": "round_duration_max",
+  "category": "duration",
+  "canto": "全場最長嗰局係 m2 第 4 局，打咗約 190 秒（3 分 10 秒），最後 pinglamb 生還",
+  "english_gloss": "longest round is m2r4 at 190294 ms, won by pinglamb",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 3,
+      "pl": "pinglamb",
+      "f": "lifetime"
+     },
+     "b": {
+      "e": "lit",
+      "v": 190294
+     }
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 1,
+      "ri": 3,
+      "pl": "pinglamb",
+      "f": "lifetime"
+     },
+     "lo": 190000,
+     "hi": 191000
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "dur_cmp",
+       "op": ">",
+       "v": 190294
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 3,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G016",
+  "python_check": "(facts['matches'][1]['rounds'][3]['players']['pinglamb']['lifetime'] == 190294) and (190000 <= facts['matches'][1]['rounds'][3]['players']['pinglamb']['lifetime'] < 191000) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) > 190294) == 0) and (facts['matches'][1]['rounds'][3]['winner']=='pinglamb')"
+ },
+ {
+  "family": "round_duration_min",
+  "category": "duration",
+  "canto": "全場最短嗰局係 m1 第 4 局，打咗約 14 秒，最後 yachi 生還",
+  "english_gloss": "shortest round is m1r4 at 14364 ms, won by yachi",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 0,
+      "ri": 3,
+      "pl": "yachi",
+      "f": "lifetime"
+     },
+     "b": {
+      "e": "lit",
+      "v": 14364
+     }
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 0,
+      "ri": 3,
+      "pl": "yachi",
+      "f": "lifetime"
+     },
+     "lo": 14000,
+     "hi": 15000
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "dur_cmp",
+       "op": "<",
+       "v": 14364
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 3,
+     "pl": "yachi"
+    }
+   ]
+  },
+  "id": "G017",
+  "python_check": "(facts['matches'][0]['rounds'][3]['players']['yachi']['lifetime'] == 14364) and (14000 <= facts['matches'][0]['rounds'][3]['players']['yachi']['lifetime'] < 15000) and (sum(1 for m in facts['matches'] for r in m['rounds'] if max(d['lifetime'] for d in r['players'].values()) < 14364) == 0) and (facts['matches'][0]['rounds'][3]['winner']=='yachi')"
+ },
+ {
+  "family": "match_apm_max",
+  "category": "pace",
+  "canto": "以整場 match 計，最高 APM 係 pinglamb 喺 m3 嘅約 60.9",
+  "english_gloss": "highest match-level APM is 60.9 by pinglamb in m3",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "between",
+     "x": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "lo": 60900,
+     "hi": 61000
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lit",
+      "v": 60990
+     },
+     "b": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     }
+    }
+   ]
+  },
+  "id": "G018",
+  "python_check": "(60900 <= facts['matches'][2]['leaderboard']['pinglamb']['apm_x1000'] < 61000) and (60990 > facts['matches'][0]['leaderboard']['yachi']['apm_x1000']) and (60990 > facts['matches'][0]['leaderboard']['pinglamb']['apm_x1000']) and (60990 > facts['matches'][1]['leaderboard']['yachi']['apm_x1000']) and (60990 > facts['matches'][1]['leaderboard']['pinglamb']['apm_x1000']) and (60990 > facts['matches'][2]['leaderboard']['yachi']['apm_x1000']) and (60990 > facts['matches'][2]['leaderboard']['pinglamb']['apm_x1000'])"
+ },
+ {
+  "family": "vs_decides",
+  "category": "style",
+  "canto": "24 局裏面，每一局贏嗰個嘅 VS 都高過輸嗰個，零例外",
+  "english_gloss": "in all 24 rounds the winner had the higher VS",
+  "spec": {
+   "p": "all_rounds",
+   "cond": {
+    "c": "winner_gt_loser",
+    "f": "vs_x1000"
+   }
+  },
+  "id": "G019",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players'][r['winner']]['vs_x1000'] > min(r['players'][p]['vs_x1000'] for p in r['players'] if p!=r['winner'])) == sum(len(m['rounds']) for m in facts['matches']))"
+ },
+ {
+  "family": "biggest_comeback",
+  "category": "comeback",
+  "canto": "最硬淨嘅一局係 m3 第 5 局：pinglamb 俾人射埋嚟 50 行，多過 yachi 嘅 41 行，照樣頂住贏返",
+  "english_gloss": "biggest comeback m3r5: winner faced 50 queued attack vs loser's 41",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 4,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "pinglamb",
+      "mi": 2,
+      "ri": 4
+     },
+     "b": {
+      "e": "lit",
+      "v": 50
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "yachi",
+      "mi": 2,
+      "ri": 4
+     },
+     "b": {
+      "e": "lit",
+      "v": 41
+     }
+    }
+   ]
+  },
+  "id": "G020",
+  "python_check": "(facts['matches'][2]['rounds'][4]['winner']=='pinglamb') and (sum(g['amt'] for g in facts['matches'][2]['rounds'][4]['players']['pinglamb']['garbage_events']) == 50) and (sum(g['amt'] for g in facts['matches'][2]['rounds'][4]['players']['yachi']['garbage_events']) == 41)"
+ },
+ {
+  "family": "cancellation",
+  "category": "attack",
+  "canto": "yachi 全場俾人射埋嚟 1183 行，真正食落身嘅係 1066 行，即係 cancel 咗 117 行",
+  "english_gloss": "yachi: 1183 lines of attack queued, 1066 materialised, 117 cancelled",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "yachi",
+      "mi": null,
+      "ri": null
+     },
+     "b": {
+      "e": "lit",
+      "v": 1183
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "garbagereceived"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1066
+     }
+    }
+   ]
+  },
+  "id": "G021",
+  "python_check": "(sum(g['amt'] for m in facts['matches'] for r in m['rounds'] for g in r['players']['yachi']['garbage_events']) == 1183) and (sum(r['players']['yachi']['garbagereceived'] for m in facts['matches'] for r in m['rounds']) == 1066)"
+ },
+ {
+  "family": "cancellation",
+  "category": "attack",
+  "canto": "pinglamb 全場俾人射埋嚟 1063 行，真正食落身嘅係 942 行，即係 cancel 咗 121 行",
+  "english_gloss": "pinglamb: 1063 lines of attack queued, 942 materialised, 121 cancelled",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_ge",
+      "pl": "pinglamb",
+      "mi": null,
+      "ri": null
+     },
+     "b": {
+      "e": "lit",
+      "v": 1063
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "garbagereceived"
+     },
+     "b": {
+      "e": "lit",
+      "v": 942
+     }
+    }
+   ]
+  },
+  "id": "G022",
+  "python_check": "(sum(g['amt'] for m in facts['matches'] for r in m['rounds'] for g in r['players']['pinglamb']['garbage_events']) == 1063) and (sum(r['players']['pinglamb']['garbagereceived'] for m in facts['matches'] for r in m['rounds']) == 942)"
+ },
+ {
+  "family": "total_pieces",
+  "category": "pace",
+  "canto": "全 session 落咗嘅方塊：yachi 2236 粒，pinglamb 2216 粒",
+  "english_gloss": "total pieces: yachi 2236, pinglamb 2216",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "pieces"
+     },
+     "b": {
+      "e": "lit",
+      "v": 2236
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "pieces"
+     },
+     "b": {
+      "e": "lit",
+      "v": 2216
+     }
+    }
+   ]
+  },
+  "id": "G023",
+  "python_check": "(sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']) == 2236) and (sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']) == 2216)"
+ },
+ {
+  "family": "total_garbage_attack",
+  "category": "attack",
+  "canto": "全 session 打出嘅攻擊：pinglamb 1489 行，yachi 1332 行",
+  "english_gloss": "total garbage_attack: pinglamb 1489, yachi 1332",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "garbage_attack"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1489
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "garbage_attack"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1332
+     }
+    }
+   ]
+  },
+  "id": "G024",
+  "python_check": "(sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) == 1489) and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) == 1332)"
+ },
+ {
+  "family": "total_garbage_cleared",
+  "category": "attack",
+  "canto": "全 session 清走嘅垃圾：yachi 477 行，pinglamb 422 行",
+  "english_gloss": "total garbage_cleared: yachi 477, pinglamb 422",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "garbage_cleared"
+     },
+     "b": {
+      "e": "lit",
+      "v": 477
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "garbage_cleared"
+     },
+     "b": {
+      "e": "lit",
+      "v": 422
+     }
+    }
+   ]
+  },
+  "id": "G025",
+  "python_check": "(sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) == 477) and (sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) == 422)"
+ },
+ {
+  "family": "total_finesse_faults",
+  "category": "finesse",
+  "canto": "全 session finesse 失誤：yachi 410 次，pinglamb 362 次",
+  "english_gloss": "total finesse_faults: yachi 410, pinglamb 362",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "finesse_faults"
+     },
+     "b": {
+      "e": "lit",
+      "v": 410
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "finesse_faults"
+     },
+     "b": {
+      "e": "lit",
+      "v": 362
+     }
+    }
+   ]
+  },
+  "id": "G026",
+  "python_check": "(sum(r['players']['yachi']['finesse_faults'] for m in facts['matches'] for r in m['rounds']) == 410) and (sum(r['players']['pinglamb']['finesse_faults'] for m in facts['matches'] for r in m['rounds']) == 362)"
+ },
+ {
+  "family": "total_holds",
+  "category": "style",
+  "canto": "全 session hold 次數：yachi 904 次，pinglamb 823 次",
+  "english_gloss": "total holds: yachi 904, pinglamb 823",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "holds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 904
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "holds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 823
+     }
+    }
+   ]
+  },
+  "id": "G027",
+  "python_check": "(sum(r['players']['yachi']['holds'] for m in facts['matches'] for r in m['rounds']) == 904) and (sum(r['players']['pinglamb']['holds'] for m in facts['matches'] for r in m['rounds']) == 823)"
+ },
+ {
+  "family": "total_tspins",
+  "category": "style",
+  "canto": "全 session T-spin 總數（計埋冇消行嘅）：pinglamb 159 個，yachi 122 個",
+  "english_gloss": "total tspins: pinglamb 159, yachi 122",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "tspins"
+     },
+     "b": {
+      "e": "lit",
+      "v": 159
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "tspins"
+     },
+     "b": {
+      "e": "lit",
+      "v": 122
+     }
+    }
+   ]
+  },
+  "id": "G028",
+  "python_check": "(sum(r['players']['pinglamb']['tspins'] for m in facts['matches'] for r in m['rounds']) == 159) and (sum(r['players']['yachi']['tspins'] for m in facts['matches'] for r in m['rounds']) == 122)"
+ },
+ {
+  "family": "clears_quads",
+  "category": "style",
+  "canto": "Quad 總數：yachi 110 個，pinglamb 103 個",
+  "english_gloss": "total quads: yachi 110, pinglamb 103",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "clears.quads"
+     },
+     "b": {
+      "e": "lit",
+      "v": 110
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "clears.quads"
+     },
+     "b": {
+      "e": "lit",
+      "v": 103
+     }
+    }
+   ]
+  },
+  "id": "G029",
+  "python_check": "(sum(r['players']['yachi']['clears']['quads'] for m in facts['matches'] for r in m['rounds']) == 110) and (sum(r['players']['pinglamb']['clears']['quads'] for m in facts['matches'] for r in m['rounds']) == 103)"
+ },
+ {
+  "family": "clears_tspin_doubles",
+  "category": "style",
+  "canto": "T-spin double 總數：pinglamb 113 個，yachi 82 個",
+  "english_gloss": "total tspin_doubles: pinglamb 113, yachi 82",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "clears.tspin_doubles"
+     },
+     "b": {
+      "e": "lit",
+      "v": 113
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "clears.tspin_doubles"
+     },
+     "b": {
+      "e": "lit",
+      "v": 82
+     }
+    }
+   ]
+  },
+  "id": "G030",
+  "python_check": "(sum(r['players']['pinglamb']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds']) == 113) and (sum(r['players']['yachi']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds']) == 82)"
+ },
+ {
+  "family": "clears_tspin_triples",
+  "category": "style",
+  "canto": "T-spin triple 總數：pinglamb 26 個，yachi 14 個",
+  "english_gloss": "total tspin_triples: pinglamb 26, yachi 14",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "clears.tspin_triples"
+     },
+     "b": {
+      "e": "lit",
+      "v": 26
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "clears.tspin_triples"
+     },
+     "b": {
+      "e": "lit",
+      "v": 14
+     }
+    }
+   ]
+  },
+  "id": "G031",
+  "python_check": "(sum(r['players']['pinglamb']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds']) == 26) and (sum(r['players']['yachi']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds']) == 14)"
+ },
+ {
+  "family": "clears_allclear",
+  "category": "style",
+  "canto": "All Clear 總數：pinglamb 3 個，yachi 2 個",
+  "english_gloss": "total allclear: pinglamb 3, yachi 2",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "clears.allclear"
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "clears.allclear"
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    }
+   ]
+  },
+  "id": "G032",
+  "python_check": "(sum(r['players']['pinglamb']['clears']['allclear'] for m in facts['matches'] for r in m['rounds']) == 3) and (sum(r['players']['yachi']['clears']['allclear'] for m in facts['matches'] for r in m['rounds']) == 2)"
+ },
+ {
+  "family": "kills",
+  "category": "attack",
+  "canto": "KO 數：pinglamb 15、yachi 9 —— 1v1 一局一命，所以呢個數等於局數，唔算另一個獨立指標",
+  "english_gloss": "kills: pinglamb 15, yachi 9 — equal to round wins by construction in 1v1",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 15
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_lb",
+      "pl": "pinglamb",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 15
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_lb",
+      "pl": "yachi",
+      "f": "kills"
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    }
+   ]
+  },
+  "id": "G033",
+  "python_check": "(sum(r['players']['pinglamb']['kills'] for m in facts['matches'] for r in m['rounds']) == 15) and (sum(r['players']['yachi']['kills'] for m in facts['matches'] for r in m['rounds']) == 9) and (sum(m['leaderboard']['pinglamb']['kills'] for m in facts['matches']) == 15) and (sum(m['leaderboard']['yachi']['kills'] for m in facts['matches']) == 9)"
+ },
+ {
+  "family": "avg_pps_x1000",
+  "category": "pace",
+  "canto": "每局平均 PPS：pinglamb 約 1.45，高過 yachi 嘅約 1.43",
+  "english_gloss": "per-round mean PPS: pinglamb 1.453 > yachi 1.434",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 34892
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 34425
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "pps_x1000"
+     }
+    }
+   ]
+  },
+  "id": "G034",
+  "python_check": "(sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 34892) and (sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) == 34425) and (sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']))"
+ },
+ {
+  "family": "avg_apm_x1000",
+  "category": "pace",
+  "canto": "每局平均 APM：pinglamb 約 59.0，高過 yachi 嘅約 51.5",
+  "english_gloss": "per-round mean APM: pinglamb 59.090 > yachi 51.515",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1418182
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1236360
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    }
+   ]
+  },
+  "id": "G035",
+  "python_check": "(sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 1418182) and (sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) == 1236360) and (sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) > sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']))"
+ },
+ {
+  "family": "per_piece_garbage_attack",
+  "category": "attack",
+  "canto": "每粒方塊打出嘅攻擊：pinglamb 多過 yachi",
+  "english_gloss": "garbage_attack per piece: pinglamb > yachi",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "garbage_attack"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "garbage_attack"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G036",
+  "python_check": "((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "family": "per_piece_finesse_faults",
+  "category": "finesse",
+  "canto": "每粒方塊嘅 finesse 失誤：yachi 多過 pinglamb",
+  "english_gloss": "finesse_faults per piece: yachi > pinglamb",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "finesse_faults"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "finesse_faults"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G037",
+  "python_check": "((sum(r['players']['yachi']['finesse_faults'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['pinglamb']['finesse_faults'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "family": "per_piece_finesse_perfect",
+  "category": "finesse",
+  "canto": "perfect piece 嘅比率：yachi 多過 pinglamb",
+  "english_gloss": "finesse_perfect per piece: yachi > pinglamb",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "finesse_perfect"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "finesse_perfect"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G038",
+  "python_check": "((sum(r['players']['yachi']['finesse_perfect'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['pinglamb']['finesse_perfect'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "family": "consistency_pps_x1000",
+  "category": "style",
+  "canto": "逐局 PPS 嘅波動：pinglamb 平穩過 yachi",
+  "english_gloss": "per-round PPS variance: pinglamb < yachi",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "sub",
+    "a": {
+     "e": "mul",
+     "a": {
+      "e": "lit",
+      "v": 24
+     },
+     "b": {
+      "e": "sum_sq_round",
+      "pl": "yachi",
+      "f": "pps_x1000"
+     }
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "pps_x1000"
+     }
+    }
+   },
+   "b": {
+    "e": "sub",
+    "a": {
+     "e": "mul",
+     "a": {
+      "e": "lit",
+      "v": 24
+     },
+     "b": {
+      "e": "sum_sq_round",
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    }
+   }
+  },
+  "id": "G039",
+  "python_check": "(((24 * sum(r['players']['yachi']['pps_x1000']*r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds'])) - (sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pps_x1000'] for m in facts['matches'] for r in m['rounds']))) > ((24 * sum(r['players']['pinglamb']['pps_x1000']*r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds'])) - (sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pps_x1000'] for m in facts['matches'] for r in m['rounds']))))"
+ },
+ {
+  "family": "consistency_apm_x1000",
+  "category": "style",
+  "canto": "逐局 APM 嘅波動：pinglamb 平穩過 yachi",
+  "english_gloss": "per-round APM variance: pinglamb < yachi",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "sub",
+    "a": {
+     "e": "mul",
+     "a": {
+      "e": "lit",
+      "v": 24
+     },
+     "b": {
+      "e": "sum_sq_round",
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    }
+   },
+   "b": {
+    "e": "sub",
+    "a": {
+     "e": "mul",
+     "a": {
+      "e": "lit",
+      "v": 24
+     },
+     "b": {
+      "e": "sum_sq_round",
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     }
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     }
+    }
+   }
+  },
+  "id": "G040",
+  "python_check": "(((24 * sum(r['players']['yachi']['apm_x1000']*r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds'])) - (sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['apm_x1000'] for m in facts['matches'] for r in m['rounds']))) > ((24 * sum(r['players']['pinglamb']['apm_x1000']*r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds'])) - (sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['apm_x1000'] for m in facts['matches'] for r in m['rounds']))))"
+ },
+ {
+  "family": "high_apm_record",
+  "category": "clutch",
+  "canto": "yachi 打到 APM 65 以上嘅局有 4 局，贏咗 3 局",
+  "english_gloss": "yachi in rounds with APM >= 65: 3/4",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "apm_x1000",
+       "op": ">=",
+       "v": 65000
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "apm_x1000",
+         "op": ">=",
+         "v": 65000
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    }
+   ]
+  },
+  "id": "G041",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] >= 65000) == 4) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['apm_x1000'] >= 65000) and (r['winner']=='yachi')) == 3)"
+ },
+ {
+  "family": "high_apm_record",
+  "category": "clutch",
+  "canto": "pinglamb 打到 APM 65 以上嘅局有 8 局，贏咗 8 局",
+  "english_gloss": "pinglamb in rounds with APM >= 65: 8/8",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "apm_x1000",
+       "op": ">=",
+       "v": 65000
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "apm_x1000",
+         "op": ">=",
+         "v": 65000
+        },
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    }
+   ]
+  },
+  "id": "G042",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000'] >= 65000) == 8) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['apm_x1000'] >= 65000) and (r['winner']=='pinglamb')) == 8)"
+ },
+ {
+  "family": "bounce_back",
+  "category": "clutch",
+  "canto": "yachi 輸咗一局之後，12 次機會裏面即刻贏返 6 次",
+  "english_gloss": "yachi bounce-back after a lost round: 6/12",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 2,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 4,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 6,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 3,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 4,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 7,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 1,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 2,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 2,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 4,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 6,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G043",
+  "python_check": "(facts['matches'][0]['rounds'][0]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][1]['winner']=='yachi') and (facts['matches'][0]['rounds'][2]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][3]['winner']=='yachi') and (facts['matches'][0]['rounds'][4]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][6]['winner']=='yachi') and (facts['matches'][1]['rounds'][0]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][1]['winner']=='yachi') and (facts['matches'][1]['rounds'][3]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][4]['winner']=='yachi') and (facts['matches'][1]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][7]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][1]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][2]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][2]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][3]['winner']=='yachi') and (facts['matches'][2]['rounds'][4]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][6]['winner']=='pinglamb')"
+ },
+ {
+  "family": "bounce_back",
+  "category": "clutch",
+  "canto": "pinglamb 輸咗一局之後，9 次機會裏面即刻贏返 7 次",
+  "english_gloss": "pinglamb bounce-back after a lost round: 7/9",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 2,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 4,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 6,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 7,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 7,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 8,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 3,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 4,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 0,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 1,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 4,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G044",
+  "python_check": "(facts['matches'][0]['rounds'][1]['winner']=='yachi') and (facts['matches'][0]['rounds'][2]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][3]['winner']=='yachi') and (facts['matches'][0]['rounds'][4]['winner']=='pinglamb') and (facts['matches'][0]['rounds'][6]['winner']=='yachi') and (facts['matches'][0]['rounds'][7]['winner']=='yachi') and (facts['matches'][0]['rounds'][7]['winner']=='yachi') and (facts['matches'][0]['rounds'][8]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][1]['winner']=='yachi') and (facts['matches'][1]['rounds'][2]['winner']=='yachi') and (facts['matches'][1]['rounds'][2]['winner']=='yachi') and (facts['matches'][1]['rounds'][3]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][4]['winner']=='yachi') and (facts['matches'][1]['rounds'][5]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][0]['winner']=='yachi') and (facts['matches'][2]['rounds'][1]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][3]['winner']=='yachi') and (facts['matches'][2]['rounds'][4]['winner']=='pinglamb')"
+ },
+ {
+  "family": "match_dominance_pps_x1000",
+  "category": "pace",
+  "canto": "3 場 match，yachi 嘅場均 PPS 場場都高過 pinglamb，但係都輸咗個系列 —— 快唔等於贏",
+  "english_gloss": "yachi's match-level PPS exceeded pinglamb's in all 3 matches",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     }
+    }
+   ]
+  },
+  "id": "G045",
+  "python_check": "(facts['matches'][0]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][0]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][1]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][1]['leaderboard']['pinglamb']['pps_x1000']) and (facts['matches'][2]['leaderboard']['yachi']['pps_x1000'] > facts['matches'][2]['leaderboard']['pinglamb']['pps_x1000'])"
+ },
+ {
+  "family": "match_dominance_apm_x1000",
+  "category": "pace",
+  "canto": "3 場 match，pinglamb 嘅場均 APM 場場都高過 yachi，全面壓住對手",
+  "english_gloss": "pinglamb's match-level APM exceeded yachi's in all 3 matches",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 0,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 1,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lb",
+      "mi": 2,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    }
+   ]
+  },
+  "id": "G046",
+  "python_check": "(facts['matches'][0]['leaderboard']['pinglamb']['apm_x1000'] > facts['matches'][0]['leaderboard']['yachi']['apm_x1000']) and (facts['matches'][1]['leaderboard']['pinglamb']['apm_x1000'] > facts['matches'][1]['leaderboard']['yachi']['apm_x1000']) and (facts['matches'][2]['leaderboard']['pinglamb']['apm_x1000'] > facts['matches'][2]['leaderboard']['yachi']['apm_x1000'])"
+ },
+ {
+  "family": "player_ceiling_maxspike",
+  "category": "spike",
+  "canto": "單一次 spike 嘅個人上限：pinglamb 做到 18 行，yachi 最多 17 行",
+  "english_gloss": "best single-round maxspike: pinglamb 18 vs yachi 17",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 2,
+      "pl": "pinglamb",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 18
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "maxspike",
+       "op": ">",
+       "v": 18
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 0,
+      "ri": 3,
+      "pl": "yachi",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 17
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "maxspike",
+       "op": ">",
+       "v": 17
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    }
+   ]
+  },
+  "id": "G047",
+  "python_check": "(facts['matches'][2]['rounds'][2]['players']['pinglamb']['maxspike'] == 18) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike'] > 18) == 0) and (facts['matches'][0]['rounds'][3]['players']['yachi']['maxspike'] == 17) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike'] > 17) == 0)"
+ },
+ {
+  "family": "player_ceiling_topbtb",
+  "category": "style",
+  "canto": "B2B 鏈 嘅個人上限：pinglamb 做到 8 段，yachi 最多 6 段",
+  "english_gloss": "best single-round topbtb: pinglamb 8 vs yachi 6",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "topbtb",
+       "op": ">",
+       "v": 8
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 6
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "topbtb",
+       "op": ">",
+       "v": 6
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    }
+   ]
+  },
+  "id": "G048",
+  "python_check": "(facts['matches'][2]['rounds'][6]['players']['pinglamb']['topbtb'] == 8) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['topbtb'] > 8) == 0) and (facts['matches'][1]['rounds'][6]['players']['yachi']['topbtb'] == 6) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['topbtb'] > 6) == 0)"
+ },
+ {
+  "family": "spike_frequency",
+  "category": "spike",
+  "canto": "劈到 12 行以上嘅局數：pinglamb 有 8 局，yachi 有 4 局",
+  "english_gloss": "rounds with a spike of 12+: pinglamb 8, yachi 4",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "maxspike",
+       "op": ">=",
+       "v": 12
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 8
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "maxspike",
+       "op": ">=",
+       "v": 12
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    }
+   ]
+  },
+  "id": "G049",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['maxspike'] >= 12) == 8) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['maxspike'] >= 12) == 4)"
+ },
+ {
+  "family": "tspin_lines",
+  "category": "style",
+  "canto": "T-spin double 加 triple 計埋：pinglamb 139 個，yachi 96 個（唔計冇消行嘅 T-spin）",
+  "english_gloss": "T-spin doubles+triples: pinglamb 139, yachi 96 (line-clearing T-spins only)",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "clears.tspin_doubles"
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "clears.tspin_triples"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 139
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "clears.tspin_doubles"
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "clears.tspin_triples"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 96
+     }
+    }
+   ]
+  },
+  "id": "G050",
+  "python_check": "((sum(r['players']['pinglamb']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds']) + sum(r['players']['pinglamb']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])) == 139) and ((sum(r['players']['yachi']['clears']['tspin_doubles'] for m in facts['matches'] for r in m['rounds']) + sum(r['players']['yachi']['clears']['tspin_triples'] for m in facts['matches'] for r in m['rounds'])) == 96)"
+ },
+ {
+  "family": "score_table",
+  "category": "score",
+  "canto": "3 場嘅比數（yachi 對 pinglamb）：m1 4-5、m2 3-5、m3 2-5",
+  "english_gloss": "all match scores in order (yachi-pinglamb): 4-5, 3-5, 2-5",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 0,
+        "pl": "yachi"
+       },
+       "b": {
+        "e": "lit",
+        "v": 4
+       }
+      },
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 0,
+        "pl": "pinglamb"
+       },
+       "b": {
+        "e": "lit",
+        "v": 5
+       }
+      },
+      {
+       "p": "match_winner",
+       "mi": 0,
+       "pl": "pinglamb"
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 1,
+        "pl": "yachi"
+       },
+       "b": {
+        "e": "lit",
+        "v": 3
+       }
+      },
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 1,
+        "pl": "pinglamb"
+       },
+       "b": {
+        "e": "lit",
+        "v": 5
+       }
+      },
+      {
+       "p": "match_winner",
+       "mi": 1,
+       "pl": "pinglamb"
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 2,
+        "pl": "yachi"
+       },
+       "b": {
+        "e": "lit",
+        "v": 2
+       }
+      },
+      {
+       "p": "eq",
+       "a": {
+        "e": "score",
+        "mi": 2,
+        "pl": "pinglamb"
+       },
+       "b": {
+        "e": "lit",
+        "v": 5
+       }
+      },
+      {
+       "p": "match_winner",
+       "mi": 2,
+       "pl": "pinglamb"
+      }
+     ]
+    }
+   ]
+  },
+  "id": "G051",
+  "python_check": "(facts['matches'][0]['score']['yachi'] == 4) and (facts['matches'][0]['score']['pinglamb'] == 5) and (facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][1]['score']['yachi'] == 3) and (facts['matches'][1]['score']['pinglamb'] == 5) and (facts['matches'][1]['winner']=='pinglamb') and (facts['matches'][2]['score']['yachi'] == 2) and (facts['matches'][2]['score']['pinglamb'] == 5) and (facts['matches'][2]['winner']=='pinglamb')"
+ },
+ {
+  "family": "comeback_rounds",
+  "category": "comeback",
+  "canto": "有 3 局係食多過對手嘅垃圾都照贏，pinglamb 佔 2 局、yachi 佔 1 局",
+  "english_gloss": "3 rounds won while receiving more real garbage; pinglamb 2, yachi 1",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "winner_gt_loser",
+       "f": "garbagereceived"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "winner_gt_loser",
+         "f": "garbagereceived"
+        },
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "winner_gt_loser",
+         "f": "garbagereceived"
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    }
+   ]
+  },
+  "id": "G052",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players'][r['winner']]['garbagereceived'] > min(r['players'][p]['garbagereceived'] for p in r['players'] if p!=r['winner'])) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players'][r['winner']]['garbagereceived'] > min(r['players'][p]['garbagereceived'] for p in r['players'] if p!=r['winner'])) and (r['winner']=='pinglamb')) == 2) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players'][r['winner']]['garbagereceived'] > min(r['players'][p]['garbagereceived'] for p in r['players'] if p!=r['winner'])) and (r['winner']=='yachi')) == 1)"
+ },
+ {
+  "family": "cleanest_win",
+  "category": "clutch",
+  "canto": "最乾淨嘅一局係 m3 第 2 局：pinglamb 全局只食咗 0 行垃圾，直接封死 yachi",
+  "english_gloss": "cleanest win m3r2: pinglamb conceded only 0 lines of garbage (session minimum for a winner)",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 1,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 1,
+      "pl": "pinglamb",
+      "f": "garbagereceived"
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "garbagereceived",
+         "op": "<",
+         "v": 0
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "winner",
+         "pl": "yachi"
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "garbagereceived",
+         "op": "<",
+         "v": 0
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    }
+   ]
+  },
+  "id": "G053",
+  "python_check": "(facts['matches'][2]['rounds'][1]['winner']=='pinglamb') and (facts['matches'][2]['rounds'][1]['players']['pinglamb']['garbagereceived'] == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['winner']=='pinglamb') and (r['players']['pinglamb']['garbagereceived'] < 0)) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['winner']=='yachi') and (r['players']['yachi']['garbagereceived'] < 0)) == 0)"
+ },
+ {
+  "family": "decider_final_round",
+  "category": "clutch",
+  "canto": "m1 嘅生死局：pinglamb 打出 VS 約 106.6、APM 約 52.1，yachi 得 VS 約 85.2、APM 約 47.1",
+  "english_gloss": "m1 deciding round: pinglamb VS 106.6 / APM 52.1 vs yachi VS 85.2 / APM 47.1",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 8,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 0,
+      "ri": 8,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "lo": 106600,
+     "hi": 106700
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 0,
+      "ri": 8,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "lo": 52100,
+     "hi": 52200
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 0,
+      "ri": 8,
+      "pl": "yachi",
+      "f": "vs_x1000"
+     },
+     "lo": 85200,
+     "hi": 85300
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "round",
+      "mi": 0,
+      "ri": 8,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "lo": 47100,
+     "hi": 47200
+    }
+   ]
+  },
+  "id": "G054",
+  "python_check": "(facts['matches'][0]['rounds'][8]['winner']=='pinglamb') and (106600 <= facts['matches'][0]['rounds'][8]['players']['pinglamb']['vs_x1000'] < 106700) and (52100 <= facts['matches'][0]['rounds'][8]['players']['pinglamb']['apm_x1000'] < 52200) and (85200 <= facts['matches'][0]['rounds'][8]['players']['yachi']['vs_x1000'] < 85300) and (47100 <= facts['matches'][0]['rounds'][8]['players']['yachi']['apm_x1000'] < 47200)"
+ },
+ {
+  "family": "most_intense_round",
+  "category": "pace",
+  "canto": "打足 60 秒以上嘅局入面最癲嘅一局係 m2 第 7 局，兩邊 VS 加埋約 304.5（pinglamb 約 162.0 對 yachi 約 142.5）",
+  "english_gloss": "highest combined VS among rounds of 60s or more is m2r7 at 304.5, won by pinglamb",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 0,
+       "ri": 0,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 0,
+       "ri": 0,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 0,
+       "ri": 5,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 0,
+       "ri": 5,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 0,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 0,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 0,
+       "ri": 8,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 0,
+       "ri": 8,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 0,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 0,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 1,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 1,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 3,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 3,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 2,
+       "ri": 0,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 2,
+       "ri": 0,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    },
+    {
+     "p": "le",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "round",
+       "mi": 2,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "vs_x1000"
+      },
+      "b": {
+       "e": "round",
+       "mi": 2,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "vs_x1000"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 304599
+     }
+    }
+   ]
+  },
+  "id": "G055",
+  "python_check": "(facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and ((facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000'] + facts['matches'][1]['rounds'][6]['players']['yachi']['vs_x1000']) == 304599) and ((facts['matches'][0]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][0]['rounds'][5]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][5]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][0]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][0]['rounds'][8]['players']['yachi']['vs_x1000'] + facts['matches'][0]['rounds'][8]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][1]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][1]['rounds'][1]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][1]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][1]['rounds'][3]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][3]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][1]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][2]['rounds'][0]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][0]['players']['pinglamb']['vs_x1000']) <= 304599) and ((facts['matches'][2]['rounds'][6]['players']['yachi']['vs_x1000'] + facts['matches'][2]['rounds'][6]['players']['pinglamb']['vs_x1000']) <= 304599)"
+ },
+ {
+  "family": "keys_per_piece",
+  "category": "finesse",
+  "canto": "每粒方塊要按幾多下（KPP）：pinglamb 少過 yachi，即係 pinglamb 嘅手法比較省力",
+  "english_gloss": "keys per piece: pinglamb lower than yachi",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "inputs"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "inputs"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G056",
+  "python_check": "((sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "family": "death_reasons",
+  "category": "style",
+  "canto": "24 局係點收嘅：22 局俾垃圾頂爆、2 局自己頂到頂",
+  "english_gloss": "how rounds ended: garbagesmash 22, topout 2",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "count_rounds",
+       "cond": {
+        "c": "str_field",
+        "pl": "yachi",
+        "f": "gameoverreason",
+        "v": "garbagesmash"
+       }
+      },
+      "b": {
+       "e": "count_rounds",
+       "cond": {
+        "c": "str_field",
+        "pl": "pinglamb",
+        "f": "gameoverreason",
+        "v": "garbagesmash"
+       }
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 22
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "count_rounds",
+       "cond": {
+        "c": "str_field",
+        "pl": "yachi",
+        "f": "gameoverreason",
+        "v": "topout"
+       }
+      },
+      "b": {
+       "e": "count_rounds",
+       "cond": {
+        "c": "str_field",
+        "pl": "pinglamb",
+        "f": "gameoverreason",
+        "v": "topout"
+       }
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    }
+   ]
+  },
+  "id": "G057",
+  "python_check": "((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['gameoverreason'] == 'garbagesmash') + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['gameoverreason'] == 'garbagesmash')) == 22) and ((sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['gameoverreason'] == 'topout') + sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['gameoverreason'] == 'topout')) == 2)"
+ },
+ {
+  "family": "score_totals",
+  "category": "style",
+  "canto": "全 session 累計分數：pinglamb 481,090 分，yachi 421,632 分",
+  "english_gloss": "total in-game score: pinglamb 481090, yachi 421632",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "score"
+     },
+     "b": {
+      "e": "lit",
+      "v": 481090
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "yachi",
+      "f": "score"
+     },
+     "b": {
+      "e": "lit",
+      "v": 421632
+     }
+    }
+   ]
+  },
+  "id": "G058",
+  "python_check": "(sum(r['players']['pinglamb']['score'] for m in facts['matches'] for r in m['rounds']) == 481090) and (sum(r['players']['yachi']['score'] for m in facts['matches'] for r in m['rounds']) == 421632)"
+ },
+ {
+  "family": "multiplier_bonus",
+  "category": "attack",
+  "canto": "pinglamb 送出 1183 行垃圾，當中 3 行係倍率加成嚟嘅（唔計倍率淨係 1180 行）",
+  "english_gloss": "pinglamb sent 1183 lines, 3 of them from multipliers (1180 before multipliers)",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "garbage_sent_raw"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1183
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round",
+      "pl": "pinglamb",
+      "f": "garbage_sent_nomult"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1180
+     }
+    }
+   ]
+  },
+  "id": "G059",
+  "python_check": "(sum(r['players']['pinglamb']['garbage_sent_raw'] for m in facts['matches'] for r in m['rounds']) == 1183) and (sum(r['players']['pinglamb']['garbage_sent_nomult'] for m in facts['matches'] for r in m['rounds']) == 1180)"
+ },
+ {
+  "family": "rate_split_garbage_attack",
+  "category": "attack",
+  "canto": "yachi 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.65，輸嘅局約 0.56，贏局高咗大約 15% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
+  "english_gloss": "yachi's attack per piece: 0.654 in rounds won vs 0.564 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   }
+  },
+  "id": "G060",
+  "python_check": "((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))"
+ },
+ {
+  "family": "rate_split_garbage_attack",
+  "category": "attack",
+  "canto": "pinglamb 贏嘅局嘅 APP（每粒方塊打出嘅攻擊）約 0.72，輸嘅局約 0.57，贏局高咗大約 26% —— 即係話佢贏嘅時候係靠每粒方塊打得更重，唔係靠落多啲方塊",
+  "english_gloss": "pinglamb's attack per piece: 0.723 in rounds won vs 0.570 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_attack",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   }
+  },
+  "id": "G061",
+  "python_check": "((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))"
+ },
+ {
+  "family": "rate_flat_inputs",
+  "category": "finesse",
+  "canto": "yachi 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.11（即係唔到 3%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "yachi's keypresses per piece barely differs between rounds won and lost (under 0.11, ~2%) — not the lever",
+  "spec": {
+   "p": "lt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sub",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     }
+    },
+    "b": {
+     "e": "lit",
+     "v": 1000
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "lit",
+     "v": 108
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round_where",
+      "pl": "yachi",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "yachi"
+      }
+     },
+     "b": {
+      "e": "sum_round_where",
+      "pl": "yachi",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "pinglamb"
+      }
+     }
+    }
+   }
+  },
+  "id": "G062",
+  "python_check": "((((sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) - (sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) * 1000) < (108 * (sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))))"
+ },
+ {
+  "family": "rate_flat_inputs",
+  "category": "finesse",
+  "canto": "pinglamb 嘅 KPP（每粒方塊要按幾多下）贏局同輸局幾乎一樣，差距唔夠 0.11（即係唔到 3%），所以 KPP 唔係佢輸贏嘅關鍵",
+  "english_gloss": "pinglamb's keypresses per piece barely differs between rounds won and lost (under 0.11, ~2%) — not the lever",
+  "spec": {
+   "p": "lt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sub",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "inputs",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     }
+    },
+    "b": {
+     "e": "lit",
+     "v": 1000
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "lit",
+     "v": 106
+    },
+    "b": {
+     "e": "mul",
+     "a": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "pinglamb"
+      }
+     },
+     "b": {
+      "e": "sum_round_where",
+      "pl": "pinglamb",
+      "f": "pieces",
+      "cond": {
+       "c": "winner",
+       "pl": "yachi"
+      }
+     }
+    }
+   }
+  },
+  "id": "G063",
+  "python_check": "((((sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) - (sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) * 1000) < (106 * (sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))))"
+ },
+ {
+  "family": "rate_split_garbage_cleared",
+  "category": "style",
+  "canto": "yachi 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.24，輸嘅局約 0.19，贏局高咗大約 25% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到",
+  "english_gloss": "yachi's garbage cleared per piece: 0.245 in rounds won vs 0.196 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "yachi",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   }
+  },
+  "id": "G064",
+  "python_check": "((sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))"
+ },
+ {
+  "family": "rate_split_garbage_cleared",
+  "category": "style",
+  "canto": "pinglamb 贏嘅局嘅 DS（每粒方塊清走幾多垃圾）約 0.20，輸嘅局約 0.16，贏局高咗大約 26% —— 贏嘅時候花多啲方塊落去清垃圾，守得住先贏得到",
+  "english_gloss": "pinglamb's garbage cleared per piece: 0.204 in rounds won vs 0.161 in rounds lost",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "garbage_cleared",
+     "cond": {
+      "c": "winner",
+      "pl": "yachi"
+     }
+    },
+    "b": {
+     "e": "sum_round_where",
+     "pl": "pinglamb",
+     "f": "pieces",
+     "cond": {
+      "c": "winner",
+      "pl": "pinglamb"
+     }
+    }
+   }
+  },
+  "id": "G065",
+  "python_check": "((sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) > (sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))"
+ },
+ {
+  "family": "app_decides_rounds",
+  "category": "attack",
+  "canto": "兩個人都一樣：贏嘅局嘅 APP 高過輸嘅局。呢個 session 決定一局嘅唔係手速，而係每粒方塊嘅傷害",
+  "english_gloss": "both players' attack per piece is higher in the rounds they won than in the rounds they lost",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "yachi",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "cond": {
+        "c": "winner",
+        "pl": "yachi"
+       }
+      },
+      "b": {
+       "e": "sum_round_where",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "cond": {
+        "c": "winner",
+        "pl": "pinglamb"
+       }
+      }
+     }
+    }
+   ]
+  },
+  "id": "G066",
+  "python_check": "((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))"
+ },
+ {
+  "family": "ds_session",
+  "category": "style",
+  "canto": "全 session 計每粒方塊清走幾多垃圾（DS）：yachi 高過 pinglamb，即係 yachi 花多啲方塊落喺守同清垃圾上面",
+  "english_gloss": "session downstack per piece: yachi higher than pinglamb",
+  "spec": {
+   "p": "gt",
+   "a": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "garbage_cleared"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "pieces"
+    }
+   },
+   "b": {
+    "e": "mul",
+    "a": {
+     "e": "sum_round",
+     "pl": "pinglamb",
+     "f": "garbage_cleared"
+    },
+    "b": {
+     "e": "sum_round",
+     "pl": "yachi",
+     "f": "pieces"
+    }
+   }
+  },
+  "id": "G067",
+  "python_check": "((sum(r['players']['yachi']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) > (sum(r['players']['pinglamb']['garbage_cleared'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "family": "round_peak_apm_x1000",
+  "category": "pace",
+  "canto": "唔設任何局長下限嘅話，全場最高單局 APM係 pinglamb 喺 m3 第 5 局打出嘅 約92.2，但嗰局只打咗 41 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局",
+  "english_gloss": "unqualified session peak apm_x1000 is 92233 by pinglamb at m3r5, a 41s round — not the record",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 2,
+      "ri": 4,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 92233
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "apm_x1000",
+       "op": ">",
+       "v": 92233
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "apm_x1000",
+       "op": ">",
+       "v": 92233
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 2,
+     "ri": 4,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": "<",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "apm_x1000",
+         "op": "==",
+         "v": 92233
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    }
+   ]
+  },
+  "id": "G068",
+  "python_check": "(facts['matches'][2]['rounds'][4]['players']['pinglamb']['apm_x1000'] == 92233) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['apm_x1000'] > 92233) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['apm_x1000'] > 92233) == 0) and (facts['matches'][2]['rounds'][4]['winner']=='pinglamb') and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) < 60000) and (r['players']['pinglamb']['apm_x1000'] == 92233)) == 1)"
+ },
+ {
+  "family": "round_peak_vs_x1000",
+  "category": "pace",
+  "canto": "唔設任何局長下限嘅話，全場最高單局 VS係 yachi 喺 m1 第 4 局打出嘅 約209.3，但嗰局只打咗 14 秒——速率嘅分母就係局長，所以呢個數唔算紀錄，紀錄只計打足 60 秒嘅局",
+  "english_gloss": "unqualified session peak vs_x1000 is 209302 by yachi at m1r4, a 14s round — not the record",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 0,
+      "ri": 3,
+      "pl": "yachi",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 209302
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "vs_x1000",
+       "op": ">",
+       "v": 209302
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "vs_x1000",
+       "op": ">",
+       "v": 209302
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 0,
+     "ri": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "dur_cmp",
+         "op": "<",
+         "v": 60000
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "vs_x1000",
+         "op": "==",
+         "v": 209302
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    }
+   ]
+  },
+  "id": "G069",
+  "python_check": "(facts['matches'][0]['rounds'][3]['players']['yachi']['vs_x1000'] == 209302) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['vs_x1000'] > 209302) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['vs_x1000'] > 209302) == 0) and (facts['matches'][0]['rounds'][3]['winner']=='yachi') and (sum(1 for m in facts['matches'] for r in m['rounds'] if (max(d['lifetime'] for d in r['players'].values()) < 60000) and (r['players']['yachi']['vs_x1000'] == 209302)) == 1)"
+ },
+ {
+  "family": "pc_rounds",
+  "category": "style",
+  "canto": "yachi 有 2 局做到 Perfect Clear，入面贏咗 0 局；佢成晚打 24 局贏 9 局",
+  "english_gloss": "yachi had a perfect clear in 2 rounds and won 0 of them; 9 round wins out of 24 overall",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "yachi",
+       "f": "clears.allclear",
+       "op": ">",
+       "v": 0
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "yachi"
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "total_rounds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 24
+     }
+    }
+   ]
+  },
+  "id": "G070",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['clears']['allclear'] > 0) == 2) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['yachi']['clears']['allclear'] > 0) and (r['winner']=='yachi')) == 0) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') == 9) and (sum(len(m['rounds']) for m in facts['matches']) == 24)"
+ },
+ {
+  "family": "pc_rounds",
+  "category": "style",
+  "canto": "pinglamb 有 3 局做到 Perfect Clear，入面贏咗 3 局；佢成晚打 24 局贏 15 局",
+  "english_gloss": "pinglamb had a perfect clear in 3 rounds and won 3 of them; 15 round wins out of 24 overall",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "field_cmp",
+       "pl": "pinglamb",
+       "f": "clears.allclear",
+       "op": ">",
+       "v": 0
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "pinglamb"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 3
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds_won",
+      "pl": "pinglamb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 15
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "total_rounds"
+     },
+     "b": {
+      "e": "lit",
+      "v": 24
+     }
+    }
+   ]
+  },
+  "id": "G071",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['clears']['allclear'] > 0) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['winner']=='pinglamb')) == 3) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') == 15) and (sum(len(m['rounds']) for m in facts['matches']) == 24)"
+ },
+ {
+  "family": "pc_solo_lost",
+  "category": "style",
+  "canto": "有 1 局係全場淨係 pinglamb 做到 Perfect Clear，入面佢仲要輸咗 0 局",
+  "english_gloss": "1 rounds where only pinglamb got a perfect clear; pinglamb lost 0 of them",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "and",
+       "xs": [
+        {
+         "c": "field_cmp",
+         "pl": "pinglamb",
+         "f": "clears.allclear",
+         "op": ">",
+         "v": 0
+        },
+        {
+         "c": "field_cmp",
+         "pl": "yachi",
+         "f": "clears.allclear",
+         "op": "==",
+         "v": 0
+        },
+        {
+         "c": "winner",
+         "pl": "yachi"
+        }
+       ]
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 0
+     }
+    }
+   ]
+  },
+  "id": "G072",
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['players']['yachi']['clears']['allclear'] == 0)) == 1) and (sum(1 for m in facts['matches'] for r in m['rounds'] if (r['players']['pinglamb']['clears']['allclear'] > 0) and (r['players']['yachi']['clears']['allclear'] == 0) and (r['winner']=='yachi')) == 0)"
+ },
+ {
+  "family": "intense_round_profile",
+  "category": "pace",
+  "canto": "最癲嘅一局（m2 第 7 局）yachi 嘅數：APM 約 61.0、PPS 約 1.42、VS 約 142.5、粒數 143、攻擊 102、送出 79、食 85、清走 41、行數 93、最大單波 9、最高 B2B 6、佢自己嘅時間 約 100 秒",
+  "english_gloss": "most intense round m2r7 — yachi: apm_x1000 61017, pps_x1000 1426, vs_x1000 142572, pieces 143, garbage_attack 102, garbagesent 79, garbagereceived 85, garbage_cleared 41, lines 93, maxspike 9, topbtb 6, finaltime_ms 100303",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 61017
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1426
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 142572
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "pieces"
+     },
+     "b": {
+      "e": "lit",
+      "v": 143
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbage_attack"
+     },
+     "b": {
+      "e": "lit",
+      "v": 102
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbagesent"
+     },
+     "b": {
+      "e": "lit",
+      "v": 79
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbagereceived"
+     },
+     "b": {
+      "e": "lit",
+      "v": 85
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbage_cleared"
+     },
+     "b": {
+      "e": "lit",
+      "v": 41
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "lines"
+     },
+     "b": {
+      "e": "lit",
+      "v": 93
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 9
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 6
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "finaltime_ms"
+     },
+     "b": {
+      "e": "lit",
+      "v": 100303
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G073",
+  "python_check": "(facts['matches'][1]['rounds'][6]['players']['yachi']['apm_x1000'] == 61017) and (facts['matches'][1]['rounds'][6]['players']['yachi']['pps_x1000'] == 1426) and (facts['matches'][1]['rounds'][6]['players']['yachi']['vs_x1000'] == 142572) and (facts['matches'][1]['rounds'][6]['players']['yachi']['pieces'] == 143) and (facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack'] == 102) and (facts['matches'][1]['rounds'][6]['players']['yachi']['garbagesent'] == 79) and (facts['matches'][1]['rounds'][6]['players']['yachi']['garbagereceived'] == 85) and (facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared'] == 41) and (facts['matches'][1]['rounds'][6]['players']['yachi']['lines'] == 93) and (facts['matches'][1]['rounds'][6]['players']['yachi']['maxspike'] == 9) and (facts['matches'][1]['rounds'][6]['players']['yachi']['topbtb'] == 6) and (facts['matches'][1]['rounds'][6]['players']['yachi']['finaltime_ms'] == 100303) and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb')"
+ },
+ {
+  "family": "intense_round_profile",
+  "category": "pace",
+  "canto": "最癲嘅一局（m2 第 7 局）pinglamb 嘅數：APM 約 71.4、PPS 約 1.51、VS 約 162.0、粒數 151、攻擊 119、送出 93、食 71、清走 43、行數 98、最大單波 7、最高 B2B 4、佢自己嘅時間 約 99 秒",
+  "english_gloss": "most intense round m2r7 — pinglamb: apm_x1000 71412, pps_x1000 1510, vs_x1000 162027, pieces 151, garbage_attack 119, garbagesent 93, garbagereceived 71, garbage_cleared 43, lines 98, maxspike 7, topbtb 4, finaltime_ms 99983",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 71412
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 1510
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "lit",
+      "v": 162027
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "pieces"
+     },
+     "b": {
+      "e": "lit",
+      "v": 151
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbage_attack"
+     },
+     "b": {
+      "e": "lit",
+      "v": 119
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbagesent"
+     },
+     "b": {
+      "e": "lit",
+      "v": 93
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbagereceived"
+     },
+     "b": {
+      "e": "lit",
+      "v": 71
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbage_cleared"
+     },
+     "b": {
+      "e": "lit",
+      "v": 43
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "lines"
+     },
+     "b": {
+      "e": "lit",
+      "v": 98
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "lit",
+      "v": 7
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "lit",
+      "v": 4
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "finaltime_ms"
+     },
+     "b": {
+      "e": "lit",
+      "v": 99983
+     }
+    },
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    }
+   ]
+  },
+  "id": "G074",
+  "python_check": "(facts['matches'][1]['rounds'][6]['players']['pinglamb']['apm_x1000'] == 71412) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['pps_x1000'] == 1510) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000'] == 162027) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['pieces'] == 151) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack'] == 119) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbagesent'] == 93) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbagereceived'] == 71) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared'] == 43) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['lines'] == 98) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['maxspike'] == 7) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['topbtb'] == 4) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['finaltime_ms'] == 99983) and (facts['matches'][1]['rounds'][6]['winner']=='pinglamb')"
+ },
+ {
+  "family": "intense_round_edges",
+  "category": "pace",
+  "canto": "最癲嘅一局係 pinglamb 贏，但佢喺 最大單波 呢 1 條軸係落後嘅——贏嗰個唔係攻得最多嗰個；另外，唔計呢四條軸，佢仲有 1 格輸蝕：最高 B2B",
+  "english_gloss": "m2r7 winner pinglamb trailed on 1 of 4 attacking axes: 最大單波; behind on 1 non-axis column(s): 最高 B2B",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbage_attack"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbage_attack"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "apm_x1000"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "apm_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "pieces"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "pieces"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "pps_x1000"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "pps_x1000"
+     }
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "maxspike"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "maxspike"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "lines"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "lines"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "vs_x1000"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "vs_x1000"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbagesent"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbagesent"
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "garbage_cleared"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "garbage_cleared"
+     }
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "pinglamb",
+      "f": "topbtb"
+     },
+     "b": {
+      "e": "round",
+      "mi": 1,
+      "ri": 6,
+      "pl": "yachi",
+      "f": "topbtb"
+     }
+    }
+   ]
+  },
+  "id": "G075",
+  "python_check": "(facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack'] > facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['apm_x1000'] > facts['matches'][1]['rounds'][6]['players']['yachi']['apm_x1000']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['pieces'] > facts['matches'][1]['rounds'][6]['players']['yachi']['pieces']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['pps_x1000'] > facts['matches'][1]['rounds'][6]['players']['yachi']['pps_x1000']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['maxspike'] < facts['matches'][1]['rounds'][6]['players']['yachi']['maxspike']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['lines'] > facts['matches'][1]['rounds'][6]['players']['yachi']['lines']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000'] > facts['matches'][1]['rounds'][6]['players']['yachi']['vs_x1000']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbagesent'] > facts['matches'][1]['rounds'][6]['players']['yachi']['garbagesent']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared'] > facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared']) and (facts['matches'][1]['rounds'][6]['players']['pinglamb']['topbtb'] < facts['matches'][1]['rounds'][6]['players']['yachi']['topbtb'])"
+ },
+ {
+  "family": "intense_round_attack_rate",
+  "category": "pace",
+  "canto": "最癲嘅一局每粒棋嘅攻擊：pinglamb 約 0.788、yachi 約 0.713——pinglamb 高",
+  "english_gloss": "m2r7 attack per piece: pinglamb 0.788, yachi 0.713",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 1000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      }
+     },
+     "lo": 118988,
+     "hi": 119139
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 1000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_attack"
+      }
+     },
+     "lo": 101959,
+     "hi": 102102
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      },
+      "b": {
+       "e": "lit",
+       "v": 143
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_attack"
+      },
+      "b": {
+       "e": "lit",
+       "v": 151
+      }
+     }
+    }
+   ]
+  },
+  "id": "G076",
+  "python_check": "(facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (118988 <= (1000 * facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack']) < 119139) and (101959 <= (1000 * facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack']) < 102102) and ((facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack'] * 143) > (facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack'] * 151))"
+ },
+ {
+  "family": "intense_round_downstack_rate",
+  "category": "pace",
+  "canto": "最癲嘅一局每粒棋嘅清走：pinglamb 約 0.284、yachi 約 0.286——yachi 高",
+  "english_gloss": "m2r7 downstack per piece: pinglamb 0.284, yachi 0.286",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "round_winner",
+     "mi": 1,
+     "ri": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 1000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_cleared"
+      }
+     },
+     "lo": 42884,
+     "hi": 43035
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 1000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_cleared"
+      }
+     },
+     "lo": 40898,
+     "hi": 41041
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_cleared"
+      },
+      "b": {
+       "e": "lit",
+       "v": 143
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_cleared"
+      },
+      "b": {
+       "e": "lit",
+       "v": 151
+      }
+     }
+    }
+   ]
+  },
+  "id": "G077",
+  "python_check": "(facts['matches'][1]['rounds'][6]['winner']=='pinglamb') and (42884 <= (1000 * facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared']) < 43035) and (40898 <= (1000 * facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared']) < 41041) and ((facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared'] * 143) < (facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared'] * 151))"
+ },
+ {
+  "family": "intense_round_vs_split",
+  "category": "pace",
+  "canto": "最癲嘅一局 yachi 嘅 VS 拆得開兩邊：攻嗰邊約 101.6、清垃圾嗰邊約 40.8，兩邊加埋同佢實際 VS 約 142.5 相差唔夠 0.01",
+  "english_gloss": "m2r7 yachi VS splits into attack 101.6 + downstack 40.8, residual under 0.01",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "between",
+     "x": {
+      "e": "sub",
+      "a": {
+       "e": "mul",
+       "a": {
+        "e": "round",
+        "mi": 1,
+        "ri": 6,
+        "pl": "yachi",
+        "f": "vs_x1000"
+       },
+       "b": {
+        "e": "round",
+        "mi": 1,
+        "ri": 6,
+        "pl": "yachi",
+        "f": "finaltime_ms"
+       }
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "lit",
+        "v": 100000000
+       },
+       "b": {
+        "e": "add",
+        "a": {
+         "e": "round",
+         "mi": 1,
+         "ri": 6,
+         "pl": "yachi",
+         "f": "garbage_attack"
+        },
+        "b": {
+         "e": "round",
+         "mi": 1,
+         "ri": 6,
+         "pl": "yachi",
+         "f": "garbage_cleared"
+        }
+       }
+      }
+     },
+     "lo": -399316,
+     "hi": 399317
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100000000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_attack"
+      }
+     },
+     "lo": 10199912373,
+     "hi": 10200012676
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100000000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "yachi",
+       "f": "garbage_cleared"
+      }
+     },
+     "lo": 4099985428,
+     "hi": 4100085731
+    }
+   ]
+  },
+  "id": "G078",
+  "python_check": "(-399316 <= ((facts['matches'][1]['rounds'][6]['players']['yachi']['vs_x1000'] * facts['matches'][1]['rounds'][6]['players']['yachi']['finaltime_ms']) - (100000000 * (facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack'] + facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared']))) < 399317) and (10199912373 <= (100000000 * facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_attack']) < 10200012676) and (4099985428 <= (100000000 * facts['matches'][1]['rounds'][6]['players']['yachi']['garbage_cleared']) < 4100085731)"
+ },
+ {
+  "family": "intense_round_vs_split",
+  "category": "pace",
+  "canto": "最癲嘅一局 pinglamb 嘅 VS 拆得開兩邊：攻嗰邊約 119.0、清垃圾嗰邊約 43.0，兩邊加埋同佢實際 VS 約 162.0 相差唔夠 0.01",
+  "english_gloss": "m2r7 pinglamb VS splits into attack 119.0 + downstack 43.0, residual under 0.01",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "between",
+     "x": {
+      "e": "sub",
+      "a": {
+       "e": "mul",
+       "a": {
+        "e": "round",
+        "mi": 1,
+        "ri": 6,
+        "pl": "pinglamb",
+        "f": "vs_x1000"
+       },
+       "b": {
+        "e": "round",
+        "mi": 1,
+        "ri": 6,
+        "pl": "pinglamb",
+        "f": "finaltime_ms"
+       }
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "lit",
+        "v": 100000000
+       },
+       "b": {
+        "e": "add",
+        "a": {
+         "e": "round",
+         "mi": 1,
+         "ri": 6,
+         "pl": "pinglamb",
+         "f": "garbage_attack"
+        },
+        "b": {
+         "e": "round",
+         "mi": 1,
+         "ri": 6,
+         "pl": "pinglamb",
+         "f": "garbage_cleared"
+        }
+       }
+      }
+     },
+     "lo": -54459,
+     "hi": 54460
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100000000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      }
+     },
+     "lo": 11899976660,
+     "hi": 11900076643
+    },
+    {
+     "p": "between",
+     "x": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100000000
+      },
+      "b": {
+       "e": "round",
+       "mi": 1,
+       "ri": 6,
+       "pl": "pinglamb",
+       "f": "garbage_cleared"
+      }
+     },
+     "lo": 4299968881,
+     "hi": 4300068864
+    }
+   ]
+  },
+  "id": "G079",
+  "python_check": "(-54459 <= ((facts['matches'][1]['rounds'][6]['players']['pinglamb']['vs_x1000'] * facts['matches'][1]['rounds'][6]['players']['pinglamb']['finaltime_ms']) - (100000000 * (facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack'] + facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared']))) < 54460) and (11899976660 <= (100000000 * facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_attack']) < 11900076643) and (4299968881 <= (100000000 * facts['matches'][1]['rounds'][6]['players']['pinglamb']['garbage_cleared']) < 4300068864)"
+ }
+]

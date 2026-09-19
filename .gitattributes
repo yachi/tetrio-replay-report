@@ -24,3 +24,12 @@ spec/fixtures/jp-forecast/*.jpg binary linguist-vendored
 pipeline/sim/jp-forecast-boards.json linguist-generated -diff
 # four.lol forecast boards, decoded from the committed fumen codes — machine data.
 pipeline/sim/four-forecast-boards.json linguist-generated -diff
+
+# The filtered-subset artefact under subsets/ is machine-generated exactly as a session's
+# is; it lives outside sessions/ only so corpus sweeps do not count it (see
+# .github/workflows/verify.yml). Same treatment, same reasons.
+subsets/*/report/dafny/*.dfy linguist-generated
+subsets/**/facts*.json linguist-generated
+subsets/**/facts*.json -diff
+subsets/**/report*.html linguist-generated
+subsets/*/report/claims.smt2 linguist-generated

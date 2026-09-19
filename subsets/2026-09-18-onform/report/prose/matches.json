@@ -1,0 +1,25 @@
+{
+  "eyebrow": "戰況直擊 · 三場",
+  "title": "篩選出嚟嘅三場",
+  "lede": "三場都係 first-to-5（<b>G003</b>），三場都係 <span class=\"hl-p\">pinglamb</span> 贏（<b>G001</b>），24 局入面佢攞 15 局、<span class=\"hl-y\">yachi</span> 攞 9 局（<b>G002</b>）。揀場嘅條件係兩邊嘅 VS 都高，唔係邊個贏，所以呢個 3:0 唔好當係實力差距讀。",
+  "closer": "三場入面淨係第 1 場拖到最後一局先分勝負（<b>G007</b>），嗰局 <span class=\"hl-p\">pinglamb</span> VS 106.6 對 <span class=\"hl-y\">yachi</span> 85.2（<b>G054</b>）——呢個就係「兩邊都喺狀態」嘅場，分勝負嗰下仍然可以爭好遠。",
+  "hero_match": 2,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "第 1 場 — 原本嗰晚嘅 m1",
+      "flag": "拖到最後一局",
+      "body": "<code>replay-2026-09-18-01.ttrm</code>。<span class=\"hl-p\">pinglamb</span> 5:4 贏（<b>G004</b>），三場入面淨係呢場入到決勝局（<b>G007</b>）。全場最短嗰局都喺呢場，m1r4，14364 毫秒，<span class=\"hl-y\">yachi</span> 贏（<b>G017</b>）。"
+    },
+    "2": {
+      "title": "第 2 場 — 原本嗰晚嘅 m3",
+      "flag": "子集最勁嗰局",
+      "body": "<code>replay-2026-09-18-03.ttrm</code>。<span class=\"hl-p\">pinglamb</span> 5:3（<b>G005</b>）。打足 60 秒嘅局入面，最高合併 VS 就喺呢場嘅 m2r7，304.5，<span class=\"hl-p\">pinglamb</span> 贏（<b>G055</b>）；同一局亦都係子集最高 VS（<b>G010</b>）同最高 APM（<b>G009</b>）。最長嗰局 m2r4 都喺呢場，190294 毫秒（<b>G016</b>）。"
+    },
+    "3": {
+      "title": "第 3 場 — 原本嗰晚嘅 m5",
+      "flag": "最大逆轉",
+      "body": "<code>replay-2026-09-18-05.ttrm</code>。<span class=\"hl-p\">pinglamb</span> 5:2（<b>G006</b>），佢喺呢場打出子集最高 maxspike 18（<b>G011</b>）同最高 topbtb 8（<b>G013</b>）。m3r5 係最大逆轉：贏嗰個食咗 50 行排隊攻擊，輸嗰個得 41（<b>G020</b>）。"
+    }
+  }
+}
