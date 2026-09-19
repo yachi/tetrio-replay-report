@@ -508,6 +508,23 @@ quantity gets ONE home in this document, and a second copy is a defect on sight,
 copies are currently correct.** The second copy is what makes the first unfalsifiable by reading:
 a reader who checks one has no reason to suspect the other exists.
 
+**A third arrived in the same pass and it is the sharpest instance the class has, because it sat
+one line from a GATED fragment and survived four sessions anyway.** README.md and ROADMAP.md each
+close the equiv-coverage section with 「a floor all eight pass would sit at 60%」. 「Eight」 was the
+session COUNT, written on 2026-08-25 when there were eight; the sentence directly above it carries
+`equiv:gate-count`, which is rendered and byte-compared on every push and has since moved
+eight → nine → … → **nine of the twelve**. So a marked fragment and an unmarked number sat in
+adjacent lines, both saying 「eight」 for one session, and then only one of them moved. Four
+sessions passed. **2026-09-12's pass was specifically hunting this class and did not find it** —
+which is the point worth keeping, not the fix.
+
+Two things this adds. **The gated neighbour is what hid it**: 「eight」 beside a green fragment
+reads as checked, and the rule 「when a marked fragment's value changes, re-read the whole
+paragraph」 was written for exactly this and still needs a human to run it. And **the number was
+not a summary of anything** — it is a session count, so it belongs to the class the previous
+bullet names: re-derive 「N of M」 from the corpus, never carry it, and that applies to an M
+standing alone just as much as to the N in front of it.
+
 ## Data semantics that cost real debugging
 
 - `lifetime` is **milliseconds**, not frames (verify via `pieces / pps`; 60 fps is ~15× off).
@@ -1245,17 +1262,17 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**.
 
-**07-28 is not the exception — <!--equiv:sf-match-->eight of the eleven<!--/equiv:sf-match--> measured sessions lose coverage
+**07-28 is not the exception — <!--equiv:sf-match-->nine of the twelve<!--/equiv:sf-match--> measured sessions lose coverage
 to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
-08-19 C007). **That count used to be at `match` granularity only, and `match` used to be the only
-reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but loses R018 at
-`round`, so for nine sessions the `round` count was every session measured. At eleven it is
-**<!--equiv:sf-round-->nine of the eleven<!--/equiv:sf-round-->**, because 2026-09-10 and
-2026-09-11 both lose nothing at EITHER granularity — 13 of 16 and 12 of 15 at all three, the same
-covered set each time.
+08-19 C007, **09-17 C007**). **That count used to be at `match` granularity only, and `match` used
+to be the only reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but
+loses R018 at `round`, so for nine sessions the `round` count was every session measured. At twelve
+it is **<!--equiv:sf-round-->ten of the twelve<!--/equiv:sf-round-->**, because 2026-09-10 and
+2026-09-11 remain the only two that lose nothing at EITHER granularity — 13 of 16 and 12 of 15 at
+all three, the same covered set each time.
 Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
 was measured on — check which one a count came from before carrying it forward.
 
@@ -1278,6 +1295,16 @@ the regime and route claims, so the second family finds them; 09-10's and 09-11'
 in one claim a generated family already implies. Nothing about the second family changed — what
 changed is where a hand-written ledger puts its windows, which is an authoring choice and not a
 measurement. Read the exemption as a fact about the ledger, never about the session.
+
+**2026-09-17 is the test that explanation needed, and it passes.** That ledger holds C010 exactly
+as 09-11's does — one windowed claim, already implied at single value — so on a reading where the
+exemption were about the session it would be exempt too. It is not: it drops from 13 to 12, and
+**the claim it loses is C007**, the per-match separation. C007 is the only claim this ledger adds
+beyond 09-11's shape, and per-match is precisely what the second family can falsify and
+single-value cannot. So the mechanism is confirmed by the one session that could have refuted it:
+what decides the exemption is whether the ledger holds a windowed claim a generated family does
+NOT already imply, and nothing else. It also prices the authoring choice — minting C007 is what
+cost the point, and it was worth it.
 `sum_round_range` arrived at 07-28 and every session since uses it, so a single-value figure
 published alone is blind to exactly the headline claims. `check_equiv_coverage.py` fails the
 build if one is published without its two-site companion for a session holding windowed claims.
