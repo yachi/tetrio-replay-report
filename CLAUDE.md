@@ -732,11 +732,13 @@ the tenth of the thirteen below chance. **Nothing else takes a corpus extreme, a
 that is the most informative thing on the row**: every earlier session's extremes sit on 46-84
 rounds, so a night three times the size landing mid-column everywhere is evidence that those
 extremes were sample size. Two columns are worth naming for what they do downstream rather than
-for their rank. **APM 92.0 and 攻 92.7 are the lowest and second-lowest of the thirteen**, which
-is the only place this session is near a boundary, and both are within a point of 08-25's and
-08-14's. **PC 54.0 over 26 decided pairs** is the largest decided count any session has
-contributed to that column — 09-11's 16 was the previous most — and it is what moves the pooled
-row below across its correction threshold for the first time.
+for their rank. APM 92.0 and 攻 92.7 are both **fourth-lowest of the thirteen** — a first draft of
+this sentence called them the lowest and second-lowest, which is wrong by three places on each:
+08-25 (90.4/90.4), 08-14 (90.5/91.1) and 08-01 (90.6/90.6) are all below. So this session is not
+near a boundary anywhere, which strengthens rather than weakens the paragraph above.
+**PC 54.0 over 26 decided pairs** is the largest decided count any session has
+contributed to that column — the previous most was 16, shared by 07-22, 08-14 and 09-11 — and it
+is what moves the pooled row below across its correction threshold for the first time.
 
 **Two of the 129-round block's "no signal" entries are false at 884 rounds, and the fault is
 provenance, not arithmetic.** COMBO 45.0 and TST 55.8 were measured on the FIRST TWO SESSIONS
