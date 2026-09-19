@@ -27,6 +27,23 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 DOCS = REPO / "docs"
 SESSIONS = REPO / "sessions"
+# A FILTERED SUBSET is published like a session but is NOT one. It lives outside
+# `sessions/` because `analysis/stat_sources.py` globs `sessions/*/*.ttrm` and
+# `pipeline/corpus-membership.ts` calls any directory holding replays a session, so a
+# subset placed there would join every corpus-wide figure. Publishing it here therefore
+# needs a second root — and its corpus membership is DERIVED from which root it sits in
+# (`_root`), never from a list of exceptions, because a hand-kept exception list is what
+# goes stale in the direction that reads green.
+SUBSETS = REPO / "subsets"
+ROOTS = (SESSIONS, SUBSETS)
+
+
+def _root(session):
+    """The root `session` lives under. Subsets are excluded from the corpus totals."""
+    for r in ROOTS:
+        if (r / session).is_dir():
+            return r
+    return SESSIONS
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled  # noqa: E402  (needs REPO on the path first)
@@ -72,6 +89,10 @@ ARTEFACTS = [
      "七場 series、51 局，全 corpus 最一面倒：1 比 6、19 比 32，頭四場已經 8 比 20。"),
     ("2026-09-17", "report", "2026-09-17.html", "完整戰報",
      "七場 series、49 局：2 比 5，但打完頭三場逐局係 14 比 10，yachi 領先。"),
+    ("2026-09-18-onform", "report", "2026-09-18-onform.html", "篩選子集 · 唔係當晚戰報",
+     "2026-09-18 嗰 18 場入面揀出嚟嘅 3 場：兩個人嘅每場 VS 都高過自己喺之前十二個 session "
+     "嘅中位數。下面個 0:3 係呢三場嘅比數，唔係當晚嘅——當晚 18 場係 pinglamb 11:7。"
+     "唔計入上面嘅 session／match／局數總數。"),
 ]
 
 
@@ -87,7 +108,7 @@ def proof_map_rows(path):
 
 def summarize(session, artefact):
     """Derive the headline numbers straight from the session's own data."""
-    base = SESSIONS / session / artefact
+    base = _root(session) / session / artefact
     facts_file = next(
         (p for p in sorted(base.glob("facts*.json")) if not p.name.startswith("facts2")), None
     )
@@ -251,7 +272,7 @@ def main(argv=None):
     # covers the four ways this table can look complete and not be — on disk but unpublished,
     # published but not on disk, listed twice, and published with no report.html behind it.
     arts = {d.name: (d / "report" / "report.html" if (d / "report" / "report.html").exists() else None)
-            for d in sorted(SESSIONS.glob("*")) if d.is_dir()}
+            for r in ROOTS for d in sorted(r.glob("*")) if d.is_dir()}
     problems = docs_gate.row_membership(
         "bin/build-docs", [a[0] for a in ARTEFACTS], arts, "report.html", noun="report")
     if problems:
@@ -263,7 +284,7 @@ def main(argv=None):
     # that: the `continue` that used to stand here dropped the session from the page and from
     # `totals`, so a --check run compared a smaller site against itself and printed ok.
     for session, artefact, out_name, label, blurb in ARTEFACTS:
-        src = SESSIONS / session / artefact / "report.html"
+        src = _root(session) / session / artefact / "report.html"
         summary = summarize(session, artefact)
         # The same rule one level down, and the last skip in this loop. `row_membership` keys on
         # report.html, so a session whose facts.json is missing gets past it and used to `continue`
@@ -285,12 +306,17 @@ def main(argv=None):
             {"href": out_name, "date": session, "label": label,
              "blurb": blurb, "summary": summary}
         )
-        totals["claims"] += summary["claims"]
-        if session not in seen_sessions:
-            seen_sessions.add(session)
-            totals["sessions"] += 1
-            totals["matches"] += summary["matches"]
-            totals["rounds"] += summary["rounds"]
+        # A subset gets a card but never a row in the corpus totals: its rounds are a
+        # RE-CUT of a night, so adding them would publish a count of matches and rounds
+        # that were never played. Derived from the root, so a new subset is excluded by
+        # where it sits rather than by being remembered here.
+        if _root(session) is SESSIONS:
+            totals["claims"] += summary["claims"]
+            if session not in seen_sessions:
+                seen_sessions.add(session)
+                totals["sessions"] += 1
+                totals["matches"] += summary["matches"]
+                totals["rounds"] += summary["rounds"]
         if not check:
             print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
 
