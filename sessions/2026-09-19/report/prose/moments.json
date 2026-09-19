@@ -1,0 +1,30 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：一個唔再出現嘅樣、一個要換軸嘅發現、同一對唔可以照讀嘅紀錄",
+  "cards": [
+    {
+      "accent": "g",
+      "label": "兩邊 REGIME 返返中間",
+      "value": "+5.84% / +6.39%",
+      "body": "上一晚（09-17）係 corpus 第一次兩邊 regime 一齊拉大——贏嗰邊排第二、輸嗰邊排第三。當時寫低咗一句：一晚唔算一類，要睇第十三晚。<strong>第十三晚就係今晚，而佢冇重複到。</strong>贏嗰啲局爭 5.84%、輸嗰啲局爭 6.39%<span class=\"badge\" data-claim=\"C002\"></span>，擺返落自己嗰欄排係第十同第七（中位數）——即係兩個都喺中位數或者以下，同 07-24、07-28、08-01 一類。而今晚有 150 局，係呢一類歷來最有份量嗰次：同一個讀法喺 46 局度出，就淨係一個小樣本。"
+    },
+    {
+      "accent": "y",
+      "label": "一個度錯咗嘅軸",
+      "value": "ρ 0.923 → 0.995",
+      "body": "CLAUDE.md 有一張表，用「shortfall」（個窿減返粒數盈餘買到嘅）去排「攻擊差幾多條」。<strong>個 x 軸係比率，個 y 軸係條數——即係一個會跟住 session 長短一齊大嘅數。</strong>十二晚全部喺 46 到 84 局之間，差唔夠 1.8 倍，所以兩個讀法排出嚟一樣，冇人分得開。今晚 150 局，係最大嗰晚嘅 1.79 倍、最細嗰晚嘅 3.26 倍。用條數排：今晚應該喺 −120 同 −236 之間，實際 −476<span class=\"badge\" data-claim=\"C005\"></span>，成張表一次多咗四對排錯。用比率排：應該喺 −4.38% 同 −6.13% 之間，實際 −5.36%，啱啱好落格。而且比率嗰個版本喺九、十、十一晚嗰陣本來就零個排錯——即係話文件一路歸咎 09-03 嘅嗰個「排錯咗」，由頭到尾都唔係 09-03，係個軸。"
+    },
+    {
+      "accent": "p",
+      "label": "兩個唔可以照讀嘅紀錄",
+      "value": "714 粒 / 15 次",
+      "body": "今晚有兩個「歷來最大」，兩個都係假嘅。yachi 多疊 714 粒方塊、少打 476 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>，係呢條路歷來最大嘅一對數字；換返做比率，476 條即係 pinglamb 總攻擊嘅 5.36%，十三晚排第五。佢頂爆咗 15 次<span class=\"badge\" data-claim=\"C006\"></span>，係單一個人歷來最多；但 15 除以 150 局係一成，反而低過 08-14 嗰十一次除八十四局嘅 13%。<strong>兩個紀錄講嘅都係今晚幾長，唔係今晚打成點。</strong>"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m5 第六局，兩邊 VS 加埋約 305.7<span class=\"badge\" data-claim=\"G075\"></span>。yachi 贏咗，而且<strong>一條軸都冇輸</strong><span class=\"badge\" data-claim=\"G097\"></span>——佢每粒方塊攻擊 0.909 對 0.697<span class=\"badge\" data-claim=\"G098\"></span>，淨係喺「清走」呢個唔算軸嘅格輸蝕。",
+    "全晚最長嗰局係 m18 第二局，打咗約 258 秒<span class=\"badge\" data-claim=\"G034\"></span>，亦係單局清行最多嘅一局（236 行）<span class=\"badge\" data-claim=\"G033\"></span>——最後係 pinglamb 生還。最短嗰局 m19 第九局得約 11 秒<span class=\"badge\" data-claim=\"G035\"></span>。",
+    "32 個 All Clear（pinglamb 18、yachi 14）<span class=\"badge\" data-claim=\"G050\"></span>，但全消一路都唔係贏局嘅指標：全場 25 局係得一個人做到全消，嗰個人輸咗 7 局<span class=\"badge\" data-claim=\"G092\"></span><span class=\"badge\" data-claim=\"G094\"></span>。",
+    "yachi 嘅 KPP 高過 pinglamb 1.05%<span class=\"badge\" data-claim=\"C008\"></span>——上一晚啱啱掉轉。呢一欄近四晚反咗三次，係一晚嘅狀態，唔係邊個嘅特徵。"
+  ]
+}

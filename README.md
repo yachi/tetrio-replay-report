@@ -22,6 +22,7 @@ formal claim, and proved with [Dafny](https://dafny.org).
 | [2026-09-10](sessions/2026-09-10) | yachi 4 : 4 pinglamb | 65 over 8 matches | 103 |
 | [2026-09-11](sessions/2026-09-11) | yachi 1 : 6 pinglamb | 51 over 7 matches | 98 |
 | [2026-09-17](sessions/2026-09-17) | yachi 2 : 5 pinglamb | 49 over 7 matches | 103 |
+| [2026-09-19](sessions/2026-09-19) | yachi 5 : 15 pinglamb | 150 over 20 matches | 130 |
 
 **Two things about that last column.** It is `claims-proof-map.json`'s row count, i.e. what
 `dafny verify` actually certified for that session — not a target and not comparable across
@@ -208,6 +209,7 @@ unless it is:
 | 2026-09-10 | 13 of 16 testable — **81%** | 13 of 16 — **81%** | 13 of 16 — **81%** |
 | 2026-09-11 | 12 of 15 testable — **80%** | 12 of 15 — **80%** | 12 of 15 — **80%** |
 | 2026-09-17 | 13 of 16 testable — **81%** | 12 of 16 — **75%** | 12 of 16 — **75%** |
+| 2026-09-19 | 25 of 28 testable — **89%** | 25 of 28 — **89%** | 25 of 28 — **89%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -218,12 +220,18 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->nine of the twelve<!--/equiv:gate-count-->
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->nine of the thirteen<!--/equiv:gate-count-->
 rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11 and 09-17<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
-twelve pass would sit at 60% and bless that session's artefact by definition. The gate compares
+thirteen pass would sit at 60% and bless that session's artefact by definition. The gate compares
 **verdict sets**, not a percentage.
+
+(That 「a floor all N pass」 sentence is the one CLAUDE.md's 冇第二份 section names as having read
+「eight」 for four sessions while the gated fragment one line above it moved every session. It is a
+session COUNT sitting beside a marked fragment, which is exactly the camouflage the section
+describes — so it is re-derived from the table above on every pass, never carried, and the same
+correction is made in ROADMAP.md's copy of the sentence at the same time.)
 
 **2026-07-28's 100% was an artefact, and the second family is what shows it.** Its hand
 claims are *windowed* — they compare matches 1-2 against matches 3-8 — and every window sum

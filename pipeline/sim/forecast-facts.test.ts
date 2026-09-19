@@ -89,6 +89,27 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // 288 scorable T-spins), which is the first time that has happened. Five sessions running with
   // no `path_opened`, and the corpus count is still 2.
   '2026-09-17': { yachi: 0, pinglamb: 0 },
+  // THE RUN ENDS AT FIVE. One of yachi's, in the corpus's largest session — so the corpus-wide
+  // `path_opened` count goes 2 -> 3 and it is no longer entirely 08-19's, though it IS still
+  // entirely yachi's across 08-14, 08-19 and 09-19 (08-09's one belongs to pinglamb and predates
+  // the bucket's own naming; see the two comments above, which disagree with each other about
+  // whether the corpus count includes it — the pins below are the answer, the comments are not).
+  //
+  // This session is also the corpus's only non-zero `unattributed`, and that entry is NOT a new
+  // class of play: `localiseMechanism` now returns `unattributed` when two locks share a frame,
+  // because `boards[]` is indexed per lock and snapshotted per frame, so the step holds two
+  // placements and 「which edit raised availability」 has no answer inside the model. Exactly one
+  // step in the corpus is both same-frame and on a walk this function takes, and it is here.
+  '2026-09-19': { yachi: 1, pinglamb: 0 },
+};
+
+/** `unattributed` per session and player — the bucket that was identically zero until 2026-09-19.
+ *
+ *  Same idiom and the same reason as PATH_OPENED above: a named table, so a value the data does
+ *  not support fails from either side and a SECOND event has to be investigated rather than
+ *  absorbed into a `<= 1`. The single entry's cause is documented at the assertion that reads it. */
+const UNATTRIBUTED: Record<string, Record<string, number>> = {
+  '2026-09-19': { yachi: 1 },
 };
 
 // The reciprocal, and it cannot be folded into the per-artefact loop below: that loop only visits
@@ -340,10 +361,26 @@ for (const PATH of ARTEFACTS) {
       // `forecast_total` was 0 either way. What moved is the `self_built` count the report prints as
       // 「玩家自己落嗰隻棋整出嚟」 — a gloss that was false for the 08-09 event.
       //
-      // 0 UNCONDITIONALLY, AND THE FIELD STAYS EMITTED. A counter that is identically zero is not a
-      // dead field: it is the model saying it can still explain everything it sees, and the next gap
-      // is what it is for. Deleting it would delete the only thing that can announce one.
-      expect([SESSION, p.user, p.unattributed]).toEqual([SESSION, p.user, 0]);
+      // IT WAS 0 UNCONDITIONALLY UNTIL 2026-09-19, AND THE FIELD EARNED ITS KEEP BY GOING TO 1.
+      // The sentence that stood here said 「a counter that is identically zero is not a dead field:
+      // it is the model saying it can still explain everything it sees, and the next gap is what it
+      // is for」. The next gap arrived, this assertion is what announced it, and the unconditional
+      // 0 is replaced by a NAMED table rather than by a bound — a second event has to be looked at.
+      //
+      // The one entry is not a new class of play. `boards[]` is indexed per LOCK but snapshotted
+      // per FRAME, so when two locks share a frame the snapshot after the first already contains
+      // the second, and the step model — place one piece, clear, snapshot — is not what happened.
+      // `localiseMechanism` reconstructs the whole same-frame run, still asserts it against
+      // `boards[t]` (so the model keeps its teeth), and then returns `unattributed`, because a step
+      // holding two placements has no answer to 「which edit raised availability」 and crediting one
+      // of them would be the confidently-wrong verdict the 08-09 case above is about.
+      //
+      // The phenomenon is old: 24 extra same-frame locks over 23 player-rounds of 8 sessions,
+      // 15 of them inside a verified prefix, and all 24 yachi's. What is new is that one of them finally
+      // lies on a walk this function takes — which is why re-emitting every earlier session's
+      // artefact after the change produced byte-identical files. A dormant assertion is not an
+      // absent one, and this is the same lesson the 08-09 entry above records from the other side.
+      expect([SESSION, p.user, p.unattributed]).toEqual([SESSION, p.user, UNATTRIBUTED[SESSION]?.[p.user] ?? 0]);
       expect(p.verified_placements).toBeLessThanOrEqual(p.total_placements);
       for (const k of ['forecast_rate_x1000','sampling_ci95_lo_x1000','sampling_ci95_hi_x1000'])
         expect(Number.isInteger(p[k])).toBe(true);

@@ -121,7 +121,23 @@ def r_stats():
         "sd_ratio": fmt.ratio1(sd_short, sd_long),
         "sd_ratio_exact": vs["sd_short"] / vs["sd_long"],
         "mean_ratio": vs["mean_long"] / vs["mean_short"],
+        # BOTH halves of the fraction, because the footnote quotes a share and not a total.
+        # It read `n` alone and called it 「全部 N 項」 from 2026-07 until 2026-09-19 — i.e.
+        # it published the DENOMINATOR under the word 「all」. That was true while every
+        # unqualified record sat in the shortest quartile and became false on 2026-08-25,
+        # when 08-25's VS record (45.5 s) did not. CLAUDE.md's own copy of the sentence was
+        # corrected that day to 「35 of the 36」 and this one was not, so five sessions of
+        # reports shipped an absolute the artefact beside them already refuted.
+        #
+        # Nothing could catch it: the number IS read from the artefact, so the figure looked
+        # gated; it was the wrong FIELD, and the word next to it was hardcoded prose that no
+        # gate reads. `check_prose_figures` resolves figures against facts.json and 39 is a
+        # real value there; `check_rate_records` gates CLAUDE.md's fragments and not this
+        # generated region. The repair is to render the fraction unconditionally — 「N 項之中
+        # 有 M 項」 stays true at M == N, so the sentence can never again encode an absolute
+        # that the data has to keep earning.
         "n_records": art["records"]["n"],
+        "n_records_in_quartile": art["records"]["in_shortest_quartile"],
     }
 
 
@@ -325,6 +341,7 @@ def build(facts, report_dir):
     # what the unqualified argmax does, and pps is an unqualified argmax too. Read out
     # of the artefact so it cannot disagree with the run that produced the p-value.
     n_rate_records = r["n_records"]
+    n_in_quartile = r["n_records_in_quartile"]
     sd_short, sd_long, sd_ratio = r["sd_short"], r["sd_long"], r["sd_ratio"]
     t_short, t_long = r["t_short"], r["t_long"]
     mean_short, mean_long = r["mean_short"], r["mean_long"]
@@ -338,8 +355,8 @@ def build(facts, report_dir):
                f'同一段路平均數反而由 {mean_short} 升到 {mean_long}，'
                '即係短局唔止唔係打得好啲，'
                '仲要係量得唔準好多。'
-               f'未設限之前，{_cn(n_sessions)}個 session 全部 {n_rate_records} 項速率紀錄'
-               '都落喺最短嗰四分一嘅局度。'
+               f'未設限之前，{_cn(n_sessions)}個 session 嗰 {n_rate_records} 項速率紀錄'
+               f'入面，有 {n_in_quartile} 項落喺該場 session 最短嗰四分一嘅局度。'
                '<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>'
                '——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>')
     if skipped:

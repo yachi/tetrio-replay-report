@@ -180,22 +180,25 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-10 | 13/16 testable = **81%** | 13/16 = **81%** | 13/16 = **81%** | 2 |
 | 2026-09-11 | 12/15 testable = **80%** | 12/15 = **80%** | 12/15 = **80%** | 2 |
 | 2026-09-17 | 13/16 testable = **81%** | 12/16 = **75%** | 12/16 = **75%** | 2 |
+| 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the twelve<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the thirteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all twelve pass would sit at 60%.
+2026-07-28, and a floor all thirteen pass would sit at 60%. (The session count in that clause is
+the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
+the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the twelve<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the twelve<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the thirteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the thirteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3924,6 +3927,108 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 第十三個 session：一晚夠大，照出一條度錯咗嘅軸 (2026-09-19)
+
+2026-09-19 落地(**20 場、150 局、pinglamb 15 比 5**)。呢晚係全 corpus 最大嘅一晚 —— 局數係
+之前最大嗰晚(08-14 嘅 84)嘅 1.79 倍、最細嗰晚(09-03 嘅 46)嘅 3.26 倍,一晚就佔咗歷來所有
+局數嘅 17%,而 corpus 由 734 局去到 884 局。
+
+**個比數係最唔緊要嗰部分。** 91 比 59 即係 60.67% 嘅局,喺 corpus 排**第三**(09-11 62.75%、
+09-17 61.22%);場數 75.00% 同 07-28 並列**第四**(08-09 100%、09-11 85.71%、09-03 83.33%),
+即係兩個量度都唔係最一面倒,而且兩個都唔係差少少。
+
+(呢兩個位第一稿寫咗「第二」同「第三」——兩個都係憑印象寫,冇對返隔籬張表。呢個正正係
+CLAUDE.md 自己講嘅第八類 冇第二份:一個 count 擺喺一份自己已經有齊數據嘅文件入面,睇落似
+係喺總結佢,其實冇人對過。改法唔係改個數字,係每次都由表度數返。)C002 兩個
+regime gap 都返返自己嗰欄嘅中間(第十同第七,第七即中位數),即係 09-17 嗰個「兩邊一齊大」
+**冇重複到**,佢照舊係一個 instance。
+
+### 1. 個 shortfall ordering 個 y 軸一直係「條數」,唔係「比率」
+
+CLAUDE.md 有一張表,用 shortfall(個窿減返粒數盈餘買到嘅,單位係百分點)去排「攻擊差幾多」。
+**個 x 軸係比率,個 y 軸一直係 raw lines —— 一個會跟住 session 長短一齊大嘅數。**
+
+十二個 session 全部喺 46 到 84 局之間,差唔夠 1.8 倍,所以兩個讀法排出嚟一模一樣,冇人分得開。
+今晚 150 局就分得開:
+
+| y 軸 | ρ@12 | ρ@13 | discordant pairs @ 9/10/11/12/13 |
+|---|---|---|---|
+| raw lines | 0.9720 | **0.9231** | 2 · 2 · 2 · 3 · **7** |
+| % of pinglamb's attack | 0.9930 | **0.9945** | 0 · 0 · 0 · 1 · **1** |
+
+用條數排,今晚應該落 −120 同 −236 之間,實際 −476,一次多咗四對排錯;用比率排,應該落 −4.38%
+同 −6.13% 之間,實際 −5.36%,啱啱好落格。Exact permutation p(13! 全枚舉,subset DP)分別係
+**2.4e-05** 同 **4.2e-09**。
+
+**四樣嘢要分清楚,因為好易寫成「再 fit 過」:**
+
+1. 呢個係**單位改正**,唔係 re-fit。x 軸係兩個 rate 嘅比,y 軸就一定要係 rate;而嗰個百分比
+   **本來就已經寫喺每個 raw 數字隔籬**,同一段文入面。
+2. **佢喺舊數據上面本來就已經好過。** 比率嗰個版本喺九、十、十一個 session 之下係**零個**
+   discordant pair,而條數嗰個已經有兩對。即係話呢個改進唔係今晚買返嚟嘅,今晚淨係令佢大到
+   睇得出。
+3. **09-03 從來冇 miss 過個位 —— miss 嘅係個軸。** 呢份文件四個版本一直寫住「the perfect
+   ordering is broken」同「one session out of place」,而佢點名嗰個 session 就係 corpus 最短
+   嗰個(46 局),佢個 raw attack difference 細係因為佢短。喺比率軸上面佢啱啱好落返自己個位,
+   即係話個 ordering 去到十一個 session 都仲係完美嘅。呢個更正係**喺原地劃走**,唔係淨係喺
+   新一節度寫 —— 跟返呢個 repo 自己嗰條「closing a ROADMAP item means striking it AT ITS
+   ORIGINAL SITE」。
+4. 剩返嗰一對 discordant 係 08-09 / 09-17,兩者喺 x 軸上面相差 0.03 pp,份文件本來就已經寫咗
+   呢個量度分唔開咁細嘅距離。兩個軸都係同一對,啱晒 —— 一個真正嘅解析度極限唔會理你用邊個單位。
+
+**呢個 repo 本來就有呢條規矩,只係喺另一層執行。**「Windows of different sizes must be
+compared as cross-multiplied rates, never as raw sums」寫咗喺 windowed-claims 嗰節,講緊一個
+session **入面**嘅 claim。呢張表比較嘅係唔同大細嘅 window —— 成個 session —— 而用咗 raw sum。
+**一條喺某個 scope 寫低咗嘅規矩,唔會自動喺另一個 scope 被執行**,而呢個 repo 冇嘢讀得明 prose。
+
+### 2. 兩個「歷來最大」,兩個都係假嘅
+
+同一個陷阱喺今晚出咗三次,兩次喺 session 入面:
+
+* yachi 多疊 **714 粒**、少打 **476 條**攻擊[C005] —— 兩個都係呢條路歷來最大嘅數字,
+  兩個都係因為今晚最長。換做比率,476 條即係 pinglamb 總攻擊嘅 **5.36%**,十三晚排第五。
+* 佢頂爆咗 **15 次**[C006] —— 單一個人歷來最多,過咗 08-14 嘅 11 次。但 15 除 150 局係
+  **10.0%**,反而低過 08-14 嗰 11 除 84 局嘅 13.1%。個 raw record 同個 rate 講緊相反嘅嘢。
+
+所以 C005 特登連個百分比一齊釘住,唔淨係釘兩個 count;C006 釘 count,而個 rate 由 report
+嘅文字孭。
+
+### 3. 順手照出嘅四樣嘢
+
+* **報告個 footnote 讀錯咗 artefact 嘅欄。** `records.py` 攞 `art["records"]["n"]`(**分母**)
+  去印「全部 N 項速率紀錄都落喺最短嗰四分一」。真正個分子係 `in_shortest_quartile`,而由
+  2026-08-25(08-25 個 VS 紀錄係第一個唔喺最短四分一嗰個)開始,呢句就已經係假嘅 —— 五個
+  session 嘅 report 一路出住一句 artefact 自己隔籬就否定咗嘅 absolute。CLAUDE.md 嗰邊嗰句
+  當日改咗做「35 of the 36」,report 呢邊冇。冇 gate 捉得到:個數**係**由 artefact 讀嘅,所以
+  睇落有 gate,錯嘅係讀錯欄,而隔籬個「全部」係 hardcode 嘅字,冇 gate 讀。而家無條件印
+  「N 項之中有 M 項」,M == N 都啱,所以以後唔會再變成一個要靠數據一路守住嘅 absolute。
+* **`localiseMechanism` 撞到兩個 lock 同一個 frame。** `boards[]` 係逐個 lock index,但係逐個
+  frame 影相,所以兩個 lock 同 frame 嗰陣,第一個嗰張相已經有埋第二個。全 corpus 24 個,喺 8 個
+  session 嘅 23 個 player-round 入面,15 個喺 verified prefix 入面,**24 個全部都係 yachi 嘅**
+  (24 個 lock 得 23 局,因為有一局自己有兩對);之所以十二個
+  session 都冇響過,係因為呢個 function 淨係去到有 forecast record 行返轉頭嗰啲 step,而之前
+  嗰十三個啱啱好冇一個喺嗰啲 step 上面。**一個瞓着咗嘅 assertion 唔等於冇 assertion。** 改法
+  係將成串同 frame 嘅 lock 一次過重建、照舊 assert(所以個 model 冇鬆過),然後出
+  `unattributed` —— 一個 step 有兩隻棋,「邊個 edit 令 availability 升」喺個 model 入面根本冇
+  答案。七個舊 session 重出 artefact 全部 byte-identical,即係呢個改動對舊數據係 inert 嘅。
+* **`forecast-facts.test.ts` 嗰個「永遠 0」嘅 counter 響咗。** 佢自己寫住「a counter that is
+  identically zero is not a dead field … the next gap is what it is for」。The next gap 就係上面
+  嗰個。而家改成 named table(`UNATTRIBUTED`),唔係放寬做 bound。
+* **access class 第五個成員。** 五個 session 冇新成員之後,今晚出一個(`replay-2026-09-19-12`
+  r3 yachi lock 73)。逐個 counterfactual 度返:A 得 0、A 減走清咗嗰行得 2、Bpre 得 0、target 2,
+  控制組(隨便清另一行)全部 0,清咗嗰行下面 19 行 occupancy 完全一樣 —— 即係個窿本來就喺度,
+  嗰隻棋淨係揭開個蓋。**佢係 O,唔係 L** —— 08-19 嗰兩個「都係 L」嘅巧合斷咗。跟 CLAUDE.md
+  嗰條「a count measured against a pinned SET is void the moment that set changes」,四人 set
+  上面度過嘅 mutation score 全部作廢咗,重新行咗七個 mutant(全部 killed)加一個 control。
+
+### 4. AUC 表:KPP 第三次過線,PC 第一次
+
+* **KPP 0.048 → 0.059 → 0.0010。** 過線、退返、再過。三次都有寫住個 margin,所以份記錄讀落
+  係一串量度而唔係三次互相矛盾。今次郁佢嘅係**大細**唔係新效應:抽走今晚就變返 44.55 / 0.059。
+* **PC 第一次過 correction(0.022)。** 而份文件已經寫咗四個版本解釋點解呢一行過線會係最冇意思
+  嗰一行。164 個 decided pair 入面,今晚一晚佔 26 個;抽走今晚就變返 0.23。照原文講:呢個係
+  嗰個預言嘅證據,唔係「全消決定局」嘅證據。
 
 ## 第十二個 session：兩邊 gap 第一次一齊大，同一個自己應驗咗嘅預言 (2026-09-17)
 

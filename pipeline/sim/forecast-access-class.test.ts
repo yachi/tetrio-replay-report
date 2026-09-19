@@ -107,7 +107,26 @@
  * class did not — so the SET the five re-run mutants were measured against is intact, and the
  * scoping paragraph above still says exactly what it said. A count is void when its pinned set
  * moves; this one has not moved in two sessions. The fifteen that were never re-run are still
- * never re-run, and no session since has changed that either way.
+ * never re-run, and no session since has changed that either way. 2026-09-10, 2026-09-11 and
+ * 2026-09-17 did not move it either: five sessions, candidates 13 -> 20, class unchanged at four.
+ *
+ * PARTIALLY RE-MEASURED 2026-09-19, when the class grew from four members to FIVE and ended that
+ * run. The same rule applies in the same direction and it is now the second time it has bitten:
+ * the set moved, so **every count measured against the four-member list is void**, including the
+ * five-mutant re-measurement of 2026-08-19 — that one was a claim about a file whose ACCESS_CLASS
+ * held four entries. SEVEN mutants were re-run against the file as it now stands, all killed:
+ * the new entry removed, its verdict flipped to `placement`, its lock drifted by one, its STEP
+ * drifted by one, the list padded with an invented sixth member, `formed` reverted to its old 11,
+ * and `clearAlone` reverted to its old 20. (The step mutant is new here — the 08-19 set re-ran a
+ * lock drift and not a step drift, so this is one more than that pass, not the same five again.)
+ * The control was run too: the unmutated file passes, which is what stops "everything is killed"
+ * from meaning "the file always fails".
+ *
+ * The remaining thirteen — the counterfactual branches and the engine-branch mutants — were NOT
+ * re-run. They exercise code this change did not touch, and the 20-mutant score at the top of this
+ * header is a statement about a two-member file and has been void since 2026-08-19; it is kept as
+ * the record of when it was measured, not as current coverage. Saying that is cheaper than
+ * implying coverage nobody measured.
  *
  * Killed (16): both ACCESS_CLASS entries removed, reclassified and drifted separately (6), the list
  * padded with an invented third (1), and every counterfactual branch — clearAlone disabled,
@@ -230,6 +249,25 @@ const ACCESS_CLASS: Member[] = [
     lock: 23, step: 22, mechanism: 'access', kind: 'path_opened' },
   { session: '2026-08-19', file: 'replay-2026-08-19-5.ttrm', round: 6, user: 'yachi',
     lock: 32, step: 24, mechanism: 'access', kind: 'path_opened' },
+  // ── 2026-09-19 adds the FIFTH, after five sessions that added candidates and no member ────────
+  // Derived the same way as the four above, from the counterfactuals rather than the engine:
+  //
+  //            causing piece   cleared   A    A-cleared   Bpre   target   controls (other rows)
+  //   r3/l73   O, spin none    row 20    0    2           0      2        17/18/19/21/22/23 -> all 0
+  //
+  // The control column rules out the artefact a bare `clearAlone` cannot: deleting any other single
+  // row gives 0, so what raised availability is THAT row and not the act of deleting one. The slot
+  // pre-existed cell for cell — all 19 rows below the cleared row are occupancy-identical in A and
+  // in Bpre — so nothing down there was formed, and the placement alone reaches 0 against target 2,
+  // which is why this is `access` and not `overdetermined`.
+  //
+  // WHAT IT BREAKS is the coincidence the 08-19 pair was NOTED-NOT-EXPLAINED for. Those two were
+  // both an L; this is an O. What survives across all five is narrower and duller: yachi (4 of 5),
+  // `spin: 'none'`, exactly one row cleared, target 2. Five events is still too few to call even
+  // that anything, and it is recorded here for the same reason the pair was — so the next one is
+  // read against what actually held rather than against the first shape someone noticed.
+  { session: '2026-09-19', file: 'replay-2026-09-19-12.ttrm', round: 3, user: 'yachi',
+    lock: 73, step: 71, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -353,7 +391,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 20, formed: 11, overdetermined: 5, access: 4 };
+const DECOMP = { clearAlone: 25, formed: 13, overdetermined: 7, access: 5 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -439,6 +477,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(12);
-  expect(result.localised).toBe(3498);
+  expect(SESSIONS.length).toBe(13);
+  expect(result.localised).toBe(4240);
 });

@@ -1,0 +1,110 @@
+{
+  "eyebrow": "戰況直擊 · 二十場",
+  "title": "二十場打成 5 比 15",
+  "lede": "二十場都係先贏五局嗰個贏<span class=\"badge\" data-claim=\"G003\"></span>，冇一場例外。四場打到最後一局先分勝負<span class=\"badge\" data-claim=\"G025\"></span>，一場 5 比 0<span class=\"badge\" data-claim=\"G024\"></span>。<strong>呢一節最值得睇嘅唔係邊場輸</strong>——係頭十場同尾十場各佔 75 局，打成 28 比 47 同 31 比 44<span class=\"badge\" data-claim=\"C010\"></span>，兩截一樣咁大，可以直接比。即係話呢晚唔係後段崩，亦都唔係開波就輸晒，係由頭到尾用差唔多嘅速度輸緊，而尾段仲略為好返少少。",
+  "closer": "全晚停喺 5 比 15<span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>、59 比 91<span class=\"badge\" data-claim=\"G002\"></span>。pinglamb 最長連贏七局，由 m12 打到 m13<span class=\"badge\" data-claim=\"G026\"></span>。150 局裏面 126 局係俾垃圾頂爆、24 局自己頂到頂<span class=\"badge\" data-claim=\"G077\"></span><span class=\"badge\" data-claim=\"C006\"></span>。",
+  "hero_match": 16,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "第一場——追到反超前，尾兩局失守",
+      "flag": "pinglamb",
+      "body": "開波連輸兩局，yachi 追到 4 比 3 反超前，跟住連失兩局，4 比 5<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G004\"></span><span class=\"badge\" data-claim=\"G025\"></span>"
+    },
+    "2": {
+      "title": "第二場——贏頭局，之後五局全失",
+      "flag": "pinglamb",
+      "body": "yachi 贏咗第一局，跟住五局全失，1 比 5<span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"G005\"></span>"
+    },
+    "3": {
+      "title": "第三場——尾三局連贏，全晚第一場",
+      "flag": "yachi",
+      "body": "yachi 尾三局連贏，5 比 3 攞低全晚第一場。呢場亦係佢兩場「每粒方塊攻擊高過對手」之一（差距 −6.19%）<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"G006\"></span>"
+    },
+    "4": {
+      "title": "第四場——逐局咬，冇人連贏過兩局",
+      "flag": "pinglamb",
+      "body": "八局逐局交換，冇一方連贏過兩局，最後 3 比 5<span class=\"badge\" data-claim=\"C014\"></span><span class=\"badge\" data-claim=\"G007\"></span>"
+    },
+    "5": {
+      "title": "第五場——中段贏返兩局，尾兩局又失",
+      "flag": "pinglamb",
+      "body": "yachi 中段贏返兩局，尾兩局又失，3 比 5。全晚最癲嗰局就喺呢場第六局<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"G008\"></span><span class=\"badge\" data-claim=\"G075\"></span>"
+    },
+    "6": {
+      "title": "第六場——得第五局",
+      "flag": "pinglamb",
+      "body": "六局入面 yachi 淨係贏到第五局，1 比 5<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"G009\"></span>"
+    },
+    "7": {
+      "title": "第七場——同上一場一模一樣",
+      "flag": "pinglamb",
+      "body": "又係六局、又係淨贏第五局，1 比 5——同第六場行嘅路完全一樣<span class=\"badge\" data-claim=\"C017\"></span><span class=\"badge\" data-claim=\"G010\"></span>"
+    },
+    "8": {
+      "title": "第八場——贏中間兩局",
+      "flag": "pinglamb",
+      "body": "yachi 贏咗中間兩局，2 比 5<span class=\"badge\" data-claim=\"C018\"></span><span class=\"badge\" data-claim=\"G011\"></span>"
+    },
+    "9": {
+      "title": "第九場——連贏三局追平，尾兩局連失",
+      "flag": "pinglamb",
+      "body": "yachi 連贏三局追到 3 比 3，尾兩局連失，3 比 5<span class=\"badge\" data-claim=\"C019\"></span><span class=\"badge\" data-claim=\"G012\"></span>"
+    },
+    "10": {
+      "title": "第十場——頭兩局尾兩局都贏",
+      "flag": "yachi",
+      "body": "yachi 開波連贏兩局，尾兩局再連贏，5 比 4——打到最後一局先分勝負<span class=\"badge\" data-claim=\"C020\"></span><span class=\"badge\" data-claim=\"G013\"></span><span class=\"badge\" data-claim=\"G025\"></span>"
+    },
+    "11": {
+      "title": "第十一場——0 比 5，全晚唯一剃光頭",
+      "flag": "pinglamb",
+      "body": "五局全失，全晚唯一一場冇攞過一局<span class=\"badge\" data-claim=\"C021\"></span><span class=\"badge\" data-claim=\"G014\"></span><span class=\"badge\" data-claim=\"G024\"></span><span class=\"badge\" data-claim=\"G067\"></span>"
+    },
+    "12": {
+      "title": "第十二場——開波贏兩局之後連失五局",
+      "flag": "pinglamb",
+      "body": "yachi 開波連贏兩局，跟住連失五局，2 比 5<span class=\"badge\" data-claim=\"C022\"></span><span class=\"badge\" data-claim=\"G015\"></span>"
+    },
+    "13": {
+      "title": "第十三場——得第三同第六局",
+      "flag": "pinglamb",
+      "body": "yachi 淨係贏到第三同第六局，2 比 5<span class=\"badge\" data-claim=\"C023\"></span><span class=\"badge\" data-claim=\"G016\"></span>"
+    },
+    "14": {
+      "title": "第十四場——頭兩局同第四第五局",
+      "flag": "yachi",
+      "body": "yachi 開波連贏兩局，第四第五局再贏，5 比 3<span class=\"badge\" data-claim=\"C024\"></span><span class=\"badge\" data-claim=\"G017\"></span>"
+    },
+    "15": {
+      "title": "第十五場——追平之後失最後一局",
+      "flag": "pinglamb",
+      "body": "yachi 中段連贏三局追平，最後一局俾人攞走，4 比 5<span class=\"badge\" data-claim=\"C025\"></span><span class=\"badge\" data-claim=\"G018\"></span><span class=\"badge\" data-claim=\"G025\"></span>"
+    },
+    "16": {
+      "title": "第十六場——開波連贏三局，全晚最爽",
+      "flag": "yachi",
+      "body": "yachi 開波連贏三局，5 比 2 收工——全晚贏得最爽嗰場，亦係佢兩場「每粒方塊攻擊高過對手」之二（−5.24%）<span class=\"badge\" data-claim=\"C026\"></span><span class=\"badge\" data-claim=\"G019\"></span>"
+    },
+    "17": {
+      "title": "第十七場——逐局咬到尾",
+      "flag": "pinglamb",
+      "body": "八局咬到尾，3 比 5<span class=\"badge\" data-claim=\"C027\"></span><span class=\"badge\" data-claim=\"G020\"></span>"
+    },
+    "18": {
+      "title": "第十八場——得第四同第六局",
+      "flag": "pinglamb",
+      "body": "yachi 淨係贏到第四同第六局，2 比 5。全晚最長嗰局（約 258 秒、236 行）就喺呢場第二局，最後 pinglamb 生還<span class=\"badge\" data-claim=\"C028\"></span><span class=\"badge\" data-claim=\"G021\"></span><span class=\"badge\" data-claim=\"G034\"></span><span class=\"badge\" data-claim=\"G033\"></span>"
+    },
+    "19": {
+      "title": "第十九場——贏最後一局收貨",
+      "flag": "yachi",
+      "body": "yachi 贏最後一局收 5 比 4<span class=\"badge\" data-claim=\"C029\"></span><span class=\"badge\" data-claim=\"G022\"></span><span class=\"badge\" data-claim=\"G025\"></span>"
+    },
+    "20": {
+      "title": "第二十場——中段贏三局，尾兩局連失",
+      "flag": "pinglamb",
+      "body": "yachi 中段贏三局，尾兩局連失，3 比 5<span class=\"badge\" data-claim=\"C030\"></span><span class=\"badge\" data-claim=\"G023\"></span>"
+    }
+  }
+}

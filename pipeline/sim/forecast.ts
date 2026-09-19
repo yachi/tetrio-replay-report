@@ -623,6 +623,55 @@ export function localiseMechanism(
   if (t <= j) return { step: t, mechanism: 'unattributed' };
 
   const A = r.boards[t - 1]!, lk = r.locks[t]!;
+
+  // TWO LOCKS CAN SHARE A FRAME, and then `boards[t]` is not this piece's board.
+  //
+  // `boards` is indexed per LOCK but snapshotted per FRAME, so when locks t..u all carry the same
+  // frame every one of boards[t..u] holds the state after ALL of them. The step model — place one
+  // piece, clear, snapshot — is then simply not what happened, and the assertion below is right to
+  // say so: `replay-2026-09-19-06.ttrm` r4 yachi is where it first said it, at lock 151, whose
+  // `boards[151]` already carries lock 152's J.
+  //
+  // The phenomenon is NOT new and that is the part worth keeping. Measured over all thirteen
+  // sessions: 24 extra same-frame locks over 23 player-rounds of 8 sessions, 15 of them inside a
+  // verified prefix — and **all 24 are yachi's**, which makes it a fact about one player's input
+  // clock rather than a simulator artefact. (24 locks over 23 rounds because one round carries
+  // two separate same-frame pairs.) It went unseen for twelve sessions because this function is
+  // only reached at a step some forecast record walks back through, and none of the earlier
+  // thirteen happened to lie on such a walk. A dormant assertion is not an absent one.
+  //
+  // What is done about it is the narrow thing. The run is reconstructed IN FULL and still asserted
+  // against `boards[t]`, so the model keeps exactly the teeth it had — a same-frame run that does
+  // not reconstruct throws like anything else, and this is not an escape hatch. But the VERDICT is
+  // `unattributed`, because the step contains more than one placement and "which edit within this
+  // step raised availability" has no answer inside the model. Crediting `lk` alone would be the
+  // confidently-wrong verdict that this function's whole branch order exists to prevent, and
+  // `unattributed` is the honest bucket the artefact already counts.
+  let last = t;
+  while (last + 1 < r.locks.length && r.locks[last + 1]!.frame === lk.frame) last++;
+  if (last > t) {
+    const R = A.map(row => [...row]) as Board;
+    let cleared = 0;
+    for (let u = t; u <= last; u++) {
+      const l = r.locks[u]!;
+      for (const c of l.cells) if (c.row >= 0 && c.row < H) R[c.row]![c.col] = l.piece as never;
+      const full = R.map((row, i) => row.every(x => x !== null) ? i : -1).filter(i => i >= 0);
+      cleared += full.length;
+      for (const row of [...full].reverse()) R.splice(row, 1);
+      for (let i = 0; i < full.length; i++) R.unshift(Array(10).fill(null) as never);
+    }
+    const want = r.locks.slice(t, last + 1).reduce((n, l) => n + l.cleared, 0);
+    if (cleared !== want)
+      throw new Error(`step ${t}: locks ${t}..${last} share frame ${lk.frame} and cleared ${want} `
+        + `rows, but reconstructing the run found ${cleared}`);
+    const S = r.boards[t]!;
+    if (!R.every((row, i) => row.every((c, x) => c === S[i]![x])))
+      throw new Error(`step ${t}: locks ${t}..${last} share frame ${lk.frame}, and applying the `
+        + `whole run to boards[${t - 1}] does not reproduce boards[${t}] — the per-frame snapshot `
+        + `is not the explanation and the step model is wrong for another reason`);
+    return { step: t, mechanism: 'unattributed' };
+  }
+
   const Bpre = A.map(row => [...row]) as Board;
   for (const c of lk.cells) if (c.row >= 0 && c.row < H) Bpre[c.row]![c.col] = lk.piece as never;
   const clearedRows = Bpre.map((row, i) => row.every(x => x !== null) ? i : -1).filter(i => i >= 0);

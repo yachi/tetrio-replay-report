@@ -1,0 +1,34 @@
+{
+  "eyebrow": "教練分析 · 兩邊",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚 150 局，係 corpus 最大嘅一晚，而佢喺 regime 拆解上面係四晚以嚟最平淡嘅一次。<strong>呢個組合好有用：無論佢講乜，都係 150 局撐住嘅。</strong>贏嗰啲局爭 5.84%、輸嗰啲局爭 6.39%<span class=\"badge\" data-claim=\"C002\"></span>，兩個都喺自己嗰欄嘅中位數或以下——上一晚嗰個「兩邊一齊拉大」冇重複到，即係嗰晚係一晚。",
+  "columns": {
+    "yachi": {
+      "tagline": "快、手靚、落得多 · 差喺每粒嘅重量",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 19.55%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G081\"></span>，十三晚都係咁——<strong>個 lever 冇變過</strong>。",
+        "落得快<span class=\"badge\" data-claim=\"G052\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G056\"></span>、Quad 多過對手<span class=\"badge\" data-claim=\"G047\"></span>。今晚 hold 咗 5791 次<span class=\"badge\" data-claim=\"G045\"></span>，多過對手成 700 次。",
+        "條路又係加粒數：多疊 714 粒<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，第九次。"
+      ],
+      "recs": [
+        "<strong>個窿有幾大先係話事嗰個，唔係落幾多粒。</strong>714 粒盈餘即係多 5.20%，而個窿係 11.16%<span class=\"badge\" data-claim=\"C004\"></span>——即係最多填到一半。08-01 嗰次同一條路填一個 7.27% 嘅窿，盈餘 6.27%，最後攻擊只差 32 條。唔係踩得唔夠落力，係盈餘買唔起一個兩倍咁大嘅窿。",
+        "<strong>兩個「歷來最大」唔好當係打差咗。</strong>頂爆 15 次<span class=\"badge\" data-claim=\"C006\"></span>係單人歷來最多，但佔 150 局嘅一成，低過 08-14 嗰次嘅 13%；少打 476 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>亦係歷來最大，換做比率係 5.36%，十三晚排第五。兩個數講嘅都係今晚有幾長。",
+        "<strong>KPP 唔使理。</strong>今次你係高嗰個（3.646 對 3.608）<span class=\"badge\" data-claim=\"C008\"></span>，上一晚啱啱掉轉；而且你自己贏局同輸局嘅 KPP 差唔夠 3%<span class=\"badge\" data-claim=\"G083\"></span>。呢一欄成個 corpus 都係一個負面結果，冇嘢好跟。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "T-spin 效率流 · 今晚兩邊都係普通幅度",
+      "profile": [
+        "贏法同一路一樣：每粒方塊打出嘅攻擊兩個 regime 都高過對手<span class=\"badge\" data-claim=\"C002\"></span>，而今晚兩個幅度都好普通——自己嗰欄排第十同第七。",
+        "自己贏局對輸局差 18.93%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G082\"></span>，<strong>第一次同對手爭唔夠一個百分點</strong>。",
+        "今晚係靠清同 T-spin 贏，唔係靠快：每粒方塊清走 0.2071 對 0.1884<span class=\"badge\" data-claim=\"G088\"></span>，T-spin double 652 對 572<span class=\"badge\" data-claim=\"G048\"></span>、triple 147 對 93<span class=\"badge\" data-claim=\"G049\"></span>，但 PPS 反而低過對手<span class=\"badge\" data-claim=\"G052\"></span>、APM 只高 3 點幾<span class=\"badge\" data-claim=\"G053\"></span>。"
+      ],
+      "recs": [
+        "<strong>少疊 714 粒仲多打 476 條，呢個就係要守住嘅嘢。</strong><span class=\"badge\" data-claim=\"C005\"></span>唔好為咗追手速而郁 T-spin 嗰條線——今晚每粒方塊嘅優勢（11.16%）<span class=\"badge\" data-claim=\"C004\"></span>淨係得一半俾對手嘅粒數盈餘食返。",
+        "<strong>上一晚嗰個「兩邊一齊拉大」唔係新常態。</strong>今晚返返中位數<span class=\"badge\" data-claim=\"C002\"></span>，冇機制解釋過點解會咁——一晚就係一晚，唔好當咗係一個水平。",
+        "逐局波動你係細嗰個<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G057\"></span>，而 150 局之後你頂爆得 9 次（對手 15 次）<span class=\"badge\" data-claim=\"C006\"></span>。守得穩就係咁。"
+      ]
+    }
+  },
+  "versus_note": "逐場排開個效率差距，今晚<strong>分唔開</strong>邊個贏場波：yachi 贏嗰五場落喺 −6.19%、−5.24%、+8.07%、+10.96%、+14.89%，pinglamb 贏嗰十五場由 +2.43% 排到 +24.36%——yachi 有三場贏喺對手六場之上。所以今晚<strong>冇 mint 「逐場排開就分得開」嗰個 claim</strong>，個位空咗，跟 09-10 同 09-11 嘅做法：十三晚入面分得開嘅仍然係三晚。同時要留意，「pinglamb 場場每粒方塊都高過 yachi」今晚亦都唔成立——佢喺 m3 同 m16 兩場落後，而嗰兩場都係 yachi 贏。"
+}
