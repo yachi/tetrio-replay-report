@@ -1,0 +1,34 @@
+{
+  "eyebrow": "教練分析 · 十四晚以嚟",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚兩個人喺輸嗰啲局幾乎打成平手<span class=\"badge\" data-claim=\"C002\"></span>，分開佢哋嘅係贏嗰啲局。所以兩邊嘅功課都唔係「唔好輸咁慘」，而係「贏嗰陣贏得夠唔夠爽」。",
+  "columns": {
+    "yachi": {
+      "tagline": "快手 volume 流",
+      "profile": [
+        "多疊 426 粒方塊，少打 352 條攻擊<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"G039\"></span><span class=\"badge\" data-claim=\"G040\"></span>——呢條路連續第十次填唔返。",
+        "每粒方塊清走多過對手<span class=\"badge\" data-claim=\"G089\"></span>，quad 550 對 466<span class=\"badge\" data-claim=\"G045\"></span>，落速亦快過對手<span class=\"badge\" data-claim=\"G050\"></span>。",
+        "第四場五局全取<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G007\"></span>，全晚最癲嗰局亦喺嗰場<span class=\"badge\" data-claim=\"G076\"></span>——天花板係有嘅。"
+      ],
+      "recs": [
+        "個盈餘最多只可以買返 3.7 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，而要填嘅係 8.9 個<span class=\"badge\" data-claim=\"C004\"></span>：所以下一步唔係再加粒數，係要每粒方塊值錢啲。",
+        "T-spin triple 66 對 121<span class=\"badge\" data-claim=\"G047\"></span>係最大嗰條裂縫——quad 換唔到同樣嘅攻擊。",
+        "每粒方塊要按幾多下贏輸之間郁都唔郁<span class=\"badge\" data-claim=\"G084\"></span>：呢一欄唔使再練，佢唔係話事嗰條。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "T-spin 效率流",
+      "profile": [
+        "每粒方塊攻擊全晚高過對手<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G052\"></span>，T-spin double 549 對 471、triple 121 對 66<span class=\"badge\" data-claim=\"G046\"></span><span class=\"badge\" data-claim=\"G047\"></span>。",
+        "自己贏同輸嘅局之間差 25.96%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G083\"></span>，今晚係闊嗰個——十四晚計落去兩個人七比七。",
+        "頭九場攞咗 7 比 2、局數 37 比 24；尾九場 4 比 5、局數 32 比 34<span class=\"badge\" data-claim=\"C010\"></span>。"
+      ],
+      "recs": [
+        "個系列係頭九場儲落嚟嘅，下半晚局數係輸嘅<span class=\"badge\" data-claim=\"C010\"></span>：贏咗都要知自己贏喺邊一截。",
+        "頂爆嘅局 12 比 11，係你多<span class=\"badge\" data-claim=\"C006\"></span><span class=\"badge\" data-claim=\"G078\"></span>，一百二十七局入面 18%——呢一欄喺 corpus 嚟講乜都預測唔到，所以唔使當佢係警號，但亦唔好當佢冇發生。",
+        "輸嗰啲局同對手淨係爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>：對手嘅地板已經追上嚟，拉開嘅位而家淨係喺贏嗰啲局。"
+      ]
+    }
+  },
+  "versus_note": "一句講晒：<strong>呢晚係開頭輸咗</strong><span class=\"badge\" data-claim=\"C010\"></span>，唔係尾段崩——頭九場局數 24 比 37，尾九場 34 比 32。而真正新嘅嘢係第四場嗰個 5 比 0<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G007\"></span>：corpus 十場剃光頭，第一次有一場唔係 pinglamb 嘅。"
+}

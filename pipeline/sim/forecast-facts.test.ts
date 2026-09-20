@@ -100,6 +100,11 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   // because `boards[]` is indexed per lock and snapshotted per frame, so the step holds two
   // placements and 「which edit raised availability」 has no answer inside the model. Exactly one
   // step in the corpus is both same-frame and on a walk this function takes, and it is here.
+  // 2026-09-18 lands BEFORE the line above in date order and after it in arrival order — the
+  // first time this table has gained a row anywhere but at the end. One of yachi's, so the
+  // corpus-wide `path_opened` count goes 3 -> 4, and it is yachi's across 08-14, 08-19, 09-18 and
+  // 09-19 with 08-09's the single pinglamb entry.
+  '2026-09-18': { yachi: 1, pinglamb: 0 },
   '2026-09-19': { yachi: 1, pinglamb: 0 },
 };
 

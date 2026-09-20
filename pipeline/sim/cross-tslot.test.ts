@@ -59,7 +59,7 @@ const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
 const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
-       '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-19'])
+       '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -119,7 +119,11 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-09-17: 113159 -> 121520, and `unexplained` is still EMPTY over the extra 8361 boards.
   // 2026-09-19: 121520 -> 145829, by far the largest single addition the file has taken (24309
   // boards, 1.67x the previous largest), and `unexplained` is still EMPTY over all of them.
-  expect(both + oursOnly + ccOnly + neither).toBe(145829);
+  // 2026-09-18: 145829 -> 166127, the second-largest addition (20298 boards), and `unexplained`
+  // is still EMPTY over all of them. This row lands out of date order — 09-18 is the night before
+  // 09-19 and arrived after it — so the running totals above read as arrival order and not as a
+  // corpus growing by date. That matters for nothing here except how to read the column.
+  expect(both + oursOnly + ccOnly + neither).toBe(166127);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same
