@@ -209,6 +209,7 @@ unless it is:
 | 2026-09-10 | 13 of 16 testable — **81%** | 13 of 16 — **81%** | 13 of 16 — **81%** |
 | 2026-09-11 | 12 of 15 testable — **80%** | 12 of 15 — **80%** | 12 of 15 — **80%** |
 | 2026-09-17 | 13 of 16 testable — **81%** | 12 of 16 — **75%** | 12 of 16 — **75%** |
+| 2026-09-18 | 24 of 27 testable — **89%** | 24 of 27 — **89%** | 24 of 27 — **89%** |
 | 2026-09-19 | 25 of 28 testable — **89%** | 25 of 28 — **89%** | 25 of 28 — **89%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
@@ -220,11 +221,11 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->nine of the thirteen<!--/equiv:gate-count-->
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->nine of the fourteen<!--/equiv:gate-count-->
 rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11 and 09-17<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
-thirteen pass would sit at 60% and bless that session's artefact by definition. The gate compares
+fourteen pass would sit at 60% and bless that session's artefact by definition. The gate compares
 **verdict sets**, not a percentage.
 
 (That 「a floor all N pass」 sentence is the one CLAUDE.md's 冇第二份 section names as having read

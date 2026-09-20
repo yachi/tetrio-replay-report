@@ -1599,17 +1599,17 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-19 89% → **89%**.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-18 89% → **89%**, 09-19 89% → **89%**.
 
-**07-28 is not the exception — <!--equiv:sf-match-->nine of the thirteen<!--/equiv:sf-match--> measured sessions lose coverage
+**07-28 is not the exception — <!--equiv:sf-match-->nine of the fourteen<!--/equiv:sf-match--> measured sessions lose coverage
 to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
 08-19 C007, **09-17 C007**). **That count used to be at `match` granularity only, and `match` used
 to be the only reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but
-loses R018 at `round`, so for nine sessions the `round` count was every session measured. At twelve
-it is **<!--equiv:sf-round-->ten of the thirteen<!--/equiv:sf-round-->**, because 2026-09-10 and
-2026-09-11 remain the only two that lose nothing at EITHER granularity — 13 of 16 and 12 of 15 at
-all three, the same covered set each time.
+loses R018 at `round`, so for nine sessions the `round` count was every session measured. At fourteen
+it is **<!--equiv:sf-round-->ten of the fourteen<!--/equiv:sf-round-->**, because 2026-09-10,
+2026-09-11, 2026-09-18 and 2026-09-19 are the four that lose nothing at EITHER granularity — 13 of
+16, 12 of 15, 24 of 27 and 25 of 28 at all three, the same covered set each time.
 Two granularities in one paragraph is how "five of the six" outlived the six-session corpus it
 was measured on — check which one a count came from before carrying it forward.
 
@@ -1627,10 +1627,19 @@ uncovered at all three granularities in both, exactly as they are at single valu
 
 **That paragraph used to end 「the two exempt sessions are the two LEAST covered in the corpus,
 which is as sharp a statement of that as the data can make」, and 2026-09-19 falsified the sharp
-half while confirming the mechanism.** It is the THIRD exempt session — 89% at all three
-granularities, losing nothing — and it is the best-covered session in the corpus bar 07-24 and the
+half while confirming the mechanism.** It was the THIRD exempt session — 89% at all three
+granularities, losing nothing — and the best-covered session in the corpus bar 07-24 and the
 two 100%s. So exemption does not track poor coverage, and the sentence that said it did was an
 observation about two sessions dressed as a principle.
+
+**2026-09-18 is the FOURTH, at the same 89% and with the same uncovered set, and it settles what
+the exemption does and does not track.** Four exempt sessions now span 80% to 89% coverage and 51
+to 150 rounds — the corpus low and two of its three highest, its smallest-but-three and its two
+largest — so neither coverage nor size predicts exemption. Every one of the four has the identical
+uncovered set **{C002, C003, C008}**, and every one of them mints no claim the second family can
+falsify: 09-10's and 09-11's windows sit in C010 alone, 09-19 minted no C007 because its per-match
+ordering interleaved, and 09-18 did not either, for the same reason. The mechanism is the whole
+of it.
 
 What actually moved is the DENOMINATOR, and it is the same arithmetic the shortfall table's y-axis
 turned out to have. 09-19 has twenty matches, so its ledger carries twenty `round_seq` claims
