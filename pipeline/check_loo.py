@@ -521,6 +521,29 @@ PUBLISHED = (
     # `attack_diff` and `score_diff` are measured and NOT published, following 08-19, 08-25 and
     # 09-11: CLAUDE.md's shortfall table quotes the −476, but that table has never been a
     # `SENTENCES` target. If a later pass makes it one, both rows go in together.
+    # 2026-09-18 takes ONE `ANNOTATED` entry, and it is the first case on this measurement
+    # whose fragility runs the OTHER WAY. Measured over all five:
+    #
+    #     app_gap_won      +8.3307 pp   m11r6 ->  +7.2659  rel 0.128  1.26x the next of 127
+    #     app_gap_lost     +1.5434 pp    m1r7 ->  +0.5900  rel 0.618  1.16x   <- annotated
+    #     app_gap_session  +8.9296 pp   m13r1 ->  +8.3933  rel 0.060  1.31x
+    #     attack_diff          -352 行   m9r5 ->     -317  rel 0.099  1.06x
+    #     score_diff       -139437 分   m13r1 ->  -127984  rel 0.082  1.19x
+    #
+    # **`rel` is direction-blind, and this is the session that shows what that costs.** In
+    # 2026-08-14 and 2026-09-10 — the only other near-zero lost-gaps — the influential round was
+    # holding the gap DOWN, so dropping it widened the gap and the 「floors have met」 reading
+    # was what failed. Here dropping m1r7 takes the gap from +1.5434 to +0.5900, i.e. FURTHER
+    # toward zero: the qualitative reading survives the drop and is strengthened by it, and only
+    # the figure +1.54 is the one round's. The gate fires either way and correctly so — the
+    # SIZE is one round's in all three — but a reader who takes 「fragile」 to mean 「the claim
+    # might not hold」 would be wrong about this one, so the annotation says which way it moves.
+    #
+    # `attack_diff` and `score_diff` are measured and NOT published, following 08-19 through
+    # 09-19: CLAUDE.md's shortfall table quotes the -352, and that table has never been a
+    # `SENTENCES` target.
+    ("2026-09-18", "app_gap_won", "series"),
+    ("2026-09-18", "app_gap_lost", "series"),
     ("2026-09-19", "app_gap_won", "series"),
     ("2026-09-19", "app_gap_lost", "series"),
 )
@@ -529,6 +552,17 @@ PUBLISHED = (
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-09-18", "app_gap_lost"): (
+        "the lost-regime gap is +1.5434 pp — the second-narrowest in the corpus, behind "
+        "2026-09-10's +1.2535 — and m1r7 alone is 0.9535 of it. **It moves it the other way.** "
+        "Dropping the round takes the gap to +0.5900, i.e. closer to zero, where 08-14's and "
+        "09-10's influential rounds each took theirs further from it. So this is the first "
+        "near-zero gap on this measurement whose 「地板撞埋」 reading SURVIVES its own leave-one-out "
+        "and is sharpened by it; what does not survive is the figure +1.54. m1r7 is pinglamb's: "
+        "he threw .7086 attack per piece over 151 pieces and LOST the round — 8th by rate among "
+        "his 58 losing rounds and 5th by size, which is the combination rather than either "
+        "extreme, and it is 3.2% of his whole losing-round piece pool. `rel` 0.618 ranks 9th of "
+        "the 34 published figures, a hair under 09-03's 0.622."),
     ("2026-09-10", "app_gap_lost"): (
         "the lost-regime gap is +1.2535 pp — the narrowest in the corpus — and m8r4 alone is "
         "2.6084 of it, taking it to +3.8619. `rel` 2.081 is the third-largest ever measured "

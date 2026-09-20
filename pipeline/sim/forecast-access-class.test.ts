@@ -122,7 +122,17 @@
  * The control was run too: the unmutated file passes, which is what stops "everything is killed"
  * from meaning "the file always fails".
  *
- * The remaining thirteen — the counterfactual branches and the engine-branch mutants — were NOT
+ * PARTIALLY RE-MEASURED AGAIN 2026-09-18, when the class grew from five members to SIX. Third
+ * time, same rule, same direction: **every count measured against the five-member list is void**,
+ * including the seven-mutant re-measurement recorded in the paragraph above. FOUR mutants were
+ * re-run against the file as it now stands, all killed: the new entry removed, its verdict flipped
+ * to `placement`, its STEP drifted by one, and `clearAlone` reverted to its old 25. That is fewer
+ * than the previous pass re-ran, and saying so is the point — this is a smaller re-measurement,
+ * not the same seven again, and the difference is that the two list-shape mutants (a padded
+ * invented member, a drifted lock) exercise exactly the machinery the 09-19 pass had just
+ * exercised on an unchanged assertion. The control was run: the unmutated file passes.
+ *
+ * The remaining mutants — the counterfactual branches and the engine-branch mutants — were NOT
  * re-run. They exercise code this change did not touch, and the 20-mutant score at the top of this
  * header is a statement about a two-member file and has been void since 2026-08-19; it is kept as
  * the record of when it was measured, not as current coverage. Saying that is cheaper than
@@ -268,6 +278,29 @@ const ACCESS_CLASS: Member[] = [
   // read against what actually held rather than against the first shape someone noticed.
   { session: '2026-09-19', file: 'replay-2026-09-19-12.ttrm', round: 3, user: 'yachi',
     lock: 73, step: 71, mechanism: 'access', kind: 'path_opened' },
+  // THE SIXTH, and the first to arrive from a session that is not the newest — 2026-09-18 lands
+  // before 09-19 in date order. Measured the same way as the five above:
+  //
+  //            causing piece   cleared   A    A-cleared   Bpre   target   controls (other rows)
+  //   r3/l37   S, spin none    row 25    1    2           0      2        22/23/24/26/27/28 ->
+  //                                                                       1/0/0/1/1/1, none reaches 2
+  //
+  // The control column does the same job it does above: deleting any other single row leaves
+  // availability below target, so what raised it is THAT row rather than the act of deleting one.
+  // All rows below the cleared row are occupancy-identical in A and in Bpre, so nothing down there
+  // was formed; the placement alone reaches 0 against target 2, which is why this is `access` and
+  // not `overdetermined`. The prefix verifies to lock 90 against a spin at 37, so it is not a
+  // prefix-edge artefact.
+  //
+  // **It breaks the narrow shape the fifth member left standing, on one of its four clauses.**
+  // What survived at five was: yachi (4 of 5), `spin: 'none'`, exactly one row cleared, target 2,
+  // and — unstated but true of all five — availability rising from ZERO. Here A is 1, not 0: the
+  // clear takes it 1 -> 2 rather than 0 -> 2. The other three clauses hold, and yachi is now 5 of
+  // 6. The causing piece is an S, where 08-19's two were L and 09-19's an O, so the piece identity
+  // continues to be the clause that never held. Six events is still too few to call any of this
+  // anything; it is recorded so the seventh is read against what actually held.
+  { session: '2026-09-18', file: 'replay-2026-09-18-11.ttrm', round: 3, user: 'yachi',
+    lock: 37, step: 34, mechanism: 'access', kind: 'path_opened' },
 ];
 
 const key = (m: Member) =>
@@ -391,7 +424,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 25, formed: 13, overdetermined: 7, access: 5 };
+const DECOMP = { clearAlone: 30, formed: 15, overdetermined: 9, access: 6 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -477,6 +510,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(13);
-  expect(result.localised).toBe(4240);
+  expect(SESSIONS.length).toBe(14);
+  expect(result.localised).toBe(4810);
 });

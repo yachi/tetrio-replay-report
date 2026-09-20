@@ -72,14 +72,18 @@ jobs:
           - sessions/2026-09-10/report
           - sessions/2026-09-11/report
           - sessions/2026-09-17/report
+          - sessions/2026-09-18/report
           - sessions/2026-09-19/report
           # A FILTERED SUBSET, not a session: the three 2026-09-18 matches in which
           # BOTH players' pooled per-match VS beat their own 12-session median. It lives
           # outside sessions/ on purpose — `analysis/stat_sources.py` globs
           # `sessions/*/*.ttrm` and `pipeline/corpus-membership.ts` calls any directory
           # holding replays a session, so placing it there would add 48 player-rounds to
-          # every corpus-wide figure while those rounds also belong to the real (not yet
-          # added) 2026-09-18 night. Gated here so it cannot rot; deliberately absent from
+          # every corpus-wide figure. **The real 2026-09-18 night IS now in the corpus**, and
+          # these three replays are byte-identical copies of three of its eighteen — which is
+          # exactly why the subset must stay out of `sessions/`: those rounds are already
+          # counted once there, and a second copy under `sessions/` would count them twice.
+          # Gated here so it cannot rot; deliberately absent from
           # the `pipeline` matrix, which builds sessions/<date>/report from a date list.
           - subsets/2026-09-18-onform/report
     steps:
@@ -219,7 +223,7 @@ jobs:
       matrix:
         session: ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09',
                   '2026-08-14', '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10',
-                  '2026-09-11', '2026-09-17', '2026-09-19']
+                  '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2

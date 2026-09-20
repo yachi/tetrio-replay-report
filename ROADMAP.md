@@ -180,25 +180,26 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-10 | 13/16 testable = **81%** | 13/16 = **81%** | 13/16 = **81%** | 2 |
 | 2026-09-11 | 12/15 testable = **80%** | 12/15 = **80%** | 12/15 = **80%** | 2 |
 | 2026-09-17 | 13/16 testable = **81%** | 12/16 = **75%** | 12/16 = **75%** | 2 |
+| 2026-09-18 | 24/27 testable = **89%** | 24/27 = **89%** | 24/27 = **89%** | 2 |
 | 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the thirteen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the fourteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all thirteen pass would sit at 60%. (The session count in that clause is
+2026-07-28, and a floor all fourteen pass would sit at 60%. (The session count in that clause is
 the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
 the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the thirteen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the thirteen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the fourteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the fourteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**

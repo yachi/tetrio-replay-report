@@ -148,6 +148,7 @@ const PINNED_TOTALS: Record<string, Totals> = {
   '2026-09-17': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 0, self_built: 219, reactive: 288, unattributed: 0 },
   // `unattributed: 1` is the same-frame double lock — see UNATTRIBUTED in forecast-facts.test.ts
   // for why the step model cannot attribute it and why the verdict is the honest bucket.
+  '2026-09-18': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 1, self_built: 566, reactive: 709, unattributed: 0 },
   '2026-09-19': { forecast_garbage: 0, forecast_lineclear: 4, path_opened: 1, self_built: 737, reactive: 827, unattributed: 1 },
 };
 
@@ -168,6 +169,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-09-10': { 'pre-existed': 515, 'arrived-later': 44, undetermined: 41 },
   '2026-09-11': { 'pre-existed': 492, 'arrived-later': 47, undetermined: 51 },
   '2026-09-17': { 'pre-existed': 417, 'arrived-later': 39, undetermined: 52 },
+  '2026-09-18': { 'pre-existed': 1054, 'arrived-later': 121, undetermined: 104 },
   '2026-09-19': { 'pre-existed': 1307, 'arrived-later': 141, undetermined: 121 },
 };
 
@@ -177,7 +179,32 @@ const PINNED_FLOORS: Record<string, Floors> = {
 const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
-  '2026-09-11': 61, '2026-09-17': 52, '2026-09-19': 177,
+  '2026-09-11': 61, '2026-09-17': 52, '2026-09-18': 146, '2026-09-19': 177,
+};
+
+/** Reactive events on which the EXECUTION-TIME garbage counterfactual fires, per session.
+ *
+ *  Thirteen sessions read 0 here and the assertion was a bare `toBe(0)`: in every session, no
+ *  executed spin's clause 4 verdict flipped when only garbage that arrived after the roof was
+ *  removed. **2026-09-18 is the first session where one does**, so the bare zero became a pinned
+ *  table rather than a bound — following DT_ORDER_IN_OPENER, a second instance has to be traced
+ *  rather than absorbed under a `<= 1`.
+ *
+ *  The event: `yachi replay-2026-09-18-10.ttrm r5 lock 21`, roof 10, `availAtRoof` 1 ->
+ *  `availAtSpin` 1, floor `arrived-later`. The prefix verifies to lock 43, twice the spin's
+ *  index, so it is not a prefix-edge artefact.
+ *
+ *  WHY THE TWO DISAGREE, which is the part worth keeping. The scalar gate compares COUNTS of
+ *  available lines at roof and at spin, and here the count does not move: 1 -> 1. The
+ *  counterfactual asks whether deleting post-roof garbage flips the verdict, and it does. Both
+ *  are right: garbage SUBSTITUTED for the available line rather than adding one, so the count is
+ *  unchanged while the line that makes the spin work is a different, garbage-derived line. A
+ *  scalar over a count cannot see a substitution — which is the same structural blindness
+ *  CLAUDE.md records for `check_equiv_coverage`'s percentage, arriving here on a different
+ *  quantity. The event stays classified `reactive`; nothing about the metric is changed by
+ *  recording it, and the disagreement is the finding rather than a defect in either check. */
+const PINNED_LOAD_BEARING: Record<string, number> = {
+  '2026-09-18': 1,
 };
 
 const PINNED_FORECASTS: Record<string, string[]> = {
@@ -222,6 +249,10 @@ const PINNED_FORECASTS: Record<string, string[]> = {
   // per-T-spin one (2/815 and 1/754), which is where this lands as 0.2% and 0.1%. A count of
   // three in the largest session is what the previous twelve already predicted, not a new
   // phenomenon.
+  // 1 verified forecast of 3 mechanism events. The other two are rejected at clause 4.
+  '2026-09-18': [
+    'pinglamb replay-2026-09-18-14.ttrm r2 lock 22 forecast_lineclear roof 20 0->2',
+  ],
   '2026-09-19': [
     'pinglamb replay-2026-09-19-08.ttrm r1 lock 65 forecast_lineclear roof 60 0->1',
     'yachi replay-2026-09-19-08.ttrm r1 lock 58 forecast_lineclear roof 56 0->2',
@@ -279,6 +310,11 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
   // PINNED_FORECASTS above); only lock 63 is rejected. That is the highest survival rate the
   // table has seen, and on 300 player-rounds it is the first session where the two tables come
   // apart by more than one event.
+  '2026-09-18': [
+    'yachi replay-2026-09-18-04.ttrm r1 lock 42 forecast_lineclear floor pre-existed from -1 roof 30',
+    'pinglamb replay-2026-09-18-14.ttrm r2 lock 22 forecast_lineclear floor pre-existed from -1 roof 20',
+    'yachi replay-2026-09-18-17.ttrm r8 lock 60 forecast_lineclear floor pre-existed from -1 roof 54',
+  ],
   '2026-09-19': [
     'yachi replay-2026-09-19-01.ttrm r1 lock 63 forecast_lineclear floor pre-existed from -1 roof 56',
     'pinglamb replay-2026-09-19-08.ttrm r1 lock 65 forecast_lineclear floor pre-existed from -1 roof 60',
@@ -331,10 +367,12 @@ for (const SESSION of SESSIONS) {
       expect(R!.counted).toBe(0);
     });
 
-    realData('the scalar gate and the garbage counterfactual agree on every event', () => {
-      // Deletion set restricted to post-roof arrivals: in every session, no executed spin's clause
-      // 4 verdict flips when only garbage that arrived after the roof is removed.
-      expect(R!.loadBearingButNotImproved).toBe(0);
+    realData('the scalar gate and the garbage counterfactual agree, except where pinned', () => {
+      // Deletion set restricted to post-roof arrivals. Thirteen sessions read 0; 2026-09-18 reads
+      // 1, traced at PINNED_LOAD_BEARING above. Pinned per session rather than bounded, so a
+      // second instance fails and has to be looked at — and so does this one disappearing.
+      expect([SESSION, R!.loadBearingButNotImproved])
+        .toEqual([SESSION, PINNED_LOAD_BEARING[SESSION] ?? 0]);
     });
 
     if (SESSION === '2026-07-28') {

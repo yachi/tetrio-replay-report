@@ -50,7 +50,7 @@ REGEN = ("REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts "
 #: counts must be non-decreasing along it — see `_invariants`.
 CHAIN = ("shipped", "no_reopen", "cavity1_no_reopen", "naive")
 WORDS = {7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve",
-         13: "thirteen"}
+         13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen"}
 
 
 def pct2(n, d):

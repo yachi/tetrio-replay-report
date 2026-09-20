@@ -49,22 +49,31 @@ and both are established rather than hypothetical:
    to say it was never a shape at all.
    2026-09-19 took it to thirteen and 884 rounds and moved all seven a SEVENTH time, the pair
    together and inward again (+0.178 → +0.157, +0.168 → +0.148) — and by FAR the largest step any
-   of the seven increments has produced, four times the previous largest on the headline rho.
+   of the seven increments had produced, four times the previous largest on the headline rho.
    That is not a new effect and it is worth saying why: this session is 150 rounds against the
    46-84 every earlier one brought, so it carries about a sixth of the pooled weight by itself.
    **A corpus statistic drifts at whatever rate the next session's SIZE dictates, not at a rate
    of its own**, which is the sharpest form of the reason none of these digits is a finding — a
    reader extrapolating the step size from six small increments would have been wrong by a
    factor of four.
-   Seven increments, no run of three in any one direction, and the sign and ordering unmoved
+   2026-09-18 took it to fourteen and 1011 rounds and moved all seven an EIGHTH time, the pair
+   together and inward for a third consecutive session (+0.157 → +0.151, +0.148 → +0.145). It is
+   127 rounds — the second largest — and it moved the headline rho by 0.006, a sixth of what the
+   150-round session moved it by. **So size sets the SCALE of a drift and does not determine it**;
+   the two largest sessions in the corpus, one day apart, moved this statistic by amounts that
+   differ by a factor of four in the same direction. A reader who had taken the previous
+   paragraph as a rule (「a long session moves it a lot」) would have over-predicted this one
+   fourfold, which is the same failure the paragraph itself warns against, one increment later.
+   Eight increments, no run of three in any one direction bar the pair's last three inward, and
+   the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
-   same lesson, now seven times over:
+   same lesson, now eight times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.157**
-   (cleared_pp/intensity), **+0.148** (cleared/intensity), **+0.034** (cleared_pp/duration),
-   **-0.173** (apm/duration), **-0.174** (attack/duration), **+0.249**
-   (cleared_per_received/intensity) and **+0.092** (received/intensity). Nothing else in this
+   re-derives rather than counting sessions. As of the current corpus they read **+0.151**
+   (cleared_pp/intensity), **+0.145** (cleared/intensity), **+0.027** (cleared_pp/duration),
+   **-0.164** (apm/duration), **-0.165** (attack/duration), **+0.252**
+   (cleared_per_received/intensity) and **+0.104** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.

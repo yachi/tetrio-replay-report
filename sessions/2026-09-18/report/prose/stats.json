@@ -1,0 +1,45 @@
+{
+  "eyebrow": "數據對決 · 十八場 127 局",
+  "title": "數據對決",
+  "lede": "呢一節嘅主線係一句：<strong>yachi 疊多咗方塊，攻擊反而少咗</strong>。全晚佢多疊 426 粒，少打 352 條攻擊，即係 pinglamb 總攻擊嘅 4.8%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"G039\"></span><span class=\"badge\" data-claim=\"G040\"></span>。呢條「加粒數買返個差距」嘅路，連續第十次填唔返個窿——今次佢最多可以填返 3.7 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，但要填嘅係 8.9 個<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G052\"></span>。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢",
+      "caps": [
+        "十八場嘅 VS 走勢。頭九場 pinglamb 拉開，尾九場兩條線貼返埋——同局數嘅 24 比 37 / 34 比 32 對得上<span class=\"badge\" data-claim=\"C010\"></span>。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布",
+      "caps": [
+        "T-spin 係 pinglamb 嘅：double 549 對 471、triple 121 對 66<span class=\"badge\" data-claim=\"G046\"></span><span class=\"badge\" data-claim=\"G047\"></span>，全消 24 對 12<span class=\"badge\" data-claim=\"G048\"></span>。",
+        "yachi 嗰邊係 quad：550 對 466<span class=\"badge\" data-claim=\"G045\"></span>，加上每粒方塊清走多過對手<span class=\"badge\" data-claim=\"G089\"></span>。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼",
+      "caps": [
+        "落速 yachi 快（每局平均 1.439 對 1.412）<span class=\"badge\" data-claim=\"G050\"></span>，APM pinglamb 高（54.997 對 50.407）<span class=\"badge\" data-claim=\"G051\"></span>。",
+        "每粒方塊要按幾多下兩個人差唔多：yachi 3.628、pinglamb 3.608<span class=\"badge\" data-claim=\"C008\"></span><span class=\"badge\" data-claim=\"G077\"></span>，而且喺贏同輸嘅局之間都郁唔郁得幾多<span class=\"badge\" data-claim=\"G084\"></span><span class=\"badge\" data-claim=\"G085\"></span>——呢一欄唔係話事嗰條。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

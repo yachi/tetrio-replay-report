@@ -1,0 +1,30 @@
+{
+  "eyebrow": "關鍵時刻 · 四場剃光頭同一條窄到貼地嘅地板",
+  "title": "呢晚真正新嘅嘢，係一個「次數」唔係一個「比率」",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "第四場",
+      "value": "5 比 0",
+      "body": "yachi 五局全取<span class=\"badge\" data-claim=\"C011\"></span><span class=\"badge\" data-claim=\"G007\"></span>。<strong>corpus 十場剃光頭，淨係呢一場唔係 pinglamb 嘅</strong>——呢個係次數，唔會因為今晚長咗而發水。全晚四場剃光頭係歷來最多，但十八場入面四場（22%）仲低過 07-24 七場入面兩場（28%），所以「最多」唔等於「最密」。"
+    },
+    {
+      "accent": "g",
+      "label": "最癲一局 m4r2",
+      "value": "兩邊 VS 加埋 306.1",
+      "body": "全晚最激嗰局就喺嗰場剃光頭入面<span class=\"badge\" data-claim=\"G076\"></span>。yachi 贏咗，但佢喺四條攻擊軸入面輸咗兩條（落速、最大單波）<span class=\"badge\" data-claim=\"G098\"></span>——佢贏嘅係每粒方塊嘅攻擊 0.803 對 0.709<span class=\"badge\" data-claim=\"G099\"></span>同每粒方塊清走 0.313 對 0.227<span class=\"badge\" data-claim=\"G100\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "輸嗰啲局嘅差距",
+      "value": "1% 幾",
+      "body": "兩個人輸嗰啲局，每粒方塊攻擊淨係爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span><span class=\"badge\" data-claim=\"G082\"></span><span class=\"badge\" data-claim=\"G083\"></span>，十四晚以嚟第二窄，僅次於 09-10。贏嗰啲局就爭 8% 幾。<strong>呢個數字係一局撐住嘅</strong>：抽走 m1r7 之後淨係剩 0.59%——不過抽走佢個差距係<em>更窄</em>，即係「地板貼埋」呢個講法企得更穩，企唔穩嘅係「1.54」呢個數。"
+    }
+  ],
+  "trivia": [
+    "第一場同第十七場走勢一模一樣：兩場都係 yachi 4 比 3 反超前，跟住連失兩局收 4 比 5<span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"C028\"></span><span class=\"badge\" data-claim=\"G004\"></span><span class=\"badge\" data-claim=\"G020\"></span>。",
+    "全晚最高 APM（71.6）同最高 VS（162.9）都係 yachi 喺第八場第二局做出嚟<span class=\"badge\" data-claim=\"G025\"></span><span class=\"badge\" data-claim=\"G026\"></span>——兩個都係夠 60 秒嗰批局入面嘅最高。",
+    "全晚 127 局，局局都係 VS 高嗰個贏<span class=\"badge\" data-claim=\"G035\"></span>。呢個喺 corpus 十四晚都成立。",
+    "最短嗰局 12.7 秒<span class=\"badge\" data-claim=\"G033\"></span>，最長嗰局 212 秒<span class=\"badge\" data-claim=\"G032\"></span>，爭成 17 倍。"
+  ]
+}
