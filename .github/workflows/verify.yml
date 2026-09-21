@@ -740,6 +740,19 @@ jobs:
           python3 spec/check_spec_vacuity.py
           python3 spec/check_spec_vacuity.py spec/DonationCave.dfy
 
+      # This repo asks one anti-vacuity question twice — `check_smt --mutate` of
+      # `claims.smt2`, `pipeline/mutation_test.sh` of `Facts.dfy` — and until
+      # 2026-09-21 the two disagreed about the OPERATOR: the shell one escalated
+      # upward only, so a one-sided claim with the mutated datum on the winning side
+      # came back as a survivor. Both gates were green for months; nothing read both.
+      # It lives in this job because this is where the mutation harnesses and the
+      # vacuity gates already are, and it runs on every push rather than weekly,
+      # because the drift happens at edit time and the weekly is where it gets found.
+      - name: The two anti-vacuity ladders agree
+        run: |
+          python3 -m pipeline.check_mutation_ladder --selftest
+          python3 -m pipeline.check_mutation_ladder
+
       # The seven worked examples are described twice — as the machine-checked witnesses above and
       # as the drawn boards in example-boards.ts. The Dafny verifier never reads the TS, and the TS
       # test only compared the roof/floor separation, so the two could disagree on the verdict of a

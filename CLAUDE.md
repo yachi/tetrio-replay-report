@@ -99,7 +99,9 @@ Corollaries that are gates, not preferences:
   link while the verifier still reports 0 errors and the status gate still counts 54/54.
   `pipeline/check_proof_links.py` is the gate; rebuild a stranded map with the session's
   `build_proof_map.py` (the committed hand layout) or `pipeline.build_proof_map` (generated)
-- a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant
+- a lemma that no mutation can kill is decorative; `mutation_test.sh` must kill every mutant —
+  with the SAME escalation ladder `check_smt --mutate` uses, because it is the same question
+  and a second copy of the operator drifted from the first for months (see 「Three backends」)
 - **before adding a check, ask whether an existing gate already entails it.** A check that cannot
   fail against correctly-produced data is not a weak gate, it is a comment — and this repo has
   produced four of them by four different routes: the naive Donation clause (`NaiveClauseForced` —
@@ -142,6 +144,8 @@ python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exh
 python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt2
 python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
+python3 -m pipeline.check_mutation_ladder   # CI gate: mutation_test.sh's escalation ladder
+python3 -m pipeline.check_mutation_ladder --selftest   #   still covers check_smt's
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
@@ -248,6 +252,58 @@ gate has had were confined to a kind:
 Coded-ness is read from the constant's **name** (the emitter marks them with a trailing
 `; label`), never from its value — detecting by value quietly reclassified a `topcombo` of 4 as
 "the code for topout" and reported six real measurements as survivors.
+
+**THAT OPERATOR HAS TWO IMPLEMENTATIONS AND THE SECOND ONE LACKED THE BOTH-WAYS RUNG UNTIL
+2026-09-21.** `pipeline/mutation_test.sh` asks the identical question of `Facts.dfy` that
+`check_smt --mutate` asks of `claims.smt2`, and its ladder was `+1`, then `v*10 + 100000` —
+upward only. The weekly run of 2026-09-21 is where that cost a red build.
+2026-09-19's `m13_r2_yachi_finesse_perfect` is 156; the only claim naming it is **G056**, whose
+spec is the one-sided `sum(yachi.finesse_perfect)·sum(pinglamb.pieces) >
+sum(pinglamb.finesse_perfect)·sum(yachi.pieces)` with yachi's datum on the winning side. Evaluate
+those four sums over that session's `facts.json` — which is what re-derives every figure in this
+paragraph, and this is the figures' only home, the harness's own comment deliberately carrying
+none of them — and the margin is 156 405, i.e. **11.39 units of that pooled sum**, so the smallest
+falsifying change is a DECREASE of 12 and *every* increase leaves the claim true. The harness was
+reporting a constrained datum as a vacuous lemma. Its ladder is `check_smt.perturbations`' now,
+plus the rung it already had.
+
+**It was latent, not flaky, and that distinction is how to read any mutation result here.** The
+harness picks its consts deterministically — evenly spaced through the file — so *which* datum
+lands in the sample is a function of how many consts the file holds and in what order, i.e. of the
+session's shape, never of chance. 09-19 is the corpus's longest session, its generated `Facts.dfy`
+holds the 12 343 numeric consts the harness's own first line prints, and index 8 of 12 falls on a
+`finesse_perfect`. Thirteen of the fourteen `pipeline` jobs in that run were green and the same
+09-19 would have failed the week before, had 09-19 existed then. **A deterministic sampler does not
+produce flakes; it produces findings that arrive when the corpus grows**, so 「re-run it」 is never
+the response. That rule is stated nowhere else in this file, which is why it is stated here rather
+than assumed: a survivor is the one CI failure in this repo that cannot be a flake, and the
+temptation to treat a once-a-week red as one is what a schedule-only gate invites.
+
+**A RULE with two implementations drifts exactly the way a FIGURE with two copies does, and it is
+harder to see.** 冇第二份 below is about numbers, and a stale number at least looks like something
+a reader could check. Here both implementations were internally consistent, both gates were green
+for months, and the divergence was invisible until a sampled datum happened to be one-sided. The
+prose that recorded the lesson is the table above, and it named SMT alone — so **the document was
+accurate and the other gate was wrong**, which is the one shape that re-reading the prose cannot
+catch. What made the repair safe to land without re-measuring every session is structural rather
+than empirical: keeping the harness's old rung makes the new ladder a **superset** of both
+operators, and a kill is the first rung that breaks verification, so no mutant that died under the
+old ladder can survive under this one.
+
+**The two ladders are still two implementations, and `pipeline/check_mutation_ladder.py` is what
+now makes them agree.** Collapsing them into one would have been the wrong repair — two
+independent implementations of one question is this repo's method, on the proof side exactly as
+on the extraction side — so what is gated is that the shell ladder is never WEAKER: every rung
+`check_smt.perturbations` would try still appears in it, in that order. Two decisions inside it
+are the transferable part. The shell side **prints** its own ladder (`mutation_test.sh --ladder
+<v>`) instead of being parsed, because a gate a reformat breaks is a gate whose normal state is
+red — the same objection this file records against recomputing the repertoire bands. And its
+values are chosen by SHAPE rather than sampled: zero, the two points where the shell ladder's own
+dedup fires, their neighbours, and a score-sized value where the two 「far up」 rungs diverge. A
+uniform draw would have missed all four boundaries, which is the stratification argument the SMT
+gate already makes about kinds of datum, reached here about kinds of value. It runs on every push
+rather than weekly, because the drift happens at edit time and the weekly is only where it gets
+found.
 
 **Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on every claim of
 every committed `claims.smt2` — 690 across the six artefacts on 2026-08-18, and that total is
