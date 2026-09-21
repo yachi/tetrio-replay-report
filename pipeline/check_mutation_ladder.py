@@ -34,6 +34,13 @@ Two decisions worth keeping:
   order. Subsequence rather than set containment, because the order decides which
   perturbation gets reported as the smallest one that falsified something.
 
+* **Scope is MEASUREMENTS, and the categorical side is deliberately not compared.**
+  `check_smt.perturbations` answers a coded constant with the other codes, which it can
+  do because `claims.smt2` carries a legend. `Facts.dfy` has no legend, so
+  `mutation_test.sh` flips a winner to a name no category holds — a different operator
+  for a different reason, not drift. Widening this gate to cover it would mean
+  asserting an agreement that should not hold.
+
 * **The shell side PRINTS its ladder; this file does not parse it.**
   `mutation_test.sh --ladder <v>` needs no dafny-dir and no dafny. Reading the `for`
   line out of the script instead would be a gate a reformat breaks, which is a gate
