@@ -144,6 +144,8 @@ python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exh
 python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt2
 python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
+python3 -m pipeline.check_mutation_ladder   # CI gate: mutation_test.sh's escalation ladder
+python3 -m pipeline.check_mutation_ladder --selftest   #   still covers check_smt's
 python3 -m pipeline.check_rate_coverage sessions/<date>/report  # CI gate: short rounds' rates still pinned
 python3 -m pipeline.check_badge_links sessions/<date>/report    # CI gate: every badge citation resolves
 python3 -m pipeline.check_report_shell sessions/<date>/report   # CI gate: no hand-written <section> in the body
@@ -285,6 +287,21 @@ catch. What made the repair safe to land without re-measuring every session is s
 than empirical: keeping the harness's old rung makes the new ladder a **superset** of both
 operators, and a kill is the first rung that breaks verification, so no mutant that died under the
 old ladder can survive under this one.
+
+**The two ladders are still two implementations, and `pipeline/check_mutation_ladder.py` is what
+now makes them agree.** Collapsing them into one would have been the wrong repair — two
+independent implementations of one question is this repo's method, on the proof side exactly as
+on the extraction side — so what is gated is that the shell ladder is never WEAKER: every rung
+`check_smt.perturbations` would try still appears in it, in that order. Two decisions inside it
+are the transferable part. The shell side **prints** its own ladder (`mutation_test.sh --ladder
+<v>`) instead of being parsed, because a gate a reformat breaks is a gate whose normal state is
+red — the same objection this file records against recomputing the repertoire bands. And its
+values are chosen by SHAPE rather than sampled: zero, the two points where the shell ladder's own
+dedup fires, their neighbours, and a score-sized value where the two 「far up」 rungs diverge. A
+uniform draw would have missed all four boundaries, which is the stratification argument the SMT
+gate already makes about kinds of datum, reached here about kinds of value. It runs on every push
+rather than weekly, because the drift happens at edit time and the weekly is only where it gets
+found.
 
 **Two solvers, and they agree.** z3 4.16.0 and cvc5 1.3.4 both answer `unsat` on every claim of
 every committed `claims.smt2` — 690 across the six artefacts on 2026-08-18, and that total is
