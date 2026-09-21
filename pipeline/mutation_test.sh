@@ -52,20 +52,51 @@ run_one() {   # $1 = line number, $2 = sed program, $3 = description
 
 # A value may only be constrained beyond a threshold — a datum compared against a
 # session maximum is not pinned by a +1 nudge, because the nudged value still loses to
-# the maximum. That is a weak mutation operator, not a vacuous lemma, so escalate to a
-# value far outside any plausible range before calling a mutant a survivor.
+# the maximum. That is a weak mutation operator, not a vacuous lemma, so escalate
+# before calling a mutant a survivor.
+#
+# ESCALATE BOTH WAYS. Many claims here are ONE-SIDED: G056 is
+# `sum(yachi.finesse_perfect) * sum(pinglamb.pieces) > sum(pinglamb.finesse_perfect) *
+# sum(yachi.pieces)`, a single `>` over two pooled products, so every INCREASE to a
+# datum on the winning side leaves it true. An upward-only ladder reports such a datum
+# as unconstrained when it is merely constrained downward — a false alarm, not a
+# finding. 2026-09-21's scheduled run is where that cost a red build:
+# 2026-09-19's `m13_r2_yachi_finesse_perfect` is 156, and G056's cross-multiplied margin
+# is 11.4 units of the pooled sum it sits in — so nothing smaller than a DECREASE of 12
+# falsifies anything, and +1 and +101560 alike were reported as a survivor.
+#
+# THE LADDER IS `check_smt.perturbations`', plus the `v*10 + 100000` rung this harness
+# already had. One operator, two gates. The SMT gate learned both-ways escalation on
+# its own one-sided case (`m4_r3_pinglamb_inputs`) and the lesson was written down for
+# SMT alone, so the second copy of the operator drifted from the first for as long as
+# nobody ran both against the same datum — which is this repo's standing 冇第二份 shape
+# with a rule in place of a figure. Keeping the old rung too makes this ladder a
+# superset of both, so no mutant that died before can survive now.
+#
+# Rungs escalate, and the ladder short-circuits on the first kill: the message names
+# the SMALLEST perturbation that falsified something, and the extra dafny runs are paid
+# only on the data that needed them. Adding rungs can only turn SURVIVED into killed,
+# never the reverse.
 run_escalating() {   # $1 = line, $2 = const name, $3 = value
   tried=$((tried + 1))
-  local big=$(( $3 * 10 + 100000 ))
-  if try_mutation "$1" "s/:= $3\$/:= $(( $3 + 1 ))/"; then
-    echo "  [$tried] killed    $2 $3 -> $(( $3 + 1 ))"
-    killed=$((killed + 1))
-  elif try_mutation "$1" "s/:= $3\$/:= ${big}/"; then
-    echo "  [$tried] killed    $2 $3 -> ${big} (needed a large mutation)"
-    killed=$((killed + 1))
-  else
-    echo "  [$tried] SURVIVED  $2 (unconstrained at $3, $(( $3 + 1 )) and ${big})"
-  fi
+  local v=$3
+  local rung probed=""
+  for rung in $(( v + 1 )) $(( v - 1 )) $(( v + 1000 )) $(( v - 1000 )) \
+              $(( v + 1000000 )) $(( v * 10 + 100000 )) 0; do
+    # A rung equal to the original mutates nothing and a repeated rung re-asks a
+    # question already answered; either one "surviving" is evidence of nothing at all,
+    # so neither is reported as a probe. Both collide in practice — `v - 1000` is 0 at
+    # v = 1000, and `v + 1000000` meets `v * 10 + 100000` at v = 100000.
+    if [ "$rung" = "$v" ]; then continue; fi
+    case ",$probed," in *",$rung,"*) continue ;; esac
+    probed="${probed:+$probed,}$rung"
+    if try_mutation "$1" "s/:= ${v}\$/:= ${rung}/"; then
+      echo "  [$tried] killed    $2 $v -> $rung"
+      killed=$((killed + 1))
+      return
+    fi
+  done
+  echo "  [$tried] SURVIVED  $2 (unconstrained at $v; tried ${probed//,/, })"
 }
 
 echo "mutating $N of $TOTAL numeric consts in $DIR/Facts.dfy"
