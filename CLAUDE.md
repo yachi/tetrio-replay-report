@@ -261,7 +261,8 @@ upward only. The weekly run of 2026-09-21 is where that cost a red build.
 spec is the one-sided `sum(yachi.finesse_perfect)·sum(pinglamb.pieces) >
 sum(pinglamb.finesse_perfect)·sum(yachi.pieces)` with yachi's datum on the winning side. Evaluate
 those four sums over that session's `facts.json` — which is what re-derives every figure in this
-paragraph — and the margin is 156 405, i.e. **11.4 units of that pooled sum**, so the smallest
+paragraph, and this is the figures' only home, the harness's own comment deliberately carrying
+none of them — and the margin is 156 405, i.e. **11.39 units of that pooled sum**, so the smallest
 falsifying change is a DECREASE of 12 and *every* increase leaves the claim true. The harness was
 reporting a constrained datum as a vacuous lemma. Its ladder is `check_smt.perturbations`' now,
 plus the rung it already had.
@@ -274,8 +275,9 @@ holds the 12 343 numeric consts the harness's own first line prints, and index 8
 `finesse_perfect`. Thirteen of the fourteen `pipeline` jobs in that run were green and the same
 09-19 would have failed the week before, had 09-19 existed then. **A deterministic sampler does not
 produce flakes; it produces findings that arrive when the corpus grows**, so 「re-run it」 is never
-the response — which is the same rule this file states for CI elsewhere, reached from the other
-direction.
+the response. That rule is stated nowhere else in this file, which is why it is stated here rather
+than assumed: a survivor is the one CI failure in this repo that cannot be a flake, and the
+temptation to treat a once-a-week red as one is what a schedule-only gate invites.
 
 **A RULE with two implementations drifts exactly the way a FIGURE with two copies does, and it is
 harder to see.** 冇第二份 below is about numbers, and a stale number at least looks like something

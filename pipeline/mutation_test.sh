@@ -29,9 +29,10 @@ set -euo pipefail
 # datum on the winning side leaves it true. An upward-only ladder reports such a datum
 # as unconstrained when it is merely constrained downward — a false alarm, not a
 # finding. 2026-09-21's scheduled run is where that cost a red build:
-# 2026-09-19's `m13_r2_yachi_finesse_perfect` is 156, and G056's cross-multiplied margin
-# is 11.4 units of the pooled sum it sits in — so nothing smaller than a DECREASE of 12
-# falsifies anything, and +1 and +101560 alike were reported as a survivor.
+# 2026-09-19's `m13_r2_yachi_finesse_perfect` is read by G056 and by nothing else, so
+# raising it can falsify nothing and only a large enough DECREASE can. The size of that
+# decrease, and the margin it comes from, are in CLAUDE.md and deliberately not repeated
+# here: one home per figure, and a comment cannot go red.
 #
 # THE LADDER IS `check_smt.perturbations`', plus the `v*10 + 100000` rung this harness
 # already had. One operator, two gates. The SMT gate learned both-ways escalation on
