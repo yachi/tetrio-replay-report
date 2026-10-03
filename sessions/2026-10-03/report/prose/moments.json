@@ -1,0 +1,30 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：兩塊記分板、一條差唔多填返晒嘅路、同一個五場都啱嘅指標",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "局數 yachi · 場數 pinglamb",
+      "value": "19:17 / 2:3",
+      "body": "十五晚以嚟，局數贏家同場數贏家第一次唔係同一個人。yachi 贏嗰兩場都係 5 比 1，合共 10 比 2；pinglamb 贏嗰三場都係 5 比 3，合共 15 比 9<span class=\"badge\" data-claim=\"C011\"></span>。<strong>大勝食咗局數，記分板唔會計兩次。</strong>五場嘅一晚，一場大勝同一場險勝喺系列入面一樣值一分。"
+    },
+    {
+      "accent": "g",
+      "label": "粒數盈餘差唔多填返晒個窿",
+      "value": "6.20% / 6.86%",
+      "body": "yachi 多疊 222 粒方塊，即係多 6.20%<span class=\"badge\" data-claim=\"C009\"></span>；pinglamb 每粒方塊嘅攻擊高 6.86%<span class=\"badge\" data-claim=\"C004\"></span>——十五晚入面第二窄。盈餘差唔多買返晒個窿，兩邊總攻擊淨係差 14 條<span class=\"badge\" data-claim=\"C005\"></span>。<strong>但 14 條係一局話事嘅數</strong>：抽走第五場第一局，yachi 反而多 13 條。企得穩嘅係「兩邊撞埋一齊」，唔係個差額。"
+    },
+    {
+      "accent": "p",
+      "label": "每粒攻擊高嗰個，場場都贏",
+      "value": "5 / 5",
+      "body": "逐場計每粒方塊嘅攻擊，邊個高邊個就贏咗嗰場，五場冇一場例外<span class=\"badge\" data-claim=\"C017\"></span>。而 yachi 嘅場均 PPS 五場都高過對手，照樣輸咗三場<span class=\"badge\" data-claim=\"G047\"></span>。<strong>快嗰個場場都快，但淨係贏咗兩場；每粒重嗰個，五場都係贏家。</strong>不過要講清楚：兩場贏喺五場入面啱啱好排喺最底，純粹撞彩都有十分一機會，所以呢晚唔計入「逐場排開分得開」嗰類。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係第二場第二局，兩邊 VS 加埋約 304.5<span class=\"badge\" data-claim=\"G056\"></span>。pinglamb 贏咗，但佢喺落速同行數兩條軸都落後<span class=\"badge\" data-claim=\"G078\"></span>——佢每粒方塊攻擊 0.950 對 0.627<span class=\"badge\" data-claim=\"G079\"></span>。呢局亦係撐住「贏局差距」嗰一局：抽走佢，個差距由 4.96% 跌到 2.42%<span class=\"badge\" data-claim=\"C002\"></span>。",
+    "全晚最長嗰局係第五場第二局，打咗約 243 秒<span class=\"badge\" data-claim=\"G017\"></span>，yachi 清咗 219 行、係單局最多，最後係 pinglamb 生還<span class=\"badge\" data-claim=\"G016\"></span>。最短嗰局第一場第二局得約 15 秒<span class=\"badge\" data-claim=\"G018\"></span>。",
+    "成晚得 4 局自己頂到頂，yachi 1 局、pinglamb 3 局<span class=\"badge\" data-claim=\"C006\"></span>——36 局入面一成一，十五晚第三低。",
+    "KPP 今晚係 pinglamb 高 1.23%（3.623 對 3.579）<span class=\"badge\" data-claim=\"C008\"></span>，同之前兩晚掉轉。呢一欄係一晚嘅狀態，唔係邊個嘅特徵。"
+  ]
+}

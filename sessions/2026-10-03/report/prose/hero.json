@@ -1,0 +1,10 @@
+{
+  "kicker": "第十五回合",
+  "title": "2 比 3，但局數係 19 比 17——\n兩塊記分板，<span class=\"hl-y\">第一次</span>寫住兩個名",
+  "tags": {
+    "yachi": "贏局數 · 輸場數 · ROUNDS",
+    "pinglamb": "贏場數 · 每粒更重 · MATCHES"
+  },
+  "lede": "五場 match、36 局，係 corpus 十五晚以嚟最細嘅一晚，場數同局數都係。<strong>pinglamb 3 比 2 攞低個系列</strong><span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>，但逐局計係 <strong>yachi 19 比 17</strong><span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>——十五晚以嚟第一次，兩塊記分板寫住唔同嘅名（09-10 嗰晚 4 比 4，根本冇場數贏家）。原因唔複雜：yachi 贏嗰兩場都係 5 比 1，pinglamb 贏嗰三場都係 5 比 3<span class=\"badge\" data-claim=\"C011\"></span>。yachi 打完三場仲係 2 比 1 領先、局數 13 比 7，之後 pinglamb 由第四場尾一路連贏七局<span class=\"badge\" data-claim=\"G009\"></span><span class=\"badge\" data-claim=\"C010\"></span>，個系列就係咁反轉。逐場計每粒方塊嘅攻擊，邊個高邊個就贏咗嗰場，五場冇一場例外<span class=\"badge\" data-claim=\"C017\"></span>；而 yachi 嘅 PPS 五場都高過對手，照輸個系列<span class=\"badge\" data-claim=\"G047\"></span>。得五場，呢啲全部都係細樣本嘅讀法。",
+  "score_claim": "G001"
+}
