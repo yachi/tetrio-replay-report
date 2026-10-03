@@ -59,7 +59,8 @@ const SESSIONS_DIR = `${import.meta.dir}/../../sessions`;
 const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
-       '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19'])
+       '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
+       '2026-10-03'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -123,7 +124,12 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // is still EMPTY over all of them. This row lands out of date order — 09-18 is the night before
   // 09-19 and arrived after it — so the running totals above read as arrival order and not as a
   // corpus growing by date. That matters for nothing here except how to read the column.
-  expect(both + oursOnly + ccOnly + neither).toBe(166127);
+  // 2026-10-03: 166127 -> 172369, the SMALLEST addition the file has taken (6242 boards, under
+  // 09-03's 7934 — it is the corpus's smallest session, 36 rounds), and `unexplained` is still
+  // EMPTY over all of them. The walk took ~193 s at fifteen sessions on the machine that pinned
+  // this, against the 300 s budget below — a large session or two more will need that budget
+  // re-measured rather than raised blind.
+  expect(both + oursOnly + ccOnly + neither).toBe(172369);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

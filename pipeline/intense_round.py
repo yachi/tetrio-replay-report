@@ -30,54 +30,58 @@ mechanism is real, this round is the illustration, and neither is the other". Wh
 still banned is a corpus figure the round appears to license, or the round's numbers
 generalised without one.
 
-The result: over 1011 decided rounds in fourteen sessions, downstacking is the only printed
+The result: over 1047 decided rounds in fifteen sessions, downstacking is the only printed
 measure that becomes MORE decisive as rounds intensify — paired AUC across terciles of
-combined VS runs 65.1 → 70.3 → 75.5 for the per-piece rate (Spearman rho +0.151 against
-intensity; raw 清走 +0.145). It survives both controls the closing note quotes: it is not
-round LENGTH (the same test against duration is rho +0.027, while APM's and 攻擊's apparent
-decay IS a length effect at rho −0.164 / −0.165 — which is why the attacking lede this
+combined VS runs 64.8 → 69.9 → 75.8 for the per-piece rate (Spearman rho +0.154 against
+intensity; raw 清走 +0.139). It survives both controls the closing note quotes: it is not
+round LENGTH (the same test against duration is rho +0.028, while APM's and 攻擊's apparent
+decay IS a length effect at rho −0.160 / −0.162 — which is why the attacking lede this
 section used to carry was not supported as stated), and it is not the loser dying with
 garbage still on the board (normalising by how much garbage ARRIVED strengthens it to
-rho +0.252, and 食 — which carries that same death bias but no skill — does not trend,
-rho +0.104).
+rho +0.255, and 食 — which carries that same death bias but no skill — does not trend,
+rho +0.101).
 
 **The ninth session moved every one of those figures and moved none of the conclusions;
-the tenth through fourteenth did it again.** The tercile progression flattened at both ends
+the tenth through fifteenth did it again.** The tercile progression flattened at both ends
 over 09-03 (62.6 → 67.0 → 80.9 became 62.2 → 68.7 → 77.1), 09-10 moved the middle to
 62.1 → 67.5 → 77.1, 09-11 lifted both ends to 62.3 → 67.5 → 77.5, 09-17 lifted all three to
 63.1 → 68.6 → 77.8, 09-19 raised the bottom two while lowering the top to
 64.8 → 69.2 → 76.8 — the first movement that COMPRESSES the progression from both ends at once —
-and 09-18 compressed it AGAIN, to 65.1 → 70.3 → 75.5, the second such movement running and the
-one that makes the first not a one-off;
+09-18 compressed it AGAIN, to 65.1 → 70.3 → 75.5, the second such movement running and the
+one that makes the first not a one-off, and 10-03 — the SMALLEST session, 36 rounds — undid part
+of both, to 64.8 → 69.9 → 75.8, the first movement that WIDENS the progression at both ends;
 the headline rho went
-+0.203 → +0.177 → +0.183 → +0.182 → +0.178 → +0.157 → +0.151, i.e. down, back up, barely at all,
-down
++0.203 → +0.177 → +0.183 → +0.182 → +0.178 → +0.157 → +0.151 → +0.154, i.e. down, back up,
+barely at all, down
 again, then the largest single fall the series has had (0.021, against a previous largest of
-0.026 at 09-03 and nothing else above 0.006), and then a sixth of that fall.
+0.026 at 09-03 and nothing else above 0.006), then a sixth of that fall, and then back up by
+half as much again.
 The ordering, the two controls and their directions are unchanged throughout.
 Read the drift as what it is: these are corpus statistics over a growing corpus, so their
 DIGITS are expected to move every session and only a change of sign or of ordering is news.
-Six sessions of movement — down, up, barely, down, down hard, down gently — is the clearest
-available
+Seven sessions of movement — down, up, barely, down, down hard, down gently, up — is the
+clearest available
 demonstration that the digits are not the finding: a reader who could predict the next one from
 the last two would have been wrong every time, and the fourth movement is the one that makes
 「not moving at the third decimal」 read as the coincidence it was rather than as convergence.
 **The two compressions are the one thing worth a second look**: both came from the corpus's two
 largest sessions, which is what a tercile split does when the new rounds are spread across all
 three buckets rather than concentrated in one — a fact about where the mass landed, not about
-downstacking.
+downstacking. The smallest session then moving all three terciles the OTHER way is the same fact
+from the other side: 36 rounds is too few to spread evenly, so it pulls whichever bucket it lands
+in.
 The fifth adds the other half of that lesson. 09-19 is 150 rounds against the 46-84 every
 earlier session brought, so it carries about a sixth of the pooled weight on its own, and it
 moved rho four times further than any session since the ninth. **A corpus statistic does not
 drift at a rate; it drifts at whatever rate the next session's SIZE dictates**, which is the
 reason to read sign and ordering rather than digits — both are unchanged here, for the
-thirteenth session running.
+fourteenth session running.
 
 Every figure in that paragraph is a string CORPUS holds, and `check_intense_corpus` compares
 them; do not edit one without re-rendering the block. That death bias is real all the same, and the note keeps it.
 
 **The monotone progression and its controls are the finding; p is supporting evidence.**
-The 1011 rounds are nested in matches, in sessions and in two players, so every p here
+The 1047 rounds are nested in matches, in sessions and in two players, so every p here
 assumes an independence the data does not have and is anti-conservative. They are printed
 raw AND Bonferroni-adjusted with the family size beside them, never Holm-adjusted: Holm's
 value for one test is a function of the ENTIRE vector of the family's raw p, so a re-source
@@ -169,19 +173,19 @@ if _missing:
 # (rho is a two-sided point estimate), `fmt_auc` likewise, and `fmt_p` CEILS, because a
 # p-value is an upper bound on a false-positive rate and the safe direction is up.
 CORPUS = {
-    "n": 1011,
-    "sessions": 14,
+    "n": 1047,
+    "sessions": 15,
     "m": 26,
     "tercile_test": "cleared_pp/intensity",
-    "terciles": ["65.1", "70.3", "75.5"],
+    "terciles": ["64.8", "69.9", "75.8"],
     "tests": {
-        "cleared_pp/intensity": {"rho": "+0.151", "raw": "0.0001", "adj": "0.0001"},
-        "cleared/intensity": {"rho": "+0.145", "raw": "0.0001", "adj": "0.0001"},
-        "cleared_pp/duration": {"rho": "+0.027", "raw": "0.3952", "adj": "1.0000"},
-        "apm/duration": {"rho": "-0.164", "raw": "0.0001", "adj": "0.0001"},
-        "attack/duration": {"rho": "-0.165", "raw": "0.0001", "adj": "0.0001"},
-        "cleared_per_received/intensity": {"rho": "+0.252", "raw": "0.0001", "adj": "0.0001"},
-        "received/intensity": {"rho": "+0.104", "raw": "0.0010", "adj": "0.0247"},
+        "cleared_pp/intensity": {"rho": "+0.154", "raw": "0.0001", "adj": "0.0001"},
+        "cleared/intensity": {"rho": "+0.139", "raw": "0.0001", "adj": "0.0002"},
+        "cleared_pp/duration": {"rho": "+0.028", "raw": "0.3630", "adj": "1.0000"},
+        "apm/duration": {"rho": "-0.160", "raw": "0.0001", "adj": "0.0001"},
+        "attack/duration": {"rho": "-0.162", "raw": "0.0001", "adj": "0.0001"},
+        "cleared_per_received/intensity": {"rho": "+0.255", "raw": "0.0001", "adj": "0.0001"},
+        "received/intensity": {"rho": "+0.101", "raw": "0.0011", "adj": "0.0276"},
     },
 }
 

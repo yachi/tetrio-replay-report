@@ -6,8 +6,10 @@ end. It is a research tool in the same tier as `tools/triangle-oracle`: nothing 
 mints a claim, or runs in CI. Every figure it produces is a **one-engine** figure (cold-clear's opinion),
 never a verified one.
 
-First run: the 2026-10-03 session (20 matches, 292 player-rounds, 27 868 placements), results in
-[`FINDINGS-2026-10-03.md`](FINDINGS-2026-10-03.md).
+First run: all 20 exports of the night of 2026-10-03 (`replay-2026-10-03-01..20.ttrm`, 292 player-rounds,
+27 868 placements), results in [`FINDINGS-2026-10-03.md`](FINDINGS-2026-10-03.md). The published
+`sessions/2026-10-03` holds only exports 16-20 (5 matches), so its report and this tool's figures cover
+different sets of matches and must not be compared as if they were one session.
 
 ## Pipeline
 

@@ -49,13 +49,14 @@ const SESSIONS = [
   { dir: '2026-09-17', rounds:  98, strict: 91, equal:  7, faults: 1805, perfect: 8422, pieces:  9509 },
   { dir: '2026-09-18', rounds: 254, strict: 215, equal: 39, faults: 4072, perfect: 20854, pieces: 23422 },
   { dir: '2026-09-19', rounds: 300, strict: 267, equal: 33, faults: 5280, perfect: 25015, pieces: 28176 },
+  { dir: '2026-10-03', rounds:  72, strict: 60, equal: 12, faults: 1195, perfect: 6632, pieces:  7378 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 2022, strict: 1749, equal: 273, faults: 33253, perfect: 169591, pieces: 190226 };
+const CORPUS = { rounds: 2094, strict: 1809, equal: 285, faults: 34448, perfect: 176223, pieces: 197604 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -161,13 +162,18 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 33 rounds, all thirteen sessions pooled (18 -> 20 when
+  // longest perfect run is the whole round. 44 rounds, all fifteen sessions pooled (18 -> 20 when
   // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
-  // contributing 3 apiece — 26 -> 28 when 2026-09-17 did, and 28 -> 33 when 2026-09-19 did).
-  // Five in one session is the largest single addition, and it is also the smallest per round:
-  // 5 of 300 against 2 of 98, so the RATE fell while the count rose.
+  // contributing 3 apiece — 26 -> 28 when 2026-09-17 did, 28 -> 33 when 2026-09-19 did,
+  // 33 -> 40 when 2026-09-18 did, and 40 -> 44 when 2026-10-03 did). The count read 「33 rounds,
+  // all thirteen sessions」 for a session after the pin beside it had moved to 40 — the pin was
+  // updated and the prose was not, which is CLAUDE.md's 冇第二份 class inside a single comment.
+  // 2026-10-03's four come from the corpus's SMALLEST session (72 player-rounds), so its RATE
+  // (4 of 72, 5.6%) is the highest any session has — 08-19's 6 of 140 (4.3%) is next — while
+  // three sessions (09-18's 7, 08-19's 6, 09-19's 5) hold a larger COUNT. A small-n reading
+  // first, recorded and not read.
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(40);
+  expect(clean.length).toBe(44);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -182,22 +188,20 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
-  // Fourteen-session figures (2026-09-18 added): 17.49 -> 17.48, 10.83 -> 10.85, 89.17 -> 89.15,
-  // 16.40 -> 16.39, 1.615 -> 1.611. **Every one moved BACK, and that is the note worth keeping.**
-  // The previous revision of this comment recorded all five moving further in the direction they
-  // had moved before, by roughly twice as much, and explained it by 09-19 being 1.8x the size of
-  // any other session. The very next session — 127 rounds, the second largest — reversed every
-  // one of them. So the explanation was right about the mechanism (a big session moves a pooled
-  // rate by its own value, not in a direction the series is heading) and would have been wrong as
-  // a prediction, which is exactly why it was written as the former. The ORDER is the finding and
-  // it is unchanged across all fourteen (perfect share > event rate > the meaningless one >
-  // faulty share). A reader who took 17.48 away as "the" fault rate would be wrong twice over: it
-  // is one corpus-state's reading of a quantity that moves, and it is one of four defensible
-  // ones.
-  expect(pct(faults / pieces)).toBe(17.48);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.85);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.15);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(16.39);    // on no meaningful denominator
+  // Fifteen-session figures (2026-10-03 added): 17.48 -> 17.43, 10.85 -> 10.82, 89.15 -> 89.18,
+  // 16.39 -> 16.35, 1.611 -> 1.611. The previous revision recorded every one moving BACK when
+  // 09-18 landed; this, the corpus's smallest session (72 player-rounds, 3.4% of the pool), moves
+  // four of them a further step the same way and leaves the fifth unmoved at three decimals. That
+  // is a session with a lower fault rate than the pool pulling the pooled rate toward its own
+  // value, and nothing more — a big session moves a pooled rate by its own value, and so does a
+  // small one, by less. The ORDER is the finding and it is unchanged across all fifteen (perfect
+  // share > event rate > the meaningless one > faulty share). A reader who took 17.43 away as
+  // "the" fault rate would be wrong twice over: it is one corpus-state's reading of a quantity
+  // that moves, and it is one of four defensible ones.
+  expect(pct(faults / pieces)).toBe(17.43);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.82);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.18);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(16.35);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
   expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.611);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);

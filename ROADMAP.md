@@ -182,24 +182,25 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-17 | 13/16 testable = **81%** | 12/16 = **75%** | 12/16 = **75%** | 2 |
 | 2026-09-18 | 24/27 testable = **89%** | 24/27 = **89%** | 24/27 = **89%** | 2 |
 | 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
+| 2026-10-03 | 11/15 testable = **73%** | 11/15 = **73%** | 11/15 = **73%** | 3 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the fourteen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->ten of the fifteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all fourteen pass would sit at 60%. (The session count in that clause is
+2026-07-28, and a floor all fifteen pass would sit at 60%. (The session count in that clause is
 the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
 the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the fourteen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the fourteen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the fifteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the fifteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3928,6 +3929,26 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 第十五個 session：贏場數嗰個輸局數 (2026-10-03)
+
+2026-10-03 落地(**5 場、36 局,pinglamb 3 比 2**),兩個量度都係全 corpus 最細(之前最少係
+6 場、46 局),所以佢攞到嘅每一個「之最」都要先當係細樣本。
+
+1. **第一次場數贏家同局數贏家唔係同一個人**:pinglamb 3 比 2 贏場數,yachi 19 比 17 贏局數
+   [C001][C010]。十五個 `facts.json` 逐個查過,其他 session 局數多嗰個一定係場數贏嗰個,
+   09-10(4 比 4)冇場數贏家。機制喺比分度 [C011]:yachi 兩場都係 5 比 1,pinglamb 三場都係
+   5 比 3。
+2. **shortfall 表由另一頭再證多次個 rate 軸**:36 局嘅 raw 差額(−14 行)細過 07-28 嘅 −15,
+   雖然佢個 shortfall 大啲,所以 raw 軸多一對排錯(11 → 12);rate 軸佢啱啱落格(−0.62%,
+   喺 −0.46% 同 −0.93% 中間),ρ 0.9956 → 0.9964,依然得一對。長 session 因為長而打爛 raw 軸,
+   呢晚因為短而加一對 —— 同一個 confound,由下面睇。
+3. **per-match 分得開,但 1/C(5,2) = 1 in 10**,同 09-11 一齊入 degenerate 嗰邊,冇 mint
+   C007;個 count 停喺 3 of 15。取而代之係 C017:五場都係 APP 高嗰個贏。
+4. **check_loo 一晚攞三個 annotation**(won-gap、攻擊差額、分數差額),係歷來最多;
+   won-gap 0.512 同下一個 0.485 只係差 1.056 倍,THRESHOLD 已經唔再坐喺一個空隙入面。
+5. **pooled AUC 表**(仍然係人手量):KPP 嘅 crossing 唔再係 09-19 一晚嘅 —— 抽走 09-19 都係
+   校正後 0.044,不過咁嘅 margin 正正係 0.048 / 0.059 嗰個位,唔係新證據。
 
 ## 第十三個 session：一晚夠大，照出一條度錯咗嘅軸 (2026-09-19)
 
