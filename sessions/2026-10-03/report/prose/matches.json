@@ -1,0 +1,35 @@
+{
+  "eyebrow": "戰況直擊 · 五場",
+  "title": "五場打成 2 比 3",
+  "lede": "五場都係先贏五局嗰個贏<span class=\"badge\" data-claim=\"G003\"></span>。<strong>呢一節最值得睇嘅係個系列喺邊度反轉</strong>：頭三場 yachi 場數 2 比 1、局數 13 比 7；尾兩場局數 6 比 10<span class=\"badge\" data-claim=\"C010\"></span>。兩截唔同長短（20 局同 16 局），要當比率比：65% 對 37.5%。即係話呢晚唔係開頭輸咗，係尾段先輸——同 09-03 嘅樣一樣，不過係全 corpus 最細嘅版本。",
+  "closer": "全晚停喺 2 比 3<span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>、19 比 17<span class=\"badge\" data-claim=\"G002\"></span>——場數係 pinglamb、局數係 yachi<span class=\"badge\" data-claim=\"C011\"></span>。pinglamb 最長連贏七局，由第四場打到第五場<span class=\"badge\" data-claim=\"G009\"></span>。36 局裏面 32 局係俾垃圾頂爆、4 局自己頂到頂<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"C006\"></span>。",
+  "hero_match": 4,
+  "score_claim": null,
+  "cards": {
+    "1": {
+      "title": "第一場——淨係輸咗第二局",
+      "flag": "yachi",
+      "body": "yachi 淨係輸咗第二局，5 比 1。呢場佢每粒方塊嘅攻擊高過對手<span class=\"badge\" data-claim=\"C012\"></span><span class=\"badge\" data-claim=\"G004\"></span><span class=\"badge\" data-claim=\"C017\"></span>"
+    },
+    "2": {
+      "title": "第二場——由 1 比 3 追平，尾兩局失守",
+      "flag": "pinglamb",
+      "body": "yachi 由 1 比 3 追到 3 比 3，尾兩局連失，3 比 5。全晚最癲嗰局就係呢場第二局<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"G005\"></span><span class=\"badge\" data-claim=\"G056\"></span>"
+    },
+    "3": {
+      "title": "第三場——又係 5 比 1",
+      "flag": "yachi",
+      "body": "yachi 淨係輸咗第三局，5 比 1——打完三場 2 比 1 領先，局數 13 比 7<span class=\"badge\" data-claim=\"C014\"></span><span class=\"badge\" data-claim=\"G006\"></span><span class=\"badge\" data-claim=\"C010\"></span>"
+    },
+    "4": {
+      "title": "第四場——3 比 1 領先，之後連失四局",
+      "flag": "pinglamb",
+      "body": "yachi 打到 3 比 1 領先，跟住連失四局，3 比 5。pinglamb 嘅七連勝由呢度開始，一直去到第五場第三局<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"G007\"></span><span class=\"badge\" data-claim=\"G009\"></span>"
+    },
+    "5": {
+      "title": "第五場——開波連輸三局，追到 3 比 4 收唔到",
+      "flag": "pinglamb",
+      "body": "yachi 開波連輸三局，追到 3 比 4，最後一局俾人攞走，3 比 5。第一局係全晚最乾淨嘅一局：pinglamb 一行垃圾都冇食<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"G008\"></span><span class=\"badge\" data-claim=\"G055\"></span>"
+    }
+  }
+}

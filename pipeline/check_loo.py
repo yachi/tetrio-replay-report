@@ -362,6 +362,13 @@ SENTENCES = {
                     "2026-08-01's near-equal attack and score totals"),
     "totals_0910": ("CLAUDE.md", re.compile(r"the route covered nearly all of it"),
                     "2026-09-10's 47-line attack shortfall"),
+    # The first key whose document is a SESSION's own file rather than CLAUDE.md. 2026-10-03's
+    # report quotes its 14-line attack difference and its 983-point score difference, both of
+    # which flip sign under leave-one-out, and no CLAUDE.md sentence publishes either — so the
+    # sentence that does is the one gated. Anchored on a phrase that file owns.
+    "totals_1003": ("sessions/2026-10-03/report/narrative-beats.md",
+                    re.compile(r"兩邊總數撞埋一齊"),
+                    "2026-10-03's near-equal attack and score totals"),
 }
 
 # (session, figure id, the sentence that publishes it). Every measurable session must appear.
@@ -546,12 +553,58 @@ PUBLISHED = (
     ("2026-09-18", "app_gap_lost", "series"),
     ("2026-09-19", "app_gap_won", "series"),
     ("2026-09-19", "app_gap_lost", "series"),
+    # 2026-10-03 — the smallest session in the corpus (5 matches, 36 rounds) — takes THREE
+    # `ANNOTATED` entries, the most any session has taken. Measured over all five:
+    #
+    #     app_gap_won      +4.9637 pp    m2r2 ->  +2.4226  rel 0.512  1.15x the next of 36  <- annotated
+    #     app_gap_lost    +12.2846 pp    m5r2 -> +15.1522  rel 0.233  1.27x
+    #     app_gap_session  +6.8683 pp    m1r5 ->  +8.2718  rel 0.204  1.03x
+    #     attack_diff          -14 行    m5r1 ->      +13  rel 1.929  1.00x  <- annotated, sign flips
+    #     score_diff          -983 分    m5r1 ->    +8141  rel 9.282  1.03x  <- annotated, sign flips
+    #
+    # Two of the three are the 「these two totals converged」 move the threshold was derived on
+    # (07-28's -15 and 08-01's -576 are the same shape and both flip sign too). The third is a
+    # won-gap, and like 2026-09-18's lost-gap it moves TOWARD zero when its round is dropped:
+    # m2r2 is the most intense round of the night and pinglamb's highest-volume efficient win,
+    # so it holds the won-gap UP, and 「天花板貼埋」 is sharpened rather than undone without it.
+    #
+    # It is tempting to file this as 「36 rounds, so of course」. Do not: 09-19's comment above
+    # records rho(rounds, max rel) = -0.06 over thirteen sessions, and 09-03 at 46 rounds
+    # crossed on one figure only. What crosses here is two near-zero totals (the fragile kind
+    # this file's header names) and one won-gap at 0.512, a hundredth over the cut.
+    #
+    # attack_diff and score_diff ARE published, unlike 08-19 through 09-19's, because this
+    # session's report quotes both — and they are gated in the session's own narrative-beats.md
+    # (`totals_1003`), the first SENTENCES key outside CLAUDE.md, rather than left ungated.
+    ("2026-10-03", "app_gap_won", "series"),
+    ("2026-10-03", "app_gap_lost", "series"),
+    ("2026-10-03", "attack_diff", "totals_1003"),
+    ("2026-10-03", "score_diff", "totals_1003"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-10-03", "app_gap_won"): (
+        "the won-regime gap is +4.9637 pp and m2r2 alone is 2.5411 of it. m2r2 is the night's "
+        "most intense round, and pinglamb's: .9505 attack per piece over 101 pieces, 4th by rate "
+        "of his 17 winning rounds and by far the largest of the four above .95, i.e. 5.9% of his "
+        "winning-round piece pool in one round. Dropping it takes the gap to +2.4226, CLOSER to "
+        "zero — the second case after 2026-09-18's lost-gap where the influential round holds "
+        "a near-level gap up rather than down. So 「天花板貼埋」 survives and is sharpened; the "
+        "figure +4.96 is that round's. `rel` 0.512 is a hundredth over THRESHOLD."),
+    ("2026-10-03", "attack_diff"): (
+        "the attack totals are 2240 vs 2254, difference -14 — the smallest raw difference in the "
+        "corpus, because the session is the shortest — and m5r1 alone is 27 of it: without that "
+        "round yachi is 13 AHEAD. m5r1 is pinglamb's 38-to-11 win in a 24-second round, the "
+        "night's cleanest (he received nothing). 「兩邊總攻擊撞埋一齊」 survives; 「爭 14 條」 is a "
+        "figure one round owns and its sign is that round's. Same shape as 07-28's -15."),
+    ("2026-10-03", "score_diff"): (
+        "the in-game score totals are 729795 vs 730778, difference -983, and the same m5r1 is "
+        "9124 of it — without it yachi leads by 8141. `rel` 9.28 is second only to 2026-08-01's "
+        "20.93 on this measurement, and it is the same statement: the totals converge, the "
+        "difference is not a stable quantity."),
     ("2026-09-18", "app_gap_lost"): (
         "the lost-regime gap is +1.5434 pp — the second-narrowest in the corpus, behind "
         "2026-09-10's +1.2535 — and m1r7 alone is 0.9535 of it. **It moves it the other way.** "
