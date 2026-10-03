@@ -86,7 +86,7 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
 <main>
   <h1>{{PLAYER}} vs Cold Clear Replays</h1>
   <p class="lede">Same board, same pieces, same garbage. On the left, what {{PLAYER}} actually played for the next {{K}} pieces. On the right, what Cold Clear played from the exact same moment. <b>Each piece is shown landing where it locked</b>; the drop is drawn straight down for clarity and is not {{PLAYER}}'s real key inputs.</p>
-  <p class="other">Also: <a href="{{OTHER_HREF}}">{{OTHER}} vs Cold Clear</a></p>
+  <p class="other"><a href="index.html">← All reports</a> · Also: <a href="{{OTHER_HREF}}">{{OTHER}} vs Cold Clear</a></p>
   <section class="dist" aria-label="distribution of the gap">
     <h3>How typical are these clips?</h3>
     <p class="note">{{DISTNOTE}}</p>
@@ -239,7 +239,8 @@ function render() {
 }
 $('play').onclick = () => playing ? stop() : play();
 $('fwd').onclick = () => { stop(); if (step < K) animateStep(); };
-$('back').onclick = () => { stop(); step = Math.max(0, step - 1); still(); };
+// ◀ during a drop cancels that drop (back to the board before it) instead of committing it and undoing it.
+$('back').onclick = () => { if (inflight) { inflight = false; stop(); still(); return; } stop(); step = Math.max(0, step - 1); still(); };
 $('scrub').oninput = e => { stop(); step = +e.target.value; still(); };
 document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
   if (e.key === ' ') { e.preventDefault(); $('play').click(); } else if (e.key === 'ArrowRight') $('fwd').click(); else if (e.key === 'ArrowLeft') $('back').click(); });

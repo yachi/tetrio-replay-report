@@ -109,7 +109,7 @@ distnote = (f"Cold Clear's {K}-piece attack minus {P}'s, over all {N} of {P}'s m
             f"The {n_pct} \"typical\" clips are windows from this chart, at percentiles {typ[0]} to {typ[-1]} "
             f"(mid-rank: windows with the same gap count half; rounded half to even). "
             f"The {n_ex} \"biggest miss\" clips were picked by a different measure, the graded loss of a single move, "
-            f"and start at that move, so {ex_where}; their own {K}-piece gaps (Cold Clear's median run minus {P}) "
+            f"and start at that move, so {ex_where}; their own {K}-piece gaps (the lower-median Cold Clear run shown, minus {P}) "
             f"are {', '.join(map(str, ex_gaps))}.")
 
 out = []
