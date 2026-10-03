@@ -1,13 +1,14 @@
-# Clip inputs: rollout windows starting at each of the 7 verified example positions, plus 5
-# rollout windows from the 40k run chosen near the 75th-90th percentile of yachi's gap
-# (representative, not cherry-picked extremes).
-import json, collections
+# Stage 3: clip inputs — rollout windows starting at each of the 7 verified example positions, plus 5
+# rollout windows from the 40k run at the 50th/75th/80th/85th/90th percentile of PLAYER's gap
+# (representative, not cherry-picked extremes). Usage: build-clips-p.py <player> <out-dir>
+import json, collections, sys
+PLAYER, OUT = sys.argv[1], sys.argv[2]
 K = 14
 P = {json.loads(l)['id']: json.loads(l) for l in open('positions.jsonl')}
 R = {(r['file'], r['round'], r['user']): r for r in json.load(open('positions.jsonl.rounds.json'))}
-ex = [e['id'] for e in json.load(open('examples.json'))]
+ex = [e['id'] for e in json.load(open(f'{OUT}/examples.json'))]
 pr = [json.loads(l) for l in open('rollouts-40k.priced.jsonl')]
-y = sorted([r for r in pr if r['user'] == 'yachi' and not r['cc']['dead']], key=lambda r: r['diff'])
+y = sorted([r for r in pr if r['user'] == PLAYER and not r['cc']['dead']], key=lambda r: r['diff'])
 n = len(y); picks = [y[int(n * q)]['id'] for q in (0.5, 0.75, 0.8, 0.85, 0.9)]
 out = []
 for i in ex + picks:
@@ -21,5 +22,5 @@ for i in ex + picks:
     st['incoming_schedule'] = [x['incoming'] for x in w[:K]]
     st['clip_source'] = 'example' if i in ex else 'percentile'
     out.append(st)
-open('clips-in.jsonl', 'w').write('\n'.join(json.dumps(o) for o in out) + '\n')
+open(f'{OUT}/clips-in.jsonl', 'w').write('\n'.join(json.dumps(o) for o in out) + '\n')
 print(len(out), picks)

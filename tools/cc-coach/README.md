@@ -112,20 +112,62 @@ already on the board, garbage already queued).
 | cold-clear's own T-spin / mini rule prices cc's spins | small; minis are rare in both | either |
 | spawn rule `Row19Or20`, lock-out pruning above row 20 | cc declares positions near topout dead earlier than TETR.IO | rollouts where cc topped out are reported, and excluding them raises the gap |
 
-## Animated clips (`clips/`)
+## Animated clips (`clips/`, published as `pages/cc-<player>.html`)
 
-`build-clips.py` picks 12 windows (the 7 verified worst-miss examples plus 5 windows from the 50th-90th
-percentile of yachi's gap), the harness rolls cold-clear forward from each under `COACH_SEED=0..7`,
-`build-frames.ts` turns both sides into per-piece frames (and fails loudly if the human's frames do
-not reproduce the recorded boards or cold-clear's do not end on the harness's own final field), and
-`build-anim.py` renders `anim-template.html` with each clip's LOWER-median seed — one rule for every
-clip, never the run that flatters cold-clear.
+One page per player, built by the same pipeline with the player as a parameter. Run it from the work
+directory the pipeline above left behind (it reads `positions.jsonl`, `positions.jsonl.rounds.json`,
+`mid.jsonl`, `grade-mid.jsonl` and `rollouts-40k.priced.jsonl` from the cwd, and writes `./<player>/`):
 
-The captions in `captions-final.json` are the output of two workflow passes, recorded so the claims
-on the page have provenance:
-1. four agents wrote their OWN checkers (`verify-batch-0..3.py`, kept here) from the raw sources and
-   re-derived all 336 placements — shape, empty cells, support, clears, garbage, TETR.IO attack /
-   b2b / combo, board continuity — with 0 mismatches; the only flag was an ambiguous one-step wording
-   of the garbage rule, now fixed in the text above;
-2. captions were refuted by two lenses (numbers/geometry and wording/overclaim) in a loop until dry:
-   13 of 190 items refuted, then 3, 2 and 0 (`refute-history.json`).
+```fish
+set -x REPLAY_DIR /path/to/session/replays
+bash ~/tetrio-replay-report/tools/cc-coach/clips/clip-pipeline.sh pinglamb   # CC=… overrides the harness path
+```
+
+| stage | script | what it does |
+|---|---|---|
+| 1 | `pick-candidates.py <player> <out>` | the player's per-move clear misses (duel regret ≥ 600) at stack heights 5-15, top 10 per category (`grade-analyze.py`'s categories) |
+| 2 | harness at 160k nodes / 320k duel, then `choose-examples.py <out>` | keep candidates that are still ≥ 600 at 4× the budget; take the largest confirmed miss per category, distinct rounds, with a full 14-piece window after it — 7 examples |
+| 3 | `build-clips-p.py <player> <out>` | the 7 examples plus 5 "typical" windows from the 40k rollouts at the 50th/75th/80th/85th/90th percentile of the player's gap; same pieces, preview and received-garbage schedule |
+| 4 | harness rollout × `COACH_SEED=0..7`, `build-frames-p.ts` per seed | per-piece frames for both sides; fails loudly if the human's frames do not reproduce the recorded boards or cold-clear's do not end on the harness's own final field |
+| 5 | `finalize-clips.py <out>` | per clip, the LOWER-median seed — one rule for every clip, never the run that flatters cold-clear — plus each human move's verified-prefix flag and graded loss; `clips-chosen.json` and readable `clipdump/` |
+| 6 | `build-anim.py` | renders `anim-template.html` into `../pages/cc-<player>.html` |
+
+`build-anim.py` derives every number on the page from its inputs: the histogram, the window count,
+the topped-out count and the "matched or beat" count from `rollouts-40k.priced.jsonl` filtered to the
+player; clip, step and seed counts from `clips-chosen.json`; the frame count, the number of checker
+agents and the caption refute history from `<player>/proof-record.json` (and `refute-history.json`
+where that is kept per round). It refuses to render if the proof record does not cover every clip and
+frame, if the refute loop did not end dry, or if the page text addresses the reader or uses a
+gendered pronoun — the pages are public and name the player in the third person.
+
+```fish
+python3 build-anim.py --player pinglamb --other yachi --data $W/pinglamb \
+    --rollouts $W/rollouts-40k.priced.jsonl --captions pinglamb/captions-final.json \
+    --proof pinglamb/proof-record.json --out ../pages/cc-pinglamb.html
+python3 build-anim.py --player yachi --other pinglamb --data $W/yachi \
+    --rollouts $W/rollouts-40k.priced.jsonl --captions yachi/captions-final.json \
+    --proof yachi/proof-record.json --refute yachi/refute-history.json --out ../pages/cc-yachi.html
+```
+
+`bin/build-docs` copies both pages into `docs/` verbatim and `--check` compares them byte for byte,
+exactly as it does `tools/analyzer.html`; the index cards say they are simulator output and not in
+the proof chain. The rendered pages are committed; the work-directory inputs are not, so a re-render
+needs the work directory from a pipeline run.
+
+The captions in `<player>/captions-final.json` are the output of two workflow passes per player,
+recorded so the claims on the page have provenance:
+1. four agents, one per batch of three clips, wrote their OWN checkers (`<player>/verify-batch-*.py`,
+   kept here) from the raw sources and re-derived all 336 placements (12 clips × 14 pieces × 2 sides)
+   — shape, empty cells, support, clears, garbage, TETR.IO attack / b2b / combo, board continuity;
+2. every caption item (title, summary, step claims) was refuted by two lenses (numbers/geometry and
+   wording/overclaim) in a loop until dry.
+
+| | frames re-derived | frame mismatches | caption checks refuted, by round |
+|---|---|---|---|
+| yachi | 336 / 336 | 0 (the only flag was an ambiguous one-step wording of the garbage rule, now fixed in the text above) | 13 of 190, then 3 of 128, 2 of 48, 0 of 16 (`yachi/refute-history.json`) |
+| pinglamb | 336 / 336 | 0, none unresolved | 10 of 192, then 2 of 112, 1 of 32, 0 of 16 (`pinglamb/proof-record.json`, per batch: 4→0 · 0 · 3→1→1→0 · 3→1→0) |
+
+pinglamb's first-pass checker outputs (not committed) listed mismatches on clips 6, 9 and 11, mostly
+garbage timing; the final record (`pinglamb/proof-record.json`) is what the workflow settled on after
+re-checking, and it holds 0 mismatches and 0 unresolved items. Batch 2 also kept a supplementary T-spin
+corner check (`verify-batch-2-extra.py`).

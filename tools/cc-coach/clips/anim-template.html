@@ -1,4 +1,8 @@
-<title>yachi vs Cold Clear Replays</title>
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>{{PLAYER}} vs Cold Clear Replays</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -6,7 +10,7 @@
 /* Layout: clip list on the left, a two-field replay stage on the right; stacks to one column on phones. */
 :root {
   --bg: #f3f5f7; --panel: #ffffff; --ink: #18202a; --muted: #5a6573; --line: #d6dce3;
-  --you: #d9822b; --cc: #1592b0; --field: #1b222b; --grid: #262f3a; --garb: #6b7683; --stackc: #a8b3bf;
+  --human: #d9822b; --cc: #1592b0; --field: #1b222b; --grid: #262f3a; --garb: #6b7683; --stackc: #a8b3bf;
   --flash: #ffffff; --good: #2f8a4c;
   --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -14,16 +18,18 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f1419; --panel: #171e26; --ink: #e4e9ef; --muted: #98a3b1; --line: #2a3542;
-  --you: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark } }
+  --human: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f1419; --panel: #171e26; --ink: #e4e9ef; --muted: #98a3b1; --line: #2a3542;
-  --you: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark }
+  --human: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark }
 body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
 main { max-width: 76rem; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
 h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
 h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); }
 .lede { max-width: 46rem; margin: .5rem 0 1.4rem; color: var(--muted); }
 .lede b { color: var(--ink); }
+.other { margin: -.8rem 0 1.4rem; font-size: .9rem; }
+.other a { color: var(--cc); }
 .layout { display: grid; grid-template-columns: 17rem 1fr; gap: 1.4rem; align-items: start; }
 @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
 .list { display: grid; gap: .4rem; min-width: 0; }
@@ -40,12 +46,12 @@ h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); }
 .fields { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
 .side { display: grid; gap: .5rem; justify-items: center; }
 .side h4 { margin: 0; font: 600 .95rem var(--display); letter-spacing: .04em; }
-.side.you h4 { color: var(--you); } .side.cc h4 { color: var(--cc); }
+.side.human h4 { color: var(--human); } .side.cc h4 { color: var(--cc); }
 canvas { display: block; border-radius: 4px; background: var(--field); max-width: 100%; height: auto; }
 .hud { display: grid; grid-template-columns: repeat(3, auto); gap: .2rem 1rem; font: .8rem var(--mono); color: var(--muted); }
 .hud b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
 .callout { min-height: 1.6em; font: 700 1rem var(--display); letter-spacing: .06em; text-transform: uppercase; }
-.side.you .callout { color: var(--you); } .side.cc .callout { color: var(--cc); }
+.side.human .callout { color: var(--human); } .side.cc .callout { color: var(--cc); }
 .queue { font: .78rem var(--mono); color: var(--muted); min-height: 1.3em; }
 .controls { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin: 1rem 0 .4rem; }
 .controls button { font: 500 .85rem var(--mono); padding: .4rem .75rem; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 5px; cursor: pointer; min-width: 2.6rem; }
@@ -54,10 +60,10 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
 .controls .pos { font: .85rem var(--mono); font-variant-numeric: tabular-nums; min-width: 6.5rem; }
 .controls select { font: .85rem var(--mono); padding: .35rem; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; }
 .notes { list-style: none; padding: 0; margin: .8rem 0 0; display: grid; gap: .35rem; }
-.notes li { display: grid; grid-template-columns: 4.6rem 1fr; gap: .6rem; font-size: .9rem; opacity: .45; transition: opacity .2s; }
+.notes li { display: grid; grid-template-columns: 6.4rem 1fr; gap: .6rem; font-size: .9rem; opacity: .45; transition: opacity .2s; }
 .notes li.on { opacity: 1; }
 .notes li .k { font: .75rem var(--mono); padding-top: .15rem; }
-.notes li .k.human { color: var(--you); } .notes li .k.cc { color: var(--cc); } .notes li .k.both { color: var(--muted); }
+.notes li .k.human { color: var(--human); } .notes li .k.cc { color: var(--cc); } .notes li .k.both { color: var(--muted); }
 .seed { margin-top: 1rem; font-size: .82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: .7rem; }
 .dist { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .9rem 1.1rem; margin-bottom: 1.4rem; }
 .dist h3 { font-size: 1.05rem; }
@@ -65,10 +71,10 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
 .note b { color: var(--ink); }
 .hist { width: 100%; max-width: 44rem; height: auto; display: block; }
 .hist text { fill: var(--muted); font: 10px var(--mono); }
-.strip { display: grid; grid-template-columns: repeat(14, 1fr); gap: 2px; width: 200px; height: 26px; align-items: end; }
+.strip { display: grid; grid-template-columns: repeat({{K}}, 1fr); gap: 2px; width: 200px; height: 26px; align-items: end; }
 .strip.ghost { visibility: hidden; }
 .strip i { display: block; background: var(--line); min-height: 2px; position: relative; }
-.strip i.miss { background: var(--you); }
+.strip i.miss { background: var(--human); }
 .strip i.nov { background: repeating-linear-gradient(45deg, var(--line) 0 3px, transparent 3px 6px); min-height: 26px; }
 .strip i.cur { outline: 1px solid var(--ink); }
 .endstat { font: .78rem var(--mono); color: var(--muted); min-height: 1.3em; }
@@ -78,11 +84,12 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
 </style>
 
 <main>
-  <h1>yachi vs Cold Clear Replays</h1>
-  <p class="lede">Same board, same pieces, same garbage. On the left, what you actually played for the next 14 pieces. On the right, what Cold Clear played from the exact same moment. <b>Each piece is shown landing where it locked</b>; the drop is drawn straight down for clarity and is not your real key inputs.</p>
+  <h1>{{PLAYER}} vs Cold Clear Replays</h1>
+  <p class="lede">Same board, same pieces, same garbage. On the left, what {{PLAYER}} actually played for the next {{K}} pieces. On the right, what Cold Clear played from the exact same moment. <b>Each piece is shown landing where it locked</b>; the drop is drawn straight down for clarity and is not {{PLAYER}}'s real key inputs.</p>
+  <p class="other">Also: <a href="{{OTHER_HREF}}">{{OTHER}} vs Cold Clear</a></p>
   <section class="dist" aria-label="distribution of the gap">
     <h3>How typical are these clips?</h3>
-    <p class="note">Cold Clear's 14-piece attack minus yours, over all 593 of your mid-game windows (one 40k-node run each, the 9 where it topped out included). You matched or beat it in <b>148 of 593 (25%)</b>. The 7 "biggest miss" clips come from the far right; the 5 "typical" clips were drawn at the 50th to 90th percentile of this chart.</p>
+    <p class="note">{{DISTNOTE}}</p>
     {{HIST}}
   </section>
   <div class="layout">
@@ -91,9 +98,9 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
       <header><h2 id="title"></h2><span class="meta" id="where"></span></header>
       <p class="summary" id="summary"></p>
       <div class="fields">
-        <div class="side you"><h4>YOU</h4><div class="callout" id="co-h"></div><canvas id="cv-h" width="200" height="440" aria-label="your field"></canvas>
+        <div class="side human"><h4>{{PLAYER_UP}}</h4><div class="callout" id="co-h"></div><canvas id="cv-h" width="200" height="440" aria-label="{{PLAYER}}'s field"></canvas>
           <div class="hud"><span>attack <b id="atk-h">0</b></span><span>B2B <b id="b2b-h">–</b></span><span>combo <b id="cmb-h">–</b></span></div><div class="queue" id="q-h"></div>
-          <div class="strip" id="strip" aria-label="graded loss of each of your moves"></div>
+          <div class="strip" id="strip" aria-label="graded loss of each of {{PLAYER}}'s moves"></div>
           <div class="endstat" id="end-h"></div></div>
         <div class="side cc"><h4>COLD CLEAR</h4><div class="callout" id="co-c"></div><canvas id="cv-c" width="200" height="440" aria-label="Cold Clear field"></canvas>
           <div class="hud"><span>attack <b id="atk-c">0</b></span><span>B2B <b id="b2b-c">–</b></span><span>combo <b id="cmb-c">–</b></span></div><div class="queue" id="q-c"></div><div class="strip ghost"></div><div class="endstat" id="end-c"></div></div>
@@ -102,8 +109,8 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
         <button id="back" aria-label="previous piece">◀</button>
         <button id="play" class="primary" aria-label="play">Play</button>
         <button id="fwd" aria-label="next piece">▶</button>
-        <input type="range" id="scrub" min="0" max="14" value="0" aria-label="piece">
-        <span class="pos" id="pos">piece 0 / 14</span>
+        <input type="range" id="scrub" min="0" max="{{K}}" value="0" aria-label="piece">
+        <span class="pos" id="pos">piece 0 / {{K}}</span>
         <select id="speed" aria-label="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
       </div>
       <ul class="notes" id="notes"></ul>
@@ -115,6 +122,8 @@ canvas { display: block; border-radius: 4px; background: var(--field); max-width
 
 <script>
 const CLIPS = {{DATA}};
+const META = {{META}};
+const K = META.k;
 const COLORS = { I:'#3fc1c9', O:'#e8c547', T:'#a066d3', S:'#5cb85c', Z:'#d9534f', L:'#e8913a', J:'#4a76d4' };
 const ROWS = 22, W = 10, CELL = 20;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -126,12 +135,12 @@ const kindLabel = s => { if (!s || s.dead) return ''; const n = ['', 'single', '
 
 function list() {
   const L = $('list'); L.innerHTML = '';
-  const groups = [['example', 'Your biggest misses'], ['percentile', 'Typical windows']];
+  const groups = [['example', META.player + "'s biggest misses"], ['percentile', 'Typical windows']];
   for (const [src, label] of groups) {
     const h = document.createElement('h3'); h.textContent = label; L.appendChild(h);
     CLIPS.forEach((c, i) => { if (c.source !== src) return;
       const b = document.createElement('button'); b.className = 'clipbtn'; b.setAttribute('aria-pressed', i === ci);
-      b.innerHTML = `<span class="t"></span><span class="sc"><span style="color:var(--you)">${c.totals.human}</span> : <span style="color:var(--cc)">${c.totals.cc}</span></span><span class="s"></span>`;
+      b.innerHTML = `<span class="t"></span><span class="sc"><span style="color:var(--human)">${c.totals.human}</span> : <span style="color:var(--cc)">${c.totals.cc}</span></span><span class="s"></span>`;
       b.querySelector('.t').textContent = c.title; b.querySelector('.s').textContent = c.tag;
       b.onclick = () => { ci = i; stop(); step = 0; render(); list(); };
       L.appendChild(b); });
@@ -187,13 +196,13 @@ function stats(board) { const rows = board; let holes = 0, h = 0;
   return { h, holes }; }
 function endstats() {
   for (const side of ['h', 'c']) { const el = $('end-' + side);
-    if (step < 14) { el.textContent = ''; continue; }
-    const s = stats(boardAt(side, 14)), seq = side === 'h' ? CLIPS[ci].human : CLIPS[ci].cc; const last = [...seq].reverse().find(x => !x.dead);
+    if (step < K) { el.textContent = ''; continue; }
+    const s = stats(boardAt(side, K)), seq = side === 'h' ? CLIPS[ci].human : CLIPS[ci].cc; const last = [...seq].reverse().find(x => !x.dead);
     el.textContent = `end: height ${s.h} · holes ${s.holes} · B2B ${last && last.b2b >= 1 ? 'alive' : 'off'}`; }
 }
 function still() {
   draw($('cv-h'), boardAt('h', step)); draw($('cv-c'), boardAt('c', step)); hud('h', step); hud('c', step);
-  $('scrub').value = step; $('pos').textContent = `piece ${step} / 14`;
+  $('scrub').value = step; $('pos').textContent = `piece ${step} / ${K}`;
   document.querySelectorAll('#notes li').forEach(li => li.classList.toggle('on', +li.dataset.step <= step));
   strip(); endstats();
 }
@@ -207,7 +216,7 @@ function animateStep(done) {
     const placed = withPiece(st.before, st.cells, st.piece); return { s, st, from, placed, full: fullRows(placed) }; });
   cancelAnimationFrame(anim);
   const tick = now => { const t = now - t0;
-    for (const p of plan) { if (!p) continue; const cv = $('cv-' + p.s), edge = p.s === 'h' ? css('--you') : css('--cc');
+    for (const p of plan) { if (!p) continue; const cv = $('cv-' + p.s), edge = p.s === 'h' ? css('--human') : css('--cc');
       if (t < DROP) draw(cv, p.st.before, { piece: { cells: p.st.cells, piece: p.st.piece, dy: Math.round(p.from * (1 - t / DROP)), edge } });
       else if (p.full.length && t < DROP + FLASH) draw(cv, p.placed, { flash: p.full, flashA: 1 - (t - DROP) / FLASH });
       else draw(cv, p.st.after); }
@@ -215,19 +224,19 @@ function animateStep(done) {
     else { step++; still(); done && done(); } };
   anim = requestAnimationFrame(tick);
 }
-function play() { if (step >= 14) step = 0; playing = true; $('play').textContent = 'Pause'; still();
-  const loop = () => { if (!playing) return; if (step >= 14) { stop(); return; } animateStep(() => { timer = setTimeout(loop, 380 / +$('speed').value); }); };
+function play() { if (step >= K) step = 0; playing = true; $('play').textContent = 'Pause'; still();
+  const loop = () => { if (!playing) return; if (step >= K) { stop(); return; } animateStep(() => { timer = setTimeout(loop, 380 / +$('speed').value); }); };
   loop(); }
 function stop() { playing = false; clearTimeout(timer); cancelAnimationFrame(anim); $('play').textContent = 'Play'; }
 function render() {
   const c = CLIPS[ci]; $('title').textContent = c.title; $('where').textContent = c.where; $('summary').textContent = c.summary;
   const N = $('notes'); N.innerHTML = '';
   for (const n of c.claims) { const li = document.createElement('li'); li.dataset.step = n.step;
-    li.innerHTML = `<span class="k ${n.side}"></span><span></span>`; li.firstChild.textContent = (n.side === 'human' ? 'you' : n.side === 'cc' ? 'cc' : 'both') + ' · ' + n.step; li.lastChild.textContent = n.text; N.appendChild(li); }
+    li.innerHTML = `<span class="k ${n.side}"></span><span></span>`; li.firstChild.textContent = (n.side === 'human' ? META.player : n.side === 'cc' ? 'cc' : 'both') + ' · ' + n.step; li.lastChild.textContent = n.text; N.appendChild(li); }
   $('seed').textContent = c.seedNote; still();
 }
 $('play').onclick = () => playing ? stop() : play();
-$('fwd').onclick = () => { stop(); if (step < 14) animateStep(); };
+$('fwd').onclick = () => { stop(); if (step < K) animateStep(); };
 $('back').onclick = () => { stop(); step = Math.max(0, step - 1); still(); };
 $('scrub').oninput = e => { stop(); step = +e.target.value; still(); };
 document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
@@ -235,3 +244,4 @@ document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || 
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', still);
 list(); render();
 </script>
+</html>

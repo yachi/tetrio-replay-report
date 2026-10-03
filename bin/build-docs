@@ -102,6 +102,19 @@ ARTEFACTS = [
 ]
 
 
+# The two cc-coach replay pages (tools/cc-coach/pages/, rendered by
+# tools/cc-coach/clips/build-anim.py). Simulator + bot output, so the cards say so and
+# carry no claim count: nothing on those pages is in the proof chain.
+CC_PAGES = [
+    ("cc-yachi.html", "yachi 對 Cold Clear 重播",
+     "同一個盤面、同一串磚、同一啲垃圾行，yachi 嘅 14 粒同 Cold Clear 嘅 14 粒並排重播。"
+     "由模擬器同 bot 行出嚟，唔喺證明鏈入面。"),
+    ("cc-pinglamb.html", "pinglamb 對 Cold Clear 重播",
+     "同一個盤面、同一串磚、同一啲垃圾行，pinglamb 嘅 14 粒同 Cold Clear 嘅 14 粒並排重播。"
+     "由模擬器同 bot 行出嚟，唔喺證明鏈入面。"),
+]
+
+
 def load(path):
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
@@ -241,6 +254,14 @@ def render_index(cards, totals, pooled_html=None):
         "<p class='blurb'>掉一個 <code>.ttrm</code> 入去就即刻出即場戰報，"
         "全部喺你部機行，冇嘢上傳。</p></a>"
     )
+    for name, title, blurb in CC_PAGES:
+        if (REPO / "tools" / "cc-coach" / "pages" / name).exists():
+            parts.append(
+                f"<a class='card' href='{escape(name)}'>"
+                f"<div class='date'>COLD CLEAR</div><div class='title'>{escape(title)}</div>"
+                f"<p class='blurb'>{escape(blurb)}</p>"
+                "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>"
+            )
     parts.append(
         "<a class='card' href='https://github.com/yachi/tetrio-replay-report'>"
         "<div class='date'>SOURCE</div><div class='title'>GitHub repo</div>"
@@ -326,15 +347,22 @@ def main(argv=None):
         if not check:
             print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
 
-    analyzer = REPO / "tools" / "analyzer.html"
-    if analyzer.exists():
-        dst = DOCS / "analyzer.html"
+    # Self-contained tool pages, copied verbatim. The cc-coach replay pages are rendered by
+    # tools/cc-coach/clips/build-anim.py from a simulator run; they are published here, never
+    # regenerated, so --check compares them byte for byte exactly like the analyzer.
+    tool_pages = [REPO / "tools" / "analyzer.html"] + [
+        REPO / "tools" / "cc-coach" / "pages" / name for name, _, _ in CC_PAGES]
+    for src in tool_pages:
+        if not src.exists():
+            continue
+        dst = DOCS / src.name
+        rel = src.relative_to(REPO)
         if check:
-            if not dst.exists() or not filecmp.cmp(analyzer, dst, shallow=False):
-                drift.append("docs/analyzer.html differs from tools/analyzer.html")
+            if not dst.exists() or not filecmp.cmp(src, dst, shallow=False):
+                drift.append(f"docs/{src.name} differs from {rel}")
         else:
-            shutil.copyfile(analyzer, dst)
-            print("  copied tools/analyzer.html -> docs/analyzer.html")
+            shutil.copyfile(src, dst)
+            print(f"  copied {rel} -> docs/{src.name}")
 
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its

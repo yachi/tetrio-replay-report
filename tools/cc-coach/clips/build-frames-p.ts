@@ -3,8 +3,8 @@
 // cold-clear's simulated final board == the harness's own final_field.
 import { priceLock } from '../attack.ts';
 import { readFileSync, writeFileSync } from 'fs';
-const IN = readFileSync('clips-in.jsonl', 'utf8').trim().split('\n').map(l => JSON.parse(l));
-const CC = new Map(readFileSync('clips-cc.jsonl', 'utf8').trim().split('\n').map(l => { const o = JSON.parse(l); return [o.id, o]; }));
+const IN = readFileSync(process.env.OUT + '/clips-in.jsonl', 'utf8').trim().split('\n').map(l => JSON.parse(l));
+const CC = new Map(readFileSync(process.env.OUT + '/clips-cc.jsonl', 'utf8').trim().split('\n').map(l => { const o = JSON.parse(l); return [o.id, o]; }));
 const P = new Map(readFileSync('positions.jsonl', 'utf8').trim().split('\n').map(l => { const o = JSON.parse(l); return [o.id, o]; }));
 const opts = JSON.parse(readFileSync(process.env.REPLAY_DIR + '/' + require('fs').readdirSync(process.env.REPLAY_DIR).filter((f: string) => f.endsWith('.ttrm')).sort()[0], 'utf8')).replay.rounds[0][0].replay.options;
 const occ = (f: string[]) => f.map(r => r.split('').map(c => c === '.' ? '.' : c === 'G' ? 'G' : 'X').join(''));
@@ -59,5 +59,5 @@ for (const st of IN) {
   clips.push({ id: st.id, source: st.clip_source, start: { field: st.field, current: st.current, hold: st.hold, next: st.next, b2b: st.b2b, combo: st.combo, incoming: st.incoming }, future: st.future, human, cc: ccs,
     totals: { human: human.reduce((a, s) => a + s.attack, 0), cc: ccs.reduce((a, s) => a + (s.attack ?? 0), 0) } });
 }
-writeFileSync('clips.json', JSON.stringify(clips));
+writeFileSync(process.env.OUT + '/clips.json', JSON.stringify(clips));
 console.log(checks, clips.map(c => [c.id, c.source, c.totals]));
