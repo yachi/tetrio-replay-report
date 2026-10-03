@@ -1,0 +1,10 @@
+== clip 9: frames 28, mismatches 2
+  MISMATCH clip9 cc step0: src garbage_in 0 != schedule sum 6
+  MISMATCH clip9 cc step1: src garbage_in 6 != schedule sum 0
+  note clip9: human total 13, cc total 15
+== clip 10: frames 28, mismatches 0
+  note clip10: human total 10, cc total 13
+== clip 11: frames 28, mismatches 2
+  MISMATCH clip11 cc step10: src garbage_in 0 != schedule sum 1
+  MISMATCH clip11 cc step11: src garbage_in 2 != schedule sum 1
+  note clip11: human total 3, cc total 6

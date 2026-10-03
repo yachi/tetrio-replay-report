@@ -1,0 +1,113 @@
+{
+ "clips": [
+  {
+   "clip": 0,
+   "id": "2026-10-03-01/r0/yachi/39",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 1,
+   "id": "2026-10-03-06/r0/yachi/58",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 2,
+   "id": "2026-10-03-11/r4/yachi/70",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 3,
+   "id": "2026-10-03-20/r2/yachi/73",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 4,
+   "id": "2026-10-03-02/r5/yachi/42",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 5,
+   "id": "2026-10-03-09/r0/yachi/223",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 6,
+   "id": "2026-10-03-10/r5/yachi/27",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 7,
+   "id": "2026-10-03-09/r3/yachi/63",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 8,
+   "id": "2026-10-03-04/r8/yachi/49",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 9,
+   "id": "2026-10-03-20/r6/yachi/77",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 10,
+   "id": "2026-10-03-20/r6/yachi/21",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 11,
+   "id": "2026-10-03-12/r4/yachi/63",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  }
+ ],
+ "frames": 336,
+ "problems": [],
+ "verifier": [
+  {
+   "file": "batch-0.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-1.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-2.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-3.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  }
+ ],
+ "unresolved": 0
+}
