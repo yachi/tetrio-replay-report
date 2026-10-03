@@ -1,0 +1,134 @@
+{
+ "clips": [
+  {
+   "clip": 0,
+   "id": "2026-10-03-01/r3/pinglamb/67",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 1,
+   "id": "2026-10-03-14/r2/pinglamb/23",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 2,
+   "id": "2026-10-03-06/r6/pinglamb/193",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 3,
+   "id": "2026-10-03-08/r2/pinglamb/108",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 5
+  },
+  {
+   "clip": 4,
+   "id": "2026-10-03-20/r7/pinglamb/75",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 5,
+   "id": "2026-10-03-02/r1/pinglamb/31",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 6,
+   "id": "2026-10-03-15/r6/pinglamb/55",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 7,
+   "id": "2026-10-03-09/r2/pinglamb/35",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 8,
+   "id": "2026-10-03-04/r8/pinglamb/21",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 5
+  },
+  {
+   "clip": 9,
+   "id": "2026-10-03-20/r1/pinglamb/63",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 10,
+   "id": "2026-10-03-17/r2/pinglamb/203",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  },
+  {
+   "clip": 11,
+   "id": "2026-10-03-09/r0/pinglamb/203",
+   "frames": 28,
+   "problems": 0,
+   "cc_rows_pending_at_end": 0
+  }
+ ],
+ "frames": 336,
+ "problems": [],
+ "verifier": [
+  {
+   "file": "batch-0.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-1.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-2.txt",
+   "mismatch_lines": 0,
+   "lines": []
+  },
+  {
+   "file": "batch-3.txt",
+   "mismatch_lines": 4,
+   "lines": [
+    {
+     "line": "clip9 cc step0: src garbage_in 0 != schedule sum 6",
+     "verdict": "explained",
+     "why": "inserted vs received: the rows waited for a piece that clears nothing, and the rebuild above confirms that insertion"
+    },
+    {
+     "line": "clip9 cc step1: src garbage_in 6 != schedule sum 0",
+     "verdict": "explained",
+     "why": "inserted vs received: the rows waited for a piece that clears nothing, and the rebuild above confirms that insertion"
+    },
+    {
+     "line": "clip11 cc step10: src garbage_in 0 != schedule sum 1",
+     "verdict": "explained",
+     "why": "inserted vs received: the rows waited for a piece that clears nothing, and the rebuild above confirms that insertion"
+    },
+    {
+     "line": "clip11 cc step11: src garbage_in 2 != schedule sum 1",
+     "verdict": "explained",
+     "why": "inserted vs received: the rows waited for a piece that clears nothing, and the rebuild above confirms that insertion"
+    }
+   ]
+  }
+ ],
+ "unresolved": 0
+}

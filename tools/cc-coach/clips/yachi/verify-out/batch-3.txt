@@ -1,0 +1,6 @@
+== clip 9: frames 28, mismatches 0
+  note clip9: human total 13, cc total 20
+== clip 10: frames 28, mismatches 0
+  note clip10: human total 5, cc total 4
+== clip 11: frames 28, mismatches 0
+  note clip11: human total 10, cc total 20

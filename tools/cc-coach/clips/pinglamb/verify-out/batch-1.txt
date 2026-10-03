@@ -1,0 +1,31 @@
+[
+ {
+  "clip": 3,
+  "id": "2026-10-03-08/r2/pinglamb/108",
+  "seed": 7,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": [
+   "clip 3: 5 CC garbage rows still pending at end"
+  ]
+ },
+ {
+  "clip": 4,
+  "id": "2026-10-03-20/r7/pinglamb/75",
+  "seed": 3,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": []
+ },
+ {
+  "clip": 5,
+  "id": "2026-10-03-02/r1/pinglamb/31",
+  "seed": 0,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": []
+ }
+]

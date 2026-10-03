@@ -3,14 +3,15 @@
 
     python3 build-anim.py --player pinglamb --other yachi \
         --data <work>/pinglamb --rollouts <work>/rollouts-40k.priced.jsonl \
-        --captions pinglamb/captions-final.json --proof pinglamb/proof-record.json \
+        --captions pinglamb/captions-final.json --rollout-nodes 40000 \
+        --verify pinglamb/adjudication.json --refute pinglamb/refute-history.json \
         --out ../pages/cc-pinglamb.html
 
 Every number on the page is derived from the inputs, never typed here: the histogram, the window
 count, the topped-out count and the "matched or beat" count come from the 40k rollouts filtered to
 --player; the clip / step / seed counts come from clips-chosen.json; the frame count, the number of
-checker agents and the caption refute history come from --proof (and --refute, when the history is
-kept as a per-round list instead of inside each proof batch).
+checkers, their saved mismatch lines and how each was resolved come from --verify (adjudicate.py's
+output over the checkers' saved re-runs); the caption refute history comes from --refute.
 
 Pages are public and third person: the player is named, never addressed.
 """
@@ -23,8 +24,9 @@ ap.add_argument('--other', required=True, help='the other player, linked from th
 ap.add_argument('--data', required=True, help='directory holding this player\'s clips-chosen.json')
 ap.add_argument('--rollouts', required=True, help='rollouts-40k.priced.jsonl (all players)')
 ap.add_argument('--captions', required=True)
-ap.add_argument('--proof', required=True, help='per-batch frame-check record (JSON list)')
-ap.add_argument('--refute', help='per-round caption refute history (JSON list); else read from --proof')
+ap.add_argument('--verify', required=True, help='adjudication.json written by adjudicate.py')
+ap.add_argument('--refute', required=True, help='per-round caption refute history (JSON list)')
+ap.add_argument('--rollout-nodes', type=int, required=True, help='node budget the rollouts were run at (CC_NODES)')
 ap.add_argument('--template', default=os.path.join(HERE, 'anim-template.html'))
 ap.add_argument('--out', required=True)
 a = ap.parse_args()
@@ -32,7 +34,7 @@ P, O = a.player, a.other
 
 clips = json.load(open(os.path.join(a.data, 'clips-chosen.json')))
 caps = json.load(open(a.captions))
-proof = json.load(open(a.proof))
+adj = json.load(open(a.verify))
 y = [r for r in map(json.loads, open(a.rollouts)) if r['user'] == P]
 assert y, f'no rollouts for {P}'
 assert len(caps) == len(clips), (len(caps), len(clips))
@@ -43,22 +45,16 @@ n_seeds = len(clips[0]['seedTotals'])
 n_ex = sum(c['source'] == 'example' for c in clips)
 n_pct = sum(c['source'] == 'percentile' for c in clips)
 
-# --- proof record: frames, agents, mismatches, refute history ---------------------------------
-frames = sum(b['framesChecked'] for b in proof)
+# --- frame checks: the checkers' saved re-runs, adjudicated -----------------------------------
+frames = adj['frames']
 expected = len(clips) * 2 * K                       # both sides, every step
-assert frames == expected, f'proof covers {frames} frames, clips hold {expected}'
-covered = sorted(i for b in proof for i in b['batch'])
-assert covered == list(range(len(clips))), f'proof batches cover {covered}'
-mismatches = sum(len(b['mismatches']) for b in proof)
-unresolved = sum(len(b.get('unresolved', [])) for b in proof)
-if a.refute:
-    hist = [(r['checked'], r['refuted']) for r in json.load(open(a.refute))]
-else:
-    by = collections.defaultdict(lambda: [0, 0])
-    for b in proof:
-        for r in b['history']:
-            by[r['round']][0] += r['checked']; by[r['round']][1] += r['refuted']
-    hist = [tuple(by[k]) for k in sorted(by)]
+assert frames == expected, f'adjudication covers {frames} frames, clips hold {expected}'
+assert [c['id'] for c in adj['clips']] == [c['id'] for c in clips], 'adjudication is for other clips'
+rebuild_problems = len(adj['problems'])
+n_checkers = len(adj['verifier'])
+vlines = [r for v in adj['verifier'] for r in v['lines']]
+unresolved = sum(r['verdict'] != 'explained' for r in vlines)
+hist = [(r['checked'], r['refuted']) for r in json.load(open(a.refute))]
 assert hist and hist[-1][1] == 0, f'refute loop did not end dry: {hist}'
 
 # --- the chart: one 40k run per mid-game window ------------------------------------------------
@@ -82,7 +78,7 @@ bars = []
 for i, b in enumerate(bins):
     n = d.get(b, 0); h = (H - B - 10) * n / top; x = L + i * bw
     col = 'var(--human)' if b <= 0 else 'var(--cc)'
-    bars.append(f'<rect x="{x+1:.1f}" y="{H-B-h:.1f}" width="{bw-2:.1f}" height="{h:.1f}" fill="{col}"><title>{b if -8 < b < 20 else ("≤-8" if b == -8 else "≥20")}: {n} windows</title></rect>')
+    bars.append(f'<rect x="{x+1:.1f}" y="{H-B-h:.1f}" width="{bw-2:.1f}" height="{h:.1f}" fill="{col}"><title>{b if -8 < b < 20 else ("≤-8" if b == -8 else "≥20")}: {n} window{"" if n == 1 else "s"}</title></rect>')
 ticks = []
 for b in (-5, 0, 5, 10, 15):
     x = L + (bins.index(b) + .5) * bw
@@ -98,11 +94,23 @@ hist_svg = (f'<svg class="hist" viewBox="0 0 {W} {H}" role="img" aria-label="his
             + f'<text x="{W-8}" y="16" text-anchor="end">Cold Clear ahead →</text><text x="{zx-6:.1f}" y="16" text-anchor="end">← {P} ahead or level</text><text x="{L}" y="{H-B+12}">≤-8</text></svg>')
 
 typ = sorted(pct[c['id']] for c in clips if c['source'] == 'percentile')
+ids = {r['id'] for r in y}
+assert all(c['id'] in ids for c in clips if c['source'] == 'percentile'), 'a typical clip is not a charted window'
+# The "biggest miss" clips are chosen per MOVE (graded loss, choose-examples.py), not from this chart: their
+# windows start at the missed move, which is generally not one of the charted windows. Say so, with their own gaps.
+ex_gaps = [c['totals']['cc'] - c['totals']['human'] for c in clips if c['source'] == 'example']
+n_ex_charted = sum(c['id'] in ids for c in clips if c['source'] == 'example')
+ex_where = ('none of them is one of the windows charted here' if n_ex_charted == 0
+            else f'{n_ex_charted} of them happen to be charted windows')
+kn = f"{a.rollout_nodes // 1000}k" if a.rollout_nodes % 1000 == 0 else str(a.rollout_nodes)
 distnote = (f"Cold Clear's {K}-piece attack minus {P}'s, over all {N} of {P}'s mid-game windows "
-            f"(one 40k-node run each, the {dead} where Cold Clear topped out included). "
+            f"(one {kn}-node run each, the {dead} where Cold Clear topped out included). "
             f"{P} matched or beat it in <b>{level} of {N} ({round(100 * level / N)}%)</b>. "
-            f"The {n_ex} \"biggest miss\" clips come from the far right; the {n_pct} \"typical\" clips sit at "
-            f"percentiles {typ[0]} to {typ[-1]} of this chart.")
+            f"The {n_pct} \"typical\" clips are windows from this chart, at percentiles {typ[0]} to {typ[-1]} "
+            f"(mid-rank: windows with the same gap count half; rounded half to even). "
+            f"The {n_ex} \"biggest miss\" clips were picked by a different measure, the graded loss of a single move, "
+            f"and start at that move, so {ex_where}; their own {K}-piece gaps (Cold Clear's median run minus {P}) "
+            f"are {', '.join(map(str, ex_gaps))}.")
 
 out = []
 for i, c in enumerate(clips):
@@ -137,10 +145,19 @@ def words(n):
 first = hist[0]
 rest = ', '.join(str(r) for _, r in hist[1:-1]) + (' and ' if len(hist) > 2 else '') + str(hist[-1][1]) if len(hist) > 1 else ''
 claims_n = sum(len(cp['claims']) for cp in caps.values())
-frame_line = ('No frame disagreed.' if mismatches == 0 and unresolved == 0
-              else f'{mismatches} frame mismatches and {unresolved} unresolved items remain.')
+n_garb = sum(r['verdict'] == 'explained' for r in vlines)
+if not vlines:
+    frame_line = f'Their saved re-runs report no mismatch.'
+else:
+    frame_line = (f"Their saved re-runs report {len(vlines)} mismatch line{'s' if len(vlines) != 1 else ''}"
+                  + (f", all of one kind: the checker compared the garbage rows Cold Clear inserted on a step with the rows {P} received on it, "
+                     f"which differ whenever Cold Clear's piece there cleared lines and the rows waited (the rule below)" if n_garb == len(vlines) else '')
+                  + '.')
+frame_line += (f" A separate script then rebuilt every frame of both sides from the frames alone, Cold Clear's garbage-waiting rule included, "
+               f"and found {'nothing wrong' if rebuild_problems == 0 else f'{rebuild_problems} problems'}"
+               + (f"; {unresolved} checker line{'s' if unresolved != 1 else ''} remain{'s' if unresolved == 1 else ''} unexplained." if unresolved else '.'))
 foot = f"""<h3>What is and isn't shown</h3><ul>
-<li><b>Every frame was rebuilt independently.</b> {words(len(proof))} agents wrote their own checkers from the raw replay data and re-derived all {frames} placements ({len(clips)} clips × {K} pieces × 2 sides): piece shape, empty cells, piece resting on something, cleared rows, garbage rows and hole column, and TETR.IO attack, B2B and combo. {frame_line} Every caption item ({len(clips)} titles, {len(clips)} summaries and {claims_n} step claims) then went through two skeptics, one checking numbers and one checking wording, in a loop until nothing was refuted: {first[1]} of {first[0]} checks refuted in the first round{', then ' + rest if rest else ''}.</li>
+<li><b>Every frame was rebuilt independently.</b> {words(n_checkers)} agents wrote their own checkers from the raw replay data and re-derived all {frames} placements ({len(clips)} clips × {K} pieces × 2 sides): piece shape, empty cells, piece resting on something, cleared rows, garbage rows and hole column, and TETR.IO attack, B2B and combo. {frame_line} Every caption item ({len(clips)} titles, {len(clips)} summaries and {claims_n} step claims) then went through two skeptics, one checking numbers and one checking wording, in a loop until nothing was refuted: {first[1]} of {first[0]} checks refuted in the first round{', then ' + rest if rest else ''}.</li>
 <li><b>Garbage:</b> Cold Clear receives exactly the rows {P} received, on the same piece, with the same hole. If its piece there clears lines, the rows wait for its next piece that clears nothing, which is TETR.IO's own rule. It gets no credit for cancelling with its attack, and the incoming meter it sees is {P}'s meter at that moment.</li>
 <li><b>Preview:</b> Cold Clear never sees more than {P} did: hold plus the 5-piece preview, with one new piece revealed per placement.</li>
 <li><b>Not modelled:</b> speed and key inputs. {P} played in real time; Cold Clear thought about 0.2 s per piece with no clock. The drop is drawn straight down for clarity, so tucks and spins are shown by where the piece ends up, not how it got there.</li>

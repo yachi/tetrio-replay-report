@@ -128,7 +128,7 @@ const COLORS = { I:'#3fc1c9', O:'#e8c547', T:'#a066d3', S:'#5cb85c', Z:'#d9534f'
 const ROWS = 22, W = 10, CELL = 20;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let ci = 0, step = 0, playing = false, timer = null, anim = null;
+let ci = 0, step = 0, playing = false, timer = null, anim = null, inflight = false;
 const $ = id => document.getElementById(id);
 const kindLabel = s => { if (!s || s.dead) return ''; const n = ['', 'single', 'double', 'triple', 'quad'][s.lines] || '';
   if (s.spin === 'normal' && s.piece === 'T') return s.lines ? 'T-spin ' + n : 'T-spin'; if (s.spin === 'mini') return s.lines ? 'mini T-spin ' + n : ''; return s.lines === 4 ? 'quad' : n; };
@@ -214,20 +214,22 @@ function animateStep(done) {
   const plan = sides.map(([s, st]) => { if (!st || st.dead) return null;
     const minR = Math.min(...st.cells.map(x => x[1])); const from = Math.max(0, minR - (40 - ROWS) + 1);
     const placed = withPiece(st.before, st.cells, st.piece); return { s, st, from, placed, full: fullRows(placed) }; });
-  cancelAnimationFrame(anim);
+  cancelAnimationFrame(anim); inflight = true;
   const tick = now => { const t = now - t0;
     for (const p of plan) { if (!p) continue; const cv = $('cv-' + p.s), edge = p.s === 'h' ? css('--human') : css('--cc');
       if (t < DROP) draw(cv, p.st.before, { piece: { cells: p.st.cells, piece: p.st.piece, dy: Math.round(p.from * (1 - t / DROP)), edge } });
       else if (p.full.length && t < DROP + FLASH) draw(cv, p.placed, { flash: p.full, flashA: 1 - (t - DROP) / FLASH });
       else draw(cv, p.st.after); }
     if (t < DROP + (plan.some(p => p && p.full.length) ? FLASH : 0) + 30) anim = requestAnimationFrame(tick);
-    else { step++; still(); done && done(); } };
+    else { inflight = false; step++; still(); done && done(); } };
   anim = requestAnimationFrame(tick);
 }
 function play() { if (step >= K) step = 0; playing = true; $('play').textContent = 'Pause'; still();
   const loop = () => { if (!playing) return; if (step >= K) { stop(); return; } animateStep(() => { timer = setTimeout(loop, 380 / +$('speed').value); }); };
   loop(); }
-function stop() { playing = false; clearTimeout(timer); cancelAnimationFrame(anim); $('play').textContent = 'Play'; }
+// An interrupted drop still counts: commit its step, so fast ▶ clicks or a held ArrowRight advance one piece each.
+function stop() { playing = false; clearTimeout(timer); cancelAnimationFrame(anim); $('play').textContent = 'Play';
+  if (inflight) { inflight = false; step++; still(); } }
 function render() {
   const c = CLIPS[ci]; $('title').textContent = c.title; $('where').textContent = c.where; $('summary').textContent = c.summary;
   const N = $('notes'); N.innerHTML = '';

@@ -134,19 +134,27 @@ bash ~/tetrio-replay-report/tools/cc-coach/clips/clip-pipeline.sh pinglamb   # C
 
 `build-anim.py` derives every number on the page from its inputs: the histogram, the window count,
 the topped-out count and the "matched or beat" count from `rollouts-40k.priced.jsonl` filtered to the
-player; clip, step and seed counts from `clips-chosen.json`; the frame count, the number of checker
-agents and the caption refute history from `<player>/proof-record.json` (and `refute-history.json`
-where that is kept per round). It refuses to render if the proof record does not cover every clip and
-frame, if the refute loop did not end dry, or if the page text addresses the reader or uses a
-gendered pronoun — the pages are public and name the player in the third person.
+player; the percentile of each typical clip is its **mid-rank** among the player's windows (windows
+with the same gap count half; Python's `round`, i.e. half to even — under strict-less-than the same
+clips read several points lower, so the page names the method); the node budget from
+`--rollout-nodes` (40000, the `CC_NODES` of the rollout command above); clip, step and seed counts
+and the biggest-miss clips' own 14-piece gaps from `clips-chosen.json`; the frame count, the
+checkers and how each of their mismatch lines was resolved from `<player>/adjudication.json`; and
+the caption refute history from `<player>/refute-history.json`. It refuses to render if the
+adjudication does not cover every clip and frame, if a typical clip is not a charted window, if the
+refute loop did not end dry, or if the page text addresses the reader or uses a gendered pronoun —
+the pages are public and name the player in the third person.
+
+The 7 "biggest miss" clips are **not** drawn from the histogram: they are chosen per move (stage 2,
+graded loss of one placement) and start at that move, so the page says so and prints their own gaps.
 
 ```fish
 python3 build-anim.py --player pinglamb --other yachi --data $W/pinglamb \
-    --rollouts $W/rollouts-40k.priced.jsonl --captions pinglamb/captions-final.json \
-    --proof pinglamb/proof-record.json --out ../pages/cc-pinglamb.html
+    --rollouts $W/rollouts-40k.priced.jsonl --rollout-nodes 40000 --captions pinglamb/captions-final.json \
+    --verify pinglamb/adjudication.json --refute pinglamb/refute-history.json --out ../pages/cc-pinglamb.html
 python3 build-anim.py --player yachi --other pinglamb --data $W/yachi \
-    --rollouts $W/rollouts-40k.priced.jsonl --captions yachi/captions-final.json \
-    --proof yachi/proof-record.json --refute yachi/refute-history.json --out ../pages/cc-yachi.html
+    --rollouts $W/rollouts-40k.priced.jsonl --rollout-nodes 40000 --captions yachi/captions-final.json \
+    --verify yachi/adjudication.json --refute yachi/refute-history.json --out ../pages/cc-yachi.html
 ```
 
 `bin/build-docs` copies both pages into `docs/` verbatim and `--check` compares them byte for byte,
@@ -154,20 +162,41 @@ exactly as it does `tools/analyzer.html`; the index cards say they are simulator
 the proof chain. The rendered pages are committed; the work-directory inputs are not, so a re-render
 needs the work directory from a pipeline run.
 
-The captions in `<player>/captions-final.json` are the output of two workflow passes per player,
-recorded so the claims on the page have provenance:
-1. four agents, one per batch of three clips, wrote their OWN checkers (`<player>/verify-batch-*.py`,
-   kept here) from the raw sources and re-derived all 336 placements (12 clips × 14 pieces × 2 sides)
-   — shape, empty cells, support, clears, garbage, TETR.IO attack / b2b / combo, board continuity;
-2. every caption item (title, summary, step claims) was refuted by two lenses (numbers/geometry and
+### Provenance of the frames and captions
+
+1. Four agents, one per batch of three clips, wrote their OWN checkers (`<player>/verify-batch-*.py`,
+   kept here) from the raw sources — shape, empty cells, support, clears, garbage, TETR.IO attack /
+   b2b / combo, board continuity. `run-verifiers.sh <player> <data-dir>` re-runs all four and saves
+   what they print in `<player>/verify-out/batch-N.txt`; then `adjudicate.py` rebuilds every frame of
+   both sides from the frames alone (continuity, support, clears, one-hole garbage rows, and Cold
+   Clear's garbage-waiting rule against the player's own inserted rows) and classifies every saved
+   mismatch line. It explains only one class — a checker comparing rows *inserted* with rows
+   *received* — and only when its own rebuild of that clip is clean; anything else stays
+   `unresolved` and the page prints it. Planted mutants (wrong garbage count, a floating piece, a
+   garbage row inserted on a clearing step) each produce rebuild problems and flip the verdicts.
+2. Every caption item (title, summary, step claims) was refuted by two lenses (numbers/geometry and
    wording/overclaim) in a loop until dry.
 
-| | frames re-derived | frame mismatches | caption checks refuted, by round |
+| | frames rebuilt | checker mismatch lines (saved re-runs) | caption checks refuted, by round |
 |---|---|---|---|
-| yachi | 336 / 336 | 0 (the only flag was an ambiguous one-step wording of the garbage rule, now fixed in the text above) | 13 of 190, then 3 of 128, 2 of 48, 0 of 16 (`yachi/refute-history.json`) |
-| pinglamb | 336 / 336 | 0, none unresolved | 10 of 192, then 2 of 112, 1 of 32, 0 of 16 (`pinglamb/proof-record.json`, per batch: 4→0 · 0 · 3→1→1→0 · 3→1→0) |
+| yachi | 336 / 336, 0 problems | 0 | 13 of 190, then 3 of 128, 2 of 48, 0 of 16 (`yachi/refute-history.json`, with every refutation's reason and fix) |
+| pinglamb | 336 / 336, 0 problems | 4, all `verify-batch-3.py` comparing inserted with received rows on clips 9 and 11; all explained, 0 unresolved | 10 of 192, then 2 of 112, 1 of 32, 0 of 16 (`pinglamb/refute-history.json`, per batch only) |
 
-pinglamb's first-pass checker outputs (not committed) listed mismatches on clips 6, 9 and 11, mostly
-garbage timing; the final record (`pinglamb/proof-record.json`) is what the workflow settled on after
-re-checking, and it holds 0 mismatches and 0 unresolved items. Batch 2 also kept a supplementary T-spin
-corner check (`verify-batch-2-extra.py`).
+Four things this record used to blur, kept here so they are not blurred again:
+
+- **The checkers' outputs were not saved the first time**, and the per-player `proof-record.json` that
+  stood in for them said "0 mismatches" while the two outputs that *were* kept (pinglamb batches 2
+  and 3) listed some. Both files are deleted; `verify-out/` and `adjudication.json` replace them.
+  The batch-2 mismatches in that early output (clips 6-8, a cascade from one garbage-timing step)
+  do not reproduce with the committed `verify-batch-2.py`, which is the script that was revised after
+  them.
+- **`verify-batch-1.py` is run with `CC_GARBAGE_MODE=early`.** Its default reading delivers the
+  player's step-N rows to Cold Clear only after Cold Clear's step-N piece, which is not the rule the
+  clips were built with or the page states; under that default it reports pinglamb's clips 3 and 4
+  and yachi's clip 4 as mismatches, at exactly the steps where the two readings differ. `run-verifiers.sh` says this at the top.
+- **pinglamb's refute history is per batch and per round counts only** — the verification workflow
+  returned counts, not the individual refutations, unlike yachi's file. The counts are the workflow's
+  record; nothing here can re-derive them.
+- **After the refute loop, "the human" in yachi's captions (28 places) and pinglamb's (1) was replaced
+  by the player's name** so both pages read alike. That substitution is mechanical and was not put
+  back through the skeptics.

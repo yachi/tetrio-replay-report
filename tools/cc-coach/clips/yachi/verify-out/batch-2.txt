@@ -1,0 +1,6 @@
+== clip 6: 28 frames checked, 0 mismatches
+  note start state (field/current/hold/next/b2b/combo/future) == clips-in.jsonl
+== clip 7: 28 frames checked, 0 mismatches
+  note start state (field/current/hold/next/b2b/combo/future) == clips-in.jsonl
+== clip 8: 28 frames checked, 0 mismatches
+  note start state (field/current/hold/next/b2b/combo/future) == clips-in.jsonl
