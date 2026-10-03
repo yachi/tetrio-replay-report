@@ -53,6 +53,19 @@ rollout ~5 s per window per core.
 | attack-row prefix | the repo's `verifiedIndex(..., 'frame+row')` | 24 268 of 27 868 decisions inside it; only those are graded |
 | reachability | the human's placement is among cold-clear's root candidates (`ZeroGComplete` movegen) | 18 341 of 18 356 graded mid-game moves (15 are 180° / SRS+ placements cold-clear cannot generate; they are still scored, through the duel) |
 
+## Cold-clear's search is random; this harness makes it reproducible
+
+Cold-clear picks which line to explore by WEIGHTED RANDOM SAMPLING (the Monte-Carlo leaf choice in
+`dag.rs`), from the unseeded thread rng, and its move generator returns placements in `HashMap`
+order, which differs per process. So the unpatched bot gives a different answer every run — measured:
+one 14-piece rollout came out 14, 9 and 4 lines of attack on three runs. The patch replaces the rng with
+a thread-local `StdRng` the harness reseeds before every search (FNV of position id + purpose, xor
+`COACH_SEED`), and sorts the move list. Same inputs + same `COACH_SEED` is now byte-identical output;
+another `COACH_SEED` is an independent sample. The first run's figures (FINDINGS) were made before this
+patch, i.e. from one unseeded sample per position; re-run with seeds 1 and 2 over 300 of yachi's
+windows, cold-clear's APP was 0.906 (original), 0.908 and 0.921 against the human's 0.629 — the
+headline is a property of the positions, not of one draw.
+
 ## Three measurement decisions, each made because the obvious version was wrong
 
 **1. Cold-clear is not converged, so a single "it would have played X" is weak evidence.** Over 300
@@ -76,8 +89,11 @@ are aggregates.
 From a mid-game decision, cold-clear plays the next 14 pieces (two bags). It sees exactly what the
 human saw: the same field, hold, b2b/combo state, the 5-piece preview, and the true future sequence
 revealed one piece per placement. Garbage is **pressure-matched**: the rows the human actually
-received at step *j* (amount and hole column) enter cold-clear's pending list after its step-*j* lock
-and are inserted on its next non-clearing lock (TETR.IO only tanks on a lock that clears nothing).
+received at step *j* (amount and hole column) are inserted under cold-clear's board at the SAME step
+*j*, right after its lock — unless that lock cleared lines, in which case they wait for its next lock
+that clears nothing (TETR.IO only tanks on a lock that clears nothing, which is also why the human
+received them on that step). Two independent re-derivations in the clip workflow found an earlier
+wording of this rule ambiguous by one step; the code has always done the above.
 Cold-clear gets no cancellation credit for its own attack, and both sides' attack is the TETR.IO
 pre-cancel figure priced by the same `garbageCalcV2`.
 
@@ -95,3 +111,21 @@ already on the board, garbage already queued).
 | no cancellation credit for cc in rollouts | cc faces at least the garbage the human let through | understates the gap |
 | cold-clear's own T-spin / mini rule prices cc's spins | small; minis are rare in both | either |
 | spawn rule `Row19Or20`, lock-out pruning above row 20 | cc declares positions near topout dead earlier than TETR.IO | rollouts where cc topped out are reported, and excluding them raises the gap |
+
+## Animated clips (`clips/`)
+
+`build-clips.py` picks 12 windows (the 7 verified worst-miss examples plus 5 windows from the 50th-90th
+percentile of yachi's gap), the harness rolls cold-clear forward from each under `COACH_SEED=0..7`,
+`build-frames.ts` turns both sides into per-piece frames (and fails loudly if the human's frames do
+not reproduce the recorded boards or cold-clear's do not end on the harness's own final field), and
+`build-anim.py` renders `anim-template.html` with each clip's LOWER-median seed — one rule for every
+clip, never the run that flatters cold-clear.
+
+The captions in `captions-final.json` are the output of two workflow passes, recorded so the claims
+on the page have provenance:
+1. four agents wrote their OWN checkers (`verify-batch-0..3.py`, kept here) from the raw sources and
+   re-derived all 336 placements — shape, empty cells, support, clears, garbage, TETR.IO attack /
+   b2b / combo, board continuity — with 0 mismatches; the only flag was an ambiguous one-step wording
+   of the garbage rule, now fixed in the text above;
+2. captions were refuted by two lenses (numbers/geometry and wording/overclaim) in a loop until dry:
+   13 of 190 items refuted, then 3, 2 and 0 (`refute-history.json`).

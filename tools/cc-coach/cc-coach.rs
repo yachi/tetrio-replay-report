@@ -1,12 +1,13 @@
 //! cc-coach: grade a human's placements against cold-clear, and roll cold-clear forward from a
-//! human's mid-game position. JSONL in, JSONL out, one line per position. Deterministic: each
-//! position is searched single-threaded to a fixed node budget; rayon only parallelises ACROSS
-//! positions, never inside one.
+//! human's mid-game position. JSONL in, JSONL out, one line per position. Each position is
+//! searched single-threaded to a fixed node budget; rayon only parallelises ACROSS positions.
+//! Cold-clear's search samples at random, so every search is reseeded first (`seed_for`, the
+//! patched `coach_reseed`): same input + same COACH_SEED => byte-identical output.
 //!
 //! Coordinates: the input is TOP-DOWN (row 0 = top of a 40-row field, this repo's convention).
 //! cold-clear is y-UP (field[0] = bottom). `y = 39 - r` is the one flip, done in `to_field` and
 //! `cells_td`.
-use cold_clear::dag::{advance, MoveCandidate};
+use cold_clear::dag::{advance, coach_reseed, MoveCandidate};
 use cold_clear::evaluation::{Evaluator, Standard};
 use cold_clear::{BotState, Options};
 use libtetris::*;
@@ -77,6 +78,16 @@ fn options(nodes: u32) -> Options {
         max_nodes: nodes,
         threads: 1,
     }
+}
+
+/// Seed for one search: FNV-1a over (position id, purpose tag), xor the run's COACH_SEED. Same
+/// inputs + same COACH_SEED => the same search, in any process, on any thread. A different
+/// COACH_SEED is an independent sample, which is how cold-clear's own sampling noise is measured.
+fn seed_for(id: &str, tag: &str) -> u64 {
+    let base: u64 = std::env::var("COACH_SEED").ok().and_then(|s| s.parse().ok()).unwrap_or(0);
+    let mut h: u64 = 0xcbf29ce484222325;
+    for b in id.bytes().chain([0u8]).chain(tag.bytes()) { h ^= b as u64; h = h.wrapping_mul(0x100000001b3); }
+    h ^ base.wrapping_mul(0x9E3779B97F4A7C15)
 }
 
 fn search(bot: &mut BotState<Standard>, eval: &Standard, nodes: u32) {
@@ -163,13 +174,14 @@ fn move_time_of(board: &Board, fp: &FallingPiece, mode: MovementMode) -> Option<
 /// board it leaves, with the same node budget for every placement scored this way. This removes
 /// the exploration bias of reading values off the main tree, where cold-clear's favourite has been
 /// searched far deeper than the human's move and a backed-up MAX is biased upward with effort.
-fn duel_value(eval: &Standard, root: &Board, fp: FallingPiece, nodes: u32) -> Option<i32> {
+fn duel_value(eval: &Standard, root: &Board, fp: FallingPiece, nodes: u32, seed: u64) -> Option<i32> {
     if !fp.cells().iter().all(|&(x, y)| x >= 0 && x < 10 && y >= 0 && y < 40 && !root.occupied(x, y)) { return None; }
     let mut b = root.clone();
     let l = advance(&mut b, fp);
     let held = fp.kind.0 != root.get_next_piece().ok()?;
     let mt = move_time_of(root, &fp, MovementMode::ZeroGComplete).unwrap_or(0) + if held { 1 } else { 0 };
     let (v, reward) = eval.evaluate(&l, &b, mt, fp.kind.0);
+    coach_reseed(seed);
     let mut sub = BotState::<Standard>::new(b, options(nodes));
     search(&mut sub, eval, nodes);
     let mut sc = sub.candidates();
@@ -189,6 +201,7 @@ fn grade(pos: &J, nodes: u32) -> J {
     let incoming = pos["incoming"].as_u64().unwrap_or(0) as u32;
 
     // expand the root once, find the player's exact child, force it to be analysed, then search
+    coach_reseed(seed_for(pos["id"].as_str().unwrap_or(""), "main"));
     search(&mut bot, &eval, 2);
     let first = bot.candidates();
     let pchild = first.iter().find(|c| c.mv.kind.0 == ppiece && cells_td(&c.mv) == pcells).map(|c| c.mv);
@@ -233,6 +246,7 @@ fn grade(pos: &J, nodes: u32) -> J {
                 // value estimate for a placement outside cold-clear's movegen: search from the
                 // resulting board with the same budget, then add the placement's own reward
                 let (_, reward) = eval.evaluate(&l, &b, mt, ppiece);
+                coach_reseed(seed_for(pos["id"].as_str().unwrap_or(""), "est"));
                 let mut sub = BotState::<Standard>::new(b.clone(), options(nodes));
                 search(&mut sub, &eval, nodes);
                 let mut sc = sub.candidates();
@@ -250,8 +264,9 @@ fn grade(pos: &J, nodes: u32) -> J {
     let duel_nodes: u32 = std::env::var("COACH_DUEL").ok().and_then(|s| s.parse().ok()).unwrap_or(0);
     let mut duel = J::Null;
     if duel_nodes > 0 {
-        let dp = pfp.and_then(|fp| duel_value(&eval, &root_q, fp, duel_nodes));
-        let dc = duel_value(&eval, &root_q, pick.mv, duel_nodes);
+        let id = pos["id"].as_str().unwrap_or("");
+        let dp = pfp.and_then(|fp| duel_value(&eval, &root_q, fp, duel_nodes, seed_for(id, "duel-human")));
+        let dc = duel_value(&eval, &root_q, pick.mv, duel_nodes, seed_for(id, "duel-cc"));
         duel = json!({"player": dp, "cc": dc, "same": pfp.map(|fp| fp.kind.0 == pick.mv.kind.0 && cells_td(&fp) == cells_td(&pick.mv))});
     }
 
@@ -287,6 +302,7 @@ fn rollout(pos: &J, nodes: u32) -> J {
     let incoming: Vec<u32> = pos["incoming_schedule"].as_array().map(|a| a.iter().map(|v| v.as_u64().unwrap() as u32).collect()).unwrap_or_default();
     let mut pending: Vec<(usize, usize)> = vec![];
     for j in 0..k {
+        coach_reseed(seed_for(pos["id"].as_str().unwrap_or(""), &format!("rollout-{}", j)));
         let mut bot = BotState::<Standard>::new(board.clone(), options(nodes));
         search(&mut bot, &eval, nodes);
         let mut c = bot.candidates();

@@ -35,10 +35,44 @@ index 7f9da03..1bff91f 100644
  [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
  libtetris = { path = "../libtetris", features = ["pcf"] }
 diff --git a/bot/src/dag.rs b/bot/src/dag.rs
-index a410377..91868bc 100644
+index a410377..9f709bb 100644
 --- a/bot/src/dag.rs
 +++ b/bot/src/dag.rs
-@@ -769,7 +769,7 @@ where
+@@ -87,6 +87,15 @@ use enumset::EnumSet;
+ use libtetris::{Board, FallingPiece, LockResult, Piece};
+ use ouroboros::self_referencing;
+ use rand::prelude::*;
++
++// COACH PATCH: the Monte-Carlo leaf choice drew from the unseeded thread rng, so every search was
++// a fresh random sample and no result reproduced. A thread-local SEEDED rng, reseeded by the caller
++// per search, makes a (position, budget, seed) triple deterministic.
++thread_local! {
++    static COACH_RNG: std::cell::RefCell<rand::rngs::StdRng> = std::cell::RefCell::new(rand::rngs::StdRng::seed_from_u64(0));
++}
++pub fn coach_reseed(seed: u64) { COACH_RNG.with(|r| *r.borrow_mut() = rand::rngs::StdRng::seed_from_u64(seed)); }
++fn coach_rng<T>(f: impl FnOnce(&mut rand::rngs::StdRng) -> T) -> T { COACH_RNG.with(|r| f(&mut r.borrow_mut())) }
+ use serde::{Deserialize, Serialize};
+ 
+ use crate::evaluation::Evaluation;
+@@ -261,7 +270,7 @@ impl<E: Evaluation<R> + 'static, R: Clone + 'static> DagState<E, R> {
+                 .map(|(i, c)| evaluation(c).map_or(0, |e| e.weight(&min_eval, i)));
+             // Choose a node randomly (the Monte-Carlo part)
+             let sampler = rand::distributions::WeightedIndex::new(weights).ok()?;
+-            Some(&children[thread_rng().sample(sampler)])
++            Some(&children[coach_rng(|r| r.sample(sampler))])
+         })
+     }
+ 
+@@ -290,7 +299,7 @@ impl<E: Evaluation<R> + 'static, R: Clone + 'static> DagState<E, R> {
+                                     pick_from.push((p, &**c));
+                                 }
+                             }
+-                            let (piece, children) = *pick_from.choose(&mut thread_rng()).unwrap();
++                            let (piece, children) = coach_rng(|r| *pick_from.choose(r).unwrap());
+                             board.add_next_piece(piece);
+                             children
+                         })
+@@ -769,7 +778,7 @@ where
  }
  
  /// keeps queue state consistent while arbitrarily placing pieces
@@ -120,3 +154,20 @@ index a858b0d..0615d27 100644
      /// Adds a new piece to the queue.
      pub fn add_next_piece(&mut self, piece: Piece) {
          self.tree.add_next_piece(piece);
+diff --git a/libtetris/src/moves.rs b/libtetris/src/moves.rs
+index 2477c21..9e85881 100644
+--- a/libtetris/src/moves.rs
++++ b/libtetris/src/moves.rs
+@@ -208,7 +208,11 @@ pub fn find_moves(board: &Board, mut spawned: FallingPiece, mode: MovementMode)
+         lock_check(position, &mut locks, moves);
+     }
+ 
+-    locks.into_iter().map(|(_, v)| v).collect()
++    // COACH PATCH: HashMap iteration order is per-process random; sort so the move list (and
++    // therefore every child's rank and the search's weighted sampling) is reproducible.
++    let mut out: Vec<Placement> = locks.into_iter().map(|(_, v)| v).collect();
++    out.sort_by_key(|p| { let l = &p.location; (l.kind.0 as u8, l.kind.1 as u8, l.x, l.y, l.tspin as u8) });
++    out
+ }
+ 
+ fn lock_check(piece: FallingPiece, locks: &mut HashMap<FallingPiece, Placement>, moves: InputList) {
