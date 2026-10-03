@@ -1,0 +1,122 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 0fe484b..38c9cb6 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,18 +1,6 @@
+ [workspace]
+ 
+-members = [
+-    "bot",
+-    "libtetris",
+-    "battle",
+-    "cc-client",
+-    "opening-book",
+-    "c-api",
+-    "compare",
+-    "optimizer",
+-    "opening-book/book-builder",
+-    "opening-book/pc-gen",
+-    "tbp"
+-]
++members = ["bot", "libtetris", "opening-book"]
+ 
+ [profile.release]
+ lto = true
+diff --git a/bot/Cargo.toml b/bot/Cargo.toml
+index 7f9da03..1bff91f 100644
+--- a/bot/Cargo.toml
++++ b/bot/Cargo.toml
+@@ -18,6 +18,7 @@ smallvec = "1.0"
+ serde-big-array = "0.2.0"
+ bumpalo = { version = "3.4.0", features = ["collections"] }
+ ouroboros = "0.14.0"
++serde_json = "1"
+ 
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ libtetris = { path = "../libtetris", features = ["pcf"] }
+diff --git a/bot/src/dag.rs b/bot/src/dag.rs
+index a410377..91868bc 100644
+--- a/bot/src/dag.rs
++++ b/bot/src/dag.rs
+@@ -769,7 +769,7 @@ where
+ }
+ 
+ /// keeps queue state consistent while arbitrarily placing pieces
+-fn advance(board: &mut Board, placement: FallingPiece) -> LockResult {
++pub fn advance(board: &mut Board, placement: FallingPiece) -> LockResult {
+     let result = board.lock_piece(placement);
+     let next = board.advance_queue().unwrap();
+     if next != placement.kind.0 {
+diff --git a/bot/src/evaluation/mod.rs b/bot/src/evaluation/mod.rs
+index e159820..c7da0bc 100644
+--- a/bot/src/evaluation/mod.rs
++++ b/bot/src/evaluation/mod.rs
+@@ -2,7 +2,7 @@ use libtetris::{Board, LockResult, Piece};
+ 
+ use crate::dag::MoveCandidate;
+ 
+-mod standard;
++pub mod standard;
+ pub use self::standard::Standard;
+ pub mod changed;
+ 
+diff --git a/bot/src/evaluation/standard.rs b/bot/src/evaluation/standard.rs
+index 17f3504..466ea86 100644
+--- a/bot/src/evaluation/standard.rs
++++ b/bot/src/evaluation/standard.rs
+@@ -678,14 +678,14 @@ fn cutout_tslot(mut board: Board, mut piece: FallingPiece) -> Cutout {
+ 
+ #[derive(Copy, Clone, Debug, Eq, PartialEq, Default, Serialize, Deserialize)]
+ pub struct Reward {
+-    value: i32,
+-    attack: i32,
++    pub value: i32,
++    pub attack: i32,
+ }
+ 
+ #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Default, Serialize, Deserialize)]
+ pub struct Value {
+-    value: i32,
+-    spike: i32,
++    pub value: i32,
++    pub spike: i32,
+ }
+ 
+ impl std::ops::Add for Value {
+diff --git a/bot/src/lib.rs b/bot/src/lib.rs
+index b93257e..43b1069 100644
+--- a/bot/src/lib.rs
++++ b/bot/src/lib.rs
+@@ -1,7 +1,7 @@
+ pub use opening_book::{Book, MemoryBook};
+ use serde::{Deserialize, Serialize};
+ 
+-mod dag;
++pub mod dag;
+ pub mod evaluation;
+ mod modes;
+ 
+diff --git a/bot/src/modes/normal.rs b/bot/src/modes/normal.rs
+index a858b0d..0615d27 100644
+--- a/bot/src/modes/normal.rs
++++ b/bot/src/modes/normal.rs
+@@ -77,6 +77,19 @@ impl<E: Evaluator> BotState<E> {
+         self.tree.is_dead()
+     }
+ 
++    /// COACH PATCH: the root's candidates with their backed-up evaluations (read-only).
++    pub fn candidates(&self) -> Vec<crate::dag::MoveCandidate<E::Value>> {
++        self.tree.get_next_candidates()
++    }
++
++    /// COACH PATCH: the principal variation and the node count.
++    pub fn plan(&self) -> Vec<(FallingPiece, LockResult)> {
++        self.tree.get_plan()
++    }
++    pub fn node_count(&self) -> u32 {
++        self.tree.nodes()
++    }
++
+     /// Adds a new piece to the queue.
+     pub fn add_next_piece(&mut self, piece: Piece) {
+         self.tree.add_next_piece(piece);
