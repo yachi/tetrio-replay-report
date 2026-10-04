@@ -1,0 +1,29 @@
+[
+ {
+  "clip": 3,
+  "id": "2026-10-03-20/r2/yachi/73",
+  "seed": 0,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": []
+ },
+ {
+  "clip": 4,
+  "id": "2026-10-03-02/r5/yachi/42",
+  "seed": 0,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": []
+ },
+ {
+  "clip": 5,
+  "id": "2026-10-03-09/r0/yachi/223",
+  "seed": 1,
+  "mismatches": [],
+  "human_steps": 14,
+  "cc_steps": 14,
+  "notes": []
+ }
+]

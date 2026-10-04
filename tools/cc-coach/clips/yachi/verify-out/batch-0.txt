@@ -1,0 +1,20 @@
+[
+ {
+  "clip": 0,
+  "framesChecked": 28,
+  "mismatches": [],
+  "pending_left": []
+ },
+ {
+  "clip": 1,
+  "framesChecked": 28,
+  "mismatches": [],
+  "pending_left": []
+ },
+ {
+  "clip": 2,
+  "framesChecked": 28,
+  "mismatches": [],
+  "pending_left": []
+ }
+]
