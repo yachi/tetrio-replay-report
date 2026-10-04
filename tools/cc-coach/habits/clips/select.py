@@ -9,7 +9,8 @@ S = CC_WORK + ''
 C = S + '/corpus'; H = S + '/scen/habits'; O = S + '/scen/hclips'
 HABITS = 'Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6'.split()
 SESS = sorted(f[:-6] for f in os.listdir(C) if f.endswith('.jsonl') and f[:4] == '2026')
-K = 4; NCAND = 3          # keep 2, one backup in case a clip fails its self-checks
+K = 4; NCAND = 10         # keep 2; the rest are backups for clips that fail a self-check, have no contrasting
+                          # Cold Clear run, or repeat a match file / a round already shown
 # Habits whose definition IS misdrop-shaped (Y1 by definition; P1 deliberately includes them per
 # FINDINGS pinglamb #1; Y6's TSS is cc's TSD one rotation off, misdrop-shaped by construction)
 MISDROP_OK = {'Y1', 'P1', 'Y6'}
@@ -50,12 +51,16 @@ def pool_filter(h, o):
     if o['regret'] is None: return 'no regret'
     if o['misdrop_shaped'] and h not in MISDROP_OK: return 'misdrop_shaped'
     return None
-# soft preferences (applied only if the night still has candidates after them)
-PREF = {
-    'Y2': ('cc pick without hold (the clear was available with the same piece)', lambda o: not o['cc_move']['hold_used']),
-    'P5': ('cc pick without hold (the clear was available with the same piece)', lambda o: not o['cc_move']['hold_used']),
-    'Y3': ('decline class held_I_now or kept_I_in_hold', lambda o: o['detail']['decline_class'] in ('held_I_now', 'kept_I_in_hold')),
-}
+# The night's pool (above) is what "typical" is measured against: its median graded cost, with no
+# narrowing. Examples are then drawn from that pool, nearest its median, under two restrictions that
+# never move the median:
+#  * graded cost > 0: a move the duel rates at least as good as Cold Clear's own pick does not
+#    illustrate a costly habit;
+#  * P3 only: single-line follow-up clears, the habit's own modal case (FINDINGS pinglamb #3: 478 of
+#    683 are singles); if a night has none, any line count.
+EXAMPLE_OK = {'P3': ('single-line clear (the most common kind of this habit)', lambda o: o['player_move']['lines'] == 1)}
+def midrank_pct(v, regs):
+    return round(100 * (sum(r < v for r in regs) + 0.5 * sum(r == v for r in regs)) / len(regs), 1)
 cands = {}; log = {'empty': [], 'short_windows': [], 'notes': [], 'pools': {}}
 for h in HABITS:
     for s in SESS:
@@ -65,17 +70,21 @@ for h in HABITS:
             why = pool_filter(h, o)
             if why: rej[why] += 1
             else: pool.append(o)
-        pref_used = None
-        if h in PREF and pool:
-            p2 = [o for o in pool if PREF[h][1](o)]
-            if p2: pref_used = PREF[h][0]; rej['not preferred: ' + PREF[h][0]] += len(pool) - len(p2); pool = p2
-        info = {'occurrences': len(allo), 'pool': len(pool), 'excluded': dict(rej), 'preference': pref_used}
+        info = {'occurrences': len(allo), 'pool': len(pool), 'excluded': dict(rej),
+                'misdrop_shaped_in_pool': sum(o['misdrop_shaped'] for o in pool), 'misdrop_ok': h in MISDROP_OK}
         if not pool:
             log['empty'].append({'habit': h, 'session': s, 'why': 'no occurrence left after filters', **info}); continue
         med = statistics.median(o['regret'] for o in pool)
-        info['pool_regret_median'] = med
-        srt = sorted(pool, key=lambda o: (abs(o['regret'] - med), o['regret'], o['id']))
         regs = sorted(o['regret'] for o in pool)
+        info['pool_regret_median'] = med
+        ex = [o for o in pool if o['regret'] > 0]
+        info['nonpositive_cost'] = len(pool) - len(ex)
+        restr = None
+        if h in EXAMPLE_OK and ex:
+            ex2 = [o for o in ex if EXAMPLE_OK[h][1](o)]
+            if ex2: restr = EXAMPLE_OK[h][0]; info['example_class_excluded'] = len(ex) - len(ex2); ex = ex2
+        info['example_restriction'] = restr
+        srt = sorted(ex, key=lambda o: (abs(o['regret'] - med), o['regret'], o['id']))
         picked = []; used = set(); short = 0
         for rank, o in enumerate(srt):
             rd = rkey(o['id']).rsplit('/', 1)[0]
@@ -84,11 +93,11 @@ for h in HABITS:
             if wf is None:
                 short += 1; log['short_windows'].append({'habit': h, 'session': s, 'id': o['id'], 'why': why}); continue
             used.add(rd)
-            pct = 100 * (sum(r < o['regret'] for r in regs) + 0.5 * sum(r == o['regret'] for r in regs)) / len(regs)
-            picked.append({'occ': o, 'why': {'rule': 'regret nearest the median regret of this night\'s display pool, distinct rounds',
+            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + '; distinct rounds',
                                             'pool_size': len(pool), 'pool_regret_median': med, 'regret': o['regret'],
                                             'distance_from_median': abs(o['regret'] - med), 'rank_by_distance': rank + 1,
-                                            'regret_percentile_in_pool_midrank': round(pct, 1), 'preference': pref_used}})
+                                            'regret_percentile_in_pool_midrank': midrank_pct(o['regret'], regs),
+                                            'misdrop_ok': h in MISDROP_OK, 'example_restriction': restr}})
             if len(picked) == NCAND: break
         info['windows_rejected'] = short
         log['pools'][f'{h}/{s}'] = info

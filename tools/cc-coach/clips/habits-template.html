@@ -95,6 +95,8 @@ table.tot th, table.tot td { padding: .2rem .35rem; border-bottom: 1px solid var
 table.tot th:first-child, table.tot td:first-child { text-align: left; }
 table.tot th { font: 600 .72rem var(--mono); color: var(--muted); }
 .empty { color: var(--muted); font-size: .88rem; }
+.strength { margin: .2rem 0 .5rem; padding: .35rem .6rem; border-left: 3px solid var(--line); color: var(--muted); font-size: .86rem; max-width: 60rem; }
+.poolnote { margin: 0 0 .5rem; color: var(--muted); font-size: .82rem; }
 .foot { max-width: 52rem; margin-top: 2rem; font-size: .85rem; color: var(--muted); }
 :focus-visible { outline: 2px solid var(--cc); outline-offset: 2px; }
 </style>
@@ -148,26 +150,39 @@ function header() {
   $('h1').textContent = w().title + ' vs Cold Clear, night by night';
   $('lede').innerHTML = '';
   $('lede').append(
-    `These are habits that came back night after night across ${N} nights, not one-off drops. For each one: ` +
-    `the night's rate next to Cold Clear's rate on the very same positions, how the gap moved over all ${N} nights, ` +
-    `and typical plays replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
+    `These are recurring habits found over ${N} nights, not one-off drops: each survived two independent re-checks, ` +
+    `though some are firm and some are weak, and each card says which. For each one: the night's rate next to Cold Clear's ` +
+    `(for the hole and seal habits Cold Clear can only be compared on a smaller set of positions, judged against its own second run), ` +
+    `how the measure moved over all ${N} nights, and typical plays replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
     `on the right what Cold Clear played from the identical position, queue, hold and garbage.`);
   const A = $('about'); A.innerHTML = '';
-  const one = META.one_ex.length ? ` ${META.one_ex.length} habit-night${META.one_ex.length > 1 ? 's have' : ' has'} only one (${META.one_ex.join(', ')}): no second usable occurrence that night.` : '';
+  const short_ = META.one_ex.length + META.zero_ex.length;
+  const one = short_ ? ` ${short_} habit-night${short_ > 1 ? 's have' : ' has'} fewer than two; the card says why for that night.` : '';
   const blocks = [
     ['How the examples were chosen',
-     `Typical, not worst. For each habit and night, the examples are occurrences whose graded cost sits nearest that night's median, ` +
-     `taken from different rounds, on positions inside the replay's verified stretch with the next ${K} recorded pieces verified too. ` +
-     `Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice) are left out, except where the habit is that shape by definition: ` +
-     `the one-column-off hole habits and the over-rotated T. Up to ${META.per_night} per habit and night, ${META.n_clips} in all.` + one],
+     `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice) ` +
+     `are left out of it, except where the habit is that shape by definition: the one-column-off hole habits and the over-rotated T. ` +
+     `"Typical" means nearest the pool's median graded cost, and each caption gives that median and where the example sits in the pool. ` +
+     `Examples are only taken from moves with a positive graded cost (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
+     `and for pinglamb's follow-up clears only from single-line clears, that habit's most common kind. ` +
+     `Each example needs its next ${K} recorded pieces verified, and a majority of the ${DATA.seeds} Cold Clear runs from it must make a first move that contrasts with the habit. ` +
+     `A night's two examples come from different matches, and no piece is shown twice on the page: a round already used by another habit is only taken when a night would otherwise have fewer than two. ` +
+     `Up to ${META.per_night} per habit and night, ${META.n_clips} in all.` + one],
     ['What Cold Clear is, and is not',
      `A strong bot's line, not "the correct play". It is tuned for a different game's scoring, values B2B as on/off, and has no 180° spins. ` +
-     `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece and the run shown is the middle one by ${K}-piece attack; ` +
-     `each example says how many of the ${DATA.seeds} runs picked the same first move. It sees no more of the queue than the player did, gets the same garbage on the same pieces ` +
-     `(rows wait while its piece clears lines, as in TETR.IO), and gets no credit for cancelling.`],
+     `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece; the run shown is the middle one, by ${K}-piece attack, ` +
+     `of the runs whose first move contrasts with the habit, and each example says how many of the ${DATA.seeds} runs contrasted and how many picked the exact first move shown. ` +
+     `It sees no more of the queue than the player did, gets the same garbage on the same pieces ` +
+     `(rows wait while its piece clears lines, as in TETR.IO), and gets no credit for cancelling. ` +
+     `The harness also declares a tall stack dead earlier than TETR.IO does (it treats spawning above row 20 as a topout), ` +
+     `so a run it ends as topped out might have kept going in the game; those runs are never the one shown.`],
     ['How to read the numbers',
-     `"Graded cost" is how much worse the move scored than Cold Clear's own pick, in Cold Clear's duel value: one move's verdict is noisy, so the page leans on rates over many positions. ` +
-     `Each card's table reads the habit's detector output for that night; "n" is how many positions qualified. Simulator and bot output: nothing here is in the match reports' proof chain.`],
+     `"Graded cost" is Cold Clear's duel value of its own pick minus that of the move played: each placement is scored, then searched afresh from the board it leaves. ` +
+     `Positive means the move scored worse than Cold Clear's pick; it can be negative, when the move scored better. One move's verdict is noisy, so the page leans on rates over many positions. ` +
+     `The ${K}-piece totals under each example are only what happened in those ${K} pieces. They are not the verdict: a move can send more over ${K} pieces and still leave the weaker position. ` +
+     `Each card's table reads the habit's detector output for that night; "n" is how many positions qualified. ` +
+     `Rounds, pieces and columns are counted from 1: "round 3" is the third round of the match file (r2 in the match reports' ids), and column 1 is the leftmost. ` +
+     `Simulator and bot output: nothing here is in the match reports' proof chain.`],
   ];
   for (const [h, t] of blocks) { const s = el('section'); s.append(el('h3', null, h), el('div', null, t)); A.append(s); }
 }
@@ -187,7 +202,7 @@ function step(d) { const all = ['all', ...NIGHTS]; let i = all.indexOf(state.nig
 
 // ---- strip: the habit's per-night value, selected night highlighted --------------------------
 function strip(h) {
-  const vals = h.strip, n = vals.length, Wd = 300, Ht = 70, L = 26, B = 14, bw = (Wd - L - 4) / n;
+  const vals = h.strip, n = vals.length, Wd = 300, Ht = 70, L = 40, B = 14, bw = (Wd - L - 4) / n;
   const nums = vals.filter(v => v != null), lo = Math.min(0, ...nums), hi = Math.max(0, ...nums), span = (hi - lo) || 1;
   const y = v => 6 + (Ht - B - 6) * (hi - v) / span;
   const ns = 'http://www.w3.org/2000/svg';
@@ -195,9 +210,13 @@ function strip(h) {
   svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', fill(h.stripLabel) + ', one bar per night');
   const add = (t, at, txt) => { const e = document.createElementNS(ns, t); for (const k in at) e.setAttribute(k, at[k]); if (txt != null) e.textContent = txt; svg.append(e); return e; };
   add('line', { x1: L, x2: Wd - 2, y1: y(0), y2: y(0), stroke: 'var(--muted)', 'stroke-width': 1 });
-  add('text', { x: L - 3, y: y(hi) + 3, 'text-anchor': 'end' }, minus(+hi.toFixed(2)));
-  if (lo < 0) add('text', { x: L - 3, y: y(lo) + 3, 'text-anchor': 'end' }, minus(+lo.toFixed(2)));
-  add('text', { x: L - 3, y: y(0) + 3, 'text-anchor': 'end' }, '0');
+  // axis labels: the extremes and zero, each drawn once, zero dropped when it would touch an extreme
+  const ticks = [[hi, 1], [lo, 1], [0, 0]];
+  const drawn = [];
+  for (const [v, ext] of ticks) {
+    if (drawn.some(d => d === v || Math.abs(y(d) - y(v)) < 10)) continue;
+    drawn.push(v); add('text', { x: L - 4, y: y(v) + 3, 'text-anchor': 'end' }, v === 0 ? '0' : minus(+v.toFixed(2)));
+  }
   vals.forEach((v, i) => { const x = L + i * bw, sel = NIGHTS[i] === state.night;
     if (v == null) return;
     const r = add('rect', { x: x + 1.5, y: Math.min(y(v), y(0)), width: bw - 3, height: Math.max(1, Math.abs(y(v) - y(0))),
@@ -241,7 +260,7 @@ class Stage {
     const R = clip.rows;
     host.innerHTML = '';
     const top = el('div', 'where');
-    top.append(`${clip.file} · round ${clip.round} · from piece ${clip.piece}`);
+    top.append(`${clip.file} · round ${clip.round} (r${clip.r0}) · from piece ${clip.piece}`);
     top.append(el('span', 'tag', `graded cost ${minus(clip.regret)}`));
     if (clip.misdrop) top.append(el('span', 'tag', 'misdrop-shaped'));
     host.append(top);
@@ -321,6 +340,9 @@ class Stage {
 
 // ---- captions: templated from the clip's facts only -------------------------------------------
 const plural = (n, a, b) => n === 1 ? a : (b || a + 's');
+const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'));
+const KEYNAME = { moveLeft: 'left', moveRight: 'right', rotateCW: 'rotate CW', rotateCCW: 'rotate CCW', rotate180: 'rotate 180',
+  softDrop: 'soft drop', hardDrop: 'hard drop', hold: 'hold' };
 function moveText(m) {
   const cols = m.columns.length > 1 ? `columns ${m.columns[0]}–${m.columns[m.columns.length - 1]}` : `column ${m.columns[0]}`;
   const clr = m.lines ? `cleared ${m.lines} ${plural(m.lines, 'line')}` : 'cleared nothing';
@@ -339,13 +361,20 @@ function caption(h, c) {
   if (h.id === 'Y6') setup += f.tsd_slot_ready ? ` A TSD slot is ready${f.tsd_available ? ' and a T is in reach' : ''}.` : '';
   li('before', [setup]);
   li('move 1', [span('hl-p', w().S), ` played ${moveText(f.player_first)}. `, span('hl-c', 'Cold Clear'), ` played ${moveText(f.cc_first)}.`]);
-  li('seeds', [`${c.same} of ${c.nseeds} Cold Clear runs chose this same first move` +
-    (c.graded_eq ? ', and it is also the pick the move was graded against.' : '.')]);
+  const k0 = c.human[0].keys;
+  if (k0) li('keys', [`${w().poss === 'your' ? 'Your' : "pinglamb's"} inputs for move 1: ${k0.map(x => KEYNAME[x] || x).join(' · ')} (holding a key down counts once).`]);
+  li('seeds', [`${c.ncon} of ${c.nseeds} Cold Clear runs made a first move that contrasts with this habit (${f.contrast_rule.replace(/^cc /, '')}); ` +
+    `${c.same} of ${c.nseeds} chose exactly the move shown` + (c.graded_eq ? ', which is also the pick the move was graded against.' : '.')]);
   if (!f.cc_first_contrasts_with_habit)
-    li('note', [`In the run shown, Cold Clear's first move does not meet this habit's contrast (${f.contrast_rule}): its middle run went a different way.`], 'warn');
-  const [pool, med, rank] = c.pool;
-  li('why this one', [`Graded cost ${minus(c.regret)}; the median of this night's ${pool} ${plural(pool, 'candidate')} was ${minus(med)}, ` +
-    `and this was the ${['', 'closest', 'second closest', 'third closest'][rank] || 'rank ' + rank} to it.`]);
+    li('note', [`In the run shown, Cold Clear's first move does not meet this habit's contrast (${f.contrast_rule}).`], 'warn');
+  const [pool, med, pct] = c.pool;
+  li('why this one', [`Graded cost ${minus(c.regret)}. Among this night's ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
+    `the median is ${minus(med)}, and this one sits at the ${ordinal(Math.round(pct))} percentile.` +
+    (pool <= 3 ? ` With so few this night, "typical" means little.` : '')]);
+  const p4 = f.player_4, q4 = f.cc_4;
+  if (p4.attack > q4.attack && p4.covered_cells_end <= q4.covered_cells_end)
+    li('note', [`Over these ${K} pieces ${w().s} came out ahead (more attack, no more holes). The ${K}-piece totals are not the verdict: ` +
+      `the graded cost scores the position each first move leaves, searched further ahead.`], 'warn');
   return U;
 }
 function totals(c) {
@@ -370,6 +399,7 @@ function render() {
     const all = state.night === 'all', N = all ? h.all : h.nights[state.night];
     const C = el('article', 'card'); C.id = 'habit-' + h.id;
     C.append(el('div', 'hid', `${h.id} · ${all ? 'all ' + NIGHTS.length + ' nights' : state.night}`), el('h2', null, h.name), el('p', 'desc', fill(h.desc)));
+    if (h.strength) C.append(el('p', 'strength', fill(h.strength)));
     const G = el('div', 'grid'), left = el('div'), right = el('div'); G.append(left, right); C.append(G);
     const tw = el('div', 'tw'), T = el('table', 'rates');
     T.innerHTML = `<thead><tr><th>${all ? 'all nights' : 'this night'}</th><th class="ph"></th><th>Cold Clear</th><th>n</th></tr></thead>`;
@@ -378,6 +408,7 @@ function render() {
     for (const r of N.rows) { const tr = el('tr'); tr.append(el('td', null, fill(r[0])), el('td', 'p', r[1]), el('td', 'c', r[2]), el('td', null, r[3])); tb.append(tr); }
     T.append(tb); tw.append(T); left.append(tw);
     const ul = el('ul', 'notes'); for (const n of N.notes) ul.append(el('li', null, fill(n))); left.append(ul);
+    if (!all && N.poolnote) right.append(el('p', 'poolnote', fill(N.poolnote)));
     const sb = el('div', 'stripbox'); sb.append(el('div', 'lab', fill(h.stripLabel) + ' — one bar per night' + (all ? '' : ', this night highlighted')), strip(h)); left.append(sb);
     const det = el('details'); det.append(el('summary', null, 'How this habit is measured (detector text)'), el('p', null, h.definition), el('p', null, h.cmp)); left.append(det);
     // examples
@@ -385,7 +416,7 @@ function render() {
                     : h.nights[state.night].ex.map((c, i) => ({ c, label: `example ${i + 1}` }));
     const picks = el('div', 'picks'); picks.append(el('span', 'h', all ? 'typical plays, by night:' : 'typical plays:'));
     const host = el('div', 'stage');
-    if (!exs.length) host.append(el('p', 'empty', 'No example passed the selection rules this night.'));
+    if (!exs.length) host.append(el('p', 'empty', all ? 'No example passed the selection rules on any night.' : 'No example passed the selection rules this night; the note above says why.'));
     let cur = null;
     const show = i => { if (cur) cur.stop(); picks.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i));
       cur = new Stage(host, h, exs[i].c); stages = stages.filter(s => s.host !== host); cur.host = host; stages.push(cur); };

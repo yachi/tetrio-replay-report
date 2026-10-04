@@ -249,12 +249,23 @@ What the clip stage checks, per start position and per seed: the player's board 
 with each file's own options and the lock-time garbage multiplier, equals the replay's raw attack;
 Cold Clear's rebuilt lines and inserted garbage match the harness at every step, and its final board
 equals the harness's `final_field`. Planted mutants (a +1 attack, a changed tank, a changed final field,
-a shifted garbage hole on a window that has garbage) each fail a check. Selection: verified
-occurrences only, misdrop-shaped moves excluded except for Y1, P1 and Y6 (misdrop-shaped by
-definition), the occurrence whose graded cost is nearest that night's pool median, distinct rounds.
-The shown Cold Clear run is the median of the five seeds by 4-piece attack, then holes; the page
-says how many of the five chose the same first move, and flags the clips whose shown first move does
-not meet the habit's own contrast test.
+a shifted garbage hole on a window that has garbage) each fail a check. The player's hold flag is read
+from the recorded inputs, not only from "played piece != current piece": a hold pressed while the current
+and held pieces are the same changes nothing on the board but is still a hold.
+
+Selection. A habit-night's pool is its verified occurrences, misdrop-shaped excluded except for Y1, P1
+and Y6 (misdrop-shaped by definition); "typical" is measured against that whole pool's median graded
+cost, never a narrowed sub-pool. Examples are then taken nearest that median from positive graded cost
+only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), and for
+P3 only from single-line clears, its modal case. A candidate is kept only if a majority of the five
+40k-node Cold Clear seeds make a first move that contrasts with the habit by the habit's own test (P4's
+test also requires the same hold use as the player and no T-spin or quad, as its eligibility does); the
+shown run is the median, by 4-piece attack then holes, of the contrasting runs the harness did not
+declare dead. The harness's topout rule (spawn above row 20) is stricter than TETR.IO's, so a run it ends
+is never the one shown. A night's two examples come from different match files; no piece is shown under
+two habits, and a round another habit already uses is taken only when a night would otherwise have
+fewer than two. Each caption gives the pool's size, median and the example's percentile in it; a night
+with fewer than two examples says why on its card.
 
 `build-habits.py` prints every rate straight from each habit's per-night entry (the detector's
 `nights.json`, carried verbatim in `habit-clips.json`). The one derived figure is Y6's all-nights row,

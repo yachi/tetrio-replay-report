@@ -61,7 +61,9 @@ for l in open(C + '/mid.jsonl'):
         d['nsub'] += 1
         s1d = delta(f, base, [tuple(c) for c in s['pick']['cells']])
         # n1: "player" = seed-0 pick (delta cd), "cc" = seed-1 pick; same SEALS rule applied cc-vs-cc
-        if cd[1] > 0 and s1d[1] <= 0 and not (md_geo(g['pick']['piece'], cc, [s['pick']] + s['top'][:3]) if (cd[0] > 0 or cd[1] > 0) else None):
+        # cc side filtered exactly as the player side is: not md_geo against the seed-1 pick/top-3, and not
+        # shift_clean (the seed-0 pick's own shape one column over would be clean)
+        if cd[1] > 0 and s1d[1] <= 0 and not md_geo(g['pick']['piece'], cc, [s['pick']] + s['top'][:3]) and not shift_clean(f, base, cc):
             d['s1'] += 1; d['s1regs'].append(s['duel']['cc'] - s['duel']['player'])
         if hit: d['hsub'] += 1; d['hsubregs'].append(reg)
     if not hit: continue
@@ -106,6 +108,7 @@ def row(label, d):
         cc_rate_per100=r3(100 * d['ccseal'] / n) if n else None,
         gap_per100=r3(100 * (d['plseal'] - d['ccseal']) / n) if n else None,
         player_seal_count=d['plseal'], cc_seal_count=d['ccseal'], player_seal_count_incl_misdrop_shaped=d['plall'],
+        player_any_seal_rate_per100=r3(100 * d['plall'] / n) if n else None,
         cc_only_seal_count=d['cconly'], cc_only_rate_per100=r3(100 * d['cconly'] / n) if n else None,
         regret_mean=mm(d['regs'])[0], regret_median=mm(d['regs'])[1], regret_ge600=sum(x >= 600 for x in d['regs']),
         cc_vs_cc_noise=dict(eligible=ns_, player_count=d['hsub'], cc_count=d['s1'],
@@ -129,7 +132,10 @@ out = dict(habit='Y4', player=USER, title='Sealing a hole when a clean placement
         'the player makes a non-misdrop-shaped seal / eligible; cc_rate_per100 = positions where cc\'s own pick seals / eligible '
         '(same positions); gap = player - cc. cc_only = cc seals where the player\'s move does not seal (the mirror of an occurrence, no misdrop filter applies to cc). regret = duel.cc - duel.player (cc-coach, 20000 nodes, seed 0) over occurrences. '
         'cc_vs_cc_noise = the skeptic\'s bot-noise rule on the sub4000 ids: the same SEALS rule applied to cc seed 0 vs cc seed 1 '
-        '(seed-0 pick seals, seed-1 pick does not, seed-0 pick not a shift/rot of seed-1 top-3), regret from grade-s1-ccpick.'),
+        '(seed-0 pick seals, seed-1 pick does not, and the seed-0 pick is not misdrop-shaped by the player side\'s own two tests: '
+        'not a shift/rot of the seed-1 pick or its top-3, and its own shape one column over would not be clean), regret from grade-s1-ccpick. '
+        'player_any_seal_rate_per100 = positions where the player\'s move seals, any shape (misdrop-shaped included) / eligible: the '
+        'like-for-like counterpart of cc_rate_per100.'),
     nights=nights, pooled=pooled, all_seals_including_misdrop_shaped=seal_all)
 json.dump(out, open(H + '/Y4.nights.json', 'w'), indent=1)
 print(json.dumps(pooled))

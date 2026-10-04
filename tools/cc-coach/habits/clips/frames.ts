@@ -57,7 +57,13 @@ for (const st of IN) {
     const x = priceLock(ctr, pl.lines, pl.spin, pl.piece, false, { ...opts, garbagemultiplier: gLock(j) }); ctr = x.ctr;
     if (!(x.attack === pl.raw || x.attack + 10 === pl.raw)) { aOk = false; why.push(`human step ${j + 1} attack ${x.attack} vs raw ${pl.raw}`); }
     if (r.lines !== pl.lines) { hOk = false; why.push(`human step ${j + 1} lines ${r.lines} vs ${pl.lines}`); }
-    human.push({ piece: pl.piece, hold: pl.piece !== p.current, cells: pl.cells, lines: r.lines, cleared: r.cleared, spin: pl.spin, attack: pl.raw,
+    // hold used: the played piece is not the current one, OR hold was pressed while the current and held
+    // pieces are the same (the swap leaves board and queue unchanged, so "piece != current" alone misses it).
+    // Further hold presses on the same piece are ignored by the game, so a count, not its parity, is the test.
+    const nHold = Array.isArray(pl.keys) ? pl.keys.filter((x: string) => x === 'hold').length : 0;
+    const held = pl.piece !== p.current || (nHold >= 1 && p.current === p.hold);
+    if (Array.isArray(pl.keys) && pl.piece !== p.current && nHold === 0) { hOk = false; why.push(`human step ${j + 1} played piece is not current but no hold key`); }
+    human.push({ piece: pl.piece, hold: held, keys: pl.keys ?? null, cells: pl.cells, lines: r.lines, cleared: r.cleared, spin: pl.spin, attack: pl.raw,
       b2b: ctr.b2b, combo: ctr.combo, garbage: pl.tanks.reduce((a: number, t: any) => a + t.amount, 0), tanks: pl.tanks, after,
       current: p.current, holdPiece: p.hold, next: p.next, verified: p.verified, incoming: p.incoming });
     const nx = P.get(`${k}/${l0 + j + 1}`);

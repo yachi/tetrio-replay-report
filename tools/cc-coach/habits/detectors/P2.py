@@ -13,7 +13,7 @@ import json, pickle, os, collections, statistics as st
 H = os.path.dirname(os.path.abspath(__file__)); SC = os.path.dirname(H); C = SC + '/../corpus/'
 src = open(SC + '/holes_build.py').read().split('\nM = [json.loads')[0]
 ns = {'__file__': SC + '/holes_build.py'}; exec(src, ns)
-hole_delta, covered = ns['hole_delta'], ns['covered']
+hole_delta, covered, misdrop, shift_clean = ns['hole_delta'], ns['covered'], ns['misdrop'], ns['shift_clean']
 
 USER = 'pinglamb'
 rows = pickle.load(open(SC + '/holes_rows.pkl', 'rb'))
@@ -43,7 +43,7 @@ S1P, CCN = {}, {}
 for l in open(C + 'grade-s1-ccpick.jsonl'):
     g = json.loads(l)
     if g['id'] in need and 'pick' in g and g.get('duel') and g['duel']['cc'] is not None and g['duel']['player'] is not None:
-        S1P[g['id']] = g['pick']; CCN[g['id']] = g['duel']['cc'] - g['duel']['player']
+        S1P[g['id']] = g; CCN[g['id']] = g['duel']['cc'] - g['duel']['player']
 
 def reach(g):
     vis = set(); stk = [(c, 0) for c in range(10) if g[0][c] == '.']; vis.update(stk)
@@ -72,7 +72,11 @@ for r in E:
     d['ccany'] += r['cd'][3] > 0
     if r['id'] in S1P:
         d['nsub'] += 1
-        if r['cd'][3] > 0 and hole_delta(f, [tuple(c) for c in S1P[r['id']]['cells']])[3] <= 0:
+        s1 = S1P[r['id']]; c0 = [tuple(c) for c in g['pick']['cells']]
+        # the player side's misdrop rule applied to cc's seed-0 pick, judged against seed 1: a shift/rot of
+        # the seed-1 pick or its top-3 (holes_build.misdrop), or its own shape one column over is clean
+        cc_md = bool(misdrop(g['pick']['piece'], c0, [s1['pick']] + s1.get('top', [])[:3])) or bool(shift_clean(f, c0))
+        if r['cd'][3] > 0 and hole_delta(f, [tuple(c) for c in s1['pick']['cells']])[3] <= 0 and not cc_md:
             d['s1'] += 1; d['s1regs'].append(CCN[r['id']])
         if SEAL(r): d['plsub'] += 1; d['plsubregs'].append(r['reg'])
     if not SEALX(r): continue
@@ -133,8 +137,8 @@ out = dict(habit='P2', player=USER,
         'eligible x100. Misdrop-shaped seals are written to P2.occ.jsonl too (misdrop_shaped=true) but are not counted in occurrences. '
         'Cold Clear on the same positions, two views: any_seal = share of eligible positions where the player\'s move seals (any shape) '
         'vs where cc\'s seed-0 pick seals; cc_same_positions = the cc-vs-cc noise rule on the eligible ids of sub4000 that have a '
-        'grade-s1-ccpick grade: cc\'s seed-0 pick seals where its seed-1 pick does not (cc judged by its own other seed as the player '
-        'is judged by seed 0), against the player\'s occurrence rule on the same ids; gap = player - cc per 100. regret = duel.cc - duel.player.'),
+        'grade-s1-ccpick grade: cc\'s seed-0 pick seals where its seed-1 pick does not and is not misdrop-shaped by the player side\'s rule against the '
+        'seed-1 pick and its top-3 (cc judged by its own other seed as the player is judged by seed 0), against the player\'s occurrence rule on the same ids; gap = player - cc per 100. regret = duel.cc - duel.player.'),
     nights=nights, pooled=pooled, reproduce=rep)
 json.dump(out, open(H + '/P2.nights.json', 'w'), indent=1)
 print(json.dumps(pooled))

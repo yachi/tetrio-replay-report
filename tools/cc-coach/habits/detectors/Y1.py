@@ -34,10 +34,17 @@ for l in open(C + 'grade-s1.jsonl'):
     g = json.loads(l)
     if g['id'] in need and 'pick' in g: S1[g['id']] = g['pick']
 SUB = {json.loads(l)['id'] for l in open(C + 'sub4000.jsonl')}
-CCN = {}   # cc-vs-cc regret of the seed-1 pick (skeptic's grade-s1-ccpick rule)
+CCN, CCP = {}, {}   # cost of cc's seed-1 pick against its seed-0 pick (grade-s1-ccpick)
+# grade-s1-ccpick grades the SEED-0 pick as the "player" move under seed 1, so its duel.cc is the seed-1
+# pick's value and duel.player the seed-0 pick's. Here the seed-1 pick is the hole move and the seed-0 pick
+# the clean one, so the hole move's cost is duel.player - duel.cc (the opposite sign to P1/Y4/P2, where the
+# seed-0 pick is the bad move). CCP keeps that file's seed-1 pick so an event is only valued when it is the
+# same move as the seed-1 hole move found in grade-s1 (the two seed-1 searches do not always agree).
 for l in open(C + 'grade-s1-ccpick.jsonl'):
     g = json.loads(l)
-    if g.get('duel') and g['duel']['cc'] is not None and g['duel']['player'] is not None: CCN[g['id']] = g['duel']['cc'] - g['duel']['player']
+    if g.get('duel') and g['duel']['cc'] is not None and g['duel']['player'] is not None:
+        CCN[g['id']] = g['duel']['player'] - g['duel']['cc']
+        CCP[g['id']] = sorted(map(tuple, g['pick']['cells'])) if g.get('pick') else None
 
 def cc_mirror(p, g):
     """Same rule applied to cc's own (seed-0) pick: it makes covered cells, a clean alternative exists among
@@ -57,7 +64,7 @@ def seed1_lookalike(r):
     return r['extra']['s1'][0] > 0 and r['cd'][0] <= 0 and bool(misdrop(s['piece'], [tuple(c) for c in s['cells']], [g['pick']] + g['top'][:3]))
 
 E = [r for r in A_all if r['maxh'] >= MINH]
-occ = []; per = collections.defaultdict(lambda: dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, regs=[], s1regs=[], plsubregs=[]))
+occ = []; per = collections.defaultdict(lambda: dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, regs=[], s1regs=[], plsubregs=[]))
 for r in E:
     p = MID[r['id']]; g = G[r['id']]; d = per[r['sess']]
     d['n'] += 1
@@ -66,7 +73,10 @@ for r in E:
         lk = seed1_lookalike(r)
         if lk is not None:
             d['nsub'] += 1
-            if lk: d['s1'] += 1; d['s1regs'].append(CCN[r['id']])
+            if lk:
+                d['s1'] += 1
+                if CCP.get(r['id']) == sorted(map(tuple, S1[r['id']]['cells'])): d['s1regs'].append(CCN[r['id']])
+                else: d['s1unval'] += 1
             if SEL(r) and r['md']: d['plsub'] += 1; d['plsubregs'].append(r['reg'])
     if not SEL(r): continue
     d['pl'] += 1; d['regs'].append(r['reg'])
@@ -101,12 +111,12 @@ def row(label, d):
             cc_rate_per100=round(100 * d['s1'] / ns_, 3) if ns_ else None,
             player_rate_per100=round(100 * d['plsub'] / ns_, 3) if ns_ else None,
             gap_per100=round(100 * (d['plsub'] - d['s1']) / ns_, 3) if ns_ else None,
-            cc_regret_mean=mm(d['s1regs'])[0], cc_regret_median=mm(d['s1regs'])[1],
+            cc_regret_mean=mm(d['s1regs'])[0], cc_regret_median=mm(d['s1regs'])[1], cc_regret_n=len(d['s1regs']), cc_events_not_valued=d['s1unval'],
             player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1]),
         # NOT comparable to the player rate (looser condition, see notes): cc's own seed-0 pick vs its other top-5 candidates
         cc_top5_mirror=dict(count=d['cc'], rate_per100=round(100 * d['cc'] / n, 3) if n else None))
 nights = [row(s, per[s]) for s in sorted(per)]
-P = dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, regs=[], s1regs=[], plsubregs=[])
+P = dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, regs=[], s1regs=[], plsubregs=[])
 for d in per.values():
     for k in P: P[k] = P[k] + d[k]
 pooled = row('pooled', P)
@@ -121,8 +131,10 @@ out = dict(habit='Y1', player=USER,
         'Cold Clear rate on the same positions (cc_same_positions) = the skeptic\'s bot-noise rule: on the positions that also have '
         'a seed-1 cc grade (sub4000 subsample, and graded cc-vs-cc in grade-s1-ccpick), Cold Clear\'s seed-1 pick makes covered cells '
         'where the seed-0 pick is clean and is a shift/rot of the seed-0 pick or its top-3; compared with the player\'s shift/rot '
-        'occurrences (geometry rule only, shiftclean-only excluded, as the skeptic did) on the same ids; cc regret there = seed-0 '
-        'duel minus seed-1 pick duel (grade-s1-ccpick). gap = player - cc per 100 on that subsample. cc_top5_mirror is a looser '
+        'occurrences (geometry rule only, shiftclean-only excluded, as the skeptic did) on the same ids; cc cost there = the seed-0 (clean) '
+        'pick\'s duel value minus the seed-1 (hole) pick\'s, from grade-s1-ccpick (duel.player - duel.cc in that file, which grades the '
+        'seed-0 pick as the "player" move under seed 1), averaged only over the events whose grade-s1-ccpick seed-1 pick is the same '
+        'move as the grade-s1 hole move (cc_regret_n; cc_events_not_valued counts the rest). gap = player - cc per 100 on that subsample. cc_top5_mirror is a looser '
         'rule on cc\'s seed-0 pick (hole while any of its other top-5 candidates is clean, geometry vs its own next 3) and is NOT '
         'comparable to the player rate.'),
     min_height=MINH, nights=nights, pooled=pooled,

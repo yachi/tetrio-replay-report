@@ -55,15 +55,27 @@ def pct_of_frac(v):        # P6 stores rates as fractions with 4 decimals; x100 
 # --- one spec per habit: which fields the card prints -------------------------------------------
 # Each returns rows [what, player, cc, n] (strings) and notes (templates with {S}/{s}/{poss}),
 # plus the strip value. {S}/{s} = You/you or pinglamb; {poss} = your / pinglamb's.
+# `here` names the scope of a note: 'this night' on a night's view, 'over all 15 nights' on the pooled one.
+HERE = 'this night'
+def cc_cost(cs):
+    """Cold Clear's mean cost on the second-run subsample. Y1 can value only the events whose graded seed-1
+    move is the hole move itself (cc_regret_n of cc_count); say so when that is not all of them."""
+    v = num(cs['cc_regret_mean'])
+    n = cs.get('cc_regret_n')
+    if n is not None and n != cs['cc_count']:
+        v = f"{v} ({n} of {cs['cc_count']} valued)" if n else f"– (0 of {cs['cc_count']} valued)"
+    return v
+
+
 def spec_Y1(r):
     cs = r['cc_same_positions']
     rows = [['hole moves per 100 positions (6+ rows)', f"{num(r['player_rate_per100'])} ({num(r['occurrences'])})", '—', num(r['eligible'])],
             ['… on positions with a second Cold Clear pick', f"{num(cs['player_rate_per100'])} ({num(cs['player_count'])})",
              f"{num(cs['cc_rate_per100'])} ({num(cs['cc_count'])})", num(cs['eligible'])],
-            ['mean graded cost of those moves', num(cs['player_regret_mean']), num(cs['cc_regret_mean']), '']]
+            ['mean graded cost of those moves', num(cs['player_regret_mean']), cc_cost(cs), '']]
     notes = ["Cold Clear makes this shape too, at a similar rate; what separates the two is the cost. "
              "That subsample is small per night, so read the cost line, not a per-night gap.",
-             f"All {num(r['occurrences'])} of {{poss}} hole moves this night: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
+             f"All {num(r['occurrences'])} of {{poss}} hole moves {HERE}: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
     return rows, notes, r['player_rate_per100']
 
 
@@ -71,7 +83,7 @@ def spec_P1(r):
     rows, _, v = spec_Y1(r)
     notes = ["For pinglamb the one-column-off shape adds nothing: hole moves of every shape cost about the same, so all of them count here. "
              "The Cold Clear subsample is small per night; read the cost line, not a per-night gap.",
-             f"All {num(r['occurrences'])} hole moves this night: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
+             f"All {num(r['occurrences'])} hole moves {HERE}: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
     return rows, notes, v
 
 
@@ -79,7 +91,7 @@ def spec_lines(r, gap_key):
     rows = [['lines cleared per move', num(r['player_lines_per_move']), num(r['cc_lines_per_move']), num(r['n'])],
             ['chance the move clears', num(r['player_p_clear']), num(r['cc_p_clear']), num(r['n'])]]
     notes = [f"Cold Clear's pick cleared on {num(r['cc_clear_positions'])} of these positions; "
-             f"{{S}} kept stacking on {num(r['occurrences'])} of them (mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
+             f"{{S}} kept stacking on {num(r['occurrences'])} of them (misdrop-shaped included; mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
     return rows, notes, r[gap_key]
 
 
@@ -93,7 +105,7 @@ def spec_Y3(r):
             ['… without misdrop-shaped declines', num(x['player_rate_pct']), num(x['cc_rate_pct']), num(x['eligible'])]]
     notes = [f"{num(r['occurrences'])} declines ({num(r['occurrences_deliberate'])} deliberate). "
              f"The quad came on the very next piece {num(r['quad_next_piece'])} times and within 2 pieces {num(r['quad_within_2'])} times. "
-             f"Mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
+             f"Over all of them, misdrop-shaped included: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
     return rows, notes, r['gap_pp']
 
 
@@ -103,8 +115,8 @@ def spec_Y4(r):
             ['same rule, Cold Clear judged by its own second run', f"{num(nz['player_rate_per100'])} ({num(nz['player_count'])})",
              f"{num(nz['cc_rate_per100'])} ({num(nz['cc_count'])})", num(nz['eligible'])],
             ['mean graded cost there', num(nz['player_regret_mean']), num(nz['cc_regret_mean']), '']]
-    notes = [f"Careful: Cold Clear's own moves seal a cell more often overall ({num(r['cc_rate_per100'])} against {{poss}} "
-             f"{num(r['player_rate_per100'])} per 100 here). The habit is not sealing more; it is sealing where a clean placement existed, "
+    notes = [f"Careful: counting every seal, Cold Clear's own moves seal a cell more often ({num(r['cc_rate_per100'])} against {{poss}} "
+             f"{num(r['player_any_seal_rate_per100'])} per 100 {HERE}). The habit is not sealing more; it is sealing where a clean placement existed, "
              f"at a mean graded cost of {num(r['regret_mean'])} (median {num(r['regret_median'])})."]
     return rows, notes, r['occurrence_rate_per100']
 
@@ -116,7 +128,7 @@ def spec_P2(r):
              f"{num(cs['cc_rate_per100'])} ({num(cs['cc_count'])})", num(cs['eligible'])],
             ['mean graded cost there', num(cs['player_regret_mean']), num(cs['cc_regret_mean']), '']]
     notes = [f"Careful: counting every seal, Cold Clear seals more often ({num(an['cc_rate_per100'])} against pinglamb's "
-             f"{num(an['player_rate_per100'])} per 100 here). The habit is sealing where a clean placement existed, "
+             f"{num(an['player_rate_per100'])} per 100 {HERE}). The habit is sealing where a clean placement existed, "
              f"at a mean graded cost of {num(r['regret_mean'])} (median {num(r['regret_median'])})."]
     return rows, notes, r['player_rate_per100']
 
@@ -127,16 +139,20 @@ def spec_Y5(r):
             ['… without misdrop-shaped moves', num(x['player_rate_pct']), num(x['cc_rate_pct']), num(x['eligible'])]]
     notes = [f"{num(r['occurrences'])} times {{s}} buried it where Cold Clear did not ({num(r['occurrences_deliberate'])} deliberate); "
              f"{num(r['reverse_cc_covers_player_not'])} times the other way round. "
-             f"Mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
+             f"Over all of them, misdrop-shaped included: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
     return rows, notes, r['gap_pp']
 
 
 def spec_Y6(r):
     rows = [['T locked sideways (TSS) in a ready TSD slot (%)', num(r['player_rate_graded_pct']), num(r['cc_rate_pct']), num(r['graded'])],
             ["pinglamb on its own ready slots (%)", num(r['pinglamb_rate_pct']), '', num(r['pinglamb_eligible'])]]
-    notes = ["Against Cold Clear this habit does not separate: Cold Clear also turns the T sideways in these slots at times. "
-             "What makes it a habit is the comparison with pinglamb and how it happens, a third rotate press once the T already points down.",
-             f"{num(r['player_tss'])} TSS against {num(r['player_tsd'])} TSD this night."]
+    pr, cr = r['player_rate_graded_pct'], r['cc_rate_pct']
+    cmpw = ('more often than' if cr > pr else 'less often than' if cr < pr else 'exactly as often as')
+    notes = [f"Against Cold Clear this habit does not separate: {HERE} Cold Clear turned the T sideways in these slots {cmpw} {{s}} "
+             f"({num(cr)}% against {num(pr)}%), and over the 15 nights Cold Clear's rate is the higher one on {Y6_CC_ABOVE} of them. "
+             "What makes it a habit is the comparison with pinglamb, and how it happens: over the corpus all 190 sideways Ts had three or more rotate presses, "
+             "against 2.0% of {poss} TSDs (the skeptic's key count).",
+             f"{num(r['player_tss'])} TSS against {num(r['player_tsd'])} TSD {HERE}."]
     return rows, notes, r['gap_pp']
 
 
@@ -147,7 +163,7 @@ def spec_P3(r):
     c = r['control_no_prior_clear']
     notes = [f"Part of this is a general taste for clearing: with no clear just before, the gap is {sg(c['gap_pp'])} pp "
              f"(n {num(c['eligible'])}), so {sg(c['combo_specific_gap_pp'])} pp is specific to keeping the combo.",
-             f"{num(r['occurrences'])} times pinglamb cleared where Cold Clear stacked (mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
+             f"{num(r['occurrences'])} times pinglamb cleared where Cold Clear stacked (misdrop-shaped included; mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
     return rows, notes, r['gap_pp']
 
 
@@ -156,7 +172,7 @@ def spec_P4(r):
     rows = [['placed on the taller half (%)', num(r['player_rate_pct']), num(r['cc_rate_pct']), num(r['eligible'])],
             ['… without misdrop-shaped moves', num(x['player_rate_pct']), num(x['cc_rate_pct']), num(x['eligible'])]]
     notes = [f"{num(r['occurrences'])} times pinglamb went tall where Cold Clear did not; {num(r['reverse_cc_tall_player_not'])} the other way round. "
-             f"Mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}. Per night the counts are small."]
+             f"Over all of them, misdrop-shaped included: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}. Per night the counts are small."]
     return rows, notes, r['gap_pp']
 
 
@@ -165,7 +181,7 @@ def spec_P6(r):
     rows = [['took the quad (%)', num(pct_of_frac(r['player_quad_rate'])), num(pct_of_frac(r['cc_quad_rate'])), num(r['n'])],
             ['… only when the I is the current piece', num(pct_of_frac(ci['player_quad_rate'])), num(pct_of_frac(ci['cc_quad_rate'])), num(ci['n'])]]
     notes = [f"{num(r['occurrences'])} times pinglamb pressed hold on a current I where Cold Clear quadded "
-             f"(mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}). This is the weakest of pinglamb's habits."]
+             f"(mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
     return rows, notes, pct_of_frac(r['gap'])
 
 
@@ -193,14 +209,26 @@ DESC = {   # one plain line per habit; no figures beyond the habit's own definit
     'Y3': "The I is in hand or in hold and a clean well is ready 4 rows deep: Cold Clear takes the quad now, {s} played another piece first.",
     'Y4': "A piece locks over a cell and cuts it off completely (no tuck or spin can reach it), where Cold Clear's pick placed cleanly.",
     'Y5': "The top garbage hole is open to dig; a piece is laid across that column without clearing the row, where Cold Clear kept it open.",
-    'Y6': "The T goes into a ready TSD slot, but an extra rotate press locks it sideways: a T-spin single instead of the double.",
+    'Y6': "The T goes into a ready TSD slot but locks sideways: a T-spin single instead of the double. Each example lists the keys pressed for that T.",
     'P1': "From a 6+ row stack, a placement leaves a covered cell where Cold Clear's pick does not, one column off or otherwise.",
     'P2': "On a board with garbage, a placement seals a cell off completely while Cold Clear's pick placed cleanly.",
-    'P3': "Right after a line clear, with no B2B to protect, pinglamb cleared again to keep a short combo where Cold Clear kept building.",
+    'P3': "Right after a line clear, with no B2B to protect, pinglamb cleared again (usually a single, which keeps a short combo going) where Cold Clear cleared nothing and kept building. The examples are single-line clears.",
     'P4': "One half of the board is clearly taller (10–13 rows, garbage below): pinglamb placed on the tall half where Cold Clear filled the low side.",
     'P5': "Stack at 12–15 rows with 4–7 garbage rows: Cold Clear takes the line clear on offer, pinglamb kept stacking instead.",
     'P6': "At 10+ rows, with the I as the current piece and a well ready 4+ deep, pinglamb pressed hold instead of taking the quad.",
 }
+
+STRENGTH = {   # how firm each habit is, in the skeptics' words (FINDINGS.md); shown on every view of the card
+    'Y4': "Weaker than the hole and line-clear habits: it held on 12 of the 15 nights in the skeptics' re-derivation, "
+          "and with every exclusion applied at once the interval on its extra cost touches zero.",
+    'Y5': "Fragile: at 12+ rows, with the 10 costliest rounds and every misdrop-shaped move removed, the gap is +0.5 pp with an interval of −0.1 to +1.3, i.e. it may be nothing.",
+    'Y6': "Against Cold Clear this does not separate (see below); it is a habit only next to pinglamb's rate.",
+    'P5': "Weaker than yachi's: under the broadest misdrop exclusion it is below Cold Clear on 11 of 15 nights (sign test p = 0.12). "
+          "The skeptics' recommended band for pinglamb is 10–13 rows; there, with any garbage, the gap is much smaller: {P5_BROAD}.",
+    'P6': "The weakest of pinglamb's habits: under fully symmetric cleaning it held on only 10 of 13 nights.",
+}
+# Habits whose gap has a direction: on a night where it runs the other way the card says so.
+DIRECTION = {'Y2': -1, 'P5': -1, 'Y3': -1, 'P6': -1, 'Y5': +1, 'P3': +1, 'P4': +1}
 
 # Y6 has no pooled block in its nights.json; sum the per-night counts and check them against the
 # figures its own comparison text prints, so a summing slip cannot reach the page.
@@ -223,15 +251,72 @@ for want in (f"{y6_pooled['player_rate_graded_pct']}%", f"{y6_pooled['cc_rate_pc
 Y6_ALL_NOTE = "All nights summed from the per-night counts: the TSS share is over every in-slot placement, Cold Clear's over the graded ones."
 
 
+Y6_CC_ABOVE = sum(v['rates']['cc_rate_pct'] > v['rates']['player_rate_graded_pct'] for v in y6['nights'].values())
+STRENGTH['P5'] = STRENGTH['P5'].replace('{P5_BROAD}', (lambda b: f"{num(b['gap_lines_per_move'])} lines per move (n {num(b['n'])})")(
+    next(h for h in HAB if h['id'] == 'P5')['pooled']['band_10_13_any_garbage']))
+
+
+def dec(t):
+    t = t.replace('−', '-')
+    return len(t.split('.')[1]) if '.' in t else 0
+
+
+def strip_value(hid, rows, v):
+    """The strip bar. For a gap habit it is the first table row's player figure minus its Cold Clear figure,
+    as printed, so the bar's value agrees with the table beside it to the last digit."""
+    if STRIP[hid][1] != 'gap':
+        return v
+    a, b = rows[0][1], rows[0][2]
+    x = float(a.replace('−', '-')) - float(b.replace('−', '-'))
+    return round(x, max(dec(a), dec(b)))
+
+
 def card(h, rates, pooled=False):
+    global HERE
+    HERE = 'over all 15 nights' if pooled else 'this night'
+    assert len(NIGHTS) == 15
     if h['id'] == 'Y6' and pooled:
         rates = y6_pooled
         rows, notes, _ = spec_Y6(dict(rates, player_tss=rates['player_tss'], player_tsd=rates['player_tsd']))
         rows[0][3] = f"{num(tot['eligible'])} / {num(tot['graded'])}"
         notes = notes[:1] + [Y6_ALL_NOTE]
-        return rows, notes
-    rows, notes, _ = SPEC[h['id']](rates)
-    return rows, notes
+        return rows, notes, strip_value('Y6', rows, None)
+    rows, notes, v = SPEC[h['id']](rates)
+    sv = strip_value(h['id'], rows, v)
+    if h['id'] in DIRECTION and not pooled:
+        want = DIRECTION[h['id']]
+        if sv == 0:
+            notes.append("On this night there is no gap: the two rates in the first row are equal.")
+        elif (sv > 0) != (want > 0):
+            notes.append(f"On this night the gap runs the other way ({sg(sv)} in the first row), so this night does not show the habit. "
+                         "The examples below are still this night's occurrences of it.")
+    return rows, notes, sv
+
+
+def pool_note(h, v):
+    """Where this night's examples come from, and why there are fewer than two when there are."""
+    p = v['pool']
+    if not p:
+        return None
+    md = '' if p['misdrop_ok'] else ' that are not misdrop-shaped'
+    t = (f"Typical plays are measured against this night's {p['pool']} verified {('occurrence' if p['pool'] == 1 else 'occurrences')}{md} "
+         f"(median graded cost {num(p['pool_regret_median'])}).")
+    npos = p.get('nonpositive_cost') or 0
+    if npos:
+        t += (f" {npos} of them {'scores' if npos == 1 else 'score'} at least as well as Cold Clear's own pick (graded cost 0 or below)"
+              f" and {'is' if npos == 1 else 'are'} never shown as {'an example' if npos == 1 else 'examples'}.")
+    if p.get('example_restriction'):
+        t += f" Examples are limited to the habit's most common kind: {p['example_restriction']}."
+    n = len(v['examples'])
+    if n < 2:
+        reasons = []
+        if p.get('windows_rejected'):
+            k = p['windows_rejected']
+            reasons.append(f"{k} {'has' if k == 1 else 'have'} fewer than {K} verified recorded pieces after {'it' if k == 1 else 'them'}")
+        for w_, c_ in sorted((v.get('not_used') or {}).items(), key=lambda kv: -kv[1]):
+            reasons.append(f"{c_}: {w_}")
+        t += f" {'Only one example' if n == 1 else 'No example'} this night. Of the remaining candidates, " + ('; '.join(reasons) if reasons else 'none was left') + '.'
+    return t
 
 
 # --- clips: slimmed to what the page draws and captions ------------------------------------------
@@ -244,6 +329,7 @@ def slim_step(s):
         o['kind'] = s['kind']
     if 'queue' in s:
         o['q'] = [s['queue']['current'], s['queue']['hold'], ''.join(s['queue']['next'])]
+        o['keys'] = s['keys']
     return o
 
 
@@ -257,15 +343,23 @@ def slim_clip(c):
     R = c['rows']
     assert len(c['start']['field']) == R and all(len(''.join(s['after'])) == 10 * R for s in c['human'])
     assert all(s.get('verified') for s in c['human']), c['id']
+    assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], c['id']
+    assert c['regret'] > 0, c['id']
+    # the hold flag agrees with the recorded inputs: hold used iff the played piece is not the current one, or hold was
+    # pressed while the current and held pieces were the same (later presses on one piece are ignored by the game)
+    assert all(s['hold'] == (s['piece'] != s['queue']['current'] or ('hold' in s['keys'] and s['queue']['current'] == s['queue']['hold']))
+               for s in c['human']), c['id']
     m = c['id'].split('/')
     run = c['cc_run']
     return {'id': c['id'], 'file': c['file'], 'round': c['round'] + 1, 'piece': c['lock'] + 1, 'rows': R,
             'regret': c['regret'], 'misdrop': c['misdrop_shaped'],
-            'pool': [c['why_picked']['pool_size'], c['why_picked']['pool_regret_median'], c['why_picked']['rank_by_distance']],
+            'pool': [c['why_picked']['pool_size'], c['why_picked']['pool_regret_median'], c['why_picked']['regret_percentile_in_pool_midrank']],
+            'r0': c['round'], 'misdrop_ok': c['why_picked']['misdrop_ok'],
             'start': {'field': ''.join(c['start']['field']), 'b2b': c['start']['b2b'], 'combo': c['start']['combo'],
                       'q': [c['start']['current'], c['start']['hold'], ''.join(c['start']['next'])]},
             'human': [slim_step(s) for s in c['human']], 'cc': [slim_step(s) for s in c['cc']],
             'same': run['first_move_same_as_shown'], 'nseeds': len(run['seeds']), 'graded_eq': run['first_move_equals_graded_pick'],
+            'ncon': run['seeds_contrasting'],
             'facts': {k: c['facts'].get(k) for k in FACT_KEYS}}
 
 
@@ -276,23 +370,35 @@ for h in HAB:
     nights = {}
     for n in NIGHTS:
         v = h['nights'][n]
-        rows, notes = card(h, v['rates'])
-        strip.append(SPEC[h['id']](v['rates'])[2])
-        nights[n] = {'rows': rows, 'notes': notes, 'pool': v['pool']['pool'], 'occ': v['pool']['occurrences'],
+        rows, notes, sv = card(h, v['rates'])
+        strip.append(sv)
+        nights[n] = {'rows': rows, 'notes': notes, 'poolnote': pool_note(h, v),
                      'ex': [slim_clip(c) for c in v['examples']]}
         assert all(c['night'] == n and c['player'] == h['player'] and c['habit'] == h['id'] for c in v['examples'])
         n_ex.append(len(v['examples']))
-    prow, pnotes = card(h, h['pooled'], pooled=True)
-    out_h.append({'id': h['id'], 'player': h['player'], 'name': h['name'], 'desc': DESC[h['id']],
+    prow, pnotes, _ = card(h, h['pooled'], pooled=True)
+    out_h.append({'id': h['id'], 'player': h['player'], 'name': h['name'], 'desc': DESC[h['id']], 'strength': STRENGTH.get(h['id']),
                   'definition': h['definition'], 'cmp': h['cc_comparison'], 'strip': strip,
                   'stripLabel': STRIP[h['id']][0], 'stripKind': STRIP[h['id']][1],
                   'all': {'rows': prow, 'notes': pnotes}, 'nights': nights})
 
+# no clip shown twice: no piece of any round appears in two examples; a habit-night's two examples
+# come from different match files; the all-nights notes never speak of "this night"
+_seen = {}
+for h in out_h:
+    for n, v in h['nights'].items():
+        assert len({c['file'] for c in v['ex']}) == len(v['ex']), (h['id'], n, 'two examples from one match file')
+        for c in v['ex']:
+            rk, l0 = c['id'].rsplit('/', 1)
+            for j in range(K):
+                assert (rk, int(l0) + j) not in _seen, (c['id'], h['id'], _seen.get((rk, int(l0) + j)), 'piece shown twice')
+                _seen[(rk, int(l0) + j)] = h['id']
+    assert not any('this night' in t for t in h['all']['notes']), (h['id'], 'pooled note says this night')
 DATA = {'nights': NIGHTS, 'players': PLAYERS, 'k': K, 'seeds': len(SEEDS), 'nodes': NODES, 'habits': out_h}
 n_clips = sum(n_ex)
 lo, hi = min(n_ex), max(n_ex)
 one_ex = D['log']['habit_nights_with_one_example']
-meta = {'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'n_habits': len(HAB)}
+meta = {'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'zero_ex': D['log']['habit_nights_without_examples'], 'n_habits': len(HAB)}
 
 TEMPLATE = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'habits-template.html'), encoding='utf-8').read()
 page = (TEMPLATE.replace('{{DATA}}', json.dumps(DATA, separators=(',', ':'), ensure_ascii=False))
