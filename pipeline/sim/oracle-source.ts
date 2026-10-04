@@ -22,7 +22,7 @@ import { BOARD_WIDTH } from './vendor/core/types.ts';
 
 // The TL ruleset fields the version-19 .ttrm `options` omit — identical to tools/triangle-oracle/oracle.mjs.
 // Board-affecting ones (gravity, holes) are pinned; the rest are TETR.IO TL defaults.
-const TL_DEFAULTS: Record<string, unknown> = {
+export const TL_DEFAULTS: Record<string, unknown> = {
   g: 0.02, boardwidth: 10, boardheight: 20, kickset: 'SRS+', bagtype: '7-bag', combotable: 'multiplier',
   spinbonuses: 'T-spins', garbageblocking: 'combo blocking', garbagetargetbonus: 'none', clutch: false,
   stock: 0, garbagemultiplier: 1, garbagespeed: 20, garbageholesize: 1, messiness_change: 1,

@@ -182,6 +182,12 @@ python3 -m pipeline.openers.extract_wiki_openers \
   --html-dir <dir> --write                                 # re-transcribe (needs the pages fetched)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
   --out sessions/<date>/sim/opener-facts.json                   # the C-Spin / DT Cannon metrics
+REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-replay.ts \
+  --out sessions/<date>/sim/replay-facts.json                   # the animated replay's timeline (quarantined)
+bun test pipeline/sim/replay.test.ts                           #   its round trip + named exception lists
+python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
+python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
+python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 Rscript analysis/rate_records.R --json analysis/rate-records.json  #   ...as the committed artefact
 python3 -m pipeline.check_rate_records            # CI gate: that artefact is current, and every
@@ -2773,6 +2779,35 @@ A `SECTIONS` entry's anchor must be a **marker comment**, not a `<section id=…
 id="coaching">` lives inside the coaching region, so anchoring there inserts the new block into a
 span a later pass rewrites: `build_report` prints `inserted: <name>` and the finished file contains
 nothing at all.
+
+## 重播 — the animated replay, the third quarantined section
+
+Two boards side by side, stepped lock by lock. **Simulator output, quarantined exactly like the
+forecast and opener sections**: one engine, no board snapshot in the `.ttrm` to check it against,
+so the artefact says `report_eligible: false` and nothing that draws from it carries a claim id, a
+✓ badge or a `data-claim`.
+
+| piece | where |
+|---|---|
+| emitter | `pipeline/sim/emit-replay.ts` → `sessions/<date>/sim/replay-facts.json` (regenerate with the Commands-block line; one per session, none for `subsets/`) |
+| test | `pipeline/sim/replay.test.ts` — the committed artefact must rebuild byte for byte, every timeline must decode back to the engine's board, and `ADMISSION_EXCEPTIONS` / `KNOCKOUT_EXCEPTIONS` are **named lists**, not bounds |
+| report section | `pipeline/replay_section.py` + `pipeline/replay_player.js` (inlined), region `round-replay`, in `SELF_INSERTING`; it replays the round `generators._intense_round` picks, so it is the same round as 最癲一局 |
+| gate | `pipeline/check_replay_section.py` (re-render, quarantine sentences `REQUIRED`, no badge, no `innerHTML`); `--selftest` plants the corruptions |
+| whole-night page | `pipeline/replay_page.py` + `replay_page.js` → `docs/<date>-replay.html`, rendered (not copied) by `bin/build-docs`, so `--check` byte-compares it; `python3 -m pipeline.replay_page --selftest` |
+
+Three things the wording must keep. **The garbage hole columns are the engine's seeded-RNG holes**:
+they agree with the game's own counters and are never observed directly, so the copy must never call
+them the recorded columns (the `oracle-source.ts` caveat is the same problem). **The ending comes
+from `gameoverreason`, not from the engine.** The engine's own topout is recorded beside it as
+`engine_knockout`, and where the two disagree the board after that point may not be the game's. **The
+verified prefix is shown as a boundary on the board, not as a ✓.** It is what the `verifiedBoundary`
+walk in `verified-prefix.ts` reached; `verifiedIndex` is now that walk's projection, not a second
+copy of it.
+
+The engine hooks the emitter needs are **opt-in**. `createEngine`'s `date` defaults to the wall clock
+as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json` re-emits
+byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
+`runCaseOracle` returns.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
