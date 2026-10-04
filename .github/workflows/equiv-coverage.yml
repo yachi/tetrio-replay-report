@@ -114,9 +114,16 @@ permissions:
 jobs:
   # THE SPLIT IS BY GRANULARITY, NOT BY WHETHER ANYTHING IS MEASURED.
   # Both jobs re-measure; this one measures the two cheap granularities and the weekly one adds the
-  # third. `--modes single_value,two_site_match` is ~4m13s for the whole corpus against ~25 min for
-  # all three, and that ratio is the only reason there are two jobs. `timeout-minutes: 30` is the
-  # ~4m13s with ~7x headroom for a slower hosted runner.
+  # third. `--modes single_value,two_site_match` was ~4m13s for the whole corpus at six sessions
+  # against ~25 min for all three, and that ratio is the only reason there are two jobs.
+  #
+  # THE COST GROWS WITH THE CORPUS, so the timeout is a budget that has to be re-checked whenever a
+  # session lands — a sweep over every datum of every session is not a constant. It was 30 min,
+  # i.e. ~7x the six-session ~4m13s; at fifteen sessions (2026-10-03 as its five-replay subset) the
+  # same step took 26m53s on a hosted runner, and the full twenty-replay 10-03 ran into the 30-min
+  # ceiling — so a timeout that had been generous for nine sessions became the build's failure mode
+  # without any code changing. 75 is ~2.5x the last measured run. Read the step's wall time off the
+  # run when a session lands and move this before it is reached, not after.
   #
   # --check (not --check-prose) so this job re-derives rather than compares two committed things.
   # It byte-compares each session's equiv-coverage.json for the named modes and gates the three
@@ -145,7 +152,7 @@ jobs:
   #       checked against the COMMITTED artefact
   coverage:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 75
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -193,8 +200,12 @@ jobs:
   # COST, and read the denominator carefully — getting it wrong here is a 6x error. The round sweep
   # is **854,937 moves corpus-wide**: the sum over all six sessions (217,480 + 82,802 + 137,970 +
   # 92,737 + 79,301 + 244,647), NOT a per-session figure. At ~1.38 ms/mutant that is ~19.6 min, plus
-  # the ~231 s single-value base, so the whole --check is **~25 minutes for the entire corpus**.
-  # `timeout-minutes: 90` is that ~25 min with ~3.6x headroom for a slower hosted runner.
+  # the ~231 s single-value base, so the whole --check was **~25 minutes for the six-session
+  # corpus**. Those figures are the SIX-session measurement and are kept as the record, not as the
+  # current cost: the sweep scales with the corpus, and at fifteen sessions (1157 rounds against
+  # ~450) a linear estimate is ~65 min — unmeasured, and too close to the 90 this job carried. It is
+  # 180 now, the same budget-not-constant rule as the `coverage` job above: read the wall time off
+  # the next weekly run and move this before it is reached.
   #
   # Round granularity is what makes the published numbers honest rather than merely stable: `match`
   # enumerates only moves out of the source match's largest round and into the target match's
@@ -209,7 +220,7 @@ jobs:
   coverage-round:
     if: github.event_name == 'schedule' || inputs.round
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 180
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
