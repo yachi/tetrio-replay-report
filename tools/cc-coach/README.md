@@ -202,3 +202,63 @@ Four things this record used to blur, kept here so they are not blurred again:
 - **After the refute loop, "the human" in yachi's captions (28 places) and pinglamb's (1) was replaced
   by the player's name** so both pages read alike. That substitution is mechanical and was not put
   back through the skeptics.
+
+## Habits page (`habits/`, published as `pages/cc-habits.html`)
+
+One page, both players, every night: for each recurring habit (six per player) the night's rate next
+to Cold Clear's rate on the same positions, a strip of that measure over all 15 nights, and typical
+example plays replayed side by side with Cold Clear from the identical position, queue, hold and
+received garbage. The habits are the ones that survived two skeptic re-derivations over the 15-night
+corpus (narrowed where a skeptic narrowed them); the page's header says what it shows and what Cold
+Clear is not. yachi's view says "you"; pinglamb is always named.
+
+The scripts expect one work directory, `$CC_WORK`, laid out as the run that produced the page was:
+`corpus/` (per-night positions, `mid.jsonl`, `grade.jsonl`, the seed-1 and weak-bot grades,
+`sub4000.jsonl`), `scen/` (`habits/lib/*.py` here), `scen/habits/` (`habits/detectors/*.py`) and
+`scen/hclips/` (`habits/clips/*`), plus `attack.ts` at its root (`frames.ts` imports
+`../../attack.ts`). Every hard-coded work path was replaced by `$CC_WORK`; nothing else was edited.
+The detectors also read the skeptics' cached row files (`scen/holes_rows.pkl` from `holes_build.py`,
+`scen/b2b_hold.pkl` from `b2b_hold_load.py`).
+
+```fish
+set -x CC_WORK /path/to/work
+# 1. detectors: <ID>.nights.json (per-night rates, verbatim on the page) + <ID>.occ.jsonl (occurrences)
+cd $CC_WORK/scen/habits
+python3 Y6_prep.py   # Y6 only: positions outside grade.jsonl, then grade them:
+CC_NODES=20000 COACH_DUEL=20000 COACH_SEED=0 cc/target/release/cc-coach < Y6.extra-in.jsonl > Y6.extra-grade.jsonl
+for h in Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6; python3 $h.py; end
+# 2. clips: pick typical windows, roll Cold Clear out from each start with seeds 0-4, rebuild and check frames
+cd $CC_WORK/scen/hclips
+python3 select.py                       # candidates.json, windows.jsonl, rollin.jsonl, select-log.json
+for s in 0 1 2 3 4
+  CC_NODES=40000 COACH_MODE=rollout COACH_SEED=$s cc/target/release/cc-coach < rollin.jsonl > roll-s$s.jsonl
+  bun frames.ts $s                      # frames-s$s.json + frames-check-s$s.json (fails loudly on a mismatch)
+end
+python3 finalize.py                     # $CC_WORK/scen/habit-clips.json
+# 3. the page, then publish
+python3 ~/tetrio-replay-report/tools/cc-coach/clips/build-habits.py \
+    --clips $CC_WORK/scen/habit-clips.json --out ~/tetrio-replay-report/tools/cc-coach/pages/cc-habits.html
+bin/build-docs; bin/build-docs --check
+```
+
+(`frames.ts` reads `HCD` instead of `$CC_WORK/scen/hclips` when set; `mut/` held the mutant inputs.) The committed `finalize.py`, run against the original work
+directory, reproduces `habit-clips.json` byte for byte.
+
+What the clip stage checks, per start position and per seed: the player's board after each of the
+4 shown pieces equals the next recorded decision's field (garbage included); the player's attack, re-priced
+with each file's own options and the lock-time garbage multiplier, equals the replay's raw attack;
+Cold Clear's rebuilt lines and inserted garbage match the harness at every step, and its final board
+equals the harness's `final_field`. Planted mutants (a +1 attack, a changed tank, a changed final field,
+a shifted garbage hole on a window that has garbage) each fail a check. Selection: verified
+occurrences only, misdrop-shaped moves excluded except for Y1, P1 and Y6 (misdrop-shaped by
+definition), the occurrence whose graded cost is nearest that night's pool median, distinct rounds.
+The shown Cold Clear run is the median of the five seeds by 4-piece attack, then holes; the page
+says how many of the five chose the same first move, and flags the clips whose shown first move does
+not meet the habit's own contrast test.
+
+`build-habits.py` prints every rate straight from each habit's per-night entry (the detector's
+`nights.json`, carried verbatim in `habit-clips.json`). The one derived figure is Y6's all-nights row,
+which its detector did not pool: it is summed from the per-night counts and the build asserts each sum
+against the figures in Y6's own comparison text. The build refuses a page with an external URL, a
+gendered pronoun or a model identifier. Like the two replay pages, it is simulator and bot output and
+not in the proof chain; `bin/build-docs` copies it verbatim and `--check` compares it byte for byte.
