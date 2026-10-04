@@ -406,6 +406,24 @@ jobs:
             python3 -m pipeline.check_opener_section "$W" --selftest
           fi
 
+      # The 最癲一局 replay, the third quarantined section: one engine's boards,
+      # no claim ids, no badges. The region must be exactly a re-render of
+      # sim/replay-facts.json (the inlined player script included), carry every
+      # quarantine sentence (drawn drop path, seeded-RNG hole column, the three
+      # boundary states), and assign no markup. --selftest gives each of those its
+      # own mutant and requires that mutant's own failure message, because every
+      # content mutant is also caught by the re-render alone. It needs a region to
+      # corrupt, so it runs where the artefact exists — the plain check already
+      # fails a session whose artefact exists and whose region does not.
+      - name: Check the simulator-derived round replay section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_replay_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/replay-facts.json" ]; then
+            python3 -m pipeline.check_replay_section "$W" --selftest
+          fi
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail
@@ -593,6 +611,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # The per-session replay pages are RENDERED by build-docs (not copied), and every
+      # render runs replay_page.audit: quarantine sentences, no badge, no markup sink, no
+      # external request. --selftest plants one corruption per rule and requires that
+      # rule's own message, so the audit is shown to fire before --check leans on it.
+      - name: Check the replay page audit catches its corruptions
+        run: python3 -m pipeline.replay_page --selftest
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
