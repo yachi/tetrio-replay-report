@@ -151,6 +151,7 @@ python3 -m pipeline.build_round_table sessions/<date>/report   # regenerate the 
 python3 -m pipeline.claims.build_claims <facts> --out <ledger> # generated ledger
 python3 -m pipeline.codegen <facts> --claims <ledger> --outdir <dir>
 python3 -m pipeline.claims.equiv <facts> --hand <ledgers...>   # coverage by exhaustive mutation
+python3 -m pipeline.claims.equiv --selftest [--selftest-round]  # the relevance index vs the frozen oracle
 python3 -m pipeline.codegen_smt <facts> --claims <ledger> --out <dir>/claims.smt2
 python3 -m pipeline.check_smt sessions/<date>/report --regen --mutate 12
 python3 -m pipeline.check_dead_consts sessions/<date>/report
@@ -2993,6 +2994,38 @@ generator expression; as `&` over ~110 machine words it is free. `implies`, `==`
 conjunction all changed representation — anything new that consumes a truth vector must go
 through `Vec`, which is why the old list-shaped `truth_vector()` was deleted rather than
 left for reuse.
+
+**`equiv` evaluates only the claims that can observe a mutant — the relevance index.**
+Every mutant used to evaluate every claim, and most of those evaluations provably return
+the pristine verdict: the mutant writes no key the predicate spells. **How many is printed by
+every run, per mode and corpus-wide (`equiv.evals_line`), and typed nowhere** — the share this
+paragraph first carried was a guess, wrong by a factor of two on the evaluated side, with three
+more copies in the code; a share is exactly the figure 冇第二份 says to point at, not to type. `pipeline/claims/readset.py`
+labels each write by the key it writes (a score-dict write by `score`), maps each label to the
+claims whose predicate subscripts it, and the sweep evaluates only those; every other bit is
+the pristine verdict, and a vector is built from the sparse exceptions (`Vec.from_sparse`).
+Exact under four premises — pure deterministic predicates whose pristine run cannot raise; a
+field slot observable only through `Subscript(Constant k)`; every `python_check ==
+spec.to_python(spec)`; a control-flow change moves which PLAYER is read, never which key — and
+each is checked on every run: **G1** the renderer equality, **G2** an AST kind system
+(`readset.audit`) under which a container may only be subscripted, iterated, `.values()`-ed or
+`len()`-ed, **G3** every write label in a closed set and never a player name, **G4** pristine
+verdicts are bools, **G5** a stratified shadow sample that evaluates every claim and fails if
+one outside the index moved. **A predicate outside the whitelist is a build error, not a slow
+path** — a new spec operator fails `IndexUnsound` until `audit` and its selftest admit it.
+G5 is a tripwire and not the proof; the proof is `python3 -m pipeline.claims.equiv --selftest`,
+which runs `equiv_reference.py` — the exhaustive sweep, frozen verbatim and never optimised —
+against the indexed one and requires the whole result dict AND every claim's `Vec` to be
+identical, then plants defects (a dropped label, a raw score key, a dropped reader, an
+inverted pristine fill, an off-by-one move offset, a dropped chunk, a disabled restore, two
+out-of-grammar predicates, a hand-reformatted one) and fails unless every one is killed. Both
+CI jobs run it first. Sessions are measured as one deterministic process pool
+(`equiv.measure_many`: one task per single-value sweep, two-site families cut into
+contiguous chunks the parent proves tile the family); `--jobs` changes the schedule, never a
+byte. Its per-process session cache is keyed by a digest of the input files' CONTENT (a
+path-only key silently re-measured a stale ledger on a second call in one process), and the
+timings it prints are `process_time` CPU, not summed wall intervals labelled as CPU. The cost figures live in `equiv-coverage.yml`'s timeout comments, with what produced
+them — not here.
 
 **`check_dead_consts` tokenises once instead of searching per const** (9.1 s → 0.04 s, 206×).
 It was `re.search(rf"\b{n}\b", body)` for each of ~4 700 names over ~600 KB. Aho-Corasick
