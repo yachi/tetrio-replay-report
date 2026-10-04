@@ -1,30 +1,31 @@
 {
   "eyebrow": "關鍵時刻 · 三件事",
-  "title": "三件事：兩塊記分板、一條差唔多填返晒嘅路、同一個五場都啱嘅指標",
+  "title": "三件事：一刀切得開嘅排序、兩個細嘅差距、同一截唔代表成晚嘅五場",
   "cards": [
     {
-      "accent": "y",
-      "label": "局數 yachi · 場數 pinglamb",
-      "value": "19:17 / 2:3",
-      "body": "十五晚以嚟，局數贏家同場數贏家第一次唔係同一個人。yachi 贏嗰兩場都係 5 比 1，合共 10 比 2；pinglamb 贏嗰三場都係 5 比 3，合共 15 比 9<span class=\"badge\" data-claim=\"C011\"></span>。<strong>大勝食咗局數，記分板唔會計兩次。</strong>五場嘅一晚，一場大勝同一場險勝喺系列入面一樣值一分。"
+      "accent": "g",
+      "label": "逐場排開就分得開",
+      "value": "38 760 分之一",
+      "body": "將二十場按「pinglamb 每粒方塊嘅攻擊高幾多」排開：yachi 贏嗰六場，個差距全部低過 4%；pinglamb 贏嗰十四場，全部高過 6%，中間一場都冇<span class=\"badge\" data-claim=\"C007\"></span>。呢個係 corpus 第四晚分得開——之前三晚係 08-19、08-25 同 09-17，隨機排到咁靚嘅機會分別係 120、126 同 21 分之一。<strong>今晚係三萬八千七百六十分之一</strong>，而之前把握最大嗰兩晚（09-19 一萬五千五百零四分之一、09-18 三萬一千八百二十四分之一）都排唔開。要記住分得開嘅係差距<strong>幾大</strong>：第十二場 pinglamb 每粒高啲，yachi 照贏<span class=\"badge\" data-claim=\"C031\"></span>。"
     },
     {
-      "accent": "g",
-      "label": "粒數盈餘差唔多填返晒個窿",
-      "value": "6.20% / 6.86%",
-      "body": "yachi 多疊 222 粒方塊，即係多 6.20%<span class=\"badge\" data-claim=\"C009\"></span>；pinglamb 每粒方塊嘅攻擊高 6.86%<span class=\"badge\" data-claim=\"C004\"></span>——十五晚入面第二窄。盈餘差唔多買返晒個窿，兩邊總攻擊淨係差 14 條<span class=\"badge\" data-claim=\"C005\"></span>。<strong>但 14 條係一局話事嘅數</strong>：抽走第五場第一局，yachi 反而多 13 條。企得穩嘅係「兩邊撞埋一齊」，唔係個差額。"
+      "accent": "y",
+      "label": "兩個 REGIME 都細",
+      "value": "+4.70% / +5.83%",
+      "body": "拆開贏同輸嘅局，pinglamb 每粒方塊嘅攻擊喺贏嗰啲局高 4.70%、輸嗰啲局高 5.83%<span class=\"badge\" data-claim=\"C002\"></span>。擺返落自己嗰欄排，贏嗰個十五晚排第十四（淨係大過 08-09），輸嗰個排第十，兩個都喺中位數以下——即係「兩邊都爭得唔多」嗰一類，同 07-24、07-28、08-01、09-19 一齊。夾埋成晚，差距係 7.24%<span class=\"badge\" data-claim=\"C004\"></span>，十五晚第二細。<strong>一個咁細嘅差距，加埋 yachi 嘅粒數盈餘淨係買返 2.38 個百分點</strong><span class=\"badge\" data-claim=\"C009\"></span>，結果仍然差 395 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>。"
     },
     {
       "accent": "p",
-      "label": "每粒攻擊高嗰個，場場都贏",
-      "value": "5 / 5",
-      "body": "逐場計每粒方塊嘅攻擊，邊個高邊個就贏咗嗰場，五場冇一場例外<span class=\"badge\" data-claim=\"C017\"></span>。而 yachi 嘅場均 PPS 五場都高過對手，照樣輸咗三場<span class=\"badge\" data-claim=\"G047\"></span>。<strong>快嗰個場場都快，但淨係贏咗兩場；每粒重嗰個，五場都係贏家。</strong>不過要講清楚：兩場贏喺五場入面啱啱好排喺最底，純粹撞彩都有十分一機會，所以呢晚唔計入「逐場排開分得開」嗰類。"
+      "label": "最後五場唔代表成晚",
+      "value": "19 比 17",
+      "body": "五場一截計局數：16 比 22、17 比 20、12 比 23、19 比 17<span class=\"badge\" data-claim=\"C010\"></span>。<strong>四截入面淨係最後一截係 yachi 贏多過對手</strong>，而且係佢比率最好嗰截。呢份報告第一版淨係用咗呢五場嘅 replay，所以當時寫出嚟嘅「局數 yachi 贏」，啱啱好係成晚唯一一截咁樣嘅五場。打足二十場，局數係 64 比 82<span class=\"badge\" data-claim=\"G002\"></span>。"
     }
   ],
   "trivia": [
-    "最癲嗰局係第二場第二局，兩邊 VS 加埋約 304.5<span class=\"badge\" data-claim=\"G056\"></span>。pinglamb 贏咗，但佢喺落速同行數兩條軸都落後<span class=\"badge\" data-claim=\"G078\"></span>——佢每粒方塊攻擊 0.950 對 0.627<span class=\"badge\" data-claim=\"G079\"></span>。呢局亦係撐住「贏局差距」嗰一局：抽走佢，個差距由 4.96% 跌到 2.42%<span class=\"badge\" data-claim=\"C002\"></span>。",
-    "全晚最長嗰局係第五場第二局，打咗約 243 秒<span class=\"badge\" data-claim=\"G017\"></span>，yachi 清咗 219 行、係單局最多，最後係 pinglamb 生還<span class=\"badge\" data-claim=\"G016\"></span>。最短嗰局第一場第二局得約 15 秒<span class=\"badge\" data-claim=\"G018\"></span>。",
-    "成晚得 4 局自己頂到頂，yachi 1 局、pinglamb 3 局<span class=\"badge\" data-claim=\"C006\"></span>——36 局入面一成一，十五晚第三低。",
-    "KPP 今晚係 pinglamb 高 1.23%（3.623 對 3.579）<span class=\"badge\" data-claim=\"C008\"></span>，同之前兩晚掉轉。呢一欄係一晚嘅狀態，唔係邊個嘅特徵。"
+    "最癲嗰局係 m17 第二局，兩邊 VS 加埋約 304.5<span class=\"badge\" data-claim=\"G078\"></span>。pinglamb 贏，但佢喺落速同行數兩條軸落後<span class=\"badge\" data-claim=\"G100\"></span>——佢每粒方塊攻擊 0.950 對 0.627<span class=\"badge\" data-claim=\"G101\"></span>，靠嘅係重，唔係快。",
+    "全晚最長嗰局係 m20 第二局，打咗約 243 秒<span class=\"badge\" data-claim=\"G034\"></span>，yachi 喺嗰局清咗全晚最多嘅 219 行<span class=\"badge\" data-claim=\"G033\"></span>，最後係 pinglamb 生還。最短嗰局 m12 第八局得約 9 秒<span class=\"badge\" data-claim=\"G035\"></span>。",
+    "38 個 All Clear（pinglamb 24、yachi 14）<span class=\"badge\" data-claim=\"G050\"></span>，但全消唔係贏局嘅指標：淨係 pinglamb 做到全消嘅 17 局，佢輸咗 6 局<span class=\"badge\" data-claim=\"G097\"></span>；淨係 yachi 做到嘅 10 局，佢輸咗 7 局<span class=\"badge\" data-claim=\"G095\"></span>。",
+    "27 局係自己頂到頂收場，yachi 14、pinglamb 13<span class=\"badge\" data-claim=\"C006\"></span>——成晚 146 局嘅 18.49%。27 係單晚最多，13 亦係 pinglamb 自己歷來最多，但兩個都係因為今晚長；計比率，09-11 嘅 23.5% 仍然高過今晚。",
+    "yachi 嘅 KPP 高過 pinglamb 0.63%<span class=\"badge\" data-claim=\"C008\"></span>。呢一欄成個 corpus 都係一個負面結果，兩個人自己贏局同輸局嘅 KPP 都差唔到 2%<span class=\"badge\" data-claim=\"G086\"></span><span class=\"badge\" data-claim=\"G087\"></span>。"
   ]
 }

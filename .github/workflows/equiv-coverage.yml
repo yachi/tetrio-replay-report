@@ -16,8 +16,9 @@ name: equiv-coverage
 #
 # verify.yml has no path filters at all: every job runs on every push and every PR, and its header
 # comment states that as the property it exists to hold ("re-establishes that on every push"). This
-# gate must be path-filtered, because even its cheap form re-measures the whole corpus (~4m13s) and
-# its full form adds ~21 min on top. It cannot live there without breaking one of two things:
+# gate must be path-filtered, because even its cheap form re-measures the whole corpus (minutes,
+# measured below where the timeouts are) and its full form adds the round tier on top. It cannot
+# live there without breaking one of two things:
 #
 #   - GitHub Actions has NO job-level `paths` key. Filters exist only under `on.<push|
 #     pull_request>`, i.e. per workflow file. (The keys valid directly under jobs.<id> are name,
@@ -99,7 +100,7 @@ on:
   workflow_dispatch:
     inputs:
       round:
-        description: 'Also run the round-granularity sweep (~25 min for the whole corpus)'
+        description: 'Also run the round-granularity sweep (see the coverage-round timeout comment)'
         type: boolean
         default: false
 
@@ -110,13 +111,37 @@ permissions:
 # check_equiv_coverage is repo-wide by construction: it globs sessions off disk and takes no
 # session argument, deliberately, so that adding a session cannot leave a list behind (the class
 # of bug the two stale loops in verify.yml are). A 6-way session matrix would therefore run the
-# whole six-session sweep six times over.
+# whole six-session sweep six times over. The parallelism is IN-PROCESS instead: `--jobs "$(nproc)"`
+# runs every session's sweep as one deterministic process pool (equiv.measure_many), which buys the
+# runner's 4 vCPU without a second job topology for bin/verify-repo's PLAN to keep in step with.
 jobs:
   # THE SPLIT IS BY GRANULARITY, NOT BY WHETHER ANYTHING IS MEASURED.
   # Both jobs re-measure; this one measures the two cheap granularities and the weekly one adds the
-  # third. `--modes single_value,two_site_match` is ~4m13s for the whole corpus against ~25 min for
-  # all three, and that ratio is the only reason there are two jobs. `timeout-minutes: 30` is the
-  # ~4m13s with ~7x headroom for a slower hosted runner.
+  # third. The round tier costs roughly eight times the other two together, before and after the
+  # relevance index alike (both measured below), and that ratio is the only reason there are two jobs.
+  #
+  # THE COST GROWS WITH THE CORPUS, so the timeout is a budget that has to be re-checked whenever a
+  # session lands — a sweep over every datum of every session is not a constant, and grows as
+  # rounds^2 x claims per session. History, kept as the record and not as the cost: ~4m13s at six
+  # sessions; 26m53s at fifteen with 2026-10-03 as its five-replay subset; past the 30-min ceiling
+  # with the full twenty-replay 10-03 — a timeout generous for nine sessions became the build's
+  # failure mode without any code changing.
+  #
+  # WHAT IT COSTS NOW, and what measured it. equiv.py evaluates only the claims that can observe each
+  # mutant (the relevance index, pipeline/claims/readset.py) and runs the sessions as a process
+  # pool. Measured on 2026-10-04 on a 4-core Linux box, Python 3.11, fifteen sessions:
+  #   - before (the exhaustive sweep, equiv_reference.py, one process per session, three or four at
+  #     a time on the 4 cores): single_value 1552 s + two_site_match 274 s summed over sessions,
+  #     i.e. ~30 min for this step on one core — the timeout this job was dying at;
+  #   - after, --jobs 4: this step 33 s wall (114 s of task CPU, i.e. `time.process_time` summed
+  #     over tasks in the processes that ran them; 2026-09-19's single-value sweep, the largest
+  #     single task, 18.9 s), and the oracle selftest before it 82 s. The step prints both, plus how
+  #     many claim evaluations the relevance index actually ran per mode (`equiv.evals_line`).
+  #     (Before 2026-10-04 the "CPU" it printed was summed wall intervals; the 30 s / 104 s pair an
+  #     earlier revision quoted here was measured that way.)
+  # Those are one machine's figures, not the runner's: read the step times off the next run, and
+  # each step prints its own per-session seconds. 20 min is several times both the local figure
+  # and any plausible runner slowdown of it; move it before it is reached, not after.
   #
   # --check (not --check-prose) so this job re-derives rather than compares two committed things.
   # It byte-compares each session's equiv-coverage.json for the named modes and gates the three
@@ -145,7 +170,7 @@ jobs:
   #       checked against the COMMITTED artefact
   coverage:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -177,24 +202,44 @@ jobs:
           set -euo pipefail
           python3 -m pipeline.claims.check_equiv_coverage --selftest
 
+      # The relevance index is exact only under premises (pipeline/claims/readset.py), and a defect
+      # in it is silent in the worst direction: a claim wrongly skipped keeps its pristine verdict
+      # and drifts toward "implied". So before anything is measured, the indexed sweep is run
+      # against equiv_reference.py — the exhaustive implementation, frozen — on two small sessions,
+      # whole result dict and every truth vector, and a set of planted index defects must each be
+      # killed. Its last line is "planted N, killed N"; fewer kills than plants fails the step.
+      - name: Check the indexed sweep against the exhaustive oracle (planted index defects)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.equiv --selftest --jobs "$(nproc)"
+
       # --check, never --write: CI re-derives and compares, it never regenerates. A CI job that
       # rewrote the artefact would make every run agree with itself by construction, which is the
       # one thing this gate must not do. (--modes is rejected outright alongside --write, so that
-      # mistake is not available here.)
+      # mistake is not available here.) --jobs is explicit so the log states the parallelism; it
+      # changes the schedule, never a byte of what is compared.
       - name: Re-measure the cheap granularities, byte-compare, and gate the published figures
         run: |
           set -euo pipefail
-          python3 -m pipeline.claims.check_equiv_coverage --check \
+          python3 -m pipeline.claims.check_equiv_coverage --check --jobs "$(nproc)" \
             --modes single_value,two_site_match
 
   # The third granularity. An unnarrowed --check measures and byte-compares all of
   # single_value, two_site_match and two_site_round.
   #
   # COST, and read the denominator carefully — getting it wrong here is a 6x error. The round sweep
-  # is **854,937 moves corpus-wide**: the sum over all six sessions (217,480 + 82,802 + 137,970 +
-  # 92,737 + 79,301 + 244,647), NOT a per-session figure. At ~1.38 ms/mutant that is ~19.6 min, plus
-  # the ~231 s single-value base, so the whole --check is **~25 minutes for the entire corpus**.
-  # `timeout-minutes: 90` is that ~25 min with ~3.6x headroom for a slower hosted runner.
+  # was **854,937 moves corpus-wide** at six sessions (a sum over sessions, NOT a per-session
+  # figure) and the whole --check ~25 min; that is the record, not the cost. At fifteen sessions the
+  # round sweep is 3,734,481 moves (each artefact's `moves_round`, summed), and on 2026-10-04 on a
+  # 4-core Linux box, Python 3.11:
+  #   - before (the exhaustive sweep, equiv_reference.py, measured as above): 14,023 s summed over
+  #     sessions for two_site_round alone and 15,849 s for all three granularities — ~4.4 h on one
+  #     core, past the 180 this job had;
+  #   - after, --jobs 4: the whole --check 4m27s wall (1011 s of task CPU, process_time as above;
+  #     2026-10-03's round tier 258 s of it, split across chunks), and the oracle selftest with
+  #     --selftest-round 2m51s.
+  # 45 min is the same budget-not-constant rule as the `coverage` job above: several times the
+  # local figure, re-read off the next weekly run, moved before it is reached.
   #
   # Round granularity is what makes the published numbers honest rather than merely stable: `match`
   # enumerates only moves out of the source match's largest round and into the target match's
@@ -209,7 +254,7 @@ jobs:
   coverage-round:
     if: github.event_name == 'schedule' || inputs.round
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -222,7 +267,17 @@ jobs:
           set -euo pipefail
           python3 -m pipeline.claims.check_equiv_coverage --selftest
 
+      # --selftest-round adds one session's two_site_round tier to the oracle comparison, because
+      # this is the job that measures it — on the chunked task pool too, which in production only a
+      # round family is large enough to be cut into.
+      - name: Check the indexed sweep against the exhaustive oracle, round tier included
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.equiv --selftest --selftest-round --jobs "$(nproc)"
+
       # No --modes: the unnarrowed form measures and byte-compares all three granularities, which
       # is the whole point of this job.
       - name: Re-measure every granularity, byte-compare the artefacts, gate the published figures
-        run: python3 -m pipeline.claims.check_equiv_coverage --check
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.claims.check_equiv_coverage --check --jobs "$(nproc)"

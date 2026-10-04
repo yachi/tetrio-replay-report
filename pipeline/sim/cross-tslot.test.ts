@@ -120,16 +120,17 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-09-17: 113159 -> 121520, and `unexplained` is still EMPTY over the extra 8361 boards.
   // 2026-09-19: 121520 -> 145829, by far the largest single addition the file has taken (24309
   // boards, 1.67x the previous largest), and `unexplained` is still EMPTY over all of them.
-  // 2026-09-18: 145829 -> 166127, the second-largest addition (20298 boards), and `unexplained`
-  // is still EMPTY over all of them. This row lands out of date order — 09-18 is the night before
-  // 09-19 and arrived after it — so the running totals above read as arrival order and not as a
+  // 2026-09-18: 145829 -> 166127, then the second-largest addition (20298 boards; third since
+  // 10-03's 24166), and `unexplained` is still EMPTY over all of them. This row lands out of
+  // date order — 09-18 is the night before 09-19 and arrived after it — so the running totals above read as arrival order and not as a
   // corpus growing by date. That matters for nothing here except how to read the column.
-  // 2026-10-03: 166127 -> 172369, the SMALLEST addition the file has taken (6242 boards, under
-  // 09-03's 7934 — it is the corpus's smallest session, 36 rounds), and `unexplained` is still
-  // EMPTY over all of them. The walk took ~193 s at fifteen sessions on the machine that pinned
-  // this, against the 300 s budget below — a large session or two more will need that budget
-  // re-measured rather than raised blind.
-  expect(both + oursOnly + ccOnly + neither).toBe(172369);
+  // 2026-10-03: 166127 -> 190293, the second-largest addition the file has taken (24166 boards,
+  // just under 09-19's 24309), and `unexplained` is still EMPTY over all of them. (This row first
+  // read 172369, 「the SMALLEST addition」 — 10-03 was first published on five of its twenty
+  // replays, and that figure is void with the subset.) The walk took ~215 s at fifteen sessions on
+  // the machine that pinned this, against the 300 s budget below — one more session of this size
+  // will need that budget re-measured rather than raised blind.
+  expect(both + oursOnly + ccOnly + neither).toBe(190293);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

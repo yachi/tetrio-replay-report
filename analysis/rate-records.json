@@ -15,70 +15,70 @@
     "2026-09-17": "62e0f1da04868f27952aa5d19f521cf3",
     "2026-09-18": "16875945484212f31b344e9acceedc1e",
     "2026-09-19": "e34b6227790ce383605f66c79778d4fd",
-    "2026-10-03": "32cd57f4f7d86e3e94fd41595241482d"
+    "2026-10-03": "3fc9541bdf6b74988db9c6b15d6656b9"
   },
   "generated_by": "analysis/rate_records.R --json",
   "metrics": {
     "vs": {
-      "slope": -0.694625,
-      "ci_lo": -0.767742,
-      "ci_hi": -0.621508,
-      "r2": 0.989019,
-      "p": 4.15536e-07,
-      "mean_p": 8.00389e-05,
+      "slope": -0.693362,
+      "ci_lo": -0.760309,
+      "ci_hi": -0.626414,
+      "r2": 0.990744,
+      "p": 2.48678e-07,
+      "mean_p": 0.000116937,
       "half_inside_ci": false,
-      "sd_short": 61.5425,
-      "sd_long": 13.3206,
-      "mean_short": 96.9215,
-      "mean_long": 118.964,
-      "t_short": 18.3017,
-      "t_long": 155.278,
-      "top_decile_short": 103,
-      "top_decile_n": 210,
-      "top_decile_p": 5.49272e-14
+      "sd_short": 62.361,
+      "sd_long": 13.1017,
+      "mean_short": 96.9023,
+      "mean_long": 118.798,
+      "t_short": 18.0156,
+      "t_long": 155.797,
+      "top_decile_short": 114,
+      "top_decile_n": 232,
+      "top_decile_p": 2.21326e-15
     },
     "apm": {
-      "slope": -0.766193,
-      "ci_lo": -0.863726,
-      "ci_hi": -0.668661,
-      "r2": 0.984021,
-      "p": 1.28261e-06,
-      "mean_p": 0.0124351,
+      "slope": -0.766956,
+      "ci_lo": -0.869956,
+      "ci_hi": -0.663956,
+      "r2": 0.982247,
+      "p": 1.76025e-06,
+      "mean_p": 0.0312311,
       "half_inside_ci": false,
-      "sd_short": 32.5971,
-      "sd_long": 5.98916,
-      "mean_short": 53.3336,
-      "mean_long": 51.3254,
-      "t_short": 18.3017,
-      "t_long": 155.278,
-      "top_decile_short": 135,
-      "top_decile_n": 210,
-      "top_decile_p": 4.35922e-33
+      "sd_short": 33.4447,
+      "sd_long": 5.9546,
+      "mean_short": 53.7038,
+      "mean_long": 51.22,
+      "t_short": 18.0156,
+      "t_long": 155.797,
+      "top_decile_short": 149,
+      "top_decile_n": 232,
+      "top_decile_p": 2.83962e-36
     },
     "pps": {
-      "slope": -0.489847,
-      "ci_lo": -0.648289,
-      "ci_hi": -0.331405,
-      "r2": 0.905107,
-      "p": 0.000277106,
-      "mean_p": 0.0856565,
+      "slope": -0.461801,
+      "ci_lo": -0.572469,
+      "ci_hi": -0.351133,
+      "r2": 0.945581,
+      "p": 5.14241e-05,
+      "mean_p": 0.0895529,
       "half_inside_ci": true,
-      "sd_short": 0.210486,
-      "sd_long": 0.0722204,
-      "mean_short": 1.44971,
-      "mean_long": 1.41468,
-      "t_short": 18.3017,
-      "t_long": 155.278,
-      "top_decile_short": 126,
-      "top_decile_n": 212,
-      "top_decile_p": 2.64159e-26
+      "sd_short": 0.210963,
+      "sd_long": 0.0709403,
+      "mean_short": 1.45653,
+      "mean_long": 1.41285,
+      "t_short": 18.0156,
+      "t_long": 155.797,
+      "top_decile_short": 140,
+      "top_decile_n": 233,
+      "top_decile_p": 9.84929e-30
     }
   },
-  "n_player_rounds": 2094,
-  "n_rounds": 1047,
+  "n_player_rounds": 2314,
+  "n_rounds": 1157,
   "predict": {
-    "r": -0.162187,
-    "p": 0.391844,
+    "r": -0.166324,
+    "p": 0.379712,
     "n": 30
   },
   "records": {
@@ -86,7 +86,7 @@
     "n_metrics": 3,
     "in_shortest_quartile": 43,
     "p": 7.3073e-24,
-    "quartile_cut_s": 33.5578
+    "quartile_cut_s": 33.695
   },
   "script_md5": "19a718d6cfcea37f470f779620be6921",
   "sessions": [
@@ -367,18 +367,18 @@
     },
     "2026-10-03": {
       "vs": {
-        "value": 203.125,
-        "round_s": 19.2,
+        "value": 203.209,
+        "round_s": 9.35,
         "player": "yachi",
         "qualified": 165.826,
-        "pct_above": 22.4929
+        "pct_above": 22.5435
       },
       "apm": {
-        "value": 100,
-        "round_s": 19.2,
+        "value": 121.925,
+        "round_s": 9.35,
         "player": "yachi",
         "qualified": 75.806,
-        "pct_above": 31.9157
+        "pct_above": 60.8382
       }
     }
   }

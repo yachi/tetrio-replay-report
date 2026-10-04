@@ -1,94 +1,96 @@
 # 2026-10-03 — narrative beats
 
-Five matches, 36 rounds. **The smallest session the corpus has, on both measures at once** —
-the previous minima were 6 matches (08-09 and 09-03) and 46 rounds (09-03). Every extreme
-below is a small-n reading first, and is written that way.
+Twenty matches, 146 rounds: **the second-largest session by rounds** (behind 09-19's 150) and
+level with 09-19 for the most matches. This session was first published from five of the
+night's twenty replays (16-20) and was rebuilt from the full twenty; nothing below is carried
+from that version, and the one place the subset matters is named where it does (C010).
 
-## The scoreboard — two winners
+## The scoreboard
 
-* pinglamb 3-2 in matches [C001][G001]; **yachi 19-17 in rounds** [C010][G002].
-* **That is the first time in fifteen sessions that the two scoreboards name different
-  players.** 09-10's 4-4 had no match winner at all; every other session's round winner is
-  its match winner. Re-derived from the fifteen facts.json files, not carried.
-* The mechanism is five scorelines and nothing more [C011][G053]: yachi's two wins were both
-  5-1, pinglamb's three were all 5-3. yachi banked 10 rounds to 2 in his own matches and lost
-  9 to 15 in pinglamb's. Big wins and narrow losses.
-* Every match went to whoever reached five first [G003].
-* **The margin arrived late — 09-03's shape, at the smallest size the corpus has held it.**
-  After three matches yachi led the series 2-1 and the rounds 13-7; the last two went 6-10
-  [C010]. The windows are 20 and 16 rounds, so the counts compare only as rates: 65% against
-  37.5%, and C010 pins the fall as a cross-multiplied inequality. The hinge is pinglamb's
-  seven-round run from the back of m4 into m5 [G009] — yachi led m4 3-1 and did not win
-  another round until m5's fourth [C015][C016].
+* pinglamb 14-6 in matches [C001][G001], 82-64 in rounds [C010][G002]. The round majority
+  belongs to the match winner, as in every decided session.
+* Every match went to whoever reached five first [G003]. Four went to a last round [G025]:
+  m2, m4, m6 and m10. Two 5-0s, one each [G024]: **m8 is yachi's**, which makes it the
+  second yachi shutout the corpus holds after 09-18's m4; m13 is pinglamb's.
+* 56.16% of the rounds and 70.00% of the matches are pinglamb's. Neither is near a corpus
+  extreme: by rounds it sits mid-table, and by matches it ties 08-19 behind 08-09, 09-11,
+  09-03, 07-28, 09-19 and 09-17.
 
-## The regimes — 07-22's shape, almost to the decimal
+## The night in four blocks — C010
 
-    attack per piece   won rounds    yachi .6537   pinglamb .6862   ->  +4.96%
-                       lost rounds   yachi .5153   pinglamb .5786   ->  +12.28%
+    matches  1-5    16-22   (38 rounds)
+    matches  6-10   17-20   (37)
+    matches 11-15   12-23   (35)   <- yachi's lowest rate
+    matches 16-20   19-17   (36)   <- yachi's highest, and the only block he won
 
-[C002] Ranked in their own columns over fifteen sessions: the won-gap is **13th** (under two
-hundredths above 08-25's +4.945; median +7.66) and the lost-gap **5th** (just under 07-22's
-+12.80; median +6.39). Ratio 0.40. Ceilings close, floors apart — the class 07-22, 08-19 and
-08-25 hold, and this is its fourth instance. 07-22 read +5.78/+12.80. Two numbers landing near
-two numbers is a coincidence, not a return.
+[C010] pins all eight counts, the 45-65 after fifteen matches, and the ORDER of the four
+rates by cross-multiplication — the blocks differ in size, so the raw counts are never
+compared across them. **The last block is the one the first publication was built from**,
+which is why that version read 「yachi 19:17 in rounds」. On the full night it is the only
+five-match stretch with that shape.
 
-**The won-gap is one round's.** `check_loo` puts it at rel 0.512, a hundredth over the
-threshold: 個 won-gap 得一局撐住（留一局：抽走 m2r2，數字變 +2.42%，即係郁 2.54 pp）。m2r2
-is the night's most intense round [G056] and pinglamb won it at 0.950 attack per piece
-[G079]. Dropping it moves the gap TOWARD zero, so 「天花板貼埋」 is sharpened, not undone — the
-second case, after 09-18's lost-gap, where the fragile round holds a near-level gap up.
+## The per-match ordering SEPARATES — C007, the best-powered instance in the corpus
 
-Within a player [C003][G062][G063]: yachi +26.86%, pinglamb +18.59%. yachi wider — eight of
-fifteen yachi, seven pinglamb. +26.86 is second in yachi's own column behind 08-09's +31.4.
+Order the twenty matches by pinglamb's attack-per-piece advantage:
 
-## The volume route, an eleventh time — and it nearly closes
+    yachi's six wins       m3 -9.36   m8 -7.80   m16 -7.59   m4 -6.38   m18 -4.08   m12 +3.25
+    pinglamb's fourteen    +6.65 (m15) ... +20.63 (m5)
 
-[C005][C009] yachi threw **222 more pieces** and landed **14 fewer lines of attack**. Session
-APP gap +6.86% [C004] — second-narrowest of fifteen, behind 09-10's +6.64%. The surplus is
-6.20% of pinglamb's count. **6.20 against 6.86** [C009][C004], so the route
-bought back nearly all of the hole: shortfall about 0.66 pp, third-smallest in the corpus.
+Nothing between +3.25 and +6.65. [C007] pins it as a cut — every yachi win under +4%, every
+pinglamb win over +6%. With k wins among m matches a random assignment puts all k at the
+bottom with probability 1/C(m,k): **1 in 38 760**, against 1/120 (08-19), 1/126 (08-25) and
+1/21 (09-17). It is the fourth separating session and by far the best-powered — more than
+the two sessions that interleaved at higher power than any earlier instance (09-18 at
+1/31 824 and 09-19 at 1/15 504). The cut sits at +3.25 / +6.65, which is neither 08-19's
+(+0.72 / +11.53), 08-25's (+8.21 / +10.32) nor 09-17's (+13.47 / +16.91): the four cuts still
+do not share a threshold.
 
-兩邊總數撞埋一齊，但個差額唔好照抄：攻擊差額
-（留一局：抽走 m5r1，數字變 +13 行，即係郁 27 行），分數差額
-（留一局：抽走 m5r1，數字變 +8141 分，即係郁 9124 分），兩個都會反轉正負號。
-The 14 is the smallest raw attack difference the corpus holds, and **it is smallest because
-the night is shortest** — as a rate it is 0.62% of pinglamb's total, second-smallest in size
-behind 07-28's 0.46%. The 983-point score gap [G059] is the same shape as 08-01's 576. m5r1 is
-pinglamb's 38-to-11 win in a 23-second round where he took no garbage at all [G055].
+**It is a statement about SIZE, not sign** [C031]: the player with the higher attack per
+piece won 19 of 20 matches, and the exception is m12 — yachi won 5-3 while pinglamb led by
++3.25%, the top of yachi's band. yachi leads attack per piece outright in five matches (m3,
+m4, m8, m16, m18), so 「pinglamb leads every match」 fails here too.
 
-## What separates — and why no C007
+## The regimes — both small
 
-* **Order the five matches by pinglamb's APP advantage and the winner falls out**: yachi's
-  wins are the two smallest gaps (m1 −7.59%, m3 −4.08%), pinglamb's three the three largest
-  (m4 +9.44%, m2 +13.16%, m5 +14.23%). Two wins among five fall that way by chance with
-  probability 1/C(5,2) = **1 in 10**. That is on the degenerate side of the gap between
-  09-11's 1 in 7 (not minted) and 09-17's 1 in 21 (minted), so **no C007** — the count of
-  separating sessions stays three.
-* **What the night does carry is a sign statement** [C017]: the player with the higher
-  attack per piece won every one of the five matches. yachi leads APP in both of his wins.
-  So 「pinglamb leads every match」 fails here — it now holds in 7 of 15.
-* And the opposite statement holds too, which is the point of printing both: **yachi's PPS
-  is higher in every one of the five matches and he lost the series** [G047]. The faster
-  player won two of five; the higher-APP player won all five — a co-occurrence C017 pins,
-  not a cause.
+    attack per piece   won rounds    yachi .6523   pinglamb .6830   ->  +4.70%
+                       lost rounds   yachi .5370   pinglamb .5683   ->  +5.83%
+
+[C002] Ranked in their own columns over fifteen sessions the won-gap is **14th** (only
+08-09's +1.85 is smaller; median +7.66) and the lost-gap **10th** (median +6.05). Ratio 0.81,
+both below their medians: the 「roughly level」 class, with 07-24, 07-28, 08-01 and 09-19.
+Session gap +7.24% [C004], **second-smallest of fifteen** behind 09-10's +6.65%.
+
+`check_loo` puts every figure this session can carry under 0.16 — won-gap 0.158 (m8r3),
+lost-gap 0.128, session gap 0.050, attack difference 0.073, score difference 0.096 — so no
+figure needs a 「得一局撐住」 annotation, and no total flips sign.
+
+Within a player [C003]: yachi +21.46%, pinglamb +20.17% — yachi the wider, by 1.29 points.
+
+## The volume route, an eleventh time
+
+[C005][C009] yachi threw **328 more pieces** (2.38% of pinglamb's count — the second-smallest
+surplus, after 09-11's 2.13%) and landed **395 fewer lines of attack**, 4.53% of pinglamb's
+total. Session APP gap 7.24% [C004], so the surplus bought back about a third of it:
+shortfall 4.86 pp, between 09-03's 4.79 and 09-18's 5.22. On the rate axis the deficit
+(−4.53%) lands between 09-03's −4.38% and 09-18's −4.80%, i.e. in its slot. On the raw axis
+−395 sits past 09-18's −352, out of its slot — a long session's raw deficit again.
+
+In-game score: pinglamb 2 846 606, yachi 2 745 136 [G081].
+
+## Topouts [C006]
+
+14 yachi, 13 pinglamb — 27 of 146 rounds, 18.49%. **27 is the largest session total** and
+**13 is pinglamb's largest tally**, both because the night is long; as a rate it is
+second to 09-11's 23.5%. One apart, yachi on the higher side.
 
 ## The night's rounds
 
-* 最癲一局 is **m2r2** [G056], combined VS ~304.5. pinglamb won it while trailing on 落速
-  and 行數 [G078], at 0.950 attack per piece against 0.627 [G079].
-* Longest round **m5r2 at ~243 s** [G017], also the night's 219-line high, yachi's — and
-  pinglamb survived it [G016]. Shortest m1r2 at ~15 s [G018].
-* Four topouts, 1 yachi and 3 pinglamb [C006][G058]. 11.1% of rounds, third-lowest rate of
-  fifteen behind 08-09's 8.0% and 08-19's 10.0%; yachi's 2.8% is his lowest bar 08-09's zero.
-  A column that predicts nothing.
-* KPP: yachi 3.579, pinglamb 3.623, pinglamb 1.2% above [C008] — the reverse of 09-18 and
-  09-19.
-* Seven All Clears, 5 pinglamb 2 yachi [G033].
-
-## What this session adds to the corpus
-
-* **A shortfall-table point at the SHORT end.** On the rate axis −0.62% lands between 07-28's
-  −0.46% and 08-01's −0.93%, exactly where its 0.66 pp shortfall puts it. On the raw axis its
-  −14 sits above 07-28's −15 and breaks the ordering. 09-18 and 09-19 broke the raw axis by
-  being long; this breaks it by being short. Same correction, confirmed from the other end.
-* **The first session whose round winner and match winner differ.**
+* 最癲一局 is **m17r2** [G078], combined VS ~304.5 — pinglamb won and trailed on two axes,
+  落速 and 行數 [G100]. His APP in it is 0.950 against 0.627 [G101]. It also holds both rate
+  records [G027][G028].
+* Longest round **m20r2 at ~243 s** [G034], with yachi's 219 lines, the session high [G033];
+  pinglamb survived. Shortest **m12r8 at ~9 s** [G035].
+* Longest run of rounds is pinglamb's seven, m19 into m20 [G026].
+* 38 All Clears, 24 pinglamb 14 yachi [G050]. Rounds where only pinglamb cleared: 17, lost 6
+  [G097]; only yachi: 10, lost 7 [G095].
+* KPP: yachi 3.614, pinglamb 3.591, yachi 0.63% above [C008].
