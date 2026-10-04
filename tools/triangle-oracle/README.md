@@ -95,7 +95,7 @@ bun cross-extract.mjs   # how much of each quarantined section two engines agree
 
 `scan-firstdiv` showed the remaining divergences are dominated by garbage-insertion TIMING, not
 placement — no second `hoisted` to find. `cross-extract` then measured Triangle as a SECOND EXTRACTOR:
-over the verified prefix, sim and Triangle agree bit-exact on **96.4%** of locks, backing **96.4%** of
+over the verified prefix, sim and Triangle agree bit-exact on **96.3%** of locks, backing **96.4%** of
 forecast events and **95.0%** of opener rounds with an independent engine — the dual-implementation
 evidence the quarantined sections are missing. Building that check exposed the oracle's own hole-pairing
 bug (the FIFO-vs-iid issue fixed above): before it, the one surviving forecast (`forecast_lineclear`)
@@ -141,7 +141,7 @@ Three separate staleness deltas had stacked up behind it, and the prose above qu
 | 3 | the sixth session (2026-08-14) added | → 96.2% |
 | 4 | four more sessions (08-19, 08-25, 09-03, 09-10) added, one at a time | → 95.9% |
 | 5 | three more (09-11, 09-17, 09-19) added, the last of them 150 rounds | → 96.3% |
-| 6 | 09-18 added (all three figures unmoved at one decimal), then 10-03, the smallest session | → 96.4% |
+| 6 | 09-18 added (all three figures unmoved at one decimal), then 10-03 (146 rounds; first manifested on 5 of its 20 replays, which read 96.4%) | → 96.3% |
 
 Only delta 3 is the one a "new session" checklist would catch. Delta 1 is prose left behind by a
 regeneration, delta 2 is an artefact left behind by a *source* change — and delta 2 is the large one.

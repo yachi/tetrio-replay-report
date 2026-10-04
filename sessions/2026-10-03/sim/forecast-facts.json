@@ -4,7 +4,7 @@
   "not_eligible_because": [
     "simulator-derived: no second independent implementation (dual-extractor rule unmet)",
     "the simulator fails its own full gate; only verified prefixes are used",
-    "no effect at any unit: round AUC undecidable — 0 decided pairs of 28, the rate ties everywhere"
+    "no effect at any unit: round AUC undecidable — 0 decided pairs of 119, the rate ties everywhere"
   ],
   "unit": "player-aggregate (all rounds pooled); per-round is unreliable by measurement, not by assumption",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -14,19 +14,19 @@
   ],
   "players": [
     {
-      "user": "yachi",
-      "tspin_triples_game_stats": 18,
-      "tspin_doubles_game_stats": 159,
-      "rounds_played": 36,
-      "verified_tspins": 188,
-      "admitted_lineclearing_tspins": 191,
-      "tspins_excluded_untucked": 3,
+      "user": "pinglamb",
+      "tspin_triples_game_stats": 153,
+      "tspin_doubles_game_stats": 608,
+      "rounds_played": 146,
+      "verified_tspins": 802,
+      "admitted_lineclearing_tspins": 824,
+      "tspins_excluded_untucked": 22,
       "tspins_excluded_no_snapshot": 0,
-      "tspins_excluded_zero_clear": 0,
+      "tspins_excluded_zero_clear": 13,
       "forecast_garbage": 0,
       "forecast_lineclear": 1,
       "path_opened": 0,
-      "self_built": 84,
+      "self_built": 363,
       "unattributed": 0,
       "mechanism_established": 1,
       "forecast_total": 1,
@@ -39,62 +39,62 @@
         "floor_undecidable": 0,
         "floor_undecidable_and_closing_clear_was_spin": 0
       },
-      "floor_pre_existed": 149,
-      "floor_arrived_later": 20,
-      "floor_undetermined": 19,
-      "reactive": 103,
-      "forecast_rate_x1000": 5,
+      "floor_pre_existed": 693,
+      "floor_arrived_later": 57,
+      "floor_undetermined": 52,
+      "reactive": 438,
+      "forecast_rate_x1000": 1,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 30,
-      "simulator_range_lo_x1000": 5,
-      "simulator_range_hi_x1000": 6,
-      "verified_placements": 3134,
-      "total_placements": 3800
+      "sampling_ci95_hi_x1000": 7,
+      "simulator_range_lo_x1000": 1,
+      "simulator_range_hi_x1000": 2,
+      "verified_placements": 12032,
+      "total_placements": 13770
     },
     {
-      "user": "pinglamb",
-      "tspin_triples_game_stats": 39,
-      "tspin_doubles_game_stats": 152,
-      "rounds_played": 36,
-      "verified_tspins": 194,
-      "admitted_lineclearing_tspins": 198,
-      "tspins_excluded_untucked": 4,
+      "user": "yachi",
+      "tspin_triples_game_stats": 86,
+      "tspin_doubles_game_stats": 605,
+      "rounds_played": 146,
+      "verified_tspins": 780,
+      "admitted_lineclearing_tspins": 786,
+      "tspins_excluded_untucked": 6,
       "tspins_excluded_no_snapshot": 0,
-      "tspins_excluded_zero_clear": 5,
+      "tspins_excluded_zero_clear": 12,
       "forecast_garbage": 0,
-      "forecast_lineclear": 1,
+      "forecast_lineclear": 2,
       "path_opened": 0,
-      "self_built": 91,
+      "self_built": 350,
       "unattributed": 0,
-      "mechanism_established": 1,
+      "mechanism_established": 2,
       "forecast_total": 1,
       "clause2_undecided": 0,
       "rejected_by": {
         "counted": 1,
         "floor_arrived_later": 0,
-        "closing_clear_was_spin": 0,
+        "closing_clear_was_spin": 1,
         "floor_arrived_later_and_closing_clear_was_spin": 0,
         "floor_undecidable": 0,
         "floor_undecidable_and_closing_clear_was_spin": 0
       },
-      "floor_pre_existed": 159,
-      "floor_arrived_later": 18,
-      "floor_undetermined": 17,
-      "reactive": 102,
-      "forecast_rate_x1000": 5,
+      "floor_pre_existed": 628,
+      "floor_arrived_later": 85,
+      "floor_undetermined": 67,
+      "reactive": 428,
+      "forecast_rate_x1000": 1,
       "sampling_ci95_lo_x1000": 0,
-      "sampling_ci95_hi_x1000": 29,
-      "simulator_range_lo_x1000": 5,
-      "simulator_range_hi_x1000": 6,
-      "verified_placements": 3108,
-      "total_placements": 3578
+      "sampling_ci95_hi_x1000": 8,
+      "simulator_range_lo_x1000": 1,
+      "simulator_range_hi_x1000": 2,
+      "verified_placements": 12134,
+      "total_placements": 14098
     }
   ],
   "session": {
-    "player_rounds": 72,
-    "verified_placements": 6242,
-    "total_placements": 7378,
-    "coverage_x1000": 846
+    "player_rounds": 292,
+    "verified_placements": 24166,
+    "total_placements": 27868,
+    "coverage_x1000": 867
   },
   "statistics": {
     "round": {
@@ -102,13 +102,13 @@
       "auc_x1000": 500,
       "wins": 0,
       "losses": 0,
-      "ties": 28,
+      "ties": 119,
       "decided": 0,
       "exact_p_x1000": null
     },
     "event": {
       "forecast_n": 0,
-      "reactive_n": 164,
+      "reactive_n": 700,
       "attack": null,
       "lines": null,
       "balance": {
@@ -120,16 +120,16 @@
     "player": null,
     "reliability": {
       "split_half_r_x1000": {
-        "yachi": null,
-        "pinglamb": null
+        "pinglamb": null,
+        "yachi": null
       },
       "scorable_rounds": {
-        "yachi": 31,
-        "pinglamb": 33
+        "pinglamb": 137,
+        "yachi": 127
       },
       "rounds_for_r70": {
-        "yachi": null,
-        "pinglamb": null
+        "pinglamb": null,
+        "yachi": null
       }
     }
   }

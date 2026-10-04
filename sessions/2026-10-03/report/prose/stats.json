@@ -1,12 +1,12 @@
 {
   "eyebrow": "數據對決 · 三張圖",
   "title": "數據對決",
-  "lede": "三張圖答三條唔同嘅問題：邊場開始散、散喺邊種清行、同埋逐項身手邊個高。睇之前記住一件事——<strong>今晚 yachi 快，pinglamb 重</strong>：yachi 每局平均 PPS 高<span class=\"badge\" data-claim=\"G035\"></span>，pinglamb 每粒方塊打出嘅攻擊高 6.86%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G037\"></span>。而五場入面，每粒攻擊高嗰個場場都贏<span class=\"badge\" data-claim=\"C017\"></span>。",
+  "lede": "三張圖答三條問題：邊段開始散、散喺邊種清行、同埋逐項身手邊個高。睇之前記住：<strong>今晚兩個人嘅速度差唔多，差嘅係每粒方塊嘅重量，而且連個重量都差得唔多</strong>。yachi 落得快少少<span class=\"badge\" data-claim=\"G052\"></span>、每粒方塊按鍵多 0.63%<span class=\"badge\" data-claim=\"C008\"></span>，pinglamb 每粒方塊打出嘅攻擊高 7.24%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G054\"></span>——呢個差距喺 corpus 十五晚入面排第二細，淨係大過 09-10。",
   "panels": [
     {
-      "heading": "逐場 VS 走勢——第四場係轉捩點",
+      "heading": "逐場 VS 走勢——第三截最差，最後一截先追得返",
       "caps": [
-        "五格細圖，一場一格。頭三場 yachi 局數 13 比 7，尾兩場 6 比 10<span class=\"badge\" data-claim=\"C010\"></span>；第四場 yachi 3 比 1 領先之後連失四局<span class=\"badge\" data-claim=\"C015\"></span>，就係個系列反轉嘅位。"
+        "二十格細圖，一場一格。五場一截計，局數 16 比 22、17 比 20、12 比 23、19 比 17<span class=\"badge\" data-claim=\"C010\"></span>：第十一到第十五場係 yachi 最差嗰截，最後五場係佢唯一贏多過對手嘅一截。四截局數唔同，比嘅係比率。"
       ],
       "footnote": null,
       "mount": {
@@ -16,11 +16,11 @@
       }
     },
     {
-      "heading": "清行類型分布——差喺 T-spin triple",
+      "heading": "清行類型分布——差距喺 T-spin triple",
       "caps": [
-        "T-spin double yachi 仲多啲，159 對 152<span class=\"badge\" data-claim=\"G031\"></span>；Quad 都係 yachi 多，174 對 158<span class=\"badge\" data-claim=\"G030\"></span>。但 T-spin triple 係 18 對 39<span class=\"badge\" data-claim=\"G032\"></span>——double 加 triple 計埋就變咗 pinglamb 191 對 177<span class=\"badge\" data-claim=\"G052\"></span>。"
+        "T-spin double 兩個人幾乎一樣，608 對 605<span class=\"badge\" data-claim=\"G048\"></span>；差嘅係 triple，153 對 86<span class=\"badge\" data-claim=\"G049\"></span>。Quad 反而係 yachi 多，622 對 591<span class=\"badge\" data-claim=\"G047\"></span>。T-spin double 加 triple 計埋 761 對 691<span class=\"badge\" data-claim=\"G068\"></span>——T-spin 清行入面，double 差唔到幾個，差距喺 triple。"
       ],
-      "footnote": "「T-spin 總數」<span class=\"badge\" data-claim=\"G029\"></span>計埋冇消行嘅 spin，所以會大過上面逐種清行加埋嘅數。兩個數量度緊唔同嘢，唔好溝埋講。",
+      "footnote": "「T-spin 總數」<span class=\"badge\" data-claim=\"G046\"></span>計埋冇消行嘅 spin，所以會大過上面逐種清行加埋嘅數。兩個數量度緊唔同嘢，唔好溝埋講。",
       "mount": {
         "id": "clears-bar-chart",
         "class": null,
@@ -30,7 +30,7 @@
     {
       "heading": "身手大比拼——快同準係 yachi，重同穩係 pinglamb",
       "caps": [
-        "yachi 每局平均 PPS 高<span class=\"badge\" data-claim=\"G035\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G039\"></span>、Quad 多<span class=\"badge\" data-claim=\"G030\"></span>；pinglamb 每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"G037\"></span>、每粒方塊清走嘅垃圾高<span class=\"badge\" data-claim=\"G069\"></span>、逐局波動細<span class=\"badge\" data-claim=\"G040\"></span><span class=\"badge\" data-claim=\"G041\"></span>。36 局之後，總攻擊淨係差 14 條<span class=\"badge\" data-claim=\"C005\"></span>。"
+        "yachi PPS 高<span class=\"badge\" data-claim=\"G052\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G056\"></span>、Quad 多<span class=\"badge\" data-claim=\"G047\"></span>；pinglamb 每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"G054\"></span>、每粒方塊清走嘅垃圾高<span class=\"badge\" data-claim=\"G091\"></span>、逐局波動細<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G057\"></span>。146 局之後，攻擊差 395 條<span class=\"badge\" data-claim=\"C005\"></span>。"
       ],
       "footnote": "「每粒 finesse 失誤」係<strong>失誤次數</strong>除粒數，唔係「幾多粒方塊撳錯」——一粒可以記幾次，所以呢一行用 toFixed(3) 唔用百分比。",
       "mount": {

@@ -1,34 +1,34 @@
 {
   "eyebrow": "教練分析 · 兩邊",
   "title": "俾兩位嘅建議",
-  "lede": "今晚 36 局，係 corpus 最細嘅一晚，所以下面每一句都係細樣本嘅讀法先。但有一樣嘢佢講得特別清楚：<strong>逐場計，每粒方塊攻擊高嗰個就贏咗嗰場，五場都係</strong><span class=\"badge\" data-claim=\"C017\"></span>。拆開贏輸嘅局睇，天花板貼埋（4.96%）、地板分開（12.28%）<span class=\"badge\" data-claim=\"C002\"></span>——同 07-22 嗰晚嘅樣差唔多一樣。",
+  "lede": "今晚 146 局，兩個 regime 嘅差距都細：贏嗰啲局爭 4.70%、輸嗰啲局爭 5.83%<span class=\"badge\" data-claim=\"C002\"></span>，兩個都喺自己嗰欄嘅中位數以下。<strong>但逐場排開，個細差距仍然一刀切開咗邊個贏</strong><span class=\"badge\" data-claim=\"C007\"></span>——即係話差距細唔代表冇用，而係每場嘅勝負就落喺幾個百分點之間。",
   "columns": {
     "yachi": {
-      "tagline": "贏局數輸場數 · 大勝食咗局",
+      "tagline": "快、手靚、落得多 · 差喺每粒嘅重量",
       "profile": [
-        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 26.86%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G062\"></span>，喺佢自己十五晚入面排第二闊——<strong>個 lever 冇變過</strong>。",
-        "快：每局平均 PPS 高過對手<span class=\"badge\" data-claim=\"G035\"></span>，五場場場都係<span class=\"badge\" data-claim=\"G047\"></span>；perfect piece 比率高<span class=\"badge\" data-claim=\"G039\"></span>、Quad 174 對 158<span class=\"badge\" data-claim=\"G030\"></span>。",
-        "條路又係加粒數：多疊 222 粒<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，今晚差唔多填返晒個窿。"
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 21.46%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G084\"></span>，十五晚都係咁——<strong>個 lever 冇變過</strong>，而且今晚佢呢個分隔闊過對手。",
+        "落得快<span class=\"badge\" data-claim=\"G052\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G056\"></span>、Quad 多過對手<span class=\"badge\" data-claim=\"G047\"></span>，hold 5730 次對 5196 次<span class=\"badge\" data-claim=\"G045\"></span>。",
+        "條路又係加粒數：多疊 328 粒<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，即係多 2.38%，係 corpus 入面買得第二少嘅一次。"
       ],
       "recs": [
-        "<strong>第四場 3 比 1 之後連失七局，係成晚嘅位。</strong><span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"G009\"></span>打完三場仲係 2 比 1、局數 13 比 7<span class=\"badge\" data-claim=\"C010\"></span>；一段七連敗就將一個五場嘅系列反轉。",
-        "<strong>T-spin triple 係個差距最易見嘅位。</strong>T-spin double 你仲多過對手（159 對 152）<span class=\"badge\" data-claim=\"G031\"></span>，但 triple 係 18 對 39<span class=\"badge\" data-claim=\"G032\"></span>。呢個係指路，唔係一個證明咗嘅拆解。",
-        "<strong>「差 14 條」唔好當係追平咗。</strong><span class=\"badge\" data-claim=\"C005\"></span>抽走第五場第一局，個差額連正負號都會反轉——企得穩嘅係兩邊總數撞埋一齊，而且係因為今晚個窿窄（6.86%，十五晚第二窄）<span class=\"badge\" data-claim=\"C004\"></span>，唔係條路改善咗。"
+        "<strong>今晚贏場嘅門檻好清楚：對手每粒方塊高唔過 4% 嗰陣，你六場全贏；高過 6%，你十四場全輸。</strong><span class=\"badge\" data-claim=\"C007\"></span>唔係要每粒打得重過對手——第十二場你每粒輕啲都贏到<span class=\"badge\" data-claim=\"C031\"></span>——係唔好俾個差距拉到幾個百分點以上。",
+        "<strong>粒數盈餘今晚幫唔到手。</strong>328 粒即係 2.38%，而個窿係 7.24%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"C009\"></span>，最多填到三分之一。個窿已經係十五晚第二細，但盈餘更細，結果仍然少打 395 條<span class=\"badge\" data-claim=\"C005\"></span>。",
+        "<strong>最後五場嗰種打法係今晚最好嗰截。</strong>局數 19 比 17，係四截入面唯一贏多過對手嘅一截；第十一到十五場 12 比 23 就係最差<span class=\"badge\" data-claim=\"C010\"></span>。同一晚入面可以差咁遠，值得翻睇第三截。"
       ]
     },
     "pinglamb": {
-      "tagline": "險勝三場 · 地板高過對手",
+      "tagline": "T-spin triple · 每粒更重 · 守得穩",
       "profile": [
-        "三場都係 5 比 3 贏<span class=\"badge\" data-claim=\"C011\"></span>，靠第四場尾到第五場頭嗰七連勝<span class=\"badge\" data-claim=\"G009\"></span>攞低個系列。",
-        "每粒方塊嘅攻擊成晚高 6.86%<span class=\"badge\" data-claim=\"C004\"></span>；輸嗰啲局高 12.28%<span class=\"badge\" data-claim=\"C002\"></span>——<strong>你嘅地板高過對手好多</strong>，天花板就貼埋。",
-        "T-spin triple 39 對 18<span class=\"badge\" data-claim=\"G032\"></span>，劈 12 行以上嘅局 14 對 8<span class=\"badge\" data-claim=\"G051\"></span>。"
+        "贏法同一路一樣：每粒方塊打出嘅攻擊兩個 regime 都高過對手<span class=\"badge\" data-claim=\"C002\"></span>，不過今晚兩個幅度都細。",
+        "自己贏局對輸局差 20.17%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G085\"></span>，今晚窄過對手。",
+        "今晚嘅差距喺 triple：T-spin triple 153 對 86<span class=\"badge\" data-claim=\"G049\"></span>，double 就幾乎一樣，608 對 605<span class=\"badge\" data-claim=\"G048\"></span>。APM 高<span class=\"badge\" data-claim=\"G053\"></span>，PPS 反而低過對手<span class=\"badge\" data-claim=\"G052\"></span>。"
       ],
       "recs": [
-        "<strong>贏局嗰個 4.96% 係一局撐住嘅。</strong><span class=\"badge\" data-claim=\"C002\"></span>第二場第二局（全晚最癲嗰局，每粒攻擊 0.950）<span class=\"badge\" data-claim=\"G056\"></span><span class=\"badge\" data-claim=\"G079\"></span>一抽走，個差距跌到 2.42%。你嘅優勢喺輸局，唔喺贏局。",
-        "<strong>局數輸咗 17 比 19</strong><span class=\"badge\" data-claim=\"G002\"></span>，係靠險勝攞到場數。五場嘅晚上咁係贏；場數多啲嘅晚上就唔一定。",
-        "KPP 今晚你係高嗰個，3.623 對 3.579<span class=\"badge\" data-claim=\"C008\"></span>，但你自己贏局同輸局嘅 KPP 差唔夠 1%<span class=\"badge\" data-claim=\"G065\"></span>。呢一欄冇嘢好跟。"
+        "<strong>守住個差距嘅闊度，唔係守住領先。</strong>你輸嗰六場，每粒方塊都冇高過 yachi 4%；你贏嗰十四場，全部高過 6%<span class=\"badge\" data-claim=\"C007\"></span>。一個 7.24% 嘅平均差距<span class=\"badge\" data-claim=\"C004\"></span>，其實係由呢兩堆場砌出嚟。",
+        "<strong>Triple 係今晚最實在嘅優勢。</strong>Double 幾乎一樣（608 對 605），triple 多 67 個<span class=\"badge\" data-claim=\"G049\"></span><span class=\"badge\" data-claim=\"G048\"></span>。同一晚，佢少疊 328 粒仲多打 395 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>。",
+        "逐局波動你係細嗰個<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G057\"></span>。頂到頂 13 次<span class=\"badge\" data-claim=\"C006\"></span>係你自己歷來最多，但今晚 146 局，計比率唔算出格。"
       ]
     }
   },
-  "versus_note": "逐場排開個效率差距，今晚<strong>分得開</strong>邊個贏場波：yachi 贏嗰兩場係差距最細嗰兩場（−7.59%、−4.08%），pinglamb 贏嗰三場係最大嗰三場（+9.44%、+13.16%、+14.23%）。但五場揀兩場啱啱好排喺最底，撞彩都有十分一機會——比 09-11 嗰次嘅七分一強少少，比 09-17 嗰次嘅二十一分一弱好多。所以今晚<strong>冇 mint 「逐場排開就分得開」嗰個 claim</strong>，跟 09-11 歸做同一類，十五晚入面分得開嘅仍然係三晚。今晚有嘅係一句更簡單嘅：每粒攻擊高嗰個，場場都贏<span class=\"badge\" data-claim=\"C017\"></span>。"
+  "versus_note": "逐場排開個效率差距，今晚<strong>分得開</strong>邊個贏場波：yachi 贏嗰六場，pinglamb 每粒方塊高唔夠 4%；pinglamb 贏嗰十四場，場場高過 6%<span class=\"badge\" data-claim=\"C007\"></span>。六勝二十場隨機排到咁，機會係三萬八千七百六十分之一，係 corpus 十五晚入面證據最硬嘅一次，分得開嘅晚由三晚變四晚。但「邊個每粒高邊個就贏」就有一場例外：第十二場<span class=\"badge\" data-claim=\"C031\"></span>——分得開嘅係個差距嘅大細，唔係邊個領先。"
 }

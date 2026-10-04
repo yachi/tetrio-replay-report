@@ -1,57 +1,41 @@
 # 2026-10-03 — coaching
 
-The smallest session in the corpus — five matches, 36 rounds — so everything below is a
-small-n reading before it is anything else. It is also the first night where the two players
-each won one scoreboard: yachi the rounds [C010][G002], pinglamb the series [C001][G001].
+Both regime gaps are small this session [C002], and the session gap is the second-smallest of
+fifteen [C004]. What makes the night worth coaching from is that a small average gap still
+decided every match by size: under +4% and yachi won all six, over +6% and pinglamb won all
+fourteen [C007].
 
 ## yachi
 
-**He won more rounds and lost the series, and the reason is distribution, not quality.** His
-two wins were both 5-1, pinglamb's three were all 5-3 [C011]. Ten rounds to two in the
-matches he took, nine to fifteen in the ones he did not. Over a five-match night that is the
-whole story: a big win spends rounds the scoreboard does not count twice.
+**The lever is unchanged.** APP is higher in the rounds he wins than the rounds he loses,
++21.46% [C003][G084], for the fifteenth session running, and this time his separation is the
+wider of the two.
 
-**The match that turned it was m4.** He led it 3-1 and lost the next seven rounds, four to
-close m4 and three to open m5 [C015][C016][G009]. Before that he led the series 2-1 and the
-rounds 13-7 [C010]. One run of seven decided a five-match night.
+**The threshold is visible this session, and it is not "out-hit him".** In m12 he won 5-3 with
+the lower attack per piece [C031]. What separated his wins from his losses is how far behind
+he was per piece [C007]: within a few points, he won; past six, he lost every time.
 
-**The lever is unchanged.** APP is higher in his won rounds than his lost rounds, +26.86%
-[C003][G062], the second-widest separation of his own fifteen sessions. And this night says
-it more plainly than any other: **in every one of the five matches, whoever had the higher
-attack per piece won it** [C017] — his two wins are the two matches where his APP beat
-pinglamb's. Meanwhile his PPS was higher in all five and he still lost three [G047]. The
-higher-APP player won every match [C017] — five matches of co-occurrence, not a mechanism.
+**The surplus was too small to matter.** 328 extra pieces is 2.38% [C009], against a 7.24%
+gap [C004] — about a third of it covered, and 395 lines of attack short [C005]. The gap was
+the second-smallest the corpus has had; the surplus was the second-smallest too.
 
-**The volume route nearly worked.** 222 extra pieces [C005] bought back 6% of a 6% gap
-[C004][C009] and the attack totals finished 14 apart — a figure one round owns, and the
-sign flips without it. Do not read that as the route being fixed: the hole was narrow (second
-narrowest of fifteen), and it is the same arithmetic as 08-01's
-(shortfall 1.00 pp, 32 lines; tonight 0.66 pp, 14 lines).
-
-**Where the gap sits: the T-spin triple.** He threw more T-spin doubles than pinglamb
-(159 to 152) [G031] and more quads (174 to 158) [G030], but 18 triples to 39 [G032]. That one
-column is where pinglamb's higher per-piece attack [G037] is easiest to see — a pointer, not
-a proved decomposition.
+**Look at matches 11-15.** 12-23 in rounds is his worst block of five, and matches 16-20
+(19-17) his best [C010]. The same night produced both.
 
 ## pinglamb
 
-**He took the series without taking the rounds, and he did it with narrow wins** — three 5-3s
-[C011]. His seven-round run across m4 and m5 [G009] is the night.
+**He wins the way he has all corpus**: more attack per piece in both regimes [C002], this
+time by small margins — 14th and 10th of fifteen in their own columns.
 
-**His per-piece edge is real but small this session**: +6.86% overall [C004], second-narrowest
-in the corpus. In the rounds both won the two are close, +4.96% [C002] — and that figure is
-one round's, his 0.950-APP win in m2's second round [G056][G079]. Where he is clearly ahead
-is the rounds both lost, +12.28% [C002]: his floor is higher.
+**The edge is triples.** T-spin doubles are nearly equal, 608 against 605 [G048]; triples 153
+against 86 [G049]. His APM is higher [G053] with the lower PPS [G052].
 
-**His own separation is +18.59%** [C003][G063], narrower than yachi's this night. His KPP is
-the higher of the two, 3.623 to 3.579 [C008], the reverse of the last two sessions — a
-night's state, and flat within each player [G064][G065].
+**The matches he lost are the ones where his per-piece edge fell under 4%** [C007] — m12 is
+the one where he still led per piece and lost [C031].
 
-**Keep the triples.** 39 to 18 [G032], 14 rounds with a spike of 12 or more against 8
-[G051]. That is the per-piece weight.
+Topouts 13 [C006] are his largest tally, on a 146-round night; as a rate it is unremarkable.
 
 ## Both
 
-Topouts were rare — four in 36 rounds, 1 yachi and 3 pinglamb [C006] — so this night was
-decided by garbage, not by stacking out. With five matches, nothing in it is a trend; it is
-one evening's evidence for the lever every session has pointed at.
+KPP is flat again (yachi 3.614, pinglamb 3.591 [C008]), and within each player the won/lost
+difference is under 2% [G086][G087]. Nothing to act on.
