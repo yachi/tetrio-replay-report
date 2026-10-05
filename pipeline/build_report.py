@@ -25,7 +25,7 @@ import sys
 
 from pipeline import (appendix, chart_data, claim_cards, coaching, forecast_section, hero,
                       intense_round, matches, moments, opener_section, pc_section, records, region,
-                      stats_section)
+                      replay_section, stats_section)
 from pipeline.claims import generators
 
 
@@ -104,6 +104,13 @@ def opener_sec(ctx):
     return opener_section.section(opener_section.load(ctx["report_dir"]))
 
 
+def replay_sec(ctx):
+    # Quarantined like forecast_sec and opener_sec, and conditional twice over: no
+    # sim/replay-facts.json, or no round long enough for `generators._intense_round`, and it
+    # returns None. The round is that selector's, shared with 最癲一局, never re-chosen here.
+    return replay_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def claims_island(ctx):
     return appendix.island(ctx["report_dir"])
 
@@ -157,6 +164,12 @@ SECTIONS = [
     # after the forecast section, so the two quarantined sections sit together below the
     # trust chain rather than one of them being stranded among the proved ones
     ("openers", '<footer class="report-footer">', opener_sec, None),
+    # the third quarantined section, after the other two so all three sit together below the
+    # trust chain. Same anchor as they use: the footer tag sits outside every region, which is
+    # the property the "marker, never a <section> tag" rule above protects — a tag INSIDE a
+    # region is what puts an inserted block into a span a later pass rewrites. The shell has no
+    # footer marker comment to anchor on instead.
+    ("round-replay", '<footer class="report-footer">', replay_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),
     ("claims-data", '<footer class="report-footer">', claims_island,

@@ -72,7 +72,10 @@ Three further failure conditions, each earned:
 
 **Three tiers, because one re-measurement cost does not fit both schedules.** `--two-site
 round` is 854,937 moves over the six-session corpus — ~25 minutes for ALL SIX sessions, not
-per session — while `single_value` + `two_site_match` is ~4m13s for the corpus. So:
+per session — while `single_value` + `two_site_match` is ~4m13s for the corpus. (Those are
+the six-session, every-claim-on-every-mutant figures, kept as the record. The sweep has since
+grown a relevance index and a process pool — see `equiv.py` — and the current costs live in
+`equiv-coverage.yml`'s timeout comments, with what measured them.) So:
 
 * `--check --modes single_value,two_site_match` — **every push**. It genuinely re-measures,
   which is the whole point of the item: a change to `generators.py`, `spec.py` or
@@ -88,6 +91,7 @@ import json
 import os
 import re
 import sys
+import time
 
 # The document-parsing layer is SHARED with pipeline/check_loo.py, which gates the same three
 # files. Two parsers over one document agree until the document is reworded; see
@@ -285,6 +289,39 @@ def build(session, report_dir, modes=None, measure_modes=None):
                        **{k: moves[m] for m in want for k in CORPUS_OF_MODE[m]}},
             "windowed_claims": windowed_claims(hand),
             "modes": modes}
+
+
+def jobs_from(arg):
+    """`--jobs`, else `EQUIV_JOBS`, else every CPU. Scheduling only — never a verdict."""
+    if arg is not None:
+        return max(1, arg)
+    env = os.environ.get("EQUIV_JOBS", "").strip()
+    if env:
+        return max(1, int(env))
+    return os.cpu_count() or 1
+
+
+def measure_all(measurable, modes, jobs, chunk=None):
+    """Every session's `measure_modes` result, measured as ONE task pool.
+
+    Each session is decomposed by `equiv.measure_many` — a single-value sweep, plus each
+    two-site family cut into contiguous chunks — and every task is a pure function of the
+    session's files, so the results are identical at any `jobs` and in any completion
+    order; they are keyed by session and everything downstream (printing, the byte
+    comparison, the prose gate) runs afterwards in sorted session order. Each worker holds
+    its own copy of the facts (inherited under fork, re-read under spawn and checked against
+    the planned content digest), so in-place perturbation never crosses a process and the
+    restore assert (`perturb.unchanged`) runs in the process that swept. `jobs=1` runs every
+    task in this process.
+    """
+    from . import equiv                     # noqa: PLC0415 - only --write/--check need it
+    gran = tuple(g for k, g in MODES if g and k in modes)
+    reqs = [{"facts_path": os.path.join(d, "facts.json"), "hand_paths": hand_ledgers(d),
+             "generated_path": os.path.join(d, GENERATED), "two_site_modes": gran}
+            for _, d in measurable]
+    out = equiv.measure_many(reqs, jobs=jobs,
+                             chunk=equiv.DEFAULT_CHUNK if chunk is None else chunk)
+    return {session: res_meta for (session, _), res_meta in zip(measurable, out)}
 
 
 def dumps(artefact):
@@ -1054,6 +1091,13 @@ def main(argv=None):
                     help="print the document blocks the artefacts imply, to paste")
     ap.add_argument("--selftest", action="store_true",
                     help="plant corruptions and require the gate to catch them, then exit")
+    ap.add_argument("--jobs", type=int, default=None,
+                    help="worker processes for --write/--check (default: $EQUIV_JOBS, else "
+                         "every CPU; 1 runs in this process). Changes the schedule, never a "
+                         "byte of the result")
+    ap.add_argument("--chunk", type=int, default=None,
+                    help="moves per task when a two-site family is split across workers "
+                         "(default: equiv.DEFAULT_CHUNK; 0 = one task per family)")
     args = ap.parse_args(argv)
     root = os.path.abspath(args.root)
 
@@ -1111,10 +1155,25 @@ def main(argv=None):
     if note:
         print(note)
 
+    jobs = jobs_from(args.jobs)
+    print(f"  ..  measuring {len(measurable)} sessions ({', '.join(modes)}) with {jobs} "
+          f"worker process(es)", flush=True)
+    t0 = time.perf_counter()
+    measured = measure_all(measurable, modes, jobs, args.chunk)
+    wall = time.perf_counter() - t0
+    cpu, evals = 0.0, {}
     for_prose, stale = {}, []
     for session, d in measurable:
-        print(f"  ..  measuring {session} ({', '.join(modes)})", flush=True)
-        art = build(session, d, modes=modes)
+        res, meta = measured[session]
+        secs = meta["cpu"]
+        cpu += sum(secs.values())
+        for k, (done, total) in meta["evals"].items():
+            e = evals.setdefault(k, [0, 0])
+            e[0] += done
+            e[1] += total
+        print(f"  ..  measured {session} (task CPU): "
+              + ", ".join(f"{k} {v:.1f}s" for k, v in secs.items()), flush=True)
+        art = build(session, d, modes=modes, measure_modes=lambda *_a, _r=res, **_k: _r)
         path = artefact_path(d)
         if args.write:
             with open(path, "w", encoding="utf-8") as fh:
@@ -1146,6 +1205,13 @@ def main(argv=None):
         # the committed file, which `note` above has already told the reader was not re-derived.
         for_prose[session] = _merge(committed, art, modes)
 
+    # `cpu` is time.process_time summed over every task, in the process that ran it — CPU time,
+    # unlike the summed wall intervals this line printed under the same label until 2026-10-04.
+    print(f"  ..  measurement wall time {wall:.1f}s over {jobs} worker(s); "
+          f"{cpu:.1f}s of task CPU time in total", flush=True)
+    from .equiv import evals_line          # noqa: PLC0415 - only --write/--check need it
+    for k, (done, total) in evals.items():
+        print(f"  ..  corpus {evals_line(k, (done, total)).strip()}", flush=True)
     if args.write:
         print("\nartefacts written. --write never checks the prose; run --check-prose next.")
         return 0

@@ -150,7 +150,7 @@ const PINNED_TOTALS: Record<string, Totals> = {
   // for why the step model cannot attribute it and why the verdict is the honest bucket.
   '2026-09-18': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 1, self_built: 566, reactive: 709, unattributed: 0 },
   '2026-09-19': { forecast_garbage: 0, forecast_lineclear: 4, path_opened: 1, self_built: 737, reactive: 827, unattributed: 1 },
-  '2026-10-03': { forecast_garbage: 0, forecast_lineclear: 2, path_opened: 0, self_built: 175, reactive: 205, unattributed: 0 },
+  '2026-10-03': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 0, self_built: 713, reactive: 866, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -172,7 +172,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-09-17': { 'pre-existed': 417, 'arrived-later': 39, undetermined: 52 },
   '2026-09-18': { 'pre-existed': 1054, 'arrived-later': 121, undetermined: 104 },
   '2026-09-19': { 'pre-existed': 1307, 'arrived-later': 141, undetermined: 121 },
-  '2026-10-03': { 'pre-existed': 308, 'arrived-later': 38, undetermined: 36 },
+  '2026-10-03': { 'pre-existed': 1321, 'arrived-later': 142, undetermined: 119 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -182,7 +182,7 @@ const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
   '2026-09-11': 61, '2026-09-17': 52, '2026-09-18': 146, '2026-09-19': 177,
-  '2026-10-03': 40,
+  '2026-10-03': 176,
 };
 
 /** Reactive events on which the EXECUTION-TIME garbage counterfactual fires, per session.
@@ -261,12 +261,14 @@ const PINNED_FORECASTS: Record<string, string[]> = {
     'yachi replay-2026-09-19-08.ttrm r1 lock 58 forecast_lineclear roof 56 0->2',
     'pinglamb replay-2026-09-19-14.ttrm r7 lock 76 forecast_lineclear roof 74 0->2',
   ],
-  // TWO verified forecasts of two mechanism events — every candidate survives every clause, which
-  // with more than one candidate has happened once before (08-01, also two of two; 07-22 and 07-24
-  // were one of one).
-  // One per player, both `floor pre-existed from -1`, both 0->2. On 72 player-rounds that is 2.8%
-  // of rounds against 09-19's 1.0%, the highest per-round rate in the corpus and the smallest
-  // session it could have come from: a small-n reading first, two events and not a change in kind.
+  // TWO verified forecasts of THREE mechanism events, one per player, both `floor pre-existed from
+  // -1`, both 0->2 — and both in m16/m17, the two matches the five-replay subset this session was
+  // first published on held. The third mechanism event (yachi replay-2026-10-03-08.ttrm r3 lock
+  // 101, floor pre-existed from 86, roof 98) is rejected by CLAUSE 4 alone — the clear that closed
+  // its gap was itself a T-spin (forecast-facts.json's `rejected_by.closing_clear_was_spin` 1),
+  // not clause 2. On 292 player-rounds two is 0.7% of rounds, below 09-19's 1.0%. (This entry
+  // first read 「every candidate survives every clause … 2.8% of rounds, the highest per-round rate
+  // in the corpus」 on the subset's 72 player-rounds; both halves are void with the full night.)
   '2026-10-03': [
     'yachi replay-2026-10-03-16.ttrm r5 lock 89 forecast_lineclear roof 85 0->2',
     'pinglamb replay-2026-10-03-17.ttrm r0 lock 57 forecast_lineclear roof 55 0->2',
@@ -335,6 +337,7 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
     'pinglamb replay-2026-09-19-14.ttrm r7 lock 76 forecast_lineclear floor pre-existed from -1 roof 74',
   ],
   '2026-10-03': [
+    'yachi replay-2026-10-03-08.ttrm r3 lock 101 forecast_lineclear floor pre-existed from 86 roof 98',
     'yachi replay-2026-10-03-16.ttrm r5 lock 89 forecast_lineclear floor pre-existed from -1 roof 85',
     'pinglamb replay-2026-10-03-17.ttrm r0 lock 57 forecast_lineclear floor pre-existed from -1 roof 55',
   ],

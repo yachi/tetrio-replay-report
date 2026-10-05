@@ -43,12 +43,15 @@ sum that separates the two rounds moves. See `move_sites` for the bound and for 
 delta is a *half* rather than the whole value.
 """
 import argparse
+import hashlib
 import json
 import random
 import re
+import time
 
 from pipeline import perturb
 
+from . import readset
 from .evaluate import ClaimEvaluationError, ClaimEvaluator
 
 SCALARS = [
@@ -60,6 +63,15 @@ SCALARS = [
 CLEARS = ["singles", "doubles", "triples", "quads", "tspin_singles",
           "tspin_doubles", "tspin_triples", "mini_tspin_singles",
           "mini_tspin_doubles", "allclear"]
+LB_FIELDS = ("apm_x1000", "pps_x1000", "vs_x1000", "garbagesent", "garbagereceived", "kills")
+
+# Every key a mutant or a move can write, by site kind: round fields and clears, leaderboard
+# fields, a match's or round's `winner`, the `alive` a round-winner flip rewrites, a garbage
+# event's `amt`, and `score` — the label a score-dict write takes (readset.key_labels). G3
+# (`check_labels`) refuses any label outside it, so a new site kind is a build error until it
+# is named here, rather than a write the relevance index has never heard of.
+WRITE_LABELS = frozenset(SCALARS) | frozenset(CLEARS) | frozenset(LB_FIELDS) | {
+    "winner", "alive", "amt", "score"}
 
 
 def mutation_sites(facts):
@@ -69,8 +81,7 @@ def mutation_sites(facts):
         sites.append(("match_winner", mi))
         for pl in facts["players"]:
             sites.append(("score", mi, pl))
-            for f in ("apm_x1000", "pps_x1000", "vs_x1000", "garbagesent",
-                      "garbagereceived", "kills"):
+            for f in LB_FIELDS:
                 if f in m["leaderboard"][pl]:
                     sites.append(("lb", mi, pl, f))
         for ri, r in enumerate(m["rounds"]):
@@ -384,7 +395,8 @@ class Vec:
     `defined` bit i is set when claim evaluation produced a verdict on sample i;
     `value` bit i is set when that verdict was True. `value` is always a subset of
     `defined`, so an undefined sample reads as 0 in both and "defined and False" is
-    exactly `defined ^ value`.
+    exactly `defined ^ value`. `nbits` is how many samples the vector ranges over — the
+    bitmaps cannot say, because a run of trailing pristine-False samples is all zeros.
 
     Why not a list of True/False/None: the pair-coverage search below tries every PAIR
     of generated claims against each uncovered hand claim — O(|hand| x |gen|^2) vector
@@ -398,10 +410,10 @@ class Vec:
     dataflow analysis; nothing about the answers changes, only how many operations
     compute them.
     """
-    __slots__ = ("defined", "value")
+    __slots__ = ("defined", "value", "nbits")
 
-    def __init__(self, defined, value):
-        self.defined, self.value = defined, value
+    def __init__(self, defined, value, nbits):
+        self.defined, self.value, self.nbits = defined, value, nbits
 
     @classmethod
     def of(cls, verdicts):
@@ -413,7 +425,38 @@ class Vec:
         """
         d = "".join("1" if v is not None else "0" for v in reversed(verdicts))
         b = "".join("1" if v else "0" for v in reversed(verdicts))
-        return cls(int(d, 2), int(b, 2))
+        return cls(int(d or "0", 2), int(b or "0", 2), len(verdicts))
+
+    @classmethod
+    def from_sparse(cls, nbits, pristine, exceptions):
+        """The vector of a claim whose verdict is `pristine` on every sample but `exceptions`.
+
+        `exceptions` is an iterable of `(sample_index, verdict)` with verdict True, False or
+        None. This is how the relevance-indexed sweep reports a claim: a mutant the claim
+        cannot observe is not evaluated at all, so its bit is the pristine verdict, and only
+        the samples where the claim was evaluated AND came out differently are listed. The
+        bits are written into bytearrays and converted once (`int.from_bytes`), O(n/8),
+        instead of materialising an n-entry list per claim — 830 000 entries x 135 claims on
+        2026-10-03's round tier. Equal to `Vec.of` of the dense list by construction, and
+        `equiv --selftest` checks that on random dense vectors holding all three values.
+        """
+        nbytes = (nbits + 7) // 8
+        exc, true, none = bytearray(nbytes), bytearray(nbytes), bytearray(nbytes)
+        for i, v in exceptions:
+            if not 0 <= i < nbits:
+                raise AssertionError(f"exception at sample {i} outside a {nbits}-sample "
+                                     f"vector — an offset is wrong")
+            b, m = i >> 3, 1 << (i & 7)
+            exc[b] |= m
+            if v is None:
+                none[b] |= m
+            elif v:
+                true[b] |= m
+        full = (1 << nbits) - 1
+        e, t, n = (int.from_bytes(x, "little") for x in (exc, true, none))
+        defined = full & ~n
+        value = ((full if pristine else 0) & ~e) | t
+        return cls(defined, value, nbits)
 
     def falsified(self):
         """Was this claim False on at least one sample? (`any(x is False for x in v)`)"""
@@ -421,11 +464,13 @@ class Vec:
 
     def __and__(self, other):
         """Pointwise conjunction, undefined wherever either side is."""
+        assert self.nbits == other.nbits, "conjunction of vectors over different corpora"
         d = self.defined & other.defined
-        return Vec(d, self.value & other.value & d)
+        return Vec(d, self.value & other.value & d, self.nbits)
 
     def __eq__(self, other):
-        return self.defined == other.defined and self.value == other.value
+        return (self.defined == other.defined and self.value == other.value
+                and self.nbits == other.nbits)
 
 
 def implies(g, h):
@@ -465,17 +510,18 @@ def _search(gen_codes, hand_codes, gvecs, hvecs, corpus):
     aliased corpus is a superset, and coverage happens not to move on it). A leak that
     the results cannot show is one the results cannot gate, so the corpus is checked by
     size: one pristine sample, plus every mutant, plus this mode's moves, and nothing
-    else. The same mutant dies here immediately.
+    else. The same mutant dies here immediately. The vectors are `Vec`s now, built from
+    sparse exceptions, so the size is each vector's `nbits` — which `Vec.from_sparse`
+    takes from the corpus it was built over, and which an exception index past it fails.
     """
     expect = 1 + corpus["mutants"] + corpus["moves"]
-    wrong = [len(v) for v in list(gvecs) + list(hvecs) if len(v) != expect]
+    wrong = [v.nbits for v in list(gvecs) + list(hvecs) if v.nbits != expect]
     assert not wrong, (
         f"a truth vector carries {wrong[0]} samples, not the {expect} this mode's corpus "
         f"has ({corpus['mutants']} mutants + {corpus['moves']} moves + the pristine "
         f"dataset) — the vectors of another mode have leaked into this one")
     gtriples = []
-    for (c, _), v in zip(gen_codes, gvecs):
-        vt = Vec.of(v)
+    for (c, _), vt in zip(gen_codes, gvecs):
         gtriples.append((c, vt, vt.falsified()))
 
     trivial = sorted(c["id"] for c, _, nt in gtriples if not nt)
@@ -485,8 +531,7 @@ def _search(gen_codes, hand_codes, gvecs, hvecs, corpus):
     live = [(c, v) for c, v, nt in gtriples if nt]
 
     covered, uncovered, untested, identical, detail = [], [], [], [], {}
-    for (h, _), v in zip(hand_codes, hvecs):
-        hv = Vec.of(v)
+    for (h, _), hv in zip(hand_codes, hvecs):
         if not hv.falsified():
             untested.append(h["id"])
             continue
@@ -524,14 +569,512 @@ def _search(gen_codes, hand_codes, gvecs, hvecs, corpus):
             "two_site_log": corpus["two_site_log"]}
 
 
+# --------------------------------------------------------------------------- the sweep
+#
+# THE RELEVANCE INDEX. Every mutant used to evaluate every claim; most of those evaluations
+# provably return the pristine verdict, because the mutant writes no slot the predicate reads
+# (pipeline/claims/readset.py states the four premises that makes exact). How many is printed by
+# every run, per mode (`evals_line`), and is deliberately not typed here: a share written into a
+# comment is a figure nothing re-derives, and the one that stood here was wrong. So each mutant now
+# evaluates only the claims whose predicates spell one of the keys it writes, and a claim's
+# truth vector is its pristine verdict everywhere except the samples where it was evaluated
+# AND came out differently (`Vec.from_sparse`). The guards, all run on every invocation:
+#
+#   G1  every claim's python_check is exactly spec.to_python(spec)      `check_index_premises`
+#   G2  every predicate is inside readset.audit's grammar               `check_index_premises`
+#   G3  every write label is a known key, never a player name           `check_labels`
+#   G4  the pristine verdict of every claim is a bool (it cannot raise) `_Session.__init__`
+#   G5  a stratified shadow sample evaluates EVERY claim and requires   `_Session.sweep`
+#       each claim outside the index to keep its pristine verdict
+#
+# G5 is a tripwire, not the proof — a sample cannot be complete (a uniform 1-in-50 sample
+# caught 0 of a planted `alive` drop). The proof is `equiv --selftest`'s differential against
+# `equiv_reference`, the frozen exhaustive implementation, plus the planted mutants it kills.
+
+
+def _check_labels(labels):
+    """G3: every label a mutant writes is in WRITE_LABELS and none is a player name.
+
+    Run once per distinct label set — `_Session.relevant` caches the set with its answer."""
+    bad = sorted(set(labels) - WRITE_LABELS, key=str)
+    if bad:
+        raise readset.IndexUnsound(
+            f"a mutant writes key(s) {bad} that no site kind is known to write — a player "
+            f"name here means a score-dict write lost its `score` label, and anything else "
+            f"is a new site kind WRITE_LABELS must name before the index can be trusted")
+
+
+def check_index_premises(claims):
+    """G1 + G2 over every claim. Returns each claim's key set, in order."""
+    from .spec import to_python
+    keysets = []
+    for c in claims:
+        if "spec" not in c:
+            raise readset.IndexUnsound(f"claim {c.get('id', '?')} carries no spec, so G1 "
+                                       f"cannot tie its predicate to the renderer's grammar")
+        if to_python(c["spec"]) != c["python_check"]:
+            raise readset.IndexUnsound(
+                f"claim {c.get('id', '?')}: python_check is not spec.to_python(spec) — the "
+                f"relevance index reasons about the renderer's grammar, and this predicate "
+                f"was not rendered by it (regenerate the ledger)")
+        keysets.append(readset.audit(c))
+    return keysets
+
+
+def _site_stratum(site):
+    kind = site[0]
+    if kind == "lb":
+        return (kind, site[3])
+    if kind in ("field", "clear"):
+        return (kind, site[4])
+    return (kind,)
+
+
+def _first_per_stratum(strata, per=2):
+    """Indices of the first `per` items of each stratum — G5's deterministic sample."""
+    seen, out = {}, set()
+    for i, s in enumerate(strata):
+        if seen.get(s, 0) < per:
+            seen[s] = seen.get(s, 0) + 1
+            out.add(i)
+    return out
+
+
+def _move_base(n_mutants):
+    """Where a mode's moves start in its truth vectors: after the pristine sample and every
+    single-value mutant. A function of its own so `--selftest` can plant an off-by-one."""
+    return 1 + n_mutants
+
+
+class _Session:
+    """Everything one session's sweep needs, rebuilt identically in any process.
+
+    It is a pure function of the files' CONTENT, which its key carries as a digest
+    (`_session_key`) and which `__init__` checks against the bytes it parses: no RNG unless
+    `samples` is set (and then seeded), so a worker process that builds its own copy
+    enumerates the same mutants and moves in the same order as every other, and in-place
+    perturbation never crosses a process.
+    """
+
+    def __init__(self, key):
+        facts_path, hand_paths, generated_path, samples, seed, digest = key
+        self.key = key
+        # The bytes are read ONCE, and the digest of exactly those bytes must be the one the
+        # key was built from: a file rewritten between `_session_key` and here (a session
+        # built later, in a spawned worker, or a cache entry outliving an edit) would
+        # otherwise be measured under the plan's name. Nothing is parsed from a second read.
+        blobs = _read_inputs(key)
+        if _digest_of(blobs) != digest:
+            raise StaleInputs(
+                f"the inputs of {facts_path} changed between planning and loading the "
+                f"session — refusing to measure a dataset other than the one planned")
+        self.facts = facts = json.loads(blobs[0])
+        if generated_path:
+            gen = json.loads(blobs[1])
+        else:
+            from .build_claims import generate, render
+            gen = render(generate(facts))
+        hand = []
+        for blob in blobs[2:]:
+            hand.extend(json.loads(blob))
+        self.gen, self.hand = gen, hand
+        self.claims = gen + hand
+        self.ngen = len(gen)
+        keysets = check_index_premises(self.claims)
+        self.readers = readset.build_readers(keysets)
+        self.codes = [compile(c["python_check"], "<gen>" if i < self.ngen else "<hand>",
+                              "eval") for i, c in enumerate(self.claims)]
+        self.ev = ClaimEvaluator(facts)
+        self.pristine = []
+        for i, (c, code) in enumerate(zip(self.claims, self.codes)):
+            try:
+                v = self.ev(code)
+            except Exception as exc:     # noqa: BLE001
+                # A predicate that raises against the facts it was written for is broken,
+                # full stop. Recording None for it would make a vector undefined at every
+                # sample, vacuously implied by every generated claim — 07-22 C021's route
+                # into `covered` while proving nothing.
+                kind = "generated" if i < self.ngen else "hand"
+                raise ClaimEvaluationError(
+                    f"{kind} claim {c.get('id', '?')} raised against the unmutated facts: "
+                    f"{type(exc).__name__}: {exc}") from exc
+            self.pristine.append(bool(v))                      # G4
+        self.score_ids = frozenset(id(m["score"]) for m in facts["matches"])
+        self.fp = perturb.fingerprint(facts)
+        self._rel = {}
+        self._moves = {}
+        self.samples, self.seed = samples, seed
+
+    # -- corpora, all built from the pristine tree before anything is perturbed ----------
+    def mutants(self):
+        sites = mutation_sites(self.facts)
+        n_sites = len(sites)
+        if self.samples and self.samples < n_sites:
+            # The only draw left in the tool, and the only thing `seed` governs.
+            random.Random(self.seed).shuffle(sites)
+            sites = sites[:self.samples]
+        # Built before the sweep, not inside it: every new value is a function of the
+        # datum's CURRENT value, and inside the sweep a slot may be one an earlier mutant
+        # has restored only moments ago. Up front, every read is of the pristine tree.
+        muts, strata = [], []
+        for site in sites:
+            for w in site_mutants(self.facts, site):
+                muts.append(w)
+                strata.append(_site_stratum(site))
+        return sites, n_sites, muts, strata
+
+    def moves(self, gran):
+        """The family's moves and its log, cached for the chunks that follow — ONE family per
+        process: a round family is ~10^6 tuples, and a worker that kept every family it had
+        touched would hold the whole corpus's."""
+        if gran not in self._moves:
+            for other in _SESSIONS.values():
+                other._moves.clear()
+            self._moves.clear()
+            log = {}
+            mv = move_sites(self.facts, self.claims, gran, log)
+            self._moves[gran] = (mv, log)
+        return self._moves[gran]
+
+    def relevant(self, writes):
+        labels = readset.key_labels(writes, self.score_ids)
+        rel = self._rel.get(labels)
+        if rel is None:
+            _check_labels(labels)                                # G3
+            rel = sorted(set().union(*(self.readers.get(lb, ()) for lb in labels)))
+            rel = self._rel[labels] = tuple(rel)
+        return rel
+
+    def sweep(self, items, base, shadow, say=None, unit="mutants", total=None):
+        """Evaluate each item's relevant claims; return per-claim exception lists, and how
+        many claim evaluations ran against how many an exhaustive sweep would have run.
+
+        `items` yields `(local_index, writes)` with `writes` read off the PRISTINE tree;
+        `base + local_index` is the sample index recorded. Items in `shadow` evaluate every
+        claim, and any claim outside the index that moves is an `IndexUnsound` (G5).
+        """
+        n = len(self.claims)
+        exc = [[] for _ in range(n)]
+        ev, codes, pr = self.ev, self.codes, self.pristine
+        everything = range(n)
+        count = evaluated = 0
+        for j, writes in items:
+            idx = base + j
+            rel = self.relevant(writes)
+            full = j in shadow
+            evaluated += n if full else len(rel)
+            with perturb.perturbed(writes):
+                for i in (everything if full else rel):
+                    try:
+                        v = bool(ev(codes[i]))
+                    except Exception:            # noqa: BLE001 - a mutant may break an index
+                        v = None
+                    if v is not pr[i]:
+                        exc[i].append((idx, v))
+            if full:
+                inside = set(rel)
+                moved = [self.claims[i].get("id", "?") for i in everything
+                         if i not in inside and exc[i] and exc[i][-1][0] == idx]
+                if moved:
+                    raise readset.IndexUnsound(
+                        f"G5: claim(s) {moved} changed verdict under a mutant writing "
+                        f"{sorted(readset.key_labels(writes, self.score_ids))} although the "
+                        f"relevance index says they cannot read it — the index is unsound")
+            count += 1
+            if say and count % 2000 == 0:
+                say(f"  ... {j + 1}/{total} {unit} evaluated")
+        # The one thing deepcopy gave for free. A restore that misses a single site leaves
+        # every later mutant on a wrong baseline and still prints a plausible coverage
+        # figure, so this is checked rather than assumed — in every process, per task.
+        assert perturb.unchanged(self.facts, self.fp), \
+            f"the {unit} sweep did not restore facts — coverage below would be measured " \
+            f"against a corrupted baseline"
+        return exc, (evaluated, n * count)
+
+
+_SESSIONS = {}
+
+
+class StaleInputs(RuntimeError):
+    """A session's files no longer hash to the digest its key was planned under."""
+
+
+def _read_inputs(key):
+    """The raw bytes of every input file a session reads: facts, generated ledger (b"" when
+    it is built rather than read), then each hand ledger in order."""
+    facts_path, hand_paths, generated_path = key[:3]
+    out = []
+    for path in (facts_path, generated_path, *hand_paths):
+        if path is None:
+            out.append(b"")
+            continue
+        with open(path, "rb") as fh:
+            out.append(fh.read())
+    return out
+
+
+def _digest_of(blobs):
+    """One sha256 over every input's bytes, each length-prefixed so no two different file
+    sets can concatenate to the same stream."""
+    h = hashlib.sha256()
+    for b in blobs:
+        h.update(len(b).to_bytes(8, "little"))
+        h.update(b)
+    return h.hexdigest()
+
+
+def _session_key(facts_path, hand_paths, generated_path, samples, seed):
+    """The cache key: the paths and parameters AND a digest of the files' CONTENT.
+
+    It used to be the paths alone, so a second measurement in one process after a ledger or
+    facts.json changed on disk silently reused the first session's claims, pristine verdicts
+    and mutants — a stale answer under the current file's name. Content in the key makes a
+    changed file a different session; `equiv --selftest` rewrites a ledger between two calls
+    and requires the second to see it, and plants a path-only key to show that control fires.
+    """
+    head = (facts_path, tuple(hand_paths), generated_path, samples, seed)
+    return head + (_digest_of(_read_inputs(head)),)
+
+
+def _session(key):
+    """The process-local `_Session` for `key`, built once per process. An entry for the same
+    paths and parameters under a different digest is a superseded version and is dropped."""
+    s = _SESSIONS.get(key)
+    if s is None:
+        for old in [k for k in _SESSIONS if k[:5] == key[:5]]:
+            del _SESSIONS[old]
+        s = _SESSIONS[key] = _Session(key)
+    return s
+
+
+def _run_task(key, task, say=None):
+    """One unit of work, in whatever process runs it. Returns exceptions with GLOBAL indices
+    — sample indices for the single-value sweep, move indices for a chunk of moves."""
+    # CPU time of THIS process, not a wall interval: a summed wall interval tracks CPU only
+    # while workers are uncontended, and overstates it whenever they outnumber the cores.
+    t0 = time.process_time()
+    s = _session(key)
+    if task[0] == "single":
+        _, _, muts, strata = s.mutants()
+        shadow = _first_per_stratum(strata)
+        exc, evals = s.sweep(enumerate(muts), 1, shadow, say=say, unit="mutants",
+                             total=len(muts))
+        out = {"exc": exc, "n": len(muts)}
+    else:
+        _, gran, lo, hi = task
+        moves, _ = s.moves(gran)
+        strata = [(gran, m[1], m[5]) for m in moves]
+        shadow = _first_per_stratum(strata)
+        facts = s.facts
+        items = ((j, move_writes(facts, moves[j])) for j in range(lo, hi))
+        exc, evals = s.sweep(items, 0, shadow, say=say, unit="moves", total=len(moves))
+        out = {"exc": exc, "lo": lo, "hi": hi, "n": len(moves)}
+    out.update(evals=evals, cpu=time.process_time() - t0)
+    return out
+
+
+DEFAULT_CHUNK = 100_000
+
+
+def _plan_chunks(n, chunk):
+    """Contiguous `[lo, hi)` ranges covering `range(n)`; `chunk` 0 means one range."""
+    if n == 0:
+        return [(0, 0)]
+    if not chunk or chunk >= n:
+        return [(0, n)]
+    return [(lo, min(n, lo + chunk)) for lo in range(0, n, chunk)]
+
+
+def _merge_chunks(parts, n):
+    """The chunks of one move family, in order, after proving they tile `range(n)` exactly
+    — no gap and no overlap. A dropped chunk would otherwise read as moves whose every
+    verdict was pristine, which is a coverage figure measured over less than it says."""
+    parts = sorted(parts, key=lambda p: (p["lo"], p["hi"]))
+    at = 0
+    for p in parts:
+        assert p["n"] == n, f"a worker enumerated {p['n']} moves where the plan has {n}"
+        assert p["lo"] == at, (f"move chunks do not tile the family: expected one starting "
+                               f"at {at}, got [{p['lo']}, {p['hi']})")
+        at = p["hi"]
+    assert at == n, f"move chunks cover [0, {at}) of the family's {n} moves"
+    return parts
+
+
+def _validate_modes(two_site_modes):
+    bad = [g for g in two_site_modes if g not in GRANULARITIES]
+    if bad:
+        # `move_sites` branches on `granularity == "match"` and treats everything else as
+        # `round`, so a typo would silently return the expensive granularity under the
+        # cheap one's name. Naming it is the whole difference between a bound and a bug.
+        raise ValueError(f"unknown two-site granularity {bad}, expected {GRANULARITIES}")
+
+
+def measure_many(requests, jobs=1, chunk=DEFAULT_CHUNK, progress=None):
+    """`measure_modes` over several sessions at once, as one deterministic task pool.
+
+    `requests` is a list of dicts with `measure_modes`' arguments (facts_path, hand_paths,
+    generated_path, two_site_modes, samples, seed). Returns one `(result, meta)` per request,
+    in request order, where `result` is exactly what `measure_modes` returns and `meta`
+    carries what must NOT enter the result: progress lines, per-mode task CPU seconds
+    (`time.process_time` in the process that ran the task, summed), and per-mode
+    `(evaluated, exhaustive)` claim-evaluation counts — the relevance index's saving, printed
+    by every run (`evals_line`) rather than typed into prose.
+
+    THE DECOMPOSITION. A session is one single-value sweep plus, per two-site mode, its moves
+    cut into contiguous chunks of `chunk` moves. Every task is a pure function of the files
+    (the session key carries their content digest), so a worker that builds the session
+    itself builds the same one, and returns exceptions with global indices; the
+    parent proves each family's chunks tile it (`_merge_chunks`) and assembles the vectors in
+    a fixed order. Tasks are submitted costliest first (LPT), and nothing about the result
+    depends on which worker ran what or in what order they finished. `jobs=1` runs every task
+    in this process, in plan order.
+    """
+    say = progress or (lambda *_: None)
+    plans = []
+    for r in requests:
+        modes = tuple(r.get("two_site_modes", ()))
+        _validate_modes(modes)
+        key = _session_key(r["facts_path"], r["hand_paths"], r.get("generated_path"),
+                           r.get("samples", 0), r.get("seed", DEFAULT_SEED))
+        s = _session(key)
+        sites, n_sites, muts, _ = s.mutants()
+        nrounds = sum(len(m["rounds"]) for m in s.facts["matches"])
+        lines = []
+        if len(sites) < n_sites:
+            note = (f"{len(sites)} of {n_sites} single-value mutation sites, sampled with "
+                    f"--seed {s.seed}; {len(muts)} mutants (every kind at each sampled site)")
+        else:
+            note = (f"all {n_sites} single-value mutation sites, {len(muts)} mutants "
+                    f"(every perturbation kind at every site, exhaustive)")
+        lines.append(f"mutation corpus: {note}")
+        tasks = [(("single",), len(muts) * nrounds)]
+        fams = {}
+        for gran in modes:
+            moves, log = s.moves(gran)
+            fams[gran] = (len(moves), log)
+            tasks += [(("moves", gran, lo, hi), (hi - lo) * nrounds)
+                      for lo, hi in _plan_chunks(len(moves), chunk)]
+            # The move list is rebuilt by whichever process runs a chunk; holding fifteen
+            # sessions' worth of round moves in the parent buys nothing.
+            del s._moves[gran]
+        plans.append({"key": key, "sites": len(sites), "mutants": len(muts),
+                      "fams": fams, "modes": modes, "tasks": tasks, "lines": lines})
+
+    flat = [(pi, t, cost) for pi, p in enumerate(plans) for t, cost in p["tasks"]]
+    results = {}
+    if jobs <= 1:
+        for pi, t, _ in flat:
+            results[(pi, t)] = _run_task(plans[pi]["key"], t, say=progress)
+    else:
+        from concurrent.futures import ProcessPoolExecutor
+        order = sorted(flat, key=lambda x: -x[2])          # LPT: costliest first
+        with ProcessPoolExecutor(max_workers=jobs) as pool:
+            futs = {(pi, t): pool.submit(_run_task, plans[pi]["key"], t)
+                    for pi, t, _ in order}
+            for k, f in futs.items():
+                results[k] = f.result()
+
+    out = []
+    for pi, p in enumerate(plans):
+        s = _session(p["key"])
+        lines = p["lines"]
+        meta = {"lines": lines, "cpu": {}, "evals": {}}
+        single = results[(pi, ("single",))]
+        # No dataset-fingerprint comparison here, deliberately. One stood here comparing each
+        # task's `s.fp` with the parent's, and it could not fire: `s.fp` is taken when a session
+        # is built, and under fork (Linux's default) a worker inherits the parent's session, so
+        # it compared the parent's value with itself. What guards the dataset is (a) the content
+        # digest in the session key, checked against the bytes actually parsed when a session is
+        # built (`StaleInputs`, the check a spawned worker or an edited file meets), and (b)
+        # `perturb.unchanged` after every sweep, in the process that swept.
+        assert single["n"] == p["mutants"], \
+            "a worker swept a different single-value corpus than the plan"
+        meta["cpu"]["single_value"] = single["cpu"]
+        meta["evals"]["single_value"] = single["evals"]
+        lines.append(evals_line("single_value", single["evals"]))
+        corpus = {"sites": p["sites"], "mutants": p["mutants"], "moves": 0,
+                  "two_site_log": None}
+        n1 = 1 + p["mutants"]
+        gv, hv = _vectors(s, n1, single["exc"], None, 0)
+        res = {"single_value": _search(_codes(s, 0), _codes(s, 1), gv, hv, corpus)}
+        for gran in p["modes"]:
+            n_moves, log = p["fams"][gran]
+            for line in _move_lines(gran, n_moves, log):
+                lines.append(line)
+            parts = _merge_chunks([results[(pi, t)] for t, _ in p["tasks"]
+                                   if t[0] == "moves" and t[1] == gran], n_moves)
+            meta["cpu"][f"two_site_{gran}"] = sum(q["cpu"] for q in parts)
+            meta["evals"][f"two_site_{gran}"] = tuple(
+                sum(q["evals"][k] for q in parts) for k in (0, 1))
+            lines.append(evals_line(f"two_site_{gran}", meta["evals"][f"two_site_{gran}"]))
+            gv, hv = _vectors(s, n1 + n_moves, single["exc"], parts, _move_base(p["mutants"]))
+            res[f"two_site_{gran}"] = _search(
+                _codes(s, 0), _codes(s, 1), gv, hv,
+                {"sites": p["sites"], "mutants": p["mutants"], "moves": n_moves,
+                 "two_site_log": log})
+        for line in lines:
+            say(line)
+        out.append((res, meta))
+    return out
+
+
+def evals_line(mode, evals):
+    """The relevance index's saving for one mode, as measured by the sweep that ran: claim
+    evaluations performed (G5's full shadow evaluations included) against the claims x items
+    an exhaustive sweep performs. This line is the figure's only home."""
+    done, total = evals
+    share = f"{100 * done / total:.2f}%" if total else "n/a"
+    return (f"  {mode}: evaluated {done} of {total} claim evaluations ({share}); "
+            f"the rest are pristine by the relevance index")
+
+
+def _codes(s, hand):
+    """`(claim, code)` pairs for `_search`, generated (0) or hand (1)."""
+    pairs = list(zip(s.claims, s.codes))
+    return pairs[s.ngen:] if hand else pairs[:s.ngen]
+
+
+def _vectors(s, nbits, single_exc, parts, offset):
+    """Every claim's Vec over `nbits` samples: the single-value exceptions, then each move
+    chunk's, offset past the single-value corpus. Nothing is copied between modes — each
+    mode's vectors are built fresh from the shared exception lists."""
+    vecs = []
+    for i, p in enumerate(s.pristine):
+        excs = single_exc[i]
+        if parts:
+            excs = excs + [(offset + j, v) for q in parts for j, v in q["exc"][i]]
+        vecs.append(Vec.from_sparse(nbits, p, excs))
+    return vecs[:s.ngen], vecs[s.ngen:]
+
+
+def _move_lines(gran, n_moves, log):
+    out = [f"two-site corpus: {n_moves} value-preserving moves ({gran} granularity)",
+           # Everything the bound threw away, named. A cap nobody can see is worse than a
+           # smaller one everybody can.
+           f"  fields never read by any predicate, so not moved: "
+           f"{log['dropped_fields'] or 'none'}",
+           f"  moves skipped because the source was too small to split (<2): "
+           f"{log['zero_source']}",
+           f"  round/field slots absent from the data: {log['absent_field']}",
+           "  not enumerated by the bound: moves between two rounds of the SAME "
+           "match (no window and no total can see one), between different fields, "
+           "and between the two players"]
+    if gran == "match":
+        out.append("  not enumerated at this granularity: moves out of any round but the "
+                   "source match's largest, or into any but the target match's smallest "
+                   "— so a claim that turns on WHICH round is touched is out of scope")
+    return out
+
+
 def measure_modes(facts_path, hand_paths, generated_path=None, two_site_modes=(),
-                  samples=0, seed=DEFAULT_SEED, progress=None):
+                  samples=0, seed=DEFAULT_SEED, progress=None, jobs=1, chunk=DEFAULT_CHUNK):
     """Measure several granularities from ONE single-value sweep.
 
     Returns ``{'single_value': {...}, 'two_site_match': {...}, 'two_site_round': {...}}``
     with only the requested modes present besides `single_value`. Each value has the same
     shape `measure` returns, and `measure` is one call to this with one mode, so there is
-    a single implementation and the two cannot drift.
+    a single implementation and the two cannot drift. `jobs` and `chunk` change how the
+    work is scheduled (`measure_many`), never what it returns.
 
     WHY THE SWEEP CAN BE SHARED
     ---------------------------
@@ -545,153 +1088,23 @@ def measure_modes(facts_path, hand_paths, generated_path=None, two_site_modes=()
     WHAT THAT RISKS, AND THE SHAPE OF THE GUARD
     -------------------------------------------
     Truth vectors are accumulating state, which is exactly the kind of thing that leaks
-    between phases: append a family's verdicts to the shared lists rather than to a copy
-    and the *next* mode is measured over both families, silently reporting a `round`
-    number under a `match` label. So each mode gets its own `list(v)` copies and the
-    shared vectors are never appended to after the sweep.
+    between phases. They used to be per-claim lists, appended to, so each mode took
+    `list(v)` copies; now each mode's vectors are built fresh by `_vectors` from the shared
+    single-value EXCEPTIONS plus that mode's own move exceptions, and nothing is appended
+    to anything shared. The guard is unchanged: `_search` asserts each vector's `nbits` is
+    one pristine sample plus the mutants plus this mode's moves, so a vector built over
+    another mode's corpus dies there — the results alone could not show it (on 2026-08-09
+    an aliased corpus changed no verdict in any mode).
 
-    Two things check that, and the weaker one is the one that looks convincing.
-    `measure_modes(..., ('match', 'round'))` returns per-mode results byte-identical to
-    three separate `measure()` calls on 2026-08-09 and 2026-07-24 — which says the sharing
-    is behaviour-preserving, but does NOT gate the copy: replacing it with an alias leaves
-    all three modes' results unchanged on 2026-08-09, because the leaked corpus is a
-    superset and no implication happens to break on the extra moves. `_search`'s length
-    assert is what actually kills that mutant. A guard whose only evidence is an
-    equivalence that survives its removal is decorative.
-
-    `facts` itself is shared too, and `perturb.unchanged` is asserted after the sweep and
-    after each family, so a mode never starts from a tree a previous mode left dirty.
+    `facts` itself is shared too, and `perturb.unchanged` is asserted after every sweep in
+    every process, so a mode never starts from a tree a previous one left dirty.
     """
-    say = progress or (lambda *_: None)
-    bad = [g for g in two_site_modes if g not in GRANULARITIES]
-    if bad:
-        # `move_sites` branches on `granularity == "match"` and treats everything else as
-        # `round`, so a typo would silently return the expensive granularity under the
-        # cheap one's name. Naming it is the whole difference between a bound and a bug.
-        raise ValueError(f"unknown two-site granularity {bad}, expected {GRANULARITIES}")
-
-    with open(facts_path, encoding="utf-8") as fh:
-        facts = json.load(fh)
-
-    if generated_path:
-        with open(generated_path, encoding="utf-8") as fh:
-            gen = json.load(fh)
-    else:
-        from .build_claims import generate, render
-        gen = render(generate(facts))
-
-    hand = []
-    for path in hand_paths:
-        with open(path, encoding="utf-8") as fh:
-            hand.extend(json.load(fh))
-
-    sites = mutation_sites(facts)
-    n_sites = len(sites)
-    if samples and samples < n_sites:
-        # The only draw left in the tool, and the only thing `seed` governs.
-        random.Random(seed).shuffle(sites)
-        sites = sites[:samples]
-    # Built before the sweep, not inside it: every new value is a function of the datum's
-    # CURRENT value, and inside the sweep a slot may be one an earlier mutant has restored
-    # only moments ago. Up front, every read is of the pristine tree.
-    mutants = [w for site in sites for w in site_mutants(facts, site)]
-    if len(sites) < n_sites:
-        note = (f"{len(sites)} of {n_sites} single-value mutation sites, sampled with "
-                f"--seed {seed}; {len(mutants)} mutants (every kind at each sampled site)")
-    else:
-        note = (f"all {n_sites} single-value mutation sites, {len(mutants)} mutants "
-                f"(every perturbation kind at every site, exhaustive)")
-    say(f"mutation corpus: {note}")
-
-    gen_codes = [(c, compile(c["python_check"], "<gen>", "eval")) for c in gen]
-    hand_codes = [(h, compile(h["python_check"], "<hand>", "eval")) for h in hand]
-
-    # Mutate `facts` in place, evaluate every claim, undo. Nothing is copied and nothing
-    # is held: the mutant exists only for the duration of the `with` block.
-    gvecs = [[] for _ in gen_codes]
-    hvecs = [[] for _ in hand_codes]
-
-    ev = ClaimEvaluator(facts)
-
-    def _append(codes, vecs, kind, unmutated):
-        for i, (claim, code) in enumerate(codes):
-            try:
-                vecs[i].append(bool(ev(code)))
-            except Exception as exc:     # noqa: BLE001 - mutation broke an index
-                # A mutant may legitimately raise: moving a datum can put an index out
-                # of range, and `None` is the honest answer there. The UNMUTATED dataset
-                # cannot — a predicate that raises against the facts it was written for
-                # is broken, full stop. Recording None for it is silent in the worst
-                # way: a truth vector that is undefined at every sample is vacuously
-                # implied by every generated claim, so the hand claim lands in `covered`
-                # while proving nothing, and the published coverage percentage comes out
-                # right for the wrong reason. That is what 07-22 C021 did — a `facts`
-                # reference inside a lambda body, invisible to the old strict eval's
-                # locals — and nothing said so until someone read the truth vectors.
-                if unmutated:
-                    raise ClaimEvaluationError(
-                        f"{kind} claim {claim.get('id', '?')} raised against the "
-                        f"unmutated facts: {type(exc).__name__}: {exc}") from exc
-                vecs[i].append(None)
-
-    def evaluate(dataset, gv, hv, unmutated=False):
-        assert dataset is facts, "the sweep perturbs `facts` in place; there is one tree"
-        _append(gen_codes, gv, "generated", unmutated)
-        _append(hand_codes, hv, "hand", unmutated)
-
-    evaluate(facts, gvecs, hvecs, unmutated=True)
-    pristine = perturb.fingerprint(facts)
-    for n, writes in enumerate(mutants, 1):
-        with perturb.perturbed(writes):
-            evaluate(facts, gvecs, hvecs)
-        if n % 2000 == 0:
-            say(f"  ... {n}/{len(mutants)} mutants evaluated")
-    # The one thing deepcopy gave for free. A restore that misses a single site leaves
-    # every later mutant on a wrong baseline and still prints a plausible coverage
-    # figure, so this is checked rather than assumed.
-    assert perturb.unchanged(facts, pristine), \
-        "the mutation sweep did not restore facts — coverage below would be measured " \
-        "against a corrupted baseline"
-
-    out = {"single_value": _search(gen_codes, hand_codes, gvecs, hvecs,
-                                   {"sites": len(sites), "mutants": len(mutants),
-                                    "moves": 0, "two_site_log": None})}
-
-    for gran in two_site_modes:
-        log = {}
-        moves = move_sites(facts, gen + hand, gran, log)
-        say(f"two-site corpus: {len(moves)} value-preserving moves "
-            f"({gran} granularity)")
-        # Everything the bound threw away, named. A cap nobody can see is worse than a
-        # smaller one everybody can.
-        say(f"  fields never read by any predicate, so not moved: "
-            f"{log['dropped_fields'] or 'none'}")
-        say(f"  moves skipped because the source was too small to split (<2): "
-            f"{log['zero_source']}")
-        say(f"  round/field slots absent from the data: {log['absent_field']}")
-        say("  not enumerated by the bound: moves between two rounds of the SAME "
-            "match (no window and no total can see one), between different fields, "
-            "and between the two players")
-        if gran == "match":
-            say("  not enumerated at this granularity: moves out of any round but the "
-                "source match's largest, or into any but the target match's smallest "
-                "— so a claim that turns on WHICH round is touched is out of scope")
-        # Copies, not the shared lists: see the module note above on what leaks otherwise.
-        gv = [list(v) for v in gvecs]
-        hv = [list(v) for v in hvecs]
-        for n, site in enumerate(moves, 1):
-            with perturb.perturbed(move_writes(facts, site)):
-                evaluate(facts, gv, hv)
-            if n % 2000 == 0:
-                say(f"  ... {n}/{len(moves)} moves evaluated")
-        assert perturb.unchanged(facts, pristine), \
-            "the two-site sweep did not restore facts — coverage below would be " \
-            "measured against a corrupted baseline"
-        out[f"two_site_{gran}"] = _search(gen_codes, hand_codes, gv, hv,
-                                          {"sites": len(sites), "mutants": len(mutants),
-                                           "moves": len(moves), "two_site_log": log})
-
-    return out
+    ((res, _),) = measure_many(
+        [{"facts_path": facts_path, "hand_paths": hand_paths,
+          "generated_path": generated_path, "two_site_modes": tuple(two_site_modes),
+          "samples": samples, "seed": seed}],
+        jobs=jobs, chunk=chunk, progress=progress)
+    return res
 
 
 def measure(facts_path, hand_paths, generated_path=None, two_site=None,
@@ -735,8 +1148,8 @@ def measure(facts_path, hand_paths, generated_path=None, two_site=None,
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("facts")
-    ap.add_argument("--hand", nargs="+", required=True, help="hand-written ledgers")
+    ap.add_argument("facts", nargs="?")
+    ap.add_argument("--hand", nargs="+", help="hand-written ledgers")
     ap.add_argument("--generated", help="generated ledger (default: build it now)")
     ap.add_argument("--samples", type=int, default=0,
                     help="subsample the mutation SITES (0 = every site, the default). "
@@ -751,11 +1164,29 @@ def main(argv=None):
                          "cross-match round pair. Neither is capped or sampled.")
     ap.add_argument("--min-coverage", type=float, default=0.0,
                     help="exit non-zero if coverage falls below this fraction")
+    ap.add_argument("--jobs", type=int, default=None,
+                    help="worker processes (default: 1 for a measurement, every CPU for "
+                         "--selftest). Changes the schedule, never the result")
+    ap.add_argument("--selftest", action="store_true",
+                    help="check the relevance-indexed sweep against the frozen exhaustive "
+                         "oracle (equiv_reference.py) and require every planted defect to be "
+                         "caught, then exit")
+    ap.add_argument("--selftest-round", action="store_true", dest="selftest_round",
+                    help="with --selftest, also compare one session's two_site_round tier")
     args = ap.parse_args(argv)
 
-    res = measure(args.facts, args.hand, generated_path=args.generated,
-                  two_site=args.two_site, samples=args.samples, seed=args.seed,
-                  progress=print)
+    if args.selftest:
+        from .equiv_selftest import run
+        return run(round_tier=args.selftest_round, jobs=args.jobs)
+    if not args.facts or not args.hand:
+        ap.error("facts and --hand are required unless --selftest is given")
+
+    two_site = None if args.two_site in ("off", "") else args.two_site
+    res = measure_modes(args.facts, args.hand, generated_path=args.generated,
+                        two_site_modes=(two_site,) if two_site else (),
+                        samples=args.samples, seed=args.seed, progress=print,
+                        jobs=args.jobs or 1)
+    res = res[f"two_site_{two_site}"] if two_site else res["single_value"]
 
     if res["trivial_generated"]:
         print("WARNING: generated claims never falsified by any mutation: "

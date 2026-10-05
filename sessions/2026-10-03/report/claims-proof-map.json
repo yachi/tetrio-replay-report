@@ -1,14 +1,14 @@
 [
  {
   "id": "G001",
-  "lemma": "G001_pinglamb_won_the_series_3_2",
+  "lemma": "G001_pinglamb_won_the_series_14_6",
   "file": "Claims.dfy",
   "family": "series_result",
   "status": "verified"
  },
  {
   "id": "G002",
-  "lemma": "G002_36_rounds_total_yachi_won_19_pinglamb_won_17",
+  "lemma": "G002_146_rounds_total_pinglamb_won_82_yachi_won_64",
   "file": "Claims.dfy",
   "family": "round_totals",
   "status": "verified"
@@ -22,567 +22,721 @@
  },
  {
   "id": "G004",
-  "lemma": "G004_match_1_yachi_won_5_1",
+  "lemma": "G004_match_1_pinglamb_won_5_1",
   "file": "Claims.dfy",
   "family": "per_match_score",
   "status": "verified"
  },
  {
   "id": "G005",
-  "lemma": "G005_match_2_pinglamb_won_5_3",
+  "lemma": "G005_match_2_pinglamb_won_5_4",
   "file": "Claims.dfy",
   "family": "per_match_score",
   "status": "verified"
  },
  {
   "id": "G006",
-  "lemma": "G006_match_3_yachi_won_5_1",
+  "lemma": "G006_match_3_yachi_won_5_3",
   "file": "Claims.dfy",
   "family": "per_match_score",
   "status": "verified"
  },
  {
   "id": "G007",
-  "lemma": "G007_match_4_pinglamb_won_5_3",
+  "lemma": "G007_match_4_yachi_won_5_4",
   "file": "Claims.dfy",
   "family": "per_match_score",
   "status": "verified"
  },
  {
   "id": "G008",
-  "lemma": "G008_match_5_pinglamb_won_5_3",
+  "lemma": "G008_match_5_pinglamb_won_5_1",
   "file": "Claims.dfy",
   "family": "per_match_score",
   "status": "verified"
  },
  {
   "id": "G009",
-  "lemma": "G009_pinglamb_s_longest_run_is_7_consecutive_rounds_spanning_matches_4_5",
+  "lemma": "G009_match_6_pinglamb_won_5_4",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G010",
+  "lemma": "G010_match_7_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G011",
+  "lemma": "G011_match_8_yachi_won_5_0",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G012",
+  "lemma": "G012_match_9_pinglamb_won_5_1",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G013",
+  "lemma": "G013_match_10_pinglamb_won_5_4",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G014",
+  "lemma": "G014_match_11_pinglamb_won_5_2",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G015",
+  "lemma": "G015_match_12_yachi_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G016",
+  "lemma": "G016_match_13_pinglamb_won_5_0",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G017",
+  "lemma": "G017_match_14_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G018",
+  "lemma": "G018_match_15_pinglamb_won_5_2",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G019",
+  "lemma": "G019_match_16_yachi_won_5_1",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G020",
+  "lemma": "G020_match_17_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G021",
+  "lemma": "G021_match_18_yachi_won_5_1",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G022",
+  "lemma": "G022_match_19_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G023",
+  "lemma": "G023_match_20_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "per_match_score",
+  "status": "verified"
+ },
+ {
+  "id": "G024",
+  "lemma": "G024_2_sweeps_shared_between_both_players",
+  "file": "Claims.dfy",
+  "family": "sweeps",
+  "status": "verified"
+ },
+ {
+  "id": "G025",
+  "lemma": "G025_4_match_es_went_to_a_deciding_final_round",
+  "file": "Claims.dfy",
+  "family": "deciders",
+  "status": "verified"
+ },
+ {
+  "id": "G026",
+  "lemma": "G026_pinglamb_s_longest_run_is_7_consecutive_rounds_spanning_matches_19_20",
   "file": "Claims.dfy",
   "family": "longest_streak",
   "status": "verified"
  },
  {
-  "id": "G010",
-  "lemma": "G010_session_max_apm_x1000_among_the_18_rounds_lasting_60s_or_more_is_75806",
+  "id": "G027",
+  "lemma": "G027_session_max_apm_x1000_among_the_70_rounds_lasting_60s_or_more_is_75806",
   "file": "Claims.dfy",
   "family": "round_max_apm_x1000",
   "status": "verified"
  },
  {
-  "id": "G011",
-  "lemma": "G011_session_max_vs_x1000_among_the_18_rounds_lasting_60s_or_more_is_165826",
+  "id": "G028",
+  "lemma": "G028_session_max_vs_x1000_among_the_70_rounds_lasting_60s_or_more_is_165826",
   "file": "Claims.dfy",
   "family": "round_max_vs_x1000",
   "status": "verified"
  },
  {
-  "id": "G012",
-  "lemma": "G012_session_max_maxspike_is_16_by_pinglamb_at_m3r3",
+  "id": "G029",
+  "lemma": "G029_session_max_maxspike_is_17_by_yachi_at_m3r6",
   "file": "Claims.dfy",
   "family": "round_max_maxspike",
   "status": "verified"
  },
  {
-  "id": "G013",
-  "lemma": "G013_session_max_topcombo_is_8_by_yachi_at_m2r3",
+  "id": "G030",
+  "lemma": "G030_session_max_topcombo_is_9_by_pinglamb_at_m11r6",
   "file": "Claims.dfy",
   "family": "round_max_topcombo",
   "status": "verified"
  },
  {
-  "id": "G014",
-  "lemma": "G014_session_max_topbtb_is_7_by_yachi_at_m1r5",
+  "id": "G031",
+  "lemma": "G031_session_max_topbtb_is_10_by_pinglamb_at_m2r9",
   "file": "Claims.dfy",
   "family": "round_max_topbtb",
   "status": "verified"
  },
  {
-  "id": "G015",
-  "lemma": "G015_session_max_tspins_is_23_by_pinglamb_at_m5r2",
+  "id": "G032",
+  "lemma": "G032_session_max_tspins_is_23_by_pinglamb_at_m20r2",
   "file": "Claims.dfy",
   "family": "round_max_tspins",
   "status": "verified"
  },
  {
-  "id": "G016",
-  "lemma": "G016_session_max_lines_is_219_by_yachi_at_m5r2",
+  "id": "G033",
+  "lemma": "G033_session_max_lines_is_219_by_yachi_at_m20r2",
   "file": "Claims.dfy",
   "family": "round_max_lines",
   "status": "verified"
  },
  {
-  "id": "G017",
-  "lemma": "G017_longest_round_is_m5r2_at_243256_ms_won_by_pinglamb",
+  "id": "G034",
+  "lemma": "G034_longest_round_is_m20r2_at_243256_ms_won_by_pinglamb",
   "file": "Claims.dfy",
   "family": "round_duration_max",
   "status": "verified"
  },
  {
-  "id": "G018",
-  "lemma": "G018_shortest_round_is_m1r2_at_15398_ms_won_by_pinglamb",
+  "id": "G035",
+  "lemma": "G035_shortest_round_is_m12r8_at_9368_ms_won_by_yachi",
   "file": "Claims.dfy",
   "family": "round_duration_min",
   "status": "verified"
  },
  {
-  "id": "G019",
-  "lemma": "G019_highest_match_level_apm_is_59_5_by_yachi_in_m3",
+  "id": "G036",
+  "lemma": "G036_highest_match_level_apm_is_59_5_by_yachi_in_m18",
   "file": "Claims.dfy",
   "family": "match_apm_max",
   "status": "verified"
  },
  {
-  "id": "G020",
-  "lemma": "G020_in_all_36_rounds_the_winner_had_the_higher_vs",
+  "id": "G037",
+  "lemma": "G037_in_all_146_rounds_the_winner_had_the_higher_vs",
   "file": "Claims.dfy",
   "family": "vs_decides",
   "status": "verified"
  },
  {
-  "id": "G021",
-  "lemma": "G021_biggest_comeback_m1r6_winner_faced_156_queued_attack_vs_loser_s_131",
+  "id": "G038",
+  "lemma": "G038_biggest_comeback_m16r6_winner_faced_156_queued_attack_vs_loser_s_131",
   "file": "Claims.dfy",
   "family": "biggest_comeback",
   "status": "verified"
  },
  {
-  "id": "G022",
-  "lemma": "G022_yachi_1834_lines_of_attack_queued_1631_materialised_203_cancelled",
+  "id": "G039",
+  "lemma": "G039_yachi_7055_lines_of_attack_queued_6169_materialised_886_cancelled",
   "file": "Claims.dfy",
   "family": "cancellation",
   "status": "verified"
  },
  {
-  "id": "G023",
-  "lemma": "G023_pinglamb_1754_lines_of_attack_queued_1569_materialised_185_cancelled",
+  "id": "G040",
+  "lemma": "G040_pinglamb_6561_lines_of_attack_queued_5663_materialised_898_cancelled",
   "file": "Claims.dfy",
   "family": "cancellation",
   "status": "verified"
  },
  {
-  "id": "G024",
-  "lemma": "G024_total_pieces_yachi_3800_pinglamb_3578",
+  "id": "G041",
+  "lemma": "G041_total_pieces_yachi_14098_pinglamb_13770",
   "file": "Claims.dfy",
   "family": "total_pieces",
   "status": "verified"
  },
  {
-  "id": "G025",
-  "lemma": "G025_total_garbage_attack_pinglamb_2254_yachi_2240",
+  "id": "G042",
+  "lemma": "G042_total_garbage_attack_pinglamb_8709_yachi_8314",
   "file": "Claims.dfy",
   "family": "total_garbage_attack",
   "status": "verified"
  },
  {
-  "id": "G026",
-  "lemma": "G026_total_garbage_cleared_yachi_777_pinglamb_752",
+  "id": "G043",
+  "lemma": "G043_total_garbage_cleared_yachi_2747_pinglamb_2704",
   "file": "Claims.dfy",
   "family": "total_garbage_cleared",
   "status": "verified"
  },
  {
-  "id": "G027",
-  "lemma": "G027_total_finesse_faults_pinglamb_629_yachi_566",
+  "id": "G044",
+  "lemma": "G044_total_finesse_faults_pinglamb_2189_yachi_2107",
   "file": "Claims.dfy",
   "family": "total_finesse_faults",
   "status": "verified"
  },
  {
-  "id": "G028",
-  "lemma": "G028_total_holds_yachi_1557_pinglamb_1354",
+  "id": "G045",
+  "lemma": "G045_total_holds_yachi_5730_pinglamb_5196",
   "file": "Claims.dfy",
   "family": "total_holds",
   "status": "verified"
  },
  {
-  "id": "G029",
-  "lemma": "G029_total_tspins_pinglamb_224_yachi_216",
+  "id": "G046",
+  "lemma": "G046_total_tspins_pinglamb_902_yachi_858",
   "file": "Claims.dfy",
   "family": "total_tspins",
   "status": "verified"
  },
  {
-  "id": "G030",
-  "lemma": "G030_total_quads_yachi_174_pinglamb_158",
+  "id": "G047",
+  "lemma": "G047_total_quads_yachi_622_pinglamb_591",
   "file": "Claims.dfy",
   "family": "clears_quads",
   "status": "verified"
  },
  {
-  "id": "G031",
-  "lemma": "G031_total_tspin_doubles_yachi_159_pinglamb_152",
+  "id": "G048",
+  "lemma": "G048_total_tspin_doubles_pinglamb_608_yachi_605",
   "file": "Claims.dfy",
   "family": "clears_tspin_doubles",
   "status": "verified"
  },
  {
-  "id": "G032",
-  "lemma": "G032_total_tspin_triples_pinglamb_39_yachi_18",
+  "id": "G049",
+  "lemma": "G049_total_tspin_triples_pinglamb_153_yachi_86",
   "file": "Claims.dfy",
   "family": "clears_tspin_triples",
   "status": "verified"
  },
  {
-  "id": "G033",
-  "lemma": "G033_total_allclear_pinglamb_5_yachi_2",
+  "id": "G050",
+  "lemma": "G050_total_allclear_pinglamb_24_yachi_14",
   "file": "Claims.dfy",
   "family": "clears_allclear",
   "status": "verified"
  },
  {
-  "id": "G034",
-  "lemma": "G034_kills_yachi_19_pinglamb_17_equal_to_round_wins_by_construction_in_1v1",
+  "id": "G051",
+  "lemma": "G051_kills_pinglamb_82_yachi_64_equal_to_round_wins_by_construction_in_1v1",
   "file": "Claims.dfy",
   "family": "kills",
   "status": "verified"
  },
  {
-  "id": "G035",
-  "lemma": "G035_per_round_mean_pps_yachi_1_476_pinglamb_1_395",
+  "id": "G052",
+  "lemma": "G052_per_round_mean_pps_yachi_1_422_pinglamb_1_410",
   "file": "Claims.dfy",
   "family": "avg_pps_x1000",
   "status": "verified"
  },
  {
-  "id": "G036",
-  "lemma": "G036_per_round_mean_apm_pinglamb_53_184_yachi_52_112",
+  "id": "G053",
+  "lemma": "G053_per_round_mean_apm_pinglamb_54_471_yachi_49_225",
   "file": "Claims.dfy",
   "family": "avg_apm_x1000",
   "status": "verified"
  },
  {
-  "id": "G037",
-  "lemma": "G037_garbage_attack_per_piece_pinglamb_yachi",
+  "id": "G054",
+  "lemma": "G054_garbage_attack_per_piece_pinglamb_yachi",
   "file": "Claims.dfy",
   "family": "per_piece_garbage_attack",
   "status": "verified"
  },
  {
-  "id": "G038",
-  "lemma": "G038_finesse_faults_per_piece_pinglamb_yachi",
+  "id": "G055",
+  "lemma": "G055_finesse_faults_per_piece_pinglamb_yachi",
   "file": "Claims.dfy",
   "family": "per_piece_finesse_faults",
   "status": "verified"
  },
  {
-  "id": "G039",
-  "lemma": "G039_finesse_perfect_per_piece_yachi_pinglamb",
+  "id": "G056",
+  "lemma": "G056_finesse_perfect_per_piece_yachi_pinglamb",
   "file": "Claims.dfy",
   "family": "per_piece_finesse_perfect",
   "status": "verified"
  },
  {
-  "id": "G040",
-  "lemma": "G040_per_round_pps_variance_pinglamb_yachi",
+  "id": "G057",
+  "lemma": "G057_per_round_pps_variance_pinglamb_yachi",
   "file": "Claims.dfy",
   "family": "consistency_pps_x1000",
   "status": "verified"
  },
  {
-  "id": "G041",
-  "lemma": "G041_per_round_apm_variance_pinglamb_yachi",
+  "id": "G058",
+  "lemma": "G058_per_round_apm_variance_pinglamb_yachi",
   "file": "Claims.dfy",
   "family": "consistency_apm_x1000",
   "status": "verified"
  },
  {
-  "id": "G042",
-  "lemma": "G042_rounds_under_40s_pinglamb_won_6_yachi_won_4_of_10",
+  "id": "G059",
+  "lemma": "G059_rounds_under_40s_pinglamb_won_26_yachi_won_18_of_44",
   "file": "Claims.dfy",
   "family": "fast_round_record",
   "status": "verified"
  },
  {
-  "id": "G043",
-  "lemma": "G043_yachi_in_rounds_with_apm_65_6_6",
+  "id": "G060",
+  "lemma": "G060_yachi_in_rounds_with_apm_65_20_22",
   "file": "Claims.dfy",
   "family": "high_apm_record",
   "status": "verified"
  },
  {
-  "id": "G044",
-  "lemma": "G044_pinglamb_in_rounds_with_apm_65_6_7",
+  "id": "G061",
+  "lemma": "G061_pinglamb_in_rounds_with_apm_65_29_30",
   "file": "Claims.dfy",
   "family": "high_apm_record",
   "status": "verified"
  },
  {
-  "id": "G045",
-  "lemma": "G045_yachi_bounce_back_after_a_lost_round_6_14",
+  "id": "G062",
+  "lemma": "G062_yachi_bounce_back_after_a_lost_round_28_68",
   "file": "Claims.dfy",
   "family": "bounce_back",
   "status": "verified"
  },
  {
-  "id": "G046",
-  "lemma": "G046_pinglamb_bounce_back_after_a_lost_round_7_17",
+  "id": "G063",
+  "lemma": "G063_pinglamb_bounce_back_after_a_lost_round_31_58",
   "file": "Claims.dfy",
   "family": "bounce_back",
   "status": "verified"
  },
  {
-  "id": "G047",
-  "lemma": "G047_yachi_s_match_level_pps_exceeded_pinglamb_s_in_all_5_matches",
-  "file": "Claims.dfy",
-  "family": "match_dominance_pps_x1000",
-  "status": "verified"
- },
- {
-  "id": "G048",
-  "lemma": "G048_best_single_round_maxspike_pinglamb_16_vs_yachi_15",
+  "id": "G064",
+  "lemma": "G064_best_single_round_maxspike_yachi_17_vs_pinglamb_16",
   "file": "Claims.dfy",
   "family": "player_ceiling_maxspike",
   "status": "verified"
  },
  {
-  "id": "G049",
-  "lemma": "G049_best_single_round_topbtb_yachi_7_vs_pinglamb_6",
+  "id": "G065",
+  "lemma": "G065_best_single_round_topbtb_pinglamb_10_vs_yachi_8",
   "file": "Claims.dfy",
   "family": "player_ceiling_topbtb",
   "status": "verified"
  },
  {
-  "id": "G050",
-  "lemma": "G050_best_single_round_topcombo_yachi_8_vs_pinglamb_6",
+  "id": "G066",
+  "lemma": "G066_best_single_round_topcombo_pinglamb_9_vs_yachi_8",
   "file": "Claims.dfy",
   "family": "player_ceiling_topcombo",
   "status": "verified"
  },
  {
-  "id": "G051",
-  "lemma": "G051_rounds_with_a_spike_of_12_pinglamb_14_yachi_8",
+  "id": "G067",
+  "lemma": "G067_rounds_with_a_spike_of_12_pinglamb_45_yachi_32",
   "file": "Claims.dfy",
   "family": "spike_frequency",
   "status": "verified"
  },
  {
-  "id": "G052",
-  "lemma": "G052_t_spin_doubles_triples_pinglamb_191_yachi_177_line_clearing_t_spins_on",
+  "id": "G068",
+  "lemma": "G068_t_spin_doubles_triples_pinglamb_761_yachi_691_line_clearing_t_spins_on",
   "file": "Claims.dfy",
   "family": "tspin_lines",
   "status": "verified"
  },
  {
-  "id": "G053",
-  "lemma": "G053_all_match_scores_in_order_yachi_pinglamb_5_1_3_5_5_1_3_5_3_5",
+  "id": "G069",
+  "lemma": "G069_m8_shutout_pinglamb_won_no_rounds_yachi_led_match_apm_by_at_least_7",
+  "file": "Claims.dfy",
+  "family": "sweep_shutout",
+  "status": "verified"
+ },
+ {
+  "id": "G070",
+  "lemma": "G070_m13_shutout_yachi_won_no_rounds_pinglamb_led_match_apm_by_at_least_5",
+  "file": "Claims.dfy",
+  "family": "sweep_shutout",
+  "status": "verified"
+ },
+ {
+  "id": "G071",
+  "lemma": "G071_all_match_scores_in_order_yachi_pinglamb_1_5_4_5_5_3_5_4_1_5_4_5_3_5_5",
   "file": "Claims.dfy",
   "family": "score_table",
   "status": "verified"
  },
  {
-  "id": "G054",
-  "lemma": "G054_4_rounds_won_while_receiving_more_real_garbage_yachi_2_pinglamb_2",
+  "id": "G072",
+  "lemma": "G072_16_rounds_won_while_receiving_more_real_garbage_pinglamb_9_yachi_7",
   "file": "Claims.dfy",
   "family": "comeback_rounds",
   "status": "verified"
  },
  {
-  "id": "G055",
-  "lemma": "G055_cleanest_win_m5r1_pinglamb_conceded_only_0_lines_of_garbage_session_mi",
+  "id": "G073",
+  "lemma": "G073_cleanest_win_m1r6_pinglamb_conceded_only_0_lines_of_garbage_session_mi",
   "file": "Claims.dfy",
   "family": "cleanest_win",
   "status": "verified"
  },
  {
-  "id": "G056",
-  "lemma": "G056_highest_combined_vs_among_rounds_of_60s_or_more_is_m2r2_at_304_5_won_b",
+  "id": "G074",
+  "lemma": "G074_m2_deciding_round_pinglamb_vs_148_2_apm_69_2_vs_yachi_vs_137_3_apm_58",
+  "file": "Claims.dfy",
+  "family": "decider_final_round",
+  "status": "verified"
+ },
+ {
+  "id": "G075",
+  "lemma": "G075_m4_deciding_round_yachi_vs_106_9_apm_48_4_vs_pinglamb_vs_74_7_apm_30_3",
+  "file": "Claims.dfy",
+  "family": "decider_final_round",
+  "status": "verified"
+ },
+ {
+  "id": "G076",
+  "lemma": "G076_m6_deciding_round_pinglamb_vs_182_0_apm_109_2_vs_yachi_vs_35_5_apm_21",
+  "file": "Claims.dfy",
+  "family": "decider_final_round",
+  "status": "verified"
+ },
+ {
+  "id": "G077",
+  "lemma": "G077_m10_deciding_round_pinglamb_vs_156_8_apm_77_8_vs_yachi_vs_114_5_apm_56",
+  "file": "Claims.dfy",
+  "family": "decider_final_round",
+  "status": "verified"
+ },
+ {
+  "id": "G078",
+  "lemma": "G078_highest_combined_vs_among_rounds_of_60s_or_more_is_m17r2_at_304_5_won",
   "file": "Claims.dfy",
   "family": "most_intense_round",
   "status": "verified"
  },
  {
-  "id": "G057",
-  "lemma": "G057_keys_per_piece_yachi_lower_than_pinglamb",
+  "id": "G079",
+  "lemma": "G079_keys_per_piece_pinglamb_lower_than_yachi",
   "file": "Claims.dfy",
   "family": "keys_per_piece",
   "status": "verified"
  },
  {
-  "id": "G058",
-  "lemma": "G058_how_rounds_ended_garbagesmash_32_topout_4",
+  "id": "G080",
+  "lemma": "G080_how_rounds_ended_garbagesmash_119_topout_27",
   "file": "Claims.dfy",
   "family": "death_reasons",
   "status": "verified"
  },
  {
-  "id": "G059",
-  "lemma": "G059_total_in_game_score_pinglamb_730778_yachi_729795",
+  "id": "G081",
+  "lemma": "G081_total_in_game_score_pinglamb_2846606_yachi_2745136",
   "file": "Claims.dfy",
   "family": "score_totals",
   "status": "verified"
  },
  {
-  "id": "G060",
-  "lemma": "G060_yachi_sent_1766_lines_18_of_them_from_multipliers_1748_before_multipli",
+  "id": "G082",
+  "lemma": "G082_yachi_sent_6591_lines_50_of_them_from_multipliers_6541_before_multipli",
   "file": "Claims.dfy",
   "family": "multiplier_bonus",
   "status": "verified"
  },
  {
-  "id": "G061",
-  "lemma": "G061_pinglamb_sent_1834_lines_27_of_them_from_multipliers_1807_before_multi",
+  "id": "G083",
+  "lemma": "G083_pinglamb_sent_7056_lines_62_of_them_from_multipliers_6994_before_multi",
   "file": "Claims.dfy",
   "family": "multiplier_bonus",
   "status": "verified"
  },
  {
-  "id": "G062",
-  "lemma": "G062_yachi_s_attack_per_piece_0_653_in_rounds_won_vs_0_515_in_rounds_lost",
+  "id": "G084",
+  "lemma": "G084_yachi_s_attack_per_piece_0_652_in_rounds_won_vs_0_537_in_rounds_lost",
   "file": "Claims.dfy",
   "family": "rate_split_garbage_attack",
   "status": "verified"
  },
  {
-  "id": "G063",
-  "lemma": "G063_pinglamb_s_attack_per_piece_0_686_in_rounds_won_vs_0_578_in_rounds_los",
+  "id": "G085",
+  "lemma": "G085_pinglamb_s_attack_per_piece_0_683_in_rounds_won_vs_0_568_in_rounds_los",
   "file": "Claims.dfy",
   "family": "rate_split_garbage_attack",
   "status": "verified"
  },
  {
-  "id": "G064",
-  "lemma": "G064_yachi_s_keypresses_per_piece_barely_differs_between_rounds_won_and_los",
+  "id": "G086",
+  "lemma": "G086_yachi_s_keypresses_per_piece_barely_differs_between_rounds_won_and_los",
   "file": "Claims.dfy",
   "family": "rate_flat_inputs",
   "status": "verified"
  },
  {
-  "id": "G065",
-  "lemma": "G065_pinglamb_s_keypresses_per_piece_barely_differs_between_rounds_won_and",
+  "id": "G087",
+  "lemma": "G087_pinglamb_s_keypresses_per_piece_barely_differs_between_rounds_won_and",
   "file": "Claims.dfy",
   "family": "rate_flat_inputs",
   "status": "verified"
  },
  {
-  "id": "G066",
-  "lemma": "G066_yachi_s_garbage_cleared_per_piece_0_220_in_rounds_won_vs_0_186_in_roun",
+  "id": "G088",
+  "lemma": "G088_yachi_s_garbage_cleared_per_piece_0_216_in_rounds_won_vs_0_176_in_roun",
   "file": "Claims.dfy",
   "family": "rate_split_garbage_cleared",
   "status": "verified"
  },
  {
-  "id": "G067",
-  "lemma": "G067_pinglamb_s_garbage_cleared_per_piece_barely_differs_between_rounds_won",
+  "id": "G089",
+  "lemma": "G089_pinglamb_s_garbage_cleared_per_piece_0_210_in_rounds_won_vs_0_179_in_r",
   "file": "Claims.dfy",
-  "family": "rate_flat_garbage_cleared",
+  "family": "rate_split_garbage_cleared",
   "status": "verified"
  },
  {
-  "id": "G068",
-  "lemma": "G068_both_players_attack_per_piece_is_higher_in_the_rounds_they_won_than_in",
+  "id": "G090",
+  "lemma": "G090_both_players_attack_per_piece_is_higher_in_the_rounds_they_won_than_in",
   "file": "Claims.dfy",
   "family": "app_decides_rounds",
   "status": "verified"
  },
  {
-  "id": "G069",
-  "lemma": "G069_session_downstack_per_piece_pinglamb_higher_than_yachi",
+  "id": "G091",
+  "lemma": "G091_session_downstack_per_piece_pinglamb_higher_than_yachi",
   "file": "Claims.dfy",
   "family": "ds_session",
   "status": "verified"
  },
  {
-  "id": "G070",
-  "lemma": "G070_unqualified_session_peak_apm_x1000_is_100000_by_yachi_at_m5r5_a_19s_ro",
+  "id": "G092",
+  "lemma": "G092_unqualified_session_peak_apm_x1000_is_121925_by_yachi_at_m12r8_a_9s_ro",
   "file": "Claims.dfy",
   "family": "round_peak_apm_x1000",
   "status": "verified"
  },
  {
-  "id": "G071",
-  "lemma": "G071_unqualified_session_peak_vs_x1000_is_203125_by_yachi_at_m5r5_a_19s_rou",
+  "id": "G093",
+  "lemma": "G093_unqualified_session_peak_vs_x1000_is_203209_by_yachi_at_m12r8_a_9s_rou",
   "file": "Claims.dfy",
   "family": "round_peak_vs_x1000",
   "status": "verified"
  },
  {
-  "id": "G072",
-  "lemma": "G072_yachi_had_a_perfect_clear_in_2_rounds_and_won_1_of_them_19_round_wins",
+  "id": "G094",
+  "lemma": "G094_yachi_had_a_perfect_clear_in_14_rounds_and_won_4_of_them_64_round_wins",
   "file": "Claims.dfy",
   "family": "pc_rounds",
   "status": "verified"
  },
  {
-  "id": "G073",
-  "lemma": "G073_2_rounds_where_only_yachi_got_a_perfect_clear_yachi_lost_1_of_them",
+  "id": "G095",
+  "lemma": "G095_10_rounds_where_only_yachi_got_a_perfect_clear_yachi_lost_7_of_them",
   "file": "Claims.dfy",
   "family": "pc_solo_lost",
   "status": "verified"
  },
  {
-  "id": "G074",
-  "lemma": "G074_pinglamb_had_a_perfect_clear_in_4_rounds_and_won_3_of_them_17_round_wi",
+  "id": "G096",
+  "lemma": "G096_pinglamb_had_a_perfect_clear_in_21_rounds_and_won_14_of_them_82_round",
   "file": "Claims.dfy",
   "family": "pc_rounds",
   "status": "verified"
  },
  {
-  "id": "G075",
-  "lemma": "G075_4_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_1_of_th",
+  "id": "G097",
+  "lemma": "G097_17_rounds_where_only_pinglamb_got_a_perfect_clear_pinglamb_lost_6_of_t",
   "file": "Claims.dfy",
   "family": "pc_solo_lost",
   "status": "verified"
  },
  {
-  "id": "G076",
-  "lemma": "G076_most_intense_round_m2r2_yachi_apm_x1000_58115_pps_x1000_1545_vs_x1000",
+  "id": "G098",
+  "lemma": "G098_most_intense_round_m17r2_yachi_apm_x1000_58115_pps_x1000_1545_vs_x1000",
   "file": "Claims.dfy",
   "family": "intense_round_profile",
   "status": "verified"
  },
  {
-  "id": "G077",
-  "lemma": "G077_most_intense_round_m2r2_pinglamb_apm_x1000_75806_pps_x1000_1329_vs_x10",
+  "id": "G099",
+  "lemma": "G099_most_intense_round_m17r2_pinglamb_apm_x1000_75806_pps_x1000_1329_vs_x1",
   "file": "Claims.dfy",
   "family": "intense_round_profile",
   "status": "verified"
  },
  {
-  "id": "G078",
-  "lemma": "G078_m2r2_winner_pinglamb_trailed_on_2_of_4_attacking_axes_behind_on_1_non",
+  "id": "G100",
+  "lemma": "G100_m17r2_winner_pinglamb_trailed_on_2_of_4_attacking_axes_behind_on_1_non",
   "file": "Claims.dfy",
   "family": "intense_round_edges",
   "status": "verified"
  },
  {
-  "id": "G079",
-  "lemma": "G079_m2r2_attack_per_piece_pinglamb_0_950_yachi_0_627",
+  "id": "G101",
+  "lemma": "G101_m17r2_attack_per_piece_pinglamb_0_950_yachi_0_627",
   "file": "Claims.dfy",
   "family": "intense_round_attack_rate",
   "status": "verified"
  },
  {
-  "id": "G080",
-  "lemma": "G080_m2r2_downstack_per_piece_pinglamb_0_297_yachi_0_271",
+  "id": "G102",
+  "lemma": "G102_m17r2_downstack_per_piece_pinglamb_0_297_yachi_0_271",
   "file": "Claims.dfy",
   "family": "intense_round_downstack_rate",
   "status": "verified"
  },
  {
-  "id": "G081",
-  "lemma": "G081_m2r2_yachi_vs_splits_into_attack_96_8_downstack_41_8_residual_under_0",
+  "id": "G103",
+  "lemma": "G103_m17r2_yachi_vs_splits_into_attack_96_8_downstack_41_8_residual_under_0",
   "file": "Claims.dfy",
   "family": "intense_round_vs_split",
   "status": "verified"
  },
  {
-  "id": "G082",
-  "lemma": "G082_m2r2_pinglamb_vs_splits_into_attack_126_3_downstack_39_4_residual_unde",
+  "id": "G104",
+  "lemma": "G104_m17r2_pinglamb_vs_splits_into_attack_126_3_downstack_39_4_residual_und",
   "file": "Claims.dfy",
   "family": "intense_round_vs_split",
   "status": "verified"
  },
  {
   "id": "C001",
-  "lemma": "C001_pinglamb_won_the_series_three_matches_to_two_yachi_won_matches_1_and_3",
+  "lemma": "C001_pinglamb_won_the_series_fourteen_matches_to_six_yachi_won_matches_3_4",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C002",
-  "lemma": "C002_in_the_rounds_each_won_pinglamb_s_attack_per_piece_is_4_96_percent_abo",
+  "lemma": "C002_in_the_rounds_each_won_pinglamb_s_attack_per_piece_is_4_70_percent_abo",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
@@ -596,91 +750,196 @@
  },
  {
   "id": "C004",
-  "lemma": "C004_over_the_whole_session_pinglamb_s_attack_per_piece_is_6_86_percent_abo",
+  "lemma": "C004_over_the_whole_session_pinglamb_s_attack_per_piece_is_7_24_percent_abo",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C005",
-  "lemma": "C005_yachi_placed_222_more_pieces_than_pinglamb_and_landed_14_less_attack_a",
+  "lemma": "C005_yachi_placed_328_more_pieces_than_pinglamb_yet_landed_395_less_attack",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C006",
-  "lemma": "C006_four_rounds_ended_in_a_topout_one_of_them_yachi_s_and_three_pinglamb_s",
+  "lemma": "C006_twenty_seven_rounds_ended_in_a_topout_fourteen_of_them_yachi_s_and_thi",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C007",
+  "lemma": "C007_in_each_of_the_six_matches_yachi_won_pinglamb_s_attack_per_piece_is_le",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C008",
-  "lemma": "C008_keypresses_per_piece_are_near_identical_yachi_3_579_and_pinglamb_3_623",
+  "lemma": "C008_keypresses_per_piece_are_near_identical_yachi_3_614_and_pinglamb_3_591",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C009",
-  "lemma": "C009_yachi_s_piece_count_is_6_20_percent_above_pinglamb_s_against_the_6_86",
+  "lemma": "C009_yachi_s_piece_count_is_2_38_percent_above_pinglamb_s_against_the_7_24",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C010",
-  "lemma": "C010_the_rounds_finished_19_to_17_the_first_three_matches_went_13_to_7_over",
+  "lemma": "C010_the_rounds_finished_64_to_82_in_blocks_of_five_matches_they_went_16_22",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C011",
-  "lemma": "C011_yachi_won_more_rounds_and_pinglamb_more_matches_yachi_s_two_wins_went",
+  "lemma": "C011_match_1_yachi_took_only_the_third_round_1_5",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C012",
-  "lemma": "C012_match_1_yachi_dropped_only_the_second_round_5_1",
+  "lemma": "C012_match_2_yachi_won_the_seventh_and_eighth_to_level_at_4_4_and_lost_the",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C013",
-  "lemma": "C013_match_2_yachi_came_back_from_1_3_to_level_at_3_3_then_lost_the_last_tw",
+  "lemma": "C013_match_3_yachi_won_three_straight_in_the_middle_to_go_ahead_and_took_it",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C014",
-  "lemma": "C014_match_3_yachi_dropped_only_the_third_round_5_1",
+  "lemma": "C014_match_4_yachi_trailed_3_4_and_won_the_last_two_to_take_it_5_4",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C015",
-  "lemma": "C015_match_4_yachi_led_3_1_then_lost_four_straight_3_5",
+  "lemma": "C015_match_5_yachi_took_only_the_fourth_round_1_5",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C016",
-  "lemma": "C016_match_5_yachi_lost_the_first_three_closed_to_3_4_and_lost_the_last_3_5",
+  "lemma": "C016_match_6_traded_in_pairs_to_the_last_round_4_5",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"
  },
  {
   "id": "C017",
-  "lemma": "C017_in_every_one_of_the_five_matches_the_player_with_the_higher_attack_per",
+  "lemma": "C017_match_7_yachi_won_the_third_and_fourth_to_level_at_2_2_then_took_one_o",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C018",
+  "lemma": "C018_match_8_yachi_won_all_five_rounds_5_0",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C019",
+  "lemma": "C019_match_9_yachi_took_only_the_fourth_round_1_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C020",
+  "lemma": "C020_match_10_yachi_led_4_3_and_lost_the_last_two_4_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C021",
+  "lemma": "C021_match_11_yachi_took_only_the_second_and_sixth_rounds_2_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C022",
+  "lemma": "C022_match_12_yachi_won_the_first_two_and_took_it_5_3",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C023",
+  "lemma": "C023_match_13_yachi_won_no_round_at_all_0_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C024",
+  "lemma": "C024_match_14_yachi_led_3_1_then_lost_four_straight_3_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C025",
+  "lemma": "C025_match_15_yachi_won_the_first_two_then_lost_five_straight_2_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C026",
+  "lemma": "C026_match_16_yachi_dropped_only_the_second_round_5_1",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C027",
+  "lemma": "C027_match_17_yachi_came_back_from_1_3_to_level_at_3_3_then_lost_the_last_t",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C028",
+  "lemma": "C028_match_18_yachi_dropped_only_the_third_round_5_1",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C029",
+  "lemma": "C029_match_19_yachi_led_3_1_then_lost_four_straight_3_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C030",
+  "lemma": "C030_match_20_yachi_lost_the_first_three_closed_to_3_4_and_lost_the_last_3",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C031",
+  "lemma": "C031_in_nineteen_of_the_twenty_matches_the_player_with_the_higher_attack_pe",
   "file": "Claims.dfy",
   "family": "",
   "status": "verified"

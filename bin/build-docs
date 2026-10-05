@@ -46,7 +46,7 @@ def _root(session):
     return SESSIONS
 
 sys.path.insert(0, str(REPO))
-from pipeline import docs_gate, forecast_pooled  # noqa: E402  (needs REPO on the path first)
+from pipeline import docs_gate, forecast_pooled, replay_page, replay_section  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -96,8 +96,8 @@ ARTEFACTS = [
      "二十場 series、150 局，全 corpus 最大嘅一晚：5 比 15、59 比 91。"
      "頭十場同尾十場各 75 局，28 比 47 同 31 比 44——由頭輸到尾，唔係邊一段崩。"),
     ("2026-10-03", "report", "2026-10-03.html", "完整戰報",
-     "五場 series、36 局，全 corpus 最細嘅一晚：2 比 3、19 比 17——"
-     "逐局 yachi 贏多兩局，場數輸咗，全 corpus 第一晚贏場同贏局唔係同一個人。"),
+     "二十場 series、146 局，全 corpus 第二大嘅一晚（僅次 09-19 嘅 150）：6 比 14、64 比 82。"
+     "頭十場同尾十場都係 3 比 7，局數 33 比 42 同 31 比 40——兩段幾乎一模一樣。"),
     ("2026-09-18-onform", "report", "2026-09-18-onform.html", "篩選子集 · 唔係當晚戰報",
      "2026-09-18 嗰 18 場入面揀出嚟嘅 3 場：兩個人嘅每場 VS 都高過自己喺之前十二個 session "
      "嘅中位數。下面個 0:3 係呢三場嘅比數，唔係當晚嘅——當晚 18 場係 pinglamb 11:7。"
@@ -217,7 +217,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals, pooled_html=None):
+def render_index(cards, totals, pooled_html=None, replays=()):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -254,6 +254,21 @@ def render_index(cards, totals, pooled_html=None):
     # it. Renders nothing at all when no session has a forecast artefact — see forecast_pooled.
     if pooled_html:
         parts.append(pooled_html)
+    # One per session that has a replay artefact. Simulator output, so these sit after the proved
+    # reports, carry no claim count, and say what they are on the pill.
+    if replays:
+        parts.append("<h2>逐局重播</h2>"
+                     "<p class='lede'>每晚每一局嘅模擬重播：兩個盤面並排、可以一粒一粒行，"
+                     "下面有一幅由 replay 記錄嘅射埋事件畫嘅攻擊圖。盤面係模擬器推導，"
+                     "唔屬於信任鏈，冇 claim 編號、冇 ✓ 標記。</p><div class='grid'>")
+        for r in replays:
+            parts.append(
+                f"<a class='card' href='{escape(r['href'])}'>"
+                f"<div class='date'>{escape(r['date'])}</div>"
+                f"<div class='title'>逐局重播</div>"
+                f"<div class='meta'>{r['matches']} 場 · {r['rounds']} 局</div>"
+                "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
+        parts.append("</div>")
     parts.append("<h2>工具</h2><div class='grid'>")
     parts.append(
         "<a class='card' href='analyzer.html'>"
@@ -371,6 +386,44 @@ def main(argv=None):
             shutil.copyfile(src, dst)
             print(f"  copied {rel} -> docs/{src.name}")
 
+    # Per-session replay pages, RENDERED here (like index.html) rather than copied: --check
+    # re-renders each from its session's sim/replay-facts.json + facts.json and byte-compares, so a
+    # page cannot drift from its data, from the shared player script, or from replay_page.py. A page
+    # exists exactly when its session has a replay artefact — the report's 「睇成晚每一局」 link
+    # renders under the same condition — and a docs/*-replay.html nothing produces is drift, so a
+    # removed artefact cannot leave its page published. Sessions only: a subset re-cuts a night and
+    # numbers its matches afresh, so `#m<pos>r<round>` would point at different rounds.
+    replays = []
+    produced = set()
+    report_of = {a[0]: a[2] for a in ARTEFACTS}
+    for d in sorted(SESSIONS.glob("*")):
+        if not (d / replay_section.FACTS_REL).exists():
+            continue
+        data, facts = replay_page.load(str(d))
+        page = replay_page.render(data, facts, report_of[d.name])
+        name = replay_section.page_name(data["session"])
+        if name != replay_section.page_name(d.name):
+            print(f"FAIL {d.name}/{replay_section.FACTS_REL} says session {data['session']!r}",
+                  file=sys.stderr)
+            return 1
+        produced.add(name)
+        dst = DOCS / name
+        if check:
+            if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                drift.append(f"docs/{name} differs from what {d.name}'s replay facts render")
+        else:
+            dst.write_text(page, encoding="utf-8")
+            print(f"  rendered {d.relative_to(REPO)} -> docs/{name} ({len(page.encode())} bytes)")
+        replays.append({"href": name, "date": d.name, "matches": len(facts["matches"]),
+                        "rounds": sum(len(m["rounds"]) for m in facts["matches"])})
+    for stale in sorted(DOCS.glob("*-replay.html")):
+        if stale.name not in produced:
+            if check:
+                drift.append(f"docs/{stale.name} is published but no session renders it")
+            else:
+                stale.unlink()
+                print(f"  removed docs/{stale.name} (no session renders it)")
+
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its
     # inputs, and there is no extra file to forget to rebuild.
@@ -384,7 +437,7 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    index = render_index(cards, totals, pooled_html)
+    index = render_index(cards, totals, pooled_html, replays)
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:

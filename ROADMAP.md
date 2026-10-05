@@ -182,13 +182,13 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-17 | 13/16 testable = **81%** | 12/16 = **75%** | 12/16 = **75%** | 2 |
 | 2026-09-18 | 24/27 testable = **89%** | 24/27 = **89%** | 24/27 = **89%** | 2 |
 | 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
-| 2026-10-03 | 11/15 testable = **73%** | 11/15 = **73%** | 11/15 = **73%** | 3 |
+| 2026-10-03 | 26/30 testable = **87%** | 25/30 = **83%** | 25/30 = **83%** | 2 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->ten of the fifteen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the fifteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
@@ -199,8 +199,8 @@ the fragment two lines above it moved every time. Re-derive it from the corpus, 
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->nine of the fifteen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->ten of the fifteen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->ten of the fifteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->eleven of the fifteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3930,25 +3930,23 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
 
-## 第十五個 session：贏場數嗰個輸局數 (2026-10-03)
+## 第十五個 session：最有力嘅一次分得開 (2026-10-03)
 
-2026-10-03 落地(**5 場、36 局,pinglamb 3 比 2**),兩個量度都係全 corpus 最細(之前最少係
-6 場、46 局),所以佢攞到嘅每一個「之最」都要先當係細樣本。
+2026-10-03(**20 場、146 局,pinglamb 14 比 6,局數 82 比 64**)係全 corpus 第二大嘅一晚,淨係
+細過 09-19 嘅 150 局。佢第一次出街嗰陣淨係用咗最後五個 replay(5 場、36 局),而家用齊二十個
+重做;嗰個版本嘅數字全部作廢。
 
-1. **第一次場數贏家同局數贏家唔係同一個人**:pinglamb 3 比 2 贏場數,yachi 19 比 17 贏局數
-   [C001][C010]。十五個 `facts.json` 逐個查過,其他 session 局數多嗰個一定係場數贏嗰個,
-   09-10(4 比 4)冇場數贏家。機制喺比分度 [C011]:yachi 兩場都係 5 比 1,pinglamb 三場都係
-   5 比 3。
-2. **shortfall 表由另一頭再證多次個 rate 軸**:36 局嘅 raw 差額(−14 行)細過 07-28 嘅 −15,
-   雖然佢個 shortfall 大啲,所以 raw 軸多一對排錯(11 → 12);rate 軸佢啱啱落格(−0.62%,
-   喺 −0.46% 同 −0.93% 中間),ρ 0.9956 → 0.9964,依然得一對。長 session 因為長而打爛 raw 軸,
-   呢晚因為短而加一對 —— 同一個 confound,由下面睇。
-3. **per-match 分得開,但 1/C(5,2) = 1 in 10**,同 09-11 一齊入 degenerate 嗰邊,冇 mint
-   C007;個 count 停喺 3 of 15。取而代之係 C017:五場都係 APP 高嗰個贏。
-4. **check_loo 一晚攞三個 annotation**(won-gap、攻擊差額、分數差額),係歷來最多;
-   won-gap 0.512 同下一個 0.485 只係差 1.056 倍,THRESHOLD 已經唔再坐喺一個空隙入面。
-5. **pooled AUC 表**(仍然係人手量):KPP 嘅 crossing 唔再係 09-19 一晚嘅 —— 抽走 09-19 都係
-   校正後 0.044,不過咁嘅 margin 正正係 0.048 / 0.059 嗰個位,唔係新證據。
+1. **per-match APP 排序分得開,mint C007,1/C(20,6) = 1 in 38 760** —— 全 corpus 最有力嘅一次,
+   比 09-18(1 in 31 824)同 09-19(1 in 15 504)兩晚都分唔開嘅更有力。個 count 變 4 of 15。
+   C031:APP 高嗰個贏咗 20 場入面 19 場,例外係 m12。
+2. **shortfall 表**:4.86 pp,喺 09-03 同 09-18 中間;rate 軸啱啱落格(−4.53%),ρ 0.9956 →
+   0.9964,依然得一對排錯;raw 軸因為 −395 行而多五對(11 → 16),ρ 0.8321。
+3. **兩個 regime gap 都細**(+4.70 / +5.83),入「兩邊都爭得唔多」嗰一類,冇一個數要 check_loo
+   annotation(最高 `rel` 0.158)。
+4. **equiv coverage**:87% → 83%,同 09-17 一樣喺 second family 之下跌咗 C007,所以唔係 exempt。
+5. **pooled AUC 表**(仍然係人手量):KPP 抽走任何一晚都企得住,但 09-19 同 10-03 一齊抽走就返過條線(校正後 0.056);PC 抽走 09-19 一晚就返過條線
+   (校正後 0.051),COMBO 抽走 09-18 都係(0.056)。
+6. **DT 先嘅開局**:yachi 一晚 18 個,其中 17 個係同一個 lock 樣式,即係一個佢嗰晚重複打嘅開局。
 
 ## 第十三個 session：一晚夠大，照出一條度錯咗嘅軸 (2026-09-19)
 

@@ -171,18 +171,39 @@ export type Gate =
  * board+table constraint for a purely positional one.
  */
 export function verifiedIndex(r: SimResult, truth: Case['truth'], gate: Gate | boolean = 'frame+amount+row'): number {
+  return verifiedBoundary(r, truth, gate).index;
+}
+
+/**
+ * The same walk as `verifiedIndex`, reporting WHY it stopped as well as where — ONE implementation,
+ * because `verifiedIndex` is now a projection of this and not a second copy of the loop (a rule with
+ * two implementations drifts the way a figure with two copies does; see CLAUDE.md on the mutation
+ * ladder). `index` is exactly `verifiedIndex`'s answer.
+ *
+ *  - `stop: 'mismatch'`  — the walk broke on attack `compared` (0-based among the attacks it was
+ *    comparing): the check FAILED there, and `failedRecord` is that attack's index in `r.records`.
+ *  - `stop: 'exhausted'` — it ran out of attacks on one side. Nothing after the last compared attack
+ *    is evidence either way. `simAttacks` / `realAttacks` say whether the two streams were the same
+ *    length, because a length difference is itself a disagreement the loop does not look at.
+ */
+export function verifiedBoundary(r: SimResult, truth: Case['truth'], gate: Gate | boolean = 'frame+amount+row'): {
+  index: number; stop: 'mismatch' | 'exhausted'; compared: number; failedRecord: number;
+  simAttacks: number; realAttacks: number;
+} {
   const g: Gate = gate === true ? 'frame+amount+row' : gate === false ? 'frame+amount' : gate;
   const mine = r.records.filter(x => x.sent > 0);
   let vf = -1;
-  for (let i = 0; i < Math.min(mine.length, truth.length); i++) {
+  let stop: 'mismatch' | 'exhausted' = 'exhausted', failed: (typeof mine)[number] | null = null, i = 0;
+  for (; i < Math.min(mine.length, truth.length); i++) {
     const a = mine[i]!, b = truth[i]!;
-    if (Math.abs(a.frame - b.frame) > 25) break;
-    if (g !== 'frame+row' && a.sent !== b.amt) break;
+    if (Math.abs(a.frame - b.frame) > 25) { stop = 'mismatch'; failed = a; break; }
+    if (g !== 'frame+row' && a.sent !== b.amt) { stop = 'mismatch'; failed = a; break; }
     // the all-clear bonus is its own event and carries no clear of its own, so no row to check
-    if (g !== 'frame+amount' && a.lines > 0 && !matchesIgeY(a.clearedRows, a.lines, b.y)) break;
+    if (g !== 'frame+amount' && a.lines > 0 && !matchesIgeY(a.clearedRows, a.lines, b.y)) { stop = 'mismatch'; failed = a; break; }
     vf = a.frame;
   }
   let vIdx = -1;
-  for (let i = 0; i < r.locks.length; i++) if (r.locks[i]!.frame <= vf) vIdx = i;
-  return vIdx;
+  for (let k = 0; k < r.locks.length; k++) if (r.locks[k]!.frame <= vf) vIdx = k;
+  return { index: vIdx, stop, compared: i, failedRecord: failed ? r.records.indexOf(failed) : -1,
+           simAttacks: mine.length, realAttacks: truth.length };
 }

@@ -5,7 +5,10 @@
 // over the TL defaults (see oracle-source.ts).
 import { Engine } from "./engine/index.mjs";
 
-export function createEngine(options, gameid, players) {
+// `date` is OPT-IN and defaults to the wall clock, exactly as before, so every existing caller is
+// unchanged. The engine reads it twice (garbage-queue class at 2025-05-06, opener phase at 2025-02-16),
+// so a replay-faithful caller should pass the replay's own timestamp rather than inherit today's.
+export function createEngine(options, gameid, players, date = undefined) {
   return new Engine({
     multiplayer: {
       opponents: players.map((o) => o.gameid).filter((id) => id !== gameid),
@@ -40,7 +43,7 @@ export function createEngine(options, gameid, players) {
                   may20G: options.gravitymay20g ?? false },
       allowed: { spin180: options.allow180, hardDrop: options.allow_harddrop, hold: options.display_hold,
                  undo: options.can_undo, retry: options.can_retry },
-      infiniteHold: options.infinite_hold, stride: options.stride, username: options.username, date: new Date(),
+      infiniteHold: options.infinite_hold, stride: options.stride, username: options.username, date: date ?? new Date(),
     },
     handling: options.handling,
   });

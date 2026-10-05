@@ -64,22 +64,23 @@ and both are established rather than hypothetical:
    differ by a factor of four in the same direction. A reader who had taken the previous
    paragraph as a rule (「a long session moves it a lot」) would have over-predicted this one
    fourfold, which is the same failure the paragraph itself warns against, one increment later.
-   2026-10-03 took it to fifteen and 1047 rounds and moved all seven a NINTH time — and the pair
-   SPLIT again, ending its three-session inward run: +0.151 → +0.154 out, +0.145 → +0.139 in. It
-   is the SMALLEST session in the corpus (36 rounds, 3.4% of the pooled 1047), and
-   it moved the headline rho by half what the 127-round session did, in the opposite direction,
-   while moving the raw-清走 rho by twice as much. So a run of three in one direction ended on the
-   session least able to move anything, which is the same lesson as the two before it from the
-   small end: neither size nor the previous direction predicts the next step.
+   2026-10-03 took it to fifteen and 1157 rounds and moved all seven a NINTH time — and the pair
+   moved TOGETHER and OUTWARD, ending its three-session inward run: +0.151 → +0.163,
+   +0.145 → +0.149. It is 146 rounds, the second largest after 09-19's 150, and it moved the
+   headline rho by 0.012 — twice what the 127-round 09-18 did and about half what 09-19 did, in
+   the opposite direction to both. (The session was first published from five of its twenty
+   replays, 36 rounds, which moved the pair apart rather than together; those figures are void.)
+   So three large sessions have now moved the headline by 0.021, 0.006 and 0.012, two inward and
+   one outward: size bounds how far a step CAN go and says nothing about which way it will.
    Nine increments, no run of three in any one direction bar the pair's three inward that this
    one ended, and the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
    same lesson, now nine times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.154**
-   (cleared_pp/intensity), **+0.139** (cleared/intensity), **+0.028** (cleared_pp/duration),
-   **-0.160** (apm/duration), **-0.162** (attack/duration), **+0.255**
+   re-derives rather than counting sessions. As of the current corpus they read **+0.163**
+   (cleared_pp/intensity), **+0.149** (cleared/intensity), **+0.043** (cleared_pp/duration),
+   **-0.152** (apm/duration), **-0.156** (attack/duration), **+0.271**
    (cleared_per_received/intensity) and **+0.101** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a

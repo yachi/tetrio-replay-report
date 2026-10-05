@@ -718,7 +718,7 @@
         <div class="sr-cid">G021 · ✓ Dafny 已證</div>
       </div>
     </div>
-    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——15個 session 夾埋 2094 個 player-round 度量過：VS 嘅標準差由 61.5（約 18 秒嗰批）跌到 13.3（約 155 秒嗰批），足足細咗 4.6 倍；同一段路平均數反而由 97 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，15個 session 嗰 45 項速率紀錄入面，有 43 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——15個 session 夾埋 2314 個 player-round 度量過：VS 嘅標準差由 62.3（約 18 秒嗰批）跌到 13.1（約 155 秒嗰批），足足細咗 4.7 倍；同一段路平均數反而由 97 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，15個 session 嗰 45 項速率紀錄入面，有 43 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G027）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -769,7 +769,7 @@
   <div class="wrap">
     <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
     <h2 class="section-title">全晚打得最癲嘅一局：第 11 場第 2 局</h2>
-    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺 15 個 session、1047 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 64.8% 升到 69.9% 再升到 75.8%（Spearman rho ＋0.154），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 1047 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺 15 個 session、1157 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 64.5% 升到 69.0% 再升到 76.9%（Spearman rho ＋0.163），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 1157 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
     <div class="ir-scroll">
       <table class="ir-table">
         <thead><tr><th>數據</th><th><span class="ir-who"><span class="ir-dot is-p2"></span>pinglamb（贏）</span></th><th><span class="ir-who"><span class="ir-dot is-p1"></span>yachi</span></th></tr></thead>
@@ -792,7 +792,7 @@
     <p class="ir-split"><strong>每粒棋攻擊</strong>：pinglamb 約 0.776、yachi 約 0.768；<strong>每粒棋清走</strong>：pinglamb 約 0.412、yachi 約 0.228。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
     <p class="ir-split">pinglamb 嘅 VS ＝ 攻 約 106.6 ＋ 清垃圾 約 56.5；yachi 嘅 VS ＝ 攻 約 118.7 ＋ 清垃圾 約 35.2。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
     <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：<strong>送出</strong>係佢掟出去嗰啲，<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。「逐局全數據」嗰邊仲有個<strong>射埋</strong>，嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——呢張表冇呢一欄。</p>
-    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.028（raw p 0.3630，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.160 同 −0.162，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.255），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.101，raw p 0.0011，校正後 0.0276）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
+    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.043（raw p 0.1476，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.152 同 −0.156，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.271），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.101，raw p 0.0006，校正後 0.0146）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
     <p class="ir-note">Claim：G085 · G086 · G087 · G088 · G089 · G090 · G091 ✓</p>
   </div>
 </section>
@@ -8110,6 +8110,760 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
   </div>
 </section>
 <!-- END generated openers -->
+
+<!-- BEGIN generated round-replay (pipeline/build_report.py) -->
+<section id="round-replay">
+  <style>
+    #round-replay { --rp-c0: var(--p1, var(--yachi)); --rp-c1: var(--p2, var(--pinglamb)); --rp-bad: #d0453a; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #round-replay { --rp-bad: #ef6a5f; } }
+    :root[data-theme="dark"] #round-replay { --rp-bad: #ef6a5f; }
+    #round-replay .rp-player { margin: 1rem 0 .5rem; padding: .9rem; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-raised); }
+    #round-replay .rp-player:focus { outline: none; }
+    #round-replay .rp-player:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    #round-replay .rp-focus-hint { font-size: .78rem; color: var(--muted); margin: 0 0 .6rem; }
+    #round-replay .rp-boards { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+    #round-replay .rp-side { display: grid; gap: .35rem; justify-items: center; min-width: 0; flex: 1 1 18rem; max-width: 26rem; }
+    #round-replay .rp-name { font-weight: 700; font-size: .95rem; }
+    #round-replay .rp-side[data-slot="0"] .rp-name { color: var(--rp-c0); }
+    #round-replay .rp-side[data-slot="1"] .rp-name { color: var(--rp-c1); }
+    #round-replay .rp-callout { height: 1.4em; line-height: 1.4; overflow: hidden; white-space: nowrap; font-weight: 700; font-size: .9rem; }
+    #round-replay .rp-side[data-slot="0"] .rp-callout { color: var(--rp-c0); }
+    #round-replay .rp-side[data-slot="1"] .rp-callout { color: var(--rp-c1); }
+    #round-replay .rp-canvas { display: block; width: 100%; height: auto; border-radius: 6px; background: var(--bg-sunken); touch-action: manipulation; }
+    #round-replay .rp-strip, #round-replay .rp-state { font: .78rem/1.45 var(--font-mono); color: var(--ink-secondary); text-align: center; font-variant-numeric: tabular-nums; }
+    #round-replay .rp-state[data-state="no_evidence"] { color: var(--pending); }
+    #round-replay .rp-state[data-state="check_failed"] { color: var(--rp-bad); }
+    #round-replay .rp-flag { font-size: .8rem; color: var(--rp-bad); font-weight: 600; text-align: center; }
+    #round-replay .rp-flag[hidden] { display: none; }
+    #round-replay .rp-controls { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; margin-top: .9rem; }
+    #round-replay .rp-btn { font: 500 .85rem var(--font-mono); padding: .4rem .7rem; min-width: 2.6rem; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg); color: var(--ink); cursor: pointer; }
+    #round-replay .rp-btn.rp-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    #round-replay .rp-speed { font: .85rem var(--font-mono); padding: .35rem; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg); color: var(--ink); }
+    #round-replay .rp-pos { font: .82rem var(--font-mono); color: var(--ink-secondary); font-variant-numeric: tabular-nums; }
+    #round-replay .rp-seek-wrap { position: relative; margin-top: .6rem; padding-top: 2.1rem; }
+    #round-replay .rp-seek { width: 100%; margin: 0; accent-color: var(--ink); }
+    #round-replay .rp-band { position: absolute; left: 0; right: 0; height: 5px; border-radius: 3px; overflow: hidden; background: var(--border); }
+    #round-replay .rp-band[data-slot="0"] { top: .2rem; }
+    #round-replay .rp-band[data-slot="1"] { top: .55rem; }
+    #round-replay .rp-seg { position: absolute; top: 0; bottom: 0; }
+    #round-replay .rp-seg[data-state="verified"] { background: var(--good); }
+    #round-replay .rp-seg[data-state="no_evidence"] { background: repeating-linear-gradient(45deg, var(--pending) 0 3px, transparent 3px 6px); }
+    #round-replay .rp-seg[data-state="check_failed"] { background: repeating-linear-gradient(-45deg, var(--rp-bad) 0 2px, transparent 2px 4px); }
+    #round-replay .rp-marks { position: absolute; left: 0; right: 0; top: 1rem; height: 1rem; }
+    #round-replay .rp-mark { position: absolute; top: 0; width: 12px; height: 12px; margin-left: -6px; padding: 0; border-radius: 50%; border: 2px solid var(--bg-raised); cursor: pointer; background: var(--muted); }
+    #round-replay .rp-mark[data-slot="0"] { background: var(--rp-c0); }
+    #round-replay .rp-mark[data-slot="1"] { background: var(--rp-c1); }
+    #round-replay .rp-mark[data-kind="pc"], #round-replay .rp-mark[data-kind="end"] { border-radius: 2px; }
+    #round-replay .rp-mark[data-kind="garbage"] { border-style: dotted; }
+    #round-replay .rp-mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    #round-replay .rp-legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .76rem; color: var(--muted); margin-top: .45rem; }
+    #round-replay .rp-key { display: inline-block; width: 1.4rem; height: 5px; vertical-align: middle; margin-right: .3rem; border-radius: 2px; }
+    #round-replay .rp-key[data-state="verified"] { background: var(--good); }
+    #round-replay .rp-key[data-state="no_evidence"] { background: repeating-linear-gradient(45deg, var(--pending) 0 3px, transparent 3px 6px); }
+    #round-replay .rp-key[data-state="check_failed"] { background: repeating-linear-gradient(-45deg, var(--rp-bad) 0 2px, transparent 2px 4px); }
+    #round-replay .rp-moments { list-style: none; padding: 0; margin: .8rem 0 0; display: flex; flex-wrap: wrap; gap: .3rem .5rem; font-size: .8rem; }
+    #round-replay .rp-moment { font: inherit; padding: .15rem .45rem; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--ink-secondary); cursor: pointer; }
+    #round-replay .rp-moment[aria-current="true"] { border-color: var(--ink); color: var(--ink); }
+    #round-replay .rp-help { margin-top: .7rem; font-size: .8rem; color: var(--ink-secondary); }
+    #round-replay .rp-help[hidden] { display: none; }
+    #round-replay .rp-help dl { display: grid; grid-template-columns: max-content 1fr; gap: .15rem .9rem; margin: .3rem 0 0; }
+    #round-replay .rp-help dt { font-family: var(--font-mono); }
+    #round-replay .rp-help dd { margin: 0; }
+    #round-replay .rp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    #round-replay .rp-more { margin-top: .8rem; font-size: .88rem; color: var(--ink-secondary); }
+    #round-replay .rp-more a { color: var(--ink); font-weight: 700; }
+    #round-replay .rp-nojs { font-size: .85rem; color: var(--muted); }
+    @media (max-width: 640px) {
+      #round-replay .rp-player { padding: .6rem; }
+      #round-replay .rp-side { flex-basis: 100%; }
+    }
+    @media print { #round-replay .rp-player { display: none; } }
+  </style>
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">最癲一局 重播：m11r2（未經證明）</h2>
+
+    <div class="method-note">
+      <p><strong>呢節唔屬於信任鏈。</strong>佢重播嘅係上面「最癲一局」嗰一局（replay-2026-08-14-10.ttrm 第 2 局，yachi、pinglamb），由同一條揀局規則揀出嚟；但盤面係<strong>一個 replay 模擬器</strong>（Triangle 引擎）重跑操作記錄推導出嚟，replay 檔本身冇記錄過任何盤面，所以冇一格曾經同遊戲逐格對過，亦冇第二份獨立實作。所以呢節<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>
+      <p>每粒方塊淨係記低最後落咗喺邊；方塊跌落去嗰條路線係畫出嚟嘅，<strong>唔係玩家真實嘅按鍵操作</strong>。</p>
+      <p>垃圾行個窿喺邊一欄，係<strong>引擎用種子亂數揀嘅</strong>：同遊戲自己嘅計數（清咗幾多垃圾、消咗幾多行）對得上，但<strong>從來冇直接觀察過</strong>。</p>
+      <p>盤邊條直柱係<strong>射埋</strong>嘅垃圾：攞對手射過嚟、記錄喺 replay 嘅數（抵銷之前），減去引擎自己抵銷咗同塞咗落盤嘅行數。未必全部都會食到。</p>
+      <p>時間軸上面兩條幼帶係每個玩家嘅核對界線，有三個狀態：<strong>實色＝已核</strong>（嗰段時間引擎打出嘅攻擊，同對手 replay 記錄收到嘅垃圾逐下對得上，時間、行數、行位都啱）；<strong>斜紋＝最後一次攻擊之後，冇證據話啱定唔啱</strong>（攻擊用晒，之後冇嘢可以核，唔係錯，係核唔到）；<strong>紅斜紋＝核對失敗</strong>（由嗰粒開始，盤面可能同真實唔同）。</p>
+      <p>yachi：核到第 252 粒（全局 263 粒）；之後攻擊用晒，冇證據話啱定唔啱。<br>pinglamb：核到第 232 粒（全局 233 粒）；之後攻擊用晒，冇證據話啱定唔啱。</p>
+      <p>呢一局兩個玩家嘅成局總數（粒數、消行、hold、清垃圾、攻擊、全消、每種 T-spin）都同 <code>facts.json</code> 對得上，引擎爆唔爆亦同遊戲記錄一致。對得上只係講總數，<strong>唔會</strong>令呢節入返信任鏈；如果有一項唔夾，呢度會寫「模擬盤面喺呢度可能同真實唔同」。</p>
+    </div>
+
+    <div class="rp-player" tabindex="0" role="group" aria-label="m11r2 模擬重播；撳 ? 睇快捷鍵" aria-describedby="rp-hint">
+      <p class="rp-focus-hint" id="rp-hint">撳一下呢個框（或者 Tab 入嚟）先用到鍵盤：Space 播／停，← → 一粒一粒行，↑ ↓ 跳關鍵時刻，? 睇全部快捷鍵。由第一粒之前開始，唔會自己播。</p>
+      <noscript><p class="rp-nojs">重播要開 JavaScript 先睇到。</p></noscript>
+      <div class="rp-boards"></div>
+      <div class="rp-controls">
+        <button type="button" class="rp-btn" data-act="start" aria-label="跳去局頭">⏮</button>
+        <button type="button" class="rp-btn" data-act="back" aria-label="上一粒">◀</button>
+        <button type="button" class="rp-btn rp-primary" data-act="play" aria-label="播放">播放</button>
+        <button type="button" class="rp-btn" data-act="fwd" aria-label="下一粒">▶</button>
+        <button type="button" class="rp-btn" data-act="end" aria-label="跳去局尾">⏭</button>
+        <select class="rp-speed" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+        <button type="button" class="rp-btn" data-act="letters" aria-pressed="false">字母</button>
+        <button type="button" class="rp-btn" data-act="help" aria-expanded="false" aria-controls="rp-help">?</button>
+        <span class="rp-pos" aria-hidden="true"></span>
+      </div>
+      <div class="rp-seek-wrap">
+        <div class="rp-band" data-slot="0" aria-hidden="true"></div>
+        <div class="rp-band" data-slot="1" aria-hidden="true"></div>
+        <div class="rp-marks" role="group" aria-label="關鍵時刻"></div>
+        <input type="range" class="rp-seek" min="0" value="0" step="1" aria-label="重播位置（粒）">
+      </div>
+      <div class="rp-legend" aria-hidden="true"><span><i class="rp-key" data-state="verified"></i>已核</span><span><i class="rp-key" data-state="no_evidence"></i>最後一次攻擊之後，冇證據</span><span><i class="rp-key" data-state="check_failed"></i>核對失敗</span><span>上帶 = yachi，下帶 = pinglamb</span></div>
+      <ul class="rp-moments" aria-label="關鍵時刻列表"></ul>
+      <div class="rp-help" id="rp-help" hidden><strong>快捷鍵</strong>（淨係喺呢個重播框有焦點嗰陣先生效）<dl><dt>Space / K</dt><dd>播放／暫停</dd><dt>← / →</dt><dd>上一粒／下一粒（兩個玩家合埋計，每次郁一粒）</dd><dt>↑ / ↓</dt><dd>上一個／下一個關鍵時刻</dd><dt>J / L</dt><dd>後退／前進 5 粒</dd><dt>Home / End</dt><dd>跳去局頭／局尾</dd><dt>&lt; / &gt;</dt><dd>慢啲／快啲（0.5×、1×、2×、4×）</dd><dt>?</dt><dd>開／收呢張快捷鍵表</dd></dl></div>
+      <div class="rp-sr" aria-live="polite" aria-atomic="true"></div>
+    </div>
+    <p class="rp-more"><a href="2026-08-14-replay.html#m11r2">睇成晚每一局</a>：同一個模擬器、同一套核對界線，成晚每一局都揀得，仲有一幅由 replay 記錄嘅射埋事件畫出嚟嘅攻擊圖。</p>
+    <script type="application/json" id="rp-data">{"session":"2026-08-14","file":"replay-2026-08-14-10.ttrm","match":11,"round":2,"label":"m11r2","winner":"pinglamb","seq":"TILJZOSZTSILOJOSTZLJIZSTLIJOZTJOILSLSIJZOTJTOILSZZSLITOJJTLSOZITZSOLJIIZTSLOJTSILOZJOSZJTLITLOSZJIJSTOILZJLSTIOZJZLOSITZLIOSJTJIZTOLSSTJOZLIJOSTZLIOTJSZILJLZOSITIOLTSJZIZSOTJLSIOLJZTLSTIZOJJTLOZISILTJZOSJOISLZTTOSZLJIZSLTIOJLJOISTZLITJSZOILJOZSTZISLOTJZJTOSILOILJSTZIZJL","shapes":{"I":[[[0,0],[1,0],[2,0],[3,0]],[[0,0],[0,1],[0,2],[0,3]]],"O":[[[0,0],[1,0],[0,1],[1,1]]],"T":[[[0,0],[1,0],[2,0],[1,1]],[[0,0],[0,1],[1,1],[0,2]],[[1,0],[0,1],[1,1],[2,1]],[[1,0],[0,1],[1,1],[1,2]]],"S":[[[0,0],[1,0],[1,1],[2,1]],[[1,0],[0,1],[1,1],[0,2]]],"Z":[[[1,0],[2,0],[0,1],[1,1]],[[0,0],[0,1],[1,1],[1,2]]],"J":[[[0,0],[1,0],[2,0],[0,1]],[[0,0],[0,1],[0,2],[1,2]],[[2,0],[0,1],[1,1],[2,1]],[[0,0],[1,0],[1,1],[1,2]]],"L":[[[0,0],[1,0],[2,0],[2,1]],[[0,0],[1,0],[0,1],[0,2]],[[0,0],[0,1],[1,1],[2,1]],[[1,0],[1,1],[0,2],[1,2]]]},"width":10,"rows":40,"visible":20,"next":5,"order":"1001101101010110010100101010101010010101011001001001001010110100110101101100100110010010010011011001001010011001010011010000101010101100010101010010001001010101001001010101001010101001011001010101010100110111101010001100110011010100101001010110010101010001010101010011010010101001010101001011000110001010000100001010110011010101001010110101010101010101010010100010101101011010101101010010101001100110010100101010100101001100101011001101110101010010011100010110010110101101010011010101011110101010","players":[{"user":"yachi","slot":0,"ending":"garbagesmash","frames":10206,"pieces":263,"locks":[[29,0,0,0,[],1,0,0],[30,10,0,0,[],0,0,0],[54,1206,0,0,[],1,0,0],[50,4,0,0,[],0,0,0],[28,8,0,0,[],0,0,0],[139,1228,0,0,[],1,0,0],[56,20,0,0,[],1,0,0],[33,24,0,0,[],1,0,0],[33,41,0,0,[],0,0,0],[30,430,0,0,[],0,0,0],[28,851,0,0,[],0,0,0],[40,37,0,0,[],0,0,0],[40,436,0,0,[],0,0,0],[45,413,3,2,[],1,6,0],[31,28,0,0,[],1,0,0],[36,803,2,2,[],0,5,5],[21,405,0,0,[],0,0,0],[28,817,0,0,[],0,0,0],[11,404,2,0,[],0,1,1],[29,0,1,0,[],0,10,10],[87,1,0,0,[],1,0,0],[98,408,0,0,[],0,0,0],[26,400,0,0,[],0,0,0],[48,407,0,0,[],0,0,0],[23,30,0,0,[[3,1]],1,0,0],[28,837,0,0,[],0,0,0],[28,416,0,0,[],1,0,0],[20,14,1,0,[],1,0,0],[60,23,1,0,[],0,0,0],[26,425,0,0,[],1,0,0],[31,820,0,0,[],1,0,0],[72,47,0,0,[[4,1]],1,0,0],[33,1248,0,0,[],0,0,0],[9,43,1,0,[],0,0,0],[59,40,0,0,[],0,0,0],[50,413,4,0,[],1,4,0],[69,46,0,0,[[3,1],[3,1],[3,1]],1,0,0],[93,459,0,0,[],1,0,0],[26,441,0,0,[],0,0,0],[31,440,0,0,[],1,0,0],[24,55,0,0,[],1,0,0],[46,833,2,2,[],1,5,0],[24,434,0,0,[],1,0,0],[40,47,0,0,[],0,0,0],[38,403,4,0,[],0,5,0],[47,411,0,0,[],0,0,0],[43,415,0,0,[],0,0,0],[40,26,0,0,[],0,0,0],[16,434,0,0,[],0,0,0],[67,437,0,0,[],0,0,0],[75,1238,0,0,[],0,0,0],[26,410,0,0,[],0,0,0],[43,812,2,2,[],1,6,6],[46,1211,0,0,[],1,0,0],[28,426,0,0,[],0,0,0],[29,30,0,0,[],1,0,0],[21,434,0,0,[],0,0,0],[52,860,0,0,[[3,1],[3,1]],1,0,0],[31,517,0,0,[[9,1],[9,1],[9,1],[9,1],[9,1]],0,0,0],[31,1318,0,0,[],1,0,0],[24,125,0,0,[],1,0,0],[22,453,4,0,[],0,6,6],[62,494,0,0,[],1,0,0],[44,106,0,0,[],1,0,0],[27,508,0,0,[],0,0,0],[25,90,0,0,[],0,0,0],[29,1291,0,0,[],0,0,0],[28,516,0,0,[],1,0,0],[22,453,4,0,[],0,6,6],[28,453,2,0,[],1,1,1],[31,450,1,0,[],0,1,1],[77,72,0,0,[[5,1],[5,1]],0,0,0],[29,474,0,0,[],0,0,0],[32,429,4,0,[],1,4,4],[79,1228,2,0,[],1,1,1],[29,420,0,0,[],0,0,0],[66,37,0,0,[],1,0,0],[17,425,0,0,[],0,0,0],[26,449,0,0,[[7,1]],0,0,0],[32,856,0,0,[],0,0,0],[50,831,2,2,[],1,4,4],[45,31,0,0,[],0,0,0],[48,52,0,0,[],1,0,0],[30,451,0,0,[],1,0,0],[28,57,0,0,[],0,0,0],[46,456,0,0,[],0,0,0],[31,1278,0,0,[],0,0,0],[41,81,0,0,[],1,0,0],[37,886,0,0,[[0,1]],0,0,0],[27,450,0,0,[],0,0,0],[48,843,2,2,[],0,5,5],[18,1243,0,0,[],0,0,0],[26,73,0,0,[],0,0,0],[28,87,0,0,[],0,0,0],[26,486,0,0,[],0,0,0],[31,470,0,0,[],0,0,0],[16,425,4,0,[],0,5,5],[33,52,0,0,[],0,0,0],[38,60,0,0,[],0,0,0],[24,470,0,0,[],0,0,0],[25,63,0,0,[],0,0,0],[60,141,0,0,[[4,1],[4,1],[4,1],[4,1],[4,1]],1,0,0],[35,518,0,0,[],0,0,0],[29,516,0,0,[],0,0,0],[19,475,4,0,[],1,6,5],[96,92,0,0,[],0,0,0],[42,475,1,0,[],1,0,0],[46,502,0,0,[],1,0,0],[28,479,2,0,[],0,1,0],[34,80,0,0,[],0,0,0],[16,475,0,0,[],0,0,0],[53,866,2,2,[],1,4,0],[257,1347,0,0,[[3,1],[3,1],[3,1],[3,1],[3,1],[0,1],[0,1],[0,1]],1,0,0],[31,1378,0,0,[[0,1],[0,1]],0,0,0],[28,208,0,0,[],0,0,0],[28,576,0,0,[],0,0,0],[20,564,2,0,[],1,1,1],[37,550,1,0,[],0,0,0],[23,504,4,0,[],1,6,6],[82,120,0,0,[],1,0,0],[23,1312,0,0,[],1,0,0],[58,504,2,0,[],1,1,1],[34,506,0,0,[],0,0,0],[48,138,0,0,[],1,0,0],[42,1356,0,0,[[7,1],[7,1],[7,1]],0,0,0],[34,150,0,0,[],0,0,0],[17,535,2,0,[],0,1,1],[30,513,3,0,[],1,2,1],[59,511,0,0,[],1,0,0],[34,902,2,2,[],1,4,4],[72,104,0,0,[],1,0,0],[43,906,0,0,[],1,0,0],[34,518,0,0,[],0,0,0],[31,500,0,0,[],0,0,0],[43,1326,0,0,[],0,0,0],[24,124,0,0,[],1,0,0],[28,120,0,0,[],0,0,0],[33,180,0,0,[[2,1],[2,1],[2,1],[2,1]],0,0,0],[21,523,4,0,[],0,5,5],[40,145,0,0,[],1,0,0],[39,955,0,0,[],1,0,0],[31,538,0,0,[],0,0,0],[33,922,2,2,[],0,5,5],[21,123,1,0,[],1,0,0],[46,921,0,0,[],0,0,0],[32,470,4,0,[],0,4,3],[44,494,0,0,[],1,0,0],[30,1288,0,0,[],0,0,0],[35,106,0,0,[],0,0,0],[28,536,0,0,[[9,1],[9,1]],0,0,0],[28,138,0,0,[],1,0,0],[18,523,0,0,[],1,0,0],[28,521,0,0,[],0,0,0],[29,490,4,0,[],1,5,5],[30,1291,0,0,[],0,0,0],[15,503,0,0,[],0,0,0],[23,505,0,0,[],1,0,0],[75,118,0,0,[],1,0,0],[29,490,2,0,[],0,1,1],[19,102,0,0,[],1,0,0],[36,900,0,0,[],1,0,0],[30,467,4,0,[],1,4,4],[35,867,1,0,[],0,0,0],[24,65,1,0,[],1,1,1],[27,463,0,0,[],0,0,0],[30,67,0,0,[],0,0,0],[15,114,0,0,[[2,1],[2,1],[2,1],[2,1]],0,0,0],[25,500,0,0,[],0,0,0],[44,891,2,2,[],1,4,4],[29,105,0,0,[],1,0,0],[28,98,0,0,[],0,0,0],[17,113,0,0,[],1,0,0],[48,117,0,0,[],0,0,0],[29,491,1,0,[],0,0,0],[44,515,0,0,[],0,0,0],[28,462,4,0,[],0,4,4],[49,83,0,0,[],0,0,0],[45,861,1,2,[],1,3,3],[30,860,0,0,[],1,0,0],[36,468,0,0,[],0,0,0],[20,94,0,0,[],1,0,0],[27,80,0,0,[],0,0,0],[47,876,2,2,[],1,5,5],[96,546,0,0,[[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1]],1,0,0],[24,1342,0,0,[],1,0,0],[31,519,3,0,[],1,2,2],[27,110,0,0,[],0,0,0],[29,518,1,0,[],1,0,0],[21,515,1,0,[],0,0,0],[37,1313,0,0,[],0,0,0],[47,517,0,0,[],0,0,0],[26,128,0,0,[],0,0,0],[19,110,1,0,[],1,0,0],[32,472,4,0,[],0,5,5],[63,70,1,0,[],1,1,1],[21,403,4,0,[],0,7,7],[46,35,0,0,[],1,0,0],[44,448,0,0,[],1,0,0],[28,830,0,0,[],0,0,0],[40,445,0,0,[],0,0,0],[34,50,0,0,[],1,0,0],[50,43,1,0,[],1,0,0],[44,487,0,0,[[3,1],[3,1],[3,1],[3,1]],0,0,0],[50,94,0,0,[],1,0,0],[32,489,1,0,[],0,0,0],[64,157,0,0,[[8,1],[8,1],[8,1],[8,1],[8,1]],1,0,0],[33,568,0,0,[],1,0,0],[38,530,0,0,[],0,0,0],[54,550,0,0,[],0,0,0],[33,1312,3,0,[],1,2,2],[36,124,0,0,[],0,0,0],[36,902,2,2,[],1,4,4],[24,492,1,0,[],1,0,0],[52,1295,1,0,[],0,1,1],[29,905,0,0,[],0,0,0],[29,501,0,0,[],1,0,0],[22,453,4,0,[],1,4,4],[42,470,0,0,[],1,0,0],[36,478,0,0,[],1,0,0],[29,85,0,0,[],1,0,0],[36,852,2,2,[],1,5,5],[19,53,2,0,[],0,1,1],[42,52,0,0,[],1,0,0],[31,850,0,0,[],0,0,0],[47,857,0,0,[],0,0,0],[29,854,1,0,[],1,0,0],[31,60,0,0,[],1,0,0],[31,471,0,0,[],0,0,0],[64,66,0,0,[],1,0,0],[18,465,0,0,[],0,0,0],[40,852,2,2,[],1,4,0],[39,463,0,0,[[0,1]],1,0,0],[59,475,0,0,[],0,0,0],[32,470,0,0,[],0,0,0],[49,418,4,0,[],1,5,4],[74,456,0,0,[],0,0,0],[62,60,0,0,[],0,0,0],[39,442,0,0,[],0,0,0],[41,1233,0,0,[],0,0,0],[28,123,0,0,[[4,1],[4,1],[4,1],[4,1],[4,1],[4,1]],0,0,0],[49,546,0,0,[],1,0,0],[14,133,0,0,[],0,0,0],[85,150,0,0,[[1,1]],1,0,0],[26,554,0,0,[],1,0,0],[22,552,0,0,[],0,0,0],[49,570,0,0,[],0,0,0],[30,171,0,0,[],0,0,0],[29,1298,0,0,[],0,0,0],[50,497,2,2,[],1,5,5],[45,897,2,2,[],0,8,8],[57,488,1,0,[],0,1,1],[43,108,1,0,[],1,1,1],[37,117,0,0,[],0,0,0],[36,521,0,0,[],1,0,0],[22,133,0,0,[],0,0,0],[48,1314,1,2,[],1,2,0],[25,496,2,0,[],0,1,0],[55,488,2,0,[],1,1,0],[48,1288,0,0,[],1,0,0],[105,112,0,0,[[6,1]],1,0,0],[36,568,0,0,[[7,1],[7,1],[7,1],[7,1]],0,0,0],[52,550,0,0,[],1,0,0],[45,594,0,0,[[6,1],[6,1],[6,1],[6,1],[6,1]],0,0,0]],"ge":[[614,6],[1019,1],[1259,1],[1424,1],[1454,6],[1739,5],[1814,5],[2369,2],[2399,5],[2849,2],[2969,1],[3119,1],[3509,1],[3779,4],[3914,5],[4004,1],[4049,1],[4199,1],[4289,4],[4409,5],[4469,5],[5024,3],[5114,2],[5474,4],[5774,1],[5909,2],[6389,4],[6989,5],[7034,7],[7664,4],[7799,5],[8294,4],[8699,5],[8864,1],[9149,6],[9224,1],[9554,2],[9749,4],[9974,1],[10034,4],[10139,5]],"verified_to":251,"after":"no_evidence","failed_at":null},{"user":"pinglamb","slot":1,"ending":"winner","frames":10184,"pieces":233,"locks":[[24,400,0,0,[],1,0,0],[35,401,0,0,[],0,0,0],[44,1206,0,0,[],0,0,0],[27,404,0,0,[],1,0,0],[29,8,0,0,[],0,0,0],[20,402,0,0,[],0,0,0],[30,27,0,0,[],0,0,0],[143,46,0,0,[],1,0,0],[28,31,0,0,[],0,0,0],[40,439,0,0,[],0,0,0],[55,823,0,0,[],0,0,0],[60,52,0,0,[],0,0,0],[27,1240,0,0,[],0,0,0],[43,1215,3,2,[],1,6,6],[35,427,0,0,[],0,0,0],[40,48,0,0,[],1,0,0],[41,804,2,2,[],1,5,0],[32,405,0,0,[],1,0,0],[36,400,0,0,[],0,0,0],[57,126,0,0,[[3,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1],[4,1]],1,0,0],[89,559,0,0,[[4,1],[4,1],[4,1]],1,0,0],[34,531,0,0,[],0,0,0],[46,923,2,0,[],0,1,1],[83,122,0,0,[],1,0,0],[39,520,0,0,[],0,0,0],[78,125,1,0,[],0,0,0],[32,1313,2,0,[],1,1,1],[42,517,0,0,[],0,0,0],[35,115,0,0,[],1,0,0],[34,1348,0,0,[],0,0,0],[40,111,1,0,[],0,0,0],[24,503,2,0,[],1,1,1],[24,404,4,0,[],1,6,6],[47,65,0,0,[],1,0,0],[32,475,0,0,[],1,0,0],[61,460,0,0,[],1,0,0],[49,461,0,0,[],1,0,0],[43,1287,0,0,[],0,0,0],[58,404,4,0,[],1,5,5],[25,56,0,0,[],0,0,0],[42,823,2,2,[],0,5,5],[101,21,0,0,[],1,0,0],[81,831,0,0,[],1,0,0],[55,1248,0,0,[],1,0,0],[38,430,0,0,[],0,0,0],[29,845,0,0,[],0,0,0],[50,51,0,0,[],1,0,0],[60,67,0,0,[],1,0,0],[73,526,0,0,[[4,1],[4,1],[4,1],[4,1],[4,1],[4,1]],0,0,0],[37,147,0,0,[],1,0,0],[34,1293,3,0,[],0,2,2],[30,404,4,0,[],0,5,5],[57,488,0,0,[],1,0,0],[31,62,0,0,[],0,0,0],[45,1260,0,0,[],0,0,0],[30,470,0,0,[],0,0,0],[52,843,2,2,[],0,5,0],[108,1298,0,0,[[4,1]],1,0,0],[31,54,1,0,[],0,0,0],[31,62,0,0,[],0,0,0],[31,526,0,0,[[7,1],[7,1],[7,1],[7,1],[7,1],[7,1]],0,0,0],[30,464,4,0,[],0,4,2],[43,500,0,0,[],1,0,0],[80,474,2,0,[],0,1,1],[78,515,0,0,[[4,1],[4,1],[4,1]],0,0,0],[69,504,1,2,[],1,2,1],[33,102,1,0,[],1,0,0],[48,901,0,0,[],1,0,0],[119,160,0,0,[[5,1],[5,1],[5,1],[5,1]],1,0,0],[89,569,0,0,[],0,0,0],[46,547,1,0,[],0,0,0],[32,534,1,0,[],1,0,0],[28,535,1,0,[],0,1,1],[76,936,0,0,[],1,0,0],[57,154,0,0,[],0,0,0],[31,931,2,0,[],0,1,0],[36,570,0,0,[[3,1],[3,1],[3,1],[3,1]],1,0,0],[27,571,0,0,[],0,0,0],[45,517,4,0,[],0,4,4],[27,1332,0,0,[],0,0,0],[29,170,0,0,[[7,1]],0,0,0],[29,558,0,0,[],0,0,0],[54,936,2,2,[],1,5,5],[48,152,0,0,[],0,0,0],[29,526,2,0,[],0,1,1],[44,504,2,0,[],1,1,1],[70,507,1,0,[],1,1,0],[58,150,0,0,[[3,1],[3,1],[3,1]],1,0,0],[31,924,2,0,[],0,1,1],[45,1328,0,0,[],1,0,0],[41,485,4,0,[],1,4,4],[26,85,0,0,[],0,0,0],[38,107,0,0,[],0,0,0],[20,495,0,0,[],0,0,0],[41,883,2,2,[],1,5,5],[35,897,0,0,[],0,0,0],[24,443,4,0,[],0,5,5],[182,1243,0,0,[],0,0,0],[27,455,0,0,[],0,0,0],[57,40,1,0,[],1,0,0],[26,42,1,0,[],0,0,0],[63,469,0,0,[[7,1]],0,0,0],[39,450,1,0,[],0,0,0],[42,514,0,0,[[2,1],[2,1],[2,1],[2,1],[2,1],[2,1]],0,0,0],[34,111,0,0,[],0,0,0],[32,1325,0,0,[],0,0,0],[51,906,2,2,[],1,4,3],[66,501,0,0,[],1,0,0],[22,473,3,0,[],0,2,2],[80,83,0,0,[],0,0,0],[38,467,2,0,[],0,1,0],[45,467,0,0,[],1,0,0],[36,460,1,0,[],1,0,0],[66,113,0,0,[[9,1],[9,1],[9,1],[9,1]],0,0,0],[27,516,0,0,[],1,0,0],[36,118,0,0,[],1,0,0],[40,442,4,0,[],0,4,4],[93,483,0,0,[],1,0,0],[21,94,0,0,[],0,0,0],[50,556,0,0,[[6,1],[6,1],[6,1],[6,1],[6,1]],0,0,0],[30,530,0,0,[],0,0,0],[26,148,0,0,[],0,0,0],[46,921,2,2,[],1,5,0],[32,511,2,0,[],1,1,1],[42,127,0,0,[],1,0,0],[49,1354,0,0,[[9,1],[9,1],[9,1]],0,0,0],[33,522,3,0,[],0,2,2],[34,523,0,0,[],0,0,0],[62,1345,0,0,[],0,0,0],[31,138,0,0,[],0,0,0],[29,947,0,0,[],0,0,0],[18,142,0,0,[],0,0,0],[44,920,2,2,[],1,4,0],[34,120,1,0,[],1,0,0],[50,520,1,1,[],1,1,0],[56,124,0,0,[],0,0,0],[28,131,0,0,[[9,1]],0,0,0],[72,981,0,0,[[8,1],[8,1],[8,1],[8,1]],1,0,0],[31,539,4,0,[],0,5,4],[99,137,1,0,[],1,0,0],[126,516,2,0,[],1,1,0],[36,517,1,0,[],0,1,0],[30,1338,0,0,[[6,1],[6,1]],0,0,0],[31,530,0,0,[],0,0,0],[30,134,0,0,[],1,0,0],[24,506,4,0,[],0,4,0],[47,502,0,0,[],1,0,0],[32,113,0,0,[],1,0,0],[34,162,0,0,[[6,1],[6,1],[6,1]],0,0,0],[47,547,0,0,[],0,0,0],[29,540,0,0,[],0,0,0],[40,935,2,2,[],1,5,5],[31,499,4,0,[],1,7,7],[69,496,0,0,[],0,0,0],[24,1294,0,0,[],0,0,0],[31,500,0,0,[],0,0,0],[29,913,0,0,[],1,0,0],[36,498,2,0,[],0,1,0],[34,499,1,0,[],0,0,0],[43,901,0,0,[[3,1]],0,0,0],[28,114,0,0,[],1,0,0],[31,122,0,0,[],0,0,0],[40,468,4,0,[],1,4,0],[68,856,1,0,[],1,0,0],[109,146,0,0,[[0,1],[6,1],[7,1],[7,1],[7,1],[7,1],[7,1],[7,1]],1,0,0],[33,530,2,0,[],0,1,0],[32,538,0,0,[],0,0,0],[24,496,4,0,[],0,4,4],[29,503,0,0,[],1,0,0],[35,514,0,0,[],0,0,0],[29,100,0,0,[],0,0,0],[51,895,2,2,[],0,5,5],[33,890,0,0,[],0,0,0],[34,96,1,0,[],0,0,0],[28,95,0,0,[],1,0,0],[31,499,1,0,[],0,0,0],[40,482,1,0,[],1,0,0],[70,87,0,0,[],1,0,0],[41,93,0,0,[],0,0,0],[37,470,2,0,[],0,1,0],[44,880,0,0,[[6,1]],1,0,0],[31,1275,2,0,[],0,1,0],[51,107,0,0,[[9,1],[9,1],[9,1]],0,0,0],[22,903,1,0,[],0,0,0],[28,447,4,0,[],0,5,4],[71,60,0,0,[],1,0,0],[32,470,0,0,[],1,0,0],[35,864,0,0,[],0,0,0],[28,72,0,0,[],1,0,0],[40,1338,0,0,[[1,1],[1,1],[1,1],[1,1],[1,1],[0,1]],1,0,0],[87,550,0,0,[],1,0,0],[32,152,0,0,[],0,0,0],[54,544,0,0,[],1,0,0],[28,507,4,0,[],0,5,5],[64,496,1,0,[],1,0,0],[44,105,0,0,[],1,0,0],[25,915,0,0,[],0,0,0],[36,498,2,0,[],1,1,1],[45,102,0,0,[],0,0,0],[31,1300,0,0,[],1,0,0],[27,112,0,0,[],1,0,0],[16,514,0,0,[],0,0,0],[40,156,0,0,[[4,1],[4,1],[4,1],[4,1]],1,0,0],[56,158,1,0,[],0,0,0],[34,550,1,0,[],1,0,0],[31,509,4,0,[],1,6,6],[76,508,1,0,[],1,1,1],[57,105,0,0,[],1,0,0],[33,902,0,0,[],0,0,0],[38,114,0,0,[],1,0,0],[49,1318,1,1,[],1,0,0],[50,101,1,0,[],0,0,0],[28,105,0,0,[],0,0,0],[40,113,0,0,[],1,0,0],[41,1280,3,0,[],1,2,2],[39,451,3,0,[],0,2,0],[34,440,1,0,[],1,1,0],[30,127,0,0,[[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1],[1,1]],0,0,0],[30,1321,1,0,[],0,0,0],[40,125,1,0,[],0,0,0],[22,484,4,0,[],0,6,4],[49,86,0,0,[],1,0,0],[19,83,0,0,[],0,0,0],[26,94,0,0,[],1,0,0],[40,880,0,0,[],1,0,0],[59,896,0,0,[],1,0,0],[31,489,2,0,[],0,1,1],[20,482,0,0,[],0,0,0],[41,870,2,2,[],0,4,4],[13,73,0,0,[],0,0,0],[43,77,0,0,[],1,0,0],[41,401,4,0,[],0,5,5],[46,1235,0,0,[],0,0,0]],"ge":[[689,5],[749,1],[779,10],[2234,6],[2519,6],[2744,6],[2774,1],[2804,1],[2954,4],[3029,1],[3254,4],[3629,5],[3779,5],[4034,5],[4709,1],[4769,6],[4934,1],[5114,1],[5144,1],[5234,4],[5564,5],[5714,5],[5804,3],[6044,5],[6224,1],[6299,4],[6359,1],[6509,4],[6734,4],[6824,3],[6974,5],[7139,2],[7364,5],[7439,1],[7454,7],[8039,2],[8114,4],[8189,1],[8279,4],[8414,5],[8429,1],[8939,4],[9539,5],[9584,8],[9644,1],[9689,1]],"verified_to":231,"after":"no_evidence","failed_at":null}],"moments":[[27,1,"tspin","pinglamb T-spin Triple，攻擊 6 行"],[28,0,"tspin","yachi T-spin Triple，攻擊 6 行"],[32,0,"tspin","yachi T-spin Double，攻擊 5 行"],[33,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[39,0,"pc","yachi 全消（Perfect Clear）"],[40,1,"garbage","pinglamb 食咗 8 行垃圾"],[68,1,"attack","pinglamb 一下攻擊 6 行"],[82,0,"tspin","yachi T-spin Double，攻擊 5 行"],[84,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[101,0,"tspin","yachi T-spin Double，攻擊 6 行"],[103,1,"garbage","pinglamb 食咗 6 行垃圾"],[111,0,"garbage","yachi 食咗 5 行垃圾"],[116,0,"attack","yachi 一下攻擊 6 行"],[120,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[128,0,"attack","yachi 一下攻擊 6 行"],[131,1,"garbage","pinglamb 食咗 6 行垃圾"],[142,1,"tspin","pinglamb T-spin Single，攻擊 2 行"],[149,0,"tspin","yachi T-spin Double，攻擊 4 行"],[151,1,"garbage","pinglamb 食咗 4 行垃圾"],[165,0,"tspin","yachi T-spin Double，攻擊 5 行"],[170,1,"garbage","pinglamb 食咗 4 行垃圾"],[184,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[185,0,"garbage","yachi 食咗 5 行垃圾"],[191,0,"attack","yachi 一下攻擊 6 行"],[205,0,"tspin","yachi T-spin Double，攻擊 4 行"],[207,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[210,0,"garbage","yachi 食咗 8 行垃圾"],[220,0,"attack","yachi 一下攻擊 6 行"],[225,1,"garbage","pinglamb 食咗 6 行垃圾"],[230,1,"tspin","pinglamb T-spin Double，攻擊 4 行"],[241,0,"tspin","yachi T-spin Double，攻擊 4 行"],[246,1,"garbage","pinglamb 食咗 4 行垃圾"],[255,0,"garbage","yachi 食咗 4 行垃圾"],[260,1,"garbage","pinglamb 食咗 5 行垃圾"],[265,0,"tspin","yachi T-spin Double，攻擊 5 行"],[267,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[289,1,"tspin","pinglamb T-spin Double，攻擊 4 行"],[292,1,"tspin","pinglamb Mini T-spin Single，攻擊 1 行"],[301,1,"garbage","pinglamb 食咗 4 行垃圾"],[306,0,"garbage","yachi 食咗 4 行垃圾"],[309,0,"tspin","yachi T-spin Double，攻擊 4 行"],[325,0,"tspin","yachi T-spin Single，攻擊 3 行"],[334,0,"tspin","yachi T-spin Double，攻擊 5 行"],[335,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[336,1,"attack","pinglamb 一下攻擊 7 行"],[337,0,"garbage","yachi 食咗 7 行垃圾"],[360,0,"attack","yachi 一下攻擊 7 行"],[363,1,"garbage","pinglamb 食咗 8 行垃圾"],[374,0,"garbage","yachi 食咗 4 行垃圾"],[375,1,"tspin","pinglamb T-spin Double，攻擊 5 行"],[381,0,"garbage","yachi 食咗 5 行垃圾"],[392,0,"tspin","yachi T-spin Double，攻擊 4 行"],[408,0,"tspin","yachi T-spin Double，攻擊 5 行"],[413,1,"garbage","pinglamb 食咗 6 行垃圾"],[426,0,"tspin","yachi T-spin Double，攻擊 4 行"],[438,1,"garbage","pinglamb 食咗 4 行垃圾"],[444,1,"attack","pinglamb 一下攻擊 6 行"],[446,0,"garbage","yachi 食咗 6 行垃圾"],[456,1,"tspin","pinglamb Mini T-spin Single，攻擊 0 行"],[463,0,"tspin","yachi T-spin Double，攻擊 5 行"],[466,0,"tspin","yachi T-spin Double，攻擊 8 行"],[469,1,"garbage","pinglamb 食咗 8 行垃圾"],[473,0,"boundary","yachi 由呢粒起冇證據話啱定唔啱（攻擊用晒）"],[474,1,"attack","pinglamb 一下攻擊 6 行"],[479,0,"tspin","yachi T-spin Single，攻擊 2 行"],[488,1,"tspin","pinglamb T-spin Double，攻擊 4 行"],[492,0,"garbage","yachi 食咗 4 行垃圾"],[495,1,"boundary","pinglamb 由呢粒起冇證據話啱定唔啱（攻擊用晒）"],[496,0,"end","yachi 俾垃圾逼爆，局完"],[496,0,"garbage","yachi 食咗 5 行垃圾"]],"flags":[],"flag_words":"模擬盤面喺呢度可能同真實唔同"}</script>
+    <script>
+/* 重播 player — ONE source for every simulator replay this repo publishes: the 最癲一局 region
+   (pipeline/replay_section.py, inlined verbatim so that region's drift gate re-renders it too) and
+   the per-session replay page (pipeline/replay_page.py, which inlines this same file and mounts it
+   once per round the viewer picks). It defines `rpReplay.mount` and does nothing on its own.
+
+   Rules this file keeps, each one a trap the report has shipped before:
+   - nodes are built with createElement / textContent, never by assigning markup strings;
+   - every class is rp- prefixed and every rule is scoped under #round-replay (check_generated_css);
+   - keys act only while the player box has focus (WCAG 2.1.4), and it starts PAUSED (2.2.2);
+   - prefers-reduced-motion is re-read on change: no drop tween, no clear flash;
+   - per-piece rates name 每粒 and are FLOORED, because 約 means "at least" in this report;
+   - colours come from the report's own tokens (--p1/--p2 via the section's --rp-c0/--rp-c1, which
+     fall back to the player-named tokens of the oldest shells), re-read when the theme moves;
+   - in the report the hash is #replay-m<pos>r<round>@p<n>, written with replaceState, and never
+     touches the round table's #rounds= state; on the replay page the page owns the hash
+     (opts.hashPrefix null) and hears every move through opts.onChange. */
+(function () {
+  "use strict";
+  var NS = window.rpReplay = window.rpReplay || {};
+
+  /* mount(root, box, D, opts) — root is the #round-replay element (tokens are read off it), box
+     the .rp-player inside it, D one round's payload. opts: hashPrefix (string, or null to leave
+     the hash alone), pos (initial position), onChange(pos, frames, playing) — called on every
+     animation frame while playing, so a listener that writes history must wait for playing to
+     be false (pause() reports the final position that way). Returns a handle whose
+     destroy() drops every listener the player put outside `box`. */
+  NS.mount = function (root, box, D, opts) {
+    opts = opts || {};
+    var W = D.width, ROWS = D.rows, VIS = D.visible, NEXT = D.next;
+    var CELLS = W * ROWS;
+    var N = D.order.length;
+    var CODE = { I: 1, O: 2, T: 3, S: 4, Z: 5, J: 6, L: 7, G: 8 };
+    var LETTER = ["", "I", "O", "T", "S", "Z", "J", "L", "G"];
+    var PIECE_COLOR = ["", "#3fb8c4", "#d9b638", "#9b5fd0", "#4caf50", "#d64f4a", "#4a72d1", "#e08a35"];
+    var LINE_NAME = ["", "Single", "Double", "Triple", "Quad"];
+    var SPIN_PREFIX = ["", "Mini T-spin ", "T-spin "];
+
+    function $(sel) { return box.querySelector(sel); }
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    /* ---------- decoding: mirror of emit-replay.ts decodeTimeline / queueStates ---------- */
+    function placeCells(piece, place) {
+      if (Array.isArray(place)) return place.slice();
+      var shape = D.shapes[piece][Math.floor(place / CELLS)];
+      var a = place % CELLS, ax = a % W, ay = Math.floor(a / W);
+      return shape.map(function (d) { return (ay + d[1]) * W + ax + d[0]; });
+    }
+
+    function decodePlayer(p) {
+      var n = p.locks.length, seq = D.seq;
+      var boards = [new Uint8Array(CELLS)], pre = [], cleared = [], cells = [], pieces = [];
+      var queue = [];            // state BEFORE lock k: {cur, hold, ptr}
+      var cur = seq[0], ptr = 1, hold = "";
+      var b = new Uint8Array(CELLS);
+      var absF = [], atk = [0], ins = [0], f = 0;
+      for (var k = 0; k < n; k++) {
+        var lk = p.locks[k];
+        queue.push({ cur: cur, hold: hold, ptr: ptr });
+        if (lk[5]) {
+          if (hold === "") { hold = cur; cur = seq[ptr++]; } else { var t = hold; hold = cur; cur = t; }
+        }
+        var piece = cur;
+        pieces.push(piece);
+        // 1. garbage, in order, the engine's own splice
+        var g = 0;
+        lk[4].forEach(function (gc) {
+          var col = gc[0], amt = gc[1];
+          g += amt;
+          var rows = [];
+          for (var y = 0; y < ROWS; y++) rows.push(b.subarray(y * W, y * W + W).slice());
+          var add = [];
+          for (var i = 0; i < amt; i++) {
+            var r = new Uint8Array(W).fill(8); r[col] = 0; add.push(r);
+          }
+          rows.splice.apply(rows, [0, 0].concat(add));
+          rows.splice(ROWS - amt - 1, amt);
+          for (var yy = 0; yy < ROWS; yy++) b.set(rows[yy], yy * W);
+        });
+        // 2. the piece
+        var pc = placeCells(piece, lk[1]);
+        pc.forEach(function (c) { b[c] = CODE[piece]; });
+        pre.push(b.slice());
+        cells.push(pc);
+        // 3. clears
+        var full = [];
+        for (var y2 = 0; y2 < ROWS; y2++) {
+          var all = true;
+          for (var x = 0; x < W; x++) if (!b[y2 * W + x]) { all = false; break; }
+          if (all) full.push(y2);
+        }
+        cleared.push(full);
+        if (full.length) {
+          var keep = [];
+          for (var y3 = 0; y3 < ROWS; y3++) if (full.indexOf(y3) < 0) keep.push(b.slice(y3 * W, y3 * W + W));
+          b = new Uint8Array(CELLS);
+          keep.forEach(function (r, i) { b.set(r, i * W); });
+        }
+        boards.push(b.slice());
+        f += lk[0];
+        absF.push(f);
+        atk.push(atk[k] + lk[6]);
+        ins.push(ins[k] + g);
+        cur = seq[ptr++];
+      }
+      queue.push({ cur: cur, hold: hold, ptr: ptr });
+      // the meter: queued (recorded 射埋 events) − cancelled (attack − sent) − inserted, by frame
+      var outAt = [0];
+      for (var k2 = 0; k2 < n; k2++) {
+        var g2 = 0;
+        p.locks[k2][4].forEach(function (gc) { g2 += gc[1]; });
+        outAt.push(outAt[k2] + (p.locks[k2][6] - p.locks[k2][7]) + g2);
+      }
+      return { boards: boards, pre: pre, cleared: cleared, cells: cells, pieces: pieces, queue: queue,
+               absF: absF, atk: atk, ins: ins, outAt: outAt };
+    }
+
+    var P = D.players.map(function (p) { return { d: p, x: decodePlayer(p) }; });
+
+    // merged position -> locks applied per player, and the frame each position is reached at
+    var countAt = [[0], [0]], tAt = [0];
+    (function () {
+      var c = [0, 0];
+      for (var i = 0; i < N; i++) {
+        var s = +D.order[i];
+        c[s]++;
+        countAt[0].push(c[0]); countAt[1].push(c[1]);
+        tAt.push(P[s].x.absF[c[s] - 1]);
+      }
+    })();
+    var T_END = Math.max(P[0].d.frames, P[1].d.frames, tAt[N]);
+    function posOfLock(s, i) {   // merged position AFTER player s's lock i
+      for (var q = 1; q <= N; q++) if (countAt[s][q] === i + 1) return q;
+      return N;
+    }
+
+    /* ---------- tokens ---------- */
+    var tok = {};
+    function readTokens() {
+      // read off the section, not :root, so the section's own scoped tokens (--rp-c0/1, --rp-bad)
+      // resolve; every shell token inherits down to it
+      var cs = getComputedStyle(root);
+      ["--bg-sunken", "--bg-raised", "--grid-line", "--muted", "--ink", "--ink-secondary", "--rp-c0",
+       "--rp-c1", "--rp-bad", "--good", "--pending", "--border-strong"].forEach(function (n) {
+        var v = cs.getPropertyValue(n).trim();
+        if (!v) throw new Error("replay: CSS token " + n + " is not defined");
+        tok[n] = v;
+      });
+    }
+    readTokens();
+
+    var motionQ = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : null;
+    var reduced = !!(motionQ && motionQ.matches);
+
+    /* ---------- the DOM the player owns ---------- */
+    var boardsEl = $(".rp-boards");
+    var C = 16;                                   // logical cell size
+    var HOLD_W = 4.6, GAP = 0.4, METER_W = 0.6, NEXT_W = 4.6, TOP = 1;
+    var CW = (HOLD_W + GAP + METER_W + 0.2 + W + GAP + NEXT_W) * C;
+    var CH = (VIS + TOP) * C;
+    var BX = (HOLD_W + GAP + METER_W + 0.2) * C;  // board left edge
+    var sides = P.map(function (pp, s) {
+      var side = el("div", "rp-side");
+      side.setAttribute("data-slot", String(s));
+      var name = el("div", "rp-name", pp.d.user + (pp.d.user === D.winner ? "（贏咗呢局）" : ""));
+      var callout = el("div", "rp-callout");
+      var cv = el("canvas", "rp-canvas");
+      cv.setAttribute("role", "img");
+      cv.width = Math.round(CW); cv.height = Math.round(CH);
+      var strip = el("div", "rp-strip");
+      var state = el("div", "rp-state");
+      var flag = el("div", "rp-flag", D.flag_words);
+      flag.hidden = true;
+      side.appendChild(name); side.appendChild(callout); side.appendChild(cv);
+      side.appendChild(strip); side.appendChild(state); side.appendChild(flag);
+      boardsEl.appendChild(side);
+      cv.addEventListener("click", function (e) {
+        var r = cv.getBoundingClientRect();
+        if (e.clientX - r.left < r.width / 2) stepBy(-1); else stepBy(1);
+      });
+      return { side: side, cv: cv, callout: callout, strip: strip, state: state, flag: flag };
+    });
+
+    var seek = $(".rp-seek"), posEl = $(".rp-pos"), playBtn = $('[data-act="play"]');
+    var speedSel = $(".rp-speed"), live = $(".rp-sr"), help = $(".rp-help");
+    var lettersBtn = $('[data-act="letters"]'), helpBtn = $('[data-act="help"]');
+    seek.max = String(N);
+
+    function frac(q) { return "calc(8px + (100% - 16px) * " + (N ? q / N : 0) + ")"; }
+
+    // boundary bands: three states per player
+    P.forEach(function (pp, s) {
+      var band = $('.rp-band[data-slot="' + s + '"]');
+      var v = pp.d.verified_to, n = pp.d.locks.length;
+      var cut = v >= 0 ? posOfLock(s, v) : 0;
+      function seg(a, b, st) {
+        if (b <= a) return;
+        var g = el("i", "rp-seg");
+        g.setAttribute("data-state", st);
+        g.style.left = frac(a);
+        g.style.width = "calc((100% - 16px) * " + (b - a) / N + ")";
+        band.appendChild(g);
+      }
+      seg(0, cut, "verified");
+      if (pp.d.after === "no_evidence") seg(cut, N, "no_evidence");
+      if (pp.d.after === "check_failed") seg(cut, N, "check_failed");
+      if (pp.d.after === "end" && n) seg(cut, N, "verified");
+    });
+
+    // key moments: markers on the bar + a list, both focusable buttons
+    var marks = $(".rp-marks"), list = $(".rp-moments");
+    var momentBtns = D.moments.map(function (m) {
+      var q = m[0], who = m[1], kind = m[2], label = m[3];
+      var mk = el("button", "rp-mark");
+      mk.type = "button";
+      mk.setAttribute("data-slot", String(who));
+      mk.setAttribute("data-kind", kind);
+      mk.style.left = frac(q);
+      mk.setAttribute("aria-label", label + "（第 " + q + " 粒）");
+      mk.title = label;
+      mk.addEventListener("click", function () { pause(); setPos(q, true); announceMoments(q); });
+      marks.appendChild(mk);
+      var li = el("li");
+      var b = el("button", "rp-moment", fmtTime(tAt[q]) + " " + label);
+      b.type = "button";
+      b.addEventListener("click", function () { pause(); setPos(q, true); announceMoments(q); });
+      li.appendChild(b);
+      list.appendChild(li);
+      return b;
+    });
+
+    /* ---------- state ---------- */
+    var pos = 0, t = 0, playing = false, raf = 0, last = 0, letters = false, touched = false;
+    var fx = [null, null];         // per player: {k, t0, drop}
+
+    function fmtTime(frames) {
+      var tenths = Math.floor(frames / 6);
+      var s = Math.floor(tenths / 10), m = Math.floor(s / 60);
+      var ss = s % 60;
+      return m + ":" + (ss < 10 ? "0" : "") + ss + "." + (tenths % 10);
+    }
+    function floor2(x) { return (Math.floor(x * 100) / 100).toFixed(2); }
+
+    function describe(s, i) {
+      var lk = P[s].d.locks[i];
+      var x = P[s].x;
+      var lines = lk[2], spin = lk[3], words = "";
+      var empty = lines > 0 && x.boards[i + 1].every(function (v) { return v === 0; });
+      if (empty) words = "全消";
+      else if (spin && lines) words = SPIN_PREFIX[spin] + LINE_NAME[lines];
+      else if (lines) words = LINE_NAME[lines];
+      if (lk[6]) words += (words ? " " : "") + "+" + lk[6];
+      return words;
+    }
+
+    function pendingAt(s, frames, k) {
+      var ge = P[s].d.ge, inc = 0;
+      for (var i = 0; i < ge.length && ge[i][0] <= frames; i++) inc += ge[i][1];
+      // never clamped: replay_section._meter_check makes a negative value a build error, and a clamp
+      // here would turn the one visible sign of a mis-join into a plausible empty meter
+      return inc - P[s].x.outAt[k];
+    }
+
+    /* ---------- drawing ---------- */
+    function cellRect(ctx, x, yUp, color, letter, garbage) {
+      var px = BX + x * C, py = (VIS + TOP - 1 - yUp) * C;
+      ctx.fillStyle = color;
+      ctx.fillRect(px + 1, py + 1, C - 2, C - 2);
+      if (garbage) {   // not colour alone: garbage carries a hatch
+        ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px + 3, py + C - 3); ctx.lineTo(px + C - 3, py + 3); ctx.stroke();
+      }
+      if (letters && letter) {
+        ctx.fillStyle = "rgba(255,255,255,.92)";
+        ctx.font = "600 " + Math.round(C * 0.62) + "px ui-monospace, monospace";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(letter, px + C / 2, py + C / 2 + 1);
+      }
+    }
+    function miniPiece(ctx, piece, ox, oy, size) {
+      if (!piece) return;
+      var shape = D.shapes[piece][0];
+      var wMax = 0, hMax = 0;
+      shape.forEach(function (d) { wMax = Math.max(wMax, d[0]); hMax = Math.max(hMax, d[1]); });
+      var cx = ox + (4 - (wMax + 1)) * size / 2, cy = oy + (2 - (hMax + 1)) * size / 2;
+      ctx.fillStyle = PIECE_COLOR[CODE[piece]];
+      shape.forEach(function (d) {
+        ctx.fillRect(cx + d[0] * size + 1, cy + (hMax - d[1]) * size + 1, size - 2, size - 2);
+      });
+      if (letters) {
+        ctx.fillStyle = tok["--ink"]; ctx.font = "600 " + Math.round(size * 0.8) + "px ui-monospace, monospace";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(piece, ox - size * 0.15, oy + size);
+      }
+    }
+
+    function drawSide(s, now) {
+      var sd = sides[s], cv = sd.cv, ctx = cv.getContext("2d");
+      var dpr = window.devicePixelRatio || 1;
+      if (cv.width !== Math.round(CW * dpr)) { cv.width = Math.round(CW * dpr); cv.height = Math.round(CH * dpr); }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, CW, CH);
+      var pp = P[s], x = pp.x, k = countAt[s][pos];
+      var accent = tok[s === 0 ? "--rp-c0" : "--rp-c1"];
+      // field
+      ctx.fillStyle = tok["--bg-sunken"];
+      ctx.fillRect(BX, 0, W * C, CH);
+      ctx.strokeStyle = tok["--grid-line"]; ctx.lineWidth = 1;
+      for (var gx = 1; gx < W; gx++) {
+        ctx.beginPath(); ctx.moveTo(BX + gx * C + 0.5, 0); ctx.lineTo(BX + gx * C + 0.5, CH); ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(127,127,127,.12)";
+      ctx.fillRect(BX, 0, W * C, TOP * C);         // the buffer row above the visible field
+      // which board, with what effect
+      var board = x.boards[k], f = fx[s], flashRows = null, flashA = 0, mover = null, outline = null;
+      if (f && !reduced && f.k === k - 1) {
+        var dropMs = f.drop ? 150 / speed() : 0, flashMs = 200 / speed(), el2 = now - f.t0;
+        var full = x.cleared[f.k];
+        if (el2 < dropMs) {
+          board = x.pre[f.k].slice();
+          x.cells[f.k].forEach(function (c) { board[c] = 0; });
+          var minY = Math.min.apply(null, x.cells[f.k].map(function (c) { return Math.floor(c / W); }));
+          var fall = Math.max(0, VIS - 1 - minY);
+          mover = { cells: x.cells[f.k], piece: x.pieces[f.k], dy: Math.round(fall * (1 - el2 / dropMs)) };
+        } else if (full.length && el2 < dropMs + flashMs) {
+          board = x.pre[f.k]; flashRows = full; flashA = 1 - (el2 - dropMs) / flashMs;
+        } else if (el2 < dropMs + flashMs + 250 && !full.length) {
+          outline = x.cells[f.k];
+        }
+      }
+      for (var y = 0; y < VIS + TOP; y++) {
+        for (var cx = 0; cx < W; cx++) {
+          var v = board[y * W + cx];
+          if (!v) continue;
+          cellRect(ctx, cx, y, v === 8 ? tok["--muted"] : PIECE_COLOR[v], LETTER[v] === "G" ? "" : LETTER[v], v === 8);
+        }
+        if (flashRows && flashRows.indexOf(y) >= 0) {
+          ctx.globalAlpha = Math.max(0, flashA);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(BX, (VIS + TOP - 1 - y) * C, W * C, C);
+          ctx.globalAlpha = 1;
+        }
+      }
+      if (mover) {
+        mover.cells.forEach(function (c) {
+          var yy = Math.floor(c / W) + mover.dy;
+          if (yy < VIS + TOP) cellRect(ctx, c % W, yy, PIECE_COLOR[CODE[mover.piece]], mover.piece, false);
+        });
+      }
+      if (outline) {
+        ctx.strokeStyle = accent; ctx.lineWidth = 2;
+        outline.forEach(function (c) {
+          var yy = Math.floor(c / W);
+          if (yy < VIS + TOP) ctx.strokeRect(BX + (c % W) * C + 1, (VIS + TOP - 1 - yy) * C + 1, C - 2, C - 2);
+        });
+      }
+      // boundary state on the board frame: solid = checked, dashed = past the checked prefix
+      var v0 = pp.d.verified_to, past = k - 1 > v0 && k > 0;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = !past ? accent : (pp.d.after === "check_failed" ? tok["--rp-bad"] : tok["--pending"]);
+      if (ctx.setLineDash) ctx.setLineDash(past ? [5, 4] : []);
+      ctx.strokeRect(BX + 1, 1, W * C - 2, CH - 2);
+      if (ctx.setLineDash) ctx.setLineDash([]);
+      // meter
+      var mx = (HOLD_W + GAP) * C, frames = Math.min(t, pp.d.frames);
+      var pend = pendingAt(s, frames, k);
+      ctx.fillStyle = tok["--border-strong"];
+      ctx.fillRect(mx, TOP * C, METER_W * C, VIS * C);
+      ctx.fillStyle = tok["--rp-bad"];
+      var hgt = Math.min(pend, VIS) * C;
+      ctx.fillRect(mx, CH - hgt, METER_W * C, hgt);
+      // hold + next
+      var q = x.queue[Math.min(k, x.queue.length - 1)];
+      ctx.fillStyle = tok["--ink-secondary"];
+      ctx.font = "600 " + Math.round(C * 0.62) + "px ui-monospace, monospace";
+      ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+      ctx.fillText("HOLD", 2, C * 0.9);
+      var nx = BX + W * C + GAP * C;
+      ctx.fillText("NEXT", nx + 2, C * 0.9);
+      var sz = C * 0.8;
+      miniPiece(ctx, q.hold, 4 + sz * 0.3, C * 1.4, sz);
+      var nexts = k < pp.d.locks.length ? [q.cur].concat(D.seq.slice(q.ptr, q.ptr + NEXT - 1).split("")) : [];
+      nexts.forEach(function (pc, i) { miniPiece(ctx, pc, nx + sz * 0.3, C * 1.4 + i * sz * 2.4, sz); });
+    }
+
+    function speed() { return +speedSel.value || 1; }
+
+    function updateText() {
+      P.forEach(function (pp, s) {
+        var sd = sides[s], k = countAt[s][pos], n = pp.d.locks.length, a = pp.x.atk[k];
+        sd.strip.textContent = "第 " + k + "/" + n + " 粒 · 攻擊 " + a + " · 每粒攻擊 "
+          + (k ? floor2(a / k) : "—") + " · 食垃圾 " + pp.x.ins[k] + " 行";
+        var v = pp.d.verified_to, st, words;
+        if (k === 0 || k - 1 <= v) { st = "verified"; words = k === 0 ? "未落第一粒" : "已核：第 " + k + " 粒之前嘅攻擊都對得上"; }
+        else if (pp.d.after === "check_failed") { st = "check_failed"; words = "核對失敗：第 " + (pp.d.failed_at + 1) + " 粒嘅攻擊對唔上，第 " + (v + 2) + " 粒起盤面可能同真實唔同"; }
+        else { st = "no_evidence"; words = "最後一次攻擊之後：冇證據話啱定唔啱（核到第 " + (v + 1) + " 粒）"; }
+        sd.state.setAttribute("data-state", st);
+        sd.state.textContent = words;
+        var flagged = D.flags.some(function (fl) { return fl[1] === s && fl[0] <= pos; });
+        sd.flag.hidden = !flagged;
+        // the callout names this player's last placement only while it is recent (one second of
+        // game time), so a stale "Double +1" does not sit beside a board that has moved on
+        sd.callout.textContent = k > 0 && tAt[pos] - pp.x.absF[k - 1] <= 60 ? describe(s, k - 1) : "";
+      });
+      seek.value = String(pos);
+      var vt = "第 " + pos + "/" + N + " 粒（兩邊合計）· " + fmtTime(t);
+      seek.setAttribute("aria-valuetext", vt);
+      posEl.textContent = vt;
+      momentBtns.forEach(function (b, i) {
+        if (D.moments[i][0] === pos) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+      });
+    }
+
+    function boardLabel(s) {
+      var pp = P[s], k = countAt[s][pos], b = pp.x.boards[k], top = 0, gar = 0;
+      for (var y = 0; y < ROWS; y++) {
+        var any = false, g = false;
+        for (var x = 0; x < W; x++) { var v = b[y * W + x]; if (v) { any = true; if (v === 8) g = true; } }
+        if (any) top = y + 1;
+        if (g) gar++;
+      }
+      return pp.d.user + " 嘅模擬盤面，第 " + k + "/" + pp.d.locks.length + " 粒之後：最高去到第 " + top
+        + " 行，有 " + gar + " 行有垃圾，等緊嘅垃圾 " + pendingAt(s, Math.min(t, pp.d.frames), k) + " 行。";
+    }
+
+    function draw() {
+      var now = performance.now();
+      drawSide(0, now); drawSide(1, now);
+    }
+    function notify() { if (opts.onChange) opts.onChange(pos, t, playing); }
+    function still() {
+      updateText(); draw();
+      if (!playing) sides.forEach(function (sd, s) { sd.cv.setAttribute("aria-label", boardLabel(s)); });
+      notify();
+    }
+
+    /* ---------- navigation ---------- */
+    var HASH = opts.hashPrefix == null ? null : String(opts.hashPrefix);
+    function writeHash() {
+      if (!touched || HASH === null) return;
+      var h = "#" + HASH + D.label + "@p" + pos;
+      if (location.hash !== h && history.replaceState) history.replaceState(null, "", h);
+    }
+    function setPos(q, animate) {
+      q = Math.max(0, Math.min(N, q));
+      var prev = pos;
+      pos = q; t = tAt[q];
+      fx = [null, null];
+      if (animate && q === prev + 1) {
+        var s = +D.order[q - 1];
+        fx[s] = { k: countAt[s][q] - 1, t0: performance.now(), drop: true };
+        kick();
+      }
+      touched = true;
+      still();
+      if (!playing) writeHash();
+    }
+    function stepBy(d) {
+      pause();
+      setPos(pos + d, d === 1);
+      if (d === 1 || d === -1) announceMoments(pos);
+    }
+    function jumpMoment(dir) {
+      pause();
+      var target = null;
+      D.moments.forEach(function (m) {
+        if (dir > 0 && m[0] > pos && (target === null || m[0] < target)) target = m[0];
+        if (dir < 0 && m[0] < pos && (target === null || m[0] > target)) target = m[0];
+      });
+      if (target !== null) { setPos(target, false); announceMoments(target); }
+    }
+    function announce(text) { live.textContent = ""; setTimeout(function () { live.textContent = text; }, 30); }
+    function announceMoments(q) {
+      var here = D.moments.filter(function (m) { return m[0] === q; }).map(function (m) { return m[3]; });
+      if (here.length) announce(here.join("；"));
+    }
+
+    /* ---------- playback on ONE shared frame clock ---------- */
+    function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+    function frame(now) {
+      raf = 0;
+      var dt = Math.min(100, now - last); last = now;
+      var fxActive = fx.some(function (f) { return f && now - f.t0 < 700; });
+      if (playing) {
+        t += dt * 60 / 1000 * speed();
+        var moved = [];
+        while (pos < N && tAt[pos + 1] <= t) {
+          pos++;
+          var s = +D.order[pos - 1];
+          fx[s] = { k: countAt[s][pos] - 1, t0: now, drop: false };
+          moved.push(pos);
+        }
+        if (speed() <= 1) {
+          var said = [];
+          moved.forEach(function (q) {
+            D.moments.forEach(function (m) { if (m[0] === q) said.push(m[3]); });
+          });
+          if (said.length) announce(said.join("；"));
+        }
+        if (t >= T_END) { t = T_END; pos = N; pause(true); return; }
+        updateText(); draw(); notify();
+        raf = requestAnimationFrame(frame);
+      } else if (fxActive) {
+        draw();
+        raf = requestAnimationFrame(frame);
+      } else {
+        draw();
+      }
+    }
+    function play() {
+      if (playing) return;
+      if (pos >= N) { pos = 0; t = 0; }
+      playing = true; touched = true;
+      playBtn.textContent = "暫停"; playBtn.setAttribute("aria-label", "暫停");
+      kick();
+    }
+    function pause(ended) {
+      if (!playing) return;
+      playing = false;
+      playBtn.textContent = "播放"; playBtn.setAttribute("aria-label", "播放");
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      still();
+      writeHash();
+      var parts = P.map(function (pp, s) {
+        return pp.d.user + " 第 " + countAt[s][pos] + "/" + pp.d.locks.length + " 粒";
+      });
+      announce((ended ? "播完：" : "暫停：") + "第 " + pos + "/" + N + " 粒，" + fmtTime(t) + "。" + parts.join("，") + "。");
+    }
+
+    playBtn.addEventListener("click", function () { if (playing) pause(); else play(); });
+    $('[data-act="back"]').addEventListener("click", function () { stepBy(-1); });
+    $('[data-act="fwd"]').addEventListener("click", function () { stepBy(1); });
+    $('[data-act="start"]').addEventListener("click", function () { pause(); setPos(0, false); });
+    $('[data-act="end"]').addEventListener("click", function () { pause(); setPos(N, false); announceMoments(N); });
+    seek.addEventListener("input", function () { pause(); setPos(+seek.value, false); });
+    speedSel.addEventListener("change", function () { if (!playing) still(); });
+    lettersBtn.addEventListener("click", function () {
+      letters = !letters; lettersBtn.setAttribute("aria-pressed", String(letters)); draw();
+    });
+    function toggleHelp(force) {
+      var open = force == null ? help.hidden : force;
+      help.hidden = !open; helpBtn.setAttribute("aria-expanded", String(open));
+    }
+    helpBtn.addEventListener("click", function () { toggleHelp(); });
+
+    var SPEEDS = ["0.5", "1", "2", "4"];
+    function shiftSpeed(d) {
+      var i = SPEEDS.indexOf(speedSel.value) + d;
+      if (i < 0 || i >= SPEEDS.length) return;
+      speedSel.value = SPEEDS[i];
+      announce("速度 " + SPEEDS[i] + "×");
+      if (!playing) still();
+    }
+
+    // keys act only while focus is inside the player (WCAG 2.1.4)
+    box.addEventListener("keydown", function (e) {
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      var tag = e.target.tagName, k = e.key;
+      if (tag === "INPUT" && /^(ArrowLeft|ArrowRight|ArrowUp|ArrowDown|Home|End|PageUp|PageDown)$/.test(k)) return;
+      if (tag === "SELECT" && k !== "?") return;
+      if ((tag === "BUTTON") && (k === " " || k === "Enter")) return;
+      var done = true;
+      switch (k) {
+        case " ": case "k": case "K": if (playing) pause(); else play(); break;
+        case "ArrowLeft": stepBy(-1); break;
+        case "ArrowRight": stepBy(1); break;
+        case "ArrowUp": jumpMoment(-1); break;
+        case "ArrowDown": jumpMoment(1); break;
+        case "j": case "J": pause(); setPos(pos - 5, false); break;
+        case "l": case "L": pause(); setPos(pos + 5, false); break;
+        case "Home": pause(); setPos(0, false); break;
+        case "End": pause(); setPos(N, false); break;
+        case "<": case ",": shiftSpeed(-1); break;
+        case ">": case ".": shiftSpeed(1); break;
+        case "?": toggleHelp(); break;
+        case "Escape": if (!help.hidden) toggleHelp(false); else done = false; break;
+        default: done = false;
+      }
+      if (done) e.preventDefault();
+    });
+
+    // theme and motion are re-read when they change; destroy() drops all three listeners
+    function retheme() { readTokens(); draw(); }
+    function remotion() { reduced = motionQ.matches; draw(); }
+    var schemeQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+    if (schemeQ) schemeQ.addEventListener("change", retheme);
+    var themeObs = window.MutationObserver ? new MutationObserver(retheme) : null;
+    if (themeObs) themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
+    if (motionQ && motionQ.addEventListener) motionQ.addEventListener("change", remotion);
+
+    if (typeof opts.pos === "number") {
+      pos = Math.max(0, Math.min(N, Math.floor(opts.pos))); t = tAt[pos];
+      touched = true;
+    }
+    // deep link: #<prefix>m<pos>r<round>@p<n> (a different round's link is ignored, not misapplied)
+    if (HASH !== null) (function readHash() {
+      var m = /^#([a-z-]*)(m\d+r\d+)(?:@p(\d+))?$/.exec(location.hash);
+      if (m && m[1] === HASH && m[2] === D.label) {
+        pos = Math.min(N, +(m[3] || 0)); t = tAt[pos];
+        touched = true;
+        setTimeout(function () { root.scrollIntoView(); }, 0);
+      }
+    })();
+    still();
+
+    return {
+      label: D.label,
+      length: N,
+      frameAt: function (q) { return tAt[Math.max(0, Math.min(N, q))]; },
+      /* the last merged position reached at or before `frames` on the shared clock */
+      posAtFrame: function (frames) {
+        var lo = 0, hi = N;
+        while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (tAt[mid] <= frames) lo = mid; else hi = mid - 1; }
+        return lo;
+      },
+      endFrame: T_END,
+      seek: function (q) { pause(); setPos(q, false); announceMoments(pos); },
+      destroy: function () {
+        pause();
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        if (schemeQ) schemeQ.removeEventListener("change", retheme);
+        if (themeObs) themeObs.disconnect();
+        if (motionQ && motionQ.removeEventListener) motionQ.removeEventListener("change", remotion);
+      }
+    };
+  };
+})();
+(function () {
+  var root = document.getElementById("round-replay");
+  var data = document.getElementById("rp-data");
+  if (!root || !data || !window.rpReplay) return;
+  rpReplay.mount(root, root.querySelector(".rp-player"), JSON.parse(data.textContent),
+                 { hashPrefix: "replay-" });
+})();
+    </script>
+  </div>
+</section>
+<!-- END generated round-replay -->
 
 <footer class="report-footer">
   yachi vs pinglamb · 2026-08-14 · report.html generated from facts.json + claims ledgers · pipeline/build_report.py keeps this in sync
