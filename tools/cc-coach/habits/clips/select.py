@@ -1,9 +1,11 @@
 import os as _os; CC_WORK = _os.environ['CC_WORK']  # the work directory: corpus/, scen/, scen/habits/, scen/hclips/
-# Stage 1: pick TYPICAL examples per (habit, night) and build the K=4 rollout inputs.
-# Typical = regret nearest the median regret of the night's display pool, and never outside the
-# middle half of that pool (midrank percentile BAND, inclusive): a night whose near-median
-# candidates are unusable shows fewer examples rather than a tail case.
-# Writes: candidates.json (ranked, up to NCAND per habit-night, distinct rounds, valid windows),
+# Stage 1: rank example candidates per (habit, night) and build the K=4 rollout inputs.
+# Candidates are every usable occurrence of the night (no cost band), in order of graded cost nearest the
+# median graded cost of the night's display pool ("typical" is only the ORDER now). finalize.py keeps the
+# first two, from different rounds and match files, on which Cold Clear's line is clearly better over
+# the K pieces (its rule MUCH, in at least 3 of the 5 seeds). At most NCAND candidates per habit-night are
+# rolled out; the log records every habit-night where that cap left candidates untried.
+# Writes: candidates.json (ranked, up to NCAND per habit-night, valid windows),
 #         windows.jsonl (every recorded decision needed for the human side + checks),
 #         rollin.jsonl (one rollout input per unique position id), select-log.json
 import json, os, statistics, collections
@@ -11,8 +13,13 @@ S = CC_WORK + ''
 C = S + '/corpus'; H = S + '/scen/habits'; O = S + '/scen/hclips'
 HABITS = 'Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6'.split()
 SESS = sorted(f[:-6] for f in os.listdir(C) if f.endswith('.jsonl') and f[:4] == '2026')
-K = 4; NCAND = 10         # keep 2; the rest are backups for clips that fail a self-check, have no contrasting
-                          # Cold Clear run, or repeat a match file / a round already shown
+K = 4; NCAND = 12         # rollout cap per habit-night: finalize.py keeps the first 2 that qualify; the rest are
+                          # backups for clips that fail a self-check, are not clearly worse than Cold Clear's line,
+                          # or repeat a match file / a round already shown
+# extend.json (optional; the union of finalize.py's log.capped_short over the earlier passes): habit-nights whose cap is lifted,
+# because after NCAND they still had fewer than 2 examples. Rerun until log.capped_short is empty, so a night is
+# short only when its candidates ran out.
+EXTEND = set(json.load(open(f'{O}/extend.json'))) if os.path.exists(f'{O}/extend.json') else set()
 # Habits whose definition IS misdrop-shaped (Y1 by definition; P1 deliberately includes them per
 # FINDINGS pinglamb #1; Y6's TSS is cc's TSD one rotation off, misdrop-shaped by construction)
 MISDROP_OK = {'Y1', 'P1', 'Y6'}
@@ -77,16 +84,9 @@ EXAMPLE_ONLY = {
     # a piece whose centroid sits exactly on the midline (4.5) is in neither half; P4.py counts it as right
     'P4': ('the piece sits clearly on one half, not on the midline', lambda o: o['detail']['player_centroid_x'] != 4.5),
 }
-# Examples only from the middle half of the pool: graded cost between the pool's first and third
-# quartiles, inclusive, with the quartiles linearly interpolated (numpy's default). On a small pool the
-# 2nd-lowest or 2nd-highest value has midrank percentile exactly 25 or 75 but sits outside this band.
-BAND = (25.0, 75.0)
-def quantile(regs, q):
-    x = (len(regs) - 1) * q / 100; i = int(x); f = x - i
-    return regs[i] if i + 1 >= len(regs) else regs[i] + f * (regs[i + 1] - regs[i])
 def midrank_pct(v, regs):
     return round(100 * (sum(r < v for r in regs) + 0.5 * sum(r == v for r in regs)) / len(regs), 1)
-cands = {}; log = {'empty': [], 'short_windows': [], 'notes': [], 'pools': {}}
+cands = {}; log = {'empty': [], 'short_windows': [], 'notes': [], 'pools': {}, 'capped': [], 'ncand': NCAND, 'extended': sorted(EXTEND)}
 for h in HABITS:
     for s in SESS:
         allo = [o for o in occ[h] if o['session'] == s]
@@ -112,28 +112,23 @@ for h in HABITS:
             ex2 = [o for o in ex if EXAMPLE_OK[h][1](o)]
             if ex2: restr = EXAMPLE_OK[h][0]; info['example_class_excluded'] = len(ex) - len(ex2); ex = ex2
         info['example_restriction'] = restr
-        q1, q3 = quantile(regs, BAND[0]), quantile(regs, BAND[1])
-        inb = [o for o in ex if q1 <= o['regret'] <= q3]
-        info['band'] = list(BAND); info['band_regret'] = [q1, q3]
-        info['positive_outside_band'] = len(ex) - len(inb); info['positive_in_band'] = len(inb)
-        ex = inb
         srt = sorted(ex, key=lambda o: (abs(o['regret'] - med), o['regret'], o['id']))
-        picked = []; used = set(); short = 0; same_round = 0
+        info['positive_eligible'] = len(ex)
+        picked = []; short = 0
         for rank, o in enumerate(srt):
-            rd = rkey(o['id']).rsplit('/', 1)[0]
-            if rd in used: same_round += 1; continue
             wf, why = window_ok(o)
             if wf is None:
                 short += 1; log['short_windows'].append({'habit': h, 'session': s, 'id': o['id'], 'why': why}); continue
-            used.add(rd)
-            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + f', graded cost inside the pool\'s interpolated {BAND[0]:g}th-{BAND[1]:g}th percentiles; distinct rounds',
-                                            'band_regret': [q1, q3], 'example_only': EXAMPLE_ONLY.get(h, (None,))[0],
+            if len(picked) == NCAND and f'{h}/{s}' not in EXTEND:   # the cap: count what it leaves untried
+                info['capped_untried'] = info.get('capped_untried', 0) + 1; continue
+            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); candidates only from positive graded cost' + (', ' + restr if restr else '') + (f'; at most {NCAND} rolled out' if f'{h}/{s}' not in EXTEND else f'; more than {NCAND} rolled out, the night being short after {NCAND}'),
+                                            'example_only': EXAMPLE_ONLY.get(h, (None,))[0],
                                             'pool_size': len(pool), 'pool_regret_median': med, 'regret': o['regret'],
                                             'distance_from_median': abs(o['regret'] - med), 'rank_by_distance': rank + 1,
                                             'regret_percentile_in_pool_midrank': midrank_pct(o['regret'], regs),
                                             'misdrop_ok': h in MISDROP_OK, 'example_restriction': restr}})
-            if len(picked) == NCAND: break
-        info['windows_rejected'] = short; info['same_round_as_closer'] = same_round
+        info['windows_rejected'] = short; info['candidates'] = len(picked); info['cap_lifted'] = f'{h}/{s}' in EXTEND
+        if info.get('capped_untried'): log['capped'].append({'habit': h, 'session': s, 'rolled': len(picked), 'untried': info['capped_untried']})
         log['pools'][f'{h}/{s}'] = info
         if not picked: log['empty'].append({'habit': h, 'session': s, 'why': 'no candidate with a valid 4-lock window in a usable round', **info}); continue
         cands[f'{h}/{s}'] = picked
@@ -153,5 +148,5 @@ with open(f'{O}/windows.jsonl', 'w') as fw, open(f'{O}/rollin.jsonl', 'w') as fr
         fr.write(json.dumps(st) + '\n')
 json.dump(log, open(f'{O}/select-log.json', 'w'), indent=1)
 print('habit-nights with candidates', len(cands), 'empty', len(log['empty']), 'unique positions', len(ids),
-      'short windows skipped', len(log['short_windows']))
+      'short windows skipped', len(log['short_windows']), 'habit-nights capped', len(log['capped']))
 for e in log['empty']: print('EMPTY', e['habit'], e['session'], e['why'], e['excluded'])

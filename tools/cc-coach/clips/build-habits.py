@@ -520,60 +520,58 @@ def card(h, rates, pooled=False, n_ex=None):
     return rows, notes, sv, qual
 
 
+MUCH = D['much_better']   # finalize.py's "clearly better" thresholds; the page prints them from here
 # finalize.py's reasons, in reader words (a reason it does not list here is printed as finalize.py wrote it)
-REASON = {'Cold Clear does not contrast': f"fewer than a majority of the {len(SEEDS)} Cold Clear runs made a first move that contrasts with the habit"}
-SMALL_POOL = 10   # below this many occurrences a night's "typical" is called a loose word, on the card and in each caption
+REASON = {'Cold Clear does not contrast': f"fewer than {MUCH['min_seeds']} of the {len(SEEDS)} Cold Clear runs made a first move that contrasts with the habit",
+          'Cold Clear not clearly better': f"Cold Clear's line was clearly better in fewer than {MUCH['min_seeds']} of the {len(SEEDS)} runs",
+          'self-check failed': "a rebuilt board or attack did not match the recording or the harness",
+          'same match file as the other example': "same match as the other example",
+          'position already shown under another habit': "already shown under another habit",
+          'its pieces are already shown under another habit': "its pieces are already shown under another habit"}
+SMALL_POOL = 10   # below this many occurrences a night's median is called a loose guide, on the card and in each caption
 
 
 def pool_note(h, v):
     """Where this night's examples come from, and why there are fewer than two when there are."""
     p = v['pool']
-    if not p:
-        return None
-    md = '' if p['misdrop_ok'] else ' that are not misdrop-shaped'
     occ = lambda k: 'occurrence' if k == 1 else 'occurrences'
-    t = (f"Typical plays are measured against this night's {p['pool']} verified {occ(p['pool'])}{md} "
-         f"(median graded cost {num(p['pool_regret_median'])}).")
-    lo, hi = p['band']; qlo, qhi = p['band_regret']
-    t += (f" Examples come only from the middle half of them (graded cost between the {lo:g}th and {hi:g}th percentiles, "
-          f"{qlo:.1f} to {qhi:.1f}".replace('-', '−') + ") and only with a positive graded cost.")
+    n = len(v['examples'])
+    if not p:
+        return "No play this night where Cold Clear's line was clearly better: the habit has no occurrence to try this night."
+    md = '' if p['misdrop_ok'] else ' that are not misdrop-shaped'
+    t = (f"Examples are tried from this night's {p['pool']} verified {occ(p['pool'])}{md} "
+         f"(median graded cost {num(p['pool_regret_median'])}), nearest that median first, from any part of the cost range, "
+         f"and shown only where Cold Clear's line was clearly better over the {K} pieces in at least {MUCH['min_seeds']} of the {len(SEEDS)} runs.")
     npos = p.get('nonpositive_cost') or 0
     if npos:
-        t += f" {npos} of the {p['pool']} {'scores' if npos == 1 else 'score'} at least as well as Cold Clear's own pick (graded cost 0 or below)."
-    if p['pool_regret_median'] <= 0:
-        t += (" So this night's typical occurrence was not costly: an example here shows the shape of the habit, "
-              "not a typical cost.")
+        t += f" {npos} of the {p['pool']} {'scores' if npos == 1 else 'score'} at least as well as Cold Clear's own pick (graded cost 0 or below) and {'is' if npos == 1 else 'are'} not tried."
     if p['pool'] < SMALL_POOL:
-        t += f" With only {p['pool']} this night, \"typical\" is a loose word."
+        t += f" With only {p['pool']} this night, that median is a loose guide."
     if p.get('example_restriction'):
         t += f" For this habit they are also limited to its most common kind, {p['example_restriction']}."
     if p.get('example_only'):
         t += f" Examples are also limited to positions where {p['example_only']}, so that they show the scene described above."
-    n = len(v['examples'])
     if n < 2:
-        inb = p['positive_in_band']
+        tried = p.get('candidates', 0)
         reasons = []
         if p.get('example_only_excluded'):
             k = p['example_only_excluded']
             reasons.append(f"{k} positive-cost {occ(k)} that {'does' if k == 1 else 'do'} not show the scene described above")
-        if p.get('positive_outside_band'):
-            k = p['positive_outside_band']
-            reasons.append(f"{k} other positive-cost {occ(k)} outside the middle half")
         if p.get('windows_rejected'):
             k = p['windows_rejected']
-            reasons.append(f"{k} in the middle half {'has' if k == 1 else 'have'} fewer than {K} verified recorded pieces after {'it' if k == 1 else 'them'}")
-        if p.get('same_round_as_closer'):
-            k = p['same_round_as_closer']
-            reasons.append(f"{k} in the middle half {'shares' if k == 1 else 'share'} a round with a closer one")
+            reasons.append(f"{k} {'has' if k == 1 else 'have'} fewer than {K} verified recorded pieces after {'it' if k == 1 else 'them'}")
         # finalize.py retries a round another habit uses whenever a night is short, so on a short night that round is
         # never the final reason; if it were, the rule printed in the header would be contradicted by this note
         assert not (v.get('not_used') or {}).get('round already shown under another habit'), (h['id'], v['pool'], 'round reason on a short night')
-        for w_, c_ in sorted((v.get('not_used') or {}).items(), key=lambda kv: -kv[1]):
-            w_ = REASON.get(w_, w_)
-            reasons.append(f"{c_} in the middle half: {w_}")
-        head = (f"Only one example this night" if n == 1 else "No example this night")
-        head += (f": {inb} {occ(inb)} {'has' if inb == 1 else 'have'} a positive graded cost inside the middle half" if inb else
-                 ": no occurrence inside the middle half has a positive graded cost")
+        for w_, c_ in sorted((v.get('not_used') or {}).items(), key=lambda kv: (-kv[1], kv[0])):
+            reasons.append(f"{c_} tried: {REASON.get(w_, w_)}")
+        untried = p.get('capped_untried') or 0
+        if untried:
+            reasons.append(f"{untried} more not tried (at most {v['cap']} are tried a night)")
+        head = ("Only one play this night" if n == 1 else "No play this night") + \
+            f" where Cold Clear's line was clearly better over the {K} pieces" + (f" among the {tried} tried" if untried else "") + \
+            (" that is not already shown under another habit" if any(k_ in (v.get('not_used') or {}) for k_ in
+             ('position already shown under another habit', 'its pieces are already shown under another habit')) else "")
         t += f" {head}." + (" Not shown: " + "; ".join(reasons) + "." if reasons else "")
     return t
 
@@ -604,14 +602,19 @@ def slim_clip(c):
     assert all(s.get('verified') for s in c['human']), c['id']
     assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], c['id']
     assert c['regret'] > 0, c['id']
-    blo, bhi = c['why_picked']['band_regret']
-    assert blo <= c['regret'] <= bhi, (c['id'], 'example outside the middle half of its pool')
+    # the shown run is clearly better than the player's K pieces, re-checked here from the clip's own facts, and at
+    # least MUCH['min_seeds'] seeds were
+    run = c['cc_run']; p4, q4 = c['facts']['player_4'], c['facts']['cc_4']
+    da, dc = q4['attack'] - p4['attack'], p4['covered_cells_end'] - q4['covered_cells_end_with_waiting']
+    assert (da, dc) == (run['margin']['attack'], run['margin']['covered']), c['id']
+    assert (p4['topped_out'] and not q4['topped_out']) or (da >= MUCH['attack'] and dc >= 0) or (dc >= MUCH['covered'] and da >= 0), (c['id'], 'not clearly better')
+    assert not (p4['attack'] > q4['attack'] and p4['covered_cells_end'] <= q4['covered_cells_end']), c['id']
+    assert run['seeds_clearly_better'] >= MUCH['min_seeds'] and sum(1 for x in run['per_seed'] if x['clearly_better']) == run['seeds_clearly_better'], c['id']
     assert all(s['garbage_in'] <= 8 for s in c['cc'] if not s.get('dead')), (c['id'], 'more rows than the per-lock cap')
     # the hold flag agrees with the recorded inputs: hold used iff the played piece is not the current one, or hold was
     # pressed while the current and held pieces were the same (later presses on one piece are ignored by the game)
     assert all(s['hold'] == (s['piece'] != s['queue']['current'] or ('hold' in s['keys'] and s['queue']['current'] == s['queue']['hold']))
                for s in c['human']), c['id']
-    run = c['cc_run']
     mr = MATCHES[c['night']][c['file']]   # the match report's own match: index and round must exist there
     assert any(r['index'] == c['round'] for r in mr['rounds']), (c['id'], 'round not in the match report')
     extra = {}
@@ -630,7 +633,8 @@ def slim_clip(c):
                       'q': [c['start']['current'], c['start']['hold'], ''.join(c['start']['next'])]},
             'human': [slim_step(s) for s in c['human']], 'cc': [slim_step(s) for s in c['cc']],
             'same': run['first_move_same_as_shown'], 'nseeds': len(run['seeds']), 'graded_eq': run['first_move_equals_graded_pick'],
-            'ncon': run['seeds_contrasting'],
+            'ncon': run['seeds_contrasting'], 'nbetter': run['seeds_clearly_better'],
+            'margin': [run['margin']['attack'], run['margin']['covered'], run['margin']['clause']],
             'facts': {k: c['facts'].get(k) for k in FACT_KEYS}}
 
 
@@ -676,7 +680,7 @@ for h in out_h:
     for v in h['nights'].values():
         for c in v['ex']:
             by_p[h['player']][0] += 1; by_p[h['player']][1] += not c['graded_eq']
-meta = {'small_pool': SMALL_POOL, 'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'zero_ex': D['log']['habit_nights_without_examples'],
+meta = {'small_pool': SMALL_POOL, 'much': MUCH, 'cap': D['habits'][0]['nights'][NIGHTS[0]]['cap'], 'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'zero_ex': D['log']['habit_nights_without_examples'],
         'n_habits': len(HAB), 'clips_by_player': by_p}
 
 TEMPLATE = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'habits-template.html'), encoding='utf-8').read()

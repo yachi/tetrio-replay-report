@@ -206,8 +206,8 @@ Four things this record used to blur, kept here so they are not blurred again:
 ## Habits page (`habits/`, published as `pages/cc-habits.html`)
 
 One page, both players, every night: for each recurring habit (six per player) the night's rate next
-to Cold Clear's rate on the same positions, a strip of that measure over all 15 nights, and typical
-example plays replayed side by side with Cold Clear from the identical position, queue, hold and
+to Cold Clear's rate on the same positions, a strip of that measure over all 15 nights, and example
+plays where Cold Clear's line was clearly better, replayed side by side with Cold Clear from the identical position, queue, hold and
 received garbage. The habits are the ones that survived two skeptic re-derivations over the 15-night
 corpus (narrowed where a skeptic narrowed them); the page's header says what it shows and what Cold
 Clear is not. yachi's view says "you"; pinglamb is always named.
@@ -227,7 +227,7 @@ cd $CC_WORK/scen/habits
 python3 Y6_prep.py   # Y6 only: positions outside grade.jsonl, then grade them:
 CC_NODES=20000 COACH_DUEL=20000 COACH_SEED=0 cc/target/release/cc-coach < Y6.extra-in.jsonl > Y6.extra-grade.jsonl
 for h in Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6; python3 $h.py; end
-# 2. clips: pick typical windows, roll Cold Clear out from each start with seeds 0-4, rebuild and check frames
+# 2. clips: rank candidate windows, roll Cold Clear out from each start with seeds 0-4, rebuild and check frames
 cd $CC_WORK/scen/hclips
 python3 select.py                       # candidates.json, windows.jsonl, rollin.jsonl, select-log.json
 for s in 0 1 2 3 4
@@ -260,35 +260,41 @@ a shifted garbage hole on a window that has garbage) each fail a check. The play
 from the recorded inputs, not only from "played piece != current piece": a hold pressed while the current
 and held pieces are the same changes nothing on the board but is still a hold.
 
-Selection. A habit-night's pool is its verified occurrences, misdrop-shaped excluded except for Y1, P1
-and Y6 (misdrop-shaped by definition); "typical" is measured against that whole pool's median graded
-cost, never a narrowed sub-pool. Examples are then taken nearest that median from positive graded cost
-only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), only
-from the middle half of the pool (graded cost between the pool's 25th and 75th percentiles,
-linearly interpolated, inclusive: `BAND` in `select.py`, asserted again in `finalize.py` and
-`build-habits.py`; on a small pool a midrank percentile of exactly 25 or 75 is the 2nd-lowest or
-2nd-highest value and falls outside), and for P3 only from single-line clears, its modal case. Some
-occurrences meet the code definition but show a different scene from the card's, so they stay in the
-pool and are not shown (`EXAMPLE_ONLY`): Y3 when the I itself is played away from the well; Y2 and P5
-when Cold Clear's pick is a quad (that is the quad habit's scene) or the position is a Y3/P6
-occurrence; P5 above 13 rows (FINDINGS: the 10-13 band for pinglamb); P4 when the piece's centroid is on
-the midline. Y2 and P5 runs contrast only with a 1-3 line first move, and P4 runs only with a centroid
-off the midline. The band ranks above every other rule: an earlier version ranked "a round no
-other habit uses" above closeness to the median, and on nights where the near-median plays shared a round
-with another habit's example it showed the night's worst occurrence instead. A night that cannot fill
-two examples from inside the band shows one or none, and its card says why. A candidate is kept only if a majority of the five
-40k-node Cold Clear seeds make a first move that contrasts with the habit by the habit's own test (P4's
-test also requires the same hold use as the player and no T-spin or quad, as its eligibility does); the
-shown run is the median, by 4-piece attack then holes, of the contrasting runs the harness did not
-declare dead. The harness's topout rule (spawn above row 20) is stricter than TETR.IO's, so a run it ends
-is never the one shown. A night's two examples come from different match files; no piece is shown under
-two habits, and a round another habit already uses is taken only when a night would otherwise have
-fewer than two. Each caption gives the pool's size, median and the example's percentile in it, and warns
-when the pool holds fewer than ten or its median cost is 0 or below; a night with fewer than two examples says why on its card. For the
-two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move seals off no cell at all by
-that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
-uncovered empty cell), so the caption, which names the cells each first move sealed
-off, cannot contradict the habit.
+Selection. Every example shown is a play where Cold Clear's line was clearly better over the 4 shown pieces;
+a play where the player's own 4 pieces came out level or ahead is never shown. A habit-night's pool is its verified
+occurrences, misdrop-shaped excluded except for Y1, P1 and Y6 (misdrop-shaped by definition). Candidates are taken
+from the whole pool, with no cost band (until 2026-10-05 only the middle half of the graded cost range was used), in
+order of graded cost nearest the pool's median ("typical" is only the order now), from positive graded cost only, and
+for P3 only from single-line clears, its modal case. At most 12 candidates per habit-night are rolled out (`NCAND` in
+`select.py`; `select-log.json` lists every habit-night the cap left candidates untried, and `habit-clips.json`'s
+`log.capped_short` the ones among them that still have fewer than two examples). Some occurrences meet the code
+definition but show a different scene from the card's, so they stay in the pool and are not tried (`EXAMPLE_ONLY`):
+Y3 when the I itself is played away from the well; Y2 and P5 when Cold Clear's pick is a quad (that is the quad
+habit's scene) or the position is a Y3/P6 occurrence; P5 above 13 rows (FINDINGS: the 10-13 band for pinglamb); P4
+when the piece's centroid is on the midline. Y2 and P5 runs contrast only with a 1-3 line first move, and P4 runs only
+with a centroid off the midline.
+
+"Clearly better" (`MUCH` in `finalize.py`, printed on the page from `habit-clips.json`) is judged per 40k-node Cold
+Clear seed against the player's actual 4 pieces: the run's first move contrasts with the habit by the habit's own
+test (P4's test also requires the same hold use as the player and no T-spin or quad, as its eligibility does), the
+harness did not declare it dead, and any of (a) the player tops out within the window and the run does not; (b) the
+run sends at least 3 more attack and ends with no more covered cells; (c) the run ends with at least 3 fewer covered
+cells and sends no less attack. Cold Clear's covered cells are counted with any received rows still waiting for it put
+in at their recorded hole columns, so a run is never credited for rows it has not taken. (Clause (a) cannot fire with
+the current windows: a window needs the player's 5th decision, so the player never tops out inside it.) A candidate
+is kept only if at least 3 of the 5 seeds are clearly better; the shown run is their median by attack margin, then
+covered-cell margin, then seed (lower first; even count, the lower middle). The harness's topout rule (spawn above
+row 20) is stricter than TETR.IO's, so a run it ends is never the one shown. A night's two examples come from
+different match files; no piece is shown under two habits, and a round another habit already uses is taken only when
+a night would otherwise have fewer than two. A night with fewer than two says so on its card, with what was tried and
+why each was not shown; its rates still show. Each caption gives the margin of the run shown (Cold Clear +X attack /
+−Y covered cells) and how many of the 5 seeds were clearly better, plus the pool's size, median and the example's
+percentile in it. For the two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move seals off no
+cell at all by that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
+uncovered empty cell), so the caption, which names the cells each first move sealed off, cannot contradict the habit.
+
+Rollouts are deterministic per position id and seed, so a rerun reuses an earlier `roll-s<seed>.jsonl` line for
+every position whose `rollin.jsonl` line is byte-identical (checked on a sample: re-rolled lines are byte-identical).
 
 A candidate skipped in the first pass only because another habit already shows its round is counted, on a
 short night, under the reason that rules it out on the retry (its pieces, the match file, or too few contrasting
