@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Habits vs Cold Clear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Tokens and board renderer follow cc-yachi.html / cc-pinglamb.html (anim-template.html); no web fonts, no external requests. */
+:root {
+  --bg: #f3f5f7; --panel: #ffffff; --ink: #18202a; --muted: #5a6573; --line: #d6dce3;
+  --human: #d9822b; --cc: #1592b0; --field: #1b222b; --grid: #262f3a; --garb: #6b7683; --stackc: #a8b3bf;
+  --flash: #ffffff; --good: #2f8a4c;
+  --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1419; --panel: #171e26; --ink: #e4e9ef; --muted: #98a3b1; --line: #2a3542;
+  --human: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1419; --panel: #171e26; --ink: #e4e9ef; --muted: #98a3b1; --line: #2a3542;
+  --human: #f0a050; --cc: #38bcd8; --field: #0b0f14; --grid: #19212b; --garb: #59636f; --stackc: #8f9aa7; color-scheme: dark }
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: hidden; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+main { max-width: 76rem; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+h2 { font-size: 1.25rem; }
+a { color: var(--cc); }
+.lede { max-width: 50rem; margin: .5rem 0 .8rem; color: var(--muted); }
+.lede b { color: var(--ink); }
+.other { margin: 0 0 1rem; font-size: .9rem; }
+.about { display: grid; gap: .6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); margin-bottom: 1.2rem; }
+.about section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: .7rem .95rem; font-size: .88rem; color: var(--muted); }
+.about h3 { font-size: .95rem; color: var(--ink); margin-bottom: .25rem; }
+.bar { position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; flex-wrap: wrap; gap: .6rem; align-items: center;
+  padding: .55rem 0; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { font: 600 .9rem var(--mono); padding: .4rem .8rem; border: 0; background: var(--panel); color: var(--ink); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--cc); color: #fff; }
+.bar label { font: .8rem var(--mono); color: var(--muted); display: inline-flex; gap: .4rem; align-items: center; }
+select { font: .9rem var(--mono); padding: .35rem; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; max-width: 100%; }
+.bar .nav button { font: .85rem var(--mono); padding: .35rem .6rem; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 5px; cursor: pointer; }
+.cards { display: grid; gap: 1.2rem; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem 1.2rem; min-width: 0; }
+.card .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 1.2rem; align-items: start; }
+@media (max-width: 960px) { .card .grid { grid-template-columns: minmax(0, 1fr); } }
+.card .hid { font: .72rem var(--mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.card .desc { margin: .35rem 0 .7rem; }
+.tw { overflow-x: auto; }
+table.rates { border-collapse: collapse; width: 100%; font-size: .86rem; }
+table.rates th, table.rates td { padding: .3rem .4rem; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+table.rates th:first-child, table.rates td:first-child { text-align: left; }
+table.rates th { font: 600 .74rem var(--mono); color: var(--muted); }
+table.rates td { font-variant-numeric: tabular-nums; }
+table.rates td.p { color: var(--human); font-weight: 600; } table.rates td.c { color: var(--cc); font-weight: 600; }
+.notes { font-size: .86rem; color: var(--muted); margin: .5rem 0; padding-left: 1.1rem; }
+.notes li { margin: .2rem 0; }
+.stripbox { margin: .7rem 0 .2rem; }
+.stripbox .lab { font: .75rem var(--mono); color: var(--muted); }
+svg.strip { width: 100%; max-width: 26rem; height: auto; display: block; }
+svg.strip text { fill: var(--muted); font: 9px var(--mono); }
+details { font-size: .84rem; color: var(--muted); margin-top: .5rem; }
+details summary { cursor: pointer; color: var(--ink); }
+details p { margin: .4rem 0; white-space: pre-line; }
+.picks { display: flex; flex-wrap: wrap; gap: .3rem; margin: 0 0 .6rem; }
+.picks button { font: .78rem var(--mono); padding: .25rem .5rem; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 5px; cursor: pointer; }
+.picks button[aria-pressed="true"] { border-color: var(--cc); box-shadow: inset 0 -2px 0 var(--cc); }
+.picks .h { font: .72rem var(--mono); color: var(--muted); align-self: center; margin-right: .2rem; }
+.stage { border: 1px solid var(--line); border-radius: 8px; padding: .7rem .7rem .8rem; background: var(--bg); min-width: 0; }
+.where { font: .75rem var(--mono); color: var(--muted); }
+.where .tag { display: inline-block; border: 1px solid var(--line); border-radius: 4px; padding: 0 .3rem; margin-left: .3rem; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: .5rem; }
+.side { display: grid; gap: .3rem; justify-items: center; min-width: 0; }
+.side h4 { margin: 0; font: 600 .9rem var(--display); letter-spacing: .04em; }
+.side.human h4 { color: var(--human); } .side.cc h4 { color: var(--cc); }
+canvas { display: block; border-radius: 4px; background: var(--field); width: 100%; max-width: 200px; height: auto; }
+.callout { min-height: 1.4em; font: 700 .85rem var(--display); letter-spacing: .05em; text-transform: uppercase; text-align: center; }
+.side.human .callout { color: var(--human); } .side.cc .callout { color: var(--cc); }
+.hud { display: flex; flex-wrap: wrap; justify-content: center; gap: .1rem .7rem; font: .74rem var(--mono); color: var(--muted); }
+.hud b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+.queue { font: .72rem var(--mono); color: var(--muted); min-height: 1.2em; text-align: center; }
+.controls { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; margin: .7rem 0 .3rem; }
+.controls button { font: 500 .85rem var(--mono); padding: .35rem .65rem; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 5px; cursor: pointer; min-width: 2.4rem; }
+.controls button.primary { background: var(--cc); color: #fff; border-color: var(--cc); }
+.controls input[type=range] { flex: 1 1 6rem; min-width: 5rem; accent-color: var(--cc); }
+.controls .pos { font: .8rem var(--mono); font-variant-numeric: tabular-nums; }
+ul.cap { list-style: none; padding: 0; margin: .5rem 0; display: grid; gap: .3rem; font-size: .86rem; }
+ul.cap li .k { font: .7rem var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-right: .35rem; }
+ul.cap li.warn { color: var(--muted); font-style: italic; }
+.hl-p { color: var(--human); font-weight: 600; } .hl-c { color: var(--cc); font-weight: 600; }
+table.tot { border-collapse: collapse; font-size: .8rem; width: 100%; }
+table.tot th, table.tot td { padding: .2rem .35rem; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+table.tot th:first-child, table.tot td:first-child { text-align: left; }
+table.tot th { font: 600 .72rem var(--mono); color: var(--muted); }
+.empty { color: var(--muted); font-size: .88rem; }
+.strength { margin: .2rem 0 .5rem; padding: .35rem .6rem; border-left: 3px solid var(--line); color: var(--muted); font-size: .86rem; max-width: 60rem; }
+.poolnote { margin: 0 0 .5rem; color: var(--muted); font-size: .82rem; }
+.nightinfo { margin: -.4rem 0 1rem; color: var(--muted); font-size: .86rem; }
+.foot { max-width: 52rem; margin-top: 2rem; font-size: .85rem; color: var(--muted); }
+:focus-visible { outline: 2px solid var(--cc); outline-offset: 2px; }
+</style>
+
+<main>
+  <h1 id="h1">Habits vs Cold Clear, night by night</h1>
+  <p class="lede" id="lede"></p>
+  <p class="other"><a href="index.html">← All reports</a> · Single-window replays: <a href="cc-yachi.html">yachi vs Cold Clear</a> · <a href="cc-pinglamb.html">pinglamb vs Cold Clear</a></p>
+  <div class="about" id="about"></div>
+  <div class="bar" role="toolbar" aria-label="choose player and night">
+    <div class="seg" id="pseg"></div>
+    <label>night <select id="night" aria-label="night"></select></label>
+    <span class="nav"><button id="prevn" aria-label="previous night">◀</button> <button id="nextn" aria-label="next night">▶</button></span>
+  </div>
+  <p class="nightinfo" id="nightinfo"></p>
+  <div class="cards" id="cards"></div>
+  <div class="foot" id="foot"></div>
+</main>
+
+<script>
+const DATA = {{DATA}};
+const META = {{META}};
+const K = DATA.k, NIGHTS = DATA.nights;
+const COLORS = { I:'#3fc1c9', O:'#e8c547', T:'#a066d3', S:'#5cb85c', Z:'#d9534f', L:'#e8913a', J:'#4a76d4' };
+const W = 10, CELL = 20;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const short = d => d.slice(5);
+
+// Wording: yachi's view addresses yachi as "you"; pinglamb is always named.
+const WHO = {
+  yachi: { S: 'You', s: 'you', poss: 'your', Poss: 'Your', label: 'YOU', title: 'Your habits' },
+  pinglamb: { S: 'pinglamb', s: 'pinglamb', poss: "pinglamb's", Poss: "pinglamb's", label: 'PINGLAMB', title: "pinglamb's habits" },
+};
+let state = { player: 'yachi', night: 'all' };
+const w = () => WHO[state.player];
+const fill = t => t.replace(/\{(S|s|poss|Poss)\}/g, (_, k) => w()[k]);
+const minus = v => String(v).replace('-', '−');
+
+function readHash() {
+  const [p, n] = decodeURIComponent(location.hash.slice(1)).split('/');
+  if (WHO[p]) state.player = p;
+  if (n === 'all' || NIGHTS.includes(n)) state.night = n;
+}
+function writeHash() { const h = '#' + state.player + '/' + state.night; if (location.hash !== h) history.replaceState(null, '', h); }
+
+// ---- header ---------------------------------------------------------------------------------
+const nHab = p => DATA.habits.filter(h => h.player === p).length;
+// cards carrying a note that qualifies the habit itself (a re-check's STRENGTH note, or a control note), on the view shown
+const view = h => state.night === 'all' ? h.all : h.nights[state.night];
+const nWeak = p => { const k = DATA.habits.filter(h => h.player === p && (h.strength || view(h).qual)).length;
+  return ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'][k] || String(k); };
+function header() {
+  const N = NIGHTS.length;
+  $('h1').textContent = w().title + ' vs Cold Clear, night by night';
+  $('lede').innerHTML = '';
+  $('lede').append(
+    `These are patterns that recur in ${state.player === 'yachi' ? 'your' : "pinglamb's"} own play over ${N} nights, not one-off drops: each survived two independent re-checks as a recurring pattern. ` +
+    `That does not make each one a clear gap to Cold Clear: ` +
+    `${nWeak(state.player).toLowerCase()} of these ${nHab(state.player)} cards carry a note where the re-checks or a control found the habit weak, narrow, ` +
+    `partly explained by something else, or possibly nothing` +
+    (state.player === 'yachi' ? `; one of them, the sideways T, stands out only next to pinglamb's rate, not next to Cold Clear's. ` : '. ') +
+    `For each one: the night's rate next to Cold Clear's ` +
+    `(for the hole and seal habits Cold Clear can only be compared on a smaller set of positions, judged against its own second run), ` +
+    `how the measure moved over all ${N} nights, and typical plays replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
+    `on the right what Cold Clear played from the identical position, queue, hold and garbage.`);
+  const A = $('about'); A.innerHTML = '';
+  const short_ = META.one_ex.length + META.zero_ex.length;
+  const one = short_ ? ` ${short_} habit-night${short_ > 1 ? 's have' : ' has'} fewer than two; the card says why for that night.` : '';
+  const blocks = [
+    ['How the examples were chosen',
+     `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice, or, for a move that leaves a covered cell, a shape that one column over would have left none) ` +
+     `are left out of it, except where the habit is that shape by definition: the one-column-off hole habits and the over-rotated T. ` +
+     `The one-column / one-rotation test compares the move with Cold Clear's pick and its next three candidates. A move that is exactly one of those candidates ` +
+     `is not counted misdrop-shaped because of that candidate, but it is still counted when another of them (for most habits, one ranked higher) is one column ` +
+     `or one rotation away from it. ` +
+     `"Typical" means nearest the pool's median graded cost, and never outside the middle half of the pool (graded cost between its 25th and 75th percentiles, interpolated): ` +
+     `a night whose near-median plays cannot be shown gets fewer examples rather than a tail case. Each caption gives the pool's median and where the example sits in it. ` +
+     `Examples are only taken from moves with a positive graded cost (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
+     `and for pinglamb's follow-up clears only from single-line clears, that habit's most common kind. ` +
+     `Each example needs its next ${K} recorded pieces verified, and a majority of the ${DATA.seeds} Cold Clear runs from it must make a first move that contrasts with the habit. ` +
+     `A night's two examples come from different matches, and no piece is shown twice on the page: a round already used by another habit is only taken when a night would otherwise have fewer than two. ` +
+     `Up to ${META.per_night} per habit and night, ${META.n_clips} in all.` + one],
+    ['What Cold Clear is, and is not',
+     `A strong bot's line, not "the correct play". It is tuned for a different game's scoring, values B2B as on/off, and has no 180° spins. ` +
+     `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece; the run shown is the middle one, by ${K}-piece attack, ` +
+     `of the runs whose first move contrasts with the habit, and each example says how many of the ${DATA.seeds} runs contrasted and how many picked the exact first move shown. ` +
+     `It sees no more of the queue than the player did, gets the same garbage on the same pieces ` +
+     `(rows wait while its piece clears lines, and at most 8 enter on one piece, as in TETR.IO), and gets no credit for cancelling. ` +
+     `When its last pieces clear lines, some of those rows are still waiting when the ${K} pieces end; the example then says how many. ` +
+     `The harness also declares a tall stack dead earlier than TETR.IO does (it treats spawning above row 20 as a topout), ` +
+     `so a run it ends as topped out might have kept going in the game; those runs are never the one shown.`],
+    ['How to read the numbers',
+     `"Graded cost" is Cold Clear's duel value of its own pick minus that of the move played: each placement is scored, then searched afresh from the board it leaves. ` +
+     `Positive means the move scored worse than Cold Clear's pick; it can be negative, when the move scored better. One move's verdict is noisy, so the page leans on rates over many positions. ` +
+     `That pick comes from a separate, shorter Cold Clear search than the runs replayed beside each example, and the two do not always choose the same first move: ` +
+     `in ${META.clips_by_player[state.player][1]} of the ${META.clips_by_player[state.player][0]} examples on this view the Cold Clear move shown is not the pick the graded cost was measured against, ` +
+     `and each of those says so in its seeds line. ` +
+     `The ${K}-piece totals under each example are only what happened in those ${K} pieces. They are not the verdict: a move can send more over ${K} pieces and still leave the weaker position. ` +
+     `Each card's table reads the habit's detector output for that night; "n" is how many positions qualified. ` +
+     `Matches are numbered as in that night's match report, and rounds, pieces and columns are counted from 1: "match 6, round 3" is m6r2 in the match report's ids ` +
+     `(its rounds count from 0), and column 1 is the leftmost. Every night uses all of its match files, the same ones its match report is built from. ` +
+     `Simulator and bot output: nothing here is in the match reports' proof chain.`],
+  ];
+  for (const [h, t] of blocks) { const s = el('section'); s.append(el('h3', null, h), el('div', null, t)); A.append(s); }
+}
+
+function controls() {
+  const P = $('pseg'); P.innerHTML = '';
+  for (const p of DATA.players) { const b = el('button', null, p); b.setAttribute('aria-pressed', p === state.player);
+    b.onclick = () => { state.player = p; update(); }; P.append(b); }
+  const S = $('night'); if (!S.options.length) {
+    S.append(new Option('All nights', 'all')); NIGHTS.forEach(n => S.append(new Option(n, n)));
+    S.onchange = () => { state.night = S.value; update(); };
+    $('prevn').onclick = () => step(-1); $('nextn').onclick = () => step(1);
+  }
+  S.value = state.night;
+}
+function step(d) { const all = ['all', ...NIGHTS]; let i = all.indexOf(state.night) + d; i = Math.max(0, Math.min(all.length - 1, i)); state.night = all[i]; update(); }
+
+// ---- strip: the habit's per-night value, selected night highlighted --------------------------
+function strip(h) {
+  const vals = h.strip, n = vals.length, Wd = 300, Ht = 70, L = 40, B = 14, bw = (Wd - L - 4) / n;
+  const nums = vals.filter(v => v != null), lo = Math.min(0, ...nums), hi = Math.max(0, ...nums), span = (hi - lo) || 1;
+  const y = v => 6 + (Ht - B - 6) * (hi - v) / span;
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', `0 0 ${Wd} ${Ht}`); svg.setAttribute('class', 'strip');
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', fill(h.stripLabel) + ', one bar per night');
+  const add = (t, at, txt) => { const e = document.createElementNS(ns, t); for (const k in at) e.setAttribute(k, at[k]); if (txt != null) e.textContent = txt; svg.append(e); return e; };
+  add('line', { x1: L, x2: Wd - 2, y1: y(0), y2: y(0), stroke: 'var(--muted)', 'stroke-width': 1 });
+  // axis labels: the extremes and zero, each drawn once, zero dropped when it would touch an extreme
+  const ticks = [[hi, 1], [lo, 1], [0, 0]];
+  const drawn = [];
+  for (const [v, ext] of ticks) {
+    if (drawn.some(d => d === v || Math.abs(y(d) - y(v)) < 10)) continue;
+    drawn.push(v); add('text', { x: L - 4, y: y(v) + 3, 'text-anchor': 'end' }, v === 0 ? '0' : minus(+v.toFixed(2)));
+  }
+  vals.forEach((v, i) => { const x = L + i * bw, sel = NIGHTS[i] === state.night;
+    if (v == null) return;
+    const r = add('rect', { x: x + 1.5, y: Math.min(y(v), y(0)), width: bw - 3, height: Math.max(1, Math.abs(y(v) - y(0))),
+      fill: sel ? 'var(--human)' : 'var(--stackc)', opacity: state.night === 'all' || sel ? 1 : .55 });
+    const t = document.createElementNS(ns, 'title'); t.textContent = `${NIGHTS[i]}: ${minus(v)}`; r.append(t);
+  });
+  // date labels: the selected night first, then the two end nights only where they do not overlap it
+  // (9px monospace: 5.4 units a character; a 2-unit gap is kept between labels)
+  const LW = 5 * 5.4, boxes = [];
+  const lab = i => { const x = L + i * bw;
+    return i === 0 ? [x + 1, x + 1 + LW, { x: x + 1, y: Ht - 2, 'text-anchor': 'start' }]
+      : i === n - 1 ? [x + bw - 1 - LW, x + bw - 1, { x: x + bw - 1, y: Ht - 2, 'text-anchor': 'end' }]
+      : [x + bw / 2 - LW / 2, x + bw / 2 + LW / 2, { x: x + bw / 2, y: Ht - 2, 'text-anchor': 'middle' }]; };
+  const si = NIGHTS.indexOf(state.night);
+  for (const i of [si, 0, n - 1]) { if (i < 0 || vals[i] == null && i === si) continue;
+    const [a, b, at] = lab(i); if (boxes.some(([c, d, j]) => j === i || (a < d + 2 && b > c - 2))) continue;
+    boxes.push([a, b, i]); add('text', at, short(NIGHTS[i])); }
+  return svg;
+}
+
+// ---- boards ---------------------------------------------------------------------------------
+const rowOf = (b, r) => b.substr(r * W, W);
+function draw(cv, board, R, opts = {}) {
+  const ctx = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  if (cv.width !== W * CELL * dpr || cv.height !== R * CELL * dpr) { cv.width = W * CELL * dpr; cv.height = R * CELL * dpr; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = css('--field'); ctx.fillRect(0, 0, W * CELL, R * CELL);
+  ctx.strokeStyle = css('--grid'); ctx.lineWidth = 1;
+  for (let x = 1; x < W; x++) { ctx.beginPath(); ctx.moveTo(x * CELL + .5, 0); ctx.lineTo(x * CELL + .5, R * CELL); ctx.stroke(); }
+  ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(0, 0, W * CELL, (R - 20) * CELL);   // rows above the visible 20
+  for (let r = 0; r < R; r++) {
+    if (opts.flash && opts.flash.includes(r)) { ctx.fillStyle = css('--flash'); ctx.globalAlpha = opts.flashA; ctx.fillRect(0, r * CELL, W * CELL, CELL); ctx.globalAlpha = 1; continue; }
+    const row = rowOf(board, r);
+    for (let c = 0; c < W; c++) { const ch = row[c]; if (ch === '.') continue;
+      ctx.fillStyle = ch === 'G' ? css('--garb') : (COLORS[ch] || css('--stackc')); ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2); } }
+  if (opts.piece) { const { cells, piece, dy, edge } = opts.piece;
+    for (const [c, r] of cells) { const rr = r - dy; if (rr < -1) continue;
+      ctx.fillStyle = COLORS[piece]; ctx.fillRect(c * CELL + 1, rr * CELL + 1, CELL - 2, CELL - 2);
+      ctx.strokeStyle = edge; ctx.lineWidth = 2; ctx.strokeRect(c * CELL + 2, rr * CELL + 2, CELL - 4, CELL - 4); } }
+  if (opts.ghost) { const { cells, edge } = opts.ghost; ctx.setLineDash([4, 3]); ctx.strokeStyle = edge; ctx.lineWidth = 2;
+    for (const [c, r] of cells) ctx.strokeRect(c * CELL + 2, r * CELL + 2, CELL - 4, CELL - 4); ctx.setLineDash([]); }
+}
+function withPiece(before, cells, piece) { const g = before.split(''); for (const [c, r] of cells) g[r * W + c] = piece; return g.join(''); }
+function fullRows(b, R) { const out = []; for (let r = 0; r < R; r++) if (!rowOf(b, r).includes('.')) out.push(r); return out; }
+const kindLabel = s => { if (!s || s.dead) return ''; const n = ['', 'single', 'double', 'triple', 'quad'][s.lines] || '';
+  if (s.spin === 'normal' && s.piece === 'T') return s.lines ? 'T-spin ' + n : 'T-spin'; if (s.spin === 'mini') return s.lines ? 'mini T-spin ' + n : ''; return s.lines === 4 ? 'quad' : n; };
+
+class Stage {
+  constructor(host, h, clip) {
+    this.h = h; this.c = clip; this.step = 0; this.playing = false; this.inflight = false; this.timer = null; this.anim = null;
+    const R = clip.rows;
+    host.innerHTML = '';
+    const top = el('div', 'where');
+    top.append(`${clip.night} match ${clip.m} (${clip.file}) · round ${clip.round} (m${clip.m}r${clip.r0} in the match report) · from piece ${clip.piece}`);
+    top.append(el('span', 'tag', `graded cost ${minus(clip.regret)}`));
+    if (clip.misdrop) top.append(el('span', 'tag', 'misdrop-shaped'));
+    host.append(top);
+    const F = el('div', 'fields'); this.ui = {};
+    for (const [side, name] of [['h', w().label], ['c', 'COLD CLEAR']]) {
+      const S = el('div', 'side ' + (side === 'h' ? 'human' : 'cc'));
+      const cv = el('canvas'); cv.width = W * CELL; cv.height = R * CELL;
+      cv.setAttribute('aria-label', (side === 'h' ? w().poss : "Cold Clear's") + ' field');
+      const co = el('div', 'callout'), hud = el('div', 'hud'), q = el('div', 'queue');
+      S.append(el('h4', null, name), co, cv, hud, q); F.append(S);
+      this.ui[side] = { cv, co, hud, q };
+    }
+    host.append(F);
+    const C = el('div', 'controls');
+    const back = el('button', null, '◀'), play = el('button', 'primary', 'Play'), fwd = el('button', null, '▶');
+    back.setAttribute('aria-label', 'previous piece'); fwd.setAttribute('aria-label', 'next piece');
+    const rng = el('input'); rng.type = 'range'; rng.min = 0; rng.max = K; rng.value = 0; rng.setAttribute('aria-label', 'piece');
+    const pos = el('span', 'pos'); const sp = el('select'); sp.setAttribute('aria-label', 'speed');
+    for (const v of ['0.5', '1', '2']) sp.append(new Option(v + '×', v, v === '1', v === '1'));
+    C.append(back, play, fwd, rng, pos, sp); host.append(C);
+    Object.assign(this.ui, { back, play, fwd, rng, pos, sp });
+    play.onclick = () => this.playing ? this.stop() : this.play();
+    fwd.onclick = () => { this.stop(); if (this.step < K) this.animateStep(); };
+    back.onclick = () => { if (this.inflight) { this.inflight = false; this.stop(); this.still(); return; } this.stop(); this.step = Math.max(0, this.step - 1); this.still(); };
+    rng.oninput = e => { this.stop(); this.step = +e.target.value; this.still(); };
+    host.append(caption(h, clip), totals(clip));
+    this.still();
+  }
+  seq(side) { return side === 'h' ? this.c.human : this.c.cc; }
+  boardAt(side, k) { const s = this.seq(side); let j = Math.min(k, s.length) - 1; while (j >= 0 && s[j].dead) j--; return j < 0 ? this.c.start.field : s[j].after; }
+  hud(side) {
+    const s = this.seq(side), u = this.ui[side], k = this.step; let atk = 0, lines = 0, last = null, dead = false;
+    for (let j = 0; j < k && j < s.length; j++) { if (s[j].dead) { dead = true; break; } atk += s[j].attack; lines += s[j].lines; last = s[j]; }
+    const b2b = last ? last.b2b : this.c.start.b2b;
+    u.hud.innerHTML = ''; for (const [l, v] of [['attack', atk], ['lines', lines], ['B2B', b2b >= 1 ? '×' + b2b : '–']]) { const sp = el('span', null, l + ' '); sp.append(el('b', null, String(v))); u.hud.append(sp); }
+    const cur = s[k - 1];
+    u.co.textContent = dead ? 'topped out' : cur ? ((k === 1 ? 'move 1 · ' : '') + (kindLabel(cur) || 'no clear') + (cur.attack ? ' +' + cur.attack : '')) : 'start';
+    const nx = s[k];
+    if (side === 'h') { const q = nx ? nx.q : null; u.q.textContent = q ? `now ${q[0]} · hold ${q[1] || '–'} · next ${q[2]}` : ''; }
+    else u.q.textContent = nx && !nx.dead ? `places ${nx.piece}${nx.hold ? ' via hold' : ''}` : (nx && nx.dead ? 'topped out next' : '');
+  }
+  still() {
+    const R = this.c.rows;
+    for (const side of ['h', 'c']) {
+      const s = this.seq(side), edge = css(side === 'h' ? '--human' : '--cc'), opts = {};
+      if (this.step === 0 && s[0] && !s[0].dead) opts.ghost = { cells: s[0].cells, edge };   // where move 1 will land
+      if (this.step === 1 && s[0] && !s[0].dead && !s[0].lines && !s[0].garbage_in) opts.ghost = { cells: s[0].cells, edge };
+      draw(this.ui[side].cv, this.boardAt(side, this.step), R, opts); this.hud(side);
+    }
+    this.ui.rng.value = this.step; this.ui.pos.textContent = `piece ${this.step} / ${K}`;
+  }
+  animateStep(done) {
+    const k = this.step, spd = +this.ui.sp.value, R = this.c.rows;
+    if (reduce) { this.step++; this.still(); done && done(); return; }
+    const DROP = 260 / spd, FLASH = 220 / spd, t0 = performance.now();
+    const plan = [['h', this.c.human[k]], ['c', this.c.cc[k]]].map(([s, st]) => { if (!st || st.dead) return null;
+      const before = this.boardAt(s, k), minR = Math.min(...st.cells.map(x => x[1])), placed = withPiece(before, st.cells, st.piece);
+      return { s, st, before, from: minR + 1, placed, full: fullRows(placed, R) }; });
+    cancelAnimationFrame(this.anim); this.inflight = true;
+    const tick = now => { const t = now - t0;
+      for (const p of plan) { if (!p) continue; const cv = this.ui[p.s].cv, edge = css(p.s === 'h' ? '--human' : '--cc');
+        if (t < DROP) draw(cv, p.before, R, { piece: { cells: p.st.cells, piece: p.st.piece, dy: Math.round(p.from * (1 - t / DROP)), edge } });
+        else if (p.full.length && t < DROP + FLASH) draw(cv, p.placed, R, { flash: p.full, flashA: 1 - (t - DROP) / FLASH });
+        else draw(cv, p.st.after, R); }
+      if (t < DROP + (plan.some(p => p && p.full.length) ? FLASH : 0) + 30) this.anim = requestAnimationFrame(tick);
+      else { this.inflight = false; this.step++; this.still(); done && done(); } };
+    this.anim = requestAnimationFrame(tick);
+  }
+  play() { if (this.step >= K) this.step = 0; this.playing = true; this.ui.play.textContent = 'Pause'; this.still();
+    const loop = () => { if (!this.playing) return; if (this.step >= K) { this.stop(); return; }
+      this.animateStep(() => { this.timer = setTimeout(loop, 420 / +this.ui.sp.value); }); };
+    loop(); }
+  stop() { this.playing = false; clearTimeout(this.timer); cancelAnimationFrame(this.anim); this.ui.play.textContent = 'Play';
+    if (this.inflight) { this.inflight = false; this.step++; this.still(); } }
+  redraw() { this.still(); }
+}
+
+// ---- captions: templated from the clip's facts only -------------------------------------------
+const plural = (n, a, b) => n === 1 ? a : (b || a + 's');
+const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'));
+const KEYNAME = { moveLeft: 'left', moveRight: 'right', rotateCW: 'rotate CW', rotateCCW: 'rotate CCW', rotate180: 'rotate 180',
+  softDrop: 'soft drop', hardDrop: 'hard drop', hold: 'hold' };
+const ORIENT = { spawn: 'in spawn orientation', cw: 'rotated clockwise', '180': 'rotated 180°', ccw: 'rotated counter-clockwise',
+  flat: 'flat', upright: 'upright', '': '' };
+const TPOINT = { spawn: 'pointing up', cw: 'pointing right', '180': 'pointing down', ccw: 'pointing left' };
+function moveText(m) {
+  const cols = m.columns.length > 1 ? `columns ${m.columns[0]}–${m.columns[m.columns.length - 1]}` : `column ${m.columns[0]}`;
+  const clr = m.lines ? `cleared ${m.lines} ${plural(m.lines, 'line')}` : 'cleared nothing';
+  const o = m.piece === 'T' ? TPOINT[m.orientation] : ORIENT[m.orientation];
+  let eff;
+  if (m.sealed_cells_new) {   // sealing habits: say what was sealed off, by the habit's own test
+    const sc = m.sealed_cells_new;
+    const byCol = {}; for (const [c, r] of sc) (byCol[c] = byCol[c] || []).push(r);
+    const where = Object.keys(byCol).map(Number).sort((a, b) => a - b).map(c => { const rs = byCol[c].sort((a, b) => a - b);
+      const run = rs.length > 1 && rs[rs.length - 1] - rs[0] === rs.length - 1;
+      return `column ${c}, ` + (rs.length === 1 ? `${ordinal(rs[0])} row` : run ? `rows ${rs[0]}–${rs[rs.length - 1]}` : `rows ${rs.join(', ')}`) + ' from the bottom'; });
+    eff = sc.length ? `sealed off ${sc.length} ${plural(sc.length, 'cell')} (${where.join('; ')})` : 'sealed off no cell';
+  } else eff = m.covered_cells_created > 0 ? `left ${m.covered_cells_created} new covered ${plural(m.covered_cells_created, 'cell')}`
+    : m.covered_cells_created < 0 ? `removed ${-m.covered_cells_created} covered ${plural(-m.covered_cells_created, 'cell')}` : 'left no new covered cell';
+  return `${m.piece}${o ? ' ' + o : ''}${m.from_hold ? ' from hold' : ''} in ${cols}: ${clr}, ${eff}`;
+}
+function caption(h, c) {
+  const f = c.facts, U = el('ul', 'cap');
+  const li = (k, parts, cls) => { const L = el('li', cls); if (k) L.append(el('span', 'k', k)); for (const p of parts) L.append(p); U.append(L); };
+  const span = (cls, t) => el('span', cls, t);
+  let setup = `Stack ${f.max_height_before} rows, ${f.garbage_rows_before} garbage ${plural(f.garbage_rows_before, 'row')}, ` +
+    `${f.covered_cells_before} covered ${plural(f.covered_cells_before, 'cell')}, ${f.incoming_before} incoming. ` +
+    `Piece ${f.current}, hold ${f.hold || 'empty'}, next ${f.next.join('')}.`;
+  if (/^(Y3|P6)$/.test(h.id) && f.well_rows_ready) setup += ` Well in column ${f.well_column}, ${f.well_rows_ready} ${plural(f.well_rows_ready, 'row')} ready${f.quad_available ? '; a quad is available now' : ''}.`;
+  if (h.id === 'Y6') setup += f.tsd_slot_ready ? ` A TSD slot is ready${f.tsd_available ? ' and a T is in reach' : ''}.` : '';
+  if (h.id === 'Y5' && c.hole_cols) setup += c.hole_cols.length === 1 ? ` The open garbage hole is in column ${c.hole_cols[0]}.`
+    : ` Open garbage holes in columns ${c.hole_cols.join(', ')}; the one buried is in column ${c.buried_cols.join(', ')}.`;
+  li('before', [setup]);
+  li('move 1', [span('hl-p', w().S), ` played ${moveText(f.player_first)}. `, span('hl-c', 'Cold Clear'), ` played ${moveText(f.cc_first)}.`]);
+  const k0 = c.human[0].keys;
+  if (k0) li('keys', [`${w().poss === 'your' ? 'Your' : "pinglamb's"} inputs for move 1: ${k0.map(x => KEYNAME[x] || x).join(' · ')} (holding a key down counts once).`]);
+  li('seeds', [`${c.ncon} of ${c.nseeds} Cold Clear runs made a first move that contrasts with this habit (${f.contrast_rule.replace(/^cc /, '')}); ` +
+    `${c.same} of ${c.nseeds} chose exactly the move shown` + (c.graded_eq ? ', which is also the pick the move was graded against.' :
+      `. The graded cost compares ${w().poss} move with a different Cold Clear pick from a separate search; the move shown is from the rollout run.`)]);
+  if (!f.cc_first_contrasts_with_habit)
+    li('note', [`In the run shown, Cold Clear's first move does not meet this habit's contrast (${f.contrast_rule}).`], 'warn');
+  const [pool, med, pct] = c.pool;
+  const tn = state.night === 'all' ? `the ${c.night} night` : 'this night';
+  li('why this one', [`Graded cost ${minus(c.regret)}. Among ${tn === 'this night' ? "this night's" : tn + "'s"} ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
+    `the median is ${minus(med)}, and this one sits at the ${ordinal(Math.round(pct))} percentile.` +
+    (med <= 0 ? ` That median is not a cost: on ${tn} the typical occurrence scored at least as well as Cold Clear's pick, so this example shows the shape, not a typical cost.` : '') +
+    (pool < META.small_pool ? ` With only ${pool} on ${tn}, "typical" is a loose word.` : '')]);
+  const wt = f.cc_4.garbage_waiting_end;
+  if (wt) li('note', [`${wt} of the garbage ${plural(wt, 'row')} ${w().s} received in these ${K} pieces ${wt === 1 ? 'is' : 'are'} still waiting for Cold Clear at the end ` +
+    `(rows wait while a piece clears lines, and at most 8 enter on one piece). Its height and holes at the end do not include ${wt === 1 ? 'it' : 'them'}, ` +
+    `so those two totals flatter Cold Clear.`], 'warn');
+  const p4 = f.player_4, q4 = f.cc_4;
+  if (p4.attack > q4.attack && p4.covered_cells_end <= q4.covered_cells_end)
+    li('note', [`Over these ${K} pieces ${w().s} came out ahead (more attack, no more holes). The ${K}-piece totals are not the verdict: ` +
+      `the graded cost scores the position each first move leaves, searched further ahead.`], 'warn');
+  return U;
+}
+function totals(c) {
+  const f = c.facts, wrap = el('div', 'tw'), T = el('table', 'tot');
+  T.innerHTML = `<thead><tr><th>over ${K} pieces</th><th class="p"></th><th>Cold Clear</th></tr></thead>`;
+  T.querySelector('th.p').textContent = w().S === 'You' ? 'you' : 'pinglamb';
+  T.querySelector('th.p').style.color = 'var(--human)'; T.querySelectorAll('th')[2].style.color = 'var(--cc)';
+  const tb = el('tbody'), p = f.player_4, q = f.cc_4;
+  const rows = [['attack (lines sent)', p.attack, q.attack], ['lines cleared', p.lines, q.lines], ['holes (covered cells) at the end', p.covered_cells_end, q.covered_cells_end],
+    ['max height at the end', p.max_height_end, q.max_height_end], ['garbage rows received', p.garbage_received, q.garbage_received]];
+  if (q.garbage_waiting_end) rows.push(['received rows still waiting at the end', '–', q.garbage_waiting_end]);
+  if (p.topped_out || q.topped_out) rows.push(['topped out', p.topped_out ? 'yes' : 'no', q.topped_out ? 'yes' : 'no']);
+  for (const r of rows) { const tr = el('tr'); r.forEach(v => tr.append(el('td', null, String(v)))); tb.append(tr); }
+  T.append(tb); wrap.append(T); return wrap;
+}
+
+// ---- cards ----------------------------------------------------------------------------------
+let stages = [];
+function render() {
+  stages.forEach(s => s.stop()); stages = [];
+  const Cs = $('cards'); Cs.innerHTML = '';
+  for (const h of DATA.habits.filter(x => x.player === state.player)) {
+    const all = state.night === 'all', N = all ? h.all : h.nights[state.night];
+    const C = el('article', 'card'); C.id = 'habit-' + h.id;
+    C.append(el('div', 'hid', `${h.id} · ${all ? 'all ' + NIGHTS.length + ' nights' : state.night}`), el('h2', null, h.name), el('p', 'desc', fill(h.desc)));
+    if (h.strength) C.append(el('p', 'strength', fill(h.strength)));
+    const G = el('div', 'grid'), left = el('div'), right = el('div'); G.append(left, right); C.append(G);
+    const tw = el('div', 'tw'), T = el('table', 'rates');
+    T.innerHTML = `<thead><tr><th>${all ? 'all nights' : 'this night'}</th><th class="ph"></th><th>Cold Clear</th><th>n</th></tr></thead>`;
+    T.querySelector('.ph').textContent = w().S === 'You' ? 'you' : 'pinglamb';
+    const tb = el('tbody');
+    for (const r of N.rows) { const tr = el('tr'); tr.append(el('td', null, fill(r[0])), el('td', 'p', r[1]), el('td', 'c', r[2]), el('td', null, r[3])); tb.append(tr); }
+    T.append(tb); tw.append(T); left.append(tw);
+    const ul = el('ul', 'notes'); for (const n of N.notes) ul.append(el('li', null, fill(n))); left.append(ul);
+    if (!all && N.poolnote) right.append(el('p', 'poolnote', fill(N.poolnote)));
+    const sb = el('div', 'stripbox'); sb.append(el('div', 'lab', fill(h.stripLabel) + ' — one bar per night' + (all ? '' : ', this night highlighted')), strip(h)); left.append(sb);
+    const det = el('details'); det.append(el('summary', null, 'How this habit is measured, over all ' + NIGHTS.length + ' nights'));
+    for (const t of h.measured) det.append(el('p', null, fill(t)));
+    left.append(det);
+    // examples
+    const exs = all ? NIGHTS.flatMap(n => h.nights[n].ex.map((c, i) => ({ c, label: `${short(n)} · ${i + 1}` })))
+                    : h.nights[state.night].ex.map((c, i) => ({ c, label: `example ${i + 1}` }));
+    const picks = el('div', 'picks'); picks.append(el('span', 'h', all ? 'typical plays, by night:' : 'typical plays:'));
+    const host = el('div', 'stage');
+    if (!exs.length) host.append(el('p', 'empty', all ? 'No example passed the selection rules on any night.' : 'No example passed the selection rules this night; the note above says why.'));
+    let cur = null;
+    const show = i => { if (cur) cur.stop(); picks.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i));
+      cur = new Stage(host, h, exs[i].c); stages = stages.filter(s => s.host !== host); cur.host = host; stages.push(cur); };
+    exs.forEach((e, i) => { const b = el('button', null, e.label); b.onclick = () => show(i); picks.append(b); });
+    right.append(picks, host);
+    Cs.append(C);
+    if (exs.length) show(0);
+  }
+}
+function nightinfo() {
+  const M = DATA.matches;
+  $('nightinfo').textContent = state.night === 'all'
+    ? `All ${NIGHTS.length} nights, each with every one of its match files: ${NIGHTS.reduce((a, n) => a + M[n][0], 0)} matches, ${NIGHTS.reduce((a, n) => a + M[n][1], 0)} rounds.`
+    : `${state.night}: all ${M[state.night][0]} match files of the night (${M[state.night][1]} rounds), the same ones its match report is built from.`;
+}
+function update() { writeHash(); controls(); header(); nightinfo(); render(); }
+window.addEventListener('hashchange', () => { readHash(); controls(); header(); nightinfo(); render(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => stages.forEach(s => s.redraw()));
+readHash(); update();
+$('foot').textContent = `Built from the habit detectors' per-night output and ${META.n_clips} replayed windows (${META.n_habits} habits × ${NIGHTS.length} nights). ` +
+  `Every number comes from that output; captions are filled in from each window's recorded facts.`;
+</script>
+</html>

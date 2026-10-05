@@ -300,6 +300,10 @@ fn rollout(pos: &J, nodes: u32) -> J {
     let sched: Vec<Vec<(usize, usize)>> = pos["garbage_schedule"].as_array().map(|a| a.iter().map(|t| t.as_array().unwrap().iter()
         .map(|g| (g["amount"].as_u64().unwrap() as usize, g["column"].as_u64().unwrap() as usize)).collect()).collect()).unwrap_or_default();
     let incoming: Vec<u32> = pos["incoming_schedule"].as_array().map(|a| a.iter().map(|v| v.as_u64().unwrap() as u32).collect()).unwrap_or_default();
+    // TETR.IO's per-lock garbage cap (`garbage_cap`, the game's garbagecap, 8 by default): at most that
+    // many queued rows enter on one lock; the rest stay queued, front first, for the next non-clearing
+    // lock. Absent = no cap (the behaviour of the earlier 14-piece rollout pages, kept reproducible).
+    let cap: usize = pos["garbage_cap"].as_u64().map(|v| v as usize).unwrap_or(usize::MAX);
     let mut pending: Vec<(usize, usize)> = vec![];
     for j in 0..k {
         coach_reseed(seed_for(pos["id"].as_str().unwrap_or(""), &format!("rollout-{}", j)));
@@ -314,19 +318,23 @@ fn rollout(pos: &J, nodes: u32) -> J {
         let mut inserted = 0usize;
         if l.cleared_lines.is_empty() && !pending.is_empty() {
             let mut f = board.get_field(); // y-up: f[0] is the bottom row
+            let mut rest: Vec<(usize, usize)> = vec![];
             for (amount, col) in pending.drain(..) {
-                for _ in 0..amount {
+                let take = amount.min(cap - inserted);
+                for _ in 0..take {
                     for y in (1..40).rev() { f[y] = f[y - 1]; }
                     let mut row = [true; 10]; if col < 10 { row[col] = false; } f[0] = row;
                     inserted += 1;
                 }
+                if take < amount { rest.push((amount - take, col)); }
             }
+            pending = rest;
             board.set_field(f);
         }
         let topped = board.column_heights().iter().any(|&h| h > 22);
         steps.push(json!({"piece": pname(pick.mv.kind.0), "hold": pick.hold, "cells": cells_td(&pick.mv),
             "kind": kind_name(l.placement_kind), "lines": l.cleared_lines.len(), "b2b": l.b2b, "pc": l.perfect_clear,
-            "combo": l.combo, "cc_garbage": l.garbage_sent, "tspin": format!("{:?}", pick.mv.tspin), "garbage_in": inserted}));
+            "combo": l.combo, "cc_garbage": l.garbage_sent, "tspin": format!("{:?}", pick.mv.tspin), "garbage_in": inserted, "garbage_waiting": pending.iter().map(|t| t.0).sum::<usize>()}));
         if topped { steps.push(json!({"dead": true, "why": "garbage pushed the stack out"})); break; }
         // reveal one more piece, keeping the visible queue at its original length
         if fed < future.len() { board.add_next_piece(future[fed]); fed += 1; }

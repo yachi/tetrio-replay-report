@@ -105,8 +105,9 @@ ARTEFACTS = [
 ]
 
 
-# The two cc-coach replay pages (tools/cc-coach/pages/, rendered by
-# tools/cc-coach/clips/build-anim.py). Simulator + bot output, so the cards say so and
+# The cc-coach pages (tools/cc-coach/pages/): the two replay pages rendered by
+# tools/cc-coach/clips/build-anim.py, and the per-night habits page rendered by
+# tools/cc-coach/clips/build-habits.py. Simulator + bot output, so the cards say so and
 # carry no claim count: nothing on those pages is in the proof chain.
 CC_PAGES = [
     ("cc-yachi.html", "yachi 對 Cold Clear 重播",
@@ -115,6 +116,9 @@ CC_PAGES = [
     ("cc-pinglamb.html", "pinglamb 對 Cold Clear 重播",
      "同一個盤面、同一串磚、同一啲垃圾行，pinglamb 嘅 14 粒同 Cold Clear 嘅 14 粒並排重播。"
      "由模擬器同 bot 行出嚟，唔喺證明鏈入面。"),
+    ("cc-habits.html", "逐晚睇習慣：對住 Cold Clear",
+     "yachi 同 pinglamb 喺 15 晚入面反覆出現嘅習慣（較弱、範圍窄，或者可能同 Cold Clear 根本分唔開嘅，張卡會註明）：揀一晚，睇嗰晚嘅比率同 Cold Clear 嘅比較，"
+     "再睇幾手例子同 Cold Clear 並排重播；例子只揀自嗰晚代價排中間一半嘅手，唔揀最差嗰啲。由模擬器同 bot 行出嚟，唔喺證明鏈入面。"),
 ]
 
 

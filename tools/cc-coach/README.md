@@ -202,3 +202,115 @@ Four things this record used to blur, kept here so they are not blurred again:
 - **After the refute loop, "the human" in yachi's captions (28 places) and pinglamb's (1) was replaced
   by the player's name** so both pages read alike. That substitution is mechanical and was not put
   back through the skeptics.
+
+## Habits page (`habits/`, published as `pages/cc-habits.html`)
+
+One page, both players, every night: for each recurring habit (six per player) the night's rate next
+to Cold Clear's rate on the same positions, a strip of that measure over all 15 nights, and typical
+example plays replayed side by side with Cold Clear from the identical position, queue, hold and
+received garbage. The habits are the ones that survived two skeptic re-derivations over the 15-night
+corpus (narrowed where a skeptic narrowed them); the page's header says what it shows and what Cold
+Clear is not. yachi's view says "you"; pinglamb is always named.
+
+The scripts expect one work directory, `$CC_WORK`, laid out as the run that produced the page was:
+`corpus/` (per-night positions, `mid.jsonl`, `grade.jsonl`, the seed-1 and weak-bot grades,
+`sub4000.jsonl`), `scen/` (`habits/lib/*.py` here), `scen/habits/` (`habits/detectors/*.py`) and
+`scen/hclips/` (`habits/clips/*`), plus `attack.ts` at its root (`frames.ts` imports
+`../../attack.ts`). Every hard-coded work path was replaced by `$CC_WORK`; nothing else was edited.
+The detectors also read the skeptics' cached row files (`scen/holes_rows.pkl` from `holes_build.py`,
+`scen/b2b_hold.pkl` from `b2b_hold_load.py`).
+
+```fish
+set -x CC_WORK /path/to/work
+# 1. detectors: <ID>.nights.json (per-night rates, verbatim on the page) + <ID>.occ.jsonl (occurrences)
+cd $CC_WORK/scen/habits
+python3 Y6_prep.py   # Y6 only: positions outside grade.jsonl, then grade them:
+CC_NODES=20000 COACH_DUEL=20000 COACH_SEED=0 cc/target/release/cc-coach < Y6.extra-in.jsonl > Y6.extra-grade.jsonl
+for h in Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6; python3 $h.py; end
+# 2. clips: pick typical windows, roll Cold Clear out from each start with seeds 0-4, rebuild and check frames
+cd $CC_WORK/scen/hclips
+python3 select.py                       # candidates.json, windows.jsonl, rollin.jsonl, select-log.json
+for s in 0 1 2 3 4
+  CC_NODES=40000 COACH_MODE=rollout COACH_SEED=$s cc/target/release/cc-coach < rollin.jsonl > roll-s$s.jsonl
+  bun frames.ts $s                      # frames-s$s.json + frames-check-s$s.json (fails loudly on a mismatch)
+end
+python3 finalize.py                     # $CC_WORK/scen/habit-clips.json
+# 3. the page, then publish
+python3 ~/tetrio-replay-report/tools/cc-coach/clips/build-habits.py \
+    --clips $CC_WORK/scen/habit-clips.json --corpus $CC_WORK/corpus \
+    --out ~/tetrio-replay-report/tools/cc-coach/pages/cc-habits.html
+bin/build-docs; bin/build-docs --check
+```
+
+(`frames.ts` reads `HCD` instead of `$CC_WORK/scen/hclips` when set; `mut/` held the mutant inputs.) The committed `finalize.py`, run against the original work
+directory, reproduces `habit-clips.json` byte for byte.
+
+What the clip stage checks, per start position and per seed: the player's board after each of the
+4 shown pieces equals the next recorded decision's field (garbage included); the player's attack, re-priced
+with each file's own options and the lock-time garbage multiplier, equals the replay's raw attack;
+Cold Clear's rebuilt lines and inserted garbage match the harness at every step, and its final board
+equals the harness's `final_field`. Cold Clear's received rows follow TETR.IO's rules on both sides of
+that check: rows wait while its piece clears lines, and at most 8 enter on one lock (the game's
+`garbagecap`, which no replay here overrides; across all 218 105 recorded locks no player took more
+than 8). The harness applies the cap only when the input carries `garbage_cap` (`select.py` sets it), so
+the older 14-piece rollouts still reproduce. Rows still waiting for Cold Clear when the 4 pieces end are
+reported per step (`garbage_waiting`) and the example says how many, since its end height and holes do
+not include them. Planted mutants (a +1 attack, a changed tank, a changed final field,
+a shifted garbage hole on a window that has garbage) each fail a check. The player's hold flag is read
+from the recorded inputs, not only from "played piece != current piece": a hold pressed while the current
+and held pieces are the same changes nothing on the board but is still a hold.
+
+Selection. A habit-night's pool is its verified occurrences, misdrop-shaped excluded except for Y1, P1
+and Y6 (misdrop-shaped by definition); "typical" is measured against that whole pool's median graded
+cost, never a narrowed sub-pool. Examples are then taken nearest that median from positive graded cost
+only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), only
+from the middle half of the pool (graded cost between the pool's 25th and 75th percentiles,
+linearly interpolated, inclusive: `BAND` in `select.py`, asserted again in `finalize.py` and
+`build-habits.py`; on a small pool a midrank percentile of exactly 25 or 75 is the 2nd-lowest or
+2nd-highest value and falls outside), and for P3 only from single-line clears, its modal case. Some
+occurrences meet the code definition but show a different scene from the card's, so they stay in the
+pool and are not shown (`EXAMPLE_ONLY`): Y3 when the I itself is played away from the well; Y2 and P5
+when Cold Clear's pick is a quad (that is the quad habit's scene) or the position is a Y3/P6
+occurrence; P5 above 13 rows (FINDINGS: the 10-13 band for pinglamb); P4 when the piece's centroid is on
+the midline. Y2 and P5 runs contrast only with a 1-3 line first move, and P4 runs only with a centroid
+off the midline. The band ranks above every other rule: an earlier version ranked "a round no
+other habit uses" above closeness to the median, and on nights where the near-median plays shared a round
+with another habit's example it showed the night's worst occurrence instead. A night that cannot fill
+two examples from inside the band shows one or none, and its card says why. A candidate is kept only if a majority of the five
+40k-node Cold Clear seeds make a first move that contrasts with the habit by the habit's own test (P4's
+test also requires the same hold use as the player and no T-spin or quad, as its eligibility does); the
+shown run is the median, by 4-piece attack then holes, of the contrasting runs the harness did not
+declare dead. The harness's topout rule (spawn above row 20) is stricter than TETR.IO's, so a run it ends
+is never the one shown. A night's two examples come from different match files; no piece is shown under
+two habits, and a round another habit already uses is taken only when a night would otherwise have
+fewer than two. Each caption gives the pool's size, median and the example's percentile in it, and warns
+when the pool holds fewer than ten or its median cost is 0 or below; a night with fewer than two examples says why on its card. For the
+two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move seals off no cell at all by
+that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
+uncovered empty cell), so the caption, which names the cells each first move sealed
+off, cannot contradict the habit.
+
+A candidate skipped in the first pass only because another habit already shows its round is counted, on a
+short night, under the reason that rules it out on the retry (its pieces, the match file, or too few contrasting
+Cold Clear runs), not under the round; `build-habits.py` refuses a short night whose note still gives the round.
+
+Cold Clear's "second run" rates (Y1, Y4, P1, P2) are one draw of a noisy search. Two separate seed-1 searches
+exist for the same sub4000 positions (`grade-s1.jsonl`, graded with the player's move, and `grade-s1-ccpick.jsonl`,
+graded with Cold Clear's seed-0 pick), and they do not always pick the same move. Each of those detectors writes its
+Cold Clear count under the other search too (`cc_alt_seed1`), and the page shows both. P2's Cold Clear side gets the
+own-shape-one-column-over test only when its pick adds covered cells, the condition `holes_build.py` puts on the
+player's side (until 2026-10-05 it was applied to every pick, which counted one fewer Cold Clear seal).
+
+`build-habits.py` also checks each night's match files and round sets against both the habit corpus
+(`--corpus`, `<night>.jsonl.rounds.json`) and the repo's match report (`sessions/<night>/report/facts.json`), and
+places every example by the report's own match index (`m<index>r<round>`).
+
+`build-habits.py` prints every rate straight from each habit's per-night entry (the detector's
+`nights.json`, carried verbatim in `habit-clips.json`), and the strip plots the detector's own gap field,
+never a difference of two rounded rates. All-nights rows read each detector's pooled entry (Y6's is its
+`nights.json` entry with session `pooled`; its rates are all over the graded in-slot placements). Each
+card's "how it is measured" text is written for readers in `READER`; the build fails if any figure in
+it is not in that habit's detector text (or in the skeptic output lines quoted in `SOURCE_EXTRA`), or if
+it uses internal wording. The build refuses a page with an external URL, a
+gendered pronoun or a model identifier. Like the two replay pages, it is simulator and bot output and
+not in the proof chain; `bin/build-docs` copies it verbatim and `--check` compares it byte for byte.
