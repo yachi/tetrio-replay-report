@@ -164,29 +164,35 @@ function header() {
     (state.player === 'yachi' ? `; one of them, the sideways T, stands out only next to pinglamb's rate, not next to Cold Clear's. ` : '. ') +
     `For each one: the night's rate next to Cold Clear's ` +
     `(for the hole and seal habits Cold Clear can only be compared on a smaller set of positions, judged against its own second run), ` +
-    `how the measure moved over all ${N} nights, and typical plays replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
+    `how the measure moved over all ${N} nights, and plays where Cold Clear's line was clearly better, replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
     `on the right what Cold Clear played from the identical position, queue, hold and garbage.`);
   const A = $('about'); A.innerHTML = '';
   const short_ = META.one_ex.length + META.zero_ex.length;
-  const one = short_ ? ` ${short_} habit-night${short_ > 1 ? 's have' : ' has'} fewer than two; the card says why for that night.` : '';
+  const one = short_ ? ` ${short_} habit-night${short_ > 1 ? 's have' : ' has'} fewer than two (${META.zero_ex.length} none); the card says why for that night.` : '';
+  const M = META.much;
   const blocks = [
     ['How the examples were chosen',
-     `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice, or, for a move that leaves a covered cell, a shape that one column over would have left none) ` +
+     `Only plays where Cold Clear's line was clearly better, so there is something to learn from it. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice, or, for a move that leaves a covered cell, a shape that one column over would have left none) ` +
      `are left out of it, except where the habit is that shape by definition: the one-column-off hole habits and the over-rotated T. ` +
      `The one-column / one-rotation test compares the move with Cold Clear's pick and its next three candidates. A move that is exactly one of those candidates ` +
      `is not counted misdrop-shaped because of that candidate, but it is still counted when another of them (for most habits, one ranked higher) is one column ` +
      `or one rotation away from it. ` +
-     `"Typical" means nearest the pool's median graded cost, and never outside the middle half of the pool (graded cost between its 25th and 75th percentiles, interpolated): ` +
-     `a night whose near-median plays cannot be shown gets fewer examples rather than a tail case. Each caption gives the pool's median and where the example sits in it. ` +
-     `Examples are only taken from moves with a positive graded cost (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
-     `and for pinglamb's follow-up clears only from single-line clears, that habit's most common kind. ` +
-     `Each example needs its next ${K} recorded pieces verified, and a majority of the ${DATA.seeds} Cold Clear runs from it must make a first move that contrasts with the habit. ` +
+     `Candidates are tried in order of graded cost nearest the pool's median, from any part of the cost range (examples are no longer limited to the middle of it), ` +
+     `at most ${META.cap} a night, or every one of them on a night still short of two after ${META.cap}; each caption gives the pool's median and where the example sits in it. ` +
+     `Only moves with a positive graded cost are tried (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
+     `and for pinglamb's follow-up clears only single-line clears, that habit's most common kind. ` +
+     `Each example needs its next ${K} recorded pieces verified, and Cold Clear's line clearly better in at least ${M.min_seeds} of the ${DATA.seeds} runs from it. ` +
+     `A run counts as clearly better only if its first move contrasts with the habit, it did not top out, and, over the ${K} pieces against what was actually played: ` +
+     `the player topped out and it did not; or it sent at least ${M.attack} more attack and ended with no more covered cells; ` +
+     `or it ended with at least ${M.covered} fewer covered cells and sent no less attack. ` +
+     `Cold Clear's covered cells are counted with any received rows still waiting for it put in, so it gets no credit for rows it has not taken yet. ` +
+     `A night with no such play says so on its card, and its rates still show. ` +
      `A night's two examples come from different matches, and no piece is shown twice on the page: a round already used by another habit is only taken when a night would otherwise have fewer than two. ` +
      `Up to ${META.per_night} per habit and night, ${META.n_clips} in all.` + one],
     ['What Cold Clear is, and is not',
      `A strong bot's line, not "the correct play". It is tuned for a different game's scoring, values B2B as on/off, and has no 180° spins. ` +
-     `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece; the run shown is the middle one, by ${K}-piece attack, ` +
-     `of the runs whose first move contrasts with the habit, and each example says how many of the ${DATA.seeds} runs contrasted and how many picked the exact first move shown. ` +
+     `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece; the run shown is the middle one, by attack margin and then covered-cell margin, ` +
+     `of the runs that were clearly better, and each example says how many of the ${DATA.seeds} runs were clearly better and how many picked the exact first move shown. ` +
      `It sees no more of the queue than the player did, gets the same garbage on the same pieces ` +
      `(rows wait while its piece clears lines, and at most 8 enter on one piece, as in TETR.IO), and gets no credit for cancelling. ` +
      `When its last pieces clear lines, some of those rows are still waiting when the ${K} pieces end; the example then says how many. ` +
@@ -198,7 +204,8 @@ function header() {
      `That pick comes from a separate, shorter Cold Clear search than the runs replayed beside each example, and the two do not always choose the same first move: ` +
      `in ${META.clips_by_player[state.player][1]} of the ${META.clips_by_player[state.player][0]} examples on this view the Cold Clear move shown is not the pick the graded cost was measured against, ` +
      `and each of those says so in its seeds line. ` +
-     `The ${K}-piece totals under each example are only what happened in those ${K} pieces. They are not the verdict: a move can send more over ${K} pieces and still leave the weaker position. ` +
+     `The ${K}-piece totals under each example are only what happened in those ${K} pieces. The examples are chosen on them, so every one shows Cold Clear ahead over them; ` +
+     `that is a short horizon, and the graded cost, which scores the position each first move leaves searched further ahead, is the longer view. ` +
      `Each card's table reads the habit's detector output for that night; "n" is how many positions qualified. ` +
      `Matches are numbered as in that night's match report, and rounds, pieces and columns are counted from 1: "match 6, round 3" is m6r2 in the match report's ids ` +
      `(its rounds count from 0), and column 1 is the leftmost. Every night uses all of its match files, the same ones its match report is built from. ` +
@@ -407,6 +414,11 @@ function caption(h, c) {
   li('move 1', [span('hl-p', w().S), ` played ${moveText(f.player_first)}. `, span('hl-c', 'Cold Clear'), ` played ${moveText(f.cc_first)}.`]);
   const k0 = c.human[0].keys;
   if (k0) li('keys', [`${w().poss === 'your' ? 'Your' : "pinglamb's"} inputs for move 1: ${k0.map(x => KEYNAME[x] || x).join(' · ')} (holding a key down counts once).`]);
+  const [da, dc, clause] = c.margin;
+  const sgn = (v, unit) => (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v) + ' ' + unit;
+  li('cold clear ahead', [span('hl-c', 'Cold Clear'), ` ${sgn(da, 'attack')} / ${sgn(-dc, plural(Math.abs(dc), 'covered cell'))} against ${w().poss} ${K} pieces in the run shown` +
+    (clause === 'a' ? ` (${w().s} topped out and it did not)` : '') +
+    `; clearly better in ${c.nbetter} of ${c.nseeds} runs.`]);
   li('seeds', [`${c.ncon} of ${c.nseeds} Cold Clear runs made a first move that contrasts with this habit (${f.contrast_rule.replace(/^cc /, '')}); ` +
     `${c.same} of ${c.nseeds} chose exactly the move shown` + (c.graded_eq ? ', which is also the pick the move was graded against.' :
       `. The graded cost compares ${w().poss} move with a different Cold Clear pick from a separate search; the move shown is from the rollout run.`)]);
@@ -416,16 +428,13 @@ function caption(h, c) {
   const tn = state.night === 'all' ? `the ${c.night} night` : 'this night';
   li('why this one', [`Graded cost ${minus(c.regret)}. Among ${tn === 'this night' ? "this night's" : tn + "'s"} ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
     `the median is ${minus(med)}, and this one sits at the ${ordinal(Math.round(pct))} percentile.` +
-    (med <= 0 ? ` That median is not a cost: on ${tn} the typical occurrence scored at least as well as Cold Clear's pick, so this example shows the shape, not a typical cost.` : '') +
-    (pool < META.small_pool ? ` With only ${pool} on ${tn}, "typical" is a loose word.` : '')]);
+    ` Candidates were tried nearest the median first.` +
+    (med <= 0 ? ` That median is not a cost: on ${tn} the middle occurrence scored at least as well as Cold Clear's pick.` : '') +
+    (pool < META.small_pool ? ` With only ${pool} on ${tn}, that median is a loose guide.` : '')]);
   const wt = f.cc_4.garbage_waiting_end;
   if (wt) li('note', [`${wt} of the garbage ${plural(wt, 'row')} ${w().s} received in these ${K} pieces ${wt === 1 ? 'is' : 'are'} still waiting for Cold Clear at the end ` +
-    `(rows wait while a piece clears lines, and at most 8 enter on one piece). Its height and holes at the end do not include ${wt === 1 ? 'it' : 'them'}, ` +
-    `so those two totals flatter Cold Clear.`], 'warn');
-  const p4 = f.player_4, q4 = f.cc_4;
-  if (p4.attack > q4.attack && p4.covered_cells_end <= q4.covered_cells_end)
-    li('note', [`Over these ${K} pieces ${w().s} came out ahead (more attack, no more holes). The ${K}-piece totals are not the verdict: ` +
-      `the graded cost scores the position each first move leaves, searched further ahead.`], 'warn');
+    `(rows wait while a piece clears lines, and at most 8 enter on one piece). Its height at the end does not include ${wt === 1 ? 'it' : 'them'}, ` +
+    `so that total flatters Cold Clear; its covered cells are given both ways below, and the margin above counts ${wt === 1 ? 'it' : 'them'} in.`], 'warn');
   return U;
 }
 function totals(c) {
@@ -436,7 +445,8 @@ function totals(c) {
   const tb = el('tbody'), p = f.player_4, q = f.cc_4;
   const rows = [['attack (lines sent)', p.attack, q.attack], ['lines cleared', p.lines, q.lines], ['holes (covered cells) at the end', p.covered_cells_end, q.covered_cells_end],
     ['max height at the end', p.max_height_end, q.max_height_end], ['garbage rows received', p.garbage_received, q.garbage_received]];
-  if (q.garbage_waiting_end) rows.push(['received rows still waiting at the end', '–', q.garbage_waiting_end]);
+  if (q.garbage_waiting_end) rows.push(['received rows still waiting at the end', '–', q.garbage_waiting_end],
+    ['holes at the end, with the waiting rows put in', p.covered_cells_end, q.covered_cells_end_with_waiting]);
   if (p.topped_out || q.topped_out) rows.push(['topped out', p.topped_out ? 'yes' : 'no', q.topped_out ? 'yes' : 'no']);
   for (const r of rows) { const tr = el('tr'); r.forEach(v => tr.append(el('td', null, String(v)))); tb.append(tr); }
   T.append(tb); wrap.append(T); return wrap;
@@ -468,9 +478,10 @@ function render() {
     // examples
     const exs = all ? NIGHTS.flatMap(n => h.nights[n].ex.map((c, i) => ({ c, label: `${short(n)} · ${i + 1}` })))
                     : h.nights[state.night].ex.map((c, i) => ({ c, label: `example ${i + 1}` }));
-    const picks = el('div', 'picks'); picks.append(el('span', 'h', all ? 'typical plays, by night:' : 'typical plays:'));
+    const picks = el('div', 'picks'); picks.append(el('span', 'h', all ? 'examples, by night:' : 'examples:'));
     const host = el('div', 'stage');
-    if (!exs.length) host.append(el('p', 'empty', all ? 'No example passed the selection rules on any night.' : 'No example passed the selection rules this night; the note above says why.'));
+    if (!exs.length) host.append(el('p', 'empty', all ? `No play on any night where Cold Clear's line was clearly better over the ${K} pieces.`
+      : `No play this night where Cold Clear's line was clearly better over the ${K} pieces; the note above says what was tried.`));
     let cur = null;
     const show = i => { if (cur) cur.stop(); picks.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i));
       cur = new Stage(host, h, exs[i].c); stages = stages.filter(s => s.host !== host); cur.host = host; stages.push(cur); };

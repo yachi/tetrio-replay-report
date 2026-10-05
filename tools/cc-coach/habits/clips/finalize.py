@@ -1,7 +1,8 @@
 import os as _os; CC_WORK = _os.environ['CC_WORK']  # the work directory: corpus/, scen/, scen/habits/, scen/hclips/
-# Stage 4: choose the shown Cold Clear run per clip (median of 5 seeds by 4-piece attack, then by
-# holes), keep 2 examples per (habit, night) whose frames passed every self-check in all 5 seeds,
-# compute caption facts from the data, trim boards, write habit-clips.json.
+# Stage 4: keep, per (habit, night), the first 2 candidates (select.py's order) whose frames passed every
+# self-check in all 5 seeds and on which Cold Clear's line is clearly better over the K pieces (MUCH, in at
+# least MUCH['min_seeds'] of the 5 seeds); show the median such run; compute caption facts from the data,
+# trim boards, write habit-clips.json.
 import json, os, sys, collections, statistics
 S = CC_WORK + ''
 D = S + '/scen/hclips'; H = S + '/scen/habits'; C = S + '/corpus'
@@ -105,9 +106,19 @@ def orientation(piece, cells):
     assert len(hit) == 1, (piece, cells)
     return hit[0]
 SEEDS = [0, 1, 2, 3, 4]; K = 4; MINROWS = 22; KEEP = 2
+# "Cold Clear's line is clearly better" for one seed's run against the player's actual K pieces: the run's first
+# move contrasts with the habit, the harness did not declare it dead, and ANY of
+#  (a) the player tops out within the K pieces and the run does not;
+#  (b) its attack >= the player's + MUCH['attack'], and its covered cells at the end <= the player's;
+#  (c) its covered cells at the end <= the player's - MUCH['covered'], and its attack >= the player's.
+# Cold Clear's covered cells are counted with any received rows still waiting for it put in at the end (at their
+# recorded hole columns), so a run is never credited with a clean board for rows it has not taken yet.
+MUCH = {'attack': 3, 'covered': 3, 'min_seeds': 3}
 HABITS = 'Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6'.split()
 SESS = sorted(f[:-6] for f in os.listdir(C) if f.endswith('.jsonl') and f[:4] == '2026')
 cands = json.load(open(f'{D}/candidates.json'))
+ROLL = {json.loads(l)['id']: json.loads(l) for l in open(f'{D}/rollin.jsonl')}
+log_ncand = json.load(open(f'{D}/select-log.json'))['ncand']
 P = {json.loads(l)['id']: json.loads(l) for l in open(f'{D}/windows.jsonl')}
 FR = {s: {c['id']: c for c in json.load(open(f'{D}/frames-s{s}.json'))} for s in SEEDS}
 CK = {s: {c['id']: c for c in json.load(open(f'{D}/frames-check-s{s}.json'))} for s in SEEDS}
@@ -160,7 +171,42 @@ def outcome(fr, side):
          'garbage_received': sum(s['garbage'] for s in steps)}
     if side == 'cc':   # rows the player received that still wait for Cold Clear (a clearing lock holds them back)
         o['garbage_waiting_end'] = steps[-1]['garbage_waiting'] if steps else None
+        o['covered_cells_end_with_waiting'] = covered_with_waiting(fr, last) if last else None
     return o
+
+def insert_rows(f, amount, col):
+    g = list(f)
+    for _ in range(amount): g = g[1:] + [''.join('.' if x == col else 'G' for x in range(10))]
+    return g
+def covered_with_waiting(fr, last):
+    """Cold Clear's covered cells at the end with the rows still waiting for it put in, in arrival order at their
+    recorded hole columns. The queue is rebuilt from the window's garbage schedule exactly as frames.ts does
+    (rows wait while the piece clears lines, at most `garbage_cap` enter on one lock) and checked against the
+    harness's per-step waiting count."""
+    st = ROLL[fr['id']]; cap = st['garbage_cap']; pending = []
+    for j, s_ in enumerate(fr['cc']):
+        if s_.get('dead'): break
+        pending += [[t['amount'], t['column']] for t in st['garbage_schedule'][j]]
+        if s_['lines'] == 0 and pending:
+            gin = 0; rest = []
+            for a_, c_ in pending:
+                take = min(a_, cap - gin); gin += take
+                if take < a_: rest.append([a_ - take, c_])
+            pending = rest
+            assert gin == s_['garbage'], (fr['id'], j)
+        assert sum(a_ for a_, _ in pending) == s_['garbage_waiting'], (fr['id'], j)
+    g = list(last)
+    for a_, c_ in pending: g = insert_rows(g, a_, c_)
+    return covered(g)
+
+def much_better(p, q):
+    """Which clause of the 'clearly better' rule a Cold Clear run meets against the player's K pieces, or None."""
+    if q['topped_out']: return None
+    if p['topped_out']: return 'a'
+    da, dc = q['attack'] - p['attack'], p['covered_cells_end'] - q['covered_cells_end_with_waiting']
+    if da >= MUCH['attack'] and dc >= 0: return 'b'
+    if dc >= MUCH['covered'] and da >= 0: return 'c'
+    return None
 
 def first_move_facts(start, m, lines, hab):
     after = apply(start, m['cells'])
@@ -201,21 +247,26 @@ def build_clip(hab, night, cand):
     st = P[i]; start = st['field']
     hm0x = FR[0][i]['human'][0]
     runs = []
+    p4 = outcome(FR[0][i], 'human')
     for s in SEEDS:
         fr = FR[s][i]; oc = outcome(fr, 'cc')
+        assert outcome(fr, 'human') == p4, (i, s)   # the player's side does not depend on the seed
         m0 = fr['cc'][0] if fr['cc'] and not fr['cc'][0].get('dead') else None
         con = contrast(hab, o, start, m0, hm0x, st)[0] if m0 else False
-        sortkey = (oc['attack'], -(oc['covered_cells_end'] if oc['covered_cells_end'] is not None else 999), -s)
-        runs.append((sortkey, s, oc, con))
-    ncon = sum(r[3] for r in runs)
-    if 2 * ncon <= len(SEEDS):
-        return None, {'id': i, 'why': 'Cold Clear does not contrast', 'detail': f'{ncon} of {len(SEEDS)} seeds made a first move that contrasts with the habit (a majority is required)'}
-    ok_runs = sorted([r for r in runs if r[3] and not r[2]['topped_out']], key=lambda r: r[0])
-    if not ok_runs:
-        return None, {'id': i, 'why': 'every contrasting Cold Clear run topped out in the harness', 'detail': f'{ncon} contrasting'}
-    # shown = the median contrasting run that the harness did not declare dead (its topout rule is stricter
-    # than TETR.IO's), ordered worst-to-best by 4-piece attack then covered cells; even count -> lower middle
-    shown = ok_runs[(len(ok_runs) - 1) // 2][1]
+        mb = much_better(p4, oc) if con else None
+        da = oc['attack'] - p4['attack']
+        dc = (p4['covered_cells_end'] - oc['covered_cells_end_with_waiting']) if oc['covered_cells_end_with_waiting'] is not None else None
+        runs.append({'seed': s, 'oc': oc, 'con': con, 'mb': mb, 'da': da, 'dc': dc})
+    ncon = sum(r['con'] for r in runs)
+    if ncon < MUCH['min_seeds']:
+        return None, {'id': i, 'why': 'Cold Clear does not contrast', 'detail': f"{ncon} of {len(SEEDS)} seeds made a first move that contrasts with the habit ({MUCH['min_seeds']} are required)"}
+    qual = sorted([r for r in runs if r['mb']], key=lambda r: (r['da'], r['dc'], r['seed']))
+    if len(qual) < MUCH['min_seeds']:
+        return None, {'id': i, 'why': 'Cold Clear not clearly better', 'detail': f"{len(qual)} of {len(SEEDS)} seeds clearly better ({MUCH['min_seeds']} are required)",
+                      'per_seed': [[r['seed'], r['da'], r['dc'], r['con'], r['oc']['topped_out']] for r in runs]}
+    # shown = the median of the clearly-better runs, ordered by attack margin, then covered-cell margin, then seed
+    # (lower seed first); even count -> the lower middle
+    shown = qual[(len(qual) - 1) // 2]['seed']
     fr = FR[shown][i]
     first = {s: (FR[s][i]['cc'][0] if FR[s][i]['cc'] and not FR[s][i]['cc'][0].get('dead') else None) for s in SEEDS}
     fk = {s: (mv_key(m) if m else None) for s, m in first.items()}
@@ -262,11 +313,15 @@ def build_clip(hab, night, cand):
         'human': [tstep(s, True) for s in hum],
         'cc': [tstep(s, False) for s in cc],
         'cc_run': {'nodes': 40000, 'seeds': SEEDS, 'shown_seed': shown,
-                   'rule': 'among the seeds whose first move contrasts with the habit and whose run the harness did not declare dead, the median by 4-piece attack, then by covered cells at the end (more = worse), ties broken by seed (even count: the lower middle); a clip needs a majority of seeds contrasting',
-                   'seeds_contrasting': ncon, 'seeds_shown_from': len(ok_runs),
-                   'per_seed': [{'seed': s, 'attack': oc['attack'], 'covered_cells_end': oc['covered_cells_end'], 'topped_out': oc['topped_out'], 'contrasts': con,
-                                 'first_move': ({'piece': first[s]['piece'], 'hold': bool(first[s]['hold']), 'cells': tc(first[s]['cells'])} if first[s] else None)}
-                                for _, s, oc, con in sorted(runs, key=lambda r: r[1])],
+                   'rule': f"among the seeds whose run is clearly better than the player's {K} pieces (MUCH), the median by attack margin, then covered-cell margin, then seed (lower first; even count: the lower middle); a clip needs {MUCH['min_seeds']} such seeds",
+                   'seeds_contrasting': ncon, 'seeds_clearly_better': len(qual),
+                   'margin': {'attack': next(r['da'] for r in runs if r['seed'] == shown), 'covered': next(r['dc'] for r in runs if r['seed'] == shown),
+                              'clause': next(r['mb'] for r in runs if r['seed'] == shown)},
+                   'per_seed': [{'seed': r['seed'], 'attack': r['oc']['attack'], 'covered_cells_end': r['oc']['covered_cells_end'],
+                                 'covered_cells_end_with_waiting': r['oc']['covered_cells_end_with_waiting'], 'topped_out': r['oc']['topped_out'],
+                                 'contrasts': r['con'], 'clearly_better': r['mb'], 'attack_margin': r['da'], 'covered_margin': r['dc'],
+                                 'first_move': ({'piece': first[r['seed']]['piece'], 'hold': bool(first[r['seed']]['hold']), 'cells': tc(first[r['seed']]['cells'])} if first[r['seed']] else None)}
+                                for r in runs],
                    'first_move_same_as_shown': len(same_first), 'first_move_same_seeds': same_first,
                    'first_move_equals_graded_pick': graded_eq,
                    'graded_pick_note': 'graded pick = cc seed-0 pick at 20000 nodes in grade.jsonl (Y6 extra positions: Y6.extra-grade.jsonl, same settings); the rollout searches 40000 nodes'},
@@ -275,7 +330,6 @@ def build_clip(hab, night, cand):
     clip['future_revealed'] = ROLL[i]['future']
     return clip, None
 
-ROLL = {json.loads(l)['id']: json.loads(l) for l in open(f'{D}/rollin.jsonl')}
 def nights_of(h):
     d = json.load(open(f'{H}/{h}.nights.json'))
     n = d['nights']
@@ -284,7 +338,8 @@ def nights_of(h):
 out = {'generated_by': 'scen/hclips/{select.py,frames.ts,finalize.py}', 'window_pieces': K,
        'cc_settings': {'mode': 'rollout', 'nodes': 40000, 'seeds': SEEDS},
        'board_rows_note': 'every board keeps its bottom `rows` rows (row 0 = top of the kept area); cells use the same trimmed row index',
-       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); examples are taken nearest the pool median graded cost, from positive graded cost only and only between the pool\'s interpolated 25th and 75th percentiles of graded cost (P3: single-line clears only, its modal case, when the night has one; Y2/P5: Cold Clear\'s graded pick a 1-3 line clear and not a ready-quad decline, P5 at 12-13 rows; Y3: not the I itself played elsewhere; P4: the piece not on the midline); window of 4 verified recorded locks plus the next decision; a majority of the 5 Cold Clear seeds must make a first move that contrasts with the habit, and the shown run is the median contrasting run the harness did not declare dead; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
+       'much_better': MUCH,
+       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); candidates are taken in order of graded cost nearest the pool median graded cost (no cost band), from positive graded cost only, at most ' + str(log_ncand) + ' rolled out per habit-night (P3: single-line clears only, its modal case, when the night has one; Y2/P5: Cold Clear\'s graded pick a 1-3 line clear and not a ready-quad decline, P5 at 12-13 rows; Y3: not the I itself played elsewhere; P4: the piece not on the midline); window of 4 verified recorded locks plus the next decision; an example needs at least 3 of the 5 Cold Clear seeds whose first move contrasts with the habit, whose run the harness did not declare dead, and whose K-piece line is clearly better than the player\'s (the player tops out and it does not; or at least 3 more attack and no more covered cells at the end; or at least 3 fewer covered cells and no less attack; Cold Clear\'s covered cells counted with its waiting received rows put in), and the shown run is the median such run by attack margin, then covered-cell margin; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
        'habits': []}
 dropped = []; log = json.load(open(f'{D}/select-log.json')); USED_POS = set(); USED_ROUND = set(); USED_PIECES = set()
 counts = {}
@@ -320,8 +375,8 @@ for h in HABITS:
                     why(err['why'], pss, i)
                     continue
                 assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], i
-                lo_, hi_ = c['why_picked']['band_regret']
-                assert lo_ <= c['regret'] <= hi_ and c['regret'] > 0, i
+                assert c['regret'] > 0 and much_better(c['facts']['player_4'], c['facts']['cc_4']), i
+                assert c['cc_run']['seeds_clearly_better'] >= MUCH['min_seeds'], i
                 cw = c['facts']['cc_4']['garbage_waiting_end']
                 assert cw == c['facts']['player_4']['garbage_received'] - c['facts']['cc_4']['garbage_received'] or c['facts']['cc_4']['pieces_played'] < K, i
                 assert all(s.get('garbage_in', 0) <= 8 for s in c['cc'] if not s.get('dead')), i
@@ -335,12 +390,15 @@ for h in HABITS:
             USED_POS.add(c['id']); USED_ROUND.add(rk); USED_PIECES.update((rk, int(l0) + j) for j in range(K))
         rates = dict(nights[s]); rates.pop('session', None)
         hab['nights'][s] = {'rates': rates, 'pool': log['pools'].get(f'{h}/{s}'), 'examples': ex,
+                            'cap': log['ncand'],
                             'candidates': len(cands.get(f'{h}/{s}', [])), 'not_used': dict(why_not)}
         counts[f'{h}/{s}'] = len(ex)
     out['habits'].append(hab)
 out['log'] = {'dropped_clips': dropped, 'habit_nights_without_examples': [k for k, v in counts.items() if v == 0],
               'habit_nights_with_one_example': [k for k, v in counts.items() if v == 1],
-              'selection_empty': log['empty'], 'windows_skipped': log['short_windows']}
+              'selection_empty': log['empty'], 'windows_skipped': log['short_windows'],
+              'capped': log['capped'], 'capped_short': [f"{e['habit']}/{e['session']}" for e in log['capped'] if counts[f"{e['habit']}/{e['session']}"] < KEEP]}
 json.dump(out, open(f'{S}/scen/habit-clips.json', 'w'), separators=(',', ':'))
+print('capped habit-nights still short:', out['log']['capped_short'])
 print('clips', sum(counts.values()), 'dropped', len(dropped), 'zero', out['log']['habit_nights_without_examples'],
       'one', out['log']['habit_nights_with_one_example'], 'size', os.path.getsize(f'{S}/scen/habit-clips.json'))
