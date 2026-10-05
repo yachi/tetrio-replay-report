@@ -61,7 +61,29 @@ def pool_filter(h, o):
 #  * P3 only: single-line follow-up clears, the habit's own modal case (FINDINGS pinglamb #3: 478 of
 #    683 are singles); if a night has none, any line count.
 EXAMPLE_OK = {'P3': ('single-line clears', lambda o: o['player_move']['lines'] == 1)}
-BAND = (25.0, 75.0)   # examples only from the middle half of the pool, by midrank percentile of graded cost
+# Hard example restrictions (no fallback): occurrences that meet the code definition but would show a
+# different scene from the one the card describes. They stay in the pool, so the median does not move.
+QUAD_IDS = {o['id'] for h in ('Y3', 'P6') for o in occ[h]}
+EXAMPLE_ONLY = {
+    # the card describes playing another piece first (I held away, or left in hold); spending the I
+    # itself away from the well is a decline by the code but not that scene
+    'Y3': ('the I was kept in hold or held away, not played elsewhere itself', lambda o: o['detail']['decline_class'] != 'I_elsewhere'),
+    # a plain line clear on offer, not a ready quad declined (that is Y3/P6, a separate card)
+    'Y2': ("Cold Clear's pick is a 1–3 line clear, not a ready quad",
+           lambda o: o['detail']['cc_lines'] in (1, 2, 3) and o['id'] not in QUAD_IDS),
+    # FINDINGS pinglamb #5: use the 10-13 band for pinglamb, so examples sit where both bands meet
+    'P5': ("Cold Clear's pick is a 1–3 line clear, not a ready quad, and the stack is 12–13 rows",
+           lambda o: o['detail']['cc_lines'] in (1, 2, 3) and o['id'] not in QUAD_IDS and o['detail']['max_height'] <= 13),
+    # a piece whose centroid sits exactly on the midline (4.5) is in neither half; P4.py counts it as right
+    'P4': ('the piece sits clearly on one half, not on the midline', lambda o: o['detail']['player_centroid_x'] != 4.5),
+}
+# Examples only from the middle half of the pool: graded cost between the pool's first and third
+# quartiles, inclusive, with the quartiles linearly interpolated (numpy's default). On a small pool the
+# 2nd-lowest or 2nd-highest value has midrank percentile exactly 25 or 75 but sits outside this band.
+BAND = (25.0, 75.0)
+def quantile(regs, q):
+    x = (len(regs) - 1) * q / 100; i = int(x); f = x - i
+    return regs[i] if i + 1 >= len(regs) else regs[i] + f * (regs[i + 1] - regs[i])
 def midrank_pct(v, regs):
     return round(100 * (sum(r < v for r in regs) + 0.5 * sum(r == v for r in regs)) / len(regs), 1)
 cands = {}; log = {'empty': [], 'short_windows': [], 'notes': [], 'pools': {}}
@@ -83,12 +105,17 @@ for h in HABITS:
         ex = [o for o in pool if o['regret'] > 0]
         info['nonpositive_cost'] = len(pool) - len(ex)
         restr = None
+        if h in EXAMPLE_ONLY:
+            ex2 = [o for o in ex if EXAMPLE_ONLY[h][1](o)]
+            info['example_only_excluded'] = len(ex) - len(ex2); info['example_only'] = EXAMPLE_ONLY[h][0]; ex = ex2
         if h in EXAMPLE_OK and ex:
             ex2 = [o for o in ex if EXAMPLE_OK[h][1](o)]
             if ex2: restr = EXAMPLE_OK[h][0]; info['example_class_excluded'] = len(ex) - len(ex2); ex = ex2
         info['example_restriction'] = restr
-        inb = [o for o in ex if BAND[0] <= midrank_pct(o['regret'], regs) <= BAND[1]]
-        info['band'] = list(BAND); info['positive_outside_band'] = len(ex) - len(inb); info['positive_in_band'] = len(inb)
+        q1, q3 = quantile(regs, BAND[0]), quantile(regs, BAND[1])
+        inb = [o for o in ex if q1 <= o['regret'] <= q3]
+        info['band'] = list(BAND); info['band_regret'] = [q1, q3]
+        info['positive_outside_band'] = len(ex) - len(inb); info['positive_in_band'] = len(inb)
         ex = inb
         srt = sorted(ex, key=lambda o: (abs(o['regret'] - med), o['regret'], o['id']))
         picked = []; used = set(); short = 0; same_round = 0
@@ -99,7 +126,8 @@ for h in HABITS:
             if wf is None:
                 short += 1; log['short_windows'].append({'habit': h, 'session': s, 'id': o['id'], 'why': why}); continue
             used.add(rd)
-            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + f', inside the {BAND[0]:g}th-{BAND[1]:g}th percentile of the pool; distinct rounds',
+            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + f', graded cost inside the pool\'s interpolated {BAND[0]:g}th-{BAND[1]:g}th percentiles; distinct rounds',
+                                            'band_regret': [q1, q3], 'example_only': EXAMPLE_ONLY.get(h, (None,))[0],
                                             'pool_size': len(pool), 'pool_regret_median': med, 'regret': o['regret'],
                                             'distance_from_median': abs(o['regret'] - med), 'rank_by_distance': rank + 1,
                                             'regret_percentile_in_pool_midrank': midrank_pct(o['regret'], regs),
@@ -119,6 +147,7 @@ with open(f'{O}/windows.jsonl', 'w') as fw, open(f'{O}/rollin.jsonl', 'w') as fr
         (w, fut), _ = window_ok({'id': i})
         for x in w: fw.write(json.dumps(x) + '\n')
         st = dict(w[0]); st['future'] = fut; st['k'] = K
+        st['garbage_cap'] = 8   # TETR.IO's garbagecap default; no replay in the corpus sets it (frames.ts checks)
         st['garbage_schedule'] = [x['played']['tanks'] for x in w[:K]]
         st['incoming_schedule'] = [x['incoming'] for x in w[:K]]
         fr.write(json.dumps(st) + '\n')

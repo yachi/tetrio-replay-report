@@ -248,7 +248,13 @@ What the clip stage checks, per start position and per seed: the player's board 
 4 shown pieces equals the next recorded decision's field (garbage included); the player's attack, re-priced
 with each file's own options and the lock-time garbage multiplier, equals the replay's raw attack;
 Cold Clear's rebuilt lines and inserted garbage match the harness at every step, and its final board
-equals the harness's `final_field`. Planted mutants (a +1 attack, a changed tank, a changed final field,
+equals the harness's `final_field`. Cold Clear's received rows follow TETR.IO's rules on both sides of
+that check: rows wait while its piece clears lines, and at most 8 enter on one lock (the game's
+`garbagecap`, which no replay here overrides; across all 218 105 recorded locks no player took more
+than 8). The harness applies the cap only when the input carries `garbage_cap` (`select.py` sets it), so
+the older 14-piece rollouts still reproduce. Rows still waiting for Cold Clear when the 4 pieces end are
+reported per step (`garbage_waiting`) and the example says how many, since its end height and holes do
+not include them. Planted mutants (a +1 attack, a changed tank, a changed final field,
 a shifted garbage hole on a window that has garbage) each fail a check. The player's hold flag is read
 from the recorded inputs, not only from "played piece != current piece": a hold pressed while the current
 and held pieces are the same changes nothing on the board but is still a hold.
@@ -257,9 +263,16 @@ Selection. A habit-night's pool is its verified occurrences, misdrop-shaped excl
 and Y6 (misdrop-shaped by definition); "typical" is measured against that whole pool's median graded
 cost, never a narrowed sub-pool. Examples are then taken nearest that median from positive graded cost
 only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), only
-from the middle half of the pool (midrank percentile of graded cost 25 to 75, inclusive: `BAND` in
-`select.py`, asserted again in `finalize.py` and `build-habits.py`), and for P3 only from single-line
-clears, its modal case. The band ranks above every other rule: an earlier version ranked "a round no
+from the middle half of the pool (graded cost between the pool's 25th and 75th percentiles,
+linearly interpolated, inclusive: `BAND` in `select.py`, asserted again in `finalize.py` and
+`build-habits.py`; on a small pool a midrank percentile of exactly 25 or 75 is the 2nd-lowest or
+2nd-highest value and falls outside), and for P3 only from single-line clears, its modal case. Some
+occurrences meet the code definition but show a different scene from the card's, so they stay in the
+pool and are not shown (`EXAMPLE_ONLY`): Y3 when the I itself is played away from the well; Y2 and P5
+when Cold Clear's pick is a quad (that is the quad habit's scene) or the position is a Y3/P6
+occurrence; P5 above 13 rows (FINDINGS: the 10-13 band for pinglamb); P4 when the piece's centroid is on
+the midline. Y2 and P5 runs contrast only with a 1-3 line first move, and P4 runs only with a centroid
+off the midline. The band ranks above every other rule: an earlier version ranked "a round no
 other habit uses" above closeness to the median, and on nights where the near-median plays shared a round
 with another habit's example it showed the night's worst occurrence instead. A night that cannot fill
 two examples from inside the band shows one or none, and its card says why. A candidate is kept only if a majority of the five
@@ -270,7 +283,7 @@ declare dead. The harness's topout rule (spawn above row 20) is stricter than TE
 is never the one shown. A night's two examples come from different match files; no piece is shown under
 two habits, and a round another habit already uses is taken only when a night would otherwise have
 fewer than two. Each caption gives the pool's size, median and the example's percentile in it, and warns
-when the pool holds fewer than five; a night with fewer than two examples says why on its card. For the
+when the pool holds fewer than ten or its median cost is 0 or below; a night with fewer than two examples says why on its card. For the
 two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move seals off no cell at all by
 that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
 uncovered empty cell), so the caption, which names the cells each first move sealed

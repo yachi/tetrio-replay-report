@@ -6,7 +6,9 @@
 //                          (or raw - 10, the separate all-clear event), with each file's own options
 //                          and the lock-time garbage multiplier, as corpus-validate-attack.ts does
 //   ccFinalMatchesHarness: cold-clear's rebuilt final board == the harness's own final_field
-//   ccLinesAndGarbage    : rebuilt lines and inserted garbage == the harness's per-step values
+//   ccLinesAndGarbage    : rebuilt lines and inserted garbage == the harness's per-step values, under
+//                          TETR.IO's per-lock garbage cap (the replay's garbagecap, 8 when the options
+//                          do not set it: at most that many rows enter on one lock, the rest wait)
 // usage: bun frames.ts <seed>
 import { priceLock } from '../../attack.ts';
 import { readFileSync, writeFileSync } from 'fs';
@@ -46,6 +48,8 @@ const out: any[] = []; const checks: any[] = [];
 for (const st of IN) {
   const k = st.id.replace(/\/\d+$/, ''), l0 = st.lock;
   const opts = optsFor(st);
+  const cap = opts.garbagecap ?? 8;
+  if (st.garbage_cap !== cap) throw new Error(`${st.id}: rollout garbage_cap ${st.garbage_cap} != replay garbagecap ${cap}`);
   // lock-time multiplier of human step j = the next decision's gmult (captured inside the lock handler)
   const gLock = (j: number) => P.get(`${k}/${l0 + j + 1}`)!.gmult;
   let f = st.field.slice(); let ctr = { b2b: st.b2b, combo: st.combo };
@@ -82,12 +86,17 @@ for (const st of IN) {
         let after = r.field;
         for (const t of st.garbage_schedule[j] ?? []) pending.push([t.amount, t.column]);
         let gin = 0;
-        if (r.lines === 0 && pending.length) { for (const [a, c] of pending) { after = insert(after, a, c); gin += a; } pending = []; }
-        if (gin !== s.garbage_in) { lgOk = false; why.push(`cc step ${j + 1} garbage`); }
+        if (r.lines === 0 && pending.length) {
+          const rest: number[][] = [];
+          for (const [a, c] of pending) { const take = Math.min(a, cap - gin); after = insert(after, take, c); gin += take; if (take < a) rest.push([a - take, c]); }
+          pending = rest;
+        }
+        const waiting = pending.reduce((x, t) => x + t[0], 0);
+        if (gin !== s.garbage_in || waiting !== s.garbage_waiting) { lgOk = false; why.push(`cc step ${j + 1} garbage`); }
         const spin = s.piece !== 'T' ? 'none' : s.tspin === 'Full' ? 'normal' : s.tspin === 'Mini' ? 'mini' : 'none';
         const x = priceLock(ctr, r.lines, spin, s.piece, s.pc, { ...opts, garbagemultiplier: gLock(j) }); ctr = x.ctr;
         ccs.push({ piece: s.piece, hold: s.hold, cells: s.cells, lines: r.lines, cleared: r.cleared, spin, kind: s.kind, attack: x.attack + x.pcBonus,
-          b2b: ctr.b2b, combo: ctr.combo, garbage: gin, after });
+          b2b: ctr.b2b, combo: ctr.combo, garbage: gin, garbage_waiting: waiting, after });
         f = after;
       }
     } catch (e) { ccOk = false; why.push('cc rebuild threw: ' + (e as Error).message); }

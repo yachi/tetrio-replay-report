@@ -102,7 +102,8 @@ def row(label, d):
             cc_clear_rate_pct=pct(d['cc_x'], d['n_x']), gap_pp=pct(d['pl_x'] - d['cc_x'], d['n_x'])),
         control_no_prior_clear=dict(eligible=d['n0'], player_clear_rate_pct=pct(d['pl0'], d['n0']),
             cc_clear_rate_pct=pct(d['cc0'], d['n0']), gap_pp=gap0,
-            combo_specific_gap_pp=(round(gap - gap0, 3) if gap is not None and gap0 is not None else None)),
+            # from the unrounded gaps (a difference of two 3-dp values drifts in the last digit)
+            combo_specific_gap_pp=(round(100 * (d['pl'] - d['cc']) / n - 100 * (d['pl0'] - d['cc0']) / d['n0'], 3) if n and d['n0'] else None)),
         cc_seed1_same_positions=dict(eligible=d['ns1'], cc_seed0_clear_rate_pct=pct(d['cc_s0'], d['ns1']),
             cc_seed1_clear_rate_pct=pct(d['cc_s1'], d['ns1']), player_clear_rate_pct=pct(d['pl_s'], d['ns1'])))
 nights = [row(s, per[s]) for s in sorted(per)]

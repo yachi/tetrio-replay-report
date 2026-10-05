@@ -153,8 +153,9 @@ function header() {
   $('h1').textContent = w().title + ' vs Cold Clear, night by night';
   $('lede').innerHTML = '';
   $('lede').append(
-    `These are recurring habits found over ${N} nights, not one-off drops: each survived two independent re-checks as a recurring pattern. ` +
-    `${nWeak(state.player)} of these ${nHab(state.player)} cards carry a note where the re-checks found the habit weak or narrow` +
+    `These are patterns that recur in ${state.player === 'yachi' ? 'your' : "pinglamb's"} own play over ${N} nights, not one-off drops: each survived two independent re-checks as a recurring pattern. ` +
+    `That does not make each one a clear gap to Cold Clear: ` +
+    `${nWeak(state.player).toLowerCase()} of these ${nHab(state.player)} cards carry a note where the re-checks found the habit weak, narrow or possibly nothing` +
     (state.player === 'yachi' ? `; one of them, the sideways T, stands out only next to pinglamb's rate, not next to Cold Clear's. ` : '. ') +
     `For each one: the night's rate next to Cold Clear's ` +
     `(for the hole and seal habits Cold Clear can only be compared on a smaller set of positions, judged against its own second run), ` +
@@ -165,9 +166,9 @@ function header() {
   const one = short_ ? ` ${short_} habit-night${short_ > 1 ? 's have' : ' has'} fewer than two; the card says why for that night.` : '';
   const blocks = [
     ['How the examples were chosen',
-     `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice) ` +
+     `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice, or, for a move that leaves a covered cell, a shape that one column over would have left none) ` +
      `are left out of it, except where the habit is that shape by definition: the one-column-off hole habits and the over-rotated T. ` +
-     `"Typical" means nearest the pool's median graded cost, and never outside the middle half of the pool (the 25th to 75th percentile of graded cost): ` +
+     `"Typical" means nearest the pool's median graded cost, and never outside the middle half of the pool (graded cost between its 25th and 75th percentiles, interpolated): ` +
      `a night whose near-median plays cannot be shown gets fewer examples rather than a tail case. Each caption gives the pool's median and where the example sits in it. ` +
      `Examples are only taken from moves with a positive graded cost (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
      `and for pinglamb's follow-up clears only from single-line clears, that habit's most common kind. ` +
@@ -179,7 +180,8 @@ function header() {
      `Its search is random, so every start was run with ${DATA.seeds} seeds at ${DATA.nodes} nodes per piece; the run shown is the middle one, by ${K}-piece attack, ` +
      `of the runs whose first move contrasts with the habit, and each example says how many of the ${DATA.seeds} runs contrasted and how many picked the exact first move shown. ` +
      `It sees no more of the queue than the player did, gets the same garbage on the same pieces ` +
-     `(rows wait while its piece clears lines, as in TETR.IO), and gets no credit for cancelling. ` +
+     `(rows wait while its piece clears lines, and at most 8 enter on one piece, as in TETR.IO), and gets no credit for cancelling. ` +
+     `When its last pieces clear lines, some of those rows are still waiting when the ${K} pieces end; the example then says how many. ` +
      `The harness also declares a tall stack dead earlier than TETR.IO does (it treats spawning above row 20 as a topout), ` +
      `so a run it ends as topped out might have kept going in the game; those runs are never the one shown.`],
     ['How to read the numbers',
@@ -228,9 +230,18 @@ function strip(h) {
     const r = add('rect', { x: x + 1.5, y: Math.min(y(v), y(0)), width: bw - 3, height: Math.max(1, Math.abs(y(v) - y(0))),
       fill: sel ? 'var(--human)' : 'var(--stackc)', opacity: state.night === 'all' || sel ? 1 : .55 });
     const t = document.createElementNS(ns, 'title'); t.textContent = `${NIGHTS[i]}: ${minus(v)}`; r.append(t);
-    if (i === 0 || i === n - 1 || sel) add('text', i === 0 ? { x: x + 1, y: Ht - 2, 'text-anchor': 'start' }
-      : i === n - 1 ? { x: x + bw - 1, y: Ht - 2, 'text-anchor': 'end' } : { x: x + bw / 2, y: Ht - 2, 'text-anchor': 'middle' }, short(NIGHTS[i]));
   });
+  // date labels: the selected night first, then the two end nights only where they do not overlap it
+  // (9px monospace: 5.4 units a character; a 2-unit gap is kept between labels)
+  const LW = 5 * 5.4, boxes = [];
+  const lab = i => { const x = L + i * bw;
+    return i === 0 ? [x + 1, x + 1 + LW, { x: x + 1, y: Ht - 2, 'text-anchor': 'start' }]
+      : i === n - 1 ? [x + bw - 1 - LW, x + bw - 1, { x: x + bw - 1, y: Ht - 2, 'text-anchor': 'end' }]
+      : [x + bw / 2 - LW / 2, x + bw / 2 + LW / 2, { x: x + bw / 2, y: Ht - 2, 'text-anchor': 'middle' }]; };
+  const si = NIGHTS.indexOf(state.night);
+  for (const i of [si, 0, n - 1]) { if (i < 0 || vals[i] == null && i === si) continue;
+    const [a, b, at] = lab(i); if (boxes.some(([c, d, j]) => j === i || (a < d + 2 && b > c - 2))) continue;
+    boxes.push([a, b, i]); add('text', at, short(NIGHTS[i])); }
   return svg;
 }
 
@@ -387,9 +398,15 @@ function caption(h, c) {
   if (!f.cc_first_contrasts_with_habit)
     li('note', [`In the run shown, Cold Clear's first move does not meet this habit's contrast (${f.contrast_rule}).`], 'warn');
   const [pool, med, pct] = c.pool;
-  li('why this one', [`Graded cost ${minus(c.regret)}. Among this night's ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
+  const tn = state.night === 'all' ? `the ${c.night} night` : 'this night';
+  li('why this one', [`Graded cost ${minus(c.regret)}. Among ${tn === 'this night' ? "this night's" : tn + "'s"} ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
     `the median is ${minus(med)}, and this one sits at the ${ordinal(Math.round(pct))} percentile.` +
-    (pool < 5 ? ` With only ${pool} this night, "typical" means little.` : '')]);
+    (med <= 0 ? ` That median is not a cost: on ${tn} the typical occurrence scored at least as well as Cold Clear's pick, so this example shows the shape, not a typical cost.` : '') +
+    (pool < META.small_pool ? ` With only ${pool} on ${tn}, "typical" is a loose word.` : '')]);
+  const wt = f.cc_4.garbage_waiting_end;
+  if (wt) li('note', [`${wt} of the garbage ${plural(wt, 'row')} ${w().s} received in these ${K} pieces ${wt === 1 ? 'is' : 'are'} still waiting for Cold Clear at the end ` +
+    `(rows wait while a piece clears lines, and at most 8 enter on one piece). Its height and holes at the end do not include ${wt === 1 ? 'it' : 'them'}, ` +
+    `so those two totals flatter Cold Clear.`], 'warn');
   const p4 = f.player_4, q4 = f.cc_4;
   if (p4.attack > q4.attack && p4.covered_cells_end <= q4.covered_cells_end)
     li('note', [`Over these ${K} pieces ${w().s} came out ahead (more attack, no more holes). The ${K}-piece totals are not the verdict: ` +
@@ -404,6 +421,7 @@ function totals(c) {
   const tb = el('tbody'), p = f.player_4, q = f.cc_4;
   const rows = [['attack (lines sent)', p.attack, q.attack], ['lines cleared', p.lines, q.lines], ['holes (covered cells) at the end', p.covered_cells_end, q.covered_cells_end],
     ['max height at the end', p.max_height_end, q.max_height_end], ['garbage rows received', p.garbage_received, q.garbage_received]];
+  if (q.garbage_waiting_end) rows.push(['received rows still waiting at the end', '–', q.garbage_waiting_end]);
   if (p.topped_out || q.topped_out) rows.push(['topped out', p.topped_out ? 'yes' : 'no', q.topped_out ? 'yes' : 'no']);
   for (const r of rows) { const tr = el('tr'); r.forEach(v => tr.append(el('td', null, String(v)))); tb.append(tr); }
   T.append(tb); wrap.append(T); return wrap;

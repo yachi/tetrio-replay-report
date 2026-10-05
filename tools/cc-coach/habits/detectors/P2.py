@@ -133,7 +133,7 @@ out = dict(habit='P2', player=USER,
         'player\'s move increases SEALED cells (covered empty cells whose empty 4-connected region contains no uncovered empty cell, '
         'i.e. no tuck/spin can reach them) while Cold Clear\'s seed-0 pick at the same position does not increase sealed cells (a clean '
         'placement existed), and the move is not misdrop-shaped (same piece as cc\'s pick or its top-3 shifted one column or rotated '
-        'within one column, or the player\'s own shape one column over would add no covered cell). player_rate_per100 = occurrences / '
+        'within one column, or, for a move that adds covered cells, the player\'s own shape one column over would add none; a move that adds no covered cell is not given this test). player_rate_per100 = occurrences / '
         'eligible x100. Misdrop-shaped seals are written to P2.occ.jsonl too (misdrop_shaped=true) but are not counted in occurrences. '
         'Cold Clear on the same positions, two views: any_seal = share of eligible positions where the player\'s move seals (any shape) '
         'vs where cc\'s seed-0 pick seals; cc_same_positions = the cc-vs-cc noise rule on the eligible ids of sub4000 that have a '

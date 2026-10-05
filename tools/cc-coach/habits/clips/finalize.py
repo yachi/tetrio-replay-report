@@ -154,10 +154,13 @@ def outcome(fr, side):
     steps = [s for s in fr[side] if not s.get('dead')]
     dead = any(s.get('dead') for s in fr[side])
     last = steps[-1]['after'] if steps else None
-    return {'attack': sum(s['attack'] for s in steps), 'lines': sum(s['lines'] for s in steps),
-            'pieces_played': len(steps), 'topped_out': dead,
-            'covered_cells_end': covered(last) if last else None, 'max_height_end': maxh(last) if last else None,
-            'garbage_received': sum(s['garbage'] for s in steps)}
+    o = {'attack': sum(s['attack'] for s in steps), 'lines': sum(s['lines'] for s in steps),
+         'pieces_played': len(steps), 'topped_out': dead,
+         'covered_cells_end': covered(last) if last else None, 'max_height_end': maxh(last) if last else None,
+         'garbage_received': sum(s['garbage'] for s in steps)}
+    if side == 'cc':   # rows the player received that still wait for Cold Clear (a clearing lock holds them back)
+        o['garbage_waiting_end'] = steps[-1]['garbage_waiting'] if steps else None
+    return o
 
 def first_move_facts(start, m, lines, hab):
     after = apply(start, m['cells'])
@@ -176,7 +179,7 @@ def contrast(hab, o, start, cm0, hm0, st):
     det = o['detail']
     if hab in ('Y1', 'P1'): return cov_delta(cm0) <= 0, 'cc first move creates no covered cell'
     if hab in ('Y4', 'P2'): return sealed_delta(cm0) == 0, 'cc first move seals off no cell'
-    if hab in ('Y2', 'P5'): return cm0['lines'] >= 1, 'cc first move clears at least one line'
+    if hab in ('Y2', 'P5'): return 1 <= cm0['lines'] <= 3, 'cc first move clears 1 to 3 lines (a plain line clear, not a quad)'
     if hab in ('Y3', 'P6'): return cm0['lines'] == 4, 'cc first move is a quad'
     if hab == 'Y6': return cm0['kind'] == 'tsd', 'cc first move is a TSD'
     if hab == 'P3': return cm0['lines'] == 0, 'cc first move clears no line'
@@ -184,8 +187,8 @@ def contrast(hab, o, start, cm0, hm0, st):
         # P4 eligibility compares like with like: same hold use as the player, no T-spin or quad
         cx = sum(x for x, y in cm0['cells']) / 4
         same_hold = bool(cm0['hold']) == (hm0['piece'] != st['current'])
-        return ((cx < 4.5) != det['tall_half'].startswith('left')) and same_hold and cm0.get('kind') not in STRONG, \
-            'cc first move uses hold exactly when the player did, is not a T-spin or quad, and its centroid is not on the taller half'
+        return cx != 4.5 and ((cx < 4.5) != det['tall_half'].startswith('left')) and same_hold and cm0.get('kind') not in STRONG, \
+            'cc first move uses hold exactly when the player did, is not a T-spin or quad, and its centroid is on the lower half (not on the midline)'
     if hab == 'Y5':
         bur = any(x == h_['column'] and y < h_['row'] for h_ in det['open_holes'] for x, y in cm0['cells']) and cov_delta(cm0) > 0
         return not bur, 'cc first move does not bury an open garbage hole (a cell in that column above the hole and covered cells rise)'
@@ -232,7 +235,7 @@ def build_clip(hab, night, cand):
              'cleared_rows': [r - off for r in s['cleared']], 'spin': s['spin'], 'attack': s['attack'],
              'b2b': s['b2b'], 'combo': s['combo'], 'garbage_in': s['garbage'], 'after': tb(s['after'])}
         if human: d.update({'keys': s.get('keys'), 'tanks': s['tanks'], 'verified': s['verified'], 'queue': {'current': s['current'], 'hold': s['holdPiece'], 'next': s['next']}})
-        else: d['kind'] = s['kind']
+        else: d['kind'] = s['kind']; d['garbage_waiting'] = s['garbage_waiting']
         return d
     wr, wc = well_ready(start); sl = tsd_slots([[c != '.' for c in row] for row in start])
     hm0, cm0 = hum[0], (cc[0] if cc and not cc[0].get('dead') else None)
@@ -281,7 +284,7 @@ def nights_of(h):
 out = {'generated_by': 'scen/hclips/{select.py,frames.ts,finalize.py}', 'window_pieces': K,
        'cc_settings': {'mode': 'rollout', 'nodes': 40000, 'seeds': SEEDS},
        'board_rows_note': 'every board keeps its bottom `rows` rows (row 0 = top of the kept area); cells use the same trimmed row index',
-       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); examples are taken nearest the pool median graded cost, from positive graded cost only and only inside the 25th-75th percentile of the pool (P3: single-line clears only, its modal case, when the night has one); window of 4 verified recorded locks plus the next decision; a majority of the 5 Cold Clear seeds must make a first move that contrasts with the habit, and the shown run is the median contrasting run the harness did not declare dead; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
+       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); examples are taken nearest the pool median graded cost, from positive graded cost only and only between the pool\'s interpolated 25th and 75th percentiles of graded cost (P3: single-line clears only, its modal case, when the night has one; Y2/P5: Cold Clear\'s graded pick a 1-3 line clear and not a ready-quad decline, P5 at 12-13 rows; Y3: not the I itself played elsewhere; P4: the piece not on the midline); window of 4 verified recorded locks plus the next decision; a majority of the 5 Cold Clear seeds must make a first move that contrasts with the habit, and the shown run is the median contrasting run the harness did not declare dead; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
        'habits': []}
 dropped = []; log = json.load(open(f'{D}/select-log.json')); USED_POS = set(); USED_ROUND = set(); USED_PIECES = set()
 counts = {}
@@ -311,7 +314,11 @@ for h in HABITS:
                     if pss == 1: dropped.append({'habit': h, 'night': s, **err}); why_not[err['why']] += 1
                     continue
                 assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], i
-                assert 25 <= c['why_picked']['regret_percentile_in_pool_midrank'] <= 75 and c['regret'] > 0, i
+                lo_, hi_ = c['why_picked']['band_regret']
+                assert lo_ <= c['regret'] <= hi_ and c['regret'] > 0, i
+                cw = c['facts']['cc_4']['garbage_waiting_end']
+                assert cw == c['facts']['player_4']['garbage_received'] - c['facts']['cc_4']['garbage_received'] or c['facts']['cc_4']['pieces_played'] < K, i
+                assert all(s.get('garbage_in', 0) <= 8 for s in c['cc'] if not s.get('dead')), i
                 if h in SEALED_SET: assert c['facts']['player_first']['sealed_cells_new'] and not c['facts']['cc_first']['sealed_cells_new'], i
                 ex.append(c); files.add(fk_)
                 if pss == 2: why_not['round already shown under another habit'] -= 1
