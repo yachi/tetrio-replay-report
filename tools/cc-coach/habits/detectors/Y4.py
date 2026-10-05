@@ -18,6 +18,9 @@ def load(fn):
         g = json.loads(l); d[g['id']] = g
     return d
 G = load('grade.jsonl'); S1C = load('grade-s1-ccpick.jsonl')
+# Second seed-1 source: grade-s1.jsonl is a separate seed-1 search of the same sub4000 positions. The two searches do not
+# always pick the same move, so the Cold Clear count on the subsample is reported under both (cc_alt_seed1).
+S1A = load('grade-s1.jsonl')
 
 def sealed_set(g):
     vis = set(); stck = [(c, 0) for c in range(10) if g[0][c] == '.']; vis.update(stck)
@@ -34,7 +37,7 @@ def lines_of(field, cells):
     for x, y in cells: g[y][x] = '#'
     return sum(1 for r in g if '.' not in r)
 
-per = collections.defaultdict(lambda: dict(n=0, occ=0, plseal=0, ccseal=0, cconly=0, plall=0, regs=[], nsub=0, hsub=0, s1=0, hsubregs=[], s1regs=[]))
+per = collections.defaultdict(lambda: dict(n=0, occ=0, plseal=0, ccseal=0, cconly=0, plall=0, regs=[], nsub=0, hsub=0, s1=0, nalt=0, s1alt=0, hsubregs=[], s1regs=[]))
 occ = []; seal_all = 0
 for l in open(C + '/mid.jsonl'):
     p = json.loads(l)
@@ -66,6 +69,11 @@ for l in open(C + '/mid.jsonl'):
         if cd[1] > 0 and s1d[1] <= 0 and not md_geo(g['pick']['piece'], cc, [s['pick']] + s['top'][:3]) and not shift_clean(f, base, cc):
             d['s1'] += 1; d['s1regs'].append(s['duel']['cc'] - s['duel']['player'])
         if hit: d['hsub'] += 1; d['hsubregs'].append(reg)
+        a = S1A.get(p['id'])
+        if a and 'pick' in a:   # same rule, the other seed-1 search's pick and top-3
+            d['nalt'] += 1
+            a1d = delta(f, base, [tuple(c) for c in a['pick']['cells']])
+            d['s1alt'] += cd[1] > 0 and a1d[1] <= 0 and not md_geo(g['pick']['piece'], cc, [a['pick']] + a['top'][:3]) and not shift_clean(f, base, cc)
     if not hit: continue
     d['occ'] += 1; d['regs'].append(reg)
     post = apply(f, pc)
@@ -115,7 +123,9 @@ def row(label, d):
             player_rate_per100=r3(100 * d['hsub'] / ns_) if ns_ else None,
             cc_rate_per100=r3(100 * d['s1'] / ns_) if ns_ else None,
             gap_per100=r3(100 * (d['hsub'] - d['s1']) / ns_) if ns_ else None,
-            player_regret_mean=mm(d['hsubregs'])[0], cc_regret_mean=mm(d['s1regs'])[0]))
+            player_regret_mean=mm(d['hsubregs'])[0], cc_regret_mean=mm(d['s1regs'])[0],
+            cc_alt_seed1=dict(source='grade-s1.jsonl', eligible=d['nalt'], cc_count=d['s1alt'],
+                              cc_rate_per100=r3(100 * d['s1alt'] / d['nalt']) if d['nalt'] else None)))
 nights = [row(s, per[s]) for s in sorted(per)]
 P = {k: (0 if not isinstance(v, list) else []) for k, v in next(iter(per.values())).items()}
 for d in per.values():

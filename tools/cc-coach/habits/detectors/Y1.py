@@ -56,6 +56,19 @@ def cc_mirror(p, g):
     if not any(hole_delta(f, [tuple(c) for c in t['cells']])[0] <= 0 for t in alts): return False
     return bool(misdrop(pk['piece'], pc, g['top'][1:4])) or bool(shift_clean(f, pc))
 
+CCPF = {}   # grade-s1-ccpick's full seed-1 pick (piece + cells), for the second seed-1 source
+for l in open(C + 'grade-s1-ccpick.jsonl'):
+    g = json.loads(l)
+    if g['id'] in need and g.get('pick'): CCPF[g['id']] = g['pick']
+
+def seed1_lookalike_alt(r, p):
+    """the same bot-noise rule with the OTHER seed-1 search's pick (grade-s1-ccpick, a separate seed-1 search of the same
+    position); one count is one noisy draw, so the page shows both."""
+    s = CCPF.get(r['id']); g = G[r['id']]
+    if s is None: return None
+    sc = [tuple(c) for c in s['cells']]
+    return hole_delta(p['field'], sc)[0] > 0 and r['cd'][0] <= 0 and bool(misdrop(s['piece'], sc, [g['pick']] + g['top'][:3]))
+
 def seed1_lookalike(r):
     """skeptic's bot-noise rule (verify-holes-H-MISDROP-misdrop.py): seed-0 pick clean, seed-1 pick makes
     covered cells and is a shift/rot of seed-0's pick or top-3."""
@@ -64,7 +77,7 @@ def seed1_lookalike(r):
     return r['extra']['s1'][0] > 0 and r['cd'][0] <= 0 and bool(misdrop(s['piece'], [tuple(c) for c in s['cells']], [g['pick']] + g['top'][:3]))
 
 E = [r for r in A_all if r['maxh'] >= MINH]
-occ = []; per = collections.defaultdict(lambda: dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, regs=[], s1regs=[], plsubregs=[]))
+occ = []; per = collections.defaultdict(lambda: dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, nalt=0, s1alt=0, regs=[], s1regs=[], plsubregs=[]))
 for r in E:
     p = MID[r['id']]; g = G[r['id']]; d = per[r['sess']]
     d['n'] += 1
@@ -78,6 +91,8 @@ for r in E:
                 if CCP.get(r['id']) == sorted(map(tuple, S1[r['id']]['cells'])): d['s1regs'].append(CCN[r['id']])
                 else: d['s1unval'] += 1
             if SEL(r) and r['md']: d['plsub'] += 1; d['plsubregs'].append(r['reg'])
+            la = seed1_lookalike_alt(r, p)
+            if la is not None: d['nalt'] += 1; d['s1alt'] += la
     if not SEL(r): continue
     d['pl'] += 1; d['regs'].append(r['reg'])
     f = p['field']; pl = p['played']; pk = g['pick']
@@ -112,11 +127,13 @@ def row(label, d):
             player_rate_per100=round(100 * d['plsub'] / ns_, 3) if ns_ else None,
             gap_per100=round(100 * (d['plsub'] - d['s1']) / ns_, 3) if ns_ else None,
             cc_regret_mean=mm(d['s1regs'])[0], cc_regret_median=mm(d['s1regs'])[1], cc_regret_n=len(d['s1regs']), cc_events_not_valued=d['s1unval'],
-            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1]),
+            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1],
+            cc_alt_seed1=dict(source='grade-s1-ccpick.jsonl', eligible=d['nalt'], cc_count=d['s1alt'],
+                              cc_rate_per100=round(100 * d['s1alt'] / d['nalt'], 3) if d['nalt'] else None)),
         # NOT comparable to the player rate (looser condition, see notes): cc's own seed-0 pick vs its other top-5 candidates
         cc_top5_mirror=dict(count=d['cc'], rate_per100=round(100 * d['cc'] / n, 3) if n else None))
 nights = [row(s, per[s]) for s in sorted(per)]
-P = dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, regs=[], s1regs=[], plsubregs=[])
+P = dict(n=0, pl=0, cc=0, nsub=0, plsub=0, s1=0, s1unval=0, nalt=0, s1alt=0, regs=[], s1regs=[], plsubregs=[])
 for d in per.values():
     for k in P: P[k] = P[k] + d[k]
 pooled = row('pooled', P)

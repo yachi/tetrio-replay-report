@@ -19,6 +19,9 @@ import argparse, json, os, re
 ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 ap.add_argument('--clips', required=True, help='habit-clips.json')
 ap.add_argument('--out', required=True)
+ap.add_argument('--corpus', required=True, help="the work directory's corpus/ (per-night <date>.jsonl.rounds.json)")
+ap.add_argument('--sessions', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'sessions'),
+                help="the repo's sessions/ (each night's match report facts.json)")
 a = ap.parse_args()
 
 D = json.load(open(a.clips))
@@ -31,6 +34,22 @@ NODES = D['cc_settings']['nodes']
 for h in HAB:
     assert sorted(h['nights']) == NIGHTS, (h['id'], 'night set differs')
     assert h['player'] in PLAYERS
+
+# Each night's match files, from the match report the page links to (sessions/<night>/report/facts.json), checked
+# against the files the habit corpus was built from: the same files, with the same number of rounds in each. The
+# page prints the count, and every example is placed by its match report index (m<index>r<round>).
+MATCHES = {}
+for n in NIGHTS:
+    fm = json.load(open(os.path.join(a.sessions, n, 'report', 'facts.json')))['matches']
+    rep = {m['file']: m for m in fm}
+    cr = json.load(open(os.path.join(a.corpus, n + '.jsonl.rounds.json')))
+    crounds = {}
+    for r in cr:
+        crounds.setdefault(r['file'], set()).add(r['round'])
+    assert set(crounds) == set(rep), (n, 'habit corpus files differ from the match report', sorted(set(crounds) ^ set(rep)))
+    for f, m in rep.items():
+        assert crounds[f] == {r['index'] for r in m['rounds']}, (n, f, 'round set differs from the match report')
+    MATCHES[n] = rep
 
 
 def num(v):
@@ -58,6 +77,9 @@ def pct_of_frac(v):        # P6 stores rates as fractions with 4 decimals; x100 
 # plus the strip value. {S}/{s} = You/you or pinglamb; {poss} = your / pinglamb's.
 # `here` names the scope of a note: 'this night' on a night's view, 'over all 15 nights' on the pooled one.
 HERE = 'this night'
+# A note starting with QUAL qualifies the habit itself (a control explains part of it), like a STRENGTH note does; the
+# header counts the cards carrying either on the view shown, so that count is read off the notes, never typed.
+QUAL = '\x00qual\x00'
 def cc_cost(cs):
     """Cold Clear's mean cost on the second-run subsample. Y1 can value only the events whose graded seed-1
     move is the hole move itself (cc_regret_n of cc_count); say so when that is not all of them."""
@@ -68,24 +90,46 @@ def cc_cost(cs):
     return v
 
 
+ALT_LABEL = "Cold Clear, same rule, from a separate second search (another draw)"
+def alt_row(cs):
+    """Cold Clear's second-run count from the OTHER seed-1 search of the same positions (the detector's cc_alt_seed1)."""
+    x = cs['cc_alt_seed1']
+    return [ALT_LABEL, '—', f"{num(x['cc_rate_per100'])} ({num(x['cc_count'])})", num(x['eligible'])]
+
+
+def alt_note(cs):
+    x = cs['cc_alt_seed1']
+    return (f"Cold Clear's second-run figure is one noisy draw: a separate second search of the same positions gives "
+            f"{num(x['cc_rate_per100'])} per 100 ({num(x['cc_count'])}) instead of {num(cs['cc_rate_per100'])} ({num(cs['cc_count'])}) {HERE}, "
+            "so read Cold Clear's rate there as a range between the two, not a point.")
+
+
 def spec_Y1(r):
     cs = r['cc_same_positions']
     rows = [['hole moves per 100 positions (6+ rows)', f"{num(r['player_rate_per100'])} ({num(r['occurrences'])})", '—', num(r['eligible'])],
-            ['… on positions with a second Cold Clear pick', f"{num(cs['player_rate_per100'])} ({num(cs['player_count'])})",
+            ['… with a second Cold Clear pick: shift or rotation shapes only, both sides', f"{num(cs['player_rate_per100'])} ({num(cs['player_count'])})",
              f"{num(cs['cc_rate_per100'])} ({num(cs['cc_count'])})", num(cs['eligible'])],
+            alt_row(cs),
             ['mean graded cost of those moves', num(cs['player_regret_mean']), cc_cost(cs), '']]
     pc = Y1_POOLED_CC
     notes = [f"Over all 15 nights, on the positions where Cold Clear can be compared, it makes this shape at a similar rate "
              f"({num(pc['cc_rate_per100'])} against {{poss}} {num(pc['player_rate_per100'])} per 100); what separates the two is the cost. "
              + ("Per night that subsample is too small to compare rates, so read the cost line, not this night's two rates." if HERE == 'this night'
                 else "Read the cost line."),
+             alt_note(cs),
              f"All {num(r['occurrences'])} of {{poss}} hole moves {HERE}: mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])}."]
     return rows, notes, r['player_rate_per100']
 
 
 def spec_P1(r):
-    rows, _, v = spec_Y1(r)
-    notes = ["For pinglamb every hole shape counts, not only one column off: in the re-checks' stricter measure (cost above "
+    cs = r['cc_same_positions']
+    rows = [['hole moves per 100 positions (6+ rows)', f"{num(r['player_rate_per100'])} ({num(r['occurrences'])})", '—', num(r['eligible'])],
+            ['… on positions with a second Cold Clear pick', f"{num(cs['player_rate_per100'])} ({num(cs['player_count'])})",
+             f"{num(cs['cc_rate_per100'])} ({num(cs['cc_count'])})", num(cs['eligible'])],
+            alt_row(cs),
+            ['mean graded cost of those moves', num(cs['player_regret_mean']), cc_cost(cs), '']]
+    v = r['player_rate_per100']
+    notes = [alt_note(cs), "For pinglamb every hole shape counts, not only one column off: in the re-checks' stricter measure (cost above "
              "pinglamb's other moves that differ from Cold Clear's) the other hole moves cost about as much. In plain graded cost the "
              "one-column-off ones average more (559.0 against 419.6 over all 15 nights), and both are costly. "
              "The Cold Clear subsample is small per night; read the cost line, not a per-night gap.",
@@ -102,7 +146,14 @@ def spec_lines(r, gap_key):
 
 
 def spec_Y2(r): return spec_lines(r, 'gap_lines_per_move')
-def spec_P5(r): return spec_lines(r, 'gap_lines_per_move')
+def spec_P5(r):
+    rows, notes, v = spec_lines(r, 'gap_lines_per_move')
+    b = r['band_10_13_any_garbage']
+    rows.append(['lines per move at 10–13 rows, any garbage: the band the re-checks recommend for pinglamb',
+                 num(b['player_lines_per_move']), num(b['cc_lines_per_move']), num(b['n'])])
+    notes.append(f"In that recommended band the gap {HERE} is {sg(b['gap_lines_per_move'])} lines per move, against "
+                 f"{sg(r['gap_lines_per_move'])} in the 12–15 row band the rest of this card shows.")
+    return rows, notes, v
 
 
 def spec_Y3(r):
@@ -121,8 +172,9 @@ def spec_Y4(r):
     rows = [["seals where Cold Clear's pick sealed nothing, per 100", f"{num(r['occurrence_rate_per100'])} ({num(r['occurrences'])})", '—', num(r['eligible'])],
             ['same rule, Cold Clear judged by its own second run', f"{num(nz['player_rate_per100'])} ({num(nz['player_count'])})",
              f"{num(nz['cc_rate_per100'])} ({num(nz['cc_count'])})", num(nz['eligible'])],
+            alt_row(nz),
             ['mean graded cost there', num(nz['player_regret_mean']), num(nz['cc_regret_mean']), '']]
-    notes = [f"Careful: counting every seal, Cold Clear's own moves seal a cell more often ({num(r['cc_rate_per100'])} against {{poss}} "
+    notes = [alt_note(nz), f"Careful: counting every seal, Cold Clear's own moves seal a cell more often ({num(r['cc_rate_per100'])} against {{poss}} "
              f"{num(r['player_any_seal_rate_per100'])} per 100 {HERE}). The habit is not sealing more; it is sealing where Cold Clear's pick sealed nothing, "
              f"at a mean graded cost of {num(r['regret_mean'])} (median {num(r['regret_median'])})."]
     return rows, notes, r['occurrence_rate_per100']
@@ -133,8 +185,9 @@ def spec_P2(r):
     rows = [["seals where Cold Clear's pick sealed nothing, per 100 (garbage boards)", f"{num(r['player_rate_per100'])} ({num(r['occurrences'])})", '—', num(r['eligible'])],
             ['same rule, Cold Clear judged by its own second run', f"{num(cs['player_rate_per100'])} ({num(cs['player_count'])})",
              f"{num(cs['cc_rate_per100'])} ({num(cs['cc_count'])})", num(cs['eligible'])],
+            alt_row(cs),
             ['mean graded cost there', num(cs['player_regret_mean']), num(cs['cc_regret_mean']), '']]
-    notes = [f"Careful: counting every seal, Cold Clear seals more often ({num(an['cc_rate_per100'])} against pinglamb's "
+    notes = [alt_note(cs), f"Careful: counting every seal, Cold Clear seals more often ({num(an['cc_rate_per100'])} against pinglamb's "
              f"{num(an['player_rate_per100'])} per 100 {HERE}). The habit is sealing where Cold Clear's pick sealed nothing, "
              f"at a mean graded cost of {num(r['regret_mean'])} (median {num(r['regret_median'])})."]
     return rows, notes, r['player_rate_per100']
@@ -157,9 +210,14 @@ def spec_Y6(r):
     pr, cr = r['player_rate_graded_pct'], r['cc_rate_pct']
     cmpw = ('more often than' if cr > pr else 'less often than' if cr < pr else 'exactly as often as')
     nt = Y6_SIGN
-    notes = [f"Against Cold Clear this habit does not separate: {HERE} Cold Clear turned the T sideways in these slots {cmpw} {{s}} "
-             f"({num(cr)}% against {num(pr)}%), and {{s}} are above Cold Clear on only {nt['player_above_cc_nights']} of the "
-             f"{nt['nights_differing']} nights where the two rates differ. "
+    allsep = (f"{{s}} are above Cold Clear on only {nt['player_above_cc_nights']} of the {nt['nights_differing']} nights where the two rates differ")
+    if HERE == 'this night' and pr > cr:   # this night does show yachi above Cold Clear: say so first, then the corpus verdict
+        head = (f"This night {{s}} turned the T sideways in these slots more often than Cold Clear's pick did ({num(pr)}% against {num(cr)}%). "
+                f"Over the 15 nights the habit still does not separate from Cold Clear: {allsep}, and this is one of them. ")
+    else:
+        head = (f"Against Cold Clear this habit does not separate: {HERE} Cold Clear turned the T sideways in these slots {cmpw} {{s}} "
+                f"({num(cr)}% against {num(pr)}%), and {allsep}. ")
+    notes = [head +
              "What makes it a habit is the comparison with pinglamb, and how it happens: {poss} TSDs are exactly two same-direction rotates "
              "98% of the time (3980 of 4060), while of the 190 sideways Ts over the 15 nights 184 had exactly three rotate presses "
              "(89 three clockwise, 70 three counter-clockwise, 25 CW CW CCW) and the rest 5, 7 or 9.",
@@ -185,7 +243,7 @@ def spec_P3(r):
         why = "so most of the gap here is a general taste for clearing, not something tied to the clear just before."
     else:
         why = "so part of the gap here is a general taste for clearing."
-    notes = [f"Control: with no clear just before, the gap is {sg(g0)} pp (n {num(c['eligible'])}), {why} "
+    notes = [(QUAL if g0 > 0 else '') + f"Control: with no clear just before, the gap is {sg(g0)} pp (n {num(c['eligible'])}), {why} "
              f"The gap after a clear is {sg(d)} pp {'above' if d >= 0 else 'below'} that control; "
              "this is a difference of two gaps, not a measured cause.",
              f"{num(r['occurrences'])} times pinglamb cleared where Cold Clear stacked (misdrop-shaped included; mean graded cost {num(r['regret_mean'])}, median {num(r['regret_median'])})."]
@@ -241,8 +299,12 @@ DESC = {   # one plain line per habit; no figures beyond the habit's own definit
     'P1': "From a 6+ row stack, a placement leaves a covered cell where Cold Clear's pick does not, one column off or otherwise.",
     'P2': "On a board with garbage, a placement seals a cell off completely while Cold Clear's pick at the same position sealed nothing.",
     'P3': "Right after a line clear, with no B2B to protect, pinglamb cleared again (usually a single, which keeps a short combo going) where Cold Clear cleared nothing and kept building. The examples are single-line clears.",
-    'P4': "One half of the board is clearly taller (10–13 rows, garbage below): pinglamb placed on the tall half where Cold Clear filled the low side.",
-    'P5': "Stack at 12–15 rows with 4–7 garbage rows: Cold Clear takes the line clear on offer, pinglamb kept stacking instead.",
+    'P4': "One half of the board is clearly taller (10–13 rows, garbage below): pinglamb placed on the tall half where Cold Clear filled the low side. "
+          "A piece goes by the average column of its four cells; one whose average sits exactly on the midline, between columns 5 and 6, "
+          "counts as on the right half, for both sides.",
+    'P5': "Stack at 12–15 rows with 4–7 garbage rows: Cold Clear takes the line clear on offer, pinglamb kept stacking instead. "
+          "The rates below are for the 12–15 row band; the last table row is the 10–13 row band the re-checks recommend for pinglamb, "
+          "where the gap is much smaller.",
     'P6': "At 10+ rows, with the I as the current piece and a well ready 4+ deep, pinglamb pressed hold instead of taking the quad.",
 }
 
@@ -261,44 +323,49 @@ SOURCE_EXTRA = {
     'P6': "I current       clean n=557 gap -0.065 [-0.106,-0.021]; sessions neg 10/13 p=9.2e-02",
 }
 READER = {
- 'Y1': ["Every graded position of {poss} with the stack at 6 or more rows. A hole move leaves a new covered cell where Cold Clear's pick "
+ 'Y1': ["Every one of {poss} graded positions with the stack at 6 or more rows. A hole move leaves a new covered cell where Cold Clear's pick "
         "does not, and is one column or one rotation away from Cold Clear's choice (or the same shape one column over would have been clean). "
         "Over the 15 nights {s} made 378 of them in 23 722 positions (1.593 per 100), at a mean graded cost of 744.8 (median 486); 166 cost 600 or more. "
         "Per night the rate runs from 1.065 (07-22) to 2.273 (08-19) per 100.",
         "Against Cold Clear: on the 1 961 positions where Cold Clear was also run a second time with a different random seed, {s} made 25 hole moves "
-        "(1.275 per 100) and Cold Clear's second run made 21 of the same shape against its first (1.071 per 100). So Cold Clear makes this shape "
-        "at a similar rate, and the difference is the cost: {poss} cost 635.4 on average there (median 461), while the 16 of Cold Clear's 21 that "
+        "(1.275 per 100) and Cold Clear's second run made 21 of the same shape against its first (1.071 per 100). On both sides this "
+        "comparison counts only the one-column-shift and rotation shapes: the own-shape-one-column-over test is left out, so {poss} count "
+        "here is not the subsample's share of the hole moves above. Cold Clear's 21 is one noisy draw: a separate second search of the "
+        "same positions gives {=cc_same_positions.cc_alt_seed1.cc_count} ({=cc_same_positions.cc_alt_seed1.cc_rate_per100} per 100). So Cold Clear makes this shape "
+        "at a similar rate, and the difference is the cost: {poss} hole moves cost 635.4 on average there (median 461), while the 16 of Cold Clear's 21 that "
         "can be valued average −43.5 (median −1.5), i.e. nothing. That subsample holds only 73–247 positions and 0–5 events a night, so read the "
         "cost, not a per-night gap."],
- 'Y2': ["Every graded position of {poss} with the stack at 12–15 rows and 4–7 garbage rows: 2508 over the 15 nights. {S} clear 0.8166 lines "
+ 'Y2': ["Every one of {poss} graded positions with the stack at 12–15 rows and 4–7 garbage rows: 2508 over the 15 nights. {S} clear 0.8166 lines "
         "per move against Cold Clear's 1.0008 (−0.1842), and clear at all on 0.339 of moves against 0.401 (−0.062). The gap is negative on 14 nights "
         "and positive on one (09-03, +0.011, n 91), and runs as wide as −0.3535 (07-24).",
         "An occurrence is a position where Cold Clear's pick clears a line and {poss} move does not: 340 in all, from 11 (09-03) to 47 (10-03) a "
         "night, at a mean graded cost of 306.0 (median 205.5). In the wider band of 10–15 rows with 1–7 garbage rows: 6220 positions, 0.688 "
         "against 0.842 lines per move (−0.1545), 824 occurrences."],
- 'Y3': ["Every graded position of {poss} where the I is the current piece or in hold and a clean well is ready at least 4 rows deep: 2465 over "
+ 'Y3': ["Every one of {poss} graded positions where the I is the current piece or in hold and a clean well is ready at least 4 rows deep: 2465 over "
         "the 15 nights. {S} took the quad on 65.96% of them, Cold Clear on 79.27% (−13.31 pp). The gap is negative on all 15 nights: smallest on "
         "08-14 (−6.98) and 09-03 (−9.35), largest on 09-10 (−24.78).",
         "Of the 556 declines, 124 are misdrop-shaped (the I dropped one column beside the well, the right piece one column off, or a very fast "
         "drop with many keys) and 432 deliberate. With the misdrop-shaped declines removed the gap is −8.71 pp (69.46% against 78.17%, n 2341)."],
- 'Y4': ["Every graded position of {poss}: 25348 over the 15 nights. A seal cuts empty cells off completely, so no tuck or spin can reach them. "
+ 'Y4': ["Every one of {poss} graded positions: 25348 over the 15 nights. A seal cuts empty cells off completely, so no tuck or spin can reach them. "
         "The habit is a seal where Cold Clear's own pick at the same position (same queue, hold and garbage) seals nothing, the two moves differ, "
         "and {poss} move is not one column or one rotation off Cold Clear's. That happened 297 times (1.172 per 100), at a mean graded cost of "
         "438.1 (median 391); 96 cost 600 or more.",
-        "Counting every seal, Cold Clear seals more than {s} do: its pick seals at 4.052 per 100 (1027 positions) against {poss} 2.884 per 100 "
+        "Counting every seal, Cold Clear seals more than {s} do: its pick seals at 4.052 per 100 (1027 positions) against {poss} moves at 2.884 per 100 "
         "(731), or 1.976 per 100 (501) without the misdrop-shaped ones, and that is so on all 15 nights. So the habit is not sealing more often; "
         "it is sealing where Cold Clear's pick sealed nothing, at a cost.",
         "Against Cold Clear's own second run (a different random seed) on 2097 positions, by the same rule: {s} 23 (1.097 per 100, mean graded "
         "cost 562.3); Cold Clear 18 (0.858 per 100, mean 209.7), or 15 (0.715 per 100, mean 138.3) with the full one-column-off filter applied "
-        "to its side too. About as often; the difference is the cost."],
- 'Y5': ["Every graded position of {poss} where a garbage hole is open to the surface: 11386 over the 15 nights. Burying it means putting a "
+        "to its side too. That last count is one noisy draw: a separate second search of the same positions gives "
+        "{=cc_vs_cc_noise.cc_alt_seed1.cc_count} ({=cc_vs_cc_noise.cc_alt_seed1.cc_rate_per100} per 100) by the same full rule. "
+        "About as often either way; the difference is the cost."],
+ 'Y5': ["Every one of {poss} graded positions where a garbage hole is open to the surface: 11386 over the 15 nights. Burying it means putting a "
         "cell in that column above the hole so that the count of covered cells goes up. {S} bury it on 3.43% of them (390), Cold Clear on "
         "1.94% (221): +1.48 pp. {S} are above Cold Clear on all 15 nights, from +0.43 (07-24) to +2.28 (09-11).",
         "296 times {s} buried it where Cold Clear did not (108 misdrop-shaped, 188 deliberate), and 127 times it went the other way round. "
         "Mean graded cost 502.4 (median 423); the deliberate ones alone 475.3 (median 405.5). With the misdrop-shaped moves removed from the "
         "positions (9007): 2.92% against 1.93%, +0.99 pp, above on 14 nights and level on 07-24. At 12+ rows (5791 positions): 4.08% "
         "against 2.45%, +1.62 pp."],
- 'Y6': ["Every T of {poss} that goes into a ready TSD slot, locked as a TSD or sideways as a TSS: 4250 over the 15 nights, of which 4229 could "
+ 'Y6': ["Every T {s} put into a ready TSD slot, locked as a TSD or sideways as a TSS: 4250 over the 15 nights, of which 4229 could "
         "be graded (Cold Clear treats the rest as lost). On the graded ones {s} locked the TSS on 4.47% and Cold Clear's pick at the same "
         "position was the sideways TSS on 4.97%: −0.50 pp. {S} are above Cold Clear on only 4 of the 14 nights where the two differ "
         "(sign test p = 0.18).",
@@ -317,15 +384,24 @@ READER = {
         "559.0, median 362); the other 515 average 419.6 (median 240).",
         "Against Cold Clear's own second run (a different random seed) on 1 708 positions: pinglamb 73 hole moves (4.274 per 100, mean graded "
         "cost 706.6, median 470), Cold Clear 30 (1.756 per 100, mean 3.3, median 41.5): +2.518 per 100. That is 12 nights above, 2 level and "
-        "1 below, but each night has only 63–218 such positions and 0–12 events, so per-night gaps are very noisy."],
+        "1 below, but each night has only 63–218 such positions and 0–12 events, so per-night gaps are very noisy. "
+        "Cold Clear's 30 is itself one noisy draw: a separate second search of the same positions gives "
+        "{=cc_same_positions.cc_alt_seed1.cc_count} ({=cc_same_positions.cc_alt_seed1.cc_rate_per100} per 100), "
+        "which leaves a gap of {=+p1_alt_gap} per 100, so the size of the gap depends on which draw is read."],
  'P2': ["Every graded position of pinglamb with garbage on the board: 21266 over the 15 nights. A seal cuts empty cells off completely, so "
         "no tuck or spin can reach them. The habit is a seal where Cold Clear's own pick at the same position seals nothing, and the move is "
         "not one column or one rotation off Cold Clear's (nor, when it adds covered cells, a shape that one column over would add none): 210 times (0.987 per 100), at a mean graded cost of 560.6 (median 351); 76 cost 600 "
         "or more.",
         "Counting every seal, Cold Clear seals more than pinglamb (3.898 per 100, 829 positions, against 2.285, 486), and that is so on all "
         "15 nights. So the habit is not sealing more often; it is sealing where Cold Clear's pick sealed nothing.",
-        "Against Cold Clear's own second run on 1741 positions, by the same rule: pinglamb 23 (1.321 per 100, mean graded cost 573.7, median "
-        "516), Cold Clear 8 (0.46 per 100, mean 75.2, median 133; 14 without the one-column-off filter): +0.862 per 100. Per night that "
+        "Against Cold Clear's own second run on {=cc_same_positions.eligible} positions, by the same rule, applied to Cold Clear's pick "
+        "exactly as to pinglamb's move (the one-column-over test only when the pick adds covered cells): pinglamb "
+        "{=cc_same_positions.player_count} ({=cc_same_positions.player_rate_per100} per 100, mean graded cost "
+        "{=cc_same_positions.player_regret_mean}, median {=cc_same_positions.player_regret_median}), Cold Clear "
+        "{=cc_same_positions.cc_count} ({=cc_same_positions.cc_rate_per100} per 100, mean {=cc_same_positions.cc_regret_mean}, median "
+        "{=cc_same_positions.cc_regret_median}; 14 without the one-column-off filter): {=+cc_same_positions.gap_per100} per 100. "
+        "Cold Clear's count is one noisy draw: a separate second search of the same positions gives "
+        "{=cc_same_positions.cc_alt_seed1.cc_count} ({=cc_same_positions.cc_alt_seed1.cc_rate_per100} per 100). Per night that "
         "subsample is small: 0–4 events for pinglamb and 0–2 for Cold Clear."],
  'P3': ["Every graded position of pinglamb right after a line clear, with no B2B chain: 4803 over the 15 nights. pinglamb clears again on "
         "41.70% of them, Cold Clear's pick on 32.92%: +8.79 pp (+6.47 pp without the misdrop-shaped moves, n 4684). With no clear just "
@@ -362,17 +438,32 @@ def _nums(t):
     t = re.sub(r'\b(?:20\d\d-)?(\d\d-\d\d)\b', lambda m: ' ' if m.group(1) in SHORT else m.group(0), t)   # night dates: checked separately
     t = re.sub(r'(?<=\d)[ \u2009\u202f\u00a0](?=\d{3}\b)', '', t.replace('−', '-'))
     return set(_NUM.findall(t))
+_PH = re.compile(r'\{=(\+?)([a-z0-9_.]+)\}')
+DERIVED = {}   # placeholders computed here from the pooled entry (a difference of two of its fields), keyed by name
+def _resolve(h, t):
+    """{=a.b.c} is the pooled entry's field a.b.c printed as the data holds it; {=+...} signs it."""
+    def one(m):
+        k = m.group(2)
+        if k in DERIVED.get(h['id'], {}):
+            v = DERIVED[h['id']][k]
+        else:
+            v = h['pooled']
+            for part in k.split('.'): v = v[part]
+        assert v is not None, (h['id'], k)
+        return sg(v) if m.group(1) else num(v)
+    return _PH.sub(one, t)
 def reader_text(h):
-    """The reader-facing measurement text, checked figure by figure against the detector's own text."""
+    """The reader-facing measurement text, checked figure by figure against the detector's own text; {=...}
+    placeholders are filled from the detector's pooled entry and so are not typed."""
     src = _nums(h['definition'] + ' ' + h['cc_comparison'] + ' ' + SOURCE_EXTRA.get(h['id'], ''))
-    paras = READER[h['id']]
+    paras = [_PH.sub(' ', t) for t in READER[h['id']]]
     for d in re.findall(r'\b\d\d-\d\d\b', ' '.join(paras)):
         assert d in SHORT and d in h['cc_comparison'], (h['id'], 'date not a night in the detector text', d)
     missing = sorted(_nums(' '.join(paras)) - src - {'15'}, key=float)   # 15 = the number of nights
     assert not missing, (h['id'], 'figures not in the detector output', missing)
     bad = re.findall(r"\b(cc|regret|skeptic|sub4000|seed-0|seed-1|nights\.json|\.py|\.out)\b", ' '.join(paras), re.I)
     assert not bad, (h['id'], 'internal wording', bad)
-    return paras
+    return [_resolve(h, t) for t in READER[h['id']]]
 
 
 STRENGTH = {   # how firm each habit is, in the skeptics' words (FINDINGS.md); shown on every view of the card
@@ -391,6 +482,8 @@ STRENGTH = {   # how firm each habit is, in the skeptics' words (FINDINGS.md); s
 DIRECTION = {'Y2': -1, 'P5': -1, 'Y3': -1, 'P6': -1, 'Y5': +1, 'P3': +1, 'P4': +1}
 
 Y1_POOLED_CC = next(h for h in HAB if h['id'] == 'Y1')['pooled']['cc_same_positions']
+_p1 = next(h for h in HAB if h['id'] == 'P1')['pooled']['cc_same_positions']
+DERIVED['P1'] = {'p1_alt_gap': round(_p1['player_rate_per100'] - _p1['cc_alt_seed1']['cc_rate_per100'], 3)}   # both 3-dp rates: exact
 # Y6's all-nights figures are the detector's own pooled entry (session 'pooled'), not a sum made here.
 y6 = next(h for h in HAB if h['id'] == 'Y6')
 assert y6['pooled'] and y6['pooled']['session'] == 'pooled', 'Y6 pooled entry missing'
@@ -414,6 +507,8 @@ def card(h, rates, pooled=False, n_ex=None):
     HERE = 'over all 15 nights' if pooled else 'this night'
     assert len(NIGHTS) == 15
     rows, notes, v = SPEC[h['id']](rates)
+    qual = any(t.startswith(QUAL) for t in notes)
+    notes = [t[len(QUAL):] if t.startswith(QUAL) else t for t in notes]
     sv = strip_value(h['id'], rows, v)
     if h['id'] in DIRECTION and not pooled:
         want = DIRECTION[h['id']]
@@ -422,9 +517,11 @@ def card(h, rates, pooled=False, n_ex=None):
         elif (sv > 0) != (want > 0):
             notes.append(f"On this night the gap runs the other way ({sg(sv)}), so this night does not show the habit." +
                          (" The examples below are still this night's occurrences of it." if n_ex else ""))
-    return rows, notes, sv
+    return rows, notes, sv, qual
 
 
+# finalize.py's reasons, in reader words (a reason it does not list here is printed as finalize.py wrote it)
+REASON = {'Cold Clear does not contrast': f"fewer than a majority of the {len(SEEDS)} Cold Clear runs made a first move that contrasts with the habit"}
 SMALL_POOL = 10   # below this many occurrences a night's "typical" is called a loose word, on the card and in each caption
 
 
@@ -468,7 +565,11 @@ def pool_note(h, v):
         if p.get('same_round_as_closer'):
             k = p['same_round_as_closer']
             reasons.append(f"{k} in the middle half {'shares' if k == 1 else 'share'} a round with a closer one")
+        # finalize.py retries a round another habit uses whenever a night is short, so on a short night that round is
+        # never the final reason; if it were, the rule printed in the header would be contradicted by this note
+        assert not (v.get('not_used') or {}).get('round already shown under another habit'), (h['id'], v['pool'], 'round reason on a short night')
         for w_, c_ in sorted((v.get('not_used') or {}).items(), key=lambda kv: -kv[1]):
+            w_ = REASON.get(w_, w_)
             reasons.append(f"{c_} in the middle half: {w_}")
         head = (f"Only one example this night" if n == 1 else "No example this night")
         head += (f": {inb} {occ(inb)} {'has' if inb == 1 else 'have'} a positive graded cost inside the middle half" if inb else
@@ -510,9 +611,18 @@ def slim_clip(c):
     # pressed while the current and held pieces were the same (later presses on one piece are ignored by the game)
     assert all(s['hold'] == (s['piece'] != s['queue']['current'] or ('hold' in s['keys'] and s['queue']['current'] == s['queue']['hold']))
                for s in c['human']), c['id']
-    m = c['id'].split('/')
     run = c['cc_run']
-    return {'id': c['id'], 'night': c['night'], 'file': c['file'], 'round': c['round'] + 1, 'piece': c['lock'] + 1, 'rows': R,
+    mr = MATCHES[c['night']][c['file']]   # the match report's own match: index and round must exist there
+    assert any(r['index'] == c['round'] for r in mr['rounds']), (c['id'], 'round not in the match report')
+    extra = {}
+    if c['habit'] == 'Y5':   # the open garbage hole(s) and the one buried, 1-based columns as the captions print them
+        dd = c['detector_detail']; off = 40 - R
+        for hl in dd['open_holes']:   # the hole is an empty cell in a garbage row of the start board
+            row = c['start']['field'][hl['row'] - off]
+            assert row[hl['column']] == '.' and 'G' in row, (c['id'], hl)
+        extra = {'hole_cols': sorted(hl['column'] + 1 for hl in dd['open_holes']),
+                 'buried_cols': sorted(hl['column'] + 1 for hl in dd['buried_holes'])}
+    return {'id': c['id'], 'night': c['night'], 'file': c['file'], 'm': mr['index'], 'round': c['round'] + 1, 'piece': c['lock'] + 1, 'rows': R, **extra,
             'regret': c['regret'], 'misdrop': c['misdrop_shaped'],
             'pool': [c['why_picked']['pool_size'], c['why_picked']['pool_regret_median'], c['why_picked']['regret_percentile_in_pool_midrank']],
             'r0': c['round'], 'misdrop_ok': c['why_picked']['misdrop_ok'],
@@ -531,17 +641,17 @@ for h in HAB:
     nights = {}
     for n in NIGHTS:
         v = h['nights'][n]
-        rows, notes, sv = card(h, v['rates'], n_ex=len(v['examples']))
+        rows, notes, sv, qual = card(h, v['rates'], n_ex=len(v['examples']))
         strip.append(sv)
-        nights[n] = {'rows': rows, 'notes': notes, 'poolnote': pool_note(h, v),
+        nights[n] = {'rows': rows, 'notes': notes, 'qual': qual, 'poolnote': pool_note(h, v),
                      'ex': [slim_clip(c) for c in v['examples']]}
         assert all(c['night'] == n and c['player'] == h['player'] and c['habit'] == h['id'] for c in v['examples'])
         n_ex.append(len(v['examples']))
-    prow, pnotes, _ = card(h, h['pooled'], pooled=True)
+    prow, pnotes, _, pqual = card(h, h['pooled'], pooled=True)
     out_h.append({'id': h['id'], 'player': h['player'], 'name': h['name'], 'desc': DESC[h['id']], 'strength': STRENGTH.get(h['id']),
                   'measured': reader_text(h), 'strip': strip,
                   'stripLabel': STRIP[h['id']][0], 'stripKind': STRIP[h['id']][1],
-                  'all': {'rows': prow, 'notes': pnotes}, 'nights': nights})
+                  'all': {'rows': prow, 'notes': pnotes, 'qual': pqual}, 'nights': nights})
 
 # no clip shown twice: no piece of any round appears in two examples; a habit-night's two examples
 # come from different match files; the all-nights notes never speak of "this night"
@@ -555,11 +665,19 @@ for h in out_h:
                 assert (rk, int(l0) + j) not in _seen, (c['id'], h['id'], _seen.get((rk, int(l0) + j)), 'piece shown twice')
                 _seen[(rk, int(l0) + j)] = h['id']
     assert not any('this night' in t for t in h['all']['notes']), (h['id'], 'pooled note says this night')
-DATA = {'nights': NIGHTS, 'players': PLAYERS, 'k': K, 'seeds': len(SEEDS), 'nodes': NODES, 'habits': out_h}
+DATA = {'nights': NIGHTS, 'players': PLAYERS, 'k': K, 'seeds': len(SEEDS), 'nodes': NODES, 'habits': out_h,
+        'matches': {n: [len(MATCHES[n]), sum(len(m['rounds']) for m in MATCHES[n].values())] for n in NIGHTS}}
 n_clips = sum(n_ex)
 lo, hi = min(n_ex), max(n_ex)
 one_ex = D['log']['habit_nights_with_one_example']
-meta = {'small_pool': SMALL_POOL, 'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'zero_ex': D['log']['habit_nights_without_examples'], 'n_habits': len(HAB)}
+# per player: how many examples, and in how many the Cold Clear move shown is not the pick the graded cost used
+by_p = {p: [0, 0] for p in PLAYERS}
+for h in out_h:
+    for v in h['nights'].values():
+        for c in v['ex']:
+            by_p[h['player']][0] += 1; by_p[h['player']][1] += not c['graded_eq']
+meta = {'small_pool': SMALL_POOL, 'n_clips': n_clips, 'per_night': hi, 'one_ex': one_ex, 'zero_ex': D['log']['habit_nights_without_examples'],
+        'n_habits': len(HAB), 'clips_by_player': by_p}
 
 TEMPLATE = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'habits-template.html'), encoding='utf-8').read()
 page = (TEMPLATE.replace('{{DATA}}', json.dumps(DATA, separators=(',', ':'), ensure_ascii=False))

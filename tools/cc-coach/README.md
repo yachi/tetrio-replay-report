@@ -237,7 +237,8 @@ end
 python3 finalize.py                     # $CC_WORK/scen/habit-clips.json
 # 3. the page, then publish
 python3 ~/tetrio-replay-report/tools/cc-coach/clips/build-habits.py \
-    --clips $CC_WORK/scen/habit-clips.json --out ~/tetrio-replay-report/tools/cc-coach/pages/cc-habits.html
+    --clips $CC_WORK/scen/habit-clips.json --corpus $CC_WORK/corpus \
+    --out ~/tetrio-replay-report/tools/cc-coach/pages/cc-habits.html
 bin/build-docs; bin/build-docs --check
 ```
 
@@ -288,6 +289,21 @@ two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move se
 that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
 uncovered empty cell), so the caption, which names the cells each first move sealed
 off, cannot contradict the habit.
+
+A candidate skipped in the first pass only because another habit already shows its round is counted, on a
+short night, under the reason that rules it out on the retry (its pieces, the match file, or too few contrasting
+Cold Clear runs), not under the round; `build-habits.py` refuses a short night whose note still gives the round.
+
+Cold Clear's "second run" rates (Y1, Y4, P1, P2) are one draw of a noisy search. Two separate seed-1 searches
+exist for the same sub4000 positions (`grade-s1.jsonl`, graded with the player's move, and `grade-s1-ccpick.jsonl`,
+graded with Cold Clear's seed-0 pick), and they do not always pick the same move. Each of those detectors writes its
+Cold Clear count under the other search too (`cc_alt_seed1`), and the page shows both. P2's Cold Clear side gets the
+own-shape-one-column-over test only when its pick adds covered cells, the condition `holes_build.py` puts on the
+player's side (until 2026-10-05 it was applied to every pick, which counted one fewer Cold Clear seal).
+
+`build-habits.py` also checks each night's match files and round sets against both the habit corpus
+(`--corpus`, `<night>.jsonl.rounds.json`) and the repo's match report (`sessions/<night>/report/facts.json`), and
+places every example by the report's own match index (`m<index>r<round>`).
 
 `build-habits.py` prints every rate straight from each habit's per-night entry (the detector's
 `nights.json`, carried verbatim in `habit-clips.json`), and the strip plots the detector's own gap field,

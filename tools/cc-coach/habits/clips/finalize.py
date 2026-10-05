@@ -295,23 +295,29 @@ for h in HABITS:
     for k in ('nights_gap_negative', 'nights_gap_positive', 'night_sign_test', 'p10_piece_time', 'reproduce', 'min_height', 'title'):
         if k in nd: hab.setdefault('extra', {})[k] = nd[k]
     for s in SESS:
-        ex = []; why_not = collections.Counter(); files = set()
+        ex = []; why_not = collections.Counter(); files = set(); round_skipped = set()
         # pass 1: no round already shown under another habit; pass 2 (only if a slot is still empty): such a
         # round is allowed when none of this window's pieces was shown there. A position is never shown twice.
+        # A candidate skipped in pass 1 only for its round is counted under the reason that finally rules it out
+        # in pass 2 (its pieces, the match file, or the Cold Clear runs), not under the round.
+        def why(reason, pss, i):
+            if pss == 1: why_not[reason] += 1
+            elif i in round_skipped: why_not['round already shown under another habit'] -= 1; why_not[reason] += 1
         for pss in (1, 2):
             for cand in cands.get(f'{h}/{s}', []):
                 if len(ex) == KEEP: break
                 i = cand['occ']['id']; rk, l0 = i.rsplit('/', 1); l0 = int(l0); fk_ = rk.split('/')[0]
                 if any(c['id'] == i for c in ex): continue
                 win = {(rk, l0 + j) for j in range(K)}
-                if i in USED_POS: why_not['position already shown under another habit'] += pss == 1; continue
-                if win & USED_PIECES:
+                if i in USED_POS: why('position already shown under another habit', pss, i); continue
+                if win & USED_PIECES:   # counted once, in pass 2 (pass 1 checks this before the round, so it never reaches the round test)
                     why_not['its pieces are already shown under another habit'] += pss == 2; continue
-                if pss == 1 and rk in USED_ROUND: why_not['round already shown under another habit'] += 1; continue
-                if fk_ in files: why_not['same match file as the other example'] += pss == 1; continue
+                if pss == 1 and rk in USED_ROUND: why('round already shown under another habit', 1, i); round_skipped.add(i); continue
+                if fk_ in files: why('same match file as the other example', pss, i); continue
                 c, err = build_clip(h, s, cand)
                 if err:
-                    if pss == 1: dropped.append({'habit': h, 'night': s, **err}); why_not[err['why']] += 1
+                    if pss == 1 or i in round_skipped: dropped.append({'habit': h, 'night': s, **err})
+                    why(err['why'], pss, i)
                     continue
                 assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], i
                 lo_, hi_ = c['why_picked']['band_regret']

@@ -45,6 +45,14 @@ for l in open(C + 'grade-s1-ccpick.jsonl'):
     if g['id'] in need and 'pick' in g and g.get('duel') and g['duel']['cc'] is not None and g['duel']['player'] is not None:
         S1P[g['id']] = g; CCN[g['id']] = g['duel']['cc'] - g['duel']['player']
 
+# Second seed-1 source: grade-s1.jsonl is a separate seed-1 search of the same sub4000 positions (the position with the
+# player's own move, so its pick is the same kind of seed-1 pick). The two searches do not always pick the same move, so the
+# Cold Clear count on the subsample is reported under both (cc_alt_seed1): one count is one noisy draw.
+S1ALT = {}
+for l in open(C + 'grade-s1.jsonl'):
+    g = json.loads(l)
+    if g['id'] in need and 'pick' in g: S1ALT[g['id']] = g
+
 def reach(g):
     vis = set(); stk = [(c, 0) for c in range(10) if g[0][c] == '.']; vis.update(stk)
     while stk:
@@ -62,7 +70,7 @@ def newly_cut(f, cells):
     r0, r1 = reach(g0), reach(g1)
     return sorted((x, y) for (x, y) in r0 - r1 if g1[y][x] == '.')
 
-K = ('n', 'plany', 'ccany', 'occ', 'md', 'nsub', 'plsub', 's1', 'regs', 'mdregs', 'occregs', 's1regs', 'plsubregs')
+K = ('n', 'plany', 'ccany', 'occ', 'md', 'nsub', 'plsub', 's1', 'nalt', 's1alt', 'regs', 'mdregs', 'occregs', 's1regs', 'plsubregs')
 def blank(): return {k: ([] if k.endswith('regs') else 0) for k in K}
 per = collections.defaultdict(blank); occ = []
 for r in E:
@@ -74,11 +82,17 @@ for r in E:
         d['nsub'] += 1
         s1 = S1P[r['id']]; c0 = [tuple(c) for c in g['pick']['cells']]
         # the player side's misdrop rule applied to cc's seed-0 pick, judged against seed 1: a shift/rot of
-        # the seed-1 pick or its top-3 (holes_build.misdrop), or its own shape one column over is clean
-        cc_md = bool(misdrop(g['pick']['piece'], c0, [s1['pick']] + s1.get('top', [])[:3])) or bool(shift_clean(f, c0))
+        # the seed-1 pick or its top-3 (holes_build.misdrop), or, only when the pick adds covered cells (r['cd'][0] > 0,
+        # the same condition holes_build puts on the player's shiftclean), its own shape one column over is clean
+        cc_md = bool(misdrop(g['pick']['piece'], c0, [s1['pick']] + s1.get('top', [])[:3])) or (r['cd'][0] > 0 and bool(shift_clean(f, c0)))
         if r['cd'][3] > 0 and hole_delta(f, [tuple(c) for c in s1['pick']['cells']])[3] <= 0 and not cc_md:
             d['s1'] += 1; d['s1regs'].append(CCN[r['id']])
         if SEAL(r): d['plsub'] += 1; d['plsubregs'].append(r['reg'])
+        a1 = S1ALT.get(r['id'])
+        if a1:   # same rule, the other seed-1 search's pick and top-3
+            d['nalt'] += 1
+            cc_md_a = bool(misdrop(g['pick']['piece'], c0, [a1['pick']] + a1.get('top', [])[:3])) or (r['cd'][0] > 0 and bool(shift_clean(f, c0)))
+            d['s1alt'] += r['cd'][3] > 0 and hole_delta(f, [tuple(c) for c in a1['pick']['cells']])[3] <= 0 and not cc_md_a
     if not SEALX(r): continue
     md = isMD(r)
     d['regs'].append(r['reg'])
@@ -120,7 +134,8 @@ def row(label, d):
             cc_rate_per100=pc(d['s1'], ns_), player_rate_per100=pc(d['plsub'], ns_),
             gap_per100=round(100 * (d['plsub'] - d['s1']) / ns_, 3) if ns_ else None,
             cc_regret_mean=mm(d['s1regs'])[0], cc_regret_median=mm(d['s1regs'])[1],
-            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1]))
+            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1],
+            cc_alt_seed1=dict(source='grade-s1.jsonl', eligible=d['nalt'], cc_count=d['s1alt'], cc_rate_per100=pc(d['s1alt'], d['nalt']))))
 nights = [row(s, per[s]) for s in sorted(per)]
 P = blank()
 for d in per.values():

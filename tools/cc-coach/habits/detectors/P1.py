@@ -45,6 +45,14 @@ for l in open(C + 'grade-s1-ccpick.jsonl'):
     if g['id'] in need and 'pick' in g and g.get('duel') and g['duel']['cc'] is not None and g['duel']['player'] is not None:
         S1P[g['id']] = g['pick']; CCN[g['id']] = g['duel']['cc'] - g['duel']['player']
 
+# Second seed-1 source: grade-s1.jsonl is a separate seed-1 search of the same sub4000 positions (the position with the
+# player's own move, so its pick is the same kind of seed-1 pick). The two searches do not always pick the same move, so the
+# Cold Clear count on the subsample is reported under both (cc_alt_seed1): one count is one noisy draw.
+S1ALT = {}
+for l in open(C + 'grade-s1.jsonl'):
+    g = json.loads(l)
+    if g['id'] in need and 'pick' in g: S1ALT[g['id']] = g['pick']
+
 def cc_mirror(p, g):
     """looser rule on cc's own seed-0 pick: it makes covered cells while one of its other top-5 candidates is clean."""
     f = p['field']; pc = [tuple(c) for c in g['pick']['cells']]
@@ -52,7 +60,7 @@ def cc_mirror(p, g):
     return any(hole_delta(f, [tuple(c) for c in t['cells']])[0] <= 0 for t in g['top'][1:5])
 
 E = [r for r in A_all if r['maxh'] >= MINH]
-K = ('n', 'pl', 'md', 'cc', 'nsub', 'plsub', 's1', 'regs', 'mdregs', 'nmdregs', 's1regs', 'plsubregs')
+K = ('n', 'pl', 'md', 'cc', 'nsub', 'plsub', 's1', 'nalt', 's1alt', 'regs', 'mdregs', 'nmdregs', 's1regs', 'plsubregs')
 def blank(): return {k: ([] if k.endswith('regs') else 0) for k in K}
 per = collections.defaultdict(blank); occ = []
 for r in E:
@@ -66,6 +74,9 @@ for r in E:
         if r['cd'][0] > 0 and hole_delta(p['field'], [tuple(c) for c in S1P[r['id']]['cells']])[0] <= 0:
             d['s1'] += 1; d['s1regs'].append(CCN[r['id']])
         if HOLE(r): d['plsub'] += 1; d['plsubregs'].append(r['reg'])
+        if r['id'] in S1ALT:   # same rule, the other seed-1 search's pick
+            d['nalt'] += 1
+            d['s1alt'] += r['cd'][0] > 0 and hole_delta(p['field'], [tuple(c) for c in S1ALT[r['id']]['cells']])[0] <= 0
     if not HOLE(r): continue
     md = isMD(r)
     d['pl'] += 1; d['regs'].append(r['reg'])
@@ -102,7 +113,8 @@ def row(label, d):
             cc_rate_per100=pc(d['s1'], ns_), player_rate_per100=pc(d['plsub'], ns_),
             gap_per100=round(100 * (d['plsub'] - d['s1']) / ns_, 3) if ns_ else None,
             cc_regret_mean=mm(d['s1regs'])[0], cc_regret_median=mm(d['s1regs'])[1],
-            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1]),
+            player_regret_mean=mm(d['plsubregs'])[0], player_regret_median=mm(d['plsubregs'])[1],
+            cc_alt_seed1=dict(source='grade-s1.jsonl', eligible=d['nalt'], cc_count=d['s1alt'], cc_rate_per100=pc(d['s1alt'], d['nalt']))),
         cc_top5_mirror=dict(count=d['cc'], rate_per100=pc(d['cc'], n)))
 nights = [row(s, per[s]) for s in sorted(per)]
 P = blank()
