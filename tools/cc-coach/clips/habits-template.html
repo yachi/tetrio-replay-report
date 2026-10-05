@@ -145,13 +145,18 @@ function readHash() {
 function writeHash() { const h = '#' + state.player + '/' + state.night; if (location.hash !== h) history.replaceState(null, '', h); }
 
 // ---- header ---------------------------------------------------------------------------------
+const nHab = p => DATA.habits.filter(h => h.player === p).length;
+const nWeak = p => { const k = DATA.habits.filter(h => h.player === p && h.strength).length;
+  return ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'][k] || String(k); };
 function header() {
   const N = NIGHTS.length;
   $('h1').textContent = w().title + ' vs Cold Clear, night by night';
   $('lede').innerHTML = '';
   $('lede').append(
-    `These are recurring habits found over ${N} nights, not one-off drops: each survived two independent re-checks, ` +
-    `though some are firm and some are weak, and each card says which. For each one: the night's rate next to Cold Clear's ` +
+    `These are recurring habits found over ${N} nights, not one-off drops: each survived two independent re-checks as a recurring pattern. ` +
+    `${nWeak(state.player)} of these ${nHab(state.player)} cards carry a note where the re-checks found the habit weak or narrow` +
+    (state.player === 'yachi' ? `; one of them, the sideways T, stands out only next to pinglamb's rate, not next to Cold Clear's. ` : '. ') +
+    `For each one: the night's rate next to Cold Clear's ` +
     `(for the hole and seal habits Cold Clear can only be compared on a smaller set of positions, judged against its own second run), ` +
     `how the measure moved over all ${N} nights, and typical plays replayed side by side: on the left what ${w().s === 'you' ? 'you' : 'pinglamb'} played for the next ${K} pieces, ` +
     `on the right what Cold Clear played from the identical position, queue, hold and garbage.`);
@@ -162,7 +167,8 @@ function header() {
     ['How the examples were chosen',
      `Typical, not worst. For each habit and night the pool is that night's verified occurrences. Misdrop-shaped moves (the same piece one column or one rotation off Cold Clear's choice) ` +
      `are left out of it, except where the habit is that shape by definition: the one-column-off hole habits and the over-rotated T. ` +
-     `"Typical" means nearest the pool's median graded cost, and each caption gives that median and where the example sits in the pool. ` +
+     `"Typical" means nearest the pool's median graded cost, and never outside the middle half of the pool (the 25th to 75th percentile of graded cost): ` +
+     `a night whose near-median plays cannot be shown gets fewer examples rather than a tail case. Each caption gives the pool's median and where the example sits in it. ` +
      `Examples are only taken from moves with a positive graded cost (a move that scores at least as well as Cold Clear's own pick does not show a costly habit), ` +
      `and for pinglamb's follow-up clears only from single-line clears, that habit's most common kind. ` +
      `Each example needs its next ${K} recorded pieces verified, and a majority of the ${DATA.seeds} Cold Clear runs from it must make a first move that contrasts with the habit. ` +
@@ -222,7 +228,8 @@ function strip(h) {
     const r = add('rect', { x: x + 1.5, y: Math.min(y(v), y(0)), width: bw - 3, height: Math.max(1, Math.abs(y(v) - y(0))),
       fill: sel ? 'var(--human)' : 'var(--stackc)', opacity: state.night === 'all' || sel ? 1 : .55 });
     const t = document.createElementNS(ns, 'title'); t.textContent = `${NIGHTS[i]}: ${minus(v)}`; r.append(t);
-    if (i === 0 || i === n - 1 || sel) add('text', { x: x + bw / 2, y: Ht - 2, 'text-anchor': 'middle' }, short(NIGHTS[i]));
+    if (i === 0 || i === n - 1 || sel) add('text', i === 0 ? { x: x + 1, y: Ht - 2, 'text-anchor': 'start' }
+      : i === n - 1 ? { x: x + bw - 1, y: Ht - 2, 'text-anchor': 'end' } : { x: x + bw / 2, y: Ht - 2, 'text-anchor': 'middle' }, short(NIGHTS[i]));
   });
   return svg;
 }
@@ -343,12 +350,24 @@ const plural = (n, a, b) => n === 1 ? a : (b || a + 's');
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th'));
 const KEYNAME = { moveLeft: 'left', moveRight: 'right', rotateCW: 'rotate CW', rotateCCW: 'rotate CCW', rotate180: 'rotate 180',
   softDrop: 'soft drop', hardDrop: 'hard drop', hold: 'hold' };
+const ORIENT = { spawn: 'in spawn orientation', cw: 'rotated clockwise', '180': 'rotated 180°', ccw: 'rotated counter-clockwise',
+  flat: 'flat', upright: 'upright', '': '' };
+const TPOINT = { spawn: 'pointing up', cw: 'pointing right', '180': 'pointing down', ccw: 'pointing left' };
 function moveText(m) {
   const cols = m.columns.length > 1 ? `columns ${m.columns[0]}–${m.columns[m.columns.length - 1]}` : `column ${m.columns[0]}`;
   const clr = m.lines ? `cleared ${m.lines} ${plural(m.lines, 'line')}` : 'cleared nothing';
-  const cov = m.covered_cells_created > 0 ? `left ${m.covered_cells_created} new covered ${plural(m.covered_cells_created, 'cell')}`
+  const o = m.piece === 'T' ? TPOINT[m.orientation] : ORIENT[m.orientation];
+  let eff;
+  if (m.sealed_cells_new) {   // sealing habits: say what was sealed off, by the habit's own test
+    const sc = m.sealed_cells_new;
+    const byCol = {}; for (const [c, r] of sc) (byCol[c] = byCol[c] || []).push(r);
+    const where = Object.keys(byCol).map(Number).sort((a, b) => a - b).map(c => { const rs = byCol[c].sort((a, b) => a - b);
+      const run = rs.length > 1 && rs[rs.length - 1] - rs[0] === rs.length - 1;
+      return `column ${c}, ` + (rs.length === 1 ? `${ordinal(rs[0])} row` : run ? `rows ${rs[0]}–${rs[rs.length - 1]}` : `rows ${rs.join(', ')}`) + ' from the bottom'; });
+    eff = sc.length ? `sealed off ${sc.length} ${plural(sc.length, 'cell')} (${where.join('; ')})` : 'sealed off no cell';
+  } else eff = m.covered_cells_created > 0 ? `left ${m.covered_cells_created} new covered ${plural(m.covered_cells_created, 'cell')}`
     : m.covered_cells_created < 0 ? `removed ${-m.covered_cells_created} covered ${plural(-m.covered_cells_created, 'cell')}` : 'left no new covered cell';
-  return `${m.piece}${m.from_hold ? ' from hold' : ''} in ${cols}: ${clr}, ${cov}`;
+  return `${m.piece}${o ? ' ' + o : ''}${m.from_hold ? ' from hold' : ''} in ${cols}: ${clr}, ${eff}`;
 }
 function caption(h, c) {
   const f = c.facts, U = el('ul', 'cap');
@@ -370,7 +389,7 @@ function caption(h, c) {
   const [pool, med, pct] = c.pool;
   li('why this one', [`Graded cost ${minus(c.regret)}. Among this night's ${pool} ${plural(pool, 'occurrence')}${c.misdrop_ok ? '' : ' that are not misdrop-shaped'} ` +
     `the median is ${minus(med)}, and this one sits at the ${ordinal(Math.round(pct))} percentile.` +
-    (pool <= 3 ? ` With so few this night, "typical" means little.` : '')]);
+    (pool < 5 ? ` With only ${pool} this night, "typical" means little.` : '')]);
   const p4 = f.player_4, q4 = f.cc_4;
   if (p4.attack > q4.attack && p4.covered_cells_end <= q4.covered_cells_end)
     li('note', [`Over these ${K} pieces ${w().s} came out ahead (more attack, no more holes). The ${K}-piece totals are not the verdict: ` +
@@ -410,7 +429,9 @@ function render() {
     const ul = el('ul', 'notes'); for (const n of N.notes) ul.append(el('li', null, fill(n))); left.append(ul);
     if (!all && N.poolnote) right.append(el('p', 'poolnote', fill(N.poolnote)));
     const sb = el('div', 'stripbox'); sb.append(el('div', 'lab', fill(h.stripLabel) + ' — one bar per night' + (all ? '' : ', this night highlighted')), strip(h)); left.append(sb);
-    const det = el('details'); det.append(el('summary', null, 'How this habit is measured (detector text)'), el('p', null, h.definition), el('p', null, h.cmp)); left.append(det);
+    const det = el('details'); det.append(el('summary', null, 'How this habit is measured, over all ' + NIGHTS.length + ' nights'));
+    for (const t of h.measured) det.append(el('p', null, fill(t)));
+    left.append(det);
     // examples
     const exs = all ? NIGHTS.flatMap(n => h.nights[n].ex.map((c, i) => ({ c, label: `${short(n)} · ${i + 1}` })))
                     : h.nights[state.night].ex.map((c, i) => ({ c, label: `example ${i + 1}` }));

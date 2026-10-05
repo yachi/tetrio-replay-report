@@ -1,6 +1,8 @@
 import os as _os; CC_WORK = _os.environ['CC_WORK']  # the work directory: corpus/, scen/, scen/habits/, scen/hclips/
 # Stage 1: pick TYPICAL examples per (habit, night) and build the K=4 rollout inputs.
-# Typical = regret nearest the median regret of the night's display pool (not the worst).
+# Typical = regret nearest the median regret of the night's display pool, and never outside the
+# middle half of that pool (midrank percentile BAND, inclusive): a night whose near-median
+# candidates are unusable shows fewer examples rather than a tail case.
 # Writes: candidates.json (ranked, up to NCAND per habit-night, distinct rounds, valid windows),
 #         windows.jsonl (every recorded decision needed for the human side + checks),
 #         rollin.jsonl (one rollout input per unique position id), select-log.json
@@ -58,7 +60,8 @@ def pool_filter(h, o):
 #    illustrate a costly habit;
 #  * P3 only: single-line follow-up clears, the habit's own modal case (FINDINGS pinglamb #3: 478 of
 #    683 are singles); if a night has none, any line count.
-EXAMPLE_OK = {'P3': ('single-line clear (the most common kind of this habit)', lambda o: o['player_move']['lines'] == 1)}
+EXAMPLE_OK = {'P3': ('single-line clears', lambda o: o['player_move']['lines'] == 1)}
+BAND = (25.0, 75.0)   # examples only from the middle half of the pool, by midrank percentile of graded cost
 def midrank_pct(v, regs):
     return round(100 * (sum(r < v for r in regs) + 0.5 * sum(r == v for r in regs)) / len(regs), 1)
 cands = {}; log = {'empty': [], 'short_windows': [], 'notes': [], 'pools': {}}
@@ -84,22 +87,25 @@ for h in HABITS:
             ex2 = [o for o in ex if EXAMPLE_OK[h][1](o)]
             if ex2: restr = EXAMPLE_OK[h][0]; info['example_class_excluded'] = len(ex) - len(ex2); ex = ex2
         info['example_restriction'] = restr
+        inb = [o for o in ex if BAND[0] <= midrank_pct(o['regret'], regs) <= BAND[1]]
+        info['band'] = list(BAND); info['positive_outside_band'] = len(ex) - len(inb); info['positive_in_band'] = len(inb)
+        ex = inb
         srt = sorted(ex, key=lambda o: (abs(o['regret'] - med), o['regret'], o['id']))
-        picked = []; used = set(); short = 0
+        picked = []; used = set(); short = 0; same_round = 0
         for rank, o in enumerate(srt):
             rd = rkey(o['id']).rsplit('/', 1)[0]
-            if rd in used: continue
+            if rd in used: same_round += 1; continue
             wf, why = window_ok(o)
             if wf is None:
                 short += 1; log['short_windows'].append({'habit': h, 'session': s, 'id': o['id'], 'why': why}); continue
             used.add(rd)
-            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + '; distinct rounds',
+            picked.append({'occ': o, 'why': {'rule': 'graded cost nearest the median graded cost of this night\'s pool (every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition); examples only from positive graded cost' + (', ' + restr if restr else '') + f', inside the {BAND[0]:g}th-{BAND[1]:g}th percentile of the pool; distinct rounds',
                                             'pool_size': len(pool), 'pool_regret_median': med, 'regret': o['regret'],
                                             'distance_from_median': abs(o['regret'] - med), 'rank_by_distance': rank + 1,
                                             'regret_percentile_in_pool_midrank': midrank_pct(o['regret'], regs),
                                             'misdrop_ok': h in MISDROP_OK, 'example_restriction': restr}})
             if len(picked) == NCAND: break
-        info['windows_rejected'] = short
+        info['windows_rejected'] = short; info['same_round_as_closer'] = same_round
         log['pools'][f'{h}/{s}'] = info
         if not picked: log['empty'].append({'habit': h, 'session': s, 'why': 'no candidate with a valid 4-lock window in a usable round', **info}); continue
         cands[f'{h}/{s}'] = picked

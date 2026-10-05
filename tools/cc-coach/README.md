@@ -256,20 +256,32 @@ and held pieces are the same changes nothing on the board but is still a hold.
 Selection. A habit-night's pool is its verified occurrences, misdrop-shaped excluded except for Y1, P1
 and Y6 (misdrop-shaped by definition); "typical" is measured against that whole pool's median graded
 cost, never a narrowed sub-pool. Examples are then taken nearest that median from positive graded cost
-only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), and for
-P3 only from single-line clears, its modal case. A candidate is kept only if a majority of the five
+only (a move the duel rates at least as good as Cold Clear's pick does not show a costly habit), only
+from the middle half of the pool (midrank percentile of graded cost 25 to 75, inclusive: `BAND` in
+`select.py`, asserted again in `finalize.py` and `build-habits.py`), and for P3 only from single-line
+clears, its modal case. The band ranks above every other rule: an earlier version ranked "a round no
+other habit uses" above closeness to the median, and on nights where the near-median plays shared a round
+with another habit's example it showed the night's worst occurrence instead. A night that cannot fill
+two examples from inside the band shows one or none, and its card says why. A candidate is kept only if a majority of the five
 40k-node Cold Clear seeds make a first move that contrasts with the habit by the habit's own test (P4's
 test also requires the same hold use as the player and no T-spin or quad, as its eligibility does); the
 shown run is the median, by 4-piece attack then holes, of the contrasting runs the harness did not
 declare dead. The harness's topout rule (spawn above row 20) is stricter than TETR.IO's, so a run it ends
 is never the one shown. A night's two examples come from different match files; no piece is shown under
 two habits, and a round another habit already uses is taken only when a night would otherwise have
-fewer than two. Each caption gives the pool's size, median and the example's percentile in it; a night
-with fewer than two examples says why on its card.
+fewer than two. Each caption gives the pool's size, median and the example's percentile in it, and warns
+when the pool holds fewer than five; a night with fewer than two examples says why on its card. For the
+two sealing habits (Y4, P2) a Cold Clear run contrasts only if its first move seals off no cell at all by
+that habit's own sealed-cell test (Y4: unreachable from the top row; P2: a covered region with no
+uncovered empty cell), so the caption, which names the cells each first move sealed
+off, cannot contradict the habit.
 
 `build-habits.py` prints every rate straight from each habit's per-night entry (the detector's
-`nights.json`, carried verbatim in `habit-clips.json`). The one derived figure is Y6's all-nights row,
-which its detector did not pool: it is summed from the per-night counts and the build asserts each sum
-against the figures in Y6's own comparison text. The build refuses a page with an external URL, a
+`nights.json`, carried verbatim in `habit-clips.json`), and the strip plots the detector's own gap field,
+never a difference of two rounded rates. All-nights rows read each detector's pooled entry (Y6's is its
+`nights.json` entry with session `pooled`; its rates are all over the graded in-slot placements). Each
+card's "how it is measured" text is written for readers in `READER`; the build fails if any figure in
+it is not in that habit's detector text (or in the skeptic output lines quoted in `SOURCE_EXTRA`), or if
+it uses internal wording. The build refuses a page with an external URL, a
 gendered pronoun or a model identifier. Like the two replay pages, it is simulator and bot output and
 not in the proof chain; `bin/build-docs` copies it verbatim and `--check` compares it byte for byte.

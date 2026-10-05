@@ -87,6 +87,7 @@ def summ(rs, label):
         session=label,
         eligible=len(y), player_tss=tss, player_tsd=len(y) - tss, player_rate_pct=pct(tss, len(y)),
         graded=len(gy), not_graded_dead=len(y) - len(gy),
+        player_tss_graded=g_tss, player_tsd_graded=len(gy) - g_tss,
         player_rate_graded_pct=pct(g_tss, len(gy)),
         cc_tsd=cc['TSD'], cc_tss=cc['TSS'], cc_other_in_slot=cc['other'], cc_not_into_slot=cc[None],
         cc_rate_pct=pct(cc['TSS'], len(gy)),

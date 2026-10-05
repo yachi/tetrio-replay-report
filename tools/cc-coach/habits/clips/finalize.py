@@ -52,6 +52,58 @@ def counts(g):
         else: sd += len(members)
     return len(cov), oh, sd
 hcounts = counts
+def hb_sealed_set(g):
+    """holes_build semantics (P2): covered cells whose empty 4-connected component holds no uncovered empty cell"""
+    cov = _hb_covered(g); out = set(); comp = {}
+    for cell in cov:
+        if cell in comp: continue
+        stack = [cell]; members = [cell]; comp[cell] = None; op = False
+        while stack:
+            x, y = stack.pop()
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < 10 and 0 <= ny < 40 and g[ny][nx] == '.':
+                    if (nx, ny) not in cov: op = True
+                    elif (nx, ny) not in comp:
+                        comp[(nx, ny)] = None; members.append((nx, ny)); stack.append((nx, ny))
+        for m in members: comp[m] = op
+        if not op: out.update(members)
+    return out
+def reach_sealed_set(g):
+    """Y4 semantics (verify-holes-H-DECISION-stats.py stats()): empty cells not reachable from the top row"""
+    vis = set(); st_ = [(c, 0) for c in range(10) if g[0][c] == '.']; vis.update(st_)
+    while st_:
+        x, y = st_.pop()
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < 10 and 0 <= ny < 40 and g[ny][nx] == '.' and (nx, ny) not in vis:
+                vis.add((nx, ny)); st_.append((nx, ny))
+    return {(x, y) for y in range(40) for x in range(10) if g[y][x] == '.' and (x, y) not in vis}
+SEALED_SET = {'Y4': reach_sealed_set, 'P2': hb_sealed_set}   # each sealing habit's own detector semantics
+def new_sealed(hab, f, cells):
+    """cells sealed off by this move: sealed after (post-clear) minus the cells already sealed before, mapped through the clear"""
+    fn = SEALED_SET[hab]
+    g = [list(r) for r in f]
+    for x, y in cells: g[y][x] = '#'
+    clr = [y for y in range(40) if '.' not in g[y]]
+    pre = {(x, y + sum(1 for c in clr if c > y)) for x, y in fn([list(r) for r in f]) if y not in clr}
+    return sorted(fn([list(r) for r in apply(f, cells)]) - pre)
+# SRS orientations, cells (x right, y down) normalised to their bounding box
+_SH = {
+ 'T': {'spawn': [(1,0),(0,1),(1,1),(2,1)], 'cw': [(0,0),(0,1),(1,1),(0,2)], '180': [(0,0),(1,0),(2,0),(1,1)], 'ccw': [(1,0),(0,1),(1,1),(1,2)]},
+ 'L': {'spawn': [(2,0),(0,1),(1,1),(2,1)], 'cw': [(0,0),(0,1),(0,2),(1,2)], '180': [(0,0),(1,0),(2,0),(0,1)], 'ccw': [(0,0),(1,0),(1,1),(1,2)]},
+ 'J': {'spawn': [(0,0),(0,1),(1,1),(2,1)], 'cw': [(0,0),(1,0),(0,1),(0,2)], '180': [(0,0),(1,0),(2,0),(2,1)], 'ccw': [(1,0),(1,1),(0,2),(1,2)]},
+ 'S': {'flat': [(1,0),(2,0),(0,1),(1,1)], 'upright': [(0,0),(0,1),(1,1),(1,2)]},
+ 'Z': {'flat': [(0,0),(1,0),(1,1),(2,1)], 'upright': [(1,0),(0,1),(1,1),(0,2)]},
+ 'I': {'flat': [(0,0),(1,0),(2,0),(3,0)], 'upright': [(0,0),(0,1),(0,2),(0,3)]},
+ 'O': {'': [(0,0),(1,0),(0,1),(1,1)]},
+}
+def orientation(piece, cells):
+    mx = min(x for x, y in cells); my = min(y for x, y in cells)
+    n = sorted((x - mx, y - my) for x, y in cells)
+    hit = [k for k, v in _SH[piece].items() if sorted(v) == n]
+    assert len(hit) == 1, (piece, cells)
+    return hit[0]
 SEEDS = [0, 1, 2, 3, 4]; K = 4; MINROWS = 22; KEEP = 2
 HABITS = 'Y1 Y2 Y3 Y4 Y5 Y6 P1 P2 P3 P4 P5 P6'.split()
 SESS = sorted(f[:-6] for f in os.listdir(C) if f.endswith('.jsonl') and f[:4] == '2026')
@@ -107,19 +159,23 @@ def outcome(fr, side):
             'covered_cells_end': covered(last) if last else None, 'max_height_end': maxh(last) if last else None,
             'garbage_received': sum(s['garbage'] for s in steps)}
 
-def first_move_facts(start, m, lines):
+def first_move_facts(start, m, lines, hab):
     after = apply(start, m['cells'])
-    return {'piece': m['piece'], 'from_hold': bool(m['hold']), 'columns': cols1(m['cells']), 'lines': lines,
-            'covered_cells_created': covered(after) - covered(start)}
+    d = {'piece': m['piece'], 'from_hold': bool(m['hold']), 'columns': cols1(m['cells']), 'lines': lines,
+         'orientation': orientation(m['piece'], m['cells']), 'covered_cells_created': covered(after) - covered(start)}
+    if hab in SEALED_SET:   # the sealing habits caption sealed cells, by the habit's own detector semantics
+        ns = new_sealed(hab, start, m['cells'])
+        d['sealed_cells_new'] = [[x + 1, 40 - y] for x, y in ns]   # [column from 1, row from the bottom from 1], board after the move
+    return d
 
 STRONG = {'tsd', 'tst', 'tss', 'mini_tss', 'tspin0', 'mini_tspin0', 'quad'}   # P4.py's STRONG kinds
 def contrast(hab, o, start, cm0, hm0, st):
     """Does a Cold Clear first move contrast with the habit, by the habit's own test? -> (bool, rule text)"""
-    def sealed_delta(m): return hcounts([list(r) for r in apply(start, m['cells'])])[2] - hcounts([list(r) for r in start])[2]
+    def sealed_delta(m): return len(new_sealed(hab, start, m['cells']))
     def cov_delta(m): return covered(apply(start, m['cells'])) - covered(start)
     det = o['detail']
     if hab in ('Y1', 'P1'): return cov_delta(cm0) <= 0, 'cc first move creates no covered cell'
-    if hab in ('Y4', 'P2'): return sealed_delta(cm0) <= 0, 'cc first move creates no sealed cell'
+    if hab in ('Y4', 'P2'): return sealed_delta(cm0) == 0, 'cc first move seals off no cell'
     if hab in ('Y2', 'P5'): return cm0['lines'] >= 1, 'cc first move clears at least one line'
     if hab in ('Y3', 'P6'): return cm0['lines'] == 4, 'cc first move is a quad'
     if hab == 'Y6': return cm0['kind'] == 'tsd', 'cc first move is a TSD'
@@ -187,8 +243,8 @@ def build_clip(hab, night, cand):
         'well_rows_ready': wr, 'well_column': (wc + 1) if wc is not None else None,
         'quad_available': wr >= 4 and 'I' in (st['current'], st['hold']),
         'tsd_slot_ready': len(sl) > 0, 'tsd_available': len(sl) > 0 and 'T' in (st['current'], st['hold']),
-        'player_first': first_move_facts(start, {'piece': hm0['piece'], 'hold': hm0['hold'], 'cells': hm0['cells']}, hm0['lines']),
-        'cc_first': first_move_facts(start, cm0, cm0['lines']) if cm0 else None,
+        'player_first': first_move_facts(start, {'piece': hm0['piece'], 'hold': hm0['hold'], 'cells': hm0['cells']}, hm0['lines'], hab),
+        'cc_first': first_move_facts(start, cm0, cm0['lines'], hab) if cm0 else None,
         'player_4': outcome(fr, 'human'), 'cc_4': outcome(fr, 'cc'),
         'columns_note': 'columns are 1-based from the left; covered cells = empty cells with a filled cell above in the same column, counted after line clears',
     }
@@ -225,14 +281,14 @@ def nights_of(h):
 out = {'generated_by': 'scen/hclips/{select.py,frames.ts,finalize.py}', 'window_pieces': K,
        'cc_settings': {'mode': 'rollout', 'nodes': 40000, 'seeds': SEEDS},
        'board_rows_note': 'every board keeps its bottom `rows` rows (row 0 = top of the kept area); cells use the same trimmed row index',
-       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); examples are taken nearest the pool median graded cost, from positive graded cost only (P3: single-line clears only, its modal case, when the night has one); window of 4 verified recorded locks plus the next decision; a majority of the 5 Cold Clear seeds must make a first move that contrasts with the habit, and the shown run is the median contrasting run the harness did not declare dead; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
+       'selection_rule': 'per habit and night: the pool is every verified occurrence, misdrop-shaped excluded unless the habit is misdrop-shaped by definition (Y1, P1, Y6); examples are taken nearest the pool median graded cost, from positive graded cost only and only inside the 25th-75th percentile of the pool (P3: single-line clears only, its modal case, when the night has one); window of 4 verified recorded locks plus the next decision; a majority of the 5 Cold Clear seeds must make a first move that contrasts with the habit, and the shown run is the median contrasting run the harness did not declare dead; the two examples come from different match files; no position or piece is shown under two habits, and a round another habit already uses is taken only when a night would otherwise have fewer than two (habits taken in page order)',
        'habits': []}
 dropped = []; log = json.load(open(f'{D}/select-log.json')); USED_POS = set(); USED_ROUND = set(); USED_PIECES = set()
 counts = {}
 for h in HABITS:
     nd, nights = nights_of(h)
     hab = {'id': h, 'player': nd['player'], 'name': meta.NAMES[h], 'definition': nd['definition'].replace('adds nothing for him', 'adds nothing for pinglamb'), 'cc_comparison': meta.CC[h],
-           'pooled': nd.get('pooled'), 'nights': {}}
+           'pooled': nd.get('pooled') or nights.get('pooled'), 'nights': {}}
     for k in ('nights_gap_negative', 'nights_gap_positive', 'night_sign_test', 'p10_piece_time', 'reproduce', 'min_height', 'title'):
         if k in nd: hab.setdefault('extra', {})[k] = nd[k]
     for s in SESS:
@@ -255,6 +311,8 @@ for h in HABITS:
                     if pss == 1: dropped.append({'habit': h, 'night': s, **err}); why_not[err['why']] += 1
                     continue
                 assert c['facts']['cc_first_contrasts_with_habit'] and not c['facts']['cc_4']['topped_out'], i
+                assert 25 <= c['why_picked']['regret_percentile_in_pool_midrank'] <= 75 and c['regret'] > 0, i
+                if h in SEALED_SET: assert c['facts']['player_first']['sealed_cells_new'] and not c['facts']['cc_first']['sealed_cells_new'], i
                 ex.append(c); files.add(fk_)
                 if pss == 2: why_not['round already shown under another habit'] -= 1
             if len(ex) == KEEP: break
