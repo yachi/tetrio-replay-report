@@ -183,24 +183,25 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-18 | 24/27 testable = **89%** | 24/27 = **89%** | 24/27 = **89%** | 2 |
 | 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
 | 2026-10-03 | 26/30 testable = **87%** | 25/30 = **83%** | 25/30 = **83%** | 2 |
+| 2026-10-09 | 19/23 testable = **83%** | 17/23 = **74%** | 17/23 = **74%** | 4 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->nine of the fifteen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->ten of the sixteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all fifteen pass would sit at 60%. (The session count in that clause is
+2026-07-28, and a floor all sixteen pass would sit at 60%. (The session count in that clause is
 the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
 the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->ten of the fifteen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->eleven of the fifteen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eleven of the sixteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->twelve of the sixteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3929,6 +3930,30 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 第十六個 session：加粒數真係買得返，但係仲係輸 (2026-10-09)
+
+2026-10-09(**12 場、102 局,pinglamb 7 比 5,局數 53 比 49**),場數同局數都係全 corpus 第四,
+淨係細過 09-19、10-03 同 09-18。以局數比率計係第二咁接近嘅一晚(51.96%),淨係 09-10 嗰晚和波更接近。
+
+1. **12 場入面 7 場打到第九局** [G016],之前冇一晚多過 4 場。C010:打完八場係 4 比 4、局數
+   33 比 34,成個系列嘅差距全部喺 m9-m11 —— 同 09-03 一樣「差距嚟得遲」。
+2. **shortfall 表多咗一個新嘅底**:yachi 多咗 1064 粒(+12.64%,兩個量度都係全 corpus 最大),
+   買返 12.64 pp 對住 11.52 pp 嘅缺口,shortfall −1.12,係 07-22 之後第一個負數。攻擊總數
+   yachi 反超 58 行(+1.00%),但呢個數嘅大細係 m7r8 一局話事(抽走佢剩 +23 行),正負號就企得穩。
+   兩條軸都啱啱落格,rate 軸 ρ 0.9964 → 0.9970,依然得一對排錯;raw 軸 0.8321 → 0.8618,排錯
+   對數冇變(16)—— 一個喺排序尾嘅點兩條軸都會順,所以呢個唔係 raw 軸嘅證據。
+3. **per-match APP 排序分唔開**(1/C(12,5) = 1 in 792),冇 mint C007,個 count 停喺 4 of 16。
+   pinglamb 十二場 APP 都高過 yachi [C023];決定場數嘅係攻擊總數 —— 攻擊多嗰個贏咗 12 場入面
+   10 場 [C024]。
+4. **equiv coverage**:83% → 74%(19/23 → 17/23),唔係 exempt,跌嘅唔係 C007 而係 C024 同 C025
+   (m7r8 一局嘅攻擊)。08-14 嘅 C019/C020 早就係 per-match 而唔係 C007,所以呢個唔係新發現,
+   係再一次證實 09-17 嗰段講嘅:機制講嘅係 claim 嘅形狀(冇 generated family 包到),唔係某一個 id。
+5. **pooled AUC 表**(仍然係人手量):PC 同 COMBO 抽走任何一晚都企得住(COMBO 抽走 09-18 係
+   0.049,得一個千分之一);KPP 抽走 09-19 同 10-03 兩晚就返過條線(0.062)。
+6. **DT 先嘅開局 29 個,全部係 yachi 同一個樣式**,令 openers.test.ts 嘅窗口比率由約 22 倍跌到
+   約 14 倍,低過條 test 嘅 20 倍。條 bound 冇郁;要決定嘅係條 assertion 想講乜。
+7. **全 corpus 第二個真正嘅 STMB cave**(pinglamb,10-09-01 第 5 局,中盤),之前一直得一個。
 
 ## 第十五個 session：最有力嘅一次分得開 (2026-10-03)
 

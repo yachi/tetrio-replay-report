@@ -54,6 +54,7 @@ argument for the extractors applied one level up.
 import argparse
 import os
 import re
+import platform
 import shutil
 import subprocess
 import sys
@@ -312,9 +313,14 @@ _TOOLCHAIN_SKIP = "installs a pinned asset into $GITHUB_PATH; the local %s is ch
 # mechanism for that — a named predicate and the reason — deliberately not a second
 # "skip" field beside it: two ways to excuse a job is how one of them stops being
 # exercised, and an escape hatch nothing takes is indistinguishable from a comment.
-# The predicate is evaluated per run, so on a Linux box `oracle-image` runs rather
-# than being permanently excused, and either way the summary names it.
-PREDICATES = {"linux": (lambda: sys.platform == "linux")}
+# The predicate is evaluated per run, so on an aarch64 Linux box `oracle-image` runs
+# rather than being permanently excused, and either way the summary names it.  It was
+# `sys.platform == "linux"` until 2026-10-10, which let an x86_64 Linux box attempt the
+# build and fail on `packages.x86_64-linux.cc-oracle-image` not existing — the flake
+# defines the image for aarch64 only, so the predicate has to name the ARCHITECTURE,
+# which is what the job's own `runs-on: ubuntu-24.04-arm` names.
+PREDICATES = {"aarch64-linux": (lambda: sys.platform == "linux"
+                                and platform.machine() in ("aarch64", "arm64"))}
 
 
 class Entry:
@@ -379,7 +385,7 @@ PLAN = {
     # `nix build .#cc-oracle-image` targets aarch64-linux; the job's own comment says
     # it is built "the way the local Mac could not".
     "oracle-image": Entry(SLOW, needs=["nix", "bun"], unless=(
-        "linux", "needs a Linux runner (ubuntu-24.04-arm) — the image is aarch64-linux "
+        "aarch64-linux", "needs an aarch64 Linux runner (ubuntu-24.04-arm) — the image is aarch64-linux "
                  "and nix has no builder for it here")),
     "coverage-round": Entry(WEEKLY),
 }

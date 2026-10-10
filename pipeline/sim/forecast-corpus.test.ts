@@ -151,6 +151,9 @@ const PINNED_TOTALS: Record<string, Totals> = {
   '2026-09-18': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 1, self_built: 566, reactive: 709, unattributed: 0 },
   '2026-09-19': { forecast_garbage: 0, forecast_lineclear: 4, path_opened: 1, self_built: 737, reactive: 827, unattributed: 1 },
   '2026-10-03': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 0, self_built: 713, reactive: 866, unattributed: 0 },
+  // `path_opened: 1` is the seventh ACCESS_CLASS member (yachi replay-2026-10-09-09.ttrm r2 lock
+  // 46) — traced in forecast-access-class.test.ts and pinned per player in forecast-facts.test.ts.
+  '2026-10-09': { forecast_garbage: 0, forecast_lineclear: 4, path_opened: 1, self_built: 540, reactive: 573, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -173,6 +176,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-09-18': { 'pre-existed': 1054, 'arrived-later': 121, undetermined: 104 },
   '2026-09-19': { 'pre-existed': 1307, 'arrived-later': 141, undetermined: 121 },
   '2026-10-03': { 'pre-existed': 1321, 'arrived-later': 142, undetermined: 119 },
+  '2026-10-09': { 'pre-existed': 911, 'arrived-later': 136, undetermined: 71 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -182,7 +186,7 @@ const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
   '2026-09-11': 61, '2026-09-17': 52, '2026-09-18': 146, '2026-09-19': 177,
-  '2026-10-03': 176,
+  '2026-10-03': 176, '2026-10-09': 154,
 };
 
 /** Reactive events on which the EXECUTION-TIME garbage counterfactual fires, per session.
@@ -273,6 +277,21 @@ const PINNED_FORECASTS: Record<string, string[]> = {
     'yachi replay-2026-10-03-16.ttrm r5 lock 89 forecast_lineclear roof 85 0->2',
     'pinglamb replay-2026-10-03-17.ttrm r0 lock 57 forecast_lineclear roof 55 0->2',
   ],
+  // TWO verified forecasts of FOUR mechanism events, one per player, both `floor pre-existed from
+  // -1`. The two rejections are both CLAUSE 2 and both pinglamb's (forecast-facts.json
+  // `rejected_by` floor_arrived_later 1, floor_undecidable 1): replay-2026-10-09-01.ttrm r5 lock
+  // 14, whose floor ARRIVED LATER than the roof at lock 6 (availAtRoof 1 -> 2), and
+  // replay-2026-10-09-02.ttrm r0 lock 55, floor undetermined — that round's prefix verifies only to
+  // lock 59, four locks past the spin, so the undecidable floor sits near the prefix edge and is
+  // read as an instrument limit, not as play. yachi's lock 59 is 0->1 (a one-line spin), the third
+  // 0->1 verified forecast, after 08-01's yachi and 09-19's pinglamb entries above. Audited as the other
+  // sessions' are — each event's clause verdict read off the record and reconciled against the
+  // artefact's own `rejected_by`; the boards were NOT hand-checked cell by cell, which only
+  // 2026-07-28's event has been. On 204 player-rounds two is 1.0% of rounds, level with 09-19.
+  '2026-10-09': [
+    'pinglamb replay-2026-10-09-01.ttrm r5 lock 38 forecast_lineclear roof 35 0->2',
+    'yachi replay-2026-10-09-05.ttrm r2 lock 59 forecast_lineclear roof 57 0->1',
+  ],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -340,6 +359,14 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
     'yachi replay-2026-10-03-08.ttrm r3 lock 101 forecast_lineclear floor pre-existed from 86 roof 98',
     'yachi replay-2026-10-03-16.ttrm r5 lock 89 forecast_lineclear floor pre-existed from -1 roof 85',
     'pinglamb replay-2026-10-03-17.ttrm r0 lock 57 forecast_lineclear floor pre-existed from -1 roof 55',
+  ],
+  // Four, three of them pinglamb's and two in one round (replay-2026-10-09-01.ttrm r5, locks 14 and
+  // 38 — the first rejected at clause 2, the second verified). See PINNED_FORECASTS above.
+  '2026-10-09': [
+    'pinglamb replay-2026-10-09-01.ttrm r5 lock 14 forecast_lineclear floor arrived-later from -1 roof 6',
+    'pinglamb replay-2026-10-09-01.ttrm r5 lock 38 forecast_lineclear floor pre-existed from -1 roof 35',
+    'pinglamb replay-2026-10-09-02.ttrm r0 lock 55 forecast_lineclear floor undetermined from -1 roof 49',
+    'yachi replay-2026-10-09-05.ttrm r2 lock 59 forecast_lineclear floor pre-existed from -1 roof 57',
   ],
 };
 

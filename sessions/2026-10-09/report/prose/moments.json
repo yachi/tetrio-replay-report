@@ -1,0 +1,32 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：填得晒嘅窿、場場都重嘅對手、同排唔開嘅十二場",
+  "cards": [
+    {
+      "accent": "y",
+      "label": "粒數填晒個窿",
+      "value": "+12.64% / +11.52%",
+      "body": "pinglamb 每粒方塊嘅攻擊高 11.52%<span class=\"badge\" data-claim=\"C004\"></span>。yachi 多疊 1064 粒方塊，即係多 12.64%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——<strong>盈餘大過個窿</strong>，結果總攻擊反過嚟多 58 條，即係 pinglamb 總攻擊嘅 1.00%<span class=\"badge\" data-claim=\"C005\"></span>。十六晚入面，yachi 總攻擊多過對手嘅得兩晚，另一晚係 07-22。呢個盈餘無論計粒數定計比率都係歷來最大。不過要讀清楚：58 條入面有 35 條係 m7 第八局一局打出嚟，嗰局打咗約 217 秒<span class=\"badge\" data-claim=\"G025\"></span>——抽走佢，yachi 仍然多，但淨係多 23 條<span class=\"badge\" data-claim=\"C025\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "場場每粒都重",
+      "value": "12 / 12",
+      "body": "十二場逐場計，<strong>pinglamb 每粒方塊嘅攻擊場場都高過 yachi</strong>，但佢淨係贏咗七場<span class=\"badge\" data-claim=\"C023\"></span>。反而逐場睇總攻擊，打得多嗰個贏咗十場，例外得第六同第十場<span class=\"badge\" data-claim=\"C024\"></span>。即係話今晚每粒嘅重量揀中贏家七次，總數揀中十次——粒數填得晒個窿嗰晚，總數比每粒更貼勝負。但系列仍然係 5 比 7<span class=\"badge\" data-claim=\"C001\"></span>：貼嘅場太多，七場打到生死局<span class=\"badge\" data-claim=\"G016\"></span>，佢淨係執到三場。"
+    },
+    {
+      "accent": "g",
+      "label": "排唔開",
+      "value": "792 分之一",
+      "body": "將十二場按「pinglamb 每粒方塊嘅攻擊高幾多」排開，yachi 贏嗰五場<strong>唔係</strong>差距最細嗰五場：差距最細嗰場（第十場，唔夠 2%）係 pinglamb 贏，差距第二大嗰場（第四場，過 22%）係 yachi 贏<span class=\"badge\" data-claim=\"C023\"></span>。五勝十二場隨機排到全部喺底，機會係七百九十二分之一<span class=\"badge\" data-claim=\"C001\"></span>，即係今晚如果排得開會好有份量，但係排唔開。corpus 分得開嘅晚仍然係四晚。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m4 第七局，兩邊 VS 加埋約 304.8<span class=\"badge\" data-claim=\"G071\"></span>。pinglamb 贏，但佢喺落速同行數兩條軸落後<span class=\"badge\" data-claim=\"G093\"></span>——佢每粒方塊攻擊 1.000 對 0.612<span class=\"badge\" data-claim=\"G094\"></span>，靠嘅係重，唔係快。",
+    "全晚最長嗰局係 m7 第八局，打咗約 217 秒<span class=\"badge\" data-claim=\"G025\"></span>，yachi 喺嗰局清咗全晚最多嘅 201 行<span class=\"badge\" data-claim=\"G024\"></span>，最後佢生還。最短嗰局 m12 第一局得約 11 秒<span class=\"badge\" data-claim=\"G026\"></span>。",
+    "yachi 嘅場均 PPS 十二場場場都高過 pinglamb<span class=\"badge\" data-claim=\"G055\"></span>，總分亦係十六晚以嚟第一次高過對手（1,917,223 對 1,831,704）<span class=\"badge\" data-claim=\"G074\"></span>——快同分數都企喺 yachi 嗰邊，系列就唔係。",
+    "23 個 All Clear（pinglamb 12、yachi 11）<span class=\"badge\" data-claim=\"G041\"></span>，但全消唔係贏局嘅指標：淨係 pinglamb 做到全消嘅 11 局，佢輸咗 5 局<span class=\"badge\" data-claim=\"G090\"></span>；淨係 yachi 做到嘅 10 局，佢輸咗 3 局<span class=\"badge\" data-claim=\"G088\"></span>。",
+    "12 局係自己頂到頂收場，yachi 7、pinglamb 5<span class=\"badge\" data-claim=\"C006\"></span>——成晚 102 局嘅 11.76%，十六晚入面第三低。",
+    "yachi 嘅 KPP 高過 pinglamb 1.01%<span class=\"badge\" data-claim=\"C008\"></span>。呢一欄成個 corpus 都係一個負面結果，兩個人自己贏局同輸局嘅 KPP 都差唔到 2%<span class=\"badge\" data-claim=\"G079\"></span><span class=\"badge\" data-claim=\"G080\"></span>。"
+  ]
+}

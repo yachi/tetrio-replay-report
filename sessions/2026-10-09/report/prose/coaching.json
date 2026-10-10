@@ -1,0 +1,34 @@
+{
+  "eyebrow": "教練分析 · 兩邊",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚 yachi 嘅粒數盈餘填晒個效率窿：多 12.64%，個窿得 11.52%<span class=\"badge\" data-claim=\"C009\"></span><span class=\"badge\" data-claim=\"C004\"></span>，總攻擊仲多 58 條<span class=\"badge\" data-claim=\"C005\"></span>——其中 35 條係 m7 第八局一局打出嚟<span class=\"badge\" data-claim=\"C025\"></span>。<strong>但系列照輸 5 比 7</strong><span class=\"badge\" data-claim=\"C001\"></span>——pinglamb 每粒方塊嘅攻擊十二場場場都高<span class=\"badge\" data-claim=\"C023\"></span>，而七場生死局入面佢執咗四場<span class=\"badge\" data-claim=\"G016\"></span>。即係話成晚嘅總數貼身（yachi 多少少），唔等於決定場波嗰幾局企喺佢嗰邊。",
+  "columns": {
+    "yachi": {
+      "tagline": "快、落得多 · 今晚總數反超",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 19.94%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G077\"></span>，十六晚都係咁——<strong>個 lever 冇變過</strong>。",
+        "落得快<span class=\"badge\" data-claim=\"G043\"></span>、Quad 多過對手<span class=\"badge\" data-claim=\"G038\"></span>，hold 3871 次對 3244 次<span class=\"badge\" data-claim=\"G036\"></span>。",
+        "條路又係加粒數：多疊 1064 粒<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>，即係多 12.64%，係 corpus 入面買得最多嘅一次，而且係自 07-22 之後第一次大過個窿。"
+      ],
+      "recs": [
+        "<strong>粒數盈餘今晚做足晒佢嘅嘢。</strong>12.64% 對 11.52%<span class=\"badge\" data-claim=\"C009\"></span><span class=\"badge\" data-claim=\"C004\"></span>，總攻擊多 58 條<span class=\"badge\" data-claim=\"C005\"></span>——其中 35 條係 m7 第八局一局打出嚟<span class=\"badge\" data-claim=\"C025\"></span>，總分都高過對手<span class=\"badge\" data-claim=\"G074\"></span>。呢條路行得通——但淨係行得通都贏唔到系列。",
+        "<strong>第六同第十場：攻擊多過對手都輸。</strong><span class=\"badge\" data-claim=\"C024\"></span>第十場對手每粒高唔夠 2%<span class=\"badge\" data-claim=\"C023\"></span>，係全晚最貼嘅一場，都係 4 比 5。七場生死局你執三場<span class=\"badge\" data-claim=\"G016\"></span>，系列就喺呢度。",
+        "<strong>第四到第八場係三段入面最好嗰段。</strong>局數 23 比 19，五場贏四場<span class=\"badge\" data-claim=\"C010\"></span><span class=\"badge\" data-claim=\"C001\"></span>；頭三場同第九到第十一場都係 0 比 3。同一晚入面差咁遠，值得翻睇中段。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "T-spin triple · 每粒更重 · 生死局穩",
+      "profile": [
+        "贏法同一路一樣：每粒方塊打出嘅攻擊兩個 regime 都高過對手<span class=\"badge\" data-claim=\"C002\"></span>，贏嗰啲局高 12.23%、輸嗰啲局高 7.43%。",
+        "自己贏局對輸局差 25.30%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G078\"></span>，今晚闊過對手。",
+        "今晚嘅差距喺 triple：T-spin triple 109 對 76<span class=\"badge\" data-claim=\"G040\"></span>，double 就一樣，424 對 424<span class=\"badge\" data-claim=\"G039\"></span>。全晚最大 spike 27 行、最長 combo 13 下都係佢<span class=\"badge\" data-claim=\"G056\"></span><span class=\"badge\" data-claim=\"G058\"></span>。"
+      ],
+      "recs": [
+        "<strong>每粒重唔等於場場贏。</strong>你十二場每粒方塊嘅攻擊都高過對手，但輸咗五場<span class=\"badge\" data-claim=\"C023\"></span>——第四場你每粒高過 22% 都輸，因為對手落多咗粒數<span class=\"badge\" data-claim=\"C023\"></span>、總攻擊多過你<span class=\"badge\" data-claim=\"C024\"></span>。",
+        "<strong>Triple 係今晚最實在嘅優勢。</strong>Double 一樣（424 對 424），triple 多 33 個<span class=\"badge\" data-claim=\"G040\"></span><span class=\"badge\" data-claim=\"G039\"></span>。",
+        "生死局執咗四場<span class=\"badge\" data-claim=\"G016\"></span>，系列就係咁贏返嚟。頂到頂 5 次<span class=\"badge\" data-claim=\"C006\"></span>，少過對手。"
+      ]
+    }
+  },
+  "versus_note": "逐場排開個效率差距，今晚<strong>排唔開</strong>邊個贏場波：差距最細嗰場係 pinglamb 贏，差距第二大嗰場係 yachi 贏<span class=\"badge\" data-claim=\"C023\"></span>。反而總攻擊多嗰個贏咗十場<span class=\"badge\" data-claim=\"C024\"></span>。粒數填得晒個窿嗰晚，決定場波嘅係總數；但總數咁貼，決定系列嘅就係生死局<span class=\"badge\" data-claim=\"G016\"></span>。"
+}
