@@ -2858,26 +2858,28 @@ it at all:
   both and the order goes BOTH ways (47 Triple-first, 38 Double-first — a round can register both,
   so these do not sum to 60, and since 2026-09-10 that is true INSIDE the window too).** The rate of
   Double-first orders is still more than an order of magnitude higher outside the window than
-  inside it — 4.54% against 63.3% — so the window is doing real work, and the test asserts that
-  ratio rather than a
-  bare zero, which is what let every genuine exception be recorded instead of absorbed.
-  **That ratio has narrowed from about 93× to about 22× across the four sessions since 09-17**
-  (cumulative, from `ordering.players[]` and its `mid_game` in each artefact: inside 0.58% → 2.82%,
-  outside 54.5% → 63.2%), so nearly all of the narrowing is the inside rate rising — 10-03's
-  eighteen alone take it from 1.65% to 2.82%. **The test's bound is 20×, so the next session like
-  10-03 may break it; that is a finding to investigate, not a bound to lower.** That is the
-  same fact the DT bullet above records, seen from the denominator's side; hand-summed, so
-  re-derive it when a session lands.
-  **2026-10-09 is that session, and it breaks it.** Its 29 Double-first openers take the inside
-  rate to 4.54% (66 of 1455) while the outside rate barely moves (63.2% → 63.3%, 38 of 60), so the
-  ratio is about **14×** — still over an order of magnitude, and under the 20× that
-  `openers.test.ts` asserts, which fails on it exactly as this paragraph said it would. The bound
-  was not lowered. What the investigation found is that 47 of the 66 inside exceptions are one
-  player's opener on two nights (10-03's eighteen and 10-09's twenty-nine, all yachi's, 46 of the
-  47 one repeated Single 6 / Double 12-13 / Triple 18-20 pattern), so the inside rate now measures what yachi chose
-  to open with, not a failure of the window to separate opening from mid-game — and the decision
-  that follows is about what the assertion is FOR (「the window separates」 against 「openings are
-  Triple-first」), which is a decision for the test's owner, not a number to retune.
+  inside it when POOLED — 4.54% against 63.3%, about 14× — **but that is a pooled sentence pinglamb
+  carries, and it must say so.** Per player: pinglamb 6 of 853 (0.70%) inside against 8 of 22
+  outside, about 52×; yachi 60 of 602 (9.97%) against 30 of 38, about 7.9×. 「Near-unanimous
+  Triple-first inside the window」 is pinglamb's property; it was yachi's too through 09-19 (13 of
+  469, 2.8%) and is not since 10-03 (47 of 133, 35.3%, one repeated Single 6 / Double 12-13 /
+  Triple 18-20 opener on two nights — 10-03's eighteen and 10-09's twenty-nine).
+  **The test used to assert a pooled 20× ratio, and 2026-10-09 broke it (about 93× at twelve
+  sessions, 22× at fifteen, 14× at sixteen).** The bound was not lowered and was not kept: the 20
+  was never a claim, only 「a twentieth」 borrowed from `DT_RIVALS_CSPIN_AT`, sitting about 5× under
+  the measurement the day it was typed, and it passed pooled only because pinglamb's rounds carried
+  yachi's. `openers.test.ts` now asserts what the test's name says — the window SEPARATES opening
+  from mid-game — **per player**, as a one-sided exact Fisher test at α = 0.05 Bonferroni-corrected
+  over the players (the AUC table's convention, fixed before the data): p ≈ 5e-21 for yachi and
+  1e-10 for pinglamb. What would have to be true for it to fire, outside counts held fixed: yachi's
+  inside DT count reaching about 375 of 602 (62%), pinglamb's about 145 of 853 (17%), i.e. a
+  player whose openings are as Double-first as his mid-game. A drift short of that is not that
+  test's job: every Double-first round is still pinned by name in `DT_ORDER_IN_OPENER`, which is
+  where near-unanimity was always really gated. Hand-summed from `ordering.players[]` and its
+  `mid_game` in each artefact, and pinned as per-player quartets in the test — re-derive when a
+  session lands. (`DT_RIVALS_CSPIN_AT`, the sibling pooled 20× bound, has three DT rounds of
+  headroom — 66 × 20 = 1320 against 1391 — and yachi alone is already 60 against 542, so the next
+  session like 10-09 will break it the same way; decide it the same way.)
 - **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:2.3
   (108 in-opener, 244 mid-game), so it is not purely mid-game.
 

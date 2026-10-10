@@ -1892,48 +1892,89 @@ const DT_ONLY_IN_OPENER: Record<string, Record<string, number>> = {
 };
 const dtOnly = (s: string, user: string) => DT_ONLY_IN_OPENER[s]?.[user] ?? 0;
 
-test('the opener window does real work: near-unanimous inside it, both ways outside it', () => {
-  // THE REASON THE SPLIT EXISTS. Inside the window the corpus is overwhelmingly one-directional —
-  // 454 of 455 rounds holding both spins ran the Triple first, across six sessions and both
-  // players, with the single named exception above. Outside it the same instrument on the same
-  // rounds finds Double-first orders at a rate two orders of magnitude higher. So
-  // "Triple-before-Double" is a property of these OPENINGS and not of how these players throw
-  // T-spins, which is the sentence the section is entitled to only because of this test.
-  let insideBoth = 0, insideDt = 0, outsideBoth = 0, outsideDt = 0;
+/** One-sided Fisher exact test on a 2×2 table [[a, b], [c, d]]: the probability, under
+ *  independence, that the first row's rate comes out THIS low or lower. Exact, via log-factorials
+ *  (n here is a few thousand, well inside double precision); the same test as R's
+ *  fisher.test(alternative = "less"). Kept in this file rather than imported so the gate's own
+ *  arithmetic is readable beside the claim it decides. */
+const logFact: number[] = [0];
+const lf = (n: number) => {
+  while (logFact.length <= n) logFact.push(logFact[logFact.length - 1]! + Math.log(logFact.length));
+  return logFact[n]!;
+};
+const logC = (n: number, k: number) => lf(n) - lf(k) - lf(n - k);
+function fisherLowerP(a: number, b: number, c: number, d: number): number {
+  const n = a + b + c + d, r1 = a + b, c1 = a + c;
+  const denom = logC(n, c1);
+  let p = 0;
+  for (let x = Math.max(0, c1 - (c + d)); x <= a; x++)
+    p += Math.exp(logC(r1, x) + logC(n - r1, c1 - x) - denom);
+  return p;
+}
+
+test('the opener window does real work: for EACH player the Double-first rate is far lower inside it than outside it', () => {
+  // THE REASON THE SPLIT EXISTS. The same instrument, scored on spins inside the 21-lock window and
+  // on spins after it, finds Double-first orders at very different rates — so "Triple-before-Double"
+  // is a property of these OPENINGS and not of how these players throw T-spins. That is the only
+  // sentence this test is entitled to, and it is asserted per player, because at sixteen sessions
+  // the two players are in different regimes: pinglamb runs the DT order in 6 of 853 both-spin
+  // rounds inside the window against 8 of 22 outside; yachi in 60 of 602 against 30 of 38, and 47 of
+  // his 60 are ONE opener (Single on lock 6, Double on 12-13, Triple on 18-20) played on two nights,
+  // 10-03 and 10-09. "Near-unanimous inside the window" was this test's name through fifteen
+  // sessions and is now pinglamb's property, not the corpus's — so it is no longer in the name.
+  //
+  // THIS USED TO BE A RATIO, `outside rate > 20 × inside rate`, pooled over both players, and
+  // 2026-10-09 broke it (~14×, down from ~93× at twelve). The 20 was never a claim about anything:
+  // it was "a twentieth" borrowed from DT_RIVALS_CSPIN_AT, sitting ~5× under the measurement the
+  // day it was typed, and it passed pooled only because pinglamb's rounds carried yachi's (his own
+  // ratio is 7.9×). Lowering it would have been a copy of today's number; excluding the rounds
+  // named in DT_ORDER_IN_OPENER would make the inside count 0 by construction (the pin below
+  // asserts dt_order === known), i.e. a check that cannot fire.
+  //
+  // WHAT IS ASSERTED INSTEAD is the test's name, exactly: a one-sided exact test that the inside
+  // rate is lower than the outside rate, per player, at alpha = 0.05 Bonferroni-corrected over the
+  // players — the repo's convention for the AUC table. The alpha is fixed by convention, not by this
+  // corpus; the p's are ~5e-21 (yachi) and ~1e-10 (pinglamb). What would have to be true for this
+  // to fire, with the outside counts held where they are: yachi's inside DT count reaching ~375 of
+  // 602 (62%), pinglamb's ~145 of 853 (17%) — a player whose openings are as Double-first as his
+  // mid-game, which is the window doing no work for him. A drift SHORT of that (yachi going from 10%
+  // to 30%, say) is not this test's job and never was: every new Double-first round fails the exact
+  // pin on DT_ORDER_IN_OPENER and has to be named and investigated there.
+  //
+  // Note what every operand here already is: pinned. insideDt by DT_ORDER_IN_OPENER, the outside
+  // pair by MID_GAME_ORDER, the per-player quartet by the literal at the bottom. At a fixed corpus
+  // this inequality is entailed by those pins; it has content only on the day a session lands and
+  // the pins are re-typed from the new artefact — which is why it must encode a question whose "no"
+  // is a finding, and not a number a previous session happened to clear.
+  const byUser = new Map<string, { insideBoth: number; insideDt: number; outsideBoth: number; outsideDt: number }>();
   for (const s of SESSIONS) {
     for (const p of orderPlayers(s)) {
       const known = DT_ORDER_IN_OPENER[s]?.[p.user] ?? 0;
       expect([s, p.user, p.dt_order]).toEqual([s, p.user, known]);
       expect([s, p.user, p.cspin_order]).toEqual([s, p.user, p.rounds_with_both - dtOnly(s, p.user)]);
-      insideBoth += p.rounds_with_both;
-      insideDt += p.dt_order;
-      outsideBoth += p.mid_game.rounds_with_both;
-      outsideDt += p.mid_game.dt_order;
+      const t = byUser.get(p.user) ?? { insideBoth: 0, insideDt: 0, outsideBoth: 0, outsideDt: 0 };
+      t.insideBoth += p.rounds_with_both;
+      t.insideDt += p.dt_order;
+      t.outsideBoth += p.mid_game.rounds_with_both;
+      t.outsideDt += p.mid_game.dt_order;
+      byUser.set(p.user, t);
     }
   }
-  // and the other half of the contrast, without which the near-unanimity above is just a small
-  // sample: the DT order is ordinary mid-game and rare in the opener. Stated as rates against
-  // their own exposures rather than as raw counts, because the two denominators differ by 38x.
+  // the other half of the contrast, without which the inside rate is just a small sample: the DT
+  // order is ordinary mid-game. Pinned to MID_GAME_ORDER so the outside column cannot drift unnoticed.
+  const outsideDt = sum([...byUser.values()].map(t => t.outsideDt));
   expect(outsideDt).toBeGreaterThan(0);
   expect(outsideDt).toBe(sum(SESSIONS.map(s => MID_GAME_ORDER[s]!.dt)));
-  //
-  // THIS BOUND IS NOW NEAR ITS EDGE, and it is the claim, not a measurement to re-fit. At fifteen
-  // sessions the two rates are 37 of 1312 (2.82%) inside and 36 of 57 (63.2%) outside — a ratio of
-  // about 22x against the 20 asserted, down from ~93x at twelve. Almost all of the fall is the
-  // INSIDE rate rising (2026-10-03's eighteen Double-first openers alone take it from 1.69% to
-  // 2.82%). If the next session breaks it, the right response is to re-read what the section says
-  // about the window, not to lower the 20: a bound lowered to today's ratio is a copy of it.
-  //
-  // 2026-10-09 BREAKS IT, as the paragraph above said the next session like 10-03 might. At sixteen
-  // sessions the inside rate is 66 of 1455 (4.54%) and the outside 38 of 60 (63.3%): a ratio of
-  // about 14x against the 20 asserted. All of the move is the INSIDE rate — yachi's twenty-nine
-  // Double-first openings (DT_ORDER_IN_OPENER) — and the outside rate barely moved (63.2% -> 63.3%).
-  // The 20 is NOT lowered here, per the instruction above: the corpus sentence this bound stands
-  // for (CLAUDE.md's 「more than an order of magnitude」 window paragraph, and whatever the section
-  // says about the window) has to be re-read against a corpus in which one player opened
-  // Double-first in 29 of his 65 rounds holding both spins on the latest night. Left failing on purpose.
-  expect(outsideDt * insideBoth).toBeGreaterThan(insideDt * outsideBoth * 20);
-  expect([insideBoth, insideDt, outsideBoth]).toEqual([1455, 66, 60]);
+  const alpha = 0.05 / byUser.size;
+  for (const [user, t] of byUser) {
+    // exposure first: a p over zero outside rounds would be 1 and read as a failure of the window
+    expect([user, t.outsideBoth > 0, t.insideBoth > 0]).toEqual([user, true, true]);
+    const p = fisherLowerP(t.insideDt, t.insideBoth - t.insideDt, t.outsideDt, t.outsideBoth - t.outsideDt);
+    expect([user, p < alpha]).toEqual([user, true]);
+  }
+  // the per-player quartets, pinned, so a session landing re-types them and re-reads the above
+  expect(Object.fromEntries([...byUser].map(([u, t]) => [u, [t.insideBoth, t.insideDt, t.outsideBoth, t.outsideDt]])))
+    .toEqual({ yachi: [602, 60, 38, 30], pinglamb: [853, 6, 22, 8] });
 });
 
 test('the mid-game denominator is far too small to be published as a rate', () => {
