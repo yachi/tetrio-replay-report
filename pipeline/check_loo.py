@@ -362,6 +362,12 @@ SENTENCES = {
                     "2026-08-01's near-equal attack and score totals"),
     "totals_0910": ("CLAUDE.md", re.compile(r"the route covered nearly all of it"),
                     "2026-09-10's 47-line attack shortfall"),
+    # A SESSION's own file, as the first 2026-10-03 build's `totals_1003` was: 2026-10-09's
+    # narrative-beats.md publishes yachi's 58-line attack LEAD, and no CLAUDE.md sentence
+    # does. Anchored on a phrase that file owns.
+    "totals_1009": ("sessions/2026-10-09/report/narrative-beats.md",
+                    re.compile(r"攻擊總數反超"),
+                    "2026-10-09's 58-line attack lead"),
 }
 
 # (session, figure id, the sentence that publishes it). Every measurable session must appear.
@@ -568,12 +574,36 @@ PUBLISHED = (
     # totals converging, is gone with the sentence.
     ("2026-10-03", "app_gap_won", "series"),
     ("2026-10-03", "app_gap_lost", "series"),
+    # 2026-10-09 takes ONE `ANNOTATED` entry, and it is the attack total, not a regime gap.
+    # Measured over all five figures, 102 rounds:
+    #
+    #     app_gap_won     +12.2312 pp    m3r8 -> +13.8728  rel 0.134  1.46x the next of 102
+    #     app_gap_lost     +7.4308 pp    m3r8 ->  +6.0600  rel 0.184  1.12x
+    #     app_gap_session +11.5206 pp    m4r3 -> +10.8610  rel 0.057  1.13x
+    #     attack_diff          +58 行    m7r8 ->      +23  rel 0.603  1.17x  <- annotated
+    #     score_diff        +85519 分    m7r8 ->   +71165  rel 0.168  1.40x
+    #
+    # attack_diff is the near-zero total this file's header names as the fragile kind, and it
+    # is published because it is the session's headline: the first night since 07-22 on which
+    # yachi's attack total is the higher one. score_diff is measured and NOT published here —
+    # the report quotes it only through G074, and at 0.168 it needs no caveat anyway.
+    ("2026-10-09", "app_gap_won", "series"),
+    ("2026-10-09", "app_gap_lost", "series"),
+    ("2026-10-09", "attack_diff", "totals_1009"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-10-09", "attack_diff"): (
+        "the attack totals are 5815 vs 5757, difference +58 — yachi AHEAD, which only 07-22 "
+        "(+28) had done before — and m7r8 alone is 35 of it: without that round yachi leads by "
+        "23. m7r8 is the night's longest round (~217 s), yachi's survival in which he cleared "
+        "201 lines, the session high, and out-attacked pinglamb 207 to 172 — so it is the one "
+        "round where the volume route ran longest. The sign survives the drop; 「多 58 條」 is a "
+        "figure one round carries a little over half of. `rel` 0.603, with the next round at "
+        "1.17x below it, so this is one long round rather than a concentrated outlier."),
     ("2026-09-18", "app_gap_lost"): (
         "the lost-regime gap is +1.5434 pp — the second-narrowest in the corpus, behind "
         "2026-09-10's +1.2535 — and m1r7 alone is 0.9535 of it. **It moves it the other way.** "

@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03'])
+       '2026-10-03', '2026-10-09'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -130,7 +130,13 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // replays, and that figure is void with the subset.) The walk took ~215 s at fifteen sessions on
   // the machine that pinned this, against the 300 s budget below — one more session of this size
   // will need that budget re-measured rather than raised blind.
-  expect(both + oursOnly + ccOnly + neither).toBe(190293);
+  // 2026-10-09: 190293 -> 206286 (15993 boards, 102 rounds), and `unexplained` is still EMPTY over
+  // all of them. The budget below was RE-MEASURED rather than raised, as the 10-03 line asks: the
+  // whole file took ~201 s alone at sixteen sessions on the machine that pinned this (four cores,
+  // otherwise idle) and ~213-232 s with other work running, against the 300 s budget — so the
+  // budget stands, with roughly 70-100 s of headroom. A session of 09-19's size would roughly
+  // consume it; re-measure again then.
+  expect(both + oursOnly + ccOnly + neither).toBe(206286);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

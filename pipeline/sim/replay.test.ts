@@ -29,7 +29,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -115,12 +115,27 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-08-19': [138, 140], '2026-08-25': [145, 146], '2026-09-03': [92, 92],
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [253, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
+  '2026-10-09': [202, 204],
 };
 
 /** Every player-round whose engine totals disagree with facts.json, with the disagreement. Mostly
  *  the round's LOSER placing one extra piece at the instant the game ended it; two are real late
  *  divergences (08-09-4 r3 pinglamb, 09-18-05 r2 yachi) that a viewer must flag for their last
- *  seconds. Named rather than bounded: a ninth must be investigated, not absorbed. */
+ *  seconds. Named rather than bounded: a ninth must be investigated, not absorbed.
+ *
+ *  2026-10-09 adds the NINTH and TENTH, both pinglamb, both the round's loser by `garbagesmash`,
+ *  and both past the end of the verified prefix — so neither touches a lock a viewer is shown as
+ *  verified:
+ *    replay-2026-10-09-06.ttrm r4 — the engine places 72 pieces against the game's 70, every other
+ *      total agreeing. The loser-places-extra shape, but TWO pieces rather than one: the engine's
+ *      board tops out at lock 68 (engine_knockout agrees with the ending) and the prefix verifies to
+ *      lock 64 of 72, so the two extra locks sit in the unverified tail after the engine's own
+ *      death — the end of the round, not a divergence a viewer could mistake for play.
+ *    replay-2026-10-09-07.ttrm r1 — pieces agree (98) and the engine clears 47 lines against the
+ *      game's 48. A real late divergence, the third after the two above: prefix verified to lock 93
+ *      of 98, engine knock-out at lock 95, so the missing clear lies in the last five locks, beyond
+ *      the verified boundary the viewer already draws. An eleventh must be investigated the same
+ *  way. */
 const ADMISSION_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-9.ttrm', round: 1, user: 'yachi', diff: { pieces: [89, 88] } },
   { session: '2026-07-28', file: 'replay-2026-07-28-1.ttrm', round: 0, user: 'yachi', diff: { pieces: [37, 36] } },
@@ -134,6 +149,8 @@ const ADMISSION_EXCEPTIONS = [
   { session: '2026-09-18', file: 'replay-2026-09-18-05.ttrm', round: 2, user: 'yachi',
     diff: { pieces: [52, 50], lines: [23, 25], holds: [22, 21], garbage_cleared: [6, 8],
             garbage_attack: [22, 23] } },
+  { session: '2026-10-09', file: 'replay-2026-10-09-06.ttrm', round: 4, user: 'pinglamb', diff: { pieces: [72, 70] } },
+  { session: '2026-10-09', file: 'replay-2026-10-09-07.ttrm', round: 1, user: 'pinglamb', diff: { lines: [47, 48] } },
 ];
 
 test('admission counts are pinned per session, and the exceptions are exactly the named list', () => {
@@ -154,7 +171,14 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  these are the rounds where it must also flag that the simulated board may differ from the real
  *  one. 22 are `topout` deaths the engine's board survives; one (10-03-01 r1 pinglamb) is the round's
  *  WINNER, whose engine board tops out at lock 52 of 59. Named rather than bounded, exactly like
- *  ADMISSION_EXCEPTIONS: a new one, or one vanishing, is a red build to investigate. */
+ *  ADMISSION_EXCEPTIONS: a new one, or one vanishing, is a red build to investigate.
+ *
+ *  2026-10-09 adds two more of the common class, making 24 `topout` deaths the engine survives:
+ *  replay-2026-10-09-08.ttrm r0 pinglamb (34 locks, prefix verified to 26) and
+ *  replay-2026-10-09-11.ttrm r4 yachi (171 locks, prefix verified to 162). Both admit cleanly —
+ *  every total agrees with facts.json — so the engine placed exactly the game's pieces and its
+ *  board simply did not top out on the last one; both last locks are past the verified prefix,
+ *  where the engine's garbage-hole columns (seeded RNG, never observed) are free to differ. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -179,6 +203,8 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-10-03', file: 'replay-2026-10-03-01.ttrm', round: 1, user: 'pinglamb', ending: 'winner', lock: 52 },
   { session: '2026-10-03', file: 'replay-2026-10-03-02.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-03', file: 'replay-2026-10-03-10.ttrm', round: 8, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-10-09', file: 'replay-2026-10-09-08.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-10-09', file: 'replay-2026-10-09-11.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {
