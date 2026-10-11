@@ -46,7 +46,7 @@ def _root(session):
     return SESSIONS
 
 sys.path.insert(0, str(REPO))
-from pipeline import docs_gate, forecast_pooled, replay_page, replay_section  # noqa: E402
+from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, stray_cannon_page  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -220,7 +220,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals, pooled_html=None, replays=()):
+def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -272,6 +272,18 @@ def render_index(cards, totals, pooled_html=None, replays=()):
                 f"<div class='meta'>{r['matches']} 場 · {r['rounds']} 局</div>"
                 "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
         parts.append("</div>")
+    # The Stray Cannon route pages: simulator output like the replays, so after them and with the
+    # same pill. The case count is rendered from analysis/stray-cannon-facts.json, never typed.
+    if openers:
+        parts.append(
+            "<h2>定式路線</h2><div class='grid'>"
+            f"<a class='card' href='{escape(openers['href'])}'>"
+            "<div class='date'>STRAY CANNON</div>"
+            "<div class='title'>迷走砲 全路線</div>"
+            f"<div class='meta'>{openers['cases']} 個個案</div>"
+            "<p class='blurb'>將 shiwehi.com 迷走砲頁嘅每一條路線對返 corpus 每一局："
+            "第一巡、第二巡、第三巡逐步睇邊局砌到邊度，每個個案都可以開重播。</p>"
+            "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a></div>")
     parts.append("<h2>工具</h2><div class='grid'>")
     parts.append(
         "<a class='card' href='analyzer.html'>"
@@ -427,6 +439,31 @@ def main(argv=None):
                 stale.unlink()
                 print(f"  removed docs/{stale.name} (no session renders it)")
 
+    # The Stray Cannon route pages, RENDERED like the replay pages: --check re-renders every page
+    # from the committed route transcription, the corpus artefact and each session's replay facts,
+    # and byte-compares. `render_all` audits every page before returning it, so a page that breaks
+    # the quarantine fails here rather than publishing. A docs/stray-cannon*.html the renderer did
+    # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html.
+    sc_inputs = stray_cannon_page.load_inputs(str(REPO))
+    sc_pages = stray_cannon_page.render_all(str(REPO), sc_inputs)
+    for name, page in sc_pages.items():
+        dst = DOCS / name
+        if check:
+            if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                drift.append(f"docs/{name} differs from what the Stray Cannon artefacts render")
+        else:
+            dst.write_text(page, encoding="utf-8")
+            print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+    for stale in sorted(DOCS.glob("stray-cannon*.html")):
+        if stale.name not in sc_pages:
+            if check:
+                drift.append(f"docs/{stale.name} is published but the Stray Cannon renderer does not produce it")
+            else:
+                stale.unlink()
+                print(f"  removed docs/{stale.name} (the Stray Cannon renderer does not produce it)")
+    openers = {"href": stray_cannon_page.OVERVIEW,
+               "cases": stray_cannon_page.case_count(sc_inputs[1])}
+
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its
     # inputs, and there is no extra file to forget to rebuild.
@@ -440,7 +477,7 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    index = render_index(cards, totals, pooled_html, replays)
+    index = render_index(cards, totals, pooled_html, replays, openers)
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:

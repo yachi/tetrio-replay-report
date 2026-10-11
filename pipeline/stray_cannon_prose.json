@@ -1,0 +1,71 @@
+{
+  "_comment": "Words for pipeline/stray_cannon_page.py. Numbers never live here: every count on the pages is rendered from analysis/stray-cannon-facts.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check.",
+  "page_sentences": {
+    "source": "路線同盤面轉錄自 shiwehi.com 嘅迷走砲頁（2026-04-11 版），百分比係原頁寫嘅，唔係我哋計嘅。",
+    "exact": "逐格完全一樣先算（可以左右反轉）；差一兩格嘅唔計，因為差唔多嘅盤面喺其他定式都撞到。",
+    "bag3": "第三巡嘅形係模擬器重砌出嚟嘅；Perfect Clear 嘅次數有 replay 自己個 counter 對過，但砌咗邊個形冇。",
+    "bag1": "第一巡先睇第七粒落咗之後個形（Z 放右／放左）；兩樣都唔係，先睇六粒時對唔對到形，再睇第七粒係咪 Z：唔係 Z 先當 hold 咗 Z，係 Z 就係「Z 放咗第二度」。六粒時對到個形本身唔等於 hold 咗 Z。",
+    "mirror": "左右反轉嘅局，Z 當 S 睇，頁面條件會將 J↔L、S↔Z 對調先睇。",
+    "our_reading": "兩樣嘢係我哋自己嘅讀法，原頁冇明講：第二巡圖入面大階 Z 嗰幾格當係第一巡嘅 Z；同埋「第一巡 Z 放左」個形係由原頁第二巡嗰幅圖推返出嚟，原頁冇獨立畫過。"
+  },
+  "unverified": "呢一步喺已核對範圍之外",
+  "empty_node": "corpus 未出現過（0 / {m} 個去到呢一步嘅乾淨回合）",
+  "status_words": {
+    "image_only": "原頁淨係得圖，冇轉錄、冇量度",
+    "text_only": "原頁淨係文字描述，冇圖，冇量度",
+    "unmatchable": "有轉錄，但有佔位格／超過 8 行，冇量度"
+  },
+  "unmatchable_reasons": {
+    "2.ideal.fire.stmb_template": "佔位格（p）可以填任何嘢，冇一個確定嘅形可以對",
+    "2.ideal.fire.stmb_example": "「例」係佔位格嘅其中一種填法，對到佢只係對到一幅示範圖，唔係對到條路線"
+  },
+  "names": {
+    "bag1.z_right": "第一巡 Z 放右",
+    "bag1.z_left": "第一巡 Z 放左（由第二巡圖推出）",
+    "bag1.z_hold": "第一巡 六粒形，第七粒唔係 Z",
+    "bag1.z_placed_elsewhere": "第一巡 Z 放咗第二度",
+    "2.ideal": "理想形",
+    "2.normal_OS": "通常形（O 早過 S）",
+    "2.normal_SO": "通常形（S 早過 O）",
+    "2.i_early": "別款：第二巡 I 早",
+    "2.z_left": "別款：第一巡 Z 放左",
+    "2.normal_OS.tst_donate": "TST 捐窿（打之前）",
+    "2.normal_OS.tst_donate.after": "TST 捐窿（打完之後）",
+    "2.normal_SO.stsd": "STSD（冇 PC）",
+    "2.ideal.l_rotate_in": "第二巡 L 轉入（原頁得圖）",
+    "2.ideal.ren4": "中開け4列REN",
+    "2.ideal.fire": "火力派生：五巡 PC",
+    "2.ideal.fire.stmb_template": "STMB cave 嘅形（模板）",
+    "2.ideal.fire.stmb_example": "STMB cave 嘅形（例）",
+    "overview.derivation_map": "派生概要圖",
+    "overview.video": "解說影片",
+    "pc": "{parent} → PC 第 {k} 款",
+    "other": "{parent} → Perfect Clear 唔喺頁面任何一款"
+  },
+  "z_hold_heading": "第一巡 Z hold 咗（六粒形，第七粒唔係 Z）",
+  "listed_under": {
+    "shown": "頁面直接畫出",
+    "rest": "残り（頁面摺埋嗰幾款）"
+  },
+  "overview_title": "迷走砲 全路線",
+  "overview_lede": "shiwehi.com 迷走砲頁畫嘅每一條路線，同 corpus 入面每一局對到邊一步。數字係「去到呢一步嘅局 / 去到上一步時盤面乾淨嘅局」，冇百分比。",
+  "node_page_lede": "呢版係第二巡去咗「{name}」嘅每一個個案，每個都可以撳嚟睇模擬重播；重播由個案嗰一步開始。",
+  "bag1_only_lede": "呢版係第一巡對到、但第二巡冇對到頁面任何一款（或者盤面已經唔乾淨）嘅個案，按第一巡嘅形分組。",
+  "matched_at_6": "「六個具名定式」表嘅迷走砲淨係睇六粒時個形，加埋係 {table} 局；呢度六粒時對到嘅{same} {m6} 局。呢頁第一巡合共 {total} 局，其中 {extra} 局係六粒時個形對唔到、第七粒落咗先對到。",
+  "matched_at_6_same": "亦係",
+  "matched_at_6_differ": "就係",
+  "conditions_caption": "頁面條件 vs 實際砌咗：每一行係實際砌咗嘅形，每一欄係嗰局個次序啱邊個頁面條件。左右反轉嘅局，次序會將 J↔L、S↔Z 對調先睇。I 早嗰款原頁冇講幾早先算，所以冇一欄。",
+  "conditions_none": "冇一個條件啱",
+  "handedness_heading": "第二巡同第一巡左右唔一致嘅局",
+  "off_page_heading": "Perfect Clear 唔喺頁面任何一款",
+  "off_page_note": "以下每一局都係八行 Perfect Clear，但砌出嚟嘅形唔係原頁畫嘅任何一款；冇圖係因為呢個形係模擬器砌嘅，撳入去睇重播。",
+  "index_heading": "個案索引",
+  "index_note": "每一個個案一行，撳入去睇模擬重播；同一局兩個玩家都對到嘅話會有兩行。",
+  "idle": "撳下面任何一個個案，重播就會喺度出現，由個案嗰一步開始。",
+  "missing": "呢個連結指住嘅個案唔喺呢版。",
+  "discrepancy_heading": "原頁自己唔一致嘅地方",
+  "discrepancies": {
+    "2.ideal.pc:stated_vs_drawn": "理想形嘅 PC 原頁寫 {stated} 款，但畫咗 {drawn} 款（{shown} 款直接畫、残り {rest} 款）；{drawn} 款我哋全部保留。",
+    "2.normal_OS.pc:non_exhaustive": "通常形 O 早過 S 嘅 PC 列表以「等」收尾，冇講總共幾款；嗰兩幅係例子，所以對唔到佢哋唔代表唔喺原頁條路線。"
+  }
+}
