@@ -172,6 +172,14 @@
     {
       "id": "2.normal_OS.pc:non_exhaustive",
       "what": "the O>S PC list ends in 「等」 and states no pattern count; its 2 diagrams are examples, so a PC off this list is not off the page's route"
+    },
+    {
+      "id": "2.ideal.pc#16:colour",
+      "what": "z has 6 cells and s 2: the zz at row 2 (from the bottom), columns 1-2, and the ss at row 4, columns 2-3, are one S across the cleared row between them (snapshot line 232)"
+    },
+    {
+      "id": "2.i_early.pc#11:colour",
+      "what": "j has 7 cells and l 1: the jjj at row 4 (from the bottom), columns 0-2, and the l at row 1, column 0, are one L across the two cleared rows between them (snapshot line 443)"
     }
   ],
   "page_order": [

@@ -180,7 +180,7 @@ function matchAgainst(rows: string[] | null, ds: Diagram[], mut: Mutants): Match
 }
 
 const SWAP: Record<string, string> = { J: 'L', L: 'J', S: 'Z', Z: 'S' };
-function conditionHolds(cond: any, order: string, bag1: string): boolean | null {
+export function conditionHolds(cond: any, order: string, bag1: string): boolean | null {
   if (!cond) return null;
   if (cond.all) {
     for (const c of cond.all) {
@@ -363,7 +363,7 @@ export function classify(digests: RoundDigest[], routes: Routes, mut: Mutants = 
 /** The bag-3 frame: the board after the TST, then every later piece placed into it with every row
  *  it clears KEPT, up to and including the PC lock. Bottom PC_ROWS rows, top to bottom; pre-TST
  *  cells lower-case (`g` for garbage), later pieces upper-case. */
-function composite(d: RoundDigest, tstI: number, end: number): string[] {
+export function composite(d: RoundDigest, tstI: number, end: number): string[] {
   const H = d.height;
   const trimmed = d.rows[tstI] ?? [];
   const full: string[] = [...Array(H - trimmed.length).fill('..........'), ...trimmed];
@@ -390,9 +390,24 @@ function composite(d: RoundDigest, tstI: number, end: number): string[] {
   return vrows.slice(0, PC_ROWS).reverse().map(x => x.join(''));
 }
 
+/** The inverse of `composite()`'s `vmap`, for a builder rather than a reader: which diagram row each
+ *  engine row (y-UP) is, starting bottom-aligned when a bag starts. `stray-cannon-demos.ts` places
+ *  a piece only while every row it is drawn on is still on the board. One sibling of the frame rule,
+ *  beside it, so the two cannot drift. */
+export const initialRowmap = (rows = 40): number[] => Array.from({ length: rows }, (_, e) => e);
+/** After a lock clears `cleared` (pre-clear y-UP rows): those rows' ids leave, fresh ids (never a
+ *  diagram row) enter at the top. */
+export function advanceRowmap(rowmap: number[], cleared: number[]): number[] {
+  const cl = new Set(cleared);
+  const keep = rowmap.filter((_, e) => !cl.has(e));
+  let fresh = Math.max(1000, ...rowmap) + 1;
+  while (keep.length < rowmap.length) keep.push(fresh++);
+  return keep;
+}
+
 /** A PC pattern against the frame: `U` is the T, `c` a pre-TST cell, a letter that piece (placed
  *  before or after the TST). With `colour` off, only occupancy and the `c` cells are compared. */
-function patternMatches(comp: string[], rows: string[], mirrored: boolean, colour: boolean): boolean {
+export function patternMatches(comp: string[], rows: string[], mirrored: boolean, colour: boolean): boolean {
   let pr = rows.map(x => x.toUpperCase().replace(/U/g, 'T'));
   if (mirrored) pr = mirrorRows(pr);
   if (pr.length > PC_ROWS) return false;

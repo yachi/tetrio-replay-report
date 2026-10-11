@@ -41,10 +41,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 ROUTES_REL = os.path.join("pipeline", "openers", "meisou-routes.json")
 FACTS_REL = os.path.join("analysis", "stray-cannon-facts.json")
+DEMOS_REL = os.path.join("analysis", "stray-cannon-demos.json")
 PROSE_PATH = os.path.join(HERE, "stray_cannon_prose.json")
 PAGE_JS = os.path.join(HERE, "stray_cannon_page.js")
 
 OVERVIEW = "stray-cannon.html"
+DEMO_PAGE = "stray-cannon-demos.html"
 DATA_ID = "scp-data"
 TEMPLATE_ID = "scp-player-tpl"
 # (slug, bag-2 node or None). A case goes to the page of its bag-2 node; no bag-2 match -> bag1-only.
@@ -64,6 +66,9 @@ PIECE_CLASS = {"i": "i", "o": "o", "t": "t", "s": "s", "z": "z", "j": "j", "l": 
 _SCRIPT = re.compile(r"<script\b.*?</script>|<style\b.*?</style>|<template\b.*?</template>", re.S)
 _SRC_QUOTE = re.compile(r'<q class="scp-src">.*?</q>', re.S)
 _HOLD_SPAN = re.compile(r'<span class="scp-hold" data-node="bag1\.z_hold">[^<]*</span>')
+_DEMO_HOLD_SPAN = re.compile(r'<span class="scp-hold" data-demo="([a-z0-9-]+)">[^<]*</span>')
+_DEMO_BLOCK = re.compile(r'data-demo-node="([^"]+)" data-demo="(built|unbuilt)"')
+_DEMO_LINK = re.compile(r'href="' + re.escape("stray-cannon-demos.html") + r'#(demo-[a-z0-9-]+)"')
 _TAG = re.compile(r"<[^>]+>")
 _HOLD = re.compile(r"hold", re.I)
 _NODE_BLOCK = re.compile(r'data-node="([^"]+)" data-status="([a-z_]+)"')
@@ -107,6 +112,13 @@ PAGE_SENTENCES = (PS["source"], PS["exact"], PS["bag3"], PS["bag1"], PS["mirror"
 # The overview embeds no player, so the two sentences about the player's timeline are not its to carry.
 OVERVIEW_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, RS.HOLE_SENTENCE) + PAGE_SENTENCES
 NODE_REQUIRED = RS.REQUIRED + PAGE_SENTENCES
+DP = PROSE["demo"]
+DS = DP["sentences"]
+# The demo page carries no garbage, no verified prefix and no admission flags, so HOLE_SENTENCE,
+# BOUNDARY_SENTENCE and FLAG_WORDS are NOT its to carry: requiring them would make it assert things
+# that are not about it. What it must say is that nobody played these.
+DEMO_SENTENCES = (DS["demo"], DS["engine"], DS["order"], DS["mirror"], DS["rule"])
+DEMO_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, PS["source"]) + DEMO_SENTENCES
 
 
 # ---------------------------------------------------------------- inputs
@@ -274,7 +286,7 @@ def status_of(fn):
     return "count", f"{fn['cases']} / {fn['opportunities']}（{by}）"
 
 
-def node_block(nid, fn, routes_by_id, href=None, extra=""):
+def node_block(nid, fn, routes_by_id, href=None, extra="", demo=""):
     """One route node, one line: name, status, board if transcribed. `data-node` + `data-status`
     are what the completeness audit reads."""
     st, words = status_of(fn)
@@ -300,6 +312,8 @@ def node_block(nid, fn, routes_by_id, href=None, extra=""):
     if rn.get("text_verbatim"):
         bits.append(f'<p class="scp-cond">原文 {_src(rn["text_verbatim"])}</p>')
     bits.append(f'<p class="scp-count">{words}</p>')
+    if demo:
+        bits.append(demo)
     if extra:
         bits.append(extra)
     bits.append("</div>")
@@ -406,7 +420,7 @@ def _tail(island, js=()):
 
 # ---------------------------------------------------------------- overview
 
-def render_overview(routes, art, sessions, page_href):
+def render_overview(routes, art, sessions, page_href, demos):
     by_id = {n["id"]: n for n in routes["nodes"]}
     fnodes = {n["id"]: n for n in art["nodes"]}
     cases = sorted(art["cases"], key=lambda c: (c["session"], c["match"], c["round"], c["player"]))
@@ -415,7 +429,7 @@ def render_overview(routes, art, sessions, page_href):
 
     def block(nid, href=None, extra=""):
         shown.add(nid)
-        return "    " + node_block(nid, fnodes[nid], by_id, href, extra)
+        return "    " + node_block(nid, fnodes[nid], by_id, href, extra, demo_link(nid, demos, by_id))
 
     out = _head(title, "迷走砲每條路線同 corpus 入面對到嘅局：模擬器推導，唔屬於信任鏈。", [], False)
     out += ['  <nav class="scp-top" aria-label="返去"><a href="index.html">← 全部戰報</a></nav>',
@@ -426,6 +440,8 @@ def render_overview(routes, art, sessions, page_href):
             _source_line(routes),
             '  </header>']
     out += _method_note(False)
+    out.append(f'  <p class="scp-quote"><a href="{DEMO_PAGE}">{_esc(DP["title"])}</a>：'
+               f'{_esc(DP["overview_note"])}</p>')
     mq = {q["id"]: q for q in routes["quotes"]}
     if "overview.max_damage" in mq:
         out.append(f'  <p class="scp-quote">原頁：{_src(mq["overview.max_damage"]["verbatim"])}</p>')
@@ -561,7 +577,7 @@ def _subtree(slug, node, art):
     return [node] + [n["id"] for n in art["nodes"] if n["id"].startswith(node + ".")]
 
 
-def render_node_page(slug, node, routes, art, sessions, payloads):
+def render_node_page(slug, node, routes, art, sessions, payloads, demos):
     """One bag-2 node's page: every case under it, each with its replay. Returns (page, {case: pos})."""
     by_id = {n["id"]: n for n in routes["nodes"]}
     fnodes = {n["id"]: n for n in art["nodes"]}
@@ -632,7 +648,7 @@ def render_node_page(slug, node, routes, art, sessions, payloads):
         fn = fnodes.get(g)
         out.append(f'  <section class="scp-sec" id="g-{_esc(g)}">')
         if fn is not None:
-            out.append("    " + node_block(g, fn, by_id))
+            out.append("    " + node_block(g, fn, by_id, demo=demo_link(g, demos, by_id)))
         else:
             out.append(f'    <div class="scp-node" data-node="{_esc(g)}" data-status="count">'
                        f'<h4 class="scp-name">{_esc(node_name(g, by_id))}</h4>'
@@ -655,12 +671,339 @@ def render_node_page(slug, node, routes, art, sessions, payloads):
     return "\n".join(out), pos_of
 
 
+# ---------------------------------------------------------------- constructed demos
+
+def load_demos(repo=REPO):
+    with open(os.path.join(repo, DEMOS_REL), encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def demo_slug(nid):
+    """`2.ideal.pc#3` -> `demo-ideal-pc3`: the ONE spelling of a demo's anchor, hash and island key."""
+    s = nid[2:] if nid.startswith("2.") else nid
+    return "demo-" + re.sub(r"[._]+", "-", s.replace("#", "")).lower()
+
+
+def _shows(board, rows, u_empty):
+    """Does a y-UP board show `rows` (bottom-aligned)? `c` any filled cell, `U` empty (the slot)
+    or a T, a letter that piece, `-` empty; nothing above the drawing."""
+    h = len(rows)
+    for y, line in enumerate(board):
+        for x, v in enumerate(line):
+            ch = rows[h - 1 - y][x] if y < h else "-"
+            if ch == "-" or (ch == "U" and u_empty):
+                if v is not None:
+                    return False
+            elif v is None or (ch != "c" and v != ("T" if ch == "U" else ch.upper())):
+                return False
+    return True
+
+
+def _read_rows(rows, readings):
+    out = [list(r) for r in rows]
+    for rd in readings:
+        for x, d in rd["cells"]:
+            i = len(rows) - 1 - d
+            _need(out[i][x] == rd["drawn"], f"reading cell {x},{d} is not {rd['drawn']}")
+            out[i][x] = rd["reads_as"].lower()
+    return ["".join(r) for r in out]
+
+
+def _composite_ok(demo, data, start, rows, readings):
+    """The kept-rows frame from lock `start` on (every row cleared after it stays drawn) against a
+    Perfect Clear pattern: `c` a cell there before `start`, a letter or U the piece placed after."""
+    width = data["board"]["width"]
+    vrows, vmap = None, None
+    for i, (piece, full, board) in enumerate(RS.decode_boards(data, demo["seq"], demo["locks"],
+                                                             RS.NEXT_SHOWN)):
+        if i == start - 1:
+            vrows = [[(v.lower() if v else "-") for v in line] for line in board]
+            vmap = list(range(len(vrows)))
+            continue
+        if i < start:
+            continue
+        # the piece's own cells: what this board has that the frame does not, read through vmap
+        cells = RS._place_cells(data["shapes"], width, data["board"]["rows"], piece, demo["locks"][i][1])
+        for c in cells:
+            y, x = divmod(c, width)
+            _need(vrows[vmap[y]][x] == "-", f"{demo['node']}: lock {i} overlaps in the frame")
+            vrows[vmap[y]][x] = piece
+        if full:
+            keep = [vmap[y] for y in range(len(vmap)) if y not in full]
+            while len(keep) < len(vmap):
+                vrows.append(["-"] * width)
+                keep.append(len(vrows) - 1)
+            vmap = keep
+    rd = _read_rows(rows, readings)
+    h = len(rd)
+    for d, line in enumerate(vrows):
+        for x, a in enumerate(line):
+            b = rd[h - 1 - d][x] if d < h else "-"
+            if b == "-":
+                if a != "-":
+                    return False
+            elif b == "c":
+                if a == "-" or a.isupper():
+                    return False
+            elif a != ("T" if b == "U" else b.upper()):
+                return False
+    return True
+
+
+def demo_problems(demos, routes):
+    """The page's own check of the demo artefact, a second implementation of the end state the bun
+    test checks: every board node has one demo or one unbuilt reason, and each demo — decoded with
+    this module's decoder — ends where its drawing says (bag 1: the drawing; bag 2: the drawing with
+    the U empty after 13 pieces, then the T into it; a PC pattern: the kept-rows frame, then an
+    empty board after 8 lines; a mid-route drawing: the board before its U, then the T)."""
+    bad = []
+    if demos.get("schema") != "stray-cannon-demos/1":
+        return [f"unknown demos schema {demos.get('schema')!r}"]
+    if demos.get("report_eligible") is not False or demos.get("constructed") is not True:
+        return ["stray-cannon-demos.json must declare report_eligible: false and constructed: true"]
+    by_id = {n["id"]: n for n in routes["nodes"]}
+    built = [d["node"] for d in demos["demos"]]
+    unbuilt = [u["node"] for u in demos["unbuilt"]]
+    for n in routes["nodes"]:
+        k = built.count(n["id"]) + unbuilt.count(n["id"])
+        if "rows" in n and k != 1:
+            bad.append(f"{n['id']}: {k} demo/unbuilt entries, want exactly one")
+        if "rows" not in n and k:
+            bad.append(f"{n['id']}: a demo for a node with no board")
+    for nid in built + unbuilt:
+        if nid not in by_id:
+            bad.append(f"{nid}: not a route node")
+    if len({demo_slug(x) for x in built}) != len(built):
+        bad.append("two demos share a slug")
+    for d in demos["demos"]:
+        bad += _demo_end(d, demos, by_id)
+    return bad
+
+
+def _demo_end(d, data, by_id):
+    n = by_id.get(d["node"])
+    if n is None:
+        return []
+    locks = d["locks"]
+    try:
+        steps = [(p, list(f), [list(r) for r in b])
+                 for p, f, b in RS.decode_boards(data, d["seq"], locks, RS.NEXT_SHOWN)]
+        hold = RS.queue_states(d["seq"], locks, RS.NEXT_SHOWN)[-1][1]
+    except SystemExit as e:
+        return [f"{d['node']}: does not decode: {e}"]
+    last = len(locks) - 1
+    lines = sum(lk[2] for lk in locks)
+    where = d["node"]
+    if n["bag"] == 1:
+        if not _shows(steps[last][2], n["rows"], False):
+            return [f"{where}: the final board is not the drawing"]
+        if n["id"] == "bag1.z_hold" and hold != "Z":
+            return [f"{where}: Z is not in the hold box"]
+    elif n["bag"] == 2:
+        if last != 13 or not _shows(steps[12][2], n["rows"], True):
+            return [f"{where}: the board after 13 pieces is not the drawing"]
+        if locks[13][3] != 2 or locks[13][2] != 3:
+            return [f"{where}: lock 14 is not a T-spin Triple"]
+    elif "list" in n:
+        if any(v for row in steps[last][2] for v in row) or lines != 8:
+            return [f"{where}: does not end on an 8-line Perfect Clear"]
+        start = sum(len(b["placed"]) for b in d["bags"][:-1])
+        if not _composite_ok(d, data, start, n["rows"], d.get("piece_readings", [])):
+            return [f"{where}: the kept-rows frame is not the pattern"]
+    elif "unmatchable" in n:
+        if not _shows(steps[last][2], n["rows"], False):
+            return [f"{where}: the final board is not the drawing"]
+    else:
+        if not _shows(steps[last - 1][2], n["rows"], True) or locks[last][3] != 2:
+            return [f"{where}: the board before the U is not the drawing, or the T did not spin"]
+    return []
+
+
+def demo_link(nid, demos, routes_by_id):
+    """The one line a node block on the overview and the node pages carries about its demo."""
+    if "rows" not in routes_by_id.get(nid, {}):
+        return ""
+    if any(d["node"] == nid for d in demos["demos"]):
+        return (f'<p class="scp-demo"><a href="{DEMO_PAGE}#{demo_slug(nid)}">'
+                f'{_esc(DP["link"])}</a></p>')
+    return f'<p class="scp-demo">{_esc(DP["link_unbuilt"])}</p>'
+
+
+def _order_words(tok, held_slug):
+    kind, _, rest = tok.partition(":")
+    w = DP["order_words"]
+    if kind == "early":
+        p, k = rest.split("@")
+        return _esc(w["early"].format(p=p, k=k))
+    if kind == "before":
+        return _esc(w["before"].format(a=rest[0], b=rest[1]))
+    if kind == "hold":
+        p, k = rest.split("@")
+        return (f'<span class="scp-hold" data-demo="{held_slug}">'
+                f'{_esc(w["hold"].format(p=p, k=k))}</span>')
+    if kind == "unused":
+        return _esc(w["unused"].format(p=rest))
+    raise SystemExit(f"stray_cannon_page: unknown order reading {tok!r}")
+
+
+def _chain_words(chain, routes_by_id):
+    """The chain as words; a PC pattern by its own short name, since its full name repeats its parent."""
+    return DP["chain"].format(chain=" → ".join(
+        f"PC 第 {routes_by_id[c]['index']} 款" if "list" in routes_by_id[c] else node_name(c, routes_by_id)
+        for c in chain))
+
+
+def _demo_payload(d, demos, routes_by_id, name):
+    locks = d["locks"]
+    moments = []
+    for e in d["events"]:
+        q = e["lock"] + 1
+        if e["kind"] == "PC":
+            label = DP["pc"].format(n=q, lines=e["lines"])
+            moments.append([q, 0, "pc", label])
+        else:
+            nm = RS.SPIN_NAMES.get((e["spin"], e["lines"]))
+            _need(nm is not None, f"{d['node']}: spin {e['spin']} with {e['lines']} lines has no name")
+            moments.append([q, 0, "tspin", DP["spin"].format(n=q, name=nm)])
+    notes = [_chain_words(d["chain"], routes_by_id)]
+    for b in d["bags"]:
+        notes.append(DP["bag"].format(name=node_name(b["node"], routes_by_id), queue=b["queue"]))
+    return {"label": demo_slug(d["node"]), "title": DP["now"].format(name=name),
+            "seq": d["seq"], "order": "0" * len(locks), "winner": None,
+            "players": [{"user": DP["user"], "slot": 0, "ending": None, "frames": d["frames"],
+                         "pieces": len(locks), "locks": locks, "ge": [],
+                         "verified_to": None, "after": None, "failed_at": None}],
+            "moments": moments, "flags": [], "notes": notes}
+
+
+def render_demo_page(routes, demos):
+    """`stray-cannon-demos.html`: every drawn node's constructed demo, one player at a time."""
+    by_id = {n["id"]: n for n in routes["nodes"]}
+    bad = demo_problems(demos, routes)
+    _need(not bad, "; ".join(bad))
+    built = {d["node"]: d for d in demos["demos"]}
+    unbuilt = {u["node"]: u["reason"] for u in demos["unbuilt"]}
+    order = [i for i in routes["page_order"] if i in by_id]
+    for n in routes["nodes"]:
+        if "rows" in n and n["id"] not in order:
+            # a derived board (bag1.z_left) goes after the board it is derived beside
+            order.insert(order.index("bag1.z_right") + 1 if n["bag"] == 1 else len(order), n["id"])
+    title = f"{DP['title']}{RS.TITLE_MARK}"
+    shared = {"shapes": demos["shapes"], "width": demos["board"]["width"], "rows": demos["board"]["rows"],
+              "visible": demos["board"]["visible_rows"], "next": RS.NEXT_SHOWN, "flag_words": RS.FLAG_WORDS}
+    rounds = {}
+    with open(PAGE_JS, encoding="utf-8") as fh:
+        page_js = fh.read().rstrip()
+    _need("</script" not in page_js.lower(), "stray_cannon_page.js may not contain a closing script tag")
+    out = _head(title, "迷走砲原頁每一幅圖嘅示範重播：由空盤用我哋揀嘅次序砌，唔係對局，唔係 corpus 數據。",
+                [DP["user"]], True)
+    out += ['  <nav class="scp-top" aria-label="返去"><a href="index.html">← 全部戰報</a>'
+            f'<a href="{OVERVIEW}">迷走砲 全路線</a></nav>',
+            '  <header class="scp-head">',
+            f'    <div class="eyebrow">{RS.EYEBROW}</div>',
+            f'    <h1 class="section-title">{_esc(title)}</h1>',
+            f'    <p>{_esc(DP["lede"])}</p>',
+            _source_line(routes),
+            '  </header>',
+            '  <div class="method-note">',
+            f'    <p><strong>呢版唔屬於信任鏈，亦唔係對局。</strong>所以呢版<strong>{RS.NO_CLAIM}</strong>。</p>']
+    out += [f"    <p>{s}</p>" for s in (PS["source"],) + DEMO_SENTENCES]
+    out.append("  </div>")
+    out += [f'  <section id="{RS.SECTION_ID}" aria-labelledby="rpg-now">',
+            '    <h2 class="rpg-now" id="rpg-now" aria-live="polite"></h2>',
+            f'    <p class="scp-idle">{_esc(DP["idle"])}</p>',
+            '    <p class="rpg-notes"></p>',
+            f'    <p class="rpg-flag" hidden>{RS.FLAG_WORDS}</p>',
+            f'    <p class="rpg-missing" hidden>{_esc(PROSE["missing"])}</p>',
+            '    <noscript><p>重播要開 JavaScript 先用到。</p></noscript>',
+            '    <div class="rpg-host"></div>',
+            f'    <template id="{TEMPLATE_ID}">',
+            *["  " + line for line in RS.player_box("", [DP["user"]], bands=False)],
+            '    </template>',
+            '  </section>',
+            '  <div class="scp-grid scd-grid">']
+    basic_k = {b["id"]: k + 1 for k, b in enumerate(routes["basic_form"])}
+    for nid in order:
+        n = by_id[nid]
+        name = node_name(nid, by_id)
+        slug = demo_slug(nid)
+        if nid in built:
+            d = built[nid]
+            held = any(lk[5] for lk in d["locks"])
+            rounds[slug] = _demo_payload(d, demos, by_id, name)
+            bits = [f'    <div class="scp-node" id="{slug}" data-demo-node="{_esc(nid)}" data-demo="built">',
+                    f'<h4 class="scp-name">{_esc(name)}</h4>', board_svg(n["rows"], name),
+                    f'<p><a class="scp-case" href="#{slug}" data-round="{slug}">{_esc(DP["play"])}</a></p>',
+                    f'<p class="scp-tag">{_esc(_chain_words(d["chain"], by_id))}</p>']
+            for b in d["bags"]:
+                words = [_order_words(t, slug) for t in b["order_reading"]]
+                cond = by_id[b["node"]].get("condition")
+                met = (_esc(DP["met"].format(cond=_condition_words(cond)))
+                       if cond and "all" in cond and b["met"] else "")
+                bits.append(f'<p class="scp-cond">{_esc(DP["bag"].format(name=node_name(b["node"], by_id), queue=b["queue"]))}'
+                            f'{met}{"；" + "；".join(words) if words else ""}</p>')
+            ev = "，".join(m[3] for m in rounds[slug]["moments"])
+            if ev:
+                bits.append(f'<p class="scp-cond">{_esc(DP["events"].format(events=ev))}</p>')
+            for b in d["also"]:
+                bits.append(f'<p class="scp-tag">{_esc(DP["also"].format(k=basic_k[b]))}</p>')
+            for rd in d["piece_readings"]:
+                bits.append(f'<p class="scp-tag">{_esc(DP["reading"].format(reason=rd["reason"]))}</p>')
+            if any(t.startswith("hold:") for b in d["bags"] for t in b["order_reading"]) and not held:
+                raise SystemExit(f"stray_cannon_page: {nid} names a hold its inputs never make")
+            bits.append("</div>")
+            out.append("".join(bits))
+        else:
+            _need(nid in unbuilt, f"{nid}: neither a demo nor an unbuilt reason")
+            out.append(f'    <div class="scp-node" id="{slug}" data-demo-node="{_esc(nid)}" data-demo="unbuilt">'
+                       f'<h4 class="scp-name">{_esc(name)}</h4>{board_svg(n["rows"], name)}'
+                       f'<p class="scp-count">{_esc(DP["unbuilt"].format(reason=unbuilt[nid]))}</p></div>')
+    out.append("  </div>")
+    island = {"shared": shared, "rounds": rounds,
+              "cases": [{"case": k, "round": k} for k in rounds]}
+    out += _tail(island, (RS.player_js(), page_js))
+    return "\n".join(out)
+
+
+def audit_demo_page(page, demos, routes):
+    """The quarantine and player rules (one copy each, from replay_page), the 「hold」 rule widened
+    only to demos whose inputs hold, completeness, and the end-state check run on what the page
+    actually EMBEDS (its island), not on the artefact it was rendered from."""
+    held = {demo_slug(d["node"]) for d in demos["demos"] if any(lk[5] for lk in d["locks"])}
+    bad = (RP.audit_quarantine(page, DEMO_REQUIRED, DATA_ID) + RP.audit_player(page)
+           + audit_text(page, held))
+    blocks = _DEMO_BLOCK.findall(page)
+    seen = [nid for nid, _st in blocks]
+    if len(seen) != len(set(seen)):
+        bad.append("a demo node appears twice on the demo page")
+    want = {d["node"]: "built" for d in demos["demos"]}
+    want.update({u["node"]: "unbuilt" for u in demos["unbuilt"]})
+    if dict(blocks) != want:
+        bad.append(f"the demo page's blocks are not every demo and every unbuilt node "
+                   f"({sorted(set(dict(blocks).items()) ^ set(want.items()))[:3]})")
+    m = _ISLAND.search(page)
+    if not m:
+        return bad + ["no data island on the demo page"]
+    island = json.loads(m.group(1))
+    if sorted(island["rounds"]) != sorted(demo_slug(d["node"]) for d in demos["demos"]):
+        bad.append("the demo page does not embed every demo exactly once")
+    by_id = {n["id"]: n for n in routes["nodes"]}
+    for d in demos["demos"]:
+        r = island["rounds"].get(demo_slug(d["node"]))
+        if r is None:
+            continue
+        shown = dict(d, seq=r["seq"], locks=r["players"][0]["locks"])
+        bad += [f"embedded {x}" for x in _demo_end(shown, demos, by_id)]
+    return bad
+
+
 # ---------------------------------------------------------------- render all
 
-def render_all(repo=REPO, inputs=None):
-    """{file name: page} for the overview and every node page, each audited, plus the cross-page
-    rule that every case is embedded once and indexed once."""
+def render_all(repo=REPO, inputs=None, demos=None):
+    """{file name: page} for the overview, every node page and the demo page, each audited, plus
+    the cross-page rules: every case is embedded once and indexed once, every demo link resolves."""
     routes, art, sessions = inputs or load_inputs(repo)
+    demos = demos if demos is not None else load_demos(repo)
     check_inputs(routes, art)
     payloads = {}
     for c in art["cases"]:
@@ -669,13 +1012,14 @@ def render_all(repo=REPO, inputs=None):
             payloads[rk] = _round_payload(sessions, c)
     pages, pos_of = {}, {}
     for slug, node in NODE_PAGES:
-        page, pos = render_node_page(slug, node, routes, art, sessions, payloads)
+        page, pos = render_node_page(slug, node, routes, art, sessions, payloads, demos)
         pages[f"stray-cannon-{slug}.html"] = page
         pos_of.update(pos)
-    pages[OVERVIEW] = render_overview(routes, art, sessions, pos_of)
+    pages[OVERVIEW] = render_overview(routes, art, sessions, pos_of, demos)
+    pages[DEMO_PAGE] = render_demo_page(routes, demos)
     for name, page in pages.items():
         _no_simplified(page, name)
-    bad = audit_all(pages, art)
+    bad = audit_all(pages, art, demos, routes)
     _need(not bad, "; ".join(bad))
     return pages
 
@@ -690,10 +1034,12 @@ def _visible(page):
     return _SCRIPT.sub("", page)
 
 
-def audit_text(page):
-    """The %, 「hold」 and simplified-glyph rules, over the page's visible text."""
+def audit_text(page, held=()):
+    """The %, 「hold」 and simplified-glyph rules, over the page's visible text. `held`: the demo
+    slugs whose inputs press hold — only their own `scp-hold` span may say it."""
     bad = []
     vis = _visible(page)
+    vis = _DEMO_HOLD_SPAN.sub(lambda m: "" if m.group(1) in held else m.group(0), vis)
     if set(page) & SIMPLIFIED:
         bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
     if "%" in _TAG.sub("", _SRC_QUOTE.sub("", vis)):
@@ -747,8 +1093,13 @@ def audit_node_page(page, slug, node, art):
     return bad
 
 
-def audit_all(pages, art):
-    bad = audit_overview(pages[OVERVIEW], art)
+def audit_all(pages, art, demos, routes):
+    bad = audit_overview(pages[OVERVIEW], art) + audit_demo_page(pages[DEMO_PAGE], demos, routes)
+    built = {demo_slug(d["node"]) for d in demos["demos"]}
+    for name, page in pages.items():
+        for slug in _DEMO_LINK.findall(page):
+            if slug not in built:
+                bad.append(f"{name}: a link to {slug}, which is no demo")
     seen = []
     for slug, node in NODE_PAGES:
         page = pages[f"stray-cannon-{slug}.html"]
@@ -775,7 +1126,9 @@ def _drop_line(page, needle):
 def _selftest():
     inputs = load_inputs(REPO)
     art = inputs[1]
-    pages = render_all(REPO, inputs)
+    demos = load_demos(REPO)
+    routes0 = inputs[0]
+    pages = render_all(REPO, inputs, demos)
     ov = pages[OVERVIEW]
     ideal = "stray-cannon-ideal.html"
     cases = [("control: the rendered pages", None, None, None)]
@@ -808,16 +1161,35 @@ def _selftest():
     m("a node page missing a PAGE_SENTENCE", ideal, pages[ideal].replace(PS["mirror"], ""), "quarantine sentence")
     m("a status that disagrees with the artefact", OVERVIEW, ov.replace(
         'data-node="2.ideal.pc#7" data-status="empty"', 'data-node="2.ideal.pc#7" data-status="count"', 1), "the artefact says")
+    dp = pages[DEMO_PAGE]
+    m("the demo page missing its not-a-game sentence", DEMO_PAGE, dp.replace(DS["demo"], ""), "quarantine sentence")
+    m("a data-claim in a demo block", DEMO_PAGE, dp.replace('data-demo="built">', 'data-demo="built" data-claim="C001">', 1), "claim badge")
+    m("a demo block dropped", DEMO_PAGE, _drop_line(dp, 'data-demo-node="2.ideal.pc#3"'), "blocks are not every demo")
+    m("an unbuilt reason dropped", DEMO_PAGE, _drop_line(dp, 'data-demo-node="2.z_left.pc#6"'), "blocks are not every demo")
+    m("「hold」 on a demo that never holds", DEMO_PAGE, dp.replace(
+        'data-demo="built"><h4 class="scp-name">理想形</h4>',
+        'data-demo="built"><h4 class="scp-name">理想形<span class="scp-hold" data-demo="demo-ideal">hold</span></h4>', 1),
+      "「hold」 outside")
+    m("an innerHTML assignment on the demo page", DEMO_PAGE, dp.replace('"use strict";', '"use strict"; document.body.innerHTML = "";', 1), "assigns markup")
+
+    def moved(page):
+        mm = _ISLAND.search(page)
+        isl = json.loads(mm.group(1))
+        lk = isl["rounds"]["demo-ideal-pc3"]["players"][0]["locks"]
+        lk[-1][1] += 1
+        return page[:mm.start(1)] + _island(isl) + page[mm.end(1):]
+    m("a demo's last lock moved one column (the page's own board check)", DEMO_PAGE, moved(dp), "embedded 2.ideal.pc#3")
+    m("a broken demo link on the overview", OVERVIEW, ov.replace(f"{DEMO_PAGE}#demo-ideal-pc3", f"{DEMO_PAGE}#demo-ideal-pc99", 1), "which is no demo")
 
     ok = True
     for name, page_name, new, want in cases:
         if page_name is None:
-            found = audit_all(pages, art)
+            found = audit_all(pages, art, demos, routes0)
             good = not found
             applied = True
         else:
             applied = new != pages[page_name]
-            found = audit_all({**pages, page_name: new}, art)
+            found = audit_all({**pages, page_name: new}, art, demos, routes0)
             good = applied and any(want in f for f in found)
         ok &= good
         print(f"  {'ok ' if good else 'BAD'} {name}: {'rejected' if found else 'accepted'}"
@@ -843,6 +1215,19 @@ def _selftest():
     except SystemExit as e:
         refused += 1
         print(f"  ok  an artefact missing a route node is refused: {str(e)[:60]}…")
+    # the artefact check: a demo whose last lock is moved, and one a node page no longer gets
+    bent = json.loads(json.dumps(demos))
+    d3 = next(d for d in bent["demos"] if d["node"] == "2.ideal.pc#3")
+    d3["locks"][-1][1] += 1
+    gone = json.loads(json.dumps(demos))
+    gone["demos"] = [d for d in gone["demos"] if d["node"] != "2.i_early.pc#4"]
+    for what, a, want in (("a demo artefact's last lock moved", bent, "2.ideal.pc#3"),
+                          ("a demo artefact missing a node", gone, "2.i_early.pc#4")):
+        got = demo_problems(a, routes0)
+        good = any(want in g for g in got)
+        ok &= good
+        refused += 1
+        print(f"  {'ok ' if good else 'BAD'} {what}: {got[:1]}")
     print(f"{'ok ' if ok else 'FAIL'} stray_cannon_page selftest: {len(cases) - 1 + refused} "
           f"corruptions, {'all caught' if ok else 'SOME MISSED'}")
     return 0 if ok else 1

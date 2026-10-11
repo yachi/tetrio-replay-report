@@ -140,14 +140,15 @@ def queue_states(seq, locks, shown):
     return out
 
 
-def decode(data, seq, locks, shown):
-    """Per lock: (piece, cleared row count, board empty afterwards). Mirrors `decodeTimeline` and
-    throws on the same disagreement it does (full rows != the lock's `lines`)."""
+def decode_boards(data, seq, locks, shown):
+    """Per lock: (piece, cleared rows as pre-clear y-UP indices, the board AFTER the lock — the live
+    grid, [y-UP][x] of a piece letter, "G" or None; copy it to keep it). Mirrors `decodeTimeline`
+    and throws on the same disagreement it does (full rows != the lock's `lines`). The one loop
+    `decode` and the 迷走砲 demo page's board check both read."""
     b = data["board"]
     width, rows = b["width"], b["rows"]
     shapes = data["shapes"]
     board = [[None] * width for _ in range(rows)]
-    out = []
     for lk, (piece, _hold) in zip(locks, queue_states(seq, locks, shown)):
         _dframe, place, lines, _spin, garbage = lk[0], lk[1], lk[2], lk[3], lk[4]
         for column, amount in garbage:
@@ -166,9 +167,13 @@ def decode(data, seq, locks, shown):
         for y in reversed(full):
             del board[y]
             board.append([None] * width)
-        empty = all(v is None for row in board for v in row)
-        out.append((piece, lines, empty))
-    return out
+        yield piece, full, board
+
+
+def decode(data, seq, locks, shown):
+    """Per lock: (piece, cleared row count, board empty afterwards)."""
+    return [(piece, len(full), all(v is None for row in board for v in row))
+            for piece, full, board in decode_boards(data, seq, locks, shown)]
 
 
 # ---------------------------------------------------------------- the payload
@@ -438,12 +443,13 @@ def _color_css(players):
             "    :root[data-theme=\"dark\"] #round-replay { --rp-bad: #ef6a5f; }")
 
 
-def player_box(label, users):
+def player_box(label, users, bands=True):
     """The `.rp-player` box the shared player mounts on — markup only, no data. The region and the
     replay page both emit THIS, so a control the player looks up cannot exist in one and not the
-    other."""
+    other. `bands=False` is for a payload with no verified prefix (a 迷走砲 constructed demo, one
+    board): no boundary band and no legend for states it does not have."""
     keys = "".join(f"<dt>{html.escape(k)}</dt><dd>{html.escape(v)}</dd>" for k, v in HELP_KEYS)
-    return [
+    out = [
         f'    <div class="rp-player" tabindex="0" role="group" '
         f'aria-label="{html.escape(label)} 模擬重播；撳 ? 睇快捷鍵" '
         f'aria-describedby="rp-hint">',
@@ -465,23 +471,24 @@ def player_box(label, users):
         '        <span class="rp-pos" aria-hidden="true"></span>',
         '      </div>',
         '      <div class="rp-seek-wrap">',
-        '        <div class="rp-band" data-slot="0" aria-hidden="true"></div>',
-        '        <div class="rp-band" data-slot="1" aria-hidden="true"></div>',
+        *([f'        <div class="rp-band" data-slot="{s}" aria-hidden="true"></div>' for s in range(len(users))]
+          if bands else []),
         '        <div class="rp-marks" role="group" aria-label="關鍵時刻"></div>',
         '        <input type="range" class="rp-seek" min="0" value="0" step="1" aria-label="重播位置（粒）">',
         '      </div>',
-        '      <div class="rp-legend" aria-hidden="true">'
-        '<span><i class="rp-key" data-state="verified"></i>已核</span>'
-        '<span><i class="rp-key" data-state="no_evidence"></i>最後一次攻擊之後，冇證據</span>'
-        '<span><i class="rp-key" data-state="check_failed"></i>核對失敗</span>'
-        '<span>上帶 = ' + html.escape(users[0]) + '，下帶 = '
-        + html.escape(users[1]) + '</span></div>',
+        *(['      <div class="rp-legend" aria-hidden="true">'
+            '<span><i class="rp-key" data-state="verified"></i>已核</span>'
+            '<span><i class="rp-key" data-state="no_evidence"></i>最後一次攻擊之後，冇證據</span>'
+            '<span><i class="rp-key" data-state="check_failed"></i>核對失敗</span>'
+            '<span>上帶 = ' + html.escape(users[0]) + '，下帶 = '
+            + html.escape(users[1]) + '</span></div>'] if bands else []),
         '      <ul class="rp-moments" aria-label="關鍵時刻列表"></ul>',
         f'      <div class="rp-help" id="rp-help" hidden><strong>快捷鍵</strong>'
         f'（淨係喺呢個重播框有焦點嗰陣先生效）<dl>{keys}</dl></div>',
         '      <div class="rp-sr" aria-live="polite" aria-atomic="true"></div>',
         '    </div>',
     ]
+    return out
 
 
 def player_js():
