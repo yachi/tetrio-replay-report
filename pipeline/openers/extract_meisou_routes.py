@@ -217,6 +217,12 @@ KNOWN_DISCREPANCIES = [
     {'id': '2.normal_OS.pc:non_exhaustive',
      'what': 'the O>S PC list ends in 「等」 and states no pattern count; its 2 diagrams are '
              'examples, so a PC off this list is not off the page\'s route'},
+    {'id': '2.ideal.pc#16:colour',
+     'what': 'z has 6 cells and s 2: the zz at row 2 (from the bottom), columns 1-2, and the ss at '
+             'row 4, columns 2-3, are one S across the cleared row between them (snapshot line 232)'},
+    {'id': '2.i_early.pc#11:colour',
+     'what': 'j has 7 cells and l 1: the jjj at row 4 (from the bottom), columns 0-2, and the l at '
+             'row 1, column 0, are one L across the two cleared rows between them (snapshot line 443)'},
 ]
 
 #: The page's content that has no board: images, the video, and the one route the page names in
@@ -416,6 +422,51 @@ def cells(rows: list[str], pred) -> set[tuple[int, int]]:
     return {(r, c) for r, row in enumerate(rows) for c, ch in enumerate(row) if pred(ch)}
 
 
+#: One drawing per piece, y-UP (x, y); every rotation is derived, never typed.
+_PIECE_BASE = {'i': [(0, 0), (1, 0), (2, 0), (3, 0)], 'o': [(0, 0), (1, 0), (0, 1), (1, 1)],
+               't': [(0, 0), (1, 0), (2, 0), (1, 1)], 's': [(0, 0), (1, 0), (1, 1), (2, 1)],
+               'z': [(1, 0), (2, 0), (0, 1), (1, 1)], 'j': [(0, 0), (1, 0), (2, 0), (0, 1)],
+               'l': [(0, 0), (1, 0), (2, 0), (2, 1)]}
+
+
+def _norm(cs):
+    mx, my = min(x for x, _ in cs), min(y for _, y in cs)
+    return tuple(sorted((x - mx, y - my) for x, y in cs))
+
+
+def _shapes(letter):
+    out, cur = set(), _PIECE_BASE[letter]
+    for _ in range(4):
+        out.add(_norm(cur))
+        cur = [(y, -x) for x, y in cur]
+    return out
+
+
+def piece_groups_ok(rows: list[str]) -> list[str]:
+    """Rule 7: every letter group of a board is one tetromino of that letter, either as drawn or
+    with the rows it straddles (and does not touch) removed — the kept-rows frame a later piece is
+    drawn in after rows under it have cleared. Returns the letters that are not."""
+    h = len(rows)
+    groups: dict[str, list[tuple[int, int]]] = {}
+    for i, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            key = 't' if ch == 'U' else ('Z' if ch == 'Z' else ch)
+            if key in _PIECE_BASE or key == 'Z':
+                groups.setdefault(key, []).append((x, h - 1 - i))
+    bad = []
+    for key, cs in sorted(groups.items()):
+        letter = 'z' if key == 'Z' else key
+        if len(cs) != 4:
+            bad.append(key)
+            continue
+        ys = sorted({y for _, y in cs})
+        gap = [y for y in range(ys[0], ys[-1] + 1) if y not in ys]
+        kept = [(x, y - sum(1 for g in gap if g < y)) for x, y in cs]
+        if _norm(cs) not in _shapes(letter) and _norm(kept) not in _shapes(letter):
+            bad.append(key)
+    return bad
+
+
 # ── the gate ───────────────────────────────────────────────────────────────────────────────────
 def verify(data: dict) -> list[str]:
     """Every rule in the plan's §1. Returns problems; each starts with its rule's tag."""
@@ -592,6 +643,14 @@ def verify(data: dict) -> list[str]:
             found.add(f'{lst["id"]}:stated_vs_drawn')
         if not lst.get('complete'):
             found.add(f'{lst["id"]}:non_exhaustive')
+    # ── rule 7: piece decomposition. Every letter is whole pieces of that letter, in the kept-rows
+    # frame; a drawing that colours a piece in another piece's colour is a source discrepancy ──
+    for n in nodes:
+        if 'rows' in n and 'p' not in ''.join(n['rows']) and piece_groups_ok(n['rows']):
+            found.add(f'{n["id"]}:colour')
+    for b in data.get('basic_form', []):
+        if piece_groups_ok(b['rows']):
+            found.add(f'{b["id"]}:colour')
     named = {d['id'] for d in data.get('known_discrepancies', [])}
     for d in sorted(found - named):
         bad.append(f'discrepancy: {d} is not on the named list — read the page, then name it')
@@ -685,6 +744,13 @@ def selftest() -> int:
     def drop_discrepancy(d):
         d['known_discrepancies'] = d['known_discrepancies'][1:]
 
+    def recolour(d):
+        setcell(node(d, '2.ideal.pc#1')['rows'], 1, 0, 'l')        # one j cell drawn as l
+
+    def drop_colour(d):
+        d['known_discrepancies'] = [x for x in d['known_discrepancies']
+                                    if x['id'] != '2.ideal.pc#16:colour']
+
     def drop_text_only(d):
         d['nodes'] = [n for n in d['nodes'] if n.get('node_kind') != 'text_only']
 
@@ -737,6 +803,8 @@ def selftest() -> int:
         (delete_pattern, 'a deleted pattern', 'discrepancy:'),
         (duplicate_pattern, 'a duplicated pattern', 'distinct:'),
         (drop_discrepancy, 'a dropped discrepancy entry', 'discrepancy:'),
+        (recolour, 'one cell of a whole piece recoloured', 'discrepancy:'),
+        (drop_colour, 'the pc#16 colour discrepancy dropped', 'discrepancy:'),
         (drop_text_only, 'a deleted text_only node', 'non-board:'),
         (fifth_z, 'z_left given a fifth Z cell', 'z_left:'),
         (both, 'a node with both a board and a node_kind', 'exclusive-or:'),

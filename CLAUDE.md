@@ -212,6 +212,9 @@ bun pipeline/sim/emit-stray-cannon-facts.ts \
   --out analysis/stray-cannon-facts.json                        # which corpus round reached which route node (quarantined)
 bun test pipeline/openers/stray-cannon.test.ts                 #   byte rebuild + named lists + mutants
 python3 -m pipeline.stray_cannon_page --selftest # the docs/stray-cannon*.html audit's mutants
+bun pipeline/sim/emit-stray-cannon-demos.ts \
+  --out analysis/stray-cannon-demos.json                        # the constructed 迷走砲 demos (quarantined, not corpus data)
+bun test pipeline/openers/stray-cannon-demos.test.ts           #   re-run, classify, board, completeness + mutants
 python3 -m pipeline.stray_cannon_page --out-dir <dir>  #   render the pages somewhere other than docs/
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
@@ -3105,6 +3108,65 @@ Four rules the code depends on, each of which an obvious simplification would br
 A mirrored round is read with J↔L and S↔Z swapped before the page's bag-2 condition is tested.
 Upper-case `Z` read as the bag-1 Z, and the derived bag-1 `z_left` board (the page draws it only
 inside its bag-2 board), are this repo's readings, and the pages say so.
+
+### 示範重播 — a constructed replay for every drawn node, and why it is not corpus data
+
+Beside the corpus cases, every route node that has a drawn board gets a **constructed** demo: from
+an empty board, one piece at a time, from a queue and key inputs WE choose, through bag 1 → bag 2
+(→ the TST) → bag 3, ending on the page's drawing. Nobody played these games, so they are quarantined
+harder than the corpus pages: the artefact says `report_eligible: false` and `constructed: true`, the
+page's player is labelled 示範, no figure from them enters any count, and nothing carries a claim id,
+a ✓ or a `data-claim`.
+
+| piece | where |
+|---|---|
+| planner | `pipeline/sim/stray-cannon-demos.ts` — per bag, a DFS over placement orders; per piece, a BFS over the ENGINE's own moves (its `rotateCW/CCW/180` through SRS+ kicks on a scratch engine, lateral steps, one-row falls copied from `#__internal_fall`), keyed by the engine's `lastSpin` because a sideways step keeps it and a fall clears it |
+| emitter | `pipeline/sim/emit-stray-cannon-demos.ts` → `analysis/stray-cannon-demos.json` (argv and file IO only); md5s of the routes file, the planner, `emit-replay.ts` and the classifier, so it goes stale loudly |
+| test | `pipeline/openers/stray-cannon-demos.test.ts` — byte rebuild; every demo re-run through `instrumentEngine` to its committed locks; the corpus `classify()` reaching the node; board equality against the drawing; spins; whole 7-bags; prefix sharing; completeness; planner and data mutants, and two measured controls |
+| page | `docs/stray-cannon-demos.html`, from `stray_cannon_page.render_demo_page`; every node block on the overview and node pages links to it (or says there is no demo). The page re-checks each EMBEDDED demo's end state with its own decoder (`replay_section.decode_boards`), a second implementation that runs in the bun-less `docs` job |
+
+Five rules the code depends on:
+
+* **The engine is the arbiter; the planner only proposes.** `build()` replays the whole input script
+  on a fresh engine through `instrumentEngine` (factored out of `emit-replay.ts`'s `runPlayer`, so a
+  demo lock and a corpus lock are recorded by the same hooks) and throws unless every lock lands on
+  the planned cells with the planned spin and lines. A planner bug cannot reach the artefact.
+* **The row map is `composite()`'s inverse and lives beside it** (`initialRowmap` / `advanceRowmap`
+  in `emit-stray-cannon-facts.ts`). A bag-3 drawing is a kept-rows composite, so a piece is placeable
+  only while every row it is drawn on is still on the board; without the map the split-piece
+  patterns cannot be built at all (the `noRowMap` mutant).
+* **A drawn `U` is the slot the T goes into, and the demo fires it.** On a bag-2 board and the two
+  mid-route drawings (TST 捐窿, STSD) the T is the bag's LAST piece and the board just before it is
+  the drawing; in a PC pattern the T goes wherever the order allows and the last lock is the Perfect
+  Clear.
+* **The shared player takes one board or two.** `replay_player.js` sizes its per-player state by
+  `players.length`, and a payload whose `verified_to` is null (a demo: no recorded game, so no prefix
+  to verify) draws no boundary band and no checked/unchecked state; `replay_section.player_box(…,
+  bands=False)` emits no band and no legend for it. Two-player output is byte-identical.
+* **「hold」 only where an input holds.** Only `bag1.z_hold` presses hold (its Z, held on arrival
+  just before J). The demo page may say the word only inside that demo's own `scp-hold` span, and
+  only while its locks carry a `held` flag; the overview's existing rule is unchanged.
+
+The named lists are `DEMO_UNBUILT` (a drawn node with no demo, and the planner's own measured reason
+— a placeholder template, a T that cannot reach its drawn slot from spawn when it must go last, and a
+pattern whose pieces wait on each other's row clears in a cycle), `DEMO_SPIN_LINES` (the U line counts
+the drawing does not fix), `DEMO_SPIN_EXCEPTIONS` (a plain `t` the engine credits as a spin; measured
+empty) and `DEMO_PIECE_READINGS`. Their sizes are read off the test, never typed here.
+
+**Two measured controls, not mutants, and the reason is the finding.** `ignoreConditions` changes
+which queue is dealt and every check still passes: in every drawing the page's order conditions
+(%J>%O, %O>%S, %S>%O, the bag-1 %J>%Z) are what gravity already requires, so the conditions are
+entailed by the boards. `no180` changes paths and breaks nothing: no demo needs a 180. Either one
+failing a check later means it has become a mutant.
+
+**The page colours two PC patterns inconsistently** (`2.ideal.pc#16`, `2.i_early.pc#11`): one
+piece's cells are drawn in another piece's colour across cleared rows. `extract_meisou_routes` rule 7
+(every letter is whole pieces of that letter in the kept-rows frame) now finds exactly these two and
+they are named in `known_discrepancies`; `PIECE_READINGS` in the planner is the ONE table that reads
+them as the piece they must be, and the demo artefact carries it to the page. **The corpus classifier
+does not apply it, on measurement**: the `2.ideal.other` off-page PCs share those patterns'
+occupancy, but none of them matches either drawing under the reading by colour, so colour-matching as
+drawn files nothing wrongly.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

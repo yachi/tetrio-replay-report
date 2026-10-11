@@ -200,13 +200,14 @@ const num = (v: unknown, what: string): number => {
   return v;
 };
 
-/** One player's half of one round, through the engine. */
-export function runPlayer(player: any, roundPlayers: any[], date: Date) {
-  const o = player.replay.options;
-  const players = roundPlayers.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
-  const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players, date);
-
-  // piece sequence: the first piece spawns inside the constructor, before any hook exists
+/**
+ * The hooks that turn an engine into a timeline recorder: the piece sequence (the first piece spawns
+ * inside the constructor, before any hook exists, so it is read off `eng.falling`), every lock in
+ * LOCK_FIELDS, every garbage insertion against the lock it happens during, holds, and the engine's
+ * own board and queue after every lock (for `assertRoundTrip`). Shared by `runPlayer` and by the
+ * 迷走砲 constructed demos (`stray-cannon-demos.ts`), so both record a lock the same way.
+ */
+export function instrumentEngine(eng: any) {
   const seq: string[] = [];
   let drawn = 0;
   const syncSeq = () => { eng.queue.forEach((p: any, k: number) => { seq[drawn + k] = String(p).toUpperCase(); }); };
@@ -225,19 +226,24 @@ export function runPlayer(player: any, roundPlayers: any[], date: Date) {
     return origInsert(g);
   };
 
-  const locks: Lock[] = [];
-  const engineStates: string[] = [];
+  const rec = {
+    locks: [] as Lock[],
+    engineStates: [] as string[],
+    engineQueue: [] as { piece: string; hold: string }[],   // checked against queueStates, not emitted
+    holdsTotal: 0, pcs: 0,
+    // index of the first lock on which the ENGINE topped out, or null. Recorded, never acted on: the
+    // ending comes from gameoverreason; this exists so a viewer can flag a round where the two disagree.
+    engineTopLock: null as number | null,
+    get seq() { return seq.join(''); },
+    get drawn() { return drawn; },
+  };
   const seen = new WeakSet<object>();
-  const engineQueue: { piece: string; hold: string }[] = [];   // checked against queueStates, not emitted
-  let lastFrame = 0, inLock = false, curHeld = 0, nextHeld = 0, holdsTotal = 0, pcs = 0;
+  let lastFrame = 0, inLock = false, curHeld = 0, nextHeld = 0;
   let preCells: number[] = [], holdAtLock = '';
-  // index of the first lock on which the ENGINE topped out, or null. Recorded, never acted on: the
-  // ending comes from gameoverreason; this exists so a viewer can flag a round where the two disagree.
-  let engineTopLock: number | null = null;
 
   eng.events.on('falling.new', (e: any) => {
     if (!e.isHold) return;
-    holdsTotal++;
+    rec.holdsTotal++;
     // a hold fired while a lock is still being processed (IHS) belongs to the NEXT piece
     if (inLock) nextHeld = 1; else curHeld = 1;
   });
@@ -269,22 +275,32 @@ export function runPlayer(player: any, roundPlayers: any[], date: Date) {
     const attack = (res.rawGarbage || []).reduce((a: number, b: number) => a + b, 0);
     const sent = (res.garbage || []).reduce((a: number, b: number) => a + b, 0);
     const piece = String(res.mino).toUpperCase();
-    if (res.topout && engineTopLock === null) engineTopLock = locks.length;
-    locks.push([eng.frame - lastFrame, encodePlace(piece, cells), lines, spin, pendingGarbage, curHeld,
-                attack, sent]);
-    engineQueue.push({ piece, hold: holdAtLock });
+    if (res.topout && rec.engineTopLock === null) rec.engineTopLock = rec.locks.length;
+    rec.locks.push([eng.frame - lastFrame, encodePlace(piece, cells), lines, spin, pendingGarbage, curHeld,
+                    attack, sent]);
+    rec.engineQueue.push({ piece, hold: holdAtLock });
     lastFrame = eng.frame;
-    engineStates.push(engineKey(st));
-    if (eng.board.perfectClear && lines > 0) pcs++;
+    rec.engineStates.push(engineKey(st));
+    if (eng.board.perfectClear && lines > 0) rec.pcs++;
     pendingGarbage = []; curHeld = nextHeld; nextHeld = 0; inLock = false;
   });
+  return rec;
+}
+
+/** One player's half of one round, through the engine. */
+export function runPlayer(player: any, roundPlayers: any[], date: Date) {
+  const o = player.replay.options;
+  const players = roundPlayers.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
+  const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players, date);
+  const rec = instrumentEngine(eng);
 
   const byFrame = new Map<number, any[]>();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame)!.push(e); }
   const maxF = player.replay.frames;
   if (typeof maxF !== 'number') throw new Error('replay.frames missing');
   for (let f = 0; f <= maxF; f++) eng.tick(byFrame.get(f) || []);
-  return { locks, engineStates, engineQueue, seq: seq.join(''), drawn, holdsTotal, pcs, engineTopLock,
+  return { locks: rec.locks, engineStates: rec.engineStates, engineQueue: rec.engineQueue, seq: rec.seq,
+           drawn: rec.drawn, holdsTotal: rec.holdsTotal, pcs: rec.pcs, engineTopLock: rec.engineTopLock,
            garbageCleared: eng.stats.garbage.cleared as number };
 }
 

@@ -7114,18 +7114,22 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     var P = D.players.map(function (p) { return { d: p, x: decodePlayer(p) }; });
 
-    // merged position -> locks applied per player, and the frame each position is reached at
-    var countAt = [[0], [0]], tAt = [0];
+    // merged position -> locks applied per player, and the frame each position is reached at.
+    // One player or two: a 迷走砲 constructed demo has one board (stray_cannon_page.py).
+    var countAt = P.map(function () { return [0]; }), tAt = [0];
     (function () {
-      var c = [0, 0];
+      var c = P.map(function () { return 0; });
       for (var i = 0; i < N; i++) {
         var s = +D.order[i];
         c[s]++;
-        countAt[0].push(c[0]); countAt[1].push(c[1]);
+        for (var j = 0; j < P.length; j++) countAt[j].push(c[j]);
         tAt.push(P[s].x.absF[c[s] - 1]);
       }
     })();
-    var T_END = Math.max(P[0].d.frames, P[1].d.frames, tAt[N]);
+    var T_END = Math.max.apply(null, P.map(function (pp) { return pp.d.frames; }).concat([tAt[N]]));
+    // a payload with no verified prefix (verified_to null: a constructed demo, not a game) draws no
+    // boundary band and no checked/unchecked state
+    function hasBoundary(pp) { return pp.d.verified_to != null; }
     function posOfLock(s, i) {   // merged position AFTER player s's lock i
       for (var q = 1; q <= N; q++) if (countAt[s][q] === i + 1) return q;
       return N;
@@ -7137,8 +7141,11 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       // read off the section, not :root, so the section's own scoped tokens (--rp-c0/1, --rp-bad)
       // resolve; every shell token inherits down to it
       var cs = getComputedStyle(root);
-      ["--bg-sunken", "--bg-raised", "--grid-line", "--muted", "--ink", "--ink-secondary", "--rp-c0",
-       "--rp-c1", "--rp-bad", "--good", "--pending", "--border-strong"].forEach(function (n) {
+      // one accent per board: a one-board payload defines --rp-c0 only
+      ["--bg-sunken", "--bg-raised", "--grid-line", "--muted", "--ink", "--ink-secondary",
+       "--rp-bad", "--good", "--pending", "--border-strong"].concat(P.map(function (pp, s) {
+        return "--rp-c" + s;
+      })).forEach(function (n) {
         var v = cs.getPropertyValue(n).trim();
         if (!v) throw new Error("replay: CSS token " + n + " is not defined");
         tok[n] = v;
@@ -7187,6 +7194,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     // boundary bands: three states per player
     P.forEach(function (pp, s) {
+      if (!hasBoundary(pp)) return;
       var band = $('.rp-band[data-slot="' + s + '"]');
       var v = pp.d.verified_to, n = pp.d.locks.length;
       var cut = v >= 0 ? posOfLock(s, v) : 0;
@@ -7228,7 +7236,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     /* ---------- state ---------- */
     var pos = 0, t = 0, playing = false, raf = 0, last = 0, letters = false, touched = false;
-    var fx = [null, null];         // per player: {k, t0, drop}
+    var fx = P.map(function () { return null; });   // per player: {k, t0, drop}
 
     function fmtTime(frames) {
       var tenths = Math.floor(frames / 6);
@@ -7352,7 +7360,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         });
       }
       // boundary state on the board frame: solid = checked, dashed = past the checked prefix
-      var v0 = pp.d.verified_to, past = k - 1 > v0 && k > 0;
+      var v0 = pp.d.verified_to, past = hasBoundary(pp) && k - 1 > v0 && k > 0;
       ctx.lineWidth = 2;
       ctx.strokeStyle = !past ? accent : (pp.d.after === "check_failed" ? tok["--rp-bad"] : tok["--pending"]);
       if (ctx.setLineDash) ctx.setLineDash(past ? [5, 4] : []);
@@ -7388,7 +7396,9 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         sd.strip.textContent = "第 " + k + "/" + n + " 粒 · 攻擊 " + a + " · 每粒攻擊 "
           + (k ? floor2(a / k) : "—") + " · 食垃圾 " + pp.x.ins[k] + " 行";
         var v = pp.d.verified_to, st, words;
-        if (k === 0 || k - 1 <= v) { st = "verified"; words = k === 0 ? "未落第一粒" : "已核：第 " + k + " 粒之前嘅攻擊都對得上"; }
+        sd.state.hidden = !hasBoundary(pp);
+        if (!hasBoundary(pp)) { st = "none"; words = ""; }
+        else if (k === 0 || k - 1 <= v) { st = "verified"; words = k === 0 ? "未落第一粒" : "已核：第 " + k + " 粒之前嘅攻擊都對得上"; }
         else if (pp.d.after === "check_failed") { st = "check_failed"; words = "核對失敗：第 " + (pp.d.failed_at + 1) + " 粒嘅攻擊對唔上，第 " + (v + 2) + " 粒起盤面可能同真實唔同"; }
         else { st = "no_evidence"; words = "最後一次攻擊之後：冇證據話啱定唔啱（核到第 " + (v + 1) + " 粒）"; }
         sd.state.setAttribute("data-state", st);
@@ -7400,7 +7410,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         sd.callout.textContent = k > 0 && tAt[pos] - pp.x.absF[k - 1] <= 60 ? describe(s, k - 1) : "";
       });
       seek.value = String(pos);
-      var vt = "第 " + pos + "/" + N + " 粒（兩邊合計）· " + fmtTime(t);
+      var vt = "第 " + pos + "/" + N + " 粒" + (P.length > 1 ? "（兩邊合計）· " : " · ") + fmtTime(t);
       seek.setAttribute("aria-valuetext", vt);
       posEl.textContent = vt;
       momentBtns.forEach(function (b, i) {
@@ -7422,7 +7432,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     function draw() {
       var now = performance.now();
-      drawSide(0, now); drawSide(1, now);
+      for (var s = 0; s < P.length; s++) drawSide(s, now);
     }
     function notify() { if (opts.onChange) opts.onChange(pos, t, playing); }
     function still() {
@@ -7442,7 +7452,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       q = Math.max(0, Math.min(N, q));
       var prev = pos;
       pos = q; t = tAt[q];
-      fx = [null, null];
+      fx = P.map(function () { return null; });
       if (animate && q === prev + 1) {
         var s = +D.order[q - 1];
         fx[s] = { k: countAt[s][q] - 1, t0: performance.now(), drop: true };

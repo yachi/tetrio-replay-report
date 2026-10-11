@@ -639,7 +639,10 @@ jobs:
       # shiwehi.com page. Gate the transcription first (grammar, the cross-check against
       # harddrop's field, internal consistency, the named source discrepancies), so
       # build-docs --check never renders from an unchecked one; then the page audit's own
-      # mutants, as for the replay pages above.
+      # mutants, as for the replay pages above. The audit covers the constructed-demo page
+      # (stray-cannon-demos.html) too, including its own decoder's check of every embedded
+      # demo's end state: the bun-less second implementation of what
+      # pipeline/openers/stray-cannon-demos.test.ts checks in the typescript job.
       - name: Check the Stray Cannon route transcription
         run: python3 -m pipeline.openers.extract_meisou_routes
 

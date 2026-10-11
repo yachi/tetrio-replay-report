@@ -1,11 +1,14 @@
-/* 迷走砲 node-page controller — pipeline/stray_cannon_page.py inlines this AFTER replay_player.js.
+/* 迷走砲 node-page and demo-page controller — pipeline/stray_cannon_page.py inlines this AFTER
+   replay_player.js.
 
    Page-only: which case is showing, and the hash. The boards, seek bar, keys and key moments are
    the shared player (rpReplay.mount), mounted on a clone of the #scp-player-tpl box only when a
    case is picked (a click on a case link, or a hash naming one), and destroy()ed before the next,
    so one player exists at a time and no listener outlives its round.
 
-   - the hash is #<date>-m<pos>r<round>@p<n>; every case link is a plain link carrying the position
+   - the hash is #<date>-m<pos>r<round>@p<n> on a node page and #demo-<slug>@p<n> on the demo page
+     (a constructed demo carries a `title`, and no session or winner); every case link is a plain
+     link carrying the position
      just after the case's own step, and moving inside a round rewrites the hash with replaceState;
    - nodes are built with createElement / textContent only. */
 (function () {
@@ -38,7 +41,7 @@
 
   /* ---------- the hash ---------- */
   function parseHash() {
-    var m = /^#(\d{4}-\d{2}-\d{2}-m\d+r\d+)(?:@p(\d+))?$/.exec(location.hash);
+    var m = /^#((?:\d{4}-\d{2}-\d{2}-m\d+r\d+)|(?:demo-[a-z0-9-]+))(?:@p(\d+))?$/.exec(location.hash);
     return m ? { key: m[1], pos: m[2] == null ? 0 : +m[2] } : null;
   }
   function writeHash(pos) {
@@ -59,8 +62,8 @@
     var box = tpl.content.firstElementChild.cloneNode(true);
     box.setAttribute("aria-label", D.label + " 模擬重播；撳 ? 睇快捷鍵");
     host.appendChild(box);
-    nowEl.textContent = D.session + " 第 " + D.match + " 場第 " + D.round + " 局 · " + D.file
-      + " · " + D.winner + " 贏";
+    nowEl.textContent = D.title || (D.session + " 第 " + D.match + " 場第 " + D.round + " 局 · "
+      + D.file + " · " + D.winner + " 贏");
     idleEl.hidden = true;
     clear(notesEl);
     D.notes.forEach(function (n, i) {
