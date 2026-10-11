@@ -635,6 +635,20 @@ jobs:
       - name: Check the replay page audit catches its corruptions
         run: python3 -m pipeline.replay_page --selftest
 
+      # The Stray Cannon route pages render from a hand-checked transcription of the
+      # shiwehi.com page. Gate the transcription first (grammar, the cross-check against
+      # harddrop's field, internal consistency, the named source discrepancies), so
+      # build-docs --check never renders from an unchecked one; then the page audit's own
+      # mutants, as for the replay pages above.
+      - name: Check the Stray Cannon route transcription
+        run: python3 -m pipeline.openers.extract_meisou_routes
+
+      - name: Check the Stray Cannon route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_meisou_routes --selftest
+
+      - name: Check the Stray Cannon page audit catches its corruptions
+        run: python3 -m pipeline.stray_cannon_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

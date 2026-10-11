@@ -1,0 +1,1351 @@
+{
+  "schema": "meisou-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/meisou.php",
+    "title": "迷走砲(Stray Cannon)",
+    "updated": "2026-04-11",
+    "fetched": "2026-10-11",
+    "fetch_method": "mcp__Parallel_Search__web_fetch with full_content=true, which renders the page to markdown (a leading \"-\" on a board row comes back escaped as \"\\-\" and is unescaped). Plain curl through the proxy gets HTTP 403, so CI cannot refetch.",
+    "snapshot_file": "meisou.md",
+    "snapshot_sha256": "a224fb464f8c566fdcd7f28e7d794e15645897388a606fad110beac45f23a09e",
+    "snapshot_bytes": 10088,
+    "snapshot_note": "sha256 of the markdown snapshot this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; a renderer change alone will move the hash, so a moved hash means \"read the board diff\", not \"the page changed\".",
+    "decorative_images": [
+      "迷走砲(Stray Cannon)タイトル画像"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows listed top to bottom exactly as the page draws them; 10 columns, column 0 is the left wall. Heights differ between diagrams (some omit empty top rows), so every comparison aligns boards at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), drawn grey on the page",
+    "U": "the T-spin slot: where the T goes",
+    "Z": "OUR READING, no legend on the page: the bag-1 Z drawn in colour inside a bag-2 diagram",
+    "p": "placeholder: any filling (only in the STMB cave template)",
+    "%X": "the page's notation for the X piece; '%J>%O' means J comes before O"
+  },
+  "quotes": [
+    {
+      "id": "overview.max_damage",
+      "figure": "21ライン",
+      "verbatim": "最大TST→TSD→8段パフェで21ラインという高火力を狙うことができる。"
+    },
+    {
+      "id": "2.ideal.pc",
+      "figure": "14パターン：パフェ率97.94%",
+      "verbatim": "3巡目はTSDを打ちつつパフェを狙います。(14パターン：パフェ率97.94%)"
+    },
+    {
+      "id": "2.normal_OS.pc",
+      "figure": "TSDPC率18.10%,TSSPC率42.86%",
+      "verbatim": "3巡目はTSDを打ち、運が良ければパフェを狙うことができます。(TSDPC率18.10%,TSSPC率42.86%)"
+    },
+    {
+      "id": "2.i_early.pc",
+      "figure": "12パターン85.28%",
+      "verbatim": "3巡目はTSDを打ち、運が良ければパフェを狙うことができます。(12パターン85.28%)"
+    },
+    {
+      "id": "2.z_left.pc",
+      "figure": "9パターン：パフェ率84.25%",
+      "verbatim": "3巡目はTSDを打ちつつパフェを狙います。(9パターン：パフェ率84.25%)"
+    }
+  ],
+  "bag1": {
+    "requires_verbatim": "1巡目の組み方は上図の通りで、%Lが早い必要があります。",
+    "requires": {
+      "early": "L"
+    },
+    "hold_free_verbatim": "%J>%Z",
+    "hold_free": {
+      "before": [
+        "J",
+        "Z"
+      ]
+    },
+    "z_note_verbatim": "パフェ重視の場合は%Zをホールドしておきたいですが、拘らない場合には下図の位置に置いてしまって構いません。"
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.z_right",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "i------zz-",
+        "ils-t--jzz",
+        "ilsstt-joo",
+        "illst-jjoo"
+      ]
+    },
+    {
+      "id": "basic.2",
+      "same_as": "2.ideal",
+      "rows": [
+        "----------",
+        "------ooji",
+        "s--z--ooji",
+        "sszz---jji",
+        "cszlllUcci",
+        "ccclcUUccc",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "basic.3",
+      "same_as": "2.ideal.pc#3",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "jjjslliiii",
+        "zzjsslcccc",
+        "czzcslcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ]
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.ideal.pc",
+      "parent": "2.ideal",
+      "heading": "3巡目 - パフェ狙い",
+      "stated_pattern_count": 14,
+      "shown": 6,
+      "rest_stated": 10,
+      "complete": true,
+      "after_pc_verbatim": "8段パフェを取った後はDPCや3回目パフェを狙うことができます。",
+      "drawn": 16
+    },
+    {
+      "id": "2.normal_OS.pc",
+      "parent": "2.normal_OS",
+      "heading": "3巡目 TSD→パフェ",
+      "stated_pattern_count": null,
+      "shown": 2,
+      "rest_stated": 0,
+      "complete": false,
+      "list_note_verbatim": "等",
+      "drawn": 2
+    },
+    {
+      "id": "2.i_early.pc",
+      "parent": "2.i_early",
+      "heading": "3巡目 TSD→パフェ",
+      "stated_pattern_count": 12,
+      "shown": 5,
+      "rest_stated": 7,
+      "complete": true,
+      "after_pc_verbatim": "8段パフェを取った後はDPCや3回目パフェを狙うことができます。",
+      "drawn": 12
+    },
+    {
+      "id": "2.z_left.pc",
+      "parent": "2.z_left",
+      "heading": "3巡目 TSD→パフェ",
+      "stated_pattern_count": 9,
+      "shown": 3,
+      "rest_stated": 6,
+      "complete": true,
+      "after_pc_verbatim": "8段パフェを取った後はDPCや3回目パフェを狙うことができます。",
+      "drawn": 9
+    }
+  ],
+  "known_discrepancies": [
+    {
+      "id": "2.ideal.pc:stated_vs_drawn",
+      "what": "the page states 14 patterns and draws 16 (6 shown + 残り10); all 16 are kept"
+    },
+    {
+      "id": "2.normal_OS.pc:non_exhaustive",
+      "what": "the O>S PC list ends in 「等」 and states no pattern count; its 2 diagrams are examples, so a PC off this list is not off the page's route"
+    }
+  ],
+  "page_order": [
+    "basic.1",
+    "basic.2",
+    "basic.3",
+    "bag1.z_hold",
+    "bag1.z_right",
+    "2.ideal",
+    "2.ideal.pc#1",
+    "2.ideal.pc#2",
+    "2.ideal.pc#3",
+    "2.ideal.pc#4",
+    "2.ideal.pc#5",
+    "2.ideal.pc#6",
+    "2.ideal.pc#7",
+    "2.ideal.pc#8",
+    "2.ideal.pc#9",
+    "2.ideal.pc#10",
+    "2.ideal.pc#11",
+    "2.ideal.pc#12",
+    "2.ideal.pc#13",
+    "2.ideal.pc#14",
+    "2.ideal.pc#15",
+    "2.ideal.pc#16",
+    "2.ideal.fire.stmb_template",
+    "2.ideal.fire.stmb_example",
+    "2.normal_OS",
+    "2.normal_OS.pc#1",
+    "2.normal_OS.pc#2",
+    "2.normal_OS.tst_donate",
+    "2.normal_OS.tst_donate.after",
+    "2.normal_SO",
+    "2.normal_SO.stsd",
+    "2.i_early",
+    "2.i_early.pc#1",
+    "2.i_early.pc#2",
+    "2.i_early.pc#3",
+    "2.i_early.pc#4",
+    "2.i_early.pc#5",
+    "2.i_early.pc#6",
+    "2.i_early.pc#7",
+    "2.i_early.pc#8",
+    "2.i_early.pc#9",
+    "2.i_early.pc#10",
+    "2.i_early.pc#11",
+    "2.i_early.pc#12",
+    "2.z_left",
+    "2.z_left.pc#1",
+    "2.z_left.pc#2",
+    "2.z_left.pc#3",
+    "2.z_left.pc#4",
+    "2.z_left.pc#5",
+    "2.z_left.pc#6",
+    "2.z_left.pc#7",
+    "2.z_left.pc#8",
+    "2.z_left.pc#9"
+  ],
+  "nodes": [
+    {
+      "id": "overview.derivation_map",
+      "bag": 0,
+      "parent": null,
+      "node_kind": "image_only",
+      "label_jp": "迷走砲の派生概要図",
+      "page_text": "迷走砲の派生概要図",
+      "note": "the derivation overview diagram (image)"
+    },
+    {
+      "id": "overview.video",
+      "bag": 0,
+      "parent": null,
+      "node_kind": "image_only",
+      "label_jp": "解説動画",
+      "page_text": "解説動画",
+      "note": "an embedded explanation video by くいものくれ"
+    },
+    {
+      "id": "bag1.z_hold",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目 (%Zホールド)",
+      "label": "bag 1, Z not placed (the page's hold variant)",
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "ils-t--j--",
+        "ilsstt-joo",
+        "illst-jjoo"
+      ]
+    },
+    {
+      "id": "bag1.z_right",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "label_jp": "1巡目 (%Z右置き)",
+      "label": "bag 1, Z placed on the right",
+      "rows": [
+        "----------",
+        "----------",
+        "i------zz-",
+        "ils-t--jzz",
+        "ilsstt-joo",
+        "illst-jjoo"
+      ]
+    },
+    {
+      "id": "bag1.z_left",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "derived": true,
+      "derived_from": "2.z_left",
+      "derivation": "bag1.z_hold plus the four upper-case Z cells of the 2.z_left board; the page draws this bag-1 shape only inside its bag-2 diagram",
+      "label_jp": "1巡目 (%Z左置き)",
+      "label": "bag 1, Z placed on the left (derived)",
+      "rows": [
+        "----------",
+        "zz--------",
+        "izz-------",
+        "ils-t--j--",
+        "ilsstt-joo",
+        "illst-jjoo"
+      ]
+    },
+    {
+      "id": "2.ideal",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.z_right",
+      "spin": "TST",
+      "label_jp": "理想形",
+      "label": "ideal",
+      "condition_verbatim": "%J>%Oの場合に組むことができます。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "J",
+              "O"
+            ]
+          }
+        ]
+      },
+      "rows": [
+        "----------",
+        "------ooji",
+        "s--z--ooji",
+        "sszz---jji",
+        "cszlllUcci",
+        "ccclcUUccc",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.ideal.l_rotate_in",
+      "bag": 2,
+      "parent": "2.ideal",
+      "node_kind": "image_only",
+      "label_jp": "迷走砲のJミノの回転入れ",
+      "page_text": "迷走砲のJミノの回転入れ",
+      "note": "image; the text says the bag-2 %L can be rotated in after Z (左回転) while the image caption says Jミノ"
+    },
+    {
+      "id": "2.ideal.ren4",
+      "bag": 3,
+      "parent": "2.ideal",
+      "node_kind": "text_only",
+      "label_jp": "中開け4列REN",
+      "page_text": "中開け4列RENにも派生できます",
+      "text_verbatim": "TST→TSD→8段パフェが理想ルートで、中開け4列RENにも派生できます。",
+      "note": "the page derives it in one sentence and draws no diagram"
+    },
+    {
+      "id": "2.ideal.fire",
+      "bag": 3,
+      "parent": "2.ideal",
+      "node_kind": "image_only",
+      "label_jp": "3巡目 - 火力派生 5巡パフェ狙い",
+      "page_text": "TDパフェ系テンプレ TSDからの5巡パフェ派生",
+      "text_verbatim": "%Tが遅い等でパフェを取らない場合等には、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。",
+      "note": "the 5-bag PC shape exists only as an image (TDパフェ系テンプレ TSDからの5巡パフェ派生)"
+    },
+    {
+      "id": "2.ideal.fire.stmb_template",
+      "bag": 3,
+      "parent": "2.ideal.fire",
+      "base": "2.ideal",
+      "label_jp": "STMB cave の形",
+      "unmatchable": "placeholder cells (p): any filling is allowed",
+      "rows": [
+        "----------",
+        "----------",
+        "ppp---iiii",
+        "ppp---cccc",
+        "cppc--cccc",
+        "cccc---ccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.ideal.fire.stmb_example",
+      "bag": 3,
+      "parent": "2.ideal.fire",
+      "base": "2.ideal",
+      "label_jp": "STMB cave の形 (例)",
+      "unmatchable": "例: one arbitrary filling of the template's placeholder cells, so a match would be a match to one illustration, not to the route (drawn 9 rows high, 8 under an empty top row)",
+      "rows": [
+        "----------",
+        "jjz-------",
+        "jzz-------",
+        "jz---ss---",
+        "lll-ssiiii",
+        "loo---cccc",
+        "cooc--cccc",
+        "cccc---ccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.normal_OS",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.z_right",
+      "spin": "TST",
+      "label_jp": "通常形 %O>%S",
+      "label": "normal, O before S",
+      "condition_verbatim": "%O>%Jの場合には、%Oと%Sの順番によって下図の2パターンで組み分けることができます。 / %O>%Sの場合",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "J"
+            ]
+          },
+          {
+            "before": [
+              "O",
+              "S"
+            ]
+          }
+        ]
+      },
+      "rows": [
+        "-jj-------",
+        "-js------i",
+        "-jss--zz-i",
+        "-oos---zzi",
+        "coolllUcci",
+        "ccclcUUccc",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.normal_OS.tst_donate",
+      "bag": 3,
+      "parent": "2.normal_OS",
+      "base": "2.normal_OS",
+      "label_jp": "TSTドネイト",
+      "label": "TST donate (no PC), before",
+      "text_verbatim": "もし%Tが遅い等でパフェを狙わない場合には、下記の様に組んでTSTドネイトを打って火力を継続することができます。",
+      "rows": [
+        "----------",
+        "-oo-----ll",
+        "-ooj-----l",
+        "iccjjjssUl",
+        "icczzssUUc",
+        "iccczzccUc",
+        "iccc---ccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.normal_OS.tst_donate.after",
+      "bag": 3,
+      "parent": "2.normal_OS.tst_donate",
+      "base": "2.normal_OS.tst_donate",
+      "label_jp": "TSTドネイト → 後",
+      "label": "TST donate, after",
+      "rows": [
+        "----------",
+        "--------ll",
+        "ioo-----zl",
+        "ioos---zzl",
+        "iccss-jzcc",
+        "icccs-jjjc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ]
+    },
+    {
+      "id": "2.normal_SO",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.z_right",
+      "spin": "TST",
+      "label_jp": "通常形 %S>%O",
+      "label": "normal, S before O",
+      "condition_verbatim": "%O>%Jの場合には、%Oと%Sの順番によって下図の2パターンで組み分けることができます。 / %S>%Oの場合",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "J"
+            ]
+          },
+          {
+            "before": [
+              "S",
+              "O"
+            ]
+          }
+        ]
+      },
+      "rows": [
+        "----------",
+        "-joo-----i",
+        "-joo--zz-i",
+        "jjss---zzi",
+        "csslllUZZi",
+        "ccclcUUcZZ",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.normal_SO.stsd",
+      "bag": 3,
+      "parent": "2.normal_SO",
+      "base": "2.normal_SO",
+      "label_jp": "STSD (パフェ無し)",
+      "text_verbatim": "上図の形のようにTST→TSDからSTSDの形を組むことができます。(パフェ無し)",
+      "rows": [
+        "----------",
+        "---jj---s-",
+        "iooj----ss",
+        "iooj-zzlls",
+        "iccc--zzlc",
+        "iccc--cclc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ]
+    },
+    {
+      "id": "2.i_early",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.z_right",
+      "spin": "TST",
+      "label_jp": "別パターン 2巡目%I早",
+      "label": "I early in bag 2",
+      "condition_verbatim": "2巡目に%Iが早い場合、上図のように組むこともできます。",
+      "condition": {
+        "early": "I",
+        "note": "the page gives no position threshold for \"early\""
+      },
+      "rows": [
+        "--------jj",
+        "--s-----ji",
+        "--ss--zzji",
+        "-oos---zzi",
+        "coolllUcci",
+        "ccclcUUccc",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.z_left",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.z_left",
+      "spin": "TST",
+      "label_jp": "別パターン 1巡目%z左置き",
+      "label": "bag-1 Z placed on the left",
+      "condition_verbatim": "%Zの置き場所が違うので使用頻度は低いですが、パフェ率を高めたい場合には覚えておくと良いでしょう。",
+      "condition": {
+        "bag1": "bag1.z_left"
+      },
+      "rows": [
+        "--z-------",
+        "-zz-------",
+        "-zoo--jjji",
+        "ZZoo---sji",
+        "cZZlllUssi",
+        "ccclcUUcsi",
+        "ccccccUccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "2.ideal.pc#1",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 1",
+      "rows": [
+        "----------",
+        "jjjllliiii",
+        "zzjloocccc",
+        "czzcoocccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#2",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 2",
+      "rows": [
+        "----------",
+        "llljjjiiii",
+        "loozzjcccc",
+        "cooczzcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#3",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 3",
+      "rows": [
+        "----------",
+        "jjjslliiii",
+        "zzjsslcccc",
+        "czzcslcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#4",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 4",
+      "rows": [
+        "----------",
+        "slloojiiii",
+        "ssloojcccc",
+        "cslcjjcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#5",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 5",
+      "rows": [
+        "----------",
+        "oojslliiii",
+        "oojsslcccc",
+        "cjjcslcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#6",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 6,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 6",
+      "rows": [
+        "----------",
+        "slljjjiiii",
+        "sslzzjcccc",
+        "cslczzcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#7",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 7",
+      "rows": [
+        "----------",
+        "oosslliiii",
+        "oojjjlcccc",
+        "csscjlcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#8",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 8",
+      "rows": [
+        "----------",
+        "zzljooiiii",
+        "llljjjcccc",
+        "czzcoocccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#9",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 9",
+      "rows": [
+        "----------",
+        "slljooiiii",
+        "ssljjjcccc",
+        "cslcoocccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#10",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 10",
+      "rows": [
+        "----------",
+        "oojslliiii",
+        "oojsslcccc",
+        "cjjczzcccc",
+        "ccccszzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#11",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 11",
+      "rows": [
+        "----------",
+        "oojjjziiii",
+        "oosszzcccc",
+        "cssczUcccc",
+        "ccccjUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#12",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 12",
+      "rows": [
+        "----------",
+        "llljjjiiii",
+        "lootttcccc",
+        "cooczzcccc",
+        "cccctzzccc",
+        "cccccjcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#13",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 13,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 13",
+      "rows": [
+        "----------",
+        "slljjjiiii",
+        "ssltttcccc",
+        "cslczzcccc",
+        "cccctzzccc",
+        "cccccjcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#14",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 14,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 14",
+      "rows": [
+        "----------",
+        "sllootiiii",
+        "ssloozcccc",
+        "cslczzcccc",
+        "cccczttccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#15",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 15,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 15",
+      "rows": [
+        "----------",
+        "oojjjtiiii",
+        "oossjzcccc",
+        "cssczzcccc",
+        "cccczttccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#16",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal",
+      "list": "2.ideal.pc",
+      "index": 16,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 16",
+      "rows": [
+        "----------",
+        "oossltiiii",
+        "oolllzcccc",
+        "czzczzcccc",
+        "cccczttccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.normal_OS.pc#1",
+      "bag": 3,
+      "parent": "2.normal_OS",
+      "base": "2.normal_OS",
+      "list": "2.normal_OS.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 1",
+      "rows": [
+        "iccslloojj",
+        "iccssloojc",
+        "icccslccjc",
+        "icccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.normal_OS.pc#2",
+      "bag": 3,
+      "parent": "2.normal_OS",
+      "base": "2.normal_OS",
+      "list": "2.normal_OS.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 2",
+      "rows": [
+        "icczzloojj",
+        "iccllloojc",
+        "iccczzccjc",
+        "icccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.i_early.pc#1",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 1",
+      "rows": [
+        "----------",
+        "ijjslloocc",
+        "ijcssloocc",
+        "ijccslcccc",
+        "icccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.i_early.pc#2",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 2",
+      "rows": [
+        "----------",
+        "ijjzzloocc",
+        "ijcllloocc",
+        "ijcczzcccc",
+        "icccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.i_early.pc#3",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 3",
+      "rows": [
+        "----------",
+        "ijjoosslcc",
+        "ijcoolllcc",
+        "ijccsscccc",
+        "icccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.i_early.pc#4",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 4",
+      "rows": [
+        "----------",
+        "llloojjjcc",
+        "lzcoossjcc",
+        "zzccsscccc",
+        "zcccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.i_early.pc#5",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 5",
+      "rows": [
+        "----------",
+        "lllzzjjjcc",
+        "oociiiijcc",
+        "oocczzcccc",
+        "lccctttccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#6",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 6",
+      "rows": [
+        "----------",
+        "ijjootttcc",
+        "ijcoolllcc",
+        "ijccslcccc",
+        "icccsstccc",
+        "cccccscccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#7",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 7",
+      "rows": [
+        "----------",
+        "ijjslloocc",
+        "ijcssloocc",
+        "ijcczzcccc",
+        "icccszzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#8",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 8",
+      "rows": [
+        "----------",
+        "ijjoolllcc",
+        "ijcoozsscc",
+        "ijcczzcccc",
+        "iccczssccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#9",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 9",
+      "rows": [
+        "----------",
+        "ijjstttlcc",
+        "ijcsslllcc",
+        "ijcczzcccc",
+        "icccszzccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#10",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 10",
+      "rows": [
+        "----------",
+        "ijjstttzcc",
+        "ijcsstzzcc",
+        "ijccllcccc",
+        "icccslzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#11",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 11",
+      "rows": [
+        "----------",
+        "jjjiiiizcc",
+        "oocjjjzzcc",
+        "ooccsjcccc",
+        "lcccsszccc",
+        "cccccscccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.i_early.pc#12",
+      "bag": 3,
+      "parent": "2.i_early",
+      "base": "2.i_early",
+      "list": "2.i_early.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 12",
+      "rows": [
+        "----------",
+        "lllstttzcc",
+        "oocssjzzcc",
+        "ooccsjcccc",
+        "lcccjjzccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#1",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 1",
+      "rows": [
+        "----------",
+        "jjciiiiloo",
+        "jcczzllloo",
+        "jccczzcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.z_left.pc#2",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 2",
+      "rows": [
+        "----------",
+        "jjcooiiiil",
+        "jccoosslll",
+        "jcccsscccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.z_left.pc#3",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 TSD→パフェ 3",
+      "rows": [
+        "----------",
+        "jjcsiiiioo",
+        "jccssllloo",
+        "jcccslcccc",
+        "ccccUUUccc",
+        "cccccUcccc"
+      ],
+      "has_u_slot": true,
+      "has_tsd_slot": true
+    },
+    {
+      "id": "2.z_left.pc#4",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 4,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 4",
+      "rows": [
+        "----------",
+        "jjciiiizoo",
+        "jcctttzzoo",
+        "jcccllcccc",
+        "cccctlzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#5",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 5,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 5",
+      "rows": [
+        "----------",
+        "jjcsiiiioo",
+        "jccsstttoo",
+        "jcccllcccc",
+        "ccccsltccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#6",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 6",
+      "rows": [
+        "----------",
+        "jjcslllzoo",
+        "jccssizzoo",
+        "jccclicccc",
+        "ccccsizccc",
+        "cccccicccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#7",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 7",
+      "rows": [
+        "----------",
+        "jjcstttloo",
+        "jccssllloo",
+        "jccczzcccc",
+        "ccccszzccc",
+        "ccccctcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#8",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 8",
+      "rows": [
+        "----------",
+        "jjcstttzoo",
+        "jccsstzzoo",
+        "jcccllcccc",
+        "ccccslzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    },
+    {
+      "id": "2.z_left.pc#9",
+      "bag": 3,
+      "parent": "2.z_left",
+      "base": "2.z_left",
+      "list": "2.z_left.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "3巡目 TSD→パフェ 9",
+      "rows": [
+        "----------",
+        "jjcsiiiioo",
+        "jccssllloo",
+        "jccczzcccc",
+        "ccccszzccc",
+        "ccccclcccc"
+      ],
+      "has_u_slot": false,
+      "has_tsd_slot": false
+    }
+  ]
+}

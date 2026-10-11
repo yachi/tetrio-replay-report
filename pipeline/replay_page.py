@@ -327,20 +327,27 @@ def render(data, facts, report_href):
 
 # ---------------------------------------------------------------- the audit
 
-def audit(page):
-    """Every reason `page` breaks the quarantine or the single-file rule; empty means clean."""
+def audit_quarantine(page, required, island_id):
+    """The quarantine and single-file rules any simulator page obeys: no badge, every sentence in
+    `required`, no markup sink, no external request, exactly one data island `island_id`."""
     bad = []
     if BADGE.search(page):
         bad.append("the page carries a claim badge — simulator boards must not be badged")
-    for s in PAGE_REQUIRED:
+    for s in required:
         if s not in page:
             bad.append(f"a quarantine sentence is gone: {s[:40]!r}…")
     if MARKUP_SINK.search(page):
         bad.append("the page assigns markup (innerHTML or similar) — build nodes instead")
     if EXTERNAL.search(page):
         bad.append("the page makes an external request — it must be one self-contained file")
-    if page.count(f'id="{PAGE_DATA_ID}"') != 1:
+    if page.count(f'id="{island_id}"') != 1:
         bad.append("the page must inline exactly one data island")
+    return bad
+
+
+def audit_player(page):
+    """The rules a page embedding the shared player obeys about history writes."""
+    bad = []
     # The player calls onChange on every animation frame while playing; a history write there
     # passes WebKit's ~100-calls rate limit within seconds at 4x and the throw kills the rAF
     # loop. So the player must report `playing`, and the page may write the hash only without it.
@@ -352,6 +359,18 @@ def audit(page):
     if not calls or any(g != "if (!playing) " for g in calls):
         bad.append("the page writes the hash while playing — history writes must wait for pause")
     return bad
+
+
+def audit_chart(page):
+    """The 射埋 chart's two sentences: its title, and that it is replay data, not simulator output."""
+    return [f"a quarantine sentence is gone: {s[:40]!r}…"
+            for s in (CHART_TITLE, CHART_SOURCE) if s not in page]
+
+
+def audit(page):
+    """Every reason `page` breaks the quarantine or the single-file rule; empty means clean."""
+    return (audit_quarantine(page, RS.REQUIRED, PAGE_DATA_ID)
+            + audit_player(page) + audit_chart(page))
 
 
 def _selftest():

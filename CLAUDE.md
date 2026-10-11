@@ -206,6 +206,13 @@ bun test pipeline/sim/replay.test.ts                           #   its round tri
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
+python3 -m pipeline.openers.extract_meisou_routes            # CI gate: the 迷走砲 route transcription
+python3 -m pipeline.openers.extract_meisou_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-stray-cannon-facts.ts \
+  --out analysis/stray-cannon-facts.json                        # which corpus round reached which route node (quarantined)
+bun test pipeline/openers/stray-cannon.test.ts                 #   byte rebuild + named lists + mutants
+python3 -m pipeline.stray_cannon_page --selftest # the docs/stray-cannon*.html audit's mutants
+python3 -m pipeline.stray_cannon_page --out-dir <dir>  #   render the pages somewhere other than docs/
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3049,6 +3056,55 @@ The engine hooks the emitter needs are **opt-in**. `createEngine`'s `date` defau
 as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json` re-emits
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
+
+## 迷走砲 全路線 — the Stray Cannon route pages, quarantined like the replays
+
+shiwehi.com's 迷走砲 page draws a tree: bag 1, five bag-2 branches, and the bag-3 Perfect Clear
+and T-spin patterns under each. These pages match every corpus round against that tree and say how
+deep it got. **Simulator output, quarantined exactly like 重播**: which bag-2 and bag-3 shape was
+built comes from one engine, so the artefact says `report_eligible: false` and no page carries a
+claim id, a ✓ or a `data-claim`. Counts only, always 「N / M」 with the denominator; the source
+page's own percentages appear only inside quoted source text.
+
+| piece | where |
+|---|---|
+| route transcription | `pipeline/openers/meisou-routes.json`, hand-checked and held as a literal in `pipeline/openers/extract_meisou_routes.py`, which gates it (grammar, `bag1.z_hold` against harddrop's `stray_cannon` field, parent/child consistency, distinctness, the named source discrepancies). The page HTML is never committed — CI cannot fetch it — so provenance carries the fetch date, a hash of the fetched markdown and the site's terms (non-commercial use allowed with a URL credit; the source link in every page header is that credit) |
+| artefact | `pipeline/sim/emit-stray-cannon-facts.ts` → `analysis/stray-cannon-facts.json`, corpus-wide like `rate-records.json`; it records md5s of every session's replays, the routes file and itself, so it goes stale loudly |
+| test | `pipeline/openers/stray-cannon.test.ts` — byte rebuild, the `matched_at_6` flag against each (session, player)'s `opener-facts.json` `stray_cannon.exact`, the named lists, and the emitter's mutants |
+| pages | `pipeline/stray_cannon_page.py` + `stray_cannon_page.js` + `stray_cannon_prose.json` → `docs/stray-cannon.html` (every node, every count, the case index; no player) and one replay page per bag-2 node, `docs/stray-cannon-<node>.html`. Rendered by `bin/build-docs`, so `--check` byte-compares them and a `docs/stray-cannon*.html` nothing renders is drift. No name ends in `-replay.html`, which `bin/build-docs` owns |
+| audit | reuses `replay_page.audit_quarantine` / `audit_player` (one copy of each rule), plus completeness: every route node appears with a count or a reason it has none, every case is embedded once and indexed once; `--selftest` plants the corruptions |
+
+The named lists in the test are `Z_HOLD_BAG1`, `Z_PLACED_ELSEWHERE_BAG1`, `Z_LEFT_BAG1`,
+`I_EARLY_CASES`, `TST_DONATE_CASES`, `PC_OFF_PAGE`, `MULTI_COLOUR_RESOLVED_BY_BRANCH`, and the
+measured-empty `BAG2_HANDEDNESS_MISMATCH`, `COLOUR_DISAGREE` and `PC_GARBAGE_IN_WINDOW`. Each is a
+named exception list, not a bound, following `DT_ORDER_IN_OPENER`: a new entry is a red build to
+investigate. Their sizes are read off the test, never typed here.
+
+Four rules the code depends on, each of which an obvious simplification would break:
+
+* **Bag 1 tries the placed variants first.** The 7-lock boards (`z_right`, then `z_left`, as drawn
+  or mirrored) are compared before the 6-lock `z_hold` field, because most rounds that match
+  z_right at 7 locks also matched the 6-lock field. Trying z_hold first swallows them.
+* **「Matched at 6 locks」 is a FLAG, not a node.** It is what the 六個具名定式 table's Stray Cannon
+  column counts, and the test compares it with that column per (session, player). A 6-lock match
+  says nothing about whether Z was held, which is why this page's bag-1 total and that table's
+  differ, and the overview says so.
+* **A hold is asserted only where the predicate tests one.** After a 6-lock-only match the emitter
+  reads the piece placed 7th and compares it with the mirror-aware bag-1 Z (S when mirrored). Not Z
+  → `bag1.z_hold`; Z → the outcome `bag1.z_placed_elsewhere`. The first version called every
+  6-lock-only round a hold and never tested it; re-reading those rounds' placement order showed
+  some of them placed Z 7th. That is 冇第二份's sixth instance (prose saying more than the spec
+  proves), and the page audit enforces it: 「hold」 may appear only in the z_hold row and the bag-1
+  sentence.
+* **Bag-3 PC detection does not wait for a bag-2 match**, and is scoped to the matched branch's
+  patterns before it throws on an ambiguous colour match. A PC under an unmatched bag 2 is recorded
+  under `bag1.<node>.other`; gating it on bag 2 drops a real off-page PC from `PC_OFF_PAGE`, and an
+  unscoped throw fails on the round in `MULTI_COLOUR_RESOLVED_BY_BRANCH`. A case's `match` is the
+  replay-facts POSITION, never a filename-sort index.
+
+A mirrored round is read with J↔L and S↔Z swapped before the page's bag-2 condition is tested.
+Upper-case `Z` read as the bag-1 Z, and the derived bag-1 `z_left` board (the page draws it only
+inside its bag-2 board), are this repo's readings, and the pages say so.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
