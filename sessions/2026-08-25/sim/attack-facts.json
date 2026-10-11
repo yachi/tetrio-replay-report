@@ -1,0 +1,649 @@
+{
+ "schema": "attack-facts/1",
+ "session": "2026-08-25",
+ "report_eligible": false,
+ "source": "vendored Triangle engine (pipeline/sim/vendor/teto), res.rawGarbage per lock — attack before cancellation",
+ "window_pieces": 21,
+ "classes": [
+  {
+   "key": "S",
+   "replay_counter": "singles",
+   "base": 0
+  },
+  {
+   "key": "D",
+   "replay_counter": "doubles",
+   "base": 1
+  },
+  {
+   "key": "T",
+   "replay_counter": "triples",
+   "base": 2
+  },
+  {
+   "key": "Q",
+   "replay_counter": "quads",
+   "base": 4
+  },
+  {
+   "key": "TSS",
+   "replay_counter": "tspinsingles",
+   "base": 2
+  },
+  {
+   "key": "TSD",
+   "replay_counter": "tspindoubles",
+   "base": 4
+  },
+  {
+   "key": "TST",
+   "replay_counter": "tspintriples",
+   "base": 6
+  },
+  {
+   "key": "mTSS",
+   "replay_counter": "minitspinsingles",
+   "base": 0
+  },
+  {
+   "key": "mTSD",
+   "replay_counter": "minitspindoubles",
+   "base": 1
+  }
+ ],
+ "denominators": "pieces = results.stats.piecesplaced (the replay's, never the engine lock count); opener pieces = min(pieces, window_pieces) per round, mid = the rest; players[].attack is the replay's garbage.attack, windows[].attack is the engine's and differs from it only in anchor.attack.exceptions",
+ "components_mean": "base = TETR.IO table value; b2b = integer back-to-back level; combo = the combo multiplier's addition; allclear = the Perfect Clear's own garbage entry; residual = engine attack beyond that integer model (garbage multiplier past garbagemargin, fractional b2b level). The five sum to the engine attack exactly.",
+ "not_eligible_because": [
+  "attack per clear and its component split come from one engine with no second implementation"
+ ],
+ "anchor": {
+  "attack": {
+   "rounds": 146,
+   "agree": 146,
+   "exceptions": []
+  },
+  "counts": {
+   "rounds": 146,
+   "agree": 145,
+   "unknown": 0,
+   "exceptions": [
+    {
+     "file": "replay-2026-08-25-05.ttrm",
+     "round": 5,
+     "user": "yachi",
+     "engine_vs_replay": {
+      "S": [
+       8,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "engine_locks_past_game_end": []
+ },
+ "players": [
+  {
+   "user": "pinglamb",
+   "rounds": 73,
+   "pieces": 7977,
+   "attack": 5152,
+   "lines": 4552,
+   "windows": {
+    "opener": {
+     "pieces": 1532,
+     "attack": 945,
+     "lines": 466,
+     "classes": {
+      "S": {
+       "n": 46,
+       "attack": 37
+      },
+      "D": {
+       "n": 15,
+       "attack": 65
+      },
+      "T": {
+       "n": 5,
+       "attack": 40
+      },
+      "Q": {
+       "n": 9,
+       "attack": 47
+      },
+      "TSS": {
+       "n": 3,
+       "attack": 8
+      },
+      "TSD": {
+       "n": 60,
+       "attack": 310
+      },
+      "TST": {
+       "n": 72,
+       "attack": 438
+      },
+      "mTSS": {
+       "n": 0,
+       "attack": 0
+      },
+      "mTSD": {
+       "n": 0,
+       "attack": 0
+      }
+     },
+     "components": {
+      "base": 739,
+      "b2b": 67,
+      "combo": 28,
+      "allclear": 110,
+      "residual": 1
+     }
+    },
+    "mid": {
+     "pieces": 6445,
+     "attack": 4207,
+     "lines": 4086,
+     "classes": {
+      "S": {
+       "n": 851,
+       "attack": 185
+      },
+      "D": {
+       "n": 397,
+       "attack": 414
+      },
+      "T": {
+       "n": 121,
+       "attack": 252
+      },
+      "Q": {
+       "n": 324,
+       "attack": 1596
+      },
+      "TSS": {
+       "n": 32,
+       "attack": 74
+      },
+      "TSD": {
+       "n": 356,
+       "attack": 1650
+      },
+      "TST": {
+       "n": 2,
+       "attack": 13
+      },
+      "mTSS": {
+       "n": 32,
+       "attack": 23
+      },
+      "mTSD": {
+       "n": 0,
+       "attack": 0
+      }
+     },
+     "components": {
+      "base": 3435,
+      "b2b": 379,
+      "combo": 364,
+      "allclear": 10,
+      "residual": 19
+     }
+    }
+   }
+  },
+  {
+   "user": "yachi",
+   "rounds": 73,
+   "pieces": 8622,
+   "attack": 4976,
+   "lines": 4934,
+   "windows": {
+    "opener": {
+     "pieces": 1533,
+     "attack": 750,
+     "lines": 465,
+     "classes": {
+      "S": {
+       "n": 70,
+       "attack": 16
+      },
+      "D": {
+       "n": 32,
+       "attack": 82
+      },
+      "T": {
+       "n": 10,
+       "attack": 31
+      },
+      "Q": {
+       "n": 11,
+       "attack": 51
+      },
+      "TSS": {
+       "n": 10,
+       "attack": 27
+      },
+      "TSD": {
+       "n": 59,
+       "attack": 283
+      },
+      "TST": {
+       "n": 43,
+       "attack": 260
+      },
+      "mTSS": {
+       "n": 0,
+       "attack": 0
+      },
+      "mTSD": {
+       "n": 0,
+       "attack": 0
+      }
+     },
+     "components": {
+      "base": 610,
+      "b2b": 48,
+      "combo": 22,
+      "allclear": 70,
+      "residual": 0
+     }
+    },
+    "mid": {
+     "pieces": 7089,
+     "attack": 4226,
+     "lines": 4468,
+     "classes": {
+      "S": {
+       "n": 895,
+       "attack": 155
+      },
+      "D": {
+       "n": 424,
+       "attack": 427
+      },
+      "T": {
+       "n": 132,
+       "attack": 275
+      },
+      "Q": {
+       "n": 445,
+       "attack": 2117
+      },
+      "TSS": {
+       "n": 52,
+       "attack": 118
+      },
+      "TSD": {
+       "n": 239,
+       "attack": 1105
+      },
+      "TST": {
+       "n": 3,
+       "attack": 20
+      },
+      "mTSS": {
+       "n": 10,
+       "attack": 9
+      },
+      "mTSD": {
+       "n": 0,
+       "attack": 0
+      }
+     },
+     "components": {
+      "base": 3546,
+      "b2b": 345,
+      "combo": 326,
+      "allclear": 0,
+      "residual": 9
+     }
+    }
+   }
+  }
+ ],
+ "per_match": [
+  {
+   "file": "replay-2026-08-25-01.ttrm",
+   "user": "pinglamb",
+   "pieces": 785,
+   "attack": 495,
+   "opener_pieces": 189,
+   "opener_attack": 101,
+   "n": {
+    "S": 79,
+    "D": 37,
+    "T": 10,
+    "Q": 34,
+    "TSS": 3,
+    "TSD": 40,
+    "TST": 9,
+    "mTSS": 4,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-01.ttrm",
+   "user": "yachi",
+   "pieces": 852,
+   "attack": 487,
+   "opener_pieces": 189,
+   "opener_attack": 77,
+   "n": {
+    "S": 75,
+    "D": 43,
+    "T": 12,
+    "Q": 44,
+    "TSS": 4,
+    "TSD": 36,
+    "TST": 3,
+    "mTSS": 1,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-02.ttrm",
+   "user": "pinglamb",
+   "pieces": 717,
+   "attack": 518,
+   "opener_pieces": 168,
+   "opener_attack": 104,
+   "n": {
+    "S": 56,
+    "D": 31,
+    "T": 8,
+    "Q": 32,
+    "TSS": 0,
+    "TSD": 47,
+    "TST": 8,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-02.ttrm",
+   "user": "yachi",
+   "pieces": 794,
+   "attack": 470,
+   "opener_pieces": 168,
+   "opener_attack": 60,
+   "n": {
+    "S": 83,
+    "D": 31,
+    "T": 15,
+    "Q": 45,
+    "TSS": 5,
+    "TSD": 31,
+    "TST": 3,
+    "mTSS": 1,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-03.ttrm",
+   "user": "pinglamb",
+   "pieces": 904,
+   "attack": 567,
+   "opener_pieces": 147,
+   "opener_attack": 113,
+   "n": {
+    "S": 97,
+    "D": 53,
+    "T": 13,
+    "Q": 37,
+    "TSS": 7,
+    "TSD": 41,
+    "TST": 8,
+    "mTSS": 1,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-03.ttrm",
+   "user": "yachi",
+   "pieces": 992,
+   "attack": 575,
+   "opener_pieces": 147,
+   "opener_attack": 97,
+   "n": {
+    "S": 120,
+    "D": 50,
+    "T": 21,
+    "Q": 53,
+    "TSS": 4,
+    "TSD": 33,
+    "TST": 5,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-04.ttrm",
+   "user": "pinglamb",
+   "pieces": 706,
+   "attack": 448,
+   "opener_pieces": 146,
+   "opener_attack": 101,
+   "n": {
+    "S": 108,
+    "D": 44,
+    "T": 7,
+    "Q": 25,
+    "TSS": 6,
+    "TSD": 35,
+    "TST": 6,
+    "mTSS": 5,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-04.ttrm",
+   "user": "yachi",
+   "pieces": 740,
+   "attack": 404,
+   "opener_pieces": 147,
+   "opener_attack": 47,
+   "n": {
+    "S": 88,
+    "D": 49,
+    "T": 10,
+    "Q": 30,
+    "TSS": 6,
+    "TSD": 29,
+    "TST": 3,
+    "mTSS": 0,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-05.ttrm",
+   "user": "pinglamb",
+   "pieces": 1007,
+   "attack": 628,
+   "opener_pieces": 189,
+   "opener_attack": 100,
+   "n": {
+    "S": 123,
+    "D": 54,
+    "T": 29,
+    "Q": 33,
+    "TSS": 1,
+    "TSD": 57,
+    "TST": 8,
+    "mTSS": 4,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-05.ttrm",
+   "user": "yachi",
+   "pieces": 1093,
+   "attack": 616,
+   "opener_pieces": 189,
+   "opener_attack": 84,
+   "n": {
+    "S": 122,
+    "D": 60,
+    "T": 17,
+    "Q": 54,
+    "TSS": 14,
+    "TSD": 39,
+    "TST": 5,
+    "mTSS": 2,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-06.ttrm",
+   "user": "pinglamb",
+   "pieces": 878,
+   "attack": 579,
+   "opener_pieces": 147,
+   "opener_attack": 95,
+   "n": {
+    "S": 82,
+    "D": 41,
+    "T": 9,
+    "Q": 35,
+    "TSS": 6,
+    "TSD": 53,
+    "TST": 6,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-06.ttrm",
+   "user": "yachi",
+   "pieces": 962,
+   "attack": 488,
+   "opener_pieces": 147,
+   "opener_attack": 97,
+   "n": {
+    "S": 138,
+    "D": 50,
+    "T": 10,
+    "Q": 45,
+    "TSS": 7,
+    "TSD": 24,
+    "TST": 7,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-07.ttrm",
+   "user": "pinglamb",
+   "pieces": 937,
+   "attack": 614,
+   "opener_pieces": 168,
+   "opener_attack": 120,
+   "n": {
+    "S": 116,
+    "D": 56,
+    "T": 12,
+    "Q": 51,
+    "TSS": 5,
+    "TSD": 37,
+    "TST": 9,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-07.ttrm",
+   "user": "yachi",
+   "pieces": 1020,
+   "attack": 646,
+   "opener_pieces": 168,
+   "opener_attack": 93,
+   "n": {
+    "S": 102,
+    "D": 52,
+    "T": 13,
+    "Q": 69,
+    "TSS": 8,
+    "TSD": 32,
+    "TST": 7,
+    "mTSS": 0,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-08.ttrm",
+   "user": "pinglamb",
+   "pieces": 1179,
+   "attack": 736,
+   "opener_pieces": 189,
+   "opener_attack": 96,
+   "n": {
+    "S": 140,
+    "D": 62,
+    "T": 23,
+    "Q": 54,
+    "TSS": 7,
+    "TSD": 56,
+    "TST": 9,
+    "mTSS": 6,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-08.ttrm",
+   "user": "yachi",
+   "pieces": 1268,
+   "attack": 733,
+   "opener_pieces": 189,
+   "opener_attack": 85,
+   "n": {
+    "S": 152,
+    "D": 74,
+    "T": 26,
+    "Q": 67,
+    "TSS": 9,
+    "TSD": 41,
+    "TST": 5,
+    "mTSS": 0,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-09.ttrm",
+   "user": "pinglamb",
+   "pieces": 864,
+   "attack": 567,
+   "opener_pieces": 189,
+   "opener_attack": 115,
+   "n": {
+    "S": 96,
+    "D": 34,
+    "T": 15,
+    "Q": 32,
+    "TSS": 0,
+    "TSD": 50,
+    "TST": 11,
+    "mTSS": 3,
+    "mTSD": 0
+   }
+  },
+  {
+   "file": "replay-2026-08-25-09.ttrm",
+   "user": "yachi",
+   "pieces": 901,
+   "attack": 557,
+   "opener_pieces": 189,
+   "opener_attack": 110,
+   "n": {
+    "S": 85,
+    "D": 47,
+    "T": 18,
+    "Q": 49,
+    "TSS": 5,
+    "TSD": 33,
+    "TST": 8,
+    "mTSS": 0,
+    "mTSD": 0
+   }
+  }
+ ]
+}

@@ -96,10 +96,7 @@ import { BOARD_WIDTH } from './vendor/core/types.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, NAME_SETS,
          loadWikiOpeners, openerPages, hasFullRow } from '../openers/match.ts';
 
-/** Three bags. The wiki's C-Spin follow-up is "a Double within about three bags of the Triple", and
- *  a window has to be a number: 21 pieces is that phrase read literally. It is emitted rather than
- *  buried so the section prints the window it actually used, and so widening it is a data change. */
-const WINDOW_PIECES = 21;
+import { WINDOW_PIECES } from './opener-window.ts';
 
 /** Distance at which two 28-cell boards stop being "the same opener, played slightly differently".
  *  Inherited from `openers/README.md`, where it is what separates the exact/variant bands from the

@@ -5884,6 +5884,74 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 </section>
 <!-- END generated openers -->
 
+<!-- BEGIN generated attack-sources (pipeline/build_report.py) -->
+<section id="attack-sources">
+  <style>
+    /* Scoped under #attack-sources and every class carries the as- prefix: a generated
+       section's <style> lands in the body and beats the report's own stylesheet. */
+    #attack-sources h3 { margin: 2.2rem 0 .1rem; font-size: 1.05rem; }
+    #attack-sources h3:first-of-type { margin-top: 1.4rem; }
+    #attack-sources td.as-num { text-align: right; font-variant-numeric: tabular-nums; }
+    #attack-sources .as-dot { display: inline-block; width: .5rem; height: .5rem;
+      border-radius: 50%; margin-right: .4rem; }
+    #attack-sources .as-dot.is-p1 { background: var(--yachi); }
+    #attack-sources .as-dot.is-p2 { background: var(--pinglamb); }
+  </style>
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">攻擊由邊度嚟（未經證明）</h2>
+
+    <div class="method-note">
+      <p><strong>同上面 C-Spin 同 DT 砲一樣，呢節唔屬於信任鏈。</strong>呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒讀返佢未抵消之前打出嘅攻擊，再按消行種類、時間同攻擊成分拆開。冇 claim 編號、冇 ✓ 標記。</p>
+      <p>引擎重算嘅攻擊總數，<strong>102 / 102</strong> 個 player-round 同 replay 自己個 <code>garbage.attack</code> counter 一樣。每種消行嘅次數（一行到 T-Spin Triple 同 Mini，全部種類），<strong>102 / 102</strong> 個 player-round 同 replay 自己個 <code>clears</code> counter 一樣。所以次數嗰幾欄同 facts.json 一樣可信；每次攻擊同埋 B2B／Combo 嘅拆分淨係得引擎一份實作，冇第二個獨立實作對過。</p>
+      <p>分母係 replay 自己數嘅粒數。「頭 21 粒」即係每局頭 21 粒（三個 bag），大約係開局定式嘅範圍；之後嘅就係中盤。呢節答嘅係攻擊由邊種消行嚟，唔係邊個贏。</p>
+    </div>
+
+    <h3>一 · 每粒攻擊 = 每粒清行 × 每行攻擊</h3>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead><tr><th></th><th>每粒攻擊</th><th>每粒清行</th><th>每行攻擊</th><th>頭 21 粒 每粒攻擊</th><th>第 22 粒起 每粒攻擊</th></tr></thead>
+        <tbody>
+          <tr><td><span class="as-dot is-p1"></span>yachi</td><td class="as-num">0.581</td><td class="as-num">0.552</td><td class="as-num">1.052</td><td class="as-num">0.518</td><td class="as-num">0.597</td></tr>
+          <tr><td><span class="as-dot is-p2"></span>pinglamb</td><td class="as-num">0.653</td><td class="as-num">0.545</td><td class="as-num">1.198</td><td class="as-num">0.670</td><td class="as-num">0.649</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p><strong>pinglamb</strong> 每 100 粒多 <strong>7.21</strong> 行攻擊（引擎數）。每粒攻擊 = 每粒清行 × 每行攻擊，所以兩欄邊欄爭得多就係差距喺邊。按時間拆：頭 21 粒 +3.30、之後 +3.91（每 100 粒，兩段加埋就係成個差距）。</p></div>
+
+    <h3>二 · 每 100 粒有幾多次係邊種消行，同每次打出幾多攻擊</h3>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead><tr><th>消行</th><th>yachi 頭 21 粒</th><th>yachi 之後</th><th>yachi 每次攻擊</th><th>pinglamb 頭 21 粒</th><th>pinglamb 之後</th><th>pinglamb 每次攻擊</th></tr></thead>
+        <tbody>
+          <tr><td>T-Spin Double</td><td class="as-num">4.30</td><td class="as-num">3.96</td><td class="as-num">4.62</td><td class="as-num">3.85</td><td class="as-num">5.28</td><td class="as-num">4.77</td></tr>
+          <tr><td>T-Spin Triple</td><td class="as-num">2.43</td><td class="as-num">0.07</td><td class="as-num">6.06</td><td class="as-num">4.79</td><td class="as-num">0.07</td><td class="as-num">6.14</td></tr>
+          <tr><td>四行（Quad）</td><td class="as-num">0.74</td><td class="as-num">5.39</td><td class="as-num">4.83</td><td class="as-num">0.65</td><td class="as-num">4.87</td><td class="as-num">5.06</td></tr>
+          <tr><td>T-Spin Single</td><td class="as-num">0.84</td><td class="as-num">0.90</td><td class="as-num">2.40</td><td class="as-num">0.00</td><td class="as-num">0.87</td><td class="as-num">2.33</td></tr>
+          <tr><td>三行</td><td class="as-num">0.46</td><td class="as-num">2.35</td><td class="as-num">2.20</td><td class="as-num">0.37</td><td class="as-num">1.99</td><td class="as-num">2.43</td></tr>
+          <tr><td>兩行</td><td class="as-num">1.87</td><td class="as-num">5.43</td><td class="as-num">1.17</td><td class="as-num">1.40</td><td class="as-num">5.28</td><td class="as-num">1.35</td></tr>
+          <tr><td>一行</td><td class="as-num">4.39</td><td class="as-num">13.27</td><td class="as-num">0.22</td><td class="as-num">1.97</td><td class="as-num">12.64</td><td class="as-num">0.27</td></tr>
+          <tr><td>Mini T-Spin Single</td><td class="as-num">0.00</td><td class="as-num">0.02</td><td class="as-num">0.00</td><td class="as-num">0.18</td><td class="as-num">0.31</td><td class="as-num">0.66</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p>「每次攻擊」包埋 B2B、Combo 同全消，所以同一種消行喺唔同局面值唔同。將差距再拆做兩份（Kitagawa 拆法，兩份加埋等於成個差距）：<strong>消行組合</strong>——即係每粒有幾多次係邊種消行——佔 +3.68；<strong>每次攻擊值</strong>——即係同一種消行 pinglamb 每次打出幾多——佔 +3.53（每 100 粒）。組合入面郁得最多嘅係：T-Spin Double +4.49、T-Spin Triple +3.03、四行（Quad） -2.21。</p></div>
+
+    <h3>三 · 攻擊由咩成分組成（每 100 粒）</h3>
+    <div class="scroll-x">
+      <table class="appendix-table">
+        <thead><tr><th></th><th>基本值</th><th>B2B</th><th>Combo</th><th>全消</th><th>其他</th><th>合計</th></tr></thead>
+        <tbody>
+          <tr><td><span class="as-dot is-p1"></span>yachi</td><td class="as-num">47.67</td><td class="as-num">4.90</td><td class="as-num">3.92</td><td class="as-num">1.51</td><td class="as-num">0.11</td><td class="as-num">58.12</td></tr>
+          <tr><td><span class="as-dot is-p2"></span>pinglamb</td><td class="as-num">51.45</td><td class="as-num">5.95</td><td class="as-num">4.87</td><td class="as-num">2.70</td><td class="as-num">0.34</td><td class="as-num">65.33</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="method-note"><p>基本值係 TETR.IO 攻擊表（T-Spin Double 4、Triple 6、四行 4）；B2B 同 Combo 係佢哋喺基本值上面加咗幾多；全消係 Perfect Clear 自己嗰份攻擊（10 行）；「其他」係引擎打出、而整數模型解釋唔到嘅部分（三分鐘之後嘅攻擊倍率，同埋引擎用小數 B2B 等級喺 Combo 倍數之後先取整）。五欄加埋就係引擎嘅攻擊；表入面各項獨立取整，所以加埋未必剛好等於合計。</p></div>
+  </div>
+</section>
+<!-- END generated attack-sources -->
+
 <!-- BEGIN generated round-replay (pipeline/build_report.py) -->
 <section id="round-replay">
   <style>
