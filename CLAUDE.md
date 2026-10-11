@@ -445,7 +445,7 @@ equivalent marker pair.
   is added** — that is a manual-only step, which this file elsewhere calls the thing
   `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
 - **Sixteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
-  covers steps 1-6 of adding a session; `bin/verify-session` takes ONE artefact directory and every
+  covers steps 1-7 of adding a session (step 6 runs the four sim emitters); `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
   `coverage` — only `docs`, via `bin/build-docs --check` — so the last mile of adding a session was

@@ -11,13 +11,20 @@
 #   3. generate the claim ledger; every predicate must evaluate True
 #   4. generate Dafny from the same specs; `dafny verify` must report 0 errors
 #   5. (MUTATION=1) flipping a datum must break verification
-#   6. emit a report skeleton — but only if the session has no report.html yet
+#   6. the four simulator emitters -> sim/*.json (quarantined: no claim ids, no badges)
+#   7. emit a report skeleton — but only if the session has no report.html yet
 #
 # What it does NOT do is write the Cantonese prose — that is the part that needs
 # judgment. It leaves you a verified ledger, a report shell with every generated
 # region already in place, and TODO prose files to write into.
 #
-# Step 6 never touches a report that exists. A committed report.html is the output
+# Step 6 runs before the skeleton because every quarantined section (forecast, openers,
+# attack-sources, round-replay) is SELF_INSERTING: build_report gives a session the section
+# only when its sim/*.json is on disk. Emitted after the skeleton, those sections would be
+# missing from a fresh report while the artefacts sat beside it — and check_attack_section
+# and its siblings fail exactly that state.
+#
+# Step 7 never touches a report that exists. A committed report.html is the output
 # of this pipeline plus a person's writing, and re-running the command on a session
 # that already has one must not cost that writing.
 set -euo pipefail
@@ -38,14 +45,14 @@ REPLAYS=("$SRC"/*.ttrm)
 [ "${#REPLAYS[@]}" -gt 0 ] || die "no .ttrm files in $SRC"
 
 WORK="$DEST/report"
-step "1/6 collecting ${#REPLAYS[@]} replays into $DEST"
+step "1/7 collecting ${#REPLAYS[@]} replays into $DEST"
 mkdir -p "$WORK"
 for f in "${REPLAYS[@]}"; do
   dst="$DEST/$(basename "$f")"
   # Test for the file rather than trusting `cp -n`: BSD/macOS cp exits 1 when -n
   # makes it skip, and `set -e` turned that into an abort at step 1 — so the
   # command could never be re-run over a session whose replays were already in
-  # place, which is exactly the run that must reach step 6 and leave report.html
+  # place, which is exactly the run that must reach step 7 and leave report.html
   # alone.
   [ -e "$dst" ] || cp "$f" "$dst"
 done
@@ -56,7 +63,7 @@ done
 cp pipeline/extract.py pipeline/extract2.ts "$WORK/" 2>/dev/null || true
 ls "$DEST"/*.ttrm >/dev/null || die "no replays landed in $DEST"
 
-step "2/6 extracting twice and comparing"
+step "2/7 extracting twice and comparing"
 ( cd "$WORK" && python3 extract.py >/dev/null )
 if command -v bun >/dev/null; then
   ( cd "$WORK" && bun extract2.ts >/dev/null )
@@ -68,11 +75,11 @@ else
   echo "      two-parser agreement gate did NOT run for this session"
 fi
 
-step "3/6 generating the claim ledger"
+step "3/7 generating the claim ledger"
 python3 -m pipeline.claims.build_claims "$WORK/facts.json" \
   --out "$WORK/claims-generated.json" || die "claim generation refused to emit"
 
-step "4/6 generating and verifying Dafny"
+step "4/7 generating and verifying Dafny"
 python3 -m pipeline.codegen "$WORK/facts.json" \
   --claims "$WORK/claims-generated.json" --outdir "$WORK/dafny"
 VOUT="$(cd "$WORK" && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4 2>&1 | tail -1)"
@@ -84,13 +91,35 @@ python3 -m pipeline.build_proof_map "$WORK/claims-generated.json" \
   --dafny-dir "$WORK/dafny" --out "$WORK/claims-proof-map.json"
 
 if [ "${MUTATION:-0}" = "1" ]; then
-  step "5/6 mutation testing the generated proofs"
+  step "5/7 mutation testing the generated proofs"
   bash pipeline/mutation_test.sh "$WORK/dafny" 12 || die "a mutant survived — some lemma is vacuous"
 else
-  step "5/6 mutation test skipped (set MUTATION=1 to run it)"
+  step "5/7 mutation test skipped (set MUTATION=1 to run it)"
 fi
 
-step "6/6 report skeleton"
+step "6/7 simulator artefacts"
+# Each emitter is deterministic — every committed sim/*.json rebuilds byte for byte — so
+# re-running over a session that has them is safe, and the line says whether one moved.
+# They read the replays from REPLAY_DIR, i.e. $DEST, where step 1 copied them.
+if command -v bun >/dev/null; then
+  mkdir -p "$DEST/sim"
+  for pair in forecast-facts:emit-forecast-facts opener-facts:emit-opener-facts \
+              attack-facts:emit-attack-facts replay-facts:emit-replay; do
+    out="$DEST/sim/${pair%%:*}.json"
+    before="$( [ -f "$out" ] && shasum "$out" || true )"
+    REPLAY_DIR="$DEST" bun "pipeline/sim/${pair##*:}.ts" --out "$out" >/dev/null \
+      || die "${pair##*:}.ts failed — see the error above"
+    if [ -z "$before" ]; then state=new
+    elif [ "$before" = "$(shasum "$out")" ]; then state=unchanged
+    else state=CHANGED; fi
+    echo "  ok  $out ($state)"
+  done
+else
+  echo "  !!  bun not installed: no sim/*.json, so the report gets none of the four"
+  echo "      quarantined sections (forecast, openers, attack-sources, round-replay)"
+fi
+
+step "7/7 report skeleton"
 # Only when there is none. A report that exists carries a person's Cantonese, and
 # the skeleton would replace every generated region with an empty one.
 if [ -f "$WORK/report.html" ]; then
@@ -126,7 +155,12 @@ checked in a browser as it goes:
        the <title> — everything else in the body is generated
   2. add hand-written claims for whatever is genuinely unique to this session,
      then re-run steps 3-4 to fold them into the proofs
-  3. rebuild the report after every prose edit, then refresh the site:
+  3. add the date to the session lists the sim tests pin — each one is asserted
+     against disk, so a miss is a red test rather than a silent skip — and investigate
+     any new anchor disagreement before naming it in an exception list:
+       bun test pipeline/sim/ pipeline/openers/ pipeline/finesse-counters.test.ts
+  4. rebuild the report after every prose edit (and after step 6 reports CHANGED on a
+     session whose report.html already existed), then refresh the site:
        python3 -m pipeline.build_report $WORK
        python3 -m pipeline.build_round_table $WORK
        python3 -m pipeline.check_prose_figures $WORK
