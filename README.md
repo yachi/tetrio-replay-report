@@ -169,11 +169,12 @@ bin/new-session sessions/2026-08-01 ~/Downloads/replay-batch
 ```
 
 That extracts the batch twice and compares, generates the claim ledger, generates the
-Dafny, verifies it, and records the proof map — failing at the first gate that does not
+Dafny, verifies it, records the proof map, and emits the four simulator artefacts
+(`sim/*.json`) the quarantined sections read — failing at the first gate that does not
 hold. Then write the Cantonese prose against the generated ledger, add hand-written
 claims for whatever is genuinely unique about the session, and run `bin/build-docs`.
 
-Before the first push, run `bin/verify-repo`. `bin/new-session` covers steps 1-6 and
+Before the first push, run `bin/verify-repo`. `bin/new-session` covers steps 1-7 and
 `bin/verify-session` is scoped to one directory, so the cross-cutting gates — the two
 extractors against each other, the published figures against the corpus, the wiki
 transcriptions, the pre-registrations — were previously discovered from a red CI run.
