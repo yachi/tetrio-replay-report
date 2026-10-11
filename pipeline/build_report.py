@@ -23,8 +23,8 @@ import json
 import os
 import sys
 
-from pipeline import (appendix, chart_data, claim_cards, coaching, forecast_section, hero,
-                      intense_round, matches, moments, opener_section, pc_section, records, region,
+from pipeline import (appendix, attack_section, chart_data, claim_cards, coaching,
+                      forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region,
                       replay_section, stats_section)
 from pipeline.claims import generators
 
@@ -104,6 +104,12 @@ def opener_sec(ctx):
     return opener_section.section(opener_section.load(ctx["report_dir"]))
 
 
+def attack_sec(ctx):
+    # Quarantined like opener_sec: the SESSION's sim/attack-facts.json, never facts.json, and
+    # None for a session with no such file. facts.json supplies only the player order.
+    return attack_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def replay_sec(ctx):
     # Quarantined like forecast_sec and opener_sec, and conditional twice over: no
     # sim/replay-facts.json, or no round long enough for `generators._intense_round`, and it
@@ -169,6 +175,11 @@ SECTIONS = [
     # the property the "marker, never a <section> tag" rule above protects — a tag INSIDE a
     # region is what puts an inserted block into a span a later pass rewrites. The shell has no
     # footer marker comment to anchor on instead.
+    # the fourth quarantined section, between openers and the replay: it reads the openers'
+    # window and explains the attack the tables above it describe. A CHAIN anchor, the
+    # intense-round idiom: before the replay region when the report has one, else the footer.
+    ("attack-sources", ('<!-- BEGIN generated round-replay',
+                        '<footer class="report-footer">'), attack_sec, None),
     ("round-replay", '<footer class="report-footer">', replay_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),

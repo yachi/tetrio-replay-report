@@ -206,6 +206,14 @@ bun test pipeline/sim/replay.test.ts                           #   its round tri
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
+REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
+  --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
+bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
+python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
+python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
+python3 -m analysis.app_decomposition [--json]  # the corpus APP-gap roll-up over every attack-facts.json
+python3 -m pipeline.check_app_decomposition     # CI gate: CLAUDE.md's APP-gap figures; --render
+python3 -m pipeline.check_app_decomposition --selftest  #   prints them, --selftest its mutants + probe control
 Rscript analysis/rate_records.R                                 # the evidence for QUALIFYING_MS
 Rscript analysis/rate_records.R --json analysis/rate-records.json  #   ...as the committed artefact
 python3 -m pipeline.check_rate_records            # CI gate: that artefact is current, and every
@@ -1406,6 +1414,42 @@ Three consequences:
   across 4-9, over 11% across 10-11 [C007] — and all four of yachi's match wins fall in the
   middle window [C001]. Per-match, m9 is the only one of eleven where his attack per piece beats
   pinglamb's [C019].
+
+### 每粒攻擊點解爭 — where the APP gap comes from, and the two halves of it
+
+**pinglamb's attack per piece is higher than yachi's in every session, and the gap is attack PER
+LINE, not lines per piece.** Pooled: APP <!--app:app-->yachi 0.588 against pinglamb 0.649<!--/app:app-->, lines per piece <!--app:lpp-->yachi 0.545 against pinglamb 0.553<!--/app:lpp-->, attack
+per line <!--app:apl-->yachi 1.079 against pinglamb 1.172<!--/app:apl-->. Every figure in this section is a marked fragment rendered by
+`pipeline/check_app_decomposition.py` from `analysis/app_decomposition.py`, which rolls up each
+session's `sim/attack-facts.json` (`pipeline/sim/emit-attack-facts.ts`) — paste from `--render`,
+never type. Each session's report carries the same split for that night in 攻擊由邊度嚟, the
+fourth quarantined section.
+
+**What is anchored and what is not.** The engine re-runs every round and reads `res.rawGarbage`,
+the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->2516 of 2518 player-rounds for the attack total and 2513 of 2518 for the clear-type counts<!--/app:anchor-->
+(the exceptions are named in `attack-facts.test.ts`). So the clear-type COUNTS below are as good as
+facts.json; attack per clear and the base/B2B/combo split are one engine's. **Do not use
+`oracle-source.ts`'s `records[].attack` for this** — it is post-cancel; measured once on 2026-10-11 and not re-derived, it summed to about 80% of
+the replay's total and made a T-spin Triple look worth 4.9 lines instead of 6.1.
+
+The engine gap is <!--app:gap-->+6.06<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
+
+* **by window** — <!--app:windows-->+2.49 from the first 21 locks and +3.57 after them<!--/app:windows-->.
+* **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.84 of mix and +2.22 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
+  each type) and the VALUE of each clear (B2B, combo, Perfect Clear riding on it). The largest mix
+  terms are <!--app:terms-->T-spin Doubles +4.15, T-spin Triples +3.01, quads -2.66, T-spin Singles -0.67<!--/app:terms-->.
+
+**The two windows are two different mechanisms, and pooling hides one of them.** T-spin Triples
+are an OPENER phenomenon: <!--app:tst-window-->1249 against 733 inside the window and 44 against 42 after it<!--/app:tst-window-->. That is the repertoire split — pinglamb's Honey
+Cup and Stray Cannon fire a Triple first, yachi's TKI-3 does not (see 六個具名定式). T-spin Doubles
+run the OTHER way inside the window and the expected way after it: <!--app:tsd-window-->961 against 1176 inside the window and 4604 against 3664 after it<!--/app:tsd-window-->. So
+「pinglamb does more T-spin Doubles」 is a mid-game statement; in the opener yachi does more, and a
+sentence that pools the two says the opposite of what happens in the first three bags.
+
+It is a property of the pair rather than of a few nights: pinglamb's per-piece rate is the higher
+in <!--app:signs-->T-spin Doubles in 16 of 16, T-spin Triples in 16 of 16, quads in 1 of 16<!--/app:signs-->, and the <!--app:jackknife-->166 single-match drops leave it between 5.99 and 6.15<!--/app:jackknife--> attack per 100 pieces. Two things it is not.
+It is not who won — APP decides rounds and not nights (08-01, 10-09) — and it is not a mechanism
+for WHY each player chose his openers; the data shows what they played, nothing more.
 
 ### 逐場排開就分得開 — the per-match APP gap separates the match winner, four times of sixteen
 
@@ -3076,12 +3120,17 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->31731<!--/round:figures--> 個
-quantized figure、<!--round:sites-->22<!--/round:sites--> 對 (site, helper)**:
-<!--round:enforced-->15<!--/round:enforced--> 個有 corpus 撐住,
-<!--round:ontrust-->7<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->34225<!--/round:figures--> 個
+quantized figure、<!--round:sites-->40<!--/round:sites--> 對 (site, helper)**:
+<!--round:enforced-->29<!--/round:enforced--> 個有 corpus 撐住,
+<!--round:ontrust-->11<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
 而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
 條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。
+
+**2026-10-11 嘅 攻擊由邊度嚟 section 加咗 18 對 (site, helper),全部嚟自 `attack_section`,唔係因為
+加咗 session。** 14 對有 corpus 撐住；4 對(`app`、`apl`、`lpp`、`app_w` 嘅 `quant`)靠信,原因同
+上面幾個 `_pct` 一樣:`permille` 已經 floor 咗,再 `quant` 去三個位係精確嘅,所以呢四對都係結構性
+咁靠信,多幾個 session 都唔會變。上面嗰幾個 fragment 由 22 / 15 / 7 跳到而家嘅數,就係呢 18 對。
 
 **但第六對會,而且已經變咗四次 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
 喺七個 session 之下分得開 floor 同 ceil(當時 14 個 call),分唔開 floor 同 round(0 個

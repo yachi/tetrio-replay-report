@@ -425,6 +425,21 @@ jobs:
             python3 -m pipeline.check_replay_section "$W" --selftest
           fi
 
+      # 攻擊由邊度嚟, the fourth quarantined section: the attack-per-piece gap split by
+      # clear type, window and component, from sim/attack-facts.json. The region must be
+      # exactly a re-render, carry every licence sentence in attack_section.REQUIRED (the
+      # two anchors against the replay's own counters, the one-implementation caveat, the
+      # not-about-who-won sentence, the rounding note) and no badge. --selftest deletes each
+      # sentence and plants the other corruptions, so it runs where the artefact exists.
+      - name: Check the simulator-derived attack-sources section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_attack_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/attack-facts.json" ]; then
+            python3 -m pipeline.check_attack_section "$W" --selftest
+          fi
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail
@@ -974,6 +989,16 @@ jobs:
           set -euo pipefail
           python3 -m pipeline.check_stat_sources --selftest
           python3 -m pipeline.check_stat_sources
+
+      # The APP-gap figures in CLAUDE.md's 「每粒攻擊點解爭」, rolled up from every committed
+      # sim/attack-facts.json. --selftest first: restricted to the sixteen sessions the
+      # 2026-10-11 scratchpad probe measured, the committed route must reproduce every value
+      # that probe printed, so the gate measures the original quantity and not an adjacent one.
+      - name: Check every APP-gap figure is the one the corpus gives (and that the gate can fail)
+        run: |
+          set -euo pipefail
+          python3 -m pipeline.check_app_decomposition --selftest
+          python3 -m pipeline.check_app_decomposition
 
   # The evidence for QUALIFYING_MS. `analysis/rate_records.R` needs R, which is not a
   # CI dependency and does not need to be: the artefact it writes records the md5 of
