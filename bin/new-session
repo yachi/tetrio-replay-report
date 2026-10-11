@@ -80,15 +80,24 @@ python3 -m pipeline.claims.build_claims "$WORK/facts.json" \
   --out "$WORK/claims-generated.json" || die "claim generation refused to emit"
 
 step "4/7 generating and verifying Dafny"
-python3 -m pipeline.codegen "$WORK/facts.json" \
-  --claims "$WORK/claims-generated.json" --outdir "$WORK/dafny"
-VOUT="$(cd "$WORK" && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4 2>&1 | tail -1)"
-case "$VOUT" in
-  *"0 errors"*) echo "  ok  $VOUT" ;;
-  *) die "dafny — $VOUT" ;;
-esac
-python3 -m pipeline.build_proof_map "$WORK/claims-generated.json" \
-  --dafny-dir "$WORK/dafny" --out "$WORK/claims-proof-map.json"
+# Only for a session with no hand claims yet. Once hand_claims*.py exists, the committed
+# dafny/ and claims-proof-map.json cover every ledger, and regenerating them from the
+# generated ledger alone would silently drop the hand lemmas and their badges' links.
+HAND=("$WORK"/hand_claims*.py)
+if [ "${#HAND[@]}" -gt 0 ]; then
+  echo "  --  ${#HAND[@]} hand_claims*.py in $WORK: dafny/ and claims-proof-map.json left"
+  echo "      untouched (they cover the hand ledgers too). bin/verify-session checks them"
+else
+  python3 -m pipeline.codegen "$WORK/facts.json" \
+    --claims "$WORK/claims-generated.json" --outdir "$WORK/dafny"
+  VOUT="$(cd "$WORK" && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4 2>&1 | tail -1)"
+  case "$VOUT" in
+    *"0 errors"*) echo "  ok  $VOUT" ;;
+    *) die "dafny — $VOUT" ;;
+  esac
+  python3 -m pipeline.build_proof_map "$WORK/claims-generated.json" \
+    --dafny-dir "$WORK/dafny" --out "$WORK/claims-proof-map.json"
+fi
 
 if [ "${MUTATION:-0}" = "1" ]; then
   step "5/7 mutation testing the generated proofs"
@@ -153,8 +162,18 @@ checked in a browser as it goes:
        $WORK/prose/coaching.json  both columns' taglines, profiles, recommendations
      and the one thing no generator owns, edited in report.html itself:
        the <title> — everything else in the body is generated
-  2. add hand-written claims for whatever is genuinely unique to this session,
-     then re-run steps 3-4 to fold them into the proofs
+  2. add hand-written claims for whatever is genuinely unique to this session in
+     $WORK/hand_claims.py, then fold them into the proofs over EVERY ledger (step 4
+     skips a session once hand claims exist, so re-running this command will not):
+       python3 -m pipeline.claims.build_hand $WORK/hand_claims.py \\
+         --facts $WORK/facts.json --out $WORK/claims-narrative.json
+       python3 -m pipeline.codegen $WORK/facts.json --outdir $WORK/dafny \\
+         --claims $WORK/claims-generated.json $WORK/claims-narrative.json
+       (cd $WORK && dafny verify dafny/Facts.dfy dafny/Claims.dfy --cores 4)
+       python3 -m pipeline.build_proof_map --dafny-dir $WORK/dafny --out $WORK/claims-proof-map.json \\
+         $WORK/claims-generated.json $WORK/claims-narrative.json
+       python3 -m pipeline.codegen_smt $WORK/facts.json --out $WORK/claims.smt2 \\
+         --claims $WORK/claims-generated.json $WORK/claims-narrative.json
   3. add the date to the session lists the sim tests pin — each one is asserted
      against disk, so a miss is a red test rather than a silent skip — and investigate
      any new anchor disagreement before naming it in an exception list:

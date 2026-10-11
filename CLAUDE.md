@@ -3369,7 +3369,7 @@ find *where* the time goes, then time the change to find out *how much*.
    replays in, a complete rendering report out, with every generated region filled and
    TODO prose files to write into. A session no longer starts by copying the previous
    one's report.html — which is what had been silently propagating stale constants
-   between sessions. Step 6 never touches an existing report.html.
+   between sessions. Step 7 never touches an existing report.html, and step 4 never touches the Dafny or proof map of a session that has hand claims.
 
    What a person still writes by hand: the five `prose/*.json` files, `narrative-beats.md`
    / `recommendations.md`, `hand_claims.py`, and the `<title>` — the only string in the
