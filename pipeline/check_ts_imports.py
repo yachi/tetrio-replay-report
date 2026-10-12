@@ -47,7 +47,7 @@ NAMED_ONLY = re.compile(r'^(?:type\s+)?\{(?P<names>[^}]*)\}$', re.S)
 DECL = re.compile(
     r'^export\s+(?:declare\s+)?(?:async\s+)?'
     r'(?:function|const|let|var|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)', re.M)
-DECL_LIST = re.compile(r'^export\s+\{(?P<names>[^}]*)\}', re.M)
+DECL_LIST = re.compile(r'^export\s+(?:type\s+)?\{(?P<names>[^}]*)\}', re.M)
 STAR = re.compile(r'^export\s+\*\s', re.M)
 SKIP_DIRS = {'vendor', 'node_modules', '.git'}
 
@@ -58,7 +58,7 @@ def exported_names(path: pathlib.Path) -> tuple[set[str], bool]:
     names = set(DECL.findall(src))
     for block in DECL_LIST.findall(src):
         for part in block.split(','):
-            part = part.strip()
+            part = part.strip().removeprefix('type ').strip()
             if part:
                 names.add(part.split(' as ')[-1].strip())
     return names, bool(STAR.search(src))
@@ -108,8 +108,10 @@ def selftest() -> int:
     """Plant a dangling import and require the gate to reject it — and only it."""
     with tempfile.TemporaryDirectory() as tmp:
         d = pathlib.Path(tmp)
-        (d / 'lib.ts').write_text('export const real = 1;\nexport { real as aliased };\n')
-        (d / 'ok.ts').write_text("import { real, aliased } from './lib.ts';\n")
+        # `export type { … }` is an export list too (a shim re-exporting types uses it)
+        (d / 'lib.ts').write_text('export const real = 1;\nexport { real as aliased };\n'
+                                  'type Shape = number;\nexport type { Shape };\n')
+        (d / 'ok.ts').write_text("import { real, aliased, type Shape } from './lib.ts';\n")
         if scan(d):
             print('SELFTEST FAIL: a sound import was reported', file=sys.stderr)
             return 1

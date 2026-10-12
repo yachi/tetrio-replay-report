@@ -17,17 +17,17 @@
  *   8. completeness: every node with a board has one demo or one DEMO_UNBUILT entry with its reason.
  *   9. mutants: each planner rule turned off, and each planted artefact defect, turns a check red.
  *
+ * Checks 2-8 are the shared `route-demo-checks.ts` (はちみつ砲's demo test runs the same ones); what
+ * stays here is 迷走砲's: its named lists, its data mutants and its controls.
+ *
  * Run: bun test pipeline/openers/stray-cannon-demos.test.ts   (about half a minute: one build plus
  * the planner mutants, each a full build)
  */
 import { test, expect } from 'bun:test';
-import { readFileSync } from 'node:fs';
-import { build, serialise, runDemo, reach, chainOf, newEngine, readRows, PIECES, DEMOS_PATH,
-         type DemoMutants } from '../sim/stray-cannon-demos.ts';
-import { decodeTimeline, queueStates, placeCells, WIDTH, ROWS, type Lock } from '../sim/emit-replay.ts';
-import { classify, composite, patternMatches, conditionHolds, loadRoutes, type RoundDigest }
-  from '../sim/emit-stray-cannon-facts.ts';
-import { rowsFromBoard } from './match.ts';
+import { build, serialise, reach, chainOf, newEngine, type DemoMutants } from '../sim/stray-cannon-demos.ts';
+import { WIDTH, ROWS } from '../sim/emit-replay.ts';
+import { MEISOU } from '../sim/route-profile-meisou.ts';
+import { demoChecks } from './route-demo-checks.ts';
 
 /** Nodes with a board and no demo, and the reason the artefact gives. A node the planner cannot
  *  build is a red build until it is named here. */
@@ -48,160 +48,11 @@ const DEMO_SPIN_EXCEPTIONS: string[] = [];
 /** The two drawings the page colours inconsistently; their demos build the piece the cells must be. */
 const DEMO_PIECE_READINGS = ['2.i_early.pc#11', '2.ideal.pc#16'];
 
-const routes = loadRoutes();
-const byId = new Map(routes.nodes.map(n => [n.id, n]));
-const committedText = () => readFileSync(DEMOS_PATH, 'utf8');
-const committed = () => JSON.parse(committedText());
-
-// ── the checks, as functions of an artefact, so each data mutant can be run through them ─────────
-
-const T_OF = (letter: string) => (letter === 'U' ? 'T' : letter.toUpperCase());
-
-/** Boards after every lock, y-UP. */
-function boards(d: any): (string | null)[][][] {
-  const out: (string | null)[][][] = [];
-  decodeTimeline(d.seq, d.locks as Lock[], b => out.push(b.map(r => [...r])));
-  return out;
-}
-
-/** Does a y-UP board show `rows` (bottom-aligned)? `c` any filled cell, `U` empty (the slot), a
- *  letter that piece, `-` empty; nothing above the drawing. */
-function shows(board: (string | null)[][], rows: string[], uEmpty: boolean): boolean {
-  for (let y = 0; y < ROWS; y++) for (let x = 0; x < WIDTH; x++) {
-    const i = rows.length - 1 - y;
-    const ch = i >= 0 ? rows[i]![x]! : '-';
-    const v = board[y]![x];
-    if (ch === '-' || (ch === 'U' && uEmpty)) { if (v != null) return false; continue; }
-    if (v == null) return false;
-    if (ch === 'c') continue;
-    if (v !== T_OF(ch)) return false;
-  }
-  return true;
-}
-
-/** The demo as a corpus round digest: no recorded game, so there is no prefix to verify (v is the
- *  last lock) and no garbage. */
-function digestOf(d: any): RoundDigest {
-  const locks: RoundDigest['locks'] = [], rows: RoundDigest['rows'] = [];
-  const q = queueStates(d.seq, d.locks);
-  const spin = ['none', 'mini', 'full'];
-  decodeTimeline(d.seq, d.locks, (b, i, cleared) => {
-    const lk = d.locks[i];
-    locks.push({ piece: q[i]!.piece,
-      cells: placeCells(q[i]!.piece, lk[1]).map(c => ({ col: c % WIDTH, row: ROWS - 1 - Math.floor(c / WIDTH) })),
-      cleared: lk[2], spin: spin[lk[3]]!, allclear: lk[2] > 0 && b.every(r => r.every(c => c == null)),
-      clearedRows: cleared.map(y => ROWS - 1 - y) });
-    rows.push(rowsFromBoard([...b].reverse().map(r => r.map(c => c))));
-  });
-  return { session: 'demo', file: d.node, round: 0, user: 'demo', match: 0, file_sort_index: 0,
-           bag2_order: d.seq.slice(7, 14), v: d.locks.length - 1, height: ROWS, garbage: [],
-           n_locks: d.locks.length, locks, rows };
-}
-
-/** Every check that reads one demo. Returns the first failure, or null. */
-function checkDemo(d: any, all: Map<string, any>): string | null {
-  const n = byId.get(d.node);
-  if (!n?.rows) return `${d.node}: not a board node`;
-  // 6. whole 7-bags, holds, conditions
-  if (d.seq.length % 7) return `${d.node}: seq is not whole bags`;
-  for (let k = 0; k < d.seq.length; k += 7)
-    if ([...d.seq.slice(k, k + 7)].sort().join('') !== [...PIECES].sort().join('')) return `${d.node}: bag ${k / 7} not a 7-bag`;
-  if (d.bags.map((b: any) => b.queue).join('') !== d.seq.slice(0, 7 * d.bags.length)) return `${d.node}: bags are not the seq`;
-  if (d.bags.reduce((a: number, b: any) => a + b.holds, 0) !== d.locks.filter((l: any) => l[5]).length)
-    return `${d.node}: holds do not match the held flags`;
-  for (const b of d.bags) {
-    const c = byId.get(b.node)!.condition;
-    if (c?.all && conditionHolds(c, b.queue, '') !== true) return `${b.node}: queue ${b.queue} breaks the page condition`;
-    if (c?.early && b.queue[0] !== c.early) return `${b.node}: ${c.early} is not first in ${b.queue}`;
-  }
-  if (b1(d) && d.bags[0].queue[0] !== (routes as any).bag1.requires.early) return `${d.node}: bag 1 not L first`;
-  // 2. re-run
-  let rr;
-  try { rr = runDemo(routes, d.seq, d.inputs, d.frames).rec; } catch (e) { return `${d.node}: re-run threw ${e}`; }
-  if (JSON.stringify(rr.locks) !== JSON.stringify(d.locks)) return `${d.node}: re-run locks differ`;
-  // 7. prefix sharing
-  if (d.parent) {
-    const p = all.get(d.parent);
-    if (!p) return `${d.node}: parent ${d.parent} has no demo`;
-    if (JSON.stringify(d.locks.slice(0, p.locks.length)) !== JSON.stringify(p.locks)) return `${d.node}: prefix differs from ${d.parent}`;
-    if (d.seq.slice(0, p.locks.length) !== p.seq.slice(0, p.locks.length)) return `${d.node}: seq prefix differs`;
-  }
-  // 5. spins
-  const q = queueStates(d.seq, d.locks);
-  for (let i = 0; i < d.locks.length; i++) {
-    const L = d.letters[i], lk = d.locks[i];
-    if (T_OF(L) !== q[i]!.piece) return `${d.node}: lock ${i} letter ${L} vs piece ${q[i]!.piece}`;
-    if (L === 'U') {
-      if (lk[3] !== 2) return `${d.node}: U lock ${i} spin ${lk[3]}`;
-      const bag = d.bags.findIndex((_: any, k: number) => d.bags.slice(0, k + 1).reduce((a: number, b: any) => a + b.placed.length, 0) > i);
-      const bn = byId.get(d.bags[bag].node)! as any;
-      const want = bn.bag === 2 ? 3 : bn.has_tsd_slot ? 2 : DEMO_SPIN_LINES[bn.id];
-      if (want === undefined || lk[2] !== want) return `${d.node}: U lock ${i} cleared ${lk[2]}, want ${want}`;
-    } else if (q[i]!.piece === 'T' && lk[3] !== 0 && !DEMO_SPIN_EXCEPTIONS.includes(d.node)) return `${d.node}: t lock ${i} spun`;
-  }
-  // 4. board equality
-  const B = boards(d);
-  const last = d.locks.length - 1;
-  if (n.bag === 1) {
-    if (!shows(B[last]!, n.rows, false)) return `${d.node}: final board is not the drawing`;
-    if (n.id === 'bag1.z_hold' && q[last]!.hold !== 'Z') return `${d.node}: Z is not in the hold box`;
-  } else if (n.bag === 2) {
-    if (!shows(B[12]!, n.rows, true)) return `${d.node}: board after 13 pieces is not the drawing`;
-    if (d.letters[13] !== 'U' || last !== 13) return `${d.node}: lock 14 is not the U`;
-  } else if (n.list) {
-    if (B[last]!.some(r => r.some(c => c != null))) return `${d.node}: last lock is not a Perfect Clear`;
-    if (d.locks.reduce((a: number, l: any) => a + l[2], 0) !== 8) return `${d.node}: not 8 lines`;
-  } else if (n.unmatchable) {
-    if (!shows(B[last]!, n.rows, false)) return `${d.node}: final board is not the drawing`;
-  } else {
-    if (!shows(B[last - 1]!, n.rows, true)) return `${d.node}: board before the U is not the drawing`;
-    if (d.letters[last] !== 'U') return `${d.node}: last lock is not the U`;
-  }
-  // 3. the classifier
-  const c = classify([digestOf(d)], routes).cases[0];
-  if (!c) return `${d.node}: classifier found no bag 1`;
-  if (n.bag === 1 && c.bag1.node !== n.id) return `${d.node}: classifier bag 1 ${c.bag1.node}`;
-  if (n.bag === 2 && (c.bag2?.node !== n.id || c.bag2.condition_met === false)) return `${d.node}: classifier bag 2 ${c.bag2?.node}`;
-  if (n.list) {
-    const dg = digestOf(d);
-    const tst = dg.locks.findIndex(l => l.piece === 'T' && l.spin === 'full' && l.cleared === 3);
-    const comp = composite(dg, tst, last);
-    if (!patternMatches(comp, readRows(n.id, n.rows), false, true)) return `${d.node}: composite is not the pattern`;
-    if (DEMO_PIECE_READINGS.includes(n.id)) {
-      if (c.pc?.node === n.id) return `${d.node}: colour reading not needed?`;
-    } else if (c.pc?.node !== n.id) return `${d.node}: classifier PC ${c.pc?.node} ${c.pc?.off_page_under}`;
-  }
-  if (n.bag === 3 && !n.list && !n.unmatchable && !c.snapshots.some((s: any) => s.node === n.id))
-    return `${d.node}: classifier snapshot missing`;
-  return null;
-}
-const b1 = (d: any) => byId.get(d.bags[0].node)!.bag === 1;
-
-/** Completeness: every board node has exactly one demo or one unbuilt entry. */
-function checkComplete(art: any): string | null {
-  const demos = new Map<string, number>();
-  for (const d of art.demos) demos.set(d.node, (demos.get(d.node) ?? 0) + 1);
-  const unb = Object.fromEntries(art.unbuilt.map((u: any) => [u.node, u.reason]));
-  if (JSON.stringify(unb) !== JSON.stringify(DEMO_UNBUILT)
-      && JSON.stringify(Object.entries(unb).sort()) !== JSON.stringify(Object.entries(DEMO_UNBUILT).sort()))
-    return `unbuilt ${JSON.stringify(unb)}`;
-  for (const n of routes.nodes) {
-    if (!n.rows) { if (demos.has(n.id)) return `${n.id}: demo for a node with no board`; continue; }
-    const k = (demos.get(n.id) ?? 0) + (n.id in unb ? 1 : 0);
-    if (k !== 1) return `${n.id}: ${k} demos/unbuilt entries`;
-  }
-  for (const id of demos.keys()) if (!byId.has(id)) return `${id}: not a route node`;
-  return null;
-}
-function checkAll(art: any): string | null {
-  const c = checkComplete(art);
-  if (c) return c;
-  const all = new Map<string, any>(art.demos.map((d: any) => [d.node, d]));
-  for (const d of art.demos) { const e = checkDemo(d, all); if (e) return e; }
-  if (JSON.stringify(art.demos.flatMap((d: any) => d.piece_readings.map((p: any) => p.node)).sort())
-      !== JSON.stringify([...DEMO_PIECE_READINGS].sort())) return 'piece readings list differs';
-  return null;
-}
+// the checks are the shared ones (`route-demo-checks.ts`), bound to 迷走砲's profile and lists
+const { routes, byId, checkAll, committedText, committed } = demoChecks(MEISOU, {
+  unbuilt: DEMO_UNBUILT, spinLines: DEMO_SPIN_LINES, spinExceptions: DEMO_SPIN_EXCEPTIONS,
+  pieceReadings: DEMO_PIECE_READINGS, hold: { node: 'bag1.z_hold', piece: 'Z' },
+});
 
 // ── the tests ─────────────────────────────────────────────────────────────────────────────────
 

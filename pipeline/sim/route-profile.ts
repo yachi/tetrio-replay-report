@@ -1,0 +1,112 @@
+/**
+ * The shape of an opener's ROUTE PROFILE: everything the shared route classifier (`route-facts.ts`)
+ * and the shared demo planner (`route-demos.ts`) need to know about one shiwehi.com route page that
+ * is not in its transcribed routes JSON. Types only, no data: each opener's profile lives in its own
+ * file (`route-profile-meisou.ts`, `route-profile-honeycup.ts`), so editing one opener's profile
+ * stales that opener's artefacts and nobody else's, while an edit to shared code stales both — the
+ * md5 inputs (`hashFiles`) are scoped that way on purpose.
+ *
+ * ONE implementation per rule. Before this file the 迷走砲 classifier was the only one; a second
+ * opener copied from it would be a second implementation of every rule, which is the drift CLAUDE.md
+ * names in 「Three backends」. So the rule lives once, here and in the two shared modules, and a
+ * profile only says which nodes, which locks and which strings.
+ */
+
+/** One bag-1 sampling stage. Stages are tried in order; the first stage whose clean board matches
+ *  one of its nodes (by occupancy, as drawn or mirrored, then by colour) decides the round's bag 1. */
+export interface Bag1Stage {
+  /** tried in this order, as drawn then mirrored; the first colour match wins */
+  nodes: string[];
+  /** clean-board sampling point: the board after this many locks */
+  locks: number;
+  /** The hold rule. A match at this stage asserts a hold ONLY when the piece placed at `atLock`
+   *  (1-based) is not the mirror-aware `piece` (`mirrorPiece` in a mirrored round): then the round is
+   *  `holdNode`; when it IS that piece, it was placed somewhere off the page and the round is the
+   *  outcome `elsewhereNode`, whose opportunities are `holdNode`'s. */
+  holdSplit?: { piece: string; mirrorPiece: string; atLock: number; holdNode: string; elsewhereNode: string };
+}
+
+/** The classifier's artefact strings. Every one ships inside the artefact, so they are byte contract. */
+export interface ArtefactText {
+  schema: string;
+  means: string;
+  notEligible: string;
+  caveat: string;
+}
+
+export interface RouteProfile {
+  /** `--opener` key */
+  key: string;
+  /** error-message prefix ('stray-cannon') — message only, never in an artefact */
+  tag: string;
+  routesPath: string;
+  artefactPath: string;
+  demosPath: string;
+  /** md5 inputs, each concatenated in order into ONE string field (`emitter_md5`, `planner_md5`) */
+  hashFiles: { classifier: string[]; planner: string[] };
+
+  bag1: {
+    stages: Bag1Stage[];
+    /** a FLAG, never a node: did `stage`'s board match its nodes by OCCUPANCY (colour never decides
+     *  it — it is compared with `opener-facts.json`'s `exact`, which is occupancy) */
+    flag: { field: string; stage: number };
+    /** the case key that records the piece placed at the hold stage's `atLock` */
+    lockPieceField: string;
+  };
+  /** bag 2's board is sampled after this 0-based lock index */
+  bag2Lock: number;
+  /** 'refuse': no garbage may arrive before a sampling point (迷走砲). 'strip': complete garbage
+   *  rows are stripped from the bottom of the bag-2 and snapshot boards before matching, and the
+   *  count is recorded in the case (`garbage_rows_stripped`). */
+  bag2Garbage: 'refuse' | 'strip';
+  /** For a round whose bag 2 matched nothing: compare the board just before its `pcAfter` spin with
+   *  every bag-2 board by occupancy and record why it missed (MEASURED, never matched: the case stays
+   *  bag-1 only). `subset` = the spin fired before the drawn board was complete; `superset` = the
+   *  drawn board plus exactly four cells; `moved` = one piece of it placed elsewhere. Absent: no such
+   *  record (迷走砲). */
+  bag2Explain?: boolean;
+  /** clear events (TST, PC) are looked for in the first eventLocks locks */
+  eventLocks: number;
+  /** snapshot routes are looked for up to this many locks; a round digest keeps this many */
+  snapshotLocks: number;
+  /** the bag-3 frame is compared over its bottom pcRows rows */
+  pcRows: number;
+  /** lines cleared by the Perfect Clear the PC lists draw, counted cumulatively from lock 0 */
+  pcLines: number;
+  /** the clear the bag-3 frame starts after */
+  pcAfter: { piece: string; spin: string; lines: number };
+
+  artefact: ArtefactText;
+  /** the artefact's `rules` object, key order included */
+  rules(): Record<string, unknown>;
+  /** the opener's own named lists, FIRST in the artefact's `lists` (the generic five follow) */
+  lists(cases: any[], name: (c: any) => string): Record<string, string[]>;
+
+  /** the demo planner's opener-specific half; absent until an opener's demos exist */
+  demos?: DemoProfile;
+}
+
+/** A colour reading: a cell group drawn in one piece's colour that can only be another piece. */
+export interface PieceReading {
+  node: string; drawn: string; reads_as: string; cells: [number, number][]; reason: string;
+}
+
+export interface DemoProfile {
+  schema: string;
+  means: string;
+  notEligible: string[];
+  caveat: Record<string, string>;
+  /** drawn nodes with no demo, and why */
+  unbuilt: Record<string, string>;
+  pieceReadings: PieceReading[];
+  /** the bag-1 half of a node's bag spec: queue constraints, the held piece and where it is held */
+  bag1Spec(n: any, routes: any): { before: [string, string][]; early: string | null;
+                                   holdPiece: string | null; holdBefore: string | null };
+  /** a node no demo builds (an illustration of a group's shared state) → the demo node whose end
+   *  state it draws, so a child's chain runs through that demo (はちみつ砲: the five 2.ideal forms
+   *  share one after-TST board, drawn once) */
+  chainVia?: Record<string, string>;
+  /** a lower-case letter a node draws in a T-spin slot, and the lines it must clear (はちみつ砲's PC
+   *  patterns draw the TSD's T as a plain `t`; 迷走砲 draws it U) */
+  spinLetter?(n: any): { letter: string; lines: number } | null;
+}

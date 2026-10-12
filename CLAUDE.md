@@ -216,6 +216,14 @@ bun pipeline/sim/emit-stray-cannon-demos.ts \
   --out analysis/stray-cannon-demos.json                        # the constructed 迷走砲 demos (quarantined, not corpus data)
 bun test pipeline/openers/stray-cannon-demos.test.ts           #   re-run, classify, board, completeness + mutants
 python3 -m pipeline.stray_cannon_page --out-dir <dir>  #   render the pages somewhere other than docs/
+python3 -m pipeline.openers.extract_honeycup_routes            # CI gate: the はちみつ砲 route transcription
+python3 -m pipeline.openers.extract_honeycup_routes --selftest #   its mutants
+bun pipeline/sim/emit-route-facts.ts --opener honeycup \
+  --out analysis/honey-cup-facts.json                           # はちみつ砲's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener honeycup \
+  --out analysis/honey-cup-demos.json                           # the constructed はちみつ砲 demos (quarantined, not corpus data)
+bun test pipeline/openers/honey-cup.test.ts pipeline/openers/honey-cup-demos.test.ts  # its two tests
+python3 -m pipeline.honey_cup_page --selftest   # the docs/honey-cup*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -2344,6 +2352,13 @@ almost any opener page. Only exact separates. `occupancy_aliases` and `round_ove
 columns that are the same rounds twice: MS1 and MS2 are one bag-1 shape built from different
 pieces, so their rows are identical in every session and must never be added.
 
+**The route pages count bag 1 differently, on purpose, and say so.** The Stray Cannon and Honey Cup
+columns here are each opener's harddrop field by occupancy; `docs/stray-cannon.html` and
+`docs/honey-cup.html` follow shiwehi.com's trees, which also take the 6-lock held-piece field, so
+their bag-1 totals are LARGER than these columns. Each route artefact carries the column's own
+predicate as a flag (`matched_at_6`, `matched_harddrop`), its test compares that flag with this
+table per (session, player), and each overview prints both totals — see 「定式路線頁」.
+
 The repertoires split, reproduced independently in all sixteen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
 pinglamb does **and opens TKI-3 far more** (172 against 9 over the corpus; pinglamb's nine are the
@@ -3060,7 +3075,29 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 迷走砲 全路線 — the Stray Cannon route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲）— the opener route pages, quarantined like the replays
+
+Two shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
+`meisou.php`) and はちみつ砲 (Honey Cup, `honeycup.php`). **One implementation per rule, one profile
+per opener**, because a rule kept in two implementations drifts (「Three backends」): the classifier
+is `pipeline/sim/route-facts.ts`, the demo planner `pipeline/sim/route-demos.ts`, the transcription
+gate `pipeline/openers/route_transcription.py`, the page renderer and audit `pipeline/route_page.py`,
+and the shared test checks `pipeline/openers/route-facts-checks.ts` / `route-demo-checks.ts`. What
+differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` (the TS profile:
+nodes, locks, artefact strings, named lists, the demo half), and `stray_cannon_page.py` /
+`honey_cup_page.py` (the page profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
+`emit-route-demos.ts --opener <key>`; 迷走砲 keeps its original entry files as shims with their old
+signatures, so its tests and commands did not change.
+
+**The md5 inputs are scoped per opener.** `emitter_md5` / `planner_md5` / `classifier_md5` each hash
+the shared module, `route-profile.ts`, that opener's own profile file and its entry file
+(`hashFiles` in the profile). An edit to one opener's profile stales only that opener's artefacts;
+an edit to shared code stales both, loudly, and the regeneration must then differ in those hash
+lines ONLY — that is the check that a shared-code edit left the other opener's behaviour alone.
+The generalisation was landed that way: every 迷走砲 artefact and page byte-identical except the
+three hash lines.
+
+### 迷走砲
 
 shiwehi.com's 迷走砲 page draws a tree: bag 1, five bag-2 branches, and the bag-3 Perfect Clear
 and T-spin patterns under each. These pages match every corpus round against that tree and say how
@@ -3109,7 +3146,7 @@ A mirrored round is read with J↔L and S↔Z swapped before the page's bag-2 co
 Upper-case `Z` read as the bag-1 Z, and the derived bag-1 `z_left` board (the page draws it only
 inside its bag-2 board), are this repo's readings, and the pages say so.
 
-### 示範重播 — a constructed replay for every drawn node, and why it is not corpus data
+#### 示範重播 — a constructed replay for every drawn node, and why it is not corpus data
 
 Beside the corpus cases, every route node that has a drawn board gets a **constructed** demo: from
 an empty board, one piece at a time, from a queue and key inputs WE choose, through bag 1 → bag 2
@@ -3120,7 +3157,7 @@ a ✓ or a `data-claim`.
 
 | piece | where |
 |---|---|
-| planner | `pipeline/sim/stray-cannon-demos.ts` — per bag, a DFS over placement orders; per piece, a BFS over the ENGINE's own moves (its `rotateCW/CCW/180` through SRS+ kicks on a scratch engine, lateral steps, one-row falls copied from `#__internal_fall`), keyed by the engine's `lastSpin` because a sideways step keeps it and a fall clears it |
+| planner | `pipeline/sim/route-demos.ts` (`stray-cannon-demos.ts` is 迷走砲's shim) — per bag, a DFS over placement orders; per piece, a BFS over the ENGINE's own moves (its `rotateCW/CCW/180` through SRS+ kicks on a scratch engine, lateral steps, one-row falls copied from `#__internal_fall`), keyed by the engine's `lastSpin` because a sideways step keeps it and a fall clears it |
 | emitter | `pipeline/sim/emit-stray-cannon-demos.ts` → `analysis/stray-cannon-demos.json` (argv and file IO only); md5s of the routes file, the planner, `emit-replay.ts` and the classifier, so it goes stale loudly |
 | test | `pipeline/openers/stray-cannon-demos.test.ts` — byte rebuild; every demo re-run through `instrumentEngine` to its committed locks; the corpus `classify()` reaching the node; board equality against the drawing; spins; whole 7-bags; prefix sharing; completeness; planner and data mutants, and two measured controls |
 | page | `docs/stray-cannon-demos.html`, from `stray_cannon_page.render_demo_page`; every node block on the overview and node pages links to it (or says there is no demo). The page re-checks each EMBEDDED demo's end state with its own decoder (`replay_section.decode_boards`), a second implementation that runs in the bun-less `docs` job |
@@ -3167,6 +3204,68 @@ them as the piece they must be, and the demo artefact carries it to the page. **
 does not apply it, on measurement**: the `2.ideal.other` off-page PCs share those patterns'
 occupancy, but none of them matches either drawing under the reading by colour, so colour-matching as
 drawn files nothing wrongly.
+
+### はちみつ砲
+
+The same deliverable for `honeycup.php`: `pipeline/openers/honeycup-routes.json` (gated by
+`extract_honeycup_routes.py` through the shared gate), `analysis/honey-cup-facts.json`
+(`honey-cup.test.ts`), `analysis/honey-cup-demos.json` (`honey-cup-demos.test.ts`), and
+`docs/honey-cup.html` plus `honey-cup-bag1-only.html`, `honey-cup-ideal.html`,
+`honey-cup-compromise.html` and `honey-cup-demos.html`, rendered by `bin/build-docs` from its
+`ROUTE_SITES` list and linked as the second card under 定式路線 on the index. Counts are read off the
+artefacts and tests, never typed here or in `honey_cup_prose.json`.
+
+What this page needs that 迷走砲 did not, each a generic rule a profile switches on:
+
+* **Bag 1 reuses the hold split with J for Z.** The 7-lock board `bag1.j_right` (harddrop's Honey
+  Cup field) first; only if it misses, the 6-lock field, split by the piece placed 7th against the
+  mirror-aware J (L when mirrored). The page's right-hand bag-1 board is the left one mirrored
+  (`bag1.l_hold`, `mirror_of`), so it is one node, never a second branch. **The FLAG is
+  `matched_harddrop`** — the 7-lock board by occupancy — and `honey-cup.test.ts` compares it with the
+  六個具名定式 Honey Cup column (`opener-facts.json` `honey_cup.exact`) per (session, player). So this
+  page's bag-1 total is that column plus the 6-lock-only rounds, and the overview says so. **Both
+  players mirror Honey Cup**, unlike 迷走砲; `MIRRORED_BAG1` pins it per player.
+* **Group scoping.** The five 理想形 forms (`2.ideal#1..#5`, `group: "2.ideal"`) share one occupancy
+  and one PC list (`parent: "2.ideal"`), so COLOUR decides which form a round built, and a bag-3
+  pattern is scoped by the matched form's group. One node page (`honey-cup-ideal.html`) holds the
+  whole group. `MULTI_COLOUR_RESOLVED_BY_GROUP` is measured empty.
+* **Bag 2 strips garbage, for this opener only** (`bag2Garbage: 'strip'`). Garbage lands under the
+  13-piece board in a large share of rounds, and boards compare bottom-aligned, so complete garbage
+  rows are stripped from the bottom before matching and the count travels in the case
+  (`garbage_rows_stripped`, named in `BAG2_GARBAGE_STRIPPED`). A bag-2 OPPORTUNITY here is therefore
+  "inside the verified prefix, no line cleared by the player before the sample", and the artefact's
+  `caveat` / `rules` say so. 迷走砲 stays on `'refuse'`, which is why its artefact did not move.
+* **A missed bag 2 is EXPLAINED, never matched** (`bag2Explain`). For a bag-1 round with no bag-2
+  match, the board before its TST is compared by occupancy with every bag-2 board:
+  `BAG2_NONE_TST_BEFORE_COMPLETE` (a strict subset — the TST came first), `BAG2_NONE_EXTRA_PIECE`
+  (the board plus four cells) and `BAG2_NONE_MOVED_PIECE` (one piece's four cells elsewhere). The
+  route is not relaxed; the bag-1-only page shows the reason beside each case.
+* **The compromise form's condition is illustrative.** The page writes 「%L・%Z>%J・%Oの場合など」 —
+  an example. It is evaluated and recorded (`condition_met`, the `CONDITIONS` table) but never
+  presented as the reason a form was built, and the transcription marks it `illustrative: true`,
+  which the page renders as 「係例子，唔係揀形嘅條件」.
+* **The PC lists hidden in the page's HTML comments are provenance, never nodes** (Heart, and the
+  compromise PCs): hand-copied from one raw-HTML fetch, outside the snapshot hash. A PC on no drawn
+  pattern goes to `PC_OFF_PAGE` even when one of those hidden boards would match it.
+
+**The demos needed the hold box to carry across bags, and the rule is one swap scheme.**
+`bag1.j_hold` holds J (it arrives after L: the page's 遅いほうはホールド), and the hold box can never
+be emptied again, so the planner (`route-demos.ts`) now plans a bag that STARTS with the box full:
+the held piece comes out at its slot in the placement order, swapped for the piece the bag places
+LAST (the T into the TST slot, which therefore arrives at that slot), and that T comes out when the
+next bag's first piece arrives; in a Perfect Clear bag that piece is the pattern's unused one and
+stays held, which the test asserts. Three more profile hooks: `spin_board` (this page draws its
+bag-2 boards with the TST slot empty and the T on a separate board, whose U cells the demo fires
+into and the test checks), `spinLetter` (the PC patterns draw the TSD's T as a plain `t`; only
+pc#1-#10 have `t_in_tsd_slot`, which the page's own sentence gets wrong — a named discrepancy), and
+`chainVia` (the PC patterns hang under the shared after-TST illustration; their demos run through
+`2.ideal#1`). 迷走砲 uses none of them, and its demos artefact moved in its hash lines only.
+
+`DEMO_UNBUILT` names the illustrations, the mirror, the STMB template's placeholders, the REN board's
+B cells, and `2.compromise.roof.after`, which the planner measures as unbuildable (the page draws it
+after its TSD cleared the two rows under it). The demo test's `ignoreConditions` is a **mutant here,
+not a control** — the reverse of 迷走砲: dropping the bag-1 order deals J before L, so the held J
+would be the earlier one, against the page's rule. `no180` stays a control.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
