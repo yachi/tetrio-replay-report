@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03', '2026-10-09'])
+       '2026-10-03', '2026-10-09', '2026-10-12'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -136,10 +136,20 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // otherwise idle) and ~213-232 s with other work running, against the 300 s budget — so the
   // budget stands, with roughly 70-100 s of headroom. A session of 09-19's size would roughly
   // consume it; re-measure again then.
-  expect(both + oursOnly + ccOnly + neither).toBe(206286);
+  // 2026-10-12: 206286 -> 215062 (8776 boards, 55 rounds), and `unexplained` is still EMPTY over
+  // all of them. RE-MEASURED, as the 10-09 line asks: the whole file took 273 s alone at
+  // seventeen sessions on the machine that pinned this (four cores, load average ~1) and 282 s
+  // with other test files running beside it — 4% more boards than at sixteen, but a slower machine
+  // than the one that measured ~201 s, which is the point: the 300 s budget had ~27 s of headroom
+  // HERE, i.e. it was a property of one machine and not of the walk. The budget below is therefore
+  // raised to 600 s — the figure the other whole-corpus rebuilds already use (replay.test.ts,
+  // stray-cannon.test.ts) — on that measurement, not blind. It is an elapsed-time guard, not a
+  // claim, and a session of 09-19's size will still need it re-measured.
+  expect(both + oursOnly + ccOnly + neither).toBe(215062);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same
 // failure reproduces on the eight-session corpus at the commit before this one, so the annotation
 // is a missing one being supplied rather than a budget being raised for the new session.
-}, 300_000);
+// (Raised 300 s -> 600 s on 2026-10-12, measured — see the 2026-10-12 line above.)
+}, 600_000);
