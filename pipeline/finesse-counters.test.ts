@@ -51,13 +51,14 @@ const SESSIONS = [
   { dir: '2026-09-19', rounds: 300, strict: 267, equal: 33, faults: 5280, perfect: 25015, pieces: 28176 },
   { dir: '2026-10-03', rounds: 292, strict: 239, equal: 53, faults: 4296, perfect: 25273, pieces: 27868 },
   { dir: '2026-10-09', rounds: 204, strict: 172, equal: 32, faults: 2904, perfect: 16213, pieces: 17894 },
+  { dir: '2026-10-12', rounds: 110, strict:  96, equal: 14, faults: 1781, perfect:  8895, pieces:  9898 },
 ];
 
 // At module scope, not inside a test: a membership check that lives in a test can be skipped
 // by whatever skips the test, and the whole point is that it runs before any literal is read.
 assertCorpusIsEverySessionOnDisk(`${import.meta.dir}/../sessions`, SESSIONS.map(s => s.dir));
 
-const CORPUS = { rounds: 2518, strict: 2160, equal: 358, faults: 40453, perfect: 211077, pieces: 235988 };
+const CORPUS = { rounds: 2628, strict: 2256, equal: 372, faults: 42234, perfect: 219972, pieces: 245886 };
 
 interface Row {
   session: string; file: string; round: number; who: string;
@@ -163,11 +164,11 @@ test('the decisive round: one non-perfect piece carrying seven faults', () => {
 
 test('a fault-free round is a round of nothing but perfect pieces', () => {
   // The other end of the same argument: with no fault events every piece is perfect, so the
-  // longest perfect run is the whole round. 57 rounds, all sixteen sessions pooled (18 -> 20 when
+  // longest perfect run is the whole round. 61 rounds, all seventeen sessions pooled (18 -> 20 when
   // 2026-09-03 joined, 20 -> 23 when 2026-09-10 did, 23 -> 26 when 2026-09-11 did — the last two
   // contributing 3 apiece — 26 -> 28 when 2026-09-17 did, 28 -> 33 when 2026-09-19 did,
-  // 33 -> 40 when 2026-09-18 did, 40 -> 49 when 2026-10-03 did, and 49 -> 57 when 2026-10-09
-  // did). The count read 「33 rounds,
+  // 33 -> 40 when 2026-09-18 did, 40 -> 49 when 2026-10-03 did, 49 -> 57 when 2026-10-09
+  // did, and 57 -> 61 when 2026-10-12 did). The count read 「33 rounds,
   // all thirteen sessions」 for a session after the pin beside it had moved to 40 — the pin was
   // updated and the prose was not, which is CLAUDE.md's 冇第二份 class inside a single comment.
   // 2026-10-03's nine are the largest COUNT any session has added (09-18's 7 is next), and at
@@ -178,8 +179,9 @@ test('a fault-free round is a round of nothing but perfect pieces', () => {
   // 2026-10-09 adds eight (seven pinglamb's, one yachi's) on 204 player-rounds, 3.9% — between
   // 08-19's 4.3% and 10-03's 3.1%, so its rate is second of sixteen and its count second only to
   // 10-03's nine. Recorded, not read: the per-session rate has no ordering a reader should use.
+  // 2026-10-12 adds four (two each) on 110 player-rounds, 3.6%.
   const clean = rows.filter(r => r.faults === 0);
-  expect(clean.length).toBe(57);
+  expect(clean.length).toBe(61);
   for (const r of clean) {
     expect(r.perfect).toBe(r.pieces);
     expect(r.combo).toBe(r.perfect);
@@ -194,6 +196,11 @@ test('the four finesse rates are four different numbers, so a rate must name its
   const tot = (f: (r: Row) => number) => rows.reduce((a, r) => a + f(r), 0);
   const faults = tot(r => r.faults), perfect = tot(r => r.perfect), pieces = tot(r => r.pieces);
   const pct = (x: number) => Math.round(x * 10000) / 100;
+  // Seventeen-session figures (2026-10-12 added): 17.14 -> 17.18, 10.56 -> 10.54, 89.44 -> 89.46,
+  // 16.08 -> 16.11, 1.624 -> 1.630. 10-12 is 110 player-rounds (4.2% of the pool) at a HIGHER
+  // fault-event rate than the pool (17.99%) and more faults per faulty piece (1.776), but a
+  // slightly LOWER faulty share, so the event rates rise and the share falls — the same
+  // pull-toward-its-own-value as every earlier step, and nothing more.
   // Sixteen-session figures (2026-10-09 added): 17.22 -> 17.14, 10.65 -> 10.56, 89.35 -> 89.44,
   // 16.16 -> 16.08, 1.616 -> 1.624. Same direction as 10-03's step on all five, smaller: 10-09 is
   // 204 player-rounds (8.1% of the pool) at a lower fault-event rate than the pool (16.23%) and a
@@ -205,15 +212,15 @@ test('the four finesse rates are four different numbers, so a rate must name its
   // lower fault rate than the pool — moves four of them a larger step the other way, and the fifth
   // (faults per faulty piece) up. That is a session pulling a pooled rate toward its own value and
   // nothing more — a big session moves a pooled rate by its own value, not in a direction the
-  // series is heading. The ORDER is the finding and it is unchanged across all sixteen (perfect
-  // share > event rate > the meaningless one > faulty share). A reader who took 17.14 away as
+  // series is heading. The ORDER is the finding and it is unchanged across all seventeen (perfect
+  // share > event rate > the meaningless one > faulty share). A reader who took 17.18 away as
   // "the" fault rate would be wrong twice over: it is one corpus-state's reading of a quantity
   // that moves, and it is one of four defensible ones.
-  expect(pct(faults / pieces)).toBe(17.14);               // fault EVENTS per piece
-  expect(pct(1 - perfect / pieces)).toBe(10.56);          // share of pieces that were faulty
-  expect(pct(perfect / pieces)).toBe(89.44);              // TETR.IO's own displayed figure
-  expect(pct(faults / (faults + perfect))).toBe(16.08);    // on no meaningful denominator
+  expect(pct(faults / pieces)).toBe(17.18);               // fault EVENTS per piece
+  expect(pct(1 - perfect / pieces)).toBe(10.54);          // share of pieces that were faulty
+  expect(pct(perfect / pieces)).toBe(89.46);              // TETR.IO's own displayed figure
+  expect(pct(faults / (faults + perfect))).toBe(16.11);    // on no meaningful denominator
   // and the mechanism behind the gap: fault events per FAULTY piece, > 1 by construction
-  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.624);
+  expect(Math.round(faults / (pieces - perfect) * 1000) / 1000).toBe(1.63);
   expect(faults / (pieces - perfect)).toBeGreaterThan(1);
 });

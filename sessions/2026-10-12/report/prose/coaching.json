@@ -1,26 +1,34 @@
 {
-  "eyebrow": "TODO · 教練分析",
+  "eyebrow": "教練分析 · 兩邊",
   "title": "俾兩位嘅建議",
-  "lede": "TODO：呢一段未寫。",
+  "lede": "今晚 yachi 嘅粒數盈餘填唔晒個效率窿：多 9.92%，個窿有 13.50%<span class=\"badge\" data-claim=\"C009\"></span><span class=\"badge\" data-claim=\"C004\"></span>，總攻擊少 102 條<span class=\"badge\" data-claim=\"C005\"></span>。逐場計，總攻擊多嗰個八場全贏<span class=\"badge\" data-claim=\"C019\"></span>，而個效率差距一排開就分得開邊個贏<span class=\"badge\" data-claim=\"C007\"></span>。<strong>輸係輸喺中間嗰三場</strong>：打完三場 2 比 1 領先，第四到第六場局數 7 比 15<span class=\"badge\" data-claim=\"C010\"></span>。",
   "columns": {
     "yachi": {
-      "tagline": "TODO 風格未寫",
+      "tagline": "快、落得多 · 輸局太輕",
       "profile": [
-        "TODO：yachi 嘅側寫未寫。"
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 26.11%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G067\"></span>，闊過對手——<strong>個 lever 冇變過</strong>。",
+        "落得快<span class=\"badge\" data-claim=\"G039\"></span>、Quad 多過對手<span class=\"badge\" data-claim=\"G034\"></span>，hold 2052 次對 1807 次<span class=\"badge\" data-claim=\"G032\"></span>。",
+        "條路又係加粒數：多疊 468 粒<span class=\"badge\" data-claim=\"C005\"></span>，即係多 9.92%<span class=\"badge\" data-claim=\"C009\"></span>，但今晚個窿大過佢。"
       ],
       "recs": [
-        "TODO：yachi 嘅第一條建議未寫。"
+        "<strong>輸嗰啲局太輕。</strong>贏嗰啲局對手每粒高你 7.14%，輸嗰啲局高 15.44%<span class=\"badge\" data-claim=\"C002\"></span>——差距主要喺你輸緊嘅時候。你自己輸局每粒方塊嘅攻擊得約 0.54<span class=\"badge\" data-claim=\"G067\"></span>，追分嗰陣先係要重。",
+        "<strong>第二同第七場示範咗條路點樣行得通。</strong>對手每粒高啲，但你落多咗粒數、總攻擊多過佢，兩場都贏<span class=\"badge\" data-claim=\"C019\"></span>。今晚每粒差距喺 5% 以內嗰三場，你全部贏晒<span class=\"badge\" data-claim=\"C007\"></span>。",
+        "<strong>領先守唔住。</strong>第六場 3 比 0 之後五局全失<span class=\"badge\" data-claim=\"C016\"></span>，第八場 3 比 2 之後尾三局連失<span class=\"badge\" data-claim=\"C018\"></span>。第四到第六場局數 7 比 15<span class=\"badge\" data-claim=\"C010\"></span>，值得翻睇。"
       ]
     },
     "pinglamb": {
-      "tagline": "TODO 風格未寫",
+      "tagline": "每粒更重 · 中段連贏三場",
       "profile": [
-        "TODO：pinglamb 嘅側寫未寫。"
+        "贏法同一路一樣：每粒方塊打出嘅攻擊兩個 regime 都高過對手<span class=\"badge\" data-claim=\"C002\"></span>，贏嗰啲局高 7.14%、輸嗰啲局高 15.44%。",
+        "自己贏局對輸局差 17.05%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G068\"></span>，今晚窄過對手——輸局都企得穩。",
+        "今晚嘅差距喺 T-spin：triple 54 對 37<span class=\"badge\" data-claim=\"G036\"></span>、double 234 對 216<span class=\"badge\" data-claim=\"G035\"></span>。全晚最長 combo 9 下都係佢<span class=\"badge\" data-claim=\"G053\"></span>。"
       ],
       "recs": [
-        "TODO：pinglamb 嘅第一條建議未寫。"
+        "<strong>每粒重唔等於場場贏。</strong>第二同第七場你每粒方塊嘅攻擊都高過對手，但對手落多咗粒數、總攻擊多過你，兩場都輸<span class=\"badge\" data-claim=\"C019\"></span>。差距收窄到 5% 以下嗰三場，你一場都冇贏<span class=\"badge\" data-claim=\"C007\"></span>。",
+        "<strong>第三場係今晚唯一一場每粒輸畀對手</strong>，而且輸成 38% 以上，結果 0 比 5<span class=\"badge\" data-claim=\"C020\"></span><span class=\"badge\" data-claim=\"C013\"></span>。",
+        "頂到頂 4 次<span class=\"badge\" data-claim=\"C006\"></span>，同對手一樣。KPP 高過對手 2.54%<span class=\"badge\" data-claim=\"C008\"></span>，不過呢欄一向都唔話事。"
       ]
     }
   },
-  "versus_note": "TODO：呢一段總結未寫。"
+  "versus_note": "逐場排開個效率差距，今晚<strong>排得開</strong>邊個贏場波：差距最細嗰三場係 yachi 贏，最大嗰五場係 pinglamb 贏<span class=\"badge\" data-claim=\"C007\"></span>。總攻擊多嗰個仲八場全贏<span class=\"badge\" data-claim=\"C019\"></span>。即係今晚個賽果冇乜意外：每粒差距細，yachi 靠粒數贏；差距大，粒數填唔晒。"
 }

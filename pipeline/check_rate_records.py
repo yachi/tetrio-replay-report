@@ -123,7 +123,16 @@ FRAGMENTS = {
     "rate:vs-mean": (lambda a: f"{_q(a['metrics']['vs']['mean_short'], 1, 'round')} → "
                                f"{_q(a['metrics']['vs']['mean_long'], 1, 'round')}", DOCS),
     "rate:vs-mean-p": (lambda a: _p(a["metrics"]["vs"]["mean_p"], "ceil"), DOCS),
-    "rate:pps-mean-p": (lambda a: _p(a["metrics"]["pps"]["mean_p"], "floor"), DOCS),
+    # PPS's mean control supported 「still flat」 through sixteen sessions and was FLOORED
+    # (0.25 when written, 0.06 at sixteen). At seventeen it is 0.0482 and the sentence
+    # beside it now says the mean moves, barely — a rejection — so the direction flipped
+    # with the claim, to CEIL. The precision moved too, and that is the part to keep: at
+    # two places 0.0482 ceils to 0.05, a p that does not support the sentence it sits
+    # under, so a rule that is right about the direction would still have printed a
+    # figure contradicting its own claim. Three places ceil it to 0.049.
+    "rate:pps-mean": (lambda a: f"{_q(a['metrics']['pps']['mean_short'], 3, 'round')} → "
+                                f"{_q(a['metrics']['pps']['mean_long'], 3, 'round')}", DOCS),
+    "rate:pps-mean-p": (lambda a: _q(a["metrics"]["pps"]["mean_p"], 3, "ceil"), DOCS),
     # --- the records test
     "rate:records": (lambda a: str(a["records"]["in_shortest_quartile"]), DOCS),
     # The DENOMINATOR of the line above. It existed only as a typed 「24」 beside these two

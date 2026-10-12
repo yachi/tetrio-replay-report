@@ -25,13 +25,17 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
   '2026-08-19 m8r5 pinglamb',   // 7th J
   '2026-08-25 m1r6 pinglamb',   // 7th I
   '2026-10-03 m5r5 yachi',      // 7th O
+  // 2026-10-12: two more, both yachi's, both read off their cases (lock-7 piece against the
+  // mirror-aware bag-1 Z) — prefixes 48 and 72, so neither is a prefix-edge reading.
+  '2026-10-12 m2r1 yachi',      // mirrored: its bag-1 Z is S, and the 7th is O
+  '2026-10-12 m6r5 yachi',      // 7th J
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 Z, placed somewhere off the page. */
 const Z_PLACED_ELSEWHERE_BAG1 = [
@@ -66,10 +70,12 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 
 /** Page condition (in the handedness the page draws) against the branch actually built, first
  *  measured once the J<->L / S<->Z swap was implemented. Pinned here and nowhere in prose. */
+// 2026-10-12 adds the table's first `2.normal_SO` build under a `2.normal_OS` condition:
+// pinglamb's replay-2026-10-12-02.ttrm round 1 (m2r2), order as drawn OISJLTZ, prefix 32.
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 295, '2.normal_OS': 34, '2.normal_SO': 9 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 98, '2.normal_SO': 13 },
-  '2.normal_SO': { '2.ideal': 9, '2.normal_SO': 30 },
+  '2.ideal': { '2.ideal': 309, '2.normal_OS': 36, '2.normal_SO': 12 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 102, '2.normal_SO': 14 },
+  '2.normal_SO': { '2.ideal': 10, '2.normal_OS': 1, '2.normal_SO': 30 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

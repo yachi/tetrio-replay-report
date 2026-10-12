@@ -184,24 +184,25 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-09-19 | 25/28 testable = **89%** | 25/28 = **89%** | 25/28 = **89%** | 2 |
 | 2026-10-03 | 26/30 testable = **87%** | 25/30 = **83%** | 25/30 = **83%** | 2 |
 | 2026-10-09 | 19/23 testable = **83%** | 17/23 = **74%** | 17/23 = **74%** | 4 |
+| 2026-10-12 | 15/19 testable = **79%** | 13/19 = **68%** | 13/19 = **68%** | 3 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->ten of the sixteen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->eleven of the seventeen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all sixteen pass would sit at 60%. (The session count in that clause is
+2026-07-28, and a floor all seventeen pass would sit at 60%. (The session count in that clause is
 the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
 the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->eleven of the sixteen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->twelve of the sixteen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->twelve of the seventeen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->thirteen of the seventeen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3930,6 +3931,31 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 第十七個 session：兩邊各剃一次光頭，排序又分得開 (2026-10-12)
+
+2026-10-12(**8 場、55 局,pinglamb 5 比 3,局數 30 比 25**),日期同到達次序都係第十七。
+
+1. **兩邊各有一場 5 比 0**(m1 pinglamb、m3 yachi),係 09-18、10-03 之後第三晚有齊兩邊剃光頭;
+   冇一場打到第九局,之前得 09-11 係咁。yachi 喺 m2-m3 連贏 9 局 [G013]。C010:頭三場 10 比 7、
+   m4-m6 7 比 15、尾兩場 8 比 8 —— 成晚嘅差距全部喺中間三場。
+2. **per-match APP 排序分得開** [C007]:yachi 三場贏嘅 gap 全部細過 5%,pinglamb 五場贏嘅全部大過
+   11%(個 cut 喺 +4.54 同 +11.97 之間)。1/C(8,3) = **1 in 56**,屬於中間嗰級(09-17 嘅 1 in 21 同
+   08-19、08-25 嘅 1 in 120 / 126 之間),個 count 變 5 of 17。m3 yachi 每粒攻擊高過 pinglamb 超過
+   38% [C020],係全 corpus 最大嘅一場 yachi 領先。攻擊總數多嗰個贏晒八場 [C019]。
+3. **regime**:won-gap +7.14、lost-gap +15.44 [C002],比率 0.46 —— 「天花板貼、地板分開」嗰類,
+   同 07-22、08-19、08-25 一齊。兩個數 leave-one-out 都企得穩(rel 0.318 同 0.156)。
+4. **volume route**:yachi 多咗 468 粒(+9.92% [C009])、少咗 102 行攻擊(−3.15% [C005]),
+   shortfall 3.58,喺 07-24 嘅 2.66 同 08-25 嘅 3.82 中間;兩條軸都落返喺個位上面。
+5. **equiv coverage**:79% → 68%(15/19 → 13/19),唔係 exempt,跌嘅係 C007 同 C020 ——
+   per-match claim,同 09-17、10-03 一樣係機制預咗嘅形狀。
+6. **C-Spin 嗰個「零」破咗**:十六個 session 冇一個乾淨嘅 first bag 喺 C-Spin 頁 4 格之內,今次
+   pinglamb `replay-2026-10-12-07.ttrm` 第 0 局有一個 —— 但係撞嘅係 `isCSpin` 用 substring 撈埋嘅
+   「SDPC-Spin」頁,塊板離 SE Cannon 2 先 2 格,而嗰局冇 Triple,所以唔係 C-Spin。已經寫成
+   `openers.test.ts` 入面一個得一個 entry 嘅 named list。
+7. **rate records**:PPS 嘅 mean 唔再平(p 0.049,啱啱過線),而 qualifying 嘅 cut-off band 由
+   [59, 61] 收窄到 [59, 60] —— 10-12 嘅 APM 紀錄(yachi m7r8,60.7 秒)令 61 秒 cut-off 唔得。
+   `records._dp1` 第五次轉類別,又返去 enforced。
 
 ## 第十六個 session：加粒數真係買得返，但係仲係輸 (2026-10-09)
 

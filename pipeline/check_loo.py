@@ -590,6 +590,16 @@ PUBLISHED = (
     ("2026-10-09", "app_gap_won", "series"),
     ("2026-10-09", "app_gap_lost", "series"),
     ("2026-10-09", "attack_diff", "totals_1009"),
+    # 2026-10-12 takes NO `ANNOTATED` entry. Measured over the two regime figures, 55 rounds:
+    #
+    #     app_gap_won      +7.1467 pp    m5r7 ->  +4.8757  rel 0.318  1.63x the next of 55
+    #     app_gap_lost    +15.4449 pp    m8r5 -> +13.0401  rel 0.156  1.53x
+    #
+    # Both under THRESHOLD, the won-gap's 0.318 the nearer; neither sign moves. Its attack and
+    # score totals are not published by any sentence this gate anchors on, so they are not
+    # named here — add them, with a SENTENCES anchor, the day one is.
+    ("2026-10-12", "app_gap_won", "series"),
+    ("2026-10-12", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

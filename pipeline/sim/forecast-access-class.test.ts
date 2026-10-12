@@ -147,6 +147,13 @@
  * control was run: the unmutated file passes. The title of the set test is now derived from
  * ACCESS_CLASS.length — it read 「exactly the four named events」 through three additions.
  *
+ * NOT RE-MEASURED 2026-10-12, and that is a statement rather than an omission. The seventeenth
+ * session adds TWO candidates (clearAlone 37 -> 39: one `formed`, one `overdetermined`) and no
+ * member, so ACCESS_CLASS holds exactly the seven entries it held after 2026-10-09 — the sweep's
+ * set test passed unchanged with the new session on disk. The SET the four-mutant 10-09 pass was
+ * measured against is intact, so that pass still says what it said; nothing was re-run because
+ * nothing it was measured against moved.
+ *
  * The remaining mutants — the counterfactual branches and the engine-branch mutants — were NOT
  * re-run. They exercise code this change did not touch, and the 20-mutant score at the top of this
  * header is a statement about a two-member file and has been void since 2026-08-19; it is kept as
@@ -461,7 +468,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 37, formed: 18, overdetermined: 12, access: 7 };
+const DECOMP = { clearAlone: 39, formed: 19, overdetermined: 13, access: 7 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -531,6 +538,10 @@ test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
   // 2026-10-09 adds 3, splitting 2 `formed` and 1 ACCESS — clearAlone 34 -> 37, formed 16 -> 18,
   // access 6 -> 7, with `overdetermined` and `pieceBlocked` unchanged at 12 / 0. The access share
   // goes 6/34 -> 7/37, i.e. it barely moves; the member is documented in ACCESS_CLASS.
+  //
+  // 2026-10-12 adds 2, splitting 1 `formed` and 1 `overdetermined` — clearAlone 37 -> 39, formed
+  // 18 -> 19, overdetermined 12 -> 13, with `pieceBlocked` and the ACCESS CLASS unchanged at 0 / 7.
+  // The access share falls 7/37 -> 7/39 by the denominator alone.
   expect(result.clearAlone).toBe(DECOMP.clearAlone);
   expect(result.formed).toBe(DECOMP.formed);
   expect(result.overdetermined).toBe(DECOMP.overdetermined);
@@ -560,6 +571,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(16);
-  expect(result.localised).toBe(6071);
+  expect(SESSIONS.length).toBe(17);
+  expect(result.localised).toBe(6320);
 });
