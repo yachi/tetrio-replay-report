@@ -36,29 +36,24 @@ flagged in the JSON rather than in prose only:
 
 WHAT IS NOT COMMITTED: the merits/demerits prose, the HTML, the images. Only the boards, the short
 condition lines, and the page's own figures with their sentence (attributed, never recomputed).
+
+THE GATE IS SHARED. Every rule both route pages need is in `route_transcription.py`, once; this file
+holds the 迷走砲 transcription, its `SPEC` (alphabet, harddrop field, the upper-case Z reading) and
+its one rule nothing else has (`_z_left_check`), plus its selftest mutants.
 """
 from __future__ import annotations
 
-import argparse
 import copy
-import hashlib
-import json
-import re
-import sys
 from pathlib import Path
+
+from pipeline.openers import route_transcription as RT
+from pipeline.openers.route_transcription import (EMPTY, ROWS, WIDTH, bottom, cells, node, occ,
+                                                  setcell, t_slot)
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / 'meisou-routes.json'
-WIKI = HERE / 'wiki-openers.json'
 
-WIDTH = 10
-#: `match.ts`'s `ROWS`. A board taller than this cannot be compared by the classifier at all.
-ROWS = 8
-EMPTY = '-'
 ALPHABET = frozenset('-ijlostzcUZp')
-PIECES = frozenset('IJLOSTZ')
-NODE_KINDS = frozenset({'image_only', 'text_only'})
-SWAP = {'l': 'j', 'j': 'l', 's': 'z', 'z': 's', 'Z': 'S'}
 
 
 # ── the transcription ──────────────────────────────────────────────────────────────────────────
@@ -353,22 +348,6 @@ PAGE_ORDER = (
 )
 
 
-# ── board geometry ─────────────────────────────────────────────────────────────────────────────
-def t_slot(rows: list[str]) -> str | None:
-    """`flat` for the UUU-over-U TSD slot, `other` for any other U, None for none."""
-    cells = [(r, c) for r, row in enumerate(rows) for c, ch in enumerate(row) if ch == 'U']
-    if not cells:
-        return None
-    by_row: dict[int, list[int]] = {}
-    for r, c in cells:
-        by_row.setdefault(r, []).append(c)
-    if len(cells) == 4 and len(by_row) == 2:
-        (ra, ca), (rb, cb) = sorted((r, sorted(cs)) for r, cs in by_row.items())
-        if rb == ra + 1 and len(ca) == 3 and ca == [ca[0], ca[0] + 1, ca[0] + 2] and cb == [ca[1]]:
-            return 'flat'
-    return 'other'
-
-
 def build() -> dict:
     nodes = copy.deepcopy(NODES) + _pattern_nodes()
     for n in nodes:
@@ -395,198 +374,12 @@ def build() -> dict:
     }
 
 
-def bottom(rows: list[str], height: int) -> list[str]:
-    """Strip leading empty rows, then pad (with empty rows on top) to `height`."""
-    first = next((i for i, r in enumerate(rows) if r != EMPTY * WIDTH), len(rows))
-    rows = rows[first:]
-    return [EMPTY * WIDTH] * max(0, height - len(rows)) + rows
-
-
-def mirror(rows: list[str]) -> list[str]:
-    return [''.join(SWAP.get(c, c) for c in reversed(r)) for r in rows]
-
-
-def occ(rows: list[str]) -> list[str]:
-    return [''.join('#' if c != EMPTY else '.' for c in r) for r in rows]
-
-
-def after_spin(rows: list[str]) -> tuple[list[str], int]:
-    """Put the T into every U cell, clear full rows, and return (board, rows cleared)."""
-    filled = [r.replace('U', 't') for r in rows]
-    keep = [r for r in filled if EMPTY in r]
-    cleared = len(filled) - len(keep)
-    return [EMPTY * WIDTH] * cleared + keep, cleared
-
-
-def cells(rows: list[str], pred) -> set[tuple[int, int]]:
-    return {(r, c) for r, row in enumerate(rows) for c, ch in enumerate(row) if pred(ch)}
-
-
-#: One drawing per piece, y-UP (x, y); every rotation is derived, never typed.
-_PIECE_BASE = {'i': [(0, 0), (1, 0), (2, 0), (3, 0)], 'o': [(0, 0), (1, 0), (0, 1), (1, 1)],
-               't': [(0, 0), (1, 0), (2, 0), (1, 1)], 's': [(0, 0), (1, 0), (1, 1), (2, 1)],
-               'z': [(1, 0), (2, 0), (0, 1), (1, 1)], 'j': [(0, 0), (1, 0), (2, 0), (0, 1)],
-               'l': [(0, 0), (1, 0), (2, 0), (2, 1)]}
-
-
-def _norm(cs):
-    mx, my = min(x for x, _ in cs), min(y for _, y in cs)
-    return tuple(sorted((x - mx, y - my) for x, y in cs))
-
-
-def _shapes(letter):
-    out, cur = set(), _PIECE_BASE[letter]
-    for _ in range(4):
-        out.add(_norm(cur))
-        cur = [(y, -x) for x, y in cur]
-    return out
-
-
-def piece_groups_ok(rows: list[str]) -> list[str]:
-    """Rule 7: every letter group of a board is one tetromino of that letter, either as drawn or
-    with the rows it straddles (and does not touch) removed — the kept-rows frame a later piece is
-    drawn in after rows under it have cleared. Returns the letters that are not."""
-    h = len(rows)
-    groups: dict[str, list[tuple[int, int]]] = {}
-    for i, row in enumerate(rows):
-        for x, ch in enumerate(row):
-            key = 't' if ch == 'U' else ('Z' if ch == 'Z' else ch)
-            if key in _PIECE_BASE or key == 'Z':
-                groups.setdefault(key, []).append((x, h - 1 - i))
-    bad = []
-    for key, cs in sorted(groups.items()):
-        letter = 'z' if key == 'Z' else key
-        if len(cs) != 4:
-            bad.append(key)
-            continue
-        ys = sorted({y for _, y in cs})
-        gap = [y for y in range(ys[0], ys[-1] + 1) if y not in ys]
-        kept = [(x, y - sum(1 for g in gap if g < y)) for x, y in cs]
-        if _norm(cs) not in _shapes(letter) and _norm(kept) not in _shapes(letter):
-            bad.append(key)
-    return bad
-
-
-# ── the gate ───────────────────────────────────────────────────────────────────────────────────
-def verify(data: dict) -> list[str]:
-    """Every rule in the plan's §1. Returns problems; each starts with its rule's tag."""
+# ── 迷走砲's own rule, and its half of the shared gate ──────────────────────────────────────────
+def _z_left_check(data: dict, ctx: dict) -> tuple[list[str], set[str]]:
+    """Rule 3, 迷走砲 only: `bag1.z_left` is DERIVED — z_hold plus exactly the four `Z` cells of the
+    board it is derived from."""
     bad: list[str] = []
-    nodes = data.get('nodes', [])
-    ids = [n.get('id') for n in nodes]
-    by_id = {n['id']: n for n in nodes if 'id' in n}
-    boards = {n['id']: n['rows'] for n in nodes if 'rows' in n}
-    boards.update({b['id']: b['rows'] for b in data.get('basic_form', [])})
-
-    # ── provenance ──
-    terms = data.get('terms', {})
-    for k in ('url', 'dated', 'read', 'allows', 'excludes', 'requests', 'how_met'):
-        if not terms.get(k):
-            bad.append(f'terms: provenance field {k!r} is missing')
-    for k in ('url', 'updated', 'fetched', 'fetch_method', 'snapshot_sha256'):
-        if not data.get('source', {}).get(k):
-            bad.append(f'source: provenance field {k!r} is missing')
-
-    # ── rule 1: grammar ──
-    all_ids = ids + [b['id'] for b in data.get('basic_form', [])]
-    if len(all_ids) != len(set(all_ids)):
-        bad.append('grammar: duplicate ids')
-    for n in nodes:
-        nid = n.get('id', '?')
-        has_board = 'rows' in n
-        has_kind = 'node_kind' in n
-        if has_board == has_kind:
-            bad.append(f'exclusive-or: {nid} must carry exactly one of a board or a node_kind')
-        if has_kind and n['node_kind'] not in NODE_KINDS:
-            bad.append(f'grammar: {nid} has unknown node_kind {n["node_kind"]!r}')
-        if 'unmatchable' in n and not n['unmatchable']:
-            bad.append(f'grammar: {nid} is unmatchable without a reason')
-        if has_board:
-            rows = n['rows']
-            if any(len(r) != WIDTH for r in rows):
-                bad.append(f'grammar: {nid} has a row that is not {WIDTH} wide')
-            if any(ch not in ALPHABET for r in rows for ch in r):
-                bad.append(f'grammar: {nid} has a cell outside {"".join(sorted(ALPHABET))}')
-            if 'unmatchable' not in n:
-                if any('p' in r for r in rows):
-                    bad.append(f'placeholder: {nid} has a p cell but is not marked unmatchable')
-                if len(bottom(rows, 0)) > ROWS:
-                    bad.append(f'grammar: {nid} is taller than {ROWS} rows but not unmatchable')
-        for ref in ('parent', 'base', 'derived_from'):
-            if n.get(ref) is not None and n[ref] not in by_id:
-                bad.append(f'grammar: {nid} {ref} {n[ref]!r} names no node')
-        if 'list' in n:
-            if nid != f'{n["list"]}#{n.get("index")}':
-                bad.append(f'id-index: {nid} does not match its list {n["list"]!r} and index '
-                           f'{n.get("index")}')
-            slot = t_slot(n['rows'])
-            if n.get('has_tsd_slot') != (slot == 'flat') or n.get('has_u_slot') != (slot is not None):
-                bad.append(f'grammar: {nid} has_tsd_slot / has_u_slot disagree with its U cells')
-        cond = n.get('condition')
-        if cond is not None:
-            pieces = [p for c in cond.get('all', []) for p in c.get('before', [])]
-            pieces += [cond['early']] if 'early' in cond else []
-            if any(p not in PIECES for p in pieces) or (
-                    'bag1' in cond and cond['bag1'] not in by_id):
-                bad.append(f'grammar: {nid} condition names something that is not a piece/node')
-
-    # every non-board feature of the page is still a node, with the kind it was read as
-    for nid, kind in NON_BOARD.items():
-        if by_id.get(nid, {}).get('node_kind') != kind:
-            bad.append(f'non-board: {nid} ({kind}) is missing or changed kind')
-    for n in nodes:
-        if 'node_kind' in n and (n['id'] not in NON_BOARD or not n.get('page_text')):
-            bad.append(f'non-board: {n["id"]} is not on the named list or has no page_text')
-
-    # the page order covers every page-drawn board exactly once
-    po = data.get('page_order', [])
-    drawn = [i for i in all_ids if i in boards and not by_id.get(i, {}).get('derived')]
-    if sorted(po) != sorted(drawn) or len(po) != len(set(po)):
-        bad.append('page_order: does not list every drawn board exactly once')
-
-    # ── rule 2: cross-source against harddrop ──
-    wiki = json.loads(WIKI.read_text())
-    sc = next(o for o in wiki['openers'] if o['key'] == 'stray_cannon')
-    hd = {tuple(f['rows']) for f in sc['fields']}
-    if 'bag1.z_hold' in boards:
-        ours = [r.replace('-', '.').upper() for r in bottom(boards['bag1.z_hold'], 0)]
-        mine = {tuple(ours), tuple(r.upper() for r in mirror([x.lower() for x in ours]))}
-        if not (mine & hd):
-            bad.append('harddrop: bag1.z_hold disagrees with wiki-openers.json stray_cannon '
-                       'cell for cell, as drawn and mirrored')
-    else:
-        bad.append('harddrop: bag1.z_hold is missing')
-
-    # ── rule 3: internal consistency ──
-    for n in nodes:
-        nid = n.get('id', '?')
-        base = n.get('base')
-        if 'rows' not in n or base not in boards:
-            continue
-        if n.get('bag') == 2:
-            # every bag-2 board contains its bag-1 base, reading upper-case Z as the bag-1 Z
-            h = max(ROWS, len(n['rows']))
-            mine = bottom(n['rows'], h)
-            theirs = bottom(boards[base], h)
-            old = cells(mine, lambda ch: ch in 'cZ')
-            if old != cells(theirs, lambda ch: ch != EMPTY):
-                bad.append(f'bag2-base: {nid} c/Z cells are not exactly {base}\'s cells')
-            if not cells(mine, lambda ch: ch == 'Z') <= cells(theirs, lambda ch: ch == 'z'):
-                bad.append(f'bag2-base: {nid} draws Z where {base} has no bag-1 z')
-            continue
-        after, cleared = after_spin(boards[base])
-        if cleared == 0:
-            bad.append(f'c-cells: {base} clears no row when its T goes in')
-        h = max(len(after), len(n['rows']))
-        if cells(bottom(n['rows'], h), lambda ch: ch == 'c') != cells(
-                bottom(after, h), lambda ch: ch != EMPTY):
-            bad.append(f'c-cells: {nid} c cells are not what {base} leaves after its spin')
-        placed = cells(n['rows'], lambda ch: ch not in (EMPTY, 'c', 'p'))
-        if 'p' not in ''.join(n['rows']) and len(placed) % 4:
-            bad.append(f'c-cells: {nid} places {len(placed)} cells, not whole pieces')
-        if 'list' in n:
-            body = bottom(n['rows'], 0)
-            if any(EMPTY in r for r in body) or len(body) + cleared != 8:
-                bad.append(f'pc: {nid} is not an 8-line perfect clear over {base}')
+    boards, by_id = ctx['boards'], ctx['by_id']
     if 'bag1.z_left' in boards and 'bag1.z_hold' in boards:
         zl = bottom(boards['bag1.z_left'], ROWS)
         zh = bottom(boards['bag1.z_hold'], ROWS)
@@ -600,127 +393,29 @@ def verify(data: dict) -> list[str]:
             if zcells != diff:
                 bad.append('z_left: bag1.z_left\'s z cells are not the Z cells of the board it is '
                            'derived from')
-    for b in data.get('basic_form', []):
-        tgt = boards.get(b['same_as'])
-        if tgt is None or bottom(b['rows'], ROWS) != bottom(tgt, ROWS):
-            bad.append(f'basic-form: {b["id"]} is not the board of {b["same_as"]}')
+    return bad, set()
 
-    # ── rule 4: distinctness, derived here and never typed ──
-    bag2 = [n for n in nodes if n.get('bag') == 2 and 'rows' in n]
-    for i, a in enumerate(bag2):
-        for b in bag2[i + 1:]:
-            ga, gb = occ(bottom(a['rows'], ROWS)), occ(bottom(b['rows'], ROWS))
-            if ga == gb or ga == occ(mirror(bottom(b['rows'], ROWS))):
-                bad.append(f'distinct: bag-2 boards {a["id"]} and {b["id"]} are equal')
-    pats = [n for n in nodes if 'list' in n]
-    seen: dict[tuple, str] = {}
-    for n in pats:
-        g = tuple(bottom(n['rows'], ROWS))
-        for key in (g, tuple(mirror(list(g)))):
-            other = seen.get((n['parent'],) + key)
-            if other:
-                bad.append(f'distinct: duplicate pattern {n["id"]} equals {other} by colour')
-        seen[(n['parent'],) + g] = n['id']
-    classes: dict[tuple, list[str]] = {}
-    for n in pats:
-        classes.setdefault(tuple(occ([r.replace('U', EMPTY) for r in n['rows']])), []).append(
-            n['parent'])
-    largest = max(classes.values(), key=len) if classes else []
-    if not classes or max(len(v) for v in classes.values()) < 2 or len(set(largest)) < 2:
-        bad.append('occupancy-classes: bag-3 patterns became distinct by occupancy, so the shape '
-                   'that forces a colour comparison no longer holds')
 
-    # ── rule 5: known source discrepancies ──
-    found = set()
-    for lst in data.get('lists', []):
-        n_drawn = sum(1 for n in pats if n['list'] == lst['id'])
-        n_rest = sum(1 for n in pats if n['list'] == lst['id'] and n['listed_under'] == 'rest')
-        if n_drawn != lst.get('drawn') or n_rest != lst.get('rest_stated') or (
-                n_drawn - n_rest != lst.get('shown')):
-            bad.append(f'list-count: {lst["id"]} draws {n_drawn} ({n_rest} under 残り), its '
-                       f'record says {lst.get("drawn")} ({lst.get("rest_stated")})')
-        if lst.get('stated_pattern_count') is not None and lst['stated_pattern_count'] != n_drawn:
-            found.add(f'{lst["id"]}:stated_vs_drawn')
-        if not lst.get('complete'):
-            found.add(f'{lst["id"]}:non_exhaustive')
-    # ── rule 7: piece decomposition. Every letter is whole pieces of that letter, in the kept-rows
-    # frame; a drawing that colours a piece in another piece's colour is a source discrepancy ──
-    for n in nodes:
-        if 'rows' in n and 'p' not in ''.join(n['rows']) and piece_groups_ok(n['rows']):
-            found.add(f'{n["id"]}:colour')
-    for b in data.get('basic_form', []):
-        if piece_groups_ok(b['rows']):
-            found.add(f'{b["id"]}:colour')
-    named = {d['id'] for d in data.get('known_discrepancies', [])}
-    for d in sorted(found - named):
-        bad.append(f'discrepancy: {d} is not on the named list — read the page, then name it')
-    for d in sorted(named - found):
-        bad.append(f'discrepancy: {d} is named but no longer measured')
-    return bad
+SPEC = RT.TranscriptionSpec(
+    out=OUT, build=build, alphabet=ALPHABET, non_board=NON_BOARD,
+    harddrop={'key': 'stray_cannon', 'node': 'bag1.z_hold'},
+    pc_lines=8, prior_letters='Z', upper_groups={'Z': 'separate'},
+    slot_flags={'has_u_slot': lambda rows: t_slot(rows) is not None,
+                'has_tsd_slot': lambda rows: t_slot(rows) == 'flat'},
+    occupancy_class_parents=2, extra_checks=_z_left_check)
+
+
+def verify(data: dict) -> list[str]:
+    return RT.verify(data, SPEC)
 
 
 def drift(data: dict) -> list[str]:
-    return [] if data == build() else ['drift: meisou-routes.json differs from SPEC — rerun --write']
-
-
-# ── the page snapshot (offline re-check after a refetch) ─────────────────────────────────────────
-BOARD_ROW = re.compile(r'^[-a-zA-Z]{10}$')
-
-
-def page_boards(md: str) -> list[list[str]]:
-    """Every board in a markdown snapshot, in page order: runs of 10-wide board rows."""
-    out, cur = [], []
-    for line in md.split('\n'):
-        s = line.replace('\\-', '-').rstrip()
-        if BOARD_ROW.match(s):
-            cur.append(s)
-        elif cur:
-            out.append(cur)
-            cur = []
-    if cur:
-        out.append(cur)
-    return out
-
-
-def check_snapshot(data: dict, html_dir: Path) -> list[str]:
-    p = html_dir / data['source']['snapshot_file']
-    raw = p.read_bytes()
-    bad = []
-    sha = hashlib.sha256(raw).hexdigest()
-    if sha != data['source']['snapshot_sha256']:
-        bad.append(f'snapshot: sha256 {sha} is not the recorded one (read the board diff below)')
-    rows = {n['id']: n['rows'] for n in data['nodes'] if 'rows' in n}
-    rows.update({b['id']: b['rows'] for b in data['basic_form']})
-    text = raw.decode('utf8')
-    for n in data['nodes']:
-        if 'page_text' in n and n['page_text'] not in text:
-            bad.append(f'snapshot: {n["id"]}\'s page_text {n["page_text"]!r} is not on the page')
-    want = [rows[i] for i in data['page_order']]
-    got = page_boards(text)
-    if got != want:
-        bad.append(f'snapshot: the page draws {len(got)} boards, page_order has {len(want)}')
-        for k, (a, b) in enumerate(zip(got, want)):
-            if a != b:
-                bad.append(f'snapshot: board {k + 1} ({data["page_order"][k]}) differs: '
-                           f'page {a} vs transcription {b}')
-                break
-    return bad
+    return RT.drift(data, SPEC)
 
 
 # ── selftest ───────────────────────────────────────────────────────────────────────────────────
 def selftest() -> int:
     """A gate nothing can fail is decorative. Plant one defect per rule, require its own message."""
-    base = build()
-    if verify(base) or drift(json.loads(OUT.read_text())):
-        print('selftest: the committed file does not verify — fix that first', file=sys.stderr)
-        return 1
-
-    def node(d, nid):
-        return next(n for n in d['nodes'] if n['id'] == nid)
-
-    def setcell(rows, r, c, ch):
-        rows[r] = rows[r][:c] + ch + rows[r][c + 1:]
-
     def flip(d):
         setcell(node(d, '2.ideal.pc#1')['rows'], 3, 0, 'o')       # a c cell becomes a piece
 
@@ -818,103 +513,13 @@ def selftest() -> int:
         (tall, 'a 9-row board not marked unmatchable', 'grammar:'),
         (no_reason, 'an unmatchable node with no reason', 'grammar:'),
     ]
-    ok = True
-    for fn, label, tag in mutants:
-        d = copy.deepcopy(base)
-        fn(d)
-        problems = verify(d)
-        if not any(p.startswith(tag) for p in problems):
-            print(f'selftest FAILED: {label} was not caught by {tag!r} (got {problems[:3]})',
-                  file=sys.stderr)
-            ok = False
-        else:
-            print(f'  killed: {label}  [{tag}]')
-    # the drift gate itself
-    d = copy.deepcopy(base)
-    node(d, '2.ideal')['label'] = 'edited by hand'
-    if drift(d):
-        print('  killed: a hand edit to the committed JSON  [drift:]')
-    else:
-        print('selftest FAILED: a hand edit was not caught by drift', file=sys.stderr)
-        ok = False
-    # the snapshot locator: one row changed in a synthetic snapshot
-    import tempfile
-    rows = {n['id']: n['rows'] for n in base['nodes'] if 'rows' in n}
-    rows.update({b['id']: b['rows'] for b in base['basic_form']})
-    md = '\n\n'.join('\n'.join(('\\' + r) if r.startswith('-') else r for r in rows[i])
-                     for i in base['page_order']) + '\n'
-    md += '\n'.join(n['page_text'] for n in base['nodes'] if 'page_text' in n) + '\n'
-    with tempfile.TemporaryDirectory() as td:
-        p = Path(td) / base['source']['snapshot_file']
-        p.write_text(md)
-        clean = [x for x in check_snapshot(base, Path(td)) if not x.startswith('snapshot: sha256')]
-        p.write_text(md.replace('cccccUcccc', 'ccccc-cccc', 1))
-        dirty = check_snapshot(base, Path(td))
-        p.write_text(md.replace('中開け4列REN', '中開け5列REN'))
-        lost = check_snapshot(base, Path(td))
-    if clean or not any('differs' in x for x in dirty):
-        print(f'selftest FAILED: snapshot locator (clean={clean}, dirty={dirty[:2]})',
-              file=sys.stderr)
-        ok = False
-    else:
-        print('  killed: a redrawn board in the page snapshot  [snapshot:]')
-    if not any("page_text" in x for x in lost):
-        print('selftest FAILED: a non-board feature gone from the snapshot was not caught',
-              file=sys.stderr)
-        ok = False
-    else:
-        print('  killed: a non-board feature gone from the page snapshot  [snapshot:]')
-    print('selftest: all mutants killed' if ok else 'selftest: FAILED')
-    return 0 if ok else 1
+    return RT.run_selftest(SPEC, mutants, {'board': ('cccccUcccc', 'ccccc-cccc'),
+                                           'text': ('中開け4列REN', '中開け5列REN'),
+                                           'hand_edit': '2.ideal'})
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=(__doc__ or '').split('\n')[0])
-    ap.add_argument('--html-dir', type=Path,
-                    help='directory holding the markdown snapshot (meisou.md) of a refetch')
-    ap.add_argument('--write', action='store_true', help='rewrite meisou-routes.json from SPEC')
-    ap.add_argument('--selftest', action='store_true', help='prove the verifier has teeth')
-    args = ap.parse_args()
-    if args.selftest:
-        return selftest()
-
-    data = build()
-    problems = verify(data)
-    if args.html_dir:
-        problems += check_snapshot(data, args.html_dir)
-    if args.write and not problems:
-        OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
-        print(f'wrote {OUT.relative_to(HERE.parent.parent)}')
-    if not args.write:
-        problems += drift(json.loads(OUT.read_text()))
-
-    nodes = data['nodes']
-    n_boards = sum(1 for n in nodes if 'rows' in n)
-    kinds: dict[str, int] = {}
-    for n in nodes:
-        if 'node_kind' in n:
-            kinds[n['node_kind']] = kinds.get(n['node_kind'], 0) + 1
-    print(f'  {len(nodes)} nodes: {n_boards} with a board, '
-          + ', '.join(f'{v} {k}' for k, v in sorted(kinds.items()))
-          + f'; {sum(1 for n in nodes if "unmatchable" in n)} unmatchable')
-    print(f'  {len(data["page_order"])} boards in page order '
-          f'(+{sum(1 for n in nodes if n.get("derived"))} derived)')
-    for lst in data['lists']:
-        print(f'  {lst["id"]:16s} drawn {lst["drawn"]:2d} (shown {lst["shown"]}, rest '
-              f'{lst["rest_stated"]}), stated {lst["stated_pattern_count"]}')
-    classes: dict[tuple, int] = {}
-    for n in nodes:
-        if 'list' in n:
-            k = tuple(occ([r.replace('U', EMPTY) for r in n['rows']]))
-            classes[k] = classes.get(k, 0) + 1
-    print(f'  bag-3 occupancy classes (raw rows, U empty): '
-          f'{sorted(classes.values(), reverse=True)} — colour decides, occupancy cannot')
-    if problems:
-        for p in problems:
-            print(f'FAIL {p}', file=sys.stderr)
-        return 1
-    print('meisou-routes.json OK')
-    return 0
+    return RT.main(SPEC, selftest, __doc__)
 
 
 if __name__ == '__main__':

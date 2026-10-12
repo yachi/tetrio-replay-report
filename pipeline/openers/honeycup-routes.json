@@ -1,0 +1,1547 @@
+{
+  "schema": "honeycup-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/honeycup.php",
+    "title": "はちみつ砲(Honey Cup)",
+    "updated": "2025-08-03",
+    "created": "2021-12-25",
+    "fetched": "2026-10-12",
+    "fetch_method": "mcp__Parallel_Search__web_fetch with full_content=true, which renders the page to markdown (a leading \"-\" on a board row comes back escaped as \"\\-\" and is unescaped); the snapshot holds every rendered board, 36 in page order. The boards inside HTML comments (html_comment_boards) came from one raw-HTML fetch (mcp__Firecrawl__firecrawl_scrape formats=[rawHtml]) and are not in the snapshot. Plain curl through the proxy gets HTTP 403, so CI cannot refetch.",
+    "snapshot_file": "honeycup.md",
+    "snapshot_sha256": "df03d90d1a7c4d8c31e71274576df2f9b304606b9b124dc4562da25aafc40817",
+    "snapshot_bytes": 8103,
+    "snapshot_note": "sha256 of the markdown snapshot this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; a renderer change alone will move the hash, so a moved hash means \"read the board diff\", not \"the page changed\". The raw-HTML-only material (html_comment_boards, the hidden quotes) is NOT covered by this hash.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-12",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "C": "#cccccc",
+        "U": "#c8a6ff with a #8400ff radial dot",
+        "p": "#ff33ff",
+        "B": "#444444",
+        "J": "#4d57d8 (muted j)",
+        "I": "#4db1d8 (muted i)",
+        "Z": "#d84d4d (muted z)",
+        "-": "#000000"
+      },
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case) and reverses nothing else in the char map; the canvas is redrawn mirrored"
+    },
+    "decorative_images": [
+      "はちみつ砲(Honey Cup)タイトル画像"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), grey",
+    "C": "a grey cell in a row the drawn spin clears (lighter grey #cccccc)",
+    "J": "the bag-1 J, held and placed in bag 2, drawn in a muted J colour (page legend: none; OUR READING, consistent with the text 遅いほうはホールド)",
+    "I Z": "only in 2.compromise.tst: muted i/z cells inside the cleared rows",
+    "U": "the T-spin slot",
+    "p": "placeholder: any filling (STMB template only)",
+    "B": "dark grey #444444, only in 2.ideal.ren4: OUR READING, the REN region; no legend on the page",
+    "%X": "the X piece; '%I>%L>%S' means I before L before S"
+  },
+  "quotes": [
+    {
+      "id": "overview.max_damage",
+      "figure": "21ライン",
+      "verbatim": "TST→TSD→8段パフェで21ラインという高火力を狙うことができる。"
+    },
+    {
+      "id": "overview.setup_rate",
+      "figure": "65.56%",
+      "verbatim": "1巡目のセットアップ率が左右反転含めて65.56%と低め。"
+    },
+    {
+      "id": "2.ideal.pc",
+      "figure": "14パターン：パフェ率96.87%",
+      "verbatim": "理想形に組んだ場合、3巡目にはTSDを打ちつつ8段パフェを狙うことができます。(14パターン：パフェ率96.87%)"
+    },
+    {
+      "id": "2.ideal.fire",
+      "figure": "5巡パフェ(14段パフェ)",
+      "verbatim": "もしくは、%Tが遅い等でパフェを取らない場合等には、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。"
+    },
+    {
+      "id": "2.ideal.fire.stmb",
+      "figure": null,
+      "verbatim": "上記の5巡パフェを狙えない場合でも、下図の形にしたときに高さが同じ3マス空きの形ができるため、STMB caveの形を組むことができます。"
+    },
+    {
+      "id": "hidden.meisou_complement",
+      "figure": "100%",
+      "rendered": false,
+      "verbatim": "はちみつ砲は迷走砲との補完相性も良く、はちみつ砲+迷走砲のセットアップ率が100%となっていることも特徴です。",
+      "note": "inside an HTML comment; not shown on the page"
+    },
+    {
+      "id": "hidden.compromise.pc",
+      "figure": "84.31%",
+      "rendered": false,
+      "verbatim": "妥協形に組んだ場合、3巡目にはTSDを打ちつつ8段パフェを狙うことができます。(84.31%)",
+      "note": "inside an HTML comment; not shown on the page"
+    }
+  ],
+  "bag1": {
+    "requires_verbatim": "1巡目の組み方は上図の通りで、少なくとも%Iが早い必要があります。",
+    "requires": {
+      "early": "I"
+    },
+    "hold_free_verbatim": "%I>%L>%S",
+    "hold_free": {
+      "applies_to": "bag1.j_hold",
+      "before": [
+        "I",
+        "L",
+        "S"
+      ]
+    },
+    "side_verbatim": "%J%Lのどちらが早いかによって左右を決める、遅いほうはホールドしておきます。",
+    "side": {
+      "later_of": [
+        "J",
+        "L"
+      ],
+      "is": "held"
+    },
+    "mirror_note_verbatim": "(ここでは、以下左のパターン(%Jホールド)で説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。)"
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.j_right",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------j",
+        "-ss------j",
+        "ssl----tjj",
+        "lll-zzttoo",
+        "iiii-zztoo"
+      ],
+      "canvas": "tetCanvas0",
+      "snapshot_line": 24
+    },
+    {
+      "id": "basic.2",
+      "same_as": "2.ideal#3",
+      "differs": "the held J is drawn c (grey) instead of J, and the TST slot is drawn U",
+      "recolour": {
+        "J": "c",
+        "-": "U"
+      },
+      "rows": [
+        "----------",
+        "iiii------",
+        "jjss--oo--",
+        "jss---oolc",
+        "jccUzzlllc",
+        "cccUUzzccc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ],
+      "canvas": "tetCanvas1",
+      "snapshot_line": 33
+    },
+    {
+      "id": "basic.3",
+      "same_as": "2.ideal.pc#1",
+      "differs": "the TSD T is drawn U instead of t",
+      "recolour": {
+        "t": "U"
+      },
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "iiiillljjj",
+        "cccclsszzj",
+        "ccccsscczz",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "canvas": "tetCanvas2",
+      "snapshot_line": 42
+    }
+  ],
+  "groups": [
+    {
+      "id": "2.ideal",
+      "heading": "理想形 2巡目",
+      "verbatim": "2巡目はホールドしてあるミノ順に応じて%Jも含めて基本的に以下の形のいずれかに積みます。",
+      "after_verbatim": "いずれかの形に組むことで必ずTSTを打つことでできます。",
+      "hedge": "「基本的に」: the page hedges, so a bag 2 off these five is not off the route by the page's own words",
+      "drawn": 5
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.ideal.pc",
+      "parent": "2.ideal",
+      "heading": "3巡目 - パフェ狙い",
+      "stated_pattern_count": 14,
+      "shown": 5,
+      "rest_stated": 10,
+      "complete": true,
+      "after_pc_verbatim": "8段パフェを取った後は DPC や 3回目パフェ を狙うことができます。",
+      "drawn": 15
+    }
+  ],
+  "known_discrepancies": [
+    {
+      "id": "2.ideal.pc:stated_vs_drawn",
+      "what": "the page states 14 patterns and draws 15 (5 shown + 残り10); all 15 are distinct and all 15 are kept"
+    },
+    {
+      "id": "2.ideal.pc:no_tsd",
+      "what": "the sentence says 3巡目にはTSDを打ちつつ, but pc#11-#15 fill the TSD slot with other pieces: pc#11 draws no T at all (pieces ijlosz), pc#12-#15 draw the T elsewhere (across a cleared row). Only pc#1-#10 have the T in the TSD slot (ccctttcccc / cccctccccc)"
+    },
+    {
+      "id": "2.compromise.tst:highlight",
+      "what": "in the highlighted copy the cleared-row cells are upper-cased (muted) for i, c, z but NOT for the l, l, j at row 4 (from the top), columns 6-8, which stay full colour (snapshot line 340 'ICCUZZlljJ'); the held J is upper case in both copies, so its highlight is not visible. Occupancy is unaffected"
+    },
+    {
+      "id": "bag1.right:mirror",
+      "what": "the right bag-1 board is the left one mirrored with J<->L, S<->Z (cell for cell), so the page has ONE bag-1 shape, not two"
+    },
+    {
+      "id": "2.ideal.bag2:no_conditions",
+      "what": "five bag-2 variants and no stated order condition for any of them"
+    }
+  ],
+  "html_comment_boards": {
+    "note": "boards inside HTML comments in the raw HTML (fetched via Firecrawl rawHtml, 2026-10-12); NOT rendered on the page, NOT in the markdown snapshot, NOT covered by snapshot_sha256. Hand-copied; every row 10 cells and every piece letter a multiple of 4 (checked). Recorded for completeness, not as route nodes",
+    "sections": {
+      "heart.SL": "Heart%S%L埋めパターン | 3巡目の%Iの位置は4巡目に%O>%Jか%O>%Lかで置き分けると良いです。",
+      "heart.OL": "Heart%O%L埋めパターン |",
+      "compromise.pc": "3巡目 - パフェ狙い (妥協形) | 妥協形に組んだ場合、3巡目にはTSDを打ちつつ8段パフェを狙うことができます。(84.31%)"
+    },
+    "boards": [
+      {
+        "section": "heart.SL",
+        "group": "1",
+        "rows": [
+          "----------",
+          "---------i",
+          "---------i",
+          "---z-----i",
+          "oozz--j--i",
+          "oozUUUjsll",
+          "ccccUjjssl",
+          "cccc--ccsl",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.SL",
+        "group": "1",
+        "rows": [
+          "----------",
+          "----------",
+          "j---------",
+          "jjjz-----c",
+          "oozz-isllc",
+          "oozc-isslc",
+          "cccc-icslc",
+          "cccc-icccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.SL",
+        "group": "1",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "tttsszjloo",
+          "ctsszzjloo",
+          "cccczjjllc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "heart.SL",
+        "group": "2",
+        "rows": [
+          "i---------",
+          "i---------",
+          "i---------",
+          "i--z------",
+          "oozz--j---",
+          "oozUUUjsll",
+          "ccccUjjssl",
+          "cccc--ccsl",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.SL",
+        "group": "2",
+        "rows": [
+          "----------",
+          "----------",
+          "c---------",
+          "cjjz-----l",
+          "cjzz-islll",
+          "cjzc-issoo",
+          "cccc-icsoo",
+          "cccc-icccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.SL",
+        "group": "2",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "tttsszjloo",
+          "ctsszzjloo",
+          "cccczjjllc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "1",
+        "rows": [
+          "i---------",
+          "i---------",
+          "i---------",
+          "iz--------",
+          "zzss--j---",
+          "zssUUUjlll",
+          "ccccUjjloo",
+          "cccc--ccoo",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "1",
+        "rows": [
+          "----------",
+          "----------",
+          "c-------oo",
+          "cjjj----oo",
+          "czzji---ss",
+          "cczzi--ssl",
+          "cccci-clll",
+          "cccci-cccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "1",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "tttssoolll",
+          "ctssjoolcc",
+          "ccccjjjzcc",
+          "cccccizzcc",
+          "cccccizccc",
+          "cccccicccc",
+          "cccccicccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "2",
+        "rows": [
+          "i---------",
+          "i---------",
+          "i---------",
+          "iz--------",
+          "zzss--j---",
+          "zssUUUjlll",
+          "ccccUjjloo",
+          "cccc--ccoo",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "2",
+        "rows": [
+          "----------",
+          "----------",
+          "c---------",
+          "csll---z--",
+          "cssl-izzoo",
+          "ccsl-izjoo",
+          "cccc-icjjj",
+          "cccc-icccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "2",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "zztttssooj",
+          "czztsslooj",
+          "cccclllcjj",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "2",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "zztttsslll",
+          "czztjjjloo",
+          "ccccssjcoo",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "3",
+        "rows": [
+          "i---------",
+          "i---------",
+          "i---------",
+          "iz--------",
+          "zzss--j---",
+          "zssUUUjlll",
+          "ccccUjjloo",
+          "cccc--ccoo",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "3",
+        "rows": [
+          "----------",
+          "----------",
+          "c-------ss",
+          "cjjj---ssi",
+          "czzj--llli",
+          "cczz--looi",
+          "cccc--cooi",
+          "cccc--cccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "3",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "zz-----lll",
+          "czz-i--lcc",
+          "ccccissccc",
+          "ccccsscccc",
+          "ccccijcccc",
+          "ccccijcccc",
+          "ccccjjcccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "3",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "zztttsslll",
+          "czztjjjloo",
+          "ccccssjcoo",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "4",
+        "rows": [
+          "----------",
+          "----------",
+          "i-z-------",
+          "izz-------",
+          "izss--j---",
+          "issUUUjlll",
+          "ccccUjjloo",
+          "cccc--ccoo",
+          "ccc---cccc",
+          "cccc-ccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "4",
+        "rows": [
+          "----------",
+          "----------",
+          "s---------",
+          "ssll---z--",
+          "cscli-zzoo",
+          "cccli-zjoo",
+          "cccci-cjjj",
+          "cccci-cccc",
+          "cccUUUcccc",
+          "ccccUccccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "4",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "tttsszjlll",
+          "ctsszzjloo",
+          "cccczjjcoo",
+          "cccccicccc",
+          "cccccicccc",
+          "cccccicccc",
+          "cccccicccc"
+        ]
+      },
+      {
+        "section": "heart.OL",
+        "group": "4",
+        "rows": [
+          "----------",
+          "----------",
+          "----------",
+          "zztttoosll",
+          "czztjoossl",
+          "ccccjjjcsl",
+          "cccccicccc",
+          "cccccicccc",
+          "cccccicccc",
+          "cccccicccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "shown",
+        "rows": [
+          "----------",
+          "lljiiiiooc",
+          "cljjjssooc",
+          "clccsscccc",
+          "ccctttcccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "shown",
+        "rows": [
+          "----------",
+          "lliiiizooc",
+          "cljjjzzooc",
+          "clccjzcccc",
+          "ccctttcccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "shown",
+        "rows": [
+          "----------",
+          "iiiijjzooc",
+          "cllljzzooc",
+          "clccjzcccc",
+          "ccctttcccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "shown",
+        "rows": [
+          "----------",
+          "iiiijssooc",
+          "cllljjjooc",
+          "clccsscccc",
+          "ccctttcccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "iiiijjzooc",
+          "cllljzzooc",
+          "clccsscccc",
+          "cccsszcccc",
+          "ccccjccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "llsiiiiooc",
+          "clsstttooc",
+          "clccjjcccc",
+          "cccsjtcccc",
+          "ccccjccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "lliiiizooc",
+          "cltttzzooc",
+          "clccjjcccc",
+          "ccctjzcccc",
+          "ccccjccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "llsjjjzooc",
+          "clssizzooc",
+          "clccizcccc",
+          "cccsijcccc",
+          "cccciccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "lljtttzooc",
+          "cljjjzzooc",
+          "clccsscccc",
+          "cccsszcccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "llstttjjjc",
+          "clssiiiijc",
+          "clccoocccc",
+          "cccsoocccc",
+          "cccctccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "llstttzooc",
+          "clsstzzooc",
+          "clccjjcccc",
+          "cccsjzcccc",
+          "ccccjccccc"
+        ]
+      },
+      {
+        "section": "compromise.pc",
+        "group": "rest 残り8パターン",
+        "rows": [
+          "----------",
+          "tttjlllooc",
+          "ciiiissooc",
+          "ctccsscccc",
+          "cccjjjcccc",
+          "cccclccccc"
+        ]
+      }
+    ]
+  },
+  "page_order": [
+    "basic.1",
+    "basic.2",
+    "basic.3",
+    "bag1.j_hold",
+    "bag1.l_hold",
+    "2.ideal#1",
+    "2.ideal#2",
+    "2.ideal#3",
+    "2.ideal#4",
+    "2.ideal#5",
+    "2.ideal.tst",
+    "2.ideal.after_tst",
+    "2.ideal.pc#1",
+    "2.ideal.pc#2",
+    "2.ideal.pc#3",
+    "2.ideal.pc#4",
+    "2.ideal.pc#5",
+    "2.ideal.pc#6",
+    "2.ideal.pc#7",
+    "2.ideal.pc#8",
+    "2.ideal.pc#9",
+    "2.ideal.pc#10",
+    "2.ideal.pc#11",
+    "2.ideal.pc#12",
+    "2.ideal.pc#13",
+    "2.ideal.pc#14",
+    "2.ideal.pc#15",
+    "2.ideal.fire.stmb_template",
+    "2.ideal.fire.stmb_example",
+    "2.ideal.ren4",
+    "2.compromise",
+    "2.compromise.tst",
+    "2.compromise.tst_donate",
+    "2.compromise.tst_donate.after",
+    "2.compromise.roof",
+    "2.compromise.roof.after"
+  ],
+  "nodes": [
+    {
+      "id": "overview.derivation_map",
+      "bag": 0,
+      "parent": null,
+      "node_kind": "image_only",
+      "label_jp": "はちみつ砲の派生概要図(簡単ver.)",
+      "page_text": "はちみつ砲の派生概要図(簡単ver.)",
+      "image": "img/honeycup1.png",
+      "note": "the derivation overview diagram (image, 簡単ver.)"
+    },
+    {
+      "id": "bag1.j_hold",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目 (左: %Jホールド)",
+      "label": "bag 1, J held (the page's left pattern)",
+      "rows": [
+        "----------",
+        "----------",
+        "-ss-------",
+        "ssl----t--",
+        "lll-zzttoo",
+        "iiii-zztoo"
+      ]
+    },
+    {
+      "id": "bag1.l_hold",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目 (右: %Lホールド)",
+      "label": "bag 1, L held (the page's right pattern)",
+      "mirror_of": "bag1.j_hold",
+      "classifier_note": "exactly bag1.j_hold mirrored with J<->L and S<->Z swapped (checked cell for cell); a mirror-aware classifier must treat it as the SAME node, not a second branch",
+      "rows": [
+        "----------",
+        "----------",
+        "-------zz-",
+        "--t----jzz",
+        "oottss-jjj",
+        "ootss-iiii"
+      ]
+    },
+    {
+      "id": "bag1.j_right",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "label_jp": "基本形 1 (%J右置き)",
+      "label": "bag 1, J placed on the right (drawn only as basic form 1)",
+      "drawn_as": "basic.1",
+      "derivation": "bag1.j_hold plus a 4-cell J at the right wall: exactly the cells the uppercase (held) J occupies in 2.ideal#3-#5 (checked)",
+      "note": "the page's text says the later of J/L is held; this 7-lock board is drawn only in 基本形 and is not described as a variant in 1巡目とミノ順",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------j",
+        "-ss------j",
+        "ssl----tjj",
+        "lll-zzttoo",
+        "iiii-zztoo"
+      ]
+    },
+    {
+      "id": "2.ideal#1",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目 1",
+      "label": "ideal bag 2, variant 1 (held J on the left)",
+      "held_j_side": "left",
+      "condition": null,
+      "condition_note": "the page gives one shared sentence for all five (ミノ順に応じて) and no per-variant order condition; which variant is built is read off the board, not off a stated condition",
+      "rows": [
+        "----------",
+        "iiii------",
+        "JJss--jj--",
+        "Jss---jlll",
+        "Jcc-zzjloo",
+        "ccc--zzcoo",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "group": "2.ideal",
+      "variant": 1,
+      "spin_board": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal#2",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目 2",
+      "label": "ideal bag 2, variant 2 (held J on the left)",
+      "held_j_side": "left",
+      "condition": null,
+      "condition_note": "the page gives one shared sentence for all five (ミノ順に応じて) and no per-variant order condition; which variant is built is read off the board, not off a stated condition",
+      "rows": [
+        "----------",
+        "iiii------",
+        "JJss--lj--",
+        "Jss---ljjj",
+        "Jcc-zzlloo",
+        "ccc--zzcoo",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "group": "2.ideal",
+      "variant": 2,
+      "spin_board": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal#3",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目 3",
+      "label": "ideal bag 2, variant 3 (held J on the right)",
+      "held_j_side": "right",
+      "condition": null,
+      "condition_note": "the page gives one shared sentence for all five (ミノ順に応じて) and no per-variant order condition; which variant is built is read off the board, not off a stated condition",
+      "rows": [
+        "----------",
+        "iiii------",
+        "jjss--oo--",
+        "jss---oolJ",
+        "jcc-zzlllJ",
+        "ccc--zzcJJ",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "group": "2.ideal",
+      "variant": 3,
+      "spin_board": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal#4",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目 4",
+      "label": "ideal bag 2, variant 4 (held J on the right)",
+      "held_j_side": "right",
+      "condition": null,
+      "condition_note": "the page gives one shared sentence for all five (ミノ順に応じて) and no per-variant order condition; which variant is built is read off the board, not off a stated condition",
+      "rows": [
+        "----------",
+        "illl------",
+        "ilss--jj--",
+        "iss---jooJ",
+        "icc-zzjooJ",
+        "ccc--zzcJJ",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "group": "2.ideal",
+      "variant": 4,
+      "spin_board": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal#5",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目 5",
+      "label": "ideal bag 2, variant 5 (held J on the right)",
+      "held_j_side": "right",
+      "condition": null,
+      "condition_note": "the page gives one shared sentence for all five (ミノ順に応じて) and no per-variant order condition; which variant is built is read off the board, not off a stated condition",
+      "rows": [
+        "----------",
+        "ijjj------",
+        "iooj--ls--",
+        "ioo---lssJ",
+        "icc-zzllsJ",
+        "ccc--zzcJJ",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "group": "2.ideal",
+      "variant": 5,
+      "spin_board": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal.tst",
+      "bag": 2,
+      "parent": "2.ideal",
+      "label_jp": "TST (消える段)",
+      "label": "ideal TST: generic illustration, cleared rows in C",
+      "node_kind": "illustration",
+      "unmatchable": "generic: every bag-2 cell drawn c/C, the three cleared rows in C (light grey); occupancy equals each 2.ideal#k board plus the U slot",
+      "rows": [
+        "----------",
+        "cccc------",
+        "cccc--cc--",
+        "ccc---cccc",
+        "CCCUCCCCCC",
+        "CCCUUCCCCC",
+        "CCCUCCCCCC",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.ideal.after_tst",
+      "bag": 2,
+      "parent": "2.ideal",
+      "label_jp": "TST後",
+      "label": "ideal, after the TST",
+      "node_kind": "illustration",
+      "note": "all five 2.ideal#k boards collapse to this exact occupancy after the TST (checked by simulating the U slot fill and the 3-row clear)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "cccc------",
+        "cccc--cc--",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ],
+      "after_of": "2.ideal.tst"
+    },
+    {
+      "id": "2.ideal.pc#1",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 1",
+      "pieces": "ijlstz",
+      "missing": "o",
+      "rows": [
+        "----------",
+        "iiiillljjj",
+        "cccclsszzj",
+        "ccccsscczz",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#2",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 2",
+      "pieces": "ijlstz",
+      "missing": "o",
+      "rows": [
+        "----------",
+        "iiiijjzsll",
+        "ccccjzzssl",
+        "ccccjzccsl",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#3",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 3",
+      "pieces": "ijlost",
+      "missing": "z",
+      "rows": [
+        "----------",
+        "iiiilllooj",
+        "cccclssooj",
+        "ccccssccjj",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#4",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 4",
+      "pieces": "ijlotz",
+      "missing": "s",
+      "rows": [
+        "----------",
+        "iiiijjzlll",
+        "ccccjzzloo",
+        "ccccjzccoo",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#5",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 5",
+      "pieces": "ijlost",
+      "missing": "z",
+      "rows": [
+        "----------",
+        "iiiijjjsll",
+        "ccccoojssl",
+        "ccccooccsl",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#6",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 6",
+      "pieces": "ijlotz",
+      "missing": "s",
+      "rows": [
+        "----------",
+        "iiiiloojjj",
+        "ccccloozzj",
+        "ccccllcczz",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#7",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 7",
+      "pieces": "ijlstz",
+      "missing": "o",
+      "rows": [
+        "----------",
+        "iiiijsszzl",
+        "ccccjjjlll",
+        "ccccsscczz",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#8",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 8",
+      "pieces": "ijlost",
+      "missing": "z",
+      "rows": [
+        "----------",
+        "iiiijsslll",
+        "ccccjjjloo",
+        "ccccssccoo",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#9",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 9",
+      "pieces": "ijlotz",
+      "missing": "s",
+      "rows": [
+        "----------",
+        "iiiiooljjj",
+        "cccclllzzj",
+        "ccccoocczz",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#10",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 10",
+      "pieces": "ijlotz",
+      "missing": "s",
+      "rows": [
+        "----------",
+        "iiiijjjzzl",
+        "ccccoojlll",
+        "ccccoocczz",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#11",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 11",
+      "pieces": "ijlosz",
+      "missing": "t",
+      "rows": [
+        "----------",
+        "iiiijjzlll",
+        "ccccjzzloo",
+        "ccccssccoo",
+        "cccsszcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#12",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 12",
+      "pieces": "ijlost",
+      "missing": "z",
+      "rows": [
+        "----------",
+        "iiiilllooj",
+        "cccctttooj",
+        "ccccssccjj",
+        "cccsstcccc",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#13",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 13,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 13",
+      "pieces": "ijlstz",
+      "missing": "o",
+      "rows": [
+        "----------",
+        "iiiillljjj",
+        "cccctttzzj",
+        "ccccsscczz",
+        "cccsstcccc",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#14",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 14,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 14",
+      "pieces": "ijostz",
+      "missing": "l",
+      "rows": [
+        "----------",
+        "iiiitoojjj",
+        "ccccsoozzj",
+        "ccccsscczz",
+        "cccttscccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#15",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "list": "2.ideal.pc",
+      "index": 15,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 15",
+      "pieces": "ilostz",
+      "missing": "j",
+      "rows": [
+        "----------",
+        "iiiitoozzl",
+        "ccccsoolll",
+        "ccccsscczz",
+        "cccttscccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.fire.pc5_image_1",
+      "bag": 3,
+      "parent": "2.ideal",
+      "node_kind": "image_only",
+      "label_jp": "はちみつ砲理想形 空中TSDからの5巡パフェ派生",
+      "page_text": "はちみつ砲理想形 空中TSDからの5巡パフェ派生",
+      "image": "img/td35honey1.png"
+    },
+    {
+      "id": "2.ideal.fire.pc5_image_2",
+      "bag": 3,
+      "parent": "2.ideal",
+      "node_kind": "image_only",
+      "label_jp": "TDパフェ系テンプレ TSDからの5巡パフェ派生",
+      "page_text": "TDパフェ系テンプレ TSDからの5巡パフェ派生",
+      "image": "img/td35matome1.png",
+      "note": "a generic TD-PC-family chart, not specific to Honey Cup"
+    },
+    {
+      "id": "2.ideal.fire.stmb_template",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "label_jp": "STMB cave の形",
+      "unmatchable": "placeholder cells (p, magenta): any filling is allowed; also 9 rows > ROWS = 8",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "iiii---ppp",
+        "cccc---ppp",
+        "cccc--ccpp",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.ideal.fire.stmb_example",
+      "bag": 3,
+      "parent": "2.ideal.fire.stmb_template",
+      "base": "2.ideal.after_tst",
+      "label_jp": "例",
+      "label": "STMB cave example",
+      "unmatchable": "9 rows > ROWS = 8",
+      "rows": [
+        "----------",
+        "-------sll",
+        "-------ssl",
+        "---zz---sl",
+        "iiiizz-ooj",
+        "cccc---ooj",
+        "cccc--ccjj",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.ideal.ren4",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after_tst",
+      "label_jp": "4列REN派生",
+      "label": "centre 4-wide REN off the TSD (タネ3)",
+      "text_verbatim": "また、基本形に組んだ場合はTSDを打った残りの地形がタネ3となるのでそのまま中開けRENに派生することもできます。",
+      "unmatchable": "B cells (dark grey #444444, no legend on the page): OUR READING, the REN stack region / pieces still to come; 13 cells, not whole pieces",
+      "rows": [
+        "---BBBB---",
+        "---BBBB---",
+        "ccccBBB---",
+        "ccccBBcc--",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ]
+    },
+    {
+      "id": "2.compromise",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.j_hold",
+      "spin": "TST",
+      "label_jp": "妥協形 2巡目",
+      "label": "compromise bag 2",
+      "condition_verbatim": "%L・%Z>%J・%Oの場合など、上の組み方ができない場合は以下のように組み、TSTを打ちます。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "J"
+            ]
+          },
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          },
+          {
+            "before": [
+              "Z",
+              "J"
+            ]
+          },
+          {
+            "before": [
+              "Z",
+              "O"
+            ]
+          }
+        ],
+        "illustrative": true
+      },
+      "condition_note": "「など」: an example, not the exhaustive trigger; the stated case is 'when the ideal shapes cannot be built'. %J here is OUR READING as the bag-2 J (the bag-1 J is held)",
+      "rows": [
+        "--------oo",
+        "i-------oo",
+        "i-ss--l-jj",
+        "iss---l-jJ",
+        "icc-zzlljJ",
+        "ccc--zzcJJ",
+        "ccc-cccccc",
+        "cccc-ccccc"
+      ],
+      "spin_board": "2.compromise.tst"
+    },
+    {
+      "id": "2.compromise.tst",
+      "bag": 2,
+      "parent": "2.compromise",
+      "label_jp": "妥協形 TST",
+      "label": "compromise with the TST slot and cleared rows highlighted",
+      "node_kind": "illustration",
+      "note": "same occupancy as 2.compromise plus the U slot (checked); cleared-row cells drawn in upper case (lighter shade)",
+      "rows": [
+        "--------oo",
+        "i-------oo",
+        "i-ss--l-jj",
+        "iss---l-jJ",
+        "ICCUZZlljJ",
+        "CCCUUZZCJJ",
+        "CCCUCCCCCC",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.tst_donate",
+      "bag": 3,
+      "parent": "2.compromise",
+      "base": "2.compromise",
+      "label_jp": "3巡目 - TSTドネイト",
+      "label": "compromise bag 3: TST donate, before",
+      "condition_verbatim": "また、%Tが遅いなどでパフェルートに行かない場合、%S>%Zであれば以下のようにドネイトを組むことで火力を維持しつつ綺麗に組み上げることができます。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "S",
+              "Z"
+            ]
+          }
+        ]
+      },
+      "rows": [
+        "----------",
+        "jj------oo",
+        "j-----l-oo",
+        "jUzzlllicc",
+        "cUUzzssicc",
+        "cUccsscicc",
+        "ccc---cicc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.tst_donate.after",
+      "bag": 3,
+      "parent": "2.compromise.tst_donate",
+      "base": "2.compromise.tst_donate",
+      "label_jp": "TSTドネイト → 後",
+      "label": "TST donate, after: a Z roof over the TSD slot",
+      "rows": [
+        "----------",
+        "jj--------",
+        "js-----ioo",
+        "jss---zioo",
+        "ccs--zzicc",
+        "c----zcicc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.roof",
+      "bag": 3,
+      "parent": "2.compromise.tst_donate",
+      "base": "2.compromise.tst_donate",
+      "label_jp": "3巡目 (L屋根)",
+      "label": "after the TST donate, an L roof over the TSD slot (the page's second continuation)",
+      "note": "drawn as the second pair under 3巡目 - TSTドネイト; its c cells are exactly what the TST donate leaves (rule 3), so it continues the donate, beside tst_donate.after (the Z roof)",
+      "text_verbatim": "%Zか%L屋根を付けてTSDを打ちつつ、綺麗な地形を保つことができます。",
+      "rows": [
+        "----------",
+        "jj--------",
+        "js-----ioo",
+        "jss----ioo",
+        "ccsl---icc",
+        "clll--cicc",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.roof.after",
+      "bag": 3,
+      "parent": "2.compromise.roof",
+      "base": "2.compromise.roof",
+      "label_jp": "→ (Z屋根)",
+      "label": "then a Z over the L roof, and the TSD fired",
+      "note": "drawn 6 rows high because it is the board AFTER the TSD: the L roof's bottom two rows held the TSD slot, and a T in it clears them (rule `continues` checks the slot is one T)",
+      "rows": [
+        "----------",
+        "jj--------",
+        "js-----ioo",
+        "jss---zioo",
+        "ccsl-zzicc",
+        "clll-zcicc"
+      ],
+      "continues": {
+        "cleared_below": 2
+      }
+    }
+  ]
+}

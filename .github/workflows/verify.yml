@@ -652,6 +652,22 @@ jobs:
       - name: Check the Stray Cannon page audit catches its corruptions
         run: python3 -m pipeline.stray_cannon_page --selftest
 
+      # The Honey Cup (はちみつ砲) route transcription, through the same shared gate
+      # (pipeline/openers/route_transcription.py) plus its own rules. Its corpus artefact is
+      # checked by pipeline/openers/honey-cup.test.ts in the typescript job.
+      - name: Check the Honey Cup route transcription
+        run: python3 -m pipeline.openers.extract_honeycup_routes
+
+      - name: Check the Honey Cup route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_honeycup_routes --selftest
+
+      # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
+      # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
+      # typescript job.
+      - name: Check the Honey Cup page audit catches its corruptions
+        run: python3 -m pipeline.honey_cup_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 
