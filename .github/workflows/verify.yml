@@ -662,12 +662,28 @@ jobs:
       - name: Check the Honey Cup route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_honeycup_routes --selftest
 
+      # The 山岳積み2号 (Mountainous Stacking 2) route transcription, through the same shared gate.
+      # Its snapshot is the page's raw HTML rather than a markdown rendering (see the script's
+      # docstring); neither is committed, so CI checks the transcription and the gate's teeth only.
+      - name: Check the Mountainous Stacking 2 route transcription
+        run: python3 -m pipeline.openers.extract_mountainous2_routes
+
+      - name: Check the Mountainous Stacking 2 route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_mountainous2_routes --selftest
+
       # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
       # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
       # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
       # typescript job.
       - name: Check the Honey Cup page audit catches its corruptions
         run: python3 -m pipeline.honey_cup_page --selftest
+
+      # The 山岳積み2号 route pages are the same shared renderer bound to
+      # pipeline/mountainous2_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (mountainous2-demos.html) are checked by pipeline/openers/mountainous2-demos.test.ts in
+      # the typescript job.
+      - name: Check the Mountainous Stacking 2 page audit catches its corruptions
+        run: python3 -m pipeline.mountainous2_page --selftest
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check

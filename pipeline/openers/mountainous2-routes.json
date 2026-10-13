@@ -1,0 +1,1653 @@
+{
+  "schema": "mountainous2-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/mountainous2.php",
+    "title": "山岳積み2号(Mountainous Stacking 2)",
+    "updated": "2024-10-16",
+    "created": "2021-12-30",
+    "fetched": "2026-10-12",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (fetched from letsencrypt.org/certs/gen-y/int-ye2.pem) because shiwehi.com omits it from its chain. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 52 ten-wide boards in page order plus six cycle fragments. NOT the markdown rendering the 迷走砲 and はちみつ砲 transcriptions hashed (MCP web_fetch, because curl got HTTP 403 there): the two kinds of hash are not comparable.",
+    "snapshot_file": "mountainous2.html",
+    "snapshot_sha256": "e7e7107e089e76d40555b114f6eee654caa4e812d1696d9372156a322602c44f",
+    "snapshot_bytes": 38268,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-12",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "U": "#c8a6ff with a #8400ff radial dot",
+        "L": "#d8904d (muted l)",
+        "-": "#000000"
+      },
+      "rows": "textContent split on whitespace, one row per token; a first row 10 wide gets class haba10, anything else (the haba4 / haba3 cycle diagrams) is drawn at its own width",
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case) and reverses nothing else in the char map; the canvas is redrawn mirrored"
+    },
+    "decorative_images": [
+      "山岳積み2号(Mountainous Stacking 2)タイトル画像"
+    ],
+    "references_listed": [
+      "https://tetristemplate.info/sangaku2/",
+      "https://harddrop.com/wiki/Mountainous_Stacking#Mountainous_Stacking_2",
+      "https://x.com/dot_TIZ/status/1804861229598667074"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), grey",
+    "L": "the bag-1 L, not stood on the tower but held into bag 2, drawn in a muted L colour (page legend: none; OUR READING, consistent with harddrop's \"the L piece is held until the second bag\")",
+    "U": "the T-spin slot",
+    "cycle fragment": "a 4-wide (haba4) or 3-wide (haba3) diagram of one region; its c means \"not one of these pieces\", not \"filled\" (all four O/S/Z cycles draw c in their corners, over an empty board cell in cycle 1)",
+    "%X": "the X piece; '%J>%Z' means J before Z; '%S%O' is OUR READING as S before O"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": null,
+      "verbatim": "という、積み込み→TSTから8ラインパフェを狙うor中開けRENに派生する開幕テンプレについて紹介していきます。"
+    },
+    {
+      "id": "overview.pc4_rare",
+      "figure": null,
+      "verbatim": "また、稀に4ラインパフェを狙うこともできます。"
+    },
+    {
+      "id": "overview.gamushiro",
+      "figure": null,
+      "verbatim": "ガムシロ積みと%Iの位置がずれた形になります。"
+    },
+    {
+      "id": "overview.setup_rate",
+      "figure": "66.67% / 100%",
+      "verbatim": "セットアップ率は片側で66.67%、左右反転も含めると100%となりますが、2巡目にミノ順による組み分けが発生します。"
+    },
+    {
+      "id": "overview.bag2_three",
+      "figure": "3パターン",
+      "verbatim": "2巡目にパフェ派生に行こうと思うと派生が多いため、覚える量が多い。(このページでは2巡目は3パターンのみ紹介)",
+      "note": "in context (「2巡目にパフェ派生に行こうと思うと…」) the three are the bag-2 Perfect Clear patterns, i.e. the 2.pc4 list, which the page also counts as 3パターン; the page also has three bag-2 board families, which this sentence does not count"
+    },
+    {
+      "id": "bag1.requires",
+      "figure": null,
+      "verbatim": "1巡目の組み方は上図の通りで、%J>%Zもしくは%L%Sが早いと組むことができます。"
+    },
+    {
+      "id": "bag1.also",
+      "figure": null,
+      "verbatim": "また、%O%S%Zが早い時も%J%Lのどちらが早いかを判断することでソフドロ無しで組むことができます。"
+    },
+    {
+      "id": "bag1.side",
+      "figure": null,
+      "verbatim": "%J%Lのどちらが早いかによって左右を決めると良いでしょう。"
+    },
+    {
+      "id": "bag1.mirror_note",
+      "figure": null,
+      "verbatim": "(ここでは、以下左のパターンで説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。)"
+    },
+    {
+      "id": "bag1.l_left_omitted",
+      "figure": null,
+      "verbatim": "%Lを左に置くパフェ率の高い派生もありますが、このページでは省略します。"
+    },
+    {
+      "id": "2.pc4",
+      "figure": "3パターン26.19%",
+      "verbatim": "山岳積み2号では3パターン26.19%で4ラインパフェを狙うことができます。"
+    },
+    {
+      "id": "2.ideal",
+      "figure": null,
+      "verbatim": "2巡目が%S%Oの場合、下図のように理想形を組むことができます。"
+    },
+    {
+      "id": "2.ideal.pc",
+      "figure": "14パターン：パフェ率97.94%",
+      "verbatim": "3巡目はTSDを打ちつつパフェを狙います。(14パターン：パフェ率97.94%)"
+    },
+    {
+      "id": "after_pc",
+      "figure": null,
+      "verbatim": "8段パフェを取った後はDPCや3回目パフェを狙うことができます。",
+      "note": "drawn under both 8-line PC lists"
+    },
+    {
+      "id": "2.ideal.fire",
+      "figure": "5巡パフェ(14段パフェ)",
+      "verbatim": "%Tが遅い等でパフェを取らない場合等には、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。"
+    },
+    {
+      "id": "2.normal",
+      "figure": null,
+      "verbatim": "2巡目に%I%Lor%O%Jが早い場合には、通常形を組むことができます。"
+    },
+    {
+      "id": "2.normal.pc",
+      "figure": "8パターン：パフェ率96.90%",
+      "verbatim": "3巡目はTSDを打ちつつパフェを狙います。(8パターン：パフェ率96.90%)"
+    },
+    {
+      "id": "2.compromise",
+      "figure": null,
+      "verbatim": "%O%Sの場合には、妥協系を組むことになります。"
+    },
+    {
+      "id": "2.compromise.fire34",
+      "figure": null,
+      "verbatim": "火力重視で安定した地形にする組み方はこちら。"
+    },
+    {
+      "id": "2.compromise.fire34.cycle",
+      "figure": "100%",
+      "verbatim": "3巡目は%Lをホールドしつつ、%O%S%Z循環で100%組むことができます。"
+    },
+    {
+      "id": "2.compromise.fire34.bag4.cycle",
+      "figure": "100%",
+      "verbatim": "4巡目は上図のように%J%L循環で100%組むことができます。"
+    },
+    {
+      "id": "2.compromise.fire5",
+      "figure": "5巡パフェ(14段パフェ)",
+      "verbatim": "もしくは、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。"
+    },
+    {
+      "id": "2.compromise.fire5.pc",
+      "figure": "6パターン：パフェ率100%",
+      "verbatim": "5巡目はパフェを狙います。(6パターン：パフェ率100%)"
+    }
+  ],
+  "bag1": {
+    "requires_verbatim": "1巡目の組み方は上図の通りで、%J>%Zもしくは%L%Sが早いと組むことができます。",
+    "requires": {
+      "any": [
+        {
+          "before": [
+            "J",
+            "Z"
+          ]
+        },
+        {
+          "early": [
+            "L",
+            "S"
+          ]
+        }
+      ],
+      "illustrative": true
+    },
+    "requires_note": "a SUFFICIENT condition, not the trigger: the next sentence widens it (%O%S%Z early also works), and the page states 66.67% one side / 100% with the mirror",
+    "also_verbatim": "また、%O%S%Zが早い時も%J%Lのどちらが早いかを判断することでソフドロ無しで組むことができます。",
+    "also": {
+      "early": [
+        "O",
+        "S",
+        "Z"
+      ],
+      "then_decided_by": [
+        "J",
+        "L"
+      ]
+    },
+    "side_verbatim": "%J%Lのどちらが早いかによって左右を決めると良いでしょう。",
+    "side": {
+      "decided_by": [
+        "J",
+        "L"
+      ],
+      "which": null
+    },
+    "side_note": "the page does not say which side goes with which piece",
+    "mirror_note_verbatim": "(ここでは、以下左のパターンで説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。)",
+    "omitted_verbatim": "%Lを左に置くパフェ率の高い派生もありますが、このページでは省略します。"
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.l_top",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "------l---",
+        "------l---",
+        "is----ll--",
+        "iss----t--",
+        "ijs-zzttoo",
+        "ijjj-zztoo"
+      ],
+      "canvas": "tetCanvas0"
+    },
+    {
+      "id": "basic.2",
+      "same_as": "2.ideal",
+      "rows": [
+        "----------",
+        "----------",
+        "jjoo------",
+        "jsoo--c--i",
+        "jss---clli",
+        "ccsUzzccli",
+        "cccUUzzcli",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ],
+      "canvas": "tetCanvas1"
+    },
+    {
+      "id": "basic.3",
+      "same_as": "2.ideal.pc#3",
+      "differs": "the TSD T is drawn U instead of t",
+      "recolour": {
+        "t": "U"
+      },
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "iiiijjzlll",
+        "ccccjzzlss",
+        "ccccjzcssc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "canvas": "tetCanvas2"
+    }
+  ],
+  "groups": [
+    {
+      "id": "2.normal",
+      "heading": "通常形 2巡目",
+      "drawn": 3,
+      "condition_verbatim": "2巡目に%I%Lor%O%Jが早い場合には、通常形を組むことができます。",
+      "condition": {
+        "any": [
+          {
+            "early": [
+              "I",
+              "L"
+            ]
+          },
+          {
+            "early": [
+              "O",
+              "J"
+            ]
+          }
+        ]
+      },
+      "condition_note": "OUR READING: two early PAIRS; the page gives the trigger for the family, never for a form"
+    },
+    {
+      "id": "2.compromise.fire5",
+      "heading": "3巡目 - 火力派生 5巡パフェ狙い",
+      "drawn": 2,
+      "heading_note": "the page's one heading over this line; it covers bag 3 and, with no text between, the bag-4 boards below",
+      "text_verbatim": "もしくは、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。"
+    },
+    {
+      "id": "2.compromise.fire5.bag4",
+      "heading": "3巡目 - 火力派生 5巡パフェ狙い",
+      "drawn": 2,
+      "heading_note": "OUR READING that these two are bag 4: the page has no 4巡目 heading or sentence for them; they follow the bag-3 TSD board with no text between, and each draws a second TSD on it (checked against the base chain)"
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.pc4",
+      "parent": "bag1.l_hold",
+      "base": "bag1.l_hold",
+      "bag": 2,
+      "heading": "2巡目4ラインパフェ",
+      "stated_pattern_count": 3,
+      "shown": 3,
+      "rest_stated": 0,
+      "complete": true,
+      "pc_lines": 4,
+      "pc_lines_note": "a 4-line PC drawn in bag 2 on the L-held board: no spin before it",
+      "drawn": 3
+    },
+    {
+      "id": "2.ideal.pc",
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "bag": 3,
+      "heading": "3巡目 - パフェ狙い",
+      "stated_pattern_count": 14,
+      "shown": 4,
+      "rest_stated": 10,
+      "complete": true,
+      "drawn": 14
+    },
+    {
+      "id": "2.normal.pc",
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "bag": 3,
+      "heading": "3巡目",
+      "stated_pattern_count": 8,
+      "shown": 3,
+      "rest_stated": 5,
+      "complete": true,
+      "drawn": 8
+    },
+    {
+      "id": "2.compromise.fire5.pc",
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "bag": 5,
+      "heading": "5巡目",
+      "stated_pattern_count": 6,
+      "shown": 6,
+      "rest_stated": 0,
+      "complete": true,
+      "pc_lines": 9,
+      "total_lines": 14,
+      "total_lines_quote": "2.compromise.fire5",
+      "pc_lines_note": "the 7-row body plus the bag-4 TSD before it; the page's 14段 counts every bag of the line (TST 3 + TSD 2 + TSD 2 + 7), which `_mountainous2_checks` re-derives along the base chain",
+      "drawn": 6
+    }
+  ],
+  "known_discrepancies": [
+    {
+      "id": "bag1.right:mirror",
+      "what": "the right bag-1 board is the left one mirrored with J<->L, S<->Z (cell for cell), so the page has ONE bag-1 shape, not two"
+    },
+    {
+      "id": "2.ideal.pc:no_tsd",
+      "what": "the sentence says 3巡目はTSDを打ちつつ, but pc#8-#14 do not put the T in the TSD slot (ccctttcccc / cccctccccc): pc#8 draws no T at all, pc#9-#14 draw it elsewhere (across a cleared row)"
+    },
+    {
+      "id": "2.normal.pc:no_tsd",
+      "what": "the same sentence over the 通常形 list, and pc#4-#8 do not put the T in the TSD slot: pc#7 draws no T at all, the others draw it elsewhere"
+    },
+    {
+      "id": "2.normal:no_conditions",
+      "what": "three 通常形 forms under one stated trigger (%I%L or %O%J early) and no condition saying which form to build"
+    },
+    {
+      "id": "2.compromise.fire5:no_conditions",
+      "what": "two 5巡パフェ bag-3 forms and no condition saying which"
+    },
+    {
+      "id": "2.compromise.fire5.bag4:no_conditions",
+      "what": "two 5巡パフェ bag-4 forms and no condition saying which"
+    },
+    {
+      "id": "overview:ren_not_drawn",
+      "what": "the introduction names a 中開けREN derivation; the page draws none"
+    }
+  ],
+  "page_order": [
+    "basic.1",
+    "basic.2",
+    "basic.3",
+    "bag1.l_top",
+    "bag1.j_top",
+    "2.pc4#1",
+    "2.pc4#2",
+    "2.pc4#3",
+    "2.ideal",
+    "2.ideal.after",
+    "2.ideal.pc#1",
+    "2.ideal.pc#2",
+    "2.ideal.pc#3",
+    "2.ideal.pc#4",
+    "2.ideal.pc#5",
+    "2.ideal.pc#6",
+    "2.ideal.pc#7",
+    "2.ideal.pc#8",
+    "2.ideal.pc#9",
+    "2.ideal.pc#10",
+    "2.ideal.pc#11",
+    "2.ideal.pc#12",
+    "2.ideal.pc#13",
+    "2.ideal.pc#14",
+    "2.normal#1",
+    "2.normal#2",
+    "2.normal#3",
+    "2.normal.after",
+    "2.normal.pc#1",
+    "2.normal.pc#2",
+    "2.normal.pc#3",
+    "2.normal.pc#4",
+    "2.normal.pc#5",
+    "2.normal.pc#6",
+    "2.normal.pc#7",
+    "2.normal.pc#8",
+    "2.compromise",
+    "2.compromise.after",
+    "2.compromise.fire34",
+    "2.compromise.fire34.bag4",
+    "2.compromise.fire5#1",
+    "2.compromise.fire5#2",
+    "2.compromise.fire5.after",
+    "2.compromise.fire5.bag4#1",
+    "2.compromise.fire5.bag4#2",
+    "2.compromise.fire5.bag4.after",
+    "2.compromise.fire5.pc#1",
+    "2.compromise.fire5.pc#2",
+    "2.compromise.fire5.pc#3",
+    "2.compromise.fire5.pc#4",
+    "2.compromise.fire5.pc#5",
+    "2.compromise.fire5.pc#6"
+  ],
+  "nodes": [
+    {
+      "id": "overview.derivation_map",
+      "bag": 0,
+      "parent": null,
+      "node_kind": "image_only",
+      "label_jp": "山岳積み2号の組み方概略図(簡単ver.)",
+      "page_text": "山岳積み2号の組み方概要図(簡単ver.)",
+      "image": "img/mountainous21.png",
+      "note": "the overview diagram (image); the heading says 概略図, the image alt (page_text) 概要図"
+    },
+    {
+      "id": "overview.video",
+      "bag": 0,
+      "parent": null,
+      "node_kind": "video_only",
+      "label_jp": "解説動画",
+      "page_text": "https://www.youtube.com/embed/V_L3uo3eP9I",
+      "note": "an embedded explanation video (posted by くぷりん, shown with permission per the page); no board"
+    },
+    {
+      "id": "bag1.l_top",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own (its sentence calls it 以下左のパターン)",
+      "label": "bag 1, the L stood on its end at the right (the page's left pattern)",
+      "rows": [
+        "----------",
+        "------l---",
+        "------l---",
+        "is----ll--",
+        "iss----t--",
+        "ijs-zzttoo",
+        "ijjj-zztoo"
+      ]
+    },
+    {
+      "id": "bag1.j_top",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own",
+      "label": "bag 1, mirrored: the J stood on its end at the left (the page's right pattern)",
+      "mirror_of": "bag1.l_top",
+      "classifier_note": "exactly bag1.l_top mirrored with J<->L and S<->Z swapped (checked cell for cell); a mirror-aware classifier must treat it as the SAME node, not a second branch",
+      "rows": [
+        "----------",
+        "---j------",
+        "---j------",
+        "--jj----zi",
+        "--t----zzi",
+        "oottss-zli",
+        "ootss-llli"
+      ]
+    },
+    {
+      "id": "bag1.l_hold",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "derived": true,
+      "derived_from": "bag1.l_top",
+      "derivation": "bag1.l_top less its four l cells (checked): the 6-lock board with the L held, which is harddrop's Mountainous Stacking 2 field cell for cell (rule 2). The page never draws it alone; it is the c cells of every board that draws the upper-case L",
+      "label": "bag 1 with the L held (harddrop's field; not drawn alone on the page)",
+      "rows": [
+        "is--------",
+        "iss----t--",
+        "ijs-zzttoo",
+        "ijjj-zztoo"
+      ]
+    },
+    {
+      "id": "2.pc4#1",
+      "bag": 2,
+      "parent": "bag1.l_hold",
+      "base": "bag1.l_hold",
+      "list": "2.pc4",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "2巡目4ラインパフェ 1",
+      "pieces": "jos",
+      "rows": [
+        "----------",
+        "ccLLjjssoo",
+        "cccLjsscoo",
+        "cccLcccccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.pc4#2",
+      "bag": 2,
+      "parent": "bag1.l_hold",
+      "base": "bag1.l_hold",
+      "list": "2.pc4",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "2巡目4ラインパフェ 2",
+      "pieces": "ilo",
+      "rows": [
+        "----------",
+        "ccLLiiiioo",
+        "cccLlllcoo",
+        "cccLcccccc",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.pc4#3",
+      "bag": 2,
+      "parent": "bag1.l_hold",
+      "base": "bag1.l_hold",
+      "list": "2.pc4",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "2巡目4ラインパフェ 3",
+      "pieces": "jot",
+      "rows": [
+        "----------",
+        "ccjjjtttoo",
+        "cccLLLtcoo",
+        "cccLcccccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.l_top",
+      "spin": "TST",
+      "label_jp": "理想形 2巡目",
+      "label": "ideal bag 2",
+      "condition_verbatim": "2巡目が%S%Oの場合、下図のように理想形を組むことができます。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "S",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_note": "OUR READING of 「%S%O」 as S before O: 妥協系 is triggered by 「%O%S」, and read as a set the two would be the same trigger",
+      "rows": [
+        "----------",
+        "jjoo------",
+        "jsoo--c--i",
+        "jss---clli",
+        "ccsUzzccli",
+        "cccUUzzcli",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.ideal.after",
+      "bag": 2,
+      "parent": "2.ideal",
+      "label": "ideal, after the TST",
+      "node_kind": "illustration",
+      "after_of": "2.ideal",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "cccc------",
+        "cccc--c--c",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.ideal.pc#1",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 1",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "iiiillljjj",
+        "cccclssooj",
+        "ccccsscooc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#2",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 2",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "iiiijjjlll",
+        "ccccoojlss",
+        "ccccoocssc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#3",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 3",
+      "pieces": "ijlstz",
+      "rows": [
+        "----------",
+        "iiiijjzlll",
+        "ccccjzzlss",
+        "ccccjzcssc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#4",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "3巡目 - パフェ狙い 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "iiiijjzloo",
+        "ccccjzzloo",
+        "ccccjzcllc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#5",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 5,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 5",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "iiiijjzzoo",
+        "ccccjllloo",
+        "ccccjlczzc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#6",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 6",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "iiiiooljss",
+        "ccccllljjj",
+        "ccccoocssc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#7",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 7",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "iiiiooljjz",
+        "ccccllljzz",
+        "ccccoocjzc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.ideal.pc#8",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 8",
+      "pieces": "ijlosz",
+      "rows": [
+        "----------",
+        "iiiijjzloo",
+        "ccccjzzloo",
+        "ccccsscllc",
+        "cccsszcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#9",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 9",
+      "pieces": "ilostz",
+      "rows": [
+        "----------",
+        "iiiisllloo",
+        "ccccsszzoo",
+        "cccctsczzc",
+        "cccttlcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#10",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 10",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "iiiillljjj",
+        "cccctttooj",
+        "ccccsscooc",
+        "cccsstcccc",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#11",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 11",
+      "pieces": "ijlstz",
+      "rows": [
+        "----------",
+        "iiiillljjz",
+        "cccctttjzz",
+        "ccccsscjzc",
+        "cccsstcccc",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#12",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 12",
+      "pieces": "ijostz",
+      "rows": [
+        "----------",
+        "iiiitoojjz",
+        "ccccsoojzz",
+        "ccccsscjzc",
+        "cccttscccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#13",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 13,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 13",
+      "pieces": "ilostz",
+      "rows": [
+        "----------",
+        "iiiitllloo",
+        "ccccslzzoo",
+        "ccccssczzc",
+        "cccttscccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.pc#14",
+      "bag": 3,
+      "parent": "2.ideal",
+      "base": "2.ideal.after",
+      "list": "2.ideal.pc",
+      "index": 14,
+      "listed_under": "rest",
+      "label_jp": "3巡目 - パフェ狙い 14",
+      "pieces": "ijostz",
+      "rows": [
+        "----------",
+        "iiiitjzzoo",
+        "ccccsjjjoo",
+        "ccccssczzc",
+        "cccttscccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.ideal.fire.pc5_image",
+      "bag": 3,
+      "parent": "2.ideal",
+      "node_kind": "image_only",
+      "label_jp": "TDパフェ系テンプレ TSDからの5巡パフェ派生",
+      "page_text": "TDパフェ系テンプレ TSDからの5巡パフェ派生",
+      "image": "img/td35matome1.png",
+      "text_verbatim": "%Tが遅い等でパフェを取らない場合等には、下図のように組むことで火力を維持しつつ5巡パフェ(14段パフェ)を狙うことができます。",
+      "note": "a generic TD-PC-family chart (the same image はちみつ砲 shows), not specific to this opener"
+    },
+    {
+      "id": "2.normal#1",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.l_top",
+      "spin": "TST",
+      "label_jp": "通常形 2巡目 1",
+      "label": "normal bag 2, form 1 (O and J on the left)",
+      "group": "2.normal",
+      "variant": 1,
+      "condition": null,
+      "rows": [
+        "----------",
+        "--------ss",
+        "oojj--cssi",
+        "ooj---clli",
+        "ccjUzzccli",
+        "cccUUzzcli",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.normal#2",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.l_top",
+      "spin": "TST",
+      "label_jp": "通常形 2巡目 2",
+      "label": "normal bag 2, form 2 (I and J on the left, O on the right)",
+      "group": "2.normal",
+      "variant": 2,
+      "condition": null,
+      "rows": [
+        "----------",
+        "--------ss",
+        "iiii--cssl",
+        "jjj---clll",
+        "ccjUzzccoo",
+        "cccUUzzcoo",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.normal#3",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.l_hold",
+      "spin": "TST",
+      "label_jp": "通常形 2巡目 3",
+      "label": "normal bag 2, form 3 (the held L placed at the right wall; the bag-2 L stands where the bag-1 L stood on 2.normal#1, sharing 2 of its 4 cells)",
+      "group": "2.normal",
+      "variant": 3,
+      "condition": null,
+      "base_note": "the only bag-2 form on the L-held board: its c cells are bag1.l_hold, not bag1.l_top (rule 3)",
+      "rows": [
+        "----------",
+        "--------LL",
+        "iiii--lllL",
+        "jjj---lssL",
+        "ccjUzzssoo",
+        "cccUUzzcoo",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.normal.after",
+      "bag": 2,
+      "parent": "2.normal",
+      "label": "normal, after the TST (all three forms collapse to it; checked)",
+      "node_kind": "illustration",
+      "after_of": "2.normal#1",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "--------cc",
+        "cccc--cccc",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.normal.pc#1",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "3巡目 1",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "oojiiiilll",
+        "oojjjsslcc",
+        "ccccsscccc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#2",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "3巡目 2",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "oollljiiii",
+        "oolzzjjjcc",
+        "cccczzcccc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#3",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "3巡目 3",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "jiiiioolll",
+        "jjjzzoolcc",
+        "cccczzcccc",
+        "ccctttcccc",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#4",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 4,
+      "listed_under": "rest",
+      "label_jp": "3巡目 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "ooiiiizlll",
+        "ootttzzlcc",
+        "ccccjjcccc",
+        "ccctjzcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.normal.pc#5",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 5,
+      "listed_under": "rest",
+      "label_jp": "3巡目 5",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "oostttiiii",
+        "oosstlllcc",
+        "ccccjjcccc",
+        "cccsjlcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#6",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "3巡目 6",
+      "pieces": "jlostz",
+      "rows": [
+        "----------",
+        "oostttzlll",
+        "oosstzzlcc",
+        "ccccjjcccc",
+        "cccsjzcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#7",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "3巡目 7",
+      "pieces": "ijlosz",
+      "rows": [
+        "----------",
+        "ooiiiizlll",
+        "oojjjzzlcc",
+        "ccccsscccc",
+        "cccsszcccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.normal.pc#8",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "3巡目 8",
+      "pieces": "ijlosz",
+      "rows": [
+        "----------",
+        "oosjjjzlll",
+        "oossizzlcc",
+        "ccccizcccc",
+        "cccsijcccc",
+        "cccciccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.compromise",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.l_top",
+      "spin": "TST",
+      "label_jp": "妥協系 2巡目",
+      "label": "compromise bag 2",
+      "condition_verbatim": "%O%Sの場合には、妥協系を組むことになります。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "S"
+            ]
+          }
+        ]
+      },
+      "condition_note": "OUR READING of 「%O%S」 as O before S (see 2.ideal)",
+      "rows": [
+        "-ss-------",
+        "ss--------",
+        "oojj--c--i",
+        "ooj---clli",
+        "ccjUzzccli",
+        "cccUUzzcli",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.after",
+      "bag": 2,
+      "parent": "2.compromise",
+      "label": "compromise, after the TST",
+      "node_kind": "illustration",
+      "after_of": "2.compromise",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-cc-------",
+        "cc--------",
+        "cccc--c--c",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire34",
+      "bag": 3,
+      "parent": "2.compromise",
+      "base": "2.compromise.after",
+      "spin": "TSD",
+      "label_jp": "火力重視 3巡目",
+      "label": "compromise, attack-first bag 3 (the L held while O/S/Z cycle in, then placed)",
+      "text_verbatim": "火力重視で安定した地形にする組み方はこちら。",
+      "hold_verbatim": "3巡目は%Lをホールドしつつ、%O%S%Z循環で100%組むことができます。",
+      "hold": "L",
+      "hold_note": "the page says the L is held during bag 3; the board shows where it ends up (lll over l, columns 6-8)",
+      "rows": [
+        "----------",
+        "i-j-------",
+        "i-j---lll-",
+        "ijj---lzs-",
+        "icc---zzss",
+        "cc----zoos",
+        "cccc--cooc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire34.cycle1",
+      "bag": 3,
+      "parent": "2.compromise.fire34",
+      "node_kind": "cycle_fragment",
+      "haba": 4,
+      "fragment_rows": [
+        "czsc",
+        "zzss",
+        "zoos",
+        "cooc"
+      ],
+      "page_text": "czsc zzss zoos cooc",
+      "fragment_of": "2.compromise.fire34",
+      "at": [
+        3,
+        6
+      ],
+      "label": "O/S/Z cycle 1: the arrangement drawn in 2.compromise.fire34"
+    },
+    {
+      "id": "2.compromise.fire34.cycle2",
+      "bag": 3,
+      "parent": "2.compromise.fire34",
+      "node_kind": "cycle_fragment",
+      "haba": 4,
+      "fragment_rows": [
+        "czzc",
+        "oozz",
+        "ooss",
+        "cssc"
+      ],
+      "page_text": "czzc oozz ooss cssc",
+      "label": "O/S/Z cycle 2"
+    },
+    {
+      "id": "2.compromise.fire34.cycle3",
+      "bag": 3,
+      "parent": "2.compromise.fire34",
+      "node_kind": "cycle_fragment",
+      "haba": 4,
+      "fragment_rows": [
+        "cooc",
+        "sooz",
+        "sszz",
+        "cszc"
+      ],
+      "page_text": "cooc sooz sszz cszc",
+      "label": "O/S/Z cycle 3"
+    },
+    {
+      "id": "2.compromise.fire34.cycle4",
+      "bag": 3,
+      "parent": "2.compromise.fire34",
+      "node_kind": "cycle_fragment",
+      "haba": 4,
+      "fragment_rows": [
+        "cssc",
+        "ssoo",
+        "zzoo",
+        "czzc"
+      ],
+      "page_text": "cssc ssoo zzoo czzc",
+      "label": "O/S/Z cycle 4"
+    },
+    {
+      "id": "2.compromise.fire34.bag4",
+      "bag": 4,
+      "parent": "2.compromise.fire34",
+      "base": "2.compromise.fire34",
+      "spin": "TSD",
+      "label_jp": "火力重視 4巡目",
+      "label": "compromise, attack-first bag 4 (J/L cycle on the left; a vertical T slot)",
+      "text_verbatim": "4巡目は上図のように%J%L循環で100%組むことができます。",
+      "rows": [
+        "----------",
+        "jjj-------",
+        "llj---zooi",
+        "clc--zzooi",
+        "clc--zccci",
+        "ccc---ccci",
+        "cccssUcccc",
+        "ccssUUcccc",
+        "cccc-Ucccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire34.bag4.cycle1",
+      "bag": 4,
+      "parent": "2.compromise.fire34.bag4",
+      "node_kind": "cycle_fragment",
+      "haba": 3,
+      "fragment_rows": [
+        "jjj",
+        "llj",
+        "clc",
+        "clc"
+      ],
+      "page_text": "jjj llj clc clc",
+      "fragment_of": "2.compromise.fire34.bag4",
+      "at": [
+        1,
+        0
+      ],
+      "label": "J/L cycle 1: the arrangement drawn in 2.compromise.fire34.bag4"
+    },
+    {
+      "id": "2.compromise.fire34.bag4.cycle2",
+      "bag": 4,
+      "parent": "2.compromise.fire34.bag4",
+      "node_kind": "cycle_fragment",
+      "haba": 3,
+      "fragment_rows": [
+        "lll",
+        "ljj",
+        "cjc",
+        "cjc"
+      ],
+      "page_text": "lll ljj cjc cjc",
+      "label": "J/L cycle 2"
+    },
+    {
+      "id": "2.compromise.fire5#1",
+      "bag": 3,
+      "parent": "2.compromise",
+      "base": "2.compromise.after",
+      "spin": "TSD",
+      "label_jp": "火力派生 5巡パフェ狙い 3巡目 1",
+      "label": "compromise, 5-bag PC line, bag 3 form 1",
+      "group": "2.compromise.fire5",
+      "variant": 1,
+      "condition": null,
+      "rows": [
+        "----------",
+        "izz-------",
+        "ijzz------",
+        "ijjj------",
+        "iccss--loo",
+        "ccss---loo",
+        "cccc--cllc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5#2",
+      "bag": 3,
+      "parent": "2.compromise",
+      "base": "2.compromise.after",
+      "spin": "TSD",
+      "label_jp": "火力派生 5巡パフェ狙い 3巡目 2",
+      "label": "compromise, 5-bag PC line, bag 3 form 2",
+      "group": "2.compromise.fire5",
+      "variant": 2,
+      "condition": null,
+      "rows": [
+        "----------",
+        "ioo-------",
+        "iool------",
+        "illl------",
+        "iccss--jjz",
+        "ccss---jzz",
+        "cccc--cjzc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5.after",
+      "bag": 3,
+      "parent": "2.compromise.fire5",
+      "label": "5-bag PC line, after the bag-3 TSD (both forms collapse to it; checked)",
+      "node_kind": "illustration",
+      "after_of": "2.compromise.fire5#1",
+      "rows": [
+        "----------",
+        "ccc-------",
+        "cccc------",
+        "cccc------",
+        "ccccc--ccc",
+        "cccc---ccc",
+        "cccc--cccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5.bag4#1",
+      "bag": 4,
+      "parent": "2.compromise.fire5",
+      "base": "2.compromise.fire5.after",
+      "spin": "TSD",
+      "label": "compromise, 5-bag PC line, bag 4 form 1 (OUR READING of the bag; the page gives no caption)",
+      "group": "2.compromise.fire5.bag4",
+      "variant": 1,
+      "condition": null,
+      "unmatchable": "9 non-empty rows (under the blank top row) > ROWS = 8",
+      "rows": [
+        "----------",
+        "jj--------",
+        "joo-------",
+        "joo------i",
+        "ccc---slli",
+        "cccc--ssli",
+        "ccccUUUsli",
+        "cccccUzccc",
+        "cccc-zzccc",
+        "cccc-zcccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5.bag4#2",
+      "bag": 4,
+      "parent": "2.compromise.fire5",
+      "base": "2.compromise.fire5.after",
+      "spin": "TSD",
+      "label": "compromise, 5-bag PC line, bag 4 form 2 (OUR READING of the bag; the page gives no caption)",
+      "group": "2.compromise.fire5.bag4",
+      "variant": 2,
+      "condition": null,
+      "unmatchable": "9 non-empty rows (under the blank top row) > ROWS = 8",
+      "rows": [
+        "----------",
+        "ls--------",
+        "lss-------",
+        "lls------i",
+        "ccc---ooji",
+        "cccc--ooji",
+        "ccccUUUjji",
+        "cccccUzccc",
+        "cccc-zzccc",
+        "cccc-zcccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5.bag4.after",
+      "bag": 4,
+      "parent": "2.compromise.fire5.bag4",
+      "label": "5-bag PC line, after the bag-4 TSD (both forms collapse to it; checked)",
+      "node_kind": "illustration",
+      "after_of": "2.compromise.fire5.bag4#1",
+      "rows": [
+        "----------",
+        "cc--------",
+        "ccc-------",
+        "ccc------c",
+        "ccc---cccc",
+        "cccc--cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.fire5.pc#1",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "5巡目 1",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "cctttiiiiz",
+        "ccctssoozz",
+        "cccssloozc",
+        "ccclllcccc",
+        "ccccjjcccc",
+        "ccccjccccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.compromise.fire5.pc#2",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "5巡目 2",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "cctttoolll",
+        "ccctzoolss",
+        "ccczzjjssc",
+        "ccczijcccc",
+        "ccccijcccc",
+        "cccciccccc",
+        "cccciccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.compromise.fire5.pc#3",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "5巡目 3",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "cciiiissoo",
+        "ccczzsstoo",
+        "cccllltttc",
+        "ccclzzcccc",
+        "ccccjjcccc",
+        "ccccjccccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.compromise.fire5.pc#4",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "5巡目 4",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "cctttssloo",
+        "ccctsszloo",
+        "cccjizzllc",
+        "cccjjjcccc",
+        "ccccizcccc",
+        "cccciccccc",
+        "cccciccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.compromise.fire5.pc#5",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "5巡目 5",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "cczzjjiiii",
+        "ccczztttss",
+        "cccllltssc",
+        "cccloocccc",
+        "ccccoocccc",
+        "ccccjccccc",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.compromise.fire5.pc#6",
+      "bag": 5,
+      "parent": "2.compromise.fire5.bag4",
+      "base": "2.compromise.fire5.bag4.after",
+      "list": "2.compromise.fire5.pc",
+      "index": 6,
+      "listed_under": "shown",
+      "label_jp": "5巡目 6",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "ccjjjtttoo",
+        "cccsjizzoo",
+        "cccssitzzc",
+        "cccllicccc",
+        "cccclicccc",
+        "cccclccccc",
+        "ccccsccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    }
+  ]
+}

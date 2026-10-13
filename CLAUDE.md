@@ -243,6 +243,14 @@ bun pipeline/sim/emit-route-demos.ts --opener honeycup \
   --out analysis/honey-cup-demos.json                           # the constructed はちみつ砲 demos (quarantined, not corpus data)
 bun test pipeline/openers/honey-cup.test.ts pipeline/openers/honey-cup-demos.test.ts  # its two tests
 python3 -m pipeline.honey_cup_page --selftest   # the docs/honey-cup*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_mountainous2_routes            # CI gate: the 山岳積み2号 route transcription
+python3 -m pipeline.openers.extract_mountainous2_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-route-facts.ts --opener mountainous2 \
+  --out analysis/mountainous2-facts.json                        # 山岳積み2号's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener mountainous2 \
+  --out analysis/mountainous2-demos.json                        # the constructed 山岳積み2号 demos (quarantined, not corpus data)
+bun test pipeline/openers/mountainous2.test.ts pipeline/openers/mountainous2-demos.test.ts  # its two tests
+python3 -m pipeline.mountainous2_page --selftest # the docs/mountainous2*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -2502,12 +2510,15 @@ almost any opener page. Only exact separates. `occupancy_aliases` and `round_ove
 columns that are the same rounds twice: MS1 and MS2 are one bag-1 shape built from different
 pieces, so their rows are identical in every session and must never be added.
 
-**The route pages count bag 1 differently, on purpose, and say so.** The Stray Cannon and Honey Cup
-columns here are each opener's harddrop field by occupancy; `docs/stray-cannon.html` and
-`docs/honey-cup.html` follow shiwehi.com's trees, which also take the 6-lock held-piece field, so
-their bag-1 totals are LARGER than these columns. Each route artefact carries the column's own
-predicate as a flag (`matched_at_6`, `matched_harddrop`), its test compares that flag with this
-table per (session, player), and each overview prints both totals — see 「定式路線頁」.
+**The route pages count bag 1 differently, on purpose, and say so.** Three of these columns have a
+route page — Stray Cannon (`docs/stray-cannon.html`), Honey Cup (`docs/honey-cup.html`) and
+Mountainous Stacking 2 (`docs/mountainous2.html`) — and each column here is that opener's harddrop
+field by occupancy, while the page follows shiwehi.com's tree, which also takes a second bag-1 board
+(the 6-lock held-piece field for the first two, the 7-lock board with the L stood on end for
+山岳積み2号, whose harddrop field is itself the 6-lock one), so every page's bag-1 total is LARGER
+than its column. Each route artefact carries the column's own predicate as a flag (`matched_at_6`,
+`matched_harddrop`), its test compares that flag with this table per (session, player), and each
+overview prints both totals — see 「定式路線頁」. MS1 has no page: it is the same occupancy as MS2.
 
 The repertoires split, reproduced independently in all seventeen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -3236,27 +3247,30 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号）— the opener route pages, quarantined like the replays
 
-Two shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
-`meisou.php`) and はちみつ砲 (Honey Cup, `honeycup.php`). **One implementation per rule, one profile
+Three shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
+`meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`) and 山岳積み2号 (Mountainous Stacking 2,
+`mountainous2.php`). **One implementation per rule, one profile
 per opener**, because a rule kept in two implementations drifts (「Three backends」): the classifier
 is `pipeline/sim/route-facts.ts`, the demo planner `pipeline/sim/route-demos.ts`, the transcription
 gate `pipeline/openers/route_transcription.py`, the page renderer and audit `pipeline/route_page.py`,
 and the shared test checks `pipeline/openers/route-facts-checks.ts` / `route-demo-checks.ts`. What
-differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` (the TS profile:
-nodes, locks, artefact strings, named lists, the demo half), and `stray_cannon_page.py` /
-`honey_cup_page.py` (the page profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
+differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` /
+`route-profile-mountainous2.ts` (the TS profile: nodes, locks, artefact strings, named lists, the
+demo half), and `stray_cannon_page.py` / `honey_cup_page.py` / `mountainous2_page.py` (the page
+profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
 `emit-route-demos.ts --opener <key>`; 迷走砲 keeps its original entry files as shims with their old
 signatures, so its tests and commands did not change.
 
 **The md5 inputs are scoped per opener.** `emitter_md5` / `planner_md5` / `classifier_md5` each hash
 the shared module, `route-profile.ts`, that opener's own profile file and its entry file
 (`hashFiles` in the profile). An edit to one opener's profile stales only that opener's artefacts;
-an edit to shared code stales both, loudly, and the regeneration must then differ in those hash
+an edit to shared code stales all of them, loudly, and the regeneration must then differ in those hash
 lines ONLY — that is the check that a shared-code edit left the other opener's behaviour alone.
 The generalisation was landed that way: every 迷走砲 artefact and page byte-identical except the
-three hash lines.
+three hash lines — and 山岳積み2号 was added the same way, moving only the hash lines of the other
+two openers' four artefacts and none of their pages.
 
 ### 迷走砲
 
@@ -3427,6 +3441,75 @@ B cells, and `2.compromise.roof.after`, which the planner measures as unbuildabl
 after its TSD cleared the two rows under it). The demo test's `ignoreConditions` is a **mutant here,
 not a control** — the reverse of 迷走砲: dropping the bag-1 order deals J before L, so the held J
 would be the earlier one, against the page's rule. `no180` stays a control.
+
+### 山岳積み2号
+
+The same deliverable for `mountainous2.php`: `pipeline/openers/mountainous2-routes.json` (gated by
+`extract_mountainous2_routes.py` through the shared gate), `analysis/mountainous2-facts.json`
+(`mountainous2.test.ts`), `analysis/mountainous2-demos.json` (`mountainous2-demos.test.ts`), and
+`docs/mountainous2.html` plus `mountainous2-bag1-only.html`, `mountainous2-ideal.html`,
+`mountainous2-normal.html`, `mountainous2-compromise.html` and `mountainous2-demos.html`, rendered by
+`bin/build-docs` from `ROUTE_SITES` and linked as the third card under 定式路線. It is the page for
+yachi's most-played named opener (the 六個具名定式 MS2 column). Counts are read off the artefacts and
+tests, never typed here or in `mountainous2_prose.json`.
+
+**Its snapshot is the page's RAW HTML, and that hash is not comparable with the other two.** curl
+works here (with TLS verification on and a CA bundle adding the Let's Encrypt YE2 intermediate the
+server omits), so the transcription is checked against the HTML byte for byte, while 迷走砲 and
+はちみつ砲 hashed a markdown rendering. Board rows are read off the raw lines; sentences are compared
+against the page with its tags dropped. Any byte of the page moves the hash, so a moved hash means
+「read the board diff」, which `--html-dir` prints.
+
+What this page needs that the other two did not:
+
+* **The harddrop field is the 6-lock board, and the page never draws it.** The page draws bag 1 with
+  the L stood on end (`bag1.l_top`, 7 locks); harddrop's Mountainous Stacking 2 field is that board
+  with the L held, so `bag1.l_hold` is DERIVED (`bag1.l_top` less its four `l` cells, checked) and
+  carries no source label. The hold split is はちみつ砲's with L for J. **The FLAG `matched_harddrop`
+  is the 6-LOCK match** — the reverse of Honey Cup's — compared per (session, player) with
+  `opener-facts.json` `mountainous_2.exact`; the page's bag-1 total is that column plus the rounds
+  that match only at 7 locks (the L landed inside the first six). Upper-case `L` has no legend on the
+  page and is read as the held bag-1 L; the gate checks every board drawing it sits on exactly the
+  6-lock board. Both players mirror it (`MIRRORED_BAG1`).
+* **Three Perfect Clear kinds** (`pcKinds` in the TS profile): a 4-line PC in bag 2 with no spin
+  before it (`2.pc4`, on the L-held board, scoped to `bag1.l_hold`), the 8-line PC after the TST, and
+  a 14-line 5巡パフェ whose frame starts after the last TSD (scoped to `2.compromise`, because the
+  bag-4 boards between are 9 rows and unmatchable). A list carries its own `pc_lines` /
+  `total_lines` in the transcription, and `route_page.pc_lines_of` reads them for the demo end check,
+  which now tests a list BEFORE the bag-2 rule (a bag-2 list is a PC, not a TST board); the page
+  selftest plants the profile's single count back and must see the 4- and 14-line demos fail.
+* **A held piece comes out at the next piece DEALT, which is not always the next bag's.** In the
+  4-line PCs the bag's unused pieces follow its last placement, so the piece swapped into the hold
+  comes out when the first unused one arrives, and that one stays held. The planner's `out@next`
+  token is unchanged (it is in はちみつ砲's artefact bytes); `route_page` words it with the prose
+  key `hold_out_next_unused` whenever the bag has unused pieces, which only this opener does.
+* **Boards past bag 2 are matched mid-round** (snapshots up to the bag-4 board); the 9-row ones are
+  `unmatchable` with the reason saying 「non-empty rows」.
+* **The TSD's T is the `t` in the slot, not the flat T shape.** `spinLetter` counts a `t` only when
+  its cells are exactly the empty slot in the bottom two rows of the pattern's base board, which the
+  demo test pins as `TSD_T_PATTERNS`; the patterns that do not are the two `no_tsd` discrepancies.
+* **Cycle diagrams are `cycle_fragment` nodes, never boards.** Six 4- and 3-wide diagrams; the
+  first of each set is checked against the board it is drawn from. A fragment's `c` means 「not one
+  of these pieces」, so a `c` over an EMPTY board cell is the page's convention (all four O/S/Z
+  cycles draw it in their corners) — the first transcription filed one as a drawing slip and the
+  independent audit showed it was not, so it is no discrepancy.
+* **Readings are marked, not smoothed.** 「%S%O」 and 「%O%S」 are read as ORDERS (as sets the two
+  triggers would be one), the 通常形 trigger as two early pairs (it is a group condition, not tallied
+  in `CONDITIONS`), the bag-1 condition is `illustrative`, and calling the second pair of 5巡パフェ
+  boards bag 4 is ours (`heading_note`: the page gives them no heading). A `label_jp` is page text or
+  a heading path, never an invented caption; the after-the-spin boards and the derived board have
+  none.
+
+The named lists are `L_HOLD_BAG1`, `L_PLACED_ELSEWHERE_BAG1`, `BAG2_GARBAGE_STRIPPED`,
+`BAG2_NONE_TST_BEFORE_COMPLETE` / `_EXTRA_PIECE` / `_MOVED_PIECE`, `PC_OFF_PAGE`, and the
+measured-empty `BAG2_HANDEDNESS_MISMATCH`, `COLOUR_DISAGREE`, `PC_GARBAGE_IN_WINDOW` and
+`MULTI_COLOUR_RESOLVED_BY_GROUP`; demos `DEMO_UNBUILT` (the mirror, the after-the-spin illustrations,
+and the planner's measured failure on one PC pattern), `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS`,
+`DEMO_PIECE_READINGS`. Sizes are read off the tests. **`ignoreConditions` is a control here**, as for
+迷走砲 and unlike はちみつ砲: every order the page states is already forced by its boards; `no180` is
+a control too. One wording leftover is deliberate: the off-page reason string says 「garbage between
+the TST and the PC」 even for a 14-line PC, because that string is part of the other two openers'
+artefact bytes.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

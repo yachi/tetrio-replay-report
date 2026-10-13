@@ -29,8 +29,12 @@ per rule and requires that tag):
      discrepancies equals the named `known_discrepancies`, both ways.
   7. piece decomposition — every letter is whole pieces of that letter in the kept-rows frame.
 
-`--html-dir` re-checks a refetched markdown snapshot: every board in page order, every non-board
-feature's `page_text`.
+A list may carry its own `pc_lines` (a 4-line PC drawn in bag 2; a PC after two spins whose body
+plus the last spin is not the spec's figure); a list node drawn in bag 2 is checked as a PC with no
+spin before it, and is left out of the bag-2 board distinctness (its list rule covers it).
+
+`--html-dir` re-checks a refetched snapshot — a markdown rendering (迷走砲, はちみつ砲) or the raw
+HTML (山岳積み2号): every board in page order, every non-board feature's `page_text`.
 """
 from __future__ import annotations
 
@@ -308,6 +312,10 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
         bad.append(f'harddrop: {hnode} is missing')
 
     # ── rule 3: internal consistency ──
+    #: a list may name its own line count (a 4-line PC drawn in bag 2, a PC after more than one
+    #: spin); every other list clears the spec's
+    list_lines = {lst['id']: lst.get('pc_lines', spec.pc_lines) for lst in data.get('lists', [])}
+
     def post_spin(base: str) -> tuple[list[str], int, str]:
         """What `base` leaves after its T-spin: from its own U cells, from the board that draws its
         spin (`spin_board`), or — for a board that IS the after-spin board (`after_of`) — itself."""
@@ -350,6 +358,12 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             for up in spec.prior_letters:
                 if not cells(mine, lambda ch: ch == up) <= cells(theirs, lambda ch: ch == up.lower()):
                     bad.append(f'bag2-base: {nid} draws {up} where {base} has no bag-1 {up.lower()}')
+            if 'list' in n:
+                # a Perfect Clear drawn in bag 2: no spin before it, so the body is every line
+                body = bottom(n['rows'], 0)
+                want = list_lines.get(n['list'], spec.pc_lines)
+                if any(EMPTY in r for r in body) or len(body) != want:
+                    bad.append(f'pc: {nid} is not a {want}-line perfect clear over {base}')
             continue
         if n.get('continues'):
             # the same board built on, then a T into the base's own slot in its bottom
@@ -384,15 +398,19 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             bad.append(f'c-cells: {nid} places {len(placed)} cells, not whole pieces')
         if 'list' in n:
             body = bottom(n['rows'], 0)
-            if any(EMPTY in r for r in body) or len(body) + cleared != spec.pc_lines:
-                bad.append(f'pc: {nid} is not an {spec.pc_lines}-line perfect clear over {base}')
+            want = list_lines.get(n['list'], spec.pc_lines)
+            if any(EMPTY in r for r in body) or len(body) + cleared != want:
+                bad.append(f'pc: {nid} is not an {want}-line perfect clear over {base}')
     for b in data.get('basic_form', []):
         tgt = boards.get(b['same_as'])
         if tgt is None or not recolour_equal(b['rows'], tgt, b.get('recolour', {})):
             bad.append(f'basic-form: {b["id"]} is not the board of {b["same_as"]}')
 
     # ── rule 4: distinctness, derived here and never typed ──
-    bag2 = [n for n in nodes if n.get('bag') == 2 and 'rows' in n and 'node_kind' not in n]
+    # a PC pattern drawn in bag 2 is a list node: its distinctness is the list rule below, and
+    # every one of them shares the full-rows occupancy by construction
+    bag2 = [n for n in nodes if n.get('bag') == 2 and 'rows' in n and 'node_kind' not in n
+            and 'list' not in n]
     for i, a in enumerate(bag2):
         for b in bag2[i + 1:]:
             ra, rb = bottom(a['rows'], ROWS), bottom(b['rows'], ROWS)
@@ -490,13 +508,21 @@ def check_snapshot(data: dict, html_dir: Path) -> list[str]:
     rows = {n['id']: n['rows'] for n in data['nodes'] if 'rows' in n}
     rows.update({b['id']: b['rows'] for b in data['basic_form']})
     text = raw.decode('utf8')
+    # a RAW-HTML snapshot (山岳積み2号: plain curl works there) carries the page's markup inside its
+    # sentences; text is compared against the page with its tags dropped and entities decoded, while
+    # boards are read off the raw lines, where the page writes one board row per line
+    flat = text
+    if p.suffix == '.html':
+        import html as _html
+        flat = _html.unescape(re.sub(r'<[^>]+>', '', text))
     for n in data['nodes']:
-        if 'page_text' in n and n['page_text'] not in text:
+        if 'page_text' in n and n['page_text'] not in text and n['page_text'] not in flat:
             bad.append(f'snapshot: {n["id"]}\'s page_text {n["page_text"]!r} is not on the page')
     # a markdown link is rendered as ` [text](url) ` where the page has `text` run into its sentence
     plain = re.sub(r'\s*\[([^\]]*)\]\([^)]*\)\s*', r'\1', text)
     for q in data.get('quotes', []):
-        if q.get('rendered', True) and q['verbatim'] not in text and q['verbatim'] not in plain:
+        if q.get('rendered', True) and q['verbatim'] not in text and q['verbatim'] not in plain \
+                and q['verbatim'] not in flat:
             bad.append(f'snapshot: quote {q["id"]} is not verbatim on the page')
     want = [rows[i] for i in data['page_order']]
     got = page_boards(text)
@@ -609,17 +635,18 @@ def run_selftest(spec: TranscriptionSpec, mutants: list, snapshot_edits: dict,
 
 
 def main(spec: TranscriptionSpec, selftest: Callable[[], int], doc: str | None) -> int:
-    snap = spec.out.name.replace('-routes.json', '.md')
+    data0 = spec.build()
+    snap = data0['source'].get('snapshot_file') or spec.out.name.replace('-routes.json', '.md')
     ap = argparse.ArgumentParser(description=(doc or '').split('\n')[0])
     ap.add_argument('--html-dir', type=Path,
-                    help=f'directory holding the markdown snapshot ({snap}) of a refetch')
+                    help=f'directory holding the page snapshot ({snap}) of a refetch')
     ap.add_argument('--write', action='store_true', help=f'rewrite {spec.out.name} from SPEC')
     ap.add_argument('--selftest', action='store_true', help='prove the verifier has teeth')
     args = ap.parse_args()
     if args.selftest:
         return selftest()
 
-    data = spec.build()
+    data = data0
     problems = verify(data, spec)
     if args.html_dir:
         problems += check_snapshot(data, args.html_dir)

@@ -2,8 +2,9 @@
  * The shape of an opener's ROUTE PROFILE: everything the shared route classifier (`route-facts.ts`)
  * and the shared demo planner (`route-demos.ts`) need to know about one shiwehi.com route page that
  * is not in its transcribed routes JSON. Types only, no data: each opener's profile lives in its own
- * file (`route-profile-meisou.ts`, `route-profile-honeycup.ts`), so editing one opener's profile
- * stales that opener's artefacts and nobody else's, while an edit to shared code stales both — the
+ * file (`route-profile-meisou.ts`, `route-profile-honeycup.ts`,
+ * `route-profile-mountainous2.ts`), so editing one opener's profile
+ * stales that opener's artefacts and nobody else's, while an edit to shared code stales all — the
  * md5 inputs (`hashFiles`) are scoped that way on purpose.
  *
  * ONE implementation per rule. Before this file the 迷走砲 classifier was the only one; a second
@@ -75,6 +76,11 @@ export interface RouteProfile {
   pcLines: number;
   /** the clear the bag-3 frame starts after */
   pcAfter: { piece: string; spin: string; lines: number };
+  /** The page's Perfect Clear KINDS, when it draws more than the one `pcAfter` / `pcLines` / `pcRows`
+   *  describes (山岳積み2号: a bag-2 4-line PC with no spin before it, the 8-line bag-3 PCs, and a
+   *  14-line PC in bag 5). Absent: one kind from those three fields over every bag-3 list (迷走砲,
+   *  はちみつ砲). A PC is filed under the kind whose `lines` its cumulative count equals. */
+  pcKinds?: PcKind[];
 
   artefact: ArtefactText;
   /** the artefact's `rules` object, key order included */
@@ -84,6 +90,19 @@ export interface RouteProfile {
 
   /** the demo planner's opener-specific half; absent until an opener's demos exist */
   demos?: DemoProfile;
+}
+
+/** One kind of Perfect Clear a route page draws: which lists hold its patterns, where its frame
+ *  starts, how many lines it clears counted from lock 0, and how many rows its frame compares. */
+export interface PcKind {
+  /** the routes JSON `list` ids whose patterns are this kind's */
+  lists: string[];
+  /** The frame starts after a clear of this shape: the FIRST such clear in the event window (it must
+   *  come before the PC) or the LAST one before the PC; `name` is what the off-page reason calls it.
+   *  Or `{ locks }`: the frame starts after that many locks, with no spin before it. */
+  after: { piece: string; spin: string; lines: number; pick: 'first' | 'last'; name: string } | { locks: number };
+  lines: number;
+  rows: number;
 }
 
 /** A colour reading: a cell group drawn in one piece's colour that can only be another piece. */
@@ -107,6 +126,7 @@ export interface DemoProfile {
    *  share one after-TST board, drawn once) */
   chainVia?: Record<string, string>;
   /** a lower-case letter a node draws in a T-spin slot, and the lines it must clear (はちみつ砲's PC
-   *  patterns draw the TSD's T as a plain `t`; 迷走砲 draws it U) */
-  spinLetter?(n: any): { letter: string; lines: number } | null;
+   *  patterns draw the TSD's T as a plain `t`; 迷走砲 draws it U). `routes` is the opener's routes JSON,
+   *  for a profile whose rule reads another node (山岳積み2号: the empty slot of the pattern's base). */
+  spinLetter?(n: any, routes: any): { letter: string; lines: number } | null;
 }

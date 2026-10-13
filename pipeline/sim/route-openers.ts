@@ -5,8 +5,9 @@
 import type { RouteProfile } from './route-profile.ts';
 import { MEISOU } from './route-profile-meisou.ts';
 import { HONEYCUP } from './route-profile-honeycup.ts';
+import { MOUNTAINOUS2 } from './route-profile-mountainous2.ts';
 
-export const OPENERS: Record<string, RouteProfile> = { meisou: MEISOU, honeycup: HONEYCUP };
+export const OPENERS: Record<string, RouteProfile> = { meisou: MEISOU, honeycup: HONEYCUP, mountainous2: MOUNTAINOUS2 };
 
 /** `--opener <key>` out of argv, or a loud failure naming the keys there are. */
 export function openerFromArgv(argv: string[]): RouteProfile {

@@ -28,11 +28,16 @@
  *     The page's condition is read off the round's own bag-2 order from `replay-facts.json`'s `seq`,
  *     with J<->L and S<->Z swapped first in a mirrored round. Garbage: `refuse` (no garbage before the
  *     sample) or `strip` (complete garbage rows stripped from the bottom first).
- *  3. Bag 3. (a) A Perfect Clear of `pcLines` cumulative lines after the profile's `pcAfter` clear
- *     (a TST) is compared, by COLOUR, in a frame that keeps every row cleared after it, against the
- *     patterns whose `parent` is the round's bag-2 node's GROUP (`group` on the node, else its id);
- *     more than one match after that scoping throws. (b) The non-PC snapshot routes are matched only
- *     under their own branch; where a node has several snapshot children, the earliest found wins.
+ *  3. Bag 3. (a) A Perfect Clear is filed under the profile's PC KIND whose cumulative line count it
+ *     has (default: one kind, `pcLines` after the `pcAfter` clear, a TST; `pcKinds` when a page draws
+ *     more, see `kindsOf`). It is compared, by COLOUR, in a frame that keeps every row cleared after
+ *     the kind's start, against that kind's patterns ANCHORED at the round's bag-1 node or its bag-2
+ *     node's GROUP (`group` on the node, else its id); a pattern's anchor is its nearest ancestor
+ *     that is a bag-1 or bag-2 sampling point, which for every 迷走砲 and はちみつ砲 pattern is its
+ *     `parent`. More than one match after that scoping throws. (b) The non-PC snapshot routes (bag 3
+ *     and later) are matched only under their own branch; where a node has several snapshot
+ *     children, the earliest found wins. Route-list boards are never bag-2 boards: a list drawn in
+ *     bag 2 (山岳積み2号's 4-line PCs) is a PC pattern.
  *
  * Variants are keyed `node` and never `kind`, and nothing counts nodes with an inline filter of
  * that field (`check_forecast_numerator`).
@@ -47,7 +52,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import { rowsFromBoard, occGrid, mirrorRows, keyOf, ROWS } from '../openers/match.ts';
 import { discoverCorpus } from '../corpus-membership.ts';
-import type { RouteProfile } from './route-profile.ts';
+import type { RouteProfile, PcKind } from './route-profile.ts';
 
 export const REPO = `${import.meta.dir}/../..`;
 export const SESSIONS_ROOT = `${REPO}/sessions`;
@@ -155,6 +160,39 @@ export function stripGarbage(rows: string[] | null): { rows: string[] | null; st
   return { rows: left, stripped };
 }
 
+// ── the Perfect Clear kinds ──────────────────────────────────────────────────────────────────
+
+/** A PC kind with its patterns resolved. */
+export interface Kind extends PcKind { patterns: RouteNode[] }
+
+/** The profile's PC kinds with their patterns: `pcKinds` when the profile has them (every list a kind
+ *  names must exist, and every list must be in exactly one kind), else ONE kind from `pcAfter` /
+ *  `pcLines` / `pcRows` over every bag-3 list pattern — the rule 迷走砲 and はちみつ砲 have always had. */
+export function kindsOf(P: RouteProfile, routes: Routes): Kind[] {
+  const pats = routes.nodes.filter(n => n.list && measurable(n));
+  if (!P.pcKinds) {
+    return [{ lists: [...new Set(pats.filter(n => n.bag === 3).map(n => n.list!))],
+              after: { ...P.pcAfter, pick: 'first', name: 'TST' }, lines: P.pcLines, rows: P.pcRows,
+              patterns: pats.filter(n => n.bag === 3) }];
+  }
+  const all = [...new Set(routes.nodes.filter(n => n.list).map(n => n.list!))];
+  const named = P.pcKinds.flatMap(k => k.lists);
+  if (JSON.stringify([...named].sort()) !== JSON.stringify([...all].sort()))
+    throw new Error(`${P.tag}: pcKinds name lists ${named.join(',')}, the routes hold ${all.join(',')}`);
+  return P.pcKinds.map(k => ({ ...k, patterns: pats.filter(n => k.lists.includes(n.list!)) }));
+}
+
+/** Where a kind's frame starts for a PC at lock `pcI`: the lock index after which it starts, or the
+ *  reason there is none. `ev` is the round's clear events in the event window. */
+export function frameStart(kind: PcKind, ev: { i: number; piece: string; spin: string; lines: number }[],
+                           pcI: number): { at: number } | { none: string } {
+  const a = kind.after;
+  if ('locks' in a) return a.locks - 1 < pcI ? { at: a.locks - 1 } : { none: `the PC before lock ${a.locks}` };
+  const is = (e: typeof ev[number]) => e.piece === a.piece && e.spin === a.spin && e.lines === a.lines;
+  const hit = a.pick === 'first' ? ev.find(is) : ev.filter(e => is(e) && e.i < pcI).at(-1);
+  return !hit || hit.i >= pcI ? { none: `no ${a.name} before the PC` } : { at: hit.i };
+}
+
 // ── the classifier ───────────────────────────────────────────────────────────────────────────
 
 /** Each field turns ONE rule off; each opener's test requires the ones it exercises to go red. */
@@ -227,10 +265,23 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
   const D = (id: string) => diagram(byId.get(id)!);
   const stages = P.bag1.stages.map(s => ({ ...s, diagrams: s.nodes.map(D) }));
   const holdStage = stages.find(s => s.holdSplit);
-  const bag2 = nodes.filter(n => n.bag === 2 && measurable(n)).map(diagram);
-  const patterns = nodes.filter(n => n.list && n.bag === 3 && measurable(n));
-  const snapshots = nodes.filter(n => n.bag === 3 && !n.list && measurable(n));
+  const bag2 = nodes.filter(n => n.bag === 2 && !n.list && measurable(n)).map(diagram);
+  const kinds = kindsOf(P, routes);
+  const patterns = kinds.flatMap(k => k.patterns);
+  const snapshots = nodes.filter(n => n.bag >= 3 && !n.list && measurable(n));
   const groupOf = (id: string) => mut.noGroupScope ? id : (byId.get(id)?.group ?? id);
+  // a pattern's ANCHOR: its nearest ancestor that is a sampling point (a bag-1 stage node, or a bag-2
+  // board's group); a group's parent is its members'
+  const points = new Set([...P.bag1.stages.flatMap(s => [...s.nodes, ...(s.holdSplit ? [s.holdSplit.holdNode] : [])]),
+                          ...bag2.map(b => groupOf(b.id))]);
+  const parentOf = (id: string): string | null =>
+    byId.get(id)?.parent ?? nodes.find(n => n.group === id)?.parent ?? null;
+  const anchorOf = (p: RouteNode): string | null => {
+    let x = p.parent;
+    for (let k = 0; x && !points.has(x) && k < nodes.length; k++) x = parentOf(x);
+    return x && points.has(x) ? x : null;
+  };
+  const anchor = new Map(patterns.map(p => [p.id, anchorOf(p)]));
   const strip = P.bag2Garbage === 'strip' && !mut.noGarbageStrip;
 
   const opp: Record<string, Record<string, number>> = {};
@@ -322,6 +373,7 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
       break;
     }
     if (!node) continue;
+    for (const p of patterns) if (anchor.get(p.id) === node) bump(p.id, d.user);
     const flagStage = seen[P.bag1.flag.stage]!;
 
     const c: any = {
@@ -354,7 +406,7 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
       if (strip) c.bag2.garbage_rows_stripped = bd.stripped;
       if (m) {
         branch = m.id; deepest = m.id; deepestLock = L2;
-        for (const p of patterns) if (p.parent === groupOf(branch)) bump(p.id, d.user);
+        for (const p of patterns) if (anchor.get(p.id) === groupOf(branch)) bump(p.id, d.user);
       }
     }
 
@@ -367,27 +419,30 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
     const A = P.pcAfter;
     const tst = ev.find(e => e.piece === A.piece && e.spin === A.spin && e.lines === A.lines);
     const pc = ev.find(e => e.pc);
-    if (pc && (mut.pcLinesOff || pc.cum === P.pcLines) && !(mut.pcNeedsBag2 && !branch)) {
+    const kind = pc ? kinds.find(k => mut.pcLinesOff || pc.cum === k.lines) : undefined;
+    if (pc && kind && !(mut.pcNeedsBag2 && !branch)) {
       const rec: any = { lock: pc.i, verified: pc.i <= d.v, node: null, mirrored: null, off_page_under: null };
-      if (!tst || tst.i >= pc.i) {
-        rec.off_page_under = `${deepest}.other`; rec.reason = 'no TST before the PC';
-      } else if (!mut.noGarbageStop && d.garbage.some(g => g > tst.i && g <= pc.i)) {
+      const fs = frameStart(kind, ev, pc.i);
+      if ('none' in fs) {
+        rec.off_page_under = `${deepest}.other`; rec.reason = fs.none;
+      } else if (!mut.noGarbageStop && d.garbage.some(g => g > fs.at && g <= pc.i)) {
         pcGarbage.push(tag); rec.reason = 'garbage between the TST and the PC';
       } else {
-        const comp = composite(d, tst.i, pc.i, P.pcRows, P.tag);
+        const comp = composite(d, fs.at, pc.i, kind.rows, P.tag);
         const test = (ns: RouteNode[]) => {
           const hit: { id: string; mirrored: boolean }[] = [];
           for (const p of ns) for (const mir of [false, true]) {
             if (mir && mut.noMirror) continue;
-            if (patternMatches(comp, p.rows!, mir, !mut.noColour, P.pcRows)) hit.push({ id: p.id, mirrored: mir });
+            if (patternMatches(comp, p.rows!, mir, !mut.noColour, kind.rows)) hit.push({ id: p.id, mirrored: mir });
           }
           return hit;
         };
-        const scope = mut.unscoped ? patterns : branch ? patterns.filter(p => p.parent === groupOf(branch!)) : [];
+        const at = [node, ...(branch ? [groupOf(branch)] : [])];
+        const scope = mut.unscoped ? kind.patterns : kind.patterns.filter(p => at.includes(anchor.get(p.id)!));
         const hits = test(scope);
         if (hits.length > 1)
           throw new Error(`${P.tag}: ${tag} PC matches ${hits.map(h => h.id + (h.mirrored ? '(m)' : '')).join(', ')}`);
-        if (hits.length === 1 && test(patterns).length > 1) multi.push(tag);
+        if (hits.length === 1 && test(kind.patterns).length > 1) multi.push(tag);
         if (hits[0]) {
           rec.node = hits[0].id; rec.mirrored = hits[0].mirrored;
           deepest = hits[0].id; deepestLock = pc.i;
