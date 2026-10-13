@@ -21,8 +21,8 @@
 import { readFileSync } from 'node:fs';
 import { runDemo, readRows as readRowsWith, spinBoardCells, PIECES } from '../sim/route-demos.ts';
 import { decodeTimeline, queueStates, placeCells, WIDTH, ROWS, type Lock } from '../sim/emit-replay.ts';
-import { classify, composite, patternMatches, conditionHolds, loadRoutes, type RoundDigest, type Routes }
-  from '../sim/route-facts.ts';
+import { classify, composite, patternMatches, conditionHolds, loadRoutes, kindsOf, frameStart,
+         type RoundDigest, type Routes } from '../sim/route-facts.ts';
 import type { RouteProfile } from '../sim/route-profile.ts';
 import { rowsFromBoard } from './match.ts';
 
@@ -38,6 +38,8 @@ export interface DemoLists {
 }
 
 const T_OF = (letter: string) => (letter === 'U' ? 'T' : letter.toUpperCase());
+/** The line count a node's named spin fires (山岳積み2号's TSD snapshot boards). */
+const SPIN_LINES: Record<string, number> = { TSS: 1, TSD: 2, TST: 3 };
 
 /** Boards after every lock, y-UP. */
 export function boards(d: any): (string | null)[][][] {
@@ -87,7 +89,9 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
   const readings = P.demos!.pieceReadings;
   const readRows = (id: string, rows: string[]) => readRowsWith(id, rows, readings, P.tag);
   const b1 = (d: any) => byId.get(d.bags[0].node)!.bag === 1;
-  const spinLetter = (n: any) => P.demos!.spinLetter?.(n) ?? null;
+  const spinLetter = (n: any) => P.demos!.spinLetter?.(n, routes) ?? null;
+  const kinds = kindsOf(P, routes);
+  const kindOf = (n: any) => kinds.find(k => k.lists.includes(n.list))!;
 
   /** Every check that reads one demo. Returns the first failure, or null. */
   function checkDemo(d: any, all: Map<string, any>): string | null {
@@ -105,8 +109,10 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
       if (c?.all && conditionHolds(c, b.queue, '') !== true) return `${b.node}: queue ${b.queue} breaks the page condition`;
       if (c?.early && b.queue[0] !== c.early) return `${b.node}: ${c.early} is not first in ${b.queue}`;
     }
+    // a bag-1 early piece is a single letter (迷走砲, はちみつ砲); 山岳積み2号's is an example pair of
+    // alternatives, applied as its `before` pair (checked with the page conditions above)
     const early = (routes as any).bag1.requires.early;
-    if (b1(d) && d.bags[0].queue[0] !== early) return `${d.node}: bag 1 not ${early} first`;
+    if (typeof early === 'string' && b1(d) && d.bags[0].queue[0] !== early) return `${d.node}: bag 1 not ${early} first`;
     // 2. re-run
     let rr;
     try { rr = runDemo(routes, d.seq, d.inputs, d.frames).rec; } catch (e) { return `${d.node}: re-run threw ${e}`; }
@@ -129,7 +135,8 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
       const sl = spinLetter(bn);
       if (Lt === 'U' || (sl && Lt === sl.letter)) {
         if (lk[3] !== 2) return `${d.node}: spin-slot lock ${i} spin ${lk[3]}`;
-        const want = bn.bag === 2 ? 3 : bn.has_tsd_slot ? 2 : sl ? sl.lines : L.spinLines[bn.id];
+        const want = bn.bag === 2 && !bn.list ? 3 : bn.has_tsd_slot ? 2 : sl ? sl.lines
+          : SPIN_LINES[bn.spin] ?? L.spinLines[bn.id];
         if (want === undefined || lk[2] !== want) return `${d.node}: spin-slot lock ${i} cleared ${lk[2]}, want ${want}`;
       } else if (q[i]!.piece === 'T' && lk[3] !== 0 && !L.spinExceptions.includes(d.node)) return `${d.node}: t lock ${i} spun`;
     }
@@ -139,6 +146,10 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
     if (n.bag === 1) {
       if (!shows(B[last]!, n.rows, false)) return `${d.node}: final board is not the drawing`;
       if (n.id === L.hold.node && q[last]!.hold !== L.hold.piece) return `${d.node}: ${L.hold.piece} is not in the hold box`;
+    } else if (n.list) {
+      if (B[last]!.some(r => r.some(c => c != null))) return `${d.node}: last lock is not a Perfect Clear`;
+      const lines = kindOf(n).lines;
+      if (d.locks.reduce((a: number, l: any) => a + l[2], 0) !== lines) return `${d.node}: not ${lines} lines`;
     } else if (n.bag === 2) {
       if (!shows(B[12]!, n.rows, true)) return `${d.node}: board after 13 pieces is not the drawing`;
       if (d.letters[13] !== 'U' || last !== 13) return `${d.node}: lock 14 is not the U`;
@@ -149,11 +160,10 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
         const want = sc.map(([x, dd]) => `${x},${dd}`).sort();
         if (JSON.stringify(got) !== JSON.stringify(want)) return `${d.node}: the TST is not in the spin board's U cells`;
       }
-    } else if (n.list) {
-      if (B[last]!.some(r => r.some(c => c != null))) return `${d.node}: last lock is not a Perfect Clear`;
-      if (d.locks.reduce((a: number, l: any) => a + l[2], 0) !== P.pcLines) return `${d.node}: not ${P.pcLines} lines`;
-    } else if (n.unmatchable || !n.rows.some(r => r.includes('U'))) {
-      // nothing to fire: the demo ends on the drawing (はちみつ砲's L roof, with its T still held)
+    } else if (!n.rows.some(r => r.includes('U'))) {
+      // nothing to fire: the demo ends on the drawing (はちみつ砲's L roof, with its T still held). An
+      // UNMATCHABLE board with a U (山岳積み2号's 9-row 4巡目 boards) is fired like any other: it is
+      // too tall for the classifier, not for the demo
       if (!shows(B[last]!, n.rows, false)) return `${d.node}: final board is not the drawing`;
     } else {
       if (!shows(B[last - 1]!, n.rows, true)) return `${d.node}: board before the U is not the drawing`;
@@ -163,17 +173,20 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
     const c = classify(P, [digestOf(d)], routes).cases[0];
     if (!c) return `${d.node}: classifier found no bag 1`;
     if (n.bag === 1 && c.bag1.node !== n.id) return `${d.node}: classifier bag 1 ${c.bag1.node}`;
-    if (n.bag === 2 && (c.bag2?.node !== n.id || c.bag2.condition_met === false)) return `${d.node}: classifier bag 2 ${c.bag2?.node}`;
+    if (n.bag === 2 && !n.list && (c.bag2?.node !== n.id || c.bag2.condition_met === false)) return `${d.node}: classifier bag 2 ${c.bag2?.node}`;
     if (n.list) {
       const dg = digestOf(d);
-      const tst = dg.locks.findIndex(l => l.piece === 'T' && l.spin === 'full' && l.cleared === 3);
-      const comp = composite(dg, tst, last, P.pcRows, P.tag);
-      if (!patternMatches(comp, readRows(n.id, n.rows), false, true, P.pcRows)) return `${d.node}: composite is not the pattern`;
+      const k = kindOf(n);
+      const ev = dg.locks.map((l, i) => ({ i, piece: l.piece, spin: l.spin, lines: l.cleared })).filter(e => e.lines > 0);
+      const fs = frameStart(k, ev, last);
+      if ('none' in fs) return `${d.node}: ${fs.none}`;
+      const comp = composite(dg, fs.at, last, k.rows, P.tag);
+      if (!patternMatches(comp, readRows(n.id, n.rows), false, true, k.rows)) return `${d.node}: composite is not the pattern`;
       if (L.pieceReadings.includes(n.id)) {
         if (c.pc?.node === n.id) return `${d.node}: colour reading not needed?`;
       } else if (c.pc?.node !== n.id) return `${d.node}: classifier PC ${c.pc?.node} ${c.pc?.off_page_under}`;
     }
-    if (n.bag === 3 && !n.list && !n.unmatchable && !c.snapshots.some((s: any) => s.node === n.id))
+    if (n.bag >= 3 && !n.list && !n.unmatchable && !c.snapshots.some((s: any) => s.node === n.id))
       return `${d.node}: classifier snapshot missing`;
     return null;
   }

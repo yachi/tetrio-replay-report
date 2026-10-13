@@ -47,10 +47,10 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import honey_cup_page, stray_cannon_page  # noqa: E402
+from pipeline import honey_cup_page, mountainous2_page, stray_cannon_page  # noqa: E402
 
 #: every opener route site, in the order its card appears under 定式路線
-ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE]
+ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE]
 
 # (session dir, artefact subdir, output name, label, blurb)
 #

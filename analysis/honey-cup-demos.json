@@ -40,9 +40,9 @@
  },
  "inputs": {
   "routes_md5": "38e59e4d5850468fcc9f8760d3376e04",
-  "planner_md5": "cbb5a8f1e76a0f329f756f451450263f",
+  "planner_md5": "6300759ed2272e7cff63f2f253d19aeb",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "7da291971cebd7dc13cba96c2f0f79ef"
+  "classifier_md5": "13d12b7dfd80414653b76e2b1521525c"
  },
  "board": {
   "width": 10,

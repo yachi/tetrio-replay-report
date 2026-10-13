@@ -477,17 +477,21 @@ function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
   const before: [string, string][] = cond?.all ? cond.all.map((c: any) => c.before) : [];
   if (n.bag === 1)
     return { node: n, uLines: null, uLast: false, pc: false, ...demoProfile(P).bag1Spec(n, routes) };
-  if (n.bag === 2) {
+  // a list drawn in bag 2 (山岳積み2号's 4-line PCs) is a Perfect Clear pattern, not a bag-2 board
+  if (n.bag === 2 && !n.list) {
     const spin = (n as any).spin as string | undefined;
     if (!spin || !(spin in SPIN_LINES)) throw new Error(`${P.tag}-demos: ${n.id} has no bag-2 spin`);
     const spinCells = spinBoardCells(n, routes, P.tag);
     return { node: n, uLines: SPIN_LINES[spin]!, uLast: true, pc: false, before,
              early: cond?.early ?? null, holdPiece: null, holdBefore: null, ...(spinCells.length ? { spinCells } : {}) };
   }
-  // bag 3 and the bag after a snapshot
+  // bag 3 and the bag after a snapshot (a snapshot board's `spin`, where the page names one, fixes
+  // its U's line count: 山岳積み2号's TSD boards)
   const isPc = !!n.list;
-  const sl = demoProfile(P).spinLetter?.(n) ?? null;
-  return { node: n, uLines: (n as any).has_tsd_slot ? 2 : sl ? sl.lines : null, uLast: !isPc, pc: isPc,
+  const sl = demoProfile(P).spinLetter?.(n, routes) ?? null;
+  const named = (n as any).spin as string | undefined;
+  const uLines = (n as any).has_tsd_slot ? 2 : sl ? sl.lines : named && named in SPIN_LINES ? SPIN_LINES[named]! : null;
+  return { node: n, uLines, uLast: !isPc, pc: isPc,
            before: [], early: null, holdPiece: null, holdBefore: null, ...(sl ? { spinLetter: sl.letter } : {}) };
 }
 

@@ -388,6 +388,8 @@ class RouteSite:
         self.CLASSES = {**PIECE_CLASS, **p.cell_classes}
         #: a bag-2 node -> the group its page is named by (filled from the routes in check_inputs)
         self.GROUP = {}
+        #: list id -> the transcription's list (filled from the routes in demo_problems)
+        self.LISTS = {}
 
     def bag1_only_slug(self):
         slugs = [s for s, n in self.NODE_PAGES if n is None]
@@ -873,6 +875,7 @@ class RouteSite:
         if demos.get("report_eligible") is not False or demos.get("constructed") is not True:
             return [f"{os.path.basename(self.DEMOS_REL)} must declare report_eligible: false and constructed: true"]
         by_id = {n["id"]: n for n in routes["nodes"]}
+        self.LISTS = {li["id"]: li for li in routes["lists"]}
         built = [d["node"] for d in demos["demos"]]
         unbuilt = [u["node"] for u in demos["unbuilt"]]
         for n in routes["nodes"]:
@@ -909,6 +912,16 @@ class RouteSite:
                 return [f"{where}: the final board is not the drawing"]
             if n["id"] == self.p.hold_node and hold != self.p.hold_piece:
                 return [f"{where}: {self.p.hold_piece} is not in the hold box"]
+        elif "list" in n:
+            # a list checked BEFORE the bag-2 rule: 山岳積み2号 draws a PC list in bag 2 (2.pc4). Its line
+            # count is the transcription's own (`total_lines`, else `pc_lines`) where it has one, the
+            # profile's otherwise — the other two openers' lists carry neither
+            want = self.pc_lines_of(n["list"])
+            if any(v for row in steps[last][2] for v in row) or lines != want:
+                return [f"{where}: does not end on an {want}-line Perfect Clear"]
+            start = sum(len(b["placed"]) for b in d["bags"][:-1])
+            if not _composite_ok(d, data, start, n["rows"], d.get("piece_readings", [])):
+                return [f"{where}: the kept-rows frame is not the pattern"]
         elif n["bag"] == 2:
             b2 = self.p.bag2_lock
             if last != b2 + 1 or not _shows(steps[b2][2], n["rows"], True):
@@ -916,19 +929,18 @@ class RouteSite:
             want = SPIN_LINES.get(n.get("spin"))
             if locks[b2 + 1][3] != 2 or locks[b2 + 1][2] != want:
                 return [f"{where}: lock {b2 + 2} is not the drawing's {n.get('spin')}"]
-        elif "list" in n:
-            if any(v for row in steps[last][2] for v in row) or lines != self.p.pc_lines:
-                return [f"{where}: does not end on an {self.p.pc_lines}-line Perfect Clear"]
-            start = sum(len(b["placed"]) for b in d["bags"][:-1])
-            if not _composite_ok(d, data, start, n["rows"], d.get("piece_readings", [])):
-                return [f"{where}: the kept-rows frame is not the pattern"]
-        elif "unmatchable" in n or not any("U" in r for r in n["rows"]):
+        elif not any("U" in r for r in n["rows"]):
             if not _shows(steps[last][2], n["rows"], False):
                 return [f"{where}: the final board is not the drawing"]
         else:
             if not _shows(steps[last - 1][2], n["rows"], True) or locks[last][3] != 2:
                 return [f"{where}: the board before the U is not the drawing, or the T did not spin"]
         return []
+
+    def pc_lines_of(self, list_id):
+        """The lines a whole demo clears on its way to a list's Perfect Clear."""
+        li = self.LISTS.get(list_id, {})
+        return li.get("total_lines", li.get("pc_lines", self.p.pc_lines))
 
     def demo_link(self, nid, demos, routes_by_id):
         """The one line a node block on the overview and the node pages carries about its demo."""
@@ -939,7 +951,7 @@ class RouteSite:
                     f'{_esc(self.DP["link"])}</a></p>')
         return f'<p class="scp-demo">{_esc(self.DP["link_unbuilt"])}</p>'
 
-    def _order_words(self, tok, held_slug):
+    def _order_words(self, tok, held_slug, unused=""):
         kind, _, rest = tok.partition(":")
         w = self.DP["order_words"]
         if kind == "early":
@@ -950,7 +962,14 @@ class RouteSite:
         if kind == "hold" and " out@" in rest:
             # the hold box was already full: `J out@4` (out at the 4th placement), `T out@next`
             p, k = rest.split(" out@")
-            words = w["hold_out_next"].format(p=p) if k == "next" else w["hold_out"].format(p=p, k=k)
+            # `next` is the next piece DEALT: the next bag's first when this bag places all its pieces,
+            # else this bag's first unused one, which then stays held (山岳積み2号's 4-line PCs)
+            if k == "next" and unused:
+                words = w["hold_out_next_unused"].format(p=p, q=unused[0])
+            elif k == "next":
+                words = w["hold_out_next"].format(p=p)
+            else:
+                words = w["hold_out"].format(p=p, k=k)
             return f'<span class="scp-hold" data-demo="{held_slug}">{_esc(words)}</span>'
         if kind == "hold":
             p, k = rest.split("@")
@@ -1050,7 +1069,7 @@ class RouteSite:
                         f'<p><a class="scp-case" href="#{slug}" data-round="{slug}">{_esc(self.DP["play"])}</a></p>',
                         f'<p class="scp-tag">{_esc(self._chain_words(d["chain"], by_id))}</p>']
                 for b in d["bags"]:
-                    words = [self._order_words(t, slug) for t in b["order_reading"]]
+                    words = [self._order_words(t, slug, b["unused"]) for t in b["order_reading"]]
                     cond = by_id[b["node"]].get("condition")
                     met = (_esc(self.DP["met"].format(cond=self._condition_words(cond)))
                            if cond and "all" in cond and b["met"] else "")
@@ -1330,6 +1349,20 @@ class RouteSite:
             ok &= good
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} {what}: {got[:1]}")
+        # a list with its own line count (山岳積み2号's 4-line and 14-line PCs): checked at the profile's
+        # count instead, its demos must fail — the per-list rule is not decorative
+        own = [li["id"] for li in routes0["lists"] if "total_lines" in li or "pc_lines" in li]
+        if own:
+            keep = self.pc_lines_of
+            self.pc_lines_of = lambda _lid: self.p.pc_lines
+            try:
+                got = self.demo_problems(demos, routes0)
+            finally:
+                self.pc_lines_of = keep
+            good = any(f"-line Perfect Clear" in g for g in got)
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} lists {own} checked at {self.p.pc_lines} lines: {got[:1]}")
         print(f"{'ok ' if ok else 'FAIL'} {self.p.module} selftest: {len(cases) - 1 + refused} "
               f"corruptions, {'all caught' if ok else 'SOME MISSED'}")
         return 0 if ok else 1
