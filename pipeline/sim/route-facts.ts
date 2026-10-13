@@ -22,7 +22,10 @@
  *     stage with a colour match decides. A stage with a HOLD SPLIT asserts a hold only when the piece
  *     placed at its `atLock` is not the MIRROR-AWARE held piece; when it is, the round is the outcome
  *     `elsewhereNode` (the piece was placed somewhere off the page). The profile's `flag` is a FLAG,
- *     not a node: its stage matched by occupancy, whatever the node.
+ *     not a node: its stage matched by occupancy, whatever the node. A profile with a bag-1 SPIN
+ *     STEP (stick spin) then reads the bag's last lock: a T fired into exactly one child board's U
+ *     cells, in the stage's handedness, with the drawn spin and line count, moves the round to that
+ *     child; the line it clears is the route's own and does not stop a later sample.
  *  2. Bag 2. The board after the profile's `bag2Lock`, inside the verified prefix, against every
  *     bag-2 board. More than one colour match throws. Handedness is measured independently of bag 1.
  *     The page's condition is read off the round's own bag-2 order from `replay-facts.json`'s `seq`,
@@ -211,6 +214,8 @@ export interface Mutants {
   noGroupScope?: boolean;        // scope bag-3 lists by the bag-2 node id, not its group
   noGarbageStrip?: boolean;      // a 'strip' profile refuses garbage like a 'refuse' one
   pcLinesOff?: boolean;          // any Perfect Clear, whatever its cumulative line count
+  spinMirrorUnaware?: boolean;   // the bag-1 spin's U cells read as drawn even in a mirrored round
+  spinClearStops?: boolean;      // the bag-1 spin's own clear stops the bag-2 sample like any other
 }
 
 interface Match { id: string; mirrored: boolean; colour: boolean }
@@ -229,6 +234,9 @@ function matchAgainst(rows: string[] | null, ds: Diagram[], mut: Mutants): Match
 
 /** `bag2Explain` compares boards up to this tall (a drawing is at most ROWS; the extra piece is not). */
 const NEAR_ROWS = 12;
+/** a profile's `near` threshold, or null (`bag2Explain: true` never computes the `near` kind) */
+const nearCellsOf = (P: RouteProfile) =>
+  typeof P.bag2Explain === 'object' ? P.bag2Explain.nearCells : null;
 
 const SWAP: Record<string, string> = { J: 'L', L: 'J', S: 'Z', Z: 'S' };
 export function conditionHolds(cond: any, order: string, bag1: string, tag = 'route'): boolean | null {
@@ -265,6 +273,17 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
   const D = (id: string) => diagram(byId.get(id)!);
   const stages = P.bag1.stages.map(s => ({ ...s, diagrams: s.nodes.map(D) }));
   const holdStage = stages.find(s => s.holdSplit);
+  const SP = P.bag1.spin;
+  /** each spin child's U cells as `x,row-from-the-bottom`, as drawn and mirrored */
+  const spinKids = (SP?.nodes ?? []).map(id => {
+    const n = byId.get(id)! as any;
+    if (!n?.rows || !n.spin_of) throw new Error(`${P.tag}: bag-1 spin node ${id} has no board or no spin_of`);
+    const u: [number, number][] = [];
+    n.rows.forEach((r: string, i: number) => [...r].forEach((ch, x) => { if (ch === 'U') u.push([x, n.rows.length - 1 - i]); }));
+    if (u.length !== 4) throw new Error(`${P.tag}: bag-1 spin node ${id} draws ${u.length} U cells`);
+    const key = (m: boolean) => u.map(([x, y]) => `${m ? 9 - x : x},${y}`).sort().join(' ');
+    return { id, of: n.spin_of as string, drawn: key(false), mirrored: key(true) };
+  });
   const bag2 = nodes.filter(n => n.bag === 2 && !n.list && measurable(n)).map(diagram);
   const kinds = kindsOf(P, routes);
   const patterns = kinds.flatMap(k => k.patterns);
@@ -273,7 +292,7 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
   // a pattern's ANCHOR: its nearest ancestor that is a sampling point (a bag-1 stage node, or a bag-2
   // board's group); a group's parent is its members'
   const points = new Set([...P.bag1.stages.flatMap(s => [...s.nodes, ...(s.holdSplit ? [s.holdSplit.holdNode] : [])]),
-                          ...bag2.map(b => groupOf(b.id))]);
+                          ...(SP?.nodes ?? []), ...bag2.map(b => groupOf(b.id))]);
   const parentOf = (id: string): string | null =>
     byId.get(id)?.parent ?? nodes.find(n => n.group === id)?.parent ?? null;
   const anchorOf = (p: RouteNode): string | null => {
@@ -283,6 +302,7 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
   };
   const anchor = new Map(patterns.map(p => [p.id, anchorOf(p)]));
   const strip = P.bag2Garbage === 'strip' && !mut.noGarbageStrip;
+  const nearCells = nearCellsOf(P);
 
   const opp: Record<string, Record<string, number>> = {};
   const bump = (id: string, user: string) => { (opp[id] ??= {})[user] = (opp[id]![user] ?? 0) + 1; };
@@ -291,9 +311,11 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
 
   for (const d of digests) {
     const garbageBefore = (n: number) => !mut.noGarbageStop && d.garbage.some(g => g < n);
+    /** lock indices whose clear the route itself draws (the bag-1 spin): not a stop */
+    const routeClears = new Set<number>();
     const noClearBefore = (n: number) => {
       if (d.v < n - 1 || d.n_locks < n) return false;
-      for (let i = 0; i < n; i++) if (d.locks[i]!.cleared > 0) return false;
+      for (let i = 0; i < n; i++) if (d.locks[i]!.cleared > 0 && !routeClears.has(i)) return false;
       return !!d.rows[n - 1];
     };
     const clean = (n: number) => !garbageBefore(n) && noClearBefore(n);
@@ -325,6 +347,7 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
       padded.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== '.') mine.add(y * 10 + x); }));
       const letters = (qs: number[], rows: string[]) => [...new Set(qs.map(q => rows[Math.floor(q / 10)]![q % 10]!))].sort().join('');
       const hits: { kind: string; group: string; mirrored: boolean; cells: number; extra: string }[] = [];
+      const nears: { group: string; mirrored: boolean; cells: number; extra: string; missing: string }[] = [];
       for (const dg of bag2) for (const mir of [false, true]) {
         if (mir && mut.noMirror) continue;
         const drawn = (mir ? mirrorRows(dg.rows.map(x => x.toUpperCase())) : dg.rows.map(x => x.toUpperCase()));
@@ -340,6 +363,9 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
           const was = letters(missing, dpad), now = letters(extra, padded);
           if (was.length === 1 && was === now) hit('moved', 4);
         }
+        if (nearCells != null && missing.length + extra.length <= nearCells)
+          nears.push({ group: groupOf(dg.id), mirrored: mir, cells: missing.length + extra.length,
+                       extra: letters(extra, padded), missing: letters(missing, dpad) });
       }
       for (const kind of ['subset', 'superset', 'moved']) {
         const hs = hits.filter(h => h.kind === kind);
@@ -347,6 +373,12 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
         return { kind, groups: [...new Set(hs.map(x => x.group))], mirrored: hs[0]!.mirrored,
                  lock: spinAt - 1, cells: hs[0]!.cells, extra: hs[0]!.extra };
       }
+      // `near`: the nearest boards by cell difference, never a match (opt-in, `nearCells`)
+      const best = Math.min(...nears.map(x => x.cells));
+      const ns = nears.filter(x => x.cells === best);
+      if (ns.length)
+        return { kind: 'near', groups: [...new Set(ns.map(x => x.group))], mirrored: ns[0]!.mirrored,
+                 lock: spinAt - 1, cells: best, extra: ns[0]!.extra, missing: ns[0]!.missing };
       return null;
     };
 
@@ -373,15 +405,36 @@ export function classify(P: RouteProfile, digests: RoundDigest[], routes: Routes
       break;
     }
     if (!node) continue;
+    // ── bag 1's spin: the last lock of the bag, into one child's U cells ──
+    let spinRec: any = null;
+    if (SP) {
+      const i = SP.atLock - 1, l = d.locks[i];
+      const kids = spinKids.filter(k => k.of === node);
+      if (kids.length && l && i <= d.v && !garbageBefore(SP.atLock)) {
+        for (const k of kids) bump(k.id, d.user);
+        const got = l.cells.map(q => `${q.col},${d.height - 1 - q.row}`).sort().join(' ');
+        const flip = mirrored && !mut.spinMirrorUnaware;
+        const hit = l.piece === 'T' && l.spin === SP.spin && l.cleared === SP.lines
+          ? kids.find(k => (flip ? k.mirrored : k.drawn) === got) : undefined;
+        spinRec = { node: hit?.id ?? null, piece: l.piece, spin: l.spin, lines: l.cleared };
+        if (hit) {
+          node = hit.id; lock = i;
+          if (!mut.spinClearStops) routeClears.add(i);
+        }
+      }
+    }
     for (const p of patterns) if (anchor.get(p.id) === node) bump(p.id, d.user);
-    const flagStage = seen[P.bag1.flag.stage]!;
+    const flagStage = P.bag1.flag ? seen[P.bag1.flag.stage]! : null;
 
     const c: any = {
       session: d.session, file: d.file, round_index0: d.round,
       match: mut.matchFromFilename ? d.file_sort_index : d.match, round: d.round + 1, player: d.user,
       verified_to: d.v,
-      bag1: { node, mirrored, lock, [P.bag1.lockPieceField]: lockPiece, [P.bag1.flag.field]: flagStage.all.length > 0,
-              matched_variants: seen.flatMap(x => x.kept.map(m => m.id + (m.mirrored ? ' (mirrored)' : '') + ` @${x.s.locks}`)) },
+      bag1: { node, mirrored, lock,
+              ...(P.bag1.lockPieceField ? { [P.bag1.lockPieceField]: lockPiece } : {}),
+              ...(P.bag1.flag ? { [P.bag1.flag.field]: flagStage!.all.length > 0 } : {}),
+              matched_variants: seen.flatMap(x => x.kept.map(m => m.id + (m.mirrored ? ' (mirrored)' : '') + ` @${x.s.locks}`)),
+              ...(SP ? { spin: spinRec } : {}) },
       bag2: null as any, pc: null as any, snapshots: [] as any[],
     };
     let deepest = node, deepestLock = lock;
@@ -581,7 +634,10 @@ export const outcomesOf = (P: RouteProfile) =>
 /** Assemble the artefact from classified rounds. */
 export function assemble(P: RouteProfile, cls: Classified, routes: Routes, sessions: string[],
                          inp: ReturnType<typeof inputs>) {
-  const users = [...new Set(cls.cases.map(c => c.player))].sort();
+  // every player with a case OR an opportunity: a player who reached a node and never stuck there is
+  // still in its denominator (stick spin: pinglamb has bag-1 opportunities and no case)
+  const users = [...new Set([...cls.cases.map(c => c.player),
+                            ...Object.values(cls.opportunities).flatMap(o => Object.keys(o))])].sort();
   const perUser = () => Object.fromEntries(users.map(u => [u, 0])) as Record<string, number>;
   const tally: Record<string, { cases: Record<string, number>; other: Record<string, number> }> = {};
   const T = (id: string) => (tally[id] ??= { cases: perUser(), other: perUser() });

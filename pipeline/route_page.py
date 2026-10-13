@@ -328,13 +328,16 @@ class RouteSiteProfile:
     bag2_order: tuple
     #: the bag-2 nodes (or groups) whose bag-3 subtrees the overview draws, in order
     bag3_parents: tuple
-    #: the one node that asserts a hold, its held piece, and the prose key of its heading
-    hold_node: str
+    #: the one node that asserts a hold, its held piece, and the prose key of its heading. None: the
+    #: page asserts no hold anywhere (stick spin), so 「hold」 may appear only in the bag-1 sentence
+    hold_node: str | None
     hold_piece: str
     hold_heading_key: str
-    #: the case flag compared with the 六個具名定式 column, the opener-facts key, the prose key
-    flag_field: str
-    harddrop_key: str
+    #: the case flag compared with the 六個具名定式 column, the opener-facts key, the prose key. None
+    #: (flag_field and harddrop_key): no harddrop column exists (stick spin); the prose key is then
+    #: formatted with the bag-1 total and `cases`, the bag-1 nodes' case counts, and nothing else
+    flag_field: str | None
+    harddrop_key: str | None
     flag_prose: str
     #: route-JSON `bag1` keys quoted on the overview's 第一巡 section
     bag1_quote_keys: tuple
@@ -357,6 +360,10 @@ class RouteSiteProfile:
     #: the largest a rendered page may be, in bytes (0: no limit). A page over it is a render failure,
     #: never a truncation: split the page instead.
     max_page_bytes: int = 0
+    #: the `near_note` format keys and the artefact list each one counts (はちみつ砲 and 山岳積み2号 name
+    #: theirs after the TST; stick spin after the TSD, plus its `near` and `unexplained` kinds)
+    near_lists: tuple = (("subset", "bag2_none_tst_before_complete"), ("superset", "bag2_none_extra_piece"),
+                         ("moved", "bag2_none_moved_piece"), ("stripped", "bag2_garbage_stripped"))
 
 
 class RouteSite:
@@ -382,8 +389,8 @@ class RouteSite:
         self.DEMO_SENTENCES = (DS["demo"], DS["engine"], DS["order"], DS["mirror"], DS["rule"])
         self.DEMO_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, PS["source"]) + self.DEMO_SENTENCES
         # visible-text extraction for the 「hold」 rule and the demo links: per site
-        self._HOLD_SPAN = re.compile(r'<span class="scp-hold" data-node="' + re.escape(p.hold_node)
-                                     + r'">[^<]*</span>')
+        self._HOLD_SPAN = (re.compile(r'<span class="scp-hold" data-node="' + re.escape(p.hold_node)
+                                      + r'">[^<]*</span>') if p.hold_node else re.compile(r"(?!)"))
         self._DEMO_LINK = re.compile(r'href="' + re.escape(self.DEMO_PAGE) + r'#(demo-[a-z0-9-]+)"')
         self.CLASSES = {**PIECE_CLASS, **p.cell_classes}
         #: a bag-2 node -> the group its page is named by (filled from the routes in check_inputs)
@@ -633,9 +640,9 @@ class RouteSite:
         b1 = routes["bag1"]
         total = sum(fnodes[n].get("cases", 0) for n in self.BAG1_ORDER)
         flag = self.p.flag_field
-        m6 = sum(1 for c in art["cases"] if c["bag1"][flag])
+        m6 = sum(1 for c in art["cases"] if c["bag1"][flag]) if flag else 0
         table = 0
-        for s, (_d, _f, op) in sessions.items():
+        for s, (_d, _f, op) in (sessions.items() if flag else ()):
             sc = [o for o in op["named_openers"]["openers"] if o["key"] == self.p.harddrop_key]
             self._need(len(sc) == 1, f"{s}: opener-facts.json has {len(sc)} {self.p.harddrop_key} entries")
             table += sum(p["exact"] for p in sc[0]["players"])
@@ -645,12 +652,17 @@ class RouteSite:
         for nid in self.BAG1_ORDER:
             out.append(block(nid, f"{self.p.prefix}-{self.bag1_only_slug()}.html#g-{nid}" if fnodes[nid].get("cases") else None))
         out.append("  </div>")
-        extra = sum(1 for c in art["cases"] if not c["bag1"][flag])
-        self._need(total == m6 + extra, f"bag-1 nodes hold {total} cases, {flag} splits them {m6} + {extra}")
         fp = self.p.flag_prose
-        out.append("  <p>" + _esc(self.PROSE[fp].format(
-            table=table, m6=m6, total=total, extra=extra,
-            same=self.PROSE[fp + "_same"] if table == m6 else self.PROSE[fp + "_differ"])) + "</p>")
+        if flag:
+            extra = sum(1 for c in art["cases"] if not c["bag1"][flag])
+            self._need(total == m6 + extra, f"bag-1 nodes hold {total} cases, {flag} splits them {m6} + {extra}")
+            out.append("  <p>" + _esc(self.PROSE[fp].format(
+                table=table, m6=m6, total=total, extra=extra,
+                same=self.PROSE[fp + "_same"] if table == m6 else self.PROSE[fp + "_differ"])) + "</p>")
+        else:
+            self._need(total == len(art["cases"]), f"bag-1 nodes hold {total} cases, the artefact {len(art['cases'])}")
+            out.append("  <p>" + _esc(self.PROSE[fp].format(
+                total=total, cases={n: fnodes[n].get("cases", 0) for n in self.BAG1_ORDER})) + "</p>")
         out.append("  </section>")
 
         # 第二巡
@@ -684,9 +696,8 @@ class RouteSite:
             L = art["lists"]
             out.append("  <p>" + _esc(self.PROSE["near_note"].format(
                 none=sum(1 for c in art["cases"] if not (c.get("bag2") or {}).get("node")),
-                subset=len(L["bag2_none_tst_before_complete"]), superset=len(L["bag2_none_extra_piece"]),
-                moved=len(L["bag2_none_moved_piece"]), stripped=len(L["bag2_garbage_stripped"]),
-                matched=sum(1 for c in art["cases"] if (c.get("bag2") or {}).get("node")))) + "</p>")
+                matched=sum(1 for c in art["cases"] if (c.get("bag2") or {}).get("node")),
+                **{k: len(L[li]) for k, li in self.p.near_lists})) + "</p>")
         mism = art["lists"]["bag2_handedness_mismatch"]
         if mism:
             out.append(f"  <h3>{_esc(self.PROSE['handedness_heading'])}</h3><ul>"
@@ -846,7 +857,8 @@ class RouteSite:
                     near = c.get("bag2_near")
                     if near:
                         tag += " · " + self.PROSE["near_words"][near["kind"]].format(
-                            groups="、".join(self.node_name(g, by_id) for g in near["groups"]), extra=near.get("extra") or "")
+                            groups="、".join(self.node_name(g, by_id) for g in near["groups"]), extra=near.get("extra") or "",
+                            missing=near.get("missing") or "", cells=near.get("cells"))
                     unv = (f' · <span class="scp-unv">{_esc(self.PROSE["unverified"])}</span>'
                            if not c["verified"] else "")
                     out.append(f'      <li data-case="{_esc(row["case"])}"><a class="scp-case" '
@@ -907,7 +919,14 @@ class RouteSite:
         last = len(locks) - 1
         lines = sum(lk[2] for lk in locks)
         where = d["node"]
-        if n["bag"] == 1:
+        if n["bag"] == 1 and any("U" in r for r in n["rows"]):
+            # stick spin's bag-1 boards draw the T as U: the board before the last lock is the drawing
+            # with the U empty, and the last lock is the drawn spin
+            if not _shows(steps[last - 1][2], n["rows"], True):
+                return [f"{where}: the board before the T is not the drawing"]
+            if locks[last][3] != 2 or locks[last][2] != SPIN_LINES.get(n.get("spin")):
+                return [f"{where}: the last lock is not the drawing's {n.get('spin')}"]
+        elif n["bag"] == 1:
             if not _shows(steps[last][2], n["rows"], False):
                 return [f"{where}: the final board is not the drawing"]
             if n["id"] == self.p.hold_node and hold != self.p.hold_piece:
@@ -929,6 +948,13 @@ class RouteSite:
             want = SPIN_LINES.get(n.get("spin"))
             if locks[b2 + 1][3] != 2 or locks[b2 + 1][2] != want:
                 return [f"{where}: lock {b2 + 2} is not the drawing's {n.get('spin')}"]
+        elif n.get("spin_board"):
+            # a board past bag 2 drawn with its slot empty and the T on a separate board (stick spin's
+            # fallbacks): the board before the last lock is the drawing, the last lock the drawn spin
+            if not _shows(steps[last - 1][2], n["rows"], True):
+                return [f"{where}: the board before the T is not the drawing"]
+            if locks[last][3] != 2 or locks[last][2] != SPIN_LINES.get(n.get("spin")):
+                return [f"{where}: the last lock is not the drawing's {n.get('spin')}"]
         elif not any("U" in r for r in n["rows"]):
             if not _shows(steps[last][2], n["rows"], False):
                 return [f"{where}: the final board is not the drawing"]
@@ -1349,9 +1375,23 @@ class RouteSite:
             ok &= good
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} {what}: {got[:1]}")
+        # demos whose last lock is a spin the end check reads off the lock (stick spin's bag-1 TSS boards
+        # and its fallbacks fired into a separate spin board): the spin flag cleared must fail them
+        for nid in T.get("demo_spin_last", ()):
+            flat = json.loads(json.dumps(demos))
+            dd = next(d for d in flat["demos"] if d["node"] == nid)
+            dd["locks"][-1][3] = 0
+            got = self.demo_problems(flat, routes0)
+            good = any(nid in g and "is not the drawing's" in g for g in got)
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} {nid}'s last lock no longer a spin: {got[:1]}")
         # a list with its own line count (山岳積み2号's 4-line and 14-line PCs): checked at the profile's
         # count instead, its demos must fail — the per-list rule is not decorative
-        own = [li["id"] for li in routes0["lists"] if "total_lines" in li or "pc_lines" in li]
+        # (a list whose own count equals the profile's — stick spin's 8 — makes that mutant equivalent, so
+        # only the lists whose count DIFFERS are planted)
+        own = [li["id"] for li in routes0["lists"] if ("total_lines" in li or "pc_lines" in li)
+               and self.pc_lines_of(li["id"]) != self.p.pc_lines]
         if own:
             keep = self.pc_lines_of
             self.pc_lines_of = lambda _lid: self.p.pc_lines

@@ -33,8 +33,9 @@ export interface DemoLists {
   spinLines: Record<string, number>;
   spinExceptions: string[];
   pieceReadings: string[];
-  /** the bag-1 node whose demo ends with a piece in the hold box, and that piece */
-  hold: { node: string; piece: string };
+  /** the bag-1 node whose demo ends with a piece in the hold box, and that piece; absent when no
+   *  demo holds (stick spin) */
+  hold?: { node: string; piece: string };
 }
 
 const T_OF = (letter: string) => (letter === 'U' ? 'T' : letter.toUpperCase());
@@ -135,7 +136,8 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
       const sl = spinLetter(bn);
       if (Lt === 'U' || (sl && Lt === sl.letter)) {
         if (lk[3] !== 2) return `${d.node}: spin-slot lock ${i} spin ${lk[3]}`;
-        const want = bn.bag === 2 && !bn.list ? 3 : bn.has_tsd_slot ? 2 : sl ? sl.lines
+        // a bag-2 board's U fires its named spin (a TST on the other three pages, stick spin's TSD)
+        const want = bn.bag === 2 && !bn.list ? SPIN_LINES[bn.spin] : bn.has_tsd_slot ? 2 : sl ? sl.lines
           : SPIN_LINES[bn.spin] ?? L.spinLines[bn.id];
         if (want === undefined || lk[2] !== want) return `${d.node}: spin-slot lock ${i} cleared ${lk[2]}, want ${want}`;
       } else if (q[i]!.piece === 'T' && lk[3] !== 0 && !L.spinExceptions.includes(d.node)) return `${d.node}: t lock ${i} spun`;
@@ -143,9 +145,19 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
     // 4. board equality
     const B = boards(d);
     const last = d.locks.length - 1;
-    if (n.bag === 1) {
+    // the U cells of a separate spin board must be where the last lock went; nothing clears in the
+    // node's own bag before its U, so engine row = diagram row from the bottom
+    const inSpinCells = (sc: [number, number][]) => {
+      const got = placeCells('T', d.locks[last][1]).map(c => `${c % WIDTH},${Math.floor(c / WIDTH)}`).sort();
+      return JSON.stringify(got) === JSON.stringify(sc.map(([x, dd]) => `${x},${dd}`).sort());
+    };
+    if (n.bag === 1 && n.rows.some(r => r.includes('U'))) {
+      // stick spin's bag 1: six pieces, then the T into the drawn U as the bag's last lock
+      if (!shows(B[last - 1]!, n.rows, true)) return `${d.node}: board before the U is not the drawing`;
+      if (d.letters[last] !== 'U' || last !== 6) return `${d.node}: lock 7 is not the U`;
+    } else if (n.bag === 1) {
       if (!shows(B[last]!, n.rows, false)) return `${d.node}: final board is not the drawing`;
-      if (n.id === L.hold.node && q[last]!.hold !== L.hold.piece) return `${d.node}: ${L.hold.piece} is not in the hold box`;
+      if (L.hold && n.id === L.hold.node && q[last]!.hold !== L.hold.piece) return `${d.node}: ${L.hold.piece} is not in the hold box`;
     } else if (n.list) {
       if (B[last]!.some(r => r.some(c => c != null))) return `${d.node}: last lock is not a Perfect Clear`;
       const lines = kindOf(n).lines;
@@ -154,12 +166,13 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
       if (!shows(B[12]!, n.rows, true)) return `${d.node}: board after 13 pieces is not the drawing`;
       if (d.letters[13] !== 'U' || last !== 13) return `${d.node}: lock 14 is not the U`;
       const sc = spinBoardCells(n, routes, P.tag);
-      if (sc.length) {
-        // y-UP cells; nothing has cleared before the TST, so engine row = diagram row from the bottom
-        const got = placeCells('T', d.locks[13][1]).map(c => `${c % WIDTH},${Math.floor(c / WIDTH)}`).sort();
-        const want = sc.map(([x, dd]) => `${x},${dd}`).sort();
-        if (JSON.stringify(got) !== JSON.stringify(want)) return `${d.node}: the TST is not in the spin board's U cells`;
-      }
+      if (sc.length && !inSpinCells(sc)) return `${d.node}: the TST is not in the spin board's U cells`;
+    } else if (spinBoardCells(n, routes, P.tag).length) {
+      // a later board drawn with its slot empty and the T on a separate spin board: the board before
+      // the last lock is the drawing, and the last lock is the T in the spin board's U cells
+      if (!shows(B[last - 1]!, n.rows, false)) return `${d.node}: board before the U is not the drawing`;
+      if (d.letters[last] !== 'U') return `${d.node}: last lock is not the U`;
+      if (!inSpinCells(spinBoardCells(n, routes, P.tag))) return `${d.node}: the U is not in the spin board's U cells`;
     } else if (!n.rows.some(r => r.includes('U'))) {
       // nothing to fire: the demo ends on the drawing (はちみつ砲's L roof, with its T still held). An
       // UNMATCHABLE board with a U (山岳積み2号's 9-row 4巡目 boards) is fired like any other: it is

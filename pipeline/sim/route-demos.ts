@@ -475,8 +475,14 @@ const SPIN_LINES: Record<string, number> = { TSS: 1, TSD: 2, TST: 3 };
 function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
   const cond = n.condition;
   const before: [string, string][] = cond?.all ? cond.all.map((c: any) => c.before) : [];
-  if (n.bag === 1)
-    return { node: n, uLines: null, uLast: false, pc: false, ...demoProfile(P).bag1Spec(n, routes) };
+  if (n.bag === 1) {
+    // a bag-1 board that draws a U (stick spin's TSS) fires it last, with the page's named spin
+    const spin = (n as any).spin as string | undefined;
+    const fires = n.rows!.some(r => r.includes('U'));
+    if (fires && !(spin && spin in SPIN_LINES)) throw new Error(`${P.tag}-demos: ${n.id} draws a U and names no spin`);
+    return { node: n, uLines: fires ? SPIN_LINES[spin!]! : null, uLast: fires, pc: false,
+             ...demoProfile(P).bag1Spec(n, routes) };
+  }
   // a list drawn in bag 2 (山岳積み2号's 4-line PCs) is a Perfect Clear pattern, not a bag-2 board
   if (n.bag === 2 && !n.list) {
     const spin = (n as any).spin as string | undefined;
@@ -491,8 +497,12 @@ function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
   const sl = demoProfile(P).spinLetter?.(n, routes) ?? null;
   const named = (n as any).spin as string | undefined;
   const uLines = (n as any).has_tsd_slot ? 2 : sl ? sl.lines : named && named in SPIN_LINES ? SPIN_LINES[named]! : null;
+  // a later board drawn with its slot empty and the T on a separate spin board (stick spin's TST,
+  // Imperial Cross and STMB Cave fallbacks) fires into that board's U cells, as bag 2 does
+  const spinCells = isPc ? [] : spinBoardCells(n, routes, P.tag);
   return { node: n, uLines, uLast: !isPc, pc: isPc,
-           before: [], early: null, holdPiece: null, holdBefore: null, ...(sl ? { spinLetter: sl.letter } : {}) };
+           before: [], early: null, holdPiece: null, holdBefore: null, ...(sl ? { spinLetter: sl.letter } : {}),
+           ...(spinCells.length ? { spinCells } : {}) };
 }
 
 /** Which nodes get a demo: every node with a drawn board, except the profile's unbuilt ones. */
@@ -502,7 +512,8 @@ export function demoNodes(P: RouteProfile, routes: Routes): RouteNode[] {
 }
 
 /** A node's chain of demo nodes, root first: its own ancestors through `parent`, and for a bag-2
- *  board its `base` bag-1 board. */
+ *  board its `base` bag-1 board. A bag-1 board is a whole bag from an empty board, so its chain is
+ *  itself (stick spin's `bag1.fire` names `bag1.left` as its parent: the same bag, less the T). */
 export function chainOf(n: RouteNode, routes: Routes, tag = 'route', via: Record<string, string> = {}): RouteNode[] {
   const byId = new Map(routes.nodes.map(x => [x.id, x]));
   const out: RouteNode[] = [];
@@ -511,7 +522,7 @@ export function chainOf(n: RouteNode, routes: Routes, tag = 'route', via: Record
     out.unshift(cur);
     const base = (cur as any).base as string | undefined;
     // 迷走砲's `2.ideal.fire.stmb_example` hangs under the image-only `2.ideal.fire`; its board is 2.ideal's bag 3
-    const up0: string | undefined = cur.bag === 2 ? base : base ?? cur.parent ?? undefined;
+    const up0: string | undefined = cur.bag === 1 ? undefined : cur.bag === 2 ? base : base ?? cur.parent ?? undefined;
     // a board no demo builds (an illustration of a group's shared state) stands for a demo node
     const up = up0 && up0 in via ? via[up0] : up0;
     cur = up ? byId.get(up) : undefined;
