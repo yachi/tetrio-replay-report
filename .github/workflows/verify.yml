@@ -680,6 +680,17 @@ jobs:
       - name: Check the stick spin route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_stickspin_routes --selftest
 
+      # The ガムシロ積み (Gamushiro Stacking) route transcription, through the same shared gate. Its
+      # snapshot is raw HTML and is not committed; its cross-source is harddrop's own
+      # Gamushiro_Stacking page (its First Bag setup fields, recorded in the routes file's
+      # cross_source with the page's oldid and hash), since neither wiki-openers.json nor
+      # opener-fields.json carries the opener.
+      - name: Check the Gamushiro Stacking route transcription
+        run: python3 -m pipeline.openers.extract_gamushiro_routes
+
+      - name: Check the Gamushiro Stacking route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
+
       # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
       # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
       # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
@@ -700,6 +711,13 @@ jobs:
       # typescript job. No corpus round reaches bag 2, so it has no per-branch node page.
       - name: Check the stick spin page audit catches its corruptions
         run: python3 -m pipeline.stickspin_page --selftest
+
+      # The ガムシロ積み (Gamushiro Stacking) route pages, the same shared renderer bound to
+      # pipeline/gamushiro_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (gamushiro-demos.html) are checked by pipeline/openers/gamushiro-demos.test.ts in the
+      # typescript job. A reference opener the corpus barely plays: only the bag-1-only node page.
+      - name: Check the Gamushiro Stacking page audit catches its corruptions
+        run: python3 -m pipeline.gamushiro_page --selftest
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check

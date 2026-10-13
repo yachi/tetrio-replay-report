@@ -1,0 +1,131 @@
+{
+  "_comment": "Words for pipeline/gamushiro_page.py (the shared pipeline/route_page.py renderer bound to ガムシロ積み). Corpus numbers never live here: every count on the pages is rendered from analysis/gamushiro-facts.json and analysis/gamushiro-demos.json, and the cross-check's counts live in pipeline/openers/gamushiro.test.ts, so the sentence naming it carries none. The only figures typed here are the SOURCE pages' own (shiwehi.com strongertemplate.php's opener counts, and the route page's pattern counts), quoted as theirs; their provenance is the routes JSON's source.why_this_opener and lists. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own Japanese stays as quoted). The word for the hold box appears only in l_hold_heading, page_sentences.bag1 and demo.order_words: the page audit allows it nowhere else.",
+  "page_sentences": {
+    "source": "路線同盤面轉錄自 shiwehi.com 嘅ガムシロ積み頁（2024-08-01 版），百分比係原頁寫嘅，唔係我哋計嘅。",
+    "exact": "逐格完全一樣先算（可以左右反轉）；差一兩格嘅唔計。第二巡同之後嘅圖，如果盤底有成行嘅垃圾行，會先剷走嗰幾行先對，每個個案都記低剷咗幾多行。",
+    "bag3": "第三巡同之後嘅形係模擬器重砌出嚟嘅；Perfect Clear 嘅次數有 replay 自己個 counter 對過，但砌咗邊個形冇。",
+    "bag1": "第一巡先睇第七粒落咗之後個形（L 企喺 O 上面，原頁淨係喺基本形畫咗呢幅）；唔係，先睇六粒時對唔對到原頁左邊個形（L 未落），再睇第七粒係咪 L：唔係 L 先當 hold 咗 L，係 L 就係「L 放咗第二度」。六粒時對到個形本身唔等於 hold 咗 L。",
+    "mirror": "左右反轉嘅局，L 當 J 睇，頁面條件會將 J↔L、S↔Z 對調先睇。",
+    "our_reading": "幾樣嘢係我哋自己嘅讀法，原頁冇明講：第二巡圖入面深色嗰粒 L 當係第一巡留起嗰粒 L；淺灰色嗰幾行當係 TST 消走嘅三行；「J、Z 要早」當係兩粒都要早；兩款通常形嘅標題同第一巡唔使額外操作嘅兩個條件當係先後次序；妥協形個標題「L 早過 O」冇當係第二巡嘅出牌次序（見下面原頁唔一致嘅地方）；インペリアルクロス 兩幅當係第三巡，原頁淨係話收唔到 PC 嗰陣砌。"
+  },
+  "unverified": "呢一步喺已核對範圍之外",
+  "empty_node": "corpus 未出現過（0 / {m} 個去到呢一步嘅回合）",
+  "status_words": {
+    "illustration": "示意圖，冇量度",
+    "mirror_of": "係「第一巡 六粒形」左右反轉，同一個形；反轉嘅局已經計入嗰一格",
+    "unmatchable": "有轉錄，但冇量度"
+  },
+  "unmatchable_reasons": {
+    "2.normal.pc.rest": "喺原頁嘅 HTML 註解入面，頁面冇顯示；唯一一幅圖係 TST 之後嘅盤面重畫做空白樣板",
+    "2.normal.imperial#1": "畫咗九行高，分類器只比對八行",
+    "2.compromise": "畫咗十行高，分類器只比對八行",
+    "2.compromise.tst": "畫咗十行高，分類器只比對八行"
+  },
+  "names": {
+    "bag1.l_top": "第一巡 L 企喺 O 上面",
+    "bag1.left": "第一巡 六粒形，第七粒唔係 L",
+    "bag1.right": "第一巡 六粒形（反轉）",
+    "bag1.l_placed_elsewhere": "第一巡 L 放咗第二度",
+    "2.pc4": "第二巡四行 PC",
+    "2.pc4#1": "第二巡四行 PC 第 1 款",
+    "2.pc4#2": "第二巡四行 PC 第 2 款",
+    "2.pc4#3": "第二巡四行 PC 第 3 款",
+    "2.normal": "通常形",
+    "2.normal#1": "通常形 第 1 款（L 早過 O）",
+    "2.normal#2": "通常形 第 2 款（O 早過 T 同 L）",
+    "2.normal.tst": "通常形 TST 位（示意）",
+    "2.normal.after": "通常形 TST 之後（示意）",
+    "2.normal.pc.rest": "通常形 其餘 55 款 PC（原頁摺埋）",
+    "2.normal.imperial": "インペリアルクロス",
+    "2.normal.imperial#1": "インペリアルクロス 第 1 款",
+    "2.normal.imperial#2": "インペリアルクロス 第 2 款",
+    "2.compromise": "妥協形",
+    "2.compromise.tst": "妥協形 TST 位（示意）",
+    "pc": "{parent} → PC 第 {k} 款",
+    "other": "{parent} → Perfect Clear 唔喺頁面任何一款"
+  },
+  "l_hold_heading": "第一巡 L hold 咗（六粒形，第七粒唔係 L）",
+  "listed_under": {
+    "shown": "頁面直接畫出",
+    "rest": "残り（頁面摺埋嗰幾款）"
+  },
+  "overview_title": "ガムシロ積み 全路線",
+  "opener_name": "ガムシロ積み",
+  "overview_desc": "ガムシロ積み（Gamushiro Stacking）每條路線同 corpus 入面對到嘅局：一個 corpus 幾乎冇人砌嘅參考開局，模擬器推導，唔屬於信任鏈。",
+  "node_page_desc": "{opener} {name}：每個個案嘅模擬重播，模擬器推導，唔屬於信任鏈。",
+  "bag1_only_name": "第一巡之後冇對到第二巡",
+  "index_card": {
+    "kicker": "GAMUSHIRO STACKING",
+    "blurb": "將 shiwehi.com ガムシロ積み頁嘅每一條路線對返 corpus 每一局。呢個係參考開局：corpus 兩個玩家幾乎冇砌過，放喺度係因為 shiwehi.com 一篇 2024 年嘅調查話佢係一個 PPT2 大賽冠軍最常用嘅開局；原頁每幅圖都有由空盤砌出嚟嘅示範。"
+  },
+  "overview_lede": "shiwehi.com ガムシロ積み頁畫嘅每一條路線，同 corpus 入面每一局對到邊一步。數字係「去到呢一步嘅局 / 去到上一步時可以比對嘅局」，冇百分比。呢個係參考開局：corpus 兩個玩家第一巡對到佢嘅局極少（幾多局見「第一巡」嗰段），呢頁唔係講佢哋嘅打法。放喺度係因為 shiwehi.com 另一篇〈強い人はどんな開幕テンプレを使っているのか(2024年)〉（strongertemplate.php，2024-08-21 版）點過 2024 年 7 月嘅配信同大賽片，話 2024-07-28「Tetris® Block Party」網上大賽ぷよぷよテトリス2 部門 GRAND MASTERS 嘅冠軍しゃけごはん 用得最多嘅開局係ガムシロ積み（嗰篇數到 83 場入面 48 場，はちみつ砲 23 場）。嗰篇自己講明個樣本可能偏：佢冇開台、資料少；淨計大賽 29 場，兩個開局差唔多一半一半（はちみつ砲 14、ガムシロ積み 13）；而且大約三分二場數係對住主力用ガムシロ積み 嘅あめみやたいよう。",
+  "node_page_lede": "呢版係第二巡去咗「{name}」嘅每一個個案，每個都可以撳嚟睇模擬重播；重播由個案嗰一步開始。",
+  "bag1_only_lede": "呢版係第一巡對到、但第二巡冇對到頁面任何一款（或者盤面已經唔可以比對）嘅個案，按第一巡嘅形分組；有啲個案旁邊寫住點樣差咗少少，嗰個係量度，唔係對到。",
+  "bag1_counts": "呢頁第一巡合共 {total} 局：L 企喺 O 上面（第七粒）{cases[bag1.l_top]} 局、六粒形而第七粒唔係 L {cases[bag1.left]} 局、六粒形而第七粒係 L 但放咗第二度 {cases[bag1.l_placed_elsewhere]} 局。成個 corpus 兩個玩家加埋就係咁多，所以呢個係參考開局，唔係佢哋嘅開局。harddrop 嘅開局轉錄冇呢個開局嘅圖，所以「六個具名定式」表冇一欄可以同呢度對數；代替嘅交叉核對喺 gamushiro.test.ts：呢頁第一巡對到而開局窗口完整嘅局，窗口入面要有 T-spin Triple 而冇先 Double 後 Triple，而且一係係先 Triple 後 Double，一係有名有姓列明原因（例如 TSD 喺窗口之後先打）。",
+  "bag2_note": "原頁第二巡分三條路：四行 PC 三款喺六粒形（L 未落）上面砌，第二巡就清晒，前面冇 T-spin；通常形兩款睇 O 早唔早（L 早過 O 砌第 1 款，O 早過 T 同 L 砌第 2 款），兩款都打 TST；T 早過 L 同 O 就砌唔到通常形，要砌妥協形，一樣打 TST。妥協形畫咗十行高，分類器比對唔到。",
+  "near_note": "第一巡對到但第二巡冇對到嘅 {none} 局入面，量度咗佢哋 TST 之前嗰個盤面同第二巡各款差幾遠：{subset} 局係 TST 早過第二巡砌完、{superset} 局係多咗一粒、{moved} 局係有一粒放咗第二度、{unexplained} 局比對過第二巡但三樣都唔係；其餘嘅局冇做呢個量度。呢啲淨係量度，唔當對到，條路線冇放寬。第二巡對到嘅 {matched} 局入面，有 {stripped} 局係剷咗盤底嘅垃圾行先對到。",
+  "near_words": {
+    "subset": "TST 早過第二巡砌完（{groups}）",
+    "superset": "第二巡多咗一粒 {extra}（{groups}）",
+    "moved": "第二巡有一粒 {extra} 放咗第二度（{groups}）"
+  },
+  "bag3_note": "通常形打完 TST 之後，第三巡原頁話最少有六十三款 PC，畫咗高機率嗰八款（其餘五十五款喺 HTML 註解入面，頁面冇顯示），連 TST 合共八行；有幾款 PC 前面要打 TSD。收唔到 PC 就砌インペリアルクロス，兩款原頁冇講點揀；第 1 款九行高，分類器比對唔到。",
+  "conditions_caption": "頁面條件 vs 實際砌咗：每一行係實際砌咗嘅形，每一欄係嗰局個次序啱邊個頁面條件。條件係我哋讀成先後次序嘅「L 早過 O」（通常形第 1 款）同「O 早過 T 同 L」（通常形第 2 款）；妥協形嘅「T 早過 L 同 O」係原頁講嘅觸發條件，盤面唔逼到。冇局對到嘅形唔會出現喺表入面。左右反轉嘅局，次序會將 J↔L、S↔Z 對調先睇。",
+  "illustrative": "（原頁呢句係例子，唔係揀形嘅條件）",
+  "conditions_none": "冇一個條件啱",
+  "handedness_heading": "第二巡同第一巡左右唔一致嘅局",
+  "off_page_heading": "Perfect Clear 唔喺頁面任何一款",
+  "off_page_note": "以下每一局都係 Perfect Clear，但砌出嚟嘅形唔係原頁畫嘅任何一款；冇圖係因為呢個形係模擬器砌嘅，撳入去睇重播。",
+  "index_heading": "個案索引",
+  "index_note": "每一個個案一行，撳入去睇模擬重播；同一局兩個玩家都對到嘅話會有兩行。",
+  "idle": "撳下面任何一個個案，重播就會喺度出現，由個案嗰一步開始。",
+  "missing": "呢個連結指住嘅個案唔喺呢版。",
+  "discrepancy_heading": "原頁自己唔一致嘅地方",
+  "discrepancies": {
+    "bag1.right:mirror": "第一巡右邊嗰幅圖係左邊嗰幅左右反轉（J↔L、S↔Z），逐格一樣，所以原頁第一巡得一個形。",
+    "2.normal.pc:stated_vs_drawn": "原頁話通常形第三巡最少有六十三款 PC，但淨係畫咗八款。",
+    "2.normal.pc:non_exhaustive": "畫出嚟嗰八款係原頁講嘅高機率嗰幾款，唔係所有收 PC 嘅方法。",
+    "2.normal.pc:rest_commented_out": "「残り55パターン」嗰段喺 HTML 註解入面，頁面唔會顯示；入面唯一一幅圖係 TST 之後嘅盤面重畫做空白樣板，其餘五十五款冇一處有畫。",
+    "2.normal.imperial:no_conditions": "インペリアルクロス 兩款（I 企喺左邊牆，或者 I 同 J 企喺第 6、7 欄、O 疊喺右邊）原頁冇講點揀。",
+    "2.compromise:heading_vs_board": "妥協形個標題話「L 早過 O」，但圖入面第二巡嗰粒 L 係疊喺 O 上面：O 下面得第一巡留起嗰粒 L。T 一早已經留起咗嘅話，第二巡嘅 L 早過 O 到就冇位放，所以個標題唔可以係第二巡嘅出牌次序；我哋讀成第一巡嗰粒 L 早過 O 放，冇當做出牌條件。",
+    "overview:ren_not_drawn": "原頁開頭話可以派生去中開け4列REN（優點嗰度亦講中開けREN），但成頁冇畫過。"
+  },
+  "demo": {
+    "title": "ガムシロ積み 示範重播",
+    "desc": "ガムシロ積み原頁每一幅圖嘅示範重播：由空盤用我哋揀嘅次序砌，唔係對局，唔係 corpus 數據。",
+    "lede": "原頁每一幅有盤面嘅圖，我哋都由空盤砌一次俾你睇：一粒一粒由出生位行到落點，打埋 T-spin 同消行，最後停喺原頁畫嘅樣。",
+    "sentences": {
+      "demo": "呢啲重播係我哋自己砌嘅示範：由空盤開始，用我哋揀嘅出牌次序逐粒擺，唔係任何一場真實對局，亦唔係 corpus 數據。",
+      "engine": "每一粒都係由出生位用真實按鍵行到落點，交俾 repo 自己嘅引擎（SRS+，有 180 轉）執行；T-spin 種類同消行數係引擎判定，唔係我哋寫。",
+      "order": "原頁冇講嘅出牌次序，係我哋揀嘅一種讀法，唔代表唯一做法。",
+      "mirror": "示範全部照原頁左邊嗰款砌，冇左右反轉；反轉嘅話 J↔L、S↔Z 對調就係。",
+      "rule": "第二巡兩款通常形，係 T 打入 TST 位之前嗰一刻同圖一樣，最後一粒係引擎判嘅 T-spin Triple；PC 圖就係最後一粒將成個盤清晒：四行 PC 喺第二巡，八行 PC 喺 TST 之後（有幾款中間打埋 TSD）。インペリアルクロス 兩幅係 TST 之後砌出嚟嘅形，第 1 款九行高分類器比對唔到，但示範照砌。"
+    },
+    "play": "播示範",
+    "unbuilt": "冇示範：{reason}",
+    "link": "睇示範",
+    "link_unbuilt": "冇示範（原因喺示範頁）",
+    "chain": "砌法：{chain}",
+    "bag": "{name}：出牌次序 {queue}",
+    "met": "（啱原頁條件：{cond}）",
+    "also": "即係原頁「基本形」第 {k} 幅。",
+    "reading": "原頁顏色唔一致：{reason}",
+    "events": "引擎判：{events}",
+    "pc": "第 {n} 粒全消（Perfect Clear），合共消 {lines} 行",
+    "spin": "第 {n} 粒 {name}",
+    "order_words": {
+      "early": "{p} 排第 {k} 粒（原頁話要早，冇講幾早，我哋放最前）",
+      "before": "{a} 早過 {b}",
+      "hold": "{p} 喺第 {k} 粒到，即刻 hold 起，第一巡唔放佢",
+      "hold_out": "放第 {k} 粒嗰陣按 hold，將 hold 住嘅 {p} 換出嚟放",
+      "hold_out_next": "{p} 換咗入 hold，到下一巡第一粒到先換出嚟打",
+      "hold_out_next_unused": "{p} 換咗入 hold，下一粒 {q} 到嗰陣先換出嚟打，{q} 就留喺 hold 冇放",
+      "held": "{p} 一直喺 hold 冇放",
+      "unused": "{p} 呢一巡冇用到，排最尾"
+    },
+    "idle": "撳任何一個「播示範」，重播就會喺度出現，由空盤開始。",
+    "overview_note": "原頁每一幅有盤面嘅圖，另外有一版由空盤砌出嚟嘅示範重播（唔係對局，唔計入任何數字）。",
+    "now": "示範：{name}",
+    "user": "示範"
+  }
+}
