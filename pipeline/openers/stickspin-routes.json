@@ -1,0 +1,1593 @@
+{
+  "schema": "stickspin-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/stickspin.php",
+    "title": "stick spin(SDパフェ)",
+    "updated": "2022-08-06",
+    "created": "2022-08-06",
+    "fetched": "2026-10-13",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method 山岳積み2号 used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 60 ten-wide boards in page order. Comparable with 山岳積み2号's hash (both raw HTML), not with the markdown renderings 迷走砲 and はちみつ砲 hashed.",
+    "snapshot_file": "stickspin.html",
+    "snapshot_sha256": "0d10263ee4794900d0cb94f99a3c39dcea3d9fdfe52be709f1a8b5038dc45366",
+    "snapshot_bytes": 35167,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-13",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "sha256_note": "the same bytes 山岳積み2号 recorded on 2026-10-12, re-fetched for this page",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "C": "#cccccc",
+        "U": "#c8a6ff with a #8400ff radial dot",
+        "I J L O S Z": "muted i j l o s z (#4db1d8 #4d57d8 #d8904d #cfcf4d #69d24d #d84d4d)",
+        "-": "#000000"
+      },
+      "rows": "textContent split on whitespace, one row per token; .ttt and .tetTableText are both drawn, `small` only changes the cell size",
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case) and reverses nothing else in the char map; the canvas is redrawn mirrored"
+    },
+    "decorative_images": [
+      "stick spin(SDパフェ)タイトル画像"
+    ],
+    "references_listed": [
+      "https://w.atwiki.jp/tetrismaps/pages/423.html",
+      "https://harddrop.com/wiki/Stickspin",
+      "https://four.lol/openers/sd-pc"
+    ],
+    "related_pages": [
+      "./imperialcross.php",
+      "./stmbcave.php"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), grey",
+    "U": "the T-spin slot; on an after-the-TSS board, the T's surviving cells (OUR READING, checked letter for letter against the board before the spin)",
+    "I J L O S Z C": "a cell of that piece (C: an earlier cell) in a row the spin clears, drawn in the renderer's muted colour (page legend: none; OUR READING, checked: every upper-case row is a row the U slot clears)",
+    "%X": "the X piece; '%O>%Z' means O before Z"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": null,
+      "verbatim": "ここでは、stick spin(SDパフェ)という、多くの場合、初順からTSS→TSD→TST→TSDを打つことができる、もしくはTSS→TSD(→TSD)→8ラインパフェを狙うことができる開幕テンプレについて紹介していきます。"
+    },
+    {
+      "id": "basic.o_early",
+      "figure": null,
+      "verbatim": "開幕で%Oが早いときに打つことができるテンプレの1つです。"
+    },
+    {
+      "id": "basic.tss",
+      "figure": null,
+      "verbatim": "また、初巡でTSSを打てるため、相手の開幕パフェを阻止することができます。"
+    },
+    {
+      "id": "basic.b2b",
+      "figure": null,
+      "verbatim": "また、その後back-to-backを維持したままTSDを打つことができます。"
+    },
+    {
+      "id": "basic.side",
+      "figure": null,
+      "verbatim": "%Jと%Lのどちらが早いかで左右を使い分けると良いでしょう。"
+    },
+    {
+      "id": "bag1.requires",
+      "figure": null,
+      "verbatim": "1巡目の組み方は上図の通りで、%Oが早い時にソフトドロップ無しで組むことができます。"
+    },
+    {
+      "id": "bag1.no_hold",
+      "figure": null,
+      "verbatim": "左のパターンがホールド無しで組める条件は以下の通りです。"
+    },
+    {
+      "id": "bag1.no_hold.o_z",
+      "figure": null,
+      "verbatim": "%O>%Z"
+    },
+    {
+      "id": "bag1.no_hold.j_l",
+      "figure": null,
+      "verbatim": "%J>%L"
+    },
+    {
+      "id": "bag1.side",
+      "figure": null,
+      "verbatim": "%J%Lのどちらが早いかによって左右を決めると良いでしょう。(ここでは、以下左のパターンで説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。)"
+    },
+    {
+      "id": "bag1.fire",
+      "figure": null,
+      "verbatim": "火力派生の場合、1巡目は%Tを立てるようにTスピンを打ちます。"
+    },
+    {
+      "id": "2.fire",
+      "figure": null,
+      "verbatim": "火力派生の場合、2巡目は下図のどちらかの形を組むことでTSDを打つことができます。"
+    },
+    {
+      "id": "2.fire.soft_s",
+      "figure": null,
+      "verbatim": "(%Sはソフトドロップで後入れできます。)"
+    },
+    {
+      "id": "2.fire.td",
+      "figure": null,
+      "verbatim": "3巡目は以下いずれかのTDアタックの形に組むことで、3巡目TST→4巡目TSDを打つことができます。"
+    },
+    {
+      "id": "2.fire.td.sz",
+      "figure": null,
+      "verbatim": "%Sと%Zの位置だけ正しく置ければあとは何とかなるかなと思います。"
+    },
+    {
+      "id": "bag1.pc",
+      "figure": null,
+      "verbatim": "パフェ派生の場合、1巡目は%Tを寝かせるようにTスピンを打ちます。"
+    },
+    {
+      "id": "2.sd.intro",
+      "figure": "97.18% / 約52%",
+      "verbatim": "SDパフェ派生は、2巡目にTSDを打ってから3巡目に97.18%でパフェを取ることができ、そのうち約52%でパフェを取る前にTSD又はTSSを打つことができます。"
+    },
+    {
+      "id": "2.sd",
+      "figure": null,
+      "verbatim": "SDパフェ派生の場合、2巡目は下図の形で必ずTSDを打つことができます。"
+    },
+    {
+      "id": "2.sd.pc",
+      "figure": "97.18%",
+      "verbatim": "3巡目は97.18%でパフェを取ることができます。",
+      "note": "the page prints this sentence twice, word for word: under SDパフェ and under もっちパフェ"
+    },
+    {
+      "id": "2.sd.pc.rest",
+      "figure": "14通り",
+      "verbatim": "その他の取り方(14通り)"
+    },
+    {
+      "id": "2.sd.fallback",
+      "figure": null,
+      "verbatim": "パフェが取れない場合は様々な形に移行できます。"
+    },
+    {
+      "id": "2.mochi.intro",
+      "figure": "100%",
+      "verbatim": "もっちパフェ派生は2巡目にTSDを打ってから、3巡目に100%でパフェを取ることができる派生です。"
+    },
+    {
+      "id": "2.mochi",
+      "figure": null,
+      "verbatim": "もっちパフェ派生の場合、2巡目は下図の形でTSDを打ちます。"
+    },
+    {
+      "id": "2.mochi.i_right",
+      "figure": "99.96%",
+      "verbatim": "%Iが早い場合には99.96%にパフェ率は下がりますが%Iを右側に立てても良いです。"
+    },
+    {
+      "id": "2.mochi.pc",
+      "figure": "97.18%",
+      "verbatim": "3巡目は97.18%でパフェを取ることができます。",
+      "note": "word for word the 2.sd.pc sentence, under the もっちパフェ heading, whose own introduction says 100%"
+    },
+    {
+      "id": "2.mochi.pc.rest",
+      "figure": "9通り",
+      "verbatim": "その他の取り方(9通り)"
+    }
+  ],
+  "bag1": {
+    "requires_verbatim": "1巡目の組み方は上図の通りで、%Oが早い時にソフトドロップ無しで組むことができます。",
+    "requires": {
+      "early": [
+        "O"
+      ],
+      "illustrative": true
+    },
+    "requires_note": "the condition for building WITHOUT SOFT DROP, not a trigger; the 基本形 sentence says the same (開幕で%Oが早いとき)",
+    "no_hold_verbatim": "左のパターンがホールド無しで組める条件は以下の通りです。",
+    "no_hold": {
+      "all": [
+        {
+          "before": [
+            "O",
+            "Z"
+          ]
+        },
+        {
+          "before": [
+            "J",
+            "L"
+          ]
+        }
+      ],
+      "node": "bag1.left"
+    },
+    "no_hold_items_verbatim": [
+      "%O>%Z",
+      "%J>%L"
+    ],
+    "no_hold_note": "the left pattern's condition for building WITHOUT HOLD; each order is checked against bag1.left by support (a cell of the later piece rests on a cell of the earlier one). The right pattern's (its mirror: O>S, L>J) is not stated",
+    "side_verbatim": "%J%Lのどちらが早いかによって左右を決めると良いでしょう。(ここでは、以下左のパターンで説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。)",
+    "side": {
+      "decided_by": [
+        "J",
+        "L"
+      ],
+      "which": null
+    },
+    "side_note": "the page does not say which side goes with which piece in this sentence; the no-hold list gives J before L for the left one",
+    "tss_lock": 7,
+    "tss_note": "six pieces and then the T: every bag-1 board below is six pieces, and the T is the bag's seventh lock, into a T-spin Single, stood up (火力派生) or laid flat (パフェ派生)"
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.fire",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-z--------",
+        "zzU------i",
+        "zUU----lli",
+        "ooUssjjjli",
+        "ooss---jli"
+      ],
+      "canvas": "tetCanvas0"
+    },
+    {
+      "id": "basic.2",
+      "same_as": "2.fire.tsd",
+      "differs": "the two rows the TSD clears are drawn in the pieces' own colours, not the muted ones",
+      "recolour": {
+        "I": "i",
+        "C": "c",
+        "J": "j",
+        "Z": "z",
+        "S": "s",
+        "L": "l"
+      },
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "ioo-------",
+        "ioo------z",
+        "icUUUjjjzz",
+        "cccUslljzc",
+        "ccc-sslccc",
+        "cccc-slccc"
+      ],
+      "canvas": "tetCanvas1"
+    },
+    {
+      "id": "basic.3",
+      "same_as": "2.fire.td#1",
+      "rows": [
+        "i---------",
+        "i---------",
+        "i---------",
+        "i-ss--jj--",
+        "css---jloo",
+        "cccUzzjloo",
+        "cccUUzzllc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ],
+      "canvas": "tetCanvas2"
+    }
+  ],
+  "groups": [
+    {
+      "id": "2.fire",
+      "heading": "火力派生(stick Spin) 2巡目",
+      "drawn": 2,
+      "text_verbatim": "火力派生の場合、2巡目は下図のどちらかの形を組むことでTSDを打つことができます。"
+    },
+    {
+      "id": "2.fire.td",
+      "heading": "火力派生(stick Spin) 3巡目→4巡目",
+      "drawn": 4,
+      "text_verbatim": "3巡目は以下いずれかのTDアタックの形に組むことで、3巡目TST→4巡目TSDを打つことができます。",
+      "shared_verbatim": "%Sと%Zの位置だけ正しく置ければあとは何とかなるかなと思います。",
+      "shared_pieces": [
+        "S",
+        "Z"
+      ],
+      "shared_note": "checked: all four forms put the S and the Z on the same cells"
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.sd.pc",
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "bag": 3,
+      "heading": "SDパフェ派生(SingleYou) 3巡目",
+      "stated_pattern_count": null,
+      "shown": 5,
+      "rest_stated": 14,
+      "complete": true,
+      "count_note": "the page states no total: it shows 5 and counts the rest behind 「その他の取り方(N通り)」, which is checked against the drawn rest; read as complete because the page gives a PC rate over them",
+      "pc_lines": 7,
+      "total_lines": 8,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "the 5-row body plus the bag-2 TSD before it; the page's 8ライン counts the bag-1 TSS too (TSS 1 + TSD 2 + 5), which `_stickspin_checks` re-derives along the base chain",
+      "drawn": 19
+    },
+    {
+      "id": "2.mochi.pc",
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "bag": 3,
+      "heading": "もっちパフェ派生(Mochi PC) 3巡目",
+      "stated_pattern_count": null,
+      "shown": 5,
+      "rest_stated": 9,
+      "complete": true,
+      "count_note": "the page states no total: it shows 5 and counts the rest behind 「その他の取り方(N通り)」, which is checked against the drawn rest; read as complete because the page gives a PC rate over them",
+      "pc_lines": 7,
+      "total_lines": 8,
+      "total_lines_quote": "overview.intro",
+      "pc_lines_note": "as 2.sd.pc: the 5-row body plus the TSD, 8 lines with the TSS",
+      "drawn": 14
+    }
+  ],
+  "slot_flags": {
+    "has_u_slot": "the pattern draws a U (T-spin slot) cell",
+    "t_flat_shape": "the pattern's t cells form the flat ttt-over-t shape ANYWHERE on the board; a shape test, not a position test, and not a TSD (the PC body is framed after the TSD): nothing downstream reads it"
+  },
+  "known_discrepancies": [
+    {
+      "id": "bag1.right:mirror",
+      "what": "the right bag-1 board is the left one mirrored with J<->L, S<->Z (cell for cell), so the page has ONE bag-1 shape, not two"
+    },
+    {
+      "id": "2.fire:no_conditions",
+      "what": "two 火力派生 bag-2 forms (J or L laid flat beside the TSD slot) and no condition saying which: the page says どちらかの形"
+    },
+    {
+      "id": "2.fire.tsd:form1_colours",
+      "what": "the TSD board is drawn after BOTH bag-2 forms (→ after the second) but in the colours of the first (JJJ / SLLJ); its occupancy fits both"
+    },
+    {
+      "id": "2.fire.td:no_conditions",
+      "what": "four TD-attack bag-3 forms and no condition saying which; the page says only the S and Z must be placed right (checked: all four put S and Z on the same cells)"
+    },
+    {
+      "id": "2.fire.bag4:not_drawn",
+      "what": "the 3巡目→4巡目 sentence names a bag-4 TSD; the page draws no bag-4 board"
+    },
+    {
+      "id": "2.mochi.pc:rate_conflict",
+      "what": "the もっちパフェ introduction says 3巡目に100%でパフェ; its 3巡目 sentence says 97.18%, word for word the SDパフェ 3巡目 sentence"
+    },
+    {
+      "id": "2.mochi.pc#13:colour",
+      "what": "the 13th もっちパフェ pattern draws five j cells and three l: the cell in column 10 of its fourth row (ccccjtoocj) is the L's fourth cell in the kept-rows frame (the third row, ccccjjoozz, clears under it), drawn in the J's colour"
+    },
+    {
+      "id": "2.mochi.i_right:no_pc_drawn",
+      "what": "the I-on-the-right もっちパフェ variant states a PC rate (99.96%) and no PC pattern is drawn for it: the drawn もっちパフェ patterns sit on the I-on-the-left board"
+    }
+  ],
+  "page_order": [
+    "basic.1",
+    "basic.2",
+    "basic.3",
+    "bag1.left",
+    "bag1.right",
+    "bag1.fire",
+    "bag1.fire.after",
+    "2.fire#1",
+    "2.fire#2",
+    "2.fire.tsd",
+    "2.fire.td#1",
+    "2.fire.td#2",
+    "2.fire.td#3",
+    "2.fire.td#4",
+    "bag1.pc",
+    "bag1.pc.after",
+    "2.sd",
+    "2.sd.after",
+    "2.sd.pc#1",
+    "2.sd.pc#2",
+    "2.sd.pc#3",
+    "2.sd.pc#4",
+    "2.sd.pc#5",
+    "2.sd.pc#6",
+    "2.sd.pc#7",
+    "2.sd.pc#8",
+    "2.sd.pc#9",
+    "2.sd.pc#10",
+    "2.sd.pc#11",
+    "2.sd.pc#12",
+    "2.sd.pc#13",
+    "2.sd.pc#14",
+    "2.sd.pc#15",
+    "2.sd.pc#16",
+    "2.sd.pc#17",
+    "2.sd.pc#18",
+    "2.sd.pc#19",
+    "2.sd.tst",
+    "2.sd.tst.spin",
+    "2.sd.imperial",
+    "2.sd.imperial.spin",
+    "2.sd.stmb",
+    "2.sd.stmb.spin",
+    "2.mochi",
+    "2.mochi.after",
+    "2.mochi.i_right",
+    "2.mochi.pc#1",
+    "2.mochi.pc#2",
+    "2.mochi.pc#3",
+    "2.mochi.pc#4",
+    "2.mochi.pc#5",
+    "2.mochi.pc#6",
+    "2.mochi.pc#7",
+    "2.mochi.pc#8",
+    "2.mochi.pc#9",
+    "2.mochi.pc#10",
+    "2.mochi.pc#11",
+    "2.mochi.pc#12",
+    "2.mochi.pc#13",
+    "2.mochi.pc#14"
+  ],
+  "nodes": [
+    {
+      "id": "bag1.left",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own (its sentence calls it 左のパターン)",
+      "label": "bag 1 less the T (the page's left pattern)",
+      "rows": [
+        "----------",
+        "-z--------",
+        "zz-------i",
+        "z------lli",
+        "oo-ssjjjli",
+        "ooss---jli"
+      ]
+    },
+    {
+      "id": "bag1.right",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own",
+      "label": "bag 1 less the T, mirrored (the page's right pattern)",
+      "mirror_of": "bag1.left",
+      "classifier_note": "exactly bag1.left mirrored with J<->L and S<->Z swapped (checked cell for cell); a mirror-aware classifier must treat it as the SAME node, not a second branch",
+      "rows": [
+        "----------",
+        "--------s-",
+        "i-------ss",
+        "ijj------s",
+        "ijlllzz-oo",
+        "ijl---zzoo"
+      ]
+    },
+    {
+      "id": "bag1.fire",
+      "bag": 1,
+      "parent": "bag1.left",
+      "spin_of": "bag1.left",
+      "locks": 7,
+      "spin": "TSS",
+      "t_orientation": "stood",
+      "label_jp": "火力派生(stick Spin) 1巡目",
+      "label": "bag 1 with the T stood up into a T-spin Single (the attack line)",
+      "rows": [
+        "----------",
+        "-z--------",
+        "zzU------i",
+        "zUU----lli",
+        "ooUssjjjli",
+        "ooss---jli"
+      ]
+    },
+    {
+      "id": "bag1.fire.after",
+      "bag": 1,
+      "parent": "bag1.fire",
+      "label": "attack line, after the TSS",
+      "node_kind": "illustration",
+      "after_of": "bag1.fire",
+      "rows": [
+        "----------",
+        "----------",
+        "-z--------",
+        "zzU------i",
+        "zUU----lli",
+        "ooss---jli"
+      ]
+    },
+    {
+      "id": "2.fire#1",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.fire.after",
+      "spin": "TSD",
+      "label_jp": "火力派生(stick Spin) 2巡目 1",
+      "label": "attack bag 2, form 1 (J laid flat beside the TSD slot, in its top row)",
+      "group": "2.fire",
+      "variant": 1,
+      "condition": null,
+      "spin_board": "2.fire.tsd",
+      "rows": [
+        "----------",
+        "i---------",
+        "ioo-------",
+        "ioo------z",
+        "ic---jjjzz",
+        "ccc-slljzc",
+        "ccc-sslccc",
+        "cccc-slccc"
+      ]
+    },
+    {
+      "id": "2.fire#2",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.fire.after",
+      "spin": "TSD",
+      "label_jp": "火力派生(stick Spin) 2巡目 2",
+      "label": "attack bag 2, form 2 (L laid flat beside the TSD slot, in its top row)",
+      "group": "2.fire",
+      "variant": 2,
+      "condition": null,
+      "spin_board": "2.fire.tsd",
+      "rows": [
+        "----------",
+        "i---------",
+        "ioo-------",
+        "ioo------z",
+        "ic---lllzz",
+        "ccc-sljjzc",
+        "ccc-ssjccc",
+        "cccc-sjccc"
+      ]
+    },
+    {
+      "id": "2.fire.tsd",
+      "bag": 2,
+      "parent": "2.fire",
+      "label_jp": "火力派生(stick Spin) 2巡目 →",
+      "label": "attack bag 2 with the TSD slot and the cleared rows highlighted (drawn in form 1's colours)",
+      "node_kind": "illustration",
+      "rows": [
+        "----------",
+        "i---------",
+        "ioo-------",
+        "ioo------z",
+        "ICUUUJJJZZ",
+        "CCCUSLLJZC",
+        "ccc-sslccc",
+        "cccc-slccc"
+      ]
+    },
+    {
+      "id": "2.fire.td#1",
+      "bag": 3,
+      "parent": "2.fire",
+      "base": "2.fire#1",
+      "base_note": "the base is the board BEFORE the TSD (2.fire#1), because the page draws no after-the-TSD board for this branch; 2.sd.pc and 2.mochi.pc are based on a drawn after-the-TSD board instead. Both bag-2 forms share one occupancy, so they leave the same board after the TSD (checked)",
+      "spin": "TST",
+      "label_jp": "火力派生(stick Spin) 3巡目→4巡目 1",
+      "label": "attack bag 3, TD attack form 1 (I stood at the left wall)",
+      "group": "2.fire.td",
+      "variant": 1,
+      "condition": null,
+      "unmatchable": "9 non-empty rows > ROWS = 8",
+      "rows": [
+        "i---------",
+        "i---------",
+        "i---------",
+        "i-ss--jj--",
+        "css---jloo",
+        "cccUzzjloo",
+        "cccUUzzllc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.fire.td#2",
+      "bag": 3,
+      "parent": "2.fire",
+      "base": "2.fire#1",
+      "spin": "TST",
+      "label_jp": "火力派生(stick Spin) 3巡目→4巡目 2",
+      "label": "attack bag 3, TD attack form 2 (O at the left, I at the right wall)",
+      "group": "2.fire.td",
+      "variant": 2,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "oo-------i",
+        "ooss--l--i",
+        "css---l-ji",
+        "cccUzzllji",
+        "cccUUzzjjc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.fire.td#3",
+      "bag": 3,
+      "parent": "2.fire",
+      "base": "2.fire#1",
+      "spin": "TST",
+      "label_jp": "火力派生(stick Spin) 3巡目→4巡目 3",
+      "label": "attack bag 3, TD attack form 3 (J and L over O, I at the right wall)",
+      "group": "2.fire.td",
+      "variant": 3,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "------j--i",
+        "--ss--jjji",
+        "css---llli",
+        "cccUzzlooi",
+        "cccUUzzooc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.fire.td#4",
+      "bag": 3,
+      "parent": "2.fire",
+      "base": "2.fire#1",
+      "spin": "TST",
+      "label_jp": "火力派生(stick Spin) 3巡目→4巡目 4",
+      "label": "attack bag 3, TD attack form 4 (L over O and J, I at the right wall)",
+      "group": "2.fire.td",
+      "variant": 4,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "--------li",
+        "--ss--llli",
+        "css---ooji",
+        "cccUzzooji",
+        "cccUUzzjjc",
+        "cccUcccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "2.fire.bag4",
+      "bag": 4,
+      "parent": "2.fire.td",
+      "node_kind": "text_only",
+      "label_jp": "3巡目→4巡目",
+      "page_text": "3巡目TST→4巡目TSDを打つことができます。",
+      "note": "the page names a bag-4 TSD after the TST and draws no bag-4 board"
+    },
+    {
+      "id": "bag1.pc",
+      "bag": 1,
+      "parent": "bag1.left",
+      "spin_of": "bag1.left",
+      "locks": 7,
+      "spin": "TSS",
+      "t_orientation": "flat",
+      "label_jp": "パフェ派生(SDパフェ・もっちパフェ) 1巡目",
+      "label_jp_note": "the section heading; the page gives this board no 1巡目 heading of its own, only the sentence 1巡目は%Tを寝かせるように",
+      "label": "bag 1 with the T laid flat into a T-spin Single (the Perfect Clear line)",
+      "rows": [
+        "----------",
+        "-z--------",
+        "zz-------i",
+        "zUUU---lli",
+        "ooUssjjjli",
+        "ooss---jli"
+      ]
+    },
+    {
+      "id": "bag1.pc.after",
+      "bag": 1,
+      "parent": "bag1.pc",
+      "label": "Perfect Clear line, after the TSS",
+      "node_kind": "illustration",
+      "after_of": "bag1.pc",
+      "rows": [
+        "----------",
+        "----------",
+        "-z--------",
+        "zz-------i",
+        "zUUU---lli",
+        "ooss---jli"
+      ]
+    },
+    {
+      "id": "2.sd",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.pc.after",
+      "spin": "TSD",
+      "label_jp": "SDパフェ派生(SingleYou) 2巡目",
+      "label": "SD-PC bag 2",
+      "condition": null,
+      "condition_note": "the page states no order condition choosing SDパフェ over もっちパフェ",
+      "rows": [
+        "----------",
+        "i---------",
+        "ioo-------",
+        "iooz---jjj",
+        "iczz----lj",
+        "cczUUUlllc",
+        "ccccUssccc",
+        "ccccss-ccc"
+      ]
+    },
+    {
+      "id": "2.sd.after",
+      "bag": 2,
+      "parent": "2.sd",
+      "label": "SD-PC, after the TSD",
+      "node_kind": "illustration",
+      "after_of": "2.sd",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "i---------",
+        "ioo-------",
+        "iooz---jjj",
+        "iczz----lj",
+        "ccccss-ccc"
+      ]
+    },
+    {
+      "id": "2.sd.pc#1",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 1",
+      "pieces": "ijlost",
+      "rows": [
+        "cjjjillloo",
+        "cccjilssoo",
+        "ccccissccc",
+        "ccccitttcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#2",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 2",
+      "pieces": "ijlotz",
+      "rows": [
+        "ciiiijjzoo",
+        "ccclljzzoo",
+        "ccccljzccc",
+        "ccccltttcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#3",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 3",
+      "pieces": "ijlost",
+      "rows": [
+        "ciiiijssoo",
+        "ccclljjjoo",
+        "cccclssccc",
+        "ccccltttcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#4",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "ciiiitttoo",
+        "cccjjjtzoo",
+        "cccclllccc",
+        "ccccljzzcc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#5",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 5",
+      "pieces": "ijlosz",
+      "rows": [
+        "ciiiislloo",
+        "ccczzssloo",
+        "cccczzsccc",
+        "ccccjjjlcc",
+        "ccccccjccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#6",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 6",
+      "pieces": "ijlstz",
+      "rows": [
+        "ciiiistttl",
+        "ccczzsslll",
+        "cccczzsccc",
+        "ccccjjjtcc",
+        "ccccccjccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#7",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 7",
+      "pieces": "ijostz",
+      "rows": [
+        "ciiiijjjoo",
+        "ccczzssjoo",
+        "cccczztccc",
+        "ccccssttcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#8",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 8",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjjjiiiioo",
+        "cccjltttoo",
+        "cccclzzccc",
+        "ccccllzzcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#9",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 9",
+      "pieces": "jlostz",
+      "rows": [
+        "cjjjstttoo",
+        "cccjsstzoo",
+        "cccclllccc",
+        "cccclszzcc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#10",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 10",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjjjiiiioo",
+        "cccjlllzoo",
+        "cccctttccc",
+        "ccccltzzcc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#11",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 11",
+      "pieces": "ijlotz",
+      "rows": [
+        "ciiiitttoo",
+        "ccczzjjjoo",
+        "cccczzlccc",
+        "ccccllljcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#12",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 12",
+      "pieces": "ijlost",
+      "rows": [
+        "ciiiijjjoo",
+        "ccclltttoo",
+        "cccclstccc",
+        "cccclssjcc",
+        "ccccccsccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#13",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 13,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 13",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjjjitttoo",
+        "cccjillloo",
+        "ccccizzccc",
+        "ccccilzzcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#14",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 14,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 14",
+      "pieces": "ijlost",
+      "rows": [
+        "ciiiitttoo",
+        "ccclljssoo",
+        "cccclssccc",
+        "ccccljjjcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#15",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 15,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 15",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjjjlllzoo",
+        "cccjltzzoo",
+        "cccctttccc",
+        "cccciiiicc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#16",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 16,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 16",
+      "pieces": "ilostz",
+      "rows": [
+        "ciiiissloo",
+        "ccczzllloo",
+        "cccczztccc",
+        "ccccssttcc",
+        "cccccctccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#17",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 17,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 17",
+      "pieces": "ijlost",
+      "rows": [
+        "ciiiilljoo",
+        "ccctttljoo",
+        "cccctssccc",
+        "ccccssjjcc",
+        "cccccclccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.pc#18",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 18,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 18",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjjjtttzoo",
+        "cccjiiiioo",
+        "cccclllccc",
+        "ccccltzzcc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.sd.pc#19",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "list": "2.sd.pc",
+      "index": 19,
+      "listed_under": "rest",
+      "label_jp": "SDパフェ派生(SingleYou) 3巡目 19",
+      "pieces": "jlostz",
+      "rows": [
+        "cjjjlllzoo",
+        "cccjstttoo",
+        "ccccsstccc",
+        "cccclszzcc",
+        "cccccczccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.sd.tst",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "spin": "TST",
+      "spin_board": "2.sd.tst.spin",
+      "label_jp": "パフェが取れない場合 TST派生",
+      "label": "SD-PC fallback: TST",
+      "text_verbatim": "パフェが取れない場合は様々な形に移行できます。",
+      "rows": [
+        "----------",
+        "c----ss---",
+        "ccc-ss----",
+        "ccccoo-ccc",
+        "ccccoo--cc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "2.sd.tst.spin",
+      "bag": 3,
+      "parent": "2.sd.tst",
+      "label_jp": "パフェが取れない場合 TST派生 →",
+      "label": "SD-PC fallback TST, with the slot and the cleared rows highlighted",
+      "node_kind": "illustration",
+      "rows": [
+        "----------",
+        "c----ss---",
+        "ccc-ss----",
+        "CCCCOOUCCC",
+        "CCCCOOUUCC",
+        "CCCCCCUCCC"
+      ]
+    },
+    {
+      "id": "2.sd.imperial",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "spin": "TSD",
+      "spin_board": "2.sd.imperial.spin",
+      "label_jp": "パフェが取れない場合 インペリアルクロス派生",
+      "label": "SD-PC fallback: Imperial Cross (a TSD whose two cleared rows are not adjacent)",
+      "rows": [
+        "----------",
+        "c---lll---",
+        "ccc-lz----",
+        "cccczz-ccc",
+        "ccccz---cc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "2.sd.imperial.spin",
+      "bag": 3,
+      "parent": "2.sd.imperial",
+      "label_jp": "パフェが取れない場合 インペリアルクロス派生 →",
+      "label": "SD-PC fallback Imperial Cross, with the slot and the two cleared rows highlighted",
+      "node_kind": "illustration",
+      "rows": [
+        "----------",
+        "c---lll---",
+        "ccc-lz----",
+        "CCCCZZUCCC",
+        "cccczUU-cc",
+        "CCCCCCUCCC"
+      ]
+    },
+    {
+      "id": "2.sd.stmb",
+      "bag": 3,
+      "parent": "2.sd",
+      "base": "2.sd.after",
+      "spin": "TSD",
+      "spin_board": "2.sd.stmb.spin",
+      "label_jp": "パフェが取れない場合 STMB Cave派生",
+      "label": "SD-PC fallback: STMB Cave",
+      "rows": [
+        "---l------",
+        "clll---zz-",
+        "ccc---sszz",
+        "cccc-ssccc",
+        "cccc----cc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "2.sd.stmb.spin",
+      "bag": 3,
+      "parent": "2.sd.stmb",
+      "label_jp": "パフェが取れない場合 STMB Cave派生 →",
+      "label": "SD-PC fallback STMB Cave, with the slot and the cleared rows highlighted",
+      "node_kind": "illustration",
+      "rows": [
+        "---l------",
+        "clll---zz-",
+        "CCCUUUSSZZ",
+        "CCCCUSSCCC",
+        "cccc----cc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "2.mochi",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.pc.after",
+      "spin": "TSD",
+      "label_jp": "もっちパフェ派生(Mochi PC) 2巡目",
+      "label": "Mochi PC bag 2 (I laid flat at the top left)",
+      "condition": null,
+      "condition_note": "the page states no order condition choosing もっちパフェ over SDパフェ",
+      "rows": [
+        "----------",
+        "iiii------",
+        "jjss------",
+        "jssz------",
+        "jczz----l-",
+        "cczUUUlllc",
+        "ccccUooccc",
+        "cccc-ooccc"
+      ]
+    },
+    {
+      "id": "2.mochi.after",
+      "bag": 2,
+      "parent": "2.mochi",
+      "label": "Mochi PC, after the TSD",
+      "node_kind": "illustration",
+      "after_of": "2.mochi",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "iiii------",
+        "jjss------",
+        "jssz------",
+        "jczz----l-",
+        "cccc-ooccc"
+      ]
+    },
+    {
+      "id": "2.mochi.i_right",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.pc.after",
+      "spin": "TSD",
+      "label_jp": "もっちパフェ派生(Mochi PC) 2巡目 (%Iが早い場合)",
+      "label": "Mochi PC bag 2 with the I stood at the right wall",
+      "condition_verbatim": "%Iが早い場合には99.96%にパフェ率は下がりますが%Iを右側に立てても良いです。",
+      "condition": {
+        "early": "I"
+      },
+      "rows": [
+        "----------",
+        "---------i",
+        "jjss-----i",
+        "jssz-----i",
+        "jczz----li",
+        "cczUUUlllc",
+        "ccccUooccc",
+        "cccc-ooccc"
+      ]
+    },
+    {
+      "id": "2.mochi.pc#1",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 1",
+      "pieces": "ijlost",
+      "rows": [
+        "cccctttjjj",
+        "ccccitllsj",
+        "ccccioolss",
+        "ccccioolcs",
+        "cccciccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#2",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 2",
+      "pieces": "ijlstz",
+      "rows": [
+        "ccccjjiiii",
+        "ccccjtttll",
+        "ccccjztssl",
+        "cccczzsscl",
+        "cccczccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#3",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 3",
+      "pieces": "ijlotz",
+      "rows": [
+        "ccccjjtlli",
+        "ccccjtttli",
+        "ccccjzooli",
+        "cccczzooci",
+        "cccczccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#4",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "ccccjjzooi",
+        "ccccjzzooi",
+        "ccccjzttti",
+        "ccccllltci",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#5",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 5",
+      "pieces": "ijlstz",
+      "rows": [
+        "cccctttssi",
+        "ccccjtsszi",
+        "ccccjjjzzi",
+        "cccclllzci",
+        "cccclccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#6",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 6,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 6",
+      "pieces": "ijlotz",
+      "rows": [
+        "ccccooiiii",
+        "ccccoozzll",
+        "ccccjjtzzl",
+        "ccccjtttcl",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#7",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 7,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 7",
+      "pieces": "ijostz",
+      "rows": [
+        "ccccjjjooi",
+        "cccczzjooi",
+        "cccctzzssi",
+        "ccccttssci",
+        "cccctccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#8",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 8,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 8",
+      "pieces": "ijlost",
+      "rows": [
+        "ccccooiiii",
+        "ccccoossll",
+        "ccccjjtttl",
+        "ccccjsstcl",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#9",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 9,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 9",
+      "pieces": "ijlotz",
+      "rows": [
+        "cccctttloo",
+        "ccccillloo",
+        "ccccizzjjj",
+        "ccccitzzcj",
+        "cccciccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#10",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 10,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 10",
+      "pieces": "ijlosz",
+      "rows": [
+        "cccclllooi",
+        "ccccjjjooi",
+        "cccclzjssi",
+        "cccczzssci",
+        "cccczccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#11",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 11,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 11",
+      "pieces": "ijlosz",
+      "rows": [
+        "ccccllljjj",
+        "cccclzoosj",
+        "cccczzooss",
+        "cccciiiics",
+        "cccczccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#12",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 12,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 12",
+      "pieces": "ijlost",
+      "rows": [
+        "ccccsllooi",
+        "ccccsslooi",
+        "ccccjjttti",
+        "ccccjsltci",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": true
+    },
+    {
+      "id": "2.mochi.pc#13",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 13,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 13",
+      "pieces": "ijlotz",
+      "rows": [
+        "cccciiiill",
+        "cccctttzzl",
+        "ccccjjoozz",
+        "ccccjtoocj",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    },
+    {
+      "id": "2.mochi.pc#14",
+      "bag": 3,
+      "parent": "2.mochi",
+      "base": "2.mochi.after",
+      "list": "2.mochi.pc",
+      "index": 14,
+      "listed_under": "rest",
+      "label_jp": "もっちパフェ派生(Mochi PC) 3巡目 14",
+      "pieces": "ijlotz",
+      "rows": [
+        "ccccjjiiii",
+        "ccccjzztll",
+        "ccccootttl",
+        "ccccoozzcl",
+        "ccccjccccc"
+      ],
+      "has_u_slot": false,
+      "t_flat_shape": false
+    }
+  ]
+}

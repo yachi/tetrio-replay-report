@@ -16,7 +16,10 @@ per rule and requires that tag):
      its cells say; a condition names pieces. Every non-board feature is on the spec's named list.
      `page_order` lists every board the page draws exactly once.
   2. harddrop — the spec's bag-1 node equals harddrop's field for the opener cell for cell, as
-     drawn or mirrored (`wiki-openers.json`).
+     drawn or mirrored (`wiki-openers.json`). An opener harddrop's transcription does not carry
+     (stick spin) names a `catalogue` entry instead (`opener-fields.json`, Ivan's opener database):
+     its named nodes, T placed in their U cells, equal that entry's fields by occupancy as drawn or
+     mirrored, and every field of the entry is one of them (tag `catalogue:`).
   3. internal consistency — a bag-2 board's `c` (and prior-bag letter) cells are exactly its bag-1
      base; a later board's `c` cells are exactly what its base leaves after its T-spin; a Perfect
      Clear pattern clears the spec's `pc_lines`; a 基本形 board equals the node it names, modulo
@@ -27,7 +30,10 @@ per rule and requires that tag):
      pattern repeats under one parent; the bag-3 patterns share occupancy, so colour must decide.
   5. discrepancies — list counts against the page's own split; the set of measured source
      discrepancies equals the named `known_discrepancies`, both ways.
-  7. piece decomposition — every letter is whole pieces of that letter in the kept-rows frame.
+  7. piece decomposition — every letter is whole pieces of that letter in the kept-rows frame. A
+     board that is the board AFTER another's spin (`after_of`) is exempt: its letters are that
+     board's pieces cut by the clear (stick spin draws its after boards in colour, the other pages
+     in grey), and the after-of rule already checks it against the board it follows.
 
 A list may carry its own `pc_lines` (a 4-line PC drawn in bag 2; a PC after two spins whose body
 plus the last spin is not the spec's figure); a list node drawn in bag 2 is checked as a PC with no
@@ -50,6 +56,7 @@ from typing import Callable
 
 HERE = Path(__file__).resolve().parent
 WIKI = HERE / 'wiki-openers.json'
+CATALOGUE = HERE / 'opener-fields.json'
 
 WIDTH = 10
 #: `match.ts`'s `ROWS`. A board taller than this cannot be compared by the classifier at all.
@@ -67,8 +74,9 @@ class TranscriptionSpec:
     alphabet: frozenset
     #: node id -> the non-board kind it was read as (image_only, text_only)
     non_board: dict
-    #: {'key': wiki-openers key, 'node': the bag-1 node that must equal its field}
-    harddrop: dict
+    #: {'key': wiki-openers key, 'node': the bag-1 node that must equal its field}, or None when
+    #: harddrop's transcription has no field for the opener (then `catalogue` must be given)
+    harddrop: dict | None
     #: node kinds that carry a board as well (an illustration of a spin, drawn with shading)
     board_kinds: frozenset = frozenset()
     pc_lines: int = 8
@@ -85,6 +93,9 @@ class TranscriptionSpec:
     extra_checks: Callable | None = None
     #: placeholder letters: a board holding one is never whole pieces and must be unmatchable
     placeholders: str = 'p'
+    #: {'name': an opener-fields.json page name, exactly, 'nodes': [node ids]}: rule 2 against Ivan's
+    #: opener database where harddrop's transcription has no field (stick spin)
+    catalogue: dict | None = None
 
 
 # ── board geometry ─────────────────────────────────────────────────────────────────────────────
@@ -298,18 +309,41 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             bad.append(f'mirror-of: {n["id"]} is not {n["mirror_of"]} mirrored (J<->L, S<->Z)')
 
     # ── rule 2: cross-source against harddrop ──
-    wiki = json.loads(WIKI.read_text())
-    key, hnode = spec.harddrop['key'], spec.harddrop['node']
-    op = next((o for o in wiki['openers'] if o['key'] == key), None)
-    hd = {tuple(f['rows']) for f in op['fields']} if op else set()
-    if hnode in boards:
-        ours = [r.replace('-', '.').upper() for r in bottom(boards[hnode], 0)]
-        mine = {tuple(ours), tuple(r.upper() for r in mirror([x.lower() for x in ours]))}
-        if not (mine & hd):
-            bad.append(f'harddrop: {hnode} disagrees with wiki-openers.json {key} '
-                       'cell for cell, as drawn and mirrored')
-    else:
-        bad.append(f'harddrop: {hnode} is missing')
+    if spec.harddrop is None and spec.catalogue is None:
+        bad.append('harddrop: the spec names no cross-source (neither harddrop nor a catalogue entry)')
+    if spec.harddrop is not None:
+        wiki = json.loads(WIKI.read_text())
+        key, hnode = spec.harddrop['key'], spec.harddrop['node']
+        op = next((o for o in wiki['openers'] if o['key'] == key), None)
+        hd = {tuple(f['rows']) for f in op['fields']} if op else set()
+        if hnode in boards:
+            ours = [r.replace('-', '.').upper() for r in bottom(boards[hnode], 0)]
+            mine = {tuple(ours), tuple(r.upper() for r in mirror([x.lower() for x in ours]))}
+            if not (mine & hd):
+                bad.append(f'harddrop: {hnode} disagrees with wiki-openers.json {key} '
+                           'cell for cell, as drawn and mirrored')
+        else:
+            bad.append(f'harddrop: {hnode} is missing')
+    if spec.catalogue is not None:
+        # occupancy only: the catalogue draws X / . (its pages are decoded fumens, no colour)
+        cat = json.loads(CATALOGUE.read_text())
+        fields = {tuple(p['rows']) for p in cat['pages'] if p['name'] == spec.catalogue['name']}
+        if not fields:
+            bad.append(f'catalogue: no opener-fields.json page is named {spec.catalogue["name"]!r}')
+        hit = set()
+        for cnode in spec.catalogue['nodes']:
+            if cnode not in boards:
+                bad.append(f'catalogue: {cnode} is missing')
+                continue
+            placed = bottom([r.replace('U', 't') for r in boards[cnode]], 0)
+            mine = {tuple(r.replace('#', 'X') for r in occ(placed)),
+                    tuple(r.replace('#', 'X') for r in occ(mirror(placed)))}
+            if not (mine & fields):
+                bad.append(f'catalogue: {cnode} (T in its U cells) is no field of '
+                           f'{spec.catalogue["name"][:40]!r}…, by occupancy, as drawn or mirrored')
+            hit |= mine & fields
+        if fields and fields - hit:
+            bad.append(f'catalogue: {len(fields - hit)} field(s) of the entry match no named node')
 
     # ── rule 3: internal consistency ──
     #: a list may name its own line count (a 4-line PC drawn in bag 2, a PC after more than one
@@ -457,7 +491,8 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
     # ── rule 7: piece decomposition. Every letter is whole pieces of that letter, in the kept-rows
     # frame; a drawing that colours a piece in another piece's colour is a source discrepancy ──
     for n in nodes:
-        if 'rows' in n and not any(ph in ''.join(n['rows']) for ph in spec.placeholders) and \
+        if 'rows' in n and not n.get('after_of') and \
+                not any(ph in ''.join(n['rows']) for ph in spec.placeholders) and \
                 piece_groups_ok(n['rows'], spec.upper_groups):
             found.add(f'{n["id"]}:colour')
     for b in data.get('basic_form', []):

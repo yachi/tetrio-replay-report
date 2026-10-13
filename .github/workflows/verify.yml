@@ -671,6 +671,15 @@ jobs:
       - name: Check the Mountainous Stacking 2 route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_mountainous2_routes --selftest
 
+      # The stick spin (SDパフェ) route transcription, through the same shared gate. Its snapshot is
+      # raw HTML like 山岳積み2号's and is not committed; its cross-source is Ivan's opener database
+      # (opener-fields.json), not harddrop, whose transcription carries no stick spin field.
+      - name: Check the stick spin route transcription
+        run: python3 -m pipeline.openers.extract_stickspin_routes
+
+      - name: Check the stick spin route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stickspin_routes --selftest
+
       # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
       # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
       # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
@@ -684,6 +693,13 @@ jobs:
       # the typescript job.
       - name: Check the Mountainous Stacking 2 page audit catches its corruptions
         run: python3 -m pipeline.mountainous2_page --selftest
+
+      # The stick spin (SDパフェ) route pages are the same shared renderer bound to
+      # pipeline/stickspin_page.py; build-docs --check below re-renders them, and the constructed
+      # demos (stickspin-demos.html) are checked by pipeline/openers/stickspin-demos.test.ts in the
+      # typescript job. No corpus round reaches bag 2, so it has no per-branch node page.
+      - name: Check the stick spin page audit catches its corruptions
+        run: python3 -m pipeline.stickspin_page --selftest
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check

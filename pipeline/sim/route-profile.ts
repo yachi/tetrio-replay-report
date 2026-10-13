@@ -3,7 +3,7 @@
  * and the shared demo planner (`route-demos.ts`) need to know about one shiwehi.com route page that
  * is not in its transcribed routes JSON. Types only, no data: each opener's profile lives in its own
  * file (`route-profile-meisou.ts`, `route-profile-honeycup.ts`,
- * `route-profile-mountainous2.ts`), so editing one opener's profile
+ * `route-profile-mountainous2.ts`, `route-profile-stickspin.ts`), so editing one opener's profile
  * stales that opener's artefacts and nobody else's, while an edit to shared code stales all — the
  * md5 inputs (`hashFiles`) are scoped that way on purpose.
  *
@@ -25,6 +25,21 @@ export interface Bag1Stage {
    *  `holdNode`; when it IS that piece, it was placed somewhere off the page and the round is the
    *  outcome `elsewhereNode`, whose opportunities are `holdNode`'s. */
   holdSplit?: { piece: string; mirrorPiece: string; atLock: number; holdNode: string; elsewhereNode: string };
+}
+
+/** The BAG-1 SPIN STEP (stick spin): the bag-1 stage board is the bag less its T, and the bag's
+ *  last lock is that T, into a T-spin the page draws as `U` cells on a child board of the stage node
+ *  (`spin_of`). The step is a descent, not a sampling point of its own: after a stage match, the
+ *  lock at `atLock` (1-based) must be a T whose spin and line count are `spin` / `lines` and whose
+ *  cells are EXACTLY one child's U cells, in the stage match's handedness; then the round's bag-1
+ *  node is that child. Any other lock 7 leaves the round at the stage node. The line it clears is
+ *  the route's own, so it does not stop the bag-2 sample's no-clear rule. */
+export interface Bag1Spin {
+  /** the child boards, each with `spin_of` naming a stage node; tried in order */
+  nodes: string[];
+  atLock: number;
+  spin: string;
+  lines: number;
 }
 
 /** The classifier's artefact strings. Every one ships inside the artefact, so they are byte contract. */
@@ -49,10 +64,14 @@ export interface RouteProfile {
   bag1: {
     stages: Bag1Stage[];
     /** a FLAG, never a node: did `stage`'s board match its nodes by OCCUPANCY (colour never decides
-     *  it — it is compared with `opener-facts.json`'s `exact`, which is occupancy) */
-    flag: { field: string; stage: number };
-    /** the case key that records the piece placed at the hold stage's `atLock` */
-    lockPieceField: string;
+     *  it — it is compared with `opener-facts.json`'s `exact`, which is occupancy). Absent: the
+     *  opener has no harddrop column to compare with (stick spin), and no flag is recorded. */
+    flag?: { field: string; stage: number };
+    /** the case key that records the piece placed at the hold stage's `atLock`; absent with no hold
+     *  stage (nothing to record) */
+    lockPieceField?: string;
+    /** the bag-1 spin step, if the page's bag 1 ends on a T-spin */
+    spin?: Bag1Spin;
   };
   /** bag 2's board is sampled after this 0-based lock index */
   bag2Lock: number;
@@ -64,8 +83,10 @@ export interface RouteProfile {
    *  every bag-2 board by occupancy and record why it missed (MEASURED, never matched: the case stays
    *  bag-1 only). `subset` = the spin fired before the drawn board was complete; `superset` = the
    *  drawn board plus exactly four cells; `moved` = one piece of it placed elsewhere. Absent: no such
-   *  record (迷走砲). */
-  bag2Explain?: boolean;
+   *  record (迷走砲). `{ nearCells: N }` adds a fourth, last kind, `near`: the bag-2 board(s) nearest by
+   *  symmetric cell difference, when that difference is at most N cells (stick spin: yachi's board
+   *  with the J and L built otherwise); `true` never computes it. */
+  bag2Explain?: boolean | { nearCells: number };
   /** clear events (TST, PC) are looked for in the first eventLocks locks */
   eventLocks: number;
   /** snapshot routes are looked for up to this many locks; a round digest keeps this many */

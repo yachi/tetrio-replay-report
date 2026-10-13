@@ -251,6 +251,14 @@ bun pipeline/sim/emit-route-demos.ts --opener mountainous2 \
   --out analysis/mountainous2-demos.json                        # the constructed 山岳積み2号 demos (quarantined, not corpus data)
 bun test pipeline/openers/mountainous2.test.ts pipeline/openers/mountainous2-demos.test.ts  # its two tests
 python3 -m pipeline.mountainous2_page --selftest # the docs/mountainous2*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stickspin_routes            # CI gate: the stick spin route transcription
+python3 -m pipeline.openers.extract_stickspin_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-route-facts.ts --opener stickspin \
+  --out analysis/stickspin-facts.json                           # stick spin's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener stickspin \
+  --out analysis/stickspin-demos.json                           # the constructed stick spin demos (quarantined, not corpus data)
+bun test pipeline/openers/stickspin.test.ts pipeline/openers/stickspin-demos.test.ts  # its two tests
+python3 -m pipeline.stickspin_page --selftest   # the docs/stickspin*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -2358,9 +2366,39 @@ merely documented:
   the list: all 29 are named in `DT_ORDER_IN_OPENER` and `DT_ONLY_IN_OPENER`.
   None of 09-19's ten is a prefix artefact (`ordering_full_round` drops the verification
   requirement and finds the same ten), and 09-18's four verify to locks 86, 81, 30 and 135 against
-  a 21-lock window. No mechanism is proposed beyond 10-03's repeated pattern; what IS settled is that 「exactly five, each investigated」 is no longer the right
-  description of this column, and `DT_ORDER_IN_OPENER` says so at its own site rather than only
-  here.
+  the opener window. The repeated pattern now has a name — stick spin, two paragraphs down — and
+  that is an identification of the opener, not a mechanism for why he chose it; what IS settled is
+  that 「exactly five, each investigated」 is no longer the right description of this column, and
+  `DT_ORDER_IN_OPENER` says so at its own site rather than only here.
+
+  **Every lock number in this section counts from 0, and the ordering metric's window is 22 locks,
+  not 21.** `emit-opener-facts.ts` gives each spin `i`, its 0-based lock index (`.map((lk, i) => …)`),
+  and `inOpener` is `i <= WINDOW_PIECES`, so the window is locks 0-21; the donation and cave
+  `in_opener` columns use the same `lock <= WINDOW_PIECES` on the same 0-based index. So 「Single on
+  lock 6, Double on 13, Triple on 18-20」 above is the 7th, 14th and 19th-21st piece, 「Double 14,
+  Triple 19」 the 15th and 20th, and the cave paragraph's 「lock 21, the last lock inside the window」
+  the 22nd piece. `emit-attack-facts.ts` numbers its locks from 1 and its opener window is 21 pieces,
+  so **the two emitters import one `WINDOW_PIECES` and disagree by one about what it covers** — found
+  on 2026-10-13 while checking this paragraph, and left as found: aligning either re-emits every
+  session's artefact and moves published counts, which is a decision for its own pass, not a side
+  effect of this one. (This paragraph said 「a 21-lock window」 in two places until then.)
+
+  **The repeated yachi opener is stick spin (SDパフェ), shiwehi.com's `stickspin.php` — see
+  「定式路線頁」.** Bag 1 is that page's six-piece board letter for letter and the T laid flat into its
+  T-spin Single (`bag1.pc`, the パフェ派生 branch); bag 2 sits a few cells off the page's SDパフェ
+  bag-2 board (`2.sd`: he stands the L up at the right where the page lays the J flat), so the route
+  page explains it rather than matching it (`BAG2_NONE_NEAR`); bag 3 is his own TST build, matching none of
+  this page's bag-3 boards (its TST派生 fallback included) — that last part is hand-measured by a 2026-10-13 probe and nothing committed
+  re-derives it. What IS re-derived is the overlap with this column: `stickspin.test.ts` reads every
+  session's `ordering.per_round` and pins that **58 of the 69 Double-first rounds are stick-spin
+  bag-1 rounds, all yachi's** (`DT_AND_STICKSPIN`), and names the other eleven with a verified
+  reason each in `DT_NOT_STICKSPIN`: the four DT Cannon rounds above, the two windows holding both
+  orders (09-10 m7r3, 09-18 m2r3), and five J/L-split boards — the stick-spin shape with the J and L
+  cells divided another way, four of them pinglamb's. Per session, hand-summed on 2026-10-13 from the
+  same two artefacts and to be re-derived, not carried: 09-17 1 of 2, 09-18 1 of 4, **09-19 8 of 10**
+  (the other two pinglamb's J/L split, so 09-19's DT rounds are mostly this opener, which is the
+  reading that night lacked), **10-03 16 of 18** (the others the DT Cannon m7r3 and the J/L split
+  m7r7 — together the seventeen that share the lock pattern), 10-09 29 of 29 and 10-12 3 of 3.
 
   **What 09-18 removes is the reading that 09-19 was one anomalous night**, which was the only
   way to hold the column's history and its last entry together at thirteen sessions. It does not
@@ -2394,7 +2432,7 @@ merely documented:
   absorbed under a `<= 1`; a `dt_order <= 1` bound would have been satisfied by it silently and the
   pairing would never have been looked for. A third must be investigated the same way.
   Neither is a short-prefix artefact: the verified prefixes run to lock 208 and lock 117
-  respectively, well past the 21-lock window. `opener_section.py` needed no change — it already
+  respectively, well past the opener window (0-based locks 0-21). `opener_section.py` needed no change — it already
   had the branch for a non-zero DT count.
 
   **2026-09-10 is the third, it arrived exactly as the list was built to make one arrive, and it
@@ -2519,6 +2557,9 @@ field by occupancy, while the page follows shiwehi.com's tree, which also takes 
 than its column. Each route artefact carries the column's own predicate as a flag (`matched_at_6`,
 `matched_harddrop`), its test compares that flag with this table per (session, player), and each
 overview prints both totals — see 「定式路線頁」. MS1 has no page: it is the same occupancy as MS2.
+A fourth route page, stick spin (`docs/stickspin.html`), has NO column here: harddrop's transcription
+draws no stick spin field, so it carries no flag, and its test cross-checks against the ordering
+metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin 同 DT 砲」).
 
 The repertoires split, reproduced independently in all seventeen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -3097,8 +3138,9 @@ it at all:
   carries, and it must say so.** Per player: pinglamb 6 of 886 (0.67%) inside against 9 of 24
   outside, about 55×; yachi 63 of 633 (9.95%) against 31 of 40, about 7.7×. 「Near-unanimous
   Triple-first inside the window」 is pinglamb's property; it was yachi's too through 09-19 (13 of
-  469, 2.8%) and is not since 10-03 (50 of 164, 30.4%, one repeated Single 6 / Double 12-13 /
-  Triple 18-20 opener on three nights — 10-03's eighteen, 10-09's twenty-nine and 10-12's three).
+  469, 2.8%) and is not since 10-03 (50 of 164, 30.4%, one repeated 0-based Single 6 / Double 12-13 /
+  Triple 18-20 opener on three nights — stick spin, see 「C-Spin 同 DT 砲」 — 10-03's eighteen, of
+  which sixteen are that opener, 10-09's twenty-nine and 10-12's three).
   **The test used to assert a pooled 20× ratio, and 2026-10-09 broke it (about 93× at twelve
   sessions, 22× at fifteen, 14× at sixteen, 13.7× at seventeen).** The bound was not lowered and was not kept: the 20
   was never a claim, only 「a twentieth」 borrowed from `DT_RIVALS_CSPIN_AT`, sitting about 5× under
@@ -3184,7 +3226,7 @@ third there, which is the window's edge rather than a mechanism. Two events were
 eight events across four shapes are still not one.
 
 `ordering_full_round` is **not** the mid-game counterpart and must not be read as one — it applies
-the *same* 21-piece window and only drops the verification requirement, so its numbers are within a
+the *same* window (0-based locks 0-21, see the lock-numbering note above) and only drops the verification requirement, so its numbers are within a
 round of `ordering`'s rather than identical, which is the whole of what dropping verification buys:
 **1524 / 1457 / 69** against `ordering`'s **1519 / 1452 / 69** (rounds with both · C-Spin order ·
 DT order, summed over the seventeen committed artefacts). Five extra rounds clear the window
@@ -3247,19 +3289,19 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin）— the opener route pages, quarantined like the replays
 
-Three shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
-`meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`) and 山岳積み2号 (Mountainous Stacking 2,
-`mountainous2.php`). **One implementation per rule, one profile
+Four shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
+`meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous Stacking 2,
+`mountainous2.php`) and stick spin (SDパフェ, `stickspin.php`). **One implementation per rule, one profile
 per opener**, because a rule kept in two implementations drifts (「Three backends」): the classifier
 is `pipeline/sim/route-facts.ts`, the demo planner `pipeline/sim/route-demos.ts`, the transcription
 gate `pipeline/openers/route_transcription.py`, the page renderer and audit `pipeline/route_page.py`,
 and the shared test checks `pipeline/openers/route-facts-checks.ts` / `route-demo-checks.ts`. What
 differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` /
-`route-profile-mountainous2.ts` (the TS profile: nodes, locks, artefact strings, named lists, the
-demo half), and `stray_cannon_page.py` / `honey_cup_page.py` / `mountainous2_page.py` (the page
-profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
+`route-profile-mountainous2.ts` / `route-profile-stickspin.ts` (the TS profile: nodes, locks,
+artefact strings, named lists, the demo half), and `stray_cannon_page.py` / `honey_cup_page.py` /
+`mountainous2_page.py` / `stickspin_page.py` (the page profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
 `emit-route-demos.ts --opener <key>`; 迷走砲 keeps its original entry files as shims with their old
 signatures, so its tests and commands did not change.
 
@@ -3270,7 +3312,9 @@ an edit to shared code stales all of them, loudly, and the regeneration must the
 lines ONLY — that is the check that a shared-code edit left the other opener's behaviour alone.
 The generalisation was landed that way: every 迷走砲 artefact and page byte-identical except the
 three hash lines — and 山岳積み2号 was added the same way, moving only the hash lines of the other
-two openers' four artefacts and none of their pages.
+two openers' four artefacts and none of their pages. stick spin moved the other three openers' six
+artefacts in their hash lines only (`emitter_md5`; `planner_md5` and `classifier_md5`) and none of
+their pages, because it changed `route-facts.ts`, `route-profile.ts` and `route-demos.ts`.
 
 ### 迷走砲
 
@@ -3510,6 +3554,87 @@ and the planner's measured failure on one PC pattern), `DEMO_SPIN_LINES`, `DEMO_
 a control too. One wording leftover is deliberate: the off-page reason string says 「garbage between
 the TST and the PC」 even for a 14-line PC, because that string is part of the other two openers'
 artefact bytes.
+
+### stick spin（SDパフェ）
+
+The same deliverable for `stickspin.php` (「2022-08-06更新」): `pipeline/openers/stickspin-routes.json`
+(gated by `extract_stickspin_routes.py` through the shared gate), `analysis/stickspin-facts.json`
+(`stickspin.test.ts`), `analysis/stickspin-demos.json` (`stickspin-demos.test.ts`), and
+`docs/stickspin.html` plus `stickspin-bag1-only.html` and `stickspin-demos.html`, rendered by
+`bin/build-docs` from `ROUTE_SITES` and linked as the fourth card under 定式路線. Its snapshot is raw
+HTML, fetched the way 山岳積み2号's was (YE2 intermediate, TLS verification on). It is the page for
+the Double-first opener yachi repeats from 2026-09-17 on (see 「C-Spin 同 DT 砲」). Counts are read off
+the artefacts and tests, never typed here or in `stickspin_prose.json`.
+
+**Every corpus case stops at bag 1, and that is the page's main measurement.** The bag-2 boards are
+compared (they have opportunities) and none matches; the reasons are per round in the artefact's
+lists and the test's `STOPS_AT_BAG1`. So the page set has no per-branch node page: the shared
+renderer refuses a node page with no case, and `node_pages` holds `bag1-only` alone.
+
+What this page needs that the other three did not:
+
+* **No harddrop field, so no flag — and the cross-check that replaces it.** `wiki-openers.json`
+  draws no stick spin board and adding one would re-emit every session's `opener-facts.json`, so
+  the transcription's cross-source is Ivan's opener database instead (`opener-fields.json`, the
+  "Single Double PC … / Stickspin …" entry, whose four fields are `bag1.fire` and `bag1.pc` with the
+  T placed, as drawn and mirrored): `route_transcription.py`'s spec takes `harddrop=None` and a
+  `catalogue` route, and a spec with neither fails. On the corpus side the profile has no
+  `bag1.flag` and no `lockPieceField`, the page profile `flag_field=None`, and `stickspin.test.ts`
+  checks the ordering metric instead, both ways: every Double-first round (`opener-facts.json`
+  `ordering.per_round` `dt_order`) is a stick-spin bag-1 case or named in `DT_NOT_STICKSPIN` with a
+  reason the test verifies (`dt_cannon` against the first-bag metric, `both_orders` against
+  `cspin_order`, `jl_split` against the board at 6 locks), the positives are pinned per player in
+  `DT_AND_STICKSPIN`, and every stick-spin case with a complete window that is not Double-first is
+  named in `STICKSPIN_NOT_DT` with no Triple in its window. The probe that motivated the page matched
+  by shape alone; the colour check is what moves the J/L-split rounds into the exception list.
+* **A bag-1 spin step** (`bag1.spin` in the TS profile). Bag 1 is six pieces (`bag1.left`) and then
+  the T into a T-spin Single, stood up (`bag1.fire`, 火力派生) or laid flat (`bag1.pc`, パフェ派生);
+  both children draw the T as `U`, so the step reads the 7th lock's own cells (exactly one child's U
+  cells, mirror-aware, a full spin clearing one line). That clear is the route's own, so it does not
+  stop the bag-2 sample (`spinClearStops` is the mutant). `bag1.left` keeps the rounds whose 7th lock
+  is no drawn TSS; the off-page spins are `BAG1_SPIN_OFF_PAGE`. The three bag-1 nodes partition the
+  bag-1 cases, which is what the overview's total is checked against in place of the flag split.
+* **A fourth bag-2 explanation, `near`** (`bag2Explain: { nearCells: 8 }`): after subset, extra piece
+  and moved piece, the nearest bag-2 board(s) within eight cells, with the missing and extra letters
+  — measured, never a match, and never a relaxation of the route. yachi's bag 2 is this kind against
+  `2.sd` (`BAG2_NONE_NEAR`); the rest are `BAG2_NONE_UNEXPLAINED`. The other openers keep
+  `bag2Explain: true`, so their artefacts did not move. The explanation reads the oracle board even
+  past the verified prefix, as the shared code already did (10-09 m2r3, verified only to its TSS, still
+  gets a near entry) — left alone so the other artefacts stay byte-identical, and an open item.
+* **The denominator is every player with an opportunity, not every player with a case.** The shared
+  `assemble` used to build its per-player tally from the cases, so pinglamb — bag-1 opportunities,
+  no case — vanished and `bag1.left` read yachi's denominator alone. Found on this page because it is
+  the first where a player has no case; the other three artefacts moved in `emitter_md5` only.
+* **Colour-drawn after-the-spin boards and muted upper case.** The source draws its cleared rows in
+  muted upper-case letters (no legend; the gate checks every upper-case row is a row the spin
+  clears) and its after-the-TSS boards in colour with `U` for the T's surviving cells, so rule 7
+  (whole pieces) skips `after_of` boards and the page-specific check compares each, letter for
+  letter, against the board before it cleared. The page renders the upper case through `cell_classes`
+  in its own CSS only.
+* **Demo end states the renderer had no branch for**, in both implementations (`route-demo-checks.ts`
+  and `route_page._demo_end`): a bag-1 board drawn with `U` ends on its named spin, and a board past
+  bag 2 drawn with a separate `spin_board` (the TST / Imperial Cross / STMB Cave fallbacks) is the
+  board before the last lock, the last lock its spin. The page selftest clears that lock's spin flag
+  on three demos (`demo_spin_last`) and must see each fail. Its PC lists carry `total_lines` 8, which
+  equals the profile's count, so the shared 「lists checked at the profile's count」 mutant is skipped
+  as equivalent for them rather than counted.
+* **No hold anywhere** (`hold_node=None`). The page's no-hold conditions (O before Z, J before L) are
+  read as orders and checked against `bag1.left` by support; no input holds, and 「hold」 may appear
+  only in the bag-1 sentence that reports them.
+* **`t_flat_shape`, not `t_in_tsd_slot`.** This page's PC body is framed after the TSD, so a PC
+  pattern's `t` is never the TSD's T; the flag is the flat ttt-over-t shape anywhere on the board
+  (the independent audit found it true with the t on the surface), named for what it tests and
+  defined in the routes JSON's `slot_flags`. Nothing downstream reads it.
+
+The named lists are `BAG1_SPIN_OFF_PAGE`, `BAG2_NONE_NEAR`, `BAG2_NONE_UNEXPLAINED`,
+`COLOUR_DISAGREE`, `DT_NOT_STICKSPIN`, `STICKSPIN_NOT_DT`, and the measured-empty
+`BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TSD_BEFORE_COMPLETE` / `_EXTRA_PIECE` / `_MOVED_PIECE`,
+`PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`, `MULTI_COLOUR_RESOLVED_BY_BRANCH` and
+`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the mirror, the illustrations, and the planner's
+measured failures on two SDパフェ patterns whose T stands under an S that only becomes whole after
+it), `DEMO_PIECE_READINGS` (the もっちパフェ pattern drawn with one L cell in J's colour),
+`DEMO_SPIN_LINES` and `DEMO_SPIN_EXCEPTIONS`. Sizes are read off the tests. `ignoreConditions` and
+`no180` are controls here, as for 迷走砲 and 山岳積み2号.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
