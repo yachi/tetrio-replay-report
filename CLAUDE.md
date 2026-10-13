@@ -259,6 +259,14 @@ bun pipeline/sim/emit-route-demos.ts --opener stickspin \
   --out analysis/stickspin-demos.json                           # the constructed stick spin demos (quarantined, not corpus data)
 bun test pipeline/openers/stickspin.test.ts pipeline/openers/stickspin-demos.test.ts  # its two tests
 python3 -m pipeline.stickspin_page --selftest   # the docs/stickspin*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_gamushiro_routes            # CI gate: the ガムシロ積み route transcription
+python3 -m pipeline.openers.extract_gamushiro_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's page beside it)
+bun pipeline/sim/emit-route-facts.ts --opener gamushiro \
+  --out analysis/gamushiro-facts.json                           # ガムシロ積み's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener gamushiro \
+  --out analysis/gamushiro-demos.json                           # the constructed ガムシロ積み demos (quarantined, not corpus data)
+bun test pipeline/openers/gamushiro.test.ts pipeline/openers/gamushiro-demos.test.ts  # its two tests
+python3 -m pipeline.gamushiro_page --selftest   # the docs/gamushiro*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -2559,7 +2567,9 @@ than its column. Each route artefact carries the column's own predicate as a fla
 overview prints both totals — see 「定式路線頁」. MS1 has no page: it is the same occupancy as MS2.
 A fourth route page, stick spin (`docs/stickspin.html`), has NO column here: harddrop's transcription
 draws no stick spin field, so it carries no flag, and its test cross-checks against the ordering
-metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin 同 DT 砲」).
+metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin 同 DT 砲」). A fifth, ガムシロ積み
+(`docs/gamushiro.html`), has no column either, for the same reason, and is a REFERENCE opener the
+corpus barely plays; its test cross-checks against the ordering metric's Triple-first rounds.
 
 The repertoires split, reproduced independently in all seventeen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -3289,19 +3299,21 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み）— the opener route pages, quarantined like the replays
 
-Four shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
+Five shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
 `meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous Stacking 2,
-`mountainous2.php`) and stick spin (SDパフェ, `stickspin.php`). **One implementation per rule, one profile
+`mountainous2.php`), stick spin (SDパフェ, `stickspin.php`) and ガムシロ積み (Gamushiro Stacking,
+`gamushiro.php`). **One implementation per rule, one profile
 per opener**, because a rule kept in two implementations drifts (「Three backends」): the classifier
 is `pipeline/sim/route-facts.ts`, the demo planner `pipeline/sim/route-demos.ts`, the transcription
 gate `pipeline/openers/route_transcription.py`, the page renderer and audit `pipeline/route_page.py`,
 and the shared test checks `pipeline/openers/route-facts-checks.ts` / `route-demo-checks.ts`. What
 differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` /
-`route-profile-mountainous2.ts` / `route-profile-stickspin.ts` (the TS profile: nodes, locks,
-artefact strings, named lists, the demo half), and `stray_cannon_page.py` / `honey_cup_page.py` /
-`mountainous2_page.py` / `stickspin_page.py` (the page profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
+`route-profile-mountainous2.ts` / `route-profile-stickspin.ts` / `route-profile-gamushiro.ts` (the TS
+profile: nodes, locks, artefact strings, named lists, the demo half), and `stray_cannon_page.py` /
+`honey_cup_page.py` / `mountainous2_page.py` / `stickspin_page.py` / `gamushiro_page.py` (the page
+profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
 `emit-route-demos.ts --opener <key>`; 迷走砲 keeps its original entry files as shims with their old
 signatures, so its tests and commands did not change.
 
@@ -3315,6 +3327,9 @@ three hash lines — and 山岳積み2号 was added the same way, moving only th
 two openers' four artefacts and none of their pages. stick spin moved the other three openers' six
 artefacts in their hash lines only (`emitter_md5`; `planner_md5` and `classifier_md5`) and none of
 their pages, because it changed `route-facts.ts`, `route-profile.ts` and `route-demos.ts`.
+ガムシロ積み changed no hashed file — one registration line in `route-openers.ts`, which no profile
+hashes, and a Python-only cross-source route in `route_transcription.py` — so every other opener's
+artefacts and pages are byte-identical, hash lines included.
 
 ### 迷走砲
 
@@ -3635,6 +3650,81 @@ measured failures on two SDパフェ patterns whose T stands under an S that onl
 it), `DEMO_PIECE_READINGS` (the もっちパフェ pattern drawn with one L cell in J's colour),
 `DEMO_SPIN_LINES` and `DEMO_SPIN_EXCEPTIONS`. Sizes are read off the tests. `ignoreConditions` and
 `no180` are controls here, as for 迷走砲 and 山岳積み2号.
+
+### ガムシロ積み
+
+The same deliverable for `gamushiro.php` (「2024-08-01更新」): `pipeline/openers/gamushiro-routes.json`
+(gated by `extract_gamushiro_routes.py` through the shared gate), `analysis/gamushiro-facts.json`
+(`gamushiro.test.ts`), `analysis/gamushiro-demos.json` (`gamushiro-demos.test.ts`), and
+`docs/gamushiro.html` plus `gamushiro-bag1-only.html` and `gamushiro-demos.html`, rendered by
+`bin/build-docs` from `ROUTE_SITES` and linked as the fifth card under 定式路線. Its snapshot is raw
+HTML, fetched the way 山岳積み2号's was (YE2 intermediate, TLS verification on). Counts are read off the
+artefacts and tests, never typed here or in `gamushiro_prose.json`.
+
+**It is a REFERENCE opener, and the pages say so before anything else.** The corpus barely plays it
+(the bag-1 total is rendered on the overview from the artefact, and the one case is pinned by name in
+the test), so it is not here for the two players. It is here because shiwehi.com's
+`strongertemplate.php` (「強い人はどんな開幕テンプレを使っているのか(2024年)」, 2024-08-21 版, surveying
+July 2024 streams) names it the most-used opener of the winner of the 2024-07-28 Tetris Block Party
+PPT2 GRAND MASTERS tournament. The overview quotes that page's own two counts and its OWN caveat
+about the sample (little data; the tournament-only games split about evenly with はちみつ砲; most games
+against a player who plays ガムシロ積み almost exclusively) and nothing beyond it. Those are the only
+typed figures in the prose, and they are the source's; the page's provenance (URL, dates, sha256,
+size, the counts as printed) sits in the routes JSON's `source.why_this_opener`, hand-read and gated
+by nothing — re-read it if a sentence about it changes.
+
+**The cross-source is a second DRAWING, not a field or a catalogue entry.** harddrop's transcription
+(`wiki-openers.json`) lists Gamushiro Stacking only as a `Triple Double openers` category member and
+draws no field; Ivan's catalogue has no entry. So `route_transcription.py` gained a third route,
+`harddrop_page`: harddrop's own Gamushiro_Stacking page (oldid and hash recorded), its four 「First
+Bag setup」 diagrams read with the same parser `wiki-openers.json` is built with and compared with
+`bag1.left` / `bag1.l_top`, as drawn and mirrored, cell for cell. The gate fails when none of the
+three routes is given, and `--html-dir` fails when the harddrop page is missing beside the shiwehi
+one. Two further ties are checked: the category membership (the normal route fires the TST first),
+and the source's own sentence 「山岳積み2号と%Iの位置がずれた形」 against harddrop's Mountainous
+Stacking 2 field (delete the I's column from each; the rest is equal letter for letter). Adding a
+field to `wiki-openers.json` instead would have re-emitted every session's `opener-facts.json`.
+
+What this page needed that the other four did not, and the readings that came out of an independent
+audit of the transcription:
+
+* **山岳積み2号's hold split with stick spin's no flag.** `bag1.l_top` (7 locks, the L stood on the O,
+  drawn only as 基本形 1) first, then `bag1.left` (6 locks, L held) split by the 7th piece against the
+  mirror-aware L; `bag1.left` is the page's `hold_node`. No 六個具名定式 column, so no flag: the
+  corpus cross-check is the ordering metric — every bag-1 case with a complete opener window must hold
+  a T-spin Triple and no Double-first order, and be Triple-first or named in `NOT_TRIPLE_FIRST` with
+  a reason the test verifies on the round's own locks. Only that direction is checked: Triple-first
+  is most of the corpus, so the reverse would test nothing.
+* **A heading that cannot be an order.** The 妥協 board is headed 「%L>%Oの場合」, but its bag-2 l
+  rests ON the O and only the held bag-1 L lies under it; with the T already in the hold (the trigger
+  「%T>%L%O」), a bag-2 L dealt before the O has nowhere to go. The first transcription encoded the
+  heading as a bag-2 order backed by the held L's support — evidence for a different piece — and the
+  demo planner then measured the board unbuildable. It is now the named discrepancy
+  `2.compromise:heading_vs_board` and no condition; the selftest puts the order back and must see the
+  discrepancy vanish. The demo stays unbuilt for a different, stated reason: the planner reads a
+  `before` pair as PLACEMENT order and fires the T last, so 「T 早過 L、O」 cannot be met, although on
+  the board it can (the T held on arrival). Teaching the planner that a swapped-in piece is dealt at
+  its swap slot is shared code, and was not done for one demo.
+* **A blank top row is not a ninth row.** `2.normal.imperial#2` is drawn nine rows tall under a blank
+  row; it was first marked unmatchable for 「9 non-empty rows」, which is false (8). It is compared now,
+  as both the gate's `bottom()` and the classifier's `occGrid` already allowed. `2.normal.imperial#1`
+  (nine real rows), `2.compromise` and its spin board (ten) stay unmatchable, so the 妥協 branch is
+  drawn among `bag2_extra` rather than in `bag2_order`, which reads every node's case count.
+* **Muted cells.** `L` the held bag-1 L and `C` the rows a TST clears, checked by the gate and drawn
+  through `cell_classes`. A `label_jp` is page text or a heading path: the after-the-TST board has
+  none, as on 山岳積み2号 (the audit caught an invented one).
+* **`2.normal.pc#3` is built without its TSD** (`TSD_NOT_FIRED`): its slot is roofed by the J's hook
+  and the S, and the planner measured no order in which the engine credits the spin; the drawing is
+  the same board either way, and the test re-runs the planner with it read as a TSD to keep that true.
+
+The named lists are `BAG2_NONE_UNEXPLAINED`, `NOT_TRIPLE_FIRST`, and the measured-empty
+`L_HOLD_BAG1`, `L_PLACED_ELSEWHERE_BAG1`, `BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TST_BEFORE_COMPLETE` /
+`_EXTRA_PIECE` / `_MOVED_PIECE`, `PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`,
+`MULTI_COLOUR_RESOLVED_BY_GROUP`, `COLOUR_DISAGREE` and `PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT`
+(the mirror, the illustrations, the commented-out template, and the 妥協 form), `TSD_NOT_FIRED`,
+`DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS` and `DEMO_PIECE_READINGS`. Sizes are read off the tests.
+`no180` is a control; `ignoreConditions` is a MUTANT here, as on はちみつ砲: the bag-1 no-hold orders
+(J before S, Z before T) are not forced by gravity.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
