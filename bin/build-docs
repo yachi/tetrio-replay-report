@@ -514,17 +514,30 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    # The PPT2 page, RENDERED from its committed CSV like the replay pages, so --check recomputes
-    # every pooled figure and byte-compares.
+    # The PPT2 pages, RENDERED from their committed CSV like the replay pages, so --check recomputes
+    # every pooled figure and byte-compares: the overview and one page per (date, opponent) card.
+    # A docs/ppt2-syakegohan-*.html the renderer did not produce is drift, exactly as for
+    # *-replay.html, so a card that disappears from the CSV cannot leave its page published.
     ppt2_games = ppt2_page.load(REPO)
-    ppt2_html = ppt2_page.render(ppt2_games)
-    dst = DOCS / ppt2_page.PAGE
-    if check:
-        if not dst.exists() or dst.read_text(encoding="utf-8") != ppt2_html:
-            drift.append(f"docs/{ppt2_page.PAGE} differs from what {ppt2_page.DATA_REL} renders")
-    else:
-        dst.write_text(ppt2_html, encoding="utf-8")
-        print(f"  rendered {ppt2_page.DATA_REL} -> docs/{ppt2_page.PAGE} ({len(ppt2_html.encode())} bytes)")
+    ppt2_pages = ppt2_page.render_all(ppt2_games)
+    for name, page in ppt2_pages.items():
+        if name != ppt2_page.PAGE and not name.startswith(ppt2_page.CARD_PREFIX):
+            print(f"FAIL ppt2_page renders {name}, outside its prefix", file=sys.stderr)
+            return 1
+        dst = DOCS / name
+        if check:
+            if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                drift.append(f"docs/{name} differs from what {ppt2_page.DATA_REL} renders")
+        else:
+            dst.write_text(page, encoding="utf-8")
+            print(f"  rendered {ppt2_page.DATA_REL} -> docs/{name} ({len(page.encode())} bytes)")
+    for stale in sorted(DOCS.glob(f"{ppt2_page.CARD_PREFIX}*.html")):
+        if stale.name not in ppt2_pages:
+            if check:
+                drift.append(f"docs/{stale.name} is published but {ppt2_page.DATA_REL} does not render it")
+            else:
+                stale.unlink()
+                print(f"  removed docs/{stale.name} ({ppt2_page.DATA_REL} does not render it)")
 
     index = render_index(cards, totals, pooled_html, replays, openers, ppt2_page.card(ppt2_games))
     if check:
