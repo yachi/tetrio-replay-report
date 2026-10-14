@@ -1305,6 +1305,12 @@ class RouteSite:
             f'data-node="{T["empty_node"]}" data-status="empty"', f'data-node="{T["empty_node"]}" data-status="count"', 1),
           "the artefact says")
         dp = pages[self.DEMO_PAGE]
+        # a target must still be what its corruption needs: dropping a BUILT block under the 「unbuilt
+        # reason」 name is caught for the wrong reason and leaves the unbuilt branch untested (ガムシロ積み's
+        # 2.compromise was the unbuilt target until its demo was built, and its mutant kept passing)
+        for key, status in (("demo_built", "built"), ("demo_unbuilt", "unbuilt")):
+            if f'data-demo-node="{T[key]}" data-demo="{status}"' not in dp:
+                raise SystemExit(f"{self.p.module}: selftest target {key}={T[key]!r} is not a {status} demo block")
         m("the demo page missing its not-a-game sentence", self.DEMO_PAGE, dp.replace(self.DS["demo"], ""), "quarantine sentence")
         m("a data-claim in a demo block", self.DEMO_PAGE, dp.replace('data-demo="built">', 'data-demo="built" data-claim="C001">', 1), "claim badge")
         m("a demo block dropped", self.DEMO_PAGE, _drop_line(dp, f'data-demo-node="{T["demo_built"]}"'), "blocks are not every demo")

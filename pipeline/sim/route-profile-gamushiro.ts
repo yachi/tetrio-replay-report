@@ -148,11 +148,13 @@ export const GAMUSHIRO: RouteProfile = {
            + 'before-pairs first (bag 1: J before S and Z before T, the page\'s no-hold conditions for the left pattern, which also '
            + 'put J and Z early as 「%J%Zが早い」 asks), then IOTSZJL, the T into the U slot last. order_reading records it per bag.',
       hold: 'bag1.left holds its L when it arrives (our choice of where: just before the bag\'s S). The hold box is then '
-          + 'never empty again: the held L comes out at its slot in bag 2 (the two 通常 forms, the 4-line PCs), swapped for '
-          + 'the piece that bag places last. No other demo holds.',
+          + 'never empty again: the held L comes out at its slot in bag 2 (the two 通常 forms, the 4-line PCs, the 妥協 form), '
+          + 'swapped for the piece that bag places last, which is therefore DEALT at that slot. The 妥協 form\'s trigger '
+          + '(T before L and O) is an order of dealing and is met that way: its T arrives fourth, is held, and is fired last '
+          + 'as the TST. No other demo holds.',
       chain: 'The 8-line PC patterns and the Imperial Cross boards hang under the page\'s after-the-TST illustration; their '
            + 'demos run through 2.normal#1, the demo that ends on that board. The two 通常 forms are drawn with the TST '
-           + 'slot empty and the T on a separate board; the demo fires it there. The 妥協 form has no demo (see unbuilt).',
+           + 'slot empty and the T on a separate board; the demo fires it there, and so does the 妥協 form.',
       spin: 'Every T-spin kind and line count is the engine\'s verdict on the replayed inputs. The 8-line PC patterns that '
           + 'draw the T flat in the TSD slot fire it as a TSD, except 2.normal.pc#3: the J\'s hook and the S roof its slot, and '
           + 'the planner measured no order in which the engine credits a T-spin clearing those two rows, so its T is placed '

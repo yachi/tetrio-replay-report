@@ -247,6 +247,7 @@ export interface DemoMutants {
   noSpinCheck?: boolean;     // accept a U lock whatever spin the engine credits
   ignoreConditions?: boolean; // the page's bag-2 order conditions not applied
   no180?: boolean;           // no 180 rotation edge
+  noSwapDeal?: boolean;      // a `before` pair read in placement order: the swap slot never deals the T early
 }
 
 interface Placement { piece: string; cells: number[]; edges: Edge[]; spin: string | null; lines: number;
@@ -325,6 +326,15 @@ export function planBag(P: RouteProfile, eng: any, st: State, spec: BagSpec, mut
   groups.sort((a, b) => prio(a) - prio(b));
   const memo = new Map<string, Path[]>();
   const t0 = performance.now();
+  // A `before` pair is an order of DEALING, and with the hold box full the queue below deals the
+  // bag's last placement (the spin's T) at the swap slot, not at the end: where a carried piece comes
+  // out of the hold, or first of all when every piece is placed. So the T counts as dealt once that
+  // slot is reached (ガムシロ積み's 妥協 form: the T arrives before L and O and is held, the bag-1 L
+  // comes out). The test is the queue builder's own rule, read early, never a second reading of it.
+  const dealtPieces = groups.filter(g => !g.carried).map(g => g.piece);
+  const holdSwaps = !!carriedIn || (!!st.heldNext && [...PIECES].every(p => dealtPieces.includes(p)));
+  const dealtEarly = (o: Group, done: Placement[]) => !mut.noSwapDeal &&
+    spec.uLast && !!o.spinSlot && holdSwaps && (!carriedIn || done.some(p => p.carried));
 
   // the deepest point any order reached, and why each remaining piece could not go there: the
   // failure reason an unbuildable node is published with
@@ -341,7 +351,8 @@ export function planBag(P: RouteProfile, eng: any, st: State, spec: BagSpec, mut
       if (spec.uLast && g.spinSlot && left.length > 1) { why.push(`${P} 要最後先放`); continue; }
       if (!mut.ignoreConditions && !g.carried) {
         // a piece whose `before` partner is still unplaced must wait (a carried piece was dealt earlier)
-        const w = spec.before.find(([a, b]) => b === g.piece && left.some(o => !o.carried && o.piece === a));
+        const w = spec.before.find(([a, b]) => b === g.piece &&
+          left.some(o => !o.carried && o.piece === a && !dealtEarly(o, done)));
         if (w) { why.push(`${P} 要等 ${w[0]}`); continue; }
       }
       const target: number[] = [];

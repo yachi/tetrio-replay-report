@@ -27,23 +27,24 @@ import { demoChecks } from './route-demo-checks.ts';
 import { conditionHolds } from '../sim/route-facts.ts';
 
 /** Nodes with a board and no demo, and the reason the artefact gives. A node the planner cannot
- *  build is a red build until it is named here. The mirror, the three illustrations and the
- *  commented-out template are the profile's; `2.compromise` is the planner's measured failure, and
- *  the reason is the page's TRIGGER, not the board: 「%T>%L%O」 (T dealt before L and O). The planner
- *  reads a `before` pair as PLACEMENT order, and the T is fired last (the TST), so L and O wait on a
- *  piece that is placed after them; it reports 「O 要等 T；L 要等 T」. On the board the order can be
- *  met — the T held on arrival, swapping out the bag-1 L — but the planner deals the T at the held
- *  L's slot only by its own swap rule and does not credit that slot to a `before` pair, so the demo
- *  is not built rather than built with a queue the page's trigger forbids (the ignoreConditions
- *  mutant below builds it, with such a queue). The heading 「%L>%Oの場合」 is no longer a condition:
- *  the transcription names it as a discrepancy (`2.compromise:heading_vs_board`). */
+ *  build is a red build until it is named here. Every entry is the profile's: the mirror, the three
+ *  illustrations and the commented-out template.
+ *
+ *  `2.compromise` IS built, and it is the one demo whose `before` pairs name a piece dealt at a hold
+ *  swap. The page's trigger 「%T>%L%O」 is an order of DEALING: the T arrives before L and O, is held
+ *  on arrival, and swaps out the bag-1 L, which the board draws placed (upper-case L) while the T is
+ *  fired last as the TST. The planner's queue already deals the bag's last placement at the swap slot;
+ *  its search used to read the pair in PLACEMENT order, where the T is last, and so reported
+ *  「O 要等 T；L 要等 T」. It now credits the swap slot (`noSwapDeal` turns that off and is a mutant
+ *  below), and the condition check reads the queue the engine was actually dealt. The heading
+ *  「%L>%Oの場合」 is not a condition: the transcription names it as a discrepancy
+ *  (`2.compromise:heading_vs_board`). */
 const DEMO_UNBUILT: Record<string, string> = {
   'bag1.right': '係原頁左邊嗰幅第一巡圖左右反轉（J↔L、S↔Z），逐格對過；用頁面嘅反轉掣睇',
   '2.normal.tst': '示意圖：兩個通常形打 TST 嘅位同消嘅三行，即係 2.normal#1 示範最後一粒',
   '2.normal.after': '示意圖：兩個通常形 TST 之後共用嘅盤面，即係 2.normal#1 示範打完之後嘅盤面',
   '2.normal.pc.rest': '「残り55パターン」喺 HTML 註解入面，頁面冇顯示；佢唯一嘅圖係 TST 之後嘅盤面重畫做空白樣板，冇一粒方塊',
   '2.compromise.tst': '示意圖：妥協形打 TST 嘅位同消嘅三行，即係 2.compromise 示範最後一粒',
-  '2.compromise': '最遠放到 LJZSI；之後：O 要等 T；L 要等 T；T(U) 要最後先放',
 };
 /** U line counts the drawing does not fix: measured empty — every U is a bag-2 TST. */
 const DEMO_SPIN_LINES: Record<string, number> = {};
@@ -70,6 +71,7 @@ const EVENTS: [RegExp, (id: string) => string][] = [
   [/^2\.normal#\d$/, () => 'TST'],
   [/^2\.normal\.pc#\d$/, id => (TSD_T_PATTERNS.includes(id) ? 'TST TSD PC' : 'TST PC')],
   [/^2\.normal\.imperial#\d$/, () => 'TST'],
+  [/^2\.compromise$/, () => 'TST'],
 ];
 
 /** ガムシロ積み's own checks, then the shared ones. */
@@ -172,8 +174,28 @@ test('data mutants: each planted defect is caught', () => {
   }
 }, 120_000);
 
+/** The 妥協 demo read off the ENGINE's record, not the planner's bag bookkeeping: the dealt queue (the
+ *  engine refuses a script whose queue is not what it dealt) puts the bag-2 T before that bag's L and
+ *  O, the hold key is pressed on the bag-1 L's lock (the T goes in, the L comes out), and the last lock
+ *  is that T fired out of the hold as a full T-spin clearing three lines. */
+test('2.compromise: T dealt before L and O, held for the bag-1 L, fired last as a TST', () => {
+  const d = committed().demos.find((x: any) => x.node === '2.compromise');
+  expect(d, '2.compromise has a demo').toBeTruthy();
+  const bag1 = d.bags[0].queue.length;
+  const dealt: string = d.seq.slice(bag1, bag1 + 7);
+  expect([...dealt].sort().join('')).toBe('IJLOSTZ');
+  expect(dealt.indexOf('T')).toBeLessThan(dealt.indexOf('L'));
+  expect(dealt.indexOf('T')).toBeLessThan(dealt.indexOf('O'));
+  const i = d.letters.indexOf('L');                         // the carried bag-1 L, drawn upper-case
+  expect(i).toBeGreaterThan(-1);
+  expect(d.locks[i][5], 'hold pressed on the bag-1 L').toBe(1);
+  const last = d.locks[d.locks.length - 1];
+  expect(d.letters[d.locks.length - 1]).toBe('U');
+  expect([last[2], last[3], last[5]], 'TST: 3 lines, full spin, out of the hold').toEqual([3, 2, 1]);
+});
+
 test('planner mutants: each rule turned off fails a check or throws', () => {
-  for (const m of ['noRowMap', 'noReach', 'noSpinCheck'] as (keyof DemoMutants)[]) {
+  for (const m of ['noRowMap', 'noReach', 'noSpinCheck', 'noSwapDeal'] as (keyof DemoMutants)[]) {
     let verdict: string | null;
     try { verdict = checkAll(JSON.parse(serialise(buildFor(GAMUSHIRO, { [m]: true })))); } catch (e) { verdict = String(e); }
     expect(verdict, m).not.toBeNull();
@@ -182,8 +204,7 @@ test('planner mutants: each rule turned off fails a check or throws', () => {
 
 /** A MUTANT here, measured, as on はちみつ砲 and unlike 迷走砲, 山岳積み2号 and stick spin: the page's bag-1
  *  no-hold conditions (J before S, Z before T) are NOT forced by gravity — the drawn T stands on the
- *  floor and the Z slides under its nub — so dropping them deals a bag 1 that breaks them, and
- *  2.compromise builds with a queue that breaks its own condition (see DEMO_UNBUILT). */
+ *  floor and the Z slides under its nub — so dropping them deals a bag 1 that breaks them. */
 test('ignoreConditions is a mutant: it deals queues that break the page\'s conditions', () => {
   const art = JSON.parse(serialise(buildFor(GAMUSHIRO, { ignoreConditions: true })));
   expect(checkAll(art)).toMatch(/breaks the (no-hold conditions|page condition)/);
