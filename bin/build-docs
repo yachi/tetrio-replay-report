@@ -48,6 +48,7 @@ def _root(session):
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
 from pipeline import honey_cup_page, mountainous2_page, stickspin_page, stray_cannon_page  # noqa: E402
+from pipeline import ppt2_page  # noqa: E402
 
 #: every opener route site, in the order its card appears under 定式路線
 ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE]
@@ -227,7 +228,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
+def render_index(cards, totals, pooled_html=None, replays=(), openers=None, ppt2=None):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -292,6 +293,19 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
                 f"<div class='meta'>{o['cases']} 個個案</div>"
                 f"<p class='blurb'>{escape(o['blurb'])}</p>"
                 "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
+        parts.append("</div>")
+    # Another game, measured from video rather than from replay files: after everything TETR.IO,
+    # and its pill says it is outside the proof chain. Counts are the renderer's, never typed here.
+    if ppt2:
+        parts.append("<h2>其他遊戲</h2><div class='grid'>")
+        parts.append(
+            f"<a class='card' href='{escape(ppt2['href'])}'>"
+            "<div class='date'>PUYO PUYO TETRIS 2</div>"
+            "<div class='title'>syakegohan（しゃけごはん）對戰數據</div>"
+            f"<div class='meta'>{ppt2['games']} 局 · syakegohan {ppt2['won']}–{ppt2['lost']}</div>"
+            "<p class='blurb'>由 YouTube 影片逐格抽出嘅 PPS、APM、APP、VS，"
+            "分對手睇，每一局都有影片連結。唔係 TETR.IO 數字。</p>"
+            "<span class='pill'>影片抽取 · 唔喺證明鏈入面</span></a>")
         parts.append("</div>")
     parts.append("<h2>工具</h2><div class='grid'>")
     parts.append(
@@ -500,7 +514,19 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    index = render_index(cards, totals, pooled_html, replays, openers)
+    # The PPT2 page, RENDERED from its committed CSV like the replay pages, so --check recomputes
+    # every pooled figure and byte-compares.
+    ppt2_games = ppt2_page.load(REPO)
+    ppt2_html = ppt2_page.render(ppt2_games)
+    dst = DOCS / ppt2_page.PAGE
+    if check:
+        if not dst.exists() or dst.read_text(encoding="utf-8") != ppt2_html:
+            drift.append(f"docs/{ppt2_page.PAGE} differs from what {ppt2_page.DATA_REL} renders")
+    else:
+        dst.write_text(ppt2_html, encoding="utf-8")
+        print(f"  rendered {ppt2_page.DATA_REL} -> docs/{ppt2_page.PAGE} ({len(ppt2_html.encode())} bytes)")
+
+    index = render_index(cards, totals, pooled_html, replays, openers, ppt2_page.card(ppt2_games))
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:
