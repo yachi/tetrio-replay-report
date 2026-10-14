@@ -19,7 +19,12 @@ per rule and requires that tag):
      drawn or mirrored (`wiki-openers.json`). An opener harddrop's transcription does not carry
      (stick spin) names a `catalogue` entry instead (`opener-fields.json`, Ivan's opener database):
      its named nodes, T placed in their U cells, equal that entry's fields by occupancy as drawn or
-     mirrored, and every field of the entry is one of them (tag `catalogue:`).
+     mirrored, and every field of the entry is one of them (tag `catalogue:`). An opener neither
+     carries (ガムシロ積み) names a `harddrop_page` instead: a harddrop page `wiki-openers.json` does
+     not transcribe, its diagrams under one heading read by that file's own parser
+     (`extract_wiki_openers.boards`) and recorded in the routes file's `cross_source` block with the
+     page's oldid and hash; its named nodes equal those fields cell for cell, as drawn or mirrored,
+     and every field is one of them (tag `harddrop-page:`). A spec naming none of the three fails.
   3. internal consistency — a bag-2 board's `c` (and prior-bag letter) cells are exactly its bag-1
      base; a later board's `c` cells are exactly what its base leaves after its T-spin; a Perfect
      Clear pattern clears the spec's `pc_lines`; a 基本形 board equals the node it names, modulo
@@ -40,7 +45,8 @@ plus the last spin is not the spec's figure); a list node drawn in bag 2 is chec
 spin before it, and is left out of the bag-2 board distinctness (its list rule covers it).
 
 `--html-dir` re-checks a refetched snapshot — a markdown rendering (迷走砲, はちみつ砲) or the raw
-HTML (山岳積み2号): every board in page order, every non-board feature's `page_text`.
+HTML (山岳積み2号): every board in page order, every non-board feature's `page_text`; and, for a
+routes file carrying a `cross_source` page, that page re-parsed in the same directory.
 """
 from __future__ import annotations
 
@@ -96,6 +102,9 @@ class TranscriptionSpec:
     #: {'name': an opener-fields.json page name, exactly, 'nodes': [node ids]}: rule 2 against Ivan's
     #: opener database where harddrop's transcription has no field (stick spin)
     catalogue: dict | None = None
+    #: {'nodes': [node ids]}: rule 2 against a harddrop page `wiki-openers.json` does not carry, whose
+    #: fields the routes file records in `cross_source` (ガムシロ積み); see `check_cross_source`
+    harddrop_page: dict | None = None
 
 
 # ── board geometry ─────────────────────────────────────────────────────────────────────────────
@@ -309,8 +318,9 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             bad.append(f'mirror-of: {n["id"]} is not {n["mirror_of"]} mirrored (J<->L, S<->Z)')
 
     # ── rule 2: cross-source against harddrop ──
-    if spec.harddrop is None and spec.catalogue is None:
-        bad.append('harddrop: the spec names no cross-source (neither harddrop nor a catalogue entry)')
+    if spec.harddrop is None and spec.catalogue is None and spec.harddrop_page is None:
+        bad.append('harddrop: the spec names no cross-source (neither harddrop nor a catalogue entry '
+                   'nor a harddrop page)')
     if spec.harddrop is not None:
         wiki = json.loads(WIKI.read_text())
         key, hnode = spec.harddrop['key'], spec.harddrop['node']
@@ -344,6 +354,29 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             hit |= mine & fields
         if fields and fields - hit:
             bad.append(f'catalogue: {len(fields - hit)} field(s) of the entry match no named node')
+
+    if spec.harddrop_page is not None:
+        # by colour, like the wiki-openers route: harddrop's fields are its own drawings, upper case
+        xs = data.get('cross_source') or {}
+        fields = {tuple(f) for f in xs.get('fields', [])}
+        if xs.get('kind') != 'harddrop_page' or not fields:
+            bad.append('harddrop-page: the routes file records no harddrop page fields (cross_source)')
+        for k in ('url', 'oldid', 'fetched', 'snapshot_file', 'snapshot_sha256', 'heading', 'parser'):
+            if not xs.get(k):
+                bad.append(f'harddrop-page: cross_source provenance field {k!r} is missing')
+        hit = set()
+        for hnode in spec.harddrop_page['nodes']:
+            if hnode not in boards:
+                bad.append(f'harddrop-page: {hnode} is missing')
+                continue
+            ours = [r.replace('-', '.').upper() for r in bottom(boards[hnode], 0)]
+            mine = {tuple(ours), tuple(r.upper() for r in mirror([x.lower() for x in ours]))}
+            if not (mine & fields):
+                bad.append(f'harddrop-page: {hnode} is no field of {xs.get("page")!r} '
+                           f'({xs.get("heading")!r}) cell for cell, as drawn or mirrored')
+            hit |= mine & fields
+        if fields and fields - hit:
+            bad.append(f'harddrop-page: {len(fields - hit)} field(s) of the page match no named node')
 
     # ── rule 3: internal consistency ──
     #: a list may name its own line count (a 4-line PC drawn in bag 2, a PC after more than one
@@ -571,6 +604,42 @@ def check_snapshot(data: dict, html_dir: Path) -> list[str]:
     return bad
 
 
+def check_cross_source(data: dict, html_dir: Path) -> list[str]:
+    """A routes file's `cross_source` harddrop page, re-parsed from `html_dir` with the parser
+    `wiki-openers.json` is transcribed with: the recorded fields must be exactly the page's diagrams
+    under the recorded heading, trimmed, in order. A missing file is a failure, not a skip."""
+    xs = data.get('cross_source')
+    if not xs:
+        return []
+    from pipeline.openers.extract_wiki_openers import boards as hd_boards, trim as hd_trim
+    p = html_dir / xs['snapshot_file']
+    if not p.exists():
+        return [f'cross-source: {xs["snapshot_file"]} is not in {html_dir} — fetch it beside the page']
+    raw = p.read_bytes()
+    bad = []
+    sha = hashlib.sha256(raw).hexdigest()
+    if sha != xs['snapshot_sha256']:
+        bad.append(f'cross-source: sha256 {sha} is not the recorded one (read the field diff below)')
+    got = [hd_trim(b['rows']) for b in hd_boards(raw.decode('utf8')) if b['heading'] == xs['heading']]
+    if got != xs['fields']:
+        bad.append(f'cross-source: {xs["page"]} draws {len(got)} field(s) under {xs["heading"]!r}, '
+                   f'the routes file records {len(xs["fields"])}, or they differ: page {got}')
+    return bad
+
+
+def synthetic_harddrop(fields: list[list[str]], heading: str) -> str:
+    """harddrop markup for `fields` under `heading`, in the shape `extract_wiki_openers.boards`
+    reads (one <img> per cell), so the selftest can plant a defect in a page it cannot fetch."""
+    def cell(c):
+        return f'<img src="https://cdn.harddrop.com/a/ab/{"" if c == "." else c}Tet.png">'
+    out = [f'<span class="mw-headline" id="x">{heading}</span>']
+    for f in fields:
+        out.append('<table style="line-height: 10px;">'
+                   + ''.join('<div style="height: 12px;">' + ''.join(cell(c) for c in r) + '</div>'
+                             for r in ['.' * WIDTH] + f) + '</table>')
+    return '\n'.join(out)
+
+
 def synthetic_snapshot(base: dict) -> str:
     """A markdown snapshot rebuilt from the transcription, the way the fetch renders one."""
     rows = {n['id']: n['rows'] for n in base['nodes'] if 'rows' in n}
@@ -659,6 +728,25 @@ def run_selftest(spec: TranscriptionSpec, mutants: list, snapshot_edits: dict,
         ok = False
     else:
         print('  killed: a non-board feature gone from the page snapshot  [snapshot:]')
+    xs = base.get('cross_source')
+    if xs:
+        # the cross-source re-check: a faithful page passes, one changed cell and a missing file fail
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / xs['snapshot_file']
+            missing = check_cross_source(base, Path(td))
+            p.write_text(synthetic_harddrop(xs['fields'], xs['heading']))
+            fine = [x for x in check_cross_source(base, Path(td)) if 'sha256' not in x]
+            f0 = [list(r) for r in xs['fields'][0]]
+            r, c = next((i, j) for i, row in enumerate(f0) for j, ch in enumerate(row) if ch != '.')
+            f0[r][c] = '.'
+            p.write_text(synthetic_harddrop([[''.join(x) for x in f0]] + xs['fields'][1:], xs['heading']))
+            moved = check_cross_source(base, Path(td))
+        if fine or not missing or not any('differ' in x for x in moved):
+            print(f'selftest FAILED: cross-source re-check (fine={fine}, missing={missing}, '
+                  f'moved={moved[:2]})', file=sys.stderr)
+            ok = False
+        else:
+            print('  killed: a changed or missing cross-source page  [cross-source:]')
     if quoted is not None:
         if any('not verbatim' in x for x in quoted):
             print('  killed: a quote edited away from the page\'s words  [snapshot:]')
@@ -685,6 +773,7 @@ def main(spec: TranscriptionSpec, selftest: Callable[[], int], doc: str | None) 
     problems = verify(data, spec)
     if args.html_dir:
         problems += check_snapshot(data, args.html_dir)
+        problems += check_cross_source(data, args.html_dir)
     if args.write and not problems:
         spec.out.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
         print(f'wrote {spec.out.relative_to(HERE.parent.parent)}')

@@ -1,0 +1,547 @@
+{
+ "schema": "gamushiro-facts/1",
+ "report_eligible": false,
+ "means": "for every corpus round whose bag 1 is shiwehi.com's ガムシロ積み bag 1 cell for cell (as drawn or mirrored, the L stood on the O at 7 locks or held at 6), the deepest node of that page's route tree the round reaches, and how often each node's sampling point was reached. A reference opener: the corpus barely plays it",
+ "not_eligible_because": "every board is the vendored Triangle engine's; which bag-2 and later shape was built has no second implementation. The Perfect Clear COUNT is anchored by perfect_clear_timing, the shape is not.",
+ "caveat": "bag-1 opportunities count rounds that reached the sampling point clean (inside the verified prefix, no clear, no garbage before it); bag-2 opportunities allow garbage: complete garbage rows are stripped from the bottom of the board first (garbage_rows_stripped), so they count rounds inside the verified prefix with no line cleared by the player before the sample. PC patterns have no separate sampling point and count the rounds that reached their anchor: the bag-1 L-held board for the 4-line PCs, the 2.normal group for the 8-line ones. A hold is asserted only by the lock-7 piece test. There is no harddrop field for this opener, so no flag. The 妥協 board and the first Imperial Cross board are taller than 8 rows and are not compared. bag2_near is measured against the board before the TST, never a match.",
+ "rules": {
+  "bag1_placed_locks": 7,
+  "bag1_hold_locks": 6,
+  "bag2_lock_index": 12,
+  "bag2_garbage": "strip complete garbage rows from the bottom",
+  "event_locks": 40,
+  "snapshot_locks": 46,
+  "pc_kinds": [
+   {
+    "lists": [
+     "2.normal.pc"
+    ],
+    "frame_after": "the first TST",
+    "lines": 8,
+    "rows": 6
+   },
+   {
+    "lists": [
+     "2.pc4"
+    ],
+    "frame_after": "6 locks (the L-held board), no spin",
+    "lines": 4,
+    "rows": 6
+   }
+  ],
+  "precedence": "l_top (7 locks); only if it misses, left (6 locks, the L held) split by the lock-7 piece against the mirror-aware bag-1 L",
+  "condition_handedness": "a mirrored round's bag-2 order is read with J<->L and S<->Z swapped",
+  "group_scope": "the two 2.normal forms share one PC list: PC patterns are scoped by their anchor, the form's group",
+  "bag2_near": "a bag-1 round with no bag-2 match: the board before its TST, by occupancy, against every bag-2 board: a strict subset (the TST before the board was complete), that board plus exactly four cells, or that board with one piece's four cells moved elsewhere"
+ },
+ "inputs": {
+  "sessions": [
+   {
+    "session": "2026-07-22",
+    "replays_md5": "5c365d5a42189e1a2138cfaacab85061",
+    "replay_facts_md5": "0c8583e1ec123cd79d9f98dcc2497db2"
+   },
+   {
+    "session": "2026-07-24",
+    "replays_md5": "036bda8130fd25676db3f56946791fe6",
+    "replay_facts_md5": "5ae71ce3745b690f30a8cbc1b098464a"
+   },
+   {
+    "session": "2026-07-28",
+    "replays_md5": "97d318eaf2faa588bf90fc1abfc6f2d7",
+    "replay_facts_md5": "5be7fefd353c58f48f78b30a26d5e8c4"
+   },
+   {
+    "session": "2026-08-01",
+    "replays_md5": "01bd0b9d96be7e3a1423f5c6b20d14a0",
+    "replay_facts_md5": "4677b48ff08b91deeb973b77c146c5d0"
+   },
+   {
+    "session": "2026-08-09",
+    "replays_md5": "b2b6556ffcd2922f39eb3e4e7c9454a0",
+    "replay_facts_md5": "580ef38628bc19630d0cc7143ddc1009"
+   },
+   {
+    "session": "2026-08-14",
+    "replays_md5": "464875cb25a2d382122d884045b60b79",
+    "replay_facts_md5": "5f6f4e61cdcf5ec669661a8f44c30f53"
+   },
+   {
+    "session": "2026-08-19",
+    "replays_md5": "0ec61c3c2360e2e7ce049ec1d5043b43",
+    "replay_facts_md5": "668a403b87216c38a8445ca9c0b178aa"
+   },
+   {
+    "session": "2026-08-25",
+    "replays_md5": "93043bcb37cd7ffcd77ad5eb8672fb7e",
+    "replay_facts_md5": "cf12c32107114833d4c5978fde9eee95"
+   },
+   {
+    "session": "2026-09-03",
+    "replays_md5": "59da0c51a5e29be634f6b7ae060b4a9b",
+    "replay_facts_md5": "84f0fffaea0abd26ae2bf44d804b5341"
+   },
+   {
+    "session": "2026-09-10",
+    "replays_md5": "ceedee793ea16b6d95bd286741e1aae9",
+    "replay_facts_md5": "2cd0158b019a9d06b9cbb73dac2c2275"
+   },
+   {
+    "session": "2026-09-11",
+    "replays_md5": "bd9f59da273fd97f3af582b467862c7b",
+    "replay_facts_md5": "9be5a738ba322fa6a0ce2f81601d40b4"
+   },
+   {
+    "session": "2026-09-17",
+    "replays_md5": "e3085e9b641941214f387e88fc15164a",
+    "replay_facts_md5": "faec48d7edcc699c63d25a2d4fe576c7"
+   },
+   {
+    "session": "2026-09-18",
+    "replays_md5": "fae311db6292ed6ab5d21062bc500d93",
+    "replay_facts_md5": "5af89e2a23420a0b1f38e245e828018f"
+   },
+   {
+    "session": "2026-09-19",
+    "replays_md5": "74a0fa2bc83c2520870eb35b1edb82e7",
+    "replay_facts_md5": "8efa186ef0f440cfdb3b47473d2302a7"
+   },
+   {
+    "session": "2026-10-03",
+    "replays_md5": "6870375613354ec9605bd366a0d32a32",
+    "replay_facts_md5": "45b21c17923ebef8ade14052e782250f"
+   },
+   {
+    "session": "2026-10-09",
+    "replays_md5": "ec6f52e26f431dd95fe2c1bf8fa53b1a",
+    "replay_facts_md5": "a598c6e53c898c60548076c4fd06843e"
+   },
+   {
+    "session": "2026-10-12",
+    "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
+    "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
+   }
+  ],
+  "routes_md5": "95375173a999fabf59b30cd86b9bfe1b",
+  "emitter_md5": "29ea6f8a350c8f06b616827f3cb538e5"
+ },
+ "sessions": [
+  "2026-07-22",
+  "2026-07-24",
+  "2026-07-28",
+  "2026-08-01",
+  "2026-08-09",
+  "2026-08-14",
+  "2026-08-19",
+  "2026-08-25",
+  "2026-09-03",
+  "2026-09-10",
+  "2026-09-11",
+  "2026-09-17",
+  "2026-09-18",
+  "2026-09-19",
+  "2026-10-03",
+  "2026-10-09",
+  "2026-10-12"
+ ],
+ "outcomes": [
+  "bag1.l_placed_elsewhere"
+ ],
+ "nodes": [
+  {
+   "id": "bag1.left",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 2482,
+   "opportunities_by_player": {
+    "pinglamb": 1259,
+    "yachi": 1223
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "bag1.right",
+   "measured": false,
+   "why": "mirror_of: bag1.left"
+  },
+  {
+   "id": "bag1.l_top",
+   "measured": true,
+   "page_node": true,
+   "cases": 1,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 1
+   },
+   "opportunities": 2130,
+   "opportunities_by_player": {
+    "pinglamb": 1192,
+    "yachi": 938
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.pc4#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.pc4#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.pc4#3",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 1,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 1
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 1,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 1
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.tst",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.normal.after",
+   "measured": false,
+   "why": "illustration"
+  },
+  {
+   "id": "2.normal.pc#1",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#3",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#4",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#5",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#6",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#7",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc#8",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.normal.pc.rest",
+   "measured": false,
+   "why": "unmatchable: inside an HTML comment, so not on the rendered page; it is 2.normal.after redrawn as an empty template that was never filled (checked)"
+  },
+  {
+   "id": "2.normal.imperial#1",
+   "measured": false,
+   "why": "unmatchable: 9 non-empty rows > ROWS = 8"
+  },
+  {
+   "id": "2.normal.imperial#2",
+   "measured": true,
+   "page_node": true,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 0,
+   "opportunities_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  },
+  {
+   "id": "2.compromise",
+   "measured": false,
+   "why": "unmatchable: 10 non-empty rows > ROWS = 8"
+  },
+  {
+   "id": "2.compromise.tst",
+   "measured": false,
+   "why": "unmatchable: 10 non-empty rows > ROWS = 8"
+  },
+  {
+   "id": "bag1.l_placed_elsewhere",
+   "measured": true,
+   "page_node": false,
+   "cases": 0,
+   "cases_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   },
+   "opportunities": 2482,
+   "opportunities_by_player": {
+    "pinglamb": 1259,
+    "yachi": 1223
+   },
+   "pc_off_page": 0,
+   "pc_off_page_by_player": {
+    "pinglamb": 0,
+    "yachi": 0
+   }
+  }
+ ],
+ "conditions": {},
+ "lists": {
+  "l_hold_bag1": [],
+  "l_placed_elsewhere_bag1": [],
+  "bag2_garbage_stripped": [],
+  "bag2_none_tst_before_complete": [],
+  "bag2_none_extra_piece": [],
+  "bag2_none_moved_piece": [],
+  "bag2_none_unexplained": [
+   "2026-07-22 m5r8 yachi"
+  ],
+  "pc_off_page": [],
+  "bag2_handedness_mismatch": [],
+  "multi_colour_resolved_by_branch": [],
+  "colour_disagree": [],
+  "pc_garbage_in_window": []
+ },
+ "cases": [
+  {"session":"2026-07-22","file":"replay-2026-07-22-5.ttrm","round_index0":7,"match":5,"round":8,"player":"yachi","verified_to":76,"bag1":{"node":"bag1.l_top","mirrored":false,"lock":6,"lock7_piece":"L","matched_variants":["bag1.l_top @7","bag1.left @6"]},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"ZJOTSLI","conditions_met":["2.normal#2"],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":0},"pc":null,"snapshots":[],"bag2_near":null,"deepest":"bag1.l_top","deepest_lock":6,"verified":true}
+ ]
+}

@@ -1,0 +1,1067 @@
+{
+  "schema": "gamushiro-routes/1",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/gamushiro.php",
+    "title": "ガムシロ積み(Gamushiro Stacking)",
+    "updated": "2024-08-01",
+    "fetched": "2026-10-13",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method 山岳積み2号 and stick spin used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 25 ten-wide boards in page order (one of them inside an HTML comment). Comparable with 山岳積み2号's and stick spin's hashes (raw HTML), not with the markdown renderings 迷走砲 and はちみつ砲 hashed.",
+    "snapshot_file": "gamushiro.html",
+    "snapshot_sha256": "5817c58d2927514f462b0cee6ef31c8b9a6621488545c87c8e4f1593523e6f81",
+    "snapshot_bytes": 29700,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with harddrop's page, cross_source, beside it); an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-13",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "sha256_note": "the same bytes 山岳積み2号 and stick spin recorded, re-fetched for this page",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "C": "#cccccc",
+        "L": "#d8904d (muted l)",
+        "U": "#c8a6ff with a #8400ff radial dot",
+        "-": "#000000"
+      },
+      "rows": "textContent split on whitespace, one row per token",
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case) and reverses nothing else in the char map; the canvas is redrawn mirrored"
+    },
+    "decorative_images": [
+      "ガムシロ積み(Gamushiro Stacking)タイトル画像"
+    ],
+    "references_listed": [
+      "https://tetrisopener.wicurio.com/index.php?%E3%82%AC%E3%83%A0%E3%82%B7%E3%83%AD%E7%A9%8D%E3%81%BF",
+      "https://w.atwiki.jp/tetrismaps/pages/195.html"
+    ],
+    "references_note": "the wicurio page (fetched 2026-10-13) draws its boards as images only, so it is not a machine-checkable source; the cross-source is harddrop's page (cross_source)",
+    "related_pages": [
+      "./mountainous2.php",
+      "./honeycup.php",
+      "./pancake.php",
+      "./dpc.php",
+      "./3rdpc.php",
+      "./imperialcross.php"
+    ],
+    "why_this_opener": {
+      "reading": "a REFERENCE opener: not one this corpus's two players are known to use (the corpus count is analysis/gamushiro-facts.json's, never typed here). It is here because shiwehi.com's own survey of the opener templates strong Puyo Puyo Tetris 2 players used names it as the most-used opener of しゃけごはん, the winner of the GRAND MASTERS rank of the PPT2 section of the 2024-07-28 「Tetris® Block Party」 online tournament",
+      "url": "https://shiwehi.com/tetris/template/strongertemplate.php",
+      "title": "強い人はどんな開幕テンプレを使っているのか(2024年)",
+      "updated": "2024-08-21",
+      "fetched": "2026-10-13",
+      "fetch_method": "the same curl method as `source` (TLS verification on, the YE2 bundle); raw HTML, not committed, not gated",
+      "snapshot_sha256": "7dba7454965206c112f77382d53b44d820fac035ae81a152a60862b511ece830",
+      "snapshot_bytes": 45991,
+      "surveyed": "streams dated 2024-07-12 to 2024-07-31, games against Tetris players only",
+      "counts_as_printed": {
+        "ガムシロ積み": 48,
+        "はちみつ砲": 23,
+        "合計": 83,
+        "tournament_only": {
+          "はちみつ砲": 14,
+          "ガムシロ積み": 13,
+          "合計": 29
+        }
+      },
+      "source_caveat": "the page itself warns the sample may be biased: しゃけごはん does not stream, so information is scarce; inside the tournament's 29 games the two openers were used about equally (はちみつ砲 14, ガムシロ積み 13); and about two thirds of the games (62 of 81 in its own words, against the table's total of 83) were against あめみやたいよう, who plays ガムシロ積み almost exclusively, which may inflate its count",
+      "not_checked": "hand-read on 2026-10-13; no gate re-reads this page. The pages quote only the two counts and the caveat"
+    }
+  },
+  "cross_source": {
+    "kind": "harddrop_page",
+    "page": "Gamushiro_Stacking",
+    "url": "https://harddrop.com/wiki/Gamushiro_Stacking",
+    "oldid": 37490,
+    "oldid_note": "wgRevisionId and wgCurRevisionId of the fetched page; the only oldid it carries",
+    "fetched": "2026-10-13",
+    "fetch_method": "curl through the session proxy, TLS verification ON (no extra CA needed). The snapshot is the page's raw HTML; it is not committed",
+    "snapshot_file": "Gamushiro_Stacking.html",
+    "snapshot_sha256": "feab02ba2c0abc0a9e06ea8a12e65fd063979ec21312787268a7c5c3ef761880",
+    "snapshot_bytes": 1825312,
+    "parser": "pipeline.openers.extract_wiki_openers.boards, fields trimmed by its trim(): the parser wiki-openers.json is transcribed with",
+    "heading": "First Bag setup",
+    "fields": [
+      [
+        "S......I..",
+        "SS....TI..",
+        "JS.ZZTTIOO",
+        "JJJ.ZZTIOO"
+      ],
+      [
+        "..I......Z",
+        "..IT....ZZ",
+        "OOITTSS.ZL",
+        "OOITSS.LLL"
+      ],
+      [
+        "........L.",
+        "S......IL.",
+        "SS....TILL",
+        "JS.ZZTTIOO",
+        "JJJ.ZZTIOO"
+      ],
+      [
+        ".J........",
+        ".JI......Z",
+        "JJIT....ZZ",
+        "OOITTSS.ZL",
+        "OOITSS.LLL"
+      ]
+    ],
+    "fields_note": "the page's four diagrams under 「First Bag setup」, in order: the L-held six-lock board, its mirror, the seven-lock board with the L on the O, its mirror",
+    "why_not_wiki_openers": "wiki-openers.json transcribes seven openers and has no Gamushiro field; adding one would re-emit every session's opener-facts.json (the 六個具名定式 table reads it). Ivan's catalogue (opener-fields.json) has no Gamushiro entry either",
+    "category": {
+      "name": "Triple Double openers",
+      "member": "Gamushiro Stacking",
+      "where": "wiki-openers.json triple_double_category.members"
+    }
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty",
+    "i o t s z j l": "a cell of that piece",
+    "c": "a cell filled before this diagram (earlier bags), grey",
+    "L": "the bag-1 L, held (「%Lをホールドしておきます」) and placed in bag 2, drawn in a muted L colour (page legend: none; OUR READING, as for 山岳積み2号: the c cells of every board drawing it are exactly the L-held board)",
+    "C": "an earlier cell in a row the TST clears, drawn light grey (page legend: none; OUR READING, checked: every C row is a row the U slot clears)",
+    "U": "the T-spin slot",
+    "%X": "the X piece; '%J>%S' means J before S"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": "8ライン",
+      "verbatim": "ここでは、ガムシロ積み(Gamushiro Stacking)という、TDアタック→8ラインパフェを狙う開幕テンプレについて紹介していきます。"
+    },
+    {
+      "id": "overview.pc4_rare",
+      "figure": null,
+      "verbatim": "また、稀に4ラインパフェを狙うこともできます。"
+    },
+    {
+      "id": "basic.ideal",
+      "figure": "8段",
+      "verbatim": "TST→TSD→8段パフェが理想ルートで、中開け4列RENにも派生できます。"
+    },
+    {
+      "id": "overview.mountainous2",
+      "figure": null,
+      "verbatim": "山岳積み2号と%Iの位置がずれた形になります。"
+    },
+    {
+      "id": "basic.mirror",
+      "figure": null,
+      "verbatim": "左右反転図が見たい場合は右下のボタンを押してください。"
+    },
+    {
+      "id": "merit.lines21",
+      "figure": "21ライン",
+      "verbatim": "最大TST→TSD→8段パフェで21ラインという高火力を狙うことができる。",
+      "note": "21 is attack sent, not lines cleared; nothing here re-derives it"
+    },
+    {
+      "id": "merit.setup_rate",
+      "figure": "100%",
+      "verbatim": "1巡目のセットアップ率が左右反転含めて100%と高め。"
+    },
+    {
+      "id": "merit.ren",
+      "figure": null,
+      "verbatim": "中開けRENに派生できる。"
+    },
+    {
+      "id": "demerit.tsd",
+      "figure": null,
+      "verbatim": "パフェルートの際、はちみつ砲と比較するとTSDを打てない可能性が高い。"
+    },
+    {
+      "id": "demerit.patterns",
+      "figure": null,
+      "verbatim": "パフェパターンが多いためパフェが若干見づらい。"
+    },
+    {
+      "id": "bag1.requires",
+      "figure": null,
+      "verbatim": "1巡目の組み方は上図の通りで、%J%Zが早い必要があります。"
+    },
+    {
+      "id": "bag1.hold",
+      "figure": null,
+      "verbatim": "%Lをホールドしておきます。"
+    },
+    {
+      "id": "bag1.no_hold",
+      "figure": null,
+      "verbatim": "左のパターンがホールド無しで組める条件は以下の通りです。"
+    },
+    {
+      "id": "bag1.no_hold.j_s",
+      "figure": null,
+      "verbatim": "%J>%S"
+    },
+    {
+      "id": "bag1.no_hold.z_t",
+      "figure": null,
+      "verbatim": "%Z>%T"
+    },
+    {
+      "id": "bag1.side",
+      "figure": null,
+      "verbatim": "ここでは、以下左のパターン(%Lホールド)で説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。"
+    },
+    {
+      "id": "2.pc4",
+      "figure": "3パターン26.19%",
+      "verbatim": "ガムシロ積みでは3パターン26.19%で4ラインパフェを狙うことができます。"
+    },
+    {
+      "id": "2.pc4.rare",
+      "figure": null,
+      "verbatim": "使用頻度は高くないと思いますが、覚えておけば奇襲にもなるかもしれません。"
+    },
+    {
+      "id": "2.normal",
+      "figure": "2パターン",
+      "verbatim": "組み分けとしては%Oが早いかどうかで2パターンで殆どの場合同じ形になります。"
+    },
+    {
+      "id": "2.normal#1",
+      "figure": null,
+      "verbatim": "%L>%Oの場合",
+      "note": "a heading; the page prints the same words again over the 妥協 form"
+    },
+    {
+      "id": "2.normal#2",
+      "figure": null,
+      "verbatim": "%O>%T%Lの場合",
+      "note": "a heading"
+    },
+    {
+      "id": "2.normal.tst",
+      "figure": null,
+      "verbatim": "その後TSTを打ちます。"
+    },
+    {
+      "id": "2.normal.pc.rate",
+      "figure": "99.09%",
+      "verbatim": "その後3巡目に99.09%の確率でパフェを取ることができます。"
+    },
+    {
+      "id": "2.normal.pc.tsd",
+      "figure": null,
+      "verbatim": "ミノ順によってはTSDを打ってからパフェを取ることができます。"
+    },
+    {
+      "id": "2.normal.pc.after",
+      "figure": null,
+      "verbatim": "8段パフェを取った後はDPCや3回目パフェを狙うことができます。"
+    },
+    {
+      "id": "2.normal.pc",
+      "figure": "63 / 8",
+      "verbatim": "(最小63パターン中高確率8パターン)"
+    },
+    {
+      "id": "2.normal.pc.rest",
+      "figure": "55",
+      "verbatim": "残り55パターン",
+      "rendered": false,
+      "note": "the summary of a <details> block that sits inside an HTML comment: in the raw HTML, never rendered"
+    },
+    {
+      "id": "2.normal.imperial",
+      "figure": null,
+      "verbatim": "また、パフェを取れない場合には下図のようにインペリアルクロスを組むことで火力を継続することができます。"
+    },
+    {
+      "id": "2.compromise",
+      "figure": null,
+      "verbatim": "%T>%L%Oの場合には通常系が組めないため、妥協形を組みます。"
+    }
+  ],
+  "bag1": {
+    "locks": 6,
+    "hold": "L",
+    "hold_verbatim": "%Lをホールドしておきます。",
+    "requires_verbatim": "1巡目の組み方は上図の通りで、%J%Zが早い必要があります。",
+    "requires": {
+      "early": [
+        "J",
+        "Z"
+      ],
+      "node": "bag1.left"
+    },
+    "requires_note": "OUR READING of 「%J%Zが早い」 as an early PAIR; checked against bag1.left by support (each of J and Z has another piece resting on it)",
+    "no_hold_verbatim": "左のパターンがホールド無しで組める条件は以下の通りです。",
+    "no_hold": {
+      "all": [
+        {
+          "before": [
+            "J",
+            "S"
+          ]
+        },
+        {
+          "before": [
+            "Z",
+            "T"
+          ]
+        }
+      ],
+      "node": "bag1.left"
+    },
+    "no_hold_items_verbatim": [
+      "%J>%S",
+      "%Z>%T"
+    ],
+    "no_hold_note": "the left pattern's condition, read as orders and checked against bag1.left by support (a cell of the later piece rests on a cell of the earlier one). It sits beside 「%Lをホールドしておきます」, so OUR READING is \"no hold beyond the L\"; the right pattern's (its mirror: L>Z, S>T) is not stated",
+    "side_verbatim": "ここでは、以下左のパターン(%Lホールド)で説明していきますが、右下にある反転ボタンを押すことで左右反転の図を見ることができます。",
+    "side": null,
+    "side_note": "unlike 山岳積み2号 and stick spin, this page names no piece that decides the side",
+    "mountainous2": {
+      "quote": "overview.mountainous2",
+      "i_column": 7,
+      "mountainous2_i_column": 0,
+      "note": "the page's 「山岳積み2号と%Iの位置がずれた形」, checked against harddrop's Mountainous Stacking 2 field (wiki-openers.json mountainous_2): delete column i_column from bag1.left and column mountainous2_i_column from that field, and the rest is equal letter for letter"
+    }
+  },
+  "basic_form": [
+    {
+      "id": "basic.1",
+      "same_as": "bag1.l_top",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--------l-",
+        "s------il-",
+        "ss----till",
+        "js-zzttioo",
+        "jjj-zztioo"
+      ],
+      "canvas": "tetCanvas0"
+    },
+    {
+      "id": "basic.2",
+      "same_as": "2.normal#1",
+      "differs": "the TST slot drawn U (its cells are 2.normal.tst's U cells, checked) and the held L drawn as an earlier cell (c)",
+      "recolour": {
+        "-": "U",
+        "L": "c"
+      },
+      "rows": [
+        "i-------oo",
+        "i-------oo",
+        "ijj-----ll",
+        "ij----sscl",
+        "cjUzzssccl",
+        "ccUUzzcccc",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ],
+      "canvas": "tetCanvas1"
+    },
+    {
+      "id": "basic.3",
+      "same_as": "2.normal.pc#1",
+      "differs": "the TSD T is drawn U instead of t",
+      "recolour": {
+        "t": "U"
+      },
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cjiiiillcc",
+        "cjjjsszlcc",
+        "cccsszzlcc",
+        "ccUUUzcccc",
+        "cccUcccccc"
+      ],
+      "canvas": "tetCanvas2"
+    }
+  ],
+  "groups": [
+    {
+      "id": "2.normal",
+      "heading": "通常ルート(2巡目→3巡目)",
+      "drawn": 2,
+      "condition_verbatim": "組み分けとしては%Oが早いかどうかで2パターンで殆どの場合同じ形になります。",
+      "condition": {
+        "decided_by": [
+          "O"
+        ]
+      },
+      "condition_note": "the family's split; each form's own heading is its condition"
+    },
+    {
+      "id": "2.normal.imperial",
+      "heading": "通常ルート(2巡目→3巡目)",
+      "drawn": 2,
+      "text_verbatim": "また、パフェを取れない場合には下図のようにインペリアルクロスを組むことで火力を継続することができます。"
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.pc4",
+      "parent": "bag1.left",
+      "base": "bag1.left",
+      "bag": 2,
+      "heading": "2巡目パフェルート",
+      "stated_pattern_count": 3,
+      "shown": 3,
+      "rest_stated": 0,
+      "complete": true,
+      "rate_verbatim": "ガムシロ積みでは3パターン26.19%で4ラインパフェを狙うことができます。",
+      "pc_lines": 4,
+      "total_lines": 4,
+      "total_lines_quote": "2.pc4",
+      "pc_lines_note": "a 4-line PC drawn in bag 2 on the L-held board: no spin before it",
+      "drawn": 3
+    },
+    {
+      "id": "2.normal.pc",
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "bag": 3,
+      "heading": "通常ルート 3巡目",
+      "stated_pattern_count": 63,
+      "shown": 8,
+      "rest_stated": 0,
+      "complete": false,
+      "rest_in_comment": 55,
+      "rate_verbatim": "その後3巡目に99.09%の確率でパフェを取ることができます。",
+      "total_lines": 8,
+      "total_lines_quote": "basic.ideal",
+      "pc_lines_note": "the 5-row body plus the TST before it; the page's 8段 is re-derived along the base chain",
+      "drawn": 8
+    }
+  ],
+  "slot_flags": {
+    "has_u_slot": "the pattern draws a U (T-spin slot) cell",
+    "t_in_tsd_slot": "the pattern's four t cells are the flat ttt-over-t shape in its BOTTOM TWO body rows, where 2.normal.after leaves its only TSD-shaped gap: the TSD the page says comes first ミノ順によっては. A position test (stick spin's t_flat_shape is a shape test)"
+  },
+  "known_discrepancies": [
+    {
+      "id": "bag1.right:mirror",
+      "what": "the right bag-1 board is the left one mirrored with J<->L, S<->Z (cell for cell), so the page has ONE bag-1 shape, not two"
+    },
+    {
+      "id": "2.normal.pc:stated_vs_drawn",
+      "what": "the page states 63 patterns (最小63パターン) and draws 8 (中高確率8パターン)"
+    },
+    {
+      "id": "2.normal.pc:non_exhaustive",
+      "what": "the 8 drawn PC patterns are the page's high-probability subset, not every way to take the PC"
+    },
+    {
+      "id": "2.normal.pc:rest_commented_out",
+      "what": "the 「残り55パターン」 block is inside an HTML comment, so the page never renders it, and its only board is 2.normal.after redrawn as an empty template: the other 55 patterns are not drawn anywhere"
+    },
+    {
+      "id": "2.normal.imperial:no_conditions",
+      "what": "two インペリアルクロス boards (the I at the left wall, or the I and J at column 6-7 under the O) and no condition saying which"
+    },
+    {
+      "id": "2.compromise:heading_vs_board",
+      "what": "the 妥協 board is headed 「%L>%Oの場合」, but its bag-2 l rests on the O: only the held bag-1 L lies under the O, so the heading cannot be a bag-2 dealing order (a bag-2 L dealt before the O, with the T already in the hold, has nowhere to go); read as the held L placed before the O, and not used as a queue condition"
+    },
+    {
+      "id": "overview:ren_not_drawn",
+      "what": "the 基本形 sentence names a 中開け4列REN derivation (and メリット a 中開けREN one); the page draws none"
+    }
+  ],
+  "page_order": [
+    "basic.1",
+    "basic.2",
+    "basic.3",
+    "bag1.left",
+    "bag1.right",
+    "2.pc4#1",
+    "2.pc4#2",
+    "2.pc4#3",
+    "2.normal#1",
+    "2.normal#2",
+    "2.normal.tst",
+    "2.normal.after",
+    "2.normal.pc#1",
+    "2.normal.pc#2",
+    "2.normal.pc#3",
+    "2.normal.pc#4",
+    "2.normal.pc#5",
+    "2.normal.pc#6",
+    "2.normal.pc#7",
+    "2.normal.pc#8",
+    "2.normal.pc.rest",
+    "2.normal.imperial#1",
+    "2.normal.imperial#2",
+    "2.compromise",
+    "2.compromise.tst"
+  ],
+  "nodes": [
+    {
+      "id": "bag1.left",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own (its sentence calls it 左のパターン(%Lホールド))",
+      "label": "bag 1 with the L held (the page's left pattern; harddrop's first First Bag setup field)",
+      "rows": [
+        "----------",
+        "----------",
+        "s------i--",
+        "ss----ti--",
+        "js-zzttioo",
+        "jjj-zztioo"
+      ]
+    },
+    {
+      "id": "bag1.right",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "label_jp": "1巡目とミノ順",
+      "label_jp_note": "the section heading; the page draws this board with no caption of its own",
+      "label": "bag 1 with the J held, mirrored (the page's right pattern)",
+      "mirror_of": "bag1.left",
+      "classifier_note": "exactly bag1.left mirrored with J<->L and S<->Z swapped (checked cell for cell); a mirror-aware classifier must treat it as the SAME node, not a second branch",
+      "rows": [
+        "----------",
+        "----------",
+        "--i------z",
+        "--it----zz",
+        "ooittss-zl",
+        "ooitss-lll"
+      ]
+    },
+    {
+      "id": "bag1.l_top",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "drawn_as": "basic.1",
+      "label_jp": "基本形 1",
+      "label_jp_note": "drawn only as the first 基本形 board",
+      "label": "bag 1 with the L placed on the O at the right (drawn only as 基本形 1; harddrop draws it under First Bag setup)",
+      "derivation": "bag1.left plus four l cells (checked), on exactly the cells where the held L stands in the 通常 %L>%O form and the 妥協 form (their upper-case L, checked)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--------l-",
+        "s------il-",
+        "ss----till",
+        "js-zzttioo",
+        "jjj-zztioo"
+      ]
+    },
+    {
+      "id": "2.pc4#1",
+      "bag": 2,
+      "parent": "bag1.left",
+      "base": "bag1.left",
+      "list": "2.pc4",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "2巡目パフェルート 1",
+      "pieces": "jos",
+      "rows": [
+        "----------",
+        "cLLjjsscoo",
+        "ccLjssccoo",
+        "ccLccccccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.pc4#2",
+      "bag": 2,
+      "parent": "bag1.left",
+      "base": "bag1.left",
+      "list": "2.pc4",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "2巡目パフェルート 2",
+      "pieces": "ilo",
+      "rows": [
+        "----------",
+        "cLLiiiicoo",
+        "ccLlllccoo",
+        "ccLccccccc",
+        "ccclcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.pc4#3",
+      "bag": 2,
+      "parent": "bag1.left",
+      "base": "bag1.left",
+      "list": "2.pc4",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "2巡目パフェルート 3",
+      "pieces": "jot",
+      "rows": [
+        "----------",
+        "cjjjtttcoo",
+        "ccLLLtccoo",
+        "ccLccccccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.normal#1",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "spin_board": "2.normal.tst",
+      "label_jp": "通常ルート %L>%Oの場合",
+      "label": "normal bag 2, form 1 (%L>%O: the held L on the O at the right, the bag-2 L and the O over it)",
+      "group": "2.normal",
+      "variant": 1,
+      "condition_verbatim": "%L>%Oの場合",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "L",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "condition_note": "OUR READING of the heading as L before O; the board forces it (the O rests on the bag-2 L)",
+      "rows": [
+        "i-------oo",
+        "i-------oo",
+        "ijj-----ll",
+        "ij----ssLl",
+        "cj-zzsscLl",
+        "cc--zzccLL",
+        "cc-ccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal#2",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "spin_board": "2.normal.tst",
+      "label_jp": "通常ルート %O>%T%Lの場合",
+      "label": "normal bag 2, form 2 (%O>%T%L: the O at the right, the held L and the bag-2 L over it)",
+      "group": "2.normal",
+      "variant": 2,
+      "condition_verbatim": "%O>%T%Lの場合",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "T"
+            ]
+          },
+          {
+            "before": [
+              "O",
+              "L"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "O",
+            "T"
+          ],
+          "by": "spin_rows"
+        },
+        {
+          "before": [
+            "O",
+            "L"
+          ],
+          "by": "support"
+        }
+      ],
+      "condition_note": "OUR READING of 「%O>%T%L」 as O before T and O before L; the board forces both (the O fills rows the TST clears; the held L rests on the O)",
+      "rows": [
+        "i-------ll",
+        "i-------Ll",
+        "ijj-----Ll",
+        "ij----ssLL",
+        "cj-zzsscoo",
+        "cc--zzccoo",
+        "cc-ccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal.tst",
+      "bag": 2,
+      "parent": "2.normal",
+      "label_jp": "通常ルート その後TSTを打ちます",
+      "label": "normal bag 2 with the TST slot and the three cleared rows highlighted (both forms share it)",
+      "node_kind": "illustration",
+      "text_verbatim": "その後TSTを打ちます。",
+      "rows": [
+        "c-------cc",
+        "c-------cc",
+        "ccc-----cc",
+        "cc----cccc",
+        "CCUCCCCCCC",
+        "CCUUCCCCCC",
+        "CCUCCCCCCC",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal.after",
+      "bag": 2,
+      "parent": "2.normal",
+      "label": "normal, after the TST (both forms collapse to it; checked)",
+      "node_kind": "illustration",
+      "after_of": "2.normal.tst",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "c-------cc",
+        "c-------cc",
+        "ccc-----cc",
+        "cc----cccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal.pc#1",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 1",
+      "pieces": "ijlstz",
+      "rows": [
+        "cjiiiillcc",
+        "cjjjsszlcc",
+        "cccsszzlcc",
+        "cctttzcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#2",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 2",
+      "pieces": "ijlost",
+      "rows": [
+        "cjiiiioocc",
+        "cjjjssoocc",
+        "cccsslllcc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#3",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 3",
+      "pieces": "ijlost",
+      "rows": [
+        "ciiiilllcc",
+        "cjjjsloocc",
+        "cccjssoocc",
+        "cctttscccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#4",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 4",
+      "pieces": "ijlost",
+      "rows": [
+        "coojjtttcc",
+        "coojsstlcc",
+        "cccsslllcc",
+        "cciiiicccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.normal.pc#5",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 5,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 5",
+      "pieces": "ijlotz",
+      "rows": [
+        "ciiiizoocc",
+        "cjjjzzoocc",
+        "cccjzlllcc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#6",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 6,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 6",
+      "pieces": "ijlotz",
+      "rows": [
+        "cjzziiiicc",
+        "cjjjlloocc",
+        "ccczzloocc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#7",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 7,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 7",
+      "pieces": "jlostz",
+      "rows": [
+        "coojssllcc",
+        "coojjjzlcc",
+        "cccsszzlcc",
+        "cctttzcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.normal.pc#8",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "list": "2.normal.pc",
+      "index": 8,
+      "listed_under": "shown",
+      "label_jp": "通常ルート 3巡目 8",
+      "pieces": "ijlosz",
+      "rows": [
+        "coozzsllcc",
+        "coojjsslcc",
+        "cccjzzslcc",
+        "cciiiicccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.normal.pc.rest",
+      "bag": 3,
+      "parent": "2.normal",
+      "node_kind": "commented_out",
+      "label_jp": "残り55パターン",
+      "page_text": "残り55パターン",
+      "label": "the 「残り55パターン」 template, inside an HTML comment (never rendered)",
+      "unmatchable": "inside an HTML comment, so not on the rendered page; it is 2.normal.after redrawn as an empty template that was never filled (checked)",
+      "rows": [
+        "c-------cc",
+        "c-------cc",
+        "ccc-----cc",
+        "cc----cccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal.imperial#1",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "label_jp": "インペリアルクロス 1",
+      "label": "normal, no PC: Imperial Cross form 1 (the I at the left wall)",
+      "bag_note": "OUR READING of the bag: the page says only パフェを取れない場合",
+      "group": "2.normal.imperial",
+      "variant": 1,
+      "condition": null,
+      "unmatchable": "9 non-empty rows > ROWS = 8",
+      "rows": [
+        "i---------",
+        "i---------",
+        "i---------",
+        "i---ss----",
+        "c--sszoocc",
+        "c---zzoocc",
+        "ccc-zlllcc",
+        "cc---lcccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.normal.imperial#2",
+      "bag": 3,
+      "parent": "2.normal",
+      "base": "2.normal.after",
+      "label_jp": "インペリアルクロス 2",
+      "label": "normal, no PC: Imperial Cross form 2 (the I and J at columns 6-7, the O on the right-hand stack at columns 8-9)",
+      "bag_note": "OUR READING of the bag: the page says only パフェを取れない場合",
+      "group": "2.normal.imperial",
+      "variant": 2,
+      "condition": null,
+      "rows": [
+        "----------",
+        "------i---",
+        "------i-oo",
+        "----ssijoo",
+        "c--sszijcc",
+        "c---zzjjcc",
+        "ccc-zlllcc",
+        "cc---lcccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.compromise",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "spin_board": "2.compromise.tst",
+      "label_jp": "妥協ルート(2巡目) %L>%Oの場合",
+      "label": "compromise bag 2 (%T>%L%O; headed %L>%O: the held L at the right, the O and the I over it, the bag-2 L on the O)",
+      "condition_verbatim": "%T>%L%Oの場合には通常系が組めないため、妥協形を組みます。",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "T",
+              "L"
+            ]
+          },
+          {
+            "before": [
+              "T",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "T",
+            "L"
+          ],
+          "by": null,
+          "note": "the stated trigger (通常系が組めない): a choice the board does not force"
+        },
+        {
+          "before": [
+            "T",
+            "O"
+          ],
+          "by": null,
+          "note": "the stated trigger (通常系が組めない): a choice the board does not force"
+        }
+      ],
+      "condition_note": "OUR READING: the trigger 「%T>%L%O」 as T before L and T before O. The heading 「%L>%Oの場合」 (the only case drawn) is NOT read as a bag-2 order: the O rests on the held bag-1 L (an L placed before the O), while the bag-2 l rests on the O, so a bag-2 L dealt before the O could not be placed where it is drawn (the hold already holds the T). Named discrepancy 2.compromise:heading_vs_board",
+      "heading_verbatim": "%L>%Oの場合",
+      "unmatchable": "10 non-empty rows > ROWS = 8",
+      "rows": [
+        "-------l--",
+        "-------l--",
+        "-------ll-",
+        "-------ooi",
+        "-jj----ooi",
+        "-j----ssLi",
+        "cj-zzsscLi",
+        "cc--zzccLL",
+        "cc-ccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.compromise.tst",
+      "bag": 2,
+      "parent": "2.compromise",
+      "label_jp": "妥協ルート →",
+      "label": "compromise bag 2 with the TST slot and the three cleared rows highlighted",
+      "node_kind": "illustration",
+      "unmatchable": "10 non-empty rows > ROWS = 8",
+      "rows": [
+        "-------c--",
+        "-------c--",
+        "-------cc-",
+        "-------ccc",
+        "-cc----ccc",
+        "-c----cccc",
+        "CCUCCCCCCC",
+        "CCUUCCCCCC",
+        "CCUCCCCCCC",
+        "ccc-cccccc"
+      ]
+    }
+  ]
+}
