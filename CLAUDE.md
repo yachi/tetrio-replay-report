@@ -3701,10 +3701,20 @@ audit of the transcription:
   heading as a bag-2 order backed by the held L's support — evidence for a different piece — and the
   demo planner then measured the board unbuildable. It is now the named discrepancy
   `2.compromise:heading_vs_board` and no condition; the selftest puts the order back and must see the
-  discrepancy vanish. The demo stays unbuilt for a different, stated reason: the planner reads a
-  `before` pair as PLACEMENT order and fires the T last, so 「T 早過 L、O」 cannot be met, although on
-  the board it can (the T held on arrival). Teaching the planner that a swapped-in piece is dealt at
-  its swap slot is shared code, and was not done for one demo.
+  discrepancy vanish. **The demo is built**, and it is the one place the planner had to learn that a
+  `before` pair is an order of DEALING. With the hold box full, the queue builder already dealt the
+  bag's last placement (the spin's T) at the swap slot, but the search's wait check read the pair in
+  PLACEMENT order, where the T is last, so 「T 早過 L、O」 could never be met and the board was reported
+  unbuildable (「O 要等 T；L 要等 T」). The wait check now credits the swap slot by the queue builder's
+  own rule (`dealtEarly` in `planBag`): the bag-2 T is dealt fourth, held, swaps out the bag-1 L, and
+  is fired last as the TST. `noSwapDeal` turns the rule off; it is a MUTANT here (the demo goes back to
+  unbuilt) and, measured on 2026-10-14, an EQUIVALENT mutant on the other four openers, whose demos
+  build byte-identically with it — so the shared-code edit moved their artefacts in `planner_md5`
+  only and none of their pages. The demos test reads the result off the ENGINE's record (the dealt
+  queue, the hold key on the bag-1 L's lock, a full 3-line spin out of the hold on the last lock), and
+  `route-demo-checks.ts` gained the branch an unmatchable BAG-2 demo needs: the board is too tall for
+  the classifier, so the drawing check is what shows the demo reached it, and the classifier must file
+  it under no bag-2 node at all.
 * **A blank top row is not a ninth row.** `2.normal.imperial#2` is drawn nine rows tall under a blank
   row; it was first marked unmatchable for 「9 non-empty rows」, which is false (8). It is compared now,
   as both the gate's `bottom()` and the classifier's `occGrid` already allowed. `2.normal.imperial#1`
@@ -3721,7 +3731,7 @@ The named lists are `BAG2_NONE_UNEXPLAINED`, `NOT_TRIPLE_FIRST`, and the measure
 `L_HOLD_BAG1`, `L_PLACED_ELSEWHERE_BAG1`, `BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TST_BEFORE_COMPLETE` /
 `_EXTRA_PIECE` / `_MOVED_PIECE`, `PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`,
 `MULTI_COLOUR_RESOLVED_BY_GROUP`, `COLOUR_DISAGREE` and `PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT`
-(the mirror, the illustrations, the commented-out template, and the 妥協 form), `TSD_NOT_FIRED`,
+(the mirror, the illustrations and the commented-out template), `TSD_NOT_FIRED`,
 `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS` and `DEMO_PIECE_READINGS`. Sizes are read off the tests.
 `no180` is a control; `ignoreConditions` is a MUTANT here, as on はちみつ砲: the bag-1 no-hold orders
 (J before S, Z before T) are not forced by gravity.

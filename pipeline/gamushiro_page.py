@@ -84,7 +84,7 @@ GAMUSHIRO_SITE = RouteSiteProfile(
         "empty_node": "2.normal#2", "text_only": "2.normal.tst",
         "unmatchable": "2.compromise", "node_page": "bag1-only", "node_page_node": "bag1.l_top",
         "elsewhere_node": "bag1.l_placed_elsewhere", "demo_built": "2.normal.pc#1",
-        "demo_unbuilt": "2.compromise", "demo_never_holds": "bag1.l_top",
+        "demo_unbuilt": "2.compromise.tst", "demo_never_holds": "bag1.l_top",
         "demo_missing": "2.normal.pc#5",
     },
 )

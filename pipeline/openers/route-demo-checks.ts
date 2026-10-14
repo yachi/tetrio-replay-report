@@ -186,7 +186,11 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
     const c = classify(P, [digestOf(d)], routes).cases[0];
     if (!c) return `${d.node}: classifier found no bag 1`;
     if (n.bag === 1 && c.bag1.node !== n.id) return `${d.node}: classifier bag 1 ${c.bag1.node}`;
-    if (n.bag === 2 && !n.list && (c.bag2?.node !== n.id || c.bag2.condition_met === false)) return `${d.node}: classifier bag 2 ${c.bag2?.node}`;
+    // an UNMATCHABLE bag-2 board (ガムシロ積み's 10-row 妥協 form) is too tall for the classifier, as a
+    // later one is: the drawing check above is what shows the demo reached it, and the classifier must
+    // file it under NO bag-2 node, never under a different drawn one
+    if (n.bag === 2 && !n.list && n.unmatchable && c.bag2?.node != null) return `${d.node}: classifier bag 2 ${c.bag2.node} for an unmatchable board`;
+    if (n.bag === 2 && !n.list && !n.unmatchable && (c.bag2?.node !== n.id || c.bag2.condition_met === false)) return `${d.node}: classifier bag 2 ${c.bag2?.node}`;
     if (n.list) {
       const dg = digestOf(d);
       const k = kindOf(n);
