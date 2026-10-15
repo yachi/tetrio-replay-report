@@ -20,6 +20,8 @@ from html import escape
 from pathlib import Path
 
 DATA_REL = "analysis/ppt2-syakegohan/games.csv"
+#: cells corrected by hand from the video, each with the chain value it replaced and its source
+HAND_REL = "analysis/ppt2-syakegohan/hand-edits.csv"
 PAGE = "ppt2-syakegohan.html"
 CHANNEL = "https://www.youtube.com/channel/UCjaIDXm6AZz1fMkBT-OU8Ag"
 ME = "syakegohan"
@@ -32,9 +34,38 @@ SUMS = ("duration_s", "pieces", "lines_cleared", "attack", "garbage_cleared", "g
 MAXES = ("max_combo", "max_b2b")
 
 
+def _hand_edits(repo):
+    with open(Path(repo) / HAND_REL, encoding="utf-8", newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
+def apply_hand_edits(rows, edits):
+    """Lay the video-verified hand edits over the extractor chain's rows, in place. An edit applies only
+    where the chain still gives the value it was written against (`was`), or already gives `value`; any
+    other chain value means the chain moved under the edit, so it raises for a review instead of
+    overwriting a value nobody has looked at."""
+    at = {(r["id"], r["player"]): r for r in rows}
+    for e in edits:
+        r = at.get((e["id"], e["player"]))
+        if r is None or e["field"] not in r:
+            raise ValueError(f"hand edit names no cell: {e['id']} {e['player']} {e['field']}")
+        if r[e["field"]] not in (e["was"], e["value"]):
+            raise ValueError(f"{e['id']} {e['player']} {e['field']}: the chain gives {r[e['field']]!r}, "
+                             f"the hand edit was written against {e['was']!r}; review it in the video")
+        r[e["field"]] = e["value"]
+    return rows
+
+
 def load(repo):
     with open(Path(repo) / DATA_REL, encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))
+    # games.csv is the chain's output with the hand edits laid over it. A rebuild that writes the chain
+    # output alone silently drops them (2026-10-15 did, all 24 rows), so the page refuses to render one.
+    for e in _hand_edits(repo):
+        got = next((r[e["field"]] for r in rows if (r["id"], r["player"]) == (e["id"], e["player"])), None)
+        if got != e["value"]:
+            raise ValueError(f"{DATA_REL}: {e['id']} {e['player']} {e['field']} is {got!r}, the hand edit says "
+                             f"{e['value']!r}; rebuild with python3 -m pipeline.ppt2_page --apply <chain.csv>")
     games = defaultdict(dict)
     for r in rows:
         games[r["id"]][r["player"]] = r
@@ -213,11 +244,11 @@ def _warn_box(small):
         "（一個睇 NEXT 列移位，一個數格仔），對數之後再由第三個讀者抽查。冇 claim 編號、冇 ✓。</li>"
         "<li><strong>攻擊係計出嚟，唔係睇到。</strong>由每次清行嘅種類用 PPT2 攻擊表計"
         "（B2B、REN、全消照計），抵銷咗嘅攻擊喺片入面睇唔到。全消同其他加成點疊係假設。</li>"
-        "<li><strong>已知缺陷：最後一下清行。</strong>舊版兩個抽取器都喺 KO 嗰格之前停咗數，"
-        "漏咗贏家最後一下清行；而家會計埋 KO 格或之前鎖低嘅嗰粒。KO 畫面好多時遮住 T-spin 字幕，"
-        "所以補返嘅清行如果有字幕問題，就逐局睇片（字幕同分數變化）先定種類。"
-        "仲有一啲局，第三個讀者（睇白色清行閃光）見到最尾一下清行而數據冇計，未逐局睇片，"
-        "所以贏家嘅攻擊可能仍然少少偏低。局長由 KO 判斷，個別局可能短咗一兩秒。</li>"
+        "<li><strong>已知缺陷：最尾一粒。</strong>KO 以輸家個板開始傾側嗰格計，比爆頂遲大約半秒；"
+        "贏家喺 KO 格或之前鎖低嘅方塊同清行都計。KO 畫面好多時遮住 T-spin 字幕，所以補返嘅清行"
+        "逐局睇片（字幕同分數變化）先定種類。如果贏家最後一粒冇消行、又啱啱喺 KO 嗰格鎖低，"
+        "抽取器睇唔到；睇片搵到兩局，已經人手改正，其他局最多少計一粒。"
+        "局長由第一粒到 KO，同睇片量度相差唔多過 0.11 秒。</li>"
         f"<li>局數少過 {MIN_GAMES} 嘅對手用斜體灰色：{small or '冇'}。只當例子睇，唔好拎嚟比較。</li>"
         "<li>所有比率都係「總和對總和」（例如 PPS = 總粒數 ÷ 總秒數），數字一律向下取。</li>"
         "</ul></div>")
@@ -498,3 +529,26 @@ def card(games):
     inc = [g for g in games.values() if g["p1"]["excluded"] == "0"]
     won = sum(g["p1"]["won"] == "1" for g in inc)
     return {"href": PAGE, "games": len(inc), "won": won, "lost": len(inc) - won}
+
+
+def _main(argv):
+    """`--apply <chain.csv>`: write games.csv as the extractor chain's output with the hand edits laid
+    over it. The chain itself lives outside the repo; this is the one step of the rebuild that is in it."""
+    if len(argv) != 2 or argv[0] != "--apply":
+        raise SystemExit("usage: python3 -m pipeline.ppt2_page --apply <chain games.csv>")
+    repo = Path(__file__).resolve().parent.parent
+    with open(argv[1], encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        rows = list(reader)
+        cols = list(reader.fieldnames or ())
+    apply_hand_edits(rows, _hand_edits(repo))
+    with open(repo / DATA_REL, "w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=cols, lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+    load(repo)
+
+
+if __name__ == "__main__":
+    import sys
+    _main(sys.argv[1:])
