@@ -51,6 +51,21 @@
   "source": "PERFECT CLEAR + 2 REN at video 1716.534 (recount quoted 1716.47; the only double within 0.5 s in this build is data t 1716.57); combo/recount/fr_g070_p1_1716.00.png"
  },
  {
+  "id": "g070",
+  "side": "p1",
+  "op": "retype",
+  "t": 1716.57,
+  "was": [
+   "double",
+   2,
+   1
+  ],
+  "kind": "double",
+  "lines": 2,
+  "gc": 0,
+  "source": "PC double at video 1716.5 clears two coloured rows, no grey on the board 1710-1719; combo3/gc/c_g070.png, out_g070_p1_1716.txt"
+ },
+ {
   "id": "j033",
   "side": "p2",
   "op": "remove",
@@ -420,8 +435,8 @@
   "kind": "double",
   "lines": 2,
   "pc": 0,
-  "gc": 0,
-  "source": "framesB (combo2/framesB/RESULTS.txt): S hard-dropped F796 = t3 796, score +900 double, 2-row band, no REN; framesB/h017"
+  "gc": 1,
+  "source": "framesB (combo2/framesB/RESULTS.txt): S hard-dropped F796 = t3 796, score +900 double, 2-row band, no REN; framesB/h017; gc 1: the S fills the col-6 hole of the top grey row, the 1493.800 band covers rows 5 (grey) and 6 (coloured); combo3/gc/c_h017.png, out_h017_p1_1493.txt"
  },
  {
   "id": "i015",
@@ -528,7 +543,7 @@
     "kind": "single",
     "lines": 1,
     "pc": 0,
-    "gc": 0
+    "gc": 1
    },
    {
     "t": 1627.333,
@@ -580,7 +595,7 @@
     "gc": 0
    }
   ],
-  "source": "framesB (combo2/framesB/RESULTS.txt): exactly 11 locks 1605-1634, all 1-row singles, REN 3..13, each score-checked (300+150*REN); no lock 1607.3-1624.5; framesB/i015"
+  "source": "framesB (combo2/framesB/RESULTS.txt): exactly 11 locks 1605-1634, all 1-row singles, REN 3..13, each score-checked (300+150*REN); no lock 1607.3-1624.5; framesB/i015; 1626.267 single clears the one grey row GGGGGG.GGG; combo3/gc/c_i015_1626a.png, i015_mid2.txt"
  },
  {
   "id": "i015",
