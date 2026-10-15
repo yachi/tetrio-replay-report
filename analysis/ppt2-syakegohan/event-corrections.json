@@ -1,0 +1,628 @@
+[
+ {
+  "id": "j009",
+  "side": "p1",
+  "op": "retype",
+  "t": 2237.8,
+  "was": [
+   "tsmini",
+   4,
+   0
+  ],
+  "kind": "quad",
+  "lines": 4,
+  "source": "verify VERDICTS.txt: TETRIS banner, vertical I at 2238.467; combo/recount/fr_j009_p1_2237.80.png"
+ },
+ {
+  "id": "j027",
+  "side": "p1",
+  "op": "remove",
+  "t": 4277.6,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "source": "verify VERDICTS.txt: REN stays 1 from 4277.43 to 4278.564 (KO); combo/recount/fr_j027_p1_4277.43.png"
+ },
+ {
+  "id": "g070",
+  "side": "p1",
+  "op": "remove",
+  "t": 1716.1,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "source": "verify VERDICTS.txt: 1 REN 1716.0 then PERFECT CLEAR + 2 REN 1716.534; single spurious; combo/recount/fr_g070_p1_1716.00.png"
+ },
+ {
+  "id": "g070",
+  "side": "p1",
+  "op": "setpc",
+  "t": 1716.57,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "pc": 1,
+  "source": "PERFECT CLEAR + 2 REN at video 1716.534 (recount quoted 1716.47; the only double within 0.5 s in this build is data t 1716.57); combo/recount/fr_g070_p1_1716.00.png"
+ },
+ {
+  "id": "g070",
+  "side": "p1",
+  "op": "retype",
+  "t": 1716.57,
+  "was": [
+   "double",
+   2,
+   1
+  ],
+  "kind": "double",
+  "lines": 2,
+  "gc": 0,
+  "source": "PC double at video 1716.5 clears two coloured rows, no grey on the board 1710-1719; combo3/gc/c_g070.png, out_g070_p1_1716.txt"
+ },
+ {
+  "id": "j033",
+  "side": "p2",
+  "op": "remove",
+  "t": 4846.67,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "source": "verify VERDICTS.txt: one PC at 4846.62, REN stays 1 through 4847.754; 4846.67 duplicates the PC double; combo/recount/fr_j033_p2_4846.62.png"
+ },
+ {
+  "id": "j033",
+  "side": "p2",
+  "op": "setpc",
+  "t": 4846.5,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "pc": 1,
+  "source": "PC at video 4846.62 (recount quoted 4846.45; the kept double in this build is data t 4846.5); combo/recount/fr_j033_p2_4846.62.png"
+ },
+ {
+  "id": "g042",
+  "side": "p1",
+  "op": "setpc",
+  "t": 268.23,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "pc": 1,
+  "source": "verify VERDICTS.txt: PERFECT CLEAR at 268.197 (recount quoted 268.17; the only double near it in this build is data t 268.23); single 267.43 UNDECIDABLE, not touched; combo/recount/fr_g042_p1_267.33.png"
+ },
+ {
+  "id": "i015",
+  "side": "p1",
+  "op": "remove",
+  "t": 1560.37,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "source": "verify VERDICTS.txt: score flat 13661 from 1560.1 to 1562.65; fr/i015p1_a.png fr/i015p1_b.png"
+ },
+ {
+  "id": "i015",
+  "side": "p1",
+  "op": "remove",
+  "t": 1560.6,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "source": "verify VERDICTS.txt: score flat 13661 from 1560.1 to 1562.65; fr/i015p1_a.png fr/i015p1_b.png"
+ },
+ {
+  "id": "g024",
+  "side": "p1",
+  "op": "replace_window",
+  "t": 279.7,
+  "t_end": 279.7,
+  "was_old": [
+   [
+    279.7,
+    null,
+    0
+   ]
+  ],
+  "events": [
+   {
+    "t": 279.3,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): 279.70 is the HOLD swap I<->Z (280.017-280.083), not a lock; green S locks 279.300, 1-row flash 279.333, tag 3->4 REN 279.367; fr_g024_p1_279.95.png"
+ },
+ {
+  "id": "g024",
+  "side": "p1",
+  "op": "retype",
+  "t": 341.37,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "kind": "double",
+  "lines": 2,
+  "source": "framesA (combo2/framesA/RESULTS.txt): 2-row white band 341.517-341.55, flash rows [7,8], no T-spin banner, score 103583->104483; two_g024_341.45.png"
+ },
+ {
+  "id": "g035",
+  "side": "p1",
+  "op": "retype",
+  "t": 52.6,
+  "was": [
+   "tsmini",
+   1,
+   0
+  ],
+  "kind": null,
+  "lines": 0,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt): zero-line Mini T-SPIN (banner 52.534, score +300, no white row, 2 colored rows unchanged); fr_g035_p1_52.20.png"
+ },
+ {
+  "id": "g099",
+  "side": "p1",
+  "op": "retype",
+  "t": 5352.57,
+  "was": [
+   "tsmini",
+   1,
+   0
+  ],
+  "kind": null,
+  "lines": 0,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt): zero-line Mini T-SPIN (score +300 at 5352.50, no white row, 3 colored rows unchanged); fr_g099_p1_5352.10.png"
+ },
+ {
+  "id": "g042",
+  "side": "p1",
+  "op": "remove",
+  "t": 267.43,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): I locks 267.30 with no flash, score 11470 flat 266.6-267.93, flash detector 266.533 then 268.166; 267.43 = HOLD swap Z<->S; fr_g042_p1_266.60.png (verify had called it undecidable)"
+ },
+ {
+  "id": "g050",
+  "side": "p1",
+  "op": "add",
+  "t": 259.867,
+  "kind": "single",
+  "lines": 1,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt) and framesB (combo2/framesB/RESULTS.txt): red Z locks f1250 = t3 1250 (HOLD box dx 1/4/7 px at f1249/1250/1251), 1 white row, 1 REN tag; fr_g050_p1_259.60.png, framesB/g050"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "retype",
+  "t": 140.2,
+  "was": [
+   "triple",
+   3,
+   0
+  ],
+  "kind": null,
+  "lines": 0,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt): after the PC triple at 139.13 (1 REN at 140.217) nothing clears to 141.3; L 140.42 / I 140.80 lock without flash; recount fr_g040_p1_140.15.png"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "retype",
+  "t": 140.5,
+  "was": [
+   "double",
+   2,
+   0
+  ],
+  "kind": null,
+  "lines": 0,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt): same as 140.2"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "replace_window",
+  "t": 196.3,
+  "t_end": 196.3,
+  "was_old": [
+   [
+    196.3,
+    "BREAK",
+    3
+   ]
+  ],
+  "events": [
+   {
+    "t": 196.7,
+    "kind": "double",
+    "lines": 2,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): untyped BREAK n=3 is a vertical I double, 2-row band 196.717, flash rows [11,12], no REN tag; fr_g040_p1_196.25.png"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "replace_window",
+  "t": 199.83,
+  "t_end": 199.87,
+  "was_old": [
+   [
+    199.83,
+    null,
+    0
+   ],
+   [
+    199.83,
+    null,
+    0
+   ],
+   [
+    199.87,
+    "BREAK",
+    4
+   ]
+  ],
+  "events": [
+   {
+    "t": 199.83,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): T locks 199.4, 1-row flash 199.467 row [15], no T-spin banner, score 166041->166341; the two B-Nones at 199.83 are one lock; BREAK n=4 untyped; fr_g040_p1_199.20.png"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "add",
+  "t": 200.334,
+  "kind": "single",
+  "lines": 1,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesA (combo2/framesA/RESULTS.txt): 1 REN tag 200.4, flash row [16]"
+ },
+ {
+  "id": "g040",
+  "side": "p1",
+  "op": "replace_window",
+  "t": 201.63,
+  "t_end": 201.63,
+  "was_old": [
+   [
+    201.63,
+    "BREAK",
+    3
+   ]
+  ],
+  "events": [
+   {
+    "t": 201.167,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 202.0,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): 2 REN 201.2 flash row [17]; 3 REN 202.1 flash row [16]; no further clear to the tilt 203.8; fr_g040_p1_201.60.png"
+ },
+ {
+  "id": "j018",
+  "side": "p2",
+  "op": "replace_window",
+  "t": 2923.67,
+  "t_end": 2923.67,
+  "was_old": [
+   [
+    2923.67,
+    null,
+    0
+   ]
+  ],
+  "events": [
+   {
+    "t": 2923.67,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesA (combo2/framesA/RESULTS.txt): orange L locks ~2923.9, 1-row flash 2923.950, 3 REN 2924.017 (supersedes the witnessed.json renx entry); fr_j018_p2_2923.35.png"
+ },
+ {
+  "id": "j018",
+  "side": "p2",
+  "op": "replace_window",
+  "t": 2924.63,
+  "t_end": 2924.63,
+  "was_old": [
+   [
+    2924.63,
+    null,
+    0
+   ]
+  ],
+  "events": [],
+  "source": "framesA (combo2/framesA/RESULTS.txt): no lock 2924.0-2924.95, the I only spawns at 2924.617"
+ },
+ {
+  "id": "j018",
+  "side": "p2",
+  "op": "setpc",
+  "t": 2925.03,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "pc": 1,
+  "source": "framesA (combo2/framesA/RESULTS.txt): I clears the last row, 1-row flash 2925.017, PERFECT CLEAR + 4 REN 2925.084"
+ },
+ {
+  "id": "g029",
+  "side": "p2",
+  "op": "add",
+  "t": 38.0,
+  "kind": "single",
+  "lines": 1,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesB (combo2/framesB/RESULTS.txt): S hard-dropped F726 = t3 726, 1 white row F727, tag 2->3 REN; framesB/g029"
+ },
+ {
+  "id": "g093",
+  "side": "p1",
+  "op": "add",
+  "t": 4775.033,
+  "kind": "single",
+  "lines": 1,
+  "pc": 0,
+  "gc": 0,
+  "source": "framesB (combo2/framesB/RESULTS.txt): T locks F769 = t3 769, score +300 plain single at level 3, 1 white row; framesB/g093"
+ },
+ {
+  "id": "h017",
+  "side": "p1",
+  "op": "add",
+  "t": 1493.733,
+  "kind": "double",
+  "lines": 2,
+  "pc": 0,
+  "gc": 1,
+  "source": "framesB (combo2/framesB/RESULTS.txt): S hard-dropped F796 = t3 796, score +900 double, 2-row band, no REN; framesB/h017; gc 1: the S fills the col-6 hole of the top grey row, the 1493.800 band covers rows 5 (grey) and 6 (coloured); combo3/gc/c_h017.png, out_h017_p1_1493.txt"
+ },
+ {
+  "id": "i015",
+  "side": "p2",
+  "op": "replace_window",
+  "t": 1605.0,
+  "t_end": 1634.0,
+  "was_old": [
+   [
+    1606.87,
+    "single",
+    1
+   ],
+   [
+    1607.97,
+    "single",
+    1
+   ],
+   [
+    1614.37,
+    "BREAK",
+    0
+   ],
+   [
+    1616.8,
+    "BREAK",
+    0
+   ],
+   [
+    1619.23,
+    "BREAK",
+    2
+   ],
+   [
+    1625.23,
+    "single",
+    1
+   ],
+   [
+    1626.03,
+    null,
+    0
+   ],
+   [
+    1626.9,
+    "single",
+    1
+   ],
+   [
+    1628.0,
+    "single",
+    1
+   ],
+   [
+    1629.0,
+    "single",
+    1
+   ],
+   [
+    1630.0,
+    "single",
+    1
+   ],
+   [
+    1631.0,
+    "single",
+    1
+   ],
+   [
+    1632.13,
+    "single",
+    1
+   ],
+   [
+    1632.97,
+    "single",
+    1
+   ]
+  ],
+  "events": [
+   {
+    "t": 1607.3,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1624.567,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1625.433,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1626.267,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 1
+   },
+   {
+    "t": 1627.333,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1628.333,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1629.333,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1630.367,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1631.467,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1632.3,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   },
+   {
+    "t": 1633.133,
+    "kind": "single",
+    "lines": 1,
+    "pc": 0,
+    "gc": 0
+   }
+  ],
+  "source": "framesB (combo2/framesB/RESULTS.txt): exactly 11 locks 1605-1634, all 1-row singles, REN 3..13, each score-checked (300+150*REN); no lock 1607.3-1624.5; framesB/i015; 1626.267 single clears the one grey row GGGGGG.GGG; combo3/gc/c_i015_1626a.png, i015_mid2.txt"
+ },
+ {
+  "id": "i015",
+  "side": "p2",
+  "op": "remove",
+  "t": 1574.7,
+  "was": [
+   "single",
+   1,
+   0
+  ],
+  "source": "verify (combo2/verify/VERDICTS.txt): one O falls 1561.0-1580.0 without locking, score flat 13358; it locks and clears at video 1580.5 (+600, 2 REN), which is data 1581.37; verify/i015p2_1561.png"
+ },
+ {
+  "id": "i015",
+  "side": "p2",
+  "op": "replace_window",
+  "t": 1558.87,
+  "t_end": 1558.87,
+  "was_old": [
+   [
+    1558.87,
+    null,
+    0
+   ]
+  ],
+  "events": [],
+  "source": "verify (combo2/verify/VERDICTS.txt): hold swap Z<->T 1559.17-1559.30, not a lock; the Z clears at 1559.30 with 1 REN (+486); verify/i015p2_1558f.png"
+ }
+]
