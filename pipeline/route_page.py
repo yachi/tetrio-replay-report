@@ -155,11 +155,18 @@ def board_svg(rows, label, classes=PIECE_CLASS):
     return "".join(out)
 
 
-def _source_line(routes):
+#: the header's credit, as the five shiwehi.com openers print it. An opener from another site (SDPC
+#: Spin, from harddrop, which publishes no licence) overrides these through its prose's
+#: `source_credit`, so the words about a site live beside the site's other words
+SOURCE_CREDIT = {"site": "shiwehi.com", "terms_link": "使用條款", "terms_words": "非商業用途，註明出處"}
+
+
+def _source_line(routes, credit=None):
     src, terms = routes["source"], routes["terms"]
+    cr = {**SOURCE_CREDIT, **(credit or {})}
     return (f'  <p class="scp-src-line">來源：<a href="{_esc(src["url"])}">{_esc(src["title"])}'
-            f'（shiwehi.com）</a>，原頁 {_esc(src["updated"])} 版，{_esc(src["fetched"])} 讀取；'
-            f'<a href="{_esc(terms["url"])}">使用條款</a>（非商業用途，註明出處）。</p>')
+            f'（{_esc(cr["site"])}）</a>，原頁 {_esc(src["updated"])} 版，{_esc(src["fetched"])} 讀取；'
+            f'<a href="{_esc(terms["url"])}">{_esc(cr["terms_link"])}</a>（{_esc(cr["terms_words"])}）。</p>')
 
 
 def _island(obj):
@@ -509,6 +516,10 @@ class RouteSite:
             return f"{cond['early']} 早（原頁冇講幾早先算）"
         if "bag1" in cond:
             return f"第一巡係「{self.PROSE['names'][cond['bag1']]}」"
+        if "at_least" in cond:
+            # SDPC Spin's STMB Cave: 「J needs to come before at least two of T, L, and Z」
+            a = cond["at_least"]
+            return f"{a['before']} 早過 {'、'.join(a['of'])} 其中至少 {a['count']} 粒"
         raise SystemExit(f"{self.p.module}: unknown condition {cond!r}")
 
     def status_of(self, fn):
@@ -614,7 +625,7 @@ class RouteSite:
                 f'    <div class="eyebrow">{RS.EYEBROW}</div>',
                 f'    <h1 class="section-title">{_esc(title)}</h1>',
                 f'    <p>{_esc(self.PROSE["overview_lede"])}</p>',
-                _source_line(routes),
+                _source_line(routes, self.PROSE.get("source_credit")),
                 '  </header>']
         out += self._method_note(False)
         out.append(f'  <p class="scp-quote"><a href="{self.DEMO_PAGE}">{_esc(self.DP["title"])}</a>：'
@@ -628,13 +639,14 @@ class RouteSite:
             out.append(block(nid))
         out.append("  </div>")
 
-        # 基本形
-        out += ['  <section class="scp-sec" id="basic"><h2>基本形</h2><div class="scp-grid">']
-        for b in routes["basic_form"]:
-            nm = self.node_name(b["same_as"], by_id)
-            out.append(f'    <div class="scp-basic"><h4 class="scp-name">{_esc(nm)}</h4>'
-                       f'{board_svg(b["rows"], nm, self.CLASSES)}</div>')
-        out.append("  </div></section>")
+        # 基本形 (a source that draws none — SDPC Spin — gets no empty heading)
+        if routes["basic_form"]:
+            out += ['  <section class="scp-sec" id="basic"><h2>基本形</h2><div class="scp-grid">']
+            for b in routes["basic_form"]:
+                nm = self.node_name(b["same_as"], by_id)
+                out.append(f'    <div class="scp-basic"><h4 class="scp-name">{_esc(nm)}</h4>'
+                           f'{board_svg(b["rows"], nm, self.CLASSES)}</div>')
+            out.append("  </div></section>")
 
         # 第一巡
         b1 = routes["bag1"]
@@ -824,7 +836,7 @@ class RouteSite:
                 f'    <h1 class="section-title">{_esc(title)}</h1>',
                 "    <p>" + _esc(self.PROSE["bag1_only_lede"] if node is None
                                  else self.PROSE["node_page_lede"].format(name=name)) + "</p>",
-                _source_line(routes),
+                _source_line(routes, self.PROSE.get("source_credit")),
                 '  </header>']
         out += self._method_note(True)
         out += [f'  <section id="{RS.SECTION_ID}" aria-labelledby="rpg-now">',
@@ -1062,7 +1074,7 @@ class RouteSite:
                 f'    <div class="eyebrow">{RS.EYEBROW}</div>',
                 f'    <h1 class="section-title">{_esc(title)}</h1>',
                 f'    <p>{_esc(self.DP["lede"])}</p>',
-                _source_line(routes),
+                _source_line(routes, self.PROSE.get("source_credit")),
                 '  </header>',
                 '  <div class="method-note">',
                 f'    <p><strong>呢版唔屬於信任鏈，亦唔係對局。</strong>所以呢版<strong>{RS.NO_CLAIM}</strong>。</p>']
@@ -1192,7 +1204,9 @@ class RouteSite:
             bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
         if "%" in _TAG.sub("", _SRC_QUOTE.sub("", vis)):
             bad.append("a % outside quoted source text — this page prints counts, never computed rates")
-        held = _TAG.sub("", self._HOLD_SPAN.sub("", vis).replace(self.PS["bag1"], ""))
+        # quoted source text is the source's words, not this page's assertion — exempt from the 「hold」
+        # rule exactly as from the % rule (SDPC Spin's transition board quotes 「hold O and tuck it」)
+        held = _TAG.sub("", self._HOLD_SPAN.sub("", _SRC_QUOTE.sub("", vis)).replace(self.PS["bag1"], ""))
         if _HOLD.search(held):
             bad.append(f"「hold」 outside the {self.p.hold_node} row and the bag-1 sentence — only the hold-split "
                        "test earns it")
