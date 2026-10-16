@@ -1,0 +1,1409 @@
+{
+  "schema": "sdpcspin-routes/1",
+  "source": {
+    "url": "https://harddrop.com/wiki/SDPC_Spin",
+    "edit_url": "https://harddrop.com/w/index.php?title=SDPC_Spin&action=edit",
+    "title": "SDPC Spin",
+    "author": "Ecchou (page text: 「an opener invented by Ecchou」)",
+    "site": "harddrop.com (Hard Drop Tetris Wiki, MediaWiki)",
+    "updated": "2025-05-10",
+    "updated_note": "the rendered page's footer 「This page was last edited on 10 May 2025, at 14:16.」, read 2026-10-15 with oc",
+    "oldid": 42723,
+    "oldid_note": "the rendered page's 「Retrieved from」 link names oldid=42723 (read 2026-10-15 with oc); the wikitext itself carries no revision id",
+    "categories": [
+      "T-Spin openers",
+      "T-Spin Single openers",
+      "Single Double openers"
+    ],
+    "fetched": "2026-10-15",
+    "fetch_method": "only-cli `oc raw` of the action=edit page (NOT curl): the textarea's wikitext. The saved snapshot holds the page on ONE line, whitespace runs collapsed by the fetch; the hash is of those bytes. Boards are {{pfstart}} … {{pfend}} templates, 35 of them in 14 {| |} tables, read by route_transcription.wikitext_tables / wikitext_cell",
+    "snapshot_file": "SDPC_Spin.wikitext",
+    "snapshot_sha256": "6470895c2b8074f1e5b6051d06444eaac9ef38d95919e7ed1f581144012a0f80",
+    "snapshot_bytes": 10999,
+    "snapshot_note": "sha256 of the wikitext this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with SingleYou.wikitext, cross_source, beside it). A refetch that keeps the newlines will move the hash without moving a board; the board diff is what to read.",
+    "references_listed": [
+      "https://harddrop.com/wiki/SDPC",
+      "https://harddrop.com/wiki/Stickspin",
+      "https://harddrop.com/wiki/STMB_Cave",
+      "https://harddrop.com/wiki/STSD",
+      "https://harddrop.com/wiki/Trinity",
+      "https://harddrop.com/wiki/Imperial_Cross",
+      "https://harddrop.com/wiki/Donation",
+      "https://harddrop.com/wiki/6-3",
+      "https://harddrop.com/wiki/5-4",
+      "https://harddrop.com/wiki/Tuck"
+    ],
+    "references_note": "the page's own [[links]], as URLs; none of them is read here except SDPC (as SingleYou, cross_source)"
+  },
+  "cross_source": {
+    "kind": "harddrop_wikitext",
+    "page": "SingleYou",
+    "url": "https://harddrop.com/w/index.php?title=SingleYou&action=edit",
+    "rendered_url": "https://harddrop.com/wiki/SingleYou",
+    "oldid": 43398,
+    "oldid_note": "the current revision per the page's history at the fetch; the wikitext itself carries no revision id",
+    "fetched": "2026-10-15",
+    "fetch_method": "only-cli `oc raw` of the action=edit page, as for the source: one line, whitespace collapsed",
+    "snapshot_file": "SingleYou.wikitext",
+    "snapshot_sha256": "9e659fb741834fe51b480530c5f4b974a2b291a7e18541dc340f04f742819121",
+    "snapshot_bytes": 73303,
+    "parser": "pipeline.openers.route_transcription.wikitext_boards (wikitext_tables, cells read by wikitext_cell), each board trimmed by bottom(rows, 0): the reader the source page is read with",
+    "table": 0,
+    "table_context_verbatim": "In all continuations, the first bag is stacked like so:",
+    "fields": [
+      [
+        "--------s-",
+        "i-------ss",
+        "ilj---UUUs",
+        "iljjjzzUoo",
+        "ill---zzoo"
+      ],
+      [
+        "--------s-",
+        "i-------ss",
+        "ijj---UUUs",
+        "ijlllzzUoo",
+        "ijl---zzoo"
+      ],
+      [
+        "--------c-",
+        "c-------cc",
+        "ccc---cccc",
+        "ccc---cccc"
+      ]
+    ],
+    "fields_note": "the table's three boards, in order: the T-spin Single with the L under the J at column 1, with the J there, and the board after the TSS in grey. The page's sentence 「stacked the same way as SDPC」 is this equality",
+    "bag2_onward": "single source: nothing outside this page draws its bag-2 board or anything after it. SingleYou's own second bag (its Perfect Clear route) is a different board, and is not compared",
+    "why_not_wiki_openers": "wiki-openers.json transcribes seven openers and has no SDPC or SDPC Spin field; adding one would re-emit every session's opener-facts.json (the 六個具名定式 table reads it)"
+  },
+  "terms": {
+    "url": "https://harddrop.com/wiki/Hard_Drop_Tetris_Wiki:About",
+    "dated": "not stated: harddrop publishes no licence or terms page for wiki content",
+    "read": "2026-10-15, with oc: the SDPC Spin page footer (Privacy policy, About Hard Drop Tetris Wiki, Powered by MediaWiki — no licence line) and the About page it links (no body)",
+    "allows": "not stated (no licence is published)",
+    "excludes": "not stated (no licence is published)",
+    "requests": "not stated; credited by link, as this repo credits every harddrop page it reads",
+    "how_met": "source link to the harddrop page in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty (a blank cell or {{pfrowblank}})",
+    "i o s z j l": "a live cell of that piece (the page's single upper-case letter)",
+    "c": "a cell placed before this diagram, drawn grey G (checked: exactly what the board this one continues leaves after its spin)",
+    "U": "the T, drawn in the slot whose rows it completes: the page writes it P (purple), and T on the four PC boards (OUR READING, one letter for both)",
+    "J L O S Z": "a muted cell of that piece, the page's two-letter L<x> (DT Cannon continuation): residue of the C-Spin, drawn dimmed",
+    "v": "the page's apostrophe: the cells the Z leaves when it goes on the J instead (checked: exactly 3.second.cspin's z cells)",
+    "%X": "the X piece",
+    "label_jp": "the source's own words (here English): a heading path or a bold label, never a caption of ours"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": null,
+      "verbatim": "'''SDPC Spin''' is an opener invented by Ecchou. It sends the same amount of attack as [[Stickspin]], but has a simpler third bag."
+    },
+    {
+      "id": "bag1.sdpc",
+      "figure": null,
+      "verbatim": "The first bag is stacked the same way as [[SDPC]]."
+    },
+    {
+      "id": "bag3.ways",
+      "figure": "two",
+      "verbatim": "There are two main ways to stack the third bag. The first is always possible, but the second results in a flatter stack."
+    },
+    {
+      "id": "bag3.third",
+      "figure": null,
+      "verbatim": "If S comes before O, the third build can also be stacked."
+    },
+    {
+      "id": "bag3.center",
+      "figure": null,
+      "verbatim": "If the first build or third build is used, the center area must be filled in to complete the T-Spin Double. This can be done freestyle or using the [[STMB Cave]] continuation below."
+    },
+    {
+      "id": "first.heading",
+      "figure": null,
+      "verbatim": "===First C-Spin build==="
+    },
+    {
+      "id": "cave.heading",
+      "figure": null,
+      "verbatim": "'''[[STMB Cave]] into [[STSD]]'''"
+    },
+    {
+      "id": "cave.author",
+      "figure": null,
+      "verbatim": "Created by stickmancomic."
+    },
+    {
+      "id": "cave.requires",
+      "figure": null,
+      "verbatim": "This requires the first build to be taken for the third bag."
+    },
+    {
+      "id": "cave.j",
+      "figure": "two",
+      "verbatim": "J needs to come before at least two of T, L, and Z."
+    },
+    {
+      "id": "trinity",
+      "figure": null,
+      "verbatim": "Alternatively, one can build a [[Trinity]] on the fifth bag, leaving cleaner residue."
+    },
+    {
+      "id": "trinity.after",
+      "figure": null,
+      "verbatim": "From here it is possible to upstack or [[Donation|donate]] a TSD."
+    },
+    {
+      "id": "second.heading",
+      "figure": null,
+      "verbatim": "===Second C-Spin build==="
+    },
+    {
+      "id": "second.covers",
+      "figure": "73.33%",
+      "verbatim": "Covers 73.33% of all bags."
+    },
+    {
+      "id": "second.z_early",
+      "figure": null,
+      "verbatim": "If Z comes too early, one can sometimes put Z on top of the J piece."
+    },
+    {
+      "id": "alt.heading",
+      "figure": null,
+      "verbatim": "'''Alternate fourth bag'''"
+    },
+    {
+      "id": "alt.pc12",
+      "figure": "68.10% / 12-line",
+      "verbatim": "If I is saved, there is a 68.10% chance of being able to do a 12-line perfect clear.",
+      "note": "no 12-line PC is drawn; nothing here re-derives 68.10%"
+    },
+    {
+      "id": "alt.transition",
+      "figure": null,
+      "verbatim": "Otherwise, one can transition into [[6-3]] or [[5-4]]."
+    },
+    {
+      "id": "dt.heading",
+      "figure": null,
+      "verbatim": "'''DT Cannon continuation'''"
+    },
+    {
+      "id": "dt",
+      "figure": null,
+      "verbatim": "One can build a DT Cannon with the residue after completing the C-Spin."
+    },
+    {
+      "id": "cspin_first.heading",
+      "figure": null,
+      "verbatim": "'''First build'''"
+    },
+    {
+      "id": "cspin_first.covers",
+      "figure": "91.67%",
+      "verbatim": "Covers 91.67% of all fifth bags, leading into 6-3."
+    },
+    {
+      "id": "cspin_second.heading",
+      "figure": null,
+      "verbatim": "'''Second builds'''"
+    },
+    {
+      "id": "cspin_second.author",
+      "figure": null,
+      "verbatim": "Made by swng."
+    },
+    {
+      "id": "o_first",
+      "figure": null,
+      "verbatim": "'''O before L'''"
+    },
+    {
+      "id": "l_first",
+      "figure": null,
+      "verbatim": "'''L before O'''"
+    },
+    {
+      "id": "third.heading",
+      "figure": null,
+      "verbatim": "===Third C-Spin build==="
+    },
+    {
+      "id": "third.imperial",
+      "figure": null,
+      "verbatim": "An [[Imperial Cross]] can sometimes be built."
+    },
+    {
+      "id": "third.pc",
+      "figure": "99.68% / 14-line / 4",
+      "verbatim": "From here, there is a 99.68% chance of a 14-line Perfect Clear with 4 minimals.",
+      "note": "14 is re-derived along the base chain (`lines:`); 99.68% is not"
+    },
+    {
+      "id": "third.transition",
+      "figure": null,
+      "verbatim": "The setups below can transition to the second C-Spin build. For the second diagram hold O and [[tuck]] it after taking the TSD."
+    }
+  ],
+  "bag1": {
+    "locks": 7,
+    "spin": "TSS",
+    "t_orientation": "flat",
+    "sdpc_verbatim": "The first bag is stacked the same way as [[SDPC]].",
+    "colourings": [
+      "bag1.lj",
+      "bag1.jl"
+    ],
+    "colourings_note": "one occupancy, two colourings, NOT mirrors (checked): the page draws the I at the left wall in both and divides the J and L cells of columns 1-4 two ways. bag1.jl is stick spin's bag1.pc mirrored; bag1.lj is the J/L split stick spin's test names",
+    "stickspin": {
+      "jl": "bag1.pc",
+      "after": "bag1.pc.after",
+      "how": "mirrored"
+    },
+    "catalogue_name_contains": "SDPC-Spin",
+    "catalogue_note": "Ivan's compound entry (SDPC / Motchi PC / Stickspin / SDPC-Spin / …): its four fields are the flat-T board (bag1.lj / bag1.jl, T placed, as drawn and mirrored, by occupancy) and the stood-T board (stick spin's bag1.fire, which this page does not draw). Checked both ways by `catalogue:`",
+    "mirror_note": "the page draws no mirrored bag 1 and names no side; the mirror is the classifier's business",
+    "requires": {},
+    "requires_note": "the page states no bag-1 piece order or early piece; empty, not absent, so the shared demo check reads \"no early piece\" from the transcription itself"
+  },
+  "basic_form": [],
+  "groups": [
+    {
+      "id": "bag1.sdpc",
+      "heading": "First bag",
+      "drawn": 2,
+      "text_verbatim": "The first bag is stacked the same way as [[SDPC]].",
+      "note": "one occupancy, two J/L colourings (bag1.after, the third board of the table, is their after board)"
+    },
+    {
+      "id": "3.build",
+      "heading": "Third bag",
+      "drawn": 3,
+      "text_verbatim": "There are two main ways to stack the third bag. The first is always possible, but the second results in a flatter stack."
+    },
+    {
+      "id": "3.second.alt",
+      "heading": "Second C-Spin build / Alternate fourth bag",
+      "drawn": 2
+    },
+    {
+      "id": "3.second.cspin.dt",
+      "heading": "Second C-Spin build / DT Cannon continuation",
+      "drawn": 2
+    },
+    {
+      "id": "3.second.cspin.first",
+      "heading": "Second C-Spin build / First build",
+      "drawn": 2,
+      "reading": "one build, its T drawn in two slots (equal colour for colour once the U cells are removed, checked); which fires first is not stated"
+    },
+    {
+      "id": "3.second.cspin.o_first",
+      "heading": "Second C-Spin build / Second builds / O before L",
+      "drawn": 2,
+      "reading": "as 3.second.cspin.first"
+    },
+    {
+      "id": "3.second.cspin.l_first",
+      "heading": "Second C-Spin build / Second builds / L before O",
+      "drawn": 4,
+      "reading": "two builds (the I at the right wall, the I at column 6), each its T in two slots"
+    },
+    {
+      "id": "3.third.transition",
+      "heading": "Third C-Spin build",
+      "drawn": 2,
+      "text_verbatim": "The setups below can transition to the second C-Spin build. For the second diagram hold O and [[tuck]] it after taking the TSD."
+    }
+  ],
+  "lists": [
+    {
+      "id": "3.third.imperial.pc",
+      "parent": "3.third.imperial",
+      "base": "3.third.imperial",
+      "bag": 5,
+      "heading": "Third C-Spin build",
+      "stated_pattern_count": 4,
+      "shown": 4,
+      "rest_stated": 0,
+      "complete": true,
+      "count_note": "the page's 「4 minimals」: a minimal solution set the page gives its 99.68% over, read as complete for that reason",
+      "rate_verbatim": "From here, there is a 99.68% chance of a 14-line Perfect Clear with 4 minimals.",
+      "pc_lines": 8,
+      "total_lines": 14,
+      "total_lines_quote": "third.pc",
+      "pc_lines_note": "the 6-row body plus the Imperial Cross's first TSD before it; the page's 14-line counts every spin from bag 1 (TSS 1 + TSD 2 + TST 3 + TSD 2 + 6), re-derived along the base chain by `lines:`",
+      "drawn": 4
+    }
+  ],
+  "slot_flags": {
+    "u_flat_bottom": "the pattern's T (U) is the flat UUU-over-U shape in its bottom two body rows: the Imperial Cross's second TSD slot, filled as the Perfect Clear's last spin"
+  },
+  "known_discrepancies": [
+    {
+      "id": "3.second.cspin.dt#1:colour",
+      "what": "the DT Cannon board draws the C-Spin's residue muted (LJ LZ LS LL LO) except the bag-3 I at the left wall, which it draws as a live I: so the board carries two live I pieces, the old one and the new one at column 9 (checked: the cells the residue leaves unmuted are exactly that I)"
+    },
+    {
+      "id": "3.second.cspin.dt#2:colour",
+      "what": "as #1: the residue's bag-3 I drawn live beside the new I at column 6"
+    }
+  ],
+  "page_order": [
+    "bag1.lj",
+    "bag1.jl",
+    "bag1.after",
+    "2.tsd",
+    "2.after",
+    "3.first",
+    "3.second",
+    "3.third",
+    "3.first.cave",
+    "3.first.cave.stsd",
+    "3.first.cave.stsd.next",
+    "3.first.trinity",
+    "3.first.trinity.tsd",
+    "3.first.trinity.tss",
+    "3.second.cspin",
+    "3.second.cspin.z_early",
+    "3.second.alt#1",
+    "3.second.alt#2",
+    "3.second.cspin.dt#1",
+    "3.second.cspin.dt#2",
+    "3.second.cspin.first#1",
+    "3.second.cspin.first#2",
+    "3.second.cspin.o_first#1",
+    "3.second.cspin.o_first#2",
+    "3.second.cspin.l_first#1",
+    "3.second.cspin.l_first#2",
+    "3.second.cspin.l_first#3",
+    "3.second.cspin.l_first#4",
+    "3.third.imperial",
+    "3.third.imperial.pc#1",
+    "3.third.imperial.pc#2",
+    "3.third.imperial.pc#3",
+    "3.third.imperial.pc#4",
+    "3.third.transition#1",
+    "3.third.transition#2"
+  ],
+  "nodes": [
+    {
+      "id": "bag1.lj.left",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "derived": true,
+      "derived_from": "bag1.lj",
+      "label": "bag 1, less its T (derived: the TSS board with its U cells removed)",
+      "rows": [
+        "----------",
+        "--------s-",
+        "i-------ss",
+        "ilj------s",
+        "iljjjzz-oo",
+        "ill---zzoo"
+      ]
+    },
+    {
+      "id": "bag1.lj",
+      "bag": 1,
+      "parent": "bag1.lj.left",
+      "locks": 7,
+      "spin": "TSS",
+      "label_jp": "First bag",
+      "label": "bag 1, the T laid flat into a T-spin Single; the L under the J at column 1 (the J/L split)",
+      "group": "bag1.sdpc",
+      "variant": 1,
+      "rows": [
+        "----------",
+        "--------s-",
+        "i-------ss",
+        "ilj---UUUs",
+        "iljjjzzUoo",
+        "ill---zzoo"
+      ],
+      "spin_of": "bag1.lj.left"
+    },
+    {
+      "id": "bag1.jl.left",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "derived": true,
+      "derived_from": "bag1.jl",
+      "label": "bag 1, less its T (derived: the TSS board with its U cells removed)",
+      "rows": [
+        "----------",
+        "--------s-",
+        "i-------ss",
+        "ijj------s",
+        "ijlllzz-oo",
+        "ijl---zzoo"
+      ]
+    },
+    {
+      "id": "bag1.jl",
+      "bag": 1,
+      "parent": "bag1.jl.left",
+      "locks": 7,
+      "spin": "TSS",
+      "label_jp": "First bag",
+      "label": "bag 1, the T laid flat into a T-spin Single; the J at column 1 (stick spin's bag1.pc, mirrored)",
+      "group": "bag1.sdpc",
+      "variant": 2,
+      "rows": [
+        "----------",
+        "--------s-",
+        "i-------ss",
+        "ijj---UUUs",
+        "ijlllzzUoo",
+        "ijl---zzoo"
+      ],
+      "spin_of": "bag1.jl.left"
+    },
+    {
+      "id": "bag1.after",
+      "bag": 1,
+      "parent": "bag1.sdpc",
+      "label_jp": "First bag",
+      "label": "bag 1 after the TSS, in grey (both colourings collapse to it; checked)",
+      "node_kind": "illustration",
+      "after_of": "bag1.lj",
+      "also_after_of": "bag1.jl",
+      "rows": [
+        "----------",
+        "----------",
+        "--------c-",
+        "c-------cc",
+        "ccc---cccc",
+        "ccc---cccc"
+      ]
+    },
+    {
+      "id": "2.tsd",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.after",
+      "spin": "TSD",
+      "label_jp": "Second bag",
+      "label": "bag 2, the T laid flat into a TSD under the bag-1 residue",
+      "rows": [
+        "----------",
+        "---------i",
+        "-j-----ooi",
+        "-j----sooi",
+        "jj-l--ssci",
+        "clllUUUscc",
+        "ccczzUcccc",
+        "ccc-zzcccc"
+      ]
+    },
+    {
+      "id": "2.after",
+      "bag": 2,
+      "parent": "2.tsd",
+      "label_jp": "Second bag",
+      "label": "bag 2 after the TSD, in grey",
+      "node_kind": "illustration",
+      "after_of": "2.tsd",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------c",
+        "-c-----ccc",
+        "-c----cccc",
+        "cc-c--cccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.first",
+      "bag": 3,
+      "parent": "2.tsd",
+      "base": "2.after",
+      "spin": "TST",
+      "label_jp": "Third bag",
+      "label": "bag 3, the first build (「always possible」): the T stood up into the C-Spin's TST",
+      "group": "3.build",
+      "variant": 1,
+      "rows": [
+        "----------",
+        "--------s-",
+        "--z-----ss",
+        "izz----oos",
+        "iz-----ooc",
+        "icUlljjccc",
+        "icUUljcccc",
+        "ccUcljcccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second",
+      "bag": 3,
+      "parent": "2.tsd",
+      "base": "2.after",
+      "spin": "TST",
+      "label_jp": "Third bag",
+      "label": "bag 3, the second build (「a flatter stack」): the O and S lower than in the first",
+      "group": "3.build",
+      "variant": 2,
+      "rows": [
+        "----------",
+        "----------",
+        "--z-------",
+        "izz--oo-ss",
+        "iz---oossc",
+        "icUlljjccc",
+        "icUUljcccc",
+        "ccUcljcccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.third",
+      "bag": 3,
+      "parent": "2.tsd",
+      "base": "2.after",
+      "spin": "TST",
+      "label_jp": "Third bag",
+      "label": "bag 3, the third build (S before O): the O on the S at the right",
+      "group": "3.build",
+      "variant": 3,
+      "condition_verbatim": "If S comes before O, the third build can also be stacked.",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "S",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "S",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "condition_note": "the page's order; the board forces it (an O cell rests on an S cell)",
+      "rows": [
+        "----------",
+        "--------oo",
+        "--z-----oo",
+        "izz-----ss",
+        "iz-----ssc",
+        "icUlljjccc",
+        "icUUljcccc",
+        "ccUcljcccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.first.cave",
+      "bag": 4,
+      "parent": "3.first",
+      "base": "3.first",
+      "spin": "TSD",
+      "label_jp": "First C-Spin build / STMB Cave into STSD",
+      "label": "first build, bag 4: the STMB Cave, its T into the TSD at the centre",
+      "requires_verbatim": "This requires the first build to be taken for the third bag.",
+      "condition_verbatim": "J needs to come before at least two of T, L, and Z.",
+      "condition": {
+        "at_least": {
+          "before": "J",
+          "count": 2,
+          "of": [
+            "T",
+            "L",
+            "Z"
+          ]
+        }
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "J",
+            "T"
+          ],
+          "by": "support"
+        },
+        {
+          "before": [
+            "J",
+            "L"
+          ],
+          "by": null,
+          "note": "stated (at least two of three): the board does not force it, no L cell rests on the J"
+        },
+        {
+          "before": [
+            "J",
+            "Z"
+          ],
+          "by": null,
+          "note": "stated (at least two of three): the board does not force it, no Z cell rests on the J"
+        }
+      ],
+      "condition_note": "OUR READING of 「at least two of T, L, and Z」 as J before any two of the three; the board forces only J before T",
+      "rows": [
+        "----------",
+        "-------s-i",
+        "-------ssi",
+        "------llsi",
+        "oozzUUUlci",
+        "ooczzUjlcc",
+        "ccc---jccc",
+        "cc---jjccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.first.cave.stsd",
+      "bag": 5,
+      "parent": "3.first.cave",
+      "base": "3.first.cave",
+      "spin": "TSD",
+      "label_jp": "First C-Spin build / STMB Cave into STSD",
+      "label": "first build, bag 5: the STSD, its T into the TSD at the bottom",
+      "unmatchable": "9 non-empty rows > ROWS = 8",
+      "rows": [
+        "------s---",
+        "------ss-z",
+        "i----llszz",
+        "i-----lczc",
+        "ioojj-lccc",
+        "iooj--cccc",
+        "cccj--cccc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.first.cave.stsd.next",
+      "bag": 6,
+      "parent": "3.first.cave.stsd",
+      "base": "3.first.cave.stsd",
+      "spin": "TSD",
+      "label_jp": "First C-Spin build / STMB Cave into STSD",
+      "label": "first build, after the STSD: an O and the T into the next TSD (the T stood up)",
+      "bag_note": "OUR READING: the two pieces after a 7-piece bag 5 are bag 6",
+      "rows": [
+        "----------",
+        "----------",
+        "------c---",
+        "------cc-c",
+        "coo--ccccc",
+        "coo---cccc",
+        "cccccUcccc",
+        "ccccUUcccc",
+        "cccc-Ucccc"
+      ]
+    },
+    {
+      "id": "3.first.trinity",
+      "bag": 5,
+      "parent": "3.first.cave",
+      "base": "3.first.cave",
+      "spin": "TSD",
+      "label_jp": "First C-Spin build",
+      "label_jp_note": "the heading only: the bold 「STMB Cave into STSD」 labels the table before; this one follows 「Alternatively, one can build a Trinity on the fifth bag」",
+      "label": "first build, bag 5: a Trinity instead of the STSD, its T into the TSD at the bottom",
+      "text_verbatim": "Alternatively, one can build a [[Trinity]] on the fifth bag, leaving cleaner residue.",
+      "rows": [
+        "----------",
+        "---------z",
+        "i-ss--jjzz",
+        "iss---jczc",
+        "ioo-lljccc",
+        "ioo--lcccc",
+        "ccc--lcccc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.first.trinity.tsd",
+      "bag": 6,
+      "parent": "3.first.trinity",
+      "base": "3.first.trinity",
+      "spin": "TSD",
+      "label_jp": "First C-Spin build",
+      "label": "Trinity, the T alone into the cave its TSD leaves (the T stood up)",
+      "bag_note": "OUR READING: placed after bag 5",
+      "order_note": "this board and 3.first.trinity.tss both rest on 3.first.trinity after its TSD and neither holds the other's T (checked): the page does not say which T fires first",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------c",
+        "c-cc--cccc",
+        "ccc---cccc",
+        "cccUcccccc",
+        "cccUUccccc",
+        "cccU-ccccc"
+      ]
+    },
+    {
+      "id": "3.first.trinity.tss",
+      "bag": 6,
+      "parent": "3.first.trinity",
+      "base": "3.first.trinity",
+      "spin": "TSS",
+      "label_jp": "First C-Spin build",
+      "label": "Trinity, a Z and an S and the T laid flat over the left wall: one row",
+      "bag_note": "OUR READING: placed after bag 5",
+      "order_note": "see 3.first.trinity.tsd",
+      "rows": [
+        "----------",
+        "----------",
+        "--zz------",
+        "UUUzzss--c",
+        "cUccsscccc",
+        "ccc---cccc",
+        "ccc-cccccc",
+        "ccc--ccccc",
+        "ccc--ccccc"
+      ]
+    },
+    {
+      "id": "3.first.trinity.donate",
+      "bag": 6,
+      "parent": "3.first.trinity",
+      "node_kind": "text_only",
+      "label": "after the Trinity: upstack, or donate a TSD (no board)",
+      "page_text": "From here it is possible to upstack or [[Donation|donate]] a TSD."
+    },
+    {
+      "id": "3.second.cspin",
+      "bag": 4,
+      "parent": "3.second",
+      "base": "3.second",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build",
+      "label": "second build, bag 4: the C-Spin's TSD at the bottom",
+      "text_verbatim": "Covers 73.33% of all bags.",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "i---------",
+        "ijj----lll",
+        "ij---zsloo",
+        "ijc-zzssoo",
+        "ccc-zccscc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.z_early",
+      "bag": 4,
+      "parent": "3.second",
+      "base": "3.second",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build",
+      "label": "second build, bag 4, when the Z comes too early: the Z on the J, its usual cells marked",
+      "text_verbatim": "If Z comes too early, one can sometimes put Z on top of the J piece.",
+      "vacated_of": "3.second.cspin",
+      "unmatchable": "draws one Z twice (on the J, and its usual cells marked with apostrophes): not one board state; and 9 non-empty rows > ROWS = 8",
+      "rows": [
+        "----------",
+        "--z-------",
+        "-zz-------",
+        "iz--------",
+        "ijj----lll",
+        "ij---vsloo",
+        "ijc-vvssoo",
+        "ccc-vccscc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.second.alt#1",
+      "bag": 4,
+      "parent": "3.second",
+      "base": "3.second",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Alternate fourth bag",
+      "label": "second build, alternate bag 4 with the I held: J and Z at the left wall",
+      "group": "3.second.alt",
+      "variant": 1,
+      "hold": "I",
+      "hold_verbatim": "If I is saved, there is a 68.10% chance of being able to do a 12-line perfect clear.",
+      "rows": [
+        "----------",
+        "jjz----lll",
+        "jzz---sloo",
+        "jzc---ssoo",
+        "ccc--ccscc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.second.alt#2",
+      "bag": 4,
+      "parent": "3.second",
+      "base": "3.second",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Alternate fourth bag",
+      "label": "second build, alternate bag 4 with the I held: L and O at the left wall",
+      "group": "3.second.alt",
+      "variant": 2,
+      "hold": "I",
+      "hold_verbatim": "If I is saved, there is a 68.10% chance of being able to do a 12-line perfect clear.",
+      "rows": [
+        "----------",
+        "loo----jjj",
+        "loo---szzj",
+        "llc---sszz",
+        "ccc--ccscc",
+        "ccUUUccccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.second.alt.pc12",
+      "bag": 5,
+      "parent": "3.second.alt",
+      "node_kind": "text_only",
+      "label": "with the I held, a 12-line Perfect Clear (no board drawn)",
+      "page_text": "If I is saved, there is a 68.10% chance of being able to do a 12-line perfect clear."
+    },
+    {
+      "id": "3.second.alt.transition",
+      "bag": 5,
+      "parent": "3.second.alt",
+      "node_kind": "text_only",
+      "label": "otherwise, into 6-3 or 5-4 (no board drawn)",
+      "page_text": "Otherwise, one can transition into [[6-3]] or [[5-4]]."
+    },
+    {
+      "id": "3.second.cspin.dt#1",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "residue_of": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / DT Cannon continuation",
+      "label": "second build, DT Cannon on the C-Spin's residue: the new I at the right wall",
+      "group": "3.second.cspin.dt",
+      "variant": 1,
+      "text_verbatim": "One can build a DT Cannon with the residue after completing the C-Spin.",
+      "residue_note": "no `base`: the residue is drawn muted (upper case), not grey, so the shared c-cells rule cannot read it. `residue:` checks c plus the muted cells plus the one I drawn live are exactly 3.second.cspin after its TSD, letter for letter",
+      "live_residue": "i",
+      "rows": [
+        "----------",
+        "---------i",
+        "s-jj--oo-i",
+        "ssj---ooli",
+        "isj-zzllli",
+        "iJJ--zzLLL",
+        "iJUUUZSLOO",
+        "iJcUZZSSOO",
+        "ccc-ZccScc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.dt#2",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "residue_of": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / DT Cannon continuation",
+      "label": "second build, DT Cannon on the C-Spin's residue: the new I at column 6",
+      "group": "3.second.cspin.dt",
+      "variant": 2,
+      "text_verbatim": "One can build a DT Cannon with the residue after completing the C-Spin.",
+      "live_residue": "i",
+      "rows": [
+        "----------",
+        "------i---",
+        "s-jj--i-ll",
+        "ssj---iool",
+        "isj-zziool",
+        "iJJ--zzLLL",
+        "iJUUUZSLOO",
+        "iJcUZZSSOO",
+        "ccc-ZccScc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.first#1",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / First build",
+      "label": "second build, bag 5, first build: the T in the residue's slot at the bottom",
+      "group": "3.second.cspin.first",
+      "variant": 1,
+      "t_slot": "residue",
+      "text_verbatim": "Covers 91.67% of all fifth bags, leading into 6-3.",
+      "unmatchable": "9 non-empty rows > ROWS = 8",
+      "rows": [
+        "----------",
+        "i---------",
+        "i---------",
+        "i-z---oos-",
+        "izz--jooss",
+        "cz---jllls",
+        "ccc-jjlccc",
+        "ccUUUccccc",
+        "cccUcccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.first#2",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / First build",
+      "label": "second build, bag 5, first build: the T in the slot the build makes",
+      "group": "3.second.cspin.first",
+      "variant": 2,
+      "t_slot": "build",
+      "text_verbatim": "Covers 91.67% of all fifth bags, leading into 6-3.",
+      "unmatchable": "9 non-empty rows > ROWS = 8",
+      "rows": [
+        "----------",
+        "i---------",
+        "i---------",
+        "i-z---oos-",
+        "izz--jooss",
+        "czUUUjllls",
+        "cccUjjlccc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.o_first#1",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / O before L",
+      "label": "second build, bag 5, swng's build with the O before the L: the T in the residue's slot",
+      "group": "3.second.cspin.o_first",
+      "variant": 1,
+      "t_slot": "residue",
+      "condition_verbatim": "'''O before L'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "L"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "O",
+            "L"
+          ],
+          "by": "support"
+        }
+      ],
+      "condition_note": "the page's order; the board forces it (an L cell rests on an O cell)",
+      "rows": [
+        "----------",
+        "-----z----",
+        "s---zzi-ll",
+        "ss--zjiool",
+        "cs---jiool",
+        "ccc-jjiccc",
+        "ccUUUccccc",
+        "cccUcccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.o_first#2",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / O before L",
+      "label": "second build, bag 5, O before L: the T in the slot the build makes",
+      "group": "3.second.cspin.o_first",
+      "variant": 2,
+      "t_slot": "build",
+      "condition_verbatim": "'''O before L'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "O",
+              "L"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "O",
+            "L"
+          ],
+          "by": "support"
+        }
+      ],
+      "rows": [
+        "----------",
+        "-----z----",
+        "s---zzi-ll",
+        "ss--zjiool",
+        "csUUUjiool",
+        "cccUjjiccc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.l_first#1",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / L before O",
+      "label": "second build, bag 5, L before O, the I at the right wall: the T in the residue's slot",
+      "group": "3.second.cspin.l_first",
+      "variant": 1,
+      "t_slot": "residue",
+      "build": 1,
+      "condition_verbatim": "'''L before O'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "L",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "condition_note": "the page's order; the board forces it (an O cell rests on an L cell)",
+      "rows": [
+        "----------",
+        "-----z---i",
+        "s---zz-ooi",
+        "ss--zj-ooi",
+        "cs---jllli",
+        "ccc-jjlccc",
+        "ccUUUccccc",
+        "cccUcccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.l_first#2",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / L before O",
+      "label": "second build, bag 5, L before O, the I at the right wall: the T in the slot the build makes",
+      "group": "3.second.cspin.l_first",
+      "variant": 2,
+      "t_slot": "build",
+      "build": 1,
+      "condition_verbatim": "'''L before O'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "L",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "rows": [
+        "----------",
+        "-----z---i",
+        "s---zz-ooi",
+        "ss--zj-ooi",
+        "csUUUjllli",
+        "cccUjjlccc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.l_first#3",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / L before O",
+      "label": "second build, bag 5, L before O, the I at column 6: the T in the residue's slot",
+      "group": "3.second.cspin.l_first",
+      "variant": 3,
+      "t_slot": "residue",
+      "build": 2,
+      "condition_verbatim": "'''L before O'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "L",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "rows": [
+        "----------",
+        "-----z----",
+        "s---zzioo-",
+        "ss--zjiool",
+        "cs---jilll",
+        "ccc-jjiccc",
+        "ccUUUccccc",
+        "cccUcccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.second.cspin.l_first#4",
+      "bag": 5,
+      "parent": "3.second.cspin",
+      "base": "3.second.cspin",
+      "spin": "TSD",
+      "label_jp": "Second C-Spin build / Second builds / L before O",
+      "label": "second build, bag 5, L before O, the I at column 6: the T in the slot the build makes",
+      "group": "3.second.cspin.l_first",
+      "variant": 4,
+      "t_slot": "build",
+      "build": 2,
+      "condition_verbatim": "'''L before O'''",
+      "condition": {
+        "all": [
+          {
+            "before": [
+              "L",
+              "O"
+            ]
+          }
+        ]
+      },
+      "condition_evidence": [
+        {
+          "before": [
+            "L",
+            "O"
+          ],
+          "by": "support"
+        }
+      ],
+      "rows": [
+        "----------",
+        "-----z----",
+        "s---zzioo-",
+        "ss--zjiool",
+        "csUUUjilll",
+        "cccUjjiccc",
+        "cc---ccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "3.third.imperial",
+      "bag": 4,
+      "parent": "3.third",
+      "base": "3.third",
+      "spin": "TSD",
+      "label_jp": "Third C-Spin build",
+      "label": "third build, bag 4: an Imperial Cross, its first T into rows 5 and 7 (not adjacent)",
+      "text_verbatim": "An [[Imperial Cross]] can sometimes be built.",
+      "rows": [
+        "----------",
+        "i------jjj",
+        "i------ssj",
+        "illl--sscc",
+        "ilc---oocc",
+        "cccUzzoocc",
+        "ccUU-zzccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.third.imperial.pc#1",
+      "bag": 5,
+      "parent": "3.third.imperial",
+      "base": "3.third.imperial",
+      "list": "3.third.imperial.pc",
+      "index": 1,
+      "listed_under": "shown",
+      "label_jp": "Third C-Spin build 1",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "lljjooiiii",
+        "cljsoozccc",
+        "cljsszzccc",
+        "ccccszcccc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "u_flat_bottom": true
+    },
+    {
+      "id": "3.third.imperial.pc#2",
+      "bag": 5,
+      "parent": "3.third.imperial",
+      "base": "3.third.imperial",
+      "list": "3.third.imperial.pc",
+      "index": 2,
+      "listed_under": "shown",
+      "label_jp": "Third C-Spin build 2",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "lljjzziiii",
+        "cljoozzccc",
+        "cljoossccc",
+        "ccccsscccc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "u_flat_bottom": true
+    },
+    {
+      "id": "3.third.imperial.pc#3",
+      "bag": 5,
+      "parent": "3.third.imperial",
+      "base": "3.third.imperial",
+      "list": "3.third.imperial.pc",
+      "index": 3,
+      "listed_under": "shown",
+      "label_jp": "Third C-Spin build 3",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "lljjssiiii",
+        "cljssooccc",
+        "cljzzooccc",
+        "cccczzcccc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "u_flat_bottom": true
+    },
+    {
+      "id": "3.third.imperial.pc#4",
+      "bag": 5,
+      "parent": "3.third.imperial",
+      "base": "3.third.imperial",
+      "list": "3.third.imperial.pc",
+      "index": 4,
+      "listed_under": "shown",
+      "label_jp": "Third C-Spin build 4",
+      "pieces": "ijlostz",
+      "rows": [
+        "----------",
+        "zzjjjsiiii",
+        "czzljssccc",
+        "cllloosccc",
+        "ccccoocccc",
+        "cccUUUcccc",
+        "ccccUccccc"
+      ],
+      "u_flat_bottom": true
+    },
+    {
+      "id": "3.third.transition#1",
+      "bag": 4,
+      "parent": "3.third",
+      "base": "3.third",
+      "spin": "TSD",
+      "label_jp": "Third C-Spin build",
+      "label": "third build, bag 4: a TSD that leaves the second C-Spin build's residue",
+      "group": "3.third.transition",
+      "variant": 1,
+      "transition_to": "3.second.cspin",
+      "text_verbatim": "The setups below can transition to the second C-Spin build. For the second diagram hold O and [[tuck]] it after taking the TSD.",
+      "rows": [
+        "i---------",
+        "ijj----lll",
+        "ij---zslcc",
+        "ijc-zzsscc",
+        "ccc-zooscc",
+        "ccUUUooccc",
+        "cccUcccccc"
+      ]
+    },
+    {
+      "id": "3.third.transition#2",
+      "bag": 4,
+      "parent": "3.third",
+      "base": "3.third",
+      "spin": "TSD",
+      "label_jp": "Third C-Spin build",
+      "label": "third build, bag 4: the same, the O held and tucked after the TSD",
+      "group": "3.third.transition",
+      "variant": 2,
+      "transition_to": "3.second.cspin",
+      "hold": "O",
+      "hold_verbatim": "The setups below can transition to the second C-Spin build. For the second diagram hold O and [[tuck]] it after taking the TSD.",
+      "hold_note": "the page's instruction; the board draws the O where it ends after the tuck, so nothing here checks the hold",
+      "rows": [
+        "i---------",
+        "ijj----lll",
+        "ij---zzlcc",
+        "ijc-oozzcc",
+        "ccc-oosscc",
+        "ccUUUssccc",
+        "cccUcccccc"
+      ]
+    }
+  ]
+}

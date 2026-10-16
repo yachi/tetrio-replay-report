@@ -691,6 +691,19 @@ jobs:
       - name: Check the Gamushiro Stacking route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
 
+      # The SDPC Spin route transcription, through the same shared gate. Its source is harddrop's
+      # SDPC_Spin page read as wikitext (not shiwehi.com HTML), and bag 1 is cross-checked against
+      # harddrop's SingleYou page (table 0), stick spin's bag1.pc mirrored and Ivan's catalogue entry;
+      # bag 2 onward has no second source. Neither .wikitext snapshot is committed, so CI checks the
+      # transcription and the gate's teeth only. Its corpus artefact and demos are checked by
+      # pipeline/openers/sdpcspin.test.ts and sdpcspin-demos.test.ts, which the typescript job's
+      # whole-suite `bun test` picks up.
+      - name: Check the SDPC Spin route transcription
+        run: python3 -m pipeline.openers.extract_sdpcspin_routes
+
+      - name: Check the SDPC Spin route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_sdpcspin_routes --selftest
+
       # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
       # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
       # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the
@@ -718,6 +731,13 @@ jobs:
       # typescript job. A reference opener the corpus barely plays: only the bag-1-only node page.
       - name: Check the Gamushiro Stacking page audit catches its corruptions
         run: python3 -m pipeline.gamushiro_page --selftest
+
+      # The SDPC Spin route pages, the same shared renderer bound to pipeline/sdpcspin_page.py;
+      # build-docs --check below re-renders them, and the constructed demos (sdpcspin-demos.html) are
+      # checked by pipeline/openers/sdpcspin-demos.test.ts in the typescript job. One bag-2 page
+      # (sdpcspin-tsd.html), since the source draws one bag-2 board, plus the bag-1-only page.
+      - name: Check the SDPC Spin page audit catches its corruptions
+        run: python3 -m pipeline.sdpcspin_page --selftest
 
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check

@@ -44,9 +44,11 @@ A list may carry its own `pc_lines` (a 4-line PC drawn in bag 2; a PC after two 
 plus the last spin is not the spec's figure); a list node drawn in bag 2 is checked as a PC with no
 spin before it, and is left out of the bag-2 board distinctness (its list rule covers it).
 
-`--html-dir` re-checks a refetched snapshot — a markdown rendering (迷走砲, はちみつ砲) or the raw
-HTML (山岳積み2号): every board in page order, every non-board feature's `page_text`; and, for a
-routes file carrying a `cross_source` page, that page re-parsed in the same directory.
+`--html-dir` re-checks a refetched snapshot — a markdown rendering (迷走砲, はちみつ砲), the raw
+HTML (山岳積み2号) or a harddrop page's wikitext (SDPC Spin, `.wikitext`, read by `wikitext_tables`):
+every board in page order, every non-board feature's `page_text`; and, for a routes file carrying a
+`cross_source` page, that page re-parsed in the same directory (a `harddrop_wikitext` cross-source by
+the same wikitext reader, one recorded table).
 """
 from __future__ import annotations
 
@@ -105,6 +107,10 @@ class TranscriptionSpec:
     #: {'nodes': [node ids]}: rule 2 against a harddrop page `wiki-openers.json` does not carry, whose
     #: fields the routes file records in `cross_source` (ガムシロ積み); see `check_cross_source`
     harddrop_page: dict | None = None
+    #: {'nodes': [node ids]}: rule 2 against one table of another harddrop page's WIKITEXT (SDPC Spin's
+    #: bag 1 against SingleYou's), recorded in `cross_source` with kind `harddrop_wikitext`; the
+    #: fields are in this file's alphabet, read by `wikitext_tables` / `wikitext_cell`
+    harddrop_wikitext: dict | None = None
 
 
 # ── board geometry ─────────────────────────────────────────────────────────────────────────────
@@ -318,9 +324,10 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             bad.append(f'mirror-of: {n["id"]} is not {n["mirror_of"]} mirrored (J<->L, S<->Z)')
 
     # ── rule 2: cross-source against harddrop ──
-    if spec.harddrop is None and spec.catalogue is None and spec.harddrop_page is None:
+    if spec.harddrop is None and spec.catalogue is None and spec.harddrop_page is None \
+            and spec.harddrop_wikitext is None:
         bad.append('harddrop: the spec names no cross-source (neither harddrop nor a catalogue entry '
-                   'nor a harddrop page)')
+                   'nor a harddrop page nor a harddrop wikitext)')
     if spec.harddrop is not None:
         wiki = json.loads(WIKI.read_text())
         key, hnode = spec.harddrop['key'], spec.harddrop['node']
@@ -377,6 +384,32 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             hit |= mine & fields
         if fields and fields - hit:
             bad.append(f'harddrop-page: {len(fields - hit)} field(s) of the page match no named node')
+
+    if spec.harddrop_wikitext is not None:
+        # cell for cell in THIS file's alphabet: the fields were read by `wikitext_cell`, the same
+        # reading the opener's own page is read with
+        xs = data.get('cross_source') or {}
+        fields = {tuple(f) for f in xs.get('fields', [])}
+        if xs.get('kind') != 'harddrop_wikitext' or not fields:
+            bad.append('harddrop-wikitext: the routes file records no harddrop wikitext fields (cross_source)')
+        for k in ('url', 'oldid', 'fetched', 'fetch_method', 'snapshot_file', 'snapshot_sha256', 'parser'):
+            if not xs.get(k):
+                bad.append(f'harddrop-wikitext: cross_source provenance field {k!r} is missing')
+        if not isinstance(xs.get('table'), int):
+            bad.append('harddrop-wikitext: cross_source names no table index')
+        hit = set()
+        for hnode in spec.harddrop_wikitext['nodes']:
+            if hnode not in boards:
+                bad.append(f'harddrop-wikitext: {hnode} is missing')
+                continue
+            ours = bottom(boards[hnode], 0)
+            mine = {tuple(ours), tuple(mirror(ours))}
+            if not (mine & fields):
+                bad.append(f'harddrop-wikitext: {hnode} is no field of {xs.get("page")!r} table '
+                           f'{xs.get("table")} cell for cell, as drawn or mirrored')
+            hit |= mine & fields
+        if fields and fields - hit:
+            bad.append(f'harddrop-wikitext: {len(fields - hit)} field(s) of the table match no named node')
 
     # ── rule 3: internal consistency ──
     #: a list may name its own line count (a 4-line PC drawn in bag 2, a PC after more than one
@@ -566,6 +599,101 @@ def page_boards(md: str) -> list[list[str]]:
     return out
 
 
+#: harddrop wikitext (a page's `action=edit` source): `{| ... |}` tables of `{{pfstart}}` boards, one
+#: `{{pfrow|c|c|...}}` (ten cells) or `{{pfrowblank}}` per row; `{{sstart}}` / `{{srow}}` /
+#: `{{srowblank}}` are the small-size board (closed by `{{pfend}}` too), read the same way. Read over the
+#: WHOLE string, never by line: a saved snapshot can hold the page on one line.
+WIKI_TOKEN = re.compile(r'\{\||\|\}|\{\{(?:pf|s)start\}\}|\{\{pfend\}\}|\{\{(?:pf|s)rowblank\}\}'
+                        r'|\{\{(?:pf|s)row\|([^}]*)\}\}')
+
+
+def wikitext_tables(text: str) -> list[list[list[list[str]]]]:
+    """Every `{| |}` table of a wikitext, in page order: its boards, each a list of rows, each row a
+    list of the page's raw cell codes (padding kept). A board outside any table, a table opened inside
+    a board, or a row of the wrong width is an error, never a guess."""
+    tables: list[list] = []
+    stack: list[int] = []
+    board: list | None = None
+    for m in WIKI_TOKEN.finditer(text):
+        tok = m.group(0)
+        if tok == '{|':
+            if board is not None:
+                raise ValueError('wikitext: a table opens inside a board')
+            tables.append([])
+            stack.append(len(tables) - 1)
+        elif tok == '|}':
+            if not stack or board is not None:
+                raise ValueError('wikitext: a table closes that is not open, or inside a board')
+            stack.pop()
+        elif tok in ('{{pfstart}}', '{{sstart}}'):
+            if not stack or board is not None:
+                raise ValueError('wikitext: a board starts outside a table or inside another board')
+            board = []
+        elif tok == '{{pfend}}':
+            if board is None:
+                raise ValueError('wikitext: {{pfend}} with no board open')
+            tables[stack[-1]].append(board)
+            board = None
+        elif board is None:
+            raise ValueError(f'wikitext: a row outside a board: {tok[:40]!r}')
+        elif tok in ('{{pfrowblank}}', '{{srowblank}}'):
+            board.append([' '] * WIDTH)
+        else:
+            row = m.group(1).split('|')
+            if len(row) != WIDTH:
+                raise ValueError(f'wikitext: a row of {len(row)} cells: {tok!r}')
+            board.append(row)
+    if stack or board is not None:
+        raise ValueError('wikitext: a table or a board is left open')
+    return tables
+
+
+def wikitext_cell(code: str) -> str:
+    """One harddrop cell code in a route file's alphabet: blank `-`, grey G `c` (cells placed before
+    this diagram), the T in its spin `U` (drawn P, and T on some boards), `'` the vacated-cell mark
+    `v`, a muted two-letter `L<x>` the upper-case `<x>`, any other piece letter its lower case."""
+    c = code.strip()
+    if c == '':
+        return EMPTY
+    if c == 'G':
+        return 'c'
+    if c in ('P', 'T'):
+        return 'U'
+    if c == "'":
+        return 'v'
+    if len(c) == 2 and c[0] == 'L' and c[1] in PIECES:
+        return c[1]
+    if len(c) == 1 and c in PIECES:
+        return c.lower()
+    raise ValueError(f'wikitext: no reading for the cell code {code!r}')
+
+
+def wikitext_page_cell(ch: str) -> str:
+    """`wikitext_cell` backwards, for a synthetic page (selftest): `U` is written P."""
+    if ch == EMPTY:
+        return ' '
+    return {'c': 'G', 'U': 'P', 'v': "'"}.get(ch, ('L' + ch) if ch.isupper() else ch.upper())
+
+
+def wikitext_boards(text: str, table: int | None = None) -> list[list[str]]:
+    """The boards of one table (or of every table, in page order) in the route alphabet."""
+    tables = wikitext_tables(text)
+    chosen = tables if table is None else [tables[table]]
+    return [[''.join(wikitext_cell(c) for c in row) for row in b] for t in chosen for b in t]
+
+
+def synthetic_wikitext(tables: list[list[list[str]]]) -> str:
+    """harddrop wikitext for boards in the route alphabet, one `{| |}` per table, on ONE line the way
+    the fetched snapshots are."""
+    out = []
+    for t in tables:
+        bs = ['|{{pfstart}} ' + ' '.join(
+            '{{pfrow|' + '|'.join(wikitext_page_cell(ch) for ch in r) + '}}' for r in b) + ' {{pfend}}'
+              for b in t]
+        out.append('{| ' + ' '.join(bs) + ' |}')
+    return ' '.join(out)
+
+
 def check_snapshot(data: dict, html_dir: Path) -> list[str]:
     p = html_dir / data['source']['snapshot_file']
     raw = p.read_bytes()
@@ -593,7 +721,8 @@ def check_snapshot(data: dict, html_dir: Path) -> list[str]:
                 and q['verbatim'] not in flat:
             bad.append(f'snapshot: quote {q["id"]} is not verbatim on the page')
     want = [rows[i] for i in data['page_order']]
-    got = page_boards(text)
+    # a harddrop WIKITEXT snapshot (SDPC Spin) holds its boards as {{pfrow}} templates, not as lines
+    got = wikitext_boards(text) if p.suffix == '.wikitext' else page_boards(text)
     if got != want:
         bad.append(f'snapshot: the page draws {len(got)} boards, page_order has {len(want)}')
         for k, (a, b) in enumerate(zip(got, want)):
@@ -611,6 +740,8 @@ def check_cross_source(data: dict, html_dir: Path) -> list[str]:
     xs = data.get('cross_source')
     if not xs:
         return []
+    if xs.get('kind') == 'harddrop_wikitext':
+        return check_wikitext_cross_source(xs, html_dir)
     from pipeline.openers.extract_wiki_openers import boards as hd_boards, trim as hd_trim
     p = html_dir / xs['snapshot_file']
     if not p.exists():
@@ -623,6 +754,27 @@ def check_cross_source(data: dict, html_dir: Path) -> list[str]:
     got = [hd_trim(b['rows']) for b in hd_boards(raw.decode('utf8')) if b['heading'] == xs['heading']]
     if got != xs['fields']:
         bad.append(f'cross-source: {xs["page"]} draws {len(got)} field(s) under {xs["heading"]!r}, '
+                   f'the routes file records {len(xs["fields"])}, or they differ: page {got}')
+    return bad
+
+
+def check_wikitext_cross_source(xs: dict, html_dir: Path) -> list[str]:
+    """A `harddrop_wikitext` cross-source re-parsed from `html_dir`: the recorded fields must be
+    exactly the boards of the recorded table, in this alphabet, trimmed, in order."""
+    p = html_dir / xs['snapshot_file']
+    if not p.exists():
+        return [f'cross-source: {xs["snapshot_file"]} is not in {html_dir} — fetch it beside the page']
+    raw = p.read_bytes()
+    bad = []
+    sha = hashlib.sha256(raw).hexdigest()
+    if sha != xs['snapshot_sha256']:
+        bad.append(f'cross-source: sha256 {sha} is not the recorded one (read the field diff below)')
+    try:
+        got = [bottom(b, 0) for b in wikitext_boards(raw.decode('utf8'), xs['table'])]
+    except (ValueError, IndexError) as e:
+        return bad + [f'cross-source: {xs["page"]} does not parse: {e}']
+    if got != xs['fields']:
+        bad.append(f'cross-source: {xs["page"]} draws {len(got)} field(s) in table {xs["table"]}, '
                    f'the routes file records {len(xs["fields"])}, or they differ: page {got}')
     return bad
 
@@ -644,6 +796,11 @@ def synthetic_snapshot(base: dict) -> str:
     """A markdown snapshot rebuilt from the transcription, the way the fetch renders one."""
     rows = {n['id']: n['rows'] for n in base['nodes'] if 'rows' in n}
     rows.update({b['id']: b['rows'] for b in base['basic_form']})
+    if base['source']['snapshot_file'].endswith('.wikitext'):
+        # a harddrop wikitext page: every board in one table, then the sentences
+        text = synthetic_wikitext([[rows[i] for i in base['page_order']]])
+        text += ' ' + ' '.join(n['page_text'] for n in base['nodes'] if 'page_text' in n)
+        return text + ' ' + ' '.join(q['verbatim'] for q in base.get('quotes', []) if q.get('rendered', True))
     md = '\n\n'.join('\n'.join(('\\' + r) if r.startswith('-') else r for r in rows[i])
                      for i in base['page_order']) + '\n'
     md += '\n'.join(n['page_text'] for n in base['nodes'] if 'page_text' in n) + '\n'
@@ -731,15 +888,23 @@ def run_selftest(spec: TranscriptionSpec, mutants: list, snapshot_edits: dict,
     xs = base.get('cross_source')
     if xs:
         # the cross-source re-check: a faithful page passes, one changed cell and a missing file fail
+        wikitext = xs.get('kind') == 'harddrop_wikitext'
+        blank = EMPTY if wikitext else '.'
+
+        def page(fields):
+            if wikitext:
+                # the recorded table at its recorded index, after as many empty tables
+                return synthetic_wikitext([[]] * xs['table'] + [fields])
+            return synthetic_harddrop(fields, xs['heading'])
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / xs['snapshot_file']
             missing = check_cross_source(base, Path(td))
-            p.write_text(synthetic_harddrop(xs['fields'], xs['heading']))
+            p.write_text(page(xs['fields']))
             fine = [x for x in check_cross_source(base, Path(td)) if 'sha256' not in x]
             f0 = [list(r) for r in xs['fields'][0]]
-            r, c = next((i, j) for i, row in enumerate(f0) for j, ch in enumerate(row) if ch != '.')
-            f0[r][c] = '.'
-            p.write_text(synthetic_harddrop([[''.join(x) for x in f0]] + xs['fields'][1:], xs['heading']))
+            r, c = next((i, j) for i, row in enumerate(f0) for j, ch in enumerate(row) if ch != blank)
+            f0[r][c] = blank
+            p.write_text(page([[''.join(x) for x in f0]] + xs['fields'][1:]))
             moved = check_cross_source(base, Path(td))
         if fine or not missing or not any('differ' in x for x in moved):
             print(f'selftest FAILED: cross-source re-check (fine={fine}, missing={missing}, '

@@ -267,6 +267,14 @@ bun pipeline/sim/emit-route-demos.ts --opener gamushiro \
   --out analysis/gamushiro-demos.json                           # the constructed ガムシロ積み demos (quarantined, not corpus data)
 bun test pipeline/openers/gamushiro.test.ts pipeline/openers/gamushiro-demos.test.ts  # its two tests
 python3 -m pipeline.gamushiro_page --selftest   # the docs/gamushiro*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_sdpcspin_routes            # CI gate: the SDPC Spin route transcription
+python3 -m pipeline.openers.extract_sdpcspin_routes --selftest #   its mutants; --html-dir <dir> re-checks the two harddrop wikitext snapshots (SDPC_Spin + SingleYou)
+bun pipeline/sim/emit-route-facts.ts --opener sdpcspin \
+  --out analysis/sdpcspin-facts.json                            # SDPC Spin's corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener sdpcspin \
+  --out analysis/sdpcspin-demos.json                            # the constructed SDPC Spin demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/sdpcspin.test.ts pipeline/openers/sdpcspin-demos.test.ts  # its two tests
+python3 -m pipeline.sdpcspin_page --selftest    # the docs/sdpcspin*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -2391,18 +2399,29 @@ merely documented:
   session's artefact and moves published counts, which is a decision for its own pass, not a side
   effect of this one. (This paragraph said 「a 21-lock window」 in two places until then.)
 
-  **The repeated yachi opener is stick spin (SDパフェ), shiwehi.com's `stickspin.php` — see
-  「定式路線頁」.** Bag 1 is that page's six-piece board letter for letter and the T laid flat into its
-  T-spin Single (`bag1.pc`, the パフェ派生 branch); bag 2 sits a few cells off the page's SDパフェ
-  bag-2 board (`2.sd`: he stands the L up at the right where the page lays the J flat), so the route
-  page explains it rather than matching it (`BAG2_NONE_NEAR`); bag 3 is his own TST build, matching none of
-  this page's bag-3 boards (its TST派生 fallback included) — that last part is hand-measured by a 2026-10-13 probe and nothing committed
-  re-derives it. What IS re-derived is the overlap with this column: `stickspin.test.ts` reads every
+  **The repeated yachi opener is SDPC Spin (Ecchou's, harddrop's `SDPC_Spin` page) — see
+  「定式路線頁」, ### SDPC Spin.** It read as stick spin (SDパフェ, shiwehi.com's `stickspin.php`) for one
+  pass, and that identification was of BAG 1 ONLY: SDPC Spin's bag 1 is stick spin's six-piece board
+  letter for letter and the T laid flat into its T-spin Single (`bag1.pc`, the パフェ派生 branch),
+  mirrored, so both route pages file the same bag-1 rounds. ~~bag 2 sits a few cells off the page's
+  SDパフェ bag-2 board … bag 3 is his own TST build, matching none of this page's bag-3 boards — that
+  last part is hand-measured by a 2026-10-13 probe and nothing committed re-derives it~~ — **struck
+  2026-10-16: bag 3 is not his own build.** Bag 2 is still a few cells off stick spin's `2.sd` (he
+  stands the L up at the right where that page lays the J flat; `BAG2_NONE_NEAR` stays true of the
+  stick spin page), and it IS SDPC Spin's Second-bag board (`2.tsd`); bag 3 is SDPC Spin's Third-bag
+  build, mostly its first form (`3.first`). Those figures are re-derived by `sdpcspin.test.ts`, never
+  by this paragraph: `NODE_CASES` for the per-node counts, `STOPS_AT_2TSD` for every round that
+  reached `2.tsd` and no bag-3 board (with the measured reason), `STICKSPIN_NEAR_NOT_2TSD` for stick
+  spin's near-`2.sd` rounds that are not SDPC Spin bag-2 cases, and `DT_AND_SDPCSPIN` for the overlap
+  with this column. Stick spin's own test re-derives its half: `stickspin.test.ts` reads every
   session's `ordering.per_round` and pins that **58 of the 69 Double-first rounds are stick-spin
   bag-1 rounds, all yachi's** (`DT_AND_STICKSPIN`), and names the other eleven with a verified
   reason each in `DT_NOT_STICKSPIN`: the four DT Cannon rounds above, the two windows holding both
   orders (09-10 m7r3, 09-18 m2r3), and five J/L-split boards — the stick-spin shape with the J and L
-  cells divided another way, four of them pinglamb's. Per session, hand-summed on 2026-10-13 from the
+  cells divided another way, four of them pinglamb's. **That J/L split is SDPC Spin's other drawn
+  colouring** (`bag1.lj`; SingleYou draws it too), so on the SDPC Spin page those rounds are ordinary
+  cases, and `sdpcspin.test.ts` asserts that every stick-spin bag-1 case is an SDPC Spin case and names
+  every difference. Per session, hand-summed on 2026-10-13 from the
   same two artefacts and to be re-derived, not carried: 09-17 1 of 2, 09-18 1 of 4, **09-19 8 of 10**
   (the other two pinglamb's J/L split, so 09-19's DT rounds are mostly this opener, which is the
   reading that night lacked), **10-03 16 of 18** (the others the DT Cannon m7r3 and the J/L split
@@ -2569,7 +2588,10 @@ A fourth route page, stick spin (`docs/stickspin.html`), has NO column here: har
 draws no stick spin field, so it carries no flag, and its test cross-checks against the ordering
 metric's Double-first rounds instead (see 「定式路線頁」 and 「C-Spin 同 DT 砲」). A fifth, ガムシロ積み
 (`docs/gamushiro.html`), has no column either, for the same reason, and is a REFERENCE opener the
-corpus barely plays; its test cross-checks against the ordering metric's Triple-first rounds.
+corpus barely plays; its test cross-checks against the ordering metric's Triple-first rounds. A
+sixth, SDPC Spin (`docs/sdpcspin.html`), has no column either (`wiki-openers.json` draws no SDPC
+field), and is the opener yachi's Double-first rounds actually are: its test cross-checks against the
+ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases.
 
 The repertoires split, reproduced independently in all seventeen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
@@ -3299,21 +3321,21 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み、SDPC Spin）— the opener route pages, quarantined like the replays
 
-Five shiwehi.com opener pages are transcribed and matched against the corpus: 迷走砲 (Stray Cannon,
-`meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous Stacking 2,
-`mountainous2.php`), stick spin (SDパフェ, `stickspin.php`) and ガムシロ積み (Gamushiro Stacking,
-`gamushiro.php`). **One implementation per rule, one profile
+Six opener pages are transcribed and matched against the corpus — five from shiwehi.com, 迷走砲
+(Stray Cannon, `meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous
+Stacking 2, `mountainous2.php`), stick spin (SDパフェ, `stickspin.php`) and ガムシロ積み (Gamushiro
+Stacking, `gamushiro.php`), and one from harddrop, SDPC Spin (`SDPC_Spin`, read as wikitext). **One implementation per rule, one profile
 per opener**, because a rule kept in two implementations drifts (「Three backends」): the classifier
 is `pipeline/sim/route-facts.ts`, the demo planner `pipeline/sim/route-demos.ts`, the transcription
 gate `pipeline/openers/route_transcription.py`, the page renderer and audit `pipeline/route_page.py`,
 and the shared test checks `pipeline/openers/route-facts-checks.ts` / `route-demo-checks.ts`. What
 differs per opener is DATA: `route-profile-meisou.ts` / `route-profile-honeycup.ts` /
-`route-profile-mountainous2.ts` / `route-profile-stickspin.ts` / `route-profile-gamushiro.ts` (the TS
-profile: nodes, locks, artefact strings, named lists, the demo half), and `stray_cannon_page.py` /
-`honey_cup_page.py` / `mountainous2_page.py` / `stickspin_page.py` / `gamushiro_page.py` (the page
-profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
+`route-profile-mountainous2.ts` / `route-profile-stickspin.ts` / `route-profile-gamushiro.ts` /
+`route-profile-sdpcspin.ts` (the TS profile: nodes, locks, artefact strings, named lists, the demo
+half), and `stray_cannon_page.py` / `honey_cup_page.py` / `mountainous2_page.py` / `stickspin_page.py`
+/ `gamushiro_page.py` / `sdpcspin_page.py` (the page profile) with their prose JSON. The CLIs are `emit-route-facts.ts` /
 `emit-route-demos.ts --opener <key>`; 迷走砲 keeps its original entry files as shims with their old
 signatures, so its tests and commands did not change.
 
@@ -3329,7 +3351,12 @@ artefacts in their hash lines only (`emitter_md5`; `planner_md5` and `classifier
 their pages, because it changed `route-facts.ts`, `route-profile.ts` and `route-demos.ts`.
 ガムシロ積み changed no hashed file — one registration line in `route-openers.ts`, which no profile
 hashes, and a Python-only cross-source route in `route_transcription.py` — so every other opener's
-artefacts and pages are byte-identical, hash lines included.
+artefacts and pages are byte-identical, hash lines included. SDPC Spin changed no hashed file either:
+one registration line in `route-openers.ts`, an additive wikitext reader and cross-source route in
+`route_transcription.py`, and four default-preserving branches in `route_page.py` (both Python, which
+no profile hashes). The five sibling transcription gates printed byte-identical output under the
+edited and the pre-edit `route_transcription.py` (compared with `cmp`), and `bin/build-docs --check`
+passed against the edited `route_page.py` before SDPC Spin was registered, so no sibling page moved.
 
 ### 迷走砲
 
@@ -3612,7 +3639,8 @@ What this page needs that the other three did not:
 * **A fourth bag-2 explanation, `near`** (`bag2Explain: { nearCells: 8 }`): after subset, extra piece
   and moved piece, the nearest bag-2 board(s) within eight cells, with the missing and extra letters
   — measured, never a match, and never a relaxation of the route. yachi's bag 2 is this kind against
-  `2.sd` (`BAG2_NONE_NEAR`); the rest are `BAG2_NONE_UNEXPLAINED`. The other openers keep
+  `2.sd` (`BAG2_NONE_NEAR`) — because it is SDPC Spin's bag 2, which that page explains as a match
+  (see ### SDPC Spin); the rest are `BAG2_NONE_UNEXPLAINED`. The other openers keep
   `bag2Explain: true`, so their artefacts did not move. The explanation reads the oracle board even
   past the verified prefix, as the shared code already did (10-09 m2r3, verified only to its TSS, still
   gets a near entry) — left alone so the other artefacts stay byte-identical, and an open item.
@@ -3735,6 +3763,107 @@ The named lists are `BAG2_NONE_UNEXPLAINED`, `NOT_TRIPLE_FIRST`, and the measure
 `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS` and `DEMO_PIECE_READINGS`. Sizes are read off the tests.
 `no180` is a control; `ignoreConditions` is a MUTANT here, as on はちみつ砲: the bag-1 no-hold orders
 (J before S, Z before T) are not forced by gravity.
+
+### SDPC Spin
+
+The same deliverable for harddrop's `SDPC_Spin` page (an opener by Ecchou; categories T-Spin openers,
+T-Spin Single openers, Single Double openers): `pipeline/openers/sdpcspin-routes.json` (gated by
+`extract_sdpcspin_routes.py` through the shared gate), `analysis/sdpcspin-facts.json`
+(`sdpcspin.test.ts`), `analysis/sdpcspin-demos.json` (`sdpcspin-demos.test.ts`), and
+`docs/sdpcspin.html` plus `sdpcspin-tsd.html`, `sdpcspin-bag1-only.html` and `sdpcspin-demos.html`,
+rendered by `bin/build-docs` from `ROUTE_SITES` and linked as the sixth card under 定式路線. Counts are
+read off the artefacts and tests, never typed here or in `sdpcspin_prose.json`. **Emit the facts
+before the demos**: the demos artefact hashes the classifier, and its test classifies every demo.
+
+**It is the opener yachi's Double-first rounds are, and that is the page's corpus finding.** The
+2026-10-13 reading called them stick spin; a 2026-10-15 probe followed them through three bags and
+found SDPC Spin's bag 1, its Second-bag TSD board and its Third-bag TST builds (the correction is at
+the original site, 「C-Spin 同 DT 砲」). The probe used a bag-attributed composite and was never
+committed, so **none of its figures is quoted anywhere**: the committed route is the classifier's
+snapshot rule, and `sdpcspin.test.ts` is what re-derives every count — `NODE_CASES` per node,
+`DT_AND_SDPCSPIN` for the Double-first rounds that are SDPC Spin cases (with `DT_NOT_SDPCSPIN` naming
+the rest, each with a verified reason: `dt_cannon`, `both_orders`, or `garbage_bag1` for the one
+round whose garbage arrived before lock 6), `SDPCSPIN_NOT_DT` for the converse, and `STOPS` for where
+every case ends. **The snapshot rule files fewer bag-3 rounds than the composite did, and that is a
+definition, not a miss**: a round that fires its TST with one or two bag-3 pieces still to place
+never holds the drawn board at any lock. `STOPS_AT_2TSD` measures every round that reached `2.tsd`
+and no bag-3 board, as `tst_before_complete`, `tst_off_page` or `no_tst`; the rule is not relaxed.
+
+**The source is wikitext, not HTML, and it is the first route page not from shiwehi.com.** The page
+was read with `oc raw` of its `action=edit` page (never curl); `source` in the routes JSON records
+the oldid, the sha256 and byte count of the snapshot, and how it was fetched. Boards are
+`{{pfstart}} … {{pfend}}` templates, read by a new additive reader in `route_transcription.py`
+(`wikitext_tables` / `wikitext_cell` / `wikitext_boards`). harddrop publishes no licence for wiki
+content, so `terms` records 「not stated」 and every page credits by link; the header credit comes from
+the prose's `source_credit`, a branch `route_page.py` gained for this page (the shared default stays
+shiwehi.com's terms). A refetch is re-checked with `--html-dir` holding both `.wikitext` snapshots.
+
+**Bag 1 has three cross-sources, all checked by the gate; bag 2 onward has none, and every page says
+so.** (1) harddrop's SingleYou page, table 0 — the page's 「stacked the same way as SDPC」 is that
+equality — through a new `harddrop_wikitext` route of the gate's rule 2; (2) stick spin's `bag1.pc` and
+its after board, mirrored; (3) Ivan's catalogue's SDPC-Spin compound entry. `cross_source.bag2_onward`
+records the single source, and `page_sentences.source` is a REQUIRED sentence on every page.
+
+What this page needs that the other five did not:
+
+* **Derived 6-lock stage nodes, one per colouring.** harddrop draws bag 1 only with the T placed
+  (`bag1.lj`, the L under the J; `bag1.jl`, the J there), so the bag-1 spin step needs a 6-lock board
+  to stand on: `bag1.lj.left` and `bag1.jl.left` are DERIVED (each TSS board less its `U` cells,
+  checked by the gate's `bag1-derived:` rule, with two selftest mutants), and each TSS board is
+  `spin_of` and `parent` its own. They carry no `group`: `bag1.sdpc`'s `drawn` is the page's own
+  count of two boards, which the shared grammar rule pins. `bag1.requires` is `{}` (the page states no
+  bag-1 order), so the shared demo check reads 「no early piece」 from the transcription itself. Two, not one, because both TSS boards
+  draw the same `U` cells, so colour must decide at the stage — 山岳積み2号's `bag1.l_hold` precedent
+  and stick spin's `bag1.left` → `bag1.pc` shape. Stick spin's J/L-split exceptions are `bag1.lj`
+  rounds here.
+* **No flag and no hold**, as stick spin: no 六個具名定式 column draws SDPC Spin, and no input holds.
+  The source's transition board says 「hold O and tuck it」; that is quoted source text, which the
+  shared 「hold」 audit now exempts exactly as the % rule always did. The siblings' hold mutants plant
+  outside quotes and are still caught, so this narrows nothing they test.
+* **A tree six bags deep.** Bag 3 has three TST builds (`3.first`, `3.second`, `3.third`) and bags 4
+  and 5 hang under them: the STMB Cave and STSD, the Trinity, the C-Spin and its DT Cannon
+  continuation, the Imperial Cross and its four 14-line PCs. `bag3_parents` places by id prefix, so
+  the three builds are parents of their own and everything from bag 3 to bag 6 is drawn under 第三巡;
+  the prose says so. Only one bag-2 board exists, so there is one bag-2 page (`sdpcspin-tsd.html`).
+* **The PC frame is `{locks: 28}`, `lines: 14`, `rows: 7`, and the obvious rule cannot work.** All four
+  Imperial Cross patterns roof the T slot, so the body's own TSD always fires before the PC's last
+  lock and 「after the last TSD」 picks it; and the patterns are drawn seven rows tall, which a six-row
+  frame refuses. `route-profile.ts`'s `PcKind` docstring still describes `{locks}` as 「with no spin
+  before it」, which this use contradicts and `frameStart` does not enforce.
+* **An `at_least` condition** (the STMB Cave's 「J before at least two of T, L and Z」): the board
+  forces only J before T, so the other two are marked stated, not forced. The page reads it through a
+  new branch of `_condition_words`; the shared planner and `conditionHolds` read only `all`, so the
+  demo test checks it on the queue itself.
+* **Readings, marked**: `P` and `T` read as `U`; `G` as `c` (earlier cells, checked as the post-spin
+  base); an upper-case letter as a muted residue; the apostrophe as `v`. The two DT Cannon boards carry
+  `residue_of` and no base, and draw the C-Spin's bag-3 I live beside the new one — the named
+  discrepancies `3.second.cspin.dt#1:colour` / `dt#2:colour`. The page does not say which Trinity spin
+  fires first (`order_note`).
+* **`3.first.trinity.tss` is a STRUCTURAL zero, not a measured one.** Its sibling
+  `3.first.trinity.tsd` draws the board the Trinity's TSD leaves, and the classifier files a round at
+  the earliest matching sibling, so nothing — corpus or constructed — can reach the TSS node. The demo
+  test names it in `CLASSIFIER_SIBLING` and checks the TSS demo is filed under the TSD, the facts test
+  labels its 0 in `STRUCTURAL_ZERO`; the page's
+  bag-3 note says so beside the count.
+
+The named lists are `BAG1_SPIN_OFF_PAGE`, `BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TSD_BEFORE_COMPLETE`,
+`BAG2_NONE_UNEXPLAINED`, `STOPS_AT_2TSD`, `DEEPEST_UNVERIFIED`, `DT_NOT_SDPCSPIN`, `SDPCSPIN_NOT_DT`,
+`STICKSPIN_NEAR_NOT_2TSD`, and the measured-empty `BAG2_NONE_EXTRA_PIECE` / `_MOVED_PIECE`,
+`PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`, `MULTI_COLOUR_RESOLVED_BY_BRANCH`, `COLOUR_DISAGREE` and
+`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the two illustrations, the board that draws its Z twice,
+the two DT Cannon boards, and the planner's measured failures: the page draws those TSDs firing BEFORE
+a Z, O or J the board already shows, while the shared planner fires a snapshot board's T last, and the
+test 「measured: each unbuilt TSD fires before a piece its board draws」 re-measures each with the
+engine's own `reach()`), `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS`
+and `DEMO_PIECE_READINGS`. Sizes are read off the tests. The facts test's live mutants are `noMirror`,
+`spinMirrorUnaware`, `spinClearStops`, `bag2Early`, `noGarbageStrip`, `noGarbageStop` and `noSwap`,
+each with its symptom asserted; the hold-stage, PC/scope and `matchFromFilename` mutants are measured
+EQUIVALENT on this corpus and named, so the day one stops being equivalent is a red build. In the
+demos, `noRowMap`, `noReach` and `noSpinCheck` are mutants, `noSwapDeal` and `ignoreConditions` are
+EQUIVALENT here (no demo holds; `3.third`'s S before O is forced by gravity), and `no180` is a
+control. Building the planner-unbuilt nodes would need a shared change (fire a snapshot board's U
+before named later pieces), which would stale every sibling's `planner_md5`; it is an open item, not
+done.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

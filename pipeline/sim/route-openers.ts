@@ -8,9 +8,11 @@ import { HONEYCUP } from './route-profile-honeycup.ts';
 import { MOUNTAINOUS2 } from './route-profile-mountainous2.ts';
 import { STICKSPIN } from './route-profile-stickspin.ts';
 import { GAMUSHIRO } from './route-profile-gamushiro.ts';
+import { SDPCSPIN } from './route-profile-sdpcspin.ts';
 
 export const OPENERS: Record<string, RouteProfile> = { meisou: MEISOU, honeycup: HONEYCUP, mountainous2: MOUNTAINOUS2,
-                                                   stickspin: STICKSPIN, gamushiro: GAMUSHIRO };
+                                                   stickspin: STICKSPIN, gamushiro: GAMUSHIRO,
+                                                   sdpcspin: SDPCSPIN };
 
 /** `--opener <key>` out of argv, or a loud failure naming the keys there are. */
 export function openerFromArgv(argv: string[]): RouteProfile {
