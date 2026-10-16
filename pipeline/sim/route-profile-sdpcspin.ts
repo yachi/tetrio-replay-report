@@ -144,5 +144,19 @@ export const SDPCSPIN: RouteProfile = {
     pieceReadings: [],
     bag1Spec: () => ({ before: [], early: null, holdPiece: null, holdBefore: null }),
     chainVia: { 'bag1.after': 'bag1.jl', '2.after': '2.tsd' },
+    // OUR READING, measured by `sdpcspin-demos.test.ts`: the pieces each board forces AFTER its TSD. One
+    // of them stands over the T's slot, so the T cannot reach it once that piece is placed; in the three
+    // ZJ boards the Z only rests on that J (`U_BEFORE_SUPPORT`), so it follows the J. transition#2 is the
+    // page's own 「hold O and tuck it after taking the TSD」; the demo deals the O after the T instead
+    uFiresBefore: {
+      '3.second.cspin': ['Z'],
+      '3.third.transition#1': ['Z'],
+      '3.third.transition#2': ['O'],
+      '3.first.cave.stsd': ['J'],
+      '3.second.cspin.first#1': ['J'],
+      '3.second.cspin.o_first#1': ['Z', 'J'],
+      '3.second.cspin.l_first#1': ['Z', 'J'],
+      '3.second.cspin.l_first#3': ['Z', 'J'],
+    },
   },
 };

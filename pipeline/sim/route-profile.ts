@@ -150,4 +150,9 @@ export interface DemoProfile {
    *  patterns draw the TSD's T as a plain `t`; 迷走砲 draws it U). `routes` is the opener's routes JSON,
    *  for a profile whose rule reads another node (山岳積み2号: the empty slot of the pattern's base). */
   spinLetter?(n: any, routes: any): { letter: string; lines: number } | null;
+  /** a snapshot node whose T fires BEFORE the named pieces (upper-case letters), not last: the board
+   *  draws a piece over the T's slot, so with every piece placed the T cannot reach it (SDPC Spin's
+   *  C-Spin and transition boards). The drawn board then never stands at any lock: the demo reaches
+   *  it only as a kept-rows composite. An explicit reading per node, never a search fallback. */
+  uFiresBefore?: Record<string, string[]>;
 }

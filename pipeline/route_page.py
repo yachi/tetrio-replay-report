@@ -931,6 +931,34 @@ class RouteSite:
         last = len(locks) - 1
         lines = sum(lk[2] for lk in locks)
         where = d["node"]
+        u_before = [t for t in d["bags"][-1]["order_reading"] if t.startswith("u_before:")]
+        if u_before:
+            # SDPC Spin's `uFiresBefore` nodes: the T fires into the U BEFORE the named pieces, which
+            # are placed after it, so the drawn snapshot never stands at any lock. The U lock is
+            # `last - k` (k the pieces named), it is the drawn spin, the pieces after it are exactly the
+            # named ones, and the kept-rows composite of the last bag is the drawing. The bun test
+            # (route-demo-checks.ts) states the same rule in its own implementation
+            after = u_before[0].partition(":")[2]
+            start = sum(len(b["placed"]) for b in d["bags"][:-1])
+            u = last - len(after)
+            if len(u_before) != 1 or not after or u < start:
+                return [f"{where}: a malformed u_before reading {u_before}"]
+            if steps[u][0] != "T" or locks[u][3] != 2 or locks[u][2] != SPIN_LINES.get(n.get("spin")):
+                return [f"{where}: lock {u + 1} is not the drawing's {n.get('spin')} fired before {after}"]
+            if d["letters"][u] != "U" or d["letters"][start:last + 1].count("U") != 1:
+                return [f"{where}: lock {u + 1} is not the last bag's one U"]
+            if sorted(s[0] for s in steps[u + 1:]) != sorted(after):
+                return [f"{where}: the pieces placed after the T are not {after}"]
+            # the page says the drawing never stands in such a demo: checked, not assumed
+            if any(_shows(steps[i][2], n["rows"], e) for i in range(start, last + 1) for e in (True, False)):
+                return [f"{where}: the drawing stands at a lock, so the T need not fire before {after}"]
+            try:
+                ok = _composite_ok(d, data, start, n["rows"], d.get("piece_readings", []))
+            except SystemExit as e:
+                return [f"{where}: the kept-rows composite does not build: {e}"]
+            if not ok:
+                return [f"{where}: the kept-rows composite of the last bag is not the drawing"]
+            return []
         if n["bag"] == 1 and any("U" in r for r in n["rows"]):
             # stick spin's bag-1 boards draw the T as U: the board before the last lock is the drawing
             # with the U empty, and the last lock is the drawn spin
@@ -1017,7 +1045,29 @@ class RouteSite:
             return f'<span class="scp-hold" data-demo="{held_slug}">{_esc(w["held"].format(p=rest))}</span>'
         if kind == "unused":
             return _esc(w["unused"].format(p=rest))
+        if kind == "u_before" and "u_before" in w:
+            # SDPC Spin only: the T fires into the U before these pieces (`uFiresBefore`)
+            return _esc(w["u_before"].format(p="、".join(rest)))
         raise SystemExit(f"{self.p.module}: unknown order reading {tok!r}")
+
+    def _u_before_note(self, d, n, held):
+        """Beside a demo whose drawn board never stands (its last bag's T fires before the named
+        pieces): why, and — where the source tells the player to hold a piece (`hold_verbatim`) — that
+        the instruction is quoted source text and the demo holds nothing. Empty for every other demo,
+        so no other opener's page moves; `_demo_end` checks the 「never stands」 half."""
+        tok = [t for t in d["bags"][-1]["order_reading"] if t.startswith("u_before:")]
+        if not tok:
+            return []
+        rest = tok[0].partition(":")[2]
+        p = "、".join(rest)
+        out = [f'<p class="scp-tag">{_esc(self.DP["u_before_note"].format(p=p))}</p>']
+        if n.get("hold_verbatim"):
+            self._need(not held, f"{d['node']}: the demo holds, but the page says it holds nothing")
+            q = d["bags"][-1]["queue"]
+            self._need(all(q.index(x) > q.index("T") for x in rest),
+                       f"{d['node']}: {rest} is not dealt after the T in {q}")
+            out.append(f'<p class="scp-tag">{self.DP["u_before_hold"].format(quote=_src(n["hold_verbatim"]), p=_esc(p))}</p>')
+        return out
 
     def _chain_words(self, chain, routes_by_id):
         """The chain as words; a PC pattern by its own short name, since its full name repeats its parent."""
@@ -1120,6 +1170,7 @@ class RouteSite:
                     bits.append(f'<p class="scp-tag">{_esc(self.DP["also"].format(k=basic_k[b]))}</p>')
                 for rd in d["piece_readings"]:
                     bits.append(f'<p class="scp-tag">{_esc(self.DP["reading"].format(reason=rd["reason"]))}</p>')
+                bits += self._u_before_note(d, n, held)
                 if any(t.startswith(("hold:", "held:")) for b in d["bags"] for t in b["order_reading"]) and not held:
                     raise SystemExit(f"{self.p.module}: {nid} names a hold its inputs never make")
                 bits.append("</div>")
@@ -1406,6 +1457,31 @@ class RouteSite:
             ok &= good
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} {nid}'s last lock no longer a spin: {got[:1]}")
+        # a T fired before named pieces (SDPC Spin's `u_before:` demos): moving the U lock, and its
+        # piece in the deal, to the end of the demo — the plain 「T last」 shape the old rule accepted —
+        # must fail the u_before branch, not merely fail to decode
+        for nid in T.get("demo_u_before", ()):
+            late = json.loads(json.dumps(demos))
+            dd = next(d for d in late["demos"] if d["node"] == nid)
+            rest = next(t for t in dd["bags"][-1]["order_reading"] if t.startswith("u_before:")).partition(":")[2]
+            last = len(dd["locks"]) - 1
+            u = last - len(rest)
+            dd["locks"].append(dd["locks"].pop(u))
+            s = dd["seq"]
+            dd["seq"] = s[:u] + s[u + 1:last + 1] + s[u] + s[last + 1:]
+            got = self.demo_problems(late, routes0)
+            good = any(nid in g and f"fired before {rest}" in g for g in got)
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} {nid}'s T moved after {rest}: {got[:1]}")
+            # and the composite half: the last piece one column left must fail the kept-rows check
+            bent = json.loads(json.dumps(demos))
+            next(d for d in bent["demos"] if d["node"] == nid)["locks"][-1][1] -= 1
+            got = self.demo_problems(bent, routes0)
+            good = any(nid in g and "kept-rows composite" in g for g in got)
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} {nid}'s last piece one column left: {got[:1]}")
         # a list with its own line count (山岳積み2号's 4-line and 14-line PCs): checked at the profile's
         # count instead, its demos must fail — the per-list rule is not decorative
         # (a list whose own count equals the profile's — stick spin's 8 — makes that mutant equivalent, so

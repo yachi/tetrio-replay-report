@@ -11,7 +11,9 @@
  *      demonstrates (a colour reading: off the page by colour as drawn, on it as read).
  *   4. board equality against the drawing, independent of the classifier: the U is empty on the
  *      drawn board and fired next (into the spin board's U cells, where a node has one); a PC pattern
- *      is the kept-rows composite and ends empty.
+ *      is the kept-rows composite and ends empty. A board the profile's `uFiresBefore` names fires its
+ *      U before the named pieces: its drawing is the last bag's kept-rows composite, never a lock's
+ *      board, and the classifier must NOT file a snapshot for it.
  *   5. spins: every spin-slot lock (U, or the profile's spin letter) is a full T-spin, every other T
  *      none; the line counts the drawing does not fix are a NAMED list, compared both ways.
  *   6. the queue is whole 7-bags, each bag satisfies its node's page condition, holds match flags.
@@ -151,7 +153,34 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
       const got = placeCells('T', d.locks[last][1]).map(c => `${c % WIDTH},${Math.floor(c / WIDTH)}`).sort();
       return JSON.stringify(got) === JSON.stringify(sc.map(([x, dd]) => `${x},${dd}`).sort());
     };
-    if (n.bag === 1 && n.rows.some(r => r.includes('U'))) {
+    // the profile's `uFiresBefore` (SDPC Spin's C-Spin and transition boards): the U fires BEFORE the
+    // named pieces, so the drawn board never stands at any lock. The last bag must carry exactly the
+    // profile's reading as its `u_before:` token, and a token the profile does not name is a defect
+    const named = P.demos!.uFiresBefore?.[n.id];
+    const tokens = d.bags.at(-1).order_reading.filter((r: string) => r.startsWith('u_before:'));
+    if (tokens.length > 1) return `${d.node}: ${tokens.length} u_before tokens`;
+    const ub: string | null = tokens.length ? tokens[0].slice('u_before:'.length) : null;
+    if ((named ? named.join('') : null) !== ub) return `${d.node}: u_before ${ub} but the profile names ${named?.join('') ?? 'none'}`;
+    if (ub !== null) {
+      // the U is followed by exactly the named pieces; its lock is the node's named spin; the drawing is
+      // the kept-rows composite of the last bag (the frame rule `composite()` reads a PC pattern with),
+      // over the whole board height, so nothing stands above it
+      // the same five conditions route_page._demo_end checks, read off the decoded locks (`q`), not
+      // off the artefact's own `placed` metadata
+      const bag = d.bags.at(-1), k = ub.length, ui = last - k, start = last - bag.placed.length + 1;
+      const after = q.slice(ui + 1, last + 1).map(s => s.piece).sort().join('');
+      if (k < 1 || ui < start || q[ui]!.piece !== 'T' || after !== [...ub].sort().join(''))
+        return `${d.node}: the last bag does not place the T then ${ub}`;
+      if (d.letters[ui] !== 'U' || d.letters.slice(start, last + 1).split('U').length !== 2)
+        return `${d.node}: lock ${ui} is not the bag's one U`;
+      const want = SPIN_LINES[n.spin];
+      if (want === undefined || d.locks[ui][3] !== 2 || d.locks[ui][2] !== want) return `${d.node}: the U at lock ${ui} is not a full ${n.spin}`;
+      // the page says the drawing never stands in such a demo: checked here too, U empty or filled
+      for (let i = start; i <= last; i++)
+        if (shows(B[i]!, n.rows, true) || shows(B[i]!, n.rows, false)) return `${d.node}: the drawing stands at lock ${i}`;
+      const comp = composite(digestOf(d), start - 1, last, ROWS, P.tag);
+      if (!patternMatches(comp, readRows(n.id, n.rows), false, true, ROWS)) return `${d.node}: the last bag's kept-rows composite is not the drawing`;
+    } else if (n.bag === 1 && n.rows.some(r => r.includes('U'))) {
       // stick spin's bag 1: six pieces, then the T into the drawn U as the bag's last lock
       if (!shows(B[last - 1]!, n.rows, true)) return `${d.node}: board before the U is not the drawing`;
       if (d.letters[last] !== 'U' || last !== 6) return `${d.node}: lock 7 is not the U`;
@@ -203,7 +232,11 @@ export function demoChecks(P: RouteProfile, L: DemoLists) {
         if (c.pc?.node === n.id) return `${d.node}: colour reading not needed?`;
       } else if (c.pc?.node !== n.id) return `${d.node}: classifier PC ${c.pc?.node} ${c.pc?.off_page_under}`;
     }
-    if (n.bag >= 3 && !n.list && !n.unmatchable && !c.snapshots.some((s: any) => s.node === n.id))
+    // a `uFiresBefore` board never stands at any lock, so the classifier must NOT file it: a snapshot
+    // there would mean the board stood after all (unmatchable or not, the requirement is the same)
+    if (ub !== null) {
+      if (c.snapshots.some((s: any) => s.node === n.id)) return `${d.node}: classifier snapshot present for a u_before board`;
+    } else if (n.bag >= 3 && !n.list && !n.unmatchable && !c.snapshots.some((s: any) => s.node === n.id))
       return `${d.node}: classifier snapshot missing`;
     return null;
   }

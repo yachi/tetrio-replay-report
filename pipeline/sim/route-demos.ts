@@ -248,6 +248,7 @@ export interface DemoMutants {
   ignoreConditions?: boolean; // the page's bag-2 order conditions not applied
   no180?: boolean;           // no 180 rotation edge
   noSwapDeal?: boolean;      // a `before` pair read in placement order: the swap slot never deals the T early
+  noUBefore?: boolean;       // the profile's `uFiresBefore` ignored: the U always goes last
 }
 
 interface Placement { piece: string; cells: number[]; edges: Edge[]; spin: string | null; lines: number;
@@ -283,6 +284,8 @@ export interface BagSpec {
   uLines: number | null;
   /** the U must be the bag's last placement (bag 2 and the snapshot routes) */
   uLast: boolean;
+  /** pieces that come AFTER the U although `uLast` (the profile's `uFiresBefore`) */
+  uBefore?: string[];
   /** this bag must end on a Perfect Clear */
   pc: boolean;
   /** pieces that must come before others in the queue (the page's condition), and the early piece */
@@ -335,6 +338,9 @@ export function planBag(P: RouteProfile, eng: any, st: State, spec: BagSpec, mut
   const holdSwaps = !!carriedIn || (!!st.heldNext && [...PIECES].every(p => dealtPieces.includes(p)));
   const dealtEarly = (o: Group, done: Placement[]) => !mut.noSwapDeal &&
     spec.uLast && !!o.spinSlot && holdSwaps && (!carriedIn || done.some(p => p.carried));
+  // a piece the profile's `uFiresBefore` places after the U (empty for every other opener)
+  const uBefore = mut.noUBefore ? [] : spec.uBefore ?? [];
+  const afterU = (o: Group) => !o.spinSlot && !o.carried && uBefore.includes(o.piece);
 
   // the deepest point any order reached, and why each remaining piece could not go there: the
   // failure reason an unbuildable node is published with
@@ -348,7 +354,9 @@ export function planBag(P: RouteProfile, eng: any, st: State, spec: BagSpec, mut
     const why: string[] = [];
     for (const g of left) {
       const P = g.spinSlot ? 'T(U)' : g.piece;
-      if (spec.uLast && g.spinSlot && left.length > 1) { why.push(`${P} 要最後先放`); continue; }
+      if (spec.uLast && g.spinSlot && left.some(o => o !== g && !afterU(o))) { why.push(`${P} 要最後先放`); continue; }
+      // a piece the profile reads as placed after the U waits for it (SDPC Spin's C-Spin Z)
+      if (afterU(g) && left.some(o => o.spinSlot)) { why.push(`${P} 要等 T(U)`); continue; }
       if (!mut.ignoreConditions && !g.carried) {
         // a piece whose `before` partner is still unplaced must wait (a carried piece was dealt earlier)
         const w = spec.before.find(([a, b]) => b === g.piece &&
@@ -461,6 +469,7 @@ export function planBag(P: RouteProfile, eng: any, st: State, spec: BagSpec, mut
   for (const [a, b] of spec.before) lead.push(`before:${a}${b}`);
   if (spec.holdPiece) lead.push(`hold:${spec.holdPiece}@${queue.indexOf(spec.holdPiece) + 1}`);
   if (unused) reading.push(`unused:${unused}`);
+  if (uBefore.length) reading.push(`u_before:${uBefore.join('')}`);
   reading.unshift(...lead);
   const met = n.condition && !n.condition.bag1 ? conditionHolds(n.condition, queue, '') : null;
   const grid = cloneGrid(st.grid);
@@ -511,7 +520,9 @@ function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
   // a later board drawn with its slot empty and the T on a separate spin board (stick spin's TST,
   // Imperial Cross and STMB Cave fallbacks) fires into that board's U cells, as bag 2 does
   const spinCells = isPc ? [] : spinBoardCells(n, routes, P.tag);
-  return { node: n, uLines, uLast: !isPc, pc: isPc,
+  const uBefore = demoProfile(P).uFiresBefore?.[n.id];
+  if (uBefore && isPc) throw new Error(`${P.tag}-demos: ${n.id} is a Perfect Clear pattern and names uFiresBefore`);
+  return { node: n, uLines, uLast: !isPc, pc: isPc, ...(uBefore ? { uBefore } : {}),
            before: [], early: null, holdPiece: null, holdBefore: null, ...(sl ? { spinLetter: sl.letter } : {}),
            ...(spinCells.length ? { spinCells } : {}) };
 }

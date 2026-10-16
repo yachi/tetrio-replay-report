@@ -1,0 +1,46 @@
+name: wikitext-sources
+
+# The SDPC Spin route transcription (pipeline/openers/sdpcspin-routes.json) is read from harddrop
+# pages' wikitext, pinned by revision: `oldid`, MediaWiki's own `revision_sha1`, and our
+# `snapshot_sha256` of the bytes. The pages are not committed, so the per-push gates in verify.yml
+# check the transcription and the gate's teeth only — nothing re-reads the page itself.
+#
+# This job does: `pipeline.openers.check_wikitext_sources` discovers every routes file pinning a
+# harddrop wikitext revision, fetches each pinned revision from the MediaWiki API, checks the API's
+# sha1, sha1 of the bytes and the recorded sha1 agree and that sha256 matches, re-runs that routes
+# file's extractor with --html-dir over the fetched bytes, and FAILS when the page has a revision
+# newer than the pin (the upstream page changed; the transcription has not been re-read).
+#
+# WHY A FILE OF ITS OWN RATHER THAN A JOB IN verify.yml
+#
+# verify.yml runs every job on every push, and its jobs need no network beyond installing pinned
+# toolchains. This one is a network check against a third-party wiki: on every push it would make
+# the build depend on harddrop.com being up, and what it detects (an upstream edit) happens on
+# harddrop's schedule, not ours. So it runs weekly and on demand. Its offline half — the gate's
+# mutants against a fake API — DOES run on every push, as a step of verify.yml's `docs` job
+# (`check_wikitext_sources --selftest`).
+#
+# The cron is offset from verify.yml's '17 6 * * 1', dual-backed.yml's '41 6 * * 1' and
+# equiv-coverage.yml's '53 6 * * 1', so the four weekly runs do not queue on the same minute.
+#
+# No setup-python: every python gate in this repo runs on the runner's system python3, and this
+# script is stdlib only (urllib, not curl).
+
+on:
+  schedule:
+    - cron: '29 6 * * 1'   # weekly: an upstream edit is found within a week
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wikitext-sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Refetch the pinned harddrop wikitext revisions and re-check the transcriptions
+        run: python3 -m pipeline.openers.check_wikitext_sources

@@ -388,6 +388,10 @@ PLAN = {
         "aarch64-linux", "needs an aarch64 Linux runner (ubuntu-24.04-arm) — the image is aarch64-linux "
                  "and nix has no builder for it here")),
     "coverage-round": Entry(WEEKLY),
+    # wikitext-sources.yml: the job IS a network fetch of harddrop's pinned revisions, and CI runs it
+    # on schedule/workflow_dispatch only, so it sits in the tier --weekly selects. Run locally it is
+    # the same live fetch, not a stand-in; its offline half (--selftest) is a step of `docs`, FAST.
+    "wikitext-sources": Entry(WEEKLY),
 }
 
 WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs"}
