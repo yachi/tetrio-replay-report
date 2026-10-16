@@ -487,8 +487,8 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **19 job definitions
-  across 3 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
+  byte-identical to what is committed. Weekly runs add mutation testing. **20 job definitions
+  across 4 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (19 — eighteen session artefacts plus the `subsets/2026-09-18-onform`
   filtered subset, which is NOT in the corpus even though the night it is drawn from now IS) and
   `pipeline` over sessions (17), so both counts move with the corpus
@@ -513,7 +513,9 @@ equivalent marker pair.
   covers it, re-run `python3 -m pipeline.build_report subsets/*/report --check` whenever a session
   is added** — that is a manual-only step, which this file elsewhere calls the thing
   `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
-- **Sixteen of those jobs are repo-wide, and `bin/verify-repo` is what runs them.** `bin/new-session`
+- **Every job but the two matrices (`verify`, `pipeline`) is repo-wide, and `bin/verify-repo` is what
+  runs them** (eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
+  one short at nineteen jobs — derive it as the job count less two, never carry it). `bin/new-session`
   covers steps 1-7 of adding a session (step 6 runs the four sim emitters); `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
   `intense-round-corpus`, `typescript`, `spec`, `oracle-image`, `preregistrations`, `manifest` or
@@ -3798,6 +3800,26 @@ content, so `terms` records 「not stated」 and every page credits by link; the
 the prose's `source_credit`, a branch `route_page.py` gained for this page (the shared default stays
 shiwehi.com's terms). A refetch is re-checked with `--html-dir` holding both `.wikitext` snapshots.
 
+**Both wikitext pins are now MediaWiki's own bytes, and a weekly job re-reads them.** The first
+snapshots were oc's whitespace-collapsed renderings, so their sha256 was ours alone. On 2026-10-16
+both records were re-pinned to the API's revision content: `revision_sha1` is MediaWiki's sha1 of the
+revision, which equals sha1 of the bytes — an authority independent of this repo — and
+`snapshot_sha256` / `snapshot_bytes` are of those bytes. (Collapsing whitespace in the API bytes
+reproduces the old SDPC_Spin hash exactly, which is how the change was checked to be a re-encoding
+and not an upstream edit.) `pipeline/openers/check_wikitext_sources.py` discovers every routes file
+whose records pin a `revision_sha1`, fetches each pinned revision through `api.php` (urllib with a
+descriptive User-Agent, never curl), checks the API sha1, the bytes' sha1 and the recorded sha1 agree
+and the sha256 and byte count match (`snapshot_bytes` is required, not skipped when absent), re-runs
+that routes file's extractor with `--html-dir` over the fetched bytes, and **fails when the page has a
+newer revision than the pin** or the API returns no revid — an upstream edit means the transcription
+has not been re-read, so it is a red build, not a pass. Revisions are immutable, so a green run says
+the pinned page is still the one transcribed. It runs in `wikitext-sources.yml`, weekly and on
+dispatch only, because a per-push network check would make every build depend on harddrop.com; its
+`--selftest` (a fake MediaWiki API: wrong or disagreeing sha1s, a newer revision, a missing revid, a
+missing `snapshot_bytes`, HTTP 403, a missing revision, a network error, a board edited under re-pinned
+hashes) runs on every push in `docs`. ガムシロ積み's harddrop cross-source pins an oldid but no
+`revision_sha1`, so it is not discovered — a control in the selftest.
+
 **Bag 1 has three cross-sources, all checked by the gate; bag 2 onward has none, and every page says
 so.** (1) harddrop's SingleYou page, table 0 — the page's 「stacked the same way as SDPC」 is that
 equality — through a new `harddrop_wikitext` route of the gate's rule 2; (2) stick spin's `bag1.pc` and
@@ -3850,20 +3872,35 @@ The named lists are `BAG1_SPIN_OFF_PAGE`, `BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TS
 `BAG2_NONE_UNEXPLAINED`, `STOPS_AT_2TSD`, `DEEPEST_UNVERIFIED`, `DT_NOT_SDPCSPIN`, `SDPCSPIN_NOT_DT`,
 `STICKSPIN_NEAR_NOT_2TSD`, and the measured-empty `BAG2_NONE_EXTRA_PIECE` / `_MOVED_PIECE`,
 `PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`, `MULTI_COLOUR_RESOLVED_BY_BRANCH`, `COLOUR_DISAGREE` and
-`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the two illustrations, the board that draws its Z twice,
-the two DT Cannon boards, and the planner's measured failures: the page draws those TSDs firing BEFORE
-a Z, O or J the board already shows, while the shared planner fires a snapshot board's T last, and the
-test 「measured: each unbuilt TSD fires before a piece its board draws」 re-measures each with the
-engine's own `reach()`), `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS`
-and `DEMO_PIECE_READINGS`. Sizes are read off the tests. The facts test's live mutants are `noMirror`,
+`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the two illustrations, the board that draws its Z twice
+and the two DT Cannon boards), `CLASSIFIER_PARENT_UNFILED`, `U_BEFORE_SUPPORT`, `DEMO_SPIN_LINES`,
+`DEMO_SPIN_EXCEPTIONS` and `DEMO_PIECE_READINGS`. Sizes are read off the tests. The facts test's live mutants are `noMirror`,
 `spinMirrorUnaware`, `spinClearStops`, `bag2Early`, `noGarbageStrip`, `noGarbageStop` and `noSwap`,
 each with its symptom asserted; the hold-stage, PC/scope and `matchFromFilename` mutants are measured
 EQUIVALENT on this corpus and named, so the day one stops being equivalent is a red build. In the
-demos, `noRowMap`, `noReach` and `noSpinCheck` are mutants, `noSwapDeal` and `ignoreConditions` are
-EQUIVALENT here (no demo holds; `3.third`'s S before O is forced by gravity), and `no180` is a
-control. Building the planner-unbuilt nodes would need a shared change (fire a snapshot board's U
-before named later pieces), which would stale every sibling's `planner_md5`; it is an open item, not
-done.
+demos, `noRowMap`, `noReach`, `noSpinCheck` and `noUBefore` are mutants, `noSwapDeal` and
+`ignoreConditions` are EQUIVALENT here (no demo holds; `3.third`'s S before O is forced by gravity),
+and `no180` is a control.
+
+**The TSDs the page fires BEFORE pieces its board draws are built since 2026-10-16, through one
+explicit reading per node.** ~~Building the planner-unbuilt nodes would need a shared change … it is
+an open item, not done.~~ The shared change is `DemoProfile.uFiresBefore` (`route-profile.ts`): a
+map from node id to the pieces the T fires before, and `BagSpec.uBefore` in `route-demos.ts`, which
+lets the U go before exactly those pieces and makes them wait for it (「要等 T(U)」); the order reading
+records `u_before:<pieces>`. It is a profile reading per node, **never a search fallback** — a
+fallback would also build nodes other openers name as unbuilt, and stick spin's two SDパフェ
+patterns are the obvious candidates for a later, deliberate reading. SDPC Spin names eight boards
+(`route-profile-sdpcspin.ts`); the sets are the pieces each board forces after its TSD — the one over
+the slot, plus, in the three Z-and-J boards, the Z that only rests on that J (`U_BEFORE_SUPPORT`) —
+and the test 「measured: each uFiresBefore TSD fires before the pieces the profile names, and no
+fewer」 re-measures each set as minimal with the engine's own `reach()`. The drawing never stands at
+any lock of such a demo, so it is checked as the last bag's kept-rows composite in both
+implementations (`route-demo-checks.ts` and `route_page._demo_end`): the U is the bag's one U, a T,
+with the drawn spin and lines, followed by exactly the named pieces, and the classifier must file NO
+snapshot for the node; a test sets a node's drawing to its sibling's and must see the composite check
+fail. Their matchable children whose parent is never filed are named in `CLASSIFIER_PARENT_UNFILED`.
+The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
+(no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

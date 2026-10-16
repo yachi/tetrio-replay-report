@@ -86,8 +86,10 @@ SDPCSPIN_SITE = RouteSiteProfile(
         "empty_node": "3.third.imperial", "text_only": "3.first.trinity.donate",
         "unmatchable": "3.first.cave.stsd", "node_page": "tsd", "node_page_node": "2.tsd",
         "elsewhere_node": "bag1.jl.left", "demo_built": "3.third.imperial.pc#1",
-        "demo_unbuilt": "3.second.cspin", "demo_never_holds": "bag1.jl",
+        "demo_unbuilt": "3.second.cspin.z_early", "demo_never_holds": "bag1.jl",
         "demo_missing": "3.first", "demo_spin_last": ("bag1.jl", "bag1.lj", "2.tsd"),
+        # a T fired before named pieces (`u_before:`): its U lock moved to the end must fail
+        "demo_u_before": ("3.second.cspin", "3.second.cspin.o_first#1", "3.third.transition#2"),
     },
 )
 

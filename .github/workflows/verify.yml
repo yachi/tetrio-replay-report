@@ -704,6 +704,14 @@ jobs:
       - name: Check the SDPC Spin route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_sdpcspin_routes --selftest
 
+      # The SDPC Spin pages are pinned by revision (oldid, revision_sha1, snapshot_sha256) and are
+      # refetched and re-checked weekly by wikitext-sources.yml, which needs the network. Its offline
+      # half runs here on every push: the refetch gate's mutants against a fake MediaWiki API (wrong
+      # or disagreeing sha1s, a newer upstream revision, HTTP 403, a missing revision, a network error,
+      # a board edited under re-pinned hashes, which only the extractor's --html-dir can see).
+      - name: Check the wikitext refetch gate catches its mutants
+        run: python3 -m pipeline.openers.check_wikitext_sources --selftest
+
       # The Honey Cup route pages are the shared pipeline/route_page.py renderer bound to
       # pipeline/honey_cup_page.py; build-docs --check below re-renders them, and the constructed
       # demos (honey-cup-demos.html) are checked by pipeline/openers/honey-cup-demos.test.ts in the

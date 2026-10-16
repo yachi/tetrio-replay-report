@@ -13,14 +13,15 @@
  *      TST, then each build's TSDs, the Imperial Cross's two TSDs and a 14-line PC); 3.first.cave's
  *      「J before at least two of T, L and Z」, which the shared planner does not read; the alternate
  *      fourth bags leave the saved I unplaced.
- *  10. the planner's measured failures, re-measured: in 3.second.cspin and 3.third.transition#1 the
- *      engine has a path into the TSD slot only while the bag's Z is not yet placed, in
- *      3.third.transition#2 only while its O is not (the page's 「hold O and tuck it after taking the
- *      TSD」), and in 3.first.cave.stsd the drawn J rests only once the T fills the slot under it. In all
- *      four the T fires BEFORE a piece the board draws; the shared planner fires a snapshot board's U
- *      last, so they are unbuilt, with every node under 3.second.cspin.
- *      The same search shows every Imperial Cross PC pattern roofs its T slot, which is why the profile
- *      frames that PC kind after 28 locks rather than after the last TSD before the PC.
+ *  10. the profile's `uFiresBefore` readings, re-measured: in each named board the engine has no path
+ *      into the TSD slot with every drawn piece placed, and has one with the pieces the T must beat left
+ *      out (the minimal set); a named piece that is not in the T's way rests on one that is
+ *      (U_BEFORE_SUPPORT). So the T fires BEFORE those pieces, the drawn board never stands at any lock,
+ *      and the demo reaches it as the last bag's kept-rows composite (the shared check's `u_before`
+ *      branch); the classifier files none of them, nor the matchable children under them
+ *      (CLASSIFIER_PARENT_UNFILED). The same search shows every Imperial Cross PC pattern roofs its T
+ *      slot, which is why the profile frames that PC kind after 28 locks rather than after the last TSD
+ *      before the PC.
  *  11. mutants: each planner rule turned off, and each planted artefact defect, turns a check red;
  *      what each of the others measured is stated at its own test.
  *
@@ -35,9 +36,8 @@ import { demoChecks, digestOf } from './route-demo-checks.ts';
 import { classify } from '../sim/route-facts.ts';
 
 /** Nodes with a board and no demo, and the reason the artefact gives. A node the planner cannot
- *  build is a red build until it is named here. The two illustrations, the doubly-drawn Z and the two
- *  DT Cannon boards are the profile's; the rest are the planner's measured failures (test 10 says
- *  why each is a fact about the page's drawing order, not a planner bug). */
+ *  build is a red build until it is named here. All five are the profile's: the two illustrations,
+ *  the doubly-drawn Z and the two DT Cannon boards. */
 const DEMO_UNBUILT: Record<string, string> = {
   'bag1.after': '示意圖：TSS 之後嘅盤面（兩種 J/L 顏色消完都係呢幅），即係 bag1.jl 示範打完之後嘅盤面',
   '2.after': '示意圖：TSD 之後嘅盤面，即係 2.tsd 示範打完之後嘅盤面',
@@ -46,19 +46,6 @@ const DEMO_UNBUILT: Record<string, string> = {
     + '唔係一個巡次嘅砌法（transcription 嘅 known_discrepancies）',
   '3.second.cspin.dt#2': 'C-Spin 嘅殘餘用淺色（大寫）畫，但第三巡嗰粒 I 畫成實色，同新嗰粒 I 一齊即係兩粒 I：'
     + '唔係一個巡次嘅砌法（transcription 嘅 known_discrepancies）',
-  '3.first.cave.stsd': '最遠放到 LZSOI；之後：J 由出生位行唔到去；T(U) 要最後先放',
-  '3.first.cave.stsd.next': '上一層 3.first.cave.stsd 砌唔到',
-  '3.second.cspin': '最遠放到 JZSOLI；之後：T(U) 由出生位行唔到去',
-  '3.second.cspin.first#1': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.first#2': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.o_first#1': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.o_first#2': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.l_first#1': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.l_first#2': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.l_first#3': '上一層 3.second.cspin 砌唔到',
-  '3.second.cspin.l_first#4': '上一層 3.second.cspin 砌唔到',
-  '3.third.transition#1': '最遠放到 LJSOZI；之後：T(U) 由出生位行唔到去',
-  '3.third.transition#2': '最遠放到 LJSZOI；之後：T(U) 由出生位行唔到去',
 };
 /** U line counts the drawing does not fix: the four Imperial Cross PC patterns draw their T (the
  *  Imperial Cross's second TSD, flat in the bottom two body rows) with no named spin. */
@@ -84,13 +71,31 @@ const { routes, byId, committedText, committed } = C;
  *  under the TSS. The page does not say which T fires first (the transcription's `order_note`). */
 const CLASSIFIER_SIBLING: Record<string, string> = { '3.first.trinity.tss': '3.first.trinity.tsd' };
 
+/** The profile's `uFiresBefore` nodes: their U fires before the named pieces, so the drawn board never
+ *  stands at any lock and the shared check requires the classifier NOT to file them. */
+const U_BEFORE = SDPCSPIN.demos!.uFiresBefore!;
+
+/** Measured: a MATCHABLE child of a `uFiresBefore` board, and that parent. The classifier searches a
+ *  node's children only under a snapshot it filed, and it never files the parent (its board never
+ *  stands), so it never looks for the child: the child's own drawing stands at its last-but-one lock
+ *  and is still not filed. The route is not relaxed for it. The unmatchable children
+ *  (3.second.cspin.first#2) are not checked by the classifier step at all, so they are not here. */
+const CLASSIFIER_PARENT_UNFILED: Record<string, string> = {
+  '3.first.cave.stsd.next': '3.first.cave.stsd',
+  '3.second.cspin.o_first#2': '3.second.cspin',
+  '3.second.cspin.l_first#2': '3.second.cspin',
+  '3.second.cspin.l_first#4': '3.second.cspin',
+};
+
 /** The kinds of T-spin a chain fires, in order, and what it ends on. */
 const EVENTS: [RegExp, string][] = [
   [/^bag1\.(lj|jl)\.left$/, ''],
   [/^bag1\.(lj|jl)$/, 'TSS'],
   [/^2\.tsd$/, 'TSS TSD'],
   [/^3\.(first|second|third)$/, 'TSS TSD TST'],
-  [/^3\.(first\.cave|second\.alt#\d|third\.imperial)$/, 'TSS TSD TST TSD'],
+  [/^3\.(first\.cave|second\.alt#\d|second\.cspin|third\.imperial|third\.transition#\d)$/, 'TSS TSD TST TSD'],
+  [/^3\.(first\.cave\.stsd|second\.cspin\.(first|o_first|l_first)#\d)$/, 'TSS TSD TST TSD TSD'],
+  [/^3\.first\.cave\.stsd\.next$/, 'TSS TSD TST TSD TSD TSD'],
   [/^3\.first\.trinity$/, 'TSS TSD TST TSD TSD'],
   [/^3\.first\.trinity\.tsd$/, 'TSS TSD TST TSD TSD TSD'],
   [/^3\.first\.trinity\.tss$/, 'TSS TSD TST TSD TSD TSS'],
@@ -138,6 +143,16 @@ function checkAll(art: any): string | null {
   if (done) return done;
   for (const d of art.demos) {
     const e = C.checkDemo(d, byNode);
+    const unfiled = CLASSIFIER_PARENT_UNFILED[d.node];
+    if (unfiled) {
+      // every shared check before the snapshot step passed; the parent is a uFiresBefore board, and the
+      // classifier filed neither it nor this child
+      if (e !== `${d.node}: classifier snapshot missing`) return e ?? `${d.node}: classifier files it after all`;
+      if (!(unfiled in U_BEFORE) || byId.get(d.node)!.parent !== unfiled) return `${d.node}: ${unfiled} is not its uFiresBefore parent`;
+      const snaps = classify(SDPCSPIN, [digestOf(d)], routes).cases[0]!.snapshots;
+      if (snaps.some((s: any) => s.node === unfiled)) return `${d.node}: ${unfiled} filed after all`;
+      continue;
+    }
     const sib = CLASSIFIER_SIBLING[d.node];
     if (!sib) { if (e) return e; continue; }
     // every shared check before the snapshot step passed, and the classifier files it under the sibling
@@ -176,16 +191,38 @@ test('every demo re-runs, reaches its node, ends on its drawing; the lists are e
   // the demo set, as measured
   expect(art.demos.map((d: any) => d.node)).toEqual([
     'bag1.lj.left', 'bag1.lj', 'bag1.jl.left', 'bag1.jl', '2.tsd', '3.first', '3.second', '3.third', '3.first.cave',
-    '3.first.trinity', '3.first.trinity.tsd', '3.first.trinity.tss', '3.second.alt#1', '3.second.alt#2',
-    '3.third.imperial', '3.third.imperial.pc#1', '3.third.imperial.pc#2', '3.third.imperial.pc#3', '3.third.imperial.pc#4',
+    '3.first.cave.stsd', '3.first.cave.stsd.next', '3.first.trinity', '3.first.trinity.tsd', '3.first.trinity.tss',
+    '3.second.cspin', '3.second.alt#1', '3.second.alt#2', '3.second.cspin.first#1', '3.second.cspin.first#2',
+    '3.second.cspin.o_first#1', '3.second.cspin.o_first#2', '3.second.cspin.l_first#1', '3.second.cspin.l_first#2',
+    '3.second.cspin.l_first#3', '3.second.cspin.l_first#4', '3.third.imperial', '3.third.imperial.pc#1',
+    '3.third.imperial.pc#2', '3.third.imperial.pc#3', '3.third.imperial.pc#4', '3.third.transition#1',
+    '3.third.transition#2',
   ]);
+  // every uFiresBefore node has a demo, and CLASSIFIER_PARENT_UNFILED is exactly the matchable demos
+  // whose parent the profile names: read off the profile, so the two cannot drift apart
+  const demoed = new Set(art.demos.map((d: any) => d.node));
+  for (const id of Object.keys(U_BEFORE)) expect(demoed.has(id), id).toBe(true);
+  expect(Object.keys(CLASSIFIER_PARENT_UNFILED).sort()).toEqual(art.demos.map((d: any) => byId.get(d.node)! as any)
+    .filter((n: any) => !n.list && !n.unmatchable && !(n.id in U_BEFORE) && n.parent in U_BEFORE).map((n: any) => n.id).sort());
 }, 120_000);
 
-/** Test 10: why the planner's failures are the page's drawing order. Each case re-runs the engine's
- *  own move search (`reach`) on the drawn board: with every drawn piece there, the piece named has no
- *  resting path into its drawn cells; with the one named piece left out (or, for the STSD's J, the T's
- *  slot filled), it has. */
-test('measured: each unbuilt TSD fires before a piece its board draws', () => {
+/** A `uFiresBefore` piece that does NOT block the T's path, and the named piece it rests on. Measured
+ *  with `reach`: in these three boards the Z's drawn cells have no resting path while the J is absent,
+ *  and leaving the Z out alone does not free the T. So the J is what the T must beat, and the Z follows
+ *  the J; the set is the pieces forced after the U, not the pieces in the T's way. */
+const U_BEFORE_SUPPORT: Record<string, Record<string, string>> = {
+  '3.second.cspin.o_first#1': { Z: 'J' },
+  '3.second.cspin.l_first#1': { Z: 'J' },
+  '3.second.cspin.l_first#3': { Z: 'J' },
+};
+
+/** Test 10: why the profile's `uFiresBefore` readings are the page's drawing order, not a planner
+ *  choice. Each entry is re-measured with the engine's own move search (`reach`) on the drawn board.
+ *  The BLOCKERS (the named pieces not in U_BEFORE_SUPPORT): with every drawn piece there the T has no
+ *  resting path into the U cells; with the blockers left out it has; put any one back and it has none
+ *  again. Every other named piece is no blocker (leaving it out alone does not free the T) and has no
+ *  resting path without the piece it is listed as resting on, so it follows the U through it. */
+test('measured: each uFiresBefore TSD fires before the pieces the profile names, and no fewer', () => {
   const W = 10;
   const gridOf = (rows: string[], skip: (ch: string) => boolean) => {
     const g = Array.from({ length: 40 }, () => new Array<string | null>(W).fill(null));
@@ -203,14 +240,32 @@ test('measured: each unbuilt TSD fires before a piece its board draws', () => {
     const rows = (byId.get(id) as any).rows as string[];
     return reach(newEngine(routes), gridOf(rows, ch => ch === letter || skip(ch)), piece, cellsOf(rows, letter)).length;
   };
-  for (const [id, late] of [['3.second.cspin', 'z'], ['3.third.transition#1', 'z'], ['3.third.transition#2', 'o']] as const) {
-    expect(paths(id, 'T', 'U', () => false), `${id}: T with the ${late} placed`).toBe(0);
-    expect(paths(id, 'T', 'U', ch => ch === late), `${id}: T before the ${late}`).toBeGreaterThan(0);
+  expect(Object.keys(U_BEFORE).length).toBeGreaterThan(0);
+  for (const id of Object.keys(U_BEFORE_SUPPORT)) expect(id in U_BEFORE, id).toBe(true);
+  for (const [id, named] of Object.entries(U_BEFORE)) {
+    const rows = (byId.get(id) as any).rows as string[];
+    // each named piece is ONE piece on the drawing, so leaving its letter out leaves out that piece
+    for (const p of named) expect(cellsOf(rows, p.toLowerCase()).length, `${id}: ${p} cells`).toBe(4);
+    const sup = U_BEFORE_SUPPORT[id] ?? {};
+    const blockers = named.filter(p => !(p in sup)).map(p => p.toLowerCase());
+    expect(blockers.length, `${id}: no blocker`).toBeGreaterThan(0);
+    expect(paths(id, 'T', 'U', () => false), `${id}: T with every drawn piece placed`).toBe(0);
+    expect(paths(id, 'T', 'U', ch => named.some(p => p.toLowerCase() === ch)), `${id}: T before ${named.join('')}`).toBeGreaterThan(0);
+    expect(paths(id, 'T', 'U', ch => blockers.includes(ch)), `${id}: T before ${blockers.join('')}`).toBeGreaterThan(0);
+    for (const back of blockers)
+      expect(paths(id, 'T', 'U', ch => blockers.includes(ch) && ch !== back), `${id}: T with ${back} put back`).toBe(0);
+    for (const [p, on] of Object.entries(sup)) {
+      expect(named.includes(on) && !(on in sup), `${id}: ${p} rests on a blocker`).toBe(true);
+      expect(paths(id, 'T', 'U', ch => ch === p.toLowerCase()), `${id}: ${p} alone is no blocker`).toBe(0);
+      expect(paths(id, p, p.toLowerCase(), () => false), `${id}: ${p} with ${on} placed`).toBeGreaterThan(0);
+      expect(paths(id, p, p.toLowerCase(), ch => ch === on.toLowerCase()), `${id}: ${p} without ${on}`).toBe(0);
+    }
   }
   // and why the PC kind is framed after 28 locks, not after the last TSD: every Imperial Cross PC
   // pattern roofs its T slot, so its TSD fires before the PC's last lock
   for (const n of routes.nodes.filter(x => x.list === '3.third.imperial.pc'))
     expect(paths(n.id, 'T', 'U', () => false), `${n.id}: T into the roofed slot`).toBe(0);
+  // the STSD's J rests only once the T fills the slot under it, which is the same reading seen from J
   expect(paths('3.first.cave.stsd', 'J', 'j', ch => ch === 'U'), 'STSD: J over the empty slot').toBe(0);
   expect(paths('3.first.cave.stsd', 'J', 'j', () => false), 'STSD: J once the T fills the slot').toBeGreaterThan(0);
 }, 120_000);
@@ -248,11 +303,36 @@ test('data mutants: each planted defect is caught', () => {
     ['a demo removed', a => { a.demos = a.demos.filter((d: any) => d.node !== '3.first.cave'); }],
     ['an unbuilt entry removed', a => { a.unbuilt = a.unbuilt.slice(1); }],
     ['a U fired as a plain T', a => { const d = pick(a, '3.third.imperial'); d.letters = d.letters.slice(0, -1) + 't'; }],
+    ['a uFiresBefore U moved to the end of its bag', a => {
+      // 3.second.cspin places IOSJLTZ: swap the T (the U) with the Z after it, keeping the 7-bag
+      const d = pick(a, '3.second.cspin'); const L = d.locks.length - 1, b = d.bags.at(-1);
+      const sw = (x: string, i: number) => x.slice(0, i) + x[i + 1] + x[i] + x.slice(i + 2);
+      [d.locks[L - 1], d.locks[L]] = [d.locks[L], d.locks[L - 1]];
+      d.letters = sw(d.letters, L - 1);
+      const qi = b.queue.indexOf('T'); b.queue = sw(b.queue, qi); b.placed = sw(b.placed, b.placed.indexOf('T'));
+      d.seq = d.bags.map((x: any) => x.queue).join('') + d.seq.slice(7 * d.bags.length);
+    }],
+    ['a u_before token dropped', a => {
+      const d = pick(a, '3.third.transition#2');
+      d.bags.at(-1).order_reading = d.bags.at(-1).order_reading.filter((r: string) => !r.startsWith('u_before:'));
+    }],
+    ['a u_before token on a node the profile does not name', a => { pick(a, '3.second.cspin.l_first#2').bags.at(-1).order_reading.push('u_before:Z'); }],
   ];
   for (const [what, f] of muts) {
     const a = fresh(); f(a);
     expect(checkAll(a), what).not.toBeNull();
   }
+}, 120_000);
+
+test('the u_before composite check has teeth: a demo against its sibling\'s drawing fails there', () => {
+  // the data mutants above are caught by the re-run check before they reach the end-state branch, so
+  // this one changes the DRAWING instead: transition#1's demo read against transition#2's board
+  const n = byId.get('3.third.transition#1')! as any, rows = n.rows;
+  n.rows = (byId.get('3.third.transition#2') as any).rows;
+  try {
+    expect(checkAll(JSON.parse(committedText()))).toContain('kept-rows composite is not the drawing');
+  } finally { n.rows = rows; }
+  expect(checkAll(JSON.parse(committedText()))).toBeNull();
 }, 120_000);
 
 test('planner mutants: each rule turned off fails a check or throws', () => {
@@ -261,6 +341,18 @@ test('planner mutants: each rule turned off fails a check or throws', () => {
     try { verdict = checkAll(JSON.parse(serialise(buildFor(SDPCSPIN, { [m]: true })))); } catch (e) { verdict = String(e); }
     expect(verdict, m).not.toBeNull();
   }
+}, 300_000);
+
+/** A MUTANT, measured: with the profile's `uFiresBefore` ignored the U goes last again, so the eight
+ *  boards it names are unbuilt again and so is every demo chained under them (5 more); nothing else
+ *  moves. The symptom is asserted as that exact unbuilt set, not as 「some check fails」. */
+test('noUBefore: the uFiresBefore boards and their chained children go back to unbuilt', () => {
+  const art = JSON.parse(serialise(buildFor(SDPCSPIN, { noUBefore: true })));
+  const under = (id: string): boolean => id in U_BEFORE || (!!byId.get(id)!.parent && under(byId.get(id)!.parent!));
+  const back = committed().demos.map((d: any) => d.node).filter(under);
+  expect(back.length).toBe(13);
+  expect(art.unbuilt.map((u: any) => u.node).sort()).toEqual([...Object.keys(DEMO_UNBUILT), ...back].sort());
+  expect(checkAll(art)).not.toBeNull();
 }, 300_000);
 
 /** EQUIVALENT here, measured: each leaves the artefact byte-identical. `noSwapDeal`: no demo holds, so

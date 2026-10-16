@@ -25,8 +25,9 @@ Every rule the openers share is `route_transcription.py`'s, once; this file hold
 its `SPEC` and the rules only this page needs (`_sdpcspin_checks`).
 
 WHERE THE TRANSCRIPTION COMES FROM. `NODES` below is a literal, hand-checked transcription of the
-page's wikitext (`action=edit`), fetched with only-cli's `oc raw` (NOT curl). The saved snapshot holds
-the page on ONE line (whitespace runs collapsed by the fetch); its hash is of those bytes. Each
+page's wikitext, first read with only-cli's `oc raw` of `action=edit` (NOT curl). The recorded snapshot is
+the pinned revision's own bytes from the MediaWiki API, its sha1 equal to the API's (`revision_sha1`), so
+`check_wikitext_sources` can refetch and re-check it in CI. Each
 `{{pfstart}} … {{pfend}}` is a board, `{{pfrow|…}}` ten cells, and every board was read by
 `route_transcription.wikitext_cell` (blank `-`, G `c`, P and T `U`, `L<x>` the muted upper case `<x>`,
 `'` `v`). Two independent hand transcriptions and a third direct parse agreed on every cell of all 35
@@ -101,18 +102,23 @@ SOURCE = {
     'oldid': 42723,
     'oldid_note': 'the rendered page\'s 「Retrieved from」 link names oldid=42723 (read 2026-10-15 with oc); the wikitext itself carries no revision id',
     'categories': ['T-Spin openers', 'T-Spin Single openers', 'Single Double openers'],
-    'fetched': '2026-10-15',
-    'fetch_method': 'only-cli `oc raw` of the action=edit page (NOT curl): the textarea\'s wikitext. The saved snapshot '
-                    'holds the page on ONE line, whitespace runs collapsed by the fetch; the hash is of those bytes. '
-                    'Boards are {{pfstart}} … {{pfend}} templates, 35 of them in 14 {| |} tables, read by '
+    'fetched': '2026-10-16',
+    'fetch_method': 'the pinned revision\'s own bytes from the MediaWiki API (`api.php?action=query&prop=revisions&revids=<oldid>&rvprop=ids|sha1|content&rvslots=main&format=json`), fetched by `pipeline.openers.check_wikitext_sources` with Python\'s urllib (NOT curl): '
+                    'the API\'s sha1 is checked against sha1 of the bytes before they are saved. Boards are '
+                    '{{pfstart}} … {{pfend}} templates, 35 of them in 14 {| |} tables, read by '
                     'route_transcription.wikitext_tables / wikitext_cell',
+    'revision_sha1': '6a90bebd3e543a6d28503fb3daa859d7398c58be',
+    'revision_timestamp': '2025-05-10T14:16:39Z',
+    'revision_note': 'MediaWiki\'s own sha1 of revision 42723 (read 2026-10-16 from the API), equal to sha1 of the saved bytes: '
+                     'a second authority beside snapshot_sha256, which is ours',
     'snapshot_file': 'SDPC_Spin.wikitext',
-    'snapshot_sha256': '6470895c2b8074f1e5b6051d06444eaac9ef38d95919e7ed1f581144012a0f80',
-    'snapshot_bytes': 10999,
-    'snapshot_note': 'sha256 of the wikitext this transcription was checked against. Not re-verifiable in CI: the page '
-                     'is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with '
-                     'SingleYou.wikitext, cross_source, beside it). A refetch that keeps the newlines will move the '
-                     'hash without moving a board; the board diff is what to read.',
+    'snapshot_sha256': 'dfe83ceea4b6a2dc1ea84961cfdc5f688ece958f9fde447712487fd2b38ee2c9',
+    'snapshot_bytes': 11062,
+    'snapshot_note': 'sha256 of the revision\'s bytes as the API serves them (newlines kept). The page is not committed; '
+                     'the weekly `wikitext-sources` job refetches the pinned revision, checks both hashes and re-runs '
+                     '--html-dir, and fails when the page has a newer revision. The transcription was first checked '
+                     'against oc\'s whitespace-collapsed rendering (sha256 6470895c…, 10999 bytes); collapsing every '
+                     'whitespace run of these bytes to one space reproduces that hash exactly.',
     'references_listed': ['https://harddrop.com/wiki/SDPC', 'https://harddrop.com/wiki/Stickspin',
                           'https://harddrop.com/wiki/STMB_Cave', 'https://harddrop.com/wiki/STSD',
                           'https://harddrop.com/wiki/Trinity', 'https://harddrop.com/wiki/Imperial_Cross',
@@ -131,12 +137,14 @@ CROSS_SOURCE = {
     'url': 'https://harddrop.com/w/index.php?title=SingleYou&action=edit',
     'rendered_url': 'https://harddrop.com/wiki/SingleYou',
     'oldid': 43398,
-    'oldid_note': 'the current revision per the page\'s history at the fetch; the wikitext itself carries no revision id',
-    'fetched': '2026-10-15',
-    'fetch_method': 'only-cli `oc raw` of the action=edit page, as for the source: one line, whitespace collapsed',
+    'oldid_note': 'the current revision per the page\'s history at the 2026-10-15 fetch, and still the current one on 2026-10-16 (API)',
+    'fetched': '2026-10-16',
+    'fetch_method': 'as for the source: the pinned revision\'s bytes from the MediaWiki API, sha1 checked',
+    'revision_sha1': '45f26d54cfa377210cfe2868c8fbf4f75b6d1072',
+    'revision_timestamp': '2025-10-03T09:29:35Z',
     'snapshot_file': 'SingleYou.wikitext',
-    'snapshot_sha256': '9e659fb741834fe51b480530c5f4b974a2b291a7e18541dc340f04f742819121',
-    'snapshot_bytes': 73303,
+    'snapshot_sha256': 'f12f172ce19223250a7c187bf4f3d49738f0d6c9b25f9602cc911185e87cf76b',
+    'snapshot_bytes': 73476,
     'parser': 'pipeline.openers.route_transcription.wikitext_boards (wikitext_tables, cells read by wikitext_cell), '
               'each board trimmed by bottom(rows, 0): the reader the source page is read with',
     'table': 0,
