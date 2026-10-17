@@ -1,0 +1,10 @@
+name = "RouteOrders"
+defaultTargets = ["RouteOrders"]
+
+[[lean_lib]]
+name = "RouteOrders"
+
+# prints every node's count under each T2/T4 mutant (the figures Discriminate.lean asserts on)
+[[lean_exe]]
+name = "measure"
+root = "Measure"

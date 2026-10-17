@@ -301,7 +301,7 @@ FAST, DEFAULT, SLOW, WEEKLY, SESSIONS = "fast", "default", "slow", "weekly", "se
 # The pinned toolchains.  CI installs each by sha256; locally we use what is on
 # PATH and REPORT the version, because a gate that verified with a different
 # verifier reproduced something other than CI.
-TOOLCHAIN = {"dafny": "DAFNY_VERSION", "z3": "Z3_VERSION", "cvc5": "CVC5_VERSION"}
+TOOLCHAIN = {"dafny": "DAFNY_VERSION", "z3": "Z3_VERSION", "cvc5": "CVC5_VERSION", "lean": "LEAN_VERSION"}
 
 # Why every install step is skipped rather than run: they `curl` a pinned asset
 # and append to $GITHUB_PATH, neither of which means anything here.  The version
@@ -381,6 +381,11 @@ PLAN = {
         "Install Dafny ${{ env.DAFNY_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "dafny",
         "Mutation-test the spec": "schedule/inputs.mutation only — --weekly runs it",
     }),
+    # lean/check.sh puts ~/.elan/bin on PATH itself, but `needs` checks PATH before the job runs.
+    "lean": Entry(DEFAULT, needs=["lean", "lake"], skips={
+        "Install Lean ${{ env.LEAN_VERSION }} (pinned by sha256)": _TOOLCHAIN_SKIP % "lean",
+        "Mutation-test the Lean proofs": "schedule/inputs.mutation only — --weekly runs it",
+    }),
     "coverage": Entry(SLOW),
     # `nix build .#cc-oracle-image` targets aarch64-linux; the job's own comment says
     # it is built "the way the local Mac could not".
@@ -394,7 +399,8 @@ PLAN = {
     "wikitext-sources": Entry(WEEKLY),
 }
 
-WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs"}
+WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs",
+                     "Mutation-test the Lean proofs"}
 
 
 # ------------------------------------------------------------- completeness
