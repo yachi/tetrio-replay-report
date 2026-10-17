@@ -275,6 +275,14 @@ bun pipeline/sim/emit-route-demos.ts --opener sdpcspin \
   --out analysis/sdpcspin-demos.json                            # the constructed SDPC Spin demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/sdpcspin.test.ts pipeline/openers/sdpcspin-demos.test.ts  # its two tests
 python3 -m pipeline.sdpcspin_page --selftest    # the docs/sdpcspin*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stsd_shapes            # CI gate: the STSD technique transcription
+python3 -m pipeline.openers.extract_stsd_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique stsd \
+  --out analysis/stsd-facts.json                               # STSD's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique stsd \
+  --out analysis/stsd-demos.json                               # the constructed STSD demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/stsd.test.ts pipeline/openers/stsd-demos.test.ts  # its two tests
+python3 -m pipeline.stsd_page --selftest        # the docs/stsd*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3901,6 +3909,80 @@ snapshot for the node; a test sets a node's drawing to its sibling's and must se
 fail. Their matchable children whose parent is never filed are named in `CLASSIFIER_PARENT_UNFILED`.
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
+
+## 中盤手法頁（STSD）— mid-game local shapes, quarantined like the route pages
+
+shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
+happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
+rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
+pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
+hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page; a
+later technique whose shape the window predicate can express is a data addition (a transcription
+module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
+two tests, three CI steps, one `TECHNIQUE_SITES` entry).
+
+| piece | where |
+|---|---|
+| transcription | `pipeline/openers/stsd-technique.json` (schema `technique-shapes/1`, named `*-technique.json` so no `*-routes.json` glob sees it), held as a literal in `extract_stsd_shapes.py` and gated by the shared `technique_transcription.py`; raw-HTML snapshot, fetched like 山岳積み2号's, re-checked with `--html-dir` |
+| matcher + artefact | `pipeline/sim/technique-facts.ts` (rules), `technique-profile.ts` (types), `technique-profile-stsd.ts` (data), `techniques.ts` (registry, unhashed) → `analysis/stsd-facts.json` |
+| facts test | `pipeline/openers/stsd.test.ts` (+ `technique-facts-checks.ts`) |
+| demos | `pipeline/sim/technique-demos.ts` (planner), `technique-demo-profile.ts` / `technique-demos-stsd.ts` → `analysis/stsd-demos.json`; test `stsd-demos.test.ts` |
+| pages | `pipeline/technique_page.py` (renderer + audit) bound by `stsd_page.py` + `stsd_prose.json` → `docs/stsd.html`, `docs/stsd-demos.html`, rendered by `bin/build-docs` from `TECHNIQUE_SITES` under a 中盤手法 index group after 定式路線 |
+
+**The predicate is anchored on the T, not on a column range.** The lock's four cells must equal the
+variant's drawn T cells under one translation (mirrored: columns reflected inside the window), which
+fixes orientation too; every other cell of the window the transcription carries must be filled
+(any piece or garbage — garbage is FILLED) or empty as drawn; colour is never compared, and nothing
+outside the window is read. The cleared rows' cells right of the window are deliberately not tested:
+they are entailed by the clear (the `NaiveClauseForced` lesson), and the gate's window rule that no
+piece letter sits outside the window is what makes leaving them out safe. The window is written
+TWICE — `windowMatch` in TS and `window_fires` in the gate — and the facts test holds the two to one
+answer over every board of every committed `*-routes.json` (the cross-source: harddrop's SDPC Spin
+page fires it as drawn and mirrored; one 山岳積み2号 board fires it unlabelled and is named, not
+explained).
+
+**The denominator is the scored TSD, and the loop that scores it is a THIRD COPY.** A T lock with an
+engine spin credit that cleared lines, inside the verified prefix, passing the reconstruction check —
+the same loop as `emit-opener-facts.ts`'s donation / cave pass and `dualVerdict`, kept as a copy so
+that emitter is not edited. `stsd.test.ts` holds its scored count to `opener-facts.json`'s
+`donation.check` in every session and for every player, which is the gate on the duplication.
+Opener / mid-game is the 0-based `lock <= WINDOW_PIECES` convention (see the lock-numbering note in
+「C-Spin 同 DT 砲」), and the artefact says which one it uses.
+
+**No headline without its controls**, and the page audit enforces it: the same window under TSS, TST
+and the mini spins, three ablations (no must-empty clause, no roof, the T merely overlapping the
+window) and the orientation baseline, each 「N / M」 beside the headline. One ablation EQUALS the
+headline on this corpus — the roof never decides a match — and is recorded as a finding, not
+dropped. The follow-up (the second TSD the page promises) carries the slot through every clear and
+garbage insertion to the next T, each step verified against the engine's own next board, and every
+miss has a named reason. Every figure is read off the artefact and the tests; none is typed here.
+
+**Readings and discrepancies are the transcription's and are printed on the page:** `B` an EMPTY
+garbage-hole cell, muted upper case the rows a spin clears, the three terrains the page never draws
+DERIVED by subtracting its pieces (checked), the after board drawn with the right side stacked up
+(`basic.after:after`), and the misfire's J drawn three cells (`misfire.spin:colour`).
+
+**Demos are BUILT from an empty board, never seeded**, because every decoder in this repo (the TS
+one, `replay_section.decode_boards`, the inlined player) starts empty and a timeline can insert only
+one-hole garbage rows. The planner enumerates exact covers of the terrain's grey cells by non-T
+pieces, then searches placement orders the engine can play, then fires the stood T at the one T
+placement where `windowMatch` matches, fills the follow-up's rows with pieces OUTSIDE the window
+columns where the drawing assumes them, and fires the follow-up. Two T-spins in a row need two T's
+close together, so the dealing is one scheme: bag 1's T dealt last and held, bag 2's first piece
+placed in its stead, bag 2's T swapped for the held one, the follow-up T swapped out when the next
+piece arrives — whole 7-bags throughout. The engine is the arbiter (`runDemo` + `assertRoundTrip`),
+the page re-decodes every embedded demo with its own decoder, and a terrain the planner cannot build
+is published unbuilt with the planner's MEASURED reason (a cell count that is not a multiple of four
+for two of them; the garbage boards because a constructed demo has no opponent). `noSpinCheck` is a
+measured EQUIVALENT mutant — both T slots are reachable only by a spin — and `no180` changes a path
+and no check. Named lists and their sizes live in the two tests, never here.
+
+**What would move every technique artefact's hash line:** a new `anchor` value (a technique the
+window predicate cannot express, e.g. 階段のドネイト's staircase over several locks) is an edit to
+`technique-facts.ts`, which every technique artefact's `emitter_md5` hashes — loud, and the cost to
+name when it happens. `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
+because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
+direction is clean: no route artefact hashes a technique file.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
