@@ -35,7 +35,12 @@ export const STSD: TechniqueProfile & { crossRoute: CrossRoute } = {
     node: '3.first.cave',
     note: 'the rounds whose SDPC Spin route reached its STMB Cave (harddrop draws the STSD as that '
       + 'branch\'s next step, 3.first.cave.stsd, which no corpus round reaches as a whole board): did an '
-      + 'STSD hit follow later in the same round? Measured, each miss with its reason.',
+      + 'STSD hit follow inside the drawn continuation? Measured, each miss with its reason; a round whose '
+      + 'node or continuation lies past its verified prefix is named and kept out of the denominator.',
+    continuationLastLock: 34,
+    continuationNote: 'OUR READING: harddrop draws the STSD (3.first.cave.stsd) as bag 5 of that route; at seven '
+      + 'locks a bag with no hold, bag 5 is 0-based locks 28-34, so the continuation is the locks after the node '
+      + 'through lock 34. An STSD hit later in the round is recorded as later_hit_lock and not counted.',
   },
   artefact: {
     schema: 'technique-facts/1',

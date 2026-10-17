@@ -100,8 +100,8 @@
     "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
    }
   ],
-  "transcription_md5": "12540952e95aaa35eef777290cbe0c30",
-  "emitter_md5": "d7a773e3baf57ec983adfabbe3926f5a",
+  "transcription_md5": "5bbd258e0b5b48f99380c7c84bd29ae6",
+  "emitter_md5": "e5f181fbcc6311380249a6515b46d81d",
   "cross_route_md5": "2108c4898e277ec85726281054e97f15"
  },
  "sessions": [
@@ -411,57 +411,110 @@
  "cross_route": {
   "source": "analysis/sdpcspin-facts.json",
   "node": "3.first.cave",
-  "note": "the rounds whose SDPC Spin route reached its STMB Cave (harddrop draws the STSD as that branch's next step, 3.first.cave.stsd, which no corpus round reaches as a whole board): did an STSD hit follow later in the same round? Measured, each miss with its reason.",
-  "rounds": 8,
-  "with_hit_after": 1,
+  "note": "the rounds whose SDPC Spin route reached its STMB Cave (harddrop draws the STSD as that branch's next step, 3.first.cave.stsd, which no corpus round reaches as a whole board): did an STSD hit follow inside the drawn continuation? Measured, each miss with its reason; a round whose node or continuation lies past its verified prefix is named and kept out of the denominator.",
+  "continuation": {
+   "last_lock": 34,
+   "note": "OUR READING: harddrop draws the STSD (3.first.cave.stsd) as bag 5 of that route; at seven locks a bag with no hold, bag 5 is 0-based locks 28-34, so the continuation is the locks after the node through lock 34. An STSD hit later in the round is recorded as later_hit_lock and not counted."
+  },
+  "rounds_reaching_node": 8,
+  "rounds_scored": 6,
+  "with_hit": 0,
   "by_round": [
    {
     "round": "2026-10-03 m15r5 yachi",
     "node_lock": 26,
+    "verified_to": 20,
+    "outcome": "node_unverified",
     "hit_lock": null,
-    "reason": "no T-spin after the node, verified to lock 20"
+    "later_hit_lock": null,
+    "tspins": null,
+    "tsd": null,
+    "tsd_stood": null,
+    "first_tsd": null
    },
    {
     "round": "2026-10-03 m4r7 yachi",
     "node_lock": 26,
-    "hit_lock": 100,
-    "reason": null
+    "verified_to": 114,
+    "outcome": "no_hit",
+    "hit_lock": null,
+    "later_hit_lock": 100,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    },
    {
     "round": "2026-10-09 m1r5 yachi",
     "node_lock": 26,
+    "verified_to": 39,
+    "outcome": "no_hit",
     "hit_lock": null,
-    "reason": "3 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 39"
+    "later_hit_lock": null,
+    "tspins": 3,
+    "tsd": 3,
+    "tsd_stood": 0,
+    "first_tsd": 27
    },
    {
     "round": "2026-10-09 m4r4 yachi",
     "node_lock": 26,
+    "verified_to": 125,
+    "outcome": "no_hit",
     "hit_lock": null,
-    "reason": "5 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 125"
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    },
    {
     "round": "2026-10-09 m4r8 yachi",
     "node_lock": 26,
+    "verified_to": 29,
+    "outcome": "continuation_unverified",
     "hit_lock": null,
-    "reason": "2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 29"
+    "later_hit_lock": null,
+    "tspins": null,
+    "tsd": null,
+    "tsd_stood": null,
+    "first_tsd": null
    },
    {
     "round": "2026-10-09 m5r1 yachi",
     "node_lock": 26,
+    "verified_to": 106,
+    "outcome": "no_hit",
     "hit_lock": null,
-    "reason": "6 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 106"
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    },
    {
     "round": "2026-10-09 m6r5 yachi",
     "node_lock": 26,
+    "verified_to": 78,
+    "outcome": "no_hit",
     "hit_lock": null,
-    "reason": "4 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 78"
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    },
    {
     "round": "2026-10-09 m7r1 yachi",
     "node_lock": 26,
+    "verified_to": 37,
+    "outcome": "no_hit",
     "hit_lock": null,
-    "reason": "2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 37"
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    }
   ]
  },
@@ -552,13 +605,16 @@
   "window_off_board": [],
   "recon_dropped_tsd": [],
   "cross_route_no_hit": [
-   "2026-10-03 m15r5 yachi (no T-spin after the node, verified to lock 20)",
-   "2026-10-09 m1r5 yachi (3 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 39)",
-   "2026-10-09 m4r4 yachi (5 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 125)",
-   "2026-10-09 m4r8 yachi (2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 29)",
-   "2026-10-09 m5r1 yachi (6 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 106)",
-   "2026-10-09 m6r5 yachi (4 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 78)",
-   "2026-10-09 m7r1 yachi (2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 37)"
+   "2026-10-03 m4r7 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood; an STSD hit at lock 100, past the continuation)",
+   "2026-10-09 m1r5 yachi (no STSD hit in locks 27-34: 3 T-spin(s), 3 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-09 m4r4 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-09 m5r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-09 m6r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-09 m7r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)"
+  ],
+  "cross_route_unscored": [
+   "2026-10-03 m15r5 yachi (node at lock 26 is past the verified prefix, verified to lock 20)",
+   "2026-10-09 m4r8 yachi (continuation runs to lock 34, verified only to lock 29; no hit before it)"
   ]
  },
  "hits": [

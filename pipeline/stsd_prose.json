@@ -21,7 +21,7 @@
     "build3.jl": "三格坑：企起 J 同 L",
     "build3.jl_hole": "三格坑：下面一行中間有窿",
     "roof.z": "屋頂用 Z",
-    "roof.i": "屋頂用 I（高一行）",
+    "roof.i": "屋頂用 I（右邊疊高咗一行）",
     "misfire.garbage": "注意：垃圾行個窿喺 T 下面",
     "misfire.spin": "注意：T 跌落個窿，TSD 消錯行（不發）",
     "recover.j": "補救：J 轉入去（ブーメラン）",
@@ -48,7 +48,7 @@
     "followup_note": "由對到嗰下起，將原頁嘅第二下 TSD 位跟住每一下消行同垃圾行推落去，一直推到下一粒 T；每一步都同引擎自己嘅盤面核過。下一粒 T 啱啱落入個位、而且係全 T-spin 消兩行，先算打到。",
     "controls": "對照",
     "cross": "同另一個來源對：SDPC Spin",
-    "cross_note": "harddrop 嘅 SDPC Spin 頁（另一個作者）喺 STMB Cave 之後畫咗一個 STSD。下面係 corpus 入面 SDPC Spin 路線去到 STMB Cave 嘅回合，之後同一局有冇對到 STSD；冇嘅逐個寫原因。",
+    "cross_note": "harddrop 嘅 SDPC Spin 頁（另一個作者）喺 STMB Cave 之後下一巡畫咗一個 STSD。下面係 corpus 入面 SDPC Spin 路線去到 STMB Cave 嘅回合，之後喺原頁畫嘅嗰一巡入面有冇對到 STSD；冇嘅逐個寫原因。分母淨係計去到 STMB Cave 嗰下同埋嗰一巡都喺已核對範圍入面嘅回合，其餘嘅照列、寫明點解唔計。",
     "cases": "個案",
     "cases_note": "每一個對到嘅 TSD 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播。",
     "demos": "示範重播",
@@ -81,9 +81,9 @@
     "window_col": "窗口",
     "followup_col": "第二下",
     "cross_round": "回合",
-    "cross_node": "去到 STMB Cave 嘅粒",
-    "cross_hit": "之後對到 STSD 嘅粒",
-    "yes": "打到（第 {lock} 粒）",
+    "cross_node": "去到 STMB Cave 嘅粒（由 0 數）",
+    "cross_hit": "嗰一巡入面對到 STSD 嘅粒（由 0 數）",
+    "yes": "打到（第 {lock} 粒，由 0 數）",
     "phase_opener": "開局",
     "phase_mid": "中盤",
     "mirrored_mark": "（反轉）"
@@ -97,6 +97,14 @@
     "slot_off_board": "個位推出咗盤面",
     "round_ended": "局完之前冇下一粒 T",
     "rowmap_unverified": "中間有一步對唔返引擎嘅盤面，停咗唔再推"
+  },
+  "cross_reasons": {
+    "hit": "對到",
+    "no_hit": "第 {first} 至 {last} 粒（由 0 數）冇對到：入面有 {tspins} 下 T-spin、{tsd} 下全 T-spin 消兩行，企直嘅有 {tsd_stood} 下",
+    "first_tsd": "（第一下 TSD 喺第 {first_tsd} 粒）",
+    "node_unverified": "唔計：去到 STMB Cave 嗰粒（第 {node_lock} 粒）已經喺已核對範圍（核到第 {verified_to} 粒）之外",
+    "continuation_unverified": "唔計：嗰一巡去到第 {last} 粒，但只核到第 {verified_to} 粒，核對範圍入面冇對到",
+    "later_hit": "；同一局第 {later_hit_lock} 粒有對到 STSD，但已經過咗原頁畫嘅嗰一巡，唔計"
   },
   "spin_kinds": {
     "TSS": "TSS",

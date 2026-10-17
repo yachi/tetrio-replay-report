@@ -148,7 +148,7 @@ NODES = [
      'label': 'a Z for the roof',
      'rows': _b('--zz------ ---zz----- jj-ccccccc j--ccccccc j--ccccccc')},
     {'id': 'roof.i', 'kind': 'build', 'on': 'roof.i.terrain', 'adds': 'ij', 'caption_quote': 'roof',
-     'label': 'an I for the roof, one row higher',
+     'label': 'an I for the roof, the stack right of the well one row taller (the roof itself is no higher than the Z one)',
      'rows': _b('---------- --iiii---- ---ccccccc jj-ccccccc j--ccccccc j--ccccccc')},
     {'id': 'misfire.garbage', 'kind': 'illustration', 'extends': 'build3.jl', 'extra_bottom_rows': 1,
      'caption_quote': 'misfire', 'muted_rows_reading': 'garbage',

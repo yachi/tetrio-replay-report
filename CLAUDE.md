@@ -3957,6 +3957,17 @@ dropped. The follow-up (the second TSD the page promises) carries the slot throu
 garbage insertion to the next T, each step verified against the engine's own next board, and every
 miss has a named reason. Every figure is read off the artefact and the tests; none is typed here.
 
+**The cross-route counts only what it measured, inside the drawn continuation.** It takes the SDPC
+Spin rounds that reached the STMB Cave node and asks whether an STSD hit follows in the bag harddrop
+draws it in (`continuationLastLock`, re-derived by the test from `sdpcspin-routes.json`). A hit later
+in the round is recorded as `later_hit_lock` and never counted — an unbounded 「any later hit」 once
+counted one 74 locks after the cave as corroboration of the drawing. A round whose node the route
+reached past its verified prefix (`verified: false` in the route artefact), or whose continuation runs
+past the prefix with no hit inside it, is named in `cross_route_unscored` and kept out of M: a scan
+for T-spins between the node and a prefix that ends before it is empty by construction, so its 「no
+T-spin」 was never a measurement. The artefact's reasons are outcome codes with counts; the page words
+each one in Cantonese from the prose, never by printing the English list line.
+
 **Readings and discrepancies are the transcription's and are printed on the page:** `B` an EMPTY
 garbage-hole cell, muted upper case the rows a spin clears, the three terrains the page never draws
 DERIVED by subtracting its pieces (checked), the after board drawn with the right side stacked up
@@ -3972,8 +3983,11 @@ close together, so the dealing is one scheme: bag 1's T dealt last and held, bag
 placed in its stead, bag 2's T swapped for the held one, the follow-up T swapped out when the next
 piece arrives — whole 7-bags throughout. The engine is the arbiter (`runDemo` + `assertRoundTrip`),
 the page re-decodes every embedded demo with its own decoder, and a terrain the planner cannot build
-is published unbuilt with the planner's MEASURED reason (a cell count that is not a multiple of four
-for two of them; the garbage boards because a constructed demo has no opponent). `noSpinCheck` is a
+is published unbuilt with the planner's MEASURED reason (an ODD cell count, which is a proof rather
+than a planner limit — each lock adds 4 cells and each line clear removes 10, so a board built from
+empty always holds an even count; an even count that is not a multiple of four is worded as THIS
+planner's limit, since it never clears a line; the garbage boards because a constructed demo has no
+opponent). `noSpinCheck` is a
 measured EQUIVALENT mutant — both T slots are reachable only by a spin — and `no180` changes a path
 and no check. Named lists and their sizes live in the two tests, never here.
 

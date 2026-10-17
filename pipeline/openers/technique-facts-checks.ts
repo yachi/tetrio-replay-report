@@ -22,8 +22,13 @@ export function checkScoredAgainstOpenerFacts(art: any, sessions: string[], root
     expect(mine, `${s}: no by_session entry`).toBeDefined();
     expect(mine.tspin_clears, `${s} tspin_clears`).toBe(of.donation.check.tspin_clears);
     expect(mine.reconstruction_disagreed, `${s} reconstruction_disagreed`).toBe(of.donation.check.reconstruction_disagreed);
-    for (const p of of.donation.players)
-      expect(mine.players[p.user] ?? 0, `${s} ${p.user} tspin_clears_scored`).toBe(p.tspin_clears_scored);
+    // a missing player is a failure, never a 0 (the 全消 lesson): the key sets must be equal first
+    expect(Object.keys(mine.players).sort(), `${s} players`).toEqual(of.donation.players.map((p: any) => p.user).sort());
+    for (const p of of.donation.players) {
+      const n = mine.players[p.user];
+      if (typeof n !== 'number') throw new Error(`${s} ${p.user}: no tspin_clears_scored in the technique artefact`);
+      expect(n, `${s} ${p.user} tspin_clears_scored`).toBe(p.tspin_clears_scored);
+    }
     total += mine.tspin_clears;
   }
   expect(total).toBe(art.check.tspin_clears_scored);

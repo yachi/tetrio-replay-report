@@ -20,8 +20,11 @@
  * THE BASE IS BUILT, NEVER SEEDED. Every decoder in this repo (`decodeTimeline`, the page's
  * `replay_section.decode_boards`, the inlined player) starts from an empty board, and the only thing
  * a timeline can insert is a one-hole garbage row. So the terrain's grey cells are pieces we chose,
- * and the page says so beside every demo. A terrain whose cell count is not a multiple of four, or
- * that no order of reachable pieces covers, is published as unbuilt with the planner's reason.
+ * and the page says so beside every demo. A terrain is published as unbuilt with the planner's
+ * reason when its cell count is ODD (every lock adds 4 cells and every line clear removes 10, so a
+ * board reachable from empty always holds an even count — a proof, not a planner limit), when it is
+ * even but not a multiple of four (reachable only through line clears, which THIS planner never makes
+ * — a limit of the planner, worded as one), or when no order of reachable pieces covers it.
  *
  * THE DEALING, one scheme for every chain. The stood T and the follow-up T are two consecutive
  * T-spins, so two T's have to arrive close together, and a 7-bag deals one per bag. So: bag 1's T is
@@ -168,7 +171,12 @@ function planChain(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node:
   const rest = [...drawn.keys()].filter(c => !page.some(p => p.cells.includes(c))).sort((a, b) => a - b);
   if (rest.join() !== [...terr.keys()].sort((a, b) => a - b).join())
     throw new Error(`${DP.tag}-demos: ${chain.node} less its page pieces is not ${chain.terrain}`);
-  if (terr.size % 4) return { plan: null, reason: `地形有 ${terr.size} 格，唔係 4 嘅倍數：用方塊由空盤砌唔出` };
+  // parity: each lock adds 4 cells, each line clear removes 10, so an empty board only ever reaches an
+  // EVEN count. Odd is a proof; even-but-not-4n needs a clear, which this planner never makes.
+  if (terr.size % 2) return { plan: null,
+    reason: `地形有 ${terr.size} 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出` };
+  if (terr.size % 4) return { plan: null,
+    reason: `地形有 ${terr.size} 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）` };
   const nBase = terr.size / 4, preT = nBase + page.length;
   if (preT < 7) return { plan: null, reason: `T 之前得 ${preT} 粒；我哋嘅發牌（第一巡嘅 T 留喺 hold）要最少 7 粒` };
 

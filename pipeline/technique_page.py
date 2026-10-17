@@ -181,7 +181,7 @@ class TechniqueSite:
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
         cr = art.get("cross_route")
         if cr:
-            out["cross"] = _nn(cr["with_hit_after"], cr["rounds"])
+            out["cross"] = _nn(cr["with_hit"], cr["rounds_scored"])
         return out
 
     def recount(self, art):
@@ -209,7 +209,8 @@ class TechniqueSite:
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
         cr = art.get("cross_route")
         if cr:
-            out["cross"] = _nn(sum(r["hit_lock"] is not None for r in cr["by_round"]), len(cr["by_round"]))
+            out["cross"] = _nn(sum(r["outcome"] == "hit" for r in cr["by_round"]),
+                               sum(r["outcome"] in ("hit", "no_hit") for r in cr["by_round"]))
         return out
 
     # ------------------------------------------------------------ page shell
@@ -374,10 +375,17 @@ class TechniqueSite:
                     '    <div class="scp-index-wrap"><table class="scp-table">',
                     f'    <tr><th>{_esc(T["cross_round"])}</th><th>{_esc(T["cross_node"])}</th>'
                     f'<th>{_esc(T["cross_hit"])}</th><th>{_esc(T["reason"])}</th></tr>']
+            CR = PR["cross_reasons"]
             for r in cr["by_round"]:
-                out.append(f'    <tr><td>{_esc(r["round"])}</td><td>{r["node_lock"]}</td>'
+                fields = dict(r, last=cr["continuation"]["last_lock"], first=r["node_lock"] + 1)
+                words = CR[r["outcome"]].format(**fields)
+                if r["outcome"] == "no_hit" and r["first_tsd"] is not None:
+                    words += CR["first_tsd"].format(**fields)
+                if r["later_hit_lock"] is not None:
+                    words += CR["later_hit"].format(**fields)
+                out.append(f'    <tr data-outcome="{_esc(r["outcome"])}"><td>{_esc(r["round"])}</td><td>{r["node_lock"]}</td>'
                            f'<td>{"—" if r["hit_lock"] is None else r["hit_lock"]}</td>'
-                           f'<td><code>{_esc(r["reason"] or "")}</code></td></tr>')
+                           f'<td>{_esc(words)}</td></tr>')
             out += ["    </table></div>", "  </section>"]
 
         # 7. the cases

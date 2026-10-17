@@ -39,17 +39,18 @@ const V = TR.variants.find((v: any) => v.id === STSD_DEMOS.variant);
 const byId = new Map<string, any>(TR.nodes.map((n: any) => [n.id, n]));
 
 /** Boards no demo stands on, and the reason the artefact gives. The four garbage boards are the
- *  profile's; the rest are the planner's measured reasons (a terrain whose cell count is not a
- *  multiple of four cannot be built from tetrominoes, and its build board fails with it). */
+ *  profile's; the rest are the planner's measured reasons (a terrain with an ODD cell count is
+ *  unreachable from an empty board — each lock adds 4 cells, each clear removes 10 — and its build
+ *  board fails with it). */
 const DEMO_UNBUILT: Record<string, string> = {
-  'build3.jl_hole': '地形有 29 格，唔係 4 嘅倍數：用方塊由空盤砌唔出',
-  'build3.jl_hole.terrain': 'build3.jl_hole 砌唔到：地形有 29 格，唔係 4 嘅倍數：用方塊由空盤砌唔出',
+  'build3.jl_hole': '地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出',
+  'build3.jl_hole.terrain': 'build3.jl_hole 砌唔到：地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出',
   'misfire.garbage': '個窿係一行垃圾嘅窿：垃圾行要對手送先有，砌出嚟嘅示範冇對手，唔可以自己落垃圾',
   'misfire.spin': '係 misfire.garbage 嗰行垃圾上面打嘅，同一個原因砌唔到',
   'recover.j': '係 misfire 之後嘅盤面（有垃圾行），同一個原因砌唔到',
   'recover.j.after': '係 recover.j 之後嘅盤面，同一個原因砌唔到',
-  'roof.z': '地形有 21 格，唔係 4 嘅倍數：用方塊由空盤砌唔出',
-  'roof.z.terrain': 'roof.z 砌唔到：地形有 21 格，唔係 4 嘅倍數：用方塊由空盤砌唔出',
+  'roof.z': '地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出',
+  'roof.z.terrain': 'roof.z 砌唔到：地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出',
 };
 /** Which boards each built demo stands on, pinned. */
 const REACHES: Record<string, string[]> = {

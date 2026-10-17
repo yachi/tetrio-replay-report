@@ -38,10 +38,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "12540952e95aaa35eef777290cbe0c30",
-  "planner_md5": "b013f115815b7d9acd5f9f9fc2f684b6",
+  "transcription_md5": "5bbd258e0b5b48f99380c7c84bd29ae6",
+  "planner_md5": "c08ef67cfef55d4647907d42f40fdd5c",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "d7a773e3baf57ec983adfabbe3926f5a"
+  "classifier_md5": "e5f181fbcc6311380249a6515b46d81d"
  },
  "board": {
   "width": 10,
@@ -421,11 +421,11 @@
  "unbuilt": [
   {
    "node": "build3.jl_hole",
-   "reason": "地形有 29 格，唔係 4 嘅倍數：用方塊由空盤砌唔出"
+   "reason": "地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
   },
   {
    "node": "build3.jl_hole.terrain",
-   "reason": "build3.jl_hole 砌唔到：地形有 29 格，唔係 4 嘅倍數：用方塊由空盤砌唔出"
+   "reason": "build3.jl_hole 砌唔到：地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
   },
   {
    "node": "misfire.garbage",
@@ -445,11 +445,11 @@
   },
   {
    "node": "roof.z",
-   "reason": "地形有 21 格，唔係 4 嘅倍數：用方塊由空盤砌唔出"
+   "reason": "地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
   },
   {
    "node": "roof.z.terrain",
-   "reason": "roof.z 砌唔到：地形有 21 格，唔係 4 嘅倍數：用方塊由空盤砌唔出"
+   "reason": "roof.z 砌唔到：地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
   }
  ],
  "demos": [

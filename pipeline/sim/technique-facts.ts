@@ -40,8 +40,10 @@
  *   4. Outside the window nothing is read. The cleared rows' cells right of it are entailed by the
  *      clear itself (the NaiveClauseForced lesson); the transcription gate's window rule (c) is what
  *      makes leaving them out safe.
- * The mirrored variant is tried only when the drawn one fails; an asymmetric T cannot match both,
- * which the `tryMirrorFirst` control measures.
+ * Both orientations are tried and a lock matching BOTH throws (an asymmetric T cannot), so the order
+ * they are tried in cannot change an answer — there is no control for it, because one that cannot
+ * fail is a comment. What the mirror CAN get wrong is the follow-up slot, which must be reflected
+ * with the window: the `followupUnmirrored` mutant leaves it as drawn on mirrored hits.
  *
  * THE FOLLOW-UP (the technique's payoff). From a hit at lock i, the variant's follow-up slot (its
  * pre-clear cells, from the transcription) is carried through lock i's clear and every later lock's
@@ -171,7 +173,7 @@ export function prepare(tr: any, v: Variant): Prepared[] {
 // ── the predicate ────────────────────────────────────────────────────────────────────────────────
 
 export interface Mutants {
-  noMirror?: boolean; tryMirrorFirst?: boolean; noRecon?: boolean; pastPrefix?: boolean;
+  noMirror?: boolean; followupUnmirrored?: boolean; noRecon?: boolean; pastPrefix?: boolean;
   includeMini?: boolean; noMustEmpty?: boolean; noRoof?: boolean; tOverlap?: boolean;
   garbageEmpty?: boolean; rowAnchorOff1?: boolean; openerLt?: boolean;
   followupNoRowmap?: boolean; followupAnyT?: boolean;
@@ -249,7 +251,10 @@ const sameSet = (a: Cell[], b: { r: number; c: number }[]) =>
 /** The follow-up from a hit at lock `i` with offset (dr, dc): see the header. */
 function followup(d: TechDigest, i: number, P: Prepared, off: { dr: number; dc: number }, mut: Mutants,
                   scored: Map<number, { kind: string; recon: boolean }>) {
-  let slot = P.followup.map(x => ({ r: x.r + off.dr, c: x.c + off.dc }));
+  // the `followupUnmirrored` mutant: on a mirrored hit, reflect the slot back to the drawn columns
+  const wc = P.cells.map(x => x.c), span = Math.min(...wc) + Math.max(...wc);
+  const unmirror = mut.followupUnmirrored && P.mirrored;
+  let slot = P.followup.map(x => ({ r: x.r + off.dr, c: (unmirror ? span - x.c : x.c) + off.dc }));
   const step = (lk: LockLite) => {
     if (mut.followupNoRowmap) return;
     slot = slot.map(x => ({ r: x.r + lk.clearedRows.filter(y => y > x.r).length - lk.garbage, c: x.c }));
@@ -320,6 +325,7 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
     for (const lk of d.locks) { rowmapSteps++; if (!lk.mapOk) rowmapBad++; }
     const name = caseName({ session: d.session, match: d.match, round: d.round + 1, player: d.user });
     const S = (bySession[d.session] ??= { tspin_clears: 0, reconstruction_disagreed: 0, players: {} });
+    S.players[d.user] ??= 0;   // every player of the session is present, so a missing one is a defect
     // pass 1: the scored set (licence + reconstruction check), and the denominators
     const scored = new Map<number, { kind: string; recon: boolean }>();
     const withTs = new Map<number, boolean[][]>();
@@ -363,7 +369,7 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
         const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!;
         const cl: Clause = { mustEmpty: !mut.noMustEmpty, roof: !mut.noRoof, garbageFilled: !mut.garbageEmpty,
                              rowOff: mut.rowAnchorOff1 ? 1 : 0 };
-        const order = mut.tryMirrorFirst ? [Ps[1]!, Ps[0]!] : [Ps[0]!, Ps[1]!];
+        const order = [Ps[0]!, Ps[1]!];
         let found: { P: Prepared; off: { dr: number; dc: number } } | null = null, off = false;
         const tryAll = (c: Clause) => {
           let f: typeof found = null, o = false;
@@ -430,34 +436,73 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
 
 // ── the cross-route (a route artefact's rounds that reached a node drawing this technique next) ───
 
-export interface CrossRoute { key: string; artefact: string; node: string; note: string }
+export interface CrossRoute {
+  key: string; artefact: string; node: string; note: string;
+  /** The last 0-based lock of the drawn continuation: a hit after it is not the drawing (recorded as
+   *  `later_hit_lock`, never counted). The profile states where it comes from; the test re-derives it. */
+  continuationLastLock: number; continuationNote: string;
+}
+
+/** A cross-route row's outcome. Only `hit` and `no_hit` are MEASURED, so only they are in the
+ *  denominator: a node the route reached past its verified prefix (`node_unverified`), or a
+ *  continuation whose verified prefix ends before its last lock with no hit inside it
+ *  (`continuation_unverified`), is named with that reason and kept out of M. */
+export type CrossOutcome = 'hit' | 'no_hit' | 'node_unverified' | 'continuation_unverified';
 
 export function crossRoute(cr: CrossRoute, digests: TechDigest[], hits: Hit[], tag: string) {
   const art = JSON.parse(readFileSync(cr.artefact, 'utf8'));
-  const rows: { round: string; node_lock: number; hit_lock: number | null; reason: string | null }[] = [];
+  const rows: { round: string; node_lock: number; verified_to: number; outcome: CrossOutcome;
+                hit_lock: number | null; later_hit_lock: number | null;
+                tspins: number | null; tsd: number | null; tsd_stood: number | null; first_tsd: number | null }[] = [];
+  const last = cr.continuationLastLock;
   for (const c of art.cases) {
     const s = c.snapshots.find((x: any) => x.node === cr.node);
     if (!s) continue;
+    if (typeof s.verified !== 'boolean') throw new Error(`${tag}: cross-route snapshot without a verified flag`);
     const d = digests.find(x => x.session === c.session && x.file === c.file && x.round === c.round_index0 && x.user === c.player);
     if (!d) throw new Error(`${tag}: cross-route ${c.session} ${c.file} r${c.round_index0} ${c.player} is in no digest`);
     const name = caseName({ session: d.session, match: d.match, round: d.round + 1, player: d.user });
-    const h = hits.filter(x => x.session === d.session && x.file === d.file && x.round_index0 === d.round
-      && x.player === d.user && x.lock > s.lock).sort((a, b) => a.lock - b.lock)[0];
-    let reason: string | null = null;
-    if (!h) {
-      // the measured reason: what the round did after the node, inside the verified prefix
-      const after = d.tspins.filter(t => t.i > s.lock && t.i <= d.v);
+    const mine = hits.filter(x => x.session === d.session && x.file === d.file && x.round_index0 === d.round
+      && x.player === d.user && x.lock > s.lock).sort((a, b) => a.lock - b.lock);
+    const inside = mine.find(x => x.lock <= last) ?? null;
+    const later = mine.find(x => x.lock > last) ?? null;
+    let outcome: CrossOutcome;
+    let counts = { tspins: null as number | null, tsd: null as number | null, tsd_stood: null as number | null,
+                   first_tsd: null as number | null };
+    if (!s.verified || s.lock > d.v) outcome = 'node_unverified';
+    else if (inside) outcome = 'hit';
+    else if (d.v < last) outcome = 'continuation_unverified';
+    else {
+      // the measured miss: every scored-or-not T-spin of the round inside the continuation
+      outcome = 'no_hit';
+      const after = d.tspins.filter(t => t.i > s.lock && t.i <= last);
       const tsd = after.filter(t => d.locks[t.i]!.spin === 'full' && d.locks[t.i]!.cleared === 2);
-      const stood = tsd.filter(t => isStood(d.locks[t.i]!.cells));
-      reason = !after.length ? `no T-spin after the node, verified to lock ${d.v}`
-        : `${tsd.length} full TSD(s) after the node (first at lock ${tsd[0]?.i ?? '-'}), ${stood.length} stood, `
-          + `none in the window; verified to lock ${d.v}`;
+      counts = { tspins: after.length, tsd: tsd.length, tsd_stood: tsd.filter(t => isStood(d.locks[t.i]!.cells)).length,
+                 first_tsd: tsd[0]?.i ?? null };
     }
-    rows.push({ round: name, node_lock: s.lock, hit_lock: h ? h.lock : null, reason });
+    rows.push({ round: name, node_lock: s.lock, verified_to: d.v, outcome,
+                hit_lock: inside ? inside.lock : null, later_hit_lock: later ? later.lock : null, ...counts });
   }
   rows.sort((a, b) => a.round < b.round ? -1 : a.round > b.round ? 1 : 0);
+  const scored = rows.filter(r => r.outcome === 'hit' || r.outcome === 'no_hit');
   return { source: cr.artefact.replace(/^.*\/analysis\//, 'analysis/'), node: cr.node, note: cr.note,
-           rounds: rows.length, with_hit_after: rows.filter(r => r.hit_lock !== null).length, by_round: rows };
+           continuation: { last_lock: last, note: cr.continuationNote },
+           rounds_reaching_node: rows.length, rounds_scored: scored.length,
+           with_hit: scored.filter(r => r.outcome === 'hit').length, by_round: rows };
+}
+
+/** One English line per cross-route row, for the named lists. */
+export function crossRouteLine(r: ReturnType<typeof crossRoute>['by_round'][number], last: number): string {
+  const later = r.later_hit_lock !== null ? `; an STSD hit at lock ${r.later_hit_lock}, past the continuation` : '';
+  switch (r.outcome) {
+    case 'hit': return `${r.round} (STSD hit at lock ${r.hit_lock})`;
+    case 'node_unverified': return `${r.round} (node at lock ${r.node_lock} is past the verified prefix, verified to lock ${r.verified_to}${later})`;
+    case 'continuation_unverified':
+      return `${r.round} (continuation runs to lock ${last}, verified only to lock ${r.verified_to}; no hit before it${later})`;
+    case 'no_hit':
+      return `${r.round} (no STSD hit in locks ${r.node_lock + 1}-${last}: ${r.tspins} T-spin(s), ${r.tsd} full TSD(s)`
+        + `${r.first_tsd !== null ? ` (first at lock ${r.first_tsd})` : ''}, ${r.tsd_stood} stood${later})`;
+  }
 }
 
 // ── the artefact ─────────────────────────────────────────────────────────────────────────────────
@@ -507,7 +552,11 @@ export function assemble(P: TechniqueProfile & { crossRoute?: CrossRoute }, cls:
       ...P.lists(hits, name),
       window_off_board: cls.offBoard,
       recon_dropped_tsd: cls.reconDropped,
-      ...(cr ? { cross_route_no_hit: cr.by_round.filter(r => r.hit_lock === null).map(r => `${r.round} (${r.reason})`) } : {}),
+      ...(cr ? {
+        cross_route_no_hit: cr.by_round.filter(r => r.outcome === 'no_hit').map(r => crossRouteLine(r, cr.continuation.last_lock)),
+        cross_route_unscored: cr.by_round.filter(r => r.outcome === 'node_unverified' || r.outcome === 'continuation_unverified')
+          .map(r => crossRouteLine(r, cr.continuation.last_lock)),
+      } : {}),
     },
     hits,
   };

@@ -18,7 +18,10 @@
  *   5. pinned per-player figures: the denominators, the hits and their split, the follow-up.
  *   6. mutants: each rule turned off must turn this file red with the symptom its rule predicts; the
  *      rules this corpus cannot exercise are NAMED as equivalent (measured, and asserted to stay
- *      byte-identical, so the day one starts to matter is a red build); `tryMirrorFirst` is a control.
+ *      byte-identical, so the day one starts to matter is a red build). There is no control: the one
+ *      that stood here (trying the mirror first) could not change a byte by construction — the
+ *      matcher throws on a lock matching both — so it was a comment, and `followupUnmirrored` (the
+ *      follow-up slot left as drawn on a mirrored hit) is the mutant that tests the mirror instead.
  *
  * COST, accepted explicitly: one more full-corpus `runCaseOracle` digest in the `typescript` job
  * (about a minute and a half), as the route tests pay. The mutants reuse ONE digest.
@@ -87,14 +90,20 @@ const WINDOW_OFF_BOARD: string[] = [];
 
 const RECON_DROPPED_TSD: string[] = [];
 
+/** The cross-route rounds MEASURED as a miss inside the drawn continuation, each with its counts. */
 const CROSS_ROUTE_NO_HIT: string[] = [
-  "2026-10-03 m15r5 yachi (no T-spin after the node, verified to lock 20)",
-  "2026-10-09 m1r5 yachi (3 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 39)",
-  "2026-10-09 m4r4 yachi (5 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 125)",
-  "2026-10-09 m4r8 yachi (2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 29)",
-  "2026-10-09 m5r1 yachi (6 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 106)",
-  "2026-10-09 m6r5 yachi (4 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 78)",
-  "2026-10-09 m7r1 yachi (2 full TSD(s) after the node (first at lock 27), 0 stood, none in the window; verified to lock 37)",
+  "2026-10-03 m4r7 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood; an STSD hit at lock 100, past the continuation)",
+  "2026-10-09 m1r5 yachi (no STSD hit in locks 27-34: 3 T-spin(s), 3 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-09 m4r4 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-09 m5r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-09 m6r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-09 m7r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+];
+
+/** The cross-route rounds kept OUT of the denominator, each with the unverified part named. */
+const CROSS_ROUTE_UNSCORED: string[] = [
+  "2026-10-03 m15r5 yachi (node at lock 26 is past the verified prefix, verified to lock 20)",
+  "2026-10-09 m4r8 yachi (continuation runs to lock 34, verified only to lock 29; no hit before it)",
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
@@ -118,10 +127,6 @@ const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
   noRoof: 'no scored TSD matches everything but the roof (ablation no_roof equals the headline)',
   garbageEmpty: 'no hit window holds garbage, and no garbage cell sits where the window wants an empty cell at an anchored T',
-};
-/** Controls: must not change a byte. */
-const CONTROL_MUTANTS: Record<string, string> = {
-  tryMirrorFirst: 'an asymmetric T cannot match both as drawn and mirrored (the matcher throws if it does)',
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -182,7 +187,9 @@ test('named lists: every hit, every follow-up miss, the opener hits, the empty l
   checkNamedList('window_off_board', L.window_off_board, WINDOW_OFF_BOARD);
   checkNamedList('recon_dropped_tsd', L.recon_dropped_tsd, RECON_DROPPED_TSD);
   checkNamedList('cross_route_no_hit', L.cross_route_no_hit, CROSS_ROUTE_NO_HIT);
-  checkHitPositions(art(), SESSIONS, ROOT, [...STSD_HITS, ...FOLLOWUP_NOT_FIRED, ...STSD_IN_OPENER, ...CROSS_ROUTE_NO_HIT]);
+  checkNamedList('cross_route_unscored', L.cross_route_unscored, CROSS_ROUTE_UNSCORED);
+  checkHitPositions(art(), SESSIONS, ROOT,
+    [...STSD_HITS, ...FOLLOWUP_NOT_FIRED, ...STSD_IN_OPENER, ...CROSS_ROUTE_NO_HIT, ...CROSS_ROUTE_UNSCORED]);
   expect(art().hits.length).toBe(STSD_HITS.length);
 });
 
@@ -207,12 +214,34 @@ test('cross-route: the SDPC Spin rounds that reached its STMB Cave, from that ar
     .map((c: any) => `${c.session} m${c.match}r${c.round} ${c.player}`).sort();
   const cr = art().cross_route;
   expect(cr.by_round.map((r: any) => r.round).sort()).toEqual(want);
-  expect(cr.rounds).toBe(8);
-  expect(cr.with_hit_after).toBe(1);
-  // the hit after the cave is one of the STSD hits
-  for (const r of cr.by_round.filter((x: any) => x.hit_lock !== null))
-    expect(STSD_HITS).toContain(`${r.round} lock ${r.hit_lock}` + (art().hits.find((h: any) =>
-      `${h.session} m${h.match}r${h.round} ${h.player}` === r.round && h.lock === r.hit_lock).mirrored ? ' (mirrored)' : ''));
+  expect(cr.rounds_reaching_node).toBe(8);
+  expect(cr.rounds_scored).toBe(6);
+  expect(cr.with_hit).toBe(0);
+  // the continuation's last lock, re-derived: the bag harddrop draws the STSD in (3.first.cave.stsd),
+  // at seven 0-based locks a bag, ends at lock 7·bag − 1
+  const routes = JSON.parse(readFileSync(`${import.meta.dir}/sdpcspin-routes.json`, 'utf8'));
+  const stsdNode = routes.nodes.find((n: any) => n.id === '3.first.cave.stsd');
+  expect(cr.continuation.last_lock).toBe(7 * stsdNode.bag - 1);
+  expect(STSD.crossRoute.continuationLastLock).toBe(cr.continuation.last_lock);
+  // each outcome against the route artefact's own verified flag and verified_to: a node the route
+  // reached past its prefix is never measured, and is in no denominator
+  for (const c of sd.cases) {
+    const s = c.snapshots.find((x: any) => x.node === '3.first.cave');
+    if (!s) continue;
+    const r = cr.by_round.find((x: any) => x.round === `${c.session} m${c.match}r${c.round} ${c.player}`);
+    expect(r.node_lock).toBe(s.lock);
+    expect(r.outcome === 'node_unverified', r.round).toBe(!s.verified);
+    if (r.outcome === 'continuation_unverified') expect(r.verified_to).toBeLessThan(cr.continuation.last_lock);
+    if (r.outcome === 'no_hit') expect(r.verified_to).toBeGreaterThanOrEqual(cr.continuation.last_lock);
+  }
+  // every STSD hit of those rounds after the node is either inside the continuation (hit_lock) or past
+  // it (later_hit_lock), and the first one is the one recorded
+  for (const r of cr.by_round) {
+    const after = art().hits.filter((h: any) => `${h.session} m${h.match}r${h.round} ${h.player}` === r.round
+      && h.lock > r.node_lock).map((h: any) => h.lock).sort((a: number, b: number) => a - b);
+    expect(r.hit_lock).toBe(after.find((l: number) => l <= cr.continuation.last_lock) ?? null);
+    expect(r.later_hit_lock).toBe(after.find((l: number) => l > cr.continuation.last_lock) ?? null);
+  }
 });
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
@@ -255,7 +284,16 @@ test('mutants: each rule turned off turns this red with its own symptom', () => 
 
   a = mut({ rowAnchorOff1: true });
   expect(sum(a, 'all')).toBe(0);
-  expect(a.cross_route.with_hit_after).toBe(0);
+  expect(a.cross_route.by_round.every((r: any) => r.later_hit_lock === null)).toBe(true);
+
+  // the follow-up slot left as drawn on a mirrored hit: the hits do not move, the non-mirrored
+  // follow-ups do not move, and the mirrored ones lose every fired follow-up
+  a = mut({ followupUnmirrored: true });
+  expect(a.hits.map((h: any) => `${h.session} ${h.file} ${h.round_index0} ${h.player} ${h.lock}`))
+    .toEqual(b.hits.map((h: any) => `${h.session} ${h.file} ${h.round_index0} ${h.player} ${h.lock}`));
+  a.hits.forEach((h: any, i: number) => { if (!h.mirrored) expect(h.followup).toEqual(b.hits[i].followup); });
+  expect(a.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBe(0);
+  expect(b.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBeGreaterThan(0);
 
   a = mut({ openerLt: true });
   expect(tsd(a, 'in_opener')).toBeLessThan(tsd(b, 'in_opener'));
@@ -267,6 +305,6 @@ test('mutants: each rule turned off turns this red with its own symptom', () => 
   a = mut({ followupAnyT: true });
   expect(fired(a)).toBeGreaterThan(fired(b));
 
-  for (const [m, why] of Object.entries({ ...EQUIVALENT, ...CONTROL_MUTANTS }))
+  for (const [m, why] of Object.entries(EQUIVALENT))
     expect(serialise(run({ [m]: true } as Mutants)), `${m}: ${why}`).toBe(base);
 }, 600_000);
