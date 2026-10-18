@@ -747,6 +747,22 @@ jobs:
       - name: Check the SDPC Spin page audit catches its corruptions
         run: python3 -m pipeline.sdpcspin_page --selftest
 
+      # The first mid-game technique page, STSD (shiwehi.com's template/stsd.php): a local-shape
+      # transcription gated by the shared pipeline/openers/technique_transcription.py (its window
+      # predicate's Python twin runs over every committed *-routes.json board), and its two pages,
+      # the shared pipeline/technique_page.py renderer bound to pipeline/stsd_page.py; build-docs
+      # --check below re-renders them. The page snapshot is not committed, so CI checks the
+      # transcription and the gate's teeth only. The corpus artefact and the constructed demos are
+      # checked by pipeline/openers/stsd.test.ts and stsd-demos.test.ts in the typescript job.
+      - name: Check the STSD technique transcription
+        run: python3 -m pipeline.openers.extract_stsd_shapes
+
+      - name: Check the STSD technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stsd_shapes --selftest
+
+      - name: Check the STSD technique page audit catches its corruptions
+        run: python3 -m pipeline.stsd_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

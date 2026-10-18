@@ -49,10 +49,13 @@ sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
 from pipeline import gamushiro_page, honey_cup_page, mountainous2_page, sdpcspin_page, stickspin_page  # noqa: E402
 from pipeline import stray_cannon_page  # noqa: E402
+from pipeline import stsd_page, technique_page  # noqa: E402
 
 #: every opener route site, in the order its card appears under 定式路線
 ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE,
                gamushiro_page.SITE, sdpcspin_page.SITE]
+#: every mid-game technique site, in the order its card appears under 中盤手法
+TECHNIQUE_SITES = [stsd_page.SITE]
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -229,7 +232,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
+def render_index(cards, totals, pooled_html=None, replays=(), openers=None, techniques=None):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -287,6 +290,20 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
     if openers:
         parts.append("<h2>定式路線</h2><div class='grid'>")
         for o in openers:
+            parts.append(
+                f"<a class='card' href='{escape(o['href'])}'>"
+                f"<div class='date'>{escape(o['kicker'])}</div>"
+                f"<div class='title'>{escape(o['title'])}</div>"
+                f"<div class='meta'>{o['cases']} 個個案</div>"
+                f"<p class='blurb'>{escape(o['blurb'])}</p>"
+                "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
+        parts.append("</div>")
+    # The mid-game technique pages (STSD, …): the same tier and pill as the route pages, after them.
+    # Each case count is rendered from that technique's facts artefact; the words are its prose's
+    # `index_card`. No group at all while no technique is registered.
+    if techniques:
+        parts.append("<h2>中盤手法</h2><div class='grid'>")
+        for o in techniques:
             parts.append(
                 f"<a class='card' href='{escape(o['href'])}'>"
                 f"<div class='date'>{escape(o['kicker'])}</div>"
@@ -468,7 +485,7 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in ROUTE_SITES]
+    prefixes = [site.p.prefix for site in ROUTE_SITES + TECHNIQUE_SITES]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
@@ -500,6 +517,34 @@ def main(argv=None):
                         "kicker": card["kicker"], "title": site.PROSE["overview_title"],
                         "blurb": card["blurb"]})
 
+    # The mid-game technique pages, rendered and byte-compared exactly like the route pages above:
+    # `render_all` audits both pages before returning them, and a docs/<prefix>*.html the renderer
+    # did not produce is drift. The prefix check above covers both lists together.
+    techniques = []
+    for site in TECHNIQUE_SITES:
+        who = site.PROSE["technique_name"]
+        ts_inputs = site.load_inputs(str(REPO))
+        ts_pages = site.render_all(str(REPO), ts_inputs)
+        for name, page in ts_pages.items():
+            if name.endswith("-replay.html") or not name.startswith(site.p.prefix):
+                print(f"FAIL {who} renders {name}, outside its prefix or in -replay.html", file=sys.stderr)
+                return 1
+            dst = DOCS / name
+            if check:
+                if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                    drift.append(f"docs/{name} differs from what the {who} artefacts render")
+            else:
+                dst.write_text(page, encoding="utf-8")
+                print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+        for stale in sorted(DOCS.glob(f"{site.p.prefix}*.html")):
+            if stale.name not in ts_pages:
+                if check:
+                    drift.append(f"docs/{stale.name} is published but the {who} renderer does not produce it")
+                else:
+                    stale.unlink()
+                    print(f"  removed docs/{stale.name} (the {who} renderer does not produce it)")
+        techniques.append(technique_page.site_card(site, ts_inputs[1]))
+
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its
     # inputs, and there is no extra file to forget to rebuild.
@@ -513,7 +558,7 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    index = render_index(cards, totals, pooled_html, replays, openers)
+    index = render_index(cards, totals, pooled_html, replays, openers, techniques)
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:
