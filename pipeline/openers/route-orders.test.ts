@@ -186,8 +186,16 @@ test('7. hand-traced verdicts on two tiny DAGs', () => {
   // T4 on the fixture: the next-held mode of ZSIOTJL is hold Z, stream SIOTJL
   expect(accepts(TWO, 'SIOTJL', 'Z')).toBe(true);
   expect(accepts(TWO, 'SIOTJL', 'Z', { noHoldFirst: true })).toBe(true);
-  // a full DAG that is not full_ok accepts nothing
-  expect(accepts({ ...TWO, full_ok: false }, 'SZIOTJL', null)).toBe(false);
+  // a full DAG that is not full_ok accepts nothing, in either mode, under any order. full_ok is true on
+  // every committed node (test 6), so this fixture is the only thing that tests the conjunct; the
+  // control is the same DAG with full_ok true, which accepts orders (the 480 pinned below), so it is
+  // full_ok and not the edges that rejects them.
+  const TWO_NOT_OK = { ...TWO, full_ok: false };
+  expect(ORDERS.filter(q => accepts(TWO_NOT_OK, q, null)).length).toBe(0);
+  expect(ORDERS.filter(q => accepts(TWO_NOT_OK, q.slice(1), q[0]!)).length).toBe(0);
+  expect(ORDERS.filter(q => accepts({ ...TWO_NOT_OK, full_ok: true }, q, null)).length).toBeGreaterThan(0);
+  expect(ORDERS.filter(q => accepts({ ...TWO_NOT_OK, full_ok: true }, q.slice(1), q[0]!)).length).toBeGreaterThan(0);
+  expect(accepts({ ...TWO_NOT_OK, full_ok: true }, 'SZIOTJL', null)).toBe(true);
 
   // SEVEN, OITSZJL from empty: O has no edge from {} -> case (c): hold O, place I (i = 2, h = O). Then at
   // every step the current piece is one ahead of the chain: swap — place O, hold T; place T, hold S;

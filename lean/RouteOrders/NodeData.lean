@@ -1,4 +1,5 @@
 import RouteOrders.Hold
+import RouteOrders.HoldMutants
 
 /-!
 # A route node as data, and the counts the artefact publishes
@@ -77,6 +78,16 @@ theorem allOrders_ne_nil : ∀ q ∈ allOrders, q ≠ [] := by
 /-- T4 applied to every node, kernel-checked (no native code): the two published counts agree. -/
 theorem countEmpty_eq_countNext (n : Node) : countEmpty n = countNext n :=
   count_empty_eq_next (dagOf n) n.fullOk allOrders allOrders_ne_nil
+
+
+/-- The counts under a T2/T4 mutant procedure (`HoldMutants.accM`), for `RouteOrders.Discriminate`. -/
+def countMutEmpty (m : HoldMutants.Mut) (n : Node) : Nat :=
+  (allOrders.filter (fun q => n.fullOk && HoldMutants.accM m (dagOf n) 0 (streamOf q) none)).length
+
+def countMutNext (m : HoldMutants.Mut) (n : Node) : Nat :=
+  (allOrders.filter (fun q => match q with
+    | c :: q' => n.fullOk && HoldMutants.accM m (dagOf n) 0 (streamOf q') (some (.piece c))
+    | [] => false)).length
 
 
 /-! ## Axioms gate: no proof-hole axiom, no native-code axiom; only Lean's three standard axioms. -/

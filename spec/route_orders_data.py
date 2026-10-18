@@ -11,7 +11,8 @@ answer as `AcceptsMemo` in spec/RouteOrders.dfy, which is proved to decide the h
 (`AccIffReach`) and to agree between the two starting modes (`EmptyHoldIsNextHeld`).
 
     python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --dafny <out.dfy>  # write the data module
-    python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check            # counts + bitsets, exit 1 on any mismatch
+    python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check            # counts + bitsets, exit 1 on any mismatch,
+                                                                                        #   plus the full_ok negative control
     python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --mutants          # each T2 mutant must move a count
 
 The data module is generated into a temporary directory and handed to `dafny run --input`, so the
@@ -111,9 +112,9 @@ def stage(tmp: str, name: str) -> tuple[str, str]:
     return os.path.join(d, 'RouteOrdersCount.dfy'), os.path.join(d, 'route_orders_data.dfy')
 
 
-def counts(art: dict, mutant: str, tmp: str) -> dict:
+def counts(art: dict, mutant: str, tmp: str, tag: str = '') -> dict:
     """{node: (empty, next, hex_empty, hex_next)} as the compiled, proved procedure computes them."""
-    runner, data = stage(tmp, f'run_{mutant}')
+    runner, data = stage(tmp, f'run_{mutant}{tag}')
     write_module(art, data)
     stdout = run(['dafny', 'run', '--target:py', '--no-verify', runner, '--input', data, mutant], 3000)
     res = {}
@@ -125,6 +126,30 @@ def counts(art: dict, mutant: str, tmp: str) -> dict:
             _, name, _, ce, _, cn, he, hn = line.split()
             res[name] = (int(ce), int(cn), he, hn)
     return res
+
+
+def full_ok_control(art: dict, want: dict, tmp: str) -> bool:
+    """Negative control on `Accepts`' `d.fullOk &&` conjunct, on the COMPILED path. `full_ok` is true on
+    every committed node, so no count above exercises it. Take the node with the most accepted orders,
+    put it in the generated data twice — as it is, and with `full_ok` flipped to false — and require
+    the first copy to reproduce the artefact while the second accepts nothing in either mode. The
+    unflipped copy is what makes the zero mean "the flag", not "this DAG". Returns True on failure."""
+    live = [n for n in art['nodes'] if n['full_ok'] and n['counts']['empty'] > 0]
+    if not live:
+        print('FULL_OK CONTROL: no node with full_ok and a nonzero count to flip')
+        return True
+    n = max(live, key=lambda n: (n['counts']['empty'], n['node']))
+    flipped = dict(n, node=n['node'] + '#fullok-false', full_ok=False)
+    got = counts({'nodes': [n, flipped]}, 'none', tmp, '_fullok')
+    same, zero = got.get(n['node']), got.get(flipped['node'])
+    nbits = len(n['accepted']['empty'])
+    ok_same = same == want[n['node']]
+    ok_zero = (zero is not None and zero[:2] == (0, 0)
+               and zero[2] == zero[3] == '0' * nbits)
+    print(f'{"ok      " if ok_same and ok_zero else "FAILED  "} full_ok control on {n["node"]}: '
+          f'as committed {same[:2] if same else None} (artefact {want[n["node"]][:2]}), '
+          f'full_ok=false {zero[:2] if zero else None} with {"all-zero" if ok_zero else "NONZERO"} bitsets')
+    return not (ok_same and ok_zero)
 
 
 def main() -> None:
@@ -173,6 +198,7 @@ def main() -> None:
                       f'{"" if t4 else "  T4 VIOLATED"}')
             print(f'\n{len(got)} nodes, counts and bitsets {"MISMATCH" if fail else "all equal"} '
                   f'(empty == next on every node: {all(g[0] == g[1] and g[2] == g[3] for g in got.values())})')
+            fail |= full_ok_control(art, want, tmp)
         if a.mutants:
             base = {k: v[:2] for k, v in want.items()}
             muts = T2_MUTANTS + OTHER_MUTANTS

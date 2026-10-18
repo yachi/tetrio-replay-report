@@ -175,7 +175,11 @@ module RouteOrders {
 
   // ── T2: the procedure decides the relation ──
 
-  lemma ReachToAcc(d: Dag, st: seq<char>, c: Key, ms: seq<Move>)
+  // ReachToAcc and AccToReach carry {:isolate_assertions} and name every step's facts in their own
+  // assert so that a mutant breaking one case fails THAT assertion as a real error. As one VC each,
+  // the two mutants that break a single case of the relation (no case (c); a hold step that places
+  // nothing) left the theorem a TIMEOUT and only a witness lemma failed (measured 2026-10-18, 60 s).
+  lemma {:isolate_assertions} ReachToAcc(d: Dag, st: seq<char>, c: Key, ms: seq<Move>)
     requires Reaches(d, st, c, ms)
     ensures Acc(d, NoMut, st, c.s, c.i, c.h)
     decreases |ms|
@@ -192,7 +196,17 @@ module RouteOrders {
     }
   }
 
-  lemma AccToReach(d: Dag, st: seq<char>, c: Key) returns (ms: seq<Move>)
+  // one legal move, then a legal tail, is a legal move list: the step every case of AccToReach takes
+  lemma ReachesCons(d: Dag, st: seq<char>, c: Key, mv: Move, rest: seq<Move>)
+    requires 0 <= mv.g && c.i < |st|
+    requires StepOk(d, st, c, mv)
+    requires Reaches(d, st, Next(st, c, mv), rest)
+    ensures Reaches(d, st, c, [mv] + rest)
+  {
+    assert ([mv] + rest)[1..] == rest;
+  }
+
+  lemma {:isolate_assertions} AccToReach(d: Dag, st: seq<char>, c: Key) returns (ms: seq<Move>)
     requires Acc(d, NoMut, st, c.s, c.i, c.h)
     ensures Reaches(d, st, c, ms)
     decreases |st| - c.i
@@ -201,19 +215,24 @@ module RouteOrders {
       ms := [];
     } else if exists g | 0 <= g < d.k :: Fits(d, NoMut, st[c.i], g) && Can(d, c.s, g) && Acc(d, NoMut, st, c.s + Pow2(g), c.i + 1, c.h) {
       var g :| 0 <= g < d.k && Fits(d, NoMut, st[c.i], g) && Can(d, c.s, g) && Acc(d, NoMut, st, c.s + Pow2(g), c.i + 1, c.h);
+      assert StepOk(d, st, c, PlaceCur(g));
       var rest := AccToReach(d, st, Key(c.s + Pow2(g), c.i + 1, c.h));
+      ReachesCons(d, st, c, PlaceCur(g), rest);
       ms := [PlaceCur(g)] + rest;
-      assert ms[1..] == rest;
     } else if c.h.Held? && exists g | 0 <= g < d.k :: Fits(d, NoMut, c.h.t, g) && Can(d, c.s, g) && Acc(d, NoMut, st, c.s + Pow2(g), c.i + 1, Held(st[c.i])) {
       var g :| 0 <= g < d.k && Fits(d, NoMut, c.h.t, g) && Can(d, c.s, g) && Acc(d, NoMut, st, c.s + Pow2(g), c.i + 1, Held(st[c.i]));
+      assert StepOk(d, st, c, Swap(g));
       var rest := AccToReach(d, st, Key(c.s + Pow2(g), c.i + 1, Held(st[c.i])));
+      ReachesCons(d, st, c, Swap(g), rest);
       ms := [Swap(g)] + rest;
-      assert ms[1..] == rest;
     } else {
+      assert c.h.Empty? && st[c.i] != '*' && c.i + 1 < |st|;
       var g :| 0 <= g < d.k && Fits(d, NoMut, st[c.i + 1], g) && Can(d, c.s, g) && Acc(d, NoMut, st, c.s + Pow2(g), c.i + 2, Held(st[c.i]));
+      assert st[c.i + 1] != '*' && GroupOf(d, st[c.i + 1]) == g;
+      assert StepOk(d, st, c, HoldFirst(g));
       var rest := AccToReach(d, st, Key(c.s + Pow2(g), c.i + 2, Held(st[c.i])));
+      ReachesCons(d, st, c, HoldFirst(g), rest);
       ms := [HoldFirst(g)] + rest;
-      assert ms[1..] == rest;
     }
   }
 
@@ -249,7 +268,7 @@ module RouteOrders {
     forall q :: q in seen && q.i >= i ==> !Acc(d, m, st, q.s, q.i, q.h)
   }
 
-  method Go(d: Dag, m: Mut, st: seq<char>, s: nat, i: nat, h: Hold, seen0: set<Key>) returns (r: bool, seen: set<Key>)
+  method {:isolate_assertions} Go(d: Dag, m: Mut, st: seq<char>, s: nat, i: nat, h: Hold, seen0: set<Key>) returns (r: bool, seen: set<Key>)
     requires SeenFalseFrom(d, m, st, seen0, i)
     ensures r == Acc(d, m, st, s, i, h)
     ensures forall q :: q in seen ==> q in seen0 || q.i >= i

@@ -1,3 +1,5 @@
+import RouteOrders.T1Defs
+
 /-!
 # T1 — order independence of placing a drawing's piece groups
 
@@ -22,7 +24,8 @@ Two modelling choices, both stated rather than hidden:
 * `writeCell` writes the engine row(s) whose rowmap entry is `some d`. `write_eq_set_idxOf` proves
   that this IS `rows.set (rowmap.idxOf (some d))` whenever `some d` occurs at most once in the rowmap,
   and `canon_rowmap_once` proves every board this process reaches has that property when the initial
-  diagram rows are distinct (they are: `initialRowmap` is `0, 1, …, H-1`). A cell whose diagram row
+  diagram rows are distinct (they are: `initialRowmap` is `0, 1, …, H-1`); `placeAllIdx_eq_placeAll`
+  lifts that from one cell to the whole process (every cell written at `rowmap.indexOf(d)`). A cell whose diagram row
   has already cleared writes nothing here; `nodeDag` refuses that edge (`if (e < 0) return`), and the
   theorem below holds for every sequence, so in particular for the ones the engine accepts.
 
@@ -37,40 +40,6 @@ only on the SET of cells placed. So two permutations of the same groups reach on
 
 namespace RouteOrders.T1
 
-/-- One engine row: column ↦ occupied. -/
-abbrev Row := Nat → Bool
-
-def setCell (r : Row) (x : Nat) : Row := fun y => if y = x then true else r y
-def emptyRow : Row := fun _ => false
-/-- `linesOf`: a row is full when each of its `W` columns is occupied. -/
-def full (W : Nat) (r : Row) : Bool := (List.range W).all r
-
-/-- The engine board (y-up rows) and its rowmap, two separate lists as in the engine. -/
-structure Board where
-  rows : List Row
-  rowmap : List (Option Nat)
-
-/-- Write one diagram cell `(x, d)` at the engine row whose rowmap entry is `d`. -/
-def writeCell (b : Board) (c : Nat × Nat) : Board :=
-  { rows := List.zipWith (fun r o => if o = some c.2 then setCell r c.1 else r) b.rows b.rowmap,
-    rowmap := b.rowmap }
-
-/-- `applyCells`' clear + `advanceRowmap`: the same full-row indices leave both lists, an empty row
-    is pushed per cleared row, and the rowmap is refilled with fresh (`none`) entries to its length. -/
-def clearRows (W : Nat) (b : Board) : Board :=
-  let keep := (List.zip b.rows b.rowmap).filter (fun p => !full W p.1)
-  { rows := keep.map Prod.fst ++ List.replicate (b.rows.length - keep.length) emptyRow,
-    rowmap := keep.map Prod.snd ++ List.replicate (b.rowmap.length - keep.length) none }
-
-/-- One lock: write every cell of the group, then clear. -/
-def place (W : Nat) (b : Board) (g : List (Nat × Nat)) : Board := clearRows W (g.foldl writeCell b)
-
-def placeAll (W : Nat) (b : Board) (gs : List (List (Nat × Nat))) : Board := gs.foldl (place W) b
-
-/-- The board a bag starts on: the parent's rows, rowmap = their diagram ids (`initialRowmap`). -/
-def initial (V : List (Nat × Row)) : Board :=
-  { rows := V.map Prod.snd, rowmap := V.map (fun p => some p.1) }
-
 /-! ## The canonical form -/
 
 /-- The virtual diagram with the cells `cs` added (diagram row ids kept). -/
@@ -82,7 +51,7 @@ def canon (W : Nat) (V : List (Nat × Row)) : Board :=
   { rows := keep.map Prod.snd ++ List.replicate (V.length - keep.length) emptyRow,
     rowmap := keep.map (fun p => some p.1) ++ List.replicate (V.length - keep.length) none }
 
-/-! The zipped view: one list of (row, rowmap entry) pairs. Only a proof device — the model above
+/-! The zipped view: one list of (row, rowmap entry) pairs. Only a proof device — the model (`T1Defs.lean`)
 keeps the two lists apart, which is what lets a desynchronising mutant be stated at all. -/
 
 abbrev Z := List (Row × Option Nat)
@@ -329,6 +298,65 @@ theorem reachable_write_is_indexOf (W : Nat) (hW : 0 < W) (V : List (Nat × Row)
   exact write_eq_set_idxOf x d _ _ (canon_length W _) (canon_rowmap_once W _ hnd' d)
 
 
+/-! ## The whole process, written with the engine's `indexOf` write
+
+`reachable_write_is_indexOf` is about one cell on a reachable board. This closes the link for the
+whole sequential process: write every cell at `rowmap.indexOf(d)` (as `nodeDag` does), clear after each
+group, and the board is the model's, for every list of groups. -/
+
+/-- `nodeDag`'s write: cell `(x, d)` goes to engine row `rowmap.indexOf(d)` (a no-op when `d` has
+    cleared: `idxOf` is then the length and `set` changes nothing). -/
+def writeIdx (b : Board) (c : Nat × Nat) : Board :=
+  { rows := b.rows.set (b.rowmap.idxOf (some c.2))
+      (setCell (b.rows.getD (b.rowmap.idxOf (some c.2)) emptyRow) c.1),
+    rowmap := b.rowmap }
+
+def placeIdx (W : Nat) (b : Board) (g : List (Nat × Nat)) : Board := clearRows W (g.foldl writeIdx b)
+
+def placeAllIdx (W : Nat) (b : Board) (gs : List (List (Nat × Nat))) : Board := gs.foldl (placeIdx W) b
+
+/-- Writing a group cell by cell keeps the rowmap, so the at-most-once property holds at every
+    cell, and each `indexOf` write is the model's. -/
+theorem foldl_writeIdx (g : List (Nat × Nat)) : ∀ b : Board,
+    b.rows.length = b.rowmap.length → (∀ d, b.rowmap.count (some d) ≤ 1) →
+    g.foldl writeIdx b = g.foldl writeCell b := by
+  induction g with
+  | nil => intros; rfl
+  | cons c g ih =>
+    intro b hl hc
+    have he : writeIdx b c = writeCell b c := by
+      simp only [writeIdx, writeCell]
+      rw [write_eq_set_idxOf c.1 c.2 b.rows b.rowmap hl (hc c.2)]
+    simp only [List.foldl_cons, he]
+    exact ih _ (by simp [writeCell, hl]) hc
+
+theorem placeIdx_canon (W : Nat) (V : List (Nat × Row)) (hV : (V.map Prod.fst).Nodup)
+    (g : List (Nat × Nat)) : placeIdx W (canon W V) g = place W (canon W V) g := by
+  simp only [placeIdx, place]
+  rw [foldl_writeIdx g _ (canon_length W V) (canon_rowmap_once W V hV)]
+
+theorem placeAllIdx_canon (W : Nat) (hW : 0 < W) (gs : List (List (Nat × Nat))) :
+    ∀ V : List (Nat × Row), (V.map Prod.fst).Nodup →
+      placeAllIdx W (canon W V) gs = placeAll W (canon W V) gs := by
+  induction gs with
+  | nil => intros; rfl
+  | cons g gs ih =>
+    intro V hnd
+    have hnd' : ((addCells V g).map Prod.fst).Nodup := by
+      simpa [addCells, List.map_map, Function.comp_def] using hnd
+    simp only [placeAllIdx, placeAll, List.foldl_cons] at ih ⊢
+    rw [placeIdx_canon W V hnd g, place_canon W hW]
+    exact ih _ hnd'
+
+/-- The engine's `indexOf` process and the model agree on every list of groups, from any board the
+    bag can start on (distinct diagram rows, no full row). -/
+theorem placeAllIdx_eq_placeAll (W : Nat) (hW : 0 < W) (V : List (Nat × Row))
+    (hV : ∀ p ∈ V, full W p.2 = false) (hnd : (V.map Prod.fst).Nodup)
+    (gs : List (List (Nat × Nat))) :
+    placeAllIdx W (initial V) gs = placeAll W (initial V) gs := by
+  rw [initial_eq_canon W V hV]
+  exact placeAllIdx_canon W hW gs V hnd
+
 /-! ## Axioms gate: no proof-hole axiom, no native-code axiom; only Lean's three standard axioms. -/
 
 /-- info: 'RouteOrders.T1.order_independent' depends on axioms: [propext, Classical.choice, Quot.sound] -/
@@ -342,5 +370,9 @@ theorem reachable_write_is_indexOf (W : Nat) (hW : 0 < W) (V : List (Nat × Row)
 /-- info: 'RouteOrders.T1.reachable_write_is_indexOf' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms RouteOrders.T1.reachable_write_is_indexOf
+
+/-- info: 'RouteOrders.T1.placeAllIdx_eq_placeAll' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms RouteOrders.T1.placeAllIdx_eq_placeAll
 
 end RouteOrders.T1

@@ -3956,11 +3956,18 @@ Three things the gates do NOT establish, stated so nobody reads them in:
   group is unplaced, so placing `'*'` as it is the swap or the plain placement. Dafny still kills it at
   the proof level; the data cannot. Until 2026-10-18 the TS switch did nothing at all (`'*'` mapped
   through `dealt.get('*')`), and its test called that 「equivalent by construction」.
-* **`lean/mutate.sh` scores any build failure as a kill**, and every T2/T4 kill there is an
-  elaboration error, not a refuted theorem; T1's semantic half is `T1Witness.lean`. Several of
-  `spec/mutate-routeorders.sh`'s kills land on a witness lemma while the main theorem only times out.
-  A T2 witness file for Lean is open work.
-* **`full_ok` is true on every node**, so no count tests the PC-end conjunct.
+* **The mutation suites pin the planted rules, not T2 in general.** Since 2026-10-18 both count a kill
+  only on a real proof error: `spec/mutate-routeorders.sh` refuses a parse or resolution error as
+  HARNESS (a built-in control checks that) and prints which lemma carries each error, and
+  `lean/mutate.sh` counts a kill only when a named witness in `HoldWitness.lean` / `T1Witness.lean` is
+  refuted by `decide` — a mutant that breaks a `cases` by name is UNRESOLVED. Before that, every Lean
+  T2/T4 kill was an elaboration error and several Dafny kills were a witness while the main theorem
+  timed out. Two limits stay: the Lean T4 mutant is refuted by the same fact as the T2 case-(c) one,
+  so its 「6 of 6」 covers five distinct mutations, and its planted `acc` disjuncts are a second text
+  copy of `HoldMutants.accM` that nothing checks against it.
+* **`full_ok` is true on every committed node**, so it is tested by controls rather than by the data:
+  a `full_ok: false` fixture in `route-orders.test.ts` test 7, and `route_orders_data.py --check`
+  re-running one node with `full_ok` flipped and requiring zero counts.
 
 CI: `spec` verifies `RouteOrders.dfy`, runs its vacuity controls and the T3 recount on every push and
 both mutation suites on the schedule; `lean` installs Lean by sha256 (GitHub's asset digest, one

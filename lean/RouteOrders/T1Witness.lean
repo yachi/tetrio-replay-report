@@ -1,12 +1,13 @@
-import RouteOrders.T1
+import RouteOrders.T1Defs
 
 /-!
 # T1's mutants are ORDER-DEPENDENT, on concrete boards (kernel `decide`, no native code)
 
-`mutate.sh` plants each mutant into `T1.clearRows` and requires the build to fail. A failing build
-shows the proof leans on the rule; these witnesses show the rule is what makes the theorem TRUE: under
-each mutant clear, two orders of the same two groups leave different boards, and under the real clear
-the same two orders agree (the control). Both witnesses were found by the brute-force probe
+`mutate.sh` plants each mutant into `T1Defs.clearRows` and counts it killed only when the matching
+`*_real` theorem below is refuted by its own `decide` (this module imports only `T1Defs`, so it still
+builds when the mutant breaks the proofs in `T1.lean`). These witnesses show the rule is what makes
+the theorem TRUE: under each mutant clear, two orders of the same two groups leave different boards,
+and under the real clear the same two orders agree (the control). Both witnesses were found by the brute-force probe
 `scratchpad/route-orders/lean/t1probe.py`; that probe also measured a third reading of "clear a row
 that is not full" — clear every row with ≥ W-1 cells — as order-INDEPENDENT on 117 164 small cases,
 which is what the proof predicts: any clear rule that is a function of the row's own content keeps
