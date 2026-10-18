@@ -1,0 +1,201 @@
+#!/usr/bin/env python3
+"""
+T3 — the route-order COUNTS, recomputed by the Dafny-proved hold search.
+
+analysis/<opener>-orders.json carries, per drawn route node, the engine's DAG over placed-group
+subsets (`edges`: [subset, group]), `full_ok`, and the engine's own answer: how many of the 5040
+dealt orders a one-slot hold accepts (`counts`) and which (`accepted`, a hex bitset over
+route-orders.ts `allOrders()`). The engine's DAG is DATA here — nothing re-checks an edge. What this
+re-checks is the other half: that the procedure route-orders.ts runs over those edges gives the same
+answer as `AcceptsMemo` in spec/RouteOrders.dfy, which is proved to decide the hold relation
+(`AccIffReach`) and to agree between the two starting modes (`EmptyHoldIsNextHeld`).
+
+    python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --dafny <out.dfy>  # write the data module
+    python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check            # counts + bitsets, exit 1 on any mismatch
+    python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --mutants          # each T2 mutant must move a count
+
+The data module is generated into a temporary directory and handed to `dafny run --input`, so the
+repo never holds a second copy of the artefact's DAGs. `--check` also VERIFIES RouteOrdersCount.dfy
+against the generated module before running it (serially, never alongside another verifier), so the
+runner that produced the numbers is one Dafny accepted. `--no-verify-runner` skips that step.
+"""
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+PIECES = 'IOTSZJL'
+
+# The mutants T2 is required to discriminate (spec/RouteOrders.dfy's Mut, switched on by name), and
+# route-orders.ts's other two OrderMutants. A T2 mutant that moves no count is a failure unless it is
+# named in EQUIVALENT with the reason it was measured to be equivalent.
+T2_MUTANTS = ['noHoldFirst', 'placeStar', 'holdNoPlace']
+OTHER_MUTANTS = ['noSwap', 'noStar']
+EQUIVALENT: dict[str, str] = {
+    # Measured 2026-10-17: 0 of 32 sdpcspin nodes move, in either mode. The reason is structural, and
+    # it holds for every DAG this runner admits (distinct dealt pieces, no carried group): the '*' is
+    # reached only after all seven dealt pieces were consumed, each one placed or sitting in the hold,
+    # so at most ONE group is unplaced and it is the held piece's. Placing the '*' as that group reaches
+    # the same subset as swapping the held piece out (case b), so no acceptance changes. The mutant is
+    # still killed at the PROOF level (spec/mutate-routeorders.sh, "relation lets the next bag's '*' be
+    # placed"); route-orders.ts's own placeStar is a no-op (`dealt.get('*') ?? -1` is -1 either way).
+    'placeStar': ("the '*' is reachable only once every dealt piece is placed or held, so at most one group is "
+                  "unplaced (the held piece's, or the last piece's under case (c)); placing '*' as it uses the same "
+                  "edge as the swap (b) or the plain placement (a)"),
+}
+
+
+def dstr(s: str) -> str:
+    assert all(c.isalnum() or c in '.#_-' for c in s), s
+    return '"' + s + '"'
+
+
+def node_dag(n: dict) -> str:
+    groups = n['groups']
+    k = len(groups)
+    if k != n['k']:
+        raise SystemExit(f'{n["node"]}: k {n["k"]} but {k} groups')
+    carried = [i for i, g in enumerate(groups) if g['carried']]
+    if carried:
+        # route-orders.ts runs a carried node in one mode, `carried:<piece>`; the runner below
+        # enumerates empty/next only, so a carried node is refused rather than half-checked
+        raise SystemExit(f'{n["node"]}: a carried group — this runner checks the empty/next modes only')
+    dealt = [g['piece'] for g in groups]
+    if len(set(dealt)) != len(dealt) or any(p not in PIECES for p in dealt):
+        # GroupOf takes the first dealt index, the TS Map the last: they agree only when unique
+        raise SystemExit(f'{n["node"]}: dealt pieces {dealt} are not distinct IOTSZJL letters')
+    table = [[False] * k for _ in range(1 << k)]
+    for s, g in n['edges']:
+        if not (0 <= s < (1 << k) and 0 <= g < k) or s & (1 << g):
+            raise SystemExit(f'{n["node"]}: edge {[s, g]} out of range or onto a placed group')
+        table[s][g] = True
+    if set(n['counts']) != {'empty', 'next'}:
+        raise SystemExit(f'{n["node"]}: modes {sorted(n["counts"])}, expected empty and next')
+    rows = ', '.join('[' + ', '.join('true' if b else 'false' for b in r) + ']' for r in table)
+    pieces = '[' + ', '.join(f"'{p}'" for p in dealt) + ']'
+    ok = 'true' if n['full_ok'] else 'false'
+    return f'({dstr(n["node"])}, Dag({k}, {pieces}, -1, [{rows}], {ok}))'
+
+
+def write_module(art: dict, out: str) -> None:
+    body = ',\n    '.join(node_dag(n) for n in art['nodes'])
+    with open(out, 'w') as fh:
+        fh.write('// GENERATED by spec/route_orders_data.py from a route-orders artefact; never commit.\n'
+                 'module RouteOrdersData {\n  import opened RouteOrders\n'
+                 f'  const NODES: seq<(string, Dag)> := [\n    {body}\n  ]\n}}\n')
+
+
+def run(cmd: list[str], timeout: int) -> str:
+    t0 = time.time()
+    out = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    print(f'  [{time.time() - t0:.1f} s] {" ".join(os.path.basename(c) if c.endswith(".dfy") else c for c in cmd[:4])} ...',
+          flush=True)
+    if out.returncode != 0:
+        sys.stderr.write(out.stdout + out.stderr)
+        raise SystemExit(f'command failed ({out.returncode}): {" ".join(cmd)}')
+    return out.stdout
+
+
+def stage(tmp: str, name: str) -> tuple[str, str]:
+    """A private copy of the two spec files beside a fresh data module: `dafny run --target:py` writes
+    its build directory next to the program, and that must never be spec/."""
+    d = os.path.join(tmp, name)
+    os.makedirs(d)
+    for f in ('RouteOrders.dfy', 'RouteOrdersCount.dfy'):
+        shutil.copy(os.path.join(HERE, f), d)
+    return os.path.join(d, 'RouteOrdersCount.dfy'), os.path.join(d, 'route_orders_data.dfy')
+
+
+def counts(art: dict, mutant: str, tmp: str) -> dict:
+    """{node: (empty, next, hex_empty, hex_next)} as the compiled, proved procedure computes them."""
+    runner, data = stage(tmp, f'run_{mutant}')
+    write_module(art, data)
+    stdout = run(['dafny', 'run', '--target:py', '--no-verify', runner, '--input', data, mutant], 3000)
+    res = {}
+    header = [l for l in stdout.splitlines() if l.startswith('mutant ')]
+    if header != [f'mutant {mutant} orders 5040']:
+        raise SystemExit(f'runner header {header}: wrong mutant or not 5040 orders')
+    for line in stdout.splitlines():
+        if line.startswith('node '):
+            _, name, _, ce, _, cn, he, hn = line.split()
+            res[name] = (int(ce), int(cn), he, hn)
+    return res
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument('artefact')
+    ap.add_argument('--dafny', metavar='OUT')
+    ap.add_argument('--check', action='store_true')
+    ap.add_argument('--mutants', action='store_true')
+    ap.add_argument('--no-verify-runner', action='store_true')
+    a = ap.parse_args()
+    art = json.load(open(a.artefact))
+    if art.get('schema') != 'route-orders/1':
+        raise SystemExit(f'schema {art.get("schema")!r}, expected route-orders/1')
+    if a.dafny:
+        write_module(art, a.dafny)
+        print(f'wrote {a.dafny}: {len(art["nodes"])} nodes')
+    if not (a.check or a.mutants):
+        return
+    tmp = tempfile.mkdtemp(prefix='route-orders-data-')
+    try:
+        want = {n['node']: (n['counts']['empty'], n['counts']['next'], n['accepted']['empty'], n['accepted']['next'])
+                for n in art['nodes']}
+        fail = False
+        if a.check:
+            if not a.no_verify_runner:
+                runner, data = stage(tmp, 'verify')
+                write_module(art, data)
+                out = run(['dafny', 'verify', '--verification-time-limit', '120', runner, data], 1200)
+                if ', 0 errors' not in out:
+                    raise SystemExit('RouteOrdersCount.dfy does not verify against the generated data')
+                print('  runner verifies: ' + out.strip().splitlines()[-1])
+            got = counts(art, 'none', tmp)
+            if set(got) != set(want):
+                print(f'NODE SET differs: missing {sorted(set(want) - set(got))}, extra {sorted(set(got) - set(want))}')
+                fail = True
+            for name in sorted(want):
+                if name not in got:
+                    continue
+                w, g = want[name], got[name]
+                ok = w == g
+                fail |= not ok
+                t4 = g[0] == g[1] and bin(int(g[2], 16)) == bin(int(g[3], 16))
+                fail |= not t4
+                print(f'{"ok      " if ok else "MISMATCH"} {name:<28} empty {g[0]:>4} next {g[1]:>4}'
+                      f'  artefact {w[0]:>4}/{w[1]:>4}  bitsets {"equal" if w[2:] == g[2:] else "DIFFER"}'
+                      f'{"" if t4 else "  T4 VIOLATED"}')
+            print(f'\n{len(got)} nodes, counts and bitsets {"MISMATCH" if fail else "all equal"} '
+                  f'(empty == next on every node: {all(g[0] == g[1] and g[2] == g[3] for g in got.values())})')
+        if a.mutants:
+            base = {k: v[:2] for k, v in want.items()}
+            muts = T2_MUTANTS + OTHER_MUTANTS
+            # one Dafny process at a time, even though `dafny run --no-verify` calls no solver: the
+            # house rule is that no two Dafny runs overlap, and holdNoPlace dominates the wall clock anyway
+            results = {mu: counts(art, mu, tmp) for mu in muts}
+            for mut in muts:
+                got = results[mut]
+                moved = sorted(k for k in base if got.get(k, (None, None))[:2] != base[k])
+                kind = 'T2' if mut in T2_MUTANTS else 'ts'
+                if moved:
+                    eg = moved[0]
+                    print(f'  killed   [{kind}] {mut:<12} moves {len(moved):>2} of {len(base)} nodes, e.g. {eg} '
+                          f'{base[eg][0]}/{base[eg][1]} -> {got[eg][0]}/{got[eg][1]}')
+                elif mut in EQUIVALENT:
+                    print(f'  EQUIV    [{kind}] {mut:<12} moves no count: {EQUIVALENT[mut]}')
+                else:
+                    print(f'SURVIVED  [{kind}] {mut:<12} moves no count on this data')
+                    fail |= mut in T2_MUTANTS
+        sys.exit(1 if fail else 0)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+if __name__ == '__main__':
+    main()
