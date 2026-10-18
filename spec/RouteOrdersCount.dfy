@@ -55,6 +55,12 @@ module RouteOrdersCount {
     "0123456789abcdef"[v]
   }
 
+  function Bit(bits: seq<bool>, k: int): int
+    ensures 0 <= Bit(bits, k) <= 1
+  {
+    if 0 <= k < |bits| && bits[k] then 1 else 0
+  }
+
   // byte b = bits 8b .. 8b+7, bit 8b+j weighted 2^j (bitsHex: LSB first within each byte)
   method Hex(bits: seq<bool>) returns (out: string)
   {
@@ -63,17 +69,11 @@ module RouteOrdersCount {
     while b * 8 < |bits|
       decreases |bits| - b * 8
     {
-      var v := 0;
-      var j := 7;
-      while j >= 0
-        decreases j + 1
-        invariant 0 <= v < 256
-        invariant -1 <= j <= 7
-        invariant v < Pow2(7 - j)
-      {
-        v := 2 * v + (if b * 8 + j < |bits| && bits[b * 8 + j] then 1 else 0);
-        j := j - 1;
-      }
+      // linear in the eight bits, so the 0 <= v < 256 bound needs no nonlinear arithmetic
+      // (a Pow2 loop invariant verified locally and failed on the CI runner, same Dafny 4.11.0)
+      var v := Bit(bits, b * 8) + 2 * Bit(bits, b * 8 + 1) + 4 * Bit(bits, b * 8 + 2)
+        + 8 * Bit(bits, b * 8 + 3) + 16 * Bit(bits, b * 8 + 4) + 32 * Bit(bits, b * 8 + 5)
+        + 64 * Bit(bits, b * 8 + 6) + 128 * Bit(bits, b * 8 + 7);
       out := out + [HexDigit(v / 16), HexDigit(v % 16)];
       b := b + 1;
     }
