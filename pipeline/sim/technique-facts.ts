@@ -54,6 +54,29 @@
  * stops the follow-up as `rowmap_unverified`, never guessed. `fired` iff lock j's cells are the
  * carried slot and lock j is a scored full TSD; otherwise the first reason that applies.
  *
+ * THE PAYOFF (a variant with `payoff` in place of `followup`; exactly one of the two, or the
+ * transcription is refused). 欄干 (Parapet) promises no second T-spin: its TSD (or TSS) re-opens a well
+ * under the T's arm, and every source draws or states the next step as a Tetris into it. So the
+ * variant names a WELL CELL (`payoff.well_cell_pre_clear`, reflected with the window when mirrored)
+ * and `wellPayoff` carries it exactly as the follow-up slot is carried: through lock i's clear and
+ * every later lock's clear and garbage insertion, each step verified (`rowmap_unverified`
+ * otherwise). It stops at the FIRST later lock that puts any cell in the well's column, and the
+ * first reason that applies is the outcome: `past_verified` (that lock is past the verified index);
+ * `well_covered` (no cell at or below the carried row: the well was roofed over); `well_filled_not_i`;
+ * `i_in_well_not_quad` (an I in the well that the engine does not record clearing 4 lines); else
+ * fired. `slot_off_board` and `round_ended` as for the follow-up. What the window already entails is
+ * NOT a payoff: that the column re-opens and that the well is at least 2 deep are decided inside the
+ * window by construction (its must-empty cells and its cleared rows), so a check on either could
+ * never fail; a quad into the kept well is decided by nothing in the window. A payoff hit also
+ * carries `well_depth`: the empty cells from the well cell down to the first filled cell or the
+ * floor, on the board before the lock, garbage filled.
+ *
+ * THE OPPORTUNITY PER VARIANT. A variant is measured at the spin its transcription names
+ * (`spin`/`lines`: TSS 1, TSD 2, TST 3, checked against each other); that spin must be the profile's
+ * `opportunity` or one of its `controlSpins`, and under a variant whose opportunity is not the
+ * profile's, the profile's opportunity becomes one of that variant's controls in its place. Every
+ * earlier technique has one TSD variant, so for them nothing moves.
+ *
  * CONTROLS, computed in the same pass so the headline is never printed without them: the same window
  * at the control spins; three ablations at the opportunity (`no_must_empty`, `no_roof`, `t_overlap`:
  * the T need not be the window's T, only overlap a window that matches the board with the T in); and
@@ -142,11 +165,18 @@ export interface Variant {
   id: string; board: string; spin: string; lines: number;
   window: { rows: [number, number]; cols: [number, number] };
   t_cells: [number, number][];
-  followup: { board: string; spin: string; lines: number; t_cells_pre_clear: [number, number][] };
+  /** the second T-spin the page draws (STSD …); exactly one of `followup` and `payoff` */
+  followup?: { board: string; spin: string; lines: number; t_cells_pre_clear: [number, number][];
+               t_cells_after: [number, number][] };
+  /** the Tetris into the well the spin keeps open (欄干); exactly one of `followup` and `payoff` */
+  payoff?: { kind: 'well_quad'; board: string; piece: 'I'; lines: 4; well_cell_pre_clear: [number, number];
+             well_cell_after: [number, number]; note: string };
 }
 interface WinCell { r: number; c: number; v: 'T' | '#' | '.' }
 export interface Prepared { id: string; mirrored: boolean; cells: WinCell[]; T: WinCell[]; roofTop: number;
-                            followup: { r: number; c: number }[]; followupKind: string }
+                            followup: { r: number; c: number }[]; followupKind: string;
+                            /** the payoff's well cell (pre-clear), mirrored with the window */
+                            well?: { r: number; c: number } }
 
 export function loadTranscription(path: string) { return JSON.parse(readFileSync(path, 'utf8')); }
 
@@ -157,16 +187,21 @@ export function prepare(tr: any, v: Variant): Prepared[] {
   const empty = (ch: string) => ch === '-' || emptyLetters.includes(ch);
   const [r0, r1] = v.window.rows, [c0, c1] = v.window.cols;
   const tc = new Set(v.t_cells.map(([r, c]) => `${r},${c}`));
+  if (!v.followup === !v.payoff)
+    throw new Error(`technique: variant ${v.id} carries ${v.followup ? 'both' : 'neither'} of followup and payoff`);
+  if (v.payoff && v.payoff.kind !== 'well_quad') throw new Error(`technique: variant ${v.id} payoff kind ${v.payoff.kind}`);
   return [false, true].map(mirrored => {
     const mc = (c: number) => mirrored ? c0 + (c1 - c) : c;
     const cells: WinCell[] = [];
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++)
       cells.push({ r, c: mc(c), v: tc.has(`${r},${c}`) ? 'T' : empty(rows[r]![c]!) ? '.' : '#' });
     const T = cells.filter(x => x.v === 'T');
-    return { id: v.id, mirrored, cells, T, roofTop: Math.min(...T.map(x => x.r)),
-             followup: v.followup.t_cells_pre_clear.map(([r, c]) => ({ r, c: mc(c) })),
+    const P: Prepared = { id: v.id, mirrored, cells, T, roofTop: Math.min(...T.map(x => x.r)),
+             followup: v.followup ? v.followup.t_cells_pre_clear.map(([r, c]) => ({ r, c: mc(c) })) : [],
              // the follow-up is a full T-spin clearing the transcription's `followup.lines`
-             followupKind: kindKey('full', v.followup.lines) };
+             followupKind: v.followup ? kindKey('full', v.followup.lines) : '' };
+    if (v.payoff) P.well = { r: v.payoff.well_cell_pre_clear[0], c: mc(v.payoff.well_cell_pre_clear[1]) };
+    return P;
   });
 }
 
@@ -177,6 +212,8 @@ export interface Mutants {
   includeMini?: boolean; noMustEmpty?: boolean; noRoof?: boolean; tOverlap?: boolean;
   garbageEmpty?: boolean; rowAnchorOff1?: boolean; openerLt?: boolean;
   followupNoRowmap?: boolean; followupAnyT?: boolean;
+  /** the payoff fires on the first piece in the well, whatever it is; on any I in the well, quad or not */
+  payoffAnyPiece?: boolean; payoffNoQuad?: boolean;
 }
 type Clause = { mustEmpty: boolean; roof: boolean; garbageFilled: boolean; rowOff: number };
 
@@ -237,12 +274,25 @@ const isStood = (cells: Cell[]) => {
 
 const KIND_NAME: Record<string, string> = { 'full:1': 'TSS', 'full:2': 'TSD', 'full:3': 'TST' };
 const kindName = (k: string) => KIND_NAME[k] ?? `T-spin ${k}`;
+const SPIN_LINES: Record<string, number> = { TSS: 1, TSD: 2, TST: 3 };
+
+/** The opportunity a variant is measured at: the full T-spin its transcription names, which must be
+ *  the profile's opportunity or one of its control spins. */
+function variantOpp(tag: string, v: Variant, opp: string, ctl: { key: string }[]): string {
+  if (SPIN_LINES[v.spin] !== v.lines) throw new Error(`${tag}: variant ${v.id} is a ${v.spin} clearing ${v.lines} line(s)`);
+  const key = kindKey('full', v.lines);
+  if (key !== opp && !ctl.some(c => c.key === key))
+    throw new Error(`${tag}: variant ${v.id}'s ${v.spin} is neither the opportunity nor a control spin`);
+  return key;
+}
 
 export interface Hit {
   session: string; file: string; round_index0: number; match: number; round: number; player: string;
   variant: string; lock: number; in_opener: boolean; mirrored: boolean; garbage_in_window: boolean;
   window_letters: string[]; verified_to: number;
   followup: { lock: number | null; fired: boolean; reason: string | null };
+  /** a payoff variant's hit only: the empty cells under the well cell, before the lock */
+  well_depth?: number;
 }
 
 const sameSet = (a: Cell[], b: { r: number; c: number }[]) =>
@@ -281,6 +331,45 @@ function followup(d: TechDigest, i: number, P: Prepared, off: { dr: number; dc: 
   return at(null, 'round_ended');
 }
 
+/** The payoff from a hit at lock `i` with offset (dr, dc): the well cell carried to the first later
+ *  lock that puts a cell in its column (see the header). */
+function wellPayoff(d: TechDigest, i: number, P: Prepared, off: { dr: number; dc: number }, mut: Mutants) {
+  const wc = P.cells.map(x => x.c), span = Math.min(...wc) + Math.max(...wc);
+  const unmirror = mut.followupUnmirrored && P.mirrored;
+  let well = { r: P.well!.r + off.dr, c: (unmirror ? span - P.well!.c : P.well!.c) + off.dc };
+  const step = (lk: LockLite) => {
+    if (mut.followupNoRowmap) return;
+    well = { r: well.r + lk.clearedRows.filter(y => y > well.r).length - lk.garbage, c: well.c };
+  };
+  const at = (lock: number | null, reason: string | null, fired = false) => ({ lock, fired, reason });
+  if (!d.locks[i]!.mapOk) return at(i, 'rowmap_unverified');
+  step(d.locks[i]!);
+  for (let k = i + 1; k < d.locks.length; k++) {
+    const lk = d.locks[k]!;
+    const inCol = lk.cells.filter(q => q.col === well.c);
+    if (inCol.length) {
+      if (k > d.v && !mut.pastPrefix) return at(k, 'past_verified');
+      if (!inCol.some(q => q.row >= well.r)) return at(k, 'well_covered');
+      if (mut.payoffAnyPiece) return at(k, null, true);
+      if (lk.piece !== 'I') return at(k, 'well_filled_not_i');
+      if (lk.cleared !== 4 && !mut.payoffNoQuad) return at(k, 'i_in_well_not_quad');
+      return at(k, null, true);
+    }
+    if (!lk.mapOk) return at(k, 'rowmap_unverified');
+    step(lk);
+    if (well.r < 0) return at(k, 'slot_off_board');
+  }
+  return at(null, 'round_ended');
+}
+
+/** The empty cells from the well cell down to the first filled cell or the floor ('G' filled). */
+function wellDepth(board: string[], P: Prepared, off: { dr: number; dc: number }): number {
+  const c = P.well!.c + off.dc;
+  let n = 0;
+  for (let r = P.well!.r + off.dr; r < board.length && board[r]![c] === '.'; r++) n++;
+  return n;
+}
+
 export interface Classified {
   users: string[];
   denominators: Record<string, any>;
@@ -289,6 +378,10 @@ export interface Classified {
   check: any;
   offBoard: string[];
   reconDropped: string[];
+  /** recon-dropped spins at a variant opportunity other than the profile's, by its kind name */
+  reconOther: Record<string, string[]>;
+  /** each variant's opportunity, by kind name */
+  variantOpps: Record<string, string>;
 }
 
 export const caseName = (h: { session: string; match: number; round: number; player: string }) =>
@@ -302,6 +395,11 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
   const split = () => ({ all: 0, in_opener: 0, mid_game: 0 });
   const opp = kindKey(P.opportunity.spin, P.opportunity.lines);
   const ctl = P.controlSpins.map(c => ({ name: c.name, key: kindKey(c.kind.spin, c.kind.lines) }));
+  // each variant's opportunity, and its controls: the profile's controls less its own spin, with the
+  // profile's opportunity in its place (for a variant measured at the opportunity: exactly `ctl`)
+  const vOpps = variants.map(v => variantOpp(P.tag, v, opp, ctl));
+  const unders = vOpps.map(vo => [{ name: kindName(opp), key: opp }, ...ctl].filter(c => c.key !== vo));
+  const otherOpps = [...new Set(vOpps.filter(k => k !== opp))];
   const denominators = per(() => ({
     [kindName(opp)]: split(),
     ...Object.fromEntries(ctl.map(c => [c.name, split()])),
@@ -313,10 +411,11 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
   let agreed = 0, disagreed = 0, rowmapSteps = 0, rowmapBad = 0;
   const hits: Hit[] = [];
   const offBoard: string[] = [], reconDropped: string[] = [];
-  const pv = Object.fromEntries(variants.map(v => [v.id, {
+  const reconOther: Record<string, string[]> = Object.fromEntries(otherOpps.map(k => [k, []]));
+  const pv = Object.fromEntries(variants.map((v, vi) => [v.id, {
     hits: per(() => ({ all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 })),
     followup: per(() => ({ fired: 0, not_fired: {} as Record<string, number> })),
-    under: Object.fromEntries(ctl.map(c => [c.name, per(() => 0)])),
+    under: Object.fromEntries(unders[vi]!.map(c => [c.name, per(() => 0)])),
     ablation: { no_must_empty: per(() => 0), no_roof: per(() => 0), t_overlap: per(() => 0) },
     orientation_baseline: per(() => 0),
   }]));
@@ -347,6 +446,8 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
       if (!recon) {
         disagreed++; denominators[d.user]!.recon_disagreed++;
         if (lk.spin === 'full' && lk.cleared === 2) reconDropped.push(`${name} lock ${t.i}`);
+        const ko = kindKey(lk.spin, lk.cleared);
+        if (reconOther[ko]) reconOther[ko]!.push(`${name} lock ${t.i}`);
         scored.set(t.i, { kind: kindKey(lk.spin, lk.cleared), recon: false });
         continue;
       }
@@ -366,7 +467,7 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
       if (!s || !s.recon) continue;
       const lk = d.locks[t.i]!;
       for (let vi = 0; vi < variants.length; vi++) {
-        const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!;
+        const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!, vOpp = vOpps[vi]!, under = unders[vi]!;
         const cl: Clause = { mustEmpty: !mut.noMustEmpty, roof: !mut.noRoof, garbageFilled: !mut.garbageEmpty,
                              rowOff: mut.rowAnchorOff1 ? 1 : 0 };
         const order = [Ps[0]!, Ps[1]!];
@@ -382,23 +483,23 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
           return { f, o };
         };
         let base = tryAll(cl);
-        if (mut.tOverlap && s.kind === opp) {
+        if (mut.tOverlap && s.kind === vOpp) {
           base = { f: overlapMatch(withTs.get(t.i)!, lk.cells, Ps) ? { P: Ps[0]!, off: { dr: 0, dc: 0 } } : null, o: false };
         }
         found = base.f; off = base.o;
-        if (s.kind === opp) {
+        if (s.kind === vOpp) {
           const strict = { mustEmpty: true, roof: true, garbageFilled: true, rowOff: 0 };
           const ab = (c: Clause) => Ps.some(Pp => !!windowMatch(t.board, lk.cells, Pp, c));
           if (ab({ ...strict, mustEmpty: false })) rec.ablation.no_must_empty[d.user]++;
           if (ab({ ...strict, roof: false })) rec.ablation.no_roof[d.user]++;
           if (overlapMatch(withTs.get(t.i)!, lk.cells, Ps)) rec.ablation.t_overlap[d.user]++;
           if (isStood(lk.cells)) rec.orientation_baseline[d.user]++;
-          if (off && !found) offBoard.push(`${name} lock ${t.i}`);
+          if (off && !found) offBoard.push(`${name} lock ${t.i}${variants.length > 1 ? ` (${v.id})` : ''}`);
         }
         if (!found) continue;
-        const c = ctl.find(x => x.key === s.kind);
+        const c = under.find(x => x.key === s.kind);
         if (c) { rec.under[c.name][d.user]++; continue; }
-        if (s.kind !== opp) continue;
+        if (s.kind !== vOpp) continue;
         // a hit
         const { P: Pp, off: o } = found;
         const rs = Pp.cells.map(x => x.r + o.dr), cs = Pp.cells.map(x => x.c + o.dc);
@@ -407,10 +508,11 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
         for (let r = R0; r <= R1; r++) letters.push(t.board[r]!.slice(C0, C1 + 1));
         const g = Pp.cells.some(x => x.v === '#' && t.board[x.r + o.dr]![x.c + o.dc] === 'G');
         const fu = mut.tOverlap ? { lock: null, fired: false, reason: 'not_anchored' }
-          : followup(d, t.i, Pp, o, mut, scored);
+          : Pp.well ? wellPayoff(d, t.i, Pp, o, mut) : followup(d, t.i, Pp, o, mut, scored);
         const h: Hit = { session: d.session, file: d.file, round_index0: d.round, match: d.match, round: d.round + 1,
           player: d.user, variant: v.id, lock: t.i, in_opener: inOpener(t.i), mirrored: Pp.mirrored,
-          garbage_in_window: g, window_letters: letters, verified_to: d.v, followup: fu };
+          garbage_in_window: g, window_letters: letters, verified_to: d.v, followup: fu,
+          ...(Pp.well ? { well_depth: wellDepth(t.board, Pp, o) } : {}) };
         hits.push(h);
         const hb = rec.hits[d.user]!;
         hb.all++; hb[h.in_opener ? 'in_opener' : 'mid_game']++;
@@ -428,6 +530,8 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
     s.players = Object.fromEntries(Object.entries(s.players).sort());
   return {
     users, denominators, hits, perVariant: pv, offBoard, reconDropped,
+    reconOther: Object.fromEntries(Object.entries(reconOther).map(([k, l]) => [kindName(k), l])),
+    variantOpps: Object.fromEntries(variants.map((v, vi) => [v.id, kindName(vOpps[vi]!)])),
     check: { tspin_clears_scored: agreed + disagreed, reconstruction_agreed: agreed,
              reconstruction_disagreed: disagreed, rowmap_steps: rowmapSteps, rowmap_unverified: rowmapBad,
              by_session: Object.fromEntries(Object.entries(bySession).sort()) },
@@ -544,6 +648,7 @@ export function assemble(P: TechniqueProfile & { crossRoute?: CrossRoute }, cls:
     window_pieces: WINDOW_PIECES,
     window_rule: `0-based lock index <= ${WINDOW_PIECES} is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)`,
     opportunity: `${P.opportunity.spin} T-spin clearing ${P.opportunity.lines} line(s)`,
+    ...(Object.keys(cls.reconOther).length ? { variant_opportunities: cls.variantOpps } : {}),
     denominators: cls.denominators,
     check: cls.check,
     variants,
@@ -552,6 +657,7 @@ export function assemble(P: TechniqueProfile & { crossRoute?: CrossRoute }, cls:
       ...P.lists(hits, name),
       window_off_board: cls.offBoard,
       recon_dropped_tsd: cls.reconDropped,
+      ...Object.fromEntries(Object.entries(cls.reconOther).map(([k, l]) => [`recon_dropped_${k.toLowerCase()}`, l])),
       ...(cr ? {
         cross_route_no_hit: cr.by_round.filter(r => r.outcome === 'no_hit').map(r => crossRouteLine(r, cr.continuation.last_lock)),
         cross_route_unscored: cr.by_round.filter(r => r.outcome === 'node_unverified' || r.outcome === 'continuation_unverified')

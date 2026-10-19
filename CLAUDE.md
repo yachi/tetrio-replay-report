@@ -331,6 +331,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique shachikutrain \
   --out analysis/shachikutrain-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/shachikutrain.test.ts pipeline/openers/shachikutrain-demos.test.ts  # its two tests
 python3 -m pipeline.shachikutrain_page --selftest # the docs/shachikutrain*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_parapet_shapes            # CI gate: the 欄干 (Parapet) technique transcription
+python3 -m pipeline.openers.extract_parapet_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Parapet.wikitext, tetrisch_parapet.html and tetrisch-parapet/ beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique parapet \
+  --out analysis/parapet-facts.json                            # 欄干's corpus artefact (quarantined; two variants, a payoff)
+bun pipeline/sim/emit-technique-demos.ts --technique parapet \
+  --out analysis/parapet-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/parapet.test.ts pipeline/openers/parapet-demos.test.ts  # its two tests
+python3 -m pipeline.parapet_page --selftest       # the docs/parapet*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3876,6 +3884,24 @@ missing `snapshot_bytes`, HTTP 403, a missing revision, a network error, a board
 hashes) runs on every push in `docs`. ガムシロ積み's harddrop cross-source pins an oldid but no
 `revision_sha1`, so it is not discovered — a control in the selftest.
 
+**Since 2026-10-19 it re-reads the technique transcriptions too, and only their wikitext half.** Every
+`*-technique.json` holding, anywhere in it, an object with both `oldid` and `revision_sha1` is discovered
+by that structure (the record's role is its dotted path, e.g. `cross_source.harddrop`), never by a list;
+each pinned revision gets the same fetch / sha1 / sha256 / bytes / latest checks, and then the extractor
+(`extract_<key>_shapes`) runs with `--wikitext-dir`, not `--html-dir`, because the technique's own page is
+shiwehi.com HTML that no `api.php` call returns. `--wikitext-dir` runs the spec's opt-in `wikitext_checks`
+alone (`technique_transcription.TechniqueSpec`) and FAILS by name when a spec declares none, so a
+discovered record is never passed with nothing re-parsed. Every snapshot the file records that is not a
+pinned revision is printed as a `gap` line: the shiwehi page (and any other non-wiki page) is still
+re-checked only by a person running `--html-dir` with a refetch. The selftest adds the structural
+discovery cases (a pin nested inside a list is found at its path; the same record without
+`revision_sha1` is not, and is a gap; a file with no pin is not discovered) and, for every discovered
+technique whose spec declares the opt-in `synthetic_wikitext`, the record-level mutants and a board edited
+under re-pinned hashes, which only the extractor's re-parse can see (a pfrow page loses a filled cell; a page
+drawing its board as a fumen has one fumen character changed). A discovered technique missing either hook is a
+SURVIVOR of the selftest, so the per-push `docs` job goes red on it: it used to be printed `NOT PLANTED` and
+passed, while the live weekly run was red by construction — 欄干's harddrop pin shipped that way for one pass.
+
 **Bag 1 has three cross-sources, all checked by the gate; bag 2 onward has none, and every page says
 so.** (1) harddrop's SingleYou page, table 0 — the page's 「stacked the same way as SDPC」 is that
 equality — through a new `harddrop_wikitext` route of the gate's rule 2; (2) stick spin's `bag1.pc` and
@@ -3958,7 +3984,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -3966,7 +3992,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth and 社畜トレイン (`template/shachikutrain.php`) the seventh (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh and 欄干 (`template/parapet.php`) the eighth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4047,6 +4073,19 @@ window predicate cannot express, e.g. 階段のドネイト's staircase over sev
 name when it happens. `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
 because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
 direction is clean: no route artefact hashes a technique file.
+
+**欄干 is the change that moved them, and it moved nothing else.** Its payoff (in place of a follow-up) and its
+per-variant opportunity are edits to `technique-facts.ts`, and the payoff variant's demo ending on the stood T is an
+edit to `technique-demos.ts`; so every one of the seven earlier technique artefacts re-emitted with a new
+`emitter_md5` (facts), `planner_md5` and `classifier_md5` (demos), which `git diff` was checked to show before any 欄干
+file was written. The same pass moved one more hash line in six of them, for a different reason:
+`transcription_md5` in BT砲's, 千鳥格子's and 社畜トレイン's facts and demos, because the wikitext-discovery change
+rewrote the `snapshot_note` of those three transcriptions (their harddrop records are refetched weekly now). STSD's,
+STMB Cave's, インペリアルクロス's and ダブルダガー's moved in the three md5 lines above and nothing else; no earlier
+artefact moved outside its hash lines. The Python halves (`technique_transcription.py`'s rule (d') and the per-variant
+external drawings, `technique_page.py`'s `more_variants`) are unhashed and default-preserving: every earlier gate's
+plain, `--selftest` and `--html-dir` output and every earlier `*_page --selftest` output was byte-compared against the
+pre-edit run, and `bin/build-docs --check` passed with no earlier page moved (only `docs/index.html` gains the card).
 
 ### STMB Cave
 
@@ -4240,8 +4279,10 @@ seven-row window cannot be placed on, so the independent drawings come from hard
 Spin's wikitext is (oldid, MediaWiki's revision sha1, our sha256 and byte count, fetched by urllib through `api.php`) and
 recorded in the transcription's `cross_source.harddrop`: every board on that page whose drawn T the window fires on (its
 「Mid-game BT Cannon」 section among them), and every board with no T drawn on which it fires. `--html-dir` re-reads the
-wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, so
-`check_wikitext_sources` does not discover it and nothing re-reads it weekly: an open item, named here.
+wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, and
+until 2026-10-19 nothing re-read it weekly; `check_wikitext_sources` now discovers it (see ### SDPC Spin) and re-runs the
+extractor's `--wikitext-dir` (`wikitext_checks`, the same function as `html_checks`) over the refetched revision. The shiwehi
+page is still re-read only by a person with `--html-dir`.
 
 **Three opt-in edits to the shared gate, in unhashed Python, each checked default-preserving** (the gate, selftest and
 `--html-dir` output of STSD, STMB Cave, インペリアルクロス and ダブルダガー were compared byte for byte before and after): a
@@ -4303,7 +4344,8 @@ drawn cells into T's (`hd_slots`; a board with no unique partition is a red buil
 harddrop reading itself (`hd_cell`, `_sections`) is imported from BT砲's module, one reading. The window is four rows by six
 columns: the outer slot's arms row with its wall and the inner roof, the two cleared rows, the outer slot's nub row. No routes
 board fires (`routes_fire_none`), and none of the other technique transcriptions' boards does (`extra_checks`, under `cross:`).
-Like BT砲's, the harddrop record is not a `*-routes.json`, so `check_wikitext_sources` does not re-read it weekly: an open item.
+Like BT砲's, the harddrop record is refetched weekly by `check_wikitext_sources` and re-checked with `--wikitext-dir`; the shiwehi
+page is not.
 
 **What the window does not express is named, from the page's own sentence**: 「(Z)は1回目のT-spinを打った後に置いても構いません」.
 One of that Z's cells is the outer slot's wall, which every drawing fills, and the window reads none of the other three (measured
@@ -4387,9 +4429,88 @@ The window clashes with STMB Cave's, ダブルダガー's, BT砲's and 千鳥格
 **No demo is built, and every board says why** (`shachikutrain-demos.test.ts` re-derives each): the basic form's and the TST build's
 terrains have ODD cell counts (a proof); the STSD build's terrain has tilings but none under the planner's dealing; DT社畜's L is
 three cells; the 4x2 terrain has no tiling at all (two parts of six), a profile reason, because given that chain the planner stops
-first at the pale S, which it reads as a piece R (measured in the test). Like BT砲's and 千鳥格子's, the two harddrop records are not
-`*-routes.json`, so `check_wikitext_sources` does not re-read them weekly: an open item. Named lists and their sizes live in the
-two tests.
+first at the pale S, which it reads as a piece R (measured in the test). Like BT砲's and 千鳥格子's, both harddrop records
+(`cross_source.harddrop` and `cross_source.stmb_cave`) are refetched weekly by `check_wikitext_sources` and re-checked with
+`--wikitext-dir`; the shiwehi page is not. Named lists and their sizes live in the two tests.
+
+### 欄干（Parapet）
+
+The same deliverable for `template/parapet.php` (「2021-03-23更新」): `pipeline/openers/parapet-technique.json` (held as a literal in
+`extract_parapet_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-parapet.ts` →
+`analysis/parapet-facts.json` (`parapet.test.ts`), `technique-demos-parapet.ts` → `analysis/parapet-demos.json`
+(`parapet-demos.test.ts`), and `docs/parapet.html` + `docs/parapet-demos.html` from `parapet_page.py` + `parapet_prose.json`, the
+eighth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**It is a donation, and the first technique page whose payoff is not a second T-spin.** An L stood on end, shifted one column
+(the page: 「%Lを1列ずらして立てて置き」 — it says nothing about the wall, and BT砲's page draws the L against it), its foot under the
+slot's left end, a roof over its right end: the flat, nub-down T clears the T's arm and the L's foot, and the column under that arm
+opens from the top to the floor. harddrop and Tetrisチャンネル draw the next step as a Tetris into that well (harddrop: an I on the
+fumen's next page; Tetrisチャンネル: its 4-deep sequence ends on one). shiwehi names a Tetris only as its reason to fire the TSS
+rather than the TSD (「TSDではなくTSSを打つ理由…打後の地形が1段高くなるためその後テトリスを送りやすい」), never as what follows the
+TSD, and the prose attributes it that way. So the variant carries a `payoff` (`well_quad`) in place of a `followup` — exactly one of the two, refused otherwise by the matcher and by
+the gate's `grammar:`. `wellPayoff` (`technique-facts.ts`) carries the WELL CELL through every clear and garbage insertion, verified
+step by step as the follow-up slot is, to the first later lock with a cell in its column: fired iff that lock is inside the verified
+prefix, has a cell at or below the carried cell, is an I and cleared four (else `past_verified`, `well_covered`, `well_filled_not_i`,
+`i_in_well_not_quad`, `rowmap_unverified`, `slot_off_board`, `round_ended`). **What the window entails is not reported as a
+payoff**: that the column re-opens and that the well is at least two deep are decided inside the window (its must-empty well cells
+and its cleared rows), so a check on either could never fail — the NaiveClauseForced screening question, asked before writing the
+payoff. Each hit carries `well_depth` (the empty cells under the well cell before the spin, garbage filled), and
+`well_depth_lt4` names the shallow ones. The gate's rule (d') checks the payoff on the DRAWING: the payoff board is the spin
+board's after board, the well column is empty top to bottom there, and every filled cell of it on the spin board is in a row the
+spin clears (harddrop's re-opening clause, on the page's own boards).
+
+**Two variants on one terrain, each measured at its own spin.** `parapet` is the TSD; `parapet_tss` the TSS the page draws on the
+same terrain (the T stood, nub right, clearing only the foot's row, the well kept one row higher). The matcher reads a variant's
+opportunity off its transcription's `spin`/`lines` (checked against each other, and required to be the profile's `opportunity` or
+one of its `controlSpins`); under the TSS variant the TSD takes the TSS's place among the controls. For the seven earlier techniques
+(one TSD variant each) this is the identity, which is why their artefacts moved only in their hash lines. Three TSS controls are
+STRUCTURAL zeros the test re-derives from the window, not measurements: `no_roof` equals the TSS headline (no window cell lies above
+its T), and a TSD (flat T) or a TST (every T row but the cleared one holds a must-empty cell) cannot hit the TSS window; nor a TST
+the TSD window. The page renders both variants (`technique_page.py`'s opt-in `more_variants`: the TSS's figures keyed
+`parapet_tss:<key>`, its headings from the prose's `more_variants.parapet_tss`).
+
+**The window is the agreement box** (rows 1-5, columns 1-5 of `tsd.spin`, the same box for both variants) of the page's two basic
+forms and four external drawings, each per variant: BT砲's page's Parapet (`btcannon-technique.json`'s `parapet`, same author, the L
+against the wall — which is what puts column 0 outside); harddrop's Parapet page (Chopin's; ONE fumen and no pfrow table, decoded
+once with knewjade's tetris-fumen 1.1.3 and recorded page by page — the board page 9 locks its T into, the T and the I locks; the
+decode is NOT re-run in CI, an open item); and Tetrisチャンネル's two Parapet boards (the page this page cites; its sixteen JPEGs
+are committed under `spec/fixtures/tetrisch-parapet/` and read with the jp-forecast sampler, which reads fifteen and refuses the
+annotation 008). The TSS slots on the external drawings are OUR READING (they draw only the TSD). The gate's external drawings now
+may name the `variant` they are drawings of (`technique_transcription.external_for`; one that names none is a drawing of every
+variant, so the earlier techniques' are unchanged). Tetrisチャンネル draws the plain TSD on both terrains beside its Parapet, the T's
+nub plugging the well — its own control — and `tetrisch:` measures the windows never fire there, nor on the bare terrains;
+`after_spin` of each spin image is its after image; 015 less its I is 014 and the I clears four in the well column; the wells are 2
+and 4 deep where drawn. The TSD window fires on two same-author 山岳積み2号 boards (`cross_source.also`; 9-row boards the route
+artefact cannot match, so no cross-route) and, measured by `bt:`, on BT砲's page's Parapet and its 途中BT build (「実は欄干を組む形から
+BT砲にすることができます」: the BT is built on this terrain). That is a relation, not a clash: in the same hand BT砲's window and this
+one agree on every cell they share, so the test names their common hits (`BTCANNON_ALSO_PARAPET`) rather than asserting none;
+against STMB Cave, ダブルダガー, 千鳥格子 and 社畜トレイン the windows clash in every pairing of hands and the hit sets are disjoint.
+Of the three external records only harddrop's is a pinned MediaWiki revision, so `check_wikitext_sources` discovers it and refetches
+it weekly (the spec's `wikitext_checks`, the harddrop half of `--html-dir`, with a `synthetic_wikitext` holding its quote and its one
+fumen; the selftest plants a fumen edit where a pfrow page loses a cell). The shiwehi page and the Tetrisチャンネル page and images are
+not re-read weekly: an open item. `--html-dir` re-reads all three (Pillow for the images; without it one named `pillow:`
+failure and the hashes only).
+
+**Donation, cross-checked.** `parapet.test.ts` re-implements `donationCols` at its shipped clauses (importing `emit-opener-facts.ts`
+runs a session), reproduces every session's per-player `donation.players[].donations` exactly, and names every hit that is not a
+donation at its well column in `HIT_NOT_DONATION` with the re-derived clause it fails: only `filled_above_window` (a filled cell over
+the slot in the well column, outside the window) and `cavity_lt4` occur — never the walls or the cleared rows, which the window
+itself decides.
+
+**What discriminates is measured per window part, per variant** (`PART_ONLY`): the rows above the cleared rows, the cleared rows,
+and the well rows under them; no part reaches the headline alone, and the well rows cut the most. The TSD's `no_roof` ablation is
+exactly its `below` part. Mutants: `payoffAnyPiece` and `payoffNoQuad` (new, shared) and the follow-up mutants `followupUnmirrored`
+and `followupNoRowmap` (honoured by the well) each move only payoffs on the corpus, and the test also builds two-lock digests from
+Tetrisチャンネル's 4-deep sequence and harddrop's fumen, as drawn and mirrored, on which the payoff fires and each payoff mutant breaks
+it (`followupNoRowmap` needs garbage under the well to matter: a spin's own clear is always above the well cell).
+
+**No demo is built, and every board says why** (`parapet-demos.test.ts` re-derives each): the O-roof terrain is a multiple of four
+with no tiling AT ALL (the well and the L's stem cut it into two parts, neither a multiple of four — 「no cover under its dealing」
+is true and weaker), and the Z-roof terrain is even but not a multiple of four (a planner limit), the four boards drawn on it
+standing on it. The shared planner gained one branch — a payoff variant's demo ends on the stood T, with nothing swapped out of the
+hold for a second T — which no committed chain reaches, so the demos test runs it on a SYNTHETIC copy of the transcription (the
+O-roof terrain widened until it tiles; a temporary file, never committed or published): the engine arbiter accepts it and it ends on
+one full TSD. Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

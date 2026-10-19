@@ -351,8 +351,9 @@ HARDDROP = {
     'snapshot_file': 'Shachiku_Train.wikitext',
     'snapshot_sha256': '41e975cb5391eaa98d43948272c8312633b0bbce3f4158ef77099de3fbab4f14',
     'snapshot_bytes': 13081,
-    'snapshot_note': 'not committed, and not discovered by check_wikitext_sources (which reads *-routes.json): '
-                     're-check with --html-dir, the file beside shachikutrain.html',
+    'snapshot_note': 'not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and '
+                     're-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside '
+                     'shachikutrain.html',
     'author_note': 'harddrop\'s page, edited by its wiki editors (it calls the technique Company Train as well): another '
                    'site and other authors than shiwehi.com, and a page the shiwehi.com page does not cite (found by its '
                    'title), so it is independent of it',
@@ -984,6 +985,10 @@ SPEC = TT.TechniqueSpec(
     extra_checks=extra_checks,
     external_drawings=external_drawings,
     html_checks=harddrop_snapshot_checks,
+    # the same checks read nothing but the pinned wikitext, so a weekly api.php refetch can run them
+    wikitext_checks=harddrop_snapshot_checks,
+    synthetic_wikitext=lambda d: {d['cross_source']['harddrop']['snapshot_file']: _synthetic_harddrop(d),
+                                   d['cross_source']['stmb_cave']['snapshot_file']: _synthetic_stmb(d)},
 )
 
 

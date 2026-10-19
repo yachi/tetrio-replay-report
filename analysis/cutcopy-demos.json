@@ -36,10 +36,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "38fcdb02b105d9ae1fb7e8f3c4e1efcf",
-  "planner_md5": "1cb4ff884191b7f8f94cceee5b77811a",
+  "transcription_md5": "38583eedb99cfdb312cfa6162bc852e1",
+  "planner_md5": "ef6b37d5b2350f9abb52ff909ec92972",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "027bd50ba60c71c736057aec9a5bbe75"
+  "classifier_md5": "097b82a882d594d264f9b1cc1c46e4a9"
  },
  "board": {
   "width": 10,

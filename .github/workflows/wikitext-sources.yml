@@ -11,6 +11,11 @@ name: wikitext-sources
 # file's extractor with --html-dir over the fetched bytes, and FAILS when the page has a revision
 # newer than the pin (the upstream page changed; the transcription has not been re-read).
 #
+# It does the same for every technique transcription (pipeline/openers/*-technique.json) holding a
+# pinned revision anywhere in it (discovered by structure; the run prints which), except
+# that the extractor runs with --wikitext-dir: the technique's own page is shiwehi.com HTML, which
+# no api.php call returns, so that half is printed as a `gap` line and not re-read here.
+#
 # WHY A FILE OF ITS OWN RATHER THAN A JOB IN verify.yml
 #
 # verify.yml runs every job on every push, and its jobs need no network beyond installing pinned
