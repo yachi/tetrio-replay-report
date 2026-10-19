@@ -825,6 +825,23 @@ jobs:
       - name: Check the BT Cannon technique page audit catches its corruptions
         run: python3 -m pipeline.btcannon_page --selftest
 
+      # The sixth technique page, 千鳥格子 (Cut Copy, shiwehi.com's template/cutcopy.php): the same gate and
+      # renderer, a flat T into the inner of two TSD slots interleaved a column apart, whose clear joins the
+      # outer slot (the follow-up is a second TSD). Its window is the AGREEMENT BOX of the page's three
+      # drawings, harddrop's Cut_copy page's five (pinned by revision, recorded in the transcription with
+      # every other drawn T on that page) and the Cut Copy harddrop's BT_Cannon page draws (read from
+      # btcannon-technique.json); no routes board draws one, which the gate's opt-in routes_fire_none
+      # records. The corpus artefact and the (all unbuilt) demos are checked by
+      # pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job.
+      - name: Check the Cut Copy technique transcription
+        run: python3 -m pipeline.openers.extract_cutcopy_shapes
+
+      - name: Check the Cut Copy technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_cutcopy_shapes --selftest
+
+      - name: Check the Cut Copy technique page audit catches its corruptions
+        run: python3 -m pipeline.cutcopy_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

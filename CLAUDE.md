@@ -315,6 +315,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique btcannon \
   --out analysis/btcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/btcannon.test.ts pipeline/openers/btcannon-demos.test.ts  # its two tests
 python3 -m pipeline.btcannon_page --selftest      # the docs/btcannon*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_cutcopy_shapes            # CI gate: the 千鳥格子 (Cut Copy) technique transcription
+python3 -m pipeline.openers.extract_cutcopy_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Cut_copy.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique cutcopy \
+  --out analysis/cutcopy-facts.json                            # 千鳥格子's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique cutcopy \
+  --out analysis/cutcopy-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/cutcopy.test.ts pipeline/openers/cutcopy-demos.test.ts  # its two tests
+python3 -m pipeline.cutcopy_page --selftest       # the docs/cutcopy*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3942,7 +3950,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -3950,7 +3958,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth and BT砲 (`template/btcannon.php`) the fifth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth and 千鳥格子 (`template/cutcopy.php`) the sixth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4255,6 +4263,56 @@ this page's 72積み builds draw them upper case (the 72積み stack lower case)
 of its own. Every board carries the profile's reason with the cell count `btcannon-demos.test.ts` re-derives; one 72積み terrain
 is a multiple of four and is stopped by that reading alone, which its reason says. Teaching the planner a per-profile page-letter
 set would move every demo artefact's `planner_md5`, so it was not done here. Named lists and their sizes live in the two tests.
+
+### 千鳥格子（Cut Copy）
+
+The same deliverable for `template/cutcopy.php` (「2020-10-14更新」): `pipeline/openers/cutcopy-technique.json` (held as a literal
+in `extract_cutcopy_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-cutcopy.ts` →
+`analysis/cutcopy-facts.json` (`cutcopy.test.ts`), `technique-demos-cutcopy.ts` → `analysis/cutcopy-demos.json`
+(`cutcopy-demos.test.ts`), and `docs/cutcopy.html` + `docs/cutcopy-demos.html` from `cutcopy_page.py` + `cutcopy_prose.json`, the
+sixth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**NO SHARED FILE CHANGED** — not the matcher, the planner, the gate or the renderer: the transcription and its extract module, the
+two profiles, the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI steps. Every
+pre-existing artefact and page is byte-identical; `docs/index.html` gains the card.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's, ダブルダガー's and BT砲's); the follow-up is a second TSD
+whose cells the first one's clear splits.** Two TSD slots are interleaved one column apart: the T goes into the inner one (its arms
+one row, its nub the row under), and its two cleared rows join the outer slot's arms row (above them) to its nub cell (under them).
+That is BT砲's split slot again, which the matcher's row map already joins, so `followup.lines` 2 and the pre-clear cells are data.
+The page writes 「縦向きに入れて」 (upright) and draws the T flat: read as the T dropping in upright and turning into the slot; the
+window reads the drawing.
+
+**The window is the agreement box, against three sources.** STSD's bounding box would be the whole board (the spin board draws the
+stack beside the slots as filled rows above the T). The agreement drawings are the page's three (the basic form, and its T-hole and
+third-column builds, both drawn MIRRORED, so `extra_checks` fires them under `mirror:` as ダブルダガー's do), harddrop's Cut_copy
+page's (the page the source cites as its reference; pinned like BT砲's BT_Cannon page — oldid, MediaWiki's revision sha1, our sha256
+and bytes, urllib through `api.php` — and recorded with every OTHER drawn T on it in `drawn_t_not_fired` and its no-T boards the
+window fires on in `fires_without_slot`, so the window does not choose its evidence), and the Cut Copy harddrop's BT_Cannon page
+draws, read by (table, board) out of `btcannon-technique.json`, whose own note names it. harddrop draws one board with three T's
+(yakine's repeating pattern), which BT砲's one-T-per-board completeness check cannot read, so this module partitions every board's
+drawn cells into T's (`hd_slots`; a board with no unique partition is a red build) and records each T as its own `slot`; the
+harddrop reading itself (`hd_cell`, `_sections`) is imported from BT砲's module, one reading. The window is four rows by six
+columns: the outer slot's arms row with its wall and the inner roof, the two cleared rows, the outer slot's nub row. No routes
+board fires (`routes_fire_none`), and none of the other technique transcriptions' boards does (`extra_checks`, under `cross:`).
+Like BT砲's, the harddrop record is not a `*-routes.json`, so `check_wikitext_sources` does not re-read it weekly: an open item.
+
+**What the window does not express is named, from the page's own sentence**: 「(Z)は1回目のT-spinを打った後に置いても構いません」.
+Two of that Z's cells are the outer slot's wall, which every drawing fills, so the T-hole build with its Z left out fires nowhere
+(`not_expressed`, measured; the piece left out must be the sentence's own mino icon, `later:`).
+
+**What discriminates is measured per window part** (`cutcopy.test.ts`, `PART_ONLY`): the cleared rows (entailed by the clear) admit every flat,
+nub-down full TSD whose window is on the board, and the row above and the row below each cut that down without reaching the headline alone, so both are
+doing work; the `no_roof` ablation is the `below` part. Unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof` makes a lock match
+both hands: both are live mutants whose hits are their ablations'. The window clashes with STMB Cave's, ダブルダガー's and BT砲's on a
+cell in every pairing of hands and no lock is a hit of two of them. Garbage reads as filled, and the page itself says the shape is
+mostly built when garbage rises, so `garbage_in_window` is most of the hit list — a fact about the corpus, read off the test.
+
+**No demo is built, and every board says why** (`cutcopy-demos.test.ts` re-derives each): the third-column terrain has an ODD cell
+count (a proof); the T-hole terrain is a multiple of four with no tiling by tetrominoes AT ALL (the hole cuts it into two parts,
+neither a multiple of four — the planner's own words, 「no cover under its dealing」, are true and weaker); the basic form is even
+but not a multiple of four (a planner limit); and both builds are drawn mirrored, so the as-drawn window the planner fires would
+not fit them even built (measured). Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
