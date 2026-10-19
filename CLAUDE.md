@@ -291,6 +291,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique stmbcave \
   --out analysis/stmbcave-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/stmbcave.test.ts pipeline/openers/stmbcave-demos.test.ts  # its two tests
 python3 -m pipeline.stmbcave_page --selftest    # the docs/stmbcave*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_imperialcross_shapes            # CI gate: the Imperial Cross technique transcription
+python3 -m pipeline.openers.extract_imperialcross_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique imperialcross \
+  --out analysis/imperialcross-facts.json                      # Imperial Cross's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique imperialcross \
+  --out analysis/imperialcross-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/imperialcross.test.ts pipeline/openers/imperialcross-demos.test.ts  # its two tests
+python3 -m pipeline.imperialcross_page --selftest # the docs/imperialcross*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3918,14 +3926,15 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave）— mid-game local shapes, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
 rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
-hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page and
-STMB Cave (`template/stmbcave.php`) the second (### below); a later technique whose shape the window
+hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
+STMB Cave (`template/stmbcave.php`) the second and インペリアルクロス (`template/imperialcross.php`) the third
+(each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4067,6 +4076,60 @@ not a full TSD). Two shared-file edits came with that, both in unhashed Python a
 `technique_page.py`'s selftest skips its demo-island plants when there is no demo (and plants a dropped
 unbuilt block instead), and the board it drops is the profile's `selftest_board` (default STSD's).
 Named lists and their sizes live in the two tests, never here.
+
+### インペリアルクロス（Imperial Cross）
+
+The same deliverable for `template/imperialcross.php` (「2020-06-20更新」): `pipeline/openers/imperialcross-technique.json`
+(held as a literal in `extract_imperialcross_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-imperialcross.ts` → `analysis/imperialcross-facts.json` (`imperialcross.test.ts`),
+`technique-demos-imperialcross.ts` → `analysis/imperialcross-demos.json` (`imperialcross-demos.test.ts`), and
+`docs/imperialcross.html` + `docs/imperialcross-demos.html` from `imperialcross_page.py` +
+`imperialcross_prose.json`, the third card under 中盤手法. Every figure is read off the artefacts and tests,
+never typed here.
+
+**The spin is a TSD and the anchor is the T's cells — the T STOOD UP, nub right (mirrored: nub left) — so
+the window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** The T goes into a
+cross-shaped hole and clears the cross's top and bottom rows, which are NOT adjacent; the engine credits a
+full TSD either way, and nothing in the matcher assumes the cleared rows touch (the follow-up's row map
+counts the cleared rows below each slot cell). The row between them keeps the cross's far arm EMPTY, and that
+cell is what tells this T from STSD's (whose nub fills it): `imperialcross.test.ts` re-derives, from both
+transcriptions, that anchored on the same stood T the two windows disagree on a cell, and measures the two hit
+sets disjoint.
+
+**The window is the agreement box (`window_basis: agreement`, STMB Cave's opt-in), and the reason is the
+page's own build.** The bounding box of T, roof and follow-up reaches a column whose top cell is empty on the
+spin board, FILLED on the page's TSD-shape build (its stood Z) and drawn `B` on the basic form. So the window
+is the box every drawing agrees on — the page's basic form and three builds, and ガムシロ積み's two Imperial
+Cross boards (`gamushiro-routes.json`, the spec's `external_drawings`, their slots declared in the extract
+module and checked by the agreement rule). `B` here is dark grey the page leaves open: read as EMPTY
+(`empty_letters`), and `extra_checks` measures that the window reads no `B` cell where it fires. The cross
+check (`cross:`) fires on harddrop's SDPC Spin `3.third.imperial` (independent) and on stick spin's
+`2.sd.imperial.spin` (same author, `also`), both nub left.
+
+**One gate change, in unhashed Python, default-preserving: the opt-in `followup.drawn_lines`.** The page draws
+its after board BEFORE the stack beside the second slot is built, so the follow-up T fills one row of the
+drawing while the TSD the page promises clears two. Rule (d) now takes the drawn count from `drawn_lines`
+when present (fewer than `lines`, with a `drawn_note`), else `lines` as before; STSD's and STMB Cave's gate,
+selftest and `--html-dir` output were compared byte for byte with and without the change. The matcher still
+scores the follow-up as a full TSD.
+
+**What discriminates is measured, and either half is enough on this corpus.** The cross's top and bottom rows
+are entailed by the clear; with only the cross's filled cells and the T anchored the window admits more TSDs
+than the headline (the count is pinned in the test), while the `no_roof` ablation (the cross with its empty
+arm) and the `no_must_empty` one (every filled cell, the overhang's included) each give the headline exactly —
+so `noMustEmpty` and `noRoof` are measured EQUIVALENT mutants, named and asserted byte-identical.
+
+**Cross-checks against the route artefacts:** no corpus round reached any route page's Imperial Cross node
+(named, empty); the one SDPC Spin round that reached its parent `3.third` is measured over bag 4 (the bag
+harddrop draws the Imperial Cross in, re-derived from `sdpcspin-routes.json`) and named with what happened.
+
+**No demo is built, and every board says why** (`imperialcross-demos.test.ts` re-derives each): the basic
+form and the bare cross have an ODD cell count (a proof); the TSD-shape terrain has no tiling by tetrominoes
+at all (an exact-cover search over all seven kinds, with a control that finds tilings where there are some),
+so only line clears could reach it; the cross-shape build's terrain is even but not a multiple of four (a
+planner limit). The page's sentence for its TST board holds 来, which the page audit's simplified-glyph check
+cannot tell from the simplified character, so that board's caption is not rendered (`caption_note` says so;
+the quote is still checked against the snapshot). Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

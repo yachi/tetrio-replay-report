@@ -777,6 +777,22 @@ jobs:
       - name: Check the STMB Cave technique page audit catches its corruptions
         run: python3 -m pipeline.stmbcave_page --selftest
 
+      # The third technique page, インペリアルクロス (shiwehi.com's template/imperialcross.php): the same gate and
+      # renderer, a T stood into a cross whose two cleared rows are not adjacent. Its window is the
+      # AGREEMENT BOX of the page's four drawings and ガムシロ積み's two Imperial Cross boards
+      # (gamushiro-routes.json); the gate's opt-in followup.drawn_lines records that the page draws the
+      # after board before the stack beside the second slot is built. The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/imperialcross.test.ts and imperialcross-demos.test.ts
+      # in the typescript job.
+      - name: Check the Imperial Cross technique transcription
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes
+
+      - name: Check the Imperial Cross technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes --selftest
+
+      - name: Check the Imperial Cross technique page audit catches its corruptions
+        run: python3 -m pipeline.imperialcross_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

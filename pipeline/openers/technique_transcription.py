@@ -33,7 +33,9 @@ per rule and requires that tag):
         variant lists and the gate re-reads) and the follow-up slot; (c) outside it, every cell of a
         row the spin does not clear is empty or `c`, so nothing the matcher ignores carries a piece
         letter; (d) the follow-up slot is empty on the after board, is one T, and fills exactly
-        `followup.lines` rows of the DRAWN after board; (e) the window, evaluated the way the matcher
+        `followup.lines` rows of the DRAWN after board (or the opt-in `followup.drawn_lines`, fewer, with
+        a `drawn_note`, for a page that draws the after board before the stack beside the slot is built);
+        (e) the window, evaluated the way the matcher
         evaluates it, fires on every board the variant lists in `fires_on` at exactly one RESTING
         placement, as drawn, and never mirrored; (f) it does not fire on any board in `misses`, at
         the spin the page draws there, or (for a board with no spin drawn) at any resting placement.
@@ -447,9 +449,16 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         else:
             o = occ_of(after, spec)
             o = [''.join('#' if (r, c) in fa else ch for c, ch in enumerate(row)) for r, row in enumerate(o)]
-            if len(full_rows(o)) != v['followup']['lines']:
+            # opt-in `drawn_lines`: a page that draws its after board BEFORE the stack beside the slot is
+            # built (Imperial Cross) — the slot fills fewer rows of the drawing than the spin it promises
+            # clears. Default: the drawing is complete, so the two are the same number (STSD, STMB Cave)
+            want = v['followup'].get('drawn_lines', v['followup']['lines'])
+            if 'drawn_lines' in v['followup'] and not (0 < want < v['followup']['lines']
+                                                       and v['followup'].get('drawn_note')):
+                bad.append(f'window: {v["id"]}: followup.drawn_lines must be fewer than its lines, with a drawn_note')
+            if len(full_rows(o)) != want:
                 bad.append(f'window: {v["id"]}: the follow-up T fills {len(full_rows(o))} rows of the drawn '
-                           f'after board, not {v["followup"]["lines"]}')
+                           f'after board, not {want}')
         # (e) fires on every listed build, once, as drawn
         for bid in v.get('fires_on', []):
             b = byid[bid]['rows']
