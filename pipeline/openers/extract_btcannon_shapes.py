@@ -283,8 +283,9 @@ HARDDROP = {
     'snapshot_file': 'BT_Cannon.wikitext',
     'snapshot_sha256': '79a356ecae617e2ca5c27f709754a0778b5ead2e9e75b12359e2244fc88b10d6',
     'snapshot_bytes': 43605,
-    'snapshot_note': 'not committed, and not discovered by check_wikitext_sources (which reads *-routes.json): '
-                     're-check with --html-dir, the file beside btcannon.html',
+    'snapshot_note': 'not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and '
+                     're-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside '
+                     'btcannon.html',
     'author_note': 'BT Cannon was invented by TCM-β (the page\'s first sentence); the page is harddrop\'s, edited by '
                    'its wiki editors — another site and other authors than shiwehi.com',
     'reading': {'blank': '-', 'P': 'U, the T placed into the spin (the slot the agreement rule fires the window at)',
@@ -648,6 +649,9 @@ SPEC = TT.TechniqueSpec(
     extra_checks=extra_checks,
     external_drawings=lambda: harddrop_drawings(),
     html_checks=harddrop_snapshot_checks,
+    # the same checks read nothing but the pinned wikitext, so a weekly api.php refetch can run them
+    wikitext_checks=harddrop_snapshot_checks,
+    synthetic_wikitext=lambda d: {d['cross_source']['harddrop']['snapshot_file']: _synthetic_harddrop(d)},
 )
 
 

@@ -228,6 +228,9 @@ function planChain(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node:
     const stood: Placement = { piece: 'T', cells: sp[0]!.cells, edges: sp[0]!.edges, spin: sp[0]!.spin,
                                lines: cl.length, hold: true, letter: 'T', role: 'stsd' };
     const after1 = [...done, stood];
+    // a payoff variant (欄干) promises no second T-spin: the demo ends on the stood T
+    if (!v.followup) return { placements: after1, baseLocks: nBase, preT: done.length, stood: done.length, follow: null,
+                              offset: st.off };
     // ── the follow-up slot, carried through the stood T's clear (top-first rows, as the matcher does) ──
     const clTop = cl.map(y => ROWS - 1 - y);
     const slot = prep.followup.map(x => ({ r: x.r + st.off.dr, c: x.c + st.off.dc }))

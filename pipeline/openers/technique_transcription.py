@@ -17,7 +17,7 @@ per rule and requires that tag):
   grammar:  — ids unique; every cell in the alphabet; a board is 10 wide and at most `max_rows` tall;
         `kind` is one of KINDS; every reference (`spin_of`, `after_of`, `on`, `same_occupancy_as`,
         `extends`, a variant's boards) names a node; `page_order` lists every DRAWN board exactly
-        once and no derived one.
+        once and no derived one; a variant carries exactly one of `followup` and `payoff`.
   spin:     — a spin board's spin piece, read off its spin letters, is one tetromino (a `spin_piece: U`
         board — a page drawing the T it places in the renderer's `U`, BT砲 — is read as a T); its upper-case
         cells are exactly the cells of the rows that are full with the piece in (cell by cell, so one
@@ -31,14 +31,20 @@ per rule and requires that tag):
         and `extends` (this board is that one plus rows at the bottom) hold.
   window:   — per variant: (a) the window holds every spin cell; (b) it is exactly the bounding box
         of the spin cells, the roof cells (the filled cells above the spin's top row, which the
-        variant lists and the gate re-reads) and the follow-up slot; (c) outside it, every cell of a
+        variant lists and the gate re-reads) and the follow-up slot (a payoff variant: its well cell); (c) outside it, every cell of a
         row the spin does not clear is empty or `c`, so nothing the matcher ignores carries a piece
         letter; (d) the follow-up slot is empty on the after board, is one T, and fills exactly
         `followup.lines` rows of the DRAWN after board (or the opt-in `followup.drawn_lines`, fewer, with
         a `drawn_note`, for a page that draws the after board before the stack beside the slot is built);
-        (e) the window, evaluated the way the matcher
+        (d') a variant with a `payoff` (欄干) in place of a `followup` — exactly one of the two, or a
+        `grammar:` problem — draws no second T: its payoff board is the `after` board of the variant's
+        spin board, the payoff is an I clearing 4, the pre-clear well cell maps to `well_cell_after` by
+        (d)'s formula, the well column is empty from the top to the bottom of the after board, and on the
+        spin board every filled cell of that column lies in a full row (the re-opening clause, on the
+        DRAWING); (e) the window, evaluated the way the matcher
         evaluates it, fires on every board the variant lists in `fires_on` at exactly one RESTING
-        placement, as drawn, and never mirrored; (f) it does not fire on any board in `misses`, at
+        placement, as drawn, and never mirrored, at a placement clearing the variant's `lines`; (f) it
+        does not fire on any board in `misses`, at
         the spin the page draws there, or (for a board with no spin drawn) at any resting placement.
         A variant with `window_basis: agreement` takes (b*), (c*), (g) and (h) of `agreement_window`
         in place of (b) and (c): its window is the box every drawing of the shape agrees on.
@@ -63,6 +69,13 @@ must reproduce `cross_source.fires` + `cross_source.also` exactly. Two implement
 unchanged: the file keeps its boards under `nodes` and carries an empty `basic_form` for that reason.
 A spec's opt-in `html_checks` re-checks whatever else the technique pinned beside the page (BT砲: the
 harddrop wikitext its external drawings are read from), from the same directory.
+
+`--wikitext-dir` is the half of that a MediaWiki API refetch can supply: the spec's opt-in
+`wikitext_checks` (the pinned harddrop wikitext revisions alone, hashes and re-parse), never the shiwehi
+page snapshot, which no api.php call returns. `check_wikitext_sources` runs it weekly over every
+`*-technique.json` pinning a revision, and its selftest plants against the spec's opt-in
+`synthetic_wikitext` (snapshot_file -> a faithful synthetic page). A spec declaring no `wikitext_checks`
+fails `--wikitext-dir` by name rather than passing with nothing checked.
 """
 from __future__ import annotations
 
@@ -107,6 +120,12 @@ class TechniqueSpec:
     external_drawings: Callable | None = None
     #: opt-in `--html-dir` checks beyond the page snapshot: fn(data, html_dir) -> problems
     html_checks: Callable | None = None
+    #: opt-in `--wikitext-dir` checks: the pinned harddrop wikitext revisions ONLY (no page snapshot),
+    #: fn(data, dir) -> problems; what `check_wikitext_sources` re-runs over a weekly api.php refetch
+    wikitext_checks: Callable | None = None
+    #: opt-in: fn(data) -> {snapshot_file: text}, a faithful synthetic page per pinned wikitext revision,
+    #: which `check_wikitext_sources --selftest` plants its mutants against (the real bytes are not committed)
+    synthetic_wikitext: Callable | None = None
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -197,7 +216,14 @@ def agreement_drawings(data: dict, var: dict, spec: TechniqueSpec) -> list[dict]
     node of this transcription with its slot's T cells and orientation), then the spec's external ones."""
     out = [{'name': a['board'], 'rows': node_rows(data, a['board']),
             't_cells': a['t_cells'], 'mirrored': a['mirrored']} for a in var.get('agreement', [])]
-    return out + (spec.external_drawings() if spec.external_drawings else [])
+    return out + external_for(var, spec)
+
+
+def external_for(var: dict, spec: TechniqueSpec) -> list[dict]:
+    """The spec's external drawings of this variant: a drawing may name the `variant` it is a drawing of (欄干's
+    TSD and TSS slots on one board); one that names none is a drawing of every variant."""
+    return [d for d in (spec.external_drawings() if spec.external_drawings else [])
+            if d.get('variant', var['id']) == var['id']]
 
 
 def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
@@ -240,7 +266,7 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
     if outside and not v.get('untested_drawn', {}).get('reason'):
         bad.append(f'window: {v["id"]}.untested_drawn carries no reason')
     ds = agreement_drawings(data, v, spec)
-    if len(ds) < 2 or not (spec.external_drawings and spec.external_drawings()):
+    if len(ds) < 2 or not external_for(v, spec):
         bad.append(f'window: {v["id"]}: an agreement window needs two drawings, one from another transcription')
         return bad
     W = window_cells(data, v, spec, False)
@@ -273,6 +299,32 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
                         ('right', [(r, c1 + 1) for r in range(r0, r1 + 1)])):
         if all(agrees(r, c) for r, c in strip):
             bad.append(f'window: {v["id"]}: every drawing agrees one {side} of the window — it is not the agreement box')
+    return bad
+
+
+def payoff_problems(v: dict, byid: dict, rows: list[str], fr: set, spec: TechniqueSpec) -> list[str]:
+    """Rule (d'), a variant whose payoff is a Tetris into the well its spin keeps open (欄干): the payoff board is the
+    variant spin board's `after` board, the payoff an I clearing 4, the pre-clear well cell maps to `well_cell_after`
+    by (d)'s formula, the well column is empty top to bottom on the after board, and on the spin board every filled
+    cell of that column lies in a row the spin clears (the re-opening clause, checked on the DRAWING)."""
+    bad = []
+    p = v['payoff']
+    ab = byid.get(p['board'], {})
+    if ab.get('kind') != 'after' or ab.get('after_of') != v['board']:
+        bad.append(f'window: {v["id"]}: the payoff board {p["board"]} is not the after board of {v["board"]}')
+        return bad
+    if p.get('kind') != 'well_quad' or p.get('piece') != 'I' or p.get('lines') != 4:
+        bad.append(f'window: {v["id"]}: the payoff is not an I clearing 4 into the well')
+    after = ab['rows']
+    (r, c) = p['well_cell_pre_clear']
+    shift = len(rows) - len(after)
+    mapped = [r + sum(1 for x in fr if x > r) - shift, c]
+    if mapped != list(p['well_cell_after']):
+        bad.append(f'window: {v["id"]}: the pre-clear well cell maps to {mapped}, not well_cell_after')
+    if any(not is_empty(row[c], spec) for row in after):
+        bad.append(f'window: {v["id"]}: the well column {c} is not empty top to bottom on {p["board"]}')
+    if any(not is_empty(row[c], spec) and rr not in fr for rr, row in enumerate(rows)):
+        bad.append(f'window: {v["id"]}: a filled cell of the well column {c} on {v["board"]} is in no row the spin clears')
     return bad
 
 
@@ -346,7 +398,10 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
     if data.get('page_order') != drawn:
         bad.append(f'grammar: page_order {data.get("page_order")} is not the drawn boards in order {drawn}')
     for v in data.get('variants', []):
-        for ref in [v['board'], v['followup']['board'], *v.get('fires_on', []), *v.get('misses', [])]:
+        if ('followup' in v) == ('payoff' in v):
+            bad.append(f'grammar: variant {v["id"]} carries {"both" if "followup" in v else "neither"} of followup and payoff')
+        for ref in [v['board'], *(f['board'] for f in (v.get('followup'), v.get('payoff')) if f),
+                    *v.get('fires_on', []), *v.get('misses', [])]:
             if ref not in byid:
                 bad.append(f'grammar: variant {v["id"]} names no node {ref!r}')
     if any(b.startswith('grammar:') for b in bad):
@@ -431,7 +486,8 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         if not tc <= inwin:
             bad.append(f'window: {v["id"]}\'s window does not hold every T cell')
         top = min(r for r, _ in sc)
-        fu = {tuple(x) for x in v['followup']['t_cells_pre_clear']}
+        fu = ({tuple(x) for x in v['followup']['t_cells_pre_clear']} if 'followup' in v
+              else {tuple(v['payoff']['well_cell_pre_clear'])})
         fr = set(full_rows(occ_of(rows, spec)))
         if v.get('window_basis') == 'agreement':
             bad += agreement_window(data, v, spec, rows, sc, top, inwin, fr)
@@ -449,31 +505,34 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
                 for c, ch in enumerate(row):
                     if (r, c) not in inwin and ch not in (EMPTY, 'c'):
                         bad.append(f'window: {v["id"]}: {v["board"]} draws {ch!r} at ({r},{c}) outside the window')
+        if 'payoff' in v:
+            bad += payoff_problems(v, byid, rows, fr, spec)
         # (d) the follow-up slot
-        after = byid[v['followup']['board']]['rows']
-        fa = {tuple(x) for x in v['followup']['t_cells_after']}
-        # the after board is compared bottom-aligned: a page may draw it shorter than the spin board
-        # (STSD draws both the same height, so the shift is 0 there)
-        shift = len(rows) - len(after)
-        mapped = {(r + sum(1 for x in fr if x > r) - shift, c) for r, c in fu}
-        if mapped != fa:
-            bad.append(f'window: {v["id"]}: the pre-clear follow-up slot maps to {sorted(mapped)}, not t_cells_after')
-        ys = {(c, len(after) - 1 - r) for r, c in fa}
-        if RT._norm(ys) not in RT._shapes('t') or any(not is_empty(after[r][c], spec) for r, c in fa):
-            bad.append(f'window: {v["id"]}: the follow-up slot is not an empty T on {v["followup"]["board"]}')
-        else:
-            o = occ_of(after, spec)
-            o = [''.join('#' if (r, c) in fa else ch for c, ch in enumerate(row)) for r, row in enumerate(o)]
-            # opt-in `drawn_lines`: a page that draws its after board BEFORE the stack beside the slot is
-            # built (Imperial Cross) — the slot fills fewer rows of the drawing than the spin it promises
-            # clears. Default: the drawing is complete, so the two are the same number (STSD, STMB Cave)
-            want = v['followup'].get('drawn_lines', v['followup']['lines'])
-            if 'drawn_lines' in v['followup'] and not (0 < want < v['followup']['lines']
-                                                       and v['followup'].get('drawn_note')):
-                bad.append(f'window: {v["id"]}: followup.drawn_lines must be fewer than its lines, with a drawn_note')
-            if len(full_rows(o)) != want:
-                bad.append(f'window: {v["id"]}: the follow-up T fills {len(full_rows(o))} rows of the drawn '
-                           f'after board, not {want}')
+        if 'followup' in v:
+            after = byid[v['followup']['board']]['rows']
+            fa = {tuple(x) for x in v['followup']['t_cells_after']}
+            # the after board is compared bottom-aligned: a page may draw it shorter than the spin board
+            # (STSD draws both the same height, so the shift is 0 there)
+            shift = len(rows) - len(after)
+            mapped = {(r + sum(1 for x in fr if x > r) - shift, c) for r, c in fu}
+            if mapped != fa:
+                bad.append(f'window: {v["id"]}: the pre-clear follow-up slot maps to {sorted(mapped)}, not t_cells_after')
+            ys = {(c, len(after) - 1 - r) for r, c in fa}
+            if RT._norm(ys) not in RT._shapes('t') or any(not is_empty(after[r][c], spec) for r, c in fa):
+                bad.append(f'window: {v["id"]}: the follow-up slot is not an empty T on {v["followup"]["board"]}')
+            else:
+                o = occ_of(after, spec)
+                o = [''.join('#' if (r, c) in fa else ch for c, ch in enumerate(row)) for r, row in enumerate(o)]
+                # opt-in `drawn_lines`: a page that draws its after board BEFORE the stack beside the slot is
+                # built (Imperial Cross) — the slot fills fewer rows of the drawing than the spin it promises
+                # clears. Default: the drawing is complete, so the two are the same number (STSD, STMB Cave)
+                want = v['followup'].get('drawn_lines', v['followup']['lines'])
+                if 'drawn_lines' in v['followup'] and not (0 < want < v['followup']['lines']
+                                                           and v['followup'].get('drawn_note')):
+                    bad.append(f'window: {v["id"]}: followup.drawn_lines must be fewer than its lines, with a drawn_note')
+                if len(full_rows(o)) != want:
+                    bad.append(f'window: {v["id"]}: the follow-up T fills {len(full_rows(o))} rows of the drawn '
+                               f'after board, not {want}')
         # (e) fires on every listed build, once, as drawn
         for bid in v.get('fires_on', []):
             b = byid[bid]['rows']
@@ -485,7 +544,7 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
             else:
                 o = occ_of(b, spec)
                 o = [''.join('#' if (r, c) in hits[0][0] else ch for c, ch in enumerate(row)) for r, row in enumerate(o)]
-                if len(full_rows(o)) != 2:
+                if len(full_rows(o)) != v['lines']:
                     bad.append(f'window: {v["id"]} fires on {bid} at a placement that clears {len(full_rows(o))} rows')
         # (f) never on a listed miss
         for bid in v.get('misses', []):
@@ -642,17 +701,27 @@ def run_selftest(spec: TechniqueSpec, mutants: list, snapshot_edits: dict, spec_
 def main(spec: TechniqueSpec, selftest: Callable[[], int], doc: str | None) -> int:
     ap = argparse.ArgumentParser(description=(doc or '').split('\n')[0])
     ap.add_argument('--html-dir', type=Path, help='directory holding the page snapshot of a refetch')
+    ap.add_argument('--wikitext-dir', type=Path,
+                    help='directory holding only the pinned harddrop wikitext revisions (no page snapshot)')
     ap.add_argument('--write', action='store_true', help=f'rewrite {spec.out.name} from SPEC')
     ap.add_argument('--selftest', action='store_true', help='prove the verifier has teeth')
     args = ap.parse_args()
     if args.selftest:
         return selftest()
+    if args.wikitext_dir and (args.write or args.html_dir):
+        ap.error('--wikitext-dir re-checks the wikitext half alone: it takes neither --write nor --html-dir')
     data = spec.build()
     problems = verify(data, spec)
     if args.html_dir:
         problems += RT.check_snapshot(data, args.html_dir)
         if spec.html_checks:
             problems += spec.html_checks(data, args.html_dir)
+    if args.wikitext_dir:
+        if spec.wikitext_checks:
+            problems += spec.wikitext_checks(data, args.wikitext_dir)
+        else:
+            problems.append(f'wikitext: {spec.out.name} declares no wikitext_checks, so --wikitext-dir has '
+                            f'nothing to re-check (set TechniqueSpec.wikitext_checks)')
     if args.write and not problems:
         spec.out.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
         print(f'wrote {spec.out.relative_to(HERE.parent.parent)}')

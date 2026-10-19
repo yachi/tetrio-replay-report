@@ -706,7 +706,7 @@
       "snapshot_file": "BT_Cannon.wikitext",
       "snapshot_sha256": "79a356ecae617e2ca5c27f709754a0778b5ead2e9e75b12359e2244fc88b10d6",
       "snapshot_bytes": 43605,
-      "snapshot_note": "not committed, and not discovered by check_wikitext_sources (which reads *-routes.json): re-check with --html-dir, the file beside btcannon.html",
+      "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside btcannon.html",
       "author_note": "BT Cannon was invented by TCM-β (the page's first sentence); the page is harddrop's, edited by its wiki editors — another site and other authors than shiwehi.com",
       "reading": {
         "blank": "-",

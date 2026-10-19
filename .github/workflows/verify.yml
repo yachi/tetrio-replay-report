@@ -859,6 +859,23 @@ jobs:
       - name: Check the Shachiku Train technique page audit catches its corruptions
         run: python3 -m pipeline.shachikutrain_page --selftest
 
+      # The eighth technique page, 欄干 (Parapet, shiwehi.com's template/parapet.php): the same gate and renderer,
+      # TWO variants on one terrain (the flat T's TSD and the stood T's TSS, each measured at its own spin), and a
+      # PAYOFF in place of a follow-up: the spin re-opens a well under the T's arm, and the matcher asks whether the
+      # first piece into it is an I clearing four (the gate's rule (d') checks the well on the drawing). Its window
+      # is the AGREEMENT BOX of the page's two basic forms, BT砲's page's Parapet, harddrop's Parapet fumen and
+      # Tetrisチャンネル's two (its images committed under spec/fixtures/tetrisch-parapet/). The corpus artefact and the
+      # (all unbuilt) demos are checked by pipeline/openers/parapet.test.ts and parapet-demos.test.ts in the
+      # typescript job.
+      - name: Check the Parapet technique transcription
+        run: python3 -m pipeline.openers.extract_parapet_shapes
+
+      - name: Check the Parapet technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_parapet_shapes --selftest
+
+      - name: Check the Parapet technique page audit catches its corruptions
+        run: python3 -m pipeline.parapet_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

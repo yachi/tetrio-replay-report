@@ -83,6 +83,9 @@ class TechniqueSiteProfile:
     max_page_bytes: int = 0
     #: the board the selftest drops from the overview (any id the transcription draws)
     selftest_board: str = "basic.after"
+    #: further variants the overview prints, each `(variant id, denominators key of its opportunity)` (欄干: its
+    #: TSS). Their figures are keyed `<id>:<key>`, their sections take `more_variants.<id>.sections` from the prose
+    more_variants: tuple = ()
 
 
 def case_key(h):
@@ -110,6 +113,8 @@ class TechniqueSite:
         self.DEMO_SENTENCES = (DS["demo"], DS["engine"], DS["base"], DS["order"], DS["rule"])
         self.DEMO_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, PS["source"]) + self.DEMO_SENTENCES
         self.CLASSES = {**RT.PIECE_CLASS, **p.cell_classes}
+        #: every variant the pages print, the primary first: (variant id, its opportunity's denominators key)
+        self.VARIANTS = ((p.variant, p.opportunity),) + tuple(p.more_variants)
 
     # ------------------------------------------------------------ inputs
 
@@ -146,12 +151,18 @@ class TechniqueSite:
                    "are not trust-chain data")
         self._need(demos.get("report_eligible") is False and demos.get("constructed") is True,
                    f"{os.path.basename(self.p.demos_rel)} must declare report_eligible: false and constructed: true")
-        self._need(self.p.variant in art["variants"], f"the facts artefact has no variant {self.p.variant!r}")
+        for vid, _opp in self.VARIANTS:
+            self._need(vid in art["variants"], f"the facts artefact has no variant {vid!r}")
 
-    def variant(self, tr):
-        v = [x for x in tr["variants"] if x["id"] == self.p.variant]
-        self._need(len(v) == 1, f"the transcription has {len(v)} variants {self.p.variant!r}")
+    def variant(self, tr, vid=None):
+        vid = vid or self.p.variant
+        v = [x for x in tr["variants"] if x["id"] == vid]
+        self._need(len(v) == 1, f"the transcription has {len(v)} variants {vid!r}")
         return v[0]
+
+    def _key(self, vid):
+        # a variant's figure-key prefix: none for the primary, so a one-variant page is unchanged
+        return "" if vid == self.p.variant else vid + ":"
 
     def name(self, nid):
         names = self.PROSE["names"]
@@ -162,8 +173,17 @@ class TechniqueSite:
 
     def figures(self, art):
         """Every figure the overview prints, by key, from the artefact's AGGREGATES."""
-        v = art["variants"][self.p.variant]
-        den, opp = art["denominators"], self.p.opportunity
+        out = {}
+        for vid, opp in self.VARIANTS:
+            out.update({self._key(vid) + k: x for k, x in self._figures(art, vid, opp).items()})
+        cr = art.get("cross_route")
+        if cr:
+            out["cross"] = _nn(cr["with_hit"], cr["rounds_scored"])
+        return out
+
+    def _figures(self, art, vid, opp):
+        v = art["variants"][vid]
+        den = art["denominators"]
         out = {}
         for u in sorted(den):
             h = v["hits_by_player"][u]
@@ -181,17 +201,24 @@ class TechniqueSite:
             for ab, by in c["ablation"].items():
                 out[f"ablation.{ab}.{u}"] = _nn(by[u], den[u][opp]["all"])
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
-        cr = art.get("cross_route")
-        if cr:
-            out["cross"] = _nn(cr["with_hit"], cr["rounds_scored"])
         return out
 
     def recount(self, art):
         """The hit-derived figures again, RE-COUNTED from the hit list (the audit's half): the
         renderer prints the aggregates, so the page renders only when the two agree."""
-        v = art["variants"][self.p.variant]
-        den, opp = art["denominators"], self.p.opportunity
-        hits = [h for h in art["hits"] if h["variant"] == self.p.variant]
+        out = {}
+        for vid, opp in self.VARIANTS:
+            out.update({self._key(vid) + k: x for k, x in self._recount(art, vid, opp).items()})
+        cr = art.get("cross_route")
+        if cr:
+            out["cross"] = _nn(sum(r["outcome"] == "hit" for r in cr["by_round"]),
+                               sum(r["outcome"] in ("hit", "no_hit") for r in cr["by_round"]))
+        return out
+
+    def _recount(self, art, vid, opp):
+        v = art["variants"][vid]
+        den = art["denominators"]
+        hits = [h for h in art["hits"] if h["variant"] == vid]
         out = {}
         for u in sorted(den):
             mine = [h for h in hits if h["player"] == u]
@@ -209,10 +236,6 @@ class TechniqueSite:
             for ab, by in c["ablation"].items():
                 out[f"ablation.{ab}.{u}"] = _nn(by[u], den[u][opp]["all"])
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
-        cr = art.get("cross_route")
-        if cr:
-            out["cross"] = _nn(sum(r["outcome"] == "hit" for r in cr["by_round"]),
-                               sum(r["outcome"] in ("hit", "no_hit") for r in cr["by_round"]))
         return out
 
     # ------------------------------------------------------------ page shell
@@ -282,7 +305,6 @@ class TechniqueSite:
 
     def render_overview(self, tr, art, demos):
         PR, T, S = self.PROSE, self.PROSE["table"], self.PROSE["sections"]
-        v = self.variant(tr)
         fig = self.figures(art)
         users = sorted(art["denominators"])
         title = f"{PR['title']}{RS.TITLE_MARK}"
@@ -322,51 +344,10 @@ class TechniqueSite:
             out.append("    " + "".join(bits))
         out += ["    </div>", "  </section>"]
 
-        # 2. the window
-        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["window"])}</h2>',
-                f'    <p>{_esc(S["window_note"])}</p>', '    <div class="scp-grid">']
-        for mirrored, words in ((False, S["window_drawn"]), (True, S["window_mirrored"])):
-            out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(words)}</h4>'
-                       f'{board_svg(self._window_rows(tr, v, mirrored), words, self.CLASSES)}</div>')
-        out += ["    </div>", "  </section>"]
-
-        # 3. the headline, with the control sentence beside it
-        cell = lambda k: f'<td data-figure="{_esc(k)}">{_esc(fig[k])}</td>'
-        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["headline"])}</h2>',
-                f'    <p>{_esc(S["headline_note"].format(pieces=art["window_pieces"] + 1, last=art["window_pieces"]))}</p>',
-                f'    <p>{self.PS["control"]}</p>',
-                '    <div class="scp-index-wrap"><table class="scp-table">',
-                f'    <tr><th>{_esc(T["player"])}</th><th>{_esc(T["all"])}</th><th>{_esc(T["in_opener"])}</th>'
-                f'<th>{_esc(T["mid_game"])}</th><th>{_esc(T["mirrored"])}</th><th>{_esc(T["garbage"])}</th></tr>']
-        for u in users:
-            out.append(f"    <tr><th>{_esc(u)}</th>" + "".join(cell(k) for k in (
-                f"hits.{u}.all", f"hits.{u}.in_opener", f"hits.{u}.mid_game", f"mirrored.{u}", f"garbage.{u}")) + "</tr>")
-        out += ["    </table></div>"]
-
-        # 4. controls
-        ctl = art["variants"][self.p.variant]["controls"]
-        out += [f'    <h3>{_esc(S["controls"])}</h3>', '    <div class="scp-index-wrap"><table class="scp-table">',
-                f'    <caption>{_esc(T["denominator_note"])}</caption>',
-                f'    <tr><th>{_esc(T["row"])}</th>' + "".join(f"<th>{_esc(u)}</th>" for u in users) + "</tr>"]
-        for kind in ctl["under"]:
-            out.append(f'    <tr><th>{_esc(T["under"].format(kind=PR["spin_kinds"][kind]))}</th>'
-                       + "".join(cell(f"under.{kind}.{u}") for u in users) + "</tr>")
-        for ab in ctl["ablation"]:
-            out.append(f'    <tr><th>{_esc(T["ablation"][ab])}</th>' + "".join(cell(f"ablation.{ab}.{u}") for u in users) + "</tr>")
-        out.append(f'    <tr><th>{_esc(T["baseline"])}</th>' + "".join(cell(f"baseline.{u}") for u in users) + "</tr>")
-        out += ["    </table></div>", "  </section>"]
-
-        # 5. the follow-up
-        reasons = sorted({k.split(".", 2)[2] for k in fig if k.startswith("reason.")})
-        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["followup"])}</h2>',
-                f'    <p>{_esc(S["followup_note"])}</p>',
-                '    <div class="scp-index-wrap"><table class="scp-table">',
-                f'    <tr><th>{_esc(T["followup_head"])}</th>' + "".join(f"<th>{_esc(u)}</th>" for u in users) + "</tr>",
-                f'    <tr><th>{_esc(T["fired"])}</th>' + "".join(cell(f"fired.{u}") for u in users) + "</tr>"]
-        for r in reasons:
-            out.append(f'    <tr><th>{_esc(PR["reasons"][r])}</th>' + "".join(
-                cell(f"reason.{u}.{r}") if f"reason.{u}.{r}" in fig else "<td>—</td>" for u in users) + "</tr>")
-        out += ["    </table></div>", "  </section>"]
+        # 2-5, per variant (the primary's here, then the cross-source, then its cases; a further
+        # variant's sections and cases after the primary's)
+        parts = {vid: self._variant_sections(tr, art, vid, opp, fig, users) for vid, opp in self.VARIANTS}
+        out += parts[self.p.variant][0]
 
         # 6. the cross-source
         cr = art.get("cross_route")
@@ -390,29 +371,92 @@ class TechniqueSite:
                            f'<td>{_esc(words)}</td></tr>')
             out += ["    </table></div>", "  </section>"]
 
-        # 7. the cases
-        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["cases"])}</h2>',
-                f'    <p>{_esc(S["cases_note"])}</p>',
-                '    <div class="scp-index-wrap"><table class="scp-table">',
-                f'    <tr><th>{_esc(T["date"])}</th><th>{_esc(T["round"])}</th><th>{_esc(T["player"])}</th>'
-                f'<th>{_esc(T["lock"])}</th><th>{_esc(T["phase"])}</th><th>{_esc(T["window_col"])}</th>'
-                f'<th>{_esc(T["followup_col"])}</th></tr>']
-        for h in art["hits"]:
-            if h["variant"] != self.p.variant:
-                continue
-            fu = h["followup"]
-            fw = T["yes"].format(lock=fu["lock"]) if fu["fired"] else PR["reasons"][fu["reason"]]
-            href = f'{h["session"]}-replay.html#m{h["match"]}r{h["round"]}'
-            out.append(f'    <tr data-case="{_esc(case_key(h))}"><td>{_esc(h["session"])}</td>'
-                       f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a></td><td>{_esc(h["player"])}</td>'
-                       f'<td>{h["lock"]}{_esc(T["mirrored_mark"]) if h["mirrored"] else ""}</td>'
-                       f'<td>{_esc(T["phase_opener"] if h["in_opener"] else T["phase_mid"])}</td>'
-                       f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td></tr>')
-        out += ["    </table></div>", "  </section>"]
+        out += parts[self.p.variant][1]
+        for vid, _opp in self.VARIANTS[1:]:
+            out += parts[vid][0] + parts[vid][1]
         out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["demos"])}</h2>',
                 f'    <p><a href="{_esc(self.DEMO_PAGE)}">{_esc(S["demos_link"])}</a></p>', '  </section>']
         out += RT._tail({"figures": fig})
         return "\n".join(out)
+
+    def _variant_sections(self, tr, art, vid, opp, fig, users):
+        """One variant's window, headline, controls and follow-up (the first list) and its case index (the
+        second). The primary reads the prose's `sections` and `table`; a further variant overlays its own
+        `more_variants.<id>` on them, and its figure keys carry its prefix."""
+        PR = self.PROSE
+        MV = PR.get("more_variants", {}).get(vid, {}) if vid != self.p.variant else {}
+        S = {**PR["sections"], **MV.get("sections", {})}
+        T = {**PR["table"], **MV.get("table", {})}
+        control = MV.get("control", self.PS["control"])
+        pre = self._key(vid)
+        v = self.variant(tr, vid)
+        out = []
+        # 2. the window
+        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["window"])}</h2>',
+                f'    <p>{_esc(S["window_note"])}</p>', '    <div class="scp-grid">']
+        for mirrored, words in ((False, S["window_drawn"]), (True, S["window_mirrored"])):
+            out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(words)}</h4>'
+                       f'{board_svg(self._window_rows(tr, v, mirrored), words, self.CLASSES)}</div>')
+        out += ["    </div>", "  </section>"]
+
+        # 3. the headline, with the control sentence beside it
+        cell = lambda k: f'<td data-figure="{_esc(pre + k)}">{_esc(fig[pre + k])}</td>'
+        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["headline"])}</h2>',
+                f'    <p>{_esc(S["headline_note"].format(pieces=art["window_pieces"] + 1, last=art["window_pieces"]))}</p>',
+                f'    <p>{control}</p>',
+                '    <div class="scp-index-wrap"><table class="scp-table">',
+                f'    <tr><th>{_esc(T["player"])}</th><th>{_esc(T["all"])}</th><th>{_esc(T["in_opener"])}</th>'
+                f'<th>{_esc(T["mid_game"])}</th><th>{_esc(T["mirrored"])}</th><th>{_esc(T["garbage"])}</th></tr>']
+        for u in users:
+            out.append(f"    <tr><th>{_esc(u)}</th>" + "".join(cell(k) for k in (
+                f"hits.{u}.all", f"hits.{u}.in_opener", f"hits.{u}.mid_game", f"mirrored.{u}", f"garbage.{u}")) + "</tr>")
+        out += ["    </table></div>"]
+
+        # 4. controls
+        ctl = art["variants"][vid]["controls"]
+        out += [f'    <h3>{_esc(S["controls"])}</h3>', '    <div class="scp-index-wrap"><table class="scp-table">',
+                f'    <caption>{_esc(T["denominator_note"])}</caption>',
+                f'    <tr><th>{_esc(T["row"])}</th>' + "".join(f"<th>{_esc(u)}</th>" for u in users) + "</tr>"]
+        for kind in ctl["under"]:
+            out.append(f'    <tr><th>{_esc(T["under"].format(kind=PR["spin_kinds"][kind]))}</th>'
+                       + "".join(cell(f"under.{kind}.{u}") for u in users) + "</tr>")
+        for ab in ctl["ablation"]:
+            out.append(f'    <tr><th>{_esc(T["ablation"][ab])}</th>' + "".join(cell(f"ablation.{ab}.{u}") for u in users) + "</tr>")
+        out.append(f'    <tr><th>{_esc(T["baseline"])}</th>' + "".join(cell(f"baseline.{u}") for u in users) + "</tr>")
+        out += ["    </table></div>", "  </section>"]
+
+        # 5. the follow-up
+        reasons = sorted({k[len(pre):].split(".", 2)[2] for k in fig if k.startswith(pre + "reason.")})
+        out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["followup"])}</h2>',
+                f'    <p>{_esc(S["followup_note"])}</p>',
+                '    <div class="scp-index-wrap"><table class="scp-table">',
+                f'    <tr><th>{_esc(T["followup_head"])}</th>' + "".join(f"<th>{_esc(u)}</th>" for u in users) + "</tr>",
+                f'    <tr><th>{_esc(T["fired"])}</th>' + "".join(cell(f"fired.{u}") for u in users) + "</tr>"]
+        for r in reasons:
+            out.append(f'    <tr><th>{_esc(PR["reasons"][r])}</th>' + "".join(
+                cell(f"reason.{u}.{r}") if pre + f"reason.{u}.{r}" in fig else "<td>—</td>" for u in users) + "</tr>")
+        out += ["    </table></div>", "  </section>"]
+
+        # 7. the cases
+        cases = ['  <section class="scp-sec">', f'    <h2>{_esc(S["cases"])}</h2>',
+                 f'    <p>{_esc(S["cases_note"])}</p>',
+                 '    <div class="scp-index-wrap"><table class="scp-table">',
+                 f'    <tr><th>{_esc(T["date"])}</th><th>{_esc(T["round"])}</th><th>{_esc(T["player"])}</th>'
+                 f'<th>{_esc(T["lock"])}</th><th>{_esc(T["phase"])}</th><th>{_esc(T["window_col"])}</th>'
+                 f'<th>{_esc(T["followup_col"])}</th></tr>']
+        for h in art["hits"]:
+            if h["variant"] != vid:
+                continue
+            fu = h["followup"]
+            fw = T["yes"].format(lock=fu["lock"]) if fu["fired"] else PR["reasons"][fu["reason"]]
+            href = f'{h["session"]}-replay.html#m{h["match"]}r{h["round"]}'
+            cases.append(f'    <tr data-case="{_esc(case_key(h))}"><td>{_esc(h["session"])}</td>'
+                         f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a></td><td>{_esc(h["player"])}</td>'
+                         f'<td>{h["lock"]}{_esc(T["mirrored_mark"]) if h["mirrored"] else ""}</td>'
+                         f'<td>{_esc(T["phase_opener"] if h["in_opener"] else T["phase_mid"])}</td>'
+                         f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td></tr>')
+        cases += ["    </table></div>", "  </section>"]
+        return out, cases
 
     # ------------------------------------------------------------ the demo page
 
@@ -420,7 +464,7 @@ class TechniqueSite:
         """The page's own check of one demo, a second implementation of `technique-demos.ts`'s
         `reachProblems`: decoded from an empty board with `replay_section.decode_boards`."""
         by_id = {n["id"]: n for n in tr["nodes"]}
-        v = self.variant(tr)
+        v = self.variant(tr, d.get("variant"))
         empties = tr.get("empty_letters", "")
         b = demos["board"]
         width, rows_n = b["width"], b["rows"]
@@ -585,7 +629,10 @@ class TechniqueSite:
         if sorted(boards) != sorted(n["id"] for n in tr["nodes"]):
             bad.append(f"the overview does not draw every board exactly once ({len(boards)} drawn, {len(tr['nodes'])} boards)")
         cases = _CASE.findall(page)
-        want = sorted(case_key(h) for h in art["hits"] if h["variant"] == self.p.variant)
+        vids = {vid for vid, _opp in self.VARIANTS}
+        want = sorted(case_key(h) for h in art["hits"] if h["variant"] in vids)
+        if len(set(want)) != len(want):
+            bad.append("two variants' hits share a case key (one lock read as two variants)")
         if sorted(html.unescape(c) for c in cases) != want:
             bad.append(f"the case index does not list every hit exactly once ({len(cases)} rows, {len(want)} hits)")
         figs = {}
@@ -685,6 +732,11 @@ class TechniqueSite:
             ("overview: a %", "ov", ov.replace("</header>", "<p>12%</p></header>")),
             ("overview: a simplified glyph", "ov", ov.replace("</header>", "<p>这</p></header>")),
         ]
+        for vid, _opp in self.VARIANTS[1:]:
+            # a further variant's figures are keyed by its prefix: changing one must be caught as well
+            vf = re.search(rf'data-figure="({re.escape(vid)}:[^"]+)">([^<]*)<', ov)
+            cases.append((f"overview: a {vid} figure changed", "ov",
+                          ov.replace(vf.group(0), f'data-figure="{vf.group(1)}">{vf.group(2)}0<', 1)))
         if demos["demos"]:
             isl = RT._ISLAND.search(dp)
             slug = demo_slug(demos["demos"][0]["node"])
@@ -757,5 +809,6 @@ class TechniqueSite:
 def site_card(site, art):
     """The index card's words and count for one technique (`bin/build-docs`)."""
     card = site.PROSE["index_card"]
-    return {"href": site.OVERVIEW, "cases": sum(h["variant"] == site.p.variant for h in art["hits"]),
+    vids = {vid for vid, _opp in site.VARIANTS}
+    return {"href": site.OVERVIEW, "cases": sum(h["variant"] in vids for h in art["hits"]),
             "kicker": card["kicker"], "title": site.PROSE["overview_title"], "blurb": card["blurb"]}

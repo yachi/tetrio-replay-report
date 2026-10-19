@@ -25,7 +25,9 @@ export interface TechniqueProfile {
   artefactPath: string;
   /** the files `emitter_md5` hashes: an edit to any of them stales the artefact */
   hashFiles: { classifier: string[] };
-  /** the opportunity: the scored spin each variant is measured at (STSD: a full TSD) */
+  /** the opportunity: the primary scored spin (STSD: a full TSD). A variant whose transcription names
+   *  another spin (欄干's TSS) is measured at that spin instead, which must be a `controlSpins` entry;
+   *  under that variant this opportunity is counted among the controls in its place */
   opportunity: SpinKind;
   /** the controls: the same window at these other scored spins (a shape that fires more under the
    *  spin it is not about is a shape test) */

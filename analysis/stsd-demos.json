@@ -39,9 +39,9 @@
  },
  "inputs": {
   "transcription_md5": "5bbd258e0b5b48f99380c7c84bd29ae6",
-  "planner_md5": "c08ef67cfef55d4647907d42f40fdd5c",
+  "planner_md5": "9ee888e1ec7d3fd6d30620603657c200",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "e5f181fbcc6311380249a6515b46d81d"
+  "classifier_md5": "16e96be185ab6e1d08911eb0f4d558d1"
  },
  "board": {
   "width": 10,
