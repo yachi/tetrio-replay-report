@@ -809,6 +809,22 @@ jobs:
       - name: Check the Double Dagger technique page audit catches its corruptions
         run: python3 -m pipeline.doubledagger_page --selftest
 
+      # The fifth technique page, BT砲 (途中BT, shiwehi.com's template/btcannon.php): the same gate and
+      # renderer, a flat T into a TSD whose clear joins a TST slot (the follow-up is a TST). Its window is
+      # the AGREEMENT BOX of the page's six drawings and harddrop's BT_Cannon page's fifteen (pinned by
+      # revision, recorded in the transcription); no routes board draws a BT, which the gate's opt-in
+      # routes_fire_none records. The corpus artefact (no hit, with the predicate shown to fire on every
+      # recorded drawing) and the (all unbuilt) demos are checked by pipeline/openers/btcannon.test.ts and
+      # btcannon-demos.test.ts in the typescript job.
+      - name: Check the BT Cannon technique transcription
+        run: python3 -m pipeline.openers.extract_btcannon_shapes
+
+      - name: Check the BT Cannon technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_btcannon_shapes --selftest
+
+      - name: Check the BT Cannon technique page audit catches its corruptions
+        run: python3 -m pipeline.btcannon_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

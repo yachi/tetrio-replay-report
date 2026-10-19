@@ -307,6 +307,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique doubledagger \
   --out analysis/doubledagger-demos.json                       # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/doubledagger.test.ts pipeline/openers/doubledagger-demos.test.ts  # its two tests
 python3 -m pipeline.doubledagger_page --selftest  # the docs/doubledagger*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_btcannon_shapes            # CI gate: the BT砲 (途中BT) technique transcription
+python3 -m pipeline.openers.extract_btcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's BT_Cannon.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique btcannon \
+  --out analysis/btcannon-facts.json                           # BT砲's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique btcannon \
+  --out analysis/btcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/btcannon.test.ts pipeline/openers/btcannon-demos.test.ts  # its two tests
+python3 -m pipeline.btcannon_page --selftest      # the docs/btcannon*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3934,7 +3942,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -3942,7 +3950,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth and BT砲 (`template/btcannon.php`) the fifth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4186,6 +4194,54 @@ terrain and the three feature boards are even but not multiples of four (a plann
 build is drawn mirrored, so the as-drawn window the planner fires would not fit it even built (measured). The
 two sentences naming the build pieces draw them as mino icons the page text drops; they are quoted as the text
 reads (`icons`) and not used as captions. Named lists and their sizes live in the two tests.
+
+### BT砲（途中BT, mid-game BT Cannon）
+
+The same deliverable for `template/btcannon.php` (「2021-07-03更新」): `pipeline/openers/btcannon-technique.json` (held as a
+literal in `extract_btcannon_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-btcannon.ts`
+→ `analysis/btcannon-facts.json` (`btcannon.test.ts`), `technique-demos-btcannon.ts` → `analysis/btcannon-demos.json`
+(`btcannon-demos.test.ts`), and `docs/btcannon.html` + `docs/btcannon-demos.html` from `btcannon_page.py` +
+`btcannon_prose.json`, the fifth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**It is a technique page although BT Cannon is also an opener.** The page is the MID-GAME form (途中BT, built from 欄干 or
+72積み), matched on a partial stack at any lock; the opener of the same name (開幕BT砲) is the same shape, so a hit inside
+the opener window is counted in the artefact's `in_opener` column, never filtered out.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's and ダブルダガー's), so the matcher is untouched; the
+follow-up is a TST.** The TST slot runs up the wall beside the T's left end and on under the clear: before the TSD its four
+cells are split by the two cleared rows, and the row map (which counts the cleared rows below each slot cell) joins them.
+`followup.lines` 3 is read by the matcher's existing `followupKind`, so `technique-facts.ts` and every hash line stayed put.
+
+**The window is the agreement box, and its external drawings are harddrop's own BT_Cannon page.** STSD's bounding box would be
+the whole board (the TSD board draws the stack right of the slots as filled rows above the T). No committed routes board
+draws a BT (the gate measures the window fires on none), and the opener catalogue's BT fields are four-row bag-1 boards the
+seven-row window cannot be placed on, so the independent drawings come from harddrop's `BT_Cannon` page, pinned the way SDPC
+Spin's wikitext is (oldid, MediaWiki's revision sha1, our sha256 and byte count, fetched by urllib through `api.php`) and
+recorded in the transcription's `cross_source.harddrop`: every board on that page whose drawn T the window fires on (its
+「Mid-game BT Cannon」 section among them), and every board with no T drawn on which it fires. `--html-dir` re-reads the
+wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, so
+`check_wikitext_sources` does not discover it and nothing re-reads it weekly: an open item, named here.
+
+**Three opt-in edits to the shared gate, in unhashed Python, each checked default-preserving** (the gate, selftest and
+`--html-dir` output of STSD, STMB Cave, インペリアルクロス and ダブルダガー were compared byte for byte before and after): a
+`spin_piece: U` board is read as a T (the page draws the T it places in the renderer's `U`); an empty `cross_source.fires` is
+allowed only with `routes_fire_none` and an agreement window with external drawings (rule (g) firing the window on each of
+them is then the independent check); and `TechniqueSpec.html_checks` extends `--html-dir`. A fourth, in `technique_page.py`:
+its selftest plants an invented hit row when the case index is empty (it assumed at least one hit); the other four pages'
+selftest output is byte-identical.
+
+**The corpus holds no hit, and the test proves the predicate could have fired.** `btcannon.test.ts` pins every named list
+empty, and runs the TS `windowMatch` (the Python predicate's twin) on every recorded harddrop drawing (once, at its drawn T, in
+its recorded hand, nowhere else), on its no-T boards and on the page's own drawings. What discriminates is measured per window
+part: the rows above the T alone admit no full TSD of the corpus, so `noMustEmpty`, `garbageEmpty` and the follow-up mutants are
+EQUIVALENT here (named, asserted byte-identical), while `noRoof` turns the `below` part into the headline. The window clashes
+with STMB Cave's and ダブルダガー's on a cell in every pairing of hands.
+
+**No demo is built and no chain is planned**: the shared planner reads a build's page pieces as its lower-case letters, and
+this page's 72積み builds draw them upper case (the 72積み stack lower case) while the 欄干 build's terrain carries a lower-case L
+of its own. Every board carries the profile's reason with the cell count `btcannon-demos.test.ts` re-derives; one 72積み terrain
+is a multiple of four and is stopped by that reading alone, which its reason says. Teaching the planner a per-profile page-letter
+set would move every demo artefact's `planner_md5`, so it was not done here. Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

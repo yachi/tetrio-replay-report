@@ -18,7 +18,8 @@ per rule and requires that tag):
         `kind` is one of KINDS; every reference (`spin_of`, `after_of`, `on`, `same_occupancy_as`,
         `extends`, a variant's boards) names a node; `page_order` lists every DRAWN board exactly
         once and no derived one.
-  spin:     — a spin board's spin piece, read off its spin letters, is one tetromino; its upper-case
+  spin:     — a spin board's spin piece, read off its spin letters, is one tetromino (a `spin_piece: U`
+        board — a page drawing the T it places in the renderer's `U`, BT砲 — is read as a T); its upper-case
         cells are exactly the cells of the rows that are full with the piece in (cell by cell, so one
         unmuted cell in a cleared row fails); the spin's named line count is the number of those rows;
         a spin board with `spin_of` equals that board by occupancy once the piece is taken out (the
@@ -45,7 +46,10 @@ per rule and requires that tag):
         `upper_groups`); a board that breaks it is a named discrepancy `<id>:colour`.
   cross:    — the variant, evaluated by the same predicate on every U-slot board of every committed
         `*-routes.json` (the U cells as the spin's cells), fires on exactly the boards the
-        transcription records in `cross_source.fires`, plus the named `cross_source.also`; and every
+        transcription records in `cross_source.fires`, plus the named `cross_source.also` (opt-in: an
+        EMPTY `fires` is allowed only with `cross_source.routes_fire_none` saying why, and only for an
+        `agreement` window with external drawings — rule (g) then fires the window on another site's
+        drawings one by one, which is the independent check `fires` stands for elsewhere); and every
         board those routes files LABEL as this technique is either one of them or named, with a
         reason, in `cross_source.labelled_not_fired`.
   quote:    — quote ids are unique, every `caption_quote` names one.
@@ -57,6 +61,8 @@ must reproduce `cross_source.fires` + `cross_source.also` exactly. Two implement
 
 `--html-dir` re-checks a refetched raw-HTML snapshot with `route_transcription.check_snapshot`,
 unchanged: the file keeps its boards under `nodes` and carries an empty `basic_form` for that reason.
+A spec's opt-in `html_checks` re-checks whatever else the technique pinned beside the page (BT砲: the
+harddrop wikitext its external drawings are read from), from the same directory.
 """
 from __future__ import annotations
 
@@ -76,6 +82,8 @@ HERE = Path(__file__).resolve().parent
 KINDS = frozenset({'base', 'spin', 'after', 'build', 'illustration', 'derived'})
 #: a technique page's boards are local, never compared whole, but still drawn short
 MAX_ROWS = 8
+#: a spin letter that is not a piece letter, read as the piece whose shape it must have
+SPIN_SHAPE = {'u': 't'}
 
 
 @dataclass
@@ -97,6 +105,8 @@ class TechniqueSpec:
     #: drawings from OTHER committed transcriptions an `agreement` window is checked against:
     #: fn() -> [{'name', 'rows' ('-' empty), 't_cells' [[row, col]], 'mirrored'}]
     external_drawings: Callable | None = None
+    #: opt-in `--html-dir` checks beyond the page snapshot: fn(data, html_dir) -> problems
+    html_checks: Callable | None = None
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -353,7 +363,8 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         sc = spin_cells(n)
         piece = n.get('spin_piece', 'T').lower()
         ys = {(c, len(n['rows']) - 1 - r) for r, c in sc}
-        if len(sc) != 4 or RT._norm(ys) not in RT._shapes(piece):
+        # `U` is the renderer's "the T goes here", so a `spin_piece: U` board's piece is a T
+        if len(sc) != 4 or RT._norm(ys) not in RT._shapes(SPIN_SHAPE.get(piece, piece)):
             bad.append(f'spin: {n["id"]}\'s {piece} cells are not one {piece}')
             continue
         o = occ_of(n['rows'], spec)
@@ -537,8 +548,13 @@ def cross_fires(data: dict, spec: TechniqueSpec) -> list[dict]:
 def check_cross_routes(data: dict, spec: TechniqueSpec) -> list[str]:
     xs = data.get('cross_source', {})
     if not xs.get('fires'):
-        return ['cross: the transcription records no routes board the technique fires on — '
-                'a technique gate needs an independent drawing to check its window against']
+        # opt-in: no routes board draws the technique (BT砲), and the independent drawer is the
+        # agreement set's external drawings instead, which rule (g) fires the window on one by one
+        alt = (xs.get('routes_fire_none') and spec.external_drawings and spec.external_drawings()
+               and data.get('variants') and all(v.get('window_basis') == 'agreement' for v in data['variants']))
+        if not alt:
+            return ['cross: the transcription records no routes board the technique fires on — '
+                    'a technique gate needs an independent drawing to check its window against']
     want = xs['fires'] + xs.get('also', [])
     key = lambda e: (e['file'], e['node'], e['variant'], e['mirrored'])
     got = cross_fires(data, spec)
@@ -631,6 +647,8 @@ def main(spec: TechniqueSpec, selftest: Callable[[], int], doc: str | None) -> i
     problems = verify(data, spec)
     if args.html_dir:
         problems += RT.check_snapshot(data, args.html_dir)
+        if spec.html_checks:
+            problems += spec.html_checks(data, args.html_dir)
     if args.write and not problems:
         spec.out.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
         print(f'wrote {spec.out.relative_to(HERE.parent.parent)}')

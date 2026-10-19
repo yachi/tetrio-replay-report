@@ -659,14 +659,25 @@ class TechniqueSite:
         pages = self.render_all(REPO, inputs)
         ov, dp = pages[self.OVERVIEW], pages[self.DEMO_PAGE]
         first_case = _CASE.search(ov)
-        case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
         fig = _FIGURE.search(ov)
         cases = [
             ("overview: a required sentence dropped", "ov", ov.replace(self.PS["midgame"], "")),
             ("overview: a badge", "ov", ov.replace("</body>", '<span data-claim="G001">✓</span></body>')),
             ("overview: an innerHTML", "ov", ov.replace("</body>", "<script>x.innerHTML=1</script></body>")),
-            ("overview: a hit row dropped", "ov", ov.replace(case_line + "\n", "")),
-            ("overview: a hit row duplicated", "ov", ov.replace(case_line, case_line + "\n" + case_line)),
+        ]
+        if first_case:
+            case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
+            cases += [
+                ("overview: a hit row dropped", "ov", ov.replace(case_line + "\n", "")),
+                ("overview: a hit row duplicated", "ov", ov.replace(case_line, case_line + "\n" + case_line)),
+            ]
+        else:
+            # no hit (BT砲): the case index is empty, so a row the artefact does not hold must be caught
+            cases.append(("overview: a hit row invented", "ov", ov.replace(
+                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>",
+                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>\n"
+                '    <tr data-case="2026-01-01 m1r1 nobody lock 0"><td>x</td></tr>', 1)))
+        cases += [
             ("overview: a figure changed", "ov",
              ov.replace(fig.group(0), f'data-figure="{fig.group(1)}">{fig.group(2)}0<', 1)),
             ("overview: the control sentence dropped", "ov", ov.replace(self.PS["control"], "")),

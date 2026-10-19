@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BT砲（途中BT）中盤手法（未經證明）</title>
+<meta name="description" content="shiwehi.com 個BT砲（途中BT）頁畫嘅局部形狀，同 corpus 每一下 T-spin Double 逐個對：模擬器推導，唔屬於信任鏈。">
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --bg-raised: #ffffff;
+    --bg-sunken: #eceef5;
+    --ink: #12141c;
+    --ink-secondary: #4b4f5e;
+    --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10);
+    --border-strong: rgba(18, 20, 28, 0.18);
+
+    /* Player colour is POSITIONAL: slot 1 and slot 2, in facts["players"] order.
+       The pair is the validated one — `node scripts/validate_palette.js` passes it
+       on all six checks in both modes, so colour is not the thing to change. */
+    --p1: #0e8f9e;
+    --p1-tint: rgba(14, 143, 158, 0.10);
+    --p1-tint-strong: rgba(14, 143, 158, 0.20);
+    --p2: #7c3aed;
+    --p2-tint: rgba(124, 58, 237, 0.10);
+    --p2-tint-strong: rgba(124, 58, 237, 0.20);
+
+    /* Aliases, not a second palette. pipeline/records.py and
+       pipeline/build_round_table.py emit `var(--yachi)` / `var(--pinglamb)`
+       literally into the CSS of the regions they own, so the two slots have to
+       answer to those names as well. A session with a different pair still gets
+       slot 1 and slot 2 here, which is the whole point of the indirection. */
+    --yachi: var(--p1);
+    --yachi-tint: var(--p1-tint);
+    --yachi-tint-strong: var(--p1-tint-strong);
+    --pinglamb: var(--p2);
+    --pinglamb-tint: var(--p2-tint);
+    --pinglamb-tint-strong: var(--p2-tint-strong);
+
+    --good: #0ca30c;
+    --good-tint: rgba(12, 163, 12, 0.12);
+    --pending: #c98500;
+    --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b;
+    --spotlight-tint: rgba(184, 134, 11, 0.12);
+    --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+
+    --grid-line: #e1e0d9;
+    --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+
+    --font-cjk: "PingFang HK", "Noto Sans HK", "Microsoft JhengHei", "Heiti TC",
+      -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas,
+      "Liberation Mono", monospace;
+
+    --content-w: 900px;
+    --wide-w: 1180px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0d13;
+      --bg-raised: #141924;
+      --bg-sunken: #10141d;
+      --ink: #edeff7;
+      --ink-secondary: #b7bcce;
+      --muted: #6e7488;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.17);
+
+      --p1: #1caa9e;
+      --p1-tint: rgba(28, 170, 158, 0.16);
+      --p1-tint-strong: rgba(28, 170, 158, 0.28);
+      --p2: #9678e8;
+      --p2-tint: rgba(150, 120, 232, 0.18);
+      --p2-tint-strong: rgba(150, 120, 232, 0.30);
+
+      --good: #23c923;
+      --good-tint: rgba(35, 201, 35, 0.16);
+      --pending: #fab219;
+      --pending-tint: rgba(250, 178, 25, 0.16);
+      --spotlight: #e8b94a;
+      --spotlight-tint: rgba(232, 185, 74, 0.16);
+      --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+
+      --grid-line: #262b38;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0d13; --bg-raised: #141924; --bg-sunken: #10141d;
+    --ink: #edeff7; --ink-secondary: #b7bcce; --muted: #6e7488;
+    --border: rgba(255, 255, 255, 0.09); --border-strong: rgba(255, 255, 255, 0.17);
+    --p1: #1caa9e; --p1-tint: rgba(28, 170, 158, 0.16); --p1-tint-strong: rgba(28, 170, 158, 0.28);
+    --p2: #9678e8; --p2-tint: rgba(150, 120, 232, 0.18); --p2-tint-strong: rgba(150, 120, 232, 0.30);
+    --good: #23c923; --good-tint: rgba(35, 201, 35, 0.16);
+    --pending: #fab219; --pending-tint: rgba(250, 178, 25, 0.16);
+    --spotlight: #e8b94a; --spotlight-tint: rgba(232, 185, 74, 0.16); --spotlight-tint-strong: rgba(232, 185, 74, 0.26);
+    --grid-line: #262b38; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f6fa; --bg-raised: #ffffff; --bg-sunken: #eceef5;
+    --ink: #12141c; --ink-secondary: #4b4f5e; --muted: #8a8fa3;
+    --border: rgba(18, 20, 28, 0.10); --border-strong: rgba(18, 20, 28, 0.18);
+    --p1: #0e8f9e; --p1-tint: rgba(14, 143, 158, 0.10); --p1-tint-strong: rgba(14, 143, 158, 0.20);
+    --p2: #7c3aed; --p2-tint: rgba(124, 58, 237, 0.10); --p2-tint-strong: rgba(124, 58, 237, 0.20);
+    --good: #0ca30c; --good-tint: rgba(12, 163, 12, 0.12);
+    --pending: #c98500; --pending-tint: rgba(201, 133, 0, 0.12);
+    --spotlight: #b8860b; --spotlight-tint: rgba(184, 134, 11, 0.12); --spotlight-tint-strong: rgba(184, 134, 11, 0.22);
+    --grid-line: #e1e0d9; --shadow: 0 1px 2px rgba(18,20,28,0.04), 0 8px 24px rgba(18,20,28,0.06);
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-cjk);
+    font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; }
+  code { font-family: var(--font-mono); font-size: .86em; }
+  .wrap-wide { max-width: var(--wide-w); margin: 0 auto; padding: 0 20px; }
+  .eyebrow { font-family: var(--font-mono); font-size: .76rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .section-title { font-size: clamp(1.4rem, 3.4vw, 2rem); font-weight: 800; margin: 0 0 .4rem;
+    line-height: 1.3; }
+  .method-note { margin: 1.2rem 0; padding: 16px 20px; border-radius: 14px; font-size: .9rem;
+    background: var(--bg-raised); border: 1px solid var(--border); color: var(--ink-secondary); }
+  .method-note p { margin: 0 0 .7em; }
+  .method-note p:last-child { margin-bottom: 0; }
+  .method-note summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+  .rpg-top { display: flex; gap: 1rem; flex-wrap: wrap; padding: 14px 0 0; font-size: .85rem;
+    font-family: var(--font-mono); }
+  .rpg-top a { color: var(--ink-secondary); }
+  .rpg-head { padding: 22px 0 6px; }
+  .rpg-picker { margin: .6rem 0 1rem; }
+  .rpg-picker h2 { font-size: .95rem; margin: 0 0 .4rem; }
+  .rpg-matches { display: flex; gap: .4rem; overflow-x: auto; padding: 2px 2px 8px;
+    scrollbar-width: thin; }
+  .rpg-match { flex: none; font: 600 .82rem var(--font-mono); padding: .35rem .6rem;
+    border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg-raised);
+    color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+  .rpg-match[aria-expanded="true"] { border-color: var(--ink); box-shadow: inset 0 -3px 0 var(--ink); }
+  .rpg-match .rpg-w0 { color: var(--p1); }
+  .rpg-match .rpg-w1 { color: var(--p2); }
+  .rpg-rounds { list-style: none; margin: .5rem 0 0; padding: 0; display: flex; flex-wrap: wrap;
+    gap: .35rem; }
+  .rpg-rounds[hidden] { display: none; }
+  .rpg-round { display: inline-block; font: .8rem var(--font-mono); padding: .25rem .55rem;
+    border: 1px solid var(--border); border-radius: 6px; text-decoration: none;
+    color: var(--ink-secondary); font-variant-numeric: tabular-nums; }
+  .rpg-round[data-w="0"] { border-left: 3px solid var(--p1); }
+  .rpg-round[data-w="1"] { border-left: 3px solid var(--p2); }
+  .rpg-round[aria-current="true"] { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+  .rpg-round .rpg-star { color: var(--pending); }
+  .rpg-now { margin: 1.2rem 0 .2rem; font-size: 1.05rem; font-weight: 800; }
+  .rpg-notes { font-size: .82rem; color: var(--ink-secondary); margin: 0; }
+  .rpg-flag { font-size: .85rem; font-weight: 700; color: var(--rp-bad); margin: .3rem 0 0; }
+  .rpg-flag[hidden] { display: none; }
+  .rpg-missing { font-size: .85rem; color: var(--rp-bad); margin: .4rem 0 0; }
+  .rpg-missing[hidden] { display: none; }
+  .rpg-chart { margin: 1rem 0 0; }
+  .rpg-chart figcaption { font-size: .8rem; color: var(--ink-secondary); margin-top: .35rem; }
+  .rpg-chart-title { font-size: .9rem; font-weight: 700; margin: 0 0 .25rem; }
+  .rpg-legend { display: flex; flex-wrap: wrap; gap: .2rem 1rem; font-size: .78rem;
+    color: var(--ink-secondary); margin: 0 0 .3rem; }
+  .rpg-legend i { display: inline-block; width: 1.2rem; height: 3px; vertical-align: middle;
+    margin-right: .3rem; border-radius: 2px; }
+  .rpg-legend i[data-slot="0"] { background: var(--rp-c0); }
+  .rpg-legend i[data-slot="1"] { background: var(--rp-c1); }
+  .rpg-canvas { display: block; width: 100%; height: 150px; cursor: crosshair;
+    background: var(--bg-sunken); border-radius: 8px; touch-action: manipulation; }
+  footer { margin: 3rem 0 2rem; padding-top: 1rem; border-top: 1px solid var(--border);
+    font-size: .8rem; color: var(--muted); }
+  @media (max-width: 640px) {
+    .wrap-wide { padding: 0 12px; }
+    .method-note { padding: 12px 14px; }
+    .rpg-canvas { height: 120px; }
+  }
+  @media print { .rpg-picker, .rpg-chart { display: none; } }
+  .scp-top { display: flex; gap: 1rem; flex-wrap: wrap; padding: 14px 0 0; font-size: .85rem; font-family: var(--font-mono); }
+  .scp-top a { color: var(--ink-secondary); }
+  .scp-head { padding: 22px 0 6px; }
+  .scp-src-line { font-size: .85rem; color: var(--ink-secondary); margin: 0; }
+  .scp-sec { margin: 2rem 0 0; }
+  .scp-sec > h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
+  .scp-sec h3 { font-size: 1rem; margin: 1.4rem 0 .4rem; }
+  .scp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); gap: .8rem; }
+  .scp-node { padding: .7rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-raised); min-width: 0; }
+  .scp-name { font-size: .92rem; margin: 0 0 .3rem; }
+  .scp-name a { text-decoration: underline; }
+  .scp-jp, .scp-tag, .scp-cond { font-size: .78rem; color: var(--ink-secondary); margin: .25rem 0; }
+  .scp-count { font: 600 .85rem var(--font-mono); margin: .35rem 0 0; font-variant-numeric: tabular-nums; }
+  .scp-node[data-status="empty"] .scp-count, .scp-node[data-status="image_only"] .scp-count,
+  .scp-node[data-status="text_only"] .scp-count, .scp-node[data-status="unmatchable"] .scp-count { font-family: var(--font-cjk); font-weight: 400; color: var(--muted); }
+  .scb { display: block; max-width: 100%; height: auto; margin: .3rem 0; }
+  .scb-bg { fill: var(--bg-sunken); }
+  .scb-i { fill: #3fb8c4; } .scb-o { fill: #d9b638; } .scb-t { fill: #9b5fd0; } .scb-s { fill: #4caf50; }
+  .scb-z { fill: #d64f4a; } .scb-j { fill: #4a72d1; } .scb-l { fill: #e08a35; }
+  .scb-c { fill: var(--muted); opacity: .55; }
+  .scb-u { fill: none; stroke: #9b5fd0; stroke-width: 2; stroke-dasharray: 3 2; }
+  .scb-zz { fill: #d64f4a; stroke: var(--ink); stroke-width: 1.5; }
+  .scb-p { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 2 2; }
+  .scp-quote { font-size: .85rem; color: var(--ink-secondary); }
+  .scp-table { border-collapse: collapse; font-size: .82rem; margin: .4rem 0; font-variant-numeric: tabular-nums; }
+  .scp-table th, .scp-table td { border: 1px solid var(--border); padding: .25rem .5rem; text-align: left; }
+  .scp-table caption { caption-side: bottom; font-size: .78rem; color: var(--ink-secondary); text-align: left; padding-top: .3rem; }
+  .scp-index-wrap { overflow-x: auto; }
+  .scp-cases { list-style: none; padding: 0; margin: .4rem 0 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+  .scp-case { display: inline-block; font: .78rem var(--font-mono); padding: .25rem .5rem; border: 1px solid var(--border); border-radius: 6px; color: var(--ink-secondary); text-decoration: none; }
+  .scp-case[aria-current="true"] { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+  .scp-case .scp-unv { color: var(--pending); }
+  .scp-idle { font-size: .9rem; color: var(--muted); }
+  .scp-idle[hidden] { display: none; }
+  @media (max-width: 640px) { .scp-grid { grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); } }
+  .scb-cl { fill: var(--muted); opacity: .3; }
+  .scb-im { fill: #3fb8c4; opacity: .55; } .scb-jm { fill: #4a72d1; opacity: .55; }
+  .scb-om { fill: #d9b638; opacity: .55; } .scb-sm { fill: #4caf50; opacity: .55; }
+  .scb-zm { fill: #d64f4a; opacity: .55; }
+</style>
+</head>
+<body>
+<div class="wrap-wide">
+  <nav class="scp-top" aria-label="返去"><a href="index.html">← 全部戰報</a><a href="btcannon-demos.html">BT砲（途中BT）示範重播</a></nav>
+  <header class="scp-head">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h1 class="section-title">BT砲（途中BT）中盤手法（未經證明）</h1>
+    <p>BT砲（途中BT）係一個先打 TSD、再打 TST 嘅中盤手法：一個 TSD 位，右邊尾有屋頂，左邊貼住牆有一條 TST 位由上面一直落到 TSD 下面。T 瞓低、尖向下打 TSD（原頁：屋頂下面推埋去再轉兩下），消走兩行之後，上面嗰截 TST 位同下面嗰格駁埋，第二粒 T 企直靠牆打一下普通嘅 TST。開局都有一個同名嘅定式（開幕BT砲），形狀一樣；原頁叫呢個做「途中BT」分開佢哋，呢版講嘅係中盤嗰個。呢版將原頁每一幅圖照抄，再同成個 corpus 每一下 TSD 對：T 瞓低落去嗰陣，佢周圍嗰個窗口係咪原頁畫嘅樣，同埋之後嗰粒 T 有冇打到原頁講嘅 TST。</p>
+  <p class="scp-src-line">來源：<a href="https://shiwehi.com/tetris/template/btcannon.php">BT砲(途中BT)(Mid-game BT Cannon)（shiwehi.com）</a>，原頁 2021-07-03 版，2026-10-17 讀取；<a href="https://shiwehi.com/tetris/explanation/terms.php">使用條款</a>（非商業用途，註明出處）。</p>
+  </header>
+  <div class="method-note">
+    <p><strong>呢版唔屬於信任鏈。</strong>每個盤面都係<strong>一個 replay 模擬器</strong>（Triangle 引擎）重跑操作記錄推導出嚟，冇第二份獨立實作；邊一下 TSD 對到呢個形亦係由佢推出嚟。所以呢版<strong>冇 claim 編號、冇 ✓ 標記</strong>。</p>
+    <p>盤面圖逐格轉錄自 shiwehi.com 嘅BT砲(途中BT)頁（2021-07-03 版），轉錄有自己嘅 gate 核對；引號入面嘅日文係原頁原文。</p>
+    <p>呢個係中盤手法，唔係開局定式：盤面係對住 T 嘅局部窗口比，唔係成個盤面比，邊一粒都可以，唔使由空盤開始。開幕BT砲同呢個形一樣，所以如果喺開局對到，會算喺「開局」嗰欄，唔會刪走。</p>
+    <p>對法：嗰粒 T 嘅四格要啱啱係原頁畫嘅瞓低、尖向下嘅 T（左右反轉都算，反轉嗰陣個窗口一齊反）；個窗口入面原頁畫咗有嘢嘅格要有嘢、畫咗空嘅格要空。顏色唔比，窗口以外一格都唔睇。個窗口係原頁同 harddrop 嘅 BT Cannon 頁每一幅呢個形嘅圖都一致嘅最大長方形（原頁 TSD 嗰幅將右邊成個堆畫晒出嚟，嗰啲格每幅圖都唔同，所以唔入窗口）：由牆邊嗰欄起四欄闊，由 TST 嘅屋頂嗰行落到 TST 位底嗰格，七行高。中間兩行係 TSD 消嘅兩行（全 T-spin 消兩行嗰陣一定滿，所以唔會分到嘢）；分到嘢嘅係 T 嘅方向、T 上面嗰四行（TST 嘅屋頂、TST 位、T 右尾嘅屋頂）同下面嗰行（TST 位底嗰格同佢兩邊）。gate 逐幅核過個窗口喺原頁每一幅呢個形嘅圖、同 harddrop 每一幅畫咗 T 落去嘅呢個形嘅圖度，喺畫咗嘅 T 位對到一次，其他位一次都唔對；harddrop 嗰頁係另一個網站、另一班作者，入面仲有一節專講中盤 BT，連原頁嗰個由欄干改過嚟嘅砌法都有。冇一個定式路線頁畫過 BT（gate 量過），開局定式目錄嘅 BT 圖得第一巡四行高，個窗口擺唔落去，所以都唔算第二個來源。</p>
+    <p>窗口入面嘅垃圾當有嘢計；垃圾行個窿喺邊一欄係引擎用種子亂數揀嘅，所以窗口有垃圾嘅個案會喺下面張表單獨數出嚟。</p>
+    <p>標住「我哋嘅讀法」嘅係我哋自己點讀原頁，原頁冇明講：虛線框（原頁淺紫色加深紫點）係 T 落嘅位；淺色大楷格係嗰下 spin 消走嘅行；72積み 嗰四幅入面，大楷嘅 I、J、O、S、Z 係原頁要你放落去嘅方塊（原頁用淡色畫），細楷係 72積み 本身嗰邊嘅方塊；冇畫出嚟嘅盤面係由圖減走頁面嗰幾粒推返出嚟。原頁冇畫 TSD 同 TST 中間嗰幅盤面（佢畫嘅係 TST 已經放咗 T 落去嗰幅），我哋將嗰幅減走個 T 推返出嚟，gate 核過佢係 TSD 消完行之後嘅樣。harddrop 嗰頁嘅圖：P 係放咗落去嘅 T，其餘每一格都當有嘢。</p>
+    <p>垃圾行個窿喺邊一欄，係<strong>引擎用種子亂數揀嘅</strong>：同遊戲自己嘅計數（清咗幾多垃圾、消咗幾多行）對得上，但<strong>從來冇直接觀察過</strong>。</p>
+  </div>
+  <section class="scp-sec">
+    <h2>原頁嘅圖</h2>
+    <p class="scp-quote">原頁每一幅圖，照頁面次序；冇畫出嚟、由圖推返出嚟嘅盤面排喺最尾。</p>
+    <div class="scp-grid">
+    <div class="scp-node" data-board="basic"><h4 class="scp-name">BT砲嘅形（TSD 位右尾有屋頂，左邊靠牆一條 TST 位）</h4><p class="scp-jp">原頁：<q class="scp-src">BT砲の形は以下の通りで、TSDを打った後にTSTを打つことができます。</q></p><svg class="scb" viewBox="0 0 140 98" width="140" height="98" role="img" aria-label="BT砲嘅形（TSD 位右尾有屋頂，左邊靠牆一條 TST 位）"><rect class="scb-bg" x="0" y="0" width="140" height="98"/><rect class="scb-c" x="1" y="1" width="12" height="12"/><rect class="scb-c" x="15" y="1" width="12" height="12"/><rect class="scb-c" x="1" y="15" width="12" height="12"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="29" y="29" width="12" height="12"/><rect class="scb-c" x="43" y="29" width="12" height="12"/><rect class="scb-c" x="57" y="29" width="12" height="12"/><rect class="scb-c" x="71" y="29" width="12" height="12"/><rect class="scb-c" x="85" y="29" width="12" height="12"/><rect class="scb-c" x="99" y="29" width="12" height="12"/><rect class="scb-c" x="113" y="29" width="12" height="12"/><rect class="scb-c" x="127" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-c" x="43" y="43" width="12" height="12"/><rect class="scb-c" x="57" y="43" width="12" height="12"/><rect class="scb-c" x="71" y="43" width="12" height="12"/><rect class="scb-c" x="85" y="43" width="12" height="12"/><rect class="scb-c" x="99" y="43" width="12" height="12"/><rect class="scb-c" x="113" y="43" width="12" height="12"/><rect class="scb-c" x="127" y="43" width="12" height="12"/><rect class="scb-c" x="1" y="57" width="12" height="12"/><rect class="scb-c" x="57" y="57" width="12" height="12"/><rect class="scb-c" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="85" y="57" width="12" height="12"/><rect class="scb-c" x="99" y="57" width="12" height="12"/><rect class="scb-c" x="113" y="57" width="12" height="12"/><rect class="scb-c" x="127" y="57" width="12" height="12"/><rect class="scb-c" x="1" y="71" width="12" height="12"/><rect class="scb-c" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="57" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="basic.spin"><h4 class="scp-name">T 瞓低、尖向下，推入屋頂下面打 TSD</h4><p class="scp-jp">原頁：<q class="scp-src">屋根下に寄せてから右回転、右回転です。</q></p><svg class="scb" viewBox="0 0 140 98" width="140" height="98" role="img" aria-label="T 瞓低、尖向下，推入屋頂下面打 TSD"><rect class="scb-bg" x="0" y="0" width="140" height="98"/><rect class="scb-c" x="1" y="1" width="12" height="12"/><rect class="scb-c" x="15" y="1" width="12" height="12"/><rect class="scb-c" x="1" y="15" width="12" height="12"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="29" y="29" width="12" height="12"/><rect class="scb-c" x="43" y="29" width="12" height="12"/><rect class="scb-c" x="57" y="29" width="12" height="12"/><rect class="scb-c" x="71" y="29" width="12" height="12"/><rect class="scb-c" x="85" y="29" width="12" height="12"/><rect class="scb-c" x="99" y="29" width="12" height="12"/><rect class="scb-c" x="113" y="29" width="12" height="12"/><rect class="scb-c" x="127" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-c" x="43" y="43" width="12" height="12"/><rect class="scb-c" x="57" y="43" width="12" height="12"/><rect class="scb-c" x="71" y="43" width="12" height="12"/><rect class="scb-c" x="85" y="43" width="12" height="12"/><rect class="scb-c" x="99" y="43" width="12" height="12"/><rect class="scb-c" x="113" y="43" width="12" height="12"/><rect class="scb-c" x="127" y="43" width="12" height="12"/><rect class="scb-cl" x="1" y="57" width="12" height="12"/><rect class="scb-u" x="15" y="57" width="12" height="12"/><rect class="scb-u" x="29" y="57" width="12" height="12"/><rect class="scb-u" x="43" y="57" width="12" height="12"/><rect class="scb-cl" x="57" y="57" width="12" height="12"/><rect class="scb-cl" x="71" y="57" width="12" height="12"/><rect class="scb-cl" x="85" y="57" width="12" height="12"/><rect class="scb-cl" x="99" y="57" width="12" height="12"/><rect class="scb-cl" x="113" y="57" width="12" height="12"/><rect class="scb-cl" x="127" y="57" width="12" height="12"/><rect class="scb-cl" x="1" y="71" width="12" height="12"/><rect class="scb-cl" x="15" y="71" width="12" height="12"/><rect class="scb-u" x="29" y="71" width="12" height="12"/><rect class="scb-cl" x="43" y="71" width="12" height="12"/><rect class="scb-cl" x="57" y="71" width="12" height="12"/><rect class="scb-cl" x="71" y="71" width="12" height="12"/><rect class="scb-cl" x="85" y="71" width="12" height="12"/><rect class="scb-cl" x="99" y="71" width="12" height="12"/><rect class="scb-cl" x="113" y="71" width="12" height="12"/><rect class="scb-cl" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="tst.spin"><h4 class="scp-name">TSD 之後，第二粒 T 企直靠牆打 TST（原頁畫嘅係放咗 T 嗰幅）</h4><p class="scp-jp">原頁：<q class="scp-src">1つ目の%Tさえ入れることができれば、2つ目は普通のTSTです。</q></p><svg class="scb" viewBox="0 0 140 98" width="140" height="98" role="img" aria-label="TSD 之後，第二粒 T 企直靠牆打 TST（原頁畫嘅係放咗 T 嗰幅）"><rect class="scb-bg" x="0" y="0" width="140" height="98"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="15" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-cl" x="1" y="57" width="12" height="12"/><rect class="scb-u" x="15" y="57" width="12" height="12"/><rect class="scb-cl" x="29" y="57" width="12" height="12"/><rect class="scb-cl" x="43" y="57" width="12" height="12"/><rect class="scb-cl" x="57" y="57" width="12" height="12"/><rect class="scb-cl" x="71" y="57" width="12" height="12"/><rect class="scb-cl" x="85" y="57" width="12" height="12"/><rect class="scb-cl" x="99" y="57" width="12" height="12"/><rect class="scb-cl" x="113" y="57" width="12" height="12"/><rect class="scb-cl" x="127" y="57" width="12" height="12"/><rect class="scb-cl" x="1" y="71" width="12" height="12"/><rect class="scb-u" x="15" y="71" width="12" height="12"/><rect class="scb-u" x="29" y="71" width="12" height="12"/><rect class="scb-cl" x="43" y="71" width="12" height="12"/><rect class="scb-cl" x="57" y="71" width="12" height="12"/><rect class="scb-cl" x="71" y="71" width="12" height="12"/><rect class="scb-cl" x="85" y="71" width="12" height="12"/><rect class="scb-cl" x="99" y="71" width="12" height="12"/><rect class="scb-cl" x="113" y="71" width="12" height="12"/><rect class="scb-cl" x="127" y="71" width="12" height="12"/><rect class="scb-cl" x="1" y="85" width="12" height="12"/><rect class="scb-u" x="15" y="85" width="12" height="12"/><rect class="scb-cl" x="29" y="85" width="12" height="12"/><rect class="scb-cl" x="43" y="85" width="12" height="12"/><rect class="scb-cl" x="57" y="85" width="12" height="12"/><rect class="scb-cl" x="71" y="85" width="12" height="12"/><rect class="scb-cl" x="85" y="85" width="12" height="12"/><rect class="scb-cl" x="99" y="85" width="12" height="12"/><rect class="scb-cl" x="113" y="85" width="12" height="12"/><rect class="scb-cl" x="127" y="85" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="parapet.terrain"><h4 class="scp-name">元地形：牆邊一粒 L，TSD 嗰行下面有個窿</h4><p class="scp-jp">原頁：<q class="scp-src">ここからこうすれば欄干</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="元地形：牆邊一粒 L，TSD 嗰行下面有個窿"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-l" x="1" y="43" width="12" height="12"/><rect class="scb-l" x="1" y="57" width="12" height="12"/><rect class="scb-c" x="57" y="57" width="12" height="12"/><rect class="scb-c" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="85" y="57" width="12" height="12"/><rect class="scb-c" x="99" y="57" width="12" height="12"/><rect class="scb-c" x="113" y="57" width="12" height="12"/><rect class="scb-c" x="127" y="57" width="12" height="12"/><rect class="scb-l" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="57" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="29" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="parapet"><h4 class="scp-name">放一粒 O：係欄干（另一個手法，唔係呢個）</h4><p class="scp-jp">原頁：<q class="scp-src">ここからこうすれば欄干</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="放一粒 O：係欄干（另一個手法，唔係呢個）"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-o" x="43" y="29" width="12" height="12"/><rect class="scb-o" x="57" y="29" width="12" height="12"/><rect class="scb-l" x="1" y="43" width="12" height="12"/><rect class="scb-o" x="43" y="43" width="12" height="12"/><rect class="scb-o" x="57" y="43" width="12" height="12"/><rect class="scb-l" x="1" y="57" width="12" height="12"/><rect class="scb-c" x="57" y="57" width="12" height="12"/><rect class="scb-c" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="85" y="57" width="12" height="12"/><rect class="scb-c" x="99" y="57" width="12" height="12"/><rect class="scb-c" x="113" y="57" width="12" height="12"/><rect class="scb-c" x="127" y="57" width="12" height="12"/><rect class="scb-l" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="57" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="29" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="bt.terrain"><h4 class="scp-name">同一個元地形，再畫一次</h4><p class="scp-jp">原頁：<q class="scp-src">こうすると途中BT</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="同一個元地形，再畫一次"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-l" x="1" y="43" width="12" height="12"/><rect class="scb-l" x="1" y="57" width="12" height="12"/><rect class="scb-c" x="57" y="57" width="12" height="12"/><rect class="scb-c" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="85" y="57" width="12" height="12"/><rect class="scb-c" x="99" y="57" width="12" height="12"/><rect class="scb-c" x="113" y="57" width="12" height="12"/><rect class="scb-c" x="127" y="57" width="12" height="12"/><rect class="scb-l" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="57" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="29" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="bt.build"><h4 class="scp-name">改放一粒 J 靠牆、一粒 Z 瞓喺個位上面：就係途中BT</h4><p class="scp-jp">原頁：<q class="scp-src">BT砲は開幕以外で組むことは中々難しいと思われがちですが、実は欄干を組む形からBT砲にすることができます。</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="改放一粒 J 靠牆、一粒 Z 瞓喺個位上面：就係途中BT"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-j" x="1" y="1" width="12" height="12"/><rect class="scb-j" x="15" y="1" width="12" height="12"/><rect class="scb-j" x="1" y="15" width="12" height="12"/><rect class="scb-j" x="1" y="29" width="12" height="12"/><rect class="scb-z" x="29" y="29" width="12" height="12"/><rect class="scb-z" x="43" y="29" width="12" height="12"/><rect class="scb-l" x="1" y="43" width="12" height="12"/><rect class="scb-z" x="43" y="43" width="12" height="12"/><rect class="scb-z" x="57" y="43" width="12" height="12"/><rect class="scb-l" x="1" y="57" width="12" height="12"/><rect class="scb-c" x="57" y="57" width="12" height="12"/><rect class="scb-c" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="85" y="57" width="12" height="12"/><rect class="scb-c" x="99" y="57" width="12" height="12"/><rect class="scb-c" x="113" y="57" width="12" height="12"/><rect class="scb-c" x="127" y="57" width="12" height="12"/><rect class="scb-l" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="57" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="29" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="s72.1"><h4 class="scp-name">由 72積み 砌：兩欄嗰邊得一粒 L，放 I、J、Z</h4><p class="scp-jp">原頁：<q class="scp-src">また、72積みから2列側の高さに応じて以下のように組むことで途中BT砲を打つことができます。</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="由 72積み 砌：兩欄嗰邊得一粒 L，放 I、J、Z"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-im" x="1" y="15" width="12" height="12"/><rect class="scb-jm" x="15" y="15" width="12" height="12"/><rect class="scb-jm" x="29" y="15" width="12" height="12"/><rect class="scb-im" x="1" y="29" width="12" height="12"/><rect class="scb-jm" x="15" y="29" width="12" height="12"/><rect class="scb-im" x="1" y="43" width="12" height="12"/><rect class="scb-jm" x="15" y="43" width="12" height="12"/><rect class="scb-zm" x="43" y="43" width="12" height="12"/><rect class="scb-zm" x="57" y="43" width="12" height="12"/><rect class="scb-im" x="1" y="57" width="12" height="12"/><rect class="scb-l" x="15" y="57" width="12" height="12"/><rect class="scb-zm" x="57" y="57" width="12" height="12"/><rect class="scb-zm" x="71" y="57" width="12" height="12"/><rect class="scb-c" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-l" x="15" y="85" width="12" height="12"/><rect class="scb-l" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="s72.2"><h4 class="scp-name">由 72積み 砌：兩欄嗰邊有粒 Z，放 S、O、Z</h4><p class="scp-jp">原頁：<q class="scp-src">また、72積みから2列側の高さに応じて以下のように組むことで途中BT砲を打つことができます。</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="由 72積み 砌：兩欄嗰邊有粒 Z，放 S、O、Z"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-sm" x="15" y="15" width="12" height="12"/><rect class="scb-sm" x="29" y="15" width="12" height="12"/><rect class="scb-sm" x="1" y="29" width="12" height="12"/><rect class="scb-sm" x="15" y="29" width="12" height="12"/><rect class="scb-om" x="1" y="43" width="12" height="12"/><rect class="scb-om" x="15" y="43" width="12" height="12"/><rect class="scb-zm" x="43" y="43" width="12" height="12"/><rect class="scb-zm" x="57" y="43" width="12" height="12"/><rect class="scb-om" x="1" y="57" width="12" height="12"/><rect class="scb-om" x="15" y="57" width="12" height="12"/><rect class="scb-zm" x="57" y="57" width="12" height="12"/><rect class="scb-zm" x="71" y="57" width="12" height="12"/><rect class="scb-z" x="1" y="71" width="12" height="12"/><rect class="scb-z" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-z" x="15" y="85" width="12" height="12"/><rect class="scb-z" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="s72.3"><h4 class="scp-name">由 72積み 砌：兩欄嗰邊有粒 S 同 J，放 J、Z</h4><p class="scp-jp">原頁：<q class="scp-src">また、72積みから2列側の高さに応じて以下のように組むことで途中BT砲を打つことができます。</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="由 72積み 砌：兩欄嗰邊有粒 S 同 J，放 J、Z"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-jm" x="15" y="15" width="12" height="12"/><rect class="scb-jm" x="29" y="15" width="12" height="12"/><rect class="scb-jm" x="15" y="29" width="12" height="12"/><rect class="scb-s" x="1" y="43" width="12" height="12"/><rect class="scb-jm" x="15" y="43" width="12" height="12"/><rect class="scb-zm" x="43" y="43" width="12" height="12"/><rect class="scb-zm" x="57" y="43" width="12" height="12"/><rect class="scb-s" x="1" y="57" width="12" height="12"/><rect class="scb-s" x="15" y="57" width="12" height="12"/><rect class="scb-zm" x="57" y="57" width="12" height="12"/><rect class="scb-zm" x="71" y="57" width="12" height="12"/><rect class="scb-j" x="1" y="71" width="12" height="12"/><rect class="scb-s" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-j" x="1" y="85" width="12" height="12"/><rect class="scb-j" x="15" y="85" width="12" height="12"/><rect class="scb-j" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="s72.4"><h4 class="scp-name">由 72積み 砌：兩欄嗰邊有粒 O 同 L，放 I、J、Z</h4><p class="scp-jp">原頁：<q class="scp-src">また、72積みから2列側の高さに応じて以下のように組むことで途中BT砲を打つことができます。</q></p><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="由 72積み 砌：兩欄嗰邊有粒 O 同 L，放 I、J、Z"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-im" x="1" y="1" width="12" height="12"/><rect class="scb-im" x="1" y="15" width="12" height="12"/><rect class="scb-jm" x="15" y="15" width="12" height="12"/><rect class="scb-jm" x="29" y="15" width="12" height="12"/><rect class="scb-im" x="1" y="29" width="12" height="12"/><rect class="scb-jm" x="15" y="29" width="12" height="12"/><rect class="scb-im" x="1" y="43" width="12" height="12"/><rect class="scb-jm" x="15" y="43" width="12" height="12"/><rect class="scb-zm" x="43" y="43" width="12" height="12"/><rect class="scb-zm" x="57" y="43" width="12" height="12"/><rect class="scb-o" x="1" y="57" width="12" height="12"/><rect class="scb-o" x="15" y="57" width="12" height="12"/><rect class="scb-zm" x="57" y="57" width="12" height="12"/><rect class="scb-zm" x="71" y="57" width="12" height="12"/><rect class="scb-o" x="1" y="71" width="12" height="12"/><rect class="scb-o" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-l" x="1" y="85" width="12" height="12"/><rect class="scb-l" x="15" y="85" width="12" height="12"/><rect class="scb-l" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-l" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg></div>
+    <div class="scp-node" data-board="basic.after"><h4 class="scp-name">TSD 消完行之後、TST 之前嘅盤面（由 TST 嗰幅推出嚟）</h4><svg class="scb" viewBox="0 0 140 98" width="140" height="98" role="img" aria-label="TSD 消完行之後、TST 之前嘅盤面（由 TST 嗰幅推出嚟）"><rect class="scb-bg" x="0" y="0" width="140" height="98"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="15" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-cl" x="1" y="57" width="12" height="12"/><rect class="scb-cl" x="29" y="57" width="12" height="12"/><rect class="scb-cl" x="43" y="57" width="12" height="12"/><rect class="scb-cl" x="57" y="57" width="12" height="12"/><rect class="scb-cl" x="71" y="57" width="12" height="12"/><rect class="scb-cl" x="85" y="57" width="12" height="12"/><rect class="scb-cl" x="99" y="57" width="12" height="12"/><rect class="scb-cl" x="113" y="57" width="12" height="12"/><rect class="scb-cl" x="127" y="57" width="12" height="12"/><rect class="scb-cl" x="1" y="71" width="12" height="12"/><rect class="scb-cl" x="43" y="71" width="12" height="12"/><rect class="scb-cl" x="57" y="71" width="12" height="12"/><rect class="scb-cl" x="71" y="71" width="12" height="12"/><rect class="scb-cl" x="85" y="71" width="12" height="12"/><rect class="scb-cl" x="99" y="71" width="12" height="12"/><rect class="scb-cl" x="113" y="71" width="12" height="12"/><rect class="scb-cl" x="127" y="71" width="12" height="12"/><rect class="scb-cl" x="1" y="85" width="12" height="12"/><rect class="scb-cl" x="29" y="85" width="12" height="12"/><rect class="scb-cl" x="43" y="85" width="12" height="12"/><rect class="scb-cl" x="57" y="85" width="12" height="12"/><rect class="scb-cl" x="71" y="85" width="12" height="12"/><rect class="scb-cl" x="85" y="85" width="12" height="12"/><rect class="scb-cl" x="99" y="85" width="12" height="12"/><rect class="scb-cl" x="113" y="85" width="12" height="12"/><rect class="scb-cl" x="127" y="85" width="12" height="12"/></svg><p class="scp-tag">我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。</p></div>
+    <div class="scp-node" data-board="s72.1.terrain"><h4 class="scp-name">s72.1 嘅元地形（72積み，由砌好嗰幅推出嚟）</h4><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="s72.1 嘅元地形（72積み，由砌好嗰幅推出嚟）"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-l" x="15" y="57" width="12" height="12"/><rect class="scb-c" x="1" y="71" width="12" height="12"/><rect class="scb-l" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-l" x="15" y="85" width="12" height="12"/><rect class="scb-l" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg><p class="scp-tag">我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。</p></div>
+    <div class="scp-node" data-board="s72.2.terrain"><h4 class="scp-name">s72.2 嘅元地形（72積み，由砌好嗰幅推出嚟）</h4><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="s72.2 嘅元地形（72積み，由砌好嗰幅推出嚟）"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-z" x="1" y="71" width="12" height="12"/><rect class="scb-z" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-z" x="15" y="85" width="12" height="12"/><rect class="scb-z" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg><p class="scp-tag">我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。</p></div>
+    <div class="scp-node" data-board="s72.3.terrain"><h4 class="scp-name">s72.3 嘅元地形（72積み，由砌好嗰幅推出嚟）</h4><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="s72.3 嘅元地形（72積み，由砌好嗰幅推出嚟）"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-s" x="1" y="43" width="12" height="12"/><rect class="scb-s" x="1" y="57" width="12" height="12"/><rect class="scb-s" x="15" y="57" width="12" height="12"/><rect class="scb-j" x="1" y="71" width="12" height="12"/><rect class="scb-s" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-j" x="1" y="85" width="12" height="12"/><rect class="scb-j" x="15" y="85" width="12" height="12"/><rect class="scb-j" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-c" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg><p class="scp-tag">我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。</p></div>
+    <div class="scp-node" data-board="s72.4.terrain"><h4 class="scp-name">s72.4 嘅元地形（72積み，由砌好嗰幅推出嚟）</h4><svg class="scb" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="s72.4 嘅元地形（72積み，由砌好嗰幅推出嚟）"><rect class="scb-bg" x="0" y="0" width="140" height="112"/><rect class="scb-o" x="1" y="57" width="12" height="12"/><rect class="scb-o" x="15" y="57" width="12" height="12"/><rect class="scb-o" x="1" y="71" width="12" height="12"/><rect class="scb-o" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="71" y="71" width="12" height="12"/><rect class="scb-c" x="85" y="71" width="12" height="12"/><rect class="scb-c" x="99" y="71" width="12" height="12"/><rect class="scb-c" x="113" y="71" width="12" height="12"/><rect class="scb-c" x="127" y="71" width="12" height="12"/><rect class="scb-l" x="1" y="85" width="12" height="12"/><rect class="scb-l" x="15" y="85" width="12" height="12"/><rect class="scb-l" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="57" y="85" width="12" height="12"/><rect class="scb-c" x="71" y="85" width="12" height="12"/><rect class="scb-c" x="85" y="85" width="12" height="12"/><rect class="scb-c" x="99" y="85" width="12" height="12"/><rect class="scb-c" x="113" y="85" width="12" height="12"/><rect class="scb-c" x="127" y="85" width="12" height="12"/><rect class="scb-l" x="1" y="99" width="12" height="12"/><rect class="scb-c" x="15" y="99" width="12" height="12"/><rect class="scb-c" x="43" y="99" width="12" height="12"/><rect class="scb-c" x="57" y="99" width="12" height="12"/><rect class="scb-c" x="71" y="99" width="12" height="12"/><rect class="scb-c" x="85" y="99" width="12" height="12"/><rect class="scb-c" x="99" y="99" width="12" height="12"/><rect class="scb-c" x="113" y="99" width="12" height="12"/><rect class="scb-c" x="127" y="99" width="12" height="12"/></svg><p class="scp-tag">我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。</p></div>
+    </div>
+  </section>
+  <section class="scp-sec">
+    <h2>我哋點樣對</h2>
+    <p>左邊係原頁嘅樣，右邊係左右反轉。虛線框係嗰粒 T 嘅四格，灰格係要有嘢嘅格，空格要空；窗口以外唔睇。</p>
+    <div class="scp-grid">
+    <div class="scp-node"><h4 class="scp-name">照原頁</h4><svg class="scb" viewBox="0 0 56 98" width="56" height="98" role="img" aria-label="照原頁"><rect class="scb-bg" x="0" y="0" width="56" height="98"/><rect class="scb-c" x="1" y="1" width="12" height="12"/><rect class="scb-c" x="15" y="1" width="12" height="12"/><rect class="scb-c" x="1" y="15" width="12" height="12"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="29" y="29" width="12" height="12"/><rect class="scb-c" x="43" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-c" x="43" y="43" width="12" height="12"/><rect class="scb-c" x="1" y="57" width="12" height="12"/><rect class="scb-u" x="15" y="57" width="12" height="12"/><rect class="scb-u" x="29" y="57" width="12" height="12"/><rect class="scb-u" x="43" y="57" width="12" height="12"/><rect class="scb-c" x="1" y="71" width="12" height="12"/><rect class="scb-c" x="15" y="71" width="12" height="12"/><rect class="scb-u" x="29" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="29" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/></svg></div>
+    <div class="scp-node"><h4 class="scp-name">左右反轉</h4><svg class="scb" viewBox="0 0 56 98" width="56" height="98" role="img" aria-label="左右反轉"><rect class="scb-bg" x="0" y="0" width="56" height="98"/><rect class="scb-c" x="29" y="1" width="12" height="12"/><rect class="scb-c" x="43" y="1" width="12" height="12"/><rect class="scb-c" x="43" y="15" width="12" height="12"/><rect class="scb-c" x="1" y="29" width="12" height="12"/><rect class="scb-c" x="15" y="29" width="12" height="12"/><rect class="scb-c" x="43" y="29" width="12" height="12"/><rect class="scb-c" x="1" y="43" width="12" height="12"/><rect class="scb-c" x="43" y="43" width="12" height="12"/><rect class="scb-u" x="1" y="57" width="12" height="12"/><rect class="scb-u" x="15" y="57" width="12" height="12"/><rect class="scb-u" x="29" y="57" width="12" height="12"/><rect class="scb-c" x="43" y="57" width="12" height="12"/><rect class="scb-c" x="1" y="71" width="12" height="12"/><rect class="scb-u" x="15" y="71" width="12" height="12"/><rect class="scb-c" x="29" y="71" width="12" height="12"/><rect class="scb-c" x="43" y="71" width="12" height="12"/><rect class="scb-c" x="1" y="85" width="12" height="12"/><rect class="scb-c" x="15" y="85" width="12" height="12"/><rect class="scb-c" x="43" y="85" width="12" height="12"/></svg></div>
+    </div>
+  </section>
+  <section class="scp-sec">
+    <h2>corpus 入面對到幾多</h2>
+    <p>分母係已核對範圍入面、過咗重組核對嘅每一下 TSD（全 T-spin、消兩行）。開局係頭 22 粒以內（由 0 數起，即係第 21 粒或之前），中盤係之後。</p>
+    <p>對照：同一個窗口擺喺 TSS、TST 同 mini T-spin 度數一次，再逐條拎走個條件數一次。一個形狀如果喺唔關佢事嘅 spin 度都對到差唔多咁多，佢就只係一個形狀測試，唔係呢個手法；所以呢幾行一定同主表一齊印。</p>
+    <div class="scp-index-wrap"><table class="scp-table">
+    <tr><th>玩家</th><th>全部</th><th>開局</th><th>中盤</th><th>左右反轉</th><th>窗口有垃圾</th></tr>
+    <tr><th>pinglamb</th><td data-figure="hits.pinglamb.all">0 / 5307</td><td data-figure="hits.pinglamb.in_opener">0 / 1043</td><td data-figure="hits.pinglamb.mid_game">0 / 4264</td><td data-figure="mirrored.pinglamb">0 / 0</td><td data-figure="garbage.pinglamb">0 / 0</td></tr>
+    <tr><th>yachi</th><td data-figure="hits.yachi.all">0 / 4751</td><td data-figure="hits.yachi.in_opener">0 / 1242</td><td data-figure="hits.yachi.mid_game">0 / 3509</td><td data-figure="mirrored.yachi">0 / 0</td><td data-figure="garbage.yachi">0 / 0</td></tr>
+    </table></div>
+    <h3>對照</h3>
+    <div class="scp-index-wrap"><table class="scp-table">
+    <caption>分母係嗰款 spin 嘅已核對數（同主表同一個核對）；拎走條件嗰幾行同基線，分母係全部 TSD。</caption>
+    <tr><th>對照</th><th>pinglamb</th><th>yachi</th></tr>
+    <tr><th>同一個窗口，喺 TSS 度</th><td data-figure="under.TSS.pinglamb">0 / 603</td><td data-figure="under.TSS.yachi">0 / 994</td></tr>
+    <tr><th>同一個窗口，喺 TST 度</th><td data-figure="under.TST.pinglamb">0 / 1333</td><td data-figure="under.TST.yachi">0 / 799</td></tr>
+    <tr><th>同一個窗口，喺 mini TSS 度</th><td data-figure="under.mini_TSS.pinglamb">0 / 310</td><td data-figure="under.mini_TSS.yachi">0 / 79</td></tr>
+    <tr><th>同一個窗口，喺 mini TSD 度</th><td data-figure="under.mini_TSD.pinglamb">0 / 0</td><td data-figure="under.mini_TSD.yachi">0 / 0</td></tr>
+    <tr><th>拎走「要空嘅格要空」</th><td data-figure="ablation.no_must_empty.pinglamb">0 / 5307</td><td data-figure="ablation.no_must_empty.yachi">0 / 4751</td></tr>
+    <tr><th>拎走 T 上面嗰四行（TST 屋頂、TST 位、T 右尾屋頂）</th><td data-figure="ablation.no_roof.pinglamb">492 / 5307</td><td data-figure="ablation.no_roof.yachi">393 / 4751</td></tr>
+    <tr><th>唔要求 T 係窗口嘅 T，淨係要同窗口重疊</th><td data-figure="ablation.t_overlap.pinglamb">0 / 5307</td><td data-figure="ablation.t_overlap.yachi">18 / 4751</td></tr>
+    <tr><th>T 企直嘅 TSD（唔睇窗口；呢個手法嘅 T 係瞓低，呢行係同 STSD 頁一樣嘅基線）</th><td data-figure="baseline.pinglamb">43 / 5307</td><td data-figure="baseline.yachi">61 / 4751</td></tr>
+    </table></div>
+  </section>
+  <section class="scp-sec">
+    <h2>TST 有冇打到</h2>
+    <p>原頁話入到第一粒 T，第二粒就係普通嘅 TST。由對到嗰下起，將原頁畫嘅 TST 位（TSD 消行之前俾消嘅兩行分開咗，消完先駁埋）跟住每一下消行同垃圾行推落去，一直推到下一粒 T；每一步都同引擎自己嘅盤面核過。下一粒 T 啱啱落入個位、而且係全 T-spin 消三行，先算打到。</p>
+    <div class="scp-index-wrap"><table class="scp-table">
+    <tr><th>結果</th><th>pinglamb</th><th>yachi</th></tr>
+    <tr><th>打到 TST</th><td data-figure="fired.pinglamb">0 / 0</td><td data-figure="fired.yachi">0 / 0</td></tr>
+    </table></div>
+  </section>
+  <section class="scp-sec">
+    <h2>個案</h2>
+    <p>每一個對到嘅 TSD 一行（張表冇行，就係一個都冇對到）。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播。</p>
+    <div class="scp-index-wrap"><table class="scp-table">
+    <tr><th>日期</th><th>局</th><th>玩家</th><th>第幾粒（由 0 數）</th><th>開局／中盤</th><th>窗口</th><th>TST</th></tr>
+    </table></div>
+  </section>
+  <section class="scp-sec">
+    <h2>示範重播</h2>
+    <p><a href="btcannon-demos.html">睇示範重播：原頁每一幅圖點解冇示範</a></p>
+  </section>
+  <footer><p>模擬器推導嘅路線分類同重播，唔屬於信任鏈；Dafny 證明嘅係戰報入面嘅 claim，唔係呢度嘅盤面。</p></footer>
+</div>
+<script type="application/json" id="scp-data">{"figures":{"hits.pinglamb.all":"0 / 5307","hits.pinglamb.in_opener":"0 / 1043","hits.pinglamb.mid_game":"0 / 4264","mirrored.pinglamb":"0 / 0","garbage.pinglamb":"0 / 0","fired.pinglamb":"0 / 0","under.TSS.pinglamb":"0 / 603","under.TST.pinglamb":"0 / 1333","under.mini_TSS.pinglamb":"0 / 310","under.mini_TSD.pinglamb":"0 / 0","ablation.no_must_empty.pinglamb":"0 / 5307","ablation.no_roof.pinglamb":"492 / 5307","ablation.t_overlap.pinglamb":"0 / 5307","baseline.pinglamb":"43 / 5307","hits.yachi.all":"0 / 4751","hits.yachi.in_opener":"0 / 1242","hits.yachi.mid_game":"0 / 3509","mirrored.yachi":"0 / 0","garbage.yachi":"0 / 0","fired.yachi":"0 / 0","under.TSS.yachi":"0 / 994","under.TST.yachi":"0 / 799","under.mini_TSS.yachi":"0 / 79","under.mini_TSD.yachi":"0 / 0","ablation.no_must_empty.yachi":"0 / 4751","ablation.no_roof.yachi":"393 / 4751","ablation.t_overlap.yachi":"18 / 4751","baseline.yachi":"61 / 4751"}}</script>
+</body>
+</html>
