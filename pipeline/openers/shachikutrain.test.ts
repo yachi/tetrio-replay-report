@@ -14,10 +14,13 @@
  *      board only and STMB Cave's (`stmbcave-technique.json`, by the same TS predicate) on its own variation only.
  *   5. STMB CAVE, ダブルダガー, BT砲 AND 千鳥格子 ARE NOT THIS: all five lay the T flat, nub down; anchored on the same T
  *      this window clashes with each of theirs on a cell in every pairing of hands (re-derived from the
- *      transcriptions), so no lock is a hit of two of them, and none is. Against STMB Cave the clash includes the cell
- *      under the nub, the one harddrop's 「same shape and steps」 does not mention.
+ *      transcriptions), so no lock is a hit of two of them, and none is. Against STMB Cave in the same hand the clash
+ *      is exactly two cells, the cell under the nub and its neighbour under one arm (the transcription's `clash`),
+ *      which harddrop's 「same shape and steps」 does not mention.
  *   6. WHAT DISCRIMINATES: measured per window part, with the T anchored (the row above the T, the cleared rows,
- *      the row under them), against the headline: no single part gives it, so each is doing work.
+ *      the row under them), against the headline: no single part gives it. The cleared rows are entailed by the
+ *      clear and do no work; the row above and the row below each cut them down (the row below by at least ten
+ *      times, the row above by less — both asserted), so those two are what discriminate.
  *   7. NAMED lists, not bounds; pinned per-player figures; mutants, each with its asserted symptom (the equivalent
  *      ones named, measured, asserted to STAY byte-identical).
  *   8. THE FOLLOW-UP on the page's own drawings: the TSD into `basic.spin`'s slot, the page's Z, then the T into the
@@ -191,10 +194,11 @@ const CONTROLS = {
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the roof over its near end and the cell beyond it, the cell over its middle and the second
  *  slot's arms open), the two rows the TSD clears, or the row under them (the cell under the nub and the S's foot,
- *  the second slot's open nub, the L's foot). The cleared rows are entailed by the clear and admit every flat,
- *  nub-down full TSD whose window is on the board; the row above and the row below each cut that down by an order of
- *  magnitude and neither alone reaches the headline, so both are doing work. The `no_roof` ablation (the window less
- *  the row above the T) is exactly `below`. */
+ *  the second slot's open nub, the L's foot). The cleared rows are entailed by the
+ *  clear and admit every flat, nub-down full TSD whose window is on the board, so they do no work. The row above and
+ *  the row below each cut that down — the row below by at least ten times, the row above by less (both asserted
+ *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
+ *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
 const PART_ONLY = { above: 1172, cleared: 8786, below: 691 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -404,7 +408,7 @@ test('pinned: denominators, hits, follow-ups, controls', () => {
 test('STMB Cave, Double Dagger, BT砲 and Cut Copy are not this: anchored on the same flat T, the windows clash in every pairing', () => {
   const norm = (P: ReturnType<typeof prepare>[number]) => {
     const r = Math.min(...P.T.map(x => x.r)), c = Math.min(...P.T.map(x => x.c));
-    return { T: P.T.map(x => `${x.r - r},${x.c - c}`).sort().join(' '),
+    return { mirrored: P.mirrored, T: P.T.map(x => `${x.r - r},${x.c - c}`).sort().join(' '),
              cells: new Map(P.cells.map(x => [`${x.r - r},${x.c - c}`, x.v])) };
   };
   const mine = hitKeys();
@@ -414,8 +418,14 @@ test('STMB Cave, Double Dagger, BT砲 and Cut Copy are not this: anchored on the
       expect(a.T, other.key).toBe(b.T);
       const clash = [...a.cells].filter(([k, v]) => b.cells.has(k) && b.cells.get(k) !== v && v !== 'T');
       expect(clash.length, other.key).toBeGreaterThan(0);
-      // against STMB Cave, one of the clashes is the cell under the nub (`1,1` from the T's top-left)
-      if (other.key === 'stmbcave') expect(clash.map(([k]) => k)).toContain('2,1');
+      // against STMB Cave in the same hand, the clashes are exactly the cell under the nub (`2,1` from the T's
+      // top-left; the nub is `1,1`) and its neighbour under one arm — the transcription's `clash`, which the gate
+      // also re-measures. Across hands the two windows are not the same shape at all (more cells clash).
+      if (other.key === 'stmbcave' && a.mirrored === b.mirrored) {
+        const want = TR.cross_source.stmb_cave.clash[a.mirrored ? 'mirrored' : 'as_drawn'].map(([r, c]: number[]) => `${r},${c}`);
+        expect(clash.map(([k]) => k).sort(), other.key).toEqual([...want].sort());
+        expect(want, other.key).toEqual(a.mirrored ? ['2,0', '2,1'] : ['2,1', '2,2']);
+      }
     }
     const theirs = JSON.parse(readFileSync(other.artefactPath, 'utf8')).hits;
     const k = (h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`;
@@ -445,6 +455,10 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
   }
   expect(got).toEqual(PART_ONLY);
   for (const n of Object.values(PART_ONLY)) expect(n).toBeGreaterThan(art().hits.length);
+  // what the comment above claims: the row below cuts the cleared rows by at least ten times, the row above by less
+  expect(PART_ONLY.cleared).toBeGreaterThanOrEqual(10 * PART_ONLY.below);
+  expect(PART_ONLY.above).toBeLessThan(PART_ONLY.cleared);
+  expect(PART_ONLY.cleared).toBeLessThan(10 * PART_ONLY.above);
   // the no_roof ablation (the window less the row above the T) is exactly the `below` part
   expect(total(art().variants.shachikutrain.controls.ablation.no_roof)).toBe(PART_ONLY.below);
 }, 600_000);

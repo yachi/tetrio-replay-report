@@ -45,8 +45,9 @@ into T's and records each T on its own (`slot`).
 
 WHAT THE WINDOW DOES NOT EXPRESS, measured and named rather than fitted (`not_expressed`): the page's own
 sentence 「(Z)は1回目のT-spinを打った後に置いても構いません」 — the T-hole build's Z may go in after the first
-T-spin. Two of its cells are the outer slot's wall beside its arms, which every drawing fills; with the Z left
-out the window fires nowhere on the build (`extra_checks` measures it), so a Cut Copy built that way is no hit.
+T-spin. One of its cells (`decides`) is the outer slot's wall beside its arms row, which every drawing fills; the
+window reads no other cell of that Z, so with the Z left out it fires nowhere on the build (`extra_checks` measures
+both: which cells of the Z decide, and that the build less the Z fires nowhere), and a Cut Copy built that way is no hit.
 
 WHAT IS AN INFERENCE, flagged in the JSON (`reading`, the legend) rather than in prose only:
 
@@ -76,6 +77,8 @@ from pipeline.openers.technique_transcription import node
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / 'cutcopy-technique.json'
+#: where the `cross:` rule reads the other technique transcriptions; the selftest points it at a planted one
+TECHNIQUE_DIR = HERE
 BT_FILE = 'btcannon-technique.json'
 
 ALPHABET = frozenset('-cCTjosz')
@@ -223,10 +226,11 @@ VARIANTS = [{
     'misses': ['second.spin', 'basic.after', 'hole.terrain', 'col3.terrain'],
     #: a Cut Copy the page describes and the window does not fire on: measured, not fitted
     'not_expressed': [
-        {'board': 'hole.osz', 'less': 'z', 'quote': 'z_later',
-         'reason': 'the page lets the T-hole build\'s Z go in after the first T-spin. Two of its cells are the outer '
-                   'slot\'s wall beside its arms row, which every drawing fills, so with the Z left out the window fires '
-                   'nowhere on the build: a Cut Copy built in that order is no hit'},
+        {'board': 'hole.osz', 'less': 'z', 'quote': 'z_later', 'decides': [[2, 8]],
+         'reason': 'the page lets the T-hole build\'s Z go in after the first T-spin. One of its cells (`decides`) is '
+                   'the outer slot\'s wall beside its arms row, which every drawing fills; the window reads none of its '
+                   'other three, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that '
+                   'order is no hit'},
     ],
 }]
 
@@ -591,7 +595,10 @@ def extra_checks(data: dict):
         bad.append('mirror: the page\'s agreement drawings are not fires_on (as drawn) and fires_mirrored (mirrored)')
     # later: a Cut Copy the page describes and the window does not express, both halves measured
     qids = {q['id'] for q in data['quotes']}
-    for e in v.get('not_expressed', []):
+    if not v.get('not_expressed'):
+        bad.append('later: no not_expressed record (the page\'s own 「(Z)は1回目のT-spinを打った後に置いても構いません」 '
+                   'reading is required, never defaulted)')
+    for e in v.get('not_expressed') or []:
         n = by.get(e.get('board'))
         if n is None or not e.get('reason') or e.get('quote') not in qids:
             bad.append(f'later: not_expressed {e.get("board")!r} names no node, no quote or carries no reason')
@@ -607,6 +614,14 @@ def extra_checks(data: dict):
             bad.append(f'later: the window fires on {e["board"]} less {e["less"]!r}, listed as not expressed')
         if not _fires_anywhere(data, n['rows']):
             bad.append(f'later: the window does not fire on {e["board"]} with its pieces in either')
+        # decides: exactly the cells of the later piece whose removal ALONE stops the window, measured cell by cell
+        cells = [(r, c) for r, row in enumerate(n['rows']) for c, ch in enumerate(row) if ch in e['less']]
+        deciding = sorted([r, c] for r, c in cells if not _fires_anywhere(
+            data, [''.join(EMPTY if (rr, cc) == (r, c) else ch for cc, ch in enumerate(row))
+                   for rr, row in enumerate(n['rows'])]))
+        if deciding != sorted(e.get('decides') or []):
+            bad.append(f'later: the cells of {e["board"]}\'s {e["less"]!r} that alone stop the window are {deciding}, '
+                       f'not_expressed records {e.get("decides")}')
     # after: the first TSD's after board is derived (the page draws it with the second T in), so the after rule is here
     sp = by['basic.spin']
     got, _n = after_spin([''.join('t' if (r, c) in TT.spin_cells(sp) else ('-' if TT.is_empty(ch, SPEC) else 'c')
@@ -620,7 +635,10 @@ def extra_checks(data: dict):
         bad.append('after: the follow-up slot is not the T second.spin draws')
     # harddrop: every recorded entry is ten wide; its slot is one of its drawn T's; checked here on the DATA (the
     # agreement rule reads the pristine build through the spec)
-    hd = xs.get('harddrop', {})
+    hd = xs.get('harddrop')
+    if not hd:
+        bad.append('harddrop: no harddrop record (the Cut_copy page this page cites is required, never defaulted)')
+        hd = {}
     seen = set()
     for d in hd.get('drawings', []):
         k = (d['table'], d['board'], str(d['slot']))
@@ -665,7 +683,7 @@ def extra_checks(data: dict):
         if any('U' in r for r in d['rows']) or hits != [(d['slot'], d['mirrored'])]:
             bad.append(f'harddrop: table {d["table"]} board {d["board"]} draws a T, or the window does not fire on it '
                        f'once at {d["slot"]} ({"mirrored" if d["mirrored"] else "as drawn"})')
-    if hd.get('page') not in ' '.join(data['source'].get('references', [])):
+    if hd and hd.get('page') not in ' '.join(data['source'].get('references', [])):
         bad.append('harddrop: the harddrop page read is not the one the page cites as its reference')
     # bt: the Cut Copy harddrop's BT_Cannon page draws, read out of the BT砲 transcription; this window fires on that
     # record's boards there and nowhere else, and the BT record's own note names it a Cut Copy
@@ -693,7 +711,7 @@ def extra_checks(data: dict):
                 bad.append(f'bt: this window fires on {bc["file"]}\'s harddrop boards {got}, not once at '
                            f'table {bc["table"]} board {bc["board"]} ({"mirrored" if bc["mirrored"] else "as drawn"})')
     # same author: this window fires on no board of the other shiwehi.com technique transcriptions (measured)
-    for f in sorted(HERE.glob('*-technique.json')):
+    for f in sorted(TECHNIQUE_DIR.glob('*-technique.json')):
         if f.name == OUT.name:
             continue
         other = json.loads(f.read_text())
@@ -773,6 +791,11 @@ MUTANTS = [
     (lambda d: _var(d)['not_expressed'][0].__setitem__('less', 's'), 'the wrong piece read as placed later', 'later:'),
     (lambda d: _var(d)['not_expressed'][0].__setitem__('reason', ''), 'not_expressed without a reason', 'later:'),
     (lambda d: _var(d)['not_expressed'][0].__setitem__('quote', 'nope'), 'not_expressed naming no quote', 'later:'),
+    (lambda d: _var(d).pop('not_expressed'), 'the not_expressed record dropped', 'later:'),
+    (lambda d: _var(d)['not_expressed'][0].__setitem__('decides', [[2, 8], [2, 9]]),
+     'two of the Z\'s cells read as deciding', 'later:'),
+    (lambda d: _var(d)['not_expressed'][0].pop('decides'), 'the deciding cells unrecorded', 'later:'),
+    (lambda d: d['cross_source'].pop('harddrop'), 'no harddrop record', 'harddrop:'),
     (lambda d: _set(node(d, 'hole.osz')['rows'], 1, 4, 'z'), 'a piece broken', 'discrepancy:'),
     (lambda d: _hdd(d, 0).__setitem__('mirrored', True), 'a harddrop drawing read mirrored', 'harddrop:'),
     (lambda d: _set(_hdd(d, 0)['rows'], 3, 1, '-'), 'a harddrop drawing\'s outer wall dropped', 'harddrop:'),
@@ -850,6 +873,27 @@ def _synthetic_harddrop(data: dict) -> str:
     return '\n'.join(out)
 
 
+def _cross_plant_problems(planted: bool) -> list[str]:
+    """The `cross:` rule run with TECHNIQUE_DIR pointed at a temporary directory holding one other transcription:
+    planted, a node that is this page's own TSD board (the window must fire on it); not planted, the same file with
+    that board's T moved out of the window (a control: the rule must stay quiet)."""
+    global TECHNIQUE_DIR
+    base = build()
+    spin = copy.deepcopy(next(n for n in base['nodes'] if n['id'] == base['variants'][0]['board']))
+    if not planted:
+        spin['rows'] = [EMPTY * len(r) for r in spin['rows']]
+    fake = {'nodes': [spin], 'empty_letters': base.get('empty_letters', '')}
+    saved = TECHNIQUE_DIR
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / 'planted-technique.json').write_text(json.dumps(fake))
+        TECHNIQUE_DIR = Path(td)
+        try:
+            bad, _measured = extra_checks(base)
+        finally:
+            TECHNIQUE_DIR = saved
+    return [x for x in bad if x.startswith('cross:')]
+
+
 def selftest() -> int:
     rc = TT.run_selftest(SPEC, MUTANTS, {'board': ('CCCCCCTTTC', 'CCCCCCTTTc'), 'text': ('T穴からの組み方', 'T穴からの組方')},
                          SPEC_MUTANTS)
@@ -900,6 +944,14 @@ def selftest() -> int:
         ok = False
     else:
         print('  killed: the harddrop snapshot missing / its bytes not the pinned revision  [harddrop:]')
+    for planted, label in ((True, 'this page\'s own TSD board planted in another technique transcription'),
+                           (False, 'control: the same file with that board emptied')):
+        got = _cross_plant_problems(planted)
+        if bool(got) != planted:
+            print(f'selftest FAILED: {label}: cross: reported {got[:2]}')
+            ok = False
+        else:
+            print(f'  {"killed" if planted else "control quiet"}: {label}  [cross:]')
     print('selftest: harddrop checks all caught' if ok else 'selftest: FAILED')
     return 0 if ok else 1
 

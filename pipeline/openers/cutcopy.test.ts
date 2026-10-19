@@ -17,7 +17,9 @@
  *      window clashes with each of theirs on a cell in every pairing of hands (re-derived from the transcriptions),
  *      so no lock is a hit of two of them, and none is.
  *   5. WHAT DISCRIMINATES: measured per window part, with the T anchored (the row above the T, the cleared rows,
- *      the row under them), against the headline: no single part gives it, so each is doing work.
+ *      the row under them), against the headline: no single part gives it. The cleared rows are entailed by the
+ *      clear and do no work; the row above and the row below each cut them down (the row below by at least ten
+ *      times, the row above by less — both asserted), so those two are what discriminate.
  *   6. NAMED lists, not bounds; pinned per-player figures; mutants, each with its asserted symptom (the one
  *      equivalent mutant named, measured, asserted to STAY byte-identical).
  *   7. THE FOLLOW-UP on the page's own drawings: the TSD into `basic.spin`'s slot, then the T into the slot
@@ -217,9 +219,10 @@ const CONTROLS = {
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the outer slot's arms, the wall beside them, the roof and the cell beyond it), the two rows
  *  the TSD clears, or the row under them (the outer slot's nub cell, walled). The cleared rows are entailed by the
- *  clear and admit every flat, nub-down full TSD whose window is on the board; the row above and the row below each cut that
- *  down by an order of magnitude and neither alone reaches the headline, so both are doing work. The `no_roof`
- *  ablation (the window less the row above the T) is exactly `below`. */
+ *  clear and admit every flat, nub-down full TSD whose window is on the board, so they do no work. The row above and
+ *  the row below each cut that down — the row below by at least ten times, the row above by less (both asserted
+ *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
+ *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
 const PART_ONLY = { above: 1477, cleared: 8786, below: 741 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -467,6 +470,10 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
   }
   expect(got).toEqual(PART_ONLY);
   for (const n of Object.values(PART_ONLY)) expect(n).toBeGreaterThan(art().hits.length);
+  // what the comment above claims: the row below cuts the cleared rows by at least ten times, the row above by less
+  expect(PART_ONLY.cleared).toBeGreaterThanOrEqual(10 * PART_ONLY.below);
+  expect(PART_ONLY.above).toBeLessThan(PART_ONLY.cleared);
+  expect(PART_ONLY.cleared).toBeLessThan(10 * PART_ONLY.above);
   // the no_roof ablation (the window less the row above the T) is exactly the `below` part
   expect(total(art().variants.cutcopy.controls.ablation.no_roof)).toBe(PART_ONLY.below);
 }, 600_000);

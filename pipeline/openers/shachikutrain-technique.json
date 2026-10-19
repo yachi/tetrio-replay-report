@@ -2069,7 +2069,34 @@
           ]
         }
       ],
-      "relation": "measured: anchored on the same flat T the two windows clash on the cell under the nub (STMB Cave empty, the cave; this window filled), so each fires on its own base only and 「the same shape」 holds everywhere both windows read but that cell"
+      "clash": {
+        "as_drawn": [
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "mirrored": [
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      },
+      "rows_both_read": [
+        0,
+        1,
+        2
+      ],
+      "relation": "measured: anchored on the same flat T the two windows clash at two cells, both in the row under the nub row: the cell under the nub and its neighbour under one arm (`clash`; STMB Cave empty, the cave three wide; this window filled, the J), so each fires on its own base only. They agree in the cleared rows, the only other rows both read (`rows_both_read`): STMB Cave's window does not read the row above the T"
     },
     "fires": [],
     "also": [

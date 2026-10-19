@@ -434,7 +434,13 @@
           "board": "hole.osz",
           "less": "z",
           "quote": "z_later",
-          "reason": "the page lets the T-hole build's Z go in after the first T-spin. Two of its cells are the outer slot's wall beside its arms row, which every drawing fills, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that order is no hit"
+          "decides": [
+            [
+              2,
+              8
+            ]
+          ],
+          "reason": "the page lets the T-hole build's Z go in after the first T-spin. One of its cells (`decides`) is the outer slot's wall beside its arms row, which every drawing fills; the window reads none of its other three, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that order is no hit"
         }
       ]
     }

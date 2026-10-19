@@ -4306,8 +4306,10 @@ board fires (`routes_fire_none`), and none of the other technique transcriptions
 Like BT砲's, the harddrop record is not a `*-routes.json`, so `check_wikitext_sources` does not re-read it weekly: an open item.
 
 **What the window does not express is named, from the page's own sentence**: 「(Z)は1回目のT-spinを打った後に置いても構いません」.
-Two of that Z's cells are the outer slot's wall, which every drawing fills, so the T-hole build with its Z left out fires nowhere
-(`not_expressed`, measured; the piece left out must be the sentence's own mino icon, `later:`).
+One of that Z's cells is the outer slot's wall, which every drawing fills, and the window reads none of the other three (measured
+cell by cell and recorded as `decides`), so the T-hole build with its Z left out fires nowhere (`not_expressed`, measured and
+required, never defaulted; the piece left out must be the sentence's own mino icon, `later:`). This read 「two of that Z's cells」
+until an audit removed each Z cell on its own: the mirrored window spans columns 3-8, so one of the two wall cells is outside it.
 
 **What discriminates is measured per window part** (`cutcopy.test.ts`, `PART_ONLY`): the cleared rows (entailed by the clear) admit every flat,
 nub-down full TSD whose window is on the board, and the row above and the row below each cut that down without reaching the headline alone, so both are
@@ -4370,9 +4372,13 @@ The rule ties `not_expressed` to the open cell under the nub, both ways (`later:
 caption equal to that file's quoted sentence) says a variation 「has the same shape and steps as Shachiku Train」. Its table 17
 draws that variation (an O base: a cave three wide under the T), the Shachiku Train it compares (a J base) and the second TSD.
 This window fires on the J base only and STMB Cave's (`stmbcave-technique.json`) on the O base only (`stmb:`); the bases differ
-only in the row under the T, and the two windows, anchored on the same flat T, clash at the cell under the nub (the test asserts
-it). harddrop's own Shachiku_Train page draws the same comparison (its tables 10 and 11; the gate holds the boards equal). So
-「the same shape」 holds above the T and in the cleared rows and fails at that one cell, which is the one that tells them apart.
+only in the row under the nub row, and the two windows, anchored on the same flat T, clash at TWO cells there: the cell under the
+nub and its neighbour under one arm (the right as drawn, the left mirrored), recorded as `clash` and re-measured by the gate
+(`stmb:`) and the test. harddrop's own Shachiku_Train page draws the same comparison (its tables 10 and 11; the gate holds the
+boards equal). So 「the same shape」 holds in the cleared rows, where both windows read and agree, and fails at those two cells;
+STMB Cave's window does not read the row above the T (`rows_both_read`), so nothing compares the two there. This paragraph
+said 「the cell under the nub」 and 「holds above the T」 until an audit anchored both windows: the test's `toContain` could not
+see the second cell, and the row above the T was never read by both.
 
 **What discriminates is measured per window part** (`shachikutrain.test.ts`, `PART_ONLY`), as for 千鳥格子: neither part above or
 below the cleared rows reaches the headline alone, and `noMustEmpty` and `noRoof` are live mutants whose hits are their ablations'.

@@ -61,9 +61,12 @@ STMB CAVE, MEASURED, NOT ASSUMED. harddrop's STMB_Cave page (wiki-tspin-techniqu
 「has the same shape and steps as Shachiku Train」. Its table 17 draws that variation (an O base: a cave three
 wide under the T), the Shachiku Train it compares (a J base) and the second TSD. Measured (`stmb:`): this window
 fires on the J base only and STMB Cave's window on the O base only; anchored on the same flat T the two windows
-clash on the cell under the nub (STMB Cave: empty, the cave; this page: filled). So 「the same shape」 holds above
-the T and in the cleared rows and fails at that one cell, which is what tells the two apart; harddrop's own
-Shachiku_Train page draws the same comparison (its tables 10 and 11), and the gate holds the boards equal.
+clash at TWO cells, both in the row under the nub row: the cell under the nub and its neighbour under one arm (the
+right arm as drawn, the left mirrored; STMB Cave: empty, the cave three wide; this page: filled, the J). They agree
+in the cleared rows, the only other rows both read: STMB Cave's window does not read the row above the T, so
+「the same shape」 is measured there by this window alone. The two clashing cells and the rows both windows read are
+recorded (`clash`, `rows_both_read`) and the gate re-measures them (`stmb:`); harddrop's own Shachiku_Train page
+draws the same comparison (its tables 10 and 11), and the gate holds the boards equal.
 
 WHAT IS AN INFERENCE, flagged in the JSON (`reading`, the legend) rather than in prose only:
 
@@ -94,6 +97,8 @@ from pipeline.openers.technique_transcription import node
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / 'shachikutrain-technique.json'
+#: where the `cross:` rule reads the other technique transcriptions; the selftest points it at a planted one
+TECHNIQUE_DIR = HERE
 STMB_FILE = 'stmbcave-technique.json'
 STSD_FILE = 'stsd-technique.json'
 WIKI_FILE = 'wiki-tspin-techniques.json'
@@ -482,9 +487,14 @@ STMB_CAVE = {
          'same_as': [9, 3], 'same_note': 'harddrop\'s Shachiku_Train page draws it with one more empty row on top',
          'rows': _b('---------- ---------- -----z---- ---gzz---- ggggzUUUgg ggggggUggg')},
     ],
-    'relation': 'measured: anchored on the same flat T the two windows clash on the cell under the nub (STMB Cave '
-                'empty, the cave; this window filled), so each fires on its own base only and 「the same shape」 holds '
-                'everywhere both windows read but that cell',
+    #: offsets (row, column) from the T's top-left, per hand (both windows in the same hand); rows relative to the T's
+    #: row. Measured by the gate from the two transcriptions' windows (`stmb:`), never typed for the prose to carry
+    'clash': {'as_drawn': [[2, 1], [2, 2]], 'mirrored': [[2, 0], [2, 1]]},
+    'rows_both_read': [0, 1, 2],
+    'relation': 'measured: anchored on the same flat T the two windows clash at two cells, both in the row under the nub '
+                'row: the cell under the nub and its neighbour under one arm (`clash`; STMB Cave empty, the cave three '
+                'wide; this window filled, the J), so each fires on its own base only. They agree in the cleared rows, '
+                'the only other rows both read (`rows_both_read`): STMB Cave\'s window does not read the row above the T',
 }
 
 CROSS_SOURCE = {
@@ -707,6 +717,26 @@ def _other(fname: str) -> tuple[dict, dict, TT.TechniqueSpec]:
     return other, other['variants'][0], ospec
 
 
+def _stmb_clash(data: dict) -> tuple[dict, list[int]]:
+    """This window against STMB Cave's, both anchored on the same flat T in the same hand: the cells (row, column
+    from the T's top-left) where one needs filled and the other empty, per hand, and the rows (relative to the T's
+    row) both windows read."""
+    other, ov, ospec = _other(STMB_FILE)
+
+    def norm(d, var, spec, m):
+        W = TT.window_cells(d, var, spec, m)
+        T = [k for k, x in W.items() if x == 'T']
+        r0, c0 = min(r for r, _ in T), min(c for _, c in T)
+        return {(r - r0, c - c0): x for (r, c), x in W.items()}
+    clash, rows = {}, None
+    for m, name in ((False, 'as_drawn'), (True, 'mirrored')):
+        a, b = norm(data, data['variants'][0], SPEC, m), norm(other, ov, ospec, m)
+        clash[name] = sorted([r, c] for (r, c) in a if (r, c) in b and a[(r, c)] != b[(r, c)] and 'T' not in
+                             (a[(r, c)], b[(r, c)]))
+        rows = sorted({r for r, _ in a} & {r for r, _ in b})
+    return clash, rows
+
+
 def _fires_other(fname: str, rows: list[str]) -> list[tuple]:
     other, ov, ospec = _other(fname)
     pre = _pre(rows)
@@ -921,8 +951,14 @@ def extra_checks(data: dict):
                            f'{b["same_as"][0]} board {b["same_as"][1]} (empty rows on top aside)')
         if [sorted(b['fires']['shachikutrain'] + b['fires']['stmbcave']) for b in sc['boards']].count([False]) != 2:
             bad.append('stmb: the comparison is not one board per window')
+        clash, rows_both = _stmb_clash(data)
+        if clash != sc.get('clash'):
+            bad.append(f'stmb: anchored on the same flat T the two windows clash at {clash}, the record holds '
+                       f'{sc.get("clash")}')
+        if rows_both != sc.get('rows_both_read'):
+            bad.append(f'stmb: the rows both windows read are {rows_both}, the record holds {sc.get("rows_both_read")}')
     # same author: this window fires on no board of the other shiwehi.com technique transcriptions (measured)
-    for f in sorted(HERE.glob('*-technique.json')):
+    for f in sorted(TECHNIQUE_DIR.glob('*-technique.json')):
         if f.name == OUT.name:
             continue
         other = json.loads(f.read_text())
@@ -1036,6 +1072,10 @@ MUTANTS = [
     (lambda d: d['cross_source']['stmb_cave'].__setitem__('caption', 'Compare this.'), 'the caption not the quoted one',
      'stmb:'),
     (lambda d: d['cross_source'].pop('stmb_cave'), 'no STMB_Cave record', 'stmb:'),
+    (lambda d: d['cross_source']['stmb_cave']['clash'].__setitem__('as_drawn', [[2, 1]]),
+     'the two windows read as clashing at the cell under the nub alone', 'stmb:'),
+    (lambda d: d['cross_source']['stmb_cave'].__setitem__('rows_both_read', [-1, 0, 1, 2]),
+     'the row above the T read as measured by both windows', 'stmb:'),
     (lambda d: d['cross_source']['also'].clear(), 'the stick spin board unrecorded', 'cross:'),
     (lambda d: d['cross_source'].pop('routes_fire_none'), 'no independent routes board and no reason', 'cross:'),
     (lambda d: node(d, 'dt').__setitem__('caption_quote', 'nope'), 'a caption naming no quote', 'quote:'),
@@ -1103,6 +1143,27 @@ def _synthetic_stmb(data: dict) -> str:
                                {sc['table']: sc['caption']})
 
 
+def _cross_plant_problems(planted: bool) -> list[str]:
+    """The `cross:` rule run with TECHNIQUE_DIR pointed at a temporary directory holding one other transcription:
+    planted, a node that is this page's own TSD board (the window must fire on it); not planted, the same file with
+    that board's T moved out of the window (a control: the rule must stay quiet)."""
+    global TECHNIQUE_DIR
+    base = build()
+    spin = copy.deepcopy(next(n for n in base['nodes'] if n['id'] == base['variants'][0]['board']))
+    if not planted:
+        spin['rows'] = [EMPTY * len(r) for r in spin['rows']]
+    fake = {'nodes': [spin], 'empty_letters': base.get('empty_letters', '')}
+    saved = TECHNIQUE_DIR
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / 'planted-technique.json').write_text(json.dumps(fake))
+        TECHNIQUE_DIR = Path(td)
+        try:
+            bad, _measured = extra_checks(base)
+        finally:
+            TECHNIQUE_DIR = saved
+    return [x for x in bad if x.startswith('cross:')]
+
+
 def selftest() -> int:
     rc = TT.run_selftest(SPEC, MUTANTS, {'board': ('cccccUUUll', 'cccccUUUlc'), 'text': ('4x2の窪み', '4x2の凹み')},
                          SPEC_MUTANTS)
@@ -1157,6 +1218,14 @@ def selftest() -> int:
         ok = False
     else:
         print('  killed: a harddrop snapshot missing / its bytes not the pinned revision  [harddrop: stmb:]')
+    for planted, label in ((True, 'this page\'s own TSD board planted in another technique transcription'),
+                           (False, 'control: the same file with that board emptied')):
+        got = _cross_plant_problems(planted)
+        if bool(got) != planted:
+            print(f'selftest FAILED: {label}: cross: reported {got[:2]}')
+            ok = False
+        else:
+            print(f'  {"killed" if planted else "control quiet"}: {label}  [cross:]')
     print('selftest: harddrop checks all caught' if ok else 'selftest: FAILED')
     return 0 if ok else 1
 
