@@ -276,10 +276,30 @@ test('what discriminates: the T anchored with the cross\'s filled cells alone, a
 test('cross-check: the route artefacts\' rounds that reached an Imperial Cross node, or its SDPC Spin parent', () => {
   const A = `${import.meta.dir}/../../analysis`;
   const reached: string[] = [];
-  for (const f of readdirSync(A).filter(x => /^(sdpcspin|stickspin|gamushiro|honey-cup|mountainous2|stray-cannon)-facts\.json$/.test(x)).sort()) {
-    for (const c of JSON.parse(readFileSync(`${A}/${f}`, 'utf8')).cases)
-      for (const s of c.snapshots ?? []) if (/imperial/.test(s.node)) reached.push(`${f} ${c.session} m${c.match}r${c.round} ${c.player} ${s.node}`);
+  // the scan reads EVERY string of a case (snapshots, pc, deepest, bag2 …), not one field: a node recorded in a
+  // field this test did not name, or a renamed field, must not empty the scan while the named list is empty.
+  // `snapshots` is required, never defaulted: a case without it is a red build, not a case with none.
+  const strings = (o: any, path: string, out: [string, string][]) => {
+    if (typeof o === 'string') out.push([path, o]);
+    else if (Array.isArray(o)) o.forEach((x, i) => strings(x, `${path}[${i}]`, out));
+    else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) strings(v, path ? `${path}.${k}` : k, out);
+    return out;
+  };
+  const files = readdirSync(A).filter(x => /^(sdpcspin|stickspin|gamushiro|honey-cup|mountainous2|stray-cannon)-facts\.json$/.test(x)).sort();
+  expect(files.length).toBe(6);
+  for (const f of files) {
+    const cases = JSON.parse(readFileSync(`${A}/${f}`, 'utf8')).cases;
+    expect(Array.isArray(cases) && cases.length > 0, f).toBe(true);
+    for (const c of cases) {
+      expect(Array.isArray(c.snapshots), `${f} ${c.session} m${c.match}r${c.round} ${c.player}: no snapshots`).toBe(true);
+      for (const [p, s] of strings(c, '', [])) if (/imperial/.test(s)) reached.push(`${f} ${c.session} m${c.match}r${c.round} ${c.player} ${p}=${s}`);
+    }
   }
+  // control: the scan's pattern names real route nodes on each route page that draws an Imperial Cross, so an
+  // empty result is a measurement over nodes that exist, not a regex that can match nothing
+  for (const o of ['gamushiro', 'sdpcspin', 'stickspin'])
+    expect(JSON.parse(readFileSync(`${import.meta.dir}/${o}-routes.json`, 'utf8')).nodes
+      .some((n: any) => /imperial/.test(n.id)), o).toBe(true);
   checkNamedList('route_imperial_reached', reached, ROUTE_IMPERIAL_REACHED);
   // the SDPC Spin parent: harddrop draws the Imperial Cross in bag 4 of the route, so the drawn continuation
   // ends at the last lock of bag 4 (0-based, seven locks a bag)
@@ -339,8 +359,17 @@ test('mutants: each rule turned off turns this red with its own symptom', () => 
   a = mut({ includeMini: true });
   expect(tss(a)).toBe(tss(b) + b.denominators.pinglamb.mini_TSS.all + b.denominators.yachi.mini_TSS.all);
 
+  // no anchor: the count is the t_overlap ablation's — which on this corpus EQUALS the headline (measured), so
+  // that line alone cannot tell the mutant from the baseline. What does: with no anchor there is no window
+  // offset, so nothing can leave the board and no follow-up can be carried (every hit is `not_anchored`).
   a = mut({ tOverlap: true });
   expect(sum(a, 'all')).toBe(total(b.variants.imperialcross.controls.ablation.t_overlap));
+  expect(a.lists.window_off_board).toEqual([]);
+  expect(b.lists.window_off_board.length).toBeGreaterThan(0);
+  expect(fired(a)).toBe(0);
+  expect(fired(b)).toBeGreaterThan(0);
+  expect(a.hits.length).toBeGreaterThan(0);
+  expect(a.hits.every((h: any) => h.followup.reason === 'not_anchored')).toBe(true);
 
   a = mut({ rowAnchorOff1: true });
   expect(sum(a, 'all')).toBe(0);

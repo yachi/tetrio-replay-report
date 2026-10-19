@@ -515,9 +515,14 @@ test('mutants: each rule turned off turns this red with its own symptom', () => 
   expect(tsd(a)).toBe(tsd(b));
 
   // no row map: the hit's own clear is ABOVE the slot (it does not move it), so only a later clear or
-  // garbage row can; the follow-ups that fired needed none, the misses change reason
+  // garbage row can. Measured: some follow-ups that fired needed one (they stop firing), none fires that
+  // did not, and some misses change reason or lock — the hits themselves do not move
   a = mut({ followupNoRowmap: true });
   expect(a.hits.map(k)).toEqual(b.hits.map(k));
+  expect(fired(a)).toBeLessThan(fired(b));
+  expect(a.hits.every((h: any, i: number) => !h.followup.fired || b.hits[i].followup.fired)).toBe(true);
+  expect(a.hits.some((h: any, i: number) => !b.hits[i].followup.fired
+    && JSON.stringify(h.followup) !== JSON.stringify(b.hits[i].followup))).toBe(true);
 
   a = mut({ followupAnyT: true });
   expect(fired(a)).toBeGreaterThan(fired(b));

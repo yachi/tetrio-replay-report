@@ -4077,8 +4077,11 @@ author's stick spin cave is over a FOUR-wide gap and is named, not fitted (the a
 is filled on every drawing in the agreement set).
 
 **`window_off_board` is a count with a property check, not a list.** The window holds the row under the
-nub, so every TSD on the floor, and every one hard against a wall, leaves the board: thousands of them.
-The test pins the count per player and checks every entry is a flat nub-down T whose window leaves the
+nub, so every TSD on the floor, and every one hard against a wall, leaves the board — far too many to list
+(the size is the artefact's and the test's, never this file's). **A window cell past the side or the floor is
+"leaves the board", never "filled"**, for every technique: the drawings draw stack in those cells, and the wall
+is not read as standing in for it, so a shape built flush against the wall is not a hit. That is a definition,
+not a measurement, and `stmbcave.test.ts` names the cave it costs (`CAVE_METRIC_ONLY`, reason `wall`). The test pins the count per player and checks every entry is a flat nub-down T whose window leaves the
 board in at least one hand and is not a hit — not an exact re-derivation, because the matcher returns
 "off board" only when no in-board cell failed first (iteration order; the `garbageEmpty` mutant moves
 entries out of that list and no hit, which is its asserted symptom).
@@ -4136,8 +4139,10 @@ arm) and the `no_must_empty` one (every filled cell, the overhang's included) ea
 so `noMustEmpty` and `noRoof` are measured EQUIVALENT mutants, named and asserted byte-identical.
 
 **Cross-checks against the route artefacts:** no corpus round reached any route page's Imperial Cross node
-(named, empty); the one SDPC Spin round that reached its parent `3.third` is measured over bag 4 (the bag
-harddrop draws the Imperial Cross in, re-derived from `sdpcspin-routes.json`) and named with what happened.
+(named, empty — the scan reads every string of every case, not one field, and `snapshots` is required, never
+defaulted); every SDPC Spin round that reached its parent `3.third` is measured over bag 4 (the bag harddrop
+draws the Imperial Cross in, re-derived from `sdpcspin-routes.json`) and named with what happened
+(`SDPC_THIRD_ROUNDS`; how many is the test's).
 
 **No demo is built, and every board says why** (`imperialcross-demos.test.ts` re-derives each): the basic
 form and the bare cross have an ODD cell count (a proof); the TSD-shape terrain has no tiling by tetrominoes
@@ -4178,7 +4183,7 @@ C-Spin build's bag-5 boards — the T in the slot the build makes, directly over
 the gate's `cross:` rule finds them; no routes board is LABELLED ダブルダガー. shiwehi.com's own インペリアルクロス
 page draws a Double Dagger as its `dagger` miss and this page draws an インペリアルクロス (`cross.imperial`): the
 `imperial:` rule measures each window firing only on the other page's drawing (same author: corroboration).
-The one SDPC Spin round that reached that build is measured over bag 5 in the test and named.
+Every SDPC Spin round that reached that build is measured over bag 5 in the test and named (`SDPC_SECOND_ROUNDS`; how many is the test's).
 
 **What discriminates is measured per window part** (`doubledagger.test.ts`, `PART_ONLY`): with the T anchored,
 the lower slot alone gives exactly the headline, while the cleared rows (entailed) and the overhang row (which a
@@ -4230,12 +4235,20 @@ them is then the independent check); and `TechniqueSpec.html_checks` extends `--
 its selftest plants an invented hit row when the case index is empty (it assumed at least one hit); the other four pages'
 selftest output is byte-identical.
 
-**The corpus holds no hit, and the test proves the predicate could have fired.** `btcannon.test.ts` pins every named list
-empty, and runs the TS `windowMatch` (the Python predicate's twin) on every recorded harddrop drawing (once, at its drawn T, in
+**The test pins the hit list as a named list, and proves the predicate could have fired** (whether the corpus
+holds a hit is that list's, never this file's). `btcannon.test.ts` pins every named list, and runs the TS `windowMatch` (the Python predicate's twin) on every recorded harddrop drawing (once, at its drawn T, in
 its recorded hand, nowhere else), on its no-T boards and on the page's own drawings. What discriminates is measured per window
 part: the rows above the T alone admit no full TSD of the corpus, so `noMustEmpty`, `garbageEmpty` and the follow-up mutants are
-EQUIVALENT here (named, asserted byte-identical), while `noRoof` turns the `below` part into the headline. The window clashes
-with STMB Cave's and ダブルダガー's on a cell in every pairing of hands.
+EQUIVALENT on the corpus (named, asserted byte-identical), while `noRoof` turns the `below` part into the headline. The
+follow-up search therefore runs nowhere on the corpus, so the test runs it on the page's own TSD → TST as a two-lock digest
+(`basic.spin`, its clear, the T into `tst.spin`'s slot), as drawn and mirrored: it fires, and each follow-up mutant breaks it
+there. The window clashes with STMB Cave's and ダブルダガー's on a cell in every pairing of hands.
+
+**harddrop's drawings are not chosen by the window.** The agreement drawings taken from harddrop are the boards whose drawn
+T the window fires on, which alone would let the window pick its own evidence. So `drawn_t_not_fired` records every OTHER
+board on that page with a drawn T — its lie, the rows it clears and why the window misses it (not the window's T, the window
+leaves the board, or a cell disagrees), measured by the gate, with a note read off the page — and `--html-dir` fails unless
+every drawn T on the page is in one list or the other. A drawing of the shape the window misses is a red build to name.
 
 **No demo is built and no chain is planned**: the shared planner reads a build's page pieces as its lower-case letters, and
 this page's 72積み builds draw them upper case (the 72積み stack lower case) while the 欄干 build's terrain carries a lower-case L

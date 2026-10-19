@@ -963,6 +963,659 @@
           ]
         }
       ],
+      "drawn_t_not_fired": [
+        {
+          "table": 3,
+          "board": 2,
+          "section": "Special β ●-hiro",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----ll----",
+            "-----loo-i",
+            "jjssUlooli",
+            "jssUUjllli",
+            "ztttUiiiis"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 3,
+          "section": "BT Cannon C-Spin",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjssUli",
+            "jjjjssUUsi",
+            "llliiiiUzz"
+          ]
+        },
+        {
+          "table": 6,
+          "board": 1,
+          "section": "BT Cannon C-Spin",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "lll-------",
+            "lz--------",
+            "zz-------i",
+            "zssoojj--i",
+            "sssooj---i",
+            "jjssijUzzi",
+            "joosilUUzz",
+            "joozilUlli",
+            "oozzill-li"
+          ]
+        },
+        {
+          "table": 6,
+          "board": 2,
+          "section": "BT Cannon C-Spin",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the C-Spin's T-spin Double, after its TST, in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "lll-------",
+            "lz--------",
+            "zz-------i",
+            "zssoojj--i",
+            "sssoojUUUi",
+            "oozzillUli"
+          ]
+        },
+        {
+          "table": 7,
+          "board": 3,
+          "section": "BT Cannon C-Spin",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "lll---s---",
+            "lz----ssoo",
+            "zzUiiiisoo",
+            "zzUUjjjooi",
+            "ssUtttllli"
+          ]
+        },
+        {
+          "table": 8,
+          "board": 1,
+          "section": "BT Cannon C-Spin",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "--------oo",
+            "--------oo",
+            "i------ssz",
+            "i--lljsszz",
+            "i---ljjjzi",
+            "issUlzooji",
+            "ssUUzzooji",
+            "lllUzlsjji",
+            "lz-lllssoo"
+          ]
+        },
+        {
+          "table": 8,
+          "board": 2,
+          "section": "BT Cannon C-Spin",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the C-Spin's T-spin Double, after its TST, in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "--------oo",
+            "--------oo",
+            "i------ssz",
+            "i--lljsszz",
+            "iUUUljjjzi",
+            "lzUlllssoo"
+          ]
+        },
+        {
+          "table": 11,
+          "board": 0,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "s---------",
+            "ssooi--zz-",
+            "jsooil--zz",
+            "jjjgil-ggg",
+            "ggggill-gg",
+            "gggggggUgg",
+            "ggggggUUgg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 11,
+          "board": 1,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "i---------",
+            "iloos--zz-",
+            "ilooss--zz",
+            "illgjs-ggg",
+            "ggggjjj-gg",
+            "gggggggUgg",
+            "ggggggUUgg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 11,
+          "board": 2,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "--s-------",
+            "jjssi--zz-",
+            "joosil--zz",
+            "joogil-ggg",
+            "ggggill-gg",
+            "gggggggUgg",
+            "ggggggUUgg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 0,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "oo--------",
+            "oo--------",
+            "szz------i",
+            "sszzljj--i",
+            "gslllj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 1,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "--zz------",
+            "sllzz----i",
+            "ssloojj--i",
+            "gslooj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 2,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "---oo-----",
+            "---oo-----",
+            "--sll----i",
+            "zzssljj--i",
+            "gzzslj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 3,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "zz--------",
+            "szzll----i",
+            "ssooljj--i",
+            "gsoolj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 4,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "oo--------",
+            "oosll----i",
+            "zzssljj--i",
+            "gzzslj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 0,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "--zz------",
+            "lllzz----i",
+            "lssoojj--i",
+            "ssgooj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 1,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "--ls------",
+            "lllss----i",
+            "oozzsjj--i",
+            "oogzzj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 2,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "-z--l-----",
+            "zzlll----i",
+            "zssoojj--i",
+            "ssgooj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 0,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a T-spin Double among the fifth bag's options (Trinity / STSD / 4-wide), in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "----------",
+            "--------ll",
+            "---------l",
+            "gg----ss-l",
+            "gggggss--g",
+            "ggggggg--g",
+            "ggggggUUUg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 1,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a T-spin Double among the fifth bag's options (Trinity / STSD / 4-wide), in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "--ssz-----",
+            "jsszzi----",
+            "jjjzli----",
+            "ggllli----",
+            "gggggi---g",
+            "ggggggg--g",
+            "ggggggUUUg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 0,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "--z-------",
+            "-zz-------",
+            "-zsll----i",
+            "oossljj--i",
+            "oogslj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 1,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----zz----",
+            "--sllzz--i",
+            "oossljj--i",
+            "oogslj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 2,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "---ss-----",
+            "--sslll--i",
+            "oozzljj--i",
+            "oogzzj---i",
+            "gggggjUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 3,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----jj----",
+            "----js----",
+            "----jss--i",
+            "oozzlls--i",
+            "oogzzl---i",
+            "ggggglUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 4,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "j----s----",
+            "jjj--ss--i",
+            "oozzlls--i",
+            "oogzzl---i",
+            "ggggglUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 22,
+          "board": 5,
+          "section": "BT Cannon C-Spin In-Depth",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "--j--s----",
+            "--jjjss--i",
+            "oozzlls--i",
+            "oogzzl---i",
+            "ggggglUggi",
+            "ggggggUUgg",
+            "ggggggUggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 24,
+          "board": 0,
+          "section": "TSM to BT",
+          "t": "stood",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "the T-spin Mini the 'TSM to BT' section makes the offset hole with, stood against the wall",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "l---------",
+            "l--------U",
+            "lls-j---UU",
+            "oossjjjzzU",
+            "oo-siiiizz"
+          ]
+        },
+        {
+          "table": 25,
+          "board": 0,
+          "section": "TSM to BT",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "------s--z",
+            "jjj---sszz",
+            "ggj--ooszl",
+            "gg---oolll",
+            "ggUiiiiggg",
+            "ggUUgggggg",
+            "ggUggggggg"
+          ]
+        },
+        {
+          "table": 25,
+          "board": 2,
+          "section": "TSM to BT",
+          "t": "flat-up",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "a flat T pointing UP into one row, in the 'TSM to BT' example's later bags",
+          "rows": [
+            "----------",
+            "-------jjj",
+            "i------zsj",
+            "il----zzss",
+            "il----zoos",
+            "ill---goog",
+            "ggg---gggg",
+            "gggU-ggggg",
+            "ggUUUggggg"
+          ]
+        },
+        {
+          "table": 28,
+          "board": 0,
+          "section": "Mid-game BT Cannon",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the Kaidan the page fires on the same base, for comparison with board 1 beside it (recorded as a drawing): no TST slot beside the T",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "-----zz---",
+            "ggsUUUzzgg",
+            "ggssUggggg",
+            "gg-sgggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 31,
+          "board": 0,
+          "section": "Mid-game BT Cannon",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the Cut Copy the page recommends before offering the BT: the TST slot's column beside the T is filled",
+          "rows": [
+            "----------",
+            "----z-----",
+            "ioozz--s--",
+            "ioozl--ss-",
+            "ijlll---sl",
+            "ijjjUUUlll",
+            "gggggUgggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 34,
+          "board": 1,
+          "section": "Mid-game BT Cannon",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---------g",
+            "---------g",
+            "--------gg",
+            "--lzz----g",
+            "lllgzzggUg",
+            "gggggggUUg",
+            "ggggggggUg",
+            "ggggggg-gg"
+          ]
+        }
+      ],
       "fires_without_slot": [
         {
           "table": 0,

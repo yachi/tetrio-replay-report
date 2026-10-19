@@ -21,6 +21,8 @@
  *   6. NAMED lists, all empty but window_off_board (pinned per player, every entry checked); pinned denominators
  *      and controls; mutants, the ones that cannot move a byte here named EQUIVALENT with their reason and asserted
  *      to stay byte-identical.
+ *   7. THE FOLLOW-UP, which no corpus hit exercises: run on the page's own TSD → TST as a two-lock digest, as
+ *      drawn and mirrored, it fires, and each follow-up mutant (equivalent on the corpus) breaks it there.
  *
  * window_off_board is not listed entry by entry: it is every flat, nub-down T at a TSD whose window leaves the
  * board before the matcher found a mismatch (the window reaches four rows above the T and one under its nub),
@@ -30,7 +32,7 @@
  */
 import { test, expect } from 'bun:test';
 import { readFileSync, readdirSync } from 'node:fs';
-import { build, serialise, digestCorpus, prepare, windowMatch, type Mutants, type TechDigest, type Cell }
+import { build, classify, serialise, digestCorpus, prepare, windowMatch, type Mutants, type TechDigest, type Cell }
   from '../sim/technique-facts.ts';
 import { BTCANNON } from '../sim/technique-profile-btcannon.ts';
 import { STMBCAVE } from '../sim/technique-profile-stmbcave.ts';
@@ -78,9 +80,9 @@ const PART_ONLY = { above: 0, overhang: 64, tst_side: 0, cleared: 9954, below: 8
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
-  followupUnmirrored: 'there is no hit, so no follow-up to carry',
-  followupNoRowmap: 'there is no hit, so no follow-up to carry',
-  followupAnyT: 'there is no hit, so no follow-up to carry',
+  followupUnmirrored: 'there is no hit, so no follow-up to carry (killed on the page\'s own TSD → TST, below)',
+  followupNoRowmap: 'there is no hit, so no follow-up to carry (killed on the page\'s own TSD → TST, below)',
+  followupAnyT: 'there is no hit, so no follow-up to carry (killed on the page\'s own TSD → TST, below)',
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
   noMustEmpty: 'the window\'s filled cells alone already match no full TSD (the no_must_empty ablation is 0 / M), '
     + 'and the matcher meets a filled-cell mismatch before it could leave the board on every flat T it reads',
@@ -345,3 +347,54 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   for (const [m] of Object.entries(EQUIVALENT))
     expect(serialise(run({ [m]: true } as Mutants)), m).toBe(base);
 }, 900_000);
+
+/** The page's own TSD → TST, as a two-lock digest: the board `basic.spin` draws (its U the T, every drawn cell
+ *  filled), the TSD's clear, then the T into the slot `tst.spin` draws. The corpus holds no hit, so the
+ *  follow-up search (the row map joining the TST slot the TSD's clear splits, and the `full:3` kind) runs
+ *  nowhere on it; this runs it, as drawn and mirrored, on a board where it can succeed and fail. */
+function pageDigest(mirrored: boolean, tstSpin = 'full'): TechDigest {
+  const node = (id: string) => TR.nodes.find((n: any) => n.id === id).rows as string[];
+  const flip = (row: string) => mirrored ? [...row].reverse().join('') : row;
+  const pad = (rows: string[]) => [...Array(H - rows.length).fill('.'.repeat(10)), ...rows.map(flip)];
+  const read = (rows: string[]) => pad(rows.map(r => [...r].map(ch => ch === '-' || ch === 'U' ? '.' : 'S').join('')));
+  const uCells = (rows: string[]): Cell[] => pad(rows).flatMap((r, row) => [...r].flatMap((ch, col) => ch === 'U' ? [{ row, col }] : []));
+  const place = (board: string[], cells: Cell[]) => {
+    const g = board.map(r => [...r]);
+    for (const q of cells) { expect(g[q.row]![q.col]).toBe('.'); g[q.row]![q.col] = 'T'; }
+    const full = g.flatMap((r, i) => r.every(x => x !== '.') ? [i] : []);
+    const kept = g.filter((_, i) => !full.includes(i)).map(r => r.join(''));
+    return { full, after: [...Array(full.length).fill('.'.repeat(10)), ...kept] };
+  };
+  const b0 = read(node('basic.spin')), t0 = uCells(node('basic.spin'));
+  const s0 = place(b0, t0);
+  // the board the TSD leaves is the derived after board, letter for letter in occupancy
+  expect(s0.after).toEqual(read(node('basic.after')));
+  const t1 = uCells(node('tst.spin'));
+  const s1 = place(s0.after, t1);
+  expect([s0.full.length, s1.full.length]).toEqual([2, 3]);
+  const lock = (cells: Cell[], spin: string, rows: number[]) =>
+    ({ piece: 'T', spin, cleared: rows.length, cells, clearedRows: rows, garbage: 0, mapOk: true });
+  return { session: 'page', file: 'btcannon.php', round: 0, match: 1, user: 'page', v: 1,
+           locks: [lock(t0, 'full', s0.full), lock(t1, tstSpin, s1.full)],
+           tspins: [{ i: 0, board: b0 }, { i: 1, board: s0.after }] };
+}
+
+test('the follow-up search on the page\'s own TSD → TST: fires as drawn and mirrored, and each follow-up mutant breaks it', () => {
+  const fu = (mirrored: boolean, m: Mutants = {}, tstSpin = 'full') => {
+    const c = classify(BTCANNON, TR, [pageDigest(mirrored, tstSpin)], m);
+    expect(c.hits.length).toBe(1);
+    expect(c.hits[0]!.mirrored).toBe(mirrored);
+    return c.hits[0]!.followup;
+  };
+  for (const m of [false, true]) {
+    expect(fu(m)).toEqual({ lock: 1, fired: true, reason: null });
+    // no row map: the TSD's two cleared rows split the TST slot, so the slot is never joined
+    expect(fu(m, { followupNoRowmap: true }).fired).toBe(false);
+    // a T in the slot that is not a full TST: refused, and fired by a follow-up that accepts any T
+    expect(fu(m, {}, 'mini')).toEqual({ lock: 1, fired: false, reason: 't_in_slot_not_tsd' });
+    expect(fu(m, { followupAnyT: true }, 'mini').fired).toBe(true);
+  }
+  // the slot carried in the drawn columns on a mirrored hit: the mirrored TST lands elsewhere
+  expect(fu(false, { followupUnmirrored: true }).fired).toBe(true);
+  expect(fu(true, { followupUnmirrored: true })).toEqual({ lock: 1, fired: false, reason: 'next_t_elsewhere' });
+});

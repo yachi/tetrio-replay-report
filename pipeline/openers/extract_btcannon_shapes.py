@@ -38,7 +38,10 @@ selftest and `--html-dir` output was compared byte for byte before and after):
     window on each of harddrop's fifteen drawings is the independent check `fires` stands for elsewhere.
   * `TechniqueSpec.html_checks`: `--html-dir` re-checks the harddrop wikitext snapshot beside the page (MediaWiki's
     sha1 and our sha256, every recorded drawing letter for letter, and that the recorded drawings are EXACTLY the
-    page's boards whose drawn T the window fires on).
+    page's boards whose drawn T the window fires on). Because that makes the window choose its own external
+    drawings, every OTHER drawn T on the page is recorded too (`drawn_t_not_fired`: its lie, its line count,
+    why the window misses it, measured, and a note read off the page), so a drawing of the shape the window
+    misses is a red build to name, never a board silently left out.
 
 WHERE THE TRANSCRIPTION COMES FROM. `NODES` is a literal, hand-checked transcription of the page's RAW HTML,
 fetched the way STSD's was: curl through the session proxy, TLS verification on, with a CA bundle adding the
@@ -255,6 +258,16 @@ def _hd(table: int, board: int, section: str, mirrored: bool, rows: str) -> dict
     return {'table': table, 'board': board, 'section': section, 'mirrored': mirrored, 'rows': _b(rows)}
 
 
+#: the note every stood T into a T-spin Triple carries in `drawn_t_not_fired`
+STOOD_TST = ('a stood T into a T-spin Triple (the BT\'s own TST, or a C-Spin\'s): the window anchors on the TSD\'s flat T '
+             'pointing down, so it cannot fire here by construction')
+
+
+def _miss(table: int, board: int, section: str, t: str, lines: int, window: str, note: str, rows: str) -> dict:
+    return {'table': table, 'board': board, 'section': section, 't': t, 'lines': lines, 'window': window,
+            'note': note, 'rows': _b(rows)}
+
+
 #: harddrop's BT_Cannon page: every board on it whose drawn T (`P`) the window fires on, read with `hd_cell`
 HARDDROP = {
     'page': 'https://harddrop.com/wiki/BT_Cannon',
@@ -293,6 +306,77 @@ HARDDROP = {
         _hd(29, 1, 'Mid-game BT Cannon', False, '---------- jj-------- j--------- j-iiiiqqqq l--zzqqqqq lUUUzzgggg llUggggggg g-gggggggg'),
         _hd(32, 0, 'Mid-game BT Cannon', True, '---------- ------ll-- -------l-- qqqqss-lqq qqqss--jqq iiiiUUUjjj gggggUgggg gggggg-ggg'),
         _hd(34, 0, 'Mid-game BT Cannon', True, '---------- ---------j ---------j --------jj ---------i ---z--ss-i oozztss--i ooztttUUUi gggggggUgg gggggggg-g ggggggg-gg'),
+    ],
+    #: every OTHER board with a drawn T (`P`, four cells) on the page: the window does not fire at it in either hand,
+    #: each named with what the T is, measured (`t` the T's lie, `lines` the rows it clears, `window` why it does not
+    #: fire: the T is not the window's flat T pointing down, the window leaves the board, or a window cell disagrees)
+    #: and a note read off the page around it. With `drawings` this is EVERY drawn T on the page, so the agreement
+    #: drawings are not chosen by the window: a drawn T the window misses is a red build until it is named here
+    'drawn_t_not_fired': [
+        _miss(3, 2, 'Special β ●-hiro', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ----ll---- -----loo-i jjssUlooli jssUUjllli ztttUiiiis'),
+        _miss(5, 3, 'BT Cannon C-Spin', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---------- ---z---lli oozz----li oozjjssUli jjjjssUUsi llliiiiUzz'),
+        _miss(6, 1, 'BT Cannon C-Spin', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- lll------- lz-------- zz-------i zssoojj--i sssooj---i jjssijUzzi joosilUUzz joozilUlli oozzill-li'),
+        _miss(6, 2, 'BT Cannon C-Spin', 'flat-down', 2, 'leaves the board', "the C-Spin's T-spin Double, after its TST, in the floor rows with no TST slot under it",
+              '---------- ---------- ---------- ---------- lll------- lz-------- zz-------i zssoojj--i sssoojUUUi oozzillUli'),
+        _miss(7, 3, 'BT Cannon C-Spin', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---------- lll---s--- lz----ssoo zzUiiiisoo zzUUjjjooi ssUtttllli'),
+        _miss(8, 1, 'BT Cannon C-Spin', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- --------oo --------oo i------ssz i--lljsszz i---ljjjzi issUlzooji ssUUzzooji lllUzlsjji lz-lllssoo'),
+        _miss(8, 2, 'BT Cannon C-Spin', 'flat-down', 2, 'leaves the board', "the C-Spin's T-spin Double, after its TST, in the floor rows with no TST slot under it",
+              '---------- ---------- ---------- ---------- --------oo --------oo i------ssz i--lljsszz iUUUljjjzi lzUlllssoo'),
+        _miss(11, 0, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- s--------- ssooi--zz- jsooil--zz jjjgil-ggg ggggill-gg gggggggUgg ggggggUUgg gggggggUgg'),
+        _miss(11, 1, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- i--------- iloos--zz- ilooss--zz illgjs-ggg ggggjjj-gg gggggggUgg ggggggUUgg gggggggUgg'),
+        _miss(11, 2, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- --s------- jjssi--zz- joosil--zz joogil-ggg ggggill-gg gggggggUgg ggggggUUgg gggggggUgg'),
+        _miss(12, 0, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- oo-------- oo-------- szz------i sszzljj--i gslllj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(12, 1, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- --zz------ sllzz----i ssloojj--i gslooj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(12, 2, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---oo----- ---oo----- --sll----i zzssljj--i gzzslj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(12, 3, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- zz-------- szzll----i ssooljj--i gsoolj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(12, 4, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- oo-------- oosll----i zzssljj--i gzzslj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(13, 0, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- --zz------ lllzz----i lssoojj--i ssgooj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(13, 1, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- --ls------ lllss----i oozzsjj--i oogzzj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(13, 2, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- -z--l----- zzlll----i zssoojj--i ssgooj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(14, 0, 'BT Cannon C-Spin In-Depth', 'flat-down', 2, 'leaves the board', "a T-spin Double among the fifth bag's options (Trinity / STSD / 4-wide), in the floor rows with no TST slot under it",
+              '---------- ---------- --------ll ---------l gg----ss-l gggggss--g ggggggg--g ggggggUUUg gggggggUgg'),
+        _miss(14, 1, 'BT Cannon C-Spin In-Depth', 'flat-down', 2, 'leaves the board', "a T-spin Double among the fifth bag's options (Trinity / STSD / 4-wide), in the floor rows with no TST slot under it",
+              '---------- --ssz----- jsszzi---- jjjzli---- ggllli---- gggggi---g ggggggg--g ggggggUUUg gggggggUgg'),
+        _miss(22, 0, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- --z------- -zz------- -zsll----i oossljj--i oogslj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(22, 1, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ----zz---- --sllzz--i oossljj--i oogslj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(22, 2, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---ss----- --sslll--i oozzljj--i oogzzj---i gggggjUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(22, 3, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ----jj---- ----js---- ----jss--i oozzlls--i oogzzl---i ggggglUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(22, 4, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- j----s---- jjj--ss--i oozzlls--i oogzzl---i ggggglUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(22, 5, 'BT Cannon C-Spin In-Depth', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- --j--s---- --jjjss--i oozzlls--i oogzzl---i ggggglUggi ggggggUUgg ggggggUggg ggggggg-gg'),
+        _miss(24, 0, 'TSM to BT', 'stood', 1, "not the window's T", "the T-spin Mini the 'TSM to BT' section makes the offset hole with, stood against the wall",
+              '---------- ---------- ---------- ---------- ---------- l--------- l--------U lls-j---UU oossjjjzzU oo-siiiizz'),
+        _miss(25, 0, 'TSM to BT', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ------s--z jjj---sszz ggj--ooszl gg---oolll ggUiiiiggg ggUUgggggg ggUggggggg'),
+        _miss(25, 2, 'TSM to BT', 'flat-up', 1, "not the window's T", "a flat T pointing UP into one row, in the 'TSM to BT' example's later bags",
+              '---------- -------jjj i------zsj il----zzss il----zoos ill---goog ggg---gggg gggU-ggggg ggUUUggggg'),
+        _miss(28, 0, 'Mid-game BT Cannon', 'flat-down', 2, 'disagrees', 'the Kaidan the page fires on the same base, for comparison with board 1 beside it (recorded as a drawing): no TST slot beside the T',
+              '---------- ---------- ---------- -----zz--- ggsUUUzzgg ggssUggggg gg-sgggggg gg-ggggggg'),
+        _miss(31, 0, 'Mid-game BT Cannon', 'flat-down', 2, 'disagrees', "the Cut Copy the page recommends before offering the BT: the TST slot's column beside the T is filled",
+              '---------- ----z----- ioozz--s-- ioozl--ss- ijlll---sl ijjjUUUlll gggggUgggg gggggg-ggg'),
+        _miss(34, 1, 'Mid-game BT Cannon', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---------- ---------g ---------g --------gg --lzz----g lllgzzggUg gggggggUUg ggggggggUg ggggggg-gg'),
     ],
     #: boards with no T drawn on which the window fires at a resting placement (the same shape one step before
     #: the page draws its T, or harddrop's STSD continuation's terrain): measured and recorded letter for letter,
@@ -368,6 +452,31 @@ def _slot(rows: list[str]) -> list[list[int]]:
     return sorted([r, c] for r, row in enumerate(rows) for c, ch in enumerate(row) if ch == 'U')
 
 
+def t_lie(data: dict, rows: list[str]) -> tuple[str, int, str]:
+    """What a drawn T (`U`) on a harddrop board is, measured: its lie (`stood`, `flat-down` — the window's T —
+    or `flat-up`), the rows it clears, and why the window does not fire at it: the T is not the window's,
+    the window leaves the board in both hands, or a window cell disagrees (`fires` if it fires after all)."""
+    slot = _slot(rows)
+    rs = sorted({r for r, _ in slot})
+    lie = 'stood' if len(rs) == 3 else ('flat-down' if sum(1 for r, _ in slot if r == rs[0]) == 3 else 'flat-up')
+    lines = sum(1 for r in rs if EMPTY not in rows[r])
+    v = data['variants'][0]
+    pre = [row.replace('U', EMPTY) for row in rows]
+    lock = {tuple(x) for x in slot}
+    if any(TT.window_fires(data, v, SPEC, pre, lock, m) for m in (False, True)):
+        return lie, lines, 'fires'
+    if lie != 'flat-down':
+        return lie, lines, "not the window's T"
+    off = []
+    for m in (False, True):
+        W = TT.window_cells(data, v, SPEC, m)
+        D = {k for k, x in W.items() if x == 'T'}
+        dr = min(r for r, _ in lock) - min(r for r, _ in D)
+        dc = min(c for _, c in lock) - min(c for _, c in D)
+        off.append(any(not (0 <= r + dr < len(rows) and 0 <= c + dc < WIDTH) for r, c in W))
+    return lie, lines, 'leaves the board' if all(off) else 'disagrees'
+
+
 def harddrop_drawings(data: dict | None = None) -> list[dict]:
     """harddrop's drawings as agreement drawings: the slot is the drawn T (`U`), read as empty."""
     data = data or build()
@@ -392,7 +501,9 @@ def _sections(text: str) -> list[str | None]:
 def harddrop_page_problems(data: dict, text: str) -> list[str]:
     """The recorded drawings against a harddrop wikitext: each letter for letter at its (table, board) under its
     heading, and the record COMPLETE both ways — the drawings are exactly the boards whose drawn T the window
-    fires on (either hand), and `fires_without_slot` exactly the boards with no T drawn on which it fires."""
+    fires on (either hand), `drawn_t_not_fired` exactly every other board with a drawn T, and `fires_without_slot`
+    exactly the boards with no T drawn on which it fires. So every drawn T on the page is in one list or the other,
+    and a drawn T the window misses is named rather than silently left out."""
     hd = data['cross_source']['harddrop']
     try:
         tables = RT.wikitext_tables(text)
@@ -404,14 +515,14 @@ def harddrop_page_problems(data: dict, text: str) -> list[str]:
     bad = []
     boards = {(i, j): [''.join(hd_cell(c) for c in row) for row in b]
               for i, t in enumerate(tables) for j, b in enumerate(t)}
-    for d in hd['drawings'] + hd['fires_without_slot']:
+    for d in hd['drawings'] + hd['drawn_t_not_fired'] + hd['fires_without_slot']:
         k = (d['table'], d['board'])
         if boards.get(k) != d['rows']:
             bad.append(f'harddrop: table {k[0]} board {k[1]} is not the recorded drawing (page {boards.get(k)})')
         elif secs[k[0]] != d['section']:
             bad.append(f'harddrop: table {k[0]} sits under {secs[k[0]]!r}, not {d["section"]!r}')
     v = data['variants'][0]
-    slotted, unslotted = [], []
+    slotted, unslotted, missed = [], [], []
     for (i, j), rows in sorted(boards.items()):
         slot = {tuple(x) for x in _slot(rows)}
         pre = [row.replace('U', EMPTY) for row in rows]
@@ -419,12 +530,17 @@ def harddrop_page_problems(data: dict, text: str) -> list[str]:
             hands = [m for m in (False, True) if TT.window_fires(data, v, SPEC, pre, slot, m)]
             if hands:
                 slotted.append((i, j, hands))
+            else:
+                missed.append((i, j))
         elif not slot and any(TT.window_fires(data, v, SPEC, pre, cs, m)
                               for cs in TT.t_placements(pre, SPEC) for m in (False, True)):
             unslotted.append((i, j))
     want = [(d['table'], d['board'], [d['mirrored']]) for d in hd['drawings']]
     if sorted(slotted) != sorted(want):
         bad.append(f'harddrop: the window fires at the drawn T of {slotted}, the record holds {want}')
+    named = sorted((e['table'], e['board']) for e in hd['drawn_t_not_fired'])
+    if sorted(missed) != named:
+        bad.append(f'harddrop: the window misses the drawn T of {sorted(missed)}, drawn_t_not_fired names {named}')
     if sorted(unslotted) != sorted((e['table'], e['board']) for e in hd['fires_without_slot']):
         bad.append(f'harddrop: with no T drawn the window fires on {unslotted}, the record names '
                    f'{[(e["table"], e["board"]) for e in hd["fires_without_slot"]]}')
@@ -473,6 +589,23 @@ def extra_checks(data: dict):
         if hits != [(frozenset(tuple(x) for x in _slot(d['rows'])), d['mirrored'])]:
             bad.append(f'harddrop: the window fires {len(hits)} time(s) on table {d["table"]} board {d["board"]}, '
                        f'not once at its drawn T ({"mirrored" if d["mirrored"] else "as drawn"})')
+    seen = {(d['table'], d['board']) for d in hd.get('drawings', [])}
+    for d in hd.get('drawn_t_not_fired', []):
+        k = (d['table'], d['board'])
+        slot = _slot(d['rows'])
+        ys = {(c, len(d['rows']) - 1 - r) for r, c in slot}
+        if any(len(r) != WIDTH for r in d['rows']) or len(slot) != 4 or RT._norm(ys) not in RT._shapes('t'):
+            bad.append(f'harddrop: table {k[0]} board {k[1]} (drawn_t_not_fired) is not a ten-wide board with one drawn T')
+            continue
+        got = t_lie(data, d['rows'])
+        if got != (d['t'], d['lines'], d['window']) or got[2] == 'fires':
+            bad.append(f'harddrop: table {k[0]} board {k[1]} is {got}, drawn_t_not_fired records '
+                       f'{(d["t"], d["lines"], d["window"])}')
+        if not d.get('note', '').strip():
+            bad.append(f'harddrop: table {k[0]} board {k[1]} is in drawn_t_not_fired with no note')
+        if k in seen:
+            bad.append(f'harddrop: table {k[0]} board {k[1]} recorded twice')
+        seen.add(k)
     for d in hd.get('fires_without_slot', []):
         if _slot(d['rows']) or not any(TT.window_fires(data, v, SPEC, d['rows'], cs, m)
                                        for cs in TT.t_placements(d['rows'], SPEC) for m in (False, True)):
@@ -531,6 +664,10 @@ def _hdd(d, i):
     return d['cross_source']['harddrop']['drawings'][i]
 
 
+def _hdm(d, table, board):
+    return next(x for x in d['cross_source']['harddrop']['drawn_t_not_fired'] if (x['table'], x['board']) == (table, board))
+
+
 MUTANTS = [
     (lambda d: d['source'].pop('snapshot_sha256'), 'source hash dropped', 'provenance:'),
     (lambda d: _set(node(d, 'parapet.terrain')['rows'], 0, 0, 'x'), 'a cell outside the alphabet', 'grammar:'),
@@ -574,6 +711,13 @@ MUTANTS = [
     (lambda d: [x.__setitem__('section', 'Basic Opening') for x in d['cross_source']['harddrop']['drawings']],
      'harddrop\'s mid-game section dropped', 'harddrop:'),
     (lambda d: d['cross_source']['harddrop']['drawings'].append(copy.deepcopy(_hdd(d, 0))), 'a harddrop drawing twice', 'harddrop:'),
+    (lambda d: _hdm(d, 28, 0).__setitem__('t', 'stood'), 'a missed drawn T\'s lie misrecorded', 'harddrop:'),
+    (lambda d: _hdm(d, 28, 0).__setitem__('window', 'leaves the board'), 'why the window misses a drawn T misrecorded', 'harddrop:'),
+    (lambda d: _hdm(d, 31, 0).__setitem__('lines', 3), 'a missed drawn T\'s line count misrecorded', 'harddrop:'),
+    (lambda d: _hdm(d, 6, 2).__setitem__('note', ''), 'a missed drawn T with no note', 'harddrop:'),
+    (lambda d: d['cross_source']['harddrop']['drawn_t_not_fired'].append(
+        {**copy.deepcopy(_hdd(d, 8)), 't': 'flat-down', 'lines': 2, 'window': 'disagrees', 'note': 'x'}),
+     'a drawing the window fires on filed as a miss', 'harddrop:'),
     (lambda d: d['cross_source']['catalogue']['names'].append('Not An Opener'), 'a catalogue name that is not there', 'catalogue:'),
     (lambda d: d['cross_source'].pop('routes_fire_none'), 'no routes board and no reason', 'cross:'),
     (lambda d: d['cross_source']['fires'].append({'file': 'sdpcspin-routes.json', 'node': '3.first.cave',
@@ -608,9 +752,10 @@ def _synthetic_harddrop(data: dict) -> str:
     """A wikitext holding the recorded drawings at their (table, board), every other board blank, each table
     under its recorded heading — the selftest's stand-in for the page CI cannot fetch."""
     hd = data['cross_source']['harddrop']
-    n = max(d['table'] for d in hd['drawings'] + hd['fires_without_slot']) + 1
+    every = hd['drawings'] + hd['drawn_t_not_fired'] + hd['fires_without_slot']
+    n = max(d['table'] for d in every) + 1
     tables = [[] for _ in range(n)]
-    for d in sorted(hd['drawings'] + hd['fires_without_slot'], key=lambda x: (x['table'], x['board'])):
+    for d in sorted(every, key=lambda x: (x['table'], x['board'])):
         t = tables[d['table']]
         while len(t) < d['board']:
             t.append([EMPTY * WIDTH] * 4)
@@ -618,7 +763,7 @@ def _synthetic_harddrop(data: dict) -> str:
     for t in tables:
         if not t:
             t.append([EMPTY * WIDTH] * 4)
-    sec = {d['table']: d['section'] for d in hd['drawings'] + hd['fires_without_slot']}
+    sec = {d['table']: d['section'] for d in every}
     out, last = [], None
     for i, t in enumerate(tables):
         s = sec.get(i, last)
@@ -649,6 +794,15 @@ def selftest() -> int:
     if clean or 'Mid-game BT Cannon' not in text:
         print(f'selftest FAILED: the synthetic harddrop page does not verify ({clean[:2]})')
         ok = False
+    unnamed = copy.deepcopy(base)
+    unnamed['cross_source']['harddrop']['drawn_t_not_fired'] = [
+        x for x in unnamed['cross_source']['harddrop']['drawn_t_not_fired'] if (x['table'], x['board']) != (31, 0)]
+    got = harddrop_page_problems(unnamed, text)
+    if not any('drawn_t_not_fired names' in x for x in got):
+        print(f'selftest FAILED: a drawn T the window misses, left out of the record, was not caught ({got[:2]})')
+        ok = False
+    else:
+        print('  killed: a drawn T the window misses left out of the record  [harddrop:]')
     for label, page in plants.items():
         got = harddrop_page_problems(base, page)
         if page == text or not any(x.startswith('harddrop:') for x in got):

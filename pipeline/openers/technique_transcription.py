@@ -217,7 +217,11 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
            least one from another transcription (the spec's `external_drawings`);
       (h)  maximality: widened by one row or column on any side, the new cells hold one on which the
            drawings disagree or which leaves one of them. The window is DERIVED from the drawings,
-           never chosen: a cell every drawing agrees on cannot be left out of it at its edge.
+           never chosen: a cell every drawing agrees on cannot be left out of it at its edge. That holds
+           only while the SET of drawings is not chosen by the window either: an external source whose
+           drawings are picked as the boards the window fires on must also name every other drawing of a
+           T on that source and why the window misses it (BT砲's `drawn_t_not_fired`), or a drawing that
+           disagrees could never refute the box.
     """
     bad = []
     (r0, r1), (c0, c1) = v['window']['rows'], v['window']['cols']
