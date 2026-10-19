@@ -842,6 +842,23 @@ jobs:
       - name: Check the Cut Copy technique page audit catches its corruptions
         run: python3 -m pipeline.cutcopy_page --selftest
 
+      # The seventh technique page, 社畜トレイン (Shachiku Train, shiwehi.com's template/shachikutrain.php): the same
+      # gate and renderer, a flat T into the slot an S one column off a wall and an L hung over its far end make,
+      # whose clear joins the row above it to the cell beside the S's foot (the follow-up is a second TSD). The page
+      # draws its spins unmuted, so its T boards are builds on derived boards less the T, checked by the module's
+      # tsd: rule. Its window is the AGREEMENT BOX of the page's five drawings and harddrop's Shachiku_Train page
+      # (pinned by revision, every drawn T recorded); harddrop's STMB_Cave comparison is measured against both
+      # windows. The corpus artefact and the (all unbuilt) demos are checked by
+      # pipeline/openers/shachikutrain.test.ts and shachikutrain-demos.test.ts in the typescript job.
+      - name: Check the Shachiku Train technique transcription
+        run: python3 -m pipeline.openers.extract_shachikutrain_shapes
+
+      - name: Check the Shachiku Train technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest
+
+      - name: Check the Shachiku Train technique page audit catches its corruptions
+        run: python3 -m pipeline.shachikutrain_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

@@ -323,6 +323,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique cutcopy \
   --out analysis/cutcopy-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/cutcopy.test.ts pipeline/openers/cutcopy-demos.test.ts  # its two tests
 python3 -m pipeline.cutcopy_page --selftest       # the docs/cutcopy*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_shachikutrain_shapes            # CI gate: the 社畜トレイン (Shachiku Train) technique transcription
+python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Shachiku_Train.wikitext and STMB_Cave.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique shachikutrain \
+  --out analysis/shachikutrain-facts.json                      # 社畜トレイン's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique shachikutrain \
+  --out analysis/shachikutrain-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/shachikutrain.test.ts pipeline/openers/shachikutrain-demos.test.ts  # its two tests
+python3 -m pipeline.shachikutrain_page --selftest # the docs/shachikutrain*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3950,7 +3958,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -3958,7 +3966,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth and 千鳥格子 (`template/cutcopy.php`) the sixth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth and 社畜トレイン (`template/shachikutrain.php`) the seventh (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4313,6 +4321,69 @@ count (a proof); the T-hole terrain is a multiple of four with no tiling by tetr
 neither a multiple of four — the planner's own words, 「no cover under its dealing」, are true and weaker); the basic form is even
 but not a multiple of four (a planner limit); and both builds are drawn mirrored, so the as-drawn window the planner fires would
 not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+### 社畜トレイン（Shachiku Train）
+
+The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
+literal in `extract_shachikutrain_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-shachikutrain.ts`
+→ `analysis/shachikutrain-facts.json` (`shachikutrain.test.ts`), `technique-demos-shachikutrain.ts` →
+`analysis/shachikutrain-demos.json` (`shachikutrain-demos.test.ts`), and `docs/shachikutrain.html` + `docs/shachikutrain-demos.html`
+from `shachikutrain_page.py` + `shachikutrain_prose.json`, the seventh card under 中盤手法. Every figure is read off the artefacts and
+tests, never typed here.
+
+**NO SHARED FILE CHANGED**, as for 千鳥格子: the transcription and its extract module, the two profiles, the page profile and
+prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI steps. Every pre-existing artefact and page is
+byte-identical; `docs/index.html` gains the card.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's, ダブルダガー's, BT砲's and 千鳥格子's); the follow-up is a
+second TSD whose cells the first one's clear splits.** An S one column off a wall and an L hung over its far end make the slot,
+roofed over its near end; the two cleared rows drop the row above the slot (the second slot's arms) onto the cell beside the S's
+foot (its nub), and the page roofs it with a Z before the second T. The matcher's row map joins the split slot, so `followup` is
+data.
+
+**This page draws its spins UNMUTED, and that decided the node kinds.** The shared `spin:` rule requires every cell of a row the
+spin clears to be upper case; this page draws the T as `U` and leaves the cleared rows in their colours. So no board here is a
+gate `spin` board: each board with a T drawn is a `build` adding its `U` on a DERIVED board (the drawing less the `U`, letter for
+letter), and the module's own `tsd:` rule checks what the spin rule would (one T, exactly two rows cleared, the board less it the
+derived one). The agreement drawings and `fires_on` boards are those derived boards, slot empty. `r` is the renderer's pale S
+(`pale:` checks it is one S); upper case is an earlier piece drawn muted, which the page does inconsistently (two `:colour`
+discrepancies name the lone lower-case L cell it leaves; a third names DT社畜's three-cell L, cut by the drawing's bottom edge).
+
+**The window is the agreement box** of the page's five drawings of the shape (the basic form, the 4x2 build, the two 2x2-hole builds
+and DT社畜, drawn mirrored and fired under `mirror:`) and harddrop's own Shachiku_Train page, which the source does not cite (pinned
+like 千鳥格子's Cut_copy page: oldid, MediaWiki's revision sha1, our sha256 and bytes, urllib through `api.php`; every OTHER drawn T on
+it recorded in `drawn_t_not_fired` with why the window misses, so the window does not choose its evidence; `hd_cell`/`_sections`
+from BT砲's module, `hd_slots` from 千鳥格子's). Four rows by six columns: the row above the T, the two cleared rows, the row under
+them; the second slot's Z roof is outside. The window fires on one routes board, the same author's stick spin `2.sd`, recorded in
+`cross_source.also` (`routes_fire_none` says no board by another author does); on no other technique transcription's board.
+`other_windows` records, measured and complete both ways, every other technique window that fires on a drawn T of harddrop's page.
+
+**Per variant, measured (`extra_checks`):** the basic form and the 4x2 build — the T the page draws next is exactly the window's
+follow-up slot re-anchored at the build's T (`second:`); the boards between the two TSDs are what the first TSD leaves plus the Z
+(and the I), measured. The two 2x2-hole builds (「STSDの地形が現れます」 and the TST terrain) — the first TSD is the window's, but the
+page's next step is the STSD or TST in the hole, so they are `not_expressed` past the first spin: the cell under the follow-up's
+nub is open, the follow-up T fills one row of the drawn after board (`fills`), and STSD's own window fires nowhere on it. DT社畜 —
+the window fires once, mirrored; the DT砲 hole it keeps under the follow-up's nub is not drawn past that and is `not_expressed`.
+The rule ties `not_expressed` to the open cell under the nub, both ways (`later:`).
+
+**STMB Cave, measured, not assumed.** harddrop's STMB_Cave page (the revision wiki-tspin-techniques.json pins, checked equal; its
+caption equal to that file's quoted sentence) says a variation 「has the same shape and steps as Shachiku Train」. Its table 17
+draws that variation (an O base: a cave three wide under the T), the Shachiku Train it compares (a J base) and the second TSD.
+This window fires on the J base only and STMB Cave's (`stmbcave-technique.json`) on the O base only (`stmb:`); the bases differ
+only in the row under the T, and the two windows, anchored on the same flat T, clash at the cell under the nub (the test asserts
+it). harddrop's own Shachiku_Train page draws the same comparison (its tables 10 and 11; the gate holds the boards equal). So
+「the same shape」 holds above the T and in the cleared rows and fails at that one cell, which is the one that tells them apart.
+
+**What discriminates is measured per window part** (`shachikutrain.test.ts`, `PART_ONLY`), as for 千鳥格子: neither part above or
+below the cleared rows reaches the headline alone, and `noMustEmpty` and `noRoof` are live mutants whose hits are their ablations'.
+The window clashes with STMB Cave's, ダブルダガー's, BT砲's and 千鳥格子's in every pairing of hands, and no lock is a hit of two.
+
+**No demo is built, and every board says why** (`shachikutrain-demos.test.ts` re-derives each): the basic form's and the TST build's
+terrains have ODD cell counts (a proof); the STSD build's terrain has tilings but none under the planner's dealing; DT社畜's L is
+three cells; the 4x2 terrain has no tiling at all (two parts of six), a profile reason, because given that chain the planner stops
+first at the pale S, which it reads as a piece R (measured in the test). Like BT砲's and 千鳥格子's, the two harddrop records are not
+`*-routes.json`, so `check_wikitext_sources` does not re-read them weekly: an open item. Named lists and their sizes live in the
+two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

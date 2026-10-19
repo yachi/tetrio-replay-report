@@ -1,0 +1,2101 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "shachikutrain",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/shachikutrain.php",
+    "title": "社畜トレイン(Shachiku Train)",
+    "author": "しゑひ(shiwehi)",
+    "created": "2020-10-31",
+    "updated": "2020-10-31",
+    "fetched": "2026-10-19",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 山岳積み2号 and stick spin used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 13 ten-wide boards in page order.",
+    "snapshot_file": "shachikutrain.html",
+    "snapshot_sha256": "874a21bbd92d38e3cae92a150d19f17529a3b0afa180b35d4d9c10a0b7d6d1b1",
+    "snapshot_bytes": 24908,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with harddrop's Shachiku_Train.wikitext and STMB_Cave.wikitext beside it); an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-19",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "sha256_note": "the same bytes STSD and BT砲 recorded, re-fetched for this page to read `r` and the upper case",
+      "colorMap_used": {
+        "c": "#a3a3a3",
+        "U": "#c8a6ff with a #8400ff dot (gradientMap)",
+        "i j l o s z": "#00b7ff #0011ff #ff7b00 #eeee00 #33ff00 #ff0000",
+        "r": "#a6ffa6, a translucent green (gradientMap), the S colour pale",
+        "J L O S Z": "#4d57d8 #d8904d #cfcf4d #69d24d #d84d4d",
+        "-": "#000000"
+      },
+      "mirror_button": "body.reversed swaps j<->l, s<->z, r<->y (and upper case); the page draws only one hand"
+    },
+    "decorative_images": [
+      "社畜トレイン(Shachiku Train)タイトル画像"
+    ],
+    "references": [
+      "https://tetrisch.github.io/main/technic/train.html (the page's own reference, Tetrisチャンネル)",
+      "https://four.lol/methods/dt-cannon (the page's own reference)",
+      "https://twitter.com/Inami10126124/status/1313321189478068224 (the page's own reference)",
+      "./stsd.php",
+      "./derivedtcannonop.php (開幕DT砲からの派生)",
+      "./mechanicaltsdv3.php (a related page)"
+    ],
+    "unfetched": [
+      "the page's three references (Tetrisチャンネル, four.lol, a tweet): harddrop's Shachiku_Train page, which the page does not cite, is the second source read instead"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "i j l o s z": "a cell of that piece, placed to build the shape",
+    "r": "a cell of an S the page draws pale (the renderer's translucent green; its mirror button turns it pale red, as it turns s into z): OUR READING, checked: its cells are one S on the board that places it",
+    "U": "a cell of the T the spin places (the renderer's light purple with a dark dot); this page draws its spins UNMUTED, so a board with a T is a build on the board less its U (`tsd:` checks the two rows it clears)",
+    "J L O S Z": "a cell placed before the first TSD, drawn in the renderer's muted colour on the boards after it: OUR READING, and the page is not consistent (the 4x2 second board keeps its L, the 2x2 after boards their O, lower case)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "intro",
+      "verbatim": "ここでは、社畜トレイン(Shachiku Train)という、TSDを2回打つドネイトについて紹介していきます。"
+    },
+    {
+      "id": "h.basic",
+      "verbatim": "基本形と組み方・ラインの消し方"
+    },
+    {
+      "id": "basic",
+      "verbatim": "下図のように%S%Lを用いてTSDの形を打ち、その後%Zで屋根を付けてもう一度TSDを打ちます。"
+    },
+    {
+      "id": "w4",
+      "verbatim": "4x2の窪みが空いていれば段を組みつつ打つことができます。"
+    },
+    {
+      "id": "h.u2",
+      "verbatim": "下穴が2x2マス空いているときの社畜トレイン"
+    },
+    {
+      "id": "u2",
+      "verbatim": "下穴が2x2マス空いているときに社畜トレインを打つことで、STSDの地形が現れます。"
+    },
+    {
+      "id": "t3",
+      "verbatim": "また、下穴の形によってはTSTの地形が現れます。"
+    },
+    {
+      "id": "h.dt",
+      "verbatim": "開幕DT砲からの社畜トレイン(DT社畜)"
+    },
+    {
+      "id": "dt.intro",
+      "verbatim": "開幕DT砲からの派生の1つとして社畜トレインを組むこともできます。"
+    },
+    {
+      "id": "dt",
+      "verbatim": "%S%Zが早い時に下図のようにすることで組むことができます。"
+    },
+    {
+      "id": "h.ref",
+      "verbatim": "参考ページ"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic",
+      "kind": "base",
+      "caption_quote": "h.basic",
+      "label": "the basic form's terrain: a stack to the left, two rows deep beside it, a well at the right wall",
+      "rows": [
+        "----------",
+        "cccccc----",
+        "ccccc-----",
+        "cccccc----",
+        "cccccc----",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "kind": "build",
+      "on": "basic.build",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "basic",
+      "label": "an S one column off the stack, an L hung over its far end, and the T laid flat, pointing down, under the stack's roof: a TSD",
+      "rows": [
+        "----------",
+        "cccccc----",
+        "cccccUUUll",
+        "ccccccUssl",
+        "ccccccss-l",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.second",
+      "kind": "build",
+      "on": "basic.roofed",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "basic",
+      "label": "what the TSD leaves, a Z roofing the second slot, and the second T laid flat into it: a second TSD (the page draws this board, not the one before the Z)",
+      "rows": [
+        "----------",
+        "-------z--",
+        "------zz--",
+        "cccccczUUU",
+        "ccccccSSUL",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "w4",
+      "kind": "base",
+      "caption_quote": "w4",
+      "label": "a hollow four wide and two deep",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ccc----ccc",
+        "ccc----ccc"
+      ]
+    },
+    {
+      "id": "w4.spin",
+      "kind": "build",
+      "on": "w4.build",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "w4",
+      "label": "the S and L in the hollow, a pale S, a J and an O stacked around them, and the T laid flat: a TSD",
+      "rows": [
+        "--------oo",
+        "-rr----joo",
+        "rrUUUlljjj",
+        "cccUsslccc",
+        "cccss-lccc"
+      ]
+    },
+    {
+      "id": "w4.second",
+      "kind": "build",
+      "on": "w4.roofed",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "w4",
+      "label": "what the TSD leaves, an I against the wall and a Z roofing the second slot, and the second T in it",
+      "rows": [
+        "i---------",
+        "i---z-----",
+        "i--zz---OO",
+        "irrzUUUJOO",
+        "cccSSUlccc"
+      ]
+    },
+    {
+      "id": "u2",
+      "kind": "base",
+      "caption_quote": "h.u2",
+      "label": "a hole two wide and two deep under the slot's row",
+      "rows": [
+        "----------",
+        "----------",
+        "------cccc",
+        "------cccc",
+        "------cccc",
+        "cccc--cccc",
+        "cccc--cccc"
+      ]
+    },
+    {
+      "id": "u2.spin",
+      "kind": "build",
+      "on": "u2.build",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "u2",
+      "label": "an O against the wall, the S and L, a Z roofing the T's near end, and the T laid flat: a TSD",
+      "rows": [
+        "-z--------",
+        "zz--------",
+        "zUUUllcccc",
+        "ooUsslcccc",
+        "ooss-lcccc",
+        "cccc--cccc",
+        "cccc--cccc"
+      ]
+    },
+    {
+      "id": "u2.after",
+      "kind": "after",
+      "after_of": "u2.spin",
+      "caption_quote": "u2",
+      "label": "what the TSD leaves: the S's foot over the hole, an STSD's terrain",
+      "rows": [
+        "----------",
+        "----------",
+        "-Z--------",
+        "ZZ--------",
+        "ooSS-Lcccc",
+        "cccc--cccc",
+        "cccc--cccc"
+      ]
+    },
+    {
+      "id": "t3",
+      "kind": "base",
+      "caption_quote": "t3",
+      "label": "the same, with one more cell filled at the hole's bottom",
+      "rows": [
+        "----------",
+        "----------",
+        "------cccc",
+        "------cccc",
+        "------cccc",
+        "cccc--cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "t3.spin",
+      "kind": "build",
+      "on": "t3.build",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "t3",
+      "label": "the same build and TSD over it",
+      "rows": [
+        "-z--------",
+        "zz--------",
+        "zUUUllcccc",
+        "ooUsslcccc",
+        "ooss-lcccc",
+        "cccc--cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "t3.after",
+      "kind": "after",
+      "after_of": "t3.spin",
+      "caption_quote": "t3",
+      "label": "what the TSD leaves: a TST's terrain",
+      "rows": [
+        "----------",
+        "----------",
+        "-Z--------",
+        "ZZ--------",
+        "ooSS-Lcccc",
+        "cccc--cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dt",
+      "kind": "build",
+      "on": "dt.terrain",
+      "adds": "jlsz",
+      "caption_quote": "dt",
+      "label": "DT社畜: from the DT砲 opener with S and Z early, a J and a Z against the wall, an S hung over the slot (mirrored; no T drawn)",
+      "rows": [
+        "----------",
+        "----s-----",
+        "----ss----",
+        "jj---scccc",
+        "jzz-cccccc",
+        "j-zzcccccc",
+        "--llcccccc",
+        "---lcccccc"
+      ]
+    },
+    {
+      "id": "basic.build",
+      "kind": "derived",
+      "derived": true,
+      "on": "basic",
+      "adds": "ls",
+      "reading": "basic.spin less its U: the slot the T goes into, the basic form plus the S and the L",
+      "rows": [
+        "----------",
+        "cccccc----",
+        "ccccc---ll",
+        "cccccc-ssl",
+        "ccccccss-l",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.roofed",
+      "kind": "derived",
+      "derived": true,
+      "reading": "basic.second less its U: what the first TSD leaves (measured to be basic.spin after its clear, by occupancy) plus the Z",
+      "rows": [
+        "----------",
+        "-------z--",
+        "------zz--",
+        "ccccccz---",
+        "ccccccSS-L",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "w4.build",
+      "kind": "derived",
+      "derived": true,
+      "on": "w4",
+      "adds": "jlors",
+      "reading": "w4.spin less its U: the slot the T goes into",
+      "rows": [
+        "--------oo",
+        "-rr----joo",
+        "rr---lljjj",
+        "ccc-sslccc",
+        "cccss-lccc"
+      ]
+    },
+    {
+      "id": "w4.roofed",
+      "kind": "derived",
+      "derived": true,
+      "reading": "w4.second less its U: what the first TSD leaves (measured to be w4.spin after its clear, by occupancy) plus the I and the Z",
+      "rows": [
+        "i---------",
+        "i---z-----",
+        "i--zz---OO",
+        "irrz---JOO",
+        "cccSS-lccc"
+      ]
+    },
+    {
+      "id": "u2.build",
+      "kind": "derived",
+      "derived": true,
+      "on": "u2",
+      "adds": "losz",
+      "reading": "u2.spin less its U: the slot the T goes into",
+      "rows": [
+        "-z--------",
+        "zz--------",
+        "z---llcccc",
+        "oo-sslcccc",
+        "ooss-lcccc",
+        "cccc--cccc",
+        "cccc--cccc"
+      ]
+    },
+    {
+      "id": "t3.build",
+      "kind": "derived",
+      "derived": true,
+      "on": "t3",
+      "adds": "losz",
+      "reading": "t3.spin less its U: the slot the T goes into",
+      "rows": [
+        "-z--------",
+        "zz--------",
+        "z---llcccc",
+        "oo-sslcccc",
+        "ooss-lcccc",
+        "cccc--cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dt.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dt less its J, L, S and Z: the DT砲 stack the page builds on",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "------cccc",
+        "----cccccc",
+        "----cccccc",
+        "----cccccc",
+        "----cccccc"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic",
+    "basic.spin",
+    "basic.second",
+    "w4",
+    "w4.spin",
+    "w4.second",
+    "u2",
+    "u2.spin",
+    "u2.after",
+    "t3",
+    "t3.spin",
+    "t3.after",
+    "dt"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "shachikutrain",
+      "board": "basic.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          4
+        ],
+        "cols": [
+          4,
+          9
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          6
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's drawings of the shape and harddrop's Shachiku_Train drawings. Row 1 is the row above the T: the roof over its near end and the cell beyond it filled, the cell over its middle and the second slot's arms empty; rows 2-3 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 4 is the row under them: the cell under the nub and the S's foot filled, the second slot's nub cell empty, the L's foot beyond it filled. The second slot's roof (the Z) is outside: the page places it after the first TSD. Occupancy only, never colour; garbage is filled.",
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "agreement": [
+        {
+          "board": "basic.build",
+          "t_cells": [
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "w4.build",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "u2.build",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "t3.build",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "dt",
+          "t_cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "mirrored": true
+        }
+      ],
+      "followup": {
+        "board": "basic.roofed",
+        "spin": "TSD",
+        "lines": 2,
+        "t_cells_pre_clear": [
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            4,
+            8
+          ]
+        ],
+        "t_cells_after": [
+          [
+            3,
+            7
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            4,
+            8
+          ]
+        ],
+        "note": "the flat T, pointing down, into the second slot. Before the TSD its cells are split by the two cleared rows (its arms above them, its nub under them); the TSD joins them, the Z roofs them, and the matcher carries the slot through every later clear to the next T."
+      },
+      "fires_on": [
+        "basic.build",
+        "w4.build",
+        "u2.build",
+        "t3.build"
+      ],
+      "fires_mirrored": [
+        "dt"
+      ],
+      "misses": [
+        "basic",
+        "basic.spin",
+        "basic.second",
+        "basic.roofed",
+        "w4",
+        "w4.spin",
+        "w4.second",
+        "w4.roofed",
+        "u2",
+        "u2.spin",
+        "u2.after",
+        "t3",
+        "t3.spin",
+        "t3.after",
+        "dt.terrain"
+      ],
+      "second_drawn": [
+        {
+          "build": "basic.build",
+          "board": "basic.second"
+        },
+        {
+          "build": "w4.build",
+          "board": "w4.second"
+        }
+      ],
+      "not_expressed": [
+        {
+          "build": "u2.build",
+          "after": "u2.after",
+          "quote": "u2",
+          "next": "STSD",
+          "fills": 1,
+          "reason": "the page's next step is the STSD whose terrain the TSD uncovers, not the second TSD: the cell under the follow-up slot's nub is the open 2x2 hole, the page draws no roof and no stack beside the slot's arms (the follow-up T fills one row of the drawn after board, a TSD two), and STSD's own window fires nowhere on it (its roof is not built yet). A hit on this terrain is still a hit, counted with the follow-up's own outcome; the STSD is the STSD page's"
+        },
+        {
+          "build": "t3.build",
+          "after": "t3.after",
+          "quote": "t3",
+          "next": "TST",
+          "fills": 1,
+          "reason": "the page's next step is the TST whose terrain the TSD uncovers, not the second TSD: the cell under the follow-up slot's nub is open, the page draws no roof and no stack beside the slot's arms (the follow-up T fills one row of the drawn after board), and STSD's window fires nowhere on it either. A TST has no window on this page"
+        },
+        {
+          "build": "dt",
+          "after": null,
+          "quote": "dt.intro",
+          "next": "DT砲",
+          "reason": "the build keeps the DT砲's hole under the follow-up slot's nub (open three rows down, mirrored), and the drawing stops there: its L shows three cells, the fourth under the bottom edge. What the page builds next from the DT砲 is not drawn, so nothing past the second TSD is read"
+        }
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "shachiku",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on one, the same author's stick spin 2.sd (`also`). The independent drawer is harddrop instead: its Shachiku_Train page (`harddrop`), whose drawings are the window's external `agreement` drawings (rule (g) fires the window on each, once, at its drawn T, in its recorded hand), and its STMB_Cave page's comparison (`stmb_cave`), measured against both windows.",
+    "routes_fire_none": "no routes board by another author draws a Shachiku Train (measured: the window fires on one U-slot board of every committed routes file, shiwehi.com's own stick spin 2.sd, recorded in `also`, and no node is labelled 社畜 or Shachiku); the independent cross-check is harddrop's own pages, read below",
+    "harddrop": {
+      "page": "https://harddrop.com/wiki/Shachiku_Train",
+      "title": "Shachiku Train",
+      "oldid": 41468,
+      "revision_sha1": "aec937b73a2c6f418ece2bf57f8b57ac96e2be0f",
+      "revision_timestamp": "2024-12-27T06:07:00Z",
+      "fetched": "2026-10-19",
+      "fetch_method": "the latest revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=Shachiku_Train&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 41468 was the page's latest revision when fetched",
+      "snapshot_file": "Shachiku_Train.wikitext",
+      "snapshot_sha256": "41e975cb5391eaa98d43948272c8312633b0bbce3f4158ef77099de3fbab4f14",
+      "snapshot_bytes": 13081,
+      "snapshot_note": "not committed, and not discovered by check_wikitext_sources (which reads *-routes.json): re-check with --html-dir, the file beside shachikutrain.html",
+      "author_note": "harddrop's page, edited by its wiki editors (it calls the technique Company Train as well): another site and other authors than shiwehi.com, and a page the shiwehi.com page does not cite (found by its title), so it is independent of it",
+      "reading": {
+        "blank": "-",
+        "P": "U, the T placed into the spin (the slot the agreement rule fires the window at)",
+        "other": "any other code, its last letter in lower case (G grey, 'S the ghost of an S, 1 and 2 the wall's height marks), every one FILLED (BT砲's hd_cell)",
+        "slots": "a board's U cells are partitioned into T's (千鳥格子's hd_slots); each T is one slot, read with every U cell of the board empty"
+      },
+      "drawings": [
+        {
+          "table": 1,
+          "board": 0,
+          "section": "Generic Structure",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-----z----",
+            "ggggzz----",
+            "ggggzUUUll",
+            "ggggggUssl",
+            "ggggggss-l",
+            "ggggggggg-",
+            "ggggggggg-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "table": 2,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-----z----",
+            "ggggzz----",
+            "ggggzUUUll",
+            "ggggggUssl",
+            "ggggggss-l",
+            "ggggggg---",
+            "ggggggg---",
+            "ggggggg---"
+          ]
+        },
+        {
+          "table": 3,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "---z----i-",
+            "--zz----i-",
+            "oozUUUllij",
+            "ooggUsslij",
+            "ggggss-ljj",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----ss----",
+            "gggssUUUll",
+            "ggggggUjjl",
+            "gggggggj-l",
+            "gggggggj-g",
+            "gggggggg-g",
+            "gggggggg-g"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "rows": [
+            "---------i",
+            "---oo----i",
+            "---oo----i",
+            "ggggUUUzzi",
+            "gggggUsszz",
+            "gggggss-oo",
+            "ggggggg-oo",
+            "ggggggg-gg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "rows": [
+            "----------",
+            "l-----i---",
+            "l-----i---",
+            "ll----izz-",
+            "gUUUssijzz",
+            "ggUssoojjj",
+            "gggg-ooggg",
+            "ggggg-gggg",
+            "ggggg-gggg"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 3,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "l---------",
+            "l----zz---",
+            "llsUUUzzgg",
+            "oossUggggg",
+            "oo-sgggggg"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 4,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "--oo-----z",
+            "j-oo----zz",
+            "jjjUUUsszl",
+            "iiiiUsslll",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "l---------",
+            "l----zz---",
+            "llsUUUzzgg",
+            "oossUggggg",
+            "oo-sgggggg"
+          ]
+        },
+        {
+          "table": 7,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "--oo-----z",
+            "j-oo----zz",
+            "jjjUUUsszl",
+            "iiiiUsslll",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 9,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "---z------",
+            "ggzz----gg",
+            "ggzUUUssgg",
+            "gggjUssggg",
+            "gggjjj-ggg"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "---z------",
+            "ggzz----gg",
+            "ggzUUUssgg",
+            "gggjUssggg",
+            "gggjjj-ggg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-ss-------",
+            "ss----iiii",
+            "oojjUUUggg",
+            "oojzzUgggg",
+            "ggj-zzgggg",
+            "ggg-gggggg",
+            "ggg-gggggg",
+            "ggg-gggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-s--------",
+            "-ss-------",
+            "oos-------",
+            "ooUUUiiiil",
+            "gggUjjjlll",
+            "ggggg-jggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              5
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "-g--z-----",
+            "-ggzz----l",
+            "gggzUUUlll",
+            "gggggUgggg",
+            "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              7,
+              5
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----z-----",
+            "---zz----i",
+            "gggzUUUlli",
+            "gggggUssli",
+            "gggggss-li"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              7,
+              5
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----z-----",
+            "---zz----l",
+            "gggzUUUlll",
+            "gggggUssoo",
+            "gggggss-oo"
+          ]
+        },
+        {
+          "table": 15,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-------lll",
+            "-------loo",
+            "iiiizUUUoo",
+            "jjjzzsUggg",
+            "--jz-ssggg",
+            "-gggggsggg",
+            "-ggggggggg",
+            "-ggggggggg"
+          ]
+        },
+        {
+          "table": 15,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "-------zz-",
+            "liiiiUUUzz",
+            "lllssgUooj",
+            "--ss-ggooj",
+            "-gggggggjj",
+            "-ggggggggg",
+            "-ggggggggg"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "gggg------",
+            "gggg------",
+            "gggg-z----",
+            "ggggzz----",
+            "ggggzUUUll",
+            "ggggggUssl",
+            "ggggggss-l",
+            "gggggggg-g"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "ggggjj----",
+            "ggggjUUUll",
+            "ggggjgUssl",
+            "ggggggss-l",
+            "gggggggg-g",
+            "gggggggg-g"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-----z----",
+            "ggoozz----",
+            "ggoozUUUll",
+            "ggiiiiUssl",
+            "ggggggss-l",
+            "gggggggg-g",
+            "gggggggg-g",
+            "gggggggg-g"
+          ]
+        }
+      ],
+      "drawn_t_not_fired": [
+        {
+          "table": 1,
+          "board": 1,
+          "section": "Generic Structure",
+          "slot": [
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              4,
+              9
+            ],
+            [
+              5,
+              8
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the generic structure's second TSD: the T into the second slot after the first TSD (this window's follow-up, not its T)",
+          "rows": [
+            "----------",
+            "----------",
+            "-------z--",
+            "-----gzz--",
+            "ggggggzUUU",
+            "ggggggggUg",
+            "ggggggggg-",
+            "ggggggggg-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "table": 6,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Compare the 4th example of the Company Train's variations above with Kaidan Setups (both L and J are just swapped)」: the Kaidan drawing, a J where the 4th example has its L",
+          "rows": [
+            "----------",
+            "-j--------",
+            "-j---zz---",
+            "jjsUUUzzgg",
+            "oossUggggg",
+            "oo-sgggggg"
+          ]
+        },
+        {
+          "table": 8,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Compare the 5th example of the Company Train's variations above with Cut Copy (S is just shifted one column to the right)」: the Cut Copy drawing (千鳥格子's window does not fire on it either, measured)",
+          "rows": [
+            "----------",
+            "--loo-----",
+            "-zloo----j",
+            "zzllUUUssj",
+            "ziiiiUssjj",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 9,
+          "board": 3,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              6
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the 4x2-hole variation's second TSD (「One could place down the floating S and the overhang before spinning J in」)",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "-----z----",
+            "---gzz----",
+            "ggggzUUUgg",
+            "ggggggUggg"
+          ]
+        },
+        {
+          "table": 11,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Compare the example of the Company Train's variation above with STMB Cave (O base is used instead of J)」: the STMB Cave drawing, a cave three wide under the T (STMB Cave's window fires on it, measured)",
+          "rows": [
+            "----------",
+            "---z------",
+            "ggzz----gg",
+            "ggzUUUssgg",
+            "ggooUssggg",
+            "ggoo---ggg"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the second TSD of 「making the overhang for the second T-Spin Double on the other side of the build before the T for the first T-Spin Double comes」",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "-gg--lll--",
+            "ggUUUlgggg",
+            "gggUgggggg",
+            "ggg-gggggg",
+            "ggg-gggggg",
+            "ggg-gggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              6,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              8
+            ],
+            [
+              7,
+              7
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the last TSD of 「three or more consecutive Company Trains」 on diagonal holes",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "i---------",
+            "i-----z---",
+            "ig--gzz---",
+            "iggggzUUUg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              7
+            ],
+            [
+              7,
+              8
+            ],
+            [
+              8,
+              7
+            ]
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "the T-Spin Triple 「Company Train could also be used as a direct follow-up to」, before the Company Train",
+          "rows": [
+            "----------",
+            "----z-----",
+            "---zz-----",
+            "gggz------",
+            "ggggg-ss--",
+            "gggggss---",
+            "gggggggUgg",
+            "gggggggUUg",
+            "gggggggUgg"
+          ]
+        },
+        {
+          "table": 15,
+          "board": 2,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Company Train could be used along with Donation T-Spin Double」: the third drawing of its first table",
+          "rows": [
+            "----------",
+            "--i-------",
+            "--i--s----",
+            "--i--ssjjj",
+            "ooiUUUsggj",
+            "ooggUggggg",
+            "-ggggggggg",
+            "-ggggggggg",
+            "-ggggggggg"
+          ]
+        },
+        {
+          "table": 16,
+          "board": 0,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Company Train could be used along with Donation T-Spin Double」: the first drawing of its second table",
+          "rows": [
+            "----------",
+            "iiii------",
+            "gjjUUUzzll",
+            "gjooUsszzl",
+            "gjooss---l",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        },
+        {
+          "table": 16,
+          "board": 1,
+          "section": "Variations, Other Uses, and Comparisons",
+          "slot": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "「Company Train could be used along with Donation T-Spin Double」: the second drawing of its second table",
+          "rows": [
+            "----------",
+            "-----z----",
+            "----zz----",
+            "ggggzUUUss",
+            "ggggggUssg",
+            "gggggg-ggg",
+            "gggggg-ggg",
+            "gggggg-ggg"
+          ]
+        }
+      ],
+      "fires_without_slot": [],
+      "other_windows": [
+        {
+          "table": 11,
+          "board": 0,
+          "file": "stmbcave-technique.json",
+          "mirrored": [
+            false
+          ]
+        }
+      ]
+    },
+    "stmb_cave": {
+      "page": "https://harddrop.com/wiki/STMB_Cave",
+      "oldid": 41496,
+      "oldid_note": "the revision wiki-tspin-techniques.json pins for its STMB_Cave transcription (checked equal)",
+      "revision_sha1": "9be6de771a3ca9bc42cec4be9e0ab3df25cf41a4",
+      "revision_timestamp": "2024-12-27T16:27:37Z",
+      "fetched": "2026-10-19",
+      "fetch_method": "the pinned revision's own bytes from the MediaWiki API, as Shachiku_Train's (urllib, NOT curl); 41496 was the page's latest revision when fetched",
+      "snapshot_file": "STMB_Cave.wikitext",
+      "snapshot_sha256": "b19a6b917858b3342f4d5afaf5e7bc5d191902e29421ff2e2f82b8444c31faf0",
+      "snapshot_bytes": 19937,
+      "table": 17,
+      "caption": "Compare this variation of STMB Cave below with [[Shachiku Train]]. Although this variation uses a floating T-Spin Double over 3 columns wide hole, this still has the same shape and steps as Shachiku Train.",
+      "boards": [
+        {
+          "board": 0,
+          "what": "the STMB Cave variation: an O base, a cave three wide under the T",
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "fires": {
+            "shachikutrain": [],
+            "stmbcave": [
+              false
+            ]
+          },
+          "same_as": [
+            11,
+            0
+          ],
+          "rows": [
+            "----------",
+            "---z------",
+            "ggzz----gg",
+            "ggzUUUssgg",
+            "ggooUssggg",
+            "ggoo---ggg"
+          ]
+        },
+        {
+          "board": 1,
+          "what": "the Shachiku Train it compares: a J base under the T",
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "fires": {
+            "shachikutrain": [
+              false
+            ],
+            "stmbcave": []
+          },
+          "same_as": [
+            10,
+            0
+          ],
+          "rows": [
+            "----------",
+            "---z------",
+            "ggzz----gg",
+            "ggzUUUssgg",
+            "gggjUssggg",
+            "gggjjj-ggg"
+          ]
+        },
+        {
+          "board": 2,
+          "what": "the second TSD, after either",
+          "slot": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "fires": {
+            "shachikutrain": [],
+            "stmbcave": []
+          },
+          "same_as": [
+            9,
+            3
+          ],
+          "same_note": "harddrop's Shachiku_Train page draws it with one more empty row on top",
+          "rows": [
+            "----------",
+            "----------",
+            "-----z----",
+            "---gzz----",
+            "ggggzUUUgg",
+            "ggggggUggg"
+          ]
+        }
+      ],
+      "relation": "measured: anchored on the same flat T the two windows clash on the cell under the nub (STMB Cave empty, the cave; this window filled), so each fires on its own base only and 「the same shape」 holds everywhere both windows read but that cell"
+    },
+    "fires": [],
+    "also": [
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd",
+        "variant": "shachikutrain",
+        "mirrored": false,
+        "page": "https://shiwehi.com/tetris/template/stickspin.php",
+        "note": "shiwehi.com's stick spin page (the same author): its SDパフェ bag-2 board, whose TSD the window fires on as drawn. Measured, not explained; not independent"
+      }
+    ],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": [
+    {
+      "id": "w4.second:colour",
+      "note": "the 4x2 build's second board draws the L's one surviving cell lower case, where it draws the other cells placed before the first TSD upper case: one l cell is no whole L (the rest of it was in the cleared rows)"
+    },
+    {
+      "id": "w4.roofed:colour",
+      "note": "w4.second less its U, so the same lone l cell"
+    },
+    {
+      "id": "dt:colour",
+      "note": "the DT社畜 board draws three cells of its L: the fourth would be under the drawing's bottom edge (the three are an L less its bottom cell)"
+    }
+  ]
+}
