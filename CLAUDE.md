@@ -299,6 +299,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique imperialcross \
   --out analysis/imperialcross-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/imperialcross.test.ts pipeline/openers/imperialcross-demos.test.ts  # its two tests
 python3 -m pipeline.imperialcross_page --selftest # the docs/imperialcross*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_doubledagger_shapes            # CI gate: the Double Dagger technique transcription
+python3 -m pipeline.openers.extract_doubledagger_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique doubledagger \
+  --out analysis/doubledagger-facts.json                       # Double Dagger's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique doubledagger \
+  --out analysis/doubledagger-demos.json                       # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/doubledagger.test.ts pipeline/openers/doubledagger-demos.test.ts  # its two tests
+python3 -m pipeline.doubledagger_page --selftest  # the docs/doubledagger*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3926,15 +3934,15 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
 rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
-STMB Cave (`template/stmbcave.php`) the second and インペリアルクロス (`template/imperialcross.php`) the third
-(each later one has a ### below); a later technique whose shape the window
+STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
+ダブルダガー (`template/doubledagger.php`) the fourth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4130,6 +4138,54 @@ so only line clears could reach it; the cross-shape build's terrain is even but 
 planner limit). The page's sentence for its TST board holds 来, which the page audit's simplified-glyph check
 cannot tell from the simplified character, so that board's caption is not rendered (`caption_note` says so;
 the quote is still checked against the snapshot). Named lists and their sizes live in the two tests.
+
+### ダブルダガー（Double Dagger）
+
+The same deliverable for `template/doubledagger.php` (「2020-06-20更新」): `pipeline/openers/doubledagger-technique.json`
+(held as a literal in `extract_doubledagger_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-doubledagger.ts` → `analysis/doubledagger-facts.json` (`doubledagger.test.ts`),
+`technique-demos-doubledagger.ts` → `analysis/doubledagger-demos.json` (`doubledagger-demos.test.ts`), and
+`docs/doubledagger.html` + `docs/doubledagger-demos.html` from `doubledagger_page.py` + `doubledagger_prose.json`,
+the fourth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is STMB Cave's flat, nub-down T, so the window predicate expresses it and NO
+shared file changed** — not the matcher, not the gate, not the renderer: the transcription, the two profiles,
+the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry. Two TSD slots are stacked
+one directly on the other, the upper roofed over one end; the TSD's clear drops the overhang onto the lower
+slot, which is the second TSD. The window is STSD's default bounding box (T, roof, follow-up slot): no other
+drawing disagrees with the spin board inside it, so the opt-in agreement box was not needed. It does NOT reach
+the lower slot's far wall, which the follow-up table answers instead.
+
+**What the shared rules could not say lives in `extra_checks`, under its own tags** (`mirror:`, `line:`,
+`pink:`, `B:`, `imperial:`, each with a selftest mutant): the page draws most of its Double Daggers MIRRORED,
+and the shared rule (e) takes only as-drawn boards, so `fires_mirrored` is checked there (once, mirrored, at a
+two-row placement; spin boards read with their spin piece taken out — the tetris feature spins an I). Its second
+feature, a line between the two slots, is a Double Dagger the window does not express: `not_expressed` records
+it, and the gate measures both halves (no fire as drawn; with the line row taken out, one fire at the drawn T).
+`p` (the page's pink cell, 「屋根の反対側」) is read as empty and measured to be the build's J cell, outside the
+window, so the corpus never tests that build condition. `max_rows` is 10 (the tetris feature).
+
+**Cross-sources, both measured.** harddrop's SDPC Spin page (another author) draws this shape in its second
+C-Spin build's bag-5 boards — the T in the slot the build makes, directly over the C-Spin's residue slot — and
+the gate's `cross:` rule finds them; no routes board is LABELLED ダブルダガー. shiwehi.com's own インペリアルクロス
+page draws a Double Dagger as its `dagger` miss and this page draws an インペリアルクロス (`cross.imperial`): the
+`imperial:` rule measures each window firing only on the other page's drawing (same author: corroboration).
+The one SDPC Spin round that reached that build is measured over bag 5 in the test and named.
+
+**What discriminates is measured per window part** (`doubledagger.test.ts`, `PART_ONLY`): with the T anchored,
+the lower slot alone gives exactly the headline, while the cleared rows (entailed) and the overhang row (which a
+TSD slot nearly always has) admit almost every full TSD — so the `no_roof` ablation equals the headline. The
+overhang is still not decoration: it is half of what tells the two HANDS apart, and both `noRoof` and
+`noMustEmpty` make a lock match both hands, which the matcher refuses (both asserted to throw). The hit sets of
+this window and STMB Cave's (the same flat T) are disjoint and the two windows clash on a cell in every pairing
+of hands, both re-derived in the test.
+
+**No demo is built, and every board says why** (`doubledagger-demos.test.ts` re-derives each): the TSD-shape
+build's terrain and the bare cross have an ODD cell count (a proof); the basic form, the cross-shape build's
+terrain and the three feature boards are even but not multiples of four (a planner limit); and the cross-shape
+build is drawn mirrored, so the as-drawn window the planner fires would not fit it even built (measured). The
+two sentences naming the build pieces draw them as mino icons the page text drops; they are quoted as the text
+reads (`icons`) and not used as captions. Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

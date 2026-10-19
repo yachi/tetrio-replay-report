@@ -793,6 +793,22 @@ jobs:
       - name: Check the Imperial Cross technique page audit catches its corruptions
         run: python3 -m pipeline.imperialcross_page --selftest
 
+      # The fourth technique page, ダブルダガー (shiwehi.com's template/doubledagger.php): the same gate and
+      # renderer, two TSD slots stacked, the T laid flat into the upper one. Its window is STMB Cave's T
+      # in STSD's default bounding box; the page's mirrored drawings, the line-between feature the window
+      # does not express, the pink build condition and the インペリアルクロス page's dagger board are the
+      # gate's extra checks. Its cross-source is harddrop's SDPC Spin (sdpcspin-routes.json). The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/doubledagger.test.ts and
+      # doubledagger-demos.test.ts in the typescript job.
+      - name: Check the Double Dagger technique transcription
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes
+
+      - name: Check the Double Dagger technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes --selftest
+
+      - name: Check the Double Dagger technique page audit catches its corruptions
+        run: python3 -m pipeline.doubledagger_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 
