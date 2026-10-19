@@ -5,12 +5,14 @@
 import type { TechniqueProfile } from './technique-profile.ts';
 import type { CrossRoute } from './technique-facts.ts';
 import { STSD } from './technique-profile-stsd.ts';
+import { STMBCAVE } from './technique-profile-stmbcave.ts';
 import type { TechniqueDemoProfile } from './technique-demo-profile.ts';
 import { STSD_DEMOS } from './technique-demos-stsd.ts';
+import { STMBCAVE_DEMOS } from './technique-demos-stmbcave.ts';
 
-export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossRoute }> = { stsd: STSD };
+export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossRoute }> = { stsd: STSD, stmbcave: STMBCAVE };
 /** each technique's constructed-demo half, by the same key */
-export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = { stsd: STSD_DEMOS };
+export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = { stsd: STSD_DEMOS, stmbcave: STMBCAVE_DEMOS };
 
 /** `--technique <key>` out of argv, or a loud failure naming the keys there are. */
 export function techniqueFromArgv(argv: string[]) {

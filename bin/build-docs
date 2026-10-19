@@ -49,13 +49,13 @@ sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
 from pipeline import gamushiro_page, honey_cup_page, mountainous2_page, sdpcspin_page, stickspin_page  # noqa: E402
 from pipeline import stray_cannon_page  # noqa: E402
-from pipeline import stsd_page, technique_page  # noqa: E402
+from pipeline import stmbcave_page, stsd_page, technique_page  # noqa: E402
 
 #: every opener route site, in the order its card appears under 定式路線
 ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE,
                gamushiro_page.SITE, sdpcspin_page.SITE]
 #: every mid-game technique site, in the order its card appears under 中盤手法
-TECHNIQUE_SITES = [stsd_page.SITE]
+TECHNIQUE_SITES = [stsd_page.SITE, stmbcave_page.SITE]
 
 # (session dir, artefact subdir, output name, label, blurb)
 #

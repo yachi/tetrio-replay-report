@@ -763,6 +763,20 @@ jobs:
       - name: Check the STSD technique page audit catches its corruptions
         run: python3 -m pipeline.stsd_page --selftest
 
+      # The second technique page, STMB Cave (shiwehi.com's template/stmbcave.php): the same gate and
+      # renderer, its window the AGREEMENT BOX of the page's drawings and harddrop's STMB_Cave diagrams
+      # (wiki-tspin-techniques.json), which the gate derives and checks from both sides. The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/stmbcave.test.ts and
+      # stmbcave-demos.test.ts in the typescript job.
+      - name: Check the STMB Cave technique transcription
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes
+
+      - name: Check the STMB Cave technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes --selftest
+
+      - name: Check the STMB Cave technique page audit catches its corruptions
+        run: python3 -m pipeline.stmbcave_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

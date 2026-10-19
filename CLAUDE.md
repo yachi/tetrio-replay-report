@@ -283,6 +283,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique stsd \
   --out analysis/stsd-demos.json                               # the constructed STSD demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/stsd.test.ts pipeline/openers/stsd-demos.test.ts  # its two tests
 python3 -m pipeline.stsd_page --selftest        # the docs/stsd*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stmbcave_shapes            # CI gate: the STMB Cave technique transcription
+python3 -m pipeline.openers.extract_stmbcave_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique stmbcave \
+  --out analysis/stmbcave-facts.json                           # STMB Cave's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique stmbcave \
+  --out analysis/stmbcave-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/stmbcave.test.ts pipeline/openers/stmbcave-demos.test.ts  # its two tests
+python3 -m pipeline.stmbcave_page --selftest    # the docs/stmbcave*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3910,14 +3918,15 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD）— mid-game local shapes, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave）— mid-game local shapes, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
 rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
-hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page; a
-later technique whose shape the window predicate can express is a data addition (a transcription
+hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page and
+STMB Cave (`template/stmbcave.php`) the second (### below); a later technique whose shape the window
+predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
 
@@ -3997,6 +4006,67 @@ window predicate cannot express, e.g. 階段のドネイト's staircase over sev
 name when it happens. `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
 because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
 direction is clean: no route artefact hashes a technique file.
+
+### STMB Cave
+
+The same deliverable for `template/stmbcave.php` (「2021-03-23更新」): `pipeline/openers/stmbcave-technique.json`
+(held as a literal in `extract_stmbcave_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-stmbcave.ts` → `analysis/stmbcave-facts.json` (`stmbcave.test.ts`),
+`technique-demos-stmbcave.ts` → `analysis/stmbcave-demos.json` (`stmbcave-demos.test.ts`), and
+`docs/stmbcave.html` + `docs/stmbcave-demos.html` from `stmbcave_page.py` + `stmbcave_prose.json`, the
+second card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is the T's cells, as STSD's — the T laid flat, nub down — so the
+window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** What did not fit
+was the GATE's window rule: STSD's window is the bounding box of the T, every filled cell above it and
+the follow-up slot, and this page's one complete TSD is drawn on a stacked board whose J, Z, L and O
+above the T are no part of the shape (each other drawing has different cells there). So a variant may
+now declare `window_basis: agreement` (opt-in; STSD's gate output is byte-identical with or without the
+change, compared by running both): the window is the box on which every drawing of the shape agrees —
+the page's own three, and harddrop's positive STMB_Cave diagrams from `wiki-tspin-techniques.json` (the
+spec's `external_drawings`) — checked from BOTH sides: every drawing fires it exactly once, at its
+declared slot and hand, and widening it by a row or a column on any side meets a disagreement or leaves
+a drawing. Every piece letter left outside is named in `untested_drawn`, both ways. The same pass made
+the follow-up rule compare the after board BOTTOM-aligned (this page draws it a row shorter than the
+spin board; STSD draws them the same height, so its shift is zero).
+
+**What the window can discriminate is one row.** Its top two rows are the rows the TSD clears, so at
+the opportunity every filled cell in them is entailed by the clear (`NaiveClauseForced`), the nub row
+being the cave's roof (`RoofForced` / `RoofCannotDiscriminate`) — no roof test is added, and the test
+MEASURES that the cave row alone, with the T anchored, gives exactly the headline. The page's own roof
+(the stood Z over the T's back arm) is outside the box: on the stacked board the cell beside it is the L
+that roofs the NEXT TSD, which no other drawing has, and a rectangle cannot keep one without the other.
+Because a flat T is symmetric, the must-empty cells are what tell the two hands apart: the `noMustEmpty`
+mutant makes a lock match both, and the matcher refuses it (the test asserts the throw).
+
+**Cross-checks, each stated in the test as agreement or named differences.** (1) The opener metric
+(`opener-facts.json` `stmb_cave`, harddrop's ≥3-wide gap overlapping the T): `stmbcave.test.ts`
+re-implements `caveAt` (importing `emit-opener-facts.ts` runs a session) and reproduces every session's
+per-player `width_ge_3`, `min_depth_ge_2`, `in_opener` and `mid_game` exactly; every hit is one of its
+caves, and every cave that is not a hit is named in `CAVE_METRIC_ONLY` with a re-derived geometric
+reason (`centred`: the gap is the T's own columns; `arm_only`: the gap reaches under one arm, the nub on
+a filled cell; `wall`: the cells behind the nub leave the board). (2) SDPC Spin: every round whose route
+reached `3.first.cave` with the node verified is a hit at its next T lock (`SDPC_CAVE_HITS`), the rest
+named. (3) The gate's `cross:` rule over every routes board: harddrop's SDPC Spin cave fires; the same
+author's stick spin cave is over a FOUR-wide gap and is named, not fitted (the agreement box's far wall
+is filled on every drawing in the agreement set).
+
+**`window_off_board` is a count with a property check, not a list.** The window holds the row under the
+nub, so every TSD on the floor, and every one hard against a wall, leaves the board: thousands of them.
+The test pins the count per player and checks every entry is a flat nub-down T whose window leaves the
+board in at least one hand and is not a hit — not an exact re-derivation, because the matcher returns
+"off board" only when no in-board cell failed first (iteration order; the `garbageEmpty` mutant moves
+entries out of that list and no hit, which is its asserted symptom).
+
+**No demo is built, and every board says why.** The planner stops each chain at its first failing
+check — the basic form's terrain is even but not a multiple of four (a planner limit), the complete
+TSD's J is two lower-case cells (its third is muted in the cleared row), the similar form's S is a Z's
+shape — and `stmbcave-demos.test.ts` re-derives each, with the facts behind them (two of the three
+terrains have an ODD cell count, a proof; the basic form's T completes one row, so it is a local sketch,
+not a full TSD). Two shared-file edits came with that, both in unhashed Python and default-preserving:
+`technique_page.py`'s selftest skips its demo-island plants when there is no demo (and plants a dropped
+unbuilt block instead), and the board it drops is the profile's `selftest_board` (default STSD's).
+Named lists and their sizes live in the two tests, never here.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
