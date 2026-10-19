@@ -1,0 +1,461 @@
+{
+ "schema": "technique-facts/1",
+ "report_eligible": false,
+ "technique": "imperialcross",
+ "means": "For every scored T-spin in the corpus (a T with an engine spin credit that cleared lines, inside the verified prefix, passing the reconstruction check), whether the Imperial Cross page's local shape stood around it: the lock's cells are the page's T stood with its nub right (as drawn, or nub left mirrored) and every cell of the window around it — the cross's three rows with its far arm empty, and the two rows of overhang above — is filled or empty as drawn. The opportunity is a full T-spin Double; every hit is followed to the next T lock to see whether the second TSD the page draws in the empty arm fired.",
+ "not_eligible_because": "simulator output: which local shape a T went into is read off the vendored Triangle engine's boards, and nothing on the corpus side has a second implementation of it. No claim id, no badge, no figure in a report.",
+ "caveat": "garbage is read as FILLED inside the window, and its hole columns are the engine's seeded-RNG columns, which disagree with the recorded ones (oracle-source.ts); a hit with garbage in its window is named in garbage_in_window for that reason. At a full TSD the cross's top and bottom rows are entailed by the clear (NaiveClauseForced): the T's orientation, the empty arm and the overhang discriminate. Counts only, always N / M with the denominator.",
+ "rules": [
+  "opportunity: a T lock with spin \"full\" clearing 2 lines, at a 0-based lock index <= the verified index, whose board-before plus its cells makes exactly the rows the engine recorded clearing (the reconstruction check, counted exactly as opener-facts.json donation.check counts it)",
+  "match: the lock's cells equal the variant's stood T under one translation (mirrored: columns reflected in the window), and every other window cell is filled (a piece or garbage) or empty as the page draws it; colour is never compared; cells outside the window are not read",
+  "mirrored is tried only when as-drawn fails; a window leaving the board is no match (window_off_board)",
+  "follow-up: the page's second-TSD slot in the empty arm carried through every clear and garbage insertion to the next T lock, each step verified against the engine's next board; fired iff that T is the slot and a scored full TSD",
+  "controls: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, no_roof and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up"
+ ],
+ "inputs": {
+  "sessions": [
+   {
+    "session": "2026-07-22",
+    "replays_md5": "5c365d5a42189e1a2138cfaacab85061",
+    "replay_facts_md5": "0c8583e1ec123cd79d9f98dcc2497db2"
+   },
+   {
+    "session": "2026-07-24",
+    "replays_md5": "036bda8130fd25676db3f56946791fe6",
+    "replay_facts_md5": "5ae71ce3745b690f30a8cbc1b098464a"
+   },
+   {
+    "session": "2026-07-28",
+    "replays_md5": "97d318eaf2faa588bf90fc1abfc6f2d7",
+    "replay_facts_md5": "5be7fefd353c58f48f78b30a26d5e8c4"
+   },
+   {
+    "session": "2026-08-01",
+    "replays_md5": "01bd0b9d96be7e3a1423f5c6b20d14a0",
+    "replay_facts_md5": "4677b48ff08b91deeb973b77c146c5d0"
+   },
+   {
+    "session": "2026-08-09",
+    "replays_md5": "b2b6556ffcd2922f39eb3e4e7c9454a0",
+    "replay_facts_md5": "580ef38628bc19630d0cc7143ddc1009"
+   },
+   {
+    "session": "2026-08-14",
+    "replays_md5": "464875cb25a2d382122d884045b60b79",
+    "replay_facts_md5": "5f6f4e61cdcf5ec669661a8f44c30f53"
+   },
+   {
+    "session": "2026-08-19",
+    "replays_md5": "0ec61c3c2360e2e7ce049ec1d5043b43",
+    "replay_facts_md5": "668a403b87216c38a8445ca9c0b178aa"
+   },
+   {
+    "session": "2026-08-25",
+    "replays_md5": "93043bcb37cd7ffcd77ad5eb8672fb7e",
+    "replay_facts_md5": "cf12c32107114833d4c5978fde9eee95"
+   },
+   {
+    "session": "2026-09-03",
+    "replays_md5": "59da0c51a5e29be634f6b7ae060b4a9b",
+    "replay_facts_md5": "84f0fffaea0abd26ae2bf44d804b5341"
+   },
+   {
+    "session": "2026-09-10",
+    "replays_md5": "ceedee793ea16b6d95bd286741e1aae9",
+    "replay_facts_md5": "2cd0158b019a9d06b9cbb73dac2c2275"
+   },
+   {
+    "session": "2026-09-11",
+    "replays_md5": "bd9f59da273fd97f3af582b467862c7b",
+    "replay_facts_md5": "9be5a738ba322fa6a0ce2f81601d40b4"
+   },
+   {
+    "session": "2026-09-17",
+    "replays_md5": "e3085e9b641941214f387e88fc15164a",
+    "replay_facts_md5": "faec48d7edcc699c63d25a2d4fe576c7"
+   },
+   {
+    "session": "2026-09-18",
+    "replays_md5": "fae311db6292ed6ab5d21062bc500d93",
+    "replay_facts_md5": "5af89e2a23420a0b1f38e245e828018f"
+   },
+   {
+    "session": "2026-09-19",
+    "replays_md5": "74a0fa2bc83c2520870eb35b1edb82e7",
+    "replay_facts_md5": "8efa186ef0f440cfdb3b47473d2302a7"
+   },
+   {
+    "session": "2026-10-03",
+    "replays_md5": "6870375613354ec9605bd366a0d32a32",
+    "replay_facts_md5": "45b21c17923ebef8ade14052e782250f"
+   },
+   {
+    "session": "2026-10-09",
+    "replays_md5": "ec6f52e26f431dd95fe2c1bf8fa53b1a",
+    "replay_facts_md5": "a598c6e53c898c60548076c4fd06843e"
+   },
+   {
+    "session": "2026-10-12",
+    "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
+    "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
+   }
+  ],
+  "transcription_md5": "c09b74c1486f7b88f3e9a29f5a95e1a0",
+  "emitter_md5": "c55ac21e73a43ab467cb9eb6b9adcb86"
+ },
+ "sessions": [
+  "2026-07-22",
+  "2026-07-24",
+  "2026-07-28",
+  "2026-08-01",
+  "2026-08-09",
+  "2026-08-14",
+  "2026-08-19",
+  "2026-08-25",
+  "2026-09-03",
+  "2026-09-10",
+  "2026-09-11",
+  "2026-09-17",
+  "2026-09-18",
+  "2026-09-19",
+  "2026-10-03",
+  "2026-10-09",
+  "2026-10-12"
+ ],
+ "window_pieces": 21,
+ "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
+ "opportunity": "full T-spin clearing 2 line(s)",
+ "denominators": {
+  "pinglamb": {
+   "TSD": {
+    "all": 5307,
+    "in_opener": 1043,
+    "mid_game": 4264
+   },
+   "TSS": {
+    "all": 603,
+    "in_opener": 77,
+    "mid_game": 526
+   },
+   "TST": {
+    "all": 1333,
+    "in_opener": 1306,
+    "mid_game": 27
+   },
+   "mini_TSS": {
+    "all": 310,
+    "in_opener": 12,
+    "mid_game": 298
+   },
+   "mini_TSD": {
+    "all": 0,
+    "in_opener": 0,
+    "mid_game": 0
+   },
+   "other_scored": 0,
+   "recon_disagreed": 0,
+   "unscored_past_prefix": 629
+  },
+  "yachi": {
+   "TSD": {
+    "all": 4751,
+    "in_opener": 1242,
+    "mid_game": 3509
+   },
+   "TSS": {
+    "all": 994,
+    "in_opener": 243,
+    "mid_game": 751
+   },
+   "TST": {
+    "all": 799,
+    "in_opener": 758,
+    "mid_game": 41
+   },
+   "mini_TSS": {
+    "all": 79,
+    "in_opener": 6,
+    "mid_game": 73
+   },
+   "mini_TSD": {
+    "all": 0,
+    "in_opener": 0,
+    "mid_game": 0
+   },
+   "other_scored": 0,
+   "recon_disagreed": 0,
+   "unscored_past_prefix": 414
+  }
+ },
+ "check": {
+  "tspin_clears_scored": 14176,
+  "reconstruction_agreed": 14176,
+  "reconstruction_disagreed": 0,
+  "rowmap_steps": 245899,
+  "rowmap_unverified": 30,
+  "by_session": {
+   "2026-07-22": {
+    "tspin_clears": 795,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 434,
+     "yachi": 361
+    }
+   },
+   "2026-07-24": {
+    "tspin_clears": 544,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 309,
+     "yachi": 235
+    }
+   },
+   "2026-07-28": {
+    "tspin_clears": 626,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 336,
+     "yachi": 290
+    }
+   },
+   "2026-08-01": {
+    "tspin_clears": 612,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 288,
+     "yachi": 324
+    }
+   },
+   "2026-08-09": {
+    "tspin_clears": 565,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 324,
+     "yachi": 241
+    }
+   },
+   "2026-08-14": {
+    "tspin_clears": 893,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 505,
+     "yachi": 388
+    }
+   },
+   "2026-08-19": {
+    "tspin_clears": 728,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 390,
+     "yachi": 338
+    }
+   },
+   "2026-08-25": {
+    "tspin_clears": 898,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 508,
+     "yachi": 390
+    }
+   },
+   "2026-09-03": {
+    "tspin_clears": 518,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 279,
+     "yachi": 239
+    }
+   },
+   "2026-09-10": {
+    "tspin_clears": 612,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 315,
+     "yachi": 297
+    }
+   },
+   "2026-09-11": {
+    "tspin_clears": 603,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 336,
+     "yachi": 267
+    }
+   },
+   "2026-09-17": {
+    "tspin_clears": 519,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 297,
+     "yachi": 222
+    }
+   },
+   "2026-09-18": {
+    "tspin_clears": 1322,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 702,
+     "yachi": 620
+    }
+   },
+   "2026-09-19": {
+    "tspin_clears": 1598,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 838,
+     "yachi": 760
+    }
+   },
+   "2026-10-03": {
+    "tspin_clears": 1610,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 824,
+     "yachi": 786
+    }
+   },
+   "2026-10-09": {
+    "tspin_clears": 1140,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 557,
+     "yachi": 583
+    }
+   },
+   "2026-10-12": {
+    "tspin_clears": 593,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 311,
+     "yachi": 282
+    }
+   }
+  }
+ },
+ "variants": {
+  "imperialcross": {
+   "hits_by_player": {
+    "pinglamb": {
+     "all": 7,
+     "in_opener": 1,
+     "mid_game": 6,
+     "mirrored": 5,
+     "garbage_in_window": 0
+    },
+    "yachi": {
+     "all": 3,
+     "in_opener": 1,
+     "mid_game": 2,
+     "mirrored": 2,
+     "garbage_in_window": 1
+    }
+   },
+   "followup_by_player": {
+    "pinglamb": {
+     "fired": 4,
+     "not_fired": {
+      "round_ended": 1,
+      "slot_filled_before_t": 2
+     }
+    },
+    "yachi": {
+     "fired": 3,
+     "not_fired": {}
+    }
+   },
+   "controls": {
+    "under": {
+     "TSS": {
+      "pinglamb": 1,
+      "yachi": 0
+     },
+     "TST": {
+      "pinglamb": 0,
+      "yachi": 0
+     },
+     "mini_TSS": {
+      "pinglamb": 0,
+      "yachi": 0
+     },
+     "mini_TSD": {
+      "pinglamb": 0,
+      "yachi": 0
+     }
+    },
+    "ablation": {
+     "no_must_empty": {
+      "pinglamb": 7,
+      "yachi": 3
+     },
+     "no_roof": {
+      "pinglamb": 7,
+      "yachi": 3
+     },
+     "t_overlap": {
+      "pinglamb": 7,
+      "yachi": 3
+     }
+    },
+    "orientation_baseline": {
+     "pinglamb": 43,
+     "yachi": 61
+    }
+   }
+  }
+ },
+ "lists": {
+  "imperialcross_hits": [
+   "2026-08-09 m5r8 pinglamb lock 86",
+   "2026-08-14 m8r1 yachi lock 38 (mirrored)",
+   "2026-08-14 m8r3 yachi lock 17",
+   "2026-08-19 m6r1 pinglamb lock 24 (mirrored)",
+   "2026-08-19 m10r5 pinglamb lock 25 (mirrored)",
+   "2026-09-11 m1r4 pinglamb lock 94 (mirrored)",
+   "2026-09-11 m4r2 yachi lock 124 (mirrored)",
+   "2026-09-18 m11r1 pinglamb lock 17 (mirrored)",
+   "2026-09-18 m18r3 pinglamb lock 22",
+   "2026-10-03 m11r3 pinglamb lock 72 (mirrored)"
+  ],
+  "followup_not_fired": [
+   "2026-08-19 m6r1 pinglamb lock 24 (slot_filled_before_t at lock 25)",
+   "2026-08-19 m10r5 pinglamb lock 25 (round_ended)",
+   "2026-09-18 m18r3 pinglamb lock 22 (slot_filled_before_t at lock 29)"
+  ],
+  "garbage_in_window": [
+   "2026-08-14 m8r1 yachi lock 38"
+  ],
+  "imperialcross_in_opener": [
+   "2026-08-14 m8r3 yachi lock 17",
+   "2026-09-18 m11r1 pinglamb lock 17"
+  ],
+  "window_off_board": [
+   "2026-07-22 m1r1 pinglamb lock 19",
+   "2026-07-24 m6r8 pinglamb lock 64",
+   "2026-08-01 m5r4 pinglamb lock 19",
+   "2026-08-09 m3r1 pinglamb lock 19",
+   "2026-08-09 m5r8 yachi lock 82",
+   "2026-08-14 m4r2 pinglamb lock 19",
+   "2026-08-14 m8r4 pinglamb lock 20",
+   "2026-08-19 m10r5 pinglamb lock 20",
+   "2026-08-19 m4r1 pinglamb lock 20",
+   "2026-08-19 m6r1 pinglamb lock 20",
+   "2026-08-19 m6r6 pinglamb lock 20",
+   "2026-09-10 m4r4 pinglamb lock 20",
+   "2026-09-17 m2r1 pinglamb lock 20",
+   "2026-09-18 m18r3 pinglamb lock 19"
+  ],
+  "recon_dropped_tsd": []
+ },
+ "hits": [
+  {"session":"2026-08-09","file":"replay-2026-08-09-5.ttrm","round_index0":7,"match":5,"round":8,"player":"pinglamb","variant":"imperialcross","lock":86,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..SS","...S","JJ.S","J...","JT.S"],"verified_to":149,"followup":{"lock":89,"fired":true,"reason":null}},
+  {"session":"2026-08-14","file":"replay-2026-08-14-7.ttrm","round_index0":0,"match":8,"round":1,"player":"yachi","variant":"imperialcross","lock":38,"in_opener":false,"mirrored":true,"garbage_in_window":true,"window_letters":["OO..","J...","O.JJ","...Z","G.GG"],"verified_to":72,"followup":{"lock":42,"fired":true,"reason":null}},
+  {"session":"2026-08-14","file":"replay-2026-08-14-7.ttrm","round_index0":2,"match":8,"round":3,"player":"yachi","variant":"imperialcross","lock":17,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..SS","...Z","II.Z","L...","II.Z"],"verified_to":95,"followup":{"lock":25,"fired":true,"reason":null}},
+  {"session":"2026-08-19","file":"replay-2026-08-19-6.ttrm","round_index0":0,"match":6,"round":1,"player":"pinglamb","variant":"imperialcross","lock":24,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["ZS..","O...","O.SS","...Z","S.II"],"verified_to":77,"followup":{"lock":25,"fired":false,"reason":"slot_filled_before_t"}},
+  {"session":"2026-08-19","file":"replay-2026-08-19-10.ttrm","round_index0":4,"match":10,"round":5,"player":"pinglamb","variant":"imperialcross","lock":25,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["ZS..","O...","O.SS","...Z","S.II"],"verified_to":26,"followup":{"lock":null,"fired":false,"reason":"round_ended"}},
+  {"session":"2026-09-11","file":"replay-2026-09-11-01.ttrm","round_index0":3,"match":1,"round":4,"player":"pinglamb","variant":"imperialcross","lock":94,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["JJ..","Z...","Z.LL","...L","J.ZL"],"verified_to":210,"followup":{"lock":101,"fired":true,"reason":null}},
+  {"session":"2026-09-11","file":"replay-2026-09-11-04.ttrm","round_index0":1,"match":4,"round":2,"player":"yachi","variant":"imperialcross","lock":124,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["OO..","O...","O.JJ","...T","L.TT"],"verified_to":134,"followup":{"lock":132,"fired":true,"reason":null}},
+  {"session":"2026-09-18","file":"replay-2026-09-18-11.ttrm","round_index0":0,"match":11,"round":1,"player":"pinglamb","variant":"imperialcross","lock":17,"in_opener":true,"mirrored":true,"garbage_in_window":false,"window_letters":["OJ..","O...","S.LL","...L","I.ZZ"],"verified_to":195,"followup":{"lock":24,"fired":true,"reason":null}},
+  {"session":"2026-09-18","file":"replay-2026-09-18-18.ttrm","round_index0":2,"match":18,"round":3,"player":"pinglamb","variant":"imperialcross","lock":22,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..LL","...O","ZZ.O","S...","II.Z"],"verified_to":35,"followup":{"lock":29,"fired":false,"reason":"slot_filled_before_t"}},
+  {"session":"2026-10-03","file":"replay-2026-10-03-11.ttrm","round_index0":2,"match":11,"round":3,"player":"pinglamb","variant":"imperialcross","lock":72,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["OO..","O...","O.JJ","...Z","S.ZZ"],"verified_to":93,"followup":{"lock":74,"fired":true,"reason":null}}
+ ]
+}

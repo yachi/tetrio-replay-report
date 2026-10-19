@@ -81,6 +81,8 @@ class TechniqueSiteProfile:
     cell_classes: dict = field(default_factory=dict)
     extra_css: str = ""
     max_page_bytes: int = 0
+    #: the board the selftest drops from the overview (any id the transcription draws)
+    selftest_board: str = "basic.after"
 
 
 def case_key(h):
@@ -657,32 +659,49 @@ class TechniqueSite:
         pages = self.render_all(REPO, inputs)
         ov, dp = pages[self.OVERVIEW], pages[self.DEMO_PAGE]
         first_case = _CASE.search(ov)
-        case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
         fig = _FIGURE.search(ov)
-        isl = RT._ISLAND.search(dp)
-        island = json.loads(isl.group(1))
-        slug = demo_slug(demos["demos"][0]["node"])
-        bad_island = json.loads(isl.group(1))
-        bad_island["rounds"][slug]["players"][0]["locks"][0][1] += 1
-        corrupt = dp.replace(isl.group(1), RT._island(bad_island))
-        reach = _REACH.search(dp).group(0)
         cases = [
             ("overview: a required sentence dropped", "ov", ov.replace(self.PS["midgame"], "")),
             ("overview: a badge", "ov", ov.replace("</body>", '<span data-claim="G001">✓</span></body>')),
             ("overview: an innerHTML", "ov", ov.replace("</body>", "<script>x.innerHTML=1</script></body>")),
-            ("overview: a hit row dropped", "ov", ov.replace(case_line + "\n", "")),
-            ("overview: a hit row duplicated", "ov", ov.replace(case_line, case_line + "\n" + case_line)),
+        ]
+        if first_case:
+            case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
+            cases += [
+                ("overview: a hit row dropped", "ov", ov.replace(case_line + "\n", "")),
+                ("overview: a hit row duplicated", "ov", ov.replace(case_line, case_line + "\n" + case_line)),
+            ]
+        else:
+            # no hit (BT砲): the case index is empty, so a row the artefact does not hold must be caught
+            cases.append(("overview: a hit row invented", "ov", ov.replace(
+                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>",
+                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>\n"
+                '    <tr data-case="2026-01-01 m1r1 nobody lock 0"><td>x</td></tr>', 1)))
+        cases += [
             ("overview: a figure changed", "ov",
              ov.replace(fig.group(0), f'data-figure="{fig.group(1)}">{fig.group(2)}0<', 1)),
             ("overview: the control sentence dropped", "ov", ov.replace(self.PS["control"], "")),
-            ("overview: a board dropped", "ov", RT._drop_line(ov, 'data-board="basic.after"')),
+            ("overview: a board dropped", "ov", RT._drop_line(ov, f'data-board="{self.p.selftest_board}"')),
             ("overview: a %", "ov", ov.replace("</header>", "<p>12%</p></header>")),
             ("overview: a simplified glyph", "ov", ov.replace("</header>", "<p>这</p></header>")),
-            ("demo: an embedded lock moved", "dp", corrupt),
-            ("demo: a reach dropped", "dp", dp.replace(reach, "<span>", 1)),
-            ("demo: a demo block dropped", "dp", RT._drop_line(dp, f'id="{slug}"')),
-            ("demo: a required sentence dropped", "dp", dp.replace(self.DS_rule(), "")),
         ]
+        if demos["demos"]:
+            isl = RT._ISLAND.search(dp)
+            slug = demo_slug(demos["demos"][0]["node"])
+            bad_island = json.loads(isl.group(1))
+            bad_island["rounds"][slug]["players"][0]["locks"][0][1] += 1
+            corrupt = dp.replace(isl.group(1), RT._island(bad_island))
+            reach = _REACH.search(dp).group(0)
+            cases += [
+                ("demo: an embedded lock moved", "dp", corrupt),
+                ("demo: a reach dropped", "dp", dp.replace(reach, "<span>", 1)),
+                ("demo: a demo block dropped", "dp", RT._drop_line(dp, f'id="{slug}"')),
+            ]
+        else:
+            # no demo was built: the page is its unbuilt blocks, so dropping one must be caught
+            cases.append(("demo: an unbuilt block dropped", "dp",
+                          RT._drop_line(dp, f'data-demo-node="{demos["unbuilt"][0]["node"]}"')))
+        cases.append(("demo: a required sentence dropped", "dp", dp.replace(self.DS_rule(), "")))
         ok = True
         for name, which, page in cases:
             if page == (ov if which == "ov" else dp):

@@ -1,0 +1,635 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "imperialcross",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/imperialcross.php",
+    "title": "インペリアルクロス(Imperial Cross)",
+    "author": "しゑひ(shiwehi)",
+    "updated": "2020-06-20",
+    "fetched": "2026-10-17",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, STMB Cave, 山岳積み2号 and stick spin used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 14 ten-wide boards in page order.",
+    "snapshot_file": "imperialcross.html",
+    "snapshot_sha256": "819c2f5ac322448209e009d7c9cc7232368972c362354709da064b6a8cda545b",
+    "snapshot_bytes": 24103,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "note": "the same script URL STSD's page loads (its bytes and colour map recorded in stsd-technique.json: B #444444, C #cccccc, c #a3a3a3, - #000000); not re-hashed for this page",
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case)"
+    },
+    "decorative_images": [
+      "インペリアルクロス(Imperial Cross)タイトル画像"
+    ],
+    "references": [
+      "./doubledagger.php (ダブルダガー, linked from the last sentence: a different technique)"
+    ],
+    "unfetched": [
+      "the ダブルダガー page — not transcribed, not claimed"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "j l z s o": "a cell of that piece",
+    "t": "a cell of the T, in a row it does not clear (on the illustrations: the T on its way in)",
+    "T": "a cell of the T in a row the spin clears (muted; OUR READING, checked: every upper-case row is a full row)",
+    "C": "on the spin board, an earlier cell in a row the spin clears (muted; checked the same way); on the cross-shape builds, in a row no spin clears, the stack the page assumes beside the build (OUR READING)",
+    "B": "dark grey on the basic form only: a cell the page leaves open, drawn empty on every later drawing of that board (OUR READING: read as EMPTY; the window reads none of them)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "B",
+  "quotes": [
+    {
+      "id": "intro",
+      "verbatim": "ここでは、インペリアルクロス(Imperial Cross)という、TSDを2回打つことができる中盤テンプレについて紹介していきます。"
+    },
+    {
+      "id": "h.basic",
+      "verbatim": "基本形とラインの消し方"
+    },
+    {
+      "id": "basic",
+      "verbatim": "基本形は上図の通りです。"
+    },
+    {
+      "id": "spin",
+      "verbatim": "ここから、以下のように%Tを縦向きに入れてTSDを打つと、もう一度TSDを打てる形が残ります。"
+    },
+    {
+      "id": "h.build",
+      "verbatim": "元地形からの組み方と特徴"
+    },
+    {
+      "id": "h.tsd",
+      "verbatim": "TSD形からの組み方"
+    },
+    {
+      "id": "tsd",
+      "verbatim": "1つ目の組み方としては、既に完成されたTSDの形から%Zや%Lを引っ掛けて作る方法です。"
+    },
+    {
+      "id": "tsd.j",
+      "verbatim": "%Jが来た場合には代わりにTSTを組むことができます。"
+    },
+    {
+      "id": "h.cross",
+      "verbatim": "十字形からの組み方"
+    },
+    {
+      "id": "cross",
+      "verbatim": "2つ目に、既に完成された十字形から%Zを乗せて作る方法です。"
+    },
+    {
+      "id": "dagger",
+      "verbatim": "インペリアルクロスを組む代わりにダブルダガーを組むこともできます。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic",
+      "kind": "base",
+      "caption_quote": "basic",
+      "label": "the basic form: the cross under a Z-shaped overhang; the dark-grey cells are left open",
+      "rows": [
+        "--BBBBBBBB",
+        "--ccBBBBBB",
+        "---ccBBBBB",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.t_drop",
+      "kind": "illustration",
+      "caption_quote": "spin",
+      "label": "the T on its way in: stood up at the left wall",
+      "rows": [
+        "t---------",
+        "ttcc------",
+        "t--cc-----",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.t_up",
+      "kind": "illustration",
+      "caption_quote": "spin",
+      "label": "the T on its way in: pointing up, under the overhang",
+      "rows": [
+        "----------",
+        "-tcc------",
+        "tttcc-----",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.t_left",
+      "kind": "illustration",
+      "caption_quote": "spin",
+      "label": "the T on its way in: stood, nub left, in the cross",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---cc-----",
+        "cctccccccc",
+        "ctt-cccccc",
+        "cctccccccc"
+      ]
+    },
+    {
+      "id": "basic.t_down",
+      "kind": "illustration",
+      "caption_quote": "spin",
+      "label": "the T on its way in: flat, pointing down, in the cross",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---cc-----",
+        "cc-ccccccc",
+        "ctttcccccc",
+        "cctccccccc"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "kind": "spin",
+      "spin_of": "basic",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "spin",
+      "label": "the T stood, nub right: a TSD clearing the cross's top and bottom rows, not adjacent",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---cc-----",
+        "CCTCCCCCCC",
+        "c-ttcccccc",
+        "CCTCCCCCCC"
+      ]
+    },
+    {
+      "id": "basic.after",
+      "kind": "after",
+      "after_of": "basic.spin",
+      "caption_quote": "spin",
+      "label": "what the TSD leaves: the empty arm under the overhang, a second TSD slot",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--cc------",
+        "---cc-----",
+        "c-ttcccccc"
+      ]
+    },
+    {
+      "id": "tsd.terrain",
+      "kind": "base",
+      "caption_quote": "tsd",
+      "label": "the TSD shape: a finished TSD slot, no roof",
+      "rows": [
+        "----------",
+        "cc--cccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tsd.oz",
+      "kind": "build",
+      "on": "tsd.terrain",
+      "adds": "oz",
+      "caption_quote": "tsd",
+      "label": "an O and a Z stood into the TSD slot's open corner: the cross under the overhang",
+      "rows": [
+        "----------",
+        "--oo------",
+        "--ooz-----",
+        "---zz-----",
+        "cc-zcccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tsd.ol",
+      "kind": "build",
+      "on": "tsd.terrain",
+      "adds": "ol",
+      "caption_quote": "tsd",
+      "label": "an O and an L hooked into the same corner: the same cross",
+      "rows": [
+        "----------",
+        "--oo------",
+        "--oo------",
+        "---lll----",
+        "cc-lcccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tsd.oj",
+      "kind": "build",
+      "on": "tsd.terrain",
+      "adds": "oj",
+      "caption_note": "the page's sentence for this board is quote tsd.j, checked verbatim against the snapshot and NOT rendered as its caption: it holds 来, the Japanese glyph the page audit's simplified-character check cannot tell from the simplified one",
+      "label": "with a J instead: a TST slot, not an Imperial Cross",
+      "rows": [
+        "----------",
+        "--oo------",
+        "--oo------",
+        "---jj-----",
+        "cc-jcccccc",
+        "c--jcccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "cross.terrain",
+      "kind": "base",
+      "caption_quote": "cross",
+      "label": "the cross shape, finished, no roof",
+      "rows": [
+        "----------",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "cross.z",
+      "kind": "build",
+      "on": "cross.z.terrain",
+      "adds": "z",
+      "caption_quote": "cross",
+      "label": "a Z laid flat over the cross: the overhang (the stack beside it drawn muted)",
+      "rows": [
+        "----------",
+        "----------",
+        "--zz------",
+        "---zzCCCCC",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dagger",
+      "kind": "build",
+      "on": "dagger.terrain",
+      "adds": "z",
+      "caption_quote": "dagger",
+      "label": "the Z one column right: ダブルダガー, a different technique",
+      "rows": [
+        "----------",
+        "----------",
+        "---zz-----",
+        "C---zzCCCC",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "cross.z.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "cross.z less its z: the cross with the muted stack beside where the Z goes",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-----CCCCC",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dagger.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dagger less its z: the cross with the muted stack on both sides of where the Z goes",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "C-----CCCC",
+        "cc-ccccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic",
+    "basic.t_drop",
+    "basic.t_up",
+    "basic.t_left",
+    "basic.t_down",
+    "basic.spin",
+    "basic.after",
+    "tsd.terrain",
+    "tsd.oz",
+    "tsd.ol",
+    "tsd.oj",
+    "cross.terrain",
+    "cross.z",
+    "dagger"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "imperialcross",
+      "board": "basic.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          5
+        ],
+        "cols": [
+          0,
+          3
+        ]
+      },
+      "t_cells": [
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          2
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of every drawing in `agreement` and ガムシロ積み's two Imperial Cross boards. Rows 3 and 5 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 4 is the cross's middle row, its LEFT arm empty (column 1), which no T but this stood one leaves and which keeps the two cleared rows apart; rows 1-2 are the overhang: the stem's top cell has an empty cell over it, the nub's corner a filled one. Column 4 is outside: the top cell of it disagrees (empty here, the stood Z on tsd.oz, B on the basic form). Occupancy only, never colour; garbage is filled.",
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "agreement": [
+        {
+          "board": "basic",
+          "t_cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "tsd.oz",
+          "t_cells": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "tsd.ol",
+          "t_cells": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "cross.z",
+          "t_cells": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "followup": {
+        "board": "basic.after",
+        "spin": "TSD",
+        "lines": 2,
+        "t_cells_pre_clear": [
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        "t_cells_after": [
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            1
+          ]
+        ],
+        "drawn_lines": 1,
+        "drawn_note": "the page draws basic.after before the stack right of the overhang is built: the flat T fills the bottom row there and not the one above it, whose cells right of the overhang are still empty. The TSD the page promises (もう一度TSDを打てる形) clears both once that side is stacked up, which is what the matcher scores.",
+        "note": "the flat T, pointing down, into the empty arm under the overhang (pre-clear: the row above the cross and the arm, two cleared rows apart). It lies inside the window; the matcher carries it through every clear to the next T."
+      },
+      "fires_on": [
+        "basic",
+        "tsd.oz",
+        "tsd.ol",
+        "cross.z"
+      ],
+      "misses": [
+        "tsd.terrain",
+        "tsd.oj",
+        "cross.terrain",
+        "dagger",
+        "basic.after"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "imperial",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T. `fires` is the independent drawer (harddrop's SDPC Spin page, another author); `also` is measured and named, not explained. ガムシロ積み's two boards are the window's `agreement` drawings, not a cross-check of it.",
+    "agreement_external": [
+      {
+        "file": "gamushiro-routes.json",
+        "node": "2.normal.imperial#1"
+      },
+      {
+        "file": "gamushiro-routes.json",
+        "node": "2.normal.imperial#2"
+      }
+    ],
+    "fires": [
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial",
+        "variant": "imperialcross",
+        "mirrored": true,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "harddrop's SDPC Spin: the Imperial Cross of its third C-Spin build, the T stood with its nub left"
+      }
+    ],
+    "also": [
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd.imperial.spin",
+        "variant": "imperialcross",
+        "mirrored": true,
+        "note": "shiwehi.com's stick spin page (the same author as this one): its SD-PC fallback, the nub left"
+      }
+    ],
+    "labelled_not_fired": [
+      {
+        "file": "gamushiro-routes.json",
+        "node": "2.normal.imperial#1",
+        "reason": "no T slot drawn (no U); one of the window's agreement drawings, its slot declared there"
+      },
+      {
+        "file": "gamushiro-routes.json",
+        "node": "2.normal.imperial#2",
+        "reason": "no T slot drawn (no U); one of the window's agreement drawings, its slot declared there"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial.pc#1",
+        "reason": "the SECOND TSD (a flat T into the empty arm) inside a Perfect Clear pattern: the follow-up, not the stood T the window anchors on"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial.pc#2",
+        "reason": "the second TSD inside a Perfect Clear pattern, as pc#1"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial.pc#3",
+        "reason": "the second TSD inside a Perfect Clear pattern, as pc#1"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial.pc#4",
+        "reason": "the second TSD inside a Perfect Clear pattern, as pc#1"
+      },
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd.imperial",
+        "reason": "the board before its T: no T slot drawn (no U); its spin board is 2.sd.imperial.spin"
+      }
+    ],
+    "unfetched": [
+      "https://harddrop.com/wiki/SDPC_Spin is read from sdpcspin-routes.json, not refetched here"
+    ]
+  },
+  "known_discrepancies": []
+}

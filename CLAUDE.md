@@ -283,6 +283,38 @@ bun pipeline/sim/emit-technique-demos.ts --technique stsd \
   --out analysis/stsd-demos.json                               # the constructed STSD demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/stsd.test.ts pipeline/openers/stsd-demos.test.ts  # its two tests
 python3 -m pipeline.stsd_page --selftest        # the docs/stsd*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stmbcave_shapes            # CI gate: the STMB Cave technique transcription
+python3 -m pipeline.openers.extract_stmbcave_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique stmbcave \
+  --out analysis/stmbcave-facts.json                           # STMB Cave's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique stmbcave \
+  --out analysis/stmbcave-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/stmbcave.test.ts pipeline/openers/stmbcave-demos.test.ts  # its two tests
+python3 -m pipeline.stmbcave_page --selftest    # the docs/stmbcave*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_imperialcross_shapes            # CI gate: the Imperial Cross technique transcription
+python3 -m pipeline.openers.extract_imperialcross_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique imperialcross \
+  --out analysis/imperialcross-facts.json                      # Imperial Cross's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique imperialcross \
+  --out analysis/imperialcross-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/imperialcross.test.ts pipeline/openers/imperialcross-demos.test.ts  # its two tests
+python3 -m pipeline.imperialcross_page --selftest # the docs/imperialcross*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_doubledagger_shapes            # CI gate: the Double Dagger technique transcription
+python3 -m pipeline.openers.extract_doubledagger_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique doubledagger \
+  --out analysis/doubledagger-facts.json                       # Double Dagger's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique doubledagger \
+  --out analysis/doubledagger-demos.json                       # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/doubledagger.test.ts pipeline/openers/doubledagger-demos.test.ts  # its two tests
+python3 -m pipeline.doubledagger_page --selftest  # the docs/doubledagger*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_btcannon_shapes            # CI gate: the BT砲 (途中BT) technique transcription
+python3 -m pipeline.openers.extract_btcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's BT_Cannon.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique btcannon \
+  --out analysis/btcannon-facts.json                           # BT砲's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique btcannon \
+  --out analysis/btcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/btcannon.test.ts pipeline/openers/btcannon-demos.test.ts  # its two tests
+python3 -m pipeline.btcannon_page --selftest      # the docs/btcannon*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3910,14 +3942,16 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD）— mid-game local shapes, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
 rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
-hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page; a
-later technique whose shape the window predicate can express is a data addition (a transcription
+hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
+STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
+ダブルダガー (`template/doubledagger.php`) the fourth and BT砲 (`template/btcannon.php`) the fifth (each later one has a ### below); a later technique whose shape the window
+predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
 
@@ -3997,6 +4031,230 @@ window predicate cannot express, e.g. 階段のドネイト's staircase over sev
 name when it happens. `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
 because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
 direction is clean: no route artefact hashes a technique file.
+
+### STMB Cave
+
+The same deliverable for `template/stmbcave.php` (「2021-03-23更新」): `pipeline/openers/stmbcave-technique.json`
+(held as a literal in `extract_stmbcave_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-stmbcave.ts` → `analysis/stmbcave-facts.json` (`stmbcave.test.ts`),
+`technique-demos-stmbcave.ts` → `analysis/stmbcave-demos.json` (`stmbcave-demos.test.ts`), and
+`docs/stmbcave.html` + `docs/stmbcave-demos.html` from `stmbcave_page.py` + `stmbcave_prose.json`, the
+second card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is the T's cells, as STSD's — the T laid flat, nub down — so the
+window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** What did not fit
+was the GATE's window rule: STSD's window is the bounding box of the T, every filled cell above it and
+the follow-up slot, and this page's one complete TSD is drawn on a stacked board whose J, Z, L and O
+above the T are no part of the shape (each other drawing has different cells there). So a variant may
+now declare `window_basis: agreement` (opt-in; STSD's gate output is byte-identical with or without the
+change, compared by running both): the window is the box on which every drawing of the shape agrees —
+the page's own three, and harddrop's positive STMB_Cave diagrams from `wiki-tspin-techniques.json` (the
+spec's `external_drawings`) — checked from BOTH sides: every drawing fires it exactly once, at its
+declared slot and hand, and widening it by a row or a column on any side meets a disagreement or leaves
+a drawing. Every piece letter left outside is named in `untested_drawn`, both ways. The same pass made
+the follow-up rule compare the after board BOTTOM-aligned (this page draws it a row shorter than the
+spin board; STSD draws them the same height, so its shift is zero).
+
+**What the window can discriminate is one row.** Its top two rows are the rows the TSD clears, so at
+the opportunity every filled cell in them is entailed by the clear (`NaiveClauseForced`), the nub row
+being the cave's roof (`RoofForced` / `RoofCannotDiscriminate`) — no roof test is added, and the test
+MEASURES that the cave row alone, with the T anchored, gives exactly the headline. The page's own roof
+(the stood Z over the T's back arm) is outside the box: on the stacked board the cell beside it is the L
+that roofs the NEXT TSD, which no other drawing has, and a rectangle cannot keep one without the other.
+Because a flat T is symmetric, the must-empty cells are what tell the two hands apart: the `noMustEmpty`
+mutant makes a lock match both, and the matcher refuses it (the test asserts the throw).
+
+**Cross-checks, each stated in the test as agreement or named differences.** (1) The opener metric
+(`opener-facts.json` `stmb_cave`, harddrop's ≥3-wide gap overlapping the T): `stmbcave.test.ts`
+re-implements `caveAt` (importing `emit-opener-facts.ts` runs a session) and reproduces every session's
+per-player `width_ge_3`, `min_depth_ge_2`, `in_opener` and `mid_game` exactly; every hit is one of its
+caves, and every cave that is not a hit is named in `CAVE_METRIC_ONLY` with a re-derived geometric
+reason (`centred`: the gap is the T's own columns; `arm_only`: the gap reaches under one arm, the nub on
+a filled cell; `wall`: the cells behind the nub leave the board). (2) SDPC Spin: every round whose route
+reached `3.first.cave` with the node verified is a hit at its next T lock (`SDPC_CAVE_HITS`), the rest
+named. (3) The gate's `cross:` rule over every routes board: harddrop's SDPC Spin cave fires; the same
+author's stick spin cave is over a FOUR-wide gap and is named, not fitted (the agreement box's far wall
+is filled on every drawing in the agreement set).
+
+**`window_off_board` is a count with a property check, not a list.** The window holds the row under the
+nub, so every TSD on the floor, and every one hard against a wall, leaves the board — far too many to list
+(the size is the artefact's and the test's, never this file's). **A window cell past the side or the floor is
+"leaves the board", never "filled"**, for every technique: the drawings draw stack in those cells, and the wall
+is not read as standing in for it, so a shape built flush against the wall is not a hit. That is a definition,
+not a measurement, and `stmbcave.test.ts` names the cave it costs (`CAVE_METRIC_ONLY`, reason `wall`). The test pins the count per player and checks every entry is a flat nub-down T whose window leaves the
+board in at least one hand and is not a hit — not an exact re-derivation, because the matcher returns
+"off board" only when no in-board cell failed first (iteration order; the `garbageEmpty` mutant moves
+entries out of that list and no hit, which is its asserted symptom).
+
+**No demo is built, and every board says why.** The planner stops each chain at its first failing
+check — the basic form's terrain is even but not a multiple of four (a planner limit), the complete
+TSD's J is two lower-case cells (its third is muted in the cleared row), the similar form's S is a Z's
+shape — and `stmbcave-demos.test.ts` re-derives each, with the facts behind them (two of the three
+terrains have an ODD cell count, a proof; the basic form's T completes one row, so it is a local sketch,
+not a full TSD). Two shared-file edits came with that, both in unhashed Python and default-preserving:
+`technique_page.py`'s selftest skips its demo-island plants when there is no demo (and plants a dropped
+unbuilt block instead), and the board it drops is the profile's `selftest_board` (default STSD's).
+Named lists and their sizes live in the two tests, never here.
+
+### インペリアルクロス（Imperial Cross）
+
+The same deliverable for `template/imperialcross.php` (「2020-06-20更新」): `pipeline/openers/imperialcross-technique.json`
+(held as a literal in `extract_imperialcross_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-imperialcross.ts` → `analysis/imperialcross-facts.json` (`imperialcross.test.ts`),
+`technique-demos-imperialcross.ts` → `analysis/imperialcross-demos.json` (`imperialcross-demos.test.ts`), and
+`docs/imperialcross.html` + `docs/imperialcross-demos.html` from `imperialcross_page.py` +
+`imperialcross_prose.json`, the third card under 中盤手法. Every figure is read off the artefacts and tests,
+never typed here.
+
+**The spin is a TSD and the anchor is the T's cells — the T STOOD UP, nub right (mirrored: nub left) — so
+the window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** The T goes into a
+cross-shaped hole and clears the cross's top and bottom rows, which are NOT adjacent; the engine credits a
+full TSD either way, and nothing in the matcher assumes the cleared rows touch (the follow-up's row map
+counts the cleared rows below each slot cell). The row between them keeps the cross's far arm EMPTY, and that
+cell is what tells this T from STSD's (whose nub fills it): `imperialcross.test.ts` re-derives, from both
+transcriptions, that anchored on the same stood T the two windows disagree on a cell, and measures the two hit
+sets disjoint.
+
+**The window is the agreement box (`window_basis: agreement`, STMB Cave's opt-in), and the reason is the
+page's own build.** The bounding box of T, roof and follow-up reaches a column whose top cell is empty on the
+spin board, FILLED on the page's TSD-shape build (its stood Z) and drawn `B` on the basic form. So the window
+is the box every drawing agrees on — the page's basic form and three builds, and ガムシロ積み's two Imperial
+Cross boards (`gamushiro-routes.json`, the spec's `external_drawings`, their slots declared in the extract
+module and checked by the agreement rule). `B` here is dark grey the page leaves open: read as EMPTY
+(`empty_letters`), and `extra_checks` measures that the window reads no `B` cell where it fires. The cross
+check (`cross:`) fires on harddrop's SDPC Spin `3.third.imperial` (independent) and on stick spin's
+`2.sd.imperial.spin` (same author, `also`), both nub left.
+
+**One gate change, in unhashed Python, default-preserving: the opt-in `followup.drawn_lines`.** The page draws
+its after board BEFORE the stack beside the second slot is built, so the follow-up T fills one row of the
+drawing while the TSD the page promises clears two. Rule (d) now takes the drawn count from `drawn_lines`
+when present (fewer than `lines`, with a `drawn_note`), else `lines` as before; STSD's and STMB Cave's gate,
+selftest and `--html-dir` output were compared byte for byte with and without the change. The matcher still
+scores the follow-up as a full TSD.
+
+**What discriminates is measured, and either half is enough on this corpus.** The cross's top and bottom rows
+are entailed by the clear; with only the cross's filled cells and the T anchored the window admits more TSDs
+than the headline (the count is pinned in the test), while the `no_roof` ablation (the cross with its empty
+arm) and the `no_must_empty` one (every filled cell, the overhang's included) each give the headline exactly —
+so `noMustEmpty` and `noRoof` are measured EQUIVALENT mutants, named and asserted byte-identical.
+
+**Cross-checks against the route artefacts:** no corpus round reached any route page's Imperial Cross node
+(named, empty — the scan reads every string of every case, not one field, and `snapshots` is required, never
+defaulted); every SDPC Spin round that reached its parent `3.third` is measured over bag 4 (the bag harddrop
+draws the Imperial Cross in, re-derived from `sdpcspin-routes.json`) and named with what happened
+(`SDPC_THIRD_ROUNDS`; how many is the test's).
+
+**No demo is built, and every board says why** (`imperialcross-demos.test.ts` re-derives each): the basic
+form and the bare cross have an ODD cell count (a proof); the TSD-shape terrain has no tiling by tetrominoes
+at all (an exact-cover search over all seven kinds, with a control that finds tilings where there are some),
+so only line clears could reach it; the cross-shape build's terrain is even but not a multiple of four (a
+planner limit). The page's sentence for its TST board holds 来, which the page audit's simplified-glyph check
+cannot tell from the simplified character, so that board's caption is not rendered (`caption_note` says so;
+the quote is still checked against the snapshot). Named lists and their sizes live in the two tests.
+
+### ダブルダガー（Double Dagger）
+
+The same deliverable for `template/doubledagger.php` (「2020-06-20更新」): `pipeline/openers/doubledagger-technique.json`
+(held as a literal in `extract_doubledagger_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-doubledagger.ts` → `analysis/doubledagger-facts.json` (`doubledagger.test.ts`),
+`technique-demos-doubledagger.ts` → `analysis/doubledagger-demos.json` (`doubledagger-demos.test.ts`), and
+`docs/doubledagger.html` + `docs/doubledagger-demos.html` from `doubledagger_page.py` + `doubledagger_prose.json`,
+the fourth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is STMB Cave's flat, nub-down T, so the window predicate expresses it and NO
+shared file changed** — not the matcher, not the gate, not the renderer: the transcription, the two profiles,
+the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry. Two TSD slots are stacked
+one directly on the other, the upper roofed over one end; the TSD's clear drops the overhang onto the lower
+slot, which is the second TSD. The window is STSD's default bounding box (T, roof, follow-up slot): no other
+drawing disagrees with the spin board inside it, so the opt-in agreement box was not needed. It does NOT reach
+the lower slot's far wall, which the follow-up table answers instead.
+
+**What the shared rules could not say lives in `extra_checks`, under its own tags** (`mirror:`, `line:`,
+`pink:`, `B:`, `imperial:`, each with a selftest mutant): the page draws most of its Double Daggers MIRRORED,
+and the shared rule (e) takes only as-drawn boards, so `fires_mirrored` is checked there (once, mirrored, at a
+two-row placement; spin boards read with their spin piece taken out — the tetris feature spins an I). Its second
+feature, a line between the two slots, is a Double Dagger the window does not express: `not_expressed` records
+it, and the gate measures both halves (no fire as drawn; with the line row taken out, one fire at the drawn T).
+`p` (the page's pink cell, 「屋根の反対側」) is read as empty and measured to be the build's J cell, outside the
+window, so the corpus never tests that build condition. `max_rows` is 10 (the tetris feature).
+
+**Cross-sources, both measured.** harddrop's SDPC Spin page (another author) draws this shape in its second
+C-Spin build's bag-5 boards — the T in the slot the build makes, directly over the C-Spin's residue slot — and
+the gate's `cross:` rule finds them; no routes board is LABELLED ダブルダガー. shiwehi.com's own インペリアルクロス
+page draws a Double Dagger as its `dagger` miss and this page draws an インペリアルクロス (`cross.imperial`): the
+`imperial:` rule measures each window firing only on the other page's drawing (same author: corroboration).
+Every SDPC Spin round that reached that build is measured over bag 5 in the test and named (`SDPC_SECOND_ROUNDS`; how many is the test's).
+
+**What discriminates is measured per window part** (`doubledagger.test.ts`, `PART_ONLY`): with the T anchored,
+the lower slot alone gives exactly the headline, while the cleared rows (entailed) and the overhang row (which a
+TSD slot nearly always has) admit almost every full TSD — so the `no_roof` ablation equals the headline. The
+overhang is still not decoration: it is half of what tells the two HANDS apart, and both `noRoof` and
+`noMustEmpty` make a lock match both hands, which the matcher refuses (both asserted to throw). The hit sets of
+this window and STMB Cave's (the same flat T) are disjoint and the two windows clash on a cell in every pairing
+of hands, both re-derived in the test.
+
+**No demo is built, and every board says why** (`doubledagger-demos.test.ts` re-derives each): the TSD-shape
+build's terrain and the bare cross have an ODD cell count (a proof); the basic form, the cross-shape build's
+terrain and the three feature boards are even but not multiples of four (a planner limit); and the cross-shape
+build is drawn mirrored, so the as-drawn window the planner fires would not fit it even built (measured). The
+two sentences naming the build pieces draw them as mino icons the page text drops; they are quoted as the text
+reads (`icons`) and not used as captions. Named lists and their sizes live in the two tests.
+
+### BT砲（途中BT, mid-game BT Cannon）
+
+The same deliverable for `template/btcannon.php` (「2021-07-03更新」): `pipeline/openers/btcannon-technique.json` (held as a
+literal in `extract_btcannon_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-btcannon.ts`
+→ `analysis/btcannon-facts.json` (`btcannon.test.ts`), `technique-demos-btcannon.ts` → `analysis/btcannon-demos.json`
+(`btcannon-demos.test.ts`), and `docs/btcannon.html` + `docs/btcannon-demos.html` from `btcannon_page.py` +
+`btcannon_prose.json`, the fifth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**It is a technique page although BT Cannon is also an opener.** The page is the MID-GAME form (途中BT, built from 欄干 or
+72積み), matched on a partial stack at any lock; the opener of the same name (開幕BT砲) is the same shape, so a hit inside
+the opener window is counted in the artefact's `in_opener` column, never filtered out.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's and ダブルダガー's), so the matcher is untouched; the
+follow-up is a TST.** The TST slot runs up the wall beside the T's left end and on under the clear: before the TSD its four
+cells are split by the two cleared rows, and the row map (which counts the cleared rows below each slot cell) joins them.
+`followup.lines` 3 is read by the matcher's existing `followupKind`, so `technique-facts.ts` and every hash line stayed put.
+
+**The window is the agreement box, and its external drawings are harddrop's own BT_Cannon page.** STSD's bounding box would be
+the whole board (the TSD board draws the stack right of the slots as filled rows above the T). No committed routes board
+draws a BT (the gate measures the window fires on none), and the opener catalogue's BT fields are four-row bag-1 boards the
+seven-row window cannot be placed on, so the independent drawings come from harddrop's `BT_Cannon` page, pinned the way SDPC
+Spin's wikitext is (oldid, MediaWiki's revision sha1, our sha256 and byte count, fetched by urllib through `api.php`) and
+recorded in the transcription's `cross_source.harddrop`: every board on that page whose drawn T the window fires on (its
+「Mid-game BT Cannon」 section among them), and every board with no T drawn on which it fires. `--html-dir` re-reads the
+wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, so
+`check_wikitext_sources` does not discover it and nothing re-reads it weekly: an open item, named here.
+
+**Three opt-in edits to the shared gate, in unhashed Python, each checked default-preserving** (the gate, selftest and
+`--html-dir` output of STSD, STMB Cave, インペリアルクロス and ダブルダガー were compared byte for byte before and after): a
+`spin_piece: U` board is read as a T (the page draws the T it places in the renderer's `U`); an empty `cross_source.fires` is
+allowed only with `routes_fire_none` and an agreement window with external drawings (rule (g) firing the window on each of
+them is then the independent check); and `TechniqueSpec.html_checks` extends `--html-dir`. A fourth, in `technique_page.py`:
+its selftest plants an invented hit row when the case index is empty (it assumed at least one hit); the other four pages'
+selftest output is byte-identical.
+
+**The test pins the hit list as a named list, and proves the predicate could have fired** (whether the corpus
+holds a hit is that list's, never this file's). `btcannon.test.ts` pins every named list, and runs the TS `windowMatch` (the Python predicate's twin) on every recorded harddrop drawing (once, at its drawn T, in
+its recorded hand, nowhere else), on its no-T boards and on the page's own drawings. What discriminates is measured per window
+part: the rows above the T alone admit no full TSD of the corpus, so `noMustEmpty`, `garbageEmpty` and the follow-up mutants are
+EQUIVALENT on the corpus (named, asserted byte-identical), while `noRoof` turns the `below` part into the headline. The
+follow-up search therefore runs nowhere on the corpus, so the test runs it on the page's own TSD → TST as a two-lock digest
+(`basic.spin`, its clear, the T into `tst.spin`'s slot), as drawn and mirrored: it fires, and each follow-up mutant breaks it
+there. The window clashes with STMB Cave's and ダブルダガー's on a cell in every pairing of hands.
+
+**harddrop's drawings are not chosen by the window.** The agreement drawings taken from harddrop are the boards whose drawn
+T the window fires on, which alone would let the window pick its own evidence. So `drawn_t_not_fired` records every OTHER
+board on that page with a drawn T — its lie, the rows it clears and why the window misses it (not the window's T, the window
+leaves the board, or a cell disagrees), measured by the gate, with a note read off the page — and `--html-dir` fails unless
+every drawn T on the page is in one list or the other. A drawing of the shape the window misses is a red build to name.
+
+**No demo is built and no chain is planned**: the shared planner reads a build's page pieces as its lower-case letters, and
+this page's 72積み builds draw them upper case (the 72積み stack lower case) while the 欄干 build's terrain carries a lower-case L
+of its own. Every board carries the profile's reason with the cell count `btcannon-demos.test.ts` re-derives; one 72積み terrain
+is a multiple of four and is stopped by that reading alone, which its reason says. Teaching the planner a per-profile page-letter
+set would move every demo artefact's `planner_md5`, so it was not done here. Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

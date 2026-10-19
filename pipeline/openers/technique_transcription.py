@@ -18,7 +18,8 @@ per rule and requires that tag):
         `kind` is one of KINDS; every reference (`spin_of`, `after_of`, `on`, `same_occupancy_as`,
         `extends`, a variant's boards) names a node; `page_order` lists every DRAWN board exactly
         once and no derived one.
-  spin:     — a spin board's spin piece, read off its spin letters, is one tetromino; its upper-case
+  spin:     — a spin board's spin piece, read off its spin letters, is one tetromino (a `spin_piece: U`
+        board — a page drawing the T it places in the renderer's `U`, BT砲 — is read as a T); its upper-case
         cells are exactly the cells of the rows that are full with the piece in (cell by cell, so one
         unmuted cell in a cleared row fails); the spin's named line count is the number of those rows;
         a spin board with `spin_of` equals that board by occupancy once the piece is taken out (the
@@ -33,15 +34,22 @@ per rule and requires that tag):
         variant lists and the gate re-reads) and the follow-up slot; (c) outside it, every cell of a
         row the spin does not clear is empty or `c`, so nothing the matcher ignores carries a piece
         letter; (d) the follow-up slot is empty on the after board, is one T, and fills exactly
-        `followup.lines` rows of the DRAWN after board; (e) the window, evaluated the way the matcher
+        `followup.lines` rows of the DRAWN after board (or the opt-in `followup.drawn_lines`, fewer, with
+        a `drawn_note`, for a page that draws the after board before the stack beside the slot is built);
+        (e) the window, evaluated the way the matcher
         evaluates it, fires on every board the variant lists in `fires_on` at exactly one RESTING
         placement, as drawn, and never mirrored; (f) it does not fire on any board in `misses`, at
         the spin the page draws there, or (for a board with no spin drawn) at any resting placement.
+        A variant with `window_basis: agreement` takes (b*), (c*), (g) and (h) of `agreement_window`
+        in place of (b) and (c): its window is the box every drawing of the shape agrees on.
   colour:   — every letter is whole pieces (`route_transcription.piece_groups_ok`, with the spec's
         `upper_groups`); a board that breaks it is a named discrepancy `<id>:colour`.
   cross:    — the variant, evaluated by the same predicate on every U-slot board of every committed
         `*-routes.json` (the U cells as the spin's cells), fires on exactly the boards the
-        transcription records in `cross_source.fires`, plus the named `cross_source.also`; and every
+        transcription records in `cross_source.fires`, plus the named `cross_source.also` (opt-in: an
+        EMPTY `fires` is allowed only with `cross_source.routes_fire_none` saying why, and only for an
+        `agreement` window with external drawings — rule (g) then fires the window on another site's
+        drawings one by one, which is the independent check `fires` stands for elsewhere); and every
         board those routes files LABEL as this technique is either one of them or named, with a
         reason, in `cross_source.labelled_not_fired`.
   quote:    — quote ids are unique, every `caption_quote` names one.
@@ -53,6 +61,8 @@ must reproduce `cross_source.fires` + `cross_source.also` exactly. Two implement
 
 `--html-dir` re-checks a refetched raw-HTML snapshot with `route_transcription.check_snapshot`,
 unchanged: the file keeps its boards under `nodes` and carries an empty `basic_form` for that reason.
+A spec's opt-in `html_checks` re-checks whatever else the technique pinned beside the page (BT砲: the
+harddrop wikitext its external drawings are read from), from the same directory.
 """
 from __future__ import annotations
 
@@ -72,6 +82,8 @@ HERE = Path(__file__).resolve().parent
 KINDS = frozenset({'base', 'spin', 'after', 'build', 'illustration', 'derived'})
 #: a technique page's boards are local, never compared whole, but still drawn short
 MAX_ROWS = 8
+#: a spin letter that is not a piece letter, read as the piece whose shape it must have
+SPIN_SHAPE = {'u': 't'}
 
 
 @dataclass
@@ -90,6 +102,11 @@ class TechniqueSpec:
     routes_glob: str = '*-routes.json'
     #: technique-only rules: fn(data) -> (problems, measured discrepancy ids)
     extra_checks: Callable | None = None
+    #: drawings from OTHER committed transcriptions an `agreement` window is checked against:
+    #: fn() -> [{'name', 'rows' ('-' empty), 't_cells' [[row, col]], 'mirrored'}]
+    external_drawings: Callable | None = None
+    #: opt-in `--html-dir` checks beyond the page snapshot: fn(data, html_dir) -> problems
+    html_checks: Callable | None = None
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -161,6 +178,102 @@ def window_fires(data: dict, var: dict, spec: TechniqueSpec, board: list[str], l
         if (v == '#') != filled(R, C):
             return False
     return True
+
+
+def frame_map(data: dict, var: dict, spec: TechniqueSpec, lock: set, mirrored: bool):
+    """The map `window_fires` applies, from the variant board's frame to a board where the spin went
+    into `lock`: columns reflected inside the window when mirrored, then the one translation that puts
+    the window's T on `lock`. Defined for cells outside the window too (the agreement rule extends it)."""
+    (c0, c1) = var['window']['cols']
+    tc = [tuple(x) for x in var['t_cells']]
+    mc = (lambda c: c0 + (c1 - c)) if mirrored else (lambda c: c)
+    dr = min(r for r, _ in lock) - min(r for r, _ in tc)
+    dc = min(c for _, c in lock) - min(mc(c) for _, c in tc)
+    return lambda r, c: (r + dr, mc(c) + dc)
+
+
+def agreement_drawings(data: dict, var: dict, spec: TechniqueSpec) -> list[dict]:
+    """The drawings an `agreement` window is checked on: the variant's own `agreement` boards (each a
+    node of this transcription with its slot's T cells and orientation), then the spec's external ones."""
+    out = [{'name': a['board'], 'rows': node_rows(data, a['board']),
+            't_cells': a['t_cells'], 'mirrored': a['mirrored']} for a in var.get('agreement', [])]
+    return out + (spec.external_drawings() if spec.external_drawings else [])
+
+
+def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
+    """The window rule for a variant whose window is the AGREEMENT BOX (`window_basis: agreement`), the
+    opt-in alternative to the bounding box of T, roof and follow-up. A page that draws its technique
+    once as a whole stacked board (pieces above the spin that are no part of the shape) and once more
+    as local sketches cannot take the bounding-box rule: the stacked pieces would all be in the
+    window. So the window is the box on which every drawing of the shape AGREES, cell for cell, and it
+    is checked from both sides:
+
+      (b*) the window lies on its board; its roof cells are the filled cells above the spin INSIDE it;
+           the follow-up slot may lie outside it (the matcher carries it either way);
+      (c*) every piece letter drawn outside the window in a row the spin does not clear is NAMED in
+           `untested_drawn` (exactly those, both ways), so nothing the matcher ignores is silent;
+      (g)  agreement: anchored at each drawing's declared slot, in its declared orientation, the window
+           fires — and at no other resting placement, either orientation; at least two drawings, at
+           least one from another transcription (the spec's `external_drawings`);
+      (h)  maximality: widened by one row or column on any side, the new cells hold one on which the
+           drawings disagree or which leaves one of them. The window is DERIVED from the drawings,
+           never chosen: a cell every drawing agrees on cannot be left out of it at its edge. That holds
+           only while the SET of drawings is not chosen by the window either: an external source whose
+           drawings are picked as the boards the window fires on must also name every other drawing of a
+           T on that source and why the window misses it (BT砲's `drawn_t_not_fired`), or a drawing that
+           disagrees could never refute the box.
+    """
+    bad = []
+    (r0, r1), (c0, c1) = v['window']['rows'], v['window']['cols']
+    if r0 < 0 or c0 < 0 or r1 >= len(rows) or c1 >= WIDTH:
+        bad.append(f'window: {v["id"]}\'s window leaves its board')
+        return bad
+    roof = {(r, c) for (r, c) in filled_set(rows, spec) if r < top and (r, c) in inwin}
+    if roof != {tuple(x) for x in v['roof_cells']}:
+        bad.append(f'window: {v["id"]}.roof_cells are not the filled cells above the T inside the window: {sorted(roof)}')
+    outside = {(r, c) for r, row in enumerate(rows) if r not in fr for c, ch in enumerate(row)
+               if (r, c) not in inwin and ch not in (EMPTY, 'c') and not is_empty(ch, spec)}
+    named = {tuple(x) for x in v.get('untested_drawn', {}).get('cells', [])}
+    if outside != named:
+        bad.append(f'window: {v["id"]}.untested_drawn {sorted(named)} is not the piece letters outside the window '
+                   f'{sorted(outside)}')
+    if outside and not v.get('untested_drawn', {}).get('reason'):
+        bad.append(f'window: {v["id"]}.untested_drawn carries no reason')
+    ds = agreement_drawings(data, v, spec)
+    if len(ds) < 2 or not (spec.external_drawings and spec.external_drawings()):
+        bad.append(f'window: {v["id"]}: an agreement window needs two drawings, one from another transcription')
+        return bad
+    W = window_cells(data, v, spec, False)
+    for d in ds:
+        lock = {tuple(x) for x in d['t_cells']}
+        if any(not is_empty(d['rows'][r][c], spec) for r, c in lock):
+            bad.append(f'window: {v["id"]}: {d["name"]}\'s slot is not empty')
+            continue
+        hits = [(frozenset(cs), m) for cs in t_placements(d['rows'], spec) for m in (False, True)
+                if window_fires(data, v, spec, d['rows'], cs, m)]
+        if hits != [(frozenset(lock), d['mirrored'])]:
+            bad.append(f'window: {v["id"]} fires {len(hits)} time(s) on {d["name"]}, not once at its slot '
+                       f'({"mirrored" if d["mirrored"] else "as drawn"})')
+    maps = [(d, frame_map(data, v, spec, {tuple(x) for x in d['t_cells']}, d['mirrored'])) for d in ds]
+
+    def agrees(r, c):
+        vals = set()
+        for d, f in maps:
+            R, C = f(r, c)
+            if R < 0 or R >= len(d['rows']) or C < 0 or C >= WIDTH:
+                return False
+            vals.add(not is_empty(d['rows'][R][C], spec))
+        return len(vals) == 1
+    for (r, c) in W:
+        if W[(r, c)] != 'T' and not agrees(r, c):
+            bad.append(f'window: {v["id"]}: the drawings disagree at ({r},{c}), inside the window')
+    for side, strip in (('up', [(r0 - 1, c) for c in range(c0, c1 + 1)]),
+                        ('down', [(r1 + 1, c) for c in range(c0, c1 + 1)]),
+                        ('left', [(r, c0 - 1) for r in range(r0, r1 + 1)]),
+                        ('right', [(r, c1 + 1) for r in range(r0, r1 + 1)])):
+        if all(agrees(r, c) for r, c in strip):
+            bad.append(f'window: {v["id"]}: every drawing agrees one {side} of the window — it is not the agreement box')
+    return bad
 
 
 def node_rows(data: dict, nid: str) -> list[str]:
@@ -254,7 +367,8 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         sc = spin_cells(n)
         piece = n.get('spin_piece', 'T').lower()
         ys = {(c, len(n['rows']) - 1 - r) for r, c in sc}
-        if len(sc) != 4 or RT._norm(ys) not in RT._shapes(piece):
+        # `U` is the renderer's "the T goes here", so a `spin_piece: U` board's piece is a T
+        if len(sc) != 4 or RT._norm(ys) not in RT._shapes(SPIN_SHAPE.get(piece, piece)):
             bad.append(f'spin: {n["id"]}\'s {piece} cells are not one {piece}')
             continue
         o = occ_of(n['rows'], spec)
@@ -317,25 +431,31 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         if not tc <= inwin:
             bad.append(f'window: {v["id"]}\'s window does not hold every T cell')
         top = min(r for r, _ in sc)
-        roof = {(r, c) for (r, c) in filled_set(rows, spec) if r < top}
-        if roof != {tuple(x) for x in v['roof_cells']}:
-            bad.append(f'window: {v["id"]}.roof_cells are not the filled cells above the T: {sorted(roof)}')
         fu = {tuple(x) for x in v['followup']['t_cells_pre_clear']}
-        basis = sc | roof | fu
-        box = ([min(r for r, _ in basis), max(r for r, _ in basis)], [min(c for _, c in basis), max(c for _, c in basis)])
-        if [v['window']['rows'], v['window']['cols']] != [box[0], box[1]]:
-            bad.append(f'window: {v["id"]}\'s window {v["window"]} is not the bounding box {box} of T, roof and follow-up')
         fr = set(full_rows(occ_of(rows, spec)))
-        for r, row in enumerate(rows):
-            if r in fr:
-                continue
-            for c, ch in enumerate(row):
-                if (r, c) not in inwin and ch not in (EMPTY, 'c'):
-                    bad.append(f'window: {v["id"]}: {v["board"]} draws {ch!r} at ({r},{c}) outside the window')
+        if v.get('window_basis') == 'agreement':
+            bad += agreement_window(data, v, spec, rows, sc, top, inwin, fr)
+        else:
+            roof = {(r, c) for (r, c) in filled_set(rows, spec) if r < top}
+            if roof != {tuple(x) for x in v['roof_cells']}:
+                bad.append(f'window: {v["id"]}.roof_cells are not the filled cells above the T: {sorted(roof)}')
+            basis = sc | roof | fu
+            box = ([min(r for r, _ in basis), max(r for r, _ in basis)], [min(c for _, c in basis), max(c for _, c in basis)])
+            if [v['window']['rows'], v['window']['cols']] != [box[0], box[1]]:
+                bad.append(f'window: {v["id"]}\'s window {v["window"]} is not the bounding box {box} of T, roof and follow-up')
+            for r, row in enumerate(rows):
+                if r in fr:
+                    continue
+                for c, ch in enumerate(row):
+                    if (r, c) not in inwin and ch not in (EMPTY, 'c'):
+                        bad.append(f'window: {v["id"]}: {v["board"]} draws {ch!r} at ({r},{c}) outside the window')
         # (d) the follow-up slot
         after = byid[v['followup']['board']]['rows']
         fa = {tuple(x) for x in v['followup']['t_cells_after']}
-        mapped = {(r + sum(1 for x in fr if x > r), c) for r, c in fu}
+        # the after board is compared bottom-aligned: a page may draw it shorter than the spin board
+        # (STSD draws both the same height, so the shift is 0 there)
+        shift = len(rows) - len(after)
+        mapped = {(r + sum(1 for x in fr if x > r) - shift, c) for r, c in fu}
         if mapped != fa:
             bad.append(f'window: {v["id"]}: the pre-clear follow-up slot maps to {sorted(mapped)}, not t_cells_after')
         ys = {(c, len(after) - 1 - r) for r, c in fa}
@@ -344,9 +464,16 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         else:
             o = occ_of(after, spec)
             o = [''.join('#' if (r, c) in fa else ch for c, ch in enumerate(row)) for r, row in enumerate(o)]
-            if len(full_rows(o)) != v['followup']['lines']:
+            # opt-in `drawn_lines`: a page that draws its after board BEFORE the stack beside the slot is
+            # built (Imperial Cross) — the slot fills fewer rows of the drawing than the spin it promises
+            # clears. Default: the drawing is complete, so the two are the same number (STSD, STMB Cave)
+            want = v['followup'].get('drawn_lines', v['followup']['lines'])
+            if 'drawn_lines' in v['followup'] and not (0 < want < v['followup']['lines']
+                                                       and v['followup'].get('drawn_note')):
+                bad.append(f'window: {v["id"]}: followup.drawn_lines must be fewer than its lines, with a drawn_note')
+            if len(full_rows(o)) != want:
                 bad.append(f'window: {v["id"]}: the follow-up T fills {len(full_rows(o))} rows of the drawn '
-                           f'after board, not {v["followup"]["lines"]}')
+                           f'after board, not {want}')
         # (e) fires on every listed build, once, as drawn
         for bid in v.get('fires_on', []):
             b = byid[bid]['rows']
@@ -425,8 +552,13 @@ def cross_fires(data: dict, spec: TechniqueSpec) -> list[dict]:
 def check_cross_routes(data: dict, spec: TechniqueSpec) -> list[str]:
     xs = data.get('cross_source', {})
     if not xs.get('fires'):
-        return ['cross: the transcription records no routes board the technique fires on — '
-                'a technique gate needs an independent drawing to check its window against']
+        # opt-in: no routes board draws the technique (BT砲), and the independent drawer is the
+        # agreement set's external drawings instead, which rule (g) fires the window on one by one
+        alt = (xs.get('routes_fire_none') and spec.external_drawings and spec.external_drawings()
+               and data.get('variants') and all(v.get('window_basis') == 'agreement' for v in data['variants']))
+        if not alt:
+            return ['cross: the transcription records no routes board the technique fires on — '
+                    'a technique gate needs an independent drawing to check its window against']
     want = xs['fires'] + xs.get('also', [])
     key = lambda e: (e['file'], e['node'], e['variant'], e['mirrored'])
     got = cross_fires(data, spec)
@@ -519,6 +651,8 @@ def main(spec: TechniqueSpec, selftest: Callable[[], int], doc: str | None) -> i
     problems = verify(data, spec)
     if args.html_dir:
         problems += RT.check_snapshot(data, args.html_dir)
+        if spec.html_checks:
+            problems += spec.html_checks(data, args.html_dir)
     if args.write and not problems:
         spec.out.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
         print(f'wrote {spec.out.relative_to(HERE.parent.parent)}')

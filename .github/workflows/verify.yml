@@ -763,6 +763,68 @@ jobs:
       - name: Check the STSD technique page audit catches its corruptions
         run: python3 -m pipeline.stsd_page --selftest
 
+      # The second technique page, STMB Cave (shiwehi.com's template/stmbcave.php): the same gate and
+      # renderer, its window the AGREEMENT BOX of the page's drawings and harddrop's STMB_Cave diagrams
+      # (wiki-tspin-techniques.json), which the gate derives and checks from both sides. The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/stmbcave.test.ts and
+      # stmbcave-demos.test.ts in the typescript job.
+      - name: Check the STMB Cave technique transcription
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes
+
+      - name: Check the STMB Cave technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes --selftest
+
+      - name: Check the STMB Cave technique page audit catches its corruptions
+        run: python3 -m pipeline.stmbcave_page --selftest
+
+      # The third technique page, インペリアルクロス (shiwehi.com's template/imperialcross.php): the same gate and
+      # renderer, a T stood into a cross whose two cleared rows are not adjacent. Its window is the
+      # AGREEMENT BOX of the page's four drawings and ガムシロ積み's two Imperial Cross boards
+      # (gamushiro-routes.json); the gate's opt-in followup.drawn_lines records that the page draws the
+      # after board before the stack beside the second slot is built. The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/imperialcross.test.ts and imperialcross-demos.test.ts
+      # in the typescript job.
+      - name: Check the Imperial Cross technique transcription
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes
+
+      - name: Check the Imperial Cross technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes --selftest
+
+      - name: Check the Imperial Cross technique page audit catches its corruptions
+        run: python3 -m pipeline.imperialcross_page --selftest
+
+      # The fourth technique page, ダブルダガー (shiwehi.com's template/doubledagger.php): the same gate and
+      # renderer, two TSD slots stacked, the T laid flat into the upper one. Its window is STMB Cave's T
+      # in STSD's default bounding box; the page's mirrored drawings, the line-between feature the window
+      # does not express, the pink build condition and the インペリアルクロス page's dagger board are the
+      # gate's extra checks. Its cross-source is harddrop's SDPC Spin (sdpcspin-routes.json). The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/doubledagger.test.ts and
+      # doubledagger-demos.test.ts in the typescript job.
+      - name: Check the Double Dagger technique transcription
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes
+
+      - name: Check the Double Dagger technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes --selftest
+
+      - name: Check the Double Dagger technique page audit catches its corruptions
+        run: python3 -m pipeline.doubledagger_page --selftest
+
+      # The fifth technique page, BT砲 (途中BT, shiwehi.com's template/btcannon.php): the same gate and
+      # renderer, a flat T into a TSD whose clear joins a TST slot (the follow-up is a TST). Its window is
+      # the AGREEMENT BOX of the page's six drawings and harddrop's BT_Cannon page's fifteen (pinned by
+      # revision, recorded in the transcription); no routes board draws a BT, which the gate's opt-in
+      # routes_fire_none records. The corpus artefact (no hit, with the predicate shown to fire on every
+      # recorded drawing) and the (all unbuilt) demos are checked by pipeline/openers/btcannon.test.ts and
+      # btcannon-demos.test.ts in the typescript job.
+      - name: Check the BT Cannon technique transcription
+        run: python3 -m pipeline.openers.extract_btcannon_shapes
+
+      - name: Check the BT Cannon technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_btcannon_shapes --selftest
+
+      - name: Check the BT Cannon technique page audit catches its corruptions
+        run: python3 -m pipeline.btcannon_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 
