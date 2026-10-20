@@ -1,5 +1,5 @@
 {
-  "_comment": "Words for pipeline/cutcopy_page.py (the shared pipeline/technique_page.py renderer bound to 千鳥格子 / Cut Copy). Numbers never live here: every count on the pages is rendered from analysis/cutcopy-facts.json and analysis/cutcopy-demos.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own Japanese stays as quoted text).",
+  "_comment": "Words for pipeline/cutcopy_page.py (the shared pipeline/technique_page.py renderer bound to 千鳥格子 / Cut Copy). Numbers never live here: every count on the pages is rendered from analysis/cutcopy-facts.json, analysis/cutcopy-demos.json, analysis/cutcopy-own.json and analysis/cutcopy-selfplay.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own Japanese stays as quoted text).",
   "title": "千鳥格子（Cut Copy）中盤手法",
   "overview_title": "千鳥格子（Cut Copy）中盤手法",
   "technique_name": "千鳥格子",
@@ -107,7 +107,7 @@
     "lede": "示範要由空盤開始：先用方塊砌出原頁灰色嘅元地形，再放原頁畫嘅幾粒，再將 T 瞓低打 TSD，再打第二下。呢頁每一幅圖都砌唔到，原因逐幅寫喺下面，係 planner 自己度出嚟、或者由佢企喺嗰幅圖推返嚟嘅。",
     "user": "示範",
     "play": "播呢個示範",
-    "idle": "呢版冇砌得到嘅示範，所以冇嘢播。",
+    "idle": "揀一個示範嚟播：原頁嘅圖一幅都砌唔到，可以播嘅係下面我哋自己設計嘅盤面，同 cold-clear 自己打嘅局。",
     "now": "示範：{name}",
     "sentences": {
       "demo": "呢度嘅示範（如果有）都係我哋砌出嚟嘅，唔係任何人打過嘅對局：出邊粒、幾時 hold、點樣按掣，全部係我哋揀嘅，所以唔計入任何數。",
@@ -147,5 +147,63 @@
         }
       }
     }
+  },
+  "showcase": {
+    "title": "揀出嚟嘅實例：自己砌、兩下 TSD 都打到",
+    "note": "個案入面，個窗口冇垃圾（即係成個形係自己砌出嚟，唔係垃圾行湊出嚟）而且第二下 TSD 都打到嘅，全部喺度，一個都冇揀走；揀嘅規則就係呢兩條，唔係睇樣揀。每個實例四幅圖，都係由 replay 重組出嚟嘅盤面（淨係嗰個玩家）：虛線係嗰粒 T 嘅位。",
+    "case": "{date} {round}，{player}，第 {lock} 粒打第一下，第 {followup} 粒打第二下",
+    "link": "睇重播",
+    "moments": [
+      "第一粒 T 落之前",
+      "第一下 TSD 消完",
+      "第二粒 T 落之前",
+      "第二下 TSD 消完"
+    ]
+  },
+  "own": {
+    "title": "我哋自己設計嘅千鳥格子",
+    "note": "原頁嘅圖一幅都砌唔到，所以呢度係我哋自己搵出嚟嘅盤面：唔係任何網站畫嘅，亦唔係對局。搜尋將原頁個窗口照原頁方向擺喺盤底，逐個欄位試；窗口外面，第一下 TSD 消嘅兩行要填滿，其餘格同窗口上面兩行可以填可以唔填；再列出每一個用方塊鋪得出、又啱我哋發牌方法嘅鋪法（第一巡六粒唔同嘅方塊、第二巡最多四粒），由細到大逐個交俾同一個 planner 由空盤砌、交俾引擎打兩下 TSD；圖入面虛線係第一粒 T 落嘅位。每個位置砌到兩幅、或者試到上限就停；下面張表係每個位置試過幾多個、每個結果幾多個，冇試過嘅冇計。窗口貼住牆（位置 0 同 4）嗰陣，搜尋一個鋪法都搵唔到：我哋嘅元地形入面冇 T，貼住牆又喺盤底，窗口要填嘅格鋪唔晒而唔留低單格。搵唔到唔代表砌唔到：真正打嘅時候 T 都會疊入個堆度。",
+    "offset_col": "窗口位置（左邊第幾欄，由 0 數）",
+    "candidates_col": "候選盤面",
+    "tried_col": "試咗",
+    "outcomes": {
+      "built": "砌到",
+      "no_cover": "冇鋪法",
+      "no_order": "冇一個次序行得通",
+      "no_stood_t": "第一粒 T 入唔到",
+      "no_followup": "第二下 TSD 打唔到",
+      "over_budget": "超過搜尋上限",
+      "other": "其他"
+    },
+    "name": "自己設計：窗口喺第 {offset} 欄，第 {n} 個候選",
+    "base_words": "頭 {n} 粒係我哋揀嘅方塊（{pieces}），砌出成個盤面"
+  },
+  "selfplay": {
+    "title": "cold-clear 自己一個人打出嚟嘅千鳥格子",
+    "note": [
+      "呢度啲局唔係 corpus 嘅對局，唔係任何網站畫嘅圖，亦唔係我哋設計嘅：係 cold-clear（一個 Tetris bot）自己一個人打嘅。冇對手、冇垃圾行，由空盤開始，每一粒放邊度都係佢揀嘅；所以呢度冇一個數計入任何 corpus 嘅數。",
+      "我哋將佢每一粒嘅位置交俾同 corpus 一樣嘅 Triangle 引擎重新打一次：去嗰個位嘅路線係引擎自己搵嘅，每一粒都要落喺 cold-clear 揀嘅格、消嘅行數要同佢一樣，唔係就停。再用 analysis/cutcopy-facts.json 同一個分類器、同一個窗口搵千鳥格子，下面每一局都係分類器搵到嘅。每局只放到決定第二下 TSD 嗰粒之後 {tail} 粒，之後嘅冇放上嚟。",
+      "cold-clear 嘅搜尋係抽樣嘅，每局只抽咗一次，搜尋量亦未收斂；冇垃圾行，而原頁講千鳥格子多數係垃圾行升上嚟嗰陣砌成，呢度同原頁講嗰種情況唔同。即係話，呢度講唔到人、或者 bot 喺壓力之下幾常砌到千鳥格子，只係俾你睇吓 bot 點樣砌出嚟、點樣打第二下。"
+    ],
+    "scan": "掃咗 {games} 局（每局 {pieces} 粒；cold-clear {rev}，每步搜 {nodes} 個節點，COACH_SEED {coach_seed}），引擎由頭打到尾打得晒嘅有 {complete} 局；引擎重打咗嘅 {replayed} 粒（中途停咗嘅局計到停之前嗰粒）入面，全 T-spin 消兩行有 {tsds} 下；分類器搵到 {hits} 個，喺下面 {shown} 局入面。",
+    "name": "cold-clear 自己打：種子 {seed}",
+    "now": "cold-clear 自己打：{name}",
+    "user": "cold-clear",
+    "variant_names": {
+      "cutcopy": "千鳥格子",
+      "uncut": "第二種（Uncut copy）"
+    },
+    "hands": {
+      "as_drawn": "照原頁方向",
+      "mirrored": "左右反轉"
+    },
+    "hit": "第 {n} 粒 T：{variant}，{hand}；{followup}。圖入面虛線係呢粒 T 落嘅位。",
+    "followup_fired": "第二下 TSD 喺第 {n} 粒打咗",
+    "followup_not": "第二下冇打到（{reason}）",
+    "play_hit": "由第 {n} 粒 T 之前開始播",
+    "play": "由頭播",
+    "moment_hit": "第 {n} 粒：{variant} 第一下 TSD",
+    "moment_followup": "第 {n} 粒：第二下 TSD",
+    "notes": "cold-clear 自己打嘅局，唔係對局亦唔係示範：呢度放咗頭 {n} 粒。"
   }
 }

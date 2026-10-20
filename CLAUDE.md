@@ -4439,6 +4439,68 @@ the images beside the shiwehi snapshot (Pillow; without it one named `pillow:` f
 nothing may be reproduced without permission, so nothing of theirs is transcribed, committed or published; the page says so in a
 sentence. A `declined:` rule requires each entry's url, date and reason.
 
+**精選 (since 2026-10-20): the corpus examples are picked by a RULE, never by eye.** `TechniqueSiteProfile.showcase` (opt-in,
+千鳥格子 only; every other page is byte-identical) draws, before the case index, EVERY hit of the primary variant with no garbage in
+its window and its follow-up fired, at four moments read from the replay (`replay_section.decode_boards`, the hit player's board
+only): before the T with its cells dashed, after the first TSD, before the second T, after it. The audit checks the set is the
+rule's, in artefact order, and re-reads each first board with `technique_transcription.window_fires` — the Python twin of the TS
+matcher that found the hit. How many qualify is a figure (`showcase`), never typed here.
+
+**Own designs (since 2026-10-20): boards nobody drew, found by a search and played by the engine.** The demo planner builds none of
+the source drawings, so `pipeline/sim/technique-own.ts` asks the other way round, deterministically (no clock, no random draw): the
+variant's window, as drawn, on the floor at every column offset in `technique-own-cutcopy.ts`; outside it the rows the stood T clears
+full and the rest, plus two rows above, optional; every cover of the must-fill cells by non-T pieces the planner's two-bag dealing
+allows (each of IJLOSZ once or twice, at most four second-bag pieces), smallest first; each handed to the SHARED planner
+(`technique-demos.ts`'s `build`, which gained two opt-in options, an in-memory transcription and `maxSteps`, a step COUNT cap so an
+over-budget candidate is reported the same on every machine; with both unset it is the emitter's byte for byte, and the nine demo
+artefacts moved in `planner_md5` only); stop at an offset after `pick` builds. `emit-technique-own.ts` → `analysis/cutcopy-own.json`
+(`report_eligible: false`, `constructed: true`, `own: true`), with every TRIED candidate's outcome counted by kind and how many were
+never tried. `cutcopy-own.test.ts` re-derives the candidate lists, re-plans every published board byte for byte, decodes each demo on
+its own (board, window, two full TSDs, `reachProblems`), checks no published board is a transcribed drawing, and checks the md5s;
+the outcome counts are re-derived only by the full search (`OWN_FULL=1`, or the emitter), which takes long. The demo page plays them
+after the drawn boards (`own_rel`), and re-checks each embedded one with `reach_problems` and `window_fires`. Against a wall
+(offsets 0 and 4) the search finds no candidate: a count of THIS search (no T in the terrain, the window on the floor), not a
+claim about the technique, and the page says so.
+
+**`reach()` caches its whole search (since 2026-10-20).** The BFS never reads the target — it only filters by it at the
+end — so `route-demos.ts` keeps, per (board as the engine holds it, piece, `no180`), every resting placement's paths in
+discovery order with `reach()`'s own per-spin dedup, and answers each target from that (copies, so a caller cannot
+mutate the cache). Entries are keyed by how the engine was built (`newEngine`'s options and date; an engine built
+anywhere else keys by its own identity) and dropped least-recently-used past a fixed cap. Nothing it returns changed:
+every route demo, technique demo and own-design artefact re-emitted with only its `planner_md5` line moved, and no
+page moved. Measured on 2026-10-20 by re-running the own-design emitter and by timing `planOwn` over offset 2's
+first 100 candidates against a scratch copy of the old file, with identical results; the timings were not committed
+anywhere, so re-measure rather than quote one.
+
+**A second implementation behind the own designs, for REACHABILITY only: the original cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
+every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary
+(`CC_ORACLE_MOVES=1`, `find_moves` ZeroGComplete, `cross-movegen`'s protocol) whether that exact T placement is reachable, then
+classifies it with cold-clear's `rotate()` rule (`cc-tspin.ts`; the binary's movegen line carries cells, not a spin status) under
+EVERY kick index, since the timeline does not record which one our engine used, and counts the rows the four cells complete on that
+board. It found cold-clear reaching both T's of every committed design and calling each a full T-spin clearing two whatever the
+kick, because both front corners are filled. Only the reachability half is the Rust binary; the spin half is this repo's own
+TypeScript port of cold-clear's rule, so it is not an independent implementation of the spin and must not be read as one. A placement cold-clear's mover does not reach would be its documented
+mid-height-tuck asymmetry, named in `CC_UNREACHED` with its reason (measured empty), never a bound. It skips without the binary and
+runs beside the cross tests in verify.yml's `oracle-image` job (the flake builds `cc-oracle` for aarch64 only).
+
+**cold-clear's own Cut Copies, played on the demo page after our design (since 2026-10-20): bot games, not corpus, not drawn,
+not ours.** The pilot in `tools/cc-coach/FINDINGS-cutcopy-selfplay.md` had cold-clear (the pinned rev, the cc-coach patch and
+harness, `COACH_MODE=selfplay`) play alone with no garbage; its replay core is now `pipeline/sim/cc-selfplay.ts` (the tools
+script imports it; its output on the pilot's JSONL was compared by hand with the pilot's on 2026-10-20 and was identical
+apart from the input path, a one-off check nothing re-runs). `emit-cutcopy-selfplay.ts --games <jsonl> --coach-seed
+<n>` scans every game through the engine and the corpus classifier unchanged (`cutcopy-selfplay.ts`), then commits, INSIDE
+`analysis/cutcopy-selfplay.json` (`report_eligible: false`, `constructed: true`, `selfplay: true`), each hit game's own
+placements up to the last lock deciding a hit's follow-up plus `tail` more, and the engine's timeline of them; the bot's whole
+JSONL is not committed (its md5 and the run's settings are in `provenance`). `cutcopy-selfplay.test.ts` rebuilds the artefact
+from the committed placements byte for byte (`--rebuild` does the same), pins the hits as a named list, decodes every timeline on
+its own (cold-clear's cells at every lock, the window in the hit's hand, both TSDs full and clearing two) and checks the md5s,
+the cold-clear harness files among them. What it cannot re-derive is the `scan` summary, which needs the JSONL: re-run the
+emitter. The page (`technique_page.py`'s opt-in `selfplay_rel`, default off) draws each game with each hit's board and a link
+to the position before its T, prints the scan sentence and the quarantine sentences (their cut-off from the artefact's `tail`) and requires both, and re-checks every embedded game with
+`decode_boards` and `window_fires`; it also holds each hit's words (variant, hand, follow-up) to the artefact; its selftest deletes a quarantine sentence, swaps a
+hit's hand words, drops a game, moves a hit's T, moves a hit link and reads a hit in the
+other hand. The board drawn per hit is not re-read by the audit; `bin/build-docs --check` byte-compares it with the renderer. These games say nothing about how often a person, or the bot under garbage, builds one.
+
 ### 社畜トレイン（Shachiku Train）
 
 The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
