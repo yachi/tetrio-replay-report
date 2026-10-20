@@ -4462,6 +4462,27 @@ after the drawn boards (`own_rel`), and re-checks each embedded one with `reach_
 (offsets 0 and 4) the search finds no candidate: a count of THIS search (no T in the terrain, the window on the floor), not a
 claim about the technique, and the page says so.
 
+**`reach()` caches its whole search (since 2026-10-20).** The BFS never reads the target — it only filters by it at the
+end — so `route-demos.ts` keeps, per (board as the engine holds it, piece, `no180`), every resting placement's paths in
+discovery order with `reach()`'s own per-spin dedup, and answers each target from that (copies, so a caller cannot
+mutate the cache). Entries are keyed by how the engine was built (`newEngine`'s options and date; an engine built
+anywhere else keys by its own identity) and dropped least-recently-used past a fixed cap. Nothing it returns changed:
+every route demo, technique demo and own-design artefact re-emitted with only its `planner_md5` line moved, and no
+page moved. Measured on 2026-10-20 by re-running the own-design emitter and by timing `planOwn` over offset 2's
+first 100 candidates against a scratch copy of the old file, with identical results; the timings are in that pass's
+report, not here.
+
+**A second implementation behind the own designs: the ORIGINAL cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
+every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary
+(`CC_ORACLE_MOVES=1`, `find_moves` ZeroGComplete, `cross-movegen`'s protocol) whether that exact T placement is reachable, then
+classifies it with cold-clear's `rotate()` rule (`cc-tspin.ts`; the binary's movegen line carries cells, not a spin status) under
+EVERY kick index, since the timeline does not record which one our engine used, and counts the rows the four cells complete on that
+board. It found cold-clear reaching both T's of every committed design and calling each a full T-spin clearing two whatever the
+kick, because both front corners are filled. A placement cold-clear's mover does not reach would be its documented
+mid-height-tuck asymmetry, named in `CC_UNREACHED` with its reason (measured empty), never a bound. It skips without the binary and
+runs beside the cross tests in verify.yml's `oracle-image` job. The flake builds `cc-oracle` for aarch64 only, so on an x86_64 host
+it was built from the same derivation and flake-pinned nixpkgs by `--expr`, not `nix build .#cc-oracle`.
+
 ### 社畜トレイン（Shachiku Train）
 
 The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
