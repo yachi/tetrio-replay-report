@@ -1,0 +1,485 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "kaidan",
+ "means": "One constructed replay per 階段のドネイト build board the planner can build: from an empty board, the page's grey staircase built out of pieces WE chose, then the page's own pieces (the Z stood on end, and the roof), then the flat T into the window the corpus matcher reads, a TSD that re-opens the wall column. Run through the vendored Triangle engine. A board the planner cannot build is published unbuilt with its measured reason.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the terrain's pieces are ours too (the page draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "the page draws its terrains grey and its DT砲 boards mirrored; a demo stands only on what the planner can build from an empty board without clearing a line, and fires the window as drawn. It ends on the TSD, as every payoff variant's demo does: the Tetris after it is harddrop's next step (its Anchor_Set page draws an I into a four-deep re-opened column, on a later board of that line), and is not constructed.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are the build board's lower-case letters, one whole piece per letter",
+  "the flat T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "a variant with a payoff in place of a follow-up ends the demo on the stood T",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-19T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "02e4f810b3697c3aecfb5981d3d6626b",
+  "planner_md5": "b2aca15d55178aacd842aa3759f309a4",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "a6ce4d93c735084c1fcc6123b57305a8"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "after.1",
+   "reason": "打後嘅示意圖（頁面冇講係 ST積み 定 よしひろ積み），唔係階段のドネイト本身"
+  },
+  {
+   "node": "after.2",
+   "reason": "打後嘅示意圖（頁面冇講係 ST積み 定 よしひろ積み），唔係階段のドネイト本身"
+  },
+  {
+   "node": "basic.after",
+   "reason": "係 basic.spin 之後嘅盤面，同一個原因冇示範"
+  },
+  {
+   "node": "basic.o",
+   "reason": "地形有 39 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "basic.spin",
+   "reason": "TSD 企喺四級樓梯嘅基本形上面：基本形砌唔到，所以呢幅都冇示範"
+  },
+  {
+   "node": "basic.terrain",
+   "reason": "basic.o 砌唔到：地形有 39 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "basic.z",
+   "reason": "係四級樓梯（basic.terrain）加一粒 Z：四級樓梯砌唔到（見 basic.o），所以呢幅都冇示範"
+  },
+  {
+   "node": "dt.amemiya",
+   "reason": "係 dt.amemiya.pre 上面打嘅 TSD：連埋 DT砲 嘅盤面有 54 格，係雙數但唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且頁面畫嘅係左右反轉嘅形，planner 用嘅照畫窗口就算砌到都對唔上"
+  },
+  {
+   "node": "dt.amemiya.pre",
+   "reason": "連埋 DT砲 嘅盤面有 54 格，係雙數但唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且頁面畫嘅係左右反轉嘅形，planner 用嘅照畫窗口就算砌到都對唔上"
+  },
+  {
+   "node": "dt.anchor",
+   "reason": "係 dt.anchor.pre 上面打嘅 TSD：連埋 DT砲 嘅盤面有 58 格，係雙數但唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且頁面畫嘅係左右反轉嘅形，planner 用嘅照畫窗口就算砌到都對唔上"
+  },
+  {
+   "node": "dt.anchor.pre",
+   "reason": "連埋 DT砲 嘅盤面有 58 格，係雙數但唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且頁面畫嘅係左右反轉嘅形，planner 用嘅照畫窗口就算砌到都對唔上"
+  },
+  {
+   "node": "j3.terrain",
+   "reason": "s3.j 砌唔到：地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法"
+  },
+  {
+   "node": "s3.j",
+   "reason": "地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法"
+  },
+  {
+   "node": "s3.s",
+   "reason": "地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法"
+  },
+  {
+   "node": "s3.terrain",
+   "reason": "s3.s 砌唔到：地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法"
+  }
+ ],
+ "demos": [
+
+ ]
+}

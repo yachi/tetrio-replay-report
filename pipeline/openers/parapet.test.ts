@@ -18,7 +18,7 @@
  *      nothing in the windows forbids it.
  *   5. WHAT DISCRIMINATES, measured per window part with the T anchored (above the cleared rows, the cleared rows,
  *      below them: the well), per variant.
- *   6. DONATION: `donationCols` re-implemented (importing `emit-opener-facts.ts` runs a session), every session's
+ *   6. DONATION: `donationCols` re-implemented (`technique-donation-checks.ts`, shared with `kaidan.test.ts`), every session's
  *      per-player `donation.players[].donations` reproduced exactly, and every hit that is not a donation at its well
  *      column named with its re-derived reason (HIT_NOT_DONATION).
  *   7. NAMED lists, not bounds; pinned per-player figures; the STRUCTURAL zeros re-derived from the window; mutants,
@@ -45,6 +45,7 @@ import { CUTCOPY } from '../sim/technique-profile-cutcopy.ts';
 import { SHACHIKUTRAIN } from '../sim/technique-profile-shachikutrain.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
+import { H, W, scored, donationVerdict } from './technique-donation-checks.ts';
 
 const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
@@ -55,7 +56,6 @@ const ART_PATH = `${import.meta.dir}/../../analysis/parapet-facts.json`;
 const TR = JSON.parse(readFileSync(PARAPET.transcriptionPath, 'utf8'));
 const TSD = TR.variants.find((v: any) => v.id === 'parapet');
 const TSS = TR.variants.find((v: any) => v.id === 'parapet_tss');
-const H = 40, W = 10;
 
 const PARAPET_HITS: string[] = [
   "2026-07-22 m3r6 yachi lock 29", "2026-07-22 m3r7 pinglamb lock 86 (mirrored)",
@@ -690,24 +690,6 @@ const keyOf = (d: TechDigest, lock: number) => `${d.session}|${d.file}|${d.round
 const USERS = ['pinglamb', 'yachi'] as const;
 const VIDS = ['parapet', 'parapet_tss'] as const;
 
-/** Every scored T-spin, exactly as the matcher scores it: inside the prefix, the reconstruction agreeing on a
- *  non-empty set of rows. */
-function scored(d: TechDigest) {
-  const out: { i: number; rows: number[]; lk: TechDigest['locks'][number]; board: string[]; withT: boolean[][] }[] = [];
-  for (const t of d.tspins) {
-    if (t.i > d.v) continue;
-    const lk = d.locks[t.i]!;
-    const withT = t.board.map(s => [...s].map(x => x !== '.'));
-    for (const q of lk.cells) withT[q.row]![q.col] = true;
-    const rows: number[] = [];
-    for (let r = 0; r < H; r++) if (withT[r]!.every(Boolean)) rows.push(r);
-    const theirs = [...lk.clearedRows].sort((a, b) => a - b);
-    if (rows.length !== theirs.length || !rows.every((x, k) => x === theirs[k]) || !rows.length) continue;
-    out.push({ i: t.i, rows, lk, board: t.board, withT });
-  }
-  return out;
-}
-
 /** A drawing (rows top first, '-' or '.' empty) as a 40-row matcher board, every other cell filled. */
 const pad = (rows: string[]) => [...Array(H - rows.length).fill('.'.repeat(W)),
                                  ...rows.map(r => [...r].map(ch => ch === '-' || ch === '.' ? '.' : 'X').join(''))];
@@ -943,27 +925,6 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
   }
   expect(total(art().variants.parapet.controls.ablation.no_roof)).toBe(PART_ONLY.parapet.below);
 }, 600_000);
-
-/** DONATION (harddrop.com/wiki/Donation), re-implemented from `emit-opener-facts.ts`'s `donationCols` at its
- *  shipped clauses (importing that file runs a session): the verdict for one column, or the first clause it fails. */
-function donationVerdict(withT: boolean[][], cleared: number[], t: Cell[], c: number) {
-  const inC = new Set(cleared);
-  const tRows = new Set(t.filter(q => q.col === c).map(q => q.row));
-  if (tRows.size && cleared.every(r => tRows.has(r))) return 't_slot';
-  let inR = 0, outR = 0;
-  for (let r = 0; r < H; r++) { if (!withT[r]![c]) continue; inC.has(r) ? inR++ : outR++; }
-  if (inR === 0) return 'naive';
-  if (outR > 0) return 'filled_above_window';
-  let lowest = -1;
-  for (let r = 0; r < H; r++) if (withT[r]![c]) lowest = r;
-  let cav = 0;
-  for (let r = lowest + 1; r < H; r++) if (!withT[r]![c]) cav++;
-  if (cav < 4) return 'cavity_lt4';
-  const deep: number[] = [];
-  for (let r = H - 1; r > lowest && deep.length < 4; r--) if (!withT[r]![c]) deep.push(r);
-  if (!deep.every(r => (c === 0 || withT[r]![c - 1]) && (c === W - 1 || withT[r]![c + 1]))) return 'not_walled';
-  return 'donation';
-}
 
 test('donation: the shipped predicate reproduced per session and player, and every hit that is not one named', () => {
   const count: Record<string, Record<string, number>> = {};

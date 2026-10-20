@@ -7,10 +7,15 @@
  * JSON, gated by `technique_transcription.py`, so the matcher reads exactly what the gate checked.
  *
  * Adding a Phase 1 technique whose shape this window predicate can express is: a transcription
- * (`extract_<x>_shapes.py` + JSON), a profile file, one line in `techniques.ts`, a test. A technique
- * it cannot express (a staircase over several locks) needs a new `anchor` value, which is an edit to
- * `technique-facts.ts` — hashed by every technique artefact, so it moves every one of their
- * `emitter_md5` lines, loudly, and that is the cost to name when it happens.
+ * (`extract_<x>_shapes.py` + JSON), a profile file, one line in `techniques.ts`, a test. 階段のドネイト
+ * (Kaidan) was guessed here to need "a staircase over several locks"; measured, it does not — its
+ * shape sits in the rows the TSD clears and the two rows under them, all on one board at the TSD's lock
+ * (the window counts no steps and cannot tell a staircase from a flat stack). A
+ * technique it cannot express needs a new `anchor` value: アンカーセット (Anchor Set) is the live case, a
+ * J or L placement with no T-spin, whose drawings agree on no rectangle holding both the anchor and the
+ * overhang (ROADMAP.md). That is an edit to `technique-facts.ts` — hashed by every technique artefact,
+ * so it moves every one of their `emitter_md5` lines, loudly, and that is the cost to name when it
+ * happens.
  */
 
 /** Which T-spin, by the engine's own credit and line count. */

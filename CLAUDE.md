@@ -339,6 +339,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique parapet \
   --out analysis/parapet-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/parapet.test.ts pipeline/openers/parapet-demos.test.ts  # its two tests
 python3 -m pipeline.parapet_page --selftest       # the docs/parapet*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_kaidan_shapes            # CI gate: the 階段のドネイト (Kaidan Setups) technique transcription
+python3 -m pipeline.openers.extract_kaidan_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Kaidan_Setups.wikitext, Anchor_Set.wikitext and STMB_Cave.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique kaidan \
+  --out analysis/kaidan-facts.json                             # 階段のドネイト's corpus artefact (quarantined; a payoff, harddrop's)
+bun pipeline/sim/emit-technique-demos.ts --technique kaidan \
+  --out analysis/kaidan-demos.json                             # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/kaidan.test.ts pipeline/openers/kaidan-demos.test.ts  # its two tests
+python3 -m pipeline.kaidan_page --selftest        # the docs/kaidan*.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -3984,7 +3992,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -3992,7 +4000,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh and 欄干 (`template/parapet.php`) the eighth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth and 階段のドネイト (`template/kaidansetup.php`) the ninth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -4068,9 +4076,13 @@ measured EQUIVALENT mutant — both T slots are reachable only by a spin — and
 and no check. Named lists and their sizes live in the two tests, never here.
 
 **What would move every technique artefact's hash line:** a new `anchor` value (a technique the
-window predicate cannot express, e.g. 階段のドネイト's staircase over several locks) is an edit to
-`technique-facts.ts`, which every technique artefact's `emitter_md5` hashes — loud, and the cost to
-name when it happens. `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
+window predicate cannot express) is an edit to `technique-facts.ts`, which every technique artefact's `emitter_md5`
+hashes — loud, and the cost to name when it happens. The live case is アンカーセット (Anchor Set, `template/anchorset.php`):
+a J or L placement with no T-spin, whose drawings agree on no rectangle holding both the anchor and the overhang, so
+matching it needs an anchor on a non-spin lock AND a window that is not a rectangle (ROADMAP.md, with the measured
+reasons). 階段のドネイト was the example this sentence used to give (「a staircase over several locks」), and it was wrong:
+measured, its shape sits in the rows the TSD clears and the two rows under them, all on one board at the TSD's lock, so no
+sequence of locks is needed (the window counts no steps and cannot tell a staircase from a flat stack). `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
 because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
 direction is clean: no route artefact hashes a technique file.
 
@@ -4086,6 +4098,17 @@ artefact moved outside its hash lines. The Python halves (`technique_transcripti
 external drawings, `technique_page.py`'s `more_variants`) are unhashed and default-preserving: every earlier gate's
 plain, `--selftest` and `--html-dir` output and every earlier `*_page --selftest` output was byte-compared against the
 pre-edit run, and `bin/build-docs --check` passed with no earlier page moved (only `docs/index.html` gains the card).
+
+**階段のドネイト changed no shared RULE file, and then one docstring moved every hash line, on purpose.** Its files were added
+and every earlier technique artefact re-emitted byte-identical (the zero-shared-change control), with one exception that is data,
+not code: 社畜トレイン's `other_windows` (complete both ways over every committed technique window) now records the
+drawn T's of its harddrop page at which the Kaidan window fires, so its transcription and its two artefacts' `transcription_md5`
+moved, and its gate's plain, `--selftest` and `--html-dir` output did not. Every earlier gate's output and every earlier page
+was byte-compared against 6844978 and is identical. Only then was `technique-profile.ts`'s docstring corrected (it repeated the
+false 「staircase over several locks」 example); that file is hashed, so all nine facts artefacts' `emitter_md5` and all nine
+demos' `classifier_md5` moved, and `git diff` shows those lines and nothing else. One shared TEST module was added too:
+`pipeline/openers/technique-donation-checks.ts` (`H`, `W`, `scored`, `donationVerdict`) is `parapet.test.ts`'s donation helper
+moved verbatim so `kaidan.test.ts` can import it, and `parapet.test.ts` imports it now; no artefact hashes it.
 
 ### STMB Cave
 
@@ -4511,6 +4534,57 @@ standing on it. The shared planner gained one branch — a payoff variant's demo
 hold for a second T — which no committed chain reaches, so the demos test runs it on a SYNTHETIC copy of the transcription (the
 O-roof terrain widened until it tiles; a temporary file, never committed or published): the engine arbiter accepts it and it ends on
 one full TSD. Named lists and their sizes live in the two tests.
+
+### 階段のドネイト（Kaidan Setups）
+
+The same deliverable for `template/kaidansetup.php` (「2021-03-23」): `pipeline/openers/kaidan-technique.json` (held as a literal in
+`extract_kaidan_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-kaidan.ts` →
+`analysis/kaidan-facts.json` (`kaidan.test.ts`), `technique-demos-kaidan.ts` → `analysis/kaidan-demos.json` (`kaidan-demos.test.ts`),
+and `docs/kaidan.html` + `docs/kaidan-demos.html` from `kaidan_page.py` + `kaidan_prose.json`, the ninth card under 中盤手法. Every
+figure is read off the artefacts and tests, never typed here.
+
+**No shared RULE file changed** — not the matcher, the planner, the gate or the renderer. Three shared files did move, and
+are named in the 中盤手法 paragraph above: `technique-profile.ts`'s docstring (hashed, so every technique artefact's
+`emitter_md5` / `classifier_md5`), 社畜トレイン's transcription (its `other_windows` data), and the new shared test helper
+`technique-donation-checks.ts` lifted out of `parapet.test.ts`.
+
+A staircase, a Z stood on end on its lowest step at the wall, a roof over the slot's end away from the wall: the flat,
+nub-down T (STMB Cave's, ダブルダガー's, BT砲's, 千鳥格子's, 社畜トレイン's and 欄干's anchor) makes a full TSD that clears the two rows the
+Z's top half is in, and the column beside the Z's foot opens from the top to the floor. So the variant is 欄干's shape of record: one
+TSD and a `well_quad` payoff, which the matcher, the planner, the gate and the renderer already carried. The window counts no steps
+and does not see the Z: the page's four-step form and its three-step S and J forms are one window. harddrop builds the same edge
+from other pieces and from line clears, but those drawings carry no T and the window fires on none of them, so that it fires once
+they are completed is reasoned from its reading occupancy only, not measured.
+
+**The payoff is harddrop's, and the page and the artefact say so.** shiwehi.com names no Tetris after a Kaidan (its next step is
+ST積み or よしひろ積み, which nothing measures); harddrop's Kaidan_Setups page says the column should be open again and its Anchor_Set page
+draws the I clearing four into it (`payoff:` checks that drawing: one vertical I in the re-opened column, four rows filled). The
+page draws its well three deep, so the facts test's payoff digest on the page's own board gives `i_in_well_not_quad`, and the board
+on which the payoff fires is CONSTRUCTED (the bottom row repeated once) and says so.
+
+**The window is the agreement box, and it holds the one choice.** Over the page's three builds and two DT砲 boards (mirrored),
+harddrop's four Kaidan_Setups drawings, Anchor_Set's Kaidan (mirrored) and the Kaidan BT砲's harddrop record holds (mirrored,
+read from `btcannon-technique.json`), there are three maximal boxes on which every drawing agrees: the cleared rows alone, the
+cleared and well rows (no roof), and the window, which is the only one holding the roof. The facts test measures the other two as
+controls (`OTHER_MAXIMAL_BOXES`) and asserts nothing about them. Both harddrop pages are pinned revisions (`revision_sha1`), read
+with `kd_cell` (blank/`-`/`--` empty; a digit filled; `P`/`SP` the T; `'X` the next piece, empty before it; every other code
+`hd_cell`'s), and `check_wikitext_sources` discovers both by structure and re-reads them weekly with `--wikitext-dir`; the
+shiwehi page is re-read only by a person with `--html-dir`. harddrop STMB_Cave's last table (a Kaidan beside an STMB Cave
+variation) is recorded by pointer to 社畜トレイン's pin, not re-pinned: its window leaves that board.
+
+**Relations, measured both ways (`other:`).** This window over every board of every other committed technique transcription,
+and every other technique window over every drawing this one holds, are recorded complete both ways. With 社畜トレイン's window,
+anchored on the same flat T in the same hand, it clashes on NO cell: the Kaidan window fires on 社畜トレイン's 2x2-hole builds'
+first TSD, on its DT社畜 (mirrored) and on several of harddrop's Shachiku_Train drawings of the shape itself (every board listed
+in `other_windows`), and cannot tell them apart, and the common corpus hits are a named list (`SHACHIKUTRAIN_ALSO_KAIDAN`), never asserted
+absent. STMB Cave, ダブルダガー, BT砲, 千鳥格子 and 欄干 clash in every pairing of hands and their hit sets are disjoint;
+STSD's and インペリアルクロス's T stands up. The hits are checked against harddrop's Donation predicate (`technique-donation-checks.ts`,
+lifted out of `parapet.test.ts` and shared): every hit that is not a donation fails only a clause outside the window.
+
+**No demo is built, and every board says why** (`kaidan-demos.test.ts` re-derives each): the four-step staircase has an ODD
+cell count (a proof); the three-step staircases tile, but never without a T, and the planner's dealing keeps the T's for the spin
+(its 「no cover by non-T pieces」 is the measurement, not a proof); the DT砲 boards are even but not multiples of four and drawn
+mirrored, so the as-drawn window would not fit them even built (measured). Named lists and their sizes live in the two tests.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
