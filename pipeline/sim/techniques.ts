@@ -12,6 +12,7 @@ import { BTCANNON } from './technique-profile-btcannon.ts';
 import { CUTCOPY } from './technique-profile-cutcopy.ts';
 import { SHACHIKUTRAIN } from './technique-profile-shachikutrain.ts';
 import { PARAPET } from './technique-profile-parapet.ts';
+import { KAIDAN } from './technique-profile-kaidan.ts';
 import type { TechniqueDemoProfile } from './technique-demo-profile.ts';
 import { STSD_DEMOS } from './technique-demos-stsd.ts';
 import { STMBCAVE_DEMOS } from './technique-demos-stmbcave.ts';
@@ -21,16 +22,17 @@ import { BTCANNON_DEMOS } from './technique-demos-btcannon.ts';
 import { CUTCOPY_DEMOS } from './technique-demos-cutcopy.ts';
 import { SHACHIKUTRAIN_DEMOS } from './technique-demos-shachikutrain.ts';
 import { PARAPET_DEMOS } from './technique-demos-parapet.ts';
+import { KAIDAN_DEMOS } from './technique-demos-kaidan.ts';
 
 export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossRoute }> = {
   stsd: STSD, stmbcave: STMBCAVE, imperialcross: IMPERIALCROSS, doubledagger: DOUBLEDAGGER, btcannon: BTCANNON,
-  cutcopy: CUTCOPY, shachikutrain: SHACHIKUTRAIN, parapet: PARAPET,
+  cutcopy: CUTCOPY, shachikutrain: SHACHIKUTRAIN, parapet: PARAPET, kaidan: KAIDAN,
 };
 /** each technique's constructed-demo half, by the same key */
 export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
   stsd: STSD_DEMOS, stmbcave: STMBCAVE_DEMOS, imperialcross: IMPERIALCROSS_DEMOS,
   doubledagger: DOUBLEDAGGER_DEMOS, btcannon: BTCANNON_DEMOS, cutcopy: CUTCOPY_DEMOS,
-  shachikutrain: SHACHIKUTRAIN_DEMOS, parapet: PARAPET_DEMOS,
+  shachikutrain: SHACHIKUTRAIN_DEMOS, parapet: PARAPET_DEMOS, kaidan: KAIDAN_DEMOS,
 };
 
 /** `--technique <key>` out of argv, or a loud failure naming the keys there are. */

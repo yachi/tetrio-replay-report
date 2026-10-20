@@ -876,6 +876,23 @@ jobs:
       - name: Check the Parapet technique page audit catches its corruptions
         run: python3 -m pipeline.parapet_page --selftest
 
+      # The ninth technique page, 階段のドネイト (Kaidan Setups, shiwehi.com's template/kaidansetup.php): the same gate
+      # and renderer, no shared RULE file changed (the shared files that moved are named in CLAUDE.md). The flat T's
+      # TSD on a staircase with a Z stood on end, and 欄干's
+      # well_quad PAYOFF (the Tetris into the column the TSD re-opens — harddrop's next step, not shiwehi.com's). Its
+      # window is the AGREEMENT BOX of the page's builds and DT砲 boards, harddrop's Kaidan_Setups and Anchor_Set pages
+      # (both pinned revisions, refetched weekly by check_wikitext_sources) and the Kaidan BT砲's harddrop record holds.
+      # The corpus artefact and the (all unbuilt) demos are checked by pipeline/openers/kaidan.test.ts and
+      # kaidan-demos.test.ts in the typescript job.
+      - name: Check the Kaidan technique transcription
+        run: python3 -m pipeline.openers.extract_kaidan_shapes
+
+      - name: Check the Kaidan technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_kaidan_shapes --selftest
+
+      - name: Check the Kaidan technique page audit catches its corruptions
+        run: python3 -m pipeline.kaidan_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

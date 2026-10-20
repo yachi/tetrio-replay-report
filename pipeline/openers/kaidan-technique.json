@@ -1,0 +1,3633 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "kaidan",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/kaidansetup.php",
+    "title": "階段のドネイト(Kaidan Setups)",
+    "author": "しゑひ(shiwehi)",
+    "updated": "2021-03-23",
+    "fetched": "2026-10-19",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 社畜トレイン, 欄干, 山岳積み2号 and stick spin used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 11 ten-wide boards in page order.",
+    "snapshot_file": "kaidansetup.html",
+    "snapshot_sha256": "3d501dd72bf6e163838d46bc6322cda1c962b9083017e6917aa40b8827d45dee",
+    "snapshot_bytes": 26696,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with harddrop's Kaidan_Setups.wikitext, Anchor_Set.wikitext and STMB_Cave.wikitext beside it); an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "decorative_images": [
+      "階段のドネイト(Kaidan Setups)タイトル画像",
+      "the related-page thumbnails (Tスピン, 開幕DT砲からの派生, あめみや砲, アンカーセット, 脱初心者のための基本的なドネイト)"
+    ],
+    "references": [
+      "./derivedtcannonop.php (開幕DT砲からの派生)",
+      "./amemiyacannon.php (あめみや砲)",
+      "./anchorset.php (アンカーセット; not matched, see ROADMAP.md)",
+      "./basicdonating.php (脱初心者のための基本的なドネイト)"
+    ],
+    "unfetched": [
+      "the embedded video https://www.youtube.com/embed/-YZyjNNMSOw?start=152 (I凜's explanation, embedded with permission per the page): not transcribed"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "i j l o s z": "a cell of that piece, placed to build the shape",
+    "t": "a cell of a T in a row no spin clears (the second 打後 board's stood T)",
+    "T": "a cell of the T in a row the spin clears (muted; OUR READING, checked: every upper-case row of a spin board is a full row)",
+    "U": "a cell of the T the spin places on the DT砲 boards (the renderer's light purple)",
+    "C": "on a spin board, an earlier cell in a row the spin clears (muted; checked the same way); on the two 打後 boards, an earlier stack drawn muted, in rows that are NOT full (`illus:`; the second board's stood T completes a row of unmuted cells below them)",
+    "I J L O S Z": "a cell of that piece in a row the spin clears, drawn muted",
+    "%X": "the X piece"
+  },
+  "cell_images": {
+    "": {
+      "file": "Tet.png",
+      "sha1": "4a13b4b3a08a50a8071886b018675b558a926659",
+      "reads": "empty (white)"
+    },
+    "-": {
+      "file": "-Tet.png",
+      "sha1": "9e1b403ca10552c673fd936a775506ece6e71da4",
+      "reads": "empty (white)"
+    },
+    "--": {
+      "file": "--Tet.png",
+      "sha1": "9e1b403ca10552c673fd936a775506ece6e71da4",
+      "reads": "empty (white; the same bytes as -Tet.png)"
+    },
+    "1": {
+      "file": "1Tet.png",
+      "sha1": "6ea1e1f134e34947d537d6c7ecc4096851931a2c",
+      "reads": "filled (a dark cell with a numeral)"
+    },
+    "2": {
+      "file": "2Tet.png",
+      "sha1": "cdb5218ba0f48435ebf25711e5d6920a882f1903",
+      "reads": "filled (a dark cell with a white numeral)"
+    },
+    "3": {
+      "file": "3Tet.png",
+      "sha1": "1a599fead6d8ec95ec9f065b19382e8ef4c37f54",
+      "reads": "filled (a dark cell with a white numeral)"
+    },
+    "4": {
+      "file": "4Tet.png",
+      "sha1": "40e079cd59fc1ee68dfd1fd26fb1cac95cfff188",
+      "reads": "filled (a dark cell with a white numeral)"
+    },
+    "P": {
+      "file": "PTet.png",
+      "sha1": "72e099fc958e4708a34b407164e07473093799d1",
+      "reads": "the T placed (white, a T-coloured margin)"
+    },
+    "SP": {
+      "file": "SPTet.png",
+      "sha1": "9ad7b972afebe1cac23290b7050256627b2f0cca",
+      "reads": "the T placed, the second skin (white, a T-coloured margin)"
+    },
+    "'I": {
+      "file": "'ITet.png",
+      "sha1": "1a159d4dbc3c85e4ef31ad8942a8792dbae37f75",
+      "reads": "the I placed next (white, an I-coloured margin)"
+    }
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "intro",
+      "verbatim": "ここでは、階段のドネイト(Kaidan Setups)という、ドネイトについて紹介していきます。"
+    },
+    {
+      "id": "h.basic",
+      "verbatim": "基本系"
+    },
+    {
+      "id": "def",
+      "verbatim": "階段のドネイトとは、上手のように4段以上の階段ができている時に、%Zを縦向きに置くことによって%Tの形を作り、屋根をつけてT-spinを狙っていくというドネイトの一種です。",
+      "reading_note": "「上手のように」 is the page's own typo for 「上図のように」 (as the figures above it); quoted as printed"
+    },
+    {
+      "id": "flat",
+      "verbatim": "図を見ると分かるように、T-spinを打ちつつ地形を平らにすることができます。"
+    },
+    {
+      "id": "three",
+      "verbatim": "また、下図のように階段が3段しかない場合にも%Sや%Jを使用することによって階段のドネイトを打つことができます。"
+    },
+    {
+      "id": "h.after",
+      "verbatim": "打後"
+    },
+    {
+      "id": "after",
+      "verbatim": "階段のドネイトを打った後はST積みやよしひろ積みへ移行できます。"
+    },
+    {
+      "id": "h.dt",
+      "verbatim": "開幕DT砲後の階段のドネイト"
+    },
+    {
+      "id": "dt",
+      "verbatim": "開幕DT砲の派生として階段のドネイトを打つことができます。"
+    },
+    {
+      "id": "amemiya",
+      "verbatim": "%Lをソフトドロップした後に打つことができます。"
+    },
+    {
+      "id": "cap.amemiya",
+      "verbatim": "あめみや砲"
+    },
+    {
+      "id": "anchor",
+      "verbatim": "%Jでアンカーセットを行って打つことができます。"
+    },
+    {
+      "id": "cap.anchor",
+      "verbatim": "アンカーセットを用いた階段のドネイト"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic.terrain",
+      "kind": "base",
+      "caption_quote": "h.basic",
+      "label": "a staircase of four steps down to the right wall, the wall column open two rows deep",
+      "rows": [
+        "----------",
+        "----------",
+        "cccccc----",
+        "ccccccc---",
+        "cccccccc--",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.z",
+      "kind": "build",
+      "on": "basic.terrain",
+      "adds": "z",
+      "caption_quote": "def",
+      "label": "a Z stood on end on the lowest step, at the wall: the T's slot",
+      "rows": [
+        "----------",
+        "----------",
+        "cccccc---z",
+        "ccccccc-zz",
+        "ccccccccz-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.o",
+      "kind": "build",
+      "on": "basic.z",
+      "adds": "o",
+      "caption_quote": "def",
+      "label": "an O roofing the slot's end away from the wall",
+      "rows": [
+        "-----oo---",
+        "-----oo---",
+        "cccccc---z",
+        "ccccccc-zz",
+        "ccccccccz-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "kind": "spin",
+      "spin_of": "basic.o",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "def",
+      "label": "the T laid flat, pointing down: a TSD clearing the two rows the Z's top half is in",
+      "rows": [
+        "-----oo---",
+        "-----oo---",
+        "CCCCCCTTTZ",
+        "CCCCCCCTZZ",
+        "ccccccccz-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "basic.after",
+      "kind": "after",
+      "after_of": "basic.spin",
+      "caption_quote": "flat",
+      "label": "what the TSD leaves: the stack flat, and the wall column open from the top to the floor (the O drawn grey)",
+      "rows": [
+        "----------",
+        "----------",
+        "-----cc---",
+        "-----cc---",
+        "ccccccccc-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "s3.s",
+      "kind": "build",
+      "on": "s3.terrain",
+      "adds": "sz",
+      "caption_quote": "three",
+      "label": "three steps: the Z and an S roofing the slot's end away from the wall",
+      "rows": [
+        "----------",
+        "-----ss---",
+        "ccccss---z",
+        "ccccccc-zz",
+        "ccccccccz-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "s3.j",
+      "kind": "build",
+      "on": "j3.terrain",
+      "adds": "jz",
+      "caption_quote": "three",
+      "label": "three steps: the Z and a J roofing the slot's end away from the wall, over a hole under its stem",
+      "rows": [
+        "----------",
+        "-----jj---",
+        "cccccj---z",
+        "cccccjc-zz",
+        "ccccccccz-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "after.1",
+      "kind": "illustration",
+      "caption_quote": "after",
+      "label": "after a Kaidan, the next stack begun (the page does not say which of ST積み and よしひろ積み)",
+      "rows": [
+        "-----ss---",
+        "CCCCss---z",
+        "CCCCCcc-zz",
+        "CCCCCcc-z-",
+        "ccccccccc-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "after.2",
+      "kind": "illustration",
+      "caption_quote": "after",
+      "label": "after a Kaidan, the next stack begun with a stood T at the wall, which completes one row (the page names neither board)",
+      "rows": [
+        "----------",
+        "-----ss---",
+        "CCCCss---t",
+        "CCCCCcc-tt",
+        "ccccccccct",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "dt.amemiya",
+      "kind": "spin",
+      "on": "dt.amemiya.pre",
+      "adds": "U",
+      "spin_of": "dt.amemiya.pre",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "cap.amemiya",
+      "label": "after the DT砲 opener, the あめみや砲 branch (the L soft-dropped first): the Kaidan's TSD, mirrored",
+      "rows": [
+        "----------",
+        "----------",
+        "---zz----i",
+        "SUUUZZJJJI",
+        "SSUCCCCCJI",
+        "-scccccc-i",
+        "-lcccccccc",
+        "-lcccccccc",
+        "-llccccccc"
+      ]
+    },
+    {
+      "id": "dt.anchor",
+      "kind": "spin",
+      "on": "dt.anchor.pre",
+      "adds": "U",
+      "spin_of": "dt.anchor.pre",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "cap.anchor",
+      "label": "after the DT砲 opener, an アンカーセット with the J, then the Kaidan's TSD, mirrored",
+      "rows": [
+        "---------i",
+        "---------i",
+        "---zz---li",
+        "SUUUZZOOLI",
+        "SSUCCCOOLL",
+        "-scccccccc",
+        "-jcccccccc",
+        "-jcccccccc",
+        "jj-ccccccc"
+      ]
+    },
+    {
+      "id": "s3.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "s3.s less its S and Z: three steps",
+      "rows": [
+        "----------",
+        "----------",
+        "cccc------",
+        "ccccccc---",
+        "cccccccc--",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "j3.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "s3.j less its J and Z: three steps, a hole under the J's stem",
+      "rows": [
+        "----------",
+        "----------",
+        "ccccc-----",
+        "ccccc-c---",
+        "cccccccc--",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "dt.amemiya.pre",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dt.amemiya with its U read empty: the slot the T goes into",
+      "rows": [
+        "----------",
+        "----------",
+        "---zz----i",
+        "S---ZZJJJI",
+        "SS-CCCCCJI",
+        "-scccccc-i",
+        "-lcccccccc",
+        "-lcccccccc",
+        "-llccccccc"
+      ]
+    },
+    {
+      "id": "dt.anchor.pre",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dt.anchor with its U read empty: the slot the T goes into",
+      "rows": [
+        "---------i",
+        "---------i",
+        "---zz---li",
+        "S---ZZOOLI",
+        "SS-CCCOOLL",
+        "-scccccccc",
+        "-jcccccccc",
+        "-jcccccccc",
+        "jj-ccccccc"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic.terrain",
+    "basic.z",
+    "basic.o",
+    "basic.spin",
+    "basic.after",
+    "s3.s",
+    "s3.j",
+    "after.1",
+    "after.2",
+    "dt.amemiya",
+    "dt.anchor"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "kaidan",
+      "board": "basic.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          5
+        ],
+        "cols": [
+          5,
+          9
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's three builds and two DT砲 boards (mirrored), harddrop's four Kaidan_Setups drawings, harddrop Anchor_Set's Kaidan (mirrored) and the Kaidan BT砲's harddrop record holds (mirrored). Row 1 is the row above the T: the roof over its end away from the wall filled, the cells over its nub, its far arm and the Z's top empty; rows 2-3 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); rows 4-5 are the two rows under them: the Z's foot and the steps filled, the wall column (the well) empty. THE ONE CHOICE: there are three maximal boxes on which every drawing agrees (the cleared rows alone; the cleared rows and the well rows; this one), and this is the only one holding the roof. Occupancy only, never colour; garbage is filled.",
+      "untested_drawn": {
+        "cells": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        "reason": "the O roof's top row: the S and J forms roof the slot with a piece one row lower and draw nothing there, so the drawings disagree one row above the window"
+      },
+      "agreement": [
+        {
+          "board": "basic.o",
+          "t_cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "s3.s",
+          "t_cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "s3.j",
+          "t_cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "dt.amemiya.pre",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": true
+        },
+        {
+          "board": "dt.anchor.pre",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": true
+        }
+      ],
+      "payoff": {
+        "kind": "well_quad",
+        "board": "basic.after",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          4,
+          9
+        ],
+        "well_cell_after": [
+          4,
+          9
+        ],
+        "note": "a Tetris into the column the TSD re-opens: HARDDROP's next step, not shiwehi.com's. harddrop's Kaidan_Setups page: 「After performing the T-Spin Double, the empty column should be open again. The Kaidan setup is especially effective in games that reward a Back-to-Back bonus.」; its Anchor_Set page draws the I clearing four into that column (cross_source.harddrop_anchor_set.payoff_drawing). shiwehi.com names no Tetris: its next step is ST積み or よしひろ積み, which nothing here measures. The matcher carries the well cell to the first later lock that puts a cell in its column and asks whether that lock is an I the engine credits with four lines"
+      },
+      "fires_on": [
+        "basic.o",
+        "s3.s",
+        "s3.j"
+      ],
+      "fires_mirrored": [
+        "dt.amemiya.pre",
+        "dt.anchor.pre"
+      ],
+      "misses": [
+        "basic.terrain",
+        "basic.z",
+        "basic.after",
+        "s3.terrain",
+        "j3.terrain",
+        "after.1",
+        "after.2"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "kaidan",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none, and no node is labelled 階段 or Kaidan. The independent drawer is harddrop instead: its Kaidan_Setups and Anchor_Set pages and the Kaidan its BT_Cannon page draws, whose drawings are the window's external `agreement` drawings (rule (g) fires the window on each, once, at its drawn T, in its recorded hand).",
+    "routes_fire_none": "no committed routes file draws a Kaidan (measured: the window fires on none of their U-slot boards at any resting placement, and no node is labelled 階段 or Kaidan); the cross-check is harddrop's own pages, read below",
+    "harddrop": {
+      "page": "https://harddrop.com/wiki/Kaidan_Setups",
+      "title": "Kaidan Setups",
+      "oldid": 37594,
+      "revision_sha1": "698d8565e9a95ed38ed7989a4d7a153c319bfe0f",
+      "revision_timestamp": "2023-11-01T22:37:17Z",
+      "fetched": "2026-10-19",
+      "fetch_method": "the latest revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=Kaidan_Setups&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 37594 was the page's latest revision when fetched",
+      "snapshot_file": "Kaidan_Setups.wikitext",
+      "snapshot_sha256": "b7d13f7e9f5c7e68e903cc9d61c4c5259095c80596fdd259f3d1b1147f107b5e",
+      "snapshot_bytes": 28991,
+      "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside kaidansetup.html",
+      "author_note": "harddrop's page, edited by its wiki editors: another site and other authors than shiwehi.com, and a page the shiwehi.com page does not cite (found by its title, which \"Kaidan\" redirects to), so it is independent of it",
+      "categories": [
+        "Mid-game T-Spin setups",
+        "T-Spin setups",
+        "T-Spin techniques"
+      ],
+      "quote": "After performing the T-Spin Double, the empty column should be open again. The Kaidan setup is especially effective in games that reward a Back-to-Back bonus.",
+      "board_counts": [
+        4,
+        4,
+        3,
+        2,
+        4,
+        2,
+        2,
+        3,
+        3,
+        4,
+        2,
+        2,
+        2,
+        2,
+        1,
+        2,
+        2,
+        2,
+        3,
+        2,
+        4,
+        4,
+        2,
+        2,
+        4,
+        3,
+        2,
+        4,
+        3,
+        2,
+        3,
+        3,
+        4,
+        3,
+        3
+      ],
+      "reading": {
+        "blank, - and --": "empty",
+        "a digit": "g, FILLED (hd_cell reads it as the digit itself, also filled)",
+        "P and SP": "U, the T the page places (hd_cell reads SP as a piece p)",
+        "'X": "v, the X the page places next, read EMPTY on the board before it (hd_cell reads it as the piece, filled)",
+        "S followed by a letter": "that letter, lower case: the template's second skin (as hd_cell)",
+        "other": "hd_cell: its last letter in lower case (G grey, Q a lighter grey), every one FILLED",
+        "slots": "a board's U cells are partitioned into T's (千鳥格子's hd_slots); each T is one slot, read with every U and v cell of the board empty"
+      },
+      "special_cells": {
+        "--": [
+          [
+            1,
+            0,
+            3,
+            6
+          ],
+          [
+            1,
+            0,
+            3,
+            7
+          ],
+          [
+            1,
+            0,
+            3,
+            8
+          ],
+          [
+            1,
+            0,
+            3,
+            9
+          ],
+          [
+            1,
+            0,
+            4,
+            7
+          ],
+          [
+            1,
+            0,
+            4,
+            8
+          ],
+          [
+            1,
+            0,
+            4,
+            9
+          ],
+          [
+            1,
+            0,
+            5,
+            8
+          ],
+          [
+            1,
+            0,
+            5,
+            9
+          ],
+          [
+            2,
+            1,
+            3,
+            0
+          ],
+          [
+            2,
+            1,
+            3,
+            1
+          ],
+          [
+            2,
+            1,
+            3,
+            2
+          ],
+          [
+            2,
+            1,
+            3,
+            3
+          ],
+          [
+            2,
+            1,
+            3,
+            4
+          ],
+          [
+            2,
+            1,
+            3,
+            5
+          ],
+          [
+            2,
+            1,
+            3,
+            6
+          ],
+          [
+            2,
+            1,
+            3,
+            7
+          ],
+          [
+            2,
+            1,
+            3,
+            8
+          ],
+          [
+            2,
+            1,
+            3,
+            9
+          ],
+          [
+            2,
+            1,
+            4,
+            0
+          ],
+          [
+            2,
+            1,
+            4,
+            1
+          ],
+          [
+            2,
+            1,
+            4,
+            2
+          ],
+          [
+            2,
+            1,
+            4,
+            3
+          ],
+          [
+            2,
+            1,
+            4,
+            4
+          ],
+          [
+            2,
+            1,
+            4,
+            5
+          ],
+          [
+            2,
+            1,
+            4,
+            6
+          ],
+          [
+            2,
+            1,
+            4,
+            7
+          ],
+          [
+            2,
+            1,
+            4,
+            8
+          ],
+          [
+            2,
+            1,
+            4,
+            9
+          ],
+          [
+            4,
+            0,
+            4,
+            0
+          ],
+          [
+            4,
+            0,
+            5,
+            0
+          ],
+          [
+            4,
+            1,
+            4,
+            0
+          ],
+          [
+            4,
+            1,
+            5,
+            0
+          ],
+          [
+            4,
+            2,
+            4,
+            0
+          ],
+          [
+            4,
+            2,
+            5,
+            0
+          ],
+          [
+            4,
+            3,
+            4,
+            0
+          ],
+          [
+            4,
+            3,
+            5,
+            0
+          ],
+          [
+            7,
+            1,
+            2,
+            5
+          ],
+          [
+            7,
+            2,
+            2,
+            5
+          ],
+          [
+            7,
+            2,
+            3,
+            5
+          ]
+        ],
+        "1": [
+          [
+            3,
+            0,
+            5,
+            8
+          ],
+          [
+            3,
+            1,
+            5,
+            8
+          ],
+          [
+            4,
+            0,
+            5,
+            1
+          ],
+          [
+            4,
+            0,
+            5,
+            2
+          ],
+          [
+            4,
+            0,
+            5,
+            3
+          ],
+          [
+            4,
+            0,
+            5,
+            4
+          ],
+          [
+            4,
+            0,
+            5,
+            5
+          ],
+          [
+            4,
+            0,
+            5,
+            7
+          ],
+          [
+            4,
+            0,
+            5,
+            8
+          ],
+          [
+            4,
+            0,
+            5,
+            9
+          ],
+          [
+            4,
+            1,
+            5,
+            1
+          ],
+          [
+            4,
+            1,
+            5,
+            2
+          ],
+          [
+            4,
+            1,
+            5,
+            3
+          ],
+          [
+            4,
+            1,
+            5,
+            4
+          ],
+          [
+            4,
+            1,
+            5,
+            5
+          ],
+          [
+            4,
+            1,
+            5,
+            7
+          ],
+          [
+            4,
+            1,
+            5,
+            8
+          ],
+          [
+            4,
+            1,
+            5,
+            9
+          ],
+          [
+            4,
+            2,
+            5,
+            1
+          ],
+          [
+            4,
+            2,
+            5,
+            2
+          ],
+          [
+            4,
+            2,
+            5,
+            3
+          ],
+          [
+            4,
+            2,
+            5,
+            4
+          ],
+          [
+            4,
+            2,
+            5,
+            5
+          ],
+          [
+            4,
+            2,
+            5,
+            7
+          ],
+          [
+            4,
+            2,
+            5,
+            8
+          ],
+          [
+            4,
+            2,
+            5,
+            9
+          ],
+          [
+            4,
+            3,
+            5,
+            1
+          ],
+          [
+            4,
+            3,
+            5,
+            2
+          ],
+          [
+            4,
+            3,
+            5,
+            3
+          ],
+          [
+            4,
+            3,
+            5,
+            4
+          ],
+          [
+            4,
+            3,
+            5,
+            5
+          ],
+          [
+            4,
+            3,
+            5,
+            7
+          ],
+          [
+            4,
+            3,
+            5,
+            8
+          ],
+          [
+            4,
+            3,
+            5,
+            9
+          ]
+        ],
+        "2": [
+          [
+            3,
+            0,
+            4,
+            7
+          ],
+          [
+            3,
+            1,
+            4,
+            7
+          ],
+          [
+            4,
+            0,
+            4,
+            1
+          ],
+          [
+            4,
+            0,
+            4,
+            2
+          ],
+          [
+            4,
+            0,
+            4,
+            3
+          ],
+          [
+            4,
+            0,
+            4,
+            4
+          ],
+          [
+            4,
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            0,
+            4,
+            8
+          ],
+          [
+            4,
+            0,
+            4,
+            9
+          ],
+          [
+            4,
+            1,
+            4,
+            1
+          ],
+          [
+            4,
+            1,
+            4,
+            2
+          ],
+          [
+            4,
+            1,
+            4,
+            3
+          ],
+          [
+            4,
+            1,
+            4,
+            4
+          ],
+          [
+            4,
+            1,
+            4,
+            7
+          ],
+          [
+            4,
+            1,
+            4,
+            8
+          ],
+          [
+            4,
+            1,
+            4,
+            9
+          ],
+          [
+            4,
+            2,
+            4,
+            1
+          ],
+          [
+            4,
+            2,
+            4,
+            2
+          ],
+          [
+            4,
+            2,
+            4,
+            3
+          ],
+          [
+            4,
+            2,
+            4,
+            4
+          ],
+          [
+            4,
+            2,
+            4,
+            7
+          ],
+          [
+            4,
+            2,
+            4,
+            8
+          ],
+          [
+            4,
+            2,
+            4,
+            9
+          ],
+          [
+            4,
+            3,
+            4,
+            1
+          ],
+          [
+            4,
+            3,
+            4,
+            2
+          ],
+          [
+            4,
+            3,
+            4,
+            3
+          ],
+          [
+            4,
+            3,
+            4,
+            4
+          ],
+          [
+            4,
+            3,
+            4,
+            7
+          ],
+          [
+            4,
+            3,
+            4,
+            8
+          ],
+          [
+            4,
+            3,
+            4,
+            9
+          ]
+        ],
+        "3": [
+          [
+            3,
+            0,
+            3,
+            6
+          ],
+          [
+            3,
+            1,
+            3,
+            6
+          ]
+        ],
+        "4": [
+          [
+            3,
+            0,
+            2,
+            5
+          ],
+          [
+            3,
+            1,
+            2,
+            5
+          ]
+        ],
+        "SP": [
+          [
+            0,
+            2,
+            3,
+            6
+          ],
+          [
+            0,
+            2,
+            3,
+            7
+          ],
+          [
+            0,
+            2,
+            3,
+            8
+          ],
+          [
+            0,
+            2,
+            4,
+            7
+          ],
+          [
+            2,
+            0,
+            3,
+            6
+          ],
+          [
+            2,
+            0,
+            3,
+            7
+          ],
+          [
+            2,
+            0,
+            3,
+            8
+          ],
+          [
+            2,
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            2,
+            2,
+            3
+          ],
+          [
+            4,
+            2,
+            2,
+            4
+          ],
+          [
+            4,
+            2,
+            2,
+            5
+          ],
+          [
+            4,
+            2,
+            3,
+            4
+          ],
+          [
+            27,
+            2,
+            2,
+            6
+          ],
+          [
+            27,
+            2,
+            2,
+            7
+          ],
+          [
+            27,
+            2,
+            2,
+            8
+          ],
+          [
+            27,
+            2,
+            3,
+            7
+          ],
+          [
+            30,
+            2,
+            2,
+            7
+          ],
+          [
+            30,
+            2,
+            3,
+            6
+          ],
+          [
+            30,
+            2,
+            3,
+            7
+          ],
+          [
+            30,
+            2,
+            4,
+            7
+          ],
+          [
+            31,
+            2,
+            3,
+            6
+          ],
+          [
+            31,
+            2,
+            3,
+            7
+          ],
+          [
+            31,
+            2,
+            3,
+            8
+          ],
+          [
+            31,
+            2,
+            4,
+            7
+          ],
+          [
+            32,
+            1,
+            3,
+            6
+          ],
+          [
+            32,
+            1,
+            3,
+            7
+          ],
+          [
+            32,
+            1,
+            3,
+            8
+          ],
+          [
+            32,
+            1,
+            4,
+            7
+          ],
+          [
+            33,
+            1,
+            2,
+            6
+          ],
+          [
+            33,
+            1,
+            2,
+            7
+          ],
+          [
+            33,
+            1,
+            2,
+            8
+          ],
+          [
+            33,
+            1,
+            3,
+            7
+          ],
+          [
+            34,
+            1,
+            2,
+            9
+          ],
+          [
+            34,
+            1,
+            3,
+            8
+          ],
+          [
+            34,
+            1,
+            3,
+            9
+          ],
+          [
+            34,
+            1,
+            4,
+            9
+          ],
+          [
+            34,
+            2,
+            3,
+            6
+          ],
+          [
+            34,
+            2,
+            3,
+            7
+          ],
+          [
+            34,
+            2,
+            3,
+            8
+          ],
+          [
+            34,
+            2,
+            4,
+            7
+          ]
+        ]
+      },
+      "drawings": [
+        {
+          "n": 2,
+          "table": 0,
+          "board": 2,
+          "section": "General Formation",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "ggggggg---",
+            "ggggggUUUz",
+            "gggggggUzz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 8,
+          "table": 2,
+          "board": 0,
+          "section": "Step by Step",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-----oo---",
+            "-----oo---",
+            "ggggggUUUz",
+            "gggggggUzz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 15,
+          "table": 4,
+          "board": 2,
+          "section": "General Tips",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "rows": [
+            "---l------",
+            "-lll------",
+            "gggUUUzggg",
+            "ggggUzzggg",
+            "-ggggz-ggg",
+            "-ggggg-ggg"
+          ]
+        },
+        {
+          "n": 92,
+          "table": 33,
+          "board": 1,
+          "section": "Transfers",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "rows": [
+            "gggg------",
+            "gggglll---",
+            "gggglgUUUz",
+            "gggggggUzz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        }
+      ],
+      "drawn_t_not_fired": [
+        {
+          "n": 74,
+          "table": 27,
+          "board": 2,
+          "section": "Line Clear Base",
+          "slot": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the Line Clear Base: the hole sits under the T's right arm, not beside the Z's foot (the window's well cells (1,9) and (4,9) and the step (4,8) disagree)",
+          "rows": [
+            "-----oo---",
+            "-----oo--j",
+            "ggggggUUUj",
+            "gggggggUjj",
+            "gggggggg-g",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 83,
+          "table": 30,
+          "board": 2,
+          "section": "T-Spin Double Replacements",
+          "slot": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "t": "stood",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "a T-Spin Double Replacement: an Imperial TSS (the T stood up)",
+          "rows": [
+            "----------",
+            "------l---",
+            "----lllU--",
+            "ggggggUU--",
+            "gggggggUoo",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 86,
+          "table": 31,
+          "board": 2,
+          "section": "T-Spin Double Replacements",
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 1,
+          "window": "leaves the board",
+          "note": "a T-Spin Double Replacement: the TSD slot fired as a TSS (one row fills)",
+          "rows": [
+            "----------",
+            "------l---",
+            "----lll---",
+            "ggggggUUU-",
+            "gggggggUoo",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 88,
+          "table": 32,
+          "board": 1,
+          "section": "Transfers",
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a Transfer: the Kaidan drawn one row above the board's floor, so the window's second well row is under the drawing",
+          "rows": [
+            "gggg------",
+            "gggggoo---",
+            "gggggoo---",
+            "ggggggUUUz",
+            "gggggggUzz",
+            "ggggggggz-"
+          ]
+        },
+        {
+          "n": 95,
+          "table": 34,
+          "board": 1,
+          "section": "Transfers",
+          "slot": [
+            [
+              2,
+              9
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              3,
+              9
+            ],
+            [
+              4,
+              9
+            ]
+          ],
+          "t": "stood",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "a Transfer: a stood T at the wall in the Z's place",
+          "rows": [
+            "----------",
+            "-----ss---",
+            "ggggss---U",
+            "gggglll-UU",
+            "ggggggggzU",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 96,
+          "table": 34,
+          "board": 2,
+          "section": "Transfers",
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a Transfer: the TSD over the stood T of the board before, drawn one row above the floor",
+          "rows": [
+            "----------",
+            "----------",
+            "-----ss---",
+            "ggggssUUUt",
+            "gggglllUtt",
+            "ggggggggg-"
+          ]
+        }
+      ],
+      "fires_without_slot": [
+        {
+          "n": 1,
+          "table": 0,
+          "board": 1,
+          "section": "General Formation",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "ggggggg---",
+            "gggggg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 6,
+          "table": 1,
+          "board": 2,
+          "section": "Step by Step",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-----oo---",
+            "-----oo---",
+            "gggggg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 14,
+          "table": 4,
+          "board": 1,
+          "section": "General Tips",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "rows": [
+            "---l------",
+            "-lll------",
+            "ggg---zggg",
+            "gggg-zzggg",
+            "-ggggz-ggg",
+            "-ggggg-ggg"
+          ]
+        },
+        {
+          "n": 18,
+          "table": 5,
+          "board": 1,
+          "section": "General Tips",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "rows": [
+            "-----oo---",
+            "-----oo---",
+            "gggggg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 20,
+          "table": 6,
+          "board": 1,
+          "section": "General Tips",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "rows": [
+            "-----oo---",
+            "-----oo---",
+            "gggggg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 78,
+          "table": 28,
+          "board": 2,
+          "section": "T-Spin Double Replacements",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "-----oo---",
+            "-----oo---",
+            "gggggg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-",
+            "ggggggggg-"
+          ]
+        },
+        {
+          "n": 91,
+          "table": 33,
+          "board": 0,
+          "section": "Transfers",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "rows": [
+            "gggg------",
+            "gggglll---",
+            "gggglg---z",
+            "ggggggg-zz",
+            "ggggggggz-",
+            "ggggggggg-"
+          ]
+        }
+      ]
+    },
+    "harddrop_anchor_set": {
+      "page": "https://harddrop.com/wiki/Anchor_Set",
+      "title": "Anchor Set",
+      "oldid": 40815,
+      "revision_sha1": "0bfdd986120f5dd20cdc8b6a3b615b84bc7db415",
+      "revision_timestamp": "2024-10-05T01:12:14Z",
+      "fetched": "2026-10-19",
+      "fetch_method": "the latest revision's own bytes from the MediaWiki API, as Kaidan_Setups' (urllib, NOT curl); 40815 was the page's latest revision when fetched",
+      "snapshot_file": "Anchor_Set.wikitext",
+      "snapshot_sha256": "f936bc67866039667595b5c8478d7733165cf3c3bf0f9bb43fbf9c5586fc158f",
+      "snapshot_bytes": 10665,
+      "snapshot_note": "not committed: check_wikitext_sources refetches it weekly as Kaidan_Setups'",
+      "author_note": "harddrop's page (another site than shiwehi.com); pinned here so a later アンカーセット pass starts from a pinned source",
+      "categories": [
+        "Tetris techniques"
+      ],
+      "quote": "Anchor Set could be used with Kaidan for extra firepower. This one is especially used with the J anchor.",
+      "board_counts": [
+        1,
+        4,
+        4,
+        1,
+        2,
+        2,
+        1,
+        2,
+        1,
+        3,
+        2,
+        2,
+        2,
+        1,
+        3,
+        3,
+        4,
+        4
+      ],
+      "reading": {
+        "blank, - and --": "empty",
+        "a digit": "g, FILLED (hd_cell reads it as the digit itself, also filled)",
+        "P and SP": "U, the T the page places (hd_cell reads SP as a piece p)",
+        "'X": "v, the X the page places next, read EMPTY on the board before it (hd_cell reads it as the piece, filled)",
+        "S followed by a letter": "that letter, lower case: the template's second skin (as hd_cell)",
+        "other": "hd_cell: its last letter in lower case (G grey, Q a lighter grey), every one FILLED",
+        "slots": "a board's U cells are partitioned into T's (千鳥格子's hd_slots); each T is one slot, read with every U and v cell of the board empty"
+      },
+      "special_cells": {
+        "'I": [
+          [
+            1,
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            2,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            3,
+            0
+          ],
+          [
+            1,
+            2,
+            4,
+            0
+          ],
+          [
+            2,
+            2,
+            3,
+            1
+          ],
+          [
+            2,
+            2,
+            4,
+            1
+          ],
+          [
+            2,
+            2,
+            5,
+            1
+          ],
+          [
+            2,
+            2,
+            6,
+            1
+          ],
+          [
+            10,
+            1,
+            4,
+            0
+          ],
+          [
+            10,
+            1,
+            5,
+            0
+          ],
+          [
+            10,
+            1,
+            6,
+            0
+          ],
+          [
+            10,
+            1,
+            7,
+            0
+          ],
+          [
+            11,
+            1,
+            2,
+            1
+          ],
+          [
+            11,
+            1,
+            3,
+            1
+          ],
+          [
+            11,
+            1,
+            4,
+            1
+          ],
+          [
+            11,
+            1,
+            5,
+            1
+          ],
+          [
+            12,
+            0,
+            3,
+            0
+          ],
+          [
+            12,
+            0,
+            4,
+            0
+          ],
+          [
+            12,
+            0,
+            5,
+            0
+          ],
+          [
+            12,
+            0,
+            6,
+            0
+          ],
+          [
+            14,
+            1,
+            2,
+            5
+          ],
+          [
+            14,
+            1,
+            3,
+            5
+          ],
+          [
+            14,
+            1,
+            4,
+            5
+          ],
+          [
+            14,
+            1,
+            5,
+            5
+          ],
+          [
+            15,
+            1,
+            2,
+            4
+          ],
+          [
+            15,
+            1,
+            3,
+            4
+          ],
+          [
+            15,
+            1,
+            4,
+            4
+          ],
+          [
+            15,
+            1,
+            5,
+            4
+          ],
+          [
+            16,
+            2,
+            2,
+            5
+          ],
+          [
+            16,
+            2,
+            3,
+            5
+          ],
+          [
+            16,
+            2,
+            4,
+            5
+          ],
+          [
+            16,
+            2,
+            5,
+            5
+          ],
+          [
+            17,
+            2,
+            3,
+            6
+          ],
+          [
+            17,
+            2,
+            4,
+            6
+          ],
+          [
+            17,
+            2,
+            5,
+            6
+          ],
+          [
+            17,
+            2,
+            6,
+            6
+          ]
+        ],
+        "1": [
+          [
+            3,
+            0,
+            4,
+            2
+          ]
+        ],
+        "2": [
+          [
+            3,
+            0,
+            3,
+            2
+          ]
+        ],
+        "3": [
+          [
+            3,
+            0,
+            2,
+            2
+          ]
+        ],
+        "4": [
+          [
+            3,
+            0,
+            1,
+            2
+          ]
+        ],
+        "P": [
+          [
+            7,
+            0,
+            4,
+            1
+          ],
+          [
+            7,
+            0,
+            4,
+            2
+          ],
+          [
+            7,
+            0,
+            4,
+            3
+          ],
+          [
+            7,
+            0,
+            5,
+            2
+          ],
+          [
+            7,
+            1,
+            3,
+            2
+          ],
+          [
+            7,
+            1,
+            4,
+            2
+          ],
+          [
+            7,
+            1,
+            4,
+            3
+          ],
+          [
+            7,
+            1,
+            5,
+            2
+          ],
+          [
+            9,
+            0,
+            5,
+            1
+          ],
+          [
+            9,
+            0,
+            5,
+            2
+          ],
+          [
+            9,
+            0,
+            5,
+            3
+          ],
+          [
+            9,
+            0,
+            6,
+            2
+          ],
+          [
+            9,
+            1,
+            4,
+            2
+          ],
+          [
+            9,
+            1,
+            5,
+            1
+          ],
+          [
+            9,
+            1,
+            5,
+            2
+          ],
+          [
+            9,
+            1,
+            6,
+            2
+          ],
+          [
+            9,
+            2,
+            3,
+            1
+          ],
+          [
+            9,
+            2,
+            4,
+            1
+          ],
+          [
+            9,
+            2,
+            4,
+            2
+          ],
+          [
+            9,
+            2,
+            5,
+            1
+          ],
+          [
+            10,
+            0,
+            3,
+            1
+          ],
+          [
+            10,
+            0,
+            3,
+            2
+          ],
+          [
+            10,
+            0,
+            3,
+            3
+          ],
+          [
+            10,
+            0,
+            4,
+            2
+          ],
+          [
+            11,
+            0,
+            1,
+            2
+          ],
+          [
+            11,
+            0,
+            2,
+            2
+          ],
+          [
+            11,
+            0,
+            2,
+            3
+          ],
+          [
+            11,
+            0,
+            3,
+            2
+          ],
+          [
+            12,
+            1,
+            6,
+            7
+          ],
+          [
+            12,
+            1,
+            6,
+            8
+          ],
+          [
+            12,
+            1,
+            6,
+            9
+          ],
+          [
+            12,
+            1,
+            7,
+            8
+          ]
+        ]
+      },
+      "drawings": [
+        {
+          "n": 21,
+          "table": 10,
+          "board": 0,
+          "section": "Useful Usages",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "rows": [
+            "----------",
+            "---------i",
+            "---zz--lli",
+            "sUUUzzooli",
+            "ssUgggooli",
+            "-sgggggggg",
+            "-jgggggggg",
+            "-jgggggggg",
+            "jj-ggggggg"
+          ]
+        }
+      ],
+      "payoff_drawing": {
+        "n": 22,
+        "table": 10,
+        "board": 1,
+        "section": "Useful Usages",
+        "column": 0,
+        "cleared": 4,
+        "note": "the board beside #21 in the same table (a later board of that line, not what #21's TSD leaves, by occupancy): the ghost I placed into the column the Kaidan re-opened, at the left wall, four deep",
+        "rows": [
+          "----------",
+          "----------",
+          "-l--------",
+          "-l----ss-g",
+          "vllggssggg",
+          "vggggggggg",
+          "vggggggggg",
+          "vggggggggg",
+          "gg-ggggggg"
+        ]
+      },
+      "drawn_t_not_fired": [
+        {
+          "n": 15,
+          "table": 7,
+          "board": 0,
+          "section": "Followups",
+          "slot": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a Followup: a TSD over the anchor's hole, at the board's floor",
+          "rows": [
+            "----------",
+            "----------",
+            "-z-------j",
+            "zz-------j",
+            "zUUUiiiijj",
+            "ggUggggggg"
+          ]
+        },
+        {
+          "n": 16,
+          "table": 7,
+          "board": 1,
+          "section": "Followups",
+          "slot": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a Followup: a TST into the anchor's hole",
+          "rows": [
+            "----------",
+            "-ss-------",
+            "ss--------",
+            "ooUzzqqqqq",
+            "ooUUzzqqqq",
+            "ggUggggggg"
+          ]
+        },
+        {
+          "n": 18,
+          "table": 9,
+          "board": 0,
+          "section": "Followups",
+          "slot": [
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a Followup: a TSD at the board's floor",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "g--zz-----",
+            "gUUUzziiii",
+            "ggUggggggg"
+          ]
+        },
+        {
+          "n": 19,
+          "table": 9,
+          "board": 1,
+          "section": "Followups",
+          "slot": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "t": "stood",
+          "lines": 2,
+          "window": "not the window's T",
+          "note": "a Followup: a stood T into the anchor's hole",
+          "rows": [
+            "----------",
+            "-oo-------",
+            "soo-------",
+            "ss--------",
+            "gsUzzqqqqq",
+            "gUU-zzqqqq",
+            "ggUggggggg"
+          ]
+        },
+        {
+          "n": 20,
+          "table": 9,
+          "board": 2,
+          "section": "Followups",
+          "slot": [
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ]
+          ],
+          "t": "stood",
+          "lines": 2,
+          "window": "not the window's T",
+          "note": "a Followup: a stood T beside the anchor",
+          "rows": [
+            "----------",
+            "jj--------",
+            "j---------",
+            "jUllqqqqqq",
+            "gUUlqqqqqq",
+            "gU-lqqqqqq",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "n": 23,
+          "table": 11,
+          "board": 0,
+          "section": "Useful Usages",
+          "slot": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "t": "stood",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "a Useful Usage: a stood T over an L anchor",
+          "rows": [
+            "----------",
+            "l-Uzz-----",
+            "l-UUzz----",
+            "llUggggggg",
+            "l-gggggggg",
+            "l-gggggggg",
+            "ll-ggggggg"
+          ]
+        },
+        {
+          "n": 26,
+          "table": 12,
+          "board": 1,
+          "section": "Useful Usages",
+          "slot": [
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              8
+            ],
+            [
+              6,
+              9
+            ],
+            [
+              7,
+              8
+            ]
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "a Useful Usage: a TSD at the board's floor",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "oo----jj--",
+            "oolllzjUUU",
+            "jjlgggggUg"
+          ]
+        }
+      ],
+      "fires_without_slot": []
+    },
+    "bt_cannon": {
+      "file": "btcannon-technique.json",
+      "list": "drawn_t_not_fired",
+      "table": 28,
+      "board": 0,
+      "mirrored": true,
+      "page": "https://harddrop.com/wiki/BT_Cannon",
+      "note": "the Kaidan harddrop's BT_Cannon page fires on the same base as a mid-game BT (its record's own note names it): this window fires on it once, mirrored, at its drawn T"
+    },
+    "stmb_cave_kaidan": {
+      "pin": "shachikutrain-technique.json cross_source.stmb_cave",
+      "page": "https://harddrop.com/wiki/STMB_Cave",
+      "table": 20,
+      "board": 1,
+      "caption": "Compare this variation of STMB Cave below with [[Kaidan]]. On these kinds of terrain, one could choose either one of these techniques depending on their NEXT queue after the T-Spin Double or the terrain left over after the T-Spin Double.",
+      "slot": [
+        [
+          3,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "t": "flat-down",
+      "lines": 2,
+      "window": "leaves the board",
+      "note": "the Kaidan is drawn one row under the clear: the window's second well row is under the drawing, so it leaves the board in both hands (measured)",
+      "rows": [
+        "----------",
+        "oo--------",
+        "ooss---j--",
+        "gssUUUzjjj",
+        "ggggUzzggg",
+        "gggggz-ggg"
+      ]
+    },
+    "other_windows": {
+      "kaidan_fires_on": [
+        {
+          "file": "btcannon-technique.json",
+          "board": "cross_source.harddrop.drawn_t_not_fired[29]",
+          "cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "nodes.u2.spin",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "nodes.t3.spin",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "nodes.dt",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "nodes.u2.build",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "nodes.t3.build",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[2]",
+          "cells": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[3]",
+          "cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[4]",
+          "cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[7]",
+          "cells": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[9]",
+          "cells": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[12]",
+          "cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[19]",
+          "cells": [
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              5,
+              7
+            ],
+            [
+              6,
+              6
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[20]",
+          "cells": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawings[21]",
+          "cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawn_t_not_fired[9]",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        }
+      ],
+      "fires_on_kaidan": [
+        {
+          "file": "imperialcross-technique.json",
+          "variant": "imperialcross",
+          "board": "harddrop_anchor_set #19",
+          "cells": [
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "variant": "parapet",
+          "board": "harddrop_anchor_set #23",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "variant": "parapet_tss",
+          "board": "harddrop_anchor_set #23",
+          "cells": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "variant": "shachikutrain",
+          "board": "harddrop #15",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "variant": "shachikutrain",
+          "board": "harddrop #14",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "stsd-technique.json",
+          "variant": "stsd",
+          "board": "harddrop_anchor_set #20",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              1
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        }
+      ],
+      "shachikutrain_relation": {
+        "as_drawn": {
+          "shared": 16,
+          "clash": []
+        },
+        "mirrored": {
+          "shared": 16,
+          "clash": []
+        }
+      }
+    },
+    "fires": [],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": []
+}

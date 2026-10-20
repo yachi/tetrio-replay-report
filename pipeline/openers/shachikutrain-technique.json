@@ -1932,6 +1932,86 @@
           "mirrored": [
             false
           ]
+        },
+        {
+          "table": 3,
+          "board": 2,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 4,
+          "board": 0,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 4,
+          "board": 1,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 4,
+          "board": 4,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 7,
+          "board": 0,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 12,
+          "board": 0,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 16,
+          "board": 0,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 17,
+          "board": 0,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 17,
+          "board": 1,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 17,
+          "board": 2,
+          "file": "kaidan-technique.json",
+          "mirrored": [
+            false
+          ]
         }
       ]
     },

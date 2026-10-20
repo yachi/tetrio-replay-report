@@ -456,7 +456,19 @@ HARDDROP = {
     'fires_without_slot': [],
     #: every other committed technique window, at every drawn T of the page and on every board with none: where it
     #: fires (measured; the gate holds the list complete both ways)
-    'other_windows': [{'table': 11, 'board': 0, 'file': 'stmbcave-technique.json', 'mirrored': [False]}],
+    #: kaidan-technique.json's window (階段のドネイト, the ninth technique page) fires at ten of these drawn T's, measured:
+    #: anchored on the same flat T the two windows clash on no cell (kaidan-technique.json's `shachikutrain_relation`)
+    'other_windows': [{'table': 11, 'board': 0, 'file': 'stmbcave-technique.json', 'mirrored': [False]},
+                      {'table': 3, 'board': 2, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 4, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 4, 'board': 1, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 4, 'board': 4, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 7, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 12, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [True]},
+                      {'table': 16, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 17, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 17, 'board': 1, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      {'table': 17, 'board': 2, 'file': 'kaidan-technique.json', 'mirrored': [False]}],
 }
 
 #: harddrop's STMB_Cave page, table 17: the variation it says 「has the same shape and steps as Shachiku Train」, the
