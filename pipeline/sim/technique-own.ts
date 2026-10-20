@@ -23,8 +23,9 @@
  *    script, and the arbiter, the round trip and `reachProblems` check it exactly as for a drawn board. A
  *    search is capped by a COUNT of steps (`maxSteps`), so a candidate over it is reported the same way on
  *    every machine.
- * 4. Publish the first `pick` built candidates at each offset, in that order, with every candidate's outcome
- *    counted by kind.
+ * 4. Stop at an offset once `pick` candidates have built, or `maxTried` have been tried, and publish the ones
+ *    built. The outcome of every candidate TRIED is counted by kind; the rest were never tried, and the artefact
+ *    says how many.
  *
  * THE DEALING is the planner's (bag 1: six terrain pieces then its T, held; bag 2: the rest of the terrain,
  * its T swapped for the held one and fired, the fillers, the piece that swaps the follow-up T out). That is
@@ -58,6 +59,8 @@ export interface OwnProfile {
   maxExtra: number;
   /** each candidate's search cap, in planner steps */
   maxSteps: number;
+  /** candidates tried at most per offset; the rest are counted as not tried */
+  maxTried: number;
   /** boards published per offset */
   pick: number;
   artefact: { schema: string; means: string; notEligible: string; caveat: string };
@@ -181,33 +184,44 @@ export function planOwn(P: TechniqueProfile, DP: TechniqueDemoProfile, tr: any, 
   return { demo, reason, out };
 }
 
-export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProfile) {
+/** One offset of the search (steps 1-4): its candidates, the outcome of every one TRIED, the boards it publishes.
+ *  The emitter runs the offsets in parallel processes and `assemble` puts them back in profile order, so the
+ *  artefact does not depend on which finished first. */
+export function searchOffset(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProfile, off: number) {
   const tr = loadTranscription(DP.transcriptionPath);
   const v: Variant = tr.variants.find((x: Variant) => x.id === OP.variant);
   if (!v) throw new Error(`${OP.tag}-own: no variant ${OP.variant}`);
-  const per_offset: any[] = [];
-  const boards: any[] = [];
-  const demos: any[] = [];
-  let shared: any = null;
-  for (const off of OP.offsets) {
-    const cands = candidates(tr, v, off, OP.rowsAbove, OP.maxExtra);
-    const outcomes: Record<string, number> = {};
-    const built: string[] = [];
-    cands.forEach((cells, i) => {
-      const id = `own.${off}.${i + 1}`;
-      const rows = rowsOf(cells);
-      const r = planOwn(P, DP, tr, id, rows, OP.maxSteps);
-      const k = r.demo ? 'built' : outcomeKind(r.reason);
-      outcomes[k] = (outcomes[k] ?? 0) + 1;
-      if (!r.demo) return;
-      built.push(id);
-      if (built.length > OP.pick) return;
-      shared ??= r.out;
-      boards.push({ id, offset: off, candidate: i + 1, cells: cells.length, rows });
-      demos.push(r.demo);
-    });
-    per_offset.push({ offset: off, candidates: cands.length, outcomes, first_built: built.slice(0, OP.pick) });
+  const cands = candidates(tr, v, off, OP.rowsAbove, OP.maxExtra);
+  const outcomes: Record<string, number> = {};
+  const built: string[] = [];
+  const boards: any[] = [], demos: any[] = [];
+  let shared: any = null, tried = 0;
+  for (const [i, cells] of cands.entries()) {
+    if (built.length >= OP.pick || tried >= OP.maxTried) break;
+    tried++;
+    const id = `own.${off}.${i + 1}`;
+    const rows = rowsOf(cells);
+    const r = planOwn(P, DP, tr, id, rows, OP.maxSteps);
+    const k = r.demo ? 'built' : outcomeKind(r.reason);
+    outcomes[k] = (outcomes[k] ?? 0) + 1;
+    if (process.env.OWN_PROGRESS && (tried % 50 === 0 || r.demo)) console.error(`  offset ${off}: ${tried} tried, last ${id} ${k}`);
+    if (!r.demo) continue;
+    built.push(id);
+    if (!shared) shared = { engine: r.out.engine, board: r.out.board, lock_fields: r.out.lock_fields, shapes: r.out.shapes };
+    boards.push({ id, offset: off, candidate: i + 1, cells: cells.length, rows });
+    demos.push(r.demo);
   }
+  return { per_offset: { offset: off, candidates: cands.length, tried, not_tried: cands.length - tried, outcomes, built },
+           boards, demos, shared };
+}
+
+/** The artefact, from every offset's part in profile order. */
+export function assemble(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProfile, parts: any[]) {
+  const tr = loadTranscription(DP.transcriptionPath);
+  const v: Variant = tr.variants.find((x: Variant) => x.id === OP.variant);
+  const offs = parts.map(p => p.per_offset.offset);
+  if (offs.join() !== OP.offsets.join()) throw new Error(`${OP.tag}-own: parts for offsets ${offs}, want ${OP.offsets}`);
+  const shared = parts.find(p => p.shared)?.shared ?? null;
   return {
     schema: OP.artefact.schema,
     report_eligible: false,
@@ -219,7 +233,8 @@ export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProf
     caveat: OP.artefact.caveat,
     rules: OP.rules(),
     search: { variant: OP.variant, window: windowGrid(tr, v).g, offsets: OP.offsets, rows_above: OP.rowsAbove,
-              max_extra: OP.maxExtra, max_steps: OP.maxSteps, pick: OP.pick, per_offset },
+              max_extra: OP.maxExtra, max_steps: OP.maxSteps, max_tried: OP.maxTried, pick: OP.pick,
+              per_offset: parts.map(p => p.per_offset) },
     engine: shared?.engine ?? null,
     inputs: {
       transcription_md5: md5(readFileSync(DP.transcriptionPath)),
@@ -230,9 +245,14 @@ export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProf
     board: shared?.board ?? null,
     lock_fields: shared?.lock_fields ?? null,
     shapes: shared?.shapes ?? null,
-    boards,
-    demos,
+    boards: parts.flatMap(p => p.boards),
+    demos: parts.flatMap(p => p.demos),
   };
+}
+
+/** The whole search in one process (the test's OWN_FULL rebuild). */
+export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnProfile) {
+  return assemble(P, DP, OP, OP.offsets.map(o => searchOffset(P, DP, OP, o)));
 }
 
 /** One demo per line, as the demo artefact is written. */

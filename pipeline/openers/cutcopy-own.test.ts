@@ -49,6 +49,7 @@ test('the artefact is quarantined and names its search', () => {
   expect(committed.search.rows_above).toBe(OP.rowsAbove);
   expect(committed.search.max_extra).toBe(OP.maxExtra);
   expect(committed.search.max_steps).toBe(OP.maxSteps);
+  expect(committed.search.max_tried).toBe(OP.maxTried);
   expect(committed.search.window).toEqual(windowGrid(TR, V).g);
   expect(committed.boards.map((b: any) => b.id)).toEqual(committed.demos.map((d: any) => d.node));
   expect(committed.boards.length).toBeGreaterThan(0);
@@ -68,9 +69,10 @@ test('every offset\'s candidate count, every stop, and every published board, re
     const c = CANDS.get(o.offset)!;
     expect(o.candidates).toBe(c.length);
     expect(o.built.length).toBeLessThanOrEqual(OP.pick);
-    // the search stops on its pick-th build, or runs out
+    // the search stops on its pick-th build, at its cap, or when it runs out
     expect(o.tried).toBe(o.built.length === OP.pick
-      ? Math.max(...o.built.map((id: string) => Number(id.split('.').pop()))) : c.length);
+      ? Math.max(...o.built.map((id: string) => Number(id.split('.').pop()))) : Math.min(c.length, OP.maxTried));
+    expect(o.not_tried).toBe(c.length - o.tried);
     expect(Object.values(o.outcomes).reduce((a: number, b: any) => a + b, 0)).toBe(o.tried);
     expect(o.outcomes.built ?? 0).toBe(o.built.length);
   }
