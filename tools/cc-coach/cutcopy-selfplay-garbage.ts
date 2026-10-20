@@ -147,7 +147,7 @@ games.forEach((g, gi) => {
   tally.garbage_rows_inserted_engine += r.garbageRows;
   tally.spin_credit_disagreed += r.spinDisagreements.length;
   for (const lk of r.locks) { if (!lk.mapOk) tally.rowmap_unverified++; if (lk.piece === 'T' && lk.spin === 'full' && lk.cleared === 2) tally.engine_full_tsd++; }
-  tally.cc_tsd += (g.steps as any[]).slice(0, r.locks.length).filter(s => s.kind === 'tsd').length;
+  for (const s of (g.steps as any[]).slice(0, r.locks.length)) if (s.kind === 'tsd') tally.cc_tsd++;
   if (r.cut) { tally.cut[r.cut.why] = (tally.cut[r.cut.why] ?? 0) + 1; if (tally.cut_examples.length < 30) tally.cut_examples.push(`${r.cut.why}: ${r.cut.where}`); }
   else tally.games_complete++;
   digests.push({ session: 'selfplay-garbage', file: `seed-${g.seed}`, round: 0, match: gi + 1, user: 'cold-clear',
