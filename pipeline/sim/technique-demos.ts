@@ -76,6 +76,16 @@ export interface DemoMutants {
   no180?: boolean;
 }
 
+/** Not mutants: how `build` is driven by a caller other than the demo emitter (the own-design search,
+ *  `technique-own.ts`). `tr` plans on a transcription held in memory (boards of ours added to it), and
+ *  `maxSteps` caps each chain's search by a COUNT of search steps, so a chain over it is reported the
+ *  same way on every machine — a wall-clock cap would make the search's output depend on the machine.
+ *  Both unset, `build` is the emitter's, byte for byte. */
+export interface BuildOptions { tr?: any; maxSteps?: number }
+
+/** thrown inside a chain's search when it has taken `maxSteps` steps */
+class OverBudget extends Error {}
+
 /** A placement, in the shape `route-demos.ts`'s `inputsOf` reads. `role` is ours. */
 export interface Placement { piece: string; cells: number[]; edges: Path['edges']; spin: string | null;
                              lines: number; hold: boolean; letter: string;
@@ -152,7 +162,18 @@ interface Plan { placements: Placement[]; baseLocks: number; preT: number; stood
                  offset: { dr: number; dc: number } }
 
 function planChain(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node: string; terrain: string },
-                   eng: any, mut: DemoMutants): { plan: Plan | null; reason: string } {
+                   eng: any, mut: DemoMutants, maxSteps?: number): { plan: Plan | null; reason: string } {
+  try { return planChain1(DP, tr, v, chain, eng, mut, maxSteps); }
+  catch (e) {
+    if (e instanceof OverBudget) return { plan: null, reason: `搜尋超過 ${maxSteps} 步上限` };
+    throw e;
+  }
+}
+
+function planChain1(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node: string; terrain: string },
+                    eng: any, mut: DemoMutants, maxSteps?: number): { plan: Plan | null; reason: string } {
+  let steps = 0;
+  const step = () => { if (maxSteps !== undefined && ++steps > maxSteps) throw new OverBudget(); };
   const byId = new Map<string, any>(tr.nodes.map((n: any) => [n.id, n]));
   const empties: string = tr.empty_letters ?? '';
   const build = byId.get(chain.node), terrain = byId.get(chain.terrain);
@@ -248,6 +269,7 @@ function planChain(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node:
     const c0 = winCols[0] + st.off.dc, c1 = winCols[1] + st.off.dc;
     const lowY = Math.min(...slotRows);
     const fill = (g: Grid, d: Placement[], miss: Set<number>): Plan | null => {
+      step();
       if (performance.now() - t0 > 120_000) throw new Error(`${DP.tag}-demos: ${chain.node} search over 120 s`);
       if (!miss.size) {
         // the bag-2 piece whose arrival swaps the follow-up T out of the hold must exist
@@ -329,6 +351,7 @@ function planChain(DP: TechniqueDemoProfile, tr: any, v: Variant, chain: { node:
     return r0;
   };
   const dfs1 = (grid: Grid, done: Placement[], baseLeft: Piece[], pageLeft: Piece[]): Plan | null => {
+    step();
     if (!baseLeft.length && !pageLeft.length) return tail(grid, done);
     const why: string[] = [];
     const cands = baseLeft.length ? baseLeft.map(q => ({ ...q, role: 'base' as const }))
@@ -376,8 +399,8 @@ function queueOf(pl: Placement[], tag: string) {
   return { bags: [b1, b2], swap, unused: free.join('') };
 }
 
-export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, mut: DemoMutants = {}) {
-  const tr = loadTranscription(DP.transcriptionPath);
+export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, mut: DemoMutants = {}, opts: BuildOptions = {}) {
+  const tr = opts.tr ?? loadTranscription(DP.transcriptionPath);
   const v: Variant = tr.variants.find((x: Variant) => x.id === DP.variant);
   if (!v) throw new Error(`${DP.tag}-demos: no variant ${DP.variant}`);
   const empties: string = tr.empty_letters ?? '';
@@ -387,7 +410,7 @@ export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, mut: DemoMu
   const unbuilt: { node: string; reason: string }[] =
     Object.entries(DP.unbuilt).map(([node, reason]) => ({ node, reason }));
   for (const chain of DP.chains) {
-    const { plan, reason } = planChain(DP, tr, v, chain, eng, mut);
+    const { plan, reason } = planChain(DP, tr, v, chain, eng, mut, opts.maxSteps);
     if (!plan) { unbuilt.push({ node: chain.node, reason }, { node: chain.terrain, reason: `${chain.node} 砌唔到：${reason}` }); continue; }
     const pl = plan.placements;
     const q = queueOf(pl, DP.tag);
@@ -448,7 +471,7 @@ export function build(P: TechniqueProfile, DP: TechniqueDemoProfile, mut: DemoMu
     engine: { options: DEMO_OPTIONS, kickset: TL_DEFAULTS.kickset, allow180: TL_DEFAULTS.allow180,
               date: demoDate(tr).toISOString(), frames_per_input: FRAMES_PER_INPUT },
     inputs: {
-      transcription_md5: md5(readFileSync(DP.transcriptionPath)),
+      transcription_md5: opts.tr ? md5(JSON.stringify(opts.tr)) : md5(readFileSync(DP.transcriptionPath)),
       planner_md5: md5Files(DP.hashFiles.planner),
       emit_replay_md5: md5(readFileSync(`${import.meta.dir}/emit-replay.ts`)),
       classifier_md5: md5Files(P.hashFiles.classifier),

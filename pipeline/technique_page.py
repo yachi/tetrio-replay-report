@@ -92,6 +92,13 @@ class TechniqueSiteProfile:
     #: further variants the overview prints, each `(variant id, denominators key of its opportunity)` (欄干: its
     #: TSS). Their figures are keyed `<id>:<key>`, their sections take `more_variants.<id>.sections` from the prose
     more_variants: tuple = ()
+    #: opt-in: a 精選 section before the primary variant's cases, every hit of it with no garbage in the window and
+    #: the follow-up fired, drawn from the replay at four moments (千鳥格子)
+    showcase: bool = False
+    #: opt-in: boards of OURS found by `technique-own.ts`'s search, played on the demo page after the drawn boards'
+    #: demos (千鳥格子). Empty: no own-design section, and the page is byte for byte what it was
+    own_rel: str = ""
+    own_schema: str = "technique-own/1"
 
 
 def case_key(h):
@@ -119,6 +126,7 @@ class TechniqueSite:
         self.DEMO_SENTENCES = (DS["demo"], DS["engine"], DS["base"], DS["order"], DS["rule"])
         self.DEMO_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, PS["source"]) + self.DEMO_SENTENCES
         self.CLASSES = {**RT.PIECE_CLASS, **p.cell_classes}
+        self.OW = self.PROSE["own"] if p.own_rel else None
         #: every variant the pages print, the primary first: (variant id, its opportunity's denominators key)
         self.VARIANTS = ((p.variant, p.opportunity),) + tuple(p.more_variants)
 
@@ -185,6 +193,8 @@ class TechniqueSite:
         cr = art.get("cross_route")
         if cr:
             out["cross"] = _nn(cr["with_hit"], cr["rounds_scored"])
+        if self.p.showcase:
+            out["showcase"] = _nn(len(self.showcase_hits(art)), len([h for h in art["hits"] if h["variant"] == self.p.variant]))
         return out
 
     def _figures(self, art, vid, opp):
@@ -219,6 +229,9 @@ class TechniqueSite:
         if cr:
             out["cross"] = _nn(sum(r["outcome"] == "hit" for r in cr["by_round"]),
                                sum(r["outcome"] in ("hit", "no_hit") for r in cr["by_round"]))
+        if self.p.showcase:
+            prim = [h for h in art["hits"] if h["variant"] == self.p.variant]
+            out["showcase"] = _nn(sum(not h["garbage_in_window"] and h["followup"]["fired"] for h in prim), len(prim))
         return out
 
     def _recount(self, art, vid, opp):
@@ -259,6 +272,7 @@ class TechniqueSite:
             self._need(data is not None, f"{session} has no replay facts, so a hit cannot be linked to its moment")
             RS.check_artefact(data)
             sessions[session] = (data, facts)
+        self._sessions_cache = sessions
         data, facts = sessions[session]
         at = [(mi, ri) for mi, m in enumerate(facts["matches"]) if m["file"] == file
               for ri, fr in enumerate(m["rounds"]) if fr["index"] == round_index0]
@@ -271,6 +285,97 @@ class TechniqueSite:
         rounds[key] = {"label": pl["label"], "order": pl["order"],
                        "users": [p["user"] for p in pl["players"]], "locks": locks}
         return rounds[key]
+
+    def _round_boards(self, h):
+        """The hit player's boards through the round, read the way the replay page reads them: per lock the
+        piece, its cells (y-UP cell indices) and a copy of the board after it. Cached."""
+        boards = self.__dict__.setdefault("_boards", {})
+        key = (h["session"], h["file"], h["round_index0"], h["player"])
+        if key not in boards:
+            self._replay_round(h["session"], h["file"], h["round_index0"])
+            data, facts = self._sessions_cache[h["session"]]
+            at = [(mi, ri) for mi, m in enumerate(facts["matches"]) if m["file"] == h["file"]
+                  for ri, fr in enumerate(m["rounds"]) if fr["index"] == h["round_index0"]]
+            pl = RS.round_payload(data, facts, *at[0])
+            p = [p for p in pl["players"] if p["user"] == h["player"]][0]
+            b = data["board"]
+            out = []
+            for lk, (piece, _full, board) in zip(p["locks"], RS.decode_boards(data, pl["seq"], p["locks"], RS.NEXT_SHOWN)):
+                cells = RS._place_cells(data["shapes"], b["width"], b["rows"], piece, lk[1])
+                out.append((piece, sorted(cells), [list(r) for r in board]))
+            boards[key] = out
+        return boards[key]
+
+    def showcase_hits(self, art):
+        """THE RULE: every hit of the primary variant with no garbage in its window and its follow-up fired."""
+        return [h for h in art["hits"] if h["variant"] == self.p.variant and not h["garbage_in_window"]
+                and h["followup"]["fired"]]
+
+    @staticmethod
+    def _rows_of(board, mark, height):
+        """A y-UP board as rows top first, `height` rows from the floor, piece letters lower case, garbage
+        grey, the cells in `mark` drawn as the dashed slot."""
+        rows = []
+        for y in range(height - 1, -1, -1):
+            line = ""
+            for x in range(len(board[0])):
+                v = board[y][x]
+                c = y * len(board[0]) + x
+                line += "U" if c in mark else ("-" if v is None else ("c" if v == "G" else v.lower()))
+            rows.append(line)
+        return rows
+
+    def showcase_moments(self, h):
+        """The four boards of one showcased hit: before its T (the T's cells dashed), after it, before the
+        follow-up T (its cells dashed), after it."""
+        bs = self._round_boards(h)
+        k, f = h["lock"], h["followup"]["lock"]
+        before = bs[k - 1][2] if k else [[None] * 10 for _ in range(40)]
+        moments = [(before, set(bs[k][1])), (bs[k][2], set()), (bs[f - 1][2], set(bs[f][1])), (bs[f][2], set())]
+        top = max([y + 1 for b, m in moments for y in range(len(b)) if any(v is not None for v in b[y])]
+                  + [c // 10 + 1 for _b, m in moments for c in m])
+        return [self._rows_of(b, m, top + 1) for b, m in moments]
+
+    def _showcase(self, tr, art):
+        PR = self.PROSE
+        SC = PR["showcase"]
+        hits = self.showcase_hits(art)
+        out = ['  <section class="scp-sec">', f'    <h2>{_esc(SC["title"])}</h2>',
+               f'    <p>{_esc(SC["note"])}</p>',
+               f'    <p class="scp-count" data-figure="showcase">{_esc(self.figures(art)["showcase"])}</p>']
+        for h in hits:
+            ck, rnd = case_key(h), f"m{h['match']}r{h['round']}"
+            out += [f'    <div data-showcase="{_esc(ck)}">',
+                    f'    <h3>{_esc(SC["case"].format(date=h["session"], round=rnd, player=h["player"], lock=h["lock"], followup=h["followup"]["lock"]))}'
+                    f'（<a href="{_esc(self.replay_href(h))}">{_esc(SC["link"])}</a>）</h3>',
+                    '    <div class="scp-grid">']
+            for words, rows in zip(SC["moments"], self.showcase_moments(h)):
+                out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(words)}</h4>'
+                           f'{board_svg(rows, f"{ck} {words}", self.CLASSES)}</div>')
+            out += ["    </div>", "    </div>"]
+        out += ["  </section>"]
+        return out
+
+    def audit_showcase(self, page, tr, art):
+        """The showcase is the rule's set, in artefact order, and each first board fires the window — read by
+        the Python twin of the matcher (`technique_transcription.window_fires`), not by the TS one that found
+        the hit — at the dashed T, in the hit's hand."""
+        from types import SimpleNamespace
+        from pipeline.openers.technique_transcription import window_fires
+        bad = []
+        want = [case_key(h) for h in self.showcase_hits(art)]
+        got = [html.unescape(x) for x in re.findall(r'data-showcase="([^"]+)"', page)]
+        if got != want:
+            bad.append(f"the showcase lists {got}, the rule gives {want}")
+        spec = SimpleNamespace(empty_letters=tr.get("empty_letters", ""))
+        v = self.variant(tr)
+        for h in self.showcase_hits(art):
+            rows = self.showcase_moments(h)[0]
+            lock = {(r, c) for r, line in enumerate(rows) for c, ch in enumerate(line) if ch == "U"}
+            board = [line.replace("U", "-") for line in rows]
+            if window_fires(tr, v, spec, board, lock, h["mirrored"]) is not True:
+                bad.append(f"{case_key(h)}: the window does not fire on the board drawn before its T")
+        return bad
 
     def replay_href(self, h):
         """The hit's link: its night's replay page, its round, at the merged position just BEFORE its T lock
@@ -455,6 +560,8 @@ class TechniqueSite:
                            f'<td>{_esc(words)}</td></tr>')
             out += ["    </table></div>", "  </section>"]
 
+        if self.p.showcase:
+            out += self._showcase(tr, art)
         out += parts[self.p.variant][1]
         for vid, _opp in self.VARIANTS[1:]:
             out += parts[vid][0] + parts[vid][1]
@@ -608,18 +715,18 @@ class TechniqueSite:
                 bad.append(f"{where}: unknown check {r['check']!r}")
         return bad
 
-    def _demo_payload(self, d):
+    def _demo_payload(self, d, name=None):
         moments = []
         for e in d["events"]:
             nm = RS.SPIN_NAMES.get((e["spin"], e["lines"]))
             self._need(nm is not None, f"{d['node']}: spin {e['spin']} with {e['lines']} lines has no name")
             moments.append([e["lock"] + 1, 0, "tspin", self.DP["spin"].format(n=e["lock"] + 1, name=nm)])
-        return {"label": demo_slug(d["node"]), "title": self.DP["now"].format(name=self.name(d["node"])),
+        return {"label": demo_slug(d["node"]), "title": self.DP["now"].format(name=name or self.name(d["node"])),
                 "seq": d["seq"], "order": "0" * len(d["locks"]), "winner": None,
                 "players": [{"user": self.DP["user"], "slot": 0, "ending": None, "frames": d["frames"],
                              "pieces": len(d["locks"]), "locks": d["locks"], "ge": [],
                              "verified_to": None, "after": None, "failed_at": None}],
-                "moments": moments, "flags": [], "notes": [self._chain_words(d)]}
+                "moments": moments, "flags": [], "notes": [self._own_chain_words(d) if name else self._chain_words(d)]}
 
     def _chain_words(self, d):
         pieces = [q for q, _h in RS.queue_states(d["seq"], d["locks"], RS.NEXT_SHOWN)]
@@ -630,6 +737,82 @@ class TechniqueSite:
         if part("f"):
             words.append(self.DP["fill_words"].format(pieces=part("f")))
         return self.DP["chain"].format(chain="；".join(words))
+
+    def _own_chain_words(self, d):
+        pieces = [q for q, _h in RS.queue_states(d["seq"], d["locks"], RS.NEXT_SHOWN)]
+        part = lambda code: "".join(p for p, r in zip(pieces, d["roles"]) if r == code)
+        words = [self.OW["base_words"].format(n=d["base_locks"], pieces=part("b"))]
+        if part("f"):
+            words.append(self.DP["fill_words"].format(pieces=part("f")))
+        return self.DP["chain"].format(chain="；".join(words))
+
+    def own_name(self, b):
+        return self.OW["name"].format(offset=b["offset"], n=b["candidate"])
+
+    @staticmethod
+    def own_tr(tr, own):
+        """The transcription with every own board added, as the search handed it to the planner (the board
+        and its terrain, two ids), so `reach_problems` reads them as it reads a drawn board."""
+        extra = [n for b in own["boards"] for n in ({"id": b["id"], "rows": b["rows"]},
+                                                     {"id": b["id"] + ".terrain", "rows": b["rows"]})]
+        return dict(tr, nodes=list(tr["nodes"]) + extra)
+
+    def own_problems(self, d, own, tr):
+        """One own demo, checked by THIS page's implementations: `reach_problems` (decoded from an empty board),
+        and the window read by `technique_transcription.window_fires`, the Python twin of the TS matcher the
+        planner used, on the decoded board before the stood T; both T's must be full T-spins clearing the
+        variant's lines."""
+        from types import SimpleNamespace
+        from pipeline.openers.technique_transcription import window_fires
+        bad = self.reach_problems(d, own, self.own_tr(tr, own))
+        v = self.variant(tr, own["search"]["variant"])
+        b = own["board"]
+        width, rows_n = b["width"], b["rows"]
+        try:
+            steps = [(p, [list(r) for r in board]) for p, _f, board in
+                     RS.decode_boards(own, d["seq"], d["locks"], RS.NEXT_SHOWN)]
+        except SystemExit as e:
+            return bad + [f"{d['node']}: does not decode: {e}"]
+        for i, lines in ((d["stood_lock"], v["lines"]), (d["followup_lock"], v["followup"]["lines"])):
+            lk = d["locks"][i]
+            if steps[i][0] != "T" or lk[3] != 2 or lk[2] != lines:
+                bad.append(f"{d['node']}: lock {i + 1} is not a full T-spin clearing {lines}")
+        i = d["stood_lock"]
+        before = steps[i - 1][1]
+        board = ["".join("-" if before[y][x] is None else "c" for x in range(width)) for y in range(rows_n - 1, -1, -1)]
+        cells = RS._place_cells(own["shapes"], width, rows_n, "T", d["locks"][i][1])
+        lock = {(rows_n - 1 - c // width, c % width) for c in cells}
+        spec = SimpleNamespace(empty_letters=tr.get("empty_letters", ""))
+        if window_fires(tr, v, spec, board, lock, False) is not True:
+            bad.append(f"{d['node']}: the window does not fire on the board before lock {i + 1}")
+        return bad
+
+    def _own_section(self, tr, own, rounds):
+        OW = self.OW
+        out = [f'  <h2 class="scp-sec" id="own">{_esc(OW["title"])}</h2>', f'  <p>{_esc(OW["note"])}</p>',
+               '  <div class="scp-index-wrap"><table class="scp-table">',
+               f'  <tr><th>{_esc(OW["offset_col"])}</th><th>{_esc(OW["candidates_col"])}</th><th>{_esc(OW["tried_col"])}</th>'
+               + "".join(f"<th>{_esc(OW['outcomes'][k])}</th>" for k in OW["outcomes"]) + "</tr>"]
+        for o in own["search"]["per_offset"]:
+            out.append(f'  <tr data-own-offset="{o["offset"]}"><td>{o["offset"]}</td><td>{o["candidates"]}</td><td>{o["tried"]}</td>'
+                       + "".join(f"<td>{o['outcomes'].get(k, 0)}</td>" for k in OW["outcomes"]) + "</tr>")
+        out += ["  </table></div>", '  <div class="scp-grid scd-grid">']
+        by_node = {d["node"]: d for d in own["demos"]}
+        for b in own["boards"]:
+            d = by_node[b["id"]]
+            slug = demo_slug(d["node"])
+            nm = self.own_name(b)
+            rounds[slug] = self._demo_payload(d, nm)
+            out.append("".join([
+                f'    <div class="scp-node" id="{slug}" data-own-node="{_esc(b["id"])}">',
+                f'<h4 class="scp-name">{_esc(nm)}</h4>',
+                board_svg(b["rows"], nm, self.CLASSES),
+                f'<p><a class="scp-case" href="#{slug}" data-round="{slug}">{_esc(self.DP["play"])}</a></p>',
+                f'<p class="scp-tag">{_esc(self._own_chain_words(d))}</p>',
+                f'<p class="scp-cond">{_esc(self.DP["events"].format(events="，".join(m[3] for m in rounds[slug]["moments"])))}</p>',
+                "</div>"]))
+        out.append("  </div>")
+        return out
 
     def render_demo_page(self, tr, demos):
         bad = [x for d in demos["demos"] for x in self.reach_problems(d, demos, tr)]
@@ -684,6 +867,11 @@ class TechniqueSite:
                     "</div>"]
             out.append("".join(bits))
         out.append("  </div>")
+        own = getattr(self, "_own", None)
+        if own:
+            bad = [x for d in own["demos"] for x in self.own_problems(d, own, tr)]
+            self._need(not bad, "; ".join(bad))
+            out += self._own_section(tr, own, rounds)
         out += [f'  <h2 class="scp-sec">{_esc(DP["unbuilt_title"])}</h2>', '  <div class="scp-grid">']
         for u in demos["unbuilt"]:
             n = by_id[u["node"]]
@@ -732,6 +920,8 @@ class TechniqueSite:
             bad.append("the headline is printed without the control sentence")
         if f'href="{self.DEMO_PAGE}"' not in page:
             bad.append("the overview does not link the demo page")
+        if self.p.showcase:
+            bad += self.audit_showcase(page, tr, art)
         return bad + self.audit_replay_links(page, tr, art)
 
     def audit_demo_page(self, page, tr, demos):
@@ -753,8 +943,20 @@ class TechniqueSite:
         if not m:
             return bad + ["no data island on the demo page"]
         island = json.loads(m.group(1))
-        if sorted(island["rounds"]) != sorted(demo_slug(d["node"]) for d in demos["demos"]):
+        own = getattr(self, "_own", None)
+        own_ids = [b["id"] for b in own["boards"]] if own else []
+        if sorted(island["rounds"]) != sorted(demo_slug(d["node"]) for d in demos["demos"] + (own["demos"] if own else [])):
             bad.append("the demo page does not embed every demo exactly once")
+        if [html.unescape(x) for x in re.findall(r'data-own-node="([^"]+)"', page)] != own_ids:
+            bad.append("the demo page does not draw every own board exactly once, in the artefact's order")
+        if own:
+            if sorted(d["node"] for d in own["demos"]) != sorted(own_ids):
+                bad.append("the own-design artefact's boards and demos disagree")
+            for d in own["demos"]:
+                r = island["rounds"].get(demo_slug(d["node"]))
+                if r is not None:
+                    shown = dict(d, seq=r["seq"], locks=r["players"][0]["locks"])
+                    bad += [f"embedded {x}" for x in self.own_problems(shown, own, tr)]
         for d in demos["demos"]:
             r = island["rounds"].get(demo_slug(d["node"]))
             if r is None:
@@ -771,6 +973,15 @@ class TechniqueSite:
         self._repo = repo
         tr, art, demos = inputs or self.load_inputs(repo)
         self.check_inputs(tr, art, demos)
+        self._own = None
+        if self.p.own_rel:
+            with open(os.path.join(repo, self.p.own_rel), encoding="utf-8") as fh:
+                own = json.load(fh)
+            self._need(own.get("schema") == self.p.own_schema, f"unknown own-design schema {own.get('schema')!r}")
+            self._need(own.get("report_eligible") is False and own.get("constructed") is True and own.get("own") is True,
+                       f"{os.path.basename(self.p.own_rel)} must declare report_eligible: false, constructed: true "
+                       "and own: true")
+            self._own = own
         self._need(self.figures(art) == self.recount(art),
                    "the facts artefact's aggregates disagree with its own hit list")
         pages = {self.OVERVIEW: self.render_overview(tr, art, demos), self.DEMO_PAGE: self.render_demo_page(tr, demos)}
@@ -853,6 +1064,18 @@ class TechniqueSite:
             cases.append(("demo: an unbuilt block dropped", "dp",
                           RT._drop_line(dp, f'data-demo-node="{demos["unbuilt"][0]["node"]}"')))
         cases.append(("demo: a required sentence dropped", "dp", dp.replace(self.DS_rule(), "")))
+        if self.p.showcase and self.showcase_hits(art):
+            first = re.search(r'data-showcase="([^"]+)"', ov)
+            cases.append(("overview: a showcase example dropped", "ov", ov.replace(first.group(0), "data-x=\"\"", 1)))
+        own = getattr(self, "_own", None)
+        if own and own["demos"]:
+            isl = RT._ISLAND.search(dp)
+            d0 = own["demos"][0]
+            slug = demo_slug(d0["node"])
+            moved = json.loads(isl.group(1))
+            moved["rounds"][slug]["players"][0]["locks"][d0["stood_lock"]][1] += 1
+            cases += [("demo: an own design's stood T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
+                      ("demo: an own design dropped", "dp", RT._drop_line(dp, f'data-own-node="{d0["node"]}"'))]
         ok = True
         for name, which, page in cases:
             if page == (ov if which == "ov" else dp):

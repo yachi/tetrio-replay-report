@@ -23,6 +23,8 @@ import { CUTCOPY_DEMOS } from './technique-demos-cutcopy.ts';
 import { SHACHIKUTRAIN_DEMOS } from './technique-demos-shachikutrain.ts';
 import { PARAPET_DEMOS } from './technique-demos-parapet.ts';
 import { KAIDAN_DEMOS } from './technique-demos-kaidan.ts';
+import type { OwnProfile } from './technique-own.ts';
+import { CUTCOPY_OWN } from './technique-own-cutcopy.ts';
 
 export const TECHNIQUES: Record<string, TechniqueProfile & { crossRoute?: CrossRoute }> = {
   stsd: STSD, stmbcave: STMBCAVE, imperialcross: IMPERIALCROSS, doubledagger: DOUBLEDAGGER, btcannon: BTCANNON,
@@ -34,6 +36,8 @@ export const TECHNIQUE_DEMOS: Record<string, TechniqueDemoProfile> = {
   doubledagger: DOUBLEDAGGER_DEMOS, btcannon: BTCANNON_DEMOS, cutcopy: CUTCOPY_DEMOS,
   shachikutrain: SHACHIKUTRAIN_DEMOS, parapet: PARAPET_DEMOS, kaidan: KAIDAN_DEMOS,
 };
+/** the techniques with an own-design search (`technique-own.ts`), by the same key */
+export const TECHNIQUE_OWN: Record<string, OwnProfile> = { cutcopy: CUTCOPY_OWN };
 
 /** `--technique <key>` out of argv, or a loud failure naming the keys there are. */
 export function techniqueFromArgv(argv: string[]) {

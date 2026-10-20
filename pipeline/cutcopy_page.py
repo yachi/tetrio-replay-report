@@ -41,6 +41,9 @@ PROFILE = TechniqueSiteProfile(
     selftest_board="second.spin",
     # harddrop's second generic type (Uncut copy), measured at the same TSD
     more_variants=(("uncut", "TSD"),),
+    showcase=True,
+    # boards of ours (technique-own.ts's search), played on the demo page after the drawn boards
+    own_rel=os.path.join("analysis", "cutcopy-own.json"),
 )
 
 SITE = TechniqueSite(PROFILE)

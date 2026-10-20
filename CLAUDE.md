@@ -4439,6 +4439,29 @@ the images beside the shiwehi snapshot (Pillow; without it one named `pillow:` f
 nothing may be reproduced without permission, so nothing of theirs is transcribed, committed or published; the page says so in a
 sentence. A `declined:` rule requires each entry's url, date and reason.
 
+**精選 (since 2026-10-20): the corpus examples are picked by a RULE, never by eye.** `TechniqueSiteProfile.showcase` (opt-in,
+千鳥格子 only; every other page is byte-identical) draws, before the case index, EVERY hit of the primary variant with no garbage in
+its window and its follow-up fired, at four moments read from the replay (`replay_section.decode_boards`, the hit player's board
+only): before the T with its cells dashed, after the first TSD, before the second T, after it. The audit checks the set is the
+rule's, in artefact order, and re-reads each first board with `technique_transcription.window_fires` — the Python twin of the TS
+matcher that found the hit. How many qualify is a figure (`showcase`), never typed here.
+
+**Own designs (since 2026-10-20): boards nobody drew, found by a search and played by the engine.** The demo planner builds none of
+the source drawings, so `pipeline/sim/technique-own.ts` asks the other way round, deterministically (no clock, no random draw): the
+variant's window, as drawn, on the floor at every column offset in `technique-own-cutcopy.ts`; outside it the rows the stood T clears
+full and the rest, plus two rows above, optional; every cover of the must-fill cells by non-T pieces the planner's two-bag dealing
+allows (each of IJLOSZ once or twice, at most four second-bag pieces), smallest first; each handed to the SHARED planner
+(`technique-demos.ts`'s `build`, which gained two opt-in options, an in-memory transcription and `maxSteps`, a step COUNT cap so an
+over-budget candidate is reported the same on every machine; with both unset it is the emitter's byte for byte, and the nine demo
+artefacts moved in `planner_md5` only); stop at an offset after `pick` builds. `emit-technique-own.ts` → `analysis/cutcopy-own.json`
+(`report_eligible: false`, `constructed: true`, `own: true`), with every TRIED candidate's outcome counted by kind and how many were
+never tried. `cutcopy-own.test.ts` re-derives the candidate lists, re-plans every published board byte for byte, decodes each demo on
+its own (board, window, two full TSDs, `reachProblems`), checks no published board is a transcribed drawing, and checks the md5s;
+the outcome counts are re-derived only by the full search (`OWN_FULL=1`, or the emitter), which takes long. The demo page plays them
+after the drawn boards (`own_rel`), and re-checks each embedded one with `reach_problems` and `window_fires`. Against a wall
+(offsets 0 and 4) the search finds no candidate: a count of THIS search (no T in the terrain, the window on the floor), not a
+claim about the technique, and the page says so.
+
 ### 社畜トレイン（Shachiku Train）
 
 The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
