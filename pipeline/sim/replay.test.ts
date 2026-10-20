@@ -29,7 +29,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -115,7 +115,7 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-08-19': [138, 140], '2026-08-25': [145, 146], '2026-09-03': [92, 92],
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [253, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
-  '2026-10-09': [202, 204], '2026-10-12': [110, 110],
+  '2026-10-09': [202, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
 };
 
 /** Every player-round whose engine totals disagree with facts.json, with the disagreement. Mostly
@@ -135,7 +135,8 @@ const ADMISSION: Record<string, [number, number]> = {
  *      game's 48. A real late divergence, the third after the two above: prefix verified to lock 93
  *      of 98, engine knock-out at lock 95, so the missing clear lies in the last five locks, beyond
  *      the verified boundary the viewer already draws. An eleventh must be investigated the same
- *  way. 2026-10-12 adds none: all 110 of its player-rounds admit. */
+ *  way. 2026-10-12 adds none: all 110 of its player-rounds admit. 2026-10-20 adds none either:
+ *  all 60 of its player-rounds admit. */
 const ADMISSION_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-9.ttrm', round: 1, user: 'yachi', diff: { pieces: [89, 88] } },
   { session: '2026-07-28', file: 'replay-2026-07-28-1.ttrm', round: 0, user: 'yachi', diff: { pieces: [37, 36] } },
@@ -184,7 +185,9 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  replay-2026-10-12-02.ttrm r0 pinglamb (37 locks, prefix verified to lock 32, `no_evidence`
  *  after it). It admits cleanly — 10-12 admits 110 of 110 — so the engine placed exactly the
  *  game's pieces and its board did not top out on the last one; the last four locks are past the
- *  verified prefix, the same unobserved-garbage-hole tail as every other entry of this class. */
+ *  verified prefix, the same unobserved-garbage-hole tail as every other entry of this class.
+ *
+ *  2026-10-20 adds none: `engine_knockout.agrees` is true for all 60 of its player-rounds. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },

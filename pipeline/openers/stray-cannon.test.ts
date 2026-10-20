@@ -25,7 +25,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -72,10 +72,13 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
  *  measured once the J<->L / S<->Z swap was implemented. Pinned here and nowhere in prose. */
 // 2026-10-12 adds the table's first `2.normal_SO` build under a `2.normal_OS` condition:
 // pinglamb's replay-2026-10-12-02.ttrm round 1 (m2r2), order as drawn OISJLTZ, prefix 32.
+// 2026-10-20 adds 20 bag-2 rounds, every one under its own condition but one: 2.ideal 309 -> 320,
+// 2.normal_OS 102 -> 109, 2.normal_SO 30 -> 31, and one more 2.ideal build under a 2.normal_OS
+// condition (36 -> 37). No new named-list entry: its 25 bag-1 cases are all bag1.z_right.
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 309, '2.normal_OS': 36, '2.normal_SO': 12 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 102, '2.normal_SO': 14 },
-  '2.normal_SO': { '2.ideal': 10, '2.normal_OS': 1, '2.normal_SO': 30 },
+  '2.ideal': { '2.ideal': 320, '2.normal_OS': 37, '2.normal_SO': 12 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 109, '2.normal_SO': 14 },
+  '2.normal_SO': { '2.ideal': 10, '2.normal_OS': 1, '2.normal_SO': 31 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

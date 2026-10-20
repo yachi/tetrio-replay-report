@@ -1,0 +1,31 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：打和嘅一晚、填得晒嘅窿、同總攻擊",
+  "cards": [
+    {
+      "accent": "g",
+      "label": "兩樣都打和",
+      "value": "2:2 · 15:15",
+      "body": "四場 2 比 2<span class=\"badge\" data-claim=\"C001\"></span>，30 局 15 比 15<span class=\"badge\" data-claim=\"C010\"></span><span class=\"badge\" data-claim=\"G002\"></span>。09-10 嗰晚場數 4 比 4，但局數 32 比 33；<strong>十八晚以嚟今晚係第一次兩樣都打和</strong>。而且兩段啱啱好倒轉：頭兩場 10 比 5，尾兩場 5 比 10<span class=\"badge\" data-claim=\"C010\"></span>。"
+    },
+    {
+      "accent": "y",
+      "label": "粒數填得晒個窿",
+      "value": "+11.18% / +6.73%",
+      "body": "pinglamb 每粒方塊嘅攻擊高 6.73%<span class=\"badge\" data-claim=\"C004\"></span>。yachi 多疊 323 粒，即係多 11.18%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——呢條路最多填返 11.18 個百分點，<strong>盈餘大過個窿</strong>，所以總攻擊反而多過對手 80 條，即係 pinglamb 總攻擊嘅 4.16%<span class=\"badge\" data-claim=\"C005\"></span>。今晚累計分數都係 yachi 高<span class=\"badge\" data-claim=\"G059\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "總攻擊話事",
+      "value": "4 / 4",
+      "body": "逐場計總攻擊，打得多嗰個四場全贏<span class=\"badge\" data-claim=\"C015\"></span>。第一場 pinglamb 每粒方塊嘅攻擊高啲，yachi 靠落多啲粒數贏<span class=\"badge\" data-claim=\"C015\"></span>；第四場 yachi 每粒輕過對手、總攻擊又少過對手，輸咗<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"C016\"></span>。所以總數贏咗成晚都冇用——<strong>總數係逐場計先話事</strong>，而尾兩場總攻擊係 pinglamb 多。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m2 第一局，兩邊 VS 加埋約 313.3<span class=\"badge\" data-claim=\"G056\"></span>。yachi 贏，而且攻擊量、落速、最大單波、行數每一條軸都領先<span class=\"badge\" data-claim=\"G077\"></span>，每粒方塊嘅攻擊約 0.789 對約 0.736<span class=\"badge\" data-claim=\"G078\"></span>。",
+    "全晚 yachi 一局都冇自己頂到頂，2 局都係 pinglamb<span class=\"badge\" data-claim=\"C006\"></span>。",
+    "KPP 今晚兩個人幾乎一樣：yachi 3.631 下、pinglamb 3.637 下，差 0.16%<span class=\"badge\" data-claim=\"C008\"></span>。兩個人自己贏局同輸局嘅 KPP 都差唔到 2%<span class=\"badge\" data-claim=\"G064\"></span><span class=\"badge\" data-claim=\"G065\"></span>。",
+    "5 個 All Clear（pinglamb 3、yachi 2）<span class=\"badge\" data-claim=\"G033\"></span>。淨係 yachi 做到全消嘅 2 局，佢輸咗 1 局<span class=\"badge\" data-claim=\"G072\"></span>；淨係 pinglamb 做到嘅 3 局，佢輸咗 1 局<span class=\"badge\" data-claim=\"G074\"></span>。",
+    "全晚最長連勝係 yachi 連贏 5 局，由第一場尾打到第二場頭<span class=\"badge\" data-claim=\"G009\"></span>。"
+  ]
+}

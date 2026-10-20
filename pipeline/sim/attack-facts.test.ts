@@ -19,13 +19,15 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/attack-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
 
 /* 2026-10-12 adds nothing to any of the three lists: its 110 player-rounds agree on the attack
- * total and on every clear-type count, and no engine run locks past the game's `piecesplaced`. */
+ * total and on every clear-type count, and no engine run locks past the game's `piecesplaced`.
+ * 2026-10-20 adds nothing either: all 60 of its player-rounds agree on both anchors, and no
+ * engine run locks past the game's `piecesplaced`. */
 /** Player-rounds where the engine's attack total is not the replay's. Each is the engine missing
  *  one Double the game credited at the very end of the round (it is also in COUNT_EXCEPTIONS). */
 const ATTACK_EXCEPTIONS = [

@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03', '2026-10-09', '2026-10-12'])
+       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -145,7 +145,12 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // raised to 600 s — the figure the other whole-corpus rebuilds already use (replay.test.ts,
   // stray-cannon.test.ts) — on that measurement, not blind. It is an elapsed-time guard, not a
   // claim, and a session of 09-19's size will still need it re-measured.
-  expect(both + oursOnly + ccOnly + neither).toBe(215062);
+  // 2026-10-20: 215062 -> 220492 (5430 boards, 30 rounds — the corpus's smallest session, and the
+  // smallest row here since 09-03's 7934), and `unexplained` is still EMPTY over all of them.
+  // RE-MEASURED: the whole file took 304 s at eighteen sessions with another test file running
+  // beside it on the same four cores (the 10-12 line's machine) — over the OLD 300 s budget and
+  // half the 600 s one, so the 10-12 raise is what kept this row green and the budget stands.
+  expect(both + oursOnly + ccOnly + neither).toBe(220492);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same
