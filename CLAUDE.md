@@ -4497,7 +4497,8 @@ its own (cold-clear's cells at every lock, the window in the hit's hand, both TS
 the cold-clear harness files among them. What it cannot re-derive is the `scan` summary, which needs the JSONL: re-run the
 emitter. The page (`technique_page.py`'s opt-in `selfplay_rel`, default off) draws each game with each hit's board and a link
 to the position before its T, prints the scan sentence and the quarantine sentences (their cut-off from the artefact's `tail`) and requires both, and re-checks every embedded game with
-`decode_boards` and `window_fires`; its selftest deletes a quarantine sentence, drops a game, moves a hit's T, moves a hit link and reads a hit in the
+`decode_boards` and `window_fires`; it also holds each hit's words (variant, hand, follow-up) to the artefact; its selftest deletes a quarantine sentence, swaps a
+hit's hand words, drops a game, moves a hit's T, moves a hit link and reads a hit in the
 other hand. The board drawn per hit is not re-read by the audit; `bin/build-docs --check` byte-compares it with the renderer. These games say nothing about how often a person, or the bot under garbage, builds one.
 
 ### 社畜トレイン（Shachiku Train）

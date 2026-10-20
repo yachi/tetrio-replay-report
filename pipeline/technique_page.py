@@ -1100,6 +1100,12 @@ class TechniqueSite:
                     for g in sp["games"] for h in g["hits"]]
             if links != want:
                 bad.append("a self-play hit's link is not at its hit's lock, or a hit has no link")
+            # each hit's words (variant, hand, follow-up) are the artefact's, in its order, inside the section
+            sec = page[page.find('id="selfplay"'):]
+            sec = sec[:sec.find('<h2', 1)]
+            tags = [html.unescape(x) for x in re.findall(r'<p class="scp-tag">([^<]*)</p>', sec)]
+            if tags != [self.sp_hit_words(h) for g in sp["games"] for h in g["hits"]]:
+                bad.append("a self-play hit's words (variant, hand or follow-up) are not the artefact's")
             scan = re.findall(r'data-selfplay-scan="">([^<]*)<', page)
             if [html.unescape(x) for x in scan] != [self.sp_scan_words(sp)]:
                 bad.append("the self-play scan sentence is not the artefact's")
@@ -1255,7 +1261,13 @@ class TechniqueSite:
             moved = json.loads(isl.group(1))
             moved["rounds"][slug]["players"][0]["locks"][h0["lock"]][1] += 1
             link = f'href="#{slug}@p{h0["lock"]}"'
-            cases += [("demo: a self-play quarantine sentence deleted", "dp", dp.replace(self.sp_notes(sp)[0], "", 1)),
+            w0 = _esc(self.sp_hit_words(h0))
+            hands = self.SP["hands"]
+            cases += [("demo: a self-play hit's hand words swapped", "dp",
+                       dp.replace(f'<p class="scp-tag">{w0}</p>', '<p class="scp-tag">' + w0.replace(
+                           _esc(hands[h0["hand"]]), _esc(hands["as_drawn" if h0["hand"] == "mirrored" else "mirrored"]))
+                           + "</p>", 1)),
+                      ("demo: a self-play quarantine sentence deleted", "dp", dp.replace(self.sp_notes(sp)[0], "", 1)),
                       ("demo: the self-play cut-off sentence deleted", "dp", dp.replace(self.sp_notes(sp)[1], "", 1)),
                       ("demo: a self-play hit's embedded T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
                       ("demo: a self-play hit's link one lock late", "dp",
