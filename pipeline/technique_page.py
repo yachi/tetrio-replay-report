@@ -841,8 +841,12 @@ class TechniqueSite:
         s, pv = sp["scan"], sp["provenance"]
         return self.SP["scan"].format(games=s["games"], pieces=s["pieces_per_game"], rev=pv["rev"][:7],
                                       nodes=pv["cc_nodes"], coach_seed=pv["coach_seed"],
-                                      complete=s["games_complete"], tsds=s["scored_tsds"], hits=len(s["hits"]),
-                                      shown=len(sp["games"]))
+                                      complete=s["games_complete"], replayed=s["pieces_replayed"],
+                                      tsds=s["scored_tsds"], hits=len(s["hits"]), shown=len(sp["games"]))
+
+    def sp_notes(self, sp):
+        """The section's quarantine notes, rendered (the cut-off is the artefact's `tail`, never typed)."""
+        return [_esc(x.format(tail=sp["tail"])) for x in self.SP["note"]]
 
     def sp_hit_words(self, h):
         SP = self.SP
@@ -919,7 +923,7 @@ class TechniqueSite:
     def _selfplay_section(self, tr, sp, rounds):
         SP = self.SP
         out = [f'  <h2 class="scp-sec" id="selfplay">{_esc(SP["title"])}</h2>',
-               *[f"  <p>{_esc(x)}</p>" for x in SP["note"]],
+               *[f"  <p>{x}</p>" for x in self.sp_notes(sp)],
                f'  <p class="scp-count" data-selfplay-scan="">{_esc(self.sp_scan_words(sp))}</p>',
                '  <div class="scp-grid scd-grid">']
         for g in sp["games"]:
@@ -1090,6 +1094,7 @@ class TechniqueSite:
         if [html.unescape(x) for x in re.findall(r'data-selfplay-node="([^"]+)"', page)] != sp_ids:
             bad.append("the demo page does not draw every self-play game exactly once, in the artefact's order")
         if sp:
+            bad += [f"a self-play quarantine sentence is gone: {x[:40]!r}…" for x in self.sp_notes(sp) if x not in page]
             links = re.findall(r'href="#(demo-[a-z0-9-]+)@p(\d+)" data-round="([^"]+)" data-selfplay-hit="(\d+)"', page)
             want = [(demo_slug(g["node"]), str(h["lock"]), demo_slug(g["node"]), str(h["lock"]))
                     for g in sp["games"] for h in g["hits"]]
@@ -1250,7 +1255,9 @@ class TechniqueSite:
             moved = json.loads(isl.group(1))
             moved["rounds"][slug]["players"][0]["locks"][h0["lock"]][1] += 1
             link = f'href="#{slug}@p{h0["lock"]}"'
-            cases += [("demo: a self-play hit's embedded T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
+            cases += [("demo: a self-play quarantine sentence deleted", "dp", dp.replace(self.sp_notes(sp)[0], "", 1)),
+                      ("demo: the self-play cut-off sentence deleted", "dp", dp.replace(self.sp_notes(sp)[1], "", 1)),
+                      ("demo: a self-play hit's embedded T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
                       ("demo: a self-play hit's link one lock late", "dp",
                        dp.replace(link, f'href="#{slug}@p{h0["lock"] + 1}"', 1)),
                       ("demo: a self-play hit lock moved", "dp",

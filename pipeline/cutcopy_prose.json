@@ -182,10 +182,10 @@
     "title": "cold-clear 自己一個人打出嚟嘅千鳥格子",
     "note": [
       "呢度啲局唔係 corpus 嘅對局，唔係任何網站畫嘅圖，亦唔係我哋設計嘅：係 cold-clear（一個 Tetris bot）自己一個人打嘅。冇對手、冇垃圾行，由空盤開始，每一粒放邊度都係佢揀嘅；所以呢度冇一個數計入任何 corpus 嘅數。",
-      "我哋將佢每一粒嘅位置交俾同 corpus 一樣嘅 Triangle 引擎重新打一次：去嗰個位嘅路線係引擎自己搵嘅，每一粒都要落喺 cold-clear 揀嘅格、消嘅行數要同佢一樣，唔係就停。再用 analysis/cutcopy-facts.json 同一個分類器、同一個窗口搵千鳥格子，下面每一局都係分類器搵到嘅。每局只放到決定第二下 TSD 嗰粒之後兩粒，之後嘅冇放上嚟。",
+      "我哋將佢每一粒嘅位置交俾同 corpus 一樣嘅 Triangle 引擎重新打一次：去嗰個位嘅路線係引擎自己搵嘅，每一粒都要落喺 cold-clear 揀嘅格、消嘅行數要同佢一樣，唔係就停。再用 analysis/cutcopy-facts.json 同一個分類器、同一個窗口搵千鳥格子，下面每一局都係分類器搵到嘅。每局只放到決定第二下 TSD 嗰粒之後 {tail} 粒，之後嘅冇放上嚟。",
       "cold-clear 嘅搜尋係抽樣嘅，每局只抽咗一次，搜尋量亦未收斂；冇垃圾行，而原頁講千鳥格子多數係垃圾行升上嚟嗰陣砌成，呢度同原頁講嗰種情況唔同。即係話，呢度講唔到人、或者 bot 喺壓力之下幾常砌到千鳥格子，只係俾你睇吓 bot 點樣砌出嚟、點樣打第二下。"
     ],
-    "scan": "掃咗 {games} 局（每局 {pieces} 粒；cold-clear {rev}，每步搜 {nodes} 個節點，COACH_SEED {coach_seed}），引擎由頭打到尾打得晒嘅有 {complete} 局，入面全 T-spin 消兩行打咗 {tsds} 下；分類器搵到 {hits} 個，喺下面 {shown} 局入面。",
+    "scan": "掃咗 {games} 局（每局 {pieces} 粒；cold-clear {rev}，每步搜 {nodes} 個節點，COACH_SEED {coach_seed}），引擎由頭打到尾打得晒嘅有 {complete} 局；引擎重打咗嘅 {replayed} 粒（中途停咗嘅局計到停之前嗰粒）入面，全 T-spin 消兩行有 {tsds} 下；分類器搵到 {hits} 個，喺下面 {shown} 局入面。",
     "name": "cold-clear 自己打：種子 {seed}",
     "now": "cold-clear 自己打：{name}",
     "user": "cold-clear",

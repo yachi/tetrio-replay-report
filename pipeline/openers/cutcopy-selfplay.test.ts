@@ -71,7 +71,13 @@ test('the hits are exactly the named list, in the scan and in the committed game
 test('each game is cut `tail` locks after the last lock deciding a hit (or at the game\'s end)', () => {
   for (const g of committed.games) {
     const decides = Math.max(...g.hits.map((h: any) => Math.max(h.lock, h.followup.lock ?? h.lock)));
-    expect(g.placements.length).toBe(decides + committed.tail + 1);
+    // cut `tail` after the deciding lock; a game shorter than that is committed whole (`select`'s Math.min),
+    // and the only way that can happen is the game ending, so its length must then be the game's whole length
+    const want = decides + committed.tail + 1;
+    if (g.placements.length !== want) {
+      expect(g.placements.length).toBeLessThan(want);
+      expect(g.placements.length).toBe(committed.scan.pieces_per_game);
+    }
     expect(g.locks.length).toBe(g.placements.length);
     expect(g.node).toBe(`selfplay.${g.seed}`);
   }
