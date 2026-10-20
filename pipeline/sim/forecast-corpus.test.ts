@@ -156,6 +156,9 @@ const PINNED_TOTALS: Record<string, Totals> = {
   '2026-10-09': { forecast_garbage: 0, forecast_lineclear: 4, path_opened: 1, self_built: 540, reactive: 573, unattributed: 0 },
   // No path_opened and nothing unattributed: ACCESS_CLASS stays at seven members.
   '2026-10-12': { forecast_garbage: 0, forecast_lineclear: 3, path_opened: 0, self_built: 246, reactive: 323, unattributed: 0 },
+  // The corpus's smallest session (60 player-rounds): one mechanism event, pinglamb's, and it is
+  // verified. No path_opened and nothing unattributed: ACCESS_CLASS stays at seven members.
+  '2026-10-20': { forecast_garbage: 0, forecast_lineclear: 1, path_opened: 0, self_built: 155, reactive: 196, unattributed: 0 },
 };
 
 const PINNED_FLOORS: Record<string, Floors> = {
@@ -180,6 +183,7 @@ const PINNED_FLOORS: Record<string, Floors> = {
   '2026-10-03': { 'pre-existed': 1321, 'arrived-later': 142, undetermined: 119 },
   '2026-10-09': { 'pre-existed': 911, 'arrived-later': 136, undetermined: 71 },
   '2026-10-12': { 'pre-existed': 475, 'arrived-later': 48, undetermined: 49 },
+  '2026-10-20': { 'pre-existed': 293, 'arrived-later': 36, undetermined: 23 },
 };
 
 // Population of "a T-spin trailing a C-Spin triple" per session — pinned alongside the verdict so a
@@ -189,7 +193,7 @@ const PINNED_CSPIN: Record<string, number> = {
   '2026-07-22': 109, '2026-07-24': 64, '2026-07-28': 89, '2026-08-01': 68, '2026-08-09': 64, '2026-08-14': 109,
   '2026-08-19': 80, '2026-08-25': 102, '2026-09-03': 57, '2026-09-10': 88,
   '2026-09-11': 61, '2026-09-17': 52, '2026-09-18': 146, '2026-09-19': 177,
-  '2026-10-03': 176, '2026-10-09': 154, '2026-10-12': 73,
+  '2026-10-03': 176, '2026-10-09': 154, '2026-10-12': 73, '2026-10-20': 35,
 };
 
 /** Reactive events on which the EXECUTION-TIME garbage counterfactual fires, per session.
@@ -312,6 +316,18 @@ const PINNED_FORECASTS: Record<string, string[]> = {
     'yachi replay-2026-10-12-01.ttrm r0 lock 75 forecast_lineclear roof 73 1->2',
     'yachi replay-2026-10-12-01.ttrm r2 lock 132 forecast_lineclear roof 128 0->2',
   ],
+  // ONE verified forecast of ONE mechanism event — pinglamb's, `floor pre-existed from -1`, 0->2,
+  // the first session since 09-10 where every mechanism event is verified (forecast-facts.json
+  // `rejected_by.counted` 1, every rejection bucket 0, `clause2_undecided` 0). The spin is at lock
+  // 24 of a round whose prefix verifies to lock 26 with `after: "end"`, i.e. the WHOLE round is
+  // verified and the round is simply 27 locks long — so it is near the end of the round, not near
+  // a prefix edge. yachi has no mechanism event at all (as at 10-12 pinglamb had none). Audited
+  // as the other sessions' are — the clause verdict read off the record and reconciled against the
+  // artefact's own `rejected_by`; the board was NOT hand-checked cell by cell. On 60 player-rounds
+  // one is 1.6% of rounds, the corpus's smallest denominator.
+  '2026-10-20': [
+    'pinglamb replay-2026-10-20-03.ttrm r3 lock 24 forecast_lineclear roof 22 0->2',
+  ],
 };
 
 const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
@@ -393,6 +409,10 @@ const PINNED_MECHANISM_ONLY: Record<string, string[]> = {
     'yachi replay-2026-10-12-01.ttrm r0 lock 75 forecast_lineclear floor pre-existed from -1 roof 73',
     'yachi replay-2026-10-12-01.ttrm r2 lock 132 forecast_lineclear floor pre-existed from -1 roof 128',
     'yachi replay-2026-10-12-04.ttrm r5 lock 71 forecast_lineclear floor undetermined from -1 roof 64',
+  ],
+  // One, pinglamb's, and verified — see PINNED_FORECASTS above.
+  '2026-10-20': [
+    'pinglamb replay-2026-10-20-03.ttrm r3 lock 24 forecast_lineclear floor pre-existed from -1 roof 22',
   ],
 };
 

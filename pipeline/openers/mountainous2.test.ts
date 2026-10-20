@@ -33,7 +33,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock L-held field, and the 7th piece was NOT the
  *  mirror-aware bag-1 L (J when mirrored): a hold. Most of them go on to place the held L on its tower
@@ -109,6 +109,8 @@ const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
   "2026-09-18 m7r6 pinglamb under 2.ideal", "2026-09-18 m14r1 yachi under 2.ideal+2.normal+2.compromise",
   "2026-09-19 m14r6 pinglamb under 2.ideal+2.normal+2.compromise", "2026-10-03 m15r4 pinglamb under 2.ideal+2.normal+2.compromise",
   "2026-10-09 m1r2 pinglamb under 2.ideal+2.normal+2.compromise",
+  // 2026-10-20: one, yachi's, a 4-cell subset of all three bag-2 boards at lock 11 (prefix 106).
+  "2026-10-20 m3r1 yachi under 2.ideal+2.normal+2.compromise",
 ];
 /** No bag-2 match: the board before the TST is a bag-2 board plus exactly four cells (their letters). MEASURED. */
 const BAG2_NONE_EXTRA_PIECE: string[] = [
@@ -155,15 +157,15 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror 山岳積み2号: pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { yachi: 153, pinglamb: 25 };
+const MIRRORED_BAG1 = { yachi: 154, pinglamb: 25 };
 
 /** Cases per measured node. No corpus round reaches the 4-line PCs, 2.normal#2/#3 or anything under
  *  2.compromise past its TST: those zeros are COMPARED (the classifier detects all three PC kinds and
  *  the bag-3 and bag-4 snapshot boards; the demos test reaches each one), never "not compared". */
 const NODE_CASES: Record<string, number> = {
-  'bag1.l_top': 372, 'bag1.l_hold': 93, 'bag1.l_placed_elsewhere': 0,
+  'bag1.l_top': 375, 'bag1.l_hold': 93, 'bag1.l_placed_elsewhere': 0,
   '2.pc4#1': 0, '2.pc4#2': 0, '2.pc4#3': 0,
-  '2.ideal': 237, '2.normal#1': 97, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
+  '2.ideal': 237, '2.normal#1': 98, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
   '2.ideal.pc#1': 4, '2.ideal.pc#2': 13, '2.ideal.pc#3': 18, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
   '2.ideal.pc#6': 0, '2.ideal.pc#7': 1, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0,
@@ -192,7 +194,7 @@ const UNMEASURED: Record<string, string> = {
 const CONDITIONS = {
   '2.ideal': { '2.compromise': 44, '2.ideal': 193 },
   '2.compromise': { '2.compromise': 19 },
-  '2.normal#1': { '2.compromise': 93, '2.ideal': 4 },
+  '2.normal#1': { '2.compromise': 94, '2.ideal': 4 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */

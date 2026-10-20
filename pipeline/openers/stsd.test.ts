@@ -40,7 +40,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
 const ART_PATH = `${import.meta.dir}/../../analysis/stsd-facts.json`;
 const TR = JSON.parse(readFileSync(STSD.transcriptionPath, 'utf8'));
 
@@ -65,7 +65,8 @@ const STSD_HITS: string[] = [
   "2026-09-19 m15r6 yachi lock 43", "2026-09-19 m17r6 pinglamb lock 110", "2026-10-03 m4r7 yachi lock 100",
   "2026-10-03 m13r5 yachi lock 75", "2026-10-03 m17r3 pinglamb lock 143 (mirrored)", "2026-10-09 m4r2 pinglamb lock 73",
   "2026-10-12 m1r1 pinglamb lock 66", "2026-10-12 m2r1 pinglamb lock 24 (mirrored)", "2026-10-12 m5r3 yachi lock 46 (mirrored)",
-  "2026-10-12 m8r7 pinglamb lock 41 (mirrored)",
+  "2026-10-12 m8r7 pinglamb lock 41 (mirrored)", "2026-10-20 m1r3 yachi lock 10", "2026-10-20 m1r8 pinglamb lock 26 (mirrored)",
+  "2026-10-20 m2r4 pinglamb lock 23 (mirrored)", "2026-10-20 m2r6 pinglamb lock 36 (mirrored)", "2026-10-20 m3r2 yachi lock 46 (mirrored)",
 ];
 
 const FOLLOWUP_NOT_FIRED: string[] = [
@@ -77,13 +78,16 @@ const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-09-18 m17r6 yachi lock 122 (slot_filled_before_t at lock 127)", "2026-09-19 m5r7 yachi lock 72 (slot_filled_before_t at lock 74)",
   "2026-09-19 m10r8 yachi lock 67 (slot_filled_before_t at lock 69)", "2026-09-19 m14r3 yachi lock 136 (slot_filled_before_t at lock 137)",
   "2026-10-03 m4r7 yachi lock 100 (next_t_elsewhere at lock 109)", "2026-10-12 m1r1 pinglamb lock 66 (t_in_slot_not_tsd at lock 75)",
-  "2026-10-12 m8r7 pinglamb lock 41 (t_in_slot_not_tsd at lock 42)",
+  "2026-10-12 m8r7 pinglamb lock 41 (t_in_slot_not_tsd at lock 42)", "2026-10-20 m1r3 yachi lock 10 (next_t_elsewhere at lock 17)",
 ];
 
 const GARBAGE_IN_WINDOW: string[] = [];
 
 const STSD_IN_OPENER: string[] = [
   "2026-08-09 m4r4 yachi lock 12",
+  // 2026-10-20 adds the second: yachi's m1r3, a stood T on lock 10 of a prefix verified to 71, no
+  // garbage in the window (ZZ / Z / JJ over the slot) — not a prefix-edge effect; its follow-up T went elsewhere (lock 17)
+  "2026-10-20 m1r3 yachi lock 10",
 ];
 
 const WINDOW_OFF_BOARD: string[] = [];
@@ -98,6 +102,8 @@ const CROSS_ROUTE_NO_HIT: string[] = [
   "2026-10-09 m5r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
   "2026-10-09 m6r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
   "2026-10-09 m7r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-20 m1r4 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+  "2026-10-20 m3r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
 ];
 
 /** The cross-route rounds kept OUT of the denominator, each with the unverified part named. */
@@ -107,19 +113,19 @@ const CROSS_ROUTE_UNSCORED: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 5307, in_opener: 1043, mid_game: 4264 },
-                    yachi: { all: 4751, in_opener: 1242, mid_game: 3509 } };
+const TSD_DENOM = { pinglamb: { all: 5421, in_opener: 1061, mid_game: 4360 },
+                    yachi: { all: 4891, in_opener: 1268, mid_game: 3623 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
-const HITS = { pinglamb: { all: 13, in_opener: 0, mid_game: 13, mirrored: 6, garbage_in_window: 0 },
-               yachi: { all: 45, in_opener: 1, mid_game: 44, mirrored: 24, garbage_in_window: 0 } };
-const FOLLOWUP_FIRED = { pinglamb: 10, yachi: 31 };
+const HITS = { pinglamb: { all: 16, in_opener: 0, mid_game: 16, mirrored: 9, garbage_in_window: 0 },
+               yachi: { all: 47, in_opener: 2, mid_game: 45, mirrored: 25, garbage_in_window: 0 } };
+const FOLLOWUP_FIRED = { pinglamb: 13, yachi: 32 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 3 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 36, yachi: 57 }, no_roof: { pinglamb: 13, yachi: 45 },
-              t_overlap: { pinglamb: 17, yachi: 46 } },
-  orientation_baseline: { pinglamb: 43, yachi: 61 },
+  ablation: { no_must_empty: { pinglamb: 39, yachi: 60 }, no_roof: { pinglamb: 16, yachi: 47 },
+              t_overlap: { pinglamb: 20, yachi: 49 } },
+  orientation_baseline: { pinglamb: 46, yachi: 64 },
 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -149,7 +155,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(14176);
+  expect(n).toBe(14538);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -214,8 +220,8 @@ test('cross-route: the SDPC Spin rounds that reached its STMB Cave, from that ar
     .map((c: any) => `${c.session} m${c.match}r${c.round} ${c.player}`).sort();
   const cr = art().cross_route;
   expect(cr.by_round.map((r: any) => r.round).sort()).toEqual(want);
-  expect(cr.rounds_reaching_node).toBe(8);
-  expect(cr.rounds_scored).toBe(6);
+  expect(cr.rounds_reaching_node).toBe(10);
+  expect(cr.rounds_scored).toBe(8);
   expect(cr.with_hit).toBe(0);
   // the continuation's last lock, re-derived: the bag harddrop draws the STSD in (3.first.cave.stsd),
   // at seven 0-based locks a bag, ends at lock 7·bag − 1
@@ -247,7 +253,7 @@ test('cross-route: the SDPC Spin rounds that reached its STMB Cave, from that ar
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(30);
-  expect(c.rowmap_steps).toBe(245899);
+  expect(c.rowmap_steps).toBe(252000);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

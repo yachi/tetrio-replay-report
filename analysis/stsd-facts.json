@@ -98,11 +98,16 @@
     "session": "2026-10-12",
     "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
     "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
+   },
+   {
+    "session": "2026-10-20",
+    "replays_md5": "54aad262054f2e92c85f7bf94462eb2c",
+    "replay_facts_md5": "0426348d586721b430916ddc751a2de1"
    }
   ],
   "transcription_md5": "5bbd258e0b5b48f99380c7c84bd29ae6",
   "emitter_md5": "0d79221e93274a6bf6e9761bf289bdfa",
-  "cross_route_md5": "2108c4898e277ec85726281054e97f15"
+  "cross_route_md5": "012ac3641dc5c8ea8a8f4706de40864d"
  },
  "sessions": [
   "2026-07-22",
@@ -121,7 +126,8 @@
   "2026-09-19",
   "2026-10-03",
   "2026-10-09",
-  "2026-10-12"
+  "2026-10-12",
+  "2026-10-20"
  ],
  "window_pieces": 21,
  "window_rule": "0-based lock index <= 21 is in_opener (emit-opener-facts.ts's convention; emit-attack-facts.ts counts from 1)",
@@ -129,24 +135,24 @@
  "denominators": {
   "pinglamb": {
    "TSD": {
-    "all": 5307,
-    "in_opener": 1043,
-    "mid_game": 4264
+    "all": 5421,
+    "in_opener": 1061,
+    "mid_game": 4360
    },
    "TSS": {
-    "all": 603,
-    "in_opener": 77,
-    "mid_game": 526
+    "all": 621,
+    "in_opener": 78,
+    "mid_game": 543
    },
    "TST": {
-    "all": 1333,
-    "in_opener": 1306,
-    "mid_game": 27
+    "all": 1368,
+    "in_opener": 1340,
+    "mid_game": 28
    },
    "mini_TSS": {
-    "all": 310,
-    "in_opener": 12,
-    "mid_game": 298
+    "all": 318,
+    "in_opener": 13,
+    "mid_game": 305
    },
    "mini_TSD": {
     "all": 0,
@@ -155,28 +161,28 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 629
+   "unscored_past_prefix": 647
   },
   "yachi": {
    "TSD": {
-    "all": 4751,
-    "in_opener": 1242,
-    "mid_game": 3509
+    "all": 4891,
+    "in_opener": 1268,
+    "mid_game": 3623
    },
    "TSS": {
-    "all": 994,
-    "in_opener": 243,
-    "mid_game": 751
+    "all": 1019,
+    "in_opener": 251,
+    "mid_game": 768
    },
    "TST": {
-    "all": 799,
-    "in_opener": 758,
-    "mid_game": 41
+    "all": 818,
+    "in_opener": 776,
+    "mid_game": 42
    },
    "mini_TSS": {
-    "all": 79,
+    "all": 82,
     "in_opener": 6,
-    "mid_game": 73
+    "mid_game": 76
    },
    "mini_TSD": {
     "all": 0,
@@ -185,14 +191,14 @@
    },
    "other_scored": 0,
    "recon_disagreed": 0,
-   "unscored_past_prefix": 414
+   "unscored_past_prefix": 419
   }
  },
  "check": {
-  "tspin_clears_scored": 14176,
-  "reconstruction_agreed": 14176,
+  "tspin_clears_scored": 14538,
+  "reconstruction_agreed": 14538,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 245899,
+  "rowmap_steps": 252000,
   "rowmap_unverified": 30,
   "by_session": {
    "2026-07-22": {
@@ -330,6 +336,14 @@
      "pinglamb": 311,
      "yachi": 282
     }
+   },
+   "2026-10-20": {
+    "tspin_clears": 362,
+    "reconstruction_disagreed": 0,
+    "players": {
+     "pinglamb": 175,
+     "yachi": 187
+    }
    }
   }
  },
@@ -337,32 +351,32 @@
   "stsd": {
    "hits_by_player": {
     "pinglamb": {
-     "all": 13,
+     "all": 16,
      "in_opener": 0,
-     "mid_game": 13,
-     "mirrored": 6,
+     "mid_game": 16,
+     "mirrored": 9,
      "garbage_in_window": 0
     },
     "yachi": {
-     "all": 45,
-     "in_opener": 1,
-     "mid_game": 44,
-     "mirrored": 24,
+     "all": 47,
+     "in_opener": 2,
+     "mid_game": 45,
+     "mirrored": 25,
      "garbage_in_window": 0
     }
    },
    "followup_by_player": {
     "pinglamb": {
-     "fired": 10,
+     "fired": 13,
      "not_fired": {
       "slot_filled_before_t": 1,
       "t_in_slot_not_tsd": 2
      }
     },
     "yachi": {
-     "fired": 31,
+     "fired": 32,
      "not_fired": {
-      "next_t_elsewhere": 5,
+      "next_t_elsewhere": 6,
       "slot_filled_before_t": 8,
       "t_in_slot_not_tsd": 1
      }
@@ -389,21 +403,21 @@
     },
     "ablation": {
      "no_must_empty": {
-      "pinglamb": 36,
-      "yachi": 57
+      "pinglamb": 39,
+      "yachi": 60
      },
      "no_roof": {
-      "pinglamb": 13,
-      "yachi": 45
+      "pinglamb": 16,
+      "yachi": 47
      },
      "t_overlap": {
-      "pinglamb": 17,
-      "yachi": 46
+      "pinglamb": 20,
+      "yachi": 49
      }
     },
     "orientation_baseline": {
-     "pinglamb": 43,
-     "yachi": 61
+     "pinglamb": 46,
+     "yachi": 64
     }
    }
   }
@@ -416,8 +430,8 @@
    "last_lock": 34,
    "note": "OUR READING: harddrop draws the STSD (3.first.cave.stsd) as bag 5 of that route; at seven locks a bag with no hold, bag 5 is 0-based locks 28-34, so the continuation is the locks after the node through lock 34. An STSD hit later in the round is recorded as later_hit_lock and not counted."
   },
-  "rounds_reaching_node": 8,
-  "rounds_scored": 6,
+  "rounds_reaching_node": 10,
+  "rounds_scored": 8,
   "with_hit": 0,
   "by_round": [
    {
@@ -515,6 +529,30 @@
     "tsd": 2,
     "tsd_stood": 0,
     "first_tsd": 27
+   },
+   {
+    "round": "2026-10-20 m1r4 yachi",
+    "node_lock": 26,
+    "verified_to": 66,
+    "outcome": "no_hit",
+    "hit_lock": null,
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
+   },
+   {
+    "round": "2026-10-20 m3r5 yachi",
+    "node_lock": 26,
+    "verified_to": 150,
+    "outcome": "no_hit",
+    "hit_lock": null,
+    "later_hit_lock": null,
+    "tspins": 2,
+    "tsd": 2,
+    "tsd_stood": 0,
+    "first_tsd": 27
    }
   ]
  },
@@ -577,7 +615,12 @@
    "2026-10-12 m1r1 pinglamb lock 66",
    "2026-10-12 m2r1 pinglamb lock 24 (mirrored)",
    "2026-10-12 m5r3 yachi lock 46 (mirrored)",
-   "2026-10-12 m8r7 pinglamb lock 41 (mirrored)"
+   "2026-10-12 m8r7 pinglamb lock 41 (mirrored)",
+   "2026-10-20 m1r3 yachi lock 10",
+   "2026-10-20 m1r8 pinglamb lock 26 (mirrored)",
+   "2026-10-20 m2r4 pinglamb lock 23 (mirrored)",
+   "2026-10-20 m2r6 pinglamb lock 36 (mirrored)",
+   "2026-10-20 m3r2 yachi lock 46 (mirrored)"
   ],
   "followup_not_fired": [
    "2026-07-28 m2r1 yachi lock 64 (t_in_slot_not_tsd at lock 67)",
@@ -596,11 +639,13 @@
    "2026-09-19 m14r3 yachi lock 136 (slot_filled_before_t at lock 137)",
    "2026-10-03 m4r7 yachi lock 100 (next_t_elsewhere at lock 109)",
    "2026-10-12 m1r1 pinglamb lock 66 (t_in_slot_not_tsd at lock 75)",
-   "2026-10-12 m8r7 pinglamb lock 41 (t_in_slot_not_tsd at lock 42)"
+   "2026-10-12 m8r7 pinglamb lock 41 (t_in_slot_not_tsd at lock 42)",
+   "2026-10-20 m1r3 yachi lock 10 (next_t_elsewhere at lock 17)"
   ],
   "garbage_in_window": [],
   "stsd_in_opener": [
-   "2026-08-09 m4r4 yachi lock 12"
+   "2026-08-09 m4r4 yachi lock 12",
+   "2026-10-20 m1r3 yachi lock 10"
   ],
   "window_off_board": [],
   "recon_dropped_tsd": [],
@@ -610,7 +655,9 @@
    "2026-10-09 m4r4 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
    "2026-10-09 m5r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
    "2026-10-09 m6r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
-   "2026-10-09 m7r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)"
+   "2026-10-09 m7r1 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-20 m1r4 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)",
+   "2026-10-20 m3r5 yachi (no STSD hit in locks 27-34: 2 T-spin(s), 2 full TSD(s) (first at lock 27), 0 stood)"
   ],
   "cross_route_unscored": [
    "2026-10-03 m15r5 yachi (node at lock 26 is past the verified prefix, verified to lock 20)",
@@ -675,6 +722,11 @@
   {"session":"2026-10-12","file":"replay-2026-10-12-01.ttrm","round_index0":0,"match":1,"round":1,"player":"pinglamb","variant":"stsd","lock":66,"in_opener":false,"mirrored":false,"garbage_in_window":false,"window_letters":["..TT","...T","LL.S","Z..S","Z..J"],"verified_to":147,"followup":{"lock":75,"fired":false,"reason":"t_in_slot_not_tsd"}},
   {"session":"2026-10-12","file":"replay-2026-10-12-02.ttrm","round_index0":0,"match":2,"round":1,"player":"pinglamb","variant":"stsd","lock":24,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["JJ..","J...","J.ZZ","O..Z","O..Z"],"verified_to":32,"followup":{"lock":32,"fired":true,"reason":null}},
   {"session":"2026-10-12","file":"replay-2026-10-12-05.ttrm","round_index0":2,"match":5,"round":3,"player":"yachi","variant":"stsd","lock":46,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["SS..","S...","O.LL","O..L","J..L"],"verified_to":55,"followup":{"lock":53,"fired":true,"reason":null}},
-  {"session":"2026-10-12","file":"replay-2026-10-12-08.ttrm","round_index0":6,"match":8,"round":7,"player":"pinglamb","variant":"stsd","lock":41,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["ZZ..","Z...","J.JJ","J..S","Z..S"],"verified_to":162,"followup":{"lock":42,"fired":false,"reason":"t_in_slot_not_tsd"}}
+  {"session":"2026-10-12","file":"replay-2026-10-12-08.ttrm","round_index0":6,"match":8,"round":7,"player":"pinglamb","variant":"stsd","lock":41,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["ZZ..","Z...","J.JJ","J..S","Z..S"],"verified_to":162,"followup":{"lock":42,"fired":false,"reason":"t_in_slot_not_tsd"}},
+  {"session":"2026-10-20","file":"replay-2026-10-20-01.ttrm","round_index0":2,"match":1,"round":3,"player":"yachi","variant":"stsd","lock":10,"in_opener":true,"mirrored":false,"garbage_in_window":false,"window_letters":["..ZZ","...Z","JJ.T","J..T","J..T"],"verified_to":71,"followup":{"lock":17,"fired":false,"reason":"next_t_elsewhere"}},
+  {"session":"2026-10-20","file":"replay-2026-10-20-01.ttrm","round_index0":7,"match":1,"round":8,"player":"pinglamb","variant":"stsd","lock":26,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["JJ..","J...","J.ZZ","O..Z","O..Z"],"verified_to":63,"followup":{"lock":30,"fired":true,"reason":null}},
+  {"session":"2026-10-20","file":"replay-2026-10-20-02.ttrm","round_index0":3,"match":2,"round":4,"player":"pinglamb","variant":"stsd","lock":23,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["OO..","O...","O.ZZ","O..Z","O..Z"],"verified_to":40,"followup":{"lock":27,"fired":true,"reason":null}},
+  {"session":"2026-10-20","file":"replay-2026-10-20-02.ttrm","round_index0":5,"match":2,"round":6,"player":"pinglamb","variant":"stsd","lock":36,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["SS..","S...","S.LL","Z..L","Z..L"],"verified_to":111,"followup":{"lock":47,"fired":true,"reason":null}},
+  {"session":"2026-10-20","file":"replay-2026-10-20-03.ttrm","round_index0":1,"match":3,"round":2,"player":"yachi","variant":"stsd","lock":46,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["ZZ..","Z...","J.LL","I..L","I..L"],"verified_to":81,"followup":{"lock":47,"fired":true,"reason":null}}
  ]
 }
