@@ -42,7 +42,9 @@ python3 ~/tetrio-replay-report/tools/cc-coach/window-analysis.py rollouts-40k.pr
 
 A third mode, `COACH_MODE=selfplay` (input `{"id","seed","pieces"}`), has cold-clear play alone from an empty
 board on a seeded 7-bag queue with no garbage; the Cut Copy pilot built on it is
-[`FINDINGS-cutcopy-selfplay.md`](FINDINGS-cutcopy-selfplay.md) (`cutcopy-selfplay.ts`).
+[`FINDINGS-cutcopy-selfplay.md`](FINDINGS-cutcopy-selfplay.md) (`cutcopy-selfplay.ts`, whose replay core is
+`pipeline/sim/cc-selfplay.ts`; the hit games are committed as `analysis/cutcopy-selfplay.json` by
+`pipeline/sim/emit-cutcopy-selfplay.ts`).
 
 Runtime on 4 cores: extraction 30 s; grading ~0.6 s per position per core; a 40k-node 14-piece
 rollout ~5 s per window per core.

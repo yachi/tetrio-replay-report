@@ -99,6 +99,11 @@ class TechniqueSiteProfile:
     #: demos (千鳥格子). Empty: no own-design section, and the page is byte for byte what it was
     own_rel: str = ""
     own_schema: str = "technique-own/1"
+    #: opt-in: games cold-clear played ALONE in which the corpus classifier finds a hit (`cutcopy-selfplay.ts`),
+    #: played on the demo page after the own designs (千鳥格子). Empty: no self-play section, and the page is byte
+    #: for byte what it was
+    selfplay_rel: str = ""
+    selfplay_schema: str = "technique-selfplay/1"
 
 
 def case_key(h):
@@ -127,6 +132,7 @@ class TechniqueSite:
         self.DEMO_REQUIRED = (RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, PS["source"]) + self.DEMO_SENTENCES
         self.CLASSES = {**RT.PIECE_CLASS, **p.cell_classes}
         self.OW = self.PROSE["own"] if p.own_rel else None
+        self.SP = self.PROSE["selfplay"] if p.selfplay_rel else None
         #: every variant the pages print, the primary first: (variant id, its opportunity's denominators key)
         self.VARIANTS = ((p.variant, p.opportunity),) + tuple(p.more_variants)
 
@@ -826,6 +832,120 @@ class TechniqueSite:
         out.append("  </div>")
         return out
 
+    # ------------------------------------------------------------ cold-clear self-play (opt-in)
+
+    def sp_name(self, g):
+        return self.SP["name"].format(seed=g["seed"])
+
+    def sp_scan_words(self, sp):
+        s, pv = sp["scan"], sp["provenance"]
+        return self.SP["scan"].format(games=s["games"], pieces=s["pieces_per_game"], rev=pv["rev"][:7],
+                                      nodes=pv["cc_nodes"], coach_seed=pv["coach_seed"],
+                                      complete=s["games_complete"], tsds=s["scored_tsds"], hits=len(s["hits"]),
+                                      shown=len(sp["games"]))
+
+    def sp_hit_words(self, h):
+        SP = self.SP
+        fu = h["followup"]
+        follow = (SP["followup_fired"].format(n=fu["lock"] + 1) if fu["fired"]
+                  else SP["followup_not"].format(reason=self.PROSE["reasons"].get(fu["reason"], fu["reason"])))
+        return SP["hit"].format(n=h["lock"] + 1, variant=SP["variant_names"][h["variant"]],
+                                hand=SP["hands"][h["hand"]], followup=follow)
+
+    def _sp_steps(self, g, sp):
+        b = sp["board"]
+        return [(p, [list(r) for r in board]) for p, _f, board in
+                RS.decode_boards(sp, g["seq"], g["locks"], RS.NEXT_SHOWN)], b["width"], b["rows"]
+
+    def selfplay_problems(self, g, sp, tr):
+        """One self-play game, checked by THIS page's implementations: decoded from an empty board with
+        `replay_section.decode_boards`, every lock on cold-clear's own placement; at each hit, the window read by
+        `technique_transcription.window_fires`, in the hit's hand, on the decoded board before its T, and the hit's
+        T (and a fired follow-up's) a full T-spin clearing the variant's lines."""
+        from types import SimpleNamespace
+        from pipeline.openers.technique_transcription import window_fires
+        node = g["node"]
+        try:
+            steps, width, rows_n = self._sp_steps(g, sp)
+        except SystemExit as e:
+            return [f"{node}: does not decode: {e}"]
+        bad = []
+        if len(steps) != len(g["placements"]):
+            bad.append(f"{node}: {len(steps)} locks for {len(g['placements'])} placements")
+        for i, ((piece, _b), pl) in enumerate(zip(steps, g["placements"])):
+            cells = sorted(RS._place_cells(sp["shapes"], width, rows_n, piece, g["locks"][i][1]))
+            want = sorted((rows_n - 1 - r) * width + x for x, r in pl["cells"])
+            if piece != pl["piece"] or cells != want:
+                bad.append(f"{node}: lock {i + 1} is not cold-clear's placement")
+                break
+        spec = SimpleNamespace(empty_letters=tr.get("empty_letters", ""))
+        for h in g["hits"]:
+            v = self.variant(tr, h["variant"])
+            i = h["lock"]
+            if not 0 < i < len(steps):
+                bad.append(f"{node}: no lock {i + 1}")
+                continue
+            ts = [(i, v["lines"])]
+            if h["followup"]["fired"]:
+                ts.append((h["followup"]["lock"], v["followup"]["lines"]))
+            for j, lines in ts:
+                lk = g["locks"][j] if 0 <= j < len(steps) else None
+                if lk is None or steps[j][0] != "T" or lk[3] != 2 or lk[2] != lines:
+                    bad.append(f"{node}: lock {j + 1} is not a full T-spin clearing {lines}")
+            before = steps[i - 1][1]
+            board = ["".join("-" if before[y][x] is None else "c" for x in range(width)) for y in range(rows_n - 1, -1, -1)]
+            cells = RS._place_cells(sp["shapes"], width, rows_n, "T", g["locks"][i][1])
+            lock = {(rows_n - 1 - c // width, c % width) for c in cells}
+            if window_fires(tr, v, spec, board, lock, h["hand"] == "mirrored") is not True:
+                bad.append(f"{node}: the {h['variant']} window ({h['hand']}) does not fire on the board before lock {i + 1}")
+        return bad
+
+    def _selfplay_payload(self, g, name):
+        SP = self.SP
+        moments = []
+        for h in g["hits"]:
+            moments.append([h["lock"] + 1, 0, "tspin", SP["moment_hit"].format(
+                n=h["lock"] + 1, variant=SP["variant_names"][h["variant"]])])
+            if h["followup"]["fired"]:
+                moments.append([h["followup"]["lock"] + 1, 0, "tspin",
+                                SP["moment_followup"].format(n=h["followup"]["lock"] + 1)])
+        return {"label": demo_slug(g["node"]), "title": SP["now"].format(name=name),
+                "seq": g["seq"], "order": "0" * len(g["locks"]), "winner": None,
+                "players": [{"user": SP["user"], "slot": 0, "ending": None, "frames": g["frames"],
+                             "pieces": len(g["locks"]), "locks": g["locks"], "ge": [],
+                             "verified_to": None, "after": None, "failed_at": None}],
+                "moments": sorted(moments), "flags": [], "notes": [SP["notes"].format(n=len(g["locks"]))]}
+
+    def _selfplay_section(self, tr, sp, rounds):
+        SP = self.SP
+        out = [f'  <h2 class="scp-sec" id="selfplay">{_esc(SP["title"])}</h2>',
+               *[f"  <p>{_esc(x)}</p>" for x in SP["note"]],
+               f'  <p class="scp-count" data-selfplay-scan="">{_esc(self.sp_scan_words(sp))}</p>',
+               '  <div class="scp-grid scd-grid">']
+        for g in sp["games"]:
+            slug = demo_slug(g["node"])
+            nm = self.sp_name(g)
+            rounds[slug] = self._selfplay_payload(g, nm)
+            steps, width, _rows_n = self._sp_steps(g, sp)
+            bits = [f'    <div class="scp-node" id="{slug}" data-selfplay-node="{_esc(g["node"])}">',
+                    f'<h4 class="scp-name">{_esc(nm)}</h4>']
+            for h in g["hits"]:
+                i = h["lock"]
+                before = steps[i - 1][1]
+                mark = set(RS._place_cells(sp["shapes"], width, sp["board"]["rows"], "T", g["locks"][i][1]))
+                top = max([y + 1 for y in range(len(before)) if any(v is not None for v in before[y])]
+                          + [c // width + 1 for c in mark])
+                words = self.sp_hit_words(h)
+                bits += [board_svg(self._rows_of(before, mark, top + 1), f"{nm} {words}", self.CLASSES),
+                         f'<p class="scp-tag">{_esc(words)}</p>',
+                         f'<p><a class="scp-case" href="#{slug}@p{i}" data-round="{slug}" data-selfplay-hit="{i}">'
+                         f'{_esc(SP["play_hit"].format(n=i + 1))}</a></p>']
+            bits += [f'<p><a class="scp-case" href="#{slug}" data-round="{slug}">{_esc(SP["play"])}</a></p>',
+                     f'<p class="scp-cond">{_esc(SP["notes"].format(n=len(g["locks"])))}</p>', "</div>"]
+            out.append("".join(bits))
+        out.append("  </div>")
+        return out
+
     def render_demo_page(self, tr, demos):
         bad = [x for d in demos["demos"] for x in self.reach_problems(d, demos, tr)]
         self._need(not bad, "; ".join(bad))
@@ -884,6 +1004,11 @@ class TechniqueSite:
             bad = [x for d in own["demos"] for x in self.own_problems(d, own, tr)]
             self._need(not bad, "; ".join(bad))
             out += self._own_section(tr, own, rounds)
+        sp = getattr(self, "_sp", None)
+        if sp:
+            bad = [x for g in sp["games"] for x in self.selfplay_problems(g, sp, tr)]
+            self._need(not bad, "; ".join(bad))
+            out += self._selfplay_section(tr, sp, rounds)
         out += [f'  <h2 class="scp-sec">{_esc(DP["unbuilt_title"])}</h2>', '  <div class="scp-grid">']
         for u in demos["unbuilt"]:
             n = by_id[u["node"]]
@@ -957,8 +1082,27 @@ class TechniqueSite:
         island = json.loads(m.group(1))
         own = getattr(self, "_own", None)
         own_ids = [b["id"] for b in own["boards"]] if own else []
-        if sorted(island["rounds"]) != sorted(demo_slug(d["node"]) for d in demos["demos"] + (own["demos"] if own else [])):
+        sp = getattr(self, "_sp", None)
+        sp_ids = [g["node"] for g in sp["games"]] if sp else []
+        if sorted(island["rounds"]) != sorted([demo_slug(d["node"]) for d in demos["demos"] + (own["demos"] if own else [])]
+                                              + [demo_slug(n) for n in sp_ids]):
             bad.append("the demo page does not embed every demo exactly once")
+        if [html.unescape(x) for x in re.findall(r'data-selfplay-node="([^"]+)"', page)] != sp_ids:
+            bad.append("the demo page does not draw every self-play game exactly once, in the artefact's order")
+        if sp:
+            links = re.findall(r'href="#(demo-[a-z0-9-]+)@p(\d+)" data-round="([^"]+)" data-selfplay-hit="(\d+)"', page)
+            want = [(demo_slug(g["node"]), str(h["lock"]), demo_slug(g["node"]), str(h["lock"]))
+                    for g in sp["games"] for h in g["hits"]]
+            if links != want:
+                bad.append("a self-play hit's link is not at its hit's lock, or a hit has no link")
+            scan = re.findall(r'data-selfplay-scan="">([^<]*)<', page)
+            if [html.unescape(x) for x in scan] != [self.sp_scan_words(sp)]:
+                bad.append("the self-play scan sentence is not the artefact's")
+            for g in sp["games"]:
+                r = island["rounds"].get(demo_slug(g["node"]))
+                if r is not None:
+                    shown = dict(g, seq=r["seq"], locks=r["players"][0]["locks"])
+                    bad += [f"embedded {x}" for x in self.selfplay_problems(shown, sp, tr)]
         if [html.unescape(x) for x in re.findall(r'data-own-node="([^"]+)"', page)] != own_ids:
             bad.append("the demo page does not draw every own board exactly once, in the artefact's order")
         if own:
@@ -994,6 +1138,15 @@ class TechniqueSite:
                        f"{os.path.basename(self.p.own_rel)} must declare report_eligible: false, constructed: true "
                        "and own: true")
             self._own = own
+        self._sp = None
+        if self.p.selfplay_rel:
+            with open(os.path.join(repo, self.p.selfplay_rel), encoding="utf-8") as fh:
+                sp = json.load(fh)
+            self._need(sp.get("schema") == self.p.selfplay_schema, f"unknown self-play schema {sp.get('schema')!r}")
+            self._need(sp.get("report_eligible") is False and sp.get("constructed") is True and sp.get("selfplay") is True,
+                       f"{os.path.basename(self.p.selfplay_rel)} must declare report_eligible: false, constructed: true "
+                       "and selfplay: true")
+            self._sp = sp
         self._need(self.figures(art) == self.recount(art),
                    "the facts artefact's aggregates disagree with its own hit list")
         pages = {self.OVERVIEW: self.render_overview(tr, art, demos), self.DEMO_PAGE: self.render_demo_page(tr, demos)}
@@ -1088,6 +1241,23 @@ class TechniqueSite:
             moved["rounds"][slug]["players"][0]["locks"][d0["stood_lock"]][1] += 1
             cases += [("demo: an own design's stood T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
                       ("demo: an own design dropped", "dp", RT._drop_line(dp, f'data-own-node="{d0["node"]}"'))]
+        sp = getattr(self, "_sp", None)
+        if sp and sp["games"]:
+            isl = RT._ISLAND.search(dp)
+            g0 = sp["games"][0]
+            h0 = g0["hits"][0]
+            slug = demo_slug(g0["node"])
+            moved = json.loads(isl.group(1))
+            moved["rounds"][slug]["players"][0]["locks"][h0["lock"]][1] += 1
+            link = f'href="#{slug}@p{h0["lock"]}"'
+            cases += [("demo: a self-play hit's embedded T moved", "dp", dp.replace(isl.group(1), RT._island(moved))),
+                      ("demo: a self-play hit's link one lock late", "dp",
+                       dp.replace(link, f'href="#{slug}@p{h0["lock"] + 1}"', 1)),
+                      ("demo: a self-play hit lock moved", "dp",
+                       dp.replace(f'data-selfplay-hit="{h0["lock"]}"', f'data-selfplay-hit="{h0["lock"] - 1}"', 1)),
+                      ("demo: a self-play game dropped", "dp", RT._drop_line(dp, f'data-selfplay-node="{g0["node"]}"')),
+                      ("demo: the self-play scan sentence changed", "dp",
+                       dp.replace('data-selfplay-scan="">', 'data-selfplay-scan="">1', 1))]
         ok = True
         for name, which, page in cases:
             if page == (ov if which == "ov" else dp):
@@ -1116,6 +1286,16 @@ class TechniqueSite:
             ok &= good
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} refused: {name}")
+        sp = getattr(self, "_sp", None)
+        if sp and sp["games"]:
+            # the window check itself: the first hit read in the other hand must not fire
+            g0 = json.loads(json.dumps(sp["games"][0]))
+            g0["hits"][0]["hand"] = "as_drawn" if g0["hits"][0]["hand"] == "mirrored" else "mirrored"
+            got = self.selfplay_problems(g0, sp, tr)
+            good = any("does not fire" in x for x in got)
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} refused: a self-play hit read in the other hand: {got[:1]}")
         print(f"{'ok ' if ok else 'FAIL'} {self.p.module} selftest: {len(cases) + refused} corruptions, "
               f"{'all caught' if ok else 'SOME MISSED'}")
         return 0 if ok else 1

@@ -4,6 +4,9 @@
 // Input: the JSONL `cc-coach` writes in COACH_MODE=selfplay (one game per line: seed, the dealt
 // `queue`, every placement as {piece, hold, cells [x, row-top-down], kind, tspin, lines}).
 //
+// The replay core is `pipeline/sim/cc-selfplay.ts` (shared with the committed artefact
+// `analysis/cutcopy-selfplay.json`); this script adds the pilot's tally and its near-miss diagnostic.
+//
 // THE ENGINE IS THE ARBITER. Each game is replayed through the repo's vendored Triangle engine (TETR.IO's
 // TL ruleset at g = 0, the demo planner's own `newEngine`), with the dealt queue spliced in exactly as
 // `route-demos.runDemo` does. For every placement the path is found by the planner's own `reach` (a BFS over
@@ -25,14 +28,10 @@
 //
 //   bun tools/cc-coach/cutcopy-selfplay.ts games.jsonl [out.json]
 import { readFileSync, writeFileSync } from 'node:fs';
-import { newEngine, reach, inputsOf } from '../../pipeline/sim/route-demos.ts';
-import { classify, loadTranscription, prepare, type TechDigest, type LockLite, type TSpinLock } from '../../pipeline/sim/technique-facts.ts';
+import { newEngine } from '../../pipeline/sim/route-demos.ts';
+import { classify, loadTranscription, prepare, type TechDigest } from '../../pipeline/sim/technique-facts.ts';
 import { CUTCOPY } from '../../pipeline/sim/technique-profile-cutcopy.ts';
-
-const H = 40, W = 10;
-// `newEngine` dates the engine from a routes file's fetch date; there is none here, so a fixed one.
-const ROUTES_LIKE = { source: { fetched: '2026-10-20' } };
-const SPIN_OF_CC: Record<string, string | null> = { Full: 'normal', Mini: 'mini', None: null };
+import { H, W, rowsOf, replayGame, digestOf } from '../../pipeline/sim/cc-selfplay.ts';
 
 const inFile = process.argv[2];
 if (!inFile) throw new Error('usage: bun cutcopy-selfplay.ts games.jsonl|--control [out.json]');
@@ -68,18 +67,6 @@ function controlGames(): any[] {
   });
 }
 
-const rowsOf = (st: any[][]): string[] => {
-  const out: string[] = [];
-  for (let r = 0; r < H; r++) {
-    const src = st[(H - 1) - r]; let s = '';
-    for (let x = 0; x < W; x++) { const t = src?.[x]; s += t == null ? '.' : t.mino === 'gb' ? 'G' : String(t.mino).toUpperCase(); }
-    out.push(s);
-  }
-  return out;
-};
-const gridOf = (st: any[][]) => Array.from({ length: H }, (_, y) =>
-  Array.from({ length: W }, (_, x) => { const t = st[y]?.[x]; return t == null ? null : String(t.mino); }));
-
 const games: any[] = inFile === '--control' ? controlGames()
   : readFileSync(inFile, 'utf8').split('\n').filter(l => l.trim()).map(l => JSON.parse(l));
 
@@ -89,84 +76,29 @@ const tally = { games: games.length, games_complete: 0, pieces_cc: 0, pieces_rep
   cc_kinds: {} as Record<string, number>, engine_full_tsd: 0 };
 const cut = (why: string, ex: string) => { tally.cut[why] = (tally.cut[why] ?? 0) + 1; if (tally.cut_examples.length < 20) tally.cut_examples.push(`${why}: ${ex}`); };
 const digests: TechDigest[] = [];
-const scratch = newEngine(ROUTES_LIKE);
 
 games.forEach((g, gi) => {
-  const seq: string = g.queue;
-  const steps: any[] = g.steps.filter((s: any) => !s.dead);
-  if (g.steps.some((s: any) => s.dead)) tally.cc_dead++;
-  tally.pieces_cc += steps.length;
-  const eng = newEngine(ROUTES_LIKE);
-  eng.queue.splice(0, eng.queue.length, ...[...seq.slice(1)].map(c => c.toLowerCase()));
-  eng.initiatePiece(seq[0]!.toLowerCase());
-  // NB: at 'falling.lock.pre' the engine has ALREADY locked and cleared (index.mjs emits it after the
-  // clear), so the board BEFORE the lock is taken before the step's inputs are played; only the piece's
-  // pre-clear cells are read at lock.pre (the falling piece still sits where it locked).
-  let pre: { board: string[]; cells: { row: number; col: number }[] } | null = null;
-  let boardBefore: string[] = [];
-  let lockRes: any = null;
-  eng.events.on('falling.lock.pre', () => {
-    pre = { board: boardBefore,
-            cells: eng.falling.absoluteBlocks.map(([x, y]: [number, number]) => ({ row: (H - 1) - y, col: x })) };
-  });
-  eng.events.on('falling.lock', (res: any) => { lockRes = res; });
-  let frame = 0;
-  const tickTo = (events: any[], until: number) => {
-    const by = new Map<number, any[]>();
-    for (const e of events) { if (!by.has(e.frame)) by.set(e.frame, []); by.get(e.frame)!.push(e); }
-    for (; frame <= until; frame++) eng.tick(by.get(frame) || []);
-  };
-  const locks: LockLite[] = [], tspins: TSpinLock[] = [];
-  let ok = true;
-  for (let j = 0; j < steps.length && ok; j++) {
-    const s = steps[j];
-    const where = `seed ${g.seed} lock ${j}`;
-    // which piece will be placed: after a hold, the held piece (or the next in the queue if none)
-    const cur = String(eng.falling.symbol).toUpperCase();
-    const placed = s.hold ? (eng.held != null ? String(eng.held).toUpperCase() : String(eng.queue[0]).toUpperCase()) : cur;
-    if (placed !== s.piece) { cut('piece_mismatch', `${where} cc ${s.piece} engine ${placed}`); ok = false; break; }
-    const target = (s.cells as [number, number][]).map(([x, r]) => ((H - 1) - r) * W + x);
-    const paths = reach(scratch, gridOf(eng.board.state), s.piece, target);
-    if (!paths.length) { cut('no_engine_path', `${where} ${s.piece} ${JSON.stringify(s.cells)}`); ok = false; break; }
-    const want = SPIN_OF_CC[s.tspin] ?? null;
-    const path = s.piece === 'T' ? (paths.find(p => p.spin === want) ?? paths[0]!) : paths[0]!;
-    const { inputs, frames } = inputsOf([{ hold: s.hold, edges: path.edges } as any]);
-    const base = frame;
-    pre = null; lockRes = null; boardBefore = rowsOf(eng.board.state);
-    tickTo(inputs.map(([f, type, k]) => ({ frame: base + f, type, data: { key: k, subframe: 0 } })), base + frames);
-    if (!lockRes || !pre) { cut('no_lock', where); ok = false; break; }
-    const p = pre as { board: string[]; cells: { row: number; col: number }[] };
-    const got = p.cells.map(q => ((H - 1) - q.row) * W + q.col).sort((a, b) => a - b).join(',');
-    if (got !== [...target].sort((a, b) => a - b).join(',')) { cut('cells_mismatch', where); ok = false; break; }
-    if (lockRes.lines !== s.lines) { cut('lines_mismatch', `${where} cc ${s.lines} engine ${lockRes.lines}`); ok = false; break; }
-    const espin = lockRes.spin === 'none' ? null : lockRes.spin === 'mini' ? 'mini' : 'normal';
-    if (s.piece === 'T' && espin !== want) {
-      tally.spin_credit_disagreed++;
-      if (tally.spin_examples.length < 20) tally.spin_examples.push(`${where} cc ${s.kind}/${s.tspin} engine ${lockRes.spin} lines ${lockRes.lines}`);
-    }
-    // the row map, checked against the engine's own board after the lock (no garbage in self-play)
-    const g2 = p.board.map(r => [...r].map(c => c !== '.'));
-    for (const q of p.cells) if (q.row >= 0 && q.row < H) g2[q.row]![q.col] = true;
-    const clearedRows: number[] = [];
-    for (let r = 0; r < H; r++) if (g2[r]!.every(Boolean)) clearedRows.push(r);
-    const kept = g2.filter((_, r) => !clearedRows.includes(r));
-    while (kept.length < H) kept.unshift(new Array(W).fill(false));
-    const after = rowsOf(eng.board.state);
-    const mapOk = kept.every((row, r) => row.every((x, c) => x === (after[r]![c] !== '.')));
-    const spin = lockRes.spin === 'none' ? 'none' : lockRes.spin === 'mini' ? 'mini' : 'full';
-    locks.push({ piece: s.piece, spin, cleared: lockRes.lines, cells: p.cells, clearedRows, garbage: 0, mapOk });
-    if (s.piece === 'T' && spin !== 'none' && lockRes.lines > 0) tspins.push({ i: j, board: p.board });
-    if (s.piece === 'T' && spin === 'full' && lockRes.lines === 2) tally.engine_full_tsd++;
-    tally.cc_kinds[s.kind] = (tally.cc_kinds[s.kind] ?? 0) + 1;
-    tally.pieces_replayed++;
+  const r = replayGame(g);
+  if (r.dead) tally.cc_dead++;
+  tally.pieces_cc += r.steps.length;
+  // a spin-credit disagreement is counted on a step that was replayed, before the next step can cut
+  for (const ex of r.spinDisagreements) {
+    tally.spin_credit_disagreed++;
+    if (tally.spin_examples.length < 20) tally.spin_examples.push(ex);
   }
-  if (ok) {
+  r.locks.forEach((lk, j) => {
+    if (lk.piece === 'T' && lk.spin === 'full' && lk.cleared === 2) tally.engine_full_tsd++;
+    const k = r.steps[j]!.kind;
+    tally.cc_kinds[k] = (tally.cc_kinds[k] ?? 0) + 1;
+    tally.pieces_replayed++;
+  });
+  if (r.cut) cut(r.cut.why, r.cut.where);
+  else {
     tally.games_complete++;
-    const fin = rowsOf(eng.board.state).map(r => r.replace(/[^.]/g, '#'));
+    const fin = r.finalRows!.map(x => x.replace(/[^.]/g, '#'));
     if (fin.join('') !== (g.final_field as string[]).join('')) tally.final_field_mismatch++;
   }
-  digests.push({ session: 'selfplay', file: `seed-${g.seed}`, round: 0, match: gi + 1, user: 'cold-clear',
-                 v: locks.length - 1, locks, tspins });
+  digests.push(digestOf(g, r, gi));
 });
 
 const tr = loadTranscription(CUTCOPY.transcriptionPath);

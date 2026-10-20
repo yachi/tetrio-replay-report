@@ -835,7 +835,9 @@ jobs:
       # records. A second variant, harddrop's second generic type (Uncut copy), has its own agreement window on
       # harddrop's drawings, its board an `external` node. The corpus artefact and the (all unbuilt) demos are
       # checked by pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job, and the boards
-      # of our own design (analysis/cutcopy-own.json, technique-own.ts's search) by cutcopy-own.test.ts there.
+      # of our own design (analysis/cutcopy-own.json, technique-own.ts's search) by cutcopy-own.test.ts there, and
+      # cold-clear's self-play Cut Copies (analysis/cutcopy-selfplay.json, replayed from their committed placements)
+      # by cutcopy-selfplay.test.ts there.
       - name: Check the Cut Copy technique transcription
         run: python3 -m pipeline.openers.extract_cutcopy_shapes
 

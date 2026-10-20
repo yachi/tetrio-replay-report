@@ -4483,6 +4483,22 @@ TypeScript port of cold-clear's rule, so it is not an independent implementation
 mid-height-tuck asymmetry, named in `CC_UNREACHED` with its reason (measured empty), never a bound. It skips without the binary and
 runs beside the cross tests in verify.yml's `oracle-image` job (the flake builds `cc-oracle` for aarch64 only).
 
+**cold-clear's own Cut Copies, played on the demo page after our design (since 2026-10-20): bot games, not corpus, not drawn,
+not ours.** The pilot in `tools/cc-coach/FINDINGS-cutcopy-selfplay.md` had cold-clear (the pinned rev, the cc-coach patch and
+harness, `COACH_MODE=selfplay`) play alone with no garbage; its replay core is now `pipeline/sim/cc-selfplay.ts` (the tools
+script imports it, and its output was checked identical to the pilot's). `emit-cutcopy-selfplay.ts --games <jsonl> --coach-seed
+<n>` scans every game through the engine and the corpus classifier unchanged (`cutcopy-selfplay.ts`), then commits, INSIDE
+`analysis/cutcopy-selfplay.json` (`report_eligible: false`, `constructed: true`, `selfplay: true`), each hit game's own
+placements up to the last lock deciding a hit's follow-up plus `tail` more, and the engine's timeline of them; the bot's whole
+JSONL is not committed (its md5 and the run's settings are in `provenance`). `cutcopy-selfplay.test.ts` rebuilds the artefact
+from the committed placements byte for byte (`--rebuild` does the same), pins the hits as a named list, decodes every timeline on
+its own (cold-clear's cells at every lock, the window in the hit's hand, both TSDs full and clearing two) and checks the md5s,
+the cold-clear harness files among them. What it cannot re-derive is the `scan` summary, which needs the JSONL: re-run the
+emitter. The page (`technique_page.py`'s opt-in `selfplay_rel`, default off) draws each game with each hit's board and a link
+to the position before its T, prints the scan sentence from the artefact, and re-checks every embedded game with
+`decode_boards` and `window_fires`; its selftest drops a game, moves a hit's T, moves a hit link and reads a hit in the other
+hand. These games say nothing about how often a person, or the bot under garbage, builds one.
+
 ### 社畜トレイン（Shachiku Train）
 
 The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
