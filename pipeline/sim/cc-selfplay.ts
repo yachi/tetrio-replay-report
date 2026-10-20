@@ -25,7 +25,8 @@ import { newEngine, reach, inputsOf } from './route-demos.ts';
 import { instrumentEngine, type Lock } from './emit-replay.ts';
 import type { LockLite, TSpinLock, TechDigest } from './technique-facts.ts';
 
-export const H = 40, W = 10;
+export const H = 40;
+export const W = 10;
 /** `newEngine` dates the engine from a routes file's fetch date; there is none here, so a fixed one (the
  *  pilot's). Changing it changes the engine's options date and therefore every timeline: it is hashed with
  *  this file. */
