@@ -7,7 +7,8 @@
  * Both builds the page draws are chains (the T-hole build and the third-column build, each on its own derived
  * terrain), and the planner's measured reason is what the artefact publishes when it cannot build one; the boards
  * with no page pieces (the basic form, its TSD, what it leaves and the second TSD) carry the profile's reason,
- * with the cell count `cutcopy-demos.test.ts` re-derives.
+ * with the cell count `cutcopy-demos.test.ts` re-derives. The second variant's two boards are harddrop's drawings
+ * (external nodes, occupancy only, no page pieces), so no chain is planned on them and the profile says why.
  */
 import type { TechniqueDemoProfile } from './technique-demo-profile.ts';
 
@@ -16,6 +17,7 @@ const OPENERS = `${SIM}/../openers`;
 const REPO = `${SIM}/../..`;
 
 const LIMIT = '要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）';
+const EXTERNAL = '係 harddrop 畫嘅第二種（Uncut copy），抄入嚟淨係得佔位、冇頁面方塊；呢個 planner 只砌原頁嘅 build 盤面，所以冇示範';
 
 export const CUTCOPY_DEMOS: TechniqueDemoProfile = {
   key: 'cutcopy',
@@ -36,6 +38,8 @@ export const CUTCOPY_DEMOS: TechniqueDemoProfile = {
     'basic.spin': '係基本形上面打嘅 TSD：基本形砌唔到，所以呢幅都冇示範',
     'basic.after': '係 basic.spin 之後嘅盤面（由 second.spin 推出嚟），同一個原因冇示範',
     'second.spin': '係 basic.after 上面打嘅第二下 TSD，同一個原因冇示範',
+    'uncut.spin': EXTERNAL,
+    'uncut.after': '係 uncut.spin 之後嘅盤面（harddrop 畫嘅），同一個原因冇示範',
   },
   artefact: {
     schema: 'technique-demos/1',

@@ -22,7 +22,19 @@
     "references": [
       "https://harddrop.com/wiki/Cut_copy (the page's own 参考ページ, read below as cross_source.harddrop)"
     ],
-    "unfetched": []
+    "unfetched": [],
+    "declined": [
+      {
+        "url": "https://howtotetris.com/11-cut-copy",
+        "checked": "2026-10-20",
+        "reason": "the site states 「All Rights Reserved. No part of this site or its content may be reproduced, distributed, or published without permission.」: checked, and none of its diagrams is transcribed, committed or published"
+      },
+      {
+        "url": "https://four.lol/",
+        "checked": "2026-10-20",
+        "reason": "the site reserves all rights (no reproduction without permission), and its methods index lists no Cut Copy page (/methods/cut-copy answers 404): checked, and nothing of it is used"
+      }
+    ]
   },
   "terms": {
     "url": "https://shiwehi.com/tetris/explanation/terms.php",
@@ -242,6 +254,47 @@
         "cccccc-ccc",
         "ccccccc-cc"
       ]
+    },
+    {
+      "id": "uncut.spin",
+      "kind": "spin",
+      "external": "harddrop",
+      "source_board": {
+        "table": 1,
+        "board": 3
+      },
+      "spin": "TSD",
+      "lines": 2,
+      "label": "harddrop's second generic type, 「Uncut copy」: the flat T into the upper slot, the whole second TSD slot saved under it",
+      "reading": "harddrop Cut_copy table 1 board 3 (Generic Structures) in occupancy only: every drawn cell c, C in the rows the TSD clears, its P the T",
+      "rows": [
+        "----------",
+        "cc--cccccc",
+        "CCTTTCCCCC",
+        "CCCTCCCCCC",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "uncut.after",
+      "kind": "after",
+      "after_of": "uncut.spin",
+      "external": "harddrop",
+      "source_board": {
+        "table": 1,
+        "board": 4
+      },
+      "label": "what the first TSD leaves: the second slot, roofed by the row that dropped onto it",
+      "reading": "harddrop Cut_copy table 1 board 4 in occupancy only",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cc--cccccc",
+        "c---cccccc",
+        "cc-ccccccc"
+      ]
     }
   ],
   "page_order": [
@@ -301,7 +354,7 @@
           9
         ]
       ],
-      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's three drawings of the shape and harddrop's six. Row 2 is the outer slot's arms row: its three cells empty, the wall beside them filled, and on the other side the roof over the T's right end and the cell beyond it filled; rows 3-4 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 5 the outer slot's nub cell, under the T's left arm, walled both sides. The outer slot's roof (the row above) is outside: harddrop's and the page's builds fill the cells the basic form leaves open there. Occupancy only, never colour; garbage is filled.",
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's three drawings of the shape, harddrop's six and Tetrisちゃんねる's two. Row 2 is the outer slot's arms row: its three cells empty, the wall beside them filled, and on the other side the roof over the T's right end and the cell beyond it filled; rows 3-4 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 5 the outer slot's nub cell, under the T's left arm, walled both sides. The outer slot's roof (the row above) is outside: harddrop's and the page's builds fill the cells the basic form leaves open there. Occupancy only, never colour; garbage is filled.",
       "untested_drawn": {
         "cells": [],
         "reason": ""
@@ -427,7 +480,9 @@
         "second.spin",
         "basic.after",
         "hole.terrain",
-        "col3.terrain"
+        "col3.terrain",
+        "uncut.spin",
+        "uncut.after"
       ],
       "not_expressed": [
         {
@@ -443,12 +498,125 @@
           "reason": "the page lets the T-hole build's Z go in after the first T-spin. One of its cells (`decides`) is the outer slot's wall beside its arms row, which every drawing fills; the window reads none of its other three, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that order is no hit"
         }
       ]
+    },
+    {
+      "id": "uncut",
+      "board": "uncut.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          5
+        ],
+        "cols": [
+          0,
+          5
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      "window_note": "in uncut.spin's frame (harddrop's Generic Structures drawing), row 0 the top: the AGREEMENT BOX of harddrop's eight drawings of the second type. Row 1 is the row above the T: open over its left arm and middle, filled over its right arm (the overhang) and beyond it, and filled two cells to the left; rows 2-3 the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); rows 4-5 the second slot, whole, one column toward the open side: its arms row walled both sides, its nub walled both sides. Occupancy only, never colour; garbage is filled.",
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "agreement": [],
+      "followup": {
+        "board": "uncut.after",
+        "spin": "TSD",
+        "lines": 2,
+        "t_cells_pre_clear": [
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "t_cells_after": [
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "note": "the flat T, pointing down, into the second slot under the cleared rows. The first TSD does not split it (it is under both cleared rows), and the row above the T drops onto it as its roof."
+      },
+      "fires_on": [],
+      "misses": [
+        "basic",
+        "basic.spin",
+        "second.spin",
+        "hole.osz",
+        "col3.jz",
+        "basic.after",
+        "hole.terrain",
+        "col3.terrain",
+        "uncut.after"
+      ]
     }
   ],
   "cross_source": {
     "kind": "routes",
     "label_pattern": "cut copy",
-    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none (no route page draws a Cut Copy). The independent drawer is harddrop instead: its Cut_copy page (`harddrop`, the page this page cites) and the Cut Copy its BT_Cannon page draws (`bt_cannon`). Their drawings are the window's external `agreement` drawings: rule (g) fires the window on each, once, at its drawn T, in its recorded hand.",
+    "note": "the windows, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: they fire on none (no route page draws a Cut Copy). The independent drawers are harddrop and Tetrisちゃんねる instead: harddrop's Cut_copy page (`harddrop`, the page this page cites; both variants), the Cut Copy its BT_Cannon page draws (`bt_cannon`), and two of Tetrisちゃんねる's images (`tetrisch`). Their drawings are the windows' external `agreement` drawings: rule (g) fires each variant's window on each of its drawings, once, at its drawn T, in its recorded hand.",
     "routes_fire_none": "no committed routes file draws a Cut Copy (measured: the window fires on none of their U-slot boards, and no node is labelled 千鳥格子 or Cut Copy); the cross-check is harddrop's own pages, read below",
     "harddrop": {
       "page": "https://harddrop.com/wiki/Cut_copy",
@@ -471,6 +639,7 @@
       },
       "drawings": [
         {
+          "variant": "cutcopy",
           "table": 0,
           "board": 3,
           "section": "Generic Structures",
@@ -504,6 +673,111 @@
           ]
         },
         {
+          "variant": "uncut",
+          "table": 1,
+          "board": 3,
+          "section": "Generic Structures",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "gg--zzgggg",
+            "ggUUUzzggg",
+            "lllUoogggg",
+            "l---oogggg",
+            "gg-ggggggg"
+          ],
+          "note": "the page's second type, 「Uncut copy」: the whole second T-Spin Double saved underneath (the external node uncut.spin is this board)"
+        },
+        {
+          "variant": "uncut",
+          "table": 2,
+          "board": 3,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "oo--s-----",
+            "oo--ssgggg",
+            "zzUUUsgggg",
+            "gzzUjggggg",
+            "g---jggggg",
+            "gg-jjggggg"
+          ],
+          "note": "「Cut copy could be made using pieces other than the generic structure」 (fumen #3, S/Z/J): the second type's full slot under the T"
+        },
+        {
+          "variant": "uncut",
+          "table": 3,
+          "board": 0,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "oo--s-----",
+            "oo--ssgggg",
+            "zzUUUsgggg",
+            "gzzUjggggg",
+            "g---jggggg",
+            "gg-jjggggg"
+          ],
+          "note": "the same variation again, beside STMB Cave for comparison"
+        },
+        {
+          "variant": "cutcopy",
           "table": 4,
           "board": 3,
           "section": "Variations, Other Uses and Comparisons",
@@ -537,6 +811,7 @@
           ]
         },
         {
+          "variant": "cutcopy",
           "table": 5,
           "board": 1,
           "section": "Variations, Other Uses and Comparisons",
@@ -570,6 +845,120 @@
           ]
         },
         {
+          "variant": "uncut",
+          "table": 7,
+          "board": 1,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "------z---",
+            "-oo--zz---",
+            "joo--zl---",
+            "jjjUUUlggg",
+            "iiiiUllggg",
+            "gg---ssggg",
+            "ggg-ssgggg",
+            "ggg---gggg",
+            "gggg-ggggg"
+          ],
+          "note": "「Repeating the second type of Cut copy」: the first T, over the second type's full slot"
+        },
+        {
+          "variant": "uncut",
+          "table": 7,
+          "board": 2,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              6,
+              2
+            ],
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              7,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "------z---",
+            "-oo--zz---",
+            "joo--zl---",
+            "ggUUUssggg",
+            "gggUssgggg",
+            "ggg---gggg",
+            "gggg-ggggg"
+          ],
+          "note": "the same repeat, its second T over the next full slot: the first T's follow-up is itself a second-type Cut Copy, mirrored"
+        },
+        {
+          "variant": "uncut",
+          "table": 8,
+          "board": 1,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "ggoo---zgg",
+            "ggoo--zzgg",
+            "ggsUUUzlgg",
+            "ggssUlllgg",
+            "ggjsUUUzgg",
+            "ggjjjUzzgg",
+            "gggUUUzlgg",
+            "ggggUlllgg"
+          ],
+          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once); its first T"
+        },
+        {
+          "variant": "cutcopy",
           "table": 9,
           "board": 1,
           "section": "Variations, Other Uses and Comparisons",
@@ -605,6 +994,44 @@
           ]
         },
         {
+          "variant": "uncut",
+          "table": 9,
+          "board": 2,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": true,
+          "slot": [
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              6,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "--z-------",
+            "-zz--lllgg",
+            "jzUUUloogg",
+            "gggUssgggg",
+            "ggg---gggg",
+            "gggg-ggggg"
+          ],
+          "note": "「mix both types of Cut copy to make three consecutive T-Spin Doubles」: the second T, over the second type's full slot (the first T, board 1, is a first-type drawing)"
+        },
+        {
+          "variant": "cutcopy",
           "table": 11,
           "board": 2,
           "section": "Variations, Other Uses and Comparisons",
@@ -639,116 +1066,47 @@
             "gggggUgggg",
             "gggggg-ggg"
           ]
+        },
+        {
+          "variant": "uncut",
+          "table": 12,
+          "board": 2,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "i-ss------",
+            "iss----ggg",
+            "ioo-jjjggg",
+            "ioo--gjggg",
+            "ggg--ggggg",
+            "gggUUUgggg",
+            "ggggUggggg",
+            "gg---ggggg",
+            "ggg-gggggg"
+          ],
+          "note": "「make a Cut copy underneath an STSD」, its second drawing: the T over the second type's full slot"
         }
       ],
       "drawn_t_not_fired": [
-        {
-          "table": 1,
-          "board": 3,
-          "section": "Generic Structures",
-          "slot": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "the page's second type, 「Uncut copy」: the whole second T-Spin Double saved underneath, so a full TSD slot lies under the T rather than the first type's half",
-          "rows": [
-            "----------",
-            "gg--zzgggg",
-            "ggUUUzzggg",
-            "lllUoogggg",
-            "l---oogggg",
-            "gg-ggggggg"
-          ]
-        },
-        {
-          "table": 2,
-          "board": 3,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "「Cut copy could be made using pieces other than the generic structure」: the second type's full slot under the T",
-          "rows": [
-            "----------",
-            "oo--s-----",
-            "oo--ssgggg",
-            "zzUUUsgggg",
-            "gzzUjggggg",
-            "g---jggggg",
-            "gg-jjggggg"
-          ]
-        },
-        {
-          "table": 3,
-          "board": 0,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "the same variation again, beside STMB Cave for comparison",
-          "rows": [
-            "----------",
-            "oo--s-----",
-            "oo--ssgggg",
-            "zzUUUsgggg",
-            "gzzUjggggg",
-            "g---jggggg",
-            "gg-jjggggg"
-          ]
-        },
         {
           "table": 3,
           "board": 1,
@@ -774,7 +1132,7 @@
           "t": "flat-down",
           "lines": 2,
           "window": "disagrees",
-          "note": "STMB Cave, drawn beside the variation for comparison (「Compare the variation of Cut copy above with STMB Cave」)",
+          "note": "STMB Cave, drawn beside the variation for comparison (「Compare the variation of Cut copy above with STMB Cave」): its cave is two rows deep, where the second type walls its nub",
           "rows": [
             "----------",
             "----s-----",
@@ -810,7 +1168,7 @@
           "t": "stood",
           "lines": 1,
           "window": "not the window's T",
-          "note": "a stood T into one row, on the L-built board drawn after the Parapet comparison",
+          "note": "a stood T into one row, on the L-built board drawn after the Parapet comparison: a TSS, where both windows' T is flat. Measured, 欄干's TSS window fires at exactly this T, as drawn (`other_window`): it is a Parapet TSS drawn on the Cut copy page, not a Cut Copy",
           "rows": [
             "----------",
             "-jj-------",
@@ -820,123 +1178,12 @@
             "ggllUggggg",
             "ggg-gggggg",
             "ggg-gggggg"
-          ]
-        },
-        {
-          "table": 7,
-          "board": 1,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
           ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "「Repeating the second type of Cut copy」: the first T, over the second type's full slot",
-          "rows": [
-            "----------",
-            "------z---",
-            "-oo--zz---",
-            "joo--zl---",
-            "jjjUUUlggg",
-            "iiiiUllggg",
-            "gg---ssggg",
-            "ggg-ssgggg",
-            "ggg---gggg",
-            "gggg-ggggg"
-          ]
-        },
-        {
-          "table": 7,
-          "board": 2,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              6,
-              2
-            ],
-            [
-              6,
-              3
-            ],
-            [
-              6,
-              4
-            ],
-            [
-              7,
-              3
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "the same repeat, its second T over the next full slot",
-          "rows": [
-            "----------",
-            "----------",
-            "----------",
-            "------z---",
-            "-oo--zz---",
-            "joo--zl---",
-            "ggUUUssggg",
-            "gggUssgggg",
-            "ggg---gggg",
-            "gggg-ggggg"
-          ]
-        },
-        {
-          "table": 8,
-          "board": 1,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once)",
-          "rows": [
-            "----------",
-            "ggoo---zgg",
-            "ggoo--zzgg",
-            "ggsUUUzlgg",
-            "ggssUlllgg",
-            "ggjsUUUzgg",
-            "ggjjjUzzgg",
-            "gggUUUzlgg",
-            "ggggUlllgg"
-          ]
+          "other_window": {
+            "file": "parapet-technique.json",
+            "variant": "parapet_tss",
+            "mirrored": false
+          }
         },
         {
           "table": 8,
@@ -963,7 +1210,7 @@
           "t": "flat-down",
           "lines": 2,
           "window": "disagrees",
-          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once)",
+          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once); its second T",
           "rows": [
             "----------",
             "ggoo---zgg",
@@ -1001,7 +1248,7 @@
           "t": "flat-down",
           "lines": 2,
           "window": "leaves the board",
-          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once)",
+          "note": "yakine's repeating pattern of the second type: three T's drawn on one board, read with all three slots empty (a board that never stands at once); its third T",
           "rows": [
             "----------",
             "ggoo---zgg",
@@ -1012,44 +1259,6 @@
             "ggjjjUzzgg",
             "gggUUUzlgg",
             "ggggUlllgg"
-          ]
-        },
-        {
-          "table": 9,
-          "board": 2,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              5,
-              2
-            ],
-            [
-              5,
-              3
-            ],
-            [
-              5,
-              4
-            ],
-            [
-              6,
-              3
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "「mix both types of Cut copy to make three consecutive T-Spin Doubles」: the second T, over the second type's full slot (the first T, board 1, is a first-type Cut Copy and is a drawing)",
-          "rows": [
-            "----------",
-            "----------",
-            "----------",
-            "--z-------",
-            "-zz--lllgg",
-            "jzUUUloogg",
-            "gggUssgggg",
-            "ggg---gggg",
-            "gggg-ggggg"
           ]
         },
         {
@@ -1195,49 +1404,30 @@
             "-sl---gggi",
             "-ggg-ggggg"
           ]
-        },
+        }
+      ],
+      "after_drawn": [
         {
-          "table": 12,
-          "board": 2,
-          "section": "Variations, Other Uses and Comparisons",
-          "slot": [
-            [
-              6,
-              3
-            ],
-            [
-              6,
-              4
-            ],
-            [
-              6,
-              5
-            ],
-            [
-              7,
-              4
-            ]
-          ],
-          "t": "flat-down",
-          "lines": 2,
-          "window": "disagrees",
-          "note": "「make a Cut copy underneath an STSD」, its second drawing: the T over the second type's full slot",
+          "variant": "uncut",
+          "table": 1,
+          "board": 4,
+          "section": "Generic Structures",
+          "mirrored": false,
+          "slot": [],
           "rows": [
             "----------",
-            "i-ss------",
-            "iss----ggg",
-            "ioo-jjjggg",
-            "ioo--gjggg",
-            "ggg--ggggg",
-            "gggUUUgggg",
-            "ggggUggggg",
-            "gg---ggggg",
-            "ggg-gggggg"
-          ]
+            "----------",
+            "----------",
+            "gg--zzgggg",
+            "l---oogggg",
+            "gg-ggggggg"
+          ],
+          "note": "what the second type's first TSD leaves: the second slot, roofed by the row that dropped onto it"
         }
       ],
       "fires_without_slot": [
         {
+          "variant": "cutcopy",
           "table": 0,
           "board": 2,
           "section": "Generic Structures",
@@ -1271,6 +1461,74 @@
           ]
         },
         {
+          "variant": "uncut",
+          "table": 1,
+          "board": 2,
+          "section": "Generic Structures",
+          "mirrored": false,
+          "slot": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "gg--zzgggg",
+            "gg---zzggg",
+            "lll-oogggg",
+            "l---oogggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "variant": "uncut",
+          "table": 2,
+          "board": 2,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "rows": [
+            "----------",
+            "oo--s-----",
+            "oo--ssgggg",
+            "zz---sgggg",
+            "gzz-jggggg",
+            "g---jggggg",
+            "gg-jjggggg"
+          ]
+        },
+        {
+          "variant": "cutcopy",
           "table": 11,
           "board": 1,
           "section": "Variations, Other Uses and Comparisons",
@@ -1305,8 +1563,269 @@
             "ggggg-ssgg",
             "gggggg-ggg"
           ]
+        },
+        {
+          "variant": "uncut",
+          "table": 12,
+          "board": 1,
+          "section": "Variations, Other Uses and Comparisons",
+          "mirrored": false,
+          "slot": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "rows": [
+            "----------",
+            "-------ggg",
+            "-------ggg",
+            "-----s-ggg",
+            "goo--ssggg",
+            "goo---sggg",
+            "glll-ggggg",
+            "gl---ggggg",
+            "ggg-gggggg"
+          ]
         }
       ]
+    },
+    "tetrisch": {
+      "page": "https://tetrisch.github.io/main/ts/cutcopy.html",
+      "title": "千鳥格子 Cut Copy",
+      "fetched": "2026-10-20",
+      "fetch_method": "curl through the session proxy, TLS verification ON (the page and its ten images, ../img/t-spin/cutcopy_0NN.jpg, byte for byte; fetched twice that day, the bytes identical)",
+      "snapshot_file": "tetrisch_cutcopy.html",
+      "snapshot_sha256": "827947f214bb85485feacd474d3f440b0fad59647eabf644afb4d6ae7f8eec14",
+      "snapshot_bytes": 5656,
+      "terms": "not stated on the page; credited by link",
+      "author_note": "Tetrisちゃんねる: another site and another author than shiwehi.com and harddrop",
+      "quotes": [
+        "千鳥格子はTSDを2回連続で行う技です．",
+        "千鳥格子はTSDをTSDで挟んだような地形です．",
+        "挟む量をふやすことも可能です．",
+        "その際はTミノを入れるための2列を確保することを意識してください．",
+        "下穴が1マス横にずれている場合に可能です．",
+        "江戸城の場合は交互にずれている場合，トリル下穴の場合に可能です．",
+        "綺麗な地形が残るのでスムーズに他の技へ移行できるでしょう．"
+      ],
+      "images_dir": "spec/fixtures/tetrisch-cutcopy",
+      "reading": {
+        ".": "empty",
+        "#": "grey, filled",
+        "other": "a letter its piece, filled (the jp-forecast sampler's reading, pipeline.sim.extract_jp_forecast.extract_one); in 008 and 009 the colours mark which TSD a row belongs to, not pieces"
+      },
+      "images": [
+        {
+          "file": "cutcopy_001.jpg",
+          "sha256": "4680ef5d4f0712e1bbb738cc37334ffa14f39fc8da60e567f074db5bbd2fb206",
+          "bytes": 33387,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "##...#####",
+            "###...####",
+            "####.#####",
+            "###.######"
+          ]
+        },
+        {
+          "file": "cutcopy_002.jpg",
+          "sha256": "addbc3b6a1010059bbf0b17a2649cddfd3b84318a8b15e44c715172b76da35d2",
+          "bytes": 34226,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "##..T#####",
+            "###TT.####",
+            "####T#####",
+            "###.######"
+          ]
+        },
+        {
+          "file": "cutcopy_003.jpg",
+          "sha256": "a29c32639ba1aa2bb0de0944fd4dc6f0cfc9f2006d0cfb7fa43797488bc03348",
+          "bytes": 34473,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "##...#####",
+            "###TTT####",
+            "####T#####",
+            "###.######"
+          ]
+        },
+        {
+          "file": "cutcopy_004.jpg",
+          "sha256": "3b807900ad66c6e5fe5bc915ed8f7b86dc2b26fc6a81feeb9e0bc308ca365fad",
+          "bytes": 32923,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "##...#####",
+            "###.######"
+          ]
+        },
+        {
+          "file": "cutcopy_005.jpg",
+          "sha256": "01d0bf6a542d5a67ba4ed1a0c616b8f855f87d596f62d68e390654d0633acc7f",
+          "bytes": 34475,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "###T.#####",
+            "##.TT#####",
+            "###T######"
+          ]
+        },
+        {
+          "file": "cutcopy_006.jpg",
+          "sha256": "0bc66823cefa1c71e2009191c0852423e641f6846603693bfd93d010b55151cc",
+          "bytes": 33648,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "##TTT#####",
+            "###T######"
+          ]
+        },
+        {
+          "file": "cutcopy_007.jpg",
+          "sha256": "6055697bfa32ffdc577ab1d6d1c2fe92000381e3a7c782c8122b80afb162b1ab",
+          "bytes": 31714,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "###..#####"
+          ]
+        },
+        {
+          "file": "cutcopy_008.jpg",
+          "sha256": "0c3d275a11d77723564372b687166d394764abfd2a3d5271a4eb7c49a1e799e9",
+          "bytes": 39871,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "###..#####",
+            "JJ...JJJJJ",
+            "ZZZ...ZZZZ",
+            "ZZZZ.ZZZZZ",
+            "JJJ.JJJJJJ"
+          ]
+        },
+        {
+          "file": "cutcopy_009.jpg",
+          "sha256": "c85fce697c823375318080e11cdd66e0c55ed975279cdd53dd7007405ef8dda3",
+          "bytes": 42628,
+          "rows": [
+            "..........",
+            "..........",
+            "SSS...SSSS",
+            "JJ...JJJJJ",
+            "ZZZ...ZZZZ",
+            "ZZZZ.ZZZZZ",
+            "JJJ.JJJJJJ",
+            "SSSS.SSSSS"
+          ]
+        },
+        {
+          "file": "cutcopy_010.jpg",
+          "sha256": "8dd611dcb209594de027172dac3148a4778901e49d9cdfacbce5c098a1c9e89c",
+          "bytes": 50381,
+          "annotation": "the two columns the T needs kept open, drawn as a translucent grey band over 009's board (「Tミノを入れるための2列を確保」): the sampler refuses it, a translucent cell being no piece colour"
+        }
+      ],
+      "basic": {
+        "terrain": "001",
+        "upright": "002",
+        "spin": "003",
+        "after": "004",
+        "second_upright": "005",
+        "second_spin": "006",
+        "second_after": "007"
+      },
+      "coloured": {
+        "image": "008",
+        "same_occupancy_as": "001"
+      },
+      "edo": {
+        "image": "009",
+        "tsds": 3,
+        "reading": "three TSDs nested, each row coloured by its TSD; measured below as two Cut Copies in a row"
+      },
+      "slots": {
+        "001": [
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "009": [
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            4
+          ]
+        ]
+      }
     },
     "bt_cannon": {
       "file": "btcannon-technique.json",
@@ -1318,7 +1837,59 @@
     },
     "fires": [],
     "also": [],
-    "labelled_not_fired": []
+    "labelled_not_fired": [],
+    "also_technique": [
+      {
+        "file": "stmbcave-technique.json",
+        "node": "feature.pre",
+        "variant": "uncut",
+        "mirrored": true,
+        "cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "note": "the STMB Cave page's 「TSDの地形でSTMB caveを行うと連続してTSDを狙うことができます」: an STMB Cave over a TSD terrain is, on that board, harddrop's second type (「could be easily mistaken with STMB Cave」). Same author: a relation, recorded, not fitted"
+      },
+      {
+        "file": "stmbcave-technique.json",
+        "node": "feature.spin",
+        "variant": "uncut",
+        "mirrored": true,
+        "cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "note": "the same board with its T in (read with the T taken out)"
+      }
+    ]
   },
   "known_discrepancies": []
 }

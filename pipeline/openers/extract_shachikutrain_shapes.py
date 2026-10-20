@@ -96,6 +96,8 @@ from pipeline.openers.route_transcription import EMPTY, WIDTH, after_spin, botto
 from pipeline.openers.technique_transcription import node
 
 HERE = Path(__file__).resolve().parent
+#: where `_other` and the `other_windows` loop read the other technique transcriptions; the selftest repoints it
+OTHERS_DIR = HERE
 OUT = HERE / 'shachikutrain-technique.json'
 #: where the `cross:` rule reads the other technique transcriptions; the selftest points it at a planted one
 TECHNIQUE_DIR = HERE
@@ -723,8 +725,9 @@ def _less(rows: list[str], letters: str) -> list[str]:
 
 
 def _other(fname: str) -> tuple[dict, dict, TT.TechniqueSpec]:
-    """Another committed technique transcription, its first variant, and a spec its window can be evaluated with."""
-    other = json.loads((HERE / fname).read_text())
+    """Another committed technique transcription, its first variant, and a spec its window can be evaluated with
+    (the `other_windows` loop reads every variant of it, not this first one alone)."""
+    other = json.loads((OTHERS_DIR / fname).read_text())
     ospec = TT.TechniqueSpec(out=HERE / fname, build=lambda: other, alphabet=frozenset(),
                              empty_letters=other.get('empty_letters', ''), max_rows=99)
     return other, other['variants'][0], ospec
@@ -920,15 +923,19 @@ def extra_checks(data: dict):
     # every other committed technique window over every board of the page: where it fires, complete both ways
     got = []
     every = hd.get('drawings', []) + hd.get('drawn_t_not_fired', [])
-    for f in sorted(HERE.glob('*-technique.json')):
+    for f in sorted(OTHERS_DIR.glob('*-technique.json')):
         if f.name == OUT.name:
             continue
-        other, ov, ospec = _other(f.name)
-        for d in every:
-            hands = [m for m in (False, True)
-                     if TT.window_fires(other, ov, ospec, _pre(d['rows']), {tuple(x) for x in d['slot']}, m)]
-            if hands:
-                got.append({'table': d['table'], 'board': d['board'], 'file': f.name, 'mirrored': hands})
+        other, _, ospec = _other(f.name)
+        # EVERY variant of the other file, not only its first (千鳥格子 and 欄干 carry two); an entry names its
+        # variant only when it is not the file's first, so the records written before this loop read them all stay
+        for i, ov in enumerate(other['variants']):
+            for d in every:
+                hands = [m for m in (False, True)
+                         if TT.window_fires(other, ov, ospec, _pre(d['rows']), {tuple(x) for x in d['slot']}, m)]
+                if hands:
+                    got.append({'table': d['table'], 'board': d['board'], 'file': f.name, 'mirrored': hands,
+                                **({'variant': ov['id']} if i else {})})
     if sorted(got, key=str) != sorted(hd.get('other_windows', []), key=str):
         bad.append(f'harddrop: the other technique windows fire on {got}, other_windows records {hd.get("other_windows")}')
     for d in hd.get('fires_without_slot', []):
@@ -1181,6 +1188,29 @@ def _cross_plant_problems(planted: bool) -> list[str]:
     return [x for x in bad if x.startswith('cross:')]
 
 
+def _second_variant_problems(planted: bool) -> list[str]:
+    """The `other_windows` loop run with OTHERS_DIR pointed at a copy of every committed transcription plus one
+    planted file whose FIRST variant can fire nowhere (no spin cells) and whose SECOND is this page's own window:
+    planted, the loop must find the second variant firing on the harddrop drawings, which other_windows does not
+    record; not planted (the file holding the first variant alone), a control that must stay quiet."""
+    global OTHERS_DIR
+    base = build()
+    v = base['variants'][0]
+    never = {**copy.deepcopy(v), 'id': 'never', 't_cells': []}
+    fake = {**copy.deepcopy(base), 'variants': [never] + ([copy.deepcopy(v)] if planted else [])}
+    saved = OTHERS_DIR
+    with tempfile.TemporaryDirectory() as td:
+        for f in HERE.glob('*-technique.json'):
+            (Path(td) / f.name).write_bytes(f.read_bytes())
+        (Path(td) / 'planted-technique.json').write_text(json.dumps(fake))
+        OTHERS_DIR = Path(td)
+        try:
+            bad, _measured = extra_checks(base)
+        finally:
+            OTHERS_DIR = saved
+    return [x for x in bad if 'other technique windows' in x]
+
+
 def selftest() -> int:
     rc = TT.run_selftest(SPEC, MUTANTS, {'board': ('cccccUUUll', 'cccccUUUlc'), 'text': ('4x2の窪み', '4x2の凹み')},
                          SPEC_MUTANTS)
@@ -1243,6 +1273,14 @@ def selftest() -> int:
             ok = False
         else:
             print(f'  {"killed" if planted else "control quiet"}: {label}  [cross:]')
+    for planted, label in ((True, 'another transcription\'s SECOND variant firing on the page, unrecorded'),
+                           (False, 'control: the same file with its first variant alone')):
+        got = _second_variant_problems(planted)
+        if bool(got) != planted or (planted and "'variant': 'shachikutrain'" not in got[0]):
+            print(f'selftest FAILED: {label}: other_windows reported {got[:1]}')
+            ok = False
+        else:
+            print(f'  {"killed" if planted else "control quiet"}: {label}  [harddrop:]')
     print('selftest: harddrop checks all caught' if ok else 'selftest: FAILED')
     return 0 if ok else 1
 

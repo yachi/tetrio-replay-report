@@ -14,8 +14,12 @@ moves because a technique exists.
 Inputs, all committed: the technique's transcription (`pipeline/openers/<x>-technique.json`, gated by
 `technique_transcription.py`), its corpus artefact (`technique-facts.ts`) and its demo artefact
 (`technique-demos.ts`). Pure Python, so `bin/build-docs` renders it in the `docs` job, which has no
-bun. The overview embeds no replay: each case links to its night's `<date>-replay.html#m<pos>r<round>`,
-an anchor that page already reads.
+bun. The overview embeds no replay: each case links to its night's `<date>-replay.html#m<pos>r<round>@p<n>`,
+an anchor that page already reads, where `<n>` is the round's MERGED lock position (both players' locks in
+the replay page's frame order, `replay_section.round_payload`'s `order`) just before the hit's T: the page
+opens on the board the T went into, and stepping once plays the T. The audit re-reads every link from the
+other side — the lock the position's next step plays is decoded with `replay_section.decode_boards` and must
+be the hit player's T, at the hit's lock index, with a full spin clearing the variant's lines.
 
 QUARANTINE. Simulator output, the replay pages' tier: no claim ids, no ✓, no `data-claim`, and both
 artefacts must say `report_eligible: false` (the demos `constructed: true` as well). The audit reuses
@@ -55,6 +59,8 @@ DATA_ID, TEMPLATE_ID = RT.DATA_ID, RT.TEMPLATE_ID
 _FIGURE = re.compile(r'data-figure="([^"]+)">([^<]*)<')
 _BOARD = re.compile(r'data-board="([^"]+)"')
 _CASE = re.compile(r'data-case="([^"]+)"')
+_CASE_LINK = re.compile(r'<tr data-case="([^"]+)">.*?<a href="([^"]+)">')
+_REPLAY_HREF = re.compile(r'^(\d{4}-\d{2}-\d{2})-replay\.html#(m\d+r\d+)@p(\d+)$')
 _DEMO_BLOCK = re.compile(r'data-demo-node="([^"]+)" data-demo="(built|unbuilt)"')
 _REACH = re.compile(r'data-reach="([^"]+)"')
 _SRC_QUOTE = re.compile(r'<q class="scp-src">.*?</q>', re.S)
@@ -238,6 +244,81 @@ class TechniqueSite:
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
         return out
 
+    # ------------------------------------------------------------ replay positions
+
+    def _replay_round(self, session, file, round_index0):
+        """One round of a night's replay page, read the way that page reads it: its label, its merged lock
+        order, its players in slot order, and per player each lock's (piece, lines, spin). Cached."""
+        rounds = self.__dict__.setdefault("_rounds", {})
+        sessions = self.__dict__.setdefault("_sessions", {})
+        key = (session, file, round_index0)
+        if key in rounds:
+            return rounds[key]
+        if session not in sessions:
+            data, facts = RP.load(os.path.join(self._repo, "sessions", session))
+            self._need(data is not None, f"{session} has no replay facts, so a hit cannot be linked to its moment")
+            RS.check_artefact(data)
+            sessions[session] = (data, facts)
+        data, facts = sessions[session]
+        at = [(mi, ri) for mi, m in enumerate(facts["matches"]) if m["file"] == file
+              for ri, fr in enumerate(m["rounds"]) if fr["index"] == round_index0]
+        self._need(len(at) == 1, f"{session} {file} round {round_index0}: {len(at)} rounds in facts.json")
+        pl = RS.round_payload(data, facts, *at[0])
+        locks = {}
+        for p in pl["players"]:
+            dec = RS.decode_boards(data, pl["seq"], p["locks"], RS.NEXT_SHOWN)
+            locks[p["user"]] = [(piece, len(full), lk[3]) for lk, (piece, full, _b) in zip(p["locks"], dec)]
+        rounds[key] = {"label": pl["label"], "order": pl["order"],
+                       "users": [p["user"] for p in pl["players"]], "locks": locks}
+        return rounds[key]
+
+    def replay_href(self, h):
+        """The hit's link: its night's replay page, its round, at the merged position just BEFORE its T lock
+        (the replay page's `@p<n>`: n locks of both players placed, so the hit player's next lock is the T)."""
+        r = self._replay_round(h["session"], h["file"], h["round_index0"])
+        self._need(r["label"] == f"m{h['match']}r{h['round']}",
+                   f"{case_key(h)}: the replay page labels this round {r['label']}")
+        self._need(h["player"] in r["users"], f"{case_key(h)}: {h['player']} is not in the replay round")
+        slot = str(r["users"].index(h["player"]))
+        mine = [n for n, s in enumerate(r["order"]) if s == slot]
+        self._need(0 <= h["lock"] < len(mine), f"{case_key(h)}: lock {h['lock']} is past the round's locks")
+        return f'{h["session"]}-replay.html#{r["label"]}@p{mine[h["lock"]]}'
+
+    def audit_replay_links(self, page, tr, art):
+        """Every case row's link, read back from the replay side: the position's next step must be the hit
+        player's lock at the hit's lock index, and that lock (decoded from an empty board) a T with a full
+        spin clearing the variant's lines."""
+        bad = []
+        hits = {case_key(h): h for h in art["hits"]}
+        lines = {v["id"]: v["lines"] for v in tr["variants"]}
+        for ck, href in _CASE_LINK.findall(page):
+            ck, href = html.unescape(ck), html.unescape(href)
+            h = hits.get(ck)
+            m = _REPLAY_HREF.match(href)
+            if h is None or not m:
+                bad.append(f"{ck}: the case link {href!r} is not a replay link at a position")
+                continue
+            if m.group(1) != h["session"] or m.group(2) != f"m{h['match']}r{h['round']}":
+                bad.append(f"{ck}: the case link {href!r} names another night or round")
+                continue
+            r = self._replay_round(h["session"], h["file"], h["round_index0"])
+            n = int(m.group(3))
+            if n >= len(r["order"]):
+                bad.append(f"{ck}: position {n} is past the round's {len(r['order'])} locks")
+                continue
+            slot = r["order"][n]
+            k = r["order"][:n].count(slot)
+            user = r["users"][int(slot)]
+            piece, cleared, spin = r["locks"][user][k]
+            if user != h["player"] or k != h["lock"]:
+                bad.append(f"{ck}: position {n} steps into {user}'s lock {k}, not the hit's T")
+            elif piece != "T" or spin != 2 or cleared != lines[h["variant"]]:
+                bad.append(f"{ck}: position {n} steps into a {piece} (spin {spin}, {cleared} lines), not a full "
+                           f"T-spin clearing {lines[h['variant']]}")
+        if len(_CASE_LINK.findall(page)) != len(_CASE.findall(page)):
+            bad.append("a case row carries no replay link")
+        return bad
+
     # ------------------------------------------------------------ page shell
 
     def _head(self, title, desc, users, with_player):
@@ -338,6 +419,9 @@ class TechniqueSite:
             bits.append(board_svg(n["rows"], self.name(nid), self.CLASSES))
             if n.get("derived"):
                 bits.append(f'<p class="scp-tag">{_esc(PR["derived_note"])}</p>')
+            if n.get("external"):
+                # opt-in: a board another site draws, transcribed into the file (千鳥格子's harddrop variant)
+                bits.append(f'<p class="scp-tag">{_esc(PR["external_note"])}</p>')
             if nid in disc:
                 bits.append(f'<p class="scp-tag">{_esc(PR["discrepancies"][disc[nid]])}</p>')
             bits.append("</div>")
@@ -449,7 +533,7 @@ class TechniqueSite:
                 continue
             fu = h["followup"]
             fw = T["yes"].format(lock=fu["lock"]) if fu["fired"] else PR["reasons"][fu["reason"]]
-            href = f'{h["session"]}-replay.html#m{h["match"]}r{h["round"]}'
+            href = self.replay_href(h)
             cases.append(f'    <tr data-case="{_esc(case_key(h))}"><td>{_esc(h["session"])}</td>'
                          f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a></td><td>{_esc(h["player"])}</td>'
                          f'<td>{h["lock"]}{_esc(T["mirrored_mark"]) if h["mirrored"] else ""}</td>'
@@ -648,7 +732,7 @@ class TechniqueSite:
             bad.append("the headline is printed without the control sentence")
         if f'href="{self.DEMO_PAGE}"' not in page:
             bad.append("the overview does not link the demo page")
-        return bad
+        return bad + self.audit_replay_links(page, tr, art)
 
     def audit_demo_page(self, page, tr, demos):
         bad = (RP.audit_quarantine(page, self.DEMO_REQUIRED, DATA_ID) + RP.audit_player(page)
@@ -684,6 +768,7 @@ class TechniqueSite:
                 + self.audit_demo_page(pages[self.DEMO_PAGE], tr, demos))
 
     def render_all(self, repo=REPO, inputs=None):
+        self._repo = repo
         tr, art, demos = inputs or self.load_inputs(repo)
         self.check_inputs(tr, art, demos)
         self._need(self.figures(art) == self.recount(art),
@@ -714,10 +799,24 @@ class TechniqueSite:
         ]
         if first_case:
             case_line = [l for l in ov.split("\n") if first_case.group(0) in l][0]
+            at = re.search(r'@p(\d+)"', case_line)
             cases += [
                 ("overview: a hit row dropped", "ov", ov.replace(case_line + "\n", "")),
                 ("overview: a hit row duplicated", "ov", ov.replace(case_line, case_line + "\n" + case_line)),
+                ("overview: a replay link one position late", "ov",
+                 ov.replace(case_line, case_line.replace(at.group(0), f'@p{int(at.group(1)) + 1}"'))),
+                ("overview: a replay link one position early", "ov",
+                 ov.replace(case_line, case_line.replace(at.group(0), f'@p{int(at.group(1)) - 1}"'))),
+                ("overview: a replay link at the round's start", "ov",
+                 ov.replace(case_line, case_line.replace(at.group(0), '"'))),
             ]
+            # the same player's previous lock: right player, wrong lock (a link one T early in the round)
+            h0 = next(h for h in art["hits"] if case_key(h) == html.unescape(first_case.group(1)))
+            r0 = self._replay_round(h0["session"], h0["file"], h0["round_index0"])
+            mine = [n for n, x in enumerate(r0["order"]) if x == str(r0["users"].index(h0["player"]))]
+            if h0["lock"] > 0:
+                cases.append(("overview: a replay link at the player's previous lock", "ov",
+                              ov.replace(case_line, case_line.replace(at.group(0), f'@p{mine[h0["lock"] - 1]}"'))))
         else:
             # no hit (BT砲): the case index is empty, so a row the artefact does not hold must be caught
             cases.append(("overview: a hit row invented", "ov", ov.replace(

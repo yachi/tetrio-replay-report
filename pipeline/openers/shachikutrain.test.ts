@@ -414,7 +414,9 @@ test('STMB Cave, Double Dagger, BT砲 and Cut Copy are not this: anchored on the
   const mine = hitKeys();
   for (const other of [STMBCAVE, DOUBLEDAGGER, BTCANNON, CUTCOPY]) {
     const tr = JSON.parse(readFileSync(other.transcriptionPath, 'utf8'));
-    for (const a of prepare(TR, TR.variants[0]).map(norm)) for (const b of prepare(tr, tr.variants[0]).map(norm)) {
+    // every variant of 千鳥格子 (both its windows lay the T flat, nub down; `uncut` included), the others' first
+    for (const ov of (other === CUTCOPY ? tr.variants : [tr.variants[0]]))
+    for (const a of prepare(TR, TR.variants[0]).map(norm)) for (const b of prepare(tr, ov).map(norm)) {
       expect(a.T, other.key).toBe(b.T);
       const clash = [...a.cells].filter(([k, v]) => b.cells.has(k) && b.cells.get(k) !== v && v !== 'T');
       expect(clash.length, other.key).toBeGreaterThan(0);

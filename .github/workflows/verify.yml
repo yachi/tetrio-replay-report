@@ -830,9 +830,11 @@ jobs:
       # outer slot (the follow-up is a second TSD). Its window is the AGREEMENT BOX of the page's three
       # drawings, harddrop's Cut_copy page's five (pinned by revision, recorded in the transcription with
       # every other drawn T on that page) and the Cut Copy harddrop's BT_Cannon page draws (read from
-      # btcannon-technique.json); no routes board draws one, which the gate's opt-in routes_fire_none
-      # records. The corpus artefact and the (all unbuilt) demos are checked by
-      # pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job.
+      # btcannon-technique.json) and Tetrisちゃんねる's two (its images committed under
+      # spec/fixtures/tetrisch-cutcopy/); no routes board draws one, which the gate's opt-in routes_fire_none
+      # records. A second variant, harddrop's second generic type (Uncut copy), has its own agreement window on
+      # harddrop's drawings, its board an `external` node. The corpus artefact and the (all unbuilt) demos are
+      # checked by pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job.
       - name: Check the Cut Copy technique transcription
         run: python3 -m pipeline.openers.extract_cutcopy_shapes
 

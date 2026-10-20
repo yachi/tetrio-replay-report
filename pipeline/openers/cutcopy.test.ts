@@ -26,6 +26,14 @@
  *      `second.spin` draws, as a two-lock digest, as drawn and mirrored — it fires, and the follow-up mutants
  *      break it there as they do on the corpus.
  *
+ *   8. THE SECOND VARIANT (`uncut`, harddrop's second generic type, its board an external node): its window fires on each
+ *      of its harddrop drawings at the drawn T and nowhere else, clashes with the first type's on a cell, and its
+ *      follow-up search fires on harddrop's own drawing as a two-lock digest, as drawn and mirrored. Its corpus hits
+ *      are a named list like the first type's — measured EMPTY — and its controls and per-part counts are pinned.
+ *   9. TETRISちゃんねる: its two agreement boards fire the first type's window at their slots, and its 江戸城 (009) is two
+ *      Cut Copies in a row in alternating hands — the TS twin of the gate's measurement. On the corpus, a hit whose
+ *      follow-up is itself a hit is a named list (`followup_is_a_hit`), measured EMPTY.
+ *
  * window_off_board is not listed entry by entry: it is every flat, nub-down T at a TSD whose window leaves the
  * board before the matcher found a mismatch (the window reaches two columns past one end of the T and three past
  * the other), thousands of them. It is pinned per player as a count, and every entry is checked to be such a T
@@ -195,8 +203,14 @@ const CUTCOPY_IN_OPENER: string[] = [
   "2026-08-19 m1r6 pinglamb lock 11", "2026-09-11 m3r7 yachi lock 19", "2026-10-03 m4r2 yachi lock 15",
 ];
 const RECON_DROPPED_TSD: string[] = [];
-/** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1648, yachi: 1674 };
+/** The second variant's hits (harddrop's second type): measured, none. */
+const UNCUT_HITS: string[] = [];
+/** A hit whose follow-up fired at a lock that is itself a hit (two Cut Copies in a row): measured, none. */
+const FOLLOWUP_IS_A_HIT: string[] = [];
+/** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
+const WINDOW_OFF_BOARD: Record<string, Record<string, number>> = {
+  cutcopy: { pinglamb: 1648, yachi: 1674 }, uncut: { pinglamb: 2035, yachi: 2070 },
+};
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
 const TSD_DENOM = { pinglamb: { all: 5307, in_opener: 1043, mid_game: 4264 },
@@ -224,6 +238,24 @@ const CONTROLS = {
  *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
 const PART_ONLY = { above: 1477, cleared: 8786, below: 741 };
+/** The second variant (harddrop's second type), pinned the same way: its hits (none), its follow-ups, its controls,
+ *  and the full TSDs each part of its window admits with the T anchored (the row above the T, the cleared rows, the
+ *  two rows of the second slot under them). */
+const HITS_UNCUT = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 },
+                     yachi: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 } };
+const FOLLOWUP_UNCUT = { pinglamb: { fired: 0, not_fired: {} }, yachi: { fired: 0, not_fired: {} } };
+const CONTROLS_UNCUT = {
+  under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
+           mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
+  ablation: { no_must_empty: { pinglamb: 681, yachi: 423 }, no_roof: { pinglamb: 1, yachi: 7 },
+              t_overlap: { pinglamb: 17, yachi: 4 } },
+  orientation_baseline: { pinglamb: 43, yachi: 61 },
+};
+const PART_ONLY_UNCUT = { above: 4229, cleared: 8786, below: 8 };
+/** The second type and STMB Cave are a RELATION, not a clash: anchored on the same flat T in OPPOSITE hands their
+ *  windows agree on every cell both read (the STMB Cave page's own 「連続してTSD」 board is the second type, mirrored).
+ *  The corpus locks that are hits of both: measured, none (the second type has no hit). */
+const STMBCAVE_ALSO_UNCUT: string[] = [];
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -284,8 +316,12 @@ function tPlacements(board: string[]) {
   }
   return out;
 }
-const fires = (board: string[], lock: Cell[]) =>
-  prepare(TR, TR.variants[0]).filter(P => !!windowMatch(board, lock, P)).map(P => P.mirrored);
+const firesV = (board: string[], lock: Cell[], vi = 0) =>
+  prepare(TR, TR.variants[vi]).filter(P => !!windowMatch(board, lock, P)).map(P => P.mirrored);
+const fires = (board: string[], lock: Cell[]) => firesV(board, lock, 0);
+/** every variant's window at one placement: [variant, hand] */
+const firesAny = (board: string[], lock: Cell[]) =>
+  TR.variants.flatMap((v: any, vi: number) => firesV(board, lock, vi).map(m => [v.id, m]));
 const same = (a: Cell[], b: Cell[]) => a.length === b.length && a.every(q => b.some(x => x.row === q.row && x.col === q.col));
 
 test('the committed artefact is what build() produces now (byte identity)', () => {
@@ -309,23 +345,25 @@ test('the scored T-spins are the ones emit-opener-facts.ts scores (the third cop
 test('the Python twin on the drawings: windowMatch fires where the gate records it, and nowhere else', () => {
   const hd = TR.cross_source.harddrop;
   const pre = (rows: string[]) => asBoard(rows, ch => ch !== '-' && ch !== 'U');
-  // harddrop's Cut_copy drawings: once, at the drawn T, in the recorded hand; at no other placement
-  expect(hd.drawings.length).toBe(5);
-  expect(hd.drawings.filter((d: any) => d.section === 'Generic Structures').length).toBe(1);
+  // harddrop's Cut_copy drawings: once, the recorded variant's window, at the drawn T, in the recorded hand; no window
+  // at any other placement
+  expect(hd.drawings.map((d: any) => d.variant).sort()).toEqual([...Array(5).fill('cutcopy'), ...Array(8).fill('uncut')]);
+  for (const vid of ['cutcopy', 'uncut'])
+    expect(hd.drawings.filter((d: any) => d.section === 'Generic Structures' && d.variant === vid).length, vid).toBe(1);
   for (const d of hd.drawings) {
     const board = pre(d.rows), lock = cellsOf(d.slot);
-    expect(fires(board, lock), `table ${d.table} board ${d.board}`).toEqual([d.mirrored]);
+    expect(firesAny(board, lock), `table ${d.table} board ${d.board}`).toEqual([[d.variant, d.mirrored]]);
     for (const cs of tPlacements(board).filter(cs => !same(cs, lock)))
-      expect(fires(board, cs), `table ${d.table} board ${d.board}`).toEqual([]);
+      expect(firesAny(board, cs), `table ${d.table} board ${d.board}`).toEqual([]);
   }
-  // every other drawn T on the page: the window does not fire at it
-  expect(hd.drawn_t_not_fired.length).toBe(16);
+  // every other drawn T on the page: no window fires at it
+  expect(hd.drawn_t_not_fired.length).toBe(8);
   for (const d of hd.drawn_t_not_fired)
-    expect(fires(pre(d.rows), cellsOf(d.slot)), `table ${d.table} board ${d.board}`).toEqual([]);
-  // its boards with no T drawn: the window fires at the recorded placement, in the recorded hand
-  expect(hd.fires_without_slot.length).toBe(2);
+    expect(firesAny(pre(d.rows), cellsOf(d.slot)), `table ${d.table} board ${d.board}`).toEqual([]);
+  // its boards with no T drawn: the recorded variant's window fires at the recorded placement, in the recorded hand
+  expect(hd.fires_without_slot.length).toBe(5);
   for (const d of hd.fires_without_slot)
-    expect(fires(pre(d.rows), cellsOf(d.slot)), `table ${d.table} board ${d.board}`).toEqual([d.mirrored]);
+    expect(firesAny(pre(d.rows), cellsOf(d.slot)), `table ${d.table} board ${d.board}`).toEqual([[d.variant, d.mirrored]]);
   // the Cut Copy harddrop's BT_Cannon page draws, read out of the BT砲 transcription by (table, board)
   const bc = TR.cross_source.bt_cannon;
   const bt = JSON.parse(readFileSync(`${import.meta.dir}/${bc.file}`, 'utf8')).cross_source.harddrop;
@@ -339,7 +377,11 @@ test('the Python twin on the drawings: windowMatch fires where the gate records 
     return lock.length ? fires(board, lock).length > 0 : tPlacements(board).some(cs => fires(board, cs).length);
   }).map((x: any) => `${x.table},${x.board}`);
   expect(fired).toEqual([`${bc.table},${bc.board}`]);
-  expect(fires(pre(e[0].rows), lockOf(e[0].rows))).toEqual([bc.mirrored]);
+  expect(firesAny(pre(e[0].rows), lockOf(e[0].rows))).toEqual([['cutcopy', bc.mirrored]]);
+  expect(btBoards.filter((x: any) => {
+    const board = pre(x.rows), lock = lockOf(x.rows);
+    return lock.length ? firesV(board, lock, 1).length > 0 : tPlacements(board).some(cs => firesV(board, cs, 1).length);
+  })).toEqual([]);
   // this page's own drawings of the shape, each at its agreement slot, in its hand
   const byId = new Map<string, any>(TR.nodes.map((n: any) => [n.id, n]));
   const v = TR.variants[0];
@@ -353,7 +395,7 @@ test('the Python twin on the drawings: windowMatch fires where the gate records 
   const ne = v.not_expressed[0];
   expect([ne.board, ne.less]).toEqual(['hole.osz', 'z']);
   const less = asBoard(byId.get(ne.board).rows, ch => ch !== '-' && !ne.less.includes(ch));
-  expect(tPlacements(less).filter(cs => fires(less, cs).length)).toEqual([]);
+  expect(tPlacements(less).filter(cs => firesAny(less, cs).length)).toEqual([]);
   // and on no routes board (the gate records none, with its reason)
   const got: string[] = [];
   const dir = `${import.meta.dir}`;
@@ -362,13 +404,56 @@ test('the Python twin on the drawings: windowMatch fires where the gate records 
       if (!n.rows) continue;
       const cells = lockOf(n.rows);
       if (cells.length !== 4) continue;
-      if (fires(pre(n.rows), cells).length) got.push(`${f} ${n.id}`);
+      if (firesAny(pre(n.rows), cells).length) got.push(`${f} ${n.id}`);
     }
   }
   expect(got).toEqual([]);
   expect(TR.cross_source.fires).toEqual([]);
   expect(TR.cross_source.also).toEqual([]);
   expect(TR.cross_source.routes_fire_none.length).toBeGreaterThan(0);
+});
+
+test('Tetrisちゃんねる: its agreement boards fire the first type\'s window at their slots, and 江戸城 is two Cut Copies in a row', () => {
+  const tc = TR.cross_source.tetrisch;
+  const img = (n: string) => tc.images.find((x: any) => x.file === `cutcopy_${n}.jpg`).rows as string[];
+  const read = (rows: string[]) => asBoard(rows, ch => ch !== '.');
+  for (const n of Object.keys(tc.slots)) {
+    const board = read(img(n)), lock = cellsOf(tc.slots[n]);
+    expect(firesAny(board, lock), n).toEqual([['cutcopy', false]]);
+    for (const cs of tPlacements(board).filter(cs => !same(cs, lock))) expect(firesAny(board, cs), n).toEqual([]);
+  }
+  // the basic sequence's slot is 003's T, and the boards after each TSD fire no window anywhere
+  const tOf = (rows: string[]) => rows.flatMap((r, row) => [...r].flatMap((ch, col) => ch === 'T' ? [{ row, col }] : []));
+  expect(same(cellsOf(tc.slots[tc.basic.terrain]), tOf(img(tc.basic.spin)))).toBe(true);
+  for (const n of [tc.basic.after, tc.basic.second_after]) {
+    const board = read(img(n));
+    expect(tPlacements(board).filter(cs => firesAny(board, cs).length), n).toEqual([]);
+  }
+  // 江戸城: the innermost T, then the board it leaves, where the window fires MIRRORED at the follow-up slot, then the
+  // last TSD, which leaves the board empty
+  const place = (board: string[], cells: Cell[]) => {
+    const g = board.map(r => [...r]);
+    for (const q of cells) { expect(g[q.row]![q.col]).toBe('.'); g[q.row]![q.col] = 'X'; }
+    const full = g.flatMap((r, i) => r.every(x => x !== '.') ? [i] : []);
+    return { full, after: [...Array(full.length).fill('.'.repeat(10)), ...g.filter((_, i) => !full.includes(i)).map(r => r.join(''))] };
+  };
+  let board = read(img(tc.edo.image));
+  const first = cellsOf(tc.slots[tc.edo.image]);
+  expect(firesAny(board, first)).toEqual([['cutcopy', false]]);
+  const s1 = place(board, first);
+  expect(s1.full.length).toBe(2);
+  board = s1.after;
+  const second = tPlacements(board).filter(cs => firesAny(board, cs).length);
+  expect(second.length).toBe(1);
+  expect(firesAny(board, second[0]!)).toEqual([['cutcopy', true]]);
+  const s2 = place(board, second[0]!);
+  expect(s2.full.length).toBe(2);
+  board = s2.after;
+  expect(tPlacements(board).filter(cs => firesAny(board, cs).length)).toEqual([]);
+  const last = tPlacements(board).filter(cs => place(board, cs).full.length === 2);
+  expect(last.length).toBe(1);
+  expect(place(board, last[0]!).after.every(r => r === '.'.repeat(10))).toBe(true);
+  expect(tc.edo.tsds).toBe(3);
 });
 
 test('the transcription the artefact read is the committed one, and its window is the gated one', () => {
@@ -380,6 +465,16 @@ test('the transcription the artefact read is the committed one, and its window i
   expect(v.followup).toMatchObject({ spin: 'TSD', lines: 2, t_cells_pre_clear: [[2, 5], [2, 6], [2, 7], [5, 6]] });
   expect(TR.empty_letters).toBe('');
   expect(prepare(TR, v).map(P => P.followupKind)).toEqual(['full:2', 'full:2']);
+  // the second variant: harddrop's second type, on its external board
+  expect(TR.variants.map((x: any) => x.id)).toEqual(['cutcopy', 'uncut']);
+  const u = TR.variants[1];
+  expect(TR.nodes.find((n: any) => n.id === u.board).external).toBe('harddrop');
+  expect(TR.page_order).not.toContain(u.board);
+  expect(u.window_basis).toBe('agreement');
+  expect(u.window).toEqual({ rows: [1, 5], cols: [0, 5] });
+  expect(u.t_cells).toEqual(v.t_cells.map(([r, c]: number[]) => [r! - 1, c! - 4]));
+  expect(u.followup).toMatchObject({ spin: 'TSD', lines: 2, t_cells_pre_clear: [[4, 1], [4, 2], [4, 3], [5, 2]] });
+  expect(prepare(TR, u).map(P => P.followupKind)).toEqual(['full:2', 'full:2']);
 });
 
 test('named lists: every hit, every follow-up miss, the opener hits, garbage, the empty lists', () => {
@@ -389,30 +484,40 @@ test('named lists: every hit, every follow-up miss, the opener hits, garbage, th
   checkNamedList('garbage_in_window', L.garbage_in_window, GARBAGE_IN_WINDOW);
   checkNamedList('cutcopy_in_opener', L.cutcopy_in_opener, CUTCOPY_IN_OPENER);
   checkNamedList('recon_dropped_tsd', L.recon_dropped_tsd, RECON_DROPPED_TSD);
-  checkHitPositions(art(), SESSIONS, ROOT, [...CUTCOPY_HITS, ...FOLLOWUP_NOT_FIRED, ...GARBAGE_IN_WINDOW, ...CUTCOPY_IN_OPENER]);
-  expect(art().hits.length).toBe(CUTCOPY_HITS.length);
+  checkNamedList('uncut_hits', L.uncut_hits, UNCUT_HITS);
+  checkNamedList('followup_is_a_hit', L.followup_is_a_hit, FOLLOWUP_IS_A_HIT);
+  checkHitPositions(art(), SESSIONS, ROOT, [...CUTCOPY_HITS, ...UNCUT_HITS, ...FOLLOWUP_NOT_FIRED, ...GARBAGE_IN_WINDOW,
+                                            ...CUTCOPY_IN_OPENER]);
+  expect(art().hits.length).toBe(CUTCOPY_HITS.length + UNCUT_HITS.length);
+  // no lock is a hit of both variants
+  const keys = art().hits.map((h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`);
+  expect(new Set(keys).size).toBe(keys.length);
 });
 
-test('window_off_board: pinned per player, every entry a flat nub-down T whose window leaves the board', () => {
+test('window_off_board: pinned per variant and player, every entry a flat nub-down T whose window leaves the board', () => {
   const L: string[] = art().lists.window_off_board;
-  for (const u of ['pinglamb', 'yachi'] as const)
-    expect(L.filter(x => x.split(' ')[2] === u).length, u).toBe(WINDOW_OFF_BOARD[u]);
-  const v = TR.variants[0];
-  const [r0, r1] = v.window.rows, [c0, c1] = v.window.cols;
-  const [nr, nc] = v.t_cells.reduce((a: number[], b: number[]) => (b[0]! > a[0]! ? b : a));
-  const want = new Set<string>();
-  const hits = hitKeys();
-  for (const d of digests()) for (const s of scored(d)) {
-    if (s.lk.spin !== 'full' || s.lk.cleared !== 2) continue;
-    const n = nubOf(s.lk.cells);
-    if (!n || hits.has(keyOf(d, s.i))) continue;
-    const rowsOff = n.row + (r0 - nr) < 0 || n.row + (r1 - nr) >= H;
-    const drawnOff = rowsOff || n.col + (c0 - nc) < 0 || n.col + (c1 - nc) > 9;
-    const mirrOff = rowsOff || n.col - (c1 - nc) < 0 || n.col - (c0 - nc) > 9;
-    if (drawnOff || mirrOff) want.add(nameOf(d, s.i));
+  // a lock is off the board for one variant whatever the other found there
+  const hits = new Set(art().hits.map((h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}|${h.variant}`));
+  for (const v of TR.variants) {
+    const mine = L.filter(x => x.endsWith(` (${v.id})`)).map(x => x.slice(0, -` (${v.id})`.length));
+    for (const u of ['pinglamb', 'yachi'] as const)
+      expect(mine.filter(x => x.split(' ')[2] === u).length, `${v.id} ${u}`).toBe(WINDOW_OFF_BOARD[v.id]![u]);
+    const [r0, r1] = v.window.rows, [c0, c1] = v.window.cols;
+    const [nr, nc] = v.t_cells.reduce((a: number[], b: number[]) => (b[0]! > a[0]! ? b : a));
+    const want = new Set<string>();
+    for (const d of digests()) for (const s of scored(d)) {
+      if (s.lk.spin !== 'full' || s.lk.cleared !== 2) continue;
+      const n = nubOf(s.lk.cells);
+      if (!n || hits.has(`${keyOf(d, s.i)}|${v.id}`)) continue;
+      const rowsOff = n.row + (r0 - nr) < 0 || n.row + (r1 - nr) >= H;
+      const drawnOff = rowsOff || n.col + (c0 - nc) < 0 || n.col + (c1 - nc) > 9;
+      const mirrOff = rowsOff || n.col - (c1 - nc) < 0 || n.col - (c0 - nc) > 9;
+      if (drawnOff || mirrOff) want.add(nameOf(d, s.i));
+    }
+    for (const x of mine) expect(want.has(x), `${v.id} ${x}`).toBe(true);
+    expect(new Set(mine).size).toBe(mine.length);
   }
-  for (const x of L) expect(want.has(x), x).toBe(true);
-  expect(new Set(L).size).toBe(L.length);
+  expect(L.every(x => TR.variants.some((v: any) => x.endsWith(` (${v.id})`)))).toBe(true);
 }, 600_000);
 
 test('pinned: denominators, hits, follow-ups, controls', () => {
@@ -426,6 +531,11 @@ test('pinned: denominators, hits, follow-ups, controls', () => {
   expect(v.controls).toEqual(CONTROLS);
   for (const k of ['no_must_empty', 'no_roof'] as const)
     for (const u of ['pinglamb', 'yachi'] as const) expect(v.controls.ablation[k][u]).toBeGreaterThanOrEqual(HITS[u].all);
+  const w = a.variants.uncut;
+  expect(Object.keys(a.variants)).toEqual(['cutcopy', 'uncut']);
+  expect(w.hits_by_player).toEqual(HITS_UNCUT);
+  expect(w.followup_by_player).toEqual(FOLLOWUP_UNCUT);
+  expect(w.controls).toEqual(CONTROLS_UNCUT);
 });
 
 test('STMB Cave, Double Dagger and BT砲 are not this: anchored on the same flat T, the windows clash in every pairing', () => {
@@ -435,18 +545,55 @@ test('STMB Cave, Double Dagger and BT砲 are not this: anchored on the same flat
              cells: new Map(P.cells.map(x => [`${x.r - r},${x.c - c}`, x.v])) };
   };
   const mine = hitKeys();
+  // the two variants against each other, in every pairing of hands
+  for (const a of prepare(TR, TR.variants[0]).map(norm)) for (const b of prepare(TR, TR.variants[1]).map(norm)) {
+    expect(a.T).toBe(b.T);
+    expect([...a.cells].filter(([k, v]) => b.cells.has(k) && b.cells.get(k) !== v && v !== 'T').length).toBeGreaterThan(0);
+  }
   for (const other of [STMBCAVE, DOUBLEDAGGER, BTCANNON]) {
     const tr = JSON.parse(readFileSync(other.transcriptionPath, 'utf8'));
-    for (const a of prepare(TR, TR.variants[0]).map(norm)) for (const b of prepare(tr, tr.variants[0]).map(norm)) {
+    for (const mv of TR.variants)
+    for (const [ia, a] of prepare(TR, mv).map(norm).entries())
+    for (const [ib, b] of prepare(tr, tr.variants[0]).map(norm).entries()) {
       expect(a.T, other.key).toBe(b.T);
       const clash = [...a.cells].filter(([k, v]) => b.cells.has(k) && b.cells.get(k) !== v && v !== 'T');
-      expect(clash.length, other.key).toBeGreaterThan(0);
+      // the one relation: the second type against STMB Cave in opposite hands
+      if (mv.id === 'uncut' && other === STMBCAVE && ia !== ib) expect(clash, `${mv.id} ${other.key}`).toEqual([]);
+      else expect(clash.length, `${mv.id} ${other.key}`).toBeGreaterThan(0);
+    }
+    if (other === STMBCAVE) {
+      const k2 = (h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`;
+      const both = JSON.parse(readFileSync(other.artefactPath, 'utf8')).hits
+        .filter((h: any) => art().hits.some((x: any) => x.variant === 'uncut' && k2(x) === k2(h)))
+        .map((h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock}`);
+      checkNamedList('stmbcave_also_uncut', both, STMBCAVE_ALSO_UNCUT);
     }
     const theirs = JSON.parse(readFileSync(other.artefactPath, 'utf8')).hits;
     const k = (h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`;
     expect(theirs.filter((h: any) => mine.has(k(h))), other.key).toEqual([]);
   }
 });
+
+test('what discriminates, the second type: each part of its window alone, with the T anchored', () => {
+  const v = TR.variants[1];
+  const [top] = v.t_cells[0]!;
+  const parts: Record<keyof typeof PART_ONLY_UNCUT, (r: number) => boolean> = {
+    above: r => r < top, cleared: r => r === top || r === top + 1, below: r => r > top + 1,
+  };
+  const got: Record<string, number> = {};
+  for (const [name, keep] of Object.entries(parts)) {
+    const preps = prepare(TR, v).map(P => ({ ...P, cells: P.cells.filter(x => x.v === 'T' || keep(x.r)) }));
+    let n = 0;
+    for (const d of digests()) for (const s of scored(d)) {
+      if (s.lk.spin !== 'full' || s.lk.cleared !== 2) continue;
+      if (preps.some(P => !!windowMatch(s.board, s.lk.cells, P))) n++;
+    }
+    got[name] = n;
+  }
+  expect(got).toEqual(PART_ONLY_UNCUT);
+  // the no_roof ablation (the window less the row above the T) is exactly the `below` part with the cleared rows
+  expect(total(art().variants.uncut.controls.ablation.no_roof)).toBe(PART_ONLY_UNCUT.below);
+}, 600_000);
 
 test('what discriminates: each part of the window alone, with the T anchored, against the headline', () => {
   const v = TR.variants[0];
@@ -494,6 +641,10 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   const b = JSON.parse(base);
   const mut = (m: Mutants) => { const s = serialise(run(m)); expect(s, JSON.stringify(m)).not.toBe(base); return JSON.parse(s); };
   const k = (h: any) => `${h.session} ${h.file} ${h.round_index0} ${h.player} ${h.lock}`;
+  // the first type's hits (the second type's are measured separately below)
+  const cc = (x: any) => x.hits.filter((h: any) => h.variant === 'cutcopy');
+  const un = (x: any, key = 'all') => total(Object.fromEntries(Object.entries(x.variants.uncut.hits_by_player)
+    .map(([u, y]: any) => [u, y[key]])));
 
   let a = mut({ noMirror: true });
   expect(sum(a, 'mirrored')).toBe(0);
@@ -511,11 +662,17 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
 
   // without the must-empty cells, or without the row above the T, the window is weaker and its hits are the
   // ablation's; the T's hand is still decided (no lock matches both)
-  a = mut({ noMustEmpty: true });
-  expect(sum(a, 'all')).toBe(total(b.variants.cutcopy.controls.ablation.no_must_empty));
+  // without the must-empty cells the second type's window is symmetric about the T and a lock matches both hands,
+  // which the matcher refuses (as ダブルダガー's does); the first type, measured on its own, still decides its hand
+  expect(() => run({ noMustEmpty: true })).toThrow(/matches as drawn AND mirrored/);
+  const firstOnly = classify(CUTCOPY, { ...TR, variants: [TR.variants[0]] }, digests(), { noMustEmpty: true });
+  expect(firstOnly.hits.length).toBe(total(b.variants.cutcopy.controls.ablation.no_must_empty));
   a = mut({ noRoof: true });
   expect(sum(a, 'all')).toBe(total(b.variants.cutcopy.controls.ablation.no_roof));
   expect(sum(a, 'all')).toBe(PART_ONLY.below);
+  // the second type's whole corpus absence is its row above the T: without it, its ablation's hits appear
+  expect(un(a)).toBe(total(b.variants.uncut.controls.ablation.no_roof));
+  expect(un(a)).toBeGreaterThan(0);
 
   a = mut({ tOverlap: true });
   expect(sum(a, 'all')).toBe(total(b.variants.cutcopy.controls.ablation.t_overlap));
@@ -525,7 +682,7 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
 
   // garbage read as EMPTY: exactly the hits with garbage in their window are lost
   a = mut({ garbageEmpty: true });
-  expect(a.hits.map(k)).toEqual(b.hits.filter((h: any) => !h.garbage_in_window).map(k));
+  expect(cc(a).map(k)).toEqual(cc(b).filter((h: any) => !h.garbage_in_window).map(k));
 
   a = mut({ followupUnmirrored: true });
   expect(a.hits.map(k)).toEqual(b.hits.map(k));
@@ -596,6 +753,57 @@ test('the follow-up search on the page\'s own TSD → TSD: fires as drawn and mi
     expect(fu(m, { followupAnyT: true }, 'mini').fired).toBe(true);
   }
   // the slot carried in the drawn columns on a mirrored hit: the mirrored second TSD lands elsewhere
+  expect(fu(false, { followupUnmirrored: true }).fired).toBe(true);
+  expect(fu(true, { followupUnmirrored: true })).toEqual({ lock: 1, fired: false, reason: 'next_t_elsewhere' });
+});
+
+/** harddrop's second type, as a two-lock digest on its own drawing (the external node `uncut.spin`, its T the lock,
+ *  every other drawn cell filled), the TSD's clear, then the T into the second slot `uncut.after` leaves open. */
+function uncutDigest(mirrored: boolean, secondSpin = 'full'): TechDigest {
+  const node = (id: string) => TR.nodes.find((n: any) => n.id === id).rows as string[];
+  const u = TR.variants[1];
+  const flip = (row: string) => mirrored ? [...row].reverse().join('') : row;
+  const pad = (rows: string[]) => [...Array(H - rows.length).fill('.'.repeat(10)), ...rows.map(flip)];
+  const read = (rows: string[]) => pad(rows.map(r => [...r].map(ch => ch === '-' || ch === 'T' ? '.' : 'S').join('')));
+  const tCells = (rows: string[]): Cell[] => pad(rows).flatMap((r, row) => [...r].flatMap((ch, col) => ch === 'T' ? [{ row, col }] : []));
+  const after = node(u.followup.board);
+  const slotRows = after.map((r, i) => [...r].map((_, c) =>
+    u.followup.t_cells_after.some(([rr, cc]: number[]) => rr === i && cc === c) ? 'T' : '-').join(''));
+  const place = (board: string[], cells: Cell[]) => {
+    const g = board.map(r => [...r]);
+    for (const q of cells) { expect(g[q.row]![q.col]).toBe('.'); g[q.row]![q.col] = 'T'; }
+    const full = g.flatMap((r, i) => r.every(x => x !== '.') ? [i] : []);
+    const kept = g.filter((_, i) => !full.includes(i)).map(r => r.join(''));
+    return { full, after: [...Array(full.length).fill('.'.repeat(10)), ...kept] };
+  };
+  const b0 = read(node(u.board)), t0 = tCells(node(u.board));
+  const s0 = place(b0, t0);
+  // the board the TSD leaves is the drawn after board, in occupancy
+  expect(s0.after).toEqual(read(after));
+  const t1 = tCells(slotRows);
+  const s1 = place(s0.after, t1);
+  expect([s0.full.length, s1.full.length]).toEqual([2, 2]);
+  const lock = (cells: Cell[], spin: string, rows: number[]) =>
+    ({ piece: 'T', spin, cleared: rows.length, cells, clearedRows: rows, garbage: 0, mapOk: true });
+  return { session: 'harddrop', file: 'Cut_copy', round: 0, match: 1, user: 'page', v: 1,
+           locks: [lock(t0, 'full', s0.full), lock(t1, secondSpin, s1.full)],
+           tspins: [{ i: 0, board: b0 }, { i: 1, board: s0.after }] };
+}
+
+test('the second type\'s follow-up search on harddrop\'s own drawing: fires as drawn and mirrored, and its mutants', () => {
+  const fu = (mirrored: boolean, m: Mutants = {}, spin = 'full') => {
+    const c = classify(CUTCOPY, TR, [uncutDigest(mirrored, spin)], m);
+    expect(c.hits.map(h => [h.variant, h.lock, h.mirrored])).toEqual([['uncut', 0, mirrored]]);
+    return c.hits[0]!.followup;
+  };
+  for (const m of [false, true]) {
+    expect(fu(m)).toEqual({ lock: 1, fired: true, reason: null });
+    // the second slot lies under both cleared rows, so the row map moves none of its cells: the mutant that drops
+    // it is EQUIVALENT on this variant (measured), unlike the first type's split slot
+    expect(fu(m, { followupNoRowmap: true })).toEqual({ lock: 1, fired: true, reason: null });
+    expect(fu(m, {}, 'mini')).toEqual({ lock: 1, fired: false, reason: 't_in_slot_not_tsd' });
+    expect(fu(m, { followupAnyT: true }, 'mini').fired).toBe(true);
+  }
   expect(fu(false, { followupUnmirrored: true }).fired).toBe(true);
   expect(fu(true, { followupUnmirrored: true })).toEqual({ lock: 1, fired: false, reason: 'next_t_elsewhere' });
 });

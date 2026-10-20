@@ -17,7 +17,8 @@ per rule and requires that tag):
   grammar:  — ids unique; every cell in the alphabet; a board is 10 wide and at most `max_rows` tall;
         `kind` is one of KINDS; every reference (`spin_of`, `after_of`, `on`, `same_occupancy_as`,
         `extends`, a variant's boards) names a node; `page_order` lists every DRAWN board exactly
-        once and no derived one; a variant carries exactly one of `followup` and `payoff`.
+        once and no derived or `external` one (opt-in: a board another site draws, transcribed into
+        the file); a variant carries exactly one of `followup` and `payoff`.
   spin:     — a spin board's spin piece, read off its spin letters, is one tetromino (a `spin_piece: U`
         board — a page drawing the T it places in the renderer's `U`, BT砲 — is read as a T); its upper-case
         cells are exactly the cells of the rows that are full with the piece in (cell by cell, so one
@@ -394,7 +395,9 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
                 bad.append(f'grammar: {n["id"]}.{ref} names no node ({n[ref]!r})')
         if (n['kind'] == 'derived') != bool(n.get('derived')):
             bad.append(f'grammar: {n["id"]} kind derived iff derived: true')
-    drawn = [n['id'] for n in nodes if not n.get('derived')]
+    # opt-in `external`: a board another site draws, transcribed into this file (千鳥格子's harddrop variant); like a
+    # derived board it is not on the page, so `page_order` leaves it out
+    drawn = [n['id'] for n in nodes if not n.get('derived') and not n.get('external')]
     if data.get('page_order') != drawn:
         bad.append(f'grammar: page_order {data.get("page_order")} is not the drawn boards in order {drawn}')
     for v in data.get('variants', []):

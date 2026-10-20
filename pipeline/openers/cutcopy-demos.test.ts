@@ -47,8 +47,8 @@ const LIMIT = '要消過行先砌得出，而呢個 planner 唔消行（係 plan
 const ODD = '每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出';
 const NO_COVER = '地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法';
 
-/** Boards no demo stands on, and the reason the artefact gives: four are the profile's, four the planner's
- *  measured reasons for its two chains. */
+/** Boards no demo stands on, and the reason the artefact gives: six are the profile's (two of them the second
+ *  variant's harddrop boards), four the planner's measured reasons for its two chains. */
 const DEMO_UNBUILT: Record<string, string> = {
   'basic': `基本形冇畫頁面嘅方塊，成幅都係灰色嘅元地形：有 34 格，唔係 4 嘅倍數：${LIMIT}`,
   'basic.after': '係 basic.spin 之後嘅盤面（由 second.spin 推出嚟），同一個原因冇示範',
@@ -58,6 +58,8 @@ const DEMO_UNBUILT: Record<string, string> = {
   'hole.osz': NO_COVER,
   'hole.terrain': `hole.osz 砌唔到：${NO_COVER}`,
   'second.spin': '係 basic.after 上面打嘅第二下 TSD，同一個原因冇示範',
+  'uncut.after': '係 uncut.spin 之後嘅盤面（harddrop 畫嘅），同一個原因冇示範',
+  'uncut.spin': '係 harddrop 畫嘅第二種（Uncut copy），抄入嚟淨係得佔位、冇頁面方塊；呢個 planner 只砌原頁嘅 build 盤面，所以冇示範',
 };
 
 const fresh = build(CUTCOPY, CUTCOPY_DEMOS);
@@ -166,6 +168,13 @@ test('the planner\'s reasons, re-derived from the transcription', () => {
   expect(byId.get('second.spin').on).toBe('basic.after');
   expect(byId.get('hole.osz').on).toBe('hole.terrain');
   expect(byId.get('col3.jz').on).toBe('col3.terrain');
+  // the second variant's boards: harddrop's, in occupancy only (no page piece), never in the page order
+  for (const id of ['uncut.spin', 'uncut.after']) {
+    expect(byId.get(id).external, id).toBe('harddrop');
+    expect(TR.page_order).not.toContain(id);
+    expect([...byId.get(id).rows.join('')].filter((ch: string) => !'-cCT'.includes(ch)), id).toEqual([]);
+  }
+  expect(byId.get('uncut.after').after_of).toBe('uncut.spin');
 });
 
 const T = 300_000;
