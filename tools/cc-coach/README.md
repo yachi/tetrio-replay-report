@@ -45,6 +45,12 @@ board on a seeded 7-bag queue with no garbage; the Cut Copy pilot built on it is
 [`FINDINGS-cutcopy-selfplay.md`](FINDINGS-cutcopy-selfplay.md) (`cutcopy-selfplay.ts`, whose replay core is
 `pipeline/sim/cc-selfplay.ts`; the hit games are committed as `analysis/cutcopy-selfplay.json` by
 `pipeline/sim/emit-cutcopy-selfplay.ts`).
+An input line may also carry a received-garbage schedule (`"garbage": [{"after_piece", "lines", "col"}]`): the
+rows are tanked with the rollout's own pending rule (a non-clearing lock, at most 8 per lock), cold-clear's pick is
+told what is incoming, and every step then carries its board and inserted hole columns. Without the key the output
+is byte-identical to before (checked by hand on seeds 7, 48, 65 and 136 on 2026-10-20). The garbage pilot uses
+`selfplay-garbage-input.py` (the rule) and `cutcopy-selfplay-garbage.ts` (the replay, which re-derives the
+insertion and checks the engine's board after every placement); see the findings' garbage section.
 
 Runtime on 4 cores: extraction 30 s; grading ~0.6 s per position per core; a 40k-node 14-piece
 rollout ~5 s per window per core.

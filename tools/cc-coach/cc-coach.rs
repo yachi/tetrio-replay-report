@@ -306,6 +306,11 @@ fn rollout(pos: &J, nodes: u32) -> J {
     // lock. Absent = no cap (the behaviour of the earlier 14-piece rollout pages, kept reproducible).
     let cap: usize = pos["garbage_cap"].as_u64().map(|v| v as usize).unwrap_or(usize::MAX);
     let mut pending: Vec<(usize, usize)> = vec![];
+    // Opt-in (self-play with a garbage schedule only; absent = false, the earlier behaviour byte for byte):
+    // `incoming_includes_pending` adds the rows still waiting to the incoming count `pick_move` sees, and
+    // `record_fields` adds each step's board (after its garbage) and the hole columns inserted on that lock.
+    let inc_pending = pos["incoming_includes_pending"].as_bool().unwrap_or(false);
+    let record_fields = pos["record_fields"].as_bool().unwrap_or(false);
     for j in 0..k {
         coach_reseed(seed_for(pos["id"].as_str().unwrap_or(""), &format!("rollout-{}", j)));
         let mut bot = BotState::<Standard>::new(board.clone(), options(nodes));
@@ -313,10 +318,12 @@ fn rollout(pos: &J, nodes: u32) -> J {
         let mut c = bot.candidates();
         if c.is_empty() { steps.push(json!({"dead": true})); break; }
         c.sort_by(|a, b| b.evaluation.cmp(&a.evaluation));
-        let pick = eval.pick_move(c, *incoming.get(j).unwrap_or(&0));
+        let waiting: u32 = if inc_pending { pending.iter().map(|t| t.0 as u32).sum() } else { 0 };
+        let pick = eval.pick_move(c, *incoming.get(j).unwrap_or(&0) + waiting);
         let l = advance(&mut board, pick.mv);
         if let Some(t) = sched.get(j) { pending.extend(t.iter().cloned()); }
         let mut inserted = 0usize;
+        let mut cols: Vec<usize> = vec![];
         if l.cleared_lines.is_empty() && !pending.is_empty() {
             let mut f = board.get_field(); // y-up: f[0] is the bottom row
             let mut rest: Vec<(usize, usize)> = vec![];
@@ -326,6 +333,7 @@ fn rollout(pos: &J, nodes: u32) -> J {
                     for y in (1..40).rev() { f[y] = f[y - 1]; }
                     let mut row = [true; 10]; if col < 10 { row[col] = false; } f[0] = row;
                     inserted += 1;
+                    cols.push(col);
                 }
                 if take < amount { rest.push((amount - take, col)); }
             }
@@ -333,9 +341,17 @@ fn rollout(pos: &J, nodes: u32) -> J {
             board.set_field(f);
         }
         let topped = board.column_heights().iter().any(|&h| h > 22);
-        steps.push(json!({"piece": pname(pick.mv.kind.0), "hold": pick.hold, "cells": cells_td(&pick.mv),
+        let mut step = json!({"piece": pname(pick.mv.kind.0), "hold": pick.hold, "cells": cells_td(&pick.mv),
             "kind": kind_name(l.placement_kind), "lines": l.cleared_lines.len(), "b2b": l.b2b, "pc": l.perfect_clear,
-            "combo": l.combo, "cc_garbage": l.garbage_sent, "tspin": format!("{:?}", pick.mv.tspin), "garbage_in": inserted, "garbage_waiting": pending.iter().map(|t| t.0).sum::<usize>()}));
+            "combo": l.combo, "cc_garbage": l.garbage_sent, "tspin": format!("{:?}", pick.mv.tspin), "garbage_in": inserted, "garbage_waiting": pending.iter().map(|t| t.0).sum::<usize>()});
+        if record_fields {
+            // rows top-down from the highest non-empty row to the floor
+            let rows = field_td(&board);
+            let top = rows.iter().position(|r| r.contains('#')).unwrap_or(40);
+            step["field"] = json!(rows[top..].to_vec());
+            step["garbage_cols"] = json!(cols);
+        }
+        steps.push(step);
         if topped { steps.push(json!({"dead": true, "why": "garbage pushed the stack out"})); break; }
         // reveal one more piece, keeping the visible queue at its original length
         if fed < future.len() { board.add_next_piece(future[fed]); fed += 1; }
@@ -344,13 +360,23 @@ fn rollout(pos: &J, nodes: u32) -> J {
            "b2b_end": board.b2b_bonus, "combo_end": board.combo})
 }
 
-/// SELF-PLAY (COACH_MODE=selfplay): cold-clear alone, from an EMPTY board, no garbage, its normal
-/// evaluator. Input line: {"id": str, "seed": u64, "pieces": N}. The queue is a 7-bag dealt by a
+/// SELF-PLAY (COACH_MODE=selfplay): cold-clear alone, from an EMPTY board, its normal
+/// evaluator, with no garbage unless the input carries a schedule (below). Input line: {"id": str, "seed": u64, "pieces": N}. The queue is a 7-bag dealt by a
 /// `StdRng` seeded with `seed` (each bag a Fisher-Yates shuffle of IOTSZJL), so a seed fixes the
 /// queue in any process. The game is then exactly a `rollout` from an empty field with that queue
 /// (current + 5 previews visible, one more revealed per placement), so the search seeding, the
 /// pick and the dead/topout rule are the rollout's own, not a second copy. Output: the rollout's
 /// JSON plus `seed` and the dealt `queue` (as a string), which is what a replay needs.
+///
+/// RECEIVED GARBAGE (optional): `"garbage": [{"after_piece": j, "lines": n, "col": c}, ...]`. An attack with
+/// `after_piece` j is in the incoming meter while piece j (0-based) is placed and joins the rollout's pending list
+/// after that lock; pending rows enter, front first, on the first lock that clears nothing, at most
+/// `garbage_cap` (8, TETR.IO's default) per lock — the rollout's own rule. Every row of one attack has its hole
+/// in column c. cold-clear sends nothing back, so nothing cancels. `pick_move` is told the rows of attacks
+/// arriving at this piece plus the rows still waiting. The schedule is the caller's (see
+/// `selfplay-garbage-input.py` for the rule this repo used); it is echoed in the output, and every step then
+/// also carries its board (`field`, top-down from the highest non-empty row) and `garbage_cols`, so a replay
+/// can check the board after every placement. Without the key the game, and its output, are unchanged.
 fn selfplay(pos: &J, nodes: u32) -> J {
     use rand::{seq::SliceRandom, SeedableRng};
     let seed = pos["seed"].as_u64().unwrap();
@@ -364,9 +390,27 @@ fn selfplay(pos: &J, nodes: u32) -> J {
     }
     let id = pos["id"].as_str().unwrap_or("").to_string();
     let empty: Vec<J> = (0..40).map(|_| json!("..........")).collect();
-    let root = json!({"id": id, "field": empty, "bagRemain": ["I", "O", "T", "S", "Z", "J", "L"], "hold": null,
+    let mut root = json!({"id": id, "field": empty, "bagRemain": ["I", "O", "T", "S", "Z", "J", "L"], "hold": null,
         "b2b": -1, "combo": -1, "current": queue[0], "next": queue[1..6].to_vec(), "future": queue[6..].to_vec(), "k": n});
+    let garbage = pos.get("garbage").cloned();
+    if let Some(g) = &garbage {
+        let mut sched: Vec<Vec<J>> = vec![vec![]; n];
+        let mut inc: Vec<u32> = vec![0; n];
+        for a in g.as_array().unwrap() {
+            let j = a["after_piece"].as_u64().unwrap() as usize;
+            let lines = a["lines"].as_u64().unwrap();
+            let col = a["col"].as_u64().unwrap();
+            assert!(col < 10 && lines > 0, "bad garbage entry {}", a);
+            if j < n { sched[j].push(json!({"amount": lines, "column": col})); inc[j] += lines as u32; }
+        }
+        root["garbage_schedule"] = json!(sched);
+        root["incoming_schedule"] = json!(inc);
+        root["garbage_cap"] = json!(8);
+        root["incoming_includes_pending"] = json!(true);
+        root["record_fields"] = json!(true);
+    }
     let mut r = rollout(&root, nodes);
+    if let Some(g) = garbage { r["garbage"] = g; }
     r["seed"] = json!(seed);
     r["queue"] = json!(queue.concat());
     r["nodes"] = json!(nodes);
