@@ -25,7 +25,7 @@ bun ~/tetrio-replay-report/tools/cc-coach/validate-attack.ts          # TETR.IO 
 # 2. cold-clear, pinned rev 279edd7 (the same rev as nix/cold-clear-oracle), plus this patch + harness
 git clone https://github.com/MinusKelvin/cold-clear cc && cd cc && git checkout 279edd7c3177ff8077f6a930193397814b281f27
 git apply ~/tetrio-replay-report/tools/cc-coach/cold-clear-coach.patch
-cp ~/tetrio-replay-report/tools/cc-coach/cc-coach.rs bot/src/bin/ && cp ~/tetrio-replay-report/tools/cc-coach/Cargo.lock .
+mkdir -p bot/src/bin && cp ~/tetrio-replay-report/tools/cc-coach/cc-coach.rs bot/src/bin/ && cp ~/tetrio-replay-report/tools/cc-coach/Cargo.lock .
 cargo build --release -p cold-clear --bin cc-coach && cd ..
 
 # 3a. per-move grading (mid-game = lock >= 21, verified prefix only)
@@ -39,6 +39,10 @@ CC_NODES=40000 COACH_MODE=rollout cc/target/release/cc-coach < rollouts.jsonl > 
 bun ~/tetrio-replay-report/tools/cc-coach/analyze-rollouts.ts rollouts.jsonl rollouts-40k.jsonl
 python3 ~/tetrio-replay-report/tools/cc-coach/window-analysis.py rollouts-40k.priced.jsonl
 ```
+
+A third mode, `COACH_MODE=selfplay` (input `{"id","seed","pieces"}`), has cold-clear play alone from an empty
+board on a seeded 7-bag queue with no garbage; the Cut Copy pilot built on it is
+[`FINDINGS-cutcopy-selfplay.md`](FINDINGS-cutcopy-selfplay.md) (`cutcopy-selfplay.ts`).
 
 Runtime on 4 cores: extraction 30 s; grading ~0.6 s per position per core; a 40k-node 14-piece
 rollout ~5 s per window per core.

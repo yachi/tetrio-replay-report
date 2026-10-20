@@ -3,6 +3,7 @@
 //! searched single-threaded to a fixed node budget; rayon only parallelises ACROSS positions.
 //! Cold-clear's search samples at random, so every search is reseeded first (`seed_for`, the
 //! patched `coach_reseed`): same input + same COACH_SEED => byte-identical output.
+//! Modes (COACH_MODE): grade (default), rollout, selfplay (cold-clear alone from an empty board).
 //!
 //! Coordinates: the input is TOP-DOWN (row 0 = top of a 40-row field, this repo's convention).
 //! cold-clear is y-UP (field[0] = bottom). `y = 39 - r` is the one flip, done in `to_field` and
@@ -343,13 +344,42 @@ fn rollout(pos: &J, nodes: u32) -> J {
            "b2b_end": board.b2b_bonus, "combo_end": board.combo})
 }
 
+/// SELF-PLAY (COACH_MODE=selfplay): cold-clear alone, from an EMPTY board, no garbage, its normal
+/// evaluator. Input line: {"id": str, "seed": u64, "pieces": N}. The queue is a 7-bag dealt by a
+/// `StdRng` seeded with `seed` (each bag a Fisher-Yates shuffle of IOTSZJL), so a seed fixes the
+/// queue in any process. The game is then exactly a `rollout` from an empty field with that queue
+/// (current + 5 previews visible, one more revealed per placement), so the search seeding, the
+/// pick and the dead/topout rule are the rollout's own, not a second copy. Output: the rollout's
+/// JSON plus `seed` and the dealt `queue` (as a string), which is what a replay needs.
+fn selfplay(pos: &J, nodes: u32) -> J {
+    use rand::{seq::SliceRandom, SeedableRng};
+    let seed = pos["seed"].as_u64().unwrap();
+    let n = pos["pieces"].as_u64().unwrap() as usize;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    let mut queue: Vec<&str> = vec![];
+    while queue.len() < n + 6 {
+        let mut bag = ["I", "O", "T", "S", "Z", "J", "L"];
+        bag.shuffle(&mut rng);
+        queue.extend(bag.iter());
+    }
+    let id = pos["id"].as_str().unwrap_or("").to_string();
+    let empty: Vec<J> = (0..40).map(|_| json!("..........")).collect();
+    let root = json!({"id": id, "field": empty, "bagRemain": ["I", "O", "T", "S", "Z", "J", "L"], "hold": null,
+        "b2b": -1, "combo": -1, "current": queue[0], "next": queue[1..6].to_vec(), "future": queue[6..].to_vec(), "k": n});
+    let mut r = rollout(&root, nodes);
+    r["seed"] = json!(seed);
+    r["queue"] = json!(queue.concat());
+    r["nodes"] = json!(nodes);
+    r
+}
+
 fn main() {
     let nodes: u32 = std::env::var("CC_NODES").ok().and_then(|s| s.parse().ok()).unwrap_or(10_000);
     let mode = std::env::var("COACH_MODE").unwrap_or_else(|_| "grade".into());
     let lines: Vec<String> = io::stdin().lock().lines().map(|l| l.unwrap()).filter(|l| !l.trim().is_empty()).collect();
     let outs: Vec<String> = lines.par_iter().map(|l| {
         let pos: J = serde_json::from_str(l).unwrap();
-        let r = if mode == "rollout" { rollout(&pos, nodes) } else { grade(&pos, nodes) };
+        let r = match mode.as_str() { "rollout" => rollout(&pos, nodes), "selfplay" => selfplay(&pos, nodes), _ => grade(&pos, nodes) };
         r.to_string()
     }).collect();
     let out = io::stdout();

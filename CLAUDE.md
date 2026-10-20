@@ -4469,19 +4469,19 @@ mutate the cache). Entries are keyed by how the engine was built (`newEngine`'s 
 anywhere else keys by its own identity) and dropped least-recently-used past a fixed cap. Nothing it returns changed:
 every route demo, technique demo and own-design artefact re-emitted with only its `planner_md5` line moved, and no
 page moved. Measured on 2026-10-20 by re-running the own-design emitter and by timing `planOwn` over offset 2's
-first 100 candidates against a scratch copy of the old file, with identical results; the timings are in that pass's
-report, not here.
+first 100 candidates against a scratch copy of the old file, with identical results; the timings were not committed
+anywhere, so re-measure rather than quote one.
 
-**A second implementation behind the own designs: the ORIGINAL cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
+**A second implementation behind the own designs, for REACHABILITY only: the original cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
 every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary
 (`CC_ORACLE_MOVES=1`, `find_moves` ZeroGComplete, `cross-movegen`'s protocol) whether that exact T placement is reachable, then
 classifies it with cold-clear's `rotate()` rule (`cc-tspin.ts`; the binary's movegen line carries cells, not a spin status) under
 EVERY kick index, since the timeline does not record which one our engine used, and counts the rows the four cells complete on that
 board. It found cold-clear reaching both T's of every committed design and calling each a full T-spin clearing two whatever the
-kick, because both front corners are filled. A placement cold-clear's mover does not reach would be its documented
+kick, because both front corners are filled. Only the reachability half is the Rust binary; the spin half is this repo's own
+TypeScript port of cold-clear's rule, so it is not an independent implementation of the spin and must not be read as one. A placement cold-clear's mover does not reach would be its documented
 mid-height-tuck asymmetry, named in `CC_UNREACHED` with its reason (measured empty), never a bound. It skips without the binary and
-runs beside the cross tests in verify.yml's `oracle-image` job. The flake builds `cc-oracle` for aarch64 only, so on an x86_64 host
-it was built from the same derivation and flake-pinned nixpkgs by `--expr`, not `nix build .#cc-oracle`.
+runs beside the cross tests in verify.yml's `oracle-image` job (the flake builds `cc-oracle` for aarch64 only).
 
 ### 社畜トレイン（Shachiku Train）
 
