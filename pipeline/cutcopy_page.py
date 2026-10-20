@@ -8,7 +8,9 @@ quarantine, figures); this file is Cut Copy's `TechniqueSiteProfile`, and its wo
 
 Inputs, all committed: `pipeline/openers/cutcopy-technique.json` (transcribed and gated by
 `extract_cutcopy_shapes`), `analysis/cutcopy-facts.json` (`emit-technique-facts.ts --technique cutcopy`) and
-`analysis/cutcopy-demos.json` (`emit-technique-demos.ts --technique cutcopy`).
+`analysis/cutcopy-demos.json` (`emit-technique-demos.ts --technique cutcopy`), `analysis/cutcopy-own.json` (boards of
+our own design, `emit-technique-own.ts --technique cutcopy`) and `analysis/cutcopy-selfplay.json` (games cold-clear
+played alone, `emit-cutcopy-selfplay.ts`), the last two played on the demo page.
 
 The letters this page draws beyond the route pages': `C` an earlier cell muted in a spin board's cleared rows,
 and `T` the spin's T in a cleared row, muted. A second variant (`uncut`, harddrop's second generic type) is printed
@@ -41,6 +43,11 @@ PROFILE = TechniqueSiteProfile(
     selftest_board="second.spin",
     # harddrop's second generic type (Uncut copy), measured at the same TSD
     more_variants=(("uncut", "TSD"),),
+    showcase=True,
+    # boards of ours (technique-own.ts's search), played on the demo page after the drawn boards
+    own_rel=os.path.join("analysis", "cutcopy-own.json"),
+    # games cold-clear played alone (cutcopy-selfplay.ts), played on the demo page after the own designs
+    selfplay_rel=os.path.join("analysis", "cutcopy-selfplay.json"),
 )
 
 SITE = TechniqueSite(PROFILE)

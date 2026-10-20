@@ -25,7 +25,7 @@ bun ~/tetrio-replay-report/tools/cc-coach/validate-attack.ts          # TETR.IO 
 # 2. cold-clear, pinned rev 279edd7 (the same rev as nix/cold-clear-oracle), plus this patch + harness
 git clone https://github.com/MinusKelvin/cold-clear cc && cd cc && git checkout 279edd7c3177ff8077f6a930193397814b281f27
 git apply ~/tetrio-replay-report/tools/cc-coach/cold-clear-coach.patch
-cp ~/tetrio-replay-report/tools/cc-coach/cc-coach.rs bot/src/bin/ && cp ~/tetrio-replay-report/tools/cc-coach/Cargo.lock .
+mkdir -p bot/src/bin && cp ~/tetrio-replay-report/tools/cc-coach/cc-coach.rs bot/src/bin/ && cp ~/tetrio-replay-report/tools/cc-coach/Cargo.lock .
 cargo build --release -p cold-clear --bin cc-coach && cd ..
 
 # 3a. per-move grading (mid-game = lock >= 21, verified prefix only)
@@ -39,6 +39,18 @@ CC_NODES=40000 COACH_MODE=rollout cc/target/release/cc-coach < rollouts.jsonl > 
 bun ~/tetrio-replay-report/tools/cc-coach/analyze-rollouts.ts rollouts.jsonl rollouts-40k.jsonl
 python3 ~/tetrio-replay-report/tools/cc-coach/window-analysis.py rollouts-40k.priced.jsonl
 ```
+
+A third mode, `COACH_MODE=selfplay` (input `{"id","seed","pieces"}`), has cold-clear play alone from an empty
+board on a seeded 7-bag queue with no garbage; the Cut Copy pilot built on it is
+[`FINDINGS-cutcopy-selfplay.md`](FINDINGS-cutcopy-selfplay.md) (`cutcopy-selfplay.ts`, whose replay core is
+`pipeline/sim/cc-selfplay.ts`; the hit games are committed as `analysis/cutcopy-selfplay.json` by
+`pipeline/sim/emit-cutcopy-selfplay.ts`).
+An input line may also carry a received-garbage schedule (`"garbage": [{"after_piece", "lines", "col"}]`): the
+rows are tanked with the rollout's own pending rule (a non-clearing lock, at most 8 per lock), cold-clear's pick is
+told what is incoming, and every step then carries its board and inserted hole columns. Without the key the output
+is byte-identical to before (checked by hand on seeds 7, 48, 65 and 136 on 2026-10-20). The garbage pilot uses
+`selfplay-garbage-input.py` (the rule) and `cutcopy-selfplay-garbage.ts` (the replay, which re-derives the
+insertion and checks the engine's board after every placement); see the findings' garbage section.
 
 Runtime on 4 cores: extraction 30 s; grading ~0.6 s per position per core; a 40k-node 14-piece
 rollout ~5 s per window per core.

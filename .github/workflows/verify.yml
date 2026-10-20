@@ -835,7 +835,10 @@ jobs:
       # spec/fixtures/tetrisch-cutcopy/); no routes board draws one, which the gate's opt-in routes_fire_none
       # records. A second variant, harddrop's second generic type (Uncut copy), has its own agreement window on
       # harddrop's drawings, its board an `external` node. The corpus artefact and the (all unbuilt) demos are
-      # checked by pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job.
+      # checked by pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job, and the boards
+      # of our own design (analysis/cutcopy-own.json, technique-own.ts's search) by cutcopy-own.test.ts there, and
+      # cold-clear's self-play Cut Copies (analysis/cutcopy-selfplay.json, replayed from their committed placements)
+      # by cutcopy-selfplay.test.ts there.
       - name: Check the Cut Copy technique transcription
         run: python3 -m pipeline.openers.extract_cutcopy_shapes
 
@@ -1188,10 +1191,12 @@ jobs:
       # the two steps above prove that a session list written down once goes stale). Without
       # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
-      - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin) vs cold-clear
+      # cutcopy-own-cc asks the same binary whether our own 千鳥格子 designs' two T's are reachable
+      # and full two-line spins (analysis/cutcopy-own.json), and skips the same way without it.
+      - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
         env:
           CC_ORACLE: ./result/bin/cc-oracle
-        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts
+        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts
 
   # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has
   # now measured three times in one week that an obligation recorded only in prose does not survive
