@@ -11,7 +11,8 @@ Inputs, all committed: `pipeline/openers/cutcopy-technique.json` (transcribed an
 `analysis/cutcopy-demos.json` (`emit-technique-demos.ts --technique cutcopy`).
 
 The letters this page draws beyond the route pages': `C` an earlier cell muted in a spin board's cleared rows,
-and `T` the spin's T in a cleared row, muted.
+and `T` the spin's T in a cleared row, muted. A second variant (`uncut`, harddrop's second generic type) is printed
+after the first, its board and after board harddrop's drawings (`external` nodes, each tagged on the page).
 """
 import os
 
@@ -38,6 +39,8 @@ PROFILE = TechniqueSiteProfile(
     extra_css=CUTCOPY_CSS,
     max_page_bytes=1_000_000,
     selftest_board="second.spin",
+    # harddrop's second generic type (Uncut copy), measured at the same TSD
+    more_variants=(("uncut", "TSD"),),
 )
 
 SITE = TechniqueSite(PROFILE)

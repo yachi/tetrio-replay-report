@@ -50,7 +50,7 @@
     "cross": "同另一個來源對：SDPC Spin",
     "cross_note": "harddrop 嘅 SDPC Spin 頁（另一個作者）喺 STMB Cave 之後下一巡畫咗一個 STSD。下面係 corpus 入面 SDPC Spin 路線去到 STMB Cave 嘅回合，之後喺原頁畫嘅嗰一巡入面有冇對到 STSD；冇嘅逐個寫原因。分母淨係計去到 STMB Cave 嗰下同埋嗰一巡都喺已核對範圍入面嘅回合，其餘嘅照列、寫明點解唔計。",
     "cases": "個案",
-    "cases_note": "每一個對到嘅 TSD 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播。",
+    "cases_note": "每一個對到嘅 TSD 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播，一開就停喺呢粒 T 落之前，行多一粒就係呢下 T-spin。",
     "demos": "示範重播",
     "demos_link": "睇示範重播：由空盤砌到 STSD，再打埋第二下 TSD"
   },

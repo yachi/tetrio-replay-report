@@ -4013,6 +4013,16 @@ two tests, three CI steps, one `TECHNIQUE_SITES` entry).
 | demos | `pipeline/sim/technique-demos.ts` (planner), `technique-demo-profile.ts` / `technique-demos-stsd.ts` → `analysis/stsd-demos.json`; test `stsd-demos.test.ts` |
 | pages | `pipeline/technique_page.py` (renderer + audit) bound by `stsd_page.py` + `stsd_prose.json` → `docs/stsd.html`, `docs/stsd-demos.html`, rendered by `bin/build-docs` from `TECHNIQUE_SITES` under a 中盤手法 index group after 定式路線 |
 
+**Every hit links to the moment, not the round start** (since 2026-10-20): the case row's link is
+`<date>-replay.html#m<pos>r<round>@p<n>`, where `<n>` indexes the replay page's MERGED lock order (both players' locks by frame,
+`replay_section.round_payload`'s `order`, which `replay_player.js` steps through), set to the position just before the hit's T —
+`n` locks placed, so the page shows the board the T went into and one step plays it. `technique_page.replay_href` computes it from
+the session's `replay-facts.json` and `facts.json`; the overview audit re-reads every link from the other side
+(`audit_replay_links`): the position's next step, decoded from an empty board with `replay_section.decode_boards`, must be the hit
+player's lock at the hit's lock index, a T with a full spin clearing the variant's lines. The page selftest plants a link one
+position late, one early, at the player's previous lock and at the round's start, and each is caught. Only the hrefs and the
+`cases_note` sentence moved on the nine pages.
+
 **The predicate is anchored on the T, not on a column range.** The lock's four cells must equal the
 variant's drawn T cells under one translation (mirrored: columns reflected inside the window), which
 fixes orientation too; every other cell of the window the transcription carries must be filled
@@ -4344,9 +4354,14 @@ in `extract_cutcopy_shapes.py`, gated by the shared `technique_transcription.py`
 (`cutcopy-demos.test.ts`), and `docs/cutcopy.html` + `docs/cutcopy-demos.html` from `cutcopy_page.py` + `cutcopy_prose.json`, the
 sixth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
 
-**NO SHARED FILE CHANGED** — not the matcher, the planner, the gate or the renderer: the transcription and its extract module, the
-two profiles, the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI steps. Every
-pre-existing artefact and page is byte-identical; `docs/index.html` gains the card.
+**NO SHARED FILE CHANGED when it landed** — not the matcher, the planner, the gate or the renderer: the transcription and its
+extract module, the two profiles, the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI
+steps. Every pre-existing artefact and page was byte-identical; `docs/index.html` gained the card. **2026-10-20's pass changed two
+shared Python files and no hashed one.** Two of its edits are opt-in and default-preserving: the gate's `external` nodes (below)
+and the renderer's `external_note` (only read when a node is external). A third, in the same renderer, is NOT: the case links now
+open a replay position (`replay_href` / `audit_replay_links`, the paragraph on case links above), which re-rendered every technique
+page's case hrefs and its cases note. Every other technique's gate output and artefact is unchanged; their pages moved by that one
+edit and nothing else.
 
 **The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's, ダブルダガー's and BT砲's); the follow-up is a second TSD
 whose cells the first one's clear splits.** Two TSD slots are interleaved one column apart: the T goes into the inner one (its arms
@@ -4355,7 +4370,7 @@ That is BT砲's split slot again, which the matcher's row map already joins, so 
 The page writes 「縦向きに入れて」 (upright) and draws the T flat: read as the T dropping in upright and turning into the slot; the
 window reads the drawing.
 
-**The window is the agreement box, against three sources.** STSD's bounding box would be the whole board (the spin board draws the
+**The window is the agreement box, against four sources.** STSD's bounding box would be the whole board (the spin board draws the
 stack beside the slots as filled rows above the T). The agreement drawings are the page's three (the basic form, and its T-hole and
 third-column builds, both drawn MIRRORED, so `extra_checks` fires them under `mirror:` as ダブルダガー's do), harddrop's Cut_copy
 page's (the page the source cites as its reference; pinned like BT砲's BT_Cannon page — oldid, MediaWiki's revision sha1, our sha256
@@ -4364,8 +4379,10 @@ window fires on in `fires_without_slot`, so the window does not choose its evide
 draws, read by (table, board) out of `btcannon-technique.json`, whose own note names it. harddrop draws one board with three T's
 (yakine's repeating pattern), which BT砲's one-T-per-board completeness check cannot read, so this module partitions every board's
 drawn cells into T's (`hd_slots`; a board with no unique partition is a red build) and records each T as its own `slot`; the
-harddrop reading itself (`hd_cell`, `_sections`) is imported from BT砲's module, one reading. The window is four rows by six
-columns: the outer slot's arms row with its wall and the inner roof, the two cleared rows, the outer slot's nub row. No routes
+harddrop reading itself (`hd_cell`, `_sections`) is imported from BT砲's module, one reading. The fourth source is Tetrisちゃんねる's
+千鳥格子 page (`cross_source.tetrisch`, added 2026-10-20): its ten images are committed under `spec/fixtures/tetrisch-cutcopy/` and
+read with the jp-forecast sampler (欄干's route), and its basic terrain and its 江戸城 board are agreement drawings. The window is
+four rows by six columns: the outer slot's arms row with its wall and the inner roof, the two cleared rows, the outer slot's nub row. No routes
 board fires (`routes_fire_none`), and none of the other technique transcriptions' boards does (`extra_checks`, under `cross:`).
 Like BT砲's, the harddrop record is refetched weekly by `check_wikitext_sources` and re-checked with `--wikitext-dir`; the shiwehi
 page is not.
@@ -4378,9 +4395,11 @@ until an audit removed each Z cell on its own: the mirrored window spans columns
 
 **What discriminates is measured per window part** (`cutcopy.test.ts`, `PART_ONLY`): the cleared rows (entailed by the clear) admit every flat,
 nub-down full TSD whose window is on the board, and the row above and the row below each cut that down without reaching the headline alone, so both are
-doing work; the `no_roof` ablation is the `below` part. Unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof` makes a lock match
-both hands: both are live mutants whose hits are their ablations'. The window clashes with STMB Cave's, ダブルダガー's and BT砲's on a
-cell in every pairing of hands and no lock is a hit of two of them. Garbage reads as filled, and the page itself says the shape is
+doing work; the `no_roof` ablation is the `below` part. For the first type, unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof`
+makes a lock match both hands: both are live mutants whose hits are their ablations'. Since the second variant landed, a full
+`noMustEmpty` build throws (that variant's window less its must-empty cells is symmetric about the T, ダブルダガー's case), so the
+test asserts the throw and measures the first type's symptom on a transcription holding it alone. The first type's window clashes
+with STMB Cave's, ダブルダガー's and BT砲's on a cell in every pairing of hands and no lock is a hit of two of them. Garbage reads as filled, and the page itself says the shape is
 mostly built when garbage rises, so `garbage_in_window` is most of the hit list — a fact about the corpus, read off the test.
 
 **No demo is built, and every board says why** (`cutcopy-demos.test.ts` re-derives each): the third-column terrain has an ODD cell
@@ -4388,6 +4407,37 @@ count (a proof); the T-hole terrain is a multiple of four with no tiling by tetr
 neither a multiple of four — the planner's own words, 「no cover under its dealing」, are true and weaker); the basic form is even
 but not a multiple of four (a planner limit); and both builds are drawn mirrored, so the as-drawn window the planner fires would
 not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+**A second variant, harddrop's (`uncut`), added 2026-10-20 by measurement.** harddrop's page draws two generic Cut Copies; the
+second, 「Uncut copy」, saves the WHOLE second TSD slot under the first T (one column toward the open side) rather than its bottom
+half. shiwehi.com draws only the first. A single-T window expresses it: the agreement box of every harddrop drawing of it (its
+Generic Structures board, the S/Z/J variation of fumen #3, the same variation again beside its STMB Cave comparison, the repeat's
+two T's, one T of yakine's pattern, the mix's second T, the T under an STSD; the test pins how many), five rows by six columns — the row above the T, the two cleared rows, the second slot's two rows. Its board is
+harddrop's own drawing transcribed as an `external` node (`external: harddrop`, never in `page_order`, which is shiwehi.com's page;
+the gate's one opt-in for it), in occupancy only, beside harddrop's drawn after board, and `extra_checks` holds both to the harddrop
+record (`external:`). Its follow-up is unsplit, so `followupNoRowmap` is measured EQUIVALENT on it (asserted on a two-lock digest of
+harddrop's own drawing, where the other follow-up mutants break it). The two variants' windows clash on a cell; the second type and
+STMB Cave are a RELATION, not a clash — in OPPOSITE hands their windows agree on every shared cell, and the STMB Cave page's own
+「連続してTSD」 board fires the second type's window mirrored (`cross_source.also_technique`, measured both ways; harddrop says the
+second type 「could be easily mistaken with STMB Cave」, and its own STMB Cave comparison, its cave two rows deep, is no hit). The
+corpus hits of both are a named list (`STMBCAVE_ALSO_UNCUT`). What was decided NOT to be a variant, by measurement, stays in
+`drawn_t_not_fired` with its reason: the deeper-hole S variation is already a drawing of the first type; the stood T after the
+Parapet comparison is a Parapet TSS (欄干's TSS window fires at exactly that T, `other_window`, checked); yakine's other two T's
+are read on a board that never stands; the Donation boards are donations. The `harddrop` record's `drawings` and
+`fires_without_slot` now name the variant each belongs to, and its completeness check runs over both windows.
+
+**Tetrisちゃんねる's 江戸城 is two Cut Copies in a row, not a third shape** (measured in `_check_tetrisch` and the TS twin): the
+window fires once on 009 at its innermost T; on the board that TSD leaves it fires again, MIRRORED, at the carried follow-up slot;
+that hit's follow-up is the last TSD, which leaves nothing. The page's own 「交互にずれている」 is the alternation of hands. The
+matcher already reads such a night as a hit whose follow-up lock is itself a hit; the profile publishes those as
+`followup_is_a_hit` (a named list in the test). Its other images: 002 and 005 draw the T UPRIGHT before 003 and 006 draw it flat
+about the same centre (checked), which is shiwehi.com's 「縦向きに入れて」 drawn by a second site; 008 is 001's board coloured by
+which TSD each row belongs to (same occupancy, checked); 010 is an annotation the sampler refuses. `--html-dir` re-reads the page and
+the images beside the shiwehi snapshot (Pillow; without it one named `pillow:` failure); the weekly wikitext job does not.
+
+**Declined, recorded in `source.declined`**: howtotetris.com's Cut Copy lesson and four.lol state that all rights are reserved and
+nothing may be reproduced without permission, so nothing of theirs is transcribed, committed or published; the page says so in a
+sentence. A `declined:` rule requires each entry's url, date and reason.
 
 ### 社畜トレイン（Shachiku Train）
 
@@ -4423,7 +4473,9 @@ it recorded in `drawn_t_not_fired` with why the window misses, so the window doe
 from BT砲's module, `hd_slots` from 千鳥格子's). Four rows by six columns: the row above the T, the two cleared rows, the row under
 them; the second slot's Z roof is outside. The window fires on one routes board, the same author's stick spin `2.sd`, recorded in
 `cross_source.also` (`routes_fire_none` says no board by another author does); on no other technique transcription's board.
-`other_windows` records, measured and complete both ways, every other technique window that fires on a drawn T of harddrop's page.
+`other_windows` records, measured and complete both ways, every other technique window that fires on a drawn T of harddrop's page —
+EVERY variant of each other file (千鳥格子's `uncut` and 欄干's `parapet_tss` included), which until 2026-10-20 read only each file's
+first; an entry names its `variant` only when it is not the file's first, and a selftest plants a second variant that fires.
 
 **Per variant, measured (`extra_checks`):** the basic form and the 4x2 build — the T the page draws next is exactly the window's
 follow-up slot re-anchored at the build's T (`second:`); the boards between the two TSDs are what the first TSD leaves plus the Z

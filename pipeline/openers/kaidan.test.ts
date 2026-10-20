@@ -613,7 +613,9 @@ test('the other flat-T windows: clashes per hand pairing, and the hit sets', () 
   const mine = new Set(art().hits.map(hitKey));
   for (const other of [STMBCAVE, DOUBLEDAGGER, BTCANNON, CUTCOPY, SHACHIKUTRAIN, PARAPET]) {
     const tr = JSON.parse(readFileSync(other.transcriptionPath, 'utf8'));
-    for (const a of prepare(TR, V)) for (const b of prepare(tr, tr.variants[0])) {
+    // every variant of 千鳥格子 (both its windows lay the T flat, nub down; `uncut` included), the others' first
+    for (const ov of (other === CUTCOPY ? tr.variants : [tr.variants[0]]))
+    for (const a of prepare(TR, V)) for (const b of prepare(tr, ov)) {
       const A = normP(a), B = normP(b);
       expect(A.T, other.key).toBe(B.T);
       const shared = [...A.cells].filter(([k, v]) => B.cells.has(k) && v !== 'T');
