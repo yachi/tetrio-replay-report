@@ -22,7 +22,7 @@ export const CUTCOPY_OWN: OwnProfile = {
   rowsAbove: 2,
   maxExtra: 4,
   maxSteps: 300,
-  maxTried: 1000,
+  maxTried: 5000,
   pick: 2,
   artefact: {
     schema: 'technique-own/1',

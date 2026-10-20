@@ -787,6 +787,18 @@ class TechniqueSite:
             bad.append(f"{d['node']}: the window does not fire on the board before lock {i + 1}")
         return bad
 
+    @staticmethod
+    def _own_rows(b, d, own):
+        """An own board with the first T's cells drawn as the dashed slot (the T goes in where the window fires)."""
+        w, n = own["board"]["width"], own["board"]["rows"]
+        cells = RS._place_cells(own["shapes"], w, n, "T", d["locks"][d["stood_lock"]][1])
+        h = len(b["rows"])
+        rows = [list(r) for r in b["rows"]]
+        for c in cells:
+            y, x = divmod(c, w)
+            rows[h - 1 - y][x] = "U"
+        return ["".join(r) for r in rows]
+
     def _own_section(self, tr, own, rounds):
         OW = self.OW
         out = [f'  <h2 class="scp-sec" id="own">{_esc(OW["title"])}</h2>', f'  <p>{_esc(OW["note"])}</p>',
@@ -806,7 +818,7 @@ class TechniqueSite:
             out.append("".join([
                 f'    <div class="scp-node" id="{slug}" data-own-node="{_esc(b["id"])}">',
                 f'<h4 class="scp-name">{_esc(nm)}</h4>',
-                board_svg(b["rows"], nm, self.CLASSES),
+                board_svg(self._own_rows(b, d, own), nm, self.CLASSES),
                 f'<p><a class="scp-case" href="#{slug}" data-round="{slug}">{_esc(self.DP["play"])}</a></p>',
                 f'<p class="scp-tag">{_esc(self._own_chain_words(d))}</p>',
                 f'<p class="scp-cond">{_esc(self.DP["events"].format(events="，".join(m[3] for m in rounds[slug]["moments"])))}</p>',
