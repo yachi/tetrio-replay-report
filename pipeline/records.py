@@ -94,18 +94,30 @@ def _dp1(x):
     return fmt.quantf(x, 1, "floor", site="records._dp1")
 
 
+def _dp1_up(x):
+    """One decimal place, CEILED — the SD ratio's denominator.
+
+    Flooring the denominator inflates the quotient, and on 2026-10-22's corpus it inflated it
+    past the data: 63.7 / 14.1 floors to 4.5 against an unrounded 4.4948, so `_check_sd_ratio`
+    refused the footnote. Ceiling the small end of a fall understates the fall, which is the
+    direction 足足 needs, so the printed ratio can never exceed the measured one. A rounding
+    direction is per claim, not per number: the numerator floors and the denominator ceils.
+    """
+    return fmt.quantf(x, 1, "ceil", site="records._dp1_up")
+
+
 def r_stats():
     """The R figures the footnote prints, at the precision it prints them.
 
     The two bin lengths floor because the sentence prefixes them with 約, which this repo
-    defines as "at least this much". The SD endpoints floor too, on `fmt`'s convention.
+    defines as "at least this much". The SD numerator floors on `fmt`'s convention and the denominator ceils (`_dp1_up`).
     The mean endpoints ROUND: they carry no 約 and they are a rise, so flooring the low
     end would print a bigger rise than was measured. The six-session values (104.1, 120.1)
     floored and rounded to the same integers, which is why that had not come up before.
     """
     art = rate_records_artefact.load()
     vs = art["metrics"]["vs"]
-    sd_short, sd_long = _dp1(vs["sd_short"]), _dp1(vs["sd_long"])
+    sd_short, sd_long = _dp1(vs["sd_short"]), _dp1_up(vs["sd_long"])
     return {
         "sessions": len(art["sessions"]),
         "sd_short": sd_short,
