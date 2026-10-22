@@ -230,9 +230,11 @@ def payload(data, facts):
     return round_payload(data, facts, mi, ri)
 
 
-def round_payload(data, facts, mi, ri):
+def round_payload(data, facts, mi, ri, extra=()):
     """The player's JSON for match `mi`, round `ri` (both 0-based list positions in facts.json).
-    The caller has run `check_artefact`."""
+    The caller has run `check_artefact`. `extra` adds key moments the caller has already checked, as
+    (user, lock index, before, kind, label): at the merged position after that lock, or just before
+    it when `before` (the replay page's opener / technique labels, `replay_labels`)."""
     m = facts["matches"][mi]
     fr = m["rounds"][ri]
     hits = [r for r in data["rounds"] if r["file"] == m["file"] and r["round"] == fr["index"]]
@@ -309,7 +311,13 @@ def round_payload(data, facts, mi, ri):
     events = sorted((f, s, i) for s, fl in enumerate(abs_frames) for i, f in enumerate(fl))
     order = "".join(str(s) for _f, s, _i in events)
     pos = {(s, i): n + 1 for n, (_f, s, i) in enumerate(events)}   # merged position AFTER the lock
-    moments = sorted([pos[(s, i)], s, kind, label] for s, i, kind, label in moments)
+    moments = [[pos[(s, i)], s, kind, label] for s, i, kind, label in moments]
+    for user, i, before, kind, label in extra:
+        _need(user in order_users, f"{m['file']} r{fr['index']}: a label for {user!r}, not a player")
+        s = order_users.index(user)
+        _need((s, i) in pos, f"{m['file']} r{fr['index']} {user}: a label at lock {i}, past the round")
+        moments.append([pos[(s, i)] - (1 if before else 0), s, kind, label])
+    moments.sort()
     flags = sorted([pos[(s, i)], s, kind] for s, i, kind in flags)
     return {
         "session": data["session"], "file": m["file"], "match": m["index"], "round": ri + 1,

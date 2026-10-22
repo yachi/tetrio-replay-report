@@ -13,7 +13,13 @@ ONE PLAYER. The boards, seek bar, keys and key moments are `replay_player.js` �
 report's 最癲一局 region inlines — mounted once per round the viewer picks, on the markup
 `replay_section.player_box` emits for both. The per-round JSON is `replay_section.round_payload`, so
 the region and the page cannot decode a round two ways. What this page adds is page-only and lives
-in `replay_page.js`: the round picker, the hash (`#m<pos>r<round>@p<n>`), and the attack chart.
+in `replay_page.js`: the round picker, the hash (`#m<pos>r<round>@p<n>`), the attack chart, and the
+round's links to the opener route and mid-game technique pages its labels name.
+
+OPENER AND TECHNIQUE LABELS. `bin/build-docs` passes `replay_labels.for_session`'s result, which adds
+two kinds of key moment (`opener`, `technique`) read out of those pages' corpus artefacts and
+re-checked against this page's own decode; see that module. A page holding one must say what a label
+means (`replay_labels.SENTENCE`), which `audit` enforces.
 
 QUARANTINE. Same tier as the region: one simulator, no claim ids, no ✓ badges, no `data-claim`
 anywhere on the page, and every sentence in `replay_section.REQUIRED` present. `audit()` enforces
@@ -36,6 +42,7 @@ import os
 import re
 import sys
 
+from pipeline import replay_labels as RL
 from pipeline import replay_section as RS
 from pipeline import skeleton
 
@@ -155,6 +162,17 @@ BASE_CSS = """
 """
 
 
+# This page's own rules, kept out of BASE_CSS, which the route and technique pages embed too.
+LABEL_CSS = """
+  .rpg-labels { font-size: .82rem; color: var(--ink-secondary); margin: .2rem 0 0; }
+  .rpg-labels[hidden] { display: none; }
+  .rpg-labels a + a::before { content: "、"; }
+  #round-replay .rp-mark[data-kind="opener"], #round-replay .rp-mark[data-kind="technique"] {
+    width: 10px; height: 10px; margin-left: -5px; border-radius: 1px; transform: rotate(45deg); }
+  #round-replay .rp-mark[data-kind="technique"] { border-style: double; border-width: 3px; }
+"""
+
+
 # ---------------------------------------------------------------- data
 
 def _score(rounds, users, upto=None):
@@ -166,9 +184,12 @@ def _score(rounds, users, upto=None):
     return w
 
 
-def page_data(data, facts):
+def page_data(data, facts, labels=None):
     """(shared, rounds, picker, default label) for one session. Every round of facts.json must
-    have exactly one replay entry — a missing round is a refusal, never a gap in the picker."""
+    have exactly one replay entry — a missing round is a refusal, never a gap in the picker.
+    `labels` is `replay_labels.for_session`'s result: each round's opener / technique key moments
+    and the pages they link to."""
+    labels = labels or {}
     RS.check_artefact(data)
     users = list(facts["players"])
     _need(len(users) == 2, "a replay page is for a two-player session")
@@ -181,7 +202,8 @@ def page_data(data, facts):
         items = []
         for ri, r in enumerate(m["rounds"]):
             n_facts += 1
-            pl = RS.round_payload(data, facts, mi, ri)
+            lab = labels.get((mi, ri), {"marks": [], "links": []})
+            pl = RS.round_payload(data, facts, mi, ri, lab["marks"])
             if shared is None:
                 shared = {k: pl[k] for k in SHARED}
             # inlined once, so it must BE the same for every round, not assumed to be
@@ -189,6 +211,7 @@ def page_data(data, facts):
                   f"{pl['label']}: a field the page shares across rounds differs")
             lean = {k: v for k, v in pl.items() if k not in SHARED}
             lean["notes"] = [RS._player_note(p, esc=str) for p in pl["players"]]
+            lean["links"] = [list(x) for x in lab["links"]]
             rounds.append(lean)
             intense = sel is not None and (sel[0], sel[1]) == (mi, ri)
             if intense:
@@ -231,11 +254,12 @@ def _picker_html(picker, users):
     return out
 
 
-def render(data, facts, report_href):
-    """The whole page, or None when the session has no replay artefact. Audited before return."""
+def render(data, facts, report_href, labels=None):
+    """The whole page, or None when the session has no replay artefact. Audited before return.
+    `labels` is `replay_labels.for_session`'s result, or None for a page without them."""
     if data is None:
         return None
-    shared, rounds, picker, default = page_data(data, facts)
+    shared, rounds, picker, default = page_data(data, facts, labels)
     _need(rounds, "no rounds to replay")
     users = list(facts["players"])
     session = shared["session"]
@@ -259,6 +283,7 @@ def render(data, facts, report_href):
         '<style>',
         '  ' + css,
         BASE_CSS.strip('\n'),
+        LABEL_CSS.strip('\n'),
         RS._color_css([{"user": u} for u in users]),
         RS.CSS.strip('\n'),
         '</style>',
@@ -285,6 +310,7 @@ def render(data, facts, report_href):
         '      <p>盤邊條直柱係<strong>射埋</strong>嘅垃圾：攞對手射過嚟、記錄喺 replay 嘅數'
         '（抵銷之前），減去引擎自己抵銷咗同塞咗落盤嘅行數。未必全部都會食到。</p>',
         f'      <p>{RS.BOUNDARY_SENTENCE}</p>',
+        *([f'      <p>{RL.SENTENCE}</p>'] if labels else []),
         '      <p>每一局都會核成局總數（粒數、消行、hold、清垃圾、攻擊、全消、每種 T-spin）同 '
         '<code>facts.json</code> 夾唔夾，同埋引擎個盤爆唔爆同遊戲記錄夾唔夾；有一項唔夾，嗰局就會寫'
         f'「{RS.FLAG_WORDS}」。對得上只係講總數，<strong>唔會</strong>令呢版入返信任鏈。</p>',
@@ -295,6 +321,7 @@ def render(data, facts, report_href):
         f'  <section id="{RS.SECTION_ID}" aria-labelledby="rpg-now">',
         '    <h2 class="rpg-now" id="rpg-now" aria-live="polite"></h2>',
         '    <p class="rpg-notes"></p>',
+        f'    <p class="rpg-labels" hidden>{RL.LINKS_LEAD}</p>',
         f'    <p class="rpg-flag" hidden>{RS.FLAG_WORDS}</p>',
         '    <p class="rpg-missing" hidden>呢個連結指住嘅局唔存在，而家顯示緊預設嗰局。</p>',
         '    <noscript><p>重播同揀局要開 JavaScript 先用到。</p></noscript>',
@@ -367,10 +394,17 @@ def audit_chart(page):
             for s in (CHART_TITLE, CHART_SOURCE) if s not in page]
 
 
+def audit_labels(page):
+    """A page carrying an opener / technique label must carry the sentence saying what one means."""
+    has = re.search(r'"(opener|technique)","', page) is not None
+    return (["the page labels openers or techniques without the sentence saying what a label means"]
+            if has and RL.SENTENCE not in page else [])
+
+
 def audit(page):
     """Every reason `page` breaks the quarantine or the single-file rule; empty means clean."""
     return (audit_quarantine(page, RS.REQUIRED, PAGE_DATA_ID)
-            + audit_player(page) + audit_chart(page))
+            + audit_player(page) + audit_chart(page) + audit_labels(page))
 
 
 def _selftest():
@@ -378,7 +412,7 @@ def _selftest():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sdir = os.path.join(root, "sessions", "2026-07-24")
     data, facts = load(sdir)
-    page = render(data, facts, "2026-07-24.html")
+    page = render(data, facts, "2026-07-24.html", RL.for_session(data, facts, RL.load_sources(root)))
     cases = [("control: the rendered page", page, None)]
     cases.append(("a claim badge", page.replace(RS.TITLE_MARK, RS.TITLE_MARK + '<span class="claim-badge">✓</span>', 1), "claim badge"))
     cases.append(("a data-claim attribute", page.replace('class="rpg-picker"', 'class="rpg-picker" data-claim="C001"', 1), "claim badge"))
@@ -390,6 +424,7 @@ def _selftest():
     cases.append(("destroy() before quiet", page.replace(QUIET_BEFORE_DESTROY, "if (handle) { handle.destroy(); handle = null; }\n    quiet = true;", 1), "OLD round"))
     cases.append(("an external script", page.replace("<script>", '<script src="https://cdn.example/x.js"></script><script>', 1), "external request"))
     cases.append(("an external stylesheet", page.replace("<style>", '<link rel="stylesheet" href="x.css"><style>', 1), "external request"))
+    cases.append(("a label without its sentence", page.replace(RL.SENTENCE, ""), "what a label means"))
     cases.append(("a second data island", page.replace("</body>", f'<script type="application/json" id="{PAGE_DATA_ID}">{{}}</script></body>', 1), "data island"))
     ok = True
     for name, p, want in cases:
@@ -439,7 +474,8 @@ def main(argv=None):
     if not a.session or not a.out:
         ap.error("need a session dir and --out, or --selftest")
     data, facts = load(a.session)
-    page = render(data, facts, os.path.basename(os.path.normpath(a.session)) + ".html")
+    labels = RL.for_session(data, facts, RL.load_sources()) if data is not None else None
+    page = render(data, facts, os.path.basename(os.path.normpath(a.session)) + ".html", labels)
     if page is None:
         print(f"{a.session} has no {RS.FACTS_REL}; no page", file=sys.stderr)
         return 1

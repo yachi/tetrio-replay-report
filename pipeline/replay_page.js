@@ -7,6 +7,7 @@
 
    - the hash is #m<pos>r<round>@p<n>; picking a round is a plain link to #m<pos>r<round>, and
      moving inside a round rewrites the hash with replaceState (no history flood);
+   - the round's opener / technique pages (replay_labels.py) are listed as links under its notes;
    - the chart plots the RECORDED garbage events (射埋, before cancellation), never the simulator;
      clicking it seeks to the last placement at or before that moment on the shared clock;
    - nodes are built with createElement / textContent only. */
@@ -28,6 +29,8 @@
   var host = root.querySelector(".rpg-host");
   var nowEl = document.getElementById("rpg-now");
   var notesEl = root.querySelector(".rpg-notes");
+  var labelsEl = root.querySelector(".rpg-labels");
+  var labelsLead = labelsEl.textContent;
   var flagEl = root.querySelector(".rpg-flag");
   var missingEl = root.querySelector(".rpg-missing");
   var cv = root.querySelector(".rpg-canvas");
@@ -185,6 +188,14 @@
       if (i) notesEl.appendChild(el("br"));
       notesEl.appendChild(document.createTextNode(n));
     });
+    clear(labelsEl);
+    labelsEl.appendChild(document.createTextNode(labelsLead));
+    (D.links || []).forEach(function (l) {
+      var a = el("a", null, l[0]);
+      a.href = l[1];
+      labelsEl.appendChild(a);
+    });
+    labelsEl.hidden = !(D.links && D.links.length);
     flagEl.hidden = !D.flags.length;
     missingEl.hidden = !missing;
     openMatch(D.match);
