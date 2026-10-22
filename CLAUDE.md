@@ -368,6 +368,8 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
+python3 -m pipeline.check_routes_techniques sessions/<date>/report  # CI gate: 定式路線同中盤手法 + 建議's tagged items
+python3 -m pipeline.check_routes_techniques sessions/<date>/report --selftest  #   its mutants
 python3 -m analysis.app_decomposition [--json]  # the corpus APP-gap roll-up over every attack-facts.json
 python3 -m pipeline.check_app_decomposition     # CI gate: CLAUDE.md's APP-gap figures; --render
 python3 -m pipeline.check_app_decomposition --selftest  #   prints them, --selftest its mutants + probe control
@@ -3478,6 +3480,34 @@ A `SECTIONS` entry's anchor must be a **marker comment**, not a `<section id=…
 id="coaching">` lives inside the coaching region, so anchoring there inserts the new block into a
 span a later pass rewrites: `build_report` prints `inserted: <name>` and the finished file contains
 nothing at all.
+
+## 定式路線同中盤手法 — the one quarantined section ABOVE the trust chain, and the advice written from it
+
+`pipeline/routes_techniques_section.py`, region `routes-techniques`, inserted right after 數據對決
+(before the moments region's BEGIN marker; in `SELF_INSERTING`, because a filtered subset has no
+`sim/` directory and gets none). It prints one night's slice of the corpus route and technique
+artefacts (`pipeline.sites`' lists, read through `replay_labels.load_sources`): per opener, the rounds
+whose bag 1 matched and how many reached bag 2, bag 3 or a drawn Perfect Clear inside the verified
+prefix; per technique variant, the hits over the night's scored TSDs (`opener-facts.json`
+`stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
+how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
+a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
+moment. No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
+— and it sits early only because 建議 cites it.
+
+**建議 has a second kind of item, and it is the one place hand prose cites simulator figures.** A
+`prose/coaching.json` column may carry `sim_recs`; `coaching.py` renders them after the proved `recs`,
+numbered on, each opening with `coaching.SIM_TAG` (「未經證明」, linking to the section), and adds
+`SIM_NOTE` and a `#coaching .cs-*` style. `pipeline/check_routes_techniques.py` gates both halves: the
+region is a re-render with its eyebrow, title and `REQUIRED` sentences and no badge; every authored
+item renders once with its tag (and the tag appears nowhere else), carries no badge, and **every Arabic
+figure in it is a figure the region prints**. That last check is membership over the region's printed
+numbers, not a match to the right cell — so write a tagged item's figures only from the cell it talks
+about, use Arabic digits for every count so the check sees them, and never a total the cell does not
+print (「冇接到嗰 5 次」 when the cell prints only the reasons is exactly the sentence it cannot catch).
+The items are corpus-artefact-dependent: re-emitting any route or technique artefact moves every
+night's region, `build_report --check` goes red, and each night's tagged items must be re-read against
+the new cells, not just rebuilt.
 
 ## 重播 — the animated replay, the third quarantined section
 

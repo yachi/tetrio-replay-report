@@ -1077,6 +1077,9 @@ LAYOUT = [
 # they need no empty pair here. Each entry says why, because "it is missing" and
 # "it is deliberately absent" look identical in the output.
 SELF_INSERTING = {
+    "routes-techniques": "conditional — only a report under sessions/<date>/ with sim/opener-facts.json "
+                         "gets one (a filtered subset has no sim/ directory); build_report inserts it "
+                         "before the moments region's BEGIN marker, right after 數據對決",
     "intense-round": "conditional — `_intense_round` returns None for a session whose rounds "
                      "are all shorter than QUALIFYING_MS, so no claims are generated and "
                      "`intense_round.build` returns None; it inserts itself before the "

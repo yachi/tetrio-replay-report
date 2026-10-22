@@ -18,6 +18,10 @@
         "<strong>手上功夫亦都唔係重點，但 finesse 值得順手執。</strong> KPP 3.628 對 3.639，爭唔夠 0.3%<span class=\"badge\" data-claim=\"C008\"></span>，慳嗰邊仲要係你<span class=\"badge\" data-claim=\"G065\"></span>；而喺你自己身上，KPP 喺贏局同輸局之間郁唔夠 2%<span class=\"badge\" data-claim=\"G070\"></span>，即係同輸贏無關。真正蝕嗰格係 finesse 失誤，1123 對 976<span class=\"badge\" data-claim=\"G034\"></span>、每粒方塊嘅失誤亦係你多<span class=\"badge\" data-claim=\"G045\"></span>、perfect piece 比率係佢好<span class=\"badge\" data-claim=\"G046\"></span>。執得就執，但排喺頭兩條之後。",
         "<strong>輸完一局之後嗰局，係你最明顯嘅漏洞。</strong> 你輸咗一局之後，35 次機會裏面即刻贏返 12 次<span class=\"badge\" data-claim=\"G052\"></span>；佢同一條數係 25 次贏返 15 次<span class=\"badge\" data-claim=\"G053\"></span>。呢個係可以單獨練嘅習慣，同砌波技術冇乜關係。",
         "<strong>第七場係樣板，抄返自己。</strong> 開波連贏四局、六局收工，5 比 1<span class=\"badge\" data-claim=\"G010\"></span><span class=\"badge\" data-claim=\"C015\"></span>，係全晚贏得最鬆嗰場，亦係效率差距唔夠 1% 嗰三場之一<span class=\"badge\" data-claim=\"C007\"></span>。返去睇返嗰六局你點出貨。"
+      ],
+      "sim_recs": [
+        "<strong>階段同欄干之後，條井俾人蓋住或者塞咗。</strong>階段 9 次接到 Tetris 3 次（條井俾棋蓋住咗 4、俾 I 以外嘅棋填咗 2）；欄干（TSD）2 次都冇接到，都係俾 I 以外嘅棋填咗。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
+        "<strong>今晚得山岳積み2号行得深。</strong>山岳積み2号 26 局有 17 局行到第二巡；迷走砲 9 局得 3 局、はちみつ砲 7 局得 1 局。"
       ]
     },
     "pinglamb": {
@@ -32,6 +36,10 @@
         "<strong>守住你個地板，唔使追個天花板。</strong> 你贏局約 0.72、輸局約 0.61<span class=\"badge\" data-claim=\"G069\"></span>，而對面係約 0.68 對約 0.55<span class=\"badge\" data-claim=\"G068\"></span>；兩邊贏嘅局爭 6% 幾、輸嘅局爭 11% 幾<span class=\"badge\" data-claim=\"C002\"></span>。你嘅優勢全部喺打得差嗰陣仲頂得住，所以要保養嘅係呢一格，唔係再谷高個上限。",
         "<strong>你輸嗰三場，就係咬得最緊嗰三場。</strong> 嗰三場你每粒方塊嘅攻擊高唔夠 1%，其餘七場每場都高過 11%<span class=\"badge\" data-claim=\"C007\"></span>。今晚啲數講唔到你喺貼身局入面差咗啲乜——所以呢格係下次要留意嘅嘢，唔係而家可以盲改嘅嘢。",
         "<strong>Perfect Clear 唔好當成戰績。</strong> 兩邊都係 5 個<span class=\"badge\" data-claim=\"G040\"></span>，你有 5 局做到、贏咗 2 局<span class=\"badge\" data-claim=\"G080\"></span>；全場淨係你一個做到全消嘅 4 局入面，你仲要輸咗 3 局<span class=\"badge\" data-claim=\"G081\"></span>。對面同一條數係 4 局輸 2 局<span class=\"badge\" data-claim=\"G079\"></span>。有得食就食，但唔好當佢係贏波嘅訊號。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 4 次全部冇接到第二個 TSD。</strong>4 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
+        "<strong>はちみつ砲係今晚行得最深嘅路線。</strong>24 局有 20 局行到第二巡、7 局行到第三巡或之後、1 局打出全消。"
       ]
     }
   },

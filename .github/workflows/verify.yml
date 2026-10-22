@@ -442,6 +442,20 @@ jobs:
             python3 -m pipeline.check_attack_section "$W" --selftest
           fi
 
+      # 定式路線同中盤手法: the night's slice of the opener route and mid-game technique artefacts,
+      # placed early in the report, and 建議's tagged 「未經證明」 items written from it. The region
+      # must be exactly a re-render, carry its quarantine sentences and no badge; every tagged item
+      # must render with its tag, carry no badge, and print only figures the region prints.
+      # --selftest plants each corruption, so it runs where the section exists.
+      - name: Check the simulator-derived routes and techniques section and tagged advice
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_routes_techniques "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/opener-facts.json" ]; then
+            python3 -m pipeline.check_routes_techniques "$W" --selftest
+          fi
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail

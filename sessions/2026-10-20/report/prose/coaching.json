@@ -14,6 +14,10 @@
         "<strong>差距喺贏局，唔係輸局。</strong>贏嗰啲局對手每粒高你 7.23%，輸嗰啲局淨係高 1.27%<span class=\"badge\" data-claim=\"C002\"></span>——同上一晚啱啱相反，今晚地板貼埋，天花板未到。不過 1.27% 呢個數係一局撐住嘅：抽走第二場第一局，連正負號都反轉，所以講得「地板差唔多」，講唔得「pinglamb 輸局都重啲」。",
         "<strong>第四場 3 比 2 領先之後尾三局連失</strong><span class=\"badge\" data-claim=\"C014\"></span>，嗰場總攻擊少過對手<span class=\"badge\" data-claim=\"C015\"></span>。第一場你由 2 比 4 追返<span class=\"badge\" data-claim=\"C011\"></span>，第四場就冇。",
         "<strong>全晚冇自己頂到頂</strong><span class=\"badge\" data-claim=\"C006\"></span>，守得住；要加嘅係下半場嘅攻擊。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 6 次全部冇接到第二個 TSD。</strong>個位俾其他棋填咗 4、下一粒 T 落咗第二度 2。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
+        "<strong>SDPC Spin 今晚 4 局全部行到第三巡或之後。</strong>4 局全部跟到<a href=\"sdpcspin.html\">SDPC Spin 頁</a>嘅第二巡同第三巡圖。條路線今晚行得完。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,10 @@
         "<strong>每粒重唔等於場場贏。</strong>第一場你每粒方塊嘅攻擊高過對手，但對手落多咗粒數、總攻擊多過你，結果 4 比 5<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"C011\"></span>。",
         "<strong>第二場係今晚唯一一場每粒輸畀對手</strong>，而且輸成 7% 以上，結果 1 比 5<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"C012\"></span>。",
         "頂到頂 2 次，對手 0 次<span class=\"badge\" data-claim=\"C006\"></span>。KPP 同對手只差 0.16%<span class=\"badge\" data-claim=\"C008\"></span>，呢欄一向都唔話事。"
+      ],
+      "sim_recs": [
+        "<strong>STSD 今晚次次接到。</strong>3 次接到第二個 T-spin 3 次。繼續用。",
+        "<strong>はちみつ砲今晚次次行到第二巡。</strong>8 局全部行到第二巡、3 局行到第三巡或之後；迷走砲 18 局有 14 局。"
       ]
     }
   },
