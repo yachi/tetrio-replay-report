@@ -57,7 +57,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
 const ART_PATH = `${import.meta.dir}/../../analysis/kaidan-facts.json`;
 const TR = JSON.parse(readFileSync(KAIDAN.transcriptionPath, 'utf8'));
 const V = TR.variants.find((v: any) => v.id === 'kaidan');
@@ -132,6 +132,7 @@ const KAIDAN_HITS: string[] = [
   "2026-10-12 m4r2 pinglamb lock 52 (mirrored)", "2026-10-12 m6r7 pinglamb lock 46",
   "2026-10-12 m8r1 pinglamb lock 45", "2026-10-20 m1r5 yachi lock 19 (mirrored)", "2026-10-20 m1r8 yachi lock 81",
   "2026-10-20 m2r1 pinglamb lock 54", "2026-10-20 m2r1 yachi lock 62 (mirrored)", "2026-10-20 m4r6 yachi lock 157 (mirrored)",
+  "2026-10-22 m1r3 yachi lock 25", "2026-10-22 m2r3 yachi lock 19", "2026-10-22 m3r1 pinglamb lock 61", "2026-10-22 m3r2 pinglamb lock 53 (mirrored)", "2026-10-22 m3r5 pinglamb lock 136", "2026-10-22 m6r4 pinglamb lock 25 (mirrored)", "2026-10-22 m7r2 yachi lock 119 (mirrored)", "2026-10-22 m9r4 pinglamb lock 132",
 ];
 
 const PAYOFF_NOT_FIRED: string[] = [
@@ -218,6 +219,7 @@ const PAYOFF_NOT_FIRED: string[] = [
   "2026-10-20 m1r5 yachi lock 19 (well_covered at lock 21)",
   "2026-10-20 m2r1 yachi lock 62 (i_in_well_not_quad at lock 66)",
   "2026-10-20 m4r6 yachi lock 157 (i_in_well_not_quad at lock 158)",
+  "2026-10-22 m1r3 yachi lock 25 (well_covered at lock 29)", "2026-10-22 m2r3 yachi lock 19 (well_filled_not_i at lock 20)", "2026-10-22 m3r5 pinglamb lock 136 (well_filled_not_i at lock 141)", "2026-10-22 m7r2 yachi lock 119 (well_filled_not_i at lock 120)",
 ];
 
 const GARBAGE_IN_WINDOW: string[] = [
@@ -256,6 +258,7 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-10-09 m6r8 pinglamb lock 26", "2026-10-09 m7r6 yachi lock 11", "2026-10-09 m10r8 yachi lock 44",
   "2026-10-12 m1r3 yachi lock 81", "2026-10-12 m4r2 pinglamb lock 52", "2026-10-12 m6r7 pinglamb lock 46",
   "2026-10-12 m8r1 pinglamb lock 45", "2026-10-20 m2r1 pinglamb lock 54",
+  "2026-10-22 m2r3 yachi lock 19", "2026-10-22 m3r2 pinglamb lock 53", "2026-10-22 m3r5 pinglamb lock 136", "2026-10-22 m6r4 pinglamb lock 25", "2026-10-22 m9r4 pinglamb lock 132",
 ];
 
 const KAIDAN_IN_OPENER: string[] = [
@@ -264,6 +267,7 @@ const KAIDAN_IN_OPENER: string[] = [
   // 2026-10-20 adds the sixth: yachi's m1r5, mirrored, on lock 19 of a prefix verified to 68, no garbage in the
   // window, a 3-deep well whose payoff did not fire (well_covered at lock 21)
   "2026-10-20 m1r5 yachi lock 19",
+  "2026-10-22 m2r3 yachi lock 19",
 ];
 
 const WELL_DEPTH_LT4: string[] = [
@@ -304,6 +308,7 @@ const WELL_DEPTH_LT4: string[] = [
   "2026-10-12 m1r3 pinglamb lock 99 (2 deep)", "2026-10-12 m1r3 yachi lock 81 (2 deep)",
   "2026-10-12 m8r1 pinglamb lock 45 (2 deep)", "2026-10-20 m1r5 yachi lock 19 (3 deep)",
   "2026-10-20 m2r1 yachi lock 62 (3 deep)", "2026-10-20 m4r6 yachi lock 157 (2 deep)",
+  "2026-10-22 m3r1 pinglamb lock 61 (2 deep)", "2026-10-22 m6r4 pinglamb lock 25 (3 deep)", "2026-10-22 m7r2 yachi lock 119 (3 deep)",
 ];
 
 const RECON_DROPPED_TSD: string[] = [];
@@ -384,6 +389,13 @@ const HIT_NOT_DONATION: string[] = [
   "2026-10-20 m1r5 yachi lock 19 (filled_above_window)", "2026-10-20 m1r8 yachi lock 81 (filled_above_window)",
   "2026-10-20 m2r1 pinglamb lock 54 (filled_above_window)", "2026-10-20 m2r1 yachi lock 62 (filled_above_window)",
   "2026-10-20 m4r6 yachi lock 157 (filled_above_window)",
+  "2026-10-22 m1r3 yachi lock 25 (filled_above_window)",
+  "2026-10-22 m2r3 yachi lock 19 (filled_above_window)",
+  "2026-10-22 m3r1 pinglamb lock 61 (filled_above_window)",
+  "2026-10-22 m3r2 pinglamb lock 53 (filled_above_window)",
+  "2026-10-22 m6r4 pinglamb lock 25 (filled_above_window)",
+  "2026-10-22 m7r2 yachi lock 119 (filled_above_window)",
+  "2026-10-22 m9r4 pinglamb lock 132 (filled_above_window)",
 ];
 
 /** 社畜トレイン's window and this one agree, anchored on the same flat T in the same hand, on every cell they share:
@@ -406,45 +418,48 @@ const SHACHIKUTRAIN_ALSO_KAIDAN: string[] = [
   "2026-10-09 m6r8 pinglamb lock 26", "2026-10-09 m7r6 yachi lock 11", "2026-10-09 m7r8 yachi lock 56",
   "2026-10-12 m1r3 yachi lock 81", "2026-10-12 m3r1 yachi lock 40", "2026-10-12 m4r2 pinglamb lock 52",
   "2026-10-12 m6r7 pinglamb lock 46", "2026-10-20 m1r8 yachi lock 81", "2026-10-20 m2r1 pinglamb lock 54",
+  "2026-10-22 m3r2 pinglamb lock 53",
+  "2026-10-22 m3r5 pinglamb lock 136",
+  "2026-10-22 m9r4 pinglamb lock 132",
 ];
 
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 769, yachi: 605 };
+const WINDOW_OFF_BOARD = { pinglamb: 790, yachi: 627 };
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
 const DENOM = {
-  pinglamb: { all: 5421, in_opener: 1061, mid_game: 4360 },
-  yachi: { all: 4891, in_opener: 1268, mid_game: 3623 },
+  pinglamb: { all: 5636, in_opener: 1113, mid_game: 4523 },
+  yachi: { all: 5100, in_opener: 1317, mid_game: 3783 },
 };
 /** Per player: hits, their split, mirrored, garbage in the window. */
 const HITS = {
-  pinglamb: { all: 63, in_opener: 1, mid_game: 62, mirrored: 35, garbage_in_window: 47 },
-  yachi: { all: 96, in_opener: 5, mid_game: 91, mirrored: 46, garbage_in_window: 57 },
+  pinglamb: { all: 68, in_opener: 1, mid_game: 67, mirrored: 37, garbage_in_window: 51 },
+  yachi: { all: 99, in_opener: 6, mid_game: 93, mirrored: 47, garbage_in_window: 58 },
 };
 /** Per player: the payoff (stored under `followup_by_player`, the shared artefact key). */
 const PAYOFF = {
-  pinglamb: { fired: 37, not_fired: { i_in_well_not_quad: 7, round_ended: 2, well_covered: 8, well_filled_not_i: 9 } },
-  yachi: { fired: 36, not_fired: { i_in_well_not_quad: 8, past_verified: 2, round_ended: 1, well_covered: 27,
-                                   well_filled_not_i: 22 } },
+  pinglamb: { fired: 41, not_fired: { i_in_well_not_quad: 7, round_ended: 2, well_covered: 8, well_filled_not_i: 10 } },
+  yachi: { fired: 36, not_fired: { i_in_well_not_quad: 8, past_verified: 2, round_ended: 1, well_covered: 28,
+                                   well_filled_not_i: 24 } },
 };
 const CONTROLS = {
-  under: { TSS: { pinglamb: 3, yachi: 8 }, TST: { pinglamb: 0, yachi: 0 },
+  under: { TSS: { pinglamb: 3, yachi: 9 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 1001, yachi: 816 }, no_roof: { pinglamb: 278, yachi: 234 },
-              t_overlap: { pinglamb: 264, yachi: 288 } },
-  orientation_baseline: { pinglamb: 46, yachi: 64 },
+  ablation: { no_must_empty: { pinglamb: 1036, yachi: 850 }, no_roof: { pinglamb: 290, yachi: 245 },
+              t_overlap: { pinglamb: 273, yachi: 301 } },
+  orientation_baseline: { pinglamb: 52, yachi: 67 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored flat T meets ONE part of the window — the
  *  roof row above the cleared rows, the cleared rows, the well rows under them. The cleared rows are entailed by the
  *  clear (NaiveClauseForced) and do the least work; the well rows do the most, and are exactly the `no_roof`
  *  ablation (the cleared rows add nothing to them at a full TSD). */
-const PART_ONLY = { above: 3163, cleared: 9003, below: 512 };
+const PART_ONLY = { above: 3284, cleared: 9381, below: 535 };
 /** THE OTHER TWO MAXIMAL AGREEMENT BOXES (the window's note): measured as controls, never asserted against. In
  *  basic.spin's frame: the cleared rows alone (every cell entailed), and the cleared rows with the two well rows, one
  *  column wider to the left and with no roof row. `n` the full TSDs each admits, `hits` how many of this window's hits
  *  are among them. */
 const OTHER_MAXIMAL_BOXES = {
-  cleared_only: { window: { rows: [2, 3], cols: [3, 9] }, n: 9003, hits: 159 },
-  no_roof: { window: { rows: [2, 5], cols: [4, 9] }, n: 459, hits: 138 },
+  cleared_only: { window: { rows: [2, 3], cols: [3, 9] }, n: 9381, hits: 167 },
+  no_roof: { window: { rows: [2, 5], cols: [4, 9] }, n: 480, hits: 146 },
 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
@@ -506,7 +521,7 @@ test('quarantined: report_eligible false, no claim ids, one variant measured at 
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(14538);
+  expect(n).toBe(15141);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -716,7 +731,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
 test('the payoff row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(30);
-  expect(c.rowmap_steps).toBe(252000);
+  expect(c.rowmap_steps).toBe(264047);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

@@ -222,6 +222,7 @@ unless it is:
 | 2026-10-09 | 19 of 23 testable — **83%** | 17 of 23 — **74%** | 17 of 23 — **74%** |
 | 2026-10-12 | 15 of 19 testable — **79%** | 13 of 19 — **68%** | 13 of 19 — **68%** |
 | 2026-10-20 | 10 of 14 testable — **71%** | 9 of 14 — **64%** | 9 of 14 — **64%** |
+| 2026-10-22 | 16 of 19 testable — **84%** | 14 of 19 — **74%** | 14 of 19 — **74%** |
 
 Every figure above is measured, and `pipeline/claims/check_equiv_coverage.py` re-derives
 them on push. **Until 2026-08-15 none of that was true**: three of the six sessions had
@@ -232,8 +233,8 @@ the denominator moving too. Enumerating every kind costs ~5× the wall clock and
 that session at 81%. A figure that moved with an argument nobody varied had been reading as
 a property of the data.
 
-The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->twelve of the eighteen<!--/equiv:gate-count-->
-rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12 and 10-20<!--/equiv:gate-sessions-->), and
+The **≥85%** acceptance gate P4 declared is missed by <!--equiv:gate-count-->thirteen of the nineteen<!--/equiv:gate-count-->
+rows above (<!--equiv:gate-sessions-->2026-07-22, 08-09, 08-14, 08-19, 08-25, 09-03, 09-10, 09-11, 09-17, 10-09, 10-12, 10-20 and 10-22<!--/equiv:gate-sessions-->), and
 2026-07-22 — the session the gate was declared on — is one of them at 81%. That is reported rather than enforced: one hand claim is worth 10.0
 points on 2026-07-28, so no threshold exists that is both honest and stable, and a floor all
 eighteen pass would sit at 60% and bless that session's artefact by definition. The gate compares

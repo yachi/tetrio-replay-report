@@ -19,7 +19,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/attack-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
@@ -27,12 +27,19 @@ const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
 /* 2026-10-12 adds nothing to any of the three lists: its 110 player-rounds agree on the attack
  * total and on every clear-type count, and no engine run locks past the game's `piecesplaced`.
  * 2026-10-20 adds nothing either: all 60 of its player-rounds agree on both anchors, and no
- * engine run locks past the game's `piecesplaced`. */
-/** Player-rounds where the engine's attack total is not the replay's. Each is the engine missing
- *  one Double the game credited at the very end of the round (it is also in COUNT_EXCEPTIONS). */
+ * engine run locks past the game's `piecesplaced`.
+ * 2026-10-22 adds two player-rounds to all three lists, both late divergences named in
+ * replay.test.ts's ADMISSION_EXCEPTIONS: 01 r6 pinglamb is 08-09-4's shape (one Double missed at
+ * the end, one lock past the game's count); 09 r3 yachi is the first entry missing more than one
+ * clear (three Singles and a Triple, five locks past the game's 118), past a prefix verified to 107. */
+/** Player-rounds where the engine's attack total is not the replay's. Each but 2026-10-22-09 r3 is
+ *  the engine missing one Double the game credited at the very end of the round (each is also in
+ *  COUNT_EXCEPTIONS). */
 const ATTACK_EXCEPTIONS = [
   'replay-2026-08-09-4.ttrm r3 pinglamb engine 33 replay 34',
   'replay-2026-09-18-05.ttrm r2 yachi engine 22 replay 23',
+  'replay-2026-10-22-01.ttrm r6 pinglamb engine 91 replay 92',
+  'replay-2026-10-22-09.ttrm r3 yachi engine 65 replay 67',
 ];
 /** Player-rounds where some clear-type count disagrees with the replay's counter, off by one each. */
 const COUNT_EXCEPTIONS = [
@@ -41,6 +48,8 @@ const COUNT_EXCEPTIONS = [
   'replay-2026-08-25-05.ttrm r5 yachi {"S":[8,9]}',
   'replay-2026-09-18-05.ttrm r2 yachi {"D":[2,3]}',
   'replay-2026-10-09-07.ttrm r1 pinglamb {"S":[9,10]}',
+  'replay-2026-10-22-01.ttrm r6 pinglamb {"D":[1,2]}',
+  'replay-2026-10-22-09.ttrm r3 yachi {"S":[9,12],"T":[1,2]}',
 ];
 /** Player-rounds where the engine locks pieces past the game's own `piecesplaced`. */
 const LOCKS_PAST_END = [
@@ -52,6 +61,8 @@ const LOCKS_PAST_END = [
   'replay-2026-08-19-5.ttrm r0 pinglamb 33/32',
   'replay-2026-09-18-05.ttrm r2 yachi 52/50',
   'replay-2026-10-09-06.ttrm r4 pinglamb 72/70',
+  'replay-2026-10-22-01.ttrm r6 pinglamb 108/107',
+  'replay-2026-10-22-09.ttrm r3 yachi 123/118',
 ];
 
 test('rebuilding every session reproduces its committed attack-facts.json byte for byte', () => {

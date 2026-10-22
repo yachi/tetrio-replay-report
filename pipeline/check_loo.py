@@ -611,6 +611,16 @@ PUBLISHED = (
     # is quoted only in the shortfall table, which is not a SENTENCES target.
     ("2026-10-20", "app_gap_won", "series"),
     ("2026-10-20", "app_gap_lost", "series"),
+    # 2026-10-22 takes NO `ANNOTATED` entry. Measured over the two regime figures, 63 rounds:
+    #
+    #     app_gap_won     +15.1683 pp    m3r1 -> +13.0560  rel 0.139  1.28x the next of 63
+    #     app_gap_lost    +20.1255 pp    m1r7 -> +18.0422  rel 0.104  1.39x
+    #
+    # Both far under THRESHOLD and neither sign moves: on the night with the corpus's largest
+    # session APP gap, both regime gaps are large and spread over many rounds, which is 09-17's
+    # reading. Its attack total is quoted only in the shortfall table, not a SENTENCES target.
+    ("2026-10-22", "app_gap_won", "series"),
+    ("2026-10-22", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it

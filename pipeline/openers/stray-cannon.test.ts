@@ -25,7 +25,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -45,11 +45,13 @@ const Z_PLACED_ELSEWHERE_BAG1 = [
 ];
 const Z_LEFT_BAG1 = [
   '2026-07-24 m4r1 yachi', '2026-07-28 m4r5 pinglamb', '2026-08-25 m2r3 yachi', '2026-09-19 m4r4 pinglamb',
+  '2026-10-22 m1r7 yachi',      // matched z_left at 7 and the 6-lock field; prefix 102, no bag 2
 ];
 const I_EARLY_CASES = ['2026-09-11 m7r2 yachi (mirrored)'];
 const TST_DONATE_CASES = [
   '2026-07-24 m1r2 pinglamb', '2026-07-24 m3r5 pinglamb', '2026-08-09 m2r1 pinglamb',
   '2026-08-19 m3r4 pinglamb', '2026-09-18 m10r4 pinglamb', '2026-09-19 m13r2 pinglamb',
+  '2026-10-22 m9r4 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 140
 ];
 /** 8-line PCs that are not on the page, named with the node they stop under. */
 const PC_OFF_PAGE = [
@@ -60,6 +62,7 @@ const PC_OFF_PAGE = [
   '2026-09-18 m13r7 pinglamb under 2.ideal.other',
   '2026-10-03 m18r4 yachi under bag1.z_right.other',   // no bag-2 page match: why PC detection is not gated on bag 2
   '2026-10-09 m4r6 pinglamb under 2.ideal.other',
+  '2026-10-22 m2r5 pinglamb under bag1.z_right.other',  // a PC on lock 19 with no TST before it, prefix 105
 ];
 /** A PC that matches patterns of two branches by colour; its own bag-2 branch decides. */
 const MULTI_COLOUR_RESOLVED_BY_BRANCH = ['2026-09-17 m4r2 pinglamb'];
@@ -75,10 +78,13 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2026-10-20 adds 20 bag-2 rounds, every one under its own condition but one: 2.ideal 309 -> 320,
 // 2.normal_OS 102 -> 109, 2.normal_SO 30 -> 31, and one more 2.ideal build under a 2.normal_OS
 // condition (36 -> 37). No new named-list entry: its 25 bag-1 cases are all bag1.z_right.
+// 2026-10-22 adds 34 to 2.ideal (24 under its own condition, 7 under 2.normal_OS, 1 under
+// 2.normal_SO; hand-summed from the table's deltas), 7 to 2.normal_OS and 4 to 2.normal_SO,
+// and one entry each to Z_LEFT_BAG1, TST_DONATE_CASES and PC_OFF_PAGE.
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 320, '2.normal_OS': 37, '2.normal_SO': 12 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 109, '2.normal_SO': 14 },
-  '2.normal_SO': { '2.ideal': 10, '2.normal_OS': 1, '2.normal_SO': 31 },
+  '2.ideal': { '2.ideal': 344, '2.normal_OS': 44, '2.normal_SO': 13 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 114, '2.normal_SO': 16 },
+  '2.normal_SO': { '2.ideal': 11, '2.normal_OS': 1, '2.normal_SO': 34 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 
