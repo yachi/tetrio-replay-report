@@ -3503,6 +3503,19 @@ verified prefix is shown as a boundary on the board, not as a ✓.** It is what 
 walk in `verified-prefix.ts` reached; `verifiedIndex` is now that walk's projection, not a second
 copy of it.
 
+**The whole-night page labels openers and mid-game techniques in its key moments** (`pipeline/replay_labels.py`,
+since 2026-10-22): an `opener` moment at every route stage a case reached inside the verified prefix (bag-1 board,
+bag-1 T-spin, bag-2 board, each snapshot, a drawn Perfect Clear) and a `technique` moment just before every
+technique hit's T, read from the route and technique artefacts in `pipeline/sites.py` — the ONE list of sites,
+which `bin/build-docs` now imports instead of keeping its own. Every label is re-checked against the page's own
+decode (`decode_boards`; the board equals the drawing by occupancy in the recorded hand, or the technique window
+fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
+`python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
+matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
+(no label is no evidence the opener was not played). The report's 最癲一局 region passes no labels and is unchanged.
+TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
+which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
+
 The engine hooks the emitter needs are **opt-in**. `createEngine`'s `date` defaults to the wall clock
 as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json` re-emits
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what

@@ -47,18 +47,8 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import gamushiro_page, honey_cup_page, mountainous2_page, sdpcspin_page, stickspin_page  # noqa: E402
-from pipeline import stray_cannon_page  # noqa: E402
-from pipeline import btcannon_page, doubledagger_page, imperialcross_page, stmbcave_page, stsd_page, technique_page  # noqa: E402
-from pipeline import cutcopy_page, shachikutrain_page, parapet_page, kaidan_page  # noqa: E402
-
-#: every opener route site, in the order its card appears under 定式路線
-ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE,
-               gamushiro_page.SITE, sdpcspin_page.SITE]
-#: every mid-game technique site, in the order its card appears under 中盤手法
-TECHNIQUE_SITES = [stsd_page.SITE, stmbcave_page.SITE, imperialcross_page.SITE, doubledagger_page.SITE,
-                   btcannon_page.SITE, cutcopy_page.SITE, shachikutrain_page.SITE, parapet_page.SITE,
-                   kaidan_page.SITE]
+from pipeline import replay_labels, technique_page  # noqa: E402
+from pipeline.sites import ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -453,14 +443,18 @@ def main(argv=None):
     # renders under the same condition — and a docs/*-replay.html nothing produces is drift, so a
     # removed artefact cannot leave its page published. Sessions only: a subset re-cuts a night and
     # numbers its matches afresh, so `#m<pos>r<round>` would point at different rounds.
+    # Each page's opener / technique key moments come from the route and technique artefacts, read
+    # once here and re-checked against every page's own decode as it renders (replay_labels.py).
     replays = []
     produced = set()
     report_of = {a[0]: a[2] for a in ARTEFACTS}
+    label_sources = replay_labels.load_sources(str(REPO))
     for d in sorted(SESSIONS.glob("*")):
         if not (d / replay_section.FACTS_REL).exists():
             continue
         data, facts = replay_page.load(str(d))
-        page = replay_page.render(data, facts, report_of[d.name])
+        page = replay_page.render(data, facts, report_of[d.name],
+                                  replay_labels.for_session(data, facts, label_sources))
         name = replay_section.page_name(data["session"])
         if name != replay_section.page_name(d.name):
             print(f"FAIL {d.name}/{replay_section.FACTS_REL} says session {data['session']!r}",
