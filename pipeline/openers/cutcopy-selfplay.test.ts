@@ -33,16 +33,10 @@ const TR = loadTranscription(CUTCOPY.transcriptionPath);
 
 /** THE NAMED LIST: [seed, hit lock, variant, hand, follow-up lock, fired]. */
 const HITS: [number, number, string, string, number, boolean][] = [
-  [48, 81, 'cutcopy', 'as_drawn', 86, true],
-  [65, 19, 'cutcopy', 'mirrored', 23, true],
   [83, 58, 'cutcopy', 'mirrored', 59, true],
-  [87, 11, 'cutcopy', 'mirrored', 13, true],
-  [118, 131, 'cutcopy', 'mirrored', 134, true],
-  [118, 144, 'cutcopy', 'as_drawn', 149, true],
   [136, 83, 'uncut', 'as_drawn', 84, true],
   [173, 193, 'cutcopy', 'mirrored', 196, true],
   [176, 80, 'cutcopy', 'as_drawn', 88, true],
-  [186, 27, 'cutcopy', 'as_drawn', 28, false],
   [193, 26, 'cutcopy', 'as_drawn', 32, true],
   [195, 135, 'cutcopy', 'mirrored', 141, true],
 ];

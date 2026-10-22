@@ -354,7 +354,16 @@
           9
         ]
       ],
-      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's three drawings of the shape, harddrop's six and Tetrisちゃんねる's two. Row 2 is the outer slot's arms row: its three cells empty, the wall beside them filled, and on the other side the roof over the T's right end and the cell beyond it filled; rows 3-4 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 5 the outer slot's nub cell, under the T's left arm, walled both sides. The outer slot's roof (the row above) is outside: harddrop's and the page's builds fill the cells the basic form leaves open there. Occupancy only, never colour; garbage is filled.",
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's three drawings of the shape, harddrop's six and Tetrisちゃんねる's two. Row 2 is the outer slot's arms row: its three cells empty, the wall beside them filled, and on the other side the roof over the T's right end and the cell beyond it filled; rows 3-4 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 5 the outer slot's nub cell, under the T's left arm, walled both sides. The rest of the row above the box is outside: harddrop's and the page's builds fill the cells the basic form leaves open there. The one cell of it the window does read is `window_extra`, the outer slot's overhang. Occupancy only, never colour; garbage is filled.",
+      "window_extra": {
+        "cells": [
+          [
+            1,
+            5
+          ]
+        ],
+        "note": "the overhang over the outer slot, which makes it a T-spin slot: it must already stand when the first TSD goes in. yachi's reading (2026-10-22), against the page's own allowance that the T-hole build's Z may go in after the first T-spin; every drawing of the shape fills it, so no drawing moves. Outside the box because the cells beside it in its row disagree between drawings."
+      },
       "untested_drawn": {
         "cells": [],
         "reason": ""
@@ -491,11 +500,15 @@
           "quote": "z_later",
           "decides": [
             [
+              1,
+              7
+            ],
+            [
               2,
               8
             ]
           ],
-          "reason": "the page lets the T-hole build's Z go in after the first T-spin. One of its cells (`decides`) is the outer slot's wall beside its arms row, which every drawing fills; the window reads none of its other three, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that order is no hit"
+          "reason": "the page lets the T-hole build's Z go in after the first T-spin. Two of its cells (`decides`) are the outer slot's overhang (`window_extra`) and its wall beside its arms row, which every drawing fills; the window reads neither of its other two, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that order is no hit, which is the rule (the overhang stands before the first T-spin)"
         }
       ]
     },
@@ -1786,7 +1799,8 @@
       "edo": {
         "image": "009",
         "tsds": 3,
-        "reading": "three TSDs nested, each row coloured by its TSD; measured below as two Cut Copies in a row"
+        "hits": 1,
+        "reading": "three TSDs nested, each row coloured by its TSD; measured below as one Cut Copy (the innermost T), its follow-up the middle T, whose outer slot has no overhang, so it is no second hit"
       },
       "slots": {
         "001": [

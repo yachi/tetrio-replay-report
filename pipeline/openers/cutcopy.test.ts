@@ -11,17 +11,17 @@
  *      at its drawn T, in its recorded hand, and at no other T placement; at no drawn T the gate names as a miss;
  *      on each no-T board the gate records, at its recorded placement; on this page's own drawings at their
  *      agreement slots; on the T-hole build with its Z left out, nowhere (the page's 「Z may go in after the first
- *      T-spin」, which the window does not express); and on no routes board (the gate's `cross_source.fires` is
+ *      T-spin」, which the window refuses: the overhang must stand before the first TSD); and on no routes board (the gate's `cross_source.fires` is
  *      empty, with its reason).
  *   4. STMB CAVE, ダブルダガー AND BT砲 ARE NOT THIS: all four lay the T flat, nub down; anchored on the same T this
  *      window clashes with each of theirs on a cell in every pairing of hands (re-derived from the transcriptions),
  *      so no lock is a hit of two of them, and none is.
  *   5. WHAT DISCRIMINATES: measured per window part, with the T anchored (the row above the T, the cleared rows,
  *      the row under them), against the headline: no single part gives it. The cleared rows are entailed by the
- *      clear and do no work; the row above and the row below each cut them down (the row below by at least ten
- *      times, the row above by less — both asserted), so those two are what discriminate.
+ *      clear and do no work; the row below cuts them down by at least ten times and the rows above (with the
+ *      overhang) by ten times more again — both asserted — so those two are what discriminate.
  *   6. NAMED lists, not bounds; pinned per-player figures; mutants, each with its asserted symptom (the one
- *      equivalent mutant named, measured, asserted to STAY byte-identical).
+ *      equivalent mutants named, measured, asserted to STAY byte-identical).
  *   7. THE FOLLOW-UP on the page's own drawings: the TSD into `basic.spin`'s slot, then the T into the slot
  *      `second.spin` draws, as a two-lock digest, as drawn and mirrored — it fires, and the follow-up mutants
  *      break it there as they do on the corpus.
@@ -30,8 +30,9 @@
  *      of its harddrop drawings at the drawn T and nowhere else, clashes with the first type's on a cell, and its
  *      follow-up search fires on harddrop's own drawing as a two-lock digest, as drawn and mirrored. Its corpus hits
  *      are a named list like the first type's — measured EMPTY — and its controls and per-part counts are pinned.
- *   9. TETRISちゃんねる: its two agreement boards fire the first type's window at their slots, and its 江戸城 (009) is two
- *      Cut Copies in a row in alternating hands — the TS twin of the gate's measurement. On the corpus, a hit whose
+ *   9. TETRISちゃんねる: its two agreement boards fire the first type's window at their slots, and its 江戸城 (009) is ONE
+ *      Cut Copy: the middle T's outer slot has no overhang, so the window fires there only when read without its
+ *      `window_extra` — the TS twin of the gate's measurement. On the corpus, a hit whose
  *      follow-up is itself a hit is a named list (`followup_is_a_hit`), measured EMPTY.
  *
  * window_off_board is not listed entry by entry: it is every flat, nub-down T at a TSD whose window leaves the
@@ -63,151 +64,16 @@ const H = 40;
 
 /** Every hit: the flat T into the page's window, as drawn (roof over the T's right end) or mirrored. */
 const CUTCOPY_HITS: string[] = [
-  "2026-07-22 m1r5 yachi lock 79 (mirrored)", "2026-07-22 m3r8 pinglamb lock 35 (mirrored)",
-  "2026-07-22 m8r3 yachi lock 40", "2026-07-22 m8r4 yachi lock 47 (mirrored)", "2026-07-22 m8r8 yachi lock 54",
-  "2026-07-24 m3r3 pinglamb lock 242 (mirrored)", "2026-07-24 m7r5 yachi lock 84",
-  "2026-07-28 m2r2 pinglamb lock 44", "2026-07-28 m4r1 yachi lock 83", "2026-07-28 m5r2 yachi lock 30",
-  "2026-07-28 m5r5 pinglamb lock 62 (mirrored)", "2026-07-28 m6r8 yachi lock 31", "2026-07-28 m7r6 yachi lock 35",
-  "2026-07-28 m8r3 yachi lock 53", "2026-08-01 m1r4 pinglamb lock 94", "2026-08-01 m3r5 yachi lock 61",
-  "2026-08-01 m5r2 yachi lock 79 (mirrored)", "2026-08-09 m1r6 yachi lock 128 (mirrored)",
-  "2026-08-09 m4r4 yachi lock 43", "2026-08-09 m5r3 pinglamb lock 22", "2026-08-09 m5r5 pinglamb lock 60 (mirrored)",
-  "2026-08-14 m1r5 yachi lock 124", "2026-08-14 m5r2 yachi lock 51 (mirrored)",
-  "2026-08-14 m5r2 yachi lock 105 (mirrored)", "2026-08-14 m9r1 pinglamb lock 53 (mirrored)",
-  "2026-08-14 m9r1 yachi lock 89", "2026-08-14 m9r4 pinglamb lock 192 (mirrored)",
-  "2026-08-14 m9r4 pinglamb lock 241 (mirrored)", "2026-08-14 m10r8 yachi lock 101",
-  "2026-08-14 m11r4 yachi lock 41", "2026-08-14 m11r6 yachi lock 45 (mirrored)", "2026-08-19 m1r6 pinglamb lock 11",
-  "2026-08-19 m4r3 pinglamb lock 53 (mirrored)", "2026-08-19 m4r8 yachi lock 76", "2026-08-19 m5r2 pinglamb lock 25",
-  "2026-08-19 m6r3 yachi lock 73", "2026-08-19 m6r6 yachi lock 109 (mirrored)",
-  "2026-08-25 m1r6 yachi lock 91 (mirrored)", "2026-08-25 m3r2 pinglamb lock 60",
-  "2026-08-25 m3r5 pinglamb lock 173", "2026-08-25 m5r3 pinglamb lock 106 (mirrored)",
-  "2026-08-25 m8r2 yachi lock 117", "2026-08-25 m8r7 pinglamb lock 199",
-  "2026-09-03 m2r2 pinglamb lock 144 (mirrored)", "2026-09-03 m4r1 yachi lock 48",
-  "2026-09-03 m4r7 pinglamb lock 40", "2026-09-03 m5r2 yachi lock 62 (mirrored)",
-  "2026-09-03 m5r4 yachi lock 100 (mirrored)", "2026-09-03 m6r2 pinglamb lock 51",
-  "2026-09-10 m4r5 yachi lock 124 (mirrored)", "2026-09-11 m3r7 yachi lock 19",
-  "2026-09-11 m4r1 yachi lock 155 (mirrored)", "2026-09-11 m4r4 yachi lock 27",
-  "2026-09-11 m6r2 yachi lock 62 (mirrored)", "2026-09-11 m7r4 yachi lock 31 (mirrored)",
-  "2026-09-11 m7r5 yachi lock 107 (mirrored)", "2026-09-17 m1r2 pinglamb lock 58 (mirrored)",
-  "2026-09-17 m6r1 yachi lock 72", "2026-09-18 m3r7 yachi lock 46", "2026-09-18 m4r2 pinglamb lock 99",
-  "2026-09-18 m6r5 yachi lock 50", "2026-09-18 m15r1 yachi lock 52 (mirrored)",
-  "2026-09-18 m15r7 pinglamb lock 46 (mirrored)", "2026-09-18 m16r2 yachi lock 36",
-  "2026-09-18 m16r2 yachi lock 215 (mirrored)", "2026-09-18 m17r9 yachi lock 151",
-  "2026-09-19 m2r1 yachi lock 95 (mirrored)", "2026-09-19 m3r1 yachi lock 80 (mirrored)",
-  "2026-09-19 m3r4 yachi lock 60", "2026-09-19 m3r8 pinglamb lock 137", "2026-09-19 m4r3 yachi lock 32 (mirrored)",
-  "2026-09-19 m8r2 yachi lock 58 (mirrored)", "2026-09-19 m8r3 yachi lock 74 (mirrored)",
-  "2026-09-19 m8r5 yachi lock 130 (mirrored)", "2026-09-19 m9r1 pinglamb lock 103 (mirrored)",
-  "2026-09-19 m9r1 yachi lock 34 (mirrored)", "2026-09-19 m11r1 yachi lock 52", "2026-09-19 m12r3 yachi lock 34",
-  "2026-09-19 m14r5 yachi lock 26 (mirrored)", "2026-09-19 m17r2 pinglamb lock 90",
-  "2026-09-19 m20r5 pinglamb lock 89", "2026-10-03 m2r9 yachi lock 111 (mirrored)",
-  "2026-10-03 m3r1 pinglamb lock 47 (mirrored)", "2026-10-03 m4r2 yachi lock 15 (mirrored)",
-  "2026-10-03 m6r1 pinglamb lock 69", "2026-10-03 m8r5 yachi lock 85", "2026-10-03 m9r1 yachi lock 145",
-  "2026-10-03 m9r4 yachi lock 164", "2026-10-03 m12r2 yachi lock 32 (mirrored)",
-  "2026-10-03 m12r3 pinglamb lock 38 (mirrored)", "2026-10-03 m16r6 pinglamb lock 271",
-  "2026-10-03 m17r3 pinglamb lock 87", "2026-10-03 m17r3 pinglamb lock 224", "2026-10-03 m17r3 yachi lock 121",
-  "2026-10-03 m18r1 yachi lock 65", "2026-10-03 m20r4 yachi lock 179 (mirrored)", "2026-10-09 m1r4 yachi lock 34",
-  "2026-10-09 m1r5 yachi lock 30", "2026-10-09 m4r4 pinglamb lock 66 (mirrored)", "2026-10-09 m7r5 yachi lock 33",
-  "2026-10-09 m8r3 pinglamb lock 67", "2026-10-09 m8r7 yachi lock 97", "2026-10-09 m9r1 yachi lock 83",
-  "2026-10-09 m9r1 yachi lock 111", "2026-10-09 m9r8 yachi lock 115", "2026-10-12 m2r4 yachi lock 154 (mirrored)",
-  "2026-10-12 m3r5 yachi lock 45 (mirrored)", "2026-10-12 m5r6 pinglamb lock 52",
-  "2026-10-12 m8r5 yachi lock 163 (mirrored)", "2026-10-20 m2r1 yachi lock 87", "2026-10-20 m2r1 yachi lock 117",
-  "2026-10-20 m4r4 yachi lock 55 (mirrored)", "2026-10-20 m4r7 yachi lock 43 (mirrored)", "2026-10-20 m4r8 yachi lock 320",
+  "2026-09-18 m16r2 yachi lock 215 (mirrored)",
+  "2026-10-20 m2r1 yachi lock 117",
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
-  "2026-07-22 m1r5 yachi lock 79 (slot_filled_before_t at lock 80)",
-  "2026-07-22 m8r8 yachi lock 54 (next_t_elsewhere at lock 60)", "2026-07-28 m4r1 yachi lock 83 (round_ended)",
-  "2026-07-28 m5r5 pinglamb lock 62 (slot_filled_before_t at lock 63)",
-  "2026-07-28 m6r8 yachi lock 31 (next_t_elsewhere at lock 35)",
-  "2026-07-28 m7r6 yachi lock 35 (slot_filled_before_t at lock 36)",
-  "2026-07-28 m8r3 yachi lock 53 (slot_filled_before_t at lock 54)",
-  "2026-08-01 m1r4 pinglamb lock 94 (round_ended)",
-  "2026-08-01 m3r5 yachi lock 61 (slot_filled_before_t at lock 62)",
-  "2026-08-09 m1r6 yachi lock 128 (slot_filled_before_t at lock 132)",
-  "2026-08-09 m5r3 pinglamb lock 22 (slot_filled_before_t at lock 23)",
-  "2026-08-14 m1r5 yachi lock 124 (next_t_elsewhere at lock 129)",
-  "2026-08-14 m9r4 pinglamb lock 192 (next_t_elsewhere at lock 195)",
-  "2026-08-14 m9r4 pinglamb lock 241 (slot_filled_before_t at lock 243)",
-  "2026-08-14 m10r8 yachi lock 101 (slot_filled_before_t at lock 102)",
-  "2026-08-14 m11r4 yachi lock 41 (slot_filled_before_t at lock 42)",
-  "2026-08-19 m4r3 pinglamb lock 53 (slot_filled_before_t at lock 56)",
-  "2026-08-19 m5r2 pinglamb lock 25 (slot_filled_before_t at lock 29)",
-  "2026-08-19 m6r3 yachi lock 73 (slot_filled_before_t at lock 74)",
-  "2026-08-25 m1r6 yachi lock 91 (slot_filled_before_t at lock 92)",
-  "2026-08-25 m3r2 pinglamb lock 60 (slot_filled_before_t at lock 61)",
-  "2026-08-25 m3r5 pinglamb lock 173 (slot_filled_before_t at lock 174)",
-  "2026-08-25 m5r3 pinglamb lock 106 (slot_filled_before_t at lock 107)",
-  "2026-08-25 m8r2 yachi lock 117 (slot_filled_before_t at lock 118)",
-  "2026-09-03 m5r2 yachi lock 62 (slot_filled_before_t at lock 63)",
-  "2026-09-11 m3r7 yachi lock 19 (slot_filled_before_t at lock 20)",
-  "2026-09-11 m4r1 yachi lock 155 (slot_filled_before_t at lock 156)",
-  "2026-09-11 m4r4 yachi lock 27 (slot_filled_before_t at lock 28)",
-  "2026-09-11 m7r5 yachi lock 107 (slot_filled_before_t at lock 108)",
-  "2026-09-17 m6r1 yachi lock 72 (slot_filled_before_t at lock 73)",
-  "2026-09-18 m3r7 yachi lock 46 (next_t_elsewhere at lock 52)",
-  "2026-09-18 m4r2 pinglamb lock 99 (slot_filled_before_t at lock 100)",
   "2026-09-18 m16r2 yachi lock 215 (slot_filled_before_t at lock 216)",
-  "2026-09-19 m2r1 yachi lock 95 (slot_filled_before_t at lock 97)",
-  "2026-09-19 m3r8 pinglamb lock 137 (slot_filled_before_t at lock 138)",
-  "2026-09-19 m4r3 yachi lock 32 (slot_filled_before_t at lock 33)",
-  "2026-09-19 m8r3 yachi lock 74 (slot_filled_before_t at lock 79)", "2026-09-19 m8r5 yachi lock 130 (round_ended)",
-  "2026-09-19 m9r1 pinglamb lock 103 (slot_filled_before_t at lock 104)",
-  "2026-09-19 m9r1 yachi lock 34 (slot_filled_before_t at lock 35)",
-  "2026-09-19 m11r1 yachi lock 52 (slot_filled_before_t at lock 53)",
-  "2026-10-03 m2r9 yachi lock 111 (slot_filled_before_t at lock 113)",
-  "2026-10-03 m4r2 yachi lock 15 (next_t_elsewhere at lock 21)", "2026-10-03 m9r4 yachi lock 164 (round_ended)",
-  "2026-10-03 m12r2 yachi lock 32 (slot_filled_before_t at lock 36)",
-  "2026-10-03 m12r3 pinglamb lock 38 (slot_filled_before_t at lock 39)",
-  "2026-10-03 m16r6 pinglamb lock 271 (past_verified at lock 273)",
-  "2026-10-03 m17r3 pinglamb lock 224 (round_ended)",
-  "2026-10-03 m17r3 yachi lock 121 (slot_filled_before_t at lock 123)",
-  "2026-10-03 m20r4 yachi lock 179 (slot_filled_before_t at lock 180)",
-  "2026-10-09 m1r4 yachi lock 34 (next_t_elsewhere at lock 35)",
-  "2026-10-09 m7r5 yachi lock 33 (t_in_slot_not_tsd at lock 37)",
-  "2026-10-09 m8r7 yachi lock 97 (slot_filled_before_t at lock 99)",
-  "2026-10-09 m9r1 yachi lock 83 (slot_filled_before_t at lock 85)",
-  "2026-10-09 m9r8 yachi lock 115 (slot_filled_before_t at lock 117)",
-  "2026-10-20 m4r4 yachi lock 55 (next_t_elsewhere at lock 56)",
-  "2026-10-20 m4r7 yachi lock 43 (slot_filled_before_t at lock 44)",
-  "2026-10-20 m4r8 yachi lock 320 (t_in_slot_not_tsd at lock 323)",
 ];
 const GARBAGE_IN_WINDOW: string[] = [
-  "2026-07-22 m1r5 yachi lock 79", "2026-07-22 m3r8 pinglamb lock 35", "2026-07-22 m8r3 yachi lock 40",
-  "2026-07-22 m8r4 yachi lock 47", "2026-07-22 m8r8 yachi lock 54", "2026-07-24 m3r3 pinglamb lock 242",
-  "2026-07-24 m7r5 yachi lock 84", "2026-07-28 m2r2 pinglamb lock 44", "2026-07-28 m4r1 yachi lock 83",
-  "2026-07-28 m5r2 yachi lock 30", "2026-07-28 m5r5 pinglamb lock 62", "2026-07-28 m6r8 yachi lock 31",
-  "2026-07-28 m7r6 yachi lock 35", "2026-07-28 m8r3 yachi lock 53", "2026-08-01 m1r4 pinglamb lock 94",
-  "2026-08-01 m3r5 yachi lock 61", "2026-08-01 m5r2 yachi lock 79", "2026-08-09 m1r6 yachi lock 128",
-  "2026-08-09 m4r4 yachi lock 43", "2026-08-09 m5r3 pinglamb lock 22", "2026-08-09 m5r5 pinglamb lock 60",
-  "2026-08-14 m1r5 yachi lock 124", "2026-08-14 m5r2 yachi lock 51", "2026-08-14 m5r2 yachi lock 105",
-  "2026-08-14 m9r1 pinglamb lock 53", "2026-08-14 m9r1 yachi lock 89", "2026-08-14 m9r4 pinglamb lock 192",
-  "2026-08-14 m9r4 pinglamb lock 241", "2026-08-14 m10r8 yachi lock 101", "2026-08-14 m11r4 yachi lock 41",
-  "2026-08-14 m11r6 yachi lock 45", "2026-08-19 m4r3 pinglamb lock 53", "2026-08-19 m4r8 yachi lock 76",
-  "2026-08-19 m5r2 pinglamb lock 25", "2026-08-19 m6r3 yachi lock 73", "2026-08-19 m6r6 yachi lock 109",
-  "2026-08-25 m1r6 yachi lock 91", "2026-08-25 m3r2 pinglamb lock 60", "2026-08-25 m3r5 pinglamb lock 173",
-  "2026-08-25 m5r3 pinglamb lock 106", "2026-08-25 m8r2 yachi lock 117", "2026-08-25 m8r7 pinglamb lock 199",
-  "2026-09-03 m4r1 yachi lock 48", "2026-09-03 m4r7 pinglamb lock 40", "2026-09-03 m5r2 yachi lock 62",
-  "2026-09-03 m5r4 yachi lock 100", "2026-09-03 m6r2 pinglamb lock 51", "2026-09-10 m4r5 yachi lock 124",
-  "2026-09-11 m3r7 yachi lock 19", "2026-09-11 m4r1 yachi lock 155", "2026-09-11 m6r2 yachi lock 62",
-  "2026-09-11 m7r4 yachi lock 31", "2026-09-11 m7r5 yachi lock 107", "2026-09-17 m1r2 pinglamb lock 58",
-  "2026-09-17 m6r1 yachi lock 72", "2026-09-18 m3r7 yachi lock 46", "2026-09-18 m4r2 pinglamb lock 99",
-  "2026-09-18 m6r5 yachi lock 50", "2026-09-18 m15r7 pinglamb lock 46", "2026-09-18 m16r2 yachi lock 36",
-  "2026-09-18 m17r9 yachi lock 151", "2026-09-19 m2r1 yachi lock 95", "2026-09-19 m3r1 yachi lock 80",
-  "2026-09-19 m3r4 yachi lock 60", "2026-09-19 m3r8 pinglamb lock 137", "2026-09-19 m4r3 yachi lock 32",
-  "2026-09-19 m8r2 yachi lock 58", "2026-09-19 m8r3 yachi lock 74", "2026-09-19 m8r5 yachi lock 130",
-  "2026-09-19 m9r1 pinglamb lock 103", "2026-09-19 m11r1 yachi lock 52", "2026-09-19 m12r3 yachi lock 34",
-  "2026-09-19 m17r2 pinglamb lock 90", "2026-09-19 m20r5 pinglamb lock 89", "2026-10-03 m2r9 yachi lock 111",
-  "2026-10-03 m3r1 pinglamb lock 47", "2026-10-03 m6r1 pinglamb lock 69", "2026-10-03 m8r5 yachi lock 85",
-  "2026-10-03 m9r4 yachi lock 164", "2026-10-03 m12r2 yachi lock 32", "2026-10-03 m16r6 pinglamb lock 271",
-  "2026-10-03 m17r3 pinglamb lock 87", "2026-10-03 m17r3 pinglamb lock 224", "2026-10-03 m17r3 yachi lock 121",
-  "2026-10-03 m18r1 yachi lock 65", "2026-10-09 m1r4 yachi lock 34", "2026-10-09 m1r5 yachi lock 30",
-  "2026-10-09 m4r4 pinglamb lock 66", "2026-10-09 m8r3 pinglamb lock 67", "2026-10-09 m9r1 yachi lock 83",
-  "2026-10-09 m9r1 yachi lock 111", "2026-10-09 m9r8 yachi lock 115", "2026-10-12 m2r4 yachi lock 154",
-  "2026-10-12 m5r6 pinglamb lock 52", "2026-10-12 m8r5 yachi lock 163", "2026-10-20 m2r1 yachi lock 87",
-  "2026-10-20 m2r1 yachi lock 117", "2026-10-20 m4r4 yachi lock 55", "2026-10-20 m4r7 yachi lock 43",
-  "2026-10-20 m4r8 yachi lock 320",
+  "2026-10-20 m2r1 yachi lock 117",
 ];
-const CUTCOPY_IN_OPENER: string[] = [
-  "2026-08-19 m1r6 pinglamb lock 11", "2026-09-11 m3r7 yachi lock 19", "2026-10-03 m4r2 yachi lock 15",
-];
+const CUTCOPY_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** The second variant's hits (harddrop's second type): measured, none. */
 const UNCUT_HITS: string[] = [];
@@ -215,35 +81,36 @@ const UNCUT_HITS: string[] = [];
 const FOLLOWUP_IS_A_HIT: string[] = [];
 /** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
 const WINDOW_OFF_BOARD: Record<string, Record<string, number>> = {
-  cutcopy: { pinglamb: 1688, yachi: 1715 }, uncut: { pinglamb: 2083, yachi: 2120 },
+  cutcopy: { pinglamb: 1694, yachi: 1730 }, uncut: { pinglamb: 2083, yachi: 2120 },
 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
 const TSD_DENOM = { pinglamb: { all: 5421, in_opener: 1061, mid_game: 4360 },
                     yachi: { all: 4891, in_opener: 1268, mid_game: 3623 } };
 /** Per player: hits, their split, the mirrored ones, the ones with garbage in the window, the follow-ups. */
-const HITS = { pinglamb: { all: 36, in_opener: 1, mid_game: 35, mirrored: 16, garbage_in_window: 33 },
-               yachi: { all: 78, in_opener: 2, mid_game: 76, mirrored: 35, garbage_in_window: 67 } };
+const HITS = { pinglamb: {all:  0,  in_opener:  0,  mid_game:  0,  mirrored:  0,  garbage_in_window:  0},
+               yachi: {all:  2,  in_opener:  0,  mid_game:  2,  mirrored:  1,  garbage_in_window:  1} };
 const FOLLOWUP = {
-  pinglamb: { fired: 20, not_fired: { next_t_elsewhere: 1, past_verified: 1, round_ended: 2, slot_filled_before_t: 12 } },
-  yachi: { fired: 36, not_fired: { next_t_elsewhere: 7, round_ended: 3, slot_filled_before_t: 30, t_in_slot_not_tsd: 2 } },
+  pinglamb: {fired:  0,  not_fired:  {}},
+  yachi: {fired:  1,  not_fired:  {slot_filled_before_t:  1}},
 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
-  under: { TSS: { pinglamb: 4, yachi: 1 }, TST: { pinglamb: 0, yachi: 0 },
+  under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 708, yachi: 536 }, no_roof: { pinglamb: 414, yachi: 353 },
-              t_overlap: { pinglamb: 45, yachi: 81 } },
+  ablation: { no_must_empty: {pinglamb:  264,  yachi:  156}, no_roof: {pinglamb:  414,  yachi:  353},
+              t_overlap: {pinglamb:  5,  yachi:  5} },
   orientation_baseline: { pinglamb: 46, yachi: 64 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
- *  row above the T (the outer slot's arms, the wall beside them, the roof and the cell beyond it), the two rows
- *  the TSD clears, or the row under them (the outer slot's nub cell, walled). The cleared rows are entailed by the
- *  clear and admit every flat, nub-down full TSD whose window is on the board, so they do no work. The row above and
- *  the row below each cut that down — the row below by at least ten times, the row above by less (both asserted
- *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
+ *  row above the T (the outer slot's arms, the wall beside them, the roof and the cell beyond it) with the
+ *  overhang over it (`window_extra`), the two rows the TSD clears, or the row under them (the outer slot's nub cell,
+ *  walled). The cleared rows are entailed by the clear and admit every flat, nub-down full TSD whose window is on
+ *  the board, so they do no work. The row below cuts that down by at least ten times, and the rows above (the
+ *  overhang among them) by at least ten times more again (both asserted where PART_ONLY is checked); neither alone
+ *  reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { above: 1515, cleared: 9003, below: 767 };
+const PART_ONLY = { above: 27, cleared: 9003, below: 767 };
 /** The second variant (harddrop's second type), pinned the same way: its hits (none), its follow-ups, its controls,
  *  and the full TSDs each part of its window admits with the T anchored (the row above the T, the cleared rows, the
  *  two rows of the second slot under them). */
@@ -266,6 +133,10 @@ const STMBCAVE_ALSO_UNCUT: string[] = [];
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
+  followupUnmirrored: 'no mirrored hit\'s follow-up fires: the one mirrored hit\'s slot is filled before its next T, '
+    + 'which reads the same in either hand (killed on the page\'s own two-lock digest instead)',
+  followupAnyT: 'every hit\'s next T either fires the full TSD or finds its slot filled first, so accepting any T '
+    + 'spin changes no follow-up (killed on the page\'s own two-lock digest instead)',
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -419,7 +290,7 @@ test('the Python twin on the drawings: windowMatch fires where the gate records 
   expect(TR.cross_source.routes_fire_none.length).toBeGreaterThan(0);
 });
 
-test('Tetrisちゃんねる: its agreement boards fire the first type\'s window at their slots, and 江戸城 is two Cut Copies in a row', () => {
+test('Tetrisちゃんねる: its agreement boards fire the first type\'s window at their slots, and 江戸城 is one Cut Copy (its middle slot has no overhang)', () => {
   const tc = TR.cross_source.tetrisch;
   const img = (n: string) => tc.images.find((x: any) => x.file === `cutcopy_${n}.jpg`).rows as string[];
   const read = (rows: string[]) => asBoard(rows, ch => ch !== '.');
@@ -435,23 +306,28 @@ test('Tetrisちゃんねる: its agreement boards fire the first type\'s window 
     const board = read(img(n));
     expect(tPlacements(board).filter(cs => firesAny(board, cs).length), n).toEqual([]);
   }
-  // 江戸城: the innermost T, then the board it leaves, where the window fires MIRRORED at the follow-up slot, then the
-  // last TSD, which leaves the board empty
+  // 江戸城: the innermost T fires the window; on the board it leaves, the middle T's outer slot has no overhang, so
+  // the window fires nowhere — read WITHOUT its `window_extra` (the overhang) it fires MIRRORED at exactly one
+  // placement, the carried follow-up slot; then the last TSD, which leaves the board empty. One Cut Copy, not two.
   const place = (board: string[], cells: Cell[]) => {
     const g = board.map(r => [...r]);
     for (const q of cells) { expect(g[q.row]![q.col]).toBe('.'); g[q.row]![q.col] = 'X'; }
     const full = g.flatMap((r, i) => r.every(x => x !== '.') ? [i] : []);
     return { full, after: [...Array(full.length).fill('.'.repeat(10)), ...g.filter((_, i) => !full.includes(i)).map(r => r.join(''))] };
   };
+  const bare = { ...TR.variants[0], window_extra: undefined };
+  const firesBare = (board: string[], lock: Cell[]) =>
+    prepare(TR, bare).filter(P => !!windowMatch(board, lock, P)).map(P => P.mirrored);
   let board = read(img(tc.edo.image));
   const first = cellsOf(tc.slots[tc.edo.image]);
   expect(firesAny(board, first)).toEqual([['cutcopy', false]]);
   const s1 = place(board, first);
   expect(s1.full.length).toBe(2);
   board = s1.after;
-  const second = tPlacements(board).filter(cs => firesAny(board, cs).length);
+  expect(tPlacements(board).filter(cs => firesAny(board, cs).length)).toEqual([]);
+  const second = tPlacements(board).filter(cs => firesBare(board, cs).length);
   expect(second.length).toBe(1);
-  expect(firesAny(board, second[0]!)).toEqual([['cutcopy', true]]);
+  expect(firesBare(board, second[0]!)).toEqual([true]);
   const s2 = place(board, second[0]!);
   expect(s2.full.length).toBe(2);
   board = s2.after;
@@ -460,6 +336,7 @@ test('Tetrisちゃんねる: its agreement boards fire the first type\'s window 
   expect(last.length).toBe(1);
   expect(place(board, last[0]!).after.every(r => r === '.'.repeat(10))).toBe(true);
   expect(tc.edo.tsds).toBe(3);
+  expect(tc.edo.hits).toBe(1);
 });
 
 test('the transcription the artefact read is the committed one, and its window is the gated one', () => {
@@ -468,6 +345,9 @@ test('the transcription the artefact read is the committed one, and its window i
   expect(v.window).toEqual({ rows: [2, 5], cols: [4, 9] });
   expect(v.t_cells).toEqual([[3, 6], [3, 7], [3, 8], [4, 7]]);
   expect(v.roof_cells).toEqual([[2, 4], [2, 8], [2, 9]]);
+  // the outer slot's overhang, read outside the box (yachi's reading: it is placed before the first T-spin)
+  expect(v.window_extra.cells).toEqual([[1, 5]]);
+  expect(v.window_extra.note.length).toBeGreaterThan(0);
   expect(v.followup).toMatchObject({ spin: 'TSD', lines: 2, t_cells_pre_clear: [[2, 5], [2, 6], [2, 7], [5, 6]] });
   expect(TR.empty_letters).toBe('');
   expect(prepare(TR, v).map(P => P.followupKind)).toEqual(['full:2', 'full:2']);
@@ -508,7 +388,10 @@ test('window_off_board: pinned per variant and player, every entry a flat nub-do
     const mine = L.filter(x => x.endsWith(` (${v.id})`)).map(x => x.slice(0, -` (${v.id})`.length));
     for (const u of ['pinglamb', 'yachi'] as const)
       expect(mine.filter(x => x.split(' ')[2] === u).length, `${v.id} ${u}`).toBe(WINDOW_OFF_BOARD[v.id]![u]);
-    const [r0, r1] = v.window.rows, [c0, c1] = v.window.cols;
+    // the window's rows and columns, its `window_extra` cells (the first type's overhang) included
+    const ex: [number, number][] = v.window_extra?.cells ?? [];
+    const r0 = Math.min(v.window.rows[0], ...ex.map(x => x[0])), r1 = Math.max(v.window.rows[1], ...ex.map(x => x[0]));
+    const c0 = Math.min(v.window.cols[0], ...ex.map(x => x[1])), c1 = Math.max(v.window.cols[1], ...ex.map(x => x[1]));
     const [nr, nc] = v.t_cells.reduce((a: number[], b: number[]) => (b[0]! > a[0]! ? b : a));
     const want = new Set<string>();
     for (const d of digests()) for (const s of scored(d)) {
@@ -625,8 +508,7 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
   for (const n of Object.values(PART_ONLY)) expect(n).toBeGreaterThan(art().hits.length);
   // what the comment above claims: the row below cuts the cleared rows by at least ten times, the row above by less
   expect(PART_ONLY.cleared).toBeGreaterThanOrEqual(10 * PART_ONLY.below);
-  expect(PART_ONLY.above).toBeLessThan(PART_ONLY.cleared);
-  expect(PART_ONLY.cleared).toBeLessThan(10 * PART_ONLY.above);
+  expect(PART_ONLY.below).toBeGreaterThanOrEqual(10 * PART_ONLY.above);
   // the no_roof ablation (the window less the row above the T) is exactly the `below` part
   expect(total(art().variants.cutcopy.controls.ablation.no_roof)).toBe(PART_ONLY.below);
 }, 600_000);
@@ -690,11 +572,9 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   a = mut({ garbageEmpty: true });
   expect(cc(a).map(k)).toEqual(cc(b).filter((h: any) => !h.garbage_in_window).map(k));
 
-  a = mut({ followupUnmirrored: true });
-  expect(a.hits.map(k)).toEqual(b.hits.map(k));
-  a.hits.forEach((h: any, i: number) => { if (!h.mirrored) expect(h.followup).toEqual(b.hits[i].followup); });
-  expect(a.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBe(0);
-  expect(b.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBeGreaterThan(0);
+  // followupUnmirrored is EQUIVALENT on the corpus now (see EQUIVALENT): the one mirrored hit's slot is filled before
+  // its next T in either hand. It is still killed on the page's own two-lock digest (below).
+  expect(b.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBe(0);
 
   a = mut({ openerLt: true });
   expect(tsd(a, 'in_opener')).toBeLessThan(tsd(b, 'in_opener'));
@@ -707,8 +587,7 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   expect(fired(a)).toBe(0);
   expect(fired(b)).toBeGreaterThan(0);
 
-  a = mut({ followupAnyT: true });
-  expect(fired(a)).toBeGreaterThan(fired(b));
+  // followupAnyT is EQUIVALENT on the corpus now (see EQUIVALENT); it is killed on the page's own digest (below)
 
   for (const [m] of Object.entries(EQUIVALENT))
     expect(serialise(run({ [m]: true } as Mutants)), m).toBe(base);

@@ -4543,20 +4543,30 @@ board fires (`routes_fire_none`), and none of the other technique transcriptions
 Like BT砲's, the harddrop record is refetched weekly by `check_wikitext_sources` and re-checked with `--wikitext-dir`; the shiwehi
 page is not.
 
-**What the window does not express is named, from the page's own sentence**: 「(Z)は1回目のT-spinを打った後に置いても構いません」.
-One of that Z's cells is the outer slot's wall, which every drawing fills, and the window reads none of the other three (measured
-cell by cell and recorded as `decides`), so the T-hole build with its Z left out fires nowhere (`not_expressed`, measured and
-required, never defaulted; the piece left out must be the sentence's own mino icon, `later:`). This read 「two of that Z's cells」
-until an audit removed each Z cell on its own: the mirrored window spans columns 3-8, so one of the two wall cells is outside it.
+**The outer slot's overhang must stand before the first TSD, and that is yachi's reading, not the page's** (2026-10-22). The page
+says 「(Z)は1回目のT-spinを打った後に置いても構いません」; the window refuses it. The overhang is the one cell of the row above the
+box the window reads, as drawn and mirrored with the box: the variant's opt-in `window_extra` (`cells` outside the box, a `note`),
+read by `technique-facts.ts`'s `prepare`, the gate's `window_cells` and the own-design search's `candidates`. Every drawing in the
+agreement set fills it, so the agreement rule checks it like a box cell and no drawing moved; the cells beside it in its row
+disagree between drawings, which is why it is not a row of the box. Before it, the corpus window admitted Cut Copies whose
+overhang went in between the two T-spins, and most corpus hits were that (the old and new hit lists are in git, never here).
+Two of that Z's cells (`decides`) are the overhang and the outer slot's wall, so the T-hole build with its Z left out fires
+nowhere (`not_expressed`, measured and required, never defaulted; the piece left out must be the sentence's own mino icon,
+`later:`; the selftest drops the overhang and reads it one cell over, and both are caught). `technique-facts.ts` is hashed, so
+every technique artefact moved in its `emitter_md5` / `classifier_md5` lines and nothing else; check that with `git diff` when
+`window_extra` is touched. The cold-clear self-play artefact was re-derived WITHOUT the bot's JSONL, by monotonicity: the window
+only got stricter, so every new hit is an old hit and every old hit is in a committed game; each committed game was re-scanned on
+its own and cut to what `select()` commits. Its `scan` counts other than `hits` are unchanged and are still the JSONL's.
 
 **What discriminates is measured per window part** (`cutcopy.test.ts`, `PART_ONLY`): the cleared rows (entailed by the clear) admit every flat,
-nub-down full TSD whose window is on the board, and the row above and the row below each cut that down without reaching the headline alone, so both are
-doing work; the `no_roof` ablation is the `below` part. For the first type, unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof`
+nub-down full TSD whose window is on the board, and the row above (with the overhang) and the row below each cut that down without reaching the headline alone, so both are
+doing work; the `no_roof` ablation is the `below` part (it drops the overhang with the row above). `followupUnmirrored` and `followupAnyT` are
+EQUIVALENT on the corpus since the overhang rule (named, asserted byte-identical) and killed on the page's own two-lock digest. For the first type, unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof`
 makes a lock match both hands: both are live mutants whose hits are their ablations'. Since the second variant landed, a full
 `noMustEmpty` build throws (that variant's window less its must-empty cells is symmetric about the T, ダブルダガー's case), so the
 test asserts the throw and measures the first type's symptom on a transcription holding it alone. The first type's window clashes
 with STMB Cave's, ダブルダガー's and BT砲's on a cell in every pairing of hands and no lock is a hit of two of them. Garbage reads as filled, and the page itself says the shape is
-mostly built when garbage rises, so `garbage_in_window` is most of the hit list — a fact about the corpus, read off the test.
+mostly built when garbage rises, so `garbage_in_window` is a large share of the hit list — a fact about the corpus, read off the test.
 
 **No demo is built, and every board says why** (`cutcopy-demos.test.ts` re-derives each): the third-column terrain has an ODD cell
 count (a proof); the T-hole terrain is a multiple of four with no tiling by tetrominoes AT ALL (the hole cuts it into two parts,
@@ -4582,10 +4592,11 @@ Parapet comparison is a Parapet TSS (欄干's TSS window fires at exactly that T
 are read on a board that never stands; the Donation boards are donations. The `harddrop` record's `drawings` and
 `fires_without_slot` now name the variant each belongs to, and its completeness check runs over both windows.
 
-**Tetrisちゃんねる's 江戸城 is two Cut Copies in a row, not a third shape** (measured in `_check_tetrisch` and the TS twin): the
-window fires once on 009 at its innermost T; on the board that TSD leaves it fires again, MIRRORED, at the carried follow-up slot;
-that hit's follow-up is the last TSD, which leaves nothing. The page's own 「交互にずれている」 is the alternation of hands. The
-matcher already reads such a night as a hit whose follow-up lock is itself a hit; the profile publishes those as
+**Tetrisちゃんねる's 江戸城 is ONE Cut Copy, not a third shape** (measured in `_check_tetrisch` and the TS twin; it read 「two Cut
+Copies in a row」 until the overhang rule): the window fires once on 009 at its innermost T; on the board that TSD leaves it fires
+nowhere, because the middle T's outer slot has no overhang, and read WITHOUT `window_extra` it fires MIRRORED at exactly the carried
+follow-up slot (the gate records `hits: 1` and checks both halves); that T's own follow-up is the last TSD, which leaves nothing. The
+page's own 「交互にずれている」 is the alternation of hands. A hit whose follow-up lock is itself a hit is still published as
 `followup_is_a_hit` (a named list in the test). Its other images: 002 and 005 draw the T UPRIGHT before 003 and 006 draw it flat
 about the same centre (checked), which is shiwehi.com's 「縦向きに入れて」 drawn by a second site; 008 is 001's board coloured by
 which TSD each row belongs to (same occupancy, checked); 010 is an annotation the sampler refuses. `--html-dir` re-reads the page and

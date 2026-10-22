@@ -165,6 +165,9 @@ export interface Variant {
   id: string; board: string; spin: string; lines: number;
   window: { rows: [number, number]; cols: [number, number] };
   t_cells: [number, number][];
+  /** cells OUTSIDE the box the window also reads, filled or empty as drawn (千鳥格子's overhang over the
+   *  second slot, which the drawings agree on although the rest of its row does not); mirrored with the box */
+  window_extra?: { cells: [number, number][]; note: string };
   /** the second T-spin the page draws (STSD …); exactly one of `followup` and `payoff` */
   followup?: { board: string; spin: string; lines: number; t_cells_pre_clear: [number, number][];
                t_cells_after: [number, number][] };
@@ -195,6 +198,10 @@ export function prepare(tr: any, v: Variant): Prepared[] {
     const cells: WinCell[] = [];
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++)
       cells.push({ r, c: mc(c), v: tc.has(`${r},${c}`) ? 'T' : empty(rows[r]![c]!) ? '.' : '#' });
+    for (const [r, c] of v.window_extra?.cells ?? []) {
+      if (r >= r0 && r <= r1 && c >= c0 && c <= c1) throw new Error(`technique: ${v.id}'s window_extra cell ${r},${c} is inside the box`);
+      cells.push({ r, c: mc(c), v: empty(rows[r]![c]!) ? '.' : '#' });
+    }
     const T = cells.filter(x => x.v === 'T');
     const P: Prepared = { id: v.id, mirrored, cells, T, roofTop: Math.min(...T.map(x => x.r)),
              followup: v.followup ? v.followup.t_cells_pre_clear.map(([r, c]) => ({ r, c: mc(c) })) : [],
