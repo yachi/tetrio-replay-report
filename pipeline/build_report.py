@@ -53,8 +53,10 @@ def matches_section(ctx):
 
 
 def stats_sec(ctx):
+    from pipeline import routes_techniques_charts
     return stats_section.build(ctx["facts"],
-                               stats_section.load_prose(ctx["report_dir"]))
+                               stats_section.load_prose(ctx["report_dir"]),
+                               routes_techniques_charts.build(ctx["facts"], ctx["report_dir"]))
 
 
 def routes_techniques_sec(ctx):
