@@ -14,6 +14,10 @@
         "<strong>個窿有幾大先係話事嗰個，唔係落幾多粒。</strong>714 粒盈餘即係多 5.20%，而個窿係 11.16%<span class=\"badge\" data-claim=\"C004\"></span>——即係最多填到一半。08-01 嗰次同一條路填一個 7.27% 嘅窿，盈餘 6.27%，最後攻擊只差 32 條。唔係踩得唔夠落力，係盈餘買唔起一個兩倍咁大嘅窿。",
         "<strong>兩個「歷來最大」唔好當係打差咗。</strong>頂爆 15 次<span class=\"badge\" data-claim=\"C006\"></span>係單人歷來最多，但佔 150 局嘅一成，低過 08-14 嗰次嘅 13%；少打 476 條攻擊<span class=\"badge\" data-claim=\"C005\"></span>亦係歷來最大，換做比率係 5.36%，十三晚排第五。兩個數講嘅都係今晚有幾長。",
         "<strong>KPP 唔使理。</strong>今次你係高嗰個（3.646 對 3.608）<span class=\"badge\" data-claim=\"C008\"></span>，上一晚啱啱掉轉；而且你自己贏局同輸局嘅 KPP 差唔夠 3%<span class=\"badge\" data-claim=\"G083\"></span>。呢一欄成個 corpus 都係一個負面結果，冇嘢好跟。"
+      ],
+      "sim_recs": [
+        "<strong>要接第二個 TSD 嘅手法，個位成日俾填咗。</strong>STMB Cave 8 次全部冇接到，8 次都係個位俾其他棋填咗；千鳥格子 11 次接到 5 次，個位俾其他棋填咗 5。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。",
+        "<strong>階段 15 次得 6 次接到 Tetris。</strong>條井俾棋蓋住咗 5、俾 I 以外嘅棋填咗 3。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,10 @@
         "<strong>少疊 714 粒仲多打 476 條，呢個就係要守住嘅嘢。</strong><span class=\"badge\" data-claim=\"C005\"></span>唔好為咗追手速而郁 T-spin 嗰條線——今晚每粒方塊嘅優勢（11.16%）<span class=\"badge\" data-claim=\"C004\"></span>淨係得一半俾對手嘅粒數盈餘食返。",
         "<strong>上一晚嗰個「兩邊一齊拉大」唔係新常態。</strong>今晚返返中位數<span class=\"badge\" data-claim=\"C002\"></span>，冇機制解釋過點解會咁——一晚就係一晚，唔好當咗係一個水平。",
         "逐局波動你係細嗰個<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G057\"></span>，而 150 局之後你頂爆得 9 次（對手 15 次）<span class=\"badge\" data-claim=\"C006\"></span>。守得穩就係咁。"
+      ],
+      "sim_recs": [
+        "<strong>階段同欄干之後嘅 Tetris 今晚好穩。</strong>階段 9 次接到 8 次，欄干（TSD）11 次接到 7 次。繼續用。",
+        "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>56 局有 43 局行到第二巡、9 局行到第三巡或之後、1 局打出全消。"
       ]
     }
   },
