@@ -22,6 +22,12 @@
    "###T##",
    "##.###"
   ],
+  "window_extra": [
+   [
+    1,
+    5
+   ]
+  ],
   "offsets": [
    0,
    1,
@@ -45,44 +51,44 @@
    },
    {
     "offset": 1,
-    "candidates": 1945,
-    "tried": 1945,
+    "candidates": 1583,
+    "tried": 1583,
     "not_tried": 0,
     "outcomes": {
-     "no_order": 1637,
-     "no_followup": 142,
-     "no_stood_t": 125,
-     "over_budget": 41
+     "no_order": 1412,
+     "no_stood_t": 115,
+     "no_followup": 47,
+     "over_budget": 9
     },
     "built": []
    },
    {
     "offset": 2,
-    "candidates": 4396,
-    "tried": 4396,
+    "candidates": 3736,
+    "tried": 3736,
     "not_tried": 0,
     "outcomes": {
-     "no_followup": 332,
-     "no_order": 3589,
-     "no_stood_t": 313,
-     "over_budget": 162
+     "no_order": 3268,
+     "no_followup": 107,
+     "no_stood_t": 303,
+     "over_budget": 58
     },
     "built": []
    },
    {
     "offset": 3,
-    "candidates": 3728,
-    "tried": 3728,
+    "candidates": 3168,
+    "tried": 3168,
     "not_tried": 0,
     "outcomes": {
-     "no_followup": 307,
-     "no_stood_t": 205,
-     "no_order": 3099,
-     "over_budget": 116,
+     "no_followup": 88,
+     "no_stood_t": 236,
+     "no_order": 2806,
+     "over_budget": 37,
      "built": 1
     },
     "built": [
-     "own.3.482"
+     "own.3.184"
     ]
    },
    {
@@ -119,10 +125,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "53924067dc3910fc245e04fef8fc2dc6",
-  "search_md5": "72611bb0e92d7bbc922e0f4e800968f0",
+  "transcription_md5": "baa922715bf9150a0ab6775fe35fe71a",
+  "search_md5": "27ed6c51fb25ba613613eba81651b76d",
   "planner_md5": "7130f8417875232075eb9915a841baac",
-  "classifier_md5": "b9300ede72e28ca7d9904a75523b8f05"
+  "classifier_md5": "77de2b53e86a3be61f29a85b97ad357b"
  },
  "board": {
   "width": 10,
@@ -501,9 +507,9 @@
  },
  "boards": [
   {
-   "id": "own.3.482",
+   "id": "own.3.184",
    "offset": 3,
-   "candidate": 482,
+   "candidate": 184,
    "cells": 36,
    "rows": [
     "----c---cc",
@@ -516,6 +522,6 @@
   }
  ],
  "demos": [
-  {"node":"own.3.482","terrain":"own.3.482.terrain","variant":"cutcopy","seq":"IJSOLZTSZLTIJOIJLOSTZ","roles":"bbbbbbbbbSffF","bags":["IJSOLZT","SZLTIJO"],"swap":"O","unused":"","base_locks":9,"stood_lock":9,"followup_lock":12,"offset":{"dr":34,"dc":-1},"reaches":[{"node":"own.3.482.terrain","lock":8,"check":"board"},{"node":"own.3.482","lock":8,"check":"board"}],"inputs":[[4,"keydown","moveLeft"],[5,"keyup","moveLeft"],[8,"keydown","moveLeft"],[9,"keyup","moveLeft"],[12,"keydown","softDrop"],[33,"keyup","softDrop"],[37,"keydown","hardDrop"],[38,"keyup","hardDrop"],[41,"keydown","moveRight"],[42,"keyup","moveRight"],[45,"keydown","softDrop"],[65,"keyup","softDrop"],[69,"keydown","rotateCCW"],[70,"keyup","rotateCCW"],[73,"keydown","moveRight"],[74,"keyup","moveRight"],[77,"keydown","moveRight"],[78,"keyup","moveRight"],[81,"keydown","moveRight"],[82,"keyup","moveRight"],[85,"keydown","hardDrop"],[86,"keyup","hardDrop"],[89,"keydown","moveRight"],[90,"keyup","moveRight"],[93,"keydown","moveRight"],[94,"keyup","moveRight"],[97,"keydown","moveRight"],[98,"keyup","moveRight"],[101,"keydown","softDrop"],[122,"keyup","softDrop"],[126,"keydown","hardDrop"],[127,"keyup","hardDrop"],[130,"keydown","moveLeft"],[131,"keyup","moveLeft"],[134,"keydown","moveLeft"],[135,"keyup","moveLeft"],[138,"keydown","moveLeft"],[139,"keyup","moveLeft"],[142,"keydown","moveLeft"],[143,"keyup","moveLeft"],[146,"keydown","softDrop"],[166,"keyup","softDrop"],[170,"keydown","hardDrop"],[171,"keyup","hardDrop"],[174,"keydown","moveLeft"],[175,"keyup","moveLeft"],[178,"keydown","moveLeft"],[179,"keyup","moveLeft"],[182,"keydown","softDrop"],[200,"keyup","softDrop"],[204,"keydown","rotateCW"],[205,"keyup","rotateCW"],[208,"keydown","softDrop"],[209,"keyup","softDrop"],[213,"keydown","hardDrop"],[214,"keyup","hardDrop"],[217,"keydown","softDrop"],[237,"keyup","softDrop"],[241,"keydown","hardDrop"],[242,"keyup","hardDrop"],[245,"keydown","hold"],[246,"keyup","hold"],[249,"keydown","moveRight"],[250,"keyup","moveRight"],[253,"keydown","moveRight"],[254,"keyup","moveRight"],[257,"keydown","moveRight"],[258,"keyup","moveRight"],[261,"keydown","softDrop"],[279,"keyup","softDrop"],[283,"keydown","rotateCW"],[284,"keyup","rotateCW"],[287,"keydown","hardDrop"],[288,"keyup","hardDrop"],[291,"keydown","softDrop"],[308,"keyup","softDrop"],[312,"keydown","rotateCCW"],[313,"keyup","rotateCCW"],[316,"keydown","hardDrop"],[317,"keyup","hardDrop"],[320,"keydown","moveRight"],[321,"keyup","moveRight"],[324,"keydown","moveRight"],[325,"keyup","moveRight"],[328,"keydown","moveRight"],[329,"keyup","moveRight"],[332,"keydown","softDrop"],[348,"keyup","softDrop"],[352,"keydown","rotateCCW"],[353,"keyup","rotateCCW"],[356,"keydown","moveRight"],[357,"keyup","moveRight"],[360,"keydown","softDrop"],[361,"keyup","softDrop"],[365,"keydown","hardDrop"],[366,"keyup","hardDrop"],[369,"keydown","hold"],[370,"keyup","hold"],[373,"keydown","softDrop"],[388,"keyup","softDrop"],[392,"keydown","rotateCCW"],[393,"keyup","rotateCCW"],[396,"keydown","moveRight"],[397,"keyup","moveRight"],[400,"keydown","softDrop"],[404,"keyup","softDrop"],[408,"keydown","rotateCCW"],[409,"keyup","rotateCCW"],[412,"keydown","hardDrop"],[413,"keyup","hardDrop"],[416,"keydown","moveLeft"],[417,"keyup","moveLeft"],[420,"keydown","moveLeft"],[421,"keyup","moveLeft"],[424,"keydown","moveLeft"],[425,"keyup","moveLeft"],[428,"keydown","softDrop"],[446,"keyup","softDrop"],[450,"keydown","rotateCW"],[451,"keyup","rotateCW"],[454,"keydown","softDrop"],[455,"keyup","softDrop"],[459,"keydown","hardDrop"],[460,"keyup","hardDrop"],[463,"keydown","softDrop"],[480,"keyup","softDrop"],[484,"keydown","rotateCW"],[485,"keyup","rotateCW"],[488,"keydown","moveLeft"],[489,"keyup","moveLeft"],[492,"keydown","moveLeft"],[493,"keyup","moveLeft"],[496,"keydown","softDrop"],[498,"keyup","softDrop"],[502,"keydown","hardDrop"],[503,"keyup","hardDrop"],[506,"keydown","hold"],[507,"keyup","hold"],[510,"keydown","softDrop"],[527,"keyup","softDrop"],[531,"keydown","rotateCCW"],[532,"keyup","rotateCCW"],[535,"keydown","moveRight"],[536,"keyup","moveRight"],[539,"keydown","softDrop"],[541,"keyup","softDrop"],[545,"keydown","rotateCCW"],[546,"keyup","rotateCCW"],[549,"keydown","hardDrop"],[550,"keyup","hardDrop"]],"frames":553,"locks":[[37,1,0,0,[],0,0,0],[48,1208,0,0,[],0,0,0],[41,6,0,0,[],0,0,0],[44,10,0,0,[],0,0,0],[43,412,0,0,[],0,0,0],[28,13,0,0,[],0,0,0],[46,427,0,0,[],1,0,0],[29,433,0,0,[],0,0,0],[49,1238,0,0,[],0,0,0],[47,815,2,2,[],1,4,4],[47,400,0,0,[],0,0,0],[43,411,0,0,[],0,0,0],[47,804,2,2,[],1,5,5]],"events":[{"lock":9,"kind":"TSD","spin":2,"lines":2},{"lock":12,"kind":"TSD","spin":2,"lines":2}]}
+  {"node":"own.3.184","terrain":"own.3.184.terrain","variant":"cutcopy","seq":"IJSOLZTSZLTIJOIJLOSTZ","roles":"bbbbbbbbbSffF","bags":["IJSOLZT","SZLTIJO"],"swap":"O","unused":"","base_locks":9,"stood_lock":9,"followup_lock":12,"offset":{"dr":34,"dc":-1},"reaches":[{"node":"own.3.184.terrain","lock":8,"check":"board"},{"node":"own.3.184","lock":8,"check":"board"}],"inputs":[[4,"keydown","moveLeft"],[5,"keyup","moveLeft"],[8,"keydown","moveLeft"],[9,"keyup","moveLeft"],[12,"keydown","softDrop"],[33,"keyup","softDrop"],[37,"keydown","hardDrop"],[38,"keyup","hardDrop"],[41,"keydown","moveRight"],[42,"keyup","moveRight"],[45,"keydown","softDrop"],[65,"keyup","softDrop"],[69,"keydown","rotateCCW"],[70,"keyup","rotateCCW"],[73,"keydown","moveRight"],[74,"keyup","moveRight"],[77,"keydown","moveRight"],[78,"keyup","moveRight"],[81,"keydown","moveRight"],[82,"keyup","moveRight"],[85,"keydown","hardDrop"],[86,"keyup","hardDrop"],[89,"keydown","moveRight"],[90,"keyup","moveRight"],[93,"keydown","moveRight"],[94,"keyup","moveRight"],[97,"keydown","moveRight"],[98,"keyup","moveRight"],[101,"keydown","softDrop"],[122,"keyup","softDrop"],[126,"keydown","hardDrop"],[127,"keyup","hardDrop"],[130,"keydown","moveLeft"],[131,"keyup","moveLeft"],[134,"keydown","moveLeft"],[135,"keyup","moveLeft"],[138,"keydown","moveLeft"],[139,"keyup","moveLeft"],[142,"keydown","moveLeft"],[143,"keyup","moveLeft"],[146,"keydown","softDrop"],[166,"keyup","softDrop"],[170,"keydown","hardDrop"],[171,"keyup","hardDrop"],[174,"keydown","moveLeft"],[175,"keyup","moveLeft"],[178,"keydown","moveLeft"],[179,"keyup","moveLeft"],[182,"keydown","softDrop"],[200,"keyup","softDrop"],[204,"keydown","rotateCW"],[205,"keyup","rotateCW"],[208,"keydown","softDrop"],[209,"keyup","softDrop"],[213,"keydown","hardDrop"],[214,"keyup","hardDrop"],[217,"keydown","softDrop"],[237,"keyup","softDrop"],[241,"keydown","hardDrop"],[242,"keyup","hardDrop"],[245,"keydown","hold"],[246,"keyup","hold"],[249,"keydown","moveRight"],[250,"keyup","moveRight"],[253,"keydown","moveRight"],[254,"keyup","moveRight"],[257,"keydown","moveRight"],[258,"keyup","moveRight"],[261,"keydown","softDrop"],[279,"keyup","softDrop"],[283,"keydown","rotateCW"],[284,"keyup","rotateCW"],[287,"keydown","hardDrop"],[288,"keyup","hardDrop"],[291,"keydown","softDrop"],[308,"keyup","softDrop"],[312,"keydown","rotateCCW"],[313,"keyup","rotateCCW"],[316,"keydown","hardDrop"],[317,"keyup","hardDrop"],[320,"keydown","moveRight"],[321,"keyup","moveRight"],[324,"keydown","moveRight"],[325,"keyup","moveRight"],[328,"keydown","moveRight"],[329,"keyup","moveRight"],[332,"keydown","softDrop"],[348,"keyup","softDrop"],[352,"keydown","rotateCCW"],[353,"keyup","rotateCCW"],[356,"keydown","moveRight"],[357,"keyup","moveRight"],[360,"keydown","softDrop"],[361,"keyup","softDrop"],[365,"keydown","hardDrop"],[366,"keyup","hardDrop"],[369,"keydown","hold"],[370,"keyup","hold"],[373,"keydown","softDrop"],[388,"keyup","softDrop"],[392,"keydown","rotateCCW"],[393,"keyup","rotateCCW"],[396,"keydown","moveRight"],[397,"keyup","moveRight"],[400,"keydown","softDrop"],[404,"keyup","softDrop"],[408,"keydown","rotateCCW"],[409,"keyup","rotateCCW"],[412,"keydown","hardDrop"],[413,"keyup","hardDrop"],[416,"keydown","moveLeft"],[417,"keyup","moveLeft"],[420,"keydown","moveLeft"],[421,"keyup","moveLeft"],[424,"keydown","moveLeft"],[425,"keyup","moveLeft"],[428,"keydown","softDrop"],[446,"keyup","softDrop"],[450,"keydown","rotateCW"],[451,"keyup","rotateCW"],[454,"keydown","softDrop"],[455,"keyup","softDrop"],[459,"keydown","hardDrop"],[460,"keyup","hardDrop"],[463,"keydown","softDrop"],[480,"keyup","softDrop"],[484,"keydown","rotateCW"],[485,"keyup","rotateCW"],[488,"keydown","moveLeft"],[489,"keyup","moveLeft"],[492,"keydown","moveLeft"],[493,"keyup","moveLeft"],[496,"keydown","softDrop"],[498,"keyup","softDrop"],[502,"keydown","hardDrop"],[503,"keyup","hardDrop"],[506,"keydown","hold"],[507,"keyup","hold"],[510,"keydown","softDrop"],[527,"keyup","softDrop"],[531,"keydown","rotateCCW"],[532,"keyup","rotateCCW"],[535,"keydown","moveRight"],[536,"keyup","moveRight"],[539,"keydown","softDrop"],[541,"keyup","softDrop"],[545,"keydown","rotateCCW"],[546,"keyup","rotateCCW"],[549,"keydown","hardDrop"],[550,"keyup","hardDrop"]],"frames":553,"locks":[[37,1,0,0,[],0,0,0],[48,1208,0,0,[],0,0,0],[41,6,0,0,[],0,0,0],[44,10,0,0,[],0,0,0],[43,412,0,0,[],0,0,0],[28,13,0,0,[],0,0,0],[46,427,0,0,[],1,0,0],[29,433,0,0,[],0,0,0],[49,1238,0,0,[],0,0,0],[47,815,2,2,[],1,4,4],[47,400,0,0,[],0,0,0],[43,411,0,0,[],0,0,0],[47,804,2,2,[],1,5,5]],"events":[{"lock":9,"kind":"TSD","spin":2,"lines":2},{"lock":12,"kind":"TSD","spin":2,"lines":2}]}
  ]
 }

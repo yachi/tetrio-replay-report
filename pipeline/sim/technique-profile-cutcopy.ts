@@ -50,8 +50,9 @@ export const CUTCOPY: TechniqueProfile = {
       + 'the verified prefix, passing the reconstruction check), whether a Cut Copy\'s local shape stood around it, '
       + 'in either of two variants: cutcopy, the 千鳥格子 page\'s (the lock\'s cells the flat T pointing down, as drawn '
       + 'or mirrored, and every cell of the window around it — the outer slot\'s arms row above the T with the wall '
-      + 'beside it and the roof over the T\'s far end, the two rows the TSD clears and the outer slot\'s nub cell under '
-      + 'them — filled or empty as drawn); and uncut, harddrop\'s second generic type (the same flat T, the row above '
+      + 'beside it and the roof over the T\'s far end, the overhang over the outer slot (which must already stand at '
+      + 'the first TSD), the two rows the TSD clears and the outer slot\'s nub cell under them — filled or empty as '
+      + 'drawn); and uncut, harddrop\'s second generic type (the same flat T, the row above '
       + 'it, the two rows it clears, and the whole second TSD slot under them). The opportunity is a full T-spin '
       + 'Double for both; every hit is followed to the next T lock to see whether the second TSD fired in its slot.',
     notEligible: 'simulator output: which local shape a T went into is read off the vendored Triangle '
@@ -61,7 +62,8 @@ export const CUTCOPY: TechniqueProfile = {
       + 'columns, which disagree with the recorded ones (oracle-source.ts); a hit with garbage in its window '
       + 'is named in garbage_in_window for that reason. At a full TSD the two cleared rows are entailed by the '
       + 'clear (NaiveClauseForced): the T\'s orientation and the rows above and below them discriminate. The page\'s '
-      + 'T-hole build with its Z placed after the first T-spin is not this window (the Z is the outer slot\'s wall). '
+      + 'T-hole build with its Z placed after the first T-spin is not this window (the Z is the outer slot\'s wall and '
+      + 'its overhang): a Cut Copy whose overhang goes in after the first TSD is no hit. '
       + 'The uncut window is harddrop\'s drawings\' agreement box; shiwehi.com draws no second type. '
       + 'Counts only, always N / M with the denominator.',
   },

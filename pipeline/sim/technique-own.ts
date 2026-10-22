@@ -103,6 +103,16 @@ export function candidates(tr: any, v: Variant, off: number, rowsAbove: number, 
     (cleared.includes(i) ? must : may).add(id(x, h - 1 - i));
   }
   for (let y = h; y < H; y++) for (let x = 0; x < WIDTH; x++) may.add(id(x, y));
+  // the window's cells outside its box (`window_extra`), read as drawn like the box's own
+  const rows: string[] = tr.nodes.find((n: any) => n.id === v.board).rows;
+  const empties: string = tr.empty_letters ?? '';
+  for (const [r, c] of v.window_extra?.cells ?? []) {
+    const x = off + c - v.window.cols[0], y = h - 1 - (r - v.window.rows[0]);
+    if (x < 0 || x >= WIDTH || y < 0 || y >= H) throw new Error(`own: ${v.id}'s window_extra cell ${r},${c} is outside the search's rows`);
+    const ch = rows[r]![c]!;
+    may.delete(id(x, y));
+    if (!(ch === '-' || empties.includes(ch))) must.add(id(x, y));
+  }
   const fits = (allowed: Set<number>, kind: string, at: number) => {
     const out: number[][] = [];
     for (const shape of SHAPES[kind]!) for (const [ox, oy] of shape) {
@@ -232,7 +242,7 @@ export function assemble(P: TechniqueProfile, DP: TechniqueDemoProfile, OP: OwnP
     not_eligible_because: OP.artefact.notEligible,
     caveat: OP.artefact.caveat,
     rules: OP.rules(),
-    search: { variant: OP.variant, window: windowGrid(tr, v).g, offsets: OP.offsets, rows_above: OP.rowsAbove,
+    search: { variant: OP.variant, window: windowGrid(tr, v).g, window_extra: v.window_extra?.cells ?? [], offsets: OP.offsets, rows_above: OP.rowsAbove,
               max_extra: OP.maxExtra, max_steps: OP.maxSteps, max_tried: OP.maxTried, pick: OP.pick,
               per_offset: parts.map(p => p.per_offset) },
     engine: shared?.engine ?? null,

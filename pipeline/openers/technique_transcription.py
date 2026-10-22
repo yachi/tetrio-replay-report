@@ -171,6 +171,12 @@ def window_cells(data: dict, var: dict, spec: TechniqueSpec, mirrored: bool) -> 
         for c in range(c0, c1 + 1):
             v = 'T' if (r, c) in tc else ('.' if is_empty(rows[r][c], spec) else '#')
             out[(r, c0 + (c1 - c)) if mirrored else (r, c)] = v
+    for r, c in var.get('window_extra', {}).get('cells', []):
+        # a cell outside the box the window also reads (千鳥格子's overhang over the second slot); one inside the
+        # box is the box's own cell, and the gate's window rule reports it
+        if r0 <= r <= r1 and c0 <= c <= c1:
+            continue
+        out[(r, c0 + (c1 - c)) if mirrored else (r, c)] = '.' if is_empty(rows[r][c], spec) else '#'
     return out
 
 
@@ -266,6 +272,17 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
                    f'{sorted(outside)}')
     if outside and not v.get('untested_drawn', {}).get('reason'):
         bad.append(f'window: {v["id"]}.untested_drawn carries no reason')
+    ex = v.get('window_extra')
+    if ex is not None:
+        # opt-in: cells outside the box the window also reads (千鳥格子's overhang). Each must lie outside the
+        # box and on the board, and the drawings must agree on it (checked with the box's cells below)
+        cs = [tuple(x) for x in ex.get('cells', [])]
+        if not cs or not ex.get('note'):
+            bad.append(f'window: {v["id"]}.window_extra needs cells and a note')
+        for r, c in cs:
+            if (r, c) in inwin or not (0 <= r < len(rows) and 0 <= c < WIDTH):
+                bad.append(f'window: {v["id"]}.window_extra cell {(r, c)} is inside the box or off the board')
+                return bad
     ds = agreement_drawings(data, v, spec)
     if len(ds) < 2 or not external_for(v, spec):
         bad.append(f'window: {v["id"]}: an agreement window needs two drawings, one from another transcription')

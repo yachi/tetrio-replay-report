@@ -46,8 +46,8 @@ into T's and records each T on its own (`slot`).
 
 WHAT THE WINDOW DOES NOT EXPRESS, measured and named rather than fitted (`not_expressed`): the page's own
 sentence 「(Z)は1回目のT-spinを打った後に置いても構いません」 — the T-hole build's Z may go in after the first
-T-spin. One of its cells (`decides`) is the outer slot's wall beside its arms row, which every drawing fills; the
-window reads no other cell of that Z, so with the Z left out it fires nowhere on the build (`extra_checks` measures
+T-spin. Two of its cells (`decides`) are the outer slot's overhang and its wall beside its arms row, which every
+drawing fills; the window reads no other cell of that Z, so with the Z left out it fires nowhere on the build (`extra_checks` measures
 both: which cells of the Z decide, and that the build less the Z fires nowhere), and a Cut Copy built that way is no hit.
 
 A SECOND VARIANT, harddrop's (`uncut`). harddrop's page draws TWO generic Cut Copies: the first type above, and the
@@ -81,10 +81,10 @@ two T's share their centre, which is the shiwehi page's 「縦向きに入れて
 (004), the second T upright (005) and flat (006: the follow-up slot), and what that leaves (007). 008 is 001's board
 coloured by which TSD each row belongs to (its colours mark rows, not pieces; same occupancy, checked). 009 is 江戸城
 (Edo Castle): three TSDs nested, 「TSDをTSDで挟んだような地形」. Measured, it is NOT a new shape: the window fires on it
-once, as drawn, at the innermost T; that TSD's follow-up slot is the middle T, and on the board the first TSD leaves the
-window fires again, MIRRORED, at the middle T, whose own follow-up slot is the outer T — so 江戸城 is two Cut Copies in
-a row, in alternating hands (the page's own 「交互にずれている」), and the matcher already reads it as a hit whose
-follow-up lock is itself a hit. 010 overlays the two columns the T needs kept open; the sampler refuses it (an
+once, as drawn, at the innermost T; that TSD's follow-up slot is the middle T. On the board the first TSD leaves, the
+middle T is the first type's T, mirrored, in every cell but one: its outer slot has no overhang (nothing stands above the
+outer T's slot), so since the overhang rule (2026-10-22: the overhang must stand before the first T-spin) the window
+does not fire there, and 江戸城 is ONE Cut Copy, whose follow-up is the middle TSD, followed by a third double. 010 overlays the two columns the T needs kept open; the sampler refuses it (an
 annotation). The upright and plain T's are no window's T (stood), and the window fires on no bare terrain or after
 board.
 
@@ -275,9 +275,18 @@ VARIANTS = [{
                    'harddrop\'s six and Tetrisちゃんねる\'s two. Row 2 is the outer slot\'s arms row: its three cells empty, the wall beside them '
                    'filled, and on the other side the roof over the T\'s right end and the cell beyond it filled; rows 3-4 '
                    'are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); row 5 the outer '
-                   'slot\'s nub cell, under the T\'s left arm, walled both sides. The outer slot\'s roof (the row above) '
+                   'slot\'s nub cell, under the T\'s left arm, walled both sides. The rest of the row above the box '
                    'is outside: harddrop\'s and the page\'s builds fill the cells the basic form leaves open there. '
+                   'The one cell of it the window does read is `window_extra`, the outer slot\'s overhang. '
                    'Occupancy only, never colour; garbage is filled.',
+    #: the overhang over the outer slot's arms (the cell over its left arm; mirrored, its right), read FILLED at the
+    #: first TSD although it lies above the box: every drawing fills it, and the rest of its row disagrees
+    'window_extra': {'cells': [[1, 5]],
+                     'note': 'the overhang over the outer slot, which makes it a T-spin slot: it must already stand '
+                             'when the first TSD goes in. yachi\'s reading (2026-10-22), against the page\'s own '
+                             'allowance that the T-hole build\'s Z may go in after the first T-spin; every drawing of '
+                             'the shape fills it, so no drawing moves. Outside the box because the cells beside it in '
+                             'its row disagree between drawings.'},
     'untested_drawn': {'cells': [], 'reason': ''},
     'agreement': [
         {'board': 'basic', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': False},
@@ -297,11 +306,12 @@ VARIANTS = [{
     'misses': ['second.spin', 'basic.after', 'hole.terrain', 'col3.terrain', 'uncut.spin', 'uncut.after'],
     #: a Cut Copy the page describes and the window does not fire on: measured, not fitted
     'not_expressed': [
-        {'board': 'hole.osz', 'less': 'z', 'quote': 'z_later', 'decides': [[2, 8]],
-         'reason': 'the page lets the T-hole build\'s Z go in after the first T-spin. One of its cells (`decides`) is '
-                   'the outer slot\'s wall beside its arms row, which every drawing fills; the window reads none of its '
-                   'other three, so with the Z left out the window fires nowhere on the build: a Cut Copy built in that '
-                   'order is no hit'},
+        {'board': 'hole.osz', 'less': 'z', 'quote': 'z_later', 'decides': [[1, 7], [2, 8]],
+         'reason': 'the page lets the T-hole build\'s Z go in after the first T-spin. Two of its cells (`decides`) are '
+                   'the outer slot\'s overhang (`window_extra`) and its wall beside its arms row, which every drawing '
+                   'fills; the window reads neither of its other two, so with the Z left out the window fires nowhere '
+                   'on the build: a Cut Copy built in that order is no hit, which is the rule (the overhang stands '
+                   'before the first T-spin)'},
     ],
 }, {
     'id': 'uncut', 'board': 'uncut.spin', 'spin': 'TSD', 'lines': 2,
@@ -530,8 +540,9 @@ TETRISCH = {
     'basic': {'terrain': '001', 'upright': '002', 'spin': '003', 'after': '004',
               'second_upright': '005', 'second_spin': '006', 'second_after': '007'},
     'coloured': {'image': '008', 'same_occupancy_as': '001'},
-    'edo': {'image': '009', 'tsds': 3,
-            'reading': 'three TSDs nested, each row coloured by its TSD; measured below as two Cut Copies in a row'},
+    'edo': {'image': '009', 'tsds': 3, 'hits': 1,
+            'reading': 'three TSDs nested, each row coloured by its TSD; measured below as one Cut Copy (the innermost '
+                       'T), its follow-up the middle T, whose outer slot has no overhang, so it is no second hit'},
     #: the window's slot on the boards it is checked on as an agreement drawing (as drawn): 001 at 003's T, 009 at its
     #: innermost T
     'slots': {'001': [[5, 3], [5, 4], [5, 5], [6, 4]], '009': [[4, 3], [4, 4], [4, 5], [5, 4]]},
@@ -980,7 +991,8 @@ def _check_tetrisch(data: dict) -> list[str]:
             base = rows(af)
         if _occ(img[tc['coloured']['image']]['rows']) != _occ(img[tc['coloured']['same_occupancy_as']]['rows']):
             bad.append('tetrisch: the coloured board is not the basic terrain by occupancy')
-        # 江戸城: a hit, whose follow-up slot is a hit in the other hand, whose follow-up is the last TSD
+        # 江戸城: a hit, whose follow-up slot is the middle TSD; that one is a hit only while the hits recorded say so
+        # (its outer slot has no overhang, so under the overhang rule it is none), and the last TSD is its slot
         E = tc['edo']
         board, lock, hand = rows(E['image']), tc['slots'][E['image']], False
         if _fires_any(data, board) != [('cutcopy', sorted(lock), False)]:
@@ -996,7 +1008,16 @@ def _check_tetrisch(data: dict) -> list[str]:
             board = _clear(_occ(_with(board, lock)))
             hits = _fires_any(data, board)
             if n < E['tsds'] - 1:
-                if hits != [('cutcopy', fu, not hand)]:
+                if n >= E['hits']:
+                    # no hit, and the overhang is the one reason: without it the window fires at the slot
+                    bare = json.loads(json.dumps(data))
+                    bare['variants'][0].pop('window_extra', None)
+                    if hits or _fires_any(bare, board) != [('cutcopy', fu, not hand)]:
+                        bad.append(f'tetrisch: after 江戸城 TSD {n} the windows fire {hits}, and without the overhang '
+                                   f'{_fires_any(bare, board)}; the record says {E["hits"]} hit(s), the overhang the '
+                                   'one cell missing')
+                        break
+                elif hits != [('cutcopy', fu, not hand)]:
                     bad.append(f'tetrisch: after 江戸城 TSD {n} the windows fire {hits}, not the first type once at the '
                                f'follow-up slot, {"as drawn" if hand else "mirrored"}')
                     break
@@ -1296,11 +1317,14 @@ MUTANTS = [
     (lambda d: _var(d)['fires_on'].append('hole.osz'), 'a mirrored build listed as firing as drawn', 'window:'),
     (lambda d: _var(d)['fires_mirrored'].remove('col3.jz'), 'a drawn board in no list', 'mirror:'),
     (lambda d: _var(d)['fires_mirrored'].append('hole.terrain'), 'the T-hole terrain listed as firing', 'mirror:'),
+    (lambda d: _var(d).pop('window_extra'), 'the overhang dropped from the window', 'later:'),
+    (lambda d: _var(d)['window_extra'].__setitem__('cells', [[1, 6]]), 'the overhang read one cell over', 'later:'),
+    (lambda d: _var(d)['window_extra'].__setitem__('note', ''), 'the overhang without its note', 'window:'),
     (lambda d: _var(d)['not_expressed'][0].__setitem__('less', 's'), 'the wrong piece read as placed later', 'later:'),
     (lambda d: _var(d)['not_expressed'][0].__setitem__('reason', ''), 'not_expressed without a reason', 'later:'),
     (lambda d: _var(d)['not_expressed'][0].__setitem__('quote', 'nope'), 'not_expressed naming no quote', 'later:'),
     (lambda d: _var(d).pop('not_expressed'), 'the not_expressed record dropped', 'later:'),
-    (lambda d: _var(d)['not_expressed'][0].__setitem__('decides', [[2, 8], [2, 9]]),
+    (lambda d: _var(d)['not_expressed'][0].__setitem__('decides', [[2, 8]]),
      'two of the Z\'s cells read as deciding', 'later:'),
     (lambda d: _var(d)['not_expressed'][0].pop('decides'), 'the deciding cells unrecorded', 'later:'),
     (lambda d: d['cross_source'].pop('harddrop'), 'no harddrop record', 'harddrop:'),
@@ -1364,6 +1388,7 @@ MUTANTS = [
     (lambda d: _set(_tc(d, '004')['rows'], 7, 3, '#'), 'the after board not what the TSD leaves', 'tetrisch:'),
     (lambda d: _set(_tc(d, '008')['rows'], 7, 3, 'J'), 'the coloured board not the basic terrain', 'tetrisch:'),
     (lambda d: d['cross_source']['tetrisch']['edo'].__setitem__('tsds', 2), '江戸城 read as two TSDs', 'tetrisch:'),
+    (lambda d: d['cross_source']['tetrisch']['edo'].__setitem__('hits', 2), '江戸城 read as two Cut Copies', 'tetrisch:'),
     (lambda d: _set(_tc(d, '009')['rows'], 7, 4, 'S'), '江戸城\'s last TSD filled in', 'tetrisch:'),
     (lambda d: _tc(d, '010').pop('annotation'), 'the annotation image unread', 'tetrisch:'),
     (lambda d: d['cross_source']['tetrisch']['slots'].pop('009'), '江戸城 not an agreement drawing', 'tetrisch:'),
