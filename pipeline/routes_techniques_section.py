@@ -207,6 +207,7 @@ def compute(facts, data):
                     "hits": len(mine), "den": den,
                     "fired": len(mine) - sum(reasons.values()), "reasons": reasons,
                     "opener": op, "mid": len(mine) - op,
+                    "qualified": (sum(1 for h in mine if h["qualifies"]) if t.art.get("qualify") else None),
                     "first": f"m{first['match']}r{first['round']}", "href": site.replay_href(first)}
             techs.append(row)
 
@@ -238,6 +239,9 @@ def _tech_cell(c, spin, payoff):
         return f'<td class="mono rs-zero">0{den}</td>'
     follow = "Tetris" if payoff else "第二個 T-spin"
     sub = f"接到 {follow} {c['fired']} 次 · 開局 {c['opener']} · 中盤 {c['mid']}"
+    if c.get("qualified") is not None:
+        # The artefact's `qualify` (社畜トレイン): the window says the shape stood, not that it was built.
+        sub += f"<br>四條規則都過（真係砌出嚟）{c['qualified']} 次，其餘個形對到但唔算（碎塊、垃圾、Kaidan 或 DPC）"
     miss = ""
     if c["reasons"]:
         miss = ("<br><span class=\"rs-sub\">冇接到：" + " · ".join(

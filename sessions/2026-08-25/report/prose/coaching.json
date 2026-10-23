@@ -17,8 +17,7 @@
         "<strong>T-spin 呢兩格要追。</strong>T-spin double 298 對 416、triple 46 對 74<span class=\"badge\" data-claim=\"G036\"></span><span class=\"badge\" data-claim=\"G037\"></span>——每粒方塊打得重過人嘅來源就喺呢度，而唔係喺 quad。"
       ],
       "sim_recs": [
-        "<strong>欄干兩個形，條井都俾棋蓋住咗。</strong>欄干（TSD）7 次接到 Tetris 3 次、（TSS）4 次接到 2 次；兩個形冇接到最多都係條井俾棋蓋住咗（各 2）。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
-        "<strong>社畜トレイン，個位俾其他棋填咗。</strong>社畜トレイン 3 次接到 1 次，冇接到嗰啲全部係個位俾其他棋填咗（2）。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
+        "<strong>欄干兩個形，條井都俾棋蓋住咗。</strong>欄干（TSD）7 次接到 Tetris 3 次、（TSS）4 次接到 2 次；兩個形冇接到最多都係條井俾棋蓋住咗（各 2）。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
       ]
     },
     "pinglamb": {
@@ -36,7 +35,7 @@
       ],
       "sim_recs": [
         "<strong>STMB Cave 8 次全部冇接到第二個 TSD。</strong>個位俾其他棋填咗 6、下一粒 T 落咗第二度 2。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
-        "<strong>社畜トレイン同階段今晚接得到。</strong>社畜トレイン 5 次接到第二個 T-spin 4 次，階段 6 次接到 Tetris 4 次。繼續用。"
+        "<strong>階段今晚接得到。</strong>階段 6 次接到 Tetris 4 次。繼續用。"
       ]
     }
   },
