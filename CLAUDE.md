@@ -3666,8 +3666,10 @@ decode (`decode_boards`; the board equals the drawing by occupancy in the record
 fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
 `python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
 matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
-(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン) is labelled as
-the shape only (「個形對到，但唔算砌出嚟」), never as the technique. The report's 最癲一局 region passes no labels and is unchanged.
+(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン) gets no key
+moment at all (since 2026-10-23, yachi's call: every 社畜 window hit in the corpus failed them, so the labels only ever said
+「not this technique」); the technique page's case index still lists each one, and the selftest flips one to qualifying and
+must see a label appear. The report's 最癲一局 region passes no labels and is unchanged.
 TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
 which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
 
