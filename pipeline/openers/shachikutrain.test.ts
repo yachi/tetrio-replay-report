@@ -26,6 +26,10 @@
  *   8. THE FOLLOW-UP on the page's own drawings: the TSD into `basic.spin`'s slot, the page's Z, then the T into the
  *      slot `basic.second` draws, as a three-lock digest, as drawn and mirrored — it fires, and the follow-up mutants
  *      break it there as they do on the corpus.
+ *   9. QUALIFIES (`shachikutrain-qualify.ts`, agreed with yachi on 2026-10-23): which hits were BUILT as the page's
+ *      technique. Pinned per player, the qualifying list (empty on this corpus) and the hits failing only `dpc`
+ *      named; the S/L cells are the page's four s and four l; the ownership guard throws on a board it cannot
+ *      reproduce; and each rule turned off qualifies exactly the hits failing that rule alone.
  *
  * window_off_board is not listed entry by entry: it is every flat, nub-down T at a TSD whose window leaves the
  * board before the matcher found a mismatch (the window reaches one column past one end of the T and two past the
@@ -43,6 +47,8 @@ import { STMBCAVE } from '../sim/technique-profile-stmbcave.ts';
 import { DOUBLEDAGGER } from '../sim/technique-profile-doubledagger.ts';
 import { BTCANNON } from '../sim/technique-profile-btcannon.ts';
 import { CUTCOPY } from '../sim/technique-profile-cutcopy.ts';
+import { qualifier, shapeOffsets, type QualifyMutants } from '../sim/shachikutrain-qualify.ts';
+import { KAIDAN } from '../sim/technique-profile-kaidan.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
 
@@ -546,6 +552,70 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
 
   for (const [m] of Object.entries(EQUIVALENT))
     expect(serialise(run({ [m]: true } as Mutants)), m).toBe(base);
+}, 900_000);
+
+/** The hits that qualify (`shachikutrain-qualify.ts`): none. Every hit whose shape was built from whole pieces,
+ *  with no garbage in its S and L and no Kaidan window at the same T, is a DPC (DPC_ONLY). */
+const QUALIFIED_HITS: string[] = [];
+/** Hits failing `dpc` and nothing else: twelve emptied the board at lock 19 (the 20th piece) and fired the TSD
+ *  eight to ten pieces later, the DPC setup; none reached its second Perfect Clear. DPC_AFTER is the one whose
+ *  Perfect Clear comes after the T. */
+const DPC_ONLY = [
+  '2026-07-22 m10r8 yachi lock 29', '2026-07-28 m7r2 yachi lock 28', '2026-08-25 m3r3 pinglamb lock 27',
+  '2026-08-25 m3r7 yachi lock 27', '2026-08-25 m6r6 pinglamb lock 27', '2026-08-25 m7r1 pinglamb lock 28',
+  '2026-09-11 m1r4 pinglamb lock 27', '2026-09-11 m3r1 pinglamb lock 27', '2026-09-18 m5r5 pinglamb lock 27',
+  '2026-09-19 m15r7 pinglamb lock 27', '2026-10-12 m7r2 yachi lock 27', '2026-10-20 m2r6 yachi lock 27',
+  '2026-10-22 m7r6 pinglamb lock 27'];
+const DPC_AFTER = ['2026-09-11 m1r4 pinglamb lock 27'];
+const QUALIFY_BY_PLAYER = {
+  pinglamb: { qualified: 0, not_qualified: { dpc: 8, fragment: 31, garbage_in_shape: 31, kaidan_window: 23 } },
+  yachi: { qualified: 0, not_qualified: { dpc: 6, fragment: 40, garbage_in_shape: 27, kaidan_window: 31 } },
+};
+const hitName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock}`;
+
+test('qualifies: pinned per player, the qualifying list, the DPC-only hits, the S/L cells', () => {
+  const a = art();
+  expect(a.qualify.by_player).toEqual(QUALIFY_BY_PLAYER);
+  expect(a.lists.qualified_hits).toEqual(QUALIFIED_HITS);
+  expect(a.hits.filter((h: any) => h.qualifies).map(hitName)).toEqual(QUALIFIED_HITS);
+  expect(a.hits.filter((h: any) => h.not_qualified.join() === 'dpc').map(hitName)).toEqual(DPC_ONLY);
+  // a reason only a weakened window can produce never appears
+  expect(a.hits.some((h: any) => h.not_qualified.includes('shape_cell_empty'))).toBe(false);
+  expect(a.hits.every((h: any) => typeof h.qualifies === 'boolean' && h.qualifies === (h.not_qualified.length === 0))).toBe(true);
+  const sh = shapeOffsets(TR);
+  expect(sh.filter(x => x.letter === 's').length).toBe(4);
+  expect(sh.filter(x => x.letter === 'l').length).toBe(4);
+});
+
+test('qualifies: the ownership guard throws on a board it cannot reproduce', () => {
+  const a = art();
+  const h = a.hits.find((x: any) => hitName(x) === DPC_ONLY[0]);
+  const d = digests().find(x => x.session === h.session && x.file === h.file && x.round === h.round_index0 && x.user === h.player)!;
+  const q = qualifier(SHACHIKUTRAIN.transcriptionPath, KAIDAN.transcriptionPath);
+  expect(q(h, d).not_qualified).toEqual(['dpc']);
+  const t = d.tspins.find(x => x.i === h.lock)!;
+  const r = t.board.findIndex(row => row.includes('.') && /[^.G]/.test(row));
+  const bad = { ...d, tspins: d.tspins.map(x => x !== t ? x
+    : { ...x, board: x.board.map((row, i) => i !== r ? row : row.replace(/[^.G]/, '.')) }) };
+  expect(() => q(h, bad)).toThrow(/ownership disagrees/);
+}, 120_000);
+
+test('qualifies: each rule turned off qualifies exactly the hits failing that rule alone', () => {
+  const b = art();
+  const runQ = (m: QualifyMutants) => {
+    const P = { ...SHACHIKUTRAIN, qualify: { ...SHACHIKUTRAIN.qualify!, check: qualifier(SHACHIKUTRAIN.transcriptionPath, KAIDAN.transcriptionPath, m) } };
+    return JSON.parse(serialise(build(P, {}, digests())));
+  };
+  const only = (rule: string) => b.hits.filter((h: any) => h.not_qualified.length > 0
+    && h.not_qualified.every((x: string) => x === rule)).map(hitName);
+  for (const [m, rule] of [['allowFragments', 'fragment'], ['allowGarbage', 'garbage_in_shape'],
+                           ['noKaidan', 'kaidan_window'], ['noDpc', 'dpc']] as const) {
+    const a = runQ({ [m]: true });
+    expect(only(rule).length, m).toBeGreaterThan(0);
+    expect(a.lists.qualified_hits, m).toEqual(only(rule));
+  }
+  // only a Perfect Clear AFTER the T: the twelve built after one qualify again
+  expect(runQ({ dpcAfterOnly: true }).lists.qualified_hits).toEqual(DPC_ONLY.filter(n => !DPC_AFTER.includes(n)));
 }, 900_000);
 
 /** The page's own TSD → Z → TSD, as a three-lock digest: the board `basic.spin` draws (its U the lock, every other

@@ -300,6 +300,8 @@ export interface Hit {
   followup: { lock: number | null; fired: boolean; reason: string | null };
   /** a payoff variant's hit only: the empty cells under the well cell, before the lock */
   well_depth?: number;
+  /** a profile with a `qualify` hook only: whether the hit was built as the technique, and every rule it fails */
+  qualifies?: boolean; not_qualified?: string[];
 }
 
 const sameSet = (a: Cell[], b: { r: number; c: number }[]) =>
@@ -642,6 +644,24 @@ export function assemble(P: TechniqueProfile & { crossRoute?: CrossRoute }, cls:
     controls: { under: v.under, ablation: v.ablation, orientation_baseline: v.orientation_baseline },
   }]));
   const cr = P.crossRoute ? crossRoute(P.crossRoute, digests, hits, P.tag) : null;
+  // the profile's optional `qualify` hook: each hit gains `qualifies` / `not_qualified`, and the artefact
+  // a per-player tally and two lists (a profile without the hook is untouched)
+  let qualify: any = null;
+  if (P.qualify) {
+    const byKey = new Map(digests.map(d => [`${d.session}|${d.file}|${d.round}|${d.user}`, d]));
+    const tally: Record<string, { qualified: number; not_qualified: Record<string, number> }> =
+      Object.fromEntries(cls.users.map(u => [u, { qualified: 0, not_qualified: {} }]));
+    for (const h of hits) {
+      const d = byKey.get(`${h.session}|${h.file}|${h.round_index0}|${h.player}`);
+      if (!d) throw new Error(`${P.tag}: ${caseName(h)} lock ${h.lock} has no digest`);
+      Object.assign(h, P.qualify.check(h, d));
+      const t = tally[h.player]!;
+      if (h.qualifies) t.qualified++;
+      for (const r of h.not_qualified!) t.not_qualified[r] = (t.not_qualified[r] ?? 0) + 1;
+    }
+    for (const t of Object.values(tally)) t.not_qualified = Object.fromEntries(Object.entries(t.not_qualified).sort());
+    qualify = { rules: P.qualify.rules, by_player: tally };
+  }
   return {
     schema: P.artefact.schema,
     report_eligible: false,
@@ -660,8 +680,13 @@ export function assemble(P: TechniqueProfile & { crossRoute?: CrossRoute }, cls:
     check: cls.check,
     variants,
     ...(cr ? { cross_route: cr } : {}),
+    ...(qualify ? { qualify } : {}),
     lists: {
       ...P.lists(hits, name),
+      ...(qualify ? {
+        qualified_hits: hits.filter(h => h.qualifies).map(h => `${name(h)} lock ${h.lock}`),
+        not_qualified: hits.filter(h => !h.qualifies).map(h => `${name(h)} lock ${h.lock} (${h.not_qualified!.join(', ')})`),
+      } : {}),
       window_off_board: cls.offBoard,
       recon_dropped_tsd: cls.reconDropped,
       ...Object.fromEntries(Object.entries(cls.reconOther).map(([k, l]) => [`recon_dropped_${k.toLowerCase()}`, l])),

@@ -4831,6 +4831,21 @@ see the second cell, and the row above the T was never read by both.
 below the cleared rows reaches the headline alone, and `noMustEmpty` and `noRoof` are live mutants whose hits are their ablations'.
 The window clashes with STMB Cave's, ダブルダガー's, BT砲's and 千鳥格子's in every pairing of hands, and no lock is a hit of two.
 
+**The window says the SHAPE stood; `qualify` says whether it was BUILT** (since 2026-10-23, rules agreed with yachi
+reviewing the hit list). `pipeline/sim/shachikutrain-qualify.ts` is the profile's opt-in `qualify` hook (`technique-profile.ts`),
+read by `assemble`: a hit qualifies only if the cells `basic.spin` draws as its S and L are each a cell of a piece with all four
+cells still on the board (`fragment` otherwise), none is garbage (`garbage_in_shape`), the Kaidan window does not fire at the same
+T (`kaidan_window`: the two windows clash on no cell, so a lock both fire on is read as a Kaidan), and the board is not emptied
+within `DPC_LOCKS` locks before or after the T (`dpc`: the DPC setup, a TSD built from the pieces a Perfect Clear left, into a
+second one). A failing hit stays in `hits` with `qualifies: false` and every rule it fails. Piece ownership runs through the
+digest's row map and is checked cell for cell against the board the matcher read (a mismatch throws). The first version counted
+`dpc` only AFTER the T; yachi then read the hits that passed every rule as DPCs, and measured, each had emptied the board a few
+pieces before its T, so the rule covers both sides. How many qualify is the artefact's and `shachikutrain.test.ts`'s
+(`QUALIFIED_HITS`, `DPC_ONLY`, `QUALIFY_BY_PLAYER`), never this file's. The page prints it in its own section and a column of the
+case index (`technique_page.py`'s `_qualify_section`, opt-in on the artefact carrying `qualify`; every other technique page is
+byte-identical). The hook's TYPE lives in `technique-profile.ts` and its call in `technique-facts.ts`, both hashed, so every
+technique artefact moved in its `emitter_md5` / `classifier_md5` lines and nothing else.
+
 **No demo is built, and every board says why** (`shachikutrain-demos.test.ts` re-derives each): the basic form's and the TST build's
 terrains have ODD cell counts (a proof); the STSD build's terrain has tilings but none under the planner's dealing; DT社畜's L is
 three cells; the 4x2 terrain has no tiling at all (two parts of six), a profile reason, because given that chain the planner stops
