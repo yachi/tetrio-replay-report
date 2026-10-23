@@ -104,6 +104,7 @@ class Job:
         self.env = env if env is not None else {}
         self.runs_on = None
         self.cond = None
+        self.needs = []
         self.matrix = {}
         self.steps = []
 
@@ -177,6 +178,13 @@ def scan_workflow(path, text):
                 job.runs_on = val
             elif key == "if":
                 job.cond = val
+            elif key == "needs":
+                # Only the one-line flow form `needs: [a, b]` (or a single id) is modelled; a
+                # block list would be consumed below as a nested block and read as no needs.
+                if not val:
+                    raise ParseError(f"{path.name}:{i+1}: `needs:` must be one line, "
+                                     f"`needs: [a, b]`")
+                job.needs = [x.strip() for x in val.strip("[]").split(",") if x.strip()]
             if key == "steps":
                 i = _scan_steps(path, lines, i + 1, job)
                 continue
@@ -325,7 +333,10 @@ _TOOLCHAIN_SKIP = "installs a pinned asset into $GITHUB_PATH; the local %s is ch
 # defines the image for aarch64 only, so the predicate has to name the ARCHITECTURE,
 # which is what the job's own `runs-on: ubuntu-24.04-arm` names.
 PREDICATES = {"aarch64-linux": (lambda: sys.platform == "linux"
-                                and platform.machine() in ("aarch64", "arm64"))}
+                                and platform.machine() in ("aarch64", "arm64")),
+              # The Pages deploy is a GitHub service, not a command: it has no local equivalent,
+              # so it runs nowhere but CI and the summary names it as unrun everywhere else.
+              "github-actions": lambda: os.environ.get("GITHUB_ACTIONS") == "true"}
 
 
 class Entry:
@@ -397,6 +408,11 @@ PLAN = {
     # on schedule/workflow_dispatch only, so it sits in the tier --weekly selects. Run locally it is
     # the same live fetch, not a stand-in; its offline half (--selftest) is a step of `docs`, FAST.
     "wikitext-sources": Entry(WEEKLY),
+    # verify.yml's Pages deploy: every step is a `uses:`, so there is nothing here to run, and
+    # it runs only on a push to main in CI. Planned so its `needs:` list is checked (see
+    # `deploy_problems`), excused so the summary says it did not run instead of printing ok.
+    "deploy": Entry(FAST, unless=(
+        "github-actions", "publishes to GitHub Pages; runs only in CI, on a push to main")),
 }
 
 WEEKLY_STEP_SKIPS = {"Mutation-test the spec", "Mutation-test the generated proofs"}
@@ -500,7 +516,24 @@ def completeness(env, jobs):
                            f"which the runner provides and bin/verify-repo does not — "
                            f"add it to RUNNER_VARS with a local equivalent, or skip the step")
     bad += matrix_membership_problems(on_disk)
+    bad += deploy_problems(jobs)
     bad += pin_problems(jobs)
+    return bad
+
+
+def deploy_problems(jobs):
+    """The Pages deploy must wait for EVERY other job in its workflow. GitHub does not check a
+    `needs:` list is complete, so a job added to verify.yml and left out of it would let a page
+    go live before that job's gate had passed — the one thing deploying from CI is for."""
+    bad = []
+    for d in (j for j in jobs if j.name == "deploy"):
+        others = {j.name for j in jobs if j.file == d.file and j.name != "deploy"}
+        for name in sorted(others - set(d.needs)):
+            bad.append(f"{d.file}:{d.line}: job 'deploy' does not need {name!r} — the site "
+                       f"would publish before that gate passed")
+        for name in sorted(set(d.needs) - others):
+            bad.append(f"{d.file}:{d.line}: job 'deploy' needs {name!r}, which {d.file} "
+                       f"does not define")
     return bad
 
 
@@ -759,22 +792,24 @@ def _corrupt(kind, texts):
         # them stopped corrupting the day `timeout-minutes` was added after `runs-on`.
         t[v] = re.sub(r"\n  docs:\n", "\n  docs-renamed:\n", t[v], count=1)
     elif kind == "step added carrying an unresolvable expression":
-        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions",
+        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical",
                             "      - name: Newly added step\n"
                             "        run: echo ${{ secrets.TOKEN }}\n"
-                            "      - name: Check docs/ was republished from the sessions")
+                            "      - name: Check a second render of the site is byte-identical")
     elif kind == "skipped step renamed":
         t[v] = t[v].replace("      - name: Mutation-test the spec",
                             "      - name: Mutation-test the spec (renamed)")
     elif kind == "conditional step added undeclared":
-        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions",
-                            "      - name: Check docs/ was republished from the sessions\n"
+        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical",
+                            "      - name: Check a second render of the site is byte-identical\n"
                             "        if: github.event_name == 'schedule'")
     elif kind == "step reads an unsupplied runner variable":
-        t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions\n"
-                            "        run: python3 bin/build-docs --check",
-                            "      - name: Check docs/ was republished from the sessions\n"
-                            "        run: python3 bin/build-docs --check \"$RUNNER_ARCH\"")
+        t[v] = t[v].replace("      - name: Check a second render of the site is byte-identical\n"
+                            "        run: python3 bin/build-docs --check --out _site",
+                            "      - name: Check a second render of the site is byte-identical\n"
+                            "        run: python3 bin/build-docs --check --out _site \"$RUNNER_ARCH\"")
+    elif kind == "deploy leaves a job out of its needs":
+        t[v] = t[v].replace("needs: [verify, pipeline, ", "needs: [verify, ", 1)
     elif kind == "unknown job key":
         t[d] = t[d].replace("  manifest:\n    runs-on:", "  manifest:\n    runz-on:")
     elif kind == "unknown step key":
@@ -878,9 +913,9 @@ def selftest():
     # this script's shape is gone.
     added = dict(texts)
     added["verify.yml"] = added["verify.yml"].replace(
-        "      - name: Check docs/ was republished from the sessions",
+        "      - name: Check a second render of the site is byte-identical",
         "      - name: Newly added step\n        run: echo hi\n"
-        "      - name: Check docs/ was republished from the sessions")
+        "      - name: Check a second render of the site is byte-identical")
     if added == texts:
         print("CONTROL FAILED — the absorption control's anchor moved", file=sys.stderr)
         return 1
@@ -903,6 +938,7 @@ def selftest():
                  "step reads an unsupplied runner variable", "unknown job key", "unknown step key", "content after the jobs block",
                  "a setup-bun step pins a literal version",
                  "the bun pin disagrees between workflows",
+                 "deploy leaves a job out of its needs",
                  "folded block scalar",
                  "a session dropped from the verify matrix",
                  "a session dropped from the pipeline matrix",

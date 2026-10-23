@@ -160,7 +160,7 @@ bin/new-session                replays in, verified ledger and proofs out
 bin/verify-session             re-run every gate for one artefact
 bin/verify-repo                run the repo-wide CI jobs, read out of the workflow files
 bin/build-docs                 regenerate the Pages site from the sessions
-docs/                          the published site
+docs/                          a local render of the site (git-ignored; CI renders and deploys it)
 ```
 
 ## Adding a session

@@ -1,20 +1,28 @@
 #!/usr/bin/env python3
-"""Regenerate docs/ (the GitHub Pages site) from the sessions.
+"""Render the GitHub Pages site from the sessions.
 
-    bin/build-docs            regenerate
-    bin/build-docs --check    verify docs/ matches the sessions, write nothing
+    bin/build-docs                      render into docs/ (git-ignored; a local preview)
+    bin/build-docs --out _site          render into _site/ (what CI deploys)
+    bin/build-docs --check --out _site  re-render and byte-compare against _site/, write nothing
 
-Copies each session's self-contained report into docs/ under a clean name and
-regenerates docs/index.html from facts.json + the proof maps — so the landing
-page can never drift from the data it describes. Re-run after adding a session.
+Copies each session's self-contained report into the site under a clean name and
+regenerates index.html from facts.json + the proof maps — so the landing page can
+never drift from the data it describes.
 
-`--check` exists because that promise had a hole: CI verified sessions/ in depth
-but never checked that docs/ had been regenerated from it, and nothing reruns this
-script automatically. A whole section (T-Spin Forecast) once lived in
-sessions/2026-07-22/report/report.html and was absent from the published
-docs/2026-07-22.html, so the page readers actually load was a different document
-from the one every gate had passed. --check is the same shape as
-`pipeline.build_report --check`: exit 1 and name the drifting files.
+THE SITE IS NOT COMMITTED. Since 2026-10-23 the `docs` job in verify.yml renders it
+into _site/, renders it a second time with --check (a determinism gate: the two renders
+must be byte-identical, the standard every other artefact here is held to), uploads it,
+and the `deploy` job publishes that upload to GitHub Pages once every other job in the
+workflow has passed on a push to main. Committing docs/ had made every pipeline change
+re-commit each report twice (docs/<date>.html was a byte copy of report.html) and every
+rendered page once.
+
+`--check` was first written because the committed docs/ could go stale: CI verified
+sessions/ in depth but never checked that docs/ had been regenerated from it, and a whole
+section (T-Spin Forecast) once lived in sessions/2026-07-22/report/report.html and was
+absent from the published docs/2026-07-22.html. Rendering the site in CI from the commit
+being deployed closes that hole by construction; --check survives as the determinism gate,
+and still exits 1 naming the files that differ.
 """
 import argparse
 import filecmp
@@ -358,9 +366,15 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None, tech
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true",
-                    help="verify docs/ matches the sessions; write nothing")
+                    help="verify the site directory matches the sessions; write nothing")
+    ap.add_argument("--out", metavar="DIR",
+                    help="render the site into DIR instead of docs/ (CI builds into _site and "
+                         "deploys that directory; docs/ is no longer committed)")
     args = ap.parse_args(argv)
     check = args.check
+    if args.out:
+        global DOCS
+        DOCS = Path(args.out).resolve()
     drift = []
 
     DOCS.mkdir(exist_ok=True)
@@ -598,7 +612,7 @@ def main(argv=None):
             print("run `bin/build-docs` to republish", file=sys.stderr)
             return 1
         print(
-            f"ok  docs/ matches the sessions — {totals['sessions']} sessions, "
+            f"ok  {DOCS.name}/ matches the sessions — {totals['sessions']} sessions, "
             f"{totals['matches']} matches, {totals['rounds']} rounds, "
             f"{totals['claims']} verified claims"
         )
