@@ -1054,13 +1054,27 @@ jobs:
       # guess which replays you mean. One test reads it; the rest name their sessions themselves.
       #
       # --parallel runs the files in worker processes (one per core; 4 on this runner), every
-      # file exactly once, and is what took the suite from 38 min serial to about 11. It implies
+      # file exactly once (measured locally on 4 cores before the oracle cache: 640 s against
+      # ~37 min serial). It implies
       # --isolate: each file starts with a fresh process.env and fresh globals, so a test file
       # that sets REPLAY_DIR in a session loop no longer leaks it into the files after it.
       # NEVER add --no-isolate — it brings that leak back. A file that calls process.exit is
       # counted as a failure under --parallel, where a serial run would silently truncate.
+      #
+      # The oracle cache (pipeline/sim/oracle-cache.ts) lets the ~22 corpus-replaying files share
+      # one replay per case instead of recomputing it each. It lives in the runner's tmpdir and is
+      # never persisted across runs, so every case is still replayed by the real engine once per
+      # job. Warming it first, 4-way, keeps parallel workers from filling the same cases twice.
+      # On the weekly schedule the suite reads it OFF (the warm step is then wasted, ~1 min), so the suite also runs once a week exactly as it did
+      # before the cache existed — the backstop for anything the cache key could miss.
+      - name: Warm the oracle cache
+        run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
+
       - name: Run the simulator test suite
-        run: REPLAY_DIR=sessions/2026-07-22 bun test --parallel
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off; fi
+          REPLAY_DIR=sessions/2026-07-22 bun test --parallel
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
   # claims (Facts.dfy / Claims.dfy) — that job installs Dafny and never touches spec/Forecast.dfy.

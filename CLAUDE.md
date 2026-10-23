@@ -663,7 +663,7 @@ equivalent marker pair.
   step reads it, and under `set -u` a local run dies with `unbound variable` — which is how the first
   `--only pipeline` failed all seven sessions in nine seconds. The runner-provided variables with an
   honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
-  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files, `GITHUB_EVENT_NAME` → `schedule` under `--weekly` and `push` otherwise) and **any other
   `$GITHUB_*` or `$RUNNER_*` reference is a completeness error**, so the next one is refused up front
   rather than dying halfway through a matrix.
 

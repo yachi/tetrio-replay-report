@@ -284,8 +284,14 @@ wide without first pinning per-session tallies, which is a re-measurement and no
 **What this does not certify.** With the cache on, the engine runs once per case per runner and
 every other file reads its result, so 「the oracle ran in this file」 is no longer true; the
 fill-time deep-equal says each entry is what was computed, not that the computation would repeat.
-`ORACLE_CACHE=off` is the uncached path and should stay a scheduled gate; the cache directory
-should not be persisted across CI runs without it.
+`ORACLE_CACHE=off` is the uncached path, and verify.yml's `typescript` job runs the suite with it
+on the weekly schedule; the cache directory lives in the runner's tmpdir and is never persisted
+across CI runs.
+
+**The CI step, reproduced locally on 4 cores with a fresh cache directory** (2026-10-23): the warm
+step (`--warm --jobs 4`) took 47 s and `REPLAY_DIR=sessions/2026-07-22 bun test --parallel` 306 s,
+960 pass / 7 skip / 0 fail over 63 files, peak system memory about 3.65 GB. The job was about 37 min
+serial on bun 1.2.4 before this. Hand-measured once; re-measure on the runner rather than quote it.
 
 ## Out of scope
 
@@ -294,5 +300,7 @@ should not be persisted across CI runs without it.
   verified forecast semantics across a dozen files. The evidence chain in `forecast.ts` is
   the asset here; a representation change that invalidates it is a bad trade for a suite that
   already finishes in 17.5 s.
-- **Parallelising the CI matrix further.** Already six jobs; the tail is Dafny, not Python.
+- ~~**Parallelising the CI matrix further.** Already six jobs; the tail is Dafny, not Python.~~
+  Struck 2026-10-23: by then the critical path was the `typescript` job's bun suite, not Dafny;
+  see the oracle-cache section above.
 - Micro-tuning the seven gates that run in 30 ms.

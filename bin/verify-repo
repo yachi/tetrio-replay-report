@@ -412,15 +412,18 @@ _INTERP = re.compile(r"\$\{\{\s*([a-z]+)\.([A-Za-z0-9_-]+)\s*\}\}")
 # else in this namespace is a completeness ERROR, so a step that starts reading a new
 # runner variable is refused rather than failing mid-run with `unbound variable`.
 RUNNER_VARS = ("RUNNER_TEMP", "GITHUB_WORKSPACE", "GITHUB_ENV", "GITHUB_PATH",
-               "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY")
+               "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY", "GITHUB_EVENT_NAME")
 _RUNNER_REF = re.compile(r"\$\{?((?:GITHUB|RUNNER)_[A-Z_]+)\}?")
 
 
-def runner_env(scratch):
+def runner_env(scratch, weekly=False):
     """The runner-provided variables, pointed at a scratch directory of our own.
     `RUNNER_TEMP` is literally "a temporary directory the runner cleans up", so a
-    tempdir here is the same thing rather than a stand-in for it."""
+    tempdir here is the same thing rather than a stand-in for it.  GITHUB_EVENT_NAME
+    is `schedule` under --weekly, which is the run --weekly stands in for, and `push`
+    otherwise, so a step that branches on it takes the same branch CI would."""
     e = dict(os.environ)
+    e["GITHUB_EVENT_NAME"] = "schedule" if weekly else "push"
     e["RUNNER_TEMP"] = str(scratch)
     e["GITHUB_WORKSPACE"] = str(REPO)
     for f in ("GITHUB_ENV", "GITHUB_PATH", "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY"):
@@ -644,7 +647,7 @@ def execute(env, jobs, args):
     by_name = {j.name: j for j in jobs}
     have, diverge = tool_versions(env)
     scratch = Path(tempfile.mkdtemp(prefix="verify-repo-"))
-    shellenv = runner_env(scratch)
+    shellenv = runner_env(scratch, args.weekly)
     ran, failed, skipped = [], [], []
 
     order = [n for n in PLAN if n in by_name]
