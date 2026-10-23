@@ -40,6 +40,7 @@ PROFILE = TechniqueSiteProfile(
     extra_css=SHACHIKUTRAIN_CSS,
     max_page_bytes=1_000_000,
     selftest_board="basic.second",
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)

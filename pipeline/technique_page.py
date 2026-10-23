@@ -104,6 +104,11 @@ class TechniqueSiteProfile:
     #: for byte what it was
     selfplay_rel: str = ""
     selfplay_schema: str = "technique-selfplay/1"
+    #: opt-in: the overview prints none of the window's corpus results (headline, controls, follow-up, cases),
+    #: only the artefact's `qualify` rules and how many hits pass them. 社畜トレイン, yachi's call on 2026-10-23: no
+    #: hit passes, and a page opening on the window's hits read as the technique being played. The artefact and
+    #: its tests keep every hit; the index card counts the qualifying ones
+    corpus_qualified_only: bool = False
 
 
 def case_key(h):
@@ -124,8 +129,9 @@ class TechniqueSite:
         self.PROSE = self.load_prose(p.prose_path)
         PS = self.PS = self.PROSE["page_sentences"]
         self.PAGE_SENTENCES = (PS["source"], PS["midgame"], PS["window"], PS["garbage"], PS["our_reading"])
-        self.OVERVIEW_REQUIRED = ((RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, RS.HOLE_SENTENCE)
-                                  + self.PAGE_SENTENCES + (PS["control"],))
+        self.OVERVIEW_REQUIRED = ((RS.EYEBROW, RS.TITLE_MARK, RS.NO_CLAIM, RS.HOLE_SENTENCE) + self.PAGE_SENTENCES
+                                  + ((self.PROSE["qualify"]["summary_note"],) if p.corpus_qualified_only
+                                     else (PS["control"],)))
         self.DP = self.PROSE["demo"]
         DS = self.DP["sentences"]
         self.DEMO_SENTENCES = (DS["demo"], DS["engine"], DS["base"], DS["order"], DS["rule"])
@@ -191,8 +197,14 @@ class TechniqueSite:
 
     # ------------------------------------------------------------ figures
 
-    def figures(self, art):
-        """Every figure the overview prints, by key, from the artefact's AGGREGATES."""
+    def _qualified_only(self, n):
+        return {"qualified": str(n)}
+
+    def figures(self, art, full=False):
+        """Every figure the overview prints, by key, from the artefact's AGGREGATES (`full`: every figure the
+        artefact supports, which is what the overview prints unless the profile is `corpus_qualified_only`)."""
+        if self.p.corpus_qualified_only and not full:
+            return self._qualified_only(sum(by["qualified"] for by in art["qualify"]["by_player"].values()))
         out = {}
         for vid, opp in self.VARIANTS:
             out.update({self._key(vid) + k: x for k, x in self._figures(art, vid, opp).items()})
@@ -232,9 +244,11 @@ class TechniqueSite:
             out[f"baseline.{u}"] = _nn(c["orientation_baseline"][u], den[u][opp]["all"])
         return out
 
-    def recount(self, art):
+    def recount(self, art, full=False):
         """The hit-derived figures again, RE-COUNTED from the hit list (the audit's half): the
         renderer prints the aggregates, so the page renders only when the two agree."""
+        if self.p.corpus_qualified_only and not full:
+            return self._qualified_only(sum(h["qualifies"] for h in art["hits"] if h["variant"] == self.p.variant))
         out = {}
         for vid, opp in self.VARIANTS:
             out.update({self._key(vid) + k: x for k, x in self._recount(art, vid, opp).items()})
@@ -558,7 +572,9 @@ class TechniqueSite:
         # variant's sections and cases after the primary's)
         parts = {vid: self._variant_sections(tr, art, vid, opp, fig, users) for vid, opp in self.VARIANTS}
         out += parts[self.p.variant][0]
-        if art.get("qualify"):
+        if self.p.corpus_qualified_only:
+            out += self._qualified_only_section(fig)
+        elif art.get("qualify"):
             out += self._qualify_section(art, fig, users)
 
         # 6. the cross-source
@@ -597,6 +613,14 @@ class TechniqueSite:
         Q = self.PROSE["qualify"]
         return Q["yes"] if h["qualifies"] else Q["no_join"].join(Q["reasons"][r] for r in h["not_qualified"])
 
+    def _qualified_only_section(self, fig):
+        """Opt-in (`corpus_qualified_only`): the rules and how many hits pass them, and nothing else of the corpus."""
+        Q = self.PROSE["qualify"]
+        return ['  <section class="scp-sec">', f'    <h2>{_esc(Q["title"])}</h2>', f'    <p>{_esc(Q["note"])}</p>',
+                f'    <p class="scp-count">{_esc(Q["summary_lead"])}<span data-figure="qualified">'
+                f'{_esc(fig["qualified"])}</span>{_esc(Q["summary_unit"])}</p>',
+                f'    <p>{_esc(Q["summary_note"])}</p>', "  </section>"]
+
     def _qualify_section(self, art, fig, users):
         """Opt-in (社畜トレイン, the artefact's `qualify`): of the hits, which were BUILT as the technique, and
         every rule the rest fail, per player over that player's hits."""
@@ -633,6 +657,8 @@ class TechniqueSite:
             out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(words)}</h4>'
                        f'{board_svg(self._window_rows(tr, v, mirrored), words, self.CLASSES)}</div>')
         out += ["    </div>", "  </section>"]
+        if self.p.corpus_qualified_only:
+            return out, []
 
         # 3. the headline, with the control sentence beside it
         cell = lambda k: f'<td data-figure="{_esc(pre + k)}">{_esc(fig[pre + k])}</td>'
@@ -1083,7 +1109,7 @@ class TechniqueSite:
             bad.append(f"the overview does not draw every board exactly once ({len(boards)} drawn, {len(tr['nodes'])} boards)")
         cases = _CASE.findall(page)
         vids = {vid for vid, _opp in self.VARIANTS}
-        want = sorted(case_key(h) for h in art["hits"] if h["variant"] in vids)
+        want = [] if self.p.corpus_qualified_only else sorted(case_key(h) for h in art["hits"] if h["variant"] in vids)
         if len(set(want)) != len(want):
             bad.append("two variants' hits share a case key (one lock read as two variants)")
         if sorted(html.unescape(c) for c in cases) != want:
@@ -1198,7 +1224,7 @@ class TechniqueSite:
                        f"{os.path.basename(self.p.selfplay_rel)} must declare report_eligible: false, constructed: true "
                        "and selfplay: true")
             self._sp = sp
-        self._need(self.figures(art) == self.recount(art),
+        self._need(self.figures(art, full=True) == self.recount(art, full=True),
                    "the facts artefact's aggregates disagree with its own hit list")
         pages = {self.OVERVIEW: self.render_overview(tr, art, demos), self.DEMO_PAGE: self.render_demo_page(tr, demos)}
         for name, page in pages.items():
@@ -1246,14 +1272,20 @@ class TechniqueSite:
                               ov.replace(case_line, case_line.replace(at.group(0), f'@p{mine[h0["lock"] - 1]}"'))))
         else:
             # no hit (BT砲): the case index is empty, so a row the artefact does not hold must be caught
-            cases.append(("overview: a hit row invented", "ov", ov.replace(
-                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>",
-                f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>\n"
-                '    <tr data-case="2026-01-01 m1r1 nobody lock 0"><td>x</td></tr>', 1)))
+            head = f"<th>{_esc(self.PROSE['table']['followup_col'])}</th></tr>"
+            row = '    <tr data-case="2026-01-01 m1r1 nobody lock 0"><td>x</td></tr>'
+            if head not in ov:
+                # corpus_qualified_only: no case table at all, so the row goes in before the demos link
+                head = f'    <h2>{_esc(self.PROSE["sections"]["demos"])}</h2>'
+                cases.append(("overview: a hit row invented", "ov", ov.replace(head, row + "\n" + head, 1)))
+            else:
+                cases.append(("overview: a hit row invented", "ov", ov.replace(head, head + "\n" + row, 1)))
         cases += [
             ("overview: a figure changed", "ov",
              ov.replace(fig.group(0), f'data-figure="{fig.group(1)}">{fig.group(2)}0<', 1)),
-            ("overview: the control sentence dropped", "ov", ov.replace(self.PS["control"], "")),
+            ("overview: the control sentence dropped", "ov", ov.replace(self.PS["control"], ""))
+            if not self.p.corpus_qualified_only else
+            ("overview: the hits-not-listed sentence dropped", "ov", ov.replace(self.PROSE["qualify"]["summary_note"], "")),
             ("overview: a board dropped", "ov", RT._drop_line(ov, f'data-board="{self.p.selftest_board}"')),
             ("overview: a %", "ov", ov.replace("</header>", "<p>12%</p></header>")),
             ("overview: a simplified glyph", "ov", ov.replace("</header>", "<p>这</p></header>")),
@@ -1383,5 +1415,9 @@ def site_card(site, art):
     """The index card's words and count for one technique (`bin/build-docs`)."""
     card = site.PROSE["index_card"]
     vids = {vid for vid, _opp in site.VARIANTS}
-    return {"href": site.OVERVIEW, "cases": sum(h["variant"] in vids for h in art["hits"]),
+    hits = [h for h in art["hits"] if h["variant"] in vids]
+    if site.p.corpus_qualified_only:
+        # the page lists no hit, so the card counts what the page reports: the hits that pass `qualify`
+        hits = [h for h in hits if h["qualifies"]]
+    return {"href": site.OVERVIEW, "cases": len(hits),
             "kicker": card["kicker"], "title": site.PROSE["overview_title"], "blurb": card["blurb"]}
