@@ -268,9 +268,10 @@ def technique_items(src, h, rnd):
     words = SPIN_WORDS.get((var["lines"], var["spin"]))
     _need(words is not None, f"{where}: no words for a {var['spin']} clearing {var['lines']}")
     if src.art.get("qualify") and not h["qualifies"]:
-        # 社畜トレイン's `qualify`: the window fired but the hit fails a build rule, so it is labelled
-        # as the shape only, never as the technique played.
-        words += "；個形對到，但唔算砌出嚟"
+        # 社畜トレイン's `qualify`: the window fired but the hit fails a build rule, so the shape
+        # stood and the technique was not built. It gets no key moment at all (the technique page's
+        # case index still lists it, with a link to the moment); the checks above still ran.
+        return []
     return [(h["lock"], True, T_TECH, f"{src.name}（{words}）")]
 
 
@@ -381,6 +382,24 @@ def _selftest():
             msg = f"refused: {str(e)[:90]}"
         ok &= good
         print(f"  {'ok ' if good else 'BAD'} {name}: {msg}")
+    # A hit that fails its artefact's `qualify` rules gets no key moment; the same hit marked as
+    # qualifying does, so the drop is the rule and not a hit the night never had.
+    qs = [s for s in techs if s.art.get("qualify")]
+    shape = [(s, h) for s in qs for h in s.art["hits"] if h["session"] == session and not h["qualifies"]]
+    if not shape:
+        raise SystemExit(f"replay_labels selftest: no shape-only hit on {session} to check")
+    qsrc, qhit = shape[0]
+
+    def n_marks(tt):   # labels naming the technique: a hit can share a mark with another one's
+        return sum(m[4].count(qsrc.name) for v in run(routes, tt).values() for m in v["marks"])
+
+    base = n_marks(techs)
+    flipped = n_marks([with_case(qsrc, "hits", qhit, lambda h: h.__setitem__("qualifies", True))
+                       if s is qsrc else s for s in techs])
+    good = flipped == base + 1
+    ok &= good
+    print(f"  {'ok ' if good else 'BAD'} a shape-only {qsrc.name} hit has no key moment: "
+          f"{base} labels, {flipped} with it marked as qualifying")
     print(f"{'ok ' if ok else 'FAIL'} replay_labels selftest: {len(cases) - 1} wrong labels, "
           f"{'all refused' if ok else 'SOME ACCEPTED'}")
     return 0 if ok else 1
