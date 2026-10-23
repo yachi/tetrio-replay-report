@@ -921,6 +921,19 @@ jobs:
       - name: Check the Kaidan technique page audit catches its corruptions
         run: python3 -m pipeline.kaidan_page --selftest
 
+      # The DPC page: what the first T-spin after each Perfect Clear was built on, against harddrop's six
+      # DPC Setups pages (pinned revisions, refetched weekly by check_wikitext_sources). Its PC points are
+      # anchored to the replay's own clears.allclear; the corpus artefact is checked by
+      # pipeline/openers/dpc.test.ts in the typescript job.
+      - name: Check the DPC setups transcription
+        run: python3 -m pipeline.openers.extract_dpc_setups
+
+      - name: Check the DPC setups transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_dpc_setups --selftest
+
+      - name: Check the DPC page audit catches its corruptions
+        run: python3 -m pipeline.dpc_page --selftest
+
       - name: Check docs/ was republished from the sessions
         run: python3 bin/build-docs --check
 

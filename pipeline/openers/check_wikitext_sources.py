@@ -17,7 +17,9 @@ Technique transcriptions are discovered the same way, by structure: every `pipel
 holding, ANYWHERE in it, an object carrying both `oldid` and `revision_sha1` (which ones is whatever discovery
 returns — the run prints the list; never re-type it here); the record's role is its dotted path. A discovered
 technique whose extractor declares no `wikitext_checks` / `synthetic_wikitext` is a SURVIVOR of `--selftest`,
-because the live run would fail its extractor step on it. Two things differ from a routes file, and both are stated in the output:
+because the live run would fail its extractor step on it. A `*-setups.json` (harddrop's DPC setup pages,
+`extract_<key>_setups`) is discovered and checked as a technique file; every board in it is a parse of its
+pinned revisions, so its `--wikitext-dir` re-parses them all and it has no gap lines. Two things differ from a routes file, and both are stated in the output:
 
   * the extractor (`pipeline.openers.extract_<key>_shapes`) is run with `--wikitext-dir`, not
     `--html-dir`: a technique's page is shiwehi.com HTML (and 欄干 pins a Tetrisチャンネル page beside it),
@@ -134,15 +136,19 @@ def technique_other_snapshots(data: dict) -> list[tuple[str, dict]]:
 
 
 def discover_techniques(openers: Path = HERE) -> list[Path]:
-    return [p for p in sorted(openers.glob('*-technique.json'))
+    # a setups transcription (dpc-setups.json) is read the same way: structure, --wikitext-dir, its SPEC's hooks
+    return [p for p in sorted([*openers.glob('*-technique.json'), *openers.glob('*-setups.json')])
             if technique_wikitext_records(json.loads(p.read_text()))]
 
 
 def extractor_module(routes: Path) -> str:
-    """`pipeline.openers.extract_<key>_routes` (or `_shapes` for a `-technique.json`), and only if that
+    """`pipeline.openers.extract_<key>_routes` (`_shapes` for a `-technique.json`, `_setups` for a
+    `-setups.json`), and only if that
     module writes exactly `routes`."""
     if routes.name.endswith('-technique.json'):
         name = f'pipeline.openers.extract_{routes.name[:-len("-technique.json")]}_shapes'
+    elif routes.name.endswith('-setups.json'):
+        name = f'pipeline.openers.extract_{routes.name[:-len("-setups.json")]}_setups'
     else:
         name = f'pipeline.openers.extract_{routes.name[:-len("-routes.json")]}_routes'
     try:
@@ -406,7 +412,8 @@ def selftest() -> int:
            any(t in discover() for t in techniques), False)
     try:
         report('extract_<key>_shapes resolves to its own technique file (control)',
-               not all(extractor_module(t).endswith('_shapes') for t in techniques), False)
+               not all(extractor_module(t).endswith('_setups' if t.name.endswith('-setups.json') else '_shapes')
+                       for t in techniques), False)
     except CheckFailed as e:
         report(f'extract_<key>_shapes resolves to its own technique file (control): {e}', True, False)
     # --wikitext-dir on a spec declaring no wikitext_checks fails by name (the REAL extractor, stmbcave)

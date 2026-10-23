@@ -47,7 +47,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import replay_labels, technique_page  # noqa: E402
+from pipeline import dpc_page, replay_labels, technique_page  # noqa: E402
 from pipeline.sites import ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -488,7 +488,7 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in ROUTE_SITES + TECHNIQUE_SITES]
+    prefixes = [site.p.prefix for site in ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
@@ -547,6 +547,32 @@ def main(argv=None):
                     stale.unlink()
                     print(f"  removed docs/{stale.name} (the {who} renderer does not produce it)")
         techniques.append(technique_page.site_card(site, ts_inputs[1]))
+
+    # The DPC page (what follows a Perfect Clear, against harddrop's DPC setup drawings): the same
+    # tier, the same render-and-byte-compare, and its card in the 中盤手法 group. It is not in
+    # TECHNIQUE_SITES because replay_labels and the report's routes section read that list.
+    dpc_site = dpc_page.DpcSite()
+    dpc_inputs = dpc_site.load_inputs(str(REPO))
+    dpc_pages = dpc_site.render_all(str(REPO), dpc_inputs)
+    for name, page in dpc_pages.items():
+        if name.endswith("-replay.html") or not name.startswith(dpc_page.PREFIX):
+            print(f"FAIL the DPC page renders {name}, outside its prefix or in -replay.html", file=sys.stderr)
+            return 1
+        dst = DOCS / name
+        if check:
+            if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                drift.append(f"docs/{name} differs from what the DPC artefacts render")
+        else:
+            dst.write_text(page, encoding="utf-8")
+            print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+    for stale in sorted(DOCS.glob(f"{dpc_page.PREFIX}*.html")):
+        if stale.name not in dpc_pages:
+            if check:
+                drift.append(f"docs/{stale.name} is published but the DPC renderer does not produce it")
+            else:
+                stale.unlink()
+                print(f"  removed docs/{stale.name} (the DPC renderer does not produce it)")
+    techniques.append(dpc_page.site_card(dpc_site, dpc_inputs[1]))
 
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its

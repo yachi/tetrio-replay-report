@@ -381,6 +381,11 @@ bun pipeline/sim/emit-technique-demos.ts --technique kaidan \
   --out analysis/kaidan-demos.json                             # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/kaidan.test.ts pipeline/openers/kaidan-demos.test.ts  # its two tests
 python3 -m pipeline.kaidan_page --selftest        # the docs/kaidan*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_dpc_setups            # CI gate: harddrop's six DPC Setups pages
+python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
+bun test pipeline/openers/dpc.test.ts            #   byte rebuild, the allclear anchor, named list + mutants
+python3 -m pipeline.dpc_page --selftest          # the docs/dpc.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -4982,6 +4987,26 @@ lifted out of `parapet.test.ts` and shared): every hit that is not a donation fa
 cell count (a proof); the three-step staircases tile, but never without a T, and the planner's dealing keeps the T's for the spin
 (its 「no cover by non-T pieces」 is the measurement, not a proof); the DT砲 boards are even but not multiples of four and drawn
 mirrored, so the as-drawn window would not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+## DPC 頁 — what the first T-spin after a Perfect Clear was built on
+
+harddrop's six DPC pages (DPC Setups and Extra S/Z, O, I, J/L, T) are transcribed into
+`pipeline/openers/dpc-setups.json` (named `*-setups.json`; `extract_dpc_setups.py` gates it, and
+`check_wikitext_sources` discovers its six pinned revisions like a technique file's and re-runs it
+with `--wikitext-dir`). `pipeline/sim/dpc-facts.ts` → `analysis/dpc-facts.json` takes every PC
+point and the first full or mini T-spin that clears within 15 locks after it and before the next
+PC, strips complete garbage rows from the bottom, and compares the board before that T with every
+drawn setup by occupancy, as drawn and mirrored, with the T's own cells. `docs/dpc.html` from
+`pipeline/dpc_page.py` + `dpc_prose.json` is the 中盤手法 group's last card. Same quarantine as the
+technique pages: no claim id, no ✓, no demo.
+
+Two things the wording must keep. **The PC points are anchored**: per player-round the simulator's
+board-empty count must equal `clears.allclear` (twice-extracted), and the artefact refuses to
+build otherwise. **The board after a PC is mostly past the verified prefix**, because the game
+sends that PC's attack in packets the oracle sends as one; every case says whether it is verified,
+and the page prints both counts. It is NOT in `TECHNIQUE_SITES` (`replay_labels` and the report's
+routes section read that list); `bin/build-docs` renders it in its own loop. Counts, the named
+`MATCHED` list and the Shachiku cross-check live in `dpc.test.ts`, never here.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 
