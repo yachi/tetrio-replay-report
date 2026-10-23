@@ -190,8 +190,14 @@ def compute(facts, data):
             for p in players:
                 mine = [h for h in hs if h["variant"] == vid and h["player"] == p]
                 den = data["tsd"][p] if var["spin"] == "TSD" else None
+                # A technique whose artefact carries `qualify` (社畜トレイン) counts only the hits that pass
+                # its build rules; the rest are the shape alone, printed beside the cell and never as hits.
+                shape_only = None
+                if t.art.get("qualify"):
+                    shape_only = sum(1 for h in mine if not h["qualifies"])
+                    mine = [h for h in mine if h["qualifies"]]
                 if not mine:
-                    row["cells"][p] = {"hits": 0, "den": den}
+                    row["cells"][p] = {"hits": 0, "den": den, "shape_only": shape_only}
                     continue
                 reasons = {}
                 for h in mine:
@@ -207,7 +213,7 @@ def compute(facts, data):
                     "hits": len(mine), "den": den,
                     "fired": len(mine) - sum(reasons.values()), "reasons": reasons,
                     "opener": op, "mid": len(mine) - op,
-                    "qualified": (sum(1 for h in mine if h["qualifies"]) if t.art.get("qualify") else None),
+                    "shape_only": shape_only,
                     "first": f"m{first['match']}r{first['round']}", "href": site.replay_href(first)}
             techs.append(row)
 
@@ -235,20 +241,19 @@ def _route_cell(c, nrounds, session):
 def _tech_cell(c, spin, payoff):
     den = (f" / {c['den']} 個 TSD" if c["den"] is not None
            else f"（{spin}，今晚冇可核 {spin} 總數）")
+    shape = (f"<br><span class=\"rs-sub\">另外 {c['shape_only']} 次個形對到但唔算砌出嚟"
+             f"（碎塊、垃圾、Kaidan 或 DPC）</span>" if c.get("shape_only") else "")
     if not c["hits"]:
-        return f'<td class="mono rs-zero">0{den}</td>'
+        return f'<td class="mono rs-zero">0{den}{shape}</td>'
     follow = "Tetris" if payoff else "第二個 T-spin"
     sub = f"接到 {follow} {c['fired']} 次 · 開局 {c['opener']} · 中盤 {c['mid']}"
-    if c.get("qualified") is not None:
-        # The artefact's `qualify` (社畜トレイン): the window says the shape stood, not that it was built.
-        sub += f"<br>四條規則都過（真係砌出嚟）{c['qualified']} 次，其餘個形對到但唔算（碎塊、垃圾、Kaidan 或 DPC）"
     miss = ""
     if c["reasons"]:
         miss = ("<br><span class=\"rs-sub\">冇接到：" + " · ".join(
             f"{REASON[k]} {n}" for k, n in sorted(c["reasons"].items(), key=lambda kv: (-kv[1], kv[0])))
             + "</span>")
     href = html.escape(c["href"])
-    return (f'<td class="mono"><b>{c["hits"]}</b>{den}<br><span class="rs-sub">{sub}</span>{miss}<br>'
+    return (f'<td class="mono"><b>{c["hits"]}</b>{den}<br><span class="rs-sub">{sub}</span>{miss}{shape}<br>'
             f'<a class="rs-sub" href="{href}">睇第一次（{c["first"]}，落 T 之前）</a></td>')
 
 
