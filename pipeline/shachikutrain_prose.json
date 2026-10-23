@@ -160,6 +160,6 @@
     "no_join": "；",
     "summary_lead": "corpus 入面四條都過、算係砌出嚟嘅社畜トレイン：",
     "summary_unit": " 下",
-    "summary_note": "個窗口對到個形、但唔過四條規則嘅 TSD，呢版唔列出亦唔數；佢哋仍然逐個記喺 analysis/shachikutrain-facts.json，由 shachikutrain.test.ts 逐個列名。"
+    "summary_note": "個窗口對到個形、但唔過四條規則嘅 TSD，呢版唔列出亦唔數；佢哋仍然逐個記喺 analysis/shachikutrain-facts.json，由 shachikutrain.test.ts 逐個列名。有一下過得四條，就會喺下面「個案」逐個列出，連去嗰晚嘅重播。"
   }
 }

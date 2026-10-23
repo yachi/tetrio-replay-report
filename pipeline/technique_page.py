@@ -658,7 +658,7 @@ class TechniqueSite:
                        f'{board_svg(self._window_rows(tr, v, mirrored), words, self.CLASSES)}</div>')
         out += ["    </div>", "  </section>"]
         if self.p.corpus_qualified_only:
-            return out, []
+            return out, self._cases(tr, art, vid, v, S, T)
 
         # 3. the headline, with the control sentence beside it
         cell = lambda k: f'<td data-figure="{_esc(pre + k)}">{_esc(fig[pre + k])}</td>'
@@ -698,7 +698,15 @@ class TechniqueSite:
                 cell(f"reason.{u}.{r}") if pre + f"reason.{u}.{r}" in fig else "<td>—</td>" for u in users) + "</tr>")
         out += ["    </table></div>", "  </section>"]
 
-        # 7. the cases
+        return out, self._cases(tr, art, vid, v, S, T)
+
+    def _cases(self, tr, art, vid, v, S, T):
+        """7. one variant's case index. Under `corpus_qualified_only` it lists the qualifying hits alone, and
+        is absent while there are none (社畜トレイン, yachi 2026-10-23: a hit that passes is shown, the rest are not)."""
+        PR = self.PROSE
+        shown = [h for h in art["hits"] if h["variant"] == vid and (not self.p.corpus_qualified_only or h["qualifies"])]
+        if self.p.corpus_qualified_only and not shown:
+            return []
         cases = ['  <section class="scp-sec">', f'    <h2>{_esc(S["cases"])}</h2>',
                  f'    <p>{_esc(S["cases_note"])}</p>',
                  '    <div class="scp-index-wrap"><table class="scp-table">',
@@ -706,9 +714,7 @@ class TechniqueSite:
                  f'<th>{_esc(T["lock"])}</th><th>{_esc(T["phase"])}</th><th>{_esc(T["window_col"])}</th>'
                  f'<th>{_esc(T["followup_col"])}</th>'
                  + (f'<th>{_esc(PR["qualify"]["col"])}</th>' if art.get("qualify") else "") + '</tr>']
-        for h in art["hits"]:
-            if h["variant"] != vid:
-                continue
+        for h in shown:
             fu = h["followup"]
             fw = T["yes"].format(lock=fu["lock"]) if fu["fired"] else PR["reasons"][fu["reason"]]
             href = self.replay_href(h)
@@ -719,7 +725,7 @@ class TechniqueSite:
                          f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td>'
                          + (f'<td>{_esc(self._qualify_words(h))}</td>' if art.get("qualify") else "") + '</tr>')
         cases += ["    </table></div>", "  </section>"]
-        return out, cases
+        return cases
 
     # ------------------------------------------------------------ the demo page
 
@@ -1109,7 +1115,8 @@ class TechniqueSite:
             bad.append(f"the overview does not draw every board exactly once ({len(boards)} drawn, {len(tr['nodes'])} boards)")
         cases = _CASE.findall(page)
         vids = {vid for vid, _opp in self.VARIANTS}
-        want = [] if self.p.corpus_qualified_only else sorted(case_key(h) for h in art["hits"] if h["variant"] in vids)
+        want = sorted(case_key(h) for h in art["hits"]
+                      if h["variant"] in vids and (not self.p.corpus_qualified_only or h["qualifies"]))
         if len(set(want)) != len(want):
             bad.append("two variants' hits share a case key (one lock read as two variants)")
         if sorted(html.unescape(c) for c in cases) != want:
@@ -1377,6 +1384,28 @@ class TechniqueSite:
             ok &= good
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} refused: {name}")
+        if self.p.corpus_qualified_only:
+            # the other half of the rule: a hit that DOES qualify is listed, with its replay link (no corpus hit
+            # qualifies today, so one is flipped, its aggregate with it, and the page must render and show it)
+            t2, a2, d2 = (json.loads(json.dumps(x)) for x in inputs)
+            h = next(h for h in a2["hits"] if h["variant"] == self.p.variant)
+            by = a2["qualify"]["by_player"][h["player"]]
+            for r in h["not_qualified"]:
+                by["not_qualified"][r] -= 1
+                if not by["not_qualified"][r]:
+                    del by["not_qualified"][r]
+            by["qualified"] += 1
+            h["qualifies"], h["not_qualified"] = True, []
+            try:
+                page = self.render_all(REPO, (t2, a2, d2))[self.OVERVIEW]
+                rows = [html.unescape(c) for c in _CASE.findall(page)]
+                good = rows == [case_key(h)] and len(_CASE_LINK.findall(page)) == 1
+                why = f"{len(rows)} case row(s)"
+            except SystemExit as e:
+                good, why = False, str(e)[:120]
+            ok &= good
+            refused += 1
+            print(f"  {'ok ' if good else 'BAD'} a qualifying hit is listed with its replay link: {why}")
         sp = getattr(self, "_sp", None)
         if sp and sp["games"]:
             # the window check itself: the first hit read in the other hand must not fire
