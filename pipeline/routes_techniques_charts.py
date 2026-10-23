@@ -226,9 +226,9 @@ def panels(d):
     shape = [(t["name"], sum(t["cells"][p].get("shape_only") or 0 for p in pl)) for t in d["techs"]]
     shape = [(n, k) for n, k in shape if k]
     if shape:
-        # A `qualify` technique (社畜トレイン) is drawn by its qualifying hits only; say what was left out.
+        # A `qualify` technique (every mid-game technique page has one) is drawn by its qualifying hits only; say what was left out.
         out.append('      <p class="rc-zero">' + "、".join(f"{e(n)}另外有 {k} 次個形對到" for n, k in shape)
-                   + "，但唔算砌出嚟（碎塊、垃圾、Kaidan 或 DPC），冇畫入柱。</p>")
+                   + "，但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁），冇畫入柱。</p>")
     out += [f'      <p class="footnote">{QUARANTINE}</p>', '    </div>']
     return "\n".join(out)
 

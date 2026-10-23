@@ -20,6 +20,8 @@
  * No `crossRoute`: no committed routes board draws a Kaidan (the gate's `routes_fire_none`).
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -34,7 +36,8 @@ export const KAIDAN: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/kaidan-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-kaidan.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
+                 `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -83,6 +86,18 @@ export const KAIDAN: TechniqueProfile = {
     'controls: the same window at the profile\'s other scored spins; ablations no_must_empty, no_roof and t_overlap '
       + 'at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      `fragment: a key cell — the roof over the slot's end away from the wall (basic.spin row 1, columns 5-6) and the Z stood on end on the lowest step (rows 2-4, columns 8-9), mirrored with the window — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)`,
+      'garbage_in_shape: a key cell is garbage',
+      'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
+      'z_not_one_piece: the four cells the page draws as its Z are not one piece (the page: 「Zを縦置き」)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: techniqueQualifier(`${OPENERS}/kaidan-technique.json`, QUALIFY_OPTIONS.kaidan),
+  },
   lists: (hits, name) => ({
     kaidan_hits: hits.map(h => `${name(h)} ${tag(h)}`),
     payoff_not_fired: hits.filter(h => !h.followup.fired)

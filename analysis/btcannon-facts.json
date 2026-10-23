@@ -111,7 +111,7 @@
    }
   ],
   "transcription_md5": "db93007fae4a99b68c1f0f8179003c4e",
-  "emitter_md5": "5357ea136f252f9b268706d8168dcf2b"
+  "emitter_md5": "d9c461d0f5492da4fdaa6eddec062b5e"
  },
  "sessions": [
   "2026-07-22",
@@ -428,11 +428,33 @@
    }
   }
  },
+ "qualify": {
+  "rules": [
+   "fragment: a key cell — the window's filled cells above the TSD's rows (the transcription's roof_cells): the J or I against the wall, the Z laid over the slot and the L's top, which every build places — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)",
+   "garbage_in_shape: a key cell is garbage",
+   "shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)",
+   "dpc: the board is empty after one of the 14 locks before the T, the T itself, or one of the 14 after it (the DPC setup)",
+   "ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart",
+   "qualifies iff none applies; the shape stood at every hit either way"
+  ],
+  "by_player": {
+   "pinglamb": {
+    "qualified": 0,
+    "not_qualified": {}
+   },
+   "yachi": {
+    "qualified": 0,
+    "not_qualified": {}
+   }
+  }
+ },
  "lists": {
   "btcannon_hits": [],
   "followup_not_fired": [],
   "garbage_in_window": [],
   "btcannon_in_opener": [],
+  "qualified_hits": [],
+  "not_qualified": [],
   "window_off_board": [
    "2026-07-22 m1r2 yachi lock 88",
    "2026-07-22 m1r2 pinglamb lock 76",

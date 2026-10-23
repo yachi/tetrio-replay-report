@@ -198,14 +198,19 @@ class TechniqueSite:
 
     # ------------------------------------------------------------ figures
 
-    def _qualified_only(self, n):
-        return {"qualified": str(n)}
+    def _qualified_only(self, art, n, showcase=None):
+        out = {"qualified": str(n)}
+        if self.p.showcase:
+            # the showcase under `corpus_qualified_only` ranges over the qualifying hits of the primary variant
+            out["showcase"] = _nn(len(self.showcase_hits(art)) if showcase is None else showcase,
+                                  sum(h["qualifies"] for h in art["hits"] if h["variant"] == self.p.variant))
+        return out
 
     def figures(self, art, full=False):
         """Every figure the overview prints, by key, from the artefact's AGGREGATES (`full`: every figure the
         artefact supports, which is what the overview prints unless the profile is `corpus_qualified_only`)."""
         if self.p.corpus_qualified_only and not full:
-            return self._qualified_only(sum(by["qualified"] for by in art["qualify"]["by_player"].values()))
+            return self._qualified_only(art, sum(by["qualified"] for by in art["qualify"]["by_player"].values()))
         out = {}
         for vid, opp in self.VARIANTS:
             out.update({self._key(vid) + k: x for k, x in self._figures(art, vid, opp).items()})
@@ -250,7 +255,9 @@ class TechniqueSite:
         renderer prints the aggregates, so the page renders only when the two agree."""
         if self.p.corpus_qualified_only and not full:
             vids = {vid for vid, _opp in self.VARIANTS}
-            return self._qualified_only(sum(h["qualifies"] for h in art["hits"] if h["variant"] in vids))
+            return self._qualified_only(art, sum(h["qualifies"] for h in art["hits"] if h["variant"] in vids),
+                                        sum(h["variant"] == self.p.variant and h["qualifies"] and not h["garbage_in_window"]
+                                            and h["followup"]["fired"] for h in art["hits"]))
         out = {}
         for vid, opp in self.VARIANTS:
             out.update({self._key(vid) + k: x for k, x in self._recount(art, vid, opp).items()})
@@ -346,9 +353,10 @@ class TechniqueSite:
         return boards[key]
 
     def showcase_hits(self, art):
-        """THE RULE: every hit of the primary variant with no garbage in its window and its follow-up fired."""
+        """THE RULE: every hit of the primary variant with no garbage in its window and its follow-up fired (under
+        `corpus_qualified_only`, every QUALIFYING hit of it)."""
         return [h for h in art["hits"] if h["variant"] == self.p.variant and not h["garbage_in_window"]
-                and h["followup"]["fired"]]
+                and h["followup"]["fired"] and (not self.p.corpus_qualified_only or h["qualifies"])]
 
     @staticmethod
     def _rows_of(board, mark, height):
@@ -583,7 +591,8 @@ class TechniqueSite:
 
         # 6. the cross-source
         cr = art.get("cross_route")
-        if cr:
+        # the cross-route counts window hits, so a `corpus_qualified_only` page does not print it
+        if cr and not self.p.corpus_qualified_only:
             out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["cross"])}</h2>',
                     f'    <p>{_esc(S["cross_note"])}</p>',
                     f'    <p class="scp-count" data-figure="cross">{_esc(fig["cross"])}</p>',
@@ -1398,28 +1407,41 @@ class TechniqueSite:
         if self.p.corpus_qualified_only:
             # the other half of the rule: a hit that DOES qualify is listed, with its replay link (a hit that does
             # not qualify is flipped, its aggregate with it, and the page must render and show it beside the rest)
+            # (when every hit of the primary variant qualifies, the opposite flip: a qualifying hit turned into
+            # one that does not must drop out of the list; with no hit at all there is nothing to flip)
             t2, a2, d2 = (json.loads(json.dumps(x)) for x in inputs)
-            h = next(h for h in a2["hits"] if h["variant"] == self.p.variant and not h["qualifies"])
-            by = a2["qualify"]["by_player"][h["player"]]
-            for r in h["not_qualified"]:
-                by["not_qualified"][r] -= 1
-                if not by["not_qualified"][r]:
-                    del by["not_qualified"][r]
-            by["qualified"] += 1
-            h["qualifies"], h["not_qualified"] = True, []
-            try:
-                page = self.render_all(REPO, (t2, a2, d2))[self.OVERVIEW]
-                rows = [html.unescape(c) for c in _CASE.findall(page)]
-                vids = {vid for vid, _opp in self.VARIANTS}
-                want = sorted(case_key(x) for x in a2["hits"] if x["variant"] in vids and x["qualifies"])
-                good = (case_key(h) in rows and sorted(rows) == want
-                        and len(_CASE_LINK.findall(page)) == len(want))
-                why = f"{len(rows)} case row(s)"
-            except SystemExit as e:
-                good, why = False, str(e)[:120]
-            ok &= good
-            refused += 1
-            print(f"  {'ok ' if good else 'BAD'} a qualifying hit is listed with its replay link: {why}")
+            prim = [h for h in a2["hits"] if h["variant"] == self.p.variant]
+            h = next((h for h in prim if not h["qualifies"]), None) or next(iter(prim), None)
+            if h is None:
+                print("  --  not planted: the artefact holds no hit of the primary variant, so none can be flipped")
+            else:
+                to = not h["qualifies"]
+                by = a2["qualify"]["by_player"][h["player"]]
+                for r in h["not_qualified"]:
+                    by["not_qualified"][r] -= 1
+                    if not by["not_qualified"][r]:
+                        del by["not_qualified"][r]
+                if to:
+                    by["qualified"] += 1
+                    h["qualifies"], h["not_qualified"] = True, []
+                else:
+                    by["qualified"] -= 1
+                    by["not_qualified"]["fragment"] = by["not_qualified"].get("fragment", 0) + 1
+                    h["qualifies"], h["not_qualified"] = False, ["fragment"]
+                try:
+                    page = self.render_all(REPO, (t2, a2, d2))[self.OVERVIEW]
+                    rows = [html.unescape(c) for c in _CASE.findall(page)]
+                    vids = {vid for vid, _opp in self.VARIANTS}
+                    want = sorted(case_key(x) for x in a2["hits"] if x["variant"] in vids and x["qualifies"])
+                    good = ((case_key(h) in rows) == to and sorted(rows) == want
+                            and len(_CASE_LINK.findall(page)) == len(want))
+                    why = f"{len(rows)} case row(s)"
+                except SystemExit as e:
+                    good, why = False, str(e)[:120]
+                ok &= good
+                refused += 1
+                print(f"  {'ok ' if good else 'BAD'} a {'qualifying hit is listed' if to else 'hit that stops qualifying is dropped'}"
+                      f" with the replay links of the rest: {why}")
         sp = getattr(self, "_sp", None)
         if sp and sp["games"]:
             # the window check itself: the first hit read in the other hand must not fire

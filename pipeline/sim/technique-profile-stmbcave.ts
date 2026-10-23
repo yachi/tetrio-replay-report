@@ -9,6 +9,8 @@
  * opener metric's own cave count (`opener-facts.json` `stmb_cave`) is made in `stmbcave.test.ts`.
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -21,7 +23,8 @@ export const STMBCAVE: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/stmbcave-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-stmbcave.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
+                 `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -63,6 +66,17 @@ export const STMBCAVE: TechniqueProfile = {
     'controls: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, no_roof '
       + 'and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      `fragment: a key cell — the S hooked over the gap, beside the T's far arm (feature.spin row 2, columns 5-6): the piece both of the page's builds place there; the transcription has no roof (the nub row is the cave's roof) — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)`,
+      'garbage_in_shape: a key cell is garbage',
+      'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: techniqueQualifier(`${OPENERS}/stmbcave-technique.json`, QUALIFY_OPTIONS.stmbcave),
+  },
   lists: (hits, name) => ({
     stmbcave_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),
     followup_not_fired: hits.filter(h => !h.followup.fired)

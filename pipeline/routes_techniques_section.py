@@ -242,7 +242,7 @@ def _tech_cell(c, spin, payoff):
     den = (f" / {c['den']} 個 TSD" if c["den"] is not None
            else f"（{spin}，今晚冇可核 {spin} 總數）")
     shape = (f"<br><span class=\"rs-sub\">另外 {c['shape_only']} 次個形對到但唔算砌出嚟"
-             f"（碎塊、垃圾、Kaidan 或 DPC）</span>" if c.get("shape_only") else "")
+             f"（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span>" if c.get("shape_only") else "")
     if not c["hits"]:
         return f'<td class="mono rs-zero">0{den}{shape}</td>'
     follow = "Tetris" if payoff else "第二個 T-spin"

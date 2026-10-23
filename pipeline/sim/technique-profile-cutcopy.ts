@@ -19,6 +19,8 @@
  * No `crossRoute`: no route page draws a Cut Copy (the gate measured the windows fire on no routes board).
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 /** a hit's variant, for the second type only: the first type's entries read as they always have */
@@ -33,7 +35,8 @@ export const CUTCOPY: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/cutcopy-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-cutcopy.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
+                 `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -82,6 +85,17 @@ export const CUTCOPY: TechniqueProfile = {
     'controls, per variant: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, '
       + 'no_roof and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      `fragment: a key cell — cutcopy: the roof over the T's end, the outer slot's wall and the overhang over the outer slot (roof_cells and window_extra), which every build places; uncut: the overhang over the T's right arm (uncut.spin row 1, column 4) — the other filled cells of that row harddrop draws as plain stack — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)`,
+      'garbage_in_shape: a key cell is garbage',
+      'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: techniqueQualifier(`${OPENERS}/cutcopy-technique.json`, QUALIFY_OPTIONS.cutcopy),
+  },
   lists: (hits, name) => {
     const of = (v: string) => hits.filter(h => h.variant === v);
     const tag = (h: any) => h.variant === 'cutcopy' ? '' : ` (${h.variant})`;

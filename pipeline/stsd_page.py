@@ -40,6 +40,7 @@ PROFILE = TechniqueSiteProfile(
     cell_classes={"C": "cl", "T": "tm", "J": "jm", "B": "hole"},
     extra_css=STSD_CSS,
     max_page_bytes=1_000_000,
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)
