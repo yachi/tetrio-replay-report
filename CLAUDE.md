@@ -3612,7 +3612,7 @@ prefix; per technique variant, the hits over the night's scored TSDs (`opener-fa
 `stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
 how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
 a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
-moment. A technique whose artefact carries `qualify` (社畜トレイン, 欄干) counts ONLY the hits that pass its build
+moment. A technique whose artefact carries `qualify` (all nine since 2026-10-23) counts ONLY the hits that pass its build
 rules — in the table, the per-match strip and 數據對決's chart (`routes_techniques_charts.py`) alike — and
 prints the shape-only hits beside them as 「另外 N 次個形對到但唔算砌出嚟」, so a night's window hits are never
 read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
@@ -3666,9 +3666,9 @@ decode (`decode_boards`; the board equals the drawing by occupancy in the record
 fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
 `python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
 matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
-(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン, 欄干) gets no key
+(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (every technique page) gets no key
 moment at all (since 2026-10-23, yachi's call: every 社畜 window hit in the corpus failed them, so the labels only ever said
-「not this technique」); the technique page's case index still lists each one, and the selftest flips one to qualifying and
+「not this technique」); the artefact still holds each one, and the selftest flips one to qualifying and
 must see a label appear. The report's 最癲一局 region passes no labels and is unchanged.
 TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
 which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
@@ -5024,6 +5024,27 @@ lifted out of `parapet.test.ts` and shared): every hit that is not a donation fa
 cell count (a proof); the three-step staircases tile, but never without a T, and the planner's dealing keeps the T's for the spin
 (its 「no cover by non-T pieces」 is the measurement, not a proof); the DT砲 boards are even but not multiples of four and drawn
 mirrored, so the as-drawn window would not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other seven pages
+
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子 and 階段のドネイト carry the same build rules as 社畜トレイン
+and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
+(`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
+its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page
+names as one is one piece (階段のドネイト's 「Zを縦置き」: `z_not_one_piece`), and no Perfect Clear lies within `DPC_LOCKS`
+locks either side of the T (`dpc`); `ownership_unverified` as for the other two. The key cells default to the transcription's
+`roof_cells` + `window_extra` (the pieces above the cleared rows, which every page draws as what it builds); STSD, STMB Cave,
+千鳥格子's `uncut` and 階段のドネイト name theirs in `QUALIFY_OPTIONS`, each with its reading beside it. The cleared rows and
+the stack under them are NOT required to be fresh: measured on 2026-10-23, fragments there are the ordinary old stack every
+page draws grey, while the cells above the cleared rows were whole pieces in almost every hit — so requiring the whole window
+fresh would have failed hits nobody would call accidental. No overlap rule was added: of the window relations the pages
+name (BT砲 / 欄干, 千鳥格子 uncut / STMB Cave, 階段 / 社畜), BT砲 and uncut hold no corpus hit and the last is excluded on
+社畜's side. The test pins each artefact's per-player tally and, where few fail, every failing hit by name; re-derives every
+committed verdict from the digests; and turns each rule off to see it qualify exactly the hits failing only that rule, and
+requires each rule live somewhere in the corpus. Every one of the seven pages is `corpus_qualified_only`; on 千鳥格子 the
+精選 set is drawn from qualifying hits only. Which hits fail, and how many, is the test's, never this file's — only that
+階段のドネイト is the page where most fail (its Z split by a clear, or garbage in its steps). Editing `technique-qualify.ts`
+moves all seven pages' facts and demos hash lines; 社畜トレイン's and 欄干's artefacts do not hash it.
 
 ## DPC 頁 — what the first T-spin after a Perfect Clear was built on
 

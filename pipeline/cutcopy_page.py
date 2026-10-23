@@ -48,6 +48,7 @@ PROFILE = TechniqueSiteProfile(
     own_rel=os.path.join("analysis", "cutcopy-own.json"),
     # games cold-clear played alone (cutcopy-selfplay.ts), played on the demo page after the own designs
     selfplay_rel=os.path.join("analysis", "cutcopy-selfplay.json"),
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)

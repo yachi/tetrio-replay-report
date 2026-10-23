@@ -41,6 +41,7 @@ PROFILE = TechniqueSiteProfile(
     extra_css=STMBCAVE_CSS,
     max_page_bytes=1_000_000,
     selftest_board="feature.after",
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)

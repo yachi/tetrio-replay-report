@@ -5,6 +5,8 @@
  * `pipeline/openers/stsd-technique.json`.
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 import type { CrossRoute } from './technique-facts.ts';
 
 const SIM = import.meta.dir;
@@ -18,7 +20,8 @@ export const STSD: TechniqueProfile & { crossRoute: CrossRoute } = {
   artefactPath: `${REPO}/analysis/stsd-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-stsd.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
+                 `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -70,6 +73,17 @@ export const STSD: TechniqueProfile & { crossRoute: CrossRoute } = {
     'controls: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, no_roof '
       + 'and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      `fragment: a key cell — the overhang over the well (basic.spin rows 1, columns 2-3): the cells every build draws as its roof piece (an L, a Z or an I); the cell under it the roof.i build draws as stack, so it is not required fresh — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)`,
+      'garbage_in_shape: a key cell is garbage',
+      'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: techniqueQualifier(`${OPENERS}/stsd-technique.json`, QUALIFY_OPTIONS.stsd),
+  },
   lists: (hits, name) => ({
     stsd_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),
     followup_not_fired: hits.filter(h => !h.followup.fired)

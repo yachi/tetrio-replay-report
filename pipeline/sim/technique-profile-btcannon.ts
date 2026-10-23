@@ -15,6 +15,8 @@
  * No `crossRoute`: no route page draws a BT (the gate measured the window fires on no routes board).
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -27,7 +29,8 @@ export const BTCANNON: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/btcannon-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-btcannon.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
+                 `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -71,6 +74,17 @@ export const BTCANNON: TechniqueProfile = {
     'controls: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, no_roof '
       + 'and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      `fragment: a key cell — the window's filled cells above the TSD's rows (the transcription's roof_cells): the J or I against the wall, the Z laid over the slot and the L's top, which every build places — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)`,
+      'garbage_in_shape: a key cell is garbage',
+      'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: techniqueQualifier(`${OPENERS}/btcannon-technique.json`, QUALIFY_OPTIONS.btcannon),
+  },
   lists: (hits, name) => ({
     btcannon_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),
     followup_not_fired: hits.filter(h => !h.followup.fired)

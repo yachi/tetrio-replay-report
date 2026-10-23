@@ -17,7 +17,7 @@
       ],
       "sim_recs": [
         "<strong>要接第二個 TSD 嘅手法，個位成日俾填咗。</strong>STMB Cave 8 次全部冇接到，8 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。",
-        "<strong>階段 15 次得 6 次接到 Tetris。</strong>條井俾棋蓋住咗 5、俾 I 以外嘅棋填咗 3。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
+        "<strong>階段 6 次接到 Tetris 4 次。</strong>冇接到嗰 2 次都係條井俾棋蓋住咗。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
       ]
     },
     "pinglamb": {
@@ -33,7 +33,6 @@
         "逐局波動你係細嗰個<span class=\"badge\" data-claim=\"G058\"></span><span class=\"badge\" data-claim=\"G057\"></span>，而 150 局之後你頂爆得 9 次（對手 15 次）<span class=\"badge\" data-claim=\"C006\"></span>。守得穩就係咁。"
       ],
       "sim_recs": [
-        "<strong>階段之後嘅 Tetris 今晚好穩。</strong>階段 9 次接到 8 次。繼續用。",
         "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>56 局有 43 局行到第二巡、9 局行到第三巡或之後、1 局打出全消。"
       ]
     }

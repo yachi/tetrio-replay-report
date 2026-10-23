@@ -42,6 +42,7 @@ PROFILE = TechniqueSiteProfile(
     extra_css=BTCANNON_CSS,
     max_page_bytes=1_000_000,
     selftest_board="tst.spin",
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)

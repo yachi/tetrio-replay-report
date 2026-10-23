@@ -42,6 +42,7 @@ PROFILE = TechniqueSiteProfile(
     extra_css=IMPERIALCROSS_CSS,
     max_page_bytes=1_000_000,
     selftest_board="basic.after",
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)

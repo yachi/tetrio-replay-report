@@ -111,7 +111,7 @@
    }
   ],
   "transcription_md5": "baa922715bf9150a0ab6775fe35fe71a",
-  "emitter_md5": "068a1f4d6d3d0ba9d4e42a525f7a3722"
+  "emitter_md5": "3b30e3455e2ea0a668d159a7218cfacf"
  },
  "sessions": [
   "2026-07-22",
@@ -496,6 +496,28 @@
    }
   }
  },
+ "qualify": {
+  "rules": [
+   "fragment: a key cell — cutcopy: the roof over the T's end, the outer slot's wall and the overhang over the outer slot (roof_cells and window_extra), which every build places; uncut: the overhang over the T's right arm (uncut.spin row 1, column 4) — the other filled cells of that row harddrop draws as plain stack — belongs to a piece not all four of whose cells are on the board before the T (a line clear cut it)",
+   "garbage_in_shape: a key cell is garbage",
+   "shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)",
+   "dpc: the board is empty after one of the 14 locks before the T, the T itself, or one of the 14 after it (the DPC setup)",
+   "ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart",
+   "qualifies iff none applies; the shape stood at every hit either way"
+  ],
+  "by_player": {
+   "pinglamb": {
+    "qualified": 0,
+    "not_qualified": {}
+   },
+   "yachi": {
+    "qualified": 1,
+    "not_qualified": {
+     "fragment": 1
+    }
+   }
+  }
+ },
  "lists": {
   "cutcopy_hits": [
    "2026-09-18 m16r2 yachi lock 215 (mirrored)",
@@ -510,6 +532,12 @@
   ],
   "cutcopy_in_opener": [],
   "followup_is_a_hit": [],
+  "qualified_hits": [
+   "2026-10-20 m2r1 yachi lock 117"
+  ],
+  "not_qualified": [
+   "2026-09-18 m16r2 yachi lock 215 (fragment)"
+  ],
   "window_off_board": [
    "2026-07-22 m1r1 pinglamb lock 20 (cutcopy)",
    "2026-07-22 m1r1 yachi lock 9 (cutcopy)",
@@ -8402,7 +8430,7 @@
   "recon_dropped_tsd": []
  },
  "hits": [
-  {"session":"2026-09-18","file":"replay-2026-09-18-16.ttrm","round_index0":1,"match":16,"round":2,"player":"yachi","variant":"cutcopy","lock":215,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["IJ..OO","JJ...Z","J...TZ","JZ.TTJ","ITT.TT"],"verified_to":246,"followup":{"lock":216,"fired":false,"reason":"slot_filled_before_t"}},
-  {"session":"2026-10-20","file":"replay-2026-10-20-02.ttrm","round_index0":0,"match":2,"round":1,"player":"yachi","variant":"cutcopy","lock":117,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["ZZ..SS","O...SS","OT...S","TTT.JJ","GG.GGG"],"verified_to":149,"followup":{"lock":119,"fired":true,"reason":null}}
+  {"session":"2026-09-18","file":"replay-2026-09-18-16.ttrm","round_index0":1,"match":16,"round":2,"player":"yachi","variant":"cutcopy","lock":215,"in_opener":false,"mirrored":true,"garbage_in_window":false,"window_letters":["IJ..OO","JJ...Z","J...TZ","JZ.TTJ","ITT.TT"],"verified_to":246,"followup":{"lock":216,"fired":false,"reason":"slot_filled_before_t"},"qualifies":false,"not_qualified":["fragment"]},
+  {"session":"2026-10-20","file":"replay-2026-10-20-02.ttrm","round_index0":0,"match":2,"round":1,"player":"yachi","variant":"cutcopy","lock":117,"in_opener":false,"mirrored":false,"garbage_in_window":true,"window_letters":["ZZ..SS","O...SS","OT...S","TTT.JJ","GG.GGG"],"verified_to":149,"followup":{"lock":119,"fired":true,"reason":null},"qualifies":true,"not_qualified":[]}
  ]
 }
