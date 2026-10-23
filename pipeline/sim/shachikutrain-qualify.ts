@@ -52,7 +52,7 @@ export function shapeOffsets(tr: any): { dr: number; dc: number; letter: string 
 
 /** The owner grid after each lock from 0 to `upTo`, stopping before the first lock whose row map the
  *  digest could not verify (`bad`). -2 is empty, -1 garbage, k the lock that placed the cell. */
-function owners(d: TechDigest, upTo: number): { boards: number[][][]; bad: number | null } {
+export function owners(d: TechDigest, upTo: number): { boards: number[][][]; bad: number | null } {
   let g: number[][] = Array.from({ length: H }, () => new Array(W).fill(-2));
   const boards: number[][][] = [];
   for (let k = 0; k <= upTo && k < d.locks.length; k++) {

@@ -16,9 +16,7 @@
         "<strong>死法要收。</strong>全晚 13 局自己頂到天花板收場，9 局係佢<span class=\"badge\" data-claim=\"C006\"></span>，係佢八晚以嚟第二差。落多方塊唔應該連埋落多次自己撞頂。",
         "<strong>T-spin 呢兩格要追。</strong>T-spin double 298 對 416、triple 46 對 74<span class=\"badge\" data-claim=\"G036\"></span><span class=\"badge\" data-claim=\"G037\"></span>——每粒方塊打得重過人嘅來源就喺呢度，而唔係喺 quad。"
       ],
-      "sim_recs": [
-        "<strong>欄干兩個形，條井都俾棋蓋住咗。</strong>欄干（TSD）7 次接到 Tetris 3 次、（TSS）4 次接到 2 次；兩個形冇接到最多都係條井俾棋蓋住咗（各 2）。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
-      ]
+      "sim_recs": []
     },
     "pinglamb": {
       "tagline": "T-spin 效率流 · EFFICIENCY",

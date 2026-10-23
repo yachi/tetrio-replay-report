@@ -22,6 +22,8 @@
  * cannot match (the gate records them in `cross_source.also`).
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { parapetQualifier } from './parapet-qualify.ts';
+import { DPC_LOCKS } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -36,7 +38,8 @@ export const PARAPET: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/parapet-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-parapet.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`, `${SIM}/parapet-qualify.ts`,
+                 `${SIM}/shachikutrain-qualify.ts`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -88,6 +91,20 @@ export const PARAPET: TechniqueProfile = {
       + 'them); ablations no_must_empty, no_roof and t_overlap at the variant\'s opportunity; orientation_baseline = '
       + 'opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      'fragment: a cell both of the page\'s builds (basic.z, basic.o) draw as a piece of their own inside the window '
+        + '(the stood L and the two roof cells, mirrored with the window) belongs to a piece not all four of whose '
+        + 'cells are on the board before the T (a line clear cut it)',
+      'garbage_in_shape: one of those cells is garbage',
+      'shape_cell_empty: one of those cells is empty (the window requires it filled, so only a weakened window can admit this)',
+      'l_not_one_piece: the four cells the page draws as its L are not one piece (the page: 「%Lを1列ずらして立てて置き」)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: parapetQualifier(`${OPENERS}/parapet-technique.json`),
+  },
   lists: (hits, name) => {
     const of = (v: string) => hits.filter(h => h.variant === v);
     return {

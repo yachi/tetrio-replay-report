@@ -17,9 +17,7 @@
         "<strong>練 downstack，練到「埋咗都掘得返」。</strong> 呢個係全晚最明顯嘅一條裂縫：反打局 8 比 0<span class=\"badge\" data-claim=\"G056\"></span>，DS 全場低過對面<span class=\"badge\" data-claim=\"G071\"></span>。而你自己嘅數字都話你知呢樣有用——你贏嘅局 DS 係 0.182、輸嘅局係 0.159<span class=\"badge\" data-claim=\"G068\"></span>。練法：專登開 cheese race，逼自己喺高垃圾底下搵 T-spin，唔好一味死頂等對手甩手。",
         "<strong>唔使再練手法。</strong> 講明呢樣係想你唔好浪費時間：每粒方塊按幾多下（KPP）呢一項，你贏嘅局同輸嘅局幾乎完全一樣<span class=\"badge\" data-claim=\"G066\"></span>，pinglamb 都係一樣<span class=\"badge\" data-claim=\"G067\"></span>。呢個係第三個 session 都係同一個結論——手法乾淨唔會再幫你贏多一局，慳返啲時間練上面三樣。"
       ],
-      "sim_recs": [
-        "<strong>欄干之後留住 I。</strong>欄干（TSD）3 次接到 Tetris 1 次，冇接到嗰 2 次都係條井俾 I 以外嘅棋填咗。"
-      ]
+      "sim_recs": []
     },
     "pinglamb": {
       "tagline": "power T-spin 效率流",
