@@ -201,6 +201,13 @@ class TechniqueSite:
             out["cross"] = _nn(cr["with_hit"], cr["rounds_scored"])
         if self.p.showcase:
             out["showcase"] = _nn(len(self.showcase_hits(art)), len([h for h in art["hits"] if h["variant"] == self.p.variant]))
+        q = art.get("qualify")
+        if q:
+            for u, by in q["by_player"].items():
+                n = art["variants"][self.p.variant]["hits_by_player"][u]["all"]
+                out[f"qualified.{u}"] = _nn(by["qualified"], n)
+                for r, k in by["not_qualified"].items():
+                    out[f"nq.{u}.{r}"] = _nn(k, n)
         return out
 
     def _figures(self, art, vid, opp):
@@ -238,6 +245,14 @@ class TechniqueSite:
         if self.p.showcase:
             prim = [h for h in art["hits"] if h["variant"] == self.p.variant]
             out["showcase"] = _nn(sum(not h["garbage_in_window"] and h["followup"]["fired"] for h in prim), len(prim))
+        if art.get("qualify"):
+            # opt-in (社畜トレイン): which hits were built as the technique, re-counted from each hit's own verdict
+            prim = [h for h in art["hits"] if h["variant"] == self.p.variant]
+            for u in sorted(art["denominators"]):
+                mine = [h for h in prim if h["player"] == u]
+                out[f"qualified.{u}"] = _nn(sum(h["qualifies"] for h in mine), len(mine))
+                for r in sorted({r for h in mine for r in h["not_qualified"]}):
+                    out[f"nq.{u}.{r}"] = _nn(sum(r in h["not_qualified"] for h in mine), len(mine))
         return out
 
     def _recount(self, art, vid, opp):
@@ -543,6 +558,8 @@ class TechniqueSite:
         # variant's sections and cases after the primary's)
         parts = {vid: self._variant_sections(tr, art, vid, opp, fig, users) for vid, opp in self.VARIANTS}
         out += parts[self.p.variant][0]
+        if art.get("qualify"):
+            out += self._qualify_section(art, fig, users)
 
         # 6. the cross-source
         cr = art.get("cross_route")
@@ -575,6 +592,27 @@ class TechniqueSite:
                 f'    <p><a href="{_esc(self.DEMO_PAGE)}">{_esc(S["demos_link"])}</a></p>', '  </section>']
         out += RT._tail({"figures": fig})
         return "\n".join(out)
+
+    def _qualify_words(self, h):
+        Q = self.PROSE["qualify"]
+        return Q["yes"] if h["qualifies"] else Q["no_join"].join(Q["reasons"][r] for r in h["not_qualified"])
+
+    def _qualify_section(self, art, fig, users):
+        """Opt-in (社畜トレイン, the artefact's `qualify`): of the hits, which were BUILT as the technique, and
+        every rule the rest fail, per player over that player's hits."""
+        Q = self.PROSE["qualify"]
+        cell = lambda k: f'<td data-figure="{_esc(k)}">{_esc(fig[k])}</td>' if k in fig else "<td>—</td>"
+        reasons = sorted({k.split(".", 2)[2] for k in fig if k.startswith("nq.")})
+        out = ['  <section class="scp-sec">', f'    <h2>{_esc(Q["title"])}</h2>',
+               f'    <p>{_esc(Q["note"])}</p>',
+               '    <div class="scp-index-wrap"><table class="scp-table">',
+               f'    <caption>{_esc(Q["denominator_note"])}</caption>',
+               f'    <tr><th>{_esc(Q["row"])}</th>' + "".join(f"<th>{_esc(u)}</th>" for u in users) + "</tr>",
+               f'    <tr><th>{_esc(Q["qualified"])}</th>' + "".join(cell(f"qualified.{u}") for u in users) + "</tr>"]
+        for r in reasons:
+            out.append(f'    <tr><th>{_esc(Q["reasons"][r])}</th>' + "".join(cell(f"nq.{u}.{r}") for u in users) + "</tr>")
+        out += ["    </table></div>", f'    <p>{_esc(Q["after"])}</p>', "  </section>"]
+        return out
 
     def _variant_sections(self, tr, art, vid, opp, fig, users):
         """One variant's window, headline, controls and follow-up (the first list) and its case index (the
@@ -640,7 +678,8 @@ class TechniqueSite:
                  '    <div class="scp-index-wrap"><table class="scp-table">',
                  f'    <tr><th>{_esc(T["date"])}</th><th>{_esc(T["round"])}</th><th>{_esc(T["player"])}</th>'
                  f'<th>{_esc(T["lock"])}</th><th>{_esc(T["phase"])}</th><th>{_esc(T["window_col"])}</th>'
-                 f'<th>{_esc(T["followup_col"])}</th></tr>']
+                 f'<th>{_esc(T["followup_col"])}</th>'
+                 + (f'<th>{_esc(PR["qualify"]["col"])}</th>' if art.get("qualify") else "") + '</tr>']
         for h in art["hits"]:
             if h["variant"] != vid:
                 continue
@@ -651,7 +690,8 @@ class TechniqueSite:
                          f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a></td><td>{_esc(h["player"])}</td>'
                          f'<td>{h["lock"]}{_esc(T["mirrored_mark"]) if h["mirrored"] else ""}</td>'
                          f'<td>{_esc(T["phase_opener"] if h["in_opener"] else T["phase_mid"])}</td>'
-                         f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td></tr>')
+                         f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td>'
+                         + (f'<td>{_esc(self._qualify_words(h))}</td>' if art.get("qualify") else "") + '</tr>')
         cases += ["    </table></div>", "  </section>"]
         return out, cases
 

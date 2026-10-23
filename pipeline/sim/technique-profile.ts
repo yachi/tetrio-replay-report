@@ -18,6 +18,8 @@
  * happens.
  */
 
+import type { Hit, TechDigest } from './technique-facts.ts';
+
 /** Which T-spin, by the engine's own credit and line count. */
 export interface SpinKind { spin: 'full' | 'mini'; lines: number }
 
@@ -46,4 +48,7 @@ export interface TechniqueProfile {
   rules(): string[];
   /** the profile's named lists, from the hits; `name` is the shared `session mXrY player` prefix */
   lists(hits: any[], name: (h: any) => string): Record<string, string[]>;
+  /** optional: whether a hit was BUILT as the technique, beyond the shape standing (社畜トレイン's four rules,
+   *  `shachikutrain-qualify.ts`). A profile without it emits exactly what it did before the hook existed */
+  qualify?: { rules: string[]; check(h: Hit, d: TechDigest): { qualifies: boolean; not_qualified: string[] } };
 }

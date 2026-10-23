@@ -16,6 +16,7 @@
  * pins every case stopping at bag 1), so there is no round to follow.
  */
 import type { TechniqueProfile } from './technique-profile.ts';
+import { DPC_LOCKS, qualifier } from './shachikutrain-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -28,7 +29,8 @@ export const SHACHIKUTRAIN: TechniqueProfile = {
   artefactPath: `${REPO}/analysis/shachikutrain-facts.json`,
   hashFiles: {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-shachikutrain.ts`,
-                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`],
+                 `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`, `${SIM}/shachikutrain-qualify.ts`,
+                 `${OPENERS}/kaidan-technique.json`],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -73,6 +75,19 @@ export const SHACHIKUTRAIN: TechniqueProfile = {
     'controls: the same window at scored TSS, TST, mini TSS and mini TSD; ablations no_must_empty, no_roof '
       + 'and t_overlap at the opportunity; orientation_baseline = opportunities whose T stands up',
   ],
+  qualify: {
+    rules: [
+      'fragment: a cell the page draws as its S or L (basic.spin, mirrored with the window) belongs to a piece '
+        + 'not all four of whose cells are on the board before the T (a line clear cut it)',
+      'garbage_in_shape: a cell the page draws as its S or L is garbage',
+      'shape_cell_empty: a cell the page draws as its S or L is empty (the window requires it filled, so only a weakened window can admit this)',
+      'kaidan_window: the 階段のドネイト (Kaidan) window fires at the same T (kaidan-technique.json)',
+      `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup: a TSD built from the pieces left after a Perfect Clear, into a second one)`,
+      'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      'qualifies iff none applies; the shape stood at every hit either way',
+    ],
+    check: qualifier(`${OPENERS}/shachikutrain-technique.json`, `${OPENERS}/kaidan-technique.json`),
+  },
   lists: (hits, name) => ({
     shachikutrain_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),
     followup_not_fired: hits.filter(h => !h.followup.fired)
