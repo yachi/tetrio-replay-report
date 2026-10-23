@@ -212,7 +212,7 @@ regression, not an opinion.
 ```bash
 bin/new-session sessions/<date> <replay-dir>   # extract → claims → Dafny → verify → proof map
 bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 adds mutation test)
-bin/build-docs                                 # regenerate docs/ (the Pages site) from sessions
+bin/build-docs [--out <dir>]                   # render the Pages site (default docs/, git-ignored; CI deploys it)
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
@@ -601,6 +601,16 @@ equivalent marker pair.
 
 ## Workflow
 
+- **The Pages site is rendered by CI and NOT committed (since 2026-10-23).** `docs/` is git-ignored;
+  the `docs` job in verify.yml renders the site into `_site/` with `bin/build-docs --out _site`,
+  renders it again with `--check` (the second render must be byte-identical to the first), uploads
+  it, and the `deploy` job publishes it to GitHub Pages on a push to main once every other job in
+  verify.yml has passed — `bin/verify-repo --check` refuses a `deploy.needs` list that leaves one
+  out. The repo's Pages source is "GitHub Actions". `docs/<page>` in this file names the page's
+  path on the site (and in a local `bin/build-docs` render), not a committed file; a sentence below
+  saying `--check` "byte-compares" a page against a committed copy is from before this change and
+  now means the second render. Committing docs/ had made every pipeline change re-commit each
+  report twice (`docs/<date>.html` was a byte copy of `report.html`).
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
