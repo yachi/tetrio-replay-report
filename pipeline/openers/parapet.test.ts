@@ -26,6 +26,10 @@
  *   8. THE PAYOFF ON INDEPENDENT DRAWINGS: two-lock digests built from Tetrisチャンネル's 4-deep sequence (012, 013's T,
  *      015's I) and harddrop's fumen (pages 8-10), as drawn and mirrored, through `classify` — the payoff fires, and
  *      each payoff mutant breaks it there.
+ *   9. QUALIFIES (`parapet-qualify.ts`, at yachi's request on 2026-10-23, 社畜トレイン's rules carried over): which
+ *      hits were BUILT from whole pieces. Pinned per player, the qualifying list and the hits failing one rule alone;
+ *      the six cells read (the L and the roof) re-derived from the page's builds; the ownership guard throws on a board
+ *      it cannot reproduce; and each rule turned off qualifies exactly the hits whose only failures are rules turned off.
  *
  * window_off_board is not listed entry by entry: it is every T of a variant's shape at that variant's spin whose
  * window leaves the board before the matcher found a mismatch, thousands of them. It is pinned per variant and per
@@ -46,6 +50,7 @@ import { SHACHIKUTRAIN } from '../sim/technique-profile-shachikutrain.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
 import { H, W, scored, donationVerdict } from './technique-donation-checks.ts';
+import { parapetQualifier, shapeOffsets as qualifyShape, type ParapetQualifyMutants } from '../sim/parapet-qualify.ts';
 
 const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
@@ -1135,3 +1140,84 @@ test('the payoff on independent drawings: Tetrisチャンネル\'s 4-deep sequen
   const h2 = classify(PARAPET, TR, [drawingDigest(image('002').rows, tSlot('003'), { piece: 'O', cells: [[0, 0], [0, 1], [1, 0], [1, 1]], cleared: 0 })]).hits;
   expect(h2.map(h => [h.variant, h.well_depth, h.followup.reason])).toEqual([['parapet', 2, 'round_ended']]);
 });
+
+/** The hits that qualify (`parapet-qualify.ts`): the L one whole piece, it and the two roof cells whole pieces with
+ *  no garbage, and no Perfect Clear within 14 locks either side of the T. */
+const QUALIFIED_HITS = [
+  '2026-07-22 m5r5 yachi lock 39 (parapet_tss)', '2026-07-22 m9r5 pinglamb lock 171 (parapet)',
+  '2026-07-24 m3r2 pinglamb lock 79 (parapet)', '2026-07-24 m7r3 pinglamb lock 118 (parapet)',
+  '2026-07-28 m3r5 yachi lock 33 (parapet_tss)', '2026-07-28 m6r5 yachi lock 185 (parapet_tss)',
+  '2026-08-01 m5r2 yachi lock 18 (parapet)', '2026-08-19 m6r6 pinglamb lock 33 (parapet)',
+  '2026-08-25 m6r1 pinglamb lock 110 (parapet)', '2026-09-03 m2r8 yachi lock 30 (parapet)',
+  '2026-09-03 m4r6 yachi lock 98 (parapet_tss)', '2026-09-11 m5r2 yachi lock 32 (parapet_tss)',
+  '2026-09-18 m2r2 pinglamb lock 65 (parapet)', '2026-09-18 m14r5 yachi lock 111 (parapet_tss)',
+  '2026-09-19 m18r2 yachi lock 6 (parapet_tss)', '2026-10-03 m20r7 yachi lock 192 (parapet_tss)',
+  '2026-10-03 m20r8 pinglamb lock 129 (parapet)', '2026-10-09 m7r7 yachi lock 42 (parapet_tss)',
+  '2026-10-22 m4r5 pinglamb lock 36 (parapet)', '2026-10-22 m8r1 yachi lock 54 (parapet)'];
+/** Hits failing one rule and nothing else; `fragment` and `garbage_in_shape` alone fail none (every such hit also
+ *  has its L split), which is why the rule-off check below turns them off beside `allowSplitL`. */
+const ONLY: Record<string, string[]> = {
+  l_not_one_piece: [
+    '2026-07-22 m10r7 yachi lock 88 (parapet)', '2026-07-28 m6r5 yachi lock 40 (parapet)',
+    '2026-08-01 m3r3 yachi lock 86 (parapet)', '2026-08-01 m6r1 pinglamb lock 43 (parapet_tss)',
+    '2026-08-01 m7r2 yachi lock 33 (parapet_tss)', '2026-08-14 m5r2 yachi lock 81 (parapet_tss)',
+    '2026-08-14 m6r3 pinglamb lock 27 (parapet)', '2026-08-14 m9r1 yachi lock 54 (parapet_tss)',
+    '2026-08-19 m5r3 yachi lock 39 (parapet_tss)', '2026-08-19 m5r7 pinglamb lock 46 (parapet)',
+    '2026-09-03 m2r4 pinglamb lock 26 (parapet)', '2026-09-18 m11r6 yachi lock 185 (parapet)',
+    '2026-09-19 m18r2 pinglamb lock 120 (parapet)', '2026-10-03 m5r4 yachi lock 75 (parapet_tss)',
+    '2026-10-03 m6r2 yachi lock 137 (parapet_tss)', '2026-10-20 m4r7 yachi lock 92 (parapet)',
+    '2026-10-22 m7r1 yachi lock 17 (parapet)', '2026-10-22 m7r6 yachi lock 67 (parapet_tss)'],
+  dpc: ['2026-08-14 m6r8 pinglamb lock 27 (parapet_tss)'],
+  ownership_unverified: ['2026-08-25 m8r6 yachi lock 156 (parapet)', '2026-08-25 m8r6 yachi lock 218 (parapet)',
+                         '2026-09-18 m12r3 yachi lock 45 (parapet)'],
+  fragment: [], garbage_in_shape: [],
+};
+const QUALIFY_BY_PLAYER = {
+  pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 106, garbage_in_shape: 12, l_not_one_piece: 117 } },
+  yachi: { qualified: 12, not_qualified: { fragment: 98, garbage_in_shape: 18, l_not_one_piece: 118, ownership_unverified: 3 } },
+};
+const qName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock} (${h.variant})`;
+
+test('qualifies: pinned per player, the qualifying list, the one-rule failures, the six cells read', () => {
+  const a = art();
+  expect(a.qualify.by_player).toEqual(QUALIFY_BY_PLAYER);
+  expect(a.hits.filter((h: any) => h.qualifies).map(qName)).toEqual(QUALIFIED_HITS);
+  expect(a.lists.qualified_hits.length).toBe(QUALIFIED_HITS.length);
+  for (const [rule, names] of Object.entries(ONLY))
+    expect(a.hits.filter((h: any) => h.not_qualified.join() === rule).map(qName), rule).toEqual(names);
+  expect(a.hits.some((h: any) => h.not_qualified.includes('shape_cell_empty'))).toBe(false);
+  expect(a.hits.every((h: any) => typeof h.qualifies === 'boolean' && h.qualifies === (h.not_qualified.length === 0))).toBe(true);
+  // the L's four cells and the roof's two: what both builds draw as a piece of their own inside the window
+  const sh = qualifyShape(TR);
+  expect(sh.filter(x => x.l).map(x => [x.dr, x.dc])).toEqual([[-2, -2], [-1, -2], [0, -2], [0, -1]]);
+  expect(sh.filter(x => !x.l).map(x => [x.dr, x.dc])).toEqual([[-2, 1], [-2, 2]]);
+});
+
+test('qualifies: the ownership guard throws on a board it cannot reproduce', () => {
+  const a = art();
+  const h = a.hits.find((x: any) => qName(x) === QUALIFIED_HITS[0]);
+  const d = digests().find(x => x.session === h.session && x.file === h.file && x.round === h.round_index0 && x.user === h.player)!;
+  const q = parapetQualifier(PARAPET.transcriptionPath);
+  expect(q(h, d)).toEqual({ qualifies: true, not_qualified: [] });
+  const t = d.tspins.find(x => x.i === h.lock)!;
+  const r = t.board.findIndex(row => row.includes('.') && /[^.G]/.test(row));
+  const bad = { ...d, tspins: d.tspins.map(x => x !== t ? x
+    : { ...x, board: x.board.map((row, i) => i !== r ? row : row.replace(/[^.G]/, '.')) }) };
+  expect(() => q(h, bad)).toThrow(/ownership disagrees/);
+}, 600_000);
+
+test('qualifies: each rule turned off qualifies exactly the hits whose only failures are rules turned off', () => {
+  const b = art();
+  const runQ = (m: ParapetQualifyMutants) => {
+    const P = { ...PARAPET, qualify: { ...PARAPET.qualify!, check: parapetQualifier(PARAPET.transcriptionPath, m) } };
+    return JSON.parse(serialise(build(P, {}, digests())));
+  };
+  const within = (rules: string[]) => b.hits.filter((h: any) => h.not_qualified.every((x: string) => rules.includes(x))).map(qName);
+  for (const [m, rules] of [[{ allowSplitL: true }, ['l_not_one_piece']], [{ noDpc: true }, ['dpc']],
+                            [{ allowSplitL: true, allowFragments: true }, ['l_not_one_piece', 'fragment']],
+                            [{ allowSplitL: true, allowGarbage: true }, ['l_not_one_piece', 'garbage_in_shape']]] as const) {
+    const want = within([...rules]);
+    expect(want.length, JSON.stringify(m)).toBeGreaterThan(QUALIFIED_HITS.length);
+    expect(runQ(m).hits.filter((h: any) => h.qualifies).map(qName), JSON.stringify(m)).toEqual(want);
+  }
+}, 1_800_000);

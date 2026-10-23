@@ -104,10 +104,11 @@ class TechniqueSiteProfile:
     #: for byte what it was
     selfplay_rel: str = ""
     selfplay_schema: str = "technique-selfplay/1"
-    #: opt-in: the overview prints none of the window's corpus results (headline, controls, follow-up, cases),
-    #: only the artefact's `qualify` rules and how many hits pass them. 社畜トレイン, yachi's call on 2026-10-23: no
-    #: hit passes, and a page opening on the window's hits read as the technique being played. The artefact and
-    #: its tests keep every hit; the index card counts the qualifying ones
+    #: opt-in: the overview prints none of the window's corpus results (headline, controls, follow-up), only the
+    #: artefact's `qualify` rules, how many hits of every variant pass them, and those hits as cases. 社畜トレイン,
+    #: yachi's call on 2026-10-23: no hit passes, and a page opening on the window's hits read as the technique
+    #: being played; 欄干 the same day, at yachi's request, where a few do. The artefact and its tests keep every
+    #: hit; the index card counts the qualifying ones
     corpus_qualified_only: bool = False
 
 
@@ -216,7 +217,7 @@ class TechniqueSite:
         q = art.get("qualify")
         if q:
             for u, by in q["by_player"].items():
-                n = art["variants"][self.p.variant]["hits_by_player"][u]["all"]
+                n = sum(art["variants"][vid]["hits_by_player"][u]["all"] for vid, _opp in self.VARIANTS)
                 out[f"qualified.{u}"] = _nn(by["qualified"], n)
                 for r, k in by["not_qualified"].items():
                     out[f"nq.{u}.{r}"] = _nn(k, n)
@@ -248,7 +249,8 @@ class TechniqueSite:
         """The hit-derived figures again, RE-COUNTED from the hit list (the audit's half): the
         renderer prints the aggregates, so the page renders only when the two agree."""
         if self.p.corpus_qualified_only and not full:
-            return self._qualified_only(sum(h["qualifies"] for h in art["hits"] if h["variant"] == self.p.variant))
+            vids = {vid for vid, _opp in self.VARIANTS}
+            return self._qualified_only(sum(h["qualifies"] for h in art["hits"] if h["variant"] in vids))
         out = {}
         for vid, opp in self.VARIANTS:
             out.update({self._key(vid) + k: x for k, x in self._recount(art, vid, opp).items()})
@@ -260,8 +262,10 @@ class TechniqueSite:
             prim = [h for h in art["hits"] if h["variant"] == self.p.variant]
             out["showcase"] = _nn(sum(not h["garbage_in_window"] and h["followup"]["fired"] for h in prim), len(prim))
         if art.get("qualify"):
-            # opt-in (社畜トレイン): which hits were built as the technique, re-counted from each hit's own verdict
-            prim = [h for h in art["hits"] if h["variant"] == self.p.variant]
+            # opt-in (社畜トレイン, 欄干): which hits of every variant were built as the technique, re-counted from
+            # each hit's own verdict
+            vids = {vid for vid, _opp in self.VARIANTS}
+            prim = [h for h in art["hits"] if h["variant"] in vids]
             for u in sorted(art["denominators"]):
                 mine = [h for h in prim if h["player"] == u]
                 out[f"qualified.{u}"] = _nn(sum(h["qualifies"] for h in mine), len(mine))
@@ -1298,6 +1302,13 @@ class TechniqueSite:
             ("overview: a simplified glyph", "ov", ov.replace("</header>", "<p>这</p></header>")),
         ]
         for vid, _opp in self.VARIANTS[1:]:
+            if self.p.corpus_qualified_only:
+                # no per-variant figure is printed; a further variant's qualifying case dropped must be caught
+                hv = next((h for h in art["hits"] if h["variant"] == vid and h["qualifies"]), None)
+                if hv:
+                    cases.append((f"overview: a {vid} case row dropped", "ov",
+                                  RT._drop_line(ov, f'data-case="{_esc(case_key(hv))}"')))
+                continue
             # a further variant's figures are keyed by its prefix: changing one must be caught as well
             vf = re.search(rf'data-figure="({re.escape(vid)}:[^"]+)">([^<]*)<', ov)
             cases.append((f"overview: a {vid} figure changed", "ov",
@@ -1385,10 +1396,10 @@ class TechniqueSite:
             refused += 1
             print(f"  {'ok ' if good else 'BAD'} refused: {name}")
         if self.p.corpus_qualified_only:
-            # the other half of the rule: a hit that DOES qualify is listed, with its replay link (no corpus hit
-            # qualifies today, so one is flipped, its aggregate with it, and the page must render and show it)
+            # the other half of the rule: a hit that DOES qualify is listed, with its replay link (a hit that does
+            # not qualify is flipped, its aggregate with it, and the page must render and show it beside the rest)
             t2, a2, d2 = (json.loads(json.dumps(x)) for x in inputs)
-            h = next(h for h in a2["hits"] if h["variant"] == self.p.variant)
+            h = next(h for h in a2["hits"] if h["variant"] == self.p.variant and not h["qualifies"])
             by = a2["qualify"]["by_player"][h["player"]]
             for r in h["not_qualified"]:
                 by["not_qualified"][r] -= 1
@@ -1399,7 +1410,10 @@ class TechniqueSite:
             try:
                 page = self.render_all(REPO, (t2, a2, d2))[self.OVERVIEW]
                 rows = [html.unescape(c) for c in _CASE.findall(page)]
-                good = rows == [case_key(h)] and len(_CASE_LINK.findall(page)) == 1
+                vids = {vid for vid, _opp in self.VARIANTS}
+                want = sorted(case_key(x) for x in a2["hits"] if x["variant"] in vids and x["qualifies"])
+                good = (case_key(h) in rows and sorted(rows) == want
+                        and len(_CASE_LINK.findall(page)) == len(want))
                 why = f"{len(rows)} case row(s)"
             except SystemExit as e:
                 good, why = False, str(e)[:120]

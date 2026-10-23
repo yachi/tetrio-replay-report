@@ -19,7 +19,7 @@
         "<strong>第九場係樣板，抄返自己。</strong> 十一場入面淨係嗰場你每粒方塊嘅攻擊高過對面<span class=\"badge\" data-claim=\"C019\"></span>，比數 5 比 2<span class=\"badge\" data-claim=\"G012\"></span>，係全晚贏得最鬆嗰場。返去睇返嗰七局你點出貨，唔係睇你點快。"
       ],
       "sim_recs": [
-        "<strong>欄干兩個形今晚都接得好。</strong>欄干（TSD）3 次接到 Tetris 3 次、（TSS）6 次接到 6 次；STSD 6 次接到第二個 T-spin 4 次。呢幾條路繼續用。",
+        "<strong>STSD 今晚接得好。</strong>STSD 6 次接到第二個 T-spin 4 次。呢條路繼續用。",
         "<strong>STMB Cave 冇接到，最多係個位俾填咗。</strong>STMB Cave 3 次接到 1 次（個位俾其他棋填咗 2）。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     },
@@ -37,7 +37,6 @@
         "<strong>Perfect Clear 唔好當成戰績。</strong> 你有 8 局做到全消、入面贏 6 局<span class=\"badge\" data-claim=\"G083\"></span>，但全場淨係你一個做到全消嘅 6 局入面，你仲要輸咗 1 局<span class=\"badge\" data-claim=\"G084\"></span>；對面 9 局全場淨係佢做到，佢輸咗 5 局<span class=\"badge\" data-claim=\"G082\"></span>。全消好睇，但同贏唔贏冇乜關係——呢個係六晚都一樣嘅結論。"
       ],
       "sim_recs": [
-        "<strong>欄干（TSD）8 次得 4 次接到 Tetris。</strong>冇接到：條井俾棋蓋住咗 2、俾 I 以外嘅棋填咗 2。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
         "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>31 局有 25 局行到第二巡、4 局行到第三巡或之後、1 局打出全消。"
       ]
     }

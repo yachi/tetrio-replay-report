@@ -3612,7 +3612,7 @@ prefix; per technique variant, the hits over the night's scored TSDs (`opener-fa
 `stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
 how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
 a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
-moment. A technique whose artefact carries `qualify` (社畜トレイン) counts ONLY the hits that pass its build
+moment. A technique whose artefact carries `qualify` (社畜トレイン, 欄干) counts ONLY the hits that pass its build
 rules — in the table, the per-match strip and 數據對決's chart (`routes_techniques_charts.py`) alike — and
 prints the shape-only hits beside them as 「另外 N 次個形對到但唔算砌出嚟」, so a night's window hits are never
 read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
@@ -3666,7 +3666,7 @@ decode (`decode_boards`; the board equals the drawing by occupancy in the record
 fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
 `python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
 matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
-(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン) gets no key
+(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン, 欄干) gets no key
 moment at all (since 2026-10-23, yachi's call: every 社畜 window hit in the corpus failed them, so the labels only ever said
 「not this technique」); the technique page's case index still lists each one, and the selftest flips one to qualifying and
 must see a label appear. The report's 最癲一局 region passes no labels and is unchanged.
@@ -4952,6 +4952,19 @@ exactly its `below` part. Mutants: `payoffAnyPiece` and `payoffNoQuad` (new, sha
 and `followupNoRowmap` (honoured by the well) each move only payoffs on the corpus, and the test also builds two-lock digests from
 Tetrisチャンネル's 4-deep sequence and harddrop's fumen, as drawn and mirrored, on which the payoff fires and each payoff mutant breaks
 it (`followupNoRowmap` needs garbage under the well to matter: a spin's own clear is always above the well cell).
+
+**The window says the SHAPE stood; `qualify` says whether it was BUILT** (since 2026-10-23, at yachi's request:
+社畜トレイン's rules carried over). `pipeline/sim/parapet-qualify.ts` is the profile's `qualify` hook: the six cells both
+builds draw as a piece of their own inside the window (the stood L and the two roof cells, mirrored with the window) must
+each be a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), the L's four cells one piece
+(`l_not_one_piece`, the page's 「%Lを1列ずらして立てて置き」), and no Perfect Clear within `DPC_LOCKS` locks either side of
+the T (`dpc`). 社畜トレイン's Kaidan rule does not apply: the two windows clash in every pairing of hands. Ownership is
+`shachikutrain-qualify.ts`'s exported `owners`, checked cell for cell against the board the matcher read. The page is
+`corpus_qualified_only`: it prints how many hits of either variant qualify and lists those alone, with their replay
+links; the report's region, chart, strip and the replay labels drop the rest, as for 社畜トレイン. Every 建議 tagged item
+that cited the old 欄干 hit counts was deleted or cut to its other technique on the same pass (they described shape-only
+hits). The counts and named lists are `parapet.test.ts`'s (`QUALIFIED_HITS`, `ONLY`, `QUALIFY_BY_PLAYER`), never this
+file's. Exporting `owners` moved 社畜トレイン's facts `emitter_md5` and demos `classifier_md5` and nothing else of it.
 
 **No demo is built, and every board says why** (`parapet-demos.test.ts` re-derives each): the O-roof terrain is a multiple of four
 with no tiling AT ALL (the well and the L's stem cut it into two parts, neither a multiple of four — 「no cover under its dealing」

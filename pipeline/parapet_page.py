@@ -6,7 +6,9 @@
 The renderer and every audit rule are the shared `technique_page.py` (read its header: inputs, pages,
 quarantine, figures); this file is Parapet's `TechniqueSiteProfile`, and its words are `parapet_prose.json`.
 It is the first profile with a second variant (`more_variants`): the TSS on the same terrain, whose figures are
-keyed `parapet_tss:<key>` and whose headings overlay the prose's `more_variants.parapet_tss`.
+keyed `parapet_tss:<key>` and whose headings overlay the prose's `more_variants.parapet_tss`. Since 2026-10-23 it
+is `corpus_qualified_only` (yachi: most hits are not built from whole pieces): the overview prints how many hits of
+either variant pass `parapet-qualify.ts`'s rules and lists those alone.
 
 Inputs, all committed: `pipeline/openers/parapet-technique.json` (transcribed and gated by
 `extract_parapet_shapes`), `analysis/parapet-facts.json` (`emit-technique-facts.ts --technique parapet`) and
@@ -41,6 +43,7 @@ PROFILE = TechniqueSiteProfile(
     max_page_bytes=1_000_000,
     selftest_board="tsd.after",
     more_variants=(("parapet_tss", "TSS"),),
+    corpus_qualified_only=True,
 )
 
 SITE = TechniqueSite(PROFILE)
