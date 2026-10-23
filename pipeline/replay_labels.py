@@ -267,6 +267,10 @@ def technique_items(src, h, rnd):
           f"{where}: the window does not fire on the board before the T, or the T is not its spin")
     words = SPIN_WORDS.get((var["lines"], var["spin"]))
     _need(words is not None, f"{where}: no words for a {var['spin']} clearing {var['lines']}")
+    if src.art.get("qualify") and not h["qualifies"]:
+        # 社畜トレイン's `qualify`: the window fired but the hit fails a build rule, so it is labelled
+        # as the shape only, never as the technique played.
+        words += "；個形對到，但唔算砌出嚟"
     return [(h["lock"], True, T_TECH, f"{src.name}（{words}）")]
 
 

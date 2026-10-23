@@ -3602,7 +3602,8 @@ prefix; per technique variant, the hits over the night's scored TSDs (`opener-fa
 `stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
 how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
 a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
-moment. No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
+moment. A technique whose artefact carries `qualify` (社畜トレイン) also prints how many hits pass its build
+rules, so a night's window hits are never read as the technique played. No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
 — and it sits early only because 建議 cites it.
 
 **建議 has a second kind of item, and it is the one place hand prose cites simulator figures.** A
@@ -3652,7 +3653,8 @@ decode (`decode_boards`; the board equals the drawing by occupancy in the record
 fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
 `python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
 matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
-(no label is no evidence the opener was not played). The report's 最癲一局 region passes no labels and is unchanged.
+(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (社畜トレイン) is labelled as
+the shape only (「個形對到，但唔算砌出嚟」), never as the technique. The report's 最癲一局 region passes no labels and is unchanged.
 TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
 which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
 
