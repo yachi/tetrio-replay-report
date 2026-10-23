@@ -5310,6 +5310,12 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="eyebrow">證明附錄 · 信任鏈</div>
     <h2 class="section-title">證明附錄</h2>
 
+    <style>
+    #appendix .ap-summary { cursor: pointer; color: var(--ink-secondary); padding: 0.4rem 0; }
+    #appendix .ap-fold[open] > .ap-summary { margin-bottom: 1rem; }
+    </style>
+    <details class="ap-fold" id="appendix-fold">
+      <summary class="ap-summary">撳開睇證明附錄：資料點樣核對、107 條 claim 逐條嘅 Dafny 引理同狀態（數據對質用，教打 Tetris 唔使睇）</summary>
     <div class="method-note">
       <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
       <div class="chain">
@@ -6085,6 +6091,28 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         </tbody>
       </table>
     </div>
+    </details>
+    <script>
+    (function () {
+      var fold = document.getElementById("appendix-fold");
+      function wants(h) { return h === "#appendix" || h.indexOf("#claim-") === 0; }
+      function openFor(h) { if (fold && wants(h)) fold.open = true; }
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest("a[href^='#']");
+        if (a) openFor(a.getAttribute("href"));
+      }, true);
+      window.addEventListener("hashchange", function () {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t && wants(location.hash)) t.scrollIntoView();
+      });
+      if (wants(location.hash)) {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t) setTimeout(function () { t.scrollIntoView(); }, 0);
+      }
+    })();
+    </script>
   </div>
 </section>
 <!-- END generated appendix -->
