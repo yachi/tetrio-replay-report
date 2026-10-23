@@ -4867,9 +4867,12 @@ second one). A failing hit stays in `hits` with `qualifies: false` and every rul
 digest's row map and is checked cell for cell against the board the matcher read (a mismatch throws). The first version counted
 `dpc` only AFTER the T; yachi then read the hits that passed every rule as DPCs, and measured, each had emptied the board a few
 pieces before its T, so the rule covers both sides. How many qualify is the artefact's and `shachikutrain.test.ts`'s
-(`QUALIFIED_HITS`, `DPC_ONLY`, `QUALIFY_BY_PLAYER`), never this file's. The page prints it in its own section and a column of the
-case index (`technique_page.py`'s `_qualify_section`, opt-in on the artefact carrying `qualify`; every other technique page is
-byte-identical). The hook's TYPE lives in `technique-profile.ts` and its call in `technique-facts.ts`, both hashed, so every
+(`QUALIFIED_HITS`, `DPC_ONLY`, `QUALIFY_BY_PLAYER`), never this file's. **The page prints that count and nothing else of the corpus** (since 2026-10-23, yachi's
+call: no hit qualifies, and a page opening on the window's hits, its follow-up table and its case index read as the technique
+being played). The profile's opt-in `corpus_qualified_only` (`technique_page.py`) keeps the boards, the window and the rules, prints
+one figure, the qualifying count, drops the headline, controls and follow-up, and lists only the qualifying hits as cases (none
+today, so no case table; the selftest flips one to qualifying and must see it listed with its replay link). The index card counts
+the qualifying hits too. The artefact and its tests still hold every hit; every other technique page is byte-identical. The hook's TYPE lives in `technique-profile.ts` and its call in `technique-facts.ts`, both hashed, so every
 technique artefact moved in its `emitter_md5` / `classifier_md5` lines and nothing else.
 
 **No demo is built, and every board says why** (`shachikutrain-demos.test.ts` re-derives each): the basic form's and the TST build's
