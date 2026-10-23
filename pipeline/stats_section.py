@@ -144,7 +144,9 @@ def _mount(mount):
     return f'<div class="scroll-x">{div}</div>' if mount["scroll_x"] else div
 
 
-def build(facts, prose):
+def build(facts, prose, extra=""):
+    """`extra` is HTML appended after the authored panels: the two simulator panels
+    (`routes_techniques_charts`), generated rather than authored."""
     out = ['<section id="stats">', '  <div class="wrap-wide">',
            f'    <div class="eyebrow">{html.escape(prose["eyebrow"])}</div>',
            f'    <h2 class="section-title">{html.escape(prose["title"])}</h2>',
@@ -163,5 +165,7 @@ def build(facts, prose):
             out.append(f'      <p class="footnote">{p["footnote"]}</p>')
         out.append('    </div>')
 
+    if extra:
+        out.append(extra)
     out += ['  </div>', '</section>']
     return "\n".join(out)
