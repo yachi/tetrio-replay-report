@@ -256,6 +256,10 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-replay.ts \
   --out sessions/<date>/sim/replay-facts.json                   # the animated replay's timeline (quarantined)
 bun test pipeline/sim/replay.test.ts                           #   its round trip + named exception lists
+bun pipeline/sim/oracle-cache.ts --warm [--jobs 4]             # fill the shared oracle-replay cache bun test reads; ON by
+                                                               #   default only under bun test (ORACLE_CACHE=off|on|verify,
+                                                               #   ORACLE_CACHE_DIR); emitters never read it. PERF-PLAN.md
+bun test pipeline/sim/oracle-cache.test.ts                     #   cached == fresh, the key moves with pipeline/sim, closure stays inside
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
@@ -659,7 +663,7 @@ equivalent marker pair.
   step reads it, and under `set -u` a local run dies with `unbound variable` — which is how the first
   `--only pipeline` failed all seven sessions in nine seconds. The runner-provided variables with an
   honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
-  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files, `GITHUB_EVENT_NAME` → `schedule` under `--weekly` and `push` otherwise) and **any other
   `$GITHUB_*` or `$RUNNER_*` reference is a completeness error**, so the next one is refused up front
   rather than dying halfway through a matrix.
 

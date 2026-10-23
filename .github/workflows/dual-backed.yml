@@ -37,6 +37,11 @@ on:
 permissions:
   contents: read
 
+env:
+  # Must equal verify.yml's BUN_VERSION, which is where the pin is explained; bin/verify-repo
+  # refuses the two files disagreeing.
+  BUN_VERSION: 1.4.2
+
 jobs:
   manifest:
     runs-on: ubuntu-24.04
@@ -47,7 +52,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
-          bun-version: '1.2.4'
+          bun-version: ${{ env.BUN_VERSION }}
 
       # --frozen-lockfile: the committed bun.lock is the pin. A run that silently resolved a
       # different @haelp/teto would be comparing against a different second engine, which is the

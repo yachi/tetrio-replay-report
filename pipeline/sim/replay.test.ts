@@ -23,6 +23,7 @@ import { build, serialise, runPlayer, assertRoundTrip, decodeTimeline, queueStat
          KNOCKOUT_ENDINGS, SURVIVAL_ENDINGS,
          encodePlace, placeCells, WIDTH, ROWS, type Lock } from './emit-replay.ts';
 import { loadCases } from './verified-prefix.ts';
+import { withOracleCache } from './oracle-cache.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 
 const SESSIONS = assertCorpusIsEverySessionOnDisk(
@@ -41,8 +42,12 @@ test('rebuilding every session reproduces its committed replay-facts.json byte f
 }, 600_000);
 
 test('build is deterministic', () => {
+  // with the oracle cache OFF, so both builds run the oracle afresh: through the cache the second
+  // build's oracle half would be a decode of the first's, and the test would compare it to itself
   const s = '2026-07-24';
-  expect(serialise(build(sessionDir(s)))).toBe(serialise(build(sessionDir(s))));
+  withOracleCache(false, () => {
+    expect(serialise(build(sessionDir(s)))).toBe(serialise(build(sessionDir(s))));
+  });
 }, 120_000);
 
 test('the shape table holds every orientation exactly once, and placement round-trips', () => {

@@ -88,6 +88,7 @@ class Step:
     def __init__(self, name, uses=None, run=None, cond=None, workdir=None, line=0):
         self.name, self.uses, self.run = name, uses, run
         self.cond, self.workdir, self.line = cond, workdir, line
+        self.with_ = {}       # the `with:` map, scalars only; read for the setup-bun pin rule
 
     @property
     def kind(self):
@@ -98,8 +99,8 @@ class Job:
     def __init__(self, file, name, line, env=None):
         self.file, self.name, self.line = file, name, line
         # The workflow-level `env:` this job sees. Held per job rather than merged
-        # across files: today only verify.yml defines one, so a union is harmless —
-        # and that is exactly the kind of accident that stops being harmless quietly.
+        # across files: verify.yml and dual-backed.yml both define one now (both carry
+        # BUN_VERSION), and `pin_problems` refuses a key the two give different values.
         self.env = env if env is not None else {}
         self.runs_on = None
         self.cond = None
@@ -264,6 +265,9 @@ def _scan_steps(path, lines, i, job):
         i += 1
         if key in ("with", "env"):                  # nested map
             while i < len(lines) and (_blank(lines[i]) or _indent(lines[i]) > 8):
+                m = re.match(r"^          ([A-Za-z0-9_-]+): *(.*)$", lines[i])
+                if key == "with" and m:
+                    step.with_[m.group(1)] = _plain(m.group(2))
                 i += 1
     return i
 
@@ -301,7 +305,8 @@ FAST, DEFAULT, SLOW, WEEKLY, SESSIONS = "fast", "default", "slow", "weekly", "se
 # The pinned toolchains.  CI installs each by sha256; locally we use what is on
 # PATH and REPORT the version, because a gate that verified with a different
 # verifier reproduced something other than CI.
-TOOLCHAIN = {"dafny": "DAFNY_VERSION", "z3": "Z3_VERSION", "cvc5": "CVC5_VERSION"}
+TOOLCHAIN = {"dafny": "DAFNY_VERSION", "z3": "Z3_VERSION", "cvc5": "CVC5_VERSION",
+             "bun": "BUN_VERSION"}
 
 # Why every install step is skipped rather than run: they `curl` a pinned asset
 # and append to $GITHUB_PATH, neither of which means anything here.  The version
@@ -407,15 +412,18 @@ _INTERP = re.compile(r"\$\{\{\s*([a-z]+)\.([A-Za-z0-9_-]+)\s*\}\}")
 # else in this namespace is a completeness ERROR, so a step that starts reading a new
 # runner variable is refused rather than failing mid-run with `unbound variable`.
 RUNNER_VARS = ("RUNNER_TEMP", "GITHUB_WORKSPACE", "GITHUB_ENV", "GITHUB_PATH",
-               "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY")
+               "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY", "GITHUB_EVENT_NAME")
 _RUNNER_REF = re.compile(r"\$\{?((?:GITHUB|RUNNER)_[A-Z_]+)\}?")
 
 
-def runner_env(scratch):
+def runner_env(scratch, weekly=False):
     """The runner-provided variables, pointed at a scratch directory of our own.
     `RUNNER_TEMP` is literally "a temporary directory the runner cleans up", so a
-    tempdir here is the same thing rather than a stand-in for it."""
+    tempdir here is the same thing rather than a stand-in for it.  GITHUB_EVENT_NAME
+    is `schedule` under --weekly, which is the run --weekly stands in for, and `push`
+    otherwise, so a step that branches on it takes the same branch CI would."""
     e = dict(os.environ)
+    e["GITHUB_EVENT_NAME"] = "schedule" if weekly else "push"
     e["RUNNER_TEMP"] = str(scratch)
     e["GITHUB_WORKSPACE"] = str(REPO)
     for f in ("GITHUB_ENV", "GITHUB_PATH", "GITHUB_OUTPUT", "GITHUB_STEP_SUMMARY"):
@@ -492,6 +500,42 @@ def completeness(env, jobs):
                            f"which the runner provides and bin/verify-repo does not — "
                            f"add it to RUNNER_VARS with a local equivalent, or skip the step")
     bad += matrix_membership_problems(on_disk)
+    bad += pin_problems(jobs)
+    return bad
+
+
+# The bun pin lives in two files (verify.yml and dual-backed.yml), and `load()` takes the
+# UNION of the workflows' `env:` maps, so a value that differs between files would be resolved
+# by whichever file sorts last — and `tool_versions` would compare the local bun against that
+# one while the other file's jobs ran something else. Both directions are refused here: a
+# top-level env key two files define must have one value, and every setup-bun step must read
+# the pin rather than carry a literal (a literal is a second copy of the pin, which is how the
+# four `'1.2.4'`s this replaced came to exist). Nothing else catches either: the steps are
+# `uses:` steps, which no other rule here inspects.
+SETUP_BUN = "oven-sh/setup-bun@"
+BUN_PIN = "${{ env.BUN_VERSION }}"
+
+
+def pin_problems(jobs):
+    bad, seen = [], {}
+    for j in jobs:
+        for k, v in j.env.items():
+            seen.setdefault(k, {})[j.file] = v
+    for k, by_file in sorted(seen.items()):
+        if len(set(by_file.values())) > 1:
+            bad.append(f"top-level env {k} disagrees between workflows: " + ", ".join(
+                f"{f}={v}" for f, v in sorted(by_file.items())))
+    for j in jobs:
+        for s in j.steps:
+            if not (s.uses or "").startswith(SETUP_BUN):
+                continue
+            got = s.with_.get("bun-version")
+            if got != BUN_PIN:
+                bad.append(f"{j.file}:{s.line}: setup-bun step in {j.name!r} has "
+                           f"bun-version {got!r}; it must read {BUN_PIN}")
+            elif "BUN_VERSION" not in j.env:
+                bad.append(f"{j.file}:{s.line}: setup-bun step in {j.name!r} reads "
+                           f"BUN_VERSION, which {j.file} does not define in its top-level env")
     return bad
 
 
@@ -580,7 +624,7 @@ def tool_versions(env):
         want = env[key]
         if want not in out:
             diverge.append(f"{tool}: CI pins {want}, local is {out.strip().splitlines()[0]}")
-    for t in ("bun", "jq", "nix", "sha256sum"):
+    for t in ("jq", "nix", "sha256sum"):
         have[t] = shutil.which(t)
     return have, diverge
 
@@ -603,7 +647,7 @@ def execute(env, jobs, args):
     by_name = {j.name: j for j in jobs}
     have, diverge = tool_versions(env)
     scratch = Path(tempfile.mkdtemp(prefix="verify-repo-"))
-    shellenv = runner_env(scratch)
+    shellenv = runner_env(scratch, args.weekly)
     ran, failed, skipped = [], [], []
 
     order = [n for n in PLAN if n in by_name]
@@ -710,9 +754,10 @@ def _corrupt(kind, texts):
         t[v] = t[v] + "\n  brand-new-job:\n    runs-on: ubuntu-24.04\n    steps:\n" \
                       "      - name: Do a thing\n        run: echo hi\n"
     elif kind == "job removed from CI":
-        t[v] = t[v].replace("\n  docs:\n    runs-on: ubuntu-24.04\n"
-                            "    steps:\n      - name: Checkout", "\n  docs-renamed:\n"
-                            "    runs-on: ubuntu-24.04\n    steps:\n      - name: Checkout")
+        # Anchored on the job-id line alone, not on the lines after it: the job's keys
+        # (`runs-on`, `timeout-minutes`, ...) are free to change, and an anchor that spelled
+        # them stopped corrupting the day `timeout-minutes` was added after `runs-on`.
+        t[v] = re.sub(r"\n  docs:\n", "\n  docs-renamed:\n", t[v], count=1)
     elif kind == "step added carrying an unresolvable expression":
         t[v] = t[v].replace("      - name: Check docs/ was republished from the sessions",
                             "      - name: Newly added step\n"
@@ -735,6 +780,11 @@ def _corrupt(kind, texts):
     elif kind == "unknown step key":
         t[d] = t[d].replace("      - name: Setup Bun\n        uses:",
                             "      - name: Setup Bun\n        usez:")
+    elif kind == "a setup-bun step pins a literal version":
+        t[d] = t[d].replace("          bun-version: ${{ env.BUN_VERSION }}",
+                            "          bun-version: '1.4.2'")
+    elif kind == "the bun pin disagrees between workflows":
+        t[d] = re.sub(r"\n  BUN_VERSION: *\S+", "\n  BUN_VERSION: 9.9.9", t[d], count=1)
     elif kind == "content after the jobs block":
         t[d] = t[d] + "\nafterwards: true\n"
     elif kind == "folded block scalar":
@@ -851,6 +901,8 @@ def selftest():
                  "step added carrying an unresolvable expression",
                  "skipped step renamed", "conditional step added undeclared",
                  "step reads an unsupplied runner variable", "unknown job key", "unknown step key", "content after the jobs block",
+                 "a setup-bun step pins a literal version",
+                 "the bun pin disagrees between workflows",
                  "folded block scalar",
                  "a session dropped from the verify matrix",
                  "a session dropped from the pipeline matrix",

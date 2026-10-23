@@ -218,7 +218,8 @@
  */
 import { test, expect } from 'bun:test';
 import { readdirSync, existsSync } from 'node:fs';
-import { bestTspinLines, forecastMetric } from './forecast.ts';
+import { bestTspinLines } from './forecast.ts';
+import { cachedForecastMetric } from './oracle-cache.ts';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
 import type { Board } from './vendor/core/srs.ts';
 
@@ -392,7 +393,7 @@ function sweep() {
       const r = runCaseOracle(c);
       const v = verifiedIndex(r, c.truth);
       if (v < 0) continue;
-      for (const rec of forecastMetric(r, true).records) {
+      for (const rec of cachedForecastMetric(r).records) {
         if (rec.mechanismStep === undefined || rec.mechanism === undefined) continue;
         const t = rec.mechanismStep, j = rec.roofFrom ?? -1, target = rec.availAtSpin;
         if (rec.lockIndex <= v) localised++;

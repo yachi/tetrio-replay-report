@@ -39,7 +39,8 @@
 import { test, expect, describe } from 'bun:test';
 import { existsSync, readdirSync } from 'node:fs';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
-import { forecastMetric, isVerifiedForecast, type ForecastKind, type FloorOrigin } from './forecast.ts';
+import { cachedForecastMetric } from './oracle-cache.ts';
+import { isVerifiedForecast, type ForecastKind, type FloorOrigin } from './forecast.ts';
 
 const SESSIONS_ROOT = `${import.meta.dir}/../../sessions`;
 const SESSION_DIRS = readdirSync(SESSIONS_ROOT, { withFileTypes: true })
@@ -79,7 +80,7 @@ function run(dir: string) {
     const r = runCaseOracle(c);
     const v = verifiedIndex(r, c.truth);
     if (v < 0) continue;
-    for (const rec of forecastMetric(r, true).records) {
+    for (const rec of cachedForecastMetric(r).records) {
       // Same gate both source loops shared (`run()`'s and the C-Spin test's own): everything below
       // is scoped to the verified prefix. Folding the C-Spin scan in under it, rather than before
       // it, is what keeps `behindACSpin`/`counted` identical to the two-loop original.

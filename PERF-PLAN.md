@@ -219,6 +219,80 @@ Against the repo's own 8-layer standard, this change reaches layers 1, 2, 3 and 
   measurement of the new lines (layer 5). Neither is load-bearing for a change whose
   acceptance test is byte-identical output on the real corpus, but neither was run.
 
+## 2026-10-23 — the shared oracle-replay cache (`pipeline/sim/oracle-cache.ts`)
+
+**The problem, measured by the research pass that preceded this one** (`bun 1.4.2`, linux/x64, 4
+CPUs, each test file timed in its own process): the 62 bun test files summed to 2204 s, and 22 of
+the 23 slowest each replayed the whole corpus through `runCaseOracle` themselves — the identical
+computation on the identical inputs, memoised within a file and never across files.
+`cross-tspin.test.ts` is the 23rd and uses the hand-port `runCase`, so it gains nothing here.
+
+**The change.** `runCaseOracle(c)` and `forecastMetric(r, true)` go through a content-addressed
+cache, hooked in `verified-prefix.ts` (`loadCases` registers each Case; `runCaseOracle` looks it up)
+and at the four `forecastMetric(r, true)` call sites. No md5-hashed file was edited, so no committed
+artefact moved, not even a hash line. The key is a hash of every file under `pipeline/sim` (globbed),
+`Bun.version`, platform, arch, the engine's two wall-clock branches, and per case the `.ttrm`'s
+sha256, round, side and user. Every write is preceded by a decode and a strict `Bun.deepEquals`
+against the computed value; every read checks magic, key, length and payload sha256, and anything
+else is a miss. Files are written to a temp name, fsynced and renamed. It is ON by default only
+under `bun test` (NODE_ENV=test) — every emitter computes fresh — and `ORACLE_CACHE=off|on|verify`
+and `ORACLE_CACHE_DIR` override it. `oracle-cache.test.ts` proves cached == fresh over a whole
+session, that the key moves with any source byte and each part of a case's identity, that the
+cached computation's import closure stays inside `pipeline/sim`, that damaged entries recompute and
+that `verify` catches a well-formed wrong one. `replay.test.ts`'s determinism test runs with the
+cache off, so it still compares two fresh oracle runs.
+
+**Measured** (this machine, bun 1.4.2, `REPLAY_DIR=sessions/2026-07-22`):
+
+| what | cache off | cache on | how |
+|---|---|---|---|
+| **whole `bun test`, one process** | **2227 s** | **1147 s** cold (1181 s on an earlier run) | `ORACLE_CACHE=off bun test` vs a fresh `ORACLE_CACHE_DIR`; 960 pass, 7 skip, 0 fail either way |
+| peak RSS of that process | 7.69 GB | 11.35 GB | `VmHWM` sampled every 5 s |
+| `stsd.test.ts` | 73.3 s / 75.8 s | 114.3 s cold, 28.3 s / 40.2 s warm | two runs each |
+| `forecast-corpus.test.ts` | 82.5 s | 4.7 s / 5.1 s warm | |
+| `ORACLE_CACHE=verify` on `stsd.test.ts` | — | 104.8 s | reads and recomputes every entry |
+| fill the whole corpus, 4 processes | — | 45.8-47.0 s | `bun pipeline/sim/oracle-cache.ts --warm --jobs 4`, five runs |
+| cache size, whole corpus | — | 51 MB | gzip level 1; 5552 entries |
+
+Warm, one process per file, against the research profile's off figure: `cross-tslot` 258 → 155 s,
+`openers` 158 → 23 s, `forecast-saturation` 123 → 30 s, `forecast-access-class` 95 → 6 s,
+`cutcopy` 95 → 38 s, `replay` 85 → 40 s, `honey-cup` 65 → 12 s, `provenance` 58 → 14 s,
+`cross-tspin` 82 → 74 s (the control: not oracle-backed). The off column there is the research
+pass's measurement, not this one's.
+
+Three things the table says that the headline does not:
+
+- **A cold fill costs more than a computation**: `stsd` cold is 114 s against 73 s off, because the
+  first file to reach each case pays the computation, the encoding, the round-trip decode and the
+  strict deep-equal. On a fresh runner that is paid once, by whichever file comes first.
+- **The peak RSS of the single-process suite rose by about 3.7 GB, and it is not retention.** A
+  probe that builds the technique digest three times over five sessions and collects retains the
+  same heap either way (99 against 100 MB, object counts within 0.03% type by type), and a corpus loop of
+  hits holds steady at about 250 MB RSS. Two attempts to pull the peak down — interning decoded
+  strings, and pacing a collection every 256 MB of decoded payload — moved a four-file run by less
+  than its run-to-run spread (2.31-2.52 GB on, 2.01 GB off) and were not kept. A 16 GB runner holds
+  11.35 GB; the margin is the open item, and it grows with the corpus as the off figure does.
+- **What is left is not the oracle.** `cross-tslot`'s remaining 155 s is per-board
+  `bestTspinLines` / `ccTslots` search, and `replay`'s is its own instrumented engine run (and the
+  determinism test, which runs the oracle fresh on purpose).
+
+**Splits: none made.** `openers.test.ts` has a clean seam (its `analyse` test and the per-session
+byte-identity loop), but warm it is 23 s, so a split would move no critical path. `cross-tslot.test.ts`
+has no seam that keeps its corpus-wide pins (the total 230729, `both > 1500`, `ccOnly > 50`) corpus-
+wide without first pinning per-session tallies, which is a re-measurement and not a refactor.
+
+**What this does not certify.** With the cache on, the engine runs once per case per runner and
+every other file reads its result, so 「the oracle ran in this file」 is no longer true; the
+fill-time deep-equal says each entry is what was computed, not that the computation would repeat.
+`ORACLE_CACHE=off` is the uncached path, and verify.yml's `typescript` job runs the suite with it
+on the weekly schedule; the cache directory lives in the runner's tmpdir and is never persisted
+across CI runs.
+
+**The CI step, reproduced locally on 4 cores with a fresh cache directory** (2026-10-23): the warm
+step (`--warm --jobs 4`) took 47 s and `REPLAY_DIR=sessions/2026-07-22 bun test --parallel` 306 s,
+960 pass / 7 skip / 0 fail over 63 files, peak system memory about 3.65 GB. The job was about 37 min
+serial on bun 1.2.4 before this. Hand-measured once; re-measure on the runner rather than quote it.
+
 ## Out of scope
 
 - **Rewriting the simulator on bitboards.** A 40×10 `Uint16Array` with `row === 0x3FF` for a
@@ -226,5 +300,7 @@ Against the repo's own 8-layer standard, this change reaches layers 1, 2, 3 and 
   verified forecast semantics across a dozen files. The evidence chain in `forecast.ts` is
   the asset here; a representation change that invalidates it is a bad trade for a suite that
   already finishes in 17.5 s.
-- **Parallelising the CI matrix further.** Already six jobs; the tail is Dafny, not Python.
+- ~~**Parallelising the CI matrix further.** Already six jobs; the tail is Dafny, not Python.~~
+  Struck 2026-10-23: by then the critical path was the `typescript` job's bun suite, not Dafny;
+  see the oracle-cache section above.
 - Micro-tuning the seven gates that run in 30 ms.
