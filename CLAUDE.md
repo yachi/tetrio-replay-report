@@ -256,6 +256,10 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-replay.ts \
   --out sessions/<date>/sim/replay-facts.json                   # the animated replay's timeline (quarantined)
 bun test pipeline/sim/replay.test.ts                           #   its round trip + named exception lists
+bun pipeline/sim/oracle-cache.ts --warm [--jobs 4]             # fill the shared oracle-replay cache bun test reads; ON by
+                                                               #   default only under bun test (ORACLE_CACHE=off|on|verify,
+                                                               #   ORACLE_CACHE_DIR); emitters never read it. PERF-PLAN.md
+bun test pipeline/sim/oracle-cache.test.ts                     #   cached == fresh, the key moves with pipeline/sim, closure stays inside
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants

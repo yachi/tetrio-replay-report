@@ -9,7 +9,7 @@
  *   bun run pipeline/openers/run-openers.ts sessions/2026-07-22 [...]
  */
 import { loadCases, runCaseOracle, verifiedIndex } from '../sim/verified-prefix.ts';
-import { forecastMetric } from '../sim/forecast.ts';
+import { cachedForecastMetric } from '../sim/oracle-cache.ts';
 import { loadCatalogue, prepare, occGrid, rowsFromBoard, exactMatches, nearest, isCSpin } from './match.ts';
 
 const cat = loadCatalogue();
@@ -40,7 +40,7 @@ export function analyse(sessions: string[]): RoundResult[] {
       const rows = rowsFromBoard(r.boards[6]! as (string | null)[][]);
       if (!rows) { out.push({ ...base, clean: false }); continue; }
       const grid = occGrid(rows);
-      const recs = forecastMetric(r, true).records.filter(x => x.lockIndex <= v);
+      const recs = cachedForecastMetric(r).records.filter(x => x.lockIndex <= v);
       out.push({ ...base, clean: true,
         exact: exactMatches(grid, prepared),
         best: nearest(grid, prepared),

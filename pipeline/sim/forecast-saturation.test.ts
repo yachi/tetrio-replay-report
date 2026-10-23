@@ -48,7 +48,8 @@
 import { test, expect } from 'bun:test';
 import { existsSync, readdirSync } from 'node:fs';
 import { loadCases, runCaseOracle, verifiedIndex } from './verified-prefix.ts';
-import { forecastMetric, bestTspinLines } from './forecast.ts';
+import { bestTspinLines } from './forecast.ts';
+import { cachedForecastMetric } from './oracle-cache.ts';
 import { H, detectTSpin } from './sim.ts';
 import { tryMove, tryRotate, hardDrop, getPieceCells } from './vendor/core/srs.ts';
 import type { Board, ActivePiece } from './vendor/core/srs.ts';
@@ -129,7 +130,7 @@ const scan = () => {
     for (const c of loadCases(dir)) {
       const r = runCaseOracle(c); const v = verifiedIndex(r, c.truth);
       if (v < 0) continue;
-      for (const rec of forecastMetric(r, true).records) {
+      for (const rec of cachedForecastMetric(r).records) {
         if (rec.lockIndex > v) continue;
         const k = rec.lockIndex, j = rec.roofFrom;
         if (j === null || j < 0) continue;
