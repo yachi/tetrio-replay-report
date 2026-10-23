@@ -3602,8 +3602,11 @@ prefix; per technique variant, the hits over the night's scored TSDs (`opener-fa
 `stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
 how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
 a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
-moment. A technique whose artefact carries `qualify` (社畜トレイン) also prints how many hits pass its build
-rules, so a night's window hits are never read as the technique played. No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
+moment. A technique whose artefact carries `qualify` (社畜トレイン) counts ONLY the hits that pass its build
+rules — in the table, the per-match strip and 數據對決's chart (`routes_techniques_charts.py`) alike — and
+prints the shape-only hits beside them as 「另外 N 次個形對到但唔算砌出嚟」, so a night's window hits are never
+read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
+strip kept showing the raw ones). No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
 — and it sits early only because 建議 cites it.
 
 **建議 has a second kind of item, and it is the one place hand prose cites simulator figures.** A
