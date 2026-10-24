@@ -528,42 +528,63 @@ STMB_CAVE_KAIDAN = {
 #: measured: this window over every board of every other committed technique transcription (`kaidan_fires_on`), and
 #: every other technique window over every drawing this file holds (`fires_on_kaidan`); `other:` holds both complete
 OTHER_WINDOWS = {
-    'kaidan_fires_on': [{'file': 'btcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[29]', 'cells': [[4,
-        3], [4, 4], [4, 5], [5, 4]], 'mirrored': [True]}, {'file': 'shachikutrain-technique.json', 'board':
-        'nodes.u2.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'board': 'nodes.t3.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]],
-        'mirrored': [False]}, {'file': 'shachikutrain-technique.json', 'board': 'nodes.dt', 'cells': [[3,
-        2], [3, 3], [3, 4], [4, 3]], 'mirrored': [True]}, {'file': 'shachikutrain-technique.json', 'board':
-        'nodes.u2.build', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'board': 'nodes.t3.build', 'cells': [[2, 1], [2, 2], [2, 3], [3,
-        2]], 'mirrored': [False]}, {'file': 'shachikutrain-technique.json', 'board':
-        'cross_source.harddrop.drawings[2]', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored':
-        [False]}, {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[3]',
-        'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[4]', 'cells': [[3, 4], [3,
-        5], [3, 6], [4, 5]], 'mirrored': [False]}, {'file': 'shachikutrain-technique.json', 'board':
-        'cross_source.harddrop.drawings[7]', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored':
-        [False]}, {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[9]',
-        'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[12]', 'cells': [[3, 4], [3,
-        5], [3, 6], [4, 5]], 'mirrored': [True]}, {'file': 'shachikutrain-technique.json', 'board':
-        'cross_source.harddrop.drawings[19]', 'cells': [[5, 5], [5, 6], [5, 7], [6, 6]], 'mirrored':
-        [False]}, {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[20]',
-        'cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[21]', 'cells': [[3, 5], [3,
-        6], [3, 7], [4, 6]], 'mirrored': [False]}, {'file': 'shachikutrain-technique.json', 'board':
-        'cross_source.harddrop.drawn_t_not_fired[9]', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored':
-        [False]}],
-    'fires_on_kaidan': [{'file': 'imperialcross-technique.json', 'variant': 'imperialcross', 'board': 'harddrop_anchor_set #19',
-        'cells': [[4, 2], [5, 1], [5, 2], [6, 2]], 'mirrored': [True]}, {'file': 'parapet-technique.json',
-        'variant': 'parapet', 'board': 'harddrop_anchor_set #23', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]],
-        'mirrored': [False]}, {'file': 'parapet-technique.json', 'variant': 'parapet_tss', 'board':
-        'harddrop_anchor_set #23', 'cells': [[1, 2], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]}, {'file':
-        'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'harddrop #15', 'cells': [[2,
-        3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]}, {'file': 'shachikutrain-technique.json',
-        'variant': 'shachikutrain', 'board': 'harddrop #14', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]],
-        'mirrored': [False]}, {'file': 'stsd-technique.json', 'variant': 'stsd', 'board':
-        'harddrop_anchor_set #20', 'cells': [[3, 1], [4, 1], [4, 2], [5, 1]], 'mirrored': [True]}],
+    'kaidan_fires_on': [
+        {'file': 'basicdonating-technique.json', 'board': 'nodes.one.s', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'board': 'nodes.q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'board': 'nodes.q1.2.answer', 'cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': [False]},
+        {'file': 'btcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[29]', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [True]},
+        {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'nodes.t3.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'nodes.dt', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [True]},
+        {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.build', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'nodes.t3.build', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[2]', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[3]', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[4]', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[7]', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[9]', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[12]', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [True]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[19]', 'cells': [[5, 5], [5, 6], [5, 7], [6, 6]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[20]', 'cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[21]', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
+    ],
+    'fires_on_kaidan': [
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.basic.z', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.basic.o', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.basic.spin', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.s3.s', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.s3.j', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.after.1', 'cells': [[1, 6], [1, 7], [1, 8], [2, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.dt.amemiya', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.dt.anchor', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.dt.amemiya.pre', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'nodes.dt.anchor.pre', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #2', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #8', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #15', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #92', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #88', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #96', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #6', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #14', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #18', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #20', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #78', 'cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop #91', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k1', 'board': 'harddrop_anchor_set #21', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k3', 'board': 'harddrop #15', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k3', 'board': 'harddrop #14', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k5', 'board': 'nodes.dt.amemiya', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'variant': 'k5', 'board': 'nodes.dt.amemiya.pre', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
+        {'file': 'imperialcross-technique.json', 'variant': 'imperialcross', 'board': 'harddrop_anchor_set #19', 'cells': [[4, 2], [5, 1], [5, 2], [6, 2]], 'mirrored': [True]},
+        {'file': 'parapet-technique.json', 'variant': 'parapet', 'board': 'harddrop_anchor_set #23', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'parapet-technique.json', 'variant': 'parapet_tss', 'board': 'harddrop_anchor_set #23', 'cells': [[1, 2], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'harddrop #15', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
+        {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'harddrop #14', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
+        {'file': 'stsd-technique.json', 'variant': 'stsd', 'board': 'harddrop_anchor_set #20', 'cells': [[3, 1], [4, 1], [4, 2], [5, 1]], 'mirrored': [True]},
+    ],
     #: anchored on the same flat T, in the same hand: the cells both windows read (the T aside) and where they clash
     'shachikutrain_relation': {'as_drawn': {'shared': 16, 'clash': []}, 'mirrored': {'shared': 16, 'clash': []}},
 }

@@ -966,6 +966,21 @@ jobs:
       - name: Check the mid-game DT Cannon technique page audit catches its corruptions
         run: python3 -m pipeline.dtcannon_page --selftest
 
+      # The eleventh technique page, 基本的なドネイト (basic donating, shiwehi.com's template/basicdonating.php): the
+      # same gate and renderer. A piece laid over a hole fills exactly the two rows a flat T's TSD clears, so the hole
+      # opens again; six windows (`window_basis: well`), one per hole distance from the T's arm. A T another page's
+      # window also fires on is that page's (the qualify rule `other_page`). The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/basicdonating.test.ts and basicdonating-demos.test.ts in the
+      # typescript job.
+      - name: Check the basic donating technique transcription
+        run: python3 -m pipeline.openers.extract_basicdonating_shapes
+
+      - name: Check the basic donating technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_basicdonating_shapes --selftest
+
+      - name: Check the basic donating technique page audit catches its corruptions
+        run: python3 -m pipeline.basicdonating_page --selftest
+
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against harddrop's six
       # DPC Setups pages (pinned revisions, refetched weekly by check_wikitext_sources). Its PC points are
       # anchored to the replay's own clears.allclear; the corpus artefact is checked by

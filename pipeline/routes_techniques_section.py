@@ -143,6 +143,9 @@ def _depth(src, c):
 def _variant_name(t, vid, var):
     if len(t.variants) == 1:
         return t.name
+    if var.get("well"):
+        # 基本的なドネイト: one window per hole distance from the T's arm
+        return f"{t.name}（窿離 T {var['well']['offset']} 欄）"
     spins = {v["spin"] for v in t.variants.values()}
     if len(spins) > 1:
         return f"{t.name}（{var['spin']}）"

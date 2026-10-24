@@ -1128,6 +1128,58 @@
       ],
       "note": "both windows fire, as drawn, on BT砲's page's Parapet (an agreement drawing) and on its 途中BT build (「実は欄干を組む形からBT砲にすることができます」: the BT is built from the Parapet terrain, so its board holds the Parapet slot too). A relation, not a clash; and on no other board of that transcription"
     },
+    "named_by": {
+      "file": "basicdonating-technique.json",
+      "fires": [
+        {
+          "node": "one.l_a",
+          "variant": "parapet",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "node": "one.l_a",
+          "variant": "parapet_tss",
+          "cells": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "note": "same author (shiwehi.com): the 基本的なドネイト page's 1ミノドネイト forms include 「%LドネイトA(=欄干)」, drawn without its T; on no other board of that transcription"
+    },
     "fires": [],
     "also": [
       {

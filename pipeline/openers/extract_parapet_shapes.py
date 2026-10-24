@@ -368,6 +368,17 @@ BT_CANNON = {
             'the Parapet slot too). A relation, not a clash; and on no other board of that transcription',
 }
 
+#: 基本的なドネイト (`basicdonating-technique.json`) draws a %LドネイトA and names it 欄干: both windows fire on it at its T
+#: (and the TSS window at the stood T), so this page's corpus hits are that page's named form, which its own count drops
+NAMED_BY = {
+    'file': 'basicdonating-technique.json',
+    'fires': [{'node': 'one.l_a', 'variant': 'parapet', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': False},
+              {'node': 'one.l_a', 'variant': 'parapet_tss', 'cells': [[1, 2], [2, 2], [2, 3], [3, 2]],
+               'mirrored': False}],
+    'note': 'same author (shiwehi.com): the 基本的なドネイト page\'s 1ミノドネイト forms include 「%LドネイトA(=欄干)」, drawn '
+            'without its T; on no other board of that transcription',
+}
+
 CROSS_SOURCE = {
     'kind': 'routes',
     'label_pattern': 'parapet',
@@ -382,6 +393,7 @@ CROSS_SOURCE = {
     'harddrop': HARDDROP,
     'tetrisch': TETRISCH,
     'bt_cannon': BT_CANNON,
+    'named_by': NAMED_BY,
     'fires': [],
     'also': [
         {'file': 'mountainous2-routes.json', 'node': '2.compromise.fire5.bag4#1', 'variant': 'parapet',
@@ -650,6 +662,10 @@ def extra_checks(data: dict):
     # bt and cross: every board of every other committed technique transcription, each variant, every resting T
     bc = xs.get('bt_cannon')
     got_bt = []
+    # a page that NAMES its form as this technique (基本的なドネイト's %LドネイトA(=欄干)): where the windows fire on it,
+    # recorded and re-measured (an opt-in record; a fire on any other technique board is still a failure)
+    nb = xs.get('named_by')
+    got_nb = []
     for f in sorted(TECHNIQUE_DIR.glob('*-technique.json')):
         if f.name == OUT.name:
             continue
@@ -666,6 +682,9 @@ def extra_checks(data: dict):
                         if TT.window_fires(data, v, ospec, pre, cs, m):
                             if bc and f.name == bc['file'] and not m:
                                 got_bt.append({'node': n['id'], 'variant': v['id'], 'cells': sorted([r, c] for r, c in cs)})
+                            elif nb and f.name == nb['file']:
+                                got_nb.append({'node': n['id'], 'variant': v['id'],
+                                               'cells': sorted([r, c] for r, c in cs), 'mirrored': m})
                             else:
                                 bad.append(f'cross: {v["id"]} fires on {f.name} {n["id"]}'
                                            f'{" (mirrored)" if m else ""} (record it, or measure why not)')
@@ -682,6 +701,11 @@ def extra_checks(data: dict):
                 bad.append(f'bt: {bc["file"]}\'s own window does not list {bc["drawing"]} as a miss')
         except (OSError, KeyError, IndexError) as e:
             bad.append(f'bt: {e!r}')
+    if nb:
+        key = lambda e: (e['node'], e['variant'], e['cells'], e['mirrored'])
+        if sorted(got_nb, key=key) != sorted(nb['fires'], key=key):
+            bad.append(f'cross: the windows fire on {nb["file"]} at {sorted(map(key, got_nb))}, named_by holds '
+                       f'{sorted(map(key, nb["fires"]))}')
     # cross: no routes node is labelled as this technique by its Japanese name either
     for f in sorted(HERE.glob('*-routes.json')):
         for n in json.loads(f.read_text())['nodes']:
@@ -860,6 +884,7 @@ MUTANTS = [
     (lambda d: d['cross_source']['tetrisch'].pop('slots'), 'the Tetrisチャンネル slots dropped', 'tetrisch:'),
     (lambda d: d['cross_source']['bt_cannon']['fires'].pop(), 'a BT砲 board the windows fire on unrecorded', 'bt:'),
     (lambda d: d['cross_source'].pop('bt_cannon'), 'no BT砲 record', 'bt:'),
+    (lambda d: d['cross_source']['named_by']['fires'].pop(), 'the 基本的なドネイト 欄干 form unrecorded', 'cross:'),
     (lambda d: d['cross_source']['also'].pop(), 'a same-author routes board unrecorded', 'cross:'),
     (lambda d: d['cross_source'].pop('routes_fire_none'), 'no reason for the empty fires', 'cross:'),
     (lambda d: node(d, 'basic.o').__setitem__('caption_quote', 'nope'), 'a caption naming no quote', 'quote:'),
@@ -901,9 +926,9 @@ SPEC_MUTANTS = [
 
 
 def _cross_plant_problems(planted: bool) -> list[str]:
-    """The `cross:` rule run with TECHNIQUE_DIR pointed at a temporary directory holding the BT砲 transcription and one
-    other: planted, a node that is this page's own TSD board (the window must fire on it); not planted, the same file
-    with that board emptied (a control: the rule must stay quiet)."""
+    """The `cross:` rule run with TECHNIQUE_DIR pointed at a temporary directory holding the BT砲 and 基本的なドネイト
+    transcriptions and one other: planted, a node that is this page's own TSD board (the window must fire on it); not
+    planted, the same file with that board emptied (a control: the rule must stay quiet)."""
     global TECHNIQUE_DIR
     base = build()
     spin = copy.deepcopy(node(base, 'tsd.spin'))
@@ -914,6 +939,7 @@ def _cross_plant_problems(planted: bool) -> list[str]:
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / 'planted-technique.json').write_text(json.dumps(fake))
         (Path(td) / BT_FILE).write_text((saved / BT_FILE).read_text())
+        (Path(td) / NAMED_BY['file']).write_text((saved / NAMED_BY['file']).read_text())
         TECHNIQUE_DIR = Path(td)
         try:
             bad, _measured = extra_checks(base)
