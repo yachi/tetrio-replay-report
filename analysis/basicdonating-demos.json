@@ -35,10 +35,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "8e325a32559410e5f620f76dc15666a8",
-  "planner_md5": "726082a751017d2614a463cd04a0a29b",
+  "transcription_md5": "6daa06aa217d6f5bcba16daeeca31aa2",
+  "planner_md5": "3293ae374e59fc030c78f86d5a3d1057",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "ad48531233763e63205ce3b54d9997cd"
+  "classifier_md5": "454e7fcd6e21ebae16c56886aca7ab3b"
  },
  "board": {
   "width": 10,
@@ -483,6 +483,10 @@
   {
    "node": "intro.z.after",
    "reason": "係 intro.z 打完 TSD 之後嘅盤面，intro.z 冇示範，所以呢幅都冇"
+  },
+  {
+   "node": "nub.hd",
+   "reason": "係 harddrop 嘅圖（原頁冇畫）：佢將地形、塞窿嘅 T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
   },
   {
    "node": "one.l_a",

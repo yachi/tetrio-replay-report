@@ -505,7 +505,9 @@ HARDDROP = {
                       {'table': 15, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False], 'variant': 'k4'},
                       {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [False], 'variant': 'k4'},
                       {'table': 15, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k5'},
-                      {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k5'}],
+                      {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k5'},
+                      {'table': 12, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [False, True], 'variant': 'nub'},
+                      {'table': 16, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [False, True], 'variant': 'nub'}],
 }
 
 #: harddrop's STMB_Cave page, table 17: the variation it says 「has the same shape and steps as Shachiku Train」, the

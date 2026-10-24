@@ -2275,6 +2275,26 @@
             true
           ],
           "variant": "k5"
+        },
+        {
+          "table": 12,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false,
+            true
+          ],
+          "variant": "nub"
+        },
+        {
+          "table": 16,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false,
+            true
+          ],
+          "variant": "nub"
         }
       ]
     },

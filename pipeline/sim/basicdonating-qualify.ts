@@ -7,12 +7,15 @@
  *   1. `fragment` / `garbage_in_shape`, `dpc`: the shared rules (`technique-qualify.ts`). The key cells are the two
  *      donated cells, the hole's column in the rows the TSD clears: each a cell of a complete piece, never garbage
  *      (the page: 「TSDで消える2列だけを埋める」 — a piece laid there, not what clears or garbage left); and no Perfect
- *      Clear within `DPC_LOCKS` locks either side of the T.
+ *      Clear within `DPC_LOCKS` locks either side of the T. The `nub` variant (harddrop's hole under the T's own
+ *      nub) has no donated cells — the T fills them — so `garbage_in_shape` reads its whole window instead: any
+ *      garbage there (in practice a garbage well under the nub) fails it; `fragment` has nothing to read.
  *   2. `other_page`: no other technique page's window fires at the same T (any of its variants, either hand). Many of
  *      them are donations — the page names its %Sドネイト as 階段のドネイト, its %LドネイトA as 欄干 and its
  *      %S%ZドネイトA as STMB Cave, and the Shachiku Train's first TSD is a donation one column past the arm (the
  *      transcriptions' `other_windows`, measured) — so a T another page claims is that page's, counted once.
- *   3. `nearer_well`: a smaller-k window fires at the same T. A T can fill two holes at once (the page's own Q16 and
+ *   3. `nearer_well`: a smaller-k window fires at the same T, the nub's counting as 0 (so a nub hit is never one, and
+ *      a k hit the nub window also fires at is). A T can fill two holes at once (the page's own Q16 and
  *      Q17 answers draw it); the T is counted once, at its nearest hole.
  *   4. `well_covered`: a filled cell anywhere above the window in the hole's column, so the clear does not leave the
  *      hole open from the top (harddrop's re-opening clause). No drawing on the page has one (measured by the facts
@@ -36,6 +39,8 @@ export interface DonationQualifyMutants { allowFragments?: boolean; allowGarbage
 export function donatedCells(tr: any): Record<string, [number, number][]> {
   const out: Record<string, [number, number][]> = {};
   for (const v of tr.variants) {
+    // under the nub the T itself fills the hole's column in the rows the TSD clears: no piece is donated
+    if (v.well.side === 'nub') { out[v.id] = []; continue; }
     const ex: [number, number][] = v.window_extra.cells;
     if (ex.length !== 4) throw new Error(`basicdonating qualify: ${v.id}'s window_extra is not four cells`);
     out[v.id] = [ex[1]!, ex[2]!];
@@ -52,11 +57,16 @@ export function donationQualifier(transcriptionPath: string, openersDir: string,
     return o.variants.flatMap((v: any) => prepare(o, v));
   });
   const offset = new Map<string, number>(tr.variants.map((v: any) => [v.id, v.well.offset]));
+  const nub = new Set<string>(tr.variants.filter((v: any) => v.well.side === 'nub').map((v: any) => v.id));
   const mine = tr.variants.flatMap((v: any) => prepare(tr, v));
   return (h: Hit, d: TechDigest): { qualifies: boolean; not_qualified: string[] } => {
     // the shared rules first; the three below read only the board at the T, so they are asked even when the
     // shared half stops at ownership_unverified
     const reasons = [...shared(h, d).not_qualified];
+    // the nub has no donated piece for the shared garbage rule to read, so the rule reads its whole window: a hole
+    // under the nub walled or floored by garbage is the garbage well, not a hole the player built
+    if (nub.has(h.variant) && h.garbage_in_window && !mut.allowGarbage && !reasons.includes('ownership_unverified'))
+      reasons.push('garbage_in_shape');
     const lk = d.locks[h.lock]!;
     const t = d.tspins.find(x => x.i === h.lock)!;
     if (!mut.noOtherPage && others.some((P: any) => !!windowMatch(t.board, lk.cells, P))) reasons.push('other_page');

@@ -31,7 +31,8 @@ const byId = new Map<string, any>(TR.nodes.map((n: any) => [n.id, n]));
 const size = (id: string) => drawnCells(byId.get(id).rows, TR.empty_letters).size;
 
 /** How many boards carry each kind of reason (the reasons themselves are re-derived below, board by board). */
-const KINDS = { odd: 14, not_mult4: 6, no_build_board: 46, after: 2, illustration: 2, no_on: 3, question_mismatch: 2 };
+const KINDS = { odd: 14, not_mult4: 6, no_build_board: 46, after: 2, illustration: 2, no_on: 3, question_mismatch: 2,
+                external: 1 };
 
 test('byte rebuild: the committed demos are what the planner produces now', () => {
   expect(serialise(build(BASICDONATING, BASICDONATING_DEMOS))).toBe(committedText);
@@ -58,6 +59,7 @@ test('the reasons, re-derived from the transcription', () => {
   for (const n of TR.nodes) {
     const terrain = n.kind === 'spin' ? n.on : terrainOf.has(n.id) ? n.id : null;
     if (n.kind === 'illustration') { add('illustration'); continue; }
+    if (n.external) { expect(r[n.id], n.id).toContain(n.external); add('external'); continue; }
     if (n.kind === 'after') { expect(r[n.id], n.id).toContain(n.after_of); add('after'); continue; }
     if (terrain) {
       const k = size(terrain);

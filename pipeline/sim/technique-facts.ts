@@ -183,8 +183,17 @@ export interface Prepared { id: string; mirrored: boolean; cells: WinCell[]; T: 
 
 export function loadTranscription(path: string) { return JSON.parse(readFileSync(path, 'utf8')); }
 
-/** A variant's window, as drawn and mirrored, in its board's frame (row 0 the top). */
+/** A variant's window, as drawn and mirrored, in its board's frame (row 0 the top). A window symmetric about its
+ *  box's centre column (基本的なドネイト's hole under the nub) is ONE window: its mirror is dropped, so a hit is
+ *  recorded as drawn and never as matching both hands. */
 export function prepare(tr: any, v: Variant): Prepared[] {
+  const both = prepareBoth(tr, v);
+  const key = (P: Prepared) => JSON.stringify([[...P.cells].map(x => `${x.r},${x.c},${x.v}`).sort(),
+                                               [...P.followup].map(x => `${x.r},${x.c}`).sort(), P.well ?? null]);
+  return key(both[0]!) === key(both[1]!) ? [both[0]!] : both;
+}
+
+function prepareBoth(tr: any, v: Variant): Prepared[] {
   const rows: string[] = tr.nodes.find((n: any) => n.id === v.board).rows;
   const emptyLetters: string = tr.empty_letters ?? '';
   const empty = (ch: string) => ch === '-' || emptyLetters.includes(ch);
@@ -479,7 +488,7 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
         const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!, vOpp = vOpps[vi]!, under = unders[vi]!;
         const cl: Clause = { mustEmpty: !mut.noMustEmpty, roof: !mut.noRoof, garbageFilled: !mut.garbageEmpty,
                              rowOff: mut.rowAnchorOff1 ? 1 : 0 };
-        const order = [Ps[0]!, Ps[1]!];
+        const order = Ps;
         let found: { P: Prepared; off: { dr: number; dc: number } } | null = null, off = false;
         const tryAll = (c: Clause) => {
           let f: typeof found = null, o = false;

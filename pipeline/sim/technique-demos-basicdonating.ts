@@ -38,6 +38,8 @@ export function unbuiltReasons(tr: any): Record<string, string> {
   for (const n of tr.nodes) {
     if (n.kind === 'illustration') out[n.id] = '示意圖（T 打完之後點挖、點打 Tetris），唔係捐嘅形本身';
     else if (n.kind === 'after') out[n.id] = `係 ${n.after_of} 打完 TSD 之後嘅盤面，${n.after_of} 冇示範，所以呢幅都冇`;
+    else if (n.external)
+      out[n.id] = `係 ${n.external} 嘅圖（原頁冇畫）：佢將地形、塞窿嘅 T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌`;
     else if (n.kind === 'spin' && n.on) out[n.id] = `TSD 企喺 ${n.on} 上面：${terrainReason(cells(by.get(n.on).rows))}`;
     else if (n.kind === 'spin')
       out[n.id] = 'transcription 冇記低呢幅係邊幅地形加方塊（冇 on；題目同答案對唔上嘅見 known_discrepancies），冇地形可以砌';
