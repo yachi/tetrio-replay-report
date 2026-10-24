@@ -393,6 +393,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique dtcannon \
   --out analysis/dtcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/dtcannon.test.ts pipeline/openers/dtcannon-demos.test.ts  # its two tests
 python3 -m pipeline.dtcannon_page --selftest      # the docs/dtcannon*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_basicdonating_shapes            # CI gate: the 基本的なドネイト (basic donating) technique transcription
+python3 -m pipeline.openers.extract_basicdonating_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (basicdonating.html)
+bun pipeline/sim/emit-technique-facts.ts --technique basicdonating \
+  --out analysis/basicdonating-facts.json                      # 基本的なドネイト's corpus artefact (quarantined; six hole windows, a payoff)
+bun pipeline/sim/emit-technique-demos.ts --technique basicdonating \
+  --out analysis/basicdonating-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/basicdonating.test.ts pipeline/openers/basicdonating-demos.test.ts  # its two tests
+python3 -m pipeline.basicdonating_page --selftest # the docs/basicdonating*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_dpc_setups            # CI gate: harddrop's six DPC Setups pages
 python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
@@ -4283,7 +4291,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -4291,7 +4299,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth and 途中DT砲 (`template/dtcannon.php`) the tenth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth and 基本的なドネイト (`template/basicdonating.php`) the eleventh (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -5074,6 +5082,43 @@ every build places as a piece. `noRoof` makes a lock match both hands and is ref
 measured equivalent and named. **No demo is built**: odd cell counts (a proof), boards even but not multiples of four (a planner
 limit), the DTDT residue boards, and のそみ砲's illustrations, which do not separate terrain from page pieces (a reading, not a
 measurement); `dtcannon-demos.test.ts` re-derives each.
+
+### 基本的なドネイト（basic donating）
+
+The same deliverable for `template/basicdonating.php` (「脱初心者のための基本的なドネイト」, 2024-10-07 版; yachi's 「下一個中盤」,
+2026-10-24): `pipeline/openers/basicdonating-technique.json` (held as a literal in `extract_basicdonating_shapes.py`, gated by the
+shared `technique_transcription.py`), `technique-profile-basicdonating.ts` → `analysis/basicdonating-facts.json`
+(`basicdonating.test.ts`), `technique-demos-basicdonating.ts` → `analysis/basicdonating-demos.json`
+(`basicdonating-demos.test.ts`), and `docs/basicdonating.html` + `docs/basicdonating-demos.html` from `basicdonating_page.py` +
+`basicdonating_prose.json`, the eleventh card under 中盤手法. Raw-HTML snapshot, fetched like 途中DT砲's; some boards are indented
+with a tab, which the opt-in `snapshot_indented` reads. Every figure is read off the artefacts and tests, never typed here.
+
+**It teaches a PRINCIPLE over many terrains, so its window is the principle, not a box.** 「TSDで消える2列だけを埋める」: a piece
+laid over a hole fills exactly the two rows a flat, nub-down T's TSD clears, so the hole opens again; the page draws holes 1 to 6
+columns from the T's near arm, and no two of its terrains agree between the T and the hole, so neither the bounding box nor the
+agreement box can hold them. So there are six variants, `k1`..`k6`, under a new opt-in `window_basis: well`: the T's own 2 × 3 box
+plus four cells in the hole's column (above the donation empty, the two donated cells filled, the hole under them empty), checked by
+the gate's `well_window` and held to every drawing on the page BOTH ways by `well_accounting` (every firing is a recorded drawing or
+a `well_fires_other` entry; every spin board no window fires on is a `well_not_fired` entry — the page's own L-fills-three-rows
+mistake is the one). The payoff is 欄干's `well_quad`, and it is harddrop's (the Donation page), not the page's, which says only
+that the hole stays open. Two further opt-ins in the shared gate, both default-preserving (every earlier gate's plain, `--selftest`
+and `--html-dir` output compared byte for byte): `snapshot_indented` (also in `route_transcription.page_boards`) and
+`muting_slips`, which lets a spin board whose muted cells do not equal its cleared rows be a named `:muting` discrepancy.
+
+**Every named donation is one of these windows plus more, so the qualify rules give a T to the page that names it.**
+`pipeline/sim/basicdonating-qualify.ts`: the shared rules on the two donated cells (`fragment`, `garbage_in_shape`, `dpc`), then
+`other_page` (any variant of any other technique window fires at the same T, either hand), `nearer_well` (a smaller-k window fires
+at the same T: the T counts once, at its nearest hole) and `well_covered` (a filled cell above the window in the hole's column, so
+the clear does not re-open it). Measured in `basicdonating.test.ts`: `other_page` agrees with membership in another technique
+artefact's hits on every hit; 階段のドネイト's and 社畜トレイン's hits are contained whole in this page's, STMB Cave's are not (the
+test pins the counts in `COMMON`), and no two qualifying hits share a lock. The other gates' `other_windows` records were extended
+to this window (kaidan, parapet, shachikutrain), so their transcriptions and both artefacts' `transcription_md5` moved and nothing
+else; 社畜トレイン's `emitter_md5` / `classifier_md5` moved too, because it hashes kaidan's transcription.
+
+**The report region and the replay labels see six variants**, labelled 「窿離 T k 欄」 in `routes_techniques_section._variant_name`
+(a branch on `well`; every other technique's label is unchanged). **No demo is built**: odd cell counts (a proof), even counts not
+multiples of four (a planner limit), and most boards drawing the donated pieces and the T in one diagram with no board of the
+pieces placed before the T; `basicdonating-demos.test.ts` re-derives each reason by kind. Named lists and sizes live in the tests.
 
 ### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other seven pages
 

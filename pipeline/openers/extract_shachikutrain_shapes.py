@@ -470,7 +470,42 @@ HARDDROP = {
                       {'table': 16, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
                       {'table': 17, 'board': 0, 'file': 'kaidan-technique.json', 'mirrored': [False]},
                       {'table': 17, 'board': 1, 'file': 'kaidan-technique.json', 'mirrored': [False]},
-                      {'table': 17, 'board': 2, 'file': 'kaidan-technique.json', 'mirrored': [False]}],
+                      {'table': 17, 'board': 2, 'file': 'kaidan-technique.json', 'mirrored': [False]},
+                      # basicdonating-technique.json (基本的なドネイト, the eleventh page): its hole windows fire at
+                      # most of these drawn T's, k1 (the hole one column past the T's arm) at nearly all — a
+                      # Shachiku Train's first TSD is a donation into the column beside the S's foot, measured
+                      {'table': 1, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 2, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 3, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 4, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 4, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 4, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 4, 'board': 3, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 4, 'board': 4, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 5, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 7, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 9, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 10, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 12, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 13, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 13, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 14, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 14, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 15, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 17, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 17, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 17, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 6, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False]},
+                      {'table': 11, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 16, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True]},
+                      {'table': 16, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k2'},
+                      {'table': 15, 'board': 2, 'file': 'basicdonating-technique.json', 'mirrored': [False], 'variant': 'k3'},
+                      {'table': 16, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k3'},
+                      {'table': 15, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [False], 'variant': 'k4'},
+                      {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [False], 'variant': 'k4'},
+                      {'table': 15, 'board': 0, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k5'},
+                      {'table': 15, 'board': 1, 'file': 'basicdonating-technique.json', 'mirrored': [True], 'variant': 'k5'}],
 }
 
 #: harddrop's STMB_Cave page, table 17: the variation it says 「has the same shape and steps as Shachiku Train」, the
@@ -526,6 +561,13 @@ CROSS_SOURCE = {
                         'own pages, read below',
     'harddrop': HARDDROP,
     'stmb_cave': STMB_CAVE,
+    #: the boards of the other technique transcriptions this window fires on (any resting T, either hand), measured
+    'fires_on_other_techniques': [
+        {'file': 'basicdonating-technique.json', 'node': 'q1.1.answer',
+         'note': 'same author: an answer of 基本的なドネイト\'s 1ミノ questions, the T laid flat beside an O whose left '
+                 'column fills the two cleared rows over the hole one column past the T\'s arm, an L on the stack '
+                 'behind it; that page\'s qualify rules leave a T this window fires on to this page'},
+    ],
     'fires': [],
     'also': [
         {'file': 'stickspin-routes.json', 'node': '2.sd', 'variant': 'shachikutrain', 'mirrored': False,
@@ -977,7 +1019,9 @@ def extra_checks(data: dict):
                        f'{sc.get("clash")}')
         if rows_both != sc.get('rows_both_read'):
             bad.append(f'stmb: the rows both windows read are {rows_both}, the record holds {sc.get("rows_both_read")}')
-    # same author: this window fires on no board of the other shiwehi.com technique transcriptions (measured)
+    # same author: this window fires on no board of the other shiwehi.com technique transcriptions but the ones
+    # `fires_on_other_techniques` records (measured, both ways)
+    fires_on_others = {(e['file'], e['node']) for e in xs.get('fires_on_other_techniques', [])}
     for f in sorted(TECHNIQUE_DIR.glob('*-technique.json')):
         if f.name == OUT.name:
             continue
@@ -988,8 +1032,11 @@ def extra_checks(data: dict):
             sc2 = TT.spin_cells(n) if n['kind'] == 'spin' else set()
             pre = [''.join(EMPTY if (r, c) in sc2 or ch == 'U' else ch for c, ch in enumerate(row))
                    for r, row in enumerate(n['rows'])]
-            if any(TT.window_fires(data, v, ospec, pre, cs, m) for cs in TT.t_placements(pre, ospec) for m in (False, True)):
-                bad.append(f'cross: this window fires on {f.name} {n["id"]} (record it, or measure why not)')
+            fired = any(TT.window_fires(data, v, ospec, pre, cs, m)
+                        for cs in TT.t_placements(pre, ospec) for m in (False, True))
+            if fired != ((f.name, n['id']) in fires_on_others):
+                bad.append(f'cross: this window {"fires" if fired else "does not fire"} on {f.name} {n["id"]} '
+                           f'(record it, or measure why not)')
     # cross: no routes node is labelled as this technique by its Japanese name either
     for f in sorted(HERE.glob('*-routes.json')):
         for n in json.loads(f.read_text())['nodes']:
@@ -1083,6 +1130,7 @@ MUTANTS = [
     (lambda d: _hdm(d, 11, 0).__setitem__('window', 'leaves the board'), 'why the window misses misrecorded', 'harddrop:'),
     (lambda d: _hdm(d, 1, 1).__setitem__('lines', 1), 'a missed T\'s line count misrecorded', 'harddrop:'),
     (lambda d: _hdm(d, 8, 0).__setitem__('note', ''), 'a missed drawn T with no note', 'harddrop:'),
+    (lambda d: d['cross_source']['fires_on_other_techniques'].clear(), 'the 基本的なドネイト board unrecorded', 'cross:'),
     (lambda d: d['cross_source']['harddrop']['other_windows'].clear(), 'STMB Cave\'s window on the page unrecorded',
      'harddrop:'),
     (lambda d: d['cross_source']['stmb_cave'].__setitem__('oldid', 41495), 'the STMB_Cave revision not the pinned one',

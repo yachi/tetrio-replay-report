@@ -584,11 +584,15 @@ def drift(data: dict, spec: TranscriptionSpec) -> list[str]:
 BOARD_ROW = re.compile(r'^[-a-zA-Z]{10}$')
 
 
-def page_boards(md: str) -> list[list[str]]:
-    """Every board in a markdown snapshot, in page order: runs of 10-wide board rows."""
+def page_boards(md: str, indented: bool = False) -> list[list[str]]:
+    """Every board in a markdown snapshot, in page order: runs of 10-wide board rows. `indented` (opt-in,
+    基本的なドネイト, whose raw HTML indents some boards with a tab) reads a row with leading whitespace too;
+    off, a leading tab still ends a board, as every earlier snapshot was read."""
     out, cur = [], []
     for line in md.split('\n'):
         s = line.replace('\\-', '-').rstrip()
+        if indented:
+            s = s.lstrip()
         if BOARD_ROW.match(s):
             cur.append(s)
         elif cur:
@@ -694,7 +698,7 @@ def synthetic_wikitext(tables: list[list[list[str]]]) -> str:
     return ' '.join(out)
 
 
-def check_snapshot(data: dict, html_dir: Path) -> list[str]:
+def check_snapshot(data: dict, html_dir: Path, indented: bool = False) -> list[str]:
     p = html_dir / data['source']['snapshot_file']
     raw = p.read_bytes()
     bad = []
@@ -722,7 +726,7 @@ def check_snapshot(data: dict, html_dir: Path) -> list[str]:
             bad.append(f'snapshot: quote {q["id"]} is not verbatim on the page')
     want = [rows[i] for i in data['page_order']]
     # a harddrop WIKITEXT snapshot (SDPC Spin) holds its boards as {{pfrow}} templates, not as lines
-    got = wikitext_boards(text) if p.suffix == '.wikitext' else page_boards(text)
+    got = wikitext_boards(text) if p.suffix == '.wikitext' else page_boards(text, indented)
     if got != want:
         bad.append(f'snapshot: the page draws {len(got)} boards, page_order has {len(want)}')
         for k, (a, b) in enumerate(zip(got, want)):

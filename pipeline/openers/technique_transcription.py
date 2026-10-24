@@ -127,6 +127,11 @@ class TechniqueSpec:
     #: opt-in: fn(data) -> {snapshot_file: text}, a faithful synthetic page per pinned wikitext revision,
     #: which `check_wikitext_sources --selftest` plants its mutants against (the real bytes are not committed)
     synthetic_wikitext: Callable | None = None
+    #: opt-in: the page's raw HTML indents some board rows (基本的なドネイト), read by `page_boards(indented=True)`
+    snapshot_indented: bool = False
+    #: opt-in: a spin board whose muted cells do not equal its full rows is a `<id>:muting` discrepancy to name,
+    #: not a failure (基本的なドネイト mutes a few cells off by hand)
+    muting_slips: bool = False
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -320,6 +325,129 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
     return bad
 
 
+WELL_EXTRA = ('above', 'upper', 'lower', 'under')
+
+
+def well_geometry(v: dict) -> tuple[int, int, int, list[tuple[int, int]]]:
+    """A `well` variant's frame: the T's arm row R, its left arm column a, the well column w, and the four
+    cells the window reads outside the T's box, in `WELL_EXTRA` order (above the donation, its two cells in
+    the rows the TSD clears, the hole under them). Nothing beside the hole is read: the page's own answers
+    leave it open as often as walled (Q17 of the 2ミノ set)."""
+    tc = [tuple(x) for x in v['t_cells']]
+    R = min(r for r, _ in tc)
+    a = min(c for r, c in tc if r == R)
+    k, side = v['well']['offset'], v['well']['side']
+    w = a - k if side == 'left' else a + 2 + k
+    return R, a, w, [(R - 1, w), (R, w), (R + 1, w), (R + 2, w)]
+
+
+def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> list[str]:
+    """The window rule for a variant whose window is a DONATION WELL (`window_basis: well`, 基本的なドネイト),
+    the opt-in alternative to the bounding box and the agreement box. A page that teaches a principle
+    (「TSDで消える2列だけを埋める」) over many terrains draws no two of them alike between the T and the well, so
+    neither box can hold both; the window is the principle itself, written as cells and checked here:
+
+      (w1) the T is flat, nub down, and the window's box is exactly its 2 × 3 bounding box; no roof cells;
+      (w2) `well` names a side and an offset k ≥ 1 (columns between the T's near arm and the well, the arm's
+           own column not counted): the well column w, and `window_extra` is exactly the four cells of
+           `well_geometry`, which the board draws empty, filled, filled, empty;
+      (w3) the board is the spin board the T is drawn on, or (a page drawing the form without its T) a board
+           whose t_cells are empty and on which that T clears exactly `lines` rows;
+      (w4) the payoff is a Tetris into that well: an I clearing 4, `well_cell_pre_clear` the well cell, on
+           the variant's own board (the page draws no after board), and every filled cell of the well
+           column on it lies in a row the TSD clears (the re-opening clause, on the DRAWING).
+    `well_accounting` then holds every drawing of the page to the windows, both ways."""
+    bad = []
+    tcs = sorted(tc)
+    R = min(r for r, _ in tcs)
+    if sorted(tcs) != sorted([(R, c) for c in range(tcs[0][1], tcs[0][1] + 3)] + [(R + 1, tcs[0][1] + 1)]):
+        return [f'window: {v["id"]}: the T is not flat, nub down ({tcs})']
+    a = tcs[0][1]
+    if [v['window']['rows'], v['window']['cols']] != [[R, R + 1], [a, a + 2]]:
+        bad.append(f'window: {v["id"]}\'s window {v["window"]} is not the T\'s box {[[R, R + 1], [a, a + 2]]}')
+    if v.get('roof_cells'):
+        bad.append(f'window: {v["id"]}: a well window has no roof cells')
+    wl = v.get('well', {})
+    if wl.get('side') not in ('left', 'right') or not isinstance(wl.get('offset'), int) or wl['offset'] < 1:
+        return bad + [f'window: {v["id"]}.well {wl} is not a side and an offset ≥ 1']
+    _R, _a, w, cells = well_geometry(v)
+    rows = sp['rows']
+    if [tuple(x) for x in v.get('window_extra', {}).get('cells', [])] != cells or not v['window_extra'].get('note'):
+        bad.append(f'window: {v["id"]}.window_extra is not the well\'s four cells {cells}, with a note')
+    if any(not (0 <= r < len(rows) and 0 <= c < WIDTH) for r, c in cells):
+        return bad + [f'window: {v["id"]}: the well cells leave {v["board"]}']
+    got = ['.' if is_empty(rows[r][c], spec) else '#' for r, c in cells]
+    if got != ['.', '#', '#', '.']:
+        bad.append(f'window: {v["id"]}: {v["board"]} draws the well cells {got}, not empty / filled / filled / empty')
+    if sp['kind'] != 'spin':
+        if any(not is_empty(rows[r][c], spec) for r, c in tc):
+            bad.append(f'window: {v["id"]}: the slot on {v["board"]} is not empty')
+        o = [''.join('#' if (r, c) in tc else ch for c, ch in enumerate(row)) for r, row in enumerate(occ_of(rows, spec))]
+        if full_rows(o) != [R, R + 1] or v['lines'] != 2:
+            bad.append(f'window: {v["id"]}: the T on {v["board"]} clears rows {full_rows(o)}, not its two')
+    elif sp.get('lines') != v['lines']:
+        bad.append(f'window: {v["id"]}: {v["board"]} clears {sp.get("lines")}, not {v["lines"]}')
+    p = v.get('payoff', {})
+    if p.get('kind') != 'well_quad' or p.get('piece') != 'I' or p.get('lines') != 4 or p.get('board') != v['board']:
+        bad.append(f'window: {v["id"]}: the payoff is not an I clearing 4 into the well, on {v["board"]}')
+    if [tuple(p.get('well_cell_pre_clear', []))] != [cells[3]] or [tuple(p.get('well_cell_after', []))] != [cells[3]]:
+        bad.append(f'window: {v["id"]}: the payoff\'s well cell is not {cells[3]} (no cleared row lies under it)')
+    if any(not is_empty(row[w], spec) and r not in (R, R + 1) for r, row in enumerate(rows)):
+        bad.append(f'window: {v["id"]}: a filled cell of the well column {w} on {v["board"]} is in no row the TSD clears')
+    return bad
+
+
+def well_accounting(data: dict, spec: TechniqueSpec) -> list[str]:
+    """Every drawing on the page, held to the well windows BOTH WAYS, so the windows never choose their own
+    evidence. On a spin board the windows are evaluated at its drawn T (taken out); on any other board at every
+    resting placement of a T. Every (board, variant, slot, hand) at which a window fires must be one of a
+    variant's `drawings` (a donation the page draws) or a `well_fires_other` entry with a reason; every spin
+    board at whose drawn T no window fires must be a `well_not_fired` entry with a reason; and every recorded
+    entry must be measured. A spin board that two windows fire on is recorded once per window."""
+    bad = []
+    vs = [v for v in data['variants'] if v.get('window_basis') == 'well']
+    got = set()
+    spin_fired = set()
+    for n in data['nodes']:
+        rows = n['rows']
+        if n['kind'] == 'spin':
+            sc = spin_cells(n)
+            pre = [''.join(EMPTY if (r, c) in sc else ch for c, ch in enumerate(row)) for r, row in enumerate(rows)]
+            cands, b = [sc], pre
+        else:
+            cands, b = t_placements(rows, spec), rows
+        for v in vs:
+            for cs in cands:
+                for m in (False, True):
+                    if window_fires(data, v, spec, b, cs, m):
+                        got.add((n['id'], v['id'], frozenset(cs), m))
+                        if n['kind'] == 'spin':
+                            spin_fired.add(n['id'])
+    rec = {}
+    for v in vs:
+        for d in v.get('drawings', []):
+            rec[(d['board'], v['id'], frozenset(tuple(x) for x in d['t_cells']), d['mirrored'])] = 'drawing'
+    for e in data.get('well_fires_other', []):
+        if not e.get('reason'):
+            bad.append(f'well: {e["board"]} in well_fires_other carries no reason')
+        rec[(e['board'], e['variant'], frozenset(tuple(x) for x in e['t_cells']), e['mirrored'])] = 'other'
+    for k in sorted(got - rec.keys(), key=str):
+        bad.append(f'well: {k[1]} fires on {k[0]} at {sorted(k[2])}{" (mirrored)" if k[3] else ""}, recorded nowhere')
+    for k in sorted(rec.keys() - got, key=str):
+        bad.append(f'well: {k[1]} is recorded firing on {k[0]} at {sorted(k[2])}{" (mirrored)" if k[3] else ""}, '
+                   f'and does not')
+    spins = {n['id'] for n in data['nodes'] if n['kind'] == 'spin'}
+    nf = {e['board']: e for e in data.get('well_not_fired', [])}
+    for b in sorted(spins - spin_fired - nf.keys()):
+        bad.append(f'well: no window fires at the T drawn on {b}, and well_not_fired does not name it')
+    for b, e in sorted(nf.items()):
+        if b in spin_fired or b not in spins:
+            bad.append(f'well: {b} is in well_not_fired but is no spin board a window misses')
+        if not e.get('reason'):
+            bad.append(f'well: {b} in well_not_fired carries no reason')
+    return bad
+
+
 def payoff_problems(v: dict, byid: dict, rows: list[str], fr: set, spec: TechniqueSpec) -> list[str]:
     """Rule (d'), a variant whose payoff is a Tetris into the well its spin keeps open (欄干): the payoff board is the
     variant spin board's `after` board, the payoff an I clearing 4, the pre-clear well cell maps to `well_cell_after`
@@ -451,7 +579,10 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         # cell by cell: every cell of a full row is drawn muted (upper case), no other cell is
         wrong = [(r, c) for r, row in enumerate(n['rows']) for c, ch in enumerate(row)
                  if ch not in spec.empty_letters and ch != EMPTY and ch.isupper() != (r in fr)]
-        if wrong:
+        if wrong and spec.muting_slips:
+            # opt-in: a page whose muting slips is named, board by board, rather than refused
+            measured.add(f'{n["id"]}:muting')
+        elif wrong:
             bad.append(f'spin: {n["id"]}: cells {wrong[:4]} are muted off, or unmuted in, the full rows {fr}')
         if n.get('lines') != len(fr):
             bad.append(f'spin: {n["id"]}: lines {n.get("lines")} but {len(fr)} rows clear')
@@ -501,16 +632,20 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         sc = spin_cells(sp)
         (r0, r1), (c0, c1) = v['window']['rows'], v['window']['cols']
         inwin = {(r, c) for r in range(r0, r1 + 1) for c in range(c0, c1 + 1)}
-        if tc != sc:
+        # a `well` variant may stand on a board the page draws without its T (an empty slot): well_window checks it
+        if tc != sc and not (v.get('window_basis') == 'well' and sp['kind'] != 'spin'):
             bad.append(f'window: {v["id"]}.t_cells {sorted(tc)} are not {v["board"]}\'s T cells {sorted(sc)}')
         if not tc <= inwin:
             bad.append(f'window: {v["id"]}\'s window does not hold every T cell')
-        top = min(r for r, _ in sc)
+        top = min((r for r, _ in sc), default=None)
         fu = ({tuple(x) for x in v['followup']['t_cells_pre_clear']} if 'followup' in v
               else {tuple(v['payoff']['well_cell_pre_clear'])})
         fr = set(full_rows(occ_of(rows, spec)))
         if v.get('window_basis') == 'agreement':
             bad += agreement_window(data, v, spec, rows, sc, top, inwin, fr)
+        elif v.get('window_basis') == 'well':
+            bad += well_window(data, v, spec, sp, tc)
+            continue
         else:
             roof = {(r, c) for (r, c) in filled_set(rows, spec) if r < top}
             if roof != {tuple(x) for x in v['roof_cells']}:
@@ -579,6 +714,9 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
                 cands = t_placements(b, spec)
             if any(window_fires(data, v, spec, b, cs, m) for cs in cands for m in (False, True)):
                 bad.append(f'window: {v["id"]} fires on {bid}, which the page draws as no {v["id"]}')
+
+    if any(v.get('window_basis') == 'well' for v in data.get('variants', [])):
+        bad += well_accounting(data, spec)
 
     # colour
     for n in nodes:
@@ -698,16 +836,20 @@ def run_selftest(spec: TechniqueSpec, mutants: list, snapshot_edits: dict, spec_
     node(d, base['page_order'][0])['label'] = 'edited by hand'
     expect(drift(d, spec), 'a hand edit to the committed JSON', 'drift:')
     # the snapshot locator, unchanged from the route gate: a raw-HTML page rebuilt from the boards
-    html = '\n'.join('<div class="ttt">\n' + '\n'.join(node(base, i)['rows']) + '\n</div>' for i in base['page_order'])
+    # an indented page (`snapshot_indented`) is rebuilt with a tab before every board row, as it draws them
+    ind = '\t' if spec.snapshot_indented else ''
+    html = '\n'.join('<div class="ttt">\n' + '\n'.join(ind + r for r in node(base, i)['rows']) + '\n</div>'
+                     for i in base['page_order'])
     html += '\n' + '\n'.join(f'<p>{q["verbatim"]}</p>' for q in base['quotes'])
     with tempfile.TemporaryDirectory() as td:
         p = Path(td) / base['source']['snapshot_file']
         p.write_text(html)
-        clean = [x for x in RT.check_snapshot(base, Path(td)) if 'sha256' not in x]
+        ck = lambda: RT.check_snapshot(base, Path(td), indented=spec.snapshot_indented)
+        clean = [x for x in ck() if 'sha256' not in x]
         p.write_text(html.replace(*snapshot_edits['board'], 1))
-        dirty = RT.check_snapshot(base, Path(td))
+        dirty = ck()
         p.write_text(html.replace(*snapshot_edits['text'], 1))
-        lost = RT.check_snapshot(base, Path(td))
+        lost = ck()
     if clean or not any('differs' in x for x in dirty) or not any('quote' in x for x in lost):
         print(f'selftest FAILED: snapshot re-check (clean={clean}, dirty={dirty[:2]}, lost={lost[:2]})',
               file=sys.stderr)
@@ -733,7 +875,7 @@ def main(spec: TechniqueSpec, selftest: Callable[[], int], doc: str | None) -> i
     data = spec.build()
     problems = verify(data, spec)
     if args.html_dir:
-        problems += RT.check_snapshot(data, args.html_dir)
+        problems += RT.check_snapshot(data, args.html_dir, indented=spec.snapshot_indented)
         if spec.html_checks:
             problems += spec.html_checks(data, args.html_dir)
     if args.wikitext_dir:
