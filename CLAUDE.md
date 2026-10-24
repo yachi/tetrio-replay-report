@@ -5127,7 +5127,11 @@ window's (a hit is recorded as drawn; the gate still records both hands), which 
 moved every technique artefact's `emitter_md5` / `classifier_md5` (and `dpc-facts.json`'s) and nothing else. Qualify: it has
 no donated cells (`keyCells: []`, which `technique-qualify.ts` now accepts only when given EXPLICITLY), so
 `garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail — and its offset
-0 makes every k hit the nub window also fires at a `nearer_well`. The 途中DT砲 TSD's nub sits over the TST slot, so the
+0 makes every k hit the nub window also fires at a `nearer_well`. **A nub hit also needs at least 4 empty cells
+under the nub** (`shallow_well`, since 2026-10-24, after yachi asked why the page listed so many examples): the window
+asks for 2, which any TSD over a dent meets, and most nub window hits were 2 or 3 deep; harddrop's Donation page, the
+variant's source, draws a cavity of 4 or more. A shallow nub window claims no k hit (`nearer_well` skips it), so the
+farther hole counts. The k variants keep the page's own depth: its boards are cropped under the hole. The 途中DT砲 TSD's nub sits over the TST slot, so the
 two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's.
 
 **The report region and the replay labels see seven variants**, labelled 「窿離 T k 欄」 (and 「窿喺 T 尖下面」 for the nub) in

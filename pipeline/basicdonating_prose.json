@@ -218,7 +218,8 @@
       "ownership_unverified": "T 之前有一步核對唔到，分唔出邊格屬於邊粒",
       "other_page": "另一個中盤手法頁嘅窗口喺同一下 T 都對到，計落嗰頁",
       "nearer_well": "同一下 T 有個更近嘅窿都對到，計落嗰個窗口",
-      "well_covered": "個窿嗰欄喺窗口上面有嘢，打完唔會由頂通落去"
+      "well_covered": "個窿嗰欄喺窗口上面有嘢，打完唔會由頂通落去",
+      "shallow_well": "T 尖下面個窿唔夠 4 格深，打完塞唔落一條 I 打 Tetris"
     }
   },
   "more_variants": {
