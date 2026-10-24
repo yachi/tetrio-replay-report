@@ -16,10 +16,16 @@
  *      transcriptions' `other_windows`, measured) — so a T another page claims is that page's, counted once.
  *   3. `nearer_well`: a smaller-k window fires at the same T, the nub's counting as 0 (so a nub hit is never one, and
  *      a k hit the nub window also fires at is). A T can fill two holes at once (the page's own Q16 and
- *      Q17 answers draw it); the T is counted once, at its nearest hole.
+ *      Q17 answers draw it); the T is counted once, at its nearest hole. A nub window under which `shallow_well`
+ *      would fail does not claim the T: a dent under the nub is no hole, so the farther hole is the donation.
  *   4. `well_covered`: a filled cell anywhere above the window in the hole's column, so the clear does not leave the
  *      hole open from the top (harddrop's re-opening clause). No drawing on the page has one (measured by the facts
  *      test on every drawing).
+ *   5. `shallow_well`, the `nub` variant only: fewer than 4 empty cells under the nub (`well_depth`), so the column
+ *      the clear re-opens cannot take a Tetris. The window asks for 2, which any TSD over a dent satisfies; a
+ *      donation keeps a Tetris well open (harddrop's Donation page draws a cavity of at least 4, the shipped
+ *      donation predicate's D = 4). The k variants are left as the page draws them: its boards are cropped below the
+ *      hole, so they fix no depth.
  *
  * Every other technique's transcription is read here, so each is in the profile's hashed files.
  */
@@ -33,7 +39,11 @@ export const OTHER_PAGES = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger',
                             'parapet', 'kaidan', 'dtcannon'];
 
 export interface DonationQualifyMutants { allowFragments?: boolean; allowGarbage?: boolean; noDpc?: boolean;
-                                          noOtherPage?: boolean; noNearer?: boolean; noCovered?: boolean }
+                                          noOtherPage?: boolean; noNearer?: boolean; noCovered?: boolean;
+                                          noShallow?: boolean }
+
+/** The nub's hole must take an I: at least this many empty cells under the nub. */
+export const SHALLOW_BELOW = 4;
 
 /** Per variant: the two donated cells (the window_extra's 2nd and 3rd), in the variant's board frame. */
 export function donatedCells(tr: any): Record<string, [number, number][]> {
@@ -71,8 +81,16 @@ export function donationQualifier(transcriptionPath: string, openersDir: string,
     const t = d.tspins.find(x => x.i === h.lock)!;
     if (!mut.noOtherPage && others.some((P: any) => !!windowMatch(t.board, lk.cells, P))) reasons.push('other_page');
     const k = offset.get(h.variant)!;
-    if (!mut.noNearer && mine.some((P: any) => offset.get(P.id)! < k && !!windowMatch(t.board, lk.cells, P)))
-      reasons.push('nearer_well');
+    const claims = (P: any) => {
+      const off = windowMatch(t.board, lk.cells, P);
+      if (!off) return false;
+      if (mut.noShallow || !nub.has(P.id)) return true;
+      const c = P.well!.c + off.dc;
+      let n = 0;
+      for (let r = P.well!.r + off.dr; r < t.board.length && t.board[r]![c] === '.'; r++) n++;
+      return n >= SHALLOW_BELOW;
+    };
+    if (!mut.noNearer && mine.some((P: any) => offset.get(P.id)! < k && claims(P))) reasons.push('nearer_well');
     if (!mut.noCovered) {
       // the window's own cells in the hole's column, re-read on the board at this hit's offset and hand
       const P = mine.find((x: any) => x.id === h.variant && x.mirrored === h.mirrored)!;
@@ -81,6 +99,10 @@ export function donationQualifier(transcriptionPath: string, openersDir: string,
       const top = Math.min(...P.cells.filter((x: any) => x.c === P.well!.c).map((x: any) => x.r));
       const col = P.well!.c + off.dc;
       for (let R = 0; R < top + off.dr; R++) if (t.board[R]![col] !== '.') { reasons.push('well_covered'); break; }
+    }
+    if (!mut.noShallow && nub.has(h.variant)) {
+      if (h.well_depth === undefined) throw new Error(`basicdonating qualify: nub hit with no well_depth`);
+      if (h.well_depth < SHALLOW_BELOW) reasons.push('shallow_well');
     }
     return { qualifies: reasons.length === 0, not_qualified: reasons };
   };

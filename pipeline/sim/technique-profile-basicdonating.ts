@@ -19,7 +19,7 @@
  * T's as STMB Cave's and SDPC Spin's TSS, which other pages already measure.
  */
 import type { TechniqueProfile } from './technique-profile.ts';
-import { DPC_LOCKS, OTHER_PAGES, donationQualifier } from './basicdonating-qualify.ts';
+import { DPC_LOCKS, OTHER_PAGES, SHALLOW_BELOW, donationQualifier } from './basicdonating-qualify.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -97,6 +97,7 @@ export const BASICDONATING: TechniqueProfile = {
       `other_page: another technique page's window (${OTHER_PAGES.join(', ')}; any variant, either hand) fires at the same T, so the T is that page's`,
       'nearer_well: a variant with a smaller hole offset fires at the same T, so the T is counted once, at its nearest hole',
       'well_covered: a filled cell anywhere above the window in the hole\'s column, so the clear does not leave the hole open from the top',
+      `shallow_well: the nub variant only: fewer than ${SHALLOW_BELOW} empty cells under the nub, so the re-opened column cannot take a Tetris`,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
     check: donationQualifier(`${OPENERS}/basicdonating-technique.json`, OPENERS),
