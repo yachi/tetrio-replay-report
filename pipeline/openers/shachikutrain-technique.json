@@ -2012,6 +2012,269 @@
           "mirrored": [
             false
           ]
+        },
+        {
+          "table": 1,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 2,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 3,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 4,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 4,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 4,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 4,
+          "board": 3,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 4,
+          "board": 4,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 5,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 7,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 9,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 10,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 12,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 13,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 13,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 14,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 14,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 15,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 15,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 17,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 17,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 17,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 6,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "table": 11,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 16,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "table": 16,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ],
+          "variant": "k2"
+        },
+        {
+          "table": 15,
+          "board": 2,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ],
+          "variant": "k3"
+        },
+        {
+          "table": 16,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ],
+          "variant": "k3"
+        },
+        {
+          "table": 15,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ],
+          "variant": "k4"
+        },
+        {
+          "table": 15,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ],
+          "variant": "k4"
+        },
+        {
+          "table": 15,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ],
+          "variant": "k5"
+        },
+        {
+          "table": 15,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            true
+          ],
+          "variant": "k5"
         }
       ]
     },
@@ -2178,6 +2441,13 @@
       ],
       "relation": "measured: anchored on the same flat T the two windows clash at two cells, both in the row under the nub row: the cell under the nub and its neighbour under one arm (`clash`; STMB Cave empty, the cave three wide; this window filled, the J), so each fires on its own base only. They agree in the cleared rows, the only other rows both read (`rows_both_read`): STMB Cave's window does not read the row above the T"
     },
+    "fires_on_other_techniques": [
+      {
+        "file": "basicdonating-technique.json",
+        "node": "q1.1.answer",
+        "note": "same author: an answer of 基本的なドネイト's 1ミノ questions, the T laid flat beside an O whose left column fills the two cleared rows over the hole one column past the T's arm, an L on the stack behind it; that page's qualify rules leave a T this window fires on to this page"
+      }
+    ],
     "fires": [],
     "also": [
       {

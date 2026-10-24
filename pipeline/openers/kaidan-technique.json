@@ -3056,6 +3056,81 @@
     "other_windows": {
       "kaidan_fires_on": [
         {
+          "file": "basicdonating-technique.json",
+          "board": "nodes.one.s",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "board": "nodes.q1.1.answer",
+          "cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "board": "nodes.q1.2.answer",
+          "cells": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
           "file": "btcannon-technique.json",
           "board": "cross_source.harddrop.drawn_t_not_fired[29]",
           "cells": [
@@ -3457,6 +3532,734 @@
         }
       ],
       "fires_on_kaidan": [
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.basic.z",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.basic.o",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.basic.spin",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.s3.s",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.s3.j",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.after.1",
+          "cells": [
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              2,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.dt.amemiya",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.dt.anchor",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.dt.amemiya.pre",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "nodes.dt.anchor.pre",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #2",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #8",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #15",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #92",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #88",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #96",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #1",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #6",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #14",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #18",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #20",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #78",
+          "cells": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop #91",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k1",
+          "board": "harddrop_anchor_set #21",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k3",
+          "board": "harddrop #15",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k3",
+          "board": "harddrop #14",
+          "cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k5",
+          "board": "nodes.dt.amemiya",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "k5",
+          "board": "nodes.dt.amemiya.pre",
+          "cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
         {
           "file": "imperialcross-technique.json",
           "variant": "imperialcross",
