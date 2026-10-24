@@ -950,6 +950,22 @@ jobs:
       - name: Check the Kaidan technique page audit catches its corruptions
         run: python3 -m pipeline.kaidan_page --selftest
 
+      # The tenth technique page, 途中DT砲 (mid-game DT Cannon, shiwehi.com's template/dtcannon.php): the same gate
+      # and renderer. The flat T's TSD with a TST slot standing over its nub, then the TST. Its window is the
+      # AGREEMENT BOX of the page's eight drawings of the shape and harddrop SDPC Spin's two DT Cannon continuations.
+      # The page was read as a markdown rendering (shiwehi.com is not reachable from the session that transcribed
+      # it), so its snapshot hash is of that rendering and nothing refetches it. The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/dtcannon.test.ts and dtcannon-demos.test.ts in the
+      # typescript job.
+      - name: Check the mid-game DT Cannon technique transcription
+        run: python3 -m pipeline.openers.extract_dtcannon_shapes
+
+      - name: Check the mid-game DT Cannon technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_dtcannon_shapes --selftest
+
+      - name: Check the mid-game DT Cannon technique page audit catches its corruptions
+        run: python3 -m pipeline.dtcannon_page --selftest
+
       # The DPC page: what the first T-spin after each Perfect Clear was built on, against harddrop's six
       # DPC Setups pages (pinned revisions, refetched weekly by check_wikitext_sources). Its PC points are
       # anchored to the replay's own clears.allclear; the corpus artefact is checked by

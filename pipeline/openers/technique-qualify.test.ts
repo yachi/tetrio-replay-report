@@ -26,7 +26,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
 
-const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan'] as const;
+const KEYS = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger', 'btcannon', 'cutcopy', 'kaidan', 'dtcannon'] as const;
 
 const BY_PLAYER: Record<string, any> = {
   stsd: { pinglamb: { not_qualified: {}, qualified: 19 },
@@ -39,6 +39,7 @@ const BY_PLAYER: Record<string, any> = {
   kaidan: { pinglamb: { not_qualified: { fragment: 38, garbage_in_shape: 46, z_not_one_piece: 46 }, qualified: 22 },
             yachi: { not_qualified: { dpc: 1, fragment: 39, garbage_in_shape: 40, ownership_unverified: 2, z_not_one_piece: 64 },
                      qualified: 33 } },
+  dtcannon: { pinglamb: { not_qualified: {}, qualified: 0 }, yachi: { not_qualified: { ownership_unverified: 1 }, qualified: 19 } },
 };
 
 /** every hit that does not qualify, with its reasons (階段のドネイト: the tally above only) */
@@ -50,6 +51,7 @@ const NOT_QUALIFIED: Record<string, string[]> = {
   doubledagger: [],
   btcannon: [],
   cutcopy: ['2026-09-18 m16r2 yachi lock 215 (cutcopy): fragment'],
+  dtcannon: ['2026-09-11 m4r5 yachi lock 107 (dtcannon): ownership_unverified'],
 };
 
 const qName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock} (${h.variant})`;

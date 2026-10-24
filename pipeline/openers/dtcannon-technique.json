@@ -1,0 +1,1020 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "dtcannon",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/dtcannon.php",
+    "title": "DT砲(途中DT)(Mid-game Double Triple Cannon)",
+    "author": "しゑひ(shiwehi)",
+    "created": "2021-04-01",
+    "updated": "2024-08-29",
+    "fetched": "2026-10-23",
+    "fetch_method": "mcp__Parallel_Search__web_fetch with full_content=true, which renders the page to markdown (a leading \"-\" on a board row comes back escaped as \"\\-\" and is unescaped), the route 迷走砲 and はちみつ砲 were read by. Plain curl through the session proxy is refused for shiwehi.com in this environment (HTTP 403 at CONNECT), so the raw HTML was not read and CI cannot refetch. 20 ten-wide boards in page order.",
+    "snapshot_file": "dtcannon.md",
+    "snapshot_sha256": "b069e04f665c1a5cba7704efaa58957aa4f519785eabeef496afc1d6d33014f8",
+    "snapshot_bytes": 8120,
+    "snapshot_note": "sha256 of the markdown snapshot this transcription was checked against, saved verbatim from the fetch. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; a raw-HTML or a re-rendered fetch moves the hash, so a moved hash means \"read the board diff\", not \"the boards changed\".",
+    "renderer_note": "the page's colour map was not read for this page (the host is unreachable from this session); the letters BT砲 recorded from shiwehi.com's column-exp.js are read the same way here, and `p` and `y` from the page's own text (legend)",
+    "decorative_images": [
+      "DT砲(途中DT)(Mid-game Double Triple Cannon)タイトル画像",
+      "DT砲の消し方 (an animated gif, not transcribed)"
+    ],
+    "references": [
+      "./dtcannonopener.php (開幕DT砲)",
+      "./derivedtcannonop.php (開幕DT砲からの派生, DTDT)",
+      "./mrtspinsstd.php (Mr. T-Spin's STD, のそみ砲)",
+      "./tspin.php"
+    ],
+    "unfetched": [
+      "the raw HTML of this page (the host is refused by this session's network policy)",
+      "https://harddrop.com/wiki/DT_Cannon (harddrop is refused too; its SDPC Spin page, transcribed in sdpcspin-routes.json, is the second source read instead)"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "i j l o z s": "a cell of that piece",
+    "I J L O S Z": "a cell of that piece drawn muted (in a row a spin clears, or a piece placed earlier); checked whole with its lower-case cells",
+    "U": "a cell of the T the spin places (the renderer's \"the T goes here\")",
+    "C": "an earlier cell in a row the spin clears (muted; checked on every spin board), or on a build board a cell of the stack the build places beside the slot, drawn muted (OUR READING)",
+    "p": "the finished-TSD section's pink cell, the one the page says must stay open while the yellow one is filled (「下図ピンクマスを埋めないように黄色マスを埋める」); a marker, read as filled (OUR READING)",
+    "y": "a letter on DTDT's TST board alone, two rows of a Z's shape; its colour was not read (OUR READING: filled, no piece)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "h.shape",
+      "verbatim": "DT砲の形と消し方"
+    },
+    {
+      "id": "shape",
+      "verbatim": "DT砲の形は以下の通りで、その名の通り、TSDを打った後にTSTを打つことができます。"
+    },
+    {
+      "id": "h.rotate",
+      "verbatim": "回転方法"
+    },
+    {
+      "id": "keys",
+      "verbatim": "switchのキーで解説していきます。"
+    },
+    {
+      "id": "rotate2",
+      "verbatim": "初めに右回転をしてから壁に寄せ、下におろしてから左回転、左回転です。"
+    },
+    {
+      "id": "tst",
+      "verbatim": "1つ目の%Tさえ入れることができれば、2つ目は普通のTSTです。"
+    },
+    {
+      "id": "h.build",
+      "verbatim": "DT砲の作り方"
+    },
+    {
+      "id": "h.wait",
+      "verbatim": "TSD屋根付き1列待ちの形"
+    },
+    {
+      "id": "wait",
+      "verbatim": "DT砲の最も作りやすい形は、TSDの形を作って%I待ちをしている時に、代わりに%J%Lを立てて作る方法です。"
+    },
+    {
+      "id": "wait.normal",
+      "verbatim": "通常上図のようになるところを、下図のようにすることでDT砲の形を作れます。"
+    },
+    {
+      "id": "hole",
+      "verbatim": "穴が2マス以上必要"
+    },
+    {
+      "id": "wait.any",
+      "verbatim": "上図では72積みの形で説明していますが、同様の形があればどこでも構いません。"
+    },
+    {
+      "id": "h.roof",
+      "verbatim": "TSD屋根待ちの形から"
+    },
+    {
+      "id": "roof",
+      "verbatim": "TSDの屋根待ちの状態から下図のようにして途中DTを組むことができます。"
+    },
+    {
+      "id": "roof.l",
+      "verbatim": "基本的には%L(左右反転の場合は%S)を使用します。"
+    },
+    {
+      "id": "roof.fill",
+      "verbatim": "この方法でDT砲を作った時、TSTを打つ前に%Zの左上のマスを埋める必要がありますが、63積みの3側に低い屋根を付けた場合は、%I以外で埋めようとすると%Tが入らなくなってしまうので注意してください。"
+    },
+    {
+      "id": "h.done",
+      "verbatim": "TSD完成形から"
+    },
+    {
+      "id": "done",
+      "verbatim": "TSDの形が完成している状態からも、条件によっては途中DTを組むことができます。"
+    },
+    {
+      "id": "done.wall",
+      "verbatim": "屋根が無い側の壁は2マスまで"
+    },
+    {
+      "id": "done.j",
+      "verbatim": "逆に、屋根がある側の壁は%Jを引っ掛けることができるので、屋根にプラスして4マスまで高くすることができます。"
+    },
+    {
+      "id": "h.derived",
+      "verbatim": "開幕テンプレ後の派生としてのDT砲"
+    },
+    {
+      "id": "derived",
+      "verbatim": "開幕テンプレからの派生としてDT砲を組むテンプレもいくつか存在します。"
+    },
+    {
+      "id": "h.dtdt",
+      "verbatim": "DTDT(開幕DT砲からの派生)"
+    },
+    {
+      "id": "h.nozomi",
+      "verbatim": "のそみ砲(Mr.T-Spin's STDからの派生)"
+    },
+    {
+      "id": "nozomi",
+      "verbatim": "のそみ砲と呼ばれるDT砲派生が存在します。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic",
+      "kind": "base",
+      "caption_quote": "shape",
+      "label": "the basic form: a TSD slot, and a TST slot standing on its nub column under an overhang",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---c------",
+        "cc-ccccccc",
+        "c--ccccccc",
+        "c---cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "kind": "spin",
+      "spin_of": "basic",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "shape",
+      "label": "the T laid flat, pointing down, into the TSD slot",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---c------",
+        "cc-ccccccc",
+        "c--ccccccc",
+        "CUUUCCCCCC",
+        "CCUCCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tst.spin",
+      "kind": "spin",
+      "spin_of": "basic.after",
+      "on": "basic.after",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3,
+      "caption_quote": "tst",
+      "label": "what the TSD leaves, with the second T stood up into it: a TST (the page draws this board, not the one before it)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--cc------",
+        "---c------",
+        "CCUCCCCCCC",
+        "CUUCCCCCCC",
+        "CCUCCCCCCC"
+      ]
+    },
+    {
+      "id": "wait.terrain",
+      "kind": "base",
+      "caption_quote": "wait",
+      "label": "a TSD slot roofed by a Z, waiting for an I in the column beside it (72積み)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---zz-----",
+        "----zz----",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.i",
+      "kind": "build",
+      "on": "wait.terrain",
+      "adds": "iC",
+      "caption_quote": "wait.normal",
+      "label": "what usually happens: the I goes into the column, the stack beside the slot built up",
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "i---------",
+        "i--zz-----",
+        "i---zzCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.terrain2",
+      "kind": "base",
+      "same_occupancy_as": "wait.terrain",
+      "caption_quote": "wait.normal",
+      "label": "the same terrain again",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---zz-----",
+        "----zz----",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.dt",
+      "kind": "build",
+      "on": "wait.terrain2",
+      "adds": "jlC",
+      "caption_quote": "wait.normal",
+      "label": "a J and an L stood up instead: the DT shape",
+      "rows": [
+        "----------",
+        "--ll------",
+        "---l------",
+        "jj-lCCCCCC",
+        "j--zzCCCCC",
+        "j---zzCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "roof.so",
+      "kind": "build",
+      "on": "roof.base",
+      "adds": "so",
+      "caption_quote": "roof",
+      "label": "the TSD roofed with an O and the S-lettered piece over it: by occupancy the DT shape too (measured)",
+      "rows": [
+        "----------",
+        "----ss----",
+        "-----ss---",
+        "--zz-oo---",
+        "-zz--oo---",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "roof.build",
+      "kind": "build",
+      "on": "roof.base",
+      "adds": "li",
+      "caption_quote": "roof.l",
+      "label": "an L stood up and an I laid flat instead: the DT shape",
+      "rows": [
+        "----------",
+        "----ll----",
+        "-----l----",
+        "--zz-l----",
+        "-zz--iiii-",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "roof.fill",
+      "kind": "illustration",
+      "caption_quote": "roof.fill",
+      "label": "the cell over the Z's upper left filled by an I before the TST (63積み with a low roof)",
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "i--SS-----",
+        "i---SS----",
+        "iZZ-OOCCCC",
+        "ZZ--OOCCCC",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "done.terrain",
+      "kind": "base",
+      "caption_quote": "done",
+      "label": "a finished TSD slot",
+      "rows": [
+        "----------",
+        "----------",
+        "-----ccccc",
+        "-----ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "done.build",
+      "kind": "build",
+      "on": "done.terrain",
+      "adds": "oi",
+      "caption_quote": "done",
+      "label": "an I laid beside it and an O over the stem: the DT shape",
+      "rows": [
+        "----oo----",
+        "----oo----",
+        "-----ccccc",
+        "iiii-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "done.cells",
+      "kind": "illustration",
+      "caption_quote": "done.wall",
+      "label": "the pink cell that must stay open and the yellow cell to fill (the side without a roof two high at most)",
+      "rows": [
+        "----------",
+        "----------",
+        "----cccccc",
+        "--p--ccccc",
+        "---o-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "jhook.build",
+      "kind": "build",
+      "on": "jhook.terrain",
+      "adds": "j",
+      "caption_quote": "done.j",
+      "label": "the side with the roof built four high, a J hooked over it",
+      "rows": [
+        "----jj----",
+        "----jccccc",
+        "----jccccc",
+        "-----ccccc",
+        "cccc-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dtdt.spin",
+      "kind": "spin",
+      "spin_of": "dtdt.base",
+      "on": "dtdt.base",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "h.dtdt",
+      "label": "DTDT: the DT shape built on 開幕DT砲's residue, its TSD drawn",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-----z----",
+        "--ll-zz---",
+        "---lssz--i",
+        "jj-lcssooi",
+        "j--ccccooi",
+        "JUUUCCCCCI",
+        "CCUCCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dtdt.tst",
+      "kind": "spin",
+      "spin_of": "dtdt.tst.base",
+      "on": "dtdt.tst.base",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3,
+      "caption_quote": "h.dtdt",
+      "label": "DTDT later: its TST drawn, with the next bag stacked over it",
+      "rows": [
+        "----------",
+        "-------yy-",
+        "--------yy",
+        "-----ss-oo",
+        "i---ss--oo",
+        "iljjjc---z",
+        "ilccjcc-zz",
+        "illcccc-zc",
+        "CCUCCCCCCC",
+        "CUUCCCCCCC",
+        "CCUCCCCCCC"
+      ]
+    },
+    {
+      "id": "nozomi.1",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲, from Mr. T-Spin's STD: its T-spin Single drawn",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------i",
+        "----j----i",
+        "----j----i",
+        "l--jj--z-i",
+        "LUUUSSZZOO",
+        "llUss-z-oo"
+      ]
+    },
+    {
+      "id": "nozomi.2",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: a T-spin Triple drawn",
+      "rows": [
+        "----------",
+        "--------l-",
+        "--------l-",
+        "--------ll",
+        "-oo------c",
+        "SOOZCIJJUC",
+        "SSZZCIJUUC",
+        "CSZCCIJCUC",
+        "cccccic-cc"
+      ]
+    },
+    {
+      "id": "nozomi.3",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: a stood T clearing one row",
+      "rows": [
+        "----------",
+        "----------",
+        "--------zi",
+        "----ss-zzi",
+        "---ss--zci",
+        "---jj---ci",
+        "llljoo-Ucc",
+        "lccjoo-UUc",
+        "CCCCCCCUCC"
+      ]
+    },
+    {
+      "id": "nozomi.4",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: the board it leaves, the DT shape built on it (measured)",
+      "rows": [
+        "----------",
+        "---i--szz-",
+        "---i--sszz",
+        "llli---scc",
+        "looicc-ccc",
+        "joocc--ccc",
+        "jjjcc---cc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "basic.after",
+      "kind": "derived",
+      "derived": true,
+      "reading": "tst.spin less its U: what the TSD leaves (measured to be basic.spin after its clear, by occupancy); its rows the TST clears are drawn muted, as the page draws them on tst.spin",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--cc------",
+        "---c------",
+        "CC-CCCCCCC",
+        "C--CCCCCCC",
+        "CC-CCCCCCC"
+      ]
+    },
+    {
+      "id": "roof.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "roof.build less its L and I (equally roof.so less its S-letter and O): the TSD waiting for its roof",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--zz------",
+        "-zz-------",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "jhook.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "jhook.build less its J: the finished TSD with the roof side four high",
+      "rows": [
+        "----------",
+        "-----ccccc",
+        "-----ccccc",
+        "-----ccccc",
+        "cccc-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dtdt.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dtdt.spin less its U: the DTDT board before its TSD",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-----z----",
+        "--ll-zz---",
+        "---lssz--i",
+        "jj-lcssooi",
+        "j--ccccooi",
+        "J---CCCCCI",
+        "CC-CCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dtdt.tst.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dtdt.tst less its U: the DTDT board before its TST, the next bag over it",
+      "rows": [
+        "----------",
+        "-------yy-",
+        "--------yy",
+        "-----ss-oo",
+        "i---ss--oo",
+        "iljjjc---z",
+        "ilccjcc-zz",
+        "illcccc-zc",
+        "CC-CCCCCCC",
+        "C--CCCCCCC",
+        "CC-CCCCCCC"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic",
+    "basic.spin",
+    "tst.spin",
+    "wait.terrain",
+    "wait.i",
+    "wait.terrain2",
+    "wait.dt",
+    "roof.so",
+    "roof.build",
+    "roof.fill",
+    "done.terrain",
+    "done.build",
+    "done.cells",
+    "jhook.build",
+    "dtdt.spin",
+    "dtdt.tst",
+    "nozomi.1",
+    "nozomi.2",
+    "nozomi.3",
+    "nozomi.4"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "dtcannon",
+      "board": "basic.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          7
+        ],
+        "cols": [
+          0,
+          3
+        ]
+      },
+      "t_cells": [
+        [
+          5,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          2
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's eight drawings of the shape and harddrop SDPC Spin's two DT Cannon continuations. Column 0 is the wall; rows 5-6 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); above them the TST slot's nub row (row 4: the stem over the T's middle and the nub toward the wall, walled both sides), the stem's row walled both sides (row 3), the overhang's second cell (row 2) and the overhang over the stem (row 1); under them the stem's bottom cell, walled both sides (row 7). Everything right of column 3, and row 0, is outside: the drawings disagree there. Occupancy only, never colour; garbage is filled.",
+      "agreement": [
+        {
+          "board": "basic",
+          "t_cells": [
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "wait.dt",
+          "t_cells": [
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "roof.build",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "done.build",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "jhook.build",
+          "t_cells": [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "dtdt.base",
+          "t_cells": [
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              9,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "roof.so",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "nozomi.4",
+          "t_cells": [
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              6
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "followup": {
+        "board": "basic.after",
+        "spin": "TST",
+        "lines": 3,
+        "t_cells_pre_clear": [
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            7,
+            2
+          ]
+        ],
+        "t_cells_after": [
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ]
+        ],
+        "note": "the T stood up into the TST slot, nub toward the wall (the page: 「2つ目は普通のTSTです」). Before the TSD its cells are split by the two cleared rows (three above them, the stem's bottom cell under them, under the TSD's nub); the TSD joins them, and the matcher carries the slot through every later clear to the next T."
+      },
+      "fires_on": [
+        "basic",
+        "wait.dt",
+        "roof.so",
+        "roof.build",
+        "done.build",
+        "jhook.build",
+        "dtdt.base",
+        "nozomi.4"
+      ],
+      "misses": [
+        "wait.terrain",
+        "wait.i",
+        "wait.terrain2",
+        "roof.fill",
+        "done.terrain",
+        "done.cells",
+        "tst.spin",
+        "basic.after",
+        "dtdt.tst",
+        "nozomi.1",
+        "nozomi.2",
+        "nozomi.3"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "dt",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on harddrop SDPC Spin's two DT Cannon continuations, mirrored, and on nothing else. The same two boards are the window's external agreement drawings (`routes_drawings`).",
+    "routes_drawings": {
+      "file": "sdpcspin-routes.json",
+      "nodes": [
+        "3.second.cspin.dt#1",
+        "3.second.cspin.dt#2"
+      ],
+      "mirrored": true,
+      "note": "harddrop's SDPC Spin page (another site, other authors) draws a DT Cannon on its second C-Spin build's residue, in two forms, mirrored; the U cells are the TSD's T"
+    },
+    "catalogue": {
+      "file": "opener-fields.json",
+      "names": [
+        "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+        "DT Cannon 2 {JP: 開幕DT砲2号}",
+        "Super Speed DT Cannon {JP: 超DT}"
+      ],
+      "reason": "five- and six-row opener fields, drawn before the overhang the TST needs: the seven-row window cannot be placed on them (every placement leaves the board), so they are no cross-source. wiki-openers.json draws no DT field."
+    },
+    "fires": [
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.dt#1",
+        "variant": "dtcannon",
+        "mirrored": true
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.dt#2",
+        "variant": "dtcannon",
+        "mirrored": true
+      }
+    ],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": [
+    {
+      "id": "roof.so:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "roof.build:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "roof.base:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared (the derived terrain keeps the page's letters)"
+    },
+    {
+      "id": "roof.fill:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "dtdt.spin:colour",
+      "note": "DTDT's boards draw the S-shaped piece in the Z's letter and the Z-shaped piece in the S's, as the TSD-roof section does; transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "dtdt.base:colour",
+      "note": "DTDT's boards draw the S-shaped piece in the Z's letter and the Z-shaped piece in the S's, as the TSD-roof section does; transcribed as drawn, occupancy only is compared (the derived board keeps the page's letters)"
+    },
+    {
+      "id": "done.cells:colour",
+      "note": "the yellow cell is one cell, drawn in the O's letter: a marker, not a piece"
+    }
+  ]
+}

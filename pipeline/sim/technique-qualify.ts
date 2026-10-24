@@ -3,8 +3,8 @@
  * (`technique-profile.ts`), read by `technique-facts.ts`'s `assemble`, for every technique page whose own rules are
  * the shared ones below. 社畜トレイン (`shachikutrain-qualify.ts`) and 欄干 (`parapet-qualify.ts`) keep their own
  * modules, written first; this one carries the same rules to the other seven pages, at yachi's request on 2026-10-23
- * (「睇埋其他中盤」). A hit failing any rule stays in `hits` (the shape did stand) with `qualifies: false` and every
- * rule it fails named.
+ * (「睇埋其他中盤」), and to 途中DT砲, added after them. A hit failing any rule stays in `hits` (the shape did stand)
+ * with `qualifies: false` and every rule it fails named.
  *
  *   1. `fragment` / `garbage_in_shape`: the variant's KEY cells — the pieces a player places to make the shape — are
  *      each a cell of a COMPLETE piece, all four of its cells still on the board before the T, and never garbage.
@@ -49,6 +49,9 @@ export const QUALIFY_OPTIONS: Record<string, TechniqueQualifyOptions> = {
   // the roof over the slot's end away from the wall, and the Z stood on end on the lowest step (one piece: 「Zを縦置き」)
   kaidan: { keyCells: { kaidan: [[1, 5], [1, 6], [2, 9], [3, 8], [3, 9], [4, 8]] },
       onePiece: { kaidan: [{ name: 'z', cells: [[2, 9], [3, 8], [3, 9], [4, 8]] }] } },
+  // the overhang over the TST stem: the one window cell every build places as a piece (the rest of the roof is
+  // drawn as stack on some of them)
+  dtcannon: { keyCells: { dtcannon: [[1, 2]] } },
 };
 
 export interface TechniqueQualifyMutants { allowFragments?: boolean; allowGarbage?: boolean; allowSplit?: boolean;
