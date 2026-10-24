@@ -386,7 +386,7 @@ bun pipeline/sim/emit-technique-demos.ts --technique kaidan \
 bun test pipeline/openers/kaidan.test.ts pipeline/openers/kaidan-demos.test.ts  # its two tests
 python3 -m pipeline.kaidan_page --selftest        # the docs/kaidan*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_dtcannon_shapes            # CI gate: the 途中DT砲 (mid-game DT Cannon) technique transcription
-python3 -m pipeline.openers.extract_dtcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (its snapshot is a MARKDOWN rendering, dtcannon.md)
+python3 -m pipeline.openers.extract_dtcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (dtcannon.html, with harddrop's Double_Triple_Cannon_Setups.wikitext beside it)
 bun pipeline/sim/emit-technique-facts.ts --technique dtcannon \
   --out analysis/dtcannon-facts.json                           # 途中DT砲's corpus artefact (quarantined; a TSD into a TST)
 bun pipeline/sim/emit-technique-demos.ts --technique dtcannon \
@@ -5049,15 +5049,21 @@ artefact hashing that module re-emitted for: the eight facts and demos moved in 
 column, never filtered; the opener hits are exactly the rounds `DT_ORDER_IN_OPENER` already names as DT Cannon first bags, which
 `dtcannon.test.ts` checks against `ordering.per_round`.
 
-**Its snapshot is MARKDOWN, not HTML, and it is the weakest pin of any technique.** shiwehi.com and harddrop.com are both refused
-by this environment's proxy, so the page was read through a web-fetch tool that renders markdown (`source.fetch_method`), as
-迷走砲's and はちみつ砲's were; the colour map was not read (`renderer_note`). harddrop's DT_Cannon page was not read at all; the
-window's external drawings are harddrop SDPC Spin's two DT Cannon continuations (`3.second.cspin.dt#1/#2`, mirrored, already
-transcribed), and the opener catalogue's DT fields are recorded as unplaceable (five- and six-row boards the seven-row window
-leaves). An open item: refetch the raw HTML and pin harddrop's DT_Cannon revision once a session can reach them.
+~~**Its snapshot is MARKDOWN, not HTML, and it is the weakest pin of any technique.** … An open item: refetch the raw HTML and
+pin harddrop's DT_Cannon revision once a session can reach them.~~ **Closed 2026-10-24.** The snapshot is the page's raw HTML
+(`dtcannon.html`, fetched with curl and the YE2 intermediate, TLS verification on, as 山岳積み2号's), and its renderer's colour map
+(`column-exp.js`, hashed in `source.renderer`) was read: `p` is #ff33ff and `y` the pale Z, the mirror partner of `r`. Every board
+and quoted sentence is the markdown transcription's, letter for letter; the one metadata fix was the page's created date. harddrop's
+DT_Cannon is a redirect to Double Triple Cannon Setups, whose revision is pinned in `cross_source.harddrop` (oldid,
+`revision_sha1`, sha256, bytes; read with urllib through `api.php`), so `check_wikitext_sources` discovers it and refetches it
+weekly with `--wikitext-dir`. Its drawings the window fires on are agreement drawings, every other drawn T on it is in
+`drawn_t_not_fired` with why the window misses, its no-T boards the window fires on in `fires_without_slot`, and the boards that
+nearly fire in `near_misses` (the DT STSD form differs at exactly the cell harddrop draws empty; the Higher Notch board leaves the
+window off-board) — all complete both ways, measured by the gate. The window and the corpus hits did not move; the artefacts moved
+in `transcription_md5` only.
 
 **The window is the agreement box** of the page's eight drawings and the two SDPC Spin boards. It reads no `B`; `p` (pink) and `y`
-are read from the page's legend. One measured relation the gate's miss rule does not see: `dtdt.tst` draws the first DT's TST
+are read from the page's renderer. One measured relation the gate's miss rule does not see: `dtdt.tst` draws the first DT's TST
 with the second DT already stacked above it, and the window fires there, as drawn, at that second DT's TSD slot —
 `dtcannon.test.ts` pins it (`SECOND_DT`). **Qualify**: the key cell is the overhang over the TST stem alone, the one window cell
 every build places as a piece. `noRoof` makes a lock match both hands and is refused (asserted to throw); `followupAnyT` is
