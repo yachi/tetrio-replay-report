@@ -385,6 +385,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique kaidan \
   --out analysis/kaidan-demos.json                             # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/kaidan.test.ts pipeline/openers/kaidan-demos.test.ts  # its two tests
 python3 -m pipeline.kaidan_page --selftest        # the docs/kaidan*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_dtcannon_shapes            # CI gate: the 途中DT砲 (mid-game DT Cannon) technique transcription
+python3 -m pipeline.openers.extract_dtcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (its snapshot is a MARKDOWN rendering, dtcannon.md)
+bun pipeline/sim/emit-technique-facts.ts --technique dtcannon \
+  --out analysis/dtcannon-facts.json                           # 途中DT砲's corpus artefact (quarantined; a TSD into a TST)
+bun pipeline/sim/emit-technique-demos.ts --technique dtcannon \
+  --out analysis/dtcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/dtcannon.test.ts pipeline/openers/dtcannon-demos.test.ts  # its two tests
+python3 -m pipeline.dtcannon_page --selftest      # the docs/dtcannon*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_dpc_setups            # CI gate: harddrop's six DPC Setups pages
 python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
@@ -4275,7 +4283,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -4283,7 +4291,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth and 階段のドネイト (`template/kaidansetup.php`) the ninth (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth and 途中DT砲 (`template/dtcannon.php`) the tenth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -5025,9 +5033,41 @@ cell count (a proof); the three-step staircases tile, but never without a T, and
 (its 「no cover by non-T pieces」 is the measurement, not a proof); the DT砲 boards are even but not multiples of four and drawn
 mirrored, so the as-drawn window would not fit them even built (measured). Named lists and their sizes live in the two tests.
 
+### 途中DT砲（mid-game DT Cannon）
+
+The same deliverable for `template/dtcannon.php` (「2024-08-29更新」): `pipeline/openers/dtcannon-technique.json` (held as a
+literal in `extract_dtcannon_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-dtcannon.ts` →
+`analysis/dtcannon-facts.json` (`dtcannon.test.ts`), `technique-demos-dtcannon.ts` → `analysis/dtcannon-demos.json`
+(`dtcannon-demos.test.ts`), and `docs/dtcannon.html` + `docs/dtcannon-demos.html` from `dtcannon_page.py` + `dtcannon_prose.json`,
+the tenth card under 中盤手法 (yachi's pick, 2026-10-24). Every figure is read off the artefacts and tests, never typed here.
+
+**No shared RULE file changed**: the flat, nub-down T into a TSD whose follow-up is a TST standing on its nub column is BT砲's
+shape of record (`followup.lines` 3, the slot split by the two cleared rows and joined by the row map). The one shared edit is a
+`dtcannon` entry in `technique-qualify.ts`'s `QUALIFY_OPTIONS` (and a docstring clause naming it), which every technique
+artefact hashing that module re-emitted for: the eight facts and demos moved in their hash lines only, and `cutcopy-own.json` /
+`cutcopy-selfplay.json` in `classifier_md5` only. Like BT砲 it is also an opener (開幕DT砲), so a hit in the opener window is a
+column, never filtered; the opener hits are exactly the rounds `DT_ORDER_IN_OPENER` already names as DT Cannon first bags, which
+`dtcannon.test.ts` checks against `ordering.per_round`.
+
+**Its snapshot is MARKDOWN, not HTML, and it is the weakest pin of any technique.** shiwehi.com and harddrop.com are both refused
+by this environment's proxy, so the page was read through a web-fetch tool that renders markdown (`source.fetch_method`), as
+迷走砲's and はちみつ砲's were; the colour map was not read (`renderer_note`). harddrop's DT_Cannon page was not read at all; the
+window's external drawings are harddrop SDPC Spin's two DT Cannon continuations (`3.second.cspin.dt#1/#2`, mirrored, already
+transcribed), and the opener catalogue's DT fields are recorded as unplaceable (five- and six-row boards the seven-row window
+leaves). An open item: refetch the raw HTML and pin harddrop's DT_Cannon revision once a session can reach them.
+
+**The window is the agreement box** of the page's eight drawings and the two SDPC Spin boards. It reads no `B`; `p` (pink) and `y`
+are read from the page's legend. One measured relation the gate's miss rule does not see: `dtdt.tst` draws the first DT's TST
+with the second DT already stacked above it, and the window fires there, as drawn, at that second DT's TSD slot —
+`dtcannon.test.ts` pins it (`SECOND_DT`). **Qualify**: the key cell is the overhang over the TST stem alone, the one window cell
+every build places as a piece. `noRoof` makes a lock match both hands and is refused (asserted to throw); `followupAnyT` is
+measured equivalent and named. **No demo is built**: odd cell counts (a proof), boards even but not multiples of four (a planner
+limit), the DTDT residue boards, and のそみ砲's illustrations, which do not separate terrain from page pieces (a reading, not a
+measurement); `dtcannon-demos.test.ts` re-derives each.
+
 ### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other seven pages
 
-STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子 and 階段のドネイト carry the same build rules as 社畜トレイン
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト and 途中DT砲 carry the same build rules as 社畜トレイン
 and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
 (`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
 its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page
@@ -5041,10 +5081,10 @@ fresh would have failed hits nobody would call accidental. No overlap rule was a
 name (BT砲 / 欄干, 千鳥格子 uncut / STMB Cave, 階段 / 社畜), BT砲 and uncut hold no corpus hit and the last is excluded on
 社畜's side. The test pins each artefact's per-player tally and, where few fail, every failing hit by name; re-derives every
 committed verdict from the digests; and turns each rule off to see it qualify exactly the hits failing only that rule, and
-requires each rule live somewhere in the corpus. Every one of the seven pages is `corpus_qualified_only`; on 千鳥格子 the
+requires each rule live somewhere in the corpus. Every one of the eight pages is `corpus_qualified_only`; on 千鳥格子 the
 精選 set is drawn from qualifying hits only. Which hits fail, and how many, is the test's, never this file's — only that
 階段のドネイト is the page where most fail (its Z split by a clear, or garbage in its steps). Editing `technique-qualify.ts`
-moves all seven pages' facts and demos hash lines; 社畜トレイン's and 欄干's artefacts do not hash it.
+moves all eight pages' facts and demos hash lines (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`); 社畜トレイン's and 欄干's artefacts do not hash it.
 
 ## DPC 頁 — what the first T-spin after a Perfect Clear was built on
 
