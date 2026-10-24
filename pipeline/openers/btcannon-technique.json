@@ -496,7 +496,7 @@
           3
         ]
       ],
-      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's six drawings of the shape and harddrop's fifteen. Column 0 is the wall; rows 4-5 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); above them the roof over the T's right end (row 3), the TST slot running up column 1 with the cell beside it filled (row 2), the cell over it empty (row 1) and the TST's overhang (row 0); under them the TST slot's bottom cell, walled both sides (row 6). Everything right of column 3 is outside: the drawings disagree there. Occupancy only, never colour; garbage is filled.",
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's six drawings of the shape and harddrop's seventeen. Column 0 is the wall; rows 4-5 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); above them the roof over the T's right end (row 3), the TST slot running up column 1 with the cell beside it filled (row 2), the cell over it empty (row 1) and the TST's overhang (row 0); under them the TST slot's bottom cell, walled both sides (row 6). Everything right of column 3 is outside: the drawings disagree there. Occupancy only, never colour; garbage is filled.",
       "agreement": [
         {
           "board": "basic",
@@ -693,19 +693,19 @@
   "cross_source": {
     "kind": "routes",
     "label_pattern": "btcannon",
-    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none (no route page draws a BT). The independent drawer is harddrop's BT_Cannon page instead (`harddrop`), whose fifteen boards with a drawn T the window fires on are the window's external `agreement` drawings: rule (g) fires the window on each, once, at its drawn T, in its recorded hand.",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none (no route page draws a BT). The independent drawer is harddrop's BT_Cannon page instead (`harddrop`), whose seventeen boards with a drawn T the window fires on are the window's external `agreement` drawings: rule (g) fires the window on each, once, at its drawn T, in its recorded hand.",
     "routes_fire_none": "no committed routes file draws a BT Cannon (measured: the window fires on none of their U-slot boards); the cross-check is harddrop's own BT_Cannon page, read below",
     "harddrop": {
       "page": "https://harddrop.com/wiki/BT_Cannon",
       "title": "BT Cannon",
-      "oldid": 41529,
-      "revision_sha1": "93edcb76796e2bf46867edfc56ab95a82869fd9a",
-      "revision_timestamp": "2024-12-27T16:32:56Z",
-      "fetched": "2026-10-19",
-      "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&revids=41529&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 41529 was the page's latest revision when fetched",
+      "oldid": 44634,
+      "revision_sha1": "10021bb04ca0f4d1e2def255173fd27570616eaf",
+      "revision_timestamp": "2026-10-21T15:45:11Z",
+      "fetched": "2026-10-24",
+      "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&revids=44634&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 44634 was the page's latest revision when fetched. It re-pins 41529 (2024-12-27, fetched 2026-10-19), which 44634 only extends: its first 1850 lines are 41529's byte for byte, and it adds the OBT Cannon (LST extension) and Mechanical Heart Variation sections, tables 41-47 (two of them boards outside any table, read as one-board tables by `_tabled`), so every earlier (table, board) is unchanged",
       "snapshot_file": "BT_Cannon.wikitext",
-      "snapshot_sha256": "79a356ecae617e2ca5c27f709754a0778b5ead2e9e75b12359e2244fc88b10d6",
-      "snapshot_bytes": 43605,
+      "snapshot_sha256": "c8337b03e05e841c6b2ffe261140c621580eb50dd4e03a218a56ae4a032fa8dd",
+      "snapshot_bytes": 50846,
       "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside btcannon.html",
       "author_note": "BT Cannon was invented by TCM-β (the page's first sentence); the page is harddrop's, edited by its wiki editors — another site and other authors than shiwehi.com",
       "reading": {
@@ -960,6 +960,38 @@
             "gggggggUgg",
             "gggggggg-g",
             "ggggggg-gg"
+          ]
+        },
+        {
+          "table": 41,
+          "board": 2,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "mirrored": true,
+          "rows": [
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjss-li",
+            "jjjjss--si",
+            "oojjtUUUss",
+            "ooltttUzzs",
+            "llliiii-zz"
+          ]
+        },
+        {
+          "table": 43,
+          "board": 2,
+          "section": "Z and O Before T",
+          "mirrored": true,
+          "rows": [
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjss-li",
+            "jjjjss--si",
+            "oojjtUUUss",
+            "ooltttUzzs",
+            "llliiii-zz"
           ]
         }
       ],
@@ -1614,6 +1646,117 @@
             "ggggggggUg",
             "ggggggg-gg"
           ]
+        },
+        {
+          "table": 41,
+          "board": 3,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjssUli",
+            "jjjjssUUsi",
+            "llliiiiUzz"
+          ]
+        },
+        {
+          "table": 42,
+          "board": 0,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the T-spin Double of the OBT Cannon's LST continuation (revision 44634)'s third bag, in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "-------sll",
+            "---zi--ssl",
+            "oozziUUUsl",
+            "oozgijUggg"
+          ]
+        },
+        {
+          "table": 42,
+          "board": 2,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "leaves the board",
+          "note": "the T-spin Double of the OBT Cannon's LST continuation (revision 44634)'s fourth bag, in the floor rows with no TST slot under it",
+          "rows": [
+            "----------",
+            "---------i",
+            "--------ji",
+            "---szz--ji",
+            "l--sszzjji",
+            "lUUUsooggg",
+            "llUggooggg"
+          ]
+        },
+        {
+          "table": 42,
+          "board": 3,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the T-spin Double of the OBT Cannon's LST continuation (revision 44634)'s fifth bag: no TST slot beside the T (the wall column is filled)",
+          "rows": [
+            "---------i",
+            "---------i",
+            "-------ooi",
+            "-------ooi",
+            "---zzlljjg",
+            "sUUUzzljgg",
+            "ssUgggljgg",
+            "gs-ggggggg"
+          ]
+        },
+        {
+          "table": 42,
+          "board": 4,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "the T-spin Double of the OBT Cannon's LST continuation (revision 44634)'s sixth bag: no TST slot beside the T (the wall column is filled)",
+          "rows": [
+            "----------",
+            "------i--g",
+            "---jjji--g",
+            "l--zzjiggg",
+            "lUUUzziggg",
+            "llUggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 43,
+          "board": 3,
+          "section": "Z and O Before T",
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "a stood T into a T-spin Triple (the BT's own TST, or a C-Spin's): the window anchors on the TSD's flat T pointing down, so it cannot fire here by construction",
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjssUli",
+            "jjjjssUUsi",
+            "llliiiiUzz"
+          ]
         }
       ],
       "fires_without_slot": [
@@ -1727,6 +1870,38 @@
             "gg---ggggg",
             "ggg-gggggg",
             "gggk-ggggg"
+          ]
+        },
+        {
+          "table": 41,
+          "board": 1,
+          "section": "BT Cannon LST Extension (OBT Cannon)",
+          "mirrored": null,
+          "rows": [
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjss-li",
+            "jjjjss--si",
+            "oojjt---ss",
+            "oolttt-zzs",
+            "llliiii-zz"
+          ]
+        },
+        {
+          "table": 43,
+          "board": 1,
+          "section": "Z and O Before T",
+          "mirrored": null,
+          "rows": [
+            "----------",
+            "---z---lli",
+            "oozz----li",
+            "oozjjss-li",
+            "jjjjss--si",
+            "oojjt---ss",
+            "oolttt-zzs",
+            "llliiii-zz"
           ]
         }
       ]

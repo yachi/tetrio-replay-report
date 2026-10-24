@@ -36,7 +36,7 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "db93007fae4a99b68c1f0f8179003c4e",
+  "transcription_md5": "3defc3596321216fba682fea06724fc8",
   "planner_md5": "762e8e445f5fa91bdb8cf8f182b49770",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
   "classifier_md5": "0f893d9a9f52a891b0250eba0ed72db0"
