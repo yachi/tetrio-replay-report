@@ -22,7 +22,7 @@ WHY THE WINDOW IS THE AGREEMENT BOX (`window_basis: agreement`), not STSD's boun
 draws the whole stack right of the slots as filled rows above the T, so every one of those cells is a "roof
 cell" and STSD's rule would make the window the whole board. So the window is the box on which every drawing
 of the shape agrees: this page's six (the basic form and its five builds) and harddrop's BT_Cannon page's
-fifteen (another site, other authors, `cross_source.harddrop`; seven of them under its own 「Mid-game BT
+seventeen (another site, other authors, `cross_source.harddrop`; seven of them under its own 「Mid-game BT
 Cannon」 heading, among them the same 欄干 conversion this page draws). It comes out seven rows by four
 columns: the wall column, the TST slot, the TSD's three columns, from the TST's overhang down to the TST
 slot's bottom cell. Widening it meets a disagreement (the stack right of the TSD differs between drawings) or
@@ -35,7 +35,7 @@ selftest and `--html-dir` output was compared byte for byte before and after):
     with a dark dot), and the gate's spin rule looked the letter up as a piece.
   * an EMPTY `cross_source.fires` is accepted when `routes_fire_none` says why and the window is an agreement
     box with external drawings: no committed routes board draws a BT (measured), and rule (g) firing the
-    window on each of harddrop's fifteen drawings is the independent check `fires` stands for elsewhere.
+    window on each of harddrop's seventeen drawings is the independent check `fires` stands for elsewhere.
   * `TechniqueSpec.html_checks`: `--html-dir` re-checks the harddrop wikitext snapshot beside the page (MediaWiki's
     sha1 and our sha256, every recorded drawing letter for letter, and that the recorded drawings are EXACTLY the
     page's boards whose drawn T the window fires on). Because that makes the window choose its own external
@@ -229,7 +229,7 @@ VARIANTS = [{
     't_cells': [[4, 1], [4, 2], [4, 3], [5, 2]],
     'roof_cells': [[0, 0], [0, 1], [1, 0], [2, 0], [2, 2], [2, 3], [3, 0], [3, 3]],
     'window_note': 'in basic.spin\'s frame, row 0 the top: the AGREEMENT BOX of this page\'s six drawings of the shape '
-                   'and harddrop\'s fifteen. Column 0 is the wall; rows 4-5 are the rows the TSD clears (entailed by '
+                   'and harddrop\'s seventeen. Column 0 is the wall; rows 4-5 are the rows the TSD clears (entailed by '
                    'the clear at a full TSD, NaiveClauseForced); above them the roof over the T\'s right end (row 3), '
                    'the TST slot running up column 1 with the cell beside it filled (row 2), the cell over it empty '
                    '(row 1) and the TST\'s overhang (row 0); under them the TST slot\'s bottom cell, walled both sides '
@@ -268,21 +268,28 @@ def _miss(table: int, board: int, section: str, t: str, lines: int, window: str,
             'note': note, 'rows': _b(rows)}
 
 
+#: what the four T-spin Doubles revision 44634 adds after its OBT Cannon's TST belong to
+OBT = "the OBT Cannon's LST continuation (revision 44634)"
+
 #: harddrop's BT_Cannon page: every board on it whose drawn T (`P`) the window fires on, read with `hd_cell`
 HARDDROP = {
     'page': 'https://harddrop.com/wiki/BT_Cannon',
     'title': 'BT Cannon',
-    'oldid': 41529,
-    'revision_sha1': '93edcb76796e2bf46867edfc56ab95a82869fd9a',
-    'revision_timestamp': '2024-12-27T16:32:56Z',
-    'fetched': '2026-10-19',
+    'oldid': 44634,
+    'revision_sha1': '10021bb04ca0f4d1e2def255173fd27570616eaf',
+    'revision_timestamp': '2026-10-21T15:45:11Z',
+    'fetched': '2026-10-24',
     'fetch_method': 'the pinned revision\'s own bytes from the MediaWiki API (api.php?action=query&prop=revisions&'
-                    'revids=41529&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python\'s urllib and a '
-                    'descriptive User-Agent (NOT curl); the API\'s sha1 equals the sha1 of the bytes, and 41529 was the '
-                    'page\'s latest revision when fetched',
+                    'revids=44634&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python\'s urllib and a '
+                    'descriptive User-Agent (NOT curl); the API\'s sha1 equals the sha1 of the bytes, and 44634 was the '
+                    'page\'s latest revision when fetched. It re-pins 41529 (2024-12-27, fetched 2026-10-19), '
+                    'which 44634 only extends: its first 1850 lines are 41529\'s byte for byte, and it adds the OBT '
+                    'Cannon (LST extension) and Mechanical Heart Variation sections, tables 41-47 (two of them boards '
+                    'outside any table, read as one-board tables by `_tabled`), so every earlier (table, board) is '
+                    'unchanged',
     'snapshot_file': 'BT_Cannon.wikitext',
-    'snapshot_sha256': '79a356ecae617e2ca5c27f709754a0778b5ead2e9e75b12359e2244fc88b10d6',
-    'snapshot_bytes': 43605,
+    'snapshot_sha256': 'c8337b03e05e841c6b2ffe261140c621580eb50dd4e03a218a56ae4a032fa8dd',
+    'snapshot_bytes': 50846,
     'snapshot_note': 'not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and '
                      're-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside '
                      'btcannon.html',
@@ -307,6 +314,9 @@ HARDDROP = {
         _hd(29, 1, 'Mid-game BT Cannon', False, '---------- jj-------- j--------- j-iiiiqqqq l--zzqqqqq lUUUzzgggg llUggggggg g-gggggggg'),
         _hd(32, 0, 'Mid-game BT Cannon', True, '---------- ------ll-- -------l-- qqqqss-lqq qqqss--jqq iiiiUUUjjj gggggUgggg gggggg-ggg'),
         _hd(34, 0, 'Mid-game BT Cannon', True, '---------- ---------j ---------j --------jj ---------i ---z--ss-i oozztss--i ooztttUUUi gggggggUgg gggggggg-g ggggggg-gg'),
+        # revision 44634's OBT Cannon (BT Cannon LST Extension), drawn twice: the same TSD board as table 5 board 2
+        _hd(41, 2, 'BT Cannon LST Extension (OBT Cannon)', True, '---------- ---z---lli oozz----li oozjjss-li jjjjss--si oojjtUUUss ooltttUzzs llliiii-zz'),
+        _hd(43, 2, 'Z and O Before T', True, '---------- ---z---lli oozz----li oozjjss-li jjjjss--si oojjtUUUss ooltttUzzs llliiii-zz'),
     ],
     #: every OTHER board with a drawn T (`P`, four cells) on the page: the window does not fire at it in either hand,
     #: each named with what the T is, measured (`t` the T's lie, `lines` the rows it clears, `window` why it does not
@@ -378,6 +388,22 @@ HARDDROP = {
               '---------- ----z----- ioozz--s-- ioozl--ss- ijlll---sl ijjjUUUlll gggggUgggg gggggg-ggg'),
         _miss(34, 1, 'Mid-game BT Cannon', 'stood', 3, "not the window's T", STOOD_TST,
               '---------- ---------- ---------- ---------g ---------g --------gg --lzz----g lllgzzggUg gggggggUUg ggggggggUg ggggggg-gg'),
+        _miss(41, 3, 'BT Cannon LST Extension (OBT Cannon)', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---------- ---z---lli oozz----li oozjjssUli jjjjssUUsi llliiiiUzz'),
+        _miss(42, 0, 'BT Cannon LST Extension (OBT Cannon)', 'flat-down', 2, 'leaves the board',
+              f"the T-spin Double of {OBT}'s third bag, in the floor rows with no TST slot under it",
+              '---------- ---------- ---------- -------sll ---zi--ssl oozziUUUsl oozgijUggg'),
+        _miss(42, 2, 'BT Cannon LST Extension (OBT Cannon)', 'flat-down', 2, 'leaves the board',
+              f"the T-spin Double of {OBT}'s fourth bag, in the floor rows with no TST slot under it",
+              '---------- ---------i --------ji ---szz--ji l--sszzjji lUUUsooggg llUggooggg'),
+        _miss(42, 3, 'BT Cannon LST Extension (OBT Cannon)', 'flat-down', 2, 'disagrees',
+              f"the T-spin Double of {OBT}'s fifth bag: no TST slot beside the T (the wall column is filled)",
+              '---------i ---------i -------ooi -------ooi ---zzlljjg sUUUzzljgg ssUgggljgg gs-ggggggg'),
+        _miss(42, 4, 'BT Cannon LST Extension (OBT Cannon)', 'flat-down', 2, 'disagrees',
+              f"the T-spin Double of {OBT}'s sixth bag: no TST slot beside the T (the wall column is filled)",
+              '---------- ------i--g ---jjji--g l--zzjiggg lUUUzziggg llUggggggg gg-ggggggg'),
+        _miss(43, 3, 'Z and O Before T', 'stood', 3, "not the window's T", STOOD_TST,
+              '---------- ---------- ---------- ---z---lli oozz----li oozjjssUli jjjjssUUsi llliiiiUzz'),
     ],
     #: boards with no T drawn on which the window fires at a resting placement (the same shape one step before
     #: the page draws its T, or harddrop's STSD continuation's terrain): measured and recorded letter for letter,
@@ -390,6 +416,8 @@ HARDDROP = {
         _hd(5, 1, 'BT Cannon C-Spin', None, '---------- ---z---lli oozz----li oozjjss-li jjjjss--si oojjt---ss oolttt-zzs llliiii-zz'),
         _hd(7, 1, 'BT Cannon C-Spin', None, '---------- lll---s--- lz----ssoo zz-iiiisoo zz--jjjooi zz---jjooi zss-tjjjli ss-tttllli'),
         _hd(35, 0, 'BT Cannon STSD', None, '---------- ----gggggg -----ggggg gggg-ggggg ggg--ggggg gg---ggggg ggg-gggggg gggk-ggggg'),
+        _hd(41, 1, 'BT Cannon LST Extension (OBT Cannon)', None, '---------- ---z---lli oozz----li oozjjss-li jjjjss--si oojjt---ss oolttt-zzs llliiii-zz'),
+        _hd(43, 1, 'Z and O Before T', None, '---------- ---z---lli oozz----li oozjjss-li jjjjss--si oojjt---ss oolttt-zzs llliiii-zz'),
     ],
 }
 
@@ -405,7 +433,7 @@ CROSS_SOURCE = {
     'label_pattern': 'btcannon',
     'note': 'the window, by the gate\'s predicate (technique_transcription.window_fires), over every U-slot board of every '
             'committed *-routes.json, with the U cells as the T: it fires on none (no route page draws a BT). The '
-            'independent drawer is harddrop\'s BT_Cannon page instead (`harddrop`), whose fifteen boards with a drawn '
+            'independent drawer is harddrop\'s BT_Cannon page instead (`harddrop`), whose seventeen boards with a drawn '
             'T the window fires on are the window\'s external `agreement` drawings: rule (g) fires the window on each, '
             'once, at its drawn T, in its recorded hand.',
     'routes_fire_none': 'no committed routes file draws a BT Cannon (measured: the window fires on none of their U-slot '
@@ -489,6 +517,26 @@ def harddrop_drawings(data: dict | None = None) -> list[dict]:
     return out
 
 
+def _tabled(text: str) -> str:
+    """The wikitext with every board that stands outside any `{| |}` table wrapped in a table of its own, so the
+    shared reader (which refuses a loose board) reads it as a one-board table in page order. harddrop's revision
+    44634 draws two such boards (the OBT Cannon section's Alternative Build and its Mechanical Heart Variation);
+    every board before them sits in a table, so the (table, board) of every earlier drawing is unchanged."""
+    out, depth, last, start = [], 0, 0, None
+    for m in RT.WIKI_TOKEN.finditer(text):
+        tok = m.group(0)
+        if tok == '{|':
+            depth += 1
+        elif tok == '|}':
+            depth -= 1
+        elif depth == 0 and tok in ('{{pfstart}}', '{{sstart}}'):
+            start = m.start()
+        elif depth == 0 and tok == '{{pfend}}' and start is not None:
+            out.append(text[last:start] + '{|\n|' + text[start:m.end()] + '\n|}')
+            last, start = m.end(), None
+    return ''.join(out) + text[last:]
+
+
 def _sections(text: str) -> list[str | None]:
     """The heading each `{|` table of a wikitext sits under, in table order."""
     heads = [(m.start(), m.group(2).strip()) for m in re.finditer(r'^(=+)\s*(.*?)\s*\1\s*$', text, re.M)]
@@ -506,6 +554,7 @@ def harddrop_page_problems(data: dict, text: str) -> list[str]:
     exactly the boards with no T drawn on which it fires. So every drawn T on the page is in one list or the other,
     and a drawn T the window misses is named rather than silently left out."""
     hd = data['cross_source']['harddrop']
+    text = _tabled(text)
     try:
         tables = RT.wikitext_tables(text)
     except ValueError as e:
@@ -814,6 +863,16 @@ def selftest() -> int:
             ok = False
         else:
             print(f'  killed: {label}  [harddrop:]')
+    # a board outside any table (revision 44634 draws two) is read, not refused or dropped: a firing drawing
+    # appended as a loose board must come back as an unrecorded drawing, never as a parse failure or nothing
+    loose = text + '\n{{pfstart}}\n' + '\n'.join(
+        '{{pfrow|' + '|'.join(RT.wikitext_page_cell(ch) for ch in r) + '}}' for r in _hdd(base, 0)['rows']) + '\n{{pfend}}\n'
+    got = harddrop_page_problems(base, loose)
+    if not any('the window fires at the drawn T of' in x for x in got) or any('does not parse' in x for x in got):
+        print(f'selftest FAILED: a loose board was not read as a one-board table ({got[:2]})')
+        ok = False
+    else:
+        print('  killed: a firing drawing outside any table left unrecorded  [harddrop:]')
     with tempfile.TemporaryDirectory() as td:
         missing = harddrop_snapshot_checks(base, Path(td))
         (Path(td) / base['cross_source']['harddrop']['snapshot_file']).write_text(text)

@@ -4606,7 +4606,11 @@ recorded in the transcription's `cross_source.harddrop`: every board on that pag
 wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, and
 until 2026-10-19 nothing re-read it weekly; `check_wikitext_sources` now discovers it (see ### SDPC Spin) and re-runs the
 extractor's `--wikitext-dir` (`wikitext_checks`, the same function as `html_checks`) over the refetched revision. The shiwehi
-page is still re-read only by a person with `--html-dir`.
+page is still re-read only by a person with `--html-dir`. **Re-pinned 2026-10-24 from 41529 to 44634**, the weekly job's first red on it: the new
+revision only APPENDS (its first 1850 lines are 41529's byte for byte) the OBT Cannon and Mechanical Heart sections, two of whose
+boards stand outside any table — `_tabled` wraps each in a one-board table, so every earlier (table, board) holds. Its two
+firing drawings are table 5 board 2's TSD board again, so the window and the corpus hits did not move; the artefacts moved in
+`transcription_md5` only.
 
 **Three opt-in edits to the shared gate, in unhashed Python, each checked default-preserving** (the gate, selftest and
 `--html-dir` output of STSD, STMB Cave, インペリアルクロス and ダブルダガー were compared byte for byte before and after): a

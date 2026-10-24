@@ -167,7 +167,8 @@ test('the scored T-spins are the ones emit-opener-facts.ts scores (the third cop
 test('the Python twin on the drawings: windowMatch fires on every drawing the gate records, and on no routes board', () => {
   const hd = TR.cross_source.harddrop;
   // harddrop's drawings with a drawn T: once, at the drawn T, in the recorded hand; at no other placement
-  expect(hd.drawings.length).toBe(15);
+  // 17 and 9 since revision 44634 (2026-10-21) added the OBT Cannon section: two more drawings of the TSD board, two more no-T boards
+  expect(hd.drawings.length).toBe(17);
   expect(hd.drawings.filter((d: any) => d.section === 'Mid-game BT Cannon').length).toBe(7);
   for (const d of hd.drawings) {
     const board = asBoard(d.rows, ch => ch !== '-' && ch !== 'U');
@@ -177,7 +178,7 @@ test('the Python twin on the drawings: windowMatch fires on every drawing the ga
     for (const cs of others) expect(fires(board, cs), `table ${d.table} board ${d.board}`).toEqual([]);
   }
   // its boards with no T drawn: the window fires at some placement
-  expect(hd.fires_without_slot.length).toBe(7);
+  expect(hd.fires_without_slot.length).toBe(9);
   for (const d of hd.fires_without_slot) {
     const board = asBoard(d.rows, ch => ch !== '-');
     expect(tPlacements(board).some(cs => fires(board, cs).length), `table ${d.table} board ${d.board}`).toBe(true);
