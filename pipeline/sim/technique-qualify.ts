@@ -70,7 +70,9 @@ export function keyOffsets(tr: any, opts: TechniqueQualifyOptions = {}): Map<str
     const rows: string[] = tr.nodes.find((n: any) => n.id === v.board).rows;
     const cells: [number, number][] = opts.keyCells?.[v.id]
       ?? [...(v.roof_cells ?? []), ...(v.window_extra?.cells ?? [])];
-    if (!cells.length) throw new Error(`technique qualify: variant ${v.id} has no key cells`);
+    // an EXPLICIT empty list is a variant with no piece of its own to check (基本的なドネイト's hole under the nub,
+    // where the T fills the cells another variant's piece would); a default that comes out empty is an error
+    if (!cells.length && !opts.keyCells?.[v.id]) throw new Error(`technique qualify: variant ${v.id} has no key cells`);
     const [r0, r1] = v.window.rows, [c0, c1] = v.window.cols;
     const extra = new Set((v.window_extra?.cells ?? []).map(([r, c]: [number, number]) => `${r},${c}`));
     for (const [r, c] of cells) {

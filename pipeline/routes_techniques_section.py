@@ -144,7 +144,9 @@ def _variant_name(t, vid, var):
     if len(t.variants) == 1:
         return t.name
     if var.get("well"):
-        # 基本的なドネイト: one window per hole distance from the T's arm
+        # 基本的なドネイト: one window per hole distance from the T's arm, and one under the T's own nub
+        if var["well"].get("side") == "nub":
+            return f"{t.name}（窿喺 T 尖下面）"
         return f"{t.name}（窿離 T {var['well']['offset']} 欄）"
     spins = {v["spin"] for v in t.variants.values()}
     if len(spins) > 1:

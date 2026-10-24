@@ -1425,6 +1425,32 @@
         "ccccc-cccc",
         "ccccc-cccc"
       ]
+    },
+    {
+      "id": "nub.hd",
+      "kind": "spin",
+      "external": "harddrop",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "source_board": {
+        "file": "shachikutrain-technique.json",
+        "record": "cross_source.harddrop.drawn_t_not_fired",
+        "table": 16,
+        "board": 1
+      },
+      "label": "harddrop's 「Donation T-Spin Double」: the T's nub fills the two rows the TSD clears over a hole three deep, which is open again after the clear",
+      "reading": "harddrop Shachiku_Train table 16 board 1, recorded (and pinned) in shachikutrain-technique.json's cross_source.harddrop.drawn_t_not_fired, in occupancy only: every drawn cell c, C in the rows the TSD clears, the T U",
+      "rows": [
+        "----------",
+        "-----c----",
+        "----cc----",
+        "CCCCCUUUCC",
+        "CCCCCCUCCC",
+        "cccccc-ccc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
     }
   ],
   "page_order": [
@@ -3007,9 +3033,192 @@
           "mirrored": true
         }
       ]
+    },
+    {
+      "id": "nub",
+      "board": "nub.hd",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "well",
+      "well": {
+        "side": "nub",
+        "offset": 0
+      },
+      "window": {
+        "rows": [
+          3,
+          4
+        ],
+        "cols": [
+          5,
+          7
+        ]
+      },
+      "t_cells": [
+        [
+          3,
+          5
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "roof_cells": [],
+      "window_extra": {
+        "cells": [
+          [
+            2,
+            6
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "note": "the hole under the T's own nub (harddrop's, not the page's): the T fills its two cells in the rows the TSD clears, so the window reads the cell above the T's centre empty and, under the nub, a Tetris hole: two cells empty, walled on both sides"
+      },
+      "payoff": {
+        "kind": "well_quad",
+        "board": "nub.hd",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          5,
+          6
+        ],
+        "well_cell_after": [
+          5,
+          6
+        ],
+        "note": "harddrop's: the Donation page's next step, a Tetris into the re-opened hole. The well cell is under the cleared rows, so the clear does not move it"
+      },
+      "drawings": [
+        {
+          "board": "nub.hd",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "nub.hd",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "mirrored": true
+        }
+      ]
     }
   ],
-  "well_fires_other": [],
+  "well_fires_other": [
+    {
+      "board": "q2.17",
+      "variant": "nub",
+      "t_cells": [
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "mirrored": false,
+      "reason": "a T resting over the question's own well, clearing no row (the window reads the T's box and the hole, not whether two rows clear; the corpus scores TSDs only)"
+    },
+    {
+      "board": "q2.17",
+      "variant": "nub",
+      "t_cells": [
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "mirrored": true,
+      "reason": "a T resting over the question's own well, clearing no row (the window reads the T's box and the hole, not whether two rows clear; the corpus scores TSDs only)"
+    }
+  ],
   "well_not_fired": [
     {
       "board": "intro.l3",
@@ -3255,6 +3464,33 @@
           ]
         },
         {
+          "file": "doubledagger-technique.json",
+          "board": "nodes.tetris.spin",
+          "variant": "nub",
+          "cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "mirrored": [
+            false,
+            true
+          ]
+        },
+        {
           "file": "dtcannon-technique.json",
           "board": "cross_source.harddrop.drawn_t_not_fired[5]",
           "variant": "k1",
@@ -3278,6 +3514,33 @@
           ],
           "mirrored": [
             false
+          ]
+        },
+        {
+          "file": "dtcannon-technique.json",
+          "board": "cross_source.harddrop.fires_without_slot[46]",
+          "variant": "nub",
+          "cells": [
+            [
+              9,
+              1
+            ],
+            [
+              9,
+              2
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              10,
+              2
+            ]
+          ],
+          "mirrored": [
+            false,
+            true
           ]
         },
         {
@@ -4031,6 +4294,87 @@
             ]
           ],
           "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "board": "nodes.tss.after",
+          "variant": "nub",
+          "cells": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "mirrored": [
+            false,
+            true
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "board": "cross_source.tetrisch.images[8]",
+          "variant": "nub",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "mirrored": [
+            false,
+            true
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "board": "cross_source.tetrisch.images[15]",
+          "variant": "nub",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "mirrored": [
+            false,
             true
           ]
         },
@@ -4998,6 +5342,33 @@
         },
         {
           "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
+          "variant": "nub",
+          "cells": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "mirrored": [
+            false,
+            true
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
           "board": "cross_source.harddrop.drawn_t_not_fired[8]",
           "variant": "k3",
           "cells": [
@@ -5097,6 +5468,33 @@
             ]
           ],
           "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "board": "cross_source.harddrop.drawn_t_not_fired[10]",
+          "variant": "nub",
+          "cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "mirrored": [
+            false,
             true
           ]
         },

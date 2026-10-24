@@ -5115,8 +5115,23 @@ test pins the counts in `COMMON`), and no two qualifying hits share a lock. The 
 to this window (kaidan, parapet, shachikutrain), so their transcriptions and both artefacts' `transcription_md5` moved and nothing
 else; 社畜トレイン's `emitter_md5` / `classifier_md5` moved too, because it hashes kaidan's transcription.
 
-**The report region and the replay labels see six variants**, labelled 「窿離 T k 欄」 in `routes_techniques_section._variant_name`
-(a branch on `well`; every other technique's label is unchanged). **No demo is built**: odd cell counts (a proof), even counts not
+**A seventh variant, `nub` (2026-10-24, yachi's 「好」 to a corpus-mining finding): the hole under the T's OWN nub.** The page
+draws holes 1 to 6 columns from the arm; harddrop draws the T's nub plugging a Tetris hole straight under it (its
+Shachiku_Train page, table 16 board 1, 「Donation T-Spin Double」), which is the Donation page's definition with k = 0. The
+board is an `external: harddrop` node (`nub.hd`), read BY POINTER from 社畜トレイン's pinned record
+(`cross_source.harddrop.drawn_t_not_fired`; `_check_external` holds it equal in occupancy), never re-pinned. Its window
+(`well.side: nub`, offset 0) is the T's box plus the cell above its centre empty, two empty cells under the nub and the four
+wall cells beside them filled: a one-cell hole fires on STMB Cave boards and C-Spin / DT TST setups, a two-deep walled one
+on none of them. It is SYMMETRIC about the T, so `technique-facts.ts`'s `prepare` drops a mirror whose cells equal the drawn
+window's (a hit is recorded as drawn; the gate still records both hands), which is the one change to a hashed rule file and
+moved every technique artefact's `emitter_md5` / `classifier_md5` (and `dpc-facts.json`'s) and nothing else. Qualify: it has
+no donated cells (`keyCells: []`, which `technique-qualify.ts` now accepts only when given EXPLICITLY), so
+`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail — and its offset
+0 makes every k hit the nub window also fires at a `nearer_well`. The 途中DT砲 TSD's nub sits over the TST slot, so the
+two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's.
+
+**The report region and the replay labels see seven variants**, labelled 「窿離 T k 欄」 (and 「窿喺 T 尖下面」 for the nub) in
+`routes_techniques_section._variant_name` (a branch on `well`; every other technique's label is unchanged). **No demo is built**: odd cell counts (a proof), even counts not
 multiples of four (a planner limit), and most boards drawing the donated pieces and the T in one diagram with no board of the
 pieces placed before the T; `basicdonating-demos.test.ts` re-derives each reason by kind. Named lists and sizes live in the tests.
 

@@ -337,6 +337,12 @@ def well_geometry(v: dict) -> tuple[int, int, int, list[tuple[int, int]]]:
     R = min(r for r, _ in tc)
     a = min(c for r, c in tc if r == R)
     k, side = v['well']['offset'], v['well']['side']
+    if side == 'nub':
+        # the hole under the T's own nub: the T fills the two cells in the rows it clears, so the window reads the
+        # cell above them, and under them a Tetris hole (harddrop's word): two cells deep, walled on both sides
+        w = a + 1
+        return R, a, w, [(R - 1, w), (R + 2, w), (R + 3, w), (R + 2, w - 1), (R + 2, w + 1), (R + 3, w - 1),
+                         (R + 3, w + 1)]
     w = a - k if side == 'left' else a + 2 + k
     return R, a, w, [(R - 1, w), (R, w), (R + 1, w), (R + 2, w)]
 
@@ -350,7 +356,10 @@ def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
       (w1) the T is flat, nub down, and the window's box is exactly its 2 × 3 bounding box; no roof cells;
       (w2) `well` names a side and an offset k ≥ 1 (columns between the T's near arm and the well, the arm's
            own column not counted): the well column w, and `window_extra` is exactly the four cells of
-           `well_geometry`, which the board draws empty, filled, filled, empty;
+           `well_geometry`, which the board draws empty, filled, filled, empty; or (opt-in) the side `nub` and
+           offset 0, the hole under the T's own nub, whose two cells in the rows the TSD clears are the T's, so
+           `window_extra` is the cell above them (empty) and a Tetris hole under them: two cells empty, the
+           four beside them filled (`well_geometry`'s order);
       (w3) the board is the spin board the T is drawn on, or (a page drawing the form without its T) a board
            whose t_cells are empty and on which that T clears exactly `lines` rows;
       (w4) the payoff is a Tetris into that well: an I clearing 4, `well_cell_pre_clear` the well cell, on
@@ -368,7 +377,11 @@ def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
     if v.get('roof_cells'):
         bad.append(f'window: {v["id"]}: a well window has no roof cells')
     wl = v.get('well', {})
-    if wl.get('side') not in ('left', 'right') or not isinstance(wl.get('offset'), int) or wl['offset'] < 1:
+    nub = wl.get('side') == 'nub'
+    if nub and wl.get('offset') != 0:
+        return bad + [f'window: {v["id"]}.well {wl}: the nub\'s hole has offset 0']
+    if not nub and (wl.get('side') not in ('left', 'right') or not isinstance(wl.get('offset'), int)
+                    or wl['offset'] < 1):
         return bad + [f'window: {v["id"]}.well {wl} is not a side and an offset ≥ 1']
     _R, _a, w, cells = well_geometry(v)
     rows = sp['rows']
@@ -377,8 +390,9 @@ def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
     if any(not (0 <= r < len(rows) and 0 <= c < WIDTH) for r, c in cells):
         return bad + [f'window: {v["id"]}: the well cells leave {v["board"]}']
     got = ['.' if is_empty(rows[r][c], spec) else '#' for r, c in cells]
-    if got != ['.', '#', '#', '.']:
-        bad.append(f'window: {v["id"]}: {v["board"]} draws the well cells {got}, not empty / filled / filled / empty')
+    want = ['.', '.', '.', '#', '#', '#', '#'] if nub else ['.', '#', '#', '.']
+    if got != want:
+        bad.append(f'window: {v["id"]}: {v["board"]} draws the well cells {got}, not {" / ".join(want)}')
     if sp['kind'] != 'spin':
         if any(not is_empty(rows[r][c], spec) for r, c in tc):
             bad.append(f'window: {v["id"]}: the slot on {v["board"]} is not empty')
@@ -390,8 +404,9 @@ def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
     p = v.get('payoff', {})
     if p.get('kind') != 'well_quad' or p.get('piece') != 'I' or p.get('lines') != 4 or p.get('board') != v['board']:
         bad.append(f'window: {v["id"]}: the payoff is not an I clearing 4 into the well, on {v["board"]}')
-    if [tuple(p.get('well_cell_pre_clear', []))] != [cells[3]] or [tuple(p.get('well_cell_after', []))] != [cells[3]]:
-        bad.append(f'window: {v["id"]}: the payoff\'s well cell is not {cells[3]} (no cleared row lies under it)')
+    wc = cells[1] if nub else cells[3]
+    if [tuple(p.get('well_cell_pre_clear', []))] != [wc] or [tuple(p.get('well_cell_after', []))] != [wc]:
+        bad.append(f'window: {v["id"]}: the payoff\'s well cell is not {wc} (no cleared row lies under it)')
     if any(not is_empty(row[w], spec) and r not in (R, R + 1) for r, row in enumerate(rows)):
         bad.append(f'window: {v["id"]}: a filled cell of the well column {w} on {v["board"]} is in no row the TSD clears')
     return bad

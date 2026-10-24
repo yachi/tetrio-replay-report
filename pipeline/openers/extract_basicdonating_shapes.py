@@ -308,9 +308,19 @@ NODES = [
     {'id': 'q2.17.answer', 'kind': 'spin', 'on': 'q2.17', 'adds': 'SUZs', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
      'caption_quote': 'answer', 'label': 'Q17 (2ミノ), the answer: the donation and the T',
      'rows': _b('--------s- --------ss CCCSZZUUUS CCCSSZZUCC ccc-s---cc ccccc-cccc ccccc-cccc ccccc-cccc')},
+    # ── external: harddrop's Donation T-Spin Double, the hole under the T's own nub, drawn nowhere on this page ──
+    {'id': 'nub.hd', 'kind': 'spin', 'external': 'harddrop', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'file': 'shachikutrain-technique.json', 'record': 'cross_source.harddrop.drawn_t_not_fired',
+                      'table': 16, 'board': 1},
+     'label': 'harddrop\'s 「Donation T-Spin Double」: the T\'s nub fills the two rows the TSD clears over a hole '
+              'three deep, which is open again after the clear',
+     'reading': 'harddrop Shachiku_Train table 16 board 1, recorded (and pinned) in shachikutrain-technique.json\'s '
+                'cross_source.harddrop.drawn_t_not_fired, in occupancy only: every drawn cell c, C in the rows the TSD '
+                'clears, the T U',
+     'rows': _b('---------- -----c---- ----cc---- CCCCCUUUCC CCCCCCUCCC cccccc-ccc cccccc-ccc cccccc-ccc')},
 ]
 
-PAGE_ORDER = [n['id'] for n in NODES if not n.get('derived')]
+PAGE_ORDER = [n['id'] for n in NODES if not n.get('derived') and not n.get('external')]
 
 
 def _well(k: int, board: str, side: str, rows: list, cols: list, t_cells: list, extra: list) -> dict:
@@ -387,6 +397,10 @@ DRAWINGS: dict = {
         {'board': 'hole5.b', 't_cells': [[1, 5], [1, 6], [1, 7], [2, 6]], 'mirrored': True},
         {'board': 'q2.11.answer', 't_cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'mirrored': False},
     ],
+    'nub': [
+        {'board': 'nub.hd', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': False},
+        {'board': 'nub.hd', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': True},
+    ],
     'k6': [
         {'board': 'q1.5.answer', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': False},
         {'board': 'q2.10.answer', 't_cells': [[5, 0], [5, 1], [5, 2], [6, 1]], 'mirrored': True},
@@ -406,9 +420,28 @@ VARIANTS = [
           extra=[[3, 9], [4, 9], [5, 9], [6, 9]]),
     _well(6, 'q1.5.answer', 'left', rows=[3, 4], cols=[6, 8], t_cells=[[3, 6], [3, 7], [3, 8], [4, 7]],
           extra=[[2, 0], [3, 0], [4, 0], [5, 0]]),
+    {
+        'id': 'nub', 'board': 'nub.hd', 'spin': 'TSD', 'lines': 2, 'window_basis': 'well',
+        'well': {'side': 'nub', 'offset': 0},
+        'window': {'rows': [3, 4], 'cols': [5, 7]}, 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'roof_cells': [],
+        'window_extra': {'cells': [[2, 6], [5, 6], [6, 6], [5, 5], [5, 7], [6, 5], [6, 7]],
+                         'note': 'the hole under the T\'s own nub (harddrop\'s, not the page\'s): the T fills its two '
+                                 'cells in the rows the TSD clears, so the window reads the cell above the T\'s centre '
+                                 'empty and, under the nub, a Tetris hole: two cells empty, walled on both sides'},
+        'payoff': {'kind': 'well_quad', 'board': 'nub.hd', 'piece': 'I', 'lines': 4, 'well_cell_pre_clear': [5, 6],
+                   'well_cell_after': [5, 6],
+                   'note': 'harddrop\'s: the Donation page\'s next step, a Tetris into the re-opened hole. The well '
+                           'cell is under the cleared rows, so the clear does not move it'},
+        'drawings': DRAWINGS.get('nub', []),
+    },
 ]
 
-WELL_FIRES_OTHER: list = []
+#: the nub window is symmetric about the T, so it fires in both hands wherever it fires
+WELL_FIRES_OTHER: list = [
+    {'board': 'q2.17', 'variant': 'nub', 't_cells': [[4, 4], [4, 5], [4, 6], [5, 5]], 'mirrored': m,
+     'reason': 'a T resting over the question\'s own well, clearing no row (the window reads the T\'s box and the '
+               'hole, not whether two rows clear; the corpus scores TSDs only)'} for m in (False, True)
+]
 WELL_NOT_FIRED: list = [
     {'board': 'intro.l3', 'reason': 'the page\'s own mistake: the L fills three rows, not two, so the cell under the two '
                                     'the TSD clears is filled and the hole is covered (「2列ではなく3列を埋めてしまった」)'},
@@ -427,7 +460,9 @@ OTHER_WINDOWS = {
         {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[6]', 'variant': 'k3', 'cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': [False]},
         {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[7]', 'variant': 'k1', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
         {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[7]', 'variant': 'k4', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
+        {'file': 'doubledagger-technique.json', 'board': 'nodes.tetris.spin', 'variant': 'nub', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False, True]},
         {'file': 'dtcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'k1', 'cells': [[5, 1], [5, 2], [5, 3], [6, 2]], 'mirrored': [False]},
+        {'file': 'dtcannon-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[46]', 'variant': 'nub', 'cells': [[9, 1], [9, 2], [9, 3], [10, 2]], 'mirrored': [False, True]},
         {'file': 'kaidan-technique.json', 'board': 'nodes.basic.z', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
         {'file': 'kaidan-technique.json', 'board': 'nodes.basic.o', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
         {'file': 'kaidan-technique.json', 'board': 'nodes.basic.spin', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
@@ -457,6 +492,9 @@ OTHER_WINDOWS = {
         {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[6]', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
         {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop_anchor_set.drawings[0]', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
         {'file': 'kaidan-technique.json', 'board': 'cross_source.stmb_cave_kaidan', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
+        {'file': 'parapet-technique.json', 'board': 'nodes.tss.after', 'variant': 'nub', 'cells': [[1, 1], [1, 2], [1, 3], [2, 2]], 'mirrored': [False, True]},
+        {'file': 'parapet-technique.json', 'board': 'cross_source.tetrisch.images[8]', 'variant': 'nub', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False, True]},
+        {'file': 'parapet-technique.json', 'board': 'cross_source.tetrisch.images[15]', 'variant': 'nub', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False, True]},
         {'file': 'shachikutrain-technique.json', 'board': 'nodes.basic.spin', 'variant': 'k1', 'cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'nodes.w4.spin', 'variant': 'k1', 'cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.spin', 'variant': 'k1', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
@@ -494,10 +532,12 @@ OTHER_WINDOWS = {
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[21]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[1]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[4]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'nub', 'cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'mirrored': [False, True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[8]', 'variant': 'k3', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k1', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k2', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k3', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
+        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[10]', 'variant': 'nub', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False, True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.stmb_cave.boards[0]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'cross_source.stmb_cave.boards[1]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
         {'file': 'stmbcave-technique.json', 'board': 'nodes.basic.build', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
@@ -641,6 +681,38 @@ def fires_on_donation(data: dict) -> list[dict]:
     return got
 
 
+def _hd_occ(rows: list[str]) -> list[str]:
+    """A harddrop record's board (the T `U`, every other drawn cell a letter) in this file's occupancy letters:
+    `U` kept, a drawn cell `C` in a row that would be full with the T and `c` elsewhere, empty `-`."""
+    full = {r for r, row in enumerate(rows) if '-' not in row}
+    return [''.join('-' if ch == '-' else 'U' if ch == 'U' else ('C' if r in full else 'c') for ch in row)
+            for r, row in enumerate(rows)]
+
+
+def _check_external(data: dict, byid: dict) -> list[str]:
+    """An `external` node is a harddrop drawing another transcription records and pins (no second pin here): its
+    rows are that record's board in occupancy, and the record names it by table and board."""
+    bad = []
+    for n in data['nodes']:
+        if not n.get('external'):
+            continue
+        sb = n.get('source_board') or {}
+        try:
+            other = json.loads((TECHNIQUE_DIR / sb['file']).read_text())
+            rec = other
+            for part in sb['record'].split('.'):
+                rec = rec[part]
+        except (KeyError, OSError, TypeError):
+            bad.append(f'external: {n["id"]} names no record ({sb})')
+            continue
+        e = [d for d in rec if (d.get('table'), d.get('board')) == (sb.get('table'), sb.get('board'))]
+        if n['external'] != 'harddrop' or len(e) != 1 or n['id'] in data['page_order']:
+            bad.append(f'external: {n["id"]} names no single harddrop board, or is in the page order')
+        elif n['rows'] != _hd_occ(e[0]['rows']):
+            bad.append(f'external: {n["id"]} is not {sb["file"]}\'s table {sb["table"]} board {sb["board"]} in occupancy')
+    return bad
+
+
 def extra_checks(data: dict):
     bad: list[str] = []
     xs = data.get('cross_source', {})
@@ -664,8 +736,10 @@ def extra_checks(data: dict):
             bad.append(f'named: {nid} is named as {f}\'s technique, and its window fires nowhere on it')
     if any(d['board'] == 'one.l_a' for v in data['variants'] for d in v.get('drawings', [])):
         bad.append('named: a well window fires on 欄干 (one.l_a), whose hole is under the T\'s arm (k = 0)')
-    if sorted(v['well']['offset'] for v in data['variants']) != list(range(1, 7)):
-        bad.append('named: the variants are not one per hole offset 1..6')
+    if sorted(v['well']['offset'] for v in data['variants'] if v['well']['side'] != 'nub') != list(range(1, 7)) \
+            or [v['id'] for v in data['variants'] if v['well']['side'] == 'nub'] != ['nub']:
+        bad.append('named: the variants are not one per hole offset 1..6 and one under the nub')
+    bad += _check_external(data, byid)
     # question: an answer drawn without `on` is one the page draws with a grey cell its question does not have
     # (or without one it has); that is a `<id>:question` discrepancy, and an answer that IS its question plus its
     # pieces must carry `on`
@@ -741,6 +815,14 @@ MUTANTS = [
      'other:'),
     (lambda d: _drop_named(d, 'one.s'), 'the named 階段のドネイト form no longer the Kaidan window\'s', 'named:'),
     (lambda d: d['variants'].pop(), 'a hole offset with no variant', 'named:'),
+    (lambda d: var(d, 'nub')['window_extra']['cells'].pop(), 'the nub hole one row shallower', 'window:'),
+    (lambda d: var(d, 'nub')['well'].__setitem__('offset', 1), 'the nub window off the nub', 'window:'),
+    (lambda d: var(d, 'nub')['payoff']['well_cell_pre_clear'].__setitem__(0, 6), 'the nub payoff cell not the plugged one',
+     'window:'),
+    (lambda d: _set(node(d, 'nub.hd')['rows'], 7, 0, '-'), 'the external board not harddrop\'s', 'external:'),
+    (lambda d: node(d, 'nub.hd')['source_board'].__setitem__('board', 0), 'the external board pointing elsewhere',
+     'external:'),
+    (lambda d: d['page_order'].append('nub.hd'), 'the external board in the page order', 'grammar:'),
 ]
 
 
