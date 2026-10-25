@@ -135,6 +135,11 @@ module OpenerBoard {
   // the T's own cells are never in it. There is no T-column exclusion: harddrop draws the well under
   // the T's arm and under its nub. A column whose plug, inside the cleared rows, holds such a cell
   // is not a donation (`plugComplete` in emit-opener-facts.ts).
+  //
+  // THE WELL CAME FIRST (yachi, 2026-10-25) is history the board cannot show, so it rides in the same
+  // abstract set: `inc` also holds the plug's lowest cell when, as its piece locked, the well under it
+  // was not yet the cavity floor deep (`wellAtPlug`). That cell is non-T and, under the re-opening
+  // clause, inside the cleared rows, so `PlugIncomplete` rejects the column exactly as the code does.
   ghost predicate PlugIncomplete(cleared: set<int>, inc: set<Cell>, c: int)
   {
     exists r :: r in cleared && Cell(r, c) in inc
