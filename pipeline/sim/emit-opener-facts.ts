@@ -1464,8 +1464,8 @@ function donationMetric() {
          + 'requires every column filled — and so fires on 100% of all T-spin clears, which is proved '
          + 'rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at '
          + `these thresholds without the re-opening clause fires on ${pct2(ablation.no_reopen!, scored)}% of `
-         + `this session's ${scored}, because the well-came-first clause rejects nearly every column the `
-         + 're-opening clause does. Those two carry the discrimination, and the predicate with both is what is '
+         + `this session's ${scored}. That is barely above the full predicate because the well-came-first `
+         + 'clause rejects nearly every column the re-opening clause does. Those two carry the discrimination, and the predicate with both is what is '
          + 'counted here. That figure is THIS SESSION\'s and no other: the corpus band belongs to '
          + 'whatever can see every session, which this file cannot',
     caveat: 'the oracle board source keeps the engine\'s own seeded-RNG garbage hole columns, which '
