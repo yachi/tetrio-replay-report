@@ -3,6 +3,11 @@
  * `kaidan.test.ts`): the scored T-spin loop as the matcher scores it, and harddrop's Donation predicate
  * re-implemented from `emit-opener-facts.ts`'s `donationCols` at its shipped clauses (importing that file runs a
  * session). Written once so the two tests ask one question one way; unhashed, so no artefact moves with it.
+ *
+ * Since 2026-10-25 (yachi: follow harddrop, but complete pieces) there is no T-column exclusion, and a plug cell in
+ * the cleared rows that is not the T must belong to a piece whose four cells are all on the board: `own` is the
+ * ownership grid before the T (`shachikutrain-qualify.ts`'s `owners`, -1 garbage, -2 empty, k the lock index), and
+ * `null` when the digest cannot reproduce it, which fails the clause rather than passing it.
  */
 import type { TechDigest, Cell } from '../sim/technique-facts.ts';
 
@@ -28,10 +33,9 @@ export function scored(d: TechDigest) {
 }
 
 /** DONATION (harddrop.com/wiki/Donation): the verdict for one column, or the first clause it fails. */
-export function donationVerdict(withT: boolean[][], cleared: number[], t: Cell[], c: number) {
+export function donationVerdict(withT: boolean[][], cleared: number[], t: Cell[], c: number,
+                                own: number[][] | null) {
   const inC = new Set(cleared);
-  const tRows = new Set(t.filter(q => q.col === c).map(q => q.row));
-  if (tRows.size) return 't_slot';   // any column the T is in (emit-opener-facts.ts's donationCols)
   let inR = 0, outR = 0;
   for (let r = 0; r < H; r++) { if (!withT[r]![c]) continue; inC.has(r) ? inR++ : outR++; }
   if (inR === 0) return 'naive';
@@ -44,5 +48,14 @@ export function donationVerdict(withT: boolean[][], cleared: number[], t: Cell[]
   const deep: number[] = [];
   for (let r = H - 1; r > lowest && deep.length < 4; r--) if (!withT[r]![c]) deep.push(r);
   if (!deep.every(r => (c === 0 || withT[r]![c - 1]) && (c === W - 1 || withT[r]![c + 1]))) return 'not_walled';
+  const isT = new Set(t.map(q => q.row * W + q.col));
+  for (const r of cleared) {
+    if (isT.has(r * W + c)) continue;
+    const k = own?.[r]?.[c];
+    if (k === undefined || k < 0) return 'incomplete';
+    let n = 0;
+    for (const row of own!) for (const v of row) if (v === k) n++;
+    if (n !== 4) return 'incomplete';
+  }
   return 'donation';
 }
