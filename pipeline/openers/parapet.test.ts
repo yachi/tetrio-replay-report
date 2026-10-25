@@ -49,7 +49,7 @@ import { CUTCOPY } from '../sim/technique-profile-cutcopy.ts';
 import { SHACHIKUTRAIN } from '../sim/technique-profile-shachikutrain.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
-import { H, W, scored, donationVerdict } from './technique-donation-checks.ts';
+import { H, W, scored, donationVerdict, rowBirths } from './technique-donation-checks.ts';
 import { owners } from '../sim/shachikutrain-qualify.ts';
 import { parapetQualifier, shapeOffsets as qualifyShape, type ParapetQualifyMutants } from '../sim/parapet-qualify.ts';
 
@@ -483,6 +483,9 @@ const WELL_DEPTH_LT4: string[] = [
 const RECON_DROPPED_TSD: string[] = [];
 const RECON_DROPPED_TSS: string[] = [];
 const HIT_NOT_DONATION: string[] = [
+  "2026-08-01 m6r1 pinglamb lock 43 (parapet_tss: well_late)",
+  "2026-09-03 m4r6 yachi lock 98 (parapet_tss: well_late)",
+  "2026-09-19 m18r2 pinglamb lock 120 (parapet: well_late)",
   "2026-07-22 m10r1 yachi lock 116 (parapet_tss: filled_above_window)",
   "2026-07-22 m10r4 pinglamb lock 26 (parapet: incomplete)",
   "2026-07-22 m10r5 yachi lock 92 (parapet: filled_above_window)",
@@ -1054,9 +1057,12 @@ test('donation: the shipped predicate reproduced per session and player, and eve
   for (const d of digests()) {
   const own = owners(d, d.locks.length - 1);
   const ownBefore = (i: number) => (i === 0 ? null : own.bad !== null && own.bad <= i - 1 ? null : own.boards[i - 1]!);
+  const births = rowBirths(d, d.locks.length - 1);
+  const bornBefore = (i: number) => (i === 0 ? new Array(H).fill(-1) : births[i - 1] ?? null);
+  const ownAt = (k: number) => (own.bad !== null && own.bad <= k ? null : own.boards[k] ?? null);
   for (const s of scored(d)) {
     let any = false;
-    for (let c = 0; c < W; c++) if (donationVerdict(s.withT, s.rows, s.lk.cells, c, ownBefore(s.i)) === 'donation') any = true;
+    for (let c = 0; c < W; c++) if (donationVerdict(s.withT, s.rows, s.lk.cells, c, ownBefore(s.i), bornBefore(s.i), ownAt) === 'donation') any = true;
     (count[d.session] ??= {})[d.user] = (count[d.session]![d.user] ?? 0) + (any ? 1 : 0);
     const h = hits.get(keyOf(d, s.i));
     if (!h) continue;
@@ -1065,7 +1071,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
     const P = prepare(TR, v).find(p => p.mirrored === h.mirrored)!;
     const off = windowMatch(s.board, s.lk.cells, P);
     if (!off) throw new Error(`${nameOf(d, s.i)}: the recorded hit does not match`);
-    const why = donationVerdict(s.withT, s.rows, s.lk.cells, P.well!.c + off.dc, ownBefore(s.i));
+    const why = donationVerdict(s.withT, s.rows, s.lk.cells, P.well!.c + off.dc, ownBefore(s.i), bornBefore(s.i), ownAt);
     if (why === 'donation') hitDon++;
     else notDon.push(`${nameOf(d, s.i)} (${h.variant}: ${why})`);
   }
@@ -1080,7 +1086,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
   // the window entails the re-opening INSIDE it; what a hit fails is outside it (a filled cell above the window in
   // the well column), below it (a well under four deep), or in who built the plug (a plug cell in the cleared rows
   // that is garbage or a fragment, `incomplete`): never the naive clause, never the walls the window checks
-  for (const x of HIT_NOT_DONATION) expect(x).toMatch(/: (filled_above_window|cavity_lt4|incomplete)\)$/);
+  for (const x of HIT_NOT_DONATION) expect(x).toMatch(/: (filled_above_window|cavity_lt4|incomplete|well_late)\)$/);
 }, 600_000);
 
 test('the payoff row map is verified against the engine at every step it uses', () => {

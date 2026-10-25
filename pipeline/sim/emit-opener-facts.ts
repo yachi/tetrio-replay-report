@@ -243,7 +243,7 @@ export function dualVerdict(r: SimLike, i: number) {
   const theirs = [...rec.clearedRows].sort((a, b) => a - b);
   if (!(rows.length === theirs.length && rows.every((x, k) => x === theirs[k]))) return null;
   const cv = caveAt(withT, rows, lk.cells, H);
-  return { don: donationCols(withT, rows, lk.cells, H, i > 0 ? r.provSnaps?.[i - 1] : undefined).length > 0,
+  return { don: donationCols(withT, rows, lk.cells, H, i > 0 ? r.provSnaps?.[i - 1] : undefined, 'shipped', r.provSnaps, garbageIn(r)).length > 0,
            cave: !!(cv && cv.width >= CAVE_MIN_WIDTH), board: withT };
 }
 
@@ -255,6 +255,8 @@ type SimLike = {
   records: { frame: number; clearedRows: number[] }[];
   /** The provenance grid after each lock — what `donationCols`' complete-pieces clause reads. */
   provSnaps?: (number | null)[][][];
+  /** Garbage insertions by lock — what the well-came-first clause reads beside `provSnaps`. */
+  garbageEvents?: { lockIndex: number; amt: number }[];
 };
 
 /** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
@@ -288,13 +290,13 @@ export function cavity(g: boolean[][], col: number, h: number) {
  */
 export const DONATION_ABLATIONS = {
   /** every clause — what the tables actually count */
-  shipped:           { minCavity: DONATION_CAVITY, walled: true,  reopen: true,  complete: true },
+  shipped:           { minCavity: DONATION_CAVITY, walled: true,  reopen: true,  complete: true,  existed: true },
   /** the re-opening clause deleted: the plug may be a wall. This is where the power is */
-  no_reopen:         { minCavity: DONATION_CAVITY, walled: true,  reopen: false, complete: true },
+  no_reopen:         { minCavity: DONATION_CAVITY, walled: true,  reopen: false, complete: true,  existed: true },
   /** ...and the cavity floor dropped to a single cell, i.e. any dent under any plug */
-  cavity1_no_reopen: { minCavity: 1,               walled: true,  reopen: false, complete: true },
+  cavity1_no_reopen: { minCavity: 1,               walled: true,  reopen: false, complete: true,  existed: true },
   /** the naive reading alone. Proved to fire on everything; emitted as the control */
-  naive:             { minCavity: 0,               walled: false, reopen: false, complete: false },
+  naive:             { minCavity: 0,               walled: false, reopen: false, complete: false, existed: false },
 } as const;
 export type DonationAblation = keyof typeof DONATION_ABLATIONS;
 
@@ -315,6 +317,37 @@ export function plugComplete(c: number, cleared: number[], isT: Set<number>, pro
   return true;
 }
 
+/** How deep the well under column `c`'s plug was WHEN THE PLUG WENT IN: the empty cells straight under the plug's
+ *  lowest cell, in the provenance grid right after the piece holding that cell locked (`snaps[q]`), down to the
+ *  first filled cell or the floor. A T cell at the bottom of the plug is placed by this very lock, so the well is
+ *  the one under it now (`Infinity`). `null` when the grids cannot say. */
+/** Garbage rows inserted on each lock's tick (`garbageEvents`, by `lockIndex`), after that lock's cells. */
+export function garbageIn(r: { locks: unknown[]; garbageEvents?: { lockIndex: number; amt: number }[] }): number[] | undefined {
+  if (!r.garbageEvents) return undefined;
+  const g = new Array(r.locks.length).fill(0);
+  for (const e of r.garbageEvents) if (e.lockIndex < g.length) g[e.lockIndex] += e.amt;
+  return g;
+}
+
+export function wellAtPlug(withT: boolean[][], c: number, isT: Set<number>, h: number, prov: Prov,
+                           snaps: (number | null)[][][] | undefined, gIn: number[] | undefined): number | null {
+  let lowest = -1;
+  for (let r = 0; r < h; r++) if (withT[r]![c]) lowest = r;
+  if (lowest < 0) return null;
+  if (isT.has(lowest * BOARD_WIDTH + c)) return Infinity;
+  const q = prov?.[lowest]?.[c];
+  const at = typeof q === 'number' && q >= 0 ? snaps?.[q] : undefined;
+  if (!at || !gIn) return null;
+  // the garbage that came in on the plug's own lock rose under a piece already laid: not there to be covered
+  const floor = at.length - (gIn[q as number] ?? 0);
+  let r0 = -1;
+  for (let r = 0; r < at.length; r++) if (at[r]?.[c] === q) r0 = r;
+  if (r0 < 0) return null;
+  let n = 0;
+  for (let r = r0 + 1; r < floor && at[r]![c] == null; r++) n++;
+  return n;
+}
+
 /**
  * DONATION (harddrop.com/wiki/Donation) — the well columns this T-spin clear donated into.
  *
@@ -332,12 +365,20 @@ export function plugComplete(c: number, cleared: number[], isT: Set<number>, pro
  * provenance grid) and never a fragment a line clear left behind. `prov` is the provenance grid BEFORE this
  * lock (`provSnaps[i - 1]`); the T's own cells are complete by definition.
  *
+ * THE WELL CAME FIRST (yachi, 2026-10-25: 「個窿用 O 塞住嘅時候，窿未出現，應該唔算」): when the piece at the
+ * bottom of the plug locked, the well under it must already have been at least the cavity floor deep
+ * (`wellAtPlug`, read from `snaps`, the provenance grid after every lock, less the garbage rows `gIn` says came
+ * in on that lock's own tick — they rose under the piece after it was laid). A piece laid on the stack with the
+ * well opened under it later — garbage rising with its hole in that column — covered nothing. A T at the bottom
+ * of the plug is placed by this lock, over the well as it is now. Missing `snaps` or `gIn` fails the clause.
+ *
  * `abl` names an ablation to evaluate INSTEAD of the shipped predicate. It is a parameter rather
  * than a second function on purpose: an ablation implemented as a copy is not an ablation of this
  * code, and would keep answering the old question after this one changed.
  */
 export function donationCols(withT: boolean[][], cleared: number[], t: { row: number; col: number }[], h: number,
-                             prov: Prov, abl: DonationAblation = 'shipped') {
+                             prov: Prov, abl: DonationAblation = 'shipped',
+                             snaps?: (number | null)[][][], gIn?: number[]) {
   const A = DONATION_ABLATIONS[abl];
   const inCleared = new Set(cleared);
   const isT = new Set(t.map(q => q.row * BOARD_WIDTH + q.col));
@@ -358,6 +399,7 @@ export function donationCols(withT: boolean[][], cleared: number[], t: { row: nu
       (c === 0 || withT[r]![c - 1]) && (c === BOARD_WIDTH - 1 || withT[r]![c + 1]));
     if (A.walled && !walled) continue;
     if (A.complete && !plugComplete(c, cleared, isT, prov)) continue;   // complete pieces only
+    if (A.existed && !((wellAtPlug(withT, c, isT, h, prov, snaps, gIn) ?? -1) >= A.minCavity)) continue;  // well first
     out.push({ col: c, cavity: cav });
   }
   return out;
@@ -624,6 +666,7 @@ for (const c of loadCases(dir)) {
 
   // metrics 7 & 8 — the two board-state techniques, over the same verified prefix as the geometry
   // above. Both read the board the T went into, so both are collected in one pass.
+  const gIn = garbageIn(r);
   for (let i = 0; i < r.locks.length; i++) {
     const lk = r.locks[i]!;
     if (lk.piece !== 'T' || lk.spin === 'none' || lk.cleared === 0 || i > v) continue;
@@ -643,7 +686,7 @@ for (const c of loadCases(dir)) {
     reconAgreed++;
 
     const prov = i > 0 ? r.provSnaps[i - 1] : undefined;
-    const wells = donationCols(withT, mine, lk.cells, H, prov);
+    const wells = donationCols(withT, mine, lk.cells, H, prov, 'shipped', r.provSnaps, gIn);
     let donation: TSpinClear['donation'] = null;
     if (wells.length) {
       const w = wells[0]!;
@@ -672,7 +715,7 @@ for (const c of loadCases(dir)) {
 
     const cave = caveAt(withT, mine, lk.cells, H);
     const abl = Object.fromEntries((Object.keys(DONATION_ABLATIONS) as DonationAblation[])
-      .map(k => [k, donationCols(withT, mine, lk.cells, H, prov, k).length > 0])) as Record<DonationAblation, boolean>;
+      .map(k => [k, donationCols(withT, mine, lk.cells, H, prov, k, r.provSnaps, gIn).length > 0])) as Record<DonationAblation, boolean>;
     if (abl.shipped !== (donation !== null))
       throw new Error(`donation ablation 'shipped' disagrees with the shipped path at lock ${i}`);
     tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave, abl,
@@ -1415,12 +1458,14 @@ function donationMetric() {
     },
     means: 'how many verified T-spin clears were fired across a plugged well that the clear then '
          + 're-opened — every filled cell of that column lay inside the cleared rows, with at least '
-         + `${DONATION_CAVITY} empty cells walled beneath it. The naive reading of the technique `
+         + `${DONATION_CAVITY} empty cells walled beneath it, and that well already there when the plug's `
+         + 'lowest piece locked (garbage rising under a plug later opens no well it covered). The naive reading of the technique '
          + '("the well was filled through the cleared rows") is FORCED BY ARITHMETIC — a full row '
          + 'requires every column filled — and so fires on 100% of all T-spin clears, which is proved '
          + 'rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at '
          + `these thresholds without the re-opening clause fires on ${pct2(ablation.no_reopen!, scored)}% of `
-         + `this session's ${scored}. The discriminating clause is the re-opening, and that is what is `
+         + `this session's ${scored}, because the well-came-first clause rejects nearly every column the `
+         + 're-opening clause does. Those two carry the discrimination, and the predicate with both is what is '
          + 'counted here. That figure is THIS SESSION\'s and no other: the corpus band belongs to '
          + 'whatever can see every session, which this file cannot',
     caveat: 'the oracle board source keeps the engine\'s own seeded-RNG garbage hole columns, which '

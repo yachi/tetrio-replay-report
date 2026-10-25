@@ -3160,26 +3160,32 @@ every column filled, so that clause counts line clears. That is not a measuremen
 `NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly
 <!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->15141<!--/don:scored--> scored
 clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening clause
-deleted — it fires on <!--don:noreopen-band-->15.40-20.72%<!--/don:noreopen-band-->. All the
-discriminating power is in the **re-opening** clause: every filled cell of the column must lie
-inside the cleared rows, so the clear leaves it open surface-to-floor. With it, the rate drops to
-<!--don:shipped-band-->1.79-3.66%<!--/don:shipped-band--> per session
-(<!--don:donations-->365<!--/don:donations--> donations across
+deleted — it fires on <!--don:noreopen-band-->1.63-2.94%<!--/don:noreopen-band-->. Until 2026-10-25 all the
+discriminating power was in the **re-opening** clause (every filled cell of the column must lie
+inside the cleared rows, so the clear leaves it open surface-to-floor): without it the predicate fired on
+15-21%. Since then a second clause carries most of it, **the well came first** (yachi: 「個窿用 O 塞住嘅時候，
+窿未出現，應該唔算」): when the piece at the bottom of the plug locked, the well under it must already have
+been at least four deep — on the provenance grid right after that lock, less the garbage rows that came in
+on its own tick (`wellAtPlug`). A plug laid on the floor with garbage rising under it later, its hole in
+that column, covered nothing. The two clauses now overlap almost entirely, which is why the band above
+sits just over the shipped one. With both, the rate is
+<!--don:shipped-band-->1.43-2.70%<!--/don:shipped-band--> per session
+(<!--don:donations-->294<!--/don:donations--> donations across
 <!--don:sessions-->nineteen<!--/don:sessions--> sessions).
 
 **Every band above is RENDERED from the seven artefacts, and until 2026-08-24 none of them was.**
 `pipeline/check_donation_bands.py --render` prints each marked fragment; `donation.ablation` in
 every `sessions/*/sim/opener-facts.json` carries that session's own counts. The per-session series
-read <!--don:noreopen-series-->15.60 · 17.83 · 17.57 · 16.83 · 18.23 · 20.72 · 20.05 · 15.92 · 16.60 · 16.50 · 16.09 · 19.85 · 17.17 · 16.77 · 15.40 · 17.81 · 18.21 · 17.68 · 16.92<!--/don:noreopen-series-->
-for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-08-14<!--/don:noreopen-ceiling--> is
+read <!--don:noreopen-series-->2.77 · 2.94 · 2.88 · 2.61 · 2.12 · 1.79 · 2.75 · 1.78 · 2.12 · 1.63 · 2.65 · 2.70 · 2.50 · 2.07 · 1.80 · 1.75 · 2.02 · 2.21 · 2.65<!--/don:noreopen-series-->
+for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-07-24<!--/don:noreopen-ceiling--> is
 the ceiling) and
-<!--don:cav1-series-->48.55 · 47.79 · 49.20 · 52.45 · 49.20 · 47.03 · 47.94 · 48.00 · 45.95 · 47.88 · 48.09 · 48.55 · 46.29 · 48.50 · 45.22 · 48.16 · 45.36 · 48.90 · 45.27<!--/don:cav1-series-->
+<!--don:cav1-series-->19.75 · 18.20 · 21.41 · 18.79 · 18.76 · 16.80 · 18.54 · 17.04 · 15.83 · 18.30 · 17.74 · 16.18 · 18.08 · 17.71 · 16.71 · 17.46 · 17.37 · 16.57 · 20.40<!--/don:cav1-series-->
 for the `cavity ≥ 1` composite, whose band is
-<!--don:cav1-band-->45.22-52.45%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
-<!--don:pooled-noreopen-->17.29<!--/don:pooled-noreopen-->, cav1
-<!--don:pooled-cav1-->47.61<!--/don:pooled-cav1--> — a per-session band can break while no pooled
+<!--don:cav1-band-->15.83-21.41%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
+<!--don:pooled-noreopen-->2.23<!--/don:pooled-noreopen-->, cav1
+<!--don:pooled-cav1-->17.90<!--/don:pooled-cav1--> — a per-session band can break while no pooled
 number moves, which is why the series is published beside them. A session above
-<!--don:cav1-ceiling-->52.45<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
+<!--don:cav1-ceiling-->21.41<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
 
 **The bands are quoted at two decimals on purpose, and rounding them cost the third defect.** At one
 decimal the shipped band was published as 「2.1-3.3%」 while its floor is 2.08 — a band's low end
@@ -3237,16 +3243,16 @@ keep the clause (only `naive` drops it, being the whole naive reading), so every
 
 **Nearly every donation in this corpus sits on a garbage-derived well, and 2026-09-10 is the
 session that ended the absolute**
-(<!--don:latest-garbage-->10-22 adds 16 of 16<!--/don:latest-garbage-->;
-**<!--don:self-built-->18 of 365<!--/don:self-built-->** self-built corpus-wide).
+(<!--don:latest-garbage-->10-22 adds 15 of 15<!--/don:latest-garbage-->;
+**<!--don:self-built-->18 of 294<!--/don:self-built-->** self-built corpus-wide).
 This sentence read 「every donation … 0 self-built, every session」 for nine sessions; 09-10 and 09-11
 held the first three, all yachi's mid-game `natural` plugs (`replay-2026-09-10-01.ttrm` r6 plugs a
 4-cell cavity at lock 40 of a prefix verified to 64, `replay-2026-09-10-07.ttrm` r7 a 5-cell cavity
 at lock 75 of one verified to 82). Counting the T's columns again (2026-10-25) took the list to ten
 sessions and both players (measured, not explained). They
 are named per session in `SELF_BUILT_WELLS` in `openers.test.ts` rather than absorbed into a bound,
-following `DT_ORDER_IN_OPENER`; read the counts there, never here. The three long sessions hold 102
-of the 365, and 09-18 carries four of the self-built ones — so 「not one of them self-built」, which
+following `DT_ORDER_IN_OPENER`; read the counts there, never here. The three long sessions hold 81
+of the 294, and 09-18 carries four of the self-built ones — so 「not one of them self-built」, which
 this paragraph said of those nights until then, is no longer true either. **The same
 absolute was also written into every per-session artefact**, in
 the `donation.caveat` string, which is the `29-34%` defect exactly: a corpus claim inside a file
@@ -3384,20 +3390,20 @@ verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
 whole finding. Both verdicts are rare —
-<!--dual:rare-->177 caves and 365 donations in 15141 scored clears<!--/dual:rare--> — so an
+<!--dual:rare-->177 caves and 294 donations in 15141 scored clears<!--/dual:rare--> — so an
 overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
 | cave | <!--dual:cave-overall-->6331/6331 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->75 / 75<!--/dual:cave-pos-->** |
-| donation | <!--dual:don-overall-->6074/6331 (96.0%)<!--/dual:don-overall--> | **<!--dual:don-pos-->24 / 116<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->20.7%<!--/dual:don-pos-pct-->) |
+| donation | <!--dual:don-overall-->6137/6331 (97.0%)<!--/dual:don-overall--> | **<!--dual:don-pos-->21 / 71<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->29.6%<!--/dual:don-pos-pct-->) |
 
-The donation's overall rate is **<!--dual:don-bothno-->6050 of 6074<!--/dual:don-bothno-->**
+The donation's overall rate is **<!--dual:don-bothno-->6116 of 6137<!--/dual:don-bothno-->**
 agreements being both engines saying "no". On the thing the
-table actually counts the two engines disagree about **four donations in five** — the opposite
+table actually counts the two engines disagree about **seven donations in ten** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
-<!--dual:bothno-share-->0.9960<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
+<!--dual:bothno-share-->0.9965<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
 `pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
@@ -3424,7 +3430,7 @@ completely:
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
 | cave | <!--dual:row-cave-->75 | 11 | 75/75 | 11/11 | 64/64<!--/dual:row-cave--> |
-| donation | <!--dual:row-don-->116 | 22 | 24/116 | 22/22 | 2/94<!--/dual:row-don--> |
+| donation | <!--dual:row-don-->71 | 21 | 21/71 | 21/21 | 0/50<!--/dual:row-don--> |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
@@ -3528,8 +3534,8 @@ it at all:
   three more Double-first openers than C-Spin orders allow breaks it. The sentence that stood here said 「the next session like 10-09
   will break it」; 10-12 was not one like 10-09 (3 Double-first openers, not 29), so it did not, and
   the prediction stays a conditional rather than a forecast. Decide it the same way when one does.)
-- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:3.2
-  (86 in-opener, 279 mid-game), so it is not purely mid-game.
+- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:5.5
+  (45 in-opener, 249 mid-game), so it is not purely mid-game.
 
 **The cave's window result was an absolute for six sessions and 2026-08-19 broke half of it. Read
 the two halves apart — they are not one claim.**

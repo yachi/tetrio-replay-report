@@ -8,7 +8,7 @@
     "the ordering metric is scored on 73 of 138 rounds — those holding both a T-spin Double and a T-spin Triple; rounds with only one of the two cannot show an order",
     "the ordering metric names a CLASS, not an opener: harddrop files 38 openers under \"Triple Double openers\" — C-Spin, Honey Cup, Stray Cannon and Mountainous Stacking among them — and every one of them opens Triple-before-Double",
     "the named-opener match is bounded by how each opener is DRAWN: 299 of 783 catalogue pages are free of a full row and so could ever equal a no-clear opening board; TKI-3 has 12 catalogue pages and none of them qualify, which is why harddrop's own diagrams are carried alongside",
-    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 24 of 25 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
+    "the donation metric is bounded by the oracle's GARBAGE HOLE COLUMNS: 17 of 18 donations here sit on a garbage-derived well, and the oracle keeps the engine's own seeded-RNG hole columns, which disagree with the ige-recorded ones 97 of 103 times (oracle-source.ts) — so the shape is counted, but which column any one donation used is not established"
   ],
   "session": "2026-08-19",
   "gate": "frame+amount+row (ige row oracle must agree)",
@@ -3282,9 +3282,9 @@
       "locks_same_board": 154,
       "board_split": {
         "don": {
-          "positives_same_board": 1,
-          "positives_diff_board": 6,
-          "agree_same_board": 1,
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
           "agree_diff_board": 0
         },
         "cave": {
@@ -3295,17 +3295,17 @@
         }
       },
       "donation": {
-        "both_yes": 1,
-        "oracle_only": 6,
-        "other_only": 10,
-        "both_no": 283,
-        "oracle_positives": 7,
+        "both_yes": 0,
+        "oracle_only": 3,
+        "other_only": 8,
+        "both_no": 289,
+        "oracle_positives": 3,
         "agreement_on_positives": [
-          1,
-          7
+          0,
+          3
         ],
         "agreement_overall": [
-          284,
+          289,
           300
         ]
       },
@@ -3330,26 +3330,26 @@
         "user": "pinglamb",
         "tspin_clears_scored": 390,
         "tspin_clears_replay": 400,
-        "donations": 14,
+        "donations": 9,
         "self_built_well": 1,
-        "garbage_derived_well": 13,
-        "natural": 4,
+        "garbage_derived_well": 8,
+        "natural": 1,
         "b2b_breaking": 0,
-        "plug_unknown": 10,
-        "in_opener": 3,
-        "mid_game": 11
+        "plug_unknown": 8,
+        "in_opener": 2,
+        "mid_game": 7
       },
       {
         "user": "yachi",
         "tspin_clears_scored": 338,
         "tspin_clears_replay": 351,
-        "donations": 11,
+        "donations": 9,
         "self_built_well": 0,
-        "garbage_derived_well": 11,
-        "natural": 2,
+        "garbage_derived_well": 9,
+        "natural": 0,
         "b2b_breaking": 0,
         "plug_unknown": 9,
-        "in_opener": 6,
+        "in_opener": 4,
         "mid_game": 5
       }
     ],
@@ -3357,19 +3357,19 @@
     "ablation": {
       "scored": 728,
       "counts": {
-        "shipped": 25,
-        "no_reopen": 146,
-        "cavity1_no_reopen": 349,
+        "shipped": 18,
+        "no_reopen": 20,
+        "cavity1_no_reopen": 135,
         "naive": 728
       },
       "rate_pct": {
-        "shipped": "3.43",
-        "no_reopen": "20.05",
-        "cavity1_no_reopen": "47.94",
+        "shipped": "2.47",
+        "no_reopen": "2.75",
+        "cavity1_no_reopen": "18.54",
         "naive": "100.00"
       }
     },
-    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it. The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 20.05% of this session's 728. The discriminating clause is the re-opening, and that is what is counted here. That figure is THIS SESSION's and no other: the corpus band belongs to whatever can see every session, which this file cannot",
+    "means": "how many verified T-spin clears were fired across a plugged well that the clear then re-opened — every filled cell of that column lay inside the cleared rows, with at least 4 empty cells walled beneath it, and that well already there when the plug's lowest piece locked (garbage rising under a plug later opens no well it covered). The naive reading of the technique (\"the well was filled through the cleared rows\") is FORCED BY ARITHMETIC — a full row requires every column filled — and so fires on 100% of all T-spin clears, which is proved rather than measured (NaiveClauseForced, spec/DonationCave.dfy); the same predicate at these thresholds without the re-opening clause fires on 2.75% of this session's 728, because the well-came-first clause rejects nearly every column the re-opening clause does. Those two carry the discrimination, and the predicate with both is what is counted here. That figure is THIS SESSION's and no other: the corpus band belongs to whatever can see every session, which this file cannot",
     "caveat": "the oracle board source keeps the engine's own seeded-RNG garbage hole columns, which disagree with the ige-recorded ones 97 of 103 times (see oracle-source.ts). So the count says the board offered this shape that often; it does not establish WHICH column any one donation used, and it may never be read as \"this player donated into that well\". How many of THIS session's wells were garbage-derived is the per-player split beside it (garbage_derived_well / self_built_well) — read that, never a corpus absolute: this sentence said \"every donation in this corpus sits on a garbage-derived well\" until 2026-09-10, which held for nine sessions and then did not, and no per-session file can check a claim about the corpus. Same rule as the ablation band above"
   },
   "stmb_cave": {
@@ -3465,9 +3465,9 @@
       "locks_same_board": 154,
       "board_split": {
         "don": {
-          "positives_same_board": 1,
-          "positives_diff_board": 6,
-          "agree_same_board": 1,
+          "positives_same_board": 0,
+          "positives_diff_board": 3,
+          "agree_same_board": 0,
           "agree_diff_board": 0
         },
         "cave": {
@@ -3478,17 +3478,17 @@
         }
       },
       "donation": {
-        "both_yes": 1,
-        "oracle_only": 6,
-        "other_only": 10,
-        "both_no": 283,
-        "oracle_positives": 7,
+        "both_yes": 0,
+        "oracle_only": 3,
+        "other_only": 8,
+        "both_no": 289,
+        "oracle_positives": 3,
         "agreement_on_positives": [
-          1,
-          7
+          0,
+          3
         ],
         "agreement_overall": [
-          284,
+          289,
           300
         ]
       },

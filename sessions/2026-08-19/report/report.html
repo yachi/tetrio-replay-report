@@ -7272,7 +7272,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     <h3>五 · 捐窿（Donation）</h3>
     <div class="method-note">
-      <p><strong>捐窿</strong>係 harddrop 收嘅一招：落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、嗰條欄最低嗰格填咗嘅嘢下面仲有最少 4 格空、最深嗰 4 行兩邊都有牆嘅 T-spin 消行；塞住條井嗰啲格可以係隻 T 自己（harddrop 都係咁畫），唔係 T 嘅就要屬於一粒四格齊晒喺板上面嘅方塊，垃圾行同消行剩低嘅碎都唔計。重砌返嘅板同引擎自己記低嘅消行逐個對過：<strong>728／728</strong> 個對得上，對唔上嗰 0 個<strong>直接唔計</strong>。</p>
+      <p><strong>捐窿</strong>係 harddrop 收嘅一招：落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、嗰條欄最低嗰格填咗嘅嘢下面仲有最少 4 格空、最深嗰 4 行兩邊都有牆嘅 T-spin 消行；塞住條井嗰啲格可以係隻 T 自己（harddrop 都係咁畫），唔係 T 嘅就要屬於一粒四格齊晒喺板上面嘅方塊，垃圾行同消行剩低嘅碎都唔計。仲有，塞喺最底嗰粒落定嗰陣，條井下面<strong>已經</strong>有最少 4 格空：先塞住、之後先有垃圾行升上嚟喺嗰條欄開個窿，咁唔係捐窿，因為塞嗰陣個窿未出現。重砌返嘅板同引擎自己記低嘅消行逐個對過：<strong>728／728</strong> 個對得上，對唔上嗰 0 個<strong>直接唔計</strong>。</p>
       <p>淨係睇「條井喺消嘅行度有冇填」係冇意義嘅——因為一行要滿，嗰格本來就一定要填，咁樣數會數到絕大部分嘅 T-spin。分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>
     </div>
     <div class="scroll-x">
@@ -7281,15 +7281,15 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><th>玩家</th><th>可核 T-spin 消行</th><th>全局（replay 自己數）</th><th>可核覆蓋</th><th>捐窿</th><th>佔可核 T-spin</th><th>頭 21 手內</th><th>第 21 手之後</th><th>自己砌嘅井</th><th>垃圾行留低嘅井</th><th>塞嗰手冇消行（Natural）</th><th>塞嗰手消咗行（斷 B2B）</th><th>塞嗰手查唔到</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">390</td><td class="mono">400</td><td class="mono">97.5%</td><td class="mono">14</td><td class="mono">3.5%</td><td class="mono">3</td><td class="mono">11</td><td class="mono">1</td><td class="mono">13</td><td class="mono">4</td><td class="mono">0</td><td class="mono">10</td></tr>
-          <tr><td>yachi</td><td class="mono">338</td><td class="mono">351</td><td class="mono">96.2%</td><td class="mono">11</td><td class="mono">3.2%</td><td class="mono">6</td><td class="mono">5</td><td class="mono">0</td><td class="mono">11</td><td class="mono">2</td><td class="mono">0</td><td class="mono">9</td></tr>
+          <tr><td>pinglamb</td><td class="mono">390</td><td class="mono">400</td><td class="mono">97.5%</td><td class="mono">9</td><td class="mono">2.3%</td><td class="mono">2</td><td class="mono">7</td><td class="mono">1</td><td class="mono">8</td><td class="mono">1</td><td class="mono">0</td><td class="mono">8</td></tr>
+          <tr><td>yachi</td><td class="mono">338</td><td class="mono">351</td><td class="mono">96.2%</td><td class="mono">9</td><td class="mono">2.6%</td><td class="mono">4</td><td class="mono">5</td><td class="mono">0</td><td class="mono">9</td><td class="mono">0</td><td class="mono">0</td><td class="mono">9</td></tr>
         </tbody>
       </table>
     </div>
     <div class="method-note"><p><strong>個分母而家有第二個來源，分子冇。</strong>呢兩個表數嘅係「可核嗰段」入面嘅 T-spin 消行，而「全局」嗰欄係<em>replay 自己數</em>嘅——<code>tspindoubles</code> 同佢七個兄弟，<code>extract.py</code> 同 <code>extract2.ts</code> 兩個抽取器各自讀入 <code>facts.json</code>，所以嗰個數本身已經喺信任鏈入面。逐個玩家回合、逐種消行對過：<strong>140／140</strong> 個回合全中，全場 <strong>751</strong> 個對 <strong>751</strong> 個。即係話個分母唔再係模擬器自己講嘅數，可核嗰段覆蓋咗其中 <strong>96.9%</strong>。<strong>但係分子照舊隔離</strong>——邊一次算捐窿、邊一次算窿，依然淨係得呢一個模擬器講，所以呢一節仍然冇 claim id、冇 ✓ 章。</p></div>
-    <div class="method-note"><p><strong>第二個引擎對唔上。</strong>兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>7</strong> 次入面，另一個引擎<strong>得 1 次同意</strong>（另一邊反過來多認 10 次）。<strong>唔好睇「成體 94.6% 啱」嗰個數</strong>——嗰 284 次入面有 283 次係兩邊都話「唔係」，咁樣量緊嘅係塊板嘅底，唔係呢個 metric。呢個對照淨係去到 <strong>300／728</strong>（41.2%）個可核 T-spin —— hand-port 自己可核嗰段短好多，去唔到嘅位就冇得對。<strong>兩個引擎有冇睇緊同一塊板？</strong>可比嘅 300 個 lock 入面，淨係 <strong>154</strong> 個（51.3%）兩邊逐格一模一樣，上面每個數都要放喺呢個前提入面睇。而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義：板一樣嗰 1 次，兩邊同意 <strong>1</strong> 次；板唔一樣嗰 6 次，就淨係同意 0 次。兩個引擎唔係對「乜嘢先算捐窿」有分歧，係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。所以呢個表<strong>冇</strong>第二個實作撐住，同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。</p></div>
-    <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 25 次捐窿入面，24 次條井係垃圾行留低嘅，1 次係自己砌返嚟嘅。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
-    <div class="method-note"><p><strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，而呢場 25 次捐窿，落喺頭 21 手（開局窗）之內嘅有 <strong>9</strong> 次，之後嘅有 <strong>16</strong> 次。大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）</p></div>
+    <div class="method-note"><p><strong>第二個引擎對唔上。</strong>兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>3</strong> 次入面，另一個引擎<strong>得 0 次同意</strong>（另一邊反過來多認 8 次）。<strong>唔好睇「成體 96.3% 啱」嗰個數</strong>——嗰 289 次入面有 289 次係兩邊都話「唔係」，咁樣量緊嘅係塊板嘅底，唔係呢個 metric。呢個對照淨係去到 <strong>300／728</strong>（41.2%）個可核 T-spin —— hand-port 自己可核嗰段短好多，去唔到嘅位就冇得對。<strong>兩個引擎有冇睇緊同一塊板？</strong>可比嘅 300 個 lock 入面，淨係 <strong>154</strong> 個（51.3%）兩邊逐格一模一樣，上面每個數都要放喺呢個前提入面睇。而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義：板一樣嗰 0 次，兩邊同意 <strong>0</strong> 次；板唔一樣嗰 3 次，就淨係同意 0 次。兩個引擎唔係對「乜嘢先算捐窿」有分歧，係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。所以呢個表<strong>冇</strong>第二個實作撐住，同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。</p></div>
+    <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 18 次捐窿入面，17 次條井係垃圾行留低嘅，1 次係自己砌返嚟嘅。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
+    <div class="method-note"><p><strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，而呢場 18 次捐窿，落喺頭 21 手（開局窗）之內嘅有 <strong>6</strong> 次，之後嘅有 <strong>12</strong> 次。大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）</p></div>
 
     <h3>六 · STMB Cave（浮空 T-spin Double）</h3>
     <div class="method-note">
