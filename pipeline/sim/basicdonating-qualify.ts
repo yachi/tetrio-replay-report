@@ -14,10 +14,9 @@
  *      them are donations — the page names its %Sドネイト as 階段のドネイト, its %LドネイトA as 欄干 and its
  *      %S%ZドネイトA as STMB Cave, and the Shachiku Train's first TSD is a donation one column past the arm (the
  *      transcriptions' `other_windows`, measured) — so a T another page claims is that page's, counted once.
- *   3. `nearer_well`: a smaller-k window fires at the same T, the nub's counting as 0 (so a nub hit is never one, and
- *      a k hit the nub window also fires at is). A T can fill two holes at once (the page's own Q16 and
- *      Q17 answers draw it); the T is counted once, at its nearest hole. A nub window under which `shallow_well`
- *      would fail does not claim the T: a dent under the nub is no hole, so the farther hole is the donation.
+ *   3. `nearer_well`: a smaller-k window fires at the same T. A T can fill two holes at once (the page's own Q16 and
+ *      Q17 answers draw it); the T is counted once, at its nearest hole. The nub window never claims a T (rule 6: it
+ *      is no donation), so a k hit is not blocked by it.
  *   4. `well_covered`: a filled cell anywhere above the window in the hole's column, so the clear does not leave the
  *      hole open from the top (harddrop's re-opening clause). No drawing on the page has one (measured by the facts
  *      test on every drawing).
@@ -26,6 +25,11 @@
  *      donation keeps a Tetris well open (harddrop's Donation page draws a cavity of at least 4, the shipped
  *      donation predicate's D = 4). The k variants are left as the page draws them: its boards are cropped below the
  *      hole, so they fix no depth.
+ *   6. `t_covers_hole`, the `nub` variant only, always: the hole is covered by the T itself. yachi's definition
+ *      (2026-10-24): a donation covers the hole TEMPORARILY with other pieces, which the TSD clears so the hole is
+ *      open again; the T is not the cover. So no nub hit counts on this page. The variant and harddrop's drawing
+ *      stay, so the page can show the shape harddrop calls a donation and say why it is not counted here (the
+ *      社畜トレイン precedent: the shape is drawn, the corpus counts 0).
  *
  * Every other technique's transcription is read here, so each is in the profile's hashed files.
  */
@@ -40,7 +44,7 @@ export const OTHER_PAGES = ['stsd', 'stmbcave', 'imperialcross', 'doubledagger',
 
 export interface DonationQualifyMutants { allowFragments?: boolean; allowGarbage?: boolean; noDpc?: boolean;
                                           noOtherPage?: boolean; noNearer?: boolean; noCovered?: boolean;
-                                          noShallow?: boolean }
+                                          noShallow?: boolean; noTCovers?: boolean }
 
 /** The nub's hole must take an I: at least this many empty cells under the nub. */
 export const SHALLOW_BELOW = 4;
@@ -81,16 +85,9 @@ export function donationQualifier(transcriptionPath: string, openersDir: string,
     const t = d.tspins.find(x => x.i === h.lock)!;
     if (!mut.noOtherPage && others.some((P: any) => !!windowMatch(t.board, lk.cells, P))) reasons.push('other_page');
     const k = offset.get(h.variant)!;
-    const claims = (P: any) => {
-      const off = windowMatch(t.board, lk.cells, P);
-      if (!off) return false;
-      if (mut.noShallow || !nub.has(P.id)) return true;
-      const c = P.well!.c + off.dc;
-      let n = 0;
-      for (let r = P.well!.r + off.dr; r < t.board.length && t.board[r]![c] === '.'; r++) n++;
-      return n >= SHALLOW_BELOW;
-    };
-    if (!mut.noNearer && mine.some((P: any) => offset.get(P.id)! < k && claims(P))) reasons.push('nearer_well');
+    // the nub window is no donation (rule 6), so it never claims a T from a farther hole
+    if (!mut.noNearer && mine.some((P: any) => !nub.has(P.id) && offset.get(P.id)! < k && !!windowMatch(t.board, lk.cells, P)))
+      reasons.push('nearer_well');
     if (!mut.noCovered) {
       // the window's own cells in the hole's column, re-read on the board at this hit's offset and hand
       const P = mine.find((x: any) => x.id === h.variant && x.mirrored === h.mirrored)!;
@@ -104,6 +101,7 @@ export function donationQualifier(transcriptionPath: string, openersDir: string,
       if (h.well_depth === undefined) throw new Error(`basicdonating qualify: nub hit with no well_depth`);
       if (h.well_depth < SHALLOW_BELOW) reasons.push('shallow_well');
     }
+    if (!mut.noTCovers && nub.has(h.variant)) reasons.push('t_covers_hole');
     return { qualifies: reasons.length === 0, not_qualified: reasons };
   };
 }

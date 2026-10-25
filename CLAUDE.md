@@ -5126,12 +5126,17 @@ on none of them. It is SYMMETRIC about the T, so `technique-facts.ts`'s `prepare
 window's (a hit is recorded as drawn; the gate still records both hands), which is the one change to a hashed rule file and
 moved every technique artefact's `emitter_md5` / `classifier_md5` (and `dpc-facts.json`'s) and nothing else. Qualify: it has
 no donated cells (`keyCells: []`, which `technique-qualify.ts` now accepts only when given EXPLICITLY), so
-`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail — and its offset
-0 makes every k hit the nub window also fires at a `nearer_well`. **A nub hit also needs at least 4 empty cells
+`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail. **A nub hit also needs at least 4 empty cells
 under the nub** (`shallow_well`, since 2026-10-24, after yachi asked why the page listed so many examples): the window
 asks for 2, which any TSD over a dent meets, and most nub window hits were 2 or 3 deep; harddrop's Donation page, the
-variant's source, draws a cavity of 4 or more. A shallow nub window claims no k hit (`nearer_well` skips it), so the
-farther hole counts. The k variants keep the page's own depth: its boards are cropped under the hole. The 途中DT砲 TSD's nub sits over the TST slot, so the
+variant's source, draws a cavity of 4 or more. The k variants keep the page's own depth: its boards are cropped under the hole.
+**And NO nub hit counts, since 2026-10-25** (`t_covers_hole`, failed by every nub hit): yachi's definition is that a
+donation covers the hole TEMPORARILY with other pieces, which the TSD clears so the hole is open again for any later use
+(not only a Tetris, and no later use is required); under the nub the cover is the T itself. The variant, its window and
+harddrop's drawing stay, so the page shows the shape harddrop calls a donation and says why it is not counted — the
+社畜トレイン precedent — and the nub window no longer claims any k hit (`nearer_well` reads k windows only), so the k
+hits it used to block count again. `shallow_well` is still recorded on nub hits and is shadowed by `t_covers_hole`
+(the test asserts turning it off qualifies nothing). The 途中DT砲 TSD's nub sits over the TST slot, so the
 two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's.
 
 **The report region and the replay labels see seven variants**, labelled 「窿離 T k 欄」 (and 「窿喺 T 尖下面」 for the nub) in
