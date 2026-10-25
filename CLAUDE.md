@@ -5179,6 +5179,28 @@ requires each rule live somewhere in the corpus. Every one of the eight pages is
 階段のドネイト is the page where most fail (its Z split by a clear, or garbage in its steps). Editing `technique-qualify.ts`
 moves all eight pages' facts and demos hash lines (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`); 社畜トレイン's and 欄干's artefacts do not hash it.
 
+### 成個形狀 — the whole drawn shape, a rule every page adds (since 2026-10-25)
+
+The window is the box every drawing agrees on, so it is small: STMB Cave's reads three rows and a one-deep dimple
+passes it, and yachi read the hits as ordinary stacks (「人哋係睇特定形狀，你就求其話 TSpin 就算」). So every technique
+page's `qualify` check is wrapped by `pipeline/sim/technique-wholeshape.ts` (`withWholeShape`), which adds
+`not_whole_shape`: a hit qualifies only if ONE of the source's own drawings of the variant (its board and every
+`agreement` / `drawings` entry that names a node of the same transcription) stands around the T cell for cell by
+occupancy, colour ignored, in either hand. A drawing's region is its T, every enclosed empty component (empty under a
+filled cell in the same column) that touches the T or reaches into the rows from one above the T to three under its
+lowest cell, and a one-cell margin, clipped to the drawing (nothing under its bottom row is read). On the board a cell
+under the floor is filled, above the top empty, past a wall no match. Drawings another site holds only by reference
+are not read. The rule is one module, so editing it moves every technique facts and demos artefact's
+`classifier_md5` (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s); every test that re-derives verdicts wraps its
+qualifier the same way and turns the rule off (`{ off: true }`) like the others. Which pages it bites on, and by how
+much, is the tests' (the tallies and named lists), never this file's; on STSD, インペリアルクロス, 千鳥格子, 欄干's TSD,
+階段のドネイト and 途中DT砲 it removes no qualifying hit, because their windows already hold the drawing. Mining every
+verified full T-spin by the same regions (2026-10-25, scratch only) found no repeated mid-game shape that no page
+draws: plain TSD slots, the donations, a ダブルダガー-like pair of slots, 欄干 and covered-well TSDs. Two measured
+couplings in `basicdonating.test.ts`: every hit `nearer_well` fails also fails `not_whole_shape`, and the
+`shallow_well` coupling no longer reaches a qualifying hit (pinned at 0). The 建議 tagged items that cited STMB Cave and
+ダブルダガー counts were rewritten against the new cells on the same pass, and the ones whose count went to zero deleted.
+
 ## DPC 頁 — what the first T-spin after a Perfect Clear was built on
 
 harddrop's six DPC pages (DPC Setups and Extra S/Z, O, I, J/L, T) are transcribed into

@@ -52,6 +52,7 @@ import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from
 import { H, W, scored, donationVerdict, rowBirths } from './technique-donation-checks.ts';
 import { owners } from '../sim/shachikutrain-qualify.ts';
 import { parapetQualifier, shapeOffsets as qualifyShape, type ParapetQualifyMutants } from '../sim/parapet-qualify.ts';
+import { withWholeShape } from '../sim/technique-wholeshape.ts';
 
 const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
@@ -1232,17 +1233,17 @@ test('the payoff on independent drawings: Tetrisチャンネル\'s 4-deep sequen
 });
 
 /** The hits that qualify (`parapet-qualify.ts`): the L one whole piece, it and the two roof cells whole pieces with
- *  no garbage, and no Perfect Clear within 14 locks either side of the T. */
+ *  no garbage, no Perfect Clear within 14 locks either side of the T, and one of the page's drawings standing
+ *  whole around the T (`technique-wholeshape.ts`). */
 const QUALIFIED_HITS = [
   '2026-07-22 m5r5 yachi lock 39 (parapet_tss)', '2026-07-22 m9r5 pinglamb lock 171 (parapet)',
   '2026-07-24 m3r2 pinglamb lock 79 (parapet)', '2026-07-24 m7r3 pinglamb lock 118 (parapet)',
-  '2026-07-28 m3r5 yachi lock 33 (parapet_tss)', '2026-07-28 m6r5 yachi lock 185 (parapet_tss)',
-  '2026-08-01 m5r2 yachi lock 18 (parapet)', '2026-08-19 m6r6 pinglamb lock 33 (parapet)',
-  '2026-08-25 m6r1 pinglamb lock 110 (parapet)', '2026-09-03 m2r8 yachi lock 30 (parapet)',
-  '2026-09-03 m4r6 yachi lock 98 (parapet_tss)', '2026-09-11 m5r2 yachi lock 32 (parapet_tss)',
-  '2026-09-18 m2r2 pinglamb lock 65 (parapet)', '2026-09-18 m14r5 yachi lock 111 (parapet_tss)',
-  '2026-09-19 m18r2 yachi lock 6 (parapet_tss)', '2026-10-03 m20r7 yachi lock 192 (parapet_tss)',
-  '2026-10-03 m20r8 pinglamb lock 129 (parapet)', '2026-10-09 m7r7 yachi lock 42 (parapet_tss)',
+  '2026-07-28 m3r5 yachi lock 33 (parapet_tss)', '2026-08-01 m5r2 yachi lock 18 (parapet)',
+  '2026-08-19 m6r6 pinglamb lock 33 (parapet)', '2026-08-25 m6r1 pinglamb lock 110 (parapet)',
+  '2026-09-03 m2r8 yachi lock 30 (parapet)', '2026-09-03 m4r6 yachi lock 98 (parapet_tss)',
+  '2026-09-11 m5r2 yachi lock 32 (parapet_tss)', '2026-09-18 m2r2 pinglamb lock 65 (parapet)',
+  '2026-09-18 m14r5 yachi lock 111 (parapet_tss)', '2026-09-19 m18r2 yachi lock 6 (parapet_tss)',
+  '2026-10-03 m20r7 yachi lock 192 (parapet_tss)', '2026-10-03 m20r8 pinglamb lock 129 (parapet)',
   '2026-10-22 m4r5 pinglamb lock 36 (parapet)', '2026-10-22 m8r1 yachi lock 54 (parapet)'];
 /** Hits failing one rule and nothing else; `fragment` and `garbage_in_shape` alone fail none (every such hit also
  *  has its L split), which is why the rule-off check below turns them off beside `allowSplitL`. */
@@ -1250,21 +1251,23 @@ const ONLY: Record<string, string[]> = {
   l_not_one_piece: [
     '2026-07-22 m10r7 yachi lock 88 (parapet)', '2026-07-28 m6r5 yachi lock 40 (parapet)',
     '2026-08-01 m3r3 yachi lock 86 (parapet)', '2026-08-01 m6r1 pinglamb lock 43 (parapet_tss)',
-    '2026-08-01 m7r2 yachi lock 33 (parapet_tss)', '2026-08-14 m5r2 yachi lock 81 (parapet_tss)',
-    '2026-08-14 m6r3 pinglamb lock 27 (parapet)', '2026-08-14 m9r1 yachi lock 54 (parapet_tss)',
-    '2026-08-19 m5r3 yachi lock 39 (parapet_tss)', '2026-08-19 m5r7 pinglamb lock 46 (parapet)',
+    '2026-08-14 m6r3 pinglamb lock 27 (parapet)', '2026-08-19 m5r7 pinglamb lock 46 (parapet)',
     '2026-09-03 m2r4 pinglamb lock 26 (parapet)', '2026-09-18 m11r6 yachi lock 185 (parapet)',
     '2026-09-19 m18r2 pinglamb lock 120 (parapet)', '2026-10-03 m5r4 yachi lock 75 (parapet_tss)',
-    '2026-10-03 m6r2 yachi lock 137 (parapet_tss)', '2026-10-20 m4r7 yachi lock 92 (parapet)',
-    '2026-10-22 m7r1 yachi lock 17 (parapet)', '2026-10-22 m7r6 yachi lock 67 (parapet_tss)'],
-  dpc: ['2026-08-14 m6r8 pinglamb lock 27 (parapet_tss)'],
-  ownership_unverified: ['2026-08-25 m8r6 yachi lock 156 (parapet)', '2026-08-25 m8r6 yachi lock 218 (parapet)',
-                         '2026-09-18 m12r3 yachi lock 45 (parapet)'],
-  fragment: [], garbage_in_shape: [],
+    '2026-10-20 m4r7 yachi lock 92 (parapet)', '2026-10-22 m7r1 yachi lock 17 (parapet)'],
+  dpc: [
+    '2026-08-14 m6r8 pinglamb lock 27 (parapet_tss)'],
+  ownership_unverified: [
+    '2026-08-25 m8r6 yachi lock 156 (parapet)', '2026-08-25 m8r6 yachi lock 218 (parapet)',
+    '2026-09-18 m12r3 yachi lock 45 (parapet)'],
+  not_whole_shape: [
+    '2026-07-28 m6r5 yachi lock 185 (parapet_tss)', '2026-10-09 m7r7 yachi lock 42 (parapet_tss)'],
+  fragment: [],
+  garbage_in_shape: [],
 };
 const QUALIFY_BY_PLAYER = {
-  pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 106, garbage_in_shape: 12, l_not_one_piece: 117 } },
-  yachi: { qualified: 12, not_qualified: { fragment: 98, garbage_in_shape: 18, l_not_one_piece: 118, ownership_unverified: 3 } },
+  pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 106, garbage_in_shape: 12, l_not_one_piece: 117, not_whole_shape: 3 } },
+  yachi: { qualified: 10, not_qualified: { fragment: 98, garbage_in_shape: 18, l_not_one_piece: 118, not_whole_shape: 37, ownership_unverified: 3 } },
 };
 const qName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock} (${h.variant})`;
 
@@ -1298,14 +1301,16 @@ test('qualifies: the ownership guard throws on a board it cannot reproduce', () 
 
 test('qualifies: each rule turned off qualifies exactly the hits whose only failures are rules turned off', () => {
   const b = art();
-  const runQ = (m: ParapetQualifyMutants) => {
-    const P = { ...PARAPET, qualify: { ...PARAPET.qualify!, check: parapetQualifier(PARAPET.transcriptionPath, m) } };
+  const runQ = (m: ParapetQualifyMutants & { wholeShapeOff?: boolean }) => {
+    const P = { ...PARAPET, qualify: { ...PARAPET.qualify!, check: withWholeShape(PARAPET.transcriptionPath,
+      parapetQualifier(PARAPET.transcriptionPath, m), { off: m.wholeShapeOff }) } };
     return JSON.parse(serialise(build(P, {}, digests())));
   };
   const within = (rules: string[]) => b.hits.filter((h: any) => h.not_qualified.every((x: string) => rules.includes(x))).map(qName);
   for (const [m, rules] of [[{ allowSplitL: true }, ['l_not_one_piece']], [{ noDpc: true }, ['dpc']],
                             [{ allowSplitL: true, allowFragments: true }, ['l_not_one_piece', 'fragment']],
-                            [{ allowSplitL: true, allowGarbage: true }, ['l_not_one_piece', 'garbage_in_shape']]] as const) {
+                            [{ allowSplitL: true, allowGarbage: true }, ['l_not_one_piece', 'garbage_in_shape']],
+                            [{ wholeShapeOff: true }, ['not_whole_shape']]] as const) {
     const want = within([...rules]);
     expect(want.length, JSON.stringify(m)).toBeGreaterThan(QUALIFIED_HITS.length);
     expect(runQ(m).hits.filter((h: any) => h.qualifies).map(qName), JSON.stringify(m)).toEqual(want);

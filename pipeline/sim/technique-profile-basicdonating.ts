@@ -20,6 +20,7 @@
  */
 import type { TechniqueProfile } from './technique-profile.ts';
 import { DPC_LOCKS, OTHER_PAGES, SHALLOW_BELOW, donationQualifier } from './basicdonating-qualify.ts';
+import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -33,7 +34,7 @@ export const BASICDONATING: TechniqueProfile = {
   transcriptionPath: `${OPENERS}/basicdonating-technique.json`,
   artefactPath: `${REPO}/analysis/basicdonating-facts.json`,
   hashFiles: {
-    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-basicdonating.ts`,
+    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-wholeshape.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-basicdonating.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
                  `${SIM}/basicdonating-qualify.ts`, `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`,
                  ...OTHER_PAGES.map(k => `${OPENERS}/${k}-technique.json`)],
@@ -98,9 +99,11 @@ export const BASICDONATING: TechniqueProfile = {
       'nearer_well: a variant with a smaller hole offset fires at the same T, so the T is counted once, at its nearest hole',
       'well_covered: a filled cell anywhere above the window in the hole\'s column, so the clear does not leave the hole open from the top',
       `shallow_well: the nub variant only: fewer than ${SHALLOW_BELOW} empty cells under the nub, so the re-opened column cannot take a Tetris`,
+      WHOLE_SHAPE_RULE,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
-    check: donationQualifier(`${OPENERS}/basicdonating-technique.json`, OPENERS),
+    check: withWholeShape(`${OPENERS}/basicdonating-technique.json`,
+                          donationQualifier(`${OPENERS}/basicdonating-technique.json`, OPENERS)),
   },
   lists: (hits, name) => ({
     basicdonating_hits: hits.map(h => `${name(h)} ${tag(h)}`),

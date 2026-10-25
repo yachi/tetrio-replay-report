@@ -111,7 +111,7 @@
    }
   ],
   "transcription_md5": "c09b74c1486f7b88f3e9a29f5a95e1a0",
-  "emitter_md5": "e0d98c5ce881932ddf81bf0865c9916a"
+  "emitter_md5": "e15769d139a23322f460d04241aa089e"
  },
  "sessions": [
   "2026-07-22",
@@ -438,6 +438,7 @@
    "shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)",
    "dpc: the board is empty after one of the 14 locks before the T, the T itself, or one of the 14 after it (the DPC setup)",
    "ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart",
+   "not_whole_shape: none of the source page's own drawings of the variant (its board and its agreement drawings) stands around the T cell for cell by occupancy, in either hand — each drawing read as the T, every enclosed hole touching it or within three rows under it, and a one-cell margin (technique-wholeshape.ts)",
    "qualifies iff none applies; the shape stood at every hit either way"
   ],
   "by_player": {

@@ -24,6 +24,7 @@
 import type { TechniqueProfile } from './technique-profile.ts';
 import { parapetQualifier } from './parapet-qualify.ts';
 import { DPC_LOCKS } from './shachikutrain-qualify.ts';
+import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -37,7 +38,7 @@ export const PARAPET: TechniqueProfile = {
   transcriptionPath: `${OPENERS}/parapet-technique.json`,
   artefactPath: `${REPO}/analysis/parapet-facts.json`,
   hashFiles: {
-    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-parapet.ts`,
+    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-wholeshape.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-parapet.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`, `${SIM}/parapet-qualify.ts`,
                  `${SIM}/shachikutrain-qualify.ts`],
   },
@@ -101,9 +102,11 @@ export const PARAPET: TechniqueProfile = {
       'l_not_one_piece: the four cells the page draws as its L are not one piece (the page: 「%Lを1列ずらして立てて置き」)',
       `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
       'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      WHOLE_SHAPE_RULE,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
-    check: parapetQualifier(`${OPENERS}/parapet-technique.json`),
+    check: withWholeShape(`${OPENERS}/parapet-technique.json`,
+                          parapetQualifier(`${OPENERS}/parapet-technique.json`)),
   },
   lists: (hits, name) => {
     const of = (v: string) => hits.filter(h => h.variant === v);
