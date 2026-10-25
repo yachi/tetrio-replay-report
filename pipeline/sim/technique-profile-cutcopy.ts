@@ -21,6 +21,7 @@
 import type { TechniqueProfile } from './technique-profile.ts';
 import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
 import { DPC_LOCKS } from './shachikutrain-qualify.ts';
+import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
 
 const SIM = import.meta.dir;
 /** a hit's variant, for the second type only: the first type's entries read as they always have */
@@ -34,7 +35,7 @@ export const CUTCOPY: TechniqueProfile = {
   transcriptionPath: `${OPENERS}/cutcopy-technique.json`,
   artefactPath: `${REPO}/analysis/cutcopy-facts.json`,
   hashFiles: {
-    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-cutcopy.ts`,
+    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-wholeshape.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-cutcopy.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
                  `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
@@ -92,9 +93,11 @@ export const CUTCOPY: TechniqueProfile = {
       'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
       `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
       'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      WHOLE_SHAPE_RULE,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
-    check: techniqueQualifier(`${OPENERS}/cutcopy-technique.json`, QUALIFY_OPTIONS.cutcopy),
+    check: withWholeShape(`${OPENERS}/cutcopy-technique.json`,
+                          techniqueQualifier(`${OPENERS}/cutcopy-technique.json`, QUALIFY_OPTIONS.cutcopy)),
   },
   lists: (hits, name) => {
     const of = (v: string) => hits.filter(h => h.variant === v);

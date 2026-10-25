@@ -17,6 +17,7 @@
  */
 import type { TechniqueProfile } from './technique-profile.ts';
 import { DPC_LOCKS, qualifier } from './shachikutrain-qualify.ts';
+import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -28,7 +29,7 @@ export const SHACHIKUTRAIN: TechniqueProfile = {
   transcriptionPath: `${OPENERS}/shachikutrain-technique.json`,
   artefactPath: `${REPO}/analysis/shachikutrain-facts.json`,
   hashFiles: {
-    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-shachikutrain.ts`,
+    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-wholeshape.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-shachikutrain.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`, `${SIM}/shachikutrain-qualify.ts`,
                  `${OPENERS}/kaidan-technique.json`],
   },
@@ -84,9 +85,11 @@ export const SHACHIKUTRAIN: TechniqueProfile = {
       'kaidan_window: the 階段のドネイト (Kaidan) window fires at the same T (kaidan-technique.json)',
       `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup: a TSD built from the pieces left after a Perfect Clear, into a second one)`,
       'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      WHOLE_SHAPE_RULE,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
-    check: qualifier(`${OPENERS}/shachikutrain-technique.json`, `${OPENERS}/kaidan-technique.json`),
+    check: withWholeShape(`${OPENERS}/shachikutrain-technique.json`,
+                          qualifier(`${OPENERS}/shachikutrain-technique.json`, `${OPENERS}/kaidan-technique.json`)),
   },
   lists: (hits, name) => ({
     shachikutrain_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),

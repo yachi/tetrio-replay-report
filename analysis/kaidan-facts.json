@@ -111,7 +111,7 @@
    }
   ],
   "transcription_md5": "1090409d4c33b5466b2ad493478f1e2f",
-  "emitter_md5": "d3cee1c4d1ef54137f3cf70c30ac738e"
+  "emitter_md5": "ad0250e9f0e8773f78638cd693918ca9"
  },
  "sessions": [
   "2026-07-22",
@@ -447,6 +447,7 @@
    "z_not_one_piece: the four cells the page draws as its Z are not one piece (the page: 「Zを縦置き」)",
    "dpc: the board is empty after one of the 14 locks before the T, the T itself, or one of the 14 after it (the DPC setup)",
    "ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart",
+   "not_whole_shape: none of the source page's own drawings of the variant (its board and its agreement drawings) stands around the T cell for cell by occupancy, in either hand — each drawing read as the T, every enclosed hole touching it or within three rows under it, and a one-cell margin (technique-wholeshape.ts)",
    "qualifies iff none applies; the shape stood at every hit either way"
   ],
   "by_player": {

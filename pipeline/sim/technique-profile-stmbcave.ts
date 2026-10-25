@@ -11,6 +11,7 @@
 import type { TechniqueProfile } from './technique-profile.ts';
 import { QUALIFY_OPTIONS, techniqueQualifier } from './technique-qualify.ts';
 import { DPC_LOCKS } from './shachikutrain-qualify.ts';
+import { WHOLE_SHAPE_RULE, withWholeShape } from './technique-wholeshape.ts';
 
 const SIM = import.meta.dir;
 const OPENERS = `${SIM}/../openers`;
@@ -22,7 +23,7 @@ export const STMBCAVE: TechniqueProfile = {
   transcriptionPath: `${OPENERS}/stmbcave-technique.json`,
   artefactPath: `${REPO}/analysis/stmbcave-facts.json`,
   hashFiles: {
-    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-stmbcave.ts`,
+    classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-wholeshape.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-stmbcave.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`,
                  `${SIM}/technique-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`],
   },
@@ -73,9 +74,11 @@ export const STMBCAVE: TechniqueProfile = {
       'shape_cell_empty: a key cell is empty (the window requires it filled, so only a weakened window can admit this)',
       `dpc: the board is empty after one of the ${DPC_LOCKS} locks before the T, the T itself, or one of the ${DPC_LOCKS} after it (the DPC setup)`,
       'ownership_unverified: a lock before the T has a row map the digest could not verify, so its pieces cannot be told apart',
+      WHOLE_SHAPE_RULE,
       'qualifies iff none applies; the shape stood at every hit either way',
     ],
-    check: techniqueQualifier(`${OPENERS}/stmbcave-technique.json`, QUALIFY_OPTIONS.stmbcave),
+    check: withWholeShape(`${OPENERS}/stmbcave-technique.json`,
+                          techniqueQualifier(`${OPENERS}/stmbcave-technique.json`, QUALIFY_OPTIONS.stmbcave)),
   },
   lists: (hits, name) => ({
     stmbcave_hits: hits.map(h => `${name(h)} lock ${h.lock}${h.mirrored ? ' (mirrored)' : ''}`),
