@@ -3160,35 +3160,26 @@ every column filled, so that clause counts line clears. That is not a measuremen
 `NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly
 <!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->15141<!--/don:scored--> scored
 clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening clause
-deleted — it fires on <!--don:noreopen-band-->22.77-30.46%<!--/don:noreopen-band-->. All the
+deleted — it fires on <!--don:noreopen-band-->15.40-20.72%<!--/don:noreopen-band-->. All the
 discriminating power is in the **re-opening** clause: every filled cell of the column must lie
 inside the cleared rows, so the clear leaves it open surface-to-floor. With it, the rate drops to
-<!--don:shipped-band-->1.10-2.45%<!--/don:shipped-band--> per session
-(<!--don:donations-->266<!--/don:donations--> donations across
+<!--don:shipped-band-->1.79-3.66%<!--/don:shipped-band--> per session
+(<!--don:donations-->365<!--/don:donations--> donations across
 <!--don:sessions-->nineteen<!--/don:sessions--> sessions).
-
-**A column the T is in is never the well, since 2026-10-25, and that is yachi's rule, not harddrop's.** harddrop
-excluded only the T's own slot (the column the T fills in EVERY cleared row) and let a column it touches in one row be
-the well — 3 of its article's 20 named setups do. On yachi's definition the plug must be OTHER pieces, never the T, so a
-hole under the T's arm is covered by the T and is no donation (`donationCols`: `if (tRows) continue`). It took 120 of
-the 386 donations the tables held, most of them in-opener TSDs over a garbage well; the four transcribed positives all
-put the well outside the T's columns, so no control moved. The ablation bands moved with it (the T exclusion is ahead
-of every ablation clause), and so did `dual_engine`'s donation rows. The 基本的なドネイト page's `t_covers_hole` is
-the same rule on that page's nub window.
 
 **Every band above is RENDERED from the seven artefacts, and until 2026-08-24 none of them was.**
 `pipeline/check_donation_bands.py --render` prints each marked fragment; `donation.ablation` in
 every `sessions/*/sim/opener-facts.json` carries that session's own counts. The per-session series
-read <!--don:noreopen-series-->22.77 · 25.55 · 26.04 · 23.69 · 29.56 · 30.46 · 28.43 · 26.61 · 24.13 · 26.96 · 24.21 · 26.01 · 24.81 · 26.47 · 25.71 · 26.40 · 28.33 · 24.86 · 27.03<!--/don:noreopen-series-->
+read <!--don:noreopen-series-->15.60 · 17.83 · 17.57 · 16.83 · 18.23 · 20.72 · 20.05 · 15.92 · 16.60 · 16.50 · 16.09 · 19.85 · 17.17 · 16.77 · 15.40 · 17.81 · 18.21 · 17.68 · 16.92<!--/don:noreopen-series-->
 for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-08-14<!--/don:noreopen-ceiling--> is
 the ceiling) and
-<!--don:cav1-series-->49.69 · 52.02 · 49.04 · 54.08 · 55.22 · 55.43 · 52.34 · 53.79 · 53.47 · 52.12 · 53.40 · 55.11 · 51.59 · 54.63 · 54.91 · 54.56 · 50.93 · 54.70 · 50.25<!--/don:cav1-series-->
+<!--don:cav1-series-->48.55 · 47.79 · 49.20 · 52.45 · 49.20 · 47.03 · 47.94 · 48.00 · 45.95 · 47.88 · 48.09 · 48.55 · 46.29 · 48.50 · 45.22 · 48.16 · 45.36 · 48.90 · 45.27<!--/don:cav1-series-->
 for the `cavity ≥ 1` composite, whose band is
-<!--don:cav1-band-->49.04-55.43%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
-<!--don:pooled-noreopen-->26.23<!--/don:pooled-noreopen-->, cav1
-<!--don:pooled-cav1-->53.20<!--/don:pooled-cav1--> — a per-session band can break while no pooled
+<!--don:cav1-band-->45.22-52.45%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
+<!--don:pooled-noreopen-->17.29<!--/don:pooled-noreopen-->, cav1
+<!--don:pooled-cav1-->47.61<!--/don:pooled-cav1--> — a per-session band can break while no pooled
 number moves, which is why the series is published beside them. A session above
-<!--don:cav1-ceiling-->55.43<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
+<!--don:cav1-ceiling-->52.45<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
 
 **The bands are quoted at two decimals on purpose, and rounding them cost the third defect.** At one
 decimal the shipped band was published as 「2.1-3.3%」 while its floor is 2.08 — a band's low end
@@ -3232,21 +3223,31 @@ for the live values.
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
 
+**No column is excluded for holding the T, and every plug cell must be a complete piece (since 2026-10-25, yachi:
+「跟 harddrop 都計，但要完整 pieces」).** harddrop's Donation page lets the T be part of the plug — J Donation 2, T
+Donation and Example 2 put the well under the T's arm, and its Shachiku_Train page's 「Donation T-Spin Double」 plugs it
+with the nub — so the code no longer skips the T's own slot (it did, by its first version) and no longer skips any T
+column (#88 did, for one day). In its place, `plugComplete`: every cell plugging the well inside the cleared rows that is
+not the T must carry a lock index whose four cells are all still on the board in the provenance grid before the T
+(`provSnaps[i - 1]`), so garbage (`-1`) and a fragment a line clear left behind are no plug. `PlugIncomplete` in
+`spec/DonationCave.dfy` mirrors it, `openers.test.ts` asserts it bites on every harddrop positive (the plug re-labelled
+as garbage, or split, stops being a donation on the same occupancy), and the technique tests' `donationVerdict` reads
+the digest's ownership grid (`shachikutrain-qualify.ts`'s `owners`) and calls the failure `incomplete`. The ablations
+keep the clause (only `naive` drops it, being the whole naive reading), so every band above moved with it.
+
 **Nearly every donation in this corpus sits on a garbage-derived well, and 2026-09-10 is the
 session that ended the absolute**
-(<!--don:latest-garbage-->10-22 adds 7 of 7<!--/don:latest-garbage-->;
-**<!--don:self-built-->3 of 266<!--/don:self-built-->** self-built corpus-wide).
-This sentence read 「every donation … 0 self-built, every session」 for nine sessions. All three
-exceptions are yachi's, all mid-game `natural` plugs, and none is a prefix-edge effect —
-`replay-2026-09-10-01.ttrm` r6 plugs a 4-cell cavity at lock 40 of a prefix verified to 64,
-`replay-2026-09-10-07.ttrm` r7 a 5-cell cavity at lock 75 of one verified to 82, and 09-11 adds
-the third. They are named in
-`SELF_BUILT_WELLS` in `openers.test.ts` rather than absorbed into a bound, following
-`DT_ORDER_IN_OPENER`; 09-17, 09-18, 09-19, 10-03, 10-09, 10-12, 10-20 and 10-22 each add none — so the list is unchanged at nineteen
-sessions, and the three long sessions' zeros are what carry weight: 85 donations across those
-three nights, 31% of the corpus's 266 (since 2026-10-25, when a hole in a column the T is in stopped counting; before
-that rule it read 120 of 386), and not one of them
-self-built. **The same
+(<!--don:latest-garbage-->10-22 adds 16 of 16<!--/don:latest-garbage-->;
+**<!--don:self-built-->18 of 365<!--/don:self-built-->** self-built corpus-wide).
+This sentence read 「every donation … 0 self-built, every session」 for nine sessions; 09-10 and 09-11
+held the first three, all yachi's mid-game `natural` plugs (`replay-2026-09-10-01.ttrm` r6 plugs a
+4-cell cavity at lock 40 of a prefix verified to 64, `replay-2026-09-10-07.ttrm` r7 a 5-cell cavity
+at lock 75 of one verified to 82). Counting the T's columns again (2026-10-25) took the list to ten
+sessions and both players (measured, not explained). They
+are named per session in `SELF_BUILT_WELLS` in `openers.test.ts` rather than absorbed into a bound,
+following `DT_ORDER_IN_OPENER`; read the counts there, never here. The three long sessions hold 102
+of the 365, and 09-18 carries four of the self-built ones — so 「not one of them self-built」, which
+this paragraph said of those nights until then, is no longer true either. **The same
 absolute was also written into every per-session artefact**, in
 the `donation.caveat` string, which is the `29-34%` defect exactly: a corpus claim inside a file
 that cannot see the corpus. The caveat now points at the per-player `garbage_derived_well` /
@@ -3383,20 +3384,20 @@ verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
 whole finding. Both verdicts are rare —
-<!--dual:rare-->177 caves and 266 donations in 15141 scored clears<!--/dual:rare--> — so an
+<!--dual:rare-->177 caves and 365 donations in 15141 scored clears<!--/dual:rare--> — so an
 overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
 | cave | <!--dual:cave-overall-->6331/6331 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->75 / 75<!--/dual:cave-pos-->** |
-| donation | <!--dual:don-overall-->6228/6331 (98.4%)<!--/dual:don-overall--> | **<!--dual:don-pos-->13 / 79<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->16.5%<!--/dual:don-pos-pct-->) |
+| donation | <!--dual:don-overall-->6074/6331 (96.0%)<!--/dual:don-overall--> | **<!--dual:don-pos-->24 / 116<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->20.7%<!--/dual:don-pos-pct-->) |
 
-The donation's overall rate is **<!--dual:don-bothno-->6215 of 6228<!--/dual:don-bothno-->**
+The donation's overall rate is **<!--dual:don-bothno-->6050 of 6074<!--/dual:don-bothno-->**
 agreements being both engines saying "no". On the thing the
-table actually counts the two engines disagree about **five donations in six** — the opposite
+table actually counts the two engines disagree about **four donations in five** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
-<!--dual:bothno-share-->0.9979<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
+<!--dual:bothno-share-->0.9960<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
 `pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
@@ -3423,7 +3424,7 @@ completely:
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
 | cave | <!--dual:row-cave-->75 | 11 | 75/75 | 11/11 | 64/64<!--/dual:row-cave--> |
-| donation | <!--dual:row-don-->79 | 9 | 13/79 | 9/9 | 4/70<!--/dual:row-don--> |
+| donation | <!--dual:row-don-->116 | 22 | 24/116 | 22/22 | 2/94<!--/dual:row-don--> |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
@@ -3527,8 +3528,8 @@ it at all:
   three more Double-first openers than C-Spin orders allow breaks it. The sentence that stood here said 「the next session like 10-09
   will break it」; 10-12 was not one like 10-09 (3 Double-first openers, not 29), so it did not, and
   the prediction stays a conditional rather than a forecast. Decide it the same way when one does.)
-- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:4.3
-  (50 in-opener, 216 mid-game), so it is not purely mid-game.
+- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:3.2
+  (86 in-opener, 279 mid-game), so it is not purely mid-game.
 
 **The cave's window result was an absolute for six sessions and 2026-08-19 broke half of it. Read
 the two halves apart — they are not one claim.**
@@ -4972,11 +4973,9 @@ failure and the hashes only).
 
 **Donation, cross-checked.** `parapet.test.ts` re-implements `donationCols` at its shipped clauses (importing `emit-opener-facts.ts`
 runs a session), reproduces every session's per-player `donation.players[].donations` exactly, and names every hit that is not a
-donation at its well column in `HIT_NOT_DONATION` with the re-derived clause it fails. **Since 2026-10-25 no TSD hit is a donation**:
-its well is under the T's arm, and a column the T is in is never the well (yachi's rule, see 捐窿 同 STMB Cave), which the test
-asserts for every TSD hit rather than listing them; the page's lede says so. The TSS's well is outside the T, and its hits fail
-only `filled_above_window` (a filled cell over the slot in the well column, outside the window) and `cavity_lt4` — never the walls
-or the cleared rows, which the window itself decides.
+donation at its well column in `HIT_NOT_DONATION` with the re-derived clause it fails: only `filled_above_window` (a filled cell over
+the slot in the well column, outside the window), `cavity_lt4` and, since 2026-10-25, `incomplete` (a plug cell in the cleared rows
+that is garbage or a fragment, read off the digest's ownership grid) occur — never the walls, which the window itself decides.
 
 **What discriminates is measured per window part, per variant** (`PART_ONLY`): the rows above the cleared rows, the cleared rows,
 and the well rows under them; no part reaches the headline alone, and the well rows cut the most. The TSD's `no_roof` ablation is
@@ -5138,18 +5137,15 @@ on none of them. It is SYMMETRIC about the T, so `technique-facts.ts`'s `prepare
 window's (a hit is recorded as drawn; the gate still records both hands), which is the one change to a hashed rule file and
 moved every technique artefact's `emitter_md5` / `classifier_md5` (and `dpc-facts.json`'s) and nothing else. Qualify: it has
 no donated cells (`keyCells: []`, which `technique-qualify.ts` now accepts only when given EXPLICITLY), so
-`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail. **A nub hit also needs at least 4 empty cells
+`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail — and its offset
+0 makes every k hit the nub window also fires at a `nearer_well`. **A nub hit also needs at least 4 empty cells
 under the nub** (`shallow_well`, since 2026-10-24, after yachi asked why the page listed so many examples): the window
 asks for 2, which any TSD over a dent meets, and most nub window hits were 2 or 3 deep; harddrop's Donation page, the
-variant's source, draws a cavity of 4 or more. The k variants keep the page's own depth: its boards are cropped under the hole.
-**And NO nub hit counts, since 2026-10-25** (`t_covers_hole`, failed by every nub hit): yachi's definition is that a
-donation covers the hole TEMPORARILY with other pieces, which the TSD clears so the hole is open again for any later use
-(not only a Tetris, and no later use is required); under the nub the cover is the T itself. The variant, its window and
-harddrop's drawing stay, so the page shows the shape harddrop calls a donation and says why it is not counted — the
-社畜トレイン precedent — and the nub window no longer claims any k hit (`nearer_well` reads k windows only), so the k
-hits it used to block count again. `shallow_well` is still recorded on nub hits and is shadowed by `t_covers_hole`
-(the test asserts turning it off qualifies nothing). The 途中DT砲 TSD's nub sits over the TST slot, so the
-two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's.
+variant's source, draws a cavity of 4 or more. A shallow nub window claims no k hit (`nearer_well` skips it), so the
+farther hole counts. The k variants keep the page's own depth: its boards are cropped under the hole. The 途中DT砲 TSD's nub sits over the TST slot, so the
+two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's. A `t_covers_hole`
+rule that failed every nub hit (a hole under the T is no donation) lived for one day and was reverted on 2026-10-25, when
+yachi chose harddrop's definition with complete pieces: the T is a complete piece by definition, so the nub plug counts.
 
 **The report region and the replay labels see seven variants**, labelled 「窿離 T k 欄」 (and 「窿喺 T 尖下面」 for the nub) in
 `routes_techniques_section._variant_name` (a branch on `well`; every other technique's label is unchanged). **No demo is built**: odd cell counts (a proof), even counts not

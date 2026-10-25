@@ -243,7 +243,7 @@ export function dualVerdict(r: SimLike, i: number) {
   const theirs = [...rec.clearedRows].sort((a, b) => a - b);
   if (!(rows.length === theirs.length && rows.every((x, k) => x === theirs[k]))) return null;
   const cv = caveAt(withT, rows, lk.cells, H);
-  return { don: donationCols(withT, rows, lk.cells, H).length > 0,
+  return { don: donationCols(withT, rows, lk.cells, H, i > 0 ? r.provSnaps?.[i - 1] : undefined).length > 0,
            cave: !!(cv && cv.width >= CAVE_MIN_WIDTH), board: withT };
 }
 
@@ -253,6 +253,8 @@ type SimLike = {
            cells: { row: number; col: number }[] }[];
   boards: unknown[];
   records: { frame: number; clearedRows: number[] }[];
+  /** The provenance grid after each lock — what `donationCols`' complete-pieces clause reads. */
+  provSnaps?: (number | null)[][][];
 };
 
 /** A column's CAVITY: the empty cells strictly below its lowest filled cell, down to the floor.
@@ -286,15 +288,32 @@ export function cavity(g: boolean[][], col: number, h: number) {
  */
 export const DONATION_ABLATIONS = {
   /** every clause — what the tables actually count */
-  shipped:           { minCavity: DONATION_CAVITY, walled: true,  reopen: true },
+  shipped:           { minCavity: DONATION_CAVITY, walled: true,  reopen: true,  complete: true },
   /** the re-opening clause deleted: the plug may be a wall. This is where the power is */
-  no_reopen:         { minCavity: DONATION_CAVITY, walled: true,  reopen: false },
+  no_reopen:         { minCavity: DONATION_CAVITY, walled: true,  reopen: false, complete: true },
   /** ...and the cavity floor dropped to a single cell, i.e. any dent under any plug */
-  cavity1_no_reopen: { minCavity: 1,               walled: true,  reopen: false },
+  cavity1_no_reopen: { minCavity: 1,               walled: true,  reopen: false, complete: true },
   /** the naive reading alone. Proved to fire on everything; emitted as the control */
-  naive:             { minCavity: 0,               walled: false, reopen: false },
+  naive:             { minCavity: 0,               walled: false, reopen: false, complete: false },
 } as const;
 export type DonationAblation = keyof typeof DONATION_ABLATIONS;
+
+type Prov = (number | null)[][] | undefined;
+
+/** Whether every non-T cell plugging column `c` inside the cleared rows belongs to a piece whose four cells are
+ *  all on the board (`prov` before the lock). A missing grid, garbage, or a cell of a piece with fewer than four
+ *  cells left fails. */
+export function plugComplete(c: number, cleared: number[], isT: Set<number>, prov: Prov) {
+  for (const r of cleared) {
+    if (isT.has(r * BOARD_WIDTH + c)) continue;
+    const q = prov?.[r]?.[c];
+    if (typeof q !== 'number' || q < 0) return false;
+    let n = 0;
+    for (const row of prov!) for (const v of row) if (v === q) n++;
+    if (n !== 4) return false;
+  }
+  return true;
+}
 
 /**
  * DONATION (harddrop.com/wiki/Donation) — the well columns this T-spin clear donated into.
@@ -304,29 +323,26 @@ export type DonationAblation = keyof typeof DONATION_ABLATIONS;
  * which is what makes the plug a loan rather than a wall. How much power, on this corpus, is what
  * `DONATION_ABLATIONS` above exists to emit instead of assert.
  *
- * Every column the T is in is excluded, not only the T's own slot. harddrop lets a column the T
- * touches in just one cleared row be the well (3 of the article's 20 named setups do); this repo
- * does not, on yachi's definition (2026-10-25): the plug must be OTHER pieces, never the T, so a
- * hole under the T's arm is covered by the T and is no donation. The four transcribed positives
- * all put the well outside the T's columns, so none of them moves.
+ * No column is excluded for holding the T (since 2026-10-25, yachi: follow harddrop). harddrop's own
+ * drawings put the well under the T's arm (J Donation 2, T Donation, Example 2) and under its nub (the
+ * Shachiku_Train page's 「Donation T-Spin Double」), so a T cell may be part of the plug.
+ *
+ * COMPLETE PIECES (yachi, 2026-10-25): every cell that plugs the column inside the cleared rows and is not
+ * the T must belong to a piece whose four cells are all still on the board — never garbage (`-1` in the
+ * provenance grid) and never a fragment a line clear left behind. `prov` is the provenance grid BEFORE this
+ * lock (`provSnaps[i - 1]`); the T's own cells are complete by definition.
  *
  * `abl` names an ablation to evaluate INSTEAD of the shipped predicate. It is a parameter rather
  * than a second function on purpose: an ablation implemented as a copy is not an ablation of this
  * code, and would keep answering the old question after this one changed.
  */
 export function donationCols(withT: boolean[][], cleared: number[], t: { row: number; col: number }[], h: number,
-                             abl: DonationAblation = 'shipped') {
+                             prov: Prov, abl: DonationAblation = 'shipped') {
   const A = DONATION_ABLATIONS[abl];
   const inCleared = new Set(cleared);
-  const tByCol = new Map<number, Set<number>>();
-  for (const q of t) {
-    if (!tByCol.has(q.col)) tByCol.set(q.col, new Set());
-    tByCol.get(q.col)!.add(q.row);
-  }
+  const isT = new Set(t.map(q => q.row * BOARD_WIDTH + q.col));
   const out: { col: number; cavity: number }[] = [];
   for (let c = 0; c < BOARD_WIDTH; c++) {
-    const tRows = tByCol.get(c);
-    if (tRows) continue;   // a column the T is in: the T covers it, so it is no loan (yachi's definition)
     let inR = 0, outR = 0;
     for (let r = 0; r < h; r++) {
       if (!withT[r]![c]) continue;
@@ -341,6 +357,7 @@ export function donationCols(withT: boolean[][], cleared: number[], t: { row: nu
     const walled = deep.every(r =>
       (c === 0 || withT[r]![c - 1]) && (c === BOARD_WIDTH - 1 || withT[r]![c + 1]));
     if (A.walled && !walled) continue;
+    if (A.complete && !plugComplete(c, cleared, isT, prov)) continue;   // complete pieces only
     out.push({ col: c, cavity: cav });
   }
   return out;
@@ -625,11 +642,11 @@ for (const c of loadCases(dir)) {
     if (!mine.length) continue;
     reconAgreed++;
 
-    const wells = donationCols(withT, mine, lk.cells, H);
+    const prov = i > 0 ? r.provSnaps[i - 1] : undefined;
+    const wells = donationCols(withT, mine, lk.cells, H, prov);
     let donation: TSpinClear['donation'] = null;
     if (wells.length) {
       const w = wells[0]!;
-      const prov = i > 0 ? r.provSnaps[i - 1] : undefined;
       // WELL PROVENANCE. A well ROW is garbage-derived when that row's FILLED cells are mostly
       // garbage. Never test the well cell itself for the -1 garbage tag: it is EMPTY by
       // construction and so carries null, which made an earlier pass report every well in the
@@ -655,7 +672,7 @@ for (const c of loadCases(dir)) {
 
     const cave = caveAt(withT, mine, lk.cells, H);
     const abl = Object.fromEntries((Object.keys(DONATION_ABLATIONS) as DonationAblation[])
-      .map(k => [k, donationCols(withT, mine, lk.cells, H, k).length > 0])) as Record<DonationAblation, boolean>;
+      .map(k => [k, donationCols(withT, mine, lk.cells, H, prov, k).length > 0])) as Record<DonationAblation, boolean>;
     if (abl.shipped !== (donation !== null))
       throw new Error(`donation ablation 'shipped' disagrees with the shipped path at lock ${i}`);
     tspinClears.push({ user: c.user, lines: lk.cleared, lock: i, donation, cave, abl,

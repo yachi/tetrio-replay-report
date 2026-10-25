@@ -695,25 +695,25 @@ test('these sessions run mid-game Perfect Clears, not the Perfect Clear Opener',
 /** Corpus result per session, written out. `clears` is the licensing denominator
  *  (`donation.check.tspin_clears`), not a count of anything donated. */
 const DONATION: Record<string, { donations: number; natural: number; b2b: number; clears: number }> = {
-  '2026-07-22': { donations: 13, natural: 11, b2b: 2, clears: 795 },
-  '2026-07-24': { donations: 12, natural:  8, b2b: 1, clears: 544 },
-  '2026-07-28': { donations:  9, natural:  9, b2b: 0, clears: 626 },
-  '2026-08-01': { donations: 15, natural: 12, b2b: 2, clears: 612 },
-  '2026-08-09': { donations:  8, natural:  6, b2b: 0, clears: 565 },
-  '2026-08-14': { donations: 14, natural: 12, b2b: 1, clears: 893 },
-  '2026-08-19': { donations: 17, natural: 14, b2b: 1, clears: 728 },
-  '2026-08-25': { donations: 15, natural: 13, b2b: 2, clears: 898 },
-  '2026-09-03': { donations:  7, natural:  6, b2b: 0, clears: 518 },
-  '2026-09-10': { donations: 13, natural: 11, b2b: 1, clears: 612 },
-  '2026-09-11': { donations: 12, natural:  9, b2b: 3, clears: 603 },
-  '2026-09-17': { donations:  6, natural:  5, b2b: 1, clears: 519 },
-  '2026-09-18': { donations: 23, natural: 18, b2b: 4, clears: 1322 },
-  '2026-09-19': { donations: 38, natural: 34, b2b: 2, clears: 1598 },
-  '2026-10-03': { donations: 24, natural: 18, b2b: 4, clears: 1610 },
-  '2026-10-09': { donations: 19, natural: 13, b2b: 2, clears: 1140 },
-  '2026-10-12': { donations: 10, natural:  9, b2b: 0, clears: 593 },
-  '2026-10-20': { donations:  4, natural:  3, b2b: 0, clears: 362 },
-  '2026-10-22': { donations:  7, natural:  7, b2b: 0, clears: 603 },
+  '2026-07-22': { donations: 22, natural:  3, b2b: 0, clears: 795 },
+  '2026-07-24': { donations: 14, natural:  3, b2b: 0, clears: 544 },
+  '2026-07-28': { donations: 22, natural:  7, b2b: 0, clears: 626 },
+  '2026-08-01': { donations: 16, natural:  6, b2b: 0, clears: 612 },
+  '2026-08-09': { donations: 11, natural:  4, b2b: 0, clears: 565 },
+  '2026-08-14': { donations: 16, natural:  4, b2b: 0, clears: 893 },
+  '2026-08-19': { donations: 25, natural:  6, b2b: 0, clears: 728 },
+  '2026-08-25': { donations: 18, natural:  4, b2b: 0, clears: 898 },
+  '2026-09-03': { donations: 13, natural:  4, b2b: 0, clears: 518 },
+  '2026-09-10': { donations: 13, natural:  6, b2b: 0, clears: 612 },
+  '2026-09-11': { donations: 13, natural:  3, b2b: 0, clears: 603 },
+  '2026-09-17': { donations: 19, natural:  5, b2b: 0, clears: 519 },
+  '2026-09-18': { donations: 34, natural:  7, b2b: 0, clears: 1322 },
+  '2026-09-19': { donations: 37, natural: 14, b2b: 0, clears: 1598 },
+  '2026-10-03': { donations: 31, natural:  8, b2b: 0, clears: 1610 },
+  '2026-10-09': { donations: 24, natural:  5, b2b: 0, clears: 1140 },
+  '2026-10-12': { donations: 12, natural:  2, b2b: 0, clears: 593 },
+  '2026-10-20': { donations:  9, natural:  1, b2b: 0, clears: 362 },
+  '2026-10-22': { donations: 16, natural:  1, b2b: 0, clears: 603 },
 };
 
 /** `width_ge_3` is the RAW shape count and is NOT a cave count — `min_depth_ge_2` is the column
@@ -776,50 +776,51 @@ const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: num
 /** THE SECOND ENGINE, per session, as literals: [both_yes, oracle_positives] for each metric, and
  *  how far the comparison reached. The cave agrees on every positive in range and the donation on a
  *  fifth of them — two results the OVERALL agreement rate (96%+ for both) hides completely,
- *  because 1650 of the donation's 1659 agreements are two engines saying "no". */
+ *  because almost all of the donation's agreements are two engines saying "no" (`check_dual_engine`
+ *  renders the figures). */
 const DUAL: Record<string, { comparable: number; scored: number; sameBoard: number;
                              cave: [number, number] | null; don: [number, number] | null }> = {
-  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [0, 2] },
-  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [2, 7] },
-  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [0, 3] },
-  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 5] },
-  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [1, 2] },
-  '2026-08-14': { comparable: 373, scored: 893, sameBoard: 197, cave: [3, 3], don: [0, 3] },
-  '2026-08-19': { comparable: 300, scored: 728, sameBoard: 154, cave: [7, 7], don: [1, 9] },
-  '2026-08-25': { comparable: 313, scored: 898, sameBoard: 183, cave: [3, 3], don: [0, 2] },
-  '2026-09-03': { comparable: 216, scored: 518, sameBoard: 112, cave: [1, 1], don: [0, 3] },
-  '2026-09-10': { comparable: 278, scored: 612, sameBoard: 168, cave: [2, 2], don: [0, 1] },
-  '2026-09-11': { comparable: 245, scored: 603, sameBoard: 149, cave: [1, 1], don: [0, 3] },
+  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [2, 7] },
+  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [0, 7] },
+  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [1, 10] },
+  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 3] },
+  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [2, 4] },
+  '2026-08-14': { comparable: 373, scored: 893, sameBoard: 197, cave: [3, 3], don: [2, 5] },
+  '2026-08-19': { comparable: 300, scored: 728, sameBoard: 154, cave: [7, 7], don: [1, 7] },
+  '2026-08-25': { comparable: 313, scored: 898, sameBoard: 183, cave: [3, 3], don: [0, 3] },
+  '2026-09-03': { comparable: 216, scored: 518, sameBoard: 112, cave: [1, 1], don: [1, 7] },
+  '2026-09-10': { comparable: 278, scored: 612, sameBoard: 168, cave: [2, 2], don: [0, 3] },
+  '2026-09-11': { comparable: 245, scored: 603, sameBoard: 149, cave: [1, 1], don: [1, 3] },
   // the cave's oracle_positives is 0 here — the first session where the comparison reaches no cave
   // at all, so this session contributes nothing to the cave's positives row rather than a zero
   // agreement. `agreement_on_positives` is null for it, which is the honest spelling of "no
   // evidence" and is not the same as "the engines disagreed".
-  '2026-09-17': { comparable: 202, scored: 519, sameBoard: 105, cave: null, don: [0, 1] },
-  '2026-09-18': { comparable: 576, scored: 1322, sameBoard: 324, cave: [7, 7], don: [2, 6] },
-  '2026-09-19': { comparable: 661, scored: 1598, sameBoard: 363, cave: [6, 6], don: [2, 14] },
-  // 2026-10-03: eight caves in range, all agreed (seven of them on DIFFERING boards); fourteen
-  // donation positives, every one on a differing board, two agreed.
-  '2026-10-03': { comparable: 680, scored: 1610, sameBoard: 366, cave: [8, 8], don: [0, 5] },
+  '2026-09-17': { comparable: 202, scored: 519, sameBoard: 105, cave: null, don: [1, 3] },
+  '2026-09-18': { comparable: 576, scored: 1322, sameBoard: 324, cave: [7, 7], don: [5, 14] },
+  '2026-09-19': { comparable: 661, scored: 1598, sameBoard: 363, cave: [6, 6], don: [0, 8] },
+  // 2026-10-03: eight caves in range, all agreed (seven of them on DIFFERING boards); fifteen
+  // donation positives, the one on an identical board agreed and none of the fourteen on differing ones.
+  '2026-10-03': { comparable: 680, scored: 1610, sameBoard: 366, cave: [8, 8], don: [1, 15] },
   // 2026-10-09: fifteen caves in range, all agreed (fourteen on DIFFERING boards) — the largest
-  // single-session cave contribution; twelve donation positives, three on identical boards (all
-  // agreed) and nine on differing boards (none agreed), the donation's usual board-split shape.
-  '2026-10-09': { comparable: 505, scored: 1140, sameBoard: 263, cave: [15, 15], don: [1, 5] },
-  // 2026-10-12: three caves in range, all agreed, all on DIFFERING boards; seven donation positives,
-  // every one on a differing board, one agreed.
-  '2026-10-12': { comparable: 234, scored: 593, sameBoard: 136, cave: [3, 3], don: [1, 5] },
-  // 2026-10-20: five caves in range, all agreed (four of them on DIFFERING boards); two donation
-  // positives, the one on an identical board agreed and the one on a differing board not.
-  '2026-10-20': { comparable: 152, scored: 362, sameBoard: 90, cave: [5, 5], don: [1, 1] },
-  // 2026-10-22: one cave in range, agreed, on an identical board; four donation positives, the one
-  // on an identical board agreed and the three on differing boards not.
-  '2026-10-22': { comparable: 250, scored: 603, sameBoard: 150, cave: [1, 1], don: [0, 2] },
+  // single-session cave contribution; six donation positives, every one on a differing board, none
+  // agreed.
+  '2026-10-09': { comparable: 505, scored: 1140, sameBoard: 263, cave: [15, 15], don: [0, 6] },
+  // 2026-10-12: three caves in range, all agreed, all on DIFFERING boards; four donation positives,
+  // the two on identical boards agreed and the two on differing boards not.
+  '2026-10-12': { comparable: 234, scored: 593, sameBoard: 136, cave: [3, 3], don: [2, 4] },
+  // 2026-10-20: five caves in range, all agreed (four of them on DIFFERING boards); five donation
+  // positives, the two on identical boards agreed and the three on differing boards not.
+  '2026-10-20': { comparable: 152, scored: 362, sameBoard: 90, cave: [5, 5], don: [2, 5] },
+  // 2026-10-22: one cave in range, agreed, on an identical board; two donation positives, the one
+  // on an identical board agreed and the one on a differing board not.
+  '2026-10-22': { comparable: 250, scored: 603, sameBoard: 150, cave: [1, 1], don: [1, 2] },
 };
 
 const facts = (s: string) =>
   JSON.parse(readFileSync(`${sessionDir(s)}/sim/opener-facts.json`, 'utf8'));
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
-test('the second engine agrees on every cave and on a quarter of the donations', () => {
+test('the second engine agrees on every cave and on a fifth of the donations', () => {
   let cavePos = 0, caveHit = 0, donPos = 0, donHit = 0, bothNo = 0;
   let comparable = 0, scored = 0;
   for (const s of SESSIONS) {
@@ -849,7 +850,7 @@ test('the second engine agrees on every cave and on a quarter of the donations',
   }
   // THE TWO CORPUS FIGURES, and the gap between them is the finding.
   expect([caveHit, cavePos]).toEqual([75, 75]);      // every cave in range, both engines
-  expect([donHit, donPos]).toEqual([13, 79]);        // five donations in six disagree
+  expect([donHit, donPos]).toEqual([24, 116]);        // four donations in five disagree
   expect([comparable, scored]).toEqual([6331, 15141]);
 
   // …and the reason neither number may be quoted as an overall rate: the donation's 96.7% is
@@ -866,7 +867,7 @@ test('the second engine agrees on every cave and on a quarter of the donations',
   expect(cavePos).toBeLessThan(allCaves);
 });
 
-test('the board split is what makes the donation 9/43 readable, and it is not the cave\'s story', () => {
+test('the board split is what makes the donation split readable, and it is not the cave\'s story', () => {
   // WHY THIS IS A SEPARATE TEST. `agreement_on_positives` says the two engines disagree about three
   // donations in four; it does not say WHY. Splitting the positives by whether the other engine had
   // the same board answers it — and answers it differently for the two metrics, which is why the
@@ -895,7 +896,7 @@ test('the board split is what makes the donation 9/43 readable, and it is not th
   // THE DONATION: where the boards agree the verdicts agree perfectly, and where they differ they
   // mostly do not. So the disagreement is the BOARD (oracle-source.ts's garbage-hole columns), not
   // the predicate — the opposite of what "the two engines disagree about donations" sounds like.
-  expect(agg.don).toEqual([9, 70, 9, 4]);
+  expect(agg.don).toEqual([22,  94,  22,  2]);
   expect(agg.don[2]).toBe(agg.don[0]);                    // every positive on an identical board
   expect(agg.don[3] * 3).toBeLessThan(agg.don[1]);        // a small minority of the differing ones
 
@@ -1010,7 +1011,7 @@ test('the denominator is anchored to the replay\'s own twice-extracted T-spin co
  *  nights — the column separates whose WELL it was, never whether the player meant to build it. So
  *  this stays a named count and not a rate, and the fourth is to be investigated rather than
  *  absorbed. Note also what has NOT changed: pinglamb is 0 across all eleven sessions. */
-const SELF_BUILT_WELLS: Record<string, number> = { '2026-09-10': 2, '2026-09-11': 1 };
+const SELF_BUILT_WELLS: Record<string, number> = { '2026-07-22': 2, '2026-07-24': 1, '2026-07-28': 1, '2026-08-14': 1, '2026-08-19': 1, '2026-09-10': 3, '2026-09-11': 3, '2026-09-18': 4, '2026-09-19': 1, '2026-10-09': 1 };
 
 test('the donation counts are pinned per session, and the licensing check is clean', () => {
   for (const s of SESSIONS) {
@@ -1101,7 +1102,32 @@ function drawn(rows: string[], t: [number, number][] | null) {
   for (const q of cells) g[q.row]![q.col] = true;
   const cleared: number[] = [];
   for (let r = 0; r < g.length; r++) if (g[r]!.every(Boolean)) cleared.push(r);
-  return { g, cells, cleared, h: g.length };
+  return { g, cells, cleared, h: g.length, prov: drawnProv(rows) };
+}
+
+/** The drawing's PROVENANCE, for `donationCols`' complete-pieces clause: each 4-connected run of one
+ *  piece letter is one piece (its id), and harddrop's grey `G` stack is `-1` — it is not a piece the
+ *  drawing tracks, so a plug made of it is never complete. Every plug harddrop draws is a lettered
+ *  piece of exactly four cells, which `the complete-pieces clause` below asserts rather than assumes. */
+function drawnProv(rows: string[]): (number | null)[][] {
+  const p: (number | null)[][] = rows.map(r => [...r].map(ch => (ch === '.' ? null : ch === 'G' ? -1 : -2)));
+  let id = 0;
+  for (let r = 0; r < rows.length; r++)
+    for (let c = 0; c < 10; c++) {
+      if (p[r]![c] !== -2) continue;
+      const ch = rows[r]![c], stack = [[r, c]];
+      p[r]![c] = id;
+      while (stack.length) {
+        const [y, x] = stack.pop()!;
+        for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const yy = y! + dy!, xx = x! + dx!;
+          if (yy < 0 || yy >= rows.length || xx < 0 || xx >= 10) continue;
+          if (p[yy]![xx] === -2 && rows[yy]![xx] === ch) { p[yy]![xx] = id; stack.push([yy, xx]); }
+        }
+      }
+      id++;
+    }
+  return p;
 }
 
 /** The controls come out of `wiki-tspin-techniques.json` rather than being typed here, and that is
@@ -1178,11 +1204,36 @@ test('control — the donation predicate fires on every setup harddrop draws as 
   for (const ctl of DONATION_POSITIVES) {
     const b = drawn(ctl.rows, ctl.t_cells);
     expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);
-    const wells = donationCols(b.g, b.cleared, b.cells, b.h);
+    const wells = donationCols(b.g, b.cleared, b.cells, b.h, b.prov);
     expect([ctl.name, wells.length]).toEqual([ctl.name, 1]);
     expect([ctl.name, wells[0]!.col]).toEqual([ctl.name, ctl.well_col]);
     expect([ctl.name, wells[0]!.cavity]).toEqual([ctl.name, ctl.cavity]);
     expect([ctl.name, wells[0]!.cavity >= DONATION_CAVITY]).toEqual([ctl.name, true]);
+  }
+});
+
+test('the complete-pieces clause: garbage or a fragment in the plug is no donation', () => {
+  // yachi, 2026-10-25: follow harddrop, but every non-T cell plugging the well inside the cleared rows
+  // must be a piece whose four cells are all on the board. On each of harddrop's own positives the plug
+  // IS such a piece (asserted, not assumed); re-label it as garbage, or split it so it reads as a
+  // fragment a clear left behind, and the same board on the same occupancy stops being a donation —
+  // while the naive ablation, which does not carry the clause, still fires.
+  for (const ctl of DONATION_POSITIVES) {
+    const b = drawn(ctl.rows, ctl.t_cells);
+    const well = ctl.well_col!;
+    const plug = b.cleared.map(r => b.prov[r]![well]!);
+    for (const q of plug) {
+      expect([ctl.name, q >= 0]).toEqual([ctl.name, true]);
+      expect([ctl.name, b.prov.flat().filter(v => v === q).length]).toEqual([ctl.name, 4]);
+    }
+    const garbage = b.prov.map(r => r.map(v => (plug.includes(v as number) ? -1 : v)));
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, garbage)]).toEqual([ctl.name, []]);
+    const split = b.prov.map(r => [...r]);
+    split[b.cleared[0]!]![well] = 999;
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, split)]).toEqual([ctl.name, []]);
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, undefined)]).toEqual([ctl.name, []]);
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, garbage, 'naive').length > 0])
+      .toEqual([ctl.name, true]);
   }
 });
 
@@ -1196,7 +1247,7 @@ test('control — and does not fire on harddrop\'s own "an S donation does not w
   for (const ctl of DONATION_NEGATIVES) {
     const b = drawn(ctl.rows, ctl.t_cells);
     expect([ctl.name, b.cleared.length]).toEqual([ctl.name, ctl.clears]);
-    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, b.prov)]).toEqual([ctl.name, []]);
   }
 });
 
@@ -1218,8 +1269,8 @@ test('control — harddrop\'s own minimal pair: ONE cell decides the donation', 
     for (let c = 0; c < 10; c++) if (ok.g[r]![c] !== no.g[r]![c]) diff.push([c, r]);
   expect(diff).toEqual(nm.differing_cells);
   expect(diff).toHaveLength(1);
-  expect(donationCols(ok.g, ok.cleared, ok.cells, ok.h)).toHaveLength(1);
-  expect(donationCols(no.g, no.cleared, no.cells, no.h)).toHaveLength(0);
+  expect(donationCols(ok.g, ok.cleared, ok.cells, ok.h, ok.prov)).toHaveLength(1);
+  expect(donationCols(no.g, no.cleared, no.cells, no.h, no.prov)).toHaveLength(0);
 });
 
 /** Basic Structures from harddrop's STMB Cave page, read out of the committed transcription. The
@@ -1364,7 +1415,7 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
   for (const ctl of DONATION_POSITIVES) {
     const b = drawn(ctl.rows, ctl.t_cells);
     const well = ctl.well_col!;
-    const before = donationCols(b.g, b.cleared, b.cells, b.h);
+    const before = donationCols(b.g, b.cleared, b.cells, b.h, b.prov);
     expect([ctl.name, before.map(w => w.col)]).toEqual([ctl.name, [well]]);
 
     // the topmost row that the spin does NOT clear and where the well is still open
@@ -1382,13 +1433,13 @@ test('mutation — dropping the re-opening clause would fire on a board that mus
     // the naive clause still holds — the well is filled through every row the spin cleared ...
     expect([ctl.name, b.cleared.every(r => b.g[r]![well]!)]).toEqual([ctl.name, true]);
     // ... yet the real predicate now finds no well at all
-    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h)]).toEqual([ctl.name, []]);
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, b.prov)]).toEqual([ctl.name, []]);
 
     // ...and the ABLATION accepts exactly the board the shipped predicate just rejected, which is
     // what makes `no_reopen` a measurement of THIS clause rather than of some other difference.
     // Behavioural, on a drawn board: the corpus can only report that four numbers are ordered, and
     // an ablation that had drifted into deleting a different clause would keep that ordering.
-    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, 'no_reopen').map(w => w.col)])
+    expect([ctl.name, donationCols(b.g, b.cleared, b.cells, b.h, b.prov, 'no_reopen').map(w => w.col)])
       .toEqual([ctl.name, [well]]);
   }
 });
@@ -1403,7 +1454,7 @@ test('the donation ablations are a CHAIN — each one accepts everything the pre
   expect(Object.keys(DONATION_ABLATIONS).sort()).toEqual([...CHAIN].sort());
   for (const ctl of [...DONATION_POSITIVES, ...DONATION_NEGATIVES]) {
     const b = drawn(ctl.rows, ctl.t_cells);
-    const sets = CHAIN.map(k => new Set(donationCols(b.g, b.cleared, b.cells, b.h, k).map(w => w.col)));
+    const sets = CHAIN.map(k => new Set(donationCols(b.g, b.cleared, b.cells, b.h, b.prov, k).map(w => w.col)));
     for (let i = 0; i + 1 < CHAIN.length; i++)
       expect([ctl.name, CHAIN[i], [...sets[i]!].filter(c => !sets[i + 1]!.has(c))])
         .toEqual([ctl.name, CHAIN[i], []]);
@@ -1464,31 +1515,31 @@ const MID_GAME_ORDER: Record<string, { rounds_with_both: number; cspin: number; 
  *  column first: it is 0 in every session, which is harddrop's filing of the technique MEASURED. */
 const WINDOW_SPLIT: Record<string, { donation: [number, number]; cave: [number, number] }> = {
   //              [in_opener, mid_game]
-  '2026-07-22': { donation: [1, 12], cave: [0, 4] },
-  '2026-07-24': { donation: [3, 9], cave: [0, 6] },
-  '2026-07-28': { donation: [5, 4], cave: [0, 5] },
-  '2026-08-01': { donation: [1, 14], cave: [0, 8] },
-  '2026-08-09': { donation: [2, 6], cave: [0, 7] },
-  '2026-08-14': { donation: [2, 12], cave: [0, 9] },
+  '2026-07-22': { donation: [6, 16], cave: [0, 4] },
+  '2026-07-24': { donation: [3, 11], cave: [0, 6] },
+  '2026-07-28': { donation: [9, 13], cave: [0, 5] },
+  '2026-08-01': { donation: [1, 15], cave: [0, 8] },
+  '2026-08-09': { donation: [2, 9], cave: [0, 7] },
+  '2026-08-14': { donation: [2, 14], cave: [0, 9] },
   // NOT `cave: [0, ...]` — 2026-08-19 is the first session with a >=3-wide hit INSIDE the opener
   // window, which breaks the six-session absolute the mid-game test below asserts. Recorded here as
   // measured; see that test for why it is left failing rather than relaxed.
-  '2026-08-19': { donation: [6, 11], cave: [2, 8] },
-  '2026-08-25': { donation: [1, 14], cave: [2, 9] },
-  '2026-09-03': { donation: [1, 6], cave: [1, 5] },
-  '2026-09-10': { donation: [2, 11], cave: [0, 3] },
-  '2026-09-11': { donation: [3, 9], cave: [0, 6] },
-  '2026-09-17': { donation: [1, 5], cave: [0, 5] },
-  '2026-09-18': { donation: [2, 21], cave: [0, 13] },
-  '2026-09-19': { donation: [12, 26], cave: [0, 20] },
-  '2026-10-03': { donation: [2, 22], cave: [2, 16] },
+  '2026-08-19': { donation: [9, 16], cave: [2, 8] },
+  '2026-08-25': { donation: [3, 15], cave: [2, 9] },
+  '2026-09-03': { donation: [5, 8], cave: [1, 5] },
+  '2026-09-10': { donation: [3, 10], cave: [0, 3] },
+  '2026-09-11': { donation: [0, 13], cave: [0, 6] },
+  '2026-09-17': { donation: [4, 15], cave: [0, 5] },
+  '2026-09-18': { donation: [6, 28], cave: [0, 13] },
+  '2026-09-19': { donation: [10, 27], cave: [0, 20] },
+  '2026-10-03': { donation: [14, 17], cave: [2, 16] },
   // 31 width>=3 hits and NONE in the window, so CAVE_IN_OPENER_EXCEPTIONS is unchanged at seven.
-  '2026-10-09': { donation: [3, 16], cave: [0, 31] },
+  '2026-10-09': { donation: [2, 22], cave: [0, 31] },
   // four width>=3 hits and ONE in the window — the eighth CAVE_IN_OPENER_EXCEPTIONS entry.
-  '2026-10-12': { donation: [1, 9], cave: [1, 3] },
+  '2026-10-12': { donation: [3, 9], cave: [1, 3] },
   // six width>=3 hits (all yachi's) and NONE in the window, so CAVE_IN_OPENER_EXCEPTIONS stays at eight.
-  '2026-10-20': { donation: [0, 4], cave: [0, 6] },
-  '2026-10-22': { donation: [2, 5], cave: [0, 5] },
+  '2026-10-20': { donation: [3, 6], cave: [0, 6] },
+  '2026-10-22': { donation: [1, 15], cave: [0, 5] },
 };
 
 const orderPlayers = (s: string) => facts(s).ordering.players as any[];
