@@ -695,25 +695,25 @@ test('these sessions run mid-game Perfect Clears, not the Perfect Clear Opener',
 /** Corpus result per session, written out. `clears` is the licensing denominator
  *  (`donation.check.tspin_clears`), not a count of anything donated. */
 const DONATION: Record<string, { donations: number; natural: number; b2b: number; clears: number }> = {
-  '2026-07-22': { donations: 21, natural: 13, b2b: 2, clears: 795 },
-  '2026-07-24': { donations: 15, natural: 10, b2b: 1, clears: 544 },
-  '2026-07-28': { donations: 13, natural: 13, b2b: 0, clears: 626 },
-  '2026-08-01': { donations: 20, natural: 13, b2b: 2, clears: 612 },
-  '2026-08-09': { donations: 13, natural:  8, b2b: 0, clears: 565 },
-  '2026-08-14': { donations: 21, natural: 13, b2b: 1, clears: 893 },
-  '2026-08-19': { donations: 24, natural: 16, b2b: 1, clears: 728 },
-  '2026-08-25': { donations: 23, natural: 14, b2b: 2, clears: 898 },
-  '2026-09-03': { donations: 13, natural:  9, b2b: 0, clears: 518 },
-  '2026-09-10': { donations: 15, natural: 12, b2b: 1, clears: 612 },
-  '2026-09-11': { donations: 16, natural:  9, b2b: 3, clears: 603 },
-  '2026-09-17': { donations:  8, natural:  7, b2b: 1, clears: 519 },
-  '2026-09-18': { donations: 33, natural: 22, b2b: 4, clears: 1322 },
-  '2026-09-19': { donations: 50, natural: 38, b2b: 2, clears: 1598 },
-  '2026-10-03': { donations: 37, natural: 24, b2b: 4, clears: 1610 },
-  '2026-10-09': { donations: 30, natural: 15, b2b: 2, clears: 1140 },
-  '2026-10-12': { donations: 14, natural: 10, b2b: 0, clears: 593 },
-  '2026-10-20': { donations:  6, natural:  4, b2b: 0, clears: 362 },
-  '2026-10-22': { donations: 14, natural:  7, b2b: 0, clears: 603 },
+  '2026-07-22': { donations: 13, natural: 11, b2b: 2, clears: 795 },
+  '2026-07-24': { donations: 12, natural:  8, b2b: 1, clears: 544 },
+  '2026-07-28': { donations:  9, natural:  9, b2b: 0, clears: 626 },
+  '2026-08-01': { donations: 15, natural: 12, b2b: 2, clears: 612 },
+  '2026-08-09': { donations:  8, natural:  6, b2b: 0, clears: 565 },
+  '2026-08-14': { donations: 14, natural: 12, b2b: 1, clears: 893 },
+  '2026-08-19': { donations: 17, natural: 14, b2b: 1, clears: 728 },
+  '2026-08-25': { donations: 15, natural: 13, b2b: 2, clears: 898 },
+  '2026-09-03': { donations:  7, natural:  6, b2b: 0, clears: 518 },
+  '2026-09-10': { donations: 13, natural: 11, b2b: 1, clears: 612 },
+  '2026-09-11': { donations: 12, natural:  9, b2b: 3, clears: 603 },
+  '2026-09-17': { donations:  6, natural:  5, b2b: 1, clears: 519 },
+  '2026-09-18': { donations: 23, natural: 18, b2b: 4, clears: 1322 },
+  '2026-09-19': { donations: 38, natural: 34, b2b: 2, clears: 1598 },
+  '2026-10-03': { donations: 24, natural: 18, b2b: 4, clears: 1610 },
+  '2026-10-09': { donations: 19, natural: 13, b2b: 2, clears: 1140 },
+  '2026-10-12': { donations: 10, natural:  9, b2b: 0, clears: 593 },
+  '2026-10-20': { donations:  4, natural:  3, b2b: 0, clears: 362 },
+  '2026-10-22': { donations:  7, natural:  7, b2b: 0, clears: 603 },
 };
 
 /** `width_ge_3` is the RAW shape count and is NOT a cave count — `min_depth_ge_2` is the column
@@ -779,40 +779,40 @@ const TSPIN_ANCHOR: Record<string, { rounds: number; replay: number; scored: num
  *  because 1650 of the donation's 1659 agreements are two engines saying "no". */
 const DUAL: Record<string, { comparable: number; scored: number; sameBoard: number;
                              cave: [number, number] | null; don: [number, number] | null }> = {
-  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [2, 7] },
-  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [2, 9] },
-  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [0, 6] },
-  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 9] },
-  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [3, 5] },
-  '2026-08-14': { comparable: 373, scored: 893, sameBoard: 197, cave: [3, 3], don: [0, 7] },
-  '2026-08-19': { comparable: 300, scored: 728, sameBoard: 154, cave: [7, 7], don: [2, 15] },
-  '2026-08-25': { comparable: 313, scored: 898, sameBoard: 183, cave: [3, 3], don: [0, 5] },
-  '2026-09-03': { comparable: 216, scored: 518, sameBoard: 112, cave: [1, 1], don: [0, 7] },
-  '2026-09-10': { comparable: 278, scored: 612, sameBoard: 168, cave: [2, 2], don: [0, 2] },
-  '2026-09-11': { comparable: 245, scored: 603, sameBoard: 149, cave: [1, 1], don: [1, 6] },
+  '2026-07-22': { comparable: 360, scored: 795, sameBoard: 222, cave: [3, 3], don: [0, 2] },
+  '2026-07-24': { comparable: 244, scored: 544, sameBoard: 142, cave: [2, 2], don: [2, 7] },
+  '2026-07-28': { comparable: 273, scored: 626, sameBoard: 157, cave: [2, 2], don: [0, 3] },
+  '2026-08-01': { comparable: 229, scored: 612, sameBoard: 133, cave: [2, 2], don: [2, 5] },
+  '2026-08-09': { comparable: 240, scored: 565, sameBoard: 141, cave: [4, 4], don: [1, 2] },
+  '2026-08-14': { comparable: 373, scored: 893, sameBoard: 197, cave: [3, 3], don: [0, 3] },
+  '2026-08-19': { comparable: 300, scored: 728, sameBoard: 154, cave: [7, 7], don: [1, 9] },
+  '2026-08-25': { comparable: 313, scored: 898, sameBoard: 183, cave: [3, 3], don: [0, 2] },
+  '2026-09-03': { comparable: 216, scored: 518, sameBoard: 112, cave: [1, 1], don: [0, 3] },
+  '2026-09-10': { comparable: 278, scored: 612, sameBoard: 168, cave: [2, 2], don: [0, 1] },
+  '2026-09-11': { comparable: 245, scored: 603, sameBoard: 149, cave: [1, 1], don: [0, 3] },
   // the cave's oracle_positives is 0 here — the first session where the comparison reaches no cave
   // at all, so this session contributes nothing to the cave's positives row rather than a zero
   // agreement. `agreement_on_positives` is null for it, which is the honest spelling of "no
   // evidence" and is not the same as "the engines disagreed".
-  '2026-09-17': { comparable: 202, scored: 519, sameBoard: 105, cave: null, don: [0, 2] },
-  '2026-09-18': { comparable: 576, scored: 1322, sameBoard: 324, cave: [7, 7], don: [3, 13] },
-  '2026-09-19': { comparable: 661, scored: 1598, sameBoard: 363, cave: [6, 6], don: [2, 19] },
+  '2026-09-17': { comparable: 202, scored: 519, sameBoard: 105, cave: null, don: [0, 1] },
+  '2026-09-18': { comparable: 576, scored: 1322, sameBoard: 324, cave: [7, 7], don: [2, 6] },
+  '2026-09-19': { comparable: 661, scored: 1598, sameBoard: 363, cave: [6, 6], don: [2, 14] },
   // 2026-10-03: eight caves in range, all agreed (seven of them on DIFFERING boards); fourteen
   // donation positives, every one on a differing board, two agreed.
-  '2026-10-03': { comparable: 680, scored: 1610, sameBoard: 366, cave: [8, 8], don: [2, 14] },
+  '2026-10-03': { comparable: 680, scored: 1610, sameBoard: 366, cave: [8, 8], don: [0, 5] },
   // 2026-10-09: fifteen caves in range, all agreed (fourteen on DIFFERING boards) — the largest
   // single-session cave contribution; twelve donation positives, three on identical boards (all
   // agreed) and nine on differing boards (none agreed), the donation's usual board-split shape.
-  '2026-10-09': { comparable: 505, scored: 1140, sameBoard: 263, cave: [15, 15], don: [3, 12] },
+  '2026-10-09': { comparable: 505, scored: 1140, sameBoard: 263, cave: [15, 15], don: [1, 5] },
   // 2026-10-12: three caves in range, all agreed, all on DIFFERING boards; seven donation positives,
   // every one on a differing board, one agreed.
-  '2026-10-12': { comparable: 234, scored: 593, sameBoard: 136, cave: [3, 3], don: [1, 7] },
+  '2026-10-12': { comparable: 234, scored: 593, sameBoard: 136, cave: [3, 3], don: [1, 5] },
   // 2026-10-20: five caves in range, all agreed (four of them on DIFFERING boards); two donation
   // positives, the one on an identical board agreed and the one on a differing board not.
-  '2026-10-20': { comparable: 152, scored: 362, sameBoard: 90, cave: [5, 5], don: [1, 2] },
+  '2026-10-20': { comparable: 152, scored: 362, sameBoard: 90, cave: [5, 5], don: [1, 1] },
   // 2026-10-22: one cave in range, agreed, on an identical board; four donation positives, the one
   // on an identical board agreed and the three on differing boards not.
-  '2026-10-22': { comparable: 250, scored: 603, sameBoard: 150, cave: [1, 1], don: [1, 4] },
+  '2026-10-22': { comparable: 250, scored: 603, sameBoard: 150, cave: [1, 1], don: [0, 2] },
 };
 
 const facts = (s: string) =>
@@ -849,7 +849,7 @@ test('the second engine agrees on every cave and on a quarter of the donations',
   }
   // THE TWO CORPUS FIGURES, and the gap between them is the finding.
   expect([caveHit, cavePos]).toEqual([75, 75]);      // every cave in range, both engines
-  expect([donHit, donPos]).toEqual([25, 151]);        // five donations in six disagree
+  expect([donHit, donPos]).toEqual([13, 79]);        // five donations in six disagree
   expect([comparable, scored]).toEqual([6331, 15141]);
 
   // …and the reason neither number may be quoted as an overall rate: the donation's 96.7% is
@@ -895,7 +895,7 @@ test('the board split is what makes the donation 9/43 readable, and it is not th
   // THE DONATION: where the boards agree the verdicts agree perfectly, and where they differ they
   // mostly do not. So the disagreement is the BOARD (oracle-source.ts's garbage-hole columns), not
   // the predicate — the opposite of what "the two engines disagree about donations" sounds like.
-  expect(agg.don).toEqual([17, 134, 17, 8]);
+  expect(agg.don).toEqual([9, 70, 9, 4]);
   expect(agg.don[2]).toBe(agg.don[0]);                    // every positive on an identical board
   expect(agg.don[3] * 3).toBeLessThan(agg.don[1]);        // a small minority of the differing ones
 
@@ -1464,31 +1464,31 @@ const MID_GAME_ORDER: Record<string, { rounds_with_both: number; cspin: number; 
  *  column first: it is 0 in every session, which is harddrop's filing of the technique MEASURED. */
 const WINDOW_SPLIT: Record<string, { donation: [number, number]; cave: [number, number] }> = {
   //              [in_opener, mid_game]
-  '2026-07-22': { donation: [3, 18], cave: [0, 4] },
-  '2026-07-24': { donation: [4, 11], cave: [0, 6] },
-  '2026-07-28': { donation: [9,  4], cave: [0, 5] },
-  '2026-08-01': { donation: [4, 16], cave: [0, 8] },
-  '2026-08-09': { donation: [3, 10], cave: [0, 7] },
-  '2026-08-14': { donation: [6, 15], cave: [0, 9] },
+  '2026-07-22': { donation: [1, 12], cave: [0, 4] },
+  '2026-07-24': { donation: [3, 9], cave: [0, 6] },
+  '2026-07-28': { donation: [5, 4], cave: [0, 5] },
+  '2026-08-01': { donation: [1, 14], cave: [0, 8] },
+  '2026-08-09': { donation: [2, 6], cave: [0, 7] },
+  '2026-08-14': { donation: [2, 12], cave: [0, 9] },
   // NOT `cave: [0, ...]` — 2026-08-19 is the first session with a >=3-wide hit INSIDE the opener
   // window, which breaks the six-session absolute the mid-game test below asserts. Recorded here as
   // measured; see that test for why it is left failing rather than relaxed.
-  '2026-08-19': { donation: [10, 14], cave: [2, 8] },
-  '2026-08-25': { donation: [4, 19], cave: [2, 9] },
-  '2026-09-03': { donation: [5, 8], cave: [1, 5] },
-  '2026-09-10': { donation: [4, 11], cave: [0, 3] },
-  '2026-09-11': { donation: [6, 10], cave: [0, 6] },
-  '2026-09-17': { donation: [3, 5], cave: [0, 5] },
-  '2026-09-18': { donation: [9, 24], cave: [0, 13] },
-  '2026-09-19': { donation: [19, 31], cave: [0, 20] },
-  '2026-10-03': { donation: [11, 26], cave: [2, 16] },
+  '2026-08-19': { donation: [6, 11], cave: [2, 8] },
+  '2026-08-25': { donation: [1, 14], cave: [2, 9] },
+  '2026-09-03': { donation: [1, 6], cave: [1, 5] },
+  '2026-09-10': { donation: [2, 11], cave: [0, 3] },
+  '2026-09-11': { donation: [3, 9], cave: [0, 6] },
+  '2026-09-17': { donation: [1, 5], cave: [0, 5] },
+  '2026-09-18': { donation: [2, 21], cave: [0, 13] },
+  '2026-09-19': { donation: [12, 26], cave: [0, 20] },
+  '2026-10-03': { donation: [2, 22], cave: [2, 16] },
   // 31 width>=3 hits and NONE in the window, so CAVE_IN_OPENER_EXCEPTIONS is unchanged at seven.
-  '2026-10-09': { donation: [8, 22], cave: [0, 31] },
+  '2026-10-09': { donation: [3, 16], cave: [0, 31] },
   // four width>=3 hits and ONE in the window — the eighth CAVE_IN_OPENER_EXCEPTIONS entry.
-  '2026-10-12': { donation: [4, 10], cave: [1, 3] },
+  '2026-10-12': { donation: [1, 9], cave: [1, 3] },
   // six width>=3 hits (all yachi's) and NONE in the window, so CAVE_IN_OPENER_EXCEPTIONS stays at eight.
-  '2026-10-20': { donation: [1, 5], cave: [0, 6] },
-  '2026-10-22': { donation: [4, 10], cave: [0, 5] },
+  '2026-10-20': { donation: [0, 4], cave: [0, 6] },
+  '2026-10-22': { donation: [2, 5], cave: [0, 5] },
 };
 
 const orderPlayers = (s: string) => facts(s).ordering.players as any[];
