@@ -130,7 +130,9 @@ module OpenerBoard {
       (c == 0 || g[x][c - 1]) && (c == w - 1 || g[x][c + 1])
   }
 
-  // :263-271 — the T's own slot: excluded only when the T occupies column c in EVERY cleared row
+  // the T's columns: excluded whenever the T occupies column c in ANY row (since 2026-10-25, yachi's rule:
+  // the plug must be other pieces, never the T; harddrop excluded only the column the T fills in EVERY
+  // cleared row, and this predicate said so until then)
   ghost function TRowsAt(t: seq<Cell>, c: int): set<int>
   {
     set q | q in t && q.col == c :: q.row
@@ -138,7 +140,7 @@ module OpenerBoard {
 
   ghost predicate TSlotExcluded(cleared: set<int>, t: seq<Cell>, c: int)
   {
-    |TRowsAt(t, c)| > 0 && forall r :: r in cleared ==> r in TRowsAt(t, c)
+    |TRowsAt(t, c)| > 0
   }
 
   // The per-column accept condition of the donationCols loop, :269-285, verbatim.

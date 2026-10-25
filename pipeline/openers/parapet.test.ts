@@ -20,7 +20,8 @@
  *      below them: the well), per variant.
  *   6. DONATION: `donationCols` re-implemented (`technique-donation-checks.ts`, shared with `kaidan.test.ts`), every session's
  *      per-player `donation.players[].donations` reproduced exactly, and every hit that is not a donation at its well
- *      column named with its re-derived reason (HIT_NOT_DONATION).
+ *      column named with its re-derived reason (HIT_NOT_DONATION). Since 2026-10-25 no TSD hit is one: its well is
+ *      under the T's arm, and a column the T is in is never the well (yachi's rule), which the test asserts per hit.
  *   7. NAMED lists, not bounds; pinned per-player figures; the STRUCTURAL zeros re-derived from the window; mutants,
  *      each with its asserted symptom (the equivalent ones named, measured, asserted to STAY byte-identical).
  *   8. THE PAYOFF ON INDEPENDENT DRAWINGS: two-lock digests built from Tetrisチャンネル's 4-deep sequence (012, 013's T,
@@ -483,177 +484,55 @@ const RECON_DROPPED_TSD: string[] = [];
 const RECON_DROPPED_TSS: string[] = [];
 const HIT_NOT_DONATION: string[] = [
   "2026-07-22 m10r1 yachi lock 116 (parapet_tss: filled_above_window)",
-  "2026-07-22 m10r5 yachi lock 92 (parapet: filled_above_window)",
-  "2026-07-22 m10r7 yachi lock 88 (parapet: filled_above_window)",
   "2026-07-22 m3r3 yachi lock 38 (parapet_tss: filled_above_window)",
   "2026-07-22 m3r4 yachi lock 84 (parapet_tss: filled_above_window)",
-  "2026-07-22 m3r7 pinglamb lock 86 (parapet: filled_above_window)",
-  "2026-07-22 m5r1 pinglamb lock 18 (parapet: filled_above_window)",
   "2026-07-22 m5r5 yachi lock 39 (parapet_tss: filled_above_window)",
-  "2026-07-22 m5r7 yachi lock 24 (parapet: filled_above_window)",
-  "2026-07-22 m9r5 pinglamb lock 171 (parapet: filled_above_window)",
-  "2026-07-24 m1r1 pinglamb lock 18 (parapet: filled_above_window)",
-  "2026-07-24 m2r2 pinglamb lock 14 (parapet: cavity_lt4)",
-  "2026-07-24 m3r2 pinglamb lock 79 (parapet: filled_above_window)",
-  "2026-07-24 m6r7 yachi lock 37 (parapet: filled_above_window)",
-  "2026-07-24 m7r3 pinglamb lock 118 (parapet: filled_above_window)",
-  "2026-07-24 m7r7 pinglamb lock 39 (parapet: cavity_lt4)",
   "2026-07-28 m1r6 yachi lock 61 (parapet_tss: filled_above_window)",
   "2026-07-28 m3r5 yachi lock 33 (parapet_tss: filled_above_window)",
-  "2026-07-28 m4r2 yachi lock 166 (parapet: filled_above_window)",
   "2026-07-28 m6r5 yachi lock 185 (parapet_tss: filled_above_window)",
-  "2026-07-28 m6r5 yachi lock 40 (parapet: filled_above_window)",
-  "2026-07-28 m7r4 yachi lock 38 (parapet: filled_above_window)",
-  "2026-07-28 m7r9 pinglamb lock 47 (parapet: cavity_lt4)", "2026-08-01 m1r7 yachi lock 26 (parapet: cavity_lt4)",
   "2026-08-01 m2r2 yachi lock 90 (parapet_tss: filled_above_window)",
-  "2026-08-01 m3r3 yachi lock 86 (parapet: filled_above_window)",
-  "2026-08-01 m5r2 yachi lock 18 (parapet: filled_above_window)",
-  "2026-08-01 m5r2 yachi lock 88 (parapet: filled_above_window)",
-  "2026-08-01 m7r1 pinglamb lock 82 (parapet: filled_above_window)",
   "2026-08-09 m3r3 yachi lock 110 (parapet_tss: filled_above_window)",
   "2026-08-09 m3r8 yachi lock 125 (parapet_tss: filled_above_window)",
-  "2026-08-09 m4r2 pinglamb lock 29 (parapet: cavity_lt4)",
-  "2026-08-09 m5r7 pinglamb lock 27 (parapet: filled_above_window)",
-  "2026-08-09 m5r8 pinglamb lock 122 (parapet: filled_above_window)",
-  "2026-08-09 m6r2 pinglamb lock 38 (parapet: filled_above_window)",
-  "2026-08-14 m11r2 yachi lock 41 (parapet: cavity_lt4)",
-  "2026-08-14 m11r2 yachi lock 90 (parapet: filled_above_window)",
   "2026-08-14 m11r5 yachi lock 144 (parapet_tss: filled_above_window)",
-  "2026-08-14 m11r7 pinglamb lock 32 (parapet: filled_above_window)",
-  "2026-08-14 m4r1 pinglamb lock 45 (parapet: filled_above_window)",
   "2026-08-14 m4r6 yachi lock 207 (parapet_tss: filled_above_window)",
-  "2026-08-14 m5r2 pinglamb lock 56 (parapet: filled_above_window)",
   "2026-08-14 m5r2 yachi lock 81 (parapet_tss: filled_above_window)",
-  "2026-08-14 m6r3 pinglamb lock 27 (parapet: filled_above_window)",
   "2026-08-14 m8r2 yachi lock 46 (parapet_tss: filled_above_window)",
   "2026-08-14 m9r1 yachi lock 54 (parapet_tss: cavity_lt4)",
-  "2026-08-14 m9r3 pinglamb lock 103 (parapet: filled_above_window)",
-  "2026-08-19 m4r7 yachi lock 135 (parapet: filled_above_window)",
-  "2026-08-19 m4r8 pinglamb lock 104 (parapet: filled_above_window)",
   "2026-08-19 m5r3 yachi lock 39 (parapet_tss: filled_above_window)",
-  "2026-08-19 m5r5 yachi lock 39 (parapet: filled_above_window)",
-  "2026-08-19 m5r7 pinglamb lock 46 (parapet: filled_above_window)",
-  "2026-08-19 m6r6 pinglamb lock 33 (parapet: filled_above_window)",
-  "2026-08-19 m9r9 pinglamb lock 149 (parapet: filled_above_window)",
   "2026-08-19 m9r9 yachi lock 41 (parapet_tss: filled_above_window)",
-  "2026-08-25 m1r2 yachi lock 68 (parapet: filled_above_window)",
-  "2026-08-25 m1r7 pinglamb lock 31 (parapet: filled_above_window)",
-  "2026-08-25 m1r7 pinglamb lock 48 (parapet: filled_above_window)",
   "2026-08-25 m2r1 yachi lock 53 (parapet_tss: cavity_lt4)",
-  "2026-08-25 m2r1 yachi lock 60 (parapet: filled_above_window)",
   "2026-08-25 m5r8 yachi lock 90 (parapet_tss: filled_above_window)",
-  "2026-08-25 m6r1 pinglamb lock 110 (parapet: filled_above_window)",
-  "2026-08-25 m6r1 pinglamb lock 136 (parapet: filled_above_window)",
-  "2026-08-25 m8r6 yachi lock 156 (parapet: filled_above_window)",
-  "2026-08-25 m8r6 yachi lock 218 (parapet: filled_above_window)",
-  "2026-08-25 m9r7 pinglamb lock 84 (parapet: filled_above_window)",
   "2026-09-03 m1r6 yachi lock 106 (parapet_tss: filled_above_window)",
-  "2026-09-03 m2r4 pinglamb lock 26 (parapet: filled_above_window)",
-  "2026-09-03 m2r8 pinglamb lock 17 (parapet: filled_above_window)",
-  "2026-09-03 m2r8 yachi lock 30 (parapet: filled_above_window)",
-  "2026-09-03 m6r6 pinglamb lock 129 (parapet: filled_above_window)",
-  "2026-09-03 m6r6 pinglamb lock 216 (parapet: cavity_lt4)",
   "2026-09-10 m1r5 yachi lock 166 (parapet_tss: filled_above_window)",
-  "2026-09-10 m2r3 pinglamb lock 34 (parapet: filled_above_window)",
-  "2026-09-10 m2r3 pinglamb lock 39 (parapet: filled_above_window)",
   "2026-09-10 m4r1 yachi lock 20 (parapet_tss: filled_above_window)",
-  "2026-09-10 m4r6 yachi lock 17 (parapet: filled_above_window)",
   "2026-09-11 m1r3 yachi lock 24 (parapet_tss: filled_above_window)",
-  "2026-09-11 m2r5 pinglamb lock 134 (parapet: filled_above_window)",
-  "2026-09-11 m3r5 pinglamb lock 87 (parapet: filled_above_window)",
-  "2026-09-11 m3r7 pinglamb lock 19 (parapet: cavity_lt4)",
   "2026-09-11 m5r2 yachi lock 32 (parapet_tss: filled_above_window)",
-  "2026-09-11 m6r6 yachi lock 124 (parapet: filled_above_window)",
-  "2026-09-11 m7r5 pinglamb lock 88 (parapet: filled_above_window)",
-  "2026-09-11 m7r8 yachi lock 61 (parapet: filled_above_window)",
-  "2026-09-17 m1r1 pinglamb lock 19 (parapet: filled_above_window)",
-  "2026-09-17 m1r8 pinglamb lock 18 (parapet: filled_above_window)",
-  "2026-09-17 m2r7 pinglamb lock 15 (parapet: cavity_lt4)",
   "2026-09-17 m2r7 yachi lock 23 (parapet_tss: filled_above_window)",
-  "2026-09-17 m6r2 yachi lock 125 (parapet: filled_above_window)",
-  "2026-09-17 m7r4 pinglamb lock 14 (parapet: filled_above_window)",
-  "2026-09-18 m11r4 yachi lock 50 (parapet_tss: filled_above_window)",
-  "2026-09-18 m11r6 yachi lock 185 (parapet: filled_above_window)",
-  "2026-09-18 m12r1 pinglamb lock 15 (parapet: filled_above_window)",
-  "2026-09-18 m12r3 yachi lock 45 (parapet: filled_above_window)",
-  "2026-09-18 m12r4 pinglamb lock 85 (parapet: filled_above_window)",
-  "2026-09-18 m13r1 pinglamb lock 86 (parapet: filled_above_window)",
-  "2026-09-18 m14r5 yachi lock 111 (parapet_tss: filled_above_window)",
-  "2026-09-18 m17r8 yachi lock 45 (parapet: filled_above_window)",
-  "2026-09-18 m1r5 pinglamb lock 26 (parapet: filled_above_window)",
-  "2026-09-18 m2r2 pinglamb lock 65 (parapet: filled_above_window)",
-  "2026-09-18 m3r3 yachi lock 29 (parapet: filled_above_window)",
   "2026-09-18 m3r7 yachi lock 25 (parapet_tss: filled_above_window)",
   "2026-09-18 m6r4 yachi lock 16 (parapet_tss: cavity_lt4)",
-  "2026-09-19 m11r5 yachi lock 26 (parapet: filled_above_window)",
-  "2026-09-19 m13r3 pinglamb lock 63 (parapet: filled_above_window)",
-  "2026-09-19 m13r3 yachi lock 276 (parapet: cavity_lt4)",
-  "2026-09-19 m15r1 pinglamb lock 31 (parapet: filled_above_window)",
-  "2026-09-19 m15r8 yachi lock 39 (parapet: filled_above_window)",
-  "2026-09-19 m18r5 pinglamb lock 35 (parapet: filled_above_window)",
-  "2026-09-19 m19r7 pinglamb lock 27 (parapet: filled_above_window)",
+  "2026-09-18 m11r4 yachi lock 50 (parapet_tss: filled_above_window)",
+  "2026-09-18 m14r5 yachi lock 111 (parapet_tss: filled_above_window)",
   "2026-09-19 m1r5 yachi lock 19 (parapet_tss: filled_above_window)",
-  "2026-09-19 m20r6 pinglamb lock 19 (parapet: filled_above_window)",
   "2026-09-19 m5r3 yachi lock 15 (parapet_tss: cavity_lt4)",
-  "2026-09-19 m9r5 yachi lock 74 (parapet: filled_above_window)",
-  "2026-10-03 m10r6 pinglamb lock 45 (parapet: filled_above_window)",
-  "2026-10-03 m11r4 pinglamb lock 152 (parapet: filled_above_window)",
-  "2026-10-03 m12r6 yachi lock 109 (parapet_tss: filled_above_window)",
-  "2026-10-03 m15r1 yachi lock 33 (parapet: filled_above_window)",
-  "2026-10-03 m15r2 yachi lock 64 (parapet_tss: filled_above_window)",
-  "2026-10-03 m15r5 pinglamb lock 16 (parapet_tss: cavity_lt4)",
-  "2026-10-03 m15r7 pinglamb lock 219 (parapet_tss: cavity_lt4)",
-  "2026-10-03 m17r3 yachi lock 73 (parapet: filled_above_window)",
-  "2026-10-03 m17r6 yachi lock 105 (parapet_tss: filled_above_window)",
-  "2026-10-03 m18r3 pinglamb lock 58 (parapet: filled_above_window)",
-  "2026-10-03 m20r2 pinglamb lock 216 (parapet: filled_above_window)",
-  "2026-10-03 m20r7 yachi lock 192 (parapet_tss: filled_above_window)",
-  "2026-10-03 m20r8 pinglamb lock 129 (parapet: filled_above_window)",
-  "2026-10-03 m2r6 yachi lock 32 (parapet: filled_above_window)",
-  "2026-10-03 m3r4 pinglamb lock 24 (parapet: filled_above_window)",
-  "2026-10-03 m3r4 yachi lock 19 (parapet: filled_above_window)",
-  "2026-10-03 m3r5 pinglamb lock 19 (parapet: filled_above_window)",
-  "2026-10-03 m4r2 pinglamb lock 71 (parapet: filled_above_window)",
-  "2026-10-03 m4r2 yachi lock 32 (parapet: filled_above_window)",
   "2026-10-03 m5r4 yachi lock 75 (parapet_tss: filled_above_window)",
   "2026-10-03 m6r2 yachi lock 137 (parapet_tss: filled_above_window)",
   "2026-10-03 m9r4 pinglamb lock 59 (parapet_tss: filled_above_window)",
-  "2026-10-03 m9r6 pinglamb lock 15 (parapet: cavity_lt4)",
-  "2026-10-09 m11r2 yachi lock 192 (parapet: filled_above_window)",
-  "2026-10-09 m12r3 pinglamb lock 101 (parapet: filled_above_window)",
-  "2026-10-09 m2r6 pinglamb lock 14 (parapet: filled_above_window)",
+  "2026-10-03 m12r6 yachi lock 109 (parapet_tss: filled_above_window)",
+  "2026-10-03 m15r2 yachi lock 64 (parapet_tss: filled_above_window)",
+  "2026-10-03 m15r5 pinglamb lock 16 (parapet_tss: cavity_lt4)",
+  "2026-10-03 m15r7 pinglamb lock 219 (parapet_tss: cavity_lt4)",
+  "2026-10-03 m17r6 yachi lock 105 (parapet_tss: filled_above_window)",
+  "2026-10-03 m20r7 yachi lock 192 (parapet_tss: filled_above_window)",
   "2026-10-09 m3r8 pinglamb lock 17 (parapet_tss: cavity_lt4)",
-  "2026-10-09 m5r2 pinglamb lock 68 (parapet: filled_above_window)",
   "2026-10-09 m5r8 yachi lock 66 (parapet_tss: filled_above_window)",
   "2026-10-09 m5r8 yachi lock 75 (parapet_tss: filled_above_window)",
   "2026-10-09 m7r7 yachi lock 42 (parapet_tss: filled_above_window)",
-  "2026-10-09 m8r7 pinglamb lock 63 (parapet: filled_above_window)",
   "2026-10-09 m8r7 yachi lock 73 (parapet_tss: filled_above_window)",
-  "2026-10-09 m8r9 pinglamb lock 112 (parapet: filled_above_window)",
-  "2026-10-09 m8r9 yachi lock 127 (parapet: filled_above_window)",
-  "2026-10-09 m9r1 pinglamb lock 112 (parapet: filled_above_window)",
-  "2026-10-09 m9r7 yachi lock 72 (parapet: cavity_lt4)",
-  "2026-10-09 m9r9 pinglamb lock 34 (parapet: filled_above_window)",
-  "2026-10-12 m4r6 pinglamb lock 101 (parapet: filled_above_window)",
-  "2026-10-12 m6r8 pinglamb lock 69 (parapet: filled_above_window)",
-  "2026-10-12 m8r2 yachi lock 144 (parapet: filled_above_window)",
-  "2026-10-12 m8r7 pinglamb lock 139 (parapet: filled_above_window)",
-  "2026-10-12 m8r7 yachi lock 64 (parapet: filled_above_window)",
   "2026-10-20 m1r1 yachi lock 121 (parapet_tss: filled_above_window)",
   "2026-10-20 m2r1 pinglamb lock 129 (parapet_tss: filled_above_window)",
-  "2026-10-20 m2r4 yachi lock 50 (parapet: filled_above_window)",
-  "2026-10-20 m3r2 pinglamb lock 24 (parapet: filled_above_window)",
-  "2026-10-20 m4r7 pinglamb lock 76 (parapet: filled_above_window)",
-  "2026-10-20 m4r7 yachi lock 92 (parapet: filled_above_window)",
-  "2026-10-22 m1r8 pinglamb lock 44 (parapet: filled_above_window)",
   "2026-10-22 m2r4 yachi lock 75 (parapet_tss: filled_above_window)",
-  "2026-10-22 m3r3 pinglamb lock 17 (parapet: filled_above_window)",
-  "2026-10-22 m6r7 pinglamb lock 27 (parapet: filled_above_window)",
-  "2026-10-22 m7r1 yachi lock 17 (parapet: filled_above_window)",
   "2026-10-22 m7r6 yachi lock 67 (parapet_tss: cavity_lt4)",
-  "2026-10-22 m8r1 yachi lock 54 (parapet: filled_above_window)",
   "2026-10-22 m8r4 pinglamb lock 48 (parapet_tss: filled_above_window)",
-  "2026-10-22 m8r7 pinglamb lock 27 (parapet: filled_above_window)",
   "2026-10-22 m9r5 yachi lock 19 (parapet_tss: cavity_lt4)",
 ];
 
@@ -970,7 +849,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
   const count: Record<string, Record<string, number>> = {};
   const hits = new Map<string, any>(art().hits.map((h: any) => [hitKey(h), h]));
   const notDon: string[] = [];
-  let hitDon = 0;
+  let hitDon = 0, tslot = 0;
   for (const d of digests()) for (const s of scored(d)) {
     let any = false;
     for (let c = 0; c < W; c++) if (donationVerdict(s.withT, s.rows, s.lk.cells, c) === 'donation') any = true;
@@ -983,6 +862,9 @@ test('donation: the shipped predicate reproduced per session and player, and eve
     const off = windowMatch(s.board, s.lk.cells, P);
     if (!off) throw new Error(`${nameOf(d, s.i)}: the recorded hit does not match`);
     const why = donationVerdict(s.withT, s.rows, s.lk.cells, P.well!.c + off.dc);
+    // the TSD's well is under the T's arm, so by yachi's rule (2026-10-25: a column the T is in is never the well)
+    // no TSD hit is a donation; that is the window's geometry, asserted for every hit rather than listed
+    if (h.variant === 'parapet') { expect(why, nameOf(d, s.i)).toBe('t_slot'); tslot++; continue; }
     if (why === 'donation') hitDon++;
     else notDon.push(`${nameOf(d, s.i)} (${h.variant}: ${why})`);
   }
@@ -992,10 +874,11 @@ test('donation: the shipped predicate reproduced per session and player, and eve
     for (const p of of.donation.players) expect(count[sess]![p.user], `${sess} ${p.user}`).toBe(p.donations);
   }
   checkNamedList('HIT_NOT_DONATION', notDon, HIT_NOT_DONATION);
-  expect(hitDon + notDon.length).toBe(art().hits.length);
-  // the window entails the re-opening INSIDE it; what a hit fails is outside it (a filled cell above the window in
-  // the well column) or below it (a well under four deep): never the T's own slot, never the naive clause, never
-  // the walls the window checks
+  expect(hitDon + notDon.length + tslot).toBe(art().hits.length);
+  expect(tslot).toBe(art().hits.filter((h: any) => h.variant === 'parapet').length);
+  // for the TSS (the T stood, the well outside it) the window entails the re-opening INSIDE it; what a hit fails is
+  // outside it (a filled cell above the window in the well column) or below it (a well under four deep): never the
+  // naive clause, never the walls the window checks
   for (const x of HIT_NOT_DONATION) expect(x).toMatch(/: (filled_above_window|cavity_lt4)\)$/);
 }, 600_000);
 

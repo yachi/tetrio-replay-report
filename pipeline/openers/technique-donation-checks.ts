@@ -31,7 +31,7 @@ export function scored(d: TechDigest) {
 export function donationVerdict(withT: boolean[][], cleared: number[], t: Cell[], c: number) {
   const inC = new Set(cleared);
   const tRows = new Set(t.filter(q => q.col === c).map(q => q.row));
-  if (tRows.size && cleared.every(r => tRows.has(r))) return 't_slot';
+  if (tRows.size) return 't_slot';   // any column the T is in (emit-opener-facts.ts's donationCols)
   let inR = 0, outR = 0;
   for (let r = 0; r < H; r++) { if (!withT[r]![c]) continue; inC.has(r) ? inR++ : outR++; }
   if (inR === 0) return 'naive';

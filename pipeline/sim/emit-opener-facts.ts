@@ -304,9 +304,11 @@ export type DonationAblation = keyof typeof DONATION_ABLATIONS;
  * which is what makes the plug a loan rather than a wall. How much power, on this corpus, is what
  * `DONATION_ABLATIONS` above exists to emit instead of assert.
  *
- * The T's own slot is excluded, but only when the T occupies the column in EVERY cleared row: a
- * column the T touches in just one of them can still be the well, and is in 3 of the article's 20
- * named setups.
+ * Every column the T is in is excluded, not only the T's own slot. harddrop lets a column the T
+ * touches in just one cleared row be the well (3 of the article's 20 named setups do); this repo
+ * does not, on yachi's definition (2026-10-25): the plug must be OTHER pieces, never the T, so a
+ * hole under the T's arm is covered by the T and is no donation. The four transcribed positives
+ * all put the well outside the T's columns, so none of them moves.
  *
  * `abl` names an ablation to evaluate INSTEAD of the shipped predicate. It is a parameter rather
  * than a second function on purpose: an ablation implemented as a copy is not an ablation of this
@@ -324,7 +326,7 @@ export function donationCols(withT: boolean[][], cleared: number[], t: { row: nu
   const out: { col: number; cavity: number }[] = [];
   for (let c = 0; c < BOARD_WIDTH; c++) {
     const tRows = tByCol.get(c);
-    if (tRows && cleared.every(r => tRows.has(r))) continue;   // the T's own slot, not a plug
+    if (tRows) continue;   // a column the T is in: the T covers it, so it is no loan (yachi's definition)
     let inR = 0, outR = 0;
     for (let r = 0; r < h; r++) {
       if (!withT[r]![c]) continue;
