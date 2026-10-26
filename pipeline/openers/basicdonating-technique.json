@@ -1533,311 +1533,55 @@
   "basic_form": [],
   "variants": [
     {
-      "id": "k1",
-      "board": "q2.17.answer",
+      "id": "rule",
+      "board": "intro.z",
       "spin": "TSD",
       "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "left",
-        "offset": 1
-      },
+      "window_basis": "rule",
       "window": {
         "rows": [
           2,
           3
         ],
         "cols": [
-          6,
-          8
+          2,
+          4
         ]
       },
       "t_cells": [
         [
           2,
-          6
+          2
         ],
         [
           2,
-          7
+          3
         ],
         [
           2,
-          8
+          4
         ],
         [
           3,
-          7
+          3
         ]
       ],
       "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            1,
-            5
-          ],
-          [
-            2,
-            5
-          ],
-          [
-            3,
-            5
-          ],
-          [
-            4,
-            5
-          ]
-        ],
-        "note": "the hole 1 column(s) from the T's near arm, on q2.17.answer's side (left): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
+      "rule": "a column donates when, at its topmost cell that is empty, in no row the T makes full and directly under a cell of such a row, every filled cell of the column above it is in those rows (so the clear opens it from the top) and the cell above it is not the T; in play each covering cell must also be the T or a complete piece, never garbage (ownership is not drawn, so the gate reads the occupancy half)",
       "payoff": {
         "kind": "well_quad",
-        "board": "q2.17.answer",
+        "board": "intro.z",
         "piece": "I",
         "lines": 4,
         "well_cell_pre_clear": [
           4,
-          5
+          0
         ],
         "well_cell_after": [
           4,
-          5
+          0
         ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
-        {
-          "board": "one.s",
-          "t_cells": [
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              3,
-              2
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q1.1.answer",
-          "t_cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q1.2.answer",
-          "t_cells": [
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
-            [
-              4,
-              8
-            ],
-            [
-              5,
-              7
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "two.sz_a",
-          "t_cells": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.3.answer",
-          "t_cells": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.16.answer",
-          "t_cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.17.answer",
-          "t_cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": false
-        }
-      ]
-    },
-    {
-      "id": "k2",
-      "board": "q2.1.answer",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "left",
-        "offset": 2
-      },
-      "window": {
-        "rows": [
-          4,
-          5
-        ],
-        "cols": [
-          5,
-          7
-        ]
-      },
-      "t_cells": [
-        [
-          4,
-          5
-        ],
-        [
-          4,
-          6
-        ],
-        [
-          4,
-          7
-        ],
-        [
-          5,
-          6
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            3,
-            3
-          ],
-          [
-            4,
-            3
-          ],
-          [
-            5,
-            3
-          ],
-          [
-            6,
-            3
-          ]
-        ],
-        "note": "the hole 2 column(s) from the T's near arm, on q2.1.answer's side (left): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "q2.1.answer",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          6,
-          3
-        ],
-        "well_cell_after": [
-          6,
-          3
-        ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
+        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is the hit's own column's hole (the nearest to the T), under the cleared rows, so the clear does not move it"
       },
       "drawings": [
         {
@@ -1860,7 +1604,12 @@
               3
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
         },
         {
           "board": "one.o",
@@ -1882,7 +1631,39 @@
               3
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.s",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
         },
         {
           "board": "one.z",
@@ -1904,7 +1685,120 @@
               3
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.l_a",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "one.l_b",
+          "t_cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q1.1.answer",
+          "t_cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q1.2.answer",
+          "t_cells": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              9
+            ]
+          ]
         },
         {
           "board": "q1.3.answer",
@@ -1926,371 +1820,12 @@
               2
             ]
           ],
-          "mirrored": true
-        },
-        {
-          "board": "two.jz_a",
-          "t_cells": [
+          "holes": [
             [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "two.jz_b",
-          "t_cells": [
-            [
-              2,
-              0
-            ],
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              3,
-              1
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "two.sz_b",
-          "t_cells": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "two.js_b",
-          "t_cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "two.oz",
-          "t_cells": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.1.answer",
-          "t_cells": [
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
-            [
-              5,
-              6
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.2.answer",
-          "t_cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.4.answer",
-          "t_cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.7.answer",
-          "t_cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.9.answer",
-          "t_cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.12.answer",
-          "t_cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
+              6,
               5
             ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.16.answer",
-          "t_cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": true
-        }
-      ]
-    },
-    {
-      "id": "k3",
-      "board": "q1.6.answer",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "left",
-        "offset": 3
-      },
-      "window": {
-        "rows": [
-          4,
-          5
-        ],
-        "cols": [
-          3,
-          5
-        ]
-      },
-      "t_cells": [
-        [
-          4,
-          3
-        ],
-        [
-          4,
-          4
-        ],
-        [
-          4,
-          5
-        ],
-        [
-          5,
-          4
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            3,
-            0
-          ],
-          [
-            4,
-            0
-          ],
-          [
-            5,
-            0
-          ],
-          [
-            6,
-            0
           ]
-        ],
-        "note": "the hole 3 column(s) from the T's near arm, on q1.6.answer's side (left): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "q1.6.answer",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          6,
-          0
-        ],
-        "well_cell_after": [
-          6,
-          0
-        ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
-        {
-          "board": "one.l_b",
-          "t_cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": false
         },
         {
           "board": "q1.4.answer",
@@ -2312,7 +1847,39 @@
               2
             ]
           ],
-          "mirrored": true
+          "holes": [
+            [
+              6,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q1.5.answer",
+          "t_cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              0
+            ]
+          ]
         },
         {
           "board": "q1.6.answer",
@@ -2334,7 +1901,124 @@
               4
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "two.jz_a",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "two.jz_b",
+          "t_cells": [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              4
+            ]
+          ]
+        },
+        {
+          "board": "two.sz_a",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "two.sz_b",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
         },
         {
           "board": "two.js_a",
@@ -2356,7 +2040,12 @@
               5
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
         },
         {
           "board": "two.js_b",
@@ -2378,262 +2067,71 @@
               4
             ]
           ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.5.answer",
-          "t_cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
+          "holes": [
             [
               4,
-              2
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.6.answer",
-          "t_cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.8.answer",
-          "t_cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.13.answer",
-          "t_cells": [
-            [
-              5,
-              3
-            ],
-            [
-              5,
-              4
-            ],
-            [
-              5,
-              5
-            ],
-            [
-              6,
-              4
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "q2.14.answer",
-          "t_cells": [
-            [
-              3,
               0
             ],
             [
-              3,
+              4,
               1
-            ],
+            ]
+          ]
+        },
+        {
+          "board": "two.oz",
+          "t_cells": [
             [
-              3,
+              2,
               2
             ],
             [
-              4,
-              1
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.15.answer",
-          "t_cells": [
+              2,
+              3
+            ],
             [
-              5,
+              2,
               4
             ],
             [
-              5,
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole2.a",
+          "t_cells": [
+            [
+              4,
               5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
             ],
             [
               5,
               6
-            ],
+            ]
+          ],
+          "holes": [
             [
               6,
-              5
+              0
             ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.16.answer",
-          "t_cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": true
-        },
-        {
-          "board": "q2.17.answer",
-          "t_cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": false
-        }
-      ]
-    },
-    {
-      "id": "k4",
-      "board": "hole2.b",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "left",
-        "offset": 4
-      },
-      "window": {
-        "rows": [
-          4,
-          5
-        ],
-        "cols": [
-          5,
-          7
-        ]
-      },
-      "t_cells": [
-        [
-          4,
-          5
-        ],
-        [
-          4,
-          6
-        ],
-        [
-          4,
-          7
-        ],
-        [
-          5,
-          6
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            3,
-            1
-          ],
-          [
-            4,
-            1
-          ],
-          [
-            5,
-            1
-          ],
-          [
-            6,
-            1
           ]
-        ],
-        "note": "the hole 4 column(s) from the T's near arm, on hole2.b's side (left): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "hole2.b",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          6,
-          1
-        ],
-        "well_cell_after": [
-          6,
-          1
-        ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
+        },
         {
           "board": "hole2.b",
           "t_cells": [
@@ -2654,7 +2152,12 @@
               6
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              6,
+              1
+            ]
+          ]
         },
         {
           "board": "hole3.a",
@@ -2676,151 +2179,12 @@
               6
             ]
           ],
-          "mirrored": false
-        },
-        {
-          "board": "hole4.a",
-          "t_cells": [
-            [
-              2,
-              5
-            ],
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              3,
-              6
-            ]
-          ],
-          "mirrored": false
-        },
-        {
-          "board": "hole5.a",
-          "t_cells": [
-            [
-              1,
-              5
-            ],
-            [
-              1,
-              6
-            ],
-            [
-              1,
-              7
-            ],
-            [
-              2,
-              6
-            ]
-          ],
-          "mirrored": false
-        }
-      ]
-    },
-    {
-      "id": "k5",
-      "board": "q2.11.answer",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "right",
-        "offset": 5
-      },
-      "window": {
-        "rows": [
-          4,
-          5
-        ],
-        "cols": [
-          2,
-          4
-        ]
-      },
-      "t_cells": [
-        [
-          4,
-          2
-        ],
-        [
-          4,
-          3
-        ],
-        [
-          4,
-          4
-        ],
-        [
-          5,
-          3
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            3,
-            9
-          ],
-          [
-            4,
-            9
-          ],
-          [
-            5,
-            9
-          ],
-          [
-            6,
-            9
-          ]
-        ],
-        "note": "the hole 5 column(s) from the T's near arm, on q2.11.answer's side (right): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "q2.11.answer",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          6,
-          9
-        ],
-        "well_cell_after": [
-          6,
-          9
-        ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
-        {
-          "board": "hole2.a",
-          "t_cells": [
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
+          "holes": [
             [
               5,
-              6
+              1
             ]
-          ],
-          "mirrored": true
+          ]
         },
         {
           "board": "hole3.b",
@@ -2842,7 +2206,39 @@
               6
             ]
           ],
-          "mirrored": true
+          "holes": [
+            [
+              5,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole4.a",
+          "t_cells": [
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
         },
         {
           "board": "hole4.b",
@@ -2864,7 +2260,39 @@
               6
             ]
           ],
-          "mirrored": true
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole5.a",
+          "t_cells": [
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              2,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              3,
+              1
+            ]
+          ]
         },
         {
           "board": "hole5.b",
@@ -2886,14 +2314,19 @@
               6
             ]
           ],
-          "mirrored": true
+          "holes": [
+            [
+              3,
+              0
+            ]
+          ]
         },
         {
-          "board": "q2.11.answer",
+          "board": "fin.lj",
           "t_cells": [
             [
-              4,
-              2
+              3,
+              4
             ],
             [
               4,
@@ -2905,92 +2338,77 @@
             ],
             [
               5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "fin.to",
+          "t_cells": [
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
               3
             ]
           ],
-          "mirrored": false
-        }
-      ]
-    },
-    {
-      "id": "k6",
-      "board": "q1.5.answer",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "left",
-        "offset": 6
-      },
-      "window": {
-        "rows": [
-          3,
-          4
-        ],
-        "cols": [
-          6,
-          8
-        ]
-      },
-      "t_cells": [
-        [
-          3,
-          6
-        ],
-        [
-          3,
-          7
-        ],
-        [
-          3,
-          8
-        ],
-        [
-          4,
-          7
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            2,
-            0
-          ],
-          [
-            3,
-            0
-          ],
-          [
-            4,
-            0
-          ],
-          [
-            5,
-            0
+          "holes": [
+            [
+              6,
+              0
+            ]
           ]
-        ],
-        "note": "the hole 6 column(s) from the T's near arm, on q1.5.answer's side (left): the cell above the donation empty, its two cells in the rows the TSD clears filled, the hole under them empty"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "q1.5.answer",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          5,
-          0
-        ],
-        "well_cell_after": [
-          5,
-          0
-        ],
-        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
+        },
         {
-          "board": "q1.5.answer",
+          "board": "q2.1.answer",
           "t_cells": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.2.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
             [
               3,
               6
@@ -3000,15 +2418,209 @@
               7
             ],
             [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.3.answer",
+          "t_cells": [
+            [
               3,
-              8
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
             ],
             [
               4,
-              7
+              3
             ]
           ],
-          "mirrored": false
+          "holes": [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "q2.4.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.5.answer",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q2.6.answer",
+          "t_cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q2.7.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.8.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.9.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
         },
         {
           "board": "q2.10.answer",
@@ -3030,123 +2642,47 @@
               1
             ]
           ],
-          "mirrored": true
-        }
-      ]
-    },
-    {
-      "id": "nub",
-      "board": "nub.hd",
-      "spin": "TSD",
-      "lines": 2,
-      "window_basis": "well",
-      "well": {
-        "side": "nub",
-        "offset": 0
-      },
-      "window": {
-        "rows": [
-          3,
-          4
-        ],
-        "cols": [
-          5,
-          7
-        ]
-      },
-      "t_cells": [
-        [
-          3,
-          5
-        ],
-        [
-          3,
-          6
-        ],
-        [
-          3,
-          7
-        ],
-        [
-          4,
-          6
-        ]
-      ],
-      "roof_cells": [],
-      "window_extra": {
-        "cells": [
-          [
-            2,
-            6
-          ],
-          [
-            5,
-            6
-          ],
-          [
-            6,
-            6
-          ],
-          [
-            5,
-            5
-          ],
-          [
-            5,
-            7
-          ],
-          [
-            6,
-            5
-          ],
-          [
-            6,
-            7
-          ]
-        ],
-        "note": "the hole under the T's own nub (harddrop's, not the page's): the T fills its two cells in the rows the TSD clears, so the window reads the cell above the T's centre empty and, under the nub, a Tetris hole: two cells empty, walled on both sides"
-      },
-      "payoff": {
-        "kind": "well_quad",
-        "board": "nub.hd",
-        "piece": "I",
-        "lines": 4,
-        "well_cell_pre_clear": [
-          5,
-          6
-        ],
-        "well_cell_after": [
-          5,
-          6
-        ],
-        "note": "harddrop's: the Donation page's next step, a Tetris into the re-opened hole. The well cell is under the cleared rows, so the clear does not move it"
-      },
-      "drawings": [
-        {
-          "board": "nub.hd",
-          "t_cells": [
+          "holes": [
             [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
+              7,
+              8
             ]
-          ],
-          "mirrored": false
+          ]
         },
         {
-          "board": "nub.hd",
+          "board": "q2.11.answer",
           "t_cells": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.12.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
             [
               3,
               5
@@ -3156,2453 +2692,183 @@
               6
             ],
             [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              8
+            ]
+          ]
+        },
+        {
+          "board": "q2.13.answer",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              7,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q2.14.answer",
+          "t_cells": [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "q2.15.answer",
+          "t_cells": [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              7,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.16.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.17.answer",
+          "t_cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
               3,
               7
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              5
             ],
             [
               4,
               6
             ]
-          ],
-          "mirrored": true
+          ]
         }
       ]
     }
   ],
-  "well_fires_other": [
-    {
-      "board": "q2.17",
-      "variant": "nub",
-      "t_cells": [
-        [
-          4,
-          4
-        ],
-        [
-          4,
-          5
-        ],
-        [
-          4,
-          6
-        ],
-        [
-          5,
-          5
-        ]
-      ],
-      "mirrored": false,
-      "reason": "a T resting over the question's own well, clearing no row (the window reads the T's box and the hole, not whether two rows clear; the corpus scores TSDs only)"
-    },
-    {
-      "board": "q2.17",
-      "variant": "nub",
-      "t_cells": [
-        [
-          4,
-          4
-        ],
-        [
-          4,
-          5
-        ],
-        [
-          4,
-          6
-        ],
-        [
-          5,
-          5
-        ]
-      ],
-      "mirrored": true,
-      "reason": "a T resting over the question's own well, clearing no row (the window reads the T's box and the hole, not whether two rows clear; the corpus scores TSDs only)"
-    }
-  ],
-  "well_not_fired": [
+  "rule_not_fired": [
     {
       "board": "intro.l3",
-      "reason": "the page's own mistake: the L fills three rows, not two, so the cell under the two the TSD clears is filled and the hole is covered (「2列ではなく3列を埋めてしまった」)"
+      "reason": "the page's own mistake: the L fills three rows, not two, so a filled cell of the column lies under the rows the TSD clears and the hole stays covered (「2列ではなく3列を埋めてしまった」)"
+    },
+    {
+      "board": "nub.hd",
+      "reason": "harddrop's 「Donation T-Spin Double」: only the T's nub covers the hole, which yachi reads as a plain T-spin (2026-10-26: 「呢個係普通tspin」), so the rule's clause 3 refuses it"
     }
   ],
   "cross_source": {
     "other_windows": {
-      "donation_fires_on": [
-        {
-          "file": "btcannon-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[29]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[4]",
-          "variant": "k3",
-          "cells": [
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              5,
-              5
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[4]",
-          "variant": "k4",
-          "cells": [
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              5,
-              5
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
-          "variant": "k4",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[6]",
-          "variant": "k3",
-          "cells": [
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
-            [
-              5,
-              6
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[7]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "cutcopy-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[7]",
-          "variant": "k4",
-          "cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "doubledagger-technique.json",
-          "board": "nodes.tetris.spin",
-          "variant": "nub",
-          "cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "dtcannon-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
-          "variant": "k1",
-          "cells": [
-            [
-              5,
-              1
-            ],
-            [
-              5,
-              2
-            ],
-            [
-              5,
-              3
-            ],
-            [
-              6,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "dtcannon-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[46]",
-          "variant": "nub",
-          "cells": [
-            [
-              9,
-              1
-            ],
-            [
-              9,
-              2
-            ],
-            [
-              9,
-              3
-            ],
-            [
-              10,
-              2
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.basic.z",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.basic.o",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.basic.spin",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.s3.s",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.s3.j",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.after.1",
-          "variant": "k1",
-          "cells": [
-            [
-              1,
-              6
-            ],
-            [
-              1,
-              7
-            ],
-            [
-              1,
-              8
-            ],
-            [
-              2,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.amemiya",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.amemiya",
-          "variant": "k5",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.anchor",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.amemiya.pre",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.amemiya.pre",
-          "variant": "k5",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "nodes.dt.anchor.pre",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawings[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawings[1]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawings[2]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawings[2]",
-          "variant": "k3",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawings[3]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[3]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[1]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              3,
-              8
-            ],
-            [
-              4,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[2]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[2]",
-          "variant": "k3",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[3]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[4]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[5]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
-            [
-              4,
-              8
-            ],
-            [
-              5,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop.fires_without_slot[6]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              2,
-              8
-            ],
-            [
-              3,
-              7
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.harddrop_anchor_set.drawings[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              4,
-              2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "kaidan-technique.json",
-          "board": "cross_source.stmb_cave_kaidan",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "parapet-technique.json",
-          "board": "nodes.tss.after",
-          "variant": "nub",
-          "cells": [
-            [
-              1,
-              1
-            ],
-            [
-              1,
-              2
-            ],
-            [
-              1,
-              3
-            ],
-            [
-              2,
-              2
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "parapet-technique.json",
-          "board": "cross_source.tetrisch.images[8]",
-          "variant": "nub",
-          "cells": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "parapet-technique.json",
-          "board": "cross_source.tetrisch.images[15]",
-          "variant": "nub",
-          "cells": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.basic.spin",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              5
-            ],
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              3,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.w4.spin",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.u2.spin",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              3,
-              2
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.t3.spin",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              3,
-              2
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.dt",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              4,
-              3
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.basic.build",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              5
-            ],
-            [
-              2,
-              6
-            ],
-            [
-              2,
-              7
-            ],
-            [
-              3,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.w4.build",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              3,
-              3
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.u2.build",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              3,
-              2
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "nodes.t3.build",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              1
-            ],
-            [
-              2,
-              2
-            ],
-            [
-              2,
-              3
-            ],
-            [
-              3,
-              2
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[1]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[2]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[3]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[4]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[5]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              1
-            ],
-            [
-              4,
-              2
-            ],
-            [
-              4,
-              3
-            ],
-            [
-              5,
-              2
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[6]",
-          "variant": "k1",
-          "cells": [
-            [
-              6,
-              3
-            ],
-            [
-              6,
-              4
-            ],
-            [
-              6,
-              5
-            ],
-            [
-              7,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[7]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[8]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[9]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[10]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[11]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[12]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              4,
-              5
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[13]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              2
-            ],
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              5,
-              3
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[14]",
-          "variant": "k1",
-          "cells": [
-            [
-              5,
-              4
-            ],
-            [
-              5,
-              5
-            ],
-            [
-              5,
-              6
-            ],
-            [
-              6,
-              5
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[15]",
-          "variant": "k1",
-          "cells": [
-            [
-              6,
-              4
-            ],
-            [
-              6,
-              5
-            ],
-            [
-              6,
-              6
-            ],
-            [
-              7,
-              5
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[16]",
-          "variant": "k1",
-          "cells": [
-            [
-              6,
-              4
-            ],
-            [
-              6,
-              5
-            ],
-            [
-              6,
-              6
-            ],
-            [
-              7,
-              5
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[17]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[17]",
-          "variant": "k4",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[17]",
-          "variant": "k5",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[18]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[18]",
-          "variant": "k4",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[18]",
-          "variant": "k5",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[19]",
-          "variant": "k1",
-          "cells": [
-            [
-              5,
-              5
-            ],
-            [
-              5,
-              6
-            ],
-            [
-              5,
-              7
-            ],
-            [
-              6,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[20]",
-          "variant": "k1",
-          "cells": [
-            [
-              4,
-              5
-            ],
-            [
-              4,
-              6
-            ],
-            [
-              4,
-              7
-            ],
-            [
-              5,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawings[21]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[1]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[4]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[5]",
-          "variant": "nub",
-          "cells": [
-            [
-              4,
-              2
-            ],
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              5,
-              3
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[8]",
-          "variant": "k3",
-          "cells": [
-            [
-              4,
-              3
-            ],
-            [
-              4,
-              4
-            ],
-            [
-              4,
-              5
-            ],
-            [
-              5,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[9]",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[9]",
-          "variant": "k2",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[9]",
-          "variant": "k3",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.harddrop.drawn_t_not_fired[10]",
-          "variant": "nub",
-          "cells": [
-            [
-              3,
-              5
-            ],
-            [
-              3,
-              6
-            ],
-            [
-              3,
-              7
-            ],
-            [
-              4,
-              6
-            ]
-          ],
-          "mirrored": [
-            false,
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.stmb_cave.boards[0]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "shachikutrain-technique.json",
-          "board": "cross_source.stmb_cave.boards[1]",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "stmbcave-technique.json",
-          "board": "nodes.basic.build",
-          "variant": "k1",
-          "cells": [
-            [
-              3,
-              3
-            ],
-            [
-              3,
-              4
-            ],
-            [
-              3,
-              5
-            ],
-            [
-              4,
-              4
-            ]
-          ],
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "file": "stmbcave-technique.json",
-          "board": "nodes.similar.build",
-          "variant": "k1",
-          "cells": [
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              2,
-              6
-            ],
-            [
-              3,
-              5
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        }
-      ],
       "fires_on_donation": [
         {
           "file": "kaidan-technique.json",
@@ -5844,42 +3110,87 @@
       {
         "file": "sdpcspin-routes.json",
         "node": "3.first.cave",
-        "variant": "k1",
+        "variant": "rule",
         "mirrored": false,
         "page": "https://harddrop.com/wiki/SDPC_Spin",
-        "note": "harddrop's SDPC Spin (another author): its STMB Cave's Z fills the two cleared rows of the column one past the T's arm, the cave open under it — a k1 donation (STMB Cave's own window fires too)"
+        "note": "harddrop's SDPC Spin (another author): its STMB Cave's Z fills the two cleared rows of the column one past the T's arm, the cave open under it (STMB Cave's own window fires too, so in play the T is that page's)"
       },
       {
         "file": "sdpcspin-routes.json",
-        "node": "3.first.trinity.tss",
-        "variant": "k2",
-        "mirrored": true,
+        "node": "3.second.cspin.first#2",
+        "variant": "rule",
+        "mirrored": false,
         "page": "https://harddrop.com/wiki/SDPC_Spin",
-        "note": "harddrop's SDPC Spin: the Trinity's T laid flat over the left wall, a TSS on this board (the arm row is not full); the window reads the T's box and the hole and not whether two rows clear, and the corpus scores TSDs only. The Z and the S fill the arm row and the nub row of the columns two and three past the arm, over the Trinity's TSD hole"
+        "note": "harddrop's SDPC Spin: a bag-5 TSD of the second C-Spin build, over the C-Spin's residue slot (the ダブルダガー shape)"
       },
       {
         "file": "sdpcspin-routes.json",
-        "node": "3.first.trinity.tss",
-        "variant": "k3",
-        "mirrored": true,
+        "node": "3.second.cspin.o_first#2",
+        "variant": "rule",
+        "mirrored": false,
         "page": "https://harddrop.com/wiki/SDPC_Spin",
-        "note": "the same board, the next column out"
+        "note": "the same build, its O-first order"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.l_first#2",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "the same build, its L-first order"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.l_first#4",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "the same build, its L-first order, the next board"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "harddrop's SDPC Spin: the Imperial Cross TSD; the cross's far arm is covered only inside the cleared rows"
       }
     ],
     "also": [
       {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#1",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the same author's 山岳積み2号: a bag-4 TSD of the 5巡パフェ, a hole covered only inside the cleared rows"
+      },
+      {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#2",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the same board, its second form"
+      },
+      {
         "file": "stickspin-routes.json",
         "node": "2.sd",
-        "variant": "k1",
-        "mirrored": true,
+        "variant": "rule",
+        "mirrored": false,
         "note": "the same author's stick spin: the SDパフェ bag-2 STMB Cave, the cave one past the T's arm"
       },
       {
         "file": "stickspin-routes.json",
+        "node": "2.sd.imperial.spin",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "stick spin's Imperial Cross TSD"
+      },
+      {
+        "file": "stickspin-routes.json",
         "node": "2.sd.stmb.spin",
-        "variant": "k1",
-        "mirrored": true,
-        "note": "the same board with its T drawn"
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the SDパフェ STMB Cave with its T drawn"
       }
     ]
   },

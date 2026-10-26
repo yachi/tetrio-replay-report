@@ -40,8 +40,19 @@ export interface TechniqueProfile {
    *  spin it is not about is a shape test) */
   controlSpins: { name: string; kind: SpinKind }[];
   /** how the window is placed. Only `spin_t_cells` exists: the lock's cells equal the variant's
-   *  T cells under one translation */
+   *  T cells under one translation. A variant whose transcription says `window_basis: rule` has no window at all:
+   *  `detect` decides (基本的なドネイト's donation rule, `basicdonating-rule.ts`) */
   anchor: 'spin_t_cells';
+  /** required by a `rule` variant: whether the shape stood at one scored lock (the board before it with the lock's
+   *  cells added, the lock's cells, the rows it clears), its thumbnail box and its payoff well; `abl` relaxes one
+   *  clause for the controls, named in `ablations` */
+  detect?: {
+    ablations: string[];
+    match(d: TechDigest, i: number, withT: boolean[][], cells: { row: number; col: number }[], rows: number[],
+          abl?: string): { columns: { col: number; hole_row: number; depth: number; cover: string }[];
+                           well: { r: number; c: number };
+                           box: { rows: [number, number]; cols: [number, number] } } | null;
+  };
   /** how a garbage cell reads inside the window. Only `filled` exists */
   garbage: 'filled';
   artefact: { schema: string; means: string; notEligible: string; caveat: string };

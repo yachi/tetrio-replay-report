@@ -12,9 +12,10 @@ Inputs, all committed: `pipeline/openers/basicdonating-technique.json` (transcri
 `extract_basicdonating_shapes`), `analysis/basicdonating-facts.json` (`emit-technique-facts.ts --technique
 basicdonating`) and `analysis/basicdonating-demos.json` (`emit-technique-demos.ts --technique basicdonating`).
 
-Seven variants, all TSDs: one per hole distance (k1..k6: the hole 1 to 6 columns from the T's near arm) and `nub`,
-the hole under the T's own nub (harddrop's drawing, an `external` node); k1 is the primary and k2..k6 and nub are
-`more_variants`. The letters this page draws beyond the route pages': `C` an earlier cell
+One variant, `rule`, a TSD matched by the donation rule (`pipeline/sim/basicdonating-rule.ts`, yachi's, 2026-10-26)
+in place of a window; the six hole windows (k1..k6) and the nub window are retired. Its window section draws the T of
+the page's first drawing, and each case's thumbnail is the hit's box (the T and its own column). The letters this page
+draws beyond the route pages': `C` an earlier cell
 in a cleared row, muted, and `I J L O S` a piece's cell in a cleared row, muted (the route pages' `Z` class already
 draws an upper-case Z, outlined).
 """
@@ -39,9 +40,8 @@ PROFILE = TechniqueSiteProfile(
     transcription_schema="technique-shapes/1",
     facts_schema="technique-facts/1",
     demos_schema="technique-demos/1",
-    variant="k1",
+    variant="rule",
     opportunity="TSD",
-    more_variants=tuple((f"k{k}", "TSD") for k in range(2, 7)) + (("nub", "TSD"),),
     cell_classes={"C": "cl", "I": "im", "J": "jm", "L": "lm", "O": "om", "S": "sm"},
     extra_css=BASICDONATING_CSS,
     max_page_bytes=3_000_000,
