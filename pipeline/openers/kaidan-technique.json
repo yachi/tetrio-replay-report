@@ -3534,7 +3534,7 @@
       "fires_on_kaidan": [
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.basic.z",
           "cells": [
             [
@@ -3555,12 +3555,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.basic.o",
           "cells": [
             [
@@ -3581,12 +3581,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.basic.spin",
           "cells": [
             [
@@ -3607,12 +3607,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.s3.s",
           "cells": [
             [
@@ -3633,12 +3633,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.s3.j",
           "cells": [
             [
@@ -3659,12 +3659,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.after.1",
           "cells": [
             [
@@ -3685,12 +3685,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.dt.amemiya",
           "cells": [
             [
@@ -3716,7 +3716,7 @@
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.dt.anchor",
           "cells": [
             [
@@ -3742,7 +3742,7 @@
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.dt.amemiya.pre",
           "cells": [
             [
@@ -3768,7 +3768,7 @@
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "nodes.dt.anchor.pre",
           "cells": [
             [
@@ -3794,7 +3794,7 @@
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #2",
           "cells": [
             [
@@ -3815,12 +3815,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #8",
           "cells": [
             [
@@ -3841,12 +3841,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #15",
           "cells": [
             [
@@ -3867,12 +3867,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #92",
           "cells": [
             [
@@ -3893,12 +3893,38 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
+          "board": "harddrop #74",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule",
           "board": "harddrop #88",
           "cells": [
             [
@@ -3919,12 +3945,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #96",
           "cells": [
             [
@@ -3945,12 +3971,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #1",
           "cells": [
             [
@@ -3971,12 +3997,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #6",
           "cells": [
             [
@@ -3997,12 +4023,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #14",
           "cells": [
             [
@@ -4023,12 +4049,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #18",
           "cells": [
             [
@@ -4049,12 +4075,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #20",
           "cells": [
             [
@@ -4075,12 +4101,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #78",
           "cells": [
             [
@@ -4101,12 +4127,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop #91",
           "cells": [
             [
@@ -4127,12 +4153,12 @@
             ]
           ],
           "mirrored": [
-            true
+            false
           ]
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k1",
+          "variant": "rule",
           "board": "harddrop_anchor_set #21",
           "cells": [
             [
@@ -4158,101 +4184,23 @@
         },
         {
           "file": "basicdonating-technique.json",
-          "variant": "k3",
-          "board": "harddrop #15",
+          "variant": "rule",
+          "board": "harddrop_anchor_set #19",
           "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "basicdonating-technique.json",
-          "variant": "k3",
-          "board": "harddrop #14",
-          "cells": [
-            [
-              2,
-              3
-            ],
-            [
-              2,
-              4
-            ],
-            [
-              2,
-              5
-            ],
-            [
-              3,
-              4
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "basicdonating-technique.json",
-          "variant": "k5",
-          "board": "nodes.dt.amemiya",
-          "cells": [
-            [
-              3,
-              1
-            ],
-            [
-              3,
-              2
-            ],
-            [
-              3,
-              3
-            ],
             [
               4,
               2
-            ]
-          ],
-          "mirrored": [
-            false
-          ]
-        },
-        {
-          "file": "basicdonating-technique.json",
-          "variant": "k5",
-          "board": "nodes.dt.amemiya.pre",
-          "cells": [
+            ],
             [
-              3,
+              5,
               1
             ],
             [
-              3,
+              5,
               2
             ],
             [
-              3,
-              3
-            ],
-            [
-              4,
+              6,
               2
             ]
           ],

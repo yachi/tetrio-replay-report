@@ -35,10 +35,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "6daa06aa217d6f5bcba16daeeca31aa2",
-  "planner_md5": "3293ae374e59fc030c78f86d5a3d1057",
+  "transcription_md5": "916649bb3b528a26d0ee457aafe84edd",
+  "planner_md5": "9c22ad9d515d3a7b38d070be22f796ec",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "14e0ffc47819b4ef9bcbc607c5a84290"
+  "classifier_md5": "15451b3bffbc7558d0a3b903b176779a"
  },
  "board": {
   "width": 10,

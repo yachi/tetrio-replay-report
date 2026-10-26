@@ -49,6 +49,8 @@ per rule and requires that tag):
         the spin the page draws there, or (for a board with no spin drawn) at any resting placement.
         A variant with `window_basis: agreement` takes (b*), (c*), (g) and (h) of `agreement_window`
         in place of (b) and (c): its window is the box every drawing of the shape agrees on.
+        A variant with `window_basis: rule` (基本的なドネイト) has no window: `rule_window` and
+        `rule_accounting` check the donation rule (`rule_columns`, the twin of basicdonating-rule.ts) instead.
   colour:   — every letter is whole pieces (`route_transcription.piece_groups_ok`, with the spec's
         `upper_groups`); a board that breaks it is a named discrepancy `<id>:colour`.
   cross:    — the variant, evaluated by the same predicate on every U-slot board of every committed
@@ -190,7 +192,16 @@ def window_fires(data: dict, var: dict, spec: TechniqueSpec, board: list[str], l
     """THE PREDICATE (the Python twin of `windowMatch` in technique-facts.ts). `board` is the board
     the piece went into (rows top to bottom), `lock` the piece's cells. Anchored on the spin cells:
     the lock must equal them under exactly one translation; then every non-spin window cell must
-    agree (filled / empty) with the board. Off the board -> None. Colour is never compared."""
+    agree (filled / empty) with the board. Off the board -> None. Colour is never compared.
+    A `rule` variant (基本的なドネイト) has no window: `rule_columns` decides, in one hand only (the rule is
+    symmetric, so a mirrored call is always False and a hit is recorded once), and only where the T makes exactly
+    the variant's `lines` rows full (the matcher scores TSDs)."""
+    if var.get('window_basis') == 'rule':
+        if mirrored:
+            return False
+        f = filled or (lambda R, C: not is_empty(board[R][C], spec))
+        full = sum(all((r, c) in lock or f(r, c) for c in range(WIDTH)) for r in range(len(board)))
+        return full == var['lines'] and bool(rule_columns(board, lock, spec, filled))
     W = window_cells(data, var, spec, mirrored)
     D = {k for k, v in W.items() if v == 'T'}
     if len(lock) != len(D):
@@ -325,141 +336,117 @@ def agreement_window(data, v, spec, rows, sc, top, inwin, fr) -> list[str]:
     return bad
 
 
-WELL_EXTRA = ('above', 'upper', 'lower', 'under')
+def rule_columns(board: list[str], lock: set, spec: TechniqueSpec, filled=None) -> list[tuple[int, int]]:
+    """THE DONATION RULE's occupancy half (the Python twin of `donationColumns` in basicdonating-rule.ts, rules 1
+    and 3; ownership — rule 2, complete pieces — is not drawn, so the twin cannot read it): with the T's cells
+    `lock` added to `board`, a column donates when, at its topmost cell e that is empty, in no row the lock makes
+    full, and directly under a cell of such a row, (1) every filled cell of the column above e is in a full row
+    and (3) the cell above e is not the T. Returns every donating column as (hole row, column)."""
+    filled = filled or (lambda R, C: not is_empty(board[R][C], spec))
+    H = len(board)
+    occ = lambda R, C: (R, C) in lock or filled(R, C)
+    C = {r for r in range(H) if all(occ(r, c) for c in range(WIDTH))}
+    out = []
+    for c in range(WIDTH):
+        e = next((r for r in range(1, H) if not occ(r, c) and r not in C and occ(r - 1, c) and r - 1 in C), None)
+        if e is None or (e - 1, c) in lock:
+            continue
+        if all(r in C for r in range(e) if occ(r, c)):
+            out.append((e, c))
+    return out
 
 
-def well_geometry(v: dict) -> tuple[int, int, int, list[tuple[int, int]]]:
-    """A `well` variant's frame: the T's arm row R, its left arm column a, the well column w, and the four
-    cells the window reads outside the T's box, in `WELL_EXTRA` order (above the donation, its two cells in
-    the rows the TSD clears, the hole under them). Nothing beside the hole is read: the page's own answers
-    leave it open as often as walled (Q17 of the 2ミノ set)."""
-    tc = [tuple(x) for x in v['t_cells']]
-    R = min(r for r, _ in tc)
-    a = min(c for r, c in tc if r == R)
-    k, side = v['well']['offset'], v['well']['side']
-    if side == 'nub':
-        # the hole under the T's own nub: the T fills the two cells in the rows it clears, so the window reads the
-        # cell above them, and under them a Tetris hole (harddrop's word): two cells deep, walled on both sides
-        w = a + 1
-        return R, a, w, [(R - 1, w), (R + 2, w), (R + 3, w), (R + 2, w - 1), (R + 2, w + 1), (R + 3, w - 1),
-                         (R + 3, w + 1)]
-    w = a - k if side == 'left' else a + 2 + k
-    return R, a, w, [(R - 1, w), (R, w), (R + 1, w), (R + 2, w)]
+def rule_own(cols: list[tuple[int, int]], lock: set) -> tuple[int, int]:
+    """The hit's own column (its payoff well): the donating column nearest to the T's columns, then the leftmost
+    (`ruleMatch` in basicdonating-rule.ts)."""
+    lo, hi = min(c for _, c in lock), max(c for _, c in lock)
+    dist = lambda c: lo - c if c < lo else c - hi if c > hi else 0
+    return min(cols, key=lambda x: (dist(x[1]), x[1]))
 
 
-def well_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> list[str]:
-    """The window rule for a variant whose window is a DONATION WELL (`window_basis: well`, 基本的なドネイト),
-    the opt-in alternative to the bounding box and the agreement box. A page that teaches a principle
-    (「TSDで消える2列だけを埋める」) over many terrains draws no two of them alike between the T and the well, so
-    neither box can hold both; the window is the principle itself, written as cells and checked here:
-
-      (w1) the T is flat, nub down, and the window's box is exactly its 2 × 3 bounding box; no roof cells;
-      (w2) `well` names a side and an offset k ≥ 1 (columns between the T's near arm and the well, the arm's
-           own column not counted): the well column w, and `window_extra` is exactly the four cells of
-           `well_geometry`, which the board draws empty, filled, filled, empty; or (opt-in) the side `nub` and
-           offset 0, the hole under the T's own nub, whose two cells in the rows the TSD clears are the T's, so
-           `window_extra` is the cell above them (empty) and a Tetris hole under them: two cells empty, the
-           four beside them filled (`well_geometry`'s order);
-      (w3) the board is the spin board the T is drawn on, or (a page drawing the form without its T) a board
-           whose t_cells are empty and on which that T clears exactly `lines` rows;
-      (w4) the payoff is a Tetris into that well: an I clearing 4, `well_cell_pre_clear` the well cell, on
-           the variant's own board (the page draws no after board), and every filled cell of the well
-           column on it lies in a row the TSD clears (the re-opening clause, on the DRAWING).
-    `well_accounting` then holds every drawing of the page to the windows, both ways."""
+def rule_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> list[str]:
+    """The window rule for a variant with no window (`window_basis: rule`, 基本的なドネイト since 2026-10-26):
+      (r1) the board is a spin board and `window` is exactly its T's bounding box (where the page draws the T; the
+           matcher reads no box); no roof cells;
+      (r2) the rule fires at the drawn T;
+      (r3) the payoff is a Tetris into the hit's own column: an I clearing 4 on the variant's own board,
+           `well_cell_pre_clear` = `well_cell_after` = that column's hole cell (it is under the cleared rows, so
+           the clear does not move it).
+    `rule_accounting` then holds every drawing of the page to the rule, both ways."""
     bad = []
-    tcs = sorted(tc)
-    R = min(r for r, _ in tcs)
-    if sorted(tcs) != sorted([(R, c) for c in range(tcs[0][1], tcs[0][1] + 3)] + [(R + 1, tcs[0][1] + 1)]):
-        return [f'window: {v["id"]}: the T is not flat, nub down ({tcs})']
-    a = tcs[0][1]
-    if [v['window']['rows'], v['window']['cols']] != [[R, R + 1], [a, a + 2]]:
-        bad.append(f'window: {v["id"]}\'s window {v["window"]} is not the T\'s box {[[R, R + 1], [a, a + 2]]}')
-    if v.get('roof_cells'):
-        bad.append(f'window: {v["id"]}: a well window has no roof cells')
-    wl = v.get('well', {})
-    nub = wl.get('side') == 'nub'
-    if nub and wl.get('offset') != 0:
-        return bad + [f'window: {v["id"]}.well {wl}: the nub\'s hole has offset 0']
-    if not nub and (wl.get('side') not in ('left', 'right') or not isinstance(wl.get('offset'), int)
-                    or wl['offset'] < 1):
-        return bad + [f'window: {v["id"]}.well {wl} is not a side and an offset ≥ 1']
-    _R, _a, w, cells = well_geometry(v)
-    rows = sp['rows']
-    if [tuple(x) for x in v.get('window_extra', {}).get('cells', [])] != cells or not v['window_extra'].get('note'):
-        bad.append(f'window: {v["id"]}.window_extra is not the well\'s four cells {cells}, with a note')
-    if any(not (0 <= r < len(rows) and 0 <= c < WIDTH) for r, c in cells):
-        return bad + [f'window: {v["id"]}: the well cells leave {v["board"]}']
-    got = ['.' if is_empty(rows[r][c], spec) else '#' for r, c in cells]
-    want = ['.', '.', '.', '#', '#', '#', '#'] if nub else ['.', '#', '#', '.']
-    if got != want:
-        bad.append(f'window: {v["id"]}: {v["board"]} draws the well cells {got}, not {" / ".join(want)}')
     if sp['kind'] != 'spin':
-        if any(not is_empty(rows[r][c], spec) for r, c in tc):
-            bad.append(f'window: {v["id"]}: the slot on {v["board"]} is not empty')
-        o = [''.join('#' if (r, c) in tc else ch for c, ch in enumerate(row)) for r, row in enumerate(occ_of(rows, spec))]
-        if full_rows(o) != [R, R + 1] or v['lines'] != 2:
-            bad.append(f'window: {v["id"]}: the T on {v["board"]} clears rows {full_rows(o)}, not its two')
-    elif sp.get('lines') != v['lines']:
+        return [f'window: {v["id"]}: a rule variant stands on a spin board, not {sp["kind"]}']
+    box = [[min(r for r, _ in tc), max(r for r, _ in tc)], [min(c for _, c in tc), max(c for _, c in tc)]]
+    if [v['window']['rows'], v['window']['cols']] != box:
+        bad.append(f'window: {v["id"]}\'s window {v["window"]} is not its T\'s box {box}')
+    if v.get('roof_cells'):
+        bad.append(f'window: {v["id"]}: a rule variant has no roof cells')
+    rows = sp['rows']
+    pre = [''.join(EMPTY if (r, c) in tc else ch for c, ch in enumerate(row)) for r, row in enumerate(rows)]
+    cols = rule_columns(pre, tc, spec)
+    if not cols:
+        return bad + [f'window: {v["id"]}: the rule does not fire at the T drawn on {v["board"]}']
+    if sp.get('lines') != v['lines']:
         bad.append(f'window: {v["id"]}: {v["board"]} clears {sp.get("lines")}, not {v["lines"]}')
+    wc = rule_own(cols, tc)
     p = v.get('payoff', {})
     if p.get('kind') != 'well_quad' or p.get('piece') != 'I' or p.get('lines') != 4 or p.get('board') != v['board']:
         bad.append(f'window: {v["id"]}: the payoff is not an I clearing 4 into the well, on {v["board"]}')
-    wc = cells[1] if nub else cells[3]
     if [tuple(p.get('well_cell_pre_clear', []))] != [wc] or [tuple(p.get('well_cell_after', []))] != [wc]:
-        bad.append(f'window: {v["id"]}: the payoff\'s well cell is not {wc} (no cleared row lies under it)')
-    if any(not is_empty(row[w], spec) and r not in (R, R + 1) for r, row in enumerate(rows)):
-        bad.append(f'window: {v["id"]}: a filled cell of the well column {w} on {v["board"]} is in no row the TSD clears')
+        bad.append(f'window: {v["id"]}: the payoff\'s well cell is not the own column\'s hole {wc}')
     return bad
 
 
-def well_accounting(data: dict, spec: TechniqueSpec) -> list[str]:
-    """Every drawing on the page, held to the well windows BOTH WAYS, so the windows never choose their own
-    evidence. On a spin board the windows are evaluated at its drawn T (taken out); on any other board at every
-    resting placement of a T. Every (board, variant, slot, hand) at which a window fires must be one of a
-    variant's `drawings` (a donation the page draws) or a `well_fires_other` entry with a reason; every spin
-    board at whose drawn T no window fires must be a `well_not_fired` entry with a reason; and every recorded
-    entry must be measured. A spin board that two windows fire on is recorded once per window."""
+def rule_accounting(data: dict, spec: TechniqueSpec) -> list[str]:
+    """Every drawing on the page, held to the rule BOTH WAYS, so the rule never chooses its own evidence: on a spin
+    board at its drawn T (taken out); on a base board (a form or a question, drawn without its T) at every resting
+    T placement that makes exactly two rows full. Every (board, T) at which the rule fires must be the rule
+    variant's `drawings` entry with the donating columns measured; every spin board at whose drawn T it does not
+    fire must be a `rule_not_fired` entry with a reason; and every recorded entry must be measured."""
     bad = []
-    vs = [v for v in data['variants'] if v.get('window_basis') == 'well']
-    got = set()
-    spin_fired = set()
+    vs = [v for v in data['variants'] if v.get('window_basis') == 'rule']
+    if len(vs) != 1:
+        return [f'rule: {len(vs)} rule variants, not one']
+    got = {}
+    spins = set()
     for n in data['nodes']:
         rows = n['rows']
         if n['kind'] == 'spin':
+            spins.add(n['id'])
             sc = spin_cells(n)
-            pre = [''.join(EMPTY if (r, c) in sc else ch for c, ch in enumerate(row)) for r, row in enumerate(rows)]
-            cands, b = [sc], pre
+            b = [''.join(EMPTY if (r, c) in sc else ch for c, ch in enumerate(row)) for r, row in enumerate(rows)]
+            cands = [sc]
+        elif n['kind'] == 'base':
+            b = rows
+            o = occ_of(rows, spec)
+            cands = [cs for cs in t_placements(rows, spec)
+                     if len(full_rows([''.join('#' if (r, c) in cs else ch for c, ch in enumerate(row))
+                                       for r, row in enumerate(o)])) == 2]
         else:
-            cands, b = t_placements(rows, spec), rows
-        for v in vs:
-            for cs in cands:
-                for m in (False, True):
-                    if window_fires(data, v, spec, b, cs, m):
-                        got.add((n['id'], v['id'], frozenset(cs), m))
-                        if n['kind'] == 'spin':
-                            spin_fired.add(n['id'])
+            continue
+        for cs in cands:
+            cols = rule_columns(b, cs, spec)
+            if cols:
+                got[(n['id'], frozenset(cs))] = sorted([r, c] for r, c in cols)
     rec = {}
-    for v in vs:
-        for d in v.get('drawings', []):
-            rec[(d['board'], v['id'], frozenset(tuple(x) for x in d['t_cells']), d['mirrored'])] = 'drawing'
-    for e in data.get('well_fires_other', []):
-        if not e.get('reason'):
-            bad.append(f'well: {e["board"]} in well_fires_other carries no reason')
-        rec[(e['board'], e['variant'], frozenset(tuple(x) for x in e['t_cells']), e['mirrored'])] = 'other'
-    for k in sorted(got - rec.keys(), key=str):
-        bad.append(f'well: {k[1]} fires on {k[0]} at {sorted(k[2])}{" (mirrored)" if k[3] else ""}, recorded nowhere')
-    for k in sorted(rec.keys() - got, key=str):
-        bad.append(f'well: {k[1]} is recorded firing on {k[0]} at {sorted(k[2])}{" (mirrored)" if k[3] else ""}, '
-                   f'and does not')
-    spins = {n['id'] for n in data['nodes'] if n['kind'] == 'spin'}
-    nf = {e['board']: e for e in data.get('well_not_fired', [])}
-    for b in sorted(spins - spin_fired - nf.keys()):
-        bad.append(f'well: no window fires at the T drawn on {b}, and well_not_fired does not name it')
+    for d in vs[0].get('drawings', []):
+        rec[(d['board'], frozenset(tuple(x) for x in d['t_cells']))] = d.get('holes')
+    for k in sorted(got.keys() - rec.keys(), key=str):
+        bad.append(f'rule: fires on {k[0]} at {sorted(k[1])} (holes {got[k]}), recorded nowhere')
+    for k in sorted(rec.keys() - got.keys(), key=str):
+        bad.append(f'rule: is recorded firing on {k[0]} at {sorted(k[1])}, and does not')
+    for k in sorted(rec.keys() & got.keys(), key=str):
+        if rec[k] != got[k]:
+            bad.append(f'rule: on {k[0]} at {sorted(k[1])} the holes are {got[k]}, the record says {rec[k]}')
+    fired = {k[0] for k in got if k[0] in spins}
+    nf = {e['board']: e for e in data.get('rule_not_fired', [])}
+    for b in sorted(spins - fired - nf.keys()):
+        bad.append(f'rule: the rule does not fire at the T drawn on {b}, and rule_not_fired does not name it')
     for b, e in sorted(nf.items()):
-        if b in spin_fired or b not in spins:
-            bad.append(f'well: {b} is in well_not_fired but is no spin board a window misses')
+        if b in fired or b not in spins:
+            bad.append(f'rule: {b} is in rule_not_fired but is no spin board the rule misses')
         if not e.get('reason'):
-            bad.append(f'well: {b} in well_not_fired carries no reason')
+            bad.append(f'rule: {b} in rule_not_fired carries no reason')
     return bad
 
 
@@ -647,8 +634,7 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         sc = spin_cells(sp)
         (r0, r1), (c0, c1) = v['window']['rows'], v['window']['cols']
         inwin = {(r, c) for r in range(r0, r1 + 1) for c in range(c0, c1 + 1)}
-        # a `well` variant may stand on a board the page draws without its T (an empty slot): well_window checks it
-        if tc != sc and not (v.get('window_basis') == 'well' and sp['kind'] != 'spin'):
+        if tc != sc:
             bad.append(f'window: {v["id"]}.t_cells {sorted(tc)} are not {v["board"]}\'s T cells {sorted(sc)}')
         if not tc <= inwin:
             bad.append(f'window: {v["id"]}\'s window does not hold every T cell')
@@ -658,8 +644,8 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
         fr = set(full_rows(occ_of(rows, spec)))
         if v.get('window_basis') == 'agreement':
             bad += agreement_window(data, v, spec, rows, sc, top, inwin, fr)
-        elif v.get('window_basis') == 'well':
-            bad += well_window(data, v, spec, sp, tc)
+        elif v.get('window_basis') == 'rule':
+            bad += rule_window(data, v, spec, sp, tc)
             continue
         else:
             roof = {(r, c) for (r, c) in filled_set(rows, spec) if r < top}
@@ -730,8 +716,8 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
             if any(window_fires(data, v, spec, b, cs, m) for cs in cands for m in (False, True)):
                 bad.append(f'window: {v["id"]} fires on {bid}, which the page draws as no {v["id"]}')
 
-    if any(v.get('window_basis') == 'well' for v in data.get('variants', [])):
-        bad += well_accounting(data, spec)
+    if any(v.get('window_basis') == 'rule' for v in data.get('variants', [])):
+        bad += rule_accounting(data, spec)
 
     # colour
     for n in nodes:

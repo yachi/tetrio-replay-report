@@ -516,9 +516,14 @@ class TechniqueSite:
     def _thumb(self, tr, v, h):
         """A hit's window before the T, its letters as the artefact records them, the T's cells as the
         dashed slot (mirrored with the window)."""
-        (r0, _r1), (c0, c1) = v["window"]["rows"], v["window"]["cols"]
-        w = c1 - c0
-        tcells = {(r - r0, (w - (c - c0)) if h["mirrored"] else (c - c0)) for r, c in v["t_cells"]}
+        if v.get("window_basis") == "rule":
+            # a rule hit's thumbnail is its own box, and its T is the hit's own (`donation.t_cells`), not the drawing's
+            (r0, _r1), (c0, _c1) = h["donation"]["box"]["rows"], h["donation"]["box"]["cols"]
+            tcells = {(r - r0, c - c0) for r, c in h["donation"]["t_cells"]}
+        else:
+            (r0, _r1), (c0, c1) = v["window"]["rows"], v["window"]["cols"]
+            w = c1 - c0
+            tcells = {(r - r0, (w - (c - c0)) if h["mirrored"] else (c - c0)) for r, c in v["t_cells"]}
         rows = []
         for r, line in enumerate(h["window_letters"]):
             s = ""

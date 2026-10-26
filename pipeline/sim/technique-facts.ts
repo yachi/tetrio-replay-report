@@ -163,6 +163,9 @@ const kindKey = (spin: string, lines: number) => `${spin === 'mini' ? 'mini' : '
 
 export interface Variant {
   id: string; board: string; spin: string; lines: number;
+  /** `rule`: no window — the profile's `detect` decides (基本的なドネイト's donation rule); `window` and `t_cells`
+   *  then only say where the variant's board draws its T */
+  window_basis?: string;
   window: { rows: [number, number]; cols: [number, number] };
   t_cells: [number, number][];
   /** cells OUTSIDE the box the window also reads, filled or empty as drawn (千鳥格子's overhang over the
@@ -311,6 +314,9 @@ export interface Hit {
   well_depth?: number;
   /** a profile with a `qualify` hook only: whether the hit was built as the technique, and every rule it fails */
   qualifies?: boolean; not_qualified?: string[];
+  /** a `rule` variant's hit only: every column the detector found, and the box its `window_letters` cover */
+  donation?: { columns: { col: number; hole_row: number; depth: number; cover: string }[];
+               box: { rows: [number, number]; cols: [number, number] }; t_cells: number[][] };
 }
 
 const sameSet = (a: Cell[], b: { r: number; c: number }[]) =>
@@ -407,7 +413,12 @@ export const caseName = (h: { session: string; match: number; round: number; pla
 
 export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mut: Mutants = {}): Classified {
   const variants: Variant[] = tr.variants;
-  const preps = variants.map(v => prepare(tr, v));
+  // a `rule` variant has no window: the profile's `detect` stands in for the predicate
+  const preps = variants.map(v => v.window_basis === 'rule' ? [] : prepare(tr, v));
+  for (const v of variants) if (v.window_basis === 'rule') {
+    if (!P.detect) throw new Error(`${P.tag}: variant ${v.id} is a rule variant and the profile has no detect`);
+    if (v.followup || v.payoff?.kind !== 'well_quad') throw new Error(`${P.tag}: rule variant ${v.id} must carry a well_quad payoff`);
+  }
   const users = [...new Set(digests.map(d => d.user))].sort();
   const per = <T>(f: () => T) => Object.fromEntries(users.map(u => [u, f()])) as Record<string, T>;
   const split = () => ({ all: 0, in_opener: 0, mid_game: 0 });
@@ -434,7 +445,9 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
     hits: per(() => ({ all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 })),
     followup: per(() => ({ fired: 0, not_fired: {} as Record<string, number> })),
     under: Object.fromEntries(unders[vi]!.map(c => [c.name, per(() => 0)])),
-    ablation: { no_must_empty: per(() => 0), no_roof: per(() => 0), t_overlap: per(() => 0) },
+    ablation: v.window_basis === 'rule'
+      ? Object.fromEntries(P.detect!.ablations.map(a => [a, per(() => 0)]))
+      : { no_must_empty: per(() => 0), no_roof: per(() => 0), t_overlap: per(() => 0) },
     orientation_baseline: per(() => 0),
   }]));
 
@@ -486,6 +499,42 @@ export function classify(P: TechniqueProfile, tr: any, digests: TechDigest[], mu
       const lk = d.locks[t.i]!;
       for (let vi = 0; vi < variants.length; vi++) {
         const v = variants[vi]!, Ps = preps[vi]!, rec = pv[v.id]!, vOpp = vOpps[vi]!, under = unders[vi]!;
+        if (v.window_basis === 'rule') {
+          const withT = withTs.get(t.i)!, det = P.detect!;
+          const m = det.match(d, t.i, withT, lk.cells, lk.clearedRows);
+          if (s.kind === vOpp) {
+            for (const a of det.ablations) if (det.match(d, t.i, withT, lk.cells, lk.clearedRows, a)) rec.ablation[a][d.user]++;
+            if (isStood(lk.cells)) rec.orientation_baseline[d.user]++;
+          }
+          if (!m) continue;
+          const c = under.find(x => x.key === s.kind);
+          if (c) { rec.under[c.name][d.user]++; continue; }
+          if (s.kind !== vOpp) continue;
+          const [R0, R1] = m.box.rows, [C0, C1] = m.box.cols;
+          const letters: string[] = [];
+          const cells: WinCell[] = [];
+          for (let r = R0; r <= R1; r++) {
+            letters.push(t.board[r]!.slice(C0, C1 + 1));
+            for (let cc = C0; cc <= C1; cc++) cells.push({ r, c: cc, v: t.board[r]![cc] === '.' ? '.' : '#' });
+          }
+          const g = letters.some(x => x.includes('G'));
+          const Pp: Prepared = { id: v.id, mirrored: false, cells, T: [], roofTop: R0, followup: [], followupKind: '',
+                                 well: m.well };
+          const fu = mut.tOverlap ? { lock: null, fired: false, reason: 'not_anchored' }
+            : wellPayoff(d, t.i, Pp, { dr: 0, dc: 0 }, mut);
+          const ownCol = m.columns.find(x => x.col === m.well.c)!;
+          const h: Hit = { session: d.session, file: d.file, round_index0: d.round, match: d.match, round: d.round + 1,
+            player: d.user, variant: v.id, lock: t.i, in_opener: inOpener(t.i), mirrored: false,
+            garbage_in_window: g, window_letters: letters, verified_to: d.v, followup: fu, well_depth: ownCol.depth,
+            donation: { columns: m.columns, box: m.box, t_cells: lk.cells.map(q => [q.row, q.col]) } };
+          hits.push(h);
+          const hb = rec.hits[d.user]!;
+          hb.all++; hb[h.in_opener ? 'in_opener' : 'mid_game']++;
+          if (g) hb.garbage_in_window++;
+          const fb = rec.followup[d.user]!;
+          if (fu.fired) fb.fired++; else fb.not_fired[fu.reason!] = (fb.not_fired[fu.reason!] ?? 0) + 1;
+          continue;
+        }
         const cl: Clause = { mustEmpty: !mut.noMustEmpty, roof: !mut.noRoof, garbageFilled: !mut.garbageEmpty,
                              rowOff: mut.rowAnchorOff1 ? 1 : 0 };
         const order = Ps;

@@ -12,22 +12,21 @@ clears them, and the hole under them is open again. The page draws five one-piec
 forms, eight two-wide-hole forms and two T-spin FIN forms, and twenty-three practice questions with their
 answers. No two of them agree on the stack between the T and the hole.
 
-DECISION: the spin is a TSD and the anchor is the T's four cells, laid flat, nub down. The window is the
-principle itself (`window_basis: well`, an opt-in rule of the shared gate written for this page): the T's own
-2 × 3 box, and four cells in the hole's column — the cell above the two the TSD clears empty, those two
-filled, the cell under them empty. The hole stands k columns from the T's near arm (the arm's own column not
-counted), and the page draws it at every k from 1 to 6, on either side, so there is one variant per k, each
-on a board the page draws at that k, mirrored for the other side. k = 0 (the hole under the T's arm) is not
-a variant: the page names its two forms there as 欄干 (%LドネイトA) and STMB Cave (%S%ZドネイトA), which have
-their own pages, and the qualify rules below keep a T either of their windows fires on out of this page's
-count. Nothing beside the hole is read: the page's own answers leave the cells next to it open as often as
-walled.
+DECISION (since 2026-10-26, yachi's rule; the six hole windows k1..k6 and the nub window are retired): no window.
+The spin is a TSD and a column DONATES when, at its topmost cell that is empty, in no row the T makes full and
+directly under a cell of such a row, every filled cell of the column above it lies in those rows (so the clear
+opens it from the top) and the cell above it is not the T (a hole under the T's nub alone is a plain T-spin). Any
+column, any depth, any distance from the T. In play each covering cell must also be the T or a complete piece,
+never garbage; ownership is not drawn, so this gate reads the occupancy half (`technique_transcription.
+rule_columns`, the Python twin of `basicdonating-rule.ts`). One variant, `rule` (`window_basis: rule`), on the
+page's first one-piece form; its `window` is only the T's box, where the page draws it.
 
-THE WINDOWS DO NOT CHOOSE THEIR OWN EVIDENCE: `well_accounting` (the shared gate) evaluates all six windows
-on every board of the page, at its drawn T (a spin board) or at every resting T placement (any other board),
-and every place one fires must be a variant's `drawings` entry (a donation the page draws) or a
-`well_fires_other` entry with a reason; every spin board no window fires on must be a `well_not_fired` entry
-with a reason (the 3-row L mistake, the T-spin FIN answers, the TSS answers).
+THE RULE DOES NOT CHOOSE ITS OWN EVIDENCE: `rule_accounting` (the shared gate) applies it to every board of the
+page, at its drawn T (a spin board) or at every resting T placement making exactly two rows full (any other
+board), and every place it fires must be the variant's `drawings` entry with its donating holes measured; every
+spin board it misses must be a `rule_not_fired` entry with a reason (the 3-row L mistake; harddrop's nub-only
+board). The forms the page names as another page's technique (階段のドネイト, 欄干, STMB Cave) are donations
+too: the qualify rule `other_page` gives such a T to that page.
 
 WHERE THE TRANSCRIPTION COMES FROM. `NODES` is checked against the page's raw HTML (`basicdonating.html`,
 fetched with curl through a CA bundle adding the Let's Encrypt YE2 intermediate the server omits, TLS
@@ -323,226 +322,88 @@ NODES = [
 PAGE_ORDER = [n['id'] for n in NODES if not n.get('derived') and not n.get('external')]
 
 
-def _well(k: int, board: str, side: str, rows: list, cols: list, t_cells: list, extra: list) -> dict:
-    """One variant per hole offset k: its window, literal (the gate re-derives every cell of it)."""
-    return {
-        'id': f'k{k}', 'board': board, 'spin': 'TSD', 'lines': 2, 'window_basis': 'well',
-        'well': {'side': side, 'offset': k},
-        'window': {'rows': rows, 'cols': cols}, 't_cells': t_cells, 'roof_cells': [],
-        'window_extra': {'cells': extra, 'note': f'the hole {k} column(s) from the T\'s near arm, on {board}\'s side '
-                                                 f'({side}): the cell above the donation empty, its two cells in the '
-                                                 f'rows the TSD clears filled, the hole under them empty'},
-        'payoff': {'kind': 'well_quad', 'board': board, 'piece': 'I', 'lines': 4, 'well_cell_pre_clear': extra[3],
-                   'well_cell_after': extra[3],
-                   'note': 'harddrop\'s, not the page\'s: the page says only that the hole stays open to dig '
-                           '(「下穴が開いた状態を維持」); the Tetris into it is the Donation page\'s next step. The well '
-                           'cell is under the cleared rows, so the clear does not move it'},
-        'drawings': DRAWINGS.get(f'k{k}', []),
-    }
-
-
-DRAWINGS: dict = {
-    'k1': [
-        {'board': 'one.s', 't_cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': False},
-        {'board': 'q1.1.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': True},
-        {'board': 'q1.2.answer', 't_cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': True},
-        {'board': 'two.sz_a', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': True},
-        {'board': 'q2.3.answer', 't_cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': True},
-        {'board': 'q2.16.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': True},
-        {'board': 'q2.17.answer', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': False},
-    ],
-    'k2': [
-        {'board': 'intro.z', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'one.o', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'one.z', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'q1.3.answer', 't_cells': [[4, 1], [4, 2], [4, 3], [5, 2]], 'mirrored': True},
-        {'board': 'two.jz_a', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'two.jz_b', 't_cells': [[2, 0], [2, 1], [2, 2], [3, 1]], 'mirrored': True},
-        {'board': 'two.sz_b', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'two.js_b', 't_cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': False},
-        {'board': 'two.oz', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': False},
-        {'board': 'q2.1.answer', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': False},
-        {'board': 'q2.2.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': False},
-        {'board': 'q2.4.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': True},
-        {'board': 'q2.7.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': False},
-        {'board': 'q2.9.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': True},
-        {'board': 'q2.12.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': True},
-        {'board': 'q2.16.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': True},
-    ],
-    'k3': [
-        {'board': 'one.l_b', 't_cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': False},
-        {'board': 'q1.4.answer', 't_cells': [[4, 1], [4, 2], [4, 3], [5, 2]], 'mirrored': True},
-        {'board': 'q1.6.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': False},
-        {'board': 'two.js_a', 't_cells': [[2, 4], [2, 5], [2, 6], [3, 5]], 'mirrored': False},
-        {'board': 'two.js_b', 't_cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': False},
-        {'board': 'q2.5.answer', 't_cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': True},
-        {'board': 'q2.6.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': False},
-        {'board': 'q2.8.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': True},
-        {'board': 'q2.13.answer', 't_cells': [[5, 3], [5, 4], [5, 5], [6, 4]], 'mirrored': False},
-        {'board': 'q2.14.answer', 't_cells': [[3, 0], [3, 1], [3, 2], [4, 1]], 'mirrored': True},
-        {'board': 'q2.15.answer', 't_cells': [[5, 4], [5, 5], [5, 6], [6, 5]], 'mirrored': True},
-        {'board': 'q2.16.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': True},
-        {'board': 'q2.17.answer', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': False},
-    ],
-    'k4': [
-        {'board': 'hole2.b', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': False},
-        {'board': 'hole3.a', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': False},
-        {'board': 'hole4.a', 't_cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'mirrored': False},
-        {'board': 'hole5.a', 't_cells': [[1, 5], [1, 6], [1, 7], [2, 6]], 'mirrored': False},
-    ],
-    'k5': [
-        {'board': 'hole2.a', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': True},
-        {'board': 'hole3.b', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': True},
-        {'board': 'hole4.b', 't_cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'mirrored': True},
-        {'board': 'hole5.b', 't_cells': [[1, 5], [1, 6], [1, 7], [2, 6]], 'mirrored': True},
-        {'board': 'q2.11.answer', 't_cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'mirrored': False},
-    ],
-    'nub': [
-        {'board': 'nub.hd', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': False},
-        {'board': 'nub.hd', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': True},
-    ],
-    'k6': [
-        {'board': 'q1.5.answer', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': False},
-        {'board': 'q2.10.answer', 't_cells': [[5, 0], [5, 1], [5, 2], [6, 1]], 'mirrored': True},
-    ],
-}
+#: every board of the page at which the rule fires, at its drawn T (a spin board) or at a resting T placement making
+#: two rows full (a form or a question drawn without its T), with every donating column's hole cell: complete both
+#: ways (`rule_accounting`). Every answer and every form the page draws is here; no question is.
+DRAWINGS: list = [
+    {'board': 'intro.z', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'one.o', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'one.s', 't_cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'holes': [[4, 0]]},
+    {'board': 'one.z', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'one.l_a', 't_cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'holes': [[4, 1]]},
+    {'board': 'one.l_b', 't_cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'holes': [[4, 0]]},
+    {'board': 'q1.1.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'holes': [[6, 6]]},
+    {'board': 'q1.2.answer', 't_cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'holes': [[6, 9]]},
+    {'board': 'q1.3.answer', 't_cells': [[4, 1], [4, 2], [4, 3], [5, 2]], 'holes': [[6, 5]]},
+    {'board': 'q1.4.answer', 't_cells': [[4, 1], [4, 2], [4, 3], [5, 2]], 'holes': [[6, 6]]},
+    {'board': 'q1.5.answer', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'holes': [[5, 0]]},
+    {'board': 'q1.6.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'holes': [[6, 0]]},
+    {'board': 'two.jz_a', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'two.jz_b', 't_cells': [[2, 0], [2, 1], [2, 2], [3, 1]], 'holes': [[4, 4]]},
+    {'board': 'two.sz_a', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 4], [4, 5]]},
+    {'board': 'two.sz_b', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'two.js_a', 't_cells': [[2, 4], [2, 5], [2, 6], [3, 5]], 'holes': [[4, 1]]},
+    {'board': 'two.js_b', 't_cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'holes': [[4, 0], [4, 1]]},
+    {'board': 'two.oz', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 0]]},
+    {'board': 'hole2.a', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'holes': [[6, 0]]},
+    {'board': 'hole2.b', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'holes': [[6, 1]]},
+    {'board': 'hole3.a', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 1]]},
+    {'board': 'hole3.b', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 0]]},
+    {'board': 'hole4.a', 't_cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'holes': [[4, 1]]},
+    {'board': 'hole4.b', 't_cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'holes': [[4, 0]]},
+    {'board': 'hole5.a', 't_cells': [[1, 5], [1, 6], [1, 7], [2, 6]], 'holes': [[3, 1]]},
+    {'board': 'hole5.b', 't_cells': [[1, 5], [1, 6], [1, 7], [2, 6]], 'holes': [[3, 0]]},
+    {'board': 'fin.lj', 't_cells': [[3, 4], [4, 3], [4, 4], [5, 4]], 'holes': [[6, 0]]},
+    {'board': 'fin.to', 't_cells': [[3, 3], [4, 2], [4, 3], [5, 3]], 'holes': [[6, 0]]},
+    {'board': 'q2.1.answer', 't_cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'holes': [[6, 3]]},
+    {'board': 'q2.2.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 3]]},
+    {'board': 'q2.3.answer', 't_cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'holes': [[5, 4], [5, 5]]},
+    {'board': 'q2.4.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 9]]},
+    {'board': 'q2.5.answer', 't_cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'holes': [[5, 6]]},
+    {'board': 'q2.6.answer', 't_cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'holes': [[6, 0]]},
+    {'board': 'q2.7.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 3]]},
+    {'board': 'q2.8.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'holes': [[5, 9]]},
+    {'board': 'q2.9.answer', 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'holes': [[5, 9]]},
+    {'board': 'q2.10.answer', 't_cells': [[5, 0], [5, 1], [5, 2], [6, 1]], 'holes': [[7, 8]]},
+    {'board': 'q2.11.answer', 't_cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'holes': [[6, 9]]},
+    {'board': 'q2.12.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'holes': [[5, 8]]},
+    {'board': 'q2.13.answer', 't_cells': [[5, 3], [5, 4], [5, 5], [6, 4]], 'holes': [[7, 0]]},
+    {'board': 'q2.14.answer', 't_cells': [[3, 0], [3, 1], [3, 2], [4, 1]], 'holes': [[5, 5]]},
+    {'board': 'q2.15.answer', 't_cells': [[5, 4], [5, 5], [5, 6], [6, 5]], 'holes': [[7, 9]]},
+    {'board': 'q2.16.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'holes': [[5, 7], [5, 8], [5, 9]]},
+    {'board': 'q2.17.answer', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'holes': [[4, 3], [4, 5], [4, 6]]},
+]
 
 VARIANTS = [
-    _well(1, 'q2.17.answer', 'left', rows=[2, 3], cols=[6, 8], t_cells=[[2, 6], [2, 7], [2, 8], [3, 7]],
-          extra=[[1, 5], [2, 5], [3, 5], [4, 5]]),
-    _well(2, 'q2.1.answer', 'left', rows=[4, 5], cols=[5, 7], t_cells=[[4, 5], [4, 6], [4, 7], [5, 6]],
-          extra=[[3, 3], [4, 3], [5, 3], [6, 3]]),
-    _well(3, 'q1.6.answer', 'left', rows=[4, 5], cols=[3, 5], t_cells=[[4, 3], [4, 4], [4, 5], [5, 4]],
-          extra=[[3, 0], [4, 0], [5, 0], [6, 0]]),
-    _well(4, 'hole2.b', 'left', rows=[4, 5], cols=[5, 7], t_cells=[[4, 5], [4, 6], [4, 7], [5, 6]],
-          extra=[[3, 1], [4, 1], [5, 1], [6, 1]]),
-    _well(5, 'q2.11.answer', 'right', rows=[4, 5], cols=[2, 4], t_cells=[[4, 2], [4, 3], [4, 4], [5, 3]],
-          extra=[[3, 9], [4, 9], [5, 9], [6, 9]]),
-    _well(6, 'q1.5.answer', 'left', rows=[3, 4], cols=[6, 8], t_cells=[[3, 6], [3, 7], [3, 8], [4, 7]],
-          extra=[[2, 0], [3, 0], [4, 0], [5, 0]]),
     {
-        'id': 'nub', 'board': 'nub.hd', 'spin': 'TSD', 'lines': 2, 'window_basis': 'well',
-        'well': {'side': 'nub', 'offset': 0},
-        'window': {'rows': [3, 4], 'cols': [5, 7]}, 't_cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'roof_cells': [],
-        'window_extra': {'cells': [[2, 6], [5, 6], [6, 6], [5, 5], [5, 7], [6, 5], [6, 7]],
-                         'note': 'the hole under the T\'s own nub (harddrop\'s, not the page\'s): the T fills its two '
-                                 'cells in the rows the TSD clears, so the window reads the cell above the T\'s centre '
-                                 'empty and, under the nub, a Tetris hole: two cells empty, walled on both sides'},
-        'payoff': {'kind': 'well_quad', 'board': 'nub.hd', 'piece': 'I', 'lines': 4, 'well_cell_pre_clear': [5, 6],
-                   'well_cell_after': [5, 6],
-                   'note': 'harddrop\'s: the Donation page\'s next step, a Tetris into the re-opened hole. The well '
-                           'cell is under the cleared rows, so the clear does not move it'},
-        'drawings': DRAWINGS.get('nub', []),
+        'id': 'rule', 'board': 'intro.z', 'spin': 'TSD', 'lines': 2, 'window_basis': 'rule',
+        'window': {'rows': [2, 3], 'cols': [2, 4]}, 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'roof_cells': [],
+        'rule': 'a column donates when, at its topmost cell that is empty, in no row the T makes full and directly under '
+                'a cell of such a row, every filled cell of the column above it is in those rows (so the clear opens it '
+                'from the top) and the cell above it is not the T; in play each covering cell must also be the T or a '
+                'complete piece, never garbage (ownership is not drawn, so the gate reads the occupancy half)',
+        'payoff': {'kind': 'well_quad', 'board': 'intro.z', 'piece': 'I', 'lines': 4, 'well_cell_pre_clear': [4, 0],
+                   'well_cell_after': [4, 0],
+                   'note': 'harddrop\'s, not the page\'s: the page says only that the hole stays open to dig '
+                           '(「下穴が開いた状態を維持」); the Tetris into it is the Donation page\'s next step. The well '
+                           'cell is the hit\'s own column\'s hole (the nearest to the T), under the cleared rows, so the '
+                           'clear does not move it'},
+        'drawings': DRAWINGS,
     },
 ]
 
-#: the nub window is symmetric about the T, so it fires in both hands wherever it fires
-WELL_FIRES_OTHER: list = [
-    {'board': 'q2.17', 'variant': 'nub', 't_cells': [[4, 4], [4, 5], [4, 6], [5, 5]], 'mirrored': m,
-     'reason': 'a T resting over the question\'s own well, clearing no row (the window reads the T\'s box and the '
-               'hole, not whether two rows clear; the corpus scores TSDs only)'} for m in (False, True)
-]
-WELL_NOT_FIRED: list = [
-    {'board': 'intro.l3', 'reason': 'the page\'s own mistake: the L fills three rows, not two, so the cell under the two '
-                                    'the TSD clears is filled and the hole is covered (「2列ではなく3列を埋めてしまった」)'},
+RULE_NOT_FIRED: list = [
+    {'board': 'intro.l3', 'reason': 'the page\'s own mistake: the L fills three rows, not two, so a filled cell of the '
+                                    'column lies under the rows the TSD clears and the hole stays covered '
+                                    '(「2列ではなく3列を埋めてしまった」)'},
+    {'board': 'nub.hd', 'reason': 'harddrop\'s 「Donation T-Spin Double」: only the T\'s nub covers the hole, which yachi '
+                                  'reads as a plain T-spin (2026-10-26: 「呢個係普通tspin」), so the rule\'s clause 3 '
+                                  'refuses it'},
 ]
 
-#: measured both ways by the `other:` rule; `fires_on_donation` is the record the qualify rule `other_page`
-#: mirrors in play (a T another page's window fires on is that page's, not this one's)
+#: measured by the `other:` rule: every other technique window over every board of this page, the record the
+#: qualify rule `other_page` mirrors in play (a T another page's window fires on is that page's, not this one's)
 OTHER_WINDOWS = {
-    'donation_fires_on': [
-        {'file': 'btcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[29]', 'variant': 'k1', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[0]', 'variant': 'k1', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[4]', 'variant': 'k3', 'cells': [[4, 4], [4, 5], [4, 6], [5, 5]], 'mirrored': [False, True]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[4]', 'variant': 'k4', 'cells': [[4, 4], [4, 5], [4, 6], [5, 5]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'k4', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[6]', 'variant': 'k3', 'cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[7]', 'variant': 'k1', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
-        {'file': 'cutcopy-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[7]', 'variant': 'k4', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
-        {'file': 'doubledagger-technique.json', 'board': 'nodes.tetris.spin', 'variant': 'nub', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False, True]},
-        {'file': 'dtcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'k1', 'cells': [[5, 1], [5, 2], [5, 3], [6, 2]], 'mirrored': [False]},
-        {'file': 'dtcannon-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[46]', 'variant': 'nub', 'cells': [[9, 1], [9, 2], [9, 3], [10, 2]], 'mirrored': [False, True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.basic.z', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.basic.o', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.basic.spin', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.s3.s', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.s3.j', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.after.1', 'variant': 'k1', 'cells': [[1, 6], [1, 7], [1, 8], [2, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.amemiya', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.amemiya', 'variant': 'k5', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.anchor', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.amemiya.pre', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.amemiya.pre', 'variant': 'k5', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'nodes.dt.anchor.pre', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawings[0]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawings[1]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawings[2]', 'variant': 'k1', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawings[2]', 'variant': 'k3', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawings[3]', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[3]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[0]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[1]', 'variant': 'k1', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[2]', 'variant': 'k1', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[2]', 'variant': 'k3', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[3]', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[4]', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[5]', 'variant': 'k1', 'cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop.fires_without_slot[6]', 'variant': 'k1', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [True]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.harddrop_anchor_set.drawings[0]', 'variant': 'k1', 'cells': [[3, 1], [3, 2], [3, 3], [4, 2]], 'mirrored': [False]},
-        {'file': 'kaidan-technique.json', 'board': 'cross_source.stmb_cave_kaidan', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'parapet-technique.json', 'board': 'nodes.tss.after', 'variant': 'nub', 'cells': [[1, 1], [1, 2], [1, 3], [2, 2]], 'mirrored': [False, True]},
-        {'file': 'parapet-technique.json', 'board': 'cross_source.tetrisch.images[8]', 'variant': 'nub', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False, True]},
-        {'file': 'parapet-technique.json', 'board': 'cross_source.tetrisch.images[15]', 'variant': 'nub', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False, True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.basic.spin', 'variant': 'k1', 'cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.w4.spin', 'variant': 'k1', 'cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.spin', 'variant': 'k1', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.t3.spin', 'variant': 'k1', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.dt', 'variant': 'k1', 'cells': [[3, 2], [3, 3], [3, 4], [4, 3]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.basic.build', 'variant': 'k1', 'cells': [[2, 5], [2, 6], [2, 7], [3, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.w4.build', 'variant': 'k1', 'cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.build', 'variant': 'k1', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'nodes.t3.build', 'variant': 'k1', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[0]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[1]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[2]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[3]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[4]', 'variant': 'k1', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[5]', 'variant': 'k1', 'cells': [[4, 1], [4, 2], [4, 3], [5, 2]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[6]', 'variant': 'k1', 'cells': [[6, 3], [6, 4], [6, 5], [7, 4]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[7]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[8]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[9]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[10]', 'variant': 'k1', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[11]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[12]', 'variant': 'k1', 'cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[13]', 'variant': 'k1', 'cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[14]', 'variant': 'k1', 'cells': [[5, 4], [5, 5], [5, 6], [6, 5]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[15]', 'variant': 'k1', 'cells': [[6, 4], [6, 5], [6, 6], [7, 5]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[16]', 'variant': 'k1', 'cells': [[6, 4], [6, 5], [6, 6], [7, 5]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[17]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[17]', 'variant': 'k4', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[17]', 'variant': 'k5', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[18]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[18]', 'variant': 'k4', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[18]', 'variant': 'k5', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[19]', 'variant': 'k1', 'cells': [[5, 5], [5, 6], [5, 7], [6, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[20]', 'variant': 'k1', 'cells': [[4, 5], [4, 6], [4, 7], [5, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawings[21]', 'variant': 'k1', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[1]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[4]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[5]', 'variant': 'nub', 'cells': [[4, 2], [4, 3], [4, 4], [5, 3]], 'mirrored': [False, True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[8]', 'variant': 'k3', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k1', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k2', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[9]', 'variant': 'k3', 'cells': [[2, 3], [2, 4], [2, 5], [3, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[10]', 'variant': 'nub', 'cells': [[3, 5], [3, 6], [3, 7], [4, 6]], 'mirrored': [False, True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.stmb_cave.boards[0]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'shachikutrain-technique.json', 'board': 'cross_source.stmb_cave.boards[1]', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'stmbcave-technique.json', 'board': 'nodes.basic.build', 'variant': 'k1', 'cells': [[3, 3], [3, 4], [3, 5], [4, 4]], 'mirrored': [True]},
-        {'file': 'stmbcave-technique.json', 'board': 'nodes.similar.build', 'variant': 'k1', 'cells': [[2, 4], [2, 5], [2, 6], [3, 5]], 'mirrored': [False]},
-    ],
     'fires_on_donation': [
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'one.s', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
@@ -559,25 +420,36 @@ OTHER_WINDOWS = {
 CROSS_SOURCE = {
     'other_windows': OTHER_WINDOWS,
     'fires': [
-        {'file': 'sdpcspin-routes.json', 'node': '3.first.cave', 'variant': 'k1', 'mirrored': False,
+        {'file': 'sdpcspin-routes.json', 'node': '3.first.cave', 'variant': 'rule', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
-         'note': 'harddrop\'s SDPC Spin (another author): its STMB Cave\'s Z fills the two cleared rows of the column '
-                 'one past the T\'s arm, the cave open under it — a k1 donation (STMB Cave\'s own window fires too)'},
-        {'file': 'sdpcspin-routes.json', 'node': '3.first.trinity.tss', 'variant': 'k2', 'mirrored': True,
+         'note': "harddrop's SDPC Spin (another author): its STMB Cave's Z fills the two cleared rows of the column one past the T's arm, the cave open under it (STMB Cave's own window fires too, so in play the T is that page's)"},
+        {'file': 'sdpcspin-routes.json', 'node': '3.second.cspin.first#2', 'variant': 'rule', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
-         'note': 'harddrop\'s SDPC Spin: the Trinity\'s T laid flat over the left wall, a TSS on this board (the '
-                 'arm row is not full); the window reads the T\'s box and the hole and not whether two rows clear, '
-                 'and the corpus scores TSDs only. The Z and the S fill the arm row and the nub row of the columns two '
-                 'and three past the arm, over the Trinity\'s TSD hole'},
-        {'file': 'sdpcspin-routes.json', 'node': '3.first.trinity.tss', 'variant': 'k3', 'mirrored': True,
+         'note': "harddrop's SDPC Spin: a bag-5 TSD of the second C-Spin build, over the C-Spin's residue slot (the ダブルダガー shape)"},
+        {'file': 'sdpcspin-routes.json', 'node': '3.second.cspin.o_first#2', 'variant': 'rule', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
-         'note': 'the same board, the next column out'},
+         'note': 'the same build, its O-first order'},
+        {'file': 'sdpcspin-routes.json', 'node': '3.second.cspin.l_first#2', 'variant': 'rule', 'mirrored': False,
+         'page': 'https://harddrop.com/wiki/SDPC_Spin',
+         'note': 'the same build, its L-first order'},
+        {'file': 'sdpcspin-routes.json', 'node': '3.second.cspin.l_first#4', 'variant': 'rule', 'mirrored': False,
+         'page': 'https://harddrop.com/wiki/SDPC_Spin',
+         'note': 'the same build, its L-first order, the next board'},
+        {'file': 'sdpcspin-routes.json', 'node': '3.third.imperial', 'variant': 'rule', 'mirrored': False,
+         'page': 'https://harddrop.com/wiki/SDPC_Spin',
+         'note': "harddrop's SDPC Spin: the Imperial Cross TSD; the cross's far arm is covered only inside the cleared rows"},
     ],
     'also': [
-        {'file': 'stickspin-routes.json', 'node': '2.sd', 'variant': 'k1', 'mirrored': True,
-         'note': 'the same author\'s stick spin: the SDパフェ bag-2 STMB Cave, the cave one past the T\'s arm'},
-        {'file': 'stickspin-routes.json', 'node': '2.sd.stmb.spin', 'variant': 'k1', 'mirrored': True,
-         'note': 'the same board with its T drawn'},
+        {'file': 'mountainous2-routes.json', 'node': '2.compromise.fire5.bag4#1', 'variant': 'rule', 'mirrored': False,
+         'note': "the same author's 山岳積み2号: a bag-4 TSD of the 5巡パフェ, a hole covered only inside the cleared rows"},
+        {'file': 'mountainous2-routes.json', 'node': '2.compromise.fire5.bag4#2', 'variant': 'rule', 'mirrored': False,
+         'note': 'the same board, its second form'},
+        {'file': 'stickspin-routes.json', 'node': '2.sd', 'variant': 'rule', 'mirrored': False,
+         'note': "the same author's stick spin: the SDパフェ bag-2 STMB Cave, the cave one past the T's arm"},
+        {'file': 'stickspin-routes.json', 'node': '2.sd.imperial.spin', 'variant': 'rule', 'mirrored': False,
+         'note': "stick spin's Imperial Cross TSD"},
+        {'file': 'stickspin-routes.json', 'node': '2.sd.stmb.spin', 'variant': 'rule', 'mirrored': False,
+         'note': 'the SDパフェ STMB Cave with its T drawn'},
     ],
 }
 
@@ -611,8 +483,7 @@ def build() -> dict:
         'page_order': PAGE_ORDER,
         'basic_form': [],
         'variants': VARIANTS,
-        'well_fires_other': WELL_FIRES_OTHER,
-        'well_not_fired': WELL_NOT_FIRED,
+        'rule_not_fired': RULE_NOT_FIRED,
         'cross_source': CROSS_SOURCE,
         'known_discrepancies': KNOWN_DISCREPANCIES,
     }
@@ -643,24 +514,6 @@ def _pre(n: dict) -> list[str]:
 
 def _cells(cs) -> list:
     return sorted([r, c] for r, c in cs)
-
-
-def donation_fires_on(data: dict) -> list[dict]:
-    """These six windows over every node of every other committed technique transcription, at every resting T."""
-    from pipeline.openers.extract_kaidan_shapes import other_boards
-    got = []
-    for f in sorted(TECHNIQUE_DIR.glob('*-technique.json')):
-        if f.name == OUT.name:
-            continue
-        other, ospec = _other(f)
-        for path, rows in other_boards(other, ospec):
-            for cs in TT.t_placements(rows, ospec):
-                for v in data['variants']:
-                    hands = [m for m in (False, True) if TT.window_fires(data, v, ospec, rows, cs, m)]
-                    if hands:
-                        got.append({'file': f.name, 'board': path, 'variant': v['id'], 'cells': _cells(cs),
-                                    'mirrored': hands})
-    return got
 
 
 def fires_on_donation(data: dict) -> list[dict]:
@@ -719,26 +572,24 @@ def extra_checks(data: dict):
     ow = xs.get('other_windows', {})
     key = lambda e: json.dumps(e, sort_keys=True)
     # other: complete both ways — the record is what the qualify rule `other_page` reads in play
-    for name, fn in (('donation_fires_on', donation_fires_on), ('fires_on_donation', fires_on_donation)):
+    for name, fn in (('fires_on_donation', fires_on_donation),):
         got = fn(data)
         if sorted(map(key, got)) != sorted(map(key, ow.get(name, []))):
             bad.append(f'other: {name} is measured as {len(got)} entries, the record holds '
                        f'{len(ow.get(name, []))} that differ')
     # named: a form the page names as another page's technique is one that page's window fires on, at a T the
-    # board allows; and k = 0 is no variant here, so 欄干 is not this page's (the well windows miss it)
+    # board allows, AND a donation by the rule (the qualify rule `other_page` then gives it to that page)
     byid = {n['id']: n for n in data['nodes']}
     fon = ow.get('fires_on_donation', [])
+    drawn = {d['board'] for v in data['variants'] for d in v.get('drawings', [])}
     for nid, f, vid in NAMED_FORMS:
         if nid not in byid:
             bad.append(f'named: {nid} is no node')
             continue
         if not any(e['board'] == nid and e['file'] == f and e['variant'] == vid for e in fon):
             bad.append(f'named: {nid} is named as {f}\'s technique, and its window fires nowhere on it')
-    if any(d['board'] == 'one.l_a' for v in data['variants'] for d in v.get('drawings', [])):
-        bad.append('named: a well window fires on 欄干 (one.l_a), whose hole is under the T\'s arm (k = 0)')
-    if sorted(v['well']['offset'] for v in data['variants'] if v['well']['side'] != 'nub') != list(range(1, 7)) \
-            or [v['id'] for v in data['variants'] if v['well']['side'] == 'nub'] != ['nub']:
-        bad.append('named: the variants are not one per hole offset 1..6 and one under the nub')
+        if nid not in drawn:
+            bad.append(f'named: {nid} is named as a donation (another page\'s), and the rule does not fire on it')
     bad += _check_external(data, byid)
     # question: an answer drawn without `on` is one the page draws with a grey cell its question does not have
     # (or without one it has); that is a `<id>:question` discrepancy, and an answer that IS its question plus its
@@ -794,31 +645,27 @@ MUTANTS = [
     (lambda d: d['source'].pop('snapshot_sha256'), 'source hash dropped', 'provenance:'),
     (lambda d: _set(node(d, 'q1.1')['rows'], 0, 0, 'x'), 'a cell outside the alphabet', 'grammar:'),
     (lambda d: _set(node(d, 'q1.6.answer')['rows'], 7, 5, '-'), 'an answer not its question plus its pieces', 'build:'),
-    (lambda d: var(d, 'k2')['drawings'].pop(), 'a drawing the k2 window fires on unrecorded', 'well:'),
-    (lambda d: var(d, 'k1')['drawings'].append({'board': 'one.o', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]],
-                                                'mirrored': False}), 'a drawing recorded that k1 misses', 'well:'),
-    (lambda d: d['well_not_fired'].clear(), 'the 3-row L mistake unrecorded', 'well:'),
-    (lambda d: d['well_not_fired'].append({'board': 'q2.1.answer', 'reason': 'x'}),
-     'an answer a window fires on named as missed', 'well:'),
-    (lambda d: var(d, 'k3')['window_extra']['cells'][0].__setitem__(1, 1), 'the hole one column out', 'window:'),
-    (lambda d: var(d, 'k3')['window_extra']['cells'].pop(), 'the empty cell under the donation dropped', 'window:'),
-    (lambda d: var(d, 'k4')['well'].__setitem__('offset', 3), 'the k4 window at k3', 'window:'),
-    (lambda d: var(d, 'k5')['payoff'].__setitem__('lines', 3), 'the payoff not a Tetris', 'window:'),
+    (lambda d: var(d, 'rule')['drawings'].pop(), 'a drawing the rule fires on unrecorded', 'rule:'),
+    (lambda d: var(d, 'rule')['drawings'].append({'board': 'q1.1', 't_cells': [[0, 0], [0, 1], [0, 2], [1, 1]],
+                                                  'holes': [[2, 0]]}), 'a drawing recorded that the rule misses', 'rule:'),
+    (lambda d: var(d, 'rule')['drawings'][0]['holes'].append([9, 9]), 'a drawing\'s holes not the measured ones',
+     'rule:'),
+    (lambda d: d['rule_not_fired'].pop(0), 'the 3-row L mistake unrecorded', 'rule:'),
+    (lambda d: d['rule_not_fired'].append({'board': 'q2.1.answer', 'reason': 'x'}),
+     'an answer the rule fires on named as missed', 'rule:'),
+    (lambda d: var(d, 'rule')['window'].__setitem__('cols', [1, 4]), 'the window not the T\'s box', 'window:'),
+    (lambda d: var(d, 'rule')['payoff'].__setitem__('lines', 3), 'the payoff not a Tetris', 'window:'),
+    (lambda d: var(d, 'rule')['payoff']['well_cell_pre_clear'].__setitem__(0, 5), 'the payoff cell not the hole',
+     'window:'),
     (lambda d: d['known_discrepancies'].pop(), 'a discrepancy unnamed', 'discrepancy:'),
     (lambda d: d['known_discrepancies'].append({'id': 'q1.1.answer:muting', 'note': 'x'}), 'a stale discrepancy',
      'discrepancy:'),
     (lambda d: node(d, 'q1.1.answer').pop('on'), 'an answer that is its question plus pieces with no `on`', 'question:'),
     (lambda d: d['cross_source']['fires'].pop(), 'a routes board the window fires on unrecorded', 'cross:'),
-    (lambda d: d['cross_source']['other_windows']['donation_fires_on'].pop(), 'another page\'s board unrecorded',
-     'other:'),
     (lambda d: d['cross_source']['other_windows']['fires_on_donation'].pop(), 'another window on this page unrecorded',
      'other:'),
     (lambda d: _drop_named(d, 'one.s'), 'the named 階段のドネイト form no longer the Kaidan window\'s', 'named:'),
-    (lambda d: d['variants'].pop(), 'a hole offset with no variant', 'named:'),
-    (lambda d: var(d, 'nub')['window_extra']['cells'].pop(), 'the nub hole one row shallower', 'window:'),
-    (lambda d: var(d, 'nub')['well'].__setitem__('offset', 1), 'the nub window off the nub', 'window:'),
-    (lambda d: var(d, 'nub')['payoff']['well_cell_pre_clear'].__setitem__(0, 6), 'the nub payoff cell not the plugged one',
-     'window:'),
+    (lambda d: d['variants'].append(copy.deepcopy(d['variants'][0])), 'two rule variants', 'rule:'),
     (lambda d: _set(node(d, 'nub.hd')['rows'], 7, 0, '-'), 'the external board not harddrop\'s', 'external:'),
     (lambda d: node(d, 'nub.hd')['source_board'].__setitem__('board', 0), 'the external board pointing elsewhere',
      'external:'),

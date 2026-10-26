@@ -2018,7 +2018,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2026,7 +2026,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2034,7 +2034,7 @@
           "board": 2,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2042,7 +2042,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2050,7 +2050,7 @@
           "board": 1,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2058,7 +2058,7 @@
           "board": 2,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2074,7 +2074,7 @@
           "board": 4,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2090,7 +2090,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2098,7 +2098,7 @@
           "board": 2,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2106,7 +2106,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2122,7 +2122,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2130,7 +2130,7 @@
           "board": 1,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2138,7 +2138,7 @@
           "board": 1,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2146,7 +2146,7 @@
           "board": 2,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2170,7 +2170,7 @@
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2178,7 +2178,7 @@
           "board": 1,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
         },
         {
@@ -2186,7 +2186,15 @@
           "board": 2,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
+          ]
+        },
+        {
+          "table": 1,
+          "board": 1,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
           ]
         },
         {
@@ -2198,29 +2206,20 @@
           ]
         },
         {
+          "table": 8,
+          "board": 0,
+          "file": "basicdonating-technique.json",
+          "mirrored": [
+            false
+          ]
+        },
+        {
           "table": 11,
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
+            false
           ]
-        },
-        {
-          "table": 16,
-          "board": 0,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            true
-          ]
-        },
-        {
-          "table": 16,
-          "board": 0,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            true
-          ],
-          "variant": "k2"
         },
         {
           "table": 15,
@@ -2228,73 +2227,15 @@
           "file": "basicdonating-technique.json",
           "mirrored": [
             false
-          ],
-          "variant": "k3"
+          ]
         },
         {
           "table": 16,
           "board": 0,
           "file": "basicdonating-technique.json",
           "mirrored": [
-            true
-          ],
-          "variant": "k3"
-        },
-        {
-          "table": 15,
-          "board": 0,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
             false
-          ],
-          "variant": "k4"
-        },
-        {
-          "table": 15,
-          "board": 1,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            false
-          ],
-          "variant": "k4"
-        },
-        {
-          "table": 15,
-          "board": 0,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            true
-          ],
-          "variant": "k5"
-        },
-        {
-          "table": 15,
-          "board": 1,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            true
-          ],
-          "variant": "k5"
-        },
-        {
-          "table": 12,
-          "board": 1,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            false,
-            true
-          ],
-          "variant": "nub"
-        },
-        {
-          "table": 16,
-          "board": 1,
-          "file": "basicdonating-technique.json",
-          "mirrored": [
-            false,
-            true
-          ],
-          "variant": "nub"
+          ]
         }
       ]
     },

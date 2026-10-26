@@ -396,7 +396,7 @@ python3 -m pipeline.dtcannon_page --selftest      # the docs/dtcannon*.html audi
 python3 -m pipeline.openers.extract_basicdonating_shapes            # CI gate: the 基本的なドネイト (basic donating) technique transcription
 python3 -m pipeline.openers.extract_basicdonating_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (basicdonating.html)
 bun pipeline/sim/emit-technique-facts.ts --technique basicdonating \
-  --out analysis/basicdonating-facts.json                      # 基本的なドネイト's corpus artefact (quarantined; six hole windows, a payoff)
+  --out analysis/basicdonating-facts.json                      # 基本的なドネイト's corpus artefact (quarantined; the donation rule, a payoff)
 bun pipeline/sim/emit-technique-demos.ts --technique basicdonating \
   --out analysis/basicdonating-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/basicdonating.test.ts pipeline/openers/basicdonating-demos.test.ts  # its two tests
@@ -5110,51 +5110,31 @@ shared `technique_transcription.py`), `technique-profile-basicdonating.ts` → `
 `basicdonating_prose.json`, the eleventh card under 中盤手法. Raw-HTML snapshot, fetched like 途中DT砲's; some boards are indented
 with a tab, which the opt-in `snapshot_indented` reads. Every figure is read off the artefacts and tests, never typed here.
 
-**It teaches a PRINCIPLE over many terrains, so its window is the principle, not a box.** 「TSDで消える2列だけを埋める」: a piece
-laid over a hole fills exactly the two rows a flat, nub-down T's TSD clears, so the hole opens again; the page draws holes 1 to 6
-columns from the T's near arm, and no two of its terrains agree between the T and the hole, so neither the bounding box nor the
-agreement box can hold them. So there are six variants, `k1`..`k6`, under a new opt-in `window_basis: well`: the T's own 2 × 3 box
-plus four cells in the hole's column (above the donation empty, the two donated cells filled, the hole under them empty), checked by
-the gate's `well_window` and held to every drawing on the page BOTH ways by `well_accounting` (every firing is a recorded drawing or
-a `well_fires_other` entry; every spin board no window fires on is a `well_not_fired` entry — the page's own L-fills-three-rows
-mistake is the one). The payoff is 欄干's `well_quad`, and it is harddrop's (the Donation page), not the page's, which says only
-that the hole stays open. Two further opt-ins in the shared gate, both default-preserving (every earlier gate's plain, `--selftest`
-and `--html-dir` output compared byte for byte): `snapshot_indented` (also in `route_transcription.page_boards`) and
-`muting_slips`, which lets a spin board whose muted cells do not equal its cleared rows be a named `:muting` discrepancy.
+**Since 2026-10-26 it is matched by a RULE, not by windows (yachi: 「取代基本的なドネイト嘅認法」).** 「TSDで消える2列だけを埋める」,
+as yachi states it: a piece overhangs empty cells inside the rows the T-spin clears, and the clear opens them from the top
+again — any column, any depth, any distance from the T. `pipeline/sim/basicdonating-rule.ts` (`donationColumns`,
+`donationDetector`) is the profile's `detect`, and a variant with `window_basis: rule` has no window: a column DONATES when, at
+its topmost empty cell outside the cleared rows and directly under a cleared-row cell, (1) every filled cell of the column above
+it is in the cleared rows (so the clear re-opens it), (2) each is the T or a cell of a complete piece, never garbage or a
+fragment, and (3) the cell above it is not the T's nub (yachi: 「呢個係普通tspin」). A covering piece may keep cells above the
+cleared rows (yachi: 「算」); `cover` records `cleared` / `kept`. The hit's own column (its payoff well and its box) is the one
+nearest the T, then the leftmost; the box runs from the row over the cleared rows to the row under that hole. Ablations are
+the three clauses dropped (`allow_t_nub`, `allow_fragment`, `no_reopen`). The six hole windows `k1`..`k6` and the `nub`
+window that came before were retired: they matched the page's own distances only, and yachi's review of their hits found holes
+the build never covered and overhangs that were never holes. The rule's Python twin (`rule_columns`, `rule_own`,
+`rule_window`, `rule_accounting` in `technique_transcription.py`) holds every spin board of the page to it both ways (a miss is
+a `rule_not_fired` entry with a reason), and `basicdonating.test.ts` holds the TS rule to the Python one on every drawing. The
+payoff is 欄干's `well_quad`, harddrop's next step, not the page's. Two older opt-ins in the shared gate stay:
+`snapshot_indented` and `muting_slips`.
 
-**Every named donation is one of these windows plus more, so the qualify rules give a T to the page that names it.**
-`pipeline/sim/basicdonating-qualify.ts`: the shared rules on the two donated cells (`fragment`, `garbage_in_shape`, `dpc`), then
-`other_page` (any variant of any other technique window fires at the same T, either hand), `nearer_well` (a smaller-k window fires
-at the same T: the T counts once, at its nearest hole) and `well_covered` (a filled cell above the window in the hole's column, so
-the clear does not re-open it). Measured in `basicdonating.test.ts`: `other_page` agrees with membership in another technique
-artefact's hits on every hit; 階段のドネイト's and 社畜トレイン's hits are contained whole in this page's, STMB Cave's are not (the
-test pins the counts in `COMMON`), and no two qualifying hits share a lock. The other gates' `other_windows` records were extended
-to this window (kaidan, parapet, shachikutrain), so their transcriptions and both artefacts' `transcription_md5` moved and nothing
-else; 社畜トレイン's `emitter_md5` / `classifier_md5` moved too, because it hashes kaidan's transcription.
+**Qualify is one rule, `other_page`** (`pipeline/sim/basicdonating-qualify.ts`; yachi: 「有啲已經係其他pattern」): a T at which
+any other technique page's window fires (any variant, either hand) is that page's. The build rules (complete pieces, no
+garbage) are inside the donation rule itself, and the whole-shape rule does not apply to a rule variant. `COMMON` in the test
+pins how many of each other page's hits are donations here (counts are the test's). Every rule hit
+carries `donation: {columns, box, t_cells}`; `t_cells` is what the page's thumbnails draw the T from. The other gates'
+`other_windows` records (kaidan, shachikutrain) name the rule's firings as variant `rule`, one-handed.
 
-**A seventh variant, `nub` (2026-10-24, yachi's 「好」 to a corpus-mining finding): the hole under the T's OWN nub.** The page
-draws holes 1 to 6 columns from the arm; harddrop draws the T's nub plugging a Tetris hole straight under it (its
-Shachiku_Train page, table 16 board 1, 「Donation T-Spin Double」), which is the Donation page's definition with k = 0. The
-board is an `external: harddrop` node (`nub.hd`), read BY POINTER from 社畜トレイン's pinned record
-(`cross_source.harddrop.drawn_t_not_fired`; `_check_external` holds it equal in occupancy), never re-pinned. Its window
-(`well.side: nub`, offset 0) is the T's box plus the cell above its centre empty, two empty cells under the nub and the four
-wall cells beside them filled: a one-cell hole fires on STMB Cave boards and C-Spin / DT TST setups, a two-deep walled one
-on none of them. It is SYMMETRIC about the T, so `technique-facts.ts`'s `prepare` drops a mirror whose cells equal the drawn
-window's (a hit is recorded as drawn; the gate still records both hands), which is the one change to a hashed rule file and
-moved every technique artefact's `emitter_md5` / `classifier_md5` (and `dpc-facts.json`'s) and nothing else. Qualify: it has
-no donated cells (`keyCells: []`, which `technique-qualify.ts` now accepts only when given EXPLICITLY), so
-`garbage_in_shape` reads its whole window instead — most of its window hits sit on a garbage well and fail — and its offset
-0 makes every k hit the nub window also fires at a `nearer_well`. **A nub hit also needs at least 4 empty cells
-under the nub** (`shallow_well`, since 2026-10-24, after yachi asked why the page listed so many examples): the window
-asks for 2, which any TSD over a dent meets, and most nub window hits were 2 or 3 deep; harddrop's Donation page, the
-variant's source, draws a cavity of 4 or more. A shallow nub window claims no k hit (`nearer_well` skips it), so the
-farther hole counts. The k variants keep the page's own depth: its boards are cropped under the hole. The 途中DT砲 TSD's nub sits over the TST slot, so the
-two pages share hits, which `other_page` gives to 途中DT砲 (`COMMON` in the test). Counts are the test's. A `t_covers_hole`
-rule that failed every nub hit (a hole under the T is no donation) lived for one day and was reverted on 2026-10-25, when
-yachi chose harddrop's definition with complete pieces: the T is a complete piece by definition, so the nub plug counts.
-
-**The report region and the replay labels see seven variants**, labelled 「窿離 T k 欄」 (and 「窿喺 T 尖下面」 for the nub) in
-`routes_techniques_section._variant_name` (a branch on `well`; every other technique's label is unchanged). **No demo is built**: odd cell counts (a proof), even counts not
+**The report region and the replay labels see one variant.** **No demo is built**: odd cell counts (a proof), even counts not
 multiples of four (a planner limit), and most boards drawing the donated pieces and the T in one diagram with no board of the
 pieces placed before the T; `basicdonating-demos.test.ts` re-derives each reason by kind. Named lists and sizes live in the tests.
 
@@ -5196,9 +5176,7 @@ qualifier the same way and turns the rule off (`{ off: true }`) like the others.
 much, is the tests' (the tallies and named lists), never this file's; on STSD, インペリアルクロス, 千鳥格子, 欄干's TSD,
 階段のドネイト and 途中DT砲 it removes no qualifying hit, because their windows already hold the drawing. Mining every
 verified full T-spin by the same regions (2026-10-25, scratch only) found no repeated mid-game shape that no page
-draws: plain TSD slots, the donations, a ダブルダガー-like pair of slots, 欄干 and covered-well TSDs. Two measured
-couplings in `basicdonating.test.ts`: every hit `nearer_well` fails also fails `not_whole_shape`, and the
-`shallow_well` coupling no longer reaches a qualifying hit (pinned at 0). The 建議 tagged items that cited STMB Cave and
+draws: plain TSD slots, the donations, a ダブルダガー-like pair of slots, 欄干 and covered-well TSDs. The 建議 tagged items that cited STMB Cave and
 ダブルダガー counts were rewritten against the new cells on the same pass, and the ones whose count went to zero deleted.
 
 ## DPC 頁 — what the first T-spin after a Perfect Clear was built on

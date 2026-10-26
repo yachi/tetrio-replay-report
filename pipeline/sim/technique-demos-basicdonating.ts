@@ -4,7 +4,7 @@
  * corpus artefact.
  *
  * No chain: the planner builds a page's terrain, then the page's own pieces off a BUILD board (the terrain plus the
- * lower-case pieces, before the T), then fires the window. This page draws no such board: each answer draws the
+ * lower-case pieces, before the T), then fires the T. This page draws no such board: each answer draws the
  * donated pieces and the T together, with the pieces in the cleared rows muted upper case, which the planner does not
  * read as page pieces. So every board is published unbuilt, and the reason is measured from the transcription here
  * (and re-derived by `basicdonating-demos.test.ts`): a terrain with an ODD cell count cannot be built from an empty
@@ -60,7 +60,7 @@ export const BASICDONATING_DEMOS: TechniqueDemoProfile = {
     planner: [`${SIM}/technique-demos.ts`, `${SIM}/technique-demo-profile.ts`, `${SIM}/technique-demos-basicdonating.ts`,
               `${SIM}/emit-technique-demos.ts`, `${SIM}/route-demos.ts`],
   },
-  variant: 'k1',
+  variant: 'rule',
   chains: [],
   unbuilt: unbuiltReasons(JSON.parse(readFileSync(TR, 'utf8'))),
   artefact: {
