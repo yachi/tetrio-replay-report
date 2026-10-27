@@ -1,0 +1,143 @@
+{
+  "_comment": "Words for pipeline/hdgamushiro_page.py (the shared pipeline/route_page.py renderer bound to harddrop's Gamushiro Stacking page). Corpus numbers never live here: every count on the pages is rendered from analysis/hdgamushiro-facts.json and analysis/hdgamushiro-demos.json. The only figures typed here are the SOURCE page's own (its stated solution counts), quoted as theirs. Every key is read by name. Traditional-character Cantonese; the loader runs the simplified-glyph check. The word for the hold box appears only in l_hold_heading, page_sentences.bag1 and demo.order_words: the page audit allows it nowhere else.",
+  "source_credit": {
+    "site": "harddrop.com，Hard Drop Tetris Wiki",
+    "terms_link": "關於 Hard Drop Tetris Wiki",
+    "terms_words": "harddrop 冇公開內容授權條款；呢度同每一頁讀過嘅 harddrop 頁一樣，用連結註明出處"
+  },
+  "page_sentences": {
+    "source": "路線同盤面轉錄自 harddrop 嘅 Gamushiro Stacking 頁（Mr. Goods 嘅開局，鎖定一個 revision，每星期重新抓一次核對）。淨係抄咗第一巡、第二巡五款形同第三巡 8 行 PC；原頁其他延續（10 行、14 行 PC 等等）冇抄。第一巡、Form A1 同 L → O 嘅六款 PC 同 shiwehi.com ガムシロ積み頁逐格一樣（核對過）；其餘嘅圖淨係得 harddrop 一個來源。百分比係原頁寫嘅，唔係我哋計嘅。",
+    "exact": "逐格完全一樣先算（可以左右反轉）；差一兩格嘅唔計。第二巡同之後嘅圖，如果盤底有成行嘅垃圾行，會先剷走嗰幾行先對，每個個案都記低剷咗幾多行。",
+    "bag3": "第三巡同之後嘅形係模擬器重砌出嚟嘅；Perfect Clear 嘅次數有 replay 自己個 counter 對過，但砌咗邊個形冇。",
+    "bag1": "第一巡先睇第七粒落咗之後個形（L 企喺 O 上面，原頁「7 粒全部」嗰幅）；唔係，先睇六粒時對唔對到原頁 L 未落嗰幅，再睇第七粒係咪 L：唔係 L 先當 hold 咗 L，係 L 就係「L 放咗第二度」。六粒時對到個形本身唔等於 hold 咗 L。",
+    "mirror": "左右反轉嘅局，L 當 J 睇，J↔L、S↔Z 對調先睇。",
+    "our_reading": "幾樣嘢係我哋自己嘅讀法，原頁冇明講：第二巡圖入面深色嗰粒 L 當係第一巡留起嗰粒 L；五幅第二巡圖冇名，名係由後面幾個標題（Form A1 and A2、B、C、D）按次序對返；標題入面嘅箭咀（例如 L → O）當係形嘅名，唔當係出牌次序，因為 Form A2 個圖同佢個箭咀唔夾（見下面原頁唔一致嘅地方）。"
+  },
+  "unverified": "呢一步喺已核對範圍之外",
+  "empty_node": "corpus 未出現過（0 / {m} 個去到呢一步嘅回合）",
+  "status_words": {
+    "illustration": "示意圖，冇量度",
+    "text_only": "原頁淨係寫咗個數，冇畫圖，冇量度",
+    "mirror_of": "係左邊嗰幅左右反轉，同一個形；反轉嘅局已經計入嗰一格",
+    "unmatchable": "有轉錄，但冇量度"
+  },
+  "unmatchable_reasons": {
+    "2.d": "畫咗十行高，分類器只比對八行"
+  },
+  "names": {
+    "bag1.l_top": "第一巡 L 企喺 O 上面",
+    "bag1.left": "第一巡 六粒形，第七粒唔係 L",
+    "bag1.right": "第一巡 六粒形（反轉）",
+    "bag1.l_top_right": "第一巡 L 企喺 O 上面（反轉）",
+    "bag1.l_placed_elsewhere": "第一巡 L 放咗第二度",
+    "2.a": "Form A（L → O）",
+    "2.a1": "Form A1（L → O）",
+    "2.a2": "Form A2（L → O）",
+    "2.b": "Form B（J → O）",
+    "2.c": "Form C（S → O）",
+    "2.d": "Form D（O → L）",
+    "2.a.redraw": "Form A1 TST 位（示意）",
+    "2.a.after": "Form A TST 之後（示意）",
+    "2.a.pc.rest": "Form A 其餘 16 款 PC（原頁冇畫）",
+    "2.b.redraw": "Form B TST 位（示意）",
+    "2.b.after": "Form B TST 之後（示意）",
+    "2.b.pc.rest": "Form B 其餘 13 款 PC（原頁冇畫）",
+    "2.c.redraw": "Form C TST 位（示意）",
+    "2.c.after": "Form C TST 之後（示意）",
+    "2.c.pc.rest": "Form C 其餘 9 款 PC（原頁冇畫）",
+    "2.b.pc": "Form B PC",
+    "2.c.pc": "Form C PC",
+    "2.a.pc": "Form A PC",
+    "pc": "{parent} → PC 第 {k} 款",
+    "other": "{parent} → Perfect Clear 唔喺頁面任何一款"
+  },
+  "l_hold_heading": "第一巡 L hold 咗（六粒形，第七粒唔係 L）",
+  "listed_under": {
+    "shown": "頁面直接畫出",
+    "rest": "其餘（頁面冇畫）"
+  },
+  "overview_title": "ガムシロ積み（harddrop 版）全路線",
+  "opener_name": "ガムシロ積み（harddrop 版）",
+  "overview_desc": "harddrop Gamushiro Stacking 頁第二巡五款形同第三巡 8 行 PC，同 corpus 入面對到嘅局：一個 corpus 幾乎冇人砌嘅參考開局，模擬器推導，唔屬於信任鏈。",
+  "node_page_desc": "{opener} {name}：每個個案嘅模擬重播，模擬器推導，唔屬於信任鏈。",
+  "bag1_only_name": "第一巡之後冇對到第二巡",
+  "index_card": {
+    "kicker": "GAMUSHIRO · HARDDROP",
+    "blurb": "harddrop 版ガムシロ積み：第二巡五款形（A1、A2、B、C、D）同 A、B、C 各自嘅 8 行 PC，對返 corpus 每一局，每幅圖都有由空盤砌出嚟嘅示範。shiwehi.com 版喺隔籬卡。"
+  },
+  "overview_lede": "harddrop Gamushiro Stacking 頁畫嘅第一巡、第二巡五款形同第三巡 8 行 PC，同 corpus 入面每一局對到邊一步。數字係「去到呢一步嘅局 / 去到上一步時可以比對嘅局」，冇百分比。同一個開局 shiwehi.com 都有一版（見下面連結），嗰版第二巡得兩款通常形同一個妥協形，第三巡 PC 只畫喺通常形下面；harddrop 呢版就將第二巡分做 A1、A2、B、C、D 五款，A、B、C 各自畫六款 8 行 PC。呢個係參考開局：corpus 兩個玩家第一巡對到佢嘅局極少，呢頁唔係講佢哋嘅打法。",
+  "node_page_lede": "呢版係第二巡去咗「{name}」嘅每一個個案，每個都可以撳嚟睇模擬重播；重播由個案嗰一步開始。",
+  "bag1_only_lede": "呢版係第一巡對到、但第二巡冇對到頁面任何一款（或者盤面已經唔可以比對）嘅個案，按第一巡嘅形分組；有啲個案旁邊寫住點樣差咗少少，嗰個係量度，唔係對到。",
+  "bag1_counts": "呢頁第一巡合共 {total} 局：L 企喺 O 上面（第七粒）{cases[bag1.l_top]} 局、六粒形而第七粒唔係 L {cases[bag1.left]} 局、六粒形而第七粒係 L 但放咗第二度 {cases[bag1.l_placed_elsewhere]} 局。第一巡兩幅圖同 shiwehi.com 版逐格一樣，所以 hdgamushiro.test.ts 核對兩版對到嘅局、第一巡同 Form A1 嘅可比對局數完全相同；冇「六個具名定式」一欄可以對，開局次序嘅交叉核對同 shiwehi.com 版一樣（窗口入面要有 T-spin Triple 而冇先 Double 後 Triple）。",
+  "bag2_note": "原頁話第二巡一定係呢幾款之一，頭兩款（A1、A2）最理想，頭四款（A1、A2、B、C）收到 PC。A1 同 A2 佔嘅格一樣，淨係顏色唔同，所以共用一組 PC。五款都打 TST。Form D 畫咗十行高，分類器比對唔到。",
+  "near_note": "第一巡對到但第二巡冇對到嘅 {none} 局入面，量度咗佢哋 TST 之前嗰個盤面同第二巡各款差幾遠：{subset} 局係 TST 早過第二巡砌完、{superset} 局係多咗一粒、{moved} 局係有一粒放咗第二度、{unexplained} 局比對過第二巡但三樣都唔係；其餘嘅局冇做呢個量度。呢啲淨係量度，唔當對到，條路線冇放寬。第二巡對到嘅 {matched} 局入面，有 {stripped} 局係剷咗盤底嘅垃圾行先對到。",
+  "near_words": {
+    "subset": "TST 早過第二巡砌完（{groups}）",
+    "superset": "第二巡多咗一粒 {extra}（{groups}）",
+    "moved": "第二巡有一粒 {extra} 放咗第二度（{groups}）"
+  },
+  "bag3_note": "A、B、C 打完 TST 之後，第三巡連 TST 合共八行收 PC。原頁講每款最少有幾多款解法（L → O 22 款、J → O 19 款、S → O 15 款），每款淨係畫咗六款；有幾款 PC 前面要打 TSD。",
+  "conditions_caption": "頁面條件 vs 實際砌咗：原頁第二巡五款形冇寫出牌條件（標題嘅箭咀我哋當係名，唔當條件），所以呢個表冇欄。",
+  "illustrative": "（原頁呢句係例子，唔係揀形嘅條件）",
+  "conditions_none": "冇一個條件啱",
+  "handedness_heading": "第二巡同第一巡左右唔一致嘅局",
+  "off_page_heading": "Perfect Clear 唔喺頁面任何一款",
+  "off_page_note": "以下每一局都係 Perfect Clear，但砌出嚟嘅形唔係原頁畫嘅任何一款；冇圖係因為呢個形係模擬器砌嘅，撳入去睇重播。",
+  "index_heading": "個案索引",
+  "index_note": "每一個個案一行，撳入去睇模擬重播；同一局兩個玩家都對到嘅話會有兩行。",
+  "idle": "撳下面任何一個個案，重播就會喺度出現，由個案嗰一步開始。",
+  "missing": "呢個連結指住嘅個案唔喺呢版。",
+  "discrepancy_heading": "原頁自己唔一致嘅地方",
+  "discrepancies": {
+    "2.a.pc:stated_vs_drawn": "原頁話 L → O 有 22 款最少解法，淨係畫咗 6 款。",
+    "2.a.pc:non_exhaustive": "畫出嚟嗰 6 款 L → O 唔係所有收 PC 嘅方法。",
+    "2.b.pc:stated_vs_drawn": "原頁話 J → O 有 19 款最少解法，淨係畫咗 6 款。",
+    "2.b.pc:non_exhaustive": "畫出嚟嗰 6 款 J → O 唔係所有收 PC 嘅方法。",
+    "2.c.pc:stated_vs_drawn": "原頁話 S → O 有 15 款最少解法，淨係畫咗 6 款。",
+    "2.c.pc:non_exhaustive": "畫出嚟嗰 6 款 S → O 唔係所有收 PC 嘅方法。",
+    "2.a2:arrow_vs_board": "Form A2 同 A1 一齊寫住「L → O」，但 A2 個圖入面 O 喺兩粒 L 下面（第一巡留起嗰粒同第二巡嗰粒都疊喺佢上面），即係 O 先落。所以箭咀唔係落方塊嘅次序，我哋冇將任何一款嘅箭咀當出牌條件。",
+    "forms:no_names_on_boards": "第二巡五幅圖本身冇名，淨係後面幾個標題（Form A1 and A2 … Form D）按次序叫佢哋。"
+  },
+  "demo": {
+    "title": "ガムシロ積み（harddrop 版）示範重播",
+    "desc": "harddrop Gamushiro Stacking 頁每一幅圖嘅示範重播：由空盤用我哋揀嘅次序砌，唔係對局，唔係 corpus 數據。",
+    "lede": "原頁每一幅有盤面嘅圖，我哋都由空盤砌一次俾你睇：一粒一粒由出生位行到落點，打埋 T-spin 同消行，最後停喺原頁畫嘅樣。",
+    "sentences": {
+      "demo": "呢啲重播係我哋自己砌嘅示範：由空盤開始，用我哋揀嘅出牌次序逐粒擺，唔係任何一場真實對局，亦唔係 corpus 數據。",
+      "engine": "每一粒都係由出生位用真實按鍵行到落點，交俾 repo 自己嘅引擎（SRS+，有 180 轉）執行；T-spin 種類同消行數係引擎判定，唔係我哋寫。",
+      "order": "原頁冇講嘅出牌次序，係我哋揀嘅一種讀法，唔代表唯一做法。",
+      "mirror": "示範全部照原頁左邊嗰款砌，冇左右反轉；反轉嘅話 J↔L、S↔Z 對調就係。",
+      "rule": "第二巡五款形，係 T 打入 TST 位之前嗰一刻同圖一樣，最後一粒係引擎判嘅 T-spin Triple；PC 圖就係最後一粒將成個盤清晒，連 TST 合共八行（有幾款中間打埋 TSD）。Form D 十行高分類器比對唔到，但示範照砌。"
+    },
+    "play": "播示範",
+    "unbuilt": "冇示範：{reason}",
+    "link": "睇示範",
+    "link_unbuilt": "冇示範（原因喺示範頁）",
+    "chain": "砌法：{chain}",
+    "bag": "{name}：出牌次序 {queue}",
+    "met": "（啱原頁條件：{cond}）",
+    "also": "即係原頁「基本形」第 {k} 幅。",
+    "reading": "原頁顏色唔一致：{reason}",
+    "events": "引擎判：{events}",
+    "pc": "第 {n} 粒全消（Perfect Clear），合共消 {lines} 行",
+    "spin": "第 {n} 粒 {name}",
+    "order_words": {
+      "early": "{p} 排第 {k} 粒（原頁話要早，冇講幾早，我哋放最前）",
+      "before": "{a} 早過 {b}",
+      "hold": "{p} 喺第 {k} 粒到，即刻 hold 起，第一巡唔放佢",
+      "hold_out": "放第 {k} 粒嗰陣按 hold，將 hold 住嘅 {p} 換出嚟放",
+      "hold_out_next": "{p} 換咗入 hold，到下一巡第一粒到先換出嚟打",
+      "hold_out_next_unused": "{p} 換咗入 hold，下一粒 {q} 到嗰陣先換出嚟打，{q} 就留喺 hold 冇放",
+      "held": "{p} 一直喺 hold 冇放",
+      "unused": "{p} 呢一巡冇用到，排最尾"
+    },
+    "idle": "撳任何一個「播示範」，重播就會喺度出現，由空盤開始。",
+    "overview_note": "原頁每一幅有盤面嘅圖，另外有一版由空盤砌出嚟嘅示範重播（唔係對局，唔計入任何數字）。",
+    "now": "示範：{name}",
+    "user": "示範"
+  },
+  "see_also": {
+    "link": "ガムシロ積み 全路線（shiwehi.com 版）",
+    "words": "同一個開局 shiwehi.com 畫嘅版本：第二巡得兩款通常形同一個妥協形，仲有四行 PC 同インペリアルクロス。第一巡、Form A1 同 L → O 嘅六款 PC 兩版逐格一樣。"
+  }
+}

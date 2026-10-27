@@ -364,6 +364,9 @@ class RouteSiteProfile:
     #: board letters beyond PIECE_CLASS, and the CSS for them (empty: the page's CSS is untouched)
     cell_classes: dict = field(default_factory=dict)
     extra_css: str = ""
+    #: another route page of the SAME opener drawn by another site, as `(docs file, prose key)`: the
+    #: overview links it under its header, in the prose key's words (empty: no line, the default)
+    see_also: tuple = ()
     #: the largest a rendered page may be, in bytes (0: no limit). A page over it is a render failure,
     #: never a truncation: split the page instead.
     max_page_bytes: int = 0
@@ -628,6 +631,10 @@ class RouteSite:
                 _source_line(routes, self.PROSE.get("source_credit")),
                 '  </header>']
         out += self._method_note(False)
+        if self.p.see_also:
+            href, key = self.p.see_also
+            out.append(f'  <p class="scp-quote"><a href="{_esc(href)}">{_esc(self.PROSE[key]["link"])}</a>：'
+                       f'{_esc(self.PROSE[key]["words"])}</p>')
         out.append(f'  <p class="scp-quote"><a href="{self.DEMO_PAGE}">{_esc(self.DP["title"])}</a>：'
                    f'{_esc(self.DP["overview_note"])}</p>')
         mq = {q["id"]: q for q in routes["quotes"]}
