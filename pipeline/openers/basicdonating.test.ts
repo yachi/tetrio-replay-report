@@ -26,7 +26,7 @@ import { test, expect } from 'bun:test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { build, serialise, digestCorpus, type Mutants, type TechDigest, type Cell } from '../sim/technique-facts.ts';
 import { BASICDONATING } from '../sim/technique-profile-basicdonating.ts';
-import { donationQualifier, OTHER_PAGES } from '../sim/basicdonating-qualify.ts';
+import { donationQualifier, OTHER_PAGES, ROUTE_ARTEFACTS, ROUTE_LOCKS } from '../sim/basicdonating-qualify.ts';
 import { donationColumns, ruleMatch, RULE_ABLATIONS } from '../sim/basicdonating-rule.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 import { checkNamedList, checkScoredAgainstOpenerFacts, checkHitPositions } from './technique-facts-checks.ts';
@@ -48,9 +48,9 @@ const HITS: Record<string, any> = {"pinglamb": {"all": 374, "in_opener": 109, "m
 const PAYOFF: Record<string, any> = {"pinglamb": {"fired": 34, "not_fired": {"i_in_well_not_quad": 19, "past_verified": 15, "round_ended": 10, "well_covered": 28, "well_filled_not_i": 268}}, "yachi": {"fired": 61, "not_fired": {"i_in_well_not_quad": 28, "past_verified": 9, "round_ended": 7, "well_covered": 50, "well_filled_not_i": 188}}};
 /** The same rule at the other scored spins, and with each clause dropped at the opportunity. */
 const CONTROLS = {"under": {"TSS": {"pinglamb": 32, "yachi": 137}, "TST": {"pinglamb": 1399, "yachi": 748}, "mini_TSS": {"pinglamb": 5, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 374, "yachi": 343}, "allow_fragment": {"pinglamb": 426, "yachi": 396}, "no_reopen": {"pinglamb": 436, "yachi": 479}, "allow_late_hole": {"pinglamb": 477, "yachi": 445}}, "orientation_baseline": {"pinglamb": 52, "yachi": 67}};
-const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 263, "not_qualified": {"other_page": 111}}, "yachi": {"qualified": 180, "not_qualified": {"other_page": 163}}};
+const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 149, "not_qualified": {"opener_route": 125, "other_page": 111}}, "yachi": {"qualified": 166, "not_qualified": {"opener_route": 23, "other_page": 163}}};
 /** Qualifying hits per session (the list itself is `lists.qualified_hits`, held to `hits` below). */
-const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 26, '2026-07-24': 15, '2026-07-28': 15, '2026-08-01': 25, '2026-08-09': 22, '2026-08-14': 35, '2026-08-19': 32, '2026-08-25': 25, '2026-09-03': 7, '2026-09-10': 22, '2026-09-11': 10, '2026-09-17': 8, '2026-09-18': 32, '2026-09-19': 53, '2026-10-03': 46, '2026-10-09': 38, '2026-10-12': 16, '2026-10-20': 9, '2026-10-22': 7};
+const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 10, '2026-07-24': 13, '2026-07-28': 11, '2026-08-01': 20, '2026-08-09': 14, '2026-08-14': 20, '2026-08-19': 21, '2026-08-25': 20, '2026-09-03': 7, '2026-09-10': 12, '2026-09-11': 5, '2026-09-17': 6, '2026-09-18': 24, '2026-09-19': 43, '2026-10-03': 38, '2026-10-09': 30, '2026-10-12': 12, '2026-10-20': 6, '2026-10-22': 3};
 /** How many donating columns a hit has, and how each column's covering pieces sit (inside the cleared rows or not). */
 const COLUMNS = { per_hit: { 1: 569, 2: 147, 3: 1 }, cover: { cleared: 429, kept: 437 } };
 /** Per other technique artefact: [its T's that are a donation here, its T's]. None is contained whole: a page's
@@ -288,17 +288,38 @@ test('the other pages: other_page iff the T is a hit of another artefact; the co
     expect(h.not_qualified.includes('other_page'), hitName(h)).toBe(OTHER_PAGES.some(k => theirs[k]!.has(hitKey(h))));
 });
 
+test('opener_route iff a route case matched bag 2 and the T is within ROUTE_LOCKS after it, re-read from the route artefacts', () => {
+  const a = art();
+  const b2 = new Map<string, number[]>();
+  for (const k of ROUTE_ARTEFACTS)
+    for (const c of JSON.parse(readFileSync(`${import.meta.dir}/../../analysis/${k}-facts.json`, 'utf8')).cases)
+      if (c.bag2) { const key = `${c.session}|${c.file}|${c.round_index0}|${c.player}`; b2.set(key, [...(b2.get(key) ?? []), c.bag2.lock]); }
+  for (const h of a.hits) {
+    const ls = b2.get(`${h.session}|${h.file}|${h.round_index0}|${h.player}`) ?? [];
+    expect(h.not_qualified.includes('opener_route'), hitName(h)).toBe(ls.some(l => h.lock > l && h.lock <= l + ROUTE_LOCKS));
+  }
+  // the case yachi named: 2026-10-22 m8r1 pinglamb lock 24, 迷走砲's third-bag TSD
+  const named = a.hits.find((h: any) => h.session === '2026-10-22' && h.match === 8 && h.round === 1 && h.player === 'pinglamb' && h.lock === 24);
+  expect(named?.not_qualified).toEqual(['opener_route']);
+});
+
 test('the qualify rule, re-derived from the digests; with it off every hit qualifies', () => {
   const a = art();
   const byD = new Map(digests().map(d => [dKey(d), d]));
-  for (const [mut, all] of [[{}, false], [{ noOtherPage: true }, true]] as const) {
-    const q = donationQualifier(import.meta.dir, mut);
+  const AN = `${import.meta.dir}/../../analysis`;
+  const muts = [[{}, null], [{ noOtherPage: true, noOpenerRoute: true }, []],
+                [{ noOtherPage: true }, ['other_page']], [{ noOpenerRoute: true }, ['opener_route']]] as const;
+  for (const [mut, off] of muts) {
+    const q = donationQualifier(import.meta.dir, AN, mut);
     a.hits.forEach((h: any) => {
       const v = q(h, byD.get(`${h.session}|${h.file}|${h.round_index0}|${h.player}`)!);
-      if (all) expect(v.qualifies, hitName(h)).toBe(true);
-      else expect([v.qualifies, v.not_qualified], hitName(h)).toEqual([h.qualifies, h.not_qualified]);
+      if (off === null) expect([v.qualifies, v.not_qualified], hitName(h)).toEqual([h.qualifies, h.not_qualified]);
+      else if (off.length === 0) expect(v.qualifies, hitName(h)).toBe(true);
+      else expect(v.not_qualified, hitName(h)).toEqual(h.not_qualified.filter((r: string) => !off.includes(r as never)));
     });
   }
+  // each rule is live: turning it off moves some verdict
+  for (const r of ['other_page', 'opener_route']) expect(a.hits.some((h: any) => h.not_qualified.includes(r)), r).toBe(true);
 }, 600_000);
 
 test('mutants: each one turns this red with its own symptom', () => {

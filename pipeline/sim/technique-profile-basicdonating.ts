@@ -14,7 +14,7 @@
  * (the nearest to the T).
  */
 import type { TechniqueProfile } from './technique-profile.ts';
-import { OTHER_PAGES, donationQualifier } from './basicdonating-qualify.ts';
+import { OTHER_PAGES, ROUTE_ARTEFACTS, ROUTE_LOCKS, donationQualifier } from './basicdonating-qualify.ts';
 import { RULE_ABLATIONS, donationDetector } from './basicdonating-rule.ts';
 
 const SIM = import.meta.dir;
@@ -32,7 +32,8 @@ export const BASICDONATING: TechniqueProfile = {
     classifier: [`${SIM}/technique-facts.ts`, `${SIM}/technique-profile.ts`, `${SIM}/technique-profile-basicdonating.ts`,
                  `${SIM}/emit-technique-facts.ts`, `${SIM}/route-facts.ts`, `${SIM}/basicdonating-rule.ts`,
                  `${SIM}/basicdonating-qualify.ts`, `${SIM}/shachikutrain-qualify.ts`,
-                 ...OTHER_PAGES.map(k => `${OPENERS}/${k}-technique.json`)],
+                 ...OTHER_PAGES.map(k => `${OPENERS}/${k}-technique.json`),
+                 ...ROUTE_ARTEFACTS.map(k => `${REPO}/analysis/${k}-facts.json`)],
   },
   opportunity: { spin: 'full', lines: 2 },
   controlSpins: [
@@ -85,9 +86,10 @@ export const BASICDONATING: TechniqueProfile = {
   qualify: {
     rules: [
       `other_page: another technique page's window (${OTHER_PAGES.join(', ')}; any variant, either hand) fires at the same T, so the T is that page's`,
-      'qualifies iff it does not apply; the donation happened at every hit either way',
+      `opener_route: the round is a case of an opener route page (${ROUTE_ARTEFACTS.join(', ')}) that matched a bag-2 board, and the T locks within ${ROUTE_LOCKS} locks after that match, so the T is the route's own continuation`,
+      'qualifies iff neither applies; the donation happened at every hit either way',
     ],
-    check: donationQualifier(OPENERS),
+    check: donationQualifier(OPENERS, `${REPO}/analysis`),
   },
   lists: (hits, name) => ({
     basicdonating_hits: hits.map(h => `${name(h)} ${tag(h)}`),

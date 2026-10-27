@@ -5130,8 +5130,12 @@ a `rule_not_fired` entry with a reason), and `basicdonating.test.ts` holds the T
 payoff is 欄干's `well_quad`, harddrop's next step, not the page's. Two older opt-ins in the shared gate stay:
 `snapshot_indented` and `muting_slips`.
 
-**Qualify is one rule, `other_page`** (`pipeline/sim/basicdonating-qualify.ts`; yachi: 「有啲已經係其他pattern」): a T at which
-any other technique page's window fires (any variant, either hand) is that page's. The build rules (complete pieces, no
+**Qualify is two rules** (`pipeline/sim/basicdonating-qualify.ts`). `other_page` (yachi: 「有啲已經係其他pattern」): a T at which
+any other technique page's window fires (any variant, either hand) is that page's. `opener_route` (yachi's decision card,
+2026-10-27, on 10-22 m8r1 pinglamb lock 24, 迷走砲's third-bag 「STMB cave の形」 TSD): the round is a case of an opener route
+artefact (`ROUTE_ARTEFACTS`) that matched a bag-2 board, and the T locks within `ROUTE_LOCKS` (14, two bags) after that match,
+so it is the route's own continuation — the 迷走砲 page draws those TSDs with placeholder cells, so no window can claim them.
+The route artefacts are hashed by this page's facts, so **emit the route facts before 基本的なドネイト's**. The build rules (complete pieces, no
 garbage) are inside the donation rule itself, and the whole-shape rule does not apply to a rule variant. `COMMON` in the test
 pins how many of each other page's hits are donations here (counts are the test's). Every rule hit
 carries `donation: {columns, box, t_cells}`; `t_cells` is what the page's thumbnails draw the T from. The other gates'
