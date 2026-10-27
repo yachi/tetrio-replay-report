@@ -1,0 +1,57 @@
+{
+ "title": "第二次全消（2nd PC）",
+ "overview_title": "第二次全消（2nd PC）",
+ "desc": "全消之後即刻再打一次 4 行全消，十粒方塊點擺，對唔對到 harddrop Second Perfect Clear 頁畫嘅 setup 同解法。模擬器推導，唔屬於信任鏈。",
+ "lede": "第一次全消用咗第二包嘅三粒，手上剩低四粒；第二次全消就係用嗰四粒加第三包嘅六粒，由空盤再砌 4 行全消。呢版將 corpus 入面每次「全消之後下一次全消剛好係 4 行」嘅十粒方塊擺位，同 harddrop 畫嘅 setup 同解法逐格逐色對（正反都對，反轉時 J↔L、S↔Z）。",
+ "source_words": "來源：harddrop wiki（鎖定一個 revision，每星期重新抓一次核對）：",
+ "source_terms": "harddrop 冇公佈 wiki 內容嘅授權，所以附連結註明出處。",
+ "definition_intro": "harddrop 自己嘅講法：",
+ "declined": "姊妹頁 {link} 冇抄：佢用細楷畫下一包嘅方塊，又有啲解法畫喺消咗行之後，同呢版嘅讀法唔同。",
+ "page_sentences": [
+  "<strong>全消嘅位置有 replay 自己嘅計數核對</strong>：每一局，模擬器數到幾多次盤面清晒，都要等於遊戲自己記低嘅全消次數（兩個獨立 extractor 都讀到嘅 <code>clears.allclear</code>）。核對結果喺下面數字段。",
+  "<strong>全消之後嘅盤面大多數超出咗核實範圍</strong>：遊戲有時將全消嘅攻擊分開幾份送出，模擬器一份過送，所以由嗰度開始重建檢查就對唔上。每個 case 都標明係咪喺核實範圍之內。",
+  "呢版<strong>冇示範重播</strong>：harddrop 嘅圖未逐個砌出嚟，淨係用嚟同 corpus 對。"
+ ],
+ "index_card": {
+  "kicker": "全消循環 · harddrop",
+  "blurb": "全消之後即刻再打 4 行全消，對 harddrop Second Perfect Clear 頁嘅 setup 同解法。"
+ },
+ "sections": {
+  "figures": "數字",
+  "figures_note": "每次全消都睇下一次全消：如果中間冇垃圾行入嚟、而下一次剛好消 4 行，就係一個 case。其他情況按原因數。",
+  "cases": "全部 case",
+  "cases_note": "圖係十粒方塊喺 4 行框入面嘅擺位（中途消咗行嘅話，之後放落嚟嘅方塊會畫成斷開，同 harddrop 畫法一樣）。每行連去嗰晚 replay，停喺第一粒落之前。",
+  "setups": "harddrop 畫嘅全部 setup 同解法",
+  "setups_note": "每個 setup 係由空盤擺嘅三至四粒；解法係喺 setup 上面砌夠 4 行（灰色就係 setup 本身）。數字係 corpus 入面對到個 setup 嘅 case 數。"
+ },
+ "table": {
+  "player": "玩家",
+  "pc_points": "全消次數",
+  "no_next_pc": "之後冇再全消",
+  "other_lines": "下次唔係 4 行",
+  "garbage": "中間有垃圾",
+  "cases": "case",
+  "solution": "對到解法",
+  "setup": "淨係對到 setup",
+  "unmatched": "對唔到",
+  "verified_suffix": "（核實範圍內 {v}）",
+  "case": "局",
+  "prev_pc_lines": "上一次全消清咗幾多行",
+  "pieces_before": "之前落咗幾多粒",
+  "pc_lock": "全消（第幾粒）",
+  "verified": "核實",
+  "outcome": "結果"
+ },
+ "words": {
+  "yes": "係",
+  "no": "否",
+  "solution": "對到解法",
+  "setup": "淨係對到 setup",
+  "unmatched": "對唔到",
+  "anchor": "全消位置核對：{agree} / {rounds} 局夾，共 {pcs} 次全消。",
+  "setup_name": "setup",
+  "solution_name": "解法 {n}",
+  "pieces": "用 {p}",
+  "no_solution": "呢個 setup harddrop 冇畫解法。"
+ }
+}
