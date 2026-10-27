@@ -13,14 +13,19 @@
  *   2. each of those cells is the T or a cell of a COMPLETE piece — all four of its cells on the board before the T,
  *      never garbage (yachi, 2026-10-25: 「要完整pieces」);
  *   3. the cell directly above e is not the T: a hole covered only by the T's own nub is a plain T-spin (yachi,
- *      2026-10-26: 「呢個係普通tspin」).
+ *      2026-10-26: 「呢個係普通tspin」);
+ *   4. THE HOLE CAME FIRST: when the piece directly above e locked, the cell under its lowest cell in c was already
+ *      empty. A piece laid on the floor or on the stack, with garbage rising under it later and its hole in c, covered
+ *      nothing (yachi, 2026-10-25, for the 捐窿 table: 「個窿用 O 塞住嘅時候，窿未出現，應該唔算」; again 2026-10-27 on
+ *      2026-10-22 m8r3 lock 31, whose opener I sat on the floor until garbage rose under it: 「呢個唔算，唔係完整piece，
+ *      唔夠elegant」). Read on the board before that lock (`before`), in its own frame.
  * The covering piece may keep cells above C (yachi, 2026-10-26: 「算」) as long as rule 1 holds in column c; a column
  * whose covering pieces all lie inside C is `cover: 'cleared'`, otherwise `cover: 'kept'`. A lock DONATES when at least
  * one column does. Which column is the hit's own (its payoff well and its thumbnail): the nearest to the T's columns,
  * then the leftmost.
  *
  * The ablations relax one rule each, for the controls: `allow_t_nub` drops rule 3, `allow_fragment` drops rule 2,
- * `no_reopen` drops rule 1. The occupancy half (rules 1 and 3) has a Python twin, `technique_transcription.rule_fires`,
+ * `no_reopen` drops rule 1, `allow_late_hole` drops rule 4. The occupancy half (rules 1 and 3) has a Python twin, `technique_transcription.rule_fires`,
  * which the facts test holds to this one over every board of the transcription (ownership is not drawn, so the twin
  * cannot read rule 2).
  */
@@ -29,8 +34,12 @@ import type { Cell, TechDigest } from './technique-facts.ts';
 
 const H = 40, W = 10;
 
-export type RuleAblation = 'allow_t_nub' | 'allow_fragment' | 'no_reopen';
-export const RULE_ABLATIONS: RuleAblation[] = ['allow_t_nub', 'allow_fragment', 'no_reopen'];
+export type RuleAblation = 'allow_t_nub' | 'allow_fragment' | 'no_reopen' | 'allow_late_hole';
+export const RULE_ABLATIONS: RuleAblation[] = ['allow_t_nub', 'allow_fragment', 'no_reopen', 'allow_late_hole'];
+
+/** Rule 4's reader: did the piece of lock `k` have an empty cell under its lowest cell in column `c` when it locked?
+ *  null when it cannot be read (the rule then fails, as rule 2 does without ownership). */
+export type CameFirst = (k: number, c: number) => boolean | null;
 
 export interface DonationColumn {
   col: number;
@@ -55,7 +64,7 @@ export interface RuleMatch {
  * donates (unless it is ablated).
  */
 export function donationColumns(withT: boolean[][], tcells: Cell[], C: Set<number>, own: number[][] | null,
-                                abl?: RuleAblation): DonationColumn[] {
+                                abl?: RuleAblation, cameFirst?: CameFirst): DonationColumn[] {
   const isT = new Set(tcells.map(q => q.row * W + q.col));
   const size = new Map<number, number>();
   const rowsOf = new Map<number, Set<number>>();
@@ -83,6 +92,10 @@ export function donationColumns(withT: boolean[][], tcells: Cell[], C: Set<numbe
       if ([...rowsOf.get(k)!].some(x => !C.has(x))) kept = true;
     }
     if (!ok) continue;
+    if (cameFirst && abl !== 'allow_late_hole') {
+      const k = own ? own[e - 1]![c]! : -1;
+      if (k < 0 || cameFirst(k, c) !== true) continue;
+    }
     let depth = 0;
     for (let r = e; r < H && !withT[r]![c]; r++) depth++;
     out.push({ col: c, hole_row: e, depth, cover: kept ? 'kept' : 'cleared' });
@@ -93,8 +106,8 @@ export function donationColumns(withT: boolean[][], tcells: Cell[], C: Set<numbe
 /** The hit at one lock, or null: the donating columns, the hit's own column (the nearest to the T, then the leftmost)
  *  and its thumbnail box. */
 export function ruleMatch(withT: boolean[][], tcells: Cell[], C: Set<number>, own: number[][] | null,
-                          abl?: RuleAblation): RuleMatch | null {
-  const cols = donationColumns(withT, tcells, C, own, abl);
+                          abl?: RuleAblation, cameFirst?: CameFirst): RuleMatch | null {
+  const cols = donationColumns(withT, tcells, C, own, abl, cameFirst);
   if (!cols.length) return null;
   const tc = tcells.map(q => q.col), tr = tcells.map(q => q.row);
   const lo = Math.min(...tc), hi = Math.max(...tc);
@@ -114,6 +127,16 @@ export function donationDetector() {
     if (!o) { o = owners(d, d.locks.length - 1); cache.set(d, o); }
     const own = i === 0 ? Array.from({ length: H }, () => new Array(W).fill(-2))
       : (o.bad !== null && o.bad <= i - 1) ? null : o.boards[i - 1]!;
-    return ruleMatch(withT, cells, new Set(rows), own, abl);
+    const before = (k: number) => k === 0 ? null : o!.boards[k - 1] ?? null;
+    const cameFirst: CameFirst = (k, c) => {
+      const cs = d.locks[k]!.cells.filter(q => q.col === c);
+      if (!cs.length) return null;
+      const r = Math.max(...cs.map(q => q.row)) + 1;
+      if (r >= H) return false;
+      if (k === 0) return true;
+      const b = before(k);
+      return b ? b[r]![c] === -2 : null;
+    };
+    return ruleMatch(withT, cells, new Set(rows), own, abl, cameFirst);
   };
 }

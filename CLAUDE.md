@@ -5116,10 +5116,13 @@ again — any column, any depth, any distance from the T. `pipeline/sim/basicdon
 `donationDetector`) is the profile's `detect`, and a variant with `window_basis: rule` has no window: a column DONATES when, at
 its topmost empty cell outside the cleared rows and directly under a cleared-row cell, (1) every filled cell of the column above
 it is in the cleared rows (so the clear re-opens it), (2) each is the T or a cell of a complete piece, never garbage or a
-fragment, and (3) the cell above it is not the T's nub (yachi: 「呢個係普通tspin」). A covering piece may keep cells above the
+fragment, (3) the cell above it is not the T's nub (yachi: 「呢個係普通tspin」), and (4) THE HOLE CAME FIRST: when the piece
+directly over the hole locked, the cell under its lowest cell in that column was already empty, read on the ownership board
+before that lock (since 2026-10-27, yachi on 10-22 m8r3 lock 31, whose covering I sat on the floor until garbage rose under it:
+「呢個唔算，唔係完整piece，唔夠elegant」; the 捐窿 table's `wellAtPlug` is the same idea, kept separate). A covering piece may keep cells above the
 cleared rows (yachi: 「算」); `cover` records `cleared` / `kept`. The hit's own column (its payoff well and its box) is the one
 nearest the T, then the leftmost; the box runs from the row over the cleared rows to the row under that hole. Ablations are
-the three clauses dropped (`allow_t_nub`, `allow_fragment`, `no_reopen`). The six hole windows `k1`..`k6` and the `nub`
+the four clauses dropped (`allow_t_nub`, `allow_fragment`, `no_reopen`, `allow_late_hole`); the Python twin reads no ownership, so rules 2 and 4 are TS only. The six hole windows `k1`..`k6` and the `nub`
 window that came before were retired: they matched the page's own distances only, and yachi's review of their hits found holes
 the build never covered and overhangs that were never holes. The rule's Python twin (`rule_columns`, `rule_own`,
 `rule_window`, `rule_accounting` in `technique_transcription.py`) holds every spin board of the page to it both ways (a miss is
