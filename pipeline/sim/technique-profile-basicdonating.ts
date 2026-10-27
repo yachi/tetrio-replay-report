@@ -67,7 +67,9 @@ export const BASICDONATING: TechniqueProfile = {
     'match (no window): a column DONATES when, at its topmost cell that is empty, outside the cleared rows and directly '
       + 'under a cleared-row cell, (1) every filled cell of the column above it lies in the cleared rows, (2) each is '
       + 'the T or a cell of a complete piece (all four cells on the board before the T, never garbage), and (3) the cell '
-      + 'directly above it is not the T (a hole under the T\'s nub alone is a plain T-spin); the lock is a hit when any '
+      + 'directly above it is not the T (a hole under the T\'s nub alone is a plain T-spin), and (4) when the piece directly '
+      + 'above it locked, the cell under that piece\'s lowest cell in the column was already empty (the hole came first: '
+      + 'garbage rising under a piece later covered nothing); the lock is a hit when any '
       + 'column donates; cover = cleared when every covering piece lies inside the cleared rows, else kept',
     'the hit\'s own column (its payoff well and its box): the donating column nearest to the T\'s columns, then the '
       + 'leftmost; the box runs from the row over the cleared rows to the row under that hole, over the T and that column',
@@ -77,7 +79,7 @@ export const BASICDONATING: TechniqueProfile = {
       + 'well_covered, well_filled_not_i, i_in_well_not_quad, rowmap_unverified, slot_off_board or round_ended); '
       + 'well_depth = the empty cells from that hole down, garbage filled',
     'controls: the same rule at the profile\'s other scored spins; ablations allow_t_nub (rule 3 dropped), '
-      + 'allow_fragment (rule 2 dropped) and no_reopen (rule 1 dropped) at the opportunity; orientation_baseline = '
+      + 'allow_fragment (rule 2 dropped), no_reopen (rule 1 dropped) and allow_late_hole (rule 4 dropped) at the opportunity; orientation_baseline = '
       + 'opportunities whose T stands up',
   ],
   qualify: {
