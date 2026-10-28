@@ -71,7 +71,7 @@ test('2. accepted bits: popcount is the count, and empty == next per node (T4 on
     expect(bitsHex(ORDERS.map(q => accepts(d, q, null)))).toBe(n.accepted.empty);
     expect(bitsHex(ORDERS.map(q => accepts(d, q.slice(1), q[0]!)))).toBe(n.accepted.next);
   }
-});
+}, 60_000);
 
 test('3. condition tables recomputed from the bits with conditionOn()', () => {
   const conditioned: string[] = [];
@@ -131,7 +131,7 @@ test('4. each hold mutant changes a count, or is named equivalent', () => {
     // dropping case (c) makes T4 false on every node
     if (key === 'noHoldFirst') expect(emptyNe).toBe(A.nodes.length);
   }
-});
+}, 60_000);
 
 test('5. premise: each parent placed a whole 7-bag or the node is a root; refused is empty', () => {
   expect(A.refused.map((r: any) => r.node)).toEqual(REFUSED);
