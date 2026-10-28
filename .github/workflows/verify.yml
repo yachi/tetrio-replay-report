@@ -1011,6 +1011,19 @@ jobs:
       - name: Check the DPC page audit catches its corruptions
         run: python3 -m pipeline.dpc_page --selftest
 
+      # The Second PC page: a Perfect Clear straight into a four-line one, against harddrop's Second
+      # Perfect Clear page (pinned revision, refetched weekly by check_wikitext_sources). Its PC points
+      # are the DPC page's, anchored to clears.allclear; the corpus artefact is checked by
+      # pipeline/openers/secondpc.test.ts in the typescript job.
+      - name: Check the Second PC setups transcription
+        run: python3 -m pipeline.openers.extract_secondpc_setups
+
+      - name: Check the Second PC setups transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_secondpc_setups --selftest
+
+      - name: Check the Second PC page audit catches its corruptions
+        run: python3 -m pipeline.secondpc_page --selftest
+
       # The site is rendered here and NOT committed (since 2026-10-23): every render-time audit
       # above runs again inside this build, the second render must reproduce the first byte for
       # byte, and the `deploy` job publishes exactly this upload once every job in this workflow

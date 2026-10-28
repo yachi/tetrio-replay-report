@@ -1,0 +1,186 @@
+{
+ "schema": "secondpc-facts/1",
+ "report_eligible": false,
+ "means": "Every four-line Perfect Clear in the corpus that starts on a board a Perfect Clear just emptied, its ten pieces' layout in the four-row frame, and which of harddrop's Second Perfect Clear setups and solutions (secondpc-setups.json) it carries, by piece letter, drawn or mirrored. Simulator output, one engine.",
+ "caveat": "Boards are the vendored engine's. Most boards after a Perfect Clear are past the verified prefix (each case carries `verified`); which layout the player built has no second implementation. No claim id, no badge.",
+ "rules": {
+  "pc_point": "board empty after the lock, through the verified row map (dpc-facts.ts's reading)",
+  "case": "consecutive PC points, the second clearing exactly four lines with no garbage in between",
+  "match": "every drawn setup cell holds the same piece letter in the layout and is whole pieces of it; a solution when every other cell also equals the drawing; drawn or mirrored (J/L and S/Z swapped)"
+ },
+ "setups": 27,
+ "solutions": 157,
+ "pc_anchor": {
+  "rounds": 2814,
+  "rounds_agree": 2814,
+  "pcs_replay": 337,
+  "disagree": []
+ },
+ "sessions": 19,
+ "inputs": {
+  "sessions": [
+   {
+    "session": "2026-07-22",
+    "replays_md5": "5c365d5a42189e1a2138cfaacab85061",
+    "replay_facts_md5": "0c8583e1ec123cd79d9f98dcc2497db2"
+   },
+   {
+    "session": "2026-07-24",
+    "replays_md5": "036bda8130fd25676db3f56946791fe6",
+    "replay_facts_md5": "5ae71ce3745b690f30a8cbc1b098464a"
+   },
+   {
+    "session": "2026-07-28",
+    "replays_md5": "97d318eaf2faa588bf90fc1abfc6f2d7",
+    "replay_facts_md5": "5be7fefd353c58f48f78b30a26d5e8c4"
+   },
+   {
+    "session": "2026-08-01",
+    "replays_md5": "01bd0b9d96be7e3a1423f5c6b20d14a0",
+    "replay_facts_md5": "4677b48ff08b91deeb973b77c146c5d0"
+   },
+   {
+    "session": "2026-08-09",
+    "replays_md5": "b2b6556ffcd2922f39eb3e4e7c9454a0",
+    "replay_facts_md5": "580ef38628bc19630d0cc7143ddc1009"
+   },
+   {
+    "session": "2026-08-14",
+    "replays_md5": "464875cb25a2d382122d884045b60b79",
+    "replay_facts_md5": "5f6f4e61cdcf5ec669661a8f44c30f53"
+   },
+   {
+    "session": "2026-08-19",
+    "replays_md5": "0ec61c3c2360e2e7ce049ec1d5043b43",
+    "replay_facts_md5": "668a403b87216c38a8445ca9c0b178aa"
+   },
+   {
+    "session": "2026-08-25",
+    "replays_md5": "93043bcb37cd7ffcd77ad5eb8672fb7e",
+    "replay_facts_md5": "cf12c32107114833d4c5978fde9eee95"
+   },
+   {
+    "session": "2026-09-03",
+    "replays_md5": "59da0c51a5e29be634f6b7ae060b4a9b",
+    "replay_facts_md5": "84f0fffaea0abd26ae2bf44d804b5341"
+   },
+   {
+    "session": "2026-09-10",
+    "replays_md5": "ceedee793ea16b6d95bd286741e1aae9",
+    "replay_facts_md5": "2cd0158b019a9d06b9cbb73dac2c2275"
+   },
+   {
+    "session": "2026-09-11",
+    "replays_md5": "bd9f59da273fd97f3af582b467862c7b",
+    "replay_facts_md5": "9be5a738ba322fa6a0ce2f81601d40b4"
+   },
+   {
+    "session": "2026-09-17",
+    "replays_md5": "e3085e9b641941214f387e88fc15164a",
+    "replay_facts_md5": "faec48d7edcc699c63d25a2d4fe576c7"
+   },
+   {
+    "session": "2026-09-18",
+    "replays_md5": "fae311db6292ed6ab5d21062bc500d93",
+    "replay_facts_md5": "5af89e2a23420a0b1f38e245e828018f"
+   },
+   {
+    "session": "2026-09-19",
+    "replays_md5": "74a0fa2bc83c2520870eb35b1edb82e7",
+    "replay_facts_md5": "8efa186ef0f440cfdb3b47473d2302a7"
+   },
+   {
+    "session": "2026-10-03",
+    "replays_md5": "6870375613354ec9605bd366a0d32a32",
+    "replay_facts_md5": "45b21c17923ebef8ade14052e782250f"
+   },
+   {
+    "session": "2026-10-09",
+    "replays_md5": "ec6f52e26f431dd95fe2c1bf8fa53b1a",
+    "replay_facts_md5": "a598c6e53c898c60548076c4fd06843e"
+   },
+   {
+    "session": "2026-10-12",
+    "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
+    "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
+   },
+   {
+    "session": "2026-10-20",
+    "replays_md5": "54aad262054f2e92c85f7bf94462eb2c",
+    "replay_facts_md5": "0426348d586721b430916ddc751a2de1"
+   },
+   {
+    "session": "2026-10-22",
+    "replays_md5": "22418badae4a4fbef9e5d9d7300b1589",
+    "replay_facts_md5": "14b3331ad2a902febc41c7f8101c72a3"
+   }
+  ],
+  "setups_md5": "fa919ccdb651e5c621b0945b43983666",
+  "emitter_md5": "73242b696bcd6b99590b351a3b3ab067"
+ },
+ "by_player": {
+  "pinglamb": {
+   "pc_points": 202,
+   "no_next_pc": 194,
+   "other_lines": 7,
+   "garbage": 1,
+   "rounds_rowmap_stops": 0,
+   "cases": {
+    "all": 0,
+    "verified": 0
+   },
+   "solution": {
+    "all": 0,
+    "verified": 0
+   },
+   "setup": {
+    "all": 0,
+    "verified": 0
+   },
+   "unmatched": {
+    "all": 0,
+    "verified": 0
+   },
+   "after_ten": {
+    "all": 0,
+    "verified": 0
+   }
+  },
+  "yachi": {
+   "pc_points": 135,
+   "no_next_pc": 132,
+   "other_lines": 1,
+   "garbage": 0,
+   "rounds_rowmap_stops": 27,
+   "cases": {
+    "all": 2,
+    "verified": 0
+   },
+   "solution": {
+    "all": 0,
+    "verified": 0
+   },
+   "setup": {
+    "all": 0,
+    "verified": 0
+   },
+   "unmatched": {
+    "all": 2,
+    "verified": 0
+   },
+   "after_ten": {
+    "all": 0,
+    "verified": 0
+   }
+  }
+ },
+ "by_setup": {},
+ "unmatched_layouts": [
+  {"layout":["IIIIJJSSSS","LOOJJSSSST","LOOJZZZZTT","LLJJJZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}},
+  {"layout":["JJJIIIIISS","OOJILLLSST","OOLIZZZZTT","LLLILZZZZT"],"cases":1,"by_player":{"pinglamb":0,"yachi":1}}
+ ],
+ "cases": [
+  {"session":"2026-09-18","file":"replay-2026-09-18-15.ttrm","round_index0":4,"match":15,"round":5,"player":"yachi","prev_pc_lock":19,"prev_pc_lines":8,"pieces_before":20,"first_lock":20,"pc_lock":29,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["ZZZZLLIIII","TZZZZLLOOJ","TTSSSSLOOJ","TSSSSLLLJJ"],"shape":"IIIIJJSSSS/LOOJJSSSST/LOOJZZZZTT/LLJJJZZZZT"},
+  {"session":"2026-09-19","file":"replay-2026-09-19-16.ttrm","round_index0":2,"match":16,"round":3,"player":"yachi","prev_pc_lock":19,"prev_pc_lines":8,"pieces_before":20,"first_lock":20,"pc_lock":29,"verified":false,"outcome":"unmatched","setups":[],"solutions":[],"mirrored":null,"setup_first":null,"layout":["ZZIIIIILLL","TZZJJJILOO","TTSSSSIJOO","TSSSSJIJJJ"],"shape":"JJJIIIIISS/OOJILLLSST/OOLIZZZZTT/LLLILZZZZT"}
+ ]
+}
