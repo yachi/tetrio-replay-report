@@ -4086,11 +4086,25 @@ The named lists are `BAG1_SPIN_OFF_PAGE`, `BAG2_NONE_NEAR`, `BAG2_NONE_UNEXPLAIN
 `COLOUR_DISAGREE`, `DT_NOT_STICKSPIN`, `STICKSPIN_NOT_DT`, and the measured-empty
 `BAG2_GARBAGE_STRIPPED`, `BAG2_NONE_TSD_BEFORE_COMPLETE` / `_EXTRA_PIECE` / `_MOVED_PIECE`,
 `PC_OFF_PAGE`, `BAG2_HANDEDNESS_MISMATCH`, `MULTI_COLOUR_RESOLVED_BY_BRANCH` and
-`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the mirror, the illustrations, and the planner's
+`PC_GARBAGE_IN_WINDOW`; demos `DEMO_UNBUILT` (the mirror and the illustrations ~~, and the planner's
 measured failures on two SDパフェ patterns whose T stands under an S that only becomes whole after
-it), `DEMO_PIECE_READINGS` (the もっちパフェ pattern drawn with one L cell in J's colour),
+it~~), `DEMO_PIECE_READINGS` (the もっちパフェ pattern drawn with one L cell in J's colour),
 `DEMO_SPIN_LINES` and `DEMO_SPIN_EXCEPTIONS`. Sizes are read off the tests. `ignoreConditions` and
-`no180` are controls here, as for 迷走砲 and 山岳積み2号.
+`no180` are controls here, as for 迷走砲 and 山岳積み2号; `noSpinCheck` is equivalent.
+
+**Those two SDパフェ patterns (`2.sd.pc#7`, `2.sd.pc#16`) are built since 2026-10-28, through a spin
+reading and not an order reading.** Their T stands upright in the column-6 well under bag 2's J, and
+on the board before it every arrival `reach()` finds at the drawn cells is a rotation the engine
+credits as a full T-spin Single (no plain or mini arrival); a PC bag already lets the T go anywhere,
+so no order rule can help (a 2026-10-28 hand probe found no set of pieces placed after a plain T that
+builds either). The profile's `spinLetter` (`PC_T_TSS` in `route-profile-stickspin.ts`) reads their
+drawn `t` as the bag's spin slot, one line, so the chain is TSS TSD TSS PC. What establishes that no
+plain order builds them is `stickspin-demos.test.ts`'s mutant removing the reading: the planner then
+searches every order of the PC bag and exactly those nodes go back to unbuilt with its reasons. The
+test also measures, on each committed board, that the two named `t`'s have no plain arrival (the
+other PC patterns' plain arrival is entailed by the shared check), and mutates the reading under the
+committed demos, which the shared spin-slot check catches by name. No shared file changed; the two stick spin
+artefacts moved, and 基本的なドネイト's two only in the md5 lines that hash `stickspin-facts.json`.
 
 ### ガムシロ積み
 
@@ -4346,8 +4360,10 @@ an open item, not done.~~ The shared change is `DemoProfile.uFiresBefore` (`rout
 map from node id to the pieces the T fires before, and `BagSpec.uBefore` in `route-demos.ts`, which
 lets the U go before exactly those pieces and makes them wait for it (「要等 T(U)」); the order reading
 records `u_before:<pieces>`. It is a profile reading per node, **never a search fallback** — a
-fallback would also build nodes other openers name as unbuilt, and stick spin's two SDパフェ
-patterns are the obvious candidates for a later, deliberate reading. SDPC Spin names eight boards
+fallback would also build nodes other openers name as unbuilt~~, and stick spin's two SDパフェ
+patterns are the obvious candidates for a later, deliberate reading~~ (struck 2026-10-28: they are
+Perfect Clear patterns, whose T no order reading can help, and are built through a `spinLetter`
+reading instead; see ### stick spin). SDPC Spin names eight boards
 (`route-profile-sdpcspin.ts`); the sets are the pieces each board forces after its TSD — the one over
 the slot, plus, in the three Z-and-J boards, the Z that only rests on that J (`U_BEFORE_SUPPORT`) —
 and the test 「measured: each uFiresBefore TSD fires before the pieces the profile names, and no
