@@ -1,0 +1,1100 @@
+{
+  "schema": "hdgamushiro-routes/1",
+  "source": {
+    "url": "https://harddrop.com/wiki/Gamushiro_Stacking",
+    "edit_url": "https://harddrop.com/w/index.php?title=Gamushiro_Stacking&action=edit",
+    "title": "Gamushiro Stacking",
+    "author": "Mr. Goods (page text: 「created by ''Mr. Goods''」)",
+    "site": "harddrop.com (Hard Drop Tetris Wiki, MediaWiki)",
+    "updated": "2023-11-01",
+    "updated_note": "the timestamp of the pinned revision, read from the API",
+    "oldid": 37490,
+    "oldid_note": "the revision ガムシロ積み's HTML cross-source (gamushiro-routes.json) pins too; the page's newest on 2026-10-27",
+    "pageid": 6672,
+    "categories": [
+      "T-Spin techniques",
+      "T-Spin openers",
+      "Triple Double openers",
+      "Perfect Clear techniques",
+      "Perfect Clear openers"
+    ],
+    "fetched": "2026-10-27",
+    "fetch_method": "the revision's own bytes from the MediaWiki API (`api.php?action=query&prop=revisions&titles=Gamushiro_Stacking&rvprop=ids|sha1|size|timestamp|content&rvslots=main&format=json`), with Python's urllib and `check_wikitext_sources.USER_AGENT` (NOT curl); the API's sha1 checked against sha1 of the bytes. Boards are {{pfstart}} … {{pfend}} templates, 119 of them, read by route_transcription.wikitext_boards",
+    "revision_sha1": "76796a37af838b8fac62bbef96b2963c68d0da1b",
+    "revision_timestamp": "2023-11-01T18:52:20Z",
+    "revision_note": "MediaWiki's own sha1 of revision 37490 (read 2026-10-27 from the API), equal to sha1 of the saved bytes",
+    "snapshot_file": "Gamushiro_Stacking.wikitext",
+    "snapshot_sha256": "81d6b2ec20144dce03d78d7c5551f2f7996ca34a8ba9bd517614bc197fb9f7b8",
+    "snapshot_bytes": 34227,
+    "snapshot_note": "sha256 of the revision's bytes as the API serves them. The page is not committed; the weekly `wikitext-sources` job refetches the pinned revision, checks both hashes and re-runs --html-dir, and fails when the page has a newer revision",
+    "wikitext_readings": {
+      "T": "t",
+      "-L": "L"
+    },
+    "wikitext_readings_note": "OUR READING: the page draws the spun T as P (read U, the shared default) and every other T as T, so T reads t here (the default reads it U, SDPC Spin's page using T for the spun T); the held bag-1 L is drawn LL on the Second Bag boards (read L by default) and -L on their redraws",
+    "boards_not_transcribed": [
+      {
+        "boards": [
+          0,
+          7
+        ],
+        "heading": "Introduction",
+        "reason": "an overview of one route (the 7-lock bag 1, Form A1, its TST, the board after it, a TSD and a PC), every board redrawn in the sections below"
+      },
+      {
+        "boards": [
+          41,
+          118
+        ],
+        "heading": "Third Bag and later (Other continuations); Perfect Clear after 10 or 14 lines; ideal shape / compromise shape subspecies → Always 14-lines PC",
+        "reason": "continuations past the 8-line PC (Imperial Cross, Center 4-wide, Nil-cross, Trinity, TST, DT Cannon, DT Cannon 2, the 10- and 14-line PCs, the 14-line routes): not transcribed in this pass, so nothing here is a claim about them"
+      }
+    ],
+    "boards_note": "indexes are 0-based over every board of the page in page order",
+    "references_listed": [
+      "https://tetris-matome.com/gamushiro/",
+      "https://harddrop.com/wiki/Yamaha_Stacking",
+      "https://harddrop.com/wiki/Mountainous_Stacking",
+      "https://harddrop.com/wiki/PC-Spin"
+    ],
+    "references_note": "the page's See also and External links, as URLs; none of them is read here"
+  },
+  "cross_source": {
+    "kind": "routes_file",
+    "file": "gamushiro-routes.json",
+    "pairs": [
+      [
+        "bag1.left",
+        "bag1.left"
+      ],
+      [
+        "bag1.l_top",
+        "bag1.l_top"
+      ],
+      [
+        "2.a1",
+        "2.normal#1"
+      ],
+      [
+        "2.a2",
+        "2.normal#2"
+      ],
+      [
+        "2.a.pc#1",
+        "2.normal.pc#1"
+      ],
+      [
+        "2.a.pc#2",
+        "2.normal.pc#2"
+      ],
+      [
+        "2.a.pc#3",
+        "2.normal.pc#3"
+      ],
+      [
+        "2.a.pc#4",
+        "2.normal.pc#4"
+      ],
+      [
+        "2.a.pc#5",
+        "2.normal.pc#5"
+      ],
+      [
+        "2.a.pc#6",
+        "2.normal.pc#6"
+      ]
+    ],
+    "what": "shiwehi.com's ガムシロ積み page (gamushiro.php, 2024-08-01 版), transcribed and gated in gamushiro-routes.json: another author on another site. Each pair is equal cell for cell with every U read as empty (shiwehi draws the two 通常 forms with the TST slot empty, this page with the T in it), as drawn or mirrored",
+    "not_covered": "Forms B, C and D and the J → O and S → O PC lists: shiwehi draws none of them, so they have no second source"
+  },
+  "terms": {
+    "url": "https://harddrop.com/wiki/Hard_Drop_Tetris_Wiki:About",
+    "dated": "not stated: harddrop publishes no licence or terms page for wiki content",
+    "read": "2026-10-15, for SDPC Spin (the same wiki, no licence published); not re-read for this page",
+    "allows": "not stated (no licence is published)",
+    "excludes": "not stated (no licence is published)",
+    "requests": "not stated; credited by link, as this repo credits every harddrop page it reads",
+    "how_met": "source link to the harddrop page in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ, align at the BOTTOM row",
+    "-": "empty (a blank cell or {{pfrowblank}})",
+    "i o t s z j l": "a cell of that piece (the page's single upper-case letter; T is an ordinary T here, see source.wikitext_readings)",
+    "c": "a cell placed before this diagram, drawn grey G (checked: exactly the bag-1 board, or what the TST leaves)",
+    "L": "the bag-1 L, held and placed in bag 2: the page's LL (Second Bag) and -L (the redraws). OUR READING, checked: on Forms A1, B, C and D its four cells are exactly where bag1.l_top stands the L",
+    "U": "the T in its TST slot, drawn P (purple)",
+    "label_jp": "the source's own words (here English): a heading or the bullet over a list, never a caption of ours"
+  },
+  "quotes": [
+    {
+      "id": "overview.intro",
+      "figure": null,
+      "verbatim": "'''Gamushiro Stacking''' (ガムシロ積み) is a T-Spin [[opener]] created by ''Mr. Goods''. It is a [[Triple Double Attack]] opener."
+    },
+    {
+      "id": "overview.bag1",
+      "figure": null,
+      "verbatim": "In the first bag, only the J piece is required before the S. If the mirrored setup is considered, it is always possible to stack the first bag."
+    },
+    {
+      "id": "bag1.requires",
+      "figure": null,
+      "verbatim": "You only need the J piece before S (L before Z in the mirrored setup). The L piece is kept on hold as it will be used along with the second bag."
+    },
+    {
+      "id": "bag1.seven",
+      "figure": "7",
+      "verbatim": "Here is the first bag with all 7 pieces:"
+    },
+    {
+      "id": "2.forms",
+      "figure": "2 / 4",
+      "verbatim": "The second bag is always placed in one of these ways. The first 2 ways are the most desirable ways. The first 4 ways can result in a Perfect Clear."
+    },
+    {
+      "id": "3.pc",
+      "figure": "8",
+      "verbatim": "In the case of the first 4 forms mentioned, you can get a [[Perfect Clear]] after 8 total lines."
+    },
+    {
+      "id": "2.a.pc",
+      "figure": "99.09% / 22",
+      "verbatim": "L → O (99.09% PC rate, 22 minimal solutions)"
+    },
+    {
+      "id": "2.b.pc",
+      "figure": "96.94% / 19",
+      "verbatim": "J → O (96.94% PC rate, 19 minimal solutions)"
+    },
+    {
+      "id": "2.c.pc",
+      "figure": "86.59% / 15",
+      "verbatim": "S → O (86.59% PC rate, 15 minimal solutions)"
+    },
+    {
+      "id": "form.a",
+      "figure": null,
+      "verbatim": "=== Form A1 and A2 (L → O) ==="
+    },
+    {
+      "id": "form.b",
+      "figure": null,
+      "verbatim": "=== Form B (J → O) ==="
+    },
+    {
+      "id": "form.c",
+      "figure": null,
+      "verbatim": "=== Form C (S → O) ==="
+    },
+    {
+      "id": "form.d",
+      "figure": null,
+      "verbatim": "=== Form D (O → L) ==="
+    }
+  ],
+  "bag1": {
+    "locks": 6,
+    "hold": "L",
+    "requires_verbatim": "You only need the J piece before S (L before Z in the mirrored setup). The L piece is kept on hold as it will be used along with the second bag.",
+    "requires": {
+      "all": [
+        {
+          "before": [
+            "J",
+            "S"
+          ]
+        }
+      ],
+      "early": null,
+      "node": "bag1.left"
+    },
+    "requires_note": "read as an order, checked against bag1.left by support (an S cell rests on a J cell)",
+    "seven_verbatim": "Here is the first bag with all 7 pieces:",
+    "seven_note": "the 7-lock board (the L stood on the O) and its mirror; read as bag1.l_top, the board ガムシロ積み's page draws as 基本形 1"
+  },
+  "basic_form": [],
+  "groups": [
+    {
+      "id": "2.a",
+      "heading": "Form A1 and A2 (L → O)",
+      "drawn": 2,
+      "text_verbatim": "The second bag is always placed in one of these ways. The first 2 ways are the most desirable ways. The first 4 ways can result in a Perfect Clear.",
+      "note": "the page's first two ways, one occupancy (checked), one PC list"
+    }
+  ],
+  "lists": [
+    {
+      "id": "2.a.pc",
+      "parent": "2.a",
+      "base": "2.a.after",
+      "bag": 3,
+      "heading": "L → O",
+      "board_first": 19,
+      "rate_verbatim": "L → O (99.09% PC rate, 22 minimal solutions)",
+      "stated_pattern_count": 22,
+      "shown": 6,
+      "rest_stated": 0,
+      "complete": false,
+      "total_lines": 8,
+      "total_lines_quote": "3.pc",
+      "drawn": 6
+    },
+    {
+      "id": "2.b.pc",
+      "parent": "2.b",
+      "base": "2.b.after",
+      "bag": 3,
+      "heading": "J → O",
+      "board_first": 27,
+      "rate_verbatim": "J → O (96.94% PC rate, 19 minimal solutions)",
+      "stated_pattern_count": 19,
+      "shown": 6,
+      "rest_stated": 0,
+      "complete": false,
+      "total_lines": 8,
+      "total_lines_quote": "3.pc",
+      "drawn": 6
+    },
+    {
+      "id": "2.c.pc",
+      "parent": "2.c",
+      "base": "2.c.after",
+      "bag": 3,
+      "heading": "S → O",
+      "board_first": 35,
+      "rate_verbatim": "S → O (86.59% PC rate, 15 minimal solutions)",
+      "stated_pattern_count": 15,
+      "shown": 6,
+      "rest_stated": 0,
+      "complete": false,
+      "total_lines": 8,
+      "total_lines_quote": "3.pc",
+      "drawn": 6
+    }
+  ],
+  "slot_flags": {
+    "has_u_slot": "the pattern draws a U (T-spin slot) cell",
+    "t_in_tsd_slot": "the pattern's four t cells are the flat ttt-over-t shape in its BOTTOM TWO body rows, where the board after the TST leaves its only TSD-shaped gap: a TSD before the PC (gamushiro-routes.json's flag, the same test)"
+  },
+  "known_discrepancies": [
+    {
+      "id": "2.a.pc:stated_vs_drawn",
+      "what": "the page states 22 minimal solutions for L → O and draws 6"
+    },
+    {
+      "id": "2.a.pc:non_exhaustive",
+      "what": "the 6 drawn L → O solutions are not every way to take the PC"
+    },
+    {
+      "id": "2.b.pc:stated_vs_drawn",
+      "what": "the page states 19 minimal solutions for J → O and draws 6"
+    },
+    {
+      "id": "2.b.pc:non_exhaustive",
+      "what": "the 6 drawn J → O solutions are not every way to take the PC"
+    },
+    {
+      "id": "2.c.pc:stated_vs_drawn",
+      "what": "the page states 15 minimal solutions for S → O and draws 6"
+    },
+    {
+      "id": "2.c.pc:non_exhaustive",
+      "what": "the 6 drawn S → O solutions are not every way to take the PC"
+    },
+    {
+      "id": "2.a2:arrow_vs_board",
+      "what": "Form A2 is headed L → O with Form A1, but its O lies under both Ls (the held one and the bag-2 one rest on it): the arrow is not the order its pieces went down, so no form's arrow is read as a dealing order"
+    },
+    {
+      "id": "forms:no_names_on_boards",
+      "what": "the five Second Bag boards carry no names; the forms are named only by later headings (Form A1 and A2 … Form D), read in board order"
+    }
+  ],
+  "page_order": [
+    "bag1.left",
+    "bag1.right",
+    "bag1.l_top",
+    "bag1.l_top_right",
+    "2.a1",
+    "2.a2",
+    "2.b",
+    "2.c",
+    "2.d",
+    "2.a.redraw",
+    "2.a.after",
+    "2.a.pc#1",
+    "2.a.pc#2",
+    "2.a.pc#3",
+    "2.a.pc#4",
+    "2.a.pc#5",
+    "2.a.pc#6",
+    "2.b.redraw",
+    "2.b.after",
+    "2.b.pc#1",
+    "2.b.pc#2",
+    "2.b.pc#3",
+    "2.b.pc#4",
+    "2.b.pc#5",
+    "2.b.pc#6",
+    "2.c.redraw",
+    "2.c.after",
+    "2.c.pc#1",
+    "2.c.pc#2",
+    "2.c.pc#3",
+    "2.c.pc#4",
+    "2.c.pc#5",
+    "2.c.pc#6"
+  ],
+  "nodes": [
+    {
+      "id": "bag1.left",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "board": 8,
+      "label_jp": "First Bag setup",
+      "label": "bag 1 with the L held (the first First Bag setup board; shiwehi's bag1.left)",
+      "rows": [
+        "----------",
+        "s------i--",
+        "ss----ti--",
+        "js-zzttioo",
+        "jjj-zztioo"
+      ]
+    },
+    {
+      "id": "bag1.right",
+      "bag": 1,
+      "parent": null,
+      "locks": 6,
+      "board": 9,
+      "label_jp": "First Bag setup — Mirrored",
+      "label": "bag 1 with the J held, mirrored",
+      "mirror_of": "bag1.left",
+      "rows": [
+        "----------",
+        "--i------z",
+        "--it----zz",
+        "ooittss-zl",
+        "ooitss-lll"
+      ]
+    },
+    {
+      "id": "bag1.l_top",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "board": 10,
+      "label_jp": "First Bag setup — the first bag with all 7 pieces",
+      "label": "bag 1 with all seven pieces: the L stood on the O at the right (shiwehi's bag1.l_top)",
+      "rows": [
+        "----------",
+        "--------l-",
+        "s------il-",
+        "ss----till",
+        "js-zzttioo",
+        "jjj-zztioo"
+      ]
+    },
+    {
+      "id": "bag1.l_top_right",
+      "bag": 1,
+      "parent": null,
+      "locks": 7,
+      "board": 11,
+      "label_jp": "First Bag setup — the first bag with all 7 pieces, Mirrored",
+      "label": "the seven-piece bag 1, mirrored",
+      "mirror_of": "bag1.l_top",
+      "rows": [
+        "----------",
+        "-j--------",
+        "-ji------z",
+        "jjit----zz",
+        "ooittss-zl",
+        "ooitss-lll"
+      ]
+    },
+    {
+      "id": "2.a1",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "locks": 13,
+      "label_jp": "Form A1 and A2 (L → O)",
+      "label": "Form A1: the O on the held L at the right (shiwehi's 2.normal#1)",
+      "form_heading_verbatim": "=== Form A1 and A2 (L → O) ===",
+      "board": 12,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "i-------oo",
+        "i-------oo",
+        "ijj-----ll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ],
+      "group": "2.a",
+      "variant": 1
+    },
+    {
+      "id": "2.a2",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "locks": 13,
+      "label_jp": "Form A1 and A2 (L → O)",
+      "label": "Form A2: the O at the right under both Ls (shiwehi's 2.normal#2)",
+      "form_heading_verbatim": "=== Form A1 and A2 (L → O) ===",
+      "board": 13,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "i-------ll",
+        "i-------Ll",
+        "ijj-----Ll",
+        "ij----ssLL",
+        "cjUzzsscoo",
+        "ccUUzzccoo",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ],
+      "group": "2.a",
+      "variant": 2
+    },
+    {
+      "id": "2.b",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "locks": 13,
+      "label_jp": "Form B (J → O)",
+      "label": "Form B: the O beside the I at the left",
+      "form_heading_verbatim": "=== Form B (J → O) ===",
+      "board": 14,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ioo-------",
+        "ioo-------",
+        "ijj-----ll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.c",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "locks": 13,
+      "label_jp": "Form C (S → O)",
+      "label": "Form C: the O in the middle, on the S",
+      "form_heading_verbatim": "=== Form C (S → O) ===",
+      "board": 15,
+      "condition": null,
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "i---------",
+        "i-----oo--",
+        "ijj---ooll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.d",
+      "bag": 2,
+      "parent": null,
+      "base": "bag1.left",
+      "spin": "TST",
+      "locks": 13,
+      "label_jp": "Form D (O → L)",
+      "label": "Form D: the I stood at the right wall, the O and L stacked over the held L",
+      "form_heading_verbatim": "=== Form D (O → L) ===",
+      "board": 16,
+      "condition": null,
+      "rows": [
+        "----------",
+        "-------l--",
+        "-------l--",
+        "-------ll-",
+        "-------ooi",
+        "-jj----ooi",
+        "-j----ssLi",
+        "cjUzzsscLi",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ],
+      "unmatchable": "10 non-empty rows > ROWS = 8",
+      "pc_note": "the page says only the first 4 forms can take the PC: no PC list hangs under Form D"
+    },
+    {
+      "id": "2.a.redraw",
+      "bag": 2,
+      "parent": "2.a",
+      "node_kind": "illustration",
+      "board": 17,
+      "redraw_of": "2.a1",
+      "label_jp": "Third Bag (Perfect Clear) — L → O",
+      "label": "Form A1 redrawn over its PC list (checked: the same board)",
+      "rows": [
+        "----------",
+        "i-------oo",
+        "i-------oo",
+        "ijj-----ll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.a.after",
+      "bag": 2,
+      "parent": "2.a",
+      "node_kind": "illustration",
+      "board": 18,
+      "after_of": "2.a1",
+      "label": "Forms A1 and A2 after the TST (checked by occupancy; the two forms leave one board)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "i-------oo",
+        "i-------oo",
+        "ijj-----ll",
+        "ij----ssll",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.a.pc#1",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 1,
+      "board": 19,
+      "listed_under": "shown",
+      "label_jp": "L → O 1",
+      "pieces": "ijlstz",
+      "rows": [
+        "----------",
+        "cjiiiillcc",
+        "cjjjsszlcc",
+        "cccsszzlcc",
+        "cctttzcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.a.pc#2",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 2,
+      "board": 20,
+      "listed_under": "shown",
+      "label_jp": "L → O 2",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cjiiiioocc",
+        "cjjjssoocc",
+        "cccsslllcc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.a.pc#3",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 3,
+      "board": 21,
+      "listed_under": "shown",
+      "label_jp": "L → O 3",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "ciiiilllcc",
+        "cjjjsloocc",
+        "cccjssoocc",
+        "cctttscccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.a.pc#4",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 4,
+      "board": 22,
+      "listed_under": "shown",
+      "label_jp": "L → O 4",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "coojjtttcc",
+        "coojsstlcc",
+        "cccsslllcc",
+        "cciiiicccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.a.pc#5",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 5,
+      "board": 23,
+      "listed_under": "shown",
+      "label_jp": "L → O 5",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "ciiiizoocc",
+        "cjjjzzoocc",
+        "cccjzlllcc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.a.pc#6",
+      "bag": 3,
+      "parent": "2.a",
+      "base": "2.a.after",
+      "list": "2.a.pc",
+      "index": 6,
+      "board": 24,
+      "listed_under": "shown",
+      "label_jp": "L → O 6",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "cjzziiiicc",
+        "cjjjlloocc",
+        "ccczzloocc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.a.pc.rest",
+      "bag": 3,
+      "parent": "2.a",
+      "node_kind": "text_only",
+      "label_jp": "L → O（冇畫嘅解法）",
+      "page_text": "22 minimal solutions",
+      "note": "the page states 22 minimal solutions and draws 6; the rest are not on it"
+    },
+    {
+      "id": "2.b.redraw",
+      "bag": 2,
+      "parent": "2.b",
+      "node_kind": "illustration",
+      "board": 25,
+      "redraw_of": "2.b",
+      "label_jp": "Third Bag (Perfect Clear) — J → O",
+      "label": "Form B redrawn over its PC list (checked: the same board)",
+      "rows": [
+        "----------",
+        "ioo-------",
+        "ioo-------",
+        "ijj-----ll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.b.after",
+      "bag": 2,
+      "parent": "2.b",
+      "node_kind": "illustration",
+      "board": 26,
+      "after_of": "2.b",
+      "label": "Form B after the TST (checked by occupancy)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "ioo-------",
+        "ioo-------",
+        "ijj-----ll",
+        "ij----ssll",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.b.pc#1",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 1,
+      "board": 27,
+      "listed_under": "shown",
+      "label_jp": "J → O 1",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "cccooiiiil",
+        "cccoozzlll",
+        "cccjjjzzcc",
+        "cctttjcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.b.pc#2",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 2,
+      "board": 28,
+      "listed_under": "shown",
+      "label_jp": "J → O 2",
+      "pieces": "ijlstz",
+      "rows": [
+        "----------",
+        "cccjjiiiil",
+        "cccjszzlll",
+        "cccjsszzcc",
+        "cctttscccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.b.pc#3",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 3,
+      "board": 29,
+      "listed_under": "shown",
+      "label_jp": "J → O 3",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cccoosiiii",
+        "cccoosslll",
+        "cccjjjslcc",
+        "cctttjcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.b.pc#4",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 4,
+      "board": 30,
+      "listed_under": "shown",
+      "label_jp": "J → O 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "cccjjjiiii",
+        "cccoojzlll",
+        "cccoozzlcc",
+        "cctttzcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.b.pc#5",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 5,
+      "board": 31,
+      "listed_under": "shown",
+      "label_jp": "J → O 5",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cccjjtttoo",
+        "cccjsstloo",
+        "cccsslllcc",
+        "cciiiicccc",
+        "cccjcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.b.pc#6",
+      "bag": 3,
+      "parent": "2.b",
+      "base": "2.b.after",
+      "list": "2.b.pc",
+      "index": 6,
+      "board": 32,
+      "listed_under": "shown",
+      "label_jp": "J → O 6",
+      "pieces": "jlostz",
+      "rows": [
+        "----------",
+        "cccjsslloo",
+        "cccjjjzloo",
+        "cccsszzlcc",
+        "cctttzcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.b.pc.rest",
+      "bag": 3,
+      "parent": "2.b",
+      "node_kind": "text_only",
+      "label_jp": "J → O（冇畫嘅解法）",
+      "page_text": "19 minimal solutions",
+      "note": "the page states 19 minimal solutions and draws 6; the rest are not on it"
+    },
+    {
+      "id": "2.c.redraw",
+      "bag": 2,
+      "parent": "2.c",
+      "node_kind": "illustration",
+      "board": 33,
+      "redraw_of": "2.c",
+      "label_jp": "Third Bag (Perfect Clear) — S → O",
+      "label": "Form C redrawn over its PC list (checked: the same board)",
+      "rows": [
+        "----------",
+        "i---------",
+        "i-----oo--",
+        "ijj---ooll",
+        "ij----ssLl",
+        "cjUzzsscLl",
+        "ccUUzzccLL",
+        "ccUccccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.c.after",
+      "bag": 2,
+      "parent": "2.c",
+      "node_kind": "illustration",
+      "board": 34,
+      "after_of": "2.c",
+      "label": "Form C after the TST (checked by occupancy)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "i---------",
+        "i-----oo--",
+        "ijj---ooll",
+        "ij----ssll",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "2.c.pc#1",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 1,
+      "board": 35,
+      "listed_under": "shown",
+      "label_jp": "S → O 1",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "ciiiillloo",
+        "cjjjslccoo",
+        "cccjsscccc",
+        "cctttscccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.c.pc#2",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 2,
+      "board": 36,
+      "listed_under": "shown",
+      "label_jp": "S → O 2",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cllliiiioo",
+        "clstttccoo",
+        "cccjjjcccc",
+        "ccsstjcccc",
+        "cccscccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.c.pc#3",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 3,
+      "board": 37,
+      "listed_under": "shown",
+      "label_jp": "S → O 3",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cllliiiioo",
+        "clsjjjccoo",
+        "ccctttcccc",
+        "ccsstjcccc",
+        "cccscccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.c.pc#4",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 4,
+      "board": 38,
+      "listed_under": "shown",
+      "label_jp": "S → O 4",
+      "pieces": "ijlotz",
+      "rows": [
+        "----------",
+        "cjzziiiioo",
+        "cjjjllccoo",
+        "ccczzlcccc",
+        "cctttlcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": true
+    },
+    {
+      "id": "2.c.pc#5",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 5,
+      "board": 39,
+      "listed_under": "shown",
+      "label_jp": "S → O 5",
+      "pieces": "ijlost",
+      "rows": [
+        "----------",
+        "cllliiiioo",
+        "cltttjccoo",
+        "cccssjcccc",
+        "ccssjjcccc",
+        "ccctcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.c.pc#6",
+      "bag": 3,
+      "parent": "2.c",
+      "base": "2.c.after",
+      "list": "2.c.pc",
+      "index": 6,
+      "board": 40,
+      "listed_under": "shown",
+      "label_jp": "S → O 6",
+      "pieces": "jlostz",
+      "rows": [
+        "----------",
+        "cstttllloo",
+        "csstzlccoo",
+        "cccjjjcccc",
+        "ccszzjcccc",
+        "ccczcccccc"
+      ],
+      "has_u_slot": false,
+      "t_in_tsd_slot": false
+    },
+    {
+      "id": "2.c.pc.rest",
+      "bag": 3,
+      "parent": "2.c",
+      "node_kind": "text_only",
+      "label_jp": "S → O（冇畫嘅解法）",
+      "page_text": "15 minimal solutions",
+      "note": "the page states 15 minimal solutions and draws 6; the rest are not on it"
+    }
+  ]
+}

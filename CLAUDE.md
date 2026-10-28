@@ -305,6 +305,14 @@ bun pipeline/sim/emit-route-demos.ts --opener gamushiro \
   --out analysis/gamushiro-demos.json                           # the constructed ガムシロ積み demos (quarantined, not corpus data)
 bun test pipeline/openers/gamushiro.test.ts pipeline/openers/gamushiro-demos.test.ts  # its two tests
 python3 -m pipeline.gamushiro_page --selftest   # the docs/gamushiro*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_hdgamushiro_routes            # CI gate: harddrop's ガムシロ積み route transcription
+python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest #   its mutants; --html-dir <dir> re-checks the Gamushiro_Stacking wikitext snapshot
+bun pipeline/sim/emit-route-facts.ts --opener hdgamushiro \
+  --out analysis/hdgamushiro-facts.json                         # its corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener hdgamushiro \
+  --out analysis/hdgamushiro-demos.json                         # its constructed demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/hdgamushiro.test.ts pipeline/openers/hdgamushiro-demos.test.ts  # its two tests
+python3 -m pipeline.hdgamushiro_page --selftest # the docs/hdgamushiro*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_sdpcspin_routes            # CI gate: the SDPC Spin route transcription
 python3 -m pipeline.openers.extract_sdpcspin_routes --selftest #   its mutants; --html-dir <dir> re-checks the two harddrop wikitext snapshots (SDPC_Spin + SingleYou)
 bun pipeline/sim/emit-route-facts.ts --opener sdpcspin \
@@ -3716,7 +3724,7 @@ as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み、SDPC Spin）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み（兩個版本）、SDPC Spin）— the opener route pages, quarantined like the replays
 
 Six opener pages are transcribed and matched against the corpus — five from shiwehi.com, 迷走砲
 (Stray Cannon, `meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous
@@ -4158,6 +4166,35 @@ The named lists are `BAG2_NONE_UNEXPLAINED`, `NOT_TRIPLE_FIRST`, and the measure
 `DEMO_SPIN_LINES`, `DEMO_SPIN_EXCEPTIONS` and `DEMO_PIECE_READINGS`. Sizes are read off the tests.
 `no180` is a control; `ignoreConditions` is a MUTANT here, as on はちみつ砲: the bag-1 no-hold orders
 (J before S, Z before T) are not forced by gravity.
+
+### ガムシロ積み（harddrop 版）
+
+The same deliverable for harddrop's own `Gamushiro_Stacking` page, read as wikitext and pinned by
+revision like SDPC Spin's (`source.revision_sha1`, so `check_wikitext_sources` discovers it and
+refetches it weekly): `pipeline/openers/hdgamushiro-routes.json` (gated by
+`extract_hdgamushiro_routes.py`), `analysis/hdgamushiro-facts.json` (`hdgamushiro.test.ts`),
+`analysis/hdgamushiro-demos.json` (`hdgamushiro-demos.test.ts`), and `docs/hdgamushiro.html` plus
+`hdgamushiro-bag1-only.html` and `hdgamushiro-demos.html`. It was added because a 2026-10-27 video
+yachi sent plays ガムシロ積み into a Perfect Clear, and harddrop draws the PC routes shiwehi.com's
+page does not. Counts are read off the artefacts and tests, never typed here.
+
+**It is the same opener as the shiwehi page, so it is a PAGE-ONLY site.** Its bag 1 and its first
+bag-2 form (`2.a1`, `2.a2`) equal shiwehi's (`bag1.*`, `2.normal#1/#2`) cell for cell with every `U`
+read as empty — that is its cross-source, a new `routes_file` route in `route_transcription.py`
+naming the pairs — and `hdgamushiro.test.ts` holds the two artefacts' bag-1 cases, opportunities and
+`2.a1` / `2.normal#1` counts equal. So it is in `pipeline.sites.PAGE_ONLY_ROUTE_SITES`: a card on the
+index (`INDEX_ROUTE_SITES`, beside gamushiro's) and NO report column and NO replay label, which
+would repeat gamushiro's on every session. Forms B, C and D and their PC lists have no second source,
+and the page says so. The two pages link to each other (`route_page`'s opt-in `see_also`).
+
+**The PC lists are not exhaustive and the transcription says so.** Each list states a count of
+minimal solutions larger than the boards it draws; the rest is a `text_only` node per list
+(`2.<x>.pc.rest`), never a board, and the gap is a named discrepancy (`stated_vs_drawn`,
+`non_exhaustive`). Boards on the wiki page this repo does not transcribe are recorded with a reason
+(`boards_not_transcribed`), and the selftest's synthetic snapshot reinserts them so a skipped board
+cannot hide an edit. `TSD_NOT_FIRED` names the three PC patterns the planner builds without their
+TSD, each with the measured reason; `ignoreConditions` and `no180` are controls here, `noSwapDeal`
+equivalent. Named lists and their sizes live in the two tests.
 
 ### SDPC Spin
 

@@ -743,6 +743,17 @@ jobs:
       - name: Check the Gamushiro Stacking route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
 
+      # harddrop's own ガムシロ積み page (Gamushiro_Stacking, read as wikitext and pinned by revision),
+      # through the same shared gate: its bag 1 and its four bag-2 forms with the three PC lists under
+      # them. Its routes_file cross-source is shiwehi.com's transcription (gamushiro-routes.json); the
+      # pinned revision is refetched weekly by wikitext-sources.yml. Its corpus artefact and demos are
+      # checked by hdgamushiro.test.ts and hdgamushiro-demos.test.ts in the whole-suite `bun test`.
+      - name: Check the harddrop Gamushiro Stacking route transcription
+        run: python3 -m pipeline.openers.extract_hdgamushiro_routes
+
+      - name: Check the harddrop Gamushiro Stacking route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest
+
       # The SDPC Spin route transcription, through the same shared gate. Its source is harddrop's
       # SDPC_Spin page read as wikitext (not shiwehi.com HTML), and bag 1 is cross-checked against
       # harddrop's SingleYou page (table 0), stick spin's bag1.pc mirrored and Ivan's catalogue entry;
@@ -791,6 +802,12 @@ jobs:
       # typescript job. A reference opener the corpus barely plays: only the bag-1-only node page.
       - name: Check the Gamushiro Stacking page audit catches its corruptions
         run: python3 -m pipeline.gamushiro_page --selftest
+
+      # The harddrop ガムシロ積み route pages, the same shared renderer bound to
+      # pipeline/hdgamushiro_page.py. A page-only site (pipeline.sites.PAGE_ONLY_ROUTE_SITES): a card
+      # on the index and no report column or replay label, since gamushiro's already cover its cases.
+      - name: Check the harddrop Gamushiro Stacking page audit catches its corruptions
+        run: python3 -m pipeline.hdgamushiro_page --selftest
 
       # The SDPC Spin route pages, the same shared renderer bound to pipeline/sdpcspin_page.py;
       # build-docs --check below re-renders them, and the constructed demos (sdpcspin-demos.html) are

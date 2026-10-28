@@ -111,6 +111,11 @@ class TranscriptionSpec:
     #: bag 1 against SingleYou's), recorded in `cross_source` with kind `harddrop_wikitext`; the
     #: fields are in this file's alphabet, read by `wikitext_tables` / `wikitext_cell`
     harddrop_wikitext: dict | None = None
+    #: {'file': another committed `*-routes.json` in this directory, 'pairs': [[mine, theirs], ...]}:
+    #: rule 2 against another site's transcription of the same opener (the harddrop ガムシロ積み page
+    #: against shiwehi.com's), each pair equal cell for cell with every U read as empty, as drawn or
+    #: mirrored. Both files are committed, so the check is offline and needs no snapshot.
+    routes_file: dict | None = None
 
 
 # ── board geometry ─────────────────────────────────────────────────────────────────────────────
@@ -325,9 +330,9 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
 
     # ── rule 2: cross-source against harddrop ──
     if spec.harddrop is None and spec.catalogue is None and spec.harddrop_page is None \
-            and spec.harddrop_wikitext is None:
+            and spec.harddrop_wikitext is None and spec.routes_file is None:
         bad.append('harddrop: the spec names no cross-source (neither harddrop nor a catalogue entry '
-                   'nor a harddrop page nor a harddrop wikitext)')
+                   'nor a harddrop page nor a harddrop wikitext nor another routes file)')
     if spec.harddrop is not None:
         wiki = json.loads(WIKI.read_text())
         key, hnode = spec.harddrop['key'], spec.harddrop['node']
@@ -410,6 +415,25 @@ def verify(data: dict, spec: TranscriptionSpec) -> list[str]:
             hit |= mine & fields
         if fields and fields - hit:
             bad.append(f'harddrop-wikitext: {len(fields - hit)} field(s) of the table match no named node')
+
+    if spec.routes_file is not None:
+        xs = data.get('cross_source') or {}
+        if xs.get('kind') != 'routes_file' or xs.get('file') != spec.routes_file['file'] or \
+                xs.get('pairs') != spec.routes_file['pairs']:
+            bad.append('routes-file: cross_source does not record the spec\'s routes file and pairs')
+        other = json.loads((HERE / spec.routes_file['file']).read_text())
+        theirs_by = {n['id']: n['rows'] for n in other['nodes'] if 'rows' in n}
+
+        def no_u(rows):
+            return bottom([r.replace('U', EMPTY) for r in rows], 0)
+        for mine, theirs in spec.routes_file['pairs']:
+            if mine not in boards or theirs not in theirs_by:
+                bad.append(f'routes-file: {mine} or {spec.routes_file["file"]} {theirs} is missing')
+                continue
+            a, b = no_u(boards[mine]), no_u(theirs_by[theirs])
+            if a != b and a != mirror(b):
+                bad.append(f'routes-file: {mine} is not {spec.routes_file["file"]} {theirs} cell for cell '
+                           '(U read as empty), as drawn or mirrored')
 
     # ── rule 3: internal consistency ──
     #: a list may name its own line count (a 4-line PC drawn in bag 2, a PC after more than one
@@ -652,11 +676,15 @@ def wikitext_tables(text: str) -> list[list[list[list[str]]]]:
     return tables
 
 
-def wikitext_cell(code: str) -> str:
+def wikitext_cell(code: str, readings: dict | None = None) -> str:
     """One harddrop cell code in a route file's alphabet: blank `-`, grey G `c` (cells placed before
     this diagram), the T in its spin `U` (drawn P, and T on some boards), `'` the vacated-cell mark
-    `v`, a muted two-letter `L<x>` the upper-case `<x>`, any other piece letter its lower case."""
+    `v`, a muted two-letter `L<x>` the upper-case `<x>`, any other piece letter its lower case.
+    `readings` (opt-in, a routes file's `source.wikitext_readings`) overrides a code first: a page that
+    draws an ordinary T as `T` and only the spun T as `P` (harddrop's ガムシロ積み) reads `T` as `t`."""
     c = code.strip()
+    if readings and c in readings:
+        return readings[c]
     if c == '':
         return EMPTY
     if c == 'G':
@@ -679,11 +707,23 @@ def wikitext_page_cell(ch: str) -> str:
     return {'c': 'G', 'U': 'P', 'v': "'"}.get(ch, ('L' + ch) if ch.isupper() else ch.upper())
 
 
-def wikitext_boards(text: str, table: int | None = None) -> list[list[str]]:
-    """The boards of one table (or of every table, in page order) in the route alphabet."""
+def wikitext_boards(text: str, table: int | None = None, readings: dict | None = None,
+                    skip: frozenset = frozenset()) -> list[list[str] | None]:
+    """The boards of one table (or of every table, in page order) in the route alphabet. A board whose
+    page-order index is in `skip` (a board the routes file does not transcribe) is not read at all and
+    comes back as None, so a cell code no reading covers there is not an error."""
     tables = wikitext_tables(text)
     chosen = tables if table is None else [tables[table]]
-    return [[''.join(wikitext_cell(c) for c in row) for row in b] for t in chosen for b in t]
+    flat = [b for t in chosen for b in t]
+    return [None if k in skip else [''.join(wikitext_cell(c, readings) for c in row) for row in b]
+            for k, b in enumerate(flat)]
+
+
+def skipped_boards(source: dict) -> frozenset:
+    """The page-order indexes (0-based, every board of the page) a routes file's
+    `source.boards_not_transcribed` names, each entry {'boards': [first, last], 'heading', 'reason'}."""
+    return frozenset(k for e in source.get('boards_not_transcribed', [])
+                     for k in range(e['boards'][0], e['boards'][1] + 1))
 
 
 def synthetic_wikitext(tables: list[list[list[str]]]) -> str:
@@ -726,7 +766,20 @@ def check_snapshot(data: dict, html_dir: Path, indented: bool = False) -> list[s
             bad.append(f'snapshot: quote {q["id"]} is not verbatim on the page')
     want = [rows[i] for i in data['page_order']]
     # a harddrop WIKITEXT snapshot (SDPC Spin) holds its boards as {{pfrow}} templates, not as lines
-    got = wikitext_boards(text) if p.suffix == '.wikitext' else page_boards(text, indented)
+    if p.suffix == '.wikitext':
+        # a page the routes file transcribes only part of (harddrop's ガムシロ積み) names the boards it
+        # leaves out; every other board is read, and the count must still be the page's
+        skip = skipped_boards(data['source'])
+        try:
+            every = wikitext_boards(text, readings=data['source'].get('wikitext_readings'), skip=skip)
+        except ValueError as e:
+            return bad + [f'snapshot: the page does not parse: {e}']
+        got = [b for k, b in enumerate(every) if k not in skip]
+        if skip and (len(every) != len(want) + len(skip) or max(skip) >= len(every)):
+            bad.append(f'snapshot: the page draws {len(every)} boards, the routes file transcribes '
+                       f'{len(want)} and names {len(skip)} it leaves out')
+    else:
+        got = page_boards(text, indented)
     if got != want:
         bad.append(f'snapshot: the page draws {len(got)} boards, page_order has {len(want)}')
         for k, (a, b) in enumerate(zip(got, want)):
@@ -742,7 +795,8 @@ def check_cross_source(data: dict, html_dir: Path) -> list[str]:
     `wiki-openers.json` is transcribed with: the recorded fields must be exactly the page's diagrams
     under the recorded heading, trimmed, in order. A missing file is a failure, not a skip."""
     xs = data.get('cross_source')
-    if not xs:
+    if not xs or xs.get('kind') == 'routes_file':
+        # another committed routes file: rule 2 checks it offline, there is no snapshot to re-read
         return []
     if xs.get('kind') == 'harddrop_wikitext':
         return check_wikitext_cross_source(xs, html_dir)
@@ -801,8 +855,12 @@ def synthetic_snapshot(base: dict) -> str:
     rows = {n['id']: n['rows'] for n in base['nodes'] if 'rows' in n}
     rows.update({b['id']: b['rows'] for b in base['basic_form']})
     if base['source']['snapshot_file'].endswith('.wikitext'):
-        # a harddrop wikitext page: every board in one table, then the sentences
-        text = synthetic_wikitext([[rows[i] for i in base['page_order']]])
+        # a harddrop wikitext page: every board in one table, then the sentences; a board the routes
+        # file leaves out is an empty board at its own index
+        drawn = [rows[i] for i in base['page_order']]
+        for k in sorted(skipped_boards(base['source'])):
+            drawn.insert(k, [EMPTY * WIDTH])
+        text = synthetic_wikitext([drawn])
         text += ' ' + ' '.join(n['page_text'] for n in base['nodes'] if 'page_text' in n)
         return text + ' ' + ' '.join(q['verbatim'] for q in base.get('quotes', []) if q.get('rendered', True))
     md = '\n\n'.join('\n'.join(('\\' + r) if r.startswith('-') else r for r in rows[i])
@@ -890,7 +948,7 @@ def run_selftest(spec: TranscriptionSpec, mutants: list, snapshot_edits: dict,
     else:
         print('  killed: a non-board feature gone from the page snapshot  [snapshot:]')
     xs = base.get('cross_source')
-    if xs:
+    if xs and xs.get('kind') != 'routes_file':
         # the cross-source re-check: a faithful page passes, one changed cell and a missing file fail
         wikitext = xs.get('kind') == 'harddrop_wikitext'
         blank = EMPTY if wikitext else '.'

@@ -56,7 +56,7 @@ def _root(session):
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
 from pipeline import dpc_page, replay_labels, secondpc_page, technique_page  # noqa: E402
-from pipeline.sites import ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
+from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -502,12 +502,12 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX]
+    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
             return 1
-    for site in ROUTE_SITES:
+    for site in INDEX_ROUTE_SITES:
         who = site.PROSE["opener_name"]
         rs_inputs = site.load_inputs(str(REPO))
         rs_pages = site.render_all(str(REPO), rs_inputs)
