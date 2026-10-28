@@ -406,6 +406,11 @@ python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wik
 bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
 bun test pipeline/openers/dpc.test.ts            #   byte rebuild, the allclear anchor, named list + mutants
 python3 -m pipeline.dpc_page --selftest          # the docs/dpc.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_secondpc_setups            # CI gate: harddrop's Second Perfect Clear page
+python3 -m pipeline.openers.extract_secondpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-secondpc-facts.ts --out analysis/secondpc-facts.json  # a PC straight into a 4-line PC, against those setups (quarantined)
+bun test pipeline/openers/secondpc.test.ts       #   byte rebuild, the allclear anchor (= dpc-facts'), every drawn solution, named list + mutants
+python3 -m pipeline.secondpc_page --selftest     # the docs/secondpc.html audit's mutants (--out-dir <dir> renders)
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -5205,6 +5210,23 @@ sends that PC's attack in packets the oracle sends as one; every case says wheth
 and the page prints both counts. It is NOT in `TECHNIQUE_SITES` (`replay_labels` and the report's
 routes section read that list); `bin/build-docs` renders it in its own loop. Counts, the named
 `MATCHED` list and the Shachiku cross-check live in `dpc.test.ts`, never here.
+
+## 第二次全消頁 — a Perfect Clear straight into a four-line one
+
+harddrop's Second Perfect Clear page (one pinned revision; the sister page of queue-based setups is
+recorded in `source.declined` with its reason) is transcribed into `pipeline/openers/secondpc-setups.json`
+(gated by `extract_secondpc_setups.py`, discovered weekly by `check_wikitext_sources`). A board is a
+SETUP (no `G`, no full row, whole pieces by count) or a SOLUTION (every row full, its `G` cells exactly the
+occupancy of the setup before it under the same heading); a lower-case letter is harddrop shading a second
+piece of that letter and is read as that piece. `pipeline/sim/secondpc-facts.ts` → `analysis/secondpc-facts.json`
+takes consecutive PC points of a player-round and, when the second clears exactly four lines with no garbage
+between, draws the pieces between them in the four-row kept-rows frame and compares that layout with every
+drawn solution (letter for letter, mirrored with J↔L and S↔Z) and every setup (whole pieces, placed first).
+Its PC loop is a COPY of `dpc-facts.ts`'s, and `secondpc.test.ts` holds its per-player `pc_points` and
+`rounds_rowmap_stops` equal to the DPC artefact's. `docs/secondpc.html` from `pipeline/secondpc_page.py` +
+`secondpc_prose.json` is a 中盤手法 card rendered in `bin/build-docs`'s DPC loop, not in `TECHNIQUE_SITES`.
+Same quarantine as the DPC page. The cases are a named list in the test (none matches harddrop at the time
+of writing); every other PC point is counted out by reason, and the accounting test makes them sum.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

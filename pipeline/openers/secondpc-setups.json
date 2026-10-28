@@ -1,0 +1,4167 @@
+{
+ "schema": "secondpc-setups/1",
+ "means": "Every board of harddrop's Second Perfect Clear page, parsed from a pinned MediaWiki revision: each board with no grey is a setup placed from empty, each board with grey a four-line Perfect Clear drawn on the setup before it. Quarantined: no claim ids, no badges.",
+ "source": {
+  "site": "harddrop.com wiki",
+  "terms": "not stated; the page credits by link",
+  "fetched": "2026-10-27, urllib through api.php (formatversion 2); MediaWiki's revision sha1 equals the sha1 of the bytes read",
+  "redirects": [
+   "2nd PC",
+   "Second PC"
+  ],
+  "definition": "To solve 1st PC, you must take 3 pieces out of the 2nd bag. There will then be four leftover pieces, which are usually used in the setup. Since you use six out of the seven pieces out of the new bag to solve 2nd PC, the unused piece is referred to as the \"saved piece,\" and will be the 3rd PC/DPC you go to.",
+  "declined": [
+   {
+    "title": "Second perfect clear queuebased setups",
+    "url": "https://harddrop.com/wiki/Second_perfect_clear_queuebased_setups",
+    "oldid": 44672,
+    "date": "2026-10-27",
+    "reason": "draws next-bag pieces in lower case and some solutions after a line clear, which this transcription's rule (setup from empty, solution = four full rows on it) does not read; not transcribed"
+   }
+  ]
+ },
+ "pages": [
+  {
+   "key": "main",
+   "title": "Second Perfect Clear",
+   "url": "https://harddrop.com/wiki/Second_Perfect_Clear",
+   "oldid": 44664,
+   "revision_sha1": "f85de20ae05912a2933f6eb7a5e92d40963593da",
+   "snapshot_file": "Second_Perfect_Clear.wikitext",
+   "snapshot_sha256": "75e865cad7094a846864ba401f62a80e80cbb592d692318513c4d1e1208eaef9",
+   "snapshot_bytes": 45334
+  }
+ ],
+ "boards": [
+  {
+   "id": "main.000",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 1,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "L.....J...",
+    "L..T..JOO.",
+    "LLTTTJJOO."
+   ]
+  },
+  {
+   "id": "main.001",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 2,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "LLJJTTTOOI",
+    "GLJZZTGOOI",
+    "GLJGZZGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.002",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 2,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "TTTLLJJOOI",
+    "GTSSLJGOOI",
+    "GSSGLJGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.003",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 3,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "ZZSSLLLOOI",
+    "GSSJJJGOOI",
+    "GZZGLJGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.004",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 3,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "ZZSSLLLOOI",
+    "GZZJJJGOOI",
+    "GSSGLJGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.005",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 3,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJZZSSOOI",
+    "GLLLZZGOOI",
+    "GLJGSSGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.006",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "table": 3,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJZZSSOOI",
+    "GLLLSSGOOI",
+    "GLJGZZGGGI",
+    "GGGGGGGGGI"
+   ]
+  },
+  {
+   "id": "main.007",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 4,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OO........",
+    "OO.......T",
+    "LLL.....TT",
+    "LIIII....T"
+   ]
+  },
+  {
+   "id": "main.008",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLLIJJSS",
+    "GGLOOIJSSG",
+    "GGGOOIJTGG",
+    "GGGGGITTTG"
+   ]
+  },
+  {
+   "id": "main.009",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIIJJSS",
+    "GGZZLLJSSG",
+    "GGGZZLJTGG",
+    "GGGGGLTTTG"
+   ]
+  },
+  {
+   "id": "main.010",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGJIIIITTT",
+    "GGJJJLSSTG",
+    "GGGLLLZZGG",
+    "GGGGGSSZZG"
+   ]
+  },
+  {
+   "id": "main.011",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLLISTTT",
+    "GGLOOISSTG",
+    "GGGOOIJSGG",
+    "GGGGGIJJJG"
+   ]
+  },
+  {
+   "id": "main.012",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGSIIIITTT",
+    "GGSSJJJLTG",
+    "GGGSZZJLGG",
+    "GGGGGZZLLG"
+   ]
+  },
+  {
+   "id": "main.013",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLLIJJSS",
+    "GGLOOIJSSG",
+    "GGGOOIZZGG",
+    "GGGGGIJZZG"
+   ]
+  },
+  {
+   "id": "main.014",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 5,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLLTTTSS",
+    "GGLIIIISSG",
+    "GGGJJJZZGG",
+    "GGGGGJTZZG"
+   ]
+  },
+  {
+   "id": "main.015",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 6,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLLTTTSS",
+    "GGLOOJJSSG",
+    "GGGOOJZZGG",
+    "GGGGGJTZZG"
+   ]
+  },
+  {
+   "id": "main.016",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 6,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGOOJIZZSS",
+    "GGOOJITSSG",
+    "GGGJJITTGG",
+    "GGGGGITZZG"
+   ]
+  },
+  {
+   "id": "main.017",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 6,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGSZZTTTJJ",
+    "GGSSZZTLJG",
+    "GGGSIIIIGG",
+    "GGGGGLLLJG"
+   ]
+  },
+  {
+   "id": "main.018",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGJIIIITTT",
+    "GGJJJLZZTG",
+    "GGGLLLSSGG",
+    "GGGGGSSZZG"
+   ]
+  },
+  {
+   "id": "main.019",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIISTTT",
+    "GGZZLLSSTG",
+    "GGGZZLJSGG",
+    "GGGGGLJJJG"
+   ]
+  },
+  {
+   "id": "main.020",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLIJJSS",
+    "GGLLLIJSSG",
+    "GGGZZIJTGG",
+    "GGGGGITTTG"
+   ]
+  },
+  {
+   "id": "main.021",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLIJJSS",
+    "GGLLLIJSSG",
+    "GGGZZIJTGG",
+    "GGGGGITTTG"
+   ]
+  },
+  {
+   "id": "main.022",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGSZZLLIJJ",
+    "GGSSZZLIJG",
+    "GGGSTTTIGG",
+    "GGGGGTLIJG"
+   ]
+  },
+  {
+   "id": "main.023",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGOOZZJLLL",
+    "GGOOSSJJJG",
+    "GGGSSZZLGG",
+    "GGGGGIIIIG"
+   ]
+  },
+  {
+   "id": "main.024",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 7,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGOOJLLLSS",
+    "GGOOJZZSSG",
+    "GGGJJLZZGG",
+    "GGGGGIIIIG"
+   ]
+  },
+  {
+   "id": "main.025",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLISTTT",
+    "GGLLLISSTG",
+    "GGGZZIJSGG",
+    "GGGGGIJJJG"
+   ]
+  },
+  {
+   "id": "main.026",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGJJJLLLSS",
+    "GGZZJIIIIG",
+    "GGGZZTTTGG",
+    "GGGGGLTSSG"
+   ]
+  },
+  {
+   "id": "main.027",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLLJJSS",
+    "GGIIIIJSSG",
+    "GGGZZLJTGG",
+    "GGGGGLTTTG"
+   ]
+  },
+  {
+   "id": "main.028",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGOOLLLZSS",
+    "GGOOLIIIIG",
+    "GGGJJJZZGG",
+    "GGGGGJZSSG"
+   ]
+  },
+  {
+   "id": "main.029",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJJJTSS",
+    "GGIIIITTTG",
+    "GGGZZLLLGG",
+    "GGGGGLJSSG"
+   ]
+  },
+  {
+   "id": "main.030",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLLJJSS",
+    "GGIIIITTTG",
+    "GGGZZLJTGG",
+    "GGGGGLJSSG"
+   ]
+  },
+  {
+   "id": "main.031",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "table": 8,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGOOSSJLLL",
+    "GGOOZZJJJG",
+    "GGGSSZZLGG",
+    "GGGGGIIIIG"
+   ]
+  },
+  {
+   "id": "main.032",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 9,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........T",
+    "JJ......TT",
+    "JOO....ZZT",
+    "JOO.....ZZ"
+   ]
+  },
+  {
+   "id": "main.033",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 9,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    "LS......TI",
+    "LSS....TTI",
+    "LLS.....TI"
+   ]
+  },
+  {
+   "id": "main.034",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 9,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........T",
+    "OO......TT",
+    "OOL....ZZT",
+    "LLL.....ZZ"
+   ]
+  },
+  {
+   "id": "main.035",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJITTTSSG",
+    "GGJILTSSGG",
+    "GGGILZZGGG",
+    "GGGILLZZGG"
+   ]
+  },
+  {
+   "id": "main.036",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILJJSSG",
+    "GGLLLJSSGG",
+    "GGGOOJTGGG",
+    "GGGOOTTTGG"
+   ]
+  },
+  {
+   "id": "main.037",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJOOSTTTG",
+    "GGJOOSSTGG",
+    "GGGLLLSGGG",
+    "GGGLIIIIGG"
+   ]
+  },
+  {
+   "id": "main.038",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILJJSSG",
+    "GGLLLJSSGG",
+    "GGGOOZZGGG",
+    "GGGOOJZZGG"
+   ]
+  },
+  {
+   "id": "main.039",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILSTTTG",
+    "GGLLLSSTGG",
+    "GGGOOJSGGG",
+    "GGGOOJJJGG"
+   ]
+  },
+  {
+   "id": "main.040",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJIIIISSG",
+    "GGJLOOSSGG",
+    "GGGLOOTGGG",
+    "GGGLLTTTGG"
+   ]
+  },
+  {
+   "id": "main.041",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 10,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJLLLTTTG",
+    "GGJLZOOTGG",
+    "GGGZZOOGGG",
+    "GGGZIIIIGG"
+   ]
+  },
+  {
+   "id": "main.042",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 11,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIISLTTTG",
+    "GGZZSSJJGG",
+    "GGGZZSJGGG",
+    "GGGLLLJTGG"
+   ]
+  },
+  {
+   "id": "main.043",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJJIIIISSG",
+    "GGJLLLSSGG",
+    "GGGLTZZGGG",
+    "GGGTTTZZGG"
+   ]
+  },
+  {
+   "id": "main.044",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIIJJTTTG",
+    "GGLLJZZTGG",
+    "GGGLJSSGGG",
+    "GGGLSSZZGG"
+   ]
+  },
+  {
+   "id": "main.045",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIIZZTTTG",
+    "GGLLJJSSGG",
+    "GGGLJSSGGG",
+    "GGGLJZZTGG"
+   ]
+  },
+  {
+   "id": "main.046",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILZZSSG",
+    "GGLLLTSSGG",
+    "GGGJTTTGGG",
+    "GGGJJJZZGG"
+   ]
+  },
+  {
+   "id": "main.047",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILZZSSG",
+    "GGLLLTZZGG",
+    "GGGJTTTGGG",
+    "GGGJJJSSGG"
+   ]
+  },
+  {
+   "id": "main.048",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIISSLJJG",
+    "GGZZLLLJGG",
+    "GGGZZOOGGG",
+    "GGGSSOOJGG"
+   ]
+  },
+  {
+   "id": "main.049",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "table": 12,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIILJZSSG",
+    "GGLLLJJJGG",
+    "GGGOOZZGGG",
+    "GGGOOZSSGG"
+   ]
+  },
+  {
+   "id": "main.050",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 13,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..SS......",
+    "JSSOO.....",
+    "JJJOO....."
+   ]
+  },
+  {
+   "id": "main.051",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 13,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..LS......",
+    "LLLSS.....",
+    "IIIIS....."
+   ]
+  },
+  {
+   "id": "main.052",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 13,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..ZZ......",
+    "LLLZZ.....",
+    "LIIII....."
+   ]
+  },
+  {
+   "id": "main.053",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 13,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..LS......",
+    "OOLSS.....",
+    "OOLLS....."
+   ]
+  },
+  {
+   "id": "main.054",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 14,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJZZLLI",
+    "OOGGJTZZLI",
+    "GGGGGTTTLI",
+    "GGGGGTTTTI"
+   ]
+  },
+  {
+   "id": "main.055",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 14,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIZZLL",
+    "OOGGTTTZZL",
+    "GGGGGTSSTL",
+    "GGGGGSSTTT"
+   ]
+  },
+  {
+   "id": "main.056",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 14,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJZZLLI",
+    "OOGGJTZZLI",
+    "GGGGGTTSSI",
+    "GGGGGTSSLI"
+   ]
+  },
+  {
+   "id": "main.057",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 14,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJTTTZI",
+    "OOGGJTTZZI",
+    "GGGGGTTZLI",
+    "GGGGGTLLLI"
+   ]
+  },
+  {
+   "id": "main.058",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJTTTZI",
+    "OOGGJTTZZI",
+    "GGGGGTTZLI",
+    "GGGGGTLLLI"
+   ]
+  },
+  {
+   "id": "main.059",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIZZSS",
+    "OOGGJJJSST",
+    "GGGGGLLLTT",
+    "GGGGGLJZZT"
+   ]
+  },
+  {
+   "id": "main.060",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJLLLSS",
+    "OOGGJZZSST",
+    "GGGGGLZZTT",
+    "GGGGGIIIIT"
+   ]
+  },
+  {
+   "id": "main.061",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIISSJJ",
+    "OOGGZZLLJT",
+    "GGGGGZZLTT",
+    "GGGGGSSLJT"
+   ]
+  },
+  {
+   "id": "main.062",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIZZSS",
+    "OOGGJJJZZT",
+    "GGGGGLLLTT",
+    "GGGGGLJSST"
+   ]
+  },
+  {
+   "id": "main.063",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIISLJJ",
+    "OOGGZZSSJT",
+    "GGGGGZZSTT",
+    "GGGGGLLLJT"
+   ]
+  },
+  {
+   "id": "main.064",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 15,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIJZSS",
+    "OOGGLLJJJT",
+    "GGGGGLZZTT",
+    "GGGGGLZSST"
+   ]
+  },
+  {
+   "id": "main.065",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 16,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJTIIII",
+    "OOGGJTTZZL",
+    "GGGGGTSSZZ",
+    "GGGGGSSLLL"
+   ]
+  },
+  {
+   "id": "main.066",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 16,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJIZZSL",
+    "OOGGJITLLL",
+    "GGGGGITTSS",
+    "GGGGGITZZS"
+   ]
+  },
+  {
+   "id": "main.067",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 16,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOJJJTIIII",
+    "OOGGJTTSLL",
+    "GGGGGZZSSL",
+    "GGGGGTZZSL"
+   ]
+  },
+  {
+   "id": "main.068",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 16,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIITSSZ",
+    "OOGGLLTTZZ",
+    "GGGGGLTJJJ",
+    "GGGGGLSSZJ"
+   ]
+  },
+  {
+   "id": "main.069",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "table": 16,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIJJJT",
+    "OOGGZZSSTT",
+    "GGGGGSSLLL",
+    "GGGGGZZLJT"
+   ]
+  },
+  {
+   "id": "main.070",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 17,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..L.......",
+    "OOLZZ.....",
+    "OOLLZZ...."
+   ]
+  },
+  {
+   "id": "main.071",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 18,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZTTTLLI",
+    "OOGZZTSSLI",
+    "GGGGGSSTLI",
+    "GGGGGGTTTI"
+   ]
+  },
+  {
+   "id": "main.072",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 18,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZLLJJTI",
+    "OOGZZLJTTI",
+    "GGGGGLJTTI",
+    "GGGGGGTTTI"
+   ]
+  },
+  {
+   "id": "main.073",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZJJJLLI",
+    "OOGZZSJTLI",
+    "GGGGGSSTTI",
+    "GGGGGGSTLI"
+   ]
+  },
+  {
+   "id": "main.074",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZLLIIII",
+    "OOGZZLTJJJ",
+    "GGGGGLTTSS",
+    "GGGGGGTSSJ"
+   ]
+  },
+  {
+   "id": "main.075",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIZZLL",
+    "OOGJJJTZZL",
+    "GGGGGJTTSS",
+    "GGGGGGTSSL"
+   ]
+  },
+  {
+   "id": "main.076",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZIIIIJJ",
+    "OOGZZSLLJT",
+    "GGGGGSSLTT",
+    "GGGGGGSLJT"
+   ]
+  },
+  {
+   "id": "main.077",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZIIIISS",
+    "OOGZZJLLLT",
+    "GGGGGJJJTT",
+    "GGGGGGLSST"
+   ]
+  },
+  {
+   "id": "main.078",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIIZZSL",
+    "OOGJJJTLLL",
+    "GGGGGJTTSS",
+    "GGGGGGTZZS"
+   ]
+  },
+  {
+   "id": "main.079",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 19,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZJJJSSI",
+    "OOGZZLLLTI",
+    "GGGGGLJTTI",
+    "GGGGGGSSTI"
+   ]
+  },
+  {
+   "id": "main.080",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 20,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOZZLLTJJJ",
+    "OOGZZLTTSS",
+    "GGGGGLTSSJ",
+    "GGGGGGIIII"
+   ]
+  },
+  {
+   "id": "main.081",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 20,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIISZZT",
+    "OOGJJJSSTT",
+    "GGGGGJLLLT",
+    "GGGGGGLSZZ"
+   ]
+  },
+  {
+   "id": "main.082",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "table": 20,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIILSST",
+    "OOGJJJSSTT",
+    "GGGGGJLZZT",
+    "GGGGGGLLZZ"
+   ]
+  },
+  {
+   "id": "main.083",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 21,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "T.........",
+    "TT...L....",
+    "TSSLLL....",
+    "SSIIII...."
+   ]
+  },
+  {
+   "id": "main.084",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 21,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "IT...J....",
+    "ITTSSJ....",
+    "ITSSJJ...."
+   ]
+  },
+  {
+   "id": "main.085",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 21,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "S.........",
+    "SS...T....",
+    "JSZZTT....",
+    "JJJZZT...."
+   ]
+  },
+  {
+   "id": "main.086",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 21,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "IL...J....",
+    "ILTTTJ....",
+    "ILLTJJ...."
+   ]
+  },
+  {
+   "id": "main.087",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTIJJJ",
+    "GGZZTGILSJ",
+    "GGGGGGILSS",
+    "GGGGGGILLS"
+   ]
+  },
+  {
+   "id": "main.088",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSJJLL",
+    "GGTSSGJOOL",
+    "GGGGGGJOOL",
+    "GGGGGGIIII"
+   ]
+  },
+  {
+   "id": "main.089",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTLOOI",
+    "GGZZTGLOOI",
+    "GGGGGGJJJI",
+    "GGGGGGLLJI"
+   ]
+  },
+  {
+   "id": "main.090",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSLLLI",
+    "GGTSSGJJJI",
+    "GGGGGGZZJI",
+    "GGGGGGLZZI"
+   ]
+  },
+  {
+   "id": "main.091",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSJJLI",
+    "GGTSSGLLLI",
+    "GGGGGGJOOI",
+    "GGGGGGJOOI"
+   ]
+  },
+  {
+   "id": "main.092",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 22,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTLJJJ",
+    "GGZZTGLSSJ",
+    "GGGGGGSSOO",
+    "GGGGGGLLOO"
+   ]
+  },
+  {
+   "id": "main.093",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTIIII",
+    "GGZZTGJJSS",
+    "GGGGGGJSSL",
+    "GGGGGGJLLL"
+   ]
+  },
+  {
+   "id": "main.094",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSIIII",
+    "GGTSSGZZLL",
+    "GGGGGGJZZL",
+    "GGGGGGJJJL"
+   ]
+  },
+  {
+   "id": "main.095",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSLLLI",
+    "GGTSSGLZJI",
+    "GGGGGGZZJI",
+    "GGGGGGZJJI"
+   ]
+  },
+  {
+   "id": "main.096",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTSLLI",
+    "GGZZTGSSLI",
+    "GGGGGGJSLI",
+    "GGGGGGJJJI"
+   ]
+  },
+  {
+   "id": "main.097",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSJJZI",
+    "GGTSSGJZZI",
+    "GGGGGGJZLI",
+    "GGGGGGLLLI"
+   ]
+  },
+  {
+   "id": "main.098",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSZZLL",
+    "GGTSSGJZZL",
+    "GGGGGGJJJL",
+    "GGGGGGIIII"
+   ]
+  },
+  {
+   "id": "main.099",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 23,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTJJSS",
+    "GGZZTGJSSL",
+    "GGGGGGJLLL",
+    "GGGGGGIIII"
+   ]
+  },
+  {
+   "id": "main.100",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 24,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTJJJI",
+    "GGZZTGLLLI",
+    "GGGGGGLSSI",
+    "GGGGGGSSJI"
+   ]
+  },
+  {
+   "id": "main.101",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 24,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSLLLI",
+    "GGTSSGJJJI",
+    "GGGGGGZZJI",
+    "GGGGGGLZZI"
+   ]
+  },
+  {
+   "id": "main.102",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 24,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSSZZLI",
+    "GGTSSGLLLI",
+    "GGGGGGJZZI",
+    "GGGGGGJJJI"
+   ]
+  },
+  {
+   "id": "main.103",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "table": 24,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZTTTJSSI",
+    "GGZZTGJJJI",
+    "GGGGGGSSLI",
+    "GGGGGGLLLI"
+   ]
+  },
+  {
+   "id": "main.104",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 25,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...Z......",
+    "OOZZSST...",
+    "OOZSSTTT.."
+   ]
+  },
+  {
+   "id": "main.105",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 25,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...L......",
+    "JLLLSST...",
+    "JJJSSTTT.."
+   ]
+  },
+  {
+   "id": "main.106",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 25,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...T......",
+    "OOTTTZZ...",
+    "OOIIIIZZ.."
+   ]
+  },
+  {
+   "id": "main.107",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JIIIISSTLL",
+    "JJJGSSTTTL",
+    "GGGGGGGZZL",
+    "GGGGGGGGZZ"
+   ]
+  },
+  {
+   "id": "main.108",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOLLLSSTTT",
+    "OOLGSSZZTJ",
+    "GGGGGGGZZJ",
+    "GGGGGGGGJJ"
+   ]
+  },
+  {
+   "id": "main.109",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JIIIISSTTT",
+    "JJJGSSZZLL",
+    "GGGGGGGZZL",
+    "GGGGGGGGTL"
+   ]
+  },
+  {
+   "id": "main.110",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOLLLTIIII",
+    "OOLGTTTJJJ",
+    "GGGGGGGZZJ",
+    "GGGGGGGGZZ"
+   ]
+  },
+  {
+   "id": "main.111",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOLLLSSJJJ",
+    "OOLGSSIIII",
+    "GGGGGGGTTT",
+    "GGGGGGGGTJ"
+   ]
+  },
+  {
+   "id": "main.112",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 26,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JIIIITZZOO",
+    "JJJGTTTZZL",
+    "GGGGGGGLLL",
+    "GGGGGGGGOO"
+   ]
+  },
+  {
+   "id": "main.113",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "table": 27,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOLLLSSJJJ",
+    "OOLGSSIIII",
+    "GGGGGGGZZJ",
+    "GGGGGGGGZZ"
+   ]
+  },
+  {
+   "id": "main.114",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 28,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "J....L..OO",
+    "JJJLLL..OO"
+   ]
+  },
+  {
+   "id": "main.115",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "SZZJJJIIOO",
+    "SSZZLJIIOO",
+    "GSLLLGIIGG",
+    "GGGGGGIIGG"
+   ]
+  },
+  {
+   "id": "main.116",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "LLLSSZIIOO",
+    "LJSSZZIIOO",
+    "GJJJZGIIGG",
+    "GGGGGGIIGG"
+   ]
+  },
+  {
+   "id": "main.117",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "LLLSSZIIII",
+    "LJSSZZIIII",
+    "GJJJZGOOGG",
+    "GGGGGGOOGG"
+   ]
+  },
+  {
+   "id": "main.118",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "SZZJJJIIII",
+    "SSZZLJIIII",
+    "GSLLLGOOGG",
+    "GGGGGGOOGG"
+   ]
+  },
+  {
+   "id": "main.119",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "SIIIIZIJJL",
+    "SSOOZZILLL",
+    "GSOOZGIJGG",
+    "GGGGGGIJGG"
+   ]
+  },
+  {
+   "id": "main.120",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "STTTLLLJJJ",
+    "SSZZLIIIIJ",
+    "GSTZZGOOGG",
+    "GGGGGGOOGG"
+   ]
+  },
+  {
+   "id": "main.121",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "table": 29,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "STTTJLLIOO",
+    "SSZZJJJIOO",
+    "GSTZZGLIGG",
+    "GGGGGGLIGG"
+   ]
+  },
+  {
+   "id": "main.122",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 30,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IS........",
+    "ISS.......",
+    "IJS......L",
+    "IJJJ...LLL"
+   ]
+  },
+  {
+   "id": "main.123",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGTTTJJJOO",
+    "GGGTSSLJOO",
+    "GGGSSIIIIG",
+    "GGGGLLLGGG"
+   ]
+  },
+  {
+   "id": "main.124",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGJJJIIIIZ",
+    "GGGSJLOOZZ",
+    "GGGSSLOOZG",
+    "GGGGSLLGGG"
+   ]
+  },
+  {
+   "id": "main.125",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIITTTZ",
+    "GGGOOJLTZZ",
+    "GGGOOJJJZG",
+    "GGGGLLLGGG"
+   ]
+  },
+  {
+   "id": "main.126",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLJJSSOO",
+    "GGGLJSSTOO",
+    "GGGLZZTTTG",
+    "GGGGJZZGGG"
+   ]
+  },
+  {
+   "id": "main.127",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLIJJSSZ",
+    "GGGLIJSSZZ",
+    "GGGLITTTZG",
+    "GGGGIJTGGG"
+   ]
+  },
+  {
+   "id": "main.128",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIILLLZ",
+    "GGGOOJJJZZ",
+    "GGGOOSSJZG",
+    "GGGGSSLGGG"
+   ]
+  },
+  {
+   "id": "main.129",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 31,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLIIIIOO",
+    "GGGLJSSTOO",
+    "GGGLSSTTTG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.130",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 32,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIIZZOO",
+    "GGGLLLSSOO",
+    "GGGLJSSZZG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.131",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 32,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGTTTIZZOO",
+    "GGGLLIJJOO",
+    "GGGTLIJZZG",
+    "GGGGLIJGGG"
+   ]
+  },
+  {
+   "id": "main.132",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 32,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGTTTIZZOO",
+    "GGGLLIJJOO",
+    "GGGTLIJZZG",
+    "GGGGLIJGGG"
+   ]
+  },
+  {
+   "id": "main.133",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 32,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLSZZTTT",
+    "GGGLSSIIII",
+    "GGGLJSZZTG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.134",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIILJJZ",
+    "GGGSLLLJZZ",
+    "GGGSSOOJZG",
+    "GGGGSOOGGG"
+   ]
+  },
+  {
+   "id": "main.135",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIISSOO",
+    "GGGLLLZZOO",
+    "GGGLJSSZZG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.136",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGLLSIIIIZ",
+    "GGGLSSOOZZ",
+    "GGGLJSOOZG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.137",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZLLIIII",
+    "GGGZZLJJSS",
+    "GGGTTTJSSG",
+    "GGGGTLJGGG"
+   ]
+  },
+  {
+   "id": "main.138",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZSSILOO",
+    "GGGZZJILOO",
+    "GGGSSJILLG",
+    "GGGGJJIGGG"
+   ]
+  },
+  {
+   "id": "main.139",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGTTTSSJJZ",
+    "GGGTSSLJZZ",
+    "GGGIIIIJZG",
+    "GGGGLLLGGG"
+   ]
+  },
+  {
+   "id": "main.140",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 33,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIIZZOO",
+    "GGGSLLJJOO",
+    "GGGSSLJZZG",
+    "GGGGSLJGGG"
+   ]
+  },
+  {
+   "id": "main.141",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJJJLOO",
+    "GGGZZSSLOO",
+    "GGGIIIILLG",
+    "GGGGSSJGGG"
+   ]
+  },
+  {
+   "id": "main.142",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZSSILOO",
+    "GGGZZJILOO",
+    "GGGSSJILLG",
+    "GGGGJJIGGG"
+   ]
+  },
+  {
+   "id": "main.143",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGIIIILSSZ",
+    "GGGOOJSSZZ",
+    "GGGOOJJJZG",
+    "GGGGLLLGGG"
+   ]
+  },
+  {
+   "id": "main.144",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJJJLLL",
+    "GGGZZTJLSS",
+    "GGGIIIISSG",
+    "GGGGTTTGGG"
+   ]
+  },
+  {
+   "id": "main.145",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZSSILLL",
+    "GGGSSJITTT",
+    "GGGZZJILTG",
+    "GGGGJJIGGG"
+   ]
+  },
+  {
+   "id": "main.146",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGJJJZZTTT",
+    "GGGSJLIIII",
+    "GGGSSLZZTG",
+    "GGGGSLLGGG"
+   ]
+  },
+  {
+   "id": "main.147",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 34,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJJJLOO",
+    "GGGIIIILOO",
+    "GGGZZSSLLG",
+    "GGGGSSJGGG"
+   ]
+  },
+  {
+   "id": "main.148",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 35,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJJJLLL",
+    "GGGIIIILSS",
+    "GGGZZTJSSG",
+    "GGGGTTTGGG"
+   ]
+  },
+  {
+   "id": "main.149",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "table": 35,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GGZZJOOLLL",
+    "GGGZZOOLSS",
+    "GGGIIIISSG",
+    "GGGGJJJGGG"
+   ]
+  },
+  {
+   "id": "main.150",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 36,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "S.........",
+    "SS........",
+    "JSZZ.....L",
+    "JJJZZ..LLL"
+   ]
+  },
+  {
+   "id": "main.151",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZJJJILOO",
+    "GGZZSJILOO",
+    "GGGGSSILLG",
+    "GGGGGSIGGG"
+   ]
+  },
+  {
+   "id": "main.152",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZLLIJJOO",
+    "GGZZLIJTOO",
+    "GGGGLITTTG",
+    "GGGGGIJGGG"
+   ]
+  },
+  {
+   "id": "main.153",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZIIIILLL",
+    "GGZZOOJLSS",
+    "GGGGOOJSSG",
+    "GGGGGJJGGG"
+   ]
+  },
+  {
+   "id": "main.154",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZIIIIJJJ",
+    "GGZZOOSSLJ",
+    "GGGGOOLLLG",
+    "GGGGGSSGGG"
+   ]
+  },
+  {
+   "id": "main.155",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZIIIIJJJ",
+    "GGZZSTTTLJ",
+    "GGGGSSLLLG",
+    "GGGGGSTGGG"
+   ]
+  },
+  {
+   "id": "main.156",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZJJJILLL",
+    "GGZZSJITTT",
+    "GGGGSSILTG",
+    "GGGGGSIGGG"
+   ]
+  },
+  {
+   "id": "main.157",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 37,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTLLLJSS",
+    "GGTIIIIJJJ",
+    "GGGGLOOSSG",
+    "GGGGGOOGGG"
+   ]
+  },
+  {
+   "id": "main.158",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 38,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSLLJJJ",
+    "GGTIIIIOOJ",
+    "GGGGSSLOOG",
+    "GGGGGSLGGG"
+   ]
+  },
+  {
+   "id": "main.159",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZLLJIIII",
+    "GGZZLJJJSS",
+    "GGGGLOOSSG",
+    "GGGGGOOGGG"
+   ]
+  },
+  {
+   "id": "main.160",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZJJJIIII",
+    "GGZZLLLTTT",
+    "GGGGLJSSTG",
+    "GGGGGSSGGG"
+   ]
+  },
+  {
+   "id": "main.161",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZLLJSSOO",
+    "GGZZLJJJOO",
+    "GGGGLIIIIG",
+    "GGGGGSSGGG"
+   ]
+  },
+  {
+   "id": "main.162",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GZZJJJILLL",
+    "GGZZOOILSS",
+    "GGGGOOISSG",
+    "GGGGGJIGGG"
+   ]
+  },
+  {
+   "id": "main.163",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTSLLJJZ",
+    "GGTIIIIJZZ",
+    "GGGGSSLJZG",
+    "GGGGGSLGGG"
+   ]
+  },
+  {
+   "id": "main.164",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "table": 39,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "GTTTZZLJSS",
+    "GGTIIIIJJJ",
+    "GGGGLLLSSG",
+    "GGGGGZZGGG"
+   ]
+  },
+  {
+   "id": "main.165",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 40,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......J..",
+    ".....SSJOO",
+    "....SSJJOO"
+   ]
+  },
+  {
+   "id": "main.166",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 41,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJZlllSSOO",
+    "JZZlLSSGOO",
+    "JZLLLGGGGG",
+    "IIIIGGGGGG"
+   ]
+  },
+  {
+   "id": "main.167",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 41,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "LLIIIISSOO",
+    "LLJJZSSGOO",
+    "LLJZZGGGGG",
+    "LLJZGGGGGG"
+   ]
+  },
+  {
+   "id": "main.168",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 41,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "ZZLLJJSSOO",
+    "LZZLJSSGOO",
+    "LTTTJGGGGG",
+    "LLTLGGGGGG"
+   ]
+  },
+  {
+   "id": "main.169",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 41,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "LLIJJTTTOO",
+    "LLIJSSTGOO",
+    "LLISSGGGGG",
+    "LLIJGGGGGG"
+   ]
+  },
+  {
+   "id": "main.170",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 41,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "TTTZIIIIOO",
+    "LTZZLLLGOO",
+    "LJJJLGGGGG",
+    "LLZJGGGGGG"
+   ]
+  },
+  {
+   "id": "main.171",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 42,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "JJIIIISSOO",
+    "JLLLZSSGOO",
+    "JLLZZGGGGG",
+    "LLLZGGGGGG"
+   ]
+  },
+  {
+   "id": "main.172",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 42,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IIIIJJSSOO",
+    "LZZLJSSGOO",
+    "LLLLJGGGGG",
+    "LLZZGGGGGG"
+   ]
+  },
+  {
+   "id": "main.173",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 42,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "ZZLIJJSSOO",
+    "LLLIJSSGOO",
+    "LLLIJGGGGG",
+    "LZZIGGGGGG"
+   ]
+  },
+  {
+   "id": "main.174",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 42,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "ZZSSIIIIOO",
+    "LZZJLLLGOO",
+    "LSSJLGGGGG",
+    "LLJJGGGGGG"
+   ]
+  },
+  {
+   "id": "main.175",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "table": 42,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "IZZlllSSOO",
+    "ILJJJSSGOO",
+    "ILZZJGGGGG",
+    "ILLlGGGGGG"
+   ]
+  },
+  {
+   "id": "main.176",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJSZ/ILSZ",
+    "J before S"
+   ],
+   "table": 43,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "S.........",
+    "SS........",
+    "JSZZ......",
+    "JJJZZ....."
+   ]
+  },
+  {
+   "id": "main.177",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJSZ/ILSZ",
+    "S before J"
+   ],
+   "table": 44,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".......JJJ",
+    "........SJ",
+    "......ZZSS",
+    ".......ZZS"
+   ]
+  },
+  {
+   "id": "main.178",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "JOSZ/LOSZ"
+   ],
+   "table": 45,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "J.ZZ....OO",
+    "JJJZZ...OO"
+   ]
+  },
+  {
+   "id": "main.179",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "table": 46,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I.........",
+    "IJ......OO",
+    "IJJJ....OO"
+   ]
+  },
+  {
+   "id": "main.180",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "table": 47,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "......SS..",
+    "OO...SSJJJ",
+    "OO.IIII..J"
+   ]
+  },
+  {
+   "id": "main.181",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "table": 47,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOTJJJIIII",
+    "OOTTLJGGSS",
+    "GGLLLGGGGG",
+    "GGTGGGGSSG"
+   ]
+  },
+  {
+   "id": "main.182",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "table": 47,
+   "role": "solution",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OOIIIITTTZ",
+    "OOJJSSGGZZ",
+    "GGJSSGGGGG",
+    "GGJGGGGTZG"
+   ]
+  },
+  {
+   "id": "main.183",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOZ/ILOS"
+   ],
+   "table": 48,
+   "role": "setup",
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    "........JI",
+    "OO......JI",
+    "OO.....JJI"
+   ]
+  }
+ ],
+ "setups": [
+  {
+   "id": "main.000",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JLOT"
+   ],
+   "rows": [
+    "..........",
+    "L.....J...",
+    "L..T..JOO.",
+    "LLTTTJJOO."
+   ],
+   "pieces": "JLOT",
+   "solutions": [
+    "main.001",
+    "main.002",
+    "main.003",
+    "main.004",
+    "main.005",
+    "main.006"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.007",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILOT/IJOT"
+   ],
+   "rows": [
+    "OO........",
+    "OO.......T",
+    "LLL.....TT",
+    "LIIII....T"
+   ],
+   "pieces": "ILOT",
+   "solutions": [
+    "main.008",
+    "main.009",
+    "main.010",
+    "main.011",
+    "main.012",
+    "main.013",
+    "main.014",
+    "main.015",
+    "main.016",
+    "main.017",
+    "main.018",
+    "main.019",
+    "main.020",
+    "main.021",
+    "main.022",
+    "main.023",
+    "main.024",
+    "main.025",
+    "main.026",
+    "main.027",
+    "main.028",
+    "main.029",
+    "main.030",
+    "main.031"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.032",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "rows": [
+    ".........T",
+    "JJ......TT",
+    "JOO....ZZT",
+    "JOO.....ZZ"
+   ],
+   "pieces": "JOTZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.033",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "rows": [
+    ".........I",
+    "LS......TI",
+    "LSS....TTI",
+    "LLS.....TI"
+   ],
+   "pieces": "ILST",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.034",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOZT/LOST, ILST/IJZT, LOZT/JOST!"
+   ],
+   "rows": [
+    ".........T",
+    "OO......TT",
+    "OOL....ZZT",
+    "LLL.....ZZ"
+   ],
+   "pieces": "LOTZ",
+   "solutions": [
+    "main.035",
+    "main.036",
+    "main.037",
+    "main.038",
+    "main.039",
+    "main.040",
+    "main.041",
+    "main.042",
+    "main.043",
+    "main.044",
+    "main.045",
+    "main.046",
+    "main.047",
+    "main.048",
+    "main.049"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.050",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "rows": [
+    "..........",
+    "..SS......",
+    "JSSOO.....",
+    "JJJOO....."
+   ],
+   "pieces": "JOS",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.051",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "rows": [
+    "..........",
+    "..LS......",
+    "LLLSS.....",
+    "IIIIS....."
+   ],
+   "pieces": "ILS",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.052",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "rows": [
+    "..........",
+    "..ZZ......",
+    "LLLZZ.....",
+    "LIIII....."
+   ],
+   "pieces": "ILZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.053",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "JOST/LOZT!, ILST/IJZT!, ILZT/IJST!, LOST/JOZT better save T"
+   ],
+   "rows": [
+    "..........",
+    "..LS......",
+    "OOLSS.....",
+    "OOLLS....."
+   ],
+   "pieces": "LOS",
+   "solutions": [
+    "main.054",
+    "main.055",
+    "main.056",
+    "main.057",
+    "main.058",
+    "main.059",
+    "main.060",
+    "main.061",
+    "main.062",
+    "main.063",
+    "main.064",
+    "main.065",
+    "main.066",
+    "main.067",
+    "main.068",
+    "main.069"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.070",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "LOZT/JOST"
+   ],
+   "rows": [
+    "..........",
+    "..L.......",
+    "OOLZZ.....",
+    "OOLLZZ...."
+   ],
+   "pieces": "LOZ",
+   "solutions": [
+    "main.071",
+    "main.072",
+    "main.073",
+    "main.074",
+    "main.075",
+    "main.076",
+    "main.077",
+    "main.078",
+    "main.079",
+    "main.080",
+    "main.081",
+    "main.082"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.083",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "rows": [
+    "T.........",
+    "TT...L....",
+    "TSSLLL....",
+    "SSIIII...."
+   ],
+   "pieces": "ILST",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.084",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "rows": [
+    "I.........",
+    "IT...J....",
+    "ITTSSJ....",
+    "ITSSJJ...."
+   ],
+   "pieces": "IJST",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.085",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "rows": [
+    "S.........",
+    "SS...T....",
+    "JSZZTT....",
+    "JJJZZT...."
+   ],
+   "pieces": "JSTZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.086",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "ILST/IJZT!, IJST/ILZT, JSZT/LSZT, IJLT"
+   ],
+   "rows": [
+    "I.........",
+    "IL...J....",
+    "ILTTTJ....",
+    "ILLTJJ...."
+   ],
+   "pieces": "IJLT",
+   "solutions": [
+    "main.087",
+    "main.088",
+    "main.089",
+    "main.090",
+    "main.091",
+    "main.092",
+    "main.093",
+    "main.094",
+    "main.095",
+    "main.096",
+    "main.097",
+    "main.098",
+    "main.099",
+    "main.100",
+    "main.101",
+    "main.102",
+    "main.103"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.104",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "rows": [
+    "..........",
+    "...Z......",
+    "OOZZSST...",
+    "OOZSSTTT.."
+   ],
+   "pieces": "OSTZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.105",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "rows": [
+    "..........",
+    "...L......",
+    "JLLLSST...",
+    "JJJSSTTT.."
+   ],
+   "pieces": "JLST",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.106",
+   "page": "main",
+   "heading": [
+    "With a T piece",
+    "OSZT, JLST/JLZT, IOTS/IOTZ"
+   ],
+   "rows": [
+    "..........",
+    "...T......",
+    "OOTTTZZ...",
+    "OOIIIIZZ.."
+   ],
+   "pieces": "IOTZ",
+   "solutions": [
+    "main.107",
+    "main.108",
+    "main.109",
+    "main.110",
+    "main.111",
+    "main.112",
+    "main.113"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.114",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLO"
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "J....L..OO",
+    "JJJLLL..OO"
+   ],
+   "pieces": "JLO",
+   "solutions": [
+    "main.115",
+    "main.116",
+    "main.117",
+    "main.118",
+    "main.119",
+    "main.120",
+    "main.121"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.122",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "IJLS/IJLZ"
+   ],
+   "rows": [
+    "IS........",
+    "ISS.......",
+    "IJS......L",
+    "IJJJ...LLL"
+   ],
+   "pieces": "IJLS",
+   "solutions": [
+    "main.123",
+    "main.124",
+    "main.125",
+    "main.126",
+    "main.127",
+    "main.128",
+    "main.129",
+    "main.130",
+    "main.131",
+    "main.132",
+    "main.133",
+    "main.134",
+    "main.135",
+    "main.136",
+    "main.137",
+    "main.138",
+    "main.139",
+    "main.140",
+    "main.141",
+    "main.142",
+    "main.143",
+    "main.144",
+    "main.145",
+    "main.146",
+    "main.147",
+    "main.148",
+    "main.149"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.150",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLSZ"
+   ],
+   "rows": [
+    "S.........",
+    "SS........",
+    "JSZZ.....L",
+    "JJJZZ..LLL"
+   ],
+   "pieces": "JLSZ",
+   "solutions": [
+    "main.151",
+    "main.152",
+    "main.153",
+    "main.154",
+    "main.155",
+    "main.156",
+    "main.157",
+    "main.158",
+    "main.159",
+    "main.160",
+    "main.161",
+    "main.162",
+    "main.163",
+    "main.164"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.165",
+   "page": "main",
+   "heading": [
+    "Even J and L",
+    "JLOS/JLOZ"
+   ],
+   "rows": [
+    "..........",
+    ".......J..",
+    ".....SSJOO",
+    "....SSJJOO"
+   ],
+   "pieces": "JOS",
+   "solutions": [
+    "main.166",
+    "main.167",
+    "main.168",
+    "main.169",
+    "main.170",
+    "main.171",
+    "main.172",
+    "main.173",
+    "main.174",
+    "main.175"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.176",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJSZ/ILSZ",
+    "J before S"
+   ],
+   "rows": [
+    "S.........",
+    "SS........",
+    "JSZZ......",
+    "JJJZZ....."
+   ],
+   "pieces": "JSZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.177",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJSZ/ILSZ",
+    "S before J"
+   ],
+   "rows": [
+    ".......JJJ",
+    "........SJ",
+    "......ZZSS",
+    ".......ZZS"
+   ],
+   "pieces": "JSZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.178",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "JOSZ/LOSZ"
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "J.ZZ....OO",
+    "JJJZZ...OO"
+   ],
+   "pieces": "JOZ",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.179",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "rows": [
+    "I.........",
+    "I.........",
+    "IJ......OO",
+    "IJJJ....OO"
+   ],
+   "pieces": "IJO",
+   "solutions": [],
+   "same_as": []
+  },
+  {
+   "id": "main.180",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOS/ILOZ"
+   ],
+   "rows": [
+    "..........",
+    "......SS..",
+    "OO...SSJJJ",
+    "OO.IIII..J"
+   ],
+   "pieces": "IJOS",
+   "solutions": [
+    "main.181",
+    "main.182"
+   ],
+   "same_as": []
+  },
+  {
+   "id": "main.183",
+   "page": "main",
+   "heading": [
+    "Odd J/L",
+    "IJOZ/ILOS"
+   ],
+   "rows": [
+    ".........I",
+    "........JI",
+    "OO......JI",
+    "OO.....JJI"
+   ],
+   "pieces": "IJO",
+   "solutions": [],
+   "same_as": []
+  }
+ ]
+}
