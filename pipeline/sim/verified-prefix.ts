@@ -22,6 +22,7 @@ import { resolve } from 'node:path';
 import { simulate, DEFAULT_TABLE, type SimResult } from './sim.ts';
 import { runCaseOracle as oracleSource } from './oracle-source.ts';
 import { matchesIgeY } from './ige-y-oracle.ts';
+import { cacheMode, cachedOracle, registerCase, sha256 } from './oracle-cache.ts';
 
 /**
  * Where the .ttrm replays live. ONE definition, and it refuses to guess.
@@ -97,13 +98,18 @@ export interface Case {
 
 export function loadCases(dir = replayDir()): Case[] {
   const out: Case[] = [];
+  // The oracle cache (oracle-cache.ts) keys each Case by its file's bytes; when it is off, nothing
+  // here differs from reading the file as text.
+  const caching = cacheMode() !== 'off';
   for (const file of readdirSync(dir).filter(f => f.endsWith('.ttrm')).sort()) {
-    const d = JSON.parse(readFileSync(`${dir}/${file}`, 'utf8'));
+    const bytes = readFileSync(`${dir}/${file}`);
+    const fileSha = caching ? sha256(bytes) : '';
+    const d = JSON.parse(bytes.toString('utf8'));
     d.replay.rounds.forEach((rnd: any, round: number) => {
       if (rnd.length !== 2) return;
       const P = rnd.map((p: any) => ({ p, rp: p.replay, gameid: p.replay.options.gameid }));
-      for (const [me, other] of [[P[0], P[1]], [P[1], P[0]]] as any[]) {
-        out.push({
+      for (const [side, [me, other]] of ([[P[0], P[1]], [P[1], P[0]]] as any[]).entries()) {
+        const c: Case = {
           file, round, user: me.p.username, alive: me.p.alive,
           ev: me.rp.events.filter((e: any) => e.type === 'keydown' || e.type === 'keyup')
             .map((e: any) => ({ frame: e.frame, sub: e.data.subframe ?? 0, type: e.type, key: e.data.key, hoisted: e.data.hoisted })),
@@ -128,7 +134,9 @@ export function loadCases(dir = replayDir()): Case[] {
           // replay them through the vendored Triangle engine — it needs every event type and the
           // round's gameids, which the flattened Case fields above do not preserve.
           rawPlayer: me.p, rawRound: rnd,
-        });
+        };
+        if (caching) registerCase(c, { fileSha, round, side: side as 0 | 1, user: me.p.username });
+        out.push(c);
       }
     });
   }
@@ -148,7 +156,9 @@ export function runCase(c: Case, extra: any = {}): SimResult {
  */
 export function runCaseOracle(c: Case): SimResult {
   if (!c.rawPlayer || !c.rawRound) return runCase(c);
-  return oracleSource(c.rawPlayer, c.rawRound);
+  // through the shared content-addressed cache when `c` came from loadCases and the cache is on
+  // (oracle-cache.ts says when, and what bypasses it); a direct computation otherwise
+  return cachedOracle(c, () => oracleSource(c.rawPlayer, c.rawRound!));
 }
 
 /**

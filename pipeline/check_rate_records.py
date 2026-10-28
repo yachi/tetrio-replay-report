@@ -132,6 +132,12 @@ FRAGMENTS = {
     # figure contradicting its own claim. Three places ceil it to 0.049.
     "rate:pps-mean": (lambda a: f"{_q(a['metrics']['pps']['mean_short'], 3, 'round')} → "
                                 f"{_q(a['metrics']['pps']['mean_long'], 3, 'round')}", DOCS),
+    # At eighteen it is 0.0505, back over the line, and the sentence says 「flat」 again — so the
+    # direction flips back to FLOOR, at the same three places (0.050, which does not claim a
+    # rejection; two places would floor it to 0.05 too, but three keeps the precision fixed
+    # across the flips). The direction belongs to the claim, and the claim has now flipped twice.
+    # At nineteen it is 0.0470, under the line again, and the sentence says 「rejected」 — so it
+    # CEILS again (0.048), the third flip of the direction with the claim.
     "rate:pps-mean-p": (lambda a: _q(a["metrics"]["pps"]["mean_p"], 3, "ceil"), DOCS),
     # --- the records test
     "rate:records": (lambda a: str(a["records"]["in_shortest_quartile"]), DOCS),

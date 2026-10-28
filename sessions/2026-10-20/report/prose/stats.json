@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 三張圖",
+  "title": "數據對決",
+  "lede": "三張圖答三條問題：邊段開始散、散喺邊種清行、同埋逐項身手邊個高。睇之前記住：<strong>今晚 yachi 快啲、落多啲，pinglamb 每粒更重，而粒數填得晒個效率窿</strong>。yachi 每局平均 PPS 約 1.43 對約 1.31<span class=\"badge\" data-claim=\"G035\"></span>、全晚多疊 323 粒<span class=\"badge\" data-claim=\"C005\"></span>；pinglamb 每粒方塊打出嘅攻擊高 6.73%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G037\"></span>。兩樣相抵，總攻擊 yachi 多 80 條<span class=\"badge\" data-claim=\"G025\"></span><span class=\"badge\" data-claim=\"C005\"></span>。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢——頭兩場同尾兩場倒轉",
+      "caps": [
+        "四格細圖，一場一格。頭兩場局數 10 比 5，尾兩場 5 比 10<span class=\"badge\" data-claim=\"C010\"></span>：兩段一樣大，yachi 嘅勝率由三分之二跌到三分之一。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布——Quad 同 TSD 係 yachi，TST 係 pinglamb",
+      "caps": [
+        "Quad yachi 171 對 133<span class=\"badge\" data-claim=\"G030\"></span>，T-spin double 145 對 127<span class=\"badge\" data-claim=\"G031\"></span>；T-spin triple 反而係 pinglamb 多，35 對 19<span class=\"badge\" data-claim=\"G032\"></span>。T-spin double 加 triple 計埋 164 對 162<span class=\"badge\" data-claim=\"G051\"></span>。"
+      ],
+      "footnote": "「T-spin 總數」<span class=\"badge\" data-claim=\"G029\"></span>計埋冇消行嘅 spin，所以會大過上面逐種清行加埋嘅數。兩個數量度緊唔同嘢，唔好溝埋講。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼——快同省力係 yachi，重同穩係 pinglamb",
+      "caps": [
+        "yachi PPS 高<span class=\"badge\" data-claim=\"G035\"></span>、APM 平均高少少<span class=\"badge\" data-claim=\"G036\"></span>、每粒方塊按少啲掣<span class=\"badge\" data-claim=\"G057\"></span>；pinglamb 每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"G037\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G039\"></span>、逐局 PPS 同 APM 都穩<span class=\"badge\" data-claim=\"G040\"></span><span class=\"badge\" data-claim=\"G041\"></span>、每粒方塊清走嘅垃圾高<span class=\"badge\" data-claim=\"G069\"></span>。30 局之後，攻擊 yachi 多 80 條<span class=\"badge\" data-claim=\"C005\"></span>。"
+      ],
+      "footnote": "「每粒 finesse 失誤」係<strong>失誤次數</strong>除粒數，唔係「幾多粒方塊撳錯」——一粒可以記幾次，所以呢一行用 toFixed(3) 唔用百分比。",
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

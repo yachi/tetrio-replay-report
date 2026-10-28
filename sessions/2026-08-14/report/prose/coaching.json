@@ -17,6 +17,10 @@
         "<strong>自爆呢格今晚係主因，唔好再當佢係副作用。</strong> 全晚 13 局自己頂到天花板收場<span class=\"badge\" data-claim=\"G067\"></span>，11 局係你，pinglamb 淨係 2 局<span class=\"badge\" data-claim=\"C006\"></span>——係六個 session 以嚟你最差嘅一次，而上一晚你仲要係零。多落方塊即係多囤，囤到頂就係呢個數。局勢一劣就先開行、後砌大招。",
         "<strong>唔使去追手法嗰格。</strong> finesse 失誤兩個人差 6 個（1268 對 1262）<span class=\"badge\" data-claim=\"G035\"></span>，每粒方塊嘅 perfect 比率仲要係你高<span class=\"badge\" data-claim=\"G047\"></span>。而 KPP 同輸贏嘅關係，你同佢一樣講唔出口<span class=\"badge\" data-claim=\"G073\"></span><span class=\"badge\" data-claim=\"G074\"></span>——呢個係<strong>連續第六個 session</strong> 同一個結論。慳返啲時間練上面三樣。",
         "<strong>第九場係樣板，抄返自己。</strong> 十一場入面淨係嗰場你每粒方塊嘅攻擊高過對面<span class=\"badge\" data-claim=\"C019\"></span>，比數 5 比 2<span class=\"badge\" data-claim=\"G012\"></span>，係全晚贏得最鬆嗰場。返去睇返嗰七局你點出貨，唔係睇你點快。"
+      ],
+      "sim_recs": [
+        "<strong>STSD 今晚接得好。</strong>STSD 6 次接到第二個 T-spin 4 次。呢條路繼續用。",
+        "<strong>STMB Cave 一半接唔到，係個位俾填咗。</strong>STMB Cave 2 次接到 1 次（個位俾其他棋填咗 1）。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     },
     "pinglamb": {
@@ -31,6 +35,9 @@
         "<strong>頭尾兩段係你嘅，中段唔係。</strong> 頭三場你每粒方塊嘅攻擊高過對面超過 17%、尾兩場 11% 以上，但中間第四至第九場淨係 7% 以下，對面就喺嗰段攞晒四場 match<span class=\"badge\" data-claim=\"C007\"></span><span class=\"badge\" data-claim=\"C001\"></span>。落波前同收尾嗰陣你打得最好，中段就散——換句話講，你要練嘅係<strong>長局嘅節奏</strong>，唔係開局。",
         "<strong>連輸八局嗰段要記低。</strong> 第六場輸咗尾五局、第七場又輸埋頭三局<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"C014\"></span>，一口氣八局，係全場最長嘅一段連勝，而且係對面嘅<span class=\"badge\" data-claim=\"G017\"></span>。呢八局就係佢兩場 match 嘅來源<span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"C014\"></span>。輸完一局之後嗰局點打，係你唯一一格明顯要執嘅節奏題。",
         "<strong>Perfect Clear 唔好當成戰績。</strong> 你有 8 局做到全消、入面贏 6 局<span class=\"badge\" data-claim=\"G083\"></span>，但全場淨係你一個做到全消嘅 6 局入面，你仲要輸咗 1 局<span class=\"badge\" data-claim=\"G084\"></span>；對面 9 局全場淨係佢做到，佢輸咗 5 局<span class=\"badge\" data-claim=\"G082\"></span>。全消好睇，但同贏唔贏冇乜關係——呢個係六晚都一樣嘅結論。"
+      ],
+      "sim_recs": [
+        "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>31 局有 25 局行到第二巡、4 局行到第三巡或之後、1 局打出全消。"
       ]
     }
   },

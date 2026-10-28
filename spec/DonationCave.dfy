@@ -25,7 +25,7 @@
 //     (any full row above the run roofs it). `IsMaxCleared` is kept because caveAt:307 computes
 //     `under = Math.max(...cleared) + 1`, and the spec mirrors the code, not the weakest
 //     hypothesis. The same goes for `|cleared| == 2` (caveAt:306).
-//   - `Walled` / `CavityCount` / `TSlotExcluded` appear identically on both sides of the
+//   - `Walled` / `CavityCount` / `PlugIncomplete` appear identically on both sides of the
 //     equivalences, so no lemma depends on their internals; they are mirrored so the accept
 //     condition proved about is the one the code runs, not a tidied-up fragment of it.
 module OpenerBoard {
@@ -130,48 +130,52 @@ module OpenerBoard {
       (c == 0 || g[x][c - 1]) && (c == w - 1 || g[x][c + 1])
   }
 
-  // :263-271 — the T's own slot: excluded only when the T occupies column c in EVERY cleared row
-  ghost function TRowsAt(t: seq<Cell>, c: int): set<int>
+  // COMPLETE PIECES (yachi, 2026-10-25: follow harddrop, but complete pieces). `inc` is the set of
+  // cells that are garbage or belong to a piece with a cell missing (a fragment a line clear left);
+  // the T's own cells are never in it. There is no T-column exclusion: harddrop draws the well under
+  // the T's arm and under its nub. A column whose plug, inside the cleared rows, holds such a cell
+  // is not a donation (`plugComplete` in emit-opener-facts.ts).
+  //
+  // THE WELL CAME FIRST (yachi, 2026-10-25) is history the board cannot show, so it rides in the same
+  // abstract set: `inc` also holds the plug's lowest cell when, as its piece locked, the well under it
+  // was not yet the cavity floor deep (`wellAtPlug`). That cell is non-T and, under the re-opening
+  // clause, inside the cleared rows, so `PlugIncomplete` rejects the column exactly as the code does.
+  ghost predicate PlugIncomplete(cleared: set<int>, inc: set<Cell>, c: int)
   {
-    set q | q in t && q.col == c :: q.row
-  }
-
-  ghost predicate TSlotExcluded(cleared: set<int>, t: seq<Cell>, c: int)
-  {
-    |TRowsAt(t, c)| > 0 && forall r :: r in cleared ==> r in TRowsAt(t, c)
+    exists r :: r in cleared && Cell(r, c) in inc
   }
 
   // The per-column accept condition of the donationCols loop, :269-285, verbatim.
-  ghost predicate DonationColPass(g: Grid, h: nat, w: nat, cleared: set<int>, t: seq<Cell>, c: int)
+  ghost predicate DonationColPass(g: Grid, h: nat, w: nat, cleared: set<int>, inc: set<Cell>, c: int)
     requires Wf(g, h, w) && 0 <= c < w
   {
-    && !TSlotExcluded(cleared, t, c)                 // :271
     && |FilledIn(g, h, w, cleared, c)| > 0           // :277  inR > 0   — the NAIVE clause
     && |FilledOut(g, h, w, cleared, c)| == 0         // :277  outR == 0 — the RE-OPENING clause
     && CavityCount(g, h, w, c) >= DONATION_CAVITY    // :279
     && Walled(g, h, w, c)                            // :282-284
+    && !PlugIncomplete(cleared, inc, c)              // complete pieces only
   }
 
   // The same condition with the NAIVE clause deleted.
-  ghost predicate DonationColPassNoNaive(g: Grid, h: nat, w: nat, cleared: set<int>, t: seq<Cell>, c: int)
+  ghost predicate DonationColPassNoNaive(g: Grid, h: nat, w: nat, cleared: set<int>, inc: set<Cell>, c: int)
     requires Wf(g, h, w) && 0 <= c < w
   {
-    && !TSlotExcluded(cleared, t, c)
     && |FilledOut(g, h, w, cleared, c)| == 0
     && CavityCount(g, h, w, c) >= DONATION_CAVITY
     && Walled(g, h, w, c)
+    && !PlugIncomplete(cleared, inc, c)
   }
 
   // The same condition with the RE-OPENING clause deleted instead — referenced only by the
   // mutation script: claiming DonationColPass <==> THIS must FAIL, which is the proof that the
   // two clauses of line 277 are not symmetric.
-  ghost predicate DonationColPassNoReopen(g: Grid, h: nat, w: nat, cleared: set<int>, t: seq<Cell>, c: int)
+  ghost predicate DonationColPassNoReopen(g: Grid, h: nat, w: nat, cleared: set<int>, inc: set<Cell>, c: int)
     requires Wf(g, h, w) && 0 <= c < w
   {
-    && !TSlotExcluded(cleared, t, c)
     && |FilledIn(g, h, w, cleared, c)| > 0
     && CavityCount(g, h, w, c) >= DONATION_CAVITY
     && Walled(g, h, w, c)
+    && !PlugIncomplete(cleared, inc, c)
   }
 
   // ── claim 1: the naive clause is forced by arithmetic ──────────────────────────────────────
@@ -207,11 +211,11 @@ module OpenerBoard {
   // Deleting the naive clause from the accept condition changes nothing: it is not an
   // independent constraint. (Deleting the RE-OPENING clause instead is NOT provable — the
   // mutation script checks that this very lemma, retargeted at DonationColPassNoReopen, fails.)
-  lemma NaiveConjunctRedundant(g: Grid, h: nat, w: nat, cleared: set<int>, t: seq<Cell>, c: int)
+  lemma NaiveConjunctRedundant(g: Grid, h: nat, w: nat, cleared: set<int>, inc: set<Cell>, c: int)
     requires Wf(g, h, w)
     requires ClearedRowsFull(g, h, w, cleared)
     requires 0 <= c < w
-    ensures DonationColPass(g, h, w, cleared, t, c) <==> DonationColPassNoNaive(g, h, w, cleared, t, c)
+    ensures DonationColPass(g, h, w, cleared, inc, c) <==> DonationColPassNoNaive(g, h, w, cleared, inc, c)
   {
     NaiveClauseForced(g, h, w, cleared, c);
   }
@@ -316,7 +320,7 @@ module OpenerBoard {
     var h: nat := 6;
     var w: nat := 3;
     var cleared := {0};
-    var t: seq<Cell> := [];
+    var inc: set<Cell> := {};
     assert Wf(g, h, w);
     assert RowFull(g, h, w, 0);
     assert ClearedRowsFull(g, h, w, cleared);
@@ -343,15 +347,21 @@ module OpenerBoard {
     assert DeepRows(g, h, w, 1, 4, 0, 3) == [4, 3, 2];
     assert DeepRows(g, h, w, 1, 5, 0, 4) == [5, 4, 3, 2];
     assert Walled(g, h, w, 1);
-    assert !TSlotExcluded(cleared, t, 1);
-    assert DonationColPass(g, h, w, cleared, t, 1);
+    assert !PlugIncomplete(cleared, inc, 1);
+    assert DonationColPass(g, h, w, cleared, inc, 1);
 
     // column 0 FAILS (filled outside the cleared rows) — the predicate is not constant, and the
     // equivalence lemma is exercised on both a passing and a failing column
     assert 1 in FilledOut(g, h, w, cleared, 0);
-    assert !DonationColPass(g, h, w, cleared, t, 0);
-    NaiveConjunctRedundant(g, h, w, cleared, t, 1);
-    NaiveConjunctRedundant(g, h, w, cleared, t, 0);
+    assert !DonationColPass(g, h, w, cleared, inc, 0);
+    NaiveConjunctRedundant(g, h, w, cleared, inc, 1);
+    NaiveConjunctRedundant(g, h, w, cleared, inc, 0);
+
+    // the SAME board with the plug cell marked incomplete (garbage, or a fragment): column 1 now
+    // FAILS, so the complete-pieces clause is not decorative either
+    var bad: set<Cell> := {Cell(0, 1)};
+    assert PlugIncomplete(cleared, bad, 1);
+    assert !DonationColPass(g, h, w, cleared, bad, 1);
   }
 
   lemma CaveWitness()

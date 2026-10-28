@@ -1347,8 +1347,13 @@ def unqualified_rate_peaks(facts):
 
     So the unqualified peak stays in the ledger as its own claim, bounding every
     round again, and says what it actually is. It is emitted only when the peak
-    round is NOT a qualifying one; otherwise it would duplicate the record claim's
-    predicate, which `validate` rejects.
+    round is NOT a qualifying one. When it IS one, this claim's last conjunct (the
+    round is short) would be false, and the record claim does NOT cover the gap —
+    its conjuncts range over qualifying rounds only — so that case is
+    `qualified_rate_peaks_unbounded`'s, at the end of the file. The skip below read
+    「one claim already covers it」 until 2026-10-20, whose VS peak was the first to
+    land in a qualifying round: `check_rate_coverage` failed on sixteen short-round
+    VS constants, a branch no earlier session had taken.
 
     Defined last on purpose: FAMILIES runs in definition order and ids are assigned
     over the flattened output, so appending here leaves every existing claim id —
@@ -1364,7 +1369,7 @@ def unqualified_rate_peaks(facts):
         if v <= 0:
             continue
         if _dur(facts["matches"][mi]["rounds"][ri]) >= QUALIFYING_MS:
-            continue          # the peak IS the record; one claim already covers it
+            continue          # the peak IS the record: see qualified_rate_peaks_unbounded
         winner = facts["matches"][mi]["rounds"][ri]["winner"]
         dur_s = _dur(facts["matches"][mi]["rounds"][ri]) // 1000
         approx = "約" if scaled else ""
@@ -1943,6 +1948,45 @@ def intense_round_vs_split(facts):
                         a_term * ft, (a_term + 1) * ft),
                 between(mul(lit(_VS_K), rnd(mi, ri, pl, "garbage_cleared")),
                         d_term * ft, (d_term + 1) * ft),
+            ),
+        })
+    return out
+
+
+@family
+def qualified_rate_peaks_unbounded(facts):
+    """The other half of `unqualified_rate_peaks`: the session peak IS the record.
+
+    The record claim (`round_superlatives`) bounds qualifying rounds only, so when the
+    unqualified peak lands in a qualifying round nothing bounds a short round's rate
+    from above, and `check_rate_coverage` fails. This claim says the record holds
+    with no length floor at all, over every round. It emits nothing for a session
+    whose peak is short — every session before 2026-10-20 — and it is defined last so
+    no existing claim id moves.
+    """
+    out = []
+    for f, scaled, cat, noun, fmt, qualify in _SUPERLATIVES:
+        if not qualify:
+            continue
+        ranked = _rank_desc(facts, lambda p, f=f: p[f])
+        mi, ri, pl, v = ranked[0]
+        if v <= 0 or _dur(facts["matches"][mi]["rounds"][ri]) < QUALIFYING_MS:
+            continue          # unqualified_rate_peaks owns this case
+        winner = facts["matches"][mi]["rounds"][ri]["winner"]
+        approx = "約" if scaled else ""
+        out.append({
+            "family": f"round_peak_qualified_{f}", "category": cat,
+            "canto": f"就算唔設局長下限都係佢：全場最高{noun}係 {pl} 喺 {_ordinal(mi)} 第 "
+                     f"{ri + 1} 局打出嘅 {approx}{fmt(v)}，長局短局都冇一局高過佢",
+            "english_gloss": (f"unqualified session peak {f} is {v} by {pl} at "
+                              f"m{mi + 1}r{ri + 1}, a qualifying round — the record holds "
+                              f"over every round"),
+            "spec": conj(
+                eq(rnd(mi, ri, pl, f), lit(v)),
+                # over EVERY round: this is what bounds the short ones
+                eq(count_rounds(c_field(_players(facts)[0], f, ">", v)), lit(0)),
+                eq(count_rounds(c_field(_players(facts)[1], f, ">", v)), lit(0)),
+                round_winner(mi, ri, winner),
             ),
         })
     return out

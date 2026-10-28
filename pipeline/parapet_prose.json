@@ -1,0 +1,169 @@
+{
+  "_comment": "Words for pipeline/parapet_page.py (the shared pipeline/technique_page.py renderer bound to 欄干 / Parapet). Numbers never live here: every count on the pages is rendered from analysis/parapet-facts.json and analysis/parapet-demos.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. `more_variants.parapet_tss` overlays the TSS variant's own headings on `sections` and `table`. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own Japanese stays as quoted text).",
+  "title": "欄干（Parapet）中盤手法",
+  "overview_title": "欄干（Parapet）中盤手法",
+  "technique_name": "欄干",
+  "desc": "shiwehi.com 個欄干頁畫嘅局部形狀，同 corpus 每一下 TSD 同 TSS 逐個對：模擬器推導，唔屬於信任鏈。",
+  "lede": "欄干（Parapet）係一種捐窿（ドネイト）：T 形嘅位開咗嗰陣，將一粒 L 錯開一欄企直放（原頁：「1列ずらして立てて置き」），佢隻腳伸入 T 左尾下面，另一邊加個屋頂。T 瞓低、尖向下打 TSD，消走 T 左尾同 L 隻腳嗰兩行，T 左尾下面嗰欄就由頂通到底，留低一個直窿；同一個地形亦可以將 T 企直打 TSS，淨係消 L 隻腳嗰行，個直窿留喺高一行。harddrop 同 Tetrisチャンネル 都畫咗下一步打 Tetris 入個直窿；原頁淨係喺講點解打 TSS 唔打 TSD 嗰陣先提 Tetris（TSS 打完地形高一行，之後易啲送 Tetris）。呢版將原頁每一幅圖照抄，再同成個 corpus 每一下 TSD 同 TSS 對：T 落去嗰陣，佢周圍嗰個窗口係咪原頁畫嘅樣；對到之後再睇個形係咪用完整嘅方塊砌出嚟，過得晒規則嗰幾下先列出，連同之後第一粒入個直窿嘅方塊係咪 I、有冇打到 Tetris。",
+  "page_sentences": {
+    "source": "盤面圖逐格轉錄自 shiwehi.com 嘅欄干頁（2021-03-23 版），轉錄有自己嘅 gate 核對；引號入面嘅日文係原頁原文。",
+    "midgame": "呢個係中盤手法，唔係開局定式：盤面係對住 T 嘅局部窗口比，唔係成個盤面比，邊一粒都可以，唔使由空盤開始。",
+    "window": "對法：嗰粒 T 嘅四格要啱啱係原頁畫嘅 T（TSD 係瞓低、尖向下；TSS 係企直、尖向右；左右反轉都算，反轉嗰陣個窗口一齊反）；個窗口入面原頁畫咗有嘢嘅格要有嘢、畫咗空嘅格要空。顏色唔比，窗口以外一格都唔睇。原頁兩個基本形喺右邊同上面畫咗唔屬於呢個形嘅堆同屋頂（一個用 Z、一個用 O），所以個窗口係原頁兩個基本形、BT砲 頁畫嘅欄干、harddrop 嘅 Parapet 頁同 Tetrisチャンネル 兩幅圖都一致嘅最大長方形：五行高、五欄闊。最上面嗰行係 L 嘅身、個位兩格要空同 T 右尾嘅屋頂；中間兩行係 TSD 消嘅兩行（全 T-spin 消兩行嗰陣一定滿，所以唔會分到嘢），L 隻腳就喺 T 左尾下面；最底兩行係 T 左尾下面嗰個直窿，兩格要空、兩邊要有嘢。TSS 用同一個窗口，T 企直，T 左尾嗰格就變咗要空。harddrop 同 Tetrisチャンネル 係另外兩個網站、另外嘅作者，原頁引 Tetrisチャンネル 做參考；gate 逐幅核過個窗口喺每一幅對到一次、其他位唔對，亦核過佢喺 Tetrisチャンネル 自己畫嘅對照（普通 TSD，T 嘅尖塞死個直窿）唔對。定式路線頁淨係同一個作者嘅 山岳積み2号 兩幅（冇標名）對到 TSD 嗰個窗口；BT砲 頁畫嘅欄干同佢由欄干地形砌出嚟嘅途中BT 兩幅都對到，gate 量過，其他中盤手法頁嘅圖一幅都唔對。",
+    "garbage": "窗口入面嘅垃圾當有嘢計；垃圾行個窿喺邊一欄係引擎用種子亂數揀嘅，所以窗口有垃圾嘅個案會喺下面張表單獨數出嚟。",
+    "our_reading": "標住「我哋嘅讀法」嘅係我哋自己點讀原頁，原頁冇明講：淺色大楷格係嗰下 spin 消走嘅行；兩個基本形嘅灰色元地形都係由砌好嗰幅減走原頁放嘅方塊推出嚟；harddrop、Tetrisチャンネル 同 BT砲 頁淨係畫 TSD，佢哋地形上嘅 TSS 位係我哋讀出嚟嘅。harddrop 嗰頁得一個 fumen，我哋解咗一次逐頁記低（G 係灰色），CI 冇再解；Tetrisチャンネル 嗰十六幅圖用同 jp-forecast 一樣嘅像素讀法讀（# 係灰色），其中一幅係寫咗數字嘅說明圖，讀唔到，記低做說明。",
+    "control": "對照：同一個窗口擺喺其他 spin 度數一次（TSD 嗰個擺喺 TSS、TST 同 mini T-spin；TSS 嗰個擺喺 TSD、TST 同 mini T-spin），再逐條拎走個條件數一次。一個形狀如果喺唔關佢事嘅 spin 度都對到差唔多咁多，佢就只係一個形狀測試，唔係呢個手法；所以呢幾行一定同主表一齊印。"
+  },
+  "names": {
+    "basic.z": "基本形（L 錯開一欄企直，屋頂係 Z）",
+    "basic.o": "基本形（屋頂係 O）",
+    "tsd.spin": "T 瞓低、尖向下打 TSD，消走 T 左尾同 L 隻腳嗰兩行",
+    "tsd.after": "TSD 之後：T 左尾下面嗰欄由頂通到底",
+    "tss.spin": "同一個地形，T 企直、尖向右打 TSS，淨係消 L 隻腳嗰行",
+    "tss.after": "TSS 之後：同一個直窿，高咗一行",
+    "basic.z.terrain": "Z 頂基本形嘅元地形（由砌好嗰幅推出嚟）",
+    "basic.o.terrain": "O 頂基本形嘅元地形（由砌好嗰幅推出嚟）"
+  },
+  "derived_note": "我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。",
+  "discrepancies": {},
+  "sections": {
+    "boards": "原頁嘅圖",
+    "boards_note": "原頁每一幅圖，照頁面次序；冇畫出嚟、由圖推返出嚟嘅盤面排喺最尾。",
+    "window": "我哋點樣對（TSD）",
+    "window_note": "左邊係原頁嘅樣，右邊係左右反轉。虛線框係嗰粒 T 嘅四格，灰格係要有嘢嘅格，空格要空；窗口以外唔睇。",
+    "window_drawn": "照原頁",
+    "window_mirrored": "左右反轉",
+    "headline": "corpus 入面對到幾多（TSD）",
+    "headline_note": "分母係已核對範圍入面、過咗重組核對嘅每一下 TSD（全 T-spin、消兩行）。開局係頭 {pieces} 粒以內（由 0 數起，即係第 {last} 粒或之前），中盤係之後。",
+    "followup": "跟住有冇打到 Tetris（TSD）",
+    "followup_note": "harddrop 同 Tetrisチャンネル 都畫咗下一步打 Tetris；原頁淨係用「TSS 打完地形高一行、之後易啲送 Tetris」做打 TSS 唔打 TSD 嘅理由，冇講 TSD 之後點。由對到嗰下起，將 T 左尾下面嗰個直窿嘅格跟住每一下消行同垃圾行推落去，一直推到第一粒有格落入嗰欄嘅方塊；每一步都同引擎自己嘅盤面核過。嗰粒喺已核對範圍入面、有格落喺個窿嗰格或者更低、係 I、而且引擎記佢消四行，先算打到。個直窿重新通咗、深過兩格，個窗口本身已經決定咗，所以唔當係結果。",
+    "controls": "對照",
+    "cross": "同另一個來源對",
+    "cross_note": "（呢版冇用到）",
+    "cases": "個案（TSD）",
+    "cases_note": "每一個過得晒規則嘅 TSD 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播，一開就停喺呢粒 T 落之前，行多一粒就係呢下 T-spin。",
+    "demos": "示範重播",
+    "demos_link": "睇示範重播：原頁每一幅圖點解砌唔到"
+  },
+  "more_variants": {
+    "parapet_tss": {
+      "sections": {
+        "window": "我哋點樣對（TSS）",
+        "window_note": "同一個窗口，T 企直、尖向右：T 左尾嗰格變咗要空，T 上面冇屋頂。左邊係原頁嘅樣，右邊係左右反轉。",
+        "headline": "corpus 入面對到幾多（TSS）",
+        "headline_note": "分母係已核對範圍入面、過咗重組核對嘅每一下 TSS（全 T-spin、消一行）。開局係頭 {pieces} 粒以內（由 0 數起，即係第 {last} 粒或之前），中盤係之後。",
+        "followup": "跟住有冇打到 Tetris（TSS）",
+        "followup_note": "同 TSD 一樣：將 T 左尾下面嗰個直窿嘅格推落去，睇第一粒有格落入嗰欄嘅方塊係咪 I、引擎有冇記佢消四行。",
+        "cases": "個案（TSS）",
+        "cases_note": "每一個過得晒規則嘅 TSS 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播，一開就停喺呢粒 T 落之前，行多一粒就係呢下 T-spin。"
+      },
+      "table": {
+        "ablation": {
+          "no_must_empty": "拎走「要空嘅格要空」",
+          "no_roof": "拎走 T 上面嗰行（TSS 嘅 T 上面冇窗口格，所以呢行一定等於主表）",
+          "t_overlap": "唔要求 T 係窗口嘅 T，淨係要同窗口重疊"
+        },
+        "baseline": "T 企直嘅 TSS（唔睇窗口；呢個係同其他中盤手法頁一樣嘅基線，TSS 嘅 T 本身就企直）",
+        "denominator_note": "分母係嗰款 spin 嘅已核對數（同主表同一個核對）；拎走條件嗰幾行同基線，分母係全部 TSS。"
+      }
+    }
+  },
+  "table": {
+    "player": "玩家",
+    "all": "全部",
+    "in_opener": "開局",
+    "mid_game": "中盤",
+    "mirrored": "左右反轉",
+    "garbage": "窗口有垃圾",
+    "fired": "打到 Tetris",
+    "of_hits": "（分母係對到嘅數）",
+    "reason": "冇打到嘅原因",
+    "row": "對照",
+    "followup_head": "結果",
+    "under": "同一個窗口，喺 {kind} 度",
+    "ablation": {
+      "no_must_empty": "拎走「要空嘅格要空」",
+      "no_roof": "拎走 T 上面嗰行（L 嘅身、屋頂）",
+      "t_overlap": "唔要求 T 係窗口嘅 T，淨係要同窗口重疊"
+    },
+    "baseline": "T 企直嘅 TSD（唔睇窗口；TSD 嘅 T 係瞓低，呢行係同 STSD 頁一樣嘅基線）",
+    "denominator_note": "分母係嗰款 spin 嘅已核對數（同主表同一個核對）；拎走條件嗰幾行同基線，分母係全部 TSD。",
+    "date": "日期",
+    "round": "局",
+    "lock": "第幾粒（由 0 數）",
+    "phase": "開局／中盤",
+    "window_col": "窗口",
+    "followup_col": "Tetris",
+    "cross_round": "回合",
+    "cross_node": "去到嗰個位嘅粒（由 0 數）",
+    "cross_hit": "對到嘅粒（由 0 數）",
+    "yes": "打到（第 {lock} 粒，由 0 數）",
+    "phase_opener": "開局",
+    "phase_mid": "中盤",
+    "mirrored_mark": "（反轉）"
+  },
+  "reasons": {
+    "well_covered": "第一粒入嗰欄嘅方塊淨係喺個窿上面，冚住咗個窿",
+    "well_filled_not_i": "第一粒落入個窿嘅唔係 I",
+    "i_in_well_not_quad": "I 落咗入個窿，但引擎冇記佢消四行",
+    "past_verified": "第一粒入嗰欄嘅方塊喺已核對範圍之外",
+    "slot_off_board": "個窿推出咗盤面",
+    "round_ended": "局完之前冇方塊入過嗰欄",
+    "rowmap_unverified": "中間有一步對唔返引擎嘅盤面，停咗唔再推"
+  },
+  "spin_kinds": {
+    "TSD": "TSD",
+    "TSS": "TSS",
+    "TST": "TST",
+    "mini_TSS": "mini TSS",
+    "mini_TSD": "mini TSD"
+  },
+  "index_card": {
+    "kicker": "中盤手法 · shiwehi.com",
+    "blurb": "欄干（Parapet）：L 錯開一欄企直，T 打 TSD 或者 TSS 之後 T 左尾下面留低一個直窿，下一步打 Tetris。原頁每幅圖、corpus 入面真係用完整方塊砌出嚟嘅 TSD 同 TSS、跟住有冇打到 Tetris，同每幅圖點解冇示範。"
+  },
+  "missing": "搵唔到呢個示範。",
+  "demo": {
+    "title": "欄干 示範重播",
+    "desc": "欄干嘅示範：原頁每一幅圖，由空盤砌唔砌得到、點解砌唔到。",
+    "lede": "示範要由空盤開始：先用方塊砌出原頁灰色嘅元地形，再放原頁畫嘅 L 同屋頂，再將 T 瞓低打 TSD。呢頁每一幅圖都砌唔到，原因逐幅寫喺下面，係 planner 自己度出嚟、或者由佢企喺嗰幅圖推返嚟嘅。",
+    "user": "示範",
+    "play": "播呢個示範",
+    "idle": "呢版冇砌得到嘅示範，所以冇嘢播。",
+    "now": "示範：{name}",
+    "sentences": {
+      "demo": "呢度嘅示範（如果有）都係我哋砌出嚟嘅，唔係任何人打過嘅對局：出邊粒、幾時 hold、點樣按掣，全部係我哋揀嘅，所以唔計入任何數。",
+      "engine": "一個示範要用同 corpus 一樣嘅 Triangle 引擎由頭行一次，每一粒都要落喺計劃嘅位、spin 同消行數都要啱，先會出現喺呢度；行唔到就寫低 planner 度到嘅原因，唔會靜靜雞唔見咗。",
+      "base": "元地形要我哋自己用方塊砌：原頁將佢畫成灰色，冇講係乜方塊。由空盤砌，每粒加四格、每消一行減十格，所以格數係單數嘅地形一定砌唔出；格數係雙數但唔係四嘅倍數嘅，要消過行先砌得出，而呢個 planner 唔消行；格數係四嘅倍數都未必鋪得出。",
+      "order": "發牌同 STSD 頁一樣：第一巡最後嗰粒 T 一出就 hold 住，第二巡第一粒頂上，第二巡嘅 T 一出就換出嚟打；每一巡都係完整嘅七粒。示範喺 TSD 嗰下完：原頁嘅直窿得兩格深，冇 Tetris 可以砌；同一幅圖上面嘅 TSS 唔另外做一個示範（一幅圖一個示範）。呢頁冇一幅砌得到，所以冇示範用到。",
+      "rule": "砌唔到嘅原因係 planner 第一個撞到嘅問題：元地形嘅格數由空盤砌唔出（單數），或者係雙數但唔係四嘅倍數（要消過行先得），或者冇一個由非 T 方塊（每款最多兩粒）鋪得出嘅鋪法。同一幅圖可能仲有其他原因，下面淨係寫第一個。"
+    },
+    "chain": "砌法：{chain}",
+    "base_words": "頭 {n} 粒係我哋砌嘅元地形（{pieces}）",
+    "page_words": "跟住 {pieces} 係原頁畫嘅",
+    "fill_words": "我哋用 {pieces} 填咗",
+    "spin": "第 {n} 粒：{name}",
+    "events": "spin：{events}",
+    "reaches": "停過喺：{boards}",
+    "unbuilt": "冇示範：{reason}",
+    "unbuilt_title": "冇示範嘅圖"
+  },
+  "qualify": {
+    "title": "真係砌出嚟定撞出嚟",
+    "note": "窗口淨係話個形喺 T 落之前企咗喺度。原頁、harddrop 同 Tetrisチャンネル 每一幅圖都係用一粒完整嘅 L 企直、加一粒完整嘅方塊做屋頂砌出嚟，所以對到嘅每一下再用同社畜トレイン頁一樣嘅規則篩：原頁兩個基本形都畫做自己方塊嘅格（L 嗰四格同屋頂嗰兩格，反轉嗰陣一齊反），每格都要屬於一粒四格仲齊晒喺板上面嘅方塊（唔係消行之後剩低嘅碎）；嗰啲格唔可以係垃圾；L 嗰四格要係同一粒方塊（原頁叫你將 L 「1列ずらして立てて置き」）；T 之前或之後 14 粒以內唔可以有全消，因為咁係 DPC。階段のドネイト 嗰條唔使：兩個窗口每一個反轉組合都有格衝突，同一粒 T 唔會兩個都對到。另外，窗口細，好多普通嘅堆都過到，所以仲要原頁其中一幅圖成個形喺 T 周圍企到：T、佢掂到嘅窿同佢下面三行以內嘅窿、再加一圈一格嘅邊，每格有冇嘢都要同幅圖一樣（唔理顏色，可以反轉）。",
+    "summary_lead": "corpus 入面規則都過、算係用完整方塊砌出嚟嘅欄干（TSD 同 TSS 加埋）：",
+    "summary_unit": " 下",
+    "summary_note": "個窗口對到個形、但唔過規則嘅 T-spin，呢版唔列出亦唔數；佢哋仍然逐個記喺 analysis/parapet-facts.json，由 parapet.test.ts 逐個列名。過到嘅每一下喺下面「個案」逐個列出，連去嗰晚嘅重播。",
+    "col": "算唔算",
+    "yes": "算",
+    "no_join": "；",
+    "reasons": {
+      "fragment": "L 或屋頂嘅格係消行之後剩低嘅碎",
+      "garbage_in_shape": "L 或屋頂嘅格係垃圾",
+      "shape_cell_empty": "L 或屋頂嘅格係空（窗口要佢有嘢，正常唔會出現）",
+      "l_not_one_piece": "L 嗰四格唔係同一粒方塊",
+      "dpc": "T 前後 14 粒以內有全消（DPC）",
+      "ownership_unverified": "T 之前有一步核對唔到，分唔出邊格屬於邊粒",
+      "not_whole_shape": "原頁冇一幅圖成個形喺 T 周圍企到（每幅圖：T、佢掂到或者佢下面三行以內嘅窿、再加一格邊，格格佔位都要一樣，可以反轉）"
+    }
+  }
+}

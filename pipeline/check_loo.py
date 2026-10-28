@@ -600,12 +600,47 @@ PUBLISHED = (
     # named here — add them, with a SENTENCES anchor, the day one is.
     ("2026-10-12", "app_gap_won", "series"),
     ("2026-10-12", "app_gap_lost", "series"),
+    # 2026-10-20 takes TWO `ANNOTATED` entries, both regime gaps — the first session since 09-10
+    # where both published regime figures cross. Measured over 30 rounds, the corpus's smallest:
+    #
+    #     app_gap_won      +7.2348 pp    m4r8 -> +11.7423  rel 0.623  1.60x the next of 30
+    #     app_gap_lost     +1.2734 pp    m2r1 ->  -1.8777  rel 2.474  1.23x  <- SIGN FLIPS
+    #
+    # The lost gap is the near-zero kind this file's header names as the most fragile, and with
+    # 30 rounds a single round is a large share of either pool. Its attack total (+80 to yachi)
+    # is quoted only in the shortfall table, which is not a SENTENCES target.
+    ("2026-10-20", "app_gap_won", "series"),
+    ("2026-10-20", "app_gap_lost", "series"),
+    # 2026-10-22 takes NO `ANNOTATED` entry. Measured over the two regime figures, 63 rounds:
+    #
+    #     app_gap_won     +15.1683 pp    m3r1 -> +13.0560  rel 0.139  1.28x the next of 63
+    #     app_gap_lost    +20.1255 pp    m1r7 -> +18.0422  rel 0.104  1.39x
+    #
+    # Both far under THRESHOLD and neither sign moves: on the night with the corpus's largest
+    # session APP gap, both regime gaps are large and spread over many rounds, which is 09-17's
+    # reading. Its attack total is quoted only in the shortfall table, not a SENTENCES target.
+    ("2026-10-22", "app_gap_won", "series"),
+    ("2026-10-22", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-10-20", "app_gap_lost"): (
+        "the lost-regime gap is +1.2734 pp — the corpus's second-narrowest after 09-10's "
+        "+1.2535 — and m2r1 alone takes it to -1.8777, i.e. the SIGN flips: without that round "
+        "yachi's losing-round attack per piece is the higher. m2r1 is a round pinglamb lost at "
+        ".7361 attack per piece over 144 pieces, his third-highest rate among the 15 rounds he "
+        "lost and his second-largest by pieces. So 「地板撞埋」 is that round's statement: "
+        "the direction does not survive, only the reading that the two floors are close. `rel` "
+        "2.474 is the second-largest ever measured here, on the corpus's smallest session."),
+    ("2026-10-20", "app_gap_won"): (
+        "the won-regime gap is +7.2348 pp and m4r8 alone takes it to +11.7423. m4r8 is the "
+        "night's longest round (~233 s) and pinglamb's largest won round by far (336 pieces, "
+        "20% of his winning-round pool), won at .5923 attack per piece — his second-lowest "
+        "winning rate. One long, low-efficiency win holds his whole winning pool down; the "
+        "sign survives, the size is that round's. `rel` 0.623, the next round 1.60x below."),
     ("2026-10-09", "attack_diff"): (
         "the attack totals are 5815 vs 5757, difference +58 — yachi AHEAD, which only 07-22 "
         "(+28) had done before — and m7r8 alone is 35 of it: without that round yachi leads by "

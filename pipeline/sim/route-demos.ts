@@ -83,7 +83,11 @@ export const gridKey = (g: Grid) => g.map(r => r.map(c => c ?? '.').join('')).jo
 /** A fresh demo engine (exported for the test's unit check of `reach`). */
 export function newEngine(routes: any) {
   const opts = { ...TL_DEFAULTS, ...DEMO_OPTIONS };
-  return createEngine(opts, 'demo', [{ gameid: 'demo', userid: 'demo', username: 'demo' }], demoDate(routes)) as any;
+  const date = demoDate(routes);
+  const eng = createEngine(opts, 'demo', [{ gameid: 'demo', userid: 'demo', username: 'demo' }], date) as any;
+  // what the engine was built from, so `reach`'s cache can share a search between two engines built alike
+  ENGINE_SIG.set(eng, `${JSON.stringify(opts)}|${date.toISOString()}`);
+  return eng;
 }
 
 // ── reachability: a BFS over the engine's own moves ─────────────────────────────────────────────
@@ -111,21 +115,60 @@ const cellsAt = (eng: any, s: St) =>
   eng.falling.absoluteAt({ x: s.x, y: s.y, rotation: s.r }).map(([x, y]: [number, number]) => y * WIDTH + x)
     .sort((a: number, b: number) => a - b);
 
+/** `reach`'s cache: per engine build (`newEngine`'s options and date; an engine not built there keys by its
+ *  own identity), per (board as the engine holds it, piece, no180), the whole search's answer — every resting
+ *  placement's cells (sorted, joined) → the paths `reach` would return for that target, in discovery order.
+ *  The BFS never reads the target (it only filters by it at the end), so one search answers every target on
+ *  that board. Bounded: least recently used entries are dropped past `REACH_CACHE_MAX`. */
+const ENGINE_SIG = new WeakMap<object, string>();
+const ENGINE_OWN = new WeakMap<object, Map<string, Map<string, Path[]>>>();
+const SIG_CACHE = new Map<string, Map<string, Map<string, Path[]>>>();
+const REACH_CACHE_MAX = 4096;
+function engineCache(eng: any): Map<string, Map<string, Path[]>> {
+  const sig = ENGINE_SIG.get(eng);
+  if (sig === undefined) {
+    let c = ENGINE_OWN.get(eng);
+    if (!c) ENGINE_OWN.set(eng, c = new Map());
+    return c;
+  }
+  let c = SIG_CACHE.get(sig);
+  if (!c) SIG_CACHE.set(sig, c = new Map());
+  return c;
+}
+const copyPath = (p: Path): Path => ({ edges: [...p.edges], spin: p.spin, cells: [...p.cells] });
+
 /** Every engine-legal resting placement of `piece` on `grid` whose cells are `target`, with the
  *  shortest path to each distinct arrival spin. `no180` (a mutant) drops the 180 edge. */
 export function reach(eng: any, grid: Grid, piece: string, target: number[], opts: { no180?: boolean } = {})
   : Path[] {
-  eng.board.state = grid.map(r => r.map(c => (c ? { mino: c.toLowerCase(), connections: 0 } : null)));
+  const state = grid.map(r => r.map(c => (c ? c.toLowerCase() : null)));
+  const ck = `${opts.no180 ? 1 : 0}|${piece.toLowerCase()}|${state.map(r => r.map(c => c ?? '.').join('')).join('/')}`;
+  const cache = engineCache(eng);
+  let all = cache.get(ck);
+  if (all) { cache.delete(ck); cache.set(ck, all); }
+  else {
+    all = searchAll(eng, state, piece, opts);
+    cache.set(ck, all);
+    if (cache.size > REACH_CACHE_MAX) cache.delete(cache.keys().next().value!);
+  }
+  const want = [...target].sort((a, b) => a - b).join(',');
+  return (all.get(want) ?? []).map(copyPath);
+}
+
+/** The whole BFS behind `reach`, for every target at once: per resting placement's cells, the shortest path to
+ *  each distinct arrival spin, in the order the search finds them. */
+function searchAll(eng: any, state: (string | null)[][], piece: string, opts: { no180?: boolean })
+  : Map<string, Path[]> {
+  eng.board.state = state.map(r => r.map(c => (c ? { mino: c, connections: 0 } : null)));
   eng.held = null;
   eng.initiatePiece(piece.toLowerCase(), true);
   const f = eng.falling;
   const start: St = { x: f.location[0], y: f.location[1], r: f.rotation, spin: null };
-  const want = [...target].sort((a, b) => a - b).join(',');
   const prev = new Map<string, [string | null, Edge | null, St]>();
   prev.set(key(start), [null, null, start]);
   const queue: St[] = [start];
-  const found: Path[] = [];
-  const seenSpin = new Set<string>();
+  const found = new Map<string, Path[]>();
+  const seenSpin = new Map<string, Set<string>>();
   const rot = (s: St, how: Edge): St | null => {
     f.location = [s.x, s.y]; f.rotation = s.r; f.totalRotations = 0; f.lockResets = 0; f.rotResets = 0;
     eng.lastSpin = null;
@@ -135,14 +178,22 @@ export function reach(eng: any, grid: Grid, piece: string, target: number[], opt
     return { x: f.location[0], y: f.location[1], r: f.rotation, spin: sp };
   };
   const edges: Edge[] = opts.no180 ? ['L', 'R', 'D', 'CW', 'CCW'] : ['L', 'R', 'D', 'CW', 'CCW', '180'];
-  while (queue.length) {
-    const s = queue.shift()!;
+  for (let qi = 0; qi < queue.length; qi++) {
+    const s = queue[qi]!;
     const k = key(s);
-    if (!fall1(eng, s) && cellsAt(eng, s).join(',') === want && !seenSpin.has(String(s.spin))) {
-      seenSpin.add(String(s.spin));
-      const es: Edge[] = [];
-      for (let c = k; prev.get(c)![0] !== null; c = prev.get(c)![0]!) es.unshift(prev.get(c)![1]!);
-      found.push({ edges: es, spin: s.spin, cells: cellsAt(eng, s) });
+    if (!fall1(eng, s)) {
+      const cells = cellsAt(eng, s);
+      const ck = cells.join(',');
+      let seen = seenSpin.get(ck);
+      if (!seen) seenSpin.set(ck, seen = new Set());
+      if (!seen.has(String(s.spin))) {
+        seen.add(String(s.spin));
+        const es: Edge[] = [];
+        for (let c = k; prev.get(c)![0] !== null; c = prev.get(c)![0]!) es.unshift(prev.get(c)![1]!);
+        let list = found.get(ck);
+        if (!list) found.set(ck, list = []);
+        list.push({ edges: es, spin: s.spin, cells });
+      }
     }
     for (const e of edges) {
       let n: St | null;

@@ -1,0 +1,3231 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "basicdonating",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/basicdonating.php",
+    "title": "脱初心者のための基本的なドネイト",
+    "author": "しゑひ(shiwehi)",
+    "created": "2021-03-22",
+    "updated": "2024-10-07",
+    "fetched": "2026-10-24",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, BT砲, 階段のドネイト and 途中DT砲 used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it (some rows indented with a tab), 75 ten-wide boards in page order.",
+    "snapshot_file": "basicdonating.html",
+    "snapshot_sha256": "78241b0782ca525efeec541e04b9d03e7c0b30767a87b2609880ee72e42a3849",
+    "snapshot_bytes": 51066,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch; an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "not re-fetched for this page: the same URL 途中DT砲 read on 2026-10-24 (its colour map is recorded there); this page draws no letter outside the ones that page and STSD read"
+    },
+    "decorative_images": [
+      "脱初心者のための基本的なドネイト タイトル画像"
+    ],
+    "references": [
+      "./applieddonating.php (応用的なドネイト, not transcribed)",
+      "./kaidansetup.php (階段のドネイト)",
+      "./parapet.php (欄干)",
+      "./stmbcave.php (STMB Cave)",
+      "./tspin.php",
+      "Donation | Tetris Wiki | Fandom",
+      "TETRiS TRAiNER TRÈS-BiEN",
+      "ドネイト Donating | Tetrisちゃんねる",
+      "【テトリス/豆知識】深い2列穴を埋めるドネイト【VOICEVOX解説】 by dotTIZ",
+      "自作ドネイト「LJサイクロン」、「TOサイクロン」【ぷよテト2】"
+    ],
+    "unfetched": [
+      "./applieddonating.php"
+    ]
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "i j l o s t z": "a cell of that piece ( a T placed before the spin, on the TO-cyclone form)",
+    "I J L O S Z": "a cell of that piece in a row a spin clears, drawn muted; checked whole with its lower-case cells",
+    "U": "a cell of the T the spin places (the renderer's \"the T goes here\")",
+    "C": "an earlier cell in a row a spin clears, muted (checked on every spin board); on a form drawn without its T, a cell of the rows the T would clear (OUR READING: filled)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "title",
+      "verbatim": "脱初心者のための基本的なドネイト"
+    },
+    {
+      "id": "definition",
+      "verbatim": "とは、テトリスにおいてBack-To-Backを維持するためにわざと下穴を塞いでTスピンを打つ技術のことです。"
+    },
+    {
+      "id": "h.consciousness",
+      "verbatim": "ドネイトを行う時の意識"
+    },
+    {
+      "id": "consciousness",
+      "verbatim": "ドネイトを行う際の意識として最も重要なのは、TSDで消える2列だけを埋めるという意識です。(TSSの1列にする場合も有。)"
+    },
+    {
+      "id": "z",
+      "verbatim": "下図では%Zを使用して、ちょうどTSDで消える2列分だけを埋めることができたため、下穴が開いた状態を維持することができています。"
+    },
+    {
+      "id": "l3",
+      "verbatim": "しかし、こちらの下図では、2列ではなく3列を埋めてしまったため、下穴が埋まってしまい、掘りにくい形となってしまいました。"
+    },
+    {
+      "id": "tetris",
+      "verbatim": "このような場合は、無理にTスピンでラインを消そうとせずに、空Tスピンで地形を整えてからテトリスを打つという選択肢もある、ということを覚えておくと良いでしょう。"
+    },
+    {
+      "id": "h.one",
+      "verbatim": "1ミノドネイト"
+    },
+    {
+      "id": "one",
+      "verbatim": "1つのミノで作ることができるドネイトです。"
+    },
+    {
+      "id": "one.named",
+      "verbatim": "は名前が付いているため知っている人も多いかもしれませんが、それ以外のミノを使用したドネイトも非常に使用しやすいため、覚えておくとTスピンの幅が広がります。"
+    },
+    {
+      "id": "h.one.forms",
+      "verbatim": "1ミノドネイトの形"
+    },
+    {
+      "id": "h.one.q",
+      "verbatim": "1ミノドネイトの練習問題"
+    },
+    {
+      "id": "question",
+      "verbatim": "TSDを打ってください。"
+    },
+    {
+      "id": "answer",
+      "verbatim": "解答"
+    },
+    {
+      "id": "h.two",
+      "verbatim": "2ミノドネイト"
+    },
+    {
+      "id": "two",
+      "verbatim": "2つのミノを使用して作るドネイトです。"
+    },
+    {
+      "id": "h.two.forms",
+      "verbatim": "2ミノドネイトの形"
+    },
+    {
+      "id": "h.hole",
+      "verbatim": "2列幅の穴を埋める2ミノドネイトの形"
+    },
+    {
+      "id": "hole4",
+      "verbatim": "これは%Iを立てた後に%S/%Zの1ミノドネイトやってるのと同じですね。"
+    },
+    {
+      "id": "hole5",
+      "verbatim": "これは%Iを立てた後に%Oの1ミノドネイトやってるのと同じです。"
+    },
+    {
+      "id": "h.fin",
+      "verbatim": "T-spin FINを打つ2ミノドネイトの形"
+    },
+    {
+      "id": "fin",
+      "verbatim": "T-spin FINは残る地形があまり良くないので実戦で使うかは怪しいですが、一応掲載しておきます。"
+    },
+    {
+      "id": "h.two.q",
+      "verbatim": "2ミノドネイトの練習問題"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "intro.terrain",
+      "kind": "base",
+      "caption_quote": "consciousness",
+      "label": "a terrain with a two-deep well at the wall and a TSD slot",
+      "rows": [
+        "----------",
+        "----cc----",
+        "-----ccccc",
+        "-cc-cccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.z",
+      "kind": "spin",
+      "on": "intro.terrain",
+      "adds": "UZz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "z",
+      "label": "the Z fills exactly the two rows the TSD clears: the well stays open",
+      "rows": [
+        "----------",
+        "-z--cc----",
+        "ZZUUUCCCCC",
+        "ZCCUCCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.z.after",
+      "kind": "after",
+      "after_of": "intro.z",
+      "caption_quote": "z",
+      "label": "what that TSD leaves: the well open from the top",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-z--cc----",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.l3",
+      "kind": "spin",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "l3",
+      "label": "the L fills three rows, not two: its top cell is left over the well",
+      "rows": [
+        "----------",
+        "ll--cc----",
+        "LCUUUCCCCC",
+        "LCCUCCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.l3.after",
+      "kind": "after",
+      "after_of": "intro.l3",
+      "caption_quote": "l3",
+      "label": "what that TSD leaves: the well covered",
+      "rows": [
+        "----------",
+        "----------",
+        "ll--cc----",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.empty_t",
+      "kind": "illustration",
+      "caption_quote": "tetris",
+      "label": "the alternative: a T-spin that clears nothing, to tidy the terrain",
+      "rows": [
+        "----------",
+        "----cc----",
+        "-cUUUccccc",
+        "-ccUcccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "intro.tetris",
+      "kind": "illustration",
+      "caption_quote": "tetris",
+      "label": "...and then a Tetris into the well",
+      "rows": [
+        "----------",
+        "----cc----",
+        "ICUUUCCCCC",
+        "ICCUCCCCCC",
+        "ICCCCCCCCC",
+        "ICCCCCCCCC"
+      ]
+    },
+    {
+      "id": "one.o",
+      "kind": "base",
+      "caption_quote": "h.one.forms",
+      "label_jp": "%Oドネイト",
+      "rows": [
+        "----------",
+        "----cc----",
+        "oo---CCCCC",
+        "ooC-CCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "one.s",
+      "kind": "base",
+      "caption_quote": "h.one.forms",
+      "label_jp": "%Sドネイト(=階段のドネイト)",
+      "rows": [
+        "----------",
+        "---cc-----",
+        "s---CCCCCC",
+        "ss-CCCCCCC",
+        "-scccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "one.z",
+      "kind": "base",
+      "caption_quote": "h.one.forms",
+      "label_jp": "%Zドネイト",
+      "rows": [
+        "----------",
+        "-z--cc----",
+        "zz---CCCCC",
+        "zCC-CCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "one.l_a",
+      "kind": "base",
+      "caption_quote": "h.one.forms",
+      "label_jp": "%LドネイトA(=欄干)",
+      "rows": [
+        "----------",
+        "l--cc-----",
+        "l---CCCCCC",
+        "ll-CCCCCCC",
+        "c-cccccccc",
+        "c-cccccccc"
+      ]
+    },
+    {
+      "id": "one.l_b",
+      "kind": "base",
+      "caption_quote": "h.one.forms",
+      "label_jp": "%LドネイトB",
+      "rows": [
+        "----------",
+        "-----cc---",
+        "lll---CCCC",
+        "lCCC-CCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q1.1",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q1 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cc--------",
+        "ccc-----cc",
+        "cccc-c--cc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q1.1.answer",
+      "kind": "spin",
+      "on": "q1.1",
+      "adds": "OUl",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q1 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "--l-------",
+        "--l-------",
+        "ccll------",
+        "CCCUUUOOCC",
+        "CCCCUCOOCC",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q1.2",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q2 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "cccccc----",
+        "ccccccc---",
+        "cccccccc--",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q1.2.answer",
+      "kind": "spin",
+      "on": "q1.2",
+      "adds": "UZoz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q2 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "-----oo---",
+        "-----oo---",
+        "CCCCCCUUUZ",
+        "CCCCCCCUZZ",
+        "ccccccccz-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q1.3",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q3 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-----ccccc",
+        "c-cc-ccccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "q1.3.answer",
+      "kind": "spin",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q3 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----z-----",
+        "---zz-----",
+        "---zs-----",
+        "CUUUSSCCCC",
+        "CCUCCSCCCC",
+        "ccccc-cccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "q1.4",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q4 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-------ccc",
+        "cc-ccc-ccc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q1.4.answer",
+      "kind": "spin",
+      "on": "q1.4",
+      "adds": "JUZz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q4 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "-z--------",
+        "zz--------",
+        "ZUUUJJJCCC",
+        "CCUCCCJCCC",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q1.5",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q5 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "--------cc",
+        "---ccc---c",
+        "---cccc-cc",
+        "-ccccccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q1.5.answer",
+      "kind": "spin",
+      "on": "q1.5",
+      "adds": "JUZjz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q5 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "-zj-----cc",
+        "ZZJCCCUUUC",
+        "ZJJCCCCUCC",
+        "-ccccccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q1.6",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q6 (1ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "------cccc",
+        "---c-ccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q1.6.answer",
+      "kind": "spin",
+      "on": "q1.6",
+      "adds": "JOUj",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q6 (1ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--jj------",
+        "OOJUUUCCCC",
+        "OOJCUCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "two.jz_a",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%J%ZドネイトA",
+      "rows": [
+        "--z-------",
+        "-zz-------",
+        "jz---CCCCC",
+        "jjj-CCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "two.jz_b",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%J%ZドネイトB",
+      "rows": [
+        "----------",
+        "--zz-j----",
+        "---zzjCCCC",
+        "C-CCjjCCCC",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "two.sz_a",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%S%ZドネイトA(=STMB Cave)",
+      "rows": [
+        "--z-------",
+        "-zz-------",
+        "Cz---ssCCC",
+        "CCC-ssCCCC",
+        "ccc---cccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "two.sz_b",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%S%ZドネイトB",
+      "rows": [
+        "--z-------",
+        "-zz-------",
+        "sz---CCCCC",
+        "ssC-CCCCCC",
+        "-scccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "two.js_a",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%J%SドネイトA",
+      "rows": [
+        "----------",
+        "------cc--",
+        "jjss---CCC",
+        "jssCC-CCCC",
+        "j-cccccccc",
+        "c-cccccccc"
+      ]
+    },
+    {
+      "id": "two.js_b",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%J%SドネイトB",
+      "rows": [
+        "----------",
+        "--ss------",
+        "jss---CCCC",
+        "jjjC-CCCCC",
+        "--cccccccc",
+        "--cccccccc"
+      ]
+    },
+    {
+      "id": "two.oz",
+      "kind": "base",
+      "caption_quote": "h.two.forms",
+      "label_jp": "%O%Zドネイト(=鶏頭くびき)",
+      "rows": [
+        "----------",
+        "-z--cc----",
+        "zz---CCCCC",
+        "zoo-CCCCCC",
+        "-ooccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "hole2.a",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ2マスのとき(%S/%Z>%I)",
+      "rows": [
+        "----------",
+        "-iccc--ccc",
+        "-iccc--ccc",
+        "-iccc--ccc",
+        "siCCC---CC",
+        "ssCCCC-CCC",
+        "-scccccccc"
+      ]
+    },
+    {
+      "id": "hole2.b",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ2マスのとき(%S/%Z>%I), the other hand of the hole",
+      "rows": [
+        "----------",
+        "i-ccc--ccc",
+        "i-ccc--ccc",
+        "i-ccc--ccc",
+        "izCCC---CC",
+        "zzCCCC-CCC",
+        "z-cccccccc"
+      ]
+    },
+    {
+      "id": "hole3.a",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ3マスのとき(%J・%L)",
+      "rows": [
+        "----------",
+        "l-ccc--ccc",
+        "l-ccc--ccc",
+        "llCCC---CC",
+        "jjCCCC-CCC",
+        "j-cccccccc",
+        "j-cccccccc"
+      ]
+    },
+    {
+      "id": "hole3.b",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ3マスのとき(%J・%L), the other hand of the hole",
+      "rows": [
+        "----------",
+        "-jccc--ccc",
+        "-jccc--ccc",
+        "jjCCC---CC",
+        "llCCCC-CCC",
+        "-lcccccccc",
+        "-lcccccccc"
+      ]
+    },
+    {
+      "id": "hole4.a",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ4マスのとき(%I>%S/%Z)",
+      "rows": [
+        "----------",
+        "s-ccc--ccc",
+        "ssCCC---CC",
+        "isCCCC-CCC",
+        "i-cccccccc",
+        "i-cccccccc",
+        "i-cccccccc"
+      ]
+    },
+    {
+      "id": "hole4.b",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ4マスのとき(%I>%S/%Z), the other hand of the hole",
+      "rows": [
+        "----------",
+        "-zccc--ccc",
+        "zzCCC---CC",
+        "ziCCCC-CCC",
+        "-icccccccc",
+        "-icccccccc",
+        "-icccccccc"
+      ]
+    },
+    {
+      "id": "hole5.a",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ5マスのとき(%I>%O)",
+      "rows": [
+        "--ccc--ccc",
+        "ooCCC---CC",
+        "ooCCCC-CCC",
+        "i-cccccccc",
+        "i-cccccccc",
+        "i-cccccccc",
+        "i-cccccccc"
+      ]
+    },
+    {
+      "id": "hole5.b",
+      "kind": "base",
+      "caption_quote": "h.hole",
+      "label_jp": "高さ5マスのとき(%I>%O), the other hand of the hole",
+      "rows": [
+        "--ccc--ccc",
+        "ooCCC---CC",
+        "ooCCCC-CCC",
+        "-icccccccc",
+        "-icccccccc",
+        "-icccccccc",
+        "-icccccccc"
+      ]
+    },
+    {
+      "id": "fin.lj",
+      "kind": "base",
+      "caption_quote": "h.fin",
+      "label_jp": "%L+屋根(LJサイクロン)",
+      "rows": [
+        "----------",
+        "---jjjcccc",
+        "-----jcccc",
+        "-----ccccc",
+        "lll--CCCCC",
+        "lCCC-CCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "fin.to",
+      "kind": "base",
+      "caption_quote": "h.fin",
+      "label_jp": "%T%O+屋根(TOサイクロン)",
+      "rows": [
+        "----------",
+        "--jjj-----",
+        "----jccccc",
+        "----cccccc",
+        "OO--CCCCCC",
+        "OOt-CCCCCC",
+        "-tttcccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q2.1",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q1 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ccc------c",
+        "ccc-----cc",
+        "ccc----ccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.1.answer",
+      "kind": "spin",
+      "on": "q2.1",
+      "adds": "JUZz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q1 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "-----z----",
+        "ccc-zz---c",
+        "CCCJZUUUCC",
+        "CCCJJJUCCC",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.2",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q2 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cc------cc",
+        "cc--cc-ccc",
+        "ccc-cccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.2.answer",
+      "kind": "spin",
+      "on": "q2.2",
+      "adds": "LSUls",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q2 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "--l-ss----",
+        "CCLSSUUUCC",
+        "CCLLCCUCCC",
+        "ccc-cccccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.3",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q3 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "c---------",
+        "cc-----ccc",
+        "ccc---cccc",
+        "ccc---cccc",
+        "ccc---cccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.3.answer",
+      "kind": "spin",
+      "on": "q2.3",
+      "adds": "SUj",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q3 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "--j-------",
+        "--j-------",
+        "cjj-------",
+        "CCUUUSSCCC",
+        "CCCUSSCCCC",
+        "ccc---cccc",
+        "ccc---cccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.4",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q4 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "cc--------",
+        "ccccc-----",
+        "cccccc-c--",
+        "cccccccc--",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.4.answer",
+      "kind": "spin",
+      "on": "q2.4",
+      "adds": "SUZsz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q4 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "-------s--",
+        "cc-----ss-",
+        "CCCCCUUUSZ",
+        "CCCCCCUCZZ",
+        "ccccccccz-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.5",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q5 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "cc--------",
+        "c-------cc",
+        "cc-cc---cc",
+        "cccccc--cc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q2.5.answer",
+      "kind": "spin",
+      "on": "q2.5",
+      "adds": "LUZl",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q5 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "cc--------",
+        "CUUUZZLLCC",
+        "CCUCCZZLCC",
+        "cccccc-lcc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "q2.6",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q6 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "------cccc",
+        "---c-ccccc",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q2.6.answer",
+      "kind": "spin",
+      "on": "q2.6",
+      "adds": "JSUs",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q6 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--ss------",
+        "JSSUUUCCCC",
+        "JJJCUCCCCC",
+        "-ccccccccc",
+        "-ccccccccc"
+      ]
+    },
+    {
+      "id": "q2.7",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q7 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "ccc-----cc",
+        "ccc----ccc",
+        "ccc-c-cccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.7.answer",
+      "kind": "spin",
+      "on": "q2.7",
+      "adds": "JSUjs",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q7 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "----ss----",
+        "CCCSSUUUCC",
+        "CCCJJJUCCC",
+        "ccc-cjcccc",
+        "ccc-cccccc",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "q2.8",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q8 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cccc------",
+        "ccccc-c---",
+        "ccccccccc-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.8.answer",
+      "kind": "spin",
+      "on": "q2.8",
+      "adds": "LUZz",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q8 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "------zz--",
+        "CCCCUUUZZL",
+        "CCCCCUCLLL",
+        "ccccccccc-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.9",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q9 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "cccccc----",
+        "ccccc-----",
+        "cccccc----",
+        "ccccccc---",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.9.answer",
+      "kind": "spin",
+      "on": "q2.9",
+      "adds": "OSUos",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q9 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "cccccc--s-",
+        "CCCCCUUUSS",
+        "CCCCCCUOOS",
+        "cccccccoo-",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.10",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q10 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "------cc--",
+        "--cccccc--",
+        "---ccccc--",
+        "c-cccccc--",
+        "cccccccc--"
+      ]
+    },
+    {
+      "id": "q2.10.answer",
+      "kind": "spin",
+      "on": "q2.10",
+      "adds": "SUis",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q10 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "---------i",
+        "------cc-i",
+        "--cccccc-i",
+        "UUUCCCCCSi",
+        "CUCCCCCCSS",
+        "cccccccc-s"
+      ]
+    },
+    {
+      "id": "q2.11",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q11 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----cccc--",
+        "cc---ccc--",
+        "ccc-cccc--",
+        "cccccccc--",
+        "cccccccc--"
+      ]
+    },
+    {
+      "id": "q2.11.answer",
+      "kind": "spin",
+      "on": "q2.11",
+      "adds": "JLUj",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q11 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "--------L-",
+        "----ccccL-",
+        "CCUUUCCCLL",
+        "CCCUCCCCJJ",
+        "ccccccccj-",
+        "ccccccccj-"
+      ]
+    },
+    {
+      "id": "q2.12",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q12 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "ccccc-----",
+        "cccc---c--",
+        "ccccc-cc--",
+        "cccccccc--",
+        "cccccccc--",
+        "cccccccc--"
+      ]
+    },
+    {
+      "id": "q2.12.answer",
+      "kind": "spin",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q12 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "ccccc--c-z",
+        "CCCCUUUCZZ",
+        "CCCCCUCCZI",
+        "cccccccc-i",
+        "cccccccc-i",
+        "cccccccc-i"
+      ]
+    },
+    {
+      "id": "q2.13",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q13 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "--c---cccc",
+        "--cc-ccccc",
+        "--cccccccc"
+      ]
+    },
+    {
+      "id": "q2.13.answer",
+      "kind": "spin",
+      "on": "q2.13",
+      "adds": "LSUls",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q13 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-lll------",
+        "SLCUUUCCCC",
+        "SSCCUCCCCC",
+        "-scccccccc"
+      ]
+    },
+    {
+      "id": "q2.14",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q14 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "---------c",
+        "-------ccc",
+        "c-ccc--ccc",
+        "ccccc--ccc",
+        "ccccc--ccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "q2.14.answer",
+      "kind": "spin",
+      "on": "q2.14",
+      "adds": "JLUZjl",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q14 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "------j---",
+        "--ZZ--j--c",
+        "UUUZZJJCCC",
+        "CUCCCLLCCC",
+        "ccccc-lccc",
+        "ccccc-lccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "q2.15",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q15 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "c---------",
+        "c---------",
+        "cc-----c--",
+        "ccccc-cc--",
+        "cccccccc--"
+      ]
+    },
+    {
+      "id": "q2.15.answer",
+      "kind": "spin",
+      "on": "q2.15",
+      "adds": "ISUZis",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q15 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "----------",
+        "--------i-",
+        "c-------i-",
+        "c--ss---i-",
+        "CCSSUUUCIZ",
+        "CCCCCUCCZZ",
+        "ccccccccZ-"
+      ]
+    },
+    {
+      "id": "q2.16",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q16 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cccc------",
+        "ccccc-----",
+        "ccccc-----",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.16.answer",
+      "kind": "spin",
+      "on": "q2.16",
+      "adds": "JLUlo",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q16 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "----------",
+        "---oo-----",
+        "---oo-----",
+        "CCCCUUUJJJ",
+        "CCCCCULLLJ",
+        "ccccc-l---",
+        "ccccccccc-",
+        "ccccccccc-"
+      ]
+    },
+    {
+      "id": "q2.17",
+      "kind": "base",
+      "caption_quote": "question",
+      "label": "Q17 (2ミノ)",
+      "rows": [
+        "----------",
+        "----------",
+        "ccc-------",
+        "ccc-----cc",
+        "ccc-----cc",
+        "ccccc-cccc",
+        "ccccc-cccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "q2.17.answer",
+      "kind": "spin",
+      "on": "q2.17",
+      "adds": "SUZs",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "answer",
+      "label": "Q17 (2ミノ), the answer: the donation and the T",
+      "rows": [
+        "--------s-",
+        "--------ss",
+        "CCCSZZUUUS",
+        "CCCSSZZUCC",
+        "ccc-s---cc",
+        "ccccc-cccc",
+        "ccccc-cccc",
+        "ccccc-cccc"
+      ]
+    },
+    {
+      "id": "nub.hd",
+      "kind": "spin",
+      "external": "harddrop",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "source_board": {
+        "file": "shachikutrain-technique.json",
+        "record": "cross_source.harddrop.drawn_t_not_fired",
+        "table": 16,
+        "board": 1
+      },
+      "label": "harddrop's 「Donation T-Spin Double」: the T's nub fills the two rows the TSD clears over a hole three deep, which is open again after the clear",
+      "reading": "harddrop Shachiku_Train table 16 board 1, recorded (and pinned) in shachikutrain-technique.json's cross_source.harddrop.drawn_t_not_fired, in occupancy only: every drawn cell c, C in the rows the TSD clears, the T U",
+      "rows": [
+        "----------",
+        "-----c----",
+        "----cc----",
+        "CCCCCUUUCC",
+        "CCCCCCUCCC",
+        "cccccc-ccc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    }
+  ],
+  "page_order": [
+    "intro.terrain",
+    "intro.z",
+    "intro.z.after",
+    "intro.l3",
+    "intro.l3.after",
+    "intro.empty_t",
+    "intro.tetris",
+    "one.o",
+    "one.s",
+    "one.z",
+    "one.l_a",
+    "one.l_b",
+    "q1.1",
+    "q1.1.answer",
+    "q1.2",
+    "q1.2.answer",
+    "q1.3",
+    "q1.3.answer",
+    "q1.4",
+    "q1.4.answer",
+    "q1.5",
+    "q1.5.answer",
+    "q1.6",
+    "q1.6.answer",
+    "two.jz_a",
+    "two.jz_b",
+    "two.sz_a",
+    "two.sz_b",
+    "two.js_a",
+    "two.js_b",
+    "two.oz",
+    "hole2.a",
+    "hole2.b",
+    "hole3.a",
+    "hole3.b",
+    "hole4.a",
+    "hole4.b",
+    "hole5.a",
+    "hole5.b",
+    "fin.lj",
+    "fin.to",
+    "q2.1",
+    "q2.1.answer",
+    "q2.2",
+    "q2.2.answer",
+    "q2.3",
+    "q2.3.answer",
+    "q2.4",
+    "q2.4.answer",
+    "q2.5",
+    "q2.5.answer",
+    "q2.6",
+    "q2.6.answer",
+    "q2.7",
+    "q2.7.answer",
+    "q2.8",
+    "q2.8.answer",
+    "q2.9",
+    "q2.9.answer",
+    "q2.10",
+    "q2.10.answer",
+    "q2.11",
+    "q2.11.answer",
+    "q2.12",
+    "q2.12.answer",
+    "q2.13",
+    "q2.13.answer",
+    "q2.14",
+    "q2.14.answer",
+    "q2.15",
+    "q2.15.answer",
+    "q2.16",
+    "q2.16.answer",
+    "q2.17",
+    "q2.17.answer"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "rule",
+      "board": "intro.z",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "rule",
+      "window": {
+        "rows": [
+          2,
+          3
+        ],
+        "cols": [
+          2,
+          4
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "roof_cells": [],
+      "rule": "a column donates when, at its topmost cell that is empty, in no row the T makes full and directly under a cell of such a row, every filled cell of the column above it is in those rows (so the clear opens it from the top) and the cell above it is not the T; in play each covering cell must also be the T or a complete piece, never garbage (ownership is not drawn, so the gate reads the occupancy half)",
+      "payoff": {
+        "kind": "well_quad",
+        "board": "intro.z",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          4,
+          0
+        ],
+        "well_cell_after": [
+          4,
+          0
+        ],
+        "note": "harddrop's, not the page's: the page says only that the hole stays open to dig (「下穴が開いた状態を維持」); the Tetris into it is the Donation page's next step. The well cell is the hit's own column's hole (the nearest to the T), under the cleared rows, so the clear does not move it"
+      },
+      "drawings": [
+        {
+          "board": "intro.z",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.o",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.s",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.z",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "one.l_a",
+          "t_cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "one.l_b",
+          "t_cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q1.1.answer",
+          "t_cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q1.2.answer",
+          "t_cells": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q1.3.answer",
+          "t_cells": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "q1.4.answer",
+          "t_cells": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q1.5.answer",
+          "t_cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q1.6.answer",
+          "t_cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "two.jz_a",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "two.jz_b",
+          "t_cells": [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              4
+            ]
+          ]
+        },
+        {
+          "board": "two.sz_a",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "two.sz_b",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "two.js_a",
+          "t_cells": [
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "two.js_b",
+          "t_cells": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ],
+            [
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "two.oz",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole2.a",
+          "t_cells": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole2.b",
+          "t_cells": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "hole3.a",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "hole3.b",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole4.a",
+          "t_cells": [
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "hole4.b",
+          "t_cells": [
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "hole5.a",
+          "t_cells": [
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              2,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              3,
+              1
+            ]
+          ]
+        },
+        {
+          "board": "hole5.b",
+          "t_cells": [
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              2,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              3,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "fin.lj",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "fin.to",
+          "t_cells": [
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q2.1.answer",
+          "t_cells": [
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.2.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.3.answer",
+          "t_cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "q2.4.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.5.answer",
+          "t_cells": [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              6
+            ]
+          ]
+        },
+        {
+          "board": "q2.6.answer",
+          "t_cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q2.7.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              3
+            ]
+          ]
+        },
+        {
+          "board": "q2.8.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.9.answer",
+          "t_cells": [
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.10.answer",
+          "t_cells": [
+            [
+              5,
+              0
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              6,
+              1
+            ]
+          ],
+          "holes": [
+            [
+              7,
+              8
+            ]
+          ]
+        },
+        {
+          "board": "q2.11.answer",
+          "t_cells": [
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "holes": [
+            [
+              6,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.12.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              8
+            ]
+          ]
+        },
+        {
+          "board": "q2.13.answer",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "holes": [
+            [
+              7,
+              0
+            ]
+          ]
+        },
+        {
+          "board": "q2.14.answer",
+          "t_cells": [
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        {
+          "board": "q2.15.answer",
+          "t_cells": [
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              5,
+              6
+            ],
+            [
+              6,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              7,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.16.answer",
+          "t_cells": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "holes": [
+            [
+              5,
+              7
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              5,
+              9
+            ]
+          ]
+        },
+        {
+          "board": "q2.17.answer",
+          "t_cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "holes": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              4,
+              6
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "rule_not_fired": [
+    {
+      "board": "intro.l3",
+      "reason": "the page's own mistake: the L fills three rows, not two, so a filled cell of the column lies under the rows the TSD clears and the hole stays covered (「2列ではなく3列を埋めてしまった」)"
+    },
+    {
+      "board": "nub.hd",
+      "reason": "harddrop's 「Donation T-Spin Double」: only the T's nub covers the hole, which yachi reads as a plain T-spin (2026-10-26: 「呢個係普通tspin」), so the rule's clause 3 refuses it"
+    }
+  ],
+  "cross_source": {
+    "other_windows": {
+      "fires_on_donation": [
+        {
+          "file": "kaidan-technique.json",
+          "variant": "kaidan",
+          "board": "one.s",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        },
+        {
+          "file": "kaidan-technique.json",
+          "variant": "kaidan",
+          "board": "q1.1.answer",
+          "cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "kaidan-technique.json",
+          "variant": "kaidan",
+          "board": "q1.2.answer",
+          "cells": [
+            [
+              4,
+              6
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "variant": "parapet",
+          "board": "one.l_a",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "parapet-technique.json",
+          "variant": "parapet_tss",
+          "board": "one.l_a",
+          "cells": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "shachikutrain-technique.json",
+          "variant": "shachikutrain",
+          "board": "q1.1.answer",
+          "cells": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "stmbcave-technique.json",
+          "variant": "stmbcave",
+          "board": "two.sz_a",
+          "cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "stmbcave-technique.json",
+          "variant": "stmbcave",
+          "board": "q2.3.answer",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "stmbcave-technique.json",
+          "variant": "stmbcave",
+          "board": "q2.17.answer",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            true
+          ]
+        }
+      ]
+    },
+    "fires": [
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.first.cave",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "harddrop's SDPC Spin (another author): its STMB Cave's Z fills the two cleared rows of the column one past the T's arm, the cave open under it (STMB Cave's own window fires too, so in play the T is that page's)"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.first#2",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "harddrop's SDPC Spin: a bag-5 TSD of the second C-Spin build, over the C-Spin's residue slot (the ダブルダガー shape)"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.o_first#2",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "the same build, its O-first order"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.l_first#2",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "the same build, its L-first order"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.l_first#4",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "the same build, its L-first order, the next board"
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.third.imperial",
+        "variant": "rule",
+        "mirrored": false,
+        "page": "https://harddrop.com/wiki/SDPC_Spin",
+        "note": "harddrop's SDPC Spin: the Imperial Cross TSD; the cross's far arm is covered only inside the cleared rows"
+      }
+    ],
+    "also": [
+      {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#1",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the same author's 山岳積み2号: a bag-4 TSD of the 5巡パフェ, a hole covered only inside the cleared rows"
+      },
+      {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#2",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the same board, its second form"
+      },
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the same author's stick spin: the SDパフェ bag-2 STMB Cave, the cave one past the T's arm"
+      },
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd.imperial.spin",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "stick spin's Imperial Cross TSD"
+      },
+      {
+        "file": "stickspin-routes.json",
+        "node": "2.sd.stmb.spin",
+        "variant": "rule",
+        "mirrored": false,
+        "note": "the SDパフェ STMB Cave with its T drawn"
+      }
+    ]
+  },
+  "known_discrepancies": [
+    {
+      "id": "intro.l3:colour",
+      "note": "the mistake's L is drawn as a J's shape in L's colour (its top cell over the hole, two muted below); occupancy is what the page means"
+    },
+    {
+      "id": "q2.17.answer:colour",
+      "note": "the answer's two S pieces are drawn in one letter, so the S cells are eight, not four; read as two S pieces by occupancy"
+    },
+    {
+      "id": "q2.10.answer:muting",
+      "note": "one cell of a row the TSD clears is drawn unmuted"
+    },
+    {
+      "id": "q2.11.answer:muting",
+      "note": "two cells above the rows the TSD clears are drawn muted"
+    },
+    {
+      "id": "q2.14.answer:muting",
+      "note": "two cells above the rows the TSD clears are drawn muted"
+    },
+    {
+      "id": "q2.15.answer:muting",
+      "note": "one cell under the rows the TSD clears is drawn muted"
+    },
+    {
+      "id": "q1.3.answer:question",
+      "note": "the answer draws the question's bottom hole one column over (column 5, not 4) and its stack around it differently, so it is not the question plus its pieces (no `on`)"
+    },
+    {
+      "id": "q2.12.answer:question",
+      "note": "the answer draws one grey cell (row 2, column 7) its question leaves empty, so it is not the question plus its pieces (no `on`)"
+    }
+  ]
+}

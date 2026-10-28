@@ -185,24 +185,26 @@ generated claim's truth is impossible without it, and both are falsifiable somew
 | 2026-10-03 | 26/30 testable = **87%** | 25/30 = **83%** | 25/30 = **83%** | 2 |
 | 2026-10-09 | 19/23 testable = **83%** | 17/23 = **74%** | 17/23 = **74%** | 4 |
 | 2026-10-12 | 15/19 testable = **79%** | 13/19 = **68%** | 13/19 = **68%** | 3 |
+| 2026-10-20 | 10/14 testable = **71%** | 9/14 = **64%** | 9/14 = **64%** | 3 |
+| 2026-10-22 | 16/19 testable = **84%** | 14/19 = **74%** | 14/19 = **74%** | 3 |
 
 Every cell is measured, and gated on push — see "Gating equiv.py coverage" below for what
 that replaced. Claims no mutation can falsify are reported separately rather than counted
 as covered.
 
-**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->eleven of the seventeen<!--/equiv:gate-count--> sessions**, and
+**The ≥85% acceptance gate this phase set is not met by <!--equiv:gate-count-->thirteen of the nineteen<!--/equiv:gate-count--> sessions**, and
 2026-07-22 — the session it was declared on — is one of them, at 81% rather than the 85%
 recorded here for three weeks. That figure was a seeded draw; enumerating every
 perturbation kind settles it lower. The gate is therefore restated as a measurement rather
 than a threshold: no honest floor exists when one hand claim is worth 10.0 points on
-2026-07-28, and a floor all seventeen pass would sit at 60%. (The session count in that clause is
+2026-07-28, and a floor all eighteen pass would sit at 60%. (The session count in that clause is
 the ungated neighbour CLAUDE.md's 冇第二份 section names: it read 「eight」 for four sessions while
 the fragment two lines above it moved every time. Re-derive it from the corpus, never carry it.)
 
 2026-07-28 is the session where the two families' distinction bites: 10/10 = 100% on single
 values, 6/10 = 60% under `--two-site`, because all four of its windowed claims survive every
-single-value change. It is not an isolated artefact — <!--equiv:sf-match-->twelve of the seventeen<!--/equiv:sf-match--> sessions lose
-coverage under the second family at `match` granularity (and <!--equiv:sf-round-->thirteen of the seventeen<!--/equiv:sf-round-->
+single-value change. It is not an isolated artefact — <!--equiv:sf-match-->fourteen of the nineteen<!--/equiv:sf-match--> sessions lose
+coverage under the second family at `match` granularity (and <!--equiv:sf-round-->fifteen of the nineteen<!--/equiv:sf-round-->
 at `round`), and every claim that drops is a windowed or per-match one. See README's "Where this metric breaks down".
 
 **Bugs this phase's own gates caught**
@@ -3931,6 +3933,38 @@ won-gap 剩 +2.89% 對 lost-gap +3.88%，所以呢個 session 係入「roughly l
 但依然冇 committed artefact re-derive 佢。第 2 點嘅教訓話俾我哋聽，**「份 prose 講明用邊個
 test」唔等於個 test 有人行過**。想真係關咗呢個窿，要嘅係一個好似 `check_rate_records` 咁嘅
 renderer + gate，唔係再寫多一句。
+
+## 中盤手法：階段のドネイト 收咗，アンカーセット 未收 —— open (2026-10-19)
+
+階段のドネイト（`template/kaidansetup.php`）係第九個中盤手法頁，冇郁任何 shared 規則檔(matcher、planner、gate、renderer)；郁咗嘅 shared 檔係 `technique-profile.ts` 嘅
+docstring(所有 technique artefact 嘅 md5 行跟住郁)、社畜トレイン 嘅 `other_windows` 同新嘅 shared 測試 helper
+`technique-donation-checks.ts`(由 `parapet.test.ts` 搬出嚟)(見 CLAUDE.md
+「### 階段のドネイト」)。同一轉睇埋 アンカーセット（`template/anchorset.php`，2021-01-27 版），**決定唔做頁、唔出
+artefact**，記低喺度做 open item，理由全部係量出嚟嘅：
+
+1. **佢唔係 T-spin 手法。** shiwehi 個定義係打完 TST 之後保住 B2B 轉去 72積み；アンカーセット 嗰一下(一粒 J 或者 L
+   落位)本身冇 spin(pattern 3 嗰粒 t 唔係：量過，得一個角)。頁面嘅 spin 圖係前後嘅 T-spin，唔係アンカーセット 嗰粒：
+   「TSM→平積み」畫咗一下 T-spin mini，「DTパフェ／新DTパフェからのアンカーセット」畫咗 DT 之後階段のドネイト 嗰下 TSD。harddrop 將佢歸入 `Category:Tetris techniques`(「a mid-game upstacking technique … ignore an
+   overhang by making a Tetris near it. Use L or J mino as an "anchor"」)。件事係一粒 J(或者 L)落位，而
+   `technique-facts.ts` 每一個 opportunity loop 數嘅都係 T-spin。
+2. **冇一個長方形可以對。** 以 J 嘅格做 anchor，量 shiwehi 基本形、S 屋頂形、harddrop generic J 同 harddrop 兩個
+   TST 殘留形，唯一一個最大 agreement box 係 J 嘅 −3..2 行、0..1 欄 —— 即係個窿同 anchor 本身，冇埋個 overhang
+   嘅洞。J 頂旁邊、overhang 上面嗰格，喺 shiwehi #1 同 harddrop #1 係空，喺 shiwehi #6、harddrop #10、#12 係滿，所以
+   任何同時包到 J 同個洞嘅長方形入面都有一格唔一致。
+3. **將來要對，要兩個 shared 改動，每一個都郁晒所有 technique artefact 嘅 md5 行：** (a) 新 `anchor: 'lock_cells'`
+   (J 照畫、L 係佢反轉)：每粒過咗重組核對嘅 J/L lock 都係 opportunity，用一個 opt-in 嘅
+   `digestSession(…, {lockPieces})` 收，等 `tspins` 同 `check.by_session` 保持 byte-identical，再加一個獨立嘅
+   `classifyLocks`；(b) 唔係長方形嘅窗口(明列嘅格)，`windowMatch` 同 `window_fires` 兩邊都要改，agreement 亦要改成
+   對一個 cell set。現成嘅 `wellPayoff` 可以照用做 Tetris payoff(個窿格喺 J 隻腳上面)；gate 嘅 (d') 要一個 opt-in，
+   接受由 anchor 托住、唔係通到底嘅窿。harddrop 仲畫咗一個 L 形(企、窿、洞：個窿喺 anchor 隻腳上面)，J 嘅窗口對唔到，
+   會係另一個網站嘅第二個 variant。改用 Tetris 做件事(anchor 喺 I 度)一樣要非 spin 嘅 opportunity，而且淨返兩格唔係
+   消行 entail 嘅。
+4. **淨轉錄唔出頁，唔建議。** 要喺 `technique_transcription.py`(零 variant)、`technique_page.py`(冇 facts 冇 demos)
+   同 `bin/build-docs` 加 default-preserving 嘅分支，換一版寫住「冇對」嘅頁。階段のドネイト 頁已經畫咗 アンカーセット
+   嗰幅(`dt.anchor`)，亦已經 pin 咗 harddrop 嘅 Anchor_Set 頁(oldid、MediaWiki sha1、我哋嘅 sha256 同 bytes，
+   `check_wikitext_sources` 每星期重讀)，下一轉由一個 pin 好嘅來源開始。
+
+shiwehi 嘅 anchorset.php 抓過一次(raw HTML，TLS verification on)，冇 commit，冇入任何 gate。第 1、2 點嘅量度(角數、agreement box、邊幾幅一致)係 2026-10-19 一個冇 commit 嘅 scratch probe 量嘅 —— 冇嘢 re-derive 佢哋，下一轉要用 gate 自己嘅 `window_fires` 重量，唔好照抄。
 
 ## 第十七個 session：兩邊各剃一次光頭，排序又分得開 (2026-10-12)
 

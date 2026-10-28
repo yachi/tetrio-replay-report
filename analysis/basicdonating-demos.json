@@ -1,0 +1,727 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "basicdonating",
+ "means": "The constructed replays of the 基本的なドネイト page: none. The planner builds a terrain, then the page's own pieces off a build board, then fires the window; this page draws its donated pieces and the T on one board, so there is no build board to plan from. Every board is published unbuilt with its measured reason.",
+ "not_eligible_because": "constructed, not played: a demo's queue, hold and key inputs would be ours. No claim id, no badge, no figure in any count.",
+ "caveat": "a terrain's cell count decides whether any demo could stand on it from an empty board (odd: never; even but not a multiple of four: only with a line clear, which this planner never makes); the rest are unbuilt for want of a build board, not by measurement of the planner.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are a build board's lower-case letters, one whole piece per letter; this page has no build board",
+  "every board is unbuilt, with the reason read off the transcription: the terrain's cell count, or the missing build board"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-24T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "916649bb3b528a26d0ee457aafe84edd",
+  "planner_md5": "40b19ccd1c8e70da6d56116500d1993a",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "2bc420c527aa0c83005a0e000e4544bd"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "fin.lj",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "fin.to",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole2.a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole2.b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole3.a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole3.b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole4.a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole4.b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole5.a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "hole5.b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "intro.empty_t",
+   "reason": "示意圖（T 打完之後點挖、點打 Tetris），唔係捐嘅形本身"
+  },
+  {
+   "node": "intro.l3",
+   "reason": "transcription 冇記低呢幅係邊幅地形加方塊（冇 on；題目同答案對唔上嘅見 known_discrepancies），冇地形可以砌"
+  },
+  {
+   "node": "intro.l3.after",
+   "reason": "係 intro.l3 打完 TSD 之後嘅盤面，intro.l3 冇示範，所以呢幅都冇"
+  },
+  {
+   "node": "intro.terrain",
+   "reason": "係 intro.z 嘅地形：地形有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "intro.tetris",
+   "reason": "示意圖（T 打完之後點挖、點打 Tetris），唔係捐嘅形本身"
+  },
+  {
+   "node": "intro.z",
+   "reason": "TSD 企喺 intro.terrain 上面：地形有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "intro.z.after",
+   "reason": "係 intro.z 打完 TSD 之後嘅盤面，intro.z 冇示範，所以呢幅都冇"
+  },
+  {
+   "node": "nub.hd",
+   "reason": "係 harddrop 嘅圖（原頁冇畫）：佢將地形、塞窿嘅 T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+  },
+  {
+   "node": "one.l_a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "one.l_b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "one.o",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "one.s",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "one.z",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q1.1",
+   "reason": "係 q1.1.answer 嘅地形：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q1.1.answer",
+   "reason": "TSD 企喺 q1.1 上面：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q1.2",
+   "reason": "係 q1.2.answer 嘅地形：地形有 30 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "q1.2.answer",
+   "reason": "TSD 企喺 q1.2 上面：地形有 30 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "q1.3",
+   "reason": "係 q1.3.answer 嘅題目，但答案唔係呢幅加方塊（見 known_discrepancies），冇示範"
+  },
+  {
+   "node": "q1.3.answer",
+   "reason": "transcription 冇記低呢幅係邊幅地形加方塊（冇 on；題目同答案對唔上嘅見 known_discrepancies），冇地形可以砌"
+  },
+  {
+   "node": "q1.4",
+   "reason": "係 q1.4.answer 嘅地形：地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q1.4.answer",
+   "reason": "TSD 企喺 q1.4 上面：地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q1.5",
+   "reason": "係 q1.5.answer 嘅地形：地形有 39 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q1.5.answer",
+   "reason": "TSD 企喺 q1.5 上面：地形有 39 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q1.6",
+   "reason": "係 q1.6.answer 嘅地形：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q1.6.answer",
+   "reason": "TSD 企喺 q1.6 上面：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.1",
+   "reason": "係 q2.1.answer 嘅地形：地形有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.1.answer",
+   "reason": "TSD 企喺 q2.1 上面：地形有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.10",
+   "reason": "係 q2.10.answer 嘅地形：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.10.answer",
+   "reason": "TSD 企喺 q2.10 上面：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.11",
+   "reason": "係 q2.11.answer 嘅地形：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.11.answer",
+   "reason": "TSD 企喺 q2.11 上面：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.12",
+   "reason": "係 q2.12.answer 嘅題目，但答案唔係呢幅加方塊（見 known_discrepancies），冇示範"
+  },
+  {
+   "node": "q2.12.answer",
+   "reason": "transcription 冇記低呢幅係邊幅地形加方塊（冇 on；題目同答案對唔上嘅見 known_discrepancies），冇地形可以砌"
+  },
+  {
+   "node": "q2.13",
+   "reason": "係 q2.13.answer 嘅地形：地形有 20 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.13.answer",
+   "reason": "TSD 企喺 q2.13 上面：地形有 20 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.14",
+   "reason": "係 q2.14.answer 嘅地形：地形有 36 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.14.answer",
+   "reason": "TSD 企喺 q2.14 上面：地形有 36 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.15",
+   "reason": "係 q2.15.answer 嘅地形：地形有 20 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.15.answer",
+   "reason": "TSD 企喺 q2.15 上面：地形有 20 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.16",
+   "reason": "係 q2.16.answer 嘅地形：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.16.answer",
+   "reason": "TSD 企喺 q2.16 上面：地形有 32 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.17",
+   "reason": "係 q2.17.answer 嘅地形：地形有 40 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.17.answer",
+   "reason": "TSD 企喺 q2.17 上面：地形有 40 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.2",
+   "reason": "係 q2.2.answer 嘅地形：地形有 38 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "q2.2.answer",
+   "reason": "TSD 企喺 q2.2 上面：地形有 38 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "q2.3",
+   "reason": "係 q2.3.answer 嘅地形：地形有 36 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.3.answer",
+   "reason": "TSD 企喺 q2.3 上面：地形有 36 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.4",
+   "reason": "係 q2.4.answer 嘅地形：地形有 40 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.4.answer",
+   "reason": "TSD 企喺 q2.4 上面：地形有 40 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.5",
+   "reason": "係 q2.5.answer 嘅地形：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.5.answer",
+   "reason": "TSD 企喺 q2.5 上面：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.6",
+   "reason": "係 q2.6.answer 嘅地形：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.6.answer",
+   "reason": "TSD 企喺 q2.6 上面：地形有 28 格，係 4 嘅倍數，但頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "q2.7",
+   "reason": "係 q2.7.answer 嘅地形：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.7.answer",
+   "reason": "TSD 企喺 q2.7 上面：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.8",
+   "reason": "係 q2.8.answer 嘅地形：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.8.answer",
+   "reason": "TSD 企喺 q2.8 上面：地形有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "q2.9",
+   "reason": "係 q2.9.answer 嘅地形：地形有 42 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "q2.9.answer",
+   "reason": "TSD 企喺 q2.9 上面：地形有 42 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "two.js_a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.js_b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.jz_a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.jz_b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.oz",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.sz_a",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  },
+  {
+   "node": "two.sz_b",
+   "reason": "捐嘅形（地形同方塊畫埋一幅，冇 T）：頁面將捐嘅方塊同 T 畫埋一幅（消行入面嘅方塊仲畫成淡色大楷），冇一幅淨係擺好方塊、未入 T 嘅板，planner 要嘅 build 板唔存在，所以冇試"
+  }
+ ],
+ "demos": [
+
+ ]
+}

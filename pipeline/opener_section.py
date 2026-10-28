@@ -709,7 +709,7 @@ def _board_split_note(blk, metric):
     """WERE THE TWO ENGINES LOOKING AT THE SAME BOARD? — the sentence that makes the figure above
     readable, and it says a different thing for each table.
 
-    `agreement_on_positives` states that the two engines disagree about four donations in five. It
+    `agreement_on_positives` states that the two engines disagree about seven donations in ten. It
     does not say whether they disagree about what a donation IS or about what was on the board. Split
     the oracle's positives by cell-for-cell board equality and the donation resolves completely —
     every positive on an identical board agrees, almost none of the rest — so the disagreement is the
@@ -918,7 +918,11 @@ def _donation_block(data):
         f'消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。'
         f'呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、'
         f'嗰條欄最低嗰格填咗嘅嘢下面仲有最少 {dn["cavity_cells"]} 格空、'
-        f'最深嗰 {dn["walled_deepest_rows"]} 行兩邊都有牆嘅 T-spin 消行。'
+        f'最深嗰 {dn["walled_deepest_rows"]} 行兩邊都有牆嘅 T-spin 消行；'
+        f'塞住條井嗰啲格可以係隻 T 自己（harddrop 都係咁畫），'
+        f'唔係 T 嘅就要屬於一粒四格齊晒喺板上面嘅方塊，垃圾行同消行剩低嘅碎都唔計。'
+        f'仲有，塞喺最底嗰粒落定嗰陣，條井下面<strong>已經</strong>有最少 {dn["cavity_cells"]} 格空：'
+        f'先塞住、之後先有垃圾行升上嚟喺嗰條欄開個窿，咁唔係捐窿，因為塞嗰陣個窿未出現。'
         f'重砌返嘅板同引擎自己記低嘅消行逐個對過：'
         f'<strong>{chk["reconstruction_agreed"]}／{chk["tspin_clears"]}</strong> 個對得上，'
         f'對唔上嗰 {chk["reconstruction_disagreed"]} 個<strong>直接唔計</strong>。</p>',

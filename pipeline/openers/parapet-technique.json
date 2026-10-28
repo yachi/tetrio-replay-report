@@ -1,0 +1,1203 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "parapet",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/parapet.php",
+    "title": "欄干(Parapet)",
+    "author": "しゑひ(shiwehi)",
+    "published": "2020-10-11",
+    "updated": "2021-03-23",
+    "fetched": "2026-10-19",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 社畜トレイン, 山岳積み2号 and stick spin used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 6 ten-wide boards in page order.",
+    "snapshot_file": "parapet.html",
+    "snapshot_sha256": "c2e8b4cc3cadd40737decbccfd5a10890f4aad8e8d935ebe46a78cd86ae7945d",
+    "snapshot_bytes": 23409,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with harddrop's Parapet.wikitext, Tetrisチャンネル's tetrisch_parapet.html and its tetrisch-parapet/ images beside it); an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "decorative_images": [
+      "欄干(Parapet)タイトル画像"
+    ],
+    "references": [
+      "https://tetrisch.github.io/main/technic/parapet.html (the page's own 参考ページ, read below as cross_source.tetrisch)"
+    ],
+    "unfetched": []
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "l o z": "a cell of that piece, placed to build the shape",
+    "t": "a cell of the T in a row the spin does not clear",
+    "T": "a cell of the T in a row the spin clears (muted; OUR READING, checked: every upper-case row is a full row)",
+    "C": "an earlier cell in a row the spin clears (muted; checked the same way)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "intro",
+      "verbatim": "ここでは、欄干(Parapet)という、TSDもしくはTSSを打つことができるドネイトについて紹介していきます。"
+    },
+    {
+      "id": "h.basic",
+      "verbatim": "基本形と組み方・ラインの消し方"
+    },
+    {
+      "id": "basic",
+      "verbatim": "基本形は上図の通りです。"
+    },
+    {
+      "id": "build",
+      "verbatim": "%Tの形が開いているときに、%Lを1列ずらして立てて置き、反対側に屋根をつけることでこの形を作ることができます。"
+    },
+    {
+      "id": "spins",
+      "verbatim": "ここから以下のようにしてTSDかTSSを打つことができます。"
+    },
+    {
+      "id": "h.tsd",
+      "verbatim": "TSD"
+    },
+    {
+      "id": "h.tss",
+      "verbatim": "TSS"
+    },
+    {
+      "id": "why_tss",
+      "verbatim": "TSDではなくTSSを打つ理由としては、相手の攻撃の相殺がTSSで良い場合に余計な攻撃を送らずに縦穴をキープでき、打後の地形が1段高くなるためその後テトリスを送りやすいことです。"
+    },
+    {
+      "id": "h.ref",
+      "verbatim": "参考ページ"
+    },
+    {
+      "id": "ref",
+      "verbatim": "欄干 Parapet Tetrisチャンネル"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic.z",
+      "kind": "build",
+      "on": "basic.z.terrain",
+      "adds": "lz",
+      "caption_quote": "basic",
+      "label": "the basic form with a Z roof: an L stood on end, shifted one column (the page's 「1列ずらして」), its foot under the slot's left end, and a Z over the slot's right end",
+      "rows": [
+        "----------",
+        "cl--zz----",
+        "cl---zzccc",
+        "cll-cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.o",
+      "kind": "build",
+      "on": "basic.o.terrain",
+      "adds": "lo",
+      "caption_quote": "build",
+      "label": "the basic form with an O roof",
+      "rows": [
+        "----oo----",
+        "cl--oo----",
+        "cl---ccccc",
+        "cll-cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tsd.spin",
+      "kind": "spin",
+      "spin_of": "basic.z",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "h.tsd",
+      "label": "the T laid flat, pointing down: a TSD clearing the rows of the T's arm and the L's foot",
+      "rows": [
+        "----------",
+        "cc--cc----",
+        "CCTTTCCCCC",
+        "CCCTCCCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tsd.after",
+      "kind": "after",
+      "after_of": "tsd.spin",
+      "label": "what the TSD leaves: the column under the T's left arm open from the top to the floor",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "cc--cc----",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tss.spin",
+      "kind": "spin",
+      "spin_of": "basic.z",
+      "spin": "TSS",
+      "lines": 1,
+      "caption_quote": "h.tss",
+      "label": "the same terrain, the T stood up, nub right: a TSS clearing only the L's foot row",
+      "rows": [
+        "----------",
+        "cc-tcc----",
+        "cc-ttccccc",
+        "CCCTCCCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tss.after",
+      "kind": "after",
+      "after_of": "tss.spin",
+      "label": "what the TSS leaves: the same well, open one row higher",
+      "rows": [
+        "----------",
+        "----------",
+        "cc-ccc----",
+        "cc-ccccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.z.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "basic.z less its L and Z: the open T slot the page builds from",
+      "rows": [
+        "----------",
+        "c---------",
+        "c------ccc",
+        "c---cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.o.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "basic.o less its L and O",
+      "rows": [
+        "----------",
+        "c---------",
+        "c----ccccc",
+        "c---cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic.z",
+    "basic.o",
+    "tsd.spin",
+    "tsd.after",
+    "tss.spin",
+    "tss.after"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "parapet",
+      "board": "tsd.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          5
+        ],
+        "cols": [
+          1,
+          5
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ]
+      ],
+      "window_note": "in tsd.spin's frame, row 0 the top: the AGREEMENT BOX of this page's two basic forms, BT砲's page's Parapet, harddrop's and Tetrisチャンネル's two. Row 1: the L's stem, the slot's two open cells, the roof over the T's right end; rows 2-3: the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced), holding the L's foot under the T's left arm; rows 4-5: the well under that arm, two deep and walled both sides. Column 0 is outside (BT砲's draws the L against the wall), row 0 and column 6 are outside (the roofs and harddrop's S disagree there). Occupancy only, never colour; garbage is filled.",
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "agreement": [
+        {
+          "board": "basic.z",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "basic.o",
+          "t_cells": [
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "payoff": {
+        "kind": "well_quad",
+        "board": "tsd.after",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          4,
+          2
+        ],
+        "well_cell_after": [
+          4,
+          2
+        ],
+        "note": "a Tetris into the well under the T's left arm, the next step harddrop and Tetrisチャンネル draw (harddrop: an I into the well on the fumen's next page; Tetrisチャンネル: parapet_015). shiwehi names a Tetris only as its reason to fire the TSS instead of the TSD (「TSDではなくTSSを打つ理由…その後テトリスを送りやすい」), never as what follows the TSD. The matcher carries the well cell to the first later lock that puts a cell in its column and asks whether that lock is an I the engine credits with four lines"
+      },
+      "fires_on": [
+        "basic.z",
+        "basic.o"
+      ],
+      "misses": [
+        "tss.spin",
+        "tsd.after",
+        "tss.after"
+      ]
+    },
+    {
+      "id": "parapet_tss",
+      "board": "tss.spin",
+      "spin": "TSS",
+      "lines": 1,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          5
+        ],
+        "cols": [
+          1,
+          5
+        ]
+      },
+      "t_cells": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "roof_cells": [],
+      "window_note": "the same box as the TSD's, the T stood up with its nub right: (2,2) is must-empty now (the slot cell the stood T leaves open over the foot), and nothing above the T is in the window, so the variant has no roof. The TSS slots on BT砲's page's, harddrop's and Tetrisチャンネル's drawings are OUR READING of their terrain: those pages draw only the TSD there.",
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "agreement": [
+        {
+          "board": "basic.z",
+          "t_cells": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "basic.o",
+          "t_cells": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "payoff": {
+        "kind": "well_quad",
+        "board": "tss.after",
+        "piece": "I",
+        "lines": 4,
+        "well_cell_pre_clear": [
+          4,
+          2
+        ],
+        "well_cell_after": [
+          4,
+          2
+        ],
+        "note": "a Tetris into the well under the T's left arm, the next step harddrop and Tetrisチャンネル draw (harddrop: an I into the well on the fumen's next page; Tetrisチャンネル: parapet_015). shiwehi names a Tetris only as its reason to fire the TSS instead of the TSD (「TSDではなくTSSを打つ理由…その後テトリスを送りやすい」), never as what follows the TSD. The matcher carries the well cell to the first later lock that puts a cell in its column and asks whether that lock is an I the engine credits with four lines"
+      },
+      "fires_on": [
+        "basic.z",
+        "basic.o"
+      ],
+      "misses": [
+        "tsd.spin",
+        "tsd.after",
+        "tss.after"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "parapet",
+    "note": "the windows, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: the TSD window fires on two 山岳積み2号 boards (same author, unlabelled: `also`), the TSS window on none. The independent drawers are harddrop and Tetrisチャンネル instead; their drawings are the windows' external `agreement` drawings: rule (g) fires each window on each, once, at its slot, as drawn.",
+    "routes_fire_none": "no routes board by another author draws a Parapet (measured: the windows fire only on the two same-author 山岳積み2号 boards below, and no node is labelled 欄干 or Parapet); the cross-check is harddrop's and Tetrisチャンネル's pages, read below",
+    "harddrop": {
+      "page": "https://harddrop.com/wiki/Parapet",
+      "title": "Parapet",
+      "oldid": 31260,
+      "revision_sha1": "3a0657075072ac9592432879d262e94740fdbdb4",
+      "revision_timestamp": "2021-10-14T06:40:48Z",
+      "fetched": "2026-10-19",
+      "fetch_method": "the latest revision's own bytes from the MediaWiki API (https://harddrop.com/w/api.php?action=query&prop=revisions&titles=Parapet&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 31260 was the page's latest revision when fetched",
+      "snapshot_file": "Parapet.wikitext",
+      "snapshot_sha256": "253fea77080fd6edf959e23b3b19a73b20066b2e5204e864ac8619943c48d01a",
+      "snapshot_bytes": 1169,
+      "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside parapet.html",
+      "author_note": "harddrop's page (「Introduced by Chopin」): another site and another author than shiwehi.com",
+      "categories": [
+        "T-Spin techniques",
+        "T-Spin setups",
+        "Mid-game T-Spin setups"
+      ],
+      "quote": "If the hole is deep enough, then this directly connects to a btb tetris.",
+      "fumen": "m110@jdA3mbC3mbC3mbC3ibH3gbI3gbI3gbI3gbE3pbA4G7?eK0JB/KBK2bKecKocqocqMBNoclNBZcBAAA",
+      "decoder": "tetris-fumen@1.1.3 (knewjade), decoded once into the pages below, as fetch-catalogue.ts vendors opener fields; pipeline/ has no dependency on it and CI does not re-run the decode (an open item)",
+      "reading": {
+        ".": "empty",
+        "G": "grey, filled",
+        "other": "a letter its piece, filled"
+      },
+      "pages": {
+        "pre_t_board": {
+          "page": 9,
+          "note": "the field page 9 locks its T into (pages 0-7 the terrain, the Z, the S and the L, whose pages 3-6 are movement frames), the top row page 0's and page 2's",
+          "rows": [
+            "..G.....S.",
+            "GGGL..ZZSS",
+            "GGGL...ZZS",
+            "GGGLL.GGGG",
+            "GGGG.GGGGG",
+            "GGGG.GGGGG",
+            "GGGG.GGGGG",
+            "GGGG.GGGGG"
+          ]
+        },
+        "t_lock": {
+          "page": 9,
+          "operation": "T reverse x5 y5, lock",
+          "cells": [
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              5
+            ]
+          ],
+          "cleared_rows": [
+            2,
+            3
+          ]
+        },
+        "i_lock": {
+          "page": 10,
+          "operation": "I left x4 y1, lock",
+          "cells": [
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "cleared": 4,
+          "note": "on the board the T's clear leaves (two empty rows on top), the well's column"
+        }
+      },
+      "slots": {
+        "parapet": [
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "parapet_tss": [
+          [
+            1,
+            5
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            5
+          ]
+        ]
+      },
+      "drawn_t_not_fired": [
+        {
+          "page": 8,
+          "operation": "T right x4 y6, not a lock",
+          "cells": [
+            [
+              0,
+              4
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "note": "a movement frame of the same T before it turns into the slot (lock false): no T lands there"
+        }
+      ]
+    },
+    "tetrisch": {
+      "page": "https://tetrisch.github.io/main/technic/parapet.html",
+      "title": "欄干 Parapet",
+      "fetched": "2026-10-19",
+      "fetch_method": "curl through the session proxy, TLS verification ON (the page and its sixteen images, ../img/vstec/parapet_0NN.jpg, byte for byte)",
+      "snapshot_file": "tetrisch_parapet.html",
+      "snapshot_sha256": "0a30496d92396a73b744dc7e44bc2ad1cb6c0fd8b894abb8d4a92489091c956e",
+      "snapshot_bytes": 5956,
+      "terms": "not stated on the page; credited by link",
+      "author_note": "Tetrisチャンネル: another site and another author than shiwehi.com, and the page shiwehi.com cites as its reference",
+      "quotes": [
+        "欄干はLJミノを用いたTSDアプローチの1つです．",
+        "ドネイトの一種です．",
+        "このとき，TSD地形をそのまま利用すると以下のようになります．",
+        "この違いが大きく影響するのは下穴がちょうど4つの時です．",
+        "そのままTSDを打つとテトリスが打てません．",
+        "欄干を行うと4列を保つことができます．"
+      ],
+      "images_dir": "spec/fixtures/tetrisch-parapet",
+      "reading": {
+        ".": "empty",
+        "#": "grey, filled",
+        "other": "a letter its piece, filled (the jp-forecast sampler's reading, pipeline.sim.extract_jp_forecast.extract_one)"
+      },
+      "images": [
+        {
+          "file": "parapet_001.jpg",
+          "sha256": "253c8a2d946a393d77c3c35183e40414038a1b2969e95d5f994ef84682a583ab",
+          "bytes": 34310,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "##........",
+            "##...#####",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_002.jpg",
+          "sha256": "206d8b5b6012cbbcd6a100c8315bc226e651a70a70517f725a2b9071d1775d40",
+          "bytes": 38492,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..L..ZZ.OO",
+            "##L...ZZOO",
+            "##LL.#####",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_003.jpg",
+          "sha256": "36ff38ebc9ecb62ac13bda1b546ff1d1d7e293f1d23b8c3b6022879b671e9324",
+          "bytes": 36513,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..#..##.##",
+            "###TTT####",
+            "####T#####",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_004.jpg",
+          "sha256": "8c8f506ef5b6f76d9d6f84543dae271afd08003b963e3a5df06488e0cdb19030",
+          "bytes": 34048,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "..#..##.##",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_005.jpg",
+          "sha256": "4635b6b3a4bb2dbea26bbc7662c202d1984c4e2b8c2c741d4c4945c7f96ca2b0",
+          "bytes": 37700,
+          "rows": [
+            "..........",
+            "..........",
+            "....L.....",
+            "....LZZ.OO",
+            "##..LLZZOO",
+            "##...#####",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_006.jpg",
+          "sha256": "ea944be17a5f1486111be45bc3719f229a72ceead807c6ca200eedae4802d27c",
+          "bytes": 36373,
+          "rows": [
+            "..........",
+            "..........",
+            "....#.....",
+            "....###.##",
+            "##..######",
+            "##TTT#####",
+            "###T######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_007.jpg",
+          "sha256": "480dba3ffd1a7de3aeb9dc002f18bd30053b10d42d6112ed06ede5f5d093e906",
+          "bytes": 33992,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..........",
+            "....#.....",
+            "....###.##",
+            "##..######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_008.jpg",
+          "sha256": "493f782b802e296884eb1cde39675de445b64d053331d11902328424b8f14768",
+          "bytes": 37518,
+          "annotation": "the digits 4-3-2-1 painted on white well cells (the depth of the well beside the 4-deep terrain 016): the sampler refuses it, a white cell being no piece colour"
+        },
+        {
+          "file": "parapet_009.jpg",
+          "sha256": "6c902ea94e3c39842c574bd9ceb2803c686b6ea46430d7abc98327a27fccca92",
+          "bytes": 39059,
+          "rows": [
+            "....L.....",
+            "....LZZ.OO",
+            "##..LLZZOO",
+            "##...#####",
+            "###.######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_010.jpg",
+          "sha256": "d96c3b5c489c3837fd37b0872027c51f80a41cccacfecc2212f7a3371a6d449f",
+          "bytes": 36322,
+          "rows": [
+            "....#.....",
+            "....###.##",
+            "##..######",
+            "##TTT#####",
+            "###T######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_011.jpg",
+          "sha256": "189bc202602608948edb4c6226fb6ccac2749a2a759c93d1381ca3a5ee2d3f6b",
+          "bytes": 35256,
+          "rows": [
+            "..........",
+            "..........",
+            "....#.....",
+            "....###.##",
+            "##..######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_012.jpg",
+          "sha256": "2faa74bcf436f45ff42c1a5a74e6d977e5fffa1ecc68ecace800ec4c3bb82db7",
+          "bytes": 39195,
+          "rows": [
+            "..........",
+            "..L..ZZ.OO",
+            "##L...ZZOO",
+            "##LL.#####",
+            "###.######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_013.jpg",
+          "sha256": "b23aa07174bfe21b9a2b89b4051190460e32d1849bb751826a2313c0794457cf",
+          "bytes": 36595,
+          "rows": [
+            "..........",
+            "..#..##.##",
+            "###TTT####",
+            "####T#####",
+            "###.######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_014.jpg",
+          "sha256": "c47bb57b74bfa53ea210fe6d9fd8333ca24adf8d48c3078b80e5104ab16732b2",
+          "bytes": 35282,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..#..##.##",
+            "###.######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        },
+        {
+          "file": "parapet_015.jpg",
+          "sha256": "ec8b1aa529e284c64901e29933d62ac6c4381da865acd94e28cea25607a96d53",
+          "bytes": 36549,
+          "rows": [
+            "..........",
+            "..........",
+            "..........",
+            "..#..##.##",
+            "###I######",
+            "###I######",
+            "###I######",
+            "###I######"
+          ]
+        },
+        {
+          "file": "parapet_016.jpg",
+          "sha256": "5df2f74abf31b1588cdf8fd071438096d59386fbcd89302104758c2113f48062",
+          "bytes": 35267,
+          "rows": [
+            "..........",
+            "..........",
+            "##........",
+            "##...#####",
+            "###.######",
+            "###.######",
+            "###.######",
+            "###.######"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "kind": "parapet",
+          "terrain": "001",
+          "pre": "002",
+          "spin": "003",
+          "after": "004",
+          "well_depth": 2
+        },
+        {
+          "kind": "plain_tsd",
+          "terrain": "001",
+          "pre": "005",
+          "spin": "006",
+          "after": "007"
+        },
+        {
+          "kind": "plain_tsd",
+          "terrain": "016",
+          "pre": "009",
+          "spin": "010",
+          "after": "011"
+        },
+        {
+          "kind": "parapet",
+          "terrain": "016",
+          "pre": "012",
+          "spin": "013",
+          "after": "014",
+          "quad": "015",
+          "well_depth": 4
+        }
+      ],
+      "slots": {
+        "002": {
+          "parapet": [
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ],
+          "parapet_tss": [
+            [
+              3,
+              4
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ]
+        },
+        "012": {
+          "parapet": [
+            [
+              2,
+              3
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "parapet_tss": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        }
+      },
+      "drawn_t_not_fired": [
+        {
+          "image": "006",
+          "pre": "005",
+          "reason": "the plain TSD: rel (+2,0) is filled, the nub plugs the well"
+        },
+        {
+          "image": "010",
+          "pre": "009",
+          "reason": "the plain TSD: rel (+2,0) is filled, the nub plugs the well"
+        }
+      ]
+    },
+    "bt_cannon": {
+      "file": "btcannon-technique.json",
+      "drawing": "parapet",
+      "slots": {
+        "parapet": [
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "parapet_tss": [
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            2
+          ]
+        ]
+      },
+      "fires": [
+        {
+          "node": "bt.build",
+          "variant": "parapet",
+          "cells": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ]
+        },
+        {
+          "node": "bt.build",
+          "variant": "parapet_tss",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ]
+        },
+        {
+          "node": "parapet",
+          "variant": "parapet",
+          "cells": [
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ]
+        },
+        {
+          "node": "parapet",
+          "variant": "parapet_tss",
+          "cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              5,
+              2
+            ]
+          ]
+        }
+      ],
+      "note": "both windows fire, as drawn, on BT砲's page's Parapet (an agreement drawing) and on its 途中BT build (「実は欄干を組む形からBT砲にすることができます」: the BT is built from the Parapet terrain, so its board holds the Parapet slot too). A relation, not a clash; and on no other board of that transcription"
+    },
+    "named_by": {
+      "file": "basicdonating-technique.json",
+      "fires": [
+        {
+          "node": "one.l_a",
+          "variant": "parapet",
+          "cells": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "node": "one.l_a",
+          "variant": "parapet_tss",
+          "cells": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "note": "same author (shiwehi.com): the 基本的なドネイト page's 1ミノドネイト forms include 「%LドネイトA(=欄干)」, drawn without its T; on no other board of that transcription"
+    },
+    "fires": [],
+    "also": [
+      {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#1",
+        "variant": "parapet",
+        "mirrored": false,
+        "note": "same author (shiwehi.com), unlabelled: a 9-row board the route artefact cannot match, so no cross-route"
+      },
+      {
+        "file": "mountainous2-routes.json",
+        "node": "2.compromise.fire5.bag4#2",
+        "variant": "parapet",
+        "mirrored": false,
+        "note": "the same, its second drawing"
+      }
+    ],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": []
+}

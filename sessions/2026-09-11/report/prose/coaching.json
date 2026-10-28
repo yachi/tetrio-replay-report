@@ -15,7 +15,8 @@
         "<strong>今晚兩邊都要郁，唔淨係天花板。</strong>贏嗰啲局爭 9% 幾、輸嗰啲局爭 4% 幾<span class=\"badge\" data-claim=\"C002\"></span>——上一晚地板貼到實，今晚地板都拉開咗。守嗰邊由「唔扣分」變返「都扣緊分」。",
         "<strong>頂爆率要睇。</strong>全晚 12 局頂到天花板收，7 局係你<span class=\"badge\" data-claim=\"C006\"></span>，23.5% 係十一晚以嚟最高。不過呢一欄十一晚都係大上大落，所以當佢係今晚嘅事，唔好當佢係一個要長期修嘅毛病。",
         "<strong>KPP 唔使睇。</strong>3.620 對 3.608<span class=\"badge\" data-claim=\"C008\"></span>，喺自己贏局輸局之間一樣郁唔郁得幾多<span class=\"badge\" data-claim=\"G064\"></span>。呢一欄冇嘢執得返。"
-      ]
+      ],
+      "sim_recs": []
     },
     "pinglamb": {
       "tagline": "天花板同地板一齊拉開",
@@ -28,6 +29,10 @@
         "<strong>唔好由呢個比數推論任何嘢。</strong>1 比 6 同上一晚嘅 4 比 4 隔一晚。兩晚之間你冇變過打法——變嘅係每粒方塊嘅差距由 6 個幾去到 12 個幾<span class=\"badge\" data-claim=\"C004\"></span>。要追嘅係嗰一欄，唔係個比數。",
         "<strong>Perfect Clear 依然唔見數。</strong>14 個對 8 個<span class=\"badge\" data-claim=\"G035\"></span>，係十一晚最多，但全場淨係你做到全消嗰 9 局你仲要輸咗一局<span class=\"badge\" data-claim=\"G075\"></span>；對手嗰 4 局就一局都冇輸<span class=\"badge\" data-claim=\"G073\"></span>。分母得幾局，所以呢度唔會計百分比——但「做多啲全消」唔係今晚贏嘅原因。",
         "<strong>清走嗰欄係你唯一輸嘅總數。</strong>1049 對 962<span class=\"badge\" data-claim=\"G028\"></span>，每粒方塊計一樣係對手高<span class=\"badge\" data-claim=\"G069\"></span>。今晚贏得咁鬆，靠嘅係攻，唔係守——如果下一晚攻嗰邊追返啲，呢一欄就會變返緊要。"
+      ],
+      "sim_recs": [
+        "<strong>ダブルダガー接到。</strong>ダブルダガー 1 次接到 1 次。",
+        "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>20 局有 15 局行到第二巡、4 局行到第三巡或之後、2 局打出全消。"
       ]
     }
   },

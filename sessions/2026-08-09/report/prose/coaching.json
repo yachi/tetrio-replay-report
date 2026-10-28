@@ -17,6 +17,10 @@
         "<strong>守嗰邊有得加碼。</strong> 你贏局清走嘅垃圾（DS）每粒方塊 0.216、輸局 0.173<span class=\"badge\" data-claim=\"G071\"></span>，兩個 regime 嘅差距同 pinglamb 一樣明顯<span class=\"badge\" data-claim=\"G072\"></span>；清走嘅垃圾總數你亦都係全晚最多（966 對 930）<span class=\"badge\" data-claim=\"G028\"></span>。問題係你用咗多 382 粒方塊去清<span class=\"badge\" data-claim=\"C004\"></span>——即係守得住，但守得唔夠抵。",
         "<strong>唔使去追返手法嗰格。</strong> 呢一格今晚係輸咗<span class=\"badge\" data-claim=\"G029\"></span><span class=\"badge\" data-claim=\"G062\"></span>，但佢照舊同輸贏冇關係：你贏嘅局同輸嘅局，KPP 差距細到講唔出口<span class=\"badge\" data-claim=\"G069\"></span>，pinglamb 都係一樣<span class=\"badge\" data-claim=\"G070\"></span>。呢個係<strong>連續第五個 session</strong> 同一個結論。慳返啲時間練上面三樣。",
         "<strong>自爆嗰格你做到咗，記低。</strong> 全晚淨係 4 局自己頂到天花板收場，4 局全部係 pinglamb，你一次都冇<span class=\"badge\" data-claim=\"C006\"></span>。上一晚 8 局自爆入面 6 局係你，而嗰晚俾你嘅建議之一就係呢格。改善係實質嘅——但亦都證明咗自爆從來唔係主因。"
+      ],
+      "sim_recs": [
+        "<strong>迷走砲同はちみつ砲今晚喺第一巡之後就甩咗。</strong>迷走砲 5 局得 1 局行到第二巡、はちみつ砲 10 局得 3 局；山岳積み2号就 17 局有 10 局。開借嚟嘅定式，第二巡要跟頁上嘅圖，<a href=\"stray-cannon.html\">迷走砲頁</a>同<a href=\"honey-cup.html\">はちみつ砲頁</a>有齊。",
+        "<strong>對手嘅主力中盤 STMB Cave，你今晚一次都冇對到。</strong>對手 STMB Cave 2 次；你係 0 / 167 個 TSD。下面「逐場」嗰行睇得到。"
       ]
     },
     "pinglamb": {
@@ -31,6 +35,10 @@
         "<strong>速度仍然係你唯一一格全輸嘅嘢。</strong> 六場場均 PPS 場場低過對面<span class=\"badge\" data-claim=\"G049\"></span>，每局平均約 1.375 對佢約 1.462<span class=\"badge\" data-claim=\"G037\"></span>。你 APM 一夠 65 就 10 局贏 7 局<span class=\"badge\" data-claim=\"G046\"></span>，即係去到嗰個檔一樣贏，問題係去唔去到——今晚你得 10 局去到，對面 6 局去到而且 6 局贏晒<span class=\"badge\" data-claim=\"G045\"></span>。練法照舊：開局同過渡位嘅手速先係樽頸，唔係 T-spin 本身。",
         "<strong>留意個效率優勢一路收窄。</strong> 頭兩場你每粒方塊嘅攻擊高過對面超過三成半，尾兩場收窄到唔夠 8%<span class=\"badge\" data-claim=\"C005\"></span>。今晚照贏六場，但呢條線再走落去就會交叉。要守住呢格，靠嘅係 TST 呢個來源<span class=\"badge\" data-claim=\"G034\"></span>——同樣清行，TST 用嘅方塊少好多。",
         "<strong>自爆嗰格今晚係你嘅。</strong> 全晚 4 局自己頂到天花板收場，4 局都係你<span class=\"badge\" data-claim=\"C006\"></span>。四局都係你輸嘅局，即係代價已經計咗落個 6 比 0 度——但頂爆之前嗰幾秒通常有得救，值得逐局翻返睇。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 2 次全部冇接到第二個 TSD。</strong>2 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
+        "<strong>兩個主力開局今晚都行得深。</strong>迷走砲 21 局有 20 局行到第二巡；はちみつ砲 23 局有 18 局行到第二巡，1 局打出全消。"
       ]
     }
   },

@@ -1,20 +1,28 @@
 #!/usr/bin/env python3
-"""Regenerate docs/ (the GitHub Pages site) from the sessions.
+"""Render the GitHub Pages site from the sessions.
 
-    bin/build-docs            regenerate
-    bin/build-docs --check    verify docs/ matches the sessions, write nothing
+    bin/build-docs                      render into docs/ (git-ignored; a local preview)
+    bin/build-docs --out _site          render into _site/ (what CI deploys)
+    bin/build-docs --check --out _site  re-render and byte-compare against _site/, write nothing
 
-Copies each session's self-contained report into docs/ under a clean name and
-regenerates docs/index.html from facts.json + the proof maps — so the landing
-page can never drift from the data it describes. Re-run after adding a session.
+Copies each session's self-contained report into the site under a clean name and
+regenerates index.html from facts.json + the proof maps — so the landing page can
+never drift from the data it describes.
 
-`--check` exists because that promise had a hole: CI verified sessions/ in depth
-but never checked that docs/ had been regenerated from it, and nothing reruns this
-script automatically. A whole section (T-Spin Forecast) once lived in
-sessions/2026-07-22/report/report.html and was absent from the published
-docs/2026-07-22.html, so the page readers actually load was a different document
-from the one every gate had passed. --check is the same shape as
-`pipeline.build_report --check`: exit 1 and name the drifting files.
+THE SITE IS NOT COMMITTED. Since 2026-10-23 the `docs` job in verify.yml renders it
+into _site/, renders it a second time with --check (a determinism gate: the two renders
+must be byte-identical, the standard every other artefact here is held to), uploads it,
+and the `deploy` job publishes that upload to GitHub Pages once every other job in the
+workflow has passed on a push to main. Committing docs/ had made every pipeline change
+re-commit each report twice (docs/<date>.html was a byte copy of report.html) and every
+rendered page once.
+
+`--check` was first written because the committed docs/ could go stale: CI verified
+sessions/ in depth but never checked that docs/ had been regenerated from it, and a whole
+section (T-Spin Forecast) once lived in sessions/2026-07-22/report/report.html and was
+absent from the published docs/2026-07-22.html. Rendering the site in CI from the commit
+being deployed closes that hole by construction; --check survives as the determinism gate,
+and still exits 1 naming the files that differ.
 """
 import argparse
 import filecmp
@@ -47,12 +55,8 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import gamushiro_page, honey_cup_page, mountainous2_page, sdpcspin_page, stickspin_page  # noqa: E402
-from pipeline import stray_cannon_page  # noqa: E402
-
-#: every opener route site, in the order its card appears under 定式路線
-ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE,
-               gamushiro_page.SITE, sdpcspin_page.SITE]
+from pipeline import dpc_page, replay_labels, secondpc_page, technique_page  # noqa: E402
+from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
 #
@@ -110,6 +114,12 @@ ARTEFACTS = [
     ("2026-10-12", "report", "2026-10-12.html", "完整戰報",
      "八場 series、55 局：3 比 5、25 比 30。兩邊各剃一次光頭——第一場 pinglamb 5 比 0，"
      "第三場 yachi 5 比 0。"),
+    ("2026-10-20", "report", "2026-10-20.html", "完整戰報",
+     "四場 series、30 局，全 corpus 最細嘅一晚：2 比 2、15 比 15，第一次場數同局數都打和。"
+     "頭兩場 10 比 5 係 yachi，尾兩場 5 比 10 係 pinglamb。"),
+    ("2026-10-22", "report", "2026-10-22.html", "完整戰報",
+     "九場 series、63 局：3 比 6、25 比 38。全晚兩場剃光頭，都係 pinglamb 嘅（第五同第九場）；"
+     "每粒攻擊差距 +20.59%，全 corpus 最大。"),
     ("2026-09-18-onform", "report", "2026-09-18-onform.html", "篩選子集 · 唔係當晚戰報",
      "2026-09-18 嗰 18 場入面揀出嚟嘅 3 場：兩個人嘅每場 VS 都高過自己喺之前十二個 session "
      "嘅中位數。下面個 0:3 係呢三場嘅比數，唔係當晚嘅——當晚 18 場係 pinglamb 11:7。"
@@ -229,7 +239,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
 """
 
 
-def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
+def render_index(cards, totals, pooled_html=None, replays=(), openers=None, techniques=None):
     parts = [
         '<!doctype html><html lang="zh-HK"><head><meta charset="utf-8">',
         "<title>TETR.IO 對戰戰報 — 每個數字都有證明</title>",
@@ -295,6 +305,20 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
                 f"<p class='blurb'>{escape(o['blurb'])}</p>"
                 "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
         parts.append("</div>")
+    # The mid-game technique pages (STSD, …): the same tier and pill as the route pages, after them.
+    # Each case count is rendered from that technique's facts artefact; the words are its prose's
+    # `index_card`. No group at all while no technique is registered.
+    if techniques:
+        parts.append("<h2>中盤手法</h2><div class='grid'>")
+        for o in techniques:
+            parts.append(
+                f"<a class='card' href='{escape(o['href'])}'>"
+                f"<div class='date'>{escape(o['kicker'])}</div>"
+                f"<div class='title'>{escape(o['title'])}</div>"
+                f"<div class='meta'>{o['cases']} 個個案</div>"
+                f"<p class='blurb'>{escape(o['blurb'])}</p>"
+                "<span class='pill'>模擬器 · 唔喺證明鏈入面</span></a>")
+        parts.append("</div>")
     # Another game, measured from video rather than from replay files. It lives in its own repo and
     # site, so this card is a plain link and carries no figure: a count typed here could not be checked.
     parts.append("<h2>其他遊戲</h2><div class='grid'>")
@@ -342,9 +366,15 @@ def render_index(cards, totals, pooled_html=None, replays=(), openers=None):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true",
-                    help="verify docs/ matches the sessions; write nothing")
+                    help="verify the site directory matches the sessions; write nothing")
+    ap.add_argument("--out", metavar="DIR",
+                    help="render the site into DIR instead of docs/ (CI builds into _site and "
+                         "deploys that directory; docs/ is no longer committed)")
     args = ap.parse_args(argv)
     check = args.check
+    if args.out:
+        global DOCS
+        DOCS = Path(args.out).resolve()
     drift = []
 
     DOCS.mkdir(exist_ok=True)
@@ -430,14 +460,18 @@ def main(argv=None):
     # renders under the same condition — and a docs/*-replay.html nothing produces is drift, so a
     # removed artefact cannot leave its page published. Sessions only: a subset re-cuts a night and
     # numbers its matches afresh, so `#m<pos>r<round>` would point at different rounds.
+    # Each page's opener / technique key moments come from the route and technique artefacts, read
+    # once here and re-checked against every page's own decode as it renders (replay_labels.py).
     replays = []
     produced = set()
     report_of = {a[0]: a[2] for a in ARTEFACTS}
+    label_sources = replay_labels.load_sources(str(REPO))
     for d in sorted(SESSIONS.glob("*")):
         if not (d / replay_section.FACTS_REL).exists():
             continue
         data, facts = replay_page.load(str(d))
-        page = replay_page.render(data, facts, report_of[d.name])
+        page = replay_page.render(data, facts, report_of[d.name],
+                                  replay_labels.for_session(data, facts, label_sources))
         name = replay_section.page_name(data["session"])
         if name != replay_section.page_name(d.name):
             print(f"FAIL {d.name}/{replay_section.FACTS_REL} says session {data['session']!r}",
@@ -468,12 +502,12 @@ def main(argv=None):
     # not produce is drift, exactly as for *-replay.html — none of these names ends in -replay.html,
     # and no opener's prefix is a prefix of another's, so one site's glob never sees another's pages.
     openers = []
-    prefixes = [site.p.prefix for site in ROUTE_SITES]
+    prefixes = [site.p.prefix for site in INDEX_ROUTE_SITES + TECHNIQUE_SITES] + [dpc_page.PREFIX, secondpc_page.PREFIX]
     for a in prefixes:
         if any(b != a and b.startswith(a) for b in prefixes):
             print(f"FAIL route page prefix {a!r} is a prefix of another site's", file=sys.stderr)
             return 1
-    for site in ROUTE_SITES:
+    for site in INDEX_ROUTE_SITES:
         who = site.PROSE["opener_name"]
         rs_inputs = site.load_inputs(str(REPO))
         rs_pages = site.render_all(str(REPO), rs_inputs)
@@ -500,6 +534,63 @@ def main(argv=None):
                         "kicker": card["kicker"], "title": site.PROSE["overview_title"],
                         "blurb": card["blurb"]})
 
+    # The mid-game technique pages, rendered and byte-compared exactly like the route pages above:
+    # `render_all` audits both pages before returning them, and a docs/<prefix>*.html the renderer
+    # did not produce is drift. The prefix check above covers both lists together.
+    techniques = []
+    for site in TECHNIQUE_SITES:
+        who = site.PROSE["technique_name"]
+        ts_inputs = site.load_inputs(str(REPO))
+        ts_pages = site.render_all(str(REPO), ts_inputs)
+        for name, page in ts_pages.items():
+            if name.endswith("-replay.html") or not name.startswith(site.p.prefix):
+                print(f"FAIL {who} renders {name}, outside its prefix or in -replay.html", file=sys.stderr)
+                return 1
+            dst = DOCS / name
+            if check:
+                if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                    drift.append(f"docs/{name} differs from what the {who} artefacts render")
+            else:
+                dst.write_text(page, encoding="utf-8")
+                print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+        for stale in sorted(DOCS.glob(f"{site.p.prefix}*.html")):
+            if stale.name not in ts_pages:
+                if check:
+                    drift.append(f"docs/{stale.name} is published but the {who} renderer does not produce it")
+                else:
+                    stale.unlink()
+                    print(f"  removed docs/{stale.name} (the {who} renderer does not produce it)")
+        techniques.append(technique_page.site_card(site, ts_inputs[1]))
+
+    # The DPC page (what follows a Perfect Clear, against harddrop's DPC setup drawings) and the
+    # Second PC page (a Perfect Clear straight into a four-line one, against harddrop's Second
+    # Perfect Clear drawings): the same tier, the same render-and-byte-compare, and their cards in
+    # the 中盤手法 group. They are not in TECHNIQUE_SITES because replay_labels and the report's
+    # routes section read that list.
+    for mod, site, who in ((dpc_page, dpc_page.DpcSite(), "DPC"),
+                           (secondpc_page, secondpc_page.SecondPcSite(), "Second PC")):
+        site_inputs = site.load_inputs(str(REPO))
+        site_pages = site.render_all(str(REPO), site_inputs)
+        for name, page in site_pages.items():
+            if name.endswith("-replay.html") or not name.startswith(mod.PREFIX):
+                print(f"FAIL the {who} page renders {name}, outside its prefix or in -replay.html", file=sys.stderr)
+                return 1
+            dst = DOCS / name
+            if check:
+                if not dst.exists() or dst.read_text(encoding="utf-8") != page:
+                    drift.append(f"docs/{name} differs from what the {who} artefacts render")
+            else:
+                dst.write_text(page, encoding="utf-8")
+                print(f"  rendered docs/{name} ({len(page.encode())} bytes)")
+        for stale in sorted(DOCS.glob(f"{mod.PREFIX}*.html")):
+            if stale.name not in site_pages:
+                if check:
+                    drift.append(f"docs/{stale.name} is published but the {who} renderer does not produce it")
+                else:
+                    stale.unlink()
+                    print(f"  removed docs/{stale.name} (the {who} renderer does not produce it)")
+        techniques.append(mod.site_card(site, site_inputs[1]))
+
     # Computed from the four committed artefacts at render time rather than read from a pooled
     # artefact of its own: --check regenerates this, so the figure cannot go stale against its
     # inputs, and there is no extra file to forget to rebuild.
@@ -513,7 +604,7 @@ def main(argv=None):
             print(f"FAIL pooled forecast: {p}", file=sys.stderr)
         return 1
 
-    index = render_index(cards, totals, pooled_html, replays, openers)
+    index = render_index(cards, totals, pooled_html, replays, openers, techniques)
     if check:
         cur = (DOCS / "index.html").read_text(encoding="utf-8") if (DOCS / "index.html").exists() else None
         if cur != index:
@@ -524,7 +615,7 @@ def main(argv=None):
             print("run `bin/build-docs` to republish", file=sys.stderr)
             return 1
         print(
-            f"ok  docs/ matches the sessions — {totals['sessions']} sessions, "
+            f"ok  {DOCS.name}/ matches the sessions — {totals['sessions']} sessions, "
             f"{totals['matches']} matches, {totals['rounds']} rounds, "
             f"{totals['claims']} verified claims"
         )

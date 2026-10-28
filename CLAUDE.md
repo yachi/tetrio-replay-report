@@ -3,34 +3,68 @@
 Public repo: <https://github.com/yachi/tetrio-replay-report> · Site: <https://yachi.github.io/tetrio-replay-report/>
 
 Turns a batch of TETR.IO `.ttrm` replays into a Cantonese match report where every
-factual sentence is badge-linked to a Dafny-verified lemma. Seventeen sessions so far
+factual sentence is badge-linked to a Dafny-verified lemma. Nineteen sessions so far
 (2026-07-22: yachi 6:4 · 2026-07-24: pinglamb 4:3 · 2026-07-28: pinglamb 6:2 ·
 2026-08-01: yachi 4:3 · 2026-08-09: pinglamb 6:0 · 2026-08-14: pinglamb 7:4 ·
 2026-08-19: pinglamb 7:3 · 2026-08-25: pinglamb 5:4 · 2026-09-03: pinglamb 5:1 ·
 2026-09-10: **drawn 4:4** · 2026-09-11: pinglamb 6:1 · 2026-09-17: pinglamb 5:2 ·
 2026-09-18: pinglamb 11:7 · 2026-09-19: pinglamb 15:5 · 2026-10-03: pinglamb 14:6 ·
-2026-10-09: pinglamb 7:5 · 2026-10-12: pinglamb 5:3),
-1314 rounds, 1534 generated claims
+2026-10-09: pinglamb 7:5 · 2026-10-12: pinglamb 5:3 · 2026-10-20: **drawn 2:2** ·
+2026-10-22: pinglamb 6:3), 1407 rounds, 1707 generated claims
 plus the hand ledgers — count those from `sessions/*/report/claims-narrative.json` and
 `claims-coaching.json` rather than from a total typed here, because hand prose lands after
 the session does. **The three largest sessions are 09-19 (20 matches, 150 rounds), 10-03 (20, 146) and 09-18
 (18, 127)**, against the 11 and 84 that were the records before any of them landed. Together they
-are 32.2% of every round the corpus holds (33.6% before 10-12 landed and 36.6% before 10-09 —
+are 30.1% of every round the corpus holds (31.5% before 10-22 landed, 32.2% before 10-20, 33.6% before 10-12 and 36.6% before 10-09 —
 re-derive it, the share moves every session), which is the single most important thing to know before
-reading any pooled figure below. Ranked over all seventeen: **2026-10-09 is fourth by both matches
+reading any pooled figure below. Ranked over all nineteen: **2026-10-09 is fourth by both matches
 (12) and rounds (102)**, which pushes 2026-08-14 to fifth on both (11, 84); 2026-08-25 is seventh
 by rounds (73, behind 07-22's 79) with 9 matches; 2026-08-19 is eighth by rounds (70) and **ties**
-07-22 at 10 matches. **2026-10-12 is eleventh by rounds (55, between 07-28's 64 and 08-01's 53)
-and ties 07-28 and 09-10 at 8 matches**, so it moves none of the ranks above it. (Those ranks have
+07-22 at 10 matches. **2026-10-22 is eleventh by rounds (63, one behind 07-28's 64) and ties
+08-25 at 9 matches**, which pushes **2026-10-12 to twelfth by rounds** (55, eleventh at
+seventeen and eighteen), still tied with 07-28 and 09-10 at 8 matches; 10-22 moves no rank above
+eleventh on either measure. (Those ranks have
 been wrong in this sentence before, in both directions, and every one of them moved by a place on
 10-09's pass — re-derive them, never carry them; on 10-12's pass none above eleventh moved, which
-is a fact about where it landed and not a reason to stop re-deriving.)
-2026-09-03 has the fewest rounds of the seventeen (46) and **ties** 08-09 for the fewest matches
-(6) — and it is NO LONGER the most lopsided in matches; see 09-11 below.
+is a fact about where it landed and not a reason to stop re-deriving. **2026-10-20 lands at the
+bottom of both**, 4 matches and 30 rounds, so it moves no rank above it and takes both minima from
+the sessions below.)
+2026-09-03 has the fewest rounds of the first seventeen (46; second-fewest of nineteen behind
+10-20's 30) and **ties** 08-09 for the fewest matches of the first seventeen (6) — and it is NO
+LONGER the most lopsided in matches; see 09-11 below.
 Read its 5:1 with C010 beside it: the round split after three matches was 13:12 to yachi, and
 the whole margin is in the last three. 2026-09-17 is second-fewest by rounds (49) and sits in
 the four-session group at 7 matches with 07-24, 08-01 and 09-11 — so it is near the bottom of
 both measures without being lowest on either.
+
+**2026-10-22 is pinglamb 6:3 in matches and 38:25 in rounds [C001][C010], and its finding is the
+efficiency gap, not the scoreline.** 60.32% of the night's rounds is fourth by that measure (behind
+09-11's 62.75, 09-17's 61.22 and 09-19's 60.67); 66.67% of matches is mid-table. It is the
+nineteenth session in date order AND in arrival. Its C010 pins four stretches: yachi took m1 5:4,
+pinglamb took m2-m5 20:6, yachi took m6-m8 14:9, and pinglamb took m9 5:0 — so the night was lost in
+its second stretch, and both 5-0s are pinglamb's (m5, m9). **Its session APP gap is +20.59% [C004],
+the corpus record**, past 09-17's +20.11%, and **both regime gaps are large at once** (won +15.17,
+lost +20.13 [C002], each SECOND in its own column, behind 08-14's 18.93 and 08-09's 25.4) — the
+second session after 09-17 to have both, and on that ranking a larger instance of it; neither
+needs a leave-one-out caveat (`check_loo`, rel 0.139 and 0.104). pinglamb's APP is higher in all
+nine matches [C020] and the per-match ordering interleaves (1 in 84 by chance, no C007). The volume
+route failed by the largest shortfall the corpus holds (10.60 pp: +573 pieces [C005][C009] against
+the gap, −349 lines of attack, −8.79%), and the attack total decided 7 of the 9 matches [C021].
+KPP's AUC, 35.7, is the corpus low. Every rank in this paragraph is re-derived over the nineteen
+from facts.json by hand; none is gated.
+
+**2026-10-20 is DRAWN ON BOTH MEASURES — 2:2 in matches and 15:15 in rounds [C001][C010] — the first
+session level on both**, where 09-10 was 4:4 and 32:33. It is also the corpus's SMALLEST, 4 matches
+and 30 rounds, against 08-09's and 09-03's 6 and 09-03's 46. It is the eighteenth session in date
+order AND in arrival. Its C010 is the cleanest shape the corpus has: yachi took both of the first
+two matches 10:5 on rounds, pinglamb both of the last two 5:10, two halves of fifteen rounds
+mirrored exactly. **The volume route more than covered the gap, by the widest margin the corpus
+holds**: a +11.18% piece surplus [C009] against a +6.73% APP gap [C004], so yachi's attack total
+is the higher by 80 lines, 4.16% of pinglamb's [C005] — past 10-09's +1.00% as the largest attack
+lead yachi has had — and his score total is higher too [G059], the second session after 10-09. It
+was still drawn, because the higher attack total won each MATCH [C015] and the second half's
+totals were pinglamb's. Both regime figures need a leave-one-out caveat, and the lost-gap's SIGN is
+one round's; see the regime paragraph. yachi topped out in none of the 30 rounds [C006].
 
 **2026-10-12 is pinglamb 5:3 in matches and 30:25 in rounds [C001][C010] — a mid-table scoreline
 on both measures** (54.55% of rounds to pinglamb, seventh-closest of seventeen; 62.50% of matches,
@@ -57,9 +91,9 @@ than 4 (08-25, 09-10, 09-19 and 10-03). And its C010 pins 09-03's shape at a dif
 match score was **4:4 and the rounds 33:34 after eight matches**, m9-m11 went 11:15 to pinglamb in
 three straight matches, and that is the whole series margin; yachi took m12 5:4. **It is also the
 first session where yachi's attack total is the higher since 07-22** (+58 lines, +1.00% of
-pinglamb's [C005]) **and the first — still the only one of seventeen — where his in-game score total is higher**
+pinglamb's [C005]) **and the first of sixteen where his in-game score total is higher** (10-20 is the second)
 (+85 519 [G074]) — both carried by the largest piece surplus the corpus holds (+1064, +12.64%
-[C005][C009]). It lost anyway; see the shortfall table, where it is the new top end.
+[C005][C009]). It lost anyway; see the shortfall table, where it was the top end until 10-20.
 
 **2026-10-03 is pinglamb 14:6 in matches and 82:64 in rounds [C001][C010] — a mid-table
 scoreline on both measures** (56.16% of rounds, 70.00% of matches, which ties 08-19). It was first
@@ -109,8 +143,8 @@ their own columns over the fourteen sessions those are **2nd and 3rd**, where ev
 has one regime apart and the other level. Do not upgrade that into 「the most balanced session」 —
 07-28's won/lost ratio (0.98) is closer to 1 than this one's (0.93); what is new is that the
 balance sits on LARGE values, 07-28 being +5.9/+6.0 with both BELOW their medians, which is the
-「roughly level」 class and the opposite reading. Its C004 session gap of +20.11% is the corpus
-record, past 08-09's +18.08%, and it exceeds both regimes' gaps, which is the arithmetic of
+「roughly level」 class and the opposite reading. Its C004 session gap of +20.11% was the corpus
+record, past 08-09's +18.08%, until 10-22's +20.59%, and it exceeds both regimes' gaps, which is the arithmetic of
 pooling over two differently-sized round pools and not a finding.
 
 **2026-09-11 is the most lopsided session the corpus has by ROUNDS — 32:19, i.e. 62.7% of the
@@ -178,7 +212,7 @@ regression, not an opinion.
 ```bash
 bin/new-session sessions/<date> <replay-dir>   # extract → claims → Dafny → verify → proof map
 bin/verify-session sessions/<date>/report      # re-run all gates (MUTATION=1 adds mutation test)
-bin/build-docs                                 # regenerate docs/ (the Pages site) from sessions
+bin/build-docs [--out <dir>]                   # render the Pages site (default docs/, git-ignored; CI deploys it)
 python3 -m pipeline.build_report sessions/<date>/report         # regenerate the derived report sections
 python3 -m pipeline.build_report sessions/<date>/report --check # CI gate: fail if they drifted from facts.json
 python3 -m pipeline.check_prose_figures sessions/<date>/report   # CI gate: every 約-figure is floored
@@ -222,6 +256,10 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-opener-facts.ts \
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-replay.ts \
   --out sessions/<date>/sim/replay-facts.json                   # the animated replay's timeline (quarantined)
 bun test pipeline/sim/replay.test.ts                           #   its round trip + named exception lists
+bun pipeline/sim/oracle-cache.ts --warm [--jobs 4]             # fill the shared oracle-replay cache bun test reads; ON by
+                                                               #   default only under bun test (ORACLE_CACHE=off|on|verify,
+                                                               #   ORACLE_CACHE_DIR); emitters never read it. PERF-PLAN.md
+bun test pipeline/sim/oracle-cache.test.ts                     #   cached == fresh, the key moves with pipeline/sim, closure stays inside
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
@@ -267,6 +305,14 @@ bun pipeline/sim/emit-route-demos.ts --opener gamushiro \
   --out analysis/gamushiro-demos.json                           # the constructed ガムシロ積み demos (quarantined, not corpus data)
 bun test pipeline/openers/gamushiro.test.ts pipeline/openers/gamushiro-demos.test.ts  # its two tests
 python3 -m pipeline.gamushiro_page --selftest   # the docs/gamushiro*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_hdgamushiro_routes            # CI gate: harddrop's ガムシロ積み route transcription
+python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest #   its mutants; --html-dir <dir> re-checks the Gamushiro_Stacking wikitext snapshot
+bun pipeline/sim/emit-route-facts.ts --opener hdgamushiro \
+  --out analysis/hdgamushiro-facts.json                         # its corpus route artefact (quarantined)
+bun pipeline/sim/emit-route-demos.ts --opener hdgamushiro \
+  --out analysis/hdgamushiro-demos.json                         # its constructed demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/hdgamushiro.test.ts pipeline/openers/hdgamushiro-demos.test.ts  # its two tests
+python3 -m pipeline.hdgamushiro_page --selftest # the docs/hdgamushiro*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_sdpcspin_routes            # CI gate: the SDPC Spin route transcription
 python3 -m pipeline.openers.extract_sdpcspin_routes --selftest #   its mutants; --html-dir <dir> re-checks the two harddrop wikitext snapshots (SDPC_Spin + SingleYou)
 bun pipeline/sim/emit-route-facts.ts --opener sdpcspin \
@@ -275,6 +321,104 @@ bun pipeline/sim/emit-route-demos.ts --opener sdpcspin \
   --out analysis/sdpcspin-demos.json                            # the constructed SDPC Spin demos (quarantined, not corpus data); emit AFTER the facts
 bun test pipeline/openers/sdpcspin.test.ts pipeline/openers/sdpcspin-demos.test.ts  # its two tests
 python3 -m pipeline.sdpcspin_page --selftest    # the docs/sdpcspin*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stsd_shapes            # CI gate: the STSD technique transcription
+python3 -m pipeline.openers.extract_stsd_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique stsd \
+  --out analysis/stsd-facts.json                               # STSD's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique stsd \
+  --out analysis/stsd-demos.json                               # the constructed STSD demos (quarantined, not corpus data); emit AFTER the facts
+bun test pipeline/openers/stsd.test.ts pipeline/openers/stsd-demos.test.ts  # its two tests
+python3 -m pipeline.stsd_page --selftest        # the docs/stsd*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_stmbcave_shapes            # CI gate: the STMB Cave technique transcription
+python3 -m pipeline.openers.extract_stmbcave_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique stmbcave \
+  --out analysis/stmbcave-facts.json                           # STMB Cave's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique stmbcave \
+  --out analysis/stmbcave-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/stmbcave.test.ts pipeline/openers/stmbcave-demos.test.ts  # its two tests
+python3 -m pipeline.stmbcave_page --selftest    # the docs/stmbcave*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_imperialcross_shapes            # CI gate: the Imperial Cross technique transcription
+python3 -m pipeline.openers.extract_imperialcross_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique imperialcross \
+  --out analysis/imperialcross-facts.json                      # Imperial Cross's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique imperialcross \
+  --out analysis/imperialcross-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/imperialcross.test.ts pipeline/openers/imperialcross-demos.test.ts  # its two tests
+python3 -m pipeline.imperialcross_page --selftest # the docs/imperialcross*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_doubledagger_shapes            # CI gate: the Double Dagger technique transcription
+python3 -m pipeline.openers.extract_doubledagger_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-technique-facts.ts --technique doubledagger \
+  --out analysis/doubledagger-facts.json                       # Double Dagger's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique doubledagger \
+  --out analysis/doubledagger-demos.json                       # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/doubledagger.test.ts pipeline/openers/doubledagger-demos.test.ts  # its two tests
+python3 -m pipeline.doubledagger_page --selftest  # the docs/doubledagger*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_btcannon_shapes            # CI gate: the BT砲 (途中BT) technique transcription
+python3 -m pipeline.openers.extract_btcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's BT_Cannon.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique btcannon \
+  --out analysis/btcannon-facts.json                           # BT砲's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique btcannon \
+  --out analysis/btcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/btcannon.test.ts pipeline/openers/btcannon-demos.test.ts  # its two tests
+python3 -m pipeline.btcannon_page --selftest      # the docs/btcannon*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_cutcopy_shapes            # CI gate: the 千鳥格子 (Cut Copy) technique transcription
+python3 -m pipeline.openers.extract_cutcopy_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Cut_copy.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique cutcopy \
+  --out analysis/cutcopy-facts.json                            # 千鳥格子's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique cutcopy \
+  --out analysis/cutcopy-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/cutcopy.test.ts pipeline/openers/cutcopy-demos.test.ts  # its two tests
+python3 -m pipeline.cutcopy_page --selftest       # the docs/cutcopy*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_shachikutrain_shapes            # CI gate: the 社畜トレイン (Shachiku Train) technique transcription
+python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Shachiku_Train.wikitext and STMB_Cave.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique shachikutrain \
+  --out analysis/shachikutrain-facts.json                      # 社畜トレイン's corpus artefact (quarantined)
+bun pipeline/sim/emit-technique-demos.ts --technique shachikutrain \
+  --out analysis/shachikutrain-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/shachikutrain.test.ts pipeline/openers/shachikutrain-demos.test.ts  # its two tests
+python3 -m pipeline.shachikutrain_page --selftest # the docs/shachikutrain*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_parapet_shapes            # CI gate: the 欄干 (Parapet) technique transcription
+python3 -m pipeline.openers.extract_parapet_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Parapet.wikitext, tetrisch_parapet.html and tetrisch-parapet/ beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique parapet \
+  --out analysis/parapet-facts.json                            # 欄干's corpus artefact (quarantined; two variants, a payoff)
+bun pipeline/sim/emit-technique-demos.ts --technique parapet \
+  --out analysis/parapet-demos.json                            # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/parapet.test.ts pipeline/openers/parapet-demos.test.ts  # its two tests
+python3 -m pipeline.parapet_page --selftest       # the docs/parapet*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_kaidan_shapes            # CI gate: the 階段のドネイト (Kaidan Setups) technique transcription
+python3 -m pipeline.openers.extract_kaidan_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (with harddrop's Kaidan_Setups.wikitext, Anchor_Set.wikitext and STMB_Cave.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique kaidan \
+  --out analysis/kaidan-facts.json                             # 階段のドネイト's corpus artefact (quarantined; a payoff, harddrop's)
+bun pipeline/sim/emit-technique-demos.ts --technique kaidan \
+  --out analysis/kaidan-demos.json                             # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/kaidan.test.ts pipeline/openers/kaidan-demos.test.ts  # its two tests
+python3 -m pipeline.kaidan_page --selftest        # the docs/kaidan*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_dtcannon_shapes            # CI gate: the 途中DT砲 (mid-game DT Cannon) technique transcription
+python3 -m pipeline.openers.extract_dtcannon_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (dtcannon.html, with harddrop's Double_Triple_Cannon_Setups.wikitext beside it)
+bun pipeline/sim/emit-technique-facts.ts --technique dtcannon \
+  --out analysis/dtcannon-facts.json                           # 途中DT砲's corpus artefact (quarantined; a TSD into a TST)
+bun pipeline/sim/emit-technique-demos.ts --technique dtcannon \
+  --out analysis/dtcannon-demos.json                           # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/dtcannon.test.ts pipeline/openers/dtcannon-demos.test.ts  # its two tests
+python3 -m pipeline.dtcannon_page --selftest      # the docs/dtcannon*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_basicdonating_shapes            # CI gate: the 基本的なドネイト (basic donating) technique transcription
+python3 -m pipeline.openers.extract_basicdonating_shapes --selftest #   its mutants; --html-dir <dir> re-checks a refetch (basicdonating.html)
+bun pipeline/sim/emit-technique-facts.ts --technique basicdonating \
+  --out analysis/basicdonating-facts.json                      # 基本的なドネイト's corpus artefact (quarantined; the donation rule, a payoff)
+bun pipeline/sim/emit-technique-demos.ts --technique basicdonating \
+  --out analysis/basicdonating-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
+bun test pipeline/openers/basicdonating.test.ts pipeline/openers/basicdonating-demos.test.ts  # its two tests
+python3 -m pipeline.basicdonating_page --selftest # the docs/basicdonating*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_dpc_setups            # CI gate: harddrop's six DPC Setups pages
+python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
+bun test pipeline/openers/dpc.test.ts            #   byte rebuild, the allclear anchor, named list + mutants
+python3 -m pipeline.dpc_page --selftest          # the docs/dpc.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_secondpc_setups            # CI gate: harddrop's Second Perfect Clear page
+python3 -m pipeline.openers.extract_secondpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
+bun pipeline/sim/emit-secondpc-facts.ts --out analysis/secondpc-facts.json  # a PC straight into a 4-line PC, against those setups (quarantined)
+bun test pipeline/openers/secondpc.test.ts       #   byte rebuild, the allclear anchor (= dpc-facts'), every drawn solution, named list + mutants
+python3 -m pipeline.secondpc_page --selftest     # the docs/secondpc.html audit's mutants (--out-dir <dir> renders)
 bun pipeline/sim/emit-route-orders.ts --opener sdpcspin \
   --out analysis/sdpcspin-orders.json                           # which dealt orders build each SDPC Spin node (constructed, quarantined)
 bun pipeline/sim/emit-route-orders-cc.ts --opener sdpcspin \
@@ -290,6 +434,8 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
+python3 -m pipeline.check_routes_techniques sessions/<date>/report  # CI gate: 定式路線同中盤手法 + 建議's tagged items
+python3 -m pipeline.check_routes_techniques sessions/<date>/report --selftest  #   its mutants
 python3 -m analysis.app_decomposition [--json]  # the corpus APP-gap roll-up over every attack-facts.json
 python3 -m pipeline.check_app_decomposition     # CI gate: CLAUDE.md's APP-gap figures; --render
 python3 -m pipeline.check_app_decomposition --selftest  #   prints them, --selftest its mutants + probe control
@@ -494,14 +640,24 @@ equivalent marker pair.
 
 ## Workflow
 
+- **The Pages site is rendered by CI and NOT committed (since 2026-10-23).** `docs/` is git-ignored;
+  the `docs` job in verify.yml renders the site into `_site/` with `bin/build-docs --out _site`,
+  renders it again with `--check` (the second render must be byte-identical to the first), uploads
+  it, and the `deploy` job publishes it to GitHub Pages on a push to main once every other job in
+  verify.yml has passed — `bin/verify-repo --check` refuses a `deploy.needs` list that leaves one
+  out. The repo's Pages source is "GitHub Actions". `docs/<page>` in this file names the page's
+  path on the site (and in a local `bin/build-docs` render), not a committed file; a sentence below
+  saying `--check` "byte-compares" a page against a committed copy is from before this change and
+  now means the second render. Committing docs/ had made every pipeline change re-commit each
+  report twice (`docs/<date>.html` was a byte copy of `report.html`).
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **21 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **22 job definitions
   across 4 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
-  artefact directories (19 — eighteen session artefacts plus the `subsets/2026-09-18-onform`
+  artefact directories (21 — twenty session artefacts plus the `subsets/2026-09-18-onform`
   filtered subset, which is NOT in the corpus even though the night it is drawn from now IS) and
-  `pipeline` over sessions (17), so both counts move with the corpus
+  `pipeline` over sessions (19), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
   `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
@@ -513,18 +669,20 @@ equivalent marker pair.
   from a date list — and `build_report --check` runs only in `pipeline`. Its report nonetheless
   carries the two CORPUS-WIDE blocks every report carries (the `QUALIFYING_MS` footnote and the
   最癲一局 lede), both of which move whenever a session lands. So it drifts on exactly the
-  occasions the seventeen sessions do, and only they are checked. Found on 2026-09-19 by running the
+  occasions the eighteen sessions do, and only they are checked. Found on 2026-09-19 by running the
   check by hand, not by a red build; the report was rebuilt in the same pass, **and again on
   2026-09-18's pass, where the footnote moved from 「13個 session 夾埋 1768 個 player-round」 to
   「14個 / 2022」 and the SD ratio from 4.5× to 4.6×** — the second consecutive session where the
   manual step was the only thing standing between the subset and a stale published figure; 2026-10-03's
   pass moved it a third time (「15個 / 2314」, SD ratio 4.7×) and 2026-10-09's a fourth (「16個 / 2518」,
-  SD ratio back to 4.5×), and 2026-10-12's a fifth (「17個 / 2628」, SD ratio unchanged at 4.5×). **Until a gate
+  SD ratio back to 4.5×), 2026-10-12's a fifth (「17個 / 2628」, SD ratio unchanged at 4.5×), and 2026-10-20's a sixth
+  (「18個 / 2688」, SD ratio down to 4.4×), and 2026-10-22's a seventh
+  (「19個 / 2814」, SD ratio unchanged at 4.4×). **Until a gate
   covers it, re-run `python3 -m pipeline.build_report subsets/*/report --check` whenever a session
   is added** — that is a manual-only step, which this file elsewhere calls the thing
   `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
 - **Every job but the two matrices (`verify`, `pipeline`) is repo-wide, and `bin/verify-repo` is what
-  runs them** (nineteen of the twenty-one on 2026-10-18, when the `lean` job landed; eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
+  runs them** (twenty of the twenty-two on 2026-10-28, when the `lean` job landed — main already held 21 jobs while this read 「20」; eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
   one short at nineteen jobs — derive it as the job count less two, never carry it). `bin/new-session`
   covers steps 1-7 of adding a session (step 6 runs the four sim emitters); `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
@@ -559,7 +717,7 @@ equivalent marker pair.
   step reads it, and under `set -u` a local run dies with `unbound variable` — which is how the first
   `--only pipeline` failed all seven sessions in nine seconds. The runner-provided variables with an
   honest local equivalent are supplied (`RUNNER_TEMP` → a scratch dir, `GITHUB_WORKSPACE` → the repo,
-  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files) and **any other
+  `GITHUB_ENV`/`GITHUB_PATH`/`GITHUB_OUTPUT`/`GITHUB_STEP_SUMMARY` → scratch files, `GITHUB_EVENT_NAME` → `schedule` under `--weekly` and `push` otherwise) and **any other
   `$GITHUB_*` or `$RUNNER_*` reference is a completeness error**, so the next one is refused up front
   rather than dying halfway through a matrix.
 
@@ -779,57 +937,57 @@ standing alone just as much as to the N in front of it.
   `garbage_cleared` / `finaltime_ms` come from the final snapshot, so a rate and its own counters
   can be one tick apart — the whole of the VS-identity residual. **Every count in the rest of this
   bullet and the next is re-derived by `analysis/stat_sources.py` over all
-  <!--stat:corpus-->2628 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
+  <!--stat:corpus-->2814 player-rounds<!--/stat:corpus--> and gated by `pipeline/check_stat_sources.py`, so
   none of them is typed.** (They were, until 2026-08-23: six-session numbers in a
   seven-session document, each honestly captioned 「not re-run at 900」 — which is why none of
   them ever went red. A caveat is not a measurement.) The live tick is
-  stale in <!--stat:tick-stale-->594 of 2628<!--/stat:tick-stale--> player-rounds and
-  **<!--stat:tick-stale-survivor-->588<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
+  stale in <!--stat:tick-stale-->635 of 2814<!--/stat:tick-stale--> player-rounds and
+  **<!--stat:tick-stale-survivor-->628<!--/stat:tick-stale-survivor--> of those are the round's SURVIVOR**: the survivor keeps playing frames after
   the opponent tops out and `player.stats` freezes before those frames fold in, so a per-player skew
   in the residual is a fact about whose round ran longer, never about how someone plays.
   `aggregatestats` reproduces every rate to ≤<!--stat:resid-worst-->4.2e-16<!--/stat:resid-worst--> over
-  <!--stat:corpus-agg-->2628 player-rounds<!--/stat:corpus-agg--> as
+  <!--stat:corpus-agg-->2814 player-rounds<!--/stat:corpus-agg--> as
   `100·(attack+cleared)/T`, `60·attack/T`, `pieces/T` — where **T is the integer FRAME count, and
   `finaltime_ms` does not yield it.** `⌊finaltime_ms·60/1000⌋/60` gives the wrong frame count on
-  **<!--stat:floor-wrong-->907 of the 2628<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
+  **<!--stat:floor-wrong-->971 of the 2814<!--/stat:floor-wrong-->** and leaves up to <!--stat:floor-worst-->1.6e-3<!--/stat:floor-worst-->, because `finaltime_ms` is `results.stats.finaltime`
   rounded to the millisecond (`extract.py`'s `x1`) while the clock ticks every 1/60 s — the rounding
   destroys the frame the flooring is trying to recover. Recover it from `pps` instead:
   `round(60·pieces/pps)` is an integer to <!--stat:frames-integer-->1.9e-12<!--/stat:frames-integer--> on all
-  <!--stat:corpus-frames-->2628<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
+  <!--stat:corpus-frames-->2814<!--/stat:corpus-frames-->, and under **T = round(60·pieces/pps)/60**
   the residual is <!--stat:resid-pair-->2.9e-16 for APM and 4.2e-16 for VS<!--/stat:resid-pair-->, which is where the ≤ above came from. PPS is
   exact by construction on that route, so the **checkable** statement is the T-free identity
   `vs·60·attack == apm·100·(attack+cleared)`: worst relative residual
-  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->2609<!--/stat:identity-rounds--> rounds
+  **<!--stat:identity-->6.2e-16<!--/stat:identity-->** over the <!--stat:identity-rounds-->2792<!--/stat:identity-rounds--> rounds
   with a nonzero APM and VS. A probe that uses `finaltime_ms/1000` reports a discrepancy the data
-  does not have — up to <!--stat:secs-worst-->1.3e-3<!--/stat:secs-worst-->, and above 1e-4 on
-  <!--stat:secs-over-->815 of the 2628<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
+  does not have — up to <!--stat:secs-worst-->1.4e-3<!--/stat:secs-worst-->, and above 1e-4 on
+  <!--stat:secs-over-->868 of the 2814<!--/stat:secs-over-->. (That last count is over all THREE rates: VS and
   APM alone give two fewer. `aggregatestats` is a triple, so a route claiming to reconstruct
   it has to reconstruct the triple.)
 - **`kills` runs the OTHER way, so do not "finish the job" by moving the rest of `player.stats`.**
   The 2026-08-16 re-source moved `apm`/`pps`/`vs` off the live tick because the tick predates the end
   of the round. `kills` has the opposite problem: `results.stats.kills` disagrees with
-  `player.stats.kills` in **<!--stat:kills-->729 of 2628<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
+  `player.stats.kills` in **<!--stat:kills-->782 of 2814<!--/stat:kills-->** player-rounds, and every one is the live tick reading 1
   against the results snapshot reading 0 for a player who SURVIVED — because the results snapshot is
   taken when that player's own game ends, while the kill is credited later, when the opponent tops
   out. For `kills` the live tick is the correct source and the final snapshot is the stale one.
   `aggregatestats` carries only `apm`/`pps`/`vsscore`, so the re-source is complete as scoped rather
   than truncated; and the match-level rollup stays on the live tick because
-  **<!--stat:leaderboard-agg-->0 of 348<!--/stat:leaderboard-agg--> leaderboard entries carry
+  **<!--stat:leaderboard-agg-->0 of 374<!--/stat:leaderboard-agg--> leaderboard entries carry
   `aggregatestats` at all** — so round figures will not reconcile against the leaderboard's, and
   there is no better source for it. `garbagesent`/`garbagereceived` differ from their
   `results.stats` counterparts in
-  <!--stat:garbage-differ-->18 and 13 of 2628<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
+  <!--stat:garbage-differ-->18 and 16 of 2814<!--/stat:garbage-differ--> and are a different measure anyway (both sides are already extracted, as
   `garbage_sent_raw` / `garbage_received_raw`). Moving any of these for consistency would introduce
   the bug the rate change removed.
 - **The finesse counters are on two different units, so any finesse rate must name its denominator.**
   `perfectpieces` counts **pieces**; `faults` counts **fault events**, and one piece can register
-  several — pooled, <!--stat:finesse-pool-->42 234 faults over 25 914 non-perfect pieces<!--/stat:finesse-pool--> =
-  **<!--stat:finesse-per-piece-->1.630<!--/stat:finesse-per-piece--> per faulty piece**. Four
+  several — pooled, <!--stat:finesse-pool-->45 249 faults over 27 720 non-perfect pieces<!--/stat:finesse-pool--> =
+  **<!--stat:finesse-per-piece-->1.632<!--/stat:finesse-per-piece--> per faulty piece**. Four
   defensible rates, four different numbers, and only one is what TETR.IO displays:
-  `faults/pieces` = **<!--stat:finesse-fault-rate-->17.18%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
-  `1 − perfect/pieces` = **<!--stat:finesse-share-->10.54%<!--/stat:finesse-share-->**; TETR.IO's own figure is
-  `perfect/pieces` = **<!--stat:finesse-tetrio-->89.46%<!--/stat:finesse-tetrio-->**; and
-  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->16.11%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
+  `faults/pieces` = **<!--stat:finesse-fault-rate-->17.14%<!--/stat:finesse-fault-rate-->** is fault events per piece; the share of pieces that were faulty is
+  `1 − perfect/pieces` = **<!--stat:finesse-share-->10.50%<!--/stat:finesse-share-->**; TETR.IO's own figure is
+  `perfect/pieces` = **<!--stat:finesse-tetrio-->89.50%<!--/stat:finesse-tetrio-->**; and
+  `faults/(faults+perfect)` = **<!--stat:finesse-meaningless-->16.07%<!--/stat:finesse-meaningless-->** is on no meaningful denominator and must not be used. A
   bare「失誤率」 reads as the share and is usually the event rate. osk publishes no definition for any
   of the three fields, so the per-excess-input granularity is inferred, not specified. The four
   rates are definitions and keep their meaning at any n; the four *numbers* are re-derived over
@@ -842,7 +1000,7 @@ standing alone just as much as to the N in front of it.
   now, matching 每粒攻擊 beside it, because **a percentage rendering asserts a share** and a label
   alone does not undo one: an event rate reads as a share however the row is titled. `hold 使用率` keeps its
   percentage — a hold IS at most one per piece, which is what the gate's `SHARE` kind records. The
-  data refutes the share reading outright: in **<!--stat:finesse-exceed-->2256 of 2567<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
+  data refutes the share reading outright: in **<!--stat:finesse-exceed-->2419 of 2744<!--/stat:finesse-exceed-->** player-rounds the faults outnumber the
   non-perfect pieces, and **<!--stat:finesse-worst-->10-03 m10r1 puts 8 faults on a single non-perfect piece<!--/stat:finesse-worst-->**.
 
   Two things this cost that are worth keeping. **The defect lived where no gate looked** — the chart's
@@ -1000,9 +1158,33 @@ seventh-smallest session (55 rounds), and a session this size is the one most li
 extreme for no reason. DS 67.3 is eleventh of seventeen. **PC 50.9 sits on 7 decided pairs (4-3)**,
 which is what a column with 48 ties in 55 rounds contributes, and it barely moves the pooled row.
 
-**Two of the 129-round block's "no signal" entries are false at 1314 rounds, and the fault is
+2026-10-20 (30 rounds) is the eighteenth, and the smallest by a margin: VS 100.0 · **APM 90.0** ·
+**攻 90.0** · APP 90.0 · 送 85.0 · 分 83.3 · DS 76.7 (raw 81.7) · 食 13.3 · 射埋 15.0 — and **KPP 46.7**,
+the eighteenth measurement and the fourteenth of the eighteen below chance. **APM and 攻 both take
+the corpus LOW** (27 of 30 each, under 08-25's 90.4), one session after 10-12 took both columns'
+HIGHS — which is what a 30-round night does to a column that sits in the low nineties: three
+rounds are ten points. DS 76.7 is third of eighteen, behind 08-01's 84.0 and 09-17's 79.6. COMBO
+58.3 (14 of 23 decided), TST 46.7 (5 of 12) and **PC 51.7 on 5 decided pairs (3-2)** are all
+small-denominator readings and move the pooled rows by little. Read every figure on this row as
+the n = 30 reading it is; nothing here is evidence of anything a 46-round session could not also
+have produced by chance.
+
+2026-10-22 (63 rounds) is the nineteenth: VS 100.0 · APM 92.1 · 攻 92.1 · 分 87.3 · APP 84.1 ·
+送 81.0 · DS 72.2 (raw 69.8) · 食 19.8 (射埋 not re-measured this revision) — and **KPP 35.7, the corpus LOW**, under 09-19's 36.7,
+the nineteenth measurement and the fifteenth of the nineteen below chance. **APP 84.1 and 送 81.0
+are third-lowest of the nineteen** in their columns, on the night with the corpus's largest session
+APP gap — which is not a contradiction: the gap is a rate pooled over pieces, the AUC a count of
+rounds in which the winner held the higher APP, and a large pooled gap is compatible with many
+yachi wins at a lower APP (10 of his 25, by this AUC). TSD
+73.0 is second of nineteen behind 09-03's 79.3, and 食 19.8 third-highest. **PC 55.6 sits on 23
+decided pairs (15-8)**, the fifth-largest decided count any session has contributed and third in
+the column by value, and it is what moves the pooled PC row this revision; COMBO 58.7 (27 of 43)
+leans with the effect too. Every rank on this row was computed over the nineteen per-session
+values by the same probe that reproduces 10-20's published row; none of it is gated.
+
+**Two of the 129-round block's "no signal" entries are false at 1407 rounds, and the fault is
 provenance, not arithmetic.** COMBO 45.0 and TST 55.8 were measured on the FIRST TWO SESSIONS
-ONLY; the label was then carried forward as if it ranged over the corpus. Pooled over all 1314
+ONLY; the label was then carried forward as if it ranged over the corpus. Pooled over all 1407
 rounds, Bonferroni-corrected across the 17 columns. **The test is the two-sided exact binomial
 sign test over decided pairs** — named here because the previous revision of this table published
 p's that nothing in the repo could re-derive, and a figure whose test is unstated is a figure that
@@ -1010,15 +1192,15 @@ cannot be checked:
 
 | | pooled AUC | decided | raw p | ×17 | verdict |
 |---|---|---|---|---|---|
-| COMBO | 54.34 | 532/950 | 2.4e-04 | 0.0041 | **survives correction, but NO LONGER survives dropping any one session**: without 09-18 it reads 0.095 and without 08-19 0.057 |
-| TST | 55.67 | 408/667 | 8.7e-09 | 1.5e-07 | **survives correction** |
-| KPP | 43.68 | 573/1312 | 5.1e-06 | **8.7e-05** | below chance and distinguishable from it — survives any single drop, NOT the 09-19 + 10-03 pair (0.11); see the leave-one-out |
-| PC | 52.28 | 153/246 | 1.6e-04 | **0.0027** | crosses for a fifth revision, and **survives any single drop (worst: without 09-19, 0.026)** — but not 09-10 or 09-18 together with 09-19 (0.166, 0.165) |
+| COMBO | 54.62 | 573/1016 | 5.1e-05 | 8.7e-04 | **survives correction and any single drop** (worst: without 09-18, 0.024); 9 of the 171 pairs take it over (worst: 08-19 + 09-18, 0.25) |
+| TST | 55.40 | 431/710 | 1.3e-08 | 2.2e-07 | **survives correction** |
+| KPP | 43.39 | 609/1404 | 7.7e-07 | **1.3e-05** | below chance and distinguishable from it — survives any single drop AND, for the first time, every one of the 171 pairs; see the leave-one-out |
+| PC | 52.42 | 171/274 | 4.8e-05 | **8.1e-04** | crosses for a seventh revision, and **survives any single drop (worst: without 09-19, 0.0078)** — but not 09-10, 09-18 or 09-11 together with 09-19 (0.055, 0.054, 0.052) |
 
 **KPP HAS NOW CROSSED, UNCROSSED AND RE-CROSSED, and the three events together say more than any
 one of them.** The corrected p ran 0.048 at eleven sessions, 0.059 at twelve, **0.0010** at
-thirteen, **0.0012** at fourteen, **2.3e-05** at fifteen, **3.5e-05** at sixteen and **8.7e-05** at
-seventeen. Each revision of this section stated the margin beside the
+thirteen, **0.0012** at fourteen, **2.3e-05** at fifteen, **3.5e-05** at sixteen, **8.7e-05** at
+seventeen, **8.6e-05** at eighteen and **1.3e-05** at nineteen. Each revision of this section stated the margin beside the
 verdict, and that is the only reason the record reads as a continuous measurement rather than as
 three contradictions:
 
@@ -1047,15 +1229,21 @@ three contradictions:
   pair and still over the line. **Seventeen is the same again, from the other side of chance**:
   10-12 reads KPP 52.7 on 55 rounds, so it adds evidence AGAINST the effect — drop 09-19 and the
   row reads 44.59 / 0.0042, and drop 09-19 and 10-03 together it reads 45.68 / 0.11, still the
-  only one of the 136 pairs over the line.
+  only one of the 136 pairs over the line. **Eighteen does not move it**: 10-20 is 30 rounds at
+  KPP 46.7 — drop 09-19 and the row reads 44.64 / 0.0039, and drop 09-19 and 10-03 together it
+  reads 45.71 / 0.10, still the only one of the 153 pairs over the line. **Nineteen ends that
+  dependence**: 10-22 is 63 rounds at KPP 35.7, the corpus low, so it adds effect as well as
+  denominator — no single drop and none of the 171 pairs takes the row over the line (worst single
+  drops 09-19, 7.1e-04, and 10-03, 5.7e-04). That is a third large-effect session, not a new
+  effect; the AUC has moved 43.68 → 43.39.
 * **The standing conclusion never depended on any of it.** The pooled AUC in the table above means
   the round winner had the *lower* KPP in a little over half of decided rounds — real, small, consistent with every per-session
   reading since 07-22, and **still not 「inverted」**, which would be over 6 points of AUC away. The
   coaching conclusion below (「KPP is flat — reported as a negative result」) has now survived this
   row crossing, uncrossing and crossing again, which is a better test of it than any single state.
 
-TST's corrected p goes 2.0e-05 → 7.4e-07 → 6.0e-06 → 5.5e-06 → 5.3e-07 → **1.5e-07** across the last six revisions,
-and COMBO's 0.0028 → 4.3e-05 → 0.0018 → 0.0017 → **0.0041** — COMBO worse at fifteen because 10-03 read 44.9,
+TST's corrected p goes 2.0e-05 → 7.4e-07 → 6.0e-06 → 5.5e-06 → 5.3e-07 → 1.5e-07 → 3.2e-07 → **2.2e-07** across the last eight revisions,
+and COMBO's 0.0028 → 4.3e-05 → 0.0018 → 0.0017 → 0.0041 → 0.0026 → **8.7e-04** — COMBO worse at fifteen because 10-03 read 44.9,
 second-lowest in its column, and added evidence against the effect at the same time as it added
 denominator, which is what 09-18's TST 50.0 did two revisions earlier. **At fifteen COMBO fell
 back over the line without 09-18 (0.056); at sixteen the same drop reads 0.049**, so its crossing
@@ -1067,19 +1255,37 @@ single drops take the row back over — without 09-18 it reads 53.45 / 0.095 and
 53.58 / 0.057 — and 30 of the 136 two-session drops do (worst: 08-19 + 09-18, 0.83). The crossing
 survives on the full corpus and on nothing narrower; that is the 0.048 / 0.059 state KPP was in
 at eleven and twelve, and it is to be read as a margin, not as a verdict about combos.
+**At eighteen one of those two single drops goes back under**: 10-20's COMBO 58.3 (14 of 23) leans
+with the effect, so without 08-19 the row reads 53.69 / 0.037 and without 09-18 53.57 / 0.063 — one
+single drop over the line rather than two, and 25 of the 153 two-session drops (worst: 08-19 +
+09-18, 0.58). Thirty rounds moved it; read that as the size of the margin, not as a recovery.
+**At nineteen neither single drop takes it over**: 10-22's COMBO 58.7 (27 of 43) leans with the
+effect again, so without 09-18 the row reads 0.024 and without 08-19 0.014, and 9 of the 171
+two-session drops take it over (worst: 08-19 + 09-18, 0.25). Two sessions leaning with it in a row
+is the same kind of margin as two against; it is still the row whose margin to watch.
 TST remains a survivor by a wide margin either way; COMBO is the row whose margin to watch. The margins still travel with the claims —
 which is the whole reason a row that got worse and a row that got better can sit side by side here
 without either being news.
 
 **PC STAYS ACROSS THE CORRECTION THRESHOLD, and at sixteen and seventeen no single session can
 take it back over — which is exactly the state it was in at fourteen and lost at fifteen.** The AUC
-series is 50.97 → 51.66 → 52.26 → 52.04 → 52.38 → 52.62 → 52.33 → 52.34 → 52.28 and the raw p has
-gone 0.32 → 0.062 → 0.0085 → 0.013 → 0.0013 → 0.00014 → 3.1e-04 → 1.6e-04 → **1.6e-04** (0.000164
-then 0.000158); corrected, 0.0027 is under 0.05 by a factor of 18. Four things have to be read
+series is 50.97 → 51.66 → 52.26 → 52.04 → 52.38 → 52.62 → 52.33 → 52.34 → 52.28 → 52.27 and the raw p has
+gone 0.32 → 0.062 → 0.0085 → 0.013 → 0.0013 → 0.00014 → 3.1e-04 → 1.6e-04 → 1.6e-04 → **1.5e-04**
+(0.000164, 0.000158, then 10-20's 3-2 on top), and at nineteen 52.42 / **4.8e-05** on 10-22's 15-8;
+corrected, 8.1e-04 is under 0.05 by a factor of 60. Four things have to be read
 with it:
 
-* **The denominator is still tiny.** 246 decided of 1314 rounds — 81% of the corpus ties at zero;
-  10-09 added 21, split 13-8, and 10-12 adds 7, split 4-3.
+* **The denominator is still tiny.** 274 decided of 1407 rounds — 81% of the corpus ties at zero;
+  10-09 added 21, split 13-8, 10-12 7, split 4-3, 10-20 5, split 3-2, and 10-22 adds 23, split 15-8.
+* **At nineteen it survives any single drop and fails three of the 171 pairs**, all three with
+  09-19 in them and all three just over the line: 09-10 + 09-19 (0.054), 09-18 + 09-19 (0.053) and
+  09-11 + 09-19 (0.052). The worst single drops are 09-19 (0.0078), 09-10 (0.0066) and 09-11
+  (0.0063). The eighteen-session record follows, kept as measured.
+* **At eighteen it survives any single drop and fails six of the 153 pairs.** The worst single
+  drops are 09-19 (137/225, corrected 0.023), 09-10 (0.019) and 09-18 (0.018), and the
+  six pairs over the line are 09-10 + 09-19 (125/211, 0.149), 09-18 + 09-19 (119/200, 0.148),
+  09-11 + 09-19 (0.143), 09-10 + 09-18 (0.123), 09-10 + 09-11 and 09-11 + 09-18 (0.119 each) — the
+  seventeen-session seven less 09-03 + 09-19, which 10-20's 3-2 pulls back under (0.049).
 * **It survives any single drop and fails seven of the 136 pairs** (at seventeen; the sixteen-session
   record that follows is kept as measured). At seventeen the worst single drops are 09-19
   (134/220, corrected 0.026), 09-10 (0.022) and 09-18 (0.021), and the seven pairs over the line
@@ -1115,8 +1321,8 @@ with it:
 
 Read the column as what it is: a denominator so small that a handful of sessions swing its
 uncorrected p by a factor of nearly forty in one direction, straight back, and then across a line
-— and which at seventeen survives losing any one session (worst: without 09-19, 0.026) but not
-seven of the 136 two-session drops (worst: 09-10 + 09-19, 0.166, then 09-18 + 09-19, 0.165).
+— and which at nineteen survives losing any one session (worst: without 09-19, 0.0078) but not
+three of the 171 two-session drops (worst: 09-10 + 09-19, 0.054, then 09-18 + 09-19, 0.053).
 
 **This table is one of the 冇第二份 class and says so**: no committed artefact re-derives it, so it
 is hand-measured and must be re-measured when a session lands. Do not carry a cell forward.
@@ -1130,24 +1336,24 @@ eight sessions did NOT match that test on the eight-session data (0.000316 again
 0.000208 against 0.00025, 0.0097 against 0.011, 0.473 against 0.54), so they came from some other
 computation. No verdict changes and no AUC moved, but the row that says which test produced a
 number has to be true of the number beside it — which is the whole reason that sentence was added
-in the first place. Re-derive both columns together whenever a session lands — at seventeen that
+in the first place. Re-derive both columns together whenever a session lands — at eighteen that
 convention reproduces every per-session figure published above, exactly, and it also reproduces
-every cell of the pooled table at SIXTEEN sessions (AUC, decided count, raw p and corrected p
-alike), which is the check worth running before trusting a seventeenth-session cell:
+every cell of the pooled table at SEVENTEEN sessions (AUC, decided count, raw p and corrected p
+alike), which is the check worth running before trusting an eighteenth-session cell:
 a probe that reproduces the previous revision's whole table is measuring the same thing it did.
 
 COMBO's per-session series drifts upward, back, and up again — 41.1 · 51.0 · 62.5 · 55.7 · 57.0 ·
-58.9 · **67.9** · 58.9 · 52.2 · 48.5 · 51.0 · **67.3** · 62.6 · 53.0 · 44.9 · 52.5 · 46.4 — so 45.0 was not *wrong* when
+58.9 · **67.9** · 58.9 · 52.2 · 48.5 · 51.0 · **67.3** · 62.6 · 53.0 · 44.9 · 52.5 · 46.4 · 58.3 — so 45.0 was not *wrong* when
 written. It was a
 two-session figure that the document kept presenting as a corpus verdict, which is the same defect
 as the 「70-89%」 donation figure below wearing a different disguise: **a bucket label is a claim
 about the corpus even when the number under it is honest about its n.** The series fell for three
 sessions from that 67.9 peak, spent two near 50, went back to 67.3 and has come down three times since, the third to 44.9 (10-03, second-lowest after 07-22's 41.1), 10-09 is back at 52.5 and 10-12 down
-again at 46.4, third-lowest — so the 「drifting toward the line」 reading the pooled row carried for two revisions was itself a
+again at 46.4, third-lowest, and 10-20 back up at 58.3 on 23 decided pairs — so the 「drifting toward the line」 reading the pooled row carried for two revisions was itself a
 two-session reading, and the series is the reason it should not have been extrapolated. KPP's
 series is 38.6 · 42.0 · 42.2 ·
-53.8 · 58.0 · 40.5 · 41.4 · 45.2 · 52.2 · 43.1 · **37.3** · 49.0 · 47.2 · **36.7** · 37.0 · 48.0 · 52.7 — below
-chance in 13 of the 17 and
+53.8 · 58.0 · 40.5 · 41.4 · 45.2 · 52.2 · 43.1 · **37.3** · 49.0 · 47.2 · **36.7** · 37.0 · 48.0 · 52.7 · 46.7 — below
+chance in 14 of the 18 and
 pooled below 50, and **distinguishable from chance after correction**, which is the state the
 table above records and which this sentence contradicted for one revision while saying the
 opposite three inches higher.
@@ -1164,9 +1370,9 @@ rather than silently corrected because the previous revision's own prose says a 
 when to re-derive them. Neither series is gated; nothing but a reader re-counting the entries
 against the session count will catch the next one.)
 
-Coaching conclusions, cross-validated over seventeen sessions: **APP is the lever** — higher in
+Coaching conclusions, cross-validated over nineteen sessions: **APP is the lever** — higher in
 rounds
-won than rounds lost in 34 of 34 player-sessions (the count was published as 「14 of 14」 for four
+won than rounds lost in 38 of 38 player-sessions (the count was published as 「14 of 14」 for four
 sessions after it stopped being true; it is two per session, so re-derive it as 2× the session
 count rather than carrying it), though the *size* of that separation is not stable and does not
 settle. **Its series has ONE home in this document and it is not here** — the (yachi, pinglamb)
@@ -1176,7 +1382,7 @@ twelve while the pair series below it held thirteen. Two copies of one quantity 
 sight even while both are correct, which is the rule that removed this one; read 08-14's +7.2% as
 the outlier of that series at its own site. **DS matters** in 9 of 10
 player-sessions through 08-09 — deliberately left scoped to the session it was measured at rather
-than restated at seventeen; **KPP is flat** (0–3%) — reported as a negative result, a conclusion that
+than restated at eighteen; **KPP is flat** (0–3%) — reported as a negative result, a conclusion that
 has now survived the pooled row crossing, uncrossing and re-crossing the correction threshold. When adding
 a column or a claim, run `pipeline/claims/equiv.py` or the AUC probe rather than assuming a stat is
 informative.
@@ -1204,7 +1410,10 @@ comparison across them would go wrong silently.) The per-session won-gap runs +5
 **方向**唔係。09-18 個 lost-gap 都一樣得一局撐住
 （留一局：抽走 m1r7，數字變 +0.58%，即係郁 0.95 pp），
 rel 0.618 排第九——但佢同上面兩個唔同：抽走嗰局個差距係**更窄**，唔係更闊，
-所以「地板撞埋」企得更穩，散嘅淨係 +1.54 呢個數字。Two consequences worth
+所以「地板撞埋」企得更穩，散嘅淨係 +1.54 呢個數字。10-20 係第一晚兩個數都要 annotation：
+won-gap（留一局：抽走 m4r8，數字變 +11.74%，即係郁 4.50 pp），
+lost-gap（留一局：抽走 m2r1，數字變 -1.87%，即係郁 3.15 pp）——後者連正負號都反轉，
+所以嗰晚嘅「地板撞埋」連方向都係一局話事。Two consequences worth
 knowing before writing another report:
 
 - **The volume route is not a law.** 08-01's headline was that 326 extra pieces bought back a
@@ -1289,11 +1498,23 @@ lost-gap 排第四（淨係 08-09 嘅 +25.38、08-25 嘅 +17.48 同 09-17 嘅 +1
 而家係 +7.66 同 +6.39**（呢對數喺呢度得一個屋企，每加一個 session 都要重計；十七係單數，所以兩個
 中位數都啱啱係某一晚自己嘅數——won 係 09-03，lost 係 09-19）。won/lost 比率 0.46，同 07-22 嘅 0.45
 幾乎一樣，所以佢同 07-22、08-19、08-25 一齊。冇一個 regime 數要 annotation：won-gap `rel` 0.318
-（抽走 m5r7），lost-gap `rel` 0.156（抽走 m8r5），兩個都唔夠 THRESHOLD。
-The seventeen-session series now read
+（抽走 m5r7），lost-gap `rel` 0.156（抽走 m8r5），兩個都唔夠 THRESHOLD。**10-20 係「鏡像」嗰個樣
+嘅第四個，亦係兩個數都要 annotation 嘅第一晚** — won-gap +7.23%
+（留一局：抽走 m4r8，數字變 +11.74%，即係郁 4.50 pp），
+lost-gap +1.27%
+（留一局：抽走 m2r1，數字變 -1.87%，即係郁 3.15 pp），
+session gap +6.73% [C002][C004]。十八個 session 排落去，won-gap 喺自己嗰欄排第十，lost-gap 排第十七
+（淨係 09-10 嘅 +1.25 窄過佢）；十八係雙數，**兩欄嘅中位數而家大約係 +7.45 同 +6.25**（中間兩個數
+嘅平均，唔再係某一晚自己嘅數；上面 10-12 嗰行嘅 +7.66 / +6.39 係十七個 session 嘅紀錄）。won/lost
+比率大約 5.7，同 09-18 嘅 5.40 最近。**但呢個「鏡像」嘅方向本身都企唔穩**：抽走 m2r1（pinglamb 輸嗰局，
+用 144 粒打出 .7361 每粒攻擊），lost-gap 連正負號都反轉，即係「地板撞埋」呢句喺 30 局入面係一局話事
+——同 08-14、09-10 一樣係闊咗嗰邊，不過今次闊到過咗零。won-gap 嘅 m4r8 係成晚最長嗰局（約 233 秒），
+pinglamb 用 336 粒、.5923 每粒贏落嚟，佔佢贏局粒數兩成。30 局係 corpus 最細嘅一晚，一局佔嘅份量
+係最大，所以呢兩個 annotation 係預期之內，唔係發現。
+The nineteen-session series now read
 
-    won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  +18.9   +6.2   +4.9   +7.7  +12.0   +9.8  +14.6   +8.3   +5.8   +4.7  +12.2   +7.1
-    lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   +1.8  +11.1  +17.5   +3.9   +1.3   +4.6  +15.6   +1.5   +6.4   +5.8   +7.4  +15.4
+    won-gap    +5.8  +10.8  +5.9  +7.9   +1.8  +18.9   +6.2   +4.9   +7.7  +12.0   +9.8  +14.6   +8.3   +5.8   +4.7  +12.2   +7.1   +7.2  +15.2
+    lost-gap  +12.8   +7.3  +6.0  +6.1  +25.4   +1.8  +11.1  +17.5   +3.9   +1.3   +4.6  +15.6   +1.5   +6.4   +5.8   +7.4  +15.4   +1.3  +20.1
 
 (**Units, because this paragraph mixes two and one line used to get them wrong.** The two series
 rows above and every 「+X% / +X pp」 pair above quote the RATIO gap — 100·(pinglamb's rate /
@@ -1327,12 +1548,12 @@ numbers cannot be read as 「both large」 without ranking each against ITS OWN 
 large beside +1.3 and +1.8, which are the two values a reader of the mirror paragraph has just
 been looking at — and those are the two smallest in the corpus. Rank before you characterise.
 
-**Read the two rows as rows, not as a pair of trends.** Four of the seventeen sessions (07-22,
-08-19, 08-25 and 10-12) sit in the ceilings-close/floors-apart shape, **three are its mirror (08-14, 09-10
-and 09-18)**, one is an extreme version of the first (08-09), **five are roughly level (07-24,
+**Read the two rows as rows, not as a pair of trends.** Four of the nineteen sessions (07-22,
+08-19, 08-25 and 10-12) sit in the ceilings-close/floors-apart shape, **four are its mirror (08-14, 09-10,
+09-18 and 10-20 — the last on a lost-gap whose SIGN one round carries, see its line above)**, one is an extreme version of the first (08-09), **five are roughly level (07-24,
 07-28, 08-01, 09-19 and 10-03)**, **two are mild mirrors (09-03 and 09-11)** at won/lost ratios of 1.98
 and 2.11
-against the true mirrors' 10.6 and 9.6, **one is a shape of its own (09-17): both apart**, and
+against the true mirrors' 10.6 and 9.6, **two share a shape of their own (09-17 and 10-22): both apart**, and
 **one (10-09) fits no class cleanly**: both its gaps sit above their column medians (ranks 3 and
 6 at sixteen, 3 and 7 at seventeen), at a won/lost ratio of 1.65 that falls between 07-24's 1.49
 and the mild mirrors' 1.98. Its nearest neighbour is 07-24, which this list files as level — and
@@ -1357,7 +1578,8 @@ continuum and the four-way split is a reading aid, not a taxonomy the data suppo
 and the sentence it replaces was correct every time it was written.** The rule for reading the pair
 is unchanged and is what establishes this: rank each figure against ITS OWN column. 09-17's won-gap
 is **2nd** of its column and its lost-gap **3rd** — re-ranked at seventeen sessions, and unmoved
-by the five since it landed. **The column medians have ONE home, the 10-12 line of the
+by the five since it landed; at nineteen 10-22 takes second in both columns (+15.17 and +20.13),
+pushing 09-17 to 3rd and 4th, so 「both large」 now has two instances and 10-22 is the larger. **The column medians have ONE home, the 10-12 line of the
 regime paragraph above**; the 10-03 and 10-09 lines' 「當時中位數」 pairs are labelled there as
 fifteen- and sixteen-session values and are records, not the live median. They move every session, and the fourteen-session pair that
 used to sit here had already gone stale beside it. Through fifteen sessions no earlier session had
@@ -1429,7 +1651,7 @@ Said within a player, 08-14 has pinglamb separating his own won and lost rounds 
 by only +7.2% [C003]. **That was a one-night state, not a standing property of either player.** The
 (yachi, pinglamb) separation series runs (24.9, 17.1) (17.4, 21.3) (23.2, 23.1) (15.9, 17.9)
 (31.5, 6.8) **(7.2, 25.2)** (23.1, 17.7) (23.1, 10.0) (19.3, 23.7) **(17.9, 30.4)** (16.3, 22.0)
-(19.0, 17.9) **(18.1, 26.0)** **(19.6, 18.9)** **(21.5, 20.2)** **(19.9, 25.3)** **(26.1, 17.1)** — so 08-14 is the only session where the
+(19.0, 17.9) **(18.1, 26.0)** **(19.6, 18.9)** **(21.5, 20.2)** **(19.9, 25.3)** **(26.1, 17.1)** **(12.4, 19.0)** **(21.2, 16.2)** — so 08-14 is the only session where the
 separation is effectively one player's alone, and yachi's +7.2 there is the outlier of his own
 series, not a level he settled at; on 08-19 he is back to +23.05% against pinglamb's +17.70%, and
 on 08-25 he sits at +23.14% against pinglamb's **+10.00%**, the second-narrowest of pinglamb's
@@ -1443,9 +1665,12 @@ fifteen it was **eight yachi, seven pinglamb**; 10-09 goes to pinglamb (19.9 aga
 5.4 points apart, his third-widest of sixteen after 09-10's 30.4 and 09-18's 26.0 and a tenth past
 08-14's 25.2), so over the sixteen it was **eight each**; 10-12 goes to yachi (26.1 against 17.1
 [C003], 9.1 points apart, HIS second-widest of seventeen after 08-09's 31.5 and the third-widest of
-the thirty-four player-sessions), so over the seventeen it is **nine yachi, eight pinglamb** —
-re-derived from the series above rather than carried. One apart, as at fifteen, and the negative
-result reads exactly as it did at seven each.
+the thirty-four player-sessions), so over the seventeen it was **nine yachi, eight pinglamb**;
+10-20 goes to pinglamb (12.36 against 18.97 [C003], 6.6 points apart — and yachi's 12.36 is the
+second-narrowest of his eighteen, after 08-14's 7.2, on a 30-round night), so over the eighteen it
+was **nine each**; 10-22 goes to yachi (21.20 against 16.20 [C003], 5.0 points apart), so over the
+nineteen it is **ten yachi, nine pinglamb** — re-derived from the series above rather than carried.
+The negative result reads exactly as it did at seven each.
 
 **09-19's entry is the SECOND-closest pair the column has produced (0.62 points apart, behind
 07-28's 0.11) and it is the one the corpus can least dismiss**, because it sits on 150 rounds
@@ -1466,12 +1691,12 @@ re-derives the counts from it, and a wrong count beside a right series reads lik
 The rule 「a marked fragment's neighbours move with it」 has a sibling here: **a count derived from
 a list in the same paragraph must be re-derived from that list, not carried**.
 
-Eight of seventeen with pinglamb wider (re-derived from the series above; this read 「Six of twelve」 for four sessions after it stopped being true) is not a pattern to act on either, and the run of three ENDING
+Nine of nineteen with pinglamb wider (re-derived from the series above; this read 「Six of twelve」 for four sessions after it stopped being true) is not a pattern to act on either, and the run of three ENDING
 immediately is the reason to say so out loud rather than the reason to act: the column's two
 extremes belong to different players, and both runs the corpus has recorded (two, then three) were
 written up as counts rather than trends and then ended on the next session.
 **What IS a corpus record is pinglamb's 30.4 on 09-10**: his own high, past his
-25.2 on 08-14, and the second-widest of the thirty-four player-sessions behind yachi's 31.5 on
+25.2 on 08-14, and the second-widest of the thirty-six player-sessions behind yachi's 31.5 on
 08-09 —
 so the two extremes of this column belong to different players two sessions apart in the ordering,
 which is the clearest statement available that it is a night's state and not a trait. Likewise his
@@ -1493,9 +1718,9 @@ Three consequences:
   moved *with*
   the piece surplus, i.e. there was a mechanism; what 08-19 showed is that acting on it moved the
   tally and **not the series**, which went 4:7 → 3:7. **08-25 is the third data point and it settles
-  the column: this is a quantity that swings hard every session and predicts nothing.** Seventeen
+  the column: this is a quantity that swings hard every session and predicts nothing.** Eighteen
   values now (the series below — re-count it there, this read 「Twelve」 for four sessions), from
-  0:4 to 15:9 in raw tallies and 8.0% to 23.5% as a rate, with no run of three consecutive moves
+  0:2 to 15:9 in raw tallies and 6.7% to 23.5% as a rate, with no run of three consecutive moves
   in the same direction in the rate — read a night's tally as
   that night's, and stop reading a trend into it. 09-03 sits one apart (3:4, [C006]) right after
   the highest rate — close, but NOT the flattest: 07-24's 4:4 is the corpus's only even split, and
@@ -1508,15 +1733,20 @@ Three consequences:
   one mid-paragraph and a live eleven-value one below it, which is the 冇第二份 class occurring
   inside a single bullet. It is
   y:p = 8:3 · 4:4 · 5:4 · 6:2 · 0:4 · 11:2 · 4:3 · 9:4 · 3:4 · 5:6 · **7:5** · 4:2 · **11:12** ·
-  **15:9** · **14:13** · **7:5** · **4:4**, at
+  **15:9** · **14:13** · **7:5** · **4:4** · **0:2** · **5:1**, at
   13.9 · 16.0 · 14.1 · 15.1 · 8.0 · 15.5 · 10.0 · 17.8 · 15.2 · 16.9 · **23.5** · 12.2 · **18.1** ·
-  16.0 · **18.5** · **11.8** · **14.5** % of
-  rounds.
-  09-11's 23.5% is still the highest RATE of the seventeen, by 5.0 points over 10-03's 18.5,
-  and **10-09's 11.8% (12 of 102 [C006]) is now the THIRD-lowest** — after 08-09's 8.0 and 08-19's
-  10.0 — which makes **09-17's 12.2% the fourth-lowest**; it was third through fifteen sessions, and
+  16.0 · **18.5** · **11.8** · **14.5** · **6.7** · **9.5** % of
+  rounds. **10-22's 9.5% (6 of 63 [C006]) is the third-lowest rate of the nineteen**, after 10-20's
+  6.7 and 08-09's 8.0; 5 of the 6 are yachi's.
+  **10-20's 6.7% (2 of 30 [C006]) is the new LOWEST rate**, past 08-09's 8.0, and its 0:2 is the
+  second night yachi topped out in no round, after 08-09's 0:4 — on 30 rounds, i.e. two topouts.
+  Every rank below that names 「lowest」 moved by one place because of it.
+  09-11's 23.5% is still the highest RATE of the eighteen, by 5.0 points over 10-03's 18.5,
+  and **10-09's 11.8% (12 of 102 [C006]) was the THIRD-lowest at sixteen and seventeen** — after
+  08-09's 8.0 and 08-19's 10.0 — which made **09-17's 12.2% the fourth-lowest** (fourth and fifth at
+  eighteen, behind 10-20's 6.7); it was third through fifteen sessions, and
   the 「third」 that stood here is exactly the rank a new session moves without touching the session
-  it names. 10-12's 14.5% (8 of 55) is seventh-lowest and moves none of those ranks. (It read
+  it names. 10-12's 14.5% (8 of 55) was seventh-lowest at seventeen and moved none of those ranks. (It read
   「second-LOWEST」 for two sessions before that and
   was wrong when written: the list refuting it was already in this bullet, which is 冇第二份's
   eighth class exactly — a rank taken over a list the reader is looking at.) Read the column
@@ -1548,42 +1778,42 @@ Three consequences:
 ### 每粒攻擊點解爭 — where the APP gap comes from, and the two halves of it
 
 **pinglamb's attack per piece is higher than yachi's in every session, and the gap is attack PER
-LINE, not lines per piece.** Pooled: APP <!--app:app-->yachi 0.589 against pinglamb 0.650<!--/app:app-->, lines per piece <!--app:lpp-->yachi 0.545 against pinglamb 0.554<!--/app:lpp-->, attack
-per line <!--app:apl-->yachi 1.079 against pinglamb 1.174<!--/app:apl-->. Every figure in this section is a marked fragment rendered by
+LINE, not lines per piece.** Pooled: APP <!--app:app-->yachi 0.589 against pinglamb 0.652<!--/app:app-->, lines per piece <!--app:lpp-->yachi 0.546 against pinglamb 0.555<!--/app:lpp-->, attack
+per line <!--app:apl-->yachi 1.078 against pinglamb 1.175<!--/app:apl-->. Every figure in this section is a marked fragment rendered by
 `pipeline/check_app_decomposition.py` from `analysis/app_decomposition.py`, which rolls up each
 session's `sim/attack-facts.json` (`pipeline/sim/emit-attack-facts.ts`) — paste from `--render`,
 never type. Each session's report carries the same split for that night in 攻擊由邊度嚟, the
 fourth quarantined section.
 
 **What is anchored and what is not.** The engine re-runs every round and reads `res.rawGarbage`,
-the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->2626 of 2628 player-rounds for the attack total and 2623 of 2628 for the clear-type counts<!--/app:anchor-->
+the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->2810 of 2814 player-rounds for the attack total and 2807 of 2814 for the clear-type counts<!--/app:anchor-->
 (the exceptions are named in `attack-facts.test.ts`). So the clear-type COUNTS below are as good as
 facts.json; attack per clear and the base/B2B/combo split are one engine's. **Do not use
 `oracle-source.ts`'s `records[].attack` for this** — it is post-cancel; measured once on 2026-10-11 and not re-derived, it summed to about 80% of
 the replay's total and made a T-spin Triple look worth 4.9 lines instead of 6.1.
 
-The engine gap is <!--app:gap-->+6.14<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
+The engine gap is <!--app:gap-->+6.35<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
 
-* **by window** — <!--app:windows-->+2.47 from the first 21 locks and +3.67 after them<!--/app:windows-->.
-* **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.93 of mix and +2.21 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
+* **by window** — <!--app:windows-->+2.68 from the first 21 locks and +3.67 after them<!--/app:windows-->.
+* **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.98 of mix and +2.37 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
   each type) and the VALUE of each clear (B2B, combo, Perfect Clear riding on it). The largest mix
-  terms are <!--app:terms-->T-spin Doubles +4.14, T-spin Triples +2.99, quads -2.55, T-spin Singles -0.67<!--/app:terms-->.
+  terms are <!--app:terms-->T-spin Doubles +4.16, T-spin Triples +2.99, quads -2.61, T-spin Singles -0.62<!--/app:terms-->.
 
 **The two windows are two different mechanisms, and pooling hides one of them.** T-spin Triples
-are an OPENER phenomenon: <!--app:tst-window-->1301 against 768 inside the window and 46 against 44 after it<!--/app:tst-window-->. That is the repertoire split — pinglamb's Honey
+are an OPENER phenomenon: <!--app:tst-window-->1394 against 827 inside the window and 51 against 47 after it<!--/app:tst-window-->. That is the repertoire split — pinglamb's Honey
 Cup and Stray Cannon fire a Triple first, yachi's TKI-3 does not (see 六個具名定式). T-spin Doubles
-run the OTHER way inside the window and the expected way after it: <!--app:tsd-window-->998 against 1227 inside the window and 4801 against 3829 after it<!--/app:tsd-window-->. So
+run the OTHER way inside the window and the expected way after it: <!--app:tsd-window-->1070 against 1300 inside the window and 5130 against 4112 after it<!--/app:tsd-window-->. So
 「pinglamb does more T-spin Doubles」 is a mid-game statement; in the opener yachi does more, and a
 sentence that pools the two says the opposite of what happens in the first three bags.
 
 It is a property of the pair rather than of a few nights: pinglamb's per-piece rate is the higher
-in <!--app:signs-->T-spin Doubles in 17 of 17, T-spin Triples in 17 of 17, quads in 2 of 17<!--/app:signs-->, and the <!--app:jackknife-->174 single-match drops leave it between 6.06 and 6.23<!--/app:jackknife--> attack per 100 pieces. Two things it is not.
+in <!--app:signs-->T-spin Doubles in 18 of 19, T-spin Triples in 19 of 19, quads in 2 of 19<!--/app:signs-->, and the <!--app:jackknife-->187 single-match drops leave it between 6.28 and 6.43<!--/app:jackknife--> attack per 100 pieces. Two things it is not.
 It is not who won — APP decides rounds and not nights (08-01, 10-09) — and it is not a mechanism
 for WHY each player chose his openers; the data shows what they played, nothing more.
 
-### 逐場排開就分得開 — the per-match APP gap separates the match winner, five times of seventeen
+### 逐場排開就分得開 — the per-match APP gap separates the match winner, five times of eighteen
 
-**Order a session's matches by pinglamb's attack-per-piece advantage and, on five of the seventeen
+**Order a session's matches by pinglamb's attack-per-piece advantage and, on five of the eighteen
 nights, the match winner falls out perfectly — though not on equal evidence; see the tiers below.** 08-19 was the first: yachi's three wins are the
 three smallest gaps (−10.13, −0.98, +0.72), pinglamb's seven the seven largest (+11.53 … +40.67),
 nothing between [C007]. 08-25 reproduces it: yachi's four wins are the four smallest (+3.47, +6.15,
@@ -1682,6 +1912,18 @@ which he leads at all [C020]. So the tiers now read: well-powered (08-19, 08-25,
 intermediate (09-17, 10-12), degenerate (08-09, 09-11) — five separations at 1 in 120, 126, 21,
 38 760 and 56, which is five observations of very unequal weight and not a rate.
 
+**10-20 interleaves, and could not have said much if it had not.** Two yachi wins among four
+matches is 1/C(4,2) = **1 in 6** by chance — below 09-11's 1 in 7, so a separation would have been
+filed as degenerate before it was read. It does not separate anyway: yachi won m2 (−7.37%) and m1
+(+10.52%), pinglamb m4 (+8.28%) and m3 (+11.20%), so pinglamb's m4 sits inside yachi's band. No
+C007 is minted and the id is left empty, following 09-10, 09-11, 09-19 and 10-09. **The count stays
+5 of 18.**
+
+**10-22 interleaves by one match.** Three yachi wins among nine is 1/C(9,3) = **1 in 84** by chance.
+His wins are m8 (+7.97%), m1 (+13.61%) and m6 (+18.03%); pinglamb's six run +17.28% (m7) to +31.50%
+(m5), so m7 sits inside yachi's band, 0.75 points below m6. No C007 is minted. **The count stays 5
+of 19.**
+
 Three things this must not be turned into, each of which is a sentence someone will write next:
 
 - **It is not a sign test.** On 08-25 pinglamb's attack per piece is higher in *every one of the
@@ -1692,9 +1934,9 @@ Three things this must not be turned into, each of which is a sentence someone w
   09-03 says the same thing from the failing side: pinglamb leads APP in all six matches there
   too, and the winner does *not* fall out. **09-10 removes even the premise**: yachi leads attack
   per piece outright in m1 (−1.49%) and m7 (−8.43%), so 「pinglamb leads every match」 is not a
-  corpus regularity either — **measured, it holds in 8 of the 17** (07-22, 07-28, 08-14, 08-19,
-  09-10, 09-18, 09-19, 10-03 and 10-12 each have at least one match yachi leads; 10-09 is the eighth
-  where it holds, and 10-12 the ninth where it fails). This sentence published 「it held in
+  corpus regularity either — **measured, it holds in 9 of the 19** (07-22, 07-28, 08-14, 08-19,
+  09-10, 09-18, 09-19, 10-03, 10-12 and 10-20 each have at least one match yachi leads; 10-09 is the
+  eighth where it holds, 10-12 the ninth where it fails, 10-20 the tenth, and 10-22 the ninth where it holds). This sentence published 「it held in
   eight of ten sessions and this is one of the two where it does not」 until 2026-09-12, and that
   was wrong at ten as well as at eleven: the true ten-session count was five of ten. Nobody had
   measured it — the 09-10 paragraph beside it names two matches, and 「the two where it does not」
@@ -1719,7 +1961,12 @@ Three things this must not be turned into, each of which is a sentence someone w
   corpus's largest margin [C020] — so the share falls to **47%** (8 of 17). There the attack total
   decides every match [C019], as it does on 08-19, 09-03, 09-11 and 09-17: in m2 and m7 pinglamb
   had the higher APP and yachi still won both on volume — volume beating the APP sign twice, where
-  10-09's two C024 exceptions were the APP sign beating volume twice.
+  10-09's two C024 exceptions were the APP sign beating volume twice. **10-20 is the tenth where it
+  FAILS** — yachi leads m2 [C016] — so the share falls to **44%** (8 of 18), and the attack total
+  decides all four matches again [C015], m1 included, which yachi won on volume against a pinglamb
+  APP 10.52% higher. **10-22 is the ninth where it HOLDS** — pinglamb's APP is higher in all nine
+  matches [C020] — so the share goes back up to **47%** (9 of 19), and the attack total decides 7 of
+  the 9 [C021], the exceptions m1 and m6, two yachi wins against more pinglamb attack.
 - **The cut point is not a constant, and the third instance widens the spread rather than
   narrowing it.** 08-19's separation falls between +0.72% and +11.53%, 08-25's between +8.21% and
   +10.32%, **09-17's between +13.47% and +16.91%**. There is no corpus-wide threshold: 08-25's
@@ -1761,7 +2008,7 @@ was 1 of 12 — which is exactly where this stops being a story about volume bei
 **(+1.00%), +85 519 in-game score, +318 lines** [C005][G074] — the largest surplus the corpus holds
 as a count (past 09-19's 714) and as a rate (12.64% [C009], past 09-17's 10.05%), the first session
 since 07-22 where yachi's attack total is the higher, and the first of sixteen where his score
-total is (still the only one of seventeen). The annotation is the session's own leave-one-out: the SIGN survives losing any one round
+total is (10-20 is the second, of eighteen). The annotation is the session's own leave-one-out: the SIGN survives losing any one round
 and the SIZE does not — m7r8, the night's longest round (about 217 s), carries 35 of the 58. So the
 honest sentence is 「the route bought the gap back and a little more」, not 「yachi out-attacked him by
 58」. It was 2 of 13 runs, and the series was still lost 5:7, because attack totals are not what
@@ -1771,6 +2018,14 @@ thirteenth and it failed again: +468 pieces, −102 lines** (−3.15% [C005]), �
 a 13.50% gap [C004], the third-largest session gap after 09-17's and 08-09's. 2 of 14 runs now. And
 the night the route lost on aggregate is a night it won two matches outright: the attack total
 decided all eight [C019], m2 and m7 included, where yachi's volume beat a higher pinglamb APP.
+**10-20 ran it a fourteenth and the route covered the gap with room to spare: +323 pieces, +80
+lines** (+4.16% [C005]), +27 416 in-game score [G059], +33 lines — an 11.18% surplus [C009] against
+a 6.73% gap [C004], the narrowest session gap since 09-10's. 3 of 15 runs now, and the series was
+drawn: 2:2 in matches and 15:15 in rounds. The attack total decided all four matches
+[C015]. **10-22 ran it a fifteenth and it failed by the largest shortfall the corpus holds: +573
+pieces, −349 lines** (−8.79% [C005]), −113 511 in-game score [G068], +292 lines — a 9.99% surplus
+[C009] against a 20.59% gap [C004], the largest session gap the corpus holds (past 09-17's
+20.11%). 3 of 16 runs now; the attack total decided 7 of the 9 matches [C021].
 09-10's is
 the smallest failure in the corpus by a factor of two and 09-11's is the largest as a RATE; the two
 are adjacent sessions and the reason is arithmetic, not effort: see below. (09-18's −139 437 is the
@@ -1781,13 +2036,13 @@ confound the y-axis below turned out to have.)
 A piece surplus buys back an APP gap of **exactly** `100·(surplus_pieces/other_pieces − 1)`
 percentage points. That is the whole of what volume can do, and it is arithmetic rather than a
 tendency. Subtract it from the session's APP gap and the remainder — the **shortfall** —
-rank-orders the attack difference across the seventeen sessions:
+rank-orders the attack difference across the nineteen sessions:
 
-| shortfall (pp) | **−1.12** | −0.67 | +0.50 | +1.00 | +1.51 | +2.66 | **+3.58** | +3.82 | +4.61 | +4.79 | **+4.86** | +5.22 | +5.96 | +6.89 | *+10.03* | *+10.06* | +10.28 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| yachi's attack − pinglamb's, as % of pinglamb's total | **+1.00** | +0.63 | −0.46 | −0.93 | −1.41 | −2.42 | **−3.15** | −3.42 | −4.19 | −4.38 | **−4.53** | −4.80 | −5.36 | −6.13 | *−8.50* | *−8.38* | −9.15 |
-| the same, in raw lines | **+58** | +28 | −15 | −32 | −47 | −72 | **−102** | −176 | −206 | **−120** | **−395** | **−352** | **−476** | **−236** | −271 | −250 | −309 |
-| session | **10-09** | 07-22 | 07-28 | 08-01 | 09-10 | 07-24 | **10-12** | 08-25 | 08-14 | 09-03 | **10-03** | **09-18** | **09-19** | 08-19 | *08-09* | *09-17* | 09-11 |
+| shortfall (pp) | **−4.45** | **−1.12** | −0.67 | +0.50 | +1.00 | +1.51 | +2.66 | **+3.58** | +3.82 | +4.61 | +4.79 | **+4.86** | +5.22 | +5.96 | +6.89 | *+10.03* | *+10.06* | *+10.28* | ***+10.60*** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| yachi's attack − pinglamb's, as % of pinglamb's total | **+4.16** | **+1.00** | +0.63 | −0.46 | −0.93 | −1.41 | −2.42 | **−3.15** | −3.42 | −4.19 | −4.38 | **−4.53** | −4.80 | −5.36 | −6.13 | *−8.50* | *−8.38* | *−9.15* | ***−8.79*** |
+| the same, in raw lines | **+80** | **+58** | +28 | −15 | −32 | −47 | −72 | **−102** | −176 | −206 | **−120** | **−395** | **−352** | **−476** | **−236** | −271 | −250 | −309 | **−349** |
+| session | **10-20** | **10-09** | 07-22 | 07-28 | 08-01 | 09-10 | 07-24 | **10-12** | 08-25 | 08-14 | 09-03 | **10-03** | **09-18** | **09-19** | 08-19 | *08-09* | *09-17* | *09-11* | ***10-22*** |
 
 **THE Y-AXIS CHANGED ON 2026-09-19, AND THAT IS THIS SESSION'S FINDING.** Every earlier revision
 of this table ranked the RAW LINE COUNT. The x-axis is a rate and the y-axis was a sum over the
@@ -1796,12 +2051,13 @@ session, so the y grew with session length at fixed per-piece shortfall — and 
 150 rounds: 1.79x the largest at the time, 3.26x the smallest. It breaks the raw version and lands
 exactly in its slot on the rate version. Measured both ways over the same points:
 
-| y-axis | ρ at 12 | ρ at 13 | ρ at 14 | ρ at 15 | ρ at 16 | ρ at 17 | discordant pairs at 9 / 10 / 11 / 12 / 13 / 14 / 15 / 16 / 17 |
-|---|---|---|---|---|---|---|---|
-| raw lines | 0.9720 | 0.9231 | 0.8769 | 0.8321 | 0.8618 | **0.8849** | 2 · 2 · 2 · 3 · 7 · 11 · 16 · 16 · **16** |
-| % of pinglamb's attack | 0.9930 | 0.9945 | 0.9956 | 0.9964 | 0.9970 | **0.9975** | 0 · 0 · 0 · 1 · 1 · 1 · 1 · 1 · **1** |
+| y-axis | ρ at 12 | ρ at 13 | ρ at 14 | ρ at 15 | ρ at 16 | ρ at 17 | ρ at 18 | ρ at 19 | discordant pairs at 9 / 10 / 11 / 12 / 13 / 14 / 15 / 16 / 17 / 18 / 19 |
+|---|---|---|---|---|---|---|---|---|---|
+| raw lines | 0.9720 | 0.9231 | 0.8769 | 0.8321 | 0.8618 | 0.8849 | 0.9030 | **0.8860** | 2 · 2 · 2 · 3 · 7 · 11 · 16 · 16 · 16 · 16 · **19** |
+| % of pinglamb's attack | 0.9930 | 0.9945 | 0.9956 | 0.9964 | 0.9970 | 0.9975 | 0.9979 | **0.9964** | 0 · 0 · 0 · 1 · 1 · 1 · 1 · 1 · 1 · 1 · **2** |
 
-(The sixteen-session ρ's are 0.99706 and 0.86176, the seventeen-session ones 0.99754 and 0.88480;
+(The sixteen-session ρ's are 0.99706 and 0.86176, the seventeen-session ones 0.99754 and 0.88480,
+the eighteen-session ones 0.99793 and 0.90299, the nineteen-session ones 0.996491 and 0.885965;
 in both columns the rate axis's is floored and the raw axis's
 ceiled, because the argument needs the first large and the second small — the per-claim rounding
 rule this file states for the R statistics, applied here. **The earlier columns were NOT rounded
@@ -1857,6 +2113,33 @@ long sessions did. Adding a point that cannot discriminate raises a rank correla
 dominated by its existing sixteen discordant pairs; the pairs are the measurement, and they are
 the same sixteen.
 
+**2026-10-20 is a point at the far END of the ordering again, and it is the weakest test the
+table has had.** Its shortfall is **−4.45 pp** — a 323-piece surplus buying 11.18 pp against
+C004's 6.73 pp gap [C004][C005][C009] — the new low by more than three points, past 10-09's −1.12.
+The ordering therefore predicts the largest attack difference in yachi's favour the corpus holds,
+and it measures **+4.16%** (+80 lines): extreme on both axes, so concordant with everything under
+any monotone y, and neither axis gains a discordant pair (one and sixteen, unchanged). The rate ρ
+creeps up (0.9975 → 0.9979) and the raw ρ rises a third time (0.8849 → 0.9030), which is exactly
+the 10-09 weakness written above, at a larger size: an end point cannot discriminate, and 10-20 is
+also the corpus's shortest night (30 rounds), so its raw figure could not have broken the raw
+ordering either. Read +4.16% as a reading on 30 rounds, not as the route's best night.
+
+**2026-10-22 is a point at the far OTHER end, and it is the first point since the axis changed to
+add a discordant pair on the rate axis.** Its shortfall is **10.60 pp** — a 573-piece surplus
+buying 9.99 pp against C004's 20.59 pp gap [C004][C005][C009] — the new high, past 09-11's 10.28.
+The ordering therefore predicts the largest attack deficit the corpus holds, past 09-11's −9.15%,
+and it measures **−8.79%**: between 08-09's −8.50% and 09-11's −9.15%, so it swaps with 09-11.
+That is the rate axis's second discordant pair, and it is NOT the 08-09 / 09-17 kind: the two
+sessions are 0.32 pp apart on the x-axis, about ten times that pair's 0.03. All four sessions
+from 08-09 to 10-22 sit within 0.6 pp of each other at 10.03-10.60, the one stretch of the table
+where neighbours are that close. On the raw axis −349 lines outranks 08-09's −271, 09-17's −250 and 09-11's
+−309 but not 09-19's −476 or 10-03's −395, three new discordant pairs (sixteen to nineteen). So the
+rate ρ falls for the first time since the change (0.9979 → 0.9964) and the raw ρ falls too
+(0.9030 → 0.8860). Both are hand-measured by the same probe that reproduces the eighteen-session
+row exactly; nothing committed re-derives either. Read the swap as a limit of resolution at the
+top of the table, not as the ordering breaking: one pair at 0.32 pp is a weaker failure than
+09-03's two places at 2.1 pp would have been, and that one was an axis error.
+
 Five things follow, and the third is the one that matters most for how this file is written.
 
 * **This is a units correction, not a re-fit.** The x-axis is a ratio of rates, so the y-axis has
@@ -1873,7 +2156,9 @@ Five things follow, and the third is the one that matters most for how this file
   rate axis 09-03 sits exactly where its shortfall puts it, and the ordering was perfect through
   eleven sessions rather than broken at nine. The 2.1 pp neighbour spacing that made it read as a
   「genuine miss」 was real; the miss was not.
-* **The one discordant pair that survives is 08-09 / 09-17**, italicised above — the 0.03 pp
+* **The one discordant pair that survives is 08-09 / 09-17**, italicised above (this bullet's
+  「one」 is the eighteen-session record; 10-22 adds 09-11 / 10-22, bold-italicised, see its
+  paragraph) — the 0.03 pp
   adjacent swap the next-but-one paragraph already describes as beyond this quantity's resolving
   power. It is the same pair on both axes, which is the right outcome: a real limit of resolution
   does not care which units you plot.
@@ -1941,16 +2226,18 @@ places out against neighbours 2.1 pp away. Spearman is **0.9720** at twelve — 
 unmoved from eleven's 0.9727, which is what an unresolvable adjacent swap does to a rank
 correlation.
 
-**Both ends of this session's arithmetic are corpus records and they nearly cancel.** The surplus
+**Both ends of this session's arithmetic were corpus records at twelve sessions, and they nearly cancel** (10-09's surplus and 10-22's gap have since passed both). The surplus
 buys 10.05 pp, the largest the route has ever had; the gap handed to it is 20.11 pp, the largest in
 the corpus. 08-09 reached almost the same shortfall from 8.04 against 18.08. Same residue, both
 components two points higher — which is the cleanest statement available that the shortfall is
 what the ordering ranges over and the size of either term is not.
 
 **The p beside that ρ needs its convention named, because the two published so far disagree about
-one.** At seventeen sessions the exact permutation p over all 17! orderings is **9.6e-14 two-sided**
-on the rate axis (4.8e-14 one-sided) and **7.1e-06 two-sided** on the raw axis (both ceiled, since
-each supports a rejection). At sixteen they were 1.6e-12 (7.7e-13 one-sided) and 4.3e-05. At fifteen they were 2.3e-11 (1.1e-11 one-sided) and 2.3e-04. At fourteen it
+one.** At nineteen sessions the exact permutation p over all 19! orderings is **2.6e-15 two-sided**
+on the rate axis (1.3e-15 one-sided) and **1.6e-06 two-sided** on the raw axis (both ceiled, since
+each supports a rejection; the same probe reproduces the eighteen-session pair exactly before
+adding the nineteenth point). At eighteen they were 5.7e-15 (2.9e-15 one-sided) and 1.1e-06 —
+the rate p still improves at nineteen although ρ falls, because n grew. At seventeen they were 9.6e-14 (4.8e-14 one-sided) and 7.1e-06. At sixteen they were 1.6e-12 (7.7e-13 one-sided) and 4.3e-05. At fifteen they were 2.3e-11 (1.1e-11 one-sided) and 2.3e-04. At fourteen it
 was 3.2e-10 (1.6e-10 one-sided) against 9.0e-05 — a factor of 280 000 between the two axes, the
 same finding as the ρ pair. At thirteen the rate axis read 4.2e-09 and the raw
 2.4e-05; at
@@ -1961,8 +2248,9 @@ before 09-19 improved it: n grows and the fit gets worse, which is what an axis 
 once the corpus contains sessions long enough to separate the two axes. The rate axis improved on
 all three of those same sessions. 10-09 then improves the raw p to 4.3e-05 — by landing at the end
 of the ordering on both axes, which the shortfall paragraph above explains is no evidence for the
-raw axis, and 10-12 to 7.1e-06 by landing in an interior slot a 55-round session could not miss on
-either axis.) The p is exact rather than sampled: the null distribution of
+raw axis, 10-12 to 7.1e-06 by landing in an interior slot a 55-round session could not miss on
+either axis, and 10-20 to 1.1e-06 by landing at the end again; 10-22 worsens it to 1.6e-06 with three new
+discordant pairs.) The p is exact rather than sampled: the null distribution of
 S = Σd² over n! orderings is computed by a subset DP, self-checked against n! and against the two
 counts it must reproduce (one permutation at S = 0, n−1 at S = 2, none at S = 1 by parity). That
 self-check is written against n rather than against 13 because it had to survive a fourteenth
@@ -1972,8 +2260,9 @@ Nothing downstream compares these p's to anything, so no conclusion
 moves, but this file elsewhere records a mixed one-/two-sided convention costing months of a wrong
 comparison, so the convention is stated: **two-sided, matching the binomial table above.**
 
-What survives is a strong monotone relationship over seventeen sessions with **one discordant pair**
-— 08-09 against 09-17, 0.03 pp apart and below this quantity's resolution — and it survives on the
+What survives is a strong monotone relationship over nineteen sessions with **two discordant pairs**
+— 08-09 against 09-17, 0.03 pp apart and below this quantity's resolution, and 09-11 against
+10-22, 0.32 pp apart at the top of the table — and it survives on the
 rate axis, which is the axis the units require. The history is worth keeping in the order it
 happened: the ordering was published as perfect at eight points, read as broken at nine, and is
 now neither. It was never broken; it was measured against a y-axis that carried session length.
@@ -1981,8 +2270,9 @@ now neither. It was never broken; it was measured against a y-axis that carried 
 there is still no coefficient to read off it, and the axis was changed because of units and not
 because of fit — the test of that is that the change improves the ordering on data collected
 before the change was made, which it does (0 discordant pairs at nine, ten and eleven against the
-raw axis's 2), AND on data collected after it, which 09-18 supplied and 10-03, 10-09 and 10-12
-have not contradicted.
+raw axis's 2), AND on data collected after it, which 09-18 supplied and 10-03, 10-09, 10-12 and 10-20
+have not contradicted. 10-22 adds the second rate-axis pair and three raw-axis pairs, so it
+worsens both axes; the rate axis is still the one with two pairs against nineteen.
 
 **09-11 is the other half of 09-10's demonstration, and the pair is the cleanest statement of the
 section's thesis the corpus will produce.** Its surplus (2.13 pp) is the SMALLEST in the corpus
@@ -2056,15 +2346,15 @@ as 60%.** A windowed claim shares its rounds with the session total meant to imp
 pieces from a match-3 round to a match-1 round keeps `total_pieces`, `total_garbage_attack`
 and C008 true while flipping C005 false. The second family does exactly that, and the four
 claims that drop out (C002, C004, C005, C006) are precisely 07-28's windowed ones.
-Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-18 89% → **89%**, 09-19 89% → **89%**, 10-03 87% → **83%**, 10-09 83% → **74%**, 10-12 79% → **68%**.
+Measured with `--two-site round`. Per-session: 07-22 81% → **79%**, 07-24 96% → **94%**, 07-28 100% → **60%**, 08-01 100% → **92%**, 08-09 82% → **73%**, 08-14 84% → **68%**, 08-19 82% → **76%**, 08-25 82% → **76%**, 09-03 81% → **69%**, 09-10 81% → **81%**, 09-11 80% → **80%**, 09-17 81% → **75%**, 09-18 89% → **89%**, 09-19 89% → **89%**, 10-03 87% → **83%**, 10-09 83% → **74%**, 10-12 79% → **68%**, 10-20 71% → **64%**, 10-22 84% → **74%**.
 
-**07-28 is not the exception — <!--equiv:sf-match-->twelve of the seventeen<!--/equiv:sf-match--> measured sessions lose coverage
+**07-28 is not the exception — <!--equiv:sf-match-->fourteen of the nineteen<!--/equiv:sf-match--> measured sessions lose coverage
 to the second family**, and
 every claim that drops is windowed or per-match (08-01 C002, 08-09 C005, 08-14 C007/C019/C020,
-08-19 C007, **09-17 C007**, **10-03 C007**, **10-09 C024/C025**, **10-12 C007/C020**). **That count used to be at `match` granularity only, and `match` used
+08-19 C007, **09-17 C007**, **10-03 C007**, **10-09 C024/C025**, **10-12 C007/C020**, **10-20 C016**, **10-22 C020/C021**). **That count used to be at `match` granularity only, and `match` used
 to be the only reading on which any session was exempt**: 07-24 loses nothing there (48 → 48) but
-loses R018 at `round`, so for nine sessions the `round` count was every session measured. At seventeen
-it is **<!--equiv:sf-round-->thirteen of the seventeen<!--/equiv:sf-round-->**, because 2026-09-10,
+loses R018 at `round`, so for nine sessions the `round` count was every session measured. At eighteen
+it is **<!--equiv:sf-round-->fifteen of the nineteen<!--/equiv:sf-round-->**, because 2026-09-10,
 2026-09-11, 2026-09-18 and 2026-09-19 are the four that lose nothing at EITHER
 granularity — 13 of 16, 12 of 15, 24 of 27 and 25 of 28 at all three, the same covered
 set each time.
@@ -2126,6 +2416,20 @@ is {C002, C003, C008, C019}: the usual three plus C019, the attack total decidin
 — per-match like 10-09's C024 and, like it, implied by no generated family. Nothing here is new to
 the mechanism; it is recorded because the exempt/not-exempt split is a set, and a session that
 lands on the side the mechanism predicts is still a session that could have landed on the other.
+
+**2026-10-20 is NOT exempt, and it loses the per-match claim it holds instead of a C007.** Its
+ordering interleaves, so no C007 was minted; what it loses is **C016** — m2 as the one match in
+which yachi's APP is the higher, the same shape as 10-12's C020: 10 of 14 at single value, 9 of 14
+at both granularities, C006 untested. Its single-value uncovered set is {C002, C003, C008, C015}:
+the usual three plus C015, the attack total deciding all four matches — 10-12's C019 again, implied
+by no generated family.
+
+**2026-10-22 is NOT exempt, and both claims it loses are per-match.** Its ordering interleaves, so
+no C007 was minted; it loses **C020** (pinglamb's APP higher in all nine matches, with m8's gap the
+smallest and m5's above 31%) and **C021** (the attack total deciding 7 of the 9, m1 and m6 the two
+yachi wins with less attack): 16 of 19 at single value, 14 of 19 at both granularities, C006
+untested. Its single-value uncovered set is the usual {C002, C003, C008} alone — the first session
+since 09-19 with nothing beyond those three at single value.
 
 What actually moved is the DENOMINATOR, and it is the same arithmetic the shortfall table's y-axis
 turned out to have. 09-19 has twenty matches, so its ledger carries twenty `round_seq` claims
@@ -2212,13 +2516,13 @@ The visible cost of the volume route is in the death tally: 6 of the 8 topouts a
 For three sessions the APM/VS records were the plain argmax and were **all** short-round
 artifacts. A rate has the round's length in its denominator, so over a short round it is a
 sample mean over a small n. Measured in `analysis/rate_records.R` over all
-<!--rate:corpus-->2628 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->seventeen sessions<!--/rate:sessions-->):
-regressing log SD on log t gives **<!--rate:slopes-->−0.683 for VS and −0.761 for APM<!--/rate:slopes-->**,
-slope 0 rejected for both (p <!--rate:slope-p-->1.8e-07 / 2.9e-06<!--/rate:slope-p-->).
-**<!--rate:records-->48<!--/rate:records-->** of the
-<!--rate:records-denom-->51<!--/rate:records-denom--> unqualified records
-(<!--rate:records-basis-->3 metrics × 17 sessions<!--/rate:records-basis-->) came from the shortest
-quartile — p = <!--rate:records-p-->1.2e-25<!--/rate:records-p--> — and 07-22's headline
+<!--rate:corpus-->2814 player-rounds<!--/rate:corpus--> (<!--rate:sessions-->nineteen sessions<!--/rate:sessions-->):
+regressing log SD on log t gives **<!--rate:slopes-->−0.676 for VS and −0.755 for APM<!--/rate:slopes-->**,
+slope 0 rejected for both (p <!--rate:slope-p-->2.3e-07 / 3.8e-06<!--/rate:slope-p-->).
+**<!--rate:records-->52<!--/rate:records-->** of the
+<!--rate:records-denom-->57<!--/rate:records-denom--> unqualified records
+(<!--rate:records-basis-->3 metrics × 19 sessions<!--/rate:records-basis-->) came from the shortest
+quartile — p = <!--rate:records-p-->5.1e-26<!--/rate:records-p--> — and 07-22's headline
 約<!--rate:headline-vs-->262.5<!--/rate:headline-vs--> was a <!--rate:headline-t-->15.6 s<!--/rate:headline-t--> round,
 <!--rate:headline-pct-->46%<!--/rate:headline-pct--> above that session's qualified peak.
 
@@ -2255,27 +2559,30 @@ outside this section entirely: twenty-six lines of FOUR-session statistics in a 
 
 **Two things in that paragraph changed when the sixth session was added, and the honest version
 is weaker than the five-session one. Both still hold.** (a) APM's −0.5 is **outside**
-its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.873, −0.650]<!--/rate:apm-ci--> now — so
+its CI — [−0.918, −0.525] at six, <!--rate:apm-ci-->[−0.871, −0.639]<!--/rate:apm-ci--> now — so
 the decay is *steeper* than a pure sample mean and the conclusion holds a fortiori, but "both with
 −0.5 inside the CI" is no longer true; (b) the mean is **no longer flat for VS**
-(<!--rate:vs-mean-->96.8 → 119.0<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->2.7e-04<!--/rate:vs-mean-p-->)
+(<!--rate:vs-mean-->97.1 → 119.3<!--/rate:vs-mean--> across the bins, p = <!--rate:vs-mean-p-->2.5e-04<!--/rate:vs-mean-p-->)
 — longer rounds do carry a mildly higher mean VS. The SD still falls several times over the same
 span, so the variance effect dominates and the qualifier stands, but the control is now "the mean
-moves a little, the spread moves a lot", not "the mean is flat". **PPS's mean is no longer flat
-either, and only just**: it read flat for sixteen sessions (p = 0.06 at sixteen) and at seventeen
-it is p = <!--rate:pps-mean-p-->0.049<!--/rate:pps-mean-p--> (ceiled; unrounded 0.048), i.e. under
-0.05 by about two thousandths — the 0.048 / 0.059 situation KPP was in, a margin and not a
-finding. It moves the OTHER way from VS, <!--rate:pps-mean-->1.459 → 1.412<!--/rate:pps-mean-->
+moves a little, the spread moves a lot", not "the mean is flat". **PPS's mean is NOT flat
+again, and only just**: it read flat for sixteen sessions (p = 0.06 at sixteen), crossed at
+seventeen (0.048, ceiled to 0.049), read flat at eighteen (0.0505, floored to 0.050), and at
+nineteen it is p = <!--rate:pps-mean-p-->0.048<!--/rate:pps-mean-p--> (ceiled; unrounded 0.0470),
+i.e. under 0.05 by three thousandths — the 0.048 / 0.059 situation KPP was in, a margin and not a
+finding, crossing the line in each of the last three sessions. It moves the
+OTHER way from VS, <!--rate:pps-mean-->1.462 → 1.413<!--/rate:pps-mean-->
 across the bins, so shorter rounds carry the higher mean PPS; the SD still falls about three
-times over the same span, so the control for PPS is now VS's — the mean moves a little, the
+times over the same span, so the control for PPS reads as VS's — the mean moves a little, the
 spread a lot — and PPS carries no record qualifier for it to bear on.
 
 **A rounding DIRECTION is per claim, not per number, and applying that moved three of these.**
 A p supporting 「rejected」 must ceil, because a p rounded down claims more significance than the
 fit gives — 8.6e-05 / 5.3e-05 became 8.7e-05 / 5.4e-05. A p supporting 「still flat」 must floor,
-which is why PPS's 0.25 did not move — and why, at seventeen sessions, PPS's p CEILS: the sentence
-beside it stopped saying 「flat」, and a direction belongs to the claim, so it flipped with it.
-The precision had to move as well. At two places 0.048 ceils to 0.05, which does not support the
+which is why PPS's 0.25 did not move — and why, at seventeen sessions, PPS's p CEILED: the sentence
+beside it stopped saying 「flat」, and a direction belongs to the claim, so it flipped with it; at
+eighteen the sentence says 「flat」 again and the p FLOORS again. The precision had to move as well
+at seventeen, and stays at three places through the flip back. At two places 0.048 ceils to 0.05, which does not support the
 rejection it is printed under; the right direction at the wrong precision still publishes a
 figure contradicting its own sentence, so the fragment is quoted at three. A CI quoted to show −0.5 lies outside it widens rather than
 narrows. And the two ratios below are quoted against each other, so the one the argument needs to
@@ -2283,7 +2590,7 @@ be large floors and the one it needs to be small ceils.
 
 **Do not quote a number for that SD fall from here, and do not put one in the report either** —
 paste it. `records.r_stats()["sd_ratio"]` derives it through `fmt.ratio1`, which floors:
-4.1× at six sessions, **<!--rate:sd-ratio-->4.5×<!--/rate:sd-ratio--> now**. The report's
+4.1× at six sessions, **<!--rate:sd-ratio-->4.4×<!--/rate:sd-ratio--> now**. The report's
 footnote said 「足足細咗四倍」 as a typed word for six sessions, where it was true, and shipped
 **false into all seven rendered reports** the day 08-19 landed, because 足足 asserts a floor of
 four and the ratio had fallen to 3.82. Nothing could catch it: `check_prose_figures` resolves
@@ -2341,6 +2648,14 @@ Two holes opened the moment the qualifier was written, and both are now gated:
    caught" is too weak (the winner-gt-loser claim catches every decrease) and checking both
    directions is too strong (a round loser's VS has never been pinned from below, and
    inventing a claim to fix that would be writing for the checker, not the reader).
+   **That fix had a branch no session took for seventeen sessions, and 2026-10-20 took it.**
+   `unqualified_rate_peaks` skipped a rate whose peak landed in a QUALIFYING round, on the
+   grounds that the record claim 「already covers it」 — but the record's conjuncts range over
+   qualifying rounds only, so 10-20's VS peak (pinglamb m3r7, a 60 s-plus round) left all
+   sixteen short-round VS constants unbounded and `check_rate_coverage` went red. The repair is
+   a new family at the END of `generators.py`, `qualified_rate_peaks_unbounded`, which bounds
+   every round when the peak is the record; it emits nothing for the seventeen earlier sessions,
+   so every earlier ledger re-emits byte-identical and no claim id moved.
 2. **`==` had never appeared in a Cond**, so nobody had noticed `smt.py` passed the operator
    through verbatim — SMT-LIB spells equality `=`, and both solvers answered
    `unknown constant ==` rather than a verdict. Only `check_smt` caught it; Python and Dafny
@@ -2363,19 +2678,26 @@ Each metric ships with the control that says what it is NOT, and each control is
 merely documented:
 
 - **ordering** — control is *exposure*: scored only on rounds holding both spins, and re-run over
-  the whole simulated round so the short verified prefix cannot manufacture the result. Seventeen
-  sessions: **1452 of 1519 run the C-Spin order and 69 run the DT order** (09-19 adds 165
+  the whole simulated round so the short verified prefix cannot manufacture the result. Nineteen
+  sessions: **1556 of 1629 run the C-Spin order and 75 run the DT order** (09-19 adds 165
   rounds holding both, 155 C-Spin orders and TEN DT orders; 09-18 adds 127, 124 and FOUR; 10-03
   adds 163, 145 and EIGHTEEN; 10-09 adds 143, 114 and TWENTY-NINE; 10-12 adds 64, 61 and
-  THREE). The two
+  THREE; 10-20 adds 32, 28 and FOUR; 10-22 adds 78, 76 and TWO). The two
   counts no longer sum,
   because since 09-10 a single round can register both orders — see below.
 
   **2026-09-19 TRIPLED the DT count in one night, and 2026-09-18 — the night BEFORE it — puts
   four more in the same band.** Per round holding both spins the DT rate
   runs 0 · 0 · 0 · 0 · 0 · 0.99 · 0 · 1.11 · 0 · 1.22 · 0 · 4.00 · **3.15** · **6.06** · **11.04** ·
-  **20.28** · 4.69 %, so the last SIX sessions hold 66 of the 69 on 712 of the 1519 rounds — 9.27%
-  against 0.37% for the first eleven (3 of 807). **10-12's three are yachi's and are that same
+  **20.28** · 4.69 · **12.50** · 2.56 %, so the last EIGHT sessions hold 72 of the 75 on 822 of the 1629 rounds — 8.76%
+  against 0.37% for the first eleven (3 of 807). **10-22's two are yachi's and are not one opener** —
+  `replay-2026-10-22-06.ttrm` round 4 (m5r5) is the Single 6 / Double 13 / Triple 20 pattern again,
+  verified to lock 40, and `replay-2026-10-22-02.ttrm` round 6 (m2r7, Double 13, Triple 19, no
+  Single, verified to 61) is an exact DT Cannon first bag, the fifth the first-bag metric
+  corroborates; both windows are complete and both are DT-only. **10-20's four are yachi's and the same pattern a
+  fourth night** — `replay-2026-10-20-01.ttrm` round 3, `-02` round 2, `-03` round 4 and `-04` round 0
+  (0-based), verified to locks 66, 43, 150 and 116, every window complete and all four DT-only; 10-20
+  has no exact first-bag match of any opener, so they add nothing to the corroboration below. **10-12's three are yachi's and are that same
   pattern again** — Single on lock 6, Double on 13, Triple on 20, in `replay-2026-10-12-01.ttrm`
   round 2, `-03` round 3 and `-07` round 3, every window complete and all three DT-only — so the
   opener is now on three nights, at 3 of his 31 rounds holding both spins rather than 10-09's 29 of
@@ -2426,18 +2748,20 @@ merely documented:
   reached `2.tsd` and no bag-3 board (with the measured reason), `STICKSPIN_NEAR_NOT_2TSD` for stick
   spin's near-`2.sd` rounds that are not SDPC Spin bag-2 cases, and `DT_AND_SDPCSPIN` for the overlap
   with this column. Stick spin's own test re-derives its half: `stickspin.test.ts` reads every
-  session's `ordering.per_round` and pins that **58 of the 69 Double-first rounds are stick-spin
-  bag-1 rounds, all yachi's** (`DT_AND_STICKSPIN`), and names the other eleven with a verified
-  reason each in `DT_NOT_STICKSPIN`: the four DT Cannon rounds above, the two windows holding both
-  orders (09-10 m7r3, 09-18 m2r3), and five J/L-split boards — the stick-spin shape with the J and L
-  cells divided another way, four of them pinglamb's. **That J/L split is SDPC Spin's other drawn
+  session's `ordering.per_round` and pins that **61 of the 75 Double-first rounds are stick-spin
+  bag-1 rounds, all yachi's** (`DT_AND_STICKSPIN`), and names the other fourteen with a verified
+  reason each in `DT_NOT_STICKSPIN`: the five DT Cannon rounds above, the two windows holding both
+  orders (09-10 m7r3, 09-18 m2r3), and seven J/L-split boards — the stick-spin shape with the J and L
+  cells divided another way, four of them pinglamb's (10-20 adds two of yachi's, m1r4 and m3r5). **That J/L split is SDPC Spin's other drawn
   colouring** (`bag1.lj`; SingleYou draws it too), so on the SDPC Spin page those rounds are ordinary
   cases, and `sdpcspin.test.ts` asserts that every stick-spin bag-1 case is an SDPC Spin case and names
   every difference. Per session, hand-summed on 2026-10-13 from the
   same two artefacts and to be re-derived, not carried: 09-17 1 of 2, 09-18 1 of 4, **09-19 8 of 10**
   (the other two pinglamb's J/L split, so 09-19's DT rounds are mostly this opener, which is the
   reading that night lacked), **10-03 16 of 18** (the others the DT Cannon m7r3 and the J/L split
-  m7r7 — together the seventeen that share the lock pattern), 10-09 29 of 29 and 10-12 3 of 3.
+  m7r7 — together the seventeen that share the lock pattern), 10-09 29 of 29, 10-12 3 of 3 and
+  10-20 2 of 4 (the other two its J/L split; all four are SDPC Spin cases reaching `3.first`) and
+  10-22 1 of 2 (the other its DT Cannon m2r7).
 
   **What 09-18 removes is the reading that 09-19 was one anomalous night**, which was the only
   way to hold the column's history and its last entry together at thirteen sessions. It does not
@@ -2445,13 +2769,14 @@ merely documented:
   repo's history while sitting BEFORE them in date order, so 「the last five sessions」 above is a
   date-ordered statement and the exception list's own numbering is an arrival-ordered one; the two
   disagree here for the first time and both are labelled at their own sites.
-  **The corroboration by the first-bag metric is 4 of 69 — it was 3 of 5, then 3 of 15, then 3 of
-  19, then 4 of 37, then 4 of 66, and the ratio has fallen because the denominator grew rather than because the
+  **The corroboration by the first-bag metric is 5 of 75 — it was 3 of 5, then 3 of 15, then 3 of
+  19, then 4 of 37, then 4 of 66, then 4 of 69, then 4 of 73, and the ratio has fallen because the denominator grew rather than because the
   instrument changed.** 09-19 has zero
   exact DT Cannon first bags and both players' nearest is 6 cells away, and 09-18 likewise has
   none, so between them they contribute fourteen to the denominator and nothing to the numerator;
   10-09 has no exact first-bag match of ANY opener, so its twenty-nine add nothing to it either,
-  and neither has 10-12, whose three add nothing.
+  and neither has 10-12, whose three add nothing. 10-22 is the first session since 10-03 to move the
+  numerator: one of its two is an exact DT Cannon first bag (m2r7).
   「3 of 5」 must not be carried forward; it was a statement about five rounds, and 「3 of 15」 was
   one about fifteen. 09-17 remains what settles that the corroboration is a property of
   the ROUND rather than of the session, the player or the metric.
@@ -2605,9 +2930,9 @@ sixth, SDPC Spin (`docs/sdpcspin.html`), has no column either (`wiki-openers.jso
 field), and is the opener yachi's Double-first rounds actually are: its test cross-checks against the
 ordering metric's Double-first rounds both ways and against stick spin's bag-1 cases.
 
-The repertoires split, reproduced independently in all seventeen sessions (pinned in `openers.test.ts`):
+The repertoires split, reproduced independently in all nineteen sessions (pinned in `openers.test.ts`):
 **pinglamb opens Honey Cup** more than yachi does, **yachi opens Mountainous Stacking** more than
-pinglamb does **and opens TKI-3 far more** (179 against 9 over the corpus; pinglamb's nine are the
+pinglamb does **and opens TKI-3 far more** (185 against 9 over the corpus; pinglamb's nine are the
 named exceptions below, and 「the only one who plays it at all」 is a sentence this file used to
 carry and can no longer). PCO appears only for yachi, on 07-24, 08-01, 09-19 and 10-03. **The per-session counts are deliberately not
 written here** — read them off `sim/opener-facts.json`, or off the `openers.test.ts` assertions,
@@ -2627,8 +2952,8 @@ nine times, so those are what is published.
 absolute.** 「yachi is the only one who plays TKI-3 at all」 held at pinglamb 0 for eight sessions;
 09-03 has one board of his matching a TKI-3 field EXACTLY, and the outcome column corroborates it
 (`matched_and_delivered` 1 of 1). The ORDINAL claim — yachi opens TKI-3 more than pinglamb — is
-untouched at seventeen sessions and is what `openers.test.ts` asserts; **the 10-against-1 beside it is
-09-03's OWN counts, not a corpus total** (that is 179 against 9). 09-10 and 09-11 put pinglamb back
+untouched at nineteen sessions and is what `openers.test.ts` asserts; **the 10-against-1 beside it is
+09-03's OWN counts, not a corpus total** (that is 185 against 9). 09-10 and 09-11 put pinglamb back
 to 0, and then **2026-09-17 supplies the SECOND exception** — one more board of his matching a
 TKI-3 field exactly, again corroborated by the outcome column (`matched_and_delivered` 1 of 1),
 against yachi's 9 that night. All are named in `TKI3_OFF_REPERTOIRE` rather than absorbed into a
@@ -2638,8 +2963,8 @@ bound, following `DT_ORDER_IN_OPENER`.
 NOTICED.** This paragraph said 「two boards in twelve sessions against yachi's 96」 — a rate of about
 one every six sessions — and kept saying it after 2026-09-19 put **three** of pinglamb's on the
 board in a single night. 09-18 then put three more, and 10-03 one (`replay-2026-10-03-04.ttrm`
-round 6, delivered); 10-09 and 10-12 put none (yachi 11 and 7, pinglamb 0 both nights). The corpus
-total is **179 against 9**,
+round 6, delivered); 10-09, 10-12, 10-20 and 10-22 put none (yachi 11, 7, 3 and 3, pinglamb 0 all four nights). The corpus
+total is **185 against 9**,
 and the nine are 09-03's one, 09-17's one, three each on 09-18 and 09-19, and 10-03's one: **six of
 the nine arrived on two adjacent nights**, which is not a rate of one every six sessions by any
 reading.
@@ -2650,7 +2975,7 @@ Three things follow, and the first is about this file rather than about pinglamb
   `TKI3_OFF_REPERTOIRE` in the test — where the gate reads — and not the prose here, where nothing
   does. That is 冇第二份 exactly: the pinned table was right the whole time and the sentence beside
   it was wrong for a session, and only a hand re-derivation found it.
-* **The ordinal claim is untouched and is still the one to cite.** 179 to 9 is a wider split than
+* **The ordinal claim is untouched and is still the one to cite.** 185 to 9 is a wider split than
   the 96-to-2 it replaces, and `openers.test.ts` asserts the ordering rather than either number.
 * **What is genuinely new is a rate, and it is too young to read.** Three in each of two adjacent
   nights, after eleven sessions holding two between them, is either the start of something or two
@@ -2662,12 +2987,12 @@ counterpart.** PCO is defined by an outcome, so the row splits in two. HOW MANY 
 `clears.allclear`, twice-extracted — see 全消 below. WHEN each landed only the simulator can say, and
 what licenses printing it is that `perfect_clear_timing` compares the simulator's per-round count
 with the replay's own counter for **every** player-round and emits the piece numbers as `null` unless
-all of them agree. They do: **2628/2628 rounds, 307/307 perfect clears**, seventeen sessions, no
+all of them agree. They do: **2814/2814 rounds, 337/337 perfect clears**, nineteen sessions, no
 unknowns.
 `check_opener_section` fails if the piece numbers are published without that agreement figure or
 without harddrop's ten-piece deadline beside them.
 
-The finding is that **9 of the 307 arrived inside that deadline**, all nine on piece 10 exactly,
+The finding is that **9 of the 337 arrived inside that deadline**, all nine on piece 10 exactly,
 and the bulk land on piece 20. These are mid-game perfect clears, not the opener. 08-01 held the
 corpus's only completed PCO (yachi matched the field twice and delivered once) until 10-03:
 yachi's `replay-2026-10-03-13.ttrm` round 1 is an exact PCO first bag, delivered on piece 10.
@@ -2685,6 +3010,10 @@ packets, 1 + 10, where the oracle sends one of 11 — the shape 10-03-04 round 2
 the first-bag metric cannot see them. Their TIMING is still licensed, by the per-round count
 agreement (204/204 for the session), which is what this row has always rested on. **10-12 has 11
 (yachi 6, pinglamb 5), none inside the window** — nine on piece 20 and one each on 15 and 21.
+**10-22 has 25 (pinglamb 22, yachi 3), none inside the window, every one on piece 20** — 25 over 63
+rounds is 39.7%, the highest rate any night holds (09-18's 28.3% was the previous high), and it is
+not a session-length effect: 10-22 is eleventh by size. pinglamb's 22 is two short of his 24 on
+09-18 and 10-03, on less than half their rounds.
 
 **That numerator was 3 for five sessions, 2026-09-10 moved it to 4 and 2026-09-17 moved it to 5,
 so the streak reading is retired for good and the rate reading is what is left.** It once read
@@ -2708,7 +3037,8 @@ earlier session held, and neither put one inside the window; the previous larges
 be: a zero after two ones is
 not a return to anything, and the correct summary is still the rate, which has drifted 1-in-33 to
 1-in-48 and back to 1-in-39, and 10-09's two take it to **9 of 296**, i.e. 1-in-33 again, without
-any session doing anything unusual; 10-12's eleven, none in the window, leave it at **9 of 307**. Note what two long sessions with 68 perfect
+any session doing anything unusual; 10-12's eleven, none in the window, leave it at **9 of 307**,
+and 10-20's five (pinglamb 3, yachi 2, all on piece 20) at **9 of 312**, and 10-22's twenty-five at **9 of 337**. Note what two long sessions with 68 perfect
 clears between them and none in the opener window does say — the window result is not an artefact
 of small per-session counts, which is the one thing the first twelve sessions could not rule
 out.
@@ -2732,9 +3062,9 @@ re-derived from facts.json, so the table cannot print a number no lemma covers. 
 read out of the `.ttrm` independently by both extractors, which is why this one is badged while the
 opener tables are not.
 
-The point is not the count. Across seventeen sessions, **238 rounds had exactly one player with a
-perfect clear and that player lost 90 of them** (10-09 adds 21 and 8 [G088][G090]; 10-12 adds 7 and
-3 [G078][G080]). For the pooled AUC and its corrected p, read the
+The point is not the count. Across nineteen sessions, **266 rounds had exactly one player with a
+perfect clear and that player lost 100 of them** (10-09 adds 21 and 8 [G088][G090]; 10-12 adds 7 and
+3 [G078][G080]; 10-20 adds 5 and 2 [G072][G074]; 10-22 adds 23 and 8 [G082][G084]). For the pooled AUC and its corrected p, read the
 AUC table above rather than this paragraph — this sentence's copy is the one 冇第二份's seventh
 instance names as having gone stale at 「50.67 over 450」 and again at 「51.66 over 634」, which is
 twice in the same sentence, and the fix is to stop keeping a second copy at all rather than to
@@ -2814,7 +3144,7 @@ in-game tick sampled before the round ended, so a survivor's mid-round VS was be
 end-of-round attack count — the asymmetry was in the timestamp, which is exactly why it fell on
 survivors. Re-sourced from `results.aggregatestats` the identity holds to floating point, and the guard
 that fired on **13 of the 760 player-rounds then in the corpus** now fires on
-**<!--stat:vs-guard-->0 of 2628<!--/stat:vs-guard-->**. Do not read that as a reason to
+**<!--stat:vs-guard-->0 of 2814<!--/stat:vs-guard-->**. Do not read that as a reason to
 delete it: the residual does not go to zero, it goes to a quantization floor. The `13` stays a
 six-session figure on purpose — it is a measurement of the data BEFORE the 2026-08-16 re-source
 and there is nothing at 900 for it to be re-derived from; the `0` beside it is re-derived by
@@ -2851,28 +3181,34 @@ on partial stacks, so a 24- or 28-cell opening board can never equal one. Puttin
 "The well column is filled through the rows the spin cleared" cannot fail: a full row *requires*
 every column filled, so that clause counts line clears. That is not a measurement any more — it is
 `NaiveClauseForced` in `spec/DonationCave.dfy`, and the corpus agrees at exactly
-<!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->14176<!--/don:scored--> scored
+<!--don:naive-->100.00%<!--/don:naive--> of all <!--don:scored-->15141<!--/don:scored--> scored
 clears. As a *predicate* — the shipped thresholds (cavity ≥ 4, walled) with the re-opening clause
-deleted — it fires on <!--don:noreopen-band-->28.93-36.84%<!--/don:noreopen-band-->. All the
-discriminating power is in the **re-opening** clause: every filled cell of the column must lie
-inside the cleared rows, so the clear leaves it open surface-to-floor. With it, the rate drops to
-<!--don:shipped-band-->1.54-3.30%<!--/don:shipped-band--> per session
-(<!--don:donations-->366<!--/don:donations--> donations across
-<!--don:sessions-->seventeen<!--/don:sessions--> sessions).
+deleted — it fires on <!--don:noreopen-band-->1.63-2.94%<!--/don:noreopen-band-->. Until 2026-10-25 all the
+discriminating power was in the **re-opening** clause (every filled cell of the column must lie
+inside the cleared rows, so the clear leaves it open surface-to-floor): without it the predicate fired on
+15-21%. Since then a second clause carries most of it, **the well came first** (yachi: 「個窿用 O 塞住嘅時候，
+窿未出現，應該唔算」): when the piece at the bottom of the plug locked, the well under it must already have
+been at least four deep — on the provenance grid right after that lock, less the garbage rows that came in
+on its own tick (`wellAtPlug`). A plug laid on the floor with garbage rising under it later, its hole in
+that column, covered nothing. The two clauses now overlap almost entirely, which is why the band above
+sits just over the shipped one. With both, the rate is
+<!--don:shipped-band-->1.43-2.70%<!--/don:shipped-band--> per session
+(<!--don:donations-->294<!--/don:donations--> donations across
+<!--don:sessions-->nineteen<!--/don:sessions--> sessions).
 
 **Every band above is RENDERED from the seven artefacts, and until 2026-08-24 none of them was.**
 `pipeline/check_donation_bands.py --render` prints each marked fragment; `donation.ablation` in
 every `sessions/*/sim/opener-facts.json` carries that session's own counts. The per-session series
-read <!--don:noreopen-series-->28.93 · 33.64 · 30.99 · 29.74 · 33.27 · 36.84 · 36.13 · 31.96 · 30.89 · 32.03 · 30.02 · 29.67 · 31.62 · 32.04 · 31.30 · 32.98 · 35.75<!--/don:noreopen-series-->
-for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-08-14<!--/don:noreopen-ceiling--> is
+read <!--don:noreopen-series-->2.77 · 2.94 · 2.88 · 2.61 · 2.12 · 1.79 · 2.75 · 1.78 · 2.12 · 1.63 · 2.65 · 2.70 · 2.50 · 2.07 · 1.80 · 1.75 · 2.02 · 2.21 · 2.65<!--/don:noreopen-series-->
+for shipped-minus-re-opening (<!--don:noreopen-ceiling-->2026-07-24<!--/don:noreopen-ceiling--> is
 the ceiling) and
-<!--don:cav1-series-->74.72 · 76.84 · 74.60 · 76.80 · 76.99 · 77.04 · 76.51 · 73.94 · 75.68 · 75.65 · 74.30 · 72.64 · 73.37 · 75.78 · 75.16 · 76.40 · 75.04<!--/don:cav1-series-->
+<!--don:cav1-series-->19.75 · 18.20 · 21.41 · 18.79 · 18.76 · 16.80 · 18.54 · 17.04 · 15.83 · 18.30 · 17.74 · 16.18 · 18.08 · 17.71 · 16.71 · 17.46 · 17.37 · 16.57 · 20.40<!--/don:cav1-series-->
 for the `cavity ≥ 1` composite, whose band is
-<!--don:cav1-band-->72.64-77.04%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
-<!--don:pooled-noreopen-->32.23<!--/don:pooled-noreopen-->, cav1
-<!--don:pooled-cav1-->75.34<!--/don:pooled-cav1--> — a per-session band can break while no pooled
+<!--don:cav1-band-->15.83-21.41%<!--/don:cav1-band-->. Pooled, neither says anything: noReopen
+<!--don:pooled-noreopen-->2.23<!--/don:pooled-noreopen-->, cav1
+<!--don:pooled-cav1-->17.90<!--/don:pooled-cav1--> — a per-session band can break while no pooled
 number moves, which is why the series is published beside them. A session above
-<!--don:cav1-ceiling-->77.04<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
+<!--don:cav1-ceiling-->21.41<!--/don:cav1-ceiling--> moves that band and the fix is a paste.
 
 **The bands are quoted at two decimals on purpose, and rounding them cost the third defect.** At one
 decimal the shipped band was published as 「2.1-3.3%」 while its floor is 2.08 — a band's low end
@@ -2916,20 +3252,31 @@ for the live values.
 named setups 17 draw a four-cell cavity and 3 draw five, never three or six; and requiring *every*
 cavity row to be walled drops TSS L Donation, which the page draws as a donation.
 
+**No column is excluded for holding the T, and every plug cell must be a complete piece (since 2026-10-25, yachi:
+「跟 harddrop 都計，但要完整 pieces」).** harddrop's Donation page lets the T be part of the plug — J Donation 2, T
+Donation and Example 2 put the well under the T's arm, and its Shachiku_Train page's 「Donation T-Spin Double」 plugs it
+with the nub — so the code no longer skips the T's own slot (it did, by its first version) and no longer skips any T
+column (#88 did, for one day). In its place, `plugComplete`: every cell plugging the well inside the cleared rows that is
+not the T must carry a lock index whose four cells are all still on the board in the provenance grid before the T
+(`provSnaps[i - 1]`), so garbage (`-1`) and a fragment a line clear left behind are no plug. `PlugIncomplete` in
+`spec/DonationCave.dfy` mirrors it, `openers.test.ts` asserts it bites on every harddrop positive (the plug re-labelled
+as garbage, or split, stops being a donation on the same occupancy), and the technique tests' `donationVerdict` reads
+the digest's ownership grid (`shachikutrain-qualify.ts`'s `owners`) and calls the failure `incomplete`. The ablations
+keep the clause (only `naive` drops it, being the whole naive reading), so every band above moved with it.
+
 **Nearly every donation in this corpus sits on a garbage-derived well, and 2026-09-10 is the
 session that ended the absolute**
-(<!--don:latest-garbage-->10-12 adds 14 of 14<!--/don:latest-garbage-->;
-**<!--don:self-built-->3 of 366<!--/don:self-built-->** self-built corpus-wide).
-This sentence read 「every donation … 0 self-built, every session」 for nine sessions. All three
-exceptions are yachi's, all mid-game `natural` plugs, and none is a prefix-edge effect —
-`replay-2026-09-10-01.ttrm` r6 plugs a 4-cell cavity at lock 40 of a prefix verified to 64,
-`replay-2026-09-10-07.ttrm` r7 a 5-cell cavity at lock 75 of one verified to 82, and 09-11 adds
-the third. They are named in
-`SELF_BUILT_WELLS` in `openers.test.ts` rather than absorbed into a bound, following
-`DT_ORDER_IN_OPENER`; 09-17, 09-18, 09-19, 10-03, 10-09 and 10-12 each add none — so the list is unchanged at seventeen
-sessions, and the three long sessions' zeros are what carry weight: 120 donations across those
-three nights, 32% of the corpus's 366 (34% of 352 at sixteen, 37% of 322 at fifteen), and not one of them
-self-built. **The same
+(<!--don:latest-garbage-->10-22 adds 15 of 15<!--/don:latest-garbage-->;
+**<!--don:self-built-->18 of 294<!--/don:self-built-->** self-built corpus-wide).
+This sentence read 「every donation … 0 self-built, every session」 for nine sessions; 09-10 and 09-11
+held the first three, all yachi's mid-game `natural` plugs (`replay-2026-09-10-01.ttrm` r6 plugs a
+4-cell cavity at lock 40 of a prefix verified to 64, `replay-2026-09-10-07.ttrm` r7 a 5-cell cavity
+at lock 75 of one verified to 82). Counting the T's columns again (2026-10-25) took the list to ten
+sessions and both players (measured, not explained). They
+are named per session in `SELF_BUILT_WELLS` in `openers.test.ts` rather than absorbed into a bound,
+following `DT_ORDER_IN_OPENER`; read the counts there, never here. The three long sessions hold 81
+of the 294, and 09-18 carries four of the self-built ones — so 「not one of them self-built」, which
+this paragraph said of those nights until then, is no longer true either. **The same
 absolute was also written into every per-session artefact**, in
 the `donation.caveat` string, which is the `29-34%` defect exactly: a corpus claim inside a file
 that cannot see the corpus. The caveat now points at the per-player `garbage_derived_well` /
@@ -2960,13 +3307,13 @@ cave runs). The proof also shows the code assumes more than it needs: **maximali
 any cleared row above the run roofs it, and a Double always has two full rows. `IsMaxCleared` and the
 two-row hypothesis are kept for fidelity to `caveAt`, not because the argument rests on them.
 
-Two cross-tabs, and the section may print neither number without both: **by depth**, 164 of the 166
-width≥3 hits are one row deep — a dimple, not a cave — leaving **2 genuine caves in 2628
+Two cross-tabs, and the section may print neither number without both: **by depth**, 175 of the 177
+width≥3 hits are one row deep — a dimple, not a cave — leaving **2 genuine caves in 2814
 player-rounds** (see below for the second); **by lines**, the same gap appears under T-spin Triples
-at a *higher* RATE (9.0% vs 1.7% on 08-09; pooled over the seventeen sessions, 151 hits on 2132
-scored Triples is 7.08% against 166 on 10058 scored Doubles, 1.65%), where it is ordinary TST residue.
+at a *higher* RATE (9.0% vs 1.7% on 08-09; pooled over the nineteen sessions, 164 hits on 2291
+scored Triples is 7.15% against 177 on 10736 scored Doubles, 1.64%), where it is ordinary TST residue.
 A shape that fires more often under the spin the technique is not about is a shape test — and the
-Triple-side rate is the higher one in **every one of the seventeen sessions**.
+Triple-side rate is the higher one in **every one of the nineteen sessions**.
 
 (**That is a rate claim, and the RAW counts beside it used to be read as one.** Through fifteen
 sessions the pooled raw counts also pointed the same way (136 against 131); at sixteen they
@@ -2977,7 +3324,8 @@ raw-count statement and false when written, since 08-01 (4 against 8), 08-25 (6 
 09-03 (5 against 6) and 09-19 (19 against 20) were lower on the Triple side too — six of sixteen
 sessions on raw counts once 10-09 (10 against 31) is added, none on rate. 10-12 (5 against 4) is
 not one of them, so it is six of seventeen, and the pooled raw counts stay reversed at 151 against
-166. (The first version of
+166; nor is 10-20 (8 against 6), so six of eighteen, at 159 against 172; and 10-22 (5 against 5) is level on raw counts and
+higher on rate, so six of nineteen, at 164 against 177. (The first version of
 THIS correction named only 08-01 and 08-25, missing 09-03 and 09-19 — the latter already landed
 when the 09-18 sentence was written; re-derived from `stmb_cave` in every opener-facts.json.) 冇第二份's eighth class once
 more — a superlative over a per-session list nobody had re-derived — and the reason the pair is
@@ -2996,7 +3344,7 @@ existed.** pinglamb, `replay-2026-10-09-01.ttrm` round 5, lock 55 of a prefix ve
 T-spin Double clearing two rows over a gap 3 wide and 2 deep to the floor in columns 2-4, offset
 from the T over columns 3-5 — the drawn shape, not a dimple. It is mid-game, so the CAVE claim
 below (no genuine cave inside the opener window) is untouched. The session's other 30 width≥3 hits
-are all `min_depth` 1 (as are 10-12's four), so 「dimple, not cave」 survives at 164 of 166; what does not survive is
+are all `min_depth` 1 (as are 10-12's four, 10-20's six and 10-22's five), so 「dimple, not cave」 survives at 175 of 177; what does not survive is
 「exactly one, the same single one」, which this paragraph and the window section both said, and
 which was a count, not a law.
 
@@ -3009,12 +3357,12 @@ category makes for the ordering metric. All three category counts are recorded a
 
 Both metrics are licensed by one check: the per-lock board snapshot plus the lock's cells must make
 exactly the rows full that the engine independently recorded clearing. Different state, so it is a
-real gate — **14176/14176 across seventeen sessions**, and a spin it cannot reconstruct is dropped, never
+real gate — **15141/15141 across nineteen sessions**, and a spin it cannot reconstruct is dropped, never
 scored. (This line read **3379/3379** until 2026-08-14. 3379 is the *whole-round* T-spin clear total
 over the five sessions there were then; the check is scoped to the verified prefix, which was 3142.
 The figure was written from a whole-round probe and matched no committed artefact —
-`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 15219, so
-the two still differ by 1043. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
+`donation.check.tspin_clears` is what sums to the gate, and the whole-round total is now 16281, so
+the two still differ by 1140. Nothing caught it because CLAUDE.md is prose: a gate figure quoted here
 is not the gate.)
 
 ### 分母錨咗 replay 自己數嘅 counter — the one part of this section that is not simulator-only
@@ -3028,13 +3376,13 @@ player-round, per kind, over the whole round:
 
 | | |
 |---|---|
-| rounds where every kind agrees | **2628 / 2628** (seventeen sessions, no unknowns, 0 unclassified sim clears) |
-| whole-round T-spin clears, sim vs replay | **15219 = 15219** |
-| what the verified prefix scores of them | **14176**, i.e. **93.14%** coverage (floored) |
+| rounds where every kind agrees | **2814 / 2814** (nineteen sessions, no unknowns, 0 unclassified sim clears) |
+| whole-round T-spin clears, sim vs replay | **16281 = 16281** |
+| what the verified prefix scores of them | **15141**, i.e. **92.99%** coverage (floored) |
 
 So the two tables' **denominator** leaves quarantine: `tspin_clears_scored` is now a subset of a
 total the trust chain already carries, and 「可核覆蓋」 names the subset. This is the
-`perfect_clear_timing` pattern (2628/2628 against `clears.allclear`) applied to a denominator
+`perfect_clear_timing` pattern (2814/2814 against `clears.allclear`) applied to a denominator
 instead of a timing.
 
 **The numerators do not.** Which clear was a donation, and how wide the gap under it was, still come
@@ -3065,20 +3413,20 @@ verified.
 
 **What is published is the confusion matrix, never the agreement rate**, and that distinction is the
 whole finding. Both verdicts are rare —
-<!--dual:rare-->166 caves and 366 donations in 14176 scored clears<!--/dual:rare--> — so an
+<!--dual:rare-->177 caves and 294 donations in 15141 scored clears<!--/dual:rare--> — so an
 overall rate is negatives agreeing with negatives. Split by the oracle's own verdict:
 
 | | overall | **on the positives** |
 |---|---|---|
-| cave | <!--dual:cave-overall-->5929/5929 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->69 / 69<!--/dual:cave-pos-->** |
-| donation | <!--dual:don-overall-->5716/5929 (96.5%)<!--/dual:don-overall--> | **<!--dual:don-pos-->23 / 145<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->15.9%<!--/dual:don-pos-pct-->) |
+| cave | <!--dual:cave-overall-->6331/6331 (100%)<!--/dual:cave-overall--> | **<!--dual:cave-pos-->75 / 75<!--/dual:cave-pos-->** |
+| donation | <!--dual:don-overall-->6137/6331 (97.0%)<!--/dual:don-overall--> | **<!--dual:don-pos-->21 / 71<!--/dual:don-pos-->** (<!--dual:don-pos-pct-->29.6%<!--/dual:don-pos-pct-->) |
 
-The donation's overall rate is **<!--dual:don-bothno-->5693 of 5716<!--/dual:don-bothno-->**
+The donation's overall rate is **<!--dual:don-bothno-->6116 of 6137<!--/dual:don-bothno-->**
 agreements being both engines saying "no". On the thing the
-table actually counts the two engines disagree about **four donations in five** — the opposite
+table actually counts the two engines disagree about **seven donations in ten** — the opposite
 reading from the one the rate gives, and the same failure mode as a detector clause entailed by its
 siblings. `openers.test.ts` asserts `both_no / overall_agreements > 0.99` (it is
-<!--dual:bothno-share-->0.9959<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
+<!--dual:bothno-share-->0.9965<!--/dual:bothno-share--> over the whole corpus, as rendered) so a future change cannot
 quietly make the rate look meaningful, and `DUAL_ENGINE_MARKER`
 fails the build if the section prints a rate without the sentence saying what is in its denominator.
 `pipeline/check_dual_engine.py` asserts the same bound a second way — **it fails if `both_no` stops
@@ -3086,17 +3434,17 @@ dominating while the section still prints the rate**, because the bound is what 
 beside the table true and not merely what the number happens to be.
 
 **Neither metric leaves quarantine on this.** The hand-port verifies a far shorter prefix
-(<!--dual:prefix-->25.6 locks against 81.8<!--/dual:prefix--> on average), so the comparison reaches
-**<!--dual:coverage-->5929 of 14176<!--/dual:coverage-->** scored clears — cave's
-<!--dual:cave-of-corpus-->69 of the corpus's 166<!--/dual:cave-of-corpus-->. It is a check on the
+(<!--dual:prefix-->25.6 locks against 81.9<!--/dual:prefix--> on average), so the comparison reaches
+**<!--dual:coverage-->6331 of 15141<!--/dual:coverage-->** scored clears — cave's
+<!--dual:cave-of-corpus-->75 of the corpus's 177<!--/dual:cave-of-corpus-->. It is a check on the
 verdicts, not a re-scoping of the tables,
 exactly as the counter anchor licenses a denominator without redefining it. What it buys the
 donation table is a *caveat it did not have*: the one metric here with no second implementation
 backing it, stated as a measurement.
 
 **The disagreement is the BOARD, not the predicate, and that is what `board_split` says.** Only
-**<!--dual:same-board-->3315 of the 5929<!--/dual:same-board-->** comparison points put the two
-engines on the same board, so at **<!--dual:diff-share-->44.0%<!--/dual:diff-share-->** of
+**<!--dual:same-board-->3555 of the 6331<!--/dual:same-board-->** comparison points put the two
+engines on the same board, so at **<!--dual:diff-share-->43.8%<!--/dual:diff-share-->** of
 them they are judging boards that differ cell for cell (median
 <!--dual:diff-median-->12<!--/dual:diff-median--> cells), and every figure in the
 table above is read inside that. Split the positives by board equality and the donation resolves
@@ -3104,8 +3452,8 @@ completely:
 
 | | positives | on identical boards | agree | **agree · identical** | **agree · differing** |
 |---|---|---|---|---|---|
-| cave | <!--dual:row-cave-->69 | 9 | 69/69 | 9/9 | 60/60<!--/dual:row-cave--> |
-| donation | <!--dual:row-don-->145 | 15 | 23/145 | 15/15 | 8/130<!--/dual:row-don--> |
+| cave | <!--dual:row-cave-->75 | 11 | 75/75 | 11/11 | 64/64<!--/dual:row-cave--> |
+| donation | <!--dual:row-don-->71 | 21 | 21/71 | 21/21 | 0/50<!--/dual:row-don--> |
 
 So the two engines do not disagree about what a donation *is* — they disagree about the board, which
 is `oracle-source.ts`'s garbage-hole problem showing through. **The cave's row is a different claim
@@ -3141,7 +3489,7 @@ engines, "the hand-port leaves it empty on most clearing locks". Measured: **0 e
 `sim.ts` pushes a record only inside the clear branch, and twice on an all-clear bonus, so the
 alignment holds **0 of 5472** times there and `records[i]` reads an unrelated record. Looked up by
 the lock's own **frame**, the hand-port passes the strong check at that call site on every
-comparable lock — **<!--dual:strong-licence-->5929 of 5929<!--/dual:strong-licence-->** over the whole
+comparable lock — **<!--dual:strong-licence-->6331 of 6331<!--/dual:strong-licence-->** over the whole
 corpus (the per-session figures are each session's
 `locks_comparable`, so the artefacts cross-check it and this number tracks them), so
 `dualVerdict` now uses the same reconstruction
@@ -3167,45 +3515,50 @@ Two things that follow, and both are load-bearing:
 Three metrics answer "opener or mid-game" three different ways, and only one of them used to answer
 it at all:
 
-- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 9 of 307 inside it.
+- **全消** always did: `pco_window_locks = 10`, `within_pco_window` per player, 9 of 337 inside it.
 - **The ordering metric did NOT.** Its spins are filtered to lock ≤ `WINDOW_PIECES` before counting,
   so mid-game pairs were *excluded rather than counted*, and「先 Triple 後 Double」 was a claim about
   openings that a reader had no way to check — it reads identically to a claim about how these
   players throw T-spins at any point in a round, and the two mean completely different things about
-  the C-Spin. `ordering.players[].mid_game` is the missing control. **Inside the window 1519 rounds
-  hold both spins and 1452 run Triple-first — 69 exceptions in seventeen sessions, four of
-  them corroborated by the first-bag metric (see above); outside it, 64 rounds hold
-  both and the order goes BOTH ways (51 Triple-first, 40 Double-first — a round can register both,
-  so these do not sum to 64, and since 2026-09-10 that is true INSIDE the window too).** The rate of
+  the C-Spin. `ordering.players[].mid_game` is the missing control. **Inside the window 1629 rounds
+  hold both spins and 1556 run Triple-first — 75 exceptions in nineteen sessions, five of
+  them corroborated by the first-bag metric (see above); outside it, 70 rounds hold
+  both and the order goes BOTH ways (55 Triple-first, 45 Double-first — a round can register both,
+  so these do not sum to 70, and since 2026-09-10 that is true INSIDE the window too).** The rate of
   Double-first orders is still more than an order of magnitude higher outside the window than
-  inside it when POOLED — 4.54% against 62.5%, about 13.7× — **but that is a pooled sentence pinglamb
-  carries, and it must say so.** Per player: pinglamb 6 of 886 (0.67%) inside against 9 of 24
-  outside, about 55×; yachi 63 of 633 (9.95%) against 31 of 40, about 7.7×. 「Near-unanimous
+  inside it when POOLED — 4.60% against 64.3%, about 14.0× — **but that is a pooled sentence pinglamb
+  carries, and it must say so.** Per player: pinglamb 6 of 949 (0.63%) inside against 12 of 27
+  outside, about 70×; yachi 69 of 680 (10.15%) against 33 of 43, about 7.6×. 「Near-unanimous
   Triple-first inside the window」 is pinglamb's property; it was yachi's too through 09-19 (13 of
-  469, 2.8%) and is not since 10-03 (50 of 164, 30.4%, one repeated 0-based Single 6 / Double 12-13 /
-  Triple 18-20 opener on three nights — stick spin, see 「C-Spin 同 DT 砲」 — 10-03's eighteen, of
-  which sixteen are that opener, 10-09's twenty-nine and 10-12's three).
+  469, 2.8%) and is not since 10-03 (56 of 211, 26.5%, mostly one repeated 0-based Single 6 / Double 12-13 /
+  Triple 18-20 opener on five nights — SDPC Spin, see 「C-Spin 同 DT 砲」 — 10-03's eighteen, of
+  which sixteen are that opener, 10-09's twenty-nine, 10-12's three, 10-20's four and one of
+  10-22's two, the other an exact DT Cannon).
   **The test used to assert a pooled 20× ratio, and 2026-10-09 broke it (about 93× at twelve
-  sessions, 22× at fifteen, 14× at sixteen, 13.7× at seventeen).** The bound was not lowered and was not kept: the 20
+  sessions, 22× at fifteen, 14× at sixteen, 13.7× at seventeen, 13.2× at eighteen, 14.0× at nineteen).** The bound was not lowered and was not kept: the 20
   was never a claim, only 「a twentieth」 borrowed from `DT_RIVALS_CSPIN_AT`, sitting about 5× under
   the measurement the day it was typed, and it passed pooled only because pinglamb's rounds carried
   yachi's. `openers.test.ts` now asserts what the test's name says — the window SEPARATES opening
   from mid-game — **per player**, as a one-sided exact Fisher test at α = 0.05 Bonferroni-corrected
-  over the players (the AUC table's convention, fixed before the data): p ≈ 3e-21 for yachi and
-  6e-12 for pinglamb at seventeen sessions (5e-21 and 1e-10 at sixteen; ceiled, R's
-  `fisher.test`). What would have to be true for it to fire, outside counts held fixed: yachi's
-  inside DT count reaching about 387 of 633 (61%), pinglamb's about 164 of 886 (18%), i.e. a
+  over the players (the AUC table's convention, fixed before the data): p ≈ 4e-22 for yachi and
+  3e-16 for pinglamb at nineteen sessions (2e-20 and 2e-13 at eighteen, 3e-21 and 6e-12 at
+  seventeen, 5e-21 and 1e-10 at sixteen; ceiled, R's `fisher.test`, and an independent exact
+  implementation that reproduces the eighteen-session pair). What would have to be true for it to fire, outside counts held fixed: yachi's
+  inside DT count reaching about 414 of 680 (61%), pinglamb's about 239 of 949 (25%), i.e. a
   player whose openings are as Double-first as his mid-game. A drift short of that is not that
   test's job: every Double-first round is still pinned by name in `DT_ORDER_IN_OPENER`, which is
   where near-unanimity was always really gated. Hand-summed from `ordering.players[]` and its
   `mid_game` in each artefact, and pinned as per-player quartets in the test — re-derive when a
-  session lands. (`DT_RIVALS_CSPIN_AT`, the sibling pooled 20× bound, still has three DT rounds of
-  headroom at seventeen — 69 × 20 = 1380 against 1452, 66 × 20 = 1320 against 1391 at sixteen — and
-  yachi alone is 63 against 570. The sentence that stood here said 「the next session like 10-09
+  session lands. (`DT_RIVALS_CSPIN_AT`, the sibling pooled 20× bound, has TWO DT rounds of headroom at
+  nineteen — 75 × 20 = 1500 against 1556, after 73 × 20 = 1460 against 1480 at eighteen,
+  69 × 20 = 1380 against 1452 at seventeen and 66 × 20 = 1320 against 1391 at sixteen — and yachi
+  alone is 69 against 611. 10-20's four took three rounds of headroom down to one on a 30-round
+  night; 10-22's two DT rounds against 76 C-Spin orders took it back up to two, and a session with
+  three more Double-first openers than C-Spin orders allow breaks it. The sentence that stood here said 「the next session like 10-09
   will break it」; 10-12 was not one like 10-09 (3 Double-first openers, not 29), so it did not, and
   the prediction stays a conditional rather than a forecast. Decide it the same way when one does.)
-- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:2.3
-  (112 in-opener, 254 mid-game), so it is not purely mid-game.
+- **Donation / STMB Cave** now carry `in_opener` / `mid_game` too. Donation splits about 1:5.5
+  (45 in-opener, 249 mid-game), so it is not purely mid-game.
 
 **The cave's window result was an absolute for six sessions and 2026-08-19 broke half of it. Read
 the two halves apart — they are not one claim.**
@@ -3219,21 +3572,21 @@ the two halves apart — they are not one claim.**
   and both on lock 21, the last lock inside the window: `replay-2026-10-03-02.ttrm` round 2 and
   `replay-2026-10-03-04.ttrm` round 1, prefixes verified to 33 and 58. 10-12 adds the eighth, the
   third on lock 21: `replay-2026-10-12-04.ttrm` round 2, yachi, prefix verified to 102. All eight
-  are width exactly 3, `minDepth` 1. Corpus-wide the width≥3 hits are now **166: 158 outside the
+  are width exactly 3, `minDepth` 1. Corpus-wide the width≥3 hits are now **177: 169 outside the
   window, 8 inside** — 09-17, 09-18 and 09-19 added five, thirteen and twenty, every one of them
-  outside, 10-03 eighteen, two of them inside, 10-09 thirty-one, every one outside, and 10-12
-  four, one of them inside.
+  outside, 10-03 eighteen, two of them inside, 10-09 thirty-one, every one outside, 10-12
+  four, one of them inside, 10-20 six, every one outside, and 10-22 five, every one outside.
 - the **CAVE** claim — "no genuine cave falls inside the opener window". **STILL UNBROKEN** at
-  seventeen sessions, and it is the one the section's sentence rests on. All eight hits are `minDepth`
-  1, i.e. dimples; every session from 07-28 to 10-03, and 10-12, has `min_depth_ge_2` **0** (08-19 is only where
+  nineteen sessions, and it is the one the section's sentence rests on. All eight hits are `minDepth`
+  1, i.e. dimples; every session from 07-28 to 10-03, and 10-12, 10-20 and 10-22, has `min_depth_ge_2` **0** (08-19 is only where
   the in-opener exception list starts); and the corpus
-  holds **two** genuine caves in 2628 player-rounds — the original one and 10-09's (pinglamb,
+  holds **two** genuine caves in 2814 player-rounds — the original one and 10-09's (pinglamb,
   `replay-2026-10-09-01.ttrm` round 5, lock 55) — neither of them in an opener. 10-09 is the first
   session since 07-24 — the one holding the original cave — with `min_depth_ge_2` above zero, and it carries no in-opener exception, so
   the test's coupling (an exception-carrying session must have no genuine cave) is not engaged.
   None of 09-10, 09-17, 09-18 or 09-19 added an exception, so the SHAPE list sat
   at five for four sessions while its denominator grew fourfold; 10-03 takes it to seven, 10-09
-  leaves it there and 10-12 takes it to eight.
+  leaves it there, 10-12 takes it to eight and 10-20 and 10-22 leave it there.
   So harddrop's filing of the technique under `Mid-game T-Spin setups` is still a measurement and
   not a citation — what was lost is the right to state it as an absolute over the *raw width
   column*, which is the trap `width_ge_3` sets everywhere else in this file arriving from a new
@@ -3272,18 +3625,18 @@ eight events across four shapes are still not one.
 `ordering_full_round` is **not** the mid-game counterpart and must not be read as one — it applies
 the *same* window (0-based locks 0-21, see the lock-numbering note above) and only drops the verification requirement, so its numbers are within a
 round of `ordering`'s rather than identical, which is the whole of what dropping verification buys:
-**1524 / 1457 / 69** against `ordering`'s **1519 / 1452 / 69** (rounds with both · C-Spin order ·
-DT order, summed over the seventeen committed artefacts). Five extra rounds clear the window
+**1635 / 1562 / 75** against `ordering`'s **1629 / 1556 / 75** (rounds with both · C-Spin order ·
+DT order, summed over the nineteen committed artefacts). Six extra rounds clear the window
 unverified: 08-01's one, which stood alone from six sessions through twelve, plus two from 09-18,
-one from 09-19 and one from 10-12; 10-03 and 10-09 add none. (This sentence still said 「one extra round」 for the two
+one from 09-19, one from 10-12 and one from 10-22 (pinglamb's); 10-03, 10-09 and 10-20 add none. (This sentence still said 「one extra round」 for the two
 sessions after 09-18 and 09-19 landed — 冇第二份 again, a count re-derivable from the artefacts
 that nobody re-derived.) It answers "did the verified prefix
 manufacture this", not "what happens later in the round" — and the answer being *a handful of
 rounds*, not zero, is what makes it evidence instead of a tautology.
 
-**The mid-game denominator is 64 rounds corpus-wide, so it is printed as counts and never as a rate**
+**The mid-game denominator is 70 rounds corpus-wide, so it is printed as counts and never as a rate**
 — rounds usually end before accumulating both spin types that late, and the verified prefix truncates
-what is left. Same rule 全消 follows for its 3-12 round denominators; two of the seventeen sessions
+what is left. Same rule 全消 follows for its 3-12 round denominators; two of the nineteen sessions
 (07-24, 08-01) have no such round at all, which renders as an absence rather than a zero.
 
 New claim families go at the **end** of `generators.py`. `build_claims` numbers claims in FAMILIES
@@ -3303,6 +3656,38 @@ A `SECTIONS` entry's anchor must be a **marker comment**, not a `<section id=…
 id="coaching">` lives inside the coaching region, so anchoring there inserts the new block into a
 span a later pass rewrites: `build_report` prints `inserted: <name>` and the finished file contains
 nothing at all.
+
+## 定式路線同中盤手法 — the one quarantined section ABOVE the trust chain, and the advice written from it
+
+`pipeline/routes_techniques_section.py`, region `routes-techniques`, inserted right after 數據對決
+(before the moments region's BEGIN marker; in `SELF_INSERTING`, because a filtered subset has no
+`sim/` directory and gets none). It prints one night's slice of the corpus route and technique
+artefacts (`pipeline.sites`' lists, read through `replay_labels.load_sources`): per opener, the rounds
+whose bag 1 matched and how many reached bag 2, bag 3 or a drawn Perfect Clear inside the verified
+prefix; per technique variant, the hits over the night's scored TSDs (`opener-facts.json`
+`stmb_cave.players[].tspin_doubles_scored`; a TSS variant has no per-night count and the cell says so),
+how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
+a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
+moment. A technique whose artefact carries `qualify` (all nine since 2026-10-23) counts ONLY the hits that pass its build
+rules — in the table, the per-match strip and 數據對決's chart (`routes_techniques_charts.py`) alike — and
+prints the shape-only hits beside them as 「另外 N 次個形對到但唔算砌出嚟」, so a night's window hits are never
+read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
+strip kept showing the raw ones). No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
+— and it sits early only because 建議 cites it.
+
+**建議 has a second kind of item, and it is the one place hand prose cites simulator figures.** A
+`prose/coaching.json` column may carry `sim_recs`; `coaching.py` renders them after the proved `recs`,
+numbered on, each opening with `coaching.SIM_TAG` (「未經證明」, linking to the section), and adds
+`SIM_NOTE` and a `#coaching .cs-*` style. `pipeline/check_routes_techniques.py` gates both halves: the
+region is a re-render with its eyebrow, title and `REQUIRED` sentences and no badge; every authored
+item renders once with its tag (and the tag appears nowhere else), carries no badge, and **every Arabic
+figure in it is a figure the region prints**. That last check is membership over the region's printed
+numbers, not a match to the right cell — so write a tagged item's figures only from the cell it talks
+about, use Arabic digits for every count so the check sees them, and never a total the cell does not
+print (「冇接到嗰 5 次」 when the cell prints only the reasons is exactly the sentence it cannot catch).
+The items are corpus-artefact-dependent: re-emitting any route or technique artefact moves every
+night's region, `build_report --check` goes red, and each night's tagged items must be re-read against
+the new cells, not just rebuilt.
 
 ## 重播 — the animated replay, the third quarantined section
 
@@ -3328,12 +3713,28 @@ verified prefix is shown as a boundary on the board, not as a ✓.** It is what 
 walk in `verified-prefix.ts` reached; `verifiedIndex` is now that walk's projection, not a second
 copy of it.
 
+**The whole-night page labels openers and mid-game techniques in its key moments** (`pipeline/replay_labels.py`,
+since 2026-10-22): an `opener` moment at every route stage a case reached inside the verified prefix (bag-1 board,
+bag-1 T-spin, bag-2 board, each snapshot, a drawn Perfect Clear) and a `technique` moment just before every
+technique hit's T, read from the route and technique artefacts in `pipeline/sites.py` — the ONE list of sites,
+which `bin/build-docs` now imports instead of keeping its own. Every label is re-checked against the page's own
+decode (`decode_boards`; the board equals the drawing by occupancy in the recorded hand, or the technique window
+fires through `window_fires`), and a label that fails is a build error, so `build-docs --check` runs all of them;
+`python3 -m pipeline.replay_labels --selftest` plants a wrong lock, hand and a stale artefact. Several pages
+matching one board are joined in ONE moment, never chosen between; the page must carry `replay_labels.SENTENCE`
+(no label is no evidence the opener was not played). A technique hit that fails its artefact's `qualify` rules (every technique page) gets no key
+moment at all (since 2026-10-23, yachi's call: every 社畜 window hit in the corpus failed them, so the labels only ever said
+「not this technique」); the artefact still holds each one, and the selftest flips one to qualifying and
+must see a label appear. The report's 最癲一局 region passes no labels and is unchanged.
+TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
+which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
+
 The engine hooks the emitter needs are **opt-in**. `createEngine`'s `date` defaults to the wall clock
 as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json` re-emits
 byte-identical. Keep it that way. The emitter reads the engine directly; it does not change what
 `runCaseOracle` returns.
 
-## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み、SDPC Spin）— the opener route pages, quarantined like the replays
+## 定式路線頁（迷走砲、はちみつ砲、山岳積み2号、stick spin、ガムシロ積み（兩個版本）、SDPC Spin）— the opener route pages, quarantined like the replays
 
 Six opener pages are transcribed and matched against the corpus — five from shiwehi.com, 迷走砲
 (Stray Cannon, `meisou.php`), はちみつ砲 (Honey Cup, `honeycup.php`), 山岳積み2号 (Mountainous
@@ -3776,6 +4177,35 @@ The named lists are `BAG2_NONE_UNEXPLAINED`, `NOT_TRIPLE_FIRST`, and the measure
 `no180` is a control; `ignoreConditions` is a MUTANT here, as on はちみつ砲: the bag-1 no-hold orders
 (J before S, Z before T) are not forced by gravity.
 
+### ガムシロ積み（harddrop 版）
+
+The same deliverable for harddrop's own `Gamushiro_Stacking` page, read as wikitext and pinned by
+revision like SDPC Spin's (`source.revision_sha1`, so `check_wikitext_sources` discovers it and
+refetches it weekly): `pipeline/openers/hdgamushiro-routes.json` (gated by
+`extract_hdgamushiro_routes.py`), `analysis/hdgamushiro-facts.json` (`hdgamushiro.test.ts`),
+`analysis/hdgamushiro-demos.json` (`hdgamushiro-demos.test.ts`), and `docs/hdgamushiro.html` plus
+`hdgamushiro-bag1-only.html` and `hdgamushiro-demos.html`. It was added because a 2026-10-27 video
+yachi sent plays ガムシロ積み into a Perfect Clear, and harddrop draws the PC routes shiwehi.com's
+page does not. Counts are read off the artefacts and tests, never typed here.
+
+**It is the same opener as the shiwehi page, so it is a PAGE-ONLY site.** Its bag 1 and its first
+bag-2 form (`2.a1`, `2.a2`) equal shiwehi's (`bag1.*`, `2.normal#1/#2`) cell for cell with every `U`
+read as empty — that is its cross-source, a new `routes_file` route in `route_transcription.py`
+naming the pairs — and `hdgamushiro.test.ts` holds the two artefacts' bag-1 cases, opportunities and
+`2.a1` / `2.normal#1` counts equal. So it is in `pipeline.sites.PAGE_ONLY_ROUTE_SITES`: a card on the
+index (`INDEX_ROUTE_SITES`, beside gamushiro's) and NO report column and NO replay label, which
+would repeat gamushiro's on every session. Forms B, C and D and their PC lists have no second source,
+and the page says so. The two pages link to each other (`route_page`'s opt-in `see_also`).
+
+**The PC lists are not exhaustive and the transcription says so.** Each list states a count of
+minimal solutions larger than the boards it draws; the rest is a `text_only` node per list
+(`2.<x>.pc.rest`), never a board, and the gap is a named discrepancy (`stated_vs_drawn`,
+`non_exhaustive`). Boards on the wiki page this repo does not transcribe are recorded with a reason
+(`boards_not_transcribed`), and the selftest's synthetic snapshot reinserts them so a skipped board
+cannot hide an edit. `TSD_NOT_FIRED` names the three PC patterns the planner builds without their
+TSD, each with the measured reason; `ignoreConditions` and `no180` are controls here, `noSwapDeal`
+equivalent. Named lists and their sizes live in the two tests.
+
 ### SDPC Spin
 
 The same deliverable for harddrop's `SDPC_Spin` page (an opener by Ecchou; categories T-Spin openers,
@@ -3829,6 +4259,24 @@ dispatch only, because a per-push network check would make every build depend on
 missing `snapshot_bytes`, HTTP 403, a missing revision, a network error, a board edited under re-pinned
 hashes) runs on every push in `docs`. ガムシロ積み's harddrop cross-source pins an oldid but no
 `revision_sha1`, so it is not discovered — a control in the selftest.
+
+**Since 2026-10-19 it re-reads the technique transcriptions too, and only their wikitext half.** Every
+`*-technique.json` holding, anywhere in it, an object with both `oldid` and `revision_sha1` is discovered
+by that structure (the record's role is its dotted path, e.g. `cross_source.harddrop`), never by a list;
+each pinned revision gets the same fetch / sha1 / sha256 / bytes / latest checks, and then the extractor
+(`extract_<key>_shapes`) runs with `--wikitext-dir`, not `--html-dir`, because the technique's own page is
+shiwehi.com HTML that no `api.php` call returns. `--wikitext-dir` runs the spec's opt-in `wikitext_checks`
+alone (`technique_transcription.TechniqueSpec`) and FAILS by name when a spec declares none, so a
+discovered record is never passed with nothing re-parsed. Every snapshot the file records that is not a
+pinned revision is printed as a `gap` line: the shiwehi page (and any other non-wiki page) is still
+re-checked only by a person running `--html-dir` with a refetch. The selftest adds the structural
+discovery cases (a pin nested inside a list is found at its path; the same record without
+`revision_sha1` is not, and is a gap; a file with no pin is not discovered) and, for every discovered
+technique whose spec declares the opt-in `synthetic_wikitext`, the record-level mutants and a board edited
+under re-pinned hashes, which only the extractor's re-parse can see (a pfrow page loses a filled cell; a page
+drawing its board as a fumen has one fumen character changed). A discovered technique missing either hook is a
+SURVIVOR of the selftest, so the per-push `docs` job goes red on it: it used to be printed `NOT PLANTED` and
+passed, while the live weekly run was red by construction — 欄干's harddrop pin shipped that way for one pass.
 
 **Bag 1 has three cross-sources, all checked by the gate; bag 2 onward has none, and every page says
 so.** (1) harddrop's SingleYou page, table 0 — the page's 「stacked the same way as SDPC」 is that
@@ -3911,6 +4359,921 @@ snapshot for the node; a test sets a node's drawing to its sibling's and must se
 fail. Their matchable children whose parent is never filed are named in `CLASSIFIER_PARENT_UNFILED`.
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
+
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト）— every mid-game technique page, quarantined like the route pages
+
+shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
+happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
+rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 gate. So the technique
+pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
+hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
+STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth and 基本的なドネイト (`template/basicdonating.php`) the eleventh (each later one has a ### below); a later technique whose shape the window
+predicate can express is a data addition (a transcription
+module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
+two tests, three CI steps, one `TECHNIQUE_SITES` entry).
+
+| piece | where |
+|---|---|
+| transcription | `pipeline/openers/stsd-technique.json` (schema `technique-shapes/1`, named `*-technique.json` so no `*-routes.json` glob sees it), held as a literal in `extract_stsd_shapes.py` and gated by the shared `technique_transcription.py`; raw-HTML snapshot, fetched like 山岳積み2号's, re-checked with `--html-dir` |
+| matcher + artefact | `pipeline/sim/technique-facts.ts` (rules), `technique-profile.ts` (types), `technique-profile-stsd.ts` (data), `techniques.ts` (registry, unhashed) → `analysis/stsd-facts.json` |
+| facts test | `pipeline/openers/stsd.test.ts` (+ `technique-facts-checks.ts`) |
+| demos | `pipeline/sim/technique-demos.ts` (planner), `technique-demo-profile.ts` / `technique-demos-stsd.ts` → `analysis/stsd-demos.json`; test `stsd-demos.test.ts` |
+| pages | `pipeline/technique_page.py` (renderer + audit) bound by `stsd_page.py` + `stsd_prose.json` → `docs/stsd.html`, `docs/stsd-demos.html`, rendered by `bin/build-docs` from `TECHNIQUE_SITES` under a 中盤手法 index group after 定式路線 |
+
+**Every hit links to the moment, not the round start** (since 2026-10-20): the case row's link is
+`<date>-replay.html#m<pos>r<round>@p<n>`, where `<n>` indexes the replay page's MERGED lock order (both players' locks by frame,
+`replay_section.round_payload`'s `order`, which `replay_player.js` steps through), set to the position just before the hit's T —
+`n` locks placed, so the page shows the board the T went into and one step plays it. `technique_page.replay_href` computes it from
+the session's `replay-facts.json` and `facts.json`; the overview audit re-reads every link from the other side
+(`audit_replay_links`): the position's next step, decoded from an empty board with `replay_section.decode_boards`, must be the hit
+player's lock at the hit's lock index, a T with a full spin clearing the variant's lines. The page selftest plants a link one
+position late, one early, at the player's previous lock and at the round's start, and each is caught. Only the hrefs and the
+`cases_note` sentence moved on the nine pages.
+
+**The predicate is anchored on the T, not on a column range.** The lock's four cells must equal the
+variant's drawn T cells under one translation (mirrored: columns reflected inside the window), which
+fixes orientation too; every other cell of the window the transcription carries must be filled
+(any piece or garbage — garbage is FILLED) or empty as drawn; colour is never compared, and nothing
+outside the window is read. The cleared rows' cells right of the window are deliberately not tested:
+they are entailed by the clear (the `NaiveClauseForced` lesson), and the gate's window rule that no
+piece letter sits outside the window is what makes leaving them out safe. The window is written
+TWICE — `windowMatch` in TS and `window_fires` in the gate — and the facts test holds the two to one
+answer over every board of every committed `*-routes.json` (the cross-source: harddrop's SDPC Spin
+page fires it as drawn and mirrored; one 山岳積み2号 board fires it unlabelled and is named, not
+explained).
+
+**The denominator is the scored TSD, and the loop that scores it is a THIRD COPY.** A T lock with an
+engine spin credit that cleared lines, inside the verified prefix, passing the reconstruction check —
+the same loop as `emit-opener-facts.ts`'s donation / cave pass and `dualVerdict`, kept as a copy so
+that emitter is not edited. `stsd.test.ts` holds its scored count to `opener-facts.json`'s
+`donation.check` in every session and for every player, which is the gate on the duplication.
+Opener / mid-game is the 0-based `lock <= WINDOW_PIECES` convention (see the lock-numbering note in
+「C-Spin 同 DT 砲」), and the artefact says which one it uses.
+
+**No headline without its controls**, and the page audit enforces it: the same window under TSS, TST
+and the mini spins, three ablations (no must-empty clause, no roof, the T merely overlapping the
+window) and the orientation baseline, each 「N / M」 beside the headline. One ablation EQUALS the
+headline on this corpus — the roof never decides a match — and is recorded as a finding, not
+dropped. The follow-up (the second TSD the page promises) carries the slot through every clear and
+garbage insertion to the next T, each step verified against the engine's own next board, and every
+miss has a named reason. Every figure is read off the artefact and the tests; none is typed here.
+
+**The cross-route counts only what it measured, inside the drawn continuation.** It takes the SDPC
+Spin rounds that reached the STMB Cave node and asks whether an STSD hit follows in the bag harddrop
+draws it in (`continuationLastLock`, re-derived by the test from `sdpcspin-routes.json`). A hit later
+in the round is recorded as `later_hit_lock` and never counted — an unbounded 「any later hit」 once
+counted one 74 locks after the cave as corroboration of the drawing. A round whose node the route
+reached past its verified prefix (`verified: false` in the route artefact), or whose continuation runs
+past the prefix with no hit inside it, is named in `cross_route_unscored` and kept out of M: a scan
+for T-spins between the node and a prefix that ends before it is empty by construction, so its 「no
+T-spin」 was never a measurement. The artefact's reasons are outcome codes with counts; the page words
+each one in Cantonese from the prose, never by printing the English list line.
+
+**Readings and discrepancies are the transcription's and are printed on the page:** `B` an EMPTY
+garbage-hole cell, muted upper case the rows a spin clears, the three terrains the page never draws
+DERIVED by subtracting its pieces (checked), the after board drawn with the right side stacked up
+(`basic.after:after`), and the misfire's J drawn three cells (`misfire.spin:colour`).
+
+**Demos are BUILT from an empty board, never seeded**, because every decoder in this repo (the TS
+one, `replay_section.decode_boards`, the inlined player) starts empty and a timeline can insert only
+one-hole garbage rows. The planner enumerates exact covers of the terrain's grey cells by non-T
+pieces, then searches placement orders the engine can play, then fires the stood T at the one T
+placement where `windowMatch` matches, fills the follow-up's rows with pieces OUTSIDE the window
+columns where the drawing assumes them, and fires the follow-up. Two T-spins in a row need two T's
+close together, so the dealing is one scheme: bag 1's T dealt last and held, bag 2's first piece
+placed in its stead, bag 2's T swapped for the held one, the follow-up T swapped out when the next
+piece arrives — whole 7-bags throughout. The engine is the arbiter (`runDemo` + `assertRoundTrip`),
+the page re-decodes every embedded demo with its own decoder, and a terrain the planner cannot build
+is published unbuilt with the planner's MEASURED reason (an ODD cell count, which is a proof rather
+than a planner limit — each lock adds 4 cells and each line clear removes 10, so a board built from
+empty always holds an even count; an even count that is not a multiple of four is worded as THIS
+planner's limit, since it never clears a line; the garbage boards because a constructed demo has no
+opponent). `noSpinCheck` is a
+measured EQUIVALENT mutant — both T slots are reachable only by a spin — and `no180` changes a path
+and no check. Named lists and their sizes live in the two tests, never here.
+
+**What would move every technique artefact's hash line:** a new `anchor` value (a technique the
+window predicate cannot express) is an edit to `technique-facts.ts`, which every technique artefact's `emitter_md5`
+hashes — loud, and the cost to name when it happens. The live case is アンカーセット (Anchor Set, `template/anchorset.php`):
+a J or L placement with no T-spin, whose drawings agree on no rectangle holding both the anchor and the overhang, so
+matching it needs an anchor on a non-spin lock AND a window that is not a rectangle (ROADMAP.md, with the measured
+reasons). 階段のドネイト was the example this sentence used to give (「a staircase over several locks」), and it was wrong:
+measured, its shape sits in the rows the TSD clears and the two rows under them, all on one board at the TSD's lock, so no
+sequence of locks is needed (the window counts no steps and cannot tell a staircase from a flat stack). `technique-profile-stsd.ts` also lists `route-facts.ts` among its hashed files,
+because the emitter imports from it; the demos hash `route-demos.ts` for the same reason. The reverse
+direction is clean: no route artefact hashes a technique file.
+
+**欄干 is the change that moved them, and it moved nothing else.** Its payoff (in place of a follow-up) and its
+per-variant opportunity are edits to `technique-facts.ts`, and the payoff variant's demo ending on the stood T is an
+edit to `technique-demos.ts`; so every one of the seven earlier technique artefacts re-emitted with a new
+`emitter_md5` (facts), `planner_md5` and `classifier_md5` (demos), which `git diff` was checked to show before any 欄干
+file was written. The same pass moved one more hash line in six of them, for a different reason:
+`transcription_md5` in BT砲's, 千鳥格子's and 社畜トレイン's facts and demos, because the wikitext-discovery change
+rewrote the `snapshot_note` of those three transcriptions (their harddrop records are refetched weekly now). STSD's,
+STMB Cave's, インペリアルクロス's and ダブルダガー's moved in the three md5 lines above and nothing else; no earlier
+artefact moved outside its hash lines. The Python halves (`technique_transcription.py`'s rule (d') and the per-variant
+external drawings, `technique_page.py`'s `more_variants`) are unhashed and default-preserving: every earlier gate's
+plain, `--selftest` and `--html-dir` output and every earlier `*_page --selftest` output was byte-compared against the
+pre-edit run, and `bin/build-docs --check` passed with no earlier page moved (only `docs/index.html` gains the card).
+
+**階段のドネイト changed no shared RULE file, and then one docstring moved every hash line, on purpose.** Its files were added
+and every earlier technique artefact re-emitted byte-identical (the zero-shared-change control), with one exception that is data,
+not code: 社畜トレイン's `other_windows` (complete both ways over every committed technique window) now records the
+drawn T's of its harddrop page at which the Kaidan window fires, so its transcription and its two artefacts' `transcription_md5`
+moved, and its gate's plain, `--selftest` and `--html-dir` output did not. Every earlier gate's output and every earlier page
+was byte-compared against 6844978 and is identical. Only then was `technique-profile.ts`'s docstring corrected (it repeated the
+false 「staircase over several locks」 example); that file is hashed, so all nine facts artefacts' `emitter_md5` and all nine
+demos' `classifier_md5` moved, and `git diff` shows those lines and nothing else. One shared TEST module was added too:
+`pipeline/openers/technique-donation-checks.ts` (`H`, `W`, `scored`, `donationVerdict`) is `parapet.test.ts`'s donation helper
+moved verbatim so `kaidan.test.ts` can import it, and `parapet.test.ts` imports it now; no artefact hashes it.
+
+### STMB Cave
+
+The same deliverable for `template/stmbcave.php` (「2021-03-23更新」): `pipeline/openers/stmbcave-technique.json`
+(held as a literal in `extract_stmbcave_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-stmbcave.ts` → `analysis/stmbcave-facts.json` (`stmbcave.test.ts`),
+`technique-demos-stmbcave.ts` → `analysis/stmbcave-demos.json` (`stmbcave-demos.test.ts`), and
+`docs/stmbcave.html` + `docs/stmbcave-demos.html` from `stmbcave_page.py` + `stmbcave_prose.json`, the
+second card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is the T's cells, as STSD's — the T laid flat, nub down — so the
+window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** What did not fit
+was the GATE's window rule: STSD's window is the bounding box of the T, every filled cell above it and
+the follow-up slot, and this page's one complete TSD is drawn on a stacked board whose J, Z, L and O
+above the T are no part of the shape (each other drawing has different cells there). So a variant may
+now declare `window_basis: agreement` (opt-in; STSD's gate output is byte-identical with or without the
+change, compared by running both): the window is the box on which every drawing of the shape agrees —
+the page's own three, and harddrop's positive STMB_Cave diagrams from `wiki-tspin-techniques.json` (the
+spec's `external_drawings`) — checked from BOTH sides: every drawing fires it exactly once, at its
+declared slot and hand, and widening it by a row or a column on any side meets a disagreement or leaves
+a drawing. Every piece letter left outside is named in `untested_drawn`, both ways. The same pass made
+the follow-up rule compare the after board BOTTOM-aligned (this page draws it a row shorter than the
+spin board; STSD draws them the same height, so its shift is zero).
+
+**What the window can discriminate is one row.** Its top two rows are the rows the TSD clears, so at
+the opportunity every filled cell in them is entailed by the clear (`NaiveClauseForced`), the nub row
+being the cave's roof (`RoofForced` / `RoofCannotDiscriminate`) — no roof test is added, and the test
+MEASURES that the cave row alone, with the T anchored, gives exactly the headline. The page's own roof
+(the stood Z over the T's back arm) is outside the box: on the stacked board the cell beside it is the L
+that roofs the NEXT TSD, which no other drawing has, and a rectangle cannot keep one without the other.
+Because a flat T is symmetric, the must-empty cells are what tell the two hands apart: the `noMustEmpty`
+mutant makes a lock match both, and the matcher refuses it (the test asserts the throw).
+
+**Cross-checks, each stated in the test as agreement or named differences.** (1) The opener metric
+(`opener-facts.json` `stmb_cave`, harddrop's ≥3-wide gap overlapping the T): `stmbcave.test.ts`
+re-implements `caveAt` (importing `emit-opener-facts.ts` runs a session) and reproduces every session's
+per-player `width_ge_3`, `min_depth_ge_2`, `in_opener` and `mid_game` exactly; every hit is one of its
+caves, and every cave that is not a hit is named in `CAVE_METRIC_ONLY` with a re-derived geometric
+reason (`centred`: the gap is the T's own columns; `arm_only`: the gap reaches under one arm, the nub on
+a filled cell; `wall`: the cells behind the nub leave the board). (2) SDPC Spin: every round whose route
+reached `3.first.cave` with the node verified is a hit at its next T lock (`SDPC_CAVE_HITS`), the rest
+named. (3) The gate's `cross:` rule over every routes board: harddrop's SDPC Spin cave fires; the same
+author's stick spin cave is over a FOUR-wide gap and is named, not fitted (the agreement box's far wall
+is filled on every drawing in the agreement set).
+
+**`window_off_board` is a count with a property check, not a list.** The window holds the row under the
+nub, so every TSD on the floor, and every one hard against a wall, leaves the board — far too many to list
+(the size is the artefact's and the test's, never this file's). **A window cell past the side or the floor is
+"leaves the board", never "filled"**, for every technique: the drawings draw stack in those cells, and the wall
+is not read as standing in for it, so a shape built flush against the wall is not a hit. That is a definition,
+not a measurement, and `stmbcave.test.ts` names the cave it costs (`CAVE_METRIC_ONLY`, reason `wall`). The test pins the count per player and checks every entry is a flat nub-down T whose window leaves the
+board in at least one hand and is not a hit — not an exact re-derivation, because the matcher returns
+"off board" only when no in-board cell failed first (iteration order; the `garbageEmpty` mutant moves
+entries out of that list and no hit, which is its asserted symptom).
+
+**No demo is built, and every board says why.** The planner stops each chain at its first failing
+check — the basic form's terrain is even but not a multiple of four (a planner limit), the complete
+TSD's J is two lower-case cells (its third is muted in the cleared row), the similar form's S is a Z's
+shape — and `stmbcave-demos.test.ts` re-derives each, with the facts behind them (two of the three
+terrains have an ODD cell count, a proof; the basic form's T completes one row, so it is a local sketch,
+not a full TSD). Two shared-file edits came with that, both in unhashed Python and default-preserving:
+`technique_page.py`'s selftest skips its demo-island plants when there is no demo (and plants a dropped
+unbuilt block instead), and the board it drops is the profile's `selftest_board` (default STSD's).
+Named lists and their sizes live in the two tests, never here.
+
+### インペリアルクロス（Imperial Cross）
+
+The same deliverable for `template/imperialcross.php` (「2020-06-20更新」): `pipeline/openers/imperialcross-technique.json`
+(held as a literal in `extract_imperialcross_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-imperialcross.ts` → `analysis/imperialcross-facts.json` (`imperialcross.test.ts`),
+`technique-demos-imperialcross.ts` → `analysis/imperialcross-demos.json` (`imperialcross-demos.test.ts`), and
+`docs/imperialcross.html` + `docs/imperialcross-demos.html` from `imperialcross_page.py` +
+`imperialcross_prose.json`, the third card under 中盤手法. Every figure is read off the artefacts and tests,
+never typed here.
+
+**The spin is a TSD and the anchor is the T's cells — the T STOOD UP, nub right (mirrored: nub left) — so
+the window predicate expresses it and the matcher (`technique-facts.ts`) is untouched.** The T goes into a
+cross-shaped hole and clears the cross's top and bottom rows, which are NOT adjacent; the engine credits a
+full TSD either way, and nothing in the matcher assumes the cleared rows touch (the follow-up's row map
+counts the cleared rows below each slot cell). The row between them keeps the cross's far arm EMPTY, and that
+cell is what tells this T from STSD's (whose nub fills it): `imperialcross.test.ts` re-derives, from both
+transcriptions, that anchored on the same stood T the two windows disagree on a cell, and measures the two hit
+sets disjoint.
+
+**The window is the agreement box (`window_basis: agreement`, STMB Cave's opt-in), and the reason is the
+page's own build.** The bounding box of T, roof and follow-up reaches a column whose top cell is empty on the
+spin board, FILLED on the page's TSD-shape build (its stood Z) and drawn `B` on the basic form. So the window
+is the box every drawing agrees on — the page's basic form and three builds, and ガムシロ積み's two Imperial
+Cross boards (`gamushiro-routes.json`, the spec's `external_drawings`, their slots declared in the extract
+module and checked by the agreement rule). `B` here is dark grey the page leaves open: read as EMPTY
+(`empty_letters`), and `extra_checks` measures that the window reads no `B` cell where it fires. The cross
+check (`cross:`) fires on harddrop's SDPC Spin `3.third.imperial` (independent) and on stick spin's
+`2.sd.imperial.spin` (same author, `also`), both nub left.
+
+**One gate change, in unhashed Python, default-preserving: the opt-in `followup.drawn_lines`.** The page draws
+its after board BEFORE the stack beside the second slot is built, so the follow-up T fills one row of the
+drawing while the TSD the page promises clears two. Rule (d) now takes the drawn count from `drawn_lines`
+when present (fewer than `lines`, with a `drawn_note`), else `lines` as before; STSD's and STMB Cave's gate,
+selftest and `--html-dir` output were compared byte for byte with and without the change. The matcher still
+scores the follow-up as a full TSD.
+
+**What discriminates is measured, and either half is enough on this corpus.** The cross's top and bottom rows
+are entailed by the clear; with only the cross's filled cells and the T anchored the window admits more TSDs
+than the headline (the count is pinned in the test), while the `no_roof` ablation (the cross with its empty
+arm) and the `no_must_empty` one (every filled cell, the overhang's included) each give the headline exactly —
+so `noMustEmpty` and `noRoof` are measured EQUIVALENT mutants, named and asserted byte-identical.
+
+**Cross-checks against the route artefacts:** no corpus round reached any route page's Imperial Cross node
+(named, empty — the scan reads every string of every case, not one field, and `snapshots` is required, never
+defaulted); every SDPC Spin round that reached its parent `3.third` is measured over bag 4 (the bag harddrop
+draws the Imperial Cross in, re-derived from `sdpcspin-routes.json`) and named with what happened
+(`SDPC_THIRD_ROUNDS`; how many is the test's).
+
+**No demo is built, and every board says why** (`imperialcross-demos.test.ts` re-derives each): the basic
+form and the bare cross have an ODD cell count (a proof); the TSD-shape terrain has no tiling by tetrominoes
+at all (an exact-cover search over all seven kinds, with a control that finds tilings where there are some),
+so only line clears could reach it; the cross-shape build's terrain is even but not a multiple of four (a
+planner limit). The page's sentence for its TST board holds 来, which the page audit's simplified-glyph check
+cannot tell from the simplified character, so that board's caption is not rendered (`caption_note` says so;
+the quote is still checked against the snapshot). Named lists and their sizes live in the two tests.
+
+### ダブルダガー（Double Dagger）
+
+The same deliverable for `template/doubledagger.php` (「2020-06-20更新」): `pipeline/openers/doubledagger-technique.json`
+(held as a literal in `extract_doubledagger_shapes.py`, gated by the shared `technique_transcription.py`),
+`technique-profile-doubledagger.ts` → `analysis/doubledagger-facts.json` (`doubledagger.test.ts`),
+`technique-demos-doubledagger.ts` → `analysis/doubledagger-demos.json` (`doubledagger-demos.test.ts`), and
+`docs/doubledagger.html` + `docs/doubledagger-demos.html` from `doubledagger_page.py` + `doubledagger_prose.json`,
+the fourth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**The spin is a TSD and the anchor is STMB Cave's flat, nub-down T, so the window predicate expresses it and NO
+shared file changed** — not the matcher, not the gate, not the renderer: the transcription, the two profiles,
+the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry. Two TSD slots are stacked
+one directly on the other, the upper roofed over one end; the TSD's clear drops the overhang onto the lower
+slot, which is the second TSD. The window is STSD's default bounding box (T, roof, follow-up slot): no other
+drawing disagrees with the spin board inside it, so the opt-in agreement box was not needed. It does NOT reach
+the lower slot's far wall, which the follow-up table answers instead.
+
+**What the shared rules could not say lives in `extra_checks`, under its own tags** (`mirror:`, `line:`,
+`pink:`, `B:`, `imperial:`, each with a selftest mutant): the page draws most of its Double Daggers MIRRORED,
+and the shared rule (e) takes only as-drawn boards, so `fires_mirrored` is checked there (once, mirrored, at a
+two-row placement; spin boards read with their spin piece taken out — the tetris feature spins an I). Its second
+feature, a line between the two slots, is a Double Dagger the window does not express: `not_expressed` records
+it, and the gate measures both halves (no fire as drawn; with the line row taken out, one fire at the drawn T).
+`p` (the page's pink cell, 「屋根の反対側」) is read as empty and measured to be the build's J cell, outside the
+window, so the corpus never tests that build condition. `max_rows` is 10 (the tetris feature).
+
+**Cross-sources, both measured.** harddrop's SDPC Spin page (another author) draws this shape in its second
+C-Spin build's bag-5 boards — the T in the slot the build makes, directly over the C-Spin's residue slot — and
+the gate's `cross:` rule finds them; no routes board is LABELLED ダブルダガー. shiwehi.com's own インペリアルクロス
+page draws a Double Dagger as its `dagger` miss and this page draws an インペリアルクロス (`cross.imperial`): the
+`imperial:` rule measures each window firing only on the other page's drawing (same author: corroboration).
+Every SDPC Spin round that reached that build is measured over bag 5 in the test and named (`SDPC_SECOND_ROUNDS`; how many is the test's).
+
+**What discriminates is measured per window part** (`doubledagger.test.ts`, `PART_ONLY`): with the T anchored,
+the lower slot alone gives exactly the headline, while the cleared rows (entailed) and the overhang row (which a
+TSD slot nearly always has) admit almost every full TSD — so the `no_roof` ablation equals the headline. The
+overhang is still not decoration: it is half of what tells the two HANDS apart, and both `noRoof` and
+`noMustEmpty` make a lock match both hands, which the matcher refuses (both asserted to throw). The hit sets of
+this window and STMB Cave's (the same flat T) are disjoint and the two windows clash on a cell in every pairing
+of hands, both re-derived in the test.
+
+**No demo is built, and every board says why** (`doubledagger-demos.test.ts` re-derives each): the TSD-shape
+build's terrain and the bare cross have an ODD cell count (a proof); the basic form, the cross-shape build's
+terrain and the three feature boards are even but not multiples of four (a planner limit); and the cross-shape
+build is drawn mirrored, so the as-drawn window the planner fires would not fit it even built (measured). The
+two sentences naming the build pieces draw them as mino icons the page text drops; they are quoted as the text
+reads (`icons`) and not used as captions. Named lists and their sizes live in the two tests.
+
+### BT砲（途中BT, mid-game BT Cannon）
+
+The same deliverable for `template/btcannon.php` (「2021-07-03更新」): `pipeline/openers/btcannon-technique.json` (held as a
+literal in `extract_btcannon_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-btcannon.ts`
+→ `analysis/btcannon-facts.json` (`btcannon.test.ts`), `technique-demos-btcannon.ts` → `analysis/btcannon-demos.json`
+(`btcannon-demos.test.ts`), and `docs/btcannon.html` + `docs/btcannon-demos.html` from `btcannon_page.py` +
+`btcannon_prose.json`, the fifth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**It is a technique page although BT Cannon is also an opener.** The page is the MID-GAME form (途中BT, built from 欄干 or
+72積み), matched on a partial stack at any lock; the opener of the same name (開幕BT砲) is the same shape, so a hit inside
+the opener window is counted in the artefact's `in_opener` column, never filtered out.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's and ダブルダガー's), so the matcher is untouched; the
+follow-up is a TST.** The TST slot runs up the wall beside the T's left end and on under the clear: before the TSD its four
+cells are split by the two cleared rows, and the row map (which counts the cleared rows below each slot cell) joins them.
+`followup.lines` 3 is read by the matcher's existing `followupKind`, so `technique-facts.ts` and every hash line stayed put.
+
+**The window is the agreement box, and its external drawings are harddrop's own BT_Cannon page.** STSD's bounding box would be
+the whole board (the TSD board draws the stack right of the slots as filled rows above the T). No committed routes board
+draws a BT (the gate measures the window fires on none), and the opener catalogue's BT fields are four-row bag-1 boards the
+seven-row window cannot be placed on, so the independent drawings come from harddrop's `BT_Cannon` page, pinned the way SDPC
+Spin's wikitext is (oldid, MediaWiki's revision sha1, our sha256 and byte count, fetched by urllib through `api.php`) and
+recorded in the transcription's `cross_source.harddrop`: every board on that page whose drawn T the window fires on (its
+「Mid-game BT Cannon」 section among them), and every board with no T drawn on which it fires. `--html-dir` re-reads the
+wikitext beside the page and checks both lists COMPLETE as well as letter for letter. That record is not a `*-routes.json`, and
+until 2026-10-19 nothing re-read it weekly; `check_wikitext_sources` now discovers it (see ### SDPC Spin) and re-runs the
+extractor's `--wikitext-dir` (`wikitext_checks`, the same function as `html_checks`) over the refetched revision. The shiwehi
+page is still re-read only by a person with `--html-dir`. **Re-pinned 2026-10-24 from 41529 to 44634**, the weekly job's first red on it: the new
+revision only APPENDS (its first 1850 lines are 41529's byte for byte) the OBT Cannon and Mechanical Heart sections, two of whose
+boards stand outside any table — `_tabled` wraps each in a one-board table, so every earlier (table, board) holds. Its two
+firing drawings are table 5 board 2's TSD board again, so the window and the corpus hits did not move; the artefacts moved in
+`transcription_md5` only.
+
+**Three opt-in edits to the shared gate, in unhashed Python, each checked default-preserving** (the gate, selftest and
+`--html-dir` output of STSD, STMB Cave, インペリアルクロス and ダブルダガー were compared byte for byte before and after): a
+`spin_piece: U` board is read as a T (the page draws the T it places in the renderer's `U`); an empty `cross_source.fires` is
+allowed only with `routes_fire_none` and an agreement window with external drawings (rule (g) firing the window on each of
+them is then the independent check); and `TechniqueSpec.html_checks` extends `--html-dir`. A fourth, in `technique_page.py`:
+its selftest plants an invented hit row when the case index is empty (it assumed at least one hit); the other four pages'
+selftest output is byte-identical.
+
+**The test pins the hit list as a named list, and proves the predicate could have fired** (whether the corpus
+holds a hit is that list's, never this file's). `btcannon.test.ts` pins every named list, and runs the TS `windowMatch` (the Python predicate's twin) on every recorded harddrop drawing (once, at its drawn T, in
+its recorded hand, nowhere else), on its no-T boards and on the page's own drawings. What discriminates is measured per window
+part: the rows above the T alone admit no full TSD of the corpus, so `noMustEmpty`, `garbageEmpty` and the follow-up mutants are
+EQUIVALENT on the corpus (named, asserted byte-identical), while `noRoof` turns the `below` part into the headline. The
+follow-up search therefore runs nowhere on the corpus, so the test runs it on the page's own TSD → TST as a two-lock digest
+(`basic.spin`, its clear, the T into `tst.spin`'s slot), as drawn and mirrored: it fires, and each follow-up mutant breaks it
+there. The window clashes with STMB Cave's and ダブルダガー's on a cell in every pairing of hands.
+
+**harddrop's drawings are not chosen by the window.** The agreement drawings taken from harddrop are the boards whose drawn
+T the window fires on, which alone would let the window pick its own evidence. So `drawn_t_not_fired` records every OTHER
+board on that page with a drawn T — its lie, the rows it clears and why the window misses it (not the window's T, the window
+leaves the board, or a cell disagrees), measured by the gate, with a note read off the page — and `--html-dir` fails unless
+every drawn T on the page is in one list or the other. A drawing of the shape the window misses is a red build to name.
+
+**No demo is built and no chain is planned**: the shared planner reads a build's page pieces as its lower-case letters, and
+this page's 72積み builds draw them upper case (the 72積み stack lower case) while the 欄干 build's terrain carries a lower-case L
+of its own. Every board carries the profile's reason with the cell count `btcannon-demos.test.ts` re-derives; one 72積み terrain
+is a multiple of four and is stopped by that reading alone, which its reason says. Teaching the planner a per-profile page-letter
+set would move every demo artefact's `planner_md5`, so it was not done here. Named lists and their sizes live in the two tests.
+
+### 千鳥格子（Cut Copy）
+
+The same deliverable for `template/cutcopy.php` (「2020-10-14更新」): `pipeline/openers/cutcopy-technique.json` (held as a literal
+in `extract_cutcopy_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-cutcopy.ts` →
+`analysis/cutcopy-facts.json` (`cutcopy.test.ts`), `technique-demos-cutcopy.ts` → `analysis/cutcopy-demos.json`
+(`cutcopy-demos.test.ts`), and `docs/cutcopy.html` + `docs/cutcopy-demos.html` from `cutcopy_page.py` + `cutcopy_prose.json`, the
+sixth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**NO SHARED FILE CHANGED when it landed** — not the matcher, the planner, the gate or the renderer: the transcription and its
+extract module, the two profiles, the page profile and prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI
+steps. Every pre-existing artefact and page was byte-identical; `docs/index.html` gained the card. **2026-10-20's pass changed two
+shared Python files and no hashed one.** Two of its edits are opt-in and default-preserving: the gate's `external` nodes (below)
+and the renderer's `external_note` (only read when a node is external). A third, in the same renderer, is NOT: the case links now
+open a replay position (`replay_href` / `audit_replay_links`, the paragraph on case links above), which re-rendered every technique
+page's case hrefs and its cases note. Every other technique's gate output and artefact is unchanged; their pages moved by that one
+edit and nothing else.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's, ダブルダガー's and BT砲's); the follow-up is a second TSD
+whose cells the first one's clear splits.** Two TSD slots are interleaved one column apart: the T goes into the inner one (its arms
+one row, its nub the row under), and its two cleared rows join the outer slot's arms row (above them) to its nub cell (under them).
+That is BT砲's split slot again, which the matcher's row map already joins, so `followup.lines` 2 and the pre-clear cells are data.
+The page writes 「縦向きに入れて」 (upright) and draws the T flat: read as the T dropping in upright and turning into the slot; the
+window reads the drawing.
+
+**The window is the agreement box, against four sources.** STSD's bounding box would be the whole board (the spin board draws the
+stack beside the slots as filled rows above the T). The agreement drawings are the page's three (the basic form, and its T-hole and
+third-column builds, both drawn MIRRORED, so `extra_checks` fires them under `mirror:` as ダブルダガー's do), harddrop's Cut_copy
+page's (the page the source cites as its reference; pinned like BT砲's BT_Cannon page — oldid, MediaWiki's revision sha1, our sha256
+and bytes, urllib through `api.php` — and recorded with every OTHER drawn T on it in `drawn_t_not_fired` and its no-T boards the
+window fires on in `fires_without_slot`, so the window does not choose its evidence), and the Cut Copy harddrop's BT_Cannon page
+draws, read by (table, board) out of `btcannon-technique.json`, whose own note names it. harddrop draws one board with three T's
+(yakine's repeating pattern), which BT砲's one-T-per-board completeness check cannot read, so this module partitions every board's
+drawn cells into T's (`hd_slots`; a board with no unique partition is a red build) and records each T as its own `slot`; the
+harddrop reading itself (`hd_cell`, `_sections`) is imported from BT砲's module, one reading. The fourth source is Tetrisちゃんねる's
+千鳥格子 page (`cross_source.tetrisch`, added 2026-10-20): its ten images are committed under `spec/fixtures/tetrisch-cutcopy/` and
+read with the jp-forecast sampler (欄干's route), and its basic terrain and its 江戸城 board are agreement drawings. The window is
+four rows by six columns: the outer slot's arms row with its wall and the inner roof, the two cleared rows, the outer slot's nub row. No routes
+board fires (`routes_fire_none`), and none of the other technique transcriptions' boards does (`extra_checks`, under `cross:`).
+Like BT砲's, the harddrop record is refetched weekly by `check_wikitext_sources` and re-checked with `--wikitext-dir`; the shiwehi
+page is not.
+
+**The outer slot's overhang must stand before the first TSD, and that is yachi's reading, not the page's** (2026-10-22). The page
+says 「(Z)は1回目のT-spinを打った後に置いても構いません」; the window refuses it. The overhang is the one cell of the row above the
+box the window reads, as drawn and mirrored with the box: the variant's opt-in `window_extra` (`cells` outside the box, a `note`),
+read by `technique-facts.ts`'s `prepare`, the gate's `window_cells` and the own-design search's `candidates`. Every drawing in the
+agreement set fills it, so the agreement rule checks it like a box cell and no drawing moved; the cells beside it in its row
+disagree between drawings, which is why it is not a row of the box. Before it, the corpus window admitted Cut Copies whose
+overhang went in between the two T-spins, and most corpus hits were that (the old and new hit lists are in git, never here).
+Two of that Z's cells (`decides`) are the overhang and the outer slot's wall, so the T-hole build with its Z left out fires
+nowhere (`not_expressed`, measured and required, never defaulted; the piece left out must be the sentence's own mino icon,
+`later:`; the selftest drops the overhang and reads it one cell over, and both are caught). `technique-facts.ts` is hashed, so
+every technique artefact moved in its `emitter_md5` / `classifier_md5` lines and nothing else; check that with `git diff` when
+`window_extra` is touched. The cold-clear self-play artefact was re-derived WITHOUT the bot's JSONL, by monotonicity: the window
+only got stricter, so every new hit is an old hit and every old hit is in a committed game; each committed game was re-scanned on
+its own and cut to what `select()` commits. Its `scan` counts other than `hits` are unchanged and are still the JSONL's.
+
+**What discriminates is measured per window part** (`cutcopy.test.ts`, `PART_ONLY`): the cleared rows (entailed by the clear) admit every flat,
+nub-down full TSD whose window is on the board, and the row above (with the overhang) and the row below each cut that down without reaching the headline alone, so both are
+doing work; the `no_roof` ablation is the `below` part (it drops the overhang with the row above). `followupUnmirrored` and `followupAnyT` are
+EQUIVALENT on the corpus since the overhang rule (named, asserted byte-identical) and killed on the page's own two-lock digest. For the first type, unlike ダブルダガー's, neither `noMustEmpty` nor `noRoof`
+makes a lock match both hands: both are live mutants whose hits are their ablations'. Since the second variant landed, a full
+`noMustEmpty` build throws (that variant's window less its must-empty cells is symmetric about the T, ダブルダガー's case), so the
+test asserts the throw and measures the first type's symptom on a transcription holding it alone. The first type's window clashes
+with STMB Cave's, ダブルダガー's and BT砲's on a cell in every pairing of hands and no lock is a hit of two of them. Garbage reads as filled, and the page itself says the shape is
+mostly built when garbage rises, so `garbage_in_window` is a large share of the hit list — a fact about the corpus, read off the test.
+
+**No demo is built, and every board says why** (`cutcopy-demos.test.ts` re-derives each): the third-column terrain has an ODD cell
+count (a proof); the T-hole terrain is a multiple of four with no tiling by tetrominoes AT ALL (the hole cuts it into two parts,
+neither a multiple of four — the planner's own words, 「no cover under its dealing」, are true and weaker); the basic form is even
+but not a multiple of four (a planner limit); and both builds are drawn mirrored, so the as-drawn window the planner fires would
+not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+**A second variant, harddrop's (`uncut`), added 2026-10-20 by measurement.** harddrop's page draws two generic Cut Copies; the
+second, 「Uncut copy」, saves the WHOLE second TSD slot under the first T (one column toward the open side) rather than its bottom
+half. shiwehi.com draws only the first. A single-T window expresses it: the agreement box of every harddrop drawing of it (its
+Generic Structures board, the S/Z/J variation of fumen #3, the same variation again beside its STMB Cave comparison, the repeat's
+two T's, one T of yakine's pattern, the mix's second T, the T under an STSD; the test pins how many), five rows by six columns — the row above the T, the two cleared rows, the second slot's two rows. Its board is
+harddrop's own drawing transcribed as an `external` node (`external: harddrop`, never in `page_order`, which is shiwehi.com's page;
+the gate's one opt-in for it), in occupancy only, beside harddrop's drawn after board, and `extra_checks` holds both to the harddrop
+record (`external:`). Its follow-up is unsplit, so `followupNoRowmap` is measured EQUIVALENT on it (asserted on a two-lock digest of
+harddrop's own drawing, where the other follow-up mutants break it). The two variants' windows clash on a cell; the second type and
+STMB Cave are a RELATION, not a clash — in OPPOSITE hands their windows agree on every shared cell, and the STMB Cave page's own
+「連続してTSD」 board fires the second type's window mirrored (`cross_source.also_technique`, measured both ways; harddrop says the
+second type 「could be easily mistaken with STMB Cave」, and its own STMB Cave comparison, its cave two rows deep, is no hit). The
+corpus hits of both are a named list (`STMBCAVE_ALSO_UNCUT`). What was decided NOT to be a variant, by measurement, stays in
+`drawn_t_not_fired` with its reason: the deeper-hole S variation is already a drawing of the first type; the stood T after the
+Parapet comparison is a Parapet TSS (欄干's TSS window fires at exactly that T, `other_window`, checked); yakine's other two T's
+are read on a board that never stands; the Donation boards are donations. The `harddrop` record's `drawings` and
+`fires_without_slot` now name the variant each belongs to, and its completeness check runs over both windows.
+
+**Tetrisちゃんねる's 江戸城 is ONE Cut Copy, not a third shape** (measured in `_check_tetrisch` and the TS twin; it read 「two Cut
+Copies in a row」 until the overhang rule): the window fires once on 009 at its innermost T; on the board that TSD leaves it fires
+nowhere, because the middle T's outer slot has no overhang, and read WITHOUT `window_extra` it fires MIRRORED at exactly the carried
+follow-up slot (the gate records `hits: 1` and checks both halves); that T's own follow-up is the last TSD, which leaves nothing. The
+page's own 「交互にずれている」 is the alternation of hands. A hit whose follow-up lock is itself a hit is still published as
+`followup_is_a_hit` (a named list in the test). Its other images: 002 and 005 draw the T UPRIGHT before 003 and 006 draw it flat
+about the same centre (checked), which is shiwehi.com's 「縦向きに入れて」 drawn by a second site; 008 is 001's board coloured by
+which TSD each row belongs to (same occupancy, checked); 010 is an annotation the sampler refuses. `--html-dir` re-reads the page and
+the images beside the shiwehi snapshot (Pillow; without it one named `pillow:` failure); the weekly wikitext job does not.
+
+**Declined, recorded in `source.declined`**: howtotetris.com's Cut Copy lesson and four.lol state that all rights are reserved and
+nothing may be reproduced without permission, so nothing of theirs is transcribed, committed or published; the page says so in a
+sentence. A `declined:` rule requires each entry's url, date and reason.
+
+**精選 (since 2026-10-20): the corpus examples are picked by a RULE, never by eye.** `TechniqueSiteProfile.showcase` (opt-in,
+千鳥格子 only; every other page is byte-identical) draws, before the case index, EVERY hit of the primary variant with no garbage in
+its window and its follow-up fired, at four moments read from the replay (`replay_section.decode_boards`, the hit player's board
+only): before the T with its cells dashed, after the first TSD, before the second T, after it. The audit checks the set is the
+rule's, in artefact order, and re-reads each first board with `technique_transcription.window_fires` — the Python twin of the TS
+matcher that found the hit. How many qualify is a figure (`showcase`), never typed here.
+
+**Own designs (since 2026-10-20): boards nobody drew, found by a search and played by the engine.** The demo planner builds none of
+the source drawings, so `pipeline/sim/technique-own.ts` asks the other way round, deterministically (no clock, no random draw): the
+variant's window, as drawn, on the floor at every column offset in `technique-own-cutcopy.ts`; outside it the rows the stood T clears
+full and the rest, plus two rows above, optional; every cover of the must-fill cells by non-T pieces the planner's two-bag dealing
+allows (each of IJLOSZ once or twice, at most four second-bag pieces), smallest first; each handed to the SHARED planner
+(`technique-demos.ts`'s `build`, which gained two opt-in options, an in-memory transcription and `maxSteps`, a step COUNT cap so an
+over-budget candidate is reported the same on every machine; with both unset it is the emitter's byte for byte, and the nine demo
+artefacts moved in `planner_md5` only); stop at an offset after `pick` builds. `emit-technique-own.ts` → `analysis/cutcopy-own.json`
+(`report_eligible: false`, `constructed: true`, `own: true`), with every TRIED candidate's outcome counted by kind and how many were
+never tried. `cutcopy-own.test.ts` re-derives the candidate lists, re-plans every published board byte for byte, decodes each demo on
+its own (board, window, two full TSDs, `reachProblems`), checks no published board is a transcribed drawing, and checks the md5s;
+the outcome counts are re-derived only by the full search (`OWN_FULL=1`, or the emitter), which takes long. The demo page plays them
+after the drawn boards (`own_rel`), and re-checks each embedded one with `reach_problems` and `window_fires`. Against a wall
+(offsets 0 and 4) the search finds no candidate: a count of THIS search (no T in the terrain, the window on the floor), not a
+claim about the technique, and the page says so.
+
+**`reach()` caches its whole search (since 2026-10-20).** The BFS never reads the target — it only filters by it at the
+end — so `route-demos.ts` keeps, per (board as the engine holds it, piece, `no180`), every resting placement's paths in
+discovery order with `reach()`'s own per-spin dedup, and answers each target from that (copies, so a caller cannot
+mutate the cache). Entries are keyed by how the engine was built (`newEngine`'s options and date; an engine built
+anywhere else keys by its own identity) and dropped least-recently-used past a fixed cap. Nothing it returns changed:
+every route demo, technique demo and own-design artefact re-emitted with only its `planner_md5` line moved, and no
+page moved. Measured on 2026-10-20 by re-running the own-design emitter and by timing `planOwn` over offset 2's
+first 100 candidates against a scratch copy of the old file, with identical results; the timings were not committed
+anywhere, so re-measure rather than quote one.
+
+**A second implementation behind the own designs, for REACHABILITY only: the original cold-clear (since 2026-10-20).** `cutcopy-own-cc.test.ts` decodes
+every published demo from empty and, on the board just before the stood T and before the follow-up T, asks the `cc-oracle` binary
+(`CC_ORACLE_MOVES=1`, `find_moves` ZeroGComplete, `cross-movegen`'s protocol) whether that exact T placement is reachable, then
+classifies it with cold-clear's `rotate()` rule (`cc-tspin.ts`; the binary's movegen line carries cells, not a spin status) under
+EVERY kick index, since the timeline does not record which one our engine used, and counts the rows the four cells complete on that
+board. It found cold-clear reaching both T's of every committed design and calling each a full T-spin clearing two whatever the
+kick, because both front corners are filled. Only the reachability half is the Rust binary; the spin half is this repo's own
+TypeScript port of cold-clear's rule, so it is not an independent implementation of the spin and must not be read as one. A placement cold-clear's mover does not reach would be its documented
+mid-height-tuck asymmetry, named in `CC_UNREACHED` with its reason (measured empty), never a bound. It skips without the binary and
+runs beside the cross tests in verify.yml's `oracle-image` job (the flake builds `cc-oracle` for aarch64 only).
+
+**cold-clear's own Cut Copies, played on the demo page after our design (since 2026-10-20): bot games, not corpus, not drawn,
+not ours.** The pilot in `tools/cc-coach/FINDINGS-cutcopy-selfplay.md` had cold-clear (the pinned rev, the cc-coach patch and
+harness, `COACH_MODE=selfplay`) play alone with no garbage; its replay core is now `pipeline/sim/cc-selfplay.ts` (the tools
+script imports it; its output on the pilot's JSONL was compared by hand with the pilot's on 2026-10-20 and was identical
+apart from the input path, a one-off check nothing re-runs). `emit-cutcopy-selfplay.ts --games <jsonl> --coach-seed
+<n>` scans every game through the engine and the corpus classifier unchanged (`cutcopy-selfplay.ts`), then commits, INSIDE
+`analysis/cutcopy-selfplay.json` (`report_eligible: false`, `constructed: true`, `selfplay: true`), each hit game's own
+placements up to the last lock deciding a hit's follow-up plus `tail` more, and the engine's timeline of them; the bot's whole
+JSONL is not committed (its md5 and the run's settings are in `provenance`). `cutcopy-selfplay.test.ts` rebuilds the artefact
+from the committed placements byte for byte (`--rebuild` does the same), pins the hits as a named list, decodes every timeline on
+its own (cold-clear's cells at every lock, the window in the hit's hand, both TSDs full and clearing two) and checks the md5s,
+the cold-clear harness files among them. What it cannot re-derive is the `scan` summary, which needs the JSONL: re-run the
+emitter. The page (`technique_page.py`'s opt-in `selfplay_rel`, default off) draws each game with each hit's board and a link
+to the position before its T, prints the scan sentence and the quarantine sentences (their cut-off from the artefact's `tail`) and requires both, and re-checks every embedded game with
+`decode_boards` and `window_fires`; it also holds each hit's words (variant, hand, follow-up) to the artefact; its selftest deletes a quarantine sentence, swaps a
+hit's hand words, drops a game, moves a hit's T, moves a hit link and reads a hit in the
+other hand. The board drawn per hit is not re-read by the audit; `bin/build-docs --check` byte-compares it with the renderer. These games say nothing about how often a person, or the bot under garbage, builds one.
+
+### 社畜トレイン（Shachiku Train）
+
+The same deliverable for `template/shachikutrain.php` (「2020-10-31更新」): `pipeline/openers/shachikutrain-technique.json` (held as a
+literal in `extract_shachikutrain_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-shachikutrain.ts`
+→ `analysis/shachikutrain-facts.json` (`shachikutrain.test.ts`), `technique-demos-shachikutrain.ts` →
+`analysis/shachikutrain-demos.json` (`shachikutrain-demos.test.ts`), and `docs/shachikutrain.html` + `docs/shachikutrain-demos.html`
+from `shachikutrain_page.py` + `shachikutrain_prose.json`, the seventh card under 中盤手法. Every figure is read off the artefacts and
+tests, never typed here.
+
+**NO SHARED FILE CHANGED**, as for 千鳥格子: the transcription and its extract module, the two profiles, the page profile and
+prose, one registry line per side, one `TECHNIQUE_SITES` entry, three CI steps. Every pre-existing artefact and page is
+byte-identical; `docs/index.html` gains the card.
+
+**The spin is a TSD and the anchor is the flat, nub-down T (STMB Cave's, ダブルダガー's, BT砲's and 千鳥格子's); the follow-up is a
+second TSD whose cells the first one's clear splits.** An S one column off a wall and an L hung over its far end make the slot,
+roofed over its near end; the two cleared rows drop the row above the slot (the second slot's arms) onto the cell beside the S's
+foot (its nub), and the page roofs it with a Z before the second T. The matcher's row map joins the split slot, so `followup` is
+data.
+
+**This page draws its spins UNMUTED, and that decided the node kinds.** The shared `spin:` rule requires every cell of a row the
+spin clears to be upper case; this page draws the T as `U` and leaves the cleared rows in their colours. So no board here is a
+gate `spin` board: each board with a T drawn is a `build` adding its `U` on a DERIVED board (the drawing less the `U`, letter for
+letter), and the module's own `tsd:` rule checks what the spin rule would (one T, exactly two rows cleared, the board less it the
+derived one). The agreement drawings and `fires_on` boards are those derived boards, slot empty. `r` is the renderer's pale S
+(`pale:` checks it is one S); upper case is an earlier piece drawn muted, which the page does inconsistently (two `:colour`
+discrepancies name the lone lower-case L cell it leaves; a third names DT社畜's three-cell L, cut by the drawing's bottom edge).
+
+**The window is the agreement box** of the page's five drawings of the shape (the basic form, the 4x2 build, the two 2x2-hole builds
+and DT社畜, drawn mirrored and fired under `mirror:`) and harddrop's own Shachiku_Train page, which the source does not cite (pinned
+like 千鳥格子's Cut_copy page: oldid, MediaWiki's revision sha1, our sha256 and bytes, urllib through `api.php`; every OTHER drawn T on
+it recorded in `drawn_t_not_fired` with why the window misses, so the window does not choose its evidence; `hd_cell`/`_sections`
+from BT砲's module, `hd_slots` from 千鳥格子's). Four rows by six columns: the row above the T, the two cleared rows, the row under
+them; the second slot's Z roof is outside. The window fires on one routes board, the same author's stick spin `2.sd`, recorded in
+`cross_source.also` (`routes_fire_none` says no board by another author does); on no other technique transcription's board.
+`other_windows` records, measured and complete both ways, every other technique window that fires on a drawn T of harddrop's page —
+EVERY variant of each other file (千鳥格子's `uncut` and 欄干's `parapet_tss` included), which until 2026-10-20 read only each file's
+first; an entry names its `variant` only when it is not the file's first, and a selftest plants a second variant that fires.
+
+**Per variant, measured (`extra_checks`):** the basic form and the 4x2 build — the T the page draws next is exactly the window's
+follow-up slot re-anchored at the build's T (`second:`); the boards between the two TSDs are what the first TSD leaves plus the Z
+(and the I), measured. The two 2x2-hole builds (「STSDの地形が現れます」 and the TST terrain) — the first TSD is the window's, but the
+page's next step is the STSD or TST in the hole, so they are `not_expressed` past the first spin: the cell under the follow-up's
+nub is open, the follow-up T fills one row of the drawn after board (`fills`), and STSD's own window fires nowhere on it. DT社畜 —
+the window fires once, mirrored; the DT砲 hole it keeps under the follow-up's nub is not drawn past that and is `not_expressed`.
+The rule ties `not_expressed` to the open cell under the nub, both ways (`later:`).
+
+**STMB Cave, measured, not assumed.** harddrop's STMB_Cave page (the revision wiki-tspin-techniques.json pins, checked equal; its
+caption equal to that file's quoted sentence) says a variation 「has the same shape and steps as Shachiku Train」. Its table 17
+draws that variation (an O base: a cave three wide under the T), the Shachiku Train it compares (a J base) and the second TSD.
+This window fires on the J base only and STMB Cave's (`stmbcave-technique.json`) on the O base only (`stmb:`); the bases differ
+only in the row under the nub row, and the two windows, anchored on the same flat T, clash at TWO cells there: the cell under the
+nub and its neighbour under one arm (the right as drawn, the left mirrored), recorded as `clash` and re-measured by the gate
+(`stmb:`) and the test. harddrop's own Shachiku_Train page draws the same comparison (its tables 10 and 11; the gate holds the
+boards equal). So 「the same shape」 holds in the cleared rows, where both windows read and agree, and fails at those two cells;
+STMB Cave's window does not read the row above the T (`rows_both_read`), so nothing compares the two there. This paragraph
+said 「the cell under the nub」 and 「holds above the T」 until an audit anchored both windows: the test's `toContain` could not
+see the second cell, and the row above the T was never read by both.
+
+**What discriminates is measured per window part** (`shachikutrain.test.ts`, `PART_ONLY`), as for 千鳥格子: neither part above or
+below the cleared rows reaches the headline alone, and `noMustEmpty` and `noRoof` are live mutants whose hits are their ablations'.
+The window clashes with STMB Cave's, ダブルダガー's, BT砲's and 千鳥格子's in every pairing of hands, and no lock is a hit of two.
+
+**The window says the SHAPE stood; `qualify` says whether it was BUILT** (since 2026-10-23, rules agreed with yachi
+reviewing the hit list). `pipeline/sim/shachikutrain-qualify.ts` is the profile's opt-in `qualify` hook (`technique-profile.ts`),
+read by `assemble`: a hit qualifies only if the cells `basic.spin` draws as its S and L are each a cell of a piece with all four
+cells still on the board (`fragment` otherwise), none is garbage (`garbage_in_shape`), the Kaidan window does not fire at the same
+T (`kaidan_window`: the two windows clash on no cell, so a lock both fire on is read as a Kaidan), and the board is not emptied
+within `DPC_LOCKS` locks before or after the T (`dpc`: the DPC setup, a TSD built from the pieces a Perfect Clear left, into a
+second one). A failing hit stays in `hits` with `qualifies: false` and every rule it fails. Piece ownership runs through the
+digest's row map and is checked cell for cell against the board the matcher read (a mismatch throws). The first version counted
+`dpc` only AFTER the T; yachi then read the hits that passed every rule as DPCs, and measured, each had emptied the board a few
+pieces before its T, so the rule covers both sides. How many qualify is the artefact's and `shachikutrain.test.ts`'s
+(`QUALIFIED_HITS`, `DPC_ONLY`, `QUALIFY_BY_PLAYER`), never this file's. **The page prints that count and nothing else of the corpus** (since 2026-10-23, yachi's
+call: no hit qualifies, and a page opening on the window's hits, its follow-up table and its case index read as the technique
+being played). The profile's opt-in `corpus_qualified_only` (`technique_page.py`) keeps the boards, the window and the rules, prints
+one figure, the qualifying count, drops the headline, controls and follow-up, and lists only the qualifying hits as cases (none
+today, so no case table; the selftest flips one to qualifying and must see it listed with its replay link). The index card counts
+the qualifying hits too. The artefact and its tests still hold every hit; every other technique page is byte-identical. The hook's TYPE lives in `technique-profile.ts` and its call in `technique-facts.ts`, both hashed, so every
+technique artefact moved in its `emitter_md5` / `classifier_md5` lines and nothing else.
+
+**No demo is built, and every board says why** (`shachikutrain-demos.test.ts` re-derives each): the basic form's and the TST build's
+terrains have ODD cell counts (a proof); the STSD build's terrain has tilings but none under the planner's dealing; DT社畜's L is
+three cells; the 4x2 terrain has no tiling at all (two parts of six), a profile reason, because given that chain the planner stops
+first at the pale S, which it reads as a piece R (measured in the test). Like BT砲's and 千鳥格子's, both harddrop records
+(`cross_source.harddrop` and `cross_source.stmb_cave`) are refetched weekly by `check_wikitext_sources` and re-checked with
+`--wikitext-dir`; the shiwehi page is not. Named lists and their sizes live in the two tests.
+
+### 欄干（Parapet）
+
+The same deliverable for `template/parapet.php` (「2021-03-23更新」): `pipeline/openers/parapet-technique.json` (held as a literal in
+`extract_parapet_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-parapet.ts` →
+`analysis/parapet-facts.json` (`parapet.test.ts`), `technique-demos-parapet.ts` → `analysis/parapet-demos.json`
+(`parapet-demos.test.ts`), and `docs/parapet.html` + `docs/parapet-demos.html` from `parapet_page.py` + `parapet_prose.json`, the
+eighth card under 中盤手法. Every figure is read off the artefacts and tests, never typed here.
+
+**It is a donation, and the first technique page whose payoff is not a second T-spin.** An L stood on end, shifted one column
+(the page: 「%Lを1列ずらして立てて置き」 — it says nothing about the wall, and BT砲's page draws the L against it), its foot under the
+slot's left end, a roof over its right end: the flat, nub-down T clears the T's arm and the L's foot, and the column under that arm
+opens from the top to the floor. harddrop and Tetrisチャンネル draw the next step as a Tetris into that well (harddrop: an I on the
+fumen's next page; Tetrisチャンネル: its 4-deep sequence ends on one). shiwehi names a Tetris only as its reason to fire the TSS
+rather than the TSD (「TSDではなくTSSを打つ理由…打後の地形が1段高くなるためその後テトリスを送りやすい」), never as what follows the
+TSD, and the prose attributes it that way. So the variant carries a `payoff` (`well_quad`) in place of a `followup` — exactly one of the two, refused otherwise by the matcher and by
+the gate's `grammar:`. `wellPayoff` (`technique-facts.ts`) carries the WELL CELL through every clear and garbage insertion, verified
+step by step as the follow-up slot is, to the first later lock with a cell in its column: fired iff that lock is inside the verified
+prefix, has a cell at or below the carried cell, is an I and cleared four (else `past_verified`, `well_covered`, `well_filled_not_i`,
+`i_in_well_not_quad`, `rowmap_unverified`, `slot_off_board`, `round_ended`). **What the window entails is not reported as a
+payoff**: that the column re-opens and that the well is at least two deep are decided inside the window (its must-empty well cells
+and its cleared rows), so a check on either could never fail — the NaiveClauseForced screening question, asked before writing the
+payoff. Each hit carries `well_depth` (the empty cells under the well cell before the spin, garbage filled), and
+`well_depth_lt4` names the shallow ones. The gate's rule (d') checks the payoff on the DRAWING: the payoff board is the spin
+board's after board, the well column is empty top to bottom there, and every filled cell of it on the spin board is in a row the
+spin clears (harddrop's re-opening clause, on the page's own boards).
+
+**Two variants on one terrain, each measured at its own spin.** `parapet` is the TSD; `parapet_tss` the TSS the page draws on the
+same terrain (the T stood, nub right, clearing only the foot's row, the well kept one row higher). The matcher reads a variant's
+opportunity off its transcription's `spin`/`lines` (checked against each other, and required to be the profile's `opportunity` or
+one of its `controlSpins`); under the TSS variant the TSD takes the TSS's place among the controls. For the seven earlier techniques
+(one TSD variant each) this is the identity, which is why their artefacts moved only in their hash lines. Three TSS controls are
+STRUCTURAL zeros the test re-derives from the window, not measurements: `no_roof` equals the TSS headline (no window cell lies above
+its T), and a TSD (flat T) or a TST (every T row but the cleared one holds a must-empty cell) cannot hit the TSS window; nor a TST
+the TSD window. The page renders both variants (`technique_page.py`'s opt-in `more_variants`: the TSS's figures keyed
+`parapet_tss:<key>`, its headings from the prose's `more_variants.parapet_tss`).
+
+**The window is the agreement box** (rows 1-5, columns 1-5 of `tsd.spin`, the same box for both variants) of the page's two basic
+forms and four external drawings, each per variant: BT砲's page's Parapet (`btcannon-technique.json`'s `parapet`, same author, the L
+against the wall — which is what puts column 0 outside); harddrop's Parapet page (Chopin's; ONE fumen and no pfrow table, decoded
+once with knewjade's tetris-fumen 1.1.3 and recorded page by page — the board page 9 locks its T into, the T and the I locks; the
+decode is NOT re-run in CI, an open item); and Tetrisチャンネル's two Parapet boards (the page this page cites; its sixteen JPEGs
+are committed under `spec/fixtures/tetrisch-parapet/` and read with the jp-forecast sampler, which reads fifteen and refuses the
+annotation 008). The TSS slots on the external drawings are OUR READING (they draw only the TSD). The gate's external drawings now
+may name the `variant` they are drawings of (`technique_transcription.external_for`; one that names none is a drawing of every
+variant, so the earlier techniques' are unchanged). Tetrisチャンネル draws the plain TSD on both terrains beside its Parapet, the T's
+nub plugging the well — its own control — and `tetrisch:` measures the windows never fire there, nor on the bare terrains;
+`after_spin` of each spin image is its after image; 015 less its I is 014 and the I clears four in the well column; the wells are 2
+and 4 deep where drawn. The TSD window fires on two same-author 山岳積み2号 boards (`cross_source.also`; 9-row boards the route
+artefact cannot match, so no cross-route) and, measured by `bt:`, on BT砲's page's Parapet and its 途中BT build (「実は欄干を組む形から
+BT砲にすることができます」: the BT is built on this terrain). That is a relation, not a clash: in the same hand BT砲's window and this
+one agree on every cell they share, so the test names their common hits (`BTCANNON_ALSO_PARAPET`) rather than asserting none;
+against STMB Cave, ダブルダガー, 千鳥格子 and 社畜トレイン the windows clash in every pairing of hands and the hit sets are disjoint.
+Of the three external records only harddrop's is a pinned MediaWiki revision, so `check_wikitext_sources` discovers it and refetches
+it weekly (the spec's `wikitext_checks`, the harddrop half of `--html-dir`, with a `synthetic_wikitext` holding its quote and its one
+fumen; the selftest plants a fumen edit where a pfrow page loses a cell). The shiwehi page and the Tetrisチャンネル page and images are
+not re-read weekly: an open item. `--html-dir` re-reads all three (Pillow for the images; without it one named `pillow:`
+failure and the hashes only).
+
+**Donation, cross-checked.** `parapet.test.ts` re-implements `donationCols` at its shipped clauses (importing `emit-opener-facts.ts`
+runs a session), reproduces every session's per-player `donation.players[].donations` exactly, and names every hit that is not a
+donation at its well column in `HIT_NOT_DONATION` with the re-derived clause it fails: only `filled_above_window` (a filled cell over
+the slot in the well column, outside the window), `cavity_lt4` and, since 2026-10-25, `incomplete` (a plug cell in the cleared rows
+that is garbage or a fragment, read off the digest's ownership grid) occur — never the walls, which the window itself decides.
+
+**What discriminates is measured per window part, per variant** (`PART_ONLY`): the rows above the cleared rows, the cleared rows,
+and the well rows under them; no part reaches the headline alone, and the well rows cut the most. The TSD's `no_roof` ablation is
+exactly its `below` part. Mutants: `payoffAnyPiece` and `payoffNoQuad` (new, shared) and the follow-up mutants `followupUnmirrored`
+and `followupNoRowmap` (honoured by the well) each move only payoffs on the corpus, and the test also builds two-lock digests from
+Tetrisチャンネル's 4-deep sequence and harddrop's fumen, as drawn and mirrored, on which the payoff fires and each payoff mutant breaks
+it (`followupNoRowmap` needs garbage under the well to matter: a spin's own clear is always above the well cell).
+
+**The window says the SHAPE stood; `qualify` says whether it was BUILT** (since 2026-10-23, at yachi's request:
+社畜トレイン's rules carried over). `pipeline/sim/parapet-qualify.ts` is the profile's `qualify` hook: the six cells both
+builds draw as a piece of their own inside the window (the stood L and the two roof cells, mirrored with the window) must
+each be a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), the L's four cells one piece
+(`l_not_one_piece`, the page's 「%Lを1列ずらして立てて置き」), and no Perfect Clear within `DPC_LOCKS` locks either side of
+the T (`dpc`). 社畜トレイン's Kaidan rule does not apply: the two windows clash in every pairing of hands. Ownership is
+`shachikutrain-qualify.ts`'s exported `owners`, checked cell for cell against the board the matcher read. The page is
+`corpus_qualified_only`: it prints how many hits of either variant qualify and lists those alone, with their replay
+links; the report's region, chart, strip and the replay labels drop the rest, as for 社畜トレイン. Every 建議 tagged item
+that cited the old 欄干 hit counts was deleted or cut to its other technique on the same pass (they described shape-only
+hits). The counts and named lists are `parapet.test.ts`'s (`QUALIFIED_HITS`, `ONLY`, `QUALIFY_BY_PLAYER`), never this
+file's. Exporting `owners` moved 社畜トレイン's facts `emitter_md5` and demos `classifier_md5` and nothing else of it.
+
+**No demo is built, and every board says why** (`parapet-demos.test.ts` re-derives each): the O-roof terrain is a multiple of four
+with no tiling AT ALL (the well and the L's stem cut it into two parts, neither a multiple of four — 「no cover under its dealing」
+is true and weaker), and the Z-roof terrain is even but not a multiple of four (a planner limit), the four boards drawn on it
+standing on it. The shared planner gained one branch — a payoff variant's demo ends on the stood T, with nothing swapped out of the
+hold for a second T — which no committed chain reaches, so the demos test runs it on a SYNTHETIC copy of the transcription (the
+O-roof terrain widened until it tiles; a temporary file, never committed or published): the engine arbiter accepts it and it ends on
+one full TSD. Named lists and their sizes live in the two tests.
+
+### 階段のドネイト（Kaidan Setups）
+
+The same deliverable for `template/kaidansetup.php` (「2021-03-23」): `pipeline/openers/kaidan-technique.json` (held as a literal in
+`extract_kaidan_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-kaidan.ts` →
+`analysis/kaidan-facts.json` (`kaidan.test.ts`), `technique-demos-kaidan.ts` → `analysis/kaidan-demos.json` (`kaidan-demos.test.ts`),
+and `docs/kaidan.html` + `docs/kaidan-demos.html` from `kaidan_page.py` + `kaidan_prose.json`, the ninth card under 中盤手法. Every
+figure is read off the artefacts and tests, never typed here.
+
+**No shared RULE file changed** — not the matcher, the planner, the gate or the renderer. Three shared files did move, and
+are named in the 中盤手法 paragraph above: `technique-profile.ts`'s docstring (hashed, so every technique artefact's
+`emitter_md5` / `classifier_md5`), 社畜トレイン's transcription (its `other_windows` data), and the new shared test helper
+`technique-donation-checks.ts` lifted out of `parapet.test.ts`.
+
+A staircase, a Z stood on end on its lowest step at the wall, a roof over the slot's end away from the wall: the flat,
+nub-down T (STMB Cave's, ダブルダガー's, BT砲's, 千鳥格子's, 社畜トレイン's and 欄干's anchor) makes a full TSD that clears the two rows the
+Z's top half is in, and the column beside the Z's foot opens from the top to the floor. So the variant is 欄干's shape of record: one
+TSD and a `well_quad` payoff, which the matcher, the planner, the gate and the renderer already carried. The window counts no steps
+and does not see the Z: the page's four-step form and its three-step S and J forms are one window. harddrop builds the same edge
+from other pieces and from line clears, but those drawings carry no T and the window fires on none of them, so that it fires once
+they are completed is reasoned from its reading occupancy only, not measured.
+
+**The payoff is harddrop's, and the page and the artefact say so.** shiwehi.com names no Tetris after a Kaidan (its next step is
+ST積み or よしひろ積み, which nothing measures); harddrop's Kaidan_Setups page says the column should be open again and its Anchor_Set page
+draws the I clearing four into it (`payoff:` checks that drawing: one vertical I in the re-opened column, four rows filled). The
+page draws its well three deep, so the facts test's payoff digest on the page's own board gives `i_in_well_not_quad`, and the board
+on which the payoff fires is CONSTRUCTED (the bottom row repeated once) and says so.
+
+**The window is the agreement box, and it holds the one choice.** Over the page's three builds and two DT砲 boards (mirrored),
+harddrop's four Kaidan_Setups drawings, Anchor_Set's Kaidan (mirrored) and the Kaidan BT砲's harddrop record holds (mirrored,
+read from `btcannon-technique.json`), there are three maximal boxes on which every drawing agrees: the cleared rows alone, the
+cleared and well rows (no roof), and the window, which is the only one holding the roof. The facts test measures the other two as
+controls (`OTHER_MAXIMAL_BOXES`) and asserts nothing about them. Both harddrop pages are pinned revisions (`revision_sha1`), read
+with `kd_cell` (blank/`-`/`--` empty; a digit filled; `P`/`SP` the T; `'X` the next piece, empty before it; every other code
+`hd_cell`'s), and `check_wikitext_sources` discovers both by structure and re-reads them weekly with `--wikitext-dir`; the
+shiwehi page is re-read only by a person with `--html-dir`. harddrop STMB_Cave's last table (a Kaidan beside an STMB Cave
+variation) is recorded by pointer to 社畜トレイン's pin, not re-pinned: its window leaves that board.
+
+**Relations, measured both ways (`other:`).** This window over every board of every other committed technique transcription,
+and every other technique window over every drawing this one holds, are recorded complete both ways. With 社畜トレイン's window,
+anchored on the same flat T in the same hand, it clashes on NO cell: the Kaidan window fires on 社畜トレイン's 2x2-hole builds'
+first TSD, on its DT社畜 (mirrored) and on several of harddrop's Shachiku_Train drawings of the shape itself (every board listed
+in `other_windows`), and cannot tell them apart, and the common corpus hits are a named list (`SHACHIKUTRAIN_ALSO_KAIDAN`), never asserted
+absent. STMB Cave, ダブルダガー, BT砲, 千鳥格子 and 欄干 clash in every pairing of hands and their hit sets are disjoint;
+STSD's and インペリアルクロス's T stands up. The hits are checked against harddrop's Donation predicate (`technique-donation-checks.ts`,
+lifted out of `parapet.test.ts` and shared): every hit that is not a donation fails only a clause outside the window.
+
+**No demo is built, and every board says why** (`kaidan-demos.test.ts` re-derives each): the four-step staircase has an ODD
+cell count (a proof); the three-step staircases tile, but never without a T, and the planner's dealing keeps the T's for the spin
+(its 「no cover by non-T pieces」 is the measurement, not a proof); the DT砲 boards are even but not multiples of four and drawn
+mirrored, so the as-drawn window would not fit them even built (measured). Named lists and their sizes live in the two tests.
+
+### 途中DT砲（mid-game DT Cannon）
+
+The same deliverable for `template/dtcannon.php` (「2024-08-29更新」): `pipeline/openers/dtcannon-technique.json` (held as a
+literal in `extract_dtcannon_shapes.py`, gated by the shared `technique_transcription.py`), `technique-profile-dtcannon.ts` →
+`analysis/dtcannon-facts.json` (`dtcannon.test.ts`), `technique-demos-dtcannon.ts` → `analysis/dtcannon-demos.json`
+(`dtcannon-demos.test.ts`), and `docs/dtcannon.html` + `docs/dtcannon-demos.html` from `dtcannon_page.py` + `dtcannon_prose.json`,
+the tenth card under 中盤手法 (yachi's pick, 2026-10-24). Every figure is read off the artefacts and tests, never typed here.
+
+**No shared RULE file changed**: the flat, nub-down T into a TSD whose follow-up is a TST standing on its nub column is BT砲's
+shape of record (`followup.lines` 3, the slot split by the two cleared rows and joined by the row map). The one shared edit is a
+`dtcannon` entry in `technique-qualify.ts`'s `QUALIFY_OPTIONS` (and a docstring clause naming it), which every technique
+artefact hashing that module re-emitted for: the eight facts and demos moved in their hash lines only, and `cutcopy-own.json` /
+`cutcopy-selfplay.json` in `classifier_md5` only. Like BT砲 it is also an opener (開幕DT砲), so a hit in the opener window is a
+column, never filtered; the opener hits are exactly the rounds `DT_ORDER_IN_OPENER` already names as DT Cannon first bags, which
+`dtcannon.test.ts` checks against `ordering.per_round`.
+
+~~**Its snapshot is MARKDOWN, not HTML, and it is the weakest pin of any technique.** … An open item: refetch the raw HTML and
+pin harddrop's DT_Cannon revision once a session can reach them.~~ **Closed 2026-10-24.** The snapshot is the page's raw HTML
+(`dtcannon.html`, fetched with curl and the YE2 intermediate, TLS verification on, as 山岳積み2号's), and its renderer's colour map
+(`column-exp.js`, hashed in `source.renderer`) was read: `p` is #ff33ff and `y` the pale Z, the mirror partner of `r`. Every board
+and quoted sentence is the markdown transcription's, letter for letter; the one metadata fix was the page's created date. harddrop's
+DT_Cannon is a redirect to Double Triple Cannon Setups, whose revision is pinned in `cross_source.harddrop` (oldid,
+`revision_sha1`, sha256, bytes; read with urllib through `api.php`), so `check_wikitext_sources` discovers it and refetches it
+weekly with `--wikitext-dir`. Its drawings the window fires on are agreement drawings, every other drawn T on it is in
+`drawn_t_not_fired` with why the window misses, its no-T boards the window fires on in `fires_without_slot`, and the boards that
+nearly fire in `near_misses` (the DT STSD form differs at exactly the cell harddrop draws empty; the Higher Notch board leaves the
+window off-board) — all complete both ways, measured by the gate. The window and the corpus hits did not move; the artefacts moved
+in `transcription_md5` only.
+
+**The window is the agreement box** of the page's eight drawings and the two SDPC Spin boards. It reads no `B`; `p` (pink) and `y`
+are read from the page's renderer. One measured relation the gate's miss rule does not see: `dtdt.tst` draws the first DT's TST
+with the second DT already stacked above it, and the window fires there, as drawn, at that second DT's TSD slot —
+`dtcannon.test.ts` pins it (`SECOND_DT`). **Qualify**: the key cell is the overhang over the TST stem alone, the one window cell
+every build places as a piece. `noRoof` makes a lock match both hands and is refused (asserted to throw); `followupAnyT` is
+measured equivalent and named. **No demo is built**: odd cell counts (a proof), boards even but not multiples of four (a planner
+limit), the DTDT residue boards, and のそみ砲's illustrations, which do not separate terrain from page pieces (a reading, not a
+measurement); `dtcannon-demos.test.ts` re-derives each.
+
+### 基本的なドネイト（basic donating）
+
+The same deliverable for `template/basicdonating.php` (「脱初心者のための基本的なドネイト」, 2024-10-07 版; yachi's 「下一個中盤」,
+2026-10-24): `pipeline/openers/basicdonating-technique.json` (held as a literal in `extract_basicdonating_shapes.py`, gated by the
+shared `technique_transcription.py`), `technique-profile-basicdonating.ts` → `analysis/basicdonating-facts.json`
+(`basicdonating.test.ts`), `technique-demos-basicdonating.ts` → `analysis/basicdonating-demos.json`
+(`basicdonating-demos.test.ts`), and `docs/basicdonating.html` + `docs/basicdonating-demos.html` from `basicdonating_page.py` +
+`basicdonating_prose.json`, the eleventh card under 中盤手法. Raw-HTML snapshot, fetched like 途中DT砲's; some boards are indented
+with a tab, which the opt-in `snapshot_indented` reads. Every figure is read off the artefacts and tests, never typed here.
+
+**Since 2026-10-26 it is matched by a RULE, not by windows (yachi: 「取代基本的なドネイト嘅認法」).** 「TSDで消える2列だけを埋める」,
+as yachi states it: a piece overhangs empty cells inside the rows the T-spin clears, and the clear opens them from the top
+again — any column, any depth, any distance from the T. `pipeline/sim/basicdonating-rule.ts` (`donationColumns`,
+`donationDetector`) is the profile's `detect`, and a variant with `window_basis: rule` has no window: a column DONATES when, at
+its topmost empty cell outside the cleared rows and directly under a cleared-row cell, (1) every filled cell of the column above
+it is in the cleared rows (so the clear re-opens it), (2) each is the T or a cell of a complete piece, never garbage or a
+fragment, (3) the cell above it is not the T's nub (yachi: 「呢個係普通tspin」), and (4) THE HOLE CAME FIRST: when the piece
+directly over the hole locked, the cell under its lowest cell in that column was already empty, read on the ownership board
+before that lock (since 2026-10-27, yachi on 10-22 m8r3 lock 31, whose covering I sat on the floor until garbage rose under it:
+「呢個唔算，唔係完整piece，唔夠elegant」; the 捐窿 table's `wellAtPlug` is the same idea, kept separate). A covering piece may keep cells above the
+cleared rows (yachi: 「算」); `cover` records `cleared` / `kept`. The hit's own column (its payoff well and its box) is the one
+nearest the T, then the leftmost; the box runs from the row over the cleared rows to the row under that hole. Ablations are
+the four clauses dropped (`allow_t_nub`, `allow_fragment`, `no_reopen`, `allow_late_hole`); the Python twin reads no ownership, so rules 2 and 4 are TS only. The six hole windows `k1`..`k6` and the `nub`
+window that came before were retired: they matched the page's own distances only, and yachi's review of their hits found holes
+the build never covered and overhangs that were never holes. The rule's Python twin (`rule_columns`, `rule_own`,
+`rule_window`, `rule_accounting` in `technique_transcription.py`) holds every spin board of the page to it both ways (a miss is
+a `rule_not_fired` entry with a reason), and `basicdonating.test.ts` holds the TS rule to the Python one on every drawing. The
+payoff is 欄干's `well_quad`, harddrop's next step, not the page's. Two older opt-ins in the shared gate stay:
+`snapshot_indented` and `muting_slips`.
+
+**Qualify is two rules** (`pipeline/sim/basicdonating-qualify.ts`). `other_page` (yachi: 「有啲已經係其他pattern」): a T at which
+any other technique page's window fires (any variant, either hand) is that page's. `opener_route` (yachi's decision card,
+2026-10-27, on 10-22 m8r1 pinglamb lock 24, 迷走砲's third-bag 「STMB cave の形」 TSD): the round is a case of an opener route
+artefact (`ROUTE_ARTEFACTS`) that matched a bag-2 board, and the T locks within `ROUTE_LOCKS` (14, two bags) after that match,
+so it is the route's own continuation — the 迷走砲 page draws those TSDs with placeholder cells, so no window can claim them.
+The route artefacts are hashed by this page's facts, so **emit the route facts before 基本的なドネイト's**. The build rules (complete pieces, no
+garbage) are inside the donation rule itself, and the whole-shape rule does not apply to a rule variant. `COMMON` in the test
+pins how many of each other page's hits are donations here (counts are the test's). Every rule hit
+carries `donation: {columns, box, t_cells}`; `t_cells` is what the page's thumbnails draw the T from. The other gates'
+`other_windows` records (kaidan, shachikutrain) name the rule's firings as variant `rule`, one-handed.
+
+**The report region and the replay labels see one variant.** **No demo is built**: odd cell counts (a proof), even counts not
+multiples of four (a planner limit), and most boards drawing the donated pieces and the T in one diagram with no board of the
+pieces placed before the T; `basicdonating-demos.test.ts` re-derives each reason by kind. Named lists and sizes live in the tests.
+
+### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other seven pages
+
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト and 途中DT砲 carry the same build rules as 社畜トレイン
+and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
+(`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
+its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page
+names as one is one piece (階段のドネイト's 「Zを縦置き」: `z_not_one_piece`), and no Perfect Clear lies within `DPC_LOCKS`
+locks either side of the T (`dpc`); `ownership_unverified` as for the other two. The key cells default to the transcription's
+`roof_cells` + `window_extra` (the pieces above the cleared rows, which every page draws as what it builds); STSD, STMB Cave,
+千鳥格子's `uncut` and 階段のドネイト name theirs in `QUALIFY_OPTIONS`, each with its reading beside it. The cleared rows and
+the stack under them are NOT required to be fresh: measured on 2026-10-23, fragments there are the ordinary old stack every
+page draws grey, while the cells above the cleared rows were whole pieces in almost every hit — so requiring the whole window
+fresh would have failed hits nobody would call accidental. No overlap rule was added: of the window relations the pages
+name (BT砲 / 欄干, 千鳥格子 uncut / STMB Cave, 階段 / 社畜), BT砲 and uncut hold no corpus hit and the last is excluded on
+社畜's side. The test pins each artefact's per-player tally and, where few fail, every failing hit by name; re-derives every
+committed verdict from the digests; and turns each rule off to see it qualify exactly the hits failing only that rule, and
+requires each rule live somewhere in the corpus. Every one of the eight pages is `corpus_qualified_only`; on 千鳥格子 the
+精選 set is drawn from qualifying hits only. Which hits fail, and how many, is the test's, never this file's — only that
+階段のドネイト is the page where most fail (its Z split by a clear, or garbage in its steps). Editing `technique-qualify.ts`
+moves all eight pages' facts and demos hash lines (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`); 社畜トレイン's and 欄干's artefacts do not hash it.
+
+### 成個形狀 — the whole drawn shape, a rule every page adds (since 2026-10-25)
+
+The window is the box every drawing agrees on, so it is small: STMB Cave's reads three rows and a one-deep dimple
+passes it, and yachi read the hits as ordinary stacks (「人哋係睇特定形狀，你就求其話 TSpin 就算」). So every technique
+page's `qualify` check is wrapped by `pipeline/sim/technique-wholeshape.ts` (`withWholeShape`), which adds
+`not_whole_shape`: a hit qualifies only if ONE of the source's own drawings of the variant (its board and every
+`agreement` / `drawings` entry that names a node of the same transcription) stands around the T cell for cell by
+occupancy, colour ignored, in either hand. A drawing's region is its T, every enclosed empty component (empty under a
+filled cell in the same column) that touches the T or reaches into the rows from one above the T to three under its
+lowest cell, and a one-cell margin, clipped to the drawing (nothing under its bottom row is read). On the board a cell
+under the floor is filled, above the top empty, past a wall no match. Drawings another site holds only by reference
+are not read. The rule is one module, so editing it moves every technique facts and demos artefact's
+`classifier_md5` (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s); every test that re-derives verdicts wraps its
+qualifier the same way and turns the rule off (`{ off: true }`) like the others. Which pages it bites on, and by how
+much, is the tests' (the tallies and named lists), never this file's; on STSD, インペリアルクロス, 千鳥格子, 欄干's TSD,
+階段のドネイト and 途中DT砲 it removes no qualifying hit, because their windows already hold the drawing. Mining every
+verified full T-spin by the same regions (2026-10-25, scratch only) found no repeated mid-game shape that no page
+draws: plain TSD slots, the donations, a ダブルダガー-like pair of slots, 欄干 and covered-well TSDs. The 建議 tagged items that cited STMB Cave and
+ダブルダガー counts were rewritten against the new cells on the same pass, and the ones whose count went to zero deleted.
+
+## DPC 頁 — what the first T-spin after a Perfect Clear was built on
+
+harddrop's six DPC pages (DPC Setups and Extra S/Z, O, I, J/L, T) are transcribed into
+`pipeline/openers/dpc-setups.json` (named `*-setups.json`; `extract_dpc_setups.py` gates it, and
+`check_wikitext_sources` discovers its six pinned revisions like a technique file's and re-runs it
+with `--wikitext-dir`). `pipeline/sim/dpc-facts.ts` → `analysis/dpc-facts.json` takes every PC
+point and the first full or mini T-spin that clears within 15 locks after it and before the next
+PC, strips complete garbage rows from the bottom, and compares the board before that T with every
+drawn setup by occupancy, as drawn and mirrored, with the T's own cells. `docs/dpc.html` from
+`pipeline/dpc_page.py` + `dpc_prose.json` is the 中盤手法 group's last card. Same quarantine as the
+technique pages: no claim id, no ✓, no demo.
+
+Two things the wording must keep. **The PC points are anchored**: per player-round the simulator's
+board-empty count must equal `clears.allclear` (twice-extracted), and the artefact refuses to
+build otherwise. **The board after a PC is mostly past the verified prefix**, because the game
+sends that PC's attack in packets the oracle sends as one; every case says whether it is verified,
+and the page prints both counts. It is NOT in `TECHNIQUE_SITES` (`replay_labels` and the report's
+routes section read that list); `bin/build-docs` renders it in its own loop. Counts, the named
+`MATCHED` list and the Shachiku cross-check live in `dpc.test.ts`, never here.
+
+## 第二次全消頁 — a Perfect Clear straight into a four-line one
+
+harddrop's Second Perfect Clear page (one pinned revision; the sister page of queue-based setups is
+recorded in `source.declined` with its reason) is transcribed into `pipeline/openers/secondpc-setups.json`
+(gated by `extract_secondpc_setups.py`, discovered weekly by `check_wikitext_sources`). A board is a
+SETUP (no `G`, no full row, whole pieces by count) or a SOLUTION (every row full, its `G` cells exactly the
+occupancy of the setup before it under the same heading); a lower-case letter is harddrop shading a second
+piece of that letter and is read as that piece. `pipeline/sim/secondpc-facts.ts` → `analysis/secondpc-facts.json`
+takes consecutive PC points of a player-round and, when the second clears exactly four lines with no garbage
+between, draws the pieces between them in the four-row kept-rows frame and compares that layout with every
+drawn solution (letter for letter, mirrored with J↔L and S↔Z) and every setup (whole pieces, placed first).
+Its PC loop is a COPY of `dpc-facts.ts`'s, and `secondpc.test.ts` holds its per-player `pc_points` and
+`rounds_rowmap_stops` equal to the DPC artefact's. `docs/secondpc.html` from `pipeline/secondpc_page.py` +
+`secondpc_prose.json` is a 中盤手法 card rendered in `bin/build-docs`'s DPC loop, not in `TECHNIQUE_SITES`.
+Same quarantine as the DPC page. The cases are a named list in the test (none matches harddrop at the time
+of writing); every other PC point is counted out by reason, and the accounting test makes them sum.
 
 ### 派牌次序 — which dealt orders build each SDPC Spin node, proved twice
 
@@ -4045,10 +5408,10 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->35808<!--/round:figures--> 個
-quantized figure、<!--round:sites-->40<!--/round:sites--> 對 (site, helper)**:
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->38610<!--/round:figures--> 個
+quantized figure、<!--round:sites-->41<!--/round:sites--> 對 (site, helper)**:
 <!--round:enforced-->30<!--/round:enforced--> 個有 corpus 撐住,
-<!--round:ontrust-->10<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
+<!--round:ontrust-->11<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
 而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
 條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。
 
@@ -4060,8 +5423,8 @@ quantized figure、<!--round:sites-->40<!--/round:sites--> 對 (site, helper)**:
 **但第六對會,而且已經變咗五次 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
 喺七個 session 之下分得開 floor 同 ceil(當時 14 個 call),分唔開 floor 同 round(0 個
 call)。冇人郁過一行 code,一路加 session 落去,兩欄都郁:ceil 嗰欄而家係
-<!--round:dp1-split-->34 個 call<!--/round:dp1-split-->,而 round 嗰欄行過
-0 → 10 → 24 → 0 → 14 → 15 → 0 → <!--round:dp1-round-->17 個 call<!--/round:dp1-round-->。
+<!--round:dp1-split-->19 個 call<!--/round:dp1-split-->,而 round 嗰欄行過
+0 → 10 → 24 → 0 → 14 → 15 → 0 → <!--round:dp1-round-->19 個 call<!--/round:dp1-round-->。
 
 **第十三個 session 將佢由 enforced 打返落「靠信」,第十四個又推返上去——同一個 site,兩個方向,
 三次。** 「真正 enforced,唔再係靠一欄撐住」嗰句喺十二個 session 之下係啱嘅:當時 round 嗰欄
@@ -4094,6 +5457,15 @@ floor 同 round 會出唔同字嘅半格上面,所以成欄一齊歸零。102 �
 17 啱啱好係 34 嘅一半:加咗 10-12 之後 `sd_long` 係 13.8603,floor 出 13.8、round 出 13.9,而
 `sd_short` 嘅 62.9311 兩條規則都係 62.9 —— 即係每份 footnote 嗰對數入面一個分得開、一個分唔開。
 55 局,大細得 10-09 一半左右,照樣將佢推返上去:又一次唔係局數,係個 SD 落喺半格邊一邊。
+
+**第十九個 session(10-22)將 `_dp1` 拆開做兩個 site,所以上面條鏈最後一格同之前嘅格唔係同一樣嘢。**
+加咗 10-22 之後 footnote 嗰對數係 63.7 同 14.1(floor),而 63.7 / 14.1 floor 出 4.5,大過未
+round 嘅 4.4948 —— `_check_sd_ratio` 拒絕咗份 footnote,因為「足足細咗 4.5 倍」講多咗。分母係
+跌勢嘅細嗰頭,floor 佢就係誇大個跌幅,所以而家 `sd_long` 行 `records._dp1_up`(ceil,14.2),
+`sd_short` 留喺 `records._dp1`(floor)。即係話 `_dp1` 由「19 個 session × 一對數」變成
+「19 個 session × 一個數」:佢兩欄而家都係 19,全部分得開,所以 enforced;新嘅 `_dp1_up` 嘅
+round 欄係 0(14.1x 嘅 ceil 同 round 都出 14.2),入咗靠信,呢個就係 site 數 40 → 41、靠信
+10 → 11 嘅來源。之前嘅 0 → 10 → … → 18 係嗰對數合埋嘅紀錄,唔可以同最後嗰個 19 直接比。
 
 **同一個 session 入面,兩個 gated 嘅數一個 byte 都冇郁,而佢哋數緊嗰個 set 換咗兩個成員 ——
 呢個先係今次最值得記低嘅嘢。** 上面段嗰兩個 fragment(enforced 同 ontrust)十二同十三個

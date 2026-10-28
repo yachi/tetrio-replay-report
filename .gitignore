@@ -42,3 +42,7 @@ sessions/*/sim/pairs-cache.json
 # NO TRAILING SLASH, deliberately: `node_modules/` matches a directory, and git sees a symlink as
 # a FILE — so the slashed form left the exact artefact described above still untracked-and-unignored.
 node_modules
+
+# the Pages site: rendered by bin/build-docs, deployed by CI, never committed
+docs/
+_site/

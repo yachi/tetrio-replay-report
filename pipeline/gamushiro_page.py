@@ -76,6 +76,7 @@ GAMUSHIRO_SITE = RouteSiteProfile(
     pc_lines=8,
     cell_classes={"L": "lm", "C": "cl"},
     extra_css=GAMUSHIRO_CSS,
+    see_also=("hdgamushiro.html", "see_also"),
     max_page_bytes=3_000_000,
     near_lists=(("subset", "bag2_none_tst_before_complete"), ("superset", "bag2_none_extra_piece"),
                 ("moved", "bag2_none_moved_piece"), ("unexplained", "bag2_none_unexplained"),

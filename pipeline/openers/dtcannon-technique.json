@@ -1,0 +1,2434 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "dtcannon",
+  "source": {
+    "url": "https://shiwehi.com/tetris/template/dtcannon.php",
+    "title": "DT砲(途中DT)(Mid-game Double Triple Cannon)",
+    "author": "しゑひ(shiwehi)",
+    "created": "2021-04-02",
+    "updated": "2024-08-29",
+    "fetched": "2026-10-24",
+    "fetch_method": "curl through the session proxy, TLS verification ON, with --cacert naming a bundle that adds the Let's Encrypt YE2 intermediate (shiwehi.com omits it from its chain), the method STSD, BT砲 and 階段のドネイト used. The snapshot is the page's raw HTML, byte for byte; every board is plain text in it, 20 ten-wide boards in page order. (The first transcription, 2026-10-23, was checked against a markdown rendering, sha256 b069e04f665c1a5cba7704efaa58957aa4f519785eabeef496afc1d6d33014f8, 8120 bytes, because the host was refused then; every board and every quote is the same against this raw HTML, and the page's creation_date meta is 2021-04-02, not the 2021-04-01 that version recorded.)",
+    "snapshot_file": "dtcannon.html",
+    "snapshot_sha256": "cd4a82c025962c9475091d674f7f2542842de43a0bb6ca9343577dd501c41986",
+    "snapshot_bytes": 31366,
+    "snapshot_note": "sha256 of the raw HTML this transcription was checked against. Not re-verifiable in CI: the page is not committed and cannot be fetched there. Re-check with --html-dir after any refetch (with harddrop's Double_Triple_Cannon_Setups.wikitext beside it); an HTML hash moves with ANY byte of the page (ads, sidebar, a date), so a moved hash means \"read the board diff\", not \"the boards changed\". Sentences are compared against the page with its tags dropped.",
+    "renderer": {
+      "url": "https://shiwehi.com/tetris/mutual/column-exp.js?date=20210408",
+      "read": "2026-10-24",
+      "sha256": "95c431a4147f9c30fc0e1bae935e6af6f5669c3d2fa1edfc388848e69ab62570",
+      "sha256_note": "the same bytes STSD and BT砲 recorded, re-fetched for this page to read `p` and `y`",
+      "colorMap_used": {
+        "p": "#ff33ff (pink): the finished-TSD section's marker cell",
+        "y": "#ffa6a6 with a rgba(255,0,0,0.5) gradient, the pale Z; reversedCharMap swaps it with r, the pale S",
+        "c C U": "#a3a3a3, #cccccc, #c8a6ff with a #8400ff dot (gradientMap)",
+        "j l o z s i": "#0011ff #ff7b00 #eeee00 #ff0000 #33ff00 #00b7ff",
+        "-": "#000000"
+      },
+      "mirror_button": "body.reversed swaps j<->l, s<->z (and upper case, and r<->y); the page draws only one hand"
+    },
+    "decorative_images": [
+      "DT砲(途中DT)(Mid-game Double Triple Cannon)タイトル画像",
+      "DT砲の消し方 (an animated gif, not transcribed)"
+    ],
+    "references": [
+      "./dtcannonopener.php (開幕DT砲)",
+      "./derivedtcannonop.php (開幕DT砲からの派生, DTDT)",
+      "./mrtspinsstd.php (Mr. T-Spin's STD, のそみ砲)",
+      "./tspin.php"
+    ],
+    "unfetched": []
+  },
+  "terms": {
+    "url": "https://shiwehi.com/tetris/explanation/terms.php",
+    "dated": "2023-05-12",
+    "read": "2026-10-11, for 迷走砲: the same terms page, linked from this page's footer; not re-read for this page",
+    "allows": "non-commercial HP/blog use without contacting the admin",
+    "excludes": "営利目的 sites (e.g. Google AdSense)",
+    "requests": "URL credit or a heads-up",
+    "how_met": "source link in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell filled before this diagram (any piece, or garbage), grey",
+    "i j l o z s": "a cell of that piece",
+    "I J L O S Z": "a cell of that piece drawn muted (in a row a spin clears, or a piece placed earlier); checked whole with its lower-case cells",
+    "U": "a cell of the T the spin places (the renderer's \"the T goes here\")",
+    "C": "an earlier cell in a row the spin clears (muted; checked on every spin board), or on a build board a cell of the stack the build places beside the slot, drawn muted (OUR READING)",
+    "p": "the finished-TSD section's pink cell (the renderer's #ff33ff), the one the page says must stay open while the yellow one is filled (「下図ピンクマスを埋めないように黄色マスを埋める」); a marker, read as filled (OUR READING)",
+    "y": "a letter on DTDT's TST board alone, four cells in a Z's shape: the renderer's pale Z (#ffa6a6, the mirror partner of `r`, the pale S); the page does not say what the pale colour marks, so it is read as filled, no piece (OUR READING)",
+    "%X": "the X piece"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "h.shape",
+      "verbatim": "DT砲の形と消し方"
+    },
+    {
+      "id": "shape",
+      "verbatim": "DT砲の形は以下の通りで、その名の通り、TSDを打った後にTSTを打つことができます。"
+    },
+    {
+      "id": "h.rotate",
+      "verbatim": "回転方法"
+    },
+    {
+      "id": "keys",
+      "verbatim": "switchのキーで解説していきます。"
+    },
+    {
+      "id": "rotate2",
+      "verbatim": "初めに右回転をしてから壁に寄せ、下におろしてから左回転、左回転です。"
+    },
+    {
+      "id": "tst",
+      "verbatim": "1つ目の%Tさえ入れることができれば、2つ目は普通のTSTです。"
+    },
+    {
+      "id": "h.build",
+      "verbatim": "DT砲の作り方"
+    },
+    {
+      "id": "h.wait",
+      "verbatim": "TSD屋根付き1列待ちの形"
+    },
+    {
+      "id": "wait",
+      "verbatim": "DT砲の最も作りやすい形は、TSDの形を作って%I待ちをしている時に、代わりに%J%Lを立てて作る方法です。"
+    },
+    {
+      "id": "wait.normal",
+      "verbatim": "通常上図のようになるところを、下図のようにすることでDT砲の形を作れます。"
+    },
+    {
+      "id": "hole",
+      "verbatim": "穴が2マス以上必要"
+    },
+    {
+      "id": "wait.any",
+      "verbatim": "上図では72積みの形で説明していますが、同様の形があればどこでも構いません。"
+    },
+    {
+      "id": "h.roof",
+      "verbatim": "TSD屋根待ちの形から"
+    },
+    {
+      "id": "roof",
+      "verbatim": "TSDの屋根待ちの状態から下図のようにして途中DTを組むことができます。"
+    },
+    {
+      "id": "roof.l",
+      "verbatim": "基本的には%L(左右反転の場合は%S)を使用します。"
+    },
+    {
+      "id": "roof.fill",
+      "verbatim": "この方法でDT砲を作った時、TSTを打つ前に%Zの左上のマスを埋める必要がありますが、63積みの3側に低い屋根を付けた場合は、%I以外で埋めようとすると%Tが入らなくなってしまうので注意してください。"
+    },
+    {
+      "id": "h.done",
+      "verbatim": "TSD完成形から"
+    },
+    {
+      "id": "done",
+      "verbatim": "TSDの形が完成している状態からも、条件によっては途中DTを組むことができます。"
+    },
+    {
+      "id": "done.wall",
+      "verbatim": "屋根が無い側の壁は2マスまで"
+    },
+    {
+      "id": "done.j",
+      "verbatim": "逆に、屋根がある側の壁は%Jを引っ掛けることができるので、屋根にプラスして4マスまで高くすることができます。"
+    },
+    {
+      "id": "h.derived",
+      "verbatim": "開幕テンプレ後の派生としてのDT砲"
+    },
+    {
+      "id": "derived",
+      "verbatim": "開幕テンプレからの派生としてDT砲を組むテンプレもいくつか存在します。"
+    },
+    {
+      "id": "h.dtdt",
+      "verbatim": "DTDT(開幕DT砲からの派生)"
+    },
+    {
+      "id": "h.nozomi",
+      "verbatim": "のそみ砲(Mr.T-Spin's STDからの派生)"
+    },
+    {
+      "id": "nozomi",
+      "verbatim": "のそみ砲と呼ばれるDT砲派生が存在します。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic",
+      "kind": "base",
+      "caption_quote": "shape",
+      "label": "the basic form: a TSD slot, and a TST slot standing on its nub column under an overhang",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---c------",
+        "cc-ccccccc",
+        "c--ccccccc",
+        "c---cccccc",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "kind": "spin",
+      "spin_of": "basic",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "shape",
+      "label": "the T laid flat, pointing down, into the TSD slot",
+      "rows": [
+        "----------",
+        "--cc------",
+        "---c------",
+        "cc-ccccccc",
+        "c--ccccccc",
+        "CUUUCCCCCC",
+        "CCUCCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "tst.spin",
+      "kind": "spin",
+      "spin_of": "basic.after",
+      "on": "basic.after",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3,
+      "caption_quote": "tst",
+      "label": "what the TSD leaves, with the second T stood up into it: a TST (the page draws this board, not the one before it)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--cc------",
+        "---c------",
+        "CCUCCCCCCC",
+        "CUUCCCCCCC",
+        "CCUCCCCCCC"
+      ]
+    },
+    {
+      "id": "wait.terrain",
+      "kind": "base",
+      "caption_quote": "wait",
+      "label": "a TSD slot roofed by a Z, waiting for an I in the column beside it (72積み)",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---zz-----",
+        "----zz----",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.i",
+      "kind": "build",
+      "on": "wait.terrain",
+      "adds": "iC",
+      "caption_quote": "wait.normal",
+      "label": "what usually happens: the I goes into the column, the stack beside the slot built up",
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "i---------",
+        "i--zz-----",
+        "i---zzCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.terrain2",
+      "kind": "base",
+      "same_occupancy_as": "wait.terrain",
+      "caption_quote": "wait.normal",
+      "label": "the same terrain again",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---zz-----",
+        "----zz----",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "wait.dt",
+      "kind": "build",
+      "on": "wait.terrain2",
+      "adds": "jlC",
+      "caption_quote": "wait.normal",
+      "label": "a J and an L stood up instead: the DT shape",
+      "rows": [
+        "----------",
+        "--ll------",
+        "---l------",
+        "jj-lCCCCCC",
+        "j--zzCCCCC",
+        "j---zzCCCC",
+        "cc-ccccccc",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "roof.so",
+      "kind": "build",
+      "on": "roof.base",
+      "adds": "so",
+      "caption_quote": "roof",
+      "label": "the TSD roofed with an O and the S-lettered piece over it: by occupancy the DT shape too (measured)",
+      "rows": [
+        "----------",
+        "----ss----",
+        "-----ss---",
+        "--zz-oo---",
+        "-zz--oo---",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "roof.build",
+      "kind": "build",
+      "on": "roof.base",
+      "adds": "li",
+      "caption_quote": "roof.l",
+      "label": "an L stood up and an I laid flat instead: the DT shape",
+      "rows": [
+        "----------",
+        "----ll----",
+        "-----l----",
+        "--zz-l----",
+        "-zz--iiii-",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "roof.fill",
+      "kind": "illustration",
+      "caption_quote": "roof.fill",
+      "label": "the cell over the Z's upper left filled by an I before the TST (63積み with a low roof)",
+      "rows": [
+        "----------",
+        "----------",
+        "i---------",
+        "i--SS-----",
+        "i---SS----",
+        "iZZ-OOCCCC",
+        "ZZ--OOCCCC",
+        "ccc-cccccc"
+      ]
+    },
+    {
+      "id": "done.terrain",
+      "kind": "base",
+      "caption_quote": "done",
+      "label": "a finished TSD slot",
+      "rows": [
+        "----------",
+        "----------",
+        "-----ccccc",
+        "-----ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "done.build",
+      "kind": "build",
+      "on": "done.terrain",
+      "adds": "oi",
+      "caption_quote": "done",
+      "label": "an I laid beside it and an O over the stem: the DT shape",
+      "rows": [
+        "----oo----",
+        "----oo----",
+        "-----ccccc",
+        "iiii-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "done.cells",
+      "kind": "illustration",
+      "caption_quote": "done.wall",
+      "label": "the pink cell that must stay open and the yellow cell to fill (the side without a roof two high at most)",
+      "rows": [
+        "----------",
+        "----------",
+        "----cccccc",
+        "--p--ccccc",
+        "---o-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "jhook.build",
+      "kind": "build",
+      "on": "jhook.terrain",
+      "adds": "j",
+      "caption_quote": "done.j",
+      "label": "the side with the roof built four high, a J hooked over it",
+      "rows": [
+        "----jj----",
+        "----jccccc",
+        "----jccccc",
+        "-----ccccc",
+        "cccc-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dtdt.spin",
+      "kind": "spin",
+      "spin_of": "dtdt.base",
+      "on": "dtdt.base",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2,
+      "caption_quote": "h.dtdt",
+      "label": "DTDT: the DT shape built on 開幕DT砲's residue, its TSD drawn",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-----z----",
+        "--ll-zz---",
+        "---lssz--i",
+        "jj-lcssooi",
+        "j--ccccooi",
+        "JUUUCCCCCI",
+        "CCUCCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dtdt.tst",
+      "kind": "spin",
+      "spin_of": "dtdt.tst.base",
+      "on": "dtdt.tst.base",
+      "adds": "U",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3,
+      "caption_quote": "h.dtdt",
+      "label": "DTDT later: its TST drawn, with the next bag stacked over it",
+      "rows": [
+        "----------",
+        "-------yy-",
+        "--------yy",
+        "-----ss-oo",
+        "i---ss--oo",
+        "iljjjc---z",
+        "ilccjcc-zz",
+        "illcccc-zc",
+        "CCUCCCCCCC",
+        "CUUCCCCCCC",
+        "CCUCCCCCCC"
+      ]
+    },
+    {
+      "id": "nozomi.1",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲, from Mr. T-Spin's STD: its T-spin Single drawn",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "---------i",
+        "----j----i",
+        "----j----i",
+        "l--jj--z-i",
+        "LUUUSSZZOO",
+        "llUss-z-oo"
+      ]
+    },
+    {
+      "id": "nozomi.2",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: a T-spin Triple drawn",
+      "rows": [
+        "----------",
+        "--------l-",
+        "--------l-",
+        "--------ll",
+        "-oo------c",
+        "SOOZCIJJUC",
+        "SSZZCIJUUC",
+        "CSZCCIJCUC",
+        "cccccic-cc"
+      ]
+    },
+    {
+      "id": "nozomi.3",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: a stood T clearing one row",
+      "rows": [
+        "----------",
+        "----------",
+        "--------zi",
+        "----ss-zzi",
+        "---ss--zci",
+        "---jj---ci",
+        "llljoo-Ucc",
+        "lccjoo-UUc",
+        "CCCCCCCUCC"
+      ]
+    },
+    {
+      "id": "nozomi.4",
+      "kind": "illustration",
+      "caption_quote": "nozomi",
+      "label": "のそみ砲: the board it leaves, the DT shape built on it (measured)",
+      "rows": [
+        "----------",
+        "---i--szz-",
+        "---i--sszz",
+        "llli---scc",
+        "looicc-ccc",
+        "joocc--ccc",
+        "jjjcc---cc",
+        "cccccc-ccc",
+        "cccccc-ccc"
+      ]
+    },
+    {
+      "id": "basic.after",
+      "kind": "derived",
+      "derived": true,
+      "reading": "tst.spin less its U: what the TSD leaves (measured to be basic.spin after its clear, by occupancy); its rows the TST clears are drawn muted, as the page draws them on tst.spin",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--cc------",
+        "---c------",
+        "CC-CCCCCCC",
+        "C--CCCCCCC",
+        "CC-CCCCCCC"
+      ]
+    },
+    {
+      "id": "roof.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "roof.build less its L and I (equally roof.so less its S-letter and O): the TSD waiting for its roof",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--zz------",
+        "-zz-------",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "jhook.terrain",
+      "kind": "derived",
+      "derived": true,
+      "reading": "jhook.build less its J: the finished TSD with the roof side four high",
+      "rows": [
+        "----------",
+        "-----ccccc",
+        "-----ccccc",
+        "-----ccccc",
+        "cccc-ccccc",
+        "ccc--ccccc",
+        "ccc---cccc",
+        "cccc-ccccc",
+        "cccc-ccccc"
+      ]
+    },
+    {
+      "id": "dtdt.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dtdt.spin less its U: the DTDT board before its TSD",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "-----z----",
+        "--ll-zz---",
+        "---lssz--i",
+        "jj-lcssooi",
+        "j--ccccooi",
+        "J---CCCCCI",
+        "CC-CCCCCCC",
+        "cc-ccccccc"
+      ]
+    },
+    {
+      "id": "dtdt.tst.base",
+      "kind": "derived",
+      "derived": true,
+      "reading": "dtdt.tst less its U: the DTDT board before its TST, the next bag over it",
+      "rows": [
+        "----------",
+        "-------yy-",
+        "--------yy",
+        "-----ss-oo",
+        "i---ss--oo",
+        "iljjjc---z",
+        "ilccjcc-zz",
+        "illcccc-zc",
+        "CC-CCCCCCC",
+        "C--CCCCCCC",
+        "CC-CCCCCCC"
+      ]
+    }
+  ],
+  "page_order": [
+    "basic",
+    "basic.spin",
+    "tst.spin",
+    "wait.terrain",
+    "wait.i",
+    "wait.terrain2",
+    "wait.dt",
+    "roof.so",
+    "roof.build",
+    "roof.fill",
+    "done.terrain",
+    "done.build",
+    "done.cells",
+    "jhook.build",
+    "dtdt.spin",
+    "dtdt.tst",
+    "nozomi.1",
+    "nozomi.2",
+    "nozomi.3",
+    "nozomi.4"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "dtcannon",
+      "board": "basic.spin",
+      "spin": "TSD",
+      "lines": 2,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          1,
+          7
+        ],
+        "cols": [
+          0,
+          3
+        ]
+      },
+      "t_cells": [
+        [
+          5,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          2
+        ]
+      ],
+      "roof_cells": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's eight drawings of the shape and harddrop SDPC Spin's two DT Cannon continuations. Column 0 is the wall; rows 5-6 are the rows the TSD clears (entailed by the clear at a full TSD, NaiveClauseForced); above them the TST slot's nub row (row 4: the stem over the T's middle and the nub toward the wall, walled both sides), the stem's row walled both sides (row 3), the overhang's second cell (row 2) and the overhang over the stem (row 1); under them the stem's bottom cell, walled both sides (row 7). Everything right of column 3, and row 0, is outside: the drawings disagree there. Occupancy only, never colour; garbage is filled.",
+      "agreement": [
+        {
+          "board": "basic",
+          "t_cells": [
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "wait.dt",
+          "t_cells": [
+            [
+              5,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              6,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "roof.build",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "done.build",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "jhook.build",
+          "t_cells": [
+            [
+              6,
+              3
+            ],
+            [
+              6,
+              4
+            ],
+            [
+              6,
+              5
+            ],
+            [
+              7,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "dtdt.base",
+          "t_cells": [
+            [
+              8,
+              1
+            ],
+            [
+              8,
+              2
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              9,
+              2
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "roof.so",
+          "t_cells": [
+            [
+              5,
+              3
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              4
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "nozomi.4",
+          "t_cells": [
+            [
+              6,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              6
+            ]
+          ],
+          "mirrored": false
+        }
+      ],
+      "followup": {
+        "board": "basic.after",
+        "spin": "TST",
+        "lines": 3,
+        "t_cells_pre_clear": [
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            7,
+            2
+          ]
+        ],
+        "t_cells_after": [
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            2
+          ]
+        ],
+        "note": "the T stood up into the TST slot, nub toward the wall (the page: 「2つ目は普通のTSTです」). Before the TSD its cells are split by the two cleared rows (three above them, the stem's bottom cell under them, under the TSD's nub); the TSD joins them, and the matcher carries the slot through every later clear to the next T."
+      },
+      "fires_on": [
+        "basic",
+        "wait.dt",
+        "roof.so",
+        "roof.build",
+        "done.build",
+        "jhook.build",
+        "dtdt.base",
+        "nozomi.4"
+      ],
+      "misses": [
+        "wait.terrain",
+        "wait.i",
+        "wait.terrain2",
+        "roof.fill",
+        "done.terrain",
+        "done.cells",
+        "tst.spin",
+        "basic.after",
+        "dtdt.tst",
+        "nozomi.1",
+        "nozomi.2",
+        "nozomi.3"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "routes",
+    "label_pattern": "dt",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on harddrop SDPC Spin's two DT Cannon continuations, mirrored, and on nothing else. The same two boards are external agreement drawings (`routes_drawings`), beside harddrop's own DT Cannon page (`harddrop`): its drawings whose drawn T the window fires on, and every other board of that page the window fires on or nearly does, recorded.",
+    "routes_drawings": {
+      "file": "sdpcspin-routes.json",
+      "nodes": [
+        "3.second.cspin.dt#1",
+        "3.second.cspin.dt#2"
+      ],
+      "mirrored": true,
+      "note": "harddrop's SDPC Spin page (another site, other authors) draws a DT Cannon on its second C-Spin build's residue, in two forms, mirrored; the U cells are the TSD's T"
+    },
+    "harddrop": {
+      "page": "https://harddrop.com/wiki/Double_Triple_Cannon_Setups",
+      "title": "Double Triple Cannon Setups",
+      "redirect_from": "https://harddrop.com/wiki/DT_Cannon (a #REDIRECT page, revision 16028, 2014-02-10)",
+      "oldid": 42401,
+      "revision_sha1": "b65fa20b9eb07853093c76841e7350767785e0ef",
+      "revision_timestamp": "2025-03-10T13:29:27Z",
+      "fetched": "2026-10-24",
+      "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=DT_Cannon&redirects=1&rvprop=ids|sha1|size|timestamp|content&rvslots=main), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and 42401 was the page's latest revision when fetched",
+      "snapshot_file": "Double_Triple_Cannon_Setups.wikitext",
+      "snapshot_sha256": "21ea01e0214d4dffafc5e51752a9370530fcb39769bec6615f5c38a13f2f833f",
+      "snapshot_bytes": 42123,
+      "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir; a person re-checks it with --html-dir, the file beside dtcannon.html",
+      "author_note": "the setup is designed by TKI (the page's first sentence); the page is harddrop's, edited by its wiki editors — another site and other authors than shiwehi.com",
+      "reading": {
+        "blank": "-, -- and an empty cell",
+        "P SP": "U, the T placed into the spin (SP muted, in a cleared row)",
+        "'T -T": "empty: a marker for a T still to come (two DT STSD drawings)",
+        "other": "any other code, its last letter in lower case (G grey, Q light grey, a two-letter Sx the muted x), every one FILLED"
+      },
+      "note": "every one of the page's 133 boards is in exactly one list or none, measured both ways by harddrop_page_problems: a board in none draws no T, the window fires nowhere on it, and it has no near miss (a terrain without its overhang, a step between two drawings, or another setup altogether). The `drawings` are agreement drawings, and they do not move the window: it is the same box without them (the page's drawings and SDPC Spin's already fix it), so they corroborate it and decide nothing",
+      "drawings": [
+        {
+          "table": 1,
+          "board": 0,
+          "section": null,
+          "mirrored": false,
+          "rows": [
+            "-----gg---",
+            "------g---",
+            "ggggg-gggg",
+            "gggg--gggg",
+            "ggggUUUggg",
+            "gggggUgggg",
+            "ggggg-gggg"
+          ]
+        },
+        {
+          "table": 37,
+          "board": 3,
+          "section": "Similar DT Attack",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "-----z----",
+            "--llzz---i",
+            "---lzs---i",
+            "jj-lgssooi",
+            "j--gggsooi",
+            "gUUUgggggg",
+            "ggUggggggg",
+            "jg-ggggggg"
+          ]
+        },
+        {
+          "table": 38,
+          "board": 3,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--gg------",
+            "---gqqqqqq",
+            "gg-gqqqqqq",
+            "g--ggqqqqq",
+            "gUUUggqggg",
+            "ggUggggggg",
+            "gg-ggggggg",
+            "g-gggggggg"
+          ]
+        }
+      ],
+      "drawn_t_not_fired": [
+        {
+          "table": 1,
+          "board": 3,
+          "section": null,
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "-----gg---",
+            "------g---",
+            "gggggUgggg",
+            "ggggUUgggg",
+            "gggggUgggg"
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "the page's opening animation, its TST: a stood T"
+        },
+        {
+          "table": 33,
+          "board": 1,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--gg------",
+            "---ggggggg",
+            "gg-ggggggg",
+            "g--ggggggg",
+            "gUUUgggggg",
+            "ggUggggggg",
+            "g--ggggggg"
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "DT STSD's first TSD: harddrop's own text, 「one further cell is empty at the bottom」, is the one window cell that disagrees (filled in every drawing of the window, empty here)"
+        },
+        {
+          "table": 33,
+          "board": 3,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "--gg------",
+            "---ggggggg",
+            "ggUggggggg",
+            "gUUggggggg",
+            "g-Uggggggg"
+          ],
+          "t": "stood",
+          "lines": 2,
+          "window": "not the window's T",
+          "note": "DT STSD: the STSD's stood T, after the first TSD"
+        },
+        {
+          "table": 33,
+          "board": 5,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "--gg------",
+            "UUUggggggg",
+            "gU-ggggggg"
+          ],
+          "t": "flat-down",
+          "lines": 1,
+          "window": "disagrees",
+          "note": "DT STSD: its last T, drawn flat after the earlier clears; it fills one row as drawn"
+        },
+        {
+          "table": 34,
+          "board": 2,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "-----qqqqq",
+            "-----qqqqq",
+            "---llqqqqq",
+            "----lqqqqq",
+            "lllUlqqqqq",
+            "lzUUjqqqqq",
+            "zz-Ujqqqqq",
+            "z--jjqqqqq"
+          ],
+          "t": "stood",
+          "lines": 2,
+          "window": "not the window's T",
+          "note": "DT STSD stacked one line higher: the STSD's stood T"
+        },
+        {
+          "table": 35,
+          "board": 2,
+          "section": "Similar DT Attack",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll--s---",
+            "---lzzssoo",
+            "---lgzzsoo",
+            "---ggiiiig",
+            "gUUUgggggg",
+            "ggUggggggg",
+            "-g-ggggggg"
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "Similar DT Attack's TSD: the S takes the O's place, so the TST's left wall is not the window's"
+        },
+        {
+          "table": 35,
+          "board": 5,
+          "section": "Similar DT Attack",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "--gg--g---",
+            "---ggggggg",
+            "ggUggggggg",
+            "gUUggggggg",
+            "ggUggggggg"
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "Similar DT Attack: its TST, a stood T"
+        },
+        {
+          "table": 37,
+          "board": 5,
+          "section": "Similar DT Attack",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "jj--------",
+            "j----ss---",
+            "j-zzssiwww",
+            "l--zzgiwww",
+            "l-ggggioog",
+            "ll-gggioog",
+            "ggUggggggg",
+            "gUUggggggg",
+            "ggUggggggg"
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "Similar DT Attack: its TST, a stood T"
+        },
+        {
+          "table": 38,
+          "board": 0,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---ll-----",
+            "----l-----",
+            "oo-sl-----",
+            "oo-ss----U",
+            "j-zzs---UU",
+            "jjjzziiiiU"
+          ],
+          "t": "stood",
+          "lines": 1,
+          "window": "not the window's T",
+          "note": "Dulse Flame: its opening T-Spin Mini, a stood T clearing one row"
+        },
+        {
+          "table": 39,
+          "board": 1,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--gg------",
+            "---gqqqqqq",
+            "ggUgqqqqqq",
+            "gUUggqqqqq",
+            "ggUggggggg",
+            "g-gggggggg"
+          ],
+          "t": "stood",
+          "lines": 3,
+          "window": "not the window's T",
+          "note": "Dulse Flame: its TST, a stood T"
+        },
+        {
+          "table": 39,
+          "board": 3,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "--gg------",
+            "UUUgqqqqqq",
+            "gUgggggggg"
+          ],
+          "t": "flat-down",
+          "lines": 2,
+          "window": "disagrees",
+          "note": "Dulse Flame: the further TSD under the overhang the DT Cannon left (the page's Triple Double Attack shape), not the window's"
+        }
+      ],
+      "fires_without_slot": [
+        {
+          "table": 0,
+          "board": 0,
+          "section": null,
+          "mirrored": false,
+          "rows": [
+            "-----gg---",
+            "------g---",
+            "ggggg-gggg",
+            "gggg--gggg",
+            "gggg---ggg",
+            "ggggg-gggg",
+            "ggggg-gggg"
+          ]
+        },
+        {
+          "table": 2,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-ltggggg",
+            "j--tttiggg",
+            "j---ssizzg",
+            "oo-sslijzz",
+            "oo-lllijjj"
+          ]
+        },
+        {
+          "table": 3,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "----i-----",
+            "--lli---s-",
+            "---li--zss",
+            "jj-liizzss",
+            "j--llizzss",
+            "j---lizzss",
+            "oo-jliztss",
+            "oo-jjjttts"
+          ]
+        },
+        {
+          "table": 3,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "------jj--",
+            "------j---",
+            "----zzj-ll",
+            "----izz--l",
+            "--llioo-sl",
+            "---lioozss",
+            "jj-liizzss",
+            "j--llizzss",
+            "j---lizzss",
+            "oo-jliztss",
+            "oo-jjjttts"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--oo------",
+            "--oo------",
+            "---l------",
+            "jj-lgggggg",
+            "j--llggggg",
+            "j---tgggsg",
+            "oo-tttzzss",
+            "oo-iiiizzs"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--oo------",
+            "--oo------",
+            "---l------",
+            "jj-lgggggg",
+            "j--llsgggg",
+            "j---tsszzg",
+            "oo-tttsjzz",
+            "oo-iiiijjj"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 2,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--s-------",
+            "--ss------",
+            "---s------",
+            "jj-ooggggg",
+            "j--ooggggz",
+            "j---tgggzz",
+            "oo-tttggzl",
+            "oo-iiiilll"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 3,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--zz------",
+            "---zz-----",
+            "jj-ooggggg",
+            "j--ooggggg",
+            "j---tggggg",
+            "oo-tttgggg",
+            "oo-iiiiggg"
+          ]
+        },
+        {
+          "table": 4,
+          "board": 4,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--oo------",
+            "--oo----ss",
+            "---l---ssi",
+            "jj-lzzjjji",
+            "j--llzzlji",
+            "j---tlllsi",
+            "oo-tttzzss",
+            "oo-iiiizzs"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-lgggggg",
+            "j--jjjgggi",
+            "j---zjslli",
+            "oo-zztssli",
+            "oo-ztttsli"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-lsszggg",
+            "j--sszzggi",
+            "j---zzslli",
+            "oo-zztssli",
+            "oo-ztttsli"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 2,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--zz------",
+            "---zz-----",
+            "jj-ooggggg",
+            "j--ooggggi",
+            "j---zgslli",
+            "oo-zztssli",
+            "oo-ztttsli"
+          ]
+        },
+        {
+          "table": 5,
+          "board": 3,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----l-----",
+            "--lll-----",
+            "---jj-----",
+            "jj-jsggggg",
+            "j--jssgggi",
+            "j---zsslli",
+            "oo-zztssli",
+            "oo-ztttsli"
+          ]
+        },
+        {
+          "table": 6,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "---ss-----",
+            "--ssz-----",
+            "---zz-----",
+            "jj-ztgslli",
+            "j--tttssli",
+            "j---oolsli",
+            "oo-joolzzi",
+            "oo-jjjllzz"
+          ]
+        },
+        {
+          "table": 6,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ttt-----",
+            "---tss---i",
+            "jj-sslzzgi",
+            "j--llllzzi",
+            "j---oolzzi",
+            "oo-joollzz",
+            "oo-jjjiiii"
+          ]
+        },
+        {
+          "table": 7,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--s-------",
+            "--ss------",
+            "---sz-----",
+            "jj-zzggggg",
+            "j--zjggggg",
+            "j---jggggg",
+            "oo-jjggggl",
+            "oo-iiiilll"
+          ]
+        },
+        {
+          "table": 7,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ttt-----",
+            "---tz-----",
+            "jj-zzggggg",
+            "j--zjggggg",
+            "j---jgggss",
+            "oo-jjggssl",
+            "oo-iiiilll"
+          ]
+        },
+        {
+          "table": 8,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--s-------",
+            "--ss------",
+            "---sz-----",
+            "jj-zzggggg",
+            "j--zjggggg",
+            "j---jggggg",
+            "oo-jjlgggg",
+            "oo-llliiii"
+          ]
+        },
+        {
+          "table": 8,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ttt-----",
+            "---tz-----",
+            "jj-zzggggg",
+            "j--zjggggg",
+            "j---jggggg",
+            "oo-jjlgggg",
+            "oo-llliiii"
+          ]
+        },
+        {
+          "table": 9,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": true,
+          "rows": [
+            "----------",
+            "i-----jj--",
+            "i--l--j---",
+            "illlzzj-ll",
+            "isszjzz--l",
+            "sszzjs---l",
+            "oozjjss-oo",
+            "ooiiiis-oo"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--s-------",
+            "--ss------",
+            "---s------",
+            "jj-sgggggz",
+            "j--ssgggzz",
+            "j---sgglzt",
+            "oo-oollltt",
+            "oo-ooiiiit"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "---ss-----",
+            "--ssz-----",
+            "---zz-----",
+            "jj-ztggggg",
+            "j--tttgggg",
+            "j---ssgggg",
+            "oo-sslgggg",
+            "oo-llliiii"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 2,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-ltggggg",
+            "j--tttiggg",
+            "j---ssizzg",
+            "oo-sslijzz",
+            "oo-lllijjj"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 3,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-ltggggg",
+            "j--tttiggg",
+            "j---zjilsg",
+            "oo-zzjilss",
+            "oo-zjjills"
+          ]
+        },
+        {
+          "table": 10,
+          "board": 4,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-lssgggg",
+            "j--sstgggi",
+            "j---zttggi",
+            "oo-zztlggi",
+            "oo-zlllggi"
+          ]
+        },
+        {
+          "table": 11,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-ltggggg",
+            "j--tttiggg",
+            "j---ssizzg",
+            "oo-sslijzz",
+            "oo-lllijjj"
+          ]
+        },
+        {
+          "table": 12,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-ltggggg",
+            "j--tttiggg",
+            "j---zjilsg",
+            "oo-zzjilss",
+            "oo-zjjills"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 0,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "-----s----",
+            "--ll-ss---",
+            "---lzzs--i",
+            "jj-lgzzooi",
+            "j--ggggooi",
+            "j---gggggi",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 1,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "---------z",
+            "--ll----zz",
+            "---l--sszi",
+            "jj-lgssooi",
+            "j--ggggooi",
+            "j---gggggi",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 2,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--lls--z--",
+            "---lsszz-i",
+            "jj-lgszooi",
+            "j--ggggooi",
+            "j---gggggi",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 3,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "--ll----ss",
+            "---lzz-ssi",
+            "jj-lgzzooi",
+            "j--ggggooi",
+            "j---gggggi",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 13,
+          "board": 4,
+          "section": "Empty Field Setups",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "---ss-----",
+            "--sszl----",
+            "---zzl---i",
+            "jj-zgllooi",
+            "j--ggggooi",
+            "j---gggggi",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 1,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--zz------",
+            "---zz-----",
+            "gg-oo-----",
+            "g--ooggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 2,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "gg-lss----",
+            "g--ssggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 3,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--oo------",
+            "--oo------",
+            "---l------",
+            "gg-l------",
+            "g--llggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 14,
+          "board": 4,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---lj-----",
+            "gg-lj-----",
+            "g--jjggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 15,
+          "board": 1,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "gg-l------",
+            "g--llggggg",
+            "g---lggggg",
+            "gg-glggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 15,
+          "board": 2,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--oo------",
+            "--oo------",
+            "---jj-----",
+            "gg-ji-----",
+            "g--jiggggg",
+            "g---iggggg",
+            "gg-giggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 16,
+          "board": 1,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--s-------",
+            "--ss------",
+            "---sz-----",
+            "gg-zz-----",
+            "g--zgggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 16,
+          "board": 2,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--zz------",
+            "---zz-----",
+            "gg-lll----",
+            "g--lgggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 16,
+          "board": 3,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--oo------",
+            "--oo------",
+            "---t------",
+            "gg-tt-----",
+            "g--tgggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 1,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--ll------",
+            "---l------",
+            "gg-l------",
+            "g--zz-gggg",
+            "g---zzgggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 2,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--zz------",
+            "---zz-----",
+            "gg-sll----",
+            "g--sslgggg",
+            "g---slgggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 17,
+          "board": 3,
+          "section": "Lower Notch and Overhang",
+          "mirrored": false,
+          "rows": [
+            "--ll------",
+            "---l------",
+            "gg-ltjj---",
+            "g--ttjgggg",
+            "g---tjgggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ]
+        },
+        {
+          "table": 33,
+          "board": 0,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--gg------",
+            "---ggggggg",
+            "gg-ggggggg",
+            "g--ggggggg",
+            "g---gggggg",
+            "gg-ggggggg",
+            "gq-ggggggg"
+          ],
+          "note": "DT STSD's terrain with its one further empty cell drawn light grey (Q); read as filled, as every Q is, so it is the DT Cannon and the window fires"
+        },
+        {
+          "table": 38,
+          "board": 2,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--ll------",
+            "---l------",
+            "jj-l------",
+            "j--gg-----",
+            "j---gi-zoo",
+            "gg-ggizzoo",
+            "gg-ggizssg",
+            "g-gggissgg"
+          ]
+        },
+        {
+          "table": 40,
+          "board": 0,
+          "section": "Stacking DT Cannons",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "---zgggggg",
+            "--zzgggggg",
+            "--zllggggg",
+            "---llggggg",
+            "jj-llggggg",
+            "j--llggggg",
+            "j---zggggg",
+            "oo-zzggggg",
+            "oo-zgggggg",
+            "jj-sgggggg",
+            "j--ssggggg",
+            "j---sggggg",
+            "oo-ooggggg",
+            "oo-ooggggg"
+          ]
+        }
+      ],
+      "near_misses": [
+        {
+          "table": 18,
+          "board": 1,
+          "section": "Higher Notch",
+          "mirrored": false,
+          "rows": [
+            "jj-ggggggg",
+            "j--ggggggg",
+            "j---gggggg",
+            "gg-ggggggg",
+            "gg-ggggggg"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  2,
+                  1
+                ],
+                [
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  3
+                ],
+                [
+                  3,
+                  2
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [],
+              "off_board": 8
+            }
+          ],
+          "note": "Higher Notch, drawn cropped: every window cell on the board agrees and the eight above it, the overhang rows, are not drawn"
+        },
+        {
+          "table": 19,
+          "board": 1,
+          "section": "Higher Notch",
+          "mirrored": false,
+          "rows": [
+            "lll-gggggg",
+            "lg--gggggg",
+            "gg---ggggg",
+            "ggg-gggggg",
+            "ggg-gggggg"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  3
+                ],
+                [
+                  2,
+                  4
+                ],
+                [
+                  3,
+                  3
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [],
+              "off_board": 8
+            }
+          ],
+          "note": "Higher Notch, drawn cropped: every window cell on the board agrees and the eight above it, the overhang rows, are not drawn"
+        },
+        {
+          "table": 20,
+          "board": 1,
+          "section": "Higher Notch",
+          "mirrored": false,
+          "rows": [
+            "ttt-gggggg",
+            "gt--gggggg",
+            "gg---ggggg",
+            "ggg-gggggg",
+            "ggg-gggggg"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  3
+                ],
+                [
+                  2,
+                  4
+                ],
+                [
+                  3,
+                  3
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [],
+              "off_board": 8
+            }
+          ],
+          "note": "Higher Notch, drawn cropped: every window cell on the board agrees and the eight above it, the overhang rows, are not drawn"
+        },
+        {
+          "table": 21,
+          "board": 1,
+          "section": "Higher Notch",
+          "mirrored": false,
+          "rows": [
+            "iiii-ggggg",
+            "ggg--ggggg",
+            "ggg---gggg",
+            "gggg-ggggg",
+            "gggg-ggggg"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  2,
+                  3
+                ],
+                [
+                  2,
+                  4
+                ],
+                [
+                  2,
+                  5
+                ],
+                [
+                  3,
+                  4
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [],
+              "off_board": 8
+            }
+          ],
+          "note": "Higher Notch, drawn cropped: every window cell on the board agrees and the eight above it, the overhang rows, are not drawn"
+        },
+        {
+          "table": 22,
+          "board": 1,
+          "section": "Higher Notch",
+          "mirrored": false,
+          "rows": [
+            "-ss-gggggg",
+            "ss--gggggg",
+            "gg---ggggg",
+            "ggg-gggggg",
+            "ggg-gggggg"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  3
+                ],
+                [
+                  2,
+                  4
+                ],
+                [
+                  3,
+                  3
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [],
+              "off_board": 8
+            }
+          ],
+          "note": "Higher Notch, drawn cropped: every window cell on the board agrees and the eight above it, the overhang rows, are not drawn"
+        },
+        {
+          "table": 34,
+          "board": 0,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "---lloos--",
+            "----loossi",
+            "ijj-ltzzsi",
+            "ij--tttzzi",
+            "ij---zjooi",
+            "iss-zzjool",
+            "ss--zjjlll"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  6,
+                  2
+                ],
+                [
+                  6,
+                  3
+                ],
+                [
+                  6,
+                  4
+                ],
+                [
+                  7,
+                  3
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [
+                [
+                  8,
+                  2
+                ]
+              ],
+              "off_board": 0
+            }
+          ],
+          "note": "DT STSD: the one disagreeing cell is the cell harddrop leaves empty for the STSD"
+        },
+        {
+          "table": 34,
+          "board": 1,
+          "section": "DT STSD",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "--zz------",
+            "---zzqqqqq",
+            "jj-oollqsq",
+            "j--ooilsss",
+            "j---zilsss",
+            "jj-zzioost",
+            "j--zlioott",
+            "j-llliiiit"
+          ],
+          "misses": [
+            {
+              "t_cells": [
+                [
+                  5,
+                  1
+                ],
+                [
+                  5,
+                  2
+                ],
+                [
+                  5,
+                  3
+                ],
+                [
+                  6,
+                  2
+                ]
+              ],
+              "mirrored": false,
+              "disagree": [
+                [
+                  7,
+                  1
+                ]
+              ],
+              "off_board": 0
+            }
+          ],
+          "note": "DT STSD stacked one line higher: the one disagreeing cell is the cell harddrop leaves empty for the STSD"
+        }
+      ],
+      "u_not_one_t": [
+        {
+          "table": 38,
+          "board": 1,
+          "section": "Dulse Flame (Darth Flame)",
+          "mirrored": false,
+          "rows": [
+            "----------",
+            "----------",
+            "----------",
+            "----------",
+            "---ll-----",
+            "----l-----",
+            "oo-sl-----",
+            "oo-ss----U",
+            "j-zzs---UU"
+          ],
+          "note": "three U cells: the Dulse Flame mini's T after the row it cleared"
+        }
+      ]
+    },
+    "catalogue": {
+      "file": "opener-fields.json",
+      "names": [
+        "DT Cannon {JP: 開幕DT砲} / Double Triple Cannon / Azunyan Cannon {JP: あずにゃん砲}",
+        "DT Cannon 2 {JP: 開幕DT砲2号}",
+        "Super Speed DT Cannon {JP: 超DT}"
+      ],
+      "reason": "five- and six-row opener fields, drawn before the overhang the TST needs: the seven-row window cannot be placed on them (every placement leaves the board), so they are no cross-source. wiki-openers.json draws no DT field."
+    },
+    "fires": [
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.dt#1",
+        "variant": "dtcannon",
+        "mirrored": true
+      },
+      {
+        "file": "sdpcspin-routes.json",
+        "node": "3.second.cspin.dt#2",
+        "variant": "dtcannon",
+        "mirrored": true
+      }
+    ],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": [
+    {
+      "id": "roof.so:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "roof.build:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "roof.base:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared (the derived terrain keeps the page's letters)"
+    },
+    {
+      "id": "roof.fill:colour",
+      "note": "the TSD-roof section draws its S-shaped piece in the Z's letter and its Z-shaped piece in the S's (the 72積み section draws its Z as a Z); transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "dtdt.spin:colour",
+      "note": "DTDT's boards draw the S-shaped piece in the Z's letter and the Z-shaped piece in the S's, as the TSD-roof section does; transcribed as drawn, occupancy only is compared"
+    },
+    {
+      "id": "dtdt.base:colour",
+      "note": "DTDT's boards draw the S-shaped piece in the Z's letter and the Z-shaped piece in the S's, as the TSD-roof section does; transcribed as drawn, occupancy only is compared (the derived board keeps the page's letters)"
+    },
+    {
+      "id": "done.cells:colour",
+      "note": "the yellow cell is one cell, drawn in the O's letter: a marker, not a piece"
+    }
+  ]
+}

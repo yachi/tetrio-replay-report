@@ -1,0 +1,524 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "dtcannon",
+ "means": "One constructed replay per 途中DT砲 build board the planner can build: from an empty board, the page's grey terrain built out of pieces WE chose, then the page's own pieces, then the flat T into the window the corpus matcher reads, then the TST the page draws next. Run through the vendored Triangle engine. A board no demo stands on is published unbuilt with its reason.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the terrain's pieces are ours too (the page draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "the page draws its terrains grey; a demo stands only on what the planner can build from an empty board without clearing a line, and every build board on this page holds an odd number of cells or stands on a terrain that is not a multiple of four.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are the build board's lower-case letters, one whole piece per letter",
+  "the flat T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-24T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "dff5b813b65ae9cf061dd2d009689d41",
+  "planner_md5": "f0f76905df8ff1462625232bccd3bf22",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "d673aaa9da641b32b57afb1be4a369fa"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "basic",
+   "reason": "基本形冇畫頁面嘅方塊，成幅都係灰色嘅元地形：有 45 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "basic.after",
+   "reason": "係 basic.spin 之後嘅盤面（由 tst.spin 推出嚟）：有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "basic.spin",
+   "reason": "係基本形上面打嘅 TSD：有 49 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "done.build",
+   "reason": "企喺 done.terrain 上面：有 51 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "done.cells",
+   "reason": "係插圖（粉紅格同黃格）：有 51 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "done.terrain",
+   "reason": "TSD 完成形嘅元地形有 43 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "dtdt.base",
+   "reason": "有 52 格：呢幅係開幕DT砲打完之後嘅殘局加新方塊，頁面冇另外畫佢嘅元地形，而呢個 planner 要一幅元地形先排得，所以冇排呢幅（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "dtdt.spin",
+   "reason": "係 dtdt.base 上面打嘅 TSD，有 56 格：呢幅係開幕DT砲打完之後嘅殘局加新方塊，頁面冇另外畫佢嘅元地形，而呢個 planner 要一幅元地形先排得，所以冇排呢幅（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "dtdt.tst",
+   "reason": "係 dtdt.tst.base 上面打嘅 TST，有 68 格：呢幅係開幕DT砲打完之後嘅殘局加新方塊，頁面冇另外畫佢嘅元地形，而呢個 planner 要一幅元地形先排得，所以冇排呢幅（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "dtdt.tst.base",
+   "reason": "有 64 格：呢幅係開幕DT砲打完之後嘅殘局加新方塊，頁面冇另外畫佢嘅元地形，而呢個 planner 要一幅元地形先排得，所以冇排呢幅（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "jhook.build",
+   "reason": "企喺 jhook.terrain 上面：有 61 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "jhook.terrain",
+   "reason": "J 掛鈎嘅元地形（由 jhook.build 推出嚟）有 57 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "nozomi.1",
+   "reason": "有 28 格：係のそみ砲嘅插圖，頁面冇將佢分開畫做元地形同頁面方塊，而呢個 planner 要咁先排得，所以冇排示範（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "nozomi.2",
+   "reason": "有 46 格：係のそみ砲嘅插圖，頁面冇將佢分開畫做元地形同頁面方塊，而呢個 planner 要咁先排得，所以冇排示範（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "nozomi.3",
+   "reason": "有 44 格：係のそみ砲嘅插圖，頁面冇將佢分開畫做元地形同頁面方塊，而呢個 planner 要咁先排得，所以冇排示範（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "nozomi.4",
+   "reason": "有 58 格：係のそみ砲嘅插圖，頁面冇將佢分開畫做元地形同頁面方塊，而呢個 planner 要咁先排得，所以冇排示範（係讀法對唔上，唔係量過砌唔到）"
+  },
+  {
+   "node": "roof.base",
+   "reason": "屋頂未加嘅 TSD 盤面（由 roof.build 推出嚟）：有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "roof.build",
+   "reason": "企喺 roof.base 上面：有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "roof.fill",
+   "reason": "係插圖：有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "roof.so",
+   "reason": "企喺 roof.base 上面：有 37 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "tst.spin",
+   "reason": "係 basic.after 上面打嘅 TST：有 33 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "wait.dt",
+   "reason": "企喺 wait.terrain2 上面：有 45 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "wait.i",
+   "reason": "企喺 wait.terrain 上面：有 30 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且元地形自己有一粒細楷 Z，呢個 planner 會當咗佢係頁面方塊"
+  },
+  {
+   "node": "wait.terrain",
+   "reason": "待ち嘅元地形有 22 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "wait.terrain2",
+   "reason": "同 wait.terrain 一樣嘅元地形（佔格一樣）：有 22 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  }
+ ],
+ "demos": [
+
+ ]
+}

@@ -14,6 +14,10 @@
         "<strong>粒數盈餘今晚做足晒佢嘅嘢。</strong>12.64% 對 11.52%<span class=\"badge\" data-claim=\"C009\"></span><span class=\"badge\" data-claim=\"C004\"></span>，總攻擊多 58 條<span class=\"badge\" data-claim=\"C005\"></span>——其中 35 條係 m7 第八局一局打出嚟<span class=\"badge\" data-claim=\"C025\"></span>，總分都高過對手<span class=\"badge\" data-claim=\"G074\"></span>。呢條路行得通——但淨係行得通都贏唔到系列。",
         "<strong>第六同第十場：攻擊多過對手都輸。</strong><span class=\"badge\" data-claim=\"C024\"></span>第十場對手每粒高唔夠 2%<span class=\"badge\" data-claim=\"C023\"></span>，係全晚最貼嘅一場，都係 4 比 5。七場生死局你執三場<span class=\"badge\" data-claim=\"G016\"></span>，系列就喺呢度。",
         "<strong>第四到第八場係三段入面最好嗰段。</strong>局數 23 比 19，五場贏四場<span class=\"badge\" data-claim=\"C010\"></span><span class=\"badge\" data-claim=\"C001\"></span>；頭三場同第九到第十一場都係 0 比 3。同一晚入面差咁遠，值得翻睇中段。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 打咗 14 次，第二個 TSD 一次都冇接到。</strong>下一粒 T 落咗第二度 8、個位俾其他棋填咗 6。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）對手 5 次接到 1 次。",
+        "<strong>階段之後，留住 I 落條井。</strong>階段 4 次接到 Tetris 2 次；冇接到嗰兩次，條井俾 I 以外嘅棋填咗 1、俾棋蓋住咗 1。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,9 @@
         "<strong>每粒重唔等於場場贏。</strong>你十二場每粒方塊嘅攻擊都高過對手，但輸咗五場<span class=\"badge\" data-claim=\"C023\"></span>——第四場你每粒高過 22% 都輸，因為對手落多咗粒數<span class=\"badge\" data-claim=\"C023\"></span>、總攻擊多過你<span class=\"badge\" data-claim=\"C024\"></span>。",
         "<strong>Triple 係今晚最實在嘅優勢。</strong>Double 一樣（424 對 424），triple 多 33 個<span class=\"badge\" data-claim=\"G040\"></span><span class=\"badge\" data-claim=\"G039\"></span>。",
         "生死局執咗四場<span class=\"badge\" data-claim=\"G016\"></span>，系列就係咁贏返嚟。頂到頂 5 次<span class=\"badge\" data-claim=\"C006\"></span>，少過對手。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 5 次接到第二個 TSD 得 1 次。</strong>個位俾其他棋填咗 2、下一粒 T 落咗第二度 1、局完咗 1。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     }
   },

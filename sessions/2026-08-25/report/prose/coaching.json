@@ -15,7 +15,8 @@
         "<strong>要郁嘅係輸嗰啲局個地板。</strong>贏嗰啲局兩個人只爭 4% 幾，輸嗰啲局爭到 17% 幾<span class=\"badge\" data-claim=\"C002\"></span>。天花板已經貼得好近，所有空間都喺打得差嗰啲局——佢輸局每粒方塊得約 0.52，贏局約 0.64<span class=\"badge\" data-claim=\"G071\"></span>。",
         "<strong>死法要收。</strong>全晚 13 局自己頂到天花板收場，9 局係佢<span class=\"badge\" data-claim=\"C006\"></span>，係佢八晚以嚟第二差。落多方塊唔應該連埋落多次自己撞頂。",
         "<strong>T-spin 呢兩格要追。</strong>T-spin double 298 對 416、triple 46 對 74<span class=\"badge\" data-claim=\"G036\"></span><span class=\"badge\" data-claim=\"G037\"></span>——每粒方塊打得重過人嘅來源就喺呢度，而唔係喺 quad。"
-      ]
+      ],
+      "sim_recs": []
     },
     "pinglamb": {
       "tagline": "T-spin 效率流 · EFFICIENCY",
@@ -29,6 +30,9 @@
         "<strong>守嗰邊今晚俾人爬頭。</strong>清走 1707 對 1854<span class=\"badge\" data-claim=\"G031\"></span>，每粒方塊清走亦係輸蝕<span class=\"badge\" data-claim=\"G077\"></span>。佢贏局同輸局嘅 DS 只爭約 0.22 對 0.20<span class=\"badge\" data-claim=\"G075\"></span>，比 yachi 嗰 0.24 對 0.19 平<span class=\"badge\" data-claim=\"G074\"></span>——即係佢守嗰邊冇因應局勢加碼。",
         "<strong>Perfect Clear 唔使追住做。</strong>佢做咗 12 個、yachi 7 個<span class=\"badge\" data-claim=\"G038\"></span>，但全場淨係佢做到全消嗰 8 局佢仲輸咗 3 局<span class=\"badge\" data-claim=\"G083\"></span>——呢一格同輸贏講唔上關係。",
         "<strong>落速可以再要多少少。</strong>九場 match 場均 PPS 場場輸<span class=\"badge\" data-claim=\"G052\"></span>。佢唔需要變成 volume 流，但每粒打得咁重之下再快少少，就係對手填唔返嗰 3 個百分點。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 7 次全部冇接到第二個 TSD。</strong>個位俾其他棋填咗 5、下一粒 T 落咗第二度 2。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）"
       ]
     }
   },

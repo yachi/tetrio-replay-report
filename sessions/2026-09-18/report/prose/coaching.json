@@ -14,6 +14,10 @@
         "個盈餘最多只可以買返 3.7 個百分點<span class=\"badge\" data-claim=\"C009\"></span>，而要填嘅係 8.9 個<span class=\"badge\" data-claim=\"C004\"></span>：所以下一步唔係再加粒數，係要每粒方塊值錢啲。",
         "T-spin triple 66 對 121<span class=\"badge\" data-claim=\"G047\"></span>係最大嗰條裂縫——quad 換唔到同樣嘅攻擊。",
         "每粒方塊要按幾多下贏輸之間郁都唔郁<span class=\"badge\" data-claim=\"G084\"></span>：呢一欄唔使再練，佢唔係話事嗰條。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 4 次全部冇接到第二個 TSD。</strong>4 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
+        "<strong>階段同 STSD 今晚接得到。</strong>階段 3 次接到 Tetris 3 次，STSD 8 次接到第二個 T-spin 5 次。繼續用。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,10 @@
         "個系列係頭九場儲落嚟嘅，下半晚局數係輸嘅<span class=\"badge\" data-claim=\"C010\"></span>：贏咗都要知自己贏喺邊一截。",
         "頂爆嘅局 12 比 11，係你多<span class=\"badge\" data-claim=\"C006\"></span><span class=\"badge\" data-claim=\"G078\"></span>，一百二十七局入面 18%——呢一欄喺 corpus 嚟講乜都預測唔到，所以唔使當佢係警號，但亦唔好當佢冇發生。",
         "輸嗰啲局同對手淨係爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>：對手嘅地板已經追上嚟，拉開嘅位而家淨係喺贏嗰啲局。"
+      ],
+      "sim_recs": [
+        "<strong>迷走砲今晚開得最多，亦行得深。</strong>62 局有 47 局行到第二巡、1 局行到第三巡或之後、2 局打出全消；はちみつ砲 35 局有 22 局行到第二巡。",
+        "<strong>STMB Cave 3 次全部冇接到第二個 TSD。</strong>3 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     }
   },

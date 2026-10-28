@@ -550,11 +550,88 @@
       <p class="cap">每一行係獨立量度單位，只睇邊個喺嗰項數值較高——唔好將唔同行嘅位置直接橫向比較。今晚有一格值得留意：手法呢一格喺兩個人之間掉咗轉——finesse 失誤 yachi 880 對 pinglamb 680<span class="badge" data-claim="G029"></span>，每粒方塊嘅 perfect 比率<span class="badge" data-claim="G041"></span>同 KPP<span class="badge" data-claim="G062"></span>亦都係 pinglamb 較好，同上一晚啱啱相反。</p>
       <div class="scroll-x"><div id="tape-chart"></div></div>
     </div>
+  <style>
+    /* Scoped under the section id with an rc- prefix (check_generated_css). */
+    #stats .rc-key { display: flex; gap: 18px; flex-wrap: wrap; margin: -6px 0 14px;
+      font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+    #stats .rc-key span { display: inline-flex; align-items: center; gap: 6px; }
+    #stats .rc-sw { display: inline-block; width: 14px; height: 10px; border-radius: 3px; }
+    #stats .rc-sw.rc-pale { background: color-mix(in srgb, var(--muted) 45%, transparent); }
+    #stats .rc-sw.rc-solid { background: var(--muted); }
+    #stats .rc-sw.rc-hatch { background: repeating-linear-gradient(45deg, var(--muted) 0 2px, transparent 2px 5px); }
+    #stats .rc-zero { color: var(--muted); font-size: 0.8rem; margin-top: 8px; }
+    #stats svg a.rc-link:hover text { text-decoration: underline; }
+  </style>
+
+    <div class="chart-panel">
+      <h3>開局定式——今晚邊個開咗乜（模擬器，未經證明）</h3>
+      <p class="cap">每條柱係嗰位玩家今晚有幾多局個第一巡對得上嗰頁嘅圖，頂格係今晚嘅 50 局；柱入面實色嗰條係喺可核範圍入面行到第二巡，再窄嗰條係第三巡或之後，「◆」係打出嗰頁畫嘅全消。</p>
+      <div class="rc-key"><span><span class="rc-sw rc-pale"></span>對上第一巡</span><span><span class="rc-sw rc-solid"></span>行到下一巡</span></div>
+      <div class="scroll-x"><svg viewBox="0 0 636 326" role="img" style="width:100%;min-width:636px;height:auto;"><line class="grid-line" x1="40" x2="626" y1="264.0" y2="264.0"/><text x="32" y="267.0" font-size="9" text-anchor="end">0</text><line class="grid-line" x1="40" x2="626" y1="218.0" y2="218.0"/><text x="32" y="221.0" font-size="9" text-anchor="end">10</text><line class="grid-line" x1="40" x2="626" y1="172.0" y2="172.0"/><text x="32" y="175.0" font-size="9" text-anchor="end">20</text><line class="grid-line" x1="40" x2="626" y1="126.0" y2="126.0"/><text x="32" y="129.0" font-size="9" text-anchor="end">30</text><line class="grid-line" x1="40" x2="626" y1="80.0" y2="80.0"/><text x="32" y="83.0" font-size="9" text-anchor="end">40</text><line class="grid-line" x1="40" x2="626" y1="34.0" y2="34.0"/><text x="32" y="37.0" font-size="9" text-anchor="end">50 局</text><line class="axis-line" x1="40" x2="626" y1="264" y2="264"/><rect x="56.0" y="218.0" width="30" height="46.0" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="62.0" y="250.2" width="18" height="13.8" rx="2" ry="2" fill="var(--p1)"/><text x="71.0" y="213.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">10</text><rect x="56.0" y="34" width="30" height="230" fill="transparent"><title>yachi · はちみつ砲 · 對上 10 局 · 入第二巡 3 · 第三巡或之後 0</title></rect><rect x="90.0" y="158.2" width="30" height="105.8" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="96.0" y="181.2" width="18" height="82.8" rx="2" ry="2" fill="var(--p2)"/><rect x="100.0" y="259.4" width="10" height="4.6" rx="2" ry="2" fill="var(--p2)"/><text x="105.0" y="153.2" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">23</text><text x="105.0" y="142.2" font-size="8.5" text-anchor="middle" fill="var(--p2)" font-family="var(--font-mono)">◆1</text><rect x="90.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · はちみつ砲 · 對上 23 局 · 入第二巡 18 · 第三巡或之後 1 · 全消 1</title></rect><a class="rc-link" href="#routes-techniques"><text x="88.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">はちみつ砲</text></a><rect x="152.0" y="241.0" width="30" height="23.0" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="158.0" y="259.4" width="18" height="4.6" rx="2" ry="2" fill="var(--p1)"/><text x="167.0" y="236.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">5</text><rect x="152.0" y="34" width="30" height="230" fill="transparent"><title>yachi · 迷走砲 · 對上 5 局 · 入第二巡 1 · 第三巡或之後 0</title></rect><rect x="186.0" y="167.4" width="30" height="96.6" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="192.0" y="172.0" width="18" height="92.0" rx="2" ry="2" fill="var(--p2)"/><rect x="196.0" y="259.4" width="10" height="4.6" rx="2" ry="2" fill="var(--p2)"/><text x="201.0" y="162.4" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">21</text><rect x="186.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · 迷走砲 · 對上 21 局 · 入第二巡 20 · 第三巡或之後 1</title></rect><a class="rc-link" href="#routes-techniques"><text x="184.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">迷走砲</text></a><rect x="248.0" y="185.8" width="30" height="78.2" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="254.0" y="218.0" width="18" height="46.0" rx="2" ry="2" fill="var(--p1)"/><text x="263.0" y="180.8" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">17</text><rect x="248.0" y="34" width="30" height="230" fill="transparent"><title>yachi · 山岳積み2号 · 對上 17 局 · 入第二巡 10 · 第三巡或之後 0</title></rect><rect x="282.0" y="250.2" width="30" height="13.8" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="288.0" y="250.2" width="18" height="13.8" rx="2" ry="2" fill="var(--p2)"/><text x="297.0" y="245.2" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">3</text><rect x="282.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · 山岳積み2号 · 對上 3 局 · 入第二巡 3 · 第三巡或之後 0</title></rect><a class="rc-link" href="#routes-techniques"><text x="280.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">山岳積み2号</text></a><rect x="344.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="359.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="344.0" y="34" width="30" height="230" fill="transparent"><title>yachi · ガムシロ積み · 對上 0 局</title></rect><rect x="378.0" y="262" width="30" height="2" fill="var(--p2)"/><text x="393.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="378.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · ガムシロ積み · 對上 0 局</title></rect><a class="rc-link" href="#routes-techniques"><text x="376.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">ガムシロ積み</text></a><rect x="440.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="455.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="440.0" y="34" width="30" height="230" fill="transparent"><title>yachi · stick spin（SDパフェ） · 對上 0 局</title></rect><rect x="474.0" y="262" width="30" height="2" fill="var(--p2)"/><text x="489.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="474.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · stick spin（SDパフェ） · 對上 0 局</title></rect><a class="rc-link" href="#routes-techniques"><text x="472.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">stick spin</text><text x="472.0" y="295" font-size="8.5" text-anchor="middle">（SDパフェ）</text></a><rect x="536.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="551.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="536.0" y="34" width="30" height="230" fill="transparent"><title>yachi · SDPC Spin · 對上 0 局</title></rect><rect x="570.0" y="262" width="30" height="2" fill="var(--p2)"/><text x="585.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="570.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · SDPC Spin · 對上 0 局</title></rect><a class="rc-link" href="#routes-techniques"><text x="568.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">SDPC Spin</text></a><polyline points="434,299 434,304 606,304 606,299" fill="none" stroke="var(--muted)" stroke-dasharray="3 3"></polyline><text x="520.0" y="317" font-size="9" text-anchor="middle">同一塊第一巡板，唔好加埋</text></svg></div>
+      <p class="footnote">呢兩張圖嘅數嚟自 replay 模擬器，喺證明鏈之外：冇 claim 編號、冇 ✓。逐格對得上嗰頁嘅圖先算，對唔上唔代表冇打過；詳細同連結喺下面<a href="#routes-techniques">定式路線同中盤手法</a>。</p>
+    </div>
+
+    <div class="chart-panel">
+      <h3>中盤手法——T-spin 之前個形（模擬器，未經證明）</h3>
+      <p class="cap">每條柱係嗰位玩家今晚有幾多個 T-spin 落之前個形對到嗰個手法；柱入面實色嗰條係有幾多次接到嗰頁畫嘅下一步（第二個 T-spin，或者欄干同階段嘅 Tetris），「→」係接到嘅次數。分母係今晚可核嘅 TSD：yachi 167 / pinglamb 223；斜紋柱係 TSS 嘅形，冇每晚嘅分母。幾次之差唔好當傾向。</p>
+      <div class="rc-key"><span><span class="rc-sw rc-pale"></span>對到個形</span><span><span class="rc-sw rc-solid"></span>接到下一步</span><span><span class="rc-sw rc-hatch"></span>TSS 嘅形</span></div>
+      <div class="scroll-x"><svg viewBox="0 0 636 308" role="img" style="width:100%;min-width:636px;height:auto;"><defs><pattern id="rc-hatch-0" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="var(--p1)" fill-opacity="0.25"/><line x1="0" y1="0" x2="0" y2="5" stroke="var(--p1)" stroke-width="2" stroke-opacity="0.7"/></pattern><pattern id="rc-hatch-1" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="var(--p2)" fill-opacity="0.25"/><line x1="0" y1="0" x2="0" y2="5" stroke="var(--p2)" stroke-width="2" stroke-opacity="0.7"/></pattern></defs><line class="grid-line" x1="40" x2="626" y1="264.0" y2="264.0"/><text x="32" y="267.0" font-size="9" text-anchor="end">0</text><line class="grid-line" x1="40" x2="626" y1="218.0" y2="218.0"/><text x="32" y="221.0" font-size="9" text-anchor="end">2</text><line class="grid-line" x1="40" x2="626" y1="172.0" y2="172.0"/><text x="32" y="175.0" font-size="9" text-anchor="end">4</text><line class="grid-line" x1="40" x2="626" y1="126.0" y2="126.0"/><text x="32" y="129.0" font-size="9" text-anchor="end">6</text><line class="grid-line" x1="40" x2="626" y1="80.0" y2="80.0"/><text x="32" y="83.0" font-size="9" text-anchor="end">8</text><line class="grid-line" x1="40" x2="626" y1="34.0" y2="34.0"/><text x="32" y="37.0" font-size="9" text-anchor="end">10</text><line class="axis-line" x1="40" x2="626" y1="264" y2="264"/><rect x="56.0" y="103.0" width="30" height="161.0" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="62.0" y="172.0" width="18" height="92.0" rx="2" ry="2" fill="var(--p1)"/><text x="71.0" y="98.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">7</text><text x="71.0" y="87.0" font-size="8.5" text-anchor="middle" fill="var(--p1)" font-family="var(--font-mono)">→4</text><rect x="56.0" y="34" width="30" height="230" fill="transparent"><title>yachi · 基本的なドネイト · 7 次 · 接到Tetris 4 次 · 開局 1 · 中盤 6</title></rect><rect x="90.0" y="103.0" width="30" height="161.0" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="96.0" y="218.0" width="18" height="46.0" rx="2" ry="2" fill="var(--p2)"/><text x="105.0" y="98.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">7</text><text x="105.0" y="87.0" font-size="8.5" text-anchor="middle" fill="var(--p2)" font-family="var(--font-mono)">→2</text><rect x="90.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · 基本的なドネイト · 7 次 · 接到Tetris 2 次 · 開局 0 · 中盤 7</title></rect><a class="rc-link" href="#routes-techniques"><text x="88.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">基本的なドネイト</text></a><rect x="152.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="167.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="152.0" y="34" width="30" height="230" fill="transparent"><title>yachi · 階段のドネイト · 0 次</title></rect><rect x="186.0" y="172.0" width="30" height="92.0" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="192.0" y="241.0" width="18" height="23.0" rx="2" ry="2" fill="var(--p2)"/><text x="201.0" y="167.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">4</text><text x="201.0" y="156.0" font-size="8.5" text-anchor="middle" fill="var(--p2)" font-family="var(--font-mono)">→1</text><rect x="186.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · 階段のドネイト · 4 次 · 接到Tetris 1 次 · 開局 0 · 中盤 4</title></rect><a class="rc-link" href="#routes-techniques"><text x="184.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">階段のドネイト</text></a><rect x="248.0" y="218.0" width="30" height="46.0" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="254.0" y="218.0" width="18" height="46.0" rx="2" ry="2" fill="var(--p1)"/><text x="263.0" y="213.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">2</text><text x="263.0" y="202.0" font-size="8.5" text-anchor="middle" fill="var(--p1)" font-family="var(--font-mono)">→2</text><rect x="248.0" y="34" width="30" height="230" fill="transparent"><title>yachi · STSD · 2 次 · 接到第二個 T-spin 2 次 · 開局 1 · 中盤 1</title></rect><rect x="282.0" y="241.0" width="30" height="23.0" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="288.0" y="241.0" width="18" height="23.0" rx="2" ry="2" fill="var(--p2)"/><text x="297.0" y="236.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">1</text><text x="297.0" y="225.0" font-size="8.5" text-anchor="middle" fill="var(--p2)" font-family="var(--font-mono)">→1</text><rect x="282.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · STSD · 1 次 · 接到第二個 T-spin 1 次 · 開局 0 · 中盤 1</title></rect><a class="rc-link" href="#routes-techniques"><text x="280.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">STSD</text></a><rect x="344.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="359.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="344.0" y="34" width="30" height="230" fill="transparent"><title>yachi · STMB Cave · 0 次</title></rect><rect x="378.0" y="218.0" width="30" height="46.0" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><text x="393.0" y="213.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">2</text><rect x="378.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · STMB Cave · 2 次 · 接到第二個 T-spin 0 次 · 開局 0 · 中盤 2</title></rect><a class="rc-link" href="#routes-techniques"><text x="376.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">STMB Cave</text></a><rect x="440.0" y="262" width="30" height="2" fill="var(--p1)"/><text x="455.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="440.0" y="34" width="30" height="230" fill="transparent"><title>yachi · インペリアルクロス · 0 次</title></rect><rect x="474.0" y="241.0" width="30" height="23.0" rx="4" ry="4" fill="var(--p2)" fill-opacity="0.42"/><rect x="480.0" y="241.0" width="18" height="23.0" rx="2" ry="2" fill="var(--p2)"/><text x="489.0" y="236.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">1</text><text x="489.0" y="225.0" font-size="8.5" text-anchor="middle" fill="var(--p2)" font-family="var(--font-mono)">→1</text><rect x="474.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · インペリアルクロス · 1 次 · 接到第二個 T-spin 1 次 · 開局 0 · 中盤 1</title></rect><a class="rc-link" href="#routes-techniques"><text x="472.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">インペリアルクロス</text></a><rect x="536.0" y="241.0" width="30" height="23.0" rx="4" ry="4" fill="var(--p1)" fill-opacity="0.42"/><rect x="542.0" y="241.0" width="18" height="23.0" rx="2" ry="2" fill="var(--p1)"/><text x="551.0" y="236.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">1</text><text x="551.0" y="225.0" font-size="8.5" text-anchor="middle" fill="var(--p1)" font-family="var(--font-mono)">→1</text><rect x="536.0" y="34" width="30" height="230" fill="transparent"><title>yachi · 途中DT砲 · 1 次 · 接到第二個 T-spin 1 次 · 開局 0 · 中盤 1</title></rect><rect x="570.0" y="262" width="30" height="2" fill="var(--p2)"/><text x="585.0" y="259.0" font-size="9.5" text-anchor="middle" fill="var(--ink-secondary)" font-family="var(--font-mono)">0</text><rect x="570.0" y="34" width="30" height="230" fill="transparent"><title>pinglamb · 途中DT砲 · 0 次</title></rect><a class="rc-link" href="#routes-techniques"><text x="568.0" y="282" font-size="10.5" text-anchor="middle" font-weight="700" fill="var(--ink)">途中DT砲</text></a></svg></div>
+      <p class="rc-zero">今晚兩位都係 0 次：ダブルダガー、BT砲（途中BT）、千鳥格子（基本型）、千鳥格子（harddrop 第二型）、社畜トレイン、欄干（TSD）、欄干（TSS）。</p>
+      <p class="rc-zero">STSD另外有 1 次個形對到、STMB Cave另外有 2 次個形對到、ダブルダガー另外有 2 次個形對到、社畜トレイン另外有 2 次個形對到、欄干（TSD）另外有 5 次個形對到、欄干（TSS）另外有 4 次個形對到、階段のドネイト另外有 2 次個形對到、基本的なドネイト另外有 19 次個形對到，但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁），冇畫入柱。</p>
+      <p class="footnote">呢兩張圖嘅數嚟自 replay 模擬器，喺證明鏈之外：冇 claim 編號、冇 ✓。逐格對得上嗰頁嘅圖先算，對唔上唔代表冇打過；詳細同連結喺下面<a href="#routes-techniques">定式路線同中盤手法</a>。</p>
+    </div>
   </div>
 </section>
 <!-- END generated stats -->
 
 <!-- ============================= 關鍵時刻 ============================= -->
+
+<!-- BEGIN generated routes-techniques (pipeline/build_report.py) -->
+<section id="routes-techniques">
+  <style>
+    /* Scoped under the section id with an rs- prefix: a generated section's <style> lands in the
+       body and beats the report's own stylesheet at equal specificity. */
+    #routes-techniques h3 { margin: 2.2rem 0 .1rem; font-size: 1.05rem; }
+    #routes-techniques .rs-sub { font-size: .78rem; opacity: .75; }
+    #routes-techniques .rs-zero { opacity: .45; }
+    #routes-techniques .rs-chip { display: inline-block; font-size: .72rem; padding: .05rem .35rem;
+      margin: .1rem; border-radius: .3rem; white-space: nowrap; }
+    #routes-techniques .rs-o { background: color-mix(in srgb, var(--p1) 22%, transparent); }
+    #routes-techniques .rs-t { background: color-mix(in srgb, var(--p2) 22%, transparent); }
+    #routes-techniques td.rs-won { box-shadow: inset 0 -3px 0 currentColor; }
+  </style>
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">定式路線同中盤手法（未經證明）</h2>
+    <div class="method-note">
+      <p>呢節嘅數同下面 C-Spin 同 DT 砲一樣，嚟自<strong>一個 replay 模擬器</strong>，得一份實作，所以冇 claim 編號、冇 ✓ 標記。數字嚟自<a href="index.html">定式路線頁同中盤手法頁</a>嗰批 artefact，淨係計可核範圍入面嘅板。下面「俾兩位嘅建議」入面標住「未經證明」嘅幾條，就係用呢節嘅數寫嘅。</p>
+      <p><strong>對到</strong>係指個板逐格對得上嗰頁畫嘅圖，或者中盤手法個窗口全中；<strong>冇對到唔代表冇打過</strong>——砌法同圖差一兩格、或者可核範圍去唔到咁遠，都會冇記錄。</p>
+    </div>
+
+    <h3>一 · 開局路線</h3>
+    <div class="method-note"><p>每格係嗰位玩家今晚有幾多局個開局對到嗰頁第一巡嘅圖（分母係今晚嘅局數），跟住有幾多局喺可核範圍入面行到第二巡、第三巡或之後，或者打出嗰頁畫嘅全消。<strong>stick spin 同 SDPC Spin 第一巡係同一個板</strong>，所以兩行可以係同一批局，唔可以加埋一齊。</p></div>
+    <div class="scroll-x"><table class="appendix-table">
+      <thead><tr><th>定式</th><th>yachi</th><th>pinglamb</th></tr></thead>
+      <tbody><tr><td><a href="stray-cannon.html">迷走砲</a></td><td class="mono"><b>5</b> / 50 局<br><span class="rs-sub">第一巡 <b>5</b> → 第二巡 <b>1</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m1r1">睇第一局（m1r1）</a></td><td class="mono"><b>21</b> / 50 局<br><span class="rs-sub">第一巡 <b>21</b> → 第二巡 <b>20</b> → 第三巡或之後 <b>1</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m1r1">睇第一局（m1r1）</a></td></tr><tr><td><a href="honey-cup.html">はちみつ砲</a></td><td class="mono"><b>10</b> / 50 局<br><span class="rs-sub">第一巡 <b>10</b> → 第二巡 <b>3</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m3r2">睇第一局（m3r2）</a></td><td class="mono"><b>23</b> / 50 局<br><span class="rs-sub">第一巡 <b>23</b> → 第二巡 <b>18</b> → 第三巡或之後 <b>1</b> → 全消 <b>1</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m1r3">睇第一局（m1r3）</a></td></tr><tr><td><a href="mountainous2.html">山岳積み2号</a></td><td class="mono"><b>17</b> / 50 局<br><span class="rs-sub">第一巡 <b>17</b> → 第二巡 <b>10</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m1r2">睇第一局（m1r2）</a></td><td class="mono"><b>3</b> / 50 局<br><span class="rs-sub">第一巡 <b>3</b> → 第二巡 <b>3</b></span><br><a class="rs-sub" href="2026-08-09-replay.html#m2r6">睇第一局（m2r6）</a></td></tr><tr><td><a href="stickspin.html">stick spin（SDパフェ）</a></td><td class="mono rs-zero">0 / 50 局</td><td class="mono rs-zero">0 / 50 局</td></tr><tr><td><a href="gamushiro.html">ガムシロ積み</a></td><td class="mono rs-zero">0 / 50 局</td><td class="mono rs-zero">0 / 50 局</td></tr><tr><td><a href="sdpcspin.html">SDPC Spin</a></td><td class="mono rs-zero">0 / 50 局</td><td class="mono rs-zero">0 / 50 局</td></tr></tbody>
+    </table></div>
+
+    <h3>二 · 中盤手法</h3>
+    <div class="method-note"><p>每格係嗰位玩家今晚有幾多個 T-spin 落之前個形對到嗰個手法，分母係今晚可核嘅 TSD 總數（TSS 嘅形冇每晚嘅總數，就照講）。下面一行係有幾多次接到嗰頁畫嘅下一步（第二個 T-spin，或者欄干同階段嘅 Tetris）、冇接到嘅原因，同埋喺開局（頭 22 手）定中盤。連結直接開去重播頁、落嗰粒 T 之前嗰一刻。</p></div>
+    <div class="scroll-x"><table class="appendix-table">
+      <thead><tr><th>手法</th><th>yachi</th><th>pinglamb</th></tr></thead>
+      <tbody><tr><td><a href="stsd.html">STSD</a></td><td class="mono"><b>2</b> / 167 個 TSD<br><span class="rs-sub">接到 第二個 T-spin 2 次 · 開局 1 · 中盤 1</span><br><span class="rs-sub">另外 1 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span><br><a class="rs-sub" href="2026-08-09-replay.html#m4r4@p25">睇第一次（m4r4，落 T 之前）</a></td><td class="mono"><b>1</b> / 223 個 TSD<br><span class="rs-sub">接到 第二個 T-spin 1 次 · 開局 0 · 中盤 1</span><br><a class="rs-sub" href="2026-08-09-replay.html#m2r6@p56">睇第一次（m2r6，落 T 之前）</a></td></tr><tr><td><a href="stmbcave.html">STMB Cave</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono"><b>2</b> / 223 個 TSD<br><span class="rs-sub">接到 第二個 T-spin 0 次 · 開局 0 · 中盤 2</span><br><span class="rs-sub">冇接到：個位俾其他棋填咗 2</span><br><span class="rs-sub">另外 2 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span><br><a class="rs-sub" href="2026-08-09-replay.html#m3r4@p45">睇第一次（m3r4，落 T 之前）</a></td></tr><tr><td><a href="imperialcross.html">インペリアルクロス</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono"><b>1</b> / 223 個 TSD<br><span class="rs-sub">接到 第二個 T-spin 1 次 · 開局 0 · 中盤 1</span><br><a class="rs-sub" href="2026-08-09-replay.html#m5r8@p188">睇第一次（m5r8，落 T 之前）</a></td></tr><tr><td><a href="doubledagger.html">ダブルダガー</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono rs-zero">0 / 223 個 TSD<br><span class="rs-sub">另外 2 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td></tr><tr><td><a href="btcannon.html">BT砲（途中BT）</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono rs-zero">0 / 223 個 TSD</td></tr><tr><td><a href="cutcopy.html">千鳥格子（基本型）</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono rs-zero">0 / 223 個 TSD</td></tr><tr><td><a href="cutcopy.html">千鳥格子（harddrop 第二型）</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono rs-zero">0 / 223 個 TSD</td></tr><tr><td><a href="shachikutrain.html">社畜トレイン</a></td><td class="mono rs-zero">0 / 167 個 TSD<br><span class="rs-sub">另外 1 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td><td class="mono rs-zero">0 / 223 個 TSD<br><span class="rs-sub">另外 1 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td></tr><tr><td><a href="parapet.html">欄干（TSD）</a></td><td class="mono rs-zero">0 / 167 個 TSD</td><td class="mono rs-zero">0 / 223 個 TSD<br><span class="rs-sub">另外 5 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td></tr><tr><td><a href="parapet.html">欄干（TSS）</a></td><td class="mono rs-zero">0（TSS，今晚冇可核 TSS 總數）<br><span class="rs-sub">另外 4 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td><td class="mono rs-zero">0（TSS，今晚冇可核 TSS 總數）</td></tr><tr><td><a href="kaidan.html">階段のドネイト</a></td><td class="mono rs-zero">0 / 167 個 TSD<br><span class="rs-sub">另外 2 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span></td><td class="mono"><b>4</b> / 223 個 TSD<br><span class="rs-sub">接到 Tetris 1 次 · 開局 0 · 中盤 4</span><br><span class="rs-sub">冇接到：條井俾棋蓋住咗 2 · I 入咗井但唔係 Tetris 1</span><br><a class="rs-sub" href="2026-08-09-replay.html#m4r2@p87">睇第一次（m4r2，落 T 之前）</a></td></tr><tr><td><a href="dtcannon.html">途中DT砲</a></td><td class="mono"><b>1</b> / 167 個 TSD<br><span class="rs-sub">接到 第二個 T-spin 1 次 · 開局 0 · 中盤 1</span><br><a class="rs-sub" href="2026-08-09-replay.html#m6r7@p408">睇第一次（m6r7，落 T 之前）</a></td><td class="mono rs-zero">0 / 223 個 TSD</td></tr><tr><td><a href="basicdonating.html">基本的なドネイト</a></td><td class="mono"><b>7</b> / 167 個 TSD<br><span class="rs-sub">接到 Tetris 4 次 · 開局 1 · 中盤 6</span><br><span class="rs-sub">冇接到：I 入咗井但唔係 Tetris 1 · 條井俾棋蓋住咗 1 · 條井俾 I 以外嘅棋填咗 1</span><br><span class="rs-sub">另外 2 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span><br><a class="rs-sub" href="2026-08-09-replay.html#m4r1@p92">睇第一次（m4r1，落 T 之前）</a></td><td class="mono"><b>7</b> / 223 個 TSD<br><span class="rs-sub">接到 Tetris 2 次 · 開局 0 · 中盤 7</span><br><span class="rs-sub">冇接到：條井俾 I 以外嘅棋填咗 4 · 條井俾棋蓋住咗 1</span><br><span class="rs-sub">另外 17 次個形對到但唔算砌出嚟（唔係完整方塊、有垃圾、同另一個手法重疊或者係 DPC，規則見手法頁）</span><br><a class="rs-sub" href="2026-08-09-replay.html#m1r4@p67">睇第一次（m1r4，落 T 之前）</a></td></tr></tbody>
+    </table></div>
+
+    <h3>三 · 逐場</h3>
+    <div class="method-note"><p>每格係嗰場出現過嘅定式（<span class="rs-chip rs-o">開局</span>）同手法（<span class="rs-chip rs-t">中盤</span>）；底線係嗰場贏咗。「—」係冇對到，唔係冇打。</p></div>
+    <div class="scroll-x"><table class="appendix-table">
+      <thead><tr><th></th><th>第 1 場</th><th>第 2 場</th><th>第 3 場</th><th>第 4 場</th><th>第 5 場</th><th>第 6 場</th></tr></thead>
+      <tbody><tr><th>yachi</th><td><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">山岳2</span></td><td><span class="rs-chip rs-o">山岳2</span></td><td><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span></td><td><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-t">STSD</span><span class="rs-chip rs-t">基本的なドネイト</span></td><td><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span><span class="rs-chip rs-t">STSD</span></td><td><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span><span class="rs-chip rs-t">途中DT砲</span><span class="rs-chip rs-t">基本的なドネイト</span></td></tr><tr><th>pinglamb</th><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-t">基本的なドネイト</span></td><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span><span class="rs-chip rs-t">STSD</span></td><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-t">STMB Cave</span><span class="rs-chip rs-t">基本的なドネイト</span></td><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span><span class="rs-chip rs-t">階段のドネイト</span><span class="rs-chip rs-t">基本的なドネイト</span></td><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-t">インペリアルクロス</span><span class="rs-chip rs-t">階段のドネイト</span><span class="rs-chip rs-t">基本的なドネイト</span></td><td class="rs-won"><span class="rs-chip rs-o">迷走</span><span class="rs-chip rs-o">はちみつ</span><span class="rs-chip rs-o">山岳2</span><span class="rs-chip rs-t">階段のドネイト</span></td></tr></tbody>
+    </table></div>
+    <div class="method-note"><p><strong>呢節唔會報「打咗某個定式嗰啲局贏幾多成」</strong>：每晚每個定式同手法得幾局到十幾局，百分比睇落會比啲數撐得住嘅自信好多，同全消嗰節唔肯報率係同一個規矩。</p></div>
+  </div>
+</section>
+<!-- END generated routes-techniques -->
 
 <!-- BEGIN generated moments (pipeline/build_report.py) -->
 <section id="moments">
@@ -714,7 +791,7 @@
         <div class="sr-cid">G015 · ✓ Dafny 已證</div>
       </div>
     </div>
-    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——17個 session 夾埋 2628 個 player-round 度量過：VS 嘅標準差由 62.9（約 17 秒嗰批）跌到 13.8（約 154 秒嗰批），足足細咗 4.5 倍；同一段路平均數反而由 97 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，17個 session 嗰 51 項速率紀錄入面，有 48 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
+    <p class="sr-foot">APM／VS 呢類 <strong>速率</strong>紀錄只計打足 60 秒嘅局。速率係「攻擊 ÷ 時間」，局數愈短分母愈細，個數就愈飄——19個 session 夾埋 2814 個 player-round 度量過：VS 嘅標準差由 63.7（約 17 秒嗰批）跌到 14.2（約 155 秒嗰批），足足細咗 4.4 倍；同一段路平均數反而由 97 升到 119，即係短局唔止唔係打得好啲，仲要係量得唔準好多。未設限之前，19個 session 嗰 57 項速率紀錄入面，有 52 項落喺該場 session 最短嗰四分一嘅局度。<strong>清行數、spike、combo、B2B、T-spin 呢類「計數」紀錄照計全部局</strong>——短局入面塞得落更多，係難咗唔係易咗。分析喺 <code>analysis/rate_records.R</code>。</p>
     <p class="sr-foot">另外有 1 條紀錄類 claim（G021）嘅講法唔係「某一局某個數係幾多」，冇做成格仔，要睇就去下面嘅證明附錄。</p>
   </div>
 </section>
@@ -765,7 +842,7 @@
   <div class="wrap">
     <div class="eyebrow">最癲一局 · THE ROUND BOTH SWUNG HARDEST</div>
     <h2 class="section-title">全晚打得最癲嘅一局：第 5 場第 7 局</h2>
-    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺 17 個 session、1314 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 63.9% 升到 70.3% 再升到 75.7%（Spearman rho ＋0.163），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 1314 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
+    <p class="section-lede">呢一局係成晚<strong>兩邊 VS 加埋最高</strong>嗰局——即係雙方都攻得最狠嗰一局。揀嘅時候淨係計打足一分鐘以上嘅局：VS 係「每分鐘」嘅速率，短局個分母細，唔設下限嘅話贏嘅次次都係最短嗰局。點解要專登揀最癲嗰局出嚟拆：<strong>局打得越癲，越決定勝負嗰樣係「清走」，唔係攻擊</strong>。呢句唔係由下面呢一局睇出嚟嘅——係喺 19 個 session、1407 局有勝負嘅局度量返嚟：將全部局按「兩邊 VS 加埋」由低到高分三份，每粒棋清走呢個速率分辨到邊個贏嘅準確度，由 64.7% 升到 70.4% 再升到 75.6%（Spearman rho ＋0.156），而攻擊同 APM 完全冇呢個升勢。<strong>個發現係「一路升」同埋佢自己個控制唔跟住升</strong>，唔係個 p 值：呢 1407 局係喺同一場、同一晚、同兩個人身上打出嚟，唔係獨立嘅，所以呢度每個 p 都偏細。（旁證：raw p 0.0001，成個 family 26 個測試，Bonferroni 校正後 0.0001。用 Bonferroni 唔用 Holm，因為 Holm 校正出嚟嗰個數要成個 family 每個 raw p 先算到——第二條 column 換咗來源，你呢個數都會跟住郁；Bonferroni 係 m × p，兩個數都印咗喺度，讀者自己驗得返。）下面呢一局係<strong>個例子</strong>，唔係個證據——兩個控制實驗喺最尾嗰段。表入面每個數都係由 claim 本身證嗰條式度攞返嚟，唔係喺呢度重新計一次。</p>
     <div class="ir-scroll">
       <table class="ir-table">
         <thead><tr><th>數據</th><th><span class="ir-who"><span class="ir-dot is-p1"></span>yachi（贏）</span></th><th><span class="ir-who"><span class="ir-dot is-p2"></span>pinglamb</span></th></tr></thead>
@@ -788,7 +865,7 @@
     <p class="ir-split"><strong>每粒棋攻擊</strong>：yachi 約 0.698、pinglamb 約 0.683；<strong>每粒棋清走</strong>：yachi 約 0.253、pinglamb 約 0.310。兩個率都係用「乘返上去」嘅方式證嘅——claim 裏面冇除數，所以比較係 <code>甲×乙嘅粒數</code> 對 <code>乙×甲嘅粒數</code>，印出嚟嗰三個位就係個界證住嘅數。</p>
     <p class="ir-split">yachi 嘅 VS ＝ 攻 約 103.0 ＋ 清垃圾 約 37.4；pinglamb 嘅 VS ＝ 攻 約 86.0 ＋ 清垃圾 約 39.1。VS 唔淨係攻擊——<strong>清走幾多垃圾都計埋落去</strong>，所以一個攻少啲但清得快好多嘅人，VS 可以高過對面。呢個拆法係<strong>喺呢批數據度睇返出嚟</strong>嘅，唔係邊度公佈過嘅公式，所以 claim 證嘅係「兩邊加埋同實際 VS 相差唔超過幾多」，<strong>唔係「等於」</strong>。</p>
     <p class="ir-note">讀呢節要記住：<strong>呢度得一局</strong>。一局可以話畀你聽「有件事發生咗」，<strong>話唔到你聽「呢個人一向係咁」</strong>。開頭嗰個清走升勢係成個 corpus 嘅結果，<strong>唔係呢一局證出嚟</strong>；呢一局淨係做個例子，話畀你睇件事點樣發生。兩者邊個都唔證明到對方——成晚嘅走勢喺「數據對決」嗰節，逐局嘅原始數字喺「逐局全數據」。另外，表入面呢兩欄係<strong>一出一入</strong>，唔好溝埋：<strong>送出</strong>係佢掟出去嗰啲，<strong>食</strong>係抵銷完之後真係跌落佢塊板嗰啲。「逐局全數據」嗰邊仲有個<strong>射埋</strong>，嗰個係對面掟過嚟、排緊隊未 cancel 嗰啲——呢張表冇呢一欄。</p>
-    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.034（raw p 0.2160，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.153 同 −0.157，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.274），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.099，raw p 0.0004，校正後 0.0086）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
+    <p class="ir-note">個升勢查咗兩樣嘢先敢寫：一，<strong>唔係局長效應</strong>——同一個測試改成對住局嘅長度，rho 得 ＋0.028（raw p 0.2879，校正後 1.0000），即係乜都冇；反而 APM 同攻擊嗰種「越癲越唔準」嘅樣，先至係局長效應（rho −0.155 同 −0.159，校正後 0.0001 同 0.0001）——所以呢節以前用攻擊做主打嗰句，其實撐唔住。二，<strong>唔係「垃圾掟多咗、輸嗰個死咗冇得清」</strong>——除返收到幾多垃圾之後個升勢仲強（rho ＋0.266），而「食」呢個帶住同一個死亡偏差、但唔帶技術嘅數，冇升勢（rho ＋0.102，raw p 0.0002，校正後 0.0031）。不過個偏差本身係真嘅，唔好當佢唔存在：<strong>清走同食對輸嗰個嚟講係有偏差嘅</strong>，因為佢死嗰陣塊板上面嗰啲垃圾，按定義就係冇清到。呢啲數全部由 <code>analysis/corpus_stats.py</code> 度返嚟、<code>pipeline/check_intense_corpus.py</code> 睇住，唔係打上去嘅。</p>
     <p class="ir-note">Claim：G081 · G082 · G083 · G084 · G085 · G086 · G087 ✓</p>
   </div>
 </section>
@@ -867,10 +944,18 @@
 
 <!-- BEGIN generated coaching (pipeline/build_report.py) -->
 <section id="coaching">
+    <style>
+      /* scoped, cs- prefixed: this <style> lands in the body (see the module docstring) */
+      #coaching .cs-unproven { display: inline-block; font-size: .72rem; padding: .02rem .4rem;
+        margin-right: .4rem; border: 1px dashed currentColor; border-radius: .3rem;
+        text-decoration: none; opacity: .8; }
+      #coaching .cs-note { font-size: .85rem; opacity: .8; }
+    </style>
   <div class="wrap-wide">
     <div class="eyebrow">教練分析 · 下一步點練</div>
     <h2 class="section-title">俾兩位嘅建議</h2>
     <p class="section-lede">個比數係 6 比 0<span class="badge" data-claim="G001"></span>，但總局數係 30 比 20<span class="badge" data-claim="G002"></span>，三場打到決勝局<span class="badge" data-claim="G010"></span>，而六場嘅最後一局全部落喺同一邊<span class="badge" data-claim="C001"></span>。所以呢晚唔係「邊個叻好多」，係一啲細到用場數睇唔出嘅嘢，一次又一次喺同一個位發生。</p>
+    <p class="cs-note">標住「未經證明」嘅建議，係用上面「定式路線同中盤手法」嗰節嘅模擬器數字寫嘅：<strong>冇 ✓、唔屬於信任鏈</strong>，啲數喺嗰節逐個搵得返。</p>
 
     <div class="rec-grid">
       <div class="rec-col for-yachi">
@@ -888,6 +973,8 @@
           <li><span class="rec-num">3</span><strong>守嗰邊有得加碼。</strong> 你贏局清走嘅垃圾（DS）每粒方塊 0.216、輸局 0.173<span class="badge" data-claim="G071"></span>，兩個 regime 嘅差距同 pinglamb 一樣明顯<span class="badge" data-claim="G072"></span>；清走嘅垃圾總數你亦都係全晚最多（966 對 930）<span class="badge" data-claim="G028"></span>。問題係你用咗多 382 粒方塊去清<span class="badge" data-claim="C004"></span>——即係守得住，但守得唔夠抵。</li>
           <li><span class="rec-num">4</span><strong>唔使去追返手法嗰格。</strong> 呢一格今晚係輸咗<span class="badge" data-claim="G029"></span><span class="badge" data-claim="G062"></span>，但佢照舊同輸贏冇關係：你贏嘅局同輸嘅局，KPP 差距細到講唔出口<span class="badge" data-claim="G069"></span>，pinglamb 都係一樣<span class="badge" data-claim="G070"></span>。呢個係<strong>連續第五個 session</strong> 同一個結論。慳返啲時間練上面三樣。</li>
           <li><span class="rec-num">5</span><strong>自爆嗰格你做到咗，記低。</strong> 全晚淨係 4 局自己頂到天花板收場，4 局全部係 pinglamb，你一次都冇<span class="badge" data-claim="C006"></span>。上一晚 8 局自爆入面 6 局係你，而嗰晚俾你嘅建議之一就係呢格。改善係實質嘅——但亦都證明咗自爆從來唔係主因。</li>
+          <li class="cs-sim"><span class="rec-num">6</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>迷走砲同はちみつ砲今晚喺第一巡之後就甩咗。</strong>迷走砲 5 局得 1 局行到第二巡、はちみつ砲 10 局得 3 局；山岳積み2号就 17 局有 10 局。開借嚟嘅定式，第二巡要跟頁上嘅圖，<a href="stray-cannon.html">迷走砲頁</a>同<a href="honey-cup.html">はちみつ砲頁</a>有齊。</li>
+          <li class="cs-sim"><span class="rec-num">7</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>對手嘅主力中盤 STMB Cave，你今晚一次都冇對到。</strong>對手 STMB Cave 2 次；你係 0 / 167 個 TSD。下面「逐場」嗰行睇得到。</li>
         </ol>
       </div>
 
@@ -904,6 +991,8 @@
           <li><span class="rec-num">2</span><strong>速度仍然係你唯一一格全輸嘅嘢。</strong> 六場場均 PPS 場場低過對面<span class="badge" data-claim="G049"></span>，每局平均約 1.375 對佢約 1.462<span class="badge" data-claim="G037"></span>。你 APM 一夠 65 就 10 局贏 7 局<span class="badge" data-claim="G046"></span>，即係去到嗰個檔一樣贏，問題係去唔去到——今晚你得 10 局去到，對面 6 局去到而且 6 局贏晒<span class="badge" data-claim="G045"></span>。練法照舊：開局同過渡位嘅手速先係樽頸，唔係 T-spin 本身。</li>
           <li><span class="rec-num">3</span><strong>留意個效率優勢一路收窄。</strong> 頭兩場你每粒方塊嘅攻擊高過對面超過三成半，尾兩場收窄到唔夠 8%<span class="badge" data-claim="C005"></span>。今晚照贏六場，但呢條線再走落去就會交叉。要守住呢格，靠嘅係 TST 呢個來源<span class="badge" data-claim="G034"></span>——同樣清行，TST 用嘅方塊少好多。</li>
           <li><span class="rec-num">4</span><strong>自爆嗰格今晚係你嘅。</strong> 全晚 4 局自己頂到天花板收場，4 局都係你<span class="badge" data-claim="C006"></span>。四局都係你輸嘅局，即係代價已經計咗落個 6 比 0 度——但頂爆之前嗰幾秒通常有得救，值得逐局翻返睇。</li>
+          <li class="cs-sim"><span class="rec-num">5</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>STMB Cave 2 次全部冇接到第二個 TSD。</strong>2 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href="stmbcave.html">STMB Cave 頁</a>有圖）</li>
+          <li class="cs-sim"><span class="rec-num">6</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>兩個主力開局今晚都行得深。</strong>迷走砲 21 局有 20 局行到第二巡；はちみつ砲 23 局有 18 局行到第二巡，1 局打出全消。</li>
         </ol>
       </div>
 
@@ -4831,6 +4920,12 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
     <div class="eyebrow">證明附錄 · 信任鏈</div>
     <h2 class="section-title">證明附錄</h2>
 
+    <style>
+    #appendix .ap-summary { cursor: pointer; color: var(--ink-secondary); padding: 0.4rem 0; }
+    #appendix .ap-fold[open] > .ap-summary { margin-bottom: 1rem; }
+    </style>
+    <details class="ap-fold" id="appendix-fold">
+      <summary class="ap-summary">撳開睇證明附錄：資料點樣核對、99 條 claim 逐條嘅 Dafny 引理同狀態（數據對質用，教打 Tetris 唔使睇）</summary>
     <div class="method-note">
       <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>
       <div class="chain">
@@ -5550,6 +5645,28 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         </tbody>
       </table>
     </div>
+    </details>
+    <script>
+    (function () {
+      var fold = document.getElementById("appendix-fold");
+      function wants(h) { return h === "#appendix" || h.indexOf("#claim-") === 0; }
+      function openFor(h) { if (fold && wants(h)) fold.open = true; }
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest("a[href^='#']");
+        if (a) openFor(a.getAttribute("href"));
+      }, true);
+      window.addEventListener("hashchange", function () {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t && wants(location.hash)) t.scrollIntoView();
+      });
+      if (wants(location.hash)) {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t) setTimeout(function () { t.scrollIntoView(); }, 0);
+      }
+    })();
+    </script>
   </div>
 </section>
 <!-- END generated appendix -->
@@ -5674,7 +5791,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     <h3>五 · 捐窿（Donation）</h3>
     <div class="method-note">
-      <p><strong>捐窿</strong>係 harddrop 收嘅一招：落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、嗰條欄最低嗰格填咗嘅嘢下面仲有最少 4 格空、最深嗰 4 行兩邊都有牆嘅 T-spin 消行。重砌返嘅板同引擎自己記低嘅消行逐個對過：<strong>565／565</strong> 個對得上，對唔上嗰 0 個<strong>直接唔計</strong>。</p>
+      <p><strong>捐窿</strong>係 harddrop 收嘅一招：落一嚿棋<em>暫時</em>塞住條井，等隻 T 打個 T-spin 連條井嗰幾行一齊消，消完之後條井<strong>由面到底再打返開</strong>——嗰嚿棋係借出去嘅，唔係一堵牆。呢度數嘅係可核嗰段入面，塞住條井嗰啲格全部都喺消嗰幾行入面、嗰條欄最低嗰格填咗嘅嘢下面仲有最少 4 格空、最深嗰 4 行兩邊都有牆嘅 T-spin 消行；塞住條井嗰啲格可以係隻 T 自己（harddrop 都係咁畫），唔係 T 嘅就要屬於一粒四格齊晒喺板上面嘅方塊，垃圾行同消行剩低嘅碎都唔計。仲有，塞喺最底嗰粒落定嗰陣，條井下面<strong>已經</strong>有最少 4 格空：先塞住、之後先有垃圾行升上嚟喺嗰條欄開個窿，咁唔係捐窿，因為塞嗰陣個窿未出現。重砌返嘅板同引擎自己記低嘅消行逐個對過：<strong>565／565</strong> 個對得上，對唔上嗰 0 個<strong>直接唔計</strong>。</p>
       <p>淨係睇「條井喺消嘅行度有冇填」係冇意義嘅——因為一行要滿，嗰格本來就一定要填，咁樣數會數到絕大部分嘅 T-spin。分得出嘅係<strong>清完之後條井有冇再打返開</strong>。</p>
     </div>
     <div class="scroll-x">
@@ -5683,15 +5800,15 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><th>玩家</th><th>可核 T-spin 消行</th><th>全局（replay 自己數）</th><th>可核覆蓋</th><th>捐窿</th><th>佔可核 T-spin</th><th>頭 21 手內</th><th>第 21 手之後</th><th>自己砌嘅井</th><th>垃圾行留低嘅井</th><th>塞嗰手冇消行（Natural）</th><th>塞嗰手消咗行（斷 B2B）</th><th>塞嗰手查唔到</th></tr>
         </thead>
         <tbody>
-          <tr><td>pinglamb</td><td class="mono">324</td><td class="mono">340</td><td class="mono">95.2%</td><td class="mono">6</td><td class="mono">1.8%</td><td class="mono">0</td><td class="mono">6</td><td class="mono">0</td><td class="mono">6</td><td class="mono">4</td><td class="mono">0</td><td class="mono">2</td></tr>
-          <tr><td>yachi</td><td class="mono">241</td><td class="mono">257</td><td class="mono">93.7%</td><td class="mono">7</td><td class="mono">2.9%</td><td class="mono">3</td><td class="mono">4</td><td class="mono">0</td><td class="mono">7</td><td class="mono">4</td><td class="mono">0</td><td class="mono">3</td></tr>
+          <tr><td>pinglamb</td><td class="mono">324</td><td class="mono">340</td><td class="mono">95.2%</td><td class="mono">5</td><td class="mono">1.5%</td><td class="mono">0</td><td class="mono">5</td><td class="mono">0</td><td class="mono">5</td><td class="mono">2</td><td class="mono">0</td><td class="mono">3</td></tr>
+          <tr><td>yachi</td><td class="mono">241</td><td class="mono">257</td><td class="mono">93.7%</td><td class="mono">5</td><td class="mono">2.0%</td><td class="mono">1</td><td class="mono">4</td><td class="mono">0</td><td class="mono">5</td><td class="mono">1</td><td class="mono">0</td><td class="mono">4</td></tr>
         </tbody>
       </table>
     </div>
     <div class="method-note"><p><strong>個分母而家有第二個來源，分子冇。</strong>呢兩個表數嘅係「可核嗰段」入面嘅 T-spin 消行，而「全局」嗰欄係<em>replay 自己數</em>嘅——<code>tspindoubles</code> 同佢七個兄弟，<code>extract.py</code> 同 <code>extract2.ts</code> 兩個抽取器各自讀入 <code>facts.json</code>，所以嗰個數本身已經喺信任鏈入面。逐個玩家回合、逐種消行對過：<strong>100／100</strong> 個回合全中，全場 <strong>597</strong> 個對 <strong>597</strong> 個。即係話個分母唔再係模擬器自己講嘅數，可核嗰段覆蓋咗其中 <strong>94.6%</strong>。<strong>但係分子照舊隔離</strong>——邊一次算捐窿、邊一次算窿，依然淨係得呢一個模擬器講，所以呢一節仍然冇 claim id、冇 ✓ 章。</p></div>
-    <div class="method-note"><p><strong>第二個引擎對唔上。</strong>兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>5</strong> 次入面，另一個引擎<strong>得 3 次同意</strong>（另一邊反過來多認 2 次）。<strong>唔好睇「成體 98.3% 啱」嗰個數</strong>——嗰 236 次入面有 233 次係兩邊都話「唔係」，咁樣量緊嘅係塊板嘅底，唔係呢個 metric。呢個對照淨係去到 <strong>240／565</strong>（42.4%）個可核 T-spin —— hand-port 自己可核嗰段短好多，去唔到嘅位就冇得對。<strong>兩個引擎有冇睇緊同一塊板？</strong>可比嘅 240 個 lock 入面，淨係 <strong>141</strong> 個（58.7%）兩邊逐格一模一樣，上面每個數都要放喺呢個前提入面睇。而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義：板一樣嗰 2 次，兩邊同意 <strong>2</strong> 次；板唔一樣嗰 3 次，就淨係同意 1 次。兩個引擎唔係對「乜嘢先算捐窿」有分歧，係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。所以呢個表<strong>冇</strong>第二個實作撐住，同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。</p></div>
-    <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 13 次捐窿，條井<strong>全部都係垃圾行留低嘅窿</strong>，冇一次係自己砌返嚟嘅 Tetris 井。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
-    <div class="method-note"><p><strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，而呢場 13 次捐窿，落喺頭 21 手（開局窗）之內嘅有 <strong>3</strong> 次，之後嘅有 <strong>10</strong> 次。大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）</p></div>
+    <div class="method-note"><p><strong>第二個引擎對唔上。</strong>兩個引擎逐個 lock 對過，oracle 話係嘅 <strong>3</strong> 次入面，另一個引擎<strong>得 2 次同意</strong>（另一邊反過來多認 12 次）。<strong>唔好睇「成體 94.5% 啱」嗰個數</strong>——嗰 227 次入面有 225 次係兩邊都話「唔係」，咁樣量緊嘅係塊板嘅底，唔係呢個 metric。呢個對照淨係去到 <strong>240／565</strong>（42.4%）個可核 T-spin —— hand-port 自己可核嗰段短好多，去唔到嘅位就冇得對。<strong>兩個引擎有冇睇緊同一塊板？</strong>可比嘅 240 個 lock 入面，淨係 <strong>141</strong> 個（58.7%）兩邊逐格一模一樣，上面每個數都要放喺呢個前提入面睇。而呢個表嘅分歧，拆開嚟就見到係<strong>塊板</strong>唔係個定義：板一樣嗰 2 次，兩邊同意 <strong>2</strong> 次；板唔一樣嗰 1 次，就淨係同意 0 次。兩個引擎唔係對「乜嘢先算捐窿」有分歧，係對塊板有分歧——同垃圾窿嗰條欄同一個源頭。所以呢個表<strong>冇</strong>第二個實作撐住，同上面錨咗嘅分母唔同級數 —— 分歧落喺邊，同垃圾窿嗰條欄係同一個問題。</p></div>
+    <div class="method-note"><p><strong>呢個數要連「條井邊度嚟」一齊睇。</strong>呢場 10 次捐窿，條井<strong>全部都係垃圾行留低嘅窿</strong>，冇一次係自己砌返嚟嘅 Tetris 井。而個板嘅來源自己講明：<strong>垃圾窿嗰條欄，103 次入面有 97 次係擺錯位</strong>（見 <code>oracle-source.ts</code>）。所以呢個數講得出「有捐窿呢個形」，<strong>講唔出「捐嗰條井係邊條」</strong>。</p></div>
+    <div class="method-note"><p><strong>捐窿係開局招定係中盤招，呢度係度出嚟嘅，唔係抄返個分類。</strong>harddrop 自己將捐窿收喺 <code>Mid-game T-Spin setups</code> 入面，而呢場 10 次捐窿，落喺頭 21 手（開局窗）之內嘅有 <strong>1</strong> 次，之後嘅有 <strong>9</strong> 次。大部分都係開局之後先出現，同 harddrop 收佢入嗰個分類啱。（呢兩欄同上面次序表最後嗰幾欄用嘅係同一條界，所以兩個表講緊同一個「開局」。）</p></div>
 
     <h3>六 · STMB Cave（浮空 T-spin Double）</h3>
     <div class="method-note">

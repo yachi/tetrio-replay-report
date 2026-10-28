@@ -16,6 +16,10 @@
         "<strong>T-spin triple 係最大嗰條裂縫。</strong> TSD 兩邊差唔多（240 對 238）<span class=\"badge\" data-claim=\"G034\"></span>，但 TST 就 34 對 54，輸咗成 20 個<span class=\"badge\" data-claim=\"G035\"></span>，加埋計 274 對 292<span class=\"badge\" data-claim=\"G054\"></span>。你 quad 開多過佢<span class=\"badge\" data-claim=\"G033\"></span>，但同樣清行數，TST 用嘅方塊少好多——呢個就係嗰 7% 效率差距最抵補嘅一格。",
         "<strong>守嗰邊今次做得唔錯，繼續。</strong> 全 session 每粒方塊清走嘅垃圾（DS）你係高過 pinglamb 嘅<span class=\"badge\" data-claim=\"G072\"></span>，清走嘅垃圾總數亦都多（1124 對 1038）<span class=\"badge\" data-claim=\"G029\"></span>，贏局 DS 約 0.21、輸局約 0.18<span class=\"badge\" data-claim=\"G069\"></span>。呢樣同上一個 session 掉轉咗，係實質進步，唔好因為追效率而丟返低。",
         "<strong>唔使再練手法。</strong> 講明呢樣係想你唔好浪費時間：每粒方塊按幾多下（KPP）呢一項，你贏嘅局同輸嘅局差距唔夠 0.03，即係唔到 1%<span class=\"badge\" data-claim=\"G067\"></span>，pinglamb 都係一樣<span class=\"badge\" data-claim=\"G068\"></span>。呢個係<strong>連續第四個 session</strong> 同一個結論——手法乾淨唔會再幫你贏多一局，慳返啲時間練上面三樣。"
+      ],
+      "sim_recs": [
+        "<strong>階段 3 次得 1 次接到 Tetris。</strong>冇接到嗰 2 次都係條井俾棋蓋住咗。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
+        "<strong>STMB Cave，個位俾其他棋填咗。</strong>STMB Cave 2 次接到第二個 TSD 0 次，2 次都係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     },
     "pinglamb": {
@@ -29,6 +33,9 @@
         "<strong>效率係你嘅主武器，唔好去溝 quad。</strong> 你贏面完全建立喺每粒方塊打得重之上<span class=\"badge\" data-claim=\"C002\"></span><span class=\"badge\" data-claim=\"C004\"></span>，而個來源就係 TST<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G054\"></span>。yachi 多開 18 個 quad 都追唔到效率<span class=\"badge\" data-claim=\"G033\"></span>，你千祈唔好調轉去追 quad。",
         "<strong>要補嘅係速度，唔係輸出。</strong> 效率呢一格你已經七場七贏<span class=\"badge\" data-claim=\"C002\"></span>，再推上去嘅邊際回報好細；速度就係你唯一一格輸足七場嘅嘢<span class=\"badge\" data-claim=\"G050\"></span>。yachi 呢一晚就係示範咗速度可以買返幾多——多 326 粒方塊，補返成個效率差距<span class=\"badge\" data-claim=\"C003\"></span>。你 APM 一夠 65 就 8 局贏 7 局<span class=\"badge\" data-claim=\"G047\"></span>，即係去到嗰個檔一樣贏，問題係去唔去到。練法：唔好等到砌好 T-spin 先開火，開局同過渡位嘅手速先係樽頸。",
         "<strong>繼續食住 downstack 呢個優勢。</strong> 你贏局同輸局嘅 DS 差距四成半<span class=\"badge\" data-claim=\"G070\"></span>，係全晚所有指標入面最大嘅一個 split——「掘得返」對你嘅勝率影響比對面重好多<span class=\"badge\" data-claim=\"G069\"></span>。反打局 5 比 2 唔係彩數<span class=\"badge\" data-claim=\"G056\"></span>，係可以繼續加碼嘅本錢。"
+      ],
+      "sim_recs": [
+        "<strong>はちみつ砲今晚行得最深。</strong>19 局有 15 局行到第二巡、2 局行到第三巡或之後；迷走砲 18 局有 15 局行到第二巡，1 局打出全消。"
       ]
     }
   },

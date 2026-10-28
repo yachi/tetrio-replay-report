@@ -1,0 +1,151 @@
+{
+  "_comment": "Words for pipeline/stmbcave_page.py (the shared pipeline/technique_page.py renderer bound to STMB Cave). Numbers never live here: every count on the pages is rendered from analysis/stmbcave-facts.json and analysis/stmbcave-demos.json. Every key below is read by name, so deleting one is a KeyError at render time, not a quietly shorter page. Traditional-character Cantonese; the loader runs the simplified-glyph check (the source's own Japanese stays as quoted text).",
+  "title": "STMB Cave 中盤手法",
+  "overview_title": "STMB Cave 中盤手法",
+  "technique_name": "STMB Cave",
+  "desc": "shiwehi.com 個 STMB Cave 頁畫嘅局部形狀，同 corpus 每一下 T-spin Double 逐個對：模擬器推導，唔屬於信任鏈。",
+  "lede": "STMB Cave 係一個中盤捐窿手法：一個三格闊、兩邊一樣高嘅坑，一邊用 S（或者 Z）掛住，另一邊企一粒 Z（或者 S）做屋頂，T 瞓低、尖向下打 TSD；消完之後個坑仲喺度，冇俾人填咗。呢版將原頁每一幅圖照抄，再同成個 corpus 每一下 TSD 對：T 瞓低落去嗰陣，佢周圍嗰個窗口係咪原頁畫嘅樣，同埋之後嗰粒 T 有冇打到原頁講嘅第二下 TSD。對到之後再睇個形係咪用完整嘅方塊砌出嚟，過得晒規則嗰幾下先列出。",
+  "page_sentences": {
+    "source": "盤面圖逐格轉錄自 shiwehi.com 嘅 STMB Cave 頁（2021-03-23 版），轉錄有自己嘅 gate 核對；引號入面嘅日文係原頁原文。",
+    "midgame": "呢個係中盤手法，唔係開局定式：盤面係對住 T 嘅局部窗口比，唔係成個盤面比，邊一粒都可以，唔使由空盤開始。",
+    "window": "對法：嗰粒 T 嘅四格要啱啱係原頁畫嘅瞓低、尖向下嘅 T（左右反轉都算，反轉嗰陣個窗口一齊反）；個窗口入面原頁畫咗有嘢嘅格要有嘢、畫咗空嘅格要空。顏色唔比，窗口以外一格都唔睇。個窗口係原頁每一幅有呢個形嘅圖、同 harddrop STMB Cave 頁每一幅正面例子，逐格一致嘅最大嗰個框：上面兩行係 TSD 消嘅兩行（全 T-spin 消兩行嗰陣一定滿，所以唔會分到嘢），真正分到嘢嘅係 T 嘅方向同埋下面嗰行：尖後面兩格有嘢、坑嘅三格空、坑嘅另一邊有嘢。",
+    "garbage": "窗口入面嘅垃圾當有嘢計；垃圾行個窿喺邊一欄係引擎用種子亂數揀嘅，所以窗口有垃圾嘅個案會喺下面張表單獨數出嚟。",
+    "our_reading": "標住「我哋嘅讀法」嘅係我哋自己點讀原頁，原頁冇明講：淺色大楷格當係嗰下 spin 消走嘅行；冇畫出嚟嘅盤面係由圖減走頁面嗰幾粒推返出嚟；原頁畫嘅屋頂唔喺個窗口入面，因為疊滿咗嗰幅圖喺屋頂隔籬多咗一格（第二下 TSD 嘅屋頂），其他圖冇，一個長方形窗口唔可以要一格唔要另一格。",
+    "control": "對照：同一個窗口擺喺 TSS、TST 同 mini T-spin 度數一次，再逐條拎走個條件數一次。一個形狀如果喺唔關佢事嘅 spin 度都對到差唔多咁多，佢就只係一個形狀測試，唔係呢個手法；所以呢幾行一定同主表一齊印。"
+  },
+  "names": {
+    "basic.terrain": "基本形：元地形（三格闊、兩邊一樣高嘅坑）",
+    "basic.build": "基本形：S 掛住個坑、Z 企喺另一邊",
+    "feature.terrain": "特徵：坑下面係 TSD 地形",
+    "feature.spin": "特徵：T 瞓低打 TSD（疊滿咗嘅盤面）",
+    "feature.after": "特徵：TSD 之後（坑仲喺度，可以再打一下 TSD）",
+    "similar.terrain": "類似形：元地形",
+    "similar.build": "類似形：L 瞓低砌出同一個形（左右反轉）",
+    "basic.build.terrain": "基本形嘅元地形（由砌好嗰幅推出嚟）",
+    "feature.pre": "特徵：T 落之前（由圖推出嚟）"
+  },
+  "derived_note": "我哋嘅讀法：原頁冇畫呢幅，係由嗰幅圖減走頁面嗰幾粒推出嚟，gate 逐格核過。",
+  "discrepancies": {
+    "basic.terrain:shift": "原頁同我哋唔同：呢幅元地形個坑畫喺第 3 至 5 欄（由 0 數），但上面砌好嗰幅個坑喺第 4 至 6 欄；我哋讀成原頁將元地形畫偏咗一格，砌好嗰幅係對住由佢自己推返出嚟嘅元地形核。",
+    "feature.spin:colour": "原頁同我哋唔同：呢幅將 J 畫成三格，又將一粒 L 色嘅方塊畫成 J 嘅形；我哋讀成顏色用得鬆，唔係另外兩粒方塊。對法淨係睇有冇嘢，唔睇顏色。",
+    "feature.pre:colour": "同上：呢幅係上面嗰幅減走 T，所以都係嗰兩粒方塊顏色唔夾形。",
+    "similar.build:colour": "原頁同我哋唔同：呢幅將一粒 S 色嘅方塊畫成 Z 嘅形；我哋讀成顏色用得鬆。原頁嗰句淨係講 L 瞓低。"
+  },
+  "sections": {
+    "boards": "原頁嘅圖",
+    "boards_note": "原頁每一幅圖，照頁面次序；冇畫出嚟、由圖推返出嚟嘅盤面排喺最尾。",
+    "window": "我哋點樣對",
+    "window_note": "左邊係原頁嘅樣，右邊係左右反轉。虛線框係嗰粒 T 嘅四格，灰格係要有嘢嘅格，空格要空；窗口以外唔睇。",
+    "window_drawn": "照原頁",
+    "window_mirrored": "左右反轉",
+    "headline": "corpus 入面對到幾多",
+    "headline_note": "分母係已核對範圍入面、過咗重組核對嘅每一下 TSD（全 T-spin、消兩行）。開局係頭 {pieces} 粒以內（由 0 數起，即係第 {last} 粒或之前），中盤係之後。",
+    "followup": "第二下 TSD 有冇打到",
+    "followup_note": "原頁話喺 TSD 地形上面打 STMB Cave，消完可以再打一下 TSD。由對到嗰下起，將原頁畫嘅第二下 TSD 位（喺個坑下面，窗口以外）跟住每一下消行同垃圾行推落去，一直推到下一粒 T；每一步都同引擎自己嘅盤面核過。下一粒 T 啱啱落入個位、而且係全 T-spin 消兩行，先算打到。坑下面唔係 TSD 地形嘅個案，個位一早俾其他方塊填咗，會喺原因嗰行數出嚟。",
+    "controls": "對照",
+    "cross": "同另一個來源對",
+    "cross_note": "（呢版冇用到）",
+    "cases": "個案",
+    "cases_note": "每一個過得晒規則嘅 TSD 一行。縮圖係 T 落之前個窗口（虛線係 T 嘅位，灰色係垃圾）；連結去嗰晚嘅逐局重播，一開就停喺呢粒 T 落之前，行多一粒就係呢下 T-spin。",
+    "demos": "示範重播",
+    "demos_link": "睇示範重播：原頁每一幅圖點解砌唔到"
+  },
+  "table": {
+    "player": "玩家",
+    "all": "全部",
+    "in_opener": "開局",
+    "mid_game": "中盤",
+    "mirrored": "左右反轉",
+    "garbage": "窗口有垃圾",
+    "fired": "打到第二下",
+    "of_hits": "（分母係對到嘅數）",
+    "reason": "冇打到嘅原因",
+    "row": "對照",
+    "followup_head": "結果",
+    "under": "同一個窗口，喺 {kind} 度",
+    "ablation": {
+      "no_must_empty": "拎走「要空嘅格要空」",
+      "no_roof": "拎走屋頂（呢個窗口冇 T 上面嘅行，所以一定同主表一樣）",
+      "t_overlap": "唔要求 T 係窗口嘅 T，淨係要同窗口重疊"
+    },
+    "baseline": "T 企直嘅 TSD（唔睇窗口；呢個手法嘅 T 係瞓低，呢行係同 STSD 頁一樣嘅基線）",
+    "denominator_note": "分母係嗰款 spin 嘅已核對數（同主表同一個核對）；拎走條件嗰幾行同基線，分母係全部 TSD。",
+    "date": "日期",
+    "round": "局",
+    "lock": "第幾粒（由 0 數）",
+    "phase": "開局／中盤",
+    "window_col": "窗口",
+    "followup_col": "第二下",
+    "cross_round": "回合",
+    "cross_node": "去到嗰個位嘅粒（由 0 數）",
+    "cross_hit": "對到嘅粒（由 0 數）",
+    "yes": "打到（第 {lock} 粒，由 0 數）",
+    "phase_opener": "開局",
+    "phase_mid": "中盤",
+    "mirrored_mark": "（反轉）"
+  },
+  "reasons": {
+    "next_t_elsewhere": "下一粒 T 落咗第二度",
+    "slot_filled_before_t": "T 未到，個位已經俾其他方塊填咗（或者坑下面本身就唔係 TSD 位）",
+    "t_in_slot_not_tsd": "T 入咗個位，但唔係全 T-spin 消兩行",
+    "past_verified": "下一粒 T 喺已核對範圍之外",
+    "recon_dropped": "下一粒 T 冇過重組核對",
+    "slot_off_board": "個位推出咗盤面",
+    "round_ended": "局完之前冇下一粒 T",
+    "rowmap_unverified": "中間有一步對唔返引擎嘅盤面，停咗唔再推"
+  },
+  "spin_kinds": {
+    "TSS": "TSS",
+    "TST": "TST",
+    "mini_TSS": "mini TSS",
+    "mini_TSD": "mini TSD"
+  },
+  "index_card": {
+    "kicker": "中盤手法 · shiwehi.com",
+    "blurb": "STMB Cave：T 瞓低喺一個三格闊嘅坑上面打 TSD，個坑留低。原頁每幅圖、corpus 入面真係用完整方塊砌出嚟嘅 TSD、同每幅圖點解冇示範。"
+  },
+  "missing": "搵唔到呢個示範。",
+  "demo": {
+    "title": "STMB Cave 示範重播",
+    "desc": "STMB Cave 嘅示範：原頁每一幅圖，由空盤砌唔砌得到、點解砌唔到。",
+    "lede": "示範要由空盤開始：先用方塊砌出原頁灰色嘅元地形，再放原頁畫嘅幾粒，再將 T 瞓低打 TSD。呢頁每一幅圖都砌唔到，原因逐幅寫喺下面，係 planner 自己度出嚟嘅。",
+    "user": "示範",
+    "play": "播呢個示範",
+    "idle": "呢版冇砌得到嘅示範，所以冇嘢播。",
+    "now": "示範：{name}",
+    "sentences": {
+      "demo": "呢度嘅示範（如果有）都係我哋砌出嚟嘅，唔係任何人打過嘅對局：出邊粒、幾時 hold、點樣按掣，全部係我哋揀嘅，所以唔計入任何數。",
+      "engine": "一個示範要用同 corpus 一樣嘅 Triangle 引擎由頭行一次，每一粒都要落喺計劃嘅位、spin 同消行數都要啱，先會出現喺呢度；行唔到就寫低 planner 度到嘅原因，唔會靜靜雞唔見咗。",
+      "base": "元地形要我哋自己用方塊砌：原頁將佢畫成灰色，冇講係乜方塊。由空盤砌，每粒加四格、每消一行減十格，所以格數係單數嘅地形一定砌唔出；格數係雙數但唔係四嘅倍數嘅，要消過行先砌得出，而呢個 planner 唔消行。",
+      "order": "發牌同 STSD 頁一樣：第一巡最後嗰粒 T 一出就 hold 住，第二巡第一粒頂上，第二巡嘅 T 一出就換出嚟打；每一巡都係完整嘅七粒。呢頁冇一幅砌得到，所以冇示範用到。",
+      "rule": "砌唔到嘅原因係 planner 第一個撞到嘅問題：頁面嘅方塊唔係一粒完整嘅方塊、或者唔係佢顏色嘅形，或者元地形嘅格數由空盤砌唔出。同一幅圖可能仲有其他原因，下面淨係寫第一個。"
+    },
+    "chain": "砌法：{chain}",
+    "base_words": "頭 {n} 粒係我哋砌嘅元地形（{pieces}）",
+    "page_words": "跟住 {pieces} 係原頁畫嘅",
+    "fill_words": "第二下之前我哋用 {pieces} 填咗",
+    "spin": "第 {n} 粒：{name}",
+    "events": "spin：{events}",
+    "reaches": "停過喺：{boards}",
+    "unbuilt": "冇示範：{reason}",
+    "unbuilt_title": "冇示範嘅圖"
+  },
+  "qualify": {
+    "title": "真係砌出嚟定撞出嚟",
+    "note": "窗口淨係話個形喺 T 落之前企咗喺度。原頁兩個砌法都用一粒完整嘅 S（或者 Z）掛住個坑；呢版要求 T 遠嗰邊手臂旁邊、屬於嗰粒 S 嘅兩格，所以對到嘅每一下再用同社畜トレイン同欄干頁一樣嘅規則篩：掛住個坑嗰粒 S 嘅兩格（反轉嗰陣一齊反），每格都要屬於一粒四格仲齊晒喺板上面嘅方塊（唔係消行之後剩低嘅碎），唔可以係垃圾；T 之前或之後 14 粒以內唔可以有全消，因為咁係 DPC。TSD 消嗰兩行同佢下面嘅堆，原頁畫做普通嘅堆，所以唔要求係新方塊。另外，窗口細，好多普通嘅堆都過到，所以仲要原頁其中一幅圖成個形喺 T 周圍企到：T、佢掂到嘅窿同佢下面三行以內嘅窿、再加一圈一格嘅邊，每格有冇嘢都要同幅圖一樣（唔理顏色，可以反轉）。",
+    "summary_lead": "corpus 入面規則都過、算係用完整方塊砌出嚟嘅STMB Cave：",
+    "summary_unit": " 下",
+    "summary_note": "個窗口對到個形、但唔過規則嘅 T-spin，呢版唔列出亦唔數；佢哋仍然逐個記喺 analysis/stmbcave-facts.json。過到嘅每一下喺下面「個案」逐個列出，連去嗰晚嘅重播。",
+    "col": "算唔算",
+    "yes": "算",
+    "no_join": "；",
+    "reasons": {
+      "fragment": "掛住個坑嗰粒 S 嘅兩格有格係消行之後剩低嘅碎",
+      "garbage_in_shape": "掛住個坑嗰粒 S 嘅兩格有格係垃圾",
+      "shape_cell_empty": "掛住個坑嗰粒 S 嘅兩格有格係空（窗口要佢有嘢，正常唔會出現）",
+      "dpc": "T 前後 14 粒以內有全消（DPC）",
+      "ownership_unverified": "T 之前有一步核對唔到，分唔出邊格屬於邊粒",
+      "not_whole_shape": "原頁冇一幅圖成個形喺 T 周圍企到（每幅圖：T、佢掂到或者佢下面三行以內嘅窿、再加一格邊，格格佔位都要一樣，可以反轉）"
+    }
+  }
+}

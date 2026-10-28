@@ -1,0 +1,42 @@
+{
+  "eyebrow": "教練分析 · 兩邊",
+  "title": "俾兩位嘅建議",
+  "lede": "今晚 yachi 嘅粒數盈餘填得晒個效率窿：多 11.18%，個窿得 6.73%<span class=\"badge\" data-claim=\"C009\"></span><span class=\"badge\" data-claim=\"C004\"></span>，總攻擊多 80 條<span class=\"badge\" data-claim=\"C005\"></span>。但逐場計，總攻擊多嗰個四場全贏<span class=\"badge\" data-claim=\"C015\"></span>，而尾兩場總攻擊係 pinglamb 多。<strong>打和係打和喺下半場</strong>：頭兩場局數 10 比 5，尾兩場 5 比 10<span class=\"badge\" data-claim=\"C010\"></span>。",
+  "columns": {
+    "yachi": {
+      "tagline": "快、落得多 · 下半場散",
+      "profile": [
+        "贏嗰啲局每粒方塊嘅攻擊高過自己輸嗰啲局 12.36%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G062\"></span>，今晚窄過對手。",
+        "落得快<span class=\"badge\" data-claim=\"G035\"></span>、Quad 多過對手<span class=\"badge\" data-claim=\"G030\"></span>，T-spin double 都係佢多<span class=\"badge\" data-claim=\"G031\"></span>。",
+        "條路又係加粒數：多疊 323 粒<span class=\"badge\" data-claim=\"C005\"></span>，即係多 11.18%<span class=\"badge\" data-claim=\"C009\"></span>，今晚盈餘大過個窿。"
+      ],
+      "recs": [
+        "<strong>差距喺贏局，唔係輸局。</strong>贏嗰啲局對手每粒高你 7.23%，輸嗰啲局淨係高 1.27%<span class=\"badge\" data-claim=\"C002\"></span>——同上一晚啱啱相反，今晚地板貼埋，天花板未到。不過 1.27% 呢個數係一局撐住嘅：抽走第二場第一局，連正負號都反轉，所以講得「地板差唔多」，講唔得「pinglamb 輸局都重啲」。",
+        "<strong>第四場 3 比 2 領先之後尾三局連失</strong><span class=\"badge\" data-claim=\"C014\"></span>，嗰場總攻擊少過對手<span class=\"badge\" data-claim=\"C015\"></span>。第一場你由 2 比 4 追返<span class=\"badge\" data-claim=\"C011\"></span>，第四場就冇。",
+        "<strong>全晚冇自己頂到頂</strong><span class=\"badge\" data-claim=\"C006\"></span>，守得住；要加嘅係下半場嘅攻擊。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 4 次全部冇接到第二個 TSD。</strong>個位俾其他棋填咗 2、下一粒 T 落咗第二度 2。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href=\"stmbcave.html\">STMB Cave 頁</a>有圖）",
+        "<strong>SDPC Spin 今晚 4 局全部行到第三巡或之後。</strong>4 局全部跟到<a href=\"sdpcspin.html\">SDPC Spin 頁</a>嘅第二巡同第三巡圖。條路線今晚行得完。"
+      ]
+    },
+    "pinglamb": {
+      "tagline": "每粒更重 · 尾兩場反撲",
+      "profile": [
+        "每粒方塊嘅攻擊兩個 regime 都高過對手<span class=\"badge\" data-claim=\"C002\"></span>，但輸嗰啲局淨係高 1.27%。",
+        "自己贏局對輸局差 18.97%<span class=\"badge\" data-claim=\"C003\"></span><span class=\"badge\" data-claim=\"G063\"></span>，今晚闊過對手。",
+        "T-spin triple 35 對 19<span class=\"badge\" data-claim=\"G032\"></span>，每粒方塊清走嘅垃圾都高過對手<span class=\"badge\" data-claim=\"G069\"></span>。"
+      ],
+      "recs": [
+        "<strong>每粒重唔等於場場贏。</strong>第一場你每粒方塊嘅攻擊高過對手，但對手落多咗粒數、總攻擊多過你，結果 4 比 5<span class=\"badge\" data-claim=\"C015\"></span><span class=\"badge\" data-claim=\"C011\"></span>。",
+        "<strong>第二場係今晚唯一一場每粒輸畀對手</strong>，而且輸成 7% 以上，結果 1 比 5<span class=\"badge\" data-claim=\"C016\"></span><span class=\"badge\" data-claim=\"C012\"></span>。",
+        "頂到頂 2 次，對手 0 次<span class=\"badge\" data-claim=\"C006\"></span>。KPP 同對手只差 0.16%<span class=\"badge\" data-claim=\"C008\"></span>，呢欄一向都唔話事。"
+      ],
+      "sim_recs": [
+        "<strong>STSD 今晚次次接到。</strong>3 次接到第二個 T-spin 3 次。繼續用。",
+        "<strong>はちみつ砲今晚次次行到第二巡。</strong>8 局全部行到第二巡、3 局行到第三巡或之後；迷走砲 18 局有 14 局。"
+      ]
+    }
+  },
+  "versus_note": "今晚盈餘填得晒個窿，總攻擊 yachi 多<span class=\"badge\" data-claim=\"C005\"></span>，但個系列照樣打和<span class=\"badge\" data-claim=\"C001\"></span>：逐場計總攻擊多嗰個四場全贏<span class=\"badge\" data-claim=\"C015\"></span>，而頭兩場總攻擊多嘅係 yachi、尾兩場係 pinglamb。<strong>成晚總數話唔到邊個贏，逐場總數先話得到。</strong>"
+}

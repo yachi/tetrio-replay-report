@@ -14,6 +14,10 @@
         "<strong>開波頭三十秒要主動搶攻，唔好淨係求穩。</strong> 你嘅快局勝率係全場最痛嘅弱點——40 秒內嘅局 5 勝 11 敗<span class=\"badge\" data-claim=\"R010\"></span>，兩場被掃都係輸喺開局節奏<span class=\"badge\" data-claim=\"R015\"></span><span class=\"badge\" data-claim=\"R016\"></span>。但你 APM 一夠 65 就贏八成<span class=\"badge\" data-claim=\"R012\"></span>，證明係「唔開火」而唔係「開唔到火」。練習：開局用你嘅快手優勢（PPS 1.40<span class=\"badge\" data-claim=\"R003\"></span>）主動叠雙 well／T-spin，逼對手先食你嘅垃圾，唔好等對手起手。",
         "<strong>由純 quad 流補多啲 T-spin double 進你嘅 opener。</strong> 你每粒方塊嘅攻擊輸蝕 pinglamb<span class=\"badge\" data-claim=\"R004\"></span>，佢就係靠 T-spin 拉開效率（TSD 232 對你 189、TST 52 對你 32）<span class=\"badge\" data-claim=\"R007\"></span><span class=\"badge\" data-claim=\"R023\"></span>。你手法夠乾淨、hold 又用得密<span class=\"badge\" data-claim=\"R006\"></span><span class=\"badge\" data-claim=\"R024\"></span>，完全有條件加多啲 TSD/TST 進 build，令每粒方塊打得更重。",
         "<strong>練「輸一局即刻穩返」嘅 reset 心態。</strong> 你最大嘅隱形失分係連敗——輸一局之後追返率得三成幾<span class=\"badge\" data-claim=\"R011\"></span>，兩場 0-5 就係咁雪球滾出嚟<span class=\"badge\" data-claim=\"R015\"></span>。每輸一局，落場前深呼吸、明確重設 downstack 目標，斬斷連鎖崩盤。你 APM 波動本身好穩<span class=\"badge\" data-claim=\"R019\"></span>，證明底子夠穩，差嘅係心理 reset。"
+      ],
+      "sim_recs": [
+        "<strong>STMB Cave 嘅第二個 TSD 今晚冇接到。</strong>STMB Cave 1 次，個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。",
+        "<strong>迷走砲 20 局得 8 局行到第二巡。</strong>行得完就有回報：其中 2 局一路打到嗰頁畫嘅全消。其餘喺第一巡之後就同頁上嘅圖分咗手，<a href=\"stray-cannon.html\">迷走砲頁</a>逐局列晒停喺邊。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,10 @@
         "<strong>保住快局壓制，繼續搶開局。</strong> 你贏波嘅根就係快局同 APM 開局爆發<span class=\"badge\" data-claim=\"R010\"></span><span class=\"badge\" data-claim=\"R016\"></span>，65+ APM 局 14 戰全勝<span class=\"badge\" data-claim=\"R012\"></span>。呢個唔好變——反而要有意識喺每場頭兩局全力搶節奏，因為 yachi 一旦連敗就會塌<span class=\"badge\" data-claim=\"R011\"></span>，你越早搶到 momentum 越易滾雪球（m1、m4 就係咁掃<span class=\"badge\" data-claim=\"R015\"></span>）。",
         "<strong>補快 PPS，減少「靜局」。</strong> 你嘅弱點係節奏慢過 yachi、被佢落多三百粒<span class=\"badge\" data-claim=\"R005\"></span>，而且 APM 波動偏大<span class=\"badge\" data-claim=\"R019\"></span>。當 T-spin setup 唔就手嗰陣，唔好死等——練 PPS 一致性（你 PPS 波動其實已經幾穩<span class=\"badge\" data-claim=\"R020\"></span>，將呢個穩定度推上 APM），令啲「靜低嘅局」少啲被 yachi 靠快手追返。",
         "<strong>鞏固 T-spin 效率做主武器，唔好去溝 quad。</strong> 你嘅贏面完全建立喺 T-spin 效率同大 spike 之上<span class=\"badge\" data-claim=\"R004\"></span><span class=\"badge\" data-claim=\"R008\"></span><span class=\"badge\" data-claim=\"R013\"></span><span class=\"badge\" data-claim=\"R014\"></span>。yachi 試 quad 流反而輸效率<span class=\"badge\" data-claim=\"R007\"></span>，你千祈唔好調轉去追 quad。集中練 TSD/TST 連段同 spike timing，將你「每粒方塊更重」嘅優勢再拉大。"
+      ],
+      "sim_recs": [
+        "<strong>はちみつ砲係今晚行得最深嘅開局。</strong>19 局有 14 局行到第二巡、5 局行到第三巡或之後、1 局打出嗰頁畫嘅全消。",
+        "<strong>ダブルダガー今晚接得到。</strong>ダブルダガー 1 次，接到第二個 T-spin。繼續用。"
       ]
     }
   },

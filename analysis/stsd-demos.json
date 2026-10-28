@@ -1,0 +1,459 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "stsd",
+ "means": "One constructed replay per STSD build board the planner can build: from an empty board, the page's grey terrain built out of pieces WE chose, then the page's own pieces, then the stood T into the window the corpus matcher reads, then the second TSD the page promises. Run through the vendored Triangle engine.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the terrain's pieces are ours too (the page draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "the page draws its after board with the right side stacked up to the old roof; the demo stacks it with filler pieces of our choosing, compared exactly only inside the variant's window columns. Boards that need garbage are not built: a constructed demo has no opponent to send any.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "dealing: bag 1's T is dealt last in bag 1 and held on arrival, bag 2's first piece placed in its stead; bag 2's T is swapped for it and the held T fired as the stood T; the follow-up T is swapped out of the hold when the next piece arrives. Every bag is a whole 7-bag",
+  "the stood T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "the follow-up slot is the variant's, carried through the stood T's clear; the rows it clears are filled first with filler pieces outside the window columns, and it must be a full T-spin clearing the follow-up's lines",
+  "reaches: board = the board after that lock shows the drawing exactly; spin = that lock's cells are the drawing's T; after = before that lock the board shows the drawing exactly inside the window columns and filled-where-drawn outside them, and that lock's cells are the drawn follow-up slot",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-17T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "5bbd258e0b5b48f99380c7c84bd29ae6",
+  "planner_md5": "b9ad936a56aed56af3cfd5e9dffa9157",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "7b6bbf8d545045c9ef364314c9c08fa6"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "build3.jl_hole",
+   "reason": "地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "build3.jl_hole.terrain",
+   "reason": "build3.jl_hole 砌唔到：地形有 29 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "misfire.garbage",
+   "reason": "個窿係一行垃圾嘅窿：垃圾行要對手送先有，砌出嚟嘅示範冇對手，唔可以自己落垃圾"
+  },
+  {
+   "node": "misfire.spin",
+   "reason": "係 misfire.garbage 嗰行垃圾上面打嘅，同一個原因砌唔到"
+  },
+  {
+   "node": "recover.j",
+   "reason": "係 misfire 之後嘅盤面（有垃圾行），同一個原因砌唔到"
+  },
+  {
+   "node": "recover.j.after",
+   "reason": "係 recover.j 之後嘅盤面，同一個原因砌唔到"
+  },
+  {
+   "node": "roof.z",
+   "reason": "地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "roof.z.terrain",
+   "reason": "roof.z 砌唔到：地形有 21 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  }
+ ],
+ "demos": [
+  {"node":"build3.jl","terrain":"build3.terrain","variant":"stsd","seq":"ZISLOJTLTIOSZJIJLOSTZ","roles":"bbbbbppSffF","bags":["ZISLOJT","LTIOSZJ"],"swap":"S","unused":"ZJ","base_locks":5,"stood_lock":7,"followup_lock":10,"offset":{"dr":34,"dc":0},"reaches":[{"node":"build3.terrain","lock":4,"check":"board"},{"node":"build3.jl","lock":6,"check":"board"},{"node":"basic","lock":6,"check":"board"},{"node":"basic.spin","lock":7,"check":"spin"},{"node":"basic.after","lock":10,"check":"after"}],"inputs":[[4,"keydown","softDrop"],[24,"keyup","softDrop"],[28,"keydown","rotateCCW"],[29,"keyup","rotateCCW"],[32,"keydown","hardDrop"],[33,"keyup","hardDrop"],[36,"keydown","softDrop"],[54,"keyup","softDrop"],[58,"keydown","rotateCW"],[59,"keyup","rotateCW"],[62,"keydown","softDrop"],[63,"keyup","softDrop"],[67,"keydown","rotateCW"],[68,"keyup","rotateCW"],[71,"keydown","softDrop"],[72,"keyup","softDrop"],[76,"keydown","moveLeft"],[77,"keyup","moveLeft"],[80,"keydown","hardDrop"],[81,"keyup","hardDrop"],[84,"keydown","moveRight"],[85,"keyup","moveRight"],[88,"keydown","moveRight"],[89,"keyup","moveRight"],[92,"keydown","moveRight"],[93,"keyup","moveRight"],[96,"keydown","softDrop"],[116,"keyup","softDrop"],[120,"keydown","rotateCW"],[121,"keyup","rotateCW"],[124,"keydown","hardDrop"],[125,"keyup","hardDrop"],[128,"keydown","moveRight"],[129,"keyup","moveRight"],[132,"keydown","moveRight"],[133,"keyup","moveRight"],[136,"keydown","moveRight"],[137,"keyup","moveRight"],[140,"keydown","softDrop"],[158,"keyup","softDrop"],[162,"keydown","rotateCCW"],[163,"keyup","rotateCCW"],[166,"keydown","moveRight"],[167,"keyup","moveRight"],[170,"keydown","softDrop"],[172,"keyup","softDrop"],[176,"keydown","hardDrop"],[177,"keyup","hardDrop"],[180,"keydown","moveRight"],[181,"keyup","moveRight"],[184,"keydown","softDrop"],[204,"keyup","softDrop"],[208,"keydown","hardDrop"],[209,"keyup","hardDrop"],[212,"keydown","softDrop"],[230,"keyup","softDrop"],[234,"keydown","rotateCW"],[235,"keyup","rotateCW"],[238,"keydown","moveLeft"],[239,"keyup","moveLeft"],[242,"keydown","moveLeft"],[243,"keyup","moveLeft"],[246,"keydown","moveLeft"],[247,"keyup","moveLeft"],[250,"keydown","softDrop"],[252,"keyup","softDrop"],[256,"keydown","hardDrop"],[257,"keyup","hardDrop"],[260,"keydown","hold"],[261,"keyup","hold"],[264,"keydown","moveLeft"],[265,"keyup","moveLeft"],[268,"keydown","softDrop"],[286,"keyup","softDrop"],[290,"keydown","rotateCCW"],[291,"keyup","rotateCCW"],[294,"keydown","hardDrop"],[295,"keyup","hardDrop"],[298,"keydown","hold"],[299,"keyup","hold"],[302,"keydown","moveLeft"],[303,"keyup","moveLeft"],[306,"keydown","moveLeft"],[307,"keyup","moveLeft"],[310,"keydown","softDrop"],[326,"keyup","softDrop"],[330,"keydown","rotateCW"],[331,"keyup","rotateCW"],[334,"keydown","moveLeft"],[335,"keyup","moveLeft"],[338,"keydown","softDrop"],[339,"keyup","softDrop"],[343,"keydown","rotateCCW"],[344,"keyup","rotateCCW"],[347,"keydown","rotateCCW"],[348,"keyup","rotateCCW"],[351,"keydown","hardDrop"],[352,"keyup","hardDrop"],[355,"keydown","moveRight"],[356,"keyup","moveRight"],[359,"keydown","softDrop"],[379,"keyup","softDrop"],[383,"keydown","hardDrop"],[384,"keyup","hardDrop"],[387,"keydown","moveRight"],[388,"keyup","moveRight"],[391,"keydown","moveRight"],[392,"keyup","moveRight"],[395,"keydown","moveRight"],[396,"keyup","moveRight"],[399,"keydown","moveRight"],[400,"keyup","moveRight"],[403,"keydown","softDrop"],[423,"keyup","softDrop"],[427,"keydown","hardDrop"],[428,"keyup","hardDrop"],[431,"keydown","hold"],[432,"keyup","hold"],[435,"keydown","moveLeft"],[436,"keyup","moveLeft"],[439,"keydown","moveLeft"],[440,"keyup","moveLeft"],[443,"keydown","softDrop"],[461,"keyup","softDrop"],[465,"keydown","rotateCW"],[466,"keyup","rotateCW"],[469,"keydown","moveLeft"],[470,"keyup","moveLeft"],[473,"keydown","softDrop"],[474,"keyup","softDrop"],[478,"keydown","rotateCW"],[479,"keyup","rotateCW"],[482,"keydown","hardDrop"],[483,"keyup","hardDrop"]],"frames":486,"locks":[[32,403,0,0,[],0,0,0],[48,4,0,0,[],0,0,0],[44,407,0,0,[],0,0,0],[52,1208,0,0,[],0,0,0],[32,15,0,0,[],0,0,0],[48,400,0,0,[],0,0,0],[38,1222,0,0,[],1,0,0],[57,1201,2,2,[],1,4,4],[32,14,0,0,[],0,0,0],[44,18,0,0,[],0,0,0],[55,800,2,2,[],1,5,5]],"events":[{"lock":7,"kind":"TSD","spin":2,"lines":2},{"lock":10,"kind":"TSD","spin":2,"lines":2}]},
+  {"node":"roof.i","terrain":"roof.i.terrain","variant":"stsd","seq":"IZSLOJTZIJTOSLIJLOSTZ","roles":"bbbbbbbppSF","bags":["IZSLOJT","ZIJTOSL"],"swap":"O","unused":"SL","base_locks":7,"stood_lock":9,"followup_lock":10,"offset":{"dr":34,"dc":0},"reaches":[{"node":"roof.i.terrain","lock":6,"check":"board"},{"node":"roof.i","lock":8,"check":"board"}],"inputs":[[4,"keydown","softDrop"],[25,"keyup","softDrop"],[29,"keydown","hardDrop"],[30,"keyup","hardDrop"],[33,"keydown","moveRight"],[34,"keyup","moveRight"],[37,"keydown","moveRight"],[38,"keyup","moveRight"],[41,"keydown","moveRight"],[42,"keyup","moveRight"],[45,"keydown","softDrop"],[66,"keyup","softDrop"],[70,"keydown","hardDrop"],[71,"keyup","hardDrop"],[74,"keydown","moveRight"],[75,"keyup","moveRight"],[78,"keydown","moveRight"],[79,"keyup","moveRight"],[82,"keydown","moveRight"],[83,"keyup","moveRight"],[86,"keydown","moveRight"],[87,"keyup","moveRight"],[90,"keydown","softDrop"],[109,"keyup","softDrop"],[113,"keydown","rotateCW"],[114,"keyup","rotateCW"],[117,"keydown","softDrop"],[118,"keyup","softDrop"],[122,"keydown","hardDrop"],[123,"keyup","hardDrop"],[126,"keydown","softDrop"],[146,"keyup","softDrop"],[150,"keydown","hardDrop"],[151,"keyup","hardDrop"],[154,"keydown","moveLeft"],[155,"keyup","moveLeft"],[158,"keydown","softDrop"],[177,"keyup","softDrop"],[181,"keydown","hardDrop"],[182,"keyup","hardDrop"],[185,"keydown","moveRight"],[186,"keyup","moveRight"],[189,"keydown","moveRight"],[190,"keyup","moveRight"],[193,"keydown","moveRight"],[194,"keyup","moveRight"],[197,"keydown","moveRight"],[198,"keyup","moveRight"],[201,"keydown","softDrop"],[219,"keyup","softDrop"],[223,"keydown","rotate180"],[224,"keyup","rotate180"],[227,"keydown","hardDrop"],[228,"keyup","hardDrop"],[231,"keydown","hold"],[232,"keyup","hold"],[235,"keydown","moveRight"],[236,"keyup","moveRight"],[239,"keydown","softDrop"],[256,"keyup","softDrop"],[260,"keydown","rotateCCW"],[261,"keyup","rotateCCW"],[264,"keydown","moveRight"],[265,"keyup","moveRight"],[268,"keydown","rotateCCW"],[269,"keyup","rotateCCW"],[272,"keydown","hardDrop"],[273,"keyup","hardDrop"],[276,"keydown","moveLeft"],[277,"keyup","moveLeft"],[280,"keydown","softDrop"],[297,"keyup","softDrop"],[301,"keydown","hardDrop"],[302,"keyup","hardDrop"],[305,"keydown","moveLeft"],[306,"keyup","moveLeft"],[309,"keydown","moveLeft"],[310,"keyup","moveLeft"],[313,"keydown","softDrop"],[329,"keyup","softDrop"],[333,"keydown","rotateCW"],[334,"keyup","rotateCW"],[337,"keydown","moveLeft"],[338,"keyup","moveLeft"],[341,"keydown","softDrop"],[345,"keyup","softDrop"],[349,"keydown","hardDrop"],[350,"keyup","hardDrop"],[353,"keydown","hold"],[354,"keyup","hold"],[357,"keydown","moveLeft"],[358,"keyup","moveLeft"],[361,"keydown","moveLeft"],[362,"keyup","moveLeft"],[365,"keydown","softDrop"],[381,"keyup","softDrop"],[385,"keydown","rotateCW"],[386,"keyup","rotateCW"],[389,"keydown","moveLeft"],[390,"keyup","moveLeft"],[393,"keydown","softDrop"],[394,"keyup","softDrop"],[398,"keydown","rotateCCW"],[399,"keyup","rotateCCW"],[402,"keydown","rotateCCW"],[403,"keyup","rotateCCW"],[406,"keydown","hardDrop"],[407,"keyup","hardDrop"],[410,"keydown","hold"],[411,"keyup","hold"],[414,"keydown","moveLeft"],[415,"keyup","moveLeft"],[418,"keydown","moveLeft"],[419,"keyup","moveLeft"],[422,"keydown","softDrop"],[440,"keyup","softDrop"],[444,"keydown","rotateCW"],[445,"keyup","rotateCW"],[448,"keydown","moveLeft"],[449,"keyup","moveLeft"],[452,"keydown","softDrop"],[453,"keyup","softDrop"],[457,"keydown","rotateCW"],[458,"keyup","rotateCW"],[461,"keydown","hardDrop"],[462,"keyup","hardDrop"]],"frames":465,"locks":[[29,3,0,0,[],0,0,0],[41,6,0,0,[],0,0,0],[52,408,0,0,[],0,0,0],[28,13,0,0,[],0,0,0],[31,23,0,0,[],0,0,0],[46,827,0,0,[],0,0,0],[45,25,0,0,[],1,0,0],[29,42,0,0,[],0,0,0],[48,400,0,0,[],0,0,0],[57,1201,2,2,[],1,4,4],[55,800,2,2,[],1,6,6]],"events":[{"lock":9,"kind":"TSD","spin":2,"lines":2},{"lock":10,"kind":"TSD","spin":2,"lines":2}]}
+ ]
+}

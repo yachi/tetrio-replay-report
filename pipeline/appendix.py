@@ -130,6 +130,40 @@ def _status_prose(total, verified, proof_map_available):
             "呢份報告就會自動翻新，唔使再改呢份 HTML。")
 
 
+# The appendix is folded by default: it is the audit trail, not coaching, and a
+# reader working on their Tetris has no use for 100-odd rows of lemma names. The
+# rows stay in the DOM (every badge still resolves to its `#claim-` anchor, and
+# check_badge_links still reads them); the script opens the fold when a badge, or
+# a link to #appendix, is followed, so a badge never lands on a closed box.
+FOLD_SUMMARY = ("撳開睇證明附錄：資料點樣核對、{total} 條 claim 逐條嘅 Dafny 引理同狀態"
+                "（數據對質用，教打 Tetris 唔使睇）")
+FOLD_STYLE = """    <style>
+    #appendix .ap-summary { cursor: pointer; color: var(--ink-secondary); padding: 0.4rem 0; }
+    #appendix .ap-fold[open] > .ap-summary { margin-bottom: 1rem; }
+    </style>"""
+FOLD_SCRIPT = """    <script>
+    (function () {
+      var fold = document.getElementById("appendix-fold");
+      function wants(h) { return h === "#appendix" || h.indexOf("#claim-") === 0; }
+      function openFor(h) { if (fold && wants(h)) fold.open = true; }
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest("a[href^='#']");
+        if (a) openFor(a.getAttribute("href"));
+      }, true);
+      window.addEventListener("hashchange", function () {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t && wants(location.hash)) t.scrollIntoView();
+      });
+      if (wants(location.hash)) {
+        openFor(location.hash);
+        var t = document.getElementById(location.hash.slice(1));
+        if (t) setTimeout(function () { t.scrollIntoView(); }, 0);
+      }
+    })();
+    </script>"""
+
+
 def section(facts, report_dir):
     claims = _rows(report_dir)
     total = len(claims)
@@ -143,6 +177,9 @@ def section(facts, report_dir):
            '    <div class="eyebrow">證明附錄 · 信任鏈</div>',
            '    <h2 class="section-title">證明附錄</h2>',
            '',
+           FOLD_STYLE,
+           '    <details class="ap-fold" id="appendix-fold">',
+           f'      <summary class="ap-summary">{FOLD_SUMMARY.format(total=total)}</summary>',
            '    <div class="method-note">',
            '      <p>呢份報告入面，每一句數得出嚟嘅嘢背後都有一條信任鏈：</p>',
            '      <div class="chain">',
@@ -187,5 +224,6 @@ def section(facts, report_dir):
             '          </tr>',
         ]
     out += ['        </tbody>', '      </table>', '    </div>',
+            '    </details>', FOLD_SCRIPT,
             '  </div>', '</section>']
     return "\n".join(out)

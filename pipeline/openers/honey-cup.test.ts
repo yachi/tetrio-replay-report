@@ -28,7 +28,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock held-J field, and the 7th piece was NOT the
  *  mirror-aware bag-1 J (L when mirrored): a hold. */
@@ -41,6 +41,9 @@ const J_HOLD_BAG1: string[] = [
   "2026-09-19 m17r3 pinglamb", "2026-09-19 m19r5 yachi", "2026-10-03 m15r2 pinglamb",
   "2026-10-03 m15r2 yachi", "2026-10-09 m1r3 pinglamb", "2026-10-09 m1r3 yachi",
   "2026-10-09 m1r6 pinglamb", "2026-10-09 m7r2 pinglamb",
+  // 2026-10-20: one, pinglamb's, mirrored (its bag-1 J is L) with an S placed 7th — prefix 25, past
+  // the lock-19 TST-donate board it goes on to reach (TST_DONATE_CASES).
+  "2026-10-20 m3r3 pinglamb",
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 J (L when mirrored), placed off the page. */
 const J_PLACED_ELSEWHERE_BAG1: string[] = [
@@ -80,6 +83,11 @@ const TST_DONATE_CASES: string[] = [
   // 2026-10-12: two, both pinglamb's, both reaching the TST-donate board at lock 19 (prefixes 108
   // and 51); m4r3 needed no garbage stripped, m7r4 two rows (BAG2_GARBAGE_STRIPPED).
   "2026-10-12 m4r3 pinglamb", "2026-10-12 m7r4 pinglamb",
+  // 2026-10-20: three, all pinglamb's, all reaching the TST-donate board at lock 19 with no garbage
+  // stripped (prefixes 25, 20 and 333); m3r3 is the J_HOLD_BAG1 round, m4r8 the one 2.compromise
+  // build of the night whose own condition held (CONDITIONS).
+  "2026-10-20 m3r3 pinglamb", "2026-10-20 m4r5 pinglamb", "2026-10-20 m4r8 pinglamb",
+  "2026-10-22 m5r1 pinglamb", "2026-10-22 m9r2 pinglamb",
 ];
 /** A bag-2 match that needed complete garbage rows stripped from under it (the count in brackets). */
 const BAG2_GARBAGE_STRIPPED: string[] = [
@@ -141,6 +149,12 @@ const BAG2_GARBAGE_STRIPPED: string[] = [
   // before it, strips exactly six rows; the other three are pinglamb's compromise form.
   "2026-10-12 m2r3 pinglamb (4)", "2026-10-12 m3r5 yachi (6)", "2026-10-12 m6r2 pinglamb (3)",
   "2026-10-12 m7r4 pinglamb (2)",
+  // 2026-10-20: five. yachi's two are his twelfth and thirteenth entries here — m3r2 strips the usual
+  // six, m4r6 (under 2.ideal#3) is the first of his to strip twelve; pinglamb's three are 2.compromise
+  // (m1r4) and 2.ideal#4 (m2r1, m4r7).
+  "2026-10-20 m1r4 pinglamb (2)", "2026-10-20 m2r1 pinglamb (4)", "2026-10-20 m3r2 yachi (6)",
+  "2026-10-20 m4r6 yachi (12)", "2026-10-20 m4r7 pinglamb (4)",
+  "2026-10-22 m7r5 yachi (6)", "2026-10-22 m8r2 pinglamb (4)", "2026-10-22 m8r5 pinglamb (4)",
 ];
 /** No bag-2 match: the board before the TST is a strict subset of a bag-2 board. MEASURED, not matched. */
 const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
@@ -175,6 +189,9 @@ const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
   // 81, 100 and 126) — the TST came before the bag-2 board was complete, as for every entry above.
   "2026-10-12 m4r3 yachi under 2.ideal", "2026-10-12 m5r8 yachi under 2.ideal",
   "2026-10-12 m6r7 yachi under 2.ideal", "2026-10-12 m8r1 pinglamb under 2.compromise",
+  // 2026-10-20: one, yachi's, a 4-cell subset at lock 11 (prefix 73) — the same shape as 10-12's four.
+  "2026-10-20 m4r3 yachi under 2.ideal",
+  "2026-10-22 m4r5 pinglamb under 2.ideal", "2026-10-22 m6r2 yachi under 2.ideal", "2026-10-22 m6r6 yachi under 2.ideal",
 ];
 /** No bag-2 match: the board before the TST is a bag-2 board plus exactly four cells (their letters). MEASURED. */
 const BAG2_NONE_EXTRA_PIECE: string[] = [
@@ -191,6 +208,7 @@ const BAG2_NONE_EXTRA_PIECE: string[] = [
   "2026-10-09 m5r5 pinglamb under 2.compromise + ILO",
   // 2026-10-12: one, mirrored, lock 13, prefix 58 (nine garbage rows stripped before the compare).
   "2026-10-12 m3r3 pinglamb under 2.ideal + J",
+  "2026-10-22 m8r6 yachi under 2.ideal + IL",
 ];
 /** No bag-2 match: the board before the TST is a bag-2 board with one piece's four cells elsewhere. MEASURED. */
 const BAG2_NONE_MOVED_PIECE: string[] = [
@@ -230,6 +248,7 @@ const BAG2_NONE_MOVED_PIECE: string[] = [
   "2026-10-09 m1r3 pinglamb under 2.ideal, L moved", "2026-10-09 m3r2 pinglamb under 2.ideal, J moved",
   // 2026-10-12: two, both pinglamb's, both at lock 12 (prefixes 328 and 109; m8r8 mirrored).
   "2026-10-12 m5r7 pinglamb under 2.ideal, L moved", "2026-10-12 m8r8 pinglamb under 2.ideal, J moved",
+  "2026-10-22 m4r1 pinglamb under 2.ideal, J moved", "2026-10-22 m8r6 pinglamb under 2.ideal, L moved",
 ];
 /** 8-line PCs that are on no drawn pattern, named with the node they stop under. The compromise ones are
  *  NOT filed under the page source's hidden compromise list (html_comment_boards): nothing classifies against it. */
@@ -241,6 +260,7 @@ const PC_OFF_PAGE: string[] = [
   "2026-09-19 m16r3 pinglamb under 2.compromise.other",
   "2026-10-03 m4r5 yachi under bag1.j_right.other",
   "2026-10-03 m7r8 pinglamb under 2.compromise.other",
+  "2026-10-22 m4r4 pinglamb under 2.compromise.other", "2026-10-22 m5r4 pinglamb under 2.compromise.other",
 ];
 
 /** Measured empty. A first entry is a red build to investigate, never a number to absorb. */
@@ -251,29 +271,33 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror Honey Cup (unlike 迷走砲): pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { pinglamb: 282, yachi: 73 };
+const MIRRORED_BAG1 = { pinglamb: 305, yachi: 84 };
 
 /** Cases per measured node. The five 2.ideal forms share one occupancy, so these split by colour. */
 const NODE_CASES: Record<string, number> = {
-  'bag1.j_hold': 23, 'bag1.j_right': 596, 'bag1.j_placed_elsewhere': 30,
-  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 15, '2.ideal#4': 153, '2.ideal#5': 48, '2.compromise': 177,
+  'bag1.j_hold': 24, 'bag1.j_right': 643, 'bag1.j_placed_elsewhere': 30,
+  '2.ideal#1': 0, '2.ideal#2': 0, '2.ideal#3': 20, '2.ideal#4': 162, '2.ideal#5': 51, '2.compromise': 191,
   // 2026-10-12 adds three bag-3 PCs: two pc#1 (m7r2, pinglamb and yachi, both mirrored) and the
   // corpus's FIRST pc#9 — yachi's m5r1, mirrored, at lock 19 on a prefix verified only to 18, so
   // that case is `verified: false` and the node count carries it as the artefact does.
-  '2.ideal.pc#1': 11, '2.ideal.pc#2': 9, '2.ideal.pc#3': 8, '2.ideal.pc#4': 10, '2.ideal.pc#5': 4,
-  '2.ideal.pc#6': 2, '2.ideal.pc#7': 0, '2.ideal.pc#8': 1, '2.ideal.pc#9': 1, '2.ideal.pc#10': 0,
+  // 2026-10-20 adds one bag-3 PC, pinglamb's m4r6 under pc#6 (2 -> 3), mirrored, at lock 19 on a
+  // prefix verified only to 14 — the second `verified: false` PC case after 10-12's pc#9, carried the
+  // same way.
+  // 2026-10-22 adds six bag-3 PCs: one pc#3, two pc#4, two pc#5 (hand-counted from the node deltas).
+  '2.ideal.pc#1': 11, '2.ideal.pc#2': 9, '2.ideal.pc#3': 9, '2.ideal.pc#4': 12, '2.ideal.pc#5': 6,
+  '2.ideal.pc#6': 3, '2.ideal.pc#7': 0, '2.ideal.pc#8': 1, '2.ideal.pc#9': 1, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0, '2.ideal.pc#15': 0,
-  '2.compromise.tst_donate': 60, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
+  '2.compromise.tst_donate': 65, '2.compromise.tst_donate.after': 0, '2.compromise.roof': 0,
   '2.compromise.roof.after': 0,
 };
 
 /** The compromise form's condition (the page's example, など) against the form actually built, in the
  *  handedness the page draws. It holds for a minority of the compromise rounds: never the reason. */
 const CONDITIONS = {
-  '2.compromise': { '(none)': 149, '2.compromise': 28 },
-  '2.ideal#3': { '(none)': 12, '2.compromise': 3 },
-  '2.ideal#4': { '(none)': 138, '2.compromise': 15 },
-  '2.ideal#5': { '(none)': 37, '2.compromise': 11 },
+  '2.compromise': { '(none)': 162, '2.compromise': 29 },
+  '2.ideal#3': { '(none)': 16, '2.compromise': 4 },
+  '2.ideal#4': { '(none)': 147, '2.compromise': 15 },
+  '2.ideal#5': { '(none)': 40, '2.compromise': 11 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */

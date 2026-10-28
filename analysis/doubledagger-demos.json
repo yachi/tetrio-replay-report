@@ -1,0 +1,492 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "doubledagger",
+ "means": "One constructed replay per Double Dagger build board the planner can build: from an empty board, the page's grey terrain built out of pieces WE chose, then the page's own pieces, then the flat T into the window the corpus matcher reads, then the second TSD the page draws in the lower slot. Run through the vendored Triangle engine. A board the planner cannot build is published unbuilt with its measured reason.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the terrain's pieces are ours too (the page draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "the page draws its terrains grey, with a stack beside its builds the player is told to fill as they like; a demo stands only on what the planner can build from an empty board without clearing a line.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are the build board's lower-case letters, one whole piece per letter",
+  "the flat T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-17T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "25730dceba314ba214671797c42aeb6d",
+  "planner_md5": "d1979a48710e359409dbfb5afac7409d",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "c0e5132c8d34181bb31a9278480b0e6b"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "basic",
+   "reason": "基本形冇畫頁面嘅方塊，成幅都係灰色嘅元地形（暗灰格當空）：有 34 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "basic.after",
+   "reason": "係 basic.spin 之後嘅盤面，同一個原因冇示範"
+  },
+  {
+   "node": "basic.spin",
+   "reason": "係基本形上面打嘅 T：基本形砌唔到，所以呢幅都冇示範"
+  },
+  {
+   "node": "cross.imperial",
+   "reason": "呢幅係インペリアルクロス，唔係呢個手法；佢企喺 cross.imperial.terrain 上面"
+  },
+  {
+   "node": "cross.imperial.terrain",
+   "reason": "cross.imperial 嘅地形：cross.imperial 唔係呢個手法，所以冇示範"
+  },
+  {
+   "node": "cross.terrain",
+   "reason": "十字形元地形有 25 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "cross.z",
+   "reason": "地形有 30 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "cross.z.terrain",
+   "reason": "cross.z 砌唔到：地形有 30 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "line.after",
+   "reason": "係 line.spin 之後嘅盤面，同一個原因冇示範"
+  },
+  {
+   "node": "line.spin",
+   "reason": "係特徵圖，冇畫頁面嘅方塊：拎走粒 T 之後有 42 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）；而且個窗口喺呢幅唔對到（兩個位中間有一行）"
+  },
+  {
+   "node": "multi",
+   "reason": "係特徵圖，冇畫頁面嘅方塊：有 58 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tetris.after",
+   "reason": "係 tetris.spin 之後嘅盤面，同一個原因冇示範"
+  },
+  {
+   "node": "tetris.spin",
+   "reason": "係特徵圖，冇畫頁面嘅方塊：拎走條 I 之後有 70 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tsd.pink",
+   "reason": "係 TSD 形元地形標住粉紅格嘅同一幅（佔格一樣），同一個原因冇示範"
+  },
+  {
+   "node": "tsd.sj",
+   "reason": "地形有 27 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "tsd.sj.terrain",
+   "reason": "tsd.sj 砌唔到：地形有 27 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "tsd.terrain",
+   "reason": "TSD 形元地形本身冇呢個手法（個窗口喺度唔對到）；示範要企嘅係 tsd.sj 連埋原頁叫人隨便填嗰啲淺色格嘅地形，嗰幅點解砌唔到寫喺 tsd.sj 度"
+  }
+ ],
+ "demos": [
+
+ ]
+}

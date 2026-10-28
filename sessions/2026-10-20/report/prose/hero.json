@@ -1,0 +1,10 @@
+{
+  "kicker": "第十八回合",
+  "title": "2 比 2、15 比 15——\n<span class=\"hl-y\">頭兩場</span>同<span class=\"hl-p\">尾兩場</span>，啱啱好倒轉",
+  "tags": {
+    "yachi": "落多啲 · 總攻擊多 · VOLUME",
+    "pinglamb": "每粒更重 · 尾兩場反撲 · EFFICIENCY"
+  },
+  "lede": "四場 match、30 局，全 corpus 最細嘅一晚。<strong>打成 2 比 2，冇人攞低個系列</strong><span class=\"badge\" data-claim=\"G001\"></span><span class=\"badge\" data-claim=\"C001\"></span>，逐局計都係 15 比 15<span class=\"badge\" data-claim=\"G002\"></span><span class=\"badge\" data-claim=\"C010\"></span>——十八晚以嚟，第一次場數同局數兩樣都打和。頭兩場都係 yachi，局數 10 比 5；尾兩場都係 pinglamb，局數 5 比 10<span class=\"badge\" data-claim=\"C010\"></span>：兩段各 15 局，啱啱好倒轉。今晚 yachi 條「落多啲」嘅路行得通：多疊 11.18% 粒數<span class=\"badge\" data-claim=\"C009\"></span>，對手每粒方塊嘅攻擊高 6.73%<span class=\"badge\" data-claim=\"C004\"></span>，盈餘大過個窿，<strong>總攻擊反而多過對手 80 條</strong><span class=\"badge\" data-claim=\"C005\"></span>——但個系列照樣打和。逐場計，總攻擊多嗰個四場全贏<span class=\"badge\" data-claim=\"C015\"></span>。",
+  "score_claim": "G001"
+}

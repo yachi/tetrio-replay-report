@@ -51,15 +51,44 @@ env:
   # the install step for the pin's provenance and for why it must be z3 here.
   Z3_VERSION: 4.16.0
   Z3_SHA256: 7288c49a5bd6dbafd7b0b0d1f65956b91672da24b08f09242919af159be3418e
+  # The one bun pin. Every `oven-sh/setup-bun` step here and in dual-backed.yml reads it as
+  # `${{ env.BUN_VERSION }}`, and both files must carry the SAME value — bin/verify-repo's
+  # completeness check refuses a literal `bun-version:` and a value the two files disagree on.
+  # 1.4.2 (published 2026-09-05) because `bun test --parallel` needs >= 1.3.13; it was 1.2.4.
+  # Unlike Dafny, z3 and cvc5 this pin is not sha256-checked: setup-bun v2.0.2 verifies no
+  # checksum, which was equally true of 1.2.4. The byte-identity rebuild tests are what would
+  # catch a behaviour change in the runtime that executes the simulator.
+  BUN_VERSION: 1.4.2
   # The route-order proofs' Lean half (lean/). One authority, like z3's: GitHub's asset digest for
   # lean-4.35.0-linux.tar.zst. Lean publishes no checksum file and no Homebrew cask, so it is not
   # cvc5's two-authority standard. lean/lean-toolchain names the same version.
   LEAN_VERSION: 4.35.0
   LEAN_SHA256: 7289597a44543246c9227b8cae501767e095ce17f6d448b95fc4a8dc97268f6d
 
+# Supersede only PULL REQUEST runs. A pull request's group is its ref, so a new push to the
+# PR cancels the run it replaces. Every other event — push to main, the weekly schedule, a
+# dispatch — gets a group of its own run_id and is never cancelled: a per-ref group on main
+# would cancel QUEUED main runs even with cancel-in-progress false, because GitHub keeps only
+# one pending run per group, and every merge must get its full run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+# timeout-minutes on every job: about 2-3x the slower of the last push run (2026-10-22, run
+# 39852713199) and the last SCHEDULE run (2026-10-19, run 39257189270, which adds the mutation
+# steps), from the jobs API. Measured maxima, push / schedule: verify 2.0 / 7.6, pipeline
+# 2.0 / 16.8, spec 1.6 / 18.4, docs 5.8 / 2.8, oracle-image 13.4 / 13.3, every other
+# repo-wide job under 0.6. typescript was 38.1 serial; with `--parallel` it measured 10.7
+# locally on 4 vCPU, and 45 leaves room for the suite growing with every session landed.
+# Without these the 6-hour default applies. Re-measure before tightening any of them.
+# spec went 45 -> 90 when the route-order proofs landed: not measured in CI yet. Locally the schedule
+# adds spec/mutate-routeorders.sh (~5 min) and route_orders_data.py --mutants (~27 min) to the 18.4.
+# lean is new too: lean/check.sh measured ~1-2 min locally, plus a ~600 MB toolchain download.
+
 jobs:
   verify:
     runs-on: ubuntu-24.04
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +111,8 @@ jobs:
           - sessions/2026-10-03/report
           - sessions/2026-10-09/report
           - sessions/2026-10-12/report
+          - sessions/2026-10-20/report
+          - sessions/2026-10-22/report
           # A FILTERED SUBSET, not a session: the three 2026-09-18 matches in which
           # BOTH players' pooled per-match VS beat their own 12-session median. It lives
           # outside sessions/ on purpose — `analysis/stat_sources.py` globs
@@ -226,13 +257,15 @@ jobs:
   # what keeps "a new session is one command" true rather than aspirational.
   pipeline:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         session: ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09',
                   '2026-08-14', '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10',
                   '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-                  '2026-10-03', '2026-10-09', '2026-10-12']
+                  '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20',
+                  '2026-10-22']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -446,6 +479,20 @@ jobs:
             python3 -m pipeline.check_attack_section "$W" --selftest
           fi
 
+      # 定式路線同中盤手法: the night's slice of the opener route and mid-game technique artefacts,
+      # placed early in the report, and 建議's tagged 「未經證明」 items written from it. The region
+      # must be exactly a re-render, carry its quarantine sentences and no badge; every tagged item
+      # must render with its tag, carry no badge, and print only figures the region prints.
+      # --selftest plants each corruption, so it runs where the section exists.
+      - name: Check the simulator-derived routes and techniques section and tagged advice
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_routes_techniques "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/opener-facts.json" ]; then
+            python3 -m pipeline.check_routes_techniques "$W" --selftest
+          fi
+
       - name: Generate and verify the Dafny proofs
         run: |
           set -euo pipefail
@@ -522,6 +569,7 @@ jobs:
   # is what makes the "two parsers agree" claim mean something.
   cross-extractor:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -529,7 +577,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
-          bun-version: '1.2.4'
+          bun-version: ${{ env.BUN_VERSION }}
 
       # DISCOVERED FROM DISK, NOT LISTED. Both loops in this job used to name their seven
       # artefact directories, and they gate the repo's ONE invariant — that two independently
@@ -630,6 +678,7 @@ jobs:
   # was live in sessions/ and absent from docs/ until someone noticed by hand.
   docs:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -640,6 +689,12 @@ jobs:
       # rule's own message, so the audit is shown to fire before --check leans on it.
       - name: Check the replay page audit catches its corruptions
         run: python3 -m pipeline.replay_page --selftest
+
+      # The replay pages' opener / technique labels are re-checked against each page's own
+      # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a
+      # stale artefact and requires each to be refused, so that check is shown to fire.
+      - name: Check the replay labels refuse a wrong label
+        run: python3 -m pipeline.replay_labels --selftest
 
       # The Stray Cannon route pages render from a hand-checked transcription of the
       # shiwehi.com page. Gate the transcription first (grammar, the cross-check against
@@ -696,6 +751,17 @@ jobs:
       - name: Check the Gamushiro Stacking route transcription gate catches its mutants
         run: python3 -m pipeline.openers.extract_gamushiro_routes --selftest
 
+      # harddrop's own ガムシロ積み page (Gamushiro_Stacking, read as wikitext and pinned by revision),
+      # through the same shared gate: its bag 1 and its four bag-2 forms with the three PC lists under
+      # them. Its routes_file cross-source is shiwehi.com's transcription (gamushiro-routes.json); the
+      # pinned revision is refetched weekly by wikitext-sources.yml. Its corpus artefact and demos are
+      # checked by hdgamushiro.test.ts and hdgamushiro-demos.test.ts in the whole-suite `bun test`.
+      - name: Check the harddrop Gamushiro Stacking route transcription
+        run: python3 -m pipeline.openers.extract_hdgamushiro_routes
+
+      - name: Check the harddrop Gamushiro Stacking route transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_hdgamushiro_routes --selftest
+
       # The SDPC Spin route transcription, through the same shared gate. Its source is harddrop's
       # SDPC_Spin page read as wikitext (not shiwehi.com HTML), and bag 1 is cross-checked against
       # harddrop's SingleYou page (table 0), stick spin's bag1.pc mirrored and Ivan's catalogue entry;
@@ -745,6 +811,12 @@ jobs:
       - name: Check the Gamushiro Stacking page audit catches its corruptions
         run: python3 -m pipeline.gamushiro_page --selftest
 
+      # The harddrop ガムシロ積み route pages, the same shared renderer bound to
+      # pipeline/hdgamushiro_page.py. A page-only site (pipeline.sites.PAGE_ONLY_ROUTE_SITES): a card
+      # on the index and no report column or replay label, since gamushiro's already cover its cases.
+      - name: Check the harddrop Gamushiro Stacking page audit catches its corruptions
+        run: python3 -m pipeline.hdgamushiro_page --selftest
+
       # The SDPC Spin route pages, the same shared renderer bound to pipeline/sdpcspin_page.py;
       # build-docs --check below re-renders them, and the constructed demos (sdpcspin-demos.html) are
       # checked by pipeline/openers/sdpcspin-demos.test.ts in the typescript job. One bag-2 page
@@ -752,8 +824,228 @@ jobs:
       - name: Check the SDPC Spin page audit catches its corruptions
         run: python3 -m pipeline.sdpcspin_page --selftest
 
-      - name: Check docs/ was republished from the sessions
-        run: python3 bin/build-docs --check
+      # The first mid-game technique page, STSD (shiwehi.com's template/stsd.php): a local-shape
+      # transcription gated by the shared pipeline/openers/technique_transcription.py (its window
+      # predicate's Python twin runs over every committed *-routes.json board), and its two pages,
+      # the shared pipeline/technique_page.py renderer bound to pipeline/stsd_page.py; build-docs
+      # --check below re-renders them. The page snapshot is not committed, so CI checks the
+      # transcription and the gate's teeth only. The corpus artefact and the constructed demos are
+      # checked by pipeline/openers/stsd.test.ts and stsd-demos.test.ts in the typescript job.
+      - name: Check the STSD technique transcription
+        run: python3 -m pipeline.openers.extract_stsd_shapes
+
+      - name: Check the STSD technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stsd_shapes --selftest
+
+      - name: Check the STSD technique page audit catches its corruptions
+        run: python3 -m pipeline.stsd_page --selftest
+
+      # The second technique page, STMB Cave (shiwehi.com's template/stmbcave.php): the same gate and
+      # renderer, its window the AGREEMENT BOX of the page's drawings and harddrop's STMB_Cave diagrams
+      # (wiki-tspin-techniques.json), which the gate derives and checks from both sides. The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/stmbcave.test.ts and
+      # stmbcave-demos.test.ts in the typescript job.
+      - name: Check the STMB Cave technique transcription
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes
+
+      - name: Check the STMB Cave technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_stmbcave_shapes --selftest
+
+      - name: Check the STMB Cave technique page audit catches its corruptions
+        run: python3 -m pipeline.stmbcave_page --selftest
+
+      # The third technique page, インペリアルクロス (shiwehi.com's template/imperialcross.php): the same gate and
+      # renderer, a T stood into a cross whose two cleared rows are not adjacent. Its window is the
+      # AGREEMENT BOX of the page's four drawings and ガムシロ積み's two Imperial Cross boards
+      # (gamushiro-routes.json); the gate's opt-in followup.drawn_lines records that the page draws the
+      # after board before the stack beside the second slot is built. The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/imperialcross.test.ts and imperialcross-demos.test.ts
+      # in the typescript job.
+      - name: Check the Imperial Cross technique transcription
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes
+
+      - name: Check the Imperial Cross technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_imperialcross_shapes --selftest
+
+      - name: Check the Imperial Cross technique page audit catches its corruptions
+        run: python3 -m pipeline.imperialcross_page --selftest
+
+      # The fourth technique page, ダブルダガー (shiwehi.com's template/doubledagger.php): the same gate and
+      # renderer, two TSD slots stacked, the T laid flat into the upper one. Its window is STMB Cave's T
+      # in STSD's default bounding box; the page's mirrored drawings, the line-between feature the window
+      # does not express, the pink build condition and the インペリアルクロス page's dagger board are the
+      # gate's extra checks. Its cross-source is harddrop's SDPC Spin (sdpcspin-routes.json). The corpus
+      # artefact and the (all unbuilt) demos are checked by pipeline/openers/doubledagger.test.ts and
+      # doubledagger-demos.test.ts in the typescript job.
+      - name: Check the Double Dagger technique transcription
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes
+
+      - name: Check the Double Dagger technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_doubledagger_shapes --selftest
+
+      - name: Check the Double Dagger technique page audit catches its corruptions
+        run: python3 -m pipeline.doubledagger_page --selftest
+
+      # The fifth technique page, BT砲 (途中BT, shiwehi.com's template/btcannon.php): the same gate and
+      # renderer, a flat T into a TSD whose clear joins a TST slot (the follow-up is a TST). Its window is
+      # the AGREEMENT BOX of the page's six drawings and harddrop's BT_Cannon page's seventeen (pinned by
+      # revision, recorded in the transcription); no routes board draws a BT, which the gate's opt-in
+      # routes_fire_none records. The corpus artefact (no hit, with the predicate shown to fire on every
+      # recorded drawing) and the (all unbuilt) demos are checked by pipeline/openers/btcannon.test.ts and
+      # btcannon-demos.test.ts in the typescript job.
+      - name: Check the BT Cannon technique transcription
+        run: python3 -m pipeline.openers.extract_btcannon_shapes
+
+      - name: Check the BT Cannon technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_btcannon_shapes --selftest
+
+      - name: Check the BT Cannon technique page audit catches its corruptions
+        run: python3 -m pipeline.btcannon_page --selftest
+
+      # The sixth technique page, 千鳥格子 (Cut Copy, shiwehi.com's template/cutcopy.php): the same gate and
+      # renderer, a flat T into the inner of two TSD slots interleaved a column apart, whose clear joins the
+      # outer slot (the follow-up is a second TSD). Its window is the AGREEMENT BOX of the page's three
+      # drawings, harddrop's Cut_copy page's five (pinned by revision, recorded in the transcription with
+      # every other drawn T on that page) and the Cut Copy harddrop's BT_Cannon page draws (read from
+      # btcannon-technique.json) and Tetrisちゃんねる's two (its images committed under
+      # spec/fixtures/tetrisch-cutcopy/); no routes board draws one, which the gate's opt-in routes_fire_none
+      # records. A second variant, harddrop's second generic type (Uncut copy), has its own agreement window on
+      # harddrop's drawings, its board an `external` node. The corpus artefact and the (all unbuilt) demos are
+      # checked by pipeline/openers/cutcopy.test.ts and cutcopy-demos.test.ts in the typescript job, and the boards
+      # of our own design (analysis/cutcopy-own.json, technique-own.ts's search) by cutcopy-own.test.ts there, and
+      # cold-clear's self-play Cut Copies (analysis/cutcopy-selfplay.json, replayed from their committed placements)
+      # by cutcopy-selfplay.test.ts there.
+      - name: Check the Cut Copy technique transcription
+        run: python3 -m pipeline.openers.extract_cutcopy_shapes
+
+      - name: Check the Cut Copy technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_cutcopy_shapes --selftest
+
+      - name: Check the Cut Copy technique page audit catches its corruptions
+        run: python3 -m pipeline.cutcopy_page --selftest
+
+      # The seventh technique page, 社畜トレイン (Shachiku Train, shiwehi.com's template/shachikutrain.php): the same
+      # gate and renderer, a flat T into the slot an S one column off a wall and an L hung over its far end make,
+      # whose clear joins the row above it to the cell beside the S's foot (the follow-up is a second TSD). The page
+      # draws its spins unmuted, so its T boards are builds on derived boards less the T, checked by the module's
+      # tsd: rule. Its window is the AGREEMENT BOX of the page's five drawings and harddrop's Shachiku_Train page
+      # (pinned by revision, every drawn T recorded); harddrop's STMB_Cave comparison is measured against both
+      # windows. The corpus artefact and the (all unbuilt) demos are checked by
+      # pipeline/openers/shachikutrain.test.ts and shachikutrain-demos.test.ts in the typescript job.
+      - name: Check the Shachiku Train technique transcription
+        run: python3 -m pipeline.openers.extract_shachikutrain_shapes
+
+      - name: Check the Shachiku Train technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_shachikutrain_shapes --selftest
+
+      - name: Check the Shachiku Train technique page audit catches its corruptions
+        run: python3 -m pipeline.shachikutrain_page --selftest
+
+      # The eighth technique page, 欄干 (Parapet, shiwehi.com's template/parapet.php): the same gate and renderer,
+      # TWO variants on one terrain (the flat T's TSD and the stood T's TSS, each measured at its own spin), and a
+      # PAYOFF in place of a follow-up: the spin re-opens a well under the T's arm, and the matcher asks whether the
+      # first piece into it is an I clearing four (the gate's rule (d') checks the well on the drawing). Its window
+      # is the AGREEMENT BOX of the page's two basic forms, BT砲's page's Parapet, harddrop's Parapet fumen and
+      # Tetrisチャンネル's two (its images committed under spec/fixtures/tetrisch-parapet/). The corpus artefact and the
+      # (all unbuilt) demos are checked by pipeline/openers/parapet.test.ts and parapet-demos.test.ts in the
+      # typescript job.
+      - name: Check the Parapet technique transcription
+        run: python3 -m pipeline.openers.extract_parapet_shapes
+
+      - name: Check the Parapet technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_parapet_shapes --selftest
+
+      - name: Check the Parapet technique page audit catches its corruptions
+        run: python3 -m pipeline.parapet_page --selftest
+
+      # The ninth technique page, 階段のドネイト (Kaidan Setups, shiwehi.com's template/kaidansetup.php): the same gate
+      # and renderer, no shared RULE file changed (the shared files that moved are named in CLAUDE.md). The flat T's
+      # TSD on a staircase with a Z stood on end, and 欄干's
+      # well_quad PAYOFF (the Tetris into the column the TSD re-opens — harddrop's next step, not shiwehi.com's). Its
+      # window is the AGREEMENT BOX of the page's builds and DT砲 boards, harddrop's Kaidan_Setups and Anchor_Set pages
+      # (both pinned revisions, refetched weekly by check_wikitext_sources) and the Kaidan BT砲's harddrop record holds.
+      # The corpus artefact and the (all unbuilt) demos are checked by pipeline/openers/kaidan.test.ts and
+      # kaidan-demos.test.ts in the typescript job.
+      - name: Check the Kaidan technique transcription
+        run: python3 -m pipeline.openers.extract_kaidan_shapes
+
+      - name: Check the Kaidan technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_kaidan_shapes --selftest
+
+      - name: Check the Kaidan technique page audit catches its corruptions
+        run: python3 -m pipeline.kaidan_page --selftest
+
+      # The tenth technique page, 途中DT砲 (mid-game DT Cannon, shiwehi.com's template/dtcannon.php): the same gate
+      # and renderer. The flat T's TSD with a TST slot standing over its nub, then the TST. Its window is the
+      # AGREEMENT BOX of the page's eight drawings of the shape and harddrop SDPC Spin's two DT Cannon continuations.
+      # The page was read as a markdown rendering (shiwehi.com is not reachable from the session that transcribed
+      # it), so its snapshot hash is of that rendering and nothing refetches it. The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/dtcannon.test.ts and dtcannon-demos.test.ts in the
+      # typescript job.
+      - name: Check the mid-game DT Cannon technique transcription
+        run: python3 -m pipeline.openers.extract_dtcannon_shapes
+
+      - name: Check the mid-game DT Cannon technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_dtcannon_shapes --selftest
+
+      - name: Check the mid-game DT Cannon technique page audit catches its corruptions
+        run: python3 -m pipeline.dtcannon_page --selftest
+
+      # The eleventh technique page, 基本的なドネイト (basic donating, shiwehi.com's template/basicdonating.php): the
+      # same gate and renderer. A piece laid over a hole fills exactly the two rows a flat T's TSD clears, so the hole
+      # opens again; six windows (`window_basis: well`), one per hole distance from the T's arm. A T another page's
+      # window also fires on is that page's (the qualify rule `other_page`). The corpus artefact and the (all
+      # unbuilt) demos are checked by pipeline/openers/basicdonating.test.ts and basicdonating-demos.test.ts in the
+      # typescript job.
+      - name: Check the basic donating technique transcription
+        run: python3 -m pipeline.openers.extract_basicdonating_shapes
+
+      - name: Check the basic donating technique transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_basicdonating_shapes --selftest
+
+      - name: Check the basic donating technique page audit catches its corruptions
+        run: python3 -m pipeline.basicdonating_page --selftest
+
+      # The DPC page: what the first T-spin after each Perfect Clear was built on, against harddrop's six
+      # DPC Setups pages (pinned revisions, refetched weekly by check_wikitext_sources). Its PC points are
+      # anchored to the replay's own clears.allclear; the corpus artefact is checked by
+      # pipeline/openers/dpc.test.ts in the typescript job.
+      - name: Check the DPC setups transcription
+        run: python3 -m pipeline.openers.extract_dpc_setups
+
+      - name: Check the DPC setups transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_dpc_setups --selftest
+
+      - name: Check the DPC page audit catches its corruptions
+        run: python3 -m pipeline.dpc_page --selftest
+
+      # The Second PC page: a Perfect Clear straight into a four-line one, against harddrop's Second
+      # Perfect Clear page (pinned revision, refetched weekly by check_wikitext_sources). Its PC points
+      # are the DPC page's, anchored to clears.allclear; the corpus artefact is checked by
+      # pipeline/openers/secondpc.test.ts in the typescript job.
+      - name: Check the Second PC setups transcription
+        run: python3 -m pipeline.openers.extract_secondpc_setups
+
+      - name: Check the Second PC setups transcription gate catches its mutants
+        run: python3 -m pipeline.openers.extract_secondpc_setups --selftest
+
+      - name: Check the Second PC page audit catches its corruptions
+        run: python3 -m pipeline.secondpc_page --selftest
+
+      # The site is rendered here and NOT committed (since 2026-10-23): every render-time audit
+      # above runs again inside this build, the second render must reproduce the first byte for
+      # byte, and the `deploy` job publishes exactly this upload once every job in this workflow
+      # has passed on a push to main.
+      - name: Render the Pages site
+        run: python3 bin/build-docs --out _site
+
+      - name: Check a second render of the site is byte-identical
+        run: python3 bin/build-docs --check --out _site
+
+      - name: Upload the site for the deploy job
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b  # v4.0.0
+        with:
+          path: _site
 
   # A pooled figure that one round carries, published as if the session carried it. 2026-08-14's
   # lost-regime APP gap moves 2.874 pp when m11r2 is dropped — rank 1 of 84, 1.72x the next — and
@@ -772,6 +1064,7 @@ jobs:
   # round label — the mutant that says the line-wrap tolerance is not a whitespace strip.
   leave-one-out:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -815,6 +1108,7 @@ jobs:
   # the renderer never produced, and only that control caught it.
   intense-round-corpus:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -828,6 +1122,7 @@ jobs:
 
   typescript:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -835,7 +1130,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
-          bun-version: '1.2.4'
+          bun-version: ${{ env.BUN_VERSION }}
 
       - name: Check every named import resolves to an export (and that the gate can fail)
         run: |
@@ -851,8 +1146,29 @@ jobs:
 
       # REPLAY_DIR has no default on purpose — the simulator is session-agnostic and refuses to
       # guess which replays you mean. One test reads it; the rest name their sessions themselves.
+      #
+      # --parallel runs the files in worker processes (one per core; 4 on this runner), every
+      # file exactly once (measured locally on 4 cores before the oracle cache: 640 s against
+      # ~37 min serial). It implies
+      # --isolate: each file starts with a fresh process.env and fresh globals, so a test file
+      # that sets REPLAY_DIR in a session loop no longer leaks it into the files after it.
+      # NEVER add --no-isolate — it brings that leak back. A file that calls process.exit is
+      # counted as a failure under --parallel, where a serial run would silently truncate.
+      #
+      # The oracle cache (pipeline/sim/oracle-cache.ts) lets the ~22 corpus-replaying files share
+      # one replay per case instead of recomputing it each. It lives in the runner's tmpdir and is
+      # never persisted across runs, so every case is still replayed by the real engine once per
+      # job. Warming it first, 4-way, keeps parallel workers from filling the same cases twice.
+      # On the weekly schedule the suite reads it OFF (the warm step is then wasted, ~1 min), so the suite also runs once a week exactly as it did
+      # before the cache existed — the backstop for anything the cache key could miss.
+      - name: Warm the oracle cache
+        run: bun pipeline/sim/oracle-cache.ts --warm --jobs 4
+
       - name: Run the simulator test suite
-        run: REPLAY_DIR=sessions/2026-07-22 bun test
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then export ORACLE_CACHE=off; fi
+          REPLAY_DIR=sessions/2026-07-22 bun test --parallel
 
   # The HAND-WRITTEN spec. Distinct from the `verify` job, which checks the GENERATED per-session
   # claims (Facts.dfy / Claims.dfy) — that job installs Dafny and never touches spec/Forecast.dfy.
@@ -861,6 +1177,7 @@ jobs:
   # was that no job ran it.
   spec:
     runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -946,6 +1263,7 @@ jobs:
   # unexpected axiom is a red build. No Mathlib and no dependency, so lake fetches nothing.
   lean:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -978,6 +1296,7 @@ jobs:
   # inside it is exercised against a real corpus board.
   oracle-image:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1003,7 +1322,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76  # v2.0.2
         with:
-          bun-version: '1.2.4'
+          bun-version: ${{ env.BUN_VERSION }}
 
       # The count `bestTspinLines` produces IS what the forecast metric consumes, and it had no
       # outside check — only our own second BFS. This runs it against the Rust cutout_tslot over
@@ -1084,12 +1403,14 @@ jobs:
       # the two steps above prove that a session list written down once goes stale). Without
       # CC_ORACLE set it skips silently (bun test has no nix), so it must run here where the binary
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
+      # cutcopy-own-cc asks the same binary whether our own 千鳥格子 designs' two T's are reachable
+      # and full two-line spins (analysis/cutcopy-own.json), and skips the same way without it.
       # route-orders-cc re-queries cold-clear for every route-order DAG edge and requires the committed
       # analysis/sdpcspin-orders-cc.json byte for byte; elsewhere its test 3 skips.
-      - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin) vs cold-clear
+      - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
         env:
           CC_ORACLE: ./result/bin/cc-oracle
-        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/route-orders-cc.test.ts
+        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts
 
   # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has
   # now measured three times in one week that an obligation recorded only in prose does not survive
@@ -1098,6 +1419,7 @@ jobs:
   # implementation nothing else uses. This job is the enforceable form.
   preregistrations:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1139,6 +1461,7 @@ jobs:
   # module could be measuring something adjacent and every run would still be green.
   stat-sources:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1171,6 +1494,7 @@ jobs:
   # the only kind this repo allows.
   rate-records:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1183,6 +1507,7 @@ jobs:
 
   donation-bands:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1195,6 +1520,7 @@ jobs:
 
   dual-engine:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1207,6 +1533,7 @@ jobs:
 
   rounding:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1244,6 +1571,7 @@ jobs:
   # Offline, stdlib-only, well under a second. No Bun, no Dafny, no network.
   workflow-plan:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1253,3 +1581,26 @@ jobs:
           set -euo pipefail
           python3 bin/verify-repo --selftest
           python3 bin/verify-repo --check
+
+  # GitHub Pages. The site is the `docs` job's upload, deployed only on a push to main and only
+  # once EVERY other job in this workflow has passed, so a page goes live only after the gates
+  # that check its numbers. `bin/verify-repo --check` refuses a `needs:` list that leaves a job
+  # out. The repository's Pages source must be "GitHub Actions" for this job to succeed.
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [verify, pipeline, cross-extractor, docs, leave-one-out, intense-round-corpus, typescript, spec, lean, oracle-image, preregistrations, stat-sources, rate-records, donation-bands, dual-engine, rounding, workflow-plan]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4.0.5

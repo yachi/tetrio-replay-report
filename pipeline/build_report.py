@@ -25,7 +25,7 @@ import sys
 
 from pipeline import (appendix, attack_section, chart_data, claim_cards, coaching,
                       forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region,
-                      replay_section, stats_section)
+                      replay_section, routes_techniques_section, stats_section)
 from pipeline.claims import generators
 
 
@@ -53,8 +53,17 @@ def matches_section(ctx):
 
 
 def stats_sec(ctx):
+    from pipeline import routes_techniques_charts
     return stats_section.build(ctx["facts"],
-                               stats_section.load_prose(ctx["report_dir"]))
+                               stats_section.load_prose(ctx["report_dir"]),
+                               routes_techniques_charts.build(ctx["facts"], ctx["report_dir"]))
+
+
+def routes_techniques_sec(ctx):
+    # Quarantined like opener_sec, but placed EARLY: the corpus route / technique artefacts' slice for
+    # this night, so the tagged 建議 items (coaching.py's sim_recs) have something above them to cite.
+    # None for a report outside sessions/<date>/ (the filtered subset), which has no sim/ directory.
+    return routes_techniques_section.build(ctx["facts"], ctx["report_dir"])
 
 
 def moments_section(ctx):
@@ -132,6 +141,11 @@ SECTIONS = [
     ("hero", '<!-- BEGIN generated matches', hero_section, None),
     ("matches", '<!-- BEGIN generated stats', matches_section, None),
     ("stats", '<!-- BEGIN generated moments', stats_sec, None),
+    # simulator output ABOVE the trust chain's narrative sections, on purpose: 建議's tagged items
+    # cite it, and a reader meets the tables before the advice. Its eyebrow and title say which
+    # tier it is, and check_routes_techniques holds the quarantine sentences. Anchored on the moments
+    # region's BEGIN marker, which every report and the skeleton carry.
+    ("routes-techniques", '<!-- BEGIN generated moments', routes_techniques_sec, None),
     ("moments", '<!-- BEGIN generated records', moments_section, None),
     ("records", '<section id="coaching">', records_section, None),
     # after the records grid: 全消 is a record-shaped number whose point is the

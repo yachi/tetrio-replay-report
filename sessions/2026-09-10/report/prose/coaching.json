@@ -15,6 +15,10 @@
         "<strong>位喺天花板，唔喺地板。</strong>輸嗰啲局兩個人爭 1% 幾，贏嗰啲局爭 11% 幾<span class=\"badge\" data-claim=\"C002\"></span>。（呢句要記住得一局撐住：抽走 m8 第 4 局，地板差距就變 3.86%。）守嗰邊唔係扣緊你分嘅嘢。",
         "<strong>KPP 唔使睇。</strong>3.598 對 3.606<span class=\"badge\" data-claim=\"C008\"></span>，喺自己贏局輸局之間郁唔夠 0.05<span class=\"badge\" data-claim=\"G068\"></span>。呢一欄冇嘢執得返。",
         "<strong>真係要睇嘅係 m8。</strong>成晚 28 比 28<span class=\"badge\" data-claim=\"C010\"></span>，最後嗰局 VS 約 5.7 對約 94.2<span class=\"badge\" data-claim=\"G061\"></span>。四場生死局你執到兩場<span class=\"badge\" data-claim=\"G012\"></span>，呢場唔算打過——打成平手嘅一晚，輸喺一局唔算比賽嘅局，係最唔抵嘅一種輸法。"
+      ],
+      "sim_recs": [
+        "<strong>階段嘅 Tetris 今晚接到一半。</strong>階段 4 次接到 Tetris 2 次；冇接到嗰兩次，條井俾棋蓋住咗 1、I 入咗井但唔係 Tetris 1。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
+        "<strong>STMB Cave 冇接到。</strong>STMB Cave 1 次，係個位俾其他棋填咗。打完第一個 TSD，下一粒 T 嚟之前唔好擺嘢入嗰個位。"
       ]
     },
     "pinglamb": {
@@ -28,6 +32,10 @@
         "<strong>要郁嘅係地板。</strong>你輸嗰啲局每粒方塊打出約 0.53<span class=\"badge\" data-claim=\"G067\"></span>，同對手輸局嘅數字爭 1% 幾<span class=\"badge\" data-claim=\"C002\"></span>。你今晚輸嘅每一局，都係跌返落佢個水平打，唔係你個水平。",
         "<strong>Perfect Clear 唔見數。</strong>9 個對 5 個<span class=\"badge\" data-claim=\"G037\"></span>，但全場淨係你做到全消嗰 9 局，你仲要輸咗一局<span class=\"badge\" data-claim=\"G079\"></span>。九個全消，成晚計換返一局。",
         "<strong>條路本身冇嘢改。</strong>T-spin double 258 對 212、triple 66 對 41<span class=\"badge\" data-claim=\"G035\"></span><span class=\"badge\" data-claim=\"G036\"></span>，對手多疊嗰 276 粒方塊冇翻到你隻船<span class=\"badge\" data-claim=\"C005\"></span>——差 47 條就得，但都係冇。"
+      ],
+      "sim_recs": [
+        "<strong>はちみつ砲今晚開得最多，亦行得最深。</strong>27 局有 18 局行到第二巡、3 局行到第三巡或之後。",
+        "<strong>階段 1 次，條井俾棋蓋住咗。</strong>打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。"
       ]
     }
   },

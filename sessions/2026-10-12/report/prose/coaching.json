@@ -14,6 +14,10 @@
         "<strong>輸嗰啲局太輕。</strong>贏嗰啲局對手每粒高你 7.14%，輸嗰啲局高 15.44%<span class=\"badge\" data-claim=\"C002\"></span>——差距主要喺你輸緊嘅時候。你自己輸局每粒方塊嘅攻擊得約 0.54<span class=\"badge\" data-claim=\"G067\"></span>，追分嗰陣先係要重。",
         "<strong>第二同第七場示範咗條路點樣行得通。</strong>對手每粒高啲，但你落多咗粒數、總攻擊多過佢，兩場都贏<span class=\"badge\" data-claim=\"C019\"></span>。今晚每粒差距喺 5% 以內嗰三場，你全部贏晒<span class=\"badge\" data-claim=\"C007\"></span>。",
         "<strong>領先守唔住。</strong>第六場 3 比 0 之後五局全失<span class=\"badge\" data-claim=\"C016\"></span>，第八場 3 比 2 之後尾三局連失<span class=\"badge\" data-claim=\"C018\"></span>。第四到第六場局數 7 比 15<span class=\"badge\" data-claim=\"C010\"></span>，值得翻睇。"
+      ],
+      "sim_recs": [
+        "<strong>階段之後，條井俾棋蓋住咗。</strong>用完整方塊砌出嚟嘅階段得 1 次，條井俾棋蓋住咗，冇接到 Tetris。打完個 TSD，留住 I 落條井，唔好用其他棋塞，亦唔好喺井口上面疊嘢。",
+        "<strong>STMB Cave 今晚一次都冇接到。</strong>STMB Cave 2 次，2 次都係下一粒 T 落咗第二度。打完第一個 TSD，睇清楚第二粒 T 要落邊個位。"
       ]
     },
     "pinglamb": {
@@ -27,6 +31,10 @@
         "<strong>每粒重唔等於場場贏。</strong>第二同第七場你每粒方塊嘅攻擊都高過對手，但對手落多咗粒數、總攻擊多過你，兩場都輸<span class=\"badge\" data-claim=\"C019\"></span>。差距收窄到 5% 以下嗰三場，你一場都冇贏<span class=\"badge\" data-claim=\"C007\"></span>。",
         "<strong>第三場係今晚唯一一場每粒輸畀對手</strong>，而且輸成 38% 以上，結果 0 比 5<span class=\"badge\" data-claim=\"C020\"></span><span class=\"badge\" data-claim=\"C013\"></span>。",
         "頂到頂 4 次<span class=\"badge\" data-claim=\"C006\"></span>，同對手一樣。KPP 高過對手 2.54%<span class=\"badge\" data-claim=\"C008\"></span>，不過呢欄一向都唔話事。"
+      ],
+      "sim_recs": [
+        "<strong>STSD 3 次得 1 次接到第二個 T-spin。</strong>另外 2 次 T 入咗位但唔係 TSD——第二粒 T 嘅轉法要對返頁上嘅圖。",
+        "<strong>迷走砲今晚開得最多，亦行得深。</strong>29 局有 22 局行到第二巡；はちみつ砲 15 局有 10 局，2 局行到第三巡或之後。"
       ]
     }
   },

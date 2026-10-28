@@ -33,7 +33,14 @@ Keeping the rule here means the JSON only ever says *how many paragraphs*, never
 which tag — but note the coupling: giving 07-22 a second paragraph flips the
 wrapper and that session's stylesheet would need the `p` rule added with it.
 
-This section emits no `<style>` of its own — `.rec-grid` / `.rec-col` / `.rec-list`
+**Tagged items (`sim_recs`).** A column may carry a second list, `sim_recs`: recommendations written
+from 定式路線同中盤手法 (`routes_techniques_section.py`), which is simulator output and outside the trust
+chain. They render after the proved `recs`, numbered on from them, each with an inline 「未經證明」 tag
+linking to that section and no ✓. The loader refuses a badge or `data-claim` inside one, and
+`check_routes_techniques` checks every Arabic figure in one is a figure that section prints. When any
+column has one, the section carries `SIM_NOTE` and a `<style>` scoped `#coaching .cs-*`.
+
+Apart from that, the section emits no `<style>` of its own — `.rec-grid` / `.rec-col` / `.rec-list`
 live in the report's own stylesheet. That is deliberate: 全場之最 once defined
 `.rec-grid` for its tile grid and collapsed these two columns into auto-fit ones,
 because a generated section's `<style>` is injected into the body and wins at equal
@@ -48,7 +55,19 @@ from pipeline.claims.build_claims import SIMPLIFIED
 TOP_FIELDS = ("eyebrow", "title", "lede", "versus_note")
 SHAPE = ('  {"eyebrow": "...", "title": "...", "lede": "...", '
          '"columns": {"<player>": {"tagline": "...", "profile": ["..."], '
-         '"recs": ["..."]}}, "versus_note": "..."}')
+         '"recs": ["..."], "sim_recs": ["... (optional)"]}}, "versus_note": "..."}')
+
+# The tag every sim_recs item carries, and the sentence the section carries when any column has one.
+SIM_TAG = '<a class="cs-unproven" href="#routes-techniques">未經證明</a>'
+SIM_NOTE = ('標住「未經證明」嘅建議，係用上面「定式路線同中盤手法」嗰節嘅模擬器數字寫嘅：'
+            '<strong>冇 ✓、唔屬於信任鏈</strong>，啲數喺嗰節逐個搵得返。')
+SIM_STYLE = """    <style>
+      /* scoped, cs- prefixed: this <style> lands in the body (see the module docstring) */
+      #coaching .cs-unproven { display: inline-block; font-size: .72rem; padding: .02rem .4rem;
+        margin-right: .4rem; border: 1px dashed currentColor; border-radius: .3rem;
+        text-decoration: none; opacity: .8; }
+      #coaching .cs-note { font-size: .85rem; opacity: .8; }
+    </style>"""
 
 
 def load_prose(report_dir, facts):
@@ -92,13 +111,21 @@ def load_prose(report_dir, facts):
             blank = [i for i, t in enumerate(items, 1) if not (str(t) or "").strip()]
             if blank:
                 raise SystemExit(f"{path}: column {p} {field} {blank} empty")
+        sim = col.get("sim_recs", [])
+        if not isinstance(sim, list) or any(not (str(t) or "").strip() for t in sim):
+            raise SystemExit(f"{path}: column {p} sim_recs must be a list of non-empty strings")
+        badged = [i for i, t in enumerate(sim, 1) if "data-claim" in t or "badge" in t]
+        if badged:
+            raise SystemExit(f"{path}: column {p} sim_recs {badged} carry a claim badge — these items "
+                             "are simulator output and outside the trust chain")
 
     # The same guard the claim generator applies: reviews have repeatedly caught
     # 净/实/约 arriving from an editor with the wrong locale.
     text = " ".join([str(prose[f]) for f in TOP_FIELDS]
                     + [str(columns[p]["tagline"]) for p in players]
                     + [str(t) for p in players for f in ("profile", "recs")
-                       for t in columns[p][f]])
+                       for t in columns[p][f]]
+                    + [str(t) for p in players for t in columns[p].get("sim_recs", [])])
     bad = sorted(set(text) & SIMPLIFIED)
     if bad:
         raise SystemExit(f"{path}: simplified glyph(s) {bad} — this report is "
@@ -118,11 +145,14 @@ def _profile(paragraphs):
 
 def build(facts, prose):
     columns = prose["columns"]
-    out = ['<section id="coaching">', '  <div class="wrap-wide">',
+    tagged = any(columns[p].get("sim_recs") for p in facts["players"])
+    out = ['<section id="coaching">'] + ([SIM_STYLE] if tagged else []) + ['  <div class="wrap-wide">',
            f'    <div class="eyebrow">{html.escape(prose["eyebrow"])}</div>',
            f'    <h2 class="section-title">{html.escape(prose["title"])}</h2>',
-           f'    <p class="section-lede">{prose["lede"]}</p>',
-           '',
+           f'    <p class="section-lede">{prose["lede"]}</p>']
+    if tagged:
+        out.append(f'    <p class="cs-note">{SIM_NOTE}</p>')
+    out += ['',
            '    <div class="rec-grid">']
     for player in facts["players"]:
         col = columns[player]
@@ -137,6 +167,8 @@ def build(facts, prose):
             # positional, so inserting a recommendation cannot leave the rest
             # misnumbered — eight hand-typed counters is eight chances to slip
             out.append(f'          <li><span class="rec-num">{i}</span>{rec}</li>')
+        for i, rec in enumerate(col.get("sim_recs", []), len(col["recs"]) + 1):
+            out.append(f'          <li class="cs-sim"><span class="rec-num">{i}</span>{SIM_TAG}{rec}</li>')
         out += ['        </ol>', '      </div>', '']
 
     out += ['      <div class="versus-note">',
