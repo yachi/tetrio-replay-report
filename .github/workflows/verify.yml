@@ -59,6 +59,11 @@ env:
   # checksum, which was equally true of 1.2.4. The byte-identity rebuild tests are what would
   # catch a behaviour change in the runtime that executes the simulator.
   BUN_VERSION: 1.4.2
+  # The route-order proofs' Lean half (lean/). One authority, like z3's: GitHub's asset digest for
+  # lean-4.35.0-linux.tar.zst. Lean publishes no checksum file and no Homebrew cask, so it is not
+  # cvc5's two-authority standard. lean/lean-toolchain names the same version.
+  LEAN_VERSION: 4.35.0
+  LEAN_SHA256: 7289597a44543246c9227b8cae501767e095ce17f6d448b95fc4a8dc97268f6d
 
 # Supersede only PULL REQUEST runs. A pull request's group is its ref, so a new push to the
 # PR cancels the run it replaces. Every other event — push to main, the weekly schedule, a
@@ -76,6 +81,9 @@ concurrency:
 # repo-wide job under 0.6. typescript was 38.1 serial; with `--parallel` it measured 10.7
 # locally on 4 vCPU, and 45 leaves room for the suite growing with every session landed.
 # Without these the 6-hour default applies. Re-measure before tightening any of them.
+# spec went 45 -> 90 when the route-order proofs landed: not measured in CI yet. Locally the schedule
+# adds spec/mutate-routeorders.sh (~5 min) and route_orders_data.py --mutants (~27 min) to the 18.4.
+# lean is new too: lean/check.sh measured ~1-2 min locally, plus a ~600 MB toolchain download.
 
 jobs:
   verify:
@@ -1169,7 +1177,7 @@ jobs:
   # was that no job ran it.
   spec:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -1189,7 +1197,7 @@ jobs:
       - name: Verify the spec
         run: |
           set -euo pipefail
-          for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy spec/DonationCave.dfy; do
+          for f in spec/Forecast.dfy spec/ForecastExamples.dfy spec/BfsKey.dfy spec/DonationCave.dfy spec/RouteOrders.dfy; do
             out=$(dafny verify "$f" 2>&1) || true
             echo "$out" | tail -1
             case "$out" in
@@ -1208,6 +1216,13 @@ jobs:
         run: |
           python3 spec/check_spec_vacuity.py
           python3 spec/check_spec_vacuity.py spec/DonationCave.dfy
+          python3 spec/check_spec_vacuity.py spec/RouteOrders.dfy
+
+      # T3 of the route-order proofs: the proved AcceptsMemo, compiled to Python, recounts every
+      # node of analysis/sdpcspin-orders.json over all 5040 dealt orders in both hold modes and must
+      # reproduce the artefact's counts AND bitsets. The data module is generated into a temp dir.
+      - name: Recount the route orders with the proved procedure
+        run: python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check
 
       # This repo asks one anti-vacuity question twice — `check_smt --mutate` of
       # `claims.smt2`, `pipeline/mutation_test.sh` of `Facts.dfy` — and until
@@ -1239,6 +1254,40 @@ jobs:
         run: |
           bash spec/mutate-forecast-spec.sh
           bash spec/mutate-donationcave.sh
+          bash spec/mutate-routeorders.sh
+          python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --mutants
+
+  # The Lean half of the route-order proofs, written independently of spec/RouteOrders.dfy: T1, T2
+  # and T4 kernel-checked, T3 by native_decide over data gen_data.py writes from the committed
+  # artefact. check.sh also gates every theorem's #print axioms output, so a proof hole or an
+  # unexpected axiom is a red build. No Mathlib and no dependency, so lake fetches nothing.
+  lean:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Lean ${{ env.LEAN_VERSION }} (pinned by sha256)
+        run: |
+          set -euo pipefail
+          URL="https://github.com/leanprover/lean4/releases/download/v${LEAN_VERSION}/lean-${LEAN_VERSION}-linux.tar.zst"
+          curl -fsSL "$URL" -o lean.tar.zst
+          echo "${LEAN_SHA256}  lean.tar.zst" | sha256sum -c -
+          mkdir -p "$HOME/lean-dist"
+          tar --zstd -xf lean.tar.zst -C "$HOME/lean-dist" --strip-components=1
+          echo "$HOME/lean-dist/bin" >> "$GITHUB_PATH"
+
+      - name: Build and check the Lean proofs
+        run: |
+          set -euo pipefail
+          lean --version
+          bash lean/check.sh
+
+      # Slow (each mutant is a full lake build), so schedule and on demand, like the spec job's.
+      - name: Mutation-test the Lean proofs
+        if: github.event_name == 'schedule' || inputs.mutation
+        run: bash lean/mutate.sh
 
   # The cc-oracle container image, built the way the local Mac could not: on a native aarch64-linux
   # runner. No cross-compile (so no zstd-sys/libiconv snag), no linux-builder, no root — cc-oracle
@@ -1356,10 +1405,12 @@ jobs:
       # already exists. cross-srs-tables needs no oracle binary; it rides along since bun is already up.
       # cutcopy-own-cc asks the same binary whether our own 千鳥格子 designs' two T's are reachable
       # and full two-line spins (analysis/cutcopy-own.json), and skips the same way without it.
+      # route-orders-cc re-queries cold-clear for every route-order DAG edge and requires the committed
+      # analysis/sdpcspin-orders-cc.json byte for byte; elsewhere its test 3 skips.
       - name: Reachability (cross-movegen), kick tables (cross-srs-tables), T-spin rule (cross-tspin), own Cut Copy designs (cutcopy-own-cc) vs cold-clear
         env:
           CC_ORACLE: ./result/bin/cc-oracle
-        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts
+        run: bun test pipeline/sim/cross-movegen.test.ts pipeline/sim/cross-srs-tables.test.ts pipeline/sim/cross-tspin.test.ts pipeline/openers/cutcopy-own-cc.test.ts pipeline/openers/route-orders-cc.test.ts
 
   # A pre-registration is a script plus a pinned hash plus a gate, or it is a wish. This repo has
   # now measured three times in one week that an obligation recorded only in prose does not survive
@@ -1537,7 +1588,7 @@ jobs:
   # out. The repository's Pages source must be "GitHub Actions" for this job to succeed.
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [verify, pipeline, cross-extractor, docs, leave-one-out, intense-round-corpus, typescript, spec, oracle-image, preregistrations, stat-sources, rate-records, donation-bands, dual-engine, rounding, workflow-plan]
+    needs: [verify, pipeline, cross-extractor, docs, leave-one-out, intense-round-corpus, typescript, spec, lean, oracle-image, preregistrations, stat-sources, rate-records, donation-bands, dual-engine, rounding, workflow-plan]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

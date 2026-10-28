@@ -50,6 +50,11 @@ LEMMA = re.compile(r'^  lemma\s+(\w+)\s*\(([^)]*)\)([^\{]*?)\n  \{', re.M | re.S
 # contradictory", and the gate exits 2 with HARNESS BROKEN. A module with no entry is a hard error
 # rather than a silently skipped check.
 CONTROLS_BY_MODULE = {
+    'RouteOrders': [
+        ('poison', 'B0: seq<seq<int>>, G: seq<Grp>, w: nat, a: int, b: int', ['T1Hyp(B0, G, w)', 'a < b', 'b < a'], True),
+        ('healthy', 'B0: seq<seq<int>>, G: seq<Grp>, w: nat', ['T1Hyp(B0, G, w)'], False),
+        ('healthy_hold', 'st: seq<char>', ['StarOnlyLast(st)'], False),
+    ],
     'Forecast': [
         # (name, params, requires, must_be_flagged)
         ('poison', 's: Step, a: int, b: int', ['a < b', 'b < a'], True),

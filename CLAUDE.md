@@ -419,6 +419,16 @@ python3 -m pipeline.openers.extract_secondpc_setups --selftest #   its mutants; 
 bun pipeline/sim/emit-secondpc-facts.ts --out analysis/secondpc-facts.json  # a PC straight into a 4-line PC, against those setups (quarantined)
 bun test pipeline/openers/secondpc.test.ts       #   byte rebuild, the allclear anchor (= dpc-facts'), every drawn solution, named list + mutants
 python3 -m pipeline.secondpc_page --selftest     # the docs/secondpc.html audit's mutants (--out-dir <dir> renders)
+bun pipeline/sim/emit-route-orders.ts --opener sdpcspin \
+  --out analysis/sdpcspin-orders.json                           # which dealt orders build each SDPC Spin node (constructed, quarantined)
+bun pipeline/sim/emit-route-orders-cc.ts --opener sdpcspin \
+  --out analysis/sdpcspin-orders-cc.json                        # Cold Clear's verdict on every edge (needs result/bin/cc-oracle)
+bun test pipeline/openers/route-orders.test.ts pipeline/openers/route-orders-cc.test.ts  # its two tests
+dafny verify spec/RouteOrders.dfy          # T1, T2, T4 of the route-order proofs
+python3 spec/route_orders_data.py analysis/sdpcspin-orders.json --check   # T3: the proved DP recounts the artefact
+bash spec/mutate-routeorders.sh            # its proof mutants (serial; a TIMEOUT is UNRESOLVED)
+bash lean/check.sh                         # the Lean half, written independently; never a bare `lake build`
+bash lean/mutate.sh                        # its mutants
 REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
   --out sessions/<date>/sim/attack-facts.json                   # the 攻擊由邊度嚟 split (quarantined)
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
@@ -643,7 +653,7 @@ equivalent marker pair.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
-  byte-identical to what is committed. Weekly runs add mutation testing. **20 job definitions
+  byte-identical to what is committed. Weekly runs add mutation testing. **22 job definitions
   across 4 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
   artefact directories (21 — twenty session artefacts plus the `subsets/2026-09-18-onform`
   filtered subset, which is NOT in the corpus even though the night it is drawn from now IS) and
@@ -672,7 +682,7 @@ equivalent marker pair.
   is added** — that is a manual-only step, which this file elsewhere calls the thing
   `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
 - **Every job but the two matrices (`verify`, `pipeline`) is repo-wide, and `bin/verify-repo` is what
-  runs them** (eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
+  runs them** (twenty of the twenty-two on 2026-10-28, when the `lean` job landed — main already held 21 jobs while this read 「20」; eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
   one short at nineteen jobs — derive it as the job count less two, never carry it). `bin/new-session`
   covers steps 1-7 of adding a session (step 6 runs the four sim emitters); `bin/verify-session` takes ONE artefact directory and every
   gate it runs is internal to it. Until 2026-08-23 nothing ran `cross-extractor`, `leave-one-out`,
@@ -5264,6 +5274,69 @@ Its PC loop is a COPY of `dpc-facts.ts`'s, and `secondpc.test.ts` holds its per-
 `secondpc_prose.json` is a 中盤手法 card rendered in `bin/build-docs`'s DPC loop, not in `TECHNIQUE_SITES`.
 Same quarantine as the DPC page. The cases are a named list in the test (none matches harddrop at the time
 of writing); every other PC point is counted out by reason, and the accounting test makes them sum.
+
+### 派牌次序 — which dealt orders build each SDPC Spin node, proved twice
+
+`pipeline/sim/route-orders.ts` → `analysis/sdpcspin-orders.json` (`bun pipeline/sim/emit-route-orders.ts
+--opener sdpcspin --out …`), CONSTRUCTED and quarantined like the demos: `report_eligible: false`, no
+claim id, no page reads it yet. Per node it asks how many of the 7! = 5040 dealt orders a player with
+one hold slot can turn into a placement order that builds the drawing. Counts and bitsets are read
+off the artefact and its tests, never typed here.
+
+**It splits into an engine part and a hold part, and only the second is proved.**
+
+* **Engine:** the board after a bag places a SET of its drawn groups does not depend on the order
+  (cells sit in diagram rows through the rowmap; a row clears when full). So the buildable placement
+  orders are the paths of a subset DAG whose edges use the planner's own rules (rowmap, empty target,
+  `reach()`, spin checks, `uLast` / `uFiresBefore`, `uLines`, the PC end) — NOT the page's order
+  conditions, which is what lets the artefact test them (`cond`: stated, built∧stated, built∧¬stated,
+  stated∧¬built). `nodeDag` throws when one subset is reached with two different boards, and `build`
+  refuses a node whose parent leaves pieces unplaced. Seven nodes are partial bags (k < 7) and are
+  named in the test.
+* **Hold:** the stream is the dealt order plus `'*'`, the next bag's first piece, which may only
+  enter the hold. Each step places the current piece (a), swaps it with the held one and places
+  that (b), or, with the hold empty, holds it and places the next (c). The modes are `empty` and
+  `next` (the first piece already held).
+
+**Four theorems, each written twice and independently**: `spec/RouteOrders.dfy` (Dafny) and `lean/`
+(Lean 4.35, no Mathlib). T1 order independence of the step-by-step lock with clear and rowmap. T2 the
+procedure (`accepts()`'s case order) accepts iff the step relation reaches the full set. T3 the counts:
+Dafny's proved `AcceptsMemo` compiled to Python (`spec/route_orders_data.py --check`) and Lean's
+`native_decide` (`lean/check.sh`) each recount every node and must reproduce the artefact's counts AND
+bitsets — three DP implementations agreeing, TS, Dafny and Lean. T4 an empty hold accepts exactly the
+orders that holding the first piece does. Neither prover models Tetris: an edge is data, and that the
+engine can make the move is TypeScript's and Cold Clear's.
+
+**Cold Clear corroborates the edges' CELLS, never spins** (`emit-route-orders-cc.ts` →
+`analysis/sdpcspin-orders-cc.json`, `route-orders-cc.test.ts`). Every edge is `corroborated` or
+`ours_only`, the latter classed `tuck` or `180` and pinned by NAME. The re-query needs the binary, so it
+runs only in the `oracle-image` job; elsewhere test 1 still checks the emitter's md5, so an edit to the
+emitter stales the committed artefact everywhere.
+
+Three things the gates do NOT establish, stated so nobody reads them in:
+
+* **`placeStar` is equivalent on this data in all three implementations** — at the `'*'` at most one
+  group is unplaced, so placing `'*'` as it is the swap or the plain placement. Dafny still kills it at
+  the proof level; the data cannot. Until 2026-10-18 the TS switch did nothing at all (`'*'` mapped
+  through `dealt.get('*')`), and its test called that 「equivalent by construction」.
+* **The mutation suites pin the planted rules, not T2 in general.** Since 2026-10-18 both count a kill
+  only on a real proof error: `spec/mutate-routeorders.sh` refuses a parse or resolution error as
+  HARNESS (a built-in control checks that) and prints which lemma carries each error, and
+  `lean/mutate.sh` counts a kill only when a named witness in `HoldWitness.lean` / `T1Witness.lean` is
+  refuted by `decide` — a mutant that breaks a `cases` by name is UNRESOLVED. Before that, every Lean
+  T2/T4 kill was an elaboration error and several Dafny kills were a witness while the main theorem
+  timed out. Two limits stay: the Lean T4 mutant is refuted by the same fact as the T2 case-(c) one,
+  so its 「6 of 6」 covers five distinct mutations, and its planted `acc` disjuncts are a second text
+  copy of `HoldMutants.accM` that nothing checks against it.
+* **`full_ok` is true on every committed node**, so it is tested by controls rather than by the data:
+  a `full_ok: false` fixture in `route-orders.test.ts` test 7, and `route_orders_data.py --check`
+  re-running one node with `full_ok` flipped and requiring zero counts.
+
+CI: `spec` verifies `RouteOrders.dfy`, runs its vacuity controls and the T3 recount on every push and
+both mutation suites on the schedule; `lean` installs Lean by sha256 (GitHub's asset digest, one
+authority) and runs `lean/check.sh`, with `lean/mutate.sh` on the schedule. A bare `lake build` fails
+on a clean checkout because `RouteOrders/Generated/` is gitignored — always `bash lean/check.sh`.
+Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

@@ -1,0 +1,4 @@
+# lake's build tree
+.lake/
+# generated at check time from analysis/sdpcspin-orders.json by gen_data.py — never a committed second copy
+RouteOrders/Generated/

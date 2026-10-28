@@ -76,9 +76,9 @@ const PAD_BAG = 'IJLOSTZ';
 // ── the board, y-UP, [y][x] holding a piece letter or null ────────────────────────────────────
 
 type Grid = (string | null)[][];
-const emptyGrid = (): Grid => Array.from({ length: ROWS }, () => new Array<string | null>(WIDTH).fill(null));
-const cloneGrid = (g: Grid): Grid => g.map(r => [...r]);
-const gridKey = (g: Grid) => g.map(r => r.map(c => c ?? '.').join('')).join('/');
+export const emptyGrid = (): Grid => Array.from({ length: ROWS }, () => new Array<string | null>(WIDTH).fill(null));
+export const cloneGrid = (g: Grid): Grid => g.map(r => [...r]);
+export const gridKey = (g: Grid) => g.map(r => r.map(c => c ?? '.').join('')).join('/');
 
 /** A fresh demo engine (exported for the test's unit check of `reach`). */
 export function newEngine(routes: any) {
@@ -232,7 +232,7 @@ const NO_READING: Reading = { carried: null, spinLetter: null, spinCells: [] };
 
 /** Letters that are NOT this bag's pieces: `c` (an earlier bag), a prior-bag letter, `-` empty. `U`
  *  is this bag's T, fired as a T-spin. */
-function groupsOf(n: RouteNode, readings: PieceReading[], tag: string, rd: Reading = NO_READING): Group[] {
+export function groupsOf(n: RouteNode, readings: PieceReading[], tag: string, rd: Reading = NO_READING): Group[] {
   // the page's inconsistent colourings are read as the piece the cells have to be
   const rows = readRows(n.id, n.rows!, readings, tag);
   const by = new Map<string, [number, number][]>();
@@ -318,7 +318,7 @@ function linesOf(g: Grid): number[] {
   for (let y = 0; y < ROWS; y++) if (g[y]!.every(c => c != null)) out.push(y);
   return out;
 }
-function applyCells(g: Grid, piece: string, cells: number[]): number[] {
+export function applyCells(g: Grid, piece: string, cells: number[]): number[] {
   for (const c of cells) {
     const y = Math.floor(c / WIDTH), x = c % WIDTH;
     if (g[y]![x] != null) throw new Error('route-demos: overlap');
@@ -543,7 +543,7 @@ function straightDrop(_eng: any, _grid: Grid, _piece: string, target: number[]):
 /** The line count a bag-2 board's U fires, from the node's `spin`. */
 const SPIN_LINES: Record<string, number> = { TSS: 1, TSD: 2, TST: 3 };
 
-function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
+export function specFor(P: RouteProfile, n: RouteNode, routes: Routes): BagSpec {
   const cond = n.condition;
   const before: [string, string][] = cond?.all ? cond.all.map((c: any) => c.before) : [];
   if (n.bag === 1) {
