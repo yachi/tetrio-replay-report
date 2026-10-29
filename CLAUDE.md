@@ -409,8 +409,8 @@ bun pipeline/sim/emit-technique-demos.ts --technique basicdonating \
   --out analysis/basicdonating-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/basicdonating.test.ts pipeline/openers/basicdonating-demos.test.ts  # its two tests
 python3 -m pipeline.basicdonating_page --selftest # the docs/basicdonating*.html audit's mutants (--out-dir <dir> renders)
-python3 -m pipeline.openers.extract_dpc_setups            # CI gate: harddrop's six DPC Setups pages
-python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --wikitext-dir <dir> re-checks a refetch
+python3 -m pipeline.openers.extract_dpc_setups            # CI gate: the DPC setups of とんぼ's video
+python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --video <mp4> re-reads every board off the video
 bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
 bun test pipeline/openers/dpc.test.ts            #   byte rebuild, the allclear anchor, named list + mutants
 python3 -m pipeline.dpc_page --selftest          # the docs/dpc.html audit's mutants (--out-dir <dir> renders)
@@ -5256,15 +5256,24 @@ draws: plain TSD slots, the donations, a ダブルダガー-like pair of slots, 
 
 ## DPC 頁 — what the first T-spin after a Perfect Clear was built on
 
-harddrop's six DPC pages (DPC Setups and Extra S/Z, O, I, J/L, T) are transcribed into
-`pipeline/openers/dpc-setups.json` (named `*-setups.json`; `extract_dpc_setups.py` gates it, and
-`check_wikitext_sources` discovers its six pinned revisions like a technique file's and re-runs it
-with `--wikitext-dir`). `pipeline/sim/dpc-facts.ts` → `analysis/dpc-facts.json` takes every PC
+The setups are とんぼ_テトリス初心者講座's video 「【テトリス初心者講座】超火力！TDパフェ後のDPCテンプレ解説」
+(`1Wr8VbNfnIg`, since 2026-10-29, at yachi's request; it replaced harddrop's six DPC pages). Its catalogue
+pages (603 s to the end, one per case: the left-over piece and the order, 組み方 and パフェ boards) are READ
+off the frames by `extract_dpc_setups.read_frame` (palette sampling; a cell matching no colour is a
+failure, never a guess) into `pipeline/openers/dpc-setups.json`, and the reading was compared board for
+board with an independent hand transcription, which agreed on all of them. The video never draws the T:
+each setup's T is DERIVED as the unique placement completing two rows, and every パフェ board's grey
+cells must equal that TSD's residue, which is the video checking itself. The 2ラインパフェ page is no
+T-spin setup and is recorded without a setup entry; p10's two setup names come from the teaching part,
+a reading the page says is one. No frame is committed; the download's sha256 is ours alone (SnapYT), and
+nothing refetches it weekly: `--video <mp4>` re-reads every page and is run by hand.
+`pipeline/sim/dpc-facts.ts` → `analysis/dpc-facts.json` takes every PC
 point and the first full or mini T-spin that clears within 15 locks after it and before the next
 PC, strips complete garbage rows from the bottom, and compares the board before that T with every
-drawn setup by occupancy, as drawn and mirrored, with the T's own cells. `docs/dpc.html` from
-`pipeline/dpc_page.py` + `dpc_prose.json` is the 中盤手法 group's last card. Same quarantine as the
-technique pages: no claim id, no ✓, no demo.
+drawn setup by occupancy, as drawn and mirrored, with the T's own cells. The video draws nearly every
+shape in both hands, so `noMirror` changes no outcome on the corpus (named in the test). `docs/dpc.html` from
+`pipeline/dpc_page.py` + `dpc_prose.json` is the 中盤手法 group's last card; it draws every board of the
+video once and links each page at its time. Same quarantine as the technique pages: no claim id, no ✓, no demo.
 
 Two things the wording must keep. **The PC points are anchored**: per player-round the simulator's
 board-empty count must equal `clears.allclear` (twice-extracted), and the artefact refuses to
