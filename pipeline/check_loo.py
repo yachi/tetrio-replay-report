@@ -621,12 +621,28 @@ PUBLISHED = (
     # reading. Its attack total is quoted only in the shortfall table, not a SENTENCES target.
     ("2026-10-22", "app_gap_won", "series"),
     ("2026-10-22", "app_gap_lost", "series"),
+    # 2026-10-29 takes ONE `ANNOTATED` entry, the lost-regime gap. Measured over 68 rounds:
+    #
+    #     app_gap_won     +15.7232 pp    under THRESHOLD; its largest move is a whole match (m7, rel 0.115)
+    #     app_gap_lost     +3.8604 pp    m2r3   ->  +1.4473  rel 0.625  1.08x
+    #
+    # The lost gap moves TOWARD zero, as 09-18's did; its attack total is quoted only in the
+    # shortfall table, which is not a SENTENCES target.
+    ("2026-10-29", "app_gap_won", "series"),
+    ("2026-10-29", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-10-29", "app_gap_lost"): (
+        "the lost-regime gap is +3.8604 pp and m2r3 alone takes it to +1.4473, i.e. CLOSER to "
+        "zero — 09-18's direction, not 08-14's or 09-10's. m2r3 is a round pinglamb lost at "
+        ".7236 attack per piece over 199 pieces: second by rate and third by size of the 30 "
+        "rounds he lost, 7.4% of his losing-round piece pool. So the sign survives and 「the "
+        "floors are close」 is sharpened by the drop; what one round carries is the figure +3.86. "
+        "`rel` 0.625, the next round 1.08x below it."),
     ("2026-10-20", "app_gap_lost"): (
         "the lost-regime gap is +1.2734 pp — the corpus's second-narrowest after 09-10's "
         "+1.2535 — and m2r1 alone takes it to -1.8777, i.e. the SIGN flips: without that round "

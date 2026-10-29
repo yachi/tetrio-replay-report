@@ -39,7 +39,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
 const ART_PATH = `${import.meta.dir}/../../analysis/dtcannon-facts.json`;
 const TR = JSON.parse(readFileSync(DTCANNON.transcriptionPath, 'utf8'));
 const H = 40;
@@ -66,6 +66,7 @@ const DTCANNON_HITS: string[] = [
   '2026-10-12 m4r6 yachi lock 70 (mirrored)',
   '2026-10-22 m1r2 yachi lock 59 (mirrored)',
   '2026-10-22 m2r7 yachi lock 13',
+  '2026-10-29 m9r3 yachi lock 48',
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   '2026-09-17 m6r7 yachi lock 90 (next_t_elsewhere at lock 96)',
@@ -93,21 +94,21 @@ const NOT_QUALIFIED: string[] = [
   '2026-09-11 m4r5 yachi lock 107 (ownership_unverified)',
 ];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 701, yachi: 535 };
+const WINDOW_OFF_BOARD = { pinglamb: 745, yachi: 558 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 5636, in_opener: 1113, mid_game: 4523 },
-                    yachi: { all: 5100, in_opener: 1317, mid_game: 3783 } };
-const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 20, in_opener: 5, mid_game: 15, mirrored: 8, garbage_in_window: 7}};
-const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 18 };
-const QUALIFIED = { pinglamb: 0, yachi: 19 };
+const TSD_DENOM = { pinglamb: { all: 5884, in_opener: 1162, mid_game: 4722 },
+                    yachi: { all: 5340, in_opener: 1375, mid_game: 3965 } };
+const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 21, in_opener: 5, mid_game: 16, mirrored: 8, garbage_in_window: 7}};
+const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 19 };
+const QUALIFIED = { pinglamb: 0, yachi: 20 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
-const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 21}, no_roof: {pinglamb: 2353, yachi: 2163}, t_overlap: {pinglamb: 0, yachi: 20}}, orientation_baseline: {pinglamb: 52, yachi: 67}};
+const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 22}, no_roof: {pinglamb: 2456, yachi: 2278}, t_overlap: {pinglamb: 0, yachi: 21}}, orientation_baseline: {pinglamb: 54, yachi: 73}};
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is the four
  *  rows over the T (the overhang over the TST stem, its second cell, the stem walled both sides, the nub row of
  *  the TST slot), of which `overhang` is the top two and `tst_side` the next two; `cleared` the two rows the TSD
  *  clears; `below` the stem's bottom cell under the nub and its two walls. */
-const PART_ONLY = { above: 21, overhang: 23, tst_side: 21, cleared: 10617, below: 4516 };
+const PART_ONLY = { above: 22, overhang: 24, tst_side: 22, cleared: 11097, below: 4734 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -184,7 +185,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(15141);
+  expect(n).toBe(15834);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

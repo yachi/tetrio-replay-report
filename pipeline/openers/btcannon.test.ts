@@ -44,7 +44,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
 const ART_PATH = `${import.meta.dir}/../../analysis/btcannon-facts.json`;
 const TR = JSON.parse(readFileSync(BTCANNON.transcriptionPath, 'utf8'));
 const H = 40;
@@ -56,27 +56,27 @@ const GARBAGE_IN_WINDOW: string[] = [];
 const BTCANNON_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 701, yachi: 535 };
+const WINDOW_OFF_BOARD = { pinglamb: 745, yachi: 558 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 5636, in_opener: 1113, mid_game: 4523 },
-                    yachi: { all: 5100, in_opener: 1317, mid_game: 3783 } };
+const TSD_DENOM = { pinglamb: { all: 5884, in_opener: 1162, mid_game: 4722 },
+                    yachi: { all: 5340, in_opener: 1375, mid_game: 3965 } };
 const HITS = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 } };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 0, yachi: 0 }, no_roof: { pinglamb: 536, yachi: 425 },
-              t_overlap: { pinglamb: 0, yachi: 20 } },
-  orientation_baseline: { pinglamb: 52, yachi: 67 },
+  ablation: { no_must_empty: { pinglamb: 0, yachi: 0 }, no_roof: { pinglamb: 555, yachi: 442 },
+              t_overlap: { pinglamb: 0, yachi: 21 } },
+  orientation_baseline: { pinglamb: 54, yachi: 73 },
 };
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is rows 0-3
  *  (the TST's overhang, the cell over the slot, the TST slot beside the cell over the T's middle, the roof), of
  *  which `overhang` is rows 0-1 and `tst_side` rows 2-3; `cleared` the two rows the TSD clears; `below` the TST
  *  slot's bottom cell and its two walls. No full TSD of the corpus has the rows above the T as the page draws
  *  them, and that alone is the headline's zero: the `no_roof` ablation (the window less those rows) is `below`. */
-const PART_ONLY = { above: 0, overhang: 67, tst_side: 0, cleared: 10617, below: 961 };
+const PART_ONLY = { above: 0, overhang: 69, tst_side: 0, cleared: 11097, below: 997 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -160,7 +160,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(15141);
+  expect(n).toBe(15834);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -300,8 +300,8 @@ test('STMB Cave and Double Dagger are not this: anchored on the same flat T, the
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(30);
-  expect(c.rowmap_steps).toBe(264047);
+  expect(c.rowmap_unverified).toBe(31);
+  expect(c.rowmap_steps).toBe(275898);
 });
 
 test('mutants: each rule turned off turns this red with its own symptom, or is named equivalent', () => {

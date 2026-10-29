@@ -40,7 +40,8 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
+   '2026-10-29']);
 
 /** Bag 1 matched (six pieces, the page's board) and the 7th lock was NOT a full T-spin Single on a
  *  drawn U slot: the piece, the engine's spin and the lines it cleared. The one round is a T laid
@@ -90,6 +91,8 @@ const BAG2_NONE_NEAR: string[] = [
   // 2026-10-20: two, the usual 4-cell shape (prefixes 43 and 116; m4r1 with six garbage rows stripped).
   "2026-10-20 m2r3 yachi under 2.sd, 4 cells (drawn J missing, JL extra)", "2026-10-20 m4r1 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
   "2026-10-22 m5r5 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
+  // 2026-10-29: two, both as drawn, the usual 4-cell shape (prefixes 138 and 117).
+  "2026-10-29 m2r1 yachi under 2.sd, 4 cells (drawn J missing, JL extra)", "2026-10-29 m9r9 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
 ];
 /** A sampled bag 2 that matched nothing and has no near board. The one round: its bag-2 T (the 14th lock)
  *  clears two lines with NO spin, so the first TSD — the board `bag2_near` reads — is the 17th lock, after
@@ -105,6 +108,7 @@ const COLOUR_DISAGREE: string[] = [
   '2026-09-19 m5r2 pinglamb bag1@6 bag1.left (mirrored)', '2026-09-19 m5r3 pinglamb bag1@6 bag1.left (mirrored)',
   '2026-10-03 m7r7 yachi bag1@6 bag1.left', '2026-10-03 m7r8 yachi bag1@6 bag1.left',
   '2026-10-20 m1r4 yachi bag1@6 bag1.left', '2026-10-20 m3r5 yachi bag1@6 bag1.left',
+  '2026-10-29 m1r4 yachi bag1@6 bag1.left', '2026-10-29 m2r5 yachi bag1@6 bag1.left',
 ];
 
 /** Measured EMPTY: no round reaches a bag-2 board, so nothing is stripped under one, no PC is filed and
@@ -122,12 +126,12 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 /** Only yachi reaches bag 1, and he mirrors it twice: pinned as a count per player, not a list. */
 const MIRRORED_BAG1 = { yachi: 2 };
 
-/** Cases per measured node. EVERY ROUND STOPS AT BAG 1: 73 at bag1.pc (the TSS laid flat), 1 at
+/** Cases per measured node. EVERY ROUND STOPS AT BAG 1: 75 at bag1.pc (the TSS laid flat), 1 at
  *  bag1.left (no spin), none at bag1.fire (the TSS stood up). The bag-2 and later zeros are COMPARED
- *  (62 bag-2 opportunities; the demos test reaches every board), never "not compared". */
+ *  (64 bag-2 opportunities; the demos test reaches every board), never "not compared". */
 const NODE_CASES: Record<string, number> = {
   'bag1.left': 1, 'bag1.fire': 0, '2.fire#1': 0, '2.fire#2': 0, '2.fire.td#2': 0, '2.fire.td#3': 0,
-  '2.fire.td#4': 0, 'bag1.pc': 73, '2.sd': 0, '2.sd.pc#1': 0, '2.sd.pc#2': 0, '2.sd.pc#3': 0, '2.sd.pc#4': 0,
+  '2.fire.td#4': 0, 'bag1.pc': 75, '2.sd': 0, '2.sd.pc#1': 0, '2.sd.pc#2': 0, '2.sd.pc#3': 0, '2.sd.pc#4': 0,
   '2.sd.pc#5': 0, '2.sd.pc#6': 0, '2.sd.pc#7': 0, '2.sd.pc#8': 0, '2.sd.pc#9': 0, '2.sd.pc#10': 0,
   '2.sd.pc#11': 0, '2.sd.pc#12': 0, '2.sd.pc#13': 0, '2.sd.pc#14': 0, '2.sd.pc#15': 0, '2.sd.pc#16': 0,
   '2.sd.pc#17': 0, '2.sd.pc#18': 0, '2.sd.pc#19': 0, '2.sd.tst': 0, '2.sd.imperial': 0, '2.sd.stmb': 0,
@@ -139,8 +143,8 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities: bag 1 at 6 locks, the spin step at lock 7, bag 2 at 13 locks. bag1.left's is BOTH
  *  players': pinglamb has no case, and an earlier emitter built its per-player tally from the cases
  *  alone, so his 1259 opportunities vanished and the denominator read 1223 (yachi's). Pinned per player. */
-const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 2655, 'bag1.fire': 74, 'bag1.pc': 74, '2.sd': 62 };
-const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1348, yachi: 1307 };
+const OPPORTUNITIES: Record<string, number> = { 'bag1.left': 2780, 'bag1.fire': 76, 'bag1.pc': 76, '2.sd': 64 };
+const BAG1_OPPORTUNITIES_BY_PLAYER = { pinglamb: 1411, yachi: 1369 };
 /** Nodes the classifier cannot compare, and why (from the routes JSON, never a count of 0). */
 const UNMEASURED: Record<string, string> = {
   'bag1.right': 'mirror_of: bag1.left', 'bag1.fire.after': 'illustration', '2.fire.tsd': 'illustration',
@@ -153,7 +157,7 @@ const UNMEASURED: Record<string, string> = {
  *  ending first — three of them end AT the TSS (verified_to 6), so nothing after bag 1 is checked. */
 const STOPS_AT_BAG1: Record<string, number> = {
   'bag1.left | unsampled | -': 1,
-  'bag1.pc | sampled | near 4': 61,
+  'bag1.pc | sampled | near 4': 63,
   'bag1.pc | sampled | -': 1,
   'bag1.pc | unsampled | near 4': 1,
   'bag1.pc | unsampled | near 8': 7,
@@ -187,6 +191,9 @@ const DT_NOT_STICKSPIN: Record<string, 'dt_cannon' | 'both_orders' | 'jl_split'>
   '2026-10-20 m3r5 yachi': 'jl_split',
   // 2026-10-22: one dt_cannon, yachi's m2r7 (prefix 61), the session's one exact DT Cannon first bag.
   '2026-10-22 m2r7 yachi': 'dt_cannon',
+  // 2026-10-29: two jl_split, both yachi's, as drawn (COLOUR_DISAGREE), prefixes 51 and 32.
+  '2026-10-29 m1r4 yachi': 'jl_split',
+  '2026-10-29 m2r5 yachi': 'jl_split',
 };
 /** Stick-spin bag-1 rounds with a COMPLETE opener window (0-based locks 0-21) that are not Double-first: none has a Triple
  *  in the window (the bag1.pc ones a TSD and no TST; bag1.left's 10-12 m8r4 no T-spin at all). */
@@ -195,7 +202,7 @@ const STICKSPIN_NOT_DT: string[] = [
   '2026-10-03 m19r6 yachi', '2026-10-09 m7r5 yachi', '2026-10-09 m9r1 yachi', '2026-10-12 m8r4 yachi',
 ];
 /** Double-first rounds that ARE stick spin, per player: the cross-check's positive count. */
-const DT_AND_STICKSPIN = { yachi: 61 };
+const DT_AND_STICKSPIN = { yachi: 63 };
 
 /** The case object's key order is part of the artefact's bytes. No flag and no lock-7 piece field:
  *  the spin step records the 7th lock itself. */
@@ -358,7 +365,7 @@ test('every case and every named entry resolves to a real round with its match P
 test('the near kind is opt-in: without it, every sampled miss is unexplained and nothing else moves', () => {
   const o = build({ ...STICKSPIN, bag2Explain: true }, {}, digests());
   expect(o.lists.bag2_none_near).toEqual([]);
-  expect(o.lists.bag2_none_unexplained.length).toBe(62);
+  expect(o.lists.bag2_none_unexplained.length).toBe(64);
   expect(o.nodes).toEqual(committed().nodes);
 }, 600_000);
 
@@ -367,9 +374,9 @@ test('the near kind is opt-in: without it, every sampled miss is unexplained and
 const count = (o: any, id: string) => o.nodes.find((n: any) => n.id === id).cases;
 const opp = (o: any, id: string) => o.nodes.find((n: any) => n.id === id).opportunities;
 const MUTANTS: [string, Mutants, (o: any) => void][] = [
-  ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.pc')).toBe(73 - 2)],
+  ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.pc')).toBe(75 - 2)],
   ['the spin\'s U cells read as drawn in a mirrored round', { spinMirrorUnaware: true }, o => {
-    expect(count(o, 'bag1.pc')).toBe(73 - 2);
+    expect(count(o, 'bag1.pc')).toBe(75 - 2);
     expect(o.lists.bag1_spin_off_page.length).toBe(BAG1_SPIN_OFF_PAGE.length + 2);
   }],
   ['the bag-1 TSS stops the bag-2 sample', { spinClearStops: true }, o => {

@@ -35,29 +35,29 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
 const ART_PATH = `${import.meta.dir}/../../analysis/basicdonating-facts.json`;
 const TR = JSON.parse(readFileSync(BASICDONATING.transcriptionPath, 'utf8'));
 const USERS = ['pinglamb', 'yachi'] as const;
 const H = 40, W = 10;
 
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
-const DENOM: Record<string, any> = {"pinglamb": {"all": 5636, "in_opener": 1113, "mid_game": 4523}, "yachi": {"all": 5100, "in_opener": 1317, "mid_game": 3783}};
-const HITS: Record<string, any> = {"pinglamb": {"all": 374, "in_opener": 109, "mid_game": 265, "mirrored": 0, "garbage_in_window": 122}, "yachi": {"all": 343, "in_opener": 43, "mid_game": 300, "mirrored": 0, "garbage_in_window": 140}};
+const DENOM: Record<string, any> = {"pinglamb": {"all": 5884, "in_opener": 1162, "mid_game": 4722}, "yachi": {"all": 5340, "in_opener": 1375, "mid_game": 3965}};
+const HITS: Record<string, any> = {"pinglamb": {"all": 391, "in_opener": 112, "mid_game": 279, "mirrored": 0, "garbage_in_window": 130}, "yachi": {"all": 359, "in_opener": 44, "mid_game": 315, "mirrored": 0, "garbage_in_window": 145}};
 /** The payoff (stored under `followup_by_player`, the shared artefact key). */
-const PAYOFF: Record<string, any> = {"pinglamb": {"fired": 34, "not_fired": {"i_in_well_not_quad": 19, "past_verified": 15, "round_ended": 10, "well_covered": 28, "well_filled_not_i": 268}}, "yachi": {"fired": 61, "not_fired": {"i_in_well_not_quad": 28, "past_verified": 9, "round_ended": 7, "well_covered": 50, "well_filled_not_i": 188}}};
+const PAYOFF: Record<string, any> = {"pinglamb": {"fired": 36, "not_fired": {"i_in_well_not_quad": 20, "past_verified": 15, "round_ended": 11, "well_covered": 28, "well_filled_not_i": 281}}, "yachi": {"fired": 63, "not_fired": {"i_in_well_not_quad": 28, "past_verified": 9, "round_ended": 9, "well_covered": 52, "well_filled_not_i": 198}}};
 /** The same rule at the other scored spins, and with each clause dropped at the opportunity. */
-const CONTROLS = {"under": {"TSS": {"pinglamb": 32, "yachi": 137}, "TST": {"pinglamb": 1399, "yachi": 748}, "mini_TSS": {"pinglamb": 5, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 374, "yachi": 343}, "allow_fragment": {"pinglamb": 426, "yachi": 396}, "no_reopen": {"pinglamb": 436, "yachi": 479}, "allow_late_hole": {"pinglamb": 477, "yachi": 445}}, "orientation_baseline": {"pinglamb": 52, "yachi": 67}};
-const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 149, "not_qualified": {"opener_route": 125, "other_page": 111}}, "yachi": {"qualified": 166, "not_qualified": {"opener_route": 23, "other_page": 163}}};
+const CONTROLS = {"under": {"TSS": {"pinglamb": 33, "yachi": 142}, "TST": {"pinglamb": 1469, "yachi": 779}, "mini_TSS": {"pinglamb": 7, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 391, "yachi": 359}, "allow_fragment": {"pinglamb": 445, "yachi": 414}, "no_reopen": {"pinglamb": 455, "yachi": 504}, "allow_late_hole": {"pinglamb": 496, "yachi": 465}}, "orientation_baseline": {"pinglamb": 54, "yachi": 73}};
+const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 156, "not_qualified": {"opener_route": 130, "other_page": 117}}, "yachi": {"qualified": 174, "not_qualified": {"opener_route": 23, "other_page": 171}}};
 /** Qualifying hits per session (the list itself is `lists.qualified_hits`, held to `hits` below). */
-const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 10, '2026-07-24': 13, '2026-07-28': 11, '2026-08-01': 20, '2026-08-09': 14, '2026-08-14': 20, '2026-08-19': 21, '2026-08-25': 20, '2026-09-03': 7, '2026-09-10': 12, '2026-09-11': 5, '2026-09-17': 6, '2026-09-18': 24, '2026-09-19': 43, '2026-10-03': 38, '2026-10-09': 30, '2026-10-12': 12, '2026-10-20': 6, '2026-10-22': 3};
+const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 10, '2026-07-24': 13, '2026-07-28': 11, '2026-08-01': 20, '2026-08-09': 14, '2026-08-14': 20, '2026-08-19': 21, '2026-08-25': 20, '2026-09-03': 7, '2026-09-10': 12, '2026-09-11': 5, '2026-09-17': 6, '2026-09-18': 24, '2026-09-19': 43, '2026-10-03': 38, '2026-10-09': 30, '2026-10-12': 12, '2026-10-20': 6, '2026-10-22': 3, '2026-10-29': 15};
 /** How many donating columns a hit has, and how each column's covering pieces sit (inside the cleared rows or not). */
-const COLUMNS = { per_hit: { 1: 569, 2: 147, 3: 1 }, cover: { cleared: 429, kept: 437 } };
+const COLUMNS = { per_hit: { 1: 590, 2: 156, 3: 4 }, cover: { cleared: 464, kept: 450 } };
 /** Per other technique artefact: [its T's that are a donation here, its T's]. None is contained whole: a page's
  *  window does not read the ownership of its covering cells, and many of its hits cover with garbage or a fragment. */
 const COMMON: Record<string, [number, number]> = {
-  stsd: [0, 68], stmbcave: [129, 133], imperialcross: [6, 10], doubledagger: [34, 38], btcannon: [0, 0],
-  cutcopy: [0, 2], shachikutrain: [37, 96], parapet: [7, 259], kaidan: [76, 167], dtcannon: [0, 20],
+  stsd: [0, 71], stmbcave: [136, 140], imperialcross: [6, 11], doubledagger: [39, 43], btcannon: [0, 0],
+  cutcopy: [0, 2], shachikutrain: [39, 100], parapet: [7, 269], kaidan: [77, 170], dtcannon: [0, 21],
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -122,10 +122,10 @@ test('quarantined: report_eligible false, no claim ids, one rule variant, no win
 });
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
-  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(15141);
+  expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(15834);
   expect(art().check.reconstruction_disagreed).toBe(0);
-  expect(art().check.rowmap_unverified).toBe(30);
-  expect(art().check.rowmap_steps).toBe(264047);
+  expect(art().check.rowmap_unverified).toBe(31);
+  expect(art().check.rowmap_steps).toBe(275898);
 });
 
 test('the Python twin on the drawings: the rule fires where the gate records it, with its holes, and nowhere else', () => {

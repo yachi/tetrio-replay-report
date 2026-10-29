@@ -25,7 +25,8 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
+   '2026-10-29']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -36,6 +37,7 @@ const Z_HOLD_BAG1 = [
   // mirror-aware bag-1 Z) — prefixes 48 and 72, so neither is a prefix-edge reading.
   '2026-10-12 m2r1 yachi',      // mirrored: its bag-1 Z is S, and the 7th is O
   '2026-10-12 m6r5 yachi',      // 7th J
+  '2026-10-29 m6r7 yachi',      // 7th S (as drawn, so not the bag-1 Z), prefix 56
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 Z, placed somewhere off the page. */
 const Z_PLACED_ELSEWHERE_BAG1 = [
@@ -46,12 +48,14 @@ const Z_PLACED_ELSEWHERE_BAG1 = [
 const Z_LEFT_BAG1 = [
   '2026-07-24 m4r1 yachi', '2026-07-28 m4r5 pinglamb', '2026-08-25 m2r3 yachi', '2026-09-19 m4r4 pinglamb',
   '2026-10-22 m1r7 yachi',      // matched z_left at 7 and the 6-lock field; prefix 102, no bag 2
+  '2026-10-29 m2r8 yachi',      // matched z_left at 7 and the 6-lock field; prefix 29, no bag 2
 ];
 const I_EARLY_CASES = ['2026-09-11 m7r2 yachi (mirrored)'];
 const TST_DONATE_CASES = [
   '2026-07-24 m1r2 pinglamb', '2026-07-24 m3r5 pinglamb', '2026-08-09 m2r1 pinglamb',
   '2026-08-19 m3r4 pinglamb', '2026-09-18 m10r4 pinglamb', '2026-09-19 m13r2 pinglamb',
   '2026-10-22 m9r4 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 140
+  '2026-10-29 m3r7 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 33
 ];
 /** 8-line PCs that are not on the page, named with the node they stop under. */
 const PC_OFF_PAGE = [
@@ -63,6 +67,8 @@ const PC_OFF_PAGE = [
   '2026-10-03 m18r4 yachi under bag1.z_right.other',   // no bag-2 page match: why PC detection is not gated on bag 2
   '2026-10-09 m4r6 pinglamb under 2.ideal.other',
   '2026-10-22 m2r5 pinglamb under bag1.z_right.other',  // a PC on lock 19 with no TST before it, prefix 105
+  '2026-10-29 m2r8 pinglamb under 2.ideal.other',  // PC on lock 19, prefix 16: `verified: false`
+  '2026-10-29 m6r2 pinglamb under 2.ideal.other',  // PC on lock 19, prefix 27
 ];
 /** A PC that matches patterns of two branches by colour; its own bag-2 branch decides. */
 const MULTI_COLOUR_RESOLVED_BY_BRANCH = ['2026-09-17 m4r2 pinglamb'];
@@ -81,10 +87,13 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2026-10-22 adds 34 to 2.ideal (24 under its own condition, 7 under 2.normal_OS, 1 under
 // 2.normal_SO; hand-summed from the table's deltas), 7 to 2.normal_OS and 4 to 2.normal_SO,
 // and one entry each to Z_LEFT_BAG1, TST_DONATE_CASES and PC_OFF_PAGE.
+// 2026-10-29 adds 22 to 2.ideal (21 under its own condition, 1 under 2.normal_OS), 14 to
+// 2.normal_OS (11 under its own, 3 under 2.normal_SO) and 4 to 2.normal_SO, and one entry each to
+// Z_HOLD_BAG1, Z_LEFT_BAG1 and TST_DONATE_CASES, two to PC_OFF_PAGE.
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 344, '2.normal_OS': 44, '2.normal_SO': 13 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 114, '2.normal_SO': 16 },
-  '2.normal_SO': { '2.ideal': 11, '2.normal_OS': 1, '2.normal_SO': 34 },
+  '2.ideal': { '2.ideal': 365, '2.normal_OS': 45, '2.normal_SO': 13 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 125, '2.normal_SO': 19 },
+  '2.normal_SO': { '2.ideal': 11, '2.normal_OS': 1, '2.normal_SO': 38 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

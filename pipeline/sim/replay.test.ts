@@ -30,7 +30,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -121,7 +121,7 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [253, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
   '2026-10-09': [202, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [124, 126],
+  '2026-10-22': [124, 126], '2026-10-29': [136, 136],
 };
 
 /** Every player-round whose engine totals disagree with facts.json, with the disagreement. Mostly
@@ -149,7 +149,8 @@ const ADMISSION: Record<string, [number, number]> = {
  *  replay-2026-10-22-09.ttrm r3 yachi (verified to lock 107, check failed at 112; five locks past
  *  the game's 118, three Singles and one Triple short, 65 attack against 67). 01 r6 is m1r7, the
  *  night's selected round, so the 最癲一局 replay of it is the game's board only to lock 17 —
- *  which is what the viewer's verified boundary already draws. */
+ *  which is what the viewer's verified boundary already draws. 2026-10-29 adds none: all 136 of
+ *  its player-rounds admit. */
 const ADMISSION_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-9.ttrm', round: 1, user: 'yachi', diff: { pieces: [89, 88] } },
   { session: '2026-07-28', file: 'replay-2026-07-28-1.ttrm', round: 0, user: 'yachi', diff: { pieces: [37, 36] } },
@@ -209,7 +210,21 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  2026-10-22 adds one more of the common class, making 26 `topout` deaths the engine survives:
  *  replay-2026-10-22-02.ttrm r7 yachi (82 locks, prefix verified to lock 80, `no_evidence` after
  *  it). It admits cleanly, so the engine placed exactly the game's pieces and its board did not
- *  top out on the last one; the last two locks are past the verified prefix. */
+ *  top out on the last one; the last two locks are past the verified prefix.
+ *
+ *  2026-10-29 adds THREE. Two are the common class, making 28 `topout` deaths the engine survives,
+ *  both pinglamb's in replay-2026-10-29-01.ttrm: r0 (98 locks, prefix verified to lock 14,
+ *  `check_failed` at 19, so the last 83 locks are past the prefix) and r4 (69 locks, verified to
+ *  lock 62, `no_evidence` after it). Both admit cleanly (10-29 admits 136 of 136), so the engine
+ *  placed exactly the game's pieces and its board did not top out on the last one.
+ *  The third is the SECOND entry of 10-03-01 r1's class — the round's WINNER, whose engine board
+ *  tops out mid-round: replay-2026-10-29-04.ttrm r4 yachi, engine topout at lock 30 of 45, with
+ *  the prefix verified to the LAST lock (44, `end`). Decoded from the artefact it is 10-03-01 r1's
+ *  shape exactly: lock 29 (an O) lands as six garbage rows arrive, the stack reaches 25 rows — past
+ *  the 20 visible — and lock 30 is a T that clears one row; the game played on and he won. 10-03's
+ *  lock 52 is the same (garbage under lock 51 takes the stack to 23 rows, lock 52 a T clearing
+ *  one). So the engine's `res.topout` fires on a board the game did not end, inside a prefix the
+ *  reconstruction check verifies — the board agrees, the knock-out rule does not. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -238,6 +253,9 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-10-09', file: 'replay-2026-10-09-11.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-12', file: 'replay-2026-10-12-02.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-10-22', file: 'replay-2026-10-22-02.ttrm', round: 7, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 4, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-10-29', file: 'replay-2026-10-29-04.ttrm', round: 4, user: 'yachi', ending: 'winner', lock: 30 },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {
