@@ -78,7 +78,7 @@ STICKSPIN_SITE = RouteSiteProfile(
         "empty_node": "2.sd", "text_only": "2.fire.bag4",
         "unmatchable": "2.fire.td#1", "node_page": "bag1-only", "node_page_node": "bag1.pc",
         "elsewhere_node": "bag1.left", "demo_built": "2.sd.pc#3",
-        "demo_unbuilt": "2.sd.pc#7", "demo_never_holds": "bag1.pc",
+        "demo_unbuilt": "2.sd.tst.spin", "demo_never_holds": "bag1.pc",
         "demo_missing": "2.mochi.pc#6", "demo_spin_last": ("bag1.pc", "bag1.fire", "2.sd.tst"),
     },
 )

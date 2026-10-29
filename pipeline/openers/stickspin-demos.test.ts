@@ -10,10 +10,15 @@
  *      sharing, completeness.
  *   9. stick spin's own: no demo holds; bag 1 is six pieces and then the T, fired on lock 7 into the
  *      drawn U as a TSS (stood up for bag1.fire, laid flat for bag1.pc); every bag-2 board fires a
- *      TSD; the PC patterns are TSS + TSD + PC for 8 lines; the attack line's bag 3 is a TST; the
+ *      TSD; the PC patterns are TSS + TSD + PC for 8 lines (the two `PC_T_TSS` patterns fire their `t` as
+ *      a TSS first: TSS + TSD + TSS + PC); the attack line's bag 3 is a TST; the
  *      SD-PC fallbacks fire into their separate spin boards (TST, then the Imperial Cross and STMB
  *      Cave TSDs); the chains run through the demo that ends on each after-the-spin illustration.
  *  10. mutants: each planner rule turned off, and each planted artefact defect, turns a check red;
+ *      the profile's `spinLetter` reading removed puts exactly the two `PC_T_TSS` patterns back to
+ *      unbuilt (the planner searching every order); the reading mutated under the committed artefact
+ *      is caught by the shared spin-slot check; on each committed board the two named t's have no
+ *      plain arrival in `reach()`;
  *      `no180` and `ignoreConditions` are measured CONTROLS here (see their test).
  *
  * NOT CORPUS DATA. Nobody played these games.
@@ -21,16 +26,17 @@
  * Run: bun test pipeline/openers/stickspin-demos.test.ts   (well under a minute)
  */
 import { test, expect } from 'bun:test';
-import { build as buildFor, serialise, chainOf, type DemoMutants } from '../sim/route-demos.ts';
-import { STICKSPIN } from '../sim/route-profile-stickspin.ts';
-import { demoChecks } from './route-demo-checks.ts';
+import { build as buildFor, serialise, chainOf, newEngine, reach, type DemoMutants } from '../sim/route-demos.ts';
+import { STICKSPIN, PC_T_TSS } from '../sim/route-profile-stickspin.ts';
+import { demoChecks, boards } from './route-demo-checks.ts';
+import { placeCells } from '../sim/emit-replay.ts';
 import { conditionHolds } from '../sim/route-facts.ts';
 
 /** Nodes with a board and no demo, and the reason the artefact gives. A node the planner cannot
  *  build is a red build until it is named here. The mirror and the eight illustrations are the
- *  profile's; `2.sd.pc#7` and `2.sd.pc#16` are the planner's measured failures: both stand their T
- *  upright in the column-7 well under an S drawn across a row that clears only after the T, so
- *  whichever goes first, the other cannot (the S is not yet a piece shape; the T has no path in). */
+ *  profile's. (`2.sd.pc#7` and `2.sd.pc#16` were here until 2026-10-28 as the planner's measured
+ *  failures; they are built since through the profile's `spinLetter` reading, `PC_T_TSS`, and the
+ *  mutant test below puts them back here with the planner's reasons when that reading is removed.) */
 const DEMO_UNBUILT: Record<string, string> = {
   'bag1.right': '係原頁左邊嗰幅第一巡圖左右反轉（J↔L、S↔Z），逐格對過；用頁面嘅反轉掣睇',
   'bag1.fire.after': '示意圖：TSS 之後嘅盤面，即係 bag1.fire 示範打完之後嘅盤面',
@@ -41,14 +47,13 @@ const DEMO_UNBUILT: Record<string, string> = {
   '2.sd.imperial.spin': '示意圖：Imperial Cross 嘅 TSD 位同消嘅兩行，即係 2.sd.imperial 示範最後一粒',
   '2.sd.stmb.spin': '示意圖：STMB Cave 嘅 TSD 位同消嘅行，即係 2.sd.stmb 示範最後一粒',
   '2.mochi.after': '示意圖：TSD 之後嘅盤面，即係 2.mochi 示範打完之後嘅盤面',
-  '2.sd.pc#7': '最遠放到 JZOI；之後：T 由出生位行唔到去；S 中間隔住嘅行未消，未成形',
-  '2.sd.pc#16': '最遠放到 LZOI；之後：T 由出生位行唔到去；S 中間隔住嘅行未消，未成形',
 };
 /** U line counts the drawing does not fix: measured empty — every U is a named spin (bag 1's TSS,
  *  bag 2's TSD, the attack line's TST, the fallbacks' TST and TSDs). */
 const DEMO_SPIN_LINES: Record<string, number> = {};
-/** A plain `t` the engine credited as a spin. Measured empty: every PC pattern's T is placed without
- *  a spin, so no spin letter is needed either (the profile has no `spinLetter`). */
+/** A plain `t` the engine credited as a spin. Measured empty: the two `PC_T_TSS` patterns fire their
+ *  `t` as the bag's spin letter (a full TSS, checked by the shared spin check), and every other PC
+ *  pattern's T is placed without a spin. */
 const DEMO_SPIN_EXCEPTIONS: string[] = [];
 /** Colour-read drawings: the page's one slip (`2.mochi.pc#13:colour`), read as the L it has to be. The
  *  shared check requires the classifier to file that demo OFF the page as drawn, which is what makes
@@ -85,7 +90,7 @@ function checkAll(art: any): string | null {
     if (conditionHolds((routes as any).bag1.no_hold, d.bags[0].queue, '') !== true)
       return `${d.node}: bag 1 ${d.bags[0].queue} breaks the no-hold conditions`;
     // 9c. the chain's spins and its end
-    const want = EVENTS.find(([re]) => re.test(d.node))?.[1];
+    const want = PC_T_TSS.has(d.node) ? 'TSS TSD TSS PC' : EVENTS.find(([re]) => re.test(d.node))?.[1];
     const got = d.events.map((e: any) => e.kind).join(' ');
     if (want === undefined || got !== want) return `${d.node}: events ${got}, want ${want}`;
     if (n.list && d.events.at(-1).lines !== 8) return `${d.node}: the PC clears ${d.events.at(-1).lines} lines, not 8`;
@@ -118,9 +123,9 @@ test('every demo re-runs, reaches its node, ends on its drawing; the lists are e
     expect(d.chain[0], d.node).toBe('bag1.pc');
   for (const d of art.demos.filter((x: any) => x.node.startsWith('2.fire.td#')))
     expect(d.chain.slice(0, 2), d.node).toEqual(['bag1.fire', '2.fire#1']);
-  // every PC pattern but the two named unbuilt has a demo
+  // every PC pattern has a demo
   expect(art.demos.filter((d: any) => byId.get(d.node)!.list).length)
-    .toBe(routes.nodes.filter(n => n.list).length - 2);
+    .toBe(routes.nodes.filter(n => n.list).length);
   // bag1.left's demo places six pieces and leaves the T unplaced, last in its bag
   const left = art.demos.find((d: any) => d.node === 'bag1.left');
   expect([left.locks.length, left.bags[0].unused]).toEqual([6, 'T']);
@@ -188,4 +193,84 @@ test('controls: no180 and ignoreConditions change the build and break nothing', 
     expect(text === built(), `${m} changes the build`).toBe(false);
     expect(checkAll(JSON.parse(text)), m).toBeNull();
   }
+}, 300_000);
+
+/** PROFILE mutants against the committed artefact: the `spinLetter` reading changed, the demos left as
+ *  they are. Each must reach the shared spin rule, not the engine re-run (a lock-field edit is caught by
+ *  the re-run first, so it cannot test the reading), and each names its own message. */
+test('profile mutants: the spinLetter reading changed under the committed demos is caught by the spin rule', () => {
+  const art = committed();
+  const lists = { unbuilt: DEMO_UNBUILT, spinLines: DEMO_SPIN_LINES, spinExceptions: DEMO_SPIN_EXCEPTIONS,
+                  pieceReadings: DEMO_PIECE_READINGS };
+  const P = (f: (n: any) => { letter: string; lines: number } | null) =>
+    ({ ...STICKSPIN, demos: { ...STICKSPIN.demos!, spinLetter: f } });
+  const muts: [string, (n: any) => { letter: string; lines: number } | null, string][] = [
+    ['lines 1 -> 2', n => (PC_T_TSS.has(n.id) ? { letter: 't', lines: 2 } : null), '2.sd.pc#7: spin-slot lock 17 cleared 1, want 2'],
+    ['reading removed', () => null, '2.sd.pc#7: t lock 17 spun'],
+    ['reading on 2.sd.pc#7 only', n => (n.id === '2.sd.pc#7' ? { letter: 't', lines: 1 } : null), '2.sd.pc#16: t lock 16 spun'],
+    ['reading on a plain PC pattern too', n => (PC_T_TSS.has(n.id) || n.id === '2.sd.pc#3' ? { letter: 't', lines: 1 } : null),
+     '2.sd.pc#3: spin-slot lock 19 spin 0'],
+  ];
+  expect(demoChecks(P(STICKSPIN.demos!.spinLetter!), lists).checkAll(art)).toBeNull();   // control
+  for (const [what, f, msg] of muts) expect(demoChecks(P(f), lists).checkAll(art), what).toBe(msg);
+}, 300_000);
+
+/** The two committed reasons the planner gives when the `spinLetter` reading is gone (its deepest
+ *  state and why nothing goes further: the S is whole only after the T's clear, and once Z (and L for
+ *  #16) is down the T has no path in). */
+const WITHOUT_READING: Record<string, string> = {
+  '2.sd.pc#7': '最遠放到 JZOI；之後：T 由出生位行唔到去；S 中間隔住嘅行未消，未成形',
+  '2.sd.pc#16': '最遠放到 LZOI；之後：T 由出生位行唔到去；S 中間隔住嘅行未消，未成形',
+};
+
+/** MUTANT: the profile's reading removed (whole, then one node at a time). Exactly the removed nodes
+ *  go back to unbuilt with the planner's reasons, every other demo is byte-identical, and the checks go
+ *  red. So the set is minimal: each member is needed for its own demo and for nothing else. */
+test('the spinLetter reading removed puts exactly its nodes back to unbuilt', () => {
+  const committedArt = committed();
+  const byNode = new Map(committedArt.demos.map((d: any) => [d.node, JSON.stringify(d)]));
+  const variants: [string, Set<string>][] = [['all', new Set()], ...[...PC_T_TSS].map(id =>
+    [`drop ${id}`, new Set([...PC_T_TSS].filter(x => x !== id))] as [string, Set<string>])];
+  for (const [what, keep] of variants) {
+    const P = { ...STICKSPIN, demos: { ...STICKSPIN.demos!,
+      spinLetter: (n: any) => (keep.has(n.id) ? { letter: 't', lines: 1 } : null) } };
+    const art = JSON.parse(serialise(buildFor(P)));
+    const gone = [...PC_T_TSS].filter(id => !keep.has(id));
+    const newly = Object.fromEntries(Object.entries(Object.fromEntries(art.unbuilt.map((u: any) => [u.node, u.reason])))
+      .filter(([id]) => !(id in DEMO_UNBUILT)));
+    expect(newly, what).toEqual(Object.fromEntries(gone.map(id => [id, WITHOUT_READING[id]])));
+    expect(art.demos.map((d: any) => d.node).sort(), what)
+      .toEqual(committedArt.demos.map((d: any) => d.node).filter((id: string) => !gone.includes(id)).sort());
+    for (const d of art.demos) expect(JSON.stringify(d), `${what}: ${d.node}`).toBe(byNode.get(d.node));
+    expect(checkAll(art), what).not.toBeNull();
+  }
+}, 600_000);
+
+/** Measured on each COMMITTED board: for every PC demo that places a T, on the board just before its
+ *  `t` lock, `reach()` gives one shortest path per distinct arrival spin at the drawn T cells. For the
+ *  two `PC_T_TSS` patterns every arrival is a full spin (no plain or mini one) — that is what this test
+ *  discriminates. For every other PC pattern a plain arrival exists, but that half is entailed: the
+ *  shared check already rejects a spun plain `t`, so their committed `t` went in plain. This reads one
+ *  placement order per pattern; that NO order of a plain `t` builds the two rests on the reading-removed
+ *  mutant test above, where the planner searches every order of the PC bag and fails (and the
+ *  2026-10-28 hand probe agreed, not re-derived here). */
+test('measured: on the committed boards, the PC t\'s with no plain arrival are exactly PC_T_TSS', () => {
+  const eng = newEngine(routes);
+  const spinOnly: string[] = [];
+  for (const d of committed().demos.filter((x: any) => byId.get(x.node)!.list)) {
+    const i = d.letters.lastIndexOf('t');
+    if (i < 0) { expect(PC_T_TSS.has(d.node), d.node).toBe(false); continue; }   // a pattern that places no T
+    expect(i, d.node).toBeGreaterThan(13);
+    const before = boards(d)[i - 1]!.map(r => [...r]);
+    const target = [...placeCells('T', d.locks[i][1])].sort((a, b) => a - b);
+    const paths = reach(eng, before, 'T', target);
+    expect(paths.length, d.node).toBeGreaterThan(0);
+    for (const p of paths) expect([...p.cells].sort((a, b) => a - b), d.node).toEqual(target);
+    if (paths.every(p => p.spin !== null)) spinOnly.push(d.node);
+    if (PC_T_TSS.has(d.node)) {
+      expect(paths.map(p => p.spin), d.node).toEqual(['normal']);
+      expect([d.locks[i][2], d.locks[i][3]], d.node).toEqual([1, 2]);
+    }
+  }
+  expect(spinOnly.sort()).toEqual([...PC_T_TSS].sort());
 }, 300_000);

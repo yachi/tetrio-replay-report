@@ -47,6 +47,16 @@ export const DEMO_UNBUILT: Record<string, string> = {
   '2.mochi.after': '示意圖：TSD 之後嘅盤面，即係 2.mochi 示範打完之後嘅盤面',
 };
 
+/** Two SDパフェ PC patterns whose `t` the engine can only place as a full T-spin Single. Both stand
+ *  the T upright in the column-6 well under the bag-2 J: on the board just before it, `reach()`
+ *  finds no plain or mini arrival at the drawn cells, only a rotation with three corners filled, so
+ *  the engine credits a full TSS clearing one line. The page draws a plain `t`; reading it as the
+ *  bag's spin slot is OUR READING. `stickspin-demos.test.ts` measures it on the committed boards and,
+ *  with the reading removed, has the planner search every order of the PC bag and fail on exactly
+ *  these two (a hand probe of 2026-10-28 found no set of pieces placed after a plain T that builds
+ *  either). */
+export const PC_T_TSS = new Set(['2.sd.pc#7', '2.sd.pc#16']);
+
 const REPO = `${import.meta.dir}/../..`;
 const SIM = import.meta.dir;
 
@@ -129,10 +139,13 @@ export const STICKSPIN: RouteProfile = {
       chain: 'Bag 2 hangs under the page\'s after-the-TSS illustrations and the PC patterns under its after-the-TSD ones; their '
            + 'demos run through the demo that ends on that board (bag1.fire, bag1.pc, 2.sd, 2.mochi). The fallback boards '
            + '(TST, Imperial Cross, STMB Cave) are drawn with the slot empty and the T on a separate board; the demo fires it there.',
-      spin: 'Every T-spin kind and line count is the engine\'s verdict on the replayed inputs.',
+      spin: 'Every T-spin kind and line count is the engine\'s verdict on the replayed inputs. In 2.sd.pc#7 and 2.sd.pc#16 the '
+          + 'page draws a plain t that can only go in by a rotation the engine credits as a full T-spin Single, so those two '
+          + 'fire it as a TSS before the Perfect Clear (our reading; every other PC pattern places its T without a spin).',
     },
     unbuilt: DEMO_UNBUILT,
     pieceReadings: PIECE_READINGS,
+    spinLetter: n => (PC_T_TSS.has(n.id) ? { letter: 't', lines: 1 } : null),
     bag1Spec: (_n, routes) => ({ before: routes.bag1.no_hold.all.map((c: any) => c.before), early: null,
                                  holdPiece: null, holdBefore: null }),
     chainVia: {
