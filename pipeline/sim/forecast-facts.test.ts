@@ -121,6 +121,8 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   '2026-10-20': { yachi: 0, pinglamb: 0 },
   // None this session either (forecast-corpus.test.ts pins path_opened 0): the corpus count stays 5.
   '2026-10-22': { yachi: 0, pinglamb: 0 },
+  // None this session either (forecast-corpus.test.ts pins path_opened 0): the corpus count stays 5.
+  '2026-10-29': { yachi: 0, pinglamb: 0 },
 };
 
 /** `unattributed` per session and player — the bucket that was identically zero until 2026-09-19.

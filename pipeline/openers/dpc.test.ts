@@ -27,7 +27,8 @@ const ARTEFACT = `${import.meta.dir}/../../analysis/dpc-facts.json`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
+   '2026-10-29']);
 const H = 40, W = 10;
 
 let DIGESTS: TechDigest[] | null = null;
@@ -116,6 +117,11 @@ const MATCHED: [string, string, boolean, boolean][] = [
   ['2026-10-22 m7r7 pinglamb @27', 'p07.000', false, false],
   ['2026-10-22 m7r8 pinglamb @27', 'p07.000', false, false],
   ['2026-10-22 m9r3 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-29 m1r3 pinglamb @27', 'p01.000', false, true],
+  ['2026-10-29 m1r3 yachi @27', 'p01.000', false, false],
+  ['2026-10-29 m6r2 pinglamb @27', 'p07.000', false, true],
+  ['2026-10-29 m7r1 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-29 m9r2 pinglamb @27', 'p01.000', false, false],
 ];
 
 /** 社畜トレイン hits its qualifier calls `dpc` that are NOT a case here, with the reason */

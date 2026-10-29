@@ -43,7 +43,8 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
+   '2026-10-29']);
 
 /** THE ONE CASE. yachi, 2026-07-22 m5r8 (`replay-2026-07-22-5.ttrm`, 0-based round 7): the page's
  *  bag 1 with the L stood on the O (bag1.l_top, 7 locks) — his 6-lock board is also the L-held
@@ -88,9 +89,9 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities, per player: bag 1 at 6 and 7 locks clean; bag 2 at 13 locks (the one case). The
  *  PC patterns count the rounds that reached their anchor, so they are zero with the bag-2 boards. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
-  'bag1.left': { pinglamb: 1348, yachi: 1307 },
-  'bag1.l_top': { pinglamb: 1279, yachi: 1011 },
-  'bag1.l_placed_elsewhere': { pinglamb: 1348, yachi: 1307 },
+  'bag1.left': { pinglamb: 1411, yachi: 1369 },
+  'bag1.l_top': { pinglamb: 1342, yachi: 1059 },
+  'bag1.l_placed_elsewhere': { pinglamb: 1411, yachi: 1369 },
   '2.normal#1': { pinglamb: 0, yachi: 1 },
   '2.normal#2': { pinglamb: 0, yachi: 1 },
   '2.pc4#1': { pinglamb: 0, yachi: 0 },

@@ -1,0 +1,31 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：贏局嘅窿、填唔晒嘅粒數、同越打越近",
+  "cards": [
+    {
+      "accent": "p",
+      "label": "窿喺贏局",
+      "value": "+15.72% / +3.86%",
+      "body": "拆開贏同輸嘅局：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 15.72%，<strong>輸嗰啲局淨係高 3.86%</strong><span class=\"badge\" data-claim=\"C002\"></span>——兩個人輸嘅時候差唔多，差距喺贏嘅時候放得幾盡。"
+    },
+    {
+      "accent": "y",
+      "label": "粒數填唔晒",
+      "value": "+7.29% / +11.06%",
+      "body": "yachi 多疊 417 粒，即係多 7.29%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——呢條路最多填返 7.29 個百分點，<strong>填唔晒 11.06% 個窿</strong><span class=\"badge\" data-claim=\"C004\"></span>，所以總攻擊少咗 124 條，即係 pinglamb 總攻擊嘅 3.39%<span class=\"badge\" data-claim=\"C005\"></span>。"
+    },
+    {
+      "accent": "g",
+      "label": "越打越近",
+      "value": "8:15 · 8:13 · 14:10",
+      "body": "將九場切三段：頭三場三場全輸，中間三場贏一場，尾三場贏兩場、局數反超 14 比 10<span class=\"badge\" data-claim=\"C010\"></span>。<strong>yachi 每段嘅贏局率都高過上一段</strong><span class=\"badge\" data-claim=\"C010\"></span>。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m9 第七局<span class=\"badge\" data-claim=\"G061\"></span>。pinglamb 贏，但佢喺落速同行數兩條軸都落後<span class=\"badge\" data-claim=\"G083\"></span>；佢贏喺每粒方塊嘅攻擊，約 0.903 對約 0.655<span class=\"badge\" data-claim=\"G084\"></span>。",
+    "All Clear pinglamb 11 個、yachi 5 個<span class=\"badge\" data-claim=\"G038\"></span>。淨係 pinglamb 做到全消嘅 10 局，佢輸咗 4 局<span class=\"badge\" data-claim=\"G080\"></span>。",
+    "自己頂到頂嘅 11 局，yachi 5 局、pinglamb 6 局<span class=\"badge\" data-claim=\"C006\"></span><span class=\"badge\" data-claim=\"G063\"></span>。",
+    "KPP 今晚兩個人差唔多：yachi 3.618 下、pinglamb 3.586 下，yachi 高 0.90%<span class=\"badge\" data-claim=\"C008\"></span>。兩個人自己贏局同輸局嘅 KPP 都差唔到 1%<span class=\"badge\" data-claim=\"G069\"></span><span class=\"badge\" data-claim=\"G070\"></span>。",
+    "單次 spike 嘅個人上限 yachi 35 行、pinglamb 23 行<span class=\"badge\" data-claim=\"G052\"></span>；combo yachi 15 下、pinglamb 11 下<span class=\"badge\" data-claim=\"G054\"></span>。"
+  ]
+}

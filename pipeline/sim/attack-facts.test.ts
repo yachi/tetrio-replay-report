@@ -19,7 +19,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/attack-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
@@ -31,7 +31,9 @@ const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
  * 2026-10-22 adds two player-rounds to all three lists, both late divergences named in
  * replay.test.ts's ADMISSION_EXCEPTIONS: 01 r6 pinglamb is 08-09-4's shape (one Double missed at
  * the end, one lock past the game's count); 09 r3 yachi is the first entry missing more than one
- * clear (three Singles and a Triple, five locks past the game's 118), past a prefix verified to 107. */
+ * clear (three Singles and a Triple, five locks past the game's 118), past a prefix verified to 107.
+ * 2026-10-29 adds nothing to any of the three lists: all 136 of its player-rounds agree on both
+ * anchors, and no engine run locks past the game's `piecesplaced`. */
 /** Player-rounds where the engine's attack total is not the replay's. Each but 2026-10-22-09 r3 is
  *  the engine missing one Double the game credited at the very end of the round (each is also in
  *  COUNT_EXCEPTIONS). */

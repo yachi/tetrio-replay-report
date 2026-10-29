@@ -90,16 +90,21 @@ and both are established rather than hypothetical:
    time — the headline, raw 清走 and the cleared-per-received ratio inward (+0.160 → +0.156,
    +0.155 → +0.147, +0.274 → +0.266), the duration control inward too (+0.032 → +0.028), and the
    two attack/duration controls and 食/intensity outward by one or two thousandths. It is 63
-   rounds, and it moved the headline by 0.004. Thirteen increments, no run of three in any one direction bar the pair's three inward that 10-03
-   ended, and the sign and ordering unmoved
+   rounds, and it moved the headline by 0.004. 2026-10-29 took it to twenty and 1475 rounds
+   and moved all seven a FOURTEENTH time — the headline, raw 清走 and the cleared-per-received
+   ratio inward again (+0.156 → +0.152, +0.147 → +0.141, +0.266 → +0.260), the duration control
+   OUTWARD (+0.028 → +0.031), and the two attack/duration controls and 食/intensity outward by
+   about a hundredth each (-0.155 → -0.166, -0.159 → -0.170, +0.102 → +0.111). It is 68 rounds,
+   and it moved the headline by 0.004. Fourteen increments; the headline has now moved inward four times running (10-12, 10-20,
+   10-22, 10-29), and the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
-   same lesson, now thirteen times over:
+   same lesson, now fourteen times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
-   re-derives rather than counting sessions. As of the current corpus they read **+0.156**
-   (cleared_pp/intensity), **+0.147** (cleared/intensity), **+0.028** (cleared_pp/duration),
-   **-0.155** (apm/duration), **-0.159** (attack/duration), **+0.266**
-   (cleared_per_received/intensity) and **+0.102** (received/intensity). Nothing else in this
+   re-derives rather than counting sessions. As of the current corpus they read **+0.152**
+   (cleared_pp/intensity), **+0.141** (cleared/intensity), **+0.031** (cleared_pp/duration),
+   **-0.166** (apm/duration), **-0.170** (attack/duration), **+0.260**
+   (cleared_per_received/intensity) and **+0.111** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.
