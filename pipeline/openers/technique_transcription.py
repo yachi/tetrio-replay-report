@@ -72,6 +72,9 @@ must reproduce `cross_source.fires` + `cross_source.also` exactly. Two implement
 unchanged: the file keeps its boards under `nodes` and carries an empty `basic_form` for that reason.
 A spec's opt-in `html_checks` re-checks whatever else the technique pinned beside the page (BT砲: the
 harddrop wikitext its external drawings are read from), from the same directory.
+A technique whose PRIMARY source is a harddrop wikitext (King Crimson: shiwehi.com draws none) keeps
+`source.snapshot_file` a `.wikitext`, which `check_snapshot` already reads by its suffix, and declares the opt-in
+`synthetic_snapshot` so the selftest's snapshot re-check plants against a synthetic wikitext, not raw HTML.
 
 `--wikitext-dir` is the half of that a MediaWiki API refetch can supply: the spec's opt-in
 `wikitext_checks` (the pinned harddrop wikitext revisions alone, hashes and re-parse), never the shiwehi
@@ -134,6 +137,10 @@ class TechniqueSpec:
     #: opt-in: a spin board whose muted cells do not equal its full rows is a `<id>:muting` discrepancy to name,
     #: not a failure (基本的なドネイト mutes a few cells off by hand)
     muting_slips: bool = False
+    #: opt-in: fn(data) -> text, the selftest's synthetic page snapshot when the PRIMARY source is not shiwehi.com raw
+    #: HTML (King Crimson: harddrop's own King_Crimson wikitext, which `route_transcription.check_snapshot` reads by
+    #: its `.wikitext` suffix); default None rebuilds the raw-HTML page from `page_order`, as before
+    synthetic_snapshot: Callable | None = None
 
 
 # ── geometry ─────────────────────────────────────────────────────────────────────────────────────
@@ -838,10 +845,14 @@ def run_selftest(spec: TechniqueSpec, mutants: list, snapshot_edits: dict, spec_
     expect(drift(d, spec), 'a hand edit to the committed JSON', 'drift:')
     # the snapshot locator, unchanged from the route gate: a raw-HTML page rebuilt from the boards
     # an indented page (`snapshot_indented`) is rebuilt with a tab before every board row, as it draws them
-    ind = '\t' if spec.snapshot_indented else ''
-    html = '\n'.join('<div class="ttt">\n' + '\n'.join(ind + r for r in node(base, i)['rows']) + '\n</div>'
-                     for i in base['page_order'])
-    html += '\n' + '\n'.join(f'<p>{q["verbatim"]}</p>' for q in base['quotes'])
+    if spec.synthetic_snapshot is not None:
+        # opt-in: a primary source that is not raw HTML (a harddrop wikitext) supplies its own synthetic page
+        html = spec.synthetic_snapshot(base)
+    else:
+        ind = '\t' if spec.snapshot_indented else ''
+        html = '\n'.join('<div class="ttt">\n' + '\n'.join(ind + r for r in node(base, i)['rows']) + '\n</div>'
+                         for i in base['page_order'])
+        html += '\n' + '\n'.join(f'<p>{q["verbatim"]}</p>' for q in base['quotes'])
     with tempfile.TemporaryDirectory() as td:
         p = Path(td) / base['source']['snapshot_file']
         p.write_text(html)

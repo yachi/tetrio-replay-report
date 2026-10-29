@@ -1,0 +1,1001 @@
+{
+  "schema": "technique-shapes/1",
+  "technique": "kingcrimson",
+  "source": {
+    "url": "https://harddrop.com/wiki/King_Crimson",
+    "edit_url": "https://harddrop.com/w/index.php?title=King_Crimson&action=edit",
+    "title": "King Crimson",
+    "site": "harddrop.com (Hard Drop Tetris Wiki, MediaWiki)",
+    "author_note": "the page is harddrop's, edited by its wiki editors; it names no inventor",
+    "categories": [
+      "T-Spin techniques",
+      "T-Spin setups",
+      "Back-to-Back T-Spin setups",
+      "Mid-game T-Spin setups"
+    ],
+    "oldid": 40474,
+    "revision_sha1": "36620f5cbf949bedf07cbb23a32ba1cb4b0a3e81",
+    "revision_timestamp": "2024-09-20T23:05:19Z",
+    "updated": "2024-09-20",
+    "revision_note": "MediaWiki's own sha1 of revision 40474 (read 2026-10-29 from the API), equal to sha1 of the saved bytes: a second authority beside snapshot_sha256, which is ours; 40474 was the page's latest revision when fetched",
+    "fetched": "2026-10-29",
+    "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=King_Crimson&rvprop=ids|sha1|content|timestamp&rvslots=main&format=json&formatversion=2), with Python's urllib and a descriptive User-Agent (NOT curl). Boards are {{pfstart}} … {{pfend}} templates, 22 of them in 5 {| |} tables, read by route_transcription.wikitext_tables / wikitext_cell with `wikitext_readings`",
+    "snapshot_file": "King_Crimson.wikitext",
+    "snapshot_sha256": "c23faf3753cc79a6c7d74e950e5a06d23a7d1f27bd6f5aebad25c2bb5d4109bd",
+    "snapshot_bytes": 5876,
+    "snapshot_note": "sha256 of the revision's bytes as the API serves them (newlines kept). The page is not committed; the weekly `wikitext-sources` job refetches the pinned revision, checks both hashes and re-runs --wikitext-dir, and fails when the page has a newer revision. A person re-checks it with --html-dir, the two cross-source pages beside it.",
+    "wikitext_readings": {
+      "p": "U",
+      "s": "s",
+      "Q": "q"
+    },
+    "wikitext_readings_note": "route_transcription.wikitext_cell reads blank as -, G as c, P as U and an upper-case piece letter as its lower case; this page also draws `p` (the basic setup's placed T, read U), `s` (one S cell drawn lighter, read as the S) and `Q` (light grey, the rest of the stack, read q: filled, no piece)",
+    "shiwehi": {
+      "checked": "2026-10-29",
+      "index": "https://shiwehi.com/tetris/template/ (its 中盤テンプレ・ドネイト list names no King Crimson)",
+      "guessed_url": "https://shiwehi.com/tetris/template/kingcrimson.php (HTTP 404)",
+      "note": "no shiwehi.com page draws a King Crimson, so harddrop's page is the primary source"
+    },
+    "references_listed": [
+      "https://harddrop.com/wiki/T-Spin_Double",
+      "https://harddrop.com/wiki/T-Spin_Triple",
+      "https://harddrop.com/wiki/Super_T-Spin_Double",
+      "https://harddrop.com/wiki/Nil-cross",
+      "https://harddrop.com/wiki/TKI_3_Opening"
+    ],
+    "references_note": "the page's own [[links]], as URLs; Super T-Spin Double is read (cross_source), the rest are not"
+  },
+  "terms": {
+    "url": "https://harddrop.com/wiki/Hard_Drop_Tetris_Wiki:About",
+    "dated": "not stated: harddrop publishes no licence or terms page for wiki content",
+    "read": "2026-10-15, for SDPC Spin (sdpcspin-routes.json): the page footer and the About page it links (no body); not re-read for this page",
+    "allows": "not stated (no licence is published)",
+    "excludes": "not stated (no licence is published)",
+    "requests": "not stated; credited by link, as this repo credits every harddrop page it reads",
+    "how_met": "source link to the harddrop page in every page header; no ads on GitHub Pages"
+  },
+  "legend": {
+    "orientation": "rows top to bottom as drawn; 10 columns, column 0 the left wall; heights differ",
+    "-": "empty",
+    "c": "a cell drawn grey (harddrop G): placed before this diagram, any piece or garbage",
+    "q": "a cell drawn light grey (harddrop Q): the rest of the stack, filled, no piece (OUR READING)",
+    "i j l o z s": "a cell of that piece (harddrop's upper-case letters; one lower-case s is a lighter S cell)",
+    "U": "a cell of the T the spin places (harddrop P, and the basic setup's lower-case p)",
+    "muting": "harddrop never draws the rows a spin clears muted, so no board here uses upper case; every spin board is a named `:muting` discrepancy"
+  },
+  "empty_letters": "",
+  "quotes": [
+    {
+      "id": "def",
+      "verbatim": "A '''King Crimson''' is a [[T-Spin Triple]] layered on top of a [[Super T-Spin Double]] which can be performed when the playfield has a single block in the bottom left or bottom right corner."
+    },
+    {
+      "id": "tki",
+      "verbatim": "It can also be used as a continuation of the [[TKI_3_Opening|TKI 3]] opener."
+    },
+    {
+      "id": "h.basic",
+      "verbatim": "'''Basic setup:'''"
+    },
+    {
+      "id": "h.tki",
+      "verbatim": "== Continuation from TKI 3 =="
+    },
+    {
+      "id": "tki.bonus",
+      "verbatim": "After the first or second T-Spin from a [[TKI_3_Opening|TKI 3]] setup, a King Crimson bonus is possible."
+    },
+    {
+      "id": "tki.warn",
+      "verbatim": "This is usually not suggested due to its high height and the 3 T pieces necessary to complete the setup."
+    },
+    {
+      "id": "h.first",
+      "verbatim": "'''First T-Spin'''"
+    },
+    {
+      "id": "h.second",
+      "verbatim": "'''Second T-Spin'''"
+    },
+    {
+      "id": "h.empty",
+      "verbatim": "== Empty Field Setup =="
+    },
+    {
+      "id": "clear",
+      "verbatim": "Clear"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "basic",
+      "table": 0,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "def",
+      "label": "the basic setup: a one-column well under an overhang, a TST slot over an STSD slot",
+      "rows": [
+        "------cc--",
+        "ccccccc---",
+        "ccccccc-ll",
+        "ccccccc--l",
+        "ccccccc-sl",
+        "ccccccc-ss",
+        "ccccccc--s",
+        "ccccccc--c"
+      ]
+    },
+    {
+      "id": "basic.spin",
+      "table": 0,
+      "board": 1,
+      "kind": "spin",
+      "caption_quote": "def",
+      "label": "the T stood up into the upper slot: a T-spin Triple",
+      "rows": [
+        "------cc--",
+        "ccccccc---",
+        "cccccccUll",
+        "cccccccUUl",
+        "cccccccUsl",
+        "ccccccc-ss",
+        "ccccccc--s",
+        "ccccccc--c"
+      ],
+      "spin_of": "basic",
+      "spin_piece": "U",
+      "spin": "TST",
+      "lines": 3
+    },
+    {
+      "id": "basic.after",
+      "table": 0,
+      "board": 2,
+      "kind": "after",
+      "caption_quote": "def",
+      "label": "what the TST leaves: the STSD under the overhang",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "------cc--",
+        "ccccccc---",
+        "ccccccc-ss",
+        "ccccccc--s",
+        "ccccccc--c"
+      ],
+      "after_of": "basic.spin"
+    },
+    {
+      "id": "tki1.form",
+      "table": 1,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "tki.bonus",
+      "label": "TKI 3",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---",
+        "l---zzssoo",
+        "ll-iiiisoo"
+      ]
+    },
+    {
+      "id": "tki1.spin",
+      "table": 1,
+      "board": 1,
+      "kind": "spin",
+      "caption_quote": "tki.bonus",
+      "label": "TKI 3's T-spin Double",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---",
+        "lUUUzzssoo",
+        "llUiiiisoo"
+      ],
+      "spin_of": "tki1.form",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2
+    },
+    {
+      "id": "tki1.after",
+      "table": 1,
+      "board": 2,
+      "kind": "after",
+      "caption_quote": "tki.bonus",
+      "label": "what the TSD leaves",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---"
+      ],
+      "after_of": "tki1.spin"
+    },
+    {
+      "id": "tki1.z",
+      "table": 1,
+      "board": 3,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "a Z stood against the left wall, the TKI residue drawn grey",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-z--------",
+        "zz--------",
+        "z--ccc----",
+        "c--cccc---"
+      ],
+      "on": "tki1.after",
+      "adds": "z"
+    },
+    {
+      "id": "tki1.j",
+      "table": 1,
+      "board": 4,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "a J hooked over it: the overhang's wall",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "jj--------",
+        "j---------",
+        "jz--------",
+        "zz--------",
+        "z--ccc----",
+        "c--cccc---"
+      ],
+      "on": "tki1.z",
+      "adds": "j"
+    },
+    {
+      "id": "tki1.kc",
+      "table": 1,
+      "board": 5,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "the King Crimson, the rest of the stack drawn light grey (mirrored)",
+      "rows": [
+        "----------",
+        "--qq------",
+        "---qqqqqqq",
+        "jj-qqqqqqq",
+        "j--qqqqqqq",
+        "jz-qqqqqqq",
+        "zz-qqqqqqq",
+        "z--cccqqqq",
+        "c--ccccqqq"
+      ],
+      "on": "tki1.j",
+      "adds": "q"
+    },
+    {
+      "id": "tki2.form",
+      "table": 2,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "tki.bonus",
+      "label": "TKI 3 again",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---",
+        "l---zzssoo",
+        "ll-iiiisoo"
+      ],
+      "same_occupancy_as": "tki1.form"
+    },
+    {
+      "id": "tki2.spin",
+      "table": 2,
+      "board": 1,
+      "kind": "spin",
+      "caption_quote": "tki.bonus",
+      "label": "TKI 3's T-spin Double again",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---",
+        "lUUUzzssoo",
+        "llUiiiisoo"
+      ],
+      "spin_of": "tki2.form",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2
+    },
+    {
+      "id": "tki2.after",
+      "table": 2,
+      "board": 2,
+      "kind": "after",
+      "caption_quote": "tki.bonus",
+      "label": "what the TSD leaves",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "---jjj----",
+        "l--zzjs---"
+      ],
+      "after_of": "tki2.spin"
+    },
+    {
+      "id": "tki2.build",
+      "table": 2,
+      "board": 3,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "a Z, an O, an I and a J built for TKI 3's second T-spin Double",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-z--------",
+        "zz-iiii--j",
+        "zooccc---j",
+        "coocccc-jj"
+      ],
+      "on": "tki2.after",
+      "adds": "zoij"
+    },
+    {
+      "id": "tki2.tsd",
+      "table": 2,
+      "board": 4,
+      "kind": "spin",
+      "caption_quote": "tki.bonus",
+      "label": "TKI 3's second T-spin Double",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-z--------",
+        "zz-iiii--j",
+        "zoocccUUUj",
+        "cooccccUjj"
+      ],
+      "spin_of": "tki2.build",
+      "spin_piece": "U",
+      "spin": "TSD",
+      "lines": 2
+    },
+    {
+      "id": "tki2.tsd.after",
+      "table": 2,
+      "board": 5,
+      "kind": "after",
+      "caption_quote": "tki.bonus",
+      "label": "what the second TSD leaves",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "-z--------",
+        "zz-iiii--j"
+      ],
+      "after_of": "tki2.tsd"
+    },
+    {
+      "id": "tki2.s",
+      "table": 3,
+      "board": 0,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "an S stood against the right wall, the residue drawn grey",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "--------s-",
+        "--------ss",
+        "-c-------s",
+        "cc-cccc--c"
+      ],
+      "on": "tki2.tsd.after",
+      "adds": "s"
+    },
+    {
+      "id": "tki2.l",
+      "table": 3,
+      "board": 1,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "an L hooked over it: the TST slot's far wall",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "--------ll",
+        "---------l",
+        "--------sl",
+        "--------ss",
+        "-c-------s",
+        "cc-cccc--c"
+      ],
+      "on": "tki2.s",
+      "adds": "l"
+    },
+    {
+      "id": "tki2.kc",
+      "table": 3,
+      "board": 2,
+      "kind": "build",
+      "caption_quote": "tki.bonus",
+      "label": "the King Crimson, the rest of the stack drawn light grey (as drawn)",
+      "rows": [
+        "----------",
+        "------qq--",
+        "qqqqqqq---",
+        "qqqqqqq-ll",
+        "qqqqqqq--l",
+        "qqqqqqq-sl",
+        "qqqqqqq-ss",
+        "qcqqqqq--s",
+        "ccqcccc--c"
+      ],
+      "on": "tki2.l",
+      "adds": "q"
+    },
+    {
+      "id": "empty.j",
+      "table": 4,
+      "board": 0,
+      "kind": "base",
+      "caption_quote": "h.empty",
+      "label": "a J laid flat in the bottom corner",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "j---------",
+        "jjj-------"
+      ]
+    },
+    {
+      "id": "empty.clear",
+      "table": 4,
+      "board": 1,
+      "kind": "build",
+      "caption_quote": "clear",
+      "label": "the bottom row filled and cleared",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "j---------",
+        "jjjqqqqqqq"
+      ],
+      "on": "empty.j",
+      "adds": "q"
+    },
+    {
+      "id": "empty.cell",
+      "table": 4,
+      "board": 2,
+      "kind": "illustration",
+      "caption_quote": "clear",
+      "label": "the single block in the bottom corner the clear leaves",
+      "rows": [
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "----------",
+        "j---------"
+      ]
+    },
+    {
+      "id": "empty.kc",
+      "table": 4,
+      "board": 3,
+      "kind": "build",
+      "caption_quote": "def",
+      "label": "the King Crimson on it (mirrored)",
+      "rows": [
+        "----------",
+        "--qq------",
+        "---qqqqqqq",
+        "jj-qqqqqqq",
+        "j--qqqqqqq",
+        "jz-qqqqqqq",
+        "zz-qqqqqqq",
+        "z--qqqqqqq",
+        "c--qqqqqqq"
+      ],
+      "on": "empty.cell",
+      "adds": "jzq"
+    }
+  ],
+  "page_order": [
+    "basic",
+    "basic.spin",
+    "basic.after",
+    "tki1.form",
+    "tki1.spin",
+    "tki1.after",
+    "tki1.z",
+    "tki1.j",
+    "tki1.kc",
+    "tki2.form",
+    "tki2.spin",
+    "tki2.after",
+    "tki2.build",
+    "tki2.tsd",
+    "tki2.tsd.after",
+    "tki2.s",
+    "tki2.l",
+    "tki2.kc",
+    "empty.j",
+    "empty.clear",
+    "empty.cell",
+    "empty.kc"
+  ],
+  "basic_form": [],
+  "variants": [
+    {
+      "id": "kingcrimson",
+      "board": "basic.spin",
+      "spin": "TST",
+      "lines": 3,
+      "window_basis": "agreement",
+      "window": {
+        "rows": [
+          0,
+          7
+        ],
+        "cols": [
+          6,
+          9
+        ]
+      },
+      "t_cells": [
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          7
+        ]
+      ],
+      "roof_cells": [
+        [
+          0,
+          6
+        ],
+        [
+          0,
+          7
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "window_note": "in basic.spin's frame, row 0 the top: the AGREEMENT BOX of this page's four drawings of the shape and two drawings on two other harddrop pages, each selected by that page's own King Crimson label. Column 6 is the well's wall (filled top to bottom), column 7 the well (the overhang over it in row 0, empty from row 1 down), column 8 the TST slot's far side and the STSD's nub column, column 9 the wall column on the open side. Rows 2-4 are the rows the TST clears (entailed by the clear at a full TST, NaiveClauseForced); above them the overhang (row 0) and the row under it (row 1, open on the far side); under them the STSD slot (rows 5-7: its nub row walled by the far column's S, its bottom cell under the T, the cell beside it open). Left of column 6, and above row 0, is outside: the drawings disagree there (column 5 of row 0) or one of them ends (the basic setup's top row). Occupancy only, never colour; garbage is filled.",
+      "agreement": [
+        {
+          "board": "basic",
+          "t_cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "tki1.kc",
+          "t_cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "mirrored": true
+        },
+        {
+          "board": "tki2.kc",
+          "t_cells": [
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ],
+          "mirrored": false
+        },
+        {
+          "board": "empty.kc",
+          "t_cells": [
+            [
+              3,
+              2
+            ],
+            [
+              4,
+              1
+            ],
+            [
+              4,
+              2
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "mirrored": true
+        }
+      ],
+      "untested_drawn": {
+        "cells": [],
+        "reason": ""
+      },
+      "followup": {
+        "board": "basic.after",
+        "spin": "TSD",
+        "lines": 2,
+        "t_cells_pre_clear": [
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            7,
+            7
+          ]
+        ],
+        "t_cells_after": [
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            7,
+            7
+          ]
+        ],
+        "note": "the STSD: a second T stood up into the lower slot, nub toward the open side, credited as a full T-spin Double (the page: 「a [[T-Spin Triple]] layered on top of a [[Super T-Spin Double]]」). Its cells are all under the TST's three cleared rows, so the clear does not move or split them; the matcher carries the slot to the next T all the same."
+      },
+      "fires_on": [
+        "basic",
+        "tki2.kc"
+      ],
+      "misses": [
+        "basic.after",
+        "tki1.form",
+        "tki1.spin",
+        "tki1.after",
+        "tki1.z",
+        "tki1.j",
+        "tki2.form",
+        "tki2.spin",
+        "tki2.after",
+        "tki2.build",
+        "tki2.tsd",
+        "tki2.tsd.after",
+        "tki2.s",
+        "tki2.l",
+        "empty.j",
+        "empty.clear",
+        "empty.cell"
+      ]
+    }
+  ],
+  "cross_source": {
+    "kind": "harddrop_pages",
+    "label_pattern": "crimson",
+    "note": "the window, by the gate's predicate (technique_transcription.window_fires), over every U-slot board of every committed *-routes.json, with the U cells as the T: it fires on none (no route page draws a King Crimson). The independent drawers are two other harddrop pages (`pages`), whose King Crimson drawings are the window's external `agreement` drawings: rule (g) fires the window on each, once, at its slot, in its recorded hand.",
+    "routes_fire_none": "no committed routes file draws a King Crimson (measured: the window fires on none of their U-slot boards); the cross-check is two other harddrop pages, read below",
+    "pages": [
+      {
+        "page": "https://harddrop.com/wiki/T-Spin_Triple_Setups",
+        "title": "T-Spin Triple Setups",
+        "oldid": 42323,
+        "revision_sha1": "0e64836c95d3214bb8c83a5151cbe72763717aef",
+        "revision_timestamp": "2025-02-21T13:50:15Z",
+        "fetched": "2026-10-29",
+        "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=<title>&rvprop=ids|sha1|content|timestamp&rvslots=main&format=json&formatversion=2), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and the revision was the page's latest when fetched",
+        "snapshot_file": "T-Spin_Triple_Setups.wikitext",
+        "snapshot_sha256": "8ae446b1b7d9b4e8733fd0f4338b1b0279e8fb2609f9c5e612e2e8ee5a0a2042",
+        "snapshot_bytes": 48802,
+        "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir",
+        "label_text": "[[King Crimson]] is a technique that results in a '''T-Spin Triple''' followed by a STSD",
+        "section": "Setups involving T-Spin Triples",
+        "table": 29,
+        "boards": [
+          {
+            "table": 29,
+            "board": 0,
+            "role": "drawing",
+            "mirrored": true,
+            "rows": [
+              "----------",
+              "--ll------",
+              "---lgggggg",
+              "jjUlgggggg",
+              "jUUggggggg",
+              "jzUggggggg",
+              "zz-ggggggg",
+              "z--ggggggg",
+              "g--ggggggg"
+            ],
+            "note": "the King Crimson with its TST drawn (P), mirrored: an L as the overhang"
+          },
+          {
+            "table": 29,
+            "board": 1,
+            "role": "other",
+            "mirrored": null,
+            "rows": [
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "--ll------",
+              "---lgggggg",
+              "zz-ggggggg",
+              "z--ggggggg",
+              "g--ggggggg"
+            ],
+            "note": "what the TST leaves"
+          },
+          {
+            "table": 29,
+            "board": 2,
+            "role": "other",
+            "mirrored": null,
+            "rows": [
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "--ll------",
+              "---lgggggg",
+              "zzUggggggg",
+              "zUUggggggg",
+              "g-Uggggggg"
+            ],
+            "note": "the STSD's stood T (the follow-up), its first T-spin Double"
+          },
+          {
+            "table": 29,
+            "board": 3,
+            "role": "other",
+            "mirrored": null,
+            "rows": [
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "--ll------",
+              "---lgggggg",
+              "g-tggggggg"
+            ],
+            "note": "what that TSD leaves, the T's last cell"
+          },
+          {
+            "table": 29,
+            "board": 4,
+            "role": "other",
+            "mirrored": null,
+            "rows": [
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "----------",
+              "--ll------",
+              "UUUlgggggg",
+              "gUtggggggg"
+            ],
+            "note": "the STSD's second T-spin Double"
+          }
+        ],
+        "fires_elsewhere": []
+      },
+      {
+        "page": "https://harddrop.com/wiki/Super_T-Spin_Double",
+        "title": "Super T-Spin Double",
+        "oldid": 42285,
+        "revision_sha1": "3799c44caf1d39c2b65ea16af371886b8010df8d",
+        "revision_timestamp": "2025-02-05T04:11:45Z",
+        "fetched": "2026-10-29",
+        "fetch_method": "the pinned revision's own bytes from the MediaWiki API (api.php?action=query&prop=revisions&titles=<title>&rvprop=ids|sha1|content|timestamp&rvslots=main&format=json&formatversion=2), with Python's urllib and a descriptive User-Agent (NOT curl); the API's sha1 equals the sha1 of the bytes, and the revision was the page's latest when fetched",
+        "snapshot_file": "Super_T-Spin_Double.wikitext",
+        "snapshot_sha256": "c7d490ebd8304154b0953c9fdc577f16728848ab8f21f2abf2328fda79ba360b",
+        "snapshot_bytes": 31380,
+        "snapshot_note": "not committed: check_wikitext_sources refetches the pinned revision weekly through api.php and re-checks it with --wikitext-dir",
+        "label_text": "* '''[[King Crimson]]'''",
+        "section": "Combination Setups",
+        "table": 34,
+        "boards": [
+          {
+            "table": 34,
+            "board": 0,
+            "role": "drawing",
+            "mirrored": false,
+            "rows": [
+              "----------",
+              "gggggggg--",
+              "ggggggg---",
+              "ggggggg-ll",
+              "ggggggg--l",
+              "ggggggg-sl",
+              "ggggggg-ss",
+              "ggggggg--s",
+              "ggggggg--g"
+            ],
+            "note": "the King Crimson, as drawn, no T drawn: its slot is OUR READING (`t_cells`)"
+          }
+        ],
+        "drawing_slots": {
+          "0": [
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ],
+            [
+              4,
+              8
+            ],
+            [
+              5,
+              7
+            ]
+          ]
+        },
+        "fires_elsewhere": []
+      }
+    ],
+    "other_techniques": [],
+    "fires": [],
+    "also": [],
+    "labelled_not_fired": []
+  },
+  "known_discrepancies": [
+    {
+      "id": "basic.spin:muting",
+      "note": "harddrop draws the rows the spin clears in the same letters as the rest (it never mutes a cleared row), so the spin rule's upper case is named here, board by board"
+    },
+    {
+      "id": "tki1.spin:muting",
+      "note": "harddrop draws the rows the spin clears in the same letters as the rest (it never mutes a cleared row), so the spin rule's upper case is named here, board by board"
+    },
+    {
+      "id": "tki2.spin:muting",
+      "note": "harddrop draws the rows the spin clears in the same letters as the rest (it never mutes a cleared row), so the spin rule's upper case is named here, board by board"
+    },
+    {
+      "id": "tki2.tsd:muting",
+      "note": "harddrop draws the rows the spin clears in the same letters as the rest (it never mutes a cleared row), so the spin rule's upper case is named here, board by board"
+    },
+    {
+      "id": "empty.cell:colour",
+      "note": "the single block the empty-field clear leaves is one cell of the J (the page draws it in the J's letter): a piece cut by a line clear, not a whole J"
+    }
+  ]
+}

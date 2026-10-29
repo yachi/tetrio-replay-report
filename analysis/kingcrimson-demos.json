@@ -1,0 +1,512 @@
+{
+ "schema": "technique-demos/1",
+ "report_eligible": false,
+ "constructed": true,
+ "technique": "kingcrimson",
+ "means": "One constructed replay per King Crimson build board the planner can build: from an empty board, the page's grey stack built out of pieces WE chose, then the page's own pieces, then the stood T into the TST slot the corpus window reads, then the STSD under it. Run through the vendored Triangle engine. A board no demo stands on is published unbuilt with its reason.",
+ "not_eligible_because": "constructed, not played: the queue, the hold and the key inputs are ours, and the stack's pieces are ours too (the page draws it grey). No claim id, no badge, no figure in any count.",
+ "caveat": "the page draws its stacks grey; a demo stands only on what the planner can build from an empty board without clearing a line, in two bags; every board carrying this shape holds a 52-cell stack, more than two bags hold, and three of them draw it in a light grey the planner reads as a page piece.",
+ "rules": [
+  "a demo starts from an empty board, as every decoder does; the terrain is an exact cover of its grey cells by pieces the planner chose, every one reachable from spawn by the engine's own moves, no line cleared",
+  "the page's own pieces are the build board's lower-case letters, one whole piece per letter",
+  "the stood T is the one T placement at which the corpus window (technique-facts.ts windowMatch, as drawn) matches the build board, and must be credited a full T-spin clearing the variant's lines",
+  "the engine is the arbiter: every lock must land where the plan put it, with its spin, lines and hold flag"
+ ],
+ "engine": {
+  "options": {
+   "g": 0,
+   "gincrease": 0,
+   "gmargin": 0,
+   "seed": 0,
+   "handling": {
+    "das": 8,
+    "arr": 2,
+    "sdf": 20,
+    "dcd": 0,
+    "safelock": false,
+    "cancel": false,
+    "irs": "off",
+    "ihs": "off",
+    "may20g": false
+   }
+  },
+  "kickset": "SRS+",
+  "allow180": true,
+  "date": "2026-10-29T00:00:00.000Z",
+  "frames_per_input": 4
+ },
+ "inputs": {
+  "transcription_md5": "976c3d7f77b6ed2bdbbdd0db7390aa46",
+  "planner_md5": "9f87657717c82ac226672a3d8ee5720f",
+  "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
+  "classifier_md5": "9ddb664a2637957dcedba937faa8d3ad"
+ },
+ "board": {
+  "width": 10,
+  "rows": 40,
+  "visible_rows": 20,
+  "coords": "y-UP: row 0 is the bottom row",
+  "cell": "yUp * width + x"
+ },
+ "lock_fields": [
+  "dframe",
+  "place",
+  "lines",
+  "spin",
+  "garbage",
+  "held",
+  "attack",
+  "sent"
+ ],
+ "shapes": {
+  "I": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ]
+   ]
+  ],
+  "O": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "T": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "S": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ]
+  ],
+  "Z": [
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "J": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ],
+  "L": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ]
+  ]
+ },
+ "unbuilt": [
+  {
+   "node": "basic",
+   "reason": "基本形有 60 格：灰色嘅疊 52 格，加頁面嘅 L 同 S；頁面冇另外畫佢嘅元地形。當佢地形咁排，planner 量到「地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法」：52 格要 13 粒，兩巡非 T 方塊最多 12 粒，再扣埋頁面嗰兩粒就得 10 粒（係呢個 planner 發牌嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "basic.after",
+   "reason": "係 TST 之後嘅盤面：有 34 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "basic.spin",
+   "reason": "係基本形上面打嘅 TST：基本形砌唔到，所以呢幅都冇示範"
+  },
+  {
+   "node": "empty.cell",
+   "reason": "係插圖，得 1 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "empty.clear",
+   "reason": "有 11 格，係單數：每粒方塊加 4 格、每消一行減 10 格，由空盤砌出嚟嘅盤面格數一定係雙數，所以砌唔出"
+  },
+  {
+   "node": "empty.j",
+   "reason": "得一粒 J（4 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "empty.kc",
+   "reason": "呢個 King Crimson 有 60 格，左右反轉畫，企喺 empty.cell（1 格，係單數）上面：呢個 planner 當淺灰色嘅 q 係一粒頁面方塊，量到「頁面嘅 Q 畫咗 51 格，唔係一粒」；當 q 係地形咁排，就同基本形一樣：當佢地形咁排，planner 量到「地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法」：52 格要 13 粒，兩巡非 T 方塊最多 12 粒，再扣埋頁面嗰兩粒就得 10 粒（係呢個 planner 發牌嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tki1.after",
+   "reason": "係 TKI 3 嘅 TSD 打完嘅殘局（8 格）：最底一行有一格四邊都冇其他格（係俾消行切開咗嘅方塊），冇一粒方塊蓋得到佢而唔蓋空格：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tki1.form",
+   "reason": "係 TKI 3 開局（24 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki1.j",
+   "reason": "企喺 tki1.z 上面（16 格），嗰幅砌唔到；而且個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki1.kc",
+   "reason": "呢個 King Crimson 有 60 格，左右反轉畫：呢個 planner 當淺灰色嘅 q 係一粒頁面方塊，量到「頁面嘅 Q 畫咗 44 格，唔係一粒」；當 q 係地形咁排，就同基本形一樣：當佢地形咁排，planner 量到「地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法」：52 格要 13 粒，兩巡非 T 方塊最多 12 粒，再扣埋頁面嗰兩粒就得 10 粒（係呢個 planner 發牌嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tki1.spin",
+   "reason": "係 TKI 3 嘅 TSD（28 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki1.z",
+   "reason": "企喺 tki1.after 上面（12 格），嗰幅砌唔到；而且個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.after",
+   "reason": "係 TKI 3 嘅 TSD 打完嘅殘局（8 格）：最底一行有一格四邊都冇其他格（係俾消行切開咗嘅方塊），冇一粒方塊蓋得到佢而唔蓋空格：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tki2.build",
+   "reason": "企喺 tki2.after 上面（24 格），嗰幅砌唔到；而且個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.form",
+   "reason": "同 tki1.form 一樣嘅 TKI 3 開局（24 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.kc",
+   "reason": "呢個 King Crimson 有 60 格：呢個 planner 當淺灰色嘅 q 係一粒頁面方塊，量到「頁面嘅 Q 畫咗 44 格，唔係一粒」；當 q 係地形咁排，就同基本形一樣：當佢地形咁排，planner 量到「地形冇一個由非 T 方塊（每款最多兩粒）砌成嘅鋪法」：52 格要 13 粒，兩巡非 T 方塊最多 12 粒，再扣埋頁面嗰兩粒就得 10 粒（係呢個 planner 發牌嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tki2.l",
+   "reason": "企喺 tki2.s 上面（16 格），嗰幅砌唔到；而且個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.s",
+   "reason": "企喺 tki2.tsd.after 上面（12 格），嗰幅砌唔到；而且個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.spin",
+   "reason": "係 TKI 3 嘅 TSD（28 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.tsd",
+   "reason": "係 TKI 3 嘅第二下 TSD（28 格）：個窗口喺呢幅一個 T 位都對唔到（兩個方向都量過），唔係呢個手法嘅形，所以冇示範"
+  },
+  {
+   "node": "tki2.tsd.after",
+   "reason": "係第二下 TSD 打完嘅殘局（8 格）：最底一行有一格四邊都冇其他格（係俾消行切開咗嘅方塊），冇一粒方塊蓋得到佢而唔蓋空格：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  }
+ ],
+ "demos": [
+
+ ]
+}
