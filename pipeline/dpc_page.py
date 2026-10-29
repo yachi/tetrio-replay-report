@@ -1,4 +1,4 @@
-"""DPC — the page for harddrop's DPC setups against the corpus: `docs/dpc.html`, audited before it is returned.
+"""DPC — the page for the DPC setups とんぼ's video catalogues, against the corpus: `docs/dpc.html`, audited before it is returned.
 
     python3 -m pipeline.dpc_page --out-dir /tmp/dpc   # render it somewhere other than docs/
     python3 -m pipeline.dpc_page --selftest           # the audit's mutants
@@ -15,7 +15,9 @@ own small matcher and this own small page. It imports the shared pieces and edit
 QUARANTINE, the technique pages' tier: no claim ids, no ✓, no `data-claim`, the artefact must say
 `report_eligible: false`. The audit reuses `replay_page.audit_quarantine` and adds:
 
-* every setup in the transcription is drawn exactly once (`data-board`), and every case indexed exactly once;
+* every setup in the transcription is drawn exactly once (`data-board`), every other board the video draws (its
+  パフェ boards, the 2ラインパフェ page) exactly once (`data-vboard`), and every case indexed exactly once;
+* every page of the video is linked at its own time, and the definition is quoted as the video subtitles it;
 * every printed figure (`data-figure`) is RECOUNTED from the case list, never read from the aggregates;
 * every case link is read back from the replay side: the position's next step is the case player's lock at
   the case's lock index, a T with the case's spin and lines;
@@ -49,9 +51,14 @@ SPIN_CODE = {"full": 2, "mini": 1}
 
 _FIGURE = re.compile(r'data-figure="([^"]+)">([^<]*)<')
 _BOARD = re.compile(r'data-board="([^"]+)"')
+_VBOARD = re.compile(r'data-vboard="([^"]+)"')
 _CASE = re.compile(r'data-case="([^"]+)"')
 _CASE_LINK = re.compile(r'<tr data-case="([^"]+)">.*?<a href="([^"]+)">')
 _REPLAY_HREF = re.compile(r'^(\d{4}-\d{2}-\d{2})-replay\.html#(m\d+r\d+)@p(\d+)$')
+
+
+def _mmss(t):
+    return f"{t // 60}:{t % 60:02d}"
 
 
 def _need(cond, msg):
@@ -126,14 +133,23 @@ class DpcSite:
     # ------------------------------------------------------------ boards
 
     @staticmethod
-    def _setup_rows(tr, sid):
-        """The setup as harddrop draws it, the T's cells as the dashed slot."""
-        b = [b for b in tr["boards"] if b["id"] == sid][0]
-        rows = list(b["rows"])
+    def _board_rows(tr, bid):
+        """A board as the video draws it: pieces in their colours, the cells from before the setup grey."""
+        rows = list([b for b in tr["boards"] if b["id"] == bid][0]["rows"])
         while rows and rows[0] == "." * 10:
             rows.pop(0)
-        conv = {".": "-", "P": "U"}
-        return ["".join(conv.get(ch, ch.lower() if ch in "IJLOSTZijlostz" else "c") for ch in r) for r in rows]
+        return ["".join("-" if ch == "." else ch.lower() if ch in "IJLOSTZ" else "c" for ch in r) for r in rows]
+
+    @staticmethod
+    def _setup_rows(tr, sid):
+        """The setup as the video draws it, with the T it never draws (the derived TSD) as the dashed slot."""
+        s = [s for s in tr["setups"] if s["id"] == sid][0]
+        rows = [list(r) for r in [b for b in tr["boards"] if b["id"] == sid][0]["rows"][-s["frame_rows"]:]]
+        for r, c in s["t_cells"]:
+            _need(rows[r][c] == ".", f"{sid}: the T cell {r},{c} is drawn filled")
+            rows[r][c] = "U"
+        return ["".join("-" if ch == "." else "U" if ch == "U" else ch.lower() if ch in "IJLOSTZ" else "c"
+                        for ch in r) for r in rows]
 
     @staticmethod
     def _shape_rows(shape):
@@ -142,7 +158,7 @@ class DpcSite:
     def name(self, tr, sid):
         s = [s for s in tr["setups"] if s["id"] == sid][0]
         page = [p for p in tr["pages"] if p["key"] == s["page"]][0]
-        return f'{page["title"]} · {" › ".join(s["heading"])}'
+        return f'{page["title"]} · {s["heading"][0]}'
 
     # ------------------------------------------------------------ the page
 
@@ -161,11 +177,12 @@ class DpcSite:
                '  <header class="scp-head">', f'    <div class="eyebrow">{RS.EYEBROW}</div>',
                f'    <h1 class="section-title">{_esc(title)}</h1>', f'    <p>{_esc(PR["lede"])}</p>',
                f'    <p class="scp-src-line">{_esc(PR["source_words"])}']
-        links = [f'<a href="{_esc(p["url"])}">{_esc(p["title"])}</a>'
-                 f'（<a href="https://harddrop.com/w/index.php?oldid={p["oldid"]}">revision {p["oldid"]}</a>）'
-                 for p in tr["pages"]]
-        out += ["    " + "、".join(links) + "。" + _esc(PR["source_terms"]) + "</p>",
-                f'    <p>{_esc(PR["definition_intro"])}<q class="scp-src">{_esc(tr["source"]["definition"])}</q></p>',
+        src, dfn = tr["source"], tr["source"]["definition"]
+        out += [f'    <a href="{_esc(src["url"])}">{_esc(src["channel"])}「{_esc(src["title"])}」</a>'
+                f'（YouTube，{_esc(PR["source_pages"].format(n=len(tr["pages"]), t=_mmss(tr["pages"][0]["start"])))}）。'
+                + _esc(PR["source_terms"]) + "</p>",
+                f'    <p>{_esc(PR["definition_intro"])}<q class="scp-src">{_esc("".join(dfn["quote"]))}</q>'
+                f'（<a href="{_esc(dfn["url"])}">{_mmss(dfn["from"])}</a>）</p>',
                 "  </header>", '  <div class="method-note">',
                 '    <p><strong>呢版唔屬於信任鏈。</strong>每個盤面都係<strong>一個 replay 模擬器</strong>'
                 '（Triangle 引擎）重跑操作記錄推導出嚟，冇第二份獨立實作；邊一下 T 對到邊個 setup 亦係由佢推出嚟。'
@@ -231,15 +248,26 @@ class DpcSite:
                 f'    <p class="scp-quote">{_esc(S["setups_note"])}</p>']
         for p in tr["pages"]:
             mine = [s for s in tr["setups"] if s["page"] == p["key"]]
-            out += [f'    <h3>{_esc(p["title"])}</h3>', '    <div class="scp-grid">']
-            for s in mine:
-                nm = " › ".join(s["heading"])
-                tag = Wd["cleared_before"].format(n=s["cleared_before"]) if s["cleared_before"] else ""
-                out.append(f'    <div class="scp-node" data-board="{_esc(s["id"])}"><h4 class="scp-name">{_esc(nm)}</h4>'
-                           f'{board_svg(self._setup_rows(tr, s["id"]), nm, RT.PIECE_CLASS)}'
-                           f'<p class="scp-tag">{_esc(Wd["lines"].format(n=s["lines"]))}'
-                           f'{"；" + _esc(tag) if tag else ""}</p>'
-                           f'<p class="scp-count">{count.get(s["id"], 0)}</p></div>')
+            head = p["title"] + (f'【{p["label"]}】' if p["label"] else "")
+            out += [f'    <h3>{_esc(head)}（<a href="{_esc(p["url"])}">{_mmss(p["start"])}</a>）</h3>']
+            if "names" in p:
+                out.append(f'    <p class="scp-tag">{_esc(Wd["names"].format(t=_mmss(p["names_from"])))}</p>')
+            if not mine:
+                out.append(f'    <p class="scp-tag">{_esc(Wd["not_setup"])}</p>')
+            out.append('    <div class="scp-grid">')
+            for b in [b for b in tr["boards"] if b["page"] == p["key"]]:
+                s = next((s for s in mine if s["id"] == b["id"]), None)
+                if s is not None:
+                    nm = s["heading"][0]
+                    out.append(f'    <div class="scp-node" data-board="{_esc(s["id"])}"><h4 class="scp-name">'
+                               f'{_esc(Wd["role"]["setup"])} · {_esc(nm)}</h4>'
+                               f'{board_svg(self._setup_rows(tr, s["id"]), nm, RT.PIECE_CLASS)}'
+                               f'<p class="scp-tag">{_esc(Wd["lines"].format(n=s["lines"]))}</p>'
+                               f'<p class="scp-count">{count.get(s["id"], 0)}</p></div>')
+                else:
+                    nm = Wd["role"][b["role"]]
+                    out.append(f'    <div class="scp-node" data-vboard="{_esc(b["id"])}"><h4 class="scp-name">'
+                               f'{_esc(nm)}</h4>{board_svg(self._board_rows(tr, b["id"]), nm, RT.PIECE_CLASS)}</div>')
             out.append("    </div>")
         out += ["  </section>"]
 
@@ -273,6 +301,14 @@ class DpcSite:
             bad.append("a % outside quoted source text — this page prints counts, never computed rates")
         if sorted(_BOARD.findall(page)) != sorted(s["id"] for s in tr["setups"]):
             bad.append("the page does not draw every setup exactly once")
+        sids = {s["id"] for s in tr["setups"]}
+        if sorted(_VBOARD.findall(page)) != sorted(b["id"] for b in tr["boards"] if b["id"] not in sids):
+            bad.append("the page does not draw every other board of the video exactly once")
+        for p in tr["pages"]:
+            if f'<a href="{_esc(p["url"])}">' not in page or not p["url"].endswith(f'&t={p["start"]}s'):
+                bad.append(f"page {p['key']} of the video is not linked at its time")
+        if f'<q class="scp-src">{_esc("".join(tr["source"]["definition"]["quote"]))}</q>' not in page:
+            bad.append("the video's definition is not quoted")
         if sorted(html.unescape(c) for c in _CASE.findall(page)) != sorted(case_key(c) for c in art["cases"]):
             bad.append("the case index does not list every case exactly once")
         figs = {}
@@ -350,6 +386,11 @@ class DpcSite:
         first = _BOARD.search(page)
         expect("a setup drawn twice", self.audit(page.replace(first.group(0), first.group(0) + " " + first.group(0), 1),
                                                  tr, art, repo), True)
+        vb = _VBOARD.search(page)
+        expect("a パフェ board dropped", self.audit(page.replace(vb.group(0), 'data-x="dropped"', 1), tr, art, repo), True)
+        p0 = tr["pages"][0]
+        expect("a page linked without its time",
+               self.audit(page.replace(f'href="{_esc(p0["url"])}"', f'href="{_esc(tr["source"]["url"])}"'), tr, art, repo), True)
         row = re.search(r'    <tr data-case="[^"]+">.*?</tr>\n', page)
         expect("a case row dropped", self.audit(page.replace(row.group(0), "", 1), tr, art, repo), True)
         lk = re.search(r'@p(\d+)"', page)

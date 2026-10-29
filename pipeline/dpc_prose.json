@@ -1,29 +1,29 @@
 {
  "title": "DPC：全消之後嗰下 T-spin",
  "overview_title": "DPC：全消之後嗰下 T-spin",
- "desc": "每次全消（Perfect Clear）之後第一下 T-spin，盤面對唔對到 harddrop 嘅 DPC setup 圖。模擬器推導，唔屬於信任鏈。",
- "lede": "打完一個 8 行嘅全消循環，盤面清晒、手上淨低一粒方塊。DPC setup 就係用嗰粒加兩包方塊砌一個 T-spin，再全消一次。呢版將 corpus 入面每次全消之後第一下 T-spin 嘅盤面，同 harddrop 六版 DPC 頁畫嘅 setup 逐格對（淨係睇有冇方塊，唔睇顏色，正反都對）。",
- "source_words": "來源：harddrop wiki 六版（每版鎖定一個 revision，每星期重新抓一次核對）：",
- "source_terms": "harddrop 冇公佈 wiki 內容嘅授權，所以每版都附連結註明出處。",
- "definition_intro": "harddrop 自己嘅定義：",
+ "desc": "每次全消（Perfect Clear）之後第一下 T-spin，盤面對唔對到とんぼ條 DPC 教學片畫嘅 setup。模擬器推導，唔屬於信任鏈。",
+ "lede": "用 TD 系定式（例如山岳積み2號）打完全消，盤面清晒、hold 入面淨低第三包冇用嗰粒方塊。DPC 就係用嗰粒加下一包方塊砌一個 T-spin Double，再下一包全消一次。呢版將 corpus 入面每次全消之後第一下 T-spin 嘅盤面，同とんぼ條教學片最後幾頁畫嘅 setup 逐格對（淨係睇有冇方塊，唔睇顏色，正反都對）。",
+ "source_words": "來源：",
+ "source_terms": "條片冇任何一格畫面放入 repo 或者呢版：盤面係由畫面讀出嚟再寫成文字，每頁都附連結去片入面嗰一刻。",
+ "definition_intro": "條片自己嘅定義：",
  "page_sentences": [
   "<strong>全消嘅位置有 replay 自己嘅計數核對</strong>：每一局，模擬器數到幾多次盤面清晒，都要等於遊戲自己記低嘅全消次數（兩個獨立 extractor 都讀到嘅 <code>clears.allclear</code>）。核對結果喺下面數字段。",
   "<strong>全消之後嘅盤面大多數超出咗核實範圍</strong>：遊戲有時將全消嘅攻擊分開幾份送出，模擬器一份過送，所以由嗰度開始重建檢查就對唔上。每個 case 都標明係咪喺核實範圍之內，兩個數都印出嚟。",
-  "呢版<strong>冇示範重播</strong>：harddrop 嘅圖未逐個砌出嚟，淨係用嚟同 corpus 對。"
+  "呢版<strong>冇示範重播</strong>：條片嘅 setup 未逐個用模擬器砌出嚟，淨係用嚟同 corpus 對。片入面嘅 T 冇畫出嚟，虛線嗰格係我哋推出嚟：盤面上淨係得一個擺 T 嘅位可以消兩行（T-spin Double），每版畫嘅全消圖剩低嘅灰格都同呢個推論吻合。"
  ],
  "index_card": {
-  "kicker": "全消循環 · harddrop",
-  "blurb": "全消之後第一下 T-spin，對 harddrop 六版 DPC setup 圖。"
+  "kicker": "全消循環 · とんぼ教學片",
+  "blurb": "全消之後第一下 T-spin，對とんぼ條 DPC 教學片嘅 setup。"
  },
  "sections": {
   "figures": "數字",
   "figures_note": "一個 case 係：全消之後 15 粒方塊之內、下一次全消之前，第一下有 spin 又消到行嘅 T。底下嘅垃圾行先剝走再對（剝咗幾多行，case 表有寫）。",
-  "matched": "對到 harddrop 嘅 setup",
-  "matched_note": "同一個形喺幾版都有畫嘅，當一個形計，所有名都列出嚟。圖係 harddrop 畫嘅 setup（虛線係 T 入嘅位）。",
+  "matched": "對到條片嘅 setup",
+  "matched_note": "同一個形喺幾頁都有畫嘅（例如剩低 S 或者 Z 嗰陣砌出同一個くるまDPC），當一個形計，所有名都列出嚟。圖係條片畫嘅 setup（虛線係 T 入嘅位）。",
   "unmatched": "對唔到嘅形（出現兩次或以上）",
   "unmatched_note": "T 打落去之前嘅盤面（剝走垃圾行之後），淨係有冇方塊；正反當同一個形。淨係出現過一次嘅形冇畫，數目喺下面。",
-  "setups": "harddrop 畫嘅全部 setup",
-  "setups_note": "每版每個出 T 嘅圖（T 消到行，盤面由空砌起）。數字係 corpus 入面對到佢嘅 case 數。",
+  "setups": "條片畫嘅全部盤面",
+  "setups_note": "逐頁照片入面嘅次序：組み方（要砌嘅 setup）同埋佢之後嘅パフェ（全消圖，灰格係 setup 打完 T-spin Double 剩低嘅）。setup 下面嘅數字係 corpus 入面對到佢嘅 case 數。",
   "cases": "全部 case",
   "cases_note": "每行連去嗰晚 replay，停喺 T 落之前嗰一刻。"
  },
@@ -57,6 +57,14 @@
   "anchor": "全消位置核對：{agree} / {rounds} 局夾，共 {pcs} 次全消。",
   "singletons": "淨係出現過一次嘅形：{n} 個。",
   "group_count": "{p}：{n}",
-  "cleared_before": "T 之前先消咗 {n} 行"
- }
+  "names": "呢頁冇寫名；兩個 setup 嘅名係條片前面教學部分（{t} 起）講嘅：O 早過 J 就係くるまDPC，J 早過 O 就係 TSD DPC（Iずらし）。",
+  "not_setup": "呢頁唔係 T-spin setup：I、L、J、O 喺頭五粒 NEXT 入面就即刻全消兩行，跟住剩低嘅方塊再砌。圖照錄，唔同 corpus 對。",
+  "role": {
+   "setup": "組み方",
+   "pc": "パフェ",
+   "clear": "2ラインパフェ",
+   "board": "之後嘅盤面"
+  }
+ },
+ "source_pages": "由 {t} 開始嘅 {n} 頁一覽，每頁一個情況"
 }

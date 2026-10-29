@@ -38,66 +38,84 @@ const caseKey = (c: any) => `${c.session} m${c.match}r${c.round} ${c.player} @${
 
 /** [case, first setup id of the matched group, mirrored, verified] */
 const MATCHED: [string, string, boolean, boolean][] = [
-  ['2026-07-22 m1r5 pinglamb @27', 'i.041', false, false],
-  ['2026-07-22 m2r7 yachi @27', 'i.041', false, false],
-  ['2026-07-22 m3r6 pinglamb @27', 'i.041', false, false],
-  ['2026-07-22 m5r4 pinglamb @27', 'i.041', false, false],
-  ['2026-07-22 m6r5 pinglamb @27', 'i.041', false, false],
-  ['2026-07-22 m7r3 yachi @27', 'i.041', false, false],
-  ['2026-07-24 m1r4 pinglamb @27', 'i.041', false, false],
-  ['2026-07-28 m7r3 pinglamb @27', 'i.041', false, false],
-  ['2026-07-28 m7r7 yachi @27', 'i.041', false, false],
-  ['2026-07-28 m8r5 pinglamb @26', 'o.070', false, false],
-  ['2026-08-01 m3r6 pinglamb @27', 'i.041', false, false],
-  ['2026-08-01 m4r7 yachi @27', 'i.041', false, false],
-  ['2026-08-01 m5r2 pinglamb @27', 'i.041', false, false],
-  ['2026-08-09 m3r8 pinglamb @27', 'i.041', false, false],
-  ['2026-08-14 m8r4 yachi @26', 'sz.062', false, false],
-  ['2026-08-14 m9r3 yachi @25', 'sz.095', true, false],
-  ['2026-08-19 m4r6 pinglamb @27', 'i.041', false, false],
-  ['2026-08-25 m3r3 pinglamb @27', 'i.041', false, true],
-  ['2026-08-25 m3r7 pinglamb @27', 'i.041', false, false],
-  ['2026-08-25 m3r7 yachi @27', 'i.041', false, true],
-  ['2026-08-25 m6r3 pinglamb @25', 'sz.095', true, false],
-  ['2026-08-25 m6r3 yachi @25', 'sz.095', true, false],
-  ['2026-08-25 m6r6 pinglamb @27', 'i.041', false, true],
-  ['2026-09-03 m1r8 pinglamb @25', 'sz.095', true, true],
-  ['2026-09-10 m3r1 pinglamb @27', 'o.036', true, true],
-  ['2026-09-10 m4r5 pinglamb @26', 'o.070', true, false],
-  ['2026-09-11 m1r4 pinglamb @27', 'i.041', false, true],
-  ['2026-09-11 m3r1 pinglamb @27', 'i.041', false, true],
-  ['2026-09-11 m3r1 yachi @27', 'i.041', false, false],
-  ['2026-09-11 m3r2 pinglamb @27', 'i.041', false, false],
-  ['2026-09-11 m5r6 pinglamb @27', 'i.041', false, false],
-  ['2026-09-17 m1r9 pinglamb @25', 'sz.124', false, false],
-  ['2026-09-18 m5r5 pinglamb @27', 'i.041', false, true],
-  ['2026-09-18 m6r7 yachi @27', 'i.041', false, false],
-  ['2026-09-18 m7r5 pinglamb @27', 'i.041', false, false],
-  ['2026-09-18 m8r2 pinglamb @26', 'o.070', true, false],
-  ['2026-09-18 m10r6 pinglamb @26', 'o.070', true, false],
-  ['2026-09-18 m12r8 pinglamb @27', 'i.041', false, false],
-  ['2026-09-19 m1r5 pinglamb @27', 'o.036', true, false],
-  ['2026-09-19 m7r3 pinglamb @26', 'o.070', false, true],
-  ['2026-09-19 m15r7 pinglamb @27', 'i.041', false, true],
-  ['2026-09-19 m15r7 yachi @27', 'i.041', false, false],
-  ['2026-09-19 m16r4 pinglamb @27', 'i.041', false, false],
-  ['2026-10-03 m4r6 pinglamb @27', 'i.041', false, false],
-  ['2026-10-03 m5r1 yachi @27', 'i.041', false, false],
-  ['2026-10-03 m6r9 pinglamb @26', 'o.070', false, false],
-  ['2026-10-03 m11r3 pinglamb @27', 'o.036', true, true],
-  ['2026-10-03 m15r7 pinglamb @25', 'sz.095', true, true],
-  ['2026-10-03 m20r3 pinglamb @27', 'i.041', false, false],
-  ['2026-10-09 m7r6 pinglamb @26', 'o.070', true, false],
-  ['2026-10-09 m9r6 pinglamb @27', 'i.041', false, false],
-  ['2026-10-09 m10r9 yachi @27', 'i.041', false, false],
-  ['2026-10-12 m4r4 yachi @27', 'i.041', false, false],
-  ['2026-10-12 m7r2 pinglamb @27', 'i.041', false, false],
-  ['2026-10-22 m1r4 pinglamb @27', 'i.041', false, false],
-  ['2026-10-22 m4r4 pinglamb @27', 'i.041', false, false],
-  ['2026-10-22 m6r3 pinglamb @27', 'i.041', false, false],
-  ['2026-10-22 m7r1 pinglamb @27', 'i.041', false, false],
-  ['2026-10-22 m7r6 pinglamb @27', 'i.041', false, true],
-  ['2026-10-22 m9r3 pinglamb @27', 'i.041', false, false],
+  ['2026-07-22 m1r5 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-22 m2r7 yachi @27', 'p01.000', false, false],
+  ['2026-07-22 m3r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-22 m5r4 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-22 m6r5 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-22 m7r3 yachi @27', 'p01.000', false, false],
+  ['2026-07-22 m10r5 pinglamb @27', 'p07.000', false, false],
+  ['2026-07-24 m1r4 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-24 m5r2 pinglamb @28', 'p07.000', false, false],
+  ['2026-07-24 m6r8 pinglamb @27', 'p07.000', false, true],
+  ['2026-07-28 m5r3 pinglamb @27', 'p07.000', false, false],
+  ['2026-07-28 m7r3 pinglamb @27', 'p01.000', false, false],
+  ['2026-07-28 m7r7 yachi @27', 'p01.000', false, false],
+  ['2026-08-01 m3r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-08-01 m4r7 yachi @27', 'p01.000', false, false],
+  ['2026-08-01 m5r2 pinglamb @27', 'p01.000', false, false],
+  ['2026-08-01 m7r6 pinglamb @27', 'p07.000', false, false],
+  ['2026-08-09 m3r8 pinglamb @27', 'p01.000', false, false],
+  ['2026-08-14 m1r8 pinglamb @27', 'p07.000', false, true],
+  ['2026-08-19 m4r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-08-25 m3r3 pinglamb @27', 'p01.000', false, true],
+  ['2026-08-25 m3r7 pinglamb @27', 'p01.000', false, false],
+  ['2026-08-25 m3r7 yachi @27', 'p01.000', false, true],
+  ['2026-08-25 m6r6 pinglamb @27', 'p01.000', false, true],
+  ['2026-08-25 m7r7 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-03 m2r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-11 m1r4 pinglamb @27', 'p01.000', false, true],
+  ['2026-09-11 m3r1 pinglamb @27', 'p01.000', false, true],
+  ['2026-09-11 m3r1 yachi @27', 'p01.000', false, false],
+  ['2026-09-11 m3r2 pinglamb @27', 'p01.000', false, false],
+  ['2026-09-11 m5r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-09-11 m7r3 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-18 m3r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-18 m4r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-18 m5r5 pinglamb @27', 'p01.000', false, true],
+  ['2026-09-18 m6r7 yachi @27', 'p01.000', false, false],
+  ['2026-09-18 m7r5 pinglamb @27', 'p01.000', false, false],
+  ['2026-09-18 m11r2 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-18 m12r8 pinglamb @27', 'p01.000', false, false],
+  ['2026-09-18 m13r3 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-18 m13r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-19 m1r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-19 m13r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-19 m13r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-09-19 m13r7 pinglamb @27', 'p07.000', false, true],
+  ['2026-09-19 m15r7 pinglamb @27', 'p01.000', false, true],
+  ['2026-09-19 m15r7 yachi @27', 'p01.000', false, false],
+  ['2026-09-19 m16r4 pinglamb @27', 'p01.000', false, false],
+  ['2026-09-19 m20r3 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-03 m4r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-03 m5r1 yachi @27', 'p01.000', false, false],
+  ['2026-10-03 m9r1 pinglamb @27', 'p07.000', false, true],
+  ['2026-10-03 m11r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-03 m15r2 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-03 m20r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-03 m20r3 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-09 m4r6 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-09 m9r6 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-09 m10r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-09 m10r9 yachi @27', 'p01.000', false, false],
+  ['2026-10-12 m4r4 yachi @27', 'p01.000', false, false],
+  ['2026-10-12 m7r2 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-12 m7r2 yachi @27', 'p10.003', false, true],
+  ['2026-10-20 m2r6 yachi @27', 'p10.003', false, true],
+  ['2026-10-20 m3r1 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-20 m4r6 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m1r4 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-22 m1r7 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m2r8 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m4r4 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-22 m5r4 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m6r3 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-22 m6r5 pinglamb @27', 'p07.000', false, true],
+  ['2026-10-22 m7r1 pinglamb @27', 'p01.000', false, false],
+  ['2026-10-22 m7r6 pinglamb @27', 'p01.000', false, true],
+  ['2026-10-22 m7r7 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m7r8 pinglamb @27', 'p07.000', false, false],
+  ['2026-10-22 m9r3 pinglamb @27', 'p01.000', false, false],
 ];
 
 /** 社畜トレイン hits its qualifier calls `dpc` that are NOT a case here, with the reason */
@@ -163,12 +181,14 @@ test('mutants on the corpus, each with its symptom', () => {
   const real = classify(ds, setups).cases;
   const key = (cs: any[]) => cs.map(c => `${caseKey(c)} ${c.outcome} ${c.setups.join(',')}`);
   const run = (m: DpcMutants) => classify(ds, setups, m).cases;
-  // noMirror: exactly the mirrored matches are lost
+  // noMirror: EQUIVALENT in OUTCOME on this corpus, because the video draws every shape a case matched in both
+  // hands (くるまDPC and トラックDPC each on a pair of mirrored pages): it only drops, from each matched case, the
+  // names that reach it through the mirror. Killed on a synthetic digest below
+  expect(real.some(c => c.outcome === 'matched' && c.mirrored)).toBe(false);
   const nm = run({ noMirror: true });
-  const lost = real.filter(c => c.outcome === 'matched' && !nm.some(x => caseKey(x) === caseKey(c) && x.outcome === 'matched'));
-  expect(lost.length).toBeGreaterThan(0);
-  expect(lost.every(c => c.mirrored)).toBe(true);
-  expect(lost.length).toBe(real.filter(c => c.mirrored).length);
+  expect(nm.map(c => `${caseKey(c)} ${c.outcome}`)).toEqual(real.map(c => `${caseKey(c)} ${c.outcome}`));
+  expect(nm.some((c, i) => c.setups.length < real[i]!.setups.length)).toBe(true);
+  nm.forEach((c, i) => expect(real[i]!.setups).toEqual(expect.arrayContaining(c.setups)));
   // noGarbageStrip: only matches that stood on garbage rows are lost
   const ng = run({ noGarbageStrip: true });
   const lostG = real.filter(c => c.outcome === 'matched' && !ng.some(x => caseKey(x) === caseKey(c) && x.outcome === 'matched'));
@@ -186,7 +206,13 @@ test('mutants on the corpus, each with its symptom', () => {
 }, 600_000);
 
 test('the equivalent mutants are killed on synthetic digests', () => {
-  const s = setups.find(x => x.id === 'main.001')!;
+  // the one setup the video draws in one hand only (TSD DPC(Iずらし)): mirrored, it matches only through the mirror
+  const one = setups.find(x => x.id === 'p10.003')!;
+  const mir = synthetic(one, true);
+  expect(classify([mir], setups).cases[0]!.outcome).toBe('matched');
+  expect(classify([mir], setups).cases[0]!.mirrored).toBe(true);
+  expect(classify([mir], setups, { noMirror: true }).cases[0]!.outcome).not.toBe('matched');
+  const s = setups.find(x => x.id === 'p01.000')!;
   // the T one column over (still on the board): the real rules call it base_only, noTCheck a match
   const moved = synthetic(s, false, -1);
   expect(classify([moved], setups).cases[0]!.outcome).toBe('base_only');

@@ -136,7 +136,8 @@ def technique_other_snapshots(data: dict) -> list[tuple[str, dict]]:
 
 
 def discover_techniques(openers: Path = HERE) -> list[Path]:
-    # a setups transcription (dpc-setups.json) is read the same way: structure, --wikitext-dir, its SPEC's hooks
+    # a setups transcription (secondpc-setups.json) is read the same way: structure, --wikitext-dir, its SPEC's hooks
+    # (dpc-setups.json is read off a video and pins no revision, so it is not discovered)
     return [p for p in sorted([*openers.glob('*-technique.json'), *openers.glob('*-setups.json')])
             if technique_wikitext_records(json.loads(p.read_text()))]
 

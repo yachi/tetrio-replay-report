@@ -1006,8 +1006,9 @@ jobs:
       - name: Check the basic donating technique page audit catches its corruptions
         run: python3 -m pipeline.basicdonating_page --selftest
 
-      # The DPC page: what the first T-spin after each Perfect Clear was built on, against harddrop's six
-      # DPC Setups pages (pinned revisions, refetched weekly by check_wikitext_sources). Its PC points are
+      # The DPC page: what the first T-spin after each Perfect Clear was built on, against the setups
+      # とんぼ's DPC video catalogues (read off its frames; nothing refetches it, a re-read needs the video
+      # and --video). Its PC points are
       # anchored to the replay's own clears.allclear; the corpus artefact is checked by
       # pipeline/openers/dpc.test.ts in the typescript job.
       - name: Check the DPC setups transcription

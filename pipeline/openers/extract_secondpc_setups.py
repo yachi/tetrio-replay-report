@@ -18,8 +18,8 @@ the page credits by link. Its sibling `Second perfect clear queuebased setups` i
 and NOT transcribed: it draws next-bag pieces in lower case and some solutions after a line clear, which the
 rule below does not read, and folding it in would be a second reading for one page.
 
-THE TRANSCRIPTION IS A PARSE, NOT A HAND COPY. The board parser is the DPC module's (`parse_page`, one
-reader of harddrop's `{{pfrow}}` templates), so every token is mapped by the same table; a token this page's
+THE TRANSCRIPTION IS A PARSE, NOT A HAND COPY. The board parser is `parse_page` below (one
+reader of harddrop's `{{pfrow}}` templates; it was the DPC module's until that page moved to a video), so every token is mapped by the same table; a token this page's
 rules do not read (anything but a piece letter, `G` or blank) is a failure here, never a guess.
 
 THE ROLES, derived and checked here. A board is read with a lower-case
@@ -45,10 +45,78 @@ import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
-from pipeline.openers.extract_dpc_setups import TOKENS, Bad, parse_page, synthetic_page as _dpc_synthetic
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / 'secondpc-setups.json'
+_W = 10
+
+#: wikitext cell token -> transcription letter (harddrop's `{{pfrow}}` reader; it lived in the DPC module
+#: until the DPC page moved to a video source on 2026-10-29, and moved here unchanged)
+TOKENS = {'': '.', ' ': '.', 'G': 'G', 'P': 'P', 'N': 'N', 'F': 'F', 'Y': 'Y', '+': '+',
+          **{x: x for x in 'IJLOSTZ'}, **{"'" + x: x.lower() for x in 'IJLOSTZ'}}
+_EVENT = re.compile(r'^(={1,4})([^=\n]+?)\1\s*$|^\{\||\{\{pfstart\}\}(.*?)\{\{pfend\}\}', re.S | re.M)
+_ROW = re.compile(r'\{\{pfrow(blank)?(?:\|([^}]*))?\}\}')
+
+
+
+class Bad(Exception):
+    pass
+
+
+def parse_page(text: str) -> list[dict]:
+    """Every `{{pfstart}} … {{pfend}}` board of one page, in order: its heading path, the number of `{|`
+    seen before it, and its rows (top to bottom, TOKENS-mapped). Raises on a ragged row or unknown token."""
+    out: list[dict] = []
+    heads: list[tuple[int, str]] = []
+    table = 0
+    for m in _EVENT.finditer(text):
+        if m.group(1):
+            lvl = len(m.group(1))
+            heads = [h for h in heads if h[0] < lvl] + [(lvl, m.group(2).strip())]
+            continue
+        if m.group(0).startswith('{|'):
+            table += 1
+            continue
+        rows = []
+        for blank, cells in _ROW.findall(m.group(3)):
+            if blank:
+                rows.append('.' * _W)
+                continue
+            toks = [c.strip() if c.strip() else c for c in cells.split('|')]
+            if len(toks) != _W:
+                raise Bad(f'board {len(out)}: a pfrow with {len(toks)} cells: {cells!r}')
+            bad = [t for t in toks if t not in TOKENS]
+            if bad:
+                raise Bad(f'board {len(out)}: unknown cell token(s) {bad}')
+            rows.append(''.join(TOKENS[t] for t in toks))
+        if not rows:
+            raise Bad(f'board {len(out)}: no rows')
+        out.append({'heading': [h for _, h in heads], 'table': table, 'rows': rows})
+    return out
+
+
+def _dpc_synthetic(data: dict, key: str) -> str:
+    """A page from the recorded boards alone, for selftests (the real bytes are not committed): headings,
+    tables and boards in order, parsing back to the recorded boards."""
+    rev = {v: k for k, v in TOKENS.items() if k not in ('',)}
+    out, heads, table = [], [], 0
+    for b in [b for b in data['boards'] if b['page'] == key]:
+        if b['heading'] != heads:
+            common = 0
+            while common < min(len(heads), len(b['heading'])) and heads[common] == b['heading'][common]:
+                common += 1
+            for lvl, h in enumerate(b['heading'][common:], start=common + 2):
+                out.append(f'{"=" * lvl}{h}{"=" * lvl}')
+            heads = b['heading']
+        while table < b['table']:
+            out.append('{|')
+            table += 1
+        rows = ['{{pfrowblank}}' if r == '.' * _W else '{{pfrow|' + '|'.join(rev[c] for c in r) + '}}'
+                for r in b['rows']]
+        out.append('|{{pfstart}}\n' + '\n'.join(rows) + '\n{{pfend}}')
+    return '\n'.join(out) + '\n'
+
+
 W = 10
 ROWS = 4
 PIECES = set('IJLOSTZ')

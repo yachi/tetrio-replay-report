@@ -1,10 +1,10 @@
 /**
- * DPC: after every Perfect Clear in the corpus, the first T-spin, and which of harddrop's DPC setups (if
- * any) it was fired from. One corpus artefact, `analysis/dpc-facts.json`.
+ * DPC: after every Perfect Clear in the corpus, the first T-spin, and which of the DPC setups とんぼ's video
+ * catalogues (`dpc-setups.json`, if any) it was fired from. One corpus artefact, `analysis/dpc-facts.json`.
  *
  *   bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json
  *
- * WHY ITS OWN FRAMEWORK. A DPC setup is a WHOLE board built from empty (the left-over piece and two bags),
+ * WHY ITS OWN FRAMEWORK. A DPC setup is a WHOLE board built from empty (the left-over piece and one bag),
  * so a technique window (a local shape on a partial stack) is the wrong instrument, and a route page's tree
  * (fixed lock counts from the round's start, behind a bag-1 gate) is the wrong frame: the setup starts at a
  * Perfect Clear, wherever in the round that is. So this matcher reads the same digest the technique pages do
@@ -217,7 +217,7 @@ export function assemble(cls: ReturnType<typeof classify>, setups: Setup[], sess
   return {
     schema: 'dpc-facts/1',
     report_eligible: false,
-    means: 'After every Perfect Clear in the corpus, the first T-spin within the window, and which of harddrop\'s DPC setups '
+    means: 'After every Perfect Clear in the corpus, the first T-spin within the window, and which of the DPC setups とんぼ\'s video catalogues '
       + '(dpc-setups.json) the board before it was, by occupancy, drawn or mirrored. Simulator output, one engine.',
     caveat: 'Boards are the vendored engine\'s. Most post-PC boards are past the verified prefix (each case carries '
       + '`verified`); which setup a T went into has no second implementation. No claim id, no badge.',
