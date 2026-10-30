@@ -275,6 +275,7 @@ bun test pipeline/sim/oracle-cache.test.ts                     #   cached == fre
 python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the replay region re-renders
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
+python3 -m pipeline.replay_links --selftest     # docs/<date>.html's match/round → replay links
 python3 -m pipeline.openers.extract_meisou_routes            # CI gate: the 迷走砲 route transcription
 python3 -m pipeline.openers.extract_meisou_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-stray-cannon-facts.ts \
@@ -669,7 +670,13 @@ equivalent marker pair.
   path on the site (and in a local `bin/build-docs` render), not a committed file; a sentence below
   saying `--check` "byte-compares" a page against a committed copy is from before this change and
   now means the second render. Committing docs/ had made every pipeline change re-commit each
-  report twice (`docs/<date>.html` was a byte copy of `report.html`).
+  report twice (`docs/<date>.html` was a byte copy of `report.html`). **Since 2026-10-30 a
+  session's `docs/<date>.html` is NOT a byte copy**: `pipeline/replay_links.py` links every match
+  and round the report names (m3r8, m2 第3局, 第3場第5局, 第 N 場, a bare mN, the round table's R<N>,
+  a match card's 第N局, heading and pips) to `<date>-replay.html#m<pos>r<round>`, refusing any pass
+  that changes the page's text. report.html is untouched, so every report gate is unaffected. The
+  openers region's per-match table numbers 第 N 場 by EXPORT number (`opener_section._match_label`),
+  so the pass links it through the file map; anywhere else N is the position. Subsets are copied.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is

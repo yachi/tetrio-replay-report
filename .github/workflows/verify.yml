@@ -691,6 +691,13 @@ jobs:
       - name: Check the replay page audit catches its corruptions
         run: python3 -m pipeline.replay_page --selftest
 
+      # Each session's docs/<date>.html is report.html with every match and round it names
+      # linked to that night's replay page (pipeline/replay_links.py). Every render refuses a
+      # link pass that changed the page's text; --selftest plants the patterns, the
+      # out-of-range and raw-text cases, the openers table's export numbering and that refusal.
+      - name: Check the replay-link pass
+        run: python3 -m pipeline.replay_links --selftest
+
       # The replay pages' opener / technique labels are re-checked against each page's own
       # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a
       # stale artefact and requires each to be refused, so that check is shown to fire.
