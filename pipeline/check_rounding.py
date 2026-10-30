@@ -67,6 +67,12 @@ COVERED = (
     "pipeline/build_round_table.py",
     "pipeline/skeleton.py",
     "pipeline/claim_cards.py",
+    "pipeline/app_svg.py",
+    "pipeline/app_common.py",
+    "pipeline/app_section.py",
+    "pipeline/app_blocks_session.py",
+    "pipeline/app_blocks_rounds.py",
+    "pipeline/app_blocks_corpus.py",
 )
 
 #: What this gate does NOT cover, and why — printed on every run. An uncovered module is not a
@@ -124,6 +130,23 @@ EXCUSED = {
         "describes",
     ("pipeline/records.py", "build"):
         "`QUALIFYING_MS // 1000` prints the threshold the qualifier is defined by",
+    # ---- 每粒攻擊 (app): chart LAYOUT, never a printed figure ----
+    ("pipeline/app_svg.py", "coord"):
+        "`:.2f` formats a viewBox coordinate; every printed figure goes through num/rate/pct",
+    ("pipeline/app_blocks_session.py", "_x_ticks"):
+        "pads an axis range out to whole tick steps (x1000 ints); labels are printed by num()",
+    ("pipeline/app_blocks_rounds.py", "_tenths_floor"):
+        "the scatter's axis range in tenths, floored outward so every dot is inside the plot",
+    ("pipeline/app_blocks_rounds.py", "_tenths_ceil"):
+        "the scatter's axis range in tenths, ceiled outward so every dot is inside the plot",
+    ("pipeline/app_blocks_rounds.py", "speed_scatter"):
+        "`apm_lo // step` picks the first APM iso-curve, an integer multiple of a whole step",
+    ("pipeline/app_blocks_rounds.py", "round_strip"):
+        "the strip's y half-range in tenths, ceiled so every bar fits; tick labels are num()'s",
+    ("pipeline/app_blocks_corpus.py", "_bin_label"):
+        "`k * 1000 // BIN_STEPS` is exact (BIN_STEPS divides 1000); the label is printed by num()",
+    ("pipeline/app_blocks_corpus.py", "trend"):
+        "pads the trend chart's y range out to whole 0.05 steps; labels are printed by num()",
 
     # ---- not a published figure at all ----
     ("pipeline/build_round_table.py", "build"):

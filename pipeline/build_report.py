@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import (appendix, attack_section, chart_data, claim_cards, coaching,
+from pipeline import (app_section, appendix, attack_section, chart_data, claim_cards, coaching,
                       forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region,
                       replay_section, routes_techniques_section, stats_section)
 from pipeline.claims import generators
@@ -57,6 +57,12 @@ def stats_sec(ctx):
     return stats_section.build(ctx["facts"],
                                stats_section.load_prose(ctx["report_dir"]),
                                routes_techniques_charts.build(ctx["facts"], ctx["report_dir"]))
+
+
+def app_sec(ctx):
+    # 每粒攻擊 — attack per piece, six blocks computed from facts.json (and, for the two corpus
+    # blocks, the other sessions' facts.json up to this report's date). Unconditional.
+    return app_section.build(ctx["facts"], ctx["report_dir"])
 
 
 def routes_techniques_sec(ctx):
@@ -141,6 +147,12 @@ SECTIONS = [
     ("hero", '<!-- BEGIN generated matches', hero_section, None),
     ("matches", '<!-- BEGIN generated stats', matches_section, None),
     ("stats", '<!-- BEGIN generated moments', stats_sec, None),
+    # 每粒攻擊 right after 數據對決. A CHAIN anchor (the intense-round idiom): before the
+    # routes-techniques region when the report already carries it, else before the moments
+    # marker, which every report and the skeleton carry. Listed BEFORE routes-techniques so that on
+    # a fresh build both insert before the moments marker and this one lands first.
+    ("app", ('<!-- BEGIN generated routes-techniques',
+             '<!-- BEGIN generated moments'), app_sec, None),
     # simulator output ABOVE the trust chain's narrative sections, on purpose: 建議's tagged items
     # cite it, and a reader meets the tables before the advice. Its eyebrow and title say which
     # tier it is, and check_routes_techniques holds the quarantine sentences. Anchored on the moments

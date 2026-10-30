@@ -3801,6 +3801,45 @@ The items are corpus-artefact-dependent: re-emitting any route or technique arte
 night's region, `build_report --check` goes red, and each night's tagged items must be re-read against
 the new cells, not just rebuilt.
 
+## 每粒攻擊 — the APP section
+
+`pipeline/app_section.py`, region `app` (section id `app`), placed right after 數據對決 and before
+the routes-techniques and moments regions (in `skeleton.LAYOUT`, not `SELF_INSERTING`: every
+session has a facts.json). It is about APP (`garbage_attack / pieces`) and has seven blocks in a fixed order:
+1 the scoreboard and its volume meter (piece surplus against the surplus that would cover the gap),
+2 the speed-against-APP scatter, 3 the per-round APP-gap strip, 4a the per-match dumbbells,
+4b APP in won rounds against lost ones, 5 the corpus break-even curve, 6 the corpus trend. Blocks live in
+`app_blocks_session.py` (1, 4a, 4b), `app_blocks_rounds.py` (2, 3) and `app_blocks_corpus.py`
+(5, 6). They share `app_common.py` (the ctx helpers, `block()`, `corpus()`) and `app_svg.py`
+(server-side SVG, and `num`/`rate`/`pct`, which route every printed decimal through `fmt` with
+a `site=`). There is no script and no `innerHTML`; colour is positional (`--p1`/`--p2`, with the
+`--yachi`/`--pinglamb` fallback the four earliest reports need).
+
+**Trust tier: measured, not proved.** Every figure is computed from facts.json. A ✓ badge
+appears only where a VERIFIED generated claim's spec is exactly the statement beside it, and
+only for a claim the report's claims island carries (`_island_claims`, read through
+`appendix._rows`). 07-22's island holds its hand claims only, so it gets no badge here.
+Blocks 5 and 6 are never badged. They read the corpus **as of the report's date**
+(`app_common.corpus`: every `sessions/*/report/facts.json` dated on or before the date in the
+report's path), so an older report does not move when a session lands. They say they are corpus
+measurements, and that APP and winning are correlated, not cause and effect.
+
+Gates: `build_report --check` and the per-session gates cover the region like any other. Two
+more apply to it. `check_rounding` lists the six `app_*` modules in `COVERED`, and its chart
+layout arithmetic is named in `EXCUSED`. `python3 -m pipeline.app_section --selftest [report_dir]`
+runs in the `pipeline` matrix and checks five properties, each with a planted mutant:
+- two builds are byte-identical;
+- renaming every player in facts, claims and corpus renders the same section, and no typed name survives;
+- the region's CSS stays pinned to `#app`;
+- no `app_*` module rounds outside `fmt`;
+- the subset report's trend marks the SUBSET's own APP as 「今晚」, not the full night's corpus row
+  (`app_common.is_corpus_session`; `trend()` asserts its last row is the report's own totals).
+
+Three wording rules a review caught, each a sentence that printed a true-looking false figure.
+The ratio gap `hi/lo − 1` is how much HIGHER the leader is, never how much lower the trailer is.
+A badge whose spec proves a DIRECTION sits on the direction words, with the size after it in
+brackets. A signed 約 figure floors its MAGNITUDE (`_frac`), or a negative one overstates.
+
 ## 重播 — the animated replay, the third quarantined section
 
 Two boards side by side, stepped lock by lock. **Simulator output, quarantined exactly like the
@@ -5575,17 +5614,17 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->40494<!--/round:figures--> 個
-quantized figure、<!--round:sites-->41<!--/round:sites--> 對 (site, helper)**:
-<!--round:enforced-->29<!--/round:enforced--> 個有 corpus 撐住,
-<!--round:ontrust-->12<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->63283<!--/round:figures--> 個
+quantized figure、<!--round:sites-->94<!--/round:sites--> 對 (site, helper)**:
+<!--round:enforced-->69<!--/round:enforced--> 個有 corpus 撐住,
+<!--round:ontrust-->25<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
 而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
 條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。
 
 **2026-10-11 嘅 攻擊由邊度嚟 section 加咗 18 對 (site, helper),全部嚟自 `attack_section`,唔係因為
 加咗 session。** 14 對有 corpus 撐住；4 對(`app`、`apl`、`lpp`、`app_w` 嘅 `quant`)靠信,原因同
 上面幾個 `_pct` 一樣:`permille` 已經 floor 咗,再 `quant` 去三個位係精確嘅,所以呢四對都係結構性
-咁靠信,多幾個 session 都唔會變。上面嗰幾個 fragment 由 22 / 15 / 7 跳到而家嘅數,就係呢 18 對。
+咁靠信,多幾個 session 都唔會變。上面嗰幾個 fragment 嗰陣由 22 / 15 / 7 跳到 40 / 29 / 11,就係呢 18 對(之後再郁嘅,見下面 10-29 嗰段之後)。
 
 **但第六對會,而且已經變咗六次 —— 呢個先係「有冇數撐住」點解要度而唔係估。** `records._dp1`
 喺七個 session 之下分得開 floor 同 ceil(當時 14 個 call),分唔開 floor 同 round(0 個
@@ -5640,6 +5679,9 @@ round 欄係 0(14.1x 嘅 ceil 同 round 都出 14.2),入咗靠信,呢個就係 s
 (`sd_long` 14.2846,ceil 同 round 都出 14.3)冇轉類別,照舊靠信。拆開之前成欄由兩個數話事,一個分得開
 就撐得住;拆開之後得一個數,佢一落喺半格嘅同一邊,成個 site 就跌落靠信 —— 即係拆開令呢欄更易轉類別,
 唔係更穩。
+
+**2026-10-30 嘅 每粒攻擊 section 再加咗 53 對 (site, helper),全部嚟自六個 `app_*` module,冇加
+session。** 上面幾個 gated fragment 而家嘅數就係咁嚟;總數唔喺呢度再寫,淨係住喺嗰幾個 fragment。
 
 **同一個 session 入面,兩個 gated 嘅數一個 byte 都冇郁,而佢哋數緊嗰個 set 換咗兩個成員 ——
 呢個先係今次最值得記低嘅嘢。** 上面段嗰兩個 fragment(enforced 同 ontrust)十二同十三個

@@ -344,6 +344,12 @@ jobs:
       - name: Check no generated CSS reaches outside its region
         run: python3 -m pipeline.check_generated_css "sessions/${{ matrix.session }}/report"
 
+      # 每粒攻擊 (the `app` region): built twice byte-identical, renders the same with every
+      # player name renamed (and no typed name survives), its CSS stays in #app, and no app_*
+      # module rounds outside fmt — each property with a planted mutant that must be caught.
+      - name: Selftest the 每粒攻擊 section
+        run: python3 -m pipeline.app_section --selftest "sessions/${{ matrix.session }}/report"
+
       # `finesse.faults` counts fault EVENTS and `pieces` counts pieces — 1.580
       # faults per faulty piece pooled — so faults/pieces (16.83%) and the share
       # of pieces that were faulty (10.65%) are different numbers. The tape chart
