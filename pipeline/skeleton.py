@@ -1055,6 +1055,10 @@ LAYOUT = [
     ("region", "matches", _matches_fallback),
     ("comment", "數據對決"),
     ("region", "stats", _stats_fallback),
+    # 每粒攻擊 is unconditional (every session has facts.json), so it is PLACED here rather than
+    # self-inserting; routes-techniques then inserts before the moments marker, i.e. after it.
+    ("comment", "每粒攻擊"),
+    ("region", "app", None),
     ("comment", "關鍵時刻"),
     ("region", "moments", None),
     ("comment", "全場之最"),
