@@ -421,6 +421,14 @@ bun pipeline/sim/emit-technique-demos.ts --technique basicdonating \
   --out analysis/basicdonating-demos.json                      # its constructed demos (quarantined; none built, each board's reason published); emit AFTER the facts
 bun test pipeline/openers/basicdonating.test.ts pipeline/openers/basicdonating-demos.test.ts  # its two tests
 python3 -m pipeline.basicdonating_page --selftest # the docs/basicdonating*.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.extract_kingcrimson_shapes            # CI gate: the King Crimson technique transcription (harddrop's page)
+python3 -m pipeline.openers.extract_kingcrimson_shapes --selftest #   its mutants; --html-dir/--wikitext-dir <dir> re-checks King_Crimson, T-Spin_Triple_Setups and Super_T-Spin_Double .wikitext
+bun pipeline/sim/emit-technique-facts.ts --technique kingcrimson \
+  --out analysis/kingcrimson-facts.json                        # King Crimson's corpus artefact (quarantined; a TST into an STSD)
+bun pipeline/sim/emit-technique-demos.ts --technique kingcrimson \
+  --out analysis/kingcrimson-demos.json                        # its constructed demos (quarantined); emit AFTER the facts
+bun test pipeline/openers/kingcrimson.test.ts pipeline/openers/kingcrimson-demos.test.ts  # its two tests
+python3 -m pipeline.kingcrimson_page --selftest   # the docs/kingcrimson*.html audit's mutants (--out-dir <dir> renders)
 python3 -m pipeline.openers.extract_dpc_setups            # CI gate: the DPC setups of とんぼ's video
 python3 -m pipeline.openers.extract_dpc_setups --selftest #   its mutants; --video <mp4> re-reads every board off the video
 bun pipeline/sim/emit-dpc-facts.ts --out analysis/dpc-facts.json  # the first T-spin after each PC, against those setups (quarantined)
@@ -4473,7 +4481,7 @@ fail. Their matchable children whose parent is never filed are named in `CLASSIF
 The shared edit moved every sibling's artefacts in their md5 lines only and none of their pages
 (no sibling profile names a `uFiresBefore` node, so `noUBefore` cannot reach them).
 
-## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト）— every mid-game technique page, quarantined like the route pages
+## 中盤手法頁（STSD、STMB Cave、インペリアルクロス、ダブルダガー、BT砲、千鳥格子、社畜トレイン、欄干、階段のドネイト、途中DT砲、基本的なドネイト、King Crimson）— every mid-game technique page, quarantined like the route pages
 
 shiwehi.com's 「中盤テンプレ・ドネイト」 pages draw a technique on a PARTIAL stack, at whatever lock it
 happens, which the route machinery cannot express: `route-facts.ts` compares whole boards (at most 8
@@ -4481,7 +4489,7 @@ rows, bottom-aligned) at fixed lock counts from an empty board, behind a bag-1 g
 pages are a SIBLING framework that imports the route code and edits none of it — no route artefact's
 hash line and no route page moved when it landed. STSD (`template/stsd.php`) is the first page,
 STMB Cave (`template/stmbcave.php`) the second, インペリアルクロス (`template/imperialcross.php`) the third and
-ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth and 基本的なドネイト (`template/basicdonating.php`) the eleventh (each later one has a ### below); a later technique whose shape the window
+ダブルダガー (`template/doubledagger.php`) the fourth, BT砲 (`template/btcannon.php`) the fifth, 千鳥格子 (`template/cutcopy.php`) the sixth, 社畜トレイン (`template/shachikutrain.php`) the seventh, 欄干 (`template/parapet.php`) the eighth, 階段のドネイト (`template/kaidansetup.php`) the ninth, 途中DT砲 (`template/dtcannon.php`) the tenth, 基本的なドネイト (`template/basicdonating.php`) the eleventh and King Crimson (harddrop's `King_Crimson`, the first not from shiwehi.com) the twelfth (each later one has a ### below); a later technique whose shape the window
 predicate can express is a data addition (a transcription
 module + JSON, a facts profile, a demos profile, a page profile + prose, one registry line per side,
 two tests, three CI steps, one `TECHNIQUE_SITES` entry).
@@ -5310,9 +5318,39 @@ carries `donation: {columns, box, t_cells}`; `t_cells` is what the page's thumbn
 multiples of four (a planner limit), and most boards drawing the donated pieces and the T in one diagram with no board of the
 pieces placed before the T; `basicdonating-demos.test.ts` re-derives each reason by kind. Named lists and sizes live in the tests.
 
-### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other seven pages
+### King Crimson
 
-STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト and 途中DT砲 carry the same build rules as 社畜トレイン
+The same deliverable for harddrop's `King_Crimson` page (「a T-Spin Triple layered on top of a Super T-Spin Double」):
+`pipeline/openers/kingcrimson-technique.json` (held as a literal in `extract_kingcrimson_shapes.py`, gated by the shared
+`technique_transcription.py`), `technique-profile-kingcrimson.ts` → `analysis/kingcrimson-facts.json` (`kingcrimson.test.ts`),
+`technique-demos-kingcrimson.ts` → `analysis/kingcrimson-demos.json` (`kingcrimson-demos.test.ts`), and `docs/kingcrimson.html` +
+`docs/kingcrimson-demos.html` from `kingcrimson_page.py` + `kingcrimson_prose.json`, the twelfth card under 中盤手法 (yachi's
+request, 2026-10-29). Every figure is read off the artefacts and tests, never typed here.
+
+**The first technique page whose primary source is not shiwehi.com**, which draws no King Crimson (measured 2026-10-29: its
+template index lists none). The page is a pinned MediaWiki revision (oldid, `revision_sha1`, our sha256 and bytes, read with
+urllib through `api.php`, never curl), and so are the two other harddrop pages whose King Crimson drawings join the agreement
+set (T-Spin_Triple_Setups, Super_T-Spin_Double, each selected by that page's own King Crimson label, never by the window);
+`check_wikitext_sources` discovers all three by structure and re-reads them weekly with `--wikitext-dir`. harddrop never mutes a
+cleared row, so every spin board is a named `:muting` discrepancy (`muting_slips`); the readings (`p` the placed T, `s` one cell
+of the S drawn lighter, `Q` the light-grey stack) are in the JSON's `legend` / `reading`, and the page renders `q` muted.
+
+**The spin is a TST and the anchor is the T STOOD UP, nub toward the open side; the follow-up is the STSD under it**, a full
+T-spin Double the engine credits (`followup.lines` 2). The TST's cleared rows are all above the lower slot, so the follow-up slot
+is not split (`followupNoRowmap` is measured equivalent and named). No shared RULE file changed: the matcher already carried a TST
+opportunity with a TSD follow-up. **The window is the agreement box** of the four drawings on this page and the two on the other
+pages; what discriminates is the STSD slot under the T alone (the rows above and the cleared rows each admit every scored full
+TST), measured per part in the test. The follow-up lock of a King Crimson is an STSD hit in the OPPOSITE hand (STSD draws its T
+nub left, King Crimson its STSD nub right): `kingcrimson.test.ts` pins every such pair (`STSD_FOLLOWUPS`) and the hand flip.
+**Qualify**: the key cells are the overhang row over the well (`QUALIFY_OPTIONS.kingcrimson`), not the default roof cells, whose
+third cell is the well's wall the drawings show as grey stack. The `kingcrimson` entry in `technique-qualify.ts` moved every
+artefact hashing that module (the other eight pages of the section below, plus `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`) in
+its hash lines only. Named lists and their sizes live in the two tests. The demo page's quarantine sentence names the profile's
+`opportunity` (`technique_page.py`'s `OPP_WORD`; every other page's is TSD, so their pages did not move).
+
+### 用完整方塊砌出嚟先算 — the shared `qualify` hook of the other nine pages
+
+STSD, STMB Cave, インペリアルクロス, ダブルダガー, BT砲, 千鳥格子, 階段のドネイト, 途中DT砲 and King Crimson carry the same build rules as 社畜トレイン
 and 欄干 (yachi, 2026-10-23: 「睇埋其他中盤」), through ONE module, `pipeline/sim/technique-qualify.ts`
 (`techniqueQualifier`, `QUALIFY_OPTIONS`), gated by `pipeline/openers/technique-qualify.test.ts`. A hit qualifies iff each of
 its variant's KEY cells is a cell of a complete piece and never garbage (`fragment`, `garbage_in_shape`), a piece the page
@@ -5326,10 +5364,10 @@ fresh would have failed hits nobody would call accidental. No overlap rule was a
 name (BT砲 / 欄干, 千鳥格子 uncut / STMB Cave, 階段 / 社畜), BT砲 and uncut hold no corpus hit and the last is excluded on
 社畜's side. The test pins each artefact's per-player tally and, where few fail, every failing hit by name; re-derives every
 committed verdict from the digests; and turns each rule off to see it qualify exactly the hits failing only that rule, and
-requires each rule live somewhere in the corpus. Every one of the eight pages is `corpus_qualified_only`; on 千鳥格子 the
+requires each rule live somewhere in the corpus. Every one of the nine pages is `corpus_qualified_only`; on 千鳥格子 the
 精選 set is drawn from qualifying hits only. Which hits fail, and how many, is the test's, never this file's — only that
 階段のドネイト is the page where most fail (its Z split by a clear, or garbage in its steps). Editing `technique-qualify.ts`
-moves all eight pages' facts and demos hash lines (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`); 社畜トレイン's and 欄干's artefacts do not hash it.
+moves all nine pages' facts and demos hash lines (and `cutcopy-own.json` / `cutcopy-selfplay.json`'s `classifier_md5`); 社畜トレイン's and 欄干's artefacts do not hash it.
 
 ### 成個形狀 — the whole drawn shape, a rule every page adds (since 2026-10-25)
 

@@ -142,6 +142,8 @@ class TechniqueSite:
         self.SP = self.PROSE["selfplay"] if p.selfplay_rel else None
         #: every variant the pages print, the primary first: (variant id, its opportunity's denominators key)
         self.VARIANTS = ((p.variant, p.opportunity),) + tuple(p.more_variants)
+        #: the spin the demo page's quarantine sentence names (King Crimson's is a TST; every other page's a TSD)
+        self.OPP_WORD = p.opportunity
 
     # ------------------------------------------------------------ inputs
 
@@ -556,7 +558,7 @@ class TechniqueSite:
                 '  </header>',
                 '  <div class="method-note">',
                 '    <p><strong>呢版唔屬於信任鏈。</strong>每個盤面都係<strong>一個 replay 模擬器</strong>'
-                '（Triangle 引擎）重跑操作記錄推導出嚟，冇第二份獨立實作；邊一下 TSD 對到呢個形亦係由佢推出嚟。'
+                f'（Triangle 引擎）重跑操作記錄推導出嚟，冇第二份獨立實作；邊一下 {self.OPP_WORD} 對到呢個形亦係由佢推出嚟。'
                 f'所以呢版<strong>{RS.NO_CLAIM}</strong>。</p>']
         out += [f"    <p>{s}</p>" for s in self.PAGE_SENTENCES]
         out += [f"    <p>{RS.HOLE_SENTENCE}</p>", "  </div>"]

@@ -9,7 +9,7 @@ from pipeline import gamushiro_page, hdgamushiro_page, honey_cup_page, mountaino
 from pipeline import stray_cannon_page
 from pipeline import btcannon_page, doubledagger_page, imperialcross_page, stmbcave_page, stsd_page
 from pipeline import cutcopy_page, shachikutrain_page, parapet_page, kaidan_page, dtcannon_page
-from pipeline import basicdonating_page
+from pipeline import basicdonating_page, kingcrimson_page
 
 #: every opener route site, in the order its card appears under 定式路線
 ROUTE_SITES = [stray_cannon_page.SITE, honey_cup_page.SITE, mountainous2_page.SITE, stickspin_page.SITE,
@@ -26,4 +26,5 @@ if sorted(map(id, INDEX_ROUTE_SITES)) != sorted(map(id, ROUTE_SITES + PAGE_ONLY_
 #: every mid-game technique site, in the order its card appears under 中盤手法
 TECHNIQUE_SITES = [stsd_page.SITE, stmbcave_page.SITE, imperialcross_page.SITE, doubledagger_page.SITE,
                    btcannon_page.SITE, cutcopy_page.SITE, shachikutrain_page.SITE, parapet_page.SITE,
-                   kaidan_page.SITE, dtcannon_page.SITE, basicdonating_page.SITE]
+                   kaidan_page.SITE, dtcannon_page.SITE, basicdonating_page.SITE,
+                   kingcrimson_page.SITE]

@@ -52,6 +52,9 @@ export const QUALIFY_OPTIONS: Record<string, TechniqueQualifyOptions> = {
   // the overhang over the TST stem: the one window cell every build places as a piece (the rest of the roof is
   // drawn as stack on some of them)
   dtcannon: { keyCells: { dtcannon: [[1, 2]] } },
+  // King Crimson: the overhang over the well (row 0, over the wall and the well), which every drawing roofs the
+  // well with; the wall under it (roof_cells' third cell) is the stack the page draws grey, so it is not a key cell
+  kingcrimson: { keyCells: { kingcrimson: [[0, 6], [0, 7]] } },
 };
 
 export interface TechniqueQualifyMutants { allowFragments?: boolean; allowGarbage?: boolean; allowSplit?: boolean;
