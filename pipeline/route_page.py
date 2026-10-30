@@ -771,7 +771,8 @@ class RouteSite:
             g = group_of(c)
             ver = "已核" if c["verified"] else self.PROSE["unverified"]
             out.append(f'    <tr data-case="{_esc(case_key(c))}"><td>{_esc(c["session"])}</td>'
-                       f'<td>m{c["match"]}r{c["round"]}</td><td>{_esc(c["player"])}</td>'
+                       f'<td><a href="{_esc(c["session"])}-replay.html#m{c["match"]}r{c["round"]}">m{c["match"]}r{c["round"]}</a></td>'
+                       f'<td>{_esc(c["player"])}</td>'
                        f'<td>{"反轉" if c["bag1"]["mirrored"] else "原樣"}</td>'
                        f'<td><a href="{self.p.prefix}-{self.page_of(c)}.html#{round_key(c)}@p{{POS:{case_key(c)}}}">'
                        f'{_esc(self.node_name(g, by_id))}</a></td><td>{_esc(ver)}</td></tr>')

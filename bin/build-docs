@@ -55,7 +55,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import dpc_page, replay_labels, secondpc_page, technique_page  # noqa: E402
+from pipeline import dpc_page, replay_labels, replay_links, secondpc_page, technique_page  # noqa: E402
 from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -415,10 +415,24 @@ def main(argv=None):
             print(f"FAIL {session}/{artefact} has no facts*.json — its headline numbers "
                   f"cannot be derived, so it cannot be published", file=sys.stderr)
             return 1
+        # A session's report is published with every match and round it names linked to that
+        # night's replay page (replay_links.py), which exists exactly when sim/replay-facts.json
+        # does. A subset re-numbers its matches, so its report is copied byte for byte.
+        linked = None
+        if _root(session) is SESSIONS and (SESSIONS / session / replay_section.FACTS_REL).exists():
+            facts = json.loads((src.parent / "facts.json").read_text(encoding="utf-8"))
+            linked, lk = replay_links.link_report(src.read_text(encoding="utf-8"), session,
+                                                  replay_links.rounds_of(facts),
+                                                  replay_links.files_of(facts))
         if check:
             dst = DOCS / out_name
-            if not dst.exists() or not filecmp.cmp(src, dst, shallow=False):
+            if linked is not None:
+                if not dst.exists() or dst.read_text(encoding="utf-8") != linked:
+                    drift.append(f"docs/{out_name} differs from its linked render of {src.relative_to(REPO)}")
+            elif not dst.exists() or not filecmp.cmp(src, dst, shallow=False):
                 drift.append(f"docs/{out_name} differs from {src.relative_to(REPO)}")
+        elif linked is not None:
+            (DOCS / out_name).write_text(linked, encoding="utf-8")
         else:
             shutil.copyfile(src, DOCS / out_name)
         cards.append(
@@ -437,7 +451,9 @@ def main(argv=None):
                 totals["matches"] += summary["matches"]
                 totals["rounds"] += summary["rounds"]
         if not check:
-            print(f"  copied {src.relative_to(REPO)} -> docs/{out_name}")
+            how = (f"linked ({lk.linked} replay links, {len(lk.unresolved)} left plain)"
+                   if linked is not None else "copied")
+            print(f"  {how} {src.relative_to(REPO)} -> docs/{out_name}")
 
     # Self-contained tool pages, copied verbatim. The cc-coach replay pages are rendered by
     # tools/cc-coach/clips/build-anim.py from a simulator run; they are published here, never

@@ -166,7 +166,9 @@ class SecondPcSite:
                 '    <div class="scp-grid">']
         for c in art["cases"]:
             what = Wd[c["outcome"]] + (" " + "、".join(c["solutions"] or c["setups"]) if c["setups"] else "")
-            out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(case_key(c))}</h4>'
+            # The round only: the audited case link, with its position, is the row's below.
+            href = f'{c["session"]}-replay.html#m{c["match"]}r{c["round"]}'
+            out.append(f'    <div class="scp-node"><h4 class="scp-name"><a href="{_esc(href)}">{_esc(case_key(c))}</a></h4>'
                        f'{board_svg(draw_rows(c["layout"]), case_key(c), RT.PIECE_CLASS)}'
                        f'<p class="scp-tag">{_esc(what)}</p></div>')
         out += ["    </div>", '    <div class="scp-index-wrap"><table class="scp-table">',
