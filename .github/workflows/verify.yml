@@ -717,6 +717,10 @@ jobs:
       # out-of-range and raw-text cases, the openers table's export numbering and that refusal.
       - name: Check the replay-link pass
         run: python3 -m pipeline.replay_links --selftest
+      # Every published report's section titles link to their own section (pipeline/section_anchors.py);
+      # every render refuses a pass that changes the page's text or links a title anywhere else.
+      - name: Check the section-anchor pass
+        run: python3 -m pipeline.section_anchors --selftest
 
       # The replay pages' opener / technique labels are re-checked against each page's own
       # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a

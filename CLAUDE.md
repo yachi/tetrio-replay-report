@@ -276,6 +276,7 @@ python3 -m pipeline.check_replay_section sessions/<date>/report  # CI gate: the 
 python3 -m pipeline.check_replay_section sessions/<date>/report --selftest  #   and stays quarantined
 python3 -m pipeline.replay_page --selftest      # the docs/<date>-replay.html audit's mutants
 python3 -m pipeline.replay_links --selftest     # docs/<date>.html's match/round → replay links
+python3 -m pipeline.section_anchors --selftest # docs/<date>.html's section titles → #<section id>
 python3 -m pipeline.openers.extract_meisou_routes            # CI gate: the 迷走砲 route transcription
 python3 -m pipeline.openers.extract_meisou_routes --selftest #   its mutants; --html-dir <dir> re-checks a refetch
 bun pipeline/sim/emit-stray-cannon-facts.ts \
@@ -682,6 +683,10 @@ equivalent marker pair.
   that changes the page's text. report.html is untouched, so every report gate is unaffected. The
   openers region's per-match table numbers 第 N 場 by EXPORT number (`opener_section._match_label`),
   so the pass links it through the file map; anywhere else N is the position. Subsets are copied.
+  **Since 2026-10-31 every published report (subsets included) then goes through
+  `pipeline/section_anchors.py`**: each section's first `h2.section-title` links to its own `#<id>`
+  (text outside any existing link is wrapped, so 最癲一局's replay link is kept), with the same
+  refuse-a-text-change check. report.html is still untouched.
 - **I commit; the user pushes.** `git push` and remote changes are blocked for the agent.
   Stage, commit with a Conventional Commit message, then tell the user to push.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
