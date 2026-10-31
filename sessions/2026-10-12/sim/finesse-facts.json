@@ -3,42 +3,28 @@
  "session": "2026-10-12",
  "report_eligible": false,
  "source": "vendored Triangle engine (pipeline/sim/vendor/teto): falling.keys per lock against an empty-board Dijkstra over the engine's own Tetromino and kick table",
- "rule": "excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece whose own key presses include softDrop, or whose cells no empty-board path reaches, is not scored and counts as perfect. The rule is fitted to TETR.IO's counters, which publish no algorithm.",
+ "rule": "excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece carrying the engine's soft-drop flag when it locks (set on the falling piece when softDrop is released, cleared at spawn), or whose cells no empty-board path reaches, is not scored and counts as perfect. Checked by hand on 2026-10-31 against the TETR.IO client's own finesse code (2026-10-23 build); no TETR.IO code is in this repo, so nothing re-derives that check.",
  "not_eligible_because": [
-  "the rule is fitted, not published by TETR.IO; which placement carried a fault has no second implementation"
+  "one simulator: which placement carried a fault has no second implementation and no per-piece counter"
  ],
  "placement": "piece + shape index into emit-replay SHAPES (cells from the bottom-left, y up) + leftmost column (0-based)",
  "top_n": 10,
  "anchor": {
   "rounds": 110,
-  "agree": 109,
+  "agree": 110,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-10-12-08.ttrm",
-    "round": 1,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 167,
-     "faults": 44
-    },
-    "replay": {
-     "perfect": 168,
-     "faults": 43
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
    "user": "pinglamb",
    "rounds": 55,
    "pieces": 4715,
-   "scored": 4310,
-   "faulty": 510,
-   "faults": 917,
+   "scored": 4304,
+   "faulty": 509,
+   "faults": 916,
    "not_scored": {
-    "soft_drop": 405,
+    "soft_drop": 411,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,
@@ -597,11 +583,11 @@
    "user": "yachi",
    "rounds": 55,
    "pieces": 5183,
-   "scored": 4808,
+   "scored": 4809,
    "faulty": 494,
    "faults": 865,
    "not_scored": {
-    "soft_drop": 375,
+    "soft_drop": 374,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,

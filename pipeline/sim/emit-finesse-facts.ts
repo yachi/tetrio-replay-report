@@ -4,8 +4,12 @@
  *   REPLAY_DIR=sessions/2026-10-29 bun pipeline/sim/emit-finesse-facts.ts \
  *     --out sessions/2026-10-29/sim/finesse-facts.json
  *
- * TETR.IO publishes no finesse algorithm, so the rule here is FITTED, and the anchor is what licenses
- * printing anything from it. Every player-round is re-run through the vendored Triangle engine
+ * The rule is TETR.IO's own: on 2026-10-31 the client's `_InternalFinesse` (tetr.io/js/tetrio.js,
+ * the 2026-10-23 build) was read and this rule checked against it — its lookup table equals the
+ * empty-board Dijkstra below at all 240 in-board (piece, rotation, column) positions, and its soft-drop
+ * exemption is the engine's ACTION_SOFTDROP flag. That check was done by hand with a scratch probe; no
+ * TETR.IO code or table is in this repo, so nothing here re-derives it, and the anchor is still what
+ * licenses printing anything. Every player-round is re-run through the vendored Triangle engine
  * (byte-identical to @haelp/teto), and every lock is scored:
  *
  *   - the engine's own input counter `falling.keys` (+1 per left/right keydown, +1 per CW/CCW,
@@ -15,9 +19,12 @@
  *     wall 1, CW/CCW 1, 180 2). Cells are keyed by shape (absolute columns, rows relative to the
  *     lowest), so a symmetric piece's orientations that cover the same cells are one placement;
  *   - excess = keys − target. excess > 0 adds `excess` fault events; otherwise the piece is perfect;
- *   - a piece whose own key presses (since the last lock, restarted on hold) include softDrop is
- *     NOT scored and counts as perfect, as is a piece whose cells no empty-board path reaches (a
- *     tuck under an overhang).
+ *   - a piece carrying the engine's ACTION_SOFTDROP flag when it locks is NOT scored and counts as
+ *     perfect, as is a piece whose cells no empty-board path reaches (a tuck under an overhang). The
+ *     flag is set on the piece falling when softDrop is RELEASED and cleared when a piece spawns, so a
+ *     soft drop pressed before a piece spawned and released while it falls exempts that piece, and one
+ *     pressed on a piece but released only after it locked does not. (The rule before 2026-10-31 asked
+ *     whether softDrop was PRESSED on the piece's own keys; the test keeps it as a mutant.)
  *
  * ANCHOR: per player-round, the engine's perfect-piece count and fault count against the replay's
  * own `results.stats.finesse.perfectpieces` / `.faults`. Where both agree, the rule reproduces
@@ -114,8 +121,12 @@ export type Piece = {
 
 /** One player-round through the engine: every lock's input count, its target and the key presses
  *  the player made on that piece. */
-/** `mutant` exists for the test only: `scoreSoftDrop` drops the softDrop skip. */
-export function runRound(c: any, tables: Map<string, Table>, mutant: { scoreSoftDrop?: boolean } = {}) {
+/** `mutant` exists for the test only: `scoreSoftDrop` drops the soft-drop exemption, `softDropOnPress`
+ *  exempts a piece on whose own keys softDrop was pressed (the rule before 2026-10-31). */
+export type Mutant = { scoreSoftDrop?: boolean; softDropOnPress?: boolean };
+const ACTION_SOFTDROP = 4096; // engine/constants flags.ACTION_SOFTDROP, as TETR.IO's client
+
+export function runRound(c: any, tables: Map<string, Table>, mutant: Mutant = {}) {
   const player = c.rawPlayer, o = player.replay.options;
   const players = c.rawRound.map((p: any) => ({ gameid: p.replay.options.gameid, userid: p.id, username: p.username }));
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
@@ -134,12 +145,13 @@ export function runRound(c: any, tables: Map<string, Table>, mutant: { scoreSoft
   eng.events.on('falling.lock.pre', () => {
     const f = eng.falling;
     pre = { piece: String(f.symbol).toUpperCase(), keys: f.keys as number,
-            cells: f.absoluteBlocks.map((b: number[]) => [b[0], b[1]] as [number, number]) };
+            cells: f.absoluteBlocks.map((b: number[]) => [b[0], b[1]] as [number, number]),
+            softDropFlag: (eng.state & ACTION_SOFTDROP) !== 0 };
   });
   const pieces: Piece[] = [];
   eng.events.on('falling.lock', () => {
     const t = tables.get(pre.piece)!.get(shapeKey(pre.cells));
-    const sd = own.includes('softDrop');
+    const sd = mutant.softDropOnPress ? own.includes('softDrop') : pre.softDropFlag;
     const scored = t !== undefined && (!sd || !!mutant.scoreSoftDrop);
     const excess = scored ? Math.max(0, pre.keys - t!.cost) : 0;
     const { shape, col } = placementOf(pre.piece, pre.cells);
@@ -155,7 +167,7 @@ export function runRound(c: any, tables: Map<string, Table>, mutant: { scoreSoft
 
 const TOP = 10;
 
-export function build(dir: string, mutant: { scoreSoftDrop?: boolean } = {}) {
+export function build(dir: string, mutant: Mutant = {}) {
   const tables = new Map<string, Table>();
   const anchor = { rounds: 0, agree: 0, unknown: 0, exceptions: [] as any[] };
   const P: Record<string, any> = {};
@@ -212,11 +224,13 @@ export function build(dir: string, mutant: { scoreSoftDrop?: boolean } = {}) {
     source: 'vendored Triangle engine (pipeline/sim/vendor/teto): falling.keys per lock against an empty-board '
       + 'Dijkstra over the engine\'s own Tetromino and kick table',
     rule: 'excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, '
-      + 'CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece whose own '
-      + 'key presses include softDrop, or whose cells no empty-board path reaches, is not scored and counts '
-      + 'as perfect. The rule is fitted to TETR.IO\'s counters, which publish no algorithm.',
+      + 'CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece carrying the '
+      + 'engine\'s soft-drop flag when it locks (set on the falling piece when softDrop is released, cleared at '
+      + 'spawn), or whose cells no empty-board path reaches, is not scored and counts as perfect. Checked by '
+      + 'hand on 2026-10-31 against the TETR.IO client\'s own finesse code (2026-10-23 build); no TETR.IO code '
+      + 'is in this repo, so nothing re-derives that check.',
     not_eligible_because: [
-      'the rule is fitted, not published by TETR.IO; which placement carried a fault has no second implementation',
+      'one simulator: which placement carried a fault has no second implementation and no per-piece counter',
     ],
     placement: 'piece + shape index into emit-replay SHAPES (cells from the bottom-left, y up) + leftmost column (0-based)',
     top_n: TOP,

@@ -3,30 +3,17 @@
  "session": "2026-09-18",
  "report_eligible": false,
  "source": "vendored Triangle engine (pipeline/sim/vendor/teto): falling.keys per lock against an empty-board Dijkstra over the engine's own Tetromino and kick table",
- "rule": "excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece whose own key presses include softDrop, or whose cells no empty-board path reaches, is not scored and counts as perfect. The rule is fitted to TETR.IO's counters, which publish no algorithm.",
+ "rule": "excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece carrying the engine's soft-drop flag when it locks (set on the falling piece when softDrop is released, cleared at spawn), or whose cells no empty-board path reaches, is not scored and counts as perfect. Checked by hand on 2026-10-31 against the TETR.IO client's own finesse code (2026-10-23 build); no TETR.IO code is in this repo, so nothing re-derives that check.",
  "not_eligible_because": [
-  "the rule is fitted, not published by TETR.IO; which placement carried a fault has no second implementation"
+  "one simulator: which placement carried a fault has no second implementation and no per-piece counter"
  ],
  "placement": "piece + shape index into emit-replay SHAPES (cells from the bottom-left, y up) + leftmost column (0-based)",
  "top_n": 10,
  "anchor": {
   "rounds": 254,
-  "agree": 251,
+  "agree": 253,
   "unknown": 0,
   "exceptions": [
-   {
-    "file": "replay-2026-09-18-03.ttrm",
-    "round": 1,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 117,
-     "faults": 14
-    },
-    "replay": {
-     "perfect": 116,
-     "faults": 17
-    }
-   },
    {
     "file": "replay-2026-09-18-05.ttrm",
     "round": 2,
@@ -39,19 +26,6 @@
      "perfect": 47,
      "faults": 11
     }
-   },
-   {
-    "file": "replay-2026-09-18-16.ttrm",
-    "round": 7,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 62,
-     "faults": 14
-    },
-    "replay": {
-     "perfect": 63,
-     "faults": 13
-    }
    }
   ]
  },
@@ -60,11 +34,11 @@
    "user": "pinglamb",
    "rounds": 127,
    "pieces": 11498,
-   "scored": 10516,
+   "scored": 10511,
    "faulty": 1294,
-   "faults": 1990,
+   "faults": 1992,
    "not_scored": {
-    "soft_drop": 982,
+    "soft_drop": 987,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,
@@ -611,11 +585,11 @@
    "user": "yachi",
    "rounds": 127,
    "pieces": 11926,
-   "scored": 11059,
+   "scored": 11054,
    "faulty": 1277,
    "faults": 2085,
    "not_scored": {
-    "soft_drop": 867,
+    "soft_drop": 872,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,

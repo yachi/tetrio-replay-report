@@ -2,12 +2,13 @@
  * The finesse-placements artefact (`sessions/<date>/sim/finesse-facts.json`, from `emit-finesse-facts.ts`).
  *
  *   1. byte identity — every committed artefact is what `build()` produces now.
- *   2. the anchor — per player-round, the fitted rule's perfect-piece and fault counts against the
+ *   2. the anchor — per player-round, the rule's perfect-piece and fault counts against the
  *      replay's own `results.stats.finesse`, with every disagreeing player-round pinned by NAME and
  *      compared exactly. A new disagreement, or a vanished one, is a red build to investigate, never a
  *      number absorbed under a bound (the `DT_ORDER_IN_OPENER` rule).
  *   3. the empty-board table, hand-checked on placements whose finesse is standard.
- *   4. the softDrop skip is load-bearing: without it the anchor collapses (a mutant, measured).
+ *   4. the soft-drop exemption is load-bearing: without it the anchor collapses, and exempting on PRESS
+ *      (the rule before 2026-10-31) instead of TETR.IO's release flag loses agreement (two mutants).
  *
  * Run: bun test pipeline/sim/finesse-facts.test.ts   (rebuilds every session, ~25 s)
  */
@@ -28,41 +29,28 @@ const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/finesse-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
 
-/** Player-rounds where the fitted rule's counts are not TETR.IO's. Several are rounds where the engine
- *  locks a piece past the game's own `piecesplaced` (attack-facts.test.ts LOCKS_PAST_END) or where a
- *  softDrop near a hold moves which piece the skip lands on; none is explained piece by piece. */
-const ANCHOR_EXCEPTIONS = [
-  'replay-2026-07-22-9.ttrm r1 yachi perfect 76/76 faults 14/13',
-  'replay-2026-07-24-2.ttrm r4 pinglamb perfect 132/133 faults 30/28',
-  'replay-2026-07-28-1.ttrm r0 yachi perfect 33/33 faults 4/3',
-  'replay-2026-07-28-4.ttrm r2 pinglamb perfect 113/112 faults 45/53',
-  'replay-2026-07-28-7.ttrm r8 yachi perfect 77/77 faults 18/16',
-  'replay-2026-08-01-4.ttrm r7 pinglamb perfect 38/37 faults 8/15',
-  'replay-2026-08-01-8.ttrm r0 pinglamb perfect 181/182 faults 37/36',
-  'replay-2026-08-09-1.ttrm r2 yachi perfect 93/93 faults 22/21',
-  'replay-2026-08-09-4.ttrm r3 pinglamb perfect 47/48 faults 12/8',
-  'replay-2026-08-09-6.ttrm r2 pinglamb perfect 128/129 faults 30/28',
-  'replay-2026-08-19-1.ttrm r0 pinglamb perfect 102/103 faults 41/38',
-  'replay-2026-08-19-10.ttrm r0 pinglamb perfect 95/94 faults 11/11',
-  'replay-2026-08-19-5.ttrm r0 pinglamb perfect 28/28 faults 6/5',
-  'replay-2026-08-19-8.ttrm r1 pinglamb perfect 100/101 faults 24/21',
-  'replay-2026-08-25-03.ttrm r1 pinglamb perfect 222/223 faults 46/44',
-  'replay-2026-08-25-05.ttrm r5 yachi perfect 62/64 faults 13/11',
-  'replay-2026-09-03-01.ttrm r4 yachi perfect 81/82 faults 8/7',
-  'replay-2026-09-10-02.ttrm r2 yachi perfect 55/54 faults 7/11',
-  'replay-2026-09-10-07.ttrm r3 pinglamb perfect 44/45 faults 16/14',
-  'replay-2026-09-11-01.ttrm r6 yachi perfect 82/81 faults 31/32',
-  'replay-2026-09-11-07.ttrm r4 pinglamb perfect 134/135 faults 27/26',
-  'replay-2026-09-17-05.ttrm r0 pinglamb perfect 98/99 faults 30/29',
-  'replay-2026-09-18-03.ttrm r1 pinglamb perfect 117/116 faults 14/17',
-  'replay-2026-09-18-05.ttrm r2 yachi perfect 46/47 faults 16/11',
-  'replay-2026-09-18-16.ttrm r7 pinglamb perfect 62/63 faults 14/13',
-  'replay-2026-10-03-13.ttrm r4 pinglamb perfect 134/135 faults 18/17',
-  'replay-2026-10-09-06.ttrm r4 pinglamb perfect 61/62 faults 20/17',
-  'replay-2026-10-12-08.ttrm r1 pinglamb perfect 167/168 faults 44/43',
-  'replay-2026-10-22-01.ttrm r6 pinglamb perfect 100/101 faults 12/10',
-  'replay-2026-10-22-09.ttrm r3 yachi perfect 107/106 faults 27/17',
-  'replay-2026-10-29-02.ttrm r0 pinglamb perfect 105/104 faults 22/30',
+/** Player-rounds where the engine's counts are not TETR.IO's, each with its reason.
+ *  - `admission`: the engine's whole round already differs from the game's (pieces, lines or garbage;
+ *    replay.test.ts ADMISSION_EXCEPTIONS), so the board the finesse is read on is not the game's.
+ *    The test checks each against that round's `replay-facts.json` admission verdict.
+ *  - `unexplained`: the round is admitted and still differs by one piece; not explained piece by piece.
+ *  Until 2026-10-31 this list held 31 rounds under the rule that exempted a piece on whose keys softDrop
+ *  was PRESSED; TETR.IO exempts the piece falling when it is RELEASED, which accounts for 17 of them. */
+const ANCHOR_EXCEPTIONS: [string, 'admission' | 'unexplained'][] = [
+  ['replay-2026-07-22-9.ttrm r1 yachi perfect 76/76 faults 14/13', 'admission'],
+  ['replay-2026-07-28-1.ttrm r0 yachi perfect 33/33 faults 4/3', 'admission'],
+  ['replay-2026-07-28-7.ttrm r8 yachi perfect 77/77 faults 18/16', 'admission'],
+  ['replay-2026-08-09-4.ttrm r3 pinglamb perfect 47/48 faults 12/8', 'admission'],
+  ['replay-2026-08-19-10.ttrm r0 pinglamb perfect 94/94 faults 14/11', 'admission'],
+  ['replay-2026-08-19-5.ttrm r0 pinglamb perfect 28/28 faults 6/5', 'admission'],
+  ['replay-2026-08-25-05.ttrm r5 yachi perfect 62/64 faults 13/11', 'admission'],
+  ['replay-2026-09-10-07.ttrm r3 pinglamb perfect 44/45 faults 16/14', 'unexplained'],
+  ['replay-2026-09-11-01.ttrm r6 yachi perfect 82/81 faults 31/32', 'unexplained'],
+  ['replay-2026-09-17-05.ttrm r0 pinglamb perfect 98/99 faults 30/29', 'unexplained'],
+  ['replay-2026-09-18-05.ttrm r2 yachi perfect 46/47 faults 16/11', 'admission'],
+  ['replay-2026-10-09-06.ttrm r4 pinglamb perfect 61/62 faults 20/17', 'admission'],
+  ['replay-2026-10-22-01.ttrm r6 pinglamb perfect 100/101 faults 12/10', 'admission'],
+  ['replay-2026-10-22-09.ttrm r3 yachi perfect 107/106 faults 27/17', 'admission'],
 ];
 
 test('rebuilding every session reproduces its committed finesse-facts.json byte for byte', () => {
@@ -82,9 +70,22 @@ test('the anchor disagrees exactly where the named list says, and nowhere else',
     for (const e of a.exceptions)
       got.push(`${e.file} r${e.round} ${e.user} perfect ${e.engine.perfect}/${e.replay.perfect} faults ${e.engine.faults}/${e.replay.faults}`);
   }
-  expect(got).toEqual(ANCHOR_EXCEPTIONS);
+  expect(got).toEqual(ANCHOR_EXCEPTIONS.map(([k]) => k));
   expect(unknown).toBe(0);
   expect(agree).toBe(rounds - ANCHOR_EXCEPTIONS.length);
+});
+
+test('every `admission` exception is a round the replay artefact refuses, and no `unexplained` one is', () => {
+  const refused = new Set<string>();
+  for (const s of SESSIONS) {
+    const d = JSON.parse(readFileSync(`${sessionDir(s)}/sim/replay-facts.json`, 'utf8'));
+    for (const r of d.rounds) for (const p of r.players)
+      if (!p.admission.ok) refused.add(`${r.file} r${r.round} ${p.user}`);
+  }
+  for (const [k, why] of ANCHOR_EXCEPTIONS) {
+    const id = k.split(' perfect')[0]!;
+    expect(refused.has(id), k).toBe(why === 'admission');
+  }
 });
 
 test('every player total adds up and every ranked placement is consistent', () => {
@@ -131,7 +132,16 @@ test('the empty-board table agrees with standard finesse where it is not in doub
   expect(at(T('T'), '1:1 2:0 2:1 3:1')).toEqual([4, '←←180']);
 });
 
-test('MUTANT: scoring softDrop pieces breaks the anchor (the skip is load-bearing)', () => {
+test('MUTANT: exempting on softDrop PRESS (the rule before 2026-10-31) loses agreement', () => {
+  let lost = 0;
+  for (const d of ['2026-07-24', '2026-08-01']) {
+    process.env.REPLAY_DIR = sessionDir(d);
+    lost += load(d).anchor.agree - build(sessionDir(d), { softDropOnPress: true }).anchor.agree;
+  }
+  expect(lost).toBeGreaterThan(0);
+}, 60_000);
+
+test('MUTANT: scoring soft-dropped pieces breaks the anchor (the exemption is load-bearing)', () => {
   const dir = sessionDir('2026-10-29');
   process.env.REPLAY_DIR = dir;
   const mut = build(dir, { scoreSoftDrop: true });
