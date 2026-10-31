@@ -11,8 +11,8 @@ must. That is the job of this gate, the same job `check_opener_section` does for
 Checked:
   1. no artefact -> no region; an artefact -> exactly the region rendering it produces;
   2. the region carries every sentence in `finesse_section.REQUIRED`: the quarantine statement, the
-     anchor against TETR.IO's own finesse counters, the statement that the rule is fitted, the
-     softDrop exclusion, and the unit note (fault events, several per piece);
+     anchor against TETR.IO's own finesse counters, the statement that the rule was checked by hand
+     against TETR.IO's own code, the soft-drop (release) exemption, and the unit note (fault events, several per piece);
   3. no claim badge or `data-claim` inside the region;
   4. the artefact itself still says `report_eligible: false`;
   5. the anchor is internally whole: agree + exceptions + unknown == rounds;

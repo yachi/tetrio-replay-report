@@ -7,9 +7,11 @@ re-run through the vendored Triangle engine, the inputs the player spent on the 
 are compared with the fewest inputs that reach the same cells on an empty board, and the excess is a
 fault event. A placement is (piece, orientation, leftmost column).
 
-WHY IT IS QUARANTINED. TETR.IO publishes no finesse algorithm, so the rule is fitted: it reproduces
-the replay's own `finesse.perfectpieces` and `finesse.faults` exactly in most player-rounds, and the
-section prints that anchor, with every round where it does not, beside the tables. Which PLACEMENT a
+WHY IT IS QUARANTINED. The rule is TETR.IO's own — checked by hand on 2026-10-31 against the client's
+finesse code (no TETR.IO code is in the repo, so nothing re-derives that check) — and it reproduces the
+replay's own `finesse.perfectpieces` and `finesse.faults` exactly in most player-rounds; the section
+prints that anchor, with every round where it does not, beside the tables. The board each piece is
+read on is one simulator's. Which PLACEMENT a
 fault belongs to has no counter to check it against, so the section mints no claim ids, carries no ✓
 and says so. `check_finesse_section.py` is the gate that keeps those sentences in.
 
@@ -28,10 +30,10 @@ SHOW = 5
 
 QUARANTINE_MARKER = "呢節唔屬於信任鏈"
 ANCHOR_MARKER = "同 TETR.IO 自己數嘅 finesse 一樣"
-FITTED_MARKER = "條規則係對住 TETR.IO 嘅數砌出嚟"
-NOT_SCORED_MARKER = "有撳 soft drop 嘅方塊唔計"
+RULE_MARKER = "條規則同 TETR.IO 遊戲自己嘅 finesse code 人手對過"
+NOT_SCORED_MARKER = "放開 soft drop 嗰陣跌緊嘅方塊唔計"
 UNIT_MARKER = "一粒可以多按幾下"
-REQUIRED = (QUARANTINE_MARKER, ANCHOR_MARKER, FITTED_MARKER, NOT_SCORED_MARKER, UNIT_MARKER)
+REQUIRED = (QUARANTINE_MARKER, ANCHOR_MARKER, RULE_MARKER, NOT_SCORED_MARKER, UNIT_MARKER)
 TITLE = "最多犯錯嘅 finesse 擺位（未經證明）"
 
 CSS = """  <style>
@@ -143,7 +145,7 @@ def section(data, players, positions):
         body += [f'    <h3>{_who(i, p["user"])}</h3>',
                  f'    <p>計咗 {p["scored"]} 粒，其中 {p["faulty"]} 粒有多按，加埋多按咗 '
                  f'<strong>{p["faults"]}</strong> 下；有多按嘅擺位有 {p["placements_with_faults"]} 個。'
-                 f'冇計嘅：{ns["soft_drop"]} 粒有撳 soft drop'
+                 f'冇計嘅：{ns["soft_drop"]} 粒用 soft drop 落'
                  + (f'，{ns["no_empty_board_path"]} 粒係空板去唔到嘅位' if ns["no_empty_board_path"] else "")
                  + '。</p>']
         top = p["top"][:SHOW]
@@ -166,9 +168,11 @@ def section(data, players, positions):
         '呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒數返玩家用咗幾多下'
         '左右同轉，再同「喺空板由出生位置去同一個位最少要幾多下」比較；多出嚟嘅就係 finesse 錯。'
         '冇 claim 編號、冇 ✓ 標記。</p>',
-        f'      <p>TETR.IO 冇公開佢點計 finesse，所以{FITTED_MARKER}：{NOT_SCORED_MARKER}'
-        f'（當完美），空板去唔到嘅位（塞入去嘅）都唔計。{_anchor_note(data)}'
-        '每粒錯喺邊個位就冇第二份實作對過。</p>',
+        f'      <p>{RULE_MARKER}（2026-10-31 對 tetr.io 2026-10-23 版；repo 冇抄佢嘅 code，'
+        '所以冇嘢自動重覆呢次核對）：多按 = 用咗幾多下掣減最少要幾多下，佢個查表同我哋空板最少按法'
+        f'喺板內每個位都一樣；{NOT_SCORED_MARKER}（當完美），空板去唔到嘅位（塞入去嘅）都唔計。'
+        f'{_anchor_note(data)}'
+        '板面係模擬器重建嘅，每粒錯喺邊個位就冇第二份實作對過。</p>',
         f'      <p>排名按多按嘅下數，{UNIT_MARKER}，所以每格都印埋係幾多粒。'
         f'擺位 = 方塊 + 方向 + 最左嗰格喺邊。箭咀：{ARROWS}。'
         '「最常見錯法」入面每個箭咀係撳落一次，撳住推都係一次。'

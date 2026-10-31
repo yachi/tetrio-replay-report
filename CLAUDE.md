@@ -3850,19 +3850,30 @@ The ratio gap `hi/lo − 1` is how much HIGHER the leader is, never how much low
 A badge whose spec proves a DIRECTION sits on the direction words, with the size after it in
 brackets. A signed 約 figure floors its MAGNITUDE (`_frac`), or a negative one overstates.
 
-## 最多犯錯嘅 finesse 擺位 — the fifth quarantined section, and its fitted rule
+## 最多犯錯嘅 finesse 擺位 — the fifth quarantined section, and TETR.IO's own rule
 
 `pipeline/sim/emit-finesse-facts.ts` → `sessions/<date>/sim/finesse-facts.json` →
 `pipeline/finesse_section.py` (region `finesse-placements`, in `SELF_INSERTING`, chained after
 attack-sources), gated by `check_finesse_section.py`. Per player, the placements (piece, SHAPES index,
 leftmost column) carrying the most finesse FAULT EVENTS, each with the fewest-input path, the most
-common faulty input sequence and the worst example. **TETR.IO publishes no finesse algorithm, so the
-rule is fitted, and the anchor is the licence**: the engine's own `falling.keys` against an
+common faulty input sequence and the worst example. The rule: the engine's own `falling.keys` against an
 empty-board Dijkstra over the engine's own Tetromino and kicks (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2),
-excess = fault events, and a piece whose OWN key presses (since the last lock, restarted on hold)
-include softDrop is not scored. Per player-round the result is compared with the replay's own
+excess = fault events, and a piece carrying the engine's `ACTION_SOFTDROP` flag when it locks is not
+scored. **That flag is set on the piece falling when softDrop is RELEASED and cleared at spawn**, so it is
+not 「softDrop pressed on this piece」: a soft drop pressed in the gap before a piece spawns and released
+while it falls exempts it.
+
+**The rule was fitted until 2026-10-31 and is TETR.IO's own since.** That day the client's
+`_InternalFinesse` (tetr.io/js/tetrio.js, the 2026-10-23 build; plain minified JS, nothing deobfuscated)
+was read: its lookup table equals the Dijkstra above at all 240 in-board (piece, rotation, column)
+positions, and its soft-drop exemption is the same flag the vendored Triangle engine sets. The fitted
+rule had exempted on PRESS, which accounted for 17 of its 31 anchor disagreements. **The check was by
+hand with a scratch probe and no TETR.IO code or table is committed, so nothing re-derives it**: a new
+TETR.IO build is not noticed. Per player-round the result is compared with the replay's own
 `finesse.perfectpieces` and `.faults`; the disagreeing rounds are `ANCHOR_EXCEPTIONS` in
-`finesse-facts.test.ts`, by name, and the test's softDrop mutant shows the skip is load-bearing. How
+`finesse-facts.test.ts`, by name, each tagged `admission` (the round is refused by `replay-facts.json`'s
+admission check, i.e. the engine's board is not the game's, which the test verifies) or `unexplained`.
+Two mutants: dropping the exemption collapses the anchor, and exempting on press loses agreement. How
 many agree is the artefact's and the section's, never this file's. Two traps the probe hit:
 `res.keysPresses` holds only the CURRENT frame's keys (the engine flushes its cache every tick), so the
 emitter re-arms `eng.resCache.keys` with a recording array after every tick; and a 「←」 in an actual
