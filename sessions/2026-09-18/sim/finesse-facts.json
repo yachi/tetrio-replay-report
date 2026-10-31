@@ -1,0 +1,1175 @@
+{
+ "schema": "finesse-facts/1",
+ "session": "2026-09-18",
+ "report_eligible": false,
+ "source": "vendored Triangle engine (pipeline/sim/vendor/teto): falling.keys per lock against an empty-board Dijkstra over the engine's own Tetromino and kick table",
+ "rule": "excess = falling.keys - fewest inputs to the same cells on an empty board (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2); excess > 0 adds excess fault events, else the piece is perfect; a piece whose own key presses include softDrop, or whose cells no empty-board path reaches, is not scored and counts as perfect. The rule is fitted to TETR.IO's counters, which publish no algorithm.",
+ "not_eligible_because": [
+  "the rule is fitted, not published by TETR.IO; which placement carried a fault has no second implementation"
+ ],
+ "placement": "piece + shape index into emit-replay SHAPES (cells from the bottom-left, y up) + leftmost column (0-based)",
+ "top_n": 10,
+ "anchor": {
+  "rounds": 254,
+  "agree": 251,
+  "unknown": 0,
+  "exceptions": [
+   {
+    "file": "replay-2026-09-18-03.ttrm",
+    "round": 1,
+    "user": "pinglamb",
+    "engine": {
+     "perfect": 117,
+     "faults": 14
+    },
+    "replay": {
+     "perfect": 116,
+     "faults": 17
+    }
+   },
+   {
+    "file": "replay-2026-09-18-05.ttrm",
+    "round": 2,
+    "user": "yachi",
+    "engine": {
+     "perfect": 46,
+     "faults": 16
+    },
+    "replay": {
+     "perfect": 47,
+     "faults": 11
+    }
+   },
+   {
+    "file": "replay-2026-09-18-16.ttrm",
+    "round": 7,
+    "user": "pinglamb",
+    "engine": {
+     "perfect": 62,
+     "faults": 14
+    },
+    "replay": {
+     "perfect": 63,
+     "faults": 13
+    }
+   }
+  ]
+ },
+ "players": [
+  {
+   "user": "pinglamb",
+   "rounds": 127,
+   "pieces": 11498,
+   "scored": 10516,
+   "faulty": 1294,
+   "faults": 1990,
+   "not_scored": {
+    "soft_drop": 982,
+    "no_empty_board_path": 0
+   },
+   "placements_scored": 162,
+   "placements_with_faults": 145,
+   "top": [
+    {
+     "piece": "I",
+     "shape": 1,
+     "col": 2,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 104,
+     "faulty": 96,
+     "faults": 103,
+     "example": {
+      "file": "replay-2026-09-18-11.ttrm",
+      "round": 5,
+      "lock": 120,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "↺",
+       "←",
+       "←",
+       "←",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↺",
+       "←",
+       "←"
+      ],
+      "n": 51
+     }
+    },
+    {
+     "piece": "O",
+     "shape": 0,
+     "col": 1,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "→"
+     ],
+     "scored": 167,
+     "faulty": 90,
+     "faults": 95,
+     "example": {
+      "file": "replay-2026-09-18-17.ttrm",
+      "round": 3,
+      "lock": 12,
+      "keys": 6,
+      "excess": 4,
+      "moves": [
+       "←",
+       "→",
+       "→",
+       "→",
+       "→",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "←",
+       "←",
+       "←"
+      ],
+      "n": 85
+     }
+    },
+    {
+     "piece": "S",
+     "shape": 1,
+     "col": 1,
+     "cells": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 111,
+     "faulty": 88,
+     "faults": 92,
+     "example": {
+      "file": "replay-2026-09-18-15.ttrm",
+      "round": 0,
+      "lock": 263,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "↺",
+       "←",
+       "↺",
+       "←",
+       "↺"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "←",
+       "↺",
+       "←"
+      ],
+      "n": 44
+     }
+    },
+    {
+     "piece": "I",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↺"
+     ],
+     "scored": 88,
+     "faulty": 81,
+     "faults": 88,
+     "example": {
+      "file": "replay-2026-09-18-16.ttrm",
+      "round": 1,
+      "lock": 110,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "←",
+       "↺",
+       "→",
+       "↺",
+       "↻"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↻",
+       "→",
+       "→"
+      ],
+      "n": 46
+     }
+    },
+    {
+     "piece": "Z",
+     "shape": 1,
+     "col": 1,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 86,
+     "faulty": 69,
+     "faults": 70,
+     "example": {
+      "file": "replay-2026-09-18-05.ttrm",
+      "round": 0,
+      "lock": 205,
+      "keys": 4,
+      "excess": 2,
+      "moves": [
+       "↻",
+       "←",
+       "←",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "←",
+       "↺",
+       "←"
+      ],
+      "n": 33
+     }
+    },
+    {
+     "piece": "O",
+     "shape": 0,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "←"
+     ],
+     "scored": 148,
+     "faulty": 55,
+     "faults": 56,
+     "example": {
+      "file": "replay-2026-09-18-08.ttrm",
+      "round": 1,
+      "lock": 35,
+      "keys": 4,
+      "excess": 2,
+      "moves": [
+       "↻",
+       "→",
+       "→",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "→",
+       "→"
+      ],
+      "n": 50
+     }
+    },
+    {
+     "piece": "Z",
+     "shape": 0,
+     "col": 6,
+     "cells": [
+      [
+       1,
+       0
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "←"
+     ],
+     "scored": 94,
+     "faulty": 39,
+     "faults": 43,
+     "example": {
+      "file": "replay-2026-09-18-01.ttrm",
+      "round": 4,
+      "lock": 7,
+      "keys": 6,
+      "excess": 4,
+      "moves": [
+       "↺",
+       "←",
+       "→",
+       "→",
+       "↺",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "→",
+       "→"
+      ],
+      "n": 34
+     }
+    },
+    {
+     "piece": "J",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 3,
+     "optimal": [
+      "⇥",
+      "←",
+      "↻"
+     ],
+     "scored": 57,
+     "faulty": 33,
+     "faults": 37,
+     "example": {
+      "file": "replay-2026-09-18-02.ttrm",
+      "round": 2,
+      "lock": 45,
+      "keys": 6,
+      "excess": 3,
+      "moves": [
+       "↻",
+       "→",
+       "↻",
+       "→",
+       "→",
+       "↺"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "↻",
+       "→",
+       "→"
+      ],
+      "n": 16
+     }
+    },
+    {
+     "piece": "Z",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↺"
+     ],
+     "scored": 67,
+     "faulty": 17,
+     "faults": 35,
+     "example": {
+      "file": "replay-2026-09-18-04.ttrm",
+      "round": 0,
+      "lock": 32,
+      "keys": 6,
+      "excess": 4,
+      "moves": [
+       "↻",
+       "→",
+       "→",
+       "→",
+       "→",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "↻",
+       "→",
+       "→"
+      ],
+      "n": 6
+     }
+    },
+    {
+     "piece": "I",
+     "shape": 1,
+     "col": 8,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↻"
+     ],
+     "scored": 82,
+     "faulty": 19,
+     "faults": 33,
+     "example": {
+      "file": "replay-2026-09-18-01.ttrm",
+      "round": 6,
+      "lock": 38,
+      "keys": 4,
+      "excess": 2,
+      "moves": [
+       "↻",
+       "→",
+       "→",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "↻",
+       "→",
+       "→"
+      ],
+      "n": 10
+     }
+    }
+   ]
+  },
+  {
+   "user": "yachi",
+   "rounds": 127,
+   "pieces": 11926,
+   "scored": 11059,
+   "faulty": 1277,
+   "faults": 2085,
+   "not_scored": {
+    "soft_drop": 867,
+    "no_empty_board_path": 0
+   },
+   "placements_scored": 162,
+   "placements_with_faults": 149,
+   "top": [
+    {
+     "piece": "I",
+     "shape": 1,
+     "col": 2,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 114,
+     "faulty": 104,
+     "faults": 114,
+     "example": {
+      "file": "replay-2026-09-18-06.ttrm",
+      "round": 6,
+      "lock": 46,
+      "keys": 9,
+      "excess": 7,
+      "moves": [
+       "↺",
+       "←",
+       "←",
+       "←",
+       "↺",
+       "↺",
+       "↺",
+       "↺",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↺",
+       "←",
+       "←"
+      ],
+      "n": 69
+     }
+    },
+    {
+     "piece": "Z",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↺"
+     ],
+     "scored": 120,
+     "faulty": 68,
+     "faults": 111,
+     "example": {
+      "file": "replay-2026-09-18-16.ttrm",
+      "round": 2,
+      "lock": 171,
+      "keys": 10,
+      "excess": 8,
+      "moves": [
+       "→",
+       "↻",
+       "←",
+       "↻",
+       "←",
+       "↻",
+       "←",
+       "→",
+       "→",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "↻",
+       "←"
+      ],
+      "n": 37
+     }
+    },
+    {
+     "piece": "S",
+     "shape": 1,
+     "col": 1,
+     "cells": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 102,
+     "faulty": 101,
+     "faults": 109,
+     "example": {
+      "file": "replay-2026-09-18-17.ttrm",
+      "round": 1,
+      "lock": 74,
+      "keys": 9,
+      "excess": 7,
+      "moves": [
+       "↺",
+       "←",
+       "↺",
+       "↺",
+       "↺",
+       "→",
+       "↺",
+       "←",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↺",
+       "←",
+       "←"
+      ],
+      "n": 87
+     }
+    },
+    {
+     "piece": "I",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↺"
+     ],
+     "scored": 111,
+     "faulty": 102,
+     "faults": 106,
+     "example": {
+      "file": "replay-2026-09-18-04.ttrm",
+      "round": 1,
+      "lock": 9,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "→",
+       "↻",
+       "→",
+       "→",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↻",
+       "→",
+       "→"
+      ],
+      "n": 74
+     }
+    },
+    {
+     "piece": "Z",
+     "shape": 1,
+     "col": 1,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 89,
+     "faulty": 88,
+     "faults": 90,
+     "example": {
+      "file": "replay-2026-09-18-13.ttrm",
+      "round": 5,
+      "lock": 165,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "↺",
+       "←",
+       "←",
+       "←",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↺",
+       "←",
+       "←"
+      ],
+      "n": 60
+     }
+    },
+    {
+     "piece": "L",
+     "shape": 0,
+     "col": 7,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "target": 1,
+     "optimal": [
+      "⇥"
+     ],
+     "scored": 94,
+     "faulty": 14,
+     "faults": 44,
+     "example": {
+      "file": "replay-2026-09-18-01.ttrm",
+      "round": 2,
+      "lock": 19,
+      "keys": 11,
+      "excess": 10,
+      "moves": [
+       "↻",
+       "→",
+       "↻",
+       "←",
+       "↺",
+       "←",
+       "→",
+       "←",
+       "←",
+       "→",
+       "↺"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "←",
+       "→"
+      ],
+      "n": 3
+     }
+    },
+    {
+     "piece": "O",
+     "shape": 0,
+     "col": 1,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "→"
+     ],
+     "scored": 147,
+     "faulty": 37,
+     "faults": 39,
+     "example": {
+      "file": "replay-2026-09-18-02.ttrm",
+      "round": 1,
+      "lock": 31,
+      "keys": 4,
+      "excess": 2,
+      "moves": [
+       "←",
+       "→",
+       "→",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "←",
+       "←",
+       "←"
+      ],
+      "n": 33
+     }
+    },
+    {
+     "piece": "J",
+     "shape": 3,
+     "col": 8,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "↺",
+      "⇥"
+     ],
+     "scored": 161,
+     "faulty": 14,
+     "faults": 39,
+     "example": {
+      "file": "replay-2026-09-18-16.ttrm",
+      "round": 2,
+      "lock": 189,
+      "keys": 11,
+      "excess": 9,
+      "moves": [
+       "↻",
+       "→",
+       "↻",
+       "↻",
+       "↻",
+       "→",
+       "→",
+       "↻",
+       "↻",
+       "↻",
+       "→"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "→",
+       "↺"
+      ],
+      "n": 4
+     }
+    },
+    {
+     "piece": "O",
+     "shape": 0,
+     "col": 4,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ]
+     ],
+     "target": 0,
+     "optimal": [],
+     "scored": 143,
+     "faulty": 16,
+     "faults": 38,
+     "example": {
+      "file": "replay-2026-09-18-03.ttrm",
+      "round": 1,
+      "lock": 110,
+      "keys": 5,
+      "excess": 5,
+      "moves": [
+       "→",
+       "←",
+       "←",
+       "←",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "←"
+      ],
+      "n": 5
+     }
+    },
+    {
+     "piece": "S",
+     "shape": 1,
+     "col": 7,
+     "cells": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇥",
+      "↺"
+     ],
+     "scored": 91,
+     "faulty": 23,
+     "faults": 33,
+     "example": {
+      "file": "replay-2026-09-18-17.ttrm",
+      "round": 5,
+      "lock": 81,
+      "keys": 5,
+      "excess": 3,
+      "moves": [
+       "→",
+       "←",
+       "↺",
+       "→",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "→",
+       "↻",
+       "←"
+      ],
+      "n": 13
+     }
+    }
+   ]
+  }
+ ]
+}

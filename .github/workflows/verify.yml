@@ -486,6 +486,20 @@ jobs:
             python3 -m pipeline.check_attack_section "$W" --selftest
           fi
 
+      # 最多犯錯嘅 finesse 擺位, the fifth quarantined section: per player, the placements with the
+      # most finesse fault events, from sim/finesse-facts.json. The region must be exactly a
+      # re-render, carry every licence sentence in finesse_section.REQUIRED (the anchor against the
+      # replay's own finesse counters, the fitted-rule caveat, the softDrop exclusion, the unit note)
+      # and no badge. --selftest plants each corruption, so it runs where the artefact exists.
+      - name: Check the simulator-derived finesse-placements section
+        run: |
+          set -euo pipefail
+          W="sessions/${{ matrix.session }}/report"
+          python3 -m pipeline.check_finesse_section "$W"
+          if [ -f "sessions/${{ matrix.session }}/sim/finesse-facts.json" ]; then
+            python3 -m pipeline.check_finesse_section "$W" --selftest
+          fi
+
       # 定式路線同中盤手法: the night's slice of the opener route and mid-game technique artefacts,
       # placed early in the report, and 建議's tagged 「未經證明」 items written from it. The region
       # must be exactly a re-render, carry its quarantine sentences and no badge; every tagged item

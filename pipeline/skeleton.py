@@ -1099,6 +1099,9 @@ SELF_INSERTING = {
     "attack-sources": "conditional — only a session with sim/attack-facts.json gets one; "
                       "build_report inserts it before the round-replay region's BEGIN marker, "
                       "or before the footer anchor when there is no replay",
+    "finesse-placements": "conditional — only a session with sim/finesse-facts.json gets one; "
+                          "build_report inserts it before the round-replay region's BEGIN marker, "
+                          "or before the footer anchor when there is no replay, after attack-sources",
     "round-replay": "conditional — only a session with sim/replay-facts.json AND a round "
                     "`_intense_round` selects gets one; build_report inserts it before the "
                     "footer anchor, after openers",

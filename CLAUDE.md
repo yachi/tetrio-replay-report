@@ -455,6 +455,11 @@ REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-attack-facts.ts \
 bun test pipeline/sim/attack-facts.test.ts                     #   byte identity + named anchor exceptions
 python3 -m pipeline.check_attack_section sessions/<date>/report  # CI gate: the attack-sources region
 python3 -m pipeline.check_attack_section sessions/<date>/report --selftest  #   its mutants
+REPLAY_DIR=sessions/<date> bun pipeline/sim/emit-finesse-facts.ts \
+  --out sessions/<date>/sim/finesse-facts.json                  # the 最多犯錯嘅 finesse 擺位 artefact (quarantined)
+bun test pipeline/sim/finesse-facts.test.ts                    #   byte identity + named anchor exceptions + the softDrop mutant
+python3 -m pipeline.check_finesse_section sessions/<date>/report  # CI gate: the finesse-placements region
+python3 -m pipeline.check_finesse_section sessions/<date>/report --selftest  #   its mutants
 python3 -m pipeline.check_routes_techniques sessions/<date>/report  # CI gate: 定式路線同中盤手法 + 建議's tagged items
 python3 -m pipeline.check_routes_techniques sessions/<date>/report --selftest  #   its mutants
 python3 -m analysis.app_decomposition [--json]  # the corpus APP-gap roll-up over every attack-facts.json
@@ -3839,6 +3844,25 @@ Three wording rules a review caught, each a sentence that printed a true-looking
 The ratio gap `hi/lo − 1` is how much HIGHER the leader is, never how much lower the trailer is.
 A badge whose spec proves a DIRECTION sits on the direction words, with the size after it in
 brackets. A signed 約 figure floors its MAGNITUDE (`_frac`), or a negative one overstates.
+
+## 最多犯錯嘅 finesse 擺位 — the fifth quarantined section, and its fitted rule
+
+`pipeline/sim/emit-finesse-facts.ts` → `sessions/<date>/sim/finesse-facts.json` →
+`pipeline/finesse_section.py` (region `finesse-placements`, in `SELF_INSERTING`, chained after
+attack-sources), gated by `check_finesse_section.py`. Per player, the placements (piece, SHAPES index,
+leftmost column) carrying the most finesse FAULT EVENTS, each with the fewest-input path, the most
+common faulty input sequence and the worst example. **TETR.IO publishes no finesse algorithm, so the
+rule is fitted, and the anchor is the licence**: the engine's own `falling.keys` against an
+empty-board Dijkstra over the engine's own Tetromino and kicks (tap 1, DAS-to-wall 1, CW/CCW 1, 180 2),
+excess = fault events, and a piece whose OWN key presses (since the last lock, restarted on hold)
+include softDrop is not scored. Per player-round the result is compared with the replay's own
+`finesse.perfectpieces` and `.faults`; the disagreeing rounds are `ANCHOR_EXCEPTIONS` in
+`finesse-facts.test.ts`, by name, and the test's softDrop mutant shows the skip is load-bearing. How
+many agree is the artefact's and the section's, never this file's. Two traps the probe hit:
+`res.keysPresses` holds only the CURRENT frame's keys (the engine flushes its cache every tick), so the
+emitter re-arms `eng.resCache.keys` with a recording array after every tick; and a 「←」 in an actual
+sequence is one keydown, held or tapped — the section says so. Which placement carried a fault has no
+second implementation, so no claim id and no ✓.
 
 ## 重播 — the animated replay, the third quarantined section
 
