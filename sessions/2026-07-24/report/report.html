@@ -5754,6 +5754,143 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 </section>
 <!-- END generated attack-sources -->
 
+<!-- BEGIN generated finesse-placements (pipeline/build_report.py) -->
+<section id="finesse-placements">
+  <style>
+    /* Scoped under #finesse-placements and every class carries the fp- prefix: a generated
+       section's <style> lands in the body and beats the report's own stylesheet. */
+    #finesse-placements h3 { margin: 2.2rem 0 .3rem; font-size: 1.05rem; }
+    #finesse-placements .fp-dot { display: inline-block; width: .5rem; height: .5rem;
+      border-radius: 50%; margin-right: .4rem; }
+    #finesse-placements .fp-dot.is-p1, #finesse-placements .fp-cell.is-p1 { background: var(--yachi); }
+    #finesse-placements .fp-dot.is-p2, #finesse-placements .fp-cell.is-p2 { background: var(--pinglamb); }
+    #finesse-placements .fp-grid { display: grid; gap: .8rem;
+      grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); margin: .6rem 0 1rem; }
+    #finesse-placements .fp-card { border: 1px solid var(--rule, rgba(127,127,127,.3));
+      border-radius: .5rem; padding: .7rem .8rem; }
+    #finesse-placements .fp-rank { font-size: .8rem; opacity: .7; }
+    #finesse-placements .fp-board { display: grid; grid-template-columns: repeat(10, 1fr);
+      gap: 1px; margin: .4rem 0 .5rem; max-width: 12rem; }
+    #finesse-placements .fp-board span { aspect-ratio: 1; border-radius: 2px;
+      background: rgba(127,127,127,.12); }
+    #finesse-placements .fp-board span.fp-cell { opacity: 1; }
+    #finesse-placements .fp-keys { font-family: var(--mono, ui-monospace, monospace);
+      letter-spacing: .15em; }
+    #finesse-placements .fp-card p { margin: .2rem 0; font-size: .9rem; }
+    #finesse-placements td.fp-num { text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+  <div class="wrap-wide">
+    <div class="eyebrow">模擬器推導 · 唔屬於信任鏈</div>
+    <h2 class="section-title">最多犯錯嘅 finesse 擺位（未經證明）</h2>
+
+    <div class="method-note">
+      <p><strong>同上面幾節一樣，呢節唔屬於信任鏈。</strong>呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒數返玩家用咗幾多下左右同轉，再同「喺空板由出生位置去同一個位最少要幾多下」比較；多出嚟嘅就係 finesse 錯。冇 claim 編號、冇 ✓ 標記。</p>
+      <p>TETR.IO 冇公開佢點計 finesse，所以條規則係對住 TETR.IO 嘅數砌出嚟：有撳 soft drop 嘅方塊唔計（當完美），空板去唔到嘅位（塞入去嘅）都唔計。逐局計返嘅完美粒數同多按次數，<strong>99 / 100</strong> 個 player-round 同 TETR.IO 自己數嘅 finesse 一樣（replay 嘅 <code>finesse.perfectpieces</code> 同 <code>finesse.faults</code>）；唔一樣嘅係 <code>replay-2026-07-24-2.ttrm</code> 第 5 局 pinglamb（完美 132 對 133，多按 30 對 28）。每粒錯喺邊個位就冇第二份實作對過。</p>
+      <p>排名按多按嘅下數，一粒可以多按幾下，所以每格都印埋係幾多粒。擺位 = 方塊 + 方向 + 最左嗰格喺邊。箭咀：←→ 撳一下；⇤⇥ 撳住推到牆；↻↺ 順／逆時針轉；180 轉半圈（算兩下）。「最常見錯法」入面每個箭咀係撳落一次，撳住推都係一次。最少按法可以多過一種，呢度印其中一種。</p>
+    </div>
+
+    <h3><span class="fp-dot is-p1"></span>yachi</h3>
+    <p>計咗 4420 粒，其中 485 粒有多按，加埋多按咗 <strong>761</strong> 下；有多按嘅擺位有 117 個。冇計嘅：328 粒有撳 soft drop。</p>
+    <div class="fp-grid">
+      <div class="fp-card">
+        <div class="fp-rank">第 1 位</div>
+        <strong>S</strong>，由左邊數第 2 格起
+        <div class="fp-board" role="img" aria-label="S 由左邊數第 2 格起"><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>50</strong> 下，分佈喺 50 粒；呢個位一共放咗 50 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（44 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m1r4 佢第 3 粒，按咗 3 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 2 位</div>
+        <strong>I</strong>，由左邊數第 3 格起
+        <div class="fp-board" role="img" aria-label="I 由左邊數第 3 格起"><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>43</strong> 下，分佈喺 39 粒；呢個位一共放咗 41 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（35 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m3r3 佢第 321 粒，按咗 5 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 3 位</div>
+        <strong>Z</strong>，由左邊數第 2 格起
+        <div class="fp-board" role="img" aria-label="Z 由左邊數第 2 格起"><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>42</strong> 下，分佈喺 41 粒；呢個位一共放咗 42 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（36 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m3r3 佢第 18 粒，按咗 4 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 4 位</div>
+        <strong>I</strong>，由左邊數第 8 格起
+        <div class="fp-board" role="img" aria-label="I 由左邊數第 8 格起"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span></div>
+        <p>多按 <strong>35</strong> 下，分佈喺 34 粒；呢個位一共放咗 35 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇥ ↺</span></p>
+        <p>最常見錯法（31 粒）：<span class="fp-keys">↻ → →</span></p>
+        <p>錯得最多嗰粒：m2r4 佢第 100 粒，按咗 4 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 5 位</div>
+        <strong>Z</strong>，由左邊數第 8 格起
+        <div class="fp-board" role="img" aria-label="Z 由左邊數第 8 格起"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span class="fp-cell is-p1"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p1"></span><span></span><span></span></div>
+        <p>多按 <strong>29</strong> 下，分佈喺 24 粒；呢個位一共放咗 43 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇥ ↺</span></p>
+        <p>最常見錯法（16 粒）：<span class="fp-keys">→ ↻ ←</span></p>
+        <p>錯得最多嗰粒：m1r2 佢第 121 粒，按咗 4 下。</p>
+      </div>
+    </div>
+    <h3><span class="fp-dot is-p2"></span>pinglamb</h3>
+    <p>計咗 4045 粒，其中 514 粒有多按，加埋多按咗 <strong>784</strong> 下；有多按嘅擺位有 117 個。冇計嘅：394 粒有撳 soft drop。</p>
+    <div class="fp-grid">
+      <div class="fp-card">
+        <div class="fp-rank">第 1 位</div>
+        <strong>O</strong>，由左邊數第 2 格起
+        <div class="fp-board" role="img" aria-label="O 由左邊數第 2 格起"><span></span><span class="fp-cell is-p2"></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>42</strong> 下，分佈喺 38 粒；呢個位一共放咗 67 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ →</span></p>
+        <p>最常見錯法（35 粒）：<span class="fp-keys">← ← ←</span></p>
+        <p>錯得最多嗰粒：m4r5 佢第 71 粒，按咗 5 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 2 位</div>
+        <strong>I</strong>，由左邊數第 8 格起
+        <div class="fp-board" role="img" aria-label="I 由左邊數第 8 格起"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span></div>
+        <p>多按 <strong>38</strong> 下，分佈喺 35 粒；呢個位一共放咗 39 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇥ ↺</span></p>
+        <p>最常見錯法（24 粒）：<span class="fp-keys">↻ → →</span></p>
+        <p>錯得最多嗰粒：m6r5 佢第 98 粒，按咗 6 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 3 位</div>
+        <strong>I</strong>，由左邊數第 3 格起
+        <div class="fp-board" role="img" aria-label="I 由左邊數第 3 格起"><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>35</strong> 下，分佈喺 34 粒；呢個位一共放咗 36 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（22 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m1r4 佢第 43 粒，按咗 4 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 4 位</div>
+        <strong>S</strong>，由左邊數第 2 格起
+        <div class="fp-board" role="img" aria-label="S 由左邊數第 2 格起"><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>26</strong> 下，分佈喺 24 粒；呢個位一共放咗 34 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（13 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m2r6 佢第 45 粒，按咗 5 下。</p>
+      </div>
+      <div class="fp-card">
+        <div class="fp-rank">第 5 位</div>
+        <strong>Z</strong>，由左邊數第 2 格起
+        <div class="fp-board" role="img" aria-label="Z 由左邊數第 2 格起"><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="fp-cell is-p2"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p>多按 <strong>25</strong> 下，分佈喺 21 粒；呢個位一共放咗 30 粒。</p>
+        <p>最少按法（2 下）：<span class="fp-keys">⇤ ↻</span></p>
+        <p>最常見錯法（11 粒）：<span class="fp-keys">↺ ← ←</span></p>
+        <p>錯得最多嗰粒：m6r6 佢第 56 粒，按咗 7 下。</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END generated finesse-placements -->
+
 <!-- BEGIN generated round-replay (pipeline/build_report.py) -->
 <section id="round-replay">
   <style>
