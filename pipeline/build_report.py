@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-from pipeline import (app_section, appendix, attack_section, chart_data, claim_cards, coaching,
+from pipeline import (app_section, appendix, attack_section, finesse_section, chart_data, claim_cards, coaching,
                       forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region,
                       replay_section, routes_techniques_section, stats_section)
 from pipeline.claims import generators
@@ -125,6 +125,13 @@ def attack_sec(ctx):
     return attack_section.build(ctx["facts"], ctx["report_dir"])
 
 
+def finesse_sec(ctx):
+    # Quarantined like attack_sec: the SESSION's sim/finesse-facts.json, never facts.json, and
+    # None for a session with no such file. facts.json supplies only the player order and each
+    # file's match position.
+    return finesse_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def replay_sec(ctx):
     # Quarantined like forecast_sec and opener_sec, and conditional twice over: no
     # sim/replay-facts.json, or no round long enough for `generators._intense_round`, and it
@@ -206,6 +213,10 @@ SECTIONS = [
     # intense-round idiom: before the replay region when the report has one, else the footer.
     ("attack-sources", ('<!-- BEGIN generated round-replay',
                         '<footer class="report-footer">'), attack_sec, None),
+    # the fifth quarantined section, right after the attack one and on the same chain anchor, so
+    # it lands between attack-sources and the replay (or the footer when there is no replay).
+    ("finesse-placements", ('<!-- BEGIN generated round-replay',
+                            '<footer class="report-footer">'), finesse_sec, None),
     ("round-replay", '<footer class="report-footer">', replay_sec, None),
     ("chart-data", "<!-- CLAIMS_DATA_START -->", chart_section, None),
     ("match-copy", "<!-- CLAIMS_DATA_START -->", match_copy_section, None),

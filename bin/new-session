@@ -113,7 +113,8 @@ step "6/7 simulator artefacts"
 if command -v bun >/dev/null; then
   mkdir -p "$DEST/sim"
   for pair in forecast-facts:emit-forecast-facts opener-facts:emit-opener-facts \
-              attack-facts:emit-attack-facts replay-facts:emit-replay; do
+              attack-facts:emit-attack-facts finesse-facts:emit-finesse-facts \
+              replay-facts:emit-replay; do
     out="$DEST/sim/${pair%%:*}.json"
     before="$( [ -f "$out" ] && shasum "$out" || true )"
     REPLAY_DIR="$DEST" bun "pipeline/sim/${pair##*:}.ts" --out "$out" >/dev/null \
@@ -124,8 +125,8 @@ if command -v bun >/dev/null; then
     echo "  ok  $out ($state)"
   done
 else
-  echo "  !!  bun not installed: no sim/*.json, so the report gets none of the four"
-  echo "      quarantined sections (forecast, openers, attack-sources, round-replay)"
+  echo "  !!  bun not installed: no sim/*.json, so the report gets none of the five"
+  echo "      quarantined sections (forecast, openers, attack-sources, finesse-placements, round-replay)"
 fi
 
 step "7/7 report skeleton"
