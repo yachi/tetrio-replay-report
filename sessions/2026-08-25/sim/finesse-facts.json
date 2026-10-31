@@ -11,23 +11,9 @@
  "top_n": 10,
  "anchor": {
   "rounds": 146,
-  "agree": 145,
+  "agree": 146,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-08-25-05.ttrm",
-    "round": 5,
-    "user": "yachi",
-    "engine": {
-     "perfect": 62,
-     "faults": 13
-    },
-    "replay": {
-     "perfect": 64,
-     "faults": 11
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
@@ -599,8 +585,8 @@
    "rounds": 73,
    "pieces": 8622,
    "scored": 8075,
-   "faulty": 895,
-   "faults": 1402,
+   "faulty": 893,
+   "faults": 1400,
    "not_scored": {
     "soft_drop": 547,
     "no_empty_board_path": 0
@@ -896,7 +882,7 @@
      "optimal": [
       "⇥"
      ],
-     "scored": 232,
+     "scored": 233,
      "faulty": 15,
      "faults": 28,
      "example": {

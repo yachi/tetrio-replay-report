@@ -21,10 +21,12 @@ import type { PieceType } from './vendor/core/types.ts';
 import { BOARD_WIDTH } from './vendor/core/types.ts';
 
 // The TL ruleset fields the version-19 .ttrm `options` omit — identical to tools/triangle-oracle/oracle.mjs.
-// Board-affecting ones (gravity, holes) are pinned; the rest are TETR.IO TL defaults.
+// Board-affecting ones (gravity, holes) are pinned; the rest are TETR.IO TL defaults. `clutch` was `false`
+// here until 2026-10-31; TETR.IO's own options list (tetr.io/js/tetrio.js, 2026-10-23 build) defaults it
+// to true, and with it every player-round passes emit-replay.ts's whole-round admission (12 did not).
 export const TL_DEFAULTS: Record<string, unknown> = {
   g: 0.02, boardwidth: 10, boardheight: 20, kickset: 'SRS+', bagtype: '7-bag', combotable: 'multiplier',
-  spinbonuses: 'T-spins', garbageblocking: 'combo blocking', garbagetargetbonus: 'none', clutch: false,
+  spinbonuses: 'T-spins', garbageblocking: 'combo blocking', garbagetargetbonus: 'none', clutch: true,
   stock: 0, garbagemultiplier: 1, garbagespeed: 20, garbageholesize: 1, messiness_change: 1,
   messiness_nosame: false, messiness_timeout: 0, messiness_inner: 0, messiness_center: false,
   garbageabsolutecap: 0, garbagecapincrease: 0, garbagecapmax: 40, garbagecap: 8, garbagecapmargin: 0,
@@ -45,8 +47,19 @@ export function runCaseOracle(player: any, roundPlayers: any[]): SimResult {
   const byFrame = new Map<number, any[]>();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame)!.push(e); }
 
-  // NOTE ON GARBAGE HOLES — the oracle keeps the engine's own seeded-RNG hole columns, which mismatch the
-  // ige-recorded columns 97/103 of the time. BOTH ways of imposing the recorded column are verified dead:
+  // NOTE ON GARBAGE HOLES — the oracle keeps the engine's own seeded-RNG hole columns. This note used to
+  // say they 「mismatch the ige-recorded columns 97/103 of the time」, and that comparison was against the
+  // wrong field: read on 2026-10-31 in TETR.IO's own client (tetr.io/js/tetrio.js, the 2026-10-23 build;
+  // nothing of it is copied here), an `interaction` event's `x` / `y` are the SENDER's falling-piece
+  // position at the clear (where the attack animation starts), and the hole column the game writes there
+  // is unset in versus. So the replay records NO hole column to compare with. The same reading found the
+  // client's garbage RNG is the engine's (Park–Miller, seeded by `options.seed`, the same cancel / tank /
+  // reroll rule). Measured control, same day: seeding the engine's garbage RNG with `options.seed + 1`
+  // drops whole-round admission (emit-replay.ts) from every round to 75/292 on 2026-10-03, 40/136 on
+  // 2026-10-29 and 65/300 on 2026-09-19, so the board's line clears depend on the hole columns and the
+  // engine's columns reproduce them. That is evidence, not an observation of a column.
+  // The rest of this note (why a RECORDED column could not be imposed) is kept as measured at the time;
+  // both ways of imposing the 「recorded」 column are verified dead:
   //  - ENGINE relocation moves a hole in the live board, changing which lines the engine later completes
   //    → board height corrupts, coverage 88.6% -> 23% (FIFO and correct per-iid both).
   //  - ENCODE-time relocation (move the hole only in the emitted board) breaks clear-CONSISTENCY: pieces

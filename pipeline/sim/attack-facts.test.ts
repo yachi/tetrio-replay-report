@@ -34,38 +34,18 @@ const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
  * clear (three Singles and a Triple, five locks past the game's 118), past a prefix verified to 107.
  * 2026-10-29 adds nothing to any of the three lists: all 136 of its player-rounds agree on both
  * anchors, and no engine run locks past the game's `piecesplaced`. */
-/** Player-rounds where the engine's attack total is not the replay's. Each but 2026-10-22-09 r3 is
- *  the engine missing one Double the game credited at the very end of the round (each is also in
- *  COUNT_EXCEPTIONS). */
-const ATTACK_EXCEPTIONS = [
-  'replay-2026-08-09-4.ttrm r3 pinglamb engine 33 replay 34',
-  'replay-2026-09-18-05.ttrm r2 yachi engine 22 replay 23',
-  'replay-2026-10-22-01.ttrm r6 pinglamb engine 91 replay 92',
-  'replay-2026-10-22-09.ttrm r3 yachi engine 65 replay 67',
-];
-/** Player-rounds where some clear-type count disagrees with the replay's counter, off by one each. */
-const COUNT_EXCEPTIONS = [
-  'replay-2026-08-09-4.ttrm r3 pinglamb {"D":[1,2]}',
-  'replay-2026-08-19-10.ttrm r0 pinglamb {"S":[8,7]}',
-  'replay-2026-08-25-05.ttrm r5 yachi {"S":[8,9]}',
-  'replay-2026-09-18-05.ttrm r2 yachi {"D":[2,3]}',
-  'replay-2026-10-09-07.ttrm r1 pinglamb {"S":[9,10]}',
-  'replay-2026-10-22-01.ttrm r6 pinglamb {"D":[1,2]}',
-  'replay-2026-10-22-09.ttrm r3 yachi {"S":[9,12],"T":[1,2]}',
-];
+/* All three lists are EMPTY since 2026-10-31 and kept as named lists, so a new disagreement is a red
+ * build to investigate. Until then they held 4, 7 and 10 player-rounds (the entries are in git
+ * history): the engine missing a clear the game credited near the end of a round, or locking pieces
+ * past the game's own `piecesplaced`. Every one had one cause, `oracle-source.ts`'s
+ * `TL_DEFAULTS.clutch: false` against TETR.IO's own default (true): the engine blocked out a piece
+ * the game walked up after a line clear. See replay.test.ts ADMISSION_EXCEPTIONS. */
+/** Player-rounds where the engine's attack total is not the replay's. */
+const ATTACK_EXCEPTIONS: string[] = [];
+/** Player-rounds where some clear-type count disagrees with the replay's counter. */
+const COUNT_EXCEPTIONS: string[] = [];
 /** Player-rounds where the engine locks pieces past the game's own `piecesplaced`. */
-const LOCKS_PAST_END = [
-  'replay-2026-07-22-9.ttrm r1 yachi 89/88',
-  'replay-2026-07-28-1.ttrm r0 yachi 37/36',
-  'replay-2026-07-28-7.ttrm r8 yachi 87/86',
-  'replay-2026-08-09-4.ttrm r3 pinglamb 58/54',
-  'replay-2026-08-19-10.ttrm r0 pinglamb 103/102',
-  'replay-2026-08-19-5.ttrm r0 pinglamb 33/32',
-  'replay-2026-09-18-05.ttrm r2 yachi 52/50',
-  'replay-2026-10-09-06.ttrm r4 pinglamb 72/70',
-  'replay-2026-10-22-01.ttrm r6 pinglamb 108/107',
-  'replay-2026-10-22-09.ttrm r3 yachi 123/118',
-];
+const LOCKS_PAST_END: string[] = [];
 
 test('rebuilding every session reproduces its committed attack-facts.json byte for byte', () => {
   for (const s of SESSIONS) {

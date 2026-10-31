@@ -301,7 +301,7 @@ test('STMB Cave and Double Dagger are not this: anchored on the same flat T, the
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(31);
-  expect(c.rowmap_steps).toBe(275898);
+  expect(c.rowmap_steps).toBe(275879);
 });
 
 test('mutants: each rule turned off turns this red with its own symptom, or is named equivalent', () => {

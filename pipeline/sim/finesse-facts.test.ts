@@ -29,29 +29,18 @@ const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/finesse-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
 
-/** Player-rounds where the engine's counts are not TETR.IO's, each with its reason.
- *  - `admission`: the engine's whole round already differs from the game's (pieces, lines or garbage;
- *    replay.test.ts ADMISSION_EXCEPTIONS), so the board the finesse is read on is not the game's.
- *    The test checks each against that round's `replay-facts.json` admission verdict.
- *  - `unexplained`: the round is admitted and still differs by one piece; not explained piece by piece.
+/** Player-rounds where the engine's counts are not TETR.IO's, each with its reason. EMPTY since
+ *  2026-10-31, kept as a named list so a new disagreement is a red build to investigate.
+ *  - `admission`: the engine's whole round differs from the game's (replay.test.ts
+ *    ADMISSION_EXCEPTIONS), so the board the finesse is read on is not the game's.
+ *  - `unexplained`: the round is admitted and still differs.
  *  Until 2026-10-31 this list held 31 rounds under the rule that exempted a piece on whose keys softDrop
- *  was PRESSED; TETR.IO exempts the piece falling when it is RELEASED, which accounts for 17 of them. */
-const ANCHOR_EXCEPTIONS: [string, 'admission' | 'unexplained'][] = [
-  ['replay-2026-07-22-9.ttrm r1 yachi perfect 76/76 faults 14/13', 'admission'],
-  ['replay-2026-07-28-1.ttrm r0 yachi perfect 33/33 faults 4/3', 'admission'],
-  ['replay-2026-07-28-7.ttrm r8 yachi perfect 77/77 faults 18/16', 'admission'],
-  ['replay-2026-08-09-4.ttrm r3 pinglamb perfect 47/48 faults 12/8', 'admission'],
-  ['replay-2026-08-19-10.ttrm r0 pinglamb perfect 94/94 faults 14/11', 'admission'],
-  ['replay-2026-08-19-5.ttrm r0 pinglamb perfect 28/28 faults 6/5', 'admission'],
-  ['replay-2026-08-25-05.ttrm r5 yachi perfect 62/64 faults 13/11', 'admission'],
-  ['replay-2026-09-10-07.ttrm r3 pinglamb perfect 44/45 faults 16/14', 'unexplained'],
-  ['replay-2026-09-11-01.ttrm r6 yachi perfect 82/81 faults 31/32', 'unexplained'],
-  ['replay-2026-09-17-05.ttrm r0 pinglamb perfect 98/99 faults 30/29', 'unexplained'],
-  ['replay-2026-09-18-05.ttrm r2 yachi perfect 46/47 faults 16/11', 'admission'],
-  ['replay-2026-10-09-06.ttrm r4 pinglamb perfect 61/62 faults 20/17', 'admission'],
-  ['replay-2026-10-22-01.ttrm r6 pinglamb perfect 100/101 faults 12/10', 'admission'],
-  ['replay-2026-10-22-09.ttrm r3 yachi perfect 107/106 faults 27/17', 'admission'],
-];
+ *  was PRESSED; TETR.IO exempts the piece falling when it is RELEASED, which accounts for 17 of them.
+ *  The other 14 (11 `admission`, 3 `unexplained`: 09-10-07 r3, 09-11-01 r6, 09-17-05 r0) all went
+ *  the same day, when `oracle-source.ts`'s `TL_DEFAULTS.clutch` became TETR.IO's own default (true):
+ *  with clutch off the engine blocked out a piece the game walked up after a line clear, so its
+ *  board after that moment was not the game's. */
+const ANCHOR_EXCEPTIONS: [string, 'admission' | 'unexplained'][] = [];
 
 test('rebuilding every session reproduces its committed finesse-facts.json byte for byte', () => {
   for (const s of SESSIONS) {

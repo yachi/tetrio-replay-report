@@ -59,44 +59,16 @@
  "anchor": {
   "attack": {
    "rounds": 100,
-   "agree": 99,
-   "exceptions": [
-    {
-     "file": "replay-2026-08-09-4.ttrm",
-     "round": 3,
-     "user": "pinglamb",
-     "engine": 33,
-     "replay": 34
-    }
-   ]
+   "agree": 100,
+   "exceptions": []
   },
   "counts": {
    "rounds": 100,
-   "agree": 99,
+   "agree": 100,
    "unknown": 0,
-   "exceptions": [
-    {
-     "file": "replay-2026-08-09-4.ttrm",
-     "round": 3,
-     "user": "pinglamb",
-     "engine_vs_replay": {
-      "D": [
-       1,
-       2
-      ]
-     }
-    }
-   ]
+   "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-08-09-4.ttrm",
-    "round": 3,
-    "user": "pinglamb",
-    "locks": 58,
-    "pieces": 54
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {
@@ -158,16 +130,16 @@
     },
     "mid": {
      "pieces": 3710,
-     "attack": 2577,
-     "lines": 2320,
+     "attack": 2578,
+     "lines": 2322,
      "classes": {
       "S": {
        "n": 477,
        "attack": 122
       },
       "D": {
-       "n": 190,
-       "attack": 195
+       "n": 191,
+       "attack": 196
       },
       "T": {
        "n": 60,
@@ -199,7 +171,7 @@
       }
      },
      "components": {
-      "base": 2010,
+      "base": 2011,
       "b2b": 299,
       "combo": 256,
       "allclear": 0,
@@ -442,7 +414,7 @@
    "opener_attack": 95,
    "n": {
     "S": 93,
-    "D": 39,
+    "D": 40,
     "T": 16,
     "Q": 43,
     "TSS": 5,

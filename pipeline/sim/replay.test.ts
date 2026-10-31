@@ -113,64 +113,31 @@ test('the committed artefacts decode, and the viewer-side derivations hold on ev
 
 /* ── admission ────────────────────────────────────────────────────────────────────────────────── */
 /** Player-rounds agreeing with facts.json on pieces, lines, holds, garbage cleared, attack, all
- *  clears and every T-spin clear kind, per session, as literals. Measured 2026-10-04 with `emit-replay.ts`. */
+ *  clears and every T-spin clear kind, per session, as literals. Measured 2026-10-04 with `emit-replay.ts`;
+ *  every round admits since 2026-10-31, when `TL_DEFAULTS.clutch` became TETR.IO's own default (true). */
 const ADMISSION: Record<string, [number, number]> = {
-  '2026-07-22': [157, 158], '2026-07-24': [100, 100], '2026-07-28': [126, 128],
-  '2026-08-01': [106, 106], '2026-08-09': [99, 100], '2026-08-14': [168, 168],
-  '2026-08-19': [138, 140], '2026-08-25': [145, 146], '2026-09-03': [92, 92],
+  '2026-07-22': [158, 158], '2026-07-24': [100, 100], '2026-07-28': [128, 128],
+  '2026-08-01': [106, 106], '2026-08-09': [100, 100], '2026-08-14': [168, 168],
+  '2026-08-19': [140, 140], '2026-08-25': [146, 146], '2026-09-03': [92, 92],
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
-  '2026-09-18': [253, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
-  '2026-10-09': [202, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [124, 126], '2026-10-29': [136, 136],
+  '2026-09-18': [254, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
+  '2026-10-09': [204, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
+  '2026-10-22': [126, 126], '2026-10-29': [136, 136],
 };
 
-/** Every player-round whose engine totals disagree with facts.json, with the disagreement. Mostly
- *  the round's LOSER placing one extra piece at the instant the game ended it; two are real late
- *  divergences (08-09-4 r3 pinglamb, 09-18-05 r2 yachi) that a viewer must flag for their last
- *  seconds. Named rather than bounded: a ninth must be investigated, not absorbed.
+/** Every player-round whose engine totals disagree with facts.json. EMPTY since 2026-10-31, and kept
+ *  as a named list so a new one is a red build to investigate, not a number absorbed.
  *
- *  2026-10-09 adds the NINTH and TENTH, both pinglamb, both the round's loser by `garbagesmash`,
- *  and both past the end of the verified prefix — so neither touches a lock a viewer is shown as
- *  verified:
- *    replay-2026-10-09-06.ttrm r4 — the engine places 72 pieces against the game's 70, every other
- *      total agreeing. The loser-places-extra shape, but TWO pieces rather than one: the engine's
- *      board tops out at lock 68 (engine_knockout agrees with the ending) and the prefix verifies to
- *      lock 64 of 72, so the two extra locks sit in the unverified tail after the engine's own
- *      death — the end of the round, not a divergence a viewer could mistake for play.
- *    replay-2026-10-09-07.ttrm r1 — pieces agree (98) and the engine clears 47 lines against the
- *      game's 48. A real late divergence, the third after the two above: prefix verified to lock 93
- *      of 98, engine knock-out at lock 95, so the missing clear lies in the last five locks, beyond
- *      the verified boundary the viewer already draws. An eleventh must be investigated the same
- *  way. 2026-10-12 adds none: all 110 of its player-rounds admit. 2026-10-20 adds none either:
- *  all 60 of its player-rounds admit. 2026-10-22 adds two, both late divergences of the kind
- *  above and both `check_failed` before the engine's run ends: replay-2026-10-22-01.ttrm r6
- *  pinglamb (prefix verified to lock 17, check failed at 19; the engine locks one piece past the
- *  game's 107 and misses one Double, 91 attack against 92 — also in attack-facts.test.ts) and
- *  replay-2026-10-22-09.ttrm r3 yachi (verified to lock 107, check failed at 112; five locks past
- *  the game's 118, three Singles and one Triple short, 65 attack against 67). 01 r6 is m1r7, the
- *  night's selected round, so the 最癲一局 replay of it is the game's board only to lock 17 —
- *  which is what the viewer's verified boundary already draws. 2026-10-29 adds none: all 136 of
- *  its player-rounds admit. */
-const ADMISSION_EXCEPTIONS = [
-  { session: '2026-07-22', file: 'replay-2026-07-22-9.ttrm', round: 1, user: 'yachi', diff: { pieces: [89, 88] } },
-  { session: '2026-07-28', file: 'replay-2026-07-28-1.ttrm', round: 0, user: 'yachi', diff: { pieces: [37, 36] } },
-  { session: '2026-07-28', file: 'replay-2026-07-28-7.ttrm', round: 8, user: 'yachi', diff: { pieces: [87, 86] } },
-  { session: '2026-08-09', file: 'replay-2026-08-09-4.ttrm', round: 3, user: 'pinglamb',
-    diff: { pieces: [58, 54], lines: [20, 22], garbage_attack: [33, 34] } },
-  { session: '2026-08-19', file: 'replay-2026-08-19-5.ttrm', round: 0, user: 'pinglamb', diff: { pieces: [33, 32] } },
-  { session: '2026-08-19', file: 'replay-2026-08-19-10.ttrm', round: 0, user: 'pinglamb',
-    diff: { pieces: [103, 102], lines: [46, 45], garbage_cleared: [8, 7] } },
-  { session: '2026-08-25', file: 'replay-2026-08-25-05.ttrm', round: 5, user: 'yachi', diff: { lines: [37, 38] } },
-  { session: '2026-09-18', file: 'replay-2026-09-18-05.ttrm', round: 2, user: 'yachi',
-    diff: { pieces: [52, 50], lines: [23, 25], holds: [22, 21], garbage_cleared: [6, 8],
-            garbage_attack: [22, 23] } },
-  { session: '2026-10-09', file: 'replay-2026-10-09-06.ttrm', round: 4, user: 'pinglamb', diff: { pieces: [72, 70] } },
-  { session: '2026-10-09', file: 'replay-2026-10-09-07.ttrm', round: 1, user: 'pinglamb', diff: { lines: [47, 48] } },
-  { session: '2026-10-22', file: 'replay-2026-10-22-01.ttrm', round: 6, user: 'pinglamb',
-    diff: { pieces: [108, 107], lines: [52, 54], garbage_cleared: [12, 14], garbage_attack: [91, 92] } },
-  { session: '2026-10-22', file: 'replay-2026-10-22-09.ttrm', round: 3, user: 'yachi',
-    diff: { pieces: [123, 118], lines: [58, 64], garbage_cleared: [18, 20], garbage_attack: [65, 67] } },
-];
+ *  It held twelve until then (the per-entry write-ups are in git history, at this comment): mostly
+ *  the round's LOSER placing one or two extra pieces at the instant the game ended it, and five
+ *  「late divergences」 (08-09-4 r3, 08-19-10 r0, 09-18-05 r2, 10-09-07 r1, 10-22-01 r6, 10-22-09 r3
+ *  among them) where the engine lost or gained clears near the end. All twelve had ONE cause:
+ *  `oracle-source.ts`'s `TL_DEFAULTS` set `clutch: false`, while TETR.IO's own options list
+ *  (tetr.io/js/tetrio.js, 2026-10-23 build, read 2026-10-31) defaults it to true. With clutch off the
+ *  engine blocked out a piece the game walks up over the stack after a line clear, so the engine's
+ *  round ended (or diverged) where the game's went on. With it on, every one of the 2950
+ *  player-rounds admits. */
+const ADMISSION_EXCEPTIONS: { session: string; file: string; round: number; user: string; diff: unknown }[] = [];
 
 test('admission counts are pinned per session, and the exceptions are exactly the named list', () => {
   const found: typeof ADMISSION_EXCEPTIONS = [];
@@ -188,8 +155,12 @@ test('admission counts are pinned per session, and the exceptions are exactly th
 /** Every player-round where the ENGINE's board topping out disagrees with the game ending the
  *  player (gameoverreason topout/garbagesmash). The ending a viewer shows is always gameoverreason;
  *  these are the rounds where it must also flag that the simulated board may differ from the real
- *  one. 22 are `topout` deaths the engine's board survives; one (10-03-01 r1 pinglamb) is the round's
- *  WINNER, whose engine board tops out at lock 52 of 59. Named rather than bounded, exactly like
+ *  one. Every entry is a `topout` death the engine's board survives (28 since 2026-10-29). Until
+ *  2026-10-31 two more were the round's WINNER, whose engine board topped out mid-round (10-03-01 r1
+ *  pinglamb at lock 52, 10-29-04 r4 yachi at lock 30): in both a T cleared one row with the stack past
+ *  the 20 visible rows, so the next piece spawned overlapping it. TETR.IO clutches that piece (walks it
+ *  up until it fits, because the last lock cleared a line) and our engine, with `clutch: false` in
+ *  `TL_DEFAULTS`, blocked it out. With TETR.IO's default (true) both vanish. Named rather than bounded, exactly like
  *  ADMISSION_EXCEPTIONS: a new one, or one vanishing, is a red build to investigate.
  *
  *  2026-10-09 adds two more of the common class, making 24 `topout` deaths the engine survives:
@@ -212,19 +183,13 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  it). It admits cleanly, so the engine placed exactly the game's pieces and its board did not
  *  top out on the last one; the last two locks are past the verified prefix.
  *
- *  2026-10-29 adds THREE. Two are the common class, making 28 `topout` deaths the engine survives,
+ *  2026-10-29 added THREE. Two are the common class, making 28 `topout` deaths the engine survives,
  *  both pinglamb's in replay-2026-10-29-01.ttrm: r0 (98 locks, prefix verified to lock 14,
  *  `check_failed` at 19, so the last 83 locks are past the prefix) and r4 (69 locks, verified to
  *  lock 62, `no_evidence` after it). Both admit cleanly (10-29 admits 136 of 136), so the engine
  *  placed exactly the game's pieces and its board did not top out on the last one.
- *  The third is the SECOND entry of 10-03-01 r1's class — the round's WINNER, whose engine board
- *  tops out mid-round: replay-2026-10-29-04.ttrm r4 yachi, engine topout at lock 30 of 45, with
- *  the prefix verified to the LAST lock (44, `end`). Decoded from the artefact it is 10-03-01 r1's
- *  shape exactly: lock 29 (an O) lands as six garbage rows arrive, the stack reaches 25 rows — past
- *  the 20 visible — and lock 30 is a T that clears one row; the game played on and he won. 10-03's
- *  lock 52 is the same (garbage under lock 51 takes the stack to 23 rows, lock 52 a T clearing
- *  one). So the engine's `res.topout` fires on a board the game did not end, inside a prefix the
- *  reconstruction check verifies — the board agrees, the knock-out rule does not. */
+ *  The third was
+ *  10-29-04 r4 yachi, the second winner-class entry, which 2026-10-31's clutch fix removed (above). */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -246,7 +211,6 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-09-19', file: 'replay-2026-09-19-14.ttrm', round: 6, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-09-19', file: 'replay-2026-09-19-17.ttrm', round: 0, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-09-19', file: 'replay-2026-09-19-20.ttrm', round: 3, user: 'pinglamb', ending: 'topout', lock: null },
-  { session: '2026-10-03', file: 'replay-2026-10-03-01.ttrm', round: 1, user: 'pinglamb', ending: 'winner', lock: 52 },
   { session: '2026-10-03', file: 'replay-2026-10-03-02.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-03', file: 'replay-2026-10-03-10.ttrm', round: 8, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-09', file: 'replay-2026-10-09-08.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
@@ -255,7 +219,6 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-10-22', file: 'replay-2026-10-22-02.ttrm', round: 7, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 4, user: 'pinglamb', ending: 'topout', lock: null },
-  { session: '2026-10-29', file: 'replay-2026-10-29-04.ttrm', round: 4, user: 'yachi', ending: 'winner', lock: 30 },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {

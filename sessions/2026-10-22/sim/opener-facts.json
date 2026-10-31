@@ -1803,7 +1803,7 @@
         "file": "replay-2026-10-22-09.ttrm",
         "round": 3,
         "user": "yachi",
-        "verified": 107,
+        "verified": 111,
         "window_complete": true,
         "cspin_order": 1,
         "dt_order": 0,
@@ -3054,7 +3054,7 @@
       "locks_scored": 603,
       "prefix_locks": {
         "rounds": 126,
-        "oracle_locks": 10237,
+        "oracle_locks": 10241,
         "hand_port_locks": 2992
       },
       "board_diff_hist": {
@@ -3235,7 +3235,7 @@
       "locks_scored": 603,
       "prefix_locks": {
         "rounds": 126,
-        "oracle_locks": 10237,
+        "oracle_locks": 10241,
         "hand_port_locks": 2992
       },
       "board_diff_hist": {

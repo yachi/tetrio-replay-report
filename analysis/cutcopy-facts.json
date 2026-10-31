@@ -17,7 +17,7 @@
    {
     "session": "2026-07-22",
     "replays_md5": "5c365d5a42189e1a2138cfaacab85061",
-    "replay_facts_md5": "0c8583e1ec123cd79d9f98dcc2497db2"
+    "replay_facts_md5": "add7f7683d7d7da3f615f941869df74d"
    },
    {
     "session": "2026-07-24",
@@ -27,7 +27,7 @@
    {
     "session": "2026-07-28",
     "replays_md5": "97d318eaf2faa588bf90fc1abfc6f2d7",
-    "replay_facts_md5": "5be7fefd353c58f48f78b30a26d5e8c4"
+    "replay_facts_md5": "879a7017fbe62698fd96beaf65511078"
    },
    {
     "session": "2026-08-01",
@@ -37,22 +37,22 @@
    {
     "session": "2026-08-09",
     "replays_md5": "b2b6556ffcd2922f39eb3e4e7c9454a0",
-    "replay_facts_md5": "580ef38628bc19630d0cc7143ddc1009"
+    "replay_facts_md5": "469e7aa0d395c9a6af7c692c9caa87d9"
    },
    {
     "session": "2026-08-14",
     "replays_md5": "464875cb25a2d382122d884045b60b79",
-    "replay_facts_md5": "5f6f4e61cdcf5ec669661a8f44c30f53"
+    "replay_facts_md5": "2f3bce3f7021317376df476a691508ef"
    },
    {
     "session": "2026-08-19",
     "replays_md5": "0ec61c3c2360e2e7ce049ec1d5043b43",
-    "replay_facts_md5": "668a403b87216c38a8445ca9c0b178aa"
+    "replay_facts_md5": "bddfeb730a12b0b0104071ce2c1a6b1f"
    },
    {
     "session": "2026-08-25",
     "replays_md5": "93043bcb37cd7ffcd77ad5eb8672fb7e",
-    "replay_facts_md5": "cf12c32107114833d4c5978fde9eee95"
+    "replay_facts_md5": "348cfffff99be2a60dbaa14ff8243e80"
    },
    {
     "session": "2026-09-03",
@@ -62,12 +62,12 @@
    {
     "session": "2026-09-10",
     "replays_md5": "ceedee793ea16b6d95bd286741e1aae9",
-    "replay_facts_md5": "2cd0158b019a9d06b9cbb73dac2c2275"
+    "replay_facts_md5": "e9c11123f568a9b08f0ac97de8f09b5c"
    },
    {
     "session": "2026-09-11",
     "replays_md5": "bd9f59da273fd97f3af582b467862c7b",
-    "replay_facts_md5": "9be5a738ba322fa6a0ce2f81601d40b4"
+    "replay_facts_md5": "8d1724617c0e85bf5612efee1f89786b"
    },
    {
     "session": "2026-09-17",
@@ -77,42 +77,42 @@
    {
     "session": "2026-09-18",
     "replays_md5": "fae311db6292ed6ab5d21062bc500d93",
-    "replay_facts_md5": "5af89e2a23420a0b1f38e245e828018f"
+    "replay_facts_md5": "fb2a5a2b6d4e1819caa7847679b2ded6"
    },
    {
     "session": "2026-09-19",
     "replays_md5": "74a0fa2bc83c2520870eb35b1edb82e7",
-    "replay_facts_md5": "8efa186ef0f440cfdb3b47473d2302a7"
+    "replay_facts_md5": "4fca52a70a7b9b0e8e4508319d015bc9"
    },
    {
     "session": "2026-10-03",
     "replays_md5": "6870375613354ec9605bd366a0d32a32",
-    "replay_facts_md5": "45b21c17923ebef8ade14052e782250f"
+    "replay_facts_md5": "5ac48c57f049ade7d971ba3a00839027"
    },
    {
     "session": "2026-10-09",
     "replays_md5": "ec6f52e26f431dd95fe2c1bf8fa53b1a",
-    "replay_facts_md5": "a598c6e53c898c60548076c4fd06843e"
+    "replay_facts_md5": "3e92bd99c9bdac4169653d38600aa42a"
    },
    {
     "session": "2026-10-12",
     "replays_md5": "53f6278126ea28cd1d97f43950dfb7f4",
-    "replay_facts_md5": "c0cf358c0b1900a2aa3d562d1fe30d60"
+    "replay_facts_md5": "ac2ea4617a613b1aa3ae049e0adc7a8d"
    },
    {
     "session": "2026-10-20",
     "replays_md5": "54aad262054f2e92c85f7bf94462eb2c",
-    "replay_facts_md5": "0426348d586721b430916ddc751a2de1"
+    "replay_facts_md5": "4505c50f34a94541c2c0ee0c30f6c9f4"
    },
    {
     "session": "2026-10-22",
     "replays_md5": "22418badae4a4fbef9e5d9d7300b1589",
-    "replay_facts_md5": "14b3331ad2a902febc41c7f8101c72a3"
+    "replay_facts_md5": "54a9156c3c150bf9c72bf1a581508616"
    },
    {
     "session": "2026-10-29",
     "replays_md5": "60de4a9780cdfa347f062169ba095aa4",
-    "replay_facts_md5": "db89b9b4d963f9a65a71c46ec2967288"
+    "replay_facts_md5": "9f01f0143d094cab7eba6d73c4c72874"
    }
   ],
   "transcription_md5": "baa922715bf9150a0ab6775fe35fe71a",
@@ -209,7 +209,7 @@
   "tspin_clears_scored": 15834,
   "reconstruction_agreed": 15834,
   "reconstruction_disagreed": 0,
-  "rowmap_steps": 275898,
+  "rowmap_steps": 275879,
   "rowmap_unverified": 31,
   "by_session": {
    "2026-07-22": {

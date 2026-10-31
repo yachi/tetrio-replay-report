@@ -68,22 +68,7 @@
    "unknown": 0,
    "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-07-28-1.ttrm",
-    "round": 0,
-    "user": "yachi",
-    "locks": 37,
-    "pieces": 36
-   },
-   {
-    "file": "replay-2026-07-28-7.ttrm",
-    "round": 8,
-    "user": "yachi",
-    "locks": 87,
-    "pieces": 86
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {

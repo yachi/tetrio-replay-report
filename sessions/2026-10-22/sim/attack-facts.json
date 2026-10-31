@@ -59,73 +59,16 @@
  "anchor": {
   "attack": {
    "rounds": 126,
-   "agree": 124,
-   "exceptions": [
-    {
-     "file": "replay-2026-10-22-01.ttrm",
-     "round": 6,
-     "user": "pinglamb",
-     "engine": 91,
-     "replay": 92
-    },
-    {
-     "file": "replay-2026-10-22-09.ttrm",
-     "round": 3,
-     "user": "yachi",
-     "engine": 65,
-     "replay": 67
-    }
-   ]
+   "agree": 126,
+   "exceptions": []
   },
   "counts": {
    "rounds": 126,
-   "agree": 124,
+   "agree": 126,
    "unknown": 0,
-   "exceptions": [
-    {
-     "file": "replay-2026-10-22-01.ttrm",
-     "round": 6,
-     "user": "pinglamb",
-     "engine_vs_replay": {
-      "D": [
-       1,
-       2
-      ]
-     }
-    },
-    {
-     "file": "replay-2026-10-22-09.ttrm",
-     "round": 3,
-     "user": "yachi",
-     "engine_vs_replay": {
-      "S": [
-       9,
-       12
-      ],
-      "T": [
-       1,
-       2
-      ]
-     }
-    }
-   ]
+   "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-10-22-01.ttrm",
-    "round": 6,
-    "user": "pinglamb",
-    "locks": 108,
-    "pieces": 107
-   },
-   {
-    "file": "replay-2026-10-22-09.ttrm",
-    "round": 3,
-    "user": "yachi",
-    "locks": 123,
-    "pieces": 118
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {
@@ -187,16 +130,16 @@
     },
     "mid": {
      "pieces": 4414,
-     "attack": 3013,
-     "lines": 2804,
+     "attack": 3014,
+     "lines": 2806,
      "classes": {
       "S": {
        "n": 576,
        "attack": 140
       },
       "D": {
-       "n": 227,
-       "attack": 229
+       "n": 228,
+       "attack": 230
       },
       "T": {
        "n": 77,
@@ -228,7 +171,7 @@
       }
      },
      "components": {
-      "base": 2397,
+      "base": 2398,
       "b2b": 323,
       "combo": 281,
       "allclear": 0,
@@ -296,11 +239,11 @@
     },
     "mid": {
      "pieces": 4997,
-     "attack": 2992,
-     "lines": 3134,
+     "attack": 2994,
+     "lines": 3140,
      "classes": {
       "S": {
-       "n": 615,
+       "n": 618,
        "attack": 104
       },
       "D": {
@@ -308,8 +251,8 @@
        "attack": 296
       },
       "T": {
-       "n": 85,
-       "attack": 176
+       "n": 86,
+       "attack": 178
       },
       "Q": {
        "n": 328,
@@ -337,7 +280,7 @@
       }
      },
      "components": {
-      "base": 2491,
+      "base": 2493,
       "b2b": 285,
       "combo": 208,
       "allclear": 0,
@@ -357,7 +300,7 @@
    "opener_attack": 132,
    "n": {
     "S": 52,
-    "D": 24,
+    "D": 25,
     "T": 9,
     "Q": 30,
     "TSS": 3,
@@ -641,9 +584,9 @@
    "opener_pieces": 147,
    "opener_attack": 79,
    "n": {
-    "S": 95,
+    "S": 98,
     "D": 51,
-    "T": 15,
+    "T": 16,
     "Q": 59,
     "TSS": 4,
     "TSD": 42,

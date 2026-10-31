@@ -157,7 +157,10 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // all of them. The test itself took 496 s at twenty sessions with another test file running
   // beside it on a four-core machine shared with other work — inside the 600 s budget but with only
   // ~100 s of headroom, so the next session must re-measure it before trusting the budget.
-  expect(both + oursOnly + ccOnly + neither).toBe(241272);
+  // 2026-10-31: 241272 -> 241276 with no session added. `TL_DEFAULTS.clutch` became TETR.IO's own
+  // default (true), the engine stopped blocking out pieces the game walked up after a line clear, and
+  // a few verified prefixes grew by those boards. `unexplained` is still EMPTY over all of them.
+  expect(both + oursOnly + ccOnly + neither).toBe(241276);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

@@ -6023,7 +6023,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     <div class="method-note">
       <p><strong>同上面 C-Spin 同 DT 砲一樣，呢節唔屬於信任鏈。</strong>呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒讀返佢未抵消之前打出嘅攻擊，再按消行種類、時間同攻擊成分拆開。冇 claim 編號、冇 ✓ 標記。</p>
-      <p>引擎重算嘅攻擊總數，<strong>99 / 100</strong> 個 player-round 同 replay 自己個 <code>garbage.attack</code> counter 一樣；唔一樣嘅係 <code>replay-2026-08-09-4.ttrm</code> 第 4 局 pinglamb（引擎 33、replay 34）。每種消行嘅次數（一行到 T-Spin Triple 同 Mini，全部種類），<strong>99 / 100</strong> 個 player-round 同 replay 自己個 <code>clears</code> counter 一樣；唔一樣嘅係 <code>replay-2026-08-09-4.ttrm</code> 第 4 局 pinglamb（D 引擎 1、replay 2）。所以次數嗰幾欄同 facts.json 一樣可信；每次攻擊同埋 B2B／Combo 嘅拆分淨係得引擎一份實作，冇第二個獨立實作對過。</p>
+      <p>引擎重算嘅攻擊總數，<strong>100 / 100</strong> 個 player-round 同 replay 自己個 <code>garbage.attack</code> counter 一樣。每種消行嘅次數（一行到 T-Spin Triple 同 Mini，全部種類），<strong>100 / 100</strong> 個 player-round 同 replay 自己個 <code>clears</code> counter 一樣。所以次數嗰幾欄同 facts.json 一樣可信；每次攻擊同埋 B2B／Combo 嘅拆分淨係得引擎一份實作，冇第二個獨立實作對過。</p>
       <p>分母係 replay 自己數嘅粒數。「頭 21 粒」即係每局頭 21 粒（三個 bag），大約係開局定式嘅範圍；之後嘅就係中盤。呢節答嘅係攻擊由邊種消行嚟，唔係邊個贏。</p>
     </div>
 
@@ -6037,7 +6037,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         </tbody>
       </table>
     </div>
-    <div class="method-note"><p><strong>pinglamb</strong> 每 100 粒多 <strong>10.26</strong> 行攻擊（引擎數）。每粒攻擊 = 每粒清行 × 每行攻擊，所以兩欄邊欄爭得多就係差距喺邊。按時間拆：頭 21 粒 +3.18、之後 +7.08（每 100 粒，兩段加埋就係成個差距）。</p></div>
+    <div class="method-note"><p><strong>pinglamb</strong> 每 100 粒多 <strong>10.28</strong> 行攻擊（引擎數）。每粒攻擊 = 每粒清行 × 每行攻擊，所以兩欄邊欄爭得多就係差距喺邊。按時間拆：頭 21 粒 +3.18、之後 +7.10（每 100 粒，兩段加埋就係成個差距）。</p></div>
 
     <h3>二 · 每 100 粒有幾多次係邊種消行，同每次打出幾多攻擊</h3>
     <div class="scroll-x">
@@ -6049,13 +6049,13 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
           <tr><td>四行（Quad）</td><td class="as-num">0.66</td><td class="as-num">6.14</td><td class="as-num">4.85</td><td class="as-num">0.28</td><td class="as-num">5.55</td><td class="as-num">5.11</td></tr>
           <tr><td>T-Spin Single</td><td class="as-num">0.66</td><td class="as-num">0.83</td><td class="as-num">2.31</td><td class="as-num">0.28</td><td class="as-num">0.64</td><td class="as-num">2.25</td></tr>
           <tr><td>三行</td><td class="as-num">0.38</td><td class="as-num">1.73</td><td class="as-num">2.33</td><td class="as-num">0.57</td><td class="as-num">1.61</td><td class="as-num">2.57</td></tr>
-          <tr><td>兩行</td><td class="as-num">0.85</td><td class="as-num">5.75</td><td class="as-num">1.04</td><td class="as-num">0.57</td><td class="as-num">5.12</td><td class="as-num">1.17</td></tr>
+          <tr><td>兩行</td><td class="as-num">0.85</td><td class="as-num">5.75</td><td class="as-num">1.04</td><td class="as-num">0.57</td><td class="as-num">5.14</td><td class="as-num">1.17</td></tr>
           <tr><td>一行</td><td class="as-num">4.38</td><td class="as-num">12.22</td><td class="as-num">0.18</td><td class="as-num">1.82</td><td class="as-num">12.85</td><td class="as-num">0.27</td></tr>
           <tr><td>Mini T-Spin Single</td><td class="as-num">0.09</td><td class="as-num">0.07</td><td class="as-num">0.50</td><td class="as-num">0.00</td><td class="as-num">0.56</td><td class="as-num">0.85</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="method-note"><p>「每次攻擊」包埋 B2B、Combo 同全消，所以同一種消行喺唔同局面值唔同。將差距再拆做兩份（Kitagawa 拆法，兩份加埋等於成個差距）：<strong>消行組合</strong>——即係每粒有幾多次係邊種消行——佔 +6.06；<strong>每次攻擊值</strong>——即係同一種消行 pinglamb 每次打出幾多——佔 +4.19（每 100 粒）。組合入面郁得最多嘅係：T-Spin Double +7.12、T-Spin Triple +3.27、四行（Quad） -3.12。</p></div>
+    <div class="method-note"><p>「每次攻擊」包埋 B2B、Combo 同全消，所以同一種消行喺唔同局面值唔同。將差距再拆做兩份（Kitagawa 拆法，兩份加埋等於成個差距）：<strong>消行組合</strong>——即係每粒有幾多次係邊種消行——佔 +6.09；<strong>每次攻擊值</strong>——即係同一種消行 pinglamb 每次打出幾多——佔 +4.19（每 100 粒）。組合入面郁得最多嘅係：T-Spin Double +7.12、T-Spin Triple +3.27、四行（Quad） -3.12。</p></div>
 
     <h3>三 · 攻擊由咩成分組成（每 100 粒）</h3>
     <div class="scroll-x">
@@ -6063,7 +6063,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <thead><tr><th></th><th>基本值</th><th>B2B</th><th>Combo</th><th>全消</th><th>其他</th><th>合計</th></tr></thead>
         <tbody>
           <tr><td><span class="as-dot is-p1"></span>yachi</td><td class="as-num">47.19</td><td class="as-num">4.92</td><td class="as-num">4.05</td><td class="as-num">0.58</td><td class="as-num">0.09</td><td class="as-num">56.85</td></tr>
-          <tr><td><span class="as-dot is-p2"></span>pinglamb</td><td class="as-num">52.58</td><td class="as-num">7.17</td><td class="as-num">5.62</td><td class="as-num">1.47</td><td class="as-num">0.25</td><td class="as-num">67.11</td></tr>
+          <tr><td><span class="as-dot is-p2"></span>pinglamb</td><td class="as-num">52.61</td><td class="as-num">7.17</td><td class="as-num">5.62</td><td class="as-num">1.47</td><td class="as-num">0.25</td><td class="as-num">67.13</td></tr>
         </tbody>
       </table>
     </div>
@@ -6103,7 +6103,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     <div class="method-note">
       <p><strong>同上面幾節一樣，呢節唔屬於信任鏈。</strong>呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒數返玩家用咗幾多下左右同轉，再同「喺空板由出生位置去同一個位最少要幾多下」比較；多出嚟嘅就係 finesse 錯。冇 claim 編號、冇 ✓ 標記。</p>
-      <p>條規則同 TETR.IO 遊戲自己嘅 finesse code 人手對過（2026-10-31 對 tetr.io 2026-10-23 版；repo 冇抄佢嘅 code，所以冇嘢自動重覆呢次核對）：多按 = 用咗幾多下掣減最少要幾多下，佢個查表同我哋空板最少按法喺板內每個位都一樣；放開 soft drop 嗰陣跌緊嘅方塊唔計（當完美），空板去唔到嘅位（塞入去嘅）都唔計。逐局計返嘅完美粒數同多按次數，<strong>99 / 100</strong> 個 player-round 同 TETR.IO 自己數嘅 finesse 一樣（replay 嘅 <code>finesse.perfectpieces</code> 同 <code>finesse.faults</code>）；唔一樣嘅係 <code>replay-2026-08-09-4.ttrm</code> 第 4 局 pinglamb（完美 47 對 48，多按 12 對 8）。板面係模擬器重建嘅，每粒錯喺邊個位就冇第二份實作對過。</p>
+      <p>條規則同 TETR.IO 遊戲自己嘅 finesse code 人手對過（2026-10-31 對 tetr.io 2026-10-23 版；repo 冇抄佢嘅 code，所以冇嘢自動重覆呢次核對）：多按 = 用咗幾多下掣減最少要幾多下，佢個查表同我哋空板最少按法喺板內每個位都一樣；放開 soft drop 嗰陣跌緊嘅方塊唔計（當完美），空板去唔到嘅位（塞入去嘅）都唔計。逐局計返嘅完美粒數同多按次數，<strong>100 / 100</strong> 個 player-round 同 TETR.IO 自己數嘅 finesse 一樣（replay 嘅 <code>finesse.perfectpieces</code> 同 <code>finesse.faults</code>）。板面係模擬器重建嘅，每粒錯喺邊個位就冇第二份實作對過。</p>
       <p>排名按多按嘅下數，一粒可以多按幾下，所以每格都印埋係幾多粒。擺位 = 方塊 + 方向 + 最左嗰格喺邊。箭咀：←→ 撳一下；⇤⇥ 撳住推到牆；↻↺ 順／逆時針轉；180 轉半圈（算兩下）。「最常見錯法」入面每個箭咀係撳落一次，撳住推都係一次。最少按法可以多過一種，呢度印其中一種。</p>
     </div>
 
@@ -6157,7 +6157,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       </div>
     </div>
     <h3><span class="fp-dot is-p2"></span>pinglamb</h3>
-    <p>計咗 4308 粒，其中 452 粒有多按，加埋多按咗 <strong>684</strong> 下；有多按嘅擺位有 112 個。冇計嘅：446 粒用 soft drop 落。</p>
+    <p>計咗 4304 粒，其中 447 粒有多按，加埋多按咗 <strong>680</strong> 下；有多按嘅擺位有 110 個。冇計嘅：446 粒用 soft drop 落。</p>
     <div class="fp-grid">
       <div class="fp-card">
         <div class="fp-rank">第 1 位</div>

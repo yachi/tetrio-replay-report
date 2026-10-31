@@ -125,7 +125,7 @@ test('the scored T-spins are the ones emit-opener-facts.ts scores (the third cop
   expect(checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT)).toBe(15834);
   expect(art().check.reconstruction_disagreed).toBe(0);
   expect(art().check.rowmap_unverified).toBe(31);
-  expect(art().check.rowmap_steps).toBe(275898);
+  expect(art().check.rowmap_steps).toBe(275879);
 });
 
 test('the Python twin on the drawings: the rule fires where the gate records it, with its holes, and nowhere else', () => {
