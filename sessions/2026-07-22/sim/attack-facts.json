@@ -68,15 +68,7 @@
    "unknown": 0,
    "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-07-22-9.ttrm",
-    "round": 1,
-    "user": "yachi",
-    "locks": 89,
-    "pieces": 88
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {

@@ -1865,15 +1865,15 @@ never type. Each session's report carries the same split for that night in 攻�
 fourth quarantined section.
 
 **What is anchored and what is not.** The engine re-runs every round and reads `res.rawGarbage`,
-the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->2946 of 2950 player-rounds for the attack total and 2943 of 2950 for the clear-type counts<!--/app:anchor-->
-(the exceptions are named in `attack-facts.test.ts`). So the clear-type COUNTS below are as good as
+the attack BEFORE cancellation; it agrees with the replay's own counters in <!--app:anchor-->2950 of 2950 player-rounds for the attack total and 2950 of 2950 for the clear-type counts<!--/app:anchor-->
+(the exception lists in `attack-facts.test.ts` are empty since 2026-10-31's clutch fix). So the clear-type COUNTS below are as good as
 facts.json; attack per clear and the base/B2B/combo split are one engine's. **Do not use
 `oracle-source.ts`'s `records[].attack` for this** — it is post-cancel; measured once on 2026-10-11 and not re-derived, it summed to about 80% of
 the replay's total and made a T-spin Triple look worth 4.9 lines instead of 6.1.
 
-The engine gap is <!--app:gap-->+6.36<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
+The engine gap is <!--app:gap-->+6.35<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
 
-* **by window** — <!--app:windows-->+2.74 from the first 21 locks and +3.62 after them<!--/app:windows-->.
+* **by window** — <!--app:windows-->+2.74 from the first 21 locks and +3.61 after them<!--/app:windows-->.
 * **by clear type (Kitagawa 1955)** — <!--app:kitagawa-->+3.99 of mix and +2.36 of value<!--/app:kitagawa-->: the MIX of clears (how many per piece of
   each type) and the VALUE of each clear (B2B, combo, Perfect Clear riding on it). The largest mix
   terms are <!--app:terms-->T-spin Doubles +4.09, T-spin Triples +3.04, quads -2.54, T-spin Singles -0.65<!--/app:terms-->.
@@ -3402,10 +3402,15 @@ the `donation.caveat` string, which is the `29-34%` defect exactly: a corpus cla
 that cannot see the corpus. The caveat now points at the per-player `garbage_derived_well` /
 `self_built_well` split instead, and every artefact was re-emitted.
 The substantive caveat is untouched and does not rest on that column either way:
-the oracle keeps the engine's own seeded-RNG garbage hole *columns*, which disagree with the
-ige-recorded ones 97 of 103 times over the first six sessions (`oracle-source.ts`), so the count
-says the board offered the
-shape that often and can never say which column was donated into. The check that finds this must
+the oracle keeps the engine's own seeded-RNG garbage hole *columns*, and the replay records none to
+check them against, so the count says the board offered the shape that often and can never say which
+column was donated into. (This read 「which disagree with the ige-recorded ones 97 of 103 times」 until
+2026-10-31: that compared the hole with an `interaction` event's `x`, which TETR.IO's client sets to
+the SENDER's falling-piece position, not a hole. The engine's columns are probably the game's: the
+client's garbage RNG is the engine's, and a wrong seed collapses admission. See `oracle-source.ts`'s
+note. The same 97-of-103 sentence still sits in `opener_section.py`, `check_opener_section.py`,
+`emit-opener-facts.ts` and the technique profiles' caveats, and in every artefact and page they
+render; correcting those re-emits all of them and is its own pass.) The check that finds this must
 read the row's **filled** cells for the `-1` garbage sentinel: the well cell is empty by
 construction and carries `null`, so testing it directly is a guard nothing can fire — that exact
 bug reported every well as self-built for a whole round of measurement.
@@ -3873,6 +3878,8 @@ TETR.IO build is not noticed. Per player-round the result is compared with the r
 `finesse.perfectpieces` and `.faults`; the disagreeing rounds are `ANCHOR_EXCEPTIONS` in
 `finesse-facts.test.ts`, by name, each tagged `admission` (the round is refused by `replay-facts.json`'s
 admission check, i.e. the engine's board is not the game's, which the test verifies) or `unexplained`.
+The list is EMPTY since 2026-10-31: the other 14 (three of them `unexplained`) were all the engine's
+`clutch` setting, see 「重播」.
 Two mutants: dropping the exemption collapses the anchor, and exempting on press loses agreement. How
 many agree is the artefact's and the section's, never this file's. Two traps the probe hit:
 `res.keysPresses` holds only the CURRENT frame's keys (the engine flushes its cache every tick), so the
@@ -3919,6 +3926,16 @@ moment at all (since 2026-10-23, yachi's call: every 社畜 window hit in the co
 must see a label appear. The report's 最癲一局 region passes no labels and is unchanged.
 TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
 which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
+
+**Every player-round admits since 2026-10-31.** `TL_DEFAULTS` in `oracle-source.ts` had `clutch: false`;
+TETR.IO's own options list (tetr.io/js/tetrio.js, the 2026-10-23 build, read by hand that day; nothing
+of it committed, so a new build is not noticed) defaults it to true. With clutch the game walks a piece
+that spawns into the stack up until it fits, provided the last lock cleared a line; without it the
+engine overlapped or blocked the piece, and every one of the twelve `ADMISSION_EXCEPTIONS`, the two
+WINNER entries of `KNOCKOUT_EXCEPTIONS`, all of `attack-facts.test.ts`'s anchor exceptions and all
+fourteen of `finesse-facts.test.ts`'s went with the change. The 28 `topout` deaths the engine survives
+remain, unexplained. `tools/cc-coach/extract-positions.ts` carries its own copy with `clutch: false`
+and was not changed: it feeds the bot, not a published figure.
 
 The engine hooks the emitter needs are **opt-in**. `createEngine`'s `date` defaults to the wall clock
 as before, and `TL_DEFAULTS` is only exported, so every pre-existing `sim/*.json` re-emits

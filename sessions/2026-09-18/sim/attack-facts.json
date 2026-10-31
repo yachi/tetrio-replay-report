@@ -59,44 +59,16 @@
  "anchor": {
   "attack": {
    "rounds": 254,
-   "agree": 253,
-   "exceptions": [
-    {
-     "file": "replay-2026-09-18-05.ttrm",
-     "round": 2,
-     "user": "yachi",
-     "engine": 22,
-     "replay": 23
-    }
-   ]
+   "agree": 254,
+   "exceptions": []
   },
   "counts": {
    "rounds": 254,
-   "agree": 253,
+   "agree": 254,
    "unknown": 0,
-   "exceptions": [
-    {
-     "file": "replay-2026-09-18-05.ttrm",
-     "round": 2,
-     "user": "yachi",
-     "engine_vs_replay": {
-      "D": [
-       2,
-       3
-      ]
-     }
-    }
-   ]
+   "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-09-18-05.ttrm",
-    "round": 2,
-    "user": "yachi",
-    "locks": 52,
-    "pieces": 50
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {
@@ -267,16 +239,16 @@
     },
     "mid": {
      "pieces": 9267,
-     "attack": 5652,
-     "lines": 5778,
+     "attack": 5653,
+     "lines": 5780,
      "classes": {
       "S": {
        "n": 1176,
        "attack": 263
       },
       "D": {
-       "n": 598,
-       "attack": 603
+       "n": 599,
+       "attack": 604
       },
       "T": {
        "n": 167,
@@ -308,7 +280,7 @@
       }
      },
      "components": {
-      "base": 4640,
+      "base": 4641,
       "b2b": 492,
       "combo": 496,
       "allclear": 10,
@@ -499,7 +471,7 @@
    "opener_attack": 80,
    "n": {
     "S": 62,
-    "D": 27,
+    "D": 28,
     "T": 11,
     "Q": 30,
     "TSS": 8,

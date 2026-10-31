@@ -11,51 +11,24 @@
  "top_n": 10,
  "anchor": {
   "rounds": 126,
-  "agree": 124,
+  "agree": 126,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-10-22-01.ttrm",
-    "round": 6,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 100,
-     "faults": 12
-    },
-    "replay": {
-     "perfect": 101,
-     "faults": 10
-    }
-   },
-   {
-    "file": "replay-2026-10-22-09.ttrm",
-    "round": 3,
-    "user": "yachi",
-    "engine": {
-     "perfect": 107,
-     "faults": 27
-    },
-    "replay": {
-     "perfect": 106,
-     "faults": 17
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
    "user": "pinglamb",
    "rounds": 63,
-   "pieces": 5735,
-   "scored": 5265,
-   "faulty": 540,
-   "faults": 880,
+   "pieces": 5734,
+   "scored": 5264,
+   "faulty": 538,
+   "faults": 878,
    "not_scored": {
     "soft_drop": 470,
     "no_empty_board_path": 0
    },
    "placements_scored": 161,
-   "placements_with_faults": 118,
+   "placements_with_faults": 116,
    "top": [
     {
      "piece": "I",
@@ -627,17 +600,68 @@
   {
    "user": "yachi",
    "rounds": 63,
-   "pieces": 6312,
-   "scored": 5914,
-   "faulty": 661,
-   "faults": 1139,
+   "pieces": 6307,
+   "scored": 5909,
+   "faulty": 657,
+   "faults": 1129,
    "not_scored": {
     "soft_drop": 398,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,
-   "placements_with_faults": 126,
+   "placements_with_faults": 124,
    "top": [
+    {
+     "piece": "Z",
+     "shape": 1,
+     "col": 1,
+     "cells": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "target": 2,
+     "optimal": [
+      "⇤",
+      "↻"
+     ],
+     "scored": 48,
+     "faulty": 47,
+     "faults": 47,
+     "example": {
+      "file": "replay-2026-10-22-01.ttrm",
+      "round": 3,
+      "lock": 40,
+      "keys": 3,
+      "excess": 1,
+      "moves": [
+       "←",
+       "↺",
+       "←"
+      ]
+     },
+     "most_common_faulty": {
+      "moves": [
+       "↺",
+       "←",
+       "←"
+      ],
+      "n": 39
+     }
+    },
     {
      "piece": "I",
      "shape": 1,
@@ -688,57 +712,6 @@
        "→"
       ],
       "n": 36
-     }
-    },
-    {
-     "piece": "Z",
-     "shape": 1,
-     "col": 1,
-     "cells": [
-      [
-       0,
-       0
-      ],
-      [
-       0,
-       1
-      ],
-      [
-       1,
-       1
-      ],
-      [
-       1,
-       2
-      ]
-     ],
-     "target": 2,
-     "optimal": [
-      "⇤",
-      "↻"
-     ],
-     "scored": 47,
-     "faulty": 46,
-     "faults": 46,
-     "example": {
-      "file": "replay-2026-10-22-01.ttrm",
-      "round": 3,
-      "lock": 40,
-      "keys": 3,
-      "excess": 1,
-      "moves": [
-       "←",
-       "↺",
-       "←"
-      ]
-     },
-     "most_common_faulty": {
-      "moves": [
-       "↺",
-       "←",
-       "←"
-      ],
-      "n": 38
      }
     },
     {
@@ -1114,55 +1087,64 @@
      }
     },
     {
-     "piece": "O",
-     "shape": 0,
-     "col": 0,
+     "piece": "T",
+     "shape": 1,
+     "col": 1,
      "cells": [
       [
        0,
        0
       ],
       [
-       1,
-       0
-      ],
-      [
        0,
        1
       ],
       [
        1,
        1
+      ],
+      [
+       0,
+       2
       ]
      ],
-     "target": 1,
+     "target": 2,
      "optimal": [
-      "⇤"
+      "⇤",
+      "↻"
      ],
-     "scored": 182,
+     "scored": 19,
      "faulty": 8,
      "faults": 21,
      "example": {
-      "file": "replay-2026-10-22-04.ttrm",
+      "file": "replay-2026-10-22-06.ttrm",
       "round": 3,
-      "lock": 16,
-      "keys": 5,
-      "excess": 4,
+      "lock": 89,
+      "keys": 13,
+      "excess": 11,
       "moves": [
-       "←",
-       "←",
-       "←",
+       "↻",
        "→",
-       "←"
+       "↻",
+       "←",
+       "↻",
+       "↻",
+       "→",
+       "↻",
+       "↻",
+       "→",
+       "↻",
+       "↻",
+       "↻"
       ]
      },
      "most_common_faulty": {
       "moves": [
-       "→",
        "←",
-       "←"
+       "↻",
+       "→"
       ],
-      "n": 2
+      "n": 4
      }
     }
    ]

@@ -7157,7 +7157,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
 
     <div class="method-note">
       <p><strong>同上面幾節一樣，呢節唔屬於信任鏈。</strong>呢節將每一局用 replay 模擬器（vendored Triangle 引擎）由頭重跑，逐粒數返玩家用咗幾多下左右同轉，再同「喺空板由出生位置去同一個位最少要幾多下」比較；多出嚟嘅就係 finesse 錯。冇 claim 編號、冇 ✓ 標記。</p>
-      <p>條規則同 TETR.IO 遊戲自己嘅 finesse code 人手對過（2026-10-31 對 tetr.io 2026-10-23 版；repo 冇抄佢嘅 code，所以冇嘢自動重覆呢次核對）：多按 = 用咗幾多下掣減最少要幾多下，佢個查表同我哋空板最少按法喺板內每個位都一樣；放開 soft drop 嗰陣跌緊嘅方塊唔計（當完美），空板去唔到嘅位（塞入去嘅）都唔計。逐局計返嘅完美粒數同多按次數，<strong>129 / 130</strong> 個 player-round 同 TETR.IO 自己數嘅 finesse 一樣（replay 嘅 <code>finesse.perfectpieces</code> 同 <code>finesse.faults</code>）；唔一樣嘅係 <code>replay-2026-09-10-07.ttrm</code> 第 4 局 pinglamb（完美 44 對 45，多按 16 對 14）。板面係模擬器重建嘅，每粒錯喺邊個位就冇第二份實作對過。</p>
+      <p>條規則同 TETR.IO 遊戲自己嘅 finesse code 人手對過（2026-10-31 對 tetr.io 2026-10-23 版；repo 冇抄佢嘅 code，所以冇嘢自動重覆呢次核對）：多按 = 用咗幾多下掣減最少要幾多下，佢個查表同我哋空板最少按法喺板內每個位都一樣；放開 soft drop 嗰陣跌緊嘅方塊唔計（當完美），空板去唔到嘅位（塞入去嘅）都唔計。逐局計返嘅完美粒數同多按次數，<strong>130 / 130</strong> 個 player-round 同 TETR.IO 自己數嘅 finesse 一樣（replay 嘅 <code>finesse.perfectpieces</code> 同 <code>finesse.faults</code>）。板面係模擬器重建嘅，每粒錯喺邊個位就冇第二份實作對過。</p>
       <p>排名按多按嘅下數，一粒可以多按幾下，所以每格都印埋係幾多粒。擺位 = 方塊 + 方向 + 最左嗰格喺邊。箭咀：←→ 撳一下；⇤⇥ 撳住推到牆；↻↺ 順／逆時針轉；180 轉半圈（算兩下）。「最常見錯法」入面每個箭咀係撳落一次，撳住推都係一次。最少按法可以多過一種，呢度印其中一種。</p>
     </div>
 
@@ -7211,7 +7211,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       </div>
     </div>
     <h3><span class="fp-dot is-p2"></span>pinglamb</h3>
-    <p>計咗 4898 粒，其中 578 粒有多按，加埋多按咗 <strong>897</strong> 下；有多按嘅擺位有 120 個。冇計嘅：469 粒用 soft drop 落。</p>
+    <p>計咗 4898 粒，其中 577 粒有多按，加埋多按咗 <strong>895</strong> 下；有多按嘅擺位有 120 個。冇計嘅：469 粒用 soft drop 落。</p>
     <div class="fp-grid">
       <div class="fp-card">
         <div class="fp-rank">第 1 位</div>

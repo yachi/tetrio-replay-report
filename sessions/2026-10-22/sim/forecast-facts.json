@@ -86,13 +86,13 @@
       "sampling_ci95_hi_x1000": 20,
       "simulator_range_lo_x1000": 3,
       "simulator_range_hi_x1000": 4,
-      "verified_placements": 5828,
+      "verified_placements": 5832,
       "total_placements": 6307
     }
   ],
   "session": {
     "player_rounds": 126,
-    "verified_placements": 10237,
+    "verified_placements": 10241,
     "total_placements": 12041,
     "coverage_x1000": 850
   },

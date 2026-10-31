@@ -11,23 +11,9 @@
  "top_n": 10,
  "anchor": {
   "rounds": 98,
-  "agree": 97,
+  "agree": 98,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-09-17-05.ttrm",
-    "round": 0,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 98,
-     "faults": 30
-    },
-    "replay": {
-     "perfect": 99,
-     "faults": 29
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
@@ -35,14 +21,14 @@
    "rounds": 49,
    "pieces": 4527,
    "scored": 4134,
-   "faulty": 491,
-   "faults": 818,
+   "faulty": 490,
+   "faults": 817,
    "not_scored": {
     "soft_drop": 393,
     "no_empty_board_path": 0
    },
    "placements_scored": 161,
-   "placements_with_faults": 119,
+   "placements_with_faults": 118,
    "top": [
     {
      "piece": "I",

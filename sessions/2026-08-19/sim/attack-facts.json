@@ -64,38 +64,11 @@
   },
   "counts": {
    "rounds": 140,
-   "agree": 139,
+   "agree": 140,
    "unknown": 0,
-   "exceptions": [
-    {
-     "file": "replay-2026-08-19-10.ttrm",
-     "round": 0,
-     "user": "pinglamb",
-     "engine_vs_replay": {
-      "S": [
-       8,
-       7
-      ]
-     }
-    }
-   ]
+   "exceptions": []
   },
-  "engine_locks_past_game_end": [
-   {
-    "file": "replay-2026-08-19-10.ttrm",
-    "round": 0,
-    "user": "pinglamb",
-    "locks": 103,
-    "pieces": 102
-   },
-   {
-    "file": "replay-2026-08-19-5.ttrm",
-    "round": 0,
-    "user": "pinglamb",
-    "locks": 33,
-    "pieces": 32
-   }
-  ]
+  "engine_locks_past_game_end": []
  },
  "players": [
   {
@@ -158,10 +131,10 @@
     "mid": {
      "pieces": 4196,
      "attack": 3000,
-     "lines": 2700,
+     "lines": 2699,
      "classes": {
       "S": {
-       "n": 551,
+       "n": 550,
        "attack": 146
       },
       "D": {
@@ -364,7 +337,7 @@
    "opener_pieces": 168,
    "opener_attack": 94,
    "n": {
-    "S": 60,
+    "S": 59,
     "D": 23,
     "T": 7,
     "Q": 28,

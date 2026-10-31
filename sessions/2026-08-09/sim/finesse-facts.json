@@ -11,38 +11,24 @@
  "top_n": 10,
  "anchor": {
   "rounds": 100,
-  "agree": 99,
+  "agree": 100,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-08-09-4.ttrm",
-    "round": 3,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 47,
-     "faults": 12
-    },
-    "replay": {
-     "perfect": 48,
-     "faults": 8
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
    "user": "pinglamb",
    "rounds": 50,
-   "pieces": 4754,
-   "scored": 4308,
-   "faulty": 452,
-   "faults": 684,
+   "pieces": 4750,
+   "scored": 4304,
+   "faulty": 447,
+   "faults": 680,
    "not_scored": {
     "soft_drop": 446,
     "no_empty_board_path": 0
    },
    "placements_scored": 162,
-   "placements_with_faults": 112,
+   "placements_with_faults": 110,
    "top": [
     {
      "piece": "O",
@@ -334,7 +320,7 @@
       "⇤",
       "↻"
      ],
-     "scored": 33,
+     "scored": 34,
      "faulty": 21,
      "faults": 21,
      "example": {
@@ -494,7 +480,7 @@
      "optimal": [],
      "scored": 50,
      "faulty": 6,
-     "faults": 14,
+     "faults": 15,
      "example": {
       "file": "replay-2026-08-09-6.ttrm",
       "round": 6,
@@ -510,8 +496,8 @@
      },
      "most_common_faulty": {
       "moves": [
-       "→",
-       "←"
+       "←",
+       "→"
       ],
       "n": 2
      }

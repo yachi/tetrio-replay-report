@@ -64,21 +64,9 @@
   },
   "counts": {
    "rounds": 146,
-   "agree": 145,
+   "agree": 146,
    "unknown": 0,
-   "exceptions": [
-    {
-     "file": "replay-2026-08-25-05.ttrm",
-     "round": 5,
-     "user": "yachi",
-     "engine_vs_replay": {
-      "S": [
-       8,
-       9
-      ]
-     }
-    }
-   ]
+   "exceptions": []
   },
   "engine_locks_past_game_end": []
  },
@@ -252,10 +240,10 @@
     "mid": {
      "pieces": 7089,
      "attack": 4226,
-     "lines": 4468,
+     "lines": 4469,
      "classes": {
       "S": {
-       "n": 895,
+       "n": 896,
        "attack": 155
       },
       "D": {
@@ -482,7 +470,7 @@
    "opener_pieces": 189,
    "opener_attack": 84,
    "n": {
-    "S": 122,
+    "S": 123,
     "D": 60,
     "T": 17,
     "Q": 54,

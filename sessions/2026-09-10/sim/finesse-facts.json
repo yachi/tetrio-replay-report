@@ -11,23 +11,9 @@
  "top_n": 10,
  "anchor": {
   "rounds": 130,
-  "agree": 129,
+  "agree": 130,
   "unknown": 0,
-  "exceptions": [
-   {
-    "file": "replay-2026-09-10-07.ttrm",
-    "round": 3,
-    "user": "pinglamb",
-    "engine": {
-     "perfect": 44,
-     "faults": 16
-    },
-    "replay": {
-     "perfect": 45,
-     "faults": 14
-    }
-   }
-  ]
+  "exceptions": []
  },
  "players": [
   {
@@ -35,8 +21,8 @@
    "rounds": 65,
    "pieces": 5367,
    "scored": 4898,
-   "faulty": 578,
-   "faults": 897,
+   "faulty": 577,
+   "faults": 895,
    "not_scored": {
     "soft_drop": 469,
     "no_empty_board_path": 0
@@ -500,9 +486,9 @@
       "⇥",
       "↺"
      ],
-     "scored": 40,
-     "faulty": 12,
-     "faults": 22,
+     "scored": 39,
+     "faulty": 11,
+     "faults": 20,
      "example": {
       "file": "replay-2026-09-10-01.ttrm",
       "round": 4,
