@@ -6,8 +6,8 @@
     "hypothesis": "paired AUC, winner vs loser, of rows cleared per piece over locks whose PRE-lock board carries at least one garbage row, over the verified prefix; one-sided, winner higher",
     "estimand_entry": "pipeline/sim/board-metrics.ts",
     "board_source": "runCaseOracle",
-    "pinned_commit": "f02f84d05330085b73e6e3502d79bf24ae243a57",
-    "pinned_on": "2026-10-23",
+    "pinned_commit": "e8507d5d0d2620f769c30a67ebd077a7d5133728",
+    "pinned_on": "2026-10-31",
     "unblinding": [
       "CLAUDE.md publishes the UNCONDITIONAL per-piece DS paired AUC for both banked sessions (08-09: 66.0, 08-14: 70.2). That is not the registered estimand — the registered one conditions on garbage being on the pre-lock board — but the two are correlated, so the bank is partially unblinded and the confirmatory test must be reported as such.",
       "2026-08-19 is banked on the same terms and with the same caveat: CLAUDE.md's AUC block publishes its UNCONDITIONAL per-piece DS paired AUC (73.6) alongside the other six. Again that is not the registered estimand — which conditions on garbage being on the pre-lock board — but it is correlated, so this session enters the bank partially unblinded exactly as 08-09 and 08-14 did. Recorded at the time of banking rather than discovered at analysis time.",
@@ -75,6 +75,13 @@
         "why": "Twenty-two bun test files each replayed the whole corpus through the identical computation; the cache shares it across files. THE RELEVANT FACT FOR THIS REGISTRATION is that the change is INERT: the cache is off by default outside `bun test`, so any script computing the estimand runs exactly the code it ran before; inside `bun test` a hit is a stored copy of the same computation, checked at write time by a strict deep-equal round trip, and `oracle-cache.test.ts` checks cached == fresh over a whole session. The whole `bun test` suite passes with the cache on and with ORACLE_CACHE=off, including every byte-for-byte artefact rebuild. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session.",
         "pin_from": "9a449334c8f022ec87b374e840222c9a64b9b6d8",
         "pin_to": "f02f84d05330085b73e6e3502d79bf24ae243a57"
+      },
+      {
+        "date": "2026-10-31",
+        "what": "The estimand's import closure moved in one file, `oracle-source.ts`: `TL_DEFAULTS.clutch` goes from false to true, TETR.IO's own default (read from tetr.io/js/tetrio.js, the 2026-10-23 build, by hand on 2026-10-31; nothing of it committed). The rest of that file's diff is comments. All sessions stay classified as they were.",
+        "why": "With clutch off the engine overlapped or blocked out a piece the game walks up after a line clear, so its board was not the game's from that lock on: twelve player-rounds failed admission and every replay-anchored exception list in the repo traced to it. THE RELEVANT FACT FOR THIS REGISTRATION is that, unlike the two entries before it, this change is NOT inert: the boards `runCaseOracle` produces change on the rounds where a spawned piece overlapped the stack after a clear, and verified prefixes there grow (the cross-tslot board count moved 241272 -> 241276 with no session added). It moves the instrument TOWARD the game, which is what the estimand's `board_source` assumes, and it was made to fix the replay anchors, not by looking at the registered estimand. `board-metrics.ts` is untouched and the registered estimand has still never been computed on a banked session, so no banked session is unblinded by it.",
+        "pin_from": "f02f84d05330085b73e6e3502d79bf24ae243a57",
+        "pin_to": "e8507d5d0d2620f769c30a67ebd077a7d5133728"
       }
     ]
   }
