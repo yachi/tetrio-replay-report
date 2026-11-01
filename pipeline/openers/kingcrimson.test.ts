@@ -33,7 +33,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
 const ART_PATH = `${import.meta.dir}/../../analysis/kingcrimson-facts.json`;
 const STSD_PATH = `${import.meta.dir}/../../analysis/stsd-facts.json`;
 const TR = JSON.parse(readFileSync(KINGCRIMSON.transcriptionPath, 'utf8'));
@@ -53,21 +53,21 @@ const STSD_FOLLOWUPS: string[] = [
   '2026-10-29 m2r3 pinglamb lock 89',
 ];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 4, yachi: 7 };
+const WINDOW_OFF_BOARD = { pinglamb: 4, yachi: 8 };
 
 /** Per player: the opportunity (scored full TSTs), split at the 0-based opener window. */
-const TST_DENOM = { pinglamb: { all: 1503, in_opener: 1470, mid_game: 33 },
-                    yachi: { all: 898, in_opener: 852, mid_game: 46 } };
+const TST_DENOM = { pinglamb: { all: 1633, in_opener: 1595, mid_game: 38 },
+                    yachi: { all: 983, in_opener: 931, mid_game: 52 } };
 const HITS = { pinglamb: { all: 1, in_opener: 0, mid_game: 1, mirrored: 1, garbage_in_window: 0 },
                yachi: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 } };
 const FOLLOWUP_FIRED = { pinglamb: 1, yachi: 0 };
 const QUALIFIED = { pinglamb: 1, yachi: 0 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
-const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TSD: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 14, yachi: 28}, no_roof: {pinglamb: 1, yachi: 0}, t_overlap: {pinglamb: 1, yachi: 0}}, orientation_baseline: {pinglamb: 1503, yachi: 898}};
+const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TSD: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 17, yachi: 31}, no_roof: {pinglamb: 1, yachi: 0}, t_overlap: {pinglamb: 1, yachi: 0}}, orientation_baseline: {pinglamb: 1633, yachi: 983}};
 /** What discriminates, measured: full TSTs whose anchored T meets ONE part of the window. `above` is the two
  *  rows over the T (the overhang over the well, then the wall and the open well under it), of which `overhang` is
  *  the top row and `wall` the next; `cleared` the three rows the TST clears; `below` the STSD slot's three rows. */
-const PART_ONLY = { above: 2401, overhang: 2401, wall: 2401, cleared: 2401, below: 1 };
+const PART_ONLY = { above: 2616, overhang: 2616, wall: 2616, cleared: 2616, below: 1 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -150,7 +150,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(15834);
+  expect(n).toBe(17205);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

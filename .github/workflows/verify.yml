@@ -114,6 +114,7 @@ jobs:
           - sessions/2026-10-20/report
           - sessions/2026-10-22/report
           - sessions/2026-10-29/report
+          - sessions/2026-11-01/report
           # A FILTERED SUBSET, not a session: the three 2026-09-18 matches in which
           # BOTH players' pooled per-match VS beat their own 12-session median. It lives
           # outside sessions/ on purpose — `analysis/stat_sources.py` globs
@@ -266,7 +267,7 @@ jobs:
                   '2026-08-14', '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10',
                   '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
                   '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20',
-                  '2026-10-22', '2026-10-29']
+                  '2026-10-22', '2026-10-29', '2026-11-01']
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2

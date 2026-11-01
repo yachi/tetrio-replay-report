@@ -15,7 +15,8 @@
  *      empty, with its reason).
  *   4. STMB CAVE, ダブルダガー AND BT砲 ARE NOT THIS: all four lay the T flat, nub down; anchored on the same T this
  *      window clashes with each of theirs on a cell in every pairing of hands (re-derived from the transcriptions),
- *      so no lock is a hit of two of them, and none is.
+ *      so no lock is a hit of two of them, and none is (the second type against STMB Cave in opposite hands is a
+ *      relation, not a clash, and its common hits are a named list, see 8).
  *   5. WHAT DISCRIMINATES: measured per window part, with the T anchored (the row above the T, the cleared rows,
  *      the row under them), against the headline: no single part gives it. The cleared rows are entailed by the
  *      clear and do no work; the row below cuts them down by at least ten times and the rows above (with the
@@ -29,7 +30,8 @@
  *   8. THE SECOND VARIANT (`uncut`, harddrop's second generic type, its board an external node): its window fires on each
  *      of its harddrop drawings at the drawn T and nowhere else, clashes with the first type's on a cell, and its
  *      follow-up search fires on harddrop's own drawing as a two-lock digest, as drawn and mirrored. Its corpus hits
- *      are a named list like the first type's — measured EMPTY — and its controls and per-part counts are pinned.
+ *      are a named list like the first type's — measured EMPTY through twenty sessions, one since 2026-11-01 (also an
+ *      STMB Cave hit, in the opposite hand: STMBCAVE_ALSO_UNCUT) — and its controls and per-part counts are pinned.
  *   9. TETRISちゃんねる: its two agreement boards fire the first type's window at their slots, and its 江戸城 (009) is ONE
  *      Cut Copy: the middle T's outer slot has no overhang, so the window fires there only when read without its
  *      `window_extra` — the TS twin of the gate's measurement. On the corpus, a hit whose
@@ -57,7 +59,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
 const ART_PATH = `${import.meta.dir}/../../analysis/cutcopy-facts.json`;
 const TR = JSON.parse(readFileSync(CUTCOPY.transcriptionPath, 'utf8'));
 const H = 40;
@@ -72,21 +74,27 @@ const FOLLOWUP_NOT_FIRED: string[] = [
 ];
 const GARBAGE_IN_WINDOW: string[] = [
   "2026-10-20 m2r1 yachi lock 117",
+  "2026-11-01 m4r2 yachi lock 32 (uncut)",
 ];
 const CUTCOPY_IN_OPENER: string[] = [];
 const RECON_DROPPED_TSD: string[] = [];
-/** The second variant's hits (harddrop's second type): measured, none. */
-const UNCUT_HITS: string[] = [];
+/** The second variant's hits (harddrop's second type). Measured, none through twenty sessions; 2026-11-01 adds the
+ *  first: yachi's m4r2 (replay-2026-11-01-04.ttrm round 1), a mirrored flat T on lock 32 of a prefix verified to 109,
+ *  mid-game, the second slot's bottom row garbage (GGG.GG — so it is in GARBAGE_IN_WINDOW too), its follow-up TSD
+ *  fired at lock 40, and it qualifies. The same lock is an STMB Cave hit as drawn (STMBCAVE_ALSO_UNCUT). */
+const UNCUT_HITS: string[] = [
+  "2026-11-01 m4r2 yachi lock 32 (mirrored)",
+];
 /** A hit whose follow-up fired at a lock that is itself a hit (two Cut Copies in a row): measured, none. */
 const FOLLOWUP_IS_A_HIT: string[] = [];
 /** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
 const WINDOW_OFF_BOARD: Record<string, Record<string, number>> = {
-  cutcopy: { pinglamb: 1832, yachi: 1869 }, uncut: { pinglamb: 2263, yachi: 2287 },
+  cutcopy: { pinglamb: 1994, yachi: 2016 }, uncut: { pinglamb: 2453, yachi: 2472 },
 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 5884, in_opener: 1162, mid_game: 4722 },
-                    yachi: { all: 5340, in_opener: 1375, mid_game: 3965 } };
+const TSD_DENOM = { pinglamb: { all: 6396, in_opener: 1254, mid_game: 5142 },
+                    yachi: { all: 5783, in_opener: 1491, mid_game: 4292 } };
 /** Per player: hits, their split, the mirrored ones, the ones with garbage in the window, the follow-ups. */
 const HITS = { pinglamb: {all:  0,  in_opener:  0,  mid_game:  0,  mirrored:  0,  garbage_in_window:  0},
                yachi: {all:  2,  in_opener:  0,  mid_game:  2,  mirrored:  1,  garbage_in_window:  1} };
@@ -98,9 +106,9 @@ const FOLLOWUP = {
 const CONTROLS = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: {pinglamb:  288,  yachi:  174}, no_roof: {pinglamb:  454,  yachi:  380},
-              t_overlap: {pinglamb:  6,  yachi:  5} },
-  orientation_baseline: { pinglamb: 54, yachi: 73 },
+  ablation: { no_must_empty: {pinglamb:  315,  yachi:  183}, no_roof: {pinglamb:  486,  yachi:  404},
+              t_overlap: {pinglamb:  9,  yachi:  6} },
+  orientation_baseline: { pinglamb: 63, yachi: 80 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the outer slot's arms, the wall beside them, the roof and the cell beyond it) with the
@@ -110,31 +118,33 @@ const CONTROLS = {
  *  overhang among them) by at least ten times more again (both asserted where PART_ONLY is checked); neither alone
  *  reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { above: 31, cleared: 9794, below: 834 };
+const PART_ONLY = { above: 31, cleared: 10633, below: 890 };
 /** The second variant (harddrop's second type), pinned the same way: its hits (none), its follow-ups, its controls,
  *  and the full TSDs each part of its window admits with the T anchored (the row above the T, the cleared rows, the
  *  two rows of the second slot under them). */
 const HITS_UNCUT = { pinglamb: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 },
-                     yachi: { all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0 } };
-const FOLLOWUP_UNCUT = { pinglamb: { fired: 0, not_fired: {} }, yachi: { fired: 0, not_fired: {} } };
+                     yachi: { all: 1, in_opener: 0, mid_game: 1, mirrored: 1, garbage_in_window: 1 } };
+const FOLLOWUP_UNCUT = { pinglamb: { fired: 0, not_fired: {} }, yachi: { fired: 1, not_fired: {} } };
 const CONTROLS_UNCUT = {
   under: { TSS: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 750, yachi: 480 }, no_roof: { pinglamb: 1, yachi: 8 },
-              t_overlap: { pinglamb: 18, yachi: 5 } },
-  orientation_baseline: { pinglamb: 54, yachi: 73 },
+  ablation: { no_must_empty: { pinglamb: 813, yachi: 509 }, no_roof: { pinglamb: 1, yachi: 9 },
+              t_overlap: { pinglamb: 20, yachi: 7 } },
+  orientation_baseline: { pinglamb: 63, yachi: 80 },
 };
-const PART_ONLY_UNCUT = { above: 4718, cleared: 9794, below: 9 };
+const PART_ONLY_UNCUT = { above: 5111, cleared: 10633, below: 10 };
 /** The second type and STMB Cave are a RELATION, not a clash: anchored on the same flat T in OPPOSITE hands their
  *  windows agree on every cell both read (the STMB Cave page's own 「連続してTSD」 board is the second type, mirrored).
- *  The corpus locks that are hits of both: measured, none (the second type has no hit). */
-const STMBCAVE_ALSO_UNCUT: string[] = [];
+ *  The corpus locks that are hits of both: measured, none through twenty sessions (the second type had no hit);
+ *  2026-11-01 adds the first, the second type's only hit — yachi's m4r2 lock 32, an STMB Cave hit as drawn and an
+ *  uncut hit mirrored, i.e. in opposite hands, which is the relation exactly. */
+const STMBCAVE_ALSO_UNCUT: string[] = [
+  "2026-11-01 m4r2 yachi lock 32",
+];
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
-  followupUnmirrored: 'no mirrored hit\'s follow-up fires: the one mirrored hit\'s slot is filled before its next T, '
-    + 'which reads the same in either hand (killed on the page\'s own two-lock digest instead)',
   followupAnyT: 'every hit\'s next T either fires the full TSD or finds its slot filled first, so accepting any T '
     + 'spin changes no follow-up (killed on the page\'s own two-lock digest instead)',
 };
@@ -215,7 +225,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(15834);
+  expect(n).toBe(17205);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -459,7 +469,15 @@ test('STMB Cave, Double Dagger and BT砲 are not this: anchored on the same flat
     }
     const theirs = JSON.parse(readFileSync(other.artefactPath, 'utf8')).hits;
     const k = (h: any) => `${h.session}|${h.file}|${h.round_index0}|${h.player}|${h.lock}`;
-    expect(theirs.filter((h: any) => mine.has(k(h))), other.key).toEqual([]);
+    // against STMB Cave the common locks are exactly the relation's named list (the second type's, in opposite
+    // hands); against every other page, and for the first type against STMB Cave too, none
+    const common = theirs.filter((h: any) => mine.has(k(h)));
+    if (other === STMBCAVE)
+      checkNamedList('stmbcave ∩ this page', common.map((h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock}`),
+        STMBCAVE_ALSO_UNCUT);
+    else expect(common, other.key).toEqual([]);
+    const firstType = new Set(art().hits.filter((h: any) => h.variant === 'cutcopy').map(k));
+    expect(theirs.filter((h: any) => firstType.has(k(h))), other.key).toEqual([]);
   }
 });
 
@@ -490,7 +508,10 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
   const parts: Record<keyof typeof PART_ONLY, (r: number) => boolean> = {
     above: r => r < top, cleared: r => r === top || r === top + 1, below: r => r > top + 1,
   };
-  const hits = hitKeys();
+  // the first type's own hits: this measures the first type's window, and the second type's hit (2026-11-01 m4r2,
+  // its own window) need not pass the first type's parts
+  const firstHits = art().hits.filter((h: any) => h.variant === 'cutcopy');
+  const hits = hitKeys({ hits: firstHits });
   const got: Record<string, number> = {};
   for (const [name, keep] of Object.entries(parts)) {
     const preps = prepare(TR, v).map(P => ({ ...P, cells: P.cells.filter(x => x.v === 'T' || keep(x.r)) }));
@@ -501,11 +522,11 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
       n++;
       if (hits.has(keyOf(d, s.i))) hitsIn++;
     }
-    expect(hitsIn, name).toBe(art().hits.length);   // every hit passes each weaker predicate
+    expect(hitsIn, name).toBe(firstHits.length);   // every first-type hit passes each weaker predicate
     got[name] = n;
   }
   expect(got).toEqual(PART_ONLY);
-  for (const n of Object.values(PART_ONLY)) expect(n).toBeGreaterThan(art().hits.length);
+  for (const n of Object.values(PART_ONLY)) expect(n).toBeGreaterThan(firstHits.length);
   // what the comment above claims: the row below cuts the cleared rows by at least ten times, the row above by less
   expect(PART_ONLY.cleared).toBeGreaterThanOrEqual(10 * PART_ONLY.below);
   expect(PART_ONLY.below).toBeGreaterThanOrEqual(10 * PART_ONLY.above);
@@ -515,8 +536,8 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(31);
-  expect(c.rowmap_steps).toBe(275879);
+  expect(c.rowmap_unverified).toBe(32);
+  expect(c.rowmap_steps).toBe(300597);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 
@@ -572,9 +593,18 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   a = mut({ garbageEmpty: true });
   expect(cc(a).map(k)).toEqual(cc(b).filter((h: any) => !h.garbage_in_window).map(k));
 
-  // followupUnmirrored is EQUIVALENT on the corpus now (see EQUIVALENT): the one mirrored hit's slot is filled before
-  // its next T in either hand. It is still killed on the page's own two-lock digest (below).
-  expect(b.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBe(0);
+  // the follow-up slot left as drawn on a mirrored hit. It was EQUIVALENT on the corpus through twenty sessions (the
+  // first type's one mirrored hit has its slot filled before its next T in either hand, and still does); 2026-11-01's
+  // second-type hit (m4r2, mirrored, follow-up fired at lock 40) makes it live: the hits do not move, the
+  // non-mirrored follow-ups do not move, and the mirrored ones lose every fired follow-up. It is also killed on the
+  // page's own two-lock digest (below).
+  a = mut({ followupUnmirrored: true });
+  expect(a.hits.map(k)).toEqual(b.hits.map(k));
+  a.hits.forEach((h: any, i: number) => { if (!h.mirrored) expect(h.followup).toEqual(b.hits[i].followup); });
+  expect(a.hits.filter((h: any) => h.mirrored && h.followup.fired).length).toBe(0);
+  expect(b.hits.filter((h: any) => h.mirrored && h.followup.fired).map(k))
+    .toEqual(b.hits.filter((h: any) => h.variant === 'uncut' && h.mirrored).map(k));
+  expect(b.hits.filter((h: any) => h.variant === 'uncut' && h.mirrored).length).toBeGreaterThan(0);
 
   a = mut({ openerLt: true });
   expect(tsd(a, 'in_opener')).toBeLessThan(tsd(b, 'in_opener'));
@@ -586,6 +616,11 @@ test('mutants: each rule turned off turns this red with its own symptom, or is n
   expect(a.hits.map(k)).toEqual(b.hits.map(k));
   expect(fired(a)).toBe(0);
   expect(fired(b)).toBeGreaterThan(0);
+  // the second type's slot is not split by its own clear, but on the corpus it still needs the row map: 2026-11-01
+  // m4r2's slot moves between its TSD (lock 32) and its next T (lock 40) — an I clears four rows under it at lock 34
+  // and seven garbage rows rise at lock 37 — so without the map its one fired follow-up is lost too
+  expect(total(Object.fromEntries(Object.entries(a.variants.uncut.followup_by_player).map(([u, x]: any) => [u, x.fired])))).toBe(0);
+  expect(b.variants.uncut.followup_by_player.yachi.fired).toBe(1);
 
   // followupAnyT is EQUIVALENT on the corpus now (see EQUIVALENT); it is killed on the page's own digest (below)
 

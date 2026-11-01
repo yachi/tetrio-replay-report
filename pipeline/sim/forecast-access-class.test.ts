@@ -165,6 +165,10 @@
  * NOT RE-MEASURED 2026-10-29 either. The twentieth session adds THREE candidates (clearAlone 42 -> 45,
  * all `formed`) and no member; ACCESS_CLASS still holds the seven entries of 2026-10-09.
  *
+ * NOT RE-MEASURED 2026-11-01 either. The twenty-first session adds EIGHT candidates (clearAlone
+ * 45 -> 53: five `formed`, three `overdetermined`) and no member; ACCESS_CLASS still holds the seven
+ * entries of 2026-10-09 and the set test passed unchanged with the new session on disk.
+ *
  * The remaining mutants — the counterfactual branches and the engine-branch mutants — were NOT
  * re-run. They exercise code this change did not touch, and the 20-mutant score at the top of this
  * header is a statement about a two-member file and has been void since 2026-08-19; it is kept as
@@ -480,7 +484,7 @@ test('the class does not exist beyond the verified prefixes either', () => {
  *  which is `finesse-counters.test.ts`'s lesson arriving here: a test name cannot fail, so a name
  *  carrying figures is a 冇第二份 figure with a green build next to it. Derived from the same
  *  constants the assertions use, it moves when they do. */
-const DECOMP = { clearAlone: 45, formed: 25, overdetermined: 13, access: 7 };
+const DECOMP = { clearAlone: 53, formed: 30, overdetermined: 16, access: 7 };
 
 test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
    + `${DECOMP.overdetermined} overdetermined / ${DECOMP.access} access, and nothing else`, () => {
@@ -570,6 +574,12 @@ test(`the ${DECOMP.clearAlone} candidates decompose ${DECOMP.formed} formed / `
   // `pieceBlocked` and the ACCESS CLASS unchanged at 13 / 0 / 7. The session holds seven mechanism
   // events (forecast-corpus.test.ts), and three of them are candidates the clear alone explains.
   // The access share falls 7/42 -> 7/45 by the denominator alone.
+  //
+  // 2026-11-01 adds 8, splitting 5 `formed` and 3 `overdetermined` — clearAlone 45 -> 53, formed
+  // 25 -> 30, overdetermined 13 -> 16, with `pieceBlocked` and the ACCESS CLASS unchanged at 0 / 7 —
+  // the largest single-session addition, and the first `overdetermined` since 10-12. The session
+  // holds nine mechanism events (forecast-corpus.test.ts); the replica agrees with the engine on all
+  // eight candidates. The access share falls 7/45 -> 7/53 by the denominator alone.
   expect(result.clearAlone).toBe(DECOMP.clearAlone);
   expect(result.formed).toBe(DECOMP.formed);
   expect(result.overdetermined).toBe(DECOMP.overdetermined);
@@ -599,6 +609,6 @@ test('the sweep reached the corpus it claims to have swept', () => {
   // count against a pin rather than one literal against another — a session arriving fails here,
   // which is the whole job. `localised` is the second half: discovery finding 7 directories says
   // nothing about the sweep having replayed them.
-  expect(SESSIONS.length).toBe(20);
-  expect(result.localised).toBe(7026);
+  expect(SESSIONS.length).toBe(21);
+  expect(result.localised).toBe(7628);
 });

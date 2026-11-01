@@ -41,7 +41,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
 const ART_PATH = `${import.meta.dir}/../../analysis/stmbcave-facts.json`;
 const TR = JSON.parse(readFileSync(STMBCAVE.transcriptionPath, 'utf8'));
 const H = 40;
@@ -95,6 +95,9 @@ const STMBCAVE_HITS: string[] = [
   "2026-10-22 m8r1 yachi lock 33 (mirrored)", "2026-10-29 m1r6 yachi lock 41 (mirrored)", "2026-10-29 m2r2 pinglamb lock 27 (mirrored)",
   "2026-10-29 m4r4 pinglamb lock 25 (mirrored)", "2026-10-29 m4r6 yachi lock 294", "2026-10-29 m8r5 pinglamb lock 145",
   "2026-10-29 m9r4 yachi lock 38 (mirrored)", "2026-10-29 m9r9 yachi lock 30",
+  "2026-11-01 m4r2 yachi lock 32", "2026-11-01 m6r7 yachi lock 33 (mirrored)", "2026-11-01 m12r1 yachi lock 141 (mirrored)",
+  "2026-11-01 m12r2 yachi lock 143", "2026-11-01 m12r3 yachi lock 67", "2026-11-01 m13r6 yachi lock 27 (mirrored)",
+  "2026-11-01 m14r6 pinglamb lock 27 (mirrored)", "2026-11-01 m17r5 yachi lock 163", "2026-11-01 m18r3 pinglamb lock 32 (mirrored)",
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-07-22 m3r7 yachi lock 22 (next_t_elsewhere at lock 24)", "2026-07-22 m6r3 yachi lock 25 (slot_filled_before_t at lock 26)",
@@ -166,6 +169,10 @@ const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-10-29 m4r4 pinglamb lock 25 (slot_filled_before_t at lock 26)", "2026-10-29 m4r6 yachi lock 294 (slot_filled_before_t at lock 295)",
   "2026-10-29 m8r5 pinglamb lock 145 (slot_filled_before_t at lock 147)", "2026-10-29 m9r4 yachi lock 38 (slot_filled_before_t at lock 39)",
   "2026-10-29 m9r9 yachi lock 30 (slot_filled_before_t at lock 31)",
+  "2026-11-01 m6r7 yachi lock 33 (slot_filled_before_t at lock 35)", "2026-11-01 m12r1 yachi lock 141 (slot_filled_before_t at lock 142)",
+  "2026-11-01 m12r2 yachi lock 143 (slot_filled_before_t at lock 144)", "2026-11-01 m12r3 yachi lock 67 (slot_filled_before_t at lock 68)",
+  "2026-11-01 m13r6 yachi lock 27 (next_t_elsewhere at lock 28)", "2026-11-01 m14r6 pinglamb lock 27 (slot_filled_before_t at lock 28)",
+  "2026-11-01 m17r5 yachi lock 163 (slot_filled_before_t at lock 164)", "2026-11-01 m18r3 pinglamb lock 32 (slot_filled_before_t at lock 33)",
 ];
 const STMBCAVE_IN_OPENER: string[] = [
   "2026-08-19 m9r5 pinglamb lock 20", "2026-09-03 m6r2 yachi lock 18", "2026-10-03 m2r3 yachi lock 21",
@@ -206,6 +213,9 @@ const CAVE_METRIC_ONLY: string[] = [
   "2026-10-29 m6r6 pinglamb lock 46 (centred, width 3, depth 1)", "2026-10-29 m7r2 yachi lock 33 (arm_only, width 3, depth 1)",
   "2026-10-29 m8r6 yachi lock 80 (centred, width 3, depth 1)", "2026-10-29 m9r4 yachi lock 73 (centred, width 3, depth 1)",
   "2026-10-29 m9r8 yachi lock 78 (arm_only, width 3, depth 1)",
+  "2026-11-01 m5r5 pinglamb lock 25 (centred, width 3, depth 1)", "2026-11-01 m6r6 yachi lock 150 (centred, width 3, depth 1)",
+  "2026-11-01 m7r6 yachi lock 60 (centred, width 3, depth 1)", "2026-11-01 m7r7 yachi lock 44 (centred, width 3, depth 1)",
+  "2026-11-01 m8r7 pinglamb lock 33 (centred, width 3, depth 1)", "2026-11-01 m16r9 pinglamb lock 41 (centred, width 3, depth 1)",
 ];
 
 /** The SDPC Spin rounds that reached its STMB Cave with the node verified: a hit at the next T lock. */
@@ -220,22 +230,22 @@ const SDPC_CAVE_UNSCORED: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 5884, in_opener: 1162, mid_game: 4722 },
-                    yachi: { all: 5340, in_opener: 1375, mid_game: 3965 } };
+const TSD_DENOM = { pinglamb: { all: 6396, in_opener: 1254, mid_game: 5142 },
+                    yachi: { all: 5783, in_opener: 1491, mid_game: 4292 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
-const HITS = { pinglamb: { all: 53, in_opener: 1, mid_game: 52, mirrored: 26, garbage_in_window: 0 },
-               yachi: { all: 87, in_opener: 4, mid_game: 83, mirrored: 27, garbage_in_window: 0 } };
-const FOLLOWUP_FIRED = { pinglamb: 1, yachi: 3 };
+const HITS = { pinglamb: { all: 55, in_opener: 1, mid_game: 54, mirrored: 28, garbage_in_window: 0 },
+               yachi: { all: 94, in_opener: 4, mid_game: 90, mirrored: 30, garbage_in_window: 0 } };
+const FOLLOWUP_FIRED = { pinglamb: 1, yachi: 4 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
-  under: { TSS: { pinglamb: 2, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
+  under: { TSS: { pinglamb: 4, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 4160, yachi: 3613 }, no_roof: { pinglamb: 53, yachi: 87 },
-              t_overlap: { pinglamb: 100, yachi: 108 } },
-  orientation_baseline: { pinglamb: 54, yachi: 73 },
+  ablation: { no_must_empty: { pinglamb: 4528, yachi: 3919 }, no_roof: { pinglamb: 55, yachi: 94 },
+              t_overlap: { pinglamb: 105, yachi: 118 } },
+  orientation_baseline: { pinglamb: 63, yachi: 80 },
 };
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 2427, yachi: 2416 };
+const WINDOW_OFF_BOARD = { pinglamb: 2631, yachi: 2615 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -323,7 +333,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(15834);
+  expect(n).toBe(17205);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -477,8 +487,8 @@ test('cross-check: the SDPC Spin rounds that reached its STMB Cave', () => {
 
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
-  expect(c.rowmap_unverified).toBe(31);
-  expect(c.rowmap_steps).toBe(275879);
+  expect(c.rowmap_unverified).toBe(32);
+  expect(c.rowmap_steps).toBe(300597);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

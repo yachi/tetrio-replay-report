@@ -1,0 +1,32 @@
+{
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：局數打和、輸局嘅窿、同填唔晒嘅粒數",
+  "cards": [
+    {
+      "accent": "g",
+      "label": "局數打和",
+      "value": "35:10 · 30:55",
+      "body": "逐局計 65 比 65<span class=\"badge\" data-claim=\"C010\"></span>，場數卻係 7 比 11<span class=\"badge\" data-claim=\"C001\"></span>：yachi 贏嗰七場局數 35 比 10，<strong>輸嗰十一場 30 比 55</strong><span class=\"badge\" data-claim=\"C031\"></span>。佢贏就贏得闊——5 比 0 一場、5 比 1 三場<span class=\"badge\" data-claim=\"G022\"></span><span class=\"badge\" data-claim=\"C013\"></span><span class=\"badge\" data-claim=\"C027\"></span><span class=\"badge\" data-claim=\"C028\"></span>——輸就輸得窄，兩場都係 4 比 5<span class=\"badge\" data-claim=\"C025\"></span><span class=\"badge\" data-claim=\"C026\"></span>。"
+    },
+    {
+      "accent": "p",
+      "label": "窿喺輸局",
+      "value": "+10.20% / +14.64%",
+      "body": "拆開贏同輸嘅局：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 10.20%，<strong>輸嗰啲局高 14.64%</strong><span class=\"badge\" data-claim=\"C002\"></span>——兩個人贏嘅時候貼得埋啲，差距喺輸嘅時候。"
+    },
+    {
+      "accent": "y",
+      "label": "粒數填唔晒",
+      "value": "+8.76% / +10.73%",
+      "body": "yachi 多疊 1038 粒，即係多 8.76%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——呢條路最多填返 8.76 個百分點，<strong>填唔晒 10.73% 個窿</strong><span class=\"badge\" data-claim=\"C004\"></span>，所以總攻擊少咗 138 條，即係 pinglamb 總攻擊嘅 1.77%<span class=\"badge\" data-claim=\"C005\"></span>。"
+    }
+  ],
+  "trivia": [
+    "最癲嗰局係 m4 第 3 局<span class=\"badge\" data-claim=\"G073\"></span>。yachi 贏，但佢喺攻擊量同最大單波兩條軸都落後<span class=\"badge\" data-claim=\"G095\"></span>；每粒方塊嘅攻擊佢約 0.772 對約 0.829<span class=\"badge\" data-claim=\"G096\"></span>，佢贏喺清垃圾，每粒清走約 0.386 對約 0.244<span class=\"badge\" data-claim=\"G097\"></span>。",
+    "逐場計總攻擊，打得多嗰個十八場贏十七場，唯一例外係第五場<span class=\"badge\" data-claim=\"C030\"></span>。",
+    "All Clear pinglamb 21 個、yachi 17 個<span class=\"badge\" data-claim=\"G048\"></span>。淨係 pinglamb 做到全消嘅 18 局，佢輸咗 11 局<span class=\"badge\" data-claim=\"G092\"></span>。",
+    "自己頂到頂嘅 26 局，yachi 10 局、pinglamb 16 局<span class=\"badge\" data-claim=\"C006\"></span><span class=\"badge\" data-claim=\"G075\"></span>。",
+    "KPP 今晚兩個人差唔多：yachi 3.608 下、pinglamb 3.581 下，yachi 高 0.76%<span class=\"badge\" data-claim=\"C008\"></span>。",
+    "單次 spike 嘅個人上限 pinglamb 20 行、yachi 18 行<span class=\"badge\" data-claim=\"G063\"></span>；B2B pinglamb 10 段、yachi 9 段<span class=\"badge\" data-claim=\"G064\"></span>。"
+  ]
+}

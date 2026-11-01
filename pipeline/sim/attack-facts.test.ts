@@ -19,7 +19,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/attack-facts.json`;
 const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
@@ -33,6 +33,8 @@ const load = (s: string) => JSON.parse(readFileSync(artefact(s), 'utf8'));
  * the end, one lock past the game's count); 09 r3 yachi is the first entry missing more than one
  * clear (three Singles and a Triple, five locks past the game's 118), past a prefix verified to 107.
  * 2026-10-29 adds nothing to any of the three lists: all 136 of its player-rounds agree on both
+ * anchors, and no engine run locks past the game's `piecesplaced`.
+ * 2026-11-01 adds nothing to any of the three lists: all 260 of its player-rounds agree on both
  * anchors, and no engine run locks past the game's `piecesplaced`. */
 /* All three lists are EMPTY since 2026-10-31 and kept as named lists, so a new disagreement is a red
  * build to investigate. Until then they held 4, 7 and 10 player-rounds (the entries are in git

@@ -46,7 +46,7 @@ DOCS = ("CLAUDE.md",)
 REWORD = reword("pipeline/check_rate_records.py")
 _EN = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
        "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-       "seventeen", "eighteen", "nineteen", "twenty")
+       "seventeen", "eighteen", "nineteen", "twenty", "twenty-one")
 MINUS = "−"          # the character the section uses, not an ASCII hyphen
 
 
