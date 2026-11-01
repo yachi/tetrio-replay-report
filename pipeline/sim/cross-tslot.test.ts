@@ -60,7 +60,7 @@ const SESSIONS = (sessionsOnDisk(SESSIONS_DIR).length
   ? assertCorpusIsEverySessionOnDisk(SESSIONS_DIR,
       ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14', '2026-08-19', '2026-08-25',
        '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17', '2026-09-18', '2026-09-19',
-       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29'])
+       '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01'])
   : []).map(s => `${SESSIONS_DIR}/${s}`);
 const t = test as unknown as { skipIf: (c: boolean) => typeof test };
 const realData = t.skipIf(SESSIONS.length === 0);
@@ -160,7 +160,12 @@ realData('two methods, no shared code, disagree on nothing across the corpus', (
   // 2026-10-31: 241272 -> 241276 with no session added. `TL_DEFAULTS.clutch` became TETR.IO's own
   // default (true), the engine stopped blocking out pieces the game walked up after a line clear, and
   // a few verified prefixes grew by those boards. `unexplained` is still EMPTY over all of them.
-  expect(both + oursOnly + ccOnly + neither).toBe(241276);
+  // 2026-11-01: 241276 -> 262550 (21274 boards, 130 rounds — the third-largest row the file has
+  // taken, after 09-19's 24309 and 10-03's 24166), and `unexplained` is still EMPTY over all of them.
+  // RE-MEASURED, as the 10-29 line asks: the test took 203 s and then 336 s on two runs at
+  // twenty-one sessions, on a four-core machine shared with other work — inside the 600 s budget,
+  // so the budget stands.
+  expect(both + oursOnly + ccOnly + neither).toBe(262550);
 // Explicit timeout, following the slow corpus test in openers.test.ts. This walks every verified
 // board of every session — ~95 s at nine sessions — and bun's default per-test timeout is 5 s, so
 // without this it fails on elapsed time whatever the assertions say. Not a new cost: the same

@@ -34,7 +34,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29']);
+   '2026-10-29', '2026-11-01']);
 
 /** Bag 1 missed the 7-lock board, matched the 6-lock L-held field, and the 7th piece was NOT the
  *  mirror-aware bag-1 L (J when mirrored): a hold. Most of them go on to place the held L on its tower
@@ -74,11 +74,19 @@ const L_HOLD_BAG1: string[] = [
   "2026-10-12 m2r6 yachi", "2026-10-12 m2r7 yachi", "2026-10-12 m8r7 yachi",
   // 2026-10-29: one, yachi's, a Z placed 7th, then 2.ideal at lock 12 (prefix 139).
   "2026-10-29 m4r8 yachi",
+  // 2026-11-01: two, both yachi's, a Z placed 7th, then 2.ideal at lock 12: m4r4 mirrored (prefix 18,
+  // and the PC_OFF_PAGE round), m17r4 as drawn (prefix 137).
+  "2026-11-01 m4r4 yachi", "2026-11-01 m17r4 yachi",
 ];
-/** Measured EMPTY: no 6-lock-only match has the bag-1 L (J when mirrored) placed 7th, so the
- *  hold split never files an outcome — and the two rules that decide it are equivalent on this
- *  corpus (see EQUIVALENT below). A first entry is a red build to investigate. */
-const L_PLACED_ELSEWHERE_BAG1: string[] = [];
+/** The 6-lock field matched and the 7th piece WAS the bag-1 L (J when mirrored), placed off the page
+ *  (not on its tower: no 7-lock bag1.l_top match). Measured EMPTY through twenty sessions; the first
+ *  entry, 2026-11-01's, is what made the two rules that decide it stop being equivalent (see the
+ *  hold-split mutants below). */
+const L_PLACED_ELSEWHERE_BAG1: string[] = [
+  // 2026-11-01: yachi's, mirrored, so its bag-1 L is J, and the 7th is J — matched only
+  // `bag1.l_hold (mirrored) @6`, prefix 268 (not a prefix-edge reading), no bag 2.
+  "2026-11-01 m8r6 yachi",
+];
 /** A bag-2 match that needed complete garbage rows stripped from under it (the count in brackets). */
 const BAG2_GARBAGE_STRIPPED: string[] = [
   "2026-07-22 m4r6 pinglamb (1)", "2026-07-22 m10r8 pinglamb (6)", "2026-07-24 m1r5 pinglamb (11)",
@@ -103,6 +111,8 @@ const BAG2_GARBAGE_STRIPPED: string[] = [
   "2026-10-09 m4r2 pinglamb (6)", "2026-10-09 m6r4 pinglamb (11)", "2026-10-09 m8r5 yachi (6)",
   "2026-10-09 m8r6 pinglamb (2)", "2026-10-09 m9r8 pinglamb (1)", "2026-10-09 m9r9 pinglamb (2)",
   "2026-10-09 m12r2 pinglamb (11)", "2026-10-12 m1r4 yachi (6)",
+  // 2026-11-01: two, both yachi's, as drawn, under 2.ideal (prefixes 78 and 58).
+  "2026-11-01 m6r5 yachi (6)", "2026-11-01 m6r7 yachi (12)",
 ];
 /** No bag-2 match: the board before the TST is a strict subset of a bag-2 board. MEASURED, not matched. */
 const BAG2_NONE_TST_BEFORE_COMPLETE: string[] = [
@@ -153,6 +163,9 @@ const PC_OFF_PAGE: string[] = [
   "2026-10-09 m12r1 yachi under 2.ideal.other", "2026-10-09 m12r9 yachi under 2.normal#1.other",
   // 2026-10-29: one, yachi's, mirrored, a PC on lock 19 past a prefix verified to 18 (`verified: false`).
   "2026-10-29 m1r3 yachi under 2.ideal.other",
+  // 2026-11-01: two, both yachi's, both a PC on lock 19 past the verified prefix (`verified: false`):
+  // m4r4 mirrored (prefix 18, the L_HOLD_BAG1 round), m10r6 as drawn (prefix 16).
+  "2026-11-01 m4r4 yachi under 2.ideal.other", "2026-11-01 m10r6 yachi under 2.ideal.other",
 ];
 
 /** Measured empty. A first entry is a red build to investigate, never a number to absorb. */
@@ -162,16 +175,18 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 const MULTI_COLOUR_RESOLVED_BY_GROUP: string[] = [];
 
 /** Both players mirror 山岳積み2号: pinned as a count per player, not a list. */
-const MIRRORED_BAG1 = { yachi: 161, pinglamb: 25 };
+const MIRRORED_BAG1 = { yachi: 165, pinglamb: 25 };
 
 /** Cases per measured node. No corpus round reaches the 4-line PCs, 2.normal#2/#3 or anything under
  *  2.compromise past its TST: those zeros are COMPARED (the classifier detects all three PC kinds and
  *  the bag-3 and bag-4 snapshot boards; the demos test reaches each one), never "not compared". */
 const NODE_CASES: Record<string, number> = {
-  'bag1.l_top': 385, 'bag1.l_hold': 94, 'bag1.l_placed_elsewhere': 0,
+  'bag1.l_top': 392, 'bag1.l_hold': 96, 'bag1.l_placed_elsewhere': 1,
   '2.pc4#1': 0, '2.pc4#2': 0, '2.pc4#3': 0,
-  '2.ideal': 241, '2.normal#1': 100, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
-  '2.ideal.pc#1': 5, '2.ideal.pc#2': 13, '2.ideal.pc#3': 18, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
+  '2.ideal': 249, '2.normal#1': 101, '2.normal#2': 0, '2.normal#3': 0, '2.compromise': 19,
+  // 2026-11-01 adds two pc#3, both yachi's, at lock 19 past the verified prefix (`verified: false`):
+  // m3r6 mirrored (prefix 15), m8r3 as drawn (prefix 14).
+  '2.ideal.pc#1': 5, '2.ideal.pc#2': 13, '2.ideal.pc#3': 20, '2.ideal.pc#4': 0, '2.ideal.pc#5': 0,
   '2.ideal.pc#6': 0, '2.ideal.pc#7': 1, '2.ideal.pc#8': 0, '2.ideal.pc#9': 0, '2.ideal.pc#10': 0,
   '2.ideal.pc#11': 0, '2.ideal.pc#12': 0, '2.ideal.pc#13': 0, '2.ideal.pc#14': 0,
   '2.normal.pc#1': 3, '2.normal.pc#2': 0, '2.normal.pc#3': 0, '2.normal.pc#4': 0, '2.normal.pc#5': 0,
@@ -197,9 +212,9 @@ const UNMEASURED: Record<string, string> = {
  *  trigger is a pair of early pairs with no threshold, so it never decides. A sizeable minority of
  *  2.ideal rounds dealt O before S, so the condition is a description of the page, not of the play. */
 const CONDITIONS = {
-  '2.ideal': { '2.compromise': 44, '2.ideal': 197 },
+  '2.ideal': { '2.compromise': 47, '2.ideal': 202 },
   '2.compromise': { '2.compromise': 19 },
-  '2.normal#1': { '2.compromise': 96, '2.ideal': 4 },
+  '2.normal#1': { '2.compromise': 97, '2.ideal': 4 },
 };
 
 /** The case object's key order is part of the artefact's bytes. */
@@ -309,7 +324,7 @@ test('the case key order is pinned, and bag-3 lists are scoped by the form\'s GR
 
 test('every case and every named entry resolves to a real round with its match POSITION', () => {
   checkPositions(committed(), SESSIONS, ROOT,
-    [...L_HOLD_BAG1, ...BAG2_GARBAGE_STRIPPED, ...BAG2_NONE_TST_BEFORE_COMPLETE, ...BAG2_NONE_EXTRA_PIECE,
+    [...L_HOLD_BAG1, ...L_PLACED_ELSEWHERE_BAG1, ...BAG2_GARBAGE_STRIPPED, ...BAG2_NONE_TST_BEFORE_COMPLETE, ...BAG2_NONE_EXTRA_PIECE,
      ...BAG2_NONE_MOVED_PIECE, ...PC_OFF_PAGE]);
 });
 
@@ -328,9 +343,17 @@ const MUTANTS: [string, Mutants, (o: any) => void][] = [
   }],
   ['the hold stage tried before the placed one', { zHoldFirst: true }, o => {
     // a 7-lock round whose 6-lock board is the L-held field placed its L 7th: an outcome, not a hold
-    expect(o.lists.l_placed_elsewhere_bag1.length).toBeGreaterThan(0);
+    expect(o.lists.l_placed_elsewhere_bag1.length).toBeGreaterThan(L_PLACED_ELSEWHERE_BAG1.length);
     expect(count(o, 'bag1.l_top')).toBeLessThan(NODE_CASES['bag1.l_top']!);
   }],
+  // live since 2026-11-01's m8r6 (L_PLACED_ELSEWHERE_BAG1's first entry); equivalent through 10-29
+  ['the lock-7 piece test removed', { noLock7Test: true }, o => {
+    expect(o.lists.l_hold_bag1.length).toBe(L_HOLD_BAG1.length + L_PLACED_ELSEWHERE_BAG1.length);
+    expect(o.lists.l_placed_elsewhere_bag1).toEqual([]);
+  }],
+  // m8r6 is mirrored with a J placed 7th: read as the drawn L, the J is not it, so a hold
+  ['the lock-7 test made mirror-unaware', { lock7MirrorUnaware: true },
+   o => expect(o.lists.l_hold_bag1).toContain('2026-11-01 m8r6 yachi')],
   ['mirroring disabled', { noMirror: true }, o => expect(count(o, 'bag1.l_top')).toBeLessThan(NODE_CASES['bag1.l_top']!)],
   ['bag 2 sampled one lock early', { bag2Early: true },
    o => expect(count(o, '2.ideal') + count(o, '2.normal#1') + count(o, '2.compromise')).toBe(0)],
@@ -346,12 +369,13 @@ const MUTANTS: [string, Mutants, (o: any) => void][] = [
 ];
 
 /** EQUIVALENT on this corpus, measured: each leaves the artefact byte-identical, because the case
- *  that would exercise it never occurs. `noLock7Test` and `lock7MirrorUnaware`: no 6-lock-only match
- *  has the bag-1 L (or J) placed 7th (L_PLACED_ELSEWHERE_BAG1 is empty). `pcLinesOff`: every corpus
- *  PC after a matched bag 1 is the first kind's 8 lines. Named, so the day one stops being equivalent
- *  is a red build; the rules themselves are exercised by honey-cup.test.ts and, for the PC kinds, by
- *  the demos (which reach a 4-line and a 14-line PC through this classifier). */
-const EQUIVALENT: (keyof Mutants)[] = ['noLock7Test', 'lock7MirrorUnaware', 'pcLinesOff'];
+ *  that would exercise it never occurs. `pcLinesOff`: every corpus PC after a matched bag 1 is the
+ *  first kind's 8 lines. Named, so the day one stops being equivalent is a red build; the rule itself
+ *  is exercised, for the PC kinds, by the demos (which reach a 4-line and a 14-line PC through this
+ *  classifier). `noLock7Test` and `lock7MirrorUnaware` were named here through twenty sessions (no
+ *  6-lock-only match had the bag-1 L, or J, placed 7th) and stopped being equivalent on 2026-11-01's
+ *  m8r6 — the red build this list exists to raise — so they are mutants above now. */
+const EQUIVALENT: (keyof Mutants)[] = ['pcLinesOff'];
 
 test('every mutant changes the artefact, with the symptom its rule predicts', () => {
   const base = committedText();

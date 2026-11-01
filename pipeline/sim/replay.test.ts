@@ -30,7 +30,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -122,7 +122,7 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [254, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
   '2026-10-09': [204, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [126, 126], '2026-10-29': [136, 136],
+  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260],
 };
 
 /** Every player-round whose engine totals disagree with facts.json. EMPTY since 2026-10-31, and kept
@@ -155,7 +155,7 @@ test('admission counts are pinned per session, and the exceptions are exactly th
 /** Every player-round where the ENGINE's board topping out disagrees with the game ending the
  *  player (gameoverreason topout/garbagesmash). The ending a viewer shows is always gameoverreason;
  *  these are the rounds where it must also flag that the simulated board may differ from the real
- *  one. Every entry is a `topout` death the engine's board survives (28 since 2026-10-29). Until
+ *  one. Every entry is a `topout` death the engine's board survives (32 since 2026-11-01). Until
  *  2026-10-31 two more were the round's WINNER, whose engine board topped out mid-round (10-03-01 r1
  *  pinglamb at lock 52, 10-29-04 r4 yachi at lock 30): in both a T cleared one row with the stack past
  *  the 20 visible rows, so the next piece spawned overlapping it. TETR.IO clutches that piece (walks it
@@ -189,7 +189,16 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  lock 62, `no_evidence` after it). Both admit cleanly (10-29 admits 136 of 136), so the engine
  *  placed exactly the game's pieces and its board did not top out on the last one.
  *  The third was
- *  10-29-04 r4 yachi, the second winner-class entry, which 2026-10-31's clutch fix removed (above). */
+ *  10-29-04 r4 yachi, the second winner-class entry, which 2026-10-31's clutch fix removed (above).
+ *
+ *  2026-11-01 adds FOUR, all of the common class, making 32 `topout` deaths the engine survives:
+ *  replay-2026-11-01-01.ttrm r3 yachi (64 locks, prefix verified to lock 54),
+ *  replay-2026-11-01-06.ttrm r4 yachi (88 locks, verified to lock 78),
+ *  replay-2026-11-01-13.ttrm r5 pinglamb (54 locks, verified to lock 46) and
+ *  replay-2026-11-01-16.ttrm r2 pinglamb (64 locks, verified to lock 54), each `no_evidence` after
+ *  its prefix. All four admit cleanly (11-01 admits 260 of 260), so the engine placed exactly the
+ *  game's pieces and its board did not top out on the last one; the last locks of each are past
+ *  the verified prefix, the unobserved-garbage-hole tail of every other entry. No winner-class entry. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
@@ -219,6 +228,10 @@ const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-10-22', file: 'replay-2026-10-22-02.ttrm', round: 7, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 0, user: 'pinglamb', ending: 'topout', lock: null },
   { session: '2026-10-29', file: 'replay-2026-10-29-01.ttrm', round: 4, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-01', file: 'replay-2026-11-01-01.ttrm', round: 3, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-01', file: 'replay-2026-11-01-06.ttrm', round: 4, user: 'yachi', ending: 'topout', lock: null },
+  { session: '2026-11-01', file: 'replay-2026-11-01-13.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
+  { session: '2026-11-01', file: 'replay-2026-11-01-16.ttrm', round: 2, user: 'pinglamb', ending: 'topout', lock: null },
 ];
 
 test('engine_knockout is consistent with its own definition, and its disagreements are exactly the named list', () => {

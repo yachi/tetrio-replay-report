@@ -37,7 +37,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29']);
+   '2026-10-29', '2026-11-01']);
 
 /** THE ONE CASE, the same round as `gamushiro.test.ts`'s (checked below): yachi, 2026-07-22 m5r8, the
  *  7-lock board with the L stood on the O. Bag 2 is sampled and matches none of harddrop's forms (A1 is
@@ -76,9 +76,9 @@ const NODE_CASES: Record<string, number> = {
 /** Opportunities, per player: bag 1 at 6 and 7 locks clean; bag 2 at 13 locks (the one case). The
  *  PC patterns count the rounds that reached their anchor, so they are zero with the bag-2 boards. */
 const OPPORTUNITIES: Record<string, Record<string, number>> = {
-  'bag1.left': { pinglamb: 1411, yachi: 1369 },
-  'bag1.l_top': { pinglamb: 1342, yachi: 1059 },
-  'bag1.l_placed_elsewhere': { pinglamb: 1411, yachi: 1369 },
+  'bag1.left': { pinglamb: 1533, yachi: 1491 },
+  'bag1.l_top': { pinglamb: 1461, yachi: 1154 },
+  'bag1.l_placed_elsewhere': { pinglamb: 1533, yachi: 1491 },
   '2.a1': { pinglamb: 0, yachi: 1 }, '2.a2': { pinglamb: 0, yachi: 1 },
   '2.b': { pinglamb: 0, yachi: 1 }, '2.c': { pinglamb: 0, yachi: 1 },
   ...Object.fromEntries(PCS.map(id => [id, { pinglamb: 0, yachi: 0 }])),

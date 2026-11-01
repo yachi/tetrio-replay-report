@@ -1,0 +1,4088 @@
+[
+ {
+  "id": "C001",
+  "category": "score",
+  "canto": "十八場 match pinglamb 贏 11 場：yachi 攞第二到第五、第十四、第十七同第十八場，其餘十一場都係 pinglamb",
+  "english_gloss": "pinglamb won eleven of the eighteen matches; yachi won matches 2 to 5, 14, 17 and 18",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 4,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 7,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 8,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 9,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 10,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 11,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 12,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 13,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 14,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 15,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 16,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 17,
+     "pl": "yachi"
+    }
+   ]
+  },
+  "python_check": "(facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][1]['winner']=='yachi') and (facts['matches'][2]['winner']=='yachi') and (facts['matches'][3]['winner']=='yachi') and (facts['matches'][4]['winner']=='yachi') and (facts['matches'][5]['winner']=='pinglamb') and (facts['matches'][6]['winner']=='pinglamb') and (facts['matches'][7]['winner']=='pinglamb') and (facts['matches'][8]['winner']=='pinglamb') and (facts['matches'][9]['winner']=='pinglamb') and (facts['matches'][10]['winner']=='pinglamb') and (facts['matches'][11]['winner']=='pinglamb') and (facts['matches'][12]['winner']=='pinglamb') and (facts['matches'][13]['winner']=='yachi') and (facts['matches'][14]['winner']=='pinglamb') and (facts['matches'][15]['winner']=='pinglamb') and (facts['matches'][16]['winner']=='yachi') and (facts['matches'][17]['winner']=='yachi')"
+ },
+ {
+  "id": "C002",
+  "category": "style",
+  "canto": "拆開贏同輸嘅局嚟睇：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 10.20%，輸嗰啲局高 14.64%——差距喺輸局，贏局兩個人貼得埋啲",
+  "english_gloss": "in the rounds each won pinglamb's attack per piece is 10.20 percent above yachi's, and in the rounds each lost 14.64 percent above",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11020
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11021
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11464
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11465
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "python_check": "((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) >= (11020 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) < (11021 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) >= (11464 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) < (11465 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))))"
+ },
+ {
+  "id": "C003",
+  "category": "style",
+  "canto": "喺一個人自己身上講：兩個人贏嗰啲局每粒方塊嘅攻擊都高過自己輸嗰啲局——yachi 高 20.07%，pinglamb 高 15.43%，今次闊啲嗰個係 yachi",
+  "english_gloss": "each player's attack per piece is higher in the rounds he won than in the rounds he lost — yachi by 20.07 percent and pinglamb by 15.43 percent, yachi the wider",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 12007
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 12008
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "yachi",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11543
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 11544
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "garbage_attack",
+          "cond": {
+           "c": "winner",
+           "pl": "yachi"
+          }
+         },
+         "b": {
+          "e": "sum_round_where",
+          "pl": "pinglamb",
+          "f": "pieces",
+          "cond": {
+           "c": "winner",
+           "pl": "pinglamb"
+          }
+         }
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "python_check": "((10000 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) >= (12007 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))) and ((10000 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))) < (12008 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi')))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) >= (11543 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb')))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi'))) < (11544 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='yachi') * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'] if r['winner']=='pinglamb'))))"
+ },
+ {
+  "id": "C004",
+  "category": "style",
+  "canto": "成晚夾埋計，pinglamb 每粒方塊嘅攻擊高過 yachi 10.73%",
+  "english_gloss": "over the whole session pinglamb's attack per piece is 10.73 percent above yachi's",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "ge",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "pieces"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 11073
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "pieces"
+       }
+      }
+     }
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "pieces"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 11074
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "pieces"
+       }
+      }
+     }
+    }
+   ]
+  },
+  "python_check": "((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']))) >= (11073 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']))) < (11074 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))))"
+ },
+ {
+  "id": "C005",
+  "category": "style",
+  "canto": "yachi 全晚多疊咗 1038 粒方塊，總攻擊仍然少過 pinglamb 138 條，即係 pinglamb 總攻擊嘅 1.77%",
+  "english_gloss": "yachi placed 1038 more pieces than pinglamb and still landed 138 fewer lines of attack, 1.77 percent of pinglamb's total",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sub",
+      "a": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "pieces"
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "pieces"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 1038
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sub",
+      "a": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "garbage_attack"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 138
+     }
+    },
+    {
+     "p": "ge",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "sub",
+       "a": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "garbage_attack"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 177
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      }
+     }
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "sub",
+       "a": {
+        "e": "sum_round",
+        "pl": "pinglamb",
+        "f": "garbage_attack"
+       },
+       "b": {
+        "e": "sum_round",
+        "pl": "yachi",
+        "f": "garbage_attack"
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 178
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "garbage_attack"
+      }
+     }
+    }
+   ]
+  },
+  "python_check": "((sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']) - sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])) == 1038) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) - sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds'])) == 138) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) - sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']))) >= (177 * sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']))) and ((10000 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds']) - sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'] for r in m['rounds']))) < (178 * sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "id": "C006",
+  "category": "style",
+  "canto": "全晚有 26 局頂到上天花板收場：yachi 10 局，pinglamb 16 局",
+  "english_gloss": "twenty-six rounds ended in a topout: ten yachi's, sixteen pinglamb's",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "str_field",
+       "pl": "yachi",
+       "f": "gameoverreason",
+       "v": "topout"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 10
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "count_rounds",
+      "cond": {
+       "c": "str_field",
+       "pl": "pinglamb",
+       "f": "gameoverreason",
+       "v": "topout"
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 16
+     }
+    }
+   ]
+  },
+  "python_check": "(sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['yachi']['gameoverreason'] == 'topout') == 10) and (sum(1 for m in facts['matches'] for r in m['rounds'] if r['players']['pinglamb']['gameoverreason'] == 'topout') == 16)"
+ },
+ {
+  "id": "C008",
+  "category": "style",
+  "canto": "每粒方塊要按幾多下（KPP）兩個人差唔多：yachi 3.608 下，pinglamb 3.581 下，yachi 高 pinglamb 0.76%",
+  "english_gloss": "keypresses per piece are close: yachi 3.608 and pinglamb 3.581, yachi 0.76 percent the higher",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 1000
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "yachi",
+         "f": "inputs"
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 3608
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "yachi",
+         "f": "pieces"
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 1000
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "yachi",
+         "f": "inputs"
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 3609
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "yachi",
+         "f": "pieces"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 1000
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "pinglamb",
+         "f": "inputs"
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 3581
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "pinglamb",
+         "f": "pieces"
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 1000
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "pinglamb",
+         "f": "inputs"
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 3582
+        },
+        "b": {
+         "e": "sum_round",
+         "pl": "pinglamb",
+         "f": "pieces"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "ge",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round",
+          "pl": "yachi",
+          "f": "inputs"
+         },
+         "b": {
+          "e": "sum_round",
+          "pl": "pinglamb",
+          "f": "pieces"
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10076
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round",
+          "pl": "pinglamb",
+          "f": "inputs"
+         },
+         "b": {
+          "e": "sum_round",
+          "pl": "yachi",
+          "f": "pieces"
+         }
+        }
+       }
+      },
+      {
+       "p": "lt",
+       "a": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10000
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round",
+          "pl": "yachi",
+          "f": "inputs"
+         },
+         "b": {
+          "e": "sum_round",
+          "pl": "pinglamb",
+          "f": "pieces"
+         }
+        }
+       },
+       "b": {
+        "e": "mul",
+        "a": {
+         "e": "lit",
+         "v": 10077
+        },
+        "b": {
+         "e": "mul",
+         "a": {
+          "e": "sum_round",
+          "pl": "pinglamb",
+          "f": "inputs"
+         },
+         "b": {
+          "e": "sum_round",
+          "pl": "yachi",
+          "f": "pieces"
+         }
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "python_check": "((1000 * sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'])) >= (3608 * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']))) and ((1000 * sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds'])) < (3609 * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']))) and ((1000 * sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'])) >= (3581 * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))) and ((1000 * sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds'])) < (3582 * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))) and ((10000 * (sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))) >= (10076 * (sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])))) and ((10000 * (sum(r['players']['yachi']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))) < (10077 * (sum(r['players']['pinglamb']['inputs'] for m in facts['matches'] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds']))))"
+ },
+ {
+  "id": "C009",
+  "category": "style",
+  "canto": "yachi 嗰 1038 粒方塊盈餘，即係多過 pinglamb 8.76%——換返做每粒方塊嘅攻擊，呢條路最多可以填返 8.76 個百分點，填唔晒 C004 個 10.73% 窿",
+  "english_gloss": "yachi's piece count is 8.76 percent above pinglamb's, short of the 10.73 percent attack-per-piece gap C004 pins",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "ge",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "pieces"
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10876
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "pieces"
+      }
+     }
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10000
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "yachi",
+       "f": "pieces"
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 10877
+      },
+      "b": {
+       "e": "sum_round",
+       "pl": "pinglamb",
+       "f": "pieces"
+      }
+     }
+    }
+   ]
+  },
+  "python_check": "((10000 * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])) >= (10876 * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds']))) and ((10000 * sum(r['players']['yachi']['pieces'] for m in facts['matches'] for r in m['rounds'])) < (10877 * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'] for r in m['rounds'])))"
+ },
+ {
+  "id": "C010",
+  "category": "score",
+  "canto": "逐局計 65 比 65，打和。分四段睇：第一場 2 比 5；第二到第五場 yachi 連贏四場，局數 20 比 6；第六到第十三場 pinglamb 連贏八場，局數 20 比 40；第十四到第十八場 yachi 贏三場，局數 23 比 14",
+  "english_gloss": "the rounds finished level at 65 to 65; match 1 went 2-5, matches 2-5 20-6, matches 6-13 20-40 and matches 14-18 23-14",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "yachi",
+      "f": "alive",
+      "lo": 0,
+      "hi": 18
+     },
+     "b": {
+      "e": "lit",
+      "v": 65
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "pinglamb",
+      "f": "alive",
+      "lo": 0,
+      "hi": 18
+     },
+     "b": {
+      "e": "lit",
+      "v": 65
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "yachi",
+      "f": "alive",
+      "lo": 0,
+      "hi": 1
+     },
+     "b": {
+      "e": "lit",
+      "v": 2
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "pinglamb",
+      "f": "alive",
+      "lo": 0,
+      "hi": 1
+     },
+     "b": {
+      "e": "lit",
+      "v": 5
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "yachi",
+      "f": "alive",
+      "lo": 1,
+      "hi": 5
+     },
+     "b": {
+      "e": "lit",
+      "v": 20
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "pinglamb",
+      "f": "alive",
+      "lo": 1,
+      "hi": 5
+     },
+     "b": {
+      "e": "lit",
+      "v": 6
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "yachi",
+      "f": "alive",
+      "lo": 5,
+      "hi": 13
+     },
+     "b": {
+      "e": "lit",
+      "v": 20
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "pinglamb",
+      "f": "alive",
+      "lo": 5,
+      "hi": 13
+     },
+     "b": {
+      "e": "lit",
+      "v": 40
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "yachi",
+      "f": "alive",
+      "lo": 13,
+      "hi": 18
+     },
+     "b": {
+      "e": "lit",
+      "v": 23
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "sum_round_range",
+      "pl": "pinglamb",
+      "f": "alive",
+      "lo": 13,
+      "hi": 18
+     },
+     "b": {
+      "e": "lit",
+      "v": 14
+     }
+    }
+   ]
+  },
+  "python_check": "(sum(r['players']['yachi']['alive'] for m in facts['matches'][0:18] for r in m['rounds']) == 65) and (sum(r['players']['pinglamb']['alive'] for m in facts['matches'][0:18] for r in m['rounds']) == 65) and (sum(r['players']['yachi']['alive'] for m in facts['matches'][0:1] for r in m['rounds']) == 2) and (sum(r['players']['pinglamb']['alive'] for m in facts['matches'][0:1] for r in m['rounds']) == 5) and (sum(r['players']['yachi']['alive'] for m in facts['matches'][1:5] for r in m['rounds']) == 20) and (sum(r['players']['pinglamb']['alive'] for m in facts['matches'][1:5] for r in m['rounds']) == 6) and (sum(r['players']['yachi']['alive'] for m in facts['matches'][5:13] for r in m['rounds']) == 20) and (sum(r['players']['pinglamb']['alive'] for m in facts['matches'][5:13] for r in m['rounds']) == 40) and (sum(r['players']['yachi']['alive'] for m in facts['matches'][13:18] for r in m['rounds']) == 23) and (sum(r['players']['pinglamb']['alive'] for m in facts['matches'][13:18] for r in m['rounds']) == 14)"
+ },
+ {
+  "id": "C011",
+  "category": "moment",
+  "canto": "第一場 pinglamb 頭四局連贏，5 比 2",
+  "english_gloss": "match 1: pinglamb won the first four rounds and the match 5-2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ],
+    [
+     0,
+     3
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     5
+    ],
+    [
+     0,
+     6
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][0]['rounds'][0]['winner'], facts['matches'][0]['rounds'][1]['winner'], facts['matches'][0]['rounds'][2]['winner'], facts['matches'][0]['rounds'][3]['winner'], facts['matches'][0]['rounds'][4]['winner'], facts['matches'][0]['rounds'][5]['winner'], facts['matches'][0]['rounds'][6]['winner'],) == ('pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C012",
+  "category": "moment",
+  "canto": "第二場 yachi 5 比 2",
+  "english_gloss": "match 2: yachi won 5-2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     1,
+     4
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][1]['rounds'][0]['winner'], facts['matches'][1]['rounds'][1]['winner'], facts['matches'][1]['rounds'][2]['winner'], facts['matches'][1]['rounds'][3]['winner'], facts['matches'][1]['rounds'][4]['winner'], facts['matches'][1]['rounds'][5]['winner'], facts['matches'][1]['rounds'][6]['winner'],) == ('yachi', 'yachi', 'pinglamb', 'yachi', 'yachi', 'pinglamb', 'yachi',))"
+ },
+ {
+  "id": "C013",
+  "category": "moment",
+  "canto": "第三場 yachi 頭四局連贏，5 比 1",
+  "english_gloss": "match 3: yachi won the first four rounds and the match 5-1",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     4
+    ],
+    [
+     2,
+     5
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][2]['rounds'][0]['winner'], facts['matches'][2]['rounds'][1]['winner'], facts['matches'][2]['rounds'][2]['winner'], facts['matches'][2]['rounds'][3]['winner'], facts['matches'][2]['rounds'][4]['winner'], facts['matches'][2]['rounds'][5]['winner'],) == ('yachi', 'yachi', 'yachi', 'yachi', 'pinglamb', 'yachi',))"
+ },
+ {
+  "id": "C014",
+  "category": "moment",
+  "canto": "第四場 yachi 5 比 0 橫掃",
+  "english_gloss": "match 4: yachi swept 5-0",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     3,
+     0
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "yachi",
+    "yachi",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][3]['rounds'][0]['winner'], facts['matches'][3]['rounds'][1]['winner'], facts['matches'][3]['rounds'][2]['winner'], facts['matches'][3]['rounds'][3]['winner'], facts['matches'][3]['rounds'][4]['winner'],) == ('yachi', 'yachi', 'yachi', 'yachi', 'yachi',))"
+ },
+ {
+  "id": "C015",
+  "category": "moment",
+  "canto": "第五場 yachi 5 比 3，尾兩局連贏收場",
+  "english_gloss": "match 5: yachi won 5-3, closing with two straight rounds",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     4,
+     0
+    ],
+    [
+     4,
+     1
+    ],
+    [
+     4,
+     2
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][4]['rounds'][0]['winner'], facts['matches'][4]['rounds'][1]['winner'], facts['matches'][4]['rounds'][2]['winner'], facts['matches'][4]['rounds'][3]['winner'], facts['matches'][4]['rounds'][4]['winner'], facts['matches'][4]['rounds'][5]['winner'], facts['matches'][4]['rounds'][6]['winner'], facts['matches'][4]['rounds'][7]['winner'],) == ('yachi', 'yachi', 'pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'yachi', 'yachi',))"
+ },
+ {
+  "id": "C016",
+  "category": "moment",
+  "canto": "第六場 pinglamb 5 比 3",
+  "english_gloss": "match 6: pinglamb won 5-3",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     5,
+     0
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     5,
+     2
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     5,
+     5
+    ],
+    [
+     5,
+     6
+    ],
+    [
+     5,
+     7
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][5]['rounds'][0]['winner'], facts['matches'][5]['rounds'][1]['winner'], facts['matches'][5]['rounds'][2]['winner'], facts['matches'][5]['rounds'][3]['winner'], facts['matches'][5]['rounds'][4]['winner'], facts['matches'][5]['rounds'][5]['winner'], facts['matches'][5]['rounds'][6]['winner'], facts['matches'][5]['rounds'][7]['winner'],) == ('pinglamb', 'pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'yachi', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C017",
+  "category": "moment",
+  "canto": "第七場 pinglamb 5 比 3，由第二局起兩個人逐局交替贏",
+  "english_gloss": "match 7: pinglamb won 5-3, the two alternating round by round from the second round on",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     6,
+     0
+    ],
+    [
+     6,
+     1
+    ],
+    [
+     6,
+     2
+    ],
+    [
+     6,
+     3
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     6,
+     7
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][6]['rounds'][0]['winner'], facts['matches'][6]['rounds'][1]['winner'], facts['matches'][6]['rounds'][2]['winner'], facts['matches'][6]['rounds'][3]['winner'], facts['matches'][6]['rounds'][4]['winner'], facts['matches'][6]['rounds'][5]['winner'], facts['matches'][6]['rounds'][6]['winner'], facts['matches'][6]['rounds'][7]['winner'],) == ('pinglamb', 'pinglamb', 'yachi', 'pinglamb', 'yachi', 'pinglamb', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C018",
+  "category": "moment",
+  "canto": "第八場 pinglamb 5 比 2",
+  "english_gloss": "match 8: pinglamb won 5-2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     7,
+     0
+    ],
+    [
+     7,
+     1
+    ],
+    [
+     7,
+     2
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     7,
+     6
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][7]['rounds'][0]['winner'], facts['matches'][7]['rounds'][1]['winner'], facts['matches'][7]['rounds'][2]['winner'], facts['matches'][7]['rounds'][3]['winner'], facts['matches'][7]['rounds'][4]['winner'], facts['matches'][7]['rounds'][5]['winner'], facts['matches'][7]['rounds'][6]['winner'],) == ('pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C019",
+  "category": "moment",
+  "canto": "第九場 yachi 贏第一局，之後 pinglamb 連贏四局，5 比 2",
+  "english_gloss": "match 9: yachi took the first round, then pinglamb won four straight, 5-2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     8,
+     0
+    ],
+    [
+     8,
+     1
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     5
+    ],
+    [
+     8,
+     6
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][8]['rounds'][0]['winner'], facts['matches'][8]['rounds'][1]['winner'], facts['matches'][8]['rounds'][2]['winner'], facts['matches'][8]['rounds'][3]['winner'], facts['matches'][8]['rounds'][4]['winner'], facts['matches'][8]['rounds'][5]['winner'], facts['matches'][8]['rounds'][6]['winner'],) == ('yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C020",
+  "category": "moment",
+  "canto": "第十場 pinglamb 5 比 1，yachi 淨係贏到第二局",
+  "english_gloss": "match 10: pinglamb won 5-1, yachi taking only the second round",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     9,
+     0
+    ],
+    [
+     9,
+     1
+    ],
+    [
+     9,
+     2
+    ],
+    [
+     9,
+     3
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     9,
+     5
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][9]['rounds'][0]['winner'], facts['matches'][9]['rounds'][1]['winner'], facts['matches'][9]['rounds'][2]['winner'], facts['matches'][9]['rounds'][3]['winner'], facts['matches'][9]['rounds'][4]['winner'], facts['matches'][9]['rounds'][5]['winner'],) == ('pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'pinglamb',))"
+ },
+ {
+  "id": "C021",
+  "category": "moment",
+  "canto": "第十一場 pinglamb 5 比 3",
+  "english_gloss": "match 11: pinglamb won 5-3",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     10,
+     0
+    ],
+    [
+     10,
+     1
+    ],
+    [
+     10,
+     2
+    ],
+    [
+     10,
+     3
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     6
+    ],
+    [
+     10,
+     7
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][10]['rounds'][0]['winner'], facts['matches'][10]['rounds'][1]['winner'], facts['matches'][10]['rounds'][2]['winner'], facts['matches'][10]['rounds'][3]['winner'], facts['matches'][10]['rounds'][4]['winner'], facts['matches'][10]['rounds'][5]['winner'], facts['matches'][10]['rounds'][6]['winner'], facts['matches'][10]['rounds'][7]['winner'],) == ('pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C022",
+  "category": "moment",
+  "canto": "第十二場 pinglamb 5 比 3",
+  "english_gloss": "match 12: pinglamb won 5-3",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     11,
+     0
+    ],
+    [
+     11,
+     1
+    ],
+    [
+     11,
+     2
+    ],
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     4
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][11]['rounds'][0]['winner'], facts['matches'][11]['rounds'][1]['winner'], facts['matches'][11]['rounds'][2]['winner'], facts['matches'][11]['rounds'][3]['winner'], facts['matches'][11]['rounds'][4]['winner'], facts['matches'][11]['rounds'][5]['winner'], facts['matches'][11]['rounds'][6]['winner'], facts['matches'][11]['rounds'][7]['winner'],) == ('pinglamb', 'yachi', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'pinglamb',))"
+ },
+ {
+  "id": "C023",
+  "category": "moment",
+  "canto": "第十三場 yachi 頭兩局連贏，之後六局 pinglamb 贏五局，3 比 5",
+  "english_gloss": "match 13: yachi won the first two rounds, then pinglamb won five of six, 3-5",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     12,
+     0
+    ],
+    [
+     12,
+     1
+    ],
+    [
+     12,
+     2
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     7
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][12]['rounds'][0]['winner'], facts['matches'][12]['rounds'][1]['winner'], facts['matches'][12]['rounds'][2]['winner'], facts['matches'][12]['rounds'][3]['winner'], facts['matches'][12]['rounds'][4]['winner'], facts['matches'][12]['rounds'][5]['winner'], facts['matches'][12]['rounds'][6]['winner'], facts['matches'][12]['rounds'][7]['winner'],) == ('yachi', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb', 'yachi', 'pinglamb', 'pinglamb',))"
+ },
+ {
+  "id": "C024",
+  "category": "moment",
+  "canto": "第十四場 yachi 頭四局連贏，5 比 2",
+  "english_gloss": "match 14: yachi won the first four rounds and the match 5-2",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     13,
+     0
+    ],
+    [
+     13,
+     1
+    ],
+    [
+     13,
+     2
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ],
+    [
+     13,
+     5
+    ],
+    [
+     13,
+     6
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][13]['rounds'][0]['winner'], facts['matches'][13]['rounds'][1]['winner'], facts['matches'][13]['rounds'][2]['winner'], facts['matches'][13]['rounds'][3]['winner'], facts['matches'][13]['rounds'][4]['winner'], facts['matches'][13]['rounds'][5]['winner'], facts['matches'][13]['rounds'][6]['winner'],) == ('yachi', 'yachi', 'yachi', 'yachi', 'pinglamb', 'pinglamb', 'yachi',))"
+ },
+ {
+  "id": "C025",
+  "category": "moment",
+  "canto": "第十五場 yachi 4 比 3 領先，尾兩局連失，4 比 5",
+  "english_gloss": "match 15: yachi led 4-3, then lost the last two rounds, 4-5",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     14,
+     0
+    ],
+    [
+     14,
+     1
+    ],
+    [
+     14,
+     2
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     14,
+     5
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     14,
+     8
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][14]['rounds'][0]['winner'], facts['matches'][14]['rounds'][1]['winner'], facts['matches'][14]['rounds'][2]['winner'], facts['matches'][14]['rounds'][3]['winner'], facts['matches'][14]['rounds'][4]['winner'], facts['matches'][14]['rounds'][5]['winner'], facts['matches'][14]['rounds'][6]['winner'], facts['matches'][14]['rounds'][7]['winner'], facts['matches'][14]['rounds'][8]['winner'],) == ('pinglamb', 'yachi', 'yachi', 'pinglamb', 'yachi', 'pinglamb', 'yachi', 'pinglamb', 'pinglamb',))"
+ },
+ {
+  "id": "C026",
+  "category": "moment",
+  "canto": "第十六場 yachi 4 比 2 領先，尾三局連失，4 比 5",
+  "english_gloss": "match 16: yachi led 4-2, then lost the last three rounds, 4-5",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     15,
+     0
+    ],
+    [
+     15,
+     1
+    ],
+    [
+     15,
+     2
+    ],
+    [
+     15,
+     3
+    ],
+    [
+     15,
+     4
+    ],
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     6
+    ],
+    [
+     15,
+     7
+    ],
+    [
+     15,
+     8
+    ]
+   ],
+   "winners": [
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "pinglamb",
+    "pinglamb",
+    "pinglamb"
+   ]
+  },
+  "python_check": "((facts['matches'][15]['rounds'][0]['winner'], facts['matches'][15]['rounds'][1]['winner'], facts['matches'][15]['rounds'][2]['winner'], facts['matches'][15]['rounds'][3]['winner'], facts['matches'][15]['rounds'][4]['winner'], facts['matches'][15]['rounds'][5]['winner'], facts['matches'][15]['rounds'][6]['winner'], facts['matches'][15]['rounds'][7]['winner'], facts['matches'][15]['rounds'][8]['winner'],) == ('pinglamb', 'yachi', 'yachi', 'yachi', 'pinglamb', 'yachi', 'pinglamb', 'pinglamb', 'pinglamb',))"
+ },
+ {
+  "id": "C027",
+  "category": "moment",
+  "canto": "第十七場 yachi 5 比 1",
+  "english_gloss": "match 17: yachi won 5-1",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     16,
+     0
+    ],
+    [
+     16,
+     1
+    ],
+    [
+     16,
+     2
+    ],
+    [
+     16,
+     3
+    ],
+    [
+     16,
+     4
+    ],
+    [
+     16,
+     5
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "yachi",
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][16]['rounds'][0]['winner'], facts['matches'][16]['rounds'][1]['winner'], facts['matches'][16]['rounds'][2]['winner'], facts['matches'][16]['rounds'][3]['winner'], facts['matches'][16]['rounds'][4]['winner'], facts['matches'][16]['rounds'][5]['winner'],) == ('yachi', 'yachi', 'yachi', 'pinglamb', 'yachi', 'yachi',))"
+ },
+ {
+  "id": "C028",
+  "category": "moment",
+  "canto": "第十八場 yachi 輸第二局之後連贏四局，5 比 1",
+  "english_gloss": "match 18: yachi lost the second round, then won four straight, 5-1",
+  "spec": {
+   "p": "round_seq",
+   "pairs": [
+    [
+     17,
+     0
+    ],
+    [
+     17,
+     1
+    ],
+    [
+     17,
+     2
+    ],
+    [
+     17,
+     3
+    ],
+    [
+     17,
+     4
+    ],
+    [
+     17,
+     5
+    ]
+   ],
+   "winners": [
+    "yachi",
+    "pinglamb",
+    "yachi",
+    "yachi",
+    "yachi",
+    "yachi"
+   ]
+  },
+  "python_check": "((facts['matches'][17]['rounds'][0]['winner'], facts['matches'][17]['rounds'][1]['winner'], facts['matches'][17]['rounds'][2]['winner'], facts['matches'][17]['rounds'][3]['winner'], facts['matches'][17]['rounds'][4]['winner'], facts['matches'][17]['rounds'][5]['winner'],) == ('yachi', 'pinglamb', 'yachi', 'yachi', 'yachi', 'yachi',))"
+ },
+ {
+  "id": "C029",
+  "category": "style",
+  "canto": "十八場入面十四場係 pinglamb 每粒方塊嘅攻擊高，yachi 高嘅得四場——第三、第四、第十七同第十八場，四場都係 yachi 贏；第三場 pinglamb 低過 yachi 超過 8%，第十六場高過超過 30%。第七場 pinglamb 贏，佢嗰場高出嘅比例細過 yachi 贏嘅第十四場",
+  "english_gloss": "pinglamb's attack per piece is the higher in fourteen of the eighteen matches and yachi's in four, matches 3, 4, 17 and 18, all yachi wins; in match 3 pinglamb's is over 8 percent below yachi's and in match 16 over 30 percent above; pinglamb's advantage in match 7, which he won, is smaller than in match 14, which yachi won",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 0,
+       "hi": 1
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 0,
+       "hi": 1
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 0,
+       "hi": 1
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 0,
+       "hi": 1
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 1,
+       "hi": 2
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 1,
+       "hi": 2
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 1,
+       "hi": 2
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 1,
+       "hi": 2
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 2,
+       "hi": 3
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 2,
+       "hi": 3
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 2,
+       "hi": 3
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 2,
+       "hi": 3
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 3,
+       "hi": 4
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 3,
+       "hi": 4
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 3,
+       "hi": 4
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 3,
+       "hi": 4
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 4,
+       "hi": 5
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 4,
+       "hi": 5
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 4,
+       "hi": 5
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 4,
+       "hi": 5
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 5,
+       "hi": 6
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 5,
+       "hi": 6
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 5,
+       "hi": 6
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 5,
+       "hi": 6
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 6,
+       "hi": 7
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 6,
+       "hi": 7
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 6,
+       "hi": 7
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 6,
+       "hi": 7
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 7,
+       "hi": 8
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 7,
+       "hi": 8
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 7,
+       "hi": 8
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 7,
+       "hi": 8
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 8,
+       "hi": 9
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 8,
+       "hi": 9
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 8,
+       "hi": 9
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 8,
+       "hi": 9
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 9,
+       "hi": 10
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 9,
+       "hi": 10
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 9,
+       "hi": 10
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 9,
+       "hi": 10
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 10,
+       "hi": 11
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 10,
+       "hi": 11
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 10,
+       "hi": 11
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 10,
+       "hi": 11
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 11,
+       "hi": 12
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 11,
+       "hi": 12
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 11,
+       "hi": 12
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 11,
+       "hi": 12
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 12,
+       "hi": 13
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 12,
+       "hi": 13
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 12,
+       "hi": 13
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 12,
+       "hi": 13
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 13,
+       "hi": 14
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 13,
+       "hi": 14
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 13,
+       "hi": 14
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 13,
+       "hi": 14
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 14,
+       "hi": 15
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 14,
+       "hi": 15
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 14,
+       "hi": 15
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 14,
+       "hi": 15
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 15,
+       "hi": 16
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 15,
+       "hi": 16
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 15,
+       "hi": 16
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 15,
+       "hi": 16
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 16,
+       "hi": 17
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 16,
+       "hi": 17
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 16,
+       "hi": 17
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 16,
+       "hi": 17
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "garbage_attack",
+       "lo": 17,
+       "hi": 18
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "pieces",
+       "lo": 17,
+       "hi": 18
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "garbage_attack",
+       "lo": 17,
+       "hi": 18
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "pieces",
+       "lo": 17,
+       "hi": 18
+      }
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 16,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 17,
+     "pl": "yachi"
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 2,
+        "hi": 3
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "pieces",
+        "lo": 2,
+        "hi": 3
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 92
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 2,
+        "hi": 3
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "pieces",
+        "lo": 2,
+        "hi": 3
+       }
+      }
+     }
+    },
+    {
+     "p": "gt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 100
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 15,
+        "hi": 16
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "pieces",
+        "lo": 15,
+        "hi": 16
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "lit",
+       "v": 130
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 15,
+        "hi": 16
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "pieces",
+        "lo": 15,
+        "hi": 16
+       }
+      }
+     }
+    },
+    {
+     "p": "match_winner",
+     "mi": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 13,
+     "pl": "yachi"
+    },
+    {
+     "p": "lt",
+     "a": {
+      "e": "mul",
+      "a": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 6,
+        "hi": 7
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "pieces",
+        "lo": 6,
+        "hi": 7
+       }
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 13,
+        "hi": 14
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "pieces",
+        "lo": 13,
+        "hi": 14
+       }
+      }
+     },
+     "b": {
+      "e": "mul",
+      "a": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 13,
+        "hi": 14
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "pieces",
+        "lo": 13,
+        "hi": 14
+       }
+      },
+      "b": {
+       "e": "mul",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 6,
+        "hi": 7
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "pieces",
+        "lo": 6,
+        "hi": 7
+       }
+      }
+     }
+    }
+   ]
+  },
+  "python_check": "((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][0:1] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][0:1] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][0:1] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][0:1] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][1:2] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][1:2] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][1:2] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][1:2] for r in m['rounds']))) and ((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][2:3] for r in m['rounds'])) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][2:3] for r in m['rounds']))) and ((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][3:4] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][3:4] for r in m['rounds'])) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][3:4] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][3:4] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][4:5] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][4:5] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][4:5] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][4:5] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][5:6] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][5:6] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][5:6] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][5:6] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][6:7] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][6:7] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][7:8] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][7:8] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][7:8] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][7:8] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][8:9] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][8:9] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][8:9] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][8:9] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][9:10] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][9:10] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][9:10] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][9:10] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][10:11] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][10:11] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][10:11] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][10:11] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][11:12] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][11:12] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][11:12] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][11:12] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][12:13] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][12:13] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][12:13] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][12:13] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][13:14] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][13:14] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][14:15] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][14:15] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][14:15] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][14:15] for r in m['rounds']))) and ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][15:16] for r in m['rounds'])) > (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][15:16] for r in m['rounds']))) and ((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][16:17] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][16:17] for r in m['rounds'])) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][16:17] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][16:17] for r in m['rounds']))) and ((sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][17:18] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][17:18] for r in m['rounds'])) > (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][17:18] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][17:18] for r in m['rounds']))) and (facts['matches'][2]['winner']=='yachi') and (facts['matches'][3]['winner']=='yachi') and (facts['matches'][16]['winner']=='yachi') and (facts['matches'][17]['winner']=='yachi') and ((100 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][2:3] for r in m['rounds']))) < (92 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][2:3] for r in m['rounds'])))) and ((100 * (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][15:16] for r in m['rounds']))) > (130 * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][15:16] for r in m['rounds'])))) and (facts['matches'][6]['winner']=='pinglamb') and (facts['matches'][13]['winner']=='yachi') and (((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][6:7] for r in m['rounds'])) * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][13:14] for r in m['rounds']))) < ((sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds']) * sum(r['players']['yachi']['pieces'] for m in facts['matches'][13:14] for r in m['rounds'])) * (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds']) * sum(r['players']['pinglamb']['pieces'] for m in facts['matches'][6:7] for r in m['rounds']))))"
+ },
+ {
+  "id": "C030",
+  "category": "style",
+  "canto": "逐場計總攻擊，打得多嗰個十八場贏十七場。唯一例外係第五場：pinglamb 總攻擊多啲，但係 yachi 5 比 3 贏",
+  "english_gloss": "in seventeen of the eighteen matches the player who landed more attack won; the exception is match 5, which yachi won with less attack",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 0,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 0,
+        "hi": 1
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 0,
+        "hi": 1
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 1,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 1,
+        "hi": 2
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 1,
+        "hi": 2
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 2,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 2,
+        "hi": 3
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 2,
+        "hi": 3
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 3,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 3,
+        "hi": 4
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 3,
+        "hi": 4
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 4,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 4,
+        "hi": 5
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 4,
+        "hi": 5
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 5,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 5,
+        "hi": 6
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 5,
+        "hi": 6
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 6,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 6,
+        "hi": 7
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 6,
+        "hi": 7
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 7,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 7,
+        "hi": 8
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 7,
+        "hi": 8
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 8,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 8,
+        "hi": 9
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 8,
+        "hi": 9
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 9,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 9,
+        "hi": 10
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 9,
+        "hi": 10
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 10,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 10,
+        "hi": 11
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 10,
+        "hi": 11
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 11,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 11,
+        "hi": 12
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 11,
+        "hi": 12
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 12,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 12,
+        "hi": 13
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 12,
+        "hi": 13
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 13,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 13,
+        "hi": 14
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 13,
+        "hi": 14
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 14,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 14,
+        "hi": 15
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 14,
+        "hi": 15
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 15,
+       "pl": "pinglamb"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 15,
+        "hi": 16
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 15,
+        "hi": 16
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 16,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 16,
+        "hi": 17
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 16,
+        "hi": 17
+       }
+      }
+     ]
+    },
+    {
+     "p": "and",
+     "xs": [
+      {
+       "p": "match_winner",
+       "mi": 17,
+       "pl": "yachi"
+      },
+      {
+       "p": "gt",
+       "a": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "garbage_attack",
+        "lo": 17,
+        "hi": 18
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "garbage_attack",
+        "lo": 17,
+        "hi": 18
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "python_check": "(facts['matches'][0]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][0:1] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][0:1] for r in m['rounds'])) and (facts['matches'][1]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][1:2] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][1:2] for r in m['rounds'])) and (facts['matches'][2]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][2:3] for r in m['rounds'])) and (facts['matches'][3]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][3:4] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][3:4] for r in m['rounds'])) and (facts['matches'][4]['winner']=='yachi') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][4:5] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][4:5] for r in m['rounds'])) and (facts['matches'][5]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][5:6] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][5:6] for r in m['rounds'])) and (facts['matches'][6]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][6:7] for r in m['rounds'])) and (facts['matches'][7]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][7:8] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][7:8] for r in m['rounds'])) and (facts['matches'][8]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][8:9] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][8:9] for r in m['rounds'])) and (facts['matches'][9]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][9:10] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][9:10] for r in m['rounds'])) and (facts['matches'][10]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][10:11] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][10:11] for r in m['rounds'])) and (facts['matches'][11]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][11:12] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][11:12] for r in m['rounds'])) and (facts['matches'][12]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][12:13] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][12:13] for r in m['rounds'])) and (facts['matches'][13]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][13:14] for r in m['rounds'])) and (facts['matches'][14]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][14:15] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][14:15] for r in m['rounds'])) and (facts['matches'][15]['winner']=='pinglamb') and (sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds']) > sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][15:16] for r in m['rounds'])) and (facts['matches'][16]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][16:17] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][16:17] for r in m['rounds'])) and (facts['matches'][17]['winner']=='yachi') and (sum(r['players']['yachi']['garbage_attack'] for m in facts['matches'][17:18] for r in m['rounds']) > sum(r['players']['pinglamb']['garbage_attack'] for m in facts['matches'][17:18] for r in m['rounds']))"
+ },
+ {
+  "id": "C031",
+  "category": "score",
+  "canto": "局數打和、場數輸 7 比 11，係因為 yachi 贏嗰七場局數 35 比 10，輸嗰十一場局數 30 比 55——贏就贏得闊，輸就輸得窄",
+  "english_gloss": "the rounds are level and the matches 7-11 because yachi's seven match wins went 35-10 on rounds and his eleven match losses 30-55",
+  "spec": {
+   "p": "and",
+   "xs": [
+    {
+     "p": "match_winner",
+     "mi": 0,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 1,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 2,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 3,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 4,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 5,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 6,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 7,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 8,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 9,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 10,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 11,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 12,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 13,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 14,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 15,
+     "pl": "pinglamb"
+    },
+    {
+     "p": "match_winner",
+     "mi": 16,
+     "pl": "yachi"
+    },
+    {
+     "p": "match_winner",
+     "mi": 17,
+     "pl": "yachi"
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "add",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "add",
+         "a": {
+          "e": "add",
+          "a": {
+           "e": "add",
+           "a": {
+            "e": "sum_round_range",
+            "pl": "yachi",
+            "f": "alive",
+            "lo": 1,
+            "hi": 2
+           },
+           "b": {
+            "e": "sum_round_range",
+            "pl": "yachi",
+            "f": "alive",
+            "lo": 2,
+            "hi": 3
+           }
+          },
+          "b": {
+           "e": "sum_round_range",
+           "pl": "yachi",
+           "f": "alive",
+           "lo": 3,
+           "hi": 4
+          }
+         },
+         "b": {
+          "e": "sum_round_range",
+          "pl": "yachi",
+          "f": "alive",
+          "lo": 4,
+          "hi": 5
+         }
+        },
+        "b": {
+         "e": "sum_round_range",
+         "pl": "yachi",
+         "f": "alive",
+         "lo": 13,
+         "hi": 14
+        }
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "alive",
+        "lo": 16,
+        "hi": 17
+       }
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "alive",
+       "lo": 17,
+       "hi": 18
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 35
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "add",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "add",
+         "a": {
+          "e": "add",
+          "a": {
+           "e": "add",
+           "a": {
+            "e": "sum_round_range",
+            "pl": "pinglamb",
+            "f": "alive",
+            "lo": 1,
+            "hi": 2
+           },
+           "b": {
+            "e": "sum_round_range",
+            "pl": "pinglamb",
+            "f": "alive",
+            "lo": 2,
+            "hi": 3
+           }
+          },
+          "b": {
+           "e": "sum_round_range",
+           "pl": "pinglamb",
+           "f": "alive",
+           "lo": 3,
+           "hi": 4
+          }
+         },
+         "b": {
+          "e": "sum_round_range",
+          "pl": "pinglamb",
+          "f": "alive",
+          "lo": 4,
+          "hi": 5
+         }
+        },
+        "b": {
+         "e": "sum_round_range",
+         "pl": "pinglamb",
+         "f": "alive",
+         "lo": 13,
+         "hi": 14
+        }
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "alive",
+        "lo": 16,
+        "hi": 17
+       }
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "alive",
+       "lo": 17,
+       "hi": 18
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 10
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "add",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "add",
+         "a": {
+          "e": "add",
+          "a": {
+           "e": "add",
+           "a": {
+            "e": "add",
+            "a": {
+             "e": "add",
+             "a": {
+              "e": "add",
+              "a": {
+               "e": "add",
+               "a": {
+                "e": "sum_round_range",
+                "pl": "yachi",
+                "f": "alive",
+                "lo": 0,
+                "hi": 1
+               },
+               "b": {
+                "e": "sum_round_range",
+                "pl": "yachi",
+                "f": "alive",
+                "lo": 5,
+                "hi": 6
+               }
+              },
+              "b": {
+               "e": "sum_round_range",
+               "pl": "yachi",
+               "f": "alive",
+               "lo": 6,
+               "hi": 7
+              }
+             },
+             "b": {
+              "e": "sum_round_range",
+              "pl": "yachi",
+              "f": "alive",
+              "lo": 7,
+              "hi": 8
+             }
+            },
+            "b": {
+             "e": "sum_round_range",
+             "pl": "yachi",
+             "f": "alive",
+             "lo": 8,
+             "hi": 9
+            }
+           },
+           "b": {
+            "e": "sum_round_range",
+            "pl": "yachi",
+            "f": "alive",
+            "lo": 9,
+            "hi": 10
+           }
+          },
+          "b": {
+           "e": "sum_round_range",
+           "pl": "yachi",
+           "f": "alive",
+           "lo": 10,
+           "hi": 11
+          }
+         },
+         "b": {
+          "e": "sum_round_range",
+          "pl": "yachi",
+          "f": "alive",
+          "lo": 11,
+          "hi": 12
+         }
+        },
+        "b": {
+         "e": "sum_round_range",
+         "pl": "yachi",
+         "f": "alive",
+         "lo": 12,
+         "hi": 13
+        }
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "yachi",
+        "f": "alive",
+        "lo": 14,
+        "hi": 15
+       }
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "yachi",
+       "f": "alive",
+       "lo": 15,
+       "hi": 16
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 30
+     }
+    },
+    {
+     "p": "eq",
+     "a": {
+      "e": "add",
+      "a": {
+       "e": "add",
+       "a": {
+        "e": "add",
+        "a": {
+         "e": "add",
+         "a": {
+          "e": "add",
+          "a": {
+           "e": "add",
+           "a": {
+            "e": "add",
+            "a": {
+             "e": "add",
+             "a": {
+              "e": "add",
+              "a": {
+               "e": "add",
+               "a": {
+                "e": "sum_round_range",
+                "pl": "pinglamb",
+                "f": "alive",
+                "lo": 0,
+                "hi": 1
+               },
+               "b": {
+                "e": "sum_round_range",
+                "pl": "pinglamb",
+                "f": "alive",
+                "lo": 5,
+                "hi": 6
+               }
+              },
+              "b": {
+               "e": "sum_round_range",
+               "pl": "pinglamb",
+               "f": "alive",
+               "lo": 6,
+               "hi": 7
+              }
+             },
+             "b": {
+              "e": "sum_round_range",
+              "pl": "pinglamb",
+              "f": "alive",
+              "lo": 7,
+              "hi": 8
+             }
+            },
+            "b": {
+             "e": "sum_round_range",
+             "pl": "pinglamb",
+             "f": "alive",
+             "lo": 8,
+             "hi": 9
+            }
+           },
+           "b": {
+            "e": "sum_round_range",
+            "pl": "pinglamb",
+            "f": "alive",
+            "lo": 9,
+            "hi": 10
+           }
+          },
+          "b": {
+           "e": "sum_round_range",
+           "pl": "pinglamb",
+           "f": "alive",
+           "lo": 10,
+           "hi": 11
+          }
+         },
+         "b": {
+          "e": "sum_round_range",
+          "pl": "pinglamb",
+          "f": "alive",
+          "lo": 11,
+          "hi": 12
+         }
+        },
+        "b": {
+         "e": "sum_round_range",
+         "pl": "pinglamb",
+         "f": "alive",
+         "lo": 12,
+         "hi": 13
+        }
+       },
+       "b": {
+        "e": "sum_round_range",
+        "pl": "pinglamb",
+        "f": "alive",
+        "lo": 14,
+        "hi": 15
+       }
+      },
+      "b": {
+       "e": "sum_round_range",
+       "pl": "pinglamb",
+       "f": "alive",
+       "lo": 15,
+       "hi": 16
+      }
+     },
+     "b": {
+      "e": "lit",
+      "v": 55
+     }
+    }
+   ]
+  },
+  "python_check": "(facts['matches'][0]['winner']=='pinglamb') and (facts['matches'][1]['winner']=='yachi') and (facts['matches'][2]['winner']=='yachi') and (facts['matches'][3]['winner']=='yachi') and (facts['matches'][4]['winner']=='yachi') and (facts['matches'][5]['winner']=='pinglamb') and (facts['matches'][6]['winner']=='pinglamb') and (facts['matches'][7]['winner']=='pinglamb') and (facts['matches'][8]['winner']=='pinglamb') and (facts['matches'][9]['winner']=='pinglamb') and (facts['matches'][10]['winner']=='pinglamb') and (facts['matches'][11]['winner']=='pinglamb') and (facts['matches'][12]['winner']=='pinglamb') and (facts['matches'][13]['winner']=='yachi') and (facts['matches'][14]['winner']=='pinglamb') and (facts['matches'][15]['winner']=='pinglamb') and (facts['matches'][16]['winner']=='yachi') and (facts['matches'][17]['winner']=='yachi') and (((((((sum(r['players']['yachi']['alive'] for m in facts['matches'][1:2] for r in m['rounds']) + sum(r['players']['yachi']['alive'] for m in facts['matches'][2:3] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][3:4] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][4:5] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][13:14] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][16:17] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][17:18] for r in m['rounds'])) == 35) and (((((((sum(r['players']['pinglamb']['alive'] for m in facts['matches'][1:2] for r in m['rounds']) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][2:3] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][3:4] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][4:5] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][13:14] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][16:17] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][17:18] for r in m['rounds'])) == 10) and (((((((((((sum(r['players']['yachi']['alive'] for m in facts['matches'][0:1] for r in m['rounds']) + sum(r['players']['yachi']['alive'] for m in facts['matches'][5:6] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][6:7] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][7:8] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][8:9] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][9:10] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][10:11] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][11:12] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][12:13] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][14:15] for r in m['rounds'])) + sum(r['players']['yachi']['alive'] for m in facts['matches'][15:16] for r in m['rounds'])) == 30) and (((((((((((sum(r['players']['pinglamb']['alive'] for m in facts['matches'][0:1] for r in m['rounds']) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][5:6] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][6:7] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][7:8] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][8:9] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][9:10] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][10:11] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][11:12] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][12:13] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][14:15] for r in m['rounds'])) + sum(r['players']['pinglamb']['alive'] for m in facts['matches'][15:16] for r in m['rounds'])) == 55)"
+ }
+]

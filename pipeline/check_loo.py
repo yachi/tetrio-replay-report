@@ -630,6 +630,15 @@ PUBLISHED = (
     # shortfall table, which is not a SENTENCES target.
     ("2026-10-29", "app_gap_won", "series"),
     ("2026-10-29", "app_gap_lost", "series"),
+    # 2026-11-01 takes NO `ANNOTATED` entry. Measured over the two regime figures, 130 rounds:
+    #
+    #     app_gap_won     +10.2062 pp    m7r1 -> +11.6787  rel 0.144  1.15x the next of 130
+    #     app_gap_lost    +14.6407 pp   m14r1 -> +13.5380  rel 0.075  1.21x
+    #
+    # Both far under THRESHOLD and neither sign moves. Its attack total (-138 to yachi) is
+    # quoted only in the shortfall table, which is not a SENTENCES target.
+    ("2026-11-01", "app_gap_won", "series"),
+    ("2026-11-01", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
