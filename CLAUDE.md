@@ -715,33 +715,21 @@ equivalent marker pair.
 - CI re-runs every gate on push, including regenerating each ledger and checking it is
   byte-identical to what is committed. Weekly runs add mutation testing. **22 job definitions
   across 4 workflows; the 13 of 2026-08-20 expanded to 26 check runs that day** — `verify` is a matrix over
-  artefact directories (23 — twenty-two session artefacts plus the `subsets/2026-09-18-onform`
-  filtered subset, which is NOT in the corpus even though the night it is drawn from now IS) and
+  artefact directories (22 session artefacts; the `subsets/2026-09-18-onform` filtered subset
+  that used to make it 23 was removed on 2026-11-03 at yachi's request) and
   `pipeline` over sessions (21), so both counts move with the corpus
   and neither should be typed from memory. Re-derive the first with
   `awk 'FNR==1{j=0} /^jobs:/{j=1;next} j && /^  [a-zA-Z_-]+:$/{n++} END{print n}'
   .github/workflows/*.yml` — the `FNR==1` reset is load-bearing, because without it `j` stays set
   across files and the count comes back 21. (This bullet read 「6 jobs」 until 2026-08-23 —
   the 冇第二份 class, in the paragraph describing the gates.)
-- **`subsets/2026-09-18-onform`'s report is in ONE matrix and the drift gate is in the other, so
-  nothing catches it drifting.** The subset sits in `verify` (per-artefact gates, all internal to
-  the directory) and is deliberately absent from `pipeline`, which builds `sessions/<date>/report`
-  from a date list — and `build_report --check` runs only in `pipeline`. Its report nonetheless
-  carries the two CORPUS-WIDE blocks every report carries (the `QUALIFYING_MS` footnote and the
-  最癲一局 lede), both of which move whenever a session lands. So it drifts on exactly the
-  occasions the twenty-one sessions do, and only they are checked. Found on 2026-09-19 by running the
-  check by hand, not by a red build; the report was rebuilt in the same pass, **and again on
-  2026-09-18's pass, where the footnote moved from 「13個 session 夾埋 1768 個 player-round」 to
-  「14個 / 2022」 and the SD ratio from 4.5× to 4.6×** — the second consecutive session where the
-  manual step was the only thing standing between the subset and a stale published figure; 2026-10-03's
-  pass moved it a third time (「15個 / 2314」, SD ratio 4.7×) and 2026-10-09's a fourth (「16個 / 2518」,
-  SD ratio back to 4.5×), 2026-10-12's a fifth (「17個 / 2628」, SD ratio unchanged at 4.5×), and 2026-10-20's a sixth
-  (「18個 / 2688」, SD ratio down to 4.4×), and 2026-10-22's a seventh
-  (「19個 / 2814」, SD ratio unchanged at 4.4×), and 2026-10-29's an eighth (「20個 / 2950」, SD ratio
-  unchanged at 4.4×), and 2026-11-01's a ninth (「21個 / 3210」, SD ratio down to 4.3×). **Until a gate
-  covers it, re-run `python3 -m pipeline.build_report subsets/*/report --check` whenever a session
-  is added** — that is a manual-only step, which this file elsewhere calls the thing
-  `bin/verify-repo` exists to abolish, so it is named here rather than left to memory.
+- **There is no filtered subset any more.** `subsets/2026-09-18-onform` (「兩邊都喺狀態嗰三場」)
+  was removed on 2026-11-03 at yachi's request, with its index card and its `verify` matrix entry.
+  `bin/build-docs` still reads a `subsets/` root and excludes it from the corpus totals, and
+  `app_section --selftest` skips its subset check when none exists, so a new subset needs only its
+  directory, an `ARTEFACTS` row and a `verify` matrix entry. While it existed it sat in `verify`
+  and not in `pipeline`, so `build_report --check` never ran on it and its corpus-wide footnote
+  had to be rebuilt by hand every time a session landed (nine times); a new subset has the same gap.
 - **Every job but the two matrices (`verify`, `pipeline`) is repo-wide, and `bin/verify-repo` is what
   runs them** (twenty of the twenty-two on 2026-10-28, when the `lean` job landed — main already held 21 jobs while this read 「20」; eighteen of the twenty on 2026-10-16; this read 「Sixteen」 until then, and was already
   one short at nineteen jobs — derive it as the job count less two, never carry it). `bin/new-session`
