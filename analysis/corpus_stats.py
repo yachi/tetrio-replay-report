@@ -100,16 +100,21 @@ and both are established rather than hypothetical:
    +0.141 → +0.132, the cleared-per-received ratio +0.260 → +0.248, the duration control
    +0.031 → +0.027, and the two attack/duration controls -0.166 → -0.158 and -0.170 → -0.164)
    and 食/intensity outward (+0.111 → +0.119). It is 130 rounds, the fourth largest, and it moved
-   the headline by 0.013. Fifteen increments; the headline has now moved inward five times
-   running (10-12, 10-20, 10-22, 10-29, 11-01), and the sign and ordering unmoved
+   the headline by 0.013. 2026-11-05 took it to twenty-two and 1672 rounds and moved six of
+   the seven a SIXTEENTH time — raw 清走 outward (+0.132 → +0.134), the cleared-per-received
+   ratio outward (+0.248 → +0.252), the duration control inward (+0.027 → +0.024), the two
+   attack/duration controls inward (-0.158 → -0.154, -0.164 → -0.160) and 食/intensity inward
+   (+0.119 → +0.112) — and left the headline at +0.139 to the third decimal. It is 67 rounds.
+   Sixteen increments; the headline's run of five inward moves (10-12, 10-20, 10-22, 10-29,
+   11-01) ends in a step too small to print, and the sign and ordering unmoved
    throughout: that is what a corpus statistic over a growing corpus looks like, and it is the
    reason none of these digits is a finding. That is the other half of the
-   same lesson, now fifteen times over:
+   same lesson, now sixteen times over:
    invariance to a re-source is not invariance to data, which is why the guard downstream
    re-derives rather than counting sessions. As of the current corpus they read **+0.139**
-   (cleared_pp/intensity), **+0.132** (cleared/intensity), **+0.027** (cleared_pp/duration),
-   **-0.158** (apm/duration), **-0.164** (attack/duration), **+0.248**
-   (cleared_per_received/intensity) and **+0.119** (received/intensity). Nothing else in this
+   (cleared_pp/intensity), **+0.134** (cleared/intensity), **+0.024** (cleared_pp/duration),
+   **-0.154** (apm/duration), **-0.160** (attack/duration), **+0.252**
+   (cleared_per_received/intensity) and **+0.112** (received/intensity). Nothing else in this
    repo needs them typed out again, and they are typed out here only because
    `pipeline/check_intense_corpus.DOCSTRING_OWES` names this file — a module that derives a
    figure and then quotes a DIFFERENT one is the state that gate exists to make impossible.

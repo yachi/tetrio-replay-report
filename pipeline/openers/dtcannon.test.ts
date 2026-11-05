@@ -39,7 +39,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
 const ART_PATH = `${import.meta.dir}/../../analysis/dtcannon-facts.json`;
 const TR = JSON.parse(readFileSync(DTCANNON.transcriptionPath, 'utf8'));
 const H = 40;
@@ -73,11 +73,17 @@ const DTCANNON_HITS: string[] = [
   '2026-11-01 m7r1 yachi lock 80 (mirrored)',
   '2026-11-01 m14r3 yachi lock 35',
   '2026-11-01 m18r6 yachi lock 33',
+  '2026-11-05 m1r5 yachi lock 71',
+  '2026-11-05 m3r1 yachi lock 192',
+  '2026-11-05 m3r3 yachi lock 63',
+  '2026-11-05 m5r3 yachi lock 116',
+  '2026-11-05 m8r5 yachi lock 87 (mirrored)',
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   '2026-09-17 m6r7 yachi lock 90 (next_t_elsewhere at lock 96)',
   '2026-09-17 m7r4 yachi lock 103 (past_verified at lock 111)',
   '2026-11-01 m7r1 yachi lock 80 (slot_filled_before_t at lock 86)',
+  '2026-11-05 m8r5 yachi lock 87 (next_t_elsewhere at lock 95)',
 ];
 const GARBAGE_IN_WINDOW: string[] = [
   '2026-09-11 m1r1 yachi lock 184',
@@ -91,6 +97,9 @@ const GARBAGE_IN_WINDOW: string[] = [
   '2026-11-01 m7r1 yachi lock 80',
   '2026-11-01 m14r3 yachi lock 35',
   '2026-11-01 m18r6 yachi lock 33',
+  '2026-11-05 m3r1 yachi lock 192',
+  '2026-11-05 m3r3 yachi lock 63',
+  '2026-11-05 m5r3 yachi lock 116',
 ];
 const DTCANNON_IN_OPENER: string[] = [
   '2026-08-14 m3r4 yachi lock 13',
@@ -105,26 +114,26 @@ const NOT_QUALIFIED: string[] = [
   '2026-09-11 m4r5 yachi lock 107 (ownership_unverified)',
 ];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 819, yachi: 584 };
+const WINDOW_OFF_BOARD = { pinglamb: 853, yachi: 610 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6396, in_opener: 1254, mid_game: 5142 },
-                    yachi: { all: 5783, in_opener: 1491, mid_game: 4292 } };
-const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 27, in_opener: 5, mid_game: 22, mirrored: 10, garbage_in_window: 11}};
-const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 24 };
-const QUALIFIED = { pinglamb: 0, yachi: 26 };
+const TSD_DENOM = { pinglamb: { all: 6651, in_opener: 1302, mid_game: 5349 },
+                    yachi: { all: 6052, in_opener: 1548, mid_game: 4504 } };
+const HITS = {pinglamb: {all: 0, in_opener: 0, mid_game: 0, mirrored: 0, garbage_in_window: 0}, yachi: {all: 32, in_opener: 5, mid_game: 27, mirrored: 11, garbage_in_window: 14}};
+const FOLLOWUP_FIRED = { pinglamb: 0, yachi: 28 };
+const QUALIFIED = { pinglamb: 0, yachi: 31 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
-const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 28}, no_roof: {pinglamb: 2682, yachi: 2495}, t_overlap: {pinglamb: 0, yachi: 27}}, orientation_baseline: {pinglamb: 63, yachi: 80}};
+const CONTROLS = {under: {TSS: {pinglamb: 0, yachi: 0}, TST: {pinglamb: 0, yachi: 0}, mini_TSS: {pinglamb: 0, yachi: 0}, mini_TSD: {pinglamb: 0, yachi: 0}}, ablation: {no_must_empty: {pinglamb: 0, yachi: 33}, no_roof: {pinglamb: 2798, yachi: 2618}, t_overlap: {pinglamb: 0, yachi: 32}}, orientation_baseline: {pinglamb: 63, yachi: 86}};
 /** What discriminates, measured: full TSDs whose anchored T meets ONE part of the window. `above` is the four
  *  rows over the T (the overhang over the TST stem, its second cell, the stem walled both sides, the nub row of
  *  the TST slot), of which `overhang` is the top two and `tst_side` the next two; `cleared` the two rows the TSD
  *  clears; `below` the stem's bottom cell under the nub and its two walls. */
-const PART_ONLY = { above: 28, overhang: 30, tst_side: 28, cleared: 12036, below: 5177 };
+const PART_ONLY = { above: 33, overhang: 35, tst_side: 33, cleared: 12554, below: 5416 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
   noRecon: 'the corpus has no reconstruction disagreement (check.reconstruction_disagreed is 0)',
-  followupAnyT: 'the one hit whose next T missed the slot (next_t_elsewhere) placed a T that scored no T-spin, so counting any scored T changes nothing',
+  followupAnyT: 'the two hits whose next T missed the slot (next_t_elsewhere; 09-17 m6r7, 11-05 m8r5) each placed a T that scored no T-spin, so counting any scored T changes nothing',
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -196,7 +205,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(17205);
+  expect(n).toBe(17949);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 

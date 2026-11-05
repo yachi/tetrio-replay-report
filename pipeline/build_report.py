@@ -24,7 +24,7 @@ import os
 import sys
 
 from pipeline import (app_section, appendix, attack_section, finesse_section, chart_data, claim_cards, coaching,
-                      forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region,
+                      forecast_section, hero, intense_round, matches, moments, opener_section, pc_section, records, region, video_section,
                       replay_section, routes_techniques_section, stats_section)
 from pipeline.claims import generators
 
@@ -93,6 +93,11 @@ def intense_sec(ctx):
     return intense_round.build(ctx["facts"], ctx["report_dir"])
 
 
+def video_sec(ctx):
+    """影片 — conditional on <session>/video/video.json; quarantined video data, no badge."""
+    return video_section.build(ctx["facts"], ctx["report_dir"])
+
+
 def pc_sec(ctx):
     # Built from the session's own claims, like records_section — so the figures are the
     # proved ones. Returns None for a session with no Perfect Clear (no claims, no
@@ -153,6 +158,9 @@ def claims_island(ctx):
 SECTIONS = [
     ("hero", '<!-- BEGIN generated matches', hero_section, None),
     ("matches", '<!-- BEGIN generated stats', matches_section, None),
+    # 影片 right after 戰況: every match and round linked to the session's video. Conditional on
+    # <session>/video/video.json, so it is SELF_INSERTING; anchored on the stats marker.
+    ("video", '<!-- BEGIN generated stats', video_sec, None),
     ("stats", '<!-- BEGIN generated moments', stats_sec, None),
     # 每粒攻擊 right after 數據對決. A CHAIN anchor (the intense-round idiom): before the
     # routes-techniques region when the report already carries it, else before the moments

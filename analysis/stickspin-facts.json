@@ -125,6 +125,11 @@
     "session": "2026-11-01",
     "replays_md5": "ab7b44916f602e699f4271fa78d2f519",
     "replay_facts_md5": "2957aa454c78787ee02e47ba557c71b7"
+   },
+   {
+    "session": "2026-11-05",
+    "replays_md5": "1307e915c6c9bfe54936492f537a9620",
+    "replay_facts_md5": "aba536fe004d66aa95de053f32c06999"
    }
   ],
   "routes_md5": "aade282f2677056c49f270b0881f95f1",
@@ -151,7 +156,8 @@
   "2026-10-20",
   "2026-10-22",
   "2026-10-29",
-  "2026-11-01"
+  "2026-11-01",
+  "2026-11-05"
  ],
  "outcomes": [],
  "nodes": [
@@ -164,10 +170,10 @@
     "pinglamb": 0,
     "yachi": 1
    },
-   "opportunities": 3024,
+   "opportunities": 3153,
    "opportunities_by_player": {
-    "pinglamb": 1533,
-    "yachi": 1491
+    "pinglamb": 1597,
+    "yachi": 1556
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -189,10 +195,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 82,
+   "opportunities": 87,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 82
+    "yachi": 87
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -214,10 +220,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 69,
+   "opportunities": 73,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 69
+    "yachi": 73
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -234,10 +240,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 69,
+   "opportunities": 73,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 69
+    "yachi": 73
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -324,15 +330,15 @@
    "id": "bag1.pc",
    "measured": true,
    "page_node": true,
-   "cases": 81,
+   "cases": 86,
    "cases_by_player": {
     "pinglamb": 0,
-    "yachi": 81
+    "yachi": 86
    },
-   "opportunities": 82,
+   "opportunities": 87,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 82
+    "yachi": 87
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -354,10 +360,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 69,
+   "opportunities": 73,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 69
+    "yachi": 73
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -834,10 +840,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 69,
+   "opportunities": 73,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 69
+    "yachi": 73
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -859,10 +865,10 @@
     "pinglamb": 0,
     "yachi": 0
    },
-   "opportunities": 69,
+   "opportunities": 73,
    "opportunities_by_player": {
     "pinglamb": 0,
-    "yachi": 69
+    "yachi": 73
    },
    "pc_off_page": 0,
    "pc_off_page_by_player": {
@@ -1237,7 +1243,12 @@
    "2026-11-01 m4r5 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
    "2026-11-01 m9r1 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
    "2026-11-01 m10r4 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
-   "2026-11-01 m11r4 yachi under 2.sd, 4 cells (drawn J missing, JL extra)"
+   "2026-11-01 m11r4 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
+   "2026-11-05 m3r3 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
+   "2026-11-05 m4r7 yachi under 2.sd, 8 cells (drawn JO missing, JL extra)",
+   "2026-11-05 m6r1 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
+   "2026-11-05 m7r2 yachi under 2.sd, 4 cells (drawn J missing, JL extra)",
+   "2026-11-05 m8r8 yachi under 2.sd, 4 cells (drawn J missing, JL extra)"
   ],
   "bag2_none_unexplained": [
    "2026-10-03 m9r6 yachi"
@@ -1342,6 +1353,11 @@
   {"session":"2026-11-01","file":"replay-2026-11-01-04.ttrm","round_index0":4,"match":4,"round":5,"player":"yachi","verified_to":66,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"JLZOSIT","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":0},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
   {"session":"2026-11-01","file":"replay-2026-11-01-09.ttrm","round_index0":0,"match":9,"round":1,"player":"yachi","verified_to":76,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"SILOZJT","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":6},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
   {"session":"2026-11-01","file":"replay-2026-11-01-10.ttrm","round_index0":3,"match":10,"round":4,"player":"yachi","verified_to":63,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"SLTZIJO","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":4},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
-  {"session":"2026-11-01","file":"replay-2026-11-01-11.ttrm","round_index0":3,"match":11,"round":4,"player":"yachi","verified_to":137,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"LZISOTJ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":12},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true}
+  {"session":"2026-11-01","file":"replay-2026-11-01-11.ttrm","round_index0":3,"match":11,"round":4,"player":"yachi","verified_to":137,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"LZISOTJ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":12},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
+  {"session":"2026-11-05","file":"replay-2026-11-05-03.ttrm","round_index0":2,"match":3,"round":3,"player":"yachi","verified_to":145,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"LOTISZJ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":0},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
+  {"session":"2026-11-05","file":"replay-2026-11-05-04.ttrm","round_index0":6,"match":4,"round":7,"player":"yachi","verified_to":75,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":null,"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":11,"cells":8,"extra":"JL","missing":"JO"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
+  {"session":"2026-11-05","file":"replay-2026-11-05-06.ttrm","round_index0":0,"match":6,"round":1,"player":"yachi","verified_to":158,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"ISJTLOZ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":6},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
+  {"session":"2026-11-05","file":"replay-2026-11-05-07.ttrm","round_index0":1,"match":7,"round":2,"player":"yachi","verified_to":59,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"ILOTSZJ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":0},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true},
+  {"session":"2026-11-05","file":"replay-2026-11-05-08.ttrm","round_index0":7,"match":8,"round":8,"player":"yachi","verified_to":58,"bag1":{"node":"bag1.pc","mirrored":false,"lock":6,"matched_variants":["bag1.left @6"],"spin":{"node":"bag1.pc","piece":"T","spin":"full","lines":1}},"bag2":{"node":null,"mirrored":null,"lock":12,"order_as_drawn":"LTOISJZ","conditions_met":[],"condition_met":null,"handedness_matches_bag1":null,"garbage_rows_stripped":6},"pc":null,"snapshots":[],"bag2_near":{"kind":"near","groups":["2.sd"],"mirrored":false,"lock":12,"cells":4,"extra":"JL","missing":"J"},"deepest":"bag1.pc","deepest_lock":6,"verified":true}
  ]
 }

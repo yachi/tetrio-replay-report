@@ -1,0 +1,481 @@
+{
+ "schema": "session-video/1",
+ "video": {
+  "id": "GRra3pVcBEE",
+  "url": "https://www.youtube.com/watch?v=GRra3pVcBEE",
+  "fetched": "2026-11-05",
+  "format": "360p mp4 via yt-dlp",
+  "sha256": "ea914b571cd70e07280ea998b0bedb68c250d772b9f24178cf8d653f066e7958",
+  "duration_s": 6831
+ },
+ "report_eligible": false,
+ "alignment": {
+  "method": "each replay's ts is the match's end; walking back by the replay's own round lengths plus the gap between rounds, every round start is snapped to the first frame after the empty-board countdown in the video, sampled at 4 frames a second",
+  "max_snap_s": 1.0,
+  "link_lead_s": 5
+ },
+ "matches": [
+  {
+   "position": 1,
+   "file": "replay-2026-11-05-01.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 107.25,
+     "replay_s": 20.978
+    },
+    {
+     "round": 2,
+     "play_start_s": 138.25,
+     "replay_s": 25.25
+    },
+    {
+     "round": 3,
+     "play_start_s": 173.5,
+     "replay_s": 28.267
+    },
+    {
+     "round": 4,
+     "play_start_s": 211.75,
+     "replay_s": 14.778
+    },
+    {
+     "round": 5,
+     "play_start_s": 236.75,
+     "replay_s": 59.317
+    },
+    {
+     "round": 6,
+     "play_start_s": 306.0,
+     "replay_s": 66.883
+    },
+    {
+     "round": 7,
+     "play_start_s": 383.0,
+     "replay_s": 42.3
+    },
+    {
+     "round": 8,
+     "play_start_s": 435.25,
+     "replay_s": 129.315
+    }
+   ]
+  },
+  {
+   "position": 2,
+   "file": "replay-2026-11-05-02.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 619.0,
+     "replay_s": 45.583
+    },
+    {
+     "round": 2,
+     "play_start_s": 674.75,
+     "replay_s": 19.667
+    },
+    {
+     "round": 3,
+     "play_start_s": 704.25,
+     "replay_s": 62.362
+    },
+    {
+     "round": 4,
+     "play_start_s": 776.75,
+     "replay_s": 48.465
+    },
+    {
+     "round": 5,
+     "play_start_s": 835.25,
+     "replay_s": 25.267
+    },
+    {
+     "round": 6,
+     "play_start_s": 870.5,
+     "replay_s": 24.107
+    },
+    {
+     "round": 7,
+     "play_start_s": 904.75,
+     "replay_s": 49.917
+    },
+    {
+     "round": 8,
+     "play_start_s": 964.75,
+     "replay_s": 62.008
+    },
+    {
+     "round": 9,
+     "play_start_s": 1036.75,
+     "replay_s": 49.27
+    }
+   ]
+  },
+  {
+   "position": 3,
+   "file": "replay-2026-11-05-03.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 1289.0,
+     "replay_s": 150.125
+    },
+    {
+     "round": 2,
+     "play_start_s": 1449.25,
+     "replay_s": 52.65
+    },
+    {
+     "round": 3,
+     "play_start_s": 1511.75,
+     "replay_s": 104.833
+    },
+    {
+     "round": 4,
+     "play_start_s": 1626.75,
+     "replay_s": 38.395
+    },
+    {
+     "round": 5,
+     "play_start_s": 1675.25,
+     "replay_s": 35.533
+    },
+    {
+     "round": 6,
+     "play_start_s": 1720.75,
+     "replay_s": 155.262
+    },
+    {
+     "round": 7,
+     "play_start_s": 1886.0,
+     "replay_s": 23.2
+    }
+   ]
+  },
+  {
+   "position": 4,
+   "file": "replay-2026-11-05-04.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 1974.0,
+     "replay_s": 119.307
+    },
+    {
+     "round": 2,
+     "play_start_s": 2103.25,
+     "replay_s": 54.933
+    },
+    {
+     "round": 3,
+     "play_start_s": 2168.25,
+     "replay_s": 212.883
+    },
+    {
+     "round": 4,
+     "play_start_s": 2391.25,
+     "replay_s": 23.887
+    },
+    {
+     "round": 5,
+     "play_start_s": 2425.0,
+     "replay_s": 80.62
+    },
+    {
+     "round": 6,
+     "play_start_s": 2515.75,
+     "replay_s": 229.033
+    },
+    {
+     "round": 7,
+     "play_start_s": 2754.75,
+     "replay_s": 49.45
+    },
+    {
+     "round": 8,
+     "play_start_s": 2814.25,
+     "replay_s": 59.157
+    },
+    {
+     "round": 9,
+     "play_start_s": 2883.5,
+     "replay_s": 76.55
+    }
+   ]
+  },
+  {
+   "position": 5,
+   "file": "replay-2026-11-05-05.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 3038.0,
+     "replay_s": 121.542
+    },
+    {
+     "round": 2,
+     "play_start_s": 3169.75,
+     "replay_s": 42.617
+    },
+    {
+     "round": 3,
+     "play_start_s": 3222.25,
+     "replay_s": 83.267
+    },
+    {
+     "round": 4,
+     "play_start_s": 3315.75,
+     "replay_s": 78.675
+    },
+    {
+     "round": 5,
+     "play_start_s": 3404.25,
+     "replay_s": 24.64
+    },
+    {
+     "round": 6,
+     "play_start_s": 3439.0,
+     "replay_s": 112.832
+    },
+    {
+     "round": 7,
+     "play_start_s": 3562.0,
+     "replay_s": 67.0
+    },
+    {
+     "round": 8,
+     "play_start_s": 3639.0,
+     "replay_s": 40.183
+    },
+    {
+     "round": 9,
+     "play_start_s": 3689.25,
+     "replay_s": 131.845
+    }
+   ]
+  },
+  {
+   "position": 6,
+   "file": "replay-2026-11-05-06.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 3919.75,
+     "replay_s": 106.017
+    },
+    {
+     "round": 2,
+     "play_start_s": 4035.75,
+     "replay_s": 56.8
+    },
+    {
+     "round": 3,
+     "play_start_s": 4102.5,
+     "replay_s": 51.87
+    },
+    {
+     "round": 4,
+     "play_start_s": 4164.5,
+     "replay_s": 39.757
+    },
+    {
+     "round": 5,
+     "play_start_s": 4214.25,
+     "replay_s": 31.112
+    },
+    {
+     "round": 6,
+     "play_start_s": 4255.5,
+     "replay_s": 31.267
+    },
+    {
+     "round": 7,
+     "play_start_s": 4296.75,
+     "replay_s": 109.8
+    },
+    {
+     "round": 8,
+     "play_start_s": 4416.75,
+     "replay_s": 43.145
+    }
+   ]
+  },
+  {
+   "position": 7,
+   "file": "replay-2026-11-05-07.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 5084.75,
+     "replay_s": 12.567
+    },
+    {
+     "round": 2,
+     "play_start_s": 5107.25,
+     "replay_s": 40.733
+    },
+    {
+     "round": 3,
+     "play_start_s": 5158.0,
+     "replay_s": 66.47
+    },
+    {
+     "round": 4,
+     "play_start_s": 5234.5,
+     "replay_s": 105.903
+    },
+    {
+     "round": 5,
+     "play_start_s": 5350.5,
+     "replay_s": 200.35
+    },
+    {
+     "round": 6,
+     "play_start_s": 5561.0,
+     "replay_s": 108.533
+    },
+    {
+     "round": 7,
+     "play_start_s": 5679.5,
+     "replay_s": 41.67
+    },
+    {
+     "round": 8,
+     "play_start_s": 5731.25,
+     "replay_s": 71.417
+    }
+   ]
+  },
+  {
+   "position": 8,
+   "file": "replay-2026-11-05-08.ttrm",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 5854.5,
+     "replay_s": 106.967
+    },
+    {
+     "round": 2,
+     "play_start_s": 5971.5,
+     "replay_s": 44.525
+    },
+    {
+     "round": 3,
+     "play_start_s": 6026.25,
+     "replay_s": 104.34
+    },
+    {
+     "round": 4,
+     "play_start_s": 6140.5,
+     "replay_s": 96.033
+    },
+    {
+     "round": 5,
+     "play_start_s": 6246.5,
+     "replay_s": 130.24
+    },
+    {
+     "round": 6,
+     "play_start_s": 6387.0,
+     "replay_s": 67.767
+    },
+    {
+     "round": 7,
+     "play_start_s": 6464.75,
+     "replay_s": 122.3
+    },
+    {
+     "round": 8,
+     "play_start_s": 6597.0,
+     "replay_s": 42.467
+    },
+    {
+     "round": 9,
+     "play_start_s": 6649.5,
+     "replay_s": 95.153
+    }
+   ]
+  }
+ ],
+ "recovered": [
+  {
+   "after_position": 6,
+   "format": "FT5",
+   "rounds": [
+    {
+     "round": 1,
+     "play_start_s": 4560.75,
+     "end_s": 4583.75,
+     "winner": "yachi",
+     "score_after": {
+      "pinglamb": 0,
+      "yachi": 1
+     }
+    },
+    {
+     "round": 2,
+     "play_start_s": 4592.25,
+     "end_s": 4691.0,
+     "winner": "pinglamb",
+     "score_after": {
+      "pinglamb": 1,
+      "yachi": 1
+     }
+    },
+    {
+     "round": 3,
+     "play_start_s": 4699.25,
+     "end_s": 4741.75,
+     "winner": "yachi",
+     "score_after": {
+      "pinglamb": 1,
+      "yachi": 2
+     }
+    },
+    {
+     "round": 4,
+     "play_start_s": 4750.0,
+     "end_s": 4785.25,
+     "winner": "yachi",
+     "score_after": {
+      "pinglamb": 1,
+      "yachi": 3
+     }
+    },
+    {
+     "round": 5,
+     "play_start_s": 4793.5,
+     "end_s": 4849.75,
+     "winner": "yachi",
+     "score_after": {
+      "pinglamb": 1,
+      "yachi": 4
+     }
+    },
+    {
+     "round": 6,
+     "play_start_s": 4858.0,
+     "end_s": 4904.25,
+     "winner": "pinglamb",
+     "score_after": {
+      "pinglamb": 2,
+      "yachi": 4
+     }
+    },
+    {
+     "round": 7,
+     "play_start_s": 4912.5,
+     "end_s": 4983.0,
+     "winner": "yachi",
+     "score_after": {
+      "pinglamb": 2,
+      "yachi": 5
+     }
+    }
+   ],
+   "how_read": "each round's winner is read off the between-round score overlay TETR.IO shows (TETRA LEAGUE FT5, pinglamb : yachi), and the last round off the closing YACHI winner screen; the round start is the first frame after the empty-board countdown"
+  }
+ ]
+}

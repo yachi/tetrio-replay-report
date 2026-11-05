@@ -56,7 +56,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
 const ART_PATH = `${import.meta.dir}/../../analysis/shachikutrain-facts.json`;
 const TR = JSON.parse(readFileSync(SHACHIKUTRAIN.transcriptionPath, 'utf8'));
 const STMB_TR = JSON.parse(readFileSync(STMBCAVE.transcriptionPath, 'utf8'));
@@ -109,6 +109,7 @@ const SHACHIKUTRAIN_HITS: string[] = [
   "2026-11-01 m6r7 yachi lock 38 (mirrored)", "2026-11-01 m7r4 yachi lock 33 (mirrored)", "2026-11-01 m8r1 pinglamb lock 27",
   "2026-11-01 m8r7 yachi lock 114 (mirrored)", "2026-11-01 m12r2 yachi lock 151 (mirrored)", "2026-11-01 m14r3 pinglamb lock 27",
   "2026-11-01 m16r9 yachi lock 27",
+  "2026-11-05 m7r4 pinglamb lock 95", "2026-11-05 m8r5 pinglamb lock 182 (mirrored)",
 ];
 const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-07-22 m3r1 yachi lock 41 (t_in_slot_not_tsd at lock 46)",
@@ -176,6 +177,7 @@ const FOLLOWUP_NOT_FIRED: string[] = [
   "2026-11-01 m12r2 yachi lock 151 (slot_filled_before_t at lock 152)",
   "2026-11-01 m14r3 pinglamb lock 27 (slot_filled_before_t at lock 28)",
   "2026-11-01 m16r9 yachi lock 27 (slot_filled_before_t at lock 28)",
+  "2026-11-05 m7r4 pinglamb lock 95 (slot_filled_before_t at lock 96)", "2026-11-05 m8r5 pinglamb lock 182 (slot_filled_before_t at lock 183)",
 ];
 const GARBAGE_IN_WINDOW: string[] = [
   "2026-07-22 m4r4 yachi lock 110", "2026-07-22 m9r2 yachi lock 24", "2026-07-22 m10r8 yachi lock 31",
@@ -200,6 +202,7 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-10-22 m8r7 pinglamb lock 87", "2026-10-22 m9r4 pinglamb lock 132",
   "2026-10-29 m4r6 yachi lock 241", "2026-10-29 m8r7 yachi lock 68",
   "2026-11-01 m3r3 yachi lock 60", "2026-11-01 m6r6 yachi lock 102", "2026-11-01 m8r7 yachi lock 114",
+  "2026-11-05 m7r4 pinglamb lock 95", "2026-11-05 m8r5 pinglamb lock 182",
 ];
 const SHACHIKUTRAIN_IN_OPENER: string[] = [
   "2026-08-19 m10r5 yachi lock 16", "2026-08-25 m1r6 pinglamb lock 21", "2026-09-03 m5r3 yachi lock 20",
@@ -207,25 +210,25 @@ const SHACHIKUTRAIN_IN_OPENER: string[] = [
 ];
 const RECON_DROPPED_TSD: string[] = [];
 /** window_off_board, per player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { pinglamb: 1097, yachi: 909 };
+const WINDOW_OFF_BOARD = { pinglamb: 1144, yachi: 950 };
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6396, in_opener: 1254, mid_game: 5142 },
-                    yachi: { all: 5783, in_opener: 1491, mid_game: 4292 } };
+const TSD_DENOM = { pinglamb: { all: 6651, in_opener: 1302, mid_game: 5349 },
+                    yachi: { all: 6052, in_opener: 1548, mid_game: 4504 } };
 /** Per player: hits, their split, the mirrored ones, the ones with garbage in the window, the follow-ups. */
-const HITS = { pinglamb: { all: 43, in_opener: 2, mid_game: 41, mirrored: 25, garbage_in_window: 31 },
+const HITS = { pinglamb: { all: 45, in_opener: 2, mid_game: 43, mirrored: 26, garbage_in_window: 33 },
                yachi: { all: 67, in_opener: 3, mid_game: 64, mirrored: 29, garbage_in_window: 32 } };
 const FOLLOWUP = {
-  pinglamb: { fired: 18, not_fired: { next_t_elsewhere: 1, slot_filled_before_t: 22, t_in_slot_not_tsd: 2 } },
+  pinglamb: { fired: 18, not_fired: { next_t_elsewhere: 1, slot_filled_before_t: 24, t_in_slot_not_tsd: 2 } },
   yachi: { fired: 26, not_fired: { next_t_elsewhere: 6, round_ended: 3, slot_filled_before_t: 29, t_in_slot_not_tsd: 3 } },
 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
   under: { TSS: { pinglamb: 5, yachi: 2 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-  ablation: { no_must_empty: { pinglamb: 1053, yachi: 879 }, no_roof: { pinglamb: 393, yachi: 444 },
-              t_overlap: { pinglamb: 74, yachi: 83 } },
-  orientation_baseline: { pinglamb: 63, yachi: 80 },
+  ablation: { no_must_empty: { pinglamb: 1096, yachi: 917 }, no_roof: { pinglamb: 407, yachi: 459 },
+              t_overlap: { pinglamb: 76, yachi: 84 } },
+  orientation_baseline: { pinglamb: 63, yachi: 86 },
 };
 /** What discriminates, measured: full TSDs (not only hits) whose anchored T meets ONE part of the window — the
  *  row above the T (the roof over its near end and the cell beyond it, the cell over its middle and the second
@@ -235,7 +238,7 @@ const CONTROLS = {
  *  the row below each cut that down — the row below by at least ten times, the row above by less (both asserted
  *  where PART_ONLY is checked) — and neither alone reaches the headline, so those two are what discriminate. The
  *  `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { above: 1436, cleared: 10633, below: 837 };
+const PART_ONLY = { above: 1481, cleared: 11091, below: 866 };
 
 /** Measured byte-identical on this corpus, each for its reason; asserted to STAY identical. */
 const EQUIVALENT: Record<string, string> = {
@@ -317,7 +320,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(17205);
+  expect(n).toBe(17949);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -504,7 +507,7 @@ test('what discriminates: each part of the window alone, with the T anchored, ag
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(32);
-  expect(c.rowmap_steps).toBe(300597);
+  expect(c.rowmap_steps).toBe(314749);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 
@@ -590,7 +593,7 @@ const DPC_ONLY = [
   '2026-11-01 m14r3 pinglamb lock 27', '2026-11-01 m16r9 yachi lock 27'];
 const DPC_AFTER = ['2026-09-11 m1r4 pinglamb lock 27', '2026-11-01 m8r1 pinglamb lock 27'];
 const QUALIFY_BY_PLAYER = {
-  pinglamb: { qualified: 0, not_qualified: { dpc: 11, fragment: 31, garbage_in_shape: 31, kaidan_window: 23 } },
+  pinglamb: { qualified: 0, not_qualified: { dpc: 11, fragment: 33, garbage_in_shape: 33, kaidan_window: 25 } },
   yachi: { qualified: 0, not_qualified: { dpc: 7, fragment: 48, garbage_in_shape: 32, kaidan_window: 39 } },
 };
 const hitName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock}`;

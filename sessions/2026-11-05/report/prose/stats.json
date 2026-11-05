@@ -1,0 +1,43 @@
+{
+  "eyebrow": "數據對決 · 三張圖",
+  "title": "數據對決",
+  "lede": "三張圖答三條問題：邊段開始追、散喺邊種清行、同埋逐項身手邊個高。睇之前記住：<strong>今晚 yachi 快啲、落多啲，pinglamb 每粒重 6%，粒數差少少先填得晒</strong>。yachi 每局平均 PPS 約 1.49 對約 1.43<span class=\"badge\" data-claim=\"G039\"></span>、全晚多疊 392 粒<span class=\"badge\" data-claim=\"C005\"></span>；pinglamb 每粒方塊打出嘅攻擊高 6.14%<span class=\"badge\" data-claim=\"C004\"></span><span class=\"badge\" data-claim=\"G041\"></span>。兩樣相抵，總攻擊 pinglamb 多 18 條<span class=\"badge\" data-claim=\"G029\"></span><span class=\"badge\" data-claim=\"C005\"></span>。",
+  "panels": [
+    {
+      "heading": "逐場 VS 走勢——頭三場全輸，尾五場贏兩場",
+      "caps": [
+        "八格細圖，一場一格。頭三場局數 9 比 15，尾五場 21 比 22<span class=\"badge\" data-claim=\"C010\"></span>：yachi 尾五場嘅贏局率高過頭三場。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "清行類型分布——Quad 同 TSD 係 yachi，TST 係 pinglamb",
+      "caps": [
+        "Quad yachi 332 對 311<span class=\"badge\" data-claim=\"G034\"></span>；T-spin double yachi 288 對 282<span class=\"badge\" data-claim=\"G035\"></span>，T-spin triple pinglamb 70 對 53<span class=\"badge\" data-claim=\"G036\"></span>。T-spin double 加 triple 計埋 pinglamb 352 對 341<span class=\"badge\" data-claim=\"G056\"></span>。"
+      ],
+      "footnote": "「T-spin 總數」<span class=\"badge\" data-claim=\"G033\"></span>計埋冇消行嘅 spin，所以會大過上面逐種清行加埋嘅數。兩個數量度緊唔同嘢，唔好溝埋講。",
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "身手大比拼——快係 yachi，重同省力係 pinglamb",
+      "caps": [
+        "yachi PPS 高<span class=\"badge\" data-claim=\"G039\"></span>、perfect piece 比率高<span class=\"badge\" data-claim=\"G043\"></span>、B2B 同 combo 嘅上限都高<span class=\"badge\" data-claim=\"G053\"></span><span class=\"badge\" data-claim=\"G054\"></span>；pinglamb APM 平均高<span class=\"badge\" data-claim=\"G040\"></span>、每粒方塊嘅攻擊高<span class=\"badge\" data-claim=\"G041\"></span>、每粒方塊按少啲掣<span class=\"badge\" data-claim=\"G065\"></span>、spike 上限高<span class=\"badge\" data-claim=\"G052\"></span>。67 局之後，攻擊 pinglamb 多 18 條<span class=\"badge\" data-claim=\"C005\"></span>。"
+      ],
+      "footnote": "「每粒 finesse 失誤」係<strong>失誤次數</strong>除粒數，唔係「幾多粒方塊撳錯」——一粒可以記幾次，所以呢一行用 toFixed(3) 唔用百分比。",
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}
