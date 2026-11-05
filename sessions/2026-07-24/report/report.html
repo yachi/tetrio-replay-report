@@ -1303,6 +1303,8 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       仲有：<code>APP</code> 每粒方塊嘅攻擊、<code>KPP</code> 每粒方塊按幾多下、
       <code>DS</code> 每粒方塊清走幾多垃圾、<code>FIN%</code> 完美擺放率同失誤次數、
       <code>射埋</code>（對手射過嚟、未 cancel 嘅攻擊）對 <code>食</code>（真正變成垃圾行）、
+      <code>垃圾T</code>（T 入垃圾行個窿：一下 T-spin 清走咗垃圾行，即係 T 塞咗嗰個窿；
+      呢欄係模擬器數出嚟，未經證明，冇 ✓），
       同埋 <code>結果</code>（點收嘅）。
     </p>
     <h3 style="font-size:1.05rem;margin:.2rem 0 .3rem">每粒方塊嘅效率：邊個數真係決定輸贏</h3>
@@ -1380,7 +1382,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
       <button class="rt-chip" data-filter="f-p1" aria-pressed="false">只睇 yachi</button>
       <button class="rt-chip" data-filter="f-p2" aria-pressed="false">只睇 pinglamb</button>
       <button class="rt-chip" data-bars aria-pressed="true">長條圖</button>
-      <label class="rt-toggle" style="margin:0"><input type="checkbox" id="rt-toggle-all">全部 28 欄</label>
+      <label class="rt-toggle" style="margin:0"><input type="checkbox" id="rt-toggle-all">全部 29 欄</label>
       <button class="rt-chip" id="rt-clear">清空篩選</button>
       <button class="rt-chip" id="rt-csv">複製 CSV</button>
       <button class="rt-chip" id="rt-sum">複製摘要</button>
@@ -1394,6 +1396,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 0:5 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">pinglamb 贏</span>
         <span class="rt-agg">yachi 46.4/1.36/101.8 &nbsp;·&nbsp; pinglamb 58.7/1.31/124.2 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 4 &nbsp;·&nbsp; pinglamb 6</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="1">
@@ -1422,6 +1425,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -1453,6 +1457,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="24.0">24</td>
               <td data-v="24.0">24</td>
               <td data-v="7.0">7</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10489.0">10,489</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1483,6 +1488,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="36.0">36</td>
               <td data-v="32.0">32</td>
               <td data-v="14.0">14</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10676.0">10,676</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1513,6 +1519,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="72.0">72</td>
               <td data-v="61.0">61</td>
               <td data-v="27.0">27</td>
+              <td data-v="1.0">1</td>
               <td data-v="25378.0">25,378</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1543,6 +1550,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="56.0">56</td>
               <td data-v="49.0">49</td>
               <td data-v="24.0">24</td>
+              <td data-v="3.0">3</td>
               <td data-v="29013.0">29,013</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1573,6 +1581,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="25.0">25</td>
               <td data-v="22.0">22</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="5968.0">5,968</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1603,6 +1612,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="18.0">18</td>
               <td data-v="15.0">15</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10501.0">10,501</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1633,6 +1643,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="41.0">41</td>
               <td data-v="36.0">36</td>
               <td data-v="8.0">8</td>
+              <td data-v="1.0">1</td>
               <td data-v="7451.0">7,451</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1663,6 +1674,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="8.0">8</td>
               <td data-v="7.0">7</td>
               <td data-v="6.0">6</td>
+              <td data-v="1.0">1</td>
               <td data-v="14519.0">14,519</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1693,6 +1705,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="76.0">76</td>
               <td data-v="69.0">69</td>
               <td data-v="30.0">30</td>
+              <td data-v="2.0">2</td>
               <td data-v="30792.0">30,792</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1723,6 +1736,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="68.0">68</td>
               <td data-v="61.0">61</td>
               <td data-v="34.0">34</td>
+              <td data-v="2.0">2</td>
               <td data-v="30799.0">30,799</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1737,6 +1751,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 5:2 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">yachi 贏</span>
         <span class="rt-agg">yachi 53.5/1.42/118.4 &nbsp;·&nbsp; pinglamb 48.8/1.23/108.4 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 6 &nbsp;·&nbsp; pinglamb 11</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="2">
@@ -1765,6 +1780,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -1796,6 +1812,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="16.0">16</td>
               <td data-v="12.0">12</td>
               <td data-v="5.0">5</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="13174.0">13,174</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1826,6 +1843,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="34.0">34</td>
               <td data-v="30.0">30</td>
               <td data-v="6.0">6</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="6445.0">6,445</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1856,6 +1874,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="27.0">27</td>
               <td data-v="27.0">27</td>
               <td data-v="16.0">16</td>
+              <td data-v="1.0">1</td>
               <td data-v="15412.0">15,412</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1886,6 +1905,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="41.0">41</td>
               <td data-v="41.0">41</td>
               <td data-v="8.0">8</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="11128.0">11,128</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1916,6 +1936,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="107.0">107</td>
               <td data-v="86.0">86</td>
               <td data-v="55.0">55</td>
+              <td data-v="3.0">3</td>
               <td data-v="49213.0">49,213</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -1946,6 +1967,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="130.0">130</td>
               <td data-v="103.0">103</td>
               <td data-v="56.0">56</td>
+              <td data-v="4.0">4</td>
               <td data-v="47056.0">47,056</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -1976,6 +1998,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="45.0">45</td>
               <td data-v="42.0">42</td>
               <td data-v="14.0">14</td>
+              <td data-v="1.0">1</td>
               <td data-v="18236.0">18,236</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2006,6 +2029,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="47.0">47</td>
               <td data-v="45.0">45</td>
               <td data-v="16.0">16</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="19146.0">19,146</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2036,6 +2060,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="90.0">90</td>
               <td data-v="65.0">65</td>
               <td data-v="31.0">31</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="30288.0">30,288</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2066,6 +2091,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="75.0">75</td>
               <td data-v="54.0">54</td>
               <td data-v="42.0">42</td>
+              <td data-v="4.0">4</td>
               <td data-v="31622.0">31,622</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2096,6 +2122,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="64.0">64</td>
               <td data-v="58.0">58</td>
               <td data-v="39.0">39</td>
+              <td data-v="1.0">1</td>
               <td data-v="24691.0">24,691</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2126,6 +2153,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="64.0">64</td>
               <td data-v="56.0">56</td>
               <td data-v="22.0">22</td>
+              <td data-v="1.0">1</td>
               <td data-v="25988.0">25,988</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2156,6 +2184,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="34.0">34</td>
               <td data-v="28.0">28</td>
               <td data-v="15.0">15</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="16461.0">16,461</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2186,6 +2215,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="37.0">37</td>
               <td data-v="34.0">34</td>
               <td data-v="12.0">12</td>
+              <td data-v="2.0">2</td>
               <td data-v="14166.0">14,166</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2200,6 +2230,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 3:5 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">pinglamb 贏</span>
         <span class="rt-agg">yachi 52.8/1.40/116.1 &nbsp;·&nbsp; pinglamb 52.4/1.34/118.4 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 12 &nbsp;·&nbsp; pinglamb 16</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="3">
@@ -2228,6 +2259,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -2259,6 +2291,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="75.0">75</td>
               <td data-v="58.0">58</td>
               <td data-v="28.0">28</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="25032.0">25,032</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2289,6 +2322,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="66.0">66</td>
               <td data-v="49.0">49</td>
               <td data-v="27.0">27</td>
+              <td data-v="2.0">2</td>
               <td data-v="26933.0">26,933</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2319,6 +2353,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="55.0">55</td>
               <td data-v="44.0">44</td>
               <td data-v="34.0">34</td>
+              <td data-v="3.0">3</td>
               <td data-v="32182.0">32,182</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2349,6 +2384,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="95.0">95</td>
               <td data-v="84.0">84</td>
               <td data-v="34.0">34</td>
+              <td data-v="5.0">5</td>
               <td data-v="27483.0">27,483</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2379,6 +2415,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="177.0">177</td>
               <td data-v="160.0">160</td>
               <td data-v="92.0">92</td>
+              <td data-v="5.0">5</td>
               <td data-v="62864.0">62,864</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2409,6 +2446,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="158.0">158</td>
               <td data-v="141.0">141</td>
               <td data-v="80.0">80</td>
+              <td data-v="3.0">3</td>
               <td data-v="65296.0">65,296</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2439,6 +2477,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="6.0">6</td>
               <td data-v="6.0">6</td>
               <td data-v="1.0">1</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="13951.0">13,951</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2469,6 +2508,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="37.0">37</td>
               <td data-v="36.0">36</td>
               <td data-v="6.0">6</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="5536.0">5,536</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2499,6 +2539,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="75.0">75</td>
               <td data-v="64.0">64</td>
               <td data-v="24.0">24</td>
+              <td data-v="1.0">1</td>
               <td data-v="25025.0">25,025</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2529,6 +2570,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="56.0">56</td>
               <td data-v="40.0">40</td>
               <td data-v="28.0">28</td>
+              <td data-v="1.0">1</td>
               <td data-v="27479.0">27,479</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2559,6 +2601,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="52.0">52</td>
               <td data-v="51.0">51</td>
               <td data-v="8.0">8</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="14947.0">14,947</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2589,6 +2632,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="29.0">29</td>
               <td data-v="28.0">28</td>
               <td data-v="27.0">27</td>
+              <td data-v="2.0">2</td>
               <td data-v="13448.0">13,448</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2619,6 +2663,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="61.0">61</td>
               <td data-v="49.0">49</td>
               <td data-v="19.0">19</td>
+              <td data-v="3.0">3</td>
               <td data-v="20224.0">20,224</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2649,6 +2694,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="44.0">44</td>
               <td data-v="32.0">32</td>
               <td data-v="22.0">22</td>
+              <td data-v="2.0">2</td>
               <td data-v="21175.0">21,175</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2678,6 +2724,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="10.0">10</td>
               <td data-v="24.0">24</td>
               <td data-v="24.0">24</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="6403.0">6,403</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -2709,6 +2756,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="10.0">10</td>
               <td data-v="10.0">10</td>
               <td data-v="4.0">4</td>
+              <td data-v="1.0">1</td>
               <td data-v="9876.0">9,876</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2723,6 +2771,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 0:5 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">pinglamb 贏</span>
         <span class="rt-agg">yachi 50.8/1.39/101.5 &nbsp;·&nbsp; pinglamb 64.9/1.35/136.9 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 1 &nbsp;·&nbsp; pinglamb 6</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="4">
@@ -2751,6 +2800,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -2782,6 +2832,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="42.0">42</td>
               <td data-v="33.0">33</td>
               <td data-v="9.0">9</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="9677.0">9,677</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2812,6 +2863,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="23.0">23</td>
               <td data-v="14.0">14</td>
               <td data-v="5.0">5</td>
+              <td data-v="1.0">1</td>
               <td data-v="14433.0">14,433</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2841,6 +2893,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="11.0">11</td>
               <td data-v="32.0">32</td>
               <td data-v="26.0">26</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="5695.0">5,695</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -2872,6 +2925,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="11.0">11</td>
               <td data-v="5.0">5</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="9867.0">9,867</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2901,6 +2955,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="16.0">16</td>
               <td data-v="24.0">24</td>
               <td data-v="24.0">24</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="7918.0">7,918</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -2932,6 +2987,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="16.0">16</td>
               <td data-v="15.0">15</td>
               <td data-v="6.0">6</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="11453.0">11,453</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -2962,6 +3018,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="47.0">47</td>
               <td data-v="45.0">45</td>
               <td data-v="10.0">10</td>
+              <td data-v="1.0">1</td>
               <td data-v="22921.0">22,921</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -2992,6 +3049,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="57.0">57</td>
               <td data-v="51.0">51</td>
               <td data-v="23.0">23</td>
+              <td data-v="1.0">1</td>
               <td data-v="21057.0">21,057</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3022,6 +3080,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="61.0">61</td>
               <td data-v="54.0">54</td>
               <td data-v="21.0">21</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="22485.0">22,485</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3052,6 +3111,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="54.0">54</td>
               <td data-v="45.0">45</td>
               <td data-v="30.0">30</td>
+              <td data-v="4.0">4</td>
               <td data-v="23277.0">23,277</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3066,6 +3126,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 3:5 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">pinglamb 贏</span>
         <span class="rt-agg">yachi 50.6/1.43/106.4 &nbsp;·&nbsp; pinglamb 51.3/1.35/112.8 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 6 &nbsp;·&nbsp; pinglamb 12</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="5">
@@ -3094,6 +3155,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -3125,6 +3187,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="79.0">79</td>
               <td data-v="65.0">65</td>
               <td data-v="39.0">39</td>
+              <td data-v="2.0">2</td>
               <td data-v="37791.0">37,791</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3155,6 +3218,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="103.0">103</td>
               <td data-v="90.0">90</td>
               <td data-v="45.0">45</td>
+              <td data-v="5.0">5</td>
               <td data-v="35796.0">35,796</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3184,6 +3248,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="14.0">14</td>
               <td data-v="24.0">24</td>
               <td data-v="23.0">23</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="5967.0">5,967</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -3215,6 +3280,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="14.0">14</td>
               <td data-v="13.0">13</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="11101.0">11,101</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3245,6 +3311,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="30.0">30</td>
               <td data-v="25.0">25</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="6400.0">6,400</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3274,6 +3341,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="30.0">30</td>
               <td data-v="14.0">14</td>
               <td data-v="9.0">9</td>
+              <td data-v="1.0">1</td>
               <td data-v="1.0">1</td>
               <td data-v="12472.0">12,472</td>
               <td class="c-end" data-v="生還">生還</td>
@@ -3305,6 +3373,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="52.0">52</td>
               <td data-v="41.0">41</td>
               <td data-v="12.0">12</td>
+              <td data-v="1.0">1</td>
               <td data-v="18452.0">18,452</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3335,6 +3404,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="49.0">49</td>
               <td data-v="42.0">42</td>
               <td data-v="23.0">23</td>
+              <td data-v="2.0">2</td>
               <td data-v="18834.0">18,834</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3365,6 +3435,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="26.0">26</td>
               <td data-v="21.0">21</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="12024.0">12,024</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3395,6 +3466,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="33.0">33</td>
               <td data-v="27.0">27</td>
               <td data-v="11.0">11</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10398.0">10,398</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3425,6 +3497,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="47.0">47</td>
               <td data-v="40.0">40</td>
               <td data-v="29.0">29</td>
+              <td data-v="2.0">2</td>
               <td data-v="29269.0">29,269</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3455,6 +3528,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="75.0">75</td>
               <td data-v="72.0">72</td>
               <td data-v="36.0">36</td>
+              <td data-v="2.0">2</td>
               <td data-v="21306.0">21,306</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3485,6 +3559,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="18.0">18</td>
               <td data-v="13.0">13</td>
               <td data-v="7.0">7</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10204.0">10,204</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3514,6 +3589,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="18.0">18</td>
               <td data-v="29.0">29</td>
               <td data-v="24.0">24</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="8389.0">8,389</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -3545,6 +3621,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="40.0">40</td>
               <td data-v="31.0">31</td>
               <td data-v="9.0">9</td>
+              <td data-v="1.0">1</td>
               <td data-v="6963.0">6,963</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3575,6 +3652,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="18.0">18</td>
               <td data-v="9.0">9</td>
               <td data-v="8.0">8</td>
+              <td data-v="2.0">2</td>
               <td data-v="11484.0">11,484</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3589,6 +3667,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 5:3 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">yachi 贏</span>
         <span class="rt-agg">yachi 54.5/1.45/126.0 &nbsp;·&nbsp; pinglamb 56.0/1.37/116.1 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 9 &nbsp;·&nbsp; pinglamb 6</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="6">
@@ -3617,6 +3696,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -3648,6 +3728,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="67.0">67</td>
               <td data-v="52.0">52</td>
               <td data-v="30.0">30</td>
+              <td data-v="2.0">2</td>
               <td data-v="25768.0">25,768</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3678,6 +3759,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="62.0">62</td>
               <td data-v="50.0">50</td>
               <td data-v="20.0">20</td>
+              <td data-v="2.0">2</td>
               <td data-v="25131.0">25,131</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3708,6 +3790,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="47.0">47</td>
               <td data-v="37.0">37</td>
               <td data-v="14.0">14</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="12353.0">12,353</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3738,6 +3821,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="34.0">34</td>
               <td data-v="23.0">23</td>
               <td data-v="16.0">16</td>
+              <td data-v="1.0">1</td>
               <td data-v="17363.0">17,363</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3768,6 +3852,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="39.0">39</td>
               <td data-v="21.0">21</td>
               <td data-v="18.0">18</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="21407.0">21,407</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3798,6 +3883,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="64.0">64</td>
               <td data-v="46.0">46</td>
               <td data-v="11.0">11</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="18641.0">18,641</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -3828,6 +3914,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="32.0">32</td>
               <td data-v="29.0">29</td>
               <td data-v="18.0">18</td>
+              <td data-v="1.0">1</td>
               <td data-v="20391.0">20,391</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3858,6 +3945,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="57.0">57</td>
               <td data-v="54.0">54</td>
               <td data-v="18.0">18</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="15716.0">15,716</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3888,6 +3976,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="82.0">82</td>
               <td data-v="74.0">74</td>
               <td data-v="42.0">42</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="17422.0">17,422</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -3918,6 +4007,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="37.0">37</td>
               <td data-v="31.0">31</td>
               <td data-v="11.0">11</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="30052.0">30,052</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3948,6 +4038,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="23.0">23</td>
               <td data-v="22.0">22</td>
               <td data-v="11.0">11</td>
+              <td data-v="2.0">2</td>
               <td data-v="19116.0">19,116</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -3978,6 +4069,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="45.0">45</td>
               <td data-v="44.0">44</td>
               <td data-v="15.0">15</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="11712.0">11,712</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -4008,6 +4100,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="48.0">48</td>
               <td data-v="47.0">47</td>
               <td data-v="14.0">14</td>
+              <td data-v="1.0">1</td>
               <td data-v="14641.0">14,641</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4038,6 +4131,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="33.0">33</td>
               <td data-v="26.0">26</td>
               <td data-v="14.0">14</td>
+              <td data-v="1.0">1</td>
               <td data-v="20051.0">20,051</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4068,6 +4162,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="60.0">60</td>
               <td data-v="58.0">58</td>
               <td data-v="42.0">42</td>
+              <td data-v="3.0">3</td>
               <td data-v="23699.0">23,699</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4098,6 +4193,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="60.0">60</td>
               <td data-v="55.0">55</td>
               <td data-v="17.0">17</td>
+              <td data-v="2.0">2</td>
               <td data-v="25867.0">25,867</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4112,6 +4208,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
         <span class="rt-score"><span class="rt-y">yachi</span> 5:4 <span class="rt-p">pinglamb</span></span>
         <span class="rt-who">yachi 贏</span>
         <span class="rt-agg">yachi 49.5/1.36/100.7 &nbsp;·&nbsp; pinglamb 48.9/1.32/102.3 &nbsp;(APM/PPS/VS)</span>
+        <span class="rt-agg" title="T-spins into the garbage hole, simulator count, not proved">垃圾T yachi 4 &nbsp;·&nbsp; pinglamb 5</span>
       </div>
       <div class="rt-scroll">
         <table class="rt-tbl" data-match="7">
@@ -4140,6 +4237,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
             <th title="attack queued at this player, before cancelling">射埋<span class="rt-arrow">↕</span></th>
             <th title="garbage that actually materialised">食<span class="rt-arrow">↕</span></th>
             <th title="garbage cleared away">清<span class="rt-arrow">↕</span></th>
+            <th title="T-spins into the garbage hole: full T-spins whose clear removed a garbage row (simulator count from sim/attack-facts.json, not proved; – when the session has none)">垃圾T<span class="rt-arrow">↕</span></th>
             <th title="in-game score">分<span class="rt-arrow">↕</span></th>
             <th class="c-end" title="how the round ended for this player">結果<span class="rt-arrow">↕</span></th>
           </tr></thead>
@@ -4171,6 +4269,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="34.0">34</td>
               <td data-v="29.0">29</td>
               <td data-v="16.0">16</td>
+              <td data-v="1.0">1</td>
               <td data-v="15943.0">15,943</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4201,6 +4300,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="53.0">53</td>
               <td data-v="48.0">48</td>
               <td data-v="17.0">17</td>
+              <td data-v="1.0">1</td>
               <td data-v="12573.0">12,573</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4230,6 +4330,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="22.0">22</td>
               <td data-v="2.0">2</td>
               <td data-v="1.0">1</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="8129.0">8,129</td>
               <td class="c-end" data-v="生還">生還</td>
@@ -4261,6 +4362,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="22.0">22</td>
               <td data-v="21.0">21</td>
               <td class="rt-zero" data-v="0.0">0</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="2436.0">2,436</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4291,6 +4393,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="47.0">47</td>
               <td data-v="46.0">46</td>
               <td data-v="16.0">16</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="23787.0">23,787</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4321,6 +4424,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="67.0">67</td>
               <td data-v="66.0">66</td>
               <td data-v="34.0">34</td>
+              <td data-v="1.0">1</td>
               <td data-v="23545.0">23,545</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4351,6 +4455,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="29.0">29</td>
               <td data-v="29.0">29</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="2820.0">2,820</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4381,6 +4486,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="5.0">5</td>
               <td data-v="5.0">5</td>
               <td data-v="4.0">4</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10501.0">10,501</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4411,6 +4517,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="72.0">72</td>
               <td data-v="62.0">62</td>
               <td data-v="14.0">14</td>
+              <td data-v="1.0">1</td>
               <td data-v="20113.0">20,113</td>
               <td class="c-end" data-v="自己頂爆">自己頂爆</td>
             </tr>
@@ -4441,6 +4548,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="24.0">24</td>
               <td data-v="24.0">24</td>
               <td data-v="9.0">9</td>
+              <td data-v="2.0">2</td>
               <td data-v="28104.0">28,104</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4471,6 +4579,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="11.0">11</td>
               <td data-v="10.0">10</td>
               <td data-v="5.0">5</td>
+              <td data-v="1.0">1</td>
               <td data-v="10621.0">10,621</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4501,6 +4610,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="33.0">33</td>
               <td data-v="32.0">32</td>
               <td data-v="5.0">5</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="6348.0">6,348</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4531,6 +4641,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="53.0">53</td>
               <td data-v="46.0">46</td>
               <td data-v="29.0">29</td>
+              <td data-v="1.0">1</td>
               <td data-v="24523.0">24,523</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4561,6 +4672,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="69.0">69</td>
               <td data-v="62.0">62</td>
               <td data-v="22.0">22</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="24148.0">24,148</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
             </tr>
@@ -4590,6 +4702,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="8.0">8</td>
               <td data-v="33.0">33</td>
               <td data-v="30.0">30</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="6795.0">6,795</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>
@@ -4621,6 +4734,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="8.0">8</td>
               <td data-v="5.0">5</td>
               <td data-v="5.0">5</td>
+              <td data-v="1.0">1</td>
               <td data-v="11393.0">11,393</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4651,6 +4765,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="8.0">8</td>
               <td data-v="2.0">2</td>
               <td class="rt-zero" data-v="0.0">0</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="10357.0">10,357</td>
               <td class="c-end" data-v="生還">生還</td>
             </tr>
@@ -4680,6 +4795,7 @@ table.rt-tbl tbody tr:last-child td { border-bottom: none; }
               <td data-v="8.0">8</td>
               <td data-v="30.0">30</td>
               <td data-v="24.0">24</td>
+              <td class="rt-zero" data-v="0.0">0</td>
               <td class="rt-zero" data-v="0.0">0</td>
               <td data-v="4857.0">4,857</td>
               <td class="c-end" data-v="俾垃圾頂爆">俾垃圾頂爆</td>

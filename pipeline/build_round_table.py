@@ -633,6 +633,8 @@ COLUMNS = [
     ("射埋", "attack queued at this player, before cancelling"),
     ("食", "garbage that actually materialised"),
     ("清", "garbage cleared away"),
+    ("垃圾T", "T-spins into the garbage hole: full T-spins whose clear removed a garbage row "
+              "(simulator count from sim/attack-facts.json, not proved; – when the session has none)"),
     ("分", "in-game score"),
     ("結果", "how the round ended for this player"),
 ]
@@ -693,8 +695,31 @@ def bar_value(p, label):
     return None
 
 
-def cells(p, won):
-    """The stat cells for one player in one round, in COLUMNS order."""
+def garbage_tspins(report_dir):
+    """`{(file, round, user): {TSS, TSD, TST, rows}}` from the session's `sim/attack-facts.json`.
+
+    Simulator output (`emit-attack-facts.ts`): the per-round garbage-row total is anchored on the
+    replay's own `garbage.cleared`, but WHICH lock cleared a garbage row is the engine's alone, so
+    the column says so in its title and legend and carries no badge. `{}` when the artefact is
+    missing (a copy in a temp dir, a fresh session before step 6), and the column prints 「–」.
+    """
+    if not report_dir:
+        return {}
+    path = os.path.join(report_dir, os.pardir, "sim", "attack-facts.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        art = json.load(fh)
+    return {(r["file"], r["round"], r["user"]): r["garbage_tspins"] for r in art["per_round"]}
+
+
+def gt_total(g):
+    return g["TSS"] + g["TSD"] + g["TST"]
+
+
+def cells(p, won, gt=None):
+    """The stat cells for one player in one round, in COLUMNS order. `gt` is the round's
+    garbage-hole T-spins for this player, or None when the simulator artefact is absent."""
     c = p["clears"]
     queued = sum(g["amt"] for g in p["garbage_events"])
     reason = p.get("gameoverreason", "")
@@ -722,6 +747,7 @@ def cells(p, won):
         (str(queued), False),
         (str(p["garbagereceived"]), False),
         (str(p["garbage_cleared"]), False),
+        ("–" if gt is None else str(gt_total(gt)), False),
         (f"{p['score']:,}", False),
         (END_LABEL.get(reason, reason or "–"), False),
     ]
@@ -847,6 +873,7 @@ def player_css(p1, p2):
 def build(facts, report_dir=None):
     p1, p2 = facts["players"]
     ranges = bar_ranges(facts)
+    gts = garbage_tspins(report_dir)
     out = [START, CSS, player_css(p1, p2),
            '<section id="rounds">', '  <div class="wrap-wide">',
            '    <div class="eyebrow">逐局數據 · ROUND BY ROUND</div>',
@@ -856,6 +883,8 @@ def build(facts, report_dir=None):
            '      仲有：<code>APP</code> 每粒方塊嘅攻擊、<code>KPP</code> 每粒方塊按幾多下、',
            '      <code>DS</code> 每粒方塊清走幾多垃圾、<code>FIN%</code> 完美擺放率同失誤次數、',
            '      <code>射埋</code>（對手射過嚟、未 cancel 嘅攻擊）對 <code>食</code>（真正變成垃圾行）、',
+           '      <code>垃圾T</code>（T 入垃圾行個窿：一下 T-spin 清走咗垃圾行，即係 T 塞咗嗰個窿；',
+           '      呢欄係模擬器數出嚟，未經證明，冇 ✓），',
            '      同埋 <code>結果</code>（點收嘅）。',
            '    </p>',
            ]
@@ -924,6 +953,12 @@ def build(facts, report_dir=None):
                    f'{r1(lb[p1]["vs_x1000"])} &nbsp;·&nbsp; '
                    f'{p2} {r1(lb[p2]["apm_x1000"])}/{r2(lb[p2]["pps_x1000"])}/'
                    f'{r1(lb[p2]["vs_x1000"])} &nbsp;(APM/PPS/VS)</span>')
+        if gts:
+            tot = {pl: sum(gt_total(gts[(m["file"], ri, pl)]) for ri in range(len(m["rounds"])))
+                   for pl in (p1, p2)}
+            out.append('        <span class="rt-agg" title="T-spins into the garbage hole, '
+                       'simulator count, not proved">'
+                       f'垃圾T {p1} {tot[p1]} &nbsp;·&nbsp; {p2} {tot[p2]}</span>')
         out.append('      </div>')
         out.append('      <div class="rt-scroll">')
         out.append(f'        <table class="rt-tbl" data-match="{mi + 1}">')
@@ -962,7 +997,8 @@ def build(facts, report_dir=None):
                 mark = ' <span class="rt-win-mark">✓</span>' if won else ""
                 out.append(f'              <td class="c-who" data-v="{pl}">'
                            f'<span class="rt-dot {dot}"></span>{pl}{mark}</td>')
-                for (val, key), (label, _t) in zip(cells(p, won), COLUMNS):
+                gt = gts[(m["file"], ri, pl)] if gts else None
+                for (val, key), (label, _t) in zip(cells(p, won, gt), COLUMNS):
                     cls = []
                     if label == "結果":
                         cls.append("c-end")
