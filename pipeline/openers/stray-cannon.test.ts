@@ -26,7 +26,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
    '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22',
-   '2026-10-29', '2026-11-01']);
+   '2026-10-29', '2026-11-01', '2026-11-05']);
 
 /** Bag 1 matched the 6-lock field, the lock-7 piece was NOT the (mirror-aware) bag-1 Z: a hold. */
 const Z_HOLD_BAG1 = [
@@ -39,6 +39,7 @@ const Z_HOLD_BAG1 = [
   '2026-10-12 m6r5 yachi',      // 7th J
   '2026-10-29 m6r7 yachi',      // 7th S (as drawn, so not the bag-1 Z), prefix 56
   '2026-11-01 m11r7 pinglamb',  // 7th O (as drawn), prefix 262, no bag 2
+  '2026-11-05 m5r7 yachi',      // mirrored: its bag-1 Z is S, and the 7th is T; prefix 107, no bag 2
 ];
 /** The 6-lock field matched and the 7th piece WAS the bag-1 Z, placed somewhere off the page. */
 const Z_PLACED_ELSEWHERE_BAG1 = [
@@ -59,6 +60,7 @@ const TST_DONATE_CASES = [
   '2026-10-29 m3r7 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 33
   '2026-11-01 m2r6 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 75
   '2026-11-01 m7r6 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 144
+  '2026-11-05 m2r4 pinglamb',   // 2.normal_OS at lock 12, the TST donate at 19, prefix 74
 ];
 /** 8-line PCs that are not on the page, named with the node they stop under. */
 const PC_OFF_PAGE = [
@@ -96,10 +98,13 @@ const PC_GARBAGE_IN_WINDOW: string[] = [];
 // 2026-11-01 adds 49 to 2.ideal (36 under its own condition, 13 under 2.normal_OS), 16 to
 // 2.normal_OS (13 under its own, 3 under 2.normal_SO) and 8 to 2.normal_SO (6 under its own,
 // 2 under 2.ideal), one entry to Z_HOLD_BAG1 and two to TST_DONATE_CASES.
+// 2026-11-05 adds 33 to 2.ideal (30 under its own condition, 2 under 2.normal_OS, 1 under
+// 2.normal_SO), 8 to 2.normal_OS (7 under its own, 1 under 2.normal_SO) and 4 to 2.normal_SO
+// (all under its own), one entry to Z_HOLD_BAG1 and one to TST_DONATE_CASES.
 const CONDITIONS = {
-  '2.ideal': { '2.ideal': 401, '2.normal_OS': 58, '2.normal_SO': 13 },
-  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 138, '2.normal_SO': 22 },
-  '2.normal_SO': { '2.ideal': 13, '2.normal_OS': 1, '2.normal_SO': 44 },
+  '2.ideal': { '2.ideal': 431, '2.normal_OS': 60, '2.normal_SO': 14 },
+  '2.normal_OS': { '2.ideal': 1, '2.normal_OS': 145, '2.normal_SO': 23 },
+  '2.normal_SO': { '2.ideal': 13, '2.normal_OS': 1, '2.normal_SO': 48 },
   '2.i_early': { '2.normal_OS': 1 },
 };
 

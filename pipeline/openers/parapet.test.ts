@@ -58,7 +58,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
 const ART_PATH = `${import.meta.dir}/../../analysis/parapet-facts.json`;
 const TR = JSON.parse(readFileSync(PARAPET.transcriptionPath, 'utf8'));
 const TSD = TR.variants.find((v: any) => v.id === 'parapet');
@@ -142,6 +142,11 @@ const PARAPET_HITS: string[] = [
   "2026-11-01 m11r4 pinglamb lock 33 (mirrored)", "2026-11-01 m11r7 yachi lock 226 (mirrored)",
   "2026-11-01 m11r8 yachi lock 39 (mirrored)", "2026-11-01 m12r1 yachi lock 29", "2026-11-01 m12r2 pinglamb lock 14",
   "2026-11-01 m13r8 pinglamb lock 26", "2026-11-01 m14r4 pinglamb lock 35", "2026-11-01 m15r1 pinglamb lock 21",
+  "2026-11-05 m2r4 yachi lock 25 (mirrored)", "2026-11-05 m3r1 yachi lock 27 (mirrored)",
+  "2026-11-05 m3r3 pinglamb lock 26 (mirrored)", "2026-11-05 m5r7 pinglamb lock 23",
+  "2026-11-05 m6r7 yachi lock 117", "2026-11-05 m7r4 yachi lock 130",
+  "2026-11-05 m8r3 yachi lock 84", "2026-11-05 m8r5 pinglamb lock 19",
+  "2026-11-05 m8r5 yachi lock 20",
 ];
 const PARAPET_TSS_HITS: string[] = [
   "2026-07-22 m3r3 yachi lock 38 (mirrored)", "2026-07-22 m3r4 yachi lock 84", "2026-07-22 m5r5 yachi lock 39",
@@ -183,6 +188,9 @@ const PARAPET_TSS_HITS: string[] = [
   "2026-11-01 m7r3 yachi lock 76 (mirrored)", "2026-11-01 m11r1 pinglamb lock 69", "2026-11-01 m13r5 pinglamb lock 20",
   "2026-11-01 m14r4 yachi lock 103 (mirrored)", "2026-11-01 m14r6 pinglamb lock 15",
   "2026-11-01 m15r1 yachi lock 29 (mirrored)",
+  "2026-11-05 m1r5 yachi lock 48 (mirrored)", "2026-11-05 m1r6 yachi lock 97",
+  "2026-11-05 m1r7 yachi lock 16 (mirrored)", "2026-11-05 m2r2 yachi lock 16",
+  "2026-11-05 m6r7 pinglamb lock 24",
 ];
 const PAYOFF_NOT_FIRED: string[] = [
   "2026-07-22 m5r1 pinglamb lock 18 (parapet: well_covered at lock 23)",
@@ -296,6 +304,10 @@ const PAYOFF_NOT_FIRED: string[] = [
   "2026-11-01 m11r7 yachi lock 226 (parapet: well_filled_not_i at lock 227)",
   "2026-11-01 m11r8 yachi lock 39 (parapet: well_covered at lock 45)",
   "2026-11-01 m13r5 pinglamb lock 20 (parapet_tss: well_covered at lock 24)",
+  "2026-11-05 m1r6 yachi lock 97 (parapet_tss: past_verified at lock 98)", "2026-11-05 m2r4 yachi lock 25 (parapet: well_covered at lock 26)",
+  "2026-11-05 m3r1 yachi lock 27 (parapet: well_filled_not_i at lock 30)", "2026-11-05 m3r3 pinglamb lock 26 (parapet: well_covered at lock 28)",
+  "2026-11-05 m5r7 pinglamb lock 23 (parapet: well_filled_not_i at lock 24)", "2026-11-05 m6r7 pinglamb lock 24 (parapet_tss: well_covered at lock 32)",
+  "2026-11-05 m7r4 yachi lock 130 (parapet: well_covered at lock 132)", "2026-11-05 m8r3 yachi lock 84 (parapet: i_in_well_not_quad at lock 86)",
 ];
 const GARBAGE_IN_WINDOW: string[] = [
   "2026-07-22 m3r3 yachi lock 38 (parapet_tss)", "2026-07-22 m3r4 yachi lock 84 (parapet_tss)",
@@ -426,6 +438,13 @@ const GARBAGE_IN_WINDOW: string[] = [
   "2026-11-01 m13r8 pinglamb lock 26 (parapet)", "2026-11-01 m14r4 pinglamb lock 35 (parapet)",
   "2026-11-01 m14r4 yachi lock 103 (parapet_tss)", "2026-11-01 m14r6 pinglamb lock 15 (parapet_tss)",
   "2026-11-01 m15r1 pinglamb lock 21 (parapet)", "2026-11-01 m15r1 yachi lock 29 (parapet_tss)",
+  "2026-11-05 m1r5 yachi lock 48 (parapet_tss)", "2026-11-05 m1r6 yachi lock 97 (parapet_tss)",
+  "2026-11-05 m1r7 yachi lock 16 (parapet_tss)", "2026-11-05 m2r2 yachi lock 16 (parapet_tss)",
+  "2026-11-05 m2r4 yachi lock 25 (parapet)", "2026-11-05 m3r1 yachi lock 27 (parapet)",
+  "2026-11-05 m3r3 pinglamb lock 26 (parapet)", "2026-11-05 m5r7 pinglamb lock 23 (parapet)",
+  "2026-11-05 m6r7 yachi lock 117 (parapet)", "2026-11-05 m7r4 yachi lock 130 (parapet)",
+  "2026-11-05 m8r3 yachi lock 84 (parapet)", "2026-11-05 m8r5 pinglamb lock 19 (parapet)",
+  "2026-11-05 m8r5 yachi lock 20 (parapet)",
 ];
 const PARAPET_IN_OPENER: string[] = [
   "2026-07-22 m5r1 pinglamb lock 18 (parapet)", "2026-07-24 m1r1 pinglamb lock 18 (parapet)",
@@ -469,6 +488,8 @@ const PARAPET_IN_OPENER: string[] = [
   "2026-11-01 m6r8 pinglamb lock 14 (parapet_tss)", "2026-11-01 m12r2 pinglamb lock 14 (parapet)",
   "2026-11-01 m13r5 pinglamb lock 20 (parapet_tss)", "2026-11-01 m14r6 pinglamb lock 15 (parapet_tss)",
   "2026-11-01 m15r1 pinglamb lock 21 (parapet)",
+  "2026-11-05 m1r7 yachi lock 16 (parapet_tss)", "2026-11-05 m2r2 yachi lock 16 (parapet_tss)",
+  "2026-11-05 m8r5 pinglamb lock 19 (parapet)", "2026-11-05 m8r5 yachi lock 20 (parapet)",
 ];
 const WELL_DEPTH_LT4: string[] = [
   "2026-07-22 m5r5 yachi lock 39 (parapet_tss: 3 deep)", "2026-07-22 m10r1 yachi lock 116 (parapet_tss: 3 deep)",
@@ -520,6 +541,9 @@ const WELL_DEPTH_LT4: string[] = [
   "2026-11-01 m7r3 yachi lock 76 (parapet_tss: 2 deep)", "2026-11-01 m11r4 pinglamb lock 33 (parapet: 2 deep)",
   "2026-11-01 m11r7 yachi lock 226 (parapet: 3 deep)", "2026-11-01 m11r8 yachi lock 39 (parapet: 2 deep)",
   "2026-11-01 m14r6 pinglamb lock 15 (parapet_tss: 2 deep)", "2026-11-01 m15r1 yachi lock 29 (parapet_tss: 2 deep)",
+  "2026-11-05 m1r6 yachi lock 97 (parapet_tss: 3 deep)", "2026-11-05 m3r3 pinglamb lock 26 (parapet: 2 deep)",
+  "2026-11-05 m6r7 pinglamb lock 24 (parapet_tss: 2 deep)", "2026-11-05 m7r4 yachi lock 130 (parapet: 2 deep)",
+  "2026-11-05 m8r3 yachi lock 84 (parapet: 2 deep)",
 ];
 const RECON_DROPPED_TSD: string[] = [];
 const RECON_DROPPED_TSS: string[] = [];
@@ -809,33 +833,47 @@ const HIT_NOT_DONATION: string[] = [
   "2026-11-01 m14r6 pinglamb lock 15 (parapet_tss: cavity_lt4)",
   "2026-11-01 m15r1 pinglamb lock 21 (parapet: incomplete)",
   "2026-11-01 m15r1 yachi lock 29 (parapet_tss: filled_above_window)",
+  "2026-11-05 m1r5 yachi lock 48 (parapet_tss: filled_above_window)",
+  "2026-11-05 m1r6 yachi lock 97 (parapet_tss: filled_above_window)",
+  "2026-11-05 m1r7 yachi lock 16 (parapet_tss: incomplete)",
+  "2026-11-05 m2r2 yachi lock 16 (parapet_tss: incomplete)",
+  "2026-11-05 m2r4 yachi lock 25 (parapet: incomplete)",
+  "2026-11-05 m3r1 yachi lock 27 (parapet: filled_above_window)",
+  "2026-11-05 m3r3 pinglamb lock 26 (parapet: cavity_lt4)",
+  "2026-11-05 m5r7 pinglamb lock 23 (parapet: filled_above_window)",
+  "2026-11-05 m6r7 pinglamb lock 24 (parapet_tss: filled_above_window)",
+  "2026-11-05 m6r7 yachi lock 117 (parapet: filled_above_window)",
+  "2026-11-05 m7r4 yachi lock 130 (parapet: filled_above_window)",
+  "2026-11-05 m8r3 yachi lock 84 (parapet: filled_above_window)",
+  "2026-11-05 m8r5 pinglamb lock 19 (parapet: filled_above_window)",
+  "2026-11-05 m8r5 yachi lock 20 (parapet: incomplete)",
 ];
 
 /** window_off_board, per variant and player: a count with a property check, not a list (see the header). */
-const WINDOW_OFF_BOARD = { parapet: { pinglamb: 1486, yachi: 1484 }, parapet_tss: { pinglamb: 7, yachi: 141 } };
+const WINDOW_OFF_BOARD = { parapet: { pinglamb: 1551, yachi: 1541 }, parapet_tss: { pinglamb: 7, yachi: 146 } };
 /** Per player: the opportunities (scored full TSDs and TSSs), split at the 0-based opener window. */
 const DENOM = {
-  pinglamb: { TSD: { all: 6396, in_opener: 1254, mid_game: 5142 }, TSS: { all: 735, in_opener: 100, mid_game: 635 } },
-  yachi: { TSD: { all: 5783, in_opener: 1491, mid_game: 4292 }, TSS: { all: 1201, in_opener: 289, mid_game: 912 } },
+  pinglamb: { TSD: { all: 6651, in_opener: 1302, mid_game: 5349 }, TSS: { all: 762, in_opener: 104, mid_game: 658 } },
+  yachi: { TSD: { all: 6052, in_opener: 1548, mid_game: 4504 }, TSS: { all: 1258, in_opener: 301, mid_game: 957 } },
 };
 /** Per variant and player: hits, their split, mirrored, garbage in the window. */
 const HITS = {
-  parapet: { pinglamb: { all: 120, in_opener: 39, mid_game: 81, mirrored: 44, garbage_in_window: 116 },
-             yachi: { all: 71, in_opener: 15, mid_game: 56, mirrored: 33, garbage_in_window: 65 } },
-  parapet_tss: { pinglamb: { all: 21, in_opener: 13, mid_game: 8, mirrored: 4, garbage_in_window: 21 },
-                 yachi: { all: 77, in_opener: 20, mid_game: 57, mirrored: 43, garbage_in_window: 72 } },
+  parapet: { pinglamb: { all: 123, in_opener: 40, mid_game: 83, mirrored: 45, garbage_in_window: 119 },
+             yachi: { all: 77, in_opener: 16, mid_game: 61, mirrored: 35, garbage_in_window: 71 } },
+  parapet_tss: { pinglamb: { all: 22, in_opener: 13, mid_game: 9, mirrored: 4, garbage_in_window: 21 },
+                 yachi: { all: 81, in_opener: 22, mid_game: 59, mirrored: 45, garbage_in_window: 76 } },
 };
 /** Per variant and player: the payoff (stored under `followup_by_player`, the shared artefact key). */
 const PAYOFF = {
   parapet: {
-    pinglamb: { fired: 68, not_fired: { i_in_well_not_quad: 3, past_verified: 1, round_ended: 1, well_covered: 21,
-                                        well_filled_not_i: 26 } },
-    yachi: { fired: 29, not_fired: { i_in_well_not_quad: 1, past_verified: 2, round_ended: 1, well_covered: 12,
-                                     well_filled_not_i: 26 } },
+    pinglamb: { fired: 69, not_fired: { i_in_well_not_quad: 3, past_verified: 1, round_ended: 1, well_covered: 22,
+                                        well_filled_not_i: 27 } },
+    yachi: { fired: 31, not_fired: { i_in_well_not_quad: 2, past_verified: 2, round_ended: 1, well_covered: 14,
+                                     well_filled_not_i: 27 } },
   },
   parapet_tss: {
-    pinglamb: { fired: 14, not_fired: { well_covered: 7 } },
-    yachi: { fired: 59, not_fired: { i_in_well_not_quad: 2, round_ended: 1, well_covered: 15 } },
+    pinglamb: { fired: 14, not_fired: { well_covered: 8 } },
+    yachi: { fired: 62, not_fired: { i_in_well_not_quad: 2, past_verified: 1, round_ended: 1, well_covered: 15 } },
   },
 };
 /** The controls per variant. Under parapet_tss the TSD is a control (the profile's opportunity, in the TSS's place). */
@@ -843,24 +881,24 @@ const CONTROLS = {
   parapet: {
     under: { TSS: { pinglamb: 5, yachi: 4 }, TST: { pinglamb: 0, yachi: 0 },
              mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-    ablation: { no_must_empty: { pinglamb: 839, yachi: 507 }, no_roof: { pinglamb: 369, yachi: 282 },
-                t_overlap: { pinglamb: 783, yachi: 670 } },
-    orientation_baseline: { pinglamb: 63, yachi: 80 },
+    ablation: { no_must_empty: { pinglamb: 866, yachi: 530 }, no_roof: { pinglamb: 384, yachi: 301 },
+                t_overlap: { pinglamb: 815, yachi: 706 } },
+    orientation_baseline: { pinglamb: 63, yachi: 86 },
   },
   parapet_tss: {
     under: { TSD: { pinglamb: 0, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
              mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
-    ablation: { no_must_empty: { pinglamb: 25, yachi: 103 }, no_roof: { pinglamb: 21, yachi: 77 },
-                t_overlap: { pinglamb: 23, yachi: 77 } },
-    orientation_baseline: { pinglamb: 161, yachi: 476 },
+    ablation: { no_must_empty: { pinglamb: 26, yachi: 109 }, no_roof: { pinglamb: 22, yachi: 81 },
+                t_overlap: { pinglamb: 24, yachi: 81 } },
+    orientation_baseline: { pinglamb: 166, yachi: 502 },
   },
 };
 /** What discriminates, measured: full T-spins of the variant's kind (not only hits) whose anchored T meets ONE part
  *  of the window — the rows above the cleared rows, the cleared rows, the rows under them (the well). The cleared
  *  rows are entailed by the clear (NaiveClauseForced) and do the least work; the well rows under them do the most.
  *  For the TSD the `no_roof` ablation (the window less the row above the T) is exactly `below`. */
-const PART_ONLY = { parapet: { above: 6873, cleared: 10633, below: 651 },
-                    parapet_tss: { above: 233, cleared: 564, below: 200 } };
+const PART_ONLY = { parapet: { above: 7182, cleared: 11091, below: 685 },
+                    parapet_tss: { above: 243, cleared: 592, below: 212 } };
 /** BT砲's window and this one agree, in the same hand, on every cell they share (the BT is built from the Parapet
  *  terrain): a lock that is a hit of both is possible, so it is named rather than asserted absent. */
 const BTCANNON_ALSO_PARAPET: string[] = [];
@@ -927,7 +965,7 @@ test('quarantined: report_eligible false, no claim ids, both variants each measu
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(17205);
+  expect(n).toBe(17949);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -1163,7 +1201,7 @@ test('donation: the shipped predicate reproduced per session and player, and eve
 test('the payoff row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(32);
-  expect(c.rowmap_steps).toBe(300597);
+  expect(c.rowmap_steps).toBe(314749);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 
@@ -1326,7 +1364,8 @@ const ONLY: Record<string, string[]> = {
     '2026-09-03 m2r4 pinglamb lock 26 (parapet)', '2026-09-18 m11r6 yachi lock 185 (parapet)',
     '2026-09-19 m18r2 pinglamb lock 120 (parapet)', '2026-10-03 m5r4 yachi lock 75 (parapet_tss)',
     '2026-10-20 m4r7 yachi lock 92 (parapet)', '2026-10-22 m7r1 yachi lock 17 (parapet)',
-    '2026-10-29 m3r2 yachi lock 179 (parapet)', '2026-10-29 m9r8 pinglamb lock 109 (parapet)'],
+    '2026-10-29 m3r2 yachi lock 179 (parapet)', '2026-10-29 m9r8 pinglamb lock 109 (parapet)',
+    '2026-11-05 m6r7 pinglamb lock 24 (parapet_tss)'],
   dpc: [
     '2026-08-14 m6r8 pinglamb lock 27 (parapet_tss)'],
   ownership_unverified: [
@@ -1339,8 +1378,8 @@ const ONLY: Record<string, string[]> = {
   garbage_in_shape: [],
 };
 const QUALIFY_BY_PLAYER = {
-  pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 120, garbage_in_shape: 12, l_not_one_piece: 132, not_whole_shape: 4 } },
-  yachi: { qualified: 12, not_qualified: { fragment: 107, garbage_in_shape: 20, l_not_one_piece: 129, not_whole_shape: 39, ownership_unverified: 3 } },
+  pinglamb: { qualified: 8, not_qualified: { dpc: 1, fragment: 123, garbage_in_shape: 12, l_not_one_piece: 136, not_whole_shape: 4 } },
+  yachi: { qualified: 12, not_qualified: { fragment: 117, garbage_in_shape: 20, l_not_one_piece: 139, not_whole_shape: 39, ownership_unverified: 3 } },
 };
 const qName = (h: any) => `${h.session} m${h.match}r${h.round} ${h.player} lock ${h.lock} (${h.variant})`;
 

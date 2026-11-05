@@ -33,7 +33,7 @@ const ROOT = `${import.meta.dir}/../../sessions`;
 const SESSIONS = assertCorpusIsEverySessionOnDisk(ROOT,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
 const ART_PATH = `${import.meta.dir}/../../analysis/imperialcross-facts.json`;
 const TR = JSON.parse(readFileSync(IMPERIALCROSS.transcriptionPath, 'utf8'));
 const H = 40;
@@ -65,6 +65,7 @@ const WINDOW_OFF_BOARD: string[] = [
   "2026-09-17 m2r1 pinglamb lock 20", "2026-09-18 m18r3 pinglamb lock 19", "2026-10-22 m1r5 pinglamb lock 20",
   "2026-10-22 m8r1 pinglamb lock 123", "2026-10-29 m3r2 pinglamb lock 20",
   "2026-11-01 m2r3 yachi lock 87", "2026-11-01 m6r3 yachi lock 119",
+  "2026-11-05 m1r8 yachi lock 98", "2026-11-05 m4r5 yachi lock 89",
 ];
 
 /** No corpus round reached an Imperial Cross node of any route page; the one SDPC Spin round that reached
@@ -75,19 +76,19 @@ const SDPC_THIRD_ROUNDS: string[] = [
 ];
 
 /** Per player: the opportunity (scored full TSDs), split at the 0-based opener window. */
-const TSD_DENOM = { pinglamb: { all: 6396, in_opener: 1254, mid_game: 5142 },
-                    yachi: { all: 5783, in_opener: 1491, mid_game: 4292 } };
+const TSD_DENOM = { pinglamb: { all: 6651, in_opener: 1302, mid_game: 5349 },
+                    yachi: { all: 6052, in_opener: 1548, mid_game: 4504 } };
 /** Per player: hits, their split, the mirrored ones, the follow-ups that fired. */
 const HITS = { pinglamb: { all: 8, in_opener: 1, mid_game: 7, mirrored: 5, garbage_in_window: 0 },
                yachi: { all: 4, in_opener: 1, mid_game: 3, mirrored: 3, garbage_in_window: 1 } };
 const FOLLOWUP_FIRED = { pinglamb: 5, yachi: 3 };
 /** The controls (the same window at other spins; the ablations; the orientation baseline). */
 const CONTROLS = {
-  under: { TSS: { pinglamb: 1, yachi: 0 }, TST: { pinglamb: 0, yachi: 0 },
+  under: { TSS: { pinglamb: 1, yachi: 1 }, TST: { pinglamb: 0, yachi: 0 },
            mini_TSS: { pinglamb: 0, yachi: 0 }, mini_TSD: { pinglamb: 0, yachi: 0 } },
   ablation: { no_must_empty: { pinglamb: 8, yachi: 4 }, no_roof: { pinglamb: 8, yachi: 4 },
               t_overlap: { pinglamb: 8, yachi: 4 } },
-  orientation_baseline: { pinglamb: 63, yachi: 80 },
+  orientation_baseline: { pinglamb: 63, yachi: 86 },
 };
 /** What discriminates: the T anchored plus only the filled cells of the cross's three rows admits this many
  *  full TSDs that are not hits. The no_roof ablation (the cross's rows with the empty arm) and the
@@ -156,7 +157,7 @@ test('quarantined: report_eligible false, no claim ids', () => {
 
 test('the scored T-spins are the ones emit-opener-facts.ts scores (the third copy of the loop)', () => {
   const n = checkScoredAgainstOpenerFacts(art(), SESSIONS, ROOT);
-  expect(n).toBe(17205);
+  expect(n).toBe(17949);
   expect(art().check.reconstruction_disagreed).toBe(0);
 });
 
@@ -335,7 +336,7 @@ test('cross-check: the route artefacts\' rounds that reached an Imperial Cross n
 test('the follow-up row map is verified against the engine at every step it uses', () => {
   const c = art().check;
   expect(c.rowmap_unverified).toBe(32);
-  expect(c.rowmap_steps).toBe(300597);
+  expect(c.rowmap_steps).toBe(314749);
   expect(art().hits.every((h: any) => h.followup.reason !== 'rowmap_unverified')).toBe(true);
 });
 

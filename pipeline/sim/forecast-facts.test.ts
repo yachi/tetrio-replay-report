@@ -125,6 +125,12 @@ const PATH_OPENED: Record<string, Record<string, number>> = {
   '2026-10-29': { yachi: 0, pinglamb: 0 },
   // None this session either (forecast-corpus.test.ts pins path_opened 0): the corpus count stays 5.
   '2026-11-01': { yachi: 0, pinglamb: 0 },
+  // One of yachi's: replay-2026-11-05-08.ttrm r6 lock 28 — ACCESS_CLASS's eighth member
+  // (forecast-access-class.test.ts), the first new one since 10-09. Re-derived from THIS table rather
+  // than carried: 8 events in 7 sessions (yachi 7, pinglamb 1; 08-19 holds two). The 「corpus count
+  // stays 5」 lines above do not match the table they sit in (it summed to 7 events in 6 sessions
+  // before this row) and are left as written for whoever owns that reconciliation.
+  '2026-11-05': { yachi: 1, pinglamb: 0 },
 };
 
 /** `unattributed` per session and player — the bucket that was identically zero until 2026-09-19.

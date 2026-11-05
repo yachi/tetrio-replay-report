@@ -712,6 +712,10 @@ jobs:
       # every render refuses a pass that changes the page's text or links a title anywhere else.
       - name: Check the section-anchor pass
         run: python3 -m pipeline.section_anchors --selftest
+      # A session's video/video.json (pipeline/video_section.py) links every match and round to
+      # the recording; --selftest plants overlapping rounds, a wrong recovered score and the rest.
+      - name: Check the video section
+        run: python3 -m pipeline.video_section --selftest
 
       # The replay pages' opener / technique labels are re-checked against each page's own
       # decode as build-docs renders them. --selftest plants a wrong lock, a wrong hand and a

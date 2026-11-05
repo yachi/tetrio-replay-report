@@ -30,7 +30,7 @@ const SESSIONS = assertCorpusIsEverySessionOnDisk(
   `${import.meta.dir}/../../sessions`,
   ['2026-07-22', '2026-07-24', '2026-07-28', '2026-08-01', '2026-08-09', '2026-08-14',
    '2026-08-19', '2026-08-25', '2026-09-03', '2026-09-10', '2026-09-11', '2026-09-17',
-   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01']);
+   '2026-09-18', '2026-09-19', '2026-10-03', '2026-10-09', '2026-10-12', '2026-10-20', '2026-10-22', '2026-10-29', '2026-11-01', '2026-11-05']);
 const sessionDir = (d: string) => `${import.meta.dir}/../../sessions/${d}`;
 const artefact = (s: string) => `${sessionDir(s)}/sim/replay-facts.json`;
 
@@ -122,7 +122,7 @@ const ADMISSION: Record<string, [number, number]> = {
   '2026-09-10': [130, 130], '2026-09-11': [102, 102], '2026-09-17': [98, 98],
   '2026-09-18': [254, 254], '2026-09-19': [300, 300], '2026-10-03': [292, 292],
   '2026-10-09': [204, 204], '2026-10-12': [110, 110], '2026-10-20': [60, 60],
-  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260],
+  '2026-10-22': [126, 126], '2026-10-29': [136, 136], '2026-11-01': [260, 260], '2026-11-05': [134, 134],
 };
 
 /** Every player-round whose engine totals disagree with facts.json. EMPTY since 2026-10-31, and kept
@@ -198,7 +198,10 @@ test('admission counts are pinned per session, and the exceptions are exactly th
  *  replay-2026-11-01-16.ttrm r2 pinglamb (64 locks, verified to lock 54), each `no_evidence` after
  *  its prefix. All four admit cleanly (11-01 admits 260 of 260), so the engine placed exactly the
  *  game's pieces and its board did not top out on the last one; the last locks of each are past
- *  the verified prefix, the unobserved-garbage-hole tail of every other entry. No winner-class entry. */
+ *  the verified prefix, the unobserved-garbage-hole tail of every other entry. No winner-class entry.
+ *
+ *  2026-11-05 adds NONE: in all 134 of its player-rounds (134 of 134 admit) the engine's knockout
+ *  agrees with gameoverreason, so the list stays at 32. */
 const KNOCKOUT_EXCEPTIONS = [
   { session: '2026-07-22', file: 'replay-2026-07-22-2.ttrm', round: 1, user: 'yachi', ending: 'topout', lock: null },
   { session: '2026-07-22', file: 'replay-2026-07-22-7.ttrm', round: 5, user: 'pinglamb', ending: 'topout', lock: null },
