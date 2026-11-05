@@ -1939,6 +1939,18 @@ facts.json; attack per clear and the base/B2B/combo split are one engine's. **Do
 `oracle-source.ts`'s `records[].attack` for this** — it is post-cancel; measured once on 2026-10-11 and not re-derived, it summed to about 80% of
 the replay's total and made a T-spin Triple look worth 4.9 lines instead of 6.1.
 
+**The same artefact counts T-spins into the garbage hole, and the round table prints them**
+(since 2026-11-05, yachi: 「T spin 入插入垃圾加入 match/round metric」). A full T-spin (TSS, TSD,
+TST; minis left out) whose lock cleared at least one garbage row filled that row's one hole, so
+`per_round[].garbage_tspins` counts those per kind with the garbage rows they cleared, and
+`per_match[].garbage_tspins` sums them. A third anchor, `anchor.garbage_cleared`, holds the engine's
+per-round `res.garbageCleared` sum to the replay's own `garbage.cleared` (`GARBAGE_EXCEPTIONS` in
+`attack-facts.test.ts`, empty when added). That licenses the round's TOTAL; which lock cleared a
+garbage row is the engine's alone, so the 逐局全數據 column 「垃圾T」 and its per-match total in each
+match head carry no badge and say 「模擬器數出嚟，未經證明」. `build_round_table` reads
+`<report_dir>/../sim/attack-facts.json` and prints 「–」 without it (check_rounding's temp-dir copy).
+Counts are the artefacts', never typed here.
+
 The engine gap is <!--app:gap-->+6.35<!--/app:gap--> attack per 100 pieces, split two ways that each sum to it exactly:
 
 * **by window** — <!--app:windows-->+2.73 from the first 21 locks and +3.62 after them<!--/app:windows-->.

@@ -68,8 +68,14 @@
    "unknown": 0,
    "exceptions": []
   },
+  "garbage_cleared": {
+   "rounds": 98,
+   "agree": 98,
+   "exceptions": []
+  },
   "engine_locks_past_game_end": []
  },
+ "garbage_tspins_mean": "a full T-spin (TSS, TSD or TST; minis excluded) whose clear removed at least one garbage row. A garbage row is full but for its one hole, so a lock that clears it filled that hole: the T went into the garbage hole. rows = the garbage rows those T-spins cleared. Which lock cleared a garbage row is the engine's; the per-round total of garbage rows cleared is anchored against the replay's garbage.cleared (anchor.garbage_cleared)",
  "players": [
   {
    "user": "pinglamb",
@@ -290,6 +296,1184 @@
    }
   }
  ],
+ "per_round": [
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 23,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 19,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 25,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 18,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 5,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 5,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 33,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 26,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 4,
+    "TST": 0,
+    "rows": 4
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 16,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 11,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 13,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 12,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 6,
+   "user": "pinglamb",
+   "garbage_cleared": 8,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 6,
+   "user": "yachi",
+   "garbage_cleared": 4,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 7,
+   "user": "pinglamb",
+   "garbage_cleared": 42,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 4
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 7,
+   "user": "yachi",
+   "garbage_cleared": 40,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 8,
+   "user": "pinglamb",
+   "garbage_cleared": 85,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 3
+   }
+  },
+  {
+   "file": "replay-2026-09-17-01.ttrm",
+   "round": 8,
+   "user": "yachi",
+   "garbage_cleared": 91,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 4,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 15,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 1,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 23,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 11,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 9,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 55,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 58,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 4,
+    "TST": 0,
+    "rows": 5
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 6,
+   "user": "yachi",
+   "garbage_cleared": 4,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-02.ttrm",
+   "round": 6,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 9,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 50,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 3
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 35,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 28,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 3
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 29,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 17,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 1,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 11,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 6,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 45,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 3
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 42,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 6,
+   "user": "yachi",
+   "garbage_cleared": 14,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 6,
+   "user": "pinglamb",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 7,
+   "user": "yachi",
+   "garbage_cleared": 76,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-03.ttrm",
+   "round": 7,
+   "user": "pinglamb",
+   "garbage_cleared": 53,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 19,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 6,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 7,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 23,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 7,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 4,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-04.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 1,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 32,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 19,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 5,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 13,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 24,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 17,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 13,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 45,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-05.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 40,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 1,
+    "rows": 3
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 24,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 18,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 25,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 29,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 14,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 15,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 34,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 11,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 7,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 5,
+   "user": "yachi",
+   "garbage_cleared": 15,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 5,
+   "user": "pinglamb",
+   "garbage_cleared": 5,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 6,
+   "user": "pinglamb",
+   "garbage_cleared": 25,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 6,
+   "user": "yachi",
+   "garbage_cleared": 21,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 7,
+   "user": "pinglamb",
+   "garbage_cleared": 75,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-06.ttrm",
+   "round": 7,
+   "user": "yachi",
+   "garbage_cleared": 60,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 0,
+   "user": "pinglamb",
+   "garbage_cleared": 18,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 0,
+   "user": "yachi",
+   "garbage_cleared": 14,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 1,
+   "user": "pinglamb",
+   "garbage_cleared": 6,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 1,
+   "user": "yachi",
+   "garbage_cleared": 0,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 2,
+   "user": "pinglamb",
+   "garbage_cleared": 21,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 2,
+   "user": "yachi",
+   "garbage_cleared": 16,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 0,
+    "TST": 0,
+    "rows": 0
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 3,
+   "user": "pinglamb",
+   "garbage_cleared": 25,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 3,
+   "user": "yachi",
+   "garbage_cleared": 36,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 4,
+   "user": "pinglamb",
+   "garbage_cleared": 15,
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 2
+   }
+  },
+  {
+   "file": "replay-2026-09-17-07.ttrm",
+   "round": 4,
+   "user": "yachi",
+   "garbage_cleared": 10,
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
+   }
+  }
+ ],
  "per_match": [
   {
    "file": "replay-2026-09-17-01.ttrm",
@@ -308,6 +1492,12 @@
     "TST": 10,
     "mTSS": 4,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 12,
+    "TST": 0,
+    "rows": 13
    }
   },
   {
@@ -327,6 +1517,12 @@
     "TST": 4,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 2,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 5
    }
   },
   {
@@ -346,6 +1542,12 @@
     "TST": 7,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 1,
+    "TSD": 5,
+    "TST": 0,
+    "rows": 6
    }
   },
   {
@@ -365,6 +1567,12 @@
     "TST": 1,
     "mTSS": 0,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 0,
+    "rows": 3
    }
   },
   {
@@ -384,6 +1592,12 @@
     "TST": 7,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 2,
+    "TSD": 10,
+    "TST": 0,
+    "rows": 12
    }
   },
   {
@@ -403,6 +1617,12 @@
     "TST": 2,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 6,
+    "TST": 1,
+    "rows": 7
    }
   },
   {
@@ -422,6 +1642,12 @@
     "TST": 8,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 2,
+    "TST": 0,
+    "rows": 2
    }
   },
   {
@@ -441,6 +1667,12 @@
     "TST": 1,
     "mTSS": 0,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 1,
+    "TST": 0,
+    "rows": 1
    }
   },
   {
@@ -460,6 +1692,12 @@
     "TST": 7,
     "mTSS": 2,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 2,
+    "TSD": 6,
+    "TST": 0,
+    "rows": 8
    }
   },
   {
@@ -479,6 +1717,12 @@
     "TST": 5,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 3,
+    "TST": 1,
+    "rows": 4
    }
   },
   {
@@ -498,6 +1742,12 @@
     "TST": 7,
     "mTSS": 2,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 2,
+    "TSD": 9,
+    "TST": 0,
+    "rows": 11
    }
   },
   {
@@ -517,6 +1767,12 @@
     "TST": 1,
     "mTSS": 0,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 5,
+    "TST": 0,
+    "rows": 5
    }
   },
   {
@@ -536,6 +1792,12 @@
     "TST": 7,
     "mTSS": 2,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 2,
+    "TSD": 4,
+    "TST": 0,
+    "rows": 6
    }
   },
   {
@@ -555,6 +1817,12 @@
     "TST": 3,
     "mTSS": 1,
     "mTSD": 0
+   },
+   "garbage_tspins": {
+    "TSS": 0,
+    "TSD": 5,
+    "TST": 0,
+    "rows": 5
    }
   }
  ]

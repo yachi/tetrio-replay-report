@@ -11,7 +11,7 @@
  * sums to about 80% of the replay's total. Using the post-cancel field makes a T-spin Triple look
  * worth 4.9 lines instead of 6.1, so the choice is not cosmetic.
  *
- * TWO ANCHORS, the denominator-anchor route the opener section already uses:
+ * THREE ANCHORS, the denominator-anchor route the opener section already uses:
  *   - attack: the engine's per-round sum of `rawGarbage` against the replay's own attack counter.
  *   - counts: the engine's per-round clear-type counts against the replay's own `clears.*`
  *     counters, every kind (singles to quads, the T-spin kinds, the minis). Both counters are read
@@ -19,6 +19,9 @@
  *     agrees, the COUNT columns are as trustworthy as facts.json. Which clear CARRIED how much
  *     attack, and the base/B2B/combo split, have no second implementation: they stay quarantined,
  *     which is why the artefact says `report_eligible: false`.
+ *   - garbage_cleared: the engine's per-round sum of `res.garbageCleared` against the replay's own
+ *     `garbage.cleared`. It licenses the per-round total; WHICH lock cleared a garbage row is the
+ *     engine's alone, so `per_round[].garbage_tspins` (a T-spin into a garbage hole) is quarantined.
  *
  * Denominators are the replay's `piecesplaced`, never the engine's lock count — the two differ in
  * a handful of rounds where the engine locks one or two pieces past the game's end (named in the
@@ -109,30 +112,47 @@ export function runRound(c: Case) {
   const eng: any = createEngine({ ...TL_DEFAULTS, ...o, g: o.g ?? TL_DEFAULTS.g }, o.gameid, players);
   const byFrame = new Map<number, any[]>();
   for (const e of player.replay.events) { if (!byFrame.has(e.frame)) byFrame.set(e.frame, []); byFrame.get(e.frame)!.push(e); }
-  const locks: { i: number; cls: ClassKey | null; lines: number; raw: number; parts: Components }[] = [];
+  const locks: { i: number; cls: ClassKey | null; lines: number; raw: number; gar: number; parts: Components }[] = [];
   eng.events.on('falling.lock', (res: any) => {
     const i = locks.length + 1;
     const g = (res.rawGarbage ?? []) as number[];
     const raw = g.reduce((a, b) => a + b, 0);
+    const gar = res.garbageCleared as number;
+    if (!Number.isInteger(gar)) throw new Error(`emit-attack-facts: no garbageCleared in ${c.file} r${c.round} lock ${i}`);
     if (res.surge) throw new Error(`emit-attack-facts: surge in ${c.file} r${c.round} — b2bcharging is assumed off`);
     if (res.lines === 0) {
       if (raw !== 0) throw new Error(`emit-attack-facts: attack without a clear in ${c.file} r${c.round} lock ${i}`);
-      locks.push({ i, cls: null, lines: 0, raw: 0, parts: zeroComponents() });
+      locks.push({ i, cls: null, lines: 0, raw: 0, gar: 0, parts: zeroComponents() });
       return;
     }
     const cls = classify(res.lines, res.spin);
     const pc = eng.board.perfectClear ? g[g.length - 1]! : 0;
     const st = res.stats;
-    locks.push({ i, cls, lines: res.lines, raw, parts: split(cls, res.lines, Math.max(st.b2b, 0), Math.max(st.combo, 0), raw, pc) });
+    locks.push({ i, cls, lines: res.lines, raw, gar, parts: split(cls, res.lines, Math.max(st.b2b, 0), Math.max(st.combo, 0), raw, pc) });
   });
   const maxF = player.replay.frames ?? 20000;
   try { for (let f = 0; f <= maxF; f++) { const r = eng.tick(byFrame.get(f) || []); if (r && r.topout) break; } } catch { /* topout */ }
   return locks;
 }
 
+export type GarbageTspins = { TSS: number; TSD: number; TST: number; rows: number };
+const emptyGarbageTspins = (): GarbageTspins => ({ TSS: 0, TSD: 0, TST: 0, rows: 0 });
+
+/** The round's full T-spins that cleared at least one garbage row, by kind, and the garbage rows
+ *  they cleared. Minis are left out: the ask is a T into the hole, and a mini into a hole is not
+ *  the shape anybody builds for. */
+export function garbageTspins(locks: { cls: ClassKey | null; gar: number }[]): GarbageTspins {
+  const out = emptyGarbageTspins();
+  for (const l of locks)
+    if ((l.cls === 'TSS' || l.cls === 'TSD' || l.cls === 'TST') && l.gar > 0) { out[l.cls]++; out.rows += l.gar; }
+  return out;
+}
+
 export function build(dir: string) {
   const anchorAttack = { rounds: 0, agree: 0, exceptions: [] as any[] };
   const anchorCounts = { rounds: 0, agree: 0, unknown: 0, exceptions: [] as any[] };
+  const anchorGarbage = { rounds: 0, agree: 0, exceptions: [] as any[] };
+  const R: any[] = [];
   const lockExtra: any[] = [];
   const P: Record<string, any> = {};
   const M: Record<string, any> = {};
@@ -146,6 +166,15 @@ export function build(dir: string) {
     anchorAttack.rounds++;
     if (engAtk === replayAtk) anchorAttack.agree++;
     else anchorAttack.exceptions.push({ file: c.file, round: c.round, user: c.user, engine: engAtk, replay: replayAtk });
+    // garbage anchor: the engine's garbage rows cleared against the replay's own garbage.cleared.
+    const replayGar = st.garbage.cleared;
+    if (!Number.isInteger(replayGar)) throw new Error(`emit-attack-facts: ${c.file} r${c.round} ${c.user} has no garbage.cleared`);
+    const engGar = locks.reduce((a, l) => a + l.gar, 0);
+    anchorGarbage.rounds++;
+    if (engGar === replayGar) anchorGarbage.agree++;
+    else anchorGarbage.exceptions.push({ file: c.file, round: c.round, user: c.user, engine: engGar, replay: replayGar });
+    const gt = garbageTspins(locks);
+    R.push({ file: c.file, round: c.round, user: c.user, garbage_cleared: replayGar, garbage_tspins: gt });
     if (locks.length !== pieces) lockExtra.push({ file: c.file, round: c.round, user: c.user, locks: locks.length, pieces });
 
     // count anchor: every class against its replay counter. A missing counter is UNKNOWN, never 0.
@@ -169,8 +198,10 @@ export function build(dir: string) {
     p.windows.opener.pieces += op; p.windows.mid.pieces += pieces - op;
     const m = (M[`${c.file}|${c.user}`] ??= { file: c.file, user: c.user, pieces: 0, attack: 0,
                                              opener_pieces: 0, opener_attack: 0,
-                                             n: Object.fromEntries(CLASSES.map(k => [k.key, 0])) });
+                                             n: Object.fromEntries(CLASSES.map(k => [k.key, 0])),
+                                             garbage_tspins: emptyGarbageTspins() });
     m.pieces += pieces; m.attack += replayAtk; m.opener_pieces += op;
+    for (const k of Object.keys(gt) as (keyof GarbageTspins)[]) m.garbage_tspins[k] += gt[k];
     for (const l of locks) {
       const w: Window = l.i <= WINDOW_PIECES ? p.windows.opener : p.windows.mid;
       if (l.i <= WINDOW_PIECES) m.opener_attack += l.raw;
@@ -201,9 +232,16 @@ export function build(dir: string) {
     anchor: {
       attack: anchorAttack,
       counts: anchorCounts,
+      garbage_cleared: anchorGarbage,
       engine_locks_past_game_end: lockExtra,
     },
+    garbage_tspins_mean: 'a full T-spin (TSS, TSD or TST; minis excluded) whose clear removed at least one '
+      + 'garbage row. A garbage row is full but for its one hole, so a lock that clears it filled that hole: '
+      + 'the T went into the garbage hole. rows = the garbage rows those T-spins cleared. Which lock cleared '
+      + 'a garbage row is the engine\'s; the per-round total of garbage rows cleared is anchored against '
+      + 'the replay\'s garbage.cleared (anchor.garbage_cleared)',
     players: Object.values(P).sort(byUser),
+    per_round: R,
     per_match: Object.values(M).sort((a, b) => a.file < b.file ? -1 : a.file > b.file ? 1 : byUser(a, b)),
   };
 }
@@ -218,6 +256,7 @@ if (import.meta.main) {
   const a = out.anchor;
   console.log(`${out.session}: attack anchor ${a.attack.agree}/${a.attack.rounds}, `
     + `count anchor ${a.counts.agree}/${a.counts.rounds} (unknown ${a.counts.unknown}), `
+    + `garbage anchor ${a.garbage_cleared.agree}/${a.garbage_cleared.rounds}, `
     + `engine locks past game end ${a.engine_locks_past_game_end.length}`);
-  for (const e of [...a.attack.exceptions, ...a.counts.exceptions]) console.log('  exception', JSON.stringify(e));
+  for (const e of [...a.attack.exceptions, ...a.counts.exceptions, ...a.garbage_cleared.exceptions]) console.log('  exception', JSON.stringify(e));
 }

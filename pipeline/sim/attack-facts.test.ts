@@ -6,13 +6,18 @@
  *      own counters, with every disagreeing player-round pinned as a NAMED exception list compared
  *      exactly. A new disagreement, or a vanished one, is a red build to investigate, never a
  *      number absorbed under a bound (the `DT_ORDER_IN_OPENER` rule).
+ *   2b. the garbage anchor — the engine's garbage rows cleared against the replay's own
+ *      `garbage.cleared`, per round, with its own named list (GARBAGE_EXCEPTIONS).
+ *   2c. `per_round[].garbage_tspins` (a full T-spin whose clear removed a garbage row, i.e. the T
+ *      went into the hole) rolls up to `per_match` exactly, never clears more garbage rows than the
+ *      round did, and `garbageTspins()` counts minis and plain clears as nothing.
  *   3. the component split sums to the engine's attack, and `classify` refuses a clear it cannot name.
  *
  * Run: bun test pipeline/sim/attack-facts.test.ts   (rebuilds every session, ~30 s)
  */
 import { test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
-import { build, serialise, split, classify } from './emit-attack-facts.ts';
+import { build, serialise, split, classify, garbageTspins } from './emit-attack-facts.ts';
 import { assertCorpusIsEverySessionOnDisk } from '../corpus-membership.ts';
 
 const SESSIONS = assertCorpusIsEverySessionOnDisk(
@@ -48,6 +53,9 @@ const ATTACK_EXCEPTIONS: string[] = [];
 const COUNT_EXCEPTIONS: string[] = [];
 /** Player-rounds where the engine locks pieces past the game's own `piecesplaced`. */
 const LOCKS_PAST_END: string[] = [];
+/** Player-rounds where the engine's garbage rows cleared are not the replay's `garbage.cleared`.
+ *  Empty when it was added (2026-11-05): all 3210 player-rounds agree. */
+const GARBAGE_EXCEPTIONS: string[] = [];
 
 test('rebuilding every session reproduces its committed attack-facts.json byte for byte', () => {
   for (const s of SESSIONS) {
@@ -74,6 +82,47 @@ test('the anchors disagree exactly where the named lists say, and nowhere else',
   expect(att.sort()).toEqual([...ATTACK_EXCEPTIONS].sort());
   expect(cnt.sort()).toEqual([...COUNT_EXCEPTIONS].sort());
   expect(past.sort()).toEqual([...LOCKS_PAST_END].sort());
+});
+
+test('the garbage anchor disagrees exactly where GARBAGE_EXCEPTIONS says', () => {
+  const gar: string[] = [];
+  let rounds = 0;
+  for (const s of SESSIONS) {
+    const d = load(s), a = d.anchor.garbage_cleared;
+    rounds += a.rounds;
+    expect(a.rounds, s).toBe(d.anchor.attack.rounds);
+    expect(a.agree + a.exceptions.length, s).toBe(a.rounds);
+    for (const e of a.exceptions) gar.push(`${e.file} r${e.round} ${e.user} engine ${e.engine} replay ${e.replay}`);
+  }
+  expect(rounds).toBeGreaterThan(0);
+  expect(gar.sort()).toEqual([...GARBAGE_EXCEPTIONS].sort());
+});
+
+test('garbage T-spins: per round rolls up to per match, and never exceed the round\'s garbage rows', () => {
+  let total = 0;
+  for (const s of SESSIONS) {
+    const d = load(s);
+    expect(d.per_round.length, s).toBe(d.anchor.attack.rounds);
+    const sum: Record<string, any> = {};
+    for (const r of d.per_round) {
+      const g = r.garbage_tspins;
+      expect(g.rows, `${s} ${r.file} r${r.round} ${r.user}`).toBeLessThanOrEqual(r.garbage_cleared);
+      expect(g.rows).toBeGreaterThanOrEqual(g.TSS + g.TSD + g.TST);
+      expect(g.rows).toBeLessThanOrEqual(g.TSS + 2 * g.TSD + 3 * g.TST);
+      const m = (sum[`${r.file}|${r.user}`] ??= { TSS: 0, TSD: 0, TST: 0, rows: 0 });
+      for (const k of ['TSS', 'TSD', 'TST', 'rows']) m[k] += g[k];
+      total += g.TSS + g.TSD + g.TST;
+    }
+    for (const m of d.per_match) expect(m.garbage_tspins, `${s} ${m.file} ${m.user}`).toEqual(sum[`${m.file}|${m.user}`]);
+  }
+  expect(total).toBeGreaterThan(0);
+});
+
+test('garbageTspins(): full T-spins with a garbage row only; minis and plain clears count nothing', () => {
+  expect(garbageTspins([
+    { cls: 'TSD', gar: 2 }, { cls: 'TSD', gar: 0 }, { cls: 'TST', gar: 1 }, { cls: 'TSS', gar: 1 },
+    { cls: 'mTSD', gar: 2 }, { cls: 'Q', gar: 4 }, { cls: null, gar: 0 },
+  ])).toEqual({ TSS: 1, TSD: 1, TST: 1, rows: 4 });
 });
 
 test('per player, the windows add up: pieces exactly, engine attack within the named exceptions', () => {
