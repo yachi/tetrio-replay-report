@@ -639,12 +639,27 @@ PUBLISHED = (
     # quoted only in the shortfall table, which is not a SENTENCES target.
     ("2026-11-01", "app_gap_won", "series"),
     ("2026-11-01", "app_gap_lost", "series"),
+    # 2026-11-05 takes ONE `ANNOTATED` entry, the lost-regime gap. Measured over 67 rounds:
+    #
+    #     app_gap_won     +12.7389 pp    m6r1  ->  +14.4827  rel 0.137  1.01x
+    #     app_gap_lost     -1.8838 pp    m7r6  ->   -0.7660  rel 0.593  1.03x
+    #
+    # The lost gap is the corpus's first negative one and moves TOWARD zero without its round.
+    ("2026-11-05", "app_gap_won", "series"),
+    ("2026-11-05", "app_gap_lost", "series"),
 )
 
 # The named exception list: every (session, figure) already investigated, with the reason it
 # crosses. Named, not a raised threshold — a sixth case must be looked at, and a case that
 # stops crossing must be taken off the list and out of the prose.
 ANNOTATED = {
+    ("2026-11-05", "app_gap_lost"): (
+        "the lost-regime gap is -1.8838 pp — the first NEGATIVE published lost-gap in the corpus: "
+        "in the rounds each man lost, yachi's attack per piece is the higher — and m7r6 alone "
+        "takes it to -0.7660, i.e. CLOSER to zero, the sign surviving. m7r6 is a round pinglamb "
+        "lost at .4094 attack per piece over 149 pieces, one of his lowest losing-round rates. "
+        "So the sign stands and what one round carries is the size -1.88. `rel` 0.593, the next "
+        "round 1.03x below it."),
     ("2026-10-29", "app_gap_lost"): (
         "the lost-regime gap is +3.8604 pp and m2r3 alone takes it to +1.4473, i.e. CLOSER to "
         "zero — 09-18's direction, not 08-14's or 09-10's. m2r3 is a round pinglamb lost at "

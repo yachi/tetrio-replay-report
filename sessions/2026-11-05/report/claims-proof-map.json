@@ -628,5 +628,138 @@
   "file": "Claims.dfy",
   "family": "intense_round_vs_split",
   "status": "verified"
+ },
+ {
+  "id": "C001",
+  "lemma": "C001_pinglamb_won_six_of_the_eight_replayed_matches_yachi_won_matches_4_and",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C002",
+  "lemma": "C002_in_the_rounds_each_won_pinglamb_s_attack_per_piece_is_12_73_percent_ab",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C003",
+  "lemma": "C003_each_player_s_attack_per_piece_is_higher_in_the_rounds_he_won_than_in",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C004",
+  "lemma": "C004_over_the_whole_session_pinglamb_s_attack_per_piece_is_6_14_percent_abo",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C005",
+  "lemma": "C005_yachi_placed_392_more_pieces_than_pinglamb_and_landed_only_18_fewer_li",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C006",
+  "lemma": "C006_eight_rounds_ended_in_a_topout_five_yachi_s_three_pinglamb_s",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C008",
+  "lemma": "C008_keypresses_per_piece_are_close_yachi_3_621_and_pinglamb_3_604_yachi_0",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C009",
+  "lemma": "C009_yachi_s_piece_count_is_5_69_percent_above_pinglamb_s_a_little_short_of",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C010",
+  "lemma": "C010_the_rounds_finished_30_to_37_matches_1_3_went_9_15_and_matches_4_8_21",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C011",
+  "lemma": "C011_match_1_pinglamb_won_5_3",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C012",
+  "lemma": "C012_match_2_yachi_won_the_first_two_rounds_and_lost_4_5_in_the_ninth_round",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C013",
+  "lemma": "C013_match_3_pinglamb_won_5_2",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C014",
+  "lemma": "C014_match_4_yachi_won_5_4_in_the_ninth_round",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C015",
+  "lemma": "C015_match_5_yachi_led_3_1_it_went_to_4_4_and_he_lost_the_ninth_round_4_5",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C016",
+  "lemma": "C016_match_6_pinglamb_won_four_straight_rounds_to_lead_4_1_and_won_5_3",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C017",
+  "lemma": "C017_match_7_yachi_trailed_1_3_then_won_the_last_four_rounds_5_3",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C018",
+  "lemma": "C018_match_8_yachi_lost_4_5_in_the_ninth_round",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C019",
+  "lemma": "C019_pinglamb_s_attack_per_piece_is_the_higher_in_seven_of_the_eight_matche",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
+ },
+ {
+  "id": "C020",
+  "lemma": "C020_in_seven_of_the_eight_matches_the_player_who_landed_more_attack_won_th",
+  "file": "Claims.dfy",
+  "family": "",
+  "status": "verified"
  }
 ]

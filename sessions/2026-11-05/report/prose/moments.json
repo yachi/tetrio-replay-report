@@ -1,27 +1,32 @@
 {
-  "eyebrow": "TODO · 關鍵時刻",
-  "title": "TODO — 呢一節嘅標題未寫",
+  "eyebrow": "關鍵時刻 · 三件事",
+  "title": "三件事：輸局反轉、差少少嘅粒數、同三場 4 比 5",
   "cards": [
     {
       "accent": "y",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "輸局反轉",
+      "value": "+12.73% / −1.91%",
+      "body": "拆開贏同輸嘅局：贏嗰啲局 pinglamb 每粒方塊嘅攻擊高 12.73%，<strong>輸嗰啲局係 yachi 高 1.91%</strong><span class=\"badge\" data-claim=\"C002\"></span>——成個 corpus 第一次輸局係 yachi 重啲。差距全部喺贏局。"
     },
     {
       "accent": "p",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "差少少",
+      "value": "+5.69% / +6.14%",
+      "body": "yachi 多疊 392 粒，即係多 5.69%<span class=\"badge\" data-claim=\"C005\"></span><span class=\"badge\" data-claim=\"C009\"></span>——呢條路最多填返 5.69 個百分點，<strong>差少少先填得晒 6.14% 個窿</strong><span class=\"badge\" data-claim=\"C004\"></span>，所以總攻擊淨係少 18 條，即係 pinglamb 總攻擊嘅 0.42%<span class=\"badge\" data-claim=\"C005\"></span>。"
     },
     {
       "accent": "g",
-      "label": "TODO LABEL",
-      "value": "—",
-      "body": "TODO：呢張卡嘅文字未寫。"
+      "label": "三場 4 比 5",
+      "value": "4-5 · 4-5 · 4-5",
+      "body": "第二、第五、第八場都打到第九局，三場都係 yachi 4 比 5 輸<span class=\"badge\" data-claim=\"G012\"></span><span class=\"badge\" data-claim=\"G057\"></span>；第四場同樣打到第九局，佢贏<span class=\"badge\" data-claim=\"C014\"></span>。逐場計，總攻擊多嗰個八場贏七場，例外係第二場<span class=\"badge\" data-claim=\"C020\"></span>。"
     }
   ],
   "trivia": [
-    "TODO：呢條冷知識未寫。"
+    "最癲嗰局係 m7 第三局<span class=\"badge\" data-claim=\"G064\"></span>。pinglamb 贏，但佢喺落速同最大單波兩條軸都落後<span class=\"badge\" data-claim=\"G086\"></span>；佢贏喺每粒方塊嘅攻擊，約 0.781 對約 0.692<span class=\"badge\" data-claim=\"G087\"></span>。",
+    "All Clear pinglamb 8 個、yachi 7 個<span class=\"badge\" data-claim=\"G037\"></span>。淨係 yachi 做到全消嘅 7 局，佢輸咗 5 局<span class=\"badge\" data-claim=\"G081\"></span>。",
+    "67 局每一局都係 VS 高嗰個贏，零例外<span class=\"badge\" data-claim=\"G024\"></span>；yachi 嘅場均 PPS 八場都高過對手<span class=\"badge\" data-claim=\"G051\"></span>。",
+    "KPP 今晚兩個人差唔多：yachi 3.621 下、pinglamb 3.604 下，yachi 高 0.48%<span class=\"badge\" data-claim=\"C008\"></span>。",
+    "全晚累計分數 yachi 多啲<span class=\"badge\" data-claim=\"G067\"></span>，個系列照輸。",
+    "<a href=\"#video\">影片</a>嗰節每一場、每一局都連去錄影嗰一刻，連埋冇 replay 嗰場。"
   ]
 }
