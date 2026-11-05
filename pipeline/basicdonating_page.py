@@ -12,8 +12,8 @@ Inputs, all committed: `pipeline/openers/basicdonating-technique.json` (transcri
 `extract_basicdonating_shapes`), `analysis/basicdonating-facts.json` (`emit-technique-facts.ts --technique
 basicdonating`) and `analysis/basicdonating-demos.json` (`emit-technique-demos.ts --technique basicdonating`).
 
-One variant, `rule`, a TSD matched by the donation rule (`pipeline/sim/basicdonating-rule.ts`, yachi's, 2026-10-26)
-in place of a window; the six hole windows (k1..k6) and the nub window are retired. Its window section draws the T of
+Two variants, `rule` (a TSD) and `rule_tss` (a TSS, yachi's 「Count TSS donations too」, 2026-11-05), both matched by
+the donation rule (`pipeline/sim/basicdonating-rule.ts`, yachi's, 2026-10-26) in place of a window; the six hole windows (k1..k6) and the nub window are retired. Its window section draws the T of
 the page's first drawing, and each case's thumbnail is the hit's box (the T and its own column). The letters this page
 draws beyond the route pages': `C` an earlier cell
 in a cleared row, muted, and `I J L O S` a piece's cell in a cleared row, muted (the route pages' `Z` class already
@@ -42,6 +42,7 @@ PROFILE = TechniqueSiteProfile(
     demos_schema="technique-demos/1",
     variant="rule",
     opportunity="TSD",
+    more_variants=(("rule_tss", "TSS"),),
     cell_classes={"C": "cl", "I": "im", "J": "jm", "L": "lm", "O": "om", "S": "sm"},
     extra_css=BASICDONATING_CSS,
     max_page_bytes=3_000_000,

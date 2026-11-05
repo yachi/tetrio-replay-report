@@ -407,45 +407,60 @@ def rule_window(data: dict, v: dict, spec: TechniqueSpec, sp: dict, tc: set) -> 
 def rule_accounting(data: dict, spec: TechniqueSpec) -> list[str]:
     """Every drawing on the page, held to the rule BOTH WAYS, so the rule never chooses its own evidence: on a spin
     board at its drawn T (taken out); on a base board (a form or a question, drawn without its T) at every resting
-    T placement that makes exactly two rows full. Every (board, T) at which the rule fires must be the rule
-    variant's `drawings` entry with the donating columns measured; every spin board at whose drawn T it does not
-    fire must be a `rule_not_fired` entry with a reason; and every recorded entry must be measured."""
+    T placement that makes exactly a rule variant's `lines` rows full. A page may carry one rule variant per line
+    count (基本的なドネイト: its TSD, and since 2026-11-05 its TSS); a spin board belongs to the variant whose `lines`
+    it clears. Every (board, T) at which the rule fires must be that variant's `drawings` entry with the donating
+    columns measured; every spin board at whose drawn T it does not fire must be a `rule_not_fired` entry with a
+    reason; and every recorded entry must be measured."""
     bad = []
     vs = [v for v in data['variants'] if v.get('window_basis') == 'rule']
-    if len(vs) != 1:
-        return [f'rule: {len(vs)} rule variants, not one']
+    if not vs:
+        return ['rule: no rule variant']
+    by_lines = {}
+    for v in vs:
+        if v['lines'] in by_lines:
+            bad.append(f'rule: {by_lines[v["lines"]]["id"]} and {v["id"]} both measure {v["lines"]}-line spins')
+        by_lines[v['lines']] = v
     got = {}
     spins = set()
     for n in data['nodes']:
         rows = n['rows']
         if n['kind'] == 'spin':
             spins.add(n['id'])
+            v = by_lines.get(n.get('lines'))
+            if v is None:
+                bad.append(f'rule: spin board {n["id"]} clears {n.get("lines")}, which no rule variant measures')
+                continue
             sc = spin_cells(n)
             b = [''.join(EMPTY if (r, c) in sc else ch for c, ch in enumerate(row)) for r, row in enumerate(rows)]
-            cands = [sc]
+            cands = [(v, sc)]
         elif n['kind'] == 'base':
             b = rows
             o = occ_of(rows, spec)
-            cands = [cs for cs in t_placements(rows, spec)
-                     if len(full_rows([''.join('#' if (r, c) in cs else ch for c, ch in enumerate(row))
-                                       for r, row in enumerate(o)])) == 2]
+            cands = []
+            for cs in t_placements(rows, spec):
+                k = len(full_rows([''.join('#' if (r, c) in cs else ch for c, ch in enumerate(row))
+                                   for r, row in enumerate(o)]))
+                if k in by_lines:
+                    cands.append((by_lines[k], cs))
         else:
             continue
-        for cs in cands:
+        for v, cs in cands:
             cols = rule_columns(b, cs, spec)
             if cols:
-                got[(n['id'], frozenset(cs))] = sorted([r, c] for r, c in cols)
+                got[(v['id'], n['id'], frozenset(cs))] = sorted([r, c] for r, c in cols)
     rec = {}
-    for d in vs[0].get('drawings', []):
-        rec[(d['board'], frozenset(tuple(x) for x in d['t_cells']))] = d.get('holes')
+    for v in vs:
+        for d in v.get('drawings', []):
+            rec[(v['id'], d['board'], frozenset(tuple(x) for x in d['t_cells']))] = d.get('holes')
     for k in sorted(got.keys() - rec.keys(), key=str):
-        bad.append(f'rule: fires on {k[0]} at {sorted(k[1])} (holes {got[k]}), recorded nowhere')
+        bad.append(f'rule: {k[0]} fires on {k[1]} at {sorted(k[2])} (holes {got[k]}), recorded nowhere')
     for k in sorted(rec.keys() - got.keys(), key=str):
-        bad.append(f'rule: is recorded firing on {k[0]} at {sorted(k[1])}, and does not')
+        bad.append(f'rule: {k[0]} is recorded firing on {k[1]} at {sorted(k[2])}, and does not')
     for k in sorted(rec.keys() & got.keys(), key=str):
         if rec[k] != got[k]:
-            bad.append(f'rule: on {k[0]} at {sorted(k[1])} the holes are {got[k]}, the record says {rec[k]}')
-    fired = {k[0] for k in got if k[0] in spins}
+            bad.append(f'rule: {k[0]} on {k[1]} at {sorted(k[2])}: the holes are {got[k]}, the record says {rec[k]}')
+    fired = {k[1] for k in got if k[1] in spins}
     nf = {e['board']: e for e in data.get('rule_not_fired', [])}
     for b in sorted(spins - fired - nf.keys()):
         bad.append(f'rule: the rule does not fire at the T drawn on {b}, and rule_not_fired does not name it')
@@ -585,9 +600,11 @@ def verify(data: dict, spec: TechniqueSpec) -> list[str]:
             continue
         o = occ_of(n['rows'], spec)
         fr = full_rows(o)
-        # cell by cell: every cell of a full row is drawn muted (upper case), no other cell is
+        # cell by cell: every cell of a full row is drawn muted (upper case), no other cell is. A `U` spin cell is
+        # the renderer's T, upper case wherever it lies, so a T arm outside the full rows (a TSS) is no slip
         wrong = [(r, c) for r, row in enumerate(n['rows']) for c, ch in enumerate(row)
-                 if ch not in spec.empty_letters and ch != EMPTY and ch.isupper() != (r in fr)]
+                 if ch not in spec.empty_letters and ch != EMPTY and ch.isupper() != (r in fr)
+                 and not (ch == 'U' and (r, c) in sc)]
         if wrong and spec.muting_slips:
             # opt-in: a page whose muting slips is named, board by board, rather than refused
             measured.add(f'{n["id"]}:muting')

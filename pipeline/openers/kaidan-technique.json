@@ -4259,6 +4259,422 @@
           ]
         },
         {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #2",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ],
+            [
+              3,
+              8
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #2",
+          "cells": [
+            [
+              1,
+              8
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #92",
+          "cells": [
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ],
+            [
+              2,
+              8
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #92",
+          "cells": [
+            [
+              0,
+              8
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #74",
+          "cells": [
+            [
+              1,
+              7
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #83",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #83",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #83",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #86",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #86",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #86",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #1",
+          "cells": [
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ],
+            [
+              3,
+              8
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #1",
+          "cells": [
+            [
+              1,
+              8
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              2,
+              9
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #91",
+          "cells": [
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ],
+            [
+              2,
+              8
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop #91",
+          "cells": [
+            [
+              0,
+              8
+            ],
+            [
+              1,
+              7
+            ],
+            [
+              1,
+              8
+            ],
+            [
+              1,
+              9
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "variant": "rule_tss",
+          "board": "harddrop_anchor_set #23",
+          "cells": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
           "file": "imperialcross-technique.json",
           "variant": "imperialcross",
           "board": "harddrop_anchor_set #19",

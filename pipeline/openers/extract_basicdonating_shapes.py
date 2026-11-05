@@ -349,6 +349,25 @@ NODES = [
      'reading': 'gameplay frame, in occupancy only, its top row left out (the board is ten rows; the T is five rows '
                 'down): every drawn cell c, C in the rows the TSD clears, the T U',
      'rows': _b('ccccc----- ccccccc--- ccccccc--- CCCCCCUUUC CCCCCCCUCC ccccccc-c- ccccccc-c- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.i_play', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSS', 'lines': 1,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 72.5},
+     'label': 'とんぼ\'s video, the I clip: an I laid flat on the right fills the row the TSS clears over a well',
+     'reading': 'gameplay frame, in occupancy only: every drawn cell c, C in the row the TSS clears, the T U (the '
+                'video shows the T falling, not locked; its cells are the placement that fills the row)',
+     'rows': _b('ccc------- ccc------- ccUUUc---- CCCUCCCCCC ccccccccc- ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.burger', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSS', 'lines': 1,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 204},
+     'label': 'とんぼ\'s video, its ハンバーガー積み template: the S fills the row the TSS clears over a well, the J and '
+              'Z roof the slot',
+     'reading': 'the template diagram: grey stack c, C, the J, Z and S as drawn; the diagram draws no T, so the T U is '
+                'the one placement that fills a row under the roof',
+     'rows': _b('----jjz--- ccccjzz--- ccccjzUUU- CCCCCCCUSS cccccccss- ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.burger_play', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSS', 'lines': 1,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 199.5},
+     'label': 'とんぼ\'s video, the ハンバーガー積み template played',
+     'reading': 'gameplay frame, in occupancy only: every drawn cell c, C in the row the TSS clears, the T U (the '
+                'placement that fills the row)',
+     'rows': _b('ccc------- ccccccc--- ccccccUUU- CCCCCCCUCC ccccccccc- ccccccccc- ccccccccc- ccccccccc- ccccccccc-')},
 ]
 
 PAGE_ORDER = [n['id'] for n in NODES if not n.get('derived') and not n.get('external')]
@@ -411,6 +430,15 @@ DRAWINGS: list = [
     {'board': 'tonbo.st_play', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'holes': [[5, 9]]},
 ]
 
+#: the same, for the TSS variant: every (board, T) at which the rule fires with a T making ONE row full
+DRAWINGS_TSS: list = [
+    {'board': 'one.l_a', 't_cells': [[1, 2], [2, 2], [2, 3], [3, 2]], 'holes': [[4, 1]]},
+    {'board': 'two.sz_a', 't_cells': [[1, 3], [2, 2], [2, 3], [3, 3]], 'holes': [[4, 4]]},
+    {'board': 'tonbo.i_play', 't_cells': [[2, 2], [2, 3], [2, 4], [3, 3]], 'holes': [[4, 9]]},
+    {'board': 'tonbo.burger', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'holes': [[4, 9]]},
+    {'board': 'tonbo.burger_play', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'holes': [[4, 9]]},
+]
+
 VARIANTS = [
     {
         'id': 'rule', 'board': 'intro.z', 'spin': 'TSD', 'lines': 2, 'window_basis': 'rule',
@@ -426,6 +454,19 @@ VARIANTS = [
                            'cell is the hit\'s own column\'s hole (the nearest to the T), under the cleared rows, so the '
                            'clear does not move it'},
         'drawings': DRAWINGS,
+    },
+    # yachi, 2026-11-05 (the decision card 「Should TSS donations count on the 基本的なドネイト page?」: 「Count TSS donations
+    # too」): the same rule at a full TSS. The page draws no TSS, so the variant stands on とんぼ's ハンバーガー積み
+    {
+        'id': 'rule_tss', 'board': 'tonbo.burger', 'spin': 'TSS', 'lines': 1, 'window_basis': 'rule',
+        'window': {'rows': [2, 3], 'cols': [6, 8]}, 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'roof_cells': [],
+        'rule': 'the rule variant `rule`\'s rule at a T-spin Single: the one row the T makes full stands in for the '
+                'two rows of a TSD',
+        'payoff': {'kind': 'well_quad', 'board': 'tonbo.burger', 'piece': 'I', 'lines': 4, 'well_cell_pre_clear': [4, 9],
+                   'well_cell_after': [4, 9],
+                   'note': 'harddrop\'s, as for the TSD: the Tetris into the hole the clear re-opens. The well cell is '
+                           'the hit\'s own column\'s hole, under the cleared row, so the clear does not move it'},
+        'drawings': DRAWINGS_TSS,
     },
 ]
 
@@ -458,21 +499,19 @@ OTHER_WINDOWS = {
 
 CROSS_SOURCE = {
     'other_windows': OTHER_WINDOWS,
-    # とんぼ's video, read off its frames for the five external `tonbo` boards; the frames and the file are not committed
+    # とんぼ's video, read off its frames for the eight external `tonbo` boards; the frames and the file are not committed
     'tonbo': {
         'video': 'gLtNa3ZFIUw', 'url': 'https://youtu.be/gLtNa3ZFIUw',
         'title': '【テトリス初心者講座】火力アップ！Tスピンのドネイトのコツ', 'channel': 'とんぼ_テトリス初心者講座',
         'duration_s': 248.8, 'fetched': '2026-11-05', 'via': 'snapyt force_download, 360p mp4',
         'sha256': '8db5c67003a5812dfaae1f2dd6f687376a77607d18899572740a132eb08a704e', 'bytes': 8805480,
-        'boards': ['tonbo.o', 'tonbo.kaidan', 'tonbo.kaidan_play', 'tonbo.st', 'tonbo.st_play'],
+        'boards': ['tonbo.o', 'tonbo.kaidan', 'tonbo.kaidan_play', 'tonbo.st', 'tonbo.st_play', 'tonbo.i_play',
+                   'tonbo.burger', 'tonbo.burger_play'],
         'reading': 'each board read off one frame by palette sampling (about 11.45 px per cell) and checked by eye on '
                    'an enlarged crop; no frame is committed and nothing re-reads them, so the hash is ours alone. The '
                    'template diagrams draw no T and the gameplay frames show it before it locks, so each T is the one '
-                   'placement that fills two rows',
+                   'placement that fills the rows it clears (two for a TSD, one for a TSS)',
         'not_transcribed': [
-            {'t': 72.5, 'what': 'the I clip', 'why': 'a T-spin Single donation; this page counts TSDs only'},
-            {'t': 204, 'what': 'the ハンバーガー積み template', 'why': 'its diagram and play (199.5 s) are T-spin '
-                                                                    'Single donations; this page counts TSDs only'},
             {'t': 140, 'what': 'the よしひろ積み template', 'why': 'a T-spin Mini into a TSD, not one donation board'},
             {'t': 50, 'what': 'the Z, S, L and J clips', 'why': 'each fades out before its T locks, so no frame '
                                                               'shows the board with the T'},
@@ -497,6 +536,12 @@ CROSS_SOURCE = {
         {'file': 'sdpcspin-routes.json', 'node': '3.third.imperial', 'variant': 'rule', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
          'note': "harddrop's SDPC Spin: the Imperial Cross TSD; the cross's far arm is covered only inside the cleared rows"},
+        {'file': 'sdpcspin-routes.json', 'node': 'bag1.jl', 'variant': 'rule_tss', 'mirrored': False,
+         'page': 'https://harddrop.com/wiki/SDPC_Spin',
+         'note': "harddrop's SDPC Spin: the bag-1 TSS; the L lies in the row the TSS clears over two empty cells, which the clear re-opens"},
+        {'file': 'sdpcspin-routes.json', 'node': 'bag1.lj', 'variant': 'rule_tss', 'mirrored': False,
+         'page': 'https://harddrop.com/wiki/SDPC_Spin',
+         'note': 'the same bag-1 TSS, its other colouring: the J lies over the two empty cells'},
     ],
     'also': [
         {'file': 'mountainous2-routes.json', 'node': '2.compromise.fire5.bag4#1', 'variant': 'rule', 'mirrored': False,
@@ -509,6 +554,10 @@ CROSS_SOURCE = {
          'note': "stick spin's Imperial Cross TSD"},
         {'file': 'stickspin-routes.json', 'node': '2.sd.stmb.spin', 'variant': 'rule', 'mirrored': False,
          'note': 'the SDパフェ STMB Cave with its T drawn'},
+        {'file': 'stickspin-routes.json', 'node': 'bag1.fire', 'variant': 'rule_tss', 'mirrored': False,
+         'note': "the same author's stick spin: the bag-1 TSS stood up (火力派生), the J over the empty cells of the row it clears"},
+        {'file': 'stickspin-routes.json', 'node': 'bag1.pc', 'variant': 'rule_tss', 'mirrored': False,
+         'note': 'the bag-1 TSS laid flat (パフェ派生), the same J'},
     ],
 }
 
