@@ -43,21 +43,23 @@ const H = 40, W = 10;
 
 /** Per player: the opportunities (scored full TSDs), split at the 0-based opener window. */
 const DENOM: Record<string, any> = {"pinglamb": {"all": 6396, "in_opener": 1254, "mid_game": 5142}, "yachi": {"all": 5783, "in_opener": 1491, "mid_game": 4292}};
-const HITS: Record<string, any> = {"pinglamb": {"all": 420, "in_opener": 127, "mid_game": 293, "mirrored": 0, "garbage_in_window": 134}, "yachi": {"all": 390, "in_opener": 45, "mid_game": 345, "mirrored": 0, "garbage_in_window": 154}};
+/** The same for the TSS variant (scored full TSSs). */
+const DENOM_TSS: Record<string, any> = {"pinglamb": {"all": 735, "in_opener": 100, "mid_game": 635}, "yachi": {"all": 1201, "in_opener": 289, "mid_game": 912}};
+const HITS: Record<string, any> = {"rule": {"pinglamb": {"all": 420, "in_opener": 127, "mid_game": 293, "mirrored": 0, "garbage_in_window": 134}, "yachi": {"all": 390, "in_opener": 45, "mid_game": 345, "mirrored": 0, "garbage_in_window": 154}}, "rule_tss": {"pinglamb": {"all": 34, "in_opener": 9, "mid_game": 25, "mirrored": 0, "garbage_in_window": 7}, "yachi": {"all": 152, "in_opener": 99, "mid_game": 53, "mirrored": 0, "garbage_in_window": 21}}};
 /** The payoff (stored under `followup_by_player`, the shared artefact key). */
-const PAYOFF: Record<string, any> = {"pinglamb": {"fired": 36, "not_fired": {"i_in_well_not_quad": 20, "past_verified": 15, "round_ended": 11, "well_covered": 29, "well_filled_not_i": 309}}, "yachi": {"fired": 67, "not_fired": {"i_in_well_not_quad": 30, "past_verified": 10, "round_ended": 9, "well_covered": 55, "well_filled_not_i": 219}}};
+const PAYOFF: Record<string, any> = {"rule": {"pinglamb": {"fired": 36, "not_fired": {"i_in_well_not_quad": 20, "past_verified": 15, "round_ended": 11, "well_covered": 29, "well_filled_not_i": 309}}, "yachi": {"fired": 67, "not_fired": {"i_in_well_not_quad": 30, "past_verified": 10, "round_ended": 9, "well_covered": 55, "well_filled_not_i": 219}}}, "rule_tss": {"pinglamb": {"fired": 3, "not_fired": {"i_in_well_not_quad": 3, "well_covered": 7, "well_filled_not_i": 21}}, "yachi": {"fired": 19, "not_fired": {"i_in_well_not_quad": 14, "past_verified": 9, "well_covered": 10, "well_filled_not_i": 100}}}};
 /** The same rule at the other scored spins, and with each clause dropped at the opportunity. */
-const CONTROLS = {"under": {"TSS": {"pinglamb": 34, "yachi": 152}, "TST": {"pinglamb": 1594, "yachi": 854}, "mini_TSS": {"pinglamb": 7, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 420, "yachi": 390}, "allow_fragment": {"pinglamb": 481, "yachi": 448}, "no_reopen": {"pinglamb": 488, "yachi": 545}, "allow_late_hole": {"pinglamb": 526, "yachi": 501}}, "orientation_baseline": {"pinglamb": 63, "yachi": 80}};
-const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 165, "not_qualified": {"opener_route": 142, "other_page": 125}}, "yachi": {"qualified": 188, "not_qualified": {"opener_route": 23, "other_page": 188}}};
+const CONTROLS: Record<string, any> = {"rule": {"under": {"TSS": {"pinglamb": 34, "yachi": 152}, "TST": {"pinglamb": 1594, "yachi": 854}, "mini_TSS": {"pinglamb": 7, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 420, "yachi": 390}, "allow_fragment": {"pinglamb": 481, "yachi": 448}, "no_reopen": {"pinglamb": 488, "yachi": 545}, "allow_late_hole": {"pinglamb": 526, "yachi": 501}}, "orientation_baseline": {"pinglamb": 63, "yachi": 80}}, "rule_tss": {"under": {"TSD": {"pinglamb": 420, "yachi": 390}, "TST": {"pinglamb": 1594, "yachi": 854}, "mini_TSS": {"pinglamb": 7, "yachi": 3}, "mini_TSD": {"pinglamb": 0, "yachi": 0}}, "ablation": {"allow_t_nub": {"pinglamb": 34, "yachi": 152}, "allow_fragment": {"pinglamb": 53, "yachi": 204}, "no_reopen": {"pinglamb": 65, "yachi": 204}, "allow_late_hole": {"pinglamb": 57, "yachi": 183}}, "orientation_baseline": {"pinglamb": 161, "yachi": 476}}};
+const QUALIFY: Record<string, any> = {"pinglamb": {"qualified": 194, "not_qualified": {"opener_route": 143, "opener_spin": 4, "other_page": 125}}, "yachi": {"qualified": 244, "not_qualified": {"opener_route": 24, "opener_spin": 87, "other_page": 196}}};
 /** Qualifying hits per session (the list itself is `lists.qualified_hits`, held to `hits` below). */
-const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 10, '2026-07-24': 13, '2026-07-28': 11, '2026-08-01': 20, '2026-08-09': 14, '2026-08-14': 20, '2026-08-19': 21, '2026-08-25': 20, '2026-09-03': 7, '2026-09-10': 12, '2026-09-11': 5, '2026-09-17': 6, '2026-09-18': 24, '2026-09-19': 43, '2026-10-03': 38, '2026-10-09': 30, '2026-10-12': 12, '2026-10-20': 6, '2026-10-22': 3, '2026-10-29': 15, '2026-11-01': 23};
+const QUALIFIED_BY_SESSION: Record<string, number> = {'2026-07-22': 14, '2026-07-24': 15, '2026-07-28': 14, '2026-08-01': 25, '2026-08-09': 18, '2026-08-14': 23, '2026-08-19': 25, '2026-08-25': 22, '2026-09-03': 9, '2026-09-10': 17, '2026-09-11': 10, '2026-09-17': 13, '2026-09-18': 34, '2026-09-19': 53, '2026-10-03': 44, '2026-10-09': 34, '2026-10-12': 13, '2026-10-20': 8, '2026-10-22': 4, '2026-10-29': 16, '2026-11-01': 27};
 /** How many donating columns a hit has, and how each column's covering pieces sit (inside the cleared rows or not). */
-const COLUMNS = { per_hit: { 1: 639, 2: 167, 3: 4 }, cover: { cleared: 494, kept: 491 } };
+const COLUMNS = { per_hit: { 1: 726, 2: 173, 3: 97 }, cover: { cleared: 497, kept: 866 } };
 /** Per other technique artefact: [its T's that are a donation here, its T's]. None is contained whole: a page's
  *  window does not read the ownership of its covering cells, and many of its hits cover with garbage or a fragment. */
 const COMMON: Record<string, [number, number]> = {
   stsd: [0, 82], stmbcave: [145, 149], imperialcross: [7, 12], doubledagger: [43, 49], btcannon: [0, 0],
-  cutcopy: [1, 3], shachikutrain: [46, 110], parapet: [7, 289], kaidan: [85, 187], dtcannon: [0, 27],
+  cutcopy: [1, 3], shachikutrain: [46, 110], parapet: [15, 289], kaidan: [85, 187], dtcannon: [0, 27],
 };
 
 let DIGESTS: TechDigest[] | null = null;
@@ -99,21 +101,24 @@ test('the committed artefact is what build() produces now (byte identity)', () =
   expect(serialise(run({}))).toBe(readFileSync(ART_PATH, 'utf8'));
 }, 900_000);
 
-test('quarantined: report_eligible false, no claim ids, one rule variant, no window, the payoff harddrop\'s', () => {
+test('quarantined: report_eligible false, no claim ids, two rule variants (TSD, TSS), no window, the payoff harddrop\'s', () => {
   const a = art();
   expect(a.report_eligible).toBe(false);
   expect(JSON.stringify(a)).not.toMatch(/data-claim|\b[CRG]\d{3}\b|✓/);
   expect(a.sessions).toEqual(SESSIONS);
   expect(a.cross_route).toBeUndefined();
-  expect(Object.keys(a.variants)).toEqual(['rule']);
-  expect(TR.variants.map((v: any) => [v.id, v.window_basis, v.spin, v.lines])).toEqual([['rule', 'rule', 'TSD', 2]]);
-  const v = TR.variants[0];
-  expect(v.payoff).toMatchObject({ kind: 'well_quad', piece: 'I', lines: 4 });
-  expect(v.payoff.note).toContain('harddrop');
-  expect(v.followup).toBeUndefined();
-  expect(v.roof_cells).toEqual([]);
-  // the controls are the rule's three ablations, not the window ablations
-  expect(Object.keys(a.variants.rule.controls.ablation)).toEqual(RULE_ABLATIONS);
+  expect(Object.keys(a.variants)).toEqual(['rule', 'rule_tss']);
+  expect(TR.variants.map((v: any) => [v.id, v.window_basis, v.spin, v.lines]))
+    .toEqual([['rule', 'rule', 'TSD', 2], ['rule_tss', 'rule', 'TSS', 1]]);
+  for (const v of TR.variants) {
+    expect(v.payoff, v.id).toMatchObject({ kind: 'well_quad', piece: 'I', lines: 4 });
+    expect(v.payoff.note, v.id).toContain('harddrop');
+    expect(v.followup, v.id).toBeUndefined();
+    expect(v.roof_cells, v.id).toEqual([]);
+    // the controls are the rule's ablations, not the window ablations
+    expect(Object.keys(a.variants[v.id].controls.ablation), v.id).toEqual(RULE_ABLATIONS);
+  }
+  for (const h of a.hits) expect(['rule', 'rule_tss'], hitName(h)).toContain(h.variant);
   // every hit carries its donating columns, and its own column is the payoff's well (the nearest to the T)
   for (const h of a.hits) {
     expect(h.mirrored, hitName(h)).toBe(false);
@@ -130,8 +135,9 @@ test('the scored T-spins are the ones emit-opener-facts.ts scores (the third cop
 
 test('the Python twin on the drawings: the rule fires where the gate records it, with its holes, and nowhere else', () => {
   const filled = (ch: string) => ch !== '-';
+  // per variant: its line count decides which T placements and which spin boards it measures
   const got = new Map<string, number[][]>(), spinFired = new Set<string>();
-  for (const n of TR.nodes) {
+  for (const v of TR.variants) for (const n of TR.nodes) {
     let b: string[], cands: [number, number][][];
     if (n.kind === 'spin') {
       const p = (n.spin_piece ?? 'T') as string;
@@ -139,27 +145,28 @@ test('the Python twin on the drawings: the rule fires where the gate records it,
         ch === p || ch === p.toLowerCase() ? [[i, c] as [number, number]] : []));
       const drop = new Set(sc.map(([r, c]: number[]) => `${r},${c}`));
       b = n.rows.map((r: string, i: number) => [...r].map((ch, c) => drop.has(`${i},${c}`) ? '-' : ch).join(''));
+      if (frame(b, sc, filled).C.size !== v.lines) continue;
       cands = [sc];
     } else if (n.kind === 'base') {
       b = n.rows;
-      cands = restingT(b, filled).filter(cs => frame(b, cs, filled).C.size === 2);
+      cands = restingT(b, filled).filter(cs => frame(b, cs, filled).C.size === v.lines);
     } else continue;
     for (const cs of cands) {
       const f = frame(b, cs, filled);
       const cols = donationColumns(f.withT, f.tc, f.C, null, 'allow_fragment');
       if (!cols.length) continue;
-      got.set(`${n.id} ${tKey(cs)}`, cols.map(x => [x.hole_row - f.off, x.col]).sort((x, y) => x[0]! - y[0]! || x[1]! - y[1]!));
+      got.set(`${v.id} ${n.id} ${tKey(cs)}`, cols.map(x => [x.hole_row - f.off, x.col]).sort((x, y) => x[0]! - y[0]! || x[1]! - y[1]!));
       if (n.kind === 'spin') spinFired.add(n.id);
     }
   }
   const rec = new Map<string, number[][]>();
-  for (const d of TR.variants[0].drawings) rec.set(`${d.board} ${tKey(d.t_cells)}`, d.holes);
+  for (const v of TR.variants) for (const d of v.drawings) rec.set(`${v.id} ${d.board} ${tKey(d.t_cells)}`, d.holes);
   expect([...got.keys()].sort()).toEqual([...rec.keys()].sort());
   for (const [k, holes] of got) expect(holes, k).toEqual(rec.get(k)!);
   const spins = TR.nodes.filter((n: any) => n.kind === 'spin').map((n: any) => n.id);
   expect(spins.filter((id: string) => !spinFired.has(id)).sort()).toEqual(TR.rule_not_fired.map((e: any) => e.board).sort());
   expect(TR.rule_not_fired.map((e: any) => e.board).sort()).toEqual(['intro.l3', 'nub.hd']);
-  // the routes boards, at their U slots that clear exactly two rows (`U` the spin cell, every other letter filled)
+  // the routes boards, at their U slots that clear a variant's rows (`U` the spin cell, every other letter filled)
   const routes: string[] = [];
   for (const file of readdirSync(import.meta.dir).filter(x => x.endsWith('-routes.json')).sort())
     for (const n of JSON.parse(readFileSync(`${import.meta.dir}/${file}`, 'utf8')).nodes) {
@@ -167,11 +174,12 @@ test('the Python twin on the drawings: the rule fires where the gate records it,
       const u = n.rows.flatMap((r: string, i: number) => [...r].flatMap((ch, c) => ch === 'U' ? [[i, c] as [number, number]] : []));
       if (u.length !== 4) continue;
       const f = frame(n.rows, u, ch => ch !== '-' && ch !== 'U');
-      if (f.C.size !== 2) continue;
-      if (donationColumns(f.withT, f.tc, f.C, null, 'allow_fragment').length) routes.push(`${file} ${n.id}`);
+      const v = TR.variants.find((x: any) => x.lines === f.C.size);
+      if (!v) continue;
+      if (donationColumns(f.withT, f.tc, f.C, null, 'allow_fragment').length) routes.push(`${file} ${n.id} ${v.id}`);
     }
   const xs = TR.cross_source;
-  expect(routes.sort()).toEqual([...xs.fires, ...xs.also].map((e: any) => `${e.file} ${e.node}`).sort());
+  expect(routes.sort()).toEqual([...xs.fires, ...xs.also].map((e: any) => `${e.file} ${e.node} ${e.variant}`).sort());
 }, 120_000);
 
 /** A synthetic 40-row board, bottom-aligned: '.' empty, 'X' garbage, 'T' the lock, any other letter one piece. */
@@ -255,13 +263,16 @@ test('named lists: the qualifying hits are the hits that qualify; every hit reso
 test('pinned: denominators, hits, payoffs, controls, columns, the qualify tally, per player', () => {
   const a = art();
   for (const u of USERS) expect(a.denominators[u].TSD, u).toEqual(DENOM[u]);
-  expect(a.variants.rule.controls).toEqual(CONTROLS);
+  for (const u of USERS) expect(a.denominators[u].TSS, u).toEqual(DENOM_TSS[u]);
+  for (const vid of ['rule', 'rule_tss']) expect(a.variants[vid].controls, vid).toEqual(CONTROLS[vid]);
   for (const u of USERS) {
-    expect(a.variants.rule.hits_by_player[u], u).toEqual(HITS[u]);
-    expect(a.variants.rule.followup_by_player[u], u).toEqual(PAYOFF[u]);
-    expect(PAYOFF[u].fired + total(PAYOFF[u].not_fired)).toBe(HITS[u].all);
-    // an ablation only relaxes: it fires on every hit and more
-    for (const ab of RULE_ABLATIONS) expect(CONTROLS.ablation[ab][u]).toBeGreaterThanOrEqual(HITS[u].all);
+    for (const vid of ['rule', 'rule_tss']) {
+      expect(a.variants[vid].hits_by_player[u], `${vid} ${u}`).toEqual(HITS[vid][u]);
+      expect(a.variants[vid].followup_by_player[u], `${vid} ${u}`).toEqual(PAYOFF[vid][u]);
+      expect(PAYOFF[vid][u].fired + total(PAYOFF[vid][u].not_fired)).toBe(HITS[vid][u].all);
+      // an ablation only relaxes: it fires on every hit and more
+      for (const ab of RULE_ABLATIONS) expect(CONTROLS[vid].ablation[ab][u]).toBeGreaterThanOrEqual(HITS[vid][u].all);
+    }
     const hs = a.hits.filter((h: any) => h.player === u);
     const tally: Record<string, number> = {};
     for (const h of hs) for (const r of h.not_qualified) tally[r] = (tally[r] ?? 0) + 1;
@@ -303,12 +314,26 @@ test('opener_route iff a route case matched bag 2 and the T is within ROUTE_LOCK
   expect(named?.not_qualified).toEqual(['opener_route']);
 });
 
+test('opener_spin iff the T is a route case\'s bag-1 spin, re-read from the route artefacts; it never takes a TSD', () => {
+  const a = art();
+  const b1 = new Map<string, number[]>();
+  for (const k of ROUTE_ARTEFACTS)
+    for (const c of JSON.parse(readFileSync(`${import.meta.dir}/../../analysis/${k}-facts.json`, 'utf8')).cases)
+      if (c.bag1?.spin) { const key = `${c.session}|${c.file}|${c.round_index0}|${c.player}`; b1.set(key, [...(b1.get(key) ?? []), c.bag1.lock]); }
+  for (const h of a.hits) {
+    const ls = b1.get(`${h.session}|${h.file}|${h.round_index0}|${h.player}`) ?? [];
+    expect(h.not_qualified.includes('opener_spin'), hitName(h)).toBe(ls.includes(h.lock));
+    if (h.variant === 'rule') expect(h.not_qualified.includes('opener_spin'), hitName(h)).toBe(false);
+  }
+});
+
 test('the qualify rule, re-derived from the digests; with it off every hit qualifies', () => {
   const a = art();
   const byD = new Map(digests().map(d => [dKey(d), d]));
   const AN = `${import.meta.dir}/../../analysis`;
-  const muts = [[{}, null], [{ noOtherPage: true, noOpenerRoute: true }, []],
-                [{ noOtherPage: true }, ['other_page']], [{ noOpenerRoute: true }, ['opener_route']]] as const;
+  const muts = [[{}, null], [{ noOtherPage: true, noOpenerRoute: true, noOpenerSpin: true }, []],
+                [{ noOtherPage: true }, ['other_page']], [{ noOpenerRoute: true }, ['opener_route']],
+                [{ noOpenerSpin: true }, ['opener_spin']]] as const;
   for (const [mut, off] of muts) {
     const q = donationQualifier(import.meta.dir, AN, mut);
     a.hits.forEach((h: any) => {
@@ -319,13 +344,14 @@ test('the qualify rule, re-derived from the digests; with it off every hit quali
     });
   }
   // each rule is live: turning it off moves some verdict
-  for (const r of ['other_page', 'opener_route']) expect(a.hits.some((h: any) => h.not_qualified.includes(r)), r).toBe(true);
+  for (const r of ['other_page', 'opener_route', 'opener_spin']) expect(a.hits.some((h: any) => h.not_qualified.includes(r)), r).toBe(true);
 }, 600_000);
 
 test('mutants: each one turns this red with its own symptom', () => {
   const base = serialise(run({}));
   const b = JSON.parse(base);
-  const fired = (a: any) => USERS.reduce((m, u) => m + a.variants.rule.followup_by_player[u].fired, 0);
+  const fired = (a: any) => USERS.reduce((m, u) =>
+    m + a.variants.rule.followup_by_player[u].fired + a.variants.rule_tss.followup_by_player[u].fired, 0);
   const mut = (m: Mutants) => { const s = serialise(run(m)); expect(s, JSON.stringify(m)).not.toBe(base); return JSON.parse(s); };
   const k = (h: any) => hitKey(h);
 

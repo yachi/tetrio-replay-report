@@ -12,6 +12,9 @@
  * THE PAYOFF IS HARDDROP'S. The page says only that the hole stays open to dig (「下穴が開いた状態を維持」); harddrop's
  * Donation page draws the Tetris into it. So the variant carries 欄干's `well_quad` payoff, at the hit's own column
  * (the nearest to the T).
+ *
+ * TWO VARIANTS, ONE RULE (yachi, 2026-11-05: 「Count TSS donations too」): `rule` at a full TSD and `rule_tss` at a full
+ * TSS. The rule reads the cleared rows, so a TSS is the same rule over one row; とんぼ's video draws three TSS donations.
  */
 import type { TechniqueProfile } from './technique-profile.ts';
 import { OTHER_PAGES, ROUTE_ARTEFACTS, ROUTE_LOCKS, donationQualifier } from './basicdonating-qualify.ts';
@@ -62,7 +65,8 @@ export const BASICDONATING: TechniqueProfile = {
       + 'harddrop\'s next step, not shiwehi.com\'s. Counts only, always N / M with the denominator.',
   },
   rules: () => [
-    'opportunity: a full TSD (2 lines) at a 0-based lock index <= the verified index, whose board-before plus its '
+    'opportunity: per variant, a full TSD (2 lines; variant rule) or a full TSS (1 line; variant rule_tss, yachi '
+      + '2026-11-05: 「Count TSS donations too」) at a 0-based lock index <= the verified index, whose board-before plus its '
       + 'cells makes exactly the rows the engine recorded clearing (the reconstruction check, counted exactly as '
       + 'opener-facts.json donation.check counts it)',
     'match (no window): a column DONATES when, at its topmost cell that is empty, outside the cleared rows and directly '
@@ -85,9 +89,10 @@ export const BASICDONATING: TechniqueProfile = {
   ],
   qualify: {
     rules: [
-      `other_page: another technique page's window (${OTHER_PAGES.join(', ')}; any variant, either hand) fires at the same T, so the T is that page's`,
+      `other_page: another technique page's window (${OTHER_PAGES.join(', ')}; any variant of the same spin, either hand) fires at the same T, so the T is that page's`,
       `opener_route: the round is a case of an opener route page (${ROUTE_ARTEFACTS.join(', ')}) that matched a bag-2 board, and the T locks within ${ROUTE_LOCKS} locks after that match, so the T is the route's own continuation`,
-      'qualifies iff neither applies; the donation happened at every hit either way',
+      'opener_spin: the T is the bag-1 T-spin an opener route page draws (bag1.spin of a case in the same artefacts), so the spin is the opener\'s own, not a mid-game donation',
+      'qualifies iff none applies; the donation happened at every hit either way',
     ],
     check: donationQualifier(OPENERS, `${REPO}/analysis`),
   },
