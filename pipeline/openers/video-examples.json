@@ -1,0 +1,4334 @@
+{
+ "schema": "video-examples/1",
+ "report_eligible": false,
+ "means": "Boards read off one Puyo Puyo Tetris 2 match video: the 中盤 technique and DPC examples it shows. Not corpus data: nothing here enters a count, a claim or a report.",
+ "source": {
+  "kind": "youtube",
+  "video": "Pjn05duM_gQ",
+  "url": "https://www.youtube.com/watch?v=Pjn05duM_gQ",
+  "title": "vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】",
+  "duration_s": 1625.77,
+  "players": {
+   "L": "kazu",
+   "R": "syakegohan"
+  },
+  "player_names_note": "yachi asked for the left player to be named kazu (2026-11-05); the in-game name shown on the board is 一、一",
+  "pieces": "both players are dealt the same piece sequence",
+  "fetched": "2026-11-05, 720p MP4 through www.snapyt.app (force_download fmt=2; yt-dlp is refused in this sandbox)",
+  "file": {
+   "format": "MP4, 1280x720",
+   "sha256": "097b9729d788d6179452c2de5e4504c16480ee1360080d6fdab02646d2235c8b",
+   "bytes": 380825907
+  },
+  "reading": "every frame at 30 fps, both boards palette-sampled at each cell's centre (left board x0 212.5, right 829.0, cells 23.75 px wide, y0 110.5, 23.7 px tall); a line clear flashes its rows white, so each board is the last frame before the flash; `?` is a cell matching no colour. The reader is a scratch script and is NOT committed: nothing re-reads these boards.",
+  "terms": "nothing of the video is committed or published: no frame, no clip; every example links the video at its time",
+  "requested": "yachi, 2026-11-05: 「Find all new 中盤 example … Especially new DPC pattern examples」, then 「Add them all」"
+ },
+ "pc_times": {
+  "L": [
+   153.2,
+   207.5,
+   298.7,
+   339.5,
+   387.8,
+   394.4,
+   422.4,
+   615.0,
+   802.0,
+   1087.2,
+   1302.2,
+   1544.8
+  ],
+  "R": [
+   206.9,
+   339.9,
+   388.4,
+   483.4,
+   640.9,
+   802.4,
+   961.5,
+   1161.5,
+   1374.4
+  ]
+ },
+ "pc_times_note": "every Perfect Clear by each player, read off the PERFECT CLEAR banner and checked by eye for an empty board; two banner reads at 605.1 and 1052.6 (right) left pieces on the board and are not Perfect Clears",
+ "pc_window_s": 7,
+ "dpc_gap_s": 6,
+ "boards": [
+  {
+   "id": "L77.37",
+   "side": "L",
+   "t": 77.37,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........OO",
+    "LLL.....OO",
+    "LSS...LLLI",
+    "SSZJ..LOOI",
+    "LZZJTTTOOI",
+    "OOTSSTIIII",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GG.GGGGGGG",
+    ".GGGGGGGGG",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "R98.9",
+   "side": "R",
+   "t": 98.9,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "........?.",
+    "..........",
+    "..........",
+    "ZZ........",
+    "SZZ.......",
+    "SSJ.......",
+    "LSJ.......",
+    "LJJ...S...",
+    "LLTL..SSOO",
+    "STTLTTTSOO",
+    "SSTLLTIIII",
+    "TSOO.OOJJJ",
+    "TTOO.OOZZJ",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "L117.23",
+   "side": "L",
+   "t": 117.23,
+   "lines": 1,
+   "cleared": [
+    8
+   ],
+   "t_cells": [
+    [
+     6,
+     2
+    ],
+    [
+     7,
+     2
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     8,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....ZOO...",
+    "...ZZOO...",
+    "L.TZJJSS..",
+    "L.TTJSSLL.",
+    "LLTZJJJJLI",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "GGGGGGGGG.",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "G.GGGGGGGG",
+    "GGGGGGG.GG",
+    "???????.??"
+   ]
+  },
+  {
+   "id": "L175.07",
+   "side": "L",
+   "t": 175.07,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     9,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "L.........",
+    "L.....JJJ.",
+    "LL....OOJT",
+    "JJ..ZZOOTT",
+    "JSTTTZZSST",
+    "JSSTOOSSLL",
+    "ZZS.OOTTTL",
+    "JZZ.TTTTSL",
+    "GGG.GGGGGG",
+    "GGGG.GGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    ".GGGGGGGGG",
+    ".GGGGGGGGG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG"
+   ]
+  },
+  {
+   "id": "R210.07",
+   "side": "R",
+   "t": 210.07,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     2
+    ],
+    [
+     17,
+     3
+    ],
+    [
+     17,
+     4
+    ],
+    [
+     18,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "OO........",
+    "OOZ.......",
+    "IZZ.......",
+    "IZTTTLLJJZ",
+    "IOOTSSLJZZ",
+    "IOOSS.LJZ."
+   ]
+  },
+  {
+   "id": "L215.7",
+   "side": "L",
+   "t": 215.7,
+   "lines": 1,
+   "cleared": [
+    10
+   ],
+   "t_cells": [
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     6
+    ],
+    [
+     10,
+     7
+    ],
+    [
+     11,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "....?.....",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    "LLL....SSI",
+    "LLLZZTTTSI",
+    "OOL.ZZTSSI",
+    "OOL.JJSSTI",
+    "JJJ.JOOTTI",
+    "LSJ.JOOSTI",
+    "LSS.TZZSSI",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG"
+   ]
+  },
+  {
+   "id": "R237.57",
+   "side": "R",
+   "t": 237.57,
+   "lines": 1,
+   "cleared": [
+    13
+   ],
+   "t_cells": [
+    [
+     11,
+     5
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".......?..",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..S...OO..",
+    "..SS.TOOZ.",
+    "JJJS.TTZZZ",
+    "JSJJJTTZZZ",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "????.?????"
+   ]
+  },
+  {
+   "id": "R269.9",
+   "side": "R",
+   "t": 269.9,
+   "lines": 2,
+   "cleared": [
+    16,
+    17
+   ],
+   "t_cells": [
+    [
+     16,
+     3
+    ],
+    [
+     16,
+     4
+    ],
+    [
+     16,
+     5
+    ],
+    [
+     17,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...J..?..I",
+    "...J.....I",
+    "OOJJ....JI",
+    "OOSTTTSSJI",
+    "OOSSTSSJJZ",
+    "OOIS...LZZ",
+    "JJISSZ.LLI"
+   ]
+  },
+  {
+   "id": "L306.87",
+   "side": "L",
+   "t": 306.87,
+   "lines": 1,
+   "cleared": [
+    15
+   ],
+   "t_cells": [
+    [
+     13,
+     7
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     15,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "S.........",
+    "SSJJJ.....",
+    "ISSSJZ.TLL",
+    "ISS.ZZTT.L",
+    "ITZZZOOTTL",
+    "GGGGGGGG.G",
+    "G.GGGGGGGG",
+    "GGGGGG.GGG",
+    "G.GGGGGGGG"
+   ]
+  },
+  {
+   "id": "L342.67",
+   "side": "L",
+   "t": 342.67,
+   "lines": 2,
+   "cleared": [
+    7,
+    8
+   ],
+   "t_cells": [
+    [
+     7,
+     5
+    ],
+    [
+     7,
+     6
+    ],
+    [
+     7,
+     7
+    ],
+    [
+     8,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    ".......SSI",
+    "SLLJJTTTSI",
+    "SSLJZZTOOI",
+    ".SLJ.ZZOOI",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGG.GGGGGG",
+    "GGGGGG.GGG",
+    ".GGGGGG?GG"
+   ]
+  },
+  {
+   "id": "R349.47",
+   "side": "R",
+   "t": 349.47,
+   "lines": 2,
+   "cleared": [
+    6,
+    7
+   ],
+   "t_cells": [
+    [
+     6,
+     2
+    ],
+    [
+     6,
+     3
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     7,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".........I",
+    ".S.......I",
+    ".SS...ZOOI",
+    "OOS..ZZOOI",
+    "OOTTTZLLJJ",
+    "GGGTGGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "G.GGGGGGGG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "R365.0",
+   "side": "R",
+   "t": 365.0,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     5
+    ],
+    [
+     8,
+     6
+    ],
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "OOJ.......",
+    "OOJ.....Z.",
+    "SJJZ...ZZZ",
+    "SSZZ...ZZZ",
+    "TSZZSTTTZL",
+    "TTZZSSTLLL",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG"
+   ]
+  },
+  {
+   "id": "L391.17",
+   "side": "L",
+   "t": 391.17,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     18,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......J..",
+    ".......JJJ",
+    "IIIISTTTLL",
+    "ZZZZSSTOOL",
+    ".ZZZZS.OOL"
+   ]
+  },
+  {
+   "id": "R391.53",
+   "side": "R",
+   "t": 391.53,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     18,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...L.....L",
+    ".LLL...LLL",
+    "IIIISTTTOO",
+    "ZZZZSSTJOO",
+    ".ZZZZS.JJJ"
+   ]
+  },
+  {
+   "id": "L400.77",
+   "side": "L",
+   "t": 400.77,
+   "lines": 3,
+   "cleared": [
+    11,
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ],
+    [
+     12,
+     6
+    ],
+    [
+     13,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........ZI",
+    ".......ZZI",
+    ".......ZLI",
+    "S.....LLLI",
+    "SS....OOJI",
+    "SS.Z..OOJI",
+    "SSZZ...JJI",
+    "ISZLLLTZZI",
+    "ILSLTTTJZZ",
+    "ILSSTTTJOO",
+    "ILLST.JJOO",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    ".GGGGGGGGG",
+    ".GGGGGGGGG",
+    "GGGGGGG.GG"
+   ]
+  },
+  {
+   "id": "L442.1",
+   "side": "L",
+   "t": 442.1,
+   "lines": 2,
+   "cleared": [
+    18,
+    19
+   ],
+   "t_cells": [
+    [
+     18,
+     3
+    ],
+    [
+     18,
+     4
+    ],
+    [
+     18,
+     5
+    ],
+    [
+     19,
+     4
+    ]
+   ],
+   "rows": [
+    "...?...??.",
+    "..?.....?.",
+    "......??..",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "LL........",
+    "IL........",
+    "IL.Z...JJ.",
+    "IJZZ..JJS.",
+    "IJZTTTJJSS",
+    "JJLSTJJOOS"
+   ]
+  },
+  {
+   "id": "R486.07",
+   "side": "R",
+   "t": 486.07,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     4
+    ],
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     18,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....Z.....",
+    "I..ZZ.....",
+    "IOOZTTTJJZ",
+    "IOOSSTLJZZ",
+    "I.SSLLLJZ."
+   ]
+  },
+  {
+   "id": "L579.43",
+   "side": "L",
+   "t": 579.43,
+   "lines": 2,
+   "cleared": [
+    6,
+    7
+   ],
+   "t_cells": [
+    [
+     6,
+     3
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     7,
+     4
+    ]
+   ],
+   "rows": [
+    ".......?..",
+    "...?..?...",
+    "....?..L?.",
+    ".......L..",
+    ".ZZ....LLI",
+    "..ZZ...JJI",
+    "OOSTTTZJJI",
+    "OOSSTZZJJI",
+    "LLLSZZ.JJI",
+    "LLLTOO.ZSI",
+    "JJTTOO.SSS",
+    "JOOTOO.SSS",
+    "GGGGGG.GGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GG.GGGGGGG",
+    "G.GGGGGGGG"
+   ]
+  },
+  {
+   "id": "L618.23",
+   "side": "L",
+   "t": 618.23,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     1
+    ],
+    [
+     13,
+     2
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     14,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...ZZ.....",
+    "...SZZ..S.",
+    "L..SSJ..SS",
+    "LTTTSJJJTS",
+    "LLTIIIITTT",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    ".GGGGGGGGG"
+   ]
+  },
+  {
+   "id": "R644.2",
+   "side": "R",
+   "t": 644.2,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     6
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     17,
+     8
+    ],
+    [
+     18,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "......Z...",
+    ".....ZZ..I",
+    "OOJJJZTTTI",
+    "OOSSJSSTLI",
+    ".SS.SSLLLI"
+   ]
+  },
+  {
+   "id": "L676.17",
+   "side": "L",
+   "t": 676.17,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     9,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    ".........Z",
+    "........ZZ",
+    "......I.ZI",
+    "......IJJI",
+    "LLL...IJII",
+    "LSS...IJII",
+    "SSTTTSSZIJ",
+    "OOJTSSZZIJ",
+    "OOJJJ.ZZJJ",
+    "SSIOO.ZZTT",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "L684.57",
+   "side": "L",
+   "t": 684.57,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     2
+    ],
+    [
+     10,
+     3
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     11,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....S.....",
+    "....SS....",
+    "JJTTTSLLLL",
+    "JZZTOOLLLL",
+    "J.ZZOOZJJZ",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGGG.",
+    "GGGGGGGGG.",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "R684.77",
+   "side": "R",
+   "t": 684.77,
+   "lines": 2,
+   "cleared": [
+    6,
+    7
+   ],
+   "t_cells": [
+    [
+     6,
+     6
+    ],
+    [
+     6,
+     7
+    ],
+    [
+     6,
+     8
+    ],
+    [
+     7,
+     7
+    ]
+   ],
+   "rows": [
+    "IT........",
+    "ITT.......",
+    "ITZOO.....",
+    "LZZOO.....",
+    "LZJJJOO...",
+    "LLLSJOO...",
+    "LLLSSSTTTZ",
+    "TJJJSSSTZZ",
+    "TTSJOOSJZ.",
+    "GGGGGGGGG.",
+    "GGGGGGGGG.",
+    "GGGGGGGGG.",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGG.GGGGGG",
+    "GGGG.GGGGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    ".GGGGGGGGG"
+   ]
+  },
+  {
+   "id": "R728.93",
+   "side": "R",
+   "t": 728.93,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     2
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     15,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "L.........",
+    "L...S..J..",
+    "LL..SS.JJJ",
+    "OOTTTSIIII",
+    "OOLTTTTZOO",
+    "S...ZZZJJT",
+    "SS.IIIIJTT",
+    "GGGGGG.GGG",
+    "?????????."
+   ]
+  },
+  {
+   "id": "R773.73",
+   "side": "R",
+   "t": 773.73,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     2
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     15,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".....?....",
+    "..........",
+    "..........",
+    "S.........",
+    "SS.....JJ.",
+    "JS....ZJOO",
+    "JJJ..ZZJOO",
+    "OOTTTZIIII",
+    "GGGTGGGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "R778.1",
+   "side": "R",
+   "t": 778.1,
+   "lines": 2,
+   "cleared": [
+    7,
+    8
+   ],
+   "t_cells": [
+    [
+     7,
+     1
+    ],
+    [
+     7,
+     2
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     8,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "........?.",
+    "..........",
+    "LL....I.?.",
+    "LL....IJJ.",
+    "LL....IJOO",
+    "LL....IJOO",
+    "STTTSSZJJJ",
+    "SSTSSZZJJJ",
+    "JS...ZZJOO",
+    "JJJ..ZZJOO",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG"
+   ],
+   "hand_reads": [
+    {
+     "cell": [
+      14,
+      4
+     ],
+     "read": "?",
+     "as": ".",
+     "why": "a garbage row is never full: rows 11-15 are one batch whose hole is column 4 (rows 11-13 read it empty); the reader saw the hole as grey"
+    },
+    {
+     "cell": [
+      15,
+      4
+     ],
+     "read": "G",
+     "as": ".",
+     "why": "a garbage row is never full: rows 11-15 are one batch whose hole is column 4 (rows 11-13 read it empty); the reader saw the hole as grey"
+    }
+   ]
+  },
+  {
+   "id": "L807.1",
+   "side": "L",
+   "t": 807.1,
+   "lines": 2,
+   "cleared": [
+    12,
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     1
+    ],
+    [
+     12,
+     2
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     13,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......JJJ",
+    ".......ZZJ",
+    "T....SZZZZ",
+    "TT...SSZZL",
+    "TTTTSSSLLL",
+    "OOTSSJJJOO",
+    "OO.IIIIJOO",
+    "GG.GGGGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGG.GG"
+   ]
+  },
+  {
+   "id": "R811.73",
+   "side": "R",
+   "t": 811.73,
+   "lines": 2,
+   "cleared": [
+    15,
+    16
+   ],
+   "t_cells": [
+    [
+     15,
+     4
+    ],
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     6
+    ],
+    [
+     16,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "......?...",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "ZZ........",
+    "JZZ...S...",
+    "JJJ...SSOO",
+    "IIIITTTSOO",
+    "GGGGGTGGGG",
+    "GGGGG.GGGG",
+    "GGGGGGGGG.",
+    "GGGGGGGGG."
+   ]
+  },
+  {
+   "id": "R839.4",
+   "side": "R",
+   "t": 839.4,
+   "lines": 2,
+   "cleared": [
+    15,
+    17
+   ],
+   "t_cells": [
+    [
+     15,
+     7
+    ],
+    [
+     16,
+     6
+    ],
+    [
+     16,
+     7
+    ],
+    [
+     17,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "...JJJOO..",
+    "IZZLLJOO..",
+    "ISZZLOO...",
+    "ISSJLOOTLL",
+    "IZSJZZTT.L",
+    "ZZJJJZZTSL",
+    "GGGGGGGG.G",
+    "GGGGGG.GGG"
+   ]
+  },
+  {
+   "id": "L850.47",
+   "side": "L",
+   "t": 850.47,
+   "lines": 2,
+   "cleared": [
+    9,
+    10
+   ],
+   "t_cells": [
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     7
+    ],
+    [
+     10,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I......LLL",
+    "IZZ....LOO",
+    "IJZZSTTTOO",
+    "IJJJSSTJJJ",
+    "ZZLL.SOOSJ",
+    "IZZL.IOOSS",
+    "IOOL.ILLTS",
+    "IOOT.ISLTT",
+    "GG.GGGGGGG",
+    "GGGGG.GGGG",
+    "GG.GGGGGGG",
+    "GGGGGGGGG.",
+    "GGGGGGGGG."
+   ]
+  },
+  {
+   "id": "L910.83",
+   "side": "L",
+   "t": 910.83,
+   "lines": 2,
+   "cleared": [
+    7,
+    8
+   ],
+   "t_cells": [
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     7,
+     6
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    ".......?..",
+    "......??..",
+    "..........",
+    "..........",
+    "......OO..",
+    "......OOSS",
+    "ZZZZTTTSSI",
+    "JZZZZTJJJI",
+    "JJJ...OOJI",
+    "LLL...OOSI",
+    "LSS...OOSS",
+    "LSS.ZJOOZZ",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "L942.03",
+   "side": "L",
+   "t": 942.03,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     5
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     15,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "II........",
+    "II.......L",
+    "IIS....LLL",
+    "IISSSTTTOO",
+    "LLLSSSTJOO",
+    "LZJJ.SSJJJ",
+    "ZZZZ.OOTLL",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "R964.9",
+   "side": "R",
+   "t": 964.9,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     18,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..T....S..",
+    ".TTT...SSI",
+    "SLLJJTTTSI",
+    "SSLJZZTOOI",
+    ".SLJ.ZZOOI"
+   ]
+  },
+  {
+   "id": "R999.5",
+   "side": "R",
+   "t": 999.5,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     18,
+     5
+    ],
+    [
+     18,
+     6
+    ],
+    [
+     19,
+     5
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "........OO",
+    "..IIII..OO",
+    "JJJLL...OO",
+    "ZZJJLTLLOO",
+    "SZZJLTTLLL",
+    "ISSZZT.LII"
+   ]
+  },
+  {
+   "id": "L1053.47",
+   "side": "L",
+   "t": 1053.47,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     2
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ],
+    [
+     14,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I......SSZ",
+    "IOO..JSSZZ",
+    "IOO..JJJZL",
+    "LSTTTSSLLL",
+    "LSSTSSIIII",
+    "LLS...ZOOJ",
+    "ILLL.ZZOOJ",
+    "ILSS.ZJJJJ",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "L1090.4",
+   "side": "L",
+   "t": 1090.4,
+   "lines": 2,
+   "cleared": [
+    15,
+    16
+   ],
+   "t_cells": [
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     6
+    ],
+    [
+     15,
+     7
+    ],
+    [
+     16,
+     6
+    ]
+   ],
+   "rows": [
+    ".?.?..?...",
+    "..?..?..?.",
+    ".......?..",
+    "...???.?..",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    ".......SSI",
+    "SLLZZTTTSI",
+    "SSLJZZTOOI",
+    ".SLJJJ.OOI",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG"
+   ]
+  },
+  {
+   "id": "R1164.37",
+   "side": "R",
+   "t": 1164.37,
+   "lines": 2,
+   "cleared": [
+    17,
+    18
+   ],
+   "t_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     17,
+     7
+    ],
+    [
+     18,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "?.........",
+    "?.........",
+    "?.........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".......S..",
+    ".......SSI",
+    "SLLJJTTTSI",
+    "SSLJZZTOOI",
+    ".SLJ.ZZOOI"
+   ]
+  },
+  {
+   "id": "L1171.4",
+   "side": "L",
+   "t": 1171.4,
+   "lines": 2,
+   "cleared": [
+    11,
+    12
+   ],
+   "t_cells": [
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    "....J....I",
+    "....J....I",
+    "OOSJJ..ZZI",
+    "OOSSSTTTZZ",
+    "SLLSSSTLLL",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GG.GGGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "R1179.17",
+   "side": "R",
+   "t": 1179.17,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     5
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     15,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "LL........",
+    "LL........",
+    "LL........",
+    "LL........",
+    "OO.OO...Z.",
+    "OOSOO..ZZI",
+    "ZZSS...ZJI",
+    "JZZSTTTTJI",
+    "JJJTTTTJJI",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G"
+   ]
+  },
+  {
+   "id": "L1183.17",
+   "side": "L",
+   "t": 1183.17,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     4
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     15,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "....ZZ....",
+    ".....ZZL..",
+    "LLJJTLLLOO",
+    "ILJTTSLLOO",
+    "ILJ.TSSLOO",
+    "ZZT.JJOOLI",
+    "ZTT.JJOOLI",
+    "GGG.GGGGGG",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "L1204.6",
+   "side": "L",
+   "t": 1204.6,
+   "lines": 2,
+   "cleared": [
+    7,
+    8
+   ],
+   "t_cells": [
+    [
+     7,
+     2
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     4
+    ],
+    [
+     8,
+     3
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "OO........",
+    "OO........",
+    "ZZ.......L",
+    "TZZ....LLL",
+    "TTTTTZJJJJ",
+    "TZZTZZJJJJ",
+    "OOZZZ..SSI",
+    "OOILS.SSLI",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GGGGGGGG.G",
+    "GGG.GGGGGG",
+    "GGGGG.GGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG"
+   ]
+  },
+  {
+   "id": "R1256.57",
+   "side": "R",
+   "t": 1256.57,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     5
+    ],
+    [
+     8,
+     6
+    ],
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    ".......?..",
+    "..........",
+    "..........",
+    "OO......?.",
+    "OOL....ZZ.",
+    "LLLZZTTTZZ",
+    "IIIIZZTOOI",
+    "JJJS...OOI",
+    "JJJSS..LLI",
+    "JJZZS...LI",
+    "OOITSS.LLL",
+    ".GGGGGGGGG",
+    ".GGGGGGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGG.GG"
+   ]
+  },
+  {
+   "id": "L1314.63",
+   "side": "L",
+   "t": 1314.63,
+   "lines": 2,
+   "cleared": [
+    14,
+    15
+   ],
+   "t_cells": [
+    [
+     14,
+     5
+    ],
+    [
+     14,
+     6
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     15,
+     6
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "LOO.......",
+    "LOO......I",
+    "LLS.OO...I",
+    "JJSSOO..JI",
+    "JZZSSTTTJI",
+    "JZZZSSTJJL",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG"
+   ]
+  },
+  {
+   "id": "R1383.6",
+   "side": "R",
+   "t": 1383.6,
+   "lines": 1,
+   "cleared": [
+    13
+   ],
+   "t_cells": [
+    [
+     12,
+     6
+    ],
+    [
+     12,
+     7
+    ],
+    [
+     12,
+     8
+    ],
+    [
+     13,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".....SS...",
+    "....SSTTTI",
+    "GGGGGGGTGG",
+    "G.GGGGGGGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "?????.????"
+   ]
+  },
+  {
+   "id": "R1393.1",
+   "side": "R",
+   "t": 1393.1,
+   "lines": 2,
+   "cleared": [
+    5,
+    6
+   ],
+   "t_cells": [
+    [
+     5,
+     2
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "rows": [
+    "JJJ.......",
+    "LLL.......",
+    "LOO.......",
+    "JOO...LL..",
+    "JJJ....L..",
+    "ZZTTTOOLOO",
+    "SZZTZOOJOO",
+    "GGGGG.GGGG",
+    "GGGGGGG.GG",
+    "GGGGGGG.GG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    "GGGGG.GGGG",
+    "GG.GGGGGGG",
+    "GGGGGG.GGG",
+    "GGGGGG.GGG",
+    "GGGGGGGG.G",
+    "GGGGGGGG.G",
+    ".GGGGGGGGG"
+   ]
+  },
+  {
+   "id": "L1410.97",
+   "side": "L",
+   "t": 1410.97,
+   "lines": 2,
+   "cleared": [
+    13,
+    14
+   ],
+   "t_cells": [
+    [
+     13,
+     7
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     14,
+     8
+    ],
+    [
+     15,
+     7
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "I.........",
+    "I......J..",
+    "I......J..",
+    "IZOOS.JJ..",
+    "ZZOOSSJ...",
+    "ZSSLLSJTLL",
+    "SSLLLJJTTL",
+    "IOOLLSST.L",
+    "GGGGG.GGGG",
+    "G.GGGGGGGG",
+    "GGGGG.GGGG",
+    "GGG.GGGGGG"
+   ]
+  },
+  {
+   "id": "L1479.93",
+   "side": "L",
+   "t": 1479.93,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     1
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     9,
+     2
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    ".........I",
+    "JJ.......I",
+    "JTTTSSLLLI",
+    "JZTSSJLZZI",
+    "ZZ...JJJZZ",
+    "ZSS..OO...",
+    "SS...OOTLL",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    ".GGGGGGGGG",
+    "GGGG.GGGGG",
+    "GGGG.GGGGG",
+    "GGGGGGGGG."
+   ]
+  },
+  {
+   "id": "L1585.5",
+   "side": "L",
+   "t": 1585.5,
+   "lines": 2,
+   "cleared": [
+    10,
+    11
+   ],
+   "t_cells": [
+    [
+     10,
+     3
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     11,
+     4
+    ]
+   ],
+   "rows": [
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..........",
+    "..L.......",
+    "..L...JJ..",
+    ".ZLL..JLOO",
+    "ZZTTTTJLOO",
+    "OOSSTJSSJJ",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    "GGGG.GGGGG",
+    "G.GGGGGGGG",
+    "G.GGGGGGGG"
+   ]
+  },
+  {
+   "id": "R1596.53",
+   "side": "R",
+   "t": 1596.53,
+   "lines": 2,
+   "cleared": [
+    8,
+    9
+   ],
+   "t_cells": [
+    [
+     8,
+     1
+    ],
+    [
+     8,
+     2
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     9,
+     2
+    ]
+   ],
+   "rows": [
+    "..?....?..",
+    "..?....?..",
+    "..?.????..",
+    "..........",
+    "..........",
+    "L.........",
+    "L.......OO",
+    "LL......OO",
+    "STTTSSZOOI",
+    "SSTSSZZOOI",
+    "LS...ZJJJI",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "GG.GGGGGGG",
+    "G.GGGGGGGG",
+    "GG.GGGGGGG",
+    "GGGGG.GGGG",
+    "GGGGG.GGGG",
+    ".GGGGGGGGG"
+   ]
+  }
+ ],
+ "technique_examples": [
+  {
+   "board": "L77.37",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": false,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       11,
+       3
+      ],
+      [
+       12,
+       3
+      ],
+      [
+       13,
+       3
+      ],
+      [
+       13,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L117.23",
+   "page": "parapet",
+   "variant": "parapet_tss",
+   "mirrored": false,
+   "whole_board": "basic.o",
+   "key_cells": [
+    [
+     6,
+     0
+    ],
+    [
+     6,
+     3
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     7,
+     0
+    ],
+    [
+     8,
+     0
+    ],
+    [
+     8,
+     1
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       6,
+       0
+      ],
+      [
+       7,
+       0
+      ],
+      [
+       8,
+       0
+      ],
+      [
+       8,
+       1
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L342.67",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     8,
+     5
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     3
+    ],
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     3
+    ]
+   ],
+   "reasons": [
+    "dpc"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L579.43",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     5,
+     2
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     7,
+     6
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       6,
+       6
+      ],
+      [
+       7,
+       5
+      ],
+      [
+       7,
+       6
+      ],
+      [
+       8,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L676.17",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "s3.s",
+   "key_cells": [
+    [
+     7,
+     1
+    ],
+    [
+     7,
+     2
+    ],
+    [
+     8,
+     5
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     10,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       8,
+       5
+      ],
+      [
+       9,
+       4
+      ],
+      [
+       9,
+       5
+      ],
+      [
+       10,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L684.57",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     1
+    ],
+    [
+     11,
+     2
+    ],
+    [
+     11,
+     1
+    ],
+    [
+     12,
+     2
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       10,
+       1
+      ],
+      [
+       11,
+       2
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       12,
+       2
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L684.57",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     10,
+     1
+    ],
+    [
+     10,
+     0
+    ],
+    [
+     11,
+     2
+    ],
+    [
+     11,
+     1
+    ],
+    [
+     11,
+     0
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     12,
+     2
+    ],
+    [
+     12,
+     0
+    ]
+   ],
+   "reasons": [
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L850.47",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     8,
+     8
+    ],
+    [
+     8,
+     7
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     11,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       9,
+       4
+      ],
+      [
+       10,
+       5
+      ],
+      [
+       10,
+       4
+      ],
+      [
+       11,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L850.47",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     9,
+     4
+    ],
+    [
+     9,
+     3
+    ],
+    [
+     10,
+     5
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     3
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     5
+    ],
+    [
+     11,
+     3
+    ]
+   ],
+   "reasons": [
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L910.83",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L942.03",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     13,
+     8
+    ],
+    [
+     13,
+     7
+    ],
+    [
+     14,
+     4
+    ],
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     4
+    ],
+    [
+     16,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       14,
+       4
+      ],
+      [
+       15,
+       5
+      ],
+      [
+       15,
+       4
+      ],
+      [
+       16,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L942.03",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     14,
+     4
+    ],
+    [
+     14,
+     3
+    ],
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     4
+    ],
+    [
+     15,
+     3
+    ],
+    [
+     16,
+     6
+    ],
+    [
+     16,
+     5
+    ],
+    [
+     16,
+     3
+    ]
+   ],
+   "reasons": [
+    "fragment",
+    "kaidan_window"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L1053.47",
+   "page": "cutcopy",
+   "variant": "uncut",
+   "mirrored": true,
+   "whole_board": "uncut.spin",
+   "key_cells": [
+    [
+     12,
+     2
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1053.47",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "feature.spin",
+   "key_cells": [
+    [
+     13,
+     5
+    ],
+    [
+     13,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1171.4",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": false,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     10,
+     4
+    ],
+    [
+     10,
+     7
+    ],
+    [
+     10,
+     8
+    ],
+    [
+     11,
+     4
+    ],
+    [
+     12,
+     4
+    ],
+    [
+     12,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       10,
+       4
+      ],
+      [
+       11,
+       4
+      ],
+      [
+       12,
+       4
+      ],
+      [
+       12,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "L1183.17",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     11,
+     4
+    ],
+    [
+     11,
+     5
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1204.6",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "s3.s",
+   "key_cells": [
+    [
+     6,
+     1
+    ],
+    [
+     6,
+     2
+    ],
+    [
+     7,
+     5
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     5
+    ],
+    [
+     9,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       7,
+       5
+      ],
+      [
+       8,
+       4
+      ],
+      [
+       8,
+       5
+      ],
+      [
+       9,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1410.97",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     11,
+     7
+    ],
+    [
+     11,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1479.93",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "L1585.5",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": true,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     9,
+     6
+    ],
+    [
+     9,
+     3
+    ],
+    [
+     9,
+     2
+    ],
+    [
+     10,
+     6
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       9,
+       6
+      ],
+      [
+       10,
+       6
+      ],
+      [
+       11,
+       6
+      ],
+      [
+       11,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R98.9",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": false,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       11,
+       3
+      ],
+      [
+       12,
+       3
+      ],
+      [
+       13,
+       3
+      ],
+      [
+       13,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R210.07",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": false,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     17,
+     5
+    ],
+    [
+     17,
+     6
+    ],
+    [
+     18,
+     4
+    ],
+    [
+     18,
+     5
+    ],
+    [
+     18,
+     6
+    ],
+    [
+     19,
+     3
+    ],
+    [
+     19,
+     4
+    ],
+    [
+     19,
+     6
+    ]
+   ],
+   "reasons": [
+    "dpc"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R237.57",
+   "page": "parapet",
+   "variant": "parapet_tss",
+   "mirrored": false,
+   "whole_board": "basic.o",
+   "key_cells": [
+    [
+     11,
+     3
+    ],
+    [
+     11,
+     6
+    ],
+    [
+     11,
+     7
+    ],
+    [
+     12,
+     3
+    ],
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       11,
+       3
+      ],
+      [
+       12,
+       3
+      ],
+      [
+       13,
+       3
+      ],
+      [
+       13,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R269.9",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     16,
+     6
+    ],
+    [
+     16,
+     7
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R365.0",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": true,
+   "whole_board": "s3.s",
+   "key_cells": [
+    [
+     7,
+     8
+    ],
+    [
+     7,
+     7
+    ],
+    [
+     8,
+     4
+    ],
+    [
+     9,
+     5
+    ],
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     5
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       8,
+       4
+      ],
+      [
+       9,
+       5
+      ],
+      [
+       9,
+       4
+      ],
+      [
+       10,
+       5
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "fragment",
+    "garbage_in_shape",
+    "z_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R684.77",
+   "page": "kaidan",
+   "variant": "kaidan",
+   "mirrored": false,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     5,
+     5
+    ],
+    [
+     5,
+     6
+    ],
+    [
+     6,
+     9
+    ],
+    [
+     7,
+     8
+    ],
+    [
+     7,
+     9
+    ],
+    [
+     8,
+     8
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "z",
+     "cells": [
+      [
+       6,
+       9
+      ],
+      [
+       7,
+       8
+      ],
+      [
+       7,
+       9
+      ],
+      [
+       8,
+       8
+      ]
+     ]
+    }
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R728.93",
+   "page": "cutcopy",
+   "variant": "uncut",
+   "mirrored": false,
+   "whole_board": "uncut.spin",
+   "key_cells": [
+    [
+     13,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R728.93",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "feature.spin",
+   "key_cells": [
+    [
+     14,
+     1
+    ],
+    [
+     14,
+     0
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R773.73",
+   "page": "parapet",
+   "variant": "parapet",
+   "mirrored": true,
+   "whole_board": "tsd.spin",
+   "key_cells": [
+    [
+     13,
+     5
+    ],
+    [
+     13,
+     2
+    ],
+    [
+     13,
+     1
+    ],
+    [
+     14,
+     5
+    ],
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     4
+    ]
+   ],
+   "one_piece": [
+    {
+     "name": "l",
+     "cells": [
+      [
+       13,
+       5
+      ],
+      [
+       14,
+       5
+      ],
+      [
+       15,
+       5
+      ],
+      [
+       15,
+       4
+      ]
+     ]
+    }
+   ],
+   "reasons": [
+    "garbage_in_shape",
+    "l_not_one_piece"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R778.1",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     5
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R839.4",
+   "page": "imperialcross",
+   "variant": "imperialcross",
+   "mirrored": true,
+   "whole_board": "tsd.oz",
+   "key_cells": [
+    [
+     13,
+     7
+    ],
+    [
+     13,
+     6
+    ],
+    [
+     14,
+     6
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R999.5",
+   "page": "stsd",
+   "variant": "stsd",
+   "mirrored": true,
+   "whole_board": "basic.spin",
+   "key_cells": [
+    [
+     15,
+     5
+    ],
+    [
+     15,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R1164.37",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": true,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     17,
+     4
+    ],
+    [
+     17,
+     3
+    ],
+    [
+     18,
+     5
+    ],
+    [
+     18,
+     4
+    ],
+    [
+     18,
+     3
+    ],
+    [
+     19,
+     6
+    ],
+    [
+     19,
+     5
+    ],
+    [
+     19,
+     3
+    ]
+   ],
+   "reasons": [
+    "dpc"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R1179.17",
+   "page": "cutcopy",
+   "variant": "cutcopy",
+   "mirrored": false,
+   "whole_board": "hole.osz",
+   "key_cells": [
+    [
+     13,
+     3
+    ],
+    [
+     13,
+     7
+    ],
+    [
+     13,
+     8
+    ],
+    [
+     12,
+     4
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R1256.57",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": true,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     3
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  },
+  {
+   "board": "R1393.1",
+   "page": "shachikutrain",
+   "variant": "shachikutrain",
+   "mirrored": false,
+   "whole_board": "w4.build",
+   "key_cells": [
+    [
+     5,
+     5
+    ],
+    [
+     5,
+     6
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     6,
+     5
+    ],
+    [
+     6,
+     6
+    ],
+    [
+     7,
+     3
+    ],
+    [
+     7,
+     4
+    ],
+    [
+     7,
+     6
+    ]
+   ],
+   "reasons": [
+    "fragment",
+    "garbage_in_shape"
+   ],
+   "verdict": "rejected"
+  },
+  {
+   "board": "R1596.53",
+   "page": "stmbcave",
+   "variant": "stmbcave",
+   "mirrored": false,
+   "whole_board": "basic.build",
+   "key_cells": [
+    [
+     8,
+     4
+    ],
+    [
+     8,
+     5
+    ]
+   ],
+   "reasons": [],
+   "verdict": "qualifies"
+  }
+ ],
+ "dpc_examples": [
+  {
+   "board": "L175.07",
+   "pc_t": 153.2,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 21.87,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 8
+  },
+  {
+   "board": "L215.7",
+   "pc_t": 207.5,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 8.2,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 4
+  },
+  {
+   "board": "L306.87",
+   "pc_t": 298.7,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 8.17,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 4
+  },
+  {
+   "board": "L342.67",
+   "pc_t": 339.5,
+   "setups": [
+    [
+     "p01.000",
+     true
+    ],
+    [
+     "p02.000",
+     false
+    ],
+    [
+     "p06.000",
+     false
+    ],
+    [
+     "p08.000",
+     true
+    ],
+    [
+     "p10.000",
+     true
+    ]
+   ],
+   "near_setups": [],
+   "gap_s": 3.17,
+   "kind": "matched",
+   "pc_after": false,
+   "garbage_rows": 10
+  },
+  {
+   "board": "L391.17",
+   "pc_t": 387.8,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 3.37,
+   "kind": "new",
+   "pc_after": true,
+   "garbage_rows": 0
+  },
+  {
+   "board": "L400.77",
+   "pc_t": 394.4,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 6.37,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 5
+  },
+  {
+   "board": "L442.1",
+   "pc_t": 422.4,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 19.7,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "L618.23",
+   "pc_t": 615.0,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 3.23,
+   "kind": "new",
+   "pc_after": false,
+   "garbage_rows": 5
+  },
+  {
+   "board": "L807.1",
+   "pc_t": 802.0,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 5.1,
+   "kind": "new",
+   "pc_after": false,
+   "garbage_rows": 5
+  },
+  {
+   "board": "L1090.4",
+   "pc_t": 1087.2,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 3.2,
+   "kind": "new",
+   "pc_after": false,
+   "garbage_rows": 2
+  },
+  {
+   "board": "L1314.63",
+   "pc_t": 1302.2,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 12.43,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 4
+  },
+  {
+   "board": "R210.07",
+   "pc_t": 206.9,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 3.17,
+   "kind": "new",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R349.47",
+   "pc_t": 339.9,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 9.57,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 13
+  },
+  {
+   "board": "R391.53",
+   "pc_t": 388.4,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 3.13,
+   "kind": "new",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R486.07",
+   "pc_t": 483.4,
+   "setups": [
+    [
+     "p03.000",
+     false
+    ],
+    [
+     "p04.000",
+     true
+    ]
+   ],
+   "near_setups": [],
+   "gap_s": 2.67,
+   "kind": "matched",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R644.2",
+   "pc_t": 640.9,
+   "setups": [
+    [
+     "p07.000",
+     false
+    ],
+    [
+     "p09.000",
+     true
+    ]
+   ],
+   "near_setups": [],
+   "gap_s": 3.3,
+   "kind": "matched",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R811.73",
+   "pc_t": 802.4,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 9.33,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 4
+  },
+  {
+   "board": "R964.9",
+   "pc_t": 961.5,
+   "ignore_cells": [
+    [
+     15,
+     2
+    ],
+    [
+     16,
+     1
+    ],
+    [
+     16,
+     2
+    ],
+    [
+     16,
+     3
+    ]
+   ],
+   "note": "くるまDPC 嘅形，不過上面多咗一粒 T",
+   "setups": [],
+   "near_setups": [
+    [
+     "p01.000",
+     true
+    ],
+    [
+     "p02.000",
+     false
+    ],
+    [
+     "p06.000",
+     false
+    ],
+    [
+     "p08.000",
+     true
+    ],
+    [
+     "p10.000",
+     true
+    ]
+   ],
+   "gap_s": 3.4,
+   "kind": "near",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R1164.37",
+   "pc_t": 1161.5,
+   "setups": [
+    [
+     "p01.000",
+     true
+    ],
+    [
+     "p02.000",
+     false
+    ],
+    [
+     "p06.000",
+     false
+    ],
+    [
+     "p08.000",
+     true
+    ],
+    [
+     "p10.000",
+     true
+    ]
+   ],
+   "near_setups": [],
+   "gap_s": 2.87,
+   "kind": "matched",
+   "pc_after": false,
+   "garbage_rows": 0
+  },
+  {
+   "board": "R1383.6",
+   "pc_t": 1374.4,
+   "setups": [],
+   "near_setups": [],
+   "gap_s": 9.2,
+   "kind": "late",
+   "pc_after": false,
+   "garbage_rows": 0
+  }
+ ]
+}

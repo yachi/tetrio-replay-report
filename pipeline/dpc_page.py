@@ -37,6 +37,7 @@ import sys
 from pipeline import replay_page as RP
 from pipeline import replay_section as RS
 from pipeline import route_page as RT
+from pipeline import video_examples as VE
 from pipeline import technique_page as TP
 from pipeline.claims.build_claims import SIMPLIFIED
 
@@ -271,6 +272,9 @@ class DpcSite:
             out.append("    </div>")
         out += ["  </section>"]
 
+        # the boards read off one match video, in a section of their own (pipeline/video_examples.py)
+        out += VE.section("dpc")
+
         # 5. the case index
         out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["cases"])}</h2>', f'    <p>{_esc(S["cases_note"])}</p>',
                 '    <div class="scp-index-wrap"><table class="scp-table">',
@@ -293,7 +297,7 @@ class DpcSite:
     # ------------------------------------------------------------ the audit
 
     def audit(self, page, tr, art, repo=REPO):
-        bad = RP.audit_quarantine(page, self.REQUIRED, DATA_ID)
+        bad = RP.audit_quarantine(page, self.REQUIRED, DATA_ID) + VE.audit(page, "dpc")
         if set(page) & SIMPLIFIED:
             bad.append(f"the page carries simplified glyph(s) {sorted(set(page) & SIMPLIFIED)}")
         vis = RT._visible(page)
