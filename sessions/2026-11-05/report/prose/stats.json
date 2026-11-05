@@ -1,0 +1,43 @@
+{
+  "eyebrow": "TODO · 數據對決",
+  "title": "數據對決",
+  "lede": "TODO：呢一段未寫。",
+  "panels": [
+    {
+      "heading": "TODO — 逐場 VS 走勢",
+      "caps": [
+        "TODO：呢句圖說未寫。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "vs-small-multiples",
+        "class": "sm-grid",
+        "scroll_x": false
+      }
+    },
+    {
+      "heading": "TODO — 清行類型分布",
+      "caps": [
+        "TODO：呢句圖說未寫。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "clears-bar-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    },
+    {
+      "heading": "TODO — 身手大比拼",
+      "caps": [
+        "TODO：呢句圖說未寫。"
+      ],
+      "footnote": null,
+      "mount": {
+        "id": "tape-chart",
+        "class": null,
+        "scroll_x": true
+      }
+    }
+  ]
+}

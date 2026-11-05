@@ -1081,6 +1081,8 @@ LAYOUT = [
 # they need no empty pair here. Each entry says why, because "it is missing" and
 # "it is deliberately absent" look identical in the output.
 SELF_INSERTING = {
+    "video": "conditional — only a session with video/video.json gets one; build_report inserts "
+             "it before the stats region's BEGIN marker, right after 戰況",
     "routes-techniques": "conditional — only a report under sessions/<date>/ with sim/opener-facts.json "
                          "gets one (a filtered subset has no sim/ directory); build_report inserts it "
                          "before the moments region's BEGIN marker, right after 數據對決",
