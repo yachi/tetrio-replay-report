@@ -1153,10 +1153,18 @@
 
 <!-- BEGIN generated coaching (pipeline/build_report.py) -->
 <section id="coaching">
+    <style>
+      /* scoped, cs- prefixed: this <style> lands in the body (see the module docstring) */
+      #coaching .cs-unproven { display: inline-block; font-size: .72rem; padding: .02rem .4rem;
+        margin-right: .4rem; border: 1px dashed currentColor; border-radius: .3rem;
+        text-decoration: none; opacity: .8; }
+      #coaching .cs-note { font-size: .85rem; opacity: .8; }
+    </style>
   <div class="wrap-wide">
     <div class="eyebrow">教練分析 · 兩邊</div>
     <h2 class="section-title">俾兩位嘅建議</h2>
     <p class="section-lede">今晚 pinglamb 每粒方塊嘅攻擊高 6.14%<span class="badge" data-claim="C004"></span>，yachi 嘅粒數盈餘有 5.69%<span class="badge" data-claim="C009"></span>，總攻擊淨係少 18 條<span class="badge" data-claim="C005"></span>。<strong>個窿全部喺贏局</strong>：贏局 pinglamb 高 12.73%、輸局反而係 yachi 高 1.91%<span class="badge" data-claim="C002"></span>。</p>
+    <p class="cs-note">標住「未經證明」嘅建議，係用上面「定式路線同中盤手法」嗰節嘅模擬器數字寫嘅：<strong>冇 ✓、唔屬於信任鏈</strong>，啲數喺嗰節逐個搵得返。</p>
 
     <div class="rec-grid">
       <div class="rec-col for-yachi">
@@ -1171,6 +1179,7 @@
           <li><span class="rec-num">1</span><strong>輸局你已經重過對手，差距喺贏局。</strong>輸嗰啲局你每粒高 1.91%，贏嗰啲局對手高 12.73%<span class="badge" data-claim="C002"></span>——你贏嘅時候冇對手贏嘅時候咁重。要追嘅係贏局嘅每粒重量。</li>
           <li><span class="rec-num">2</span><strong>三場 4 比 5。</strong>第二、第五、第八場都輸喺第九局<span class="badge" data-claim="G012"></span>，第二場 2 比 0 開局<span class="badge" data-claim="C012"></span>、第五場 3 比 1 領先<span class="badge" data-claim="C015"></span>。</li>
           <li><span class="rec-num">3</span><strong>自己頂到頂 5 局，多過對手嘅 3 局</strong><span class="badge" data-claim="C006"></span>。</li>
+          <li class="cs-sim"><span class="rec-num">4</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>STSD 6 次接到第二個 T-spin 5 次</strong>，途中DT砲 5 次接到 4 次；冇接到嗰次 STSD 係個位俾其他棋填咗 1。打完第一個 TSD 之後，下一粒 T 嚟之前唔好擺嘢入嗰個位。（<a href="stsd.html">STSD 頁</a>有圖）</li>
         </ol>
       </div>
 
@@ -1186,6 +1195,7 @@
           <li><span class="rec-num">1</span><strong>輸局你每粒輕過對手。</strong>輸嗰啲局 yachi 高你 1.91%<span class="badge" data-claim="C002"></span>，係 corpus 第一次。</li>
           <li><span class="rec-num">2</span><strong>八場有七場每粒都高過對手</strong><span class="badge" data-claim="C019"></span>，但係第七場例外，嗰場你 3 比 5 輸<span class="badge" data-claim="C017"></span>。</li>
           <li><span class="rec-num">3</span>第二場你總攻擊少一條都贏到<span class="badge" data-claim="C020"></span>；三場 5 比 4 全部係你<span class="badge" data-claim="G012"></span>。</li>
+          <li class="cs-sim"><span class="rec-num">4</span><a class="cs-unproven" href="#routes-techniques">未經證明</a><strong>迷走砲 39 局有 32 局行到第二巡。</strong>基本的なドネイト 4 次一次 Tetris 都冇接到，其中 2 次條井俾 I 以外嘅棋填咗——捐完個窿，留條井俾 I。（<a href="basicdonating.html">基本的なドネイト頁</a>有圖）</li>
         </ol>
       </div>
 
