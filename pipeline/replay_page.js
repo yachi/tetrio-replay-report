@@ -30,6 +30,13 @@
   var nowEl = document.getElementById("rpg-now");
   var notesEl = root.querySelector(".rpg-notes");
   var labelsEl = root.querySelector(".rpg-labels");
+  var videoA = document.querySelector(".rpg-video-a");   // only when the night has a video
+  function videoAt(frames) {
+    if (!videoA || !DATA.video || cur == null || cur.vs == null) return;
+    var s = Math.max(0, Math.floor(cur.vs + frames / DATA.video.fps - DATA.video.lead));
+    var h = DATA.video.url + "&t=" + s + "s";
+    if (videoA.href !== h) videoA.href = h;
+  }
   var labelsLead = labelsEl.textContent;
   var flagEl = root.querySelector(".rpg-flag");
   var missingEl = root.querySelector(".rpg-missing");
@@ -207,7 +214,7 @@
       hashPrefix: null,
       pos: pos,
       onChange: function (p, frames, playing) {
-        playhead = frames; drawChart();
+        playhead = frames; drawChart(); videoAt(frames);
         /* never while playing: notify() fires every animation frame, and WebKit throws once a
            page passes ~100 history calls in a short window, which would kill the rAF loop.
            pause() -> still() -> notify() reports the final position with playing false. */
@@ -215,6 +222,7 @@
       }
     });
     quiet = false;
+    videoAt(playhead || 0);
     chartLabel();
     drawChart();
     return box;

@@ -34,6 +34,8 @@ import re
 import sys
 from pathlib import Path
 
+from pipeline import video_links as VL
+
 NUM = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
 
 # Longest form first; a bare mN must not be the head of an mNrN.
@@ -73,12 +75,14 @@ def href(session, m, r):
 
 
 class Linker:
-    def __init__(self, session, rounds, files=None):
+    def __init__(self, session, rounds, files=None, video=None):
         self.session = session
+        self.video = video            # video_links.Video, or None: no video links
         self.rounds = rounds          # {match index: number of rounds}
         self.files = files or {}      # {replay file name: match index}
         self.match_alias = None       # {第 N 場's N: match index}, where N is not the position
         self.linked = 0
+        self.videoed = 0
         self.unresolved = []
 
     def _a(self, m, r, text):
@@ -87,7 +91,14 @@ class Linker:
             self.unresolved.append(text)
             return None
         self.linked += 1
-        return f'<a class="{LINK_CLASS}" href="{html.escape(href(self.session, m, r))}">{text}</a>'
+        a = f'<a class="{LINK_CLASS}" href="{html.escape(href(self.session, m, r))}">{text}</a>'
+        if self.video is not None:
+            # Empty text, drawn by VIDEO_CSS: the page's text must not change (`_same_text`).
+            v = self.video.round_url(m, r)
+            if v is not None:
+                self.videoed += 1
+                a += VL.anchor(v, text="", cls=VL.CLASS).replace(" title=", ' aria-label="影片" title=', 1)
+        return a
 
     def text(self, s, card=None):
         """Link every reference in one text node (no tags inside)."""
@@ -171,7 +182,16 @@ CARD_JS = """<script id="%s">
 /* Published-site only (pipeline/replay_links.py): the match cards are built by the report's own
    script, so their 第 N 場 heading and their pips are linked here, by structure, after it runs. */
 document.addEventListener("DOMContentLoaded", function () {
-  var base = %s;
+  var base = %s, vid = %s;
+  function video(key, small) {
+    var u = vid && vid[key];
+    if (!u) return null;
+    var v = document.createElement("a");
+    v.className = small ? "rl-v rl-v-pip" : "rl-v";
+    v.href = u; v.target = "_blank"; v.rel = "noopener";
+    v.title = %s; v.setAttribute("aria-label", "影片");
+    return v;
+  }
   document.querySelectorAll(".match-card").forEach(function (card) {
     var idx = card.querySelector(".mc-idx");
     var mo = idx && /第 (\\d+) 場/.exec(idx.textContent);
@@ -182,6 +202,8 @@ document.addEventListener("DOMContentLoaded", function () {
     a.href = base + "#m" + m + "r1";
     while (idx.firstChild) a.appendChild(idx.firstChild);
     idx.appendChild(a);
+    var hv = video("m" + m + "r1");
+    if (hv) idx.appendChild(hv);
     card.querySelectorAll(".pip-trail .pip").forEach(function (pip, i) {
       var p = document.createElement("a");
       for (var k = 0; k < pip.attributes.length; k++) p.setAttribute(pip.attributes[k].name, pip.attributes[k].value);
@@ -189,15 +211,41 @@ document.addEventListener("DOMContentLoaded", function () {
       p.style.cursor = "pointer";
       pip.parentNode.replaceChild(p, pip);
     });
+    var trail = card.querySelector(".pip-trail");
+    if (trail && vid) {
+      var row = document.createElement("div");
+      row.className = "rl-vtrail";
+      row.appendChild(document.createTextNode("影片："));
+      trail.querySelectorAll(".pip").forEach(function (pip, i) {
+        var v = video("m" + m + "r" + (i + 1), true);
+        if (v) { v.textContent = String(i + 1); row.appendChild(v); }
+      });
+      trail.parentNode.insertBefore(row, trail.nextSibling);
+    }
   });
 });
 </script>
 """
 
 
-def link_report(page, session, rounds, files=None):
-    """report.html's text -> the published page's. Returns (html, Linker)."""
-    lk = Linker(session, rounds, files)
+VIDEO_CSS = """<style id="rl-video">
+/* Published-site only (pipeline/replay_links.py + video_links.py): a video link beside every replay
+   link. Drawn by CSS so the page's text stays report.html's. */
+a.rl-v { text-decoration: none; margin-left: .15em; font-size: .78em; color: var(--muted); }
+a.rl-v:empty::after { content: "\\25B6\\FE0E"; }
+a.rl-v:hover { color: var(--ink, inherit); }
+.rl-vtrail { margin: .3rem 0 0; font-size: .72rem; color: var(--muted); display: flex;
+  flex-wrap: wrap; gap: .1rem .45rem; align-items: baseline; }
+.rl-vtrail a.rl-v-pip { margin: 0; font-size: inherit; font-family: var(--font-mono, monospace); }
+.rl-vtrail a.rl-v-pip::before { content: "\\25B6\\FE0E"; font-size: .8em; margin-right: .1em; }
+</style>
+"""
+
+
+def link_report(page, session, rounds, files=None, video=None):
+    """report.html's text -> the published page's. Returns (html, Linker). `video` is the
+    session's video_links.Video, or None for a session without a video."""
+    lk = Linker(session, rounds, files, video)
     island = re.compile(r'(<script type="application/json" id="match-copy">)(.*?)(</script>)', re.S)
     mo = island.search(page)
     if mo:
@@ -223,7 +271,14 @@ def link_report(page, session, rounds, files=None):
         page = page[:mo.start(2)] + lk.fragment(mo.group(2)) + page[mo.end(2):]
         lk.match_alias = None
     out = lk.fragment(page)
-    js = CARD_JS % (CARD_SCRIPT_ID, json.dumps(f"{session}-replay.html"), LINK_CLASS)
+    vid = None
+    if video is not None:
+        vid = {f"m{m}r{r}": u for m, n in sorted(rounds.items()) for r in range(1, n + 1)
+               for u in [video.round_url(m, r)] if u is not None}
+    js = CARD_JS % (CARD_SCRIPT_ID, json.dumps(f"{session}-replay.html"),
+                    json.dumps(vid, ensure_ascii=False), json.dumps(VL.TITLE, ensure_ascii=False), LINK_CLASS)
+    if video is not None:
+        js = VIDEO_CSS + js
     # The report shell is a body fragment that ends on its last script; the card linker follows it.
     i = out.rfind("</body>")
     i = len(out) if i < 0 else i
@@ -284,6 +339,17 @@ def _selftest():
             bad.append(f"page lacks {want}")
     if "#m2r10" in out or "R10" not in l2.unresolved:
         bad.append("R10 past the match's end was linked")
+    # A video beside every replay link, without changing the page's text.
+    vid = VL.Video({"schema": VL.SCHEMA, "video": {"url": "https://v.example/w?v=X"},
+                    "alignment": {"link_lead_s": 5},
+                    "matches": [{"position": 3, "rounds": [{"round": 5, "play_start_s": 65.5}]}]})
+    ov, lv = link_report(page, S, rounds, video=vid)
+    if 'class="rl-v" href="https://v.example/w?v=X&amp;t=60s"' not in ov or lv.videoed != 1:
+        bad.append(f"no video link beside m3r5 (videoed {lv.videoed})")
+    if 'id="rl-video"' not in ov or 'id="rl-video"' in out:
+        bad.append("the video CSS is missing with a video, or present without one")
+    if re.search(r'class="rl-v"[^>]*>[^<]', ov):
+        bad.append("a report video link carries visible text")
     # The text-equality guard must fire on a linker that alters text.
     orig = Linker.text
     Linker.text = lambda self, s, card=None: s[1:]
@@ -296,7 +362,7 @@ def _selftest():
         Linker.text = orig
     for b in bad:
         print("FAIL", b)
-    print(f"{'ok ' if not bad else 'FAIL'} replay_links selftest: {len(cases) + 6} cases")
+    print(f"{'ok ' if not bad else 'FAIL'} replay_links selftest: {len(cases) + 9} cases")
     return 1 if bad else 0
 
 
