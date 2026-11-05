@@ -32,7 +32,7 @@ const size = (id: string) => drawnCells(byId.get(id).rows, TR.empty_letters).siz
 
 /** How many boards carry each kind of reason (the reasons themselves are re-derived below, board by board). */
 const KINDS = { odd: 14, not_mult4: 6, no_build_board: 46, after: 2, illustration: 2, no_on: 3, question_mismatch: 2,
-                external: 9 };
+                external: 12 };
 
 test('byte rebuild: the committed demos are what the planner produces now', () => {
   expect(serialise(build(BASICDONATING, BASICDONATING_DEMOS))).toBe(committedText);
