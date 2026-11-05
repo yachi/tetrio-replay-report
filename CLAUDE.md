@@ -4210,6 +4210,15 @@ must see a label appear. The report's 最癲一局 region passes no labels and i
 TKI-3, PCO, DT Cannon and the harddrop-field columns are NOT labelled: `opener-facts.json` holds their counts, not
 which rounds matched, so labelling them means an emitter change that re-emits every session's artefact.
 
+**Every replay link has a video link beside it, for a night with `sessions/<date>/video/video.json`**
+(since 2026-11-05, yachi: 「whenever there's replay references」). `pipeline/video_links.py` is the one
+reader: a round opens at its `play_start_s`, a moment at `play_start_s + frames/60` (a replay frame counts
+from the round's start; its first lock lands under a second in), both `link_lead_s` early and floored to a
+second. `replay_links` adds an EMPTY `a.rl-v` after each replay link (drawn by its injected CSS, so
+`_same_text` holds) plus a 影片 row under each match card's pips; the replay page's ▶ link follows the
+playhead; the technique, route, DPC and second-PC case links and the report's routes-techniques cells
+carry 「▶ 影片」. Video tier: never badged or counted, and a night without the file gets no link.
+
 **Every player-round admits since 2026-10-31.** `TL_DEFAULTS` in `oracle-source.ts` had `clutch: false`;
 TETR.IO's own options list (tetr.io/js/tetrio.js, the 2026-10-23 build, read by hand that day; nothing
 of it committed, so a new build is not noticed) defaults it to true. With clutch the game walks a piece

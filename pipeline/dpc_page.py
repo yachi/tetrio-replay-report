@@ -83,6 +83,7 @@ class Replays:
     `technique_page.TechniqueSite`'s own functions, so a case link here is computed by the same rule."""
     _replay_round = TP.TechniqueSite._replay_round
     replay_href = TP.TechniqueSite.replay_href
+    video_link = TP.TechniqueSite.video_link
 
     def __init__(self, repo):
         self._repo = repo
@@ -286,7 +287,7 @@ class DpcSite:
             setup = (Wd["unmatched"] if c["outcome"] != "matched"
                      else c["setups"][0] + (Wd["mirrored"] if c["mirrored"] else ""))
             spin = f'{Wd[c["spin"]]} {Wd["lines"].format(n=c["lines"])}'
-            out.append(f'    <tr data-case="{_esc(case_key(c))}"><td><a href="{_esc(href)}">{_esc(case_key(c))}</a></td>'
+            out.append(f'    <tr data-case="{_esc(case_key(c))}"><td><a href="{_esc(href)}">{_esc(case_key(c))}</a>{rp.video_link(c)}</td>'
                        f'<td>{c["pc_lines"]}</td><td>{c["pc_lock"] + 1}</td><td>{c["lock"] + 1}</td><td>{_esc(spin)}</td>'
                        f'<td>{c["garbage_rows"]}</td><td>{Wd["yes"] if c["verified"] else Wd["no"]}</td>'
                        f'<td>{_esc(setup)}</td><td>{Wd["none"] if c["next_pc"] is None else c["next_pc"] + 1}</td></tr>')

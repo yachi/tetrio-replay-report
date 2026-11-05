@@ -39,6 +39,7 @@ import os
 import re
 
 from pipeline import region
+from pipeline import video_links as VL
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAME = "routes-techniques"
@@ -177,7 +178,8 @@ def compute(facts, data):
                 tag(c["match"], p, "o", SHORT.get(r.name, r.name))
             first = min(mine, key=lambda c: (c["match"], c["round"]))
             row["cells"][p] = {"cases": len(mine), "reach": reach, "pc": pcs,
-                               "first": f"m{first['match']}r{first['round']}"}
+                               "first": f"m{first['match']}r{first['round']}",
+                               "video": VL.round_anchor(S, first["match"], first["round"], VTEXT)}
         routes.append(row)
 
     techs = []
@@ -214,12 +216,22 @@ def compute(facts, data):
                     "fired": len(mine) - sum(reasons.values()), "reasons": reasons,
                     "opener": op, "mid": len(mine) - op,
                     "shape_only": shape_only,
-                    "first": f"m{first['match']}r{first['round']}", "href": site.replay_href(first)}
+                    "first": f"m{first['match']}r{first['round']}", "href": site.replay_href(first),
+                    "video": _tech_video(site, first)}
             techs.append(row)
 
     return {"session": S, "players": players, "nrounds": nrounds, "routes": routes, "techs": techs,
             "strip": strip, "nmatch": len(facts["matches"]),
             "winners": [m.get("winner") for m in facts["matches"]]}
+
+
+VTEXT = " ▶ 影片"
+
+
+def _tech_video(site, h):
+    """The first hit's moment in the night's video, or '' (video_links.py)."""
+    a = site.video_link(h)
+    return a.replace(f">{VL.TEXT}</a>", f">{VTEXT}</a>") if a else ""
 
 
 def _route_cell(c, nrounds, session):
@@ -235,7 +247,7 @@ def _route_cell(c, nrounds, session):
     href = html.escape(f"{session}-replay.html#{c['first']}")
     return (f'<td class="mono"><b>{c["cases"]}</b> / {nrounds} 局<br>'
             f'<span class="rs-sub">{" → ".join(parts)}</span><br>'
-            f'<a class="rs-sub" href="{href}">睇第一局（{c["first"]}）</a></td>')
+            f'<a class="rs-sub" href="{href}">睇第一局（{c["first"]}）</a>{c.get("video", "")}</td>')
 
 
 def _tech_cell(c, spin, payoff):
@@ -254,7 +266,7 @@ def _tech_cell(c, spin, payoff):
             + "</span>")
     href = html.escape(c["href"])
     return (f'<td class="mono"><b>{c["hits"]}</b>{den}<br><span class="rs-sub">{sub}</span>{miss}{shape}<br>'
-            f'<a class="rs-sub" href="{href}">睇第一次（{c["first"]}，落 T 之前）</a></td>')
+            f'<a class="rs-sub" href="{href}">睇第一次（{c["first"]}，落 T 之前）</a>{c.get("video", "")}</td>')
 
 
 def section(d):

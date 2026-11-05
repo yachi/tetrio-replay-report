@@ -55,7 +55,7 @@ def _root(session):
 
 sys.path.insert(0, str(REPO))
 from pipeline import docs_gate, forecast_pooled, replay_page, replay_section, route_page  # noqa: E402
-from pipeline import dpc_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page  # noqa: E402
+from pipeline import dpc_page, replay_labels, replay_links, secondpc_page, section_anchors, technique_page, video_links  # noqa: E402
 from pipeline.sites import INDEX_ROUTE_SITES, TECHNIQUE_SITES  # noqa: E402
 
 # (session dir, artefact subdir, output name, label, blurb)
@@ -426,7 +426,8 @@ def main(argv=None):
             facts = json.loads((src.parent / "facts.json").read_text(encoding="utf-8"))
             linked, lk = replay_links.link_report(src.read_text(encoding="utf-8"), session,
                                                   replay_links.rounds_of(facts),
-                                                  replay_links.files_of(facts))
+                                                  replay_links.files_of(facts),
+                                                  video_links.for_session(session))
         # Every published report, a subset's included, then has each section's big title linked to
         # its own section (section_anchors.py); report.html itself is untouched.
         page = section_anchors.anchor(linked if linked is not None else src.read_text(encoding="utf-8"))

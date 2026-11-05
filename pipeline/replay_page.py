@@ -45,6 +45,7 @@ import sys
 from pipeline import replay_labels as RL
 from pipeline import replay_section as RS
 from pipeline import skeleton
+from pipeline import video_links as VL
 
 PAGE_JS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "replay_page.js")
 PAGE_DATA_ID = "rpg-data"
@@ -54,6 +55,8 @@ SHARED = ("session", "shapes", "width", "rows", "visible", "next", "flag_words")
 
 # The chart's own wording. Named so `audit` demands it: deleting the 「not 食」 half is the edit
 # that turns a queued-attack chart into a received-garbage one without changing a pixel.
+VIDEO_NOTE = ("影片時間係將每局 replay 長度對齊直播畫面推出嚟，大約啱，連結會早幾秒開始；"
+              "影片唔屬於信任鏈，亦唔係模擬器")
 CHART_TITLE = "射埋（對手射過嚟、抵銷之前）"
 CHART_SOURCE = ("呢幅圖<strong>唔係模擬器出嚟</strong>：每一級係 replay 記錄嘅一次攻擊事件"
                 "（<code>facts.json</code> 嘅 <code>garbage_events</code>，兩個 parser 都抽到），"
@@ -136,6 +139,7 @@ BASE_CSS = """
   .rpg-round .rpg-star { color: var(--pending); }
   .rpg-now { margin: 1.2rem 0 .2rem; font-size: 1.05rem; font-weight: 800; }
   .rpg-notes { font-size: .82rem; color: var(--ink-secondary); margin: 0; }
+  .rpg-video { font-size: .82rem; color: var(--ink-secondary); margin: .2rem 0 0; }
   .rpg-flag { font-size: .85rem; font-weight: 700; color: var(--rp-bad); margin: .3rem 0 0; }
   .rpg-flag[hidden] { display: none; }
   .rpg-missing { font-size: .85rem; color: var(--rp-bad); margin: .4rem 0 0; }
@@ -264,7 +268,17 @@ def render(data, facts, report_href, labels=None):
     users = list(facts["players"])
     session = shared["session"]
     esc = html.escape
-    blob = json.dumps({"shared": shared, "rounds": rounds, "default": default},
+    video = VL.for_session(session)
+    vblob = None
+    if video is not None:
+        # Each round's start in the video (video_links.py); the page adds the playhead to it.
+        for r in rounds:
+            mo = re.fullmatch(r"m(\d+)r(\d+)", r["label"])
+            s0 = video.starts.get((int(mo.group(1)), int(mo.group(2))))
+            _need(s0 is not None, f"{r['label']}: video.json has no start for this round")
+            r["vs"] = s0
+        vblob = {"url": video.url, "lead": video.lead, "fps": VL.FPS}
+    blob = json.dumps({"shared": shared, "rounds": rounds, "default": default, "video": vblob},
                       ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     with open(PAGE_JS, encoding="utf-8") as fh:
         page_js = fh.read().rstrip()
@@ -321,6 +335,8 @@ def render(data, facts, report_href, labels=None):
         f'  <section id="{RS.SECTION_ID}" aria-labelledby="rpg-now">',
         '    <h2 class="rpg-now" id="rpg-now" aria-live="polite"></h2>',
         '    <p class="rpg-notes"></p>',
+        *([f'    <p class="rpg-video"><a class="rpg-video-a" target="_blank" rel="noopener" '
+           f'href="{esc(video.url)}">▶ 喺直播影片睇呢一刻</a>（{VIDEO_NOTE}）</p>'] if video else []),
         f'    <p class="rpg-labels" hidden>{RL.LINKS_LEAD}</p>',
         f'    <p class="rpg-flag" hidden>{RS.FLAG_WORDS}</p>',
         '    <p class="rpg-missing" hidden>呢個連結指住嘅局唔存在，而家顯示緊預設嗰局。</p>',

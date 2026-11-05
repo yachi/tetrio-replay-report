@@ -51,6 +51,7 @@ from pipeline import replay_page as RP
 from pipeline import replay_section as RS
 from pipeline import route_page as RT
 from pipeline import video_examples as VE
+from pipeline import video_links as VL
 from pipeline.claims.build_claims import SIMPLIFIED
 
 HERE, REPO = RT.HERE, RT.REPO
@@ -327,12 +328,18 @@ class TechniqueSite:
               for ri, fr in enumerate(m["rounds"]) if fr["index"] == round_index0]
         self._need(len(at) == 1, f"{session} {file} round {round_index0}: {len(at)} rounds in facts.json")
         pl = RS.round_payload(data, facts, *at[0])
-        locks = {}
+        locks, frames = {}, {}
         for p in pl["players"]:
+            t, fr = 0, []
+            for lk in p["locks"]:
+                t += lk[0]
+                fr.append(t)
+            frames[p["user"]] = fr
             dec = RS.decode_boards(data, pl["seq"], p["locks"], RS.NEXT_SHOWN)
             locks[p["user"]] = [(piece, len(full), lk[3]) for lk, (piece, full, _b) in zip(p["locks"], dec)]
         rounds[key] = {"label": pl["label"], "order": pl["order"],
-                       "users": [p["user"] for p in pl["players"]], "locks": locks}
+                       "users": [p["user"] for p in pl["players"]], "locks": locks,
+                       "frames": frames}
         return rounds[key]
 
     def _round_boards(self, h):
@@ -397,7 +404,7 @@ class TechniqueSite:
             ck, rnd = case_key(h), f"m{h['match']}r{h['round']}"
             out += [f'    <div data-showcase="{_esc(ck)}">',
                     f'    <h3>{_esc(SC["case"].format(date=h["session"], round=rnd, player=h["player"], lock=h["lock"], followup=h["followup"]["lock"]))}'
-                    f'（<a href="{_esc(self.replay_href(h))}">{_esc(SC["link"])}</a>）</h3>',
+                    f'（<a href="{_esc(self.replay_href(h))}">{_esc(SC["link"])}</a>{self.video_link(h)}）</h3>',
                     '    <div class="scp-grid">']
             for words, rows in zip(SC["moments"], self.showcase_moments(h)):
                 out.append(f'    <div class="scp-node"><h4 class="scp-name">{_esc(words)}</h4>'
@@ -438,6 +445,17 @@ class TechniqueSite:
         mine = [n for n, s in enumerate(r["order"]) if s == slot]
         self._need(0 <= h["lock"] < len(mine), f"{case_key(h)}: lock {h['lock']} is past the round's locks")
         return f'{h["session"]}-replay.html#{r["label"]}@p{mine[h["lock"]]}'
+
+    def video_link(self, h):
+        """The hit's moment in the night's video (video_links.py), as a link, or '' when the night has no
+        video. The moment is the hit player's T lock, on the replay's own clock."""
+        v = VL.for_session(h["session"], self._repo)
+        if v is None:
+            return ""
+        r = self._replay_round(h["session"], h["file"], h["round_index0"])
+        fr = r["frames"][h["player"]]
+        self._need(0 <= h["lock"] < len(fr), f"{case_key(h)}: lock {h['lock']} is past the round's locks")
+        return VL.anchor(v.moment_url(h["match"], h["round"], fr[h["lock"]]))
 
     def audit_replay_links(self, page, tr, art):
         """Every case row's link, read back from the replay side: the position's next step must be the hit
@@ -745,7 +763,7 @@ class TechniqueSite:
             fw = T["yes"].format(lock=fu["lock"]) if fu["fired"] else PR["reasons"][fu["reason"]]
             href = self.replay_href(h)
             cases.append(f'    <tr data-case="{_esc(case_key(h))}"><td>{_esc(h["session"])}</td>'
-                         f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a></td><td>{_esc(h["player"])}</td>'
+                         f'<td><a href="{_esc(href)}">m{h["match"]}r{h["round"]}</a>{self.video_link(h)}</td><td>{_esc(h["player"])}</td>'
                          f'<td>{h["lock"]}{_esc(T["mirrored_mark"]) if h["mirrored"] else ""}</td>'
                          f'<td>{_esc(T["phase_opener"] if h["in_opener"] else T["phase_mid"])}</td>'
                          f'<td>{self._thumb(tr, v, h)}</td><td>{_esc(fw)}</td>'

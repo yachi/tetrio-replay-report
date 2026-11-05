@@ -34,6 +34,7 @@ import sys
 
 from pipeline import replay_page as RP
 from pipeline import replay_section as RS
+from pipeline import video_links as VL
 from pipeline import route_page as RT
 from pipeline.claims.build_claims import SIMPLIFIED
 from pipeline.dpc_page import Replays
@@ -168,7 +169,8 @@ class SecondPcSite:
             what = Wd[c["outcome"]] + (" " + "、".join(c["solutions"] or c["setups"]) if c["setups"] else "")
             # The round only: the audited case link, with its position, is the row's below.
             href = f'{c["session"]}-replay.html#m{c["match"]}r{c["round"]}'
-            out.append(f'    <div class="scp-node"><h4 class="scp-name"><a href="{_esc(href)}">{_esc(case_key(c))}</a></h4>'
+            out.append(f'    <div class="scp-node"><h4 class="scp-name"><a href="{_esc(href)}">{_esc(case_key(c))}</a>'
+                       f'{VL.round_anchor(c["session"], c["match"], c["round"])}</h4>'
                        f'{board_svg(draw_rows(c["layout"]), case_key(c), RT.PIECE_CLASS)}'
                        f'<p class="scp-tag">{_esc(what)}</p></div>')
         out += ["    </div>", '    <div class="scp-index-wrap"><table class="scp-table">',
@@ -176,7 +178,8 @@ class SecondPcSite:
                                      ("case", "prev_pc_lines", "pieces_before", "pc_lock", "verified", "outcome")) + "</tr>"]
         for c in art["cases"]:
             href = rp.replay_href({**c, "lock": c["first_lock"]})
-            out.append(f'    <tr data-case="{_esc(case_key(c))}"><td><a href="{_esc(href)}">{_esc(case_key(c))}</a></td>'
+            out.append(f'    <tr data-case="{_esc(case_key(c))}"><td><a href="{_esc(href)}">{_esc(case_key(c))}</a>'
+                       f'{rp.video_link({**c, "lock": c["first_lock"]})}</td>'
                        f'<td>{c["prev_pc_lines"]}</td><td>{c["pieces_before"]}</td><td>{c["pc_lock"] + 1}</td>'
                        f'<td>{Wd["yes"] if c["verified"] else Wd["no"]}</td><td>{_esc(Wd[c["outcome"]])}</td></tr>')
         out += ["    </table></div>", "  </section>"]
