@@ -9,9 +9,10 @@
   "title": "vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】",
   "duration_s": 1625.77,
   "players": {
-   "L": "一、一",
+   "L": "kazu",
    "R": "syakegohan"
   },
+  "player_names_note": "yachi asked for the left player to be named kazu (2026-11-05); the in-game name shown on the board is 一、一",
   "pieces": "both players are dealt the same piece sequence",
   "fetched": "2026-11-05, 720p MP4 through www.snapyt.app (force_download fmt=2; yt-dlp is refused in this sandbox)",
   "file": {

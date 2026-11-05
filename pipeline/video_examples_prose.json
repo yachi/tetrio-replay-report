@@ -17,7 +17,7 @@
     "new": "目錄冇嘅形（全消後六秒內）",
     "late": "全消後超過六秒先打（多數唔係 DPC）"
   },
-  "side": {"L": "左（一、一）", "R": "右（syakegohan）"},
+  "side": {"L": "左（kazu）", "R": "右（syakegohan）"},
   "spin": {"1": "TSS", "2": "TSD", "3": "TST"},
   "mirrored": "鏡像",
   "reasons": {
