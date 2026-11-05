@@ -464,6 +464,9 @@ python3 -m pipeline.openers.extract_secondpc_setups --selftest #   its mutants; 
 bun pipeline/sim/emit-secondpc-facts.ts --out analysis/secondpc-facts.json  # a PC straight into a 4-line PC, against those setups (quarantined)
 bun test pipeline/openers/secondpc.test.ts       #   byte rebuild, the allclear anchor (= dpc-facts'), every drawn solution, named list + mutants
 python3 -m pipeline.secondpc_page --selftest     # the docs/secondpc.html audit's mutants (--out-dir <dir> renders)
+python3 -m pipeline.openers.check_video_examples            # CI gate: the 影片實戰例子 boards and verdicts (both ? readings)
+python3 -m pipeline.openers.check_video_examples --selftest #   its mutants; python3 -m pipeline.video_examples --selftest the section audit's
+bun test pipeline/openers/video-examples.test.ts           #   key cells and whole shapes against each page's own qualify module
 bun pipeline/sim/emit-route-orders.ts --opener sdpcspin \
   --out analysis/sdpcspin-orders.json                           # which dealt orders build each SDPC Spin node (constructed, quarantined)
 bun pipeline/sim/emit-route-orders-cc.ts --opener sdpcspin \
@@ -5731,6 +5734,26 @@ both mutation suites on the schedule; `lean` installs Lean by sha256 (GitHub's a
 authority) and runs `lean/check.sh`, with `lean/mutate.sh` on the schedule. A bare `lake build` fails
 on a clean checkout because `RouteOrders/Generated/` is gitignored — always `bash lean/check.sh`.
 Run Dafny and Lean one at a time: the Dafny mutants' limits are wall-clock.
+
+## 影片實戰例子 — boards read off one match video, drawn beside the source drawings
+
+`pipeline/openers/video-examples.json` holds 49 boards read off kazu's PPT2 video `Pjn05duM_gQ` (720p via snapyt,
+sha256 in `source`; palette sampling, the last frame before each line-clear flash, an unmatched cell read `?`), the
+Perfect Clear times, and the examples filed per page: every T-spin whose board a technique page's whole drawn shape
+stands on (`technique_examples`, with the page's own key cells and a verdict) and the first T-spin after each PC
+(`dpc_examples`, compared with とんぼ's catalogue the way `dpc-facts.ts` compares). yachi asked for them all
+(2026-11-05). `pipeline/video_examples.py` draws them as a 「影片實戰例子」 section on `docs/dpc.html` and on each
+technique page that has one, every card linked to the video three seconds early; the page audits require the
+section's sentences and each example exactly once. **They are not corpus data and are in no count, window or
+agreement set** — nobody in the corpus played these games, and the section says so.
+
+What the video cannot give is piece ownership, so 「built」 is an APPROXIMATION and the section says that too: a key
+cell whose same-colour connected region is not a multiple of four is a fragment, and a PC within 7 s either side
+stands for 14 locks. `pipeline/openers/check_video_examples.py` re-derives every verdict and DPC field with each `?`
+read empty AND filled (an example is filed only when both agree), and `--selftest` plants its mutants;
+`video-examples.test.ts` ties each `whole_board` to `technique-wholeshape.ts` and each `key_cells` to the page's own
+qualify module (`technique-qualify.ts`, or 欄干's and 社畜トレイン's `shapeOffsets`). Hand corrections to a read
+are `hand_reads` on the board and checked. Counts are read off the gate's output, never typed here.
 
 ## Front-end traps in report.html (each one shipped a silent bug)
 

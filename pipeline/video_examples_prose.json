@@ -1,0 +1,43 @@
+{
+  "title": "影片實戰例子",
+  "sentences": {
+    "source": "以下嘅棋盤由一條對戰影片逐格讀出嚟：「vs kazuさん 15先×2 Part1【ぷよぷよテトリス２】」，ぷよぷよテトリス２，兩邊派到同一串方塊。每個例子都連去影片嗰一刻（早三秒）。",
+    "quarantine": "呢啲例子唔係 corpus 數據：冇一局係呢度兩位玩家打嘅，冇一個數、一個主張或者一份報告計佢哋，上面嘅 window、整體形狀規則同 corpus 數全部冇郁過。",
+    "approx": "影片冇得話邊格屬邊粒方塊，所以「算唔算砌出嚟」係近似：一格嘅同色相連區域唔係四嘅倍數就當碎件，全消用前後七秒代替十四粒。",
+    "unread": "讀唔到顏色嘅格（閃光、粒子）畫成空格；每個判斷都試過當佢空同當佢有嘢，兩樣都一樣先收錄。"
+  },
+  "dpc_sentence": "DPC 例子係每次全消之後嗰個 player 第一下 T-spin，用 DPC 頁上面同一個比法（底下完整垃圾行剝走、形狀連 T 嘅格、正反兩手）同影片目錄比。",
+  "technique_head": {
+    "qualifies": "算砌出嚟",
+    "rejected": "形對到，但唔算砌出嚟"
+  },
+  "dpc_head": {
+    "matched": "對到目錄嘅 DPC",
+    "near": "差少少對到",
+    "new": "目錄冇嘅形（全消後六秒內）",
+    "late": "全消後超過六秒先打（多數唔係 DPC）"
+  },
+  "side": {"L": "左（一、一）", "R": "右（syakegohan）"},
+  "spin": {"1": "TSS", "2": "TSD", "3": "TST"},
+  "mirrored": "鏡像",
+  "reasons": {
+    "fragment": "關鍵格係碎件（畀消行切開咗）",
+    "garbage_in_shape": "關鍵格係垃圾行",
+    "shape_cell_empty": "關鍵格係空",
+    "z_not_one_piece": "企直嗰粒 Z 唔係同一粒",
+    "l_not_one_piece": "嗰粒 L 唔係同一粒",
+    "dpc": "全消前後七秒內（當 DPC）",
+    "kaidan_window": "階段のドネイト 嘅 window 喺同一粒 T 都對到（歸階段）"
+  },
+  "also": "同一粒 T 亦對到：",
+  "pages": {
+    "stsd": "STSD", "stmbcave": "STMB Cave", "imperialcross": "インペリアルクロス", "doubledagger": "ダブルダガー",
+    "btcannon": "BT砲", "cutcopy": "千鳥格子", "shachikutrain": "社畜トレイン", "parapet": "欄干",
+    "kaidan": "階段のドネイト", "dtcannon": "途中DT砲", "kingcrimson": "King Crimson"
+  },
+  "variants": {"uncut": "千鳥格子（harddrop 第二型）", "parapet_tss": "欄干（TSS）"},
+  "pc": "全消 {pc}，隔 {gap} 秒",
+  "pc_after": "打完即刻再全消",
+  "setups": "目錄：",
+  "link": "影片 {mmss}"
+}

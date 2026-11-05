@@ -1070,6 +1070,20 @@ jobs:
       - name: Check the Second PC page audit catches its corruptions
         run: python3 -m pipeline.secondpc_page --selftest
 
+      # 影片實戰例子: boards read off one match video (pipeline/openers/video-examples.json), drawn on
+      # the DPC page and on each technique page beside the source drawings, never in any count. The
+      # verdicts are re-derived here with every unread cell read empty AND filled; the TS half
+      # (pipeline/openers/video-examples.test.ts, in the whole-suite bun test) ties the key cells and
+      # whole-shape boards to each page's own qualify module and the corpus whole-shape rule.
+      - name: Check the video examples
+        run: python3 -m pipeline.openers.check_video_examples
+
+      - name: Check the video examples gate catches its mutants
+        run: python3 -m pipeline.openers.check_video_examples --selftest
+
+      - name: Check the video examples section audit catches its corruptions
+        run: python3 -m pipeline.video_examples --selftest
+
       # The site is rendered here and NOT committed (since 2026-10-23): every render-time audit
       # above runs again inside this build, the second render must reproduce the first byte for
       # byte, and the `deploy` job publishes exactly this upload once every job in this workflow

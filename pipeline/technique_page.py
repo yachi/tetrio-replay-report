@@ -50,6 +50,7 @@ from dataclasses import dataclass, field
 from pipeline import replay_page as RP
 from pipeline import replay_section as RS
 from pipeline import route_page as RT
+from pipeline import video_examples as VE
 from pipeline.claims.build_claims import SIMPLIFIED
 
 HERE, REPO = RT.HERE, RT.REPO
@@ -627,6 +628,8 @@ class TechniqueSite:
         out += parts[self.p.variant][1]
         for vid, _opp in self.VARIANTS[1:]:
             out += parts[vid][0] + parts[vid][1]
+        # the boards read off one match video, in a section of their own (pipeline/video_examples.py)
+        out += VE.section(self.p.prefix)
         out += ['  <section class="scp-sec">', f'    <h2>{_esc(S["demos"])}</h2>',
                 f'    <p><a href="{_esc(self.DEMO_PAGE)}">{_esc(S["demos_link"])}</a></p>', '  </section>']
         out += RT._tail({"figures": fig})
@@ -1132,7 +1135,8 @@ class TechniqueSite:
         return bad
 
     def audit_overview(self, page, tr, art):
-        bad = RP.audit_quarantine(page, self.OVERVIEW_REQUIRED, DATA_ID) + self.audit_text(page)
+        bad = (RP.audit_quarantine(page, self.OVERVIEW_REQUIRED, DATA_ID) + self.audit_text(page)
+               + VE.audit(page, self.p.prefix))
         boards = _BOARD.findall(page)
         if sorted(boards) != sorted(n["id"] for n in tr["nodes"]):
             bad.append(f"the overview does not draw every board exactly once ({len(boards)} drawn, {len(tr['nodes'])} boards)")
