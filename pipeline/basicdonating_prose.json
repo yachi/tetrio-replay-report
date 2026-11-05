@@ -89,7 +89,12 @@
     "q2.16.answer": "2ミノ 練習題 16：答案",
     "q2.17": "2ミノ 練習題 17",
     "q2.17.answer": "2ミノ 練習題 17：答案",
-    "nub.hd": "harddrop 嘅圖：T 個尖塞住下面個 Tetris 窿"
+    "nub.hd": "harddrop 嘅圖：T 個尖塞住下面個 Tetris 窿",
+    "tonbo.o": "とんぼ條片（0:46）：O 貼住右牆，填滿 TSD 清嘅兩行",
+    "tonbo.kaidan": "とんぼ條片（1:58）：階段ドネイト 範本圖",
+    "tonbo.kaidan_play": "とんぼ條片（2:01）：階段ドネイト 實戰",
+    "tonbo.st": "とんぼ條片（3:00）：ST積み 範本圖",
+    "tonbo.st_play": "とんぼ條片（3:05）：ST積み 實戰"
   },
   "derived_note": "我哋嘅讀法：原頁冇畫呢幅，係由圖推出嚟，gate 逐格核過。",
   "discrepancies": {
@@ -217,5 +222,8 @@
     }
   },
   "more_variants": {},
-  "external_note": "呢幅唔係原頁嘅圖，係 harddrop Shachiku_Train 頁嘅一幅（佢叫「Donation T-Spin Double」），我哋照有冇嘢抄落嚟；個版本已經喺社畜トレイン嘅轉錄度釘住，呢度唔再釘多次。"
+  "external_note": {
+    "harddrop": "呢幅唔係原頁嘅圖，係 harddrop Shachiku_Train 頁嘅一幅（佢叫「Donation T-Spin Double」），我哋照有冇嘢抄落嚟；個版本已經喺社畜トレイン嘅轉錄度釘住，呢度唔再釘多次。",
+    "tonbo": "呢幅唔係原頁嘅圖，係とんぼ條片「火力アップ！Tスピンのドネイトのコツ」（https://youtu.be/gLtNa3ZFIUw）入面嘅一格，由畫面逐格讀落嚟。範本圖冇畫 T，實戰嗰格 T 仲未落地，所以 T 係唯一填滿兩行嘅擺法。條片仲有幾幅 T-spin Single 嘅捐窿，呢版淨係計 TSD，所以冇收。"
+  }
 }

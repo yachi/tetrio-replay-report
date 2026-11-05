@@ -317,6 +317,38 @@ NODES = [
                 'cross_source.harddrop.drawn_t_not_fired, in occupancy only: every drawn cell c, C in the rows the TSD '
                 'clears, the T U',
      'rows': _b('---------- -----c---- ----cc---- CCCCCUUUCC CCCCCCUCCC cccccc-ccc cccccc-ccc cccccc-ccc')},
+    # ── external: とんぼ's video 「火力アップ！Tスピンのドネイトのコツ」, read off its frames (CROSS_SOURCE['tonbo']) ──
+    {'id': 'tonbo.o', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 46.5},
+     'label': 'とんぼ\'s video, the O clip: an O on the right wall fills the two rows the TSD clears over a well',
+     'reading': 'gameplay frame, in occupancy only: every drawn cell c, C in the rows the TSD clears, the T U (the '
+                'video shows the T falling, not locked; its cells are the placement that fills the two rows)',
+     'rows': _b('-cc--ccc-- CCUUUCCCCC CCCUCCCCCC ccccccccc- ccccccccc- ccccccccc- ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.kaidan', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 118},
+     'label': 'とんぼ\'s video, its 階段ドネイト template: a Z stood on end on the stairs\' last step',
+     'reading': 'the template diagram: grey stack c, C, the Z and O as drawn; the diagram draws no T, so the T U is '
+                'the one placement that fills two rows',
+     'rows': _b('-----oo--- -----oo--- CCCCCCUUUZ CCCCCCCUZZ ccccccccz- ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.kaidan_play', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 121},
+     'label': 'とんぼ\'s video, the 階段ドネイト template played',
+     'reading': 'gameplay frame, in occupancy only: every drawn cell c, C in the rows the TSD clears, the T U (the '
+                'placement that fills the two rows)',
+     'rows': _b('--cc------ cccccc---- ccccccc--- CCCCCCUUUC CCCCCCCUCC ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.st', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 180},
+     'label': 'とんぼ\'s video, its ST積み template: the S roofs the slot, the Z stood on end fills the two rows over '
+              'a well',
+     'reading': 'the template diagram: grey stack c, C, the S and Z as drawn; the diagram draws no T, so the T U is '
+                'the one placement that fills two rows',
+     'rows': _b('cccc-ss--- CCCCSSUUUZ CCCCCCCUZZ ccccccc-z- ccccccccc- ccccccccc- ccccccccc-')},
+    {'id': 'tonbo.st_play', 'kind': 'spin', 'external': 'tonbo', 'spin_piece': 'U', 'spin': 'TSD', 'lines': 2,
+     'source_board': {'video': 'gLtNa3ZFIUw', 't': 185},
+     'label': 'とんぼ\'s video, the ST積み template played',
+     'reading': 'gameplay frame, in occupancy only, its top row left out (the board is ten rows; the T is five rows '
+                'down): every drawn cell c, C in the rows the TSD clears, the T U',
+     'rows': _b('ccccc----- ccccccc--- ccccccc--- CCCCCCUUUC CCCCCCCUCC ccccccc-c- ccccccc-c- ccccccccc- ccccccccc-')},
 ]
 
 PAGE_ORDER = [n['id'] for n in NODES if not n.get('derived') and not n.get('external')]
@@ -372,6 +404,11 @@ DRAWINGS: list = [
     {'board': 'q2.15.answer', 't_cells': [[5, 4], [5, 5], [5, 6], [6, 5]], 'holes': [[7, 9]]},
     {'board': 'q2.16.answer', 't_cells': [[3, 4], [3, 5], [3, 6], [4, 5]], 'holes': [[5, 7], [5, 8], [5, 9]]},
     {'board': 'q2.17.answer', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'holes': [[4, 3], [4, 5], [4, 6]]},
+    {'board': 'tonbo.o', 't_cells': [[1, 2], [1, 3], [1, 4], [2, 3]], 'holes': [[3, 9]]},
+    {'board': 'tonbo.kaidan', 't_cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'holes': [[4, 9]]},
+    {'board': 'tonbo.kaidan_play', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'holes': [[5, 9]]},
+    {'board': 'tonbo.st', 't_cells': [[1, 6], [1, 7], [1, 8], [2, 7]], 'holes': [[3, 9]]},
+    {'board': 'tonbo.st_play', 't_cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'holes': [[5, 9]]},
 ]
 
 VARIANTS = [
@@ -408,6 +445,8 @@ OTHER_WINDOWS = {
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'one.s', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
         {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'q1.2.answer', 'cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': [False]},
+        {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'tonbo.kaidan', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [False]},
+        {'file': 'kaidan-technique.json', 'variant': 'kaidan', 'board': 'tonbo.kaidan_play', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [False]},
         {'file': 'parapet-technique.json', 'variant': 'parapet', 'board': 'one.l_a', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
         {'file': 'parapet-technique.json', 'variant': 'parapet_tss', 'board': 'one.l_a', 'cells': [[1, 2], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'variant': 'shachikutrain', 'board': 'q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
@@ -419,6 +458,26 @@ OTHER_WINDOWS = {
 
 CROSS_SOURCE = {
     'other_windows': OTHER_WINDOWS,
+    # とんぼ's video, read off its frames for the five external `tonbo` boards; the frames and the file are not committed
+    'tonbo': {
+        'video': 'gLtNa3ZFIUw', 'url': 'https://youtu.be/gLtNa3ZFIUw',
+        'title': '【テトリス初心者講座】火力アップ！Tスピンのドネイトのコツ', 'channel': 'とんぼ_テトリス初心者講座',
+        'duration_s': 248.8, 'fetched': '2026-11-05', 'via': 'snapyt force_download, 360p mp4',
+        'sha256': '8db5c67003a5812dfaae1f2dd6f687376a77607d18899572740a132eb08a704e', 'bytes': 8805480,
+        'boards': ['tonbo.o', 'tonbo.kaidan', 'tonbo.kaidan_play', 'tonbo.st', 'tonbo.st_play'],
+        'reading': 'each board read off one frame by palette sampling (about 11.45 px per cell) and checked by eye on '
+                   'an enlarged crop; no frame is committed and nothing re-reads them, so the hash is ours alone. The '
+                   'template diagrams draw no T and the gameplay frames show it before it locks, so each T is the one '
+                   'placement that fills two rows',
+        'not_transcribed': [
+            {'t': 72.5, 'what': 'the I clip', 'why': 'a T-spin Single donation; this page counts TSDs only'},
+            {'t': 204, 'what': 'the ハンバーガー積み template', 'why': 'its diagram and play (199.5 s) are T-spin '
+                                                                    'Single donations; this page counts TSDs only'},
+            {'t': 140, 'what': 'the よしひろ積み template', 'why': 'a T-spin Mini into a TSD, not one donation board'},
+            {'t': 50, 'what': 'the Z, S, L and J clips', 'why': 'each fades out before its T locks, so no frame '
+                                                              'shows the board with the T'},
+        ],
+    },
     'fires': [
         {'file': 'sdpcspin-routes.json', 'node': '3.first.cave', 'variant': 'rule', 'mirrored': False,
          'page': 'https://harddrop.com/wiki/SDPC_Spin',
@@ -550,6 +609,12 @@ def _check_external(data: dict, byid: dict) -> list[str]:
         if not n.get('external'):
             continue
         sb = n.get('source_board') or {}
+        if n['external'] == 'tonbo':
+            tb = data.get('cross_source', {}).get('tonbo') or {}
+            if (sb.get('video') != tb.get('video') or not 0 <= sb.get('t', -1) <= tb.get('duration_s', -1)
+                    or n['id'] not in tb.get('boards', []) or n['id'] in data['page_order']):
+                bad.append(f'external: {n["id"]} names no frame of the tonbo record\'s video, or is in the page order')
+            continue
         try:
             other = json.loads((TECHNIQUE_DIR / sb['file']).read_text())
             rec = other

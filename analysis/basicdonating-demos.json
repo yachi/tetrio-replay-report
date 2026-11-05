@@ -35,10 +35,10 @@
   "frames_per_input": 4
  },
  "inputs": {
-  "transcription_md5": "916649bb3b528a26d0ee457aafe84edd",
-  "planner_md5": "40b19ccd1c8e70da6d56116500d1993a",
+  "transcription_md5": "f277bbf2d26a3e5996cf06702acd1f62",
+  "planner_md5": "c2765800f2ef8bdeb096593d590c2e82",
   "emit_replay_md5": "8632b959c3070ed7ecaca300ca5b7314",
-  "classifier_md5": "327585a1e23b6e6763e6e79689437175"
+  "classifier_md5": "56e46ac4f1c2dc949bfad8f1138b33e5"
  },
  "board": {
   "width": 10,
@@ -486,7 +486,7 @@
   },
   {
    "node": "nub.hd",
-   "reason": "係 harddrop 嘅圖（原頁冇畫）：佢將地形、塞窿嘅 T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+   "reason": "係 harddrop 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
   },
   {
    "node": "one.l_a",
@@ -691,6 +691,26 @@
   {
    "node": "q2.9.answer",
    "reason": "TSD 企喺 q2.9 上面：地形有 42 格，唔係 4 嘅倍數：要消過行先砌得出，而呢個 planner 唔消行（係 planner 嘅限制，唔係砌唔出）"
+  },
+  {
+   "node": "tonbo.kaidan",
+   "reason": "係 tonbo 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+  },
+  {
+   "node": "tonbo.kaidan_play",
+   "reason": "係 tonbo 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+  },
+  {
+   "node": "tonbo.o",
+   "reason": "係 tonbo 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+  },
+  {
+   "node": "tonbo.st",
+   "reason": "係 tonbo 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
+  },
+  {
+   "node": "tonbo.st_play",
+   "reason": "係 tonbo 嘅圖（原頁冇畫）：佢將地形、捐嘅方塊、T 同之前嘅堆畫埋一幅，冇一幅淨係地形，冇地形可以砌"
   },
   {
    "node": "two.js_a",

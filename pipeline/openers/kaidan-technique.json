@@ -3131,6 +3131,56 @@
           ]
         },
         {
+          "file": "basicdonating-technique.json",
+          "board": "nodes.tonbo.kaidan",
+          "cells": [
+            [
+              2,
+              6
+            ],
+            [
+              2,
+              7
+            ],
+            [
+              2,
+              8
+            ],
+            [
+              3,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
+          "file": "basicdonating-technique.json",
+          "board": "nodes.tonbo.kaidan_play",
+          "cells": [
+            [
+              3,
+              6
+            ],
+            [
+              3,
+              7
+            ],
+            [
+              3,
+              8
+            ],
+            [
+              4,
+              7
+            ]
+          ],
+          "mirrored": [
+            false
+          ]
+        },
+        {
           "file": "btcannon-technique.json",
           "board": "cross_source.harddrop.drawn_t_not_fired[29]",
           "cells": [

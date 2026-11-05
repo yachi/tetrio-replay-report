@@ -580,7 +580,10 @@ class TechniqueSite:
                 bits.append(f'<p class="scp-tag">{_esc(PR["derived_note"])}</p>')
             if n.get("external"):
                 # opt-in: a board another site draws, transcribed into the file (千鳥格子's harddrop variant)
-                bits.append(f'<p class="scp-tag">{_esc(PR["external_note"])}</p>')
+                note = PR["external_note"]
+                if isinstance(note, dict):  # opt-in: one note per source (基本的なドネイト's harddrop and video boards)
+                    note = note[n["external"]]
+                bits.append(f'<p class="scp-tag">{_esc(note)}</p>')
             if nid in disc:
                 bits.append(f'<p class="scp-tag">{_esc(PR["discrepancies"][disc[nid]])}</p>')
             bits.append("</div>")

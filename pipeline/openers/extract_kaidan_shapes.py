@@ -532,6 +532,8 @@ OTHER_WINDOWS = {
         {'file': 'basicdonating-technique.json', 'board': 'nodes.one.s', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [True]},
         {'file': 'basicdonating-technique.json', 'board': 'nodes.q1.1.answer', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [False]},
         {'file': 'basicdonating-technique.json', 'board': 'nodes.q1.2.answer', 'cells': [[4, 6], [4, 7], [4, 8], [5, 7]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'board': 'nodes.tonbo.kaidan', 'cells': [[2, 6], [2, 7], [2, 8], [3, 7]], 'mirrored': [False]},
+        {'file': 'basicdonating-technique.json', 'board': 'nodes.tonbo.kaidan_play', 'cells': [[3, 6], [3, 7], [3, 8], [4, 7]], 'mirrored': [False]},
         {'file': 'btcannon-technique.json', 'board': 'cross_source.harddrop.drawn_t_not_fired[29]', 'cells': [[4, 3], [4, 4], [4, 5], [5, 4]], 'mirrored': [True]},
         {'file': 'shachikutrain-technique.json', 'board': 'nodes.u2.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
         {'file': 'shachikutrain-technique.json', 'board': 'nodes.t3.spin', 'cells': [[2, 1], [2, 2], [2, 3], [3, 2]], 'mirrored': [False]},
