@@ -236,7 +236,8 @@ def speed_scatter(ctx):
             apm_txt = f"兩個人全晚 APM 一樣（{apm_s[0]}）"
         else:
             apm_txt = (f"兩樣乘埋，全晚 APM 係 {pname(ctx, 0)} {apm_s[0]} 對 "
-                       f"{pname(ctx, 1)} {apm_s[1]}，{pname(ctx, more)} 高啲")
+                       f"{pname(ctx, 1)} {apm_s[1]}（成晚攻擊 ÷ 成晚時間，唔係每局平均），"
+                       f"{pname(ctx, more)} 高啲")
             if fast is not None and heavy is not None and fast != heavy:
                 apm_txt += ("：快嗰個" + ("補得返" if more == fast else "冇補得返") + "輕")
         sents.append(apm_txt)
@@ -252,8 +253,7 @@ def speed_scatter(ctx):
                      and won_hi[i][1] * won_n[i][0] > won_hi[i][0] * won_n[i][1] for i in (0, 1))
         tail = ("。兩個人都係實心點比空心點多喺高位，即係同一個人入面，贏輸同直軸（APP）有關。"
                 if higher else "。今晚唔係兩個人都係實心點較多喺高位。")
-        note.append("同一個人入面比：" + "；".join(within) + tail
-                    + "呢個係相關，唔係因果：輸家最後幾粒係頂住壓力落嘅，本身就會拉低嗰局嘅 APP。")
+        note.append("同一個人入面比：" + "；".join(within) + tail)
     sk = [f"{pname(ctx, i)} {skipped[i]} 局" for i in (0, 1) if skipped[i]]
     note.append("菱形係全晚合計（攻擊總數 ÷ 方塊總數，方塊總數 ÷ 總時間），包埋所有局。"
                 + (f"落少過 {MIN_PIECES} 粒嘅局冇畫點（{'、'.join(sk)}），"
@@ -364,8 +364,6 @@ def round_strip(ctx):
     tie_txt = (f"有 {ties} 局兩個人 APP 一樣（或者有人一粒都冇落），唔計入分母。" if ties else "")
     note = ("<b>點睇：</b>顏色同方向夾唔夾：向上而且係 "
             f"{pname(ctx, 0)} 色、向下而且係 {pname(ctx, 1)} 色，就係 APP 高嗰個贏。"
-            "空心嗰幾條係例外，值得返去睇返嗰局。" + tie_txt
-            + "APP 高同贏局係相關，唔係因果：輸家最後幾粒係頂住壓力落嘅，"
-              "本身就會拉低佢嗰局嘅 APP，所以「APP 高所以贏」同「贏緊所以 APP 高」兩樣都有份。")
+            "空心嗰幾條係例外，值得返去睇返嗰局。" + tie_txt)
     return block("逐局 APP 差", "每粒攻擊 · 逐局", lede + legend + chart + "".join(figs), note,
                  block_id="strip")

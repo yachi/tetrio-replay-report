@@ -170,16 +170,11 @@ def build(facts, report_dir):
                     '      </div>']
     out.append('    </div>')
     if n_rec:
-        out.append('    <p class="vd-note"><strong>虛線嗰場冇 replay</strong>，影片有、'
-                   '匯出嘅檔案冇。佢每局邊個贏，係由 TETR.IO 局與局之間嗰個比數畫面讀出嚟，'
-                   '最後一局睇結束畫面。<strong>呢場唔計入呢份戰報任何一個數</strong>：'
-                   '比數、局數、每粒攻擊、claim 同 ✓ 全部淨係由 replay 嚟，'
-                   '所以上面同下面講嘅「成晚」都唔包佢；m 後面個號亦係 replay 嘅次序，'
-                   '佢之後嗰幾場喺當晚其實係遲一場打嘅。</p>')
-    out.append('    <p class="vd-note">時間點係咁對出嚟：每個 replay 記低咗場波幾時完，'
-               '再用 replay 自己每局嘅長度倒推返去，每局開始都對準影片入面倒數完、'
-               '兩塊板仲係空嘅最後一格（每秒睇 4 格），每局都對得到，相差唔夠 1 秒。'
-               '呢個係由影片畫面對出嚟，唔係由 replay 證出嚟，所以冇 claim 亦冇 ✓。</p>')
+        out.append('    <p class="vd-note"><strong>虛線嗰場冇 replay</strong>，每局邊個贏係由 TETR.IO '
+                   '局與局之間嘅比數畫面讀出嚟。<strong>呢場唔計入呢份戰報任何一個數</strong>；'
+                   'm 後面個號係 replay 嘅次序，佢之後嗰幾場當晚其實遲一場打。</p>')
+    out.append('    <p class="vd-note">時間點係用 replay 每局嘅長度對返影片畫面得出嚟，每局相差唔夠 1 秒；'
+               '係影片對出嚟，唔係 replay 證出嚟，所以冇 claim 亦冇 ✓。</p>')
     out += ['  </div>', '</section>']
     markup = "\n".join(out)
     bad = sorted(set(markup) & SIMPLIFIED)

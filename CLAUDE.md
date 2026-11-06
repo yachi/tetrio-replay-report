@@ -4079,8 +4079,8 @@ prefix; per technique variant, the hits over the night's scored TSDs (`opener-fa
 how many reached the page's next step, the worded reasons the rest did not (`REASON`; an unknown code is
 a build error) and opener against mid-game; and a per-match strip. Every cell links to the replay
 moment. A technique whose artefact carries `qualify` (all nine since 2026-10-23) counts ONLY the hits that pass its build
-rules — in the table, the per-match strip and 數據對決's chart (`routes_techniques_charts.py`) alike — and
-prints the shape-only hits beside them as 「另外 N 次個形對到但唔算砌出嚟」, so a night's window hits are never
+rules — in the table and the per-match strip alike (數據對決's two bar panels of the same cells were dropped on 2026-11-06) — and
+prints the shape-only hits beside them as 「另外 N 次形似但唔算」 (worded once in the table's note; a technique or opener both players left at zero is named in one line under its table, not drawn as a row, since 2026-11-06), so a night's window hits are never
 read as the technique played (the first pass printed the qualify count UNDER the raw hits, and the chart and
 strip kept showing the raw ones). No win rate, the 全消 rule. Same tier as the four sections below the footer — no claim id, no ✓
 — and it sits early only because 建議 cites it.
@@ -5983,9 +5983,9 @@ report 重 render 全部照綠,因為佢出嘅嘢一個 byte 都冇變。`foreca
 被記錄、唔可以被 enforce:一條規則住喺六個地方就有六個 site,而佢哋一致與否冇嘢守住。全部
 consolidate 之後七份 artefact、七份 report 同 ledger **全部 byte-identical**,呢個就係 control。
 
-一次 sweep 行晒全部 session,行到 **<!--round:figures-->71634<!--/round:figures--> 個
-quantized figure、<!--round:sites-->94<!--/round:sites--> 對 (site, helper)**:
-<!--round:enforced-->70<!--/round:enforced--> 個有 corpus 撐住,
+一次 sweep 行晒全部 session,行到 **<!--round:figures-->71414<!--/round:figures--> 個
+quantized figure、<!--round:sites-->90<!--/round:sites--> 對 (site, helper)**:
+<!--round:enforced-->66<!--/round:enforced--> 個有 corpus 撐住,
 <!--round:ontrust-->24<!--/round:ontrust--> 個至少有一對規則分唔開。四個 `_pct` 兩個方向都靠信,
 而且係**結構性**咁靠信 —— 餵入去嘅 per-mille 已經 floor 咗,所以第二次 quantize 係精確嘅,
 條規則永遠行使唔到:呢五對唔會因為多幾個 session 而變。

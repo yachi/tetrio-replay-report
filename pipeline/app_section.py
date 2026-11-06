@@ -102,10 +102,10 @@ EYEBROW = "每粒攻擊 · ATTACK PER PIECE"
 TITLE = "每粒攻擊"
 LEDE = ("每粒攻擊（APP）＝攻擊行數 ÷ 落咗嘅方塊數。快唔快睇 PPS，重唔重睇 APP，"
         "兩樣乘埋先係 APM。下面每個數都係由 facts.json 直接計出嚟；"
-        "淨係有 ✓ 嗰啲先係證明咗嘅 claim，其餘係量度，唔係證明。")
-CORPUS_DIVIDER = ("下面兩格量嘅係成個 corpus（截至呢晚為止嘅每個 session），唔係證明。"
-                  "APP 高同贏局係有相關，唔係因果：輸家最後嗰幾粒係頂住壓力落嘅，"
-                  "本身就會拉低佢嘅 APP。")
+        "淨係有 ✓ 嗰啲先係證明咗嘅 claim，其餘係量度，唔係證明。"
+        "成節讀嘅時候記住一樣嘢：輸家最尾幾粒係頂住垃圾落嘅，APP 自然低啲，"
+        "所以 APP 高同贏係一齊出現，唔等於 APP 高就一定贏。")
+CORPUS_DIVIDER = "下面兩格量嘅係成個 corpus（截至呢晚為止嘅每個 session），唔係證明。"
 
 CSS = """<style>
 /* ---------- 每粒攻擊 (generated) ---------- */
@@ -125,6 +125,8 @@ CSS = """<style>
 #app .ap-body { display: grid; gap: .8rem; min-width: 0; }
 #app .ap-note { margin: 0; font-size: .8rem; line-height: 1.8; color: var(--muted);
   border-top: 1px solid var(--border); padding-top: .6rem; }
+#app .ap-corpus { display: grid; gap: 1.4rem; }
+#app .ap-corpus > summary { cursor: pointer; font-size: .9rem; color: var(--muted); }
 #app .ap-divider { margin: .6rem 0 0; font-size: .88rem; line-height: 1.8;
   color: var(--ink-secondary); max-width: 68ch; }
 #app .ap-p1 { color: var(--ap-c1); font-weight: 700; }
@@ -261,8 +263,11 @@ def render(ctx):
            '    <div class="ap-blocks">']
     out += [b for b in session_blocks if b]
     if corpus_blocks:
+        # Reference, not tonight: folded so the section reads as the night's blocks first.
+        out.append('<details class="ap-corpus"><summary>成個 corpus 嘅參考（兩格，撳開）</summary>')
         out.append(f'<p class="ap-divider">{html.escape(CORPUS_DIVIDER)}</p>')
         out += corpus_blocks
+        out.append('</details>')
     out += ['    </div>', '  </div>', '</section>']
     body = "\n".join(out)
     check_glyphs(body, "每粒攻擊 (pipeline/app_section.py)")

@@ -220,16 +220,9 @@ def build(facts, report_dir):
                    + '<strong>成晚一個全消都冇</strong>，所以個表冇佢嗰行——'
                      '呢節每個數都要有一條 claim 證住，冇 claim 就唔會攞個 0 出嚟充數。</p>')
     out.append('    <p class="pc-note">'
-               f'讀呢個表要記住三樣嘢。一，<strong>樣本細</strong>：成晚得 {n_rounds} 局，'
-               '每個人有全消嘅局數得單位數到十幾局，所以呢度全部寫「幾多局」，'
-               '<strong>唔寫百分比</strong>——三局嘅百分比睇落好肯定，其實乜都話唔到。'
-               '二，<strong>「全消次數」同「有全消嘅局」唔同</strong>：一局入面可以出多過一次全消，'
-               '所以左邊嗰欄大得過右邊嗰欄係正常，唔可以當成同一個數。'
-               '三，呢節講嘅係<strong>有冇</strong>出全消，'
-               '<strong>唔係幾時</strong>出——「打到第幾手先全消」嗰個問題靠模擬器答，'
-               '同呢節唔同來源，喺下面模擬器嗰節（同埋佢自己講明係未經第二個實作核對嘅）。'
-               '呢節嘅數全部出自 <code>facts.json</code> 嘅 <code>clears.allclear</code>，'
-               '由兩個獨立 parser 各自由 <code>.ttrm</code> 讀一次。</p>')
+               f'成晚得 {n_rounds} 局，每人有全消嘅局得單位數到十幾局，所以只寫局數，<strong>唔寫百分比</strong>。'
+               '一局可以出多過一次全消，所以「全消次數」會大過「有全消嘅局」。'
+               '幾時出全消係模擬器嘅數，喺下面模擬器嗰節。</p>')
     out += ['  </div>', '</section>']
     # This section's Cantonese is authored in this module, not in prose/*.json, so no loader's
     # glyph check reaches it — the same hole opener_section closes the same way. 净/实/约 have all
